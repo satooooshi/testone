@@ -59,6 +59,55 @@ const ExportCsv = () => {
             exportCsvStyles.event_export_form,
           )}>
           <p className={clsx(exportCsvStyles.mb_8, exportCsvStyles.sub_title)}>
+            社員データの出力
+          </p>
+          <div className={exportCsvStyles.duration_wrapper}>
+            <div
+              className={clsx(
+                exportCsvStyles.mb_8,
+                exportCsvStyles.date_select_wrapper,
+              )}>
+              <DatePicker
+                value={userDuration?.from}
+                onChange={(d) =>
+                  setUserDuration((prev) => ({ ...prev, from: d }))
+                }
+                label="開始日"
+                formatStyle={'medium'}
+              />
+            </div>
+            <div
+              className={clsx(
+                exportCsvStyles.mb_8,
+                exportCsvStyles.date_select_wrapper,
+              )}>
+              <DatePicker
+                value={userDuration?.to}
+                onChange={(d) =>
+                  setUserDuration((prev) => ({ ...prev, to: d }))
+                }
+                label="終了日"
+                formatStyle={'medium'}
+              />
+            </div>
+          </div>
+          <p
+            className={clsx(
+              exportCsvStyles.mb_8,
+              exportCsvStyles.annotation_text,
+            )}>
+            ※イベント参加数などを開始日で選択した日付以降、終了日で指定した日付以前でフィルタリングして出力されます
+          </p>
+          <div className={exportCsvStyles.download_button_wrapper}>
+            <Button
+              onClick={() => downloadUser(userDuration || {})}
+              colorScheme="green">
+              ダウンロード
+            </Button>
+          </div>
+        </div>
+        <div className={clsx(exportCsvStyles.form_wrapper)}>
+          <p className={clsx(exportCsvStyles.mb_8, exportCsvStyles.sub_title)}>
             イベントデータの出力
           </p>
           <div className={clsx(exportCsvStyles.duration_wrapper)}>
@@ -108,55 +157,6 @@ const ExportCsv = () => {
           <div className={exportCsvStyles.download_button_wrapper}>
             <Button
               onClick={() => downloadEvent(eventDuration || {})}
-              colorScheme="green">
-              ダウンロード
-            </Button>
-          </div>
-        </div>
-        <div className={exportCsvStyles.form_wrapper}>
-          <p className={clsx(exportCsvStyles.mb_8, exportCsvStyles.sub_title)}>
-            社員データの出力
-          </p>
-          <div className={exportCsvStyles.duration_wrapper}>
-            <div
-              className={clsx(
-                exportCsvStyles.mb_8,
-                exportCsvStyles.date_select_wrapper,
-              )}>
-              <DatePicker
-                value={userDuration?.from}
-                onChange={(d) =>
-                  setUserDuration((prev) => ({ ...prev, from: d }))
-                }
-                label="開始日"
-                formatStyle={'medium'}
-              />
-            </div>
-            <div
-              className={clsx(
-                exportCsvStyles.mb_8,
-                exportCsvStyles.date_select_wrapper,
-              )}>
-              <DatePicker
-                value={userDuration?.to}
-                onChange={(d) =>
-                  setUserDuration((prev) => ({ ...prev, to: d }))
-                }
-                label="終了日"
-                formatStyle={'medium'}
-              />
-            </div>
-          </div>
-          <p
-            className={clsx(
-              exportCsvStyles.mb_8,
-              exportCsvStyles.annotation_text,
-            )}>
-            ※イベント参加数などを開始日で選択した日付以降、終了日で指定した日付以前でフィルタリングして出力されます
-          </p>
-          <div className={exportCsvStyles.download_button_wrapper}>
-            <Button
-              onClick={() => downloadUser(userDuration || {})}
               colorScheme="green">
               ダウンロード
             </Button>

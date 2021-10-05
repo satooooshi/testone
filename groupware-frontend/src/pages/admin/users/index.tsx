@@ -55,6 +55,11 @@ const UserAdmin: React.FC = () => {
       name: 'ユーザー作成',
       href: '/admin/users/new',
     },
+    {
+      type: 'link',
+      name: 'CSV出力',
+      href: '/admin/csv',
+    },
   ];
   const onDeleteClicked = (user: User) => {
     if (
