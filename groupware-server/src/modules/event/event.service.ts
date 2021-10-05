@@ -42,12 +42,12 @@ export class EventScheduleService {
     }
   }
 
-  public async getCsv(query: { year: string; month: string }) {
-    const { year, month } = query;
-    const fromDate = new Date(`${year}-${month || 1}-1`);
-    const toDate = month
-      ? new Date(fromDate.getFullYear(), fromDate.getMonth() + 1, 0)
-      : new Date(`${year}-12-31`);
+  public async getCsv(query: { from: string; to: string }) {
+    const { from, to } = query;
+    const fromDate = new Date(from);
+    const toDate = from
+      ? new Date(to)
+      : new Date(`${new Date().getFullYear()}-12-31`);
     const csvFields = [
       { label: 'id', value: 'id' },
       { label: 'タイトル', value: 'title' },

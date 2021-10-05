@@ -39,6 +39,8 @@ export class UserService {
 
   public async getCsv(query: { fromDate: Date; toDate: Date }) {
     const { fromDate, toDate } = query;
+    console.log(fromDate);
+    console.log(toDate);
     const csvFields = [
       { label: 'id', value: 'id' },
       { label: 'メールアドレス', value: 'email' },
