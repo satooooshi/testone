@@ -40,7 +40,6 @@ const ExportCsv = () => {
       href: '/admin/csv',
     },
   ];
-  console.log('eventDuration', eventDuration);
 
   return (
     <LayoutWithTab

@@ -25,10 +25,13 @@ import { useAPIDeleteEvent } from '@/hooks/api/event/useAPIDeleteEvent';
 import { useAPIUpdateEvent } from '@/hooks/api/event/useAPIUpdateEvent';
 import Image from 'next/image';
 import noImage from '@/public/no-image.jpg';
+import { UserRole } from 'src/types';
+import { useAPIDownloadEventCsv } from '@/hooks/api/event/useAPIDownloadEventCsv';
 
 const EventDetail = () => {
   const router = useRouter();
-  const { id } = router.query;
+  const { id } = router.query as { id: string };
+  const { mutate: downloadEvent } = useAPIDownloadEventCsv();
   const [editModal, setEditModal] = useState(false);
   const [commentVisible, setCommentVisible] = useState(false);
   const [newComment, setNewComment] = useState<string>('');
@@ -116,6 +119,15 @@ const EventDetail = () => {
                 )}
               </div>
               <div className={eventDetailStyles.event_info_right}>
+                <div className={eventDetailStyles.join_event_wrapper}>
+                  {user?.role === UserRole.ADMIN && (
+                    <Button
+                      colorScheme={'green'}
+                      onClick={() => downloadEvent({ id, name: data.title })}>
+                      CSV出力
+                    </Button>
+                  )}
+                </div>
                 <span className={eventDetailStyles.event_title}>
                   {data.title}
                 </span>
