@@ -30,6 +30,7 @@ import ReactCrop from 'react-image-crop';
 import { dataURLToFile } from 'src/utils/dataURLToFile';
 import 'react-image-crop/dist/ReactCrop.css';
 import { useImageCrop } from '@/hooks/crop/useImageCrop';
+import { useHeaderTab } from '@/hooks/headerTab/useHeaderTab';
 
 type ModalState = {
   isOpen: boolean;
@@ -183,16 +184,8 @@ const CreateNewUser = () => {
       }
     },
   });
-  const tabs: Tab[] = useMemo(
-    () => [
-      {
-        type: 'link',
-        name: '管理画面へ',
-        href: '/admin/users',
-      },
-    ],
-    [],
-  );
+
+  const tabs: Tab[] = useHeaderTab({ headerTabType: 'newUser' });
 
   const toggleSelectedTag = (t: UserTag) => {
     const toggledTag = toggleTag(values.tags, t);

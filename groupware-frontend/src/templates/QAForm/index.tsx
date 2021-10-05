@@ -21,6 +21,7 @@ import MDEditor, { MDEditorProps } from '@uiw/react-md-editor';
 import { liteEditorPlugins } from 'src/utils/liteEditorPlugins';
 import MarkdownIt from 'markdown-it';
 import { useAuthenticate } from 'src/contexts/useAuthenticate';
+import { useHeaderTab } from '@/hooks/headerTab/useHeaderTab';
 
 type QAFormTypeProps = {
   question?: QAQuestion;
@@ -58,16 +59,11 @@ const QAForm: React.FC<QAFormTypeProps> = ({
   });
   const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
 
-  const tabs: Tab[] = [
-    {
-      onClick: () => setActiveTab(TabName.EDIT),
-      name: question ? '質問を編集' : '質問を作成',
-    },
-    {
-      onClick: () => setActiveTab(TabName.PREVIEW),
-      name: 'プレビュー',
-    },
-  ];
+  const tabs: Tab[] = useHeaderTab({
+    headerTabType: 'qaForm',
+    question,
+    setActiveTab,
+  });
 
   const headerTabName = useMemo(() => {
     switch (question?.type) {

@@ -55,6 +55,7 @@ import EditChatGroupMembersModal from '@/components/EditChatGroupMembersModal';
 import { useAPISaveChatGroup } from '@/hooks/api/chat/useAPISaveChatGroup';
 import { useAPIGetLastReadChatTime } from '@/hooks/api/chat/useAPIGetLastReadChatTime';
 import { useAPISaveLastReadChatTime } from '@/hooks/api/chat/useAPISaveLastReadChatTime';
+import { useHeaderTab } from '@/hooks/headerTab/useHeaderTab';
 
 type MentionState = {
   suggestions: MentionData[];
@@ -211,14 +212,11 @@ const ChatDetail = () => {
     return { plugins, MentionSuggestions };
   }, []);
 
-  const tabs: Tab[] = isSmallerThan768
-    ? [
-        {
-          name: 'ルーム一覧に戻る',
-          onClick: () => router.push('/chat', undefined, { shallow: true }),
-        },
-      ]
-    : [];
+  const tabs: Tab[] = useHeaderTab({
+    headerTabType: 'chatDetail',
+    router,
+    isSmallerThan768,
+  });
 
   const { mutate: uploadFiles } = useAPIUploadStorage({
     onSuccess: (fileURLs) => {

@@ -25,6 +25,7 @@ import { useAPIDeleteEvent } from '@/hooks/api/event/useAPIDeleteEvent';
 import { useAPIUpdateEvent } from '@/hooks/api/event/useAPIUpdateEvent';
 import Image from 'next/image';
 import noImage from '@/public/no-image.jpg';
+import { useHeaderTab } from '@/hooks/headerTab/useHeaderTab';
 
 const EventDetail = () => {
   const router = useRouter();
@@ -71,18 +72,10 @@ const EventDetail = () => {
     [user, data],
   );
 
-  const tabs: Tab[] = [
-    {
-      type: 'link',
-      name: '一覧に戻る',
-      href: 'list',
-    },
-    {
-      name: 'イベントを削除',
-      onClick: () => onDeleteClicked(),
-      color: 'red',
-    },
-  ];
+  const tabs: Tab[] = useHeaderTab({
+    headerTabType: 'eventDetail',
+    onDeleteClicked,
+  });
 
   const initialHeaderValue = {
     title: 'イベント詳細',
