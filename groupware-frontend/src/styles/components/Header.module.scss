@@ -1,0 +1,221 @@
+@import '../variables.scss';
+
+.header_and_tab_wrapper {
+  @media (max-width: 768px) {
+    position: fixed;
+    z-index: 50;
+    top: 0;
+  }
+}
+
+.header {
+  height: max(56px, 2.4vw);
+  width: 100%;
+  background: #f3f6fb;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+
+  @media (max-width: 768px) {
+    padding: 0 8px;
+    width: 100vw;
+    justify-content: center;
+    height: 8vh;
+  }
+  @media (max-width: 576px) {
+    width: 100vw;
+    justify-content: center;
+  }
+
+  @media (min-width: 768px) {
+    padding-left: 48px;
+    padding-right: 48px;
+  }
+}
+
+.header_top_wrapper {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.header_title {
+  font-size: 24px;
+  color: $dark_font_color;
+  font-weight: bold;
+  font-size: $middle_font_size;
+  @media (max-width: 576px) {
+    font-size: 18px;
+  }
+}
+
+.right_button_wrapper {
+  @media (max-width: 768px) {
+    margin-right: 8px;
+  }
+}
+
+.tab_wrapper {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  background: $white_color;
+  height: max(56px, 2.4vw);
+
+  @media (max-width: 1024px) {
+    width: 88vw;
+    height: 7vh;
+    padding: 0 10%;
+    overflow-x: scroll;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+  @media (max-width: 768px) {
+    width: 100vw;
+    height: 7vh;
+    padding: 0 10%;
+    overflow-x: scroll;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+
+  @media (min-width: 768px) {
+    padding-left: 48px;
+    padding-right: 48px;
+  }
+}
+
+.tab {
+  text-align: start;
+  margin-right: 32px;
+  font-size: $p_font_size;
+  font-weight: bold;
+  white-space: nowrap;
+  padding: 0 10px;
+
+  @media (max-width: 768px) {
+    margin-right: 16px;
+    font-size: 12px;
+  }
+  @media (max-width: 576px) {
+    margin-right: 8px;
+    font-size: 11px;
+  }
+}
+
+.tab__button {
+  height: inherit;
+}
+
+.tab__active {
+  color: $blue_color;
+}
+
+.tab__disable {
+  color: $dark_font_color;
+}
+
+.impressive_university_tab {
+  border-bottom: #3182ce 2px solid;
+}
+
+.study_meeting_tab {
+  border-bottom: #38a169 2px solid;
+}
+
+.bolday_tab {
+  border-bottom: #f6ad55 2px solid;
+}
+
+.coach_tab {
+  border-bottom: #90cdf4 2px solid;
+}
+
+.club_tab {
+  border-bottom: #f56565 2px solid;
+}
+
+.submission_etc_tab {
+  border-bottom: #086f83 2px solid;
+}
+
+.header_right_button {
+  background: $green_color;
+  height: 30px;
+  width: 150px;
+  @media (max-width: 768px) {
+    height: 24px;
+  }
+}
+
+.ham_icon {
+  width: 32px;
+  height: 32px;
+  color: $blue_color;
+  z-index: 99;
+  @media (min-width: 576px) {
+    width: 45px;
+    height: 45px;
+  }
+  @media (min-width: 768px) {
+    display: none;
+  }
+}
+
+.cancel_icon {
+  height: 30px;
+  width: 30px;
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  color: $blue_color;
+  z-index: 99;
+  @media (min-width: 768px) {
+    display: none;
+  }
+}
+
+.search_button {
+  position: fixed;
+  width: 8vh;
+  height: 8vh;
+  top: auto;
+  bottom: 24px;
+  right: 24px;
+  color: $white_color;
+  background: $blue_color;
+  border-radius: 100%;
+}
+
+.header_left {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  width: 50%;
+  justify-content: flex-start;
+}
+
+.header_right {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  width: 50%;
+  justify-content: flex-end;
+  @media (min-width: 320px) {
+    width: auto;
+  }
+}
+
+.logo_image {
+  width: 40px;
+  aspect-ratio: 1;
+  margin-right: 8px;
+}

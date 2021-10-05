@@ -1,0 +1,115 @@
+import {
+  Controller,
+  Get,
+  Req,
+  UseGuards,
+  Post,
+  Body,
+  Param,
+  Query,
+  BadRequestException,
+  Res,
+} from '@nestjs/common';
+import { User, UserRole } from 'src/entities/user.entity';
+import JwtAuthenticationGuard from '../auth/jwtAuthentication.guard';
+import RequestWithUser from '../auth/requestWithUser.interface';
+import { UserService } from './user.service';
+import UpdatePasswordDto from './dto/updatePasswordDto';
+import { Response } from 'express';
+
+export interface SearchQueryToGetUsers {
+  page?: string;
+  word?: string;
+  tag?: string;
+  sort?: 'event' | 'question' | 'answer';
+  role?: UserRole;
+  verified?: boolean;
+  duration?: 'month' | 'week';
+}
+
+export interface QueryToGetUserCsv {
+  from?: string;
+  to?: string;
+}
+
+@Controller('user')
+export class UserController {
+  constructor(private readonly userService: UserService) {}
+
+  @Get('csv')
+  @UseGuards(JwtAuthenticationGuard)
+  async getCsv(@Query() query: QueryToGetUserCsv, @Res() res: Response) {
+    const { from = new Date().toString(), to = new Date().toString() } = query;
+    if (!from && !to) {
+      throw new BadRequestException();
+    }
+
+    const fromDate = new Date(from);
+    const toDate = new Date(to);
+    const csv = await this.userService.getCsv({ fromDate, toDate });
+    res.setHeader('Content-Type', 'text/csv');
+    res.setHeader('Content-Disposition', 'attachment; filename=ueer.csv');
+
+    res.status(200).end(csv);
+  }
+
+  @Get('search')
+  @UseGuards(JwtAuthenticationGuard)
+  async search(@Query() query: SearchQueryToGetUsers) {
+    return await this.userService.search(query);
+  }
+
+  @UseGuards(JwtAuthenticationGuard)
+  @Get('profile')
+  getProfile(@Req() req: RequestWithUser): User {
+    const user = req.user;
+    return user;
+  }
+
+  @UseGuards(JwtAuthenticationGuard)
+  @Get('profile/:id')
+  async getAllInfoById(@Param() params: { id: number }): Promise<User> {
+    const { id } = params;
+    const userProfile = await this.userService.getAllInfoById(id);
+    return userProfile;
+  }
+
+  @UseGuards(JwtAuthenticationGuard)
+  @Get('others-list')
+  async getUsers(@Req() req: RequestWithUser): Promise<User[]> {
+    const requestUser = req.user;
+    const allUsers = await this.userService.getUsers();
+    const usersExceptRequestUser = allUsers.filter(
+      (u) => u.id !== requestUser.id,
+    );
+    return usersExceptRequestUser;
+  }
+
+  @UseGuards(JwtAuthenticationGuard)
+  @Post('update-user')
+  async updateUser(
+    @Req() request: RequestWithUser,
+    @Body() user: Partial<User>,
+  ): Promise<User> {
+    if (!user.id) {
+      return await this.userService.saveUser({ ...request.user, ...user });
+    }
+    return await this.userService.saveUser(user);
+  }
+
+  @UseGuards(JwtAuthenticationGuard)
+  @Post('update-password')
+  async updatePassword(
+    @Req() request: RequestWithUser,
+    @Body()
+    content: UpdatePasswordDto,
+  ): Promise<User> {
+    return await this.userService.updatePassword(request, content);
+  }
+
+  @UseGuards(JwtAuthenticationGuard)
+  @Post('delete-user')
+  async deleteUser(@Body() user: User) {
+    return await this.userService.deleteUser(user.id);
+  }
+}

@@ -1,0 +1,40 @@
+.input {
+  border: 1px solid #000000;
+  font-size: 18px;
+  padding-left: 10px;
+  height: 40px;
+  border-radius: 10px;
+  width: 30vw;
+}
+
+.row {
+  display: flex;
+  flex-direction: row;
+}
+
+.label_text_wrapper {
+  width: 14vw;
+  margin-right: 2vw;
+}
+
+.label_text {
+  font-size: 18px;
+  line-height: 100%;
+}
+
+.textarea {
+  font-size: 18px;
+  line-height: 20px;
+  word-wrap: break-word;
+  height: 100%;
+  width: 100%;
+  resize: none;
+}
+
+.textarea_wrapper {
+  height: 122px;
+  width: 30vw;
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid black;
+}

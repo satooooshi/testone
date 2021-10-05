@@ -1,0 +1,142 @@
+@import '../variables.scss';
+
+.main_wrapper {
+  flex: display;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.search_form_wrapper {
+  display: flex;
+  flex-direction: row;
+  width: 70vw;
+  align-items: center;
+  // position: relative;
+  @media (max-width: 768px) {
+    margin-bottom: 0;
+    width: 70vw;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  @media (max-width: 768px) {
+    width: 80vw;
+  }
+}
+
+.input {
+  margin-right: 16px;
+  @media (max-width: 768px) {
+    margin-bottom: 16px;
+    margin-right: 0;
+    margin-bottom: 16px;
+  }
+}
+
+.add_tag_button {
+  margin-right: 16px;
+  @media (max-width: 768px) {
+    margin-right: 0;
+    margin-bottom: 16px;
+  }
+}
+
+.search_and_close_button_wrapper {
+  @media (max-width: 768px) {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+}
+
+.selected_items_wrapper {
+  width: 70vw;
+  margin-bottom: 8px;
+  @media (max-width: 576px) {
+    margin-bottom: 0;
+    overflow-x: scroll;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    &::-webkit-scrollbar {
+      display: none;
+    }
+    max-height: 20vh;
+  }
+}
+
+.item {
+  margin-bottom: 8px;
+  margin-right: 16px;
+  @media (max-width: 768px) {
+    margin-right: 8px;
+  }
+}
+
+.searched_items_title {
+  font-size: 20px;
+  color: $dark_font_color;
+  font-weight: bold;
+  font-size: $middle_font_size;
+  @media (max-width: 576px) {
+    font-size: 16px;
+  }
+}
+
+.searched_item_title_wrapper {
+  margin-bottom: 8px;
+}
+
+.close_icon_wrapper {
+  align-self: flex-end;
+  position: absolute;
+  top: -10px;
+  right: -10px;
+}
+
+.close_icon {
+  color: #718096;
+  background: $white_color;
+  border-radius: 100%;
+}
+
+.modal {
+  margin: auto auto;
+  width: 90vw;
+  height: fit-content;
+  padding: 16px 0;
+  border-radius: 8px;
+  border: 1px solid $blue_color;
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  position: absolute;
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+}
+
+.search_items_wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.search_button {
+  position: fixed;
+  width: 8vh;
+  height: 8vh;
+  top: auto;
+  bottom: 24px;
+  right: 24px;
+  color: $white_color;
+  background: $blue_color;
+  border-radius: 100%;
+  z-index: 1;
+}

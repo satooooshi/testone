@@ -1,0 +1,49 @@
+@import '../variables.scss';
+
+.tabs_wrapper {
+  margin-left: auto;
+  margin-right: auto;
+  align-self: center;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  width: 80vw;
+  border-bottom: 1px solid #e0e0e0;
+  height: 40px;
+  margin-bottom: 24px;
+  overflow-x: scroll;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+  @media (max-width: 768px) {
+    width: 100vw;
+  }
+}
+
+.tab {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  min-width: 96px;
+}
+
+.active_tab {
+  color: $blue_color;
+  border-bottom: 1px solid $blue_color;
+  height: 100%;
+}
+
+.disable_tab {
+  color: $dark_font_color;
+}
+
+.tab_name {
+  padding-bottom: 8px;
+  @media (max-width: 576px) {
+    font-size: 12px;
+  }
+}

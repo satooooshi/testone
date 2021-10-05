@@ -1,0 +1,33 @@
+@import '../variables.scss';
+
+.pagination {
+  margin: 15px auto;
+  display: flex;
+  list-style: none;
+  outline: none;
+  color: $dark_font_color;
+  font-size: $p_font_size;
+}
+.active {
+  background-color: #fff;
+  border-color: #47ccde;
+  color: $green_color;
+  outline: none;
+}
+.pagination > li > a {
+  border: 1px solid $blue_color;
+  padding: 5px 10px;
+  outline: none;
+  cursor: pointer;
+}
+
+.button__disabled {
+  color: $sidebar_disable_icon_color;
+}
+
+.pagination_wrap_layout {
+  position: absolute;
+  bottom: 16px;
+  right: auto;
+  left: auto;
+}

@@ -1,0 +1,118 @@
+@import 'variables.scss';
+/*** The new CSS Reset - version 1.2.0 (last updated 23.7.2021) ***/
+
+/* Remove all the styles of the "User-Agent-Stylesheet", except for the 'display' property */
+// *:where(:not(iframe, canvas, img, svg, video):not(svg *)) {
+//   all: unset;
+//   display: revert;
+// }
+
+/* Preferred box-sizing value */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* Remove list styles (bullets/numbers) */
+ol,
+ul {
+  list-style: none;
+}
+
+/* For images to not be able to exceed their container */
+img {
+  max-width: 100%;
+}
+
+/* removes spacing between cells in tables */
+table {
+  border-collapse: collapse;
+}
+
+/* revert the 'white-space' property for textarea elements on Safari */
+textarea {
+  white-space: revert;
+}
+
+body {
+  font-family: '游ゴシック体', YuGothic, '游ゴシック', 'Yu Gothic', sans-serif;
+  line-height: 100%;
+  background-color: $global_base_color;
+}
+h1,
+p,
+span {
+  line-height: 120%;
+}
+
+button:hover {
+  cursor: pointer;
+}
+
+a:hover {
+  cursor: pointer;
+}
+
+//react-big-calendar toolbar style
+.rbc-toolbar {
+  @media (max-width: 768px) {
+    padding: 0 16px;
+  }
+}
+.rbc-off-range-bg {
+  background: $white_color !important;
+}
+.rbc-btn-group {
+  background: $white_color;
+}
+
+.rbc-time-view {
+  background: $white_color;
+}
+.rbc-btn-group > button {
+  font-size: 0px;
+}
+
+.rbc-btn-group:nth-child(1) > button:nth-child(1)::before {
+  font-size: 14px;
+  content: '今日';
+}
+.rbc-btn-group:nth-child(1) > button:nth-child(2)::before {
+  font-size: 14px;
+  content: '←';
+}
+.rbc-btn-group:nth-child(1) > button:nth-child(3)::before {
+  font-size: 14px;
+  content: '→';
+}
+.rbc-btn-group:nth-child(3) > button:nth-child(1)::before {
+  font-size: 14px;
+  content: '月';
+}
+.rbc-btn-group:nth-child(3) > button:nth-child(2)::before {
+  font-size: 14px;
+  content: '週';
+}
+.rbc-btn-group:nth-child(3) > button:nth-child(3)::before {
+  font-size: 14px;
+  content: '日';
+}
+.rbc-btn-group:nth-child(3) > button:nth-child(4)::before {
+  font-size: 14px;
+  content: 'スケジュール';
+}
+
+.public-DraftEditorPlaceholder-inner {
+  position: absolute;
+  pointer-events: none;
+}
+
+.public-DraftEditorPlaceholder-root {
+  color: #b0b0b0;
+}
+
+// react-markdown-editor-lite border
+.editor-container > .sec-md {
+  border-right: 1px solid #b0b0b0;
+}

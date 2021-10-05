@@ -1,0 +1,78 @@
+import '@/styles/globals.scss';
+import type { AppProps } from 'next/app';
+import { useEffect } from 'react';
+import { QueryClient, QueryClientProvider } from 'react-query';
+import { useRouter } from 'next/router';
+import {
+  AuthenticateProvider,
+  useAuthenticate,
+} from 'src/contexts/useAuthenticate';
+import { ChakraProvider, extendTheme } from '@chakra-ui/react';
+import 'react-big-calendar/lib/addons/dragAndDrop/styles.scss';
+import { useAPIAuthenticate } from '@/hooks/api/auth/useAPIAuthenticate';
+
+const AuthProvder: React.FC = ({ children }) => {
+  const router = useRouter();
+  const { isAuthenticated, authenticate, setUser } = useAuthenticate();
+  const { mutate: mutateAuthenticate, isLoading } = useAPIAuthenticate({
+    onSuccess: (userData) => {
+      if (userData && userData.id) {
+        authenticate();
+        setUser(userData);
+        if (router.pathname === '/login' || router.pathname === '/register') {
+          router.push('/');
+        }
+      }
+    },
+    onError: () => {
+      if (router.pathname !== '/login' && router.pathname !== '/register') {
+        router.push('/login');
+      }
+    },
+  });
+
+  useEffect(() => {
+    mutateAuthenticate();
+  }, [mutateAuthenticate]);
+
+  if (
+    isLoading ||
+    (!isAuthenticated &&
+      router.pathname !== '/login' &&
+      router.pathname !== '/register')
+  ) {
+    return <div>Loading...</div>;
+  }
+
+  return children as React.ReactElement;
+};
+
+function MyApp({ Component, pageProps }: AppProps) {
+  const queryClient = new QueryClient();
+  const theme = {
+    styles: {
+      global: {
+        'html, body': {
+          background: '#f9fafb',
+          lineHeight: '100%',
+          fontFamily:
+            "'游ゴシック体', YuGothic, '游ゴシック', 'Yu Gothic', sans-serif",
+        },
+      },
+    },
+  };
+  const customTheme = extendTheme(theme);
+
+  return (
+    <ChakraProvider theme={customTheme}>
+      <AuthenticateProvider>
+        <QueryClientProvider client={queryClient}>
+          <AuthProvder>
+            <Component {...pageProps} />{' '}
+          </AuthProvder>
+        </QueryClientProvider>
+      </AuthenticateProvider>
+    </ChakraProvider>
+  );
+}
+export default MyApp;

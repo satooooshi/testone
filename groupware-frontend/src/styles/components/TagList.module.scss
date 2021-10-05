@@ -1,0 +1,51 @@
+@import '../variables.scss';
+
+.tags_area {
+  border: 1px $header_background_color solid;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+
+  @media (max-width: 1024px) {
+    display: none;
+    width: 20vw;
+  }
+}
+
+.tag_top {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-left: 20px;
+  margin-right: 20px;
+  min-height: 50px;
+  justify-content: space-between;
+  border-bottom: 1px $header_background_color solid;
+}
+
+.tag_list_title {
+  color: $green_color;
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.see_all_text {
+  color: $blue_color;
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.tag_name_wrapper {
+  border-bottom: 1px $header_background_color solid;
+  padding: 10px 20px;
+  // padding-left: 10px;
+  // padding-right: 10px;
+  // padding-left: 10px;
+  // padding-right: 10px;
+}
+
+.tag_name {
+  color: $dark_font_color;
+  font-weight: bold;
+  font-size: 18px;
+}

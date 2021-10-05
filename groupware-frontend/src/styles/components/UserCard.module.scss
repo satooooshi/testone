@@ -1,0 +1,122 @@
+@import '../variables.scss';
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  width: 36vw;
+  padding: 8px;
+  background: $header_background_color;
+  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+  @media (max-width: 1024px) {
+    width: 85vw;
+  }
+  &:hover {
+    cursor: pointer;
+  }
+}
+
+.left {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  margin-bottom: 8px;
+  height: 56px;
+}
+
+.avatar {
+  width: 40px;
+  aspect-ratio: 1;
+  margin-right: 16px;
+}
+
+.right {
+  width: 100%;
+}
+
+.name {
+  margin-bottom: 8px;
+  font-weight: bold;
+  color: $dark_font_color;
+  font-size: 18px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  width: 100%;
+}
+
+.introduce {
+  margin-bottom: 8px;
+  color: $dark_font_color;
+  min-height: 8px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  width: 100%;
+}
+
+.counts_wrapper {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.count_item_wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 8px;
+  min-width: 25%;
+}
+
+.count_label {
+  font-size: 14px;
+}
+
+.count {
+  font-weight: bold;
+  font-size: 24px;
+  color: $green_color;
+}
+
+.tag_item_wrapper {
+  margin-right: 8px;
+}
+
+.tags_wrapper {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  overflow: scroll;
+  scrollbar-width: none;
+  width: 88%;
+  -ms-overflow-style: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+  @media (max-width: 768px) {
+    width: 84%;
+  }
+}
+
+.tags_with_label_wrapper {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.tags_label {
+  margin-right: 8px;
+  word-break: keep-all;
+  width: 12%;
+  max-width: 64px;
+  @media (max-width: 768px) {
+    width: 16%;
+  }
+}
+
+.user_info_text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

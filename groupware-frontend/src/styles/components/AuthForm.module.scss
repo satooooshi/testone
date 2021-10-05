@@ -1,0 +1,26 @@
+@import '../variables.scss';
+
+.login_form {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.auth_title {
+  font-weight: bold;
+  font-size: 48px;
+  color: $dark_font_color;
+  @media (max-width: 768px) {
+    font-size: 32px;
+  }
+}
+
+.form_margin {
+  margin-bottom: 32px;
+}
+
+.validation_error_text {
+  font-size: 18px;
+  color: tomato;
+}

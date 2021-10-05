@@ -1,0 +1,125 @@
+@import '../variables.scss';
+
+.main {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 80vw;
+  align-self: center;
+  align-items: center;
+}
+
+.qa_wrapper {
+  width: 46vw;
+  @media (max-width: 1024px) {
+    width: 80vw;
+  }
+  @media (max-width: 768px) {
+    width: 80vw;
+  }
+  @media (min-width: 768px) {
+    margin-right: 5vw;
+  }
+}
+
+.title_wrapper {
+  width: 80vw;
+  margin-bottom: 16px;
+  display: flex;
+  flex-direction: column;
+}
+
+.title_text {
+  font-weight: bold;
+  font-size: 24px;
+  color: $dark_font_color;
+  width: 100%;
+  word-break: break-all;
+}
+
+.tags_wrapper {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  margin-bottom: 16px;
+  align-self: flex-start;
+}
+
+.tag {
+  margin-right: 8px;
+  margin-bottom: 8px;
+}
+
+.question_wrapper {
+  margin-bottom: 40px;
+}
+
+.qa_comment_wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  margin-bottom: 24px;
+}
+
+.markdown {
+  background: $white_color;
+  border-radius: 10px;
+  min-height: 60px;
+  color: $dark_font_color;
+  padding: 15px;
+  margin-bottom: 40px;
+}
+
+.markdown_editor_margin {
+  margin-bottom: 40px;
+}
+
+.answer_count__wrapper {
+  width: 80vw;
+  border-bottom: 1px $green_color solid;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  padding-bottom: 10px;
+  margin-bottom: 20px;
+}
+.answer_count {
+  color: $dark_font_color;
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.answers_wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.answer_button {
+  background-color: $green_color;
+  min-width: 100px;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+.input {
+  width: 340px;
+  height: 40px;
+  border-radius: 5px;
+  border: 1px solid $input_border_color;
+  padding-left: 10px;
+  padding-right: 10px;
+  margin-bottom: 20px;
+}
+
+.reply {
+  width: 100%;
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.reply_button {
+  margin-bottom: 40px;
+}

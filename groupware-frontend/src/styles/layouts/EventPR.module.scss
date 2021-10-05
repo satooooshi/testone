@@ -1,0 +1,150 @@
+.main {
+}
+.top_title_wrapper {
+  display: flex;
+  flex-direction: column;
+  align-self: center;
+  align-items: center;
+  margin-bottom: 16px;
+}
+.culture {
+  font-weight: bold;
+  font-size: 20px;
+  color: #6bbcde;
+}
+.top_title {
+  font-weight: bold;
+  font-size: 32px;
+  @media (max-width: 768px) {
+    font-size: 24px;
+  }
+}
+.top_images_wrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.main_image_wrapper {
+  width: 65vw;
+  max-width: 1800px;
+  margin-bottom: 40px;
+  @media (max-width: 768px) {
+    width: 90vw;
+  }
+}
+
+.latest_events_wrapper {
+  width: 90vw;
+  margin: 0 auto;
+  display: flex;
+  align-self: center;
+  flex-direction: column;
+  align-items: center;
+}
+
+.event_card_list {
+  display: flex;
+  flex-flow: row;
+  flex-wrap: wrap;
+  justify-content: center;
+
+  &::after {
+    content: '';
+    display: block;
+    width: 36vw;
+    @media (max-width: 1024px) {
+      width: 80vw;
+    }
+  }
+}
+
+.no_latest_event_text {
+  margin-bottom: 16px;
+}
+
+.latest_events_text {
+  font-weight: bold;
+  font-size: 22px;
+  margin-bottom: 16px;
+}
+
+.event_card {
+  margin-bottom: 24px;
+  margin-right: 8px;
+  :nth-child(even) {
+    margin-right: 0;
+  }
+  @media (max-width: 1024px) {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-right: 0;
+  }
+}
+
+.main_image {
+}
+.info_wrapper {
+  width: 60vw;
+  margin: 0 auto;
+  @media (max-width: 768px) {
+    width: 90vw;
+  }
+}
+
+.title_wrapper {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  margin-bottom: 40px;
+}
+.title {
+  white-space: pre-wrap;
+  font-weight: bold;
+  font-size: 32px;
+  text-align: center;
+  @media (max-width: 768px) {
+    font-size: 22px;
+  }
+}
+
+.description_wrapper {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+.description {
+  white-space: pre-wrap;
+  align-self: center;
+}
+
+.bottom_images_row {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  flex-wrap: wrap;
+  @media (max-width: 1024px) {
+    flex-direction: column;
+    align-items: center;
+  }
+  margin-bottom: 40px;
+}
+
+.bottom_image_wrapper {
+  width: 40vw;
+  @media (max-width: 1024px) {
+    width: 65vw;
+    margin-bottom: 8px;
+    margin-right: 0;
+  }
+  @media (max-width: 768px) {
+    width: 90vw;
+  }
+  @media (min-width: 1024px) {
+    &:nth-child(odd) {
+      margin-right: 8px;
+    }
+  }
+}

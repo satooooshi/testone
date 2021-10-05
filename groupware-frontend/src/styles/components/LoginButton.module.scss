@@ -1,0 +1,24 @@
+@import '../variables.scss';
+
+.button_oblong {
+  height: 50px;
+  width: 340px;
+  text-align: center;
+  border-radius: 10px;
+  font-size: 26px;
+  font-weight: bold;
+
+  &:hover {
+    cursor: pointer;
+  }
+}
+
+.button_oblong__active {
+  color: #fff;
+  background: $green_color;
+}
+
+.button_oblong__disabled {
+  color: #8d8d96;
+  background: #f2f1f2;
+}

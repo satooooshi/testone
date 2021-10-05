@@ -1,0 +1,102 @@
+.box_wrapper {
+  width: 27vw;
+  padding: 8px 16px;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 310px;
+  border: 2px solid #dddce0;
+  background: #fff;
+
+  @media (max-width: 1024px) {
+    width: 38vw;
+  }
+  @media (max-width: 576px) {
+    width: 80vw;
+  }
+  @media (min-width: 1440px) {
+    height: 15vw;
+  }
+}
+
+.icon_wrapper {
+  width: 160px;
+  height: 160px;
+}
+
+.icon {
+  width: 144px;
+  height: 144px;
+  margin-bottom: 16px;
+}
+
+.impressive_university_icon {
+  color: #3182ce;
+}
+
+.study_meeting_icon {
+  color: #38a169;
+}
+
+.bolday_icon {
+  color: #f6ad55;
+}
+
+.coach_icon {
+  color: #90cdf4;
+}
+
+.club_icon {
+  color: #f56565;
+}
+
+.submission_etc_icon {
+  color: #086f83;
+}
+
+.wiki_icon {
+  color: #00b5d8;
+}
+
+.rules_icon {
+  color: #38a169;
+}
+
+.knowledge_icon {
+  color: #ecc94b;
+}
+
+.qa_icon {
+  color: #00b5d8;
+}
+
+.chat_icon {
+  color: #f6e05e;
+}
+
+.admin_icon {
+  color: #805ad5;
+}
+
+.account_icon {
+  color: #f687b3;
+}
+
+.title_wrapper {
+  margin-bottom: 16px;
+  display: flex;
+}
+
+.title_text {
+  font-weight: bold;
+  font-size: 20px;
+}
+
+.description_wrapper {
+  margin-bottom: 1rem;
+}
+
+.description_text {
+}
