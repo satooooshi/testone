@@ -15,6 +15,7 @@ import { Response } from 'express';
 import { ChatGroup } from 'src/entities/chatGroup.entity';
 import { EventSchedule, EventType } from 'src/entities/event.entity';
 import { EventComment } from 'src/entities/eventComment.entity';
+import { SubmissionFile } from 'src/entities/submissionFiles.entity';
 import { UserRole } from 'src/entities/user.entity';
 import { dateTimeFormatterFromJSDDate } from 'src/utils/dateTimeFormatter';
 import JwtAuthenticationGuard from '../auth/jwtAuthentication.guard';
@@ -111,6 +112,14 @@ export class EventScheduleController {
     return await this.eventService.getEvents(query);
   }
 
+  @Post('save-submission')
+  @UseGuards(JwtAuthenticationGuard)
+  async saveSubmission(
+    @Body() submissionFiles: SubmissionFile[],
+  ): Promise<SubmissionFile[]> {
+    return await this.eventService.saveSubmission(submissionFiles);
+  }
+
   //get 10 latest event randomly
   @Get('latest')
   @UseGuards(JwtAuthenticationGuard)
@@ -128,7 +137,7 @@ export class EventScheduleController {
   ): Promise<GetEventDetailResopnse> {
     const { id } = params;
     const { user } = req;
-    const eventSchedule = await this.eventService.getEventDetail(id);
+    const eventSchedule = await this.eventService.getEventDetail(id, user.id);
     const isExist = eventSchedule.users.filter((u) => user.id === u.id).length;
     if (isExist) {
       return { ...eventSchedule, isJoining: true };
@@ -195,7 +204,10 @@ export class EventScheduleController {
     if (!eventSchedule.tags || !eventSchedule.tags.length) {
       throw new BadRequestException('Event must links one or more tags');
     }
-    const existEvent = await this.eventService.getEventDetail(eventSchedule.id);
+    const existEvent = await this.eventService.getEventDetail(
+      eventSchedule.id,
+      req.user.id,
+    );
     if (
       (existEvent.author && existEvent.author.id !== req.user.id) ||
       req.user.role !== UserRole.ADMIN

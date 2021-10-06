@@ -5,6 +5,7 @@ import { EventSchedule, EventType } from 'src/entities/event.entity';
 import { EventComment } from 'src/entities/eventComment.entity';
 import { EventFile } from 'src/entities/eventFile.entity';
 import { EventVideo } from 'src/entities/eventVideo.entity';
+import { SubmissionFile } from 'src/entities/submissionFiles.entity';
 import { dateTimeFormatterFromJSDDate } from 'src/utils/dateTimeFormatter';
 import { In, Not, Repository } from 'typeorm';
 import {
@@ -23,6 +24,8 @@ export class EventScheduleService {
     private readonly eventVideoRepository: Repository<EventVideo>,
     @InjectRepository(EventComment)
     private readonly eventCommentRepository: Repository<EventComment>,
+    @InjectRepository(SubmissionFile)
+    private readonly submissionFileRepository: Repository<SubmissionFile>,
   ) {}
 
   public eventTypeNameFactory(eventType: EventType): string {
@@ -248,20 +251,37 @@ export class EventScheduleService {
     return { pageCount: 0, events };
   }
 
-  public async getEventDetail(id: number): Promise<EventSchedule> {
-    const existEvent = await this.eventRepository.findOne(id, {
-      relations: [
-        'users',
-        'tags',
-        'files',
-        'videos',
-        'author',
-        'hostUsers',
-        'comments',
-        'comments.writer',
-      ],
-    });
+  public async getEventDetail(
+    id: number,
+    userID: number,
+  ): Promise<EventSchedule> {
+    const existEvent = await this.eventRepository
+      .createQueryBuilder('events')
+      .leftJoinAndSelect('events.users', 'users')
+      .leftJoinAndSelect('events.tags', 'tags')
+      .leftJoinAndSelect('events.files', 'files')
+      .leftJoinAndSelect('events.submissionFiles', 'submissionFiles')
+      .leftJoinAndSelect('events.videos', 'videos')
+      .leftJoinAndSelect('events.author', 'author')
+      .leftJoinAndSelect('events.hostUsers', 'hostUsers')
+      .leftJoinAndSelect('events.comments', 'comments')
+      .leftJoinAndSelect('comments.writer', 'writer')
+      .leftJoinAndSelect(
+        'submissionFiles.userSubmitted',
+        'userSubmitted',
+        'userSubmitted.id = :userID',
+        { userID },
+      )
+      .where('events.id = :id', { id })
+      .getOne();
     return existEvent;
+  }
+
+  public async saveSubmission(
+    submissionFiles: SubmissionFile[],
+  ): Promise<SubmissionFile[]> {
+    const submittedFiles = await this.eventRepository.save(submissionFiles);
+    return submittedFiles;
   }
 
   public async getLatestEvent(
