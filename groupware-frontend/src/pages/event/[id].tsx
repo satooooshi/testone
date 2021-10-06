@@ -5,12 +5,12 @@ import { useRouter } from 'next/router';
 import eventDetailStyles from '@/styles/layouts/EventDetail.module.scss';
 import Youtube from 'react-youtube';
 import { useAPIJoinEvent } from '@/hooks/api/event/useAPIJoinEvent';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { AiOutlineFileProtect } from 'react-icons/ai';
 import CreateEventModal from '@/components/CreateEventModal';
 import EventParticipants from '@/components/EventParticepants';
 import Linkify from 'react-linkify';
-import { Button, Textarea } from '@chakra-ui/react';
+import { Button, Textarea, useToast } from '@chakra-ui/react';
 import Head from 'next/head';
 import { useAuthenticate } from 'src/contexts/useAuthenticate';
 import Link from 'next/link';
@@ -25,8 +25,33 @@ import { useAPIDeleteEvent } from '@/hooks/api/event/useAPIDeleteEvent';
 import { useAPIUpdateEvent } from '@/hooks/api/event/useAPIUpdateEvent';
 import Image from 'next/image';
 import noImage from '@/public/no-image.jpg';
-import { UserRole } from 'src/types';
+import { EventType, SubmissionFile, UserRole } from 'src/types';
 import { useAPIDownloadEventCsv } from '@/hooks/api/event/useAPIDownloadEventCsv';
+import { useAPIUploadStorage } from '@/hooks/api/storage/useAPIUploadStorage';
+import { useAPISaveSubmission } from '@/hooks/api/event/useAPISaveSubmission';
+import clsx from 'clsx';
+
+type FileIconProps = {
+  href?: string;
+  submitted?: boolean;
+};
+
+const FileIcon: React.FC<FileIconProps> = ({ href, submitted }) => {
+  return (
+    <a
+      href={href}
+      download
+      className={clsx(
+        eventDetailStyles.file,
+        submitted
+          ? eventDetailStyles.unsubmitted_file_color
+          : eventDetailStyles.submitted_file_color,
+      )}>
+      <AiOutlineFileProtect className={eventDetailStyles.file_icon} />
+      <span>{(href?.match('.+/(.+?)([?#;].*)?$') || ['', href])[1]}</span>
+    </a>
+  );
+};
 
 const EventDetail = () => {
   const router = useRouter();
@@ -35,9 +60,41 @@ const EventDetail = () => {
   const [editModal, setEditModal] = useState(false);
   const [commentVisible, setCommentVisible] = useState(false);
   const [newComment, setNewComment] = useState<string>('');
+  const { user } = useAuthenticate();
   const { data, refetch } = useAPIGetEventDetail(
     typeof id === 'string' ? id : '0',
   );
+  const submissionRef = useRef<HTMLInputElement | null>(null);
+  const toast = useToast();
+  const [submitFiles, setSubmitFiles] = useState<
+    Partial<SubmissionFile & { submitUnFinished: boolean }>[]
+  >([]);
+  const { mutate: saveSubmission } = useAPISaveSubmission({
+    onSuccess: () => {
+      toast({
+        title: `ファイルを提出しました`,
+        status: 'success',
+        duration: 3000,
+        isClosable: true,
+      });
+      refetch();
+    },
+  });
+  const { mutate: uploadStorage } = useAPIUploadStorage({
+    onSuccess: (urls) => {
+      const filesNotSubmitted: Partial<SubmissionFile>[] = [];
+      for (const url of urls) {
+        const submitFileObj = {
+          url: url,
+          eventSchedule: data,
+          userSubmitted: user,
+          submitUnFinished: true,
+        };
+        filesNotSubmitted.push(submitFileObj);
+      }
+      setSubmitFiles((files) => [...files, ...filesNotSubmitted]);
+    },
+  });
 
   const { mutate: joinEvent } = useAPIJoinEvent({ onSuccess: () => refetch() });
   const { mutate: saveEvent } = useAPIUpdateEvent({
@@ -67,8 +124,6 @@ const EventDetail = () => {
     },
   });
 
-  const { user } = useAuthenticate();
-
   const isEditable = useMemo(
     () => user?.id === data?.author?.id || user?.role === 'admin',
     [user, data],
@@ -93,6 +148,12 @@ const EventDetail = () => {
     onClickRightButton: isEditable ? () => setEditModal(true) : undefined,
     tabs: tabs,
   };
+
+  useEffect(() => {
+    if (data && data.submissionFiles && data.submissionFiles.length) {
+      setSubmitFiles(data.submissionFiles);
+    }
+  }, [data]);
 
   return (
     <LayoutWithTab
@@ -119,15 +180,16 @@ const EventDetail = () => {
                 )}
               </div>
               <div className={eventDetailStyles.event_info_right}>
-                <div className={eventDetailStyles.join_event_wrapper}>
-                  {user?.role === UserRole.ADMIN && (
+                {user?.role === UserRole.ADMIN &&
+                data.type !== EventType.SUBMISSION_ETC ? (
+                  <div className={eventDetailStyles.admin_buttons_wrapper}>
                     <Button
                       colorScheme={'green'}
                       onClick={() => downloadEvent({ id, name: data.title })}>
-                      CSV出力
+                      イベントデータをCSV出力
                     </Button>
-                  )}
-                </div>
+                  </div>
+                ) : null}
                 <span className={eventDetailStyles.event_title}>
                   {data.title}
                 </span>
@@ -183,18 +245,7 @@ const EventDetail = () => {
             {data.files && data.files.length ? (
               <div className={eventDetailStyles.files_wrapper}>
                 {data.files.map((f) => (
-                  <a
-                    href={f.url}
-                    download
-                    key={f.id}
-                    className={eventDetailStyles.file}>
-                    <AiOutlineFileProtect
-                      className={eventDetailStyles.file_icon}
-                    />
-                    <span>
-                      {(f.url.match('.+/(.+?)([?#;].*)?$') || ['', f.url])[1]}
-                    </span>
-                  </a>
+                  <FileIcon href={f.url} key={f.id} />
                 ))}
               </div>
             ) : (
@@ -223,50 +274,120 @@ const EventDetail = () => {
                 <EventParticipants participants={data.users} />
               )}
             </div>
-            <div className={eventDetailStyles.count_and_button_wrapper}>
-              <p className={eventDetailStyles.comment_count}>
-                コメント{data.comments?.length ? data.comments.length : 0}件
-              </p>
-              <Button
-                size="sm"
-                colorScheme="teal"
-                onClick={() => {
-                  commentVisible && newComment
-                    ? createComment({
-                        body: newComment,
-                        eventSchedule: data,
-                      })
-                    : setCommentVisible(true);
-                }}>
-                {commentVisible ? 'コメントを投稿する' : 'コメントを追加'}
-              </Button>
-            </div>
-            {commentVisible && (
-              <Textarea
-                height="56"
-                background="white"
-                placeholder="コメントを記入してください。"
-                value={newComment}
-                onChange={(e) => setNewComment(e.target.value)}
-                className={eventDetailStyles.comment_input}
-                autoFocus
-              />
+            {data.type === EventType.SUBMISSION_ETC ? (
+              <>
+                <div className={eventDetailStyles.count_and_button_wrapper}>
+                  <div className={eventDetailStyles.submission_bar_left}>
+                    <p className={eventDetailStyles.submission_bar_left_info}>
+                      {data.submissionFiles.length
+                        ? data.submissionFiles.length + '件のファイルを提出済み'
+                        : '提出物を送信してください'}
+                    </p>
+                    <Button
+                      size="sm"
+                      colorScheme="blue"
+                      marginRight="16px"
+                      onClick={() => {
+                        submissionRef.current?.click();
+                      }}>
+                      提出物を追加
+                    </Button>
+                    <p className={eventDetailStyles.caution_message}>
+                      ※水色のアイコンのファイルはまだ提出状況が保存されていません
+                    </p>
+                  </div>
+                  <div className={eventDetailStyles.submit_buttons_wrapper}>
+                    <Button
+                      size="sm"
+                      colorScheme={submitFiles.length ? 'pink' : 'blue'}
+                      onClick={() => {
+                        saveSubmission(submitFiles);
+                      }}>
+                      提出状況を保存
+                    </Button>
+                    <input
+                      type="file"
+                      hidden
+                      ref={submissionRef}
+                      multiple
+                      onChange={() => {
+                        const files = submissionRef.current?.files;
+                        const fileArr: File[] = [];
+                        if (!files) {
+                          return;
+                        }
+                        for (let i = 0; i < files.length; i++) {
+                          fileArr.push(files[i]);
+                        }
+                        uploadStorage(fileArr);
+                      }}
+                    />
+                  </div>
+                </div>
+                {submitFiles && submitFiles.length ? (
+                  <div className={eventDetailStyles.submission_files_wrapper}>
+                    {submitFiles.map((f) => (
+                      <div
+                        key={f.url}
+                        className={clsx(
+                          eventDetailStyles.submission_file_icon_item_wrapper,
+                        )}>
+                        <FileIcon href={f.url} submitted={f.submitUnFinished} />
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <></>
+                )}
+              </>
+            ) : (
+              <>
+                <div className={eventDetailStyles.count_and_button_wrapper}>
+                  <p className={eventDetailStyles.comment_count}>
+                    コメント{data.comments?.length ? data.comments.length : 0}件
+                  </p>
+                  <Button
+                    size="sm"
+                    colorScheme="teal"
+                    onClick={() => {
+                      commentVisible && newComment
+                        ? createComment({
+                            body: newComment,
+                            eventSchedule: data,
+                          })
+                        : setCommentVisible(true);
+                    }}>
+                    {commentVisible ? 'コメントを投稿する' : 'コメントを追加'}
+                  </Button>
+                </div>
+                {commentVisible && (
+                  <Textarea
+                    height="56"
+                    background="white"
+                    placeholder="コメントを記入してください。"
+                    value={newComment}
+                    onChange={(e) => setNewComment(e.target.value)}
+                    className={eventDetailStyles.comment_input}
+                    autoFocus
+                  />
+                )}
+                {data.comments && data.comments.length
+                  ? data.comments.map(
+                      (comment) =>
+                        comment.writer && (
+                          <>
+                            <EventCommentCard
+                              key={comment.id}
+                              body={comment.body}
+                              date={comment.createdAt}
+                              writer={comment.writer}
+                            />
+                          </>
+                        ),
+                    )
+                  : null}
+              </>
             )}
-            {data.comments && data.comments.length
-              ? data.comments.map(
-                  (comment) =>
-                    comment.writer && (
-                      <>
-                        <EventCommentCard
-                          key={comment.id}
-                          body={comment.body}
-                          date={comment.createdAt}
-                          writer={comment.writer}
-                        />
-                      </>
-                    ),
-                )
-              : null}
           </div>
         </div>
       )}
