@@ -180,12 +180,12 @@ const EventDetail = () => {
                 )}
               </div>
               <div className={eventDetailStyles.event_info_right}>
-                <div className={eventDetailStyles.join_event_wrapper}>
+                <div className={eventDetailStyles.admin_buttons_wrapper}>
                   {user?.role === UserRole.ADMIN && (
                     <Button
                       colorScheme={'green'}
                       onClick={() => downloadEvent({ id, name: data.title })}>
-                      CSV出力
+                      イベントデータをCSV出力
                     </Button>
                   )}
                 </div>
@@ -294,7 +294,7 @@ const EventDetail = () => {
                           提出物を追加
                         </Button>
                         <p className={eventDetailStyles.caution_message}>
-                          ※水色のアイコンのファイルはまだ提出されていません
+                          ※水色のアイコンのファイルはまだ提出状況が保存されていません
                         </p>
                       </>
                     )}
@@ -326,7 +326,7 @@ const EventDetail = () => {
                           }
                         }}
                       />
-                      {submitFiles.length ? '提出する' : '提出物を選択'}
+                      {submitFiles.length ? '提出状況を保存' : '提出物を選択'}
                     </Button>
                   </div>
                 </div>
