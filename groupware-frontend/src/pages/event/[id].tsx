@@ -283,52 +283,45 @@ const EventDetail = () => {
                         ? data.submissionFiles.length + '件のファイルを提出済み'
                         : '提出物を送信してください'}
                     </p>
-                    {submitFiles.length && (
-                      <>
-                        <Button
-                          size="sm"
-                          colorScheme="blue"
-                          marginRight="16px"
-                          onClick={() => {
-                            submissionRef.current?.click();
-                          }}>
-                          提出物を追加
-                        </Button>
-                        <p className={eventDetailStyles.caution_message}>
-                          ※水色のアイコンのファイルはまだ提出状況が保存されていません
-                        </p>
-                      </>
-                    )}
+                    <Button
+                      size="sm"
+                      colorScheme="blue"
+                      marginRight="16px"
+                      onClick={() => {
+                        submissionRef.current?.click();
+                      }}>
+                      提出物を追加
+                    </Button>
+                    <p className={eventDetailStyles.caution_message}>
+                      ※水色のアイコンのファイルはまだ提出状況が保存されていません
+                    </p>
                   </div>
                   <div className={eventDetailStyles.submit_buttons_wrapper}>
                     <Button
                       size="sm"
                       colorScheme={submitFiles.length ? 'pink' : 'blue'}
                       onClick={() => {
-                        if (submitFiles.length) {
-                          saveSubmission(submitFiles);
+                        saveSubmission(submitFiles);
+                      }}>
+                      提出状況を保存
+                    </Button>
+                    <input
+                      type="file"
+                      hidden
+                      ref={submissionRef}
+                      multiple
+                      onChange={() => {
+                        const files = submissionRef.current?.files;
+                        const fileArr: File[] = [];
+                        if (!files) {
                           return;
                         }
-                        submissionRef.current?.click();
-                      }}>
-                      <input
-                        type="file"
-                        hidden
-                        ref={submissionRef}
-                        multiple
-                        onChange={() => {
-                          const files = submissionRef.current?.files;
-                          const fileArr: File[] = [];
-                          if (files) {
-                            for (let i = 0; i < files.length; i++) {
-                              fileArr.push(files[i]);
-                            }
-                            uploadStorage(fileArr);
-                          }
-                        }}
-                      />
-                      {submitFiles.length ? '提出状況を保存' : '提出物を選択'}
-                    </Button>
+                        for (let i = 0; i < files.length; i++) {
+                          fileArr.push(files[i]);
+                        }
+                        uploadStorage(fileArr);
+                      }}
+                    />
                   </div>
                 </div>
                 {submitFiles && submitFiles.length ? (
