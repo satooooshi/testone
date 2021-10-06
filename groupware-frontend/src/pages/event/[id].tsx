@@ -10,7 +10,7 @@ import { AiOutlineFileProtect } from 'react-icons/ai';
 import CreateEventModal from '@/components/CreateEventModal';
 import EventParticipants from '@/components/EventParticepants';
 import Linkify from 'react-linkify';
-import { Button, Textarea } from '@chakra-ui/react';
+import { Button, Textarea, useToast } from '@chakra-ui/react';
 import Head from 'next/head';
 import { useAuthenticate } from 'src/contexts/useAuthenticate';
 import Link from 'next/link';
@@ -29,14 +29,24 @@ import { EventType, SubmissionFile, UserRole } from 'src/types';
 import { useAPIDownloadEventCsv } from '@/hooks/api/event/useAPIDownloadEventCsv';
 import { useAPIUploadStorage } from '@/hooks/api/storage/useAPIUploadStorage';
 import { useAPISaveSubmission } from '@/hooks/api/event/useAPISaveSubmission';
+import clsx from 'clsx';
 
 type FileIconProps = {
   href?: string;
+  submitted?: boolean;
 };
 
-const FileIcon: React.FC<FileIconProps> = ({ href }) => {
+const FileIcon: React.FC<FileIconProps> = ({ href, submitted }) => {
   return (
-    <a href={href} download className={eventDetailStyles.file}>
+    <a
+      href={href}
+      download
+      className={clsx(
+        eventDetailStyles.file,
+        submitted
+          ? eventDetailStyles.unsubmitted_file_color
+          : eventDetailStyles.submitted_file_color,
+      )}>
       <AiOutlineFileProtect className={eventDetailStyles.file_icon} />
       <span>{(href?.match('.+/(.+?)([?#;].*)?$') || ['', href])[1]}</span>
     </a>
@@ -55,8 +65,21 @@ const EventDetail = () => {
     typeof id === 'string' ? id : '0',
   );
   const submissionRef = useRef<HTMLInputElement | null>(null);
-  const [submitFiles, setSubmitFiles] = useState<Partial<SubmissionFile>[]>([]);
-  const { mutate: saveSubmission } = useAPISaveSubmission();
+  const toast = useToast();
+  const [submitFiles, setSubmitFiles] = useState<
+    Partial<SubmissionFile & { submitUnFinished: boolean }>[]
+  >([]);
+  const { mutate: saveSubmission } = useAPISaveSubmission({
+    onSuccess: () => {
+      toast({
+        title: `ファイルを提出しました`,
+        status: 'success',
+        duration: 3000,
+        isClosable: true,
+      });
+      refetch();
+    },
+  });
   const { mutate: uploadStorage } = useAPIUploadStorage({
     onSuccess: (urls) => {
       const filesNotSubmitted: Partial<SubmissionFile>[] = [];
@@ -65,10 +88,11 @@ const EventDetail = () => {
           url: url,
           eventSchedule: data,
           userSubmitted: user,
+          submitUnFinished: true,
         };
         filesNotSubmitted.push(submitFileObj);
       }
-      setSubmitFiles(filesNotSubmitted);
+      setSubmitFiles((files) => [...files, ...filesNotSubmitted]);
     },
   });
 
@@ -252,44 +276,70 @@ const EventDetail = () => {
             {data.type === EventType.SUBMISSION_ETC ? (
               <>
                 <div className={eventDetailStyles.count_and_button_wrapper}>
-                  <p className={eventDetailStyles.comment_count}>
-                    {data.submissionFiles.length
-                      ? data.submissionFiles.length + '件のファイルを提出済み'
-                      : '提出物を送信してください'}
-                  </p>
-                  <Button
-                    size="sm"
-                    colorScheme="pink"
-                    onClick={() => {
-                      if (submitFiles.length) {
-                        saveSubmission(submitFiles);
-                        return;
-                      }
-                      submissionRef.current?.click();
-                    }}>
-                    <input
-                      type="file"
-                      hidden
-                      ref={submissionRef}
-                      multiple
-                      onChange={() => {
-                        const files = submissionRef.current?.files;
-                        const fileArr: File[] = [];
-                        if (files) {
-                          for (let i = 0; i < files.length; i++) {
-                            fileArr.push(files[i]);
-                          }
-                          uploadStorage(fileArr);
+                  <div className={eventDetailStyles.submission_bar_left}>
+                    <p className={eventDetailStyles.submission_bar_left_info}>
+                      {data.submissionFiles.length
+                        ? data.submissionFiles.length + '件のファイルを提出済み'
+                        : '提出物を送信してください'}
+                    </p>
+                    {submitFiles.length && (
+                      <>
+                        <Button
+                          size="sm"
+                          colorScheme="blue"
+                          marginRight="16px"
+                          onClick={() => {
+                            submissionRef.current?.click();
+                          }}>
+                          提出物を追加
+                        </Button>
+                        <p className={eventDetailStyles.caution_message}>
+                          ※水色のアイコンのファイルはまだ提出されていません
+                        </p>
+                      </>
+                    )}
+                  </div>
+                  <div className={eventDetailStyles.submit_buttons_wrapper}>
+                    <Button
+                      size="sm"
+                      colorScheme={submitFiles.length ? 'pink' : 'blue'}
+                      onClick={() => {
+                        if (submitFiles.length) {
+                          saveSubmission(submitFiles);
+                          return;
                         }
-                      }}
-                    />
-                    {submitFiles.length ? '提出する' : '提出物を選択'}
-                  </Button>
+                        submissionRef.current?.click();
+                      }}>
+                      <input
+                        type="file"
+                        hidden
+                        ref={submissionRef}
+                        multiple
+                        onChange={() => {
+                          const files = submissionRef.current?.files;
+                          const fileArr: File[] = [];
+                          if (files) {
+                            for (let i = 0; i < files.length; i++) {
+                              fileArr.push(files[i]);
+                            }
+                            uploadStorage(fileArr);
+                          }
+                        }}
+                      />
+                      {submitFiles.length ? '提出する' : '提出物を選択'}
+                    </Button>
+                  </div>
                 </div>
                 {submitFiles && submitFiles.length ? (
-                  <div className={eventDetailStyles.files_wrapper}>
+                  <div className={eventDetailStyles.submission_files_wrapper}>
                     {submitFiles.map((f) => (
-                      <FileIcon href={f.url} key={f.url} />
+                      <div
+                        key={f.url}
+                        className={clsx(
+                          eventDetailStyles.submission_file_icon_item_wrapper,
+                        )}>
+                        <FileIcon href={f.url} submitted={f.submitUnFinished} />
+                      </div>
                     ))}
                   </div>
                 ) : (

@@ -155,6 +155,29 @@
   margin-bottom: 16px;
 }
 
+.submission_files_wrapper {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  -ms-overflow-style: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+  margin-bottom: 16px;
+}
+
+.submission_file_icon_item_wrapper {
+  margin-bottom: 8px;
+}
+
+.submitted_file_color {
+  background: #fff;
+}
+
+.unsubmitted_file_color {
+  background: lightblue;
+}
+
 .file_icon {
   height: 48px;
   width: 48px;
@@ -169,6 +192,14 @@
   border: 1px solid $header_background_color;
   border-radius: 10px;
   padding: 10px;
+  max-width: 160px;
+  height: fit-content;
+
+  & > span {
+    text-align: center;
+    white-space: wrap;
+    text-align: center;
+  }
 }
 
 .sub_title {
@@ -202,6 +233,30 @@
 .tag {
   margin-right: 8px;
   margin-bottom: 8px;
+}
+
+.submit_buttons_wrapper {
+  display: flex;
+  flex-flow: row;
+}
+
+.submission_bar_left {
+  display: flex;
+  flex-flow: row;
+  align-items: center;
+}
+
+.submission_bar_left_info {
+  color: $dark_font_color;
+  font-size: 16px;
+  font-weight: bold;
+  align-self: center;
+  margin-right: 8px;
+}
+
+.caution_message {
+  color: tomato;
+  font-size: 14px;
 }
 
 .comment_count {
