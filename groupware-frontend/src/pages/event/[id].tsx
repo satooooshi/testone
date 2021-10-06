@@ -180,15 +180,16 @@ const EventDetail = () => {
                 )}
               </div>
               <div className={eventDetailStyles.event_info_right}>
-                <div className={eventDetailStyles.admin_buttons_wrapper}>
-                  {user?.role === UserRole.ADMIN && (
+                {user?.role === UserRole.ADMIN &&
+                data.type !== EventType.SUBMISSION_ETC ? (
+                  <div className={eventDetailStyles.admin_buttons_wrapper}>
                     <Button
                       colorScheme={'green'}
                       onClick={() => downloadEvent({ id, name: data.title })}>
                       イベントデータをCSV出力
                     </Button>
-                  )}
-                </div>
+                  </div>
+                ) : null}
                 <span className={eventDetailStyles.event_title}>
                   {data.title}
                 </span>
