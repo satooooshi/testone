@@ -115,7 +115,7 @@ export class EventScheduleController {
   @Post('save-submission')
   @UseGuards(JwtAuthenticationGuard)
   async saveSubmission(
-    @Body() submissionFiles: SubmissionFile[],
+    @Body() submissionFiles: Partial<SubmissionFile>[],
   ): Promise<SubmissionFile[]> {
     return await this.eventService.saveSubmission(submissionFiles);
   }

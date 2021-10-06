@@ -143,7 +143,7 @@ export class EventSchedule {
 
   @OneToMany(
     () => SubmissionFile,
-    (submissionFile) => submissionFile.userSubmitted,
+    (submissionFile) => submissionFile.eventSchedule,
   )
   submissionFiles?: SubmissionFile[];
 

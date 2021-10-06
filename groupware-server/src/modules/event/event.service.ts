@@ -278,9 +278,11 @@ export class EventScheduleService {
   }
 
   public async saveSubmission(
-    submissionFiles: SubmissionFile[],
+    submissionFiles: Partial<SubmissionFile>[],
   ): Promise<SubmissionFile[]> {
-    const submittedFiles = await this.eventRepository.save(submissionFiles);
+    const submittedFiles = await this.submissionFileRepository.save(
+      submissionFiles,
+    );
     return submittedFiles;
   }
 

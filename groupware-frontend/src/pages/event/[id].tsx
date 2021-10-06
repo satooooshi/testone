@@ -5,7 +5,7 @@ import { useRouter } from 'next/router';
 import eventDetailStyles from '@/styles/layouts/EventDetail.module.scss';
 import Youtube from 'react-youtube';
 import { useAPIJoinEvent } from '@/hooks/api/event/useAPIJoinEvent';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { AiOutlineFileProtect } from 'react-icons/ai';
 import CreateEventModal from '@/components/CreateEventModal';
 import EventParticipants from '@/components/EventParticepants';
@@ -25,8 +25,23 @@ import { useAPIDeleteEvent } from '@/hooks/api/event/useAPIDeleteEvent';
 import { useAPIUpdateEvent } from '@/hooks/api/event/useAPIUpdateEvent';
 import Image from 'next/image';
 import noImage from '@/public/no-image.jpg';
-import { UserRole } from 'src/types';
+import { EventType, SubmissionFile, UserRole } from 'src/types';
 import { useAPIDownloadEventCsv } from '@/hooks/api/event/useAPIDownloadEventCsv';
+import { useAPIUploadStorage } from '@/hooks/api/storage/useAPIUploadStorage';
+import { useAPISaveSubmission } from '@/hooks/api/event/useAPISaveSubmission';
+
+type FileIconProps = {
+  href?: string;
+};
+
+const FileIcon: React.FC<FileIconProps> = ({ href }) => {
+  return (
+    <a href={href} download className={eventDetailStyles.file}>
+      <AiOutlineFileProtect className={eventDetailStyles.file_icon} />
+      <span>{(href?.match('.+/(.+?)([?#;].*)?$') || ['', href])[1]}</span>
+    </a>
+  );
+};
 
 const EventDetail = () => {
   const router = useRouter();
@@ -35,9 +50,27 @@ const EventDetail = () => {
   const [editModal, setEditModal] = useState(false);
   const [commentVisible, setCommentVisible] = useState(false);
   const [newComment, setNewComment] = useState<string>('');
+  const { user } = useAuthenticate();
   const { data, refetch } = useAPIGetEventDetail(
     typeof id === 'string' ? id : '0',
   );
+  const submissionRef = useRef<HTMLInputElement | null>(null);
+  const [submitFiles, setSubmitFiles] = useState<Partial<SubmissionFile>[]>([]);
+  const { mutate: saveSubmission } = useAPISaveSubmission();
+  const { mutate: uploadStorage } = useAPIUploadStorage({
+    onSuccess: (urls) => {
+      const filesNotSubmitted: Partial<SubmissionFile>[] = [];
+      for (const url of urls) {
+        const submitFileObj = {
+          url: url,
+          eventSchedule: data,
+          userSubmitted: user,
+        };
+        filesNotSubmitted.push(submitFileObj);
+      }
+      setSubmitFiles(filesNotSubmitted);
+    },
+  });
 
   const { mutate: joinEvent } = useAPIJoinEvent({ onSuccess: () => refetch() });
   const { mutate: saveEvent } = useAPIUpdateEvent({
@@ -67,8 +100,6 @@ const EventDetail = () => {
     },
   });
 
-  const { user } = useAuthenticate();
-
   const isEditable = useMemo(
     () => user?.id === data?.author?.id || user?.role === 'admin',
     [user, data],
@@ -93,6 +124,12 @@ const EventDetail = () => {
     onClickRightButton: isEditable ? () => setEditModal(true) : undefined,
     tabs: tabs,
   };
+
+  useEffect(() => {
+    if (data && data.submissionFiles && data.submissionFiles.length) {
+      setSubmitFiles(data.submissionFiles);
+    }
+  }, [data]);
 
   return (
     <LayoutWithTab
@@ -183,18 +220,7 @@ const EventDetail = () => {
             {data.files && data.files.length ? (
               <div className={eventDetailStyles.files_wrapper}>
                 {data.files.map((f) => (
-                  <a
-                    href={f.url}
-                    download
-                    key={f.id}
-                    className={eventDetailStyles.file}>
-                    <AiOutlineFileProtect
-                      className={eventDetailStyles.file_icon}
-                    />
-                    <span>
-                      {(f.url.match('.+/(.+?)([?#;].*)?$') || ['', f.url])[1]}
-                    </span>
-                  </a>
+                  <FileIcon href={f.url} key={f.id} />
                 ))}
               </div>
             ) : (
@@ -223,50 +249,101 @@ const EventDetail = () => {
                 <EventParticipants participants={data.users} />
               )}
             </div>
-            <div className={eventDetailStyles.count_and_button_wrapper}>
-              <p className={eventDetailStyles.comment_count}>
-                コメント{data.comments?.length ? data.comments.length : 0}件
-              </p>
-              <Button
-                size="sm"
-                colorScheme="teal"
-                onClick={() => {
-                  commentVisible && newComment
-                    ? createComment({
-                        body: newComment,
-                        eventSchedule: data,
-                      })
-                    : setCommentVisible(true);
-                }}>
-                {commentVisible ? 'コメントを投稿する' : 'コメントを追加'}
-              </Button>
-            </div>
-            {commentVisible && (
-              <Textarea
-                height="56"
-                background="white"
-                placeholder="コメントを記入してください。"
-                value={newComment}
-                onChange={(e) => setNewComment(e.target.value)}
-                className={eventDetailStyles.comment_input}
-                autoFocus
-              />
+            {data.type === EventType.SUBMISSION_ETC ? (
+              <>
+                <div className={eventDetailStyles.count_and_button_wrapper}>
+                  <p className={eventDetailStyles.comment_count}>
+                    {data.submissionFiles.length
+                      ? data.submissionFiles.length + '件のファイルを提出済み'
+                      : '提出物を送信してください'}
+                  </p>
+                  <Button
+                    size="sm"
+                    colorScheme="pink"
+                    onClick={() => {
+                      if (submitFiles.length) {
+                        saveSubmission(submitFiles);
+                        return;
+                      }
+                      submissionRef.current?.click();
+                    }}>
+                    <input
+                      type="file"
+                      hidden
+                      ref={submissionRef}
+                      multiple
+                      onChange={() => {
+                        const files = submissionRef.current?.files;
+                        const fileArr: File[] = [];
+                        if (files) {
+                          for (let i = 0; i < files.length; i++) {
+                            fileArr.push(files[i]);
+                          }
+                          uploadStorage(fileArr);
+                        }
+                      }}
+                    />
+                    {submitFiles.length ? '提出する' : '提出物を選択'}
+                  </Button>
+                </div>
+                {submitFiles && submitFiles.length ? (
+                  <div className={eventDetailStyles.files_wrapper}>
+                    {submitFiles.map((f) => (
+                      <FileIcon href={f.url} key={f.url} />
+                    ))}
+                  </div>
+                ) : (
+                  <></>
+                )}
+              </>
+            ) : (
+              <>
+                <div className={eventDetailStyles.count_and_button_wrapper}>
+                  <p className={eventDetailStyles.comment_count}>
+                    コメント{data.comments?.length ? data.comments.length : 0}件
+                  </p>
+                  <Button
+                    size="sm"
+                    colorScheme="teal"
+                    onClick={() => {
+                      commentVisible && newComment
+                        ? createComment({
+                            body: newComment,
+                            eventSchedule: data,
+                          })
+                        : setCommentVisible(true);
+                    }}>
+                    {commentVisible ? 'コメントを投稿する' : 'コメントを追加'}
+                  </Button>
+                </div>
+                {commentVisible && (
+                  <Textarea
+                    height="56"
+                    background="white"
+                    placeholder="コメントを記入してください。"
+                    value={newComment}
+                    onChange={(e) => setNewComment(e.target.value)}
+                    className={eventDetailStyles.comment_input}
+                    autoFocus
+                  />
+                )}
+                {data.comments && data.comments.length
+                  ? data.comments.map(
+                      (comment) =>
+                        comment.writer && (
+                          <>
+                            <EventCommentCard
+                              key={comment.id}
+                              body={comment.body}
+                              date={comment.createdAt}
+                              writer={comment.writer}
+                            />
+                          </>
+                        ),
+                    )
+                  : null}
+              </>
             )}
-            {data.comments && data.comments.length
-              ? data.comments.map(
-                  (comment) =>
-                    comment.writer && (
-                      <>
-                        <EventCommentCard
-                          key={comment.id}
-                          body={comment.body}
-                          date={comment.createdAt}
-                          writer={comment.writer}
-                        />
-                      </>
-                    ),
-                )
-              : null}
           </div>
         </div>
       )}

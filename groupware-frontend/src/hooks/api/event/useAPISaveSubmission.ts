@@ -5,7 +5,7 @@ import { saveSubmissionURL } from 'src/utils/url/event.url';
 import { jsonHeader } from 'src/utils/url/header';
 
 const saveSubmission = async (
-  submissionFile: SubmissionFile[],
+  submissionFile: Partial<SubmissionFile>[],
 ): Promise<SubmissionFile[]> => {
   const res = await axiosInstance.post(saveSubmissionURL, submissionFile, {
     headers: jsonHeader,
@@ -17,11 +17,11 @@ export const useAPISaveSubmission = (
   mutationOptions?: UseMutationOptions<
     SubmissionFile[],
     Error,
-    SubmissionFile[],
+    Partial<SubmissionFile>[],
     unknown
   >,
 ) => {
-  return useMutation<SubmissionFile[], Error, SubmissionFile[]>(
+  return useMutation<SubmissionFile[], Error, Partial<SubmissionFile>[]>(
     saveSubmission,
     mutationOptions,
   );
