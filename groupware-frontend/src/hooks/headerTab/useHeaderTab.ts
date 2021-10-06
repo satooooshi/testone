@@ -180,6 +180,11 @@ const headerTab = (headerTabBehavior: HeaderTabBehavior): Tab[] => {
           name: 'ユーザー作成',
           href: '/admin/users/new',
         },
+        {
+          type: 'link',
+          name: 'CSV出力',
+          href: '/admin/csv',
+        },
       ];
     case 'mention':
       return [

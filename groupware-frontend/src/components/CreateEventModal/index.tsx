@@ -307,7 +307,7 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
                   onChange={(d) => setNewEvent((e) => ({ ...e, startAt: d }))}
                   label="開始日時"
                   hour24
-                  formatStyle={'small'}
+                  formatStyle={'medium'}
                 />
               </div>
               <div className={createEventModalStyle.date_picker}>

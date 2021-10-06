@@ -39,8 +39,8 @@ export interface SearchQueryToGetEvents {
 
 export interface QueryToGetEventCsv {
   id?: string;
-  year?: string;
-  month?: string;
+  from?: string;
+  to?: string;
 }
 
 export interface SearchResultToGetEvents {
@@ -79,8 +79,8 @@ export class EventScheduleController {
   @Get('csv')
   @UseGuards(JwtAuthenticationGuard)
   async getCsv(@Query() query: QueryToGetEventCsv, @Res() res: Response) {
-    const { id, year = new Date().getFullYear().toString(), month } = query;
-    if (!id && !year && !month) {
+    const { id, from, to } = query;
+    if (!id && !from && !to) {
       throw new BadRequestException();
     }
 
@@ -92,7 +92,7 @@ export class EventScheduleController {
       res.status(200).end(csv);
       return;
     }
-    const csv = await this.eventService.getCsv({ year, month });
+    const csv = await this.eventService.getCsv({ from, to });
     res.setHeader('Content-Type', 'text/csv');
     res.setHeader('Content-Disposition', 'attachment; filename=event.csv');
 
