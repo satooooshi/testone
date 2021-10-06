@@ -14,7 +14,6 @@ import { ChatGroup } from './chatGroup.entity';
 import { ChatMessage } from './chatMessage.entity';
 import { EventSchedule } from './event.entity';
 import { EventComment } from './eventComment.entity';
-import { EventFile } from './eventFile.entity';
 import { LastReadChatTime } from './lastReadChatTime.entity';
 import { QAAnswer } from './qaAnswer.entity';
 import { QAAnswerReply } from './qaAnswerReply.entity';
