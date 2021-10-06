@@ -1,6 +1,6 @@
 import { NextRouter } from 'next/router';
 import { useMemo } from 'react';
-import { EventType, QAQuestion, User, WikiType } from 'src/types';
+import { EventType, User, WikiType } from 'src/types';
 import { EventTab, Tab, TabName } from 'src/types/header/tab/types';
 
 type HeaderTab =
@@ -28,7 +28,6 @@ type HeaderTabBehavior = {
   isSmallerThan768?: boolean;
   setActiveTab?: (value: React.SetStateAction<TabName>) => void;
   onDeleteClicked?: () => void;
-  question?: QAQuestion;
   type?: WikiType;
 };
 
@@ -44,7 +43,6 @@ const headerTab = (headerTabBehavior: HeaderTabBehavior): Tab[] => {
     isSmallerThan768,
     setActiveTab,
     onDeleteClicked,
-    question,
     type,
   } = headerTabBehavior;
 
