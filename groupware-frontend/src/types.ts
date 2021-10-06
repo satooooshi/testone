@@ -164,8 +164,8 @@ export interface EventVideo {
 export interface SubmissionFile {
   id: number;
   url: string;
-  eventSchedule: EventSchedule;
-  userSubmitted: User;
+  eventSchedule?: Partial<EventSchedule>;
+  userSubmitted?: Partial<User>;
   createdAt: Date;
   updatedAt: Date;
 }
