@@ -29,6 +29,7 @@ type HeaderTabBehavior = {
   setActiveTab?: (value: React.SetStateAction<TabName>) => void;
   onDeleteClicked?: () => void;
   question?: QAQuestion;
+  type?: WikiType;
 };
 
 const headerTab = (headerTabBehavior: HeaderTabBehavior): Tab[] => {
@@ -44,7 +45,21 @@ const headerTab = (headerTabBehavior: HeaderTabBehavior): Tab[] => {
     setActiveTab,
     onDeleteClicked,
     question,
+    type,
   } = headerTabBehavior;
+
+  const headerTabName = useMemo(() => {
+    switch (type) {
+      case WikiType.QA:
+        return '質問を編集';
+      case WikiType.RULES:
+        return '社内規則を編集';
+      case WikiType.KNOWLEDGE:
+        return 'ナレッジを編集';
+      default:
+        return '編集';
+    }
+  }, [type]);
 
   switch (headerTabType) {
     case 'event':
@@ -224,7 +239,7 @@ const headerTab = (headerTabBehavior: HeaderTabBehavior): Tab[] => {
           onClick: () => {
             if (setActiveTab) setActiveTab(TabName.EDIT);
           },
-          name: question ? '質問を編集' : '質問を作成',
+          name: headerTabName,
         },
         {
           onClick: () => {
