@@ -27,7 +27,7 @@ import { EventScheduleService } from './event.service';
 import { GetEventDetailResopnse } from './eventDetail.type';
 
 export interface QueryToGetZipSubmission {
-  id?: string;
+  id: string;
 }
 
 export interface SearchQueryToGetEvents {
@@ -82,7 +82,7 @@ export class EventScheduleController {
   ) {}
 
   @Get('submission-zip')
-  // @UseGuards(JwtAuthenticationGuard)
+  @UseGuards(JwtAuthenticationGuard)
   async getSubmissionZip(
     @Query() query: QueryToGetZipSubmission,
     @Res() res: Response,
