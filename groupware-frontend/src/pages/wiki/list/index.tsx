@@ -81,9 +81,16 @@ const QAQuestionList = () => {
     },
   ];
 
-  const onClickCreateButton = () => {
-    router.push('/wiki/new?type=' + type || '');
-  };
+  const onClickCreateButton =
+    type === WikiType.RULES
+      ? user?.role === UserRole.ADMIN
+        ? () => {
+            router.push('/wiki/new?type=' + type || '');
+          }
+        : undefined
+      : () => {
+          router.push('/wiki/new?type=' + type || '');
+        };
 
   const headerRightButtonName = useMemo(() => {
     switch (type) {
