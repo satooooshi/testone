@@ -12,7 +12,6 @@ export const defaultCalendarEventQuery = (): { from: string; to: string } => {
 
 export const generateEventSearchQueryString = (
   query: Partial<SearchQueryToGetEvents>,
-  defaultDuration?: boolean,
 ): string => {
   const {
     page: newPage = '1',
@@ -28,15 +27,11 @@ export const generateEventSearchQueryString = (
   if (newType) {
     refreshURL = refreshURL + `&type=${newType}`;
   }
-  if ((newFrom || newFrom === '') && !defaultDuration) {
-    refreshURL = refreshURL + `&from=${newFrom}`;
-  } else if ((newFrom || newFrom === '') && defaultDuration) {
-    refreshURL = refreshURL + `&from=${defaultFrom}`;
+  if (newFrom && newTo) {
+    refreshURL = refreshURL + `&from=${newFrom}&to=${newTo}`;
   }
-  if ((newTo || newTo === '') && !defaultDuration) {
-    refreshURL = refreshURL + `&to=${newTo}`;
-  } else if ((newFrom || newFrom === '') && defaultDuration) {
-    refreshURL = refreshURL + `&to=${defaultTo}`;
+  if (newFrom === '' && newTo === '') {
+    refreshURL = refreshURL + `&from=${defaultFrom}&to=${defaultTo}`;
   }
   return refreshURL;
 };
