@@ -5,6 +5,7 @@ import { EventSchedule } from 'src/entities/event.entity';
 import { EventComment } from 'src/entities/eventComment.entity';
 import { EventFile } from 'src/entities/eventFile.entity';
 import { EventVideo } from 'src/entities/eventVideo.entity';
+import { SubmissionFile } from 'src/entities/submissionFiles.entity';
 import { Tag } from 'src/entities/tag.entity';
 import { ChatModule } from '../chat/chat.module';
 import { NotificationModule } from '../notification/notification.module';
@@ -24,6 +25,7 @@ import { EventScheduleService } from './event.service';
       EventVideo,
       Tag,
       EventComment,
+      SubmissionFile,
     ]),
   ],
   controllers: [EventScheduleController],

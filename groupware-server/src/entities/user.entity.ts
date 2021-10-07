@@ -18,6 +18,7 @@ import { LastReadChatTime } from './lastReadChatTime.entity';
 import { QAAnswer } from './qaAnswer.entity';
 import { QAAnswerReply } from './qaAnswerReply.entity';
 import { Wiki } from './qaQuestion.entity';
+import { SubmissionFile } from './submissionFiles.entity';
 import { UserTag } from './userTag.entity';
 
 export enum UserRole {
@@ -120,6 +121,12 @@ export class User {
 
   @OneToMany(() => ChatMessage, (chatMessage) => chatMessage.sender)
   chatMessages?: ChatMessage[];
+
+  @OneToMany(
+    () => SubmissionFile,
+    (submissionFile) => submissionFile.userSubmitted,
+  )
+  submissionFiles?: SubmissionFile[];
 
   @OneToMany(
     () => LastReadChatTime,
