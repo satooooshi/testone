@@ -46,7 +46,7 @@ const headerTab = (headerTabBehavior: HeaderTabBehavior): Tab[] => {
     type,
   } = headerTabBehavior;
 
-  const headerTabName = useMemo(() => {
+  const headerTabName = () => {
     switch (type) {
       case WikiType.QA:
         return '質問を編集';
@@ -57,7 +57,7 @@ const headerTab = (headerTabBehavior: HeaderTabBehavior): Tab[] => {
       default:
         return '編集';
     }
-  }, [type]);
+  };
 
   switch (headerTabType) {
     case 'event':
@@ -237,7 +237,7 @@ const headerTab = (headerTabBehavior: HeaderTabBehavior): Tab[] => {
           onClick: () => {
             if (setActiveTab) setActiveTab(TabName.EDIT);
           },
-          name: headerTabName,
+          name: headerTabName(),
         },
         {
           onClick: () => {
