@@ -315,7 +315,7 @@ const EventList = () => {
     if (isCalendar) {
       calendarRef?.current?.scrollIntoView();
     }
-  }, [isCalendar]);
+  }, []);
 
   const initialHeaderValue = {
     title: 'Events',
