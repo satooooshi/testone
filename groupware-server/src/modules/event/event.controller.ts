@@ -26,6 +26,10 @@ import { UserService } from '../user/user.service';
 import { EventScheduleService } from './event.service';
 import { GetEventDetailResopnse } from './eventDetail.type';
 
+export interface QueryToGetZipSubmission {
+  id?: string;
+}
+
 export interface SearchQueryToGetEvents {
   page?: string;
   word?: string;
@@ -76,6 +80,19 @@ export class EventScheduleController {
     private readonly notifService: NotificationService,
     private readonly configService: ConfigService,
   ) {}
+
+  @Get('submission-zip')
+  // @UseGuards(JwtAuthenticationGuard)
+  async getSubmissionZip(
+    @Query() query: QueryToGetZipSubmission,
+    @Res() res: Response,
+  ) {
+    const { id } = query;
+
+    const zip = await this.eventService.getSubmissionZip(Number(id));
+    res.setHeader('Content-Type', 'application/zip');
+    res.send(zip);
+  }
 
   @Get('csv')
   @UseGuards(JwtAuthenticationGuard)
@@ -138,7 +155,7 @@ export class EventScheduleController {
     const { id } = params;
     const { user } = req;
     const eventSchedule = await this.eventService.getEventDetail(id, user.id);
-    const isExist = eventSchedule.users.filter((u) => user.id === u.id).length;
+    const isExist = eventSchedule.users?.filter((u) => user.id === u.id).length;
     if (isExist) {
       return { ...eventSchedule, isJoining: true };
     }
