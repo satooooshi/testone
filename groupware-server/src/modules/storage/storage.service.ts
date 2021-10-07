@@ -41,6 +41,21 @@ export class StorageService {
     return urls;
   }
 
+  public async downloadFile(urls: string[]): Promise<any[]> {
+    const bucketName = this.configService.get('CLOUD_STORAGE_BUCKET');
+    const arr: any[] = [];
+    for await (const url of urls) {
+      const bucketURL = 'https://storage.googleapis.com/' + bucketName + '/';
+      const storageObjURL = url.replace(bucketURL, '');
+      const downloadedFile = await this.storage
+        .bucket(bucketName)
+        .file(storageObjURL)
+        .get();
+      arr.push(downloadedFile[0]);
+    }
+    return arr;
+  }
+
   public async parseStorageURLToSignedURL(text: string): Promise<string> {
     let parseText = text;
     const bucketName = this.configService.get('CLOUD_STORAGE_BUCKET');

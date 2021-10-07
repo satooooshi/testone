@@ -9,12 +9,14 @@ import { SubmissionFile } from 'src/entities/submissionFiles.entity';
 import { Tag } from 'src/entities/tag.entity';
 import { ChatModule } from '../chat/chat.module';
 import { NotificationModule } from '../notification/notification.module';
+import { StorageModule } from '../storage/storage.module';
 import { UserModule } from '../user/user.module';
 import { EventScheduleController } from './event.controller';
 import { EventScheduleService } from './event.service';
 
 @Module({
   imports: [
+    StorageModule,
     ChatModule,
     UserModule,
     NotificationModule,
