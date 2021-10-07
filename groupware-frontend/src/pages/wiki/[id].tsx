@@ -60,7 +60,14 @@ const QuestionDetail = () => {
   const mdEditor = React.useRef<Editor | null>(null);
   const handleImageUpload = async (file: File) => {
     const uploadedImageURL = await uploadStorage([file]);
-    return uploadedImageURL[0];
+    if (uploadedImageURL[0] === '413') {
+      alert(
+        '画像ファイルの容量が大きい為、アップロード出来ませんでした。\n容量が大きくない画像を使用して下さい。',
+      );
+      return '画像アップロード失敗';
+    } else {
+      return uploadedImageURL[0];
+    }
   };
   const plugins = [
     'header',
