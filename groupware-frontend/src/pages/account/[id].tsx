@@ -199,7 +199,7 @@ const MyAccountInfo = () => {
                 <div className={accountInfoStyles.info_texts_wrapper}>
                   <div className={accountInfoStyles.introduce_wrapper}>
                     <p className={accountInfoStyles.introduce_title_text}>
-                      役職
+                      社員区分
                     </p>
                     <p className={accountInfoStyles.introduce}>
                       {userRoleNameFactory(profile.role)}
