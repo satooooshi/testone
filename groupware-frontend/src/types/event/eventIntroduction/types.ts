@@ -3,7 +3,7 @@ import { EventSchedule } from 'src/types';
 export interface EachEventData {
   events?: EventSchedule[];
   bottomImages: StaticImageData[];
-  imgUrl?: string;
+  headlineImage: JSX.Element | StaticImageData;
   subHeading: string;
   content: string;
 }

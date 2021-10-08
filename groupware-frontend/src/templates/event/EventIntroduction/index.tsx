@@ -7,7 +7,7 @@ import Image from 'next/image';
 const EventIntroduction: React.FC<EachEventData> = ({
   events,
   bottomImages,
-  imgUrl,
+  headlineImage,
   subHeading,
   content,
 }) => {
@@ -23,7 +23,7 @@ const EventIntroduction: React.FC<EachEventData> = ({
         <div
           className={eventPRStyles.main_image_wrapper}
           style={{ marginRight: 16 }}>
-          <img src={imgUrl} alt="" />
+          {headlineImage}
         </div>
       </div>
       <div className={eventPRStyles.latest_events_wrapper}>

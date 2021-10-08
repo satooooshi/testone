@@ -21,8 +21,17 @@ const ImpressionUniversity: React.FC = () => {
     type: EventType.IMPRESSIVE_UNIVERSITY,
   });
   const bottomImages = [impressiveUniversityImage1, impressiveUniversityImage2];
-  const imgUrl =
-    'https://www.bold.ne.jp/assets/assets_recruit/images/enviroment/img_univ_main.png';
+
+  // Publicフォルダ内の画像を使用する際は import Image from 'next/image'; を宣言して下記コードのコメントアウトを解除してください。
+  // const headlineImage = <Image src={} alt="" />;
+  const headlineImage = (
+    <img
+      src={
+        'https://www.bold.ne.jp/assets/assets_recruit/images/enviroment/img_univ_main.png'
+      }
+      alt=""
+    />
+  );
   const subHeading = '技術力と人間力を\n毎日プロから学ぶことが出来る研修制度';
   const content =
     '外部講師を招へいし、社員向けに毎日研修を開講しております。技術力はもちろん、マネジメントやコミュニケーション等の人間力に関する研修もエンジニア向けの独自のカリキュラムを企画しております。\n社員の参加率は、常時75％となっており、多くの社員が自己研鑽の面で活用しています。講座数は、年間で200講座程となっており、お客様から頂く声を基にカリキュラムを作成しております。';
@@ -35,7 +44,7 @@ const ImpressionUniversity: React.FC = () => {
         <EventIntroduction
           events={events}
           bottomImages={bottomImages}
-          imgUrl={imgUrl}
+          headlineImage={headlineImage}
           subHeading={subHeading}
           content={content}
         />
