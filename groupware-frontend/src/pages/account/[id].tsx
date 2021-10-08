@@ -18,6 +18,8 @@ import TopTabBar, { TopTabBehavior } from '@/components/TopTabBar';
 import { useAPIGetEventList } from '@/hooks/api/event/useAPIGetEventList';
 import { useAPIGetWikiList } from '@/hooks/api/wiki/useAPIGetWikiList';
 import topTabBarStyles from '@/styles/components/TopTabBar.module.scss';
+import { Button } from '@chakra-ui/react';
+import { TagType } from 'src/types';
 
 const MyAccountInfo = () => {
   const router = useRouter();
@@ -124,13 +126,100 @@ const MyAccountInfo = () => {
 
             {activeTab === TabName.DETAIL && (
               <div className={accountInfoStyles.info_wrapper}>
-                <div className={accountInfoStyles.introduce_wrapper}>
-                  <p className={accountInfoStyles.introduce_title_text}>
-                    自己紹介
-                  </p>
-                  <p className={accountInfoStyles.introduce}>
-                    {profile.introduce || '自己紹介が未記入です'}
-                  </p>
+                <div className={accountInfoStyles.tag_list_area}>
+                  <div className={accountInfoStyles.tag_list_wrapper}>
+                    <p className={accountInfoStyles.tag_label_text}>技術</p>
+                    <div className={accountInfoStyles.tags_wrapper}>
+                      <div className={accountInfoStyles.tag_button_wrapper}>
+                        {profile.tags?.length ? (
+                          profile.tags
+                            ?.filter((t) => t.type === TagType.TECH)
+                            .map((t) => (
+                              <Button key={t.id} colorScheme="teal" size="xs">
+                                {t.name}
+                              </Button>
+                            ))
+                        ) : (
+                          <Button colorScheme="teal" size="xs">
+                            未設定
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className={accountInfoStyles.tag_list_wrapper}>
+                    <p className={accountInfoStyles.tag_label_text}>資格</p>
+                    <div className={accountInfoStyles.tags_wrapper}>
+                      <div className={accountInfoStyles.tag_button_wrapper}>
+                        {profile.tags?.length ? (
+                          profile.tags
+                            ?.filter((t) => t.type === TagType.TECH)
+                            .map((t) => (
+                              <Button key={t.id} colorScheme="blue" size="xs">
+                                {t.name}
+                              </Button>
+                            ))
+                        ) : (
+                          <Button colorScheme="blue" size="xs">
+                            未設定
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className={accountInfoStyles.tag_list_wrapper}>
+                    <p className={accountInfoStyles.tag_label_text}>部活動</p>
+                    <div className={accountInfoStyles.tags_wrapper}>
+                      <div className={accountInfoStyles.tag_button_wrapper}>
+                        {profile.tags?.length ? (
+                          profile.tags
+                            ?.filter((t) => t.type === TagType.TECH)
+                            .map((t) => (
+                              <Button key={t.id} colorScheme="green" size="xs">
+                                {t.name}
+                              </Button>
+                            ))
+                        ) : (
+                          <Button colorScheme="green" size="xs">
+                            未設定
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className={accountInfoStyles.tag_list_wrapper}>
+                    <p className={accountInfoStyles.tag_label_text}>趣味</p>
+                    <div className={accountInfoStyles.tags_wrapper}>
+                      <div className={accountInfoStyles.tag_button_wrapper}>
+                        {profile.tags?.length ? (
+                          profile.tags
+                            ?.filter((t) => t.type === TagType.TECH)
+                            .map((t) => (
+                              <Button key={t.id} colorScheme="pink" size="xs">
+                                {t.name}
+                              </Button>
+                            ))
+                        ) : (
+                          <Button colorScheme="pink" size="xs">
+                            未設定
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div className={accountInfoStyles.info_texts_wrapper}>
+                  <div className={accountInfoStyles.introduce_wrapper}>
+                    <p className={accountInfoStyles.introduce_title_text}>
+                      自己紹介
+                    </p>
+                    <p className={accountInfoStyles.introduce}>
+                      {profile.introduce || '自己紹介が未記入です'}
+                    </p>
+                  </div>
                 </div>
               </div>
             )}
