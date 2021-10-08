@@ -4,6 +4,8 @@ import { useAPIGetWikiDetail } from '@/hooks/api/wiki/useAPIGetWikiDetail';
 import { useAPIGetTag } from '@/hooks/api/tag/useAPIGetTag';
 import { uploadStorage } from '@/hooks/api/storage/useAPIUploadStorage';
 import QAForm from 'src/templates/QAForm';
+import QADraftForm from 'src/templates/QADraftForm';
+import { editorLanguage } from 'src/types';
 
 const EditQuestion = () => {
   const router = useRouter();
@@ -24,12 +26,21 @@ const EditQuestion = () => {
 
   return (
     <>
-      <QAForm
-        question={question}
-        tags={tags}
-        onClickSaveButton={updateQuestion}
-        handleImageUpload={handleImageUpload}
-      />
+      {question?.editorLanguage === editorLanguage.MARKDOWN ? (
+        <QAForm
+          question={question}
+          tags={tags}
+          onClickSaveButton={updateQuestion}
+          handleImageUpload={handleImageUpload}
+        />
+      ) : (
+        <QADraftForm
+          question={question}
+          tags={tags}
+          onClickSaveButton={updateQuestion}
+          handleImageUpload={handleImageUpload}
+        />
+      )}
     </>
   );
 };
