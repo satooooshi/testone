@@ -5,7 +5,7 @@ import LayoutWithTab from '@/components/LayoutWithTab';
 import { useAPIGetUserInfoById } from '@/hooks/api/user/useAPIGetUserInfoById';
 import Image from 'next/image';
 import noImage from '@/public/no-image.jpg';
-import { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import EventCard from '@/components/EventCard';
 import QACard from '@/components/QACard';
 import { axiosInstance } from 'src/utils/url';
@@ -18,6 +18,69 @@ import TopTabBar, { TopTabBehavior } from '@/components/TopTabBar';
 import { useAPIGetEventList } from '@/hooks/api/event/useAPIGetEventList';
 import { useAPIGetWikiList } from '@/hooks/api/wiki/useAPIGetWikiList';
 import topTabBarStyles from '@/styles/components/TopTabBar.module.scss';
+import { Button, ThemeTypings } from '@chakra-ui/react';
+import { TagType, UserTag } from 'src/types';
+import { userRoleNameFactory } from 'src/utils/factory/userRoleNameFactory';
+
+type UserTagListProps = {
+  tags?: UserTag[];
+  type: TagType;
+};
+
+const UserTagList: React.FC<UserTagListProps> = ({ tags, type }) => {
+  const color: ThemeTypings['colorSchemes'] = useMemo(() => {
+    switch (type) {
+      case TagType.TECH:
+        return 'teal';
+      case TagType.QUALIFICATION:
+        return 'blue';
+      case TagType.CLUB:
+        return 'green';
+      case TagType.HOBBY:
+        return 'pink';
+      default:
+        return 'teal';
+    }
+  }, [type]);
+
+  const labelName: string = useMemo(() => {
+    switch (type) {
+      case TagType.TECH:
+        return '技術';
+      case TagType.QUALIFICATION:
+        return '資格';
+      case TagType.CLUB:
+        return '部活動';
+      case TagType.HOBBY:
+        return '趣味';
+      default:
+        return '';
+    }
+  }, [type]);
+
+  return (
+    <div className={accountInfoStyles.tag_list_wrapper}>
+      <p className={accountInfoStyles.tag_label_text}>{labelName}</p>
+      <div className={accountInfoStyles.tags_wrapper}>
+        <div className={accountInfoStyles.tag_button_wrapper}>
+          {tags?.length ? (
+            tags
+              ?.filter((t) => t.type === TagType.TECH)
+              .map((t) => (
+                <Button key={t.id} colorScheme={color} size="xs">
+                  {t.name}
+                </Button>
+              ))
+          ) : (
+            <Button colorScheme={color} size="xs">
+              未設定
+            </Button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const MyAccountInfo = () => {
   const router = useRouter();
@@ -124,13 +187,32 @@ const MyAccountInfo = () => {
 
             {activeTab === TabName.DETAIL && (
               <div className={accountInfoStyles.info_wrapper}>
-                <div className={accountInfoStyles.introduce_wrapper}>
-                  <p className={accountInfoStyles.introduce_title_text}>
-                    自己紹介
-                  </p>
-                  <p className={accountInfoStyles.introduce}>
-                    {profile.introduce || '自己紹介が未記入です'}
-                  </p>
+                <div className={accountInfoStyles.tag_list_area}>
+                  <UserTagList tags={profile.tags} type={TagType.TECH} />
+                  <UserTagList
+                    tags={profile.tags}
+                    type={TagType.QUALIFICATION}
+                  />
+                  <UserTagList tags={profile.tags} type={TagType.CLUB} />
+                  <UserTagList tags={profile.tags} type={TagType.HOBBY} />
+                </div>
+                <div className={accountInfoStyles.info_texts_wrapper}>
+                  <div className={accountInfoStyles.introduce_wrapper}>
+                    <p className={accountInfoStyles.introduce_title_text}>
+                      社員区分
+                    </p>
+                    <p className={accountInfoStyles.introduce}>
+                      {userRoleNameFactory(profile.role)}
+                    </p>
+                  </div>
+                  <div className={accountInfoStyles.introduce_wrapper}>
+                    <p className={accountInfoStyles.introduce_title_text}>
+                      自己紹介
+                    </p>
+                    <p className={accountInfoStyles.introduce}>
+                      {profile.introduce || '自己紹介が未記入です'}
+                    </p>
+                  </div>
                 </div>
               </div>
             )}
