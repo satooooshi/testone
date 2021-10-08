@@ -45,9 +45,11 @@ export interface User {
   role: UserRole;
   avatarUrl: string;
   verifiedAt: Date | null;
+  employeeId: string | null;
   createdAt: Date;
   updatedAt: Date;
   tags?: Tag[];
+  submissionFiles?: SubmissionFile[];
   hostingEvents?: EventSchedule[];
   events?: EventSchedule[];
   eventComments?: EventComment[];
@@ -137,6 +139,7 @@ export interface EventSchedule {
   hostUsers?: User[];
   tags?: Tag[];
   files?: EventFile[];
+  submissionFiles?: SubmissionFile[];
   videos?: EventVideo[];
   author?: User;
   createdAt: Date;
@@ -155,6 +158,15 @@ export interface EventVideo {
   id: number;
   url: string;
   eventSchedule?: EventSchedule;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface SubmissionFile {
+  id: number;
+  url: string;
+  eventSchedule?: Partial<EventSchedule>;
+  userSubmitted?: Partial<User>;
   createdAt: Date;
   updatedAt: Date;
 }

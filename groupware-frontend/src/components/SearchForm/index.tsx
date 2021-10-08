@@ -11,6 +11,7 @@ import { Button, Input, useMediaQuery } from '@chakra-ui/react';
 import { GiCancel } from 'react-icons/gi';
 import ReactModal from 'react-modal';
 import { AiOutlineSearch } from 'react-icons/ai';
+import clsx from 'clsx';
 
 const SearchFormContext = createContext({
   isSmallerThan768: false,
@@ -78,7 +79,11 @@ const SearchInput: React.FC<SearchFormProps> = ({
 
   return (
     <div className={searchFormStyles.main_wrapper}>
-      <div className={searchFormStyles.search_form_wrapper}>
+      <div
+        className={clsx(
+          searchFormStyles.search_form_wrapper,
+          selectedTags.length && searchFormStyles.selected_tag_top_margin,
+        )}>
         {isSmallerThan768 && (
           <div className={searchFormStyles.close_icon_wrapper}>
             <GiCancel
@@ -119,7 +124,7 @@ const SearchInput: React.FC<SearchFormProps> = ({
           onComplete={() => setTagModal(false)}
           isSearch={true}
         />
-        <div className={searchFormStyles.search_and_close_button_wrapper}>
+        <div className={clsx(searchFormStyles.search_and_close_button_wrapper)}>
           <Button
             width={isSmallerThan768 ? '100%' : '15vw'}
             colorScheme="pink"
@@ -140,9 +145,9 @@ const SearchInput: React.FC<SearchFormProps> = ({
           />
         </div>
       </div>
-      {selectedTags.length && selectedTags ? (
+      {selectedTags.length ? (
         <div className={searchFormStyles.search_items_wrapper}>
-          <div className={searchFormStyles.searched_item_title_wrapper}>
+          <div className={searchFormStyles.searched_items_title_wrapper}>
             <p className={searchFormStyles.searched_items_title}>
               選択したタグ
             </p>
@@ -162,15 +167,7 @@ const SearchInput: React.FC<SearchFormProps> = ({
           </div>
         </div>
       ) : null}
-      {searchedWord ? (
-        <div className={searchFormStyles.search_items_wrapper}>
-          <div className={searchFormStyles.selected_items_wrapper}>
-            <p className={searchFormStyles.item}>
-              {`"${searchedWord}"での検索結果`}
-            </p>
-          </div>
-        </div>
-      ) : null}
+      {searchedWord ? <p>{`"${searchedWord}"での検索結果`}</p> : null}
     </div>
   );
 };

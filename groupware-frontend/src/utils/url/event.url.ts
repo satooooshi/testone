@@ -9,3 +9,5 @@ export const updateEventURL = `/${eventURL}/update-event`;
 export const joinEventURL = `/${eventURL}/join-event`;
 export const deleteEventURL = `/${eventURL}/delete-event`;
 export const createCommentURL = `/${eventURL}/create-comment`;
+export const saveSubmissionURL = `/${eventURL}/save-submission`;
+export const downloadSubmissionZipURL = `/${eventURL}/submission-zip`;

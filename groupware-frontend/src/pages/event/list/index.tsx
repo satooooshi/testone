@@ -34,6 +34,7 @@ import {
   useAPIGetEventList,
 } from '@/hooks/api/event/useAPIGetEventList';
 import { useAPIGetTag } from '@/hooks/api/tag/useAPIGetTag';
+import topTabBarStyles from '@/styles/components/TopTabBar.module.scss';
 
 const localizer = momentLocalizer(moment);
 //@ts-ignore
@@ -312,10 +313,8 @@ const EventList = () => {
   };
 
   useEffect(() => {
-    if (isCalendar) {
-      calendarRef?.current?.scrollIntoView();
-    }
-  }, [isCalendar]);
+    calendarRef?.current?.scrollIntoView();
+  }, []);
 
   const initialHeaderValue = {
     title: 'Events',
@@ -408,7 +407,9 @@ const EventList = () => {
         event={newEvent}
       />
       <div className={eventListStyles.above_pagination}>
-        <TopTabBar topTabBehaviorList={topTabBehaviorList} />
+        <div className={topTabBarStyles.component_wrapper}>
+          <TopTabBar topTabBehaviorList={topTabBehaviorList} />
+        </div>
 
         {isCalendar && (
           <div

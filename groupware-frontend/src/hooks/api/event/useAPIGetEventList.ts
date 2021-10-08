@@ -25,7 +25,7 @@ export interface SearchResultToGetEvents {
 const getEventList = async (
   query: SearchQueryToGetEvents,
 ): Promise<SearchResultToGetEvents> => {
-  const url = getEventURL + generateEventSearchQueryString(query, true);
+  const url = getEventURL + generateEventSearchQueryString(query);
   const response = await axiosInstance.get(url);
   return response.data;
 };

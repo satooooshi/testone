@@ -4,7 +4,7 @@
   display: flex;
   flex-direction: column;
   width: 36vw;
-  padding: 8px;
+  padding: 4px 8px;
   background: $header_background_color;
   box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
   @media (max-width: 1024px) {
@@ -15,26 +15,23 @@
   }
 }
 
-.left {
+.top {
   display: flex;
   flex-direction: row;
+  align-items: flex-start;
   width: 100%;
   margin-bottom: 8px;
-  height: 56px;
 }
 
 .avatar {
-  width: 40px;
-  aspect-ratio: 1;
-  margin-right: 16px;
+  margin-right: 8px;
 }
 
-.right {
+.bottom {
   width: 100%;
 }
 
 .name {
-  margin-bottom: 8px;
   font-weight: bold;
   color: $dark_font_color;
   font-size: 18px;
@@ -42,41 +39,46 @@
   text-overflow: ellipsis;
   overflow: hidden;
   width: 100%;
+  margin-bottom: 4px;
 }
 
-.introduce {
-  margin-bottom: 8px;
+.sub_info_text {
+  font-size: 14px;
+  display: flex;
+  flex-flow: row;
+  align-items: center;
+  justify-content: space-between;
+  width: 40%;
+  @media (max-width: 576px) {
+    font-size: 12px;
+    width: 100%;
+  }
+}
+
+.sub_info_wrapper {
+}
+
+.introduce_text_wrapper {
+  // height: 16px;
+}
+
+.introduce_text {
   color: $dark_font_color;
-  min-height: 8px;
+  font-size: 14px;
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
   width: 100%;
 }
 
-.counts_wrapper {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  justify-content: center;
-}
-
-.count_item_wrapper {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-bottom: 8px;
-  min-width: 25%;
-}
-
-.count_label {
-  font-size: 14px;
+.count_label_text {
+  // margin-right: 8px;
 }
 
 .count {
   font-weight: bold;
-  font-size: 24px;
-  color: $green_color;
+  color: $blue_color;
+  font-size: 18px;
 }
 
 .tag_item_wrapper {
@@ -103,7 +105,7 @@
   display: flex;
   flex-direction: row;
   align-items: center;
-  margin-bottom: 8px;
+  margin-bottom: 4px;
 }
 
 .tags_label {
@@ -111,12 +113,14 @@
   word-break: keep-all;
   width: 12%;
   max-width: 64px;
+  font-size: 14px;
   @media (max-width: 768px) {
-    width: 16%;
+    width: 20%;
   }
 }
 
 .user_info_text {
   overflow: hidden;
   text-overflow: ellipsis;
+  width: 100%;
 }
