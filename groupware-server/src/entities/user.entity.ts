@@ -29,12 +29,12 @@ export enum UserRole {
 }
 
 @Entity({ name: 'users' })
-@Unique(['email', 'employeeId'])
 @Index(['lastName', 'firstName', 'email'], { fulltext: true })
 export class User {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @Index({ unique: true })
   @Column({
     type: 'varchar',
     name: 'email',
