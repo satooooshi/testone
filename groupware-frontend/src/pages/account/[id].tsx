@@ -20,6 +20,7 @@ import { useAPIGetWikiList } from '@/hooks/api/wiki/useAPIGetWikiList';
 import topTabBarStyles from '@/styles/components/TopTabBar.module.scss';
 import { Button, ThemeTypings } from '@chakra-ui/react';
 import { TagType, UserTag } from 'src/types';
+import { userRoleNameFactory } from 'src/utils/factory/userRoleNameFactory';
 
 type UserTagListProps = {
   tags?: UserTag[];
@@ -196,6 +197,14 @@ const MyAccountInfo = () => {
                   <UserTagList tags={profile.tags} type={TagType.HOBBY} />
                 </div>
                 <div className={accountInfoStyles.info_texts_wrapper}>
+                  <div className={accountInfoStyles.introduce_wrapper}>
+                    <p className={accountInfoStyles.introduce_title_text}>
+                      役職
+                    </p>
+                    <p className={accountInfoStyles.introduce}>
+                      {userRoleNameFactory(profile.role)}
+                    </p>
+                  </div>
                   <div className={accountInfoStyles.introduce_wrapper}>
                     <p className={accountInfoStyles.introduce_title_text}>
                       自己紹介
