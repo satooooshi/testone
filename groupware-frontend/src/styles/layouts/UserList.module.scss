@@ -52,7 +52,7 @@
 .sort_select_wrapper {
   width: 40%;
   @media (max-width: 756px) {
-    width: 100%;
+    width: 45%;
   }
 }
 
@@ -65,7 +65,6 @@
   flex-direction: row;
   justify-content: space-evenly;
   @media (max-width: 756px) {
-    flex-direction: column;
-    justify-content: flex-start;
+    width: 90vw;
   }
 }
