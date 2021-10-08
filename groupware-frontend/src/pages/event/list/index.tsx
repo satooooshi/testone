@@ -312,9 +312,7 @@ const EventList = () => {
   };
 
   useEffect(() => {
-    if (isCalendar) {
-      calendarRef?.current?.scrollIntoView();
-    }
+    calendarRef?.current?.scrollIntoView();
   }, []);
 
   const initialHeaderValue = {
