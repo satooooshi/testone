@@ -7,7 +7,7 @@ import impressiveUniversityImage1 from '@/public/impressive_university_1.png';
 import impressiveUniversityImage2 from '@/public/impressive_university_2.png';
 import { useAPIGetLatestEvent } from '@/hooks/api/event/useAPIGetLatestEvent';
 import { EventType } from 'src/types';
-import EventTemplate from 'src/templates/EventTemplate';
+import EventIntroduction from 'src/templates/event/EventIntroduction';
 
 const ImpressionUniversity: React.FC = () => {
   const router = useRouter();
@@ -32,7 +32,7 @@ const ImpressionUniversity: React.FC = () => {
       sidebar={{ activeScreenName: ScreenName.EVENT }}
       header={initialHeaderValue}>
       <div className={eventPRStyles.main}>
-        <EventTemplate
+        <EventIntroduction
           events={events}
           bottomImages={bottomImages}
           imgUrl={imgUrl}

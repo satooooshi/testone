@@ -4,7 +4,7 @@ import { EventTab } from 'src/types/header/tab/types';
 import { EachEventData } from 'src/types';
 import Image from 'next/image';
 
-const EventTemplate: React.FC<EachEventData> = ({
+const EventIntroduction: React.FC<EachEventData> = ({
   events,
   bottomImages,
   imgUrl,
@@ -68,4 +68,4 @@ const EventTemplate: React.FC<EachEventData> = ({
   );
 };
 
-export default EventTemplate;
+export default EventIntroduction;

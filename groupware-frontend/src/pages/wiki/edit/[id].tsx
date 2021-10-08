@@ -3,7 +3,7 @@ import { useAPIUpdateWiki } from '@/hooks/api/wiki/useAPIUpdateQuestion';
 import { useAPIGetWikiDetail } from '@/hooks/api/wiki/useAPIGetWikiDetail';
 import { useAPIGetTag } from '@/hooks/api/tag/useAPIGetTag';
 import { uploadStorage } from '@/hooks/api/storage/useAPIUploadStorage';
-import QAForm from 'src/templates/QAForm';
+import QAForm from 'src/templates/wiki/QAForm';
 
 const EditQuestion = () => {
   const router = useRouter();
