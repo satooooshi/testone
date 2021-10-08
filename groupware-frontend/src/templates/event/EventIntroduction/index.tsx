@@ -57,9 +57,9 @@ const EventIntroduction: React.FC<EachEventData> = ({
           </div>
         </div>
         <div className={eventPRStyles.bottom_images_row}>
-          {bottomImages.map((b, id) => (
+          {bottomImages.map((i, id) => (
             <div key={id} className={eventPRStyles.bottom_image_wrapper}>
-              <Image src={b} alt="" />
+              <Image src={i} alt="" />
             </div>
           ))}
         </div>

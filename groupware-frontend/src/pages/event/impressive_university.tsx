@@ -5,7 +5,6 @@ import React from 'react';
 import eventPRStyles from '@/styles/layouts/EventPR.module.scss';
 import impressiveUniversityImage1 from '@/public/impressive_university_1.png';
 import impressiveUniversityImage2 from '@/public/impressive_university_2.png';
-import Image from 'next/image';
 import { useAPIGetLatestEvent } from '@/hooks/api/event/useAPIGetLatestEvent';
 import { EventType } from 'src/types';
 import EventIntroduction from 'src/templates/event/EventIntroduction';
