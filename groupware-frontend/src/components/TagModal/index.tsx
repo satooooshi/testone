@@ -2,16 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { Tag, TagType, UserTag } from 'src/types';
 import Modal from 'react-modal';
 import tagModalStyles from '@/styles/components/TagModal.module.scss';
-import { useAPICreateTag } from '@/hooks/api/tag/useAPICreateTag';
 import clsx from 'clsx';
-import {
-  Button,
-  FormControl,
-  FormLabel,
-  Input,
-  Select,
-  useMediaQuery,
-} from '@chakra-ui/react';
+import { Button, FormControl, FormLabel, Select } from '@chakra-ui/react';
 
 type TagModalProps = {
   isOpen: boolean;
@@ -54,7 +46,6 @@ const TagListItem: React.FC<TagListItemProps> = ({
 };
 const TagModal: React.FC<TagModalProps> = ({
   isOpen,
-  isSearch,
   tags: savedTags,
   selectedTags,
   filteredTagType,
@@ -62,25 +53,10 @@ const TagModal: React.FC<TagModalProps> = ({
   onCancel: closeTagModal,
   onComplete,
 }) => {
-  const [newTag, setNewTag] = useState<Partial<Tag>>({
-    name: '',
-  });
   const [tags, setTags] = useState(savedTags);
-  const [isLargerThan768] = useMediaQuery('(max-width: 768px)');
   const [selectedTagType, setSelectedTagType] = useState<TagType | 'all'>(
     'all',
   );
-
-  const { mutate: createTag } = useAPICreateTag({
-    onSuccess: (newTag) => {
-      setNewTag((t) => ({ ...t, name: '' }));
-      setTags((t) => (t ? [newTag, ...t] : [newTag]));
-    },
-  });
-
-  const checkAndCreateTag = () => {
-    !tags.find((tag) => tag.name === newTag.name) && createTag(newTag);
-  };
 
   useEffect(() => {
     if (savedTags) {
@@ -102,29 +78,6 @@ const TagModal: React.FC<TagModalProps> = ({
       isOpen={isOpen}
       style={{ overlay: { zIndex: 110 } }}
       className={tagModalStyles.modal_wrapper}>
-      {tags.find((tag) => tag.name === newTag.name) ? (
-        <p className={tagModalStyles.error_text}>すでに作成してあります</p>
-      ) : null}
-      {!isSearch && (
-        <div className={tagModalStyles.modal_input_wrapper}>
-          <Input
-            type="text"
-            className={tagModalStyles.modal_input_name}
-            width={isLargerThan768 ? '100%' : '75%'}
-            value={newTag.name}
-            background="white"
-            onChange={(e) => setNewTag((t) => ({ ...t, name: e.target.value }))}
-            placeholder="タグ名を入力して新規タグを作成"
-          />
-          <Button
-            colorScheme="green"
-            width={isLargerThan768 ? '100%' : '20%'}
-            className={tagModalStyles.create_button}
-            onClick={checkAndCreateTag}>
-            作成
-          </Button>
-        </div>
-      )}
       {!filteredTagType && (
         <FormControl className={tagModalStyles.tag_select_wrapper}>
           <FormLabel>タイプ</FormLabel>

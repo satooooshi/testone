@@ -12,6 +12,7 @@ import {
   FormControl,
   FormLabel,
   Input,
+  Select,
   Textarea,
   useToast,
 } from '@chakra-ui/react';
@@ -323,6 +324,27 @@ const CreateNewUser = () => {
               name="email"
               onBlur={handleBlur}
             />
+          </FormControl>
+          <FormControl className={createNewUserStyles.input_wrapper}>
+            <FormLabel fontWeight={'bold'}>
+              <p>社員区分</p>
+              {errors.role && touched.role ? (
+                <p className={validationErrorStyles.error_text}>
+                  {errors.role}
+                </p>
+              ) : null}
+            </FormLabel>
+            <Select
+              name="roles"
+              colorScheme="teal"
+              bg="white"
+              onChange={handleChange}
+              defaultValue={UserRole.COMMON}>
+              <option value={UserRole.ADMIN}>管理者</option>
+              <option value={UserRole.INSTRUCTOR}>講師</option>
+              <option value={UserRole.HEAD_OFFICE}>本社勤務</option>
+              <option value={UserRole.COMMON}>一般社員</option>
+            </Select>
           </FormControl>
           <FormControl className={createNewUserStyles.input_wrapper}>
             <FormLabel fontWeight={'bold'}>
