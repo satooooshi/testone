@@ -38,7 +38,7 @@ const TagLink: React.FC<TagLinkProps> = ({ tag, onClickTag, tagColor }) => {
       <a
         onClick={() => onClickTag(tag)}
         className={userCardStyles.tag_item_wrapper}>
-        <Button height="28px" colorScheme={tagColor}>
+        <Button size="sm" colorScheme={tagColor}>
           {tag.name}
         </Button>
       </a>
@@ -62,18 +62,44 @@ const UserCard: React.FC<UserCardProps> = ({ user, onClickTag, duration }) => {
   return (
     <Link href={`/account/${user.id}`} passHref>
       <a className={userCardStyles.wrapper}>
-        <div className={userCardStyles.left}>
-          <Avatar src={user.avatarUrl} className={userCardStyles.avatar} />
+        <div className={userCardStyles.top}>
+          <Avatar
+            size="xl"
+            src={user.avatarUrl}
+            className={userCardStyles.avatar}
+          />
           <div className={userCardStyles.user_info_text}>
             <p
               className={
                 userCardStyles.name
               }>{`${user.lastName} ${user.firstName}`}</p>
-            <p className={userCardStyles.introduce}>{`${user.introduce}`}</p>
+            <div className={userCardStyles.introduce_text_wrapper}>
+              <p className={userCardStyles.introduce_text}>{`${
+                user.introduce || '自己紹介未入力'
+              }`}</p>
+            </div>
+            <span className={userCardStyles.sub_info_text}>
+              <p className={userCardStyles.count_label_text}>
+                イベント参加数{durationText()}
+              </p>
+              <p className={userCardStyles.count}>{user.eventCount}</p>
+            </span>
+            <span className={userCardStyles.sub_info_text}>
+              <p className={userCardStyles.count_label_text}>
+                質問数{durationText()}
+              </p>
+              <p className={userCardStyles.count}>{user.questionCount}</p>
+            </span>
+            <span className={userCardStyles.sub_info_text}>
+              <p className={userCardStyles.count_label_text}>
+                質問回答数{durationText()}
+              </p>
+              <p className={userCardStyles.count}>{user.answerCount}</p>
+            </span>
           </div>
         </div>
 
-        <div className={userCardStyles.right}>
+        <div className={userCardStyles.bottom}>
           <div className={userCardStyles.tags_with_label_wrapper}>
             <p className={userCardStyles.tags_label}>技術:</p>
             <div className={userCardStyles.tags_wrapper}>
@@ -87,7 +113,7 @@ const UserCard: React.FC<UserCardProps> = ({ user, onClickTag, duration }) => {
                   />
                 ))
               ) : (
-                <Button height="28px" colorScheme="teal">
+                <Button size="sm" height="28px" colorScheme="teal">
                   未設定
                 </Button>
               )}
@@ -106,7 +132,7 @@ const UserCard: React.FC<UserCardProps> = ({ user, onClickTag, duration }) => {
                   />
                 ))
               ) : (
-                <Button height="28px" colorScheme="blue">
+                <Button size="sm" height="28px" colorScheme="blue">
                   未設定
                 </Button>
               )}
@@ -125,7 +151,7 @@ const UserCard: React.FC<UserCardProps> = ({ user, onClickTag, duration }) => {
                   />
                 ))
               ) : (
-                <Button height="28px" colorScheme="green">
+                <Button size="sm" height="28px" colorScheme="green">
                   未設定
                 </Button>
               )}
@@ -144,33 +170,33 @@ const UserCard: React.FC<UserCardProps> = ({ user, onClickTag, duration }) => {
                   />
                 ))
               ) : (
-                <Button height="28px" colorScheme="pink">
+                <Button size="sm" height="28px" colorScheme="pink">
                   未設定
                 </Button>
               )}
             </div>
           </div>
 
-          <div className={userCardStyles.counts_wrapper}>
-            <div className={userCardStyles.count_item_wrapper}>
-              <p className={userCardStyles.count}>{user.eventCount}</p>
-              <p className={userCardStyles.count_label}>
-                イベント参加数{durationText()}
-              </p>
-            </div>
-            <div className={userCardStyles.count_item_wrapper}>
-              <p className={userCardStyles.count}>{user.questionCount}</p>
-              <p className={userCardStyles.count_label}>
-                質問数{durationText()}
-              </p>
-            </div>
-            <div className={userCardStyles.count_item_wrapper}>
-              <p className={userCardStyles.count}>{user.answerCount}</p>
-              <p className={userCardStyles.count_label}>
-                回答数{durationText()}
-              </p>
-            </div>
-          </div>
+          {/* <div className={userCardStyles.counts_wrapper}> */}
+          {/*   <div className={userCardStyles.count_item_wrapper}> */}
+          {/*     <p className={userCardStyles.count}>{user.eventCount}</p> */}
+          {/*     <p className={userCardStyles.count_label}> */}
+          {/*       イベント参加数{durationText()} */}
+          {/*     </p> */}
+          {/*   </div> */}
+          {/*   <div className={userCardStyles.count_item_wrapper}> */}
+          {/*     <p className={userCardStyles.count}>{user.questionCount}</p> */}
+          {/*     <p className={userCardStyles.count_label}> */}
+          {/*       質問数{durationText()} */}
+          {/*     </p> */}
+          {/*   </div> */}
+          {/*   <div className={userCardStyles.count_item_wrapper}> */}
+          {/*     <p className={userCardStyles.count}>{user.answerCount}</p> */}
+          {/*     <p className={userCardStyles.count_label}> */}
+          {/*       回答数{durationText()} */}
+          {/*     </p> */}
+          {/*   </div> */}
+          {/* </div> */}
         </div>
       </a>
     </Link>
