@@ -22,6 +22,11 @@ export enum WikiType {
   QA = 'qa',
 }
 
+export enum EditorLanguage {
+  MARKDOWN = 'markdown',
+  MARKUP = 'markup',
+}
+
 @Entity({ name: 'wiki' })
 @Index(['title', 'body'], { fulltext: true })
 export class Wiki {
@@ -36,6 +41,14 @@ export class Wiki {
 
   @Column({ name: 'type', type: 'enum', enum: WikiType, default: WikiType.QA })
   type: WikiType;
+
+  @Column({
+    name: 'editorLanguage',
+    type: 'enum',
+    enum: EditorLanguage,
+    default: EditorLanguage.MARKDOWN,
+  })
+  editorLanguage: EditorLanguage;
 
   @Column({
     type: 'datetime',

@@ -35,6 +35,11 @@ export enum WikiType {
   QA = 'qa',
 }
 
+export enum editorLanguage {
+  MARKDOWN = 'markdown',
+  MARKUP = 'markup',
+}
+
 export interface User {
   id: number;
   email: string;
@@ -89,6 +94,7 @@ export interface QAQuestion {
   title: string;
   body: string;
   type: WikiType;
+  editorLanguage: editorLanguage;
   resolvedAt: Date;
   writer?: User;
   answers?: QAAnswer[];
