@@ -17,6 +17,7 @@ import Head from 'next/head';
 import TopTabBar, { TopTabBehavior } from '@/components/TopTabBar';
 import { useAPIGetEventList } from '@/hooks/api/event/useAPIGetEventList';
 import { useAPIGetWikiList } from '@/hooks/api/wiki/useAPIGetWikiList';
+import topTabBarStyles from '@/styles/components/TopTabBar.module.scss';
 
 const MyAccountInfo = () => {
   const router = useRouter();
@@ -117,7 +118,9 @@ const MyAccountInfo = () => {
               </h1>
             </div>
 
-            <TopTabBar topTabBehaviorList={topTabBehaviorList} />
+            <div className={topTabBarStyles.component_wrapper}>
+              <TopTabBar topTabBehaviorList={topTabBehaviorList} />
+            </div>
 
             {activeTab === TabName.DETAIL && (
               <div className={accountInfoStyles.info_wrapper}>
