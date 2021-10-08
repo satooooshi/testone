@@ -1,7 +1,7 @@
 import eventPRStyles from '@/styles/layouts/EventPR.module.scss';
 import EventCard from '@/components/EventCard';
 import { EventTab } from 'src/types/header/tab/types';
-import { EachEventData } from 'src/types';
+import { EachEventData } from 'src/types/event/eventIntroduction/types';
 import Image from 'next/image';
 
 const EventIntroduction: React.FC<EachEventData> = ({

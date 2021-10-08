@@ -167,14 +167,6 @@ export interface EventFile {
   updatedAt: Date;
 }
 
-export interface EachEventData {
-  events?: EventSchedule[];
-  bottomImages: StaticImageData[];
-  imgUrl: string;
-  subHeading: string;
-  content: string;
-}
-
 export interface Department {
   id: number;
   name: string;
