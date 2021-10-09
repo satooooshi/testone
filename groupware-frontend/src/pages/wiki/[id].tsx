@@ -3,26 +3,24 @@ import { useAPIGetWikiDetail } from '@/hooks/api/wiki/useAPIGetWikiDetail';
 import { useRouter } from 'next/router';
 import qaDetailStyles from '@/styles/layouts/QADetail.module.scss';
 import QAComment from '@/components/QAComment';
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import 'react-markdown-editor-lite/lib/index.css';
 import { useAPICreateAnswer } from '@/hooks/api/wiki/useAPICreateAnswer';
 import LayoutWithTab from '@/components/LayoutWithTab';
 import AnswerReply from '@/components/AnswerReply';
-import { QAAnswerReply, QAAnswer, WikiType } from 'src/types';
+import { editorLanguage, QAAnswerReply, WikiType } from 'src/types';
 import { Button, useMediaQuery } from '@chakra-ui/react';
-import WrappedEditor from '@/components/WrappedEditor';
-import Editor from 'react-markdown-editor-lite';
-import { uploadStorage } from '@/hooks/api/storage/useAPIUploadStorage';
-import MarkdownIt from 'markdown-it';
+import WrappedDraftEditor from '@/components/WrappedDraftEditor';
+import { ContentState, Editor, EditorState } from 'draft-js';
 import Head from 'next/head';
 import Link from 'next/link';
 import { Tab } from 'src/types/header/tab/types';
 import { useAPICreateAnswerReply } from '@/hooks/api/wiki/useAPICreateAnswerReply';
 import { useAPICreateBestAnswer } from '@/hooks/api/wiki/useAPICreateBestAnswer';
 import { useAPIGetProfile } from '@/hooks/api/user/useAPIGetProfile';
+import { stateToHTML } from 'draft-js-export-html';
 
 const QuestionDetail = () => {
-  const mdParser = new MarkdownIt({ breaks: true });
   const router = useRouter();
 
   const { id } = router.query;
@@ -30,20 +28,38 @@ const QuestionDetail = () => {
     typeof id === 'string' ? id : '0',
   );
   const [answerVisible, setAnswerVisible] = useState(false);
-  const [answerEditor, setAnswerEditor] = useState<Partial<QAAnswer>>({
-    body: '',
-  });
   const [answerReply, setAnswerReply] = useState<Partial<QAAnswerReply>>({});
+  const draftEditor = useRef<Editor>(null);
+  const [answerEditorState, setAnswerEditorState] = useState(() =>
+    EditorState.createEmpty(),
+  );
+  const [answerReplyEditorState, setAnswerReplyEditorState] = useState(() =>
+    EditorState.createEmpty(),
+  );
+
   const { mutate: createAnswerReply } = useAPICreateAnswerReply({
     onSuccess: () => {
       setAnswerReply({});
+      setAnswerReplyEditorState(
+        EditorState.push(
+          answerReplyEditorState,
+          ContentState.createFromText(''),
+          'delete-character',
+        ),
+      );
       refetch();
     },
   });
   const { mutate: createAnswer } = useAPICreateAnswer({
     onSuccess: () => {
       setAnswerVisible(false);
-      setAnswerEditor((e) => ({ ...e, body: '' }));
+      setAnswerEditorState(
+        EditorState.push(
+          answerEditorState,
+          ContentState.createFromText(''),
+          'delete-character',
+        ),
+      );
       refetch();
     },
   });
@@ -56,34 +72,6 @@ const QuestionDetail = () => {
 
   const { data: myself } = useAPIGetProfile();
   const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
-
-  const mdEditor = React.useRef<Editor | null>(null);
-  const handleImageUpload = async (file: File) => {
-    const uploadedImageURL = await uploadStorage([file]);
-    return uploadedImageURL[0];
-  };
-  const plugins = [
-    'header',
-    'font-bold',
-    'font-italic',
-    'font-strikethrough',
-    'block-quote',
-    'block-code-inline',
-    'block-code-block',
-    'image',
-    'clear',
-    'logger',
-    'mode-toggle',
-    'full-screen',
-    'tab-insert',
-  ];
-  const handleAnswerEditorChange = ({ text }: { text: string }) => {
-    setAnswerEditor((a) => ({ ...a, body: text || '' }));
-  };
-
-  const handleAnswerReplyChange = ({ text }: { text: string }) => {
-    setAnswerReply((r) => ({ ...r, body: text }));
-  };
 
   const navigateToEditQuestion = (id: number) => {
     router.push('/wiki/edit/' + id);
@@ -156,9 +144,12 @@ const QuestionDetail = () => {
                 size="sm"
                 colorScheme="teal"
                 onClick={() => {
-                  answerVisible && answerEditor.body
+                  answerVisible && answerEditorState.getCurrentContent()
                     ? createAnswer({
-                        body: answerEditor.body,
+                        editorLanguage: editorLanguage.MARKUP
+                        body: stateToHTML(
+                          answerEditorState.getCurrentContent(),
+                        ),
                         question: question,
                       })
                     : setAnswerVisible(true);
@@ -168,20 +159,15 @@ const QuestionDetail = () => {
             </div>
           )}
           {answerVisible && (
-            <WrappedEditor
-              autoFocus
+            <WrappedDraftEditor
               style={{
-                height: '650px',
                 marginBottom: 40,
                 width: isSmallerThan768 ? '100vw' : '80vw',
               }}
-              placeholder="Please enter Markdown text"
-              editorRef={mdEditor}
-              onImageUpload={handleImageUpload}
-              plugins={plugins}
-              value={answerEditor.body}
-              onChange={handleAnswerEditorChange}
-              renderHTML={(text: string) => mdParser.render(text)}
+              placeholder="回答を記入してください"
+              editorRef={draftEditor}
+              editorState={answerEditorState}
+              setEditorState={setAnswerEditorState}
             />
           )}
           {question.answers && question.answers.length
@@ -218,26 +204,28 @@ const QuestionDetail = () => {
                                 answer: a,
                                 body: '',
                               }));
+                              setAnswerReplyEditorState(
+                                EditorState.push(
+                                  answerReplyEditorState,
+                                  ContentState.createFromText(''),
+                                  'delete-character',
+                                ),
+                              );
                               return;
                             }
                           }}
                         />
                       </div>
                       {answerReply.answer && answerReply.answer.id === a.id ? (
-                        <WrappedEditor
-                          autoFocus
-                          value={answerReply.body || ''}
+                        <WrappedDraftEditor
                           style={{
-                            height: '75vh',
                             marginBottom: 10,
                             width: isSmallerThan768 ? '100vw' : '70vw',
                           }}
-                          editorRef={mdEditor}
-                          onImageUpload={handleImageUpload}
+                          editorRef={draftEditor}
                           placeholder="回答への返信を記入してください"
-                          onChange={handleAnswerReplyChange}
-                          plugins={plugins}
-                          renderHTML={(text: string) => mdParser.render(text)}
+                          editorState={answerReplyEditorState}
+                          setEditorState={setAnswerReplyEditorState}
                         />
                       ) : null}
                       {answerReply.answer && answerReply.answer.id === a.id ? (
@@ -246,8 +234,14 @@ const QuestionDetail = () => {
                           width="24"
                           className={qaDetailStyles.reply_button}
                           onClick={() => {
-                            if (answerReply.body) {
-                              createAnswerReply(answerReply);
+                            if (answerReplyEditorState.getCurrentContent()) {
+                              createAnswerReply({
+                                ...answerReply,
+                                editorLanguage: editorLanguage.MARKUP
+                                body: stateToHTML(
+                                  answerReplyEditorState.getCurrentContent(),
+                                ),
+                              });
                             }
                           }}>
                           返信を送信
