@@ -35,10 +35,7 @@ export enum WikiType {
   QA = 'qa',
 }
 
-export enum EditorLanguage {
-  MARKDOWN = 'markdown',
-  MARKUP = 'markup',
-}
+export type TextFormat = 'markdown' | 'html';
 
 export interface User {
   id: number;
@@ -94,7 +91,7 @@ export interface QAQuestion {
   title: string;
   body: string;
   type: WikiType;
-  editorLanguage: EditorLanguage;
+  textFormat: TextFormat;
   resolvedAt: Date;
   writer?: User;
   answers?: QAAnswer[];
@@ -107,7 +104,7 @@ export interface QAQuestion {
 export interface QAAnswerReply {
   id: number;
   body: string;
-  editorLanguage: EditorLanguage;
+  textFormat: TextFormat;
   writer?: User;
   answer?: QAAnswer;
   createdAt: Date;
@@ -117,7 +114,7 @@ export interface QAAnswerReply {
 export interface QAAnswer {
   id: number;
   body: string;
-  editorLanguage: EditorLanguage;
+  textFormat: TextFormat;
   createdAt: Date;
   updatedAt: Date;
   question?: QAQuestion;

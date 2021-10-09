@@ -9,13 +9,8 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { QAAnswerReply } from './qaAnswerReply.entity';
-import { Wiki } from './qaQuestion.entity';
+import { TextFormat, Wiki } from './qaQuestion.entity';
 import { User } from './user.entity';
-
-export enum EditorLanguage {
-  MARKDOWN = 'markdown',
-  MARKUP = 'markup',
-}
 
 @Entity({ name: 'qa_answers' })
 export class QAAnswer {
@@ -25,13 +20,12 @@ export class QAAnswer {
   @Column({ name: 'body', type: 'longtext' })
   body: string;
 
-  @Column({
-    name: 'editor_language',
-    type: 'enum',
-    enum: EditorLanguage,
-    default: EditorLanguage.MARKDOWN,
+  @Column('simple-enum', {
+    name: 'text_format',
+    enum: ['markdown', 'html'],
+    default: 'markdown',
   })
-  editorLanguage: EditorLanguage;
+  textFormat: TextFormat;
 
   @ManyToOne(() => Wiki, (qaQuestion) => qaQuestion.answers, {
     onUpdate: 'CASCADE',

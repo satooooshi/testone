@@ -8,7 +8,7 @@ import 'react-markdown-editor-lite/lib/index.css';
 import { useAPICreateAnswer } from '@/hooks/api/wiki/useAPICreateAnswer';
 import LayoutWithTab from '@/components/LayoutWithTab';
 import AnswerReply from '@/components/AnswerReply';
-import { EditorLanguage, QAAnswerReply, WikiType } from 'src/types';
+import { QAAnswerReply, WikiType } from 'src/types';
 import { Button, useMediaQuery } from '@chakra-ui/react';
 import WrappedDraftEditor from '@/components/WrappedDraftEditor';
 import { ContentState, Editor, EditorState } from 'draft-js';
@@ -121,7 +121,7 @@ const QuestionDetail = () => {
           <div className={qaDetailStyles.question_wrapper}>
             <div className={qaDetailStyles.qa_wrapper}>
               <QAComment
-                editorLanguage={question.editorLanguage}
+                textFormat={question.textFormat}
                 body={question.body}
                 date={question.createdAt}
                 writer={question.writer}
@@ -144,7 +144,7 @@ const QuestionDetail = () => {
                 onClick={() => {
                   answerVisible && answerEditorState.getCurrentContent()
                     ? createAnswer({
-                        editorLanguage: EditorLanguage.MARKUP,
+                        textFormat: 'html',
                         body: stateToHTML(
                           answerEditorState.getCurrentContent(),
                         ),
@@ -187,7 +187,7 @@ const QuestionDetail = () => {
                             onClickBestAnswerButton={() =>
                               createBestAnswer({ ...question, bestAnswer: a })
                             }
-                            editorLanguage={question.editorLanguage}
+                            textFormat={question.textFormat}
                             body={a.body}
                             date={a.createdAt}
                             writer={a.writer}
@@ -238,7 +238,7 @@ const QuestionDetail = () => {
                             if (answerReplyEditorState.getCurrentContent()) {
                               createAnswerReply({
                                 ...answerReply,
-                                editorLanguage: EditorLanguage.MARKUP,
+                                textFormat: 'html',
                                 body: stateToHTML(
                                   answerReplyEditorState.getCurrentContent(),
                                 ),

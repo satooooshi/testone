@@ -5,7 +5,6 @@ import { useAPIGetTag } from '@/hooks/api/tag/useAPIGetTag';
 import { uploadStorage } from '@/hooks/api/storage/useAPIUploadStorage';
 import QAForm from 'src/templates/QAForm';
 import QADraftForm from 'src/templates/QADraftForm';
-import { EditorLanguage } from 'src/types';
 
 const EditQuestion = () => {
   const router = useRouter();
@@ -24,7 +23,7 @@ const EditQuestion = () => {
     return uploadedImageURL[0];
   };
 
-  return question?.editorLanguage === EditorLanguage.MARKDOWN ? (
+  return question?.textFormat === 'markdown' ? (
     <>
       <QAForm
         question={question}

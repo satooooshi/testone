@@ -32,7 +32,7 @@ const AnswerReply: React.FC<AnswerReplyProps> = ({ reply }) => {
         </p>
       </div>
       <div className={answerReplyStyles.qa_reply_wrapper}>
-        <QAComment editorLanguage={reply.editorLanguage} body={reply.body} />
+        <QAComment textFormat={reply.textFormat} body={reply.body} />
       </div>
     </div>
   );

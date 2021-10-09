@@ -1,5 +1,5 @@
 import React from 'react';
-import { EditorLanguage, User } from 'src/types';
+import { TextFormat, User } from 'src/types';
 import qaCommentStyles from '@/styles/components/QAComment.module.scss';
 import { dateTimeFormatterFromJSDDate } from 'src/utils/dateTimeFormatter';
 import '@uiw/react-md-editor/dist/markdown-editor.css';
@@ -11,7 +11,7 @@ import 'react-markdown-editor-lite/lib/index.css';
 import DraftMarkup from '../DraftMarkup';
 
 type QACommentProps = {
-  editorLanguage: EditorLanguage;
+  textFormat: TextFormat;
   body: string;
   date?: Date;
   writer?: User;
@@ -24,7 +24,7 @@ type QACommentProps = {
 };
 
 const QAComment: React.FC<QACommentProps> = ({
-  editorLanguage,
+  textFormat,
   body,
   date,
   writer,
@@ -72,7 +72,7 @@ const QAComment: React.FC<QACommentProps> = ({
         </div>
       )}
       <div className={qaCommentStyles.markdown}>
-        {editorLanguage === 'markdown' ? (
+        {textFormat === 'markdown' ? (
           <Editor
             style={{ border: 'none' }}
             view={{ html: true, menu: false, md: false }}
