@@ -44,6 +44,7 @@ const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
   const { mutate: uploadImage } = useAPIUploadStorage({
     onSuccess: async (fileURLs) => {
       createGroup({ ...newGroup, imageURL: fileURLs[0] });
+      setSelectImageUrl('');
     },
   });
   const [selectImageName, setSelectImageName] = useState<string>('');
