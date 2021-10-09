@@ -102,6 +102,8 @@ const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
           </div>
           {selectImageUrl ? (
             <ReactCrop
+              imageStyle={{ maxHeight: '80%' }}
+              className={selectUserModalStyles.scroll}
               src={selectImageUrl}
               crop={crop}
               onChange={(newCrop) => setCrop(newCrop)}
