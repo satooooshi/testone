@@ -84,6 +84,7 @@ const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
 
   return (
     <ReactModal
+      ariaHideApp={false}
       style={{ overlay: { zIndex: 100 } }}
       isOpen={isOpen}
       className={selectUserModalStyles.modal}>
