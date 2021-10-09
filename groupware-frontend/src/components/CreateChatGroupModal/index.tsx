@@ -44,6 +44,7 @@ const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
   const { mutate: uploadImage } = useAPIUploadStorage({
     onSuccess: async (fileURLs) => {
       createGroup({ ...newGroup, imageURL: fileURLs[0] });
+      setSelectImageUrl('');
     },
   });
   const [selectImageName, setSelectImageName] = useState<string>('');
@@ -83,6 +84,7 @@ const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
 
   return (
     <ReactModal
+      ariaHideApp={false}
       style={{ overlay: { zIndex: 100 } }}
       isOpen={isOpen}
       className={selectUserModalStyles.modal}>
@@ -108,13 +110,16 @@ const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
               circularCrop={true}
             />
           ) : (
-            <div
-              {...getRootProps({
-                className: selectUserModalStyles.image_dropzone,
-              })}>
-              <input {...getInputProps()} />
-              <p>クリックかドラッグアンドドロップでアップロード</p>
-            </div>
+            <>
+              <FormLabel>ルーム画像</FormLabel>
+              <div
+                {...getRootProps({
+                  className: selectUserModalStyles.image_dropzone,
+                })}>
+                <input {...getInputProps()} />
+                <p>クリックかドラッグアンドドロップでアップロード</p>
+              </div>
+            </>
           )}
         </div>
         <div className={selectUserModalStyles.right}>

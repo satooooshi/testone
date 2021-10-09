@@ -87,7 +87,6 @@ const EditChatGroupModal: React.FC<EditChatGroupModalProps> = ({
             type="text"
             className={editChatGroupModalStyles.modal_input_name}
             value={newGroupInfo.name}
-            defaultValue={chatGroup.name}
             onChange={(e) =>
               setNewGroupInfo((i) => ({ ...i, name: e.target.value }))
             }
