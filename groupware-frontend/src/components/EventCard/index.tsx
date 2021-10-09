@@ -118,7 +118,7 @@ const EventCard: React.FC<EventCardProps> = ({
                       hrefTagClick ? hrefTagClick(t) : `/event/list?tag=${t.id}`
                     }
                     key={t.id}>
-                    <Button height="28px" colorScheme="purple">
+                    <Button size="sm" colorScheme="purple">
                       {t.name}
                     </Button>
                   </Link>
@@ -126,7 +126,7 @@ const EventCard: React.FC<EventCardProps> = ({
               ))
             ) : (
               <Button
-                height="28px"
+                size="sm"
                 colorScheme="purple"
                 className={eventCardStyles.event_card_tag__item}>
                 {'タグなし'}
