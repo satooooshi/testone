@@ -54,10 +54,6 @@ const QAForm: React.FC<QAFormTypeProps> = ({
       onClick: () => setActiveTab(TabName.EDIT),
       name: question ? '質問を編集' : '質問を作成',
     },
-    {
-      onClick: () => setActiveTab(TabName.PREVIEW),
-      name: 'プレビュー',
-    },
   ];
 
   const headerTabName = useMemo(() => {
