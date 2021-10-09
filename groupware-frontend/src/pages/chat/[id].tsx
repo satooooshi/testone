@@ -155,7 +155,7 @@ const ChatDetail = () => {
   const { data: latestMessage, isLoading: isLoadingLatestMsg } =
     useAPIGetMessages(
       {
-        group: newChatMessage.chatGroup ? newChatMessage.chatGroup.id : 0,
+        group: Number(id),
         page: '1',
       },
       { refetchInterval: 1000 },
@@ -470,6 +470,7 @@ const ChatDetail = () => {
                       router.push(`/chat/${g.id.toString()}`, undefined, {
                         shallow: true,
                       });
+                      setPage(1);
                     }}
                     key={g.id}
                     style={{ marginBottom: 8 }}>
