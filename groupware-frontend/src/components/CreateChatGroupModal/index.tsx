@@ -108,13 +108,16 @@ const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
               circularCrop={true}
             />
           ) : (
-            <div
-              {...getRootProps({
-                className: selectUserModalStyles.image_dropzone,
-              })}>
-              <input {...getInputProps()} />
-              <p>クリックかドラッグアンドドロップでアップロード</p>
-            </div>
+            <>
+              <FormLabel>Top画像</FormLabel>
+              <div
+                {...getRootProps({
+                  className: selectUserModalStyles.image_dropzone,
+                })}>
+                <input {...getInputProps()} />
+                <p>クリックかドラッグアンドドロップでアップロード</p>
+              </div>
+            </>
           )}
         </div>
         <div className={selectUserModalStyles.right}>
