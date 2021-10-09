@@ -17,6 +17,7 @@ import Head from 'next/head';
 import TopTabBar, { TopTabBehavior } from '@/components/TopTabBar';
 import { useAPIGetEventList } from '@/hooks/api/event/useAPIGetEventList';
 import { useAPIGetWikiList } from '@/hooks/api/wiki/useAPIGetWikiList';
+import { useHeaderTab } from '@/hooks/headerTab/useHeaderTab';
 import topTabBarStyles from '@/styles/components/TopTabBar.module.scss';
 import { Button, ThemeTypings } from '@chakra-ui/react';
 import { TagType, UserTag } from 'src/types';
@@ -101,18 +102,8 @@ const MyAccountInfo = () => {
       router.push('/login');
     },
   });
-  const tabs: Tab[] = [
-    {
-      type: 'link',
-      name: 'アカウント情報',
-      href: `/account/${user?.id}`,
-    },
-    {
-      type: 'link',
-      name: 'プロフィール編集',
-      href: '/account/profile',
-    },
-  ];
+
+  const tabs: Tab[] = useHeaderTab({ headerTabType: 'account', user });
 
   const topTabBehaviorList: TopTabBehavior[] = [
     {

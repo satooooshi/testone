@@ -18,6 +18,7 @@ import {
   useAPIGetWikiList,
 } from '@/hooks/api/wiki/useAPIGetWikiList';
 import { useAuthenticate } from 'src/contexts/useAuthenticate';
+import { useHeaderTab } from '@/hooks/headerTab/useHeaderTab';
 
 const QAQuestionList = () => {
   const router = useRouter();
@@ -54,32 +55,7 @@ const QAQuestionList = () => {
     router.push(`/wiki/list?${refreshedQueryStrings}`);
   };
 
-  const tabs: Tab[] = [
-    {
-      name: 'All',
-      onClick: () => {
-        queryRefresh({ type: undefined });
-      },
-    },
-    {
-      name: '社内規則',
-      onClick: () => {
-        queryRefresh({ type: WikiType.RULES });
-      },
-    },
-    {
-      name: 'ナレッジ',
-      onClick: () => {
-        queryRefresh({ type: WikiType.KNOWLEDGE });
-      },
-    },
-    {
-      name: 'Q&A',
-      onClick: () => {
-        queryRefresh({ type: WikiType.QA });
-      },
-    },
-  ];
+  const tabs: Tab[] = useHeaderTab({ headerTabType: 'wikiList', queryRefresh });
 
   const onClickCreateButton =
     type === WikiType.RULES
