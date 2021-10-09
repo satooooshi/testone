@@ -89,9 +89,9 @@ const QAForm: React.FC<QAFormTypeProps> = ({
   useEffect(() => {
     if (question) {
       setNewQuestion({ ...question, textFormat: 'html' });
-      setEditorState(
+      setEditorState((e) =>
         EditorState.push(
-          editorState,
+          e,
           ContentState.createFromBlockArray(
             convertFromHTML(question.body).contentBlocks,
             convertFromHTML(question.body).entityMap,
