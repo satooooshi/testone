@@ -51,7 +51,7 @@ const QACard: React.FC<QACardProps> = ({ qaQuestion }) => {
         <div className={qaCardStyles.qa_card__below}>
           <div className={qaCardStyles.qa_card__tags}>
             <a className={qaCardStyles.qa_card_tag__item}>
-              <Button background={tagButtonColor} color="white" height="28px">
+              <Button background={tagButtonColor} color="white" size="xs">
                 {qaQuestion.type === WikiType.QA
                   ? 'Q&A'
                   : qaQuestion.type === WikiType.RULES
@@ -66,7 +66,7 @@ const QACard: React.FC<QACardProps> = ({ qaQuestion }) => {
                       <Button
                         background={tagButtonColor}
                         color="white"
-                        height="28px">
+                        size="xs">
                         {t.name}
                       </Button>
                     </a>
