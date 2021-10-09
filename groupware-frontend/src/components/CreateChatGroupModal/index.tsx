@@ -111,7 +111,7 @@ const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
             />
           ) : (
             <>
-              <FormLabel>Top画像</FormLabel>
+              <FormLabel>ルーム画像</FormLabel>
               <div
                 {...getRootProps({
                   className: selectUserModalStyles.image_dropzone,
