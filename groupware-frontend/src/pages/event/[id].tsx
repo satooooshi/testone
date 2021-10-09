@@ -31,6 +31,7 @@ import { useAPIDownloadEventCsv } from '@/hooks/api/event/useAPIDownloadEventCsv
 import { useAPIUploadStorage } from '@/hooks/api/storage/useAPIUploadStorage';
 import { useAPISaveSubmission } from '@/hooks/api/event/useAPISaveSubmission';
 import clsx from 'clsx';
+import { useAPIDonwloadSubmissionZip } from '@/hooks/api/event/useAPIDonwloadSubmissionZip';
 
 type FileIconProps = {
   href?: string;
@@ -58,6 +59,7 @@ const EventDetail = () => {
   const router = useRouter();
   const { id } = router.query as { id: string };
   const { mutate: downloadEvent } = useAPIDownloadEventCsv();
+  const { mutate: downloadZip } = useAPIDonwloadSubmissionZip();
   const [editModal, setEditModal] = useState(false);
   const [commentVisible, setCommentVisible] = useState(false);
   const [newComment, setNewComment] = useState<string>('');
@@ -66,10 +68,12 @@ const EventDetail = () => {
     typeof id === 'string' ? id : '0',
   );
   const submissionRef = useRef<HTMLInputElement | null>(null);
+  const downloadSubmissionRef = useRef<HTMLInputElement | null>(null);
   const toast = useToast();
   const [submitFiles, setSubmitFiles] = useState<
     Partial<SubmissionFile & { submitUnFinished: boolean }>[]
   >([]);
+
   const { mutate: saveSubmission } = useAPISaveSubmission({
     onSuccess: () => {
       toast({
@@ -173,6 +177,21 @@ const EventDetail = () => {
                 )}
               </div>
               <div className={eventDetailStyles.event_info_right}>
+                {user?.role === UserRole.ADMIN &&
+                data.type === EventType.SUBMISSION_ETC ? (
+                  <div className={eventDetailStyles.admin_buttons_wrapper}>
+                    <Button
+                      colorScheme={'green'}
+                      onClick={() =>
+                        downloadZip({
+                          id: data.id.toString(),
+                          name: data.title,
+                        })
+                      }>
+                      提出物を一括ダウンロード
+                    </Button>
+                  </div>
+                ) : null}
                 {user?.role === UserRole.ADMIN &&
                 data.type !== EventType.SUBMISSION_ETC ? (
                   <div className={eventDetailStyles.admin_buttons_wrapper}>

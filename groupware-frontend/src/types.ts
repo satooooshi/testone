@@ -45,6 +45,7 @@ export interface User {
   role: UserRole;
   avatarUrl: string;
   verifiedAt: Date | null;
+  employeeId: string | null;
   createdAt: Date;
   updatedAt: Date;
   tags?: Tag[];

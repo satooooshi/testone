@@ -18,6 +18,7 @@ import {
   SearchQueryToGetUsers,
   useAPISearchUsers,
 } from '@/hooks/api/user/useAPISearchUsers';
+import topTabBarStyles from '@/styles/components/TopTabBar.module.scss';
 
 const UserList = () => {
   const router = useRouter();
@@ -106,7 +107,9 @@ const UserList = () => {
           />
         </div>
 
-        <TopTabBar topTabBehaviorList={topTabBehaviorList} />
+        <div className={topTabBarStyles.component_wrapper}>
+          <TopTabBar topTabBehaviorList={topTabBehaviorList} />
+        </div>
 
         <div className={userListStyles.sort_select_row}>
           <div className={userListStyles.sort_select_wrapper}>

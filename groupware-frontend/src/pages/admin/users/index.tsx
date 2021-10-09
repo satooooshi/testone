@@ -108,7 +108,7 @@ const UserAdmin: React.FC = () => {
             <th className={userAdminStyles.table_head}>姓</th>
             <th className={userAdminStyles.table_head}>名前</th>
             <th className={userAdminStyles.table_head}>メールアドレス</th>
-            <th className={userAdminStyles.table_head}>区分</th>
+            <th className={userAdminStyles.table_head}>社員区分</th>
             <th className={userAdminStyles.table_head}>認証</th>
             <th className={userAdminStyles.table_head} />
           </tr>

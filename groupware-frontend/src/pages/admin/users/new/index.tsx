@@ -12,6 +12,7 @@ import {
   FormControl,
   FormLabel,
   Input,
+  Select,
   Textarea,
   useToast,
 } from '@chakra-ui/react';
@@ -52,6 +53,7 @@ const CreateNewUser = () => {
       password: '',
       role: UserRole.COMMON,
       avatarUrl: '',
+      employeeId: '',
       introduce: '',
       verifiedAt: new Date(),
       tags: [],
@@ -318,6 +320,46 @@ const CreateNewUser = () => {
           </FormControl>
           <FormControl className={createNewUserStyles.input_wrapper}>
             <FormLabel fontWeight={'bold'}>
+              <p>社員区分</p>
+              {errors.role && touched.role ? (
+                <p className={validationErrorStyles.error_text}>
+                  {errors.role}
+                </p>
+              ) : null}
+            </FormLabel>
+            <Select
+              name="roles"
+              colorScheme="teal"
+              bg="white"
+              onChange={handleChange}
+              defaultValue={UserRole.COMMON}>
+              <option value={UserRole.ADMIN}>管理者</option>
+              <option value={UserRole.INSTRUCTOR}>講師</option>
+              <option value={UserRole.HEAD_OFFICE}>本社勤務</option>
+              <option value={UserRole.COMMON}>一般社員</option>
+            </Select>
+          </FormControl>
+          <FormControl className={createNewUserStyles.input_wrapper}>
+            <FormLabel fontWeight={'bold'}>
+              <p>社員コード</p>
+              {errors.employeeId && touched.employeeId ? (
+                <p className={validationErrorStyles.error_text}>
+                  {errors.employeeId}
+                </p>
+              ) : null}
+            </FormLabel>
+            <Input
+              type="text"
+              placeholder="社員コード"
+              value={values.employeeId || ''}
+              background="white"
+              name="employeeId"
+              onChange={handleChange}
+              onBlur={handleBlur}
+            />
+          </FormControl>
+          <FormControl className={createNewUserStyles.input_wrapper}>
+            <FormLabel fontWeight={'bold'}>
               <p>パスワード</p>
               {errors.password && touched.password ? (
                 <p className={validationErrorStyles.error_text}>
@@ -360,7 +402,7 @@ const CreateNewUser = () => {
               createNewUserStyles.edit_tags_button_wrapper,
             )}>
             <Button
-              size="md"
+              size="sm"
               colorScheme="teal"
               onClick={() => {
                 dispatchModal({ type: 'openTech' });
@@ -374,6 +416,7 @@ const CreateNewUser = () => {
               .map((t) => (
                 <Button
                   key={t.id}
+                  size="xs"
                   colorScheme="teal"
                   className={createNewUserStyles.selected_tag_item}
                   height="28px">
@@ -387,7 +430,7 @@ const CreateNewUser = () => {
               createNewUserStyles.edit_tags_button_wrapper,
             )}>
             <Button
-              size="md"
+              size="sm"
               colorScheme="blue"
               onClick={() => dispatchModal({ type: 'openQualification' })}>
               資格を編集
@@ -399,6 +442,7 @@ const CreateNewUser = () => {
               .map((t) => (
                 <Button
                   key={t.id}
+                  size="xs"
                   colorScheme="blue"
                   className={createNewUserStyles.selected_tag_item}
                   height="28px">
@@ -412,7 +456,7 @@ const CreateNewUser = () => {
               createNewUserStyles.edit_tags_button_wrapper,
             )}>
             <Button
-              size="md"
+              size="sm"
               colorScheme="green"
               onClick={() => dispatchModal({ type: 'openClub' })}>
               部活動を編集
@@ -424,6 +468,7 @@ const CreateNewUser = () => {
               .map((t) => (
                 <Button
                   key={t.id}
+                  size="xs"
                   colorScheme="green"
                   className={createNewUserStyles.selected_tag_item}
                   height="28px">
@@ -437,7 +482,7 @@ const CreateNewUser = () => {
               createNewUserStyles.edit_tags_button_wrapper,
             )}>
             <Button
-              size="md"
+              size="sm"
               colorScheme="pink"
               onClick={() => dispatchModal({ type: 'openHobby' })}>
               趣味を編集
@@ -449,6 +494,7 @@ const CreateNewUser = () => {
               .map((t) => (
                 <Button
                   key={t.id}
+                  size="xs"
                   colorScheme="pink"
                   className={createNewUserStyles.selected_tag_item}
                   height="28px">

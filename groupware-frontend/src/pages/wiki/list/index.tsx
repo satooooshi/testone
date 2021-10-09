@@ -57,16 +57,21 @@ const QAQuestionList = () => {
 
   const tabs: Tab[] = useHeaderTab({ headerTabType: 'wikiList', queryRefresh });
 
-  const onClickCreateButton = () => {
-    router.push('/wiki/new?type=' + type || '');
-  };
+  const onClickCreateButton =
+    type === WikiType.RULES
+      ? user?.role === UserRole.ADMIN
+        ? () => {
+            router.push('/wiki/new?type=' + type || '');
+          }
+        : undefined
+      : () => {
+          router.push('/wiki/new?type=' + type || '');
+        };
 
   const headerRightButtonName = useMemo(() => {
     switch (type) {
       case WikiType.RULES:
-        if (user?.role === UserRole.ADMIN) {
-          return '社内規則を新規作成';
-        }
+        return '社内規則を新規作成';
       case WikiType.KNOWLEDGE:
         return 'ナレッジを新規作成';
       case WikiType.QA:
@@ -74,7 +79,7 @@ const QAQuestionList = () => {
       default:
         return '新規作成';
     }
-  }, [type, user?.role]);
+  }, [type]);
 
   const initialHeaderValue = {
     title: '社内Wiki',
