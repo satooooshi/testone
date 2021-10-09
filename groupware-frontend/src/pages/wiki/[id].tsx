@@ -125,6 +125,7 @@ const QuestionDetail = () => {
           ) : null}
           <div className={qaDetailStyles.question_wrapper}>
             <QAComment
+              editorLanguage={question.editorLanguage}
               body={question.body}
               date={question.createdAt}
               writer={question.writer}
@@ -188,6 +189,7 @@ const QuestionDetail = () => {
                           onClickBestAnswerButton={() =>
                             createBestAnswer({ ...question, bestAnswer: a })
                           }
+                          editorLanguage={question.editorLanguage}
                           body={a.body}
                           date={a.createdAt}
                           writer={a.writer}
