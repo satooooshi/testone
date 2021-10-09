@@ -146,7 +146,7 @@ const QuestionDetail = () => {
                 onClick={() => {
                   answerVisible && answerEditorState.getCurrentContent()
                     ? createAnswer({
-                        editorLanguage: editorLanguage.MARKUP
+                        editorLanguage: editorLanguage.MARKUP,
                         body: stateToHTML(
                           answerEditorState.getCurrentContent(),
                         ),
@@ -237,7 +237,7 @@ const QuestionDetail = () => {
                             if (answerReplyEditorState.getCurrentContent()) {
                               createAnswerReply({
                                 ...answerReply,
-                                editorLanguage: editorLanguage.MARKUP
+                                editorLanguage: editorLanguage.MARKUP,
                                 body: stateToHTML(
                                   answerReplyEditorState.getCurrentContent(),
                                 ),
