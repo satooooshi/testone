@@ -10,15 +10,9 @@
 }
 
 .qa_wrapper {
-  width: 46vw;
-  @media (max-width: 1024px) {
-    width: 80vw;
-  }
+  width: 80vw;
   @media (max-width: 768px) {
-    width: 80vw;
-  }
-  @media (min-width: 768px) {
-    margin-right: 5vw;
+    width: 90vw;
   }
 }
 

@@ -124,17 +124,19 @@ const QuestionDetail = () => {
             </div>
           ) : null}
           <div className={qaDetailStyles.question_wrapper}>
-            <QAComment
-              editorLanguage={question.editorLanguage}
-              body={question.body}
-              date={question.createdAt}
-              writer={question.writer}
-              isWriter={myself?.id === question.writer?.id}
-              onClickEditButton={() =>
-                myself?.id === question.writer?.id &&
-                navigateToEditQuestion(question.id)
-              }
-            />
+            <div className={qaDetailStyles.qa_wrapper}>
+              <QAComment
+                editorLanguage={question.editorLanguage}
+                body={question.body}
+                date={question.createdAt}
+                writer={question.writer}
+                isWriter={myself?.id === question.writer?.id}
+                onClickEditButton={() =>
+                  myself?.id === question.writer?.id &&
+                  navigateToEditQuestion(question.id)
+                }
+              />
+            </div>
           </div>
           {question.type === WikiType.QA && (
             <div className={qaDetailStyles.answer_count__wrapper}>
@@ -177,46 +179,48 @@ const QuestionDetail = () => {
                   a.writer && (
                     <div key={a.id} className={qaDetailStyles.answers_wrapper}>
                       <div className={qaDetailStyles.qa_comment_wrapper}>
-                        <QAComment
-                          bestAnswerButtonName={
-                            question.bestAnswer?.id === a.id
-                              ? 'ベストアンサーに選ばれた回答'
-                              : !question.resolvedAt &&
-                                myself?.id === a.writer.id
-                              ? 'ベストアンサーに選ぶ'
-                              : undefined
-                          }
-                          onClickBestAnswerButton={() =>
-                            createBestAnswer({ ...question, bestAnswer: a })
-                          }
-                          editorLanguage={question.editorLanguage}
-                          body={a.body}
-                          date={a.createdAt}
-                          writer={a.writer}
-                          isWriter={myself?.id === a.writer.id}
-                          replyButtonName={
-                            answerReply.answer?.id === a.id
-                              ? undefined
-                              : '返信する'
-                          }
-                          onClickReplyButton={() => {
-                            if (answerReply.answer?.id !== a.id) {
-                              setAnswerReply((r) => ({
-                                ...r,
-                                answer: a,
-                                body: '',
-                              }));
-                              setAnswerReplyEditorState(
-                                EditorState.push(
-                                  answerReplyEditorState,
-                                  ContentState.createFromText(''),
-                                  'delete-character',
-                                ),
-                              );
-                              return;
+                        <div className={qaDetailStyles.qa_wrapper}>
+                          <QAComment
+                            bestAnswerButtonName={
+                              question.bestAnswer?.id === a.id
+                                ? 'ベストアンサーに選ばれた回答'
+                                : !question.resolvedAt &&
+                                  myself?.id === a.writer.id
+                                ? 'ベストアンサーに選ぶ'
+                                : undefined
                             }
-                          }}
-                        />
+                            onClickBestAnswerButton={() =>
+                              createBestAnswer({ ...question, bestAnswer: a })
+                            }
+                            editorLanguage={question.editorLanguage}
+                            body={a.body}
+                            date={a.createdAt}
+                            writer={a.writer}
+                            isWriter={myself?.id === a.writer.id}
+                            replyButtonName={
+                              answerReply.answer?.id === a.id
+                                ? undefined
+                                : '返信する'
+                            }
+                            onClickReplyButton={() => {
+                              if (answerReply.answer?.id !== a.id) {
+                                setAnswerReply((r) => ({
+                                  ...r,
+                                  answer: a,
+                                  body: '',
+                                }));
+                                setAnswerReplyEditorState(
+                                  EditorState.push(
+                                    answerReplyEditorState,
+                                    ContentState.createFromText(''),
+                                    'delete-character',
+                                  ),
+                                );
+                                return;
+                              }
+                            }}
+                          />
+                        </div>
                       </div>
                       {answerReply.answer && answerReply.answer.id === a.id ? (
                         <WrappedDraftEditor

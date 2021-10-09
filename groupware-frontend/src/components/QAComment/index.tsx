@@ -37,7 +37,7 @@ const QAComment: React.FC<QACommentProps> = ({
 }) => {
   const mdParser = new MarkdownIt({ breaks: true });
   return (
-    <div className={qaCommentStyles.qa_wrapper}>
+    <>
       {date && writer && (
         <div className={qaCommentStyles.question_uploader__info}>
           <div className={qaCommentStyles.user_info_wrapper}>
@@ -92,7 +92,7 @@ const QAComment: React.FC<QACommentProps> = ({
           </div>
         ) : null}
       </div>
-    </div>
+    </>
   );
 };
 
