@@ -24,23 +24,22 @@ const EditQuestion = () => {
     return uploadedImageURL[0];
   };
 
-  return (
+  return question?.editorLanguage === editorLanguage.MARKDOWN ? (
     <>
-      {question?.editorLanguage === editorLanguage.MARKDOWN ? (
-        <QAForm
-          question={question}
-          tags={tags}
-          onClickSaveButton={updateQuestion}
-          handleImageUpload={handleImageUpload}
-        />
-      ) : (
-        <QADraftForm
-          question={question}
-          tags={tags}
-          onClickSaveButton={updateQuestion}
-          handleImageUpload={handleImageUpload}
-        />
-      )}
+      <QAForm
+        question={question}
+        tags={tags}
+        onClickSaveButton={updateQuestion}
+        handleImageUpload={handleImageUpload}
+      />
+    </>
+  ) : (
+    <>
+      <QADraftForm
+        question={question}
+        tags={tags}
+        onClickSaveButton={updateQuestion}
+      />
     </>
   );
 };

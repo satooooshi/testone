@@ -6,7 +6,7 @@ import { ScreenName } from '@/components/Sidebar';
 import LayoutWithTab from '@/components/LayoutWithTab';
 import TagModal from '@/components/TagModal';
 import WrappedDraftEditor from '@/components/WrappedDraftEditor';
-import { QAQuestion, Tag, UserRole, WikiType } from 'src/types';
+import { editorLanguage, QAQuestion, Tag, UserRole, WikiType } from 'src/types';
 import { Tab, TabName } from 'src/types/header/tab/types';
 import {
   Button,
@@ -16,45 +16,36 @@ import {
   FormControl,
   FormLabel,
 } from '@chakra-ui/react';
-import Editor from 'react-markdown-editor-lite';
-import MDEditor, { MDEditorProps } from '@uiw/react-md-editor';
-import { liteEditorPlugins } from 'src/utils/liteEditorPlugins';
-import MarkdownIt from 'markdown-it';
 import { useAuthenticate } from 'src/contexts/useAuthenticate';
+import { ContentState, convertFromHTML, Editor, EditorState } from 'draft-js';
+import { stateToHTML } from 'draft-js-export-html';
 
 type QAFormTypeProps = {
   question?: QAQuestion;
   tags?: Tag[];
   onClickSaveButton: (question: Partial<QAQuestion>) => void;
-  handleImageUpload: (file: File) => Promise<string>;
 };
 
 const QAForm: React.FC<QAFormTypeProps> = ({
   question,
   tags,
   onClickSaveButton,
-  handleImageUpload,
 }) => {
-  const mdParser = new MarkdownIt({ breaks: true });
-  const mdEditor = useRef<Editor | null>(null);
+  const draftEditor = useRef<Editor | null>(null);
   const router = useRouter();
   const { type } = router.query as { type: WikiType };
   const { user } = useAuthenticate();
 
   const [tagModal, setTagModal] = useState(false);
-  const [editor, setEditor] = React.useState<MDEditorProps>({
-    visiableDragbar: true,
-    hideToolbar: true,
-    highlightEnable: true,
-    enableScroll: true,
-    value: '',
-    preview: 'live',
-  });
+  const [editorState, setEditorState] = useState(() =>
+    EditorState.createEmpty(),
+  );
   const [activeTab, setActiveTab] = useState<TabName>(TabName.EDIT);
   const [newQuestion, setNewQuestion] = useState<Partial<QAQuestion>>({
     title: '',
     body: '',
     tags: [],
+    editorLanguage: editorLanguage.MARKUP,
   });
   const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
 
@@ -99,14 +90,19 @@ const QAForm: React.FC<QAFormTypeProps> = ({
     }));
   };
 
-  const handleEditorChange = ({ text }: any) => {
-    setNewQuestion((q) => ({ ...q, body: text }));
-  };
-
   useEffect(() => {
     if (question) {
-      setNewQuestion(question);
-      setEditor((e) => ({ ...e, value: question.body }));
+      setNewQuestion({ ...question, editorLanguage: editorLanguage.MARKUP });
+      setEditorState(
+        EditorState.push(
+          editorState,
+          ContentState.createFromBlockArray(
+            convertFromHTML(question.body).contentBlocks,
+            convertFromHTML(question.body).entityMap,
+          ),
+          'apply-entity',
+        ),
+      );
     }
   }, [question]);
 
@@ -184,8 +180,15 @@ const QAForm: React.FC<QAFormTypeProps> = ({
                 colorScheme="pink"
                 onClick={() =>
                   question
-                    ? onClickSaveButton({ ...question, ...newQuestion })
-                    : onClickSaveButton(newQuestion)
+                    ? onClickSaveButton({
+                        ...question,
+                        ...newQuestion,
+                        body: stateToHTML(editorState.getCurrentContent()),
+                      })
+                    : onClickSaveButton({
+                        ...newQuestion,
+                        body: stateToHTML(editorState.getCurrentContent()),
+                      })
                 }>
                 {question ? '質問を更新' : '質問を投稿'}
               </Button>
@@ -203,28 +206,18 @@ const QAForm: React.FC<QAFormTypeProps> = ({
             ))}
           </div>
         ) : null}
-        {activeTab === TabName.EDIT ? (
-          <WrappedDraftEditor
-            style={{
-              width: isSmallerThan768 ? '90vw' : '80vw',
-              maxWidth: '1980px',
-              height: '80vh',
-              marginBottom: 40,
-            }}
-            placeholder="質問内容を入力して下さい"
-            editorRef={mdEditor}
-            onImageUpload={handleImageUpload}
-            plugins={liteEditorPlugins}
-            value={newQuestion.body}
-            onChange={handleEditorChange}
-            renderHTML={(text: string) => mdParser.render(text)}
-          />
-        ) : (
-          <MDEditor.Markdown
-            source={question ? editor.value : newQuestion.body}
-            className={qaCreateStyles.markdown_preview}
-          />
-        )}
+        <WrappedDraftEditor
+          style={{
+            width: isSmallerThan768 ? '90vw' : '80vw',
+            maxWidth: '1980px',
+            height: '80vh',
+            marginBottom: 40,
+          }}
+          placeholder="質問内容を入力して下さい"
+          editorRef={draftEditor}
+          editorState={editorState}
+          setEditorState={setEditorState}
+        />
       </LayoutWithTab>
     </>
   );
