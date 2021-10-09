@@ -21,6 +21,7 @@ import MDEditor, { MDEditorProps } from '@uiw/react-md-editor';
 import { liteEditorPlugins } from 'src/utils/liteEditorPlugins';
 import MarkdownIt from 'markdown-it';
 import { useAuthenticate } from 'src/contexts/useAuthenticate';
+import { useHeaderTab } from '@/hooks/headerTab/useHeaderTab';
 
 type QAFormTypeProps = {
   question?: QAQuestion;
@@ -55,21 +56,30 @@ const QAForm: React.FC<QAFormTypeProps> = ({
     title: '',
     body: '',
     tags: [],
+    type: WikiType.QA,
   });
   const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
 
-  const tabs: Tab[] = [
-    {
-      onClick: () => setActiveTab(TabName.EDIT),
-      name: question ? '質問を編集' : '質問を作成',
-    },
-    {
-      onClick: () => setActiveTab(TabName.PREVIEW),
-      name: 'プレビュー',
-    },
-  ];
+  const tabs: Tab[] = useHeaderTab({
+    headerTabType: 'qaForm',
+    setActiveTab,
+    type,
+  });
 
-  const headerTabName = useMemo(() => {
+  const newQAHeaderTitleName = useMemo(() => {
+    switch (newQuestion.type) {
+      case WikiType.QA:
+        return '質問を新規作成';
+      case WikiType.RULES:
+        return '社内規則を新規作成';
+      case WikiType.KNOWLEDGE:
+        return 'ナレッジを新規作成';
+      default:
+        return '新規作成';
+    }
+  }, [newQuestion.type]);
+
+  const editQAHeaderTitleName = useMemo(() => {
     switch (question?.type) {
       case WikiType.QA:
         return '質問を編集';
@@ -109,13 +119,18 @@ const QAForm: React.FC<QAFormTypeProps> = ({
       setEditor((e) => ({ ...e, value: question.body }));
     }
   }, [question]);
+  useEffect(() => {
+    if (type) {
+      setNewQuestion((q) => ({ ...q, type }));
+    }
+  }, [type]);
 
   return (
     <>
       <LayoutWithTab
         sidebar={{ activeScreenName: ScreenName.QA }}
         header={{
-          title: headerTabName,
+          title: question ? editQAHeaderTitleName : newQAHeaderTitleName,
           activeTabName: activeTab,
           tabs,
         }}>

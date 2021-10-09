@@ -19,6 +19,7 @@ import { useAPICreateAnswerReply } from '@/hooks/api/wiki/useAPICreateAnswerRepl
 import { useAPICreateBestAnswer } from '@/hooks/api/wiki/useAPICreateBestAnswer';
 import { useAPIGetProfile } from '@/hooks/api/user/useAPIGetProfile';
 import { stateToHTML } from 'draft-js-export-html';
+import { useHeaderTab } from '@/hooks/headerTab/useHeaderTab';
 
 const QuestionDetail = () => {
   const router = useRouter();
@@ -77,13 +78,7 @@ const QuestionDetail = () => {
     router.push('/wiki/edit/' + id);
   };
 
-  const tabs: Tab[] = [
-    {
-      type: 'link',
-      name: 'Wiki一覧画面へ',
-      href: `list`,
-    },
-  ];
+  const tabs: Tab[] = useHeaderTab({ headerTabType: 'wikiDetail' });
 
   const headerTitle = useMemo(() => {
     if (question?.type === WikiType.QA) {

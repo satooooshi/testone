@@ -21,6 +21,7 @@ import paginationStyles from '@/styles/components/Pagination.module.scss';
 import ReactPaginate from 'react-paginate';
 import { searchUserQueryParamFactory } from 'src/utils/userQueryRefresh';
 import { useAPIGetUserTag } from '@/hooks/api/tag/useAPIGetUserTag';
+import { useHeaderTab } from '@/hooks/headerTab/useHeaderTab';
 
 const UserAdmin: React.FC = () => {
   const router = useRouter();
@@ -44,23 +45,8 @@ const UserAdmin: React.FC = () => {
       refetch();
     },
   });
-  const tabs: Tab[] = [
-    {
-      type: 'link',
-      name: 'ユーザー管理',
-      href: '/admin/users',
-    },
-    {
-      type: 'link',
-      name: 'ユーザー作成',
-      href: '/admin/users/new',
-    },
-    {
-      type: 'link',
-      name: 'CSV出力',
-      href: '/admin/csv',
-    },
-  ];
+  const tabs: Tab[] = useHeaderTab({ headerTabType: 'admin' });
+
   const onDeleteClicked = (user: User) => {
     if (
       confirm(`${user.lastName} ${user.firstName}さんを削除して宜しいですか？`)
