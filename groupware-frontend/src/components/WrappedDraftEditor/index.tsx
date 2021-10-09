@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { MutableRefObject, useCallback, useState } from 'react';
 import {
   Editor,
   EditorState,
@@ -33,7 +33,7 @@ import { GoCode } from 'react-icons/go';
 type WrappedDraftEditorProps = {
   style?: React.CSSProperties;
   placeholder: string;
-  editorRef?: React.LegacyRef<Editor>;
+  editorRef?: MutableRefObject<Editor | null>;
   editorState: EditorState;
   setEditorState: React.Dispatch<React.SetStateAction<EditorState>>;
 };
@@ -135,6 +135,10 @@ const WrappedDraftEditor: React.FC<WrappedDraftEditorProps> = ({
   setEditorState,
 }) => {
   const [enableHeaderBlocks, setEnableHeaderBlocks] = useState(false);
+  const currentBlockType = editorState
+    .getCurrentContent()
+    .getLastBlock()
+    .getType();
   const blockStyleFn = useCallback((block: ContentBlock): string => {
     switch (block.getType()) {
       case 'blockquote':
@@ -309,7 +313,7 @@ const WrappedDraftEditor: React.FC<WrappedDraftEditorProps> = ({
           ref={editorRef}
           blockRendererFn={mediaBlockRenderer}
           blockStyleFn={blockStyleFn}
-          placeholder={placeholder}
+          placeholder={currentBlockType === 'unstyled' ? placeholder : ''}
           handleKeyCommand={handleKeyCommand}
         />
       </div>
