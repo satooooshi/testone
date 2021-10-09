@@ -4,13 +4,15 @@ export class addEditorLanguageColumn1633744404775 implements MigrationInterface 
     name = 'addEditorLanguageColumn1633744404775'
 
     public async up(queryRunner: QueryRunner): Promise<void> {
-        await queryRunner.query(`ALTER TABLE \`groupware-mysql8\`.\`qa_answer_replies\` ADD \`editorLanguage\` enum ('markdown', 'markup') NOT NULL DEFAULT 'markdown'`);
-        await queryRunner.query(`ALTER TABLE \`groupware-mysql8\`.\`qa_answers\` ADD \`editorLanguage\` enum ('markdown', 'markup') NOT NULL DEFAULT 'markdown'`);
+        await queryRunner.query(`ALTER TABLE wiki ADD editor_language enum ('markdown', 'markup') NOT NULL DEFAULT 'markdown'`);
+        await queryRunner.query(`ALTER TABLE qa_answer_replies ADD editor_language enum ('markdown', 'markup') NOT NULL DEFAULT 'markdown'`);
+        await queryRunner.query(`ALTER TABLE qa_answers ADD editor_language enum ('markdown', 'markup') NOT NULL DEFAULT 'markdown'`);
     }
 
     public async down(queryRunner: QueryRunner): Promise<void> {
-        await queryRunner.query(`ALTER TABLE \`groupware-mysql8\`.\`qa_answers\` DROP COLUMN \`editorLanguage\``);
-        await queryRunner.query(`ALTER TABLE \`groupware-mysql8\`.\`qa_answer_replies\` DROP COLUMN \`editorLanguage\``);
+        await queryRunner.query(`ALTER TABLE wiki DROP COLUMN editor_language`);
+        await queryRunner.query(`ALTER TABLE qa_answers DROP COLUMN editor_language`);
+        await queryRunner.query(`ALTER TABLE qa_answer_replies DROP COLUMN editor_language`);
     }
 
 }

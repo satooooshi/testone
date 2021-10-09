@@ -8,7 +8,7 @@ import 'react-markdown-editor-lite/lib/index.css';
 import { useAPICreateAnswer } from '@/hooks/api/wiki/useAPICreateAnswer';
 import LayoutWithTab from '@/components/LayoutWithTab';
 import AnswerReply from '@/components/AnswerReply';
-import { editorLanguage, QAAnswerReply, WikiType } from 'src/types';
+import { EditorLanguage, QAAnswerReply, WikiType } from 'src/types';
 import { Button, useMediaQuery } from '@chakra-ui/react';
 import WrappedDraftEditor from '@/components/WrappedDraftEditor';
 import { ContentState, Editor, EditorState } from 'draft-js';
@@ -144,7 +144,7 @@ const QuestionDetail = () => {
                 onClick={() => {
                   answerVisible && answerEditorState.getCurrentContent()
                     ? createAnswer({
-                        editorLanguage: editorLanguage.MARKUP,
+                        editorLanguage: EditorLanguage.MARKUP,
                         body: stateToHTML(
                           answerEditorState.getCurrentContent(),
                         ),
@@ -238,7 +238,7 @@ const QuestionDetail = () => {
                             if (answerReplyEditorState.getCurrentContent()) {
                               createAnswerReply({
                                 ...answerReply,
-                                editorLanguage: editorLanguage.MARKUP,
+                                editorLanguage: EditorLanguage.MARKUP,
                                 body: stateToHTML(
                                   answerReplyEditorState.getCurrentContent(),
                                 ),

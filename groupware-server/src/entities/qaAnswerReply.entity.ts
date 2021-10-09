@@ -24,7 +24,7 @@ export class QAAnswerReply {
   body: string;
 
   @Column({
-    name: 'editorLanguage',
+    name: 'editor_language',
     type: 'enum',
     enum: EditorLanguage,
     default: EditorLanguage.MARKDOWN,

@@ -6,7 +6,7 @@ import { ScreenName } from '@/components/Sidebar';
 import LayoutWithTab from '@/components/LayoutWithTab';
 import TagModal from '@/components/TagModal';
 import WrappedDraftEditor from '@/components/WrappedDraftEditor';
-import { editorLanguage, QAQuestion, Tag, UserRole, WikiType } from 'src/types';
+import { EditorLanguage, QAQuestion, Tag, UserRole, WikiType } from 'src/types';
 import { Tab, TabName } from 'src/types/header/tab/types';
 import {
   Button,
@@ -45,7 +45,7 @@ const QAForm: React.FC<QAFormTypeProps> = ({
     title: '',
     body: '',
     tags: [],
-    editorLanguage: editorLanguage.MARKUP,
+    editorLanguage: EditorLanguage.MARKUP,
   });
   const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
 
@@ -88,7 +88,7 @@ const QAForm: React.FC<QAFormTypeProps> = ({
 
   useEffect(() => {
     if (question) {
-      setNewQuestion({ ...question, editorLanguage: editorLanguage.MARKUP });
+      setNewQuestion({ ...question, editorLanguage: EditorLanguage.MARKUP });
       setEditorState(
         EditorState.push(
           editorState,

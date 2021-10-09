@@ -43,7 +43,7 @@ export class Wiki {
   type: WikiType;
 
   @Column({
-    name: 'editorLanguage',
+    name: 'editor_language',
     type: 'enum',
     enum: EditorLanguage,
     default: EditorLanguage.MARKDOWN,
