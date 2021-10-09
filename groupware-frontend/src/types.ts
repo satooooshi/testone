@@ -107,6 +107,7 @@ export interface QAQuestion {
 export interface QAAnswerReply {
   id: number;
   body: string;
+  editorLanguage: editorLanguage;
   writer?: User;
   answer?: QAAnswer;
   createdAt: Date;
@@ -116,6 +117,7 @@ export interface QAAnswerReply {
 export interface QAAnswer {
   id: number;
   body: string;
+  editorLanguage: editorLanguage;
   createdAt: Date;
   updatedAt: Date;
   question?: QAQuestion;

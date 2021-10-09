@@ -10,6 +10,11 @@ import {
 import { QAAnswer } from './qaAnswer.entity';
 import { User } from './user.entity';
 
+export enum EditorLanguage {
+  MARKDOWN = 'markdown',
+  MARKUP = 'markup',
+}
+
 @Entity({ name: 'qa_answer_replies' })
 export class QAAnswerReply {
   @PrimaryGeneratedColumn()
@@ -17,6 +22,14 @@ export class QAAnswerReply {
 
   @Column({ name: 'body', type: 'longtext' })
   body: string;
+
+  @Column({
+    name: 'editorLanguage',
+    type: 'enum',
+    enum: EditorLanguage,
+    default: EditorLanguage.MARKDOWN,
+  })
+  editorLanguage: EditorLanguage;
 
   @ManyToOne(() => User, (user) => user.qaAnswerReplies, {
     onUpdate: 'CASCADE',
