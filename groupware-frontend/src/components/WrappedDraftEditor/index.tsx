@@ -10,7 +10,7 @@ import {
   DraftHandleValue,
 } from 'draft-js';
 import '@draft-js-plugins/image/lib/plugin.css';
-import WrappedDraftEditorStyles from '@/styles/components/WrappedDraftEditor.module.scss';
+import wrappedDraftEditorStyles from '@/styles/components/WrappedDraftEditor.module.scss';
 import { useDropzone } from 'react-dropzone';
 import { useAPIUploadStorage } from '@/hooks/api/storage/useAPIUploadStorage';
 import 'draft-js/dist/Draft.css';
@@ -82,7 +82,7 @@ const HeadlineInlineButton: React.FC<HeadlineInlineButtonProps> = ({
   DisplayIcon,
 }) => {
   return (
-    <div className={WrappedDraftEditorStyles.headlineButtonWrapper}>
+    <div className={wrappedDraftEditorStyles.headlineButtonWrapper}>
       <button
         onMouseDown={(e) => {
           e.preventDefault();
@@ -90,8 +90,8 @@ const HeadlineInlineButton: React.FC<HeadlineInlineButtonProps> = ({
         }}
         className={
           editorState.getCurrentInlineStyle().has(inlineStyle)
-            ? WrappedDraftEditorStyles.headlineButton__active
-            : WrappedDraftEditorStyles.headlineButton
+            ? wrappedDraftEditorStyles.headlineButton__active
+            : wrappedDraftEditorStyles.headlineButton
         }>
         {DisplayIcon}
       </button>
@@ -106,7 +106,7 @@ const HeadlineBlockButton: React.FC<HeadlineBlockButtonProps> = ({
   DisplayIcon,
 }) => {
   return (
-    <div className={WrappedDraftEditorStyles.headlineButtonWrapper}>
+    <div className={wrappedDraftEditorStyles.headlineButtonWrapper}>
       <button
         onMouseDown={(e) => {
           e.preventDefault();
@@ -114,8 +114,8 @@ const HeadlineBlockButton: React.FC<HeadlineBlockButtonProps> = ({
         }}
         className={
           RichUtils.getCurrentBlockType(editorState) === blockType
-            ? WrappedDraftEditorStyles.headlineButton__active
-            : WrappedDraftEditorStyles.headlineButton
+            ? wrappedDraftEditorStyles.headlineButton__active
+            : wrappedDraftEditorStyles.headlineButton
         }>
         {DisplayIcon}
       </button>
@@ -142,9 +142,9 @@ const WrappedDraftEditor: React.FC<WrappedDraftEditorProps> = ({
   const blockStyleFn = useCallback((block: ContentBlock): string => {
     switch (block.getType()) {
       case 'blockquote':
-        return WrappedDraftEditorStyles.blockquoteStyle;
+        return wrappedDraftEditorStyles.blockquoteStyle;
       case 'code-block':
-        return WrappedDraftEditorStyles.codeBlockStyle;
+        return wrappedDraftEditorStyles.codeBlockStyle;
       default:
         return '';
     }
@@ -224,11 +224,11 @@ const WrappedDraftEditor: React.FC<WrappedDraftEditorProps> = ({
   };
 
   return (
-    <div style={style} className={WrappedDraftEditorStyles.container}>
-      <div className={WrappedDraftEditorStyles.toolbar}>
-        <div className={WrappedDraftEditorStyles.headlineButtonWrapper}>
+    <div style={style} className={wrappedDraftEditorStyles.container}>
+      <div className={wrappedDraftEditorStyles.toolbar}>
+        <div className={wrappedDraftEditorStyles.headlineButtonWrapper}>
           <button
-            className={WrappedDraftEditorStyles.headlineButton}
+            className={wrappedDraftEditorStyles.headlineButton}
             onClick={() => setEnableHeaderBlocks(!enableHeaderBlocks)}>
             <FaHeading />
           </button>
@@ -264,34 +264,34 @@ const WrappedDraftEditor: React.FC<WrappedDraftEditorProps> = ({
             DisplayIcon={b.icon}
           />
         ))}
-        <div className={WrappedDraftEditorStyles.headlineButtonWrapper}>
+        <div className={wrappedDraftEditorStyles.headlineButtonWrapper}>
           <button
             {...getinsertImageRootProps({
-              className: WrappedDraftEditorStyles.headlineButton,
+              className: wrappedDraftEditorStyles.headlineButton,
             })}>
             <input {...getinsertImageInputProps()} />
             <FaImage />
           </button>
         </div>
-        <div className={WrappedDraftEditorStyles.headlineButtonWrapper}>
+        <div className={wrappedDraftEditorStyles.headlineButtonWrapper}>
           <button
-            className={WrappedDraftEditorStyles.headlineButton}
+            className={wrappedDraftEditorStyles.headlineButton}
             disabled={editorState.getUndoStack().size <= 0}
             onMouseDown={() => setEditorState(EditorState.undo(editorState))}>
             <FaUndoAlt />
           </button>
         </div>
-        <div className={WrappedDraftEditorStyles.headlineButtonWrapper}>
+        <div className={wrappedDraftEditorStyles.headlineButtonWrapper}>
           <button
-            className={WrappedDraftEditorStyles.headlineButton}
+            className={wrappedDraftEditorStyles.headlineButton}
             disabled={editorState.getRedoStack().size <= 0}
             onMouseDown={() => setEditorState(EditorState.redo(editorState))}>
             <FaRedoAlt />
           </button>
         </div>
-        <div className={WrappedDraftEditorStyles.headlineButtonWrapper}>
+        <div className={wrappedDraftEditorStyles.headlineButtonWrapper}>
           <button
-            className={WrappedDraftEditorStyles.headlineButton}
+            className={wrappedDraftEditorStyles.headlineButton}
             onMouseDown={() =>
               setEditorState(
                 EditorState.push(
@@ -305,7 +305,7 @@ const WrappedDraftEditor: React.FC<WrappedDraftEditorProps> = ({
           </button>
         </div>
       </div>
-      <div className={WrappedDraftEditorStyles.editor}>
+      <div className={wrappedDraftEditorStyles.editor}>
         <Editor
           customStyleMap={inlineStyleMap}
           editorState={editorState}
