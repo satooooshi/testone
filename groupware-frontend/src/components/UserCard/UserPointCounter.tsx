@@ -4,7 +4,7 @@ import { useMemo } from 'react';
 type UserPointCounterType = {
   label: 'event' | 'question' | 'answer' | 'knowledge';
   count: number | string;
-  duration: 'week' | 'month';
+  duration?: 'week' | 'month';
 };
 
 const UserPointCounter: React.FC<UserPointCounterType> = ({
@@ -32,6 +32,7 @@ const UserPointCounter: React.FC<UserPointCounterType> = ({
     if (duration === 'month') {
       return '(月間)';
     }
+    return '';
   };
   return (
     <span className={userCardStyles.sub_info_text}>

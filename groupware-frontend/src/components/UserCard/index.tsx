@@ -3,7 +3,7 @@ import userCardStyles from '@/styles/components/UserCard.module.scss';
 import { Tag, TagType, User } from 'src/types';
 import { Avatar, Button } from '@chakra-ui/react';
 import Link from 'next/link';
-import UserPointCounter from './Counter';
+import UserPointCounter from './UserPointCounter';
 
 type TagLinkProps = {
   tag: Tag;
