@@ -24,6 +24,7 @@ import MarkdownEditor from 'react-markdown-editor-lite';
 import { liteEditorPlugins } from 'src/utils/liteEditorPlugins';
 import MarkdownIt from 'markdown-it';
 import { uploadStorage } from '@/hooks/api/storage/useAPIUploadStorage';
+import MDEditor from '@uiw/react-md-editor';
 
 type QAFormTypeProps = {
   question?: QAQuestion;
@@ -57,12 +58,24 @@ const QAForm: React.FC<QAFormTypeProps> = ({
   const formTopRef = useRef<HTMLDivElement | null>(null);
   const editorRef = useRef<MarkdownEditor | null>(null);
 
-  const tabs: Tab[] = [
-    {
-      onClick: () => setActiveTab(TabName.EDIT),
-      name: question ? '質問を編集' : '質問を作成',
-    },
-  ];
+  const tabs: Tab[] =
+    newQuestion.textFormat === 'html'
+      ? [
+          {
+            onClick: () => setActiveTab(TabName.EDIT),
+            name: '内容の編集',
+          },
+        ]
+      : [
+          {
+            onClick: () => setActiveTab(TabName.EDIT),
+            name: '内容の編集',
+          },
+          {
+            onClick: () => setActiveTab(TabName.PREVIEW),
+            name: 'プレビュー',
+          },
+        ];
 
   const headerTabName = useMemo(() => {
     switch (question?.type) {
@@ -180,27 +193,29 @@ const QAForm: React.FC<QAFormTypeProps> = ({
               className={qaCreateStyles.title_input}
             />
           </FormControl>
-          <FormControl
-            width={isSmallerThan768 ? '100%' : '30%'}
-            className={qaCreateStyles.type_select}>
-            <FormLabel fontWeight="bold">タイプを選択してください</FormLabel>
-            <Select
-              colorScheme="teal"
-              bg="white"
-              defaultValue={type ? type : WikiType.QA}
-              onChange={(e) =>
-                setNewQuestion((prev) => ({
-                  ...prev,
-                  type: e.target.value as WikiType,
-                }))
-              }>
-              {user?.role === UserRole.ADMIN && (
-                <option value={WikiType.RULES}>社内規則</option>
-              )}
-              <option value={WikiType.KNOWLEDGE}>ナレッジ</option>
-              <option value={WikiType.QA}>質問</option>
-            </Select>
-          </FormControl>
+          {!question && (
+            <FormControl
+              width={isSmallerThan768 ? '100%' : '30%'}
+              className={qaCreateStyles.type_select}>
+              <FormLabel fontWeight="bold">タイプを選択してください</FormLabel>
+              <Select
+                colorScheme="teal"
+                bg="white"
+                defaultValue={type ? type : WikiType.QA}
+                onChange={(e) =>
+                  setNewQuestion((prev) => ({
+                    ...prev,
+                    type: e.target.value as WikiType,
+                  }))
+                }>
+                {user?.role === UserRole.ADMIN && (
+                  <option value={WikiType.RULES}>社内規則</option>
+                )}
+                <option value={WikiType.KNOWLEDGE}>ナレッジ</option>
+                <option value={WikiType.QA}>質問</option>
+              </Select>
+            </FormControl>
+          )}
         </div>
 
         <div className={qaCreateStyles.top_form_wrapper}>
@@ -268,7 +283,7 @@ const QAForm: React.FC<QAFormTypeProps> = ({
             setEditorState={setEditorState}
           />
         )}
-        {newQuestion.textFormat === 'markdown' && (
+        {newQuestion.textFormat === 'markdown' && activeTab === TabName.EDIT ? (
           <WrappedEditor
             style={{
               width: isSmallerThan768 ? '90vw' : '80vw',
@@ -284,7 +299,14 @@ const QAForm: React.FC<QAFormTypeProps> = ({
             onChange={handleEditorChange}
             renderHTML={(text: string) => mdParser.render(text)}
           />
-        )}
+        ) : null}
+        {newQuestion.textFormat === 'markdown' &&
+        activeTab === TabName.PREVIEW ? (
+          <MDEditor.Markdown
+            source={newQuestion.body}
+            className={qaCreateStyles.markdown_preview}
+          />
+        ) : null}
       </LayoutWithTab>
     </>
   );
