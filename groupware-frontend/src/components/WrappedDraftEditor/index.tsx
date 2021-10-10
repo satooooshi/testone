@@ -38,7 +38,7 @@ type WrappedDraftEditorProps = {
   setEditorState: React.Dispatch<React.SetStateAction<EditorState>>;
 };
 
-type HeadlineInlineButtonProps = {
+type InlineButtonProps = {
   editorState: EditorState;
   setEditorState: React.Dispatch<React.SetStateAction<EditorState>>;
   inlineStyle: string;
@@ -75,7 +75,7 @@ const blockTypes = [
   { style: 'blockquote', icon: <FaQuoteRight /> },
 ];
 
-const HeadlineInlineButton: React.FC<HeadlineInlineButtonProps> = ({
+const InlineButton: React.FC<InlineButtonProps> = ({
   editorState,
   setEditorState,
   inlineStyle,
@@ -254,7 +254,7 @@ const WrappedDraftEditor: React.FC<WrappedDraftEditorProps> = ({
             </>
           )}
           {inlineStyles.map((i) => (
-            <HeadlineInlineButton
+            <InlineButton
               key={i.style}
               editorState={editorState}
               setEditorState={setEditorState}
