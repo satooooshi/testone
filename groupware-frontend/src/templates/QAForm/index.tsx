@@ -24,14 +24,14 @@ import { useAuthenticate } from 'src/contexts/useAuthenticate';
 import { useHeaderTab } from '@/hooks/headerTab/useHeaderTab';
 
 type QAFormTypeProps = {
-  question?: Wiki;
+  wiki?: Wiki;
   tags?: Tag[];
-  onClickSaveButton: (question: Partial<Wiki>) => void;
+  onClickSaveButton: (wiki: Partial<Wiki>) => void;
   handleImageUpload: (file: File) => Promise<string>;
 };
 
 const QAForm: React.FC<QAFormTypeProps> = ({
-  question,
+  wiki,
   tags,
   onClickSaveButton,
   handleImageUpload,
@@ -52,7 +52,7 @@ const QAForm: React.FC<QAFormTypeProps> = ({
     preview: 'live',
   });
   const [activeTab, setActiveTab] = useState<TabName>(TabName.EDIT);
-  const [newQuestion, setNewQuestion] = useState<Partial<Wiki>>({
+  const [newWiki, setNewWiki] = useState<Partial<Wiki>>({
     title: '',
     body: '',
     tags: [],
@@ -67,7 +67,7 @@ const QAForm: React.FC<QAFormTypeProps> = ({
   });
 
   const newQAHeaderTitleName = useMemo(() => {
-    switch (newQuestion.type) {
+    switch (newWiki.type) {
       case WikiType.QA:
         return '質問を新規作成';
       case WikiType.RULES:
@@ -77,10 +77,10 @@ const QAForm: React.FC<QAFormTypeProps> = ({
       default:
         return '新規作成';
     }
-  }, [newQuestion.type]);
+  }, [newWiki.type]);
 
   const editQAHeaderTitleName = useMemo(() => {
-    switch (question?.type) {
+    switch (wiki?.type) {
       case WikiType.QA:
         return '質問を編集';
       case WikiType.RULES:
@@ -90,39 +90,37 @@ const QAForm: React.FC<QAFormTypeProps> = ({
       default:
         return '編集';
     }
-  }, [question?.type]);
+  }, [wiki?.type]);
 
   const toggleTag = (t: Tag) => {
-    const isExist = newQuestion.tags?.filter(
-      (existT) => existT.id === t.id,
-    ).length;
+    const isExist = newWiki.tags?.filter((existT) => existT.id === t.id).length;
     if (isExist) {
-      setNewQuestion((q) => ({
+      setNewWiki((q) => ({
         ...q,
         tags: q.tags ? q.tags.filter((existT) => existT.id !== t.id) : [],
       }));
       return;
     }
-    setNewQuestion((q) => ({
+    setNewWiki((q) => ({
       ...q,
       tags: q.tags ? [...q.tags, t] : [t],
     }));
   };
 
   const handleEditorChange = ({ text }: any) => {
-    setNewQuestion((q) => ({ ...q, body: text }));
+    setNewWiki((q) => ({ ...q, body: text }));
   };
 
   useEffect(() => {
-    if (question) {
-      setNewQuestion(question);
-      setEditor((e) => ({ ...e, value: question.body }));
+    if (wiki) {
+      setNewWiki(wiki);
+      setEditor((e) => ({ ...e, value: wiki.body }));
     }
-  }, [question]);
+  }, [wiki]);
 
   useEffect(() => {
     if (type) {
-      setNewQuestion((q) => ({ ...q, type }));
+      setNewWiki((q) => ({ ...q, type }));
     }
   }, [type]);
 
@@ -131,21 +129,21 @@ const QAForm: React.FC<QAFormTypeProps> = ({
       <LayoutWithTab
         sidebar={{ activeScreenName: ScreenName.QA }}
         header={{
-          title: question ? editQAHeaderTitleName : newQAHeaderTitleName,
+          title: wiki ? editQAHeaderTitleName : newQAHeaderTitleName,
           activeTabName: activeTab,
           tabs,
         }}>
         <Head>
-          <title>ボールド | {question ? 'Wiki編集' : 'Wiki作成'}</title>
+          <title>ボールド | {wiki ? 'Wiki編集' : 'Wiki作成'}</title>
         </Head>
         <TagModal
           isOpen={tagModal}
           tags={tags ? tags : []}
-          selectedTags={newQuestion.tags ? newQuestion.tags : []}
+          selectedTags={newWiki.tags ? newWiki.tags : []}
           toggleTag={toggleTag}
           onComplete={() => setTagModal(false)}
           onCancel={() => {
-            setNewQuestion((q) => ({ ...q, tags: [] }));
+            setNewWiki((q) => ({ ...q, tags: [] }));
             setTagModal(false);
           }}
         />
@@ -156,10 +154,10 @@ const QAForm: React.FC<QAFormTypeProps> = ({
               type="text"
               width="100%"
               placeholder="タイトルを入力してください"
-              value={newQuestion.title}
+              value={newWiki.title}
               background="white"
               onChange={(e) =>
-                setNewQuestion((q) => ({ ...q, title: e.target.value }))
+                setNewWiki((q) => ({ ...q, title: e.target.value }))
               }
               className={qaCreateStyles.title_input}
             />
@@ -173,7 +171,7 @@ const QAForm: React.FC<QAFormTypeProps> = ({
               bg="white"
               defaultValue={type ? type : WikiType.QA}
               onChange={(e) =>
-                setNewQuestion((prev) => ({
+                setNewWiki((prev) => ({
                   ...prev,
                   type: e.target.value as WikiType,
                 }))
@@ -199,18 +197,18 @@ const QAForm: React.FC<QAFormTypeProps> = ({
               <Button
                 colorScheme="pink"
                 onClick={() =>
-                  question
-                    ? onClickSaveButton({ ...question, ...newQuestion })
-                    : onClickSaveButton(newQuestion)
+                  wiki
+                    ? onClickSaveButton({ ...wiki, ...newWiki })
+                    : onClickSaveButton(newWiki)
                 }>
-                {question ? '質問を更新' : '質問を投稿'}
+                {wiki ? '質問を更新' : '質問を投稿'}
               </Button>
             </div>
           </div>
         </div>
-        {newQuestion.tags?.length ? (
+        {newWiki.tags?.length ? (
           <div className={qaCreateStyles.tags}>
-            {newQuestion.tags.map((t) => (
+            {newWiki.tags.map((t) => (
               <div key={t.id} className={qaCreateStyles.tag__item}>
                 <Button colorScheme="purple" height="28px">
                   {t.name}
@@ -231,13 +229,13 @@ const QAForm: React.FC<QAFormTypeProps> = ({
             editorRef={mdEditor}
             onImageUpload={handleImageUpload}
             plugins={liteEditorPlugins}
-            value={newQuestion.body}
+            value={newWiki.body}
             onChange={handleEditorChange}
             renderHTML={(text: string) => mdParser.render(text)}
           />
         ) : (
           <MDEditor.Markdown
-            source={question ? editor.value : newQuestion.body}
+            source={wiki ? editor.value : newWiki.body}
             className={qaCreateStyles.markdown_preview}
           />
         )}

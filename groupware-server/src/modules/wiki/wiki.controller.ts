@@ -56,7 +56,7 @@ export class WikiController {
   }
 
   @UseGuards(JwtAuthenticationGuard)
-  @Post('create-question')
+  @Post('create-wiki')
   async createWiki(
     @Req() request: RequestWithUser,
     @Body() wiki: Partial<Wiki>,
@@ -69,7 +69,7 @@ export class WikiController {
   }
 
   @UseGuards(JwtAuthenticationGuard)
-  @Post('update-question')
+  @Post('update-wiki')
   async updateWiki(
     @Req() request: RequestWithUser,
     @Body() wiki: Wiki,

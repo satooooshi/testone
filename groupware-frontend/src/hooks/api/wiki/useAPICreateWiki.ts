@@ -2,10 +2,10 @@ import { useMutation, UseMutationOptions } from 'react-query';
 import { Wiki } from 'src/types';
 import { axiosInstance } from 'src/utils/url';
 import { jsonHeader } from 'src/utils/url/header';
-import { createQuestionURL } from 'src/utils/url/wiki.url';
+import { createWikiURL } from 'src/utils/url/wiki.url';
 
 const createWiki = async (question: Partial<Wiki>) => {
-  const response = await axiosInstance.post(createQuestionURL, question, {
+  const response = await axiosInstance.post(createWikiURL, question, {
     headers: jsonHeader,
   });
   return response.data;
