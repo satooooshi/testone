@@ -118,12 +118,10 @@ const QAQuestionList = () => {
           />
         </div>
         <div className={qaListStyles.qa_list}>
-          {questions?.qaQuestions.map((q) => (
+          {questions?.wiki.map((q) => (
             <QACard key={q.id} qaQuestion={q} />
           ))}
-          {!questions?.qaQuestions.length && (
-            <p>検索結果が見つかりませんでした</p>
-          )}
+          {!questions?.wiki.length && <p>検索結果が見つかりませんでした</p>}
         </div>
       </div>
       <div className={paginationStyles.pagination_wrap_layout}>

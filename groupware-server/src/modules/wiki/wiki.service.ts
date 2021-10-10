@@ -88,7 +88,7 @@ export class WikiService {
     const count = await searchQuery.getCount();
     const pageCount =
       count % limit === 0 ? count / limit : Math.floor(count / limit) + 1;
-    return { pageCount, qaQuestions: wikiWithRelation };
+    return { pageCount, wiki: wikiWithRelation };
   }
 
   public async saveWiki(wiki: Partial<Wiki>): Promise<Wiki> {

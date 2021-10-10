@@ -29,7 +29,7 @@ export interface SearchQueryToGetWiki {
 export interface SearchResultToGetWiki {
   // this key is the total page count
   pageCount: number;
-  qaQuestions: Wiki[];
+  wiki: Wiki[];
 }
 
 @Controller('wiki')
