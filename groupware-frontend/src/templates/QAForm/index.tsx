@@ -119,6 +119,7 @@ const QAForm: React.FC<QAFormTypeProps> = ({
       setEditor((e) => ({ ...e, value: question.body }));
     }
   }, [question]);
+
   useEffect(() => {
     if (type) {
       setNewQuestion((q) => ({ ...q, type }));

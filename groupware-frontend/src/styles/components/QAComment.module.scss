@@ -1,12 +1,5 @@
 @import '../variables.scss';
 
-.qa_wrapper {
-  width: 80vw;
-  @media (max-width: 768px) {
-    width: 90vw;
-  }
-}
-
 .question_uploader__info {
   display: flex;
   flex-direction: row;

@@ -22,6 +22,8 @@ export enum WikiType {
   QA = 'qa',
 }
 
+export type TextFormat = 'markdown' | 'html';
+
 @Entity({ name: 'wiki' })
 @Index(['title', 'body'], { fulltext: true })
 export class Wiki {
@@ -36,6 +38,13 @@ export class Wiki {
 
   @Column({ name: 'type', type: 'enum', enum: WikiType, default: WikiType.QA })
   type: WikiType;
+
+  @Column('simple-enum', {
+    name: 'text_format',
+    enum: ['markdown', 'html'],
+    default: 'markdown',
+  })
+  textFormat: TextFormat;
 
   @Column({
     type: 'datetime',
