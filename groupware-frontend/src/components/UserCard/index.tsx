@@ -3,6 +3,7 @@ import userCardStyles from '@/styles/components/UserCard.module.scss';
 import { Tag, TagType, User } from 'src/types';
 import { Avatar, Button } from '@chakra-ui/react';
 import Link from 'next/link';
+import UserPointCounter from './UserPointCounter';
 
 type TagLinkProps = {
   tag: Tag;
@@ -50,15 +51,6 @@ const UserCard: React.FC<UserCardProps> = ({ user, onClickTag, duration }) => {
   const groupedTags = useMemo(() => {
     return groupByTagType(user.tags || []);
   }, [user.tags]);
-
-  const durationText = () => {
-    if (duration === 'week') {
-      return '(週間)';
-    }
-    if (duration === 'month') {
-      return '(月間)';
-    }
-  };
   return (
     <Link href={`/account/${user.id}`} passHref>
       <a className={userCardStyles.wrapper}>
@@ -78,24 +70,26 @@ const UserCard: React.FC<UserCardProps> = ({ user, onClickTag, duration }) => {
                 user.introduce || '自己紹介未入力'
               }`}</p>
             </div>
-            <span className={userCardStyles.sub_info_text}>
-              <p className={userCardStyles.count_label_text}>
-                イベント参加数{durationText()}
-              </p>
-              <p className={userCardStyles.count}>{user.eventCount}</p>
-            </span>
-            <span className={userCardStyles.sub_info_text}>
-              <p className={userCardStyles.count_label_text}>
-                質問数{durationText()}
-              </p>
-              <p className={userCardStyles.count}>{user.questionCount}</p>
-            </span>
-            <span className={userCardStyles.sub_info_text}>
-              <p className={userCardStyles.count_label_text}>
-                質問回答数{durationText()}
-              </p>
-              <p className={userCardStyles.count}>{user.answerCount}</p>
-            </span>
+            <UserPointCounter
+              label="event"
+              count={user.eventCount || 0}
+              duration={duration}
+            />
+            <UserPointCounter
+              label="question"
+              count={user.questionCount || 0}
+              duration={duration}
+            />
+            <UserPointCounter
+              label="answer"
+              count={user.answerCount || 0}
+              duration={duration}
+            />
+            <UserPointCounter
+              label="knowledge"
+              count={user.knowledgeCount || 0}
+              duration={duration}
+            />
           </div>
         </div>
 
