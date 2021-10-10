@@ -1,5 +1,5 @@
 import { useQuery } from 'react-query';
-import { QAQuestion } from 'src/types';
+import { Wiki } from 'src/types';
 import { axiosInstance } from 'src/utils/url';
 import { getWikiDetailURL } from 'src/utils/url/wiki.url';
 
@@ -9,7 +9,7 @@ const getWikiDetail = async (id: string) => {
 };
 
 export const useAPIGetWikiDetail = (id: string) => {
-  return useQuery<QAQuestion, Error>(['questionDetail', { id }], () =>
+  return useQuery<Wiki, Error>(['questionDetail', { id }], () =>
     getWikiDetail(id),
   );
 };

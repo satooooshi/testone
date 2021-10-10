@@ -6,7 +6,7 @@ import { ScreenName } from '@/components/Sidebar';
 import LayoutWithTab from '@/components/LayoutWithTab';
 import TagModal from '@/components/TagModal';
 import WrappedEditor from '@/components/WrappedEditor';
-import { QAQuestion, Tag, UserRole, WikiType } from 'src/types';
+import { Wiki, Tag, UserRole, WikiType } from 'src/types';
 import { Tab, TabName } from 'src/types/header/tab/types';
 import {
   Button,
@@ -24,9 +24,9 @@ import { useAuthenticate } from 'src/contexts/useAuthenticate';
 import { useHeaderTab } from '@/hooks/headerTab/useHeaderTab';
 
 type QAFormTypeProps = {
-  question?: QAQuestion;
+  question?: Wiki;
   tags?: Tag[];
-  onClickSaveButton: (question: Partial<QAQuestion>) => void;
+  onClickSaveButton: (question: Partial<Wiki>) => void;
   handleImageUpload: (file: File) => Promise<string>;
 };
 
@@ -52,7 +52,7 @@ const QAForm: React.FC<QAFormTypeProps> = ({
     preview: 'live',
   });
   const [activeTab, setActiveTab] = useState<TabName>(TabName.EDIT);
-  const [newQuestion, setNewQuestion] = useState<Partial<QAQuestion>>({
+  const [newQuestion, setNewQuestion] = useState<Partial<Wiki>>({
     title: '',
     body: '',
     tags: [],

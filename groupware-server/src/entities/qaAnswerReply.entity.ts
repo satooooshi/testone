@@ -8,7 +8,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { QAAnswer } from './qaAnswer.entity';
-import { TextFormat } from './qaQuestion.entity';
+import { TextFormat } from './wiki.entity';
 import { User } from './user.entity';
 
 @Entity({ name: 'qa_answer_replies' })

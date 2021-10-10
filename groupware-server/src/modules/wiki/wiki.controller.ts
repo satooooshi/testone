@@ -11,7 +11,7 @@ import {
 } from '@nestjs/common';
 import { QAAnswer } from 'src/entities/qaAnswer.entity';
 import { QAAnswerReply } from 'src/entities/qaAnswerReply.entity';
-import { Wiki, WikiType } from 'src/entities/qaQuestion.entity';
+import { Wiki, WikiType } from 'src/entities/wiki.entity';
 import JwtAuthenticationGuard from '../auth/jwtAuthentication.guard';
 import RequestWithUser from '../auth/requestWithUser.interface';
 import { WikiService } from './wiki.service';
@@ -52,33 +52,33 @@ export class WikiController {
   @Get('latest')
   @UseGuards(JwtAuthenticationGuard)
   async getLatest(): Promise<Wiki[]> {
-    return await this.qaService.getLatestQuestion();
+    return await this.qaService.getLatestWiki();
   }
 
   @UseGuards(JwtAuthenticationGuard)
   @Post('create-question')
-  async createQuestion(
+  async createWiki(
     @Req() request: RequestWithUser,
-    @Body() question: Partial<Wiki>,
+    @Body() wiki: Partial<Wiki>,
   ): Promise<Wiki> {
-    if (!question.title || !question.body) {
+    if (!wiki.title || !wiki.body) {
       throw new BadRequestException('title and body is necessary');
     }
-    question.writer = request.user;
-    return await this.qaService.saveWiki(question);
+    wiki.writer = request.user;
+    return await this.qaService.saveWiki(wiki);
   }
 
   @UseGuards(JwtAuthenticationGuard)
   @Post('update-question')
-  async updateQuestion(
+  async updateWiki(
     @Req() request: RequestWithUser,
-    @Body() question: Wiki,
+    @Body() wiki: Wiki,
   ): Promise<Wiki> {
-    if (!question.id || !question.title || !question.body) {
+    if (!wiki.id || !wiki.title || !wiki.body) {
       throw new BadRequestException('title and body is necessary');
     }
-    question.writer = request.user;
-    return await this.qaService.saveWiki(question);
+    wiki.writer = request.user;
+    return await this.qaService.saveWiki(wiki);
   }
 
   @UseGuards(JwtAuthenticationGuard)
@@ -103,12 +103,12 @@ export class WikiController {
 
   @UseGuards(JwtAuthenticationGuard)
   @Post('create-best-answer')
-  async createBestAnswer(@Body() question: Partial<Wiki>): Promise<Wiki> {
-    if (!question.bestAnswer) {
+  async createBestAnswer(@Body() wiki: Partial<Wiki>): Promise<Wiki> {
+    if (!wiki.bestAnswer) {
       throw new BadRequestException('bestAnswer is necessary');
     }
     return await this.qaService.saveWiki({
-      ...question,
+      ...wiki,
       resolvedAt: new Date(),
     });
   }

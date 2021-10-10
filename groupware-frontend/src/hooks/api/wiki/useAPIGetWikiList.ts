@@ -1,5 +1,5 @@
 import { useQuery } from 'react-query';
-import { QAQuestion, WikiType } from 'src/types';
+import { Wiki, WikiType } from 'src/types';
 import { qaQueryRefresh } from 'src/utils/qaQueryRefresh';
 import { axiosInstance } from 'src/utils/url';
 import { getWikiListURL } from 'src/utils/url/wiki.url';
@@ -17,7 +17,7 @@ export interface SearchQueryToGetWiki {
 export interface SearchResultToGetWiki {
   // this key is the total page count
   pageCount: number;
-  qaQuestions: QAQuestion[];
+  qaQuestions: Wiki[];
 }
 
 const getWikiList = async (

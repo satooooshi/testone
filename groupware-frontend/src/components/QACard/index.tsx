@@ -1,12 +1,12 @@
 import React, { useMemo } from 'react';
 import qaCardStyles from '@/styles/components/QACard.module.scss';
 import { dateTimeFormatterFromJSDDate } from 'src/utils/dateTimeFormatter';
-import { QAQuestion, WikiType } from 'src/types';
+import { Wiki, WikiType } from 'src/types';
 import Link from 'next/link';
 import { Avatar, Button } from '@chakra-ui/react';
 
 type QACardProps = {
-  qaQuestion: QAQuestion;
+  qaQuestion: Wiki;
 };
 
 const QACard: React.FC<QACardProps> = ({ qaQuestion }) => {

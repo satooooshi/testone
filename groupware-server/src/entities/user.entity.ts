@@ -7,7 +7,6 @@ import {
   ManyToMany,
   OneToMany,
   PrimaryGeneratedColumn,
-  Unique,
   UpdateDateColumn,
 } from 'typeorm';
 import { ChatGroup } from './chatGroup.entity';
@@ -17,7 +16,7 @@ import { EventComment } from './eventComment.entity';
 import { LastReadChatTime } from './lastReadChatTime.entity';
 import { QAAnswer } from './qaAnswer.entity';
 import { QAAnswerReply } from './qaAnswerReply.entity';
-import { Wiki } from './qaQuestion.entity';
+import { Wiki } from './wiki.entity';
 import { SubmissionFile } from './submissionFiles.entity';
 import { UserTag } from './userTag.entity';
 
@@ -170,8 +169,8 @@ export class User {
   })
   chatGroups?: ChatGroup[];
 
-  @OneToMany(() => Wiki, (qaQuestion) => qaQuestion.writer)
-  qaQuestions?: Wiki[];
+  @OneToMany(() => Wiki, (wiki) => wiki.writer)
+  wiki?: Wiki[];
 
   @OneToMany(() => QAAnswer, (qaAnswer) => qaAnswer.writer)
   qaAnswers?: QAAnswer[];

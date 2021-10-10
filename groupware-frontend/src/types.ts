@@ -56,7 +56,7 @@ export interface User {
   events?: EventSchedule[];
   eventComments?: EventComment[];
   eventsCreated?: EventSchedule[];
-  qaQuestions?: QAQuestion[];
+  wiki?: Wiki[];
   qaAnswers?: QAAnswer[];
   qaAnswerReplies?: QAAnswerReply[];
   //this params is sent when login
@@ -74,7 +74,7 @@ export interface Tag {
   createdAt: Date;
   updatedAt: Date;
   events?: EventSchedule[];
-  qaQuestions?: QAQuestion[];
+  wiki?: Wiki[];
 }
 
 export interface UserTag {
@@ -86,7 +86,7 @@ export interface UserTag {
   users?: User[];
 }
 
-export interface QAQuestion {
+export interface Wiki {
   id: number;
   title: string;
   body: string;
@@ -117,13 +117,13 @@ export interface QAAnswer {
   textFormat: TextFormat;
   createdAt: Date;
   updatedAt: Date;
-  question?: QAQuestion;
+  wiki?: Wiki;
   writer?: User;
   replies?: QAAnswerReply[];
 }
 
 export interface QABestAnswer {
-  question?: QAQuestion;
+  wiki?: Wiki;
   answer?: QAAnswer;
   createdAt: Date;
   updatedAt: Date;

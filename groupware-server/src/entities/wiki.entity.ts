@@ -66,14 +66,14 @@ export class Wiki {
   })
   updatedAt: Date;
 
-  @ManyToOne(() => User, (user) => user.qaQuestions, {
+  @ManyToOne(() => User, (user) => user.wiki, {
     onUpdate: 'CASCADE',
     onDelete: 'CASCADE',
   })
   @JoinColumn({ name: 'user_id' })
   writer?: User;
 
-  @OneToMany(() => QAAnswer, (qaAnswer) => qaAnswer.question)
+  @OneToMany(() => QAAnswer, (qaAnswer) => qaAnswer.wiki)
   answers?: QAAnswer[];
 
   @OneToOne(() => QAAnswer, (qaAnswer) => qaAnswer.id)

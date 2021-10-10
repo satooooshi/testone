@@ -9,7 +9,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { QAAnswerReply } from './qaAnswerReply.entity';
-import { TextFormat, Wiki } from './qaQuestion.entity';
+import { TextFormat, Wiki } from './wiki.entity';
 import { User } from './user.entity';
 
 @Entity({ name: 'qa_answers' })
@@ -27,12 +27,12 @@ export class QAAnswer {
   })
   textFormat: TextFormat;
 
-  @ManyToOne(() => Wiki, (qaQuestion) => qaQuestion.answers, {
+  @ManyToOne(() => Wiki, (wiki) => wiki.answers, {
     onUpdate: 'CASCADE',
     onDelete: 'CASCADE',
   })
   @JoinColumn({ name: 'question_id' })
-  question?: Wiki;
+  wiki?: Wiki;
 
   @ManyToOne(() => User, (user) => user.qaAnswers, {
     onUpdate: 'CASCADE',

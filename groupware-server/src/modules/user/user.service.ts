@@ -12,7 +12,7 @@ import RequestWithUser from '../auth/requestWithUser.interface';
 import { compare, hash } from 'bcrypt';
 import updatePasswordDto from './dto/updatePasswordDto';
 import { UserTag } from 'src/entities/userTag.entity';
-import { WikiType } from 'src/entities/qaQuestion.entity';
+import { WikiType } from 'src/entities/wiki.entity';
 import { Parser } from 'json2csv';
 import { SearchQueryToGetUsers } from './user.controller';
 import { Tag, TagType } from 'src/entities/tag.entity';

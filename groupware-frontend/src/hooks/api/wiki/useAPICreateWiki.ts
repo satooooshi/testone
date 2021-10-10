@@ -1,10 +1,10 @@
 import { useMutation, UseMutationOptions } from 'react-query';
-import { QAQuestion } from 'src/types';
+import { Wiki } from 'src/types';
 import { axiosInstance } from 'src/utils/url';
 import { jsonHeader } from 'src/utils/url/header';
 import { createQuestionURL } from 'src/utils/url/wiki.url';
 
-const createWiki = async (question: Partial<QAQuestion>) => {
+const createWiki = async (question: Partial<Wiki>) => {
   const response = await axiosInstance.post(createQuestionURL, question, {
     headers: jsonHeader,
   });
@@ -12,14 +12,9 @@ const createWiki = async (question: Partial<QAQuestion>) => {
 };
 
 export const useAPICreateWiki = (
-  mutationOptions?: UseMutationOptions<
-    QAQuestion,
-    Error,
-    Partial<QAQuestion>,
-    unknown
-  >,
+  mutationOptions?: UseMutationOptions<Wiki, Error, Partial<Wiki>, unknown>,
 ) => {
-  return useMutation<QAQuestion, Error, Partial<QAQuestion>>(
+  return useMutation<Wiki, Error, Partial<Wiki>>(
     (q) => createWiki(q),
     mutationOptions,
   );

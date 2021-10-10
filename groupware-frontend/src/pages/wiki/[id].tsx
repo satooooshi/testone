@@ -148,7 +148,7 @@ const QuestionDetail = () => {
                         body: stateToHTML(
                           answerEditorState.getCurrentContent(),
                         ),
-                        question: question,
+                        wiki: question,
                       })
                     : setAnswerVisible(true);
                 }}>
