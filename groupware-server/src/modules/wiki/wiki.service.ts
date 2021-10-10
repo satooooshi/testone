@@ -4,7 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import * as MarkdownIt from 'markdown-it';
 import { QAAnswer } from 'src/entities/qaAnswer.entity';
 import { QAAnswerReply } from 'src/entities/qaAnswerReply.entity';
-import { Wiki, WikiType } from 'src/entities/qaQuestion.entity';
+import { Wiki, WikiType } from 'src/entities/wiki.entity';
 import { User } from 'src/entities/user.entity';
 import { In, Repository } from 'typeorm';
 import { NotificationService } from '../notification/notification.service';
@@ -20,7 +20,7 @@ export class WikiService {
     private readonly userRepository: Repository<User>,
 
     @InjectRepository(Wiki)
-    private readonly qaQuestionRepository: Repository<Wiki>,
+    private readonly wikiRepository: Repository<Wiki>,
 
     @InjectRepository(QAAnswer)
     private readonly qaAnswerRepository: Repository<QAAnswer>,
@@ -39,33 +39,31 @@ export class WikiService {
       offset = (Number(page) - 1) * limit;
     }
     const tagIDs = tag.split('+');
-    const searchQuery = this.qaQuestionRepository
-      .createQueryBuilder('qa_questions')
+    const searchQuery = this.wikiRepository
+      .createQueryBuilder('wiki')
       .select()
-      .leftJoinAndSelect('qa_questions.tags', 'tag')
-      .leftJoin('qa_questions.writer', 'writer')
-      .leftJoin('qa_questions.answers', 'answer')
+      .leftJoinAndSelect('wiki.tags', 'tag')
+      .leftJoin('wiki.writer', 'writer')
+      .leftJoin('wiki.answers', 'answer')
       .leftJoin('answer.writer', 'answer_writer')
       .where(
         word && word.length !== 1
-          ? 'MATCH(title, qa_questions.body) AGAINST (:word IN NATURAL LANGUAGE MODE)'
+          ? 'MATCH(title, wiki.body) AGAINST (:word IN NATURAL LANGUAGE MODE)'
           : '1=1',
         {
           word,
         },
       )
-      .andWhere(type ? 'qa_questions.type = :type' : '1=1', { type })
+      .andWhere(type ? 'wiki.type = :type' : '1=1', { type })
       .andWhere(
-        word.length === 1
-          ? 'CONCAT(title, qa_questions.body) LIKE :queryWord'
-          : '1=1',
+        word.length === 1 ? 'CONCAT(title, wiki.body) LIKE :queryWord' : '1=1',
         { queryWord: `%${word}%` },
       )
       .andWhere(
         status === 'new'
-          ? 'qa_questions.resolved_at is null'
+          ? 'wiki.resolved_at is null'
           : status === 'resolved'
-          ? 'qa_questions.resolved_at is not null'
+          ? 'wiki.resolved_at is not null'
           : '1=1',
       )
       .andWhere(query.writer ? 'writer = :writer' : '1=1', {
@@ -77,9 +75,9 @@ export class WikiService {
       .andWhere(tag ? 'tag.id IN (:...tagIDs)' : '1=1', {
         tagIDs,
       });
-    const qaQuestions = await searchQuery.getMany();
-    const ids = qaQuestions.map((q) => q.id);
-    const questionsWithRelation = await this.qaQuestionRepository.find({
+    const wikis = await searchQuery.getMany();
+    const ids = wikis.map((q) => q.id);
+    const wikiWithRelation = await this.wikiRepository.find({
       where: { id: In(ids) },
       relations: ['writer', 'answers', 'tags'],
       order: { createdAt: 'DESC' },
@@ -90,39 +88,39 @@ export class WikiService {
     const count = await searchQuery.getCount();
     const pageCount =
       count % limit === 0 ? count / limit : Math.floor(count / limit) + 1;
-    return { pageCount, qaQuestions: questionsWithRelation };
+    return { pageCount, wiki: wikiWithRelation };
   }
 
-  public async saveWiki(question: Partial<Wiki>): Promise<Wiki> {
+  public async saveWiki(wiki: Partial<Wiki>): Promise<Wiki> {
     try {
-      const newQuestion = await this.qaQuestionRepository.save(question);
-      if (newQuestion.type !== WikiType.RULES) {
+      const newWiki = await this.wikiRepository.save(wiki);
+      if (newWiki.type !== WikiType.RULES) {
         let mailContent = '';
         const allUsers = await this.userRepository.find();
         const emails = allUsers.map((u) => u.email);
         const postedWikiType =
-          newQuestion.type === WikiType.QA ? 'Q&A' : 'ナレッジ';
-        if (newQuestion.textFormat === 'markdown') {
+          newWiki.type === WikiType.QA ? 'Q&A' : 'ナレッジ';
+        if (newWiki.textFormat === 'markdown') {
           const md = MarkdownIt({
             breaks: true,
           });
-          mailContent = md.render(newQuestion.body);
+          mailContent = md.render(newWiki.body);
         }
-        if (newQuestion.textFormat === 'html') {
-          mailContent = newQuestion.body;
+        if (newWiki.textFormat === 'html') {
+          mailContent = newWiki.body;
         }
         this.notifService.sendEmailNotification({
           to: emails,
           subject: `新規${postedWikiType}が投稿されました`,
-          title: `${newQuestion.title}`,
+          title: `${newWiki.title}`,
           content: mailContent,
           buttonLink: `${this.configService.get('CLIENT_DOMAIN')}/wiki/${
-            newQuestion.id
+            newWiki.id
           }`,
           buttonName: `${postedWikiType}を見る`,
         });
       }
-      return newQuestion;
+      return newWiki;
     } catch (err) {
       console.log(err);
       throw new BadRequestException(
@@ -133,13 +131,11 @@ export class WikiService {
 
   public async createAnswer(answer: Partial<QAAnswer>): Promise<QAAnswer> {
     try {
-      if (!answer.question || !answer.question.id) {
+      if (!answer.wiki || !answer.wiki.id) {
         throw Error;
       }
-      const existQuestion = await this.qaQuestionRepository.findOne(
-        answer.question.id,
-      );
-      answer.question = existQuestion;
+      const existWiki = await this.wikiRepository.findOne(answer.wiki.id);
+      answer.wiki = existWiki;
       const newAnswer = await this.qaAnswerRepository.save(answer);
       return newAnswer;
     } catch (err) {
@@ -149,17 +145,17 @@ export class WikiService {
     }
   }
 
-  public async getLatestQuestion(): Promise<Wiki[]> {
+  public async getLatestWiki(): Promise<Wiki[]> {
     const now = new Date();
     const oneWeekAgo = new Date(now.setDate(now.getDate() - 7));
     const limit = 10;
-    const latest = await this.qaQuestionRepository
-      .createQueryBuilder('question')
-      .where('question.created_at < now()')
-      .andWhere('question.created_at > :oneWeekAgo', { oneWeekAgo })
+    const latest = await this.wikiRepository
+      .createQueryBuilder('wiki')
+      .where('wiki.created_at < now()')
+      .andWhere('wiki.created_at > :oneWeekAgo', { oneWeekAgo })
       .getMany();
     const ids = latest.map((q) => q.id);
-    const filteredQuestions = await this.qaQuestionRepository.find({
+    const filteredWikis = await this.wikiRepository.find({
       where: {
         id: In(ids),
       },
@@ -167,7 +163,7 @@ export class WikiService {
       order: { createdAt: 'DESC' },
       take: limit,
     });
-    return filteredQuestions;
+    return filteredWikis;
   }
 
   public async createAnswerReply(
@@ -191,18 +187,18 @@ export class WikiService {
   }
 
   public async getWikiDetail(id: number): Promise<Wiki> {
-    const existQuestion = await this.qaQuestionRepository
-      .createQueryBuilder('question')
-      .innerJoinAndSelect('question.writer', 'writer')
-      .leftJoinAndSelect('question.bestAnswer', 'bestAnswer')
-      .leftJoinAndSelect('question.answers', 'answer')
+    const existWiki = await this.wikiRepository
+      .createQueryBuilder('wiki')
+      .innerJoinAndSelect('wiki.writer', 'writer')
+      .leftJoinAndSelect('wiki.bestAnswer', 'bestAnswer')
+      .leftJoinAndSelect('wiki.answers', 'answer')
       .leftJoinAndSelect('answer.writer', 'answer_writer')
       .leftJoinAndSelect('answer.replies', 'reply')
       .leftJoinAndSelect('reply.writer', 'reply_writer')
-      .leftJoinAndSelect('question.tags', 'tags')
-      .where('question.id = :id', { id })
+      .leftJoinAndSelect('wiki.tags', 'tags')
+      .where('wiki.id = :id', { id })
       .orderBy({ 'answer.created_at': 'ASC', 'reply.created_at': 'ASC' })
       .getOne();
-    return existQuestion;
+    return existWiki;
   }
 }

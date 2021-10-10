@@ -2,7 +2,7 @@ import { ScreenName } from '@/components/Sidebar';
 import { useAPIGetWikiDetail } from '@/hooks/api/wiki/useAPIGetWikiDetail';
 import { useRouter } from 'next/router';
 import qaDetailStyles from '@/styles/layouts/QADetail.module.scss';
-import QAComment from '@/components/QAComment';
+import WikiComment from '@/components/WikiComment';
 import React, { useMemo, useRef, useState } from 'react';
 import 'react-markdown-editor-lite/lib/index.css';
 import { useAPICreateAnswer } from '@/hooks/api/wiki/useAPICreateAnswer';
@@ -25,7 +25,7 @@ const QuestionDetail = () => {
   const router = useRouter();
 
   const { id } = router.query;
-  const { data: question, refetch } = useAPIGetWikiDetail(
+  const { data: wiki, refetch } = useAPIGetWikiDetail(
     typeof id === 'string' ? id : '0',
   );
   const [answerVisible, setAnswerVisible] = useState(false);
@@ -74,40 +74,40 @@ const QuestionDetail = () => {
   const { data: myself } = useAPIGetProfile();
   const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
 
-  const navigateToEditQuestion = (id: number) => {
+  const navigateToEditWiki = (id: number) => {
     router.push('/wiki/edit/' + id);
   };
 
   const tabs: Tab[] = useHeaderTab({ headerTabType: 'wikiDetail' });
 
   const headerTitle = useMemo(() => {
-    if (question?.type === WikiType.QA) {
+    if (wiki?.type === WikiType.QA) {
       return '質問詳細';
     }
-    if (question?.type === WikiType.RULES) {
+    if (wiki?.type === WikiType.RULES) {
       return '社内規則詳細';
     }
-    if (question?.type === WikiType.KNOWLEDGE) {
+    if (wiki?.type === WikiType.KNOWLEDGE) {
       return 'ナレッジ詳細';
     }
     return '詳細';
-  }, [question?.type]);
+  }, [wiki?.type]);
 
   return (
     <LayoutWithTab
       sidebar={{ activeScreenName: ScreenName.QA }}
       header={{ title: headerTitle, tabs: tabs }}>
-      {question && question.writer ? (
+      {wiki && wiki.writer ? (
         <div className={qaDetailStyles.main}>
           <Head>
-            <title>ボールド | {question ? question.title : headerTitle}</title>
+            <title>ボールド | {wiki ? wiki.title : headerTitle}</title>
           </Head>
           <div className={qaDetailStyles.title_wrapper}>
-            <p className={qaDetailStyles.title_text}>{question.title}</p>
+            <p className={qaDetailStyles.title_text}>{wiki.title}</p>
           </div>
-          {question && question.tags && question.tags.length ? (
+          {wiki && wiki.tags && wiki.tags.length ? (
             <div className={qaDetailStyles.tags_wrapper}>
-              {question.tags.map((tag) => (
+              {wiki.tags.map((tag) => (
                 <Link href={`/wiki/list?tag=${tag.id}`} key={tag.id}>
                   <a className={qaDetailStyles.tag}>
                     <Button colorScheme="purple" height="28px">
@@ -120,23 +120,22 @@ const QuestionDetail = () => {
           ) : null}
           <div className={qaDetailStyles.question_wrapper}>
             <div className={qaDetailStyles.qa_wrapper}>
-              <QAComment
-                textFormat={question.textFormat}
-                body={question.body}
-                date={question.createdAt}
-                writer={question.writer}
-                isWriter={myself?.id === question.writer?.id}
+              <WikiComment
+                textFormat={wiki.textFormat}
+                body={wiki.body}
+                date={wiki.createdAt}
+                writer={wiki.writer}
+                isWriter={myself?.id === wiki.writer?.id}
                 onClickEditButton={() =>
-                  myself?.id === question.writer?.id &&
-                  navigateToEditQuestion(question.id)
+                  myself?.id === wiki.writer?.id && navigateToEditWiki(wiki.id)
                 }
               />
             </div>
           </div>
-          {question.type === WikiType.QA && (
+          {wiki.type === WikiType.QA && (
             <div className={qaDetailStyles.answer_count__wrapper}>
               <p className={qaDetailStyles.answer_count}>
-                回答{question.answers?.length ? question.answers.length : 0}件
+                回答{wiki.answers?.length ? wiki.answers.length : 0}件
               </p>
               <Button
                 size="sm"
@@ -148,7 +147,7 @@ const QuestionDetail = () => {
                         body: stateToHTML(
                           answerEditorState.getCurrentContent(),
                         ),
-                        question: question,
+                        wiki: wiki,
                       })
                     : setAnswerVisible(true);
                 }}>
@@ -168,26 +167,25 @@ const QuestionDetail = () => {
               setEditorState={setAnswerEditorState}
             />
           )}
-          {question.answers && question.answers.length
-            ? question.answers.map(
+          {wiki.answers && wiki.answers.length
+            ? wiki.answers.map(
                 (a) =>
                   a.writer && (
                     <div key={a.id} className={qaDetailStyles.answers_wrapper}>
                       <div className={qaDetailStyles.qa_comment_wrapper}>
                         <div className={qaDetailStyles.qa_wrapper}>
-                          <QAComment
+                          <WikiComment
                             bestAnswerButtonName={
-                              question.bestAnswer?.id === a.id
+                              wiki.bestAnswer?.id === a.id
                                 ? 'ベストアンサーに選ばれた回答'
-                                : !question.resolvedAt &&
-                                  myself?.id === a.writer.id
+                                : !wiki.resolvedAt && myself?.id === a.writer.id
                                 ? 'ベストアンサーに選ぶ'
                                 : undefined
                             }
                             onClickBestAnswerButton={() =>
-                              createBestAnswer({ ...question, bestAnswer: a })
+                              createBestAnswer({ ...wiki, bestAnswer: a })
                             }
-                            textFormat={question.textFormat}
+                            textFormat={wiki.textFormat}
                             body={a.body}
                             date={a.createdAt}
                             writer={a.writer}

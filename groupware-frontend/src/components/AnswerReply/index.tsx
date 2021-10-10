@@ -5,7 +5,7 @@ import '@uiw/react-markdown-preview/dist/markdown.css';
 import answerReplyStyles from '@/styles/components/AnswerReply.module.scss';
 import { dateTimeFormatterFromJSDDate } from 'src/utils/dateTimeFormatter';
 import { Avatar } from '@chakra-ui/react';
-import QAComment from '../QAComment';
+import WikiComment from '../WikiComment';
 
 type AnswerReplyProps = {
   reply: QAAnswerReply;
@@ -32,7 +32,7 @@ const AnswerReply: React.FC<AnswerReplyProps> = ({ reply }) => {
         </p>
       </div>
       <div className={answerReplyStyles.qa_reply_wrapper}>
-        <QAComment textFormat={reply.textFormat} body={reply.body} />
+        <WikiComment textFormat={reply.textFormat} body={reply.body} />
       </div>
     </div>
   );

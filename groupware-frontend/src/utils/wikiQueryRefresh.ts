@@ -1,6 +1,6 @@
 import { SearchQueryToGetWiki } from '@/hooks/api/wiki/useAPIGetWikiList';
 
-export const qaQueryRefresh = (
+export const wikiQueryRefresh = (
   query: Partial<SearchQueryToGetWiki>,
 ): string => {
   const {

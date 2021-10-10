@@ -6,7 +6,7 @@ import { ScreenName } from '@/components/Sidebar';
 import LayoutWithTab from '@/components/LayoutWithTab';
 import TagModal from '@/components/TagModal';
 import WrappedDraftEditor from '@/components/WrappedDraftEditor';
-import { QAQuestion, Tag, TextFormat, UserRole, WikiType } from 'src/types';
+import { Wiki, Tag, TextFormat, UserRole, WikiType } from 'src/types';
 import { Tab, TabName } from 'src/types/header/tab/types';
 import {
   Button,
@@ -26,14 +26,14 @@ import MarkdownIt from 'markdown-it';
 import { uploadStorage } from '@/hooks/api/storage/useAPIUploadStorage';
 import MDEditor from '@uiw/react-md-editor';
 
-type QAFormTypeProps = {
-  question?: QAQuestion;
+type WikiFormProps = {
+  wiki?: Wiki;
   tags?: Tag[];
-  onClickSaveButton: (question: Partial<QAQuestion>) => void;
+  onClickSaveButton: (wiki: Partial<Wiki>) => void;
 };
 
-const QAForm: React.FC<QAFormTypeProps> = ({
-  question,
+const WikiForm: React.FC<WikiFormProps> = ({
+  wiki,
   tags,
   onClickSaveButton,
 }) => {
@@ -48,7 +48,7 @@ const QAForm: React.FC<QAFormTypeProps> = ({
     EditorState.createEmpty(),
   );
   const [activeTab, setActiveTab] = useState<TabName>(TabName.EDIT);
-  const [newQuestion, setNewQuestion] = useState<Partial<QAQuestion>>({
+  const [newQuestion, setNewQuestion] = useState<Partial<Wiki>>({
     title: '',
     body: '',
     tags: [],
@@ -78,7 +78,7 @@ const QAForm: React.FC<QAFormTypeProps> = ({
         ];
 
   const headerTabName = useMemo(() => {
-    switch (question?.type) {
+    switch (wiki?.type) {
       case WikiType.QA:
         return '質問を編集';
       case WikiType.RULES:
@@ -88,7 +88,7 @@ const QAForm: React.FC<QAFormTypeProps> = ({
       default:
         return '編集';
     }
-  }, [question?.type]);
+  }, [wiki?.type]);
 
   const toggleTag = (t: Tag) => {
     const isExist = newQuestion.tags?.filter(
@@ -115,9 +115,9 @@ const QAForm: React.FC<QAFormTypeProps> = ({
   };
 
   const handleSaveButton = () => {
-    if (question) {
+    if (wiki) {
       onClickSaveButton({
-        ...question,
+        ...wiki,
         ...newQuestion,
         body:
           newQuestion.textFormat === 'html'
@@ -136,20 +136,20 @@ const QAForm: React.FC<QAFormTypeProps> = ({
   };
 
   useEffect(() => {
-    if (question) {
-      setNewQuestion({ ...question, textFormat: 'html' });
+    if (wiki) {
+      setNewQuestion({ ...wiki, textFormat: 'html' });
       setEditorState((e) =>
         EditorState.push(
           e,
           ContentState.createFromBlockArray(
-            convertFromHTML(question.body).contentBlocks,
-            convertFromHTML(question.body).entityMap,
+            convertFromHTML(wiki.body).contentBlocks,
+            convertFromHTML(wiki.body).entityMap,
           ),
           'apply-entity',
         ),
       );
     }
-  }, [question]);
+  }, [wiki]);
 
   useEffect(() => {
     formTopRef.current?.scrollIntoView();
@@ -165,7 +165,7 @@ const QAForm: React.FC<QAFormTypeProps> = ({
           tabs,
         }}>
         <Head>
-          <title>ボールド | {question ? 'Wiki編集' : 'Wiki作成'}</title>
+          <title>ボールド | {wiki ? 'Wiki編集' : 'Wiki作成'}</title>
         </Head>
         <TagModal
           isOpen={tagModal}
@@ -193,7 +193,7 @@ const QAForm: React.FC<QAFormTypeProps> = ({
               className={qaCreateStyles.title_input}
             />
           </FormControl>
-          {!question && (
+          {!wiki && (
             <FormControl
               width={isSmallerThan768 ? '100%' : '30%'}
               className={qaCreateStyles.type_select}>
@@ -219,7 +219,7 @@ const QAForm: React.FC<QAFormTypeProps> = ({
         </div>
 
         <div className={qaCreateStyles.top_form_wrapper}>
-          {!question && (
+          {!wiki && (
             <div className={qaCreateStyles.format_selector_wrapper}>
               <FormControl className={qaCreateStyles.type_select}>
                 <FormLabel fontWeight="bold">
@@ -258,7 +258,7 @@ const QAForm: React.FC<QAFormTypeProps> = ({
                 タグを編集
               </Button>
               <Button colorScheme="pink" onClick={() => handleSaveButton()}>
-                {question ? '質問を更新' : '質問を投稿'}
+                {wiki ? '質問を更新' : '質問を投稿'}
               </Button>
             </div>
           </div>
@@ -315,4 +315,4 @@ const QAForm: React.FC<QAFormTypeProps> = ({
     </>
   );
 };
-export default QAForm;
+export default WikiForm;
