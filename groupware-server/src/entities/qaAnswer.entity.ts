@@ -31,7 +31,7 @@ export class QAAnswer {
     onUpdate: 'CASCADE',
     onDelete: 'CASCADE',
   })
-  @JoinColumn({ name: 'question_id' })
+  @JoinColumn({ name: 'wiki_id' })
   wiki?: Wiki;
 
   @ManyToOne(() => User, (user) => user.qaAnswers, {

@@ -85,9 +85,9 @@ export class Wiki {
     onDelete: 'CASCADE',
   })
   @JoinTable({
-    name: 'qa_linked_tags',
+    name: 'wiki_linked_tags',
     joinColumn: {
-      name: 'question_id',
+      name: 'wiki_id',
     },
     inverseJoinColumn: {
       name: 'tag_id',
