@@ -34,6 +34,7 @@ import {
   useAPIGetEventList,
 } from '@/hooks/api/event/useAPIGetEventList';
 import { useAPIGetTag } from '@/hooks/api/tag/useAPIGetTag';
+import { useHeaderTab } from '@/hooks/headerTab/useHeaderTab';
 import topTabBarStyles from '@/styles/components/TopTabBar.module.scss';
 
 const localizer = momentLocalizer(moment);
@@ -109,47 +110,6 @@ const EventList = () => {
   });
   const [newEvent, setNewEvent] = useState<CreateEventRequest>();
 
-  const tabs: Tab[] = [
-    {
-      name: EventTab.ALL,
-      onClick: () => queryRefresh({ type: '', personal, from, to }),
-    },
-    {
-      name: EventTab.IMPRESSIVE_UNIVERSITY,
-      onClick: () =>
-        queryRefresh({
-          type: EventType.IMPRESSIVE_UNIVERSITY,
-          personal,
-          from,
-          to,
-        }),
-    },
-    {
-      name: EventTab.STUDY_MEETING,
-      onClick: () =>
-        queryRefresh({ type: EventType.STUDY_MEETING, personal, from, to }),
-    },
-    {
-      name: EventTab.BOLDAY,
-      onClick: () =>
-        queryRefresh({ type: EventType.BOLDAY, personal, from, to }),
-    },
-    {
-      name: EventTab.COACH,
-      onClick: () =>
-        queryRefresh({ type: EventType.COACH, personal, from, to }),
-    },
-    {
-      name: EventTab.CLUB,
-      onClick: () => queryRefresh({ type: EventType.CLUB, personal, from, to }),
-    },
-    {
-      name: EventTab.SUBMISSION_ETC,
-      onClick: () =>
-        queryRefresh({ type: EventType.SUBMISSION_ETC, personal, from, to }),
-    },
-  ];
-
   const onToggleTag = (t: Tag) => {
     setSelectedTags((s) => toggleTag(s, t));
   };
@@ -172,6 +132,14 @@ const EventList = () => {
       shallow: true,
     });
   };
+
+  const tabs: Tab[] = useHeaderTab({
+    headerTabType: 'event',
+    queryRefresh,
+    personal,
+    from,
+    to,
+  });
 
   const hrefTagClick = (t: Tag): string => {
     const url = generateEventSearchQueryString({

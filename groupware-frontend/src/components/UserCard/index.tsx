@@ -38,7 +38,7 @@ const TagLink: React.FC<TagLinkProps> = ({ tag, onClickTag, tagColor }) => {
       <a
         onClick={() => onClickTag(tag)}
         className={userCardStyles.tag_item_wrapper}>
-        <Button size="sm" colorScheme={tagColor}>
+        <Button size="xs" colorScheme={tagColor}>
           {tag.name}
         </Button>
       </a>
@@ -113,7 +113,7 @@ const UserCard: React.FC<UserCardProps> = ({ user, onClickTag, duration }) => {
                   />
                 ))
               ) : (
-                <Button size="sm" height="28px" colorScheme="teal">
+                <Button size="xs" height="28px" colorScheme="teal">
                   未設定
                 </Button>
               )}
@@ -132,7 +132,7 @@ const UserCard: React.FC<UserCardProps> = ({ user, onClickTag, duration }) => {
                   />
                 ))
               ) : (
-                <Button size="sm" height="28px" colorScheme="blue">
+                <Button size="xs" height="28px" colorScheme="blue">
                   未設定
                 </Button>
               )}
@@ -151,7 +151,7 @@ const UserCard: React.FC<UserCardProps> = ({ user, onClickTag, duration }) => {
                   />
                 ))
               ) : (
-                <Button size="sm" height="28px" colorScheme="green">
+                <Button size="xs" height="28px" colorScheme="green">
                   未設定
                 </Button>
               )}
@@ -170,7 +170,7 @@ const UserCard: React.FC<UserCardProps> = ({ user, onClickTag, duration }) => {
                   />
                 ))
               ) : (
-                <Button size="sm" height="28px" colorScheme="pink">
+                <Button size="xs" height="28px" colorScheme="pink">
                   未設定
                 </Button>
               )}

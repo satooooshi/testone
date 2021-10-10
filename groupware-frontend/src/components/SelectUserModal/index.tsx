@@ -61,6 +61,7 @@ const SelectUserModal: React.FC<SelectUserModalProps> = ({
   );
   return (
     <ReactModal
+      ariaHideApp={false}
       style={{ overlay: { zIndex: 110 } }}
       isOpen={isOpen}
       className={selectUserModalStyles.modal}>

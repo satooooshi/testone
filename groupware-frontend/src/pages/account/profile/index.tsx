@@ -24,6 +24,7 @@ import 'react-image-crop/dist/ReactCrop.css';
 import { dataURLToFile } from 'src/utils/dataURLToFile';
 import { useAPIGetProfile } from '@/hooks/api/user/useAPIGetProfile';
 import { useImageCrop } from '@/hooks/crop/useImageCrop';
+import { useHeaderTab } from '@/hooks/headerTab/useHeaderTab';
 
 const Profile = () => {
   const { data: profile } = useAPIGetProfile();
@@ -80,18 +81,7 @@ const Profile = () => {
     },
   });
 
-  const tabs: Tab[] = [
-    {
-      type: 'link',
-      name: 'アカウント情報',
-      href: `/account/${user?.id}`,
-    },
-    {
-      type: 'link',
-      name: 'プロフィール編集',
-      href: '/account/profile',
-    },
-  ];
+  const tabs: Tab[] = useHeaderTab({ headerTabType: 'account', user });
 
   const handleUpdateUser = async () => {
     if (!croppedImageURL || !completedCrop || !selectImageName) {

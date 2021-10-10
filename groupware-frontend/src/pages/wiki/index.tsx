@@ -5,15 +5,11 @@ import React from 'react';
 import homeStyles from '@/styles/layouts/Home.module.scss';
 import PortalLinkBox, { PortalLinkType } from '@/components/PortalLinkBox';
 import { Tab } from 'src/types/header/tab/types';
+import { useHeaderTab } from '@/hooks/headerTab/useHeaderTab';
 
 const Wiki = () => {
-  const tabs: Tab[] = [
-    {
-      type: 'link',
-      name: '社内Wiki Home',
-      href: '/qa/wiki',
-    },
-  ];
+  const tabs: Tab[] = useHeaderTab({ headerTabType: 'wiki' });
+
   return (
     <LayoutWithTab
       sidebar={{ activeScreenName: ScreenName.QA }}

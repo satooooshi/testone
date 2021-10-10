@@ -20,6 +20,7 @@ import { Tab } from 'src/types/header/tab/types';
 import { useAPICreateAnswerReply } from '@/hooks/api/wiki/useAPICreateAnswerReply';
 import { useAPICreateBestAnswer } from '@/hooks/api/wiki/useAPICreateBestAnswer';
 import { useAPIGetProfile } from '@/hooks/api/user/useAPIGetProfile';
+import { useHeaderTab } from '@/hooks/headerTab/useHeaderTab';
 
 const QuestionDetail = () => {
   const mdParser = new MarkdownIt({ breaks: true });
@@ -89,13 +90,7 @@ const QuestionDetail = () => {
     router.push('/wiki/edit/' + id);
   };
 
-  const tabs: Tab[] = [
-    {
-      type: 'link',
-      name: 'Wiki一覧画面へ',
-      href: `list`,
-    },
-  ];
+  const tabs: Tab[] = useHeaderTab({ headerTabType: 'wikiDetail' });
 
   const headerTitle = useMemo(() => {
     if (question?.type === WikiType.QA) {

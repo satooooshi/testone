@@ -55,6 +55,7 @@ const EditChatGroupMembersModal: React.FC<EditChatGroupMambersModalProps> = ({
 
   return (
     <ReactModal
+      ariaHideApp={false}
       style={{ overlay: { zIndex: 110 } }}
       isOpen={isOpen}
       className={selectUserModalStyles.modal}>

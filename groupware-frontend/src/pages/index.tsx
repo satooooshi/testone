@@ -4,20 +4,10 @@ import LayoutWithTab from '@/components/LayoutWithTab';
 import homeStyles from '@/styles/layouts/Home.module.scss';
 import PortalLinkBox, { PortalLinkType } from '@/components/PortalLinkBox';
 import Head from 'next/head';
+import { useHeaderTab } from '@/hooks/headerTab/useHeaderTab';
 
 export default function Home() {
-  const tabs: Tab[] = [
-    {
-      type: 'link',
-      name: 'ダッシュボード',
-      href: '/',
-    },
-    {
-      type: 'link',
-      name: 'メンション一覧',
-      href: '/mention',
-    },
-  ];
+  const tabs: Tab[] = useHeaderTab({ headerTabType: 'home' });
 
   return (
     <LayoutWithTab
