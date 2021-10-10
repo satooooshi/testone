@@ -6,8 +6,8 @@
   padding: 16px;
   background: #fefefe;
   overflow: scroll;
-  width: 100%;
   height: 90vh;
+  width: 100%;
   background: $white_color;
   scrollbar-width: none;
   -ms-overflow-style: none;
@@ -21,10 +21,6 @@
   h5,
   h6 {
     font-size: revert;
-  }
-
-  & > * {
-    height: auto;
   }
 }
 

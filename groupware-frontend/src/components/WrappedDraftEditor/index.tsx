@@ -224,100 +224,108 @@ const WrappedDraftEditor: React.FC<WrappedDraftEditorProps> = ({
   };
 
   return (
-    <div style={style} className={wrappedDraftEditorStyles.container}>
-      <div className={wrappedDraftEditorStyles.toolbar}>
-        <div className={wrappedDraftEditorStyles.headlineButtonWrapper}>
-          <button
-            className={wrappedDraftEditorStyles.headlineButton}
-            onClick={() => setEnableHeaderBlocks(!enableHeaderBlocks)}>
-            <FaHeading />
-          </button>
+    <>
+      <div style={style} className={wrappedDraftEditorStyles.container}>
+        <p style={{ fontSize: 14 }}>
+          ※太字/斜体/打ち消し文字にする際には文字を選択してからボタンを押してください
+        </p>
+        <div className={wrappedDraftEditorStyles.toolbar}>
+          <div className={wrappedDraftEditorStyles.headlineButtonWrapper}>
+            <button
+              className={wrappedDraftEditorStyles.headlineButton}
+              onMouseDown={(e) => {
+                e.preventDefault();
+                setEnableHeaderBlocks(!enableHeaderBlocks);
+              }}>
+              <FaHeading />
+            </button>
+          </div>
+          {enableHeaderBlocks && (
+            <>
+              {headerBlocks.map((h) => (
+                <HeadlineBlockButton
+                  key={h.style}
+                  editorState={editorState}
+                  setEditorState={setEditorState}
+                  blockType={h.style}
+                  DisplayIcon={h.icon}
+                />
+              ))}
+            </>
+          )}
+          {inlineStyles.map((i) => (
+            <HeadlineInlineButton
+              key={i.style}
+              editorState={editorState}
+              setEditorState={setEditorState}
+              inlineStyle={i.style}
+              DisplayIcon={i.icon}
+            />
+          ))}
+          {blockTypes.map((b) => (
+            <HeadlineBlockButton
+              key={b.style}
+              editorState={editorState}
+              setEditorState={setEditorState}
+              blockType={b.style}
+              DisplayIcon={b.icon}
+            />
+          ))}
+          <div className={wrappedDraftEditorStyles.headlineButtonWrapper}>
+            <button
+              {...getinsertImageRootProps({
+                className: wrappedDraftEditorStyles.headlineButton,
+              })}>
+              <input {...getinsertImageInputProps()} />
+              <FaImage />
+            </button>
+          </div>
+          <div className={wrappedDraftEditorStyles.headlineButtonWrapper}>
+            <button
+              className={wrappedDraftEditorStyles.headlineButton}
+              disabled={editorState.getUndoStack().size <= 0}
+              onMouseDown={() => setEditorState(EditorState.undo(editorState))}>
+              <FaUndoAlt />
+            </button>
+          </div>
+          <div className={wrappedDraftEditorStyles.headlineButtonWrapper}>
+            <button
+              className={wrappedDraftEditorStyles.headlineButton}
+              disabled={editorState.getRedoStack().size <= 0}
+              onMouseDown={() => setEditorState(EditorState.redo(editorState))}>
+              <FaRedoAlt />
+            </button>
+          </div>
+          <div className={wrappedDraftEditorStyles.headlineButtonWrapper}>
+            <button
+              className={wrappedDraftEditorStyles.headlineButton}
+              onMouseDown={() =>
+                setEditorState(
+                  EditorState.push(
+                    editorState,
+                    ContentState.createFromText(''),
+                    'undo',
+                  ),
+                )
+              }>
+              <FaRegTrashAlt />
+            </button>
+          </div>
         </div>
-        {enableHeaderBlocks && (
-          <>
-            {headerBlocks.map((h) => (
-              <HeadlineBlockButton
-                key={h.style}
-                editorState={editorState}
-                setEditorState={setEditorState}
-                blockType={h.style}
-                DisplayIcon={h.icon}
-              />
-            ))}
-          </>
-        )}
-        {inlineStyles.map((i) => (
-          <HeadlineInlineButton
-            key={i.style}
+        <div className={wrappedDraftEditorStyles.editor}>
+          <Editor
+            customStyleMap={inlineStyleMap}
             editorState={editorState}
-            setEditorState={setEditorState}
-            inlineStyle={i.style}
-            DisplayIcon={i.icon}
+            onChange={setEditorState}
+            ref={editorRef}
+            blockRendererFn={mediaBlockRenderer}
+            blockStyleFn={blockStyleFn}
+            placeholder={currentBlockType === 'unstyled' ? placeholder : ''}
+            handleKeyCommand={handleKeyCommand}
           />
-        ))}
-        {blockTypes.map((b) => (
-          <HeadlineBlockButton
-            key={b.style}
-            editorState={editorState}
-            setEditorState={setEditorState}
-            blockType={b.style}
-            DisplayIcon={b.icon}
-          />
-        ))}
-        <div className={wrappedDraftEditorStyles.headlineButtonWrapper}>
-          <button
-            {...getinsertImageRootProps({
-              className: wrappedDraftEditorStyles.headlineButton,
-            })}>
-            <input {...getinsertImageInputProps()} />
-            <FaImage />
-          </button>
-        </div>
-        <div className={wrappedDraftEditorStyles.headlineButtonWrapper}>
-          <button
-            className={wrappedDraftEditorStyles.headlineButton}
-            disabled={editorState.getUndoStack().size <= 0}
-            onMouseDown={() => setEditorState(EditorState.undo(editorState))}>
-            <FaUndoAlt />
-          </button>
-        </div>
-        <div className={wrappedDraftEditorStyles.headlineButtonWrapper}>
-          <button
-            className={wrappedDraftEditorStyles.headlineButton}
-            disabled={editorState.getRedoStack().size <= 0}
-            onMouseDown={() => setEditorState(EditorState.redo(editorState))}>
-            <FaRedoAlt />
-          </button>
-        </div>
-        <div className={wrappedDraftEditorStyles.headlineButtonWrapper}>
-          <button
-            className={wrappedDraftEditorStyles.headlineButton}
-            onMouseDown={() =>
-              setEditorState(
-                EditorState.push(
-                  editorState,
-                  ContentState.createFromText(''),
-                  'undo',
-                ),
-              )
-            }>
-            <FaRegTrashAlt />
-          </button>
         </div>
       </div>
-      <div className={wrappedDraftEditorStyles.editor}>
-        <Editor
-          customStyleMap={inlineStyleMap}
-          editorState={editorState}
-          onChange={setEditorState}
-          ref={editorRef}
-          blockRendererFn={mediaBlockRenderer}
-          blockStyleFn={blockStyleFn}
-          placeholder={currentBlockType === 'unstyled' ? placeholder : ''}
-          handleKeyCommand={handleKeyCommand}
-        />
-      </div>
-    </div>
+    </>
   );
 };
 export default WrappedDraftEditor;
