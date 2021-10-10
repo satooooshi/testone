@@ -45,7 +45,6 @@ export class TagController {
   async deleteTag(@Param() params: { id: number }, @Res() res: Response) {
     const { id } = params;
     const deleteResult = await this.tagService.deleteTag(id);
-    console.log(deleteResult);
     if (deleteResult) {
       res.sendStatus(200);
     }
