@@ -1,6 +1,6 @@
 import { useQuery } from 'react-query';
 import { Wiki, WikiType } from 'src/types';
-import { qaQueryRefresh } from 'src/utils/qaQueryRefresh';
+import { wikiQueryRefresh } from 'src/utils/wikiQueryRefresh';
 import { axiosInstance } from 'src/utils/url';
 import { getWikiListURL } from 'src/utils/url/wiki.url';
 
@@ -23,7 +23,7 @@ export interface SearchResultToGetWiki {
 const getWikiList = async (
   query: SearchQueryToGetWiki,
 ): Promise<SearchResultToGetWiki> => {
-  const url = qaQueryRefresh(query);
+  const url = wikiQueryRefresh(query);
   const response = await axiosInstance.get(`${getWikiListURL}?${url}`);
   return response.data;
 };

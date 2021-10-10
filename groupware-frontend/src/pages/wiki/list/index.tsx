@@ -11,7 +11,7 @@ import SearchForm from '@/components/SearchForm';
 import { useAPIGetTag } from '@/hooks/api/tag/useAPIGetTag';
 import { toggleTag } from 'src/utils/toggleTag';
 import { Tag, UserRole, WikiType } from 'src/types';
-import { qaQueryRefresh } from 'src/utils/qaQueryRefresh';
+import { wikiQueryRefresh } from 'src/utils/wikiQueryRefresh';
 import Head from 'next/head';
 import {
   SearchQueryToGetWiki,
@@ -48,7 +48,7 @@ const QAQuestionList = () => {
   const queryRefresh = (query: Partial<SearchQueryToGetWiki>) => {
     const selectedTagIDs = selectedTags.map((t) => t.id.toString());
     const tagQuery = selectedTagIDs.join('+');
-    const refreshedQueryStrings = qaQueryRefresh({
+    const refreshedQueryStrings = wikiQueryRefresh({
       ...query,
       tag: tagQuery,
     });
