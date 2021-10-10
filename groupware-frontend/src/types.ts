@@ -65,6 +65,7 @@ export interface User {
   eventCount?: number;
   questionCount?: number;
   answerCount?: number;
+  knowledgeCount?: number;
 }
 
 export interface Tag {
