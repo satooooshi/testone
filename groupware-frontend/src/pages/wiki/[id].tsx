@@ -2,7 +2,7 @@ import { ScreenName } from '@/components/Sidebar';
 import { useAPIGetWikiDetail } from '@/hooks/api/wiki/useAPIGetWikiDetail';
 import { useRouter } from 'next/router';
 import qaDetailStyles from '@/styles/layouts/QADetail.module.scss';
-import WikiComment from '@/components/QAComment';
+import WikiComment from '@/components/WikiComment';
 import React, { useMemo, useRef, useState } from 'react';
 import 'react-markdown-editor-lite/lib/index.css';
 import { useAPICreateAnswer } from '@/hooks/api/wiki/useAPICreateAnswer';
