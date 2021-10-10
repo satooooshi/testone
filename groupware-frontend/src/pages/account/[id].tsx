@@ -7,7 +7,7 @@ import Image from 'next/image';
 import noImage from '@/public/no-image.jpg';
 import React, { useMemo, useState } from 'react';
 import EventCard from '@/components/EventCard';
-import QACard from '@/components/QACard';
+import WikiCard from '@/components/WikiCard';
 import { axiosInstance } from 'src/utils/url';
 import { jsonHeader } from 'src/utils/url/header';
 import { useAPILogout } from '@/hooks/api/auth/useAPILogout';
@@ -231,7 +231,7 @@ const MyAccountInfo = () => {
                   <div
                     key={w.id}
                     className={accountInfoStyles.question_card_wrapper}>
-                    <QACard qaQuestion={w} />
+                    <WikiCard wiki={w} />
                   </div>
                 ))}
               </div>

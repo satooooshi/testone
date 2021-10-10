@@ -1,7 +1,7 @@
 import { ScreenName } from '@/components/Sidebar';
 import { Tab } from 'src/types/header/tab/types';
 import { useRouter } from 'next/router';
-import QACard from '@/components/QACard';
+import WikiCard from '@/components/WikiCard';
 import ReactPaginate from 'react-paginate';
 import paginationStyles from '@/styles/components/Pagination.module.scss';
 import qaListStyles from '@/styles/layouts/QAList.module.scss';
@@ -119,7 +119,7 @@ const QAQuestionList = () => {
         </div>
         <div className={qaListStyles.qa_list}>
           {questions?.wiki.map((q) => (
-            <QACard key={q.id} qaQuestion={q} />
+            <WikiCard key={q.id} wiki={q} />
           ))}
           {!questions?.wiki.length && <p>検索結果が見つかりませんでした</p>}
         </div>

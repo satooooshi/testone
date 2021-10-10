@@ -5,14 +5,14 @@ import { Wiki, WikiType } from 'src/types';
 import Link from 'next/link';
 import { Avatar, Button } from '@chakra-ui/react';
 
-type QACardProps = {
-  qaQuestion: Wiki;
+type WikiCardProps = {
+  wiki: Wiki;
 };
 
-const QACard: React.FC<QACardProps> = ({ qaQuestion }) => {
-  const { title, writer, tags, createdAt, answers } = qaQuestion;
+const WikiCard: React.FC<WikiCardProps> = ({ wiki }) => {
+  const { title, writer, tags, createdAt, answers } = wiki;
   const tagButtonColor = useMemo(() => {
-    switch (qaQuestion.type) {
+    switch (wiki.type) {
       case WikiType.QA:
         return '#00b5d8';
       case WikiType.KNOWLEDGE:
@@ -20,14 +20,14 @@ const QACard: React.FC<QACardProps> = ({ qaQuestion }) => {
       case WikiType.RULES:
         return '#38a169';
     }
-  }, [qaQuestion.type]);
+  }, [wiki.type]);
 
   return (
-    <Link href={`/wiki/${qaQuestion.id}`}>
+    <Link href={`/wiki/${wiki.id}`}>
       <a className={qaCardStyles.qa_card__item}>
         <div className={qaCardStyles.qa_card__top}>
           <div className={qaCardStyles.qa_card_user_info_wrapper}>
-            {qaQuestion.type !== WikiType.RULES && writer ? (
+            {wiki.type !== WikiType.RULES && writer ? (
               <Link href={`/account/${writer?.id}`} passHref>
                 <a>
                   <Avatar
@@ -39,7 +39,7 @@ const QACard: React.FC<QACardProps> = ({ qaQuestion }) => {
             ) : null}
             <p className={qaCardStyles.qa_card__title}>{title}</p>
           </div>
-          {qaQuestion.type === WikiType.QA && (
+          {wiki.type === WikiType.QA && (
             <div className={qaCardStyles.answer}>
               <p className={qaCardStyles.answer_count_label}>回答</p>
               <p className={qaCardStyles.answer_count}>
@@ -52,9 +52,9 @@ const QACard: React.FC<QACardProps> = ({ qaQuestion }) => {
           <div className={qaCardStyles.qa_card__tags}>
             <a className={qaCardStyles.qa_card_tag__item}>
               <Button background={tagButtonColor} color="white" size="xs">
-                {qaQuestion.type === WikiType.QA
+                {wiki.type === WikiType.QA
                   ? 'Q&A'
-                  : qaQuestion.type === WikiType.RULES
+                  : wiki.type === WikiType.RULES
                   ? '社内規則'
                   : 'ナレッジ'}
               </Button>
@@ -74,7 +74,7 @@ const QACard: React.FC<QACardProps> = ({ qaQuestion }) => {
                 ))
               : null}
           </div>
-          {qaQuestion.type === WikiType.QA && (
+          {wiki.type === WikiType.QA && (
             <p className={qaCardStyles.qa_card__date}>
               {dateTimeFormatterFromJSDDate({ dateTime: new Date(createdAt) })}
             </p>
@@ -85,4 +85,4 @@ const QACard: React.FC<QACardProps> = ({ qaQuestion }) => {
   );
 };
 
-export default QACard;
+export default WikiCard;
