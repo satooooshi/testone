@@ -7,6 +7,7 @@ import impressiveUniversityImage1 from '@/public/impressive_university_1.png';
 import impressiveUniversityImage2 from '@/public/impressive_university_2.png';
 import { useAPIGetLatestEvent } from '@/hooks/api/event/useAPIGetLatestEvent';
 import { EventType } from 'src/types';
+import { EventTab } from 'src/types/header/tab/types';
 import EventIntroduction from 'src/templates/event/EventIntroduction';
 
 const ImpressionUniversity: React.FC = () => {
@@ -32,6 +33,7 @@ const ImpressionUniversity: React.FC = () => {
       alt=""
     />
   );
+  const heading = EventTab.STUDY_MEETING;
   const subHeading = '技術力と人間力を\n毎日プロから学ぶことが出来る研修制度';
   const content =
     '外部講師を招へいし、社員向けに毎日研修を開講しております。技術力はもちろん、マネジメントやコミュニケーション等の人間力に関する研修もエンジニア向けの独自のカリキュラムを企画しております。\n社員の参加率は、常時75％となっており、多くの社員が自己研鑽の面で活用しています。講座数は、年間で200講座程となっており、お客様から頂く声を基にカリキュラムを作成しております。';
@@ -45,6 +47,7 @@ const ImpressionUniversity: React.FC = () => {
           events={events}
           bottomImages={bottomImages}
           headlineImage={headlineImage}
+          heading={heading}
           subHeading={subHeading}
           content={content}
         />

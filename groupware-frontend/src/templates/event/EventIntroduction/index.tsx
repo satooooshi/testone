@@ -1,6 +1,6 @@
 import eventPRStyles from '@/styles/layouts/EventPR.module.scss';
 import EventCard from '@/components/EventCard';
-import { EventTab } from 'src/types/header/tab/types';
+
 import { EachEventData } from 'src/types/event/eventIntroduction/types';
 import Image from 'next/image';
 
@@ -8,6 +8,7 @@ const EventIntroduction: React.FC<EachEventData> = ({
   events,
   bottomImages,
   headlineImage,
+  heading,
   subHeading,
   content,
 }) => {
@@ -15,9 +16,7 @@ const EventIntroduction: React.FC<EachEventData> = ({
     <>
       <div className={eventPRStyles.top_title_wrapper}>
         <p className={eventPRStyles.culture}>culture</p>
-        <p className={eventPRStyles.top_title}>
-          {EventTab.IMPRESSIVE_UNIVERSITY}
-        </p>
+        <p className={eventPRStyles.top_title}>{heading}</p>
       </div>
       <div className={eventPRStyles.top_images_wrapper}>
         <div
