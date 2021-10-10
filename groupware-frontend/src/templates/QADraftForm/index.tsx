@@ -219,32 +219,36 @@ const QAForm: React.FC<QAFormTypeProps> = ({
         </div>
 
         <div className={qaCreateStyles.top_form_wrapper}>
-          <div className={qaCreateStyles.format_selector_wrapper}>
-            <FormControl className={qaCreateStyles.type_select}>
-              <FormLabel fontWeight="bold">
-                入力形式(投稿後に変更することはできません)
-              </FormLabel>
-              <Select
-                colorScheme="teal"
-                bg="white"
-                defaultValue={
-                  newQuestion.textFormat !== 'markdown' ? 'html' : 'markdown'
-                }
-                onChange={(e) => {
-                  if (confirm('現在の入力内容は失われます。よろしいですか？')) {
-                    setEditorState(EditorState.createEmpty());
-                    setNewQuestion((prev) => ({
-                      ...prev,
-                      body: '',
-                      textFormat: e.target.value as TextFormat,
-                    }));
+          {!question && (
+            <div className={qaCreateStyles.format_selector_wrapper}>
+              <FormControl className={qaCreateStyles.type_select}>
+                <FormLabel fontWeight="bold">
+                  入力形式(投稿後に変更することはできません)
+                </FormLabel>
+                <Select
+                  colorScheme="teal"
+                  bg="white"
+                  defaultValue={
+                    newQuestion.textFormat !== 'markdown' ? 'html' : 'markdown'
                   }
-                }}>
-                <option value={'html'}>デフォルト</option>
-                <option value={'markdown'}>マークダウン</option>
-              </Select>
-            </FormControl>
-          </div>
+                  onChange={(e) => {
+                    if (
+                      confirm('現在の入力内容は失われます。よろしいですか？')
+                    ) {
+                      setEditorState(EditorState.createEmpty());
+                      setNewQuestion((prev) => ({
+                        ...prev,
+                        body: '',
+                        textFormat: e.target.value as TextFormat,
+                      }));
+                    }
+                  }}>
+                  <option value={'html'}>デフォルト</option>
+                  <option value={'markdown'}>マークダウン</option>
+                </Select>
+              </FormControl>
+            </div>
+          )}
           <div className={qaCreateStyles.title_wrapper}>
             <div className={qaCreateStyles.button_wrapper}>
               <Button
