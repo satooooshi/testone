@@ -97,18 +97,25 @@ export class WikiService {
     try {
       const newQuestion = await this.qaQuestionRepository.save(question);
       if (newQuestion.type !== WikiType.RULES) {
+        let mailContent = '';
         const allUsers = await this.userRepository.find();
         const emails = allUsers.map((u) => u.email);
         const postedWikiType =
           newQuestion.type === WikiType.QA ? 'Q&A' : 'ナレッジ';
-        const md = MarkdownIt({
-          breaks: true,
-        });
+        if (newQuestion.textFormat === 'markdown') {
+          const md = MarkdownIt({
+            breaks: true,
+          });
+          mailContent = md.render(newQuestion.body);
+        }
+        if (newQuestion.textFormat === 'html') {
+          mailContent = newQuestion.body;
+        }
         this.notifService.sendEmailNotification({
           to: emails,
           subject: `新規${postedWikiType}が投稿されました`,
           title: `${newQuestion.title}`,
-          content: `${md.render(newQuestion.body)}`,
+          content: mailContent,
           buttonLink: `${this.configService.get('CLIENT_DOMAIN')}/wiki/${
             newQuestion.id
           }`,

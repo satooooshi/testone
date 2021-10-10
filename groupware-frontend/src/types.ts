@@ -35,6 +35,8 @@ export enum WikiType {
   QA = 'qa',
 }
 
+export type TextFormat = 'markdown' | 'html';
+
 export interface User {
   id: number;
   email: string;
@@ -89,6 +91,7 @@ export interface QAQuestion {
   title: string;
   body: string;
   type: WikiType;
+  textFormat: TextFormat;
   resolvedAt: Date;
   writer?: User;
   answers?: QAAnswer[];
@@ -101,6 +104,7 @@ export interface QAQuestion {
 export interface QAAnswerReply {
   id: number;
   body: string;
+  textFormat: TextFormat;
   writer?: User;
   answer?: QAAnswer;
   createdAt: Date;
@@ -110,6 +114,7 @@ export interface QAAnswerReply {
 export interface QAAnswer {
   id: number;
   body: string;
+  textFormat: TextFormat;
   createdAt: Date;
   updatedAt: Date;
   question?: QAQuestion;

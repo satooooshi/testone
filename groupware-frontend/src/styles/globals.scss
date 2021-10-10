@@ -116,3 +116,9 @@ a:hover {
 .editor-container > .sec-md {
   border-right: 1px solid #b0b0b0;
 }
+
+.DraftEditor-root,
+.DraftEditor-editorContainer,
+.public-DraftEditor-content {
+  height: 100% !important;
+}

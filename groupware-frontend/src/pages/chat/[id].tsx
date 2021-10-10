@@ -439,7 +439,10 @@ const ChatDetail = () => {
       {users && (
         <CreateChatGroupModal
           isOpen={createGroupWindow}
-          closeModal={() => setCreateGroupWindow(false)}
+          closeModal={() => {
+            setCreateGroupWindow(false);
+            setNewGroup({});
+          }}
           newGroup={newGroup}
           onChangeNewGroupName={(groupName) =>
             setNewGroup((g) => ({ ...g, name: groupName }))
