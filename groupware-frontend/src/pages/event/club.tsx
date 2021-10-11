@@ -11,7 +11,7 @@ import clubImage6 from '@/public/club_6.jpg';
 import Image from 'next/image';
 import { useAPIGetLatestEvent } from '@/hooks/api/event/useAPIGetLatestEvent';
 import { EventType } from 'src/types';
-import EventCard from '@/components/EventCard';
+import EventCard from '@/components/common/EventCard';
 
 const Club: React.FC = () => {
   const router = useRouter();

@@ -8,7 +8,7 @@ import impressiveUniversityImage2 from '@/public/impressive_university_2.png';
 import Image from 'next/image';
 import { useAPIGetLatestEvent } from '@/hooks/api/event/useAPIGetLatestEvent';
 import { EventType } from 'src/types';
-import EventCard from '@/components/EventCard';
+import EventCard from '@/components/common/EventCard';
 
 const ImpressionUniversity: React.FC = () => {
   const router = useRouter();

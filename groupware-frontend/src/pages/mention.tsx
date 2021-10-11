@@ -3,7 +3,7 @@ import React from 'react';
 import { ScreenName } from '@/components/layout/Sidebar';
 import mentionStyles from '@/styles/layouts/Mention.module.scss';
 import { Tab } from 'src/types/header/tab/types';
-import MentionMessageCard from '@/components/MentionMessageCard';
+import MentionMessageCard from '@/components/common/MentionMessageCard';
 import Link from 'next/link';
 import { useAPIGetLatestMentionedChatMessage } from '@/hooks/api/chat/useAPIGetLatestMentionedChatMessage';
 import { useHeaderTab } from '@/hooks/headerTab/useHeaderTab';

@@ -6,7 +6,7 @@ import eventPRStyles from '@/styles/layouts/EventPR.module.scss';
 import studyMeetingImage1 from '@/public/study_meeting_1.jpg';
 import studyMeetingImage2 from '@/public/study_meeting_2.jpg';
 import Image from 'next/image';
-import EventCard from '@/components/EventCard';
+import EventCard from '@/components/common/EventCard';
 import { useAPIGetLatestEvent } from '@/hooks/api/event/useAPIGetLatestEvent';
 import { EventType } from 'src/types';
 

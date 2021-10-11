@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import Link from 'next/link';
-import AuthButton from '@/components/AuthButton';
+import AuthButton from '@/components/common/AuthButton';
 import { ChangeEvent, useEffect, useState } from 'react';
 import authFormStyles from '@/styles/components/AuthForm.module.scss';
 import textInputStyles from '@/styles/components/TextInput.module.scss';

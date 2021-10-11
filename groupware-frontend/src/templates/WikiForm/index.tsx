@@ -4,7 +4,7 @@ import { useRouter } from 'next/router';
 import Head from 'next/head';
 import { ScreenName } from '@/components/layout/Sidebar';
 import LayoutWithTab from '@/components/layout/LayoutWithTab';
-import TagModal from '@/components/TagModal';
+import TagModal from '@/components/common/TagModal';
 import WrappedDraftEditor from '@/components/wiki/WrappedDraftEditor';
 import { Wiki, Tag, TextFormat, UserRole, WikiType } from 'src/types';
 import { Tab, TabName } from 'src/types/header/tab/types';

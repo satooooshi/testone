@@ -15,7 +15,7 @@ import {
   SearchQueryToGetUsers,
   useAPISearchUsers,
 } from '@/hooks/api/user/useAPISearchUsers';
-import SearchForm from '@/components/SearchForm';
+import SearchForm from '@/components/common/SearchForm';
 import { toggleTag } from 'src/utils/toggleTag';
 import paginationStyles from '@/styles/components/Pagination.module.scss';
 import ReactPaginate from 'react-paginate';

@@ -1,6 +1,6 @@
 import LayoutWithTab from '@/components/layout/LayoutWithTab';
 import ReactPaginate from 'react-paginate';
-import SearchForm from '@/components/SearchForm';
+import SearchForm from '@/components/common/SearchForm';
 import UserCard from '@/components/user/UserCard';
 import userListStyles from '@/styles/layouts/UserList.module.scss';
 import Head from 'next/head';

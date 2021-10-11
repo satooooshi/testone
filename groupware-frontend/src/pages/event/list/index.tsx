@@ -2,7 +2,7 @@
 import { Tab } from 'src/types/header/tab/types';
 import { ScreenName } from '@/components/layout/Sidebar';
 import eventListStyles from '@/styles/layouts/EventList.module.scss';
-import EventCard from '@/components/EventCard';
+import EventCard from '@/components/common/EventCard';
 import { useRouter } from 'next/router';
 import paginationStyles from '@/styles/components/Pagination.module.scss';
 import ReactPaginate from 'react-paginate';
@@ -12,7 +12,7 @@ import LayoutWithTab from '@/components/layout/LayoutWithTab';
 import CreateEventModal, {
   CreateEventRequest,
 } from '@/components/event/CreateEventModal';
-import SearchForm from '@/components/SearchForm';
+import SearchForm from '@/components/common/SearchForm';
 import { EventSchedule, EventType, Tag } from 'src/types';
 import { EventTab } from 'src/types/header/tab/types';
 import { toggleTag } from 'src/utils/toggleTag';

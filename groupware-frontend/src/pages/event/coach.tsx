@@ -5,7 +5,7 @@ import React from 'react';
 import eventPRStyles from '@/styles/layouts/EventPR.module.scss';
 import { useAPIGetLatestEvent } from '@/hooks/api/event/useAPIGetLatestEvent';
 import { EventType } from 'src/types';
-import EventCard from '@/components/EventCard';
+import EventCard from '@/components/common/EventCard';
 
 const Coach: React.FC = () => {
   const router = useRouter();

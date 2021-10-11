@@ -8,7 +8,7 @@ import boldayImage2 from '@/public/bolday_2.jpg';
 import boldayImage3 from '@/public/bolday_3.jpg';
 import boldayImage4 from '@/public/bolday_4.jpg';
 import Image from 'next/image';
-import EventCard from '@/components/EventCard';
+import EventCard from '@/components/common/EventCard';
 import { useAPIGetLatestEvent } from '@/hooks/api/event/useAPIGetLatestEvent';
 import { EventType } from 'src/types';
 
