@@ -40,20 +40,20 @@ export class TagController {
     return await this.tagService.createTag(body);
   }
 
-  @Delete('delete/:id')
+  @Post('delete')
   @UseGuards(JwtAuthenticationGuard)
-  async deleteTag(@Param() params: { id: number }, @Res() res: Response) {
-    const { id } = params;
+  async deleteTag(@Body() body: { id: number }, @Res() res: Response) {
+    const { id } = body;
     const deleteResult = await this.tagService.deleteTag(id);
     if (deleteResult) {
       res.sendStatus(200);
     }
   }
 
-  @Delete('user-tag/delete/:id')
+  @Post('user-tag/delete')
   @UseGuards(JwtAuthenticationGuard)
-  async deleteUserTag(@Param() params: { id: number }, @Res() res: Response) {
-    const { id } = params;
+  async deleteUserTag(@Body() body: { id: number }, @Res() res: Response) {
+    const { id } = body;
     const deleteResult = await this.tagService.deleteUserTag(id);
     if (deleteResult) {
       res.sendStatus(200);

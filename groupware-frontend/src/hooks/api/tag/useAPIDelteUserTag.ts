@@ -4,9 +4,7 @@ import { axiosInstance } from 'src/utils/url';
 import { deleteUserTagURL } from 'src/utils/url/tag.url';
 
 const deleteTag = async (tag: UserTag) => {
-  const res = await axiosInstance.delete(
-    deleteUserTagURL + '/' + tag.id.toString(),
-  );
+  const res = await axiosInstance.post(deleteUserTagURL, { id: tag.id });
   return res.data;
 };
 
