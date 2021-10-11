@@ -7,9 +7,24 @@ export const uploadStorage = async (files: File[]): Promise<string[]> => {
   for (const file of files) {
     formData.append('files', file);
   }
-  const res = await axiosInstance.post(uploadStorageURL, formData);
-  console.log(res.status);
-  return res.status === 413 ? ['413'] : res.data;
+
+  // const res = await axiosInstance.post(uploadStorageURL, formData);
+  // console.log(res.status);
+  // return res.status === 413 ? ['413'] : res.data;
+
+  const uploadStorageException = async (): Promise<string[]> => {
+    try {
+      const res = await axiosInstance.post(uploadStorageURL, formData);
+      console.log(res.status);
+      if (res.status === 413) {
+        throw new Error();
+      }
+      return res.data;
+    } catch (err) {
+      return ['413'];
+    }
+  };
+  return uploadStorageException();
 };
 
 export const useAPIUploadStorage = (
