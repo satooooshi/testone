@@ -90,6 +90,7 @@ export class EventSchedule {
 
   @OneToOne(() => ChatGroup, (chatGroup) => chatGroup.event, {
     onUpdate: 'CASCADE',
+    onDelete: 'SET NULL',
   })
   chatGroup?: ChatGroup;
 
