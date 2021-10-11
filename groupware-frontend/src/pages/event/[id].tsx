@@ -64,11 +64,8 @@ const EventDetail = () => {
   const [commentVisible, setCommentVisible] = useState(false);
   const [newComment, setNewComment] = useState<string>('');
   const { user } = useAuthenticate();
-  const { data, refetch } = useAPIGetEventDetail(
-    typeof id === 'string' ? id : '0',
-  );
+  const { data, refetch } = useAPIGetEventDetail(id);
   const submissionRef = useRef<HTMLInputElement | null>(null);
-  const downloadSubmissionRef = useRef<HTMLInputElement | null>(null);
   const toast = useToast();
   const [submitFiles, setSubmitFiles] = useState<
     Partial<SubmissionFile & { submitUnFinished: boolean }>[]
