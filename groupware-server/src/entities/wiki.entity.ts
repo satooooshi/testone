@@ -76,7 +76,10 @@ export class Wiki {
   @OneToMany(() => QAAnswer, (qaAnswer) => qaAnswer.wiki)
   answers?: QAAnswer[];
 
-  @OneToOne(() => QAAnswer, (qaAnswer) => qaAnswer.id)
+  @OneToOne(() => QAAnswer, (qaAnswer) => qaAnswer.id, {
+    onUpdate: 'CASCADE',
+    onDelete: 'SET NULL',
+  })
   @JoinColumn({ name: 'best_answer_id' })
   bestAnswer?: QAAnswer;
 
