@@ -1,5 +1,5 @@
 import Faker from 'faker';
-import { Wiki } from 'src/entities/qaQuestion.entity';
+import { Wiki } from 'src/entities/wiki.entity';
 import { define } from 'typeorm-seeding';
 
 define(Wiki, (faker: typeof Faker) => {

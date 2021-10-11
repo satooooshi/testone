@@ -1,7 +1,7 @@
 import { useRouter } from 'next/router';
 import { useAPICreateWiki } from '@/hooks/api/wiki/useAPICreateWiki';
 import { useAPIGetTag } from '@/hooks/api/tag/useAPIGetTag';
-import QADraftForm from 'src/templates/QADraftForm';
+import QADraftForm from 'src/templates/WikiForm';
 
 const CreateQA = () => {
   const router = useRouter();

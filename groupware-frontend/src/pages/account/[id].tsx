@@ -7,7 +7,7 @@ import Image from 'next/image';
 import noImage from '@/public/no-image.jpg';
 import React, { useMemo, useState } from 'react';
 import EventCard from '@/components/EventCard';
-import QACard from '@/components/QACard';
+import WikiCard from '@/components/WikiCard';
 import { axiosInstance } from 'src/utils/url';
 import { jsonHeader } from 'src/utils/url/header';
 import { useAPILogout } from '@/hooks/api/auth/useAPILogout';
@@ -88,7 +88,7 @@ const MyAccountInfo = () => {
   const { id } = router.query as { id: string };
   const { data: profile } = useAPIGetUserInfoById(id);
   const { data: events } = useAPIGetEventList({ participant_id: id });
-  const { data: questions } = useAPIGetWikiList({ writer: id });
+  const { data: wikiList } = useAPIGetWikiList({ writer: id });
   const { user } = useAuthenticate();
   const [activeTab, setActiveTab] = useState<TabName>(TabName.DETAIL);
   const { mutate: logout } = useAPILogout({
@@ -224,14 +224,14 @@ const MyAccountInfo = () => {
             ) : null}
 
             {activeTab === TabName.QUESTION &&
-            questions &&
-            questions.qaQuestions.length ? (
+            wikiList &&
+            wikiList.wiki.length ? (
               <div className={accountInfoStyles.question_wrapper}>
-                {questions.qaQuestions.map((q) => (
+                {wikiList.wiki.map((w) => (
                   <div
-                    key={q.id}
+                    key={w.id}
                     className={accountInfoStyles.question_card_wrapper}>
-                    <QACard qaQuestion={q} />
+                    <WikiCard wiki={w} />
                   </div>
                 ))}
               </div>

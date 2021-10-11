@@ -195,6 +195,16 @@ const headerTab = (headerTabBehavior: HeaderTabBehavior): Tab[] => {
         },
         {
           type: 'link',
+          name: 'タグ管理',
+          href: '/admin/tag',
+        },
+        {
+          type: 'link',
+          name: 'タグ管理(ユーザー)',
+          href: '/admin/tag/user',
+        },
+        {
+          type: 'link',
           name: 'CSV出力',
           href: '/admin/csv',
         },
@@ -251,7 +261,7 @@ const headerTab = (headerTabBehavior: HeaderTabBehavior): Tab[] => {
         {
           type: 'link',
           name: '一覧に戻る',
-          href: 'list',
+          href: '/event/list',
         },
         {
           name: 'イベントを削除',
@@ -266,7 +276,7 @@ const headerTab = (headerTabBehavior: HeaderTabBehavior): Tab[] => {
         {
           type: 'link',
           name: 'Wiki一覧画面へ',
-          href: `list`,
+          href: `/wiki/list`,
         },
       ];
     case 'wikiList':

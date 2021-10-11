@@ -1,7 +1,7 @@
 import { ScreenName } from '@/components/Sidebar';
 import { Tab } from 'src/types/header/tab/types';
 import { useRouter } from 'next/router';
-import QACard from '@/components/QACard';
+import WikiCard from '@/components/WikiCard';
 import ReactPaginate from 'react-paginate';
 import paginationStyles from '@/styles/components/Pagination.module.scss';
 import qaListStyles from '@/styles/layouts/QAList.module.scss';
@@ -11,7 +11,7 @@ import SearchForm from '@/components/SearchForm';
 import { useAPIGetTag } from '@/hooks/api/tag/useAPIGetTag';
 import { toggleTag } from 'src/utils/toggleTag';
 import { Tag, UserRole, WikiType } from 'src/types';
-import { qaQueryRefresh } from 'src/utils/qaQueryRefresh';
+import { wikiQueryRefresh } from 'src/utils/wikiQueryRefresh';
 import Head from 'next/head';
 import {
   SearchQueryToGetWiki,
@@ -48,7 +48,7 @@ const QAQuestionList = () => {
   const queryRefresh = (query: Partial<SearchQueryToGetWiki>) => {
     const selectedTagIDs = selectedTags.map((t) => t.id.toString());
     const tagQuery = selectedTagIDs.join('+');
-    const refreshedQueryStrings = qaQueryRefresh({
+    const refreshedQueryStrings = wikiQueryRefresh({
       ...query,
       tag: tagQuery,
     });
@@ -118,12 +118,10 @@ const QAQuestionList = () => {
           />
         </div>
         <div className={qaListStyles.qa_list}>
-          {questions?.qaQuestions.map((q) => (
-            <QACard key={q.id} qaQuestion={q} />
+          {questions?.wiki.map((q) => (
+            <WikiCard key={q.id} wiki={q} />
           ))}
-          {!questions?.qaQuestions.length && (
-            <p>検索結果が見つかりませんでした</p>
-          )}
+          {!questions?.wiki.length && <p>検索結果が見つかりませんでした</p>}
         </div>
       </div>
       <div className={paginationStyles.pagination_wrap_layout}>

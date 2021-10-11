@@ -12,7 +12,7 @@ import RequestWithUser from '../auth/requestWithUser.interface';
 import { compare, hash } from 'bcrypt';
 import updatePasswordDto from './dto/updatePasswordDto';
 import { UserTag } from 'src/entities/userTag.entity';
-import { WikiType } from 'src/entities/qaQuestion.entity';
+import { WikiType } from 'src/entities/wiki.entity';
 import { Parser } from 'json2csv';
 import { SearchQueryToGetUsers } from './user.controller';
 import { Tag, TagType } from 'src/entities/tag.entity';
@@ -74,16 +74,16 @@ export class UserService {
       }, 'eventCount')
       .addSelect((subQuery) => {
         return subQuery
-          .select('COUNT( DISTINCT question.id )', 'questionCount')
+          .select('COUNT( DISTINCT wiki.id )', 'questionCount')
           .from(User, 'u')
-          .leftJoin('u.qaQuestions', 'question')
-          .where(fromDate ? 'question.createdAt > :fromDate' : '1=1', {
+          .leftJoin('u.wiki', 'wiki')
+          .where(fromDate ? 'wiki.createdAt > :fromDate' : '1=1', {
             fromDate,
           })
-          .andWhere('question.type < :wikiType', {
+          .andWhere('wiki.type < :wikiType', {
             wikiType: WikiType.QA,
           })
-          .andWhere(fromDate ? 'question.createdAt < :toDate' : '1=1', {
+          .andWhere(fromDate ? 'wiki.createdAt < :toDate' : '1=1', {
             toDate,
           })
           .andWhere('u.id = user.id');
@@ -103,13 +103,13 @@ export class UserService {
       }, 'answerCount')
       .addSelect((subQuery) => {
         return subQuery
-          .select('COUNT( DISTINCT question.id )', 'answerCount')
+          .select('COUNT( DISTINCT wiki.id )', 'answerCount')
           .from(User, 'u')
-          .leftJoin('u.qaQuestions', 'question')
-          .where(fromDate ? 'question.createdAt < :fromDate' : '1=1', {
+          .leftJoin('u.wiki', 'wiki')
+          .where(fromDate ? 'wiki.createdAt < :fromDate' : '1=1', {
             fromDate,
           })
-          .andWhere('question.type < :wikiType', {
+          .andWhere('wiki.type < :wikiType', {
             wikiType: WikiType.KNOWLEDGE,
           })
           .andWhere('u.id = user.id');
@@ -263,18 +263,32 @@ export class UserService {
       }, 'eventCount')
       .addSelect((subQuery) => {
         return subQuery
-          .select('COUNT( DISTINCT question.id )', 'questionCount')
+          .select('COUNT( DISTINCT wiki.id )', 'questionCount')
           .from(User, 'u')
-          .leftJoin('u.qaQuestions', 'question')
-          .where(fromDate ? 'question.createdAt > :fromDate' : '1=1', {
+          .leftJoin('u.wiki', 'wiki')
+          .where(fromDate ? 'wiki.createdAt > :fromDate' : '1=1', {
             fromDate,
           })
-          .andWhere('question.type < :wikiType', {
+          .andWhere('wiki.type < :wikiType', {
             wikiType: WikiType.QA,
           })
-          .andWhere('question.createdAt < :toDate', { toDate })
+          .andWhere('wiki.createdAt < :toDate', { toDate })
           .andWhere('u.id = user.id');
       }, 'questionCount')
+      .addSelect((subQuery) => {
+        return subQuery
+          .select('COUNT( DISTINCT wiki.id )', 'questionCount')
+          .from(User, 'u')
+          .leftJoin('u.wiki', 'wiki')
+          .where(fromDate ? 'wiki.createdAt > :fromDate' : '1=1', {
+            fromDate,
+          })
+          .andWhere('wiki.type < :wikiType', {
+            wikiType: WikiType.KNOWLEDGE,
+          })
+          .andWhere('wiki.createdAt < :toDate', { toDate })
+          .andWhere('u.id = user.id');
+      }, 'knowledgeCount')
       .addSelect((subQuery) => {
         return subQuery
           .select('COUNT( DISTINCT answer.id )', 'answerCount')
@@ -295,6 +309,8 @@ export class UserService {
           ? 'questionCount'
           : sort === 'answer'
           ? 'answerCount'
+          : sort === 'knowledge'
+          ? 'knowledgeCount'
           : 'user.createdAt',
         'DESC',
       )

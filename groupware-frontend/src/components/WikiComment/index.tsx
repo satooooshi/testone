@@ -10,7 +10,7 @@ import Editor from 'react-markdown-editor-lite';
 import 'react-markdown-editor-lite/lib/index.css';
 import DraftMarkup from '../DraftMarkup';
 
-type QACommentProps = {
+type WikiCommentProps = {
   textFormat: TextFormat;
   body: string;
   date?: Date;
@@ -23,7 +23,7 @@ type QACommentProps = {
   onClickBestAnswerButton?: () => void;
 };
 
-const QAComment: React.FC<QACommentProps> = ({
+const WikiComment: React.FC<WikiCommentProps> = ({
   textFormat,
   body,
   date,
@@ -96,4 +96,4 @@ const QAComment: React.FC<QACommentProps> = ({
   );
 };
 
-export default QAComment;
+export default WikiComment;

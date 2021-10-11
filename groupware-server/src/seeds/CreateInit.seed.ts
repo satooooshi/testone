@@ -4,7 +4,7 @@ import { User, UserRole } from 'src/entities/user.entity';
 import { ChatGroup } from 'src/entities/chatGroup.entity';
 import { Tag } from 'src/entities/tag.entity';
 import { EventSchedule } from 'src/entities/event.entity';
-import { Wiki } from 'src/entities/qaQuestion.entity';
+import { Wiki } from 'src/entities/wiki.entity';
 import { hashSync } from 'bcrypt';
 
 export default class CreateInit implements Seeder {
