@@ -8,7 +8,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { EventSchedule } from './event.entity';
-import { Wiki } from './qaQuestion.entity';
+import { Wiki } from './wiki.entity';
 
 export enum TagType {
   TECH = 'technology',
@@ -63,5 +63,5 @@ export class Tag {
     onUpdate: 'CASCADE',
     onDelete: 'CASCADE',
   })
-  qaQuestions?: Wiki[];
+  wiki?: Wiki[];
 }

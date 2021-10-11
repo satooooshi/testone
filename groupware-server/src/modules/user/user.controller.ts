@@ -21,7 +21,7 @@ export interface SearchQueryToGetUsers {
   page?: string;
   word?: string;
   tag?: string;
-  sort?: 'event' | 'question' | 'answer';
+  sort?: 'event' | 'question' | 'answer' | 'knowledge';
   role?: UserRole;
   verified?: boolean;
   duration?: 'month' | 'week';

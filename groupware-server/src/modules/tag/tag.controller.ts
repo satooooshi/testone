@@ -2,10 +2,14 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Delete,
   Get,
+  Param,
   Post,
+  Res,
   UseGuards,
 } from '@nestjs/common';
+import { Response } from 'express';
 import { Tag } from 'src/entities/tag.entity';
 import { UserTag } from 'src/entities/userTag.entity';
 import JwtAuthenticationGuard from '../auth/jwtAuthentication.guard';
@@ -34,6 +38,26 @@ export class TagController {
       throw new BadRequestException('tag name is required');
     }
     return await this.tagService.createTag(body);
+  }
+
+  @Post('delete')
+  @UseGuards(JwtAuthenticationGuard)
+  async deleteTag(@Body() body: { id: number }, @Res() res: Response) {
+    const { id } = body;
+    const deleteResult = await this.tagService.deleteTag(id);
+    if (deleteResult) {
+      res.sendStatus(200);
+    }
+  }
+
+  @Post('user-tag/delete')
+  @UseGuards(JwtAuthenticationGuard)
+  async deleteUserTag(@Body() body: { id: number }, @Res() res: Response) {
+    const { id } = body;
+    const deleteResult = await this.tagService.deleteUserTag(id);
+    if (deleteResult) {
+      res.sendStatus(200);
+    }
   }
 
   @Post('user-tag/create')

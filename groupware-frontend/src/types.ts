@@ -35,6 +35,8 @@ export enum WikiType {
   QA = 'qa',
 }
 
+export type TextFormat = 'markdown' | 'html';
+
 export interface User {
   id: number;
   email: string;
@@ -45,14 +47,16 @@ export interface User {
   role: UserRole;
   avatarUrl: string;
   verifiedAt: Date | null;
+  employeeId: string | null;
   createdAt: Date;
   updatedAt: Date;
   tags?: Tag[];
+  submissionFiles?: SubmissionFile[];
   hostingEvents?: EventSchedule[];
   events?: EventSchedule[];
   eventComments?: EventComment[];
   eventsCreated?: EventSchedule[];
-  qaQuestions?: QAQuestion[];
+  wiki?: Wiki[];
   qaAnswers?: QAAnswer[];
   qaAnswerReplies?: QAAnswerReply[];
   //this params is sent when login
@@ -61,6 +65,7 @@ export interface User {
   eventCount?: number;
   questionCount?: number;
   answerCount?: number;
+  knowledgeCount?: number;
 }
 
 export interface Tag {
@@ -70,7 +75,7 @@ export interface Tag {
   createdAt: Date;
   updatedAt: Date;
   events?: EventSchedule[];
-  qaQuestions?: QAQuestion[];
+  wiki?: Wiki[];
 }
 
 export interface UserTag {
@@ -82,11 +87,12 @@ export interface UserTag {
   users?: User[];
 }
 
-export interface QAQuestion {
+export interface Wiki {
   id: number;
   title: string;
   body: string;
   type: WikiType;
+  textFormat: TextFormat;
   resolvedAt: Date;
   writer?: User;
   answers?: QAAnswer[];
@@ -99,6 +105,7 @@ export interface QAQuestion {
 export interface QAAnswerReply {
   id: number;
   body: string;
+  textFormat: TextFormat;
   writer?: User;
   answer?: QAAnswer;
   createdAt: Date;
@@ -108,15 +115,16 @@ export interface QAAnswerReply {
 export interface QAAnswer {
   id: number;
   body: string;
+  textFormat: TextFormat;
   createdAt: Date;
   updatedAt: Date;
-  question?: QAQuestion;
+  wiki?: Wiki;
   writer?: User;
   replies?: QAAnswerReply[];
 }
 
 export interface QABestAnswer {
-  question?: QAQuestion;
+  wiki?: Wiki;
   answer?: QAAnswer;
   createdAt: Date;
   updatedAt: Date;
@@ -137,6 +145,7 @@ export interface EventSchedule {
   hostUsers?: User[];
   tags?: Tag[];
   files?: EventFile[];
+  submissionFiles?: SubmissionFile[];
   videos?: EventVideo[];
   author?: User;
   createdAt: Date;
@@ -155,6 +164,15 @@ export interface EventVideo {
   id: number;
   url: string;
   eventSchedule?: EventSchedule;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface SubmissionFile {
+  id: number;
+  url: string;
+  eventSchedule?: Partial<EventSchedule>;
+  userSubmitted?: Partial<User>;
   createdAt: Date;
   updatedAt: Date;
 }

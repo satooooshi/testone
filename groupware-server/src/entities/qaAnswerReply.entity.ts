@@ -8,6 +8,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { QAAnswer } from './qaAnswer.entity';
+import { TextFormat } from './wiki.entity';
 import { User } from './user.entity';
 
 @Entity({ name: 'qa_answer_replies' })
@@ -17,6 +18,13 @@ export class QAAnswerReply {
 
   @Column({ name: 'body', type: 'longtext' })
   body: string;
+
+  @Column('simple-enum', {
+    name: 'text_format',
+    enum: ['markdown', 'html'],
+    default: 'markdown',
+  })
+  textFormat: TextFormat;
 
   @ManyToOne(() => User, (user) => user.qaAnswerReplies, {
     onUpdate: 'CASCADE',

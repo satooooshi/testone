@@ -55,6 +55,7 @@ import EditChatGroupMembersModal from '@/components/EditChatGroupMembersModal';
 import { useAPISaveChatGroup } from '@/hooks/api/chat/useAPISaveChatGroup';
 import { useAPIGetLastReadChatTime } from '@/hooks/api/chat/useAPIGetLastReadChatTime';
 import { useAPISaveLastReadChatTime } from '@/hooks/api/chat/useAPISaveLastReadChatTime';
+import { useHeaderTab } from '@/hooks/headerTab/useHeaderTab';
 
 type MentionState = {
   suggestions: MentionData[];
@@ -151,13 +152,14 @@ const ChatDetail = () => {
     group: newChatMessage.chatGroup ? newChatMessage.chatGroup.id : 0,
     page: page.toString(),
   });
-  const { data: latestMessage } = useAPIGetMessages(
-    {
-      group: newChatMessage.chatGroup ? newChatMessage.chatGroup.id : 0,
-      page: '1',
-    },
-    { refetchInterval: 1000 },
-  );
+  const { data: latestMessage, isLoading: isLoadingLatestMsg } =
+    useAPIGetMessages(
+      {
+        group: Number(id),
+        page: '1',
+      },
+      { refetchInterval: 1000 },
+    );
   const [createGroupWindow, setCreateGroupWindow] = useState(false);
   const [selectChatGroupWindow, setSelectChatGroupWindow] = useState(false);
   const [editMembersModalVisible, setEditMembersModalVisible] = useState(false);
@@ -188,10 +190,14 @@ const ChatDetail = () => {
   const { mutate: sendChatMessage } = useAPISendChatMessage({
     onSuccess: (data) => {
       setNewChatMessage((m) => ({ ...m, content: '' }));
-      setMessages((m) => {
-        m.unshift(data);
-        return m;
-      });
+      if (!isLoadingLatestMsg) {
+        setMessages((m) => {
+          if (m.length && m[m.length - 1].id !== data.id) {
+            m.unshift(data);
+          }
+          return m;
+        });
+      }
       setEditorState(() => EditorState.createEmpty());
     },
   });
@@ -211,14 +217,11 @@ const ChatDetail = () => {
     return { plugins, MentionSuggestions };
   }, []);
 
-  const tabs: Tab[] = isSmallerThan768
-    ? [
-        {
-          name: 'ルーム一覧に戻る',
-          onClick: () => router.push('/chat', undefined, { shallow: true }),
-        },
-      ]
-    : [];
+  const tabs: Tab[] = useHeaderTab({
+    headerTabType: 'chatDetail',
+    router,
+    isSmallerThan768,
+  });
 
   const { mutate: uploadFiles } = useAPIUploadStorage({
     onSuccess: (fileURLs) => {
@@ -278,10 +281,10 @@ const ChatDetail = () => {
 
   //append new message to array
   useEffect(() => {
-    if (latestMessage) {
+    if (latestMessage && latestMessage.length) {
       setMessages((m) => {
-        if (m.length) {
-          const ascSorted = latestMessage.reverse();
+        if (m.length && m[0].id && latestMessage[0].id) {
+          const ascSorted = latestMessage.concat().reverse();
           for (const newMessage of ascSorted) {
             if (
               new Date(m[0].createdAt) < new Date(newMessage.createdAt) &&
@@ -436,7 +439,10 @@ const ChatDetail = () => {
       {users && (
         <CreateChatGroupModal
           isOpen={createGroupWindow}
-          closeModal={() => setCreateGroupWindow(false)}
+          closeModal={() => {
+            setCreateGroupWindow(false);
+            setNewGroup({});
+          }}
           newGroup={newGroup}
           onChangeNewGroupName={(groupName) =>
             setNewGroup((g) => ({ ...g, name: groupName }))
@@ -467,6 +473,7 @@ const ChatDetail = () => {
                       router.push(`/chat/${g.id.toString()}`, undefined, {
                         shallow: true,
                       });
+                      setPage(1);
                     }}
                     key={g.id}
                     style={{ marginBottom: 8 }}>

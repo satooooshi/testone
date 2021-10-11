@@ -1,13 +1,13 @@
 import { useQuery } from 'react-query';
-import { QAQuestion } from 'src/types';
+import { Wiki } from 'src/types';
 import { axiosInstance } from 'src/utils/url';
-import { getLatestQuestionURL } from 'src/utils/url/wiki.url';
+import { getLatestWikiURL } from 'src/utils/url/wiki.url';
 
-const getLatestQuestion = async (): Promise<QAQuestion[]> => {
-  const res = await axiosInstance.get(getLatestQuestionURL);
+const getLatestQuestion = async (): Promise<Wiki[]> => {
+  const res = await axiosInstance.get(getLatestWikiURL);
   return res.data;
 };
 
 export const useAPIGetLatestQuestion = () => {
-  return useQuery<QAQuestion[], Error>('getLatestQuestion', getLatestQuestion);
+  return useQuery<Wiki[], Error>('getLatestQuestion', getLatestQuestion);
 };

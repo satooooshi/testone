@@ -6,21 +6,12 @@ import { Tab } from 'src/types/header/tab/types';
 import MentionMessageCard from '@/components/MentionMessageCard';
 import Link from 'next/link';
 import { useAPIGetLatestMentionedChatMessage } from '@/hooks/api/chat/useAPIGetLatestMentionedChatMessage';
+import { useHeaderTab } from '@/hooks/headerTab/useHeaderTab';
 
 const MentionList = () => {
   const { data: messages } = useAPIGetLatestMentionedChatMessage();
-  const tabs: Tab[] = [
-    {
-      type: 'link',
-      name: 'ダッシュボード',
-      href: '/',
-    },
-    {
-      type: 'link',
-      name: 'メンション一覧',
-      href: '/mention',
-    },
-  ];
+  const tabs: Tab[] = useHeaderTab({ headerTabType: 'mention' });
+
   return (
     <LayoutWithTab
       sidebar={{ activeScreenName: ScreenName.HOME }}

@@ -1,0 +1,97 @@
+@import '../variables.scss';
+
+.editor {
+  box-sizing: border-box;
+  cursor: text;
+  padding: 16px;
+  background: #fefefe;
+  overflow: scroll;
+  height: 90vh;
+  width: 100%;
+  background: $white_color;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+  & h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-size: revert;
+  }
+}
+
+.toolbar {
+  background: #f5f5f5;
+  border-radius: 4px;
+  box-shadow: 0px 1px 3px 0px rgba(220, 220, 220, 1);
+  z-index: 2;
+  width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 0 5px;
+}
+
+.headlineButtonWrapper {
+  display: inline-block;
+  padding: 8px 0;
+}
+
+.headlineButton {
+  background-color: #f5f5f5;
+  font-size: 14px;
+  text-align: -webkit-center;
+  border: 0;
+  vertical-align: bottom;
+  height: 26px;
+  width: 29px;
+}
+
+.headlineButton__active {
+  background-color: #ddd;
+  font-size: 14px;
+  text-align: -webkit-center;
+  border: 0;
+  vertical-align: bottom;
+  height: 26px;
+  width: 29px;
+}
+
+.insert_image_dropzone {
+  background: #fbfbfb;
+  font-size: 12px;
+  text-align: -webkit-center;
+  vertical-align: bottom;
+  height: 34px;
+  width: 36px;
+  &:hover {
+    cursor: pointer;
+  }
+}
+
+.blockquoteStyle {
+  background: none repeat scroll 0 0 rgba(102, 128, 153, 0.05);
+  padding: 13px 8px 13px 30px;
+  margin: 10px 0 10px 20px;
+  border-left: 10px solid #d6dbdf;
+}
+
+.codeBlockStyle {
+  background-color: #f5f5f5;
+  margin-left: 20px;
+  padding-left: 20px;
+  &:first-of-type {
+    margin-top: 10px;
+    padding-top: 20px;
+  }
+  &:last-of-type {
+    margin-bottom: 10px;
+    padding-bottom: 20px;
+  }
+}

@@ -1,11 +1,11 @@
 import React from 'react';
 import { QAAnswerReply } from 'src/types';
-import MDEditor from '@uiw/react-md-editor';
 import '@uiw/react-md-editor/dist/markdown-editor.css';
 import '@uiw/react-markdown-preview/dist/markdown.css';
 import answerReplyStyles from '@/styles/components/AnswerReply.module.scss';
 import { dateTimeFormatterFromJSDDate } from 'src/utils/dateTimeFormatter';
 import { Avatar } from '@chakra-ui/react';
+import WikiComment from '../WikiComment';
 
 type AnswerReplyProps = {
   reply: QAAnswerReply;
@@ -31,10 +31,9 @@ const AnswerReply: React.FC<AnswerReplyProps> = ({ reply }) => {
           })}
         </p>
       </div>
-      <MDEditor.Markdown
-        source={reply.body}
-        className={answerReplyStyles.markdown}
-      />
+      <div className={answerReplyStyles.qa_reply_wrapper}>
+        <WikiComment textFormat={reply.textFormat} body={reply.body} />
+      </div>
     </div>
   );
 };

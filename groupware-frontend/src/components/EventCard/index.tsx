@@ -1,12 +1,19 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import eventCardStyles from '@/styles/components/EventCard.module.scss';
-import { EventSchedule, Tag } from 'src/types';
+import { EventSchedule, EventType, Tag } from 'src/types';
 import clsx from 'clsx';
 import { dateTimeFormatterFromJSDDate } from 'src/utils/dateTimeFormatter';
 import Link from 'next/link';
 import { Button } from '@chakra-ui/react';
 import noImage from '@/public/no-image.jpg';
+import boldayImage1 from '@/public/bolday_1.jpg';
+import impressiveUnivertyImage from '@/public/impressive_university_1.png';
+import studyMeeting1Image from '@/public/study_meeting_1.jpg';
 import Image from 'next/image';
+import { GiTeacher } from 'react-icons/gi';
+import portalLinkBoxStyles from '@/styles/components/PortalLinkBox.module.scss';
+import { MdAssignment } from 'react-icons/md';
+import { FcSportsMode } from 'react-icons/fc';
 
 type EventCardProps = {
   eventSchedule: EventSchedule;
@@ -17,6 +24,47 @@ const EventCard: React.FC<EventCardProps> = ({
   eventSchedule,
   hrefTagClick,
 }) => {
+  const imageSource = useMemo(() => {
+    switch (eventSchedule.type) {
+      case EventType.STUDY_MEETING:
+        return <Image src={studyMeeting1Image} alt="イベント画像" />;
+      case EventType.BOLDAY:
+        return <Image src={boldayImage1} alt="イベント画像" />;
+      case EventType.CLUB:
+        return (
+          <FcSportsMode
+            className={clsx(
+              eventCardStyles.icon,
+              portalLinkBoxStyles.club_icon,
+            )}
+          />
+        );
+      case EventType.IMPRESSIVE_UNIVERSITY:
+        return <Image src={impressiveUnivertyImage} alt="イベント画像" />;
+      case EventType.COACH:
+        return (
+          <GiTeacher
+            className={clsx(
+              eventCardStyles.icon,
+              portalLinkBoxStyles.coach_icon,
+            )}
+          />
+        );
+      case EventType.SUBMISSION_ETC:
+        return (
+          <MdAssignment
+            className={clsx(
+              eventCardStyles.icon,
+              portalLinkBoxStyles.submission_etc_icon,
+            )}
+          />
+        );
+
+      default:
+        return <Image src={noImage} alt="イベント画像" />;
+    }
+  }, [eventSchedule.type]);
+
   return (
     <Link href={`/event/${eventSchedule.id}`}>
       <a className={clsx(eventCardStyles.event_card)}>
@@ -29,7 +77,7 @@ const EventCard: React.FC<EventCardProps> = ({
                 className={eventCardStyles.image}
               />
             ) : (
-              <Image src={noImage} alt="イベント画像" />
+              imageSource
             )}
           </div>
           <div className={eventCardStyles.event_card_right}>
@@ -70,7 +118,7 @@ const EventCard: React.FC<EventCardProps> = ({
                       hrefTagClick ? hrefTagClick(t) : `/event/list?tag=${t.id}`
                     }
                     key={t.id}>
-                    <Button height="28px" colorScheme="purple">
+                    <Button size="sm" colorScheme="purple">
                       {t.name}
                     </Button>
                   </Link>
@@ -78,7 +126,7 @@ const EventCard: React.FC<EventCardProps> = ({
               ))
             ) : (
               <Button
-                height="28px"
+                size="sm"
                 colorScheme="purple"
                 className={eventCardStyles.event_card_tag__item}>
                 {'タグなし'}

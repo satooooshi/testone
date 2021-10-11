@@ -110,6 +110,8 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
   } = useFormik<CreateEventRequest | Required<EventSchedule>>({
     initialValues: event ? event : initialEventValue,
     enableReinitialize: true,
+    validateOnChange: false,
+    validateOnBlur: false,
     validationSchema: createEventSchema,
     onSubmit: async () => {
       if (!croppedImageURL || !selectThumbnailName || !completedCrop) {
@@ -353,7 +355,7 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
               <Button
                 key={u.id}
                 className={createEventModalStyle.tag__item}
-                size="sm"
+                size="xs"
                 colorScheme="teal">
                 {u.lastName + u.firstName}
               </Button>
@@ -370,7 +372,7 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
             {newEvent.tags?.map((t) => (
               <Button
                 key={t.id}
-                height="28px"
+                size="xs"
                 className={createEventModalStyle.tag__item}
                 colorScheme="purple">
                 {t.name}

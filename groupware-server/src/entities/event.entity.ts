@@ -16,6 +16,7 @@ import { ChatGroup } from './chatGroup.entity';
 import { EventComment } from './eventComment.entity';
 import { EventFile } from './eventFile.entity';
 import { EventVideo } from './eventVideo.entity';
+import { SubmissionFile } from './submissionFiles.entity';
 import { Tag } from './tag.entity';
 import { User } from './user.entity';
 
@@ -89,6 +90,7 @@ export class EventSchedule {
 
   @OneToOne(() => ChatGroup, (chatGroup) => chatGroup.event, {
     onUpdate: 'CASCADE',
+    onDelete: 'SET NULL',
   })
   chatGroup?: ChatGroup;
 
@@ -139,6 +141,12 @@ export class EventSchedule {
 
   @OneToMany(() => EventComment, (file) => file.eventSchedule)
   comments: EventComment[];
+
+  @OneToMany(
+    () => SubmissionFile,
+    (submissionFile) => submissionFile.eventSchedule,
+  )
+  submissionFiles?: SubmissionFile[];
 
   @OneToMany(() => EventFile, (file) => file.eventSchedule)
   files: EventFile[];

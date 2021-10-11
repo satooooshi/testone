@@ -1,7 +1,7 @@
 import { ScreenName } from '@/components/Sidebar';
 import { Tab } from 'src/types/header/tab/types';
 import { useRouter } from 'next/router';
-import QACard from '@/components/QACard';
+import WikiCard from '@/components/WikiCard';
 import ReactPaginate from 'react-paginate';
 import paginationStyles from '@/styles/components/Pagination.module.scss';
 import qaListStyles from '@/styles/layouts/QAList.module.scss';
@@ -11,13 +11,14 @@ import SearchForm from '@/components/SearchForm';
 import { useAPIGetTag } from '@/hooks/api/tag/useAPIGetTag';
 import { toggleTag } from 'src/utils/toggleTag';
 import { Tag, UserRole, WikiType } from 'src/types';
-import { qaQueryRefresh } from 'src/utils/qaQueryRefresh';
+import { wikiQueryRefresh } from 'src/utils/wikiQueryRefresh';
 import Head from 'next/head';
 import {
   SearchQueryToGetWiki,
   useAPIGetWikiList,
 } from '@/hooks/api/wiki/useAPIGetWikiList';
 import { useAuthenticate } from 'src/contexts/useAuthenticate';
+import { useHeaderTab } from '@/hooks/headerTab/useHeaderTab';
 
 const QAQuestionList = () => {
   const router = useRouter();
@@ -47,50 +48,30 @@ const QAQuestionList = () => {
   const queryRefresh = (query: Partial<SearchQueryToGetWiki>) => {
     const selectedTagIDs = selectedTags.map((t) => t.id.toString());
     const tagQuery = selectedTagIDs.join('+');
-    const refreshedQueryStrings = qaQueryRefresh({
+    const refreshedQueryStrings = wikiQueryRefresh({
       ...query,
       tag: tagQuery,
     });
     router.push(`/wiki/list?${refreshedQueryStrings}`);
   };
 
-  const tabs: Tab[] = [
-    {
-      name: 'All',
-      onClick: () => {
-        queryRefresh({ type: undefined });
-      },
-    },
-    {
-      name: '社内規則',
-      onClick: () => {
-        queryRefresh({ type: WikiType.RULES });
-      },
-    },
-    {
-      name: 'ナレッジ',
-      onClick: () => {
-        queryRefresh({ type: WikiType.KNOWLEDGE });
-      },
-    },
-    {
-      name: 'Q&A',
-      onClick: () => {
-        queryRefresh({ type: WikiType.QA });
-      },
-    },
-  ];
+  const tabs: Tab[] = useHeaderTab({ headerTabType: 'wikiList', queryRefresh });
 
-  const onClickCreateButton = () => {
-    router.push('/wiki/new?type=' + type || '');
-  };
+  const onClickCreateButton =
+    type === WikiType.RULES
+      ? user?.role === UserRole.ADMIN
+        ? () => {
+            router.push('/wiki/new?type=' + type || '');
+          }
+        : undefined
+      : () => {
+          router.push('/wiki/new?type=' + type || '');
+        };
 
   const headerRightButtonName = useMemo(() => {
     switch (type) {
       case WikiType.RULES:
-        if (user?.role === UserRole.ADMIN) {
-          return '社内規則を新規作成';
-        }
+        return '社内規則を新規作成';
       case WikiType.KNOWLEDGE:
         return 'ナレッジを新規作成';
       case WikiType.QA:
@@ -98,7 +79,7 @@ const QAQuestionList = () => {
       default:
         return '新規作成';
     }
-  }, [type, user?.role]);
+  }, [type]);
 
   const initialHeaderValue = {
     title: '社内Wiki',
@@ -137,12 +118,10 @@ const QAQuestionList = () => {
           />
         </div>
         <div className={qaListStyles.qa_list}>
-          {questions?.qaQuestions.map((q) => (
-            <QACard key={q.id} qaQuestion={q} />
+          {questions?.wiki.map((q) => (
+            <WikiCard key={q.id} wiki={q} />
           ))}
-          {!questions?.qaQuestions.length && (
-            <p>検索結果が見つかりませんでした</p>
-          )}
+          {!questions?.wiki.length && <p>検索結果が見つかりませんでした</p>}
         </div>
       </div>
       <div className={paginationStyles.pagination_wrap_layout}>

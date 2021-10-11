@@ -5,15 +5,18 @@ import { EventSchedule } from 'src/entities/event.entity';
 import { EventComment } from 'src/entities/eventComment.entity';
 import { EventFile } from 'src/entities/eventFile.entity';
 import { EventVideo } from 'src/entities/eventVideo.entity';
+import { SubmissionFile } from 'src/entities/submissionFiles.entity';
 import { Tag } from 'src/entities/tag.entity';
 import { ChatModule } from '../chat/chat.module';
 import { NotificationModule } from '../notification/notification.module';
+import { StorageModule } from '../storage/storage.module';
 import { UserModule } from '../user/user.module';
 import { EventScheduleController } from './event.controller';
 import { EventScheduleService } from './event.service';
 
 @Module({
   imports: [
+    StorageModule,
     ChatModule,
     UserModule,
     NotificationModule,
@@ -24,6 +27,7 @@ import { EventScheduleService } from './event.service';
       EventVideo,
       Tag,
       EventComment,
+      SubmissionFile,
     ]),
   ],
   controllers: [EventScheduleController],
