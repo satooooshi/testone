@@ -137,17 +137,19 @@ const WikiForm: React.FC<WikiFormProps> = ({
 
   useEffect(() => {
     if (wiki) {
-      setNewQuestion({ ...wiki, textFormat: 'html' });
-      setEditorState((e) =>
-        EditorState.push(
-          e,
-          ContentState.createFromBlockArray(
-            convertFromHTML(wiki.body).contentBlocks,
-            convertFromHTML(wiki.body).entityMap,
+      setNewQuestion(wiki);
+      if (wiki.textFormat === 'html') {
+        setEditorState((e) =>
+          EditorState.push(
+            e,
+            ContentState.createFromBlockArray(
+              convertFromHTML(wiki.body).contentBlocks,
+              convertFromHTML(wiki.body).entityMap,
+            ),
+            'apply-entity',
           ),
-          'apply-entity',
-        ),
-      );
+        );
+      }
     }
   }, [wiki]);
 

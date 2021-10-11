@@ -1,10 +1,16 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useRef,
+  useReducer,
+} from 'react';
 import { ScreenName } from '@/components/layout/Sidebar';
 import { Tab } from 'src/types/header/tab/types';
 import LayoutWithTab from '@/components/layout/LayoutWithTab';
 import profileStyles from '@/styles/layouts/Profile.module.scss';
 import { useAPIUpdateUser } from '@/hooks/api/user/useAPIUpdateUser';
-import { User } from 'src/types';
+import { TagType, User, UserTag } from 'src/types';
 import {
   Button,
   FormControl,
@@ -25,10 +31,25 @@ import { dataURLToFile } from 'src/utils/dataURLToFile';
 import { useAPIGetProfile } from '@/hooks/api/user/useAPIGetProfile';
 import { useImageCrop } from '@/hooks/crop/useImageCrop';
 import { useHeaderTab } from '@/hooks/headerTab/useHeaderTab';
+import createNewUserStyles from '@/styles/layouts/admin/CreateNewUser.module.scss';
+import clsx from 'clsx';
+import TagModal from '@/components/TagModal';
+import { toggleTag } from 'src/utils/toggleTag';
+import { useAPIGetUserTag } from '@/hooks/api/tag/useAPIGetUserTag';
+
+type ModalState = {
+  isOpen: boolean;
+  filteredTagType?: TagType;
+};
+
+type ModalAction = {
+  type: 'openTech' | 'openQualification' | 'openClub' | 'openHobby' | 'close';
+};
 
 const Profile = () => {
   const { data: profile } = useAPIGetProfile();
   const { user } = useAuthenticate();
+  const { data: tags } = useAPIGetUserTag();
   const [userInfo, setUserInfo] = useState<Partial<User>>({
     email: '',
     lastName: '',
@@ -36,6 +57,50 @@ const Profile = () => {
     avatarUrl: '',
     introduce: '',
   });
+
+  const modalReducer = (
+    _state: ModalState,
+    action: ModalAction,
+  ): ModalState => {
+    switch (action.type) {
+      case 'openTech': {
+        return {
+          isOpen: true,
+          filteredTagType: TagType.TECH,
+        };
+      }
+      case 'openQualification': {
+        return {
+          isOpen: true,
+          filteredTagType: TagType.QUALIFICATION,
+        };
+      }
+      case 'openClub': {
+        return {
+          isOpen: true,
+          filteredTagType: TagType.CLUB,
+        };
+      }
+      case 'openHobby': {
+        return {
+          isOpen: true,
+          filteredTagType: TagType.HOBBY,
+        };
+      }
+      case 'close': {
+        return {
+          isOpen: false,
+        };
+      }
+    }
+  };
+  const [{ isOpen, filteredTagType }, dispatchModal] = useReducer(
+    modalReducer,
+    {
+      isOpen: false,
+    },
+  );
+
   const { mutate: uploadImage } = useAPIUploadStorage({
     onSuccess: async (fileURLs) => {
       const updateEventImageOnState = async () => {
@@ -104,6 +169,14 @@ const Profile = () => {
     }
   }, [profile]);
 
+  const toggleSelectedTag = (t: UserTag) => {
+    const toggledTag = toggleTag(userInfo?.tags, t);
+    setUserInfo((i) => ({
+      ...i,
+      tags: toggledTag,
+    }));
+  };
+
   return (
     <LayoutWithTab
       sidebar={{ activeScreenName: ScreenName.ACCOUNT }}
@@ -115,6 +188,20 @@ const Profile = () => {
       <Head>
         <title>ボールド | プロフィール編集</title>
       </Head>
+      {tags && (
+        <TagModal
+          isOpen={isOpen}
+          isSearch={false}
+          tags={tags}
+          selectedTags={userInfo?.tags || []}
+          filteredTagType={filteredTagType}
+          toggleTag={toggleSelectedTag}
+          onCancel={() => {
+            dispatchModal({ type: 'close' });
+          }}
+          onComplete={() => dispatchModal({ type: 'close' })}
+        />
+      )}
       <div className={profileStyles.main}>
         <div className={profileStyles.image_wrapper}>
           {userInfo.avatarUrl && !selectImageUrl ? (
@@ -211,6 +298,112 @@ const Profile = () => {
               }
             />
           </FormControl>
+          <FormControl
+            className={clsx(
+              createNewUserStyles.input_wrapper,
+              createNewUserStyles.edit_tags_button_wrapper,
+            )}>
+            <Button
+              size="sm"
+              colorScheme="teal"
+              onClick={() => {
+                dispatchModal({ type: 'openTech' });
+              }}>
+              技術を編集
+            </Button>
+          </FormControl>
+          <div className={createNewUserStyles.selected_tags_wrapper}>
+            {userInfo?.tags
+              ?.filter((t) => t.type === TagType.TECH)
+              .map((t) => (
+                <Button
+                  key={t.id}
+                  size="xs"
+                  colorScheme="teal"
+                  className={createNewUserStyles.selected_tag_item}
+                  height="28px">
+                  {t.name}
+                </Button>
+              ))}
+          </div>
+          <FormControl
+            className={clsx(
+              createNewUserStyles.input_wrapper,
+              createNewUserStyles.edit_tags_button_wrapper,
+            )}>
+            <Button
+              size="sm"
+              colorScheme="blue"
+              onClick={() => dispatchModal({ type: 'openQualification' })}>
+              資格を編集
+            </Button>
+          </FormControl>
+          <div className={createNewUserStyles.selected_tags_wrapper}>
+            {userInfo?.tags
+              ?.filter((t) => t.type === TagType.QUALIFICATION)
+              .map((t) => (
+                <Button
+                  key={t.id}
+                  size="xs"
+                  colorScheme="blue"
+                  className={createNewUserStyles.selected_tag_item}
+                  height="28px">
+                  {t.name}
+                </Button>
+              ))}
+          </div>
+          <FormControl
+            className={clsx(
+              createNewUserStyles.input_wrapper,
+              createNewUserStyles.edit_tags_button_wrapper,
+            )}>
+            <Button
+              size="sm"
+              colorScheme="green"
+              onClick={() => dispatchModal({ type: 'openClub' })}>
+              部活動を編集
+            </Button>
+          </FormControl>
+          <div className={createNewUserStyles.selected_tags_wrapper}>
+            {userInfo?.tags
+              ?.filter((t) => t.type === TagType.CLUB)
+              .map((t) => (
+                <Button
+                  key={t.id}
+                  size="xs"
+                  colorScheme="green"
+                  className={createNewUserStyles.selected_tag_item}
+                  height="28px">
+                  {t.name}
+                </Button>
+              ))}
+          </div>
+          <FormControl
+            className={clsx(
+              createNewUserStyles.input_wrapper,
+              createNewUserStyles.edit_tags_button_wrapper,
+            )}>
+            <Button
+              size="sm"
+              colorScheme="pink"
+              onClick={() => dispatchModal({ type: 'openHobby' })}>
+              趣味を編集
+            </Button>
+          </FormControl>
+          <div className={createNewUserStyles.selected_tags_wrapper}>
+            {userInfo?.tags
+              ?.filter((t) => t.type === TagType.HOBBY)
+              .map((t) => (
+                <Button
+                  key={t.id}
+                  size="xs"
+                  colorScheme="pink"
+                  className={createNewUserStyles.selected_tag_item}
+                  height="28px">
+                  {t.name}
+                </Button>
+              ))}
+          </div>
         </div>
       </div>
       <Button

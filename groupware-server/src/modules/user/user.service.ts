@@ -375,6 +375,14 @@ export class UserService {
     return { users: entityUsers, pageCount };
   }
 
+  async getProfile(id: number): Promise<User> {
+    const users = await this.userRepository.findOne({
+      relations: ['tags'],
+      where: { id },
+    });
+    return users;
+  }
+
   async getUsers(): Promise<User[]> {
     const users = await this.userRepository.find();
     return users;

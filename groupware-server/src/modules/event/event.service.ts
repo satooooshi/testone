@@ -107,21 +107,35 @@ export class EventScheduleService {
     for (const e of events) {
       const host = e.hostUsers.map((h) => h.lastName + ' ' + h.firstName);
       const tag = e.tags.map((t) => t.name);
-      for (const participant of e.users) {
-        const participantName =
-          participant.lastName + ' ' + participant.firstName;
-        csvEvents.push({
-          ...e,
-          startAt: dateTimeFormatterFromJSDDate({ dateTime: e.startAt }),
-          endAt: dateTimeFormatterFromJSDDate({ dateTime: e.endAt }),
-          tag,
-          type: this.eventTypeNameFactory(e.type),
-          hostUsers: host,
-          users: participantName,
-          employeeId: participant.employeeId,
-          participantsCount: e.users.length,
-        });
+      if (e.users.length) {
+        for (const participant of e.users) {
+          const participantName =
+            participant.lastName + ' ' + participant.firstName;
+          csvEvents.push({
+            ...e,
+            startAt: dateTimeFormatterFromJSDDate({ dateTime: e.startAt }),
+            endAt: dateTimeFormatterFromJSDDate({ dateTime: e.endAt }),
+            tag,
+            type: this.eventTypeNameFactory(e.type),
+            hostUsers: host,
+            users: participantName,
+            employeeId: participant.employeeId,
+            participantsCount: e.users.length,
+          });
+        }
+        continue;
       }
+      csvEvents.push({
+        ...e,
+        startAt: dateTimeFormatterFromJSDDate({ dateTime: e.startAt }),
+        endAt: dateTimeFormatterFromJSDDate({ dateTime: e.endAt }),
+        tag,
+        type: this.eventTypeNameFactory(e.type),
+        hostUsers: host,
+        users: '',
+        employeeId: '',
+        participantsCount: e.users.length,
+      });
     }
     const csvParser = new Parser({ fields: csvFields });
     const csvData = csvParser.parse(csvEvents);
@@ -151,21 +165,35 @@ export class EventScheduleService {
     for (const e of events) {
       const host = e.hostUsers.map((h) => h.lastName + ' ' + h.firstName);
       const tag = e.tags.map((t) => t.name);
-      for (const participant of e.users) {
-        const participantName =
-          participant.lastName + ' ' + participant.firstName;
-        csvEvents.push({
-          ...e,
-          startAt: dateTimeFormatterFromJSDDate({ dateTime: e.startAt }),
-          endAt: dateTimeFormatterFromJSDDate({ dateTime: e.endAt }),
-          tag,
-          type: this.eventTypeNameFactory(e.type),
-          hostUsers: host,
-          users: participantName,
-          employeeId: participant.employeeId,
-          participantsCount: e.users.length,
-        });
+      if (e.users.length) {
+        for (const participant of e.users) {
+          const participantName =
+            participant.lastName + ' ' + participant.firstName;
+          csvEvents.push({
+            ...e,
+            startAt: dateTimeFormatterFromJSDDate({ dateTime: e.startAt }),
+            endAt: dateTimeFormatterFromJSDDate({ dateTime: e.endAt }),
+            tag,
+            type: this.eventTypeNameFactory(e.type),
+            hostUsers: host,
+            users: participantName,
+            employeeId: participant.employeeId,
+            participantsCount: e.users.length,
+          });
+        }
+        continue;
       }
+      csvEvents.push({
+        ...e,
+        startAt: dateTimeFormatterFromJSDDate({ dateTime: e.startAt }),
+        endAt: dateTimeFormatterFromJSDDate({ dateTime: e.endAt }),
+        tag,
+        type: this.eventTypeNameFactory(e.type),
+        hostUsers: host,
+        users: '',
+        employeeId: '',
+        participantsCount: e.users.length,
+      });
     }
     const csvParser = new Parser({ fields: csvFields });
     const csvData = csvParser.parse(csvEvents);
