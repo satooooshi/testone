@@ -6,7 +6,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Tag } from 'src/entities/tag.entity';
 import { UserTag } from 'src/entities/userTag.entity';
-import { Repository } from 'typeorm';
+import { DeleteResult, Repository } from 'typeorm';
 
 @Injectable()
 export class TagService {
@@ -44,6 +44,24 @@ export class TagService {
       throw new BadRequestException(
         'some parameter is missing or illegal request',
       );
+    }
+  }
+
+  public async deleteTag(id: number): Promise<DeleteResult> {
+    try {
+      const newUserTag = await this.tagRepository.delete(id);
+      return newUserTag;
+    } catch (err) {
+      throw new InternalServerErrorException('Something went wrong');
+    }
+  }
+
+  public async deleteUserTag(id: number): Promise<DeleteResult> {
+    try {
+      const newUserTag = await this.userTagRepository.delete(id);
+      return newUserTag;
+    } catch (err) {
+      throw new InternalServerErrorException('Something went wrong');
     }
   }
 }
