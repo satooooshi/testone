@@ -1,6 +1,6 @@
-import { ScreenName } from '@/components/Sidebar';
+import { ScreenName } from '@/components/layout/Sidebar';
 import { Tab } from 'src/types/header/tab/types';
-import LayoutWithTab from '@/components/LayoutWithTab';
+import LayoutWithTab from '@/components/layout/LayoutWithTab';
 import homeStyles from '@/styles/layouts/Home.module.scss';
 import PortalLinkBox, { PortalLinkType } from '@/components/PortalLinkBox';
 import Head from 'next/head';

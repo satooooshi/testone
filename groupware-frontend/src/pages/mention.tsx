@@ -1,6 +1,6 @@
-import LayoutWithTab from '@/components/LayoutWithTab';
+import LayoutWithTab from '@/components/layout/LayoutWithTab';
 import React from 'react';
-import { ScreenName } from '@/components/Sidebar';
+import { ScreenName } from '@/components/layout/Sidebar';
 import mentionStyles from '@/styles/layouts/Mention.module.scss';
 import { Tab } from 'src/types/header/tab/types';
 import MentionMessageCard from '@/components/MentionMessageCard';

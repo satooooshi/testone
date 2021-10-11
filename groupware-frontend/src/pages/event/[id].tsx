@@ -1,5 +1,5 @@
-import LayoutWithTab from '@/components/LayoutWithTab';
-import { ScreenName } from '@/components/Sidebar';
+import LayoutWithTab from '@/components/layout/LayoutWithTab';
+import { ScreenName } from '@/components/layout/Sidebar';
 import { useAPIGetEventDetail } from '@/hooks/api/event/useAPIGetEventDetail';
 import { useRouter } from 'next/router';
 import eventDetailStyles from '@/styles/layouts/EventDetail.module.scss';

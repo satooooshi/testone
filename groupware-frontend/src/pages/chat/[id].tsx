@@ -1,4 +1,4 @@
-import { ScreenName } from '@/components/Sidebar';
+import { ScreenName } from '@/components/layout/Sidebar';
 import chatStyles from '@/styles/layouts/Chat.module.scss';
 import { IoSend } from 'react-icons/io5';
 import clsx from 'clsx';
@@ -35,7 +35,7 @@ import '@draft-js-plugins/mention/lib/plugin.css';
 import { draftToMarkdown } from 'markdown-draft-js';
 import '@draft-js-plugins/image/lib/plugin.css';
 import ChatGroupCard from '@/components/chat/ChatGroupCard';
-import LayoutWithTab from '@/components/LayoutWithTab';
+import LayoutWithTab from '@/components/layout/LayoutWithTab';
 import { Tab } from 'src/types/header/tab/types';
 import { AiOutlinePaperClip, AiOutlineFileProtect } from 'react-icons/ai';
 import { useDropzone } from 'react-dropzone';

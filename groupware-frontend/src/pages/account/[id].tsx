@@ -1,7 +1,7 @@
-import { ScreenName } from '@/components/Sidebar';
+import { ScreenName } from '@/components/layout/Sidebar';
 import accountInfoStyles from '@/styles/layouts/AccountInfo.module.scss';
 import { useRouter } from 'next/router';
-import LayoutWithTab from '@/components/LayoutWithTab';
+import LayoutWithTab from '@/components/layout/LayoutWithTab';
 import { useAPIGetUserInfoById } from '@/hooks/api/user/useAPIGetUserInfoById';
 import Image from 'next/image';
 import noImage from '@/public/no-image.jpg';
@@ -14,7 +14,7 @@ import { useAPILogout } from '@/hooks/api/auth/useAPILogout';
 import { useAuthenticate } from 'src/contexts/useAuthenticate';
 import { Tab, TabName } from 'src/types/header/tab/types';
 import Head from 'next/head';
-import TopTabBar, { TopTabBehavior } from '@/components/TopTabBar';
+import TopTabBar, { TopTabBehavior } from '@/components/layout/TopTabBar';
 import { useAPIGetEventList } from '@/hooks/api/event/useAPIGetEventList';
 import { useAPIGetWikiList } from '@/hooks/api/wiki/useAPIGetWikiList';
 import { useHeaderTab } from '@/hooks/headerTab/useHeaderTab';

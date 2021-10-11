@@ -1,6 +1,6 @@
 import { Tab } from 'src/types/header/tab/types';
-import LayoutWithTab from '@/components/LayoutWithTab';
-import { ScreenName } from '@/components/Sidebar';
+import LayoutWithTab from '@/components/layout/LayoutWithTab';
+import { ScreenName } from '@/components/layout/Sidebar';
 import React, { useEffect } from 'react';
 import { TagType, UserRole } from 'src/types';
 import { useRouter } from 'next/router';

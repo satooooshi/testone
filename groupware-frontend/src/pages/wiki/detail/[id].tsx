@@ -1,4 +1,4 @@
-import { ScreenName } from '@/components/Sidebar';
+import { ScreenName } from '@/components/layout/Sidebar';
 import { useAPIGetWikiDetail } from '@/hooks/api/wiki/useAPIGetWikiDetail';
 import { useRouter } from 'next/router';
 import qaDetailStyles from '@/styles/layouts/QADetail.module.scss';
@@ -6,7 +6,7 @@ import WikiComment from '@/components/wiki/WikiComment';
 import React, { useMemo, useRef, useState } from 'react';
 import 'react-markdown-editor-lite/lib/index.css';
 import { useAPICreateAnswer } from '@/hooks/api/wiki/useAPICreateAnswer';
-import LayoutWithTab from '@/components/LayoutWithTab';
+import LayoutWithTab from '@/components/layout/LayoutWithTab';
 import AnswerReply from '@/components/wiki/AnswerReply';
 import { QAAnswerReply, WikiType } from 'src/types';
 import { Button, useMediaQuery } from '@chakra-ui/react';
