@@ -63,21 +63,21 @@ const UserTagList: React.FC<UserTagListProps> = ({ tags, type }) => {
     <div className={accountInfoStyles.tag_list_wrapper}>
       <p className={accountInfoStyles.tag_label_text}>{labelName}</p>
       <div className={accountInfoStyles.tags_wrapper}>
-        <div className={accountInfoStyles.tag_button_wrapper}>
-          {tags?.length ? (
-            tags
-              ?.filter((t) => t.type === TagType.TECH)
-              .map((t) => (
-                <Button key={t.id} colorScheme={color} size="xs">
+        {tags?.length ? (
+          tags
+            ?.filter((t) => t.type === type)
+            .map((t) => (
+              <div key={t.id} className={accountInfoStyles.tag_button_wrapper}>
+                <Button colorScheme={color} size="xs">
                   {t.name}
                 </Button>
-              ))
-          ) : (
-            <Button colorScheme={color} size="xs">
-              未設定
-            </Button>
-          )}
-        </div>
+              </div>
+            ))
+        ) : (
+          <Button colorScheme={color} size="xs">
+            未設定
+          </Button>
+        )}
       </div>
     </div>
   );
