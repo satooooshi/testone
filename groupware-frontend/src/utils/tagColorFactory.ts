@@ -12,7 +12,7 @@ export const tagColorFactory = (
     case TagType.CLUB:
       return 'green';
     case TagType.HOBBY:
-      return 'teal';
+      return 'pink';
     case TagType.OTHER:
       return 'orange';
   }
