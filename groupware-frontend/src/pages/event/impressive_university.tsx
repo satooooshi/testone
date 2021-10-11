@@ -23,15 +23,14 @@ const ImpressionUniversity: React.FC = () => {
     type: EventType.IMPRESSIVE_UNIVERSITY,
   });
 
-  const headlineImgSource = [
-    'https://www.bold.ne.jp/assets/assets_recruit/images/enviroment/img_univ_main.png',
-  ];
-  const headlineImage =
-    typeof headlineImgSource[0] === 'string' ? (
-      <img src={headlineImgSource[0]} alt="" />
-    ) : (
-      <Image src={headlineImgSource[0]} alt="" />
-    );
+  const headlineImage = (
+    <img
+      src={
+        'https://www.bold.ne.jp/assets/assets_recruit/images/enviroment/img_univ_main.png'
+      }
+      alt=""
+    />
+  );
 
   const bottomImgSources = [
     impressiveUniversityImage1,
