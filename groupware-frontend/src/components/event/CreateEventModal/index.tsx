@@ -14,7 +14,7 @@ import {
 import { IoMdAddCircle } from 'react-icons/io';
 import { useAPIGetTag } from '@/hooks/api/tag/useAPIGetTag';
 import 'rc-checkbox/assets/index.css';
-import TagModal from '../TagModal';
+import TagModal from '../../TagModal';
 import { DateTimePicker } from 'react-rainbow-components';
 import { useDropzone } from 'react-dropzone';
 import { useAPIUploadStorage } from '@/hooks/api/storage/useAPIUploadStorage';

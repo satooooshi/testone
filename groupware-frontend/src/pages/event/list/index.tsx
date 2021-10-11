@@ -11,7 +11,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import LayoutWithTab from '@/components/LayoutWithTab';
 import CreateEventModal, {
   CreateEventRequest,
-} from '@/components/CreateEventModal';
+} from '@/components/event/CreateEventModal';
 import SearchForm from '@/components/SearchForm';
 import { EventSchedule, EventType, Tag } from 'src/types';
 import { EventTab } from 'src/types/header/tab/types';
