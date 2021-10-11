@@ -6,17 +6,18 @@ import { EventTab } from 'src/types/header/tab/types';
 
 export interface EventIntroductionData {
   recommendedEvents?: EventSchedule[];
-  bottomImages: StaticImageData[];
-  headlineImage: JSX.Element | StaticImageData;
+  headlineImage: React.ReactNode | StaticImageData;
+  bottomImages: (React.ReactNode | StaticImageData)[];
   heading: EventTab;
   subHeading: string;
   content: string;
 }
 
+
 const EventIntroduction: React.FC<EventIntroductionData> = ({
   recommendedEvents,
-  bottomImages,
   headlineImage,
+  bottomImages,
   heading,
   subHeading,
   content,
@@ -65,9 +66,9 @@ const EventIntroduction: React.FC<EventIntroductionData> = ({
           </div>
         </div>
         <div className={eventPRStyles.bottom_images_row}>
-          {bottomImages.map((i, id) => (
+          {bottomImages.map((bottomImage, id) => (
             <div key={id} className={eventPRStyles.bottom_image_wrapper}>
-              <Image src={i} alt="" />
+              {bottomImage}
             </div>
           ))}
         </div>

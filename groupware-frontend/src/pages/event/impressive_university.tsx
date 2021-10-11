@@ -1,6 +1,7 @@
 import LayoutWithTab from '@/components/LayoutWithTab';
 import { ScreenName } from '@/components/Sidebar';
 import { useRouter } from 'next/router';
+import Image from 'next/image';
 import React from 'react';
 import eventPRStyles from '@/styles/layouts/EventPR.module.scss';
 import impressiveUniversityImage1 from '@/public/impressive_university_1.png';
@@ -21,18 +22,31 @@ const ImpressionUniversity: React.FC = () => {
   const { data: recommendedEvents } = useAPIGetLatestEvent({
     type: EventType.IMPRESSIVE_UNIVERSITY,
   });
-  const bottomImages = [impressiveUniversityImage1, impressiveUniversityImage2];
 
-  // Publicフォルダ内の画像を使用する際は import Image from 'next/image'; を宣言して下記コードのコメントアウトを解除してください。
-  // const headlineImage = <Image src={} alt="" />;
-  const headlineImage = (
-    <img
-      src={
-        'https://www.bold.ne.jp/assets/assets_recruit/images/enviroment/img_univ_main.png'
-      }
-      alt=""
-    />
-  );
+  const headlineImgSource = [
+    'https://www.bold.ne.jp/assets/assets_recruit/images/enviroment/img_univ_main.png',
+  ];
+  const headlineImage =
+    typeof headlineImgSource[0] === 'string' ? (
+      <img src={headlineImgSource[0]} alt="" />
+    ) : (
+      <Image src={headlineImgSource[0]} alt="" />
+    );
+
+  const bottomImgSources = [
+    impressiveUniversityImage1,
+    impressiveUniversityImage2,
+  ];
+  const bottomImages = [];
+  for (const bottomImgSource of bottomImgSources) {
+    bottomImages.push(
+      typeof bottomImgSource === 'string' ? (
+        <img src={bottomImgSource} alt="" />
+      ) : (
+        <Image src={bottomImgSource} alt="" />
+      ),
+    );
+  }
   const heading = EventTab.IMPRESSIVE_UNIVERSITY;
   const subHeading = '技術力と人間力を\n毎日プロから学ぶことが出来る研修制度';
   const content =
@@ -45,8 +59,8 @@ const ImpressionUniversity: React.FC = () => {
       <div className={eventPRStyles.main}>
         <EventIntroduction
           recommendedEvents={recommendedEvents}
-          bottomImages={bottomImages}
           headlineImage={headlineImage}
+          bottomImages={bottomImages}
           heading={heading}
           subHeading={subHeading}
           content={content}
