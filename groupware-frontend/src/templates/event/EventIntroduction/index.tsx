@@ -4,8 +4,8 @@ import Image from 'next/image';
 import { EventSchedule } from 'src/types';
 import { EventTab } from 'src/types/header/tab/types';
 
-export interface EachEventData {
-  events?: EventSchedule[];
+export interface EventIntroductionData {
+  recommendedEvents?: EventSchedule[];
   bottomImages: StaticImageData[];
   headlineImage: JSX.Element | StaticImageData;
   heading: EventTab;
@@ -13,8 +13,8 @@ export interface EachEventData {
   content: string;
 }
 
-const EventIntroduction: React.FC<EachEventData> = ({
-  events,
+const EventIntroduction: React.FC<EventIntroductionData> = ({
+  recommendedEvents,
   bottomImages,
   headlineImage,
   heading,
@@ -35,7 +35,7 @@ const EventIntroduction: React.FC<EachEventData> = ({
         </div>
       </div>
       <div className={eventPRStyles.latest_events_wrapper}>
-        {events?.length ? (
+        {recommendedEvents?.length ? (
           <p className={eventPRStyles.latest_events_text}>
             直近のおすすめイベント
           </p>
@@ -45,7 +45,7 @@ const EventIntroduction: React.FC<EachEventData> = ({
           </p>
         )}
         <div className={eventPRStyles.event_card_list}>
-          {events?.map(
+          {recommendedEvents?.map(
             (eventSchedule, index) =>
               index <= 4 && (
                 <div

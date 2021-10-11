@@ -18,7 +18,7 @@ const ImpressionUniversity: React.FC = () => {
     onClickRightButton: () =>
       router.push('/event/list?type=impressive_university&from=&to='),
   };
-  const { data: events } = useAPIGetLatestEvent({
+  const { data: recommendedEvents } = useAPIGetLatestEvent({
     type: EventType.IMPRESSIVE_UNIVERSITY,
   });
   const bottomImages = [impressiveUniversityImage1, impressiveUniversityImage2];
@@ -44,7 +44,7 @@ const ImpressionUniversity: React.FC = () => {
       header={initialHeaderValue}>
       <div className={eventPRStyles.main}>
         <EventIntroduction
-          events={events}
+          recommendedEvents={recommendedEvents}
           bottomImages={bottomImages}
           headlineImage={headlineImage}
           heading={heading}
