@@ -1,6 +1,5 @@
 import eventPRStyles from '@/styles/layouts/EventPR.module.scss';
 import EventCard from '@/components/EventCard';
-import Image from 'next/image';
 import { EventSchedule } from 'src/types';
 import { EventTab } from 'src/types/header/tab/types';
 
@@ -12,7 +11,6 @@ export interface EventIntroductionProps {
   subHeading: string;
   content: string;
 }
-
 
 const EventIntroduction: React.FC<EventIntroductionProps> = ({
   recommendedEvents,
