@@ -13,7 +13,7 @@ const EditQuestion = () => {
 
   const { mutate: updateQuestion } = useAPIUpdateWiki({
     onSuccess: () => {
-      wiki && router.push('/wiki/' + wiki.id);
+      wiki && router.push('/wiki/detail/' + wiki.id);
     },
   });
 

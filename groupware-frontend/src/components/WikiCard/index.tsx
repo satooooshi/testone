@@ -23,7 +23,7 @@ const WikiCard: React.FC<WikiCardProps> = ({ wiki }) => {
   }, [wiki.type]);
 
   return (
-    <Link href={`/wiki/${wiki.id}`}>
+    <Link href={`/wiki/detail/${wiki.id}`}>
       <a className={qaCardStyles.qa_card__item}>
         <div className={qaCardStyles.qa_card__top}>
           <div className={qaCardStyles.qa_card_user_info_wrapper}>
