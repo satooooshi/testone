@@ -4,7 +4,7 @@ import Image from 'next/image';
 import { EventSchedule } from 'src/types';
 import { EventTab } from 'src/types/header/tab/types';
 
-export interface EventIntroductionData {
+export interface EventIntroductionProps {
   recommendedEvents?: EventSchedule[];
   headlineImage: React.ReactNode | StaticImageData;
   bottomImages: (React.ReactNode | StaticImageData)[];
@@ -14,7 +14,7 @@ export interface EventIntroductionData {
 }
 
 
-const EventIntroduction: React.FC<EventIntroductionData> = ({
+const EventIntroduction: React.FC<EventIntroductionProps> = ({
   recommendedEvents,
   headlineImage,
   bottomImages,
