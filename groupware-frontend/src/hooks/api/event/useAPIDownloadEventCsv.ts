@@ -36,26 +36,24 @@ export const useAPIDownloadEventCsv = () => {
   return useMutation<string, Error, QueryToGetEventCsv>(downloadCsv, {
     onSuccess: (data, variables) => {
       const { from, to, name } = variables;
-      let fileName = '';
-      if (name) {
-        if (from && to) {
-          const fromDate = dateTimeFormatterFromJSDDate({
-            dateTime: from,
-            format: 'yyyy-LL-dd',
-          });
-          const toDate = dateTimeFormatterFromJSDDate({
-            dateTime: to,
-            format: 'yyyy-LL-dd',
-          });
-          fileName = `${fromDate} ~ ${toDate} イベント`;
-        }
-        if (!fileName) {
-          fileName = `イベント`;
-        }
+      let fileName = name || '';
+      if (from && to) {
+        const fromDate = dateTimeFormatterFromJSDDate({
+          dateTime: from,
+          format: 'yyyy-LL-dd',
+        });
+        const toDate = dateTimeFormatterFromJSDDate({
+          dateTime: to,
+          format: 'yyyy-LL-dd',
+        });
+        fileName = `${fromDate}~${toDate} イベント`;
+      }
+      if (!fileName) {
+        fileName = `イベント`;
       }
       const bom = new Uint8Array([0xef, 0xbb, 0xbf]);
       const downloadLink = document.createElement('a');
-      downloadLink.download = (name || fileName) + '.csv';
+      downloadLink.download = fileName + '.csv';
       downloadLink.href = URL.createObjectURL(
         new Blob([bom, data], { type: 'text/csv' }),
       );
