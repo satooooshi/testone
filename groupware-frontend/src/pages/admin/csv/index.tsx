@@ -15,6 +15,7 @@ import { DatePicker } from 'react-rainbow-components';
 import { Tab } from 'src/types/header/tab/types';
 import exportCsvStyles from '@/styles/layouts/admin/ExportCsv.module.scss';
 import clsx from 'clsx';
+import { useHeaderTab } from '@/hooks/headerTab/useHeaderTab';
 
 const ExportCsv = () => {
   const [eventDuration, setEventDuration] =
@@ -23,23 +24,7 @@ const ExportCsv = () => {
     useState<Partial<QueryToGetUserCsv>>();
   const { mutate: downloadEvent } = useAPIDownloadEventCsv();
   const { mutate: downloadUser } = useAPIDownloadUserCsv();
-  const tabs: Tab[] = [
-    {
-      type: 'link',
-      name: 'ユーザー管理',
-      href: '/admin/users',
-    },
-    {
-      type: 'link',
-      name: 'ユーザー作成',
-      href: '/admin/users/new',
-    },
-    {
-      type: 'link',
-      name: 'CSV出力',
-      href: '/admin/csv',
-    },
-  ];
+  const tabs: Tab[] = useHeaderTab({ headerTabType: 'admin' });
 
   return (
     <LayoutWithTab
