@@ -22,6 +22,7 @@ import ReactPaginate from 'react-paginate';
 import { searchUserQueryParamFactory } from 'src/utils/userQueryRefresh';
 import { useAPIGetUserTag } from '@/hooks/api/tag/useAPIGetUserTag';
 import { useHeaderTab } from '@/hooks/headerTab/useHeaderTab';
+import Link from 'next/link';
 
 const UserAdmin: React.FC = () => {
   const router = useRouter();
@@ -103,69 +104,77 @@ const UserAdmin: React.FC = () => {
       </div>
       <div className={userAdminStyles.table_wrapper}>
         <table className={userAdminStyles.table}>
-          <tr className={userAdminStyles.table_head_wrapper}>
-            <th className={userAdminStyles.table_head} />
-            <th className={userAdminStyles.table_head}>姓</th>
-            <th className={userAdminStyles.table_head}>名前</th>
-            <th className={userAdminStyles.table_head}>メールアドレス</th>
-            <th className={userAdminStyles.table_head}>社員区分</th>
-            <th className={userAdminStyles.table_head}>認証</th>
-            <th className={userAdminStyles.table_head} />
-          </tr>
-          {users?.users?.map((u) => (
-            <tr key={u.id} className={userAdminStyles.user_row_wrapper}>
-              <td className={userAdminStyles.avatar_wrapper}>
-                <Avatar size="md" src={u.avatarUrl} />
-              </td>
-              <td className={userAdminStyles.user_info_text}>{u.lastName}</td>
-              <td className={userAdminStyles.user_info_text}>{u.firstName}</td>
-              <td className={userAdminStyles.user_info_text}>{u.email}</td>
-              <td className={userAdminStyles.user_info_text}>
-                <Select
-                  name="roles"
-                  colorScheme="teal"
-                  bg="white"
-                  width="80%"
-                  className={userAdminStyles.roles}
-                  onChange={(e) =>
-                    updateUser({ ...u, role: e.target.value as UserRole })
-                  }
-                  defaultValue={u.role}>
-                  <option value={UserRole.ADMIN}>管理者</option>
-                  <option value={UserRole.INSTRUCTOR}>講師</option>
-                  <option value={UserRole.HEAD_OFFICE}>本社勤務</option>
-                  <option value={UserRole.COMMON}>一般社員</option>
-                </Select>
-              </td>
-              <td className={userAdminStyles.verified_button_wrapper}>
-                {u.verifiedAt ? (
-                  <Button
-                    colorScheme="green"
-                    height="32px"
-                    onClick={() =>
-                      updateUser({ ...u, verifiedAt: new Date() })
-                    }>
-                    認証済み
-                  </Button>
-                ) : (
-                  <Button
-                    colorScheme="green"
-                    height="32px"
-                    onClick={() =>
-                      updateUser({ ...u, verifiedAt: new Date() })
-                    }>
-                    承認する
-                  </Button>
-                )}
-              </td>
-              <td className={userAdminStyles.delete_icon_wrapper}>
-                <MdDelete
-                  onClick={() => onDeleteClicked(u)}
-                  className={userAdminStyles.delete_icon}
-                />
-              </td>
+          <tbody>
+            <tr className={userAdminStyles.table_head_wrapper}>
+              <th className={userAdminStyles.table_head} />
+              <th className={userAdminStyles.table_head}>姓</th>
+              <th className={userAdminStyles.table_head}>名前</th>
+              <th className={userAdminStyles.table_head}>メールアドレス</th>
+              <th className={userAdminStyles.table_head}>社員区分</th>
+              <th className={userAdminStyles.table_head}>認証</th>
+              <th className={userAdminStyles.table_head} />
             </tr>
-          ))}
+            {users?.users?.map((u) => (
+              <tr key={u.id} className={userAdminStyles.user_row_wrapper}>
+                <td className={userAdminStyles.avatar_wrapper}>
+                  <Link href={`/account/${u?.id}`} passHref>
+                    <a>
+                      <Avatar size="md" src={u.avatarUrl} />
+                    </a>
+                  </Link>
+                </td>
+                <td className={userAdminStyles.user_info_text}>{u.lastName}</td>
+                <td className={userAdminStyles.user_info_text}>
+                  {u.firstName}
+                </td>
+                <td className={userAdminStyles.user_info_text}>{u.email}</td>
+                <td className={userAdminStyles.user_info_text}>
+                  <Select
+                    name="roles"
+                    colorScheme="teal"
+                    bg="white"
+                    width="80%"
+                    className={userAdminStyles.roles}
+                    onChange={(e) =>
+                      updateUser({ ...u, role: e.target.value as UserRole })
+                    }
+                    defaultValue={u.role}>
+                    <option value={UserRole.ADMIN}>管理者</option>
+                    <option value={UserRole.INSTRUCTOR}>講師</option>
+                    <option value={UserRole.HEAD_OFFICE}>本社勤務</option>
+                    <option value={UserRole.COMMON}>一般社員</option>
+                  </Select>
+                </td>
+                <td className={userAdminStyles.verified_button_wrapper}>
+                  {u.verifiedAt ? (
+                    <Button
+                      colorScheme="green"
+                      height="32px"
+                      onClick={() =>
+                        updateUser({ ...u, verifiedAt: new Date() })
+                      }>
+                      認証済み
+                    </Button>
+                  ) : (
+                    <Button
+                      colorScheme="green"
+                      height="32px"
+                      onClick={() =>
+                        updateUser({ ...u, verifiedAt: new Date() })
+                      }>
+                      承認する
+                    </Button>
+                  )}
+                </td>
+                <td className={userAdminStyles.delete_icon_wrapper}>
+                  <MdDelete
+                    onClick={() => onDeleteClicked(u)}
+                    className={userAdminStyles.delete_icon}
+                  />
+                </td>
+              </tr>
+            ))}
+          </tbody>
         </table>
       </div>
       {users && users.pageCount ? (

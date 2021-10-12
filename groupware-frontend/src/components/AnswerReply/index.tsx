@@ -6,6 +6,7 @@ import answerReplyStyles from '@/styles/components/AnswerReply.module.scss';
 import { dateTimeFormatterFromJSDDate } from 'src/utils/dateTimeFormatter';
 import { Avatar } from '@chakra-ui/react';
 import WikiComment from '../WikiComment';
+import Link from 'next/link';
 
 type AnswerReplyProps = {
   reply: QAAnswerReply;
@@ -16,10 +17,17 @@ const AnswerReply: React.FC<AnswerReplyProps> = ({ reply }) => {
     <div className={answerReplyStyles.reply}>
       <div className={answerReplyStyles.uploader__info}>
         <div className={answerReplyStyles.user_info_wrapper}>
-          <Avatar
-            className={answerReplyStyles.user_avatar}
-            src={reply.writer?.avatarUrl}
-          />
+          <Link
+            key={reply.writer?.id}
+            href={`/account/${reply.writer?.id}`}
+            passHref>
+            <a>
+              <Avatar
+                className={answerReplyStyles.user_avatar}
+                src={reply.writer?.avatarUrl}
+              />
+            </a>
+          </Link>
           <p className={answerReplyStyles.user_name}>
             {reply.writer?.lastName + ' ' + reply.writer?.firstName}
           </p>
