@@ -192,7 +192,6 @@ const WikiForm: React.FC<WikiFormProps> = ({
               onChange={(e) =>
                 setNewQuestion((q) => ({ ...q, title: e.target.value }))
               }
-              className={qaCreateStyles.title_input}
             />
           </FormControl>
           {!wiki && (
