@@ -32,6 +32,14 @@ import { useAPIUploadStorage } from '@/hooks/api/storage/useAPIUploadStorage';
 import { useAPISaveSubmission } from '@/hooks/api/event/useAPISaveSubmission';
 import clsx from 'clsx';
 import { useAPIDonwloadSubmissionZip } from '@/hooks/api/event/useAPIDonwloadSubmissionZip';
+import { FcSportsMode } from 'react-icons/fc';
+import { GiTeacher } from 'react-icons/gi';
+import { MdAssignment } from 'react-icons/md';
+import boldayImage1 from '@/public/bolday_1.jpg';
+import impressiveUnivertyImage from '@/public/impressive_university_1.png';
+import studyMeeting1Image from '@/public/study_meeting_1.jpg';
+import portalLinkBoxStyles from '@/styles/components/PortalLinkBox.module.scss';
+import eventCardStyles from '@/styles/components/EventCard.module.scss';
 
 type FileIconProps = {
   href?: string;
@@ -64,15 +72,52 @@ const EventDetail = () => {
   const [commentVisible, setCommentVisible] = useState(false);
   const [newComment, setNewComment] = useState<string>('');
   const { user } = useAuthenticate();
-  const { data, refetch } = useAPIGetEventDetail(
-    typeof id === 'string' ? id : '0',
-  );
+  const { data, refetch } = useAPIGetEventDetail(id);
   const submissionRef = useRef<HTMLInputElement | null>(null);
-  const downloadSubmissionRef = useRef<HTMLInputElement | null>(null);
   const toast = useToast();
   const [submitFiles, setSubmitFiles] = useState<
     Partial<SubmissionFile & { submitUnFinished: boolean }>[]
   >([]);
+  const imageSource = useMemo(() => {
+    switch (data?.type) {
+      case EventType.STUDY_MEETING:
+        return <Image src={studyMeeting1Image} alt="イベント画像" />;
+      case EventType.BOLDAY:
+        return <Image src={boldayImage1} alt="イベント画像" />;
+      case EventType.CLUB:
+        return (
+          <FcSportsMode
+            className={clsx(
+              eventCardStyles.icon,
+              portalLinkBoxStyles.club_icon,
+            )}
+          />
+        );
+      case EventType.IMPRESSIVE_UNIVERSITY:
+        return <Image src={impressiveUnivertyImage} alt="イベント画像" />;
+      case EventType.COACH:
+        return (
+          <GiTeacher
+            className={clsx(
+              eventCardStyles.icon,
+              portalLinkBoxStyles.coach_icon,
+            )}
+          />
+        );
+      case EventType.SUBMISSION_ETC:
+        return (
+          <MdAssignment
+            className={clsx(
+              eventCardStyles.icon,
+              portalLinkBoxStyles.submission_etc_icon,
+            )}
+          />
+        );
+
+      default:
+        return <Image src={noImage} alt="イベント画像" />;
+    }
+  }, [data?.type]);
 
   const { mutate: saveSubmission } = useAPISaveSubmission({
     onSuccess: () => {
@@ -173,7 +218,7 @@ const EventDetail = () => {
                 {data.imageURL ? (
                   <img src={data.imageURL} alt="イベント画像" />
                 ) : (
-                  <Image src={noImage} alt="イベント画像" />
+                  imageSource
                 )}
               </div>
               <div className={eventDetailStyles.event_info_right}>

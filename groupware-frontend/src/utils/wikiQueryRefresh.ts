@@ -9,7 +9,12 @@ export const wikiQueryRefresh = (
     word: newWord = query.word || '',
     status: newStatus = query.status || 'new',
     type: newType = query.type || '',
+    rule_category: newRuleCategory = query.rule_category || '',
   } = query;
+  let searchQuery = `page=${newPage}&tag=${newTag}&word=${newWord}&status=${newStatus}&type=${newType}`;
+  if (newRuleCategory) {
+    searchQuery += `&rule_category=${newRuleCategory}`;
+  }
 
-  return `page=${newPage}&tag=${newTag}&word=${newWord}&status=${newStatus}&type=${newType}`;
+  return searchQuery;
 };

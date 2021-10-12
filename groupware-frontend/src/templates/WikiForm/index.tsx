@@ -6,7 +6,14 @@ import { ScreenName } from '@/components/Sidebar';
 import LayoutWithTab from '@/components/LayoutWithTab';
 import TagModal from '@/components/TagModal';
 import WrappedDraftEditor from '@/components/WrappedDraftEditor';
-import { Wiki, Tag, TextFormat, UserRole, WikiType } from 'src/types';
+import {
+  Wiki,
+  Tag,
+  TextFormat,
+  UserRole,
+  WikiType,
+  RuleCategory,
+} from 'src/types';
 import { Tab, TabName } from 'src/types/header/tab/types';
 import {
   Button,
@@ -137,17 +144,19 @@ const WikiForm: React.FC<WikiFormProps> = ({
 
   useEffect(() => {
     if (wiki) {
-      setNewQuestion({ ...wiki, textFormat: 'html' });
-      setEditorState((e) =>
-        EditorState.push(
-          e,
-          ContentState.createFromBlockArray(
-            convertFromHTML(wiki.body).contentBlocks,
-            convertFromHTML(wiki.body).entityMap,
+      setNewQuestion(wiki);
+      if (wiki.textFormat === 'html') {
+        setEditorState((e) =>
+          EditorState.push(
+            e,
+            ContentState.createFromBlockArray(
+              convertFromHTML(wiki.body).contentBlocks,
+              convertFromHTML(wiki.body).entityMap,
+            ),
+            'apply-entity',
           ),
-          'apply-entity',
-        ),
-      );
+        );
+      }
     }
   }, [wiki]);
 
@@ -190,7 +199,6 @@ const WikiForm: React.FC<WikiFormProps> = ({
               onChange={(e) =>
                 setNewQuestion((q) => ({ ...q, title: e.target.value }))
               }
-              className={qaCreateStyles.title_input}
             />
           </FormControl>
           {!wiki && (
@@ -202,14 +210,28 @@ const WikiForm: React.FC<WikiFormProps> = ({
                 colorScheme="teal"
                 bg="white"
                 defaultValue={type ? type : WikiType.QA}
-                onChange={(e) =>
+                onChange={(e) => {
+                  if (e.target.value === (WikiType.KNOWLEDGE || WikiType.QA)) {
+                    setNewQuestion((prev) => ({
+                      ...prev,
+                      type: e.target.value as WikiType,
+                    }));
+                    return;
+                  }
                   setNewQuestion((prev) => ({
                     ...prev,
-                    type: e.target.value as WikiType,
-                  }))
-                }>
+                    type: WikiType.RULES,
+                    ruleCategory: e.target.value as RuleCategory,
+                  }));
+                }}>
                 {user?.role === UserRole.ADMIN && (
-                  <option value={WikiType.RULES}>社内規則</option>
+                  <>
+                    <option value={RuleCategory.PHILOSOPHY}>会社理念</option>
+                    <option value={RuleCategory.RULES}>社内規則</option>
+                    <option value={RuleCategory.ABC}>ABC制度</option>
+                    <option value={RuleCategory.BENEFITS}>福利厚生等</option>
+                    <option value={RuleCategory.DOCUMENT}>各種申請書</option>
+                  </>
                 )}
                 <option value={WikiType.KNOWLEDGE}>ナレッジ</option>
                 <option value={WikiType.QA}>質問</option>

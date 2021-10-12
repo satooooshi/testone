@@ -11,7 +11,7 @@ import {
 } from '@nestjs/common';
 import { QAAnswer } from 'src/entities/qaAnswer.entity';
 import { QAAnswerReply } from 'src/entities/qaAnswerReply.entity';
-import { Wiki, WikiType } from 'src/entities/wiki.entity';
+import { RuleCategory, Wiki, WikiType } from 'src/entities/wiki.entity';
 import JwtAuthenticationGuard from '../auth/jwtAuthentication.guard';
 import RequestWithUser from '../auth/requestWithUser.interface';
 import { WikiService } from './wiki.service';
@@ -24,6 +24,7 @@ export interface SearchQueryToGetWiki {
   status?: 'new' | 'resolved';
   writer?: string;
   answer_writer?: string;
+  rule_category?: RuleCategory;
 }
 
 export interface SearchResultToGetWiki {

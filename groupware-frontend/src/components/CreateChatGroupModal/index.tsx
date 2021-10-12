@@ -79,6 +79,10 @@ const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
       }
       const result = await dataURLToFile(img, selectImageName);
       uploadImage([result]);
+      return;
+    }
+    if (newGroup.members?.length) {
+      createGroup(newGroup);
     }
   };
 

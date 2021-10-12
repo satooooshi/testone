@@ -160,6 +160,7 @@ const ChatDetail = () => {
       { refetchInterval: 1000 },
     );
   const editorRef = useRef<Editor>(null);
+  const messageWrapperDivRef = useRef<HTMLDivElement | null>(null);
   const { mutate: createGroup } = useAPISaveChatGroup({
     onSuccess: () => {
       dispatchChat({ type: 'createGroupWindow', value: false });
@@ -195,6 +196,8 @@ const ChatDetail = () => {
         type: 'editorState',
         value: EditorState.createEmpty(),
       });
+      messageWrapperDivRef.current &&
+        messageWrapperDivRef.current.scrollIntoView();
     },
   });
 
@@ -230,6 +233,8 @@ const ChatDetail = () => {
           ? ChatMessageType.VIDEO
           : ChatMessageType.OTHER_FILE,
       });
+      messageWrapperDivRef.current &&
+        messageWrapperDivRef.current.scrollIntoView();
     },
   });
 
@@ -549,7 +554,9 @@ const ChatDetail = () => {
                             />
                           </Link>
                         ) : null}
-                        <div className={chatStyles.message_wrapper}>
+                        <div
+                          className={chatStyles.message_wrapper}
+                          ref={messageWrapperDivRef}>
                           {m.isSender && (
                             <div>
                               {messageReadCount(m) ? (

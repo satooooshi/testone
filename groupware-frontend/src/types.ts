@@ -35,6 +35,20 @@ export enum WikiType {
   QA = 'qa',
 }
 
+export enum RuleCategory {
+  //会社理念
+  PHILOSOPHY = 'philosophy',
+  //社内規則
+  RULES = 'rules',
+  //ABC制度
+  ABC = 'abc',
+  //福利厚生等
+  BENEFITS = 'benefits',
+  //各種申請書
+  DOCUMENT = 'document',
+  OTHERS = '',
+}
+
 export type TextFormat = 'markdown' | 'html';
 
 export interface User {
@@ -92,6 +106,7 @@ export interface Wiki {
   title: string;
   body: string;
   type: WikiType;
+  ruleCategory: RuleCategory;
   textFormat: TextFormat;
   resolvedAt: Date;
   writer?: User;
