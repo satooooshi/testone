@@ -21,10 +21,12 @@ const AnswerReply: React.FC<AnswerReplyProps> = ({ reply }) => {
             key={reply.writer?.id}
             href={`/account/${reply.writer?.id}`}
             passHref>
-            <Avatar
-              className={answerReplyStyles.user_avatar}
-              src={reply.writer?.avatarUrl}
-            />
+            <a>
+              <Avatar
+                className={answerReplyStyles.user_avatar}
+                src={reply.writer?.avatarUrl}
+              />
+            </a>
           </Link>
           <p className={answerReplyStyles.user_name}>
             {reply.writer?.lastName + ' ' + reply.writer?.firstName}
