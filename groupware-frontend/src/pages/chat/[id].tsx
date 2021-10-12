@@ -2,26 +2,14 @@ import { ScreenName } from '@/components/Sidebar';
 import chatStyles from '@/styles/layouts/Chat.module.scss';
 import { IoSend } from 'react-icons/io5';
 import clsx from 'clsx';
-import {
-  useCallback,
-  useEffect,
-  useMemo,
-  useReducer,
-  useRef,
-  useState,
-} from 'react';
+import { useCallback, useEffect, useMemo, useReducer, useRef } from 'react';
 import { useAPIGetUsers } from '@/hooks/api/user/useAPIGetUsers';
 import 'rc-checkbox/assets/index.css';
-import {
-  ChatGroup,
-  ChatMessage,
-  ChatMessageType,
-  LastReadChatTime,
-  User,
-} from 'src/types';
+import { ChatGroup, ChatMessage, ChatMessageType, User } from 'src/types';
 import { useAPIGetChatGroupList } from '@/hooks/api/chat/useAPIGetChatGroupList';
 import { useAPIGetMessages } from '@/hooks/api/chat/useAPIGetMessages';
 import { useAPISendChatMessage } from '@/hooks/api/chat/useAPISendChatMessage';
+import { useChatReducer } from '@/hooks/chat/useChatReducer';
 import { mentionTransform } from 'src/utils/mentionTransform';
 import CreateChatGroupModal from '@/components/CreateChatGroupModal';
 import { Avatar, useMediaQuery } from '@chakra-ui/react';
@@ -122,7 +110,6 @@ const mentionReducer = (
 const ChatDetail = () => {
   const router = useRouter();
   const { id } = router.query as { id: string };
-  const [page, setPage] = useState(1);
   const [{ popup, suggestions, mentionedUserData }, dispatchMention] =
     useReducer(mentionReducer, {
       popup: false,
@@ -130,20 +117,24 @@ const ChatDetail = () => {
       allMentionUserData: [],
       mentionedUserData: [],
     });
-  const [editChatGroupModalVisible, setEditChatGroupModalVisible] =
-    useState(false);
+  const [
+    {
+      page,
+      editChatGroupModalVisible,
+      messages,
+      lastReadChatTime,
+      newChatMessage,
+      createGroupWindow,
+      selectChatGroupWindow,
+      editMembersModalVisible,
+      newGroup,
+      editorState,
+    },
+    dispatchChat,
+  ] = useChatReducer();
   const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const { data: chatGroups, refetch } = useAPIGetChatGroupList();
   const { data: users } = useAPIGetUsers();
-  const [lastReadChatTime, setLastReadChatTime] = useState<LastReadChatTime[]>(
-    [],
-  );
-
-  const [newChatMessage, setNewChatMessage] = useState<Partial<ChatMessage>>({
-    content: '',
-    type: ChatMessageType.TEXT,
-  });
   const { data: lastestLastReadChatTime } = useAPIGetLastReadChatTime(
     newChatMessage.chatGroup ? newChatMessage.chatGroup.id : 0,
     { refetchInterval: 1000 },
@@ -160,45 +151,42 @@ const ChatDetail = () => {
       },
       { refetchInterval: 1000 },
     );
-  const [createGroupWindow, setCreateGroupWindow] = useState(false);
-  const [selectChatGroupWindow, setSelectChatGroupWindow] = useState(false);
-  const [editMembersModalVisible, setEditMembersModalVisible] = useState(false);
-  const [newGroup, setNewGroup] = useState<Partial<ChatGroup>>({
-    name: '',
-    members: [],
-  });
   const editorRef = useRef<Editor>(null);
-  const [editorState, setEditorState] = useState(() =>
-    EditorState.createEmpty(),
-  );
   const { mutate: createGroup } = useAPISaveChatGroup({
     onSuccess: () => {
-      setCreateGroupWindow(false);
-      setNewGroup({ name: '', members: [] });
+      dispatchChat({ type: 'createGroupWindow', value: false });
+      dispatchChat({ type: 'newGroup', value: { ...newGroup, members: [] } });
       refetch();
     },
   });
 
   const { mutate: saveGroup } = useAPISaveChatGroup({
     onSuccess: (newInfo) => {
-      setEditChatGroupModalVisible(false);
-      setNewChatMessage((m) => ({ ...m, chatGroup: newInfo }));
+      dispatchChat({ type: 'editChatGroupModalVisible', value: false });
+      dispatchChat({
+        type: 'newChatMessage',
+        value: { ...newChatMessage, chatGroup: newInfo },
+      });
       refetch();
     },
   });
 
   const { mutate: sendChatMessage } = useAPISendChatMessage({
     onSuccess: (data) => {
-      setNewChatMessage((m) => ({ ...m, content: '' }));
+      dispatchChat({
+        type: 'newChatMessage',
+        value: { ...newChatMessage, content: '' },
+      });
       if (!isLoadingLatestMsg) {
-        setMessages((m) => {
-          if (m.length && m[m.length - 1].id !== data.id) {
-            m.unshift(data);
-          }
-          return m;
-        });
+        if (messages.length && messages[messages.length - 1].id !== data.id) {
+          messages.unshift(data);
+        }
+        dispatchChat({ type: 'messages', value: messages });
       }
-      setEditorState(() => EditorState.createEmpty());
+      dispatchChat({
+        type: 'editorState',
+        value: EditorState.createEmpty(),
+      });
     },
   });
 
@@ -240,24 +228,24 @@ const ChatDetail = () => {
   useEffect(() => {
     if (id) {
       const isExist = chatGroups?.filter((g) => g.id.toString() === id);
-      setNewChatMessage((m) => {
-        if (isExist?.length) {
-          return { ...m, chatGroup: isExist[0] };
-        }
-        return m;
-      });
-
       if (isExist?.length) {
+        dispatchChat({
+          type: 'newChatMessage',
+          value: { ...newChatMessage, chatGroup: isExist[0] },
+        });
         saveLastReadChatTime(isExist[0].id);
       }
     }
-  }, [chatGroups, id, saveLastReadChatTime]);
+  }, [chatGroups, dispatchChat, id, newChatMessage, saveLastReadChatTime]);
 
   useEffect(() => {
     if (lastestLastReadChatTime) {
-      setLastReadChatTime(lastestLastReadChatTime);
+      dispatchChat({
+        type: 'lastReadChatTime',
+        value: lastestLastReadChatTime,
+      });
     }
-  }, [id, lastestLastReadChatTime]);
+  }, [dispatchChat, id, lastestLastReadChatTime]);
 
   useEffect(() => {
     if (
@@ -282,49 +270,50 @@ const ChatDetail = () => {
   //append new message to array
   useEffect(() => {
     if (latestMessage && latestMessage.length) {
-      setMessages((m) => {
-        if (m.length && m[0].id && latestMessage[0].id) {
-          const ascSorted = latestMessage.concat().reverse();
-          for (const newMessage of ascSorted) {
-            if (
-              new Date(m[0].createdAt) < new Date(newMessage.createdAt) &&
-              m[0].id !== Number(newMessage.id)
-            ) {
-              m.unshift(newMessage);
-            }
+      if (messages.length && messages[0].id && latestMessage[0].id) {
+        const ascSorted = latestMessage.concat().reverse();
+        for (const newMessage of ascSorted) {
+          if (
+            new Date(messages[0].createdAt) < new Date(newMessage.createdAt) &&
+            messages[0].id !== Number(newMessage.id)
+          ) {
+            messages.unshift(newMessage);
           }
-          return m;
         }
-        return latestMessage;
-      });
+        dispatchChat({ type: 'messages', value: messages });
+        return;
+      }
+      dispatchChat({ type: 'messages', value: latestMessage });
     }
-  }, [latestMessage]);
+  }, [dispatchChat, latestMessage, messages]);
 
   useEffect(() => {
     if (fetchedMessage) {
-      setMessages((m) => {
-        if (m.length) {
-          for (const oldMessage of fetchedMessage) {
-            if (
-              new Date(m[m.length - 1].createdAt) >
-              new Date(oldMessage.createdAt)
-            ) {
-              m.push(oldMessage);
-            }
+      if (messages.length) {
+        for (const oldMessage of fetchedMessage) {
+          if (
+            new Date(messages[messages.length - 1].createdAt) >
+            new Date(oldMessage.createdAt)
+          ) {
+            messages.push(oldMessage);
           }
-          return m;
         }
-        return fetchedMessage;
-      });
+        dispatchChat({ type: 'messages', value: messages });
+        return;
+      }
+      dispatchChat({ type: 'messages', value: fetchedMessage });
     }
-  }, [fetchedMessage]);
+  }, [dispatchChat, fetchedMessage, messages]);
 
   const onChange = (newState: EditorState) => {
-    setEditorState(newState);
+    dispatchChat({ type: 'editorState', value: newState });
     const content = newState.getCurrentContent();
     const rawObject = convertToRaw(content);
     const markdownString = draftToMarkdown(rawObject);
-    setNewChatMessage((m) => ({ ...m, content: markdownString }));
+    dispatchChat({
+      type: 'newChatMessage',
+      value: { ...newChatMessage, content: markdownString },
+    });
   };
 
   const onOpenChange = useCallback((_open: boolean) => {
@@ -346,16 +335,22 @@ const ChatDetail = () => {
   const toggleUserIDs = (user: User) => {
     const isExist = newGroup.members?.filter((u) => u.id === user.id);
     if (isExist && isExist.length) {
-      setNewGroup((g) => ({
-        ...g,
-        members: g.members?.filter((u) => u.id !== user.id),
-      }));
+      dispatchChat({
+        type: 'newGroup',
+        value: {
+          ...newGroup,
+          members: newGroup.members?.filter((u) => u.id !== user.id),
+        },
+      });
       return;
     }
-    setNewGroup((g) => ({
-      ...g,
-      members: g.members ? [...g.members, user] : [user],
-    }));
+    dispatchChat({
+      type: 'newGroup',
+      value: {
+        ...newGroup,
+        members: newGroup.members ? [...newGroup.members, user] : [user],
+      },
+    });
   };
 
   const nameOfEmptyNameGroup = (members?: User[]): string => {
@@ -370,11 +365,11 @@ const ChatDetail = () => {
   };
 
   const toggleChatGroups = (selectGroup: ChatGroup) => {
-    setNewChatMessage({
-      ...newChatMessage,
-      chatGroup: selectGroup,
+    dispatchChat({
+      type: 'newChatMessage',
+      value: { ...newChatMessage, chatGroup: selectGroup },
     });
-    setSelectChatGroupWindow(false);
+    dispatchChat({ type: 'selectChatGroupWindow', value: false });
   };
 
   const onSend = () => {
@@ -407,7 +402,7 @@ const ChatDetail = () => {
       (e.target.scrollHeight * 2) / 3
     ) {
       if (fetchedMessage?.length) {
-        setPage((p) => p + 1);
+        dispatchChat({ type: 'page', value: page + 1 });
       }
     }
   };
@@ -415,11 +410,11 @@ const ChatDetail = () => {
   const handleMenuSelected = (e: any) => {
     const value = e.value as MenuValue;
     if (value === 'editMembers') {
-      setEditMembersModalVisible(true);
+      dispatchChat({ type: 'editMembersModalVisible', value: true });
       return;
     }
     if (value === 'editGroup') {
-      setEditChatGroupModalVisible(true);
+      dispatchChat({ type: 'editChatGroupModalVisible', value: true });
       return;
     }
   };
@@ -431,7 +426,8 @@ const ChatDetail = () => {
         title: 'Chat',
         tabs: tabs,
         rightButtonName: 'ルームを作成',
-        onClickRightButton: () => setCreateGroupWindow(true),
+        onClickRightButton: () =>
+          dispatchChat({ type: 'createGroupWindow', value: true }),
       }}>
       <Head>
         <title>ボールド | Chat</title>
@@ -440,12 +436,15 @@ const ChatDetail = () => {
         <CreateChatGroupModal
           isOpen={createGroupWindow}
           closeModal={() => {
-            setCreateGroupWindow(false);
-            setNewGroup({});
+            dispatchChat({ type: 'createGroupWindow', value: false });
+            dispatchChat({ type: 'newGroup', value: {} });
           }}
           newGroup={newGroup}
           onChangeNewGroupName={(groupName) =>
-            setNewGroup((g) => ({ ...g, name: groupName }))
+            dispatchChat({
+              type: 'newGroup',
+              value: { ...newGroup, name: groupName },
+            })
           }
           toggleNewGroupMember={toggleUserIDs}
           users={users}
@@ -456,7 +455,9 @@ const ChatDetail = () => {
         <SelectChatGroupModal
           isOpen={selectChatGroupWindow}
           chatGroups={chatGroups}
-          onClose={() => setSelectChatGroupWindow(false)}
+          onClose={() =>
+            dispatchChat({ type: 'selectChatGroupWindow', value: false })
+          }
           selectedChatGroups={newChatMessage}
           toggleChatGroups={(group) => toggleChatGroups(group)}
         />
@@ -469,11 +470,11 @@ const ChatDetail = () => {
                 chatGroups.map((g) => (
                   <a
                     onClick={() => {
-                      setMessages([]);
+                      dispatchChat({ type: 'messages', value: [] });
                       router.push(`/chat/${g.id.toString()}`, undefined, {
                         shallow: true,
                       });
-                      setPage(1);
+                      dispatchChat({ type: 'page', value: 1 });
                     }}
                     key={g.id}
                     style={{ marginBottom: 8 }}>
@@ -536,19 +537,32 @@ const ChatDetail = () => {
                       isOpen={editChatGroupModalVisible}
                       chatGroup={newChatMessage.chatGroup}
                       saveGroup={saveGroup}
-                      closeModal={() => setEditChatGroupModalVisible(false)}
+                      closeModal={() =>
+                        dispatchChat({
+                          type: 'editChatGroupModalVisible',
+                          value: false,
+                        })
+                      }
                     />
                     <EditChatGroupMembersModal
                       isOpen={editMembersModalVisible}
                       users={users || []}
                       previousUsers={newChatMessage.chatGroup.members || []}
-                      onCancel={() => setEditMembersModalVisible(false)}
+                      onCancel={() =>
+                        dispatchChat({
+                          type: 'editMembersModalVisible',
+                          value: false,
+                        })
+                      }
                       onComplete={(newMembers) => {
                         saveGroup({
                           ...newChatMessage.chatGroup,
                           members: newMembers,
                         });
-                        setEditMembersModalVisible(false);
+                        dispatchChat({
+                          type: 'editMembersModalVisible',
+                          value: false,
+                        });
                       }}
                     />
                     {messages.map((m) => (
