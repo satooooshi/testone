@@ -1,5 +1,5 @@
 import { useQuery } from 'react-query';
-import { Wiki, WikiType } from 'src/types';
+import { RuleCategory, Wiki, WikiType } from 'src/types';
 import { wikiQueryRefresh } from 'src/utils/wikiQueryRefresh';
 import { axiosInstance } from 'src/utils/url';
 import { getWikiListURL } from 'src/utils/url/wiki.url';
@@ -12,6 +12,7 @@ export interface SearchQueryToGetWiki {
   status?: 'new' | 'resolved';
   writer?: string;
   answer_writer?: string;
+  rule_category?: RuleCategory;
 }
 
 export interface SearchResultToGetWiki {
