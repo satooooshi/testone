@@ -236,16 +236,14 @@ const ChatDetail = () => {
         saveLastReadChatTime(isExist[0].id);
       }
     }
-  }, [chatGroups, dispatchChat, id, newChatMessage, saveLastReadChatTime]);
+  }, [id]);
 
   useEffect(() => {
-    if (lastestLastReadChatTime) {
-      dispatchChat({
-        type: 'lastReadChatTime',
-        value: lastestLastReadChatTime,
-      });
-    }
-  }, [dispatchChat, id, lastestLastReadChatTime]);
+    dispatchChat({
+      type: 'lastReadChatTime',
+      value: lastestLastReadChatTime,
+    });
+  }, [lastestLastReadChatTime]);
 
   useEffect(() => {
     if (
@@ -269,41 +267,12 @@ const ChatDetail = () => {
 
   //append new message to array
   useEffect(() => {
-    if (latestMessage && latestMessage.length) {
-      if (messages.length && messages[0].id && latestMessage[0].id) {
-        const ascSorted = latestMessage.concat().reverse();
-        for (const newMessage of ascSorted) {
-          if (
-            new Date(messages[0].createdAt) < new Date(newMessage.createdAt) &&
-            messages[0].id !== Number(newMessage.id)
-          ) {
-            messages.unshift(newMessage);
-          }
-        }
-        dispatchChat({ type: 'messages', value: messages });
-        return;
-      }
-      dispatchChat({ type: 'messages', value: latestMessage });
-    }
-  }, [dispatchChat, latestMessage, messages]);
+    dispatchChat({ type: 'latestMessages', value: latestMessage });
+  }, [latestMessage]);
 
   useEffect(() => {
-    if (fetchedMessage) {
-      if (messages.length) {
-        for (const oldMessage of fetchedMessage) {
-          if (
-            new Date(messages[messages.length - 1].createdAt) >
-            new Date(oldMessage.createdAt)
-          ) {
-            messages.push(oldMessage);
-          }
-        }
-        dispatchChat({ type: 'messages', value: messages });
-        return;
-      }
-      dispatchChat({ type: 'messages', value: fetchedMessage });
-    }
-  }, [dispatchChat, fetchedMessage, messages]);
+    dispatchChat({ type: 'fetchedMessages', value: fetchedMessage });
+  }, [fetchedMessage]);
 
   const onChange = (newState: EditorState) => {
     dispatchChat({ type: 'editorState', value: newState });

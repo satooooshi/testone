@@ -34,10 +34,6 @@ type ChatAction =
       value: ChatMessage[];
     }
   | {
-      type: 'lastReadChatTime';
-      value: LastReadChatTime[];
-    }
-  | {
       type: 'newChatMessage';
       value: Partial<ChatMessage>;
     }
@@ -60,6 +56,18 @@ type ChatAction =
   | {
       type: 'editorState';
       value: EditorState;
+    }
+  | {
+      type: 'lastReadChatTime';
+      value?: LastReadChatTime[];
+    }
+  | {
+      type: 'latestMessages';
+      value?: ChatMessage[];
+    }
+  | {
+      type: 'fetchedMessages';
+      value?: ChatMessage[];
     };
 
 const chatInitialValue: ChatState = {
@@ -101,12 +109,6 @@ const chatReducer = (state: ChatState, action: ChatAction): ChatState => {
         messages: action.value,
       };
     }
-    case 'lastReadChatTime': {
-      return {
-        ...state,
-        lastReadChatTime: action.value,
-      };
-    }
     case 'newChatMessage': {
       return {
         ...state,
@@ -142,6 +144,54 @@ const chatReducer = (state: ChatState, action: ChatAction): ChatState => {
         ...state,
         editorState: action.value,
       };
+    }
+    case 'lastReadChatTime': {
+      return action.value
+        ? {
+            ...state,
+            lastReadChatTime: action.value,
+          }
+        : { ...state };
+    }
+    case 'latestMessages': {
+      if (action.value && action.value.length) {
+        if (
+          state.messages.length &&
+          state.messages[0].id &&
+          action.value[0].id
+        ) {
+          const ascSorted = action.value.concat().reverse();
+          for (const newMessage of ascSorted) {
+            if (
+              new Date(state.messages[0].createdAt) <
+                new Date(newMessage.createdAt) &&
+              state.messages[0].id !== Number(newMessage.id)
+            ) {
+              state.messages.unshift(newMessage);
+            }
+          }
+          return { ...state, messages: state.messages };
+        }
+        return { ...state, messages: action.value };
+      }
+      return { ...state };
+    }
+    case 'fetchedMessages': {
+      if (action.value) {
+        if (state.messages.length) {
+          for (const oldMessage of action.value) {
+            if (
+              new Date(state.messages[state.messages.length - 1].createdAt) >
+              new Date(oldMessage.createdAt)
+            ) {
+              state.messages.push(oldMessage);
+            }
+          }
+          return { ...state, messages: state.messages };
+        }
+        return { ...state, messages: action.value };
+      }
+      return { ...state };
     }
   }
 };
