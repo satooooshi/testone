@@ -168,6 +168,7 @@ const ChatDetail = () => {
     members: [],
   });
   const editorRef = useRef<Editor>(null);
+  const divRef = useRef<HTMLDivElement>(null);
   const [editorState, setEditorState] = useState(() =>
     EditorState.createEmpty(),
   );
@@ -199,6 +200,7 @@ const ChatDetail = () => {
         });
       }
       setEditorState(() => EditorState.createEmpty());
+      divRef.current && divRef.current.scrollIntoView();
     },
   });
 
@@ -234,6 +236,7 @@ const ChatDetail = () => {
           ? ChatMessageType.VIDEO
           : ChatMessageType.OTHER_FILE,
       });
+      divRef.current && divRef.current.scrollIntoView();
     },
   });
 
@@ -568,7 +571,9 @@ const ChatDetail = () => {
                             />
                           </Link>
                         ) : null}
-                        <div className={chatStyles.message_wrapper}>
+                        <div
+                          className={chatStyles.message_wrapper}
+                          ref={divRef}>
                           {m.isSender && (
                             <div>
                               {messageReadCount(m) ? (
