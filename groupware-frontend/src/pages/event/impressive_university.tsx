@@ -32,20 +32,11 @@ const ImpressionUniversity: React.FC = () => {
     />
   );
 
-  const bottomImgSources = [
-    impressiveUniversityImage1,
-    impressiveUniversityImage2,
+  const bottomImages = [
+    <Image key="1" src={impressiveUniversityImage1} alt="" />,
+    <Image key="2" src={impressiveUniversityImage2} alt="" />,
   ];
-  const bottomImages = [];
-  for (const bottomImgSource of bottomImgSources) {
-    bottomImages.push(
-      typeof bottomImgSource === 'string' ? (
-        <img src={bottomImgSource} alt="" />
-      ) : (
-        <Image src={bottomImgSource} alt="" />
-      ),
-    );
-  }
+
   const subHeading = '技術力と人間力を\n毎日プロから学ぶことが出来る研修制度';
   const content = `外部講師を招へいし、社員向けに毎日研修を開講しております。技術力はもちろん、マネジメントやコミュニケーション等の人間力に関する研修もエンジニア向けの独自のカリキュラムを企画しております。
 社員の参加率は、常時75％となっており、多くの社員が自己研鑽の面で活用しています。講座数は、年間で200講座程となっており、お客様から頂く声を基にカリキュラムを作成しております。`;
