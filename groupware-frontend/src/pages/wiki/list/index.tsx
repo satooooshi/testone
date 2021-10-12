@@ -10,7 +10,7 @@ import LayoutWithTab from '@/components/LayoutWithTab';
 import SearchForm from '@/components/SearchForm';
 import { useAPIGetTag } from '@/hooks/api/tag/useAPIGetTag';
 import { toggleTag } from 'src/utils/toggleTag';
-import { Tag, UserRole, WikiType } from 'src/types';
+import { RuleCategory, Tag, UserRole, WikiType } from 'src/types';
 import { wikiQueryRefresh } from 'src/utils/wikiQueryRefresh';
 import Head from 'next/head';
 import {
@@ -19,6 +19,8 @@ import {
 } from '@/hooks/api/wiki/useAPIGetWikiList';
 import { useAuthenticate } from 'src/contexts/useAuthenticate';
 import { useHeaderTab } from '@/hooks/headerTab/useHeaderTab';
+import TopTabBar, { TopTabBehavior } from '@/components/TopTabBar';
+import topTabBarStyles from '@/styles/components/TopTabBar.module.scss';
 
 const QAQuestionList = () => {
   const router = useRouter();
@@ -28,6 +30,7 @@ const QAQuestionList = () => {
     word = '',
     status = 'new',
     type,
+    rule_category,
   } = router.query as SearchQueryToGetWiki;
   const { user } = useAuthenticate();
   const { data: questions } = useAPIGetWikiList({
@@ -36,10 +39,55 @@ const QAQuestionList = () => {
     word,
     status,
     type,
+    rule_category,
   });
   const [searchWord, setSearchWord] = useState('');
   const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
   const { data: tags } = useAPIGetTag();
+  const topTabBehaviorList: TopTabBehavior[] = [
+    {
+      tabName: '会社理念',
+      onClick: () =>
+        queryRefresh({
+          type: WikiType.RULES,
+          rule_category: RuleCategory.PHILOSOPHY,
+        }),
+      isActiveTab: !rule_category || rule_category === RuleCategory.PHILOSOPHY,
+    },
+    {
+      tabName: '社内規則',
+      onClick: () =>
+        queryRefresh({
+          type: WikiType.RULES,
+          rule_category: RuleCategory.RULES,
+        }),
+      isActiveTab: rule_category === RuleCategory.RULES,
+    },
+    {
+      tabName: 'ABC制度',
+      onClick: () =>
+        queryRefresh({ type: WikiType.RULES, rule_category: RuleCategory.ABC }),
+      isActiveTab: rule_category === RuleCategory.ABC,
+    },
+    {
+      tabName: '福利厚生等',
+      onClick: () =>
+        queryRefresh({
+          type: WikiType.RULES,
+          rule_category: RuleCategory.BENEFITS,
+        }),
+      isActiveTab: rule_category === RuleCategory.BENEFITS,
+    },
+    {
+      tabName: '各種申請書',
+      onClick: () =>
+        queryRefresh({
+          type: WikiType.RULES,
+          rule_category: RuleCategory.DOCUMENT,
+        }),
+      isActiveTab: rule_category === RuleCategory.DOCUMENT,
+    },
+  ];
 
   const onToggleTag = (t: Tag) => {
     setSelectedTags((s) => toggleTag(s, t));
@@ -103,6 +151,11 @@ const QAQuestionList = () => {
       <Head>
         <title>ボールド | Wiki</title>
       </Head>
+      {type === WikiType.RULES && (
+        <div className={topTabBarStyles.component_wrapper}>
+          <TopTabBar topTabBehaviorList={topTabBehaviorList} />
+        </div>
+      )}
       <div className={qaListStyles.top_contents_wrapper}>
         <div className={qaListStyles.search_form_wrapper}>
           <SearchForm

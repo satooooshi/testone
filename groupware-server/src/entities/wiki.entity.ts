@@ -22,6 +22,20 @@ export enum WikiType {
   QA = 'qa',
 }
 
+export enum RuleCategory {
+  //会社理念
+  PHILOSOPHY = 'philosophy',
+  //社内規則
+  RULES = 'rules',
+  //ABC制度
+  ABC = 'abc',
+  //福利厚生等
+  BENEFITS = 'benefits',
+  //各種申請書
+  DOCUMENT = 'document',
+  OTHERS = '',
+}
+
 export type TextFormat = 'markdown' | 'html';
 
 @Entity({ name: 'wiki' })
@@ -38,6 +52,16 @@ export class Wiki {
 
   @Column({ name: 'type', type: 'enum', enum: WikiType, default: WikiType.QA })
   type: WikiType;
+
+  @Column({
+    name: 'rule_category',
+    type: 'enum',
+    enum: RuleCategory,
+    default: RuleCategory.OTHERS,
+    comment:
+      'insert empty string to this column in the case of the type is not rule',
+  })
+  ruleCategory: RuleCategory;
 
   @Column('simple-enum', {
     name: 'text_format',
