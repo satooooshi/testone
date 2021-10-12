@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { jwtJsonHeader } from './header';
+console.log(process.env.NEXT_PUBLIC_API_URL);
 
 const baseURL = process.env.NEXT_PUBLIC_API_URL
   ? process.env.NEXT_PUBLIC_API_URL
