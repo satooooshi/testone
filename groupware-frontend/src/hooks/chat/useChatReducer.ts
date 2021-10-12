@@ -146,6 +146,6 @@ const chatReducer = (state: ChatState, action: ChatAction): ChatState => {
   }
 };
 
-export const useChatReducer = () => {
-  return useReducer(chatReducer, chatInitialValue);
+export const useChatReducer = (initialValueProps?: ChatState) => {
+  return useReducer(chatReducer, initialValueProps || chatInitialValue);
 };
