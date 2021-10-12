@@ -65,7 +65,7 @@ type MentionAction =
     }
   | {
       type: 'allMentionUserData';
-      value: MentionData[];
+      value?: User[];
     }
   | {
       type: 'mentionedUserData';
@@ -93,10 +93,18 @@ const mentionReducer = (
       };
     }
     case 'allMentionUserData': {
-      return {
-        ...state,
-        allMentionUserData: action.value,
-      };
+      return action.value?.length
+        ? {
+            ...state,
+            allMentionUserData: action.value.map((u) => ({
+              id: u.id,
+              name: u.lastName + ' ' + u.firstName,
+              avatar: u.avatarUrl,
+            })),
+          }
+        : {
+            ...state,
+          };
     }
     case 'mentionedUserData': {
       return {
@@ -225,18 +233,21 @@ const ChatDetail = () => {
     },
   });
 
-  useEffect(() => {
+  const isExist = useMemo(() => {
     if (id) {
-      const isExist = chatGroups?.filter((g) => g.id.toString() === id);
-      if (isExist?.length) {
-        dispatchChat({
-          type: 'newChatMessage',
-          value: { ...newChatMessage, chatGroup: isExist[0] },
-        });
-        saveLastReadChatTime(isExist[0].id);
-      }
+      return chatGroups?.filter((g) => g.id.toString() === id);
     }
-  }, [id]);
+  }, [id, chatGroups]);
+
+  useEffect(() => {
+    if (isExist?.length) {
+      dispatchChat({
+        type: 'newChatMessage',
+        value: { ...newChatMessage, chatGroup: isExist[0] },
+      });
+      saveLastReadChatTime(isExist[0].id);
+    }
+  }, [isExist]);
 
   useEffect(() => {
     dispatchChat({
@@ -246,24 +257,11 @@ const ChatDetail = () => {
   }, [lastestLastReadChatTime]);
 
   useEffect(() => {
-    if (
-      newChatMessage &&
-      newChatMessage.chatGroup &&
-      newChatMessage.chatGroup.members &&
-      newChatMessage.chatGroup.members.length
-    ) {
-      const suggestionDataItem: MentionData[] =
-        newChatMessage.chatGroup.members.map((u) => ({
-          id: u.id,
-          name: u.lastName + ' ' + u.firstName,
-          avatar: u.avatarUrl,
-        }));
-      dispatchMention({
-        type: 'allMentionUserData',
-        value: suggestionDataItem,
-      });
-    }
-  }, [newChatMessage]);
+    dispatchMention({
+      type: 'allMentionUserData',
+      value: newChatMessage?.chatGroup?.members,
+    });
+  }, [newChatMessage?.chatGroup?.members]);
 
   //append new message to array
   useEffect(() => {
