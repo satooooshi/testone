@@ -9,6 +9,7 @@ import MarkdownIt from 'markdown-it';
 import Editor from 'react-markdown-editor-lite';
 import 'react-markdown-editor-lite/lib/index.css';
 import DraftMarkup from '../DraftMarkup';
+import Link from 'next/link';
 
 type WikiCommentProps = {
   textFormat: TextFormat;
@@ -41,10 +42,14 @@ const WikiComment: React.FC<WikiCommentProps> = ({
       {date && writer && (
         <div className={qaCommentStyles.question_uploader__info}>
           <div className={qaCommentStyles.user_info_wrapper}>
-            <Avatar
-              className={qaCommentStyles.user_avatar}
-              src={writer.avatarUrl}
-            />
+            <Link href={`/account/${writer?.id}`} passHref>
+              <a>
+                <Avatar
+                  className={qaCommentStyles.user_avatar}
+                  src={writer.avatarUrl}
+                />
+              </a>
+            </Link>
             <p className={qaCommentStyles.user_name}>
               {writer.lastName + ' ' + writer.firstName}
             </p>
@@ -85,7 +90,7 @@ const WikiComment: React.FC<WikiCommentProps> = ({
           <div className={qaCommentStyles.best_answer_button_wrapper}>
             <Button
               colorScheme="pink"
-              classNames={[qaCommentStyles.best_answer_button]}
+              classnames={[qaCommentStyles.best_answer_button]}
               onClick={isWriter ? onClickBestAnswerButton : undefined}>
               {bestAnswerButtonName}
             </Button>
