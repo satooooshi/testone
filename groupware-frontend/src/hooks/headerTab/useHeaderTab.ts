@@ -1,6 +1,6 @@
 import { NextRouter } from 'next/router';
 import { useMemo } from 'react';
-import { EventType, User, WikiType } from 'src/types';
+import { EventType, RuleCategory, User, WikiType } from 'src/types';
 import { EventTab, Tab, TabName } from 'src/types/header/tab/types';
 
 type HeaderTab =
@@ -293,7 +293,11 @@ const headerTab = (headerTabBehavior: HeaderTabBehavior): Tab[] => {
           name: '社内規則',
           onClick: () => {
             {
-              if (queryRefresh) queryRefresh({ type: WikiType.RULES });
+              if (queryRefresh)
+                queryRefresh({
+                  type: WikiType.RULES,
+                  rule_category: RuleCategory.PHILOSOPHY,
+                });
             }
           },
         },
