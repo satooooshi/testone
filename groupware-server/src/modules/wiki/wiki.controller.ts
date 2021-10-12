@@ -38,7 +38,7 @@ export class WikiController {
   constructor(private readonly qaService: WikiService) {}
 
   @Get('list')
-  // @UseGuards(JwtAuthenticationGuard)
+  @UseGuards(JwtAuthenticationGuard)
   async getWikiList(
     @Query() query: SearchQueryToGetWiki,
   ): Promise<SearchResultToGetWiki> {
