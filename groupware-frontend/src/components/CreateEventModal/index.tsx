@@ -117,16 +117,18 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
 
   const checkErrors = useCallback(() => {
     const keys = Object.keys(errors) as (keyof CreateEventRequest)[];
+    let messages = '';
     for (const k of keys) {
       if (errors[k]) {
-        toast({
-          description: errors[k],
-          status: 'error',
-          duration: 3000,
-          isClosable: true,
-        });
+        messages += `${errors[k]}\n`;
       }
     }
+    toast({
+      description: messages,
+      status: 'error',
+      duration: 3000,
+      isClosable: true,
+    });
   }, [errors, toast]);
 
   useEffect(() => {
