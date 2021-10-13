@@ -13,10 +13,10 @@ import { User } from './user.entity';
 @Entity('user_joining_event')
 export class UserJoiningEvent {
   @CreateDateColumn({ type: 'timestamp' })
-  createdAt: Date;
+  readonly createdAt?: Date;
 
   @UpdateDateColumn({ type: 'timestamp' })
-  updatedAt: Date;
+  readonly updatedAt?: Date;
 
   @Column({
     type: 'timestamp',
@@ -24,7 +24,7 @@ export class UserJoiningEvent {
     nullable: true,
     default: null,
   })
-  canceledAt: Date;
+  canceledAt?: Date;
 
   @Column({
     type: 'int',
@@ -32,15 +32,13 @@ export class UserJoiningEvent {
     nullable: false,
     default: 0,
   })
-  lateMinutes: number;
+  lateMinutes?: number;
 
   @ManyToOne(() => User, (user) => user.userJoiningEvent, { primary: true })
-  @JoinColumn({ name: 'user_id' })
   user: User;
 
   @ManyToOne(() => EventSchedule, (event) => event.userJoiningEvent, {
     primary: true,
   })
-  @JoinColumn({ name: 'event_id' })
   event: EventSchedule;
 }
