@@ -7,6 +7,8 @@ import {
   LastReadChatTime,
 } from 'src/types';
 
+type MenuValue = 'editGroup' | 'editMembers';
+
 type ChatState = {
   page: number;
   editChatGroupModalVisible: boolean;
@@ -56,6 +58,10 @@ type ChatAction =
   | {
       type: 'editorState';
       value: EditorState;
+    }
+  | {
+      type: 'handleMenuSelected';
+      value: MenuValue;
     }
   | {
       type: 'lastReadChatTime';
@@ -144,6 +150,18 @@ const chatReducer = (state: ChatState, action: ChatAction): ChatState => {
         ...state,
         editorState: action.value,
       };
+    }
+    case 'handleMenuSelected': {
+      return action.value === 'editGroup'
+      ? {
+        ...state,
+        editChatGroupModalVisible: true,
+      }
+      : action.value === 'editMembers' ? {
+        ...state,
+        editMembersModalVisible: true,
+      }
+      : { ...state };
     }
     case 'lastReadChatTime': {
       return action.value
