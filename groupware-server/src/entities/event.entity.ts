@@ -19,6 +19,7 @@ import { EventVideo } from './eventVideo.entity';
 import { SubmissionFile } from './submissionFiles.entity';
 import { Tag } from './tag.entity';
 import { User } from './user.entity';
+import { UserJoiningEvent } from './userJoiningEvent.entity';
 
 export enum EventType {
   IMPRESSIVE_UNIVERSITY = 'impressive_university',
@@ -109,20 +110,11 @@ export class EventSchedule {
   })
   hostUsers?: User[];
 
-  @ManyToMany(() => User, (users) => users.events, {
-    onUpdate: 'CASCADE',
-    onDelete: 'CASCADE',
-  })
-  @JoinTable({
-    name: 'user_joining_event',
-    joinColumn: {
-      name: 'event_id',
-    },
-    inverseJoinColumn: {
-      name: 'user_id',
-    },
-  })
-  users?: User[];
+  @OneToMany(
+    () => UserJoiningEvent,
+    (userJoiningEvent) => userJoiningEvent.event,
+  )
+  userJoiningEvent?: UserJoiningEvent[];
 
   @ManyToMany(() => Tag, {
     onUpdate: 'CASCADE',

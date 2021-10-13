@@ -157,12 +157,23 @@ export interface EventSchedule {
   chatGroup?: ChatGroup;
   comments?: EventComment[];
   users?: User[];
+  userJoiningEvent?: UserJoiningEvent[];
   hostUsers?: User[];
   tags?: Tag[];
   files?: EventFile[];
   submissionFiles?: SubmissionFile[];
   videos?: EventVideo[];
   author?: User;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface UserJoiningEvent {
+  id?: number;
+  lateMinutes: number;
+  canceledAt: Date | null;
+  user: User;
+  event: EventSchedule;
   createdAt: Date;
   updatedAt: Date;
 }
