@@ -36,7 +36,7 @@ export class UserJoiningEvent {
     onDelete: 'CASCADE',
   })
   @JoinColumn({ name: 'user_id' })
-  users: User;
+  user: User;
 
   @ManyToOne(() => EventSchedule, (event) => event.userJoiningEvent, {
     primary: false,
@@ -44,7 +44,7 @@ export class UserJoiningEvent {
     onDelete: 'CASCADE',
   })
   @JoinColumn({ name: 'event_id' })
-  events: EventSchedule;
+  event: EventSchedule;
 
   @CreateDateColumn({
     type: 'datetime',

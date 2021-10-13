@@ -172,8 +172,8 @@ export interface UserJoiningEvent {
   id?: number;
   lateMinutes: number;
   canceledAt: Date | null;
-  users: User;
-  events: EventSchedule;
+  user: User;
+  event: EventSchedule;
   createdAt: Date;
   updatedAt: Date;
 }
