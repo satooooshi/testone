@@ -307,7 +307,7 @@ const ChatDetail = () => {
 
   const handleMenuSelected = useCallback((e: MenuItemProps) => {
     dispatchChat({ type: 'handleMenuSelected', value: e.value });
-  },[]);
+  }, []);
 
   return (
     <LayoutWithTab
