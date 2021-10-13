@@ -6,6 +6,7 @@ export class addColumnOnUserJoiningEventTable1634108116096
   name = 'addColumnOnUserJoiningEventTable1634108116096';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
+    await queryRunner.query(`ALTER TABLE user_joining_event DROP PRIMARY KEY`);
     await queryRunner.query(
       `ALTER TABLE user_joining_event ADD id int NOT NULL PRIMARY KEY AUTO_INCREMENT`,
     );
@@ -42,7 +43,6 @@ export class addColumnOnUserJoiningEventTable1634108116096
     await queryRunner.query(
       `ALTER TABLE user_joining_event DROP FOREIGN KEY FK_fb26c4d1ce414dddb63c9957453`,
     );
-    await queryRunner.query(`ALTER TABLE user_joining_event DROP PRIMARY KEY`);
     await queryRunner.query(
       `ALTER TABLE user_joining_event CHANGE event_id event_id int NOT NULL`,
     );
@@ -62,5 +62,8 @@ export class addColumnOnUserJoiningEventTable1634108116096
       `ALTER TABLE user_joining_event DROP COLUMN canceled_at`,
     );
     await queryRunner.query(`ALTER TABLE user_joining_event DROP COLUMN id`);
+    await queryRunner.query(
+      `ALTER TABLE user_joining_event ADD PRIMARY KEY (event_id, user_id)`,
+    );
   }
 }
