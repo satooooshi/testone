@@ -19,6 +19,7 @@ import { QAAnswerReply } from './qaAnswerReply.entity';
 import { Wiki } from './wiki.entity';
 import { SubmissionFile } from './submissionFiles.entity';
 import { UserTag } from './userTag.entity';
+import { UserJoiningEvent } from './userJoiningEvent.entity';
 
 export enum UserRole {
   ADMIN = 'admin',
@@ -154,11 +155,11 @@ export class User {
   })
   hostingEvents?: EventSchedule[];
 
-  @ManyToMany(() => EventSchedule, (events) => events.users, {
-    onUpdate: 'CASCADE',
-    onDelete: 'CASCADE',
-  })
-  events?: EventSchedule[];
+  @OneToMany(
+    () => UserJoiningEvent,
+    (userJoiningEvent) => userJoiningEvent.user,
+  )
+  userJoiningEvent?: UserJoiningEvent[];
 
   @OneToMany(() => EventSchedule, (eventSchedule) => eventSchedule.author)
   eventsCreated?: EventSchedule[];

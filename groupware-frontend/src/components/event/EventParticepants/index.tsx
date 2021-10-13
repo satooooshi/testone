@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
 import eventParticipantsStyles from '@/styles/components/EventParticipants.module.scss';
-import { User } from 'src/types';
+import { UserJoiningEvent } from 'src/types';
 import { Avatar } from '@chakra-ui/react';
 import Link from 'next/link';
 
 type EventParticipantsProps = {
-  participants: User[];
+  userJoiningEvent: UserJoiningEvent[];
 };
 
 const EventParticipants: React.FC<EventParticipantsProps> = ({
-  participants,
+  userJoiningEvent,
 }) => {
   const [allVisible, setAllVisible] = useState(false);
   return (
@@ -18,7 +18,7 @@ const EventParticipants: React.FC<EventParticipantsProps> = ({
         <p className={eventParticipantsStyles.participant_list_title}>
           参加者一覧
         </p>
-        {!allVisible && participants.length > 15 ? (
+        {!allVisible && userJoiningEvent.length > 15 ? (
           <button
             className={eventParticipantsStyles.see_all_text}
             onClick={() => setAllVisible(true)}>
@@ -26,16 +26,16 @@ const EventParticipants: React.FC<EventParticipantsProps> = ({
           </button>
         ) : null}
       </div>
-      {participants.map((u, index) =>
+      {userJoiningEvent.map((u, index) =>
         index <= 15 || allVisible ? (
-          <Link key={u.id} href={`/account/${u.id}`}>
+          <Link key={u.user.id} href={`/account/${u.user.id}`}>
             <a className={eventParticipantsStyles.participant_name_wrapper}>
               <Avatar
-                src={u.avatarUrl}
+                src={u.user.avatarUrl}
                 className={eventParticipantsStyles.participant_avatar}
               />
               <p className={eventParticipantsStyles.participant_name}>
-                {u.lastName + ' ' + u.firstName}
+                {u.user.lastName + ' ' + u.user.firstName}
               </p>
             </a>
           </Link>
