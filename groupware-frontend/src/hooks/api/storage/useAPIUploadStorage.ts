@@ -8,20 +8,13 @@ export const uploadStorage = async (files: File[]): Promise<string[]> => {
     formData.append('files', file);
   }
 
-  // const res = await axiosInstance.post(uploadStorageURL, formData);
-  // console.log(res.status);
-  // return res.status === 413 ? ['413'] : res.data;
-
   const uploadStorageException = async (): Promise<string[]> => {
     try {
       const res = await axiosInstance.post(uploadStorageURL, formData);
       console.log(res.status);
-      if (res.status === 413) {
-        throw new Error();
-      }
       return res.data;
-    } catch (err) {
-      return ['413'];
+    } catch (err: any) {
+      throw new Error(err.message);
     }
   };
   return uploadStorageException();
@@ -34,9 +27,9 @@ export const useAPIUploadStorage = (
     ...mutationOptions,
     onError: (err, variables, context) => {
       alert(
-        err.message.includes('413')
-          ? '画像ファイルの容量が大きい為、アップロード出来ませんでした。\n容量が大きくない画像を使用して下さい。'
-          : '画像のアップロードに失敗しました。',
+        err.message.includes('400')
+          ? 'ファイルの容量が大きい為、アップロード出来ませんでした。\n容量が大きくないファイルを使用して下さい。'
+          : 'ファイルアップロード失敗しました',
       );
       mutationOptions?.onError &&
         mutationOptions.onError(err, variables, context);

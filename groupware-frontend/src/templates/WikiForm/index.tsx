@@ -110,14 +110,16 @@ const WikiForm: React.FC<WikiFormProps> = ({
     setNewQuestion((q) => ({ ...q, body: text }));
   };
   const handleImageUpload = async (file: File) => {
-    const uploadedImageURL = await uploadStorage([file]);
-    if (uploadedImageURL[0] === '413') {
-      alert(
-        '画像ファイルの容量が大きい為、アップロード出来ませんでした。\n容量が大きくない画像を使用して下さい。',
-      );
-      return '画像アップロード失敗';
-    } else {
+    try {
+      const uploadedImageURL = await uploadStorage([file]);
       return uploadedImageURL[0];
+    } catch (err: any) {
+      alert(
+        err.message.includes('400')
+          ? 'ファイルの容量が大きい為、アップロード出来ませんでした。\n容量が大きくないファイルを使用して下さい。'
+          : 'ファイルのアップロードに失敗しました。',
+      );
+      return 'ファイルアップロード失敗しました';
     }
   };
 
