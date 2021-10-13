@@ -2,7 +2,7 @@ import { ScreenName } from '@/components/Sidebar';
 import chatStyles from '@/styles/layouts/Chat.module.scss';
 import { IoSend } from 'react-icons/io5';
 import clsx from 'clsx';
-import { useCallback, useEffect, useMemo, useReducer, useRef } from 'react';
+import { EventHandler, useCallback, useEffect, useMemo, useRef } from 'react';
 import { useAPIGetUsers } from '@/hooks/api/user/useAPIGetUsers';
 import 'rc-checkbox/assets/index.css';
 import { ChatGroup, ChatMessage, ChatMessageType, User } from 'src/types';
@@ -15,9 +15,7 @@ import CreateChatGroupModal from '@/components/CreateChatGroupModal';
 import { Avatar, useMediaQuery } from '@chakra-ui/react';
 import { convertToRaw, EditorState } from 'draft-js';
 import Editor from '@draft-js-plugins/editor';
-import createMentionPlugin, {
-  defaultSuggestionsFilter,
-} from '@draft-js-plugins/mention';
+import createMentionPlugin from '@draft-js-plugins/mention';
 import { MentionData } from '@draft-js-plugins/mention';
 import '@draft-js-plugins/mention/lib/plugin.css';
 import { draftToMarkdown } from 'markdown-draft-js';
@@ -34,7 +32,7 @@ import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { dateTimeFormatterFromJSDDate } from 'src/utils/dateTimeFormatter';
 import { HiOutlineDotsCircleHorizontal } from 'react-icons/hi';
-import { Menu, MenuItem, MenuButton } from '@szhsin/react-menu';
+import { Menu, MenuItem, MenuButton, MenuItemProps } from '@szhsin/react-menu';
 import '@szhsin/react-menu/dist/index.css';
 import '@szhsin/react-menu/dist/transitions/slide.css';
 import Link from 'next/link';
@@ -44,82 +42,13 @@ import { useAPISaveChatGroup } from '@/hooks/api/chat/useAPISaveChatGroup';
 import { useAPIGetLastReadChatTime } from '@/hooks/api/chat/useAPIGetLastReadChatTime';
 import { useAPISaveLastReadChatTime } from '@/hooks/api/chat/useAPISaveLastReadChatTime';
 import { useHeaderTab } from '@/hooks/headerTab/useHeaderTab';
-
-type MentionState = {
-  suggestions: MentionData[];
-  allMentionUserData: MentionData[];
-  popup: boolean;
-  mentionedUserData: MentionData[];
-};
-
-type MenuValue = 'editGroup' | 'editMembers';
-
-type MentionAction =
-  | {
-      type: 'popup';
-      value: boolean;
-    }
-  | {
-      type: 'suggestions';
-      value: string;
-    }
-  | {
-      type: 'allMentionUserData';
-      value?: User[];
-    }
-  | {
-      type: 'mentionedUserData';
-      value: MentionData[];
-    };
-
-const mentionReducer = (
-  state: MentionState,
-  action: MentionAction,
-): MentionState => {
-  switch (action.type) {
-    case 'popup': {
-      return {
-        ...state,
-        popup: action.value,
-      };
-    }
-    case 'suggestions': {
-      return {
-        ...state,
-        suggestions: defaultSuggestionsFilter(
-          action.value,
-          state.allMentionUserData,
-        ),
-      };
-    }
-    case 'allMentionUserData': {
-      return action.value?.length
-        ? {
-            ...state,
-            allMentionUserData: action.value.map((u) => ({
-              id: u.id,
-              name: u.lastName + ' ' + u.firstName,
-              avatar: u.avatarUrl,
-            })),
-          }
-        : {
-            ...state,
-          };
-    }
-    case 'mentionedUserData': {
-      return {
-        ...state,
-        mentionedUserData: action.value,
-      };
-    }
-  }
-};
+import { useMentionReducer } from '@/hooks/chat/useMentionReducer';
 
 const ChatDetail = () => {
   const router = useRouter();
   const { id } = router.query as { id: string };
   const [{ popup, suggestions, mentionedUserData }, dispatchMention] =
-    useReducer(mentionReducer, {
+    useMentionReducer({
       popup: false,
       suggestions: [],
       allMentionUserData: [],
@@ -237,7 +166,6 @@ const ChatDetail = () => {
         messageWrapperDivRef.current.scrollIntoView();
     },
   });
-
   const isExist = useMemo(() => {
     if (id) {
       return chatGroups?.filter((g) => g.id.toString() === id);
@@ -358,15 +286,13 @@ const ChatDetail = () => {
     }
   };
 
-  const onAddMention = (m: MentionData) => {
+  const onAddMention = useCallback((m: MentionData) => {
     // get the mention object selected
-    if (!mentionedUserData.filter((prev) => prev.id === m.id).length) {
-      dispatchMention({
-        type: 'mentionedUserData',
-        value: [...mentionedUserData, m],
-      });
-    }
-  };
+    dispatchMention({
+      type: 'mentionedUserData',
+      value: m,
+    });
+  }, []);
 
   const onScrollTopOnChat = (e: any) => {
     if (
@@ -379,17 +305,9 @@ const ChatDetail = () => {
     }
   };
 
-  const handleMenuSelected = (e: any) => {
-    const value = e.value as MenuValue;
-    if (value === 'editMembers') {
-      dispatchChat({ type: 'editMembersModalVisible', value: true });
-      return;
-    }
-    if (value === 'editGroup') {
-      dispatchChat({ type: 'editChatGroupModalVisible', value: true });
-      return;
-    }
-  };
+  const handleMenuSelected = useCallback((e: MenuItemProps) => {
+    dispatchChat({ type: 'handleMenuSelected', value: e.value });
+  },[]);
 
   return (
     <LayoutWithTab
