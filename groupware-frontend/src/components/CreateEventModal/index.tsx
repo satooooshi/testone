@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import createEventModalStyle from '@/styles/components/CreateEventModal.module.scss';
 import clsx from 'clsx';
 import Modal from 'react-modal';
@@ -94,7 +94,6 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
     values: newEvent,
     handleSubmit: onFinish,
     setValues: setNewEvent,
-    errors,
     resetForm,
     initialValues,
     validateForm,
@@ -115,7 +114,8 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
     },
   });
 
-  const checkErrors = useCallback(() => {
+  const checkErrors = async () => {
+    const errors = await validateForm();
     const keys = Object.keys(errors) as (keyof CreateEventRequest)[];
     let messages = '';
     for (const k of keys) {
@@ -127,15 +127,13 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
       toast({
         description: messages,
         status: 'error',
-        duration: 10000,
+        duration: 3000,
         isClosable: true,
       });
+    } else {
+      onFinish();
     }
-  }, [errors, toast]);
-
-  useEffect(() => {
-    checkErrors();
-  }, [checkErrors]);
+  };
 
   const [newYoutube, setNewYoutube] = useState('');
   const [tagModal, setTagModal] = useState(false);
@@ -281,9 +279,7 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
           <Button
             className={createEventModalStyle.save_event_button}
             onClick={() => {
-              validateForm(newEvent);
               checkErrors();
-              onFinish();
             }}
             colorScheme="blue">
             イベントを保存
