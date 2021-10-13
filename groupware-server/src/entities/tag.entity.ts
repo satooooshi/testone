@@ -19,7 +19,7 @@ export enum TagType {
 }
 
 @Entity({ name: 'tags' })
-@Unique(['name'])
+@Unique(['name', 'type'])
 export class Tag {
   @PrimaryGeneratedColumn()
   id: number;
@@ -27,7 +27,7 @@ export class Tag {
   @Column({
     type: 'varchar',
     name: 'name',
-    length: 30,
+    length: 60,
     nullable: false,
     default: '',
   })

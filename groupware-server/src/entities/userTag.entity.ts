@@ -11,7 +11,7 @@ import { TagType } from './tag.entity';
 import { User } from './user.entity';
 
 @Entity({ name: 'user_tags' })
-@Unique(['name'])
+@Unique(['name', 'type'])
 export class UserTag {
   @PrimaryGeneratedColumn()
   id: number;
@@ -19,7 +19,7 @@ export class UserTag {
   @Column({
     type: 'varchar',
     name: 'name',
-    length: 30,
+    length: 60,
     nullable: false,
     default: '',
   })
