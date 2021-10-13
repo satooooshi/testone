@@ -33,7 +33,7 @@ import { useImageCrop } from '@/hooks/crop/useImageCrop';
 import { useHeaderTab } from '@/hooks/headerTab/useHeaderTab';
 import createNewUserStyles from '@/styles/layouts/admin/CreateNewUser.module.scss';
 import clsx from 'clsx';
-import TagModal from '@/components/TagModal';
+import TagModal from '@/components/common/TagModal';
 import { toggleTag } from 'src/utils/toggleTag';
 import { useAPIGetUserTag } from '@/hooks/api/tag/useAPIGetUserTag';
 

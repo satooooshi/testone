@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import createEventModalStyle from '@/styles/components/CreateEventModal.module.scss';
 import clsx from 'clsx';
 import Modal from 'react-modal';
@@ -31,11 +31,12 @@ import {
   RadioGroup,
   Radio,
   Stack,
+  useToast,
 } from '@chakra-ui/react';
 import SelectUserModal from '../SelectUserModal';
 import { useAPIGetUsers } from '@/hooks/api/user/useAPIGetUsers';
 import { imageExtensions } from 'src/utils/imageExtensions';
-import { FormikErrors, useFormik } from 'formik';
+import { useFormik } from 'formik';
 import { createEventSchema } from 'src/utils/validation/schema';
 import { useImageCrop } from '@/hooks/crop/useImageCrop';
 
@@ -65,18 +66,6 @@ type CreateEventModalProps = {
   createEvent: (newEvent: CreateEventRequest) => void;
 };
 
-type ErrorMessageProps = {
-  errors: FormikErrors<CreateEventRequest | Required<EventSchedule>>;
-  field: keyof (CreateEventRequest | Required<EventSchedule>);
-};
-
-const ErrorMessage: React.FC<ErrorMessageProps> = ({ errors, field }) => {
-  if (errors[field]) {
-    return <p className={createEventModalStyle.error_text}>{errors[field]}</p>;
-  }
-  return null;
-};
-
 const initialEventValue = {
   title: '',
   description: '',
@@ -99,6 +88,7 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
 }) => {
   const { data: tags } = useAPIGetTag();
   const { data: users } = useAPIGetUsers();
+  const toast = useToast();
 
   const {
     values: newEvent,
@@ -107,6 +97,7 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
     errors,
     resetForm,
     initialValues,
+    validateForm,
   } = useFormik<CreateEventRequest | Required<EventSchedule>>({
     initialValues: event ? event : initialEventValue,
     enableReinitialize: true,
@@ -123,6 +114,24 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
       uploadThumbnail([result]);
     },
   });
+
+  const checkErrors = useCallback(() => {
+    const keys = Object.keys(errors) as (keyof CreateEventRequest)[];
+    for (const k of keys) {
+      if (errors[k]) {
+        toast({
+          title: errors[k],
+          status: 'error',
+          duration: 3000,
+          isClosable: true,
+        });
+      }
+    }
+  }, [errors, toast]);
+
+  useEffect(() => {
+    checkErrors();
+  }, [checkErrors]);
 
   const [newYoutube, setNewYoutube] = useState('');
   const [tagModal, setTagModal] = useState(false);
@@ -263,18 +272,15 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
         selectedTags={newEvent.tags ? newEvent.tags : []}
       />
       <div className={createEventModalStyle.modal_top}>
-        <div className={createEventModalStyle.errors_wrapper}>
-          <ErrorMessage errors={errors} field="title" />
-          <ErrorMessage errors={errors} field="description" />
-          <ErrorMessage errors={errors} field="startAt" />
-          <ErrorMessage errors={errors} field="endAt" />
-          <ErrorMessage errors={errors} field="hostUsers" />
-          <ErrorMessage errors={errors} field="tags" />
-        </div>
+        <div className={createEventModalStyle.errors_wrapper}></div>
         <div className={createEventModalStyle.top_button_wrapper}>
           <Button
             className={createEventModalStyle.save_event_button}
-            onClick={() => onFinish()}
+            onClick={() => {
+              validateForm(newEvent);
+              checkErrors();
+              onFinish();
+            }}
             colorScheme="blue">
             イベントを保存
           </Button>

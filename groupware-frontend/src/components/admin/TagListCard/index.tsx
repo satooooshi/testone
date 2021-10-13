@@ -8,7 +8,7 @@ import { Tag, TagType, UserTag } from 'src/types';
 
 type TagListBoxProps = {
   tagType: TagType;
-  tags?: Tag[];
+  tags?: (Tag | UserTag)[];
   onClickSaveButton: (t: Partial<Tag | UserTag>) => void;
   onClickDeleteButton: (t: Tag | UserTag) => void;
 };

@@ -61,7 +61,7 @@
     display: none;
   }
   @media (max-width: 768px) {
-    margin-bottom: 16px;
+    margin-bottom: 8px;
     max-width: 100%;
   }
 }
@@ -90,6 +90,7 @@
   align-self: flex-end;
   @media (max-width: 768px) {
     font-size: 14px;
+    margin-bottom: 24px;
   }
 }
 

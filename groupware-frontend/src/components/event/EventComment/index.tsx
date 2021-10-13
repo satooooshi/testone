@@ -2,6 +2,7 @@ import { User } from 'src/types';
 import eventCommentStyles from '@/styles/components/EventComment.module.scss';
 import { dateTimeFormatterFromJSDDate } from 'src/utils/dateTimeFormatter';
 import { Avatar } from 'react-rainbow-components';
+import Link from 'next/link';
 
 type EventCommentCardProps = {
   body: string;
@@ -17,10 +18,14 @@ const EventCommentCard: React.FC<EventCommentCardProps> = ({
     <div className={eventCommentStyles.card_wrapper}>
       <div className={eventCommentStyles.comment_uploader_info}>
         <div className={eventCommentStyles.user_info_wrapper}>
-          <Avatar
-            className={eventCommentStyles.user_avatar}
-            src={writer.avatarUrl}
-          />
+          <Link key={writer?.id} href={`/account/${writer?.id}`} passHref>
+            <a>
+              <Avatar
+                className={eventCommentStyles.user_avatar}
+                src={writer.avatarUrl}
+              />
+            </a>
+          </Link>
           <p className={eventCommentStyles.user_name}>
             {writer.lastName + ' ' + writer.firstName}
           </p>

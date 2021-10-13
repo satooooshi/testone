@@ -80,8 +80,8 @@ export class UserService {
           .where(fromDate ? 'wiki.createdAt > :fromDate' : '1=1', {
             fromDate,
           })
-          .andWhere('wiki.type < :wikiType', {
-            wikiType: WikiType.QA,
+          .andWhere('wiki.type = :qa', {
+            qa: WikiType.QA,
           })
           .andWhere(fromDate ? 'wiki.createdAt < :toDate' : '1=1', {
             toDate,
@@ -109,8 +109,8 @@ export class UserService {
           .where(fromDate ? 'wiki.createdAt < :fromDate' : '1=1', {
             fromDate,
           })
-          .andWhere('wiki.type < :wikiType', {
-            wikiType: WikiType.KNOWLEDGE,
+          .andWhere('wiki.type = :wikiType', {
+            knwoledge: WikiType.KNOWLEDGE,
           })
           .andWhere('u.id = user.id');
       }, 'knowledgeCount')
@@ -126,65 +126,42 @@ export class UserService {
         createdAt: u.tag_created_at,
         updatedAt: u.tag_updated_at,
       };
-      //sort is safe
-      const isExist = entityUsers.filter((a) => a.id === u.user_id).length;
-      if (isExist) {
-        const existTags = entityUsers.filter((a) => a.id === u.user_id)[0].tags;
-        const tags: UserTag[] = tag.id
-          ? [...existTags, tag]
-          : [...existTags, tag];
-        entityUsers = entityUsers.filter((e) => e.id !== u.user_id);
-        entityUsers.push({
-          id: u.user_id,
-          email: u.user_email,
-          lastName: u.user_last_name,
-          firstName: u.user_first_name,
-          introduce: u.user_introduce,
-          role: this.userRoleNameFactory(u.user_role),
-          technologyTag: tags.filter((t) => t.type === TagType.TECH),
-          qualificationTag: tags.filter(
-            (t) => t.type === TagType.QUALIFICATION,
-          ),
-          clubTag: tags.filter((t) => t.type === TagType.CLUB),
-          hobbyTag: tags.filter((t) => t.type === TagType.HOBBY),
-          otherTag: tags.filter((t) => t.type === TagType.OTHER),
-          verifiedAt: u.user_verified_at,
-          avatarUrl: u.user_avatar_url,
-          employeeId: u.user_employee_id,
-          createdAt: u.user_created_at,
-          updatedAt: u.user_updated_at,
-          eventCount: u.eventCount,
-          questionCount: u.questionCount,
-          answerCount: u.answerCount,
-          knowledgeCount: u.knowledgeCount,
-        });
-      } else {
-        entityUsers.push({
-          id: u.user_id,
-          email: u.user_email,
-          lastName: u.user_last_name,
-          firstName: u.user_first_name,
-          introduce: u.user_introduce,
-          role: this.userRoleNameFactory(u.user_role),
-          // tags: tag.id ? [tag] : [],
-          technologyTag: [tag].filter((t) => t.type === TagType.TECH),
-          qualificationTag: [tag].filter(
-            (t) => t.type === TagType.QUALIFICATION,
-          ),
-          clubTag: [tag].filter((t) => t.type === TagType.CLUB),
-          hobbyTag: [tag].filter((t) => t.type === TagType.HOBBY),
-          otherTag: [tag].filter((t) => t.type === TagType.OTHER),
-          verifiedAt: u.user_verified_at,
-          avatarUrl: u.user_avatar_url,
-          employeeId: u.user_employee_id,
-          createdAt: u.user_created_at,
-          updatedAt: u.user_updated_at,
-          eventCount: u.eventCount,
-          questionCount: u.questionCount,
-          answerCount: u.answerCount,
-          knowledgeCount: u.knowledgeCount,
-        });
+      let tags: UserTag[] = [];
+      const repeatedUsers = entityUsers.filter(
+        (existUesrInArr) => existUesrInArr.id === u.user_id,
+      );
+      if (repeatedUsers.length) {
+        const existTags = repeatedUsers[0].tags;
+        tags = [...existTags, tag];
+
+        //remove repeated user
+        entityUsers = entityUsers.filter(
+          (existUesrInArr) => existUesrInArr.id !== u.user_id,
+        );
       }
+      entityUsers = entityUsers.filter((e) => e.id !== u.user_id);
+      entityUsers.push({
+        id: u.user_id,
+        email: u.user_email,
+        lastName: u.user_last_name,
+        firstName: u.user_first_name,
+        introduce: u.user_introduce,
+        role: this.userRoleNameFactory(u.user_role),
+        technologyTag: tags.filter((t) => t.type === TagType.TECH),
+        qualificationTag: tags.filter((t) => t.type === TagType.QUALIFICATION),
+        clubTag: tags.filter((t) => t.type === TagType.CLUB),
+        hobbyTag: tags.filter((t) => t.type === TagType.HOBBY),
+        otherTag: tags.filter((t) => t.type === TagType.OTHER),
+        verifiedAt: u.user_verified_at,
+        avatarUrl: u.user_avatar_url,
+        employeeId: u.user_employee_id,
+        createdAt: u.user_created_at,
+        updatedAt: u.user_updated_at,
+        eventCount: u.eventCount,
+        questionCount: u.questionCount,
+        answerCount: u.answerCount,
+        knowledgeCount: u.knowledgeCount,
+      });
     }
 
     const tagModified = entityUsers.map((u) => {
@@ -269,8 +246,8 @@ export class UserService {
           .where(fromDate ? 'wiki.createdAt > :fromDate' : '1=1', {
             fromDate,
           })
-          .andWhere('wiki.type < :wikiType', {
-            wikiType: WikiType.QA,
+          .andWhere('wiki.type = :qa', {
+            qa: WikiType.QA,
           })
           .andWhere('wiki.createdAt < :toDate', { toDate })
           .andWhere('u.id = user.id');
@@ -283,8 +260,8 @@ export class UserService {
           .where(fromDate ? 'wiki.createdAt > :fromDate' : '1=1', {
             fromDate,
           })
-          .andWhere('wiki.type < :wikiType', {
-            wikiType: WikiType.KNOWLEDGE,
+          .andWhere('wiki.type = :knwoledge', {
+            knwoledge: WikiType.KNOWLEDGE,
           })
           .andWhere('wiki.createdAt < :toDate', { toDate })
           .andWhere('u.id = user.id');
@@ -326,48 +303,38 @@ export class UserService {
         createdAt: u.tag_created_at,
         updatedAt: u.tag_updated_at,
       };
-      //sort is safe
-      const isExist = entityUsers.filter((a) => a.id === u.user_id).length;
-      if (isExist) {
-        const existTags = entityUsers.filter((a) => a.id === u.user_id)[0].tags;
-        const tags: UserTag[] = tag.id ? [...existTags] : [...existTags, tag];
-        entityUsers = entityUsers.filter((e) => e.id !== u.user_id);
-        entityUsers.push({
-          id: u.user_id,
-          email: u.user_email,
-          lastName: u.user_last_name,
-          firstName: u.user_first_name,
-          introduce: u.user_introduce,
-          role: u.user_role,
-          tags: tags,
-          verifiedAt: u.user_verified_at,
-          avatarUrl: u.user_avatar_url,
-          employeeId: u.user_employee_id,
-          createdAt: u.user_created_at,
-          updatedAt: u.user_updated_at,
-          eventCount: u.eventCount,
-          questionCount: u.questionCount,
-          answerCount: u.answerCount,
-        });
-      } else {
-        entityUsers.push({
-          id: u.user_id,
-          email: u.user_email,
-          lastName: u.user_last_name,
-          firstName: u.user_first_name,
-          introduce: u.user_introduce,
-          role: u.user_role,
-          tags: tag.id ? [tag] : [],
-          verifiedAt: u.user_verified_at,
-          avatarUrl: u.user_avatar_url,
-          employeeId: u.user_employee_id,
-          createdAt: u.user_created_at,
-          updatedAt: u.user_updated_at,
-          eventCount: u.eventCount,
-          questionCount: u.questionCount,
-          answerCount: u.answerCount,
-        });
+      let tags: UserTag[] = [];
+      const repeatedUsers = entityUsers.filter(
+        (existUesrInArr) => existUesrInArr.id === u.user_id,
+      );
+      if (repeatedUsers.length) {
+        const existTags = repeatedUsers[0].tags;
+        tags = [...existTags, tag];
+
+        //remove repeated user
+        entityUsers = entityUsers.filter(
+          (existUesrInArr) => existUesrInArr.id !== u.user_id,
+        );
       }
+      entityUsers = entityUsers.filter((e) => e.id !== u.user_id);
+      entityUsers.push({
+        id: u.user_id,
+        email: u.user_email,
+        lastName: u.user_last_name,
+        firstName: u.user_first_name,
+        introduce: u.user_introduce,
+        role: u.user_role,
+        tags,
+        verifiedAt: u.user_verified_at,
+        avatarUrl: u.user_avatar_url,
+        employeeId: u.user_employee_id,
+        createdAt: u.user_created_at,
+        updatedAt: u.user_updated_at,
+        eventCount: u.eventCount,
+        questionCount: u.questionCount,
+        answerCount: u.answerCount,
+        knowledgeCount: u.knowledgeCount,
+      });
     }
     const count = await searchQuery.getCount();
     const pageCount =

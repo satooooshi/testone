@@ -32,7 +32,14 @@ export class WikiService {
   public async getWikiList(
     query: SearchQueryToGetWiki,
   ): Promise<SearchResultToGetWiki> {
-    const { page = 1, word = '', status = 'new', tag = '', type } = query;
+    const {
+      page = 1,
+      word = '',
+      status = 'new',
+      tag = '',
+      type,
+      rule_category,
+    } = query;
     let offset: number;
     const limit = 20;
     if (page) {
@@ -72,6 +79,14 @@ export class WikiService {
       .andWhere(query.answer_writer ? 'answer_writer = :answerWriter' : '1=1', {
         answerWriter: query.answer_writer,
       })
+      .andWhere(
+        rule_category && type === WikiType.RULES
+          ? 'wiki.ruleCategory = :ruleCategory'
+          : '1=1',
+        {
+          ruleCategory: rule_category,
+        },
+      )
       .andWhere(tag ? 'tag.id IN (:...tagIDs)' : '1=1', {
         tagIDs,
       });

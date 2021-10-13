@@ -31,6 +31,7 @@ async function bootstrap() {
       'https://groupware-frontend-valleyin-dev.vercel.app',
       'https://groupware-frontend-git-develop-valleyin-dev.vercel.app',
       'https://groupware-frontend-theta.vercel.app',
+      'https://groupware-seven.vercel.app',
     ],
   });
   const jsonEncoded = JSON.stringify(cloud_storage_settings);

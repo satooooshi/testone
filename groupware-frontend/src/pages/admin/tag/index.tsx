@@ -2,7 +2,7 @@ import { Tab } from 'src/types/header/tab/types';
 import LayoutWithTab from '@/components/layout/LayoutWithTab';
 import { ScreenName } from '@/components/layout/Sidebar';
 import React, { useEffect } from 'react';
-import { TagType, UserRole } from 'src/types';
+import { Tag, TagType, UserRole, UserTag } from 'src/types';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
 import { useAuthenticate } from 'src/contexts/useAuthenticate';
@@ -28,6 +28,14 @@ const TagAdmin: React.FC = () => {
     },
   });
   const tabs: Tab[] = useHeaderTab({ headerTabType: 'admin' });
+
+  const handleCreate = (t: Partial<UserTag | Tag>) => {
+    if (t.name && t.name.length >= 60) {
+      alert('タグは60文字以内で入力してください');
+      return;
+    }
+    createTag(t);
+  };
 
   useEffect(() => {
     if (user?.role !== UserRole.ADMIN) {
@@ -55,7 +63,7 @@ const TagAdmin: React.FC = () => {
               deleteTag(t);
             }
           }}
-          onClickSaveButton={(t) => createTag(t)}
+          onClickSaveButton={(t) => handleCreate(t)}
         />
         <TagListBox
           tagType={TagType.QUALIFICATION}
@@ -65,7 +73,7 @@ const TagAdmin: React.FC = () => {
               deleteTag(t);
             }
           }}
-          onClickSaveButton={(t) => createTag(t)}
+          onClickSaveButton={(t) => handleCreate(t)}
         />
         <TagListBox
           tagType={TagType.CLUB}
@@ -75,7 +83,7 @@ const TagAdmin: React.FC = () => {
               deleteTag(t);
             }
           }}
-          onClickSaveButton={(t) => createTag(t)}
+          onClickSaveButton={(t) => handleCreate(t)}
         />
         <TagListBox
           tagType={TagType.HOBBY}
@@ -85,7 +93,7 @@ const TagAdmin: React.FC = () => {
               deleteTag(t);
             }
           }}
-          onClickSaveButton={(t) => createTag(t)}
+          onClickSaveButton={(t) => handleCreate(t)}
         />
         <TagListBox
           tagType={TagType.OTHER}
@@ -95,7 +103,7 @@ const TagAdmin: React.FC = () => {
               deleteTag(t);
             }
           }}
-          onClickSaveButton={(t) => createTag(t)}
+          onClickSaveButton={(t) => handleCreate(t)}
         />
       </div>
     </LayoutWithTab>
