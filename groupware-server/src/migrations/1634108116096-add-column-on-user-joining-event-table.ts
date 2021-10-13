@@ -6,7 +6,6 @@ export class addColumnOnUserJoiningEventTable1634108116096
   name = 'addColumnOnUserJoiningEventTable1634108116096';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.query(`ALTER TABLE user_joining_event DROP PRIMARY KEY`);
     await queryRunner.query(
       `ALTER TABLE user_joining_event ADD id int NOT NULL PRIMARY KEY AUTO_INCREMENT`,
     );
