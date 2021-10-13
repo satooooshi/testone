@@ -123,12 +123,14 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
         messages += `${errors[k]}\n`;
       }
     }
-    toast({
-      description: messages,
-      status: 'error',
-      duration: 3000,
-      isClosable: true,
-    });
+    if (messages) {
+      toast({
+        description: messages,
+        status: 'error',
+        duration: 10000,
+        isClosable: true,
+      });
+    }
   }, [errors, toast]);
 
   useEffect(() => {
