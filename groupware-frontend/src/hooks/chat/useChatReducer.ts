@@ -7,17 +7,11 @@ import {
   LastReadChatTime,
 } from 'src/types';
 
-type MenuValue = 'editGroup' | 'editMembers';
-
 type ChatState = {
   page: number;
-  editChatGroupModalVisible: boolean;
   messages: ChatMessage[];
   lastReadChatTime: LastReadChatTime[];
   newChatMessage: Partial<ChatMessage>;
-  createGroupWindow: boolean;
-  selectChatGroupWindow: boolean;
-  editMembersModalVisible: boolean;
   newGroup: Partial<ChatGroup>;
   editorState: EditorState;
 };
@@ -28,10 +22,6 @@ type ChatAction =
       value: number;
     }
   | {
-      type: 'editChatGroupModalVisible';
-      value: boolean;
-    }
-  | {
       type: 'messages';
       value: ChatMessage[];
     }
@@ -40,28 +30,12 @@ type ChatAction =
       value: Partial<ChatMessage>;
     }
   | {
-      type: 'createGroupWindow';
-      value: boolean;
-    }
-  | {
-      type: 'selectChatGroupWindow';
-      value: boolean;
-    }
-  | {
-      type: 'editMembersModalVisible';
-      value: boolean;
-    }
-  | {
       type: 'newGroup';
       value: Partial<ChatGroup>;
     }
   | {
       type: 'editorState';
       value: EditorState;
-    }
-  | {
-      type: 'handleMenuSelected';
-      value: MenuValue;
     }
   | {
       type: 'lastReadChatTime';
@@ -78,16 +52,12 @@ type ChatAction =
 
 const chatInitialValue: ChatState = {
   page: 1,
-  editChatGroupModalVisible: false,
   messages: [],
   lastReadChatTime: [],
   newChatMessage: {
     content: '',
     type: ChatMessageType.TEXT,
   },
-  createGroupWindow: false,
-  selectChatGroupWindow: false,
-  editMembersModalVisible: false,
   newGroup: {
     name: '',
     members: [],
@@ -103,12 +73,6 @@ const chatReducer = (state: ChatState, action: ChatAction): ChatState => {
         page: action.value,
       };
     }
-    case 'editChatGroupModalVisible': {
-      return {
-        ...state,
-        editChatGroupModalVisible: action.value,
-      };
-    }
     case 'messages': {
       return {
         ...state,
@@ -119,24 +83,6 @@ const chatReducer = (state: ChatState, action: ChatAction): ChatState => {
       return {
         ...state,
         newChatMessage: action.value,
-      };
-    }
-    case 'createGroupWindow': {
-      return {
-        ...state,
-        createGroupWindow: action.value,
-      };
-    }
-    case 'selectChatGroupWindow': {
-      return {
-        ...state,
-        selectChatGroupWindow: action.value,
-      };
-    }
-    case 'editMembersModalVisible': {
-      return {
-        ...state,
-        editMembersModalVisible: action.value,
       };
     }
     case 'newGroup': {
@@ -150,18 +96,6 @@ const chatReducer = (state: ChatState, action: ChatAction): ChatState => {
         ...state,
         editorState: action.value,
       };
-    }
-    case 'handleMenuSelected': {
-      return action.value === 'editGroup'
-      ? {
-        ...state,
-        editChatGroupModalVisible: true,
-      }
-      : action.value === 'editMembers' ? {
-        ...state,
-        editMembersModalVisible: true,
-      }
-      : { ...state };
     }
     case 'lastReadChatTime': {
       return action.value

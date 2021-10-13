@@ -2,7 +2,7 @@ import { ScreenName } from '@/components/Sidebar';
 import chatStyles from '@/styles/layouts/Chat.module.scss';
 import { IoSend } from 'react-icons/io5';
 import clsx from 'clsx';
-import { EventHandler, useCallback, useEffect, useMemo, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useReducer, useRef } from 'react';
 import { useAPIGetUsers } from '@/hooks/api/user/useAPIGetUsers';
 import 'rc-checkbox/assets/index.css';
 import { ChatGroup, ChatMessage, ChatMessageType, User } from 'src/types';
@@ -10,12 +10,15 @@ import { useAPIGetChatGroupList } from '@/hooks/api/chat/useAPIGetChatGroupList'
 import { useAPIGetMessages } from '@/hooks/api/chat/useAPIGetMessages';
 import { useAPISendChatMessage } from '@/hooks/api/chat/useAPISendChatMessage';
 import { useChatReducer } from '@/hooks/chat/useChatReducer';
+import { useModalReducer } from '@/hooks/chat/useModalReducer';
 import { mentionTransform } from 'src/utils/mentionTransform';
 import CreateChatGroupModal from '@/components/CreateChatGroupModal';
 import { Avatar, useMediaQuery } from '@chakra-ui/react';
 import { convertToRaw, EditorState } from 'draft-js';
 import Editor from '@draft-js-plugins/editor';
-import createMentionPlugin from '@draft-js-plugins/mention';
+import createMentionPlugin, {
+  defaultSuggestionsFilter,
+} from '@draft-js-plugins/mention';
 import { MentionData } from '@draft-js-plugins/mention';
 import '@draft-js-plugins/mention/lib/plugin.css';
 import { draftToMarkdown } from 'markdown-draft-js';
@@ -42,33 +45,104 @@ import { useAPISaveChatGroup } from '@/hooks/api/chat/useAPISaveChatGroup';
 import { useAPIGetLastReadChatTime } from '@/hooks/api/chat/useAPIGetLastReadChatTime';
 import { useAPISaveLastReadChatTime } from '@/hooks/api/chat/useAPISaveLastReadChatTime';
 import { useHeaderTab } from '@/hooks/headerTab/useHeaderTab';
-import { useMentionReducer } from '@/hooks/chat/useMentionReducer';
+
+type MentionState = {
+  suggestions: MentionData[];
+  allMentionUserData: MentionData[];
+  popup: boolean;
+  mentionedUserData: MentionData[];
+};
+
+type MentionAction =
+  | {
+      type: 'popup';
+      value: boolean;
+    }
+  | {
+      type: 'suggestions';
+      value: string;
+    }
+  | {
+      type: 'allMentionUserData';
+      value?: User[];
+    }
+  | {
+      type: 'mentionedUserData';
+      value: MentionData;
+    };
+
+const mentionReducer = (
+  state: MentionState,
+  action: MentionAction,
+): MentionState => {
+  switch (action.type) {
+    case 'popup': {
+      return {
+        ...state,
+        popup: action.value,
+      };
+    }
+    case 'suggestions': {
+      return {
+        ...state,
+        suggestions: defaultSuggestionsFilter(
+          action.value,
+          state.allMentionUserData,
+        ),
+      };
+    }
+    case 'allMentionUserData': {
+      return action.value?.length
+        ? {
+            ...state,
+            allMentionUserData: action.value.map((u) => ({
+              id: u.id,
+              name: u.lastName + ' ' + u.firstName,
+              avatar: u.avatarUrl,
+            })),
+          }
+        : {
+            ...state,
+          };
+    }
+    case 'mentionedUserData': {
+      return !state.mentionedUserData.filter(
+        (prev) => prev.id === action.value.id,
+      ).length
+        ? {
+            ...state,
+            mentionedUserData: [...state.mentionedUserData, action.value],
+          }
+        : {
+            ...state,
+          };
+    }
+  }
+};
 
 const ChatDetail = () => {
   const router = useRouter();
   const { id } = router.query as { id: string };
   const [{ popup, suggestions, mentionedUserData }, dispatchMention] =
-    useMentionReducer({
+    useReducer(mentionReducer, {
       popup: false,
       suggestions: [],
       allMentionUserData: [],
       mentionedUserData: [],
     });
   const [
+    { page, messages, lastReadChatTime, newChatMessage, newGroup, editorState },
+    dispatchChat,
+  ] = useChatReducer();
+  const [
     {
-      page,
       editChatGroupModalVisible,
-      messages,
-      lastReadChatTime,
-      newChatMessage,
       createGroupWindow,
       selectChatGroupWindow,
       editMembersModalVisible,
-      newGroup,
-      editorState,
     },
-    dispatchChat,
-  ] = useChatReducer();
+    dispatchModal,
+  ] = useModalReducer();
   const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
   const { data: chatGroups, refetch } = useAPIGetChatGroupList();
   const { data: users } = useAPIGetUsers();
@@ -92,7 +166,7 @@ const ChatDetail = () => {
   const messageWrapperDivRef = useRef<HTMLDivElement | null>(null);
   const { mutate: createGroup } = useAPISaveChatGroup({
     onSuccess: () => {
-      dispatchChat({ type: 'createGroupWindow', value: false });
+      dispatchModal({ type: 'createGroupWindow', value: false });
       dispatchChat({ type: 'newGroup', value: { ...newGroup, members: [] } });
       refetch();
     },
@@ -100,7 +174,7 @@ const ChatDetail = () => {
 
   const { mutate: saveGroup } = useAPISaveChatGroup({
     onSuccess: (newInfo) => {
-      dispatchChat({ type: 'editChatGroupModalVisible', value: false });
+      dispatchModal({ type: 'editChatGroupModalVisible', value: false });
       dispatchChat({
         type: 'newChatMessage',
         value: { ...newChatMessage, chatGroup: newInfo },
@@ -269,7 +343,7 @@ const ChatDetail = () => {
       type: 'newChatMessage',
       value: { ...newChatMessage, chatGroup: selectGroup },
     });
-    dispatchChat({ type: 'selectChatGroupWindow', value: false });
+    dispatchModal({ type: 'selectChatGroupWindow', value: false });
   };
 
   const onSend = () => {
@@ -306,7 +380,7 @@ const ChatDetail = () => {
   };
 
   const handleMenuSelected = useCallback((e: MenuItemProps) => {
-    dispatchChat({ type: 'handleMenuSelected', value: e.value });
+    dispatchModal({ type: 'handleMenuSelected', value: e.value });
   }, []);
 
   return (
@@ -317,7 +391,7 @@ const ChatDetail = () => {
         tabs: tabs,
         rightButtonName: 'ルームを作成',
         onClickRightButton: () =>
-          dispatchChat({ type: 'createGroupWindow', value: true }),
+          dispatchModal({ type: 'createGroupWindow', value: true }),
       }}>
       <Head>
         <title>ボールド | Chat</title>
@@ -326,7 +400,7 @@ const ChatDetail = () => {
         <CreateChatGroupModal
           isOpen={createGroupWindow}
           closeModal={() => {
-            dispatchChat({ type: 'createGroupWindow', value: false });
+            dispatchModal({ type: 'createGroupWindow', value: false });
             dispatchChat({ type: 'newGroup', value: {} });
           }}
           newGroup={newGroup}
@@ -346,7 +420,7 @@ const ChatDetail = () => {
           isOpen={selectChatGroupWindow}
           chatGroups={chatGroups}
           onClose={() =>
-            dispatchChat({ type: 'selectChatGroupWindow', value: false })
+            dispatchModal({ type: 'selectChatGroupWindow', value: false })
           }
           selectedChatGroups={newChatMessage}
           toggleChatGroups={(group) => toggleChatGroups(group)}
@@ -428,7 +502,7 @@ const ChatDetail = () => {
                       chatGroup={newChatMessage.chatGroup}
                       saveGroup={saveGroup}
                       closeModal={() =>
-                        dispatchChat({
+                        dispatchModal({
                           type: 'editChatGroupModalVisible',
                           value: false,
                         })
@@ -439,7 +513,7 @@ const ChatDetail = () => {
                       users={users || []}
                       previousUsers={newChatMessage.chatGroup.members || []}
                       onCancel={() =>
-                        dispatchChat({
+                        dispatchModal({
                           type: 'editMembersModalVisible',
                           value: false,
                         })
@@ -449,7 +523,7 @@ const ChatDetail = () => {
                           ...newChatMessage.chatGroup,
                           members: newMembers,
                         });
-                        dispatchChat({
+                        dispatchModal({
                           type: 'editMembersModalVisible',
                           value: false,
                         });
