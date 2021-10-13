@@ -21,7 +21,7 @@ export class UserJoiningEvent {
     nullable: true,
     default: null,
   })
-  canceledAt?: Date;
+  canceledAt?: Date | null;
 
   @Column({
     type: 'int',
@@ -36,7 +36,7 @@ export class UserJoiningEvent {
     onDelete: 'CASCADE',
   })
   @JoinColumn({ name: 'user_id' })
-  user: User;
+  users: User;
 
   @ManyToOne(() => EventSchedule, (event) => event.userJoiningEvent, {
     primary: false,
@@ -44,7 +44,7 @@ export class UserJoiningEvent {
     onDelete: 'CASCADE',
   })
   @JoinColumn({ name: 'event_id' })
-  event: EventSchedule;
+  events: EventSchedule;
 
   @CreateDateColumn({
     type: 'datetime',

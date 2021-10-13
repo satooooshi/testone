@@ -169,12 +169,13 @@ export interface EventSchedule {
 }
 
 export interface UserJoiningEvent {
-  createdAt?: Date;
-  updatedAt?: Date;
-  canceledAt?: Date;
-  lateMinutes?: number;
-  user: User;
-  event: EventSchedule;
+  id?: number;
+  lateMinutes: number;
+  canceledAt: Date | null;
+  users: User;
+  events: EventSchedule;
+  createdAt: Date;
+  updatedAt: Date;
 }
 export interface EventComment {
   id: number;

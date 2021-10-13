@@ -67,7 +67,8 @@ export class UserService {
         return subQuery
           .select('COUNT( DISTINCT event.id )', 'eventCount')
           .from(User, 'u')
-          .leftJoin('u.events', 'event')
+          .leftJoin('u.userJoiningEvent', 'userJoiningEvent')
+          .leftJoin('userJoiningEvent.events', 'event')
           .where(fromDate ? 'event.endAt > :fromDate' : '1=1', { fromDate })
           .andWhere(toDate ? 'event.endAt < :toDate' : '1=1', { toDate })
           .andWhere('u.id = user.id');
@@ -256,7 +257,8 @@ export class UserService {
         return subQuery
           .select('COUNT( DISTINCT event.id )', 'eventCount')
           .from(User, 'u')
-          .leftJoin('u.events', 'event')
+          .leftJoin('u.userJoiningEvent', 'userJoiningEvent')
+          .leftJoin('userJoiningEvent.events', 'event')
           .where(fromDate ? 'event.endAt > :fromDate' : '1=1', { fromDate })
           .andWhere('event.endAt < :toDate', { toDate })
           .andWhere('u.id = user.id');

@@ -156,7 +156,7 @@ export class EventScheduleController {
     const { user } = req;
     const eventSchedule = await this.eventService.getEventDetail(id, user.id);
     const isExist = eventSchedule.userJoiningEvent?.filter(
-      (userJoiningEvent) => user === userJoiningEvent.user,
+      (userJoiningEvent) => user.id === userJoiningEvent.users.id,
     ).length;
     if (isExist) {
       return { ...eventSchedule, isJoining: true };

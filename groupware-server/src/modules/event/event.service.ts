@@ -97,7 +97,7 @@ export class EventScheduleService {
     const events = await this.eventRepository
       .createQueryBuilder('events')
       .leftJoinAndSelect('events.userJoiningEvent', 'userJoiningEvent')
-      .leftJoinAndSelect('userJoiningEvent.user', 'user')
+      .leftJoinAndSelect('userJoiningEvent.users', 'user')
       .leftJoinAndSelect('events.hostUsers', 'hostUsers')
       .leftJoinAndSelect('events.tags', 'tags')
       .where('events.startAt > :fromDate', { fromDate })
@@ -113,9 +113,9 @@ export class EventScheduleService {
       if (e.userJoiningEvent.length) {
         for (const userJoiningEvent of e.userJoiningEvent) {
           const participantName =
-            userJoiningEvent.user.lastName +
+            userJoiningEvent.users.lastName +
             ' ' +
-            userJoiningEvent.user.firstName;
+            userJoiningEvent.users.firstName;
           csvEvents.push({
             ...e,
             startAt: dateTimeFormatterFromJSDDate({ dateTime: e.startAt }),
@@ -124,7 +124,7 @@ export class EventScheduleService {
             type: this.eventTypeNameFactory(e.type),
             hostUsers: host,
             users: participantName,
-            employeeId: userJoiningEvent.user.employeeId,
+            employeeId: userJoiningEvent.users.employeeId,
             participantsCount: e.userJoiningEvent.length,
           });
         }
@@ -165,7 +165,7 @@ export class EventScheduleService {
     const events = await this.eventRepository.find({
       relations: [
         'userJoiningEvent',
-        'userJoiningEvent.user',
+        'userJoiningEvent.users',
         'hostUsers',
         'tags',
       ],
@@ -178,9 +178,9 @@ export class EventScheduleService {
       if (e.userJoiningEvent.length) {
         for (const userJoiningEvent of e.userJoiningEvent) {
           const participantName =
-            userJoiningEvent.user.lastName +
+            userJoiningEvent.users.lastName +
             ' ' +
-            userJoiningEvent.user.firstName;
+            userJoiningEvent.users.firstName;
           csvEvents.push({
             ...e,
             startAt: dateTimeFormatterFromJSDDate({ dateTime: e.startAt }),
@@ -189,7 +189,7 @@ export class EventScheduleService {
             type: this.eventTypeNameFactory(e.type),
             hostUsers: host,
             users: participantName,
-            employeeId: userJoiningEvent.user.employeeId,
+            employeeId: userJoiningEvent.users.employeeId,
             participantsCount: e.userJoiningEvent.length,
           });
         }
@@ -232,7 +232,7 @@ export class EventScheduleService {
       .createQueryBuilder('events')
       .select()
       .leftJoinAndSelect('events.userJoiningEvent', 'userJoiningEvent')
-      .leftJoinAndSelect('userJoiningEvent.user', 'user')
+      .leftJoinAndSelect('userJoiningEvent.users', 'user')
       .leftJoinAndSelect('events.tags', 'tag')
       .where(
         word && word.length !== 1
@@ -269,7 +269,7 @@ export class EventScheduleService {
     const ids = events.map((e) => e.id);
     const eventsWithRelation = await this.eventRepository.find({
       where: { id: In(ids) },
-      relations: ['userJoiningEvent', 'userJoiningEvent.user', 'tags'],
+      relations: ['userJoiningEvent', 'userJoiningEvent.users', 'tags'],
       order: { createdAt: 'DESC' },
       take: limit,
       skip: offset,
@@ -288,7 +288,7 @@ export class EventScheduleService {
       .createQueryBuilder('events')
       .select()
       .leftJoinAndSelect('events.userJoiningEvent', 'userJoiningEvent')
-      .leftJoinAndSelect('userJoiningEvent.user', 'user')
+      .leftJoinAndSelect('userJoiningEvent.users', 'user')
       .leftJoinAndSelect('events.tags', 'tag')
       .leftJoin('events.hostUsers', 'host_user')
       .where(
@@ -327,7 +327,7 @@ export class EventScheduleService {
     const existEvent = await this.eventRepository
       .createQueryBuilder('events')
       .leftJoinAndSelect('events.userJoiningEvent', 'userJoiningEvent')
-      .leftJoinAndSelect('userJoiningEvent.user', 'user')
+      .leftJoinAndSelect('userJoiningEvent.users', 'user')
       .leftJoinAndSelect('events.tags', 'tags')
       .leftJoinAndSelect('events.files', 'files')
       .leftJoinAndSelect('events.submissionFiles', 'submissionFiles')
@@ -379,7 +379,7 @@ export class EventScheduleService {
     const filteredLatestEvents = await this.eventRepository
       .createQueryBuilder('event')
       .leftJoinAndSelect('events.userJoiningEvent', 'userJoiningEvent')
-      .leftJoinAndSelect('userJoiningEvent.user', 'user')
+      .leftJoinAndSelect('userJoiningEvent.users', 'user')
       .leftJoinAndSelect('event.tags', 'tags')
       .where('event.id IN (:ids)', { ids })
       .orderBy('RAND()')
@@ -409,11 +409,11 @@ export class EventScheduleService {
   public async joinEvent(eventID: number, user: User): Promise<EventSchedule> {
     const joinedEvent = await this.eventRepository.findOne({
       where: { id: eventID },
-      relations: ['chatGroup', 'userJoiningEvent', 'userJoiningEvent.user'],
+      relations: ['chatGroup', 'userJoiningEvent', 'userJoiningEvent.users'],
     });
     const userJoiningEvent: UserJoiningEvent = {
-      user: user,
-      event: joinedEvent,
+      users: user,
+      events: joinedEvent,
     };
     joinedEvent.userJoiningEvent.push(userJoiningEvent);
     await this.eventRepository.save(joinedEvent);

@@ -112,7 +112,7 @@ export class EventSchedule {
 
   @OneToMany(
     () => UserJoiningEvent,
-    (userJoiningEvent) => userJoiningEvent.event,
+    (userJoiningEvent) => userJoiningEvent.events,
   )
   userJoiningEvent?: UserJoiningEvent[];
 

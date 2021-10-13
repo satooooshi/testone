@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import eventParticipantsStyles from '@/styles/components/EventParticipants.module.scss';
-import { User, UserJoiningEvent } from 'src/types';
+import { UserJoiningEvent } from 'src/types';
 import { Avatar } from '@chakra-ui/react';
 import Link from 'next/link';
 
@@ -28,14 +28,14 @@ const EventParticipants: React.FC<EventParticipantsProps> = ({
       </div>
       {userJoiningEvent.map((u, index) =>
         index <= 15 || allVisible ? (
-          <Link key={u.user.id} href={`/account/${u.user.id}`}>
+          <Link key={u.users.id} href={`/account/${u.users.id}`}>
             <a className={eventParticipantsStyles.participant_name_wrapper}>
               <Avatar
-                src={u.user.avatarUrl}
+                src={u.users.avatarUrl}
                 className={eventParticipantsStyles.participant_avatar}
               />
               <p className={eventParticipantsStyles.participant_name}>
-                {u.user.lastName + ' ' + u.user.firstName}
+                {u.users.lastName + ' ' + u.users.firstName}
               </p>
             </a>
           </Link>

@@ -157,7 +157,7 @@ export class User {
 
   @OneToMany(
     () => UserJoiningEvent,
-    (userJoiningEvent) => userJoiningEvent.user,
+    (userJoiningEvent) => userJoiningEvent.users,
   )
   userJoiningEvent?: UserJoiningEvent[];
 
