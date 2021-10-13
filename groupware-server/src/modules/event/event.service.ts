@@ -411,18 +411,10 @@ export class EventScheduleService {
       where: { id: eventID },
       relations: ['chatGroup', 'userJoiningEvent', 'userJoiningEvent.user'],
     });
-    // await this.eventRepository
-    //   .createQueryBuilder()
-    //   .relation(EventSchedule, 'users')
-    //   .of(joinedEvent.id)
-    //   .add(userID);
     const userJoiningEvent: UserJoiningEvent = {
       user: user,
       event: joinedEvent,
     };
-
-    console.log('joinedEvent', joinedEvent.userJoiningEvent);
-    console.log('userJoiningEvent', userJoiningEvent);
     joinedEvent.userJoiningEvent.push(userJoiningEvent);
     await this.eventRepository.save(joinedEvent);
     return joinedEvent;

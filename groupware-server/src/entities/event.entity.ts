@@ -114,7 +114,7 @@ export class EventSchedule {
     () => UserJoiningEvent,
     (userJoiningEvent) => userJoiningEvent.event,
   )
-  userJoiningEvent: UserJoiningEvent[];
+  userJoiningEvent?: UserJoiningEvent[];
 
   @ManyToMany(() => Tag, {
     onUpdate: 'CASCADE',
