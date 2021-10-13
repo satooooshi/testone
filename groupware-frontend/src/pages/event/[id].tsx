@@ -328,7 +328,7 @@ const EventDetail = () => {
             )}
             <div className={eventDetailStyles.event_participants_wrapper}>
               {data.type !== 'submission_etc' && (
-                <EventParticipants participants={data.users} />
+                <EventParticipants userJoiningEvent={data.userJoiningEvent} />
               )}
             </div>
             {data.type === EventType.SUBMISSION_ETC ? (

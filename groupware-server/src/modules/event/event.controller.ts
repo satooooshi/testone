@@ -155,12 +155,15 @@ export class EventScheduleController {
     const { id } = params;
     const { user } = req;
     const eventSchedule = await this.eventService.getEventDetail(id, user.id);
-    const isExist = eventSchedule.users?.filter((u) => user.id === u.id).length;
+    const isExist = eventSchedule.userJoiningEvent?.filter(
+      (userJoiningEvent) => user === userJoiningEvent.user,
+    ).length;
     if (isExist) {
       return { ...eventSchedule, isJoining: true };
     }
     return { ...eventSchedule, isJoining: false };
   }
+
   @Post('create-event')
   @UseGuards(JwtAuthenticationGuard)
   async createEvent(
@@ -244,7 +247,7 @@ export class EventScheduleController {
   ) {
     const joinedEvent = await this.eventService.joinEvent(
       body.eventID,
-      req.user.id,
+      req.user,
     );
     if (joinedEvent.chatNeeded && joinedEvent.chatGroup) {
       await this.chatService.joinChatGroup(

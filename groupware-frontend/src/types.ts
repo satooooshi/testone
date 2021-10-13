@@ -157,6 +157,7 @@ export interface EventSchedule {
   chatGroup?: ChatGroup;
   comments?: EventComment[];
   users?: User[];
+  userJoiningEvent?: UserJoiningEvent[];
   hostUsers?: User[];
   tags?: Tag[];
   files?: EventFile[];
@@ -165,6 +166,15 @@ export interface EventSchedule {
   author?: User;
   createdAt: Date;
   updatedAt: Date;
+}
+
+export interface UserJoiningEvent {
+  createdAt?: Date;
+  updatedAt?: Date;
+  canceledAt?: Date;
+  lateMinutes?: number;
+  user: User;
+  event: EventSchedule;
 }
 export interface EventComment {
   id: number;
