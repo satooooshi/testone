@@ -2,11 +2,12 @@ import eventPRStyles from '@/styles/layouts/EventPR.module.scss';
 import EventCard from '@/components/EventCard';
 import { EventSchedule } from 'src/types';
 import { EventTab } from 'src/types/header/tab/types';
+import Image from 'next/image';
 
 export interface EventIntroductionProps {
   recommendedEvents?: EventSchedule[];
-  headlineImage: React.ReactNode | StaticImageData;
-  bottomImages: (React.ReactNode | StaticImageData)[];
+  headlineImgSource: StaticImageData | string;
+  bottomImgSources: (StaticImageData | string)[];
   heading: EventTab;
   subHeading: string;
   content: string;
@@ -14,8 +15,8 @@ export interface EventIntroductionProps {
 
 const EventIntroduction: React.FC<EventIntroductionProps> = ({
   recommendedEvents,
-  headlineImage,
-  bottomImages,
+  headlineImgSource,
+  bottomImgSources,
   heading,
   subHeading,
   content,
@@ -30,7 +31,11 @@ const EventIntroduction: React.FC<EventIntroductionProps> = ({
         <div
           className={eventPRStyles.main_image_wrapper}
           style={{ marginRight: 16 }}>
-          {headlineImage}
+          {typeof headlineImgSource === 'string' ? (
+            <img src={headlineImgSource} alt="" />
+          ) : (
+            <Image src={headlineImgSource} alt="" />
+          )}
         </div>
       </div>
       <div className={eventPRStyles.latest_events_wrapper}>
@@ -64,9 +69,13 @@ const EventIntroduction: React.FC<EventIntroductionProps> = ({
           </div>
         </div>
         <div className={eventPRStyles.bottom_images_row}>
-          {bottomImages.map((bottomImage, id) => (
+          {bottomImgSources.map((bottomImgSource, id) => (
             <div key={id} className={eventPRStyles.bottom_image_wrapper}>
-              {bottomImage}
+              {typeof bottomImgSource === 'string' ? (
+                <img src={bottomImgSource} alt="" />
+              ) : (
+                <Image src={bottomImgSource} alt="" />
+              )}
             </div>
           ))}
         </div>

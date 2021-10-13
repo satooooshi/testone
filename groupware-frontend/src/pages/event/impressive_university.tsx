@@ -1,7 +1,6 @@
 import LayoutWithTab from '@/components/LayoutWithTab';
 import { ScreenName } from '@/components/Sidebar';
 import { useRouter } from 'next/router';
-import Image from 'next/image';
 import React from 'react';
 import eventPRStyles from '@/styles/layouts/EventPR.module.scss';
 import impressiveUniversityImage1 from '@/public/impressive_university_1.png';
@@ -23,18 +22,12 @@ const ImpressionUniversity: React.FC = () => {
     type: EventType.IMPRESSIVE_UNIVERSITY,
   });
 
-  const headlineImage = (
-    <img
-      src={
-        'https://www.bold.ne.jp/assets/assets_recruit/images/enviroment/img_univ_main.png'
-      }
-      alt=""
-    />
-  );
+  const headlineImgSource =
+    'https://www.bold.ne.jp/assets/assets_recruit/images/enviroment/img_univ_main.png';
 
-  const bottomImages = [
-    <Image key="1" src={impressiveUniversityImage1} alt="" />,
-    <Image key="2" src={impressiveUniversityImage2} alt="" />,
+  const bottomImgSources = [
+    impressiveUniversityImage1,
+    impressiveUniversityImage2,
   ];
 
   const subHeading = '技術力と人間力を\n毎日プロから学ぶことが出来る研修制度';
@@ -48,8 +41,8 @@ const ImpressionUniversity: React.FC = () => {
       <div className={eventPRStyles.main}>
         <EventIntroduction
           recommendedEvents={recommendedEvents}
-          headlineImage={headlineImage}
-          bottomImages={bottomImages}
+          headlineImgSource={headlineImgSource}
+          bottomImgSources={bottomImgSources}
           heading={EventTab.IMPRESSIVE_UNIVERSITY}
           subHeading={subHeading}
           content={content}
