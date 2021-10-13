@@ -19,7 +19,7 @@ import {
 } from '@/hooks/api/wiki/useAPIGetWikiList';
 import { useAuthenticate } from 'src/contexts/useAuthenticate';
 import { useHeaderTab } from '@/hooks/headerTab/useHeaderTab';
-import TopTabBar, { TopTabBehavior } from '@/components/TopTabBar';
+import TopTabBar, { TopTabBehavior } from '@/components/layout/TopTabBar';
 import topTabBarStyles from '@/styles/components/TopTabBar.module.scss';
 
 const QAQuestionList = () => {
