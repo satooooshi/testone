@@ -1,5 +1,5 @@
-import LayoutWithTab from '@/components/LayoutWithTab';
-import { ScreenName } from '@/components/Sidebar';
+import LayoutWithTab from '@/components/layout/LayoutWithTab';
+import { ScreenName } from '@/components/layout/Sidebar';
 import React, { useCallback, useMemo, useReducer, useRef } from 'react';
 import { Tab } from 'src/types/header/tab/types';
 import Head from 'next/head';
@@ -22,7 +22,7 @@ import { useAPIRegister } from '@/hooks/api/auth/useAPIRegister';
 import createNewUserStyles from '@/styles/layouts/admin/CreateNewUser.module.scss';
 import clsx from 'clsx';
 import { toggleTag } from 'src/utils/toggleTag';
-import TagModal from '@/components/TagModal';
+import TagModal from '@/components/common/TagModal';
 import { useAPIGetUserTag } from '@/hooks/api/tag/useAPIGetUserTag';
 import { useFormik } from 'formik';
 import { registerSchema } from 'src/utils/validation/schema';

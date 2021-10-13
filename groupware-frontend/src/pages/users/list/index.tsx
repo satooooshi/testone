@@ -1,7 +1,7 @@
-import LayoutWithTab from '@/components/LayoutWithTab';
+import LayoutWithTab from '@/components/layout/LayoutWithTab';
 import ReactPaginate from 'react-paginate';
-import SearchForm from '@/components/SearchForm';
-import UserCard from '@/components/UserCard';
+import SearchForm from '@/components/common/SearchForm';
+import UserCard from '@/components/user/UserCard';
 import userListStyles from '@/styles/layouts/UserList.module.scss';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
@@ -10,9 +10,9 @@ import { Tag, UserRole } from 'src/types';
 import { toggleTag } from 'src/utils/toggleTag';
 import paginationStyles from '@/styles/components/Pagination.module.scss';
 import { userQueryRefresh } from 'src/utils/userQueryRefresh';
-import { ScreenName } from '@/components/Sidebar';
+import { ScreenName } from '@/components/layout/Sidebar';
 import { FormControl, FormLabel, Select } from '@chakra-ui/react';
-import TopTabBar, { TopTabBehavior } from '@/components/TopTabBar';
+import TopTabBar, { TopTabBehavior } from '@/components/layout/TopTabBar';
 import { useAPIGetUserTag } from '@/hooks/api/tag/useAPIGetUserTag';
 import {
   SearchQueryToGetUsers,

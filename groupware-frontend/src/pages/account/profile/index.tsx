@@ -5,9 +5,9 @@ import React, {
   useRef,
   useReducer,
 } from 'react';
-import { ScreenName } from '@/components/Sidebar';
+import { ScreenName } from '@/components/layout/Sidebar';
 import { Tab } from 'src/types/header/tab/types';
-import LayoutWithTab from '@/components/LayoutWithTab';
+import LayoutWithTab from '@/components/layout/LayoutWithTab';
 import profileStyles from '@/styles/layouts/Profile.module.scss';
 import { useAPIUpdateUser } from '@/hooks/api/user/useAPIUpdateUser';
 import { TagType, User, UserTag } from 'src/types';
@@ -33,7 +33,7 @@ import { useImageCrop } from '@/hooks/crop/useImageCrop';
 import { useHeaderTab } from '@/hooks/headerTab/useHeaderTab';
 import createNewUserStyles from '@/styles/layouts/admin/CreateNewUser.module.scss';
 import clsx from 'clsx';
-import TagModal from '@/components/TagModal';
+import TagModal from '@/components/common/TagModal';
 import { toggleTag } from 'src/utils/toggleTag';
 import { useAPIGetUserTag } from '@/hooks/api/tag/useAPIGetUserTag';
 
