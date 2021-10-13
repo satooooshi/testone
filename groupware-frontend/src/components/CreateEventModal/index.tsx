@@ -120,7 +120,7 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
     for (const k of keys) {
       if (errors[k]) {
         toast({
-          title: errors[k],
+          description: errors[k],
           status: 'error',
           duration: 3000,
           isClosable: true,
