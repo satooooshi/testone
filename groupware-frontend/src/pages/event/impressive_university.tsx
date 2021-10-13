@@ -7,12 +7,8 @@ import impressiveUniversityImage1 from '@/public/impressive_university_1.png';
 import impressiveUniversityImage2 from '@/public/impressive_university_2.png';
 import { useAPIGetLatestEvent } from '@/hooks/api/event/useAPIGetLatestEvent';
 import { EventType } from 'src/types';
-<<<<<<< HEAD
-import EventCard from '@/components/common/EventCard';
-=======
 import { EventTab } from 'src/types/header/tab/types';
 import EventIntroduction from 'src/templates/event/EventIntroduction';
->>>>>>> develop
 
 const ImpressionUniversity: React.FC = () => {
   const router = useRouter();
