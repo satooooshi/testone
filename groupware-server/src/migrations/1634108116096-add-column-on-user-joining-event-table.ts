@@ -62,9 +62,5 @@ export class addColumnOnUserJoiningEventTable1634108116096
       `ALTER TABLE user_joining_event DROP COLUMN canceled_at`,
     );
     await queryRunner.query(`ALTER TABLE user_joining_event DROP COLUMN id`);
-    await queryRunner.query(`ALTER TABLE user_joining_event DROP PRIMARY KEY`);
-    await queryRunner.query(
-      `ALTER TABLE user_joining_event ADD PRIMARY KEY (event_id, user_id)`,
-    );
   }
 }
