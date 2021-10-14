@@ -4,6 +4,7 @@ import {
   Controller,
   Get,
   Param,
+  Patch,
   Post,
   Query,
   Req,
@@ -268,6 +269,22 @@ export class EventScheduleController {
       );
     }
     return joinedEvent;
+  }
+
+  @Patch('cancel-event/:id')
+  @UseGuards(JwtAuthenticationGuard)
+  async cancelEvent(@Req() req: RequestWithUser, @Param() eventId: number) {
+    const userJoiningEvent = await this.eventService.cancelEvent(
+      eventId,
+      req.user,
+    );
+    // if (userJoiningEvent.event.chatNeeded && userJoiningEvent.event.chatGroup) {
+    //   await this.chatService.joinChatGroup(
+    //     req.user.id,
+    //     userJoiningEvent.event.chatGroup.id,
+    //   );
+    // }
+    return userJoiningEvent.event;
   }
 
   @Post('delete-event')

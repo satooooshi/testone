@@ -1,7 +1,12 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotAcceptableException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Parser } from 'json2csv';
 import * as JSZip from 'jszip';
+import { DateTime } from 'luxon';
 import { EventSchedule, EventType } from 'src/entities/event.entity';
 import { EventComment } from 'src/entities/eventComment.entity';
 import { EventFile } from 'src/entities/eventFile.entity';
@@ -424,6 +429,23 @@ export class EventScheduleService {
     };
     await this.userJoiningEventRepository.save(userJoiningEvent);
     return joinedEvent;
+  }
+
+  public async cancelEvent(
+    eventID: number,
+    user: User,
+  ): Promise<UserJoiningEvent> {
+    const canceledUserJoiningEvent =
+      await this.userJoiningEventRepository.findOne({
+        where: [{ event: eventID, user: user.id }],
+        relations: ['user', 'event'],
+      });
+    if (!canceledUserJoiningEvent) {
+      throw new NotAcceptableException('Something went wrong');
+    }
+    canceledUserJoiningEvent.canceledAt = new Date();
+    await this.userJoiningEventRepository.save(canceledUserJoiningEvent);
+    return canceledUserJoiningEvent;
   }
 
   async deleteEvent(eventScheduleId: number) {
