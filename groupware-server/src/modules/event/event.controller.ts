@@ -187,7 +187,9 @@ export class EventScheduleController {
         dateTime: savedEvent.endAt,
       });
       const emailContent = `${title} 開始日時: ${startAtStr} 終了日時: ${endAtStr} \n ${description}`;
-      const subject = `新規${eventTypeName(savedEvent.type)}が作成されました`;
+      const subject = `新規イベント: ${eventTypeName(
+        savedEvent.type,
+      )}が登録されました`;
       const buttonName = `作成された${eventTypeName(savedEvent.type)}を見る`;
       this.notifService.sendEmailNotification({
         to: emailArr,
