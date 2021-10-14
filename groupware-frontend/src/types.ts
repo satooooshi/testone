@@ -88,7 +88,7 @@ export interface Tag {
   id: number;
   name: string;
   type: TagType;
-  createdAt: Dat
+  createdAt: Date;
   updatedAt: Date;
   events?: EventSchedule[];
   wiki?: Wiki[];
