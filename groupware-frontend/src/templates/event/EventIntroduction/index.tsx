@@ -1,5 +1,5 @@
 import eventPRStyles from '@/styles/layouts/EventPR.module.scss';
-import EventCard from '@/components/EventCard';
+import EventCard from '@/components/common/EventCard';
 import { EventSchedule } from 'src/types';
 import { EventTab } from 'src/types/header/tab/types';
 import Image from 'next/image';

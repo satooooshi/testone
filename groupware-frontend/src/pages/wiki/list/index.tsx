@@ -1,13 +1,13 @@
-import { ScreenName } from '@/components/Sidebar';
+import { ScreenName } from '@/components/layout/Sidebar';
 import { Tab } from 'src/types/header/tab/types';
 import { useRouter } from 'next/router';
-import WikiCard from '@/components/WikiCard';
+import WikiCard from '@/components/common/WikiCard';
 import ReactPaginate from 'react-paginate';
 import paginationStyles from '@/styles/components/Pagination.module.scss';
 import qaListStyles from '@/styles/layouts/QAList.module.scss';
 import { useMemo, useState } from 'react';
-import LayoutWithTab from '@/components/LayoutWithTab';
-import SearchForm from '@/components/SearchForm';
+import LayoutWithTab from '@/components/layout/LayoutWithTab';
+import SearchForm from '@/components/common/SearchForm';
 import { useAPIGetTag } from '@/hooks/api/tag/useAPIGetTag';
 import { toggleTag } from 'src/utils/toggleTag';
 import { RuleCategory, Tag, UserRole, WikiType } from 'src/types';
@@ -19,7 +19,7 @@ import {
 } from '@/hooks/api/wiki/useAPIGetWikiList';
 import { useAuthenticate } from 'src/contexts/useAuthenticate';
 import { useHeaderTab } from '@/hooks/headerTab/useHeaderTab';
-import TopTabBar, { TopTabBehavior } from '@/components/TopTabBar';
+import TopTabBar, { TopTabBehavior } from '@/components/layout/TopTabBar';
 import topTabBarStyles from '@/styles/components/TopTabBar.module.scss';
 
 const QAQuestionList = () => {

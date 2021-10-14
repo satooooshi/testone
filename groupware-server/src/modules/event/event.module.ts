@@ -7,6 +7,7 @@ import { EventFile } from 'src/entities/eventFile.entity';
 import { EventVideo } from 'src/entities/eventVideo.entity';
 import { SubmissionFile } from 'src/entities/submissionFiles.entity';
 import { Tag } from 'src/entities/tag.entity';
+import { UserJoiningEvent } from 'src/entities/userJoiningEvent.entity';
 import { ChatModule } from '../chat/chat.module';
 import { NotificationModule } from '../notification/notification.module';
 import { StorageModule } from '../storage/storage.module';
@@ -22,6 +23,7 @@ import { EventScheduleService } from './event.service';
     NotificationModule,
     ConfigModule,
     TypeOrmModule.forFeature([
+      UserJoiningEvent,
       EventSchedule,
       EventFile,
       EventVideo,

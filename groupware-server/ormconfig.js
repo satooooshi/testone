@@ -18,7 +18,7 @@ module.exports = {
       ? 'dist/entities/*.entity.js'
       : 'entities/*.entity.js',
   ],
-  synchronize: true,
+  synchronize: false,
   migrations: [
     process.env.NODE_ENV !== 'production'
       ? 'src/migrations/*.ts'

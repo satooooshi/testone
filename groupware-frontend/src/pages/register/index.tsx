@@ -7,7 +7,7 @@ import { useAPIRegister } from '@/hooks/api/auth/useAPIRegister';
 import authFormStyles from '@/styles/components/AuthForm.module.scss';
 import textInputStyles from '@/styles/components/TextInput.module.scss';
 import textLinkStyles from '@/styles/components/TextLink.module.scss';
-import AuthButton from '@/components/AuthButton';
+import AuthButton from '@/components/common/AuthButton';
 import clsx from 'clsx';
 import Link from 'next/link';
 import { useRouter } from 'next/router';

@@ -1,5 +1,5 @@
 import { SidebarProps } from '../Sidebar';
-import Sidebar from '@/components/Sidebar';
+import Sidebar from '@/components/layout/Sidebar';
 import HeaderWithTab, { HeaderProps } from '../HeaderWithTab';
 import layoutStyles from '@/styles/layouts/Layout.module.scss';
 import { useState } from 'react';

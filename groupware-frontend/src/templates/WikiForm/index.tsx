@@ -2,10 +2,10 @@ import React, { useMemo, useState, useEffect, useRef } from 'react';
 import qaCreateStyles from '@/styles/layouts/QACreate.module.scss';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
-import { ScreenName } from '@/components/Sidebar';
-import LayoutWithTab from '@/components/LayoutWithTab';
-import TagModal from '@/components/TagModal';
-import WrappedDraftEditor from '@/components/WrappedDraftEditor';
+import { ScreenName } from '@/components/layout/Sidebar';
+import LayoutWithTab from '@/components/layout/LayoutWithTab';
+import TagModal from '@/components/common/TagModal';
+import WrappedDraftEditor from '@/components/wiki/WrappedDraftEditor';
 import {
   Wiki,
   Tag,
@@ -26,7 +26,7 @@ import {
 import { useAuthenticate } from 'src/contexts/useAuthenticate';
 import { ContentState, convertFromHTML, Editor, EditorState } from 'draft-js';
 import { stateToHTML } from 'draft-js-export-html';
-import WrappedEditor from '@/components/WrappedEditor';
+import WrappedEditor from '@/components/wiki/WrappedEditor';
 import MarkdownEditor from 'react-markdown-editor-lite';
 import { liteEditorPlugins } from 'src/utils/liteEditorPlugins';
 import MarkdownIt from 'markdown-it';

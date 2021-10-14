@@ -1,18 +1,18 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import { Tab } from 'src/types/header/tab/types';
-import { ScreenName } from '@/components/Sidebar';
+import { ScreenName } from '@/components/layout/Sidebar';
 import eventListStyles from '@/styles/layouts/EventList.module.scss';
-import EventCard from '@/components/EventCard';
+import EventCard from '@/components/common/EventCard';
 import { useRouter } from 'next/router';
 import paginationStyles from '@/styles/components/Pagination.module.scss';
 import ReactPaginate from 'react-paginate';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
-import LayoutWithTab from '@/components/LayoutWithTab';
+import LayoutWithTab from '@/components/layout/LayoutWithTab';
 import CreateEventModal, {
   CreateEventRequest,
-} from '@/components/CreateEventModal';
-import SearchForm from '@/components/SearchForm';
+} from '@/components/event/CreateEventModal';
+import SearchForm from '@/components/common/SearchForm';
 import { EventSchedule, EventType, Tag } from 'src/types';
 import { EventTab } from 'src/types/header/tab/types';
 import { toggleTag } from 'src/utils/toggleTag';
@@ -27,7 +27,7 @@ import { dateTimeFormatterFromJSDDate } from 'src/utils/dateTimeFormatter';
 import { DateTime } from 'luxon';
 import Head from 'next/head';
 import { useAuthenticate } from 'src/contexts/useAuthenticate';
-import TopTabBar, { TopTabBehavior } from '@/components/TopTabBar';
+import TopTabBar, { TopTabBehavior } from '@/components/layout/TopTabBar';
 import { useAPICreateEvent } from '@/hooks/api/event/useAPICreateEvent';
 import {
   SearchQueryToGetEvents,

@@ -22,6 +22,8 @@ export class EventScheduleService {
   constructor(
     @InjectRepository(EventSchedule)
     private readonly eventRepository: Repository<EventSchedule>,
+    @InjectRepository(UserJoiningEvent)
+    private readonly userJoiningEventRepository: Repository<UserJoiningEvent>,
     @InjectRepository(EventFile)
     private readonly eventtFileRepository: Repository<EventFile>,
     @InjectRepository(EventVideo)
@@ -415,8 +417,7 @@ export class EventScheduleService {
       user: user,
       event: joinedEvent,
     };
-    joinedEvent.userJoiningEvent.push(userJoiningEvent);
-    await this.eventRepository.save(joinedEvent);
+    await this.userJoiningEventRepository.save(userJoiningEvent);
     return joinedEvent;
   }
 
