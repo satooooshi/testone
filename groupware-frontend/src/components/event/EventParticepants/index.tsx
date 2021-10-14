@@ -3,6 +3,7 @@ import eventParticipantsStyles from '@/styles/components/EventParticipants.modul
 import { UserJoiningEvent } from 'src/types';
 import { Avatar } from '@chakra-ui/react';
 import Link from 'next/link';
+import boldMascot from '@/public/bold-mascot.png';
 
 type EventParticipantsProps = {
   userJoiningEvent: UserJoiningEvent[];
@@ -28,17 +29,29 @@ const EventParticipants: React.FC<EventParticipantsProps> = ({
       </div>
       {userJoiningEvent.map((u, index) =>
         index <= 15 || allVisible ? (
-          <Link key={u.user.id} href={`/account/${u.user.id}`}>
-            <a className={eventParticipantsStyles.participant_name_wrapper}>
+          u.user.existence ? (
+            <Link key={u.user.id} href={`/account/${u.user.id}`}>
+              <a className={eventParticipantsStyles.participant_name_wrapper}>
+                <Avatar
+                  src={u.user.avatarUrl}
+                  className={eventParticipantsStyles.participant_avatar}
+                />
+                <p className={eventParticipantsStyles.participant_name}>
+                  {u.user.lastName + ' ' + u.user.firstName}
+                </p>
+              </a>
+            </Link>
+          ) : (
+            <div className={eventParticipantsStyles.participant_name_wrapper}>
               <Avatar
-                src={u.user.avatarUrl}
+                src={boldMascot.src}
                 className={eventParticipantsStyles.participant_avatar}
               />
               <p className={eventParticipantsStyles.participant_name}>
-                {u.user.lastName + ' ' + u.user.firstName}
+                ボールドくん
               </p>
-            </a>
-          </Link>
+            </div>
+          )
         ) : (
           <></>
         ),

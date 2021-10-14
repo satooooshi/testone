@@ -98,6 +98,7 @@ export class EventScheduleService {
     const csvEvents: any[] = [];
     const events = await this.eventRepository
       .createQueryBuilder('events')
+      .withDeleted()
       .leftJoinAndSelect('events.userJoiningEvent', 'userJoiningEvent')
       .leftJoinAndSelect('userJoiningEvent.user', 'user')
       .leftJoinAndSelect('events.hostUsers', 'hostUsers')
