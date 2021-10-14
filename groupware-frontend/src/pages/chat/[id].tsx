@@ -1,7 +1,6 @@
 import { ScreenName } from '@/components/layout/Sidebar';
 import chatStyles from '@/styles/layouts/Chat.module.scss';
 import { IoSend } from 'react-icons/io5';
-import clsx from 'clsx';
 import {
   useCallback,
   useEffect,
@@ -22,7 +21,6 @@ import {
 import { useAPIGetChatGroupList } from '@/hooks/api/chat/useAPIGetChatGroupList';
 import { useAPIGetMessages } from '@/hooks/api/chat/useAPIGetMessages';
 import { useAPISendChatMessage } from '@/hooks/api/chat/useAPISendChatMessage';
-import { mentionTransform } from 'src/utils/mentionTransform';
 import CreateChatGroupModal from '@/components/chat/CreateChatGroupModal';
 import { Avatar, useMediaQuery } from '@chakra-ui/react';
 import { convertToRaw, EditorState } from 'draft-js';
@@ -37,25 +35,24 @@ import '@draft-js-plugins/image/lib/plugin.css';
 import ChatGroupCard from '@/components/chat/ChatGroupCard';
 import LayoutWithTab from '@/components/layout/LayoutWithTab';
 import { Tab } from 'src/types/header/tab/types';
-import { AiOutlinePaperClip, AiOutlineFileProtect } from 'react-icons/ai';
+import { AiOutlinePaperClip } from 'react-icons/ai';
 import { useDropzone } from 'react-dropzone';
 import { useAPIUploadStorage } from '@/hooks/api/storage/useAPIUploadStorage';
 import { isImage, isVideo } from '../../utils/indecateChatMessageType';
 import SelectChatGroupModal from '@/components/chat/SelectChatGroupModal';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import { dateTimeFormatterFromJSDDate } from 'src/utils/dateTimeFormatter';
 import { HiOutlineDotsCircleHorizontal } from 'react-icons/hi';
 import { Menu, MenuItem, MenuButton } from '@szhsin/react-menu';
 import '@szhsin/react-menu/dist/index.css';
 import '@szhsin/react-menu/dist/transitions/slide.css';
-import Link from 'next/link';
 import EditChatGroupModal from '@/components/chat/EditChatGroupModal';
 import EditChatGroupMembersModal from '@/components/chat/EditChatGroupMembersModal';
 import { useAPISaveChatGroup } from '@/hooks/api/chat/useAPISaveChatGroup';
 import { useAPIGetLastReadChatTime } from '@/hooks/api/chat/useAPIGetLastReadChatTime';
 import { useAPISaveLastReadChatTime } from '@/hooks/api/chat/useAPISaveLastReadChatTime';
 import { useHeaderTab } from '@/hooks/headerTab/useHeaderTab';
+import ChatMessageItem from '@/components/chat/ChatMessageItem';
 
 type MentionState = {
   suggestions: MentionData[];
@@ -238,7 +235,7 @@ const ChatDetail = () => {
           : ChatMessageType.OTHER_FILE,
       });
       messageWrapperDivRef.current &&
-        messageWrapperDivRef.current.scrollIntoView();
+        messageWrapperDivRef.current.scrollTo({ top: 0 });
     },
   });
 
@@ -342,11 +339,6 @@ const ChatDetail = () => {
       value,
     });
   }, []);
-
-  const messageReadCount = (message: ChatMessage): number => {
-    return lastReadChatTime?.filter((l) => l.readTime >= message.updatedAt)
-      .length;
-  };
 
   const toggleUserIDs = (user: User) => {
     const isExist = newGroup.members?.filter((u) => u.id === user.id);
@@ -534,7 +526,10 @@ const ChatDetail = () => {
               {/*
                * Messages
                */}
-              <div className={chatStyles.messages} onScroll={onScrollTopOnChat}>
+              <div
+                ref={messageWrapperDivRef}
+                className={chatStyles.messages}
+                onScroll={onScrollTopOnChat}>
                 {messages && newChatMessage.chatGroup ? (
                   <>
                     <EditChatGroupModal
@@ -557,114 +552,11 @@ const ChatDetail = () => {
                       }}
                     />
                     {messages.map((m) => (
-                      <div
+                      <ChatMessageItem
                         key={m.id}
-                        className={clsx(
-                          chatStyles.message__item,
-                          m.isSender
-                            ? chatStyles.message__self
-                            : chatStyles.message__other,
-                        )}>
-                        {!m.isSender ? (
-                          <Link href={`/account/${m.sender?.id}`} passHref>
-                            <Avatar
-                              className={chatStyles.group_card_avatar_image}
-                              src={m.sender?.avatarUrl}
-                            />
-                          </Link>
-                        ) : null}
-                        <div
-                          className={chatStyles.message_wrapper}
-                          ref={messageWrapperDivRef}>
-                          {m.isSender && (
-                            <div>
-                              {messageReadCount(m) ? (
-                                <p className={chatStyles.read_count}>
-                                  既読
-                                  {messageReadCount(m)}
-                                </p>
-                              ) : null}
-                              <p className={chatStyles.send_time}>
-                                {dateTimeFormatterFromJSDDate({
-                                  dateTime: new Date(m.createdAt),
-                                  format: 'HH:mm',
-                                })}
-                              </p>
-                            </div>
-                          )}
-                          <div
-                            className={clsx(
-                              chatStyles.message_user_info_wrapper,
-                              m.isSender &&
-                                chatStyles.message_user_info_wrapper__self,
-                            )}>
-                            <p className={chatStyles.massage_sender_name}>
-                              {m.sender?.lastName + ' ' + m.sender?.firstName}
-                            </p>
-                            {m.type === ChatMessageType.TEXT ? (
-                              <p
-                                className={clsx(
-                                  chatStyles.message_content,
-                                  m.isSender
-                                    ? chatStyles.message_text__self
-                                    : chatStyles.message_text__other,
-                                )}>
-                                {mentionTransform(m.content)}
-                              </p>
-                            ) : (
-                              <span className={chatStyles.message_content}>
-                                {m.type === ChatMessageType.IMAGE ? (
-                                  <span
-                                    className={
-                                      chatStyles.message_image_or_video
-                                    }>
-                                    <img
-                                      src={m.content}
-                                      width={300}
-                                      height={300}
-                                      alt="image"
-                                    />
-                                  </span>
-                                ) : m.type === ChatMessageType.VIDEO ? (
-                                  <span
-                                    className={
-                                      chatStyles.message_image_or_video
-                                    }>
-                                    <video
-                                      src={m.content}
-                                      controls
-                                      width={300}
-                                      height={300}
-                                    />
-                                  </span>
-                                ) : (
-                                  <div
-                                    className={chatStyles.message_other_file}>
-                                    <AiOutlineFileProtect
-                                      className={chatStyles.other_file_icon}
-                                    />
-                                    <span>
-                                      {
-                                        (m.content.match(
-                                          '.+/(.+?)([?#;].*)?$',
-                                        ) || ['', m.content])[1]
-                                      }
-                                    </span>
-                                  </div>
-                                )}
-                              </span>
-                            )}
-                          </div>
-                          {!m.isSender && (
-                            <p className={chatStyles.send_time}>
-                              {dateTimeFormatterFromJSDDate({
-                                dateTime: new Date(m.createdAt),
-                                format: 'HH:mm',
-                              })}
-                            </p>
-                          )}
-                        </div>
-                      </div>
+                        message={m}
+                        lastReadChatTime={lastReadChatTime}
+                      />
                     ))}
                   </>
                 ) : (
