@@ -432,12 +432,12 @@ export class EventScheduleService {
   ): Promise<UserJoiningEvent> {
     const canceledUserJoiningEvent =
       await this.userJoiningEventRepository.findOne({
-        where: { event_id: eventID, user_id: user.id },
+        where: [{ event: eventID, user: user.id }],
+        relations: ['user', 'event'],
       });
     if (!canceledUserJoiningEvent) {
       throw new NotAcceptableException('Something went wrong');
     }
-    console.log(canceledUserJoiningEvent);
     canceledUserJoiningEvent.canceledAt = new Date();
     await this.userJoiningEventRepository.save(canceledUserJoiningEvent);
     return canceledUserJoiningEvent;
