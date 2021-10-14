@@ -17,6 +17,7 @@ import { EventSchedule, EventType } from 'src/entities/event.entity';
 import { EventComment } from 'src/entities/eventComment.entity';
 import { SubmissionFile } from 'src/entities/submissionFiles.entity';
 import { UserRole } from 'src/entities/user.entity';
+import { UserJoiningEvent } from 'src/entities/userJoiningEvent.entity';
 import { dateTimeFormatterFromJSDDate } from 'src/utils/dateTimeFormatter';
 import JwtAuthenticationGuard from '../auth/jwtAuthentication.guard';
 import RequestWithUser from '../auth/requestWithUser.interface';
@@ -239,6 +240,15 @@ export class EventScheduleController {
       );
     }
     return await this.eventService.saveEvent(eventSchedule);
+  }
+
+  @Post('save-user-joining-event')
+  @UseGuards(JwtAuthenticationGuard)
+  async saveUserJoiningEvent(@Body() userJoiningEvent: UserJoiningEvent) {
+    const savedResponse = await this.eventService.saveUserJoiningEvent(
+      userJoiningEvent,
+    );
+    return savedResponse;
   }
 
   @Post('join-event')

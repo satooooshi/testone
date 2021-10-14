@@ -330,6 +330,7 @@ export class EventScheduleService {
       .createQueryBuilder('events')
       .leftJoinAndSelect('events.userJoiningEvent', 'userJoiningEvent')
       .leftJoinAndSelect('userJoiningEvent.user', 'user')
+      .leftJoinAndSelect('userJoiningEvent.event', 'event')
       .leftJoinAndSelect('events.tags', 'tags')
       .leftJoinAndSelect('events.files', 'files')
       .leftJoinAndSelect('events.submissionFiles', 'submissionFiles')
@@ -347,6 +348,10 @@ export class EventScheduleService {
       .where('events.id = :id', { id })
       .getOne();
     return existEvent;
+  }
+
+  public async saveUserJoiningEvent(userJoiningEvent: UserJoiningEvent) {
+    return await this.userJoiningEventRepository.save(userJoiningEvent);
   }
 
   public async saveSubmission(
