@@ -9,12 +9,12 @@ import { userNameFactory } from 'src/utils/factory/userNameFactory';
 import { mentionTransform } from 'src/utils/mentionTransform';
 import chatStyles from '@/styles/layouts/Chat.module.scss';
 
-type ChatMessageProps = {
+type ChatMessageItemProps = {
   message: ChatMessage;
   lastReadChatTime: LastReadChatTime[];
 };
 
-const ChatMessage: React.FC<ChatMessageProps> = ({
+const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
   message,
   lastReadChatTime,
 }) => {
@@ -131,4 +131,4 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
   );
 };
 
-export default ChatMessage;
+export default ChatMessageItem;

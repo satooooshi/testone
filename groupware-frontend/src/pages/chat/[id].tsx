@@ -52,7 +52,7 @@ import { useAPISaveChatGroup } from '@/hooks/api/chat/useAPISaveChatGroup';
 import { useAPIGetLastReadChatTime } from '@/hooks/api/chat/useAPIGetLastReadChatTime';
 import { useAPISaveLastReadChatTime } from '@/hooks/api/chat/useAPISaveLastReadChatTime';
 import { useHeaderTab } from '@/hooks/headerTab/useHeaderTab';
-import ChatMessageComponent from '@/components/chat/ChatMessage';
+import ChatMessageItem from '@/components/chat/ChatMessageItem';
 
 type MentionState = {
   suggestions: MentionData[];
@@ -552,7 +552,7 @@ const ChatDetail = () => {
                       }}
                     />
                     {messages.map((m) => (
-                      <ChatMessageComponent
+                      <ChatMessageItem
                         key={m.id}
                         message={m}
                         lastReadChatTime={lastReadChatTime}
