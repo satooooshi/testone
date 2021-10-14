@@ -187,7 +187,7 @@ const CreateNewUser = () => {
     },
   });
 
-  const tabs: Tab[] = useHeaderTab({ headerTabType: 'newUser' });
+  const tabs: Tab[] = useHeaderTab({ headerTabType: 'admin' });
 
   const toggleSelectedTag = (t: UserTag) => {
     const toggledTag = toggleTag(values.tags, t);
@@ -205,6 +205,7 @@ const CreateNewUser = () => {
       header={{
         title: '新規ユーザー作成',
         tabs: tabs,
+        activeTabName: 'ユーザー作成',
       }}>
       <Head>
         <title>ボールド | ユーザー作成</title>
