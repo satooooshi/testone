@@ -4,6 +4,7 @@ import {
   Controller,
   Get,
   Param,
+  Patch,
   Post,
   Query,
   Req,
@@ -17,6 +18,7 @@ import { EventSchedule, EventType } from 'src/entities/event.entity';
 import { EventComment } from 'src/entities/eventComment.entity';
 import { SubmissionFile } from 'src/entities/submissionFiles.entity';
 import { UserRole } from 'src/entities/user.entity';
+import { UserJoiningEvent } from 'src/entities/userJoiningEvent.entity';
 import { dateTimeFormatterFromJSDDate } from 'src/utils/dateTimeFormatter';
 import JwtAuthenticationGuard from '../auth/jwtAuthentication.guard';
 import RequestWithUser from '../auth/requestWithUser.interface';
@@ -241,6 +243,15 @@ export class EventScheduleController {
     return await this.eventService.saveEvent(eventSchedule);
   }
 
+  @Post('save-user-joining-event')
+  @UseGuards(JwtAuthenticationGuard)
+  async saveUserJoiningEvent(@Body() userJoiningEvent: UserJoiningEvent) {
+    const savedResponse = await this.eventService.saveUserJoiningEvent(
+      userJoiningEvent,
+    );
+    return savedResponse;
+  }
+
   @Post('join-event')
   @UseGuards(JwtAuthenticationGuard)
   async joinEvent(
@@ -258,6 +269,22 @@ export class EventScheduleController {
       );
     }
     return joinedEvent;
+  }
+
+  @Patch('cancel-event/:id')
+  @UseGuards(JwtAuthenticationGuard)
+  async cancelEvent(@Req() req: RequestWithUser, @Param() eventId: number) {
+    const userJoiningEvent = await this.eventService.cancelEvent(
+      eventId,
+      req.user,
+    );
+    // if (userJoiningEvent.event.chatNeeded && userJoiningEvent.event.chatGroup) {
+    //   await this.chatService.joinChatGroup(
+    //     req.user.id,
+    //     userJoiningEvent.event.chatGroup.id,
+    //   );
+    // }
+    return userJoiningEvent.event;
   }
 
   @Post('delete-event')

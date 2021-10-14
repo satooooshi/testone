@@ -40,6 +40,7 @@ import impressiveUnivertyImage from '@/public/impressive_university_1.png';
 import studyMeeting1Image from '@/public/study_meeting_1.jpg';
 import portalLinkBoxStyles from '@/styles/components/PortalLinkBox.module.scss';
 import eventCardStyles from '@/styles/components/EventCard.module.scss';
+import { useAPISaveUserJoiningEvent } from '@/hooks/api/event/useAPISaveUserJoiningEvent';
 
 type FileIconProps = {
   href?: string;
@@ -150,6 +151,11 @@ const EventDetail = () => {
   const { mutate: saveEvent } = useAPIUpdateEvent({
     onSuccess: () => {
       setEditModal(false);
+      refetch();
+    },
+  });
+  const { mutate: handleChangeJoiningData } = useAPISaveUserJoiningEvent({
+    onSuccess: () => {
       refetch();
     },
   });
@@ -326,12 +332,64 @@ const EventDetail = () => {
                 関連動画はありません
               </p>
             )}
-            <div className={eventDetailStyles.event_participants_wrapper}>
-              {data.type !== 'submission_etc' && (
-                <EventParticipants userJoiningEvent={data.userJoiningEvent} />
-              )}
-            </div>
-            {data.type === EventType.SUBMISSION_ETC ? (
+            {data.type !== EventType.SUBMISSION_ETC && (
+              <div className={eventDetailStyles.comment_participants_wrapper}>
+                <div className={eventDetailStyles.event_participants_wrapper}>
+                  <EventParticipants
+                    onChangeJoiningData={(uje) => handleChangeJoiningData(uje)}
+                    userJoiningEvent={data.userJoiningEvent}
+                  />
+                </div>
+                <div className={eventDetailStyles.width}>
+                  <div className={eventDetailStyles.count_and_button_wrapper}>
+                    <p className={eventDetailStyles.comment_count}>
+                      コメント{data.comments?.length ? data.comments.length : 0}
+                      件
+                    </p>
+                    <Button
+                      size="sm"
+                      colorScheme="teal"
+                      onClick={() => {
+                        commentVisible && newComment
+                          ? createComment({
+                              body: newComment,
+                              eventSchedule: data,
+                            })
+                          : setCommentVisible(true);
+                      }}>
+                      {commentVisible ? 'コメントを投稿する' : 'コメントを追加'}
+                    </Button>
+                  </div>
+                  {commentVisible && (
+                    <Textarea
+                      height="56"
+                      background="white"
+                      placeholder="コメントを記入してください。"
+                      value={newComment}
+                      onChange={(e) => setNewComment(e.target.value)}
+                      className={eventDetailStyles.comment_input}
+                      autoFocus
+                    />
+                  )}
+                  {data.comments && data.comments.length
+                    ? data.comments.map(
+                        (comment) =>
+                          comment.writer && (
+                            <>
+                              <EventCommentCard
+                                key={comment.id}
+                                body={comment.body}
+                                date={comment.createdAt}
+                                writer={comment.writer}
+                              />
+                            </>
+                          ),
+                      )
+                    : null}
+                </div>
+              </div>
+            )}
+            {data.type === EventType.SUBMISSION_ETC && (
               <>
                 <div className={eventDetailStyles.count_and_button_wrapper}>
                   <div className={eventDetailStyles.submission_bar_left}>
@@ -396,53 +454,6 @@ const EventDetail = () => {
                 ) : (
                   <></>
                 )}
-              </>
-            ) : (
-              <>
-                <div className={eventDetailStyles.count_and_button_wrapper}>
-                  <p className={eventDetailStyles.comment_count}>
-                    コメント{data.comments?.length ? data.comments.length : 0}件
-                  </p>
-                  <Button
-                    size="sm"
-                    colorScheme="teal"
-                    onClick={() => {
-                      commentVisible && newComment
-                        ? createComment({
-                            body: newComment,
-                            eventSchedule: data,
-                          })
-                        : setCommentVisible(true);
-                    }}>
-                    {commentVisible ? 'コメントを投稿する' : 'コメントを追加'}
-                  </Button>
-                </div>
-                {commentVisible && (
-                  <Textarea
-                    height="56"
-                    background="white"
-                    placeholder="コメントを記入してください。"
-                    value={newComment}
-                    onChange={(e) => setNewComment(e.target.value)}
-                    className={eventDetailStyles.comment_input}
-                    autoFocus
-                  />
-                )}
-                {data.comments && data.comments.length
-                  ? data.comments.map(
-                      (comment) =>
-                        comment.writer && (
-                          <>
-                            <EventCommentCard
-                              key={comment.id}
-                              body={comment.body}
-                              date={comment.createdAt}
-                              writer={comment.writer}
-                            />
-                          </>
-                        ),
-                    )
-                  : null}
               </>
             )}
           </div>
