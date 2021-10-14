@@ -113,9 +113,9 @@ const WikiForm: React.FC<WikiFormProps> = ({
     try {
       const uploadedImageURL = await uploadStorage([file]);
       return uploadedImageURL[0];
-    } catch (err: any) {
+    } catch (err) {
       alert(
-        err.message.includes('413')
+        err instanceof Error && err.message.includes('413')
           ? 'ファイルの容量が大きい為、アップロード出来ませんでした。\n容量が大きくないファイルを使用して下さい。'
           : 'ファイルのアップロードに失敗しました。',
       );
