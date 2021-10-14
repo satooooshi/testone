@@ -7,6 +7,7 @@ import { dateTimeFormatterFromJSDDate } from 'src/utils/dateTimeFormatter';
 import { Avatar } from '@chakra-ui/react';
 import WikiComment from '../WikiComment';
 import Link from 'next/link';
+import boldMascot from '@/public/bold-mascot.png';
 
 type AnswerReplyProps = {
   reply: QAAnswerReply;
@@ -17,20 +18,32 @@ const AnswerReply: React.FC<AnswerReplyProps> = ({ reply }) => {
     <div className={answerReplyStyles.reply}>
       <div className={answerReplyStyles.uploader__info}>
         <div className={answerReplyStyles.user_info_wrapper}>
-          <Link
-            key={reply.writer?.id}
-            href={`/account/${reply.writer?.id}`}
-            passHref>
-            <a>
+          {reply.writer?.existence ? (
+            <>
+              <Link
+                key={reply.writer?.id}
+                href={`/account/${reply.writer?.id}`}
+                passHref>
+                <a>
+                  <Avatar
+                    className={answerReplyStyles.user_avatar}
+                    src={reply.writer?.avatarUrl}
+                  />
+                </a>
+              </Link>
+              <p className={answerReplyStyles.user_name}>
+                {reply.writer?.lastName + ' ' + reply.writer?.firstName}
+              </p>
+            </>
+          ) : (
+            <>
               <Avatar
                 className={answerReplyStyles.user_avatar}
-                src={reply.writer?.avatarUrl}
+                src={boldMascot.src}
               />
-            </a>
-          </Link>
-          <p className={answerReplyStyles.user_name}>
-            {reply.writer?.lastName + ' ' + reply.writer?.firstName}
-          </p>
+              <p className={answerReplyStyles.user_name}>ボールドくん</p>
+            </>
+          )}
         </div>
         <p className={answerReplyStyles.wrote_date}>
           {dateTimeFormatterFromJSDDate({

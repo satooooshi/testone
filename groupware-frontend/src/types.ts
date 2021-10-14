@@ -64,6 +64,8 @@ export interface User {
   employeeId: string | null;
   createdAt: Date;
   updatedAt: Date;
+  deletedAt: Date | null;
+  existence: 1 | null;
   tags?: Tag[];
   submissionFiles?: SubmissionFile[];
   hostingEvents?: EventSchedule[];
@@ -86,7 +88,7 @@ export interface Tag {
   id: number;
   name: string;
   type: TagType;
-  createdAt: Date;
+  createdAt: Dat
   updatedAt: Date;
   events?: EventSchedule[];
   wiki?: Wiki[];
