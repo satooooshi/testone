@@ -110,8 +110,8 @@ export class UserService {
           .where(fromDate ? 'wiki.createdAt < :fromDate' : '1=1', {
             fromDate,
           })
-          .andWhere('wiki.type = :wikiType', {
-            knwoledge: WikiType.KNOWLEDGE,
+          .andWhere('wiki.type = :knowledge', {
+            knowledge: WikiType.KNOWLEDGE,
           })
           .andWhere('u.id = user.id');
       }, 'knowledgeCount')
@@ -132,7 +132,7 @@ export class UserService {
         (existUesrInArr) => existUesrInArr.id === u.user_id,
       );
       if (repeatedUsers.length) {
-        const existTags = repeatedUsers[0].tags;
+        const existTags = repeatedUsers[0].tags || [];
         tags = [...existTags, tag];
 
         //remove repeated user
