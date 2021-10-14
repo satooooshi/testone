@@ -40,6 +40,7 @@ import impressiveUnivertyImage from '@/public/impressive_university_1.png';
 import studyMeeting1Image from '@/public/study_meeting_1.jpg';
 import portalLinkBoxStyles from '@/styles/components/PortalLinkBox.module.scss';
 import eventCardStyles from '@/styles/components/EventCard.module.scss';
+import { useAPISaveUserJoiningEvent } from '@/hooks/api/event/useAPISaveUserJoiningEvent';
 
 type FileIconProps = {
   href?: string;
@@ -150,6 +151,11 @@ const EventDetail = () => {
   const { mutate: saveEvent } = useAPIUpdateEvent({
     onSuccess: () => {
       setEditModal(false);
+      refetch();
+    },
+  });
+  const { mutate: handleChangeJoiningData } = useAPISaveUserJoiningEvent({
+    onSuccess: () => {
       refetch();
     },
   });
@@ -329,7 +335,10 @@ const EventDetail = () => {
             {data.type !== EventType.SUBMISSION_ETC && (
               <div className={eventDetailStyles.comment_participants_wrapper}>
                 <div className={eventDetailStyles.event_participants_wrapper}>
-                  <EventParticipants userJoiningEvent={data.userJoiningEvent} />
+                  <EventParticipants
+                    onChangeJoiningData={(uje) => handleChangeJoiningData(uje)}
+                    userJoiningEvent={data.userJoiningEvent}
+                  />
                 </div>
                 <div className={eventDetailStyles.width}>
                   <div className={eventDetailStyles.count_and_button_wrapper}>

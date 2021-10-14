@@ -1,32 +1,31 @@
 import React, { useState } from 'react';
 import eventParticipantsStyles from '@/styles/components/EventParticipants.module.scss';
-import { UserJoiningEvent } from 'src/types';
+import { UserJoiningEvent, UserRole } from 'src/types';
 import {
   Avatar,
   Button,
-  Input,
   Menu,
   MenuButton,
-  MenuItem,
   MenuItemOption,
   MenuList,
   MenuOptionGroup,
 } from '@chakra-ui/react';
 import Link from 'next/link';
+import { useAuthenticate } from 'src/contexts/useAuthenticate';
 
 type EventParticipantsProps = {
   userJoiningEvent: UserJoiningEvent[];
-  // lateMinutes: number;
+  onChangeJoiningData: (uje: UserJoiningEvent) => void;
 };
 
 const EventParticipants: React.FC<EventParticipantsProps> = ({
   userJoiningEvent,
-  // lateMinutes,
+  onChangeJoiningData,
 }) => {
   const [allVisible, setAllVisible] = useState(false);
-  const [m, setM] = useState('');
+  const { user } = useAuthenticate();
   const lateMinutesText = (v: number) => {
-    if (!m) {
+    if (!v) {
       return '遅刻を記録';
     }
     let message = '';
@@ -54,6 +53,15 @@ const EventParticipants: React.FC<EventParticipantsProps> = ({
           </button>
         ) : null}
       </div>
+      {!userJoiningEvent.length && (
+        <div className={eventParticipantsStyles.participant_name_wrapper}>
+          <a className={eventParticipantsStyles.user_info_wrapper}>
+            <p className={eventParticipantsStyles.participant_name}>
+              まだ参加申し込みされていません
+            </p>
+          </a>
+        </div>
+      )}
       {userJoiningEvent.map((u, index) =>
         index <= 15 || allVisible ? (
           <div className={eventParticipantsStyles.participant_name_wrapper}>
@@ -68,26 +76,32 @@ const EventParticipants: React.FC<EventParticipantsProps> = ({
                 </p>
               </a>
             </Link>
-            <Menu>
-              <MenuButton as={Button} colorScheme="blue">
-                {m ? lateMinutesText(Number(m)) : '遅刻を記録'}
-              </MenuButton>
-              <MenuList>
-                <MenuOptionGroup
-                  onChange={(v) => setM(v)}
-                  defaultValue={''}
-                  value={m}
-                  type="radio">
-                  <MenuItemOption value="">記録しない</MenuItemOption>
-                  <MenuItemOption value="15">15分遅刻</MenuItemOption>
-                  <MenuItemOption value="30">30分遅刻</MenuItemOption>
-                  <MenuItemOption value="45">45分遅刻</MenuItemOption>
-                  <MenuItemOption value="60">1時間遅刻</MenuItemOption>
-                  <MenuItemOption value="90">1時間半遅刻</MenuItemOption>
-                  <MenuItemOption value="120">2時間以上遅刻</MenuItemOption>
-                </MenuOptionGroup>
-              </MenuList>
-            </Menu>
+            {user?.role === UserRole.ADMIN && (
+              <Menu>
+                <MenuButton as={Button} colorScheme="red" size="sm">
+                  {u.lateMinutes
+                    ? lateMinutesText(Number(u.lateMinutes))
+                    : '遅刻を記録'}
+                </MenuButton>
+                <MenuList>
+                  <MenuOptionGroup
+                    onChange={(v) =>
+                      onChangeJoiningData({ ...u, lateMinutes: Number(v) })
+                    }
+                    defaultValue={''}
+                    value={u.lateMinutes.toString()}
+                    type="radio">
+                    <MenuItemOption value="">記録しない</MenuItemOption>
+                    <MenuItemOption value="15">15分遅刻</MenuItemOption>
+                    <MenuItemOption value="30">30分遅刻</MenuItemOption>
+                    <MenuItemOption value="45">45分遅刻</MenuItemOption>
+                    <MenuItemOption value="60">1時間遅刻</MenuItemOption>
+                    <MenuItemOption value="90">1時間半遅刻</MenuItemOption>
+                    <MenuItemOption value="120">2時間遅刻</MenuItemOption>
+                  </MenuOptionGroup>
+                </MenuList>
+              </Menu>
+            )}
           </div>
         ) : (
           <></>
