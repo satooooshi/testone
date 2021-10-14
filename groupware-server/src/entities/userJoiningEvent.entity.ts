@@ -32,6 +32,7 @@ export class UserJoiningEvent {
   lateMinutes?: number;
 
   @ManyToOne(() => User, (user) => user.userJoiningEvent, {
+    primary: true,
     onUpdate: 'CASCADE',
     onDelete: 'CASCADE',
   })
@@ -39,7 +40,7 @@ export class UserJoiningEvent {
   user: User;
 
   @ManyToOne(() => EventSchedule, (event) => event.userJoiningEvent, {
-    primary: false,
+    primary: true,
     onUpdate: 'CASCADE',
     onDelete: 'CASCADE',
   })
