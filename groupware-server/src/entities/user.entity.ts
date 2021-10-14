@@ -1,12 +1,18 @@
 import {
+  AfterLoad,
+  AfterUpdate,
+  BeforeRemove,
+  BeforeUpdate,
   Column,
   CreateDateColumn,
+  DeleteDateColumn,
   Entity,
   Index,
   JoinTable,
   ManyToMany,
   OneToMany,
   PrimaryGeneratedColumn,
+  Unique,
   UpdateDateColumn,
 } from 'typeorm';
 import { ChatGroup } from './chatGroup.entity';
@@ -30,11 +36,11 @@ export enum UserRole {
 
 @Entity({ name: 'users' })
 @Index(['lastName', 'firstName', 'email'], { fulltext: true })
+@Unique(['email', 'existence'])
 export class User {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Index({ unique: true })
   @Column({
     type: 'varchar',
     name: 'email',
@@ -115,6 +121,21 @@ export class User {
     name: 'updated_at',
   })
   updatedAt: Date;
+
+  @DeleteDateColumn({
+    type: 'timestamp',
+    name: 'deleted_at',
+    nullable: true,
+  })
+  deletedAt: Date;
+
+  @Column({
+    type: 'int',
+    name: 'existence',
+    nullable: true,
+    default: 1,
+  })
+  existence: 1 | null;
 
   @OneToMany(() => EventComment, (e) => e.writer)
   eventComments?: EventComment[];

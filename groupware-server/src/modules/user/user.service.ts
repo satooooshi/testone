@@ -16,6 +16,7 @@ import { WikiType } from 'src/entities/wiki.entity';
 import { Parser } from 'json2csv';
 import { SearchQueryToGetUsers } from './user.controller';
 import { Tag, TagType } from 'src/entities/tag.entity';
+import { request } from 'http';
 
 @Injectable()
 export class UserService {
@@ -332,6 +333,8 @@ export class UserService {
         employeeId: u.user_employee_id,
         createdAt: u.user_created_at,
         updatedAt: u.user_updated_at,
+        deletedAt: u.user_deleted_at,
+        existence: u.user_existence,
         eventCount: u.eventCount,
         questionCount: u.questionCount,
         answerCount: u.answerCount,
@@ -461,9 +464,10 @@ export class UserService {
     }
   }
 
-  async deleteUser(userID: number) {
+  async deleteUser(user: User) {
     try {
-      await this.userRepository.delete(userID);
+      await this.userRepository.save({ ...user, existence: null });
+      await this.userRepository.softDelete(user.id);
     } catch (err) {
       console.log(err);
       throw new InternalServerErrorException(
