@@ -386,6 +386,9 @@ const EventList = () => {
             <BigCalendar
               selectable
               resizable
+              scrollToTime={DateTime.now()
+                .set({ hour: 8, minute: 0 })
+                .toJSDate()}
               views={['month', 'week', 'day']}
               className={bigCalendarStyles.big_calendar}
               localizer={localizer}
