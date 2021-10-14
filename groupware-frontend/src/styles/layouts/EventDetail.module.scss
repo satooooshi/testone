@@ -44,6 +44,17 @@
   }
 }
 
+.comment_participants_wrapper {
+  display: flex;
+  flex-flow: row;
+  width: 80vw;
+  justify-content: center;
+  @media (max-width: 768px) {
+    width: 90vw;
+    flex-flow: column;
+  }
+}
+
 .event_info_left {
   width: 40%;
   aspect-ratio: 1;
@@ -275,8 +286,14 @@
   align-self: center;
 }
 
+.width {
+  width: 40%;
+  @media (max-width: 768px) {
+    width: 100%;
+  }
+}
+
 .count_and_button_wrapper {
-  width: 80vw;
   border-bottom: 1px $green_color solid;
   display: flex;
   flex-direction: row;
@@ -286,8 +303,14 @@
 }
 
 .event_participants_wrapper {
-  width: 80vw;
+  width: 40%;
   margin-bottom: 16px;
+  @media (min-width: 768px) {
+    margin-right: 4%;
+  }
+  @media (max-width: 768px) {
+    width: 100%;
+  }
 }
 
 .comment_input {

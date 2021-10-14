@@ -26,14 +26,19 @@ const EventParticipants: React.FC<EventParticipantsProps> = ({
   const [allVisible, setAllVisible] = useState(false);
   const [m, setM] = useState('');
   const lateMinutesText = (v: number) => {
+    if (!m) {
+      return '遅刻を記録';
+    }
     let message = '';
     const hour = Math.floor(v / 60);
     const minutes = v % 60;
     if (hour) {
       message += `${hour}時間`;
     }
-    message += `${minutes}分遅刻`;
-    return message;
+    if (minutes) {
+      message += `${minutes}分`;
+    }
+    return `${message}遅刻`;
   };
   return (
     <div className={eventParticipantsStyles.participants_area}>
@@ -53,24 +58,25 @@ const EventParticipants: React.FC<EventParticipantsProps> = ({
         index <= 15 || allVisible ? (
           <div className={eventParticipantsStyles.participant_name_wrapper}>
             <Link key={u.user.id} href={`/account/${u.user.id}`}>
-              <a>
+              <a className={eventParticipantsStyles.user_info_wrapper}>
                 <Avatar
                   src={u.user.avatarUrl}
                   className={eventParticipantsStyles.participant_avatar}
                 />
+                <p className={eventParticipantsStyles.participant_name}>
+                  {u.user.lastName + ' ' + u.user.firstName}
+                </p>
               </a>
             </Link>
-            <p className={eventParticipantsStyles.participant_name}>
-              {u.user.lastName + ' ' + u.user.firstName}
-            </p>
             <Menu>
-              <MenuButton as={Button}>
+              <MenuButton as={Button} colorScheme="blue">
                 {m ? lateMinutesText(Number(m)) : '遅刻を記録'}
               </MenuButton>
               <MenuList>
                 <MenuOptionGroup
                   onChange={(v) => setM(v)}
                   defaultValue={''}
+                  value={m}
                   type="radio">
                   <MenuItemOption value="">記録しない</MenuItemOption>
                   <MenuItemOption value="15">15分遅刻</MenuItemOption>
