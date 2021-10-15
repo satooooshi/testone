@@ -65,7 +65,7 @@ export interface User {
   createdAt: Date;
   updatedAt: Date;
   deletedAt: Date | null;
-  existence: 1 | null;
+  existence: boolean | null;
   tags?: Tag[];
   submissionFiles?: SubmissionFile[];
   hostingEvents?: EventSchedule[];

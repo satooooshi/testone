@@ -1,8 +1,4 @@
 import {
-  AfterLoad,
-  AfterUpdate,
-  BeforeRemove,
-  BeforeUpdate,
   Column,
   CreateDateColumn,
   DeleteDateColumn,
@@ -130,12 +126,12 @@ export class User {
   deletedAt: Date;
 
   @Column({
-    type: 'int',
+    type: 'boolean',
     name: 'existence',
     nullable: true,
-    default: 1,
+    default: true,
   })
-  existence: 1 | null;
+  existence: boolean | null;
 
   @OneToMany(() => EventComment, (e) => e.writer)
   eventComments?: EventComment[];
