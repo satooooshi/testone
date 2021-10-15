@@ -39,6 +39,7 @@ import { imageExtensions } from 'src/utils/imageExtensions';
 import { useFormik } from 'formik';
 import { createEventSchema } from 'src/utils/validation/schema';
 import { useImageCrop } from '@/hooks/crop/useImageCrop';
+import { DateTime } from 'luxon';
 
 type ExcludeFilesAndVideos = Pick<
   EventSchedule,
@@ -310,18 +311,33 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
           <div className={createEventModalStyle.date_form_wrapper}>
             <div className={createEventModalStyle.date_picker_wrapper}>
               <div className={createEventModalStyle.date_picker}>
-                <DateTimePicker
-                  value={newEvent.startAt}
-                  onChange={(d) => setNewEvent((e) => ({ ...e, startAt: d }))}
-                  label="開始日時"
-                  hour24
-                  formatStyle={'medium'}
-                />
+                {newEvent.type !== EventType.SUBMISSION_ETC ? (
+                  <DateTimePicker
+                    value={newEvent.startAt}
+                    onChange={(d) => setNewEvent((e) => ({ ...e, startAt: d }))}
+                    label="開始日時"
+                    hour24
+                    formatStyle={'medium'}
+                  />
+                ) : (
+                  <span className={createEventModalStyle.caution_message}>
+                    提出物イベントは終了日時の2時間前の日時に開始としてカレンダーに表示されます
+                  </span>
+                )}
               </div>
               <div className={createEventModalStyle.date_picker}>
                 <DateTimePicker
                   value={newEvent.endAt}
-                  onChange={(d) => setNewEvent((e) => ({ ...e, endAt: d }))}
+                  onChange={(d) =>
+                    setNewEvent((e) => ({
+                      ...e,
+                      startAt:
+                        newEvent.type === EventType.SUBMISSION_ETC
+                          ? DateTime.fromJSDate(d).minus({ hour: 2 }).toJSDate()
+                          : e.startAt,
+                      endAt: d,
+                    }))
+                  }
                   label="終了日時"
                   hour24
                   formatStyle={'medium'}
