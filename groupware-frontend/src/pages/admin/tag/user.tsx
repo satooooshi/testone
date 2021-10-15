@@ -12,11 +12,13 @@ import { useAPIGetUserTag } from '@/hooks/api/tag/useAPIGetUserTag';
 import { useAPICreateUserTag } from '@/hooks/api/tag/useAPICreateUesrTag';
 import { useAPIDeleteUserTag } from '@/hooks/api/tag/useAPIDelteUserTag';
 import TagListBox from '@/components/admin/TagListCard';
+import { useToast } from '@chakra-ui/react';
 
 const UserTagAdmin: React.FC = () => {
   const router = useRouter();
   const { user } = useAuthenticate();
   const { data: tags, refetch } = useAPIGetUserTag();
+  const toast = useToast();
   const { mutate: createTag } = useAPICreateUserTag({
     onSuccess: () => {
       refetch();
@@ -27,11 +29,44 @@ const UserTagAdmin: React.FC = () => {
       refetch();
     },
   });
+  const modifyStrToFlat = (targetString: string) => {
+    const deleteSymbolFromStr = (str: string) => {
+      return str.replace(/[^a-zA-Z ]/g, '');
+    };
+    const hiraToKana = (str: string) => {
+      return str.replace(/[\u3041-\u3096]/g, (match) => {
+        const chr = match.charCodeAt(0) + 0x60;
+        return String.fromCharCode(chr);
+      });
+    };
+    const escaped = deleteSymbolFromStr(targetString);
+    const changedToLowerCamel = escaped.toLowerCase();
+    const changedToKana = hiraToKana(changedToLowerCamel);
+    return changedToKana;
+  };
+  const tagNames: string[] = tags?.map((t) => modifyStrToFlat(t.name)) || [''];
   const tabs: Tab[] = useHeaderTab({ headerTabType: 'admin' });
 
   const handleCreate = (t: Partial<UserTag | Tag>) => {
-    if (t.name && t.name.length >= 60) {
-      alert('タグは60文字以内で入力してください');
+    if (!t.name) {
+      return;
+    }
+    if (t.name.length >= 60) {
+      toast({
+        description: 'タグは60文字以内で入力してください',
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      });
+      return;
+    }
+    if (tagNames.includes(modifyStrToFlat(t.name))) {
+      toast({
+        description: 'タグがすでに存在します',
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      });
       return;
     }
     createTag(t);
