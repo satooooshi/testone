@@ -42,6 +42,7 @@ import portalLinkBoxStyles from '@/styles/components/PortalLinkBox.module.scss';
 import eventCardStyles from '@/styles/components/EventCard.module.scss';
 import { useAPISaveUserJoiningEvent } from '@/hooks/api/event/useAPISaveUserJoiningEvent';
 import { userNameFactory } from 'src/utils/factory/userNameFactory';
+import { tagColorFactory } from 'src/utils/factory/tagColorFactory';
 
 type FileIconProps = {
   href?: string;
@@ -340,7 +341,9 @@ const EventDetail = () => {
                     {data.tags.map((tag) => (
                       <Link href={`/event/list?tag=${tag.id}`} key={tag.id}>
                         <a className={eventDetailStyles.tag}>
-                          <Button colorScheme="purple" height="28px">
+                          <Button
+                            colorScheme={tagColorFactory(tag.type)}
+                            size="xs">
                             {tag.name}
                           </Button>
                         </a>

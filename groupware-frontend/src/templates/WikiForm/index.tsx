@@ -32,6 +32,7 @@ import { liteEditorPlugins } from 'src/utils/liteEditorPlugins';
 import MarkdownIt from 'markdown-it';
 import { uploadStorage } from '@/hooks/api/storage/useAPIUploadStorage';
 import MDEditor from '@uiw/react-md-editor';
+import { tagColorFactory } from 'src/utils/factory/tagColorFactory';
 
 type WikiFormProps = {
   wiki?: Wiki;
@@ -327,7 +328,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
           <div className={qaCreateStyles.tags}>
             {newQuestion.tags.map((t) => (
               <div key={t.id} className={qaCreateStyles.tag__item}>
-                <Button colorScheme="purple" height="28px">
+                <Button colorScheme={tagColorFactory(t.type)} size="xs">
                   {t.name}
                 </Button>
               </div>

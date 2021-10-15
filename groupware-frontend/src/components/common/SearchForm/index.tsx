@@ -12,6 +12,7 @@ import { GiCancel } from 'react-icons/gi';
 import ReactModal from 'react-modal';
 import { AiOutlineSearch } from 'react-icons/ai';
 import clsx from 'clsx';
+import { tagColorFactory } from 'src/utils/factory/tagColorFactory';
 
 const SearchFormContext = createContext({
   isSmallerThan768: false,
@@ -156,8 +157,8 @@ const SearchInput: React.FC<SearchFormProps> = ({
             {selectedTags.map((tag) => {
               return (
                 <Button
-                  colorScheme="purple"
-                  height="28px"
+                  colorScheme={tagColorFactory(tag.type)}
+                  size="xs"
                   key={tag.id}
                   className={searchFormStyles.item}>
                   {tag.name}

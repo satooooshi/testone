@@ -32,6 +32,7 @@ import { dataURLToFile } from 'src/utils/dataURLToFile';
 import 'react-image-crop/dist/ReactCrop.css';
 import { useImageCrop } from '@/hooks/crop/useImageCrop';
 import { useHeaderTab } from '@/hooks/headerTab/useHeaderTab';
+import { tagColorFactory } from 'src/utils/factory/tagColorFactory';
 
 type ModalState = {
   isOpen: boolean;
@@ -418,9 +419,8 @@ const CreateNewUser = () => {
                 <Button
                   key={t.id}
                   size="xs"
-                  colorScheme="teal"
-                  className={createNewUserStyles.selected_tag_item}
-                  height="28px">
+                  colorScheme={tagColorFactory(t.type)}
+                  className={createNewUserStyles.selected_tag_item}>
                   {t.name}
                 </Button>
               ))}
@@ -444,7 +444,7 @@ const CreateNewUser = () => {
                 <Button
                   key={t.id}
                   size="xs"
-                  colorScheme="blue"
+                  colorScheme={tagColorFactory(t.type)}
                   className={createNewUserStyles.selected_tag_item}
                   height="28px">
                   {t.name}
@@ -470,7 +470,7 @@ const CreateNewUser = () => {
                 <Button
                   key={t.id}
                   size="xs"
-                  colorScheme="green"
+                  colorScheme={tagColorFactory(t.type)}
                   className={createNewUserStyles.selected_tag_item}
                   height="28px">
                   {t.name}
@@ -496,7 +496,7 @@ const CreateNewUser = () => {
                 <Button
                   key={t.id}
                   size="xs"
-                  colorScheme="pink"
+                  colorScheme={tagColorFactory(t.type)}
                   className={createNewUserStyles.selected_tag_item}
                   height="28px">
                   {t.name}

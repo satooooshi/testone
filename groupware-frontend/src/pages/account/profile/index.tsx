@@ -320,8 +320,7 @@ const Profile = () => {
                   key={t.id}
                   size="xs"
                   colorScheme="teal"
-                  className={createNewUserStyles.selected_tag_item}
-                  height="28px">
+                  className={createNewUserStyles.selected_tag_item}>
                   {t.name}
                 </Button>
               ))}
