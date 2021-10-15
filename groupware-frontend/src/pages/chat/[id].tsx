@@ -53,6 +53,7 @@ import { useAPIGetLastReadChatTime } from '@/hooks/api/chat/useAPIGetLastReadCha
 import { useAPISaveLastReadChatTime } from '@/hooks/api/chat/useAPISaveLastReadChatTime';
 import { useHeaderTab } from '@/hooks/headerTab/useHeaderTab';
 import ChatMessageItem from '@/components/chat/ChatMessageItem';
+import { useAPILeaveChatRoom } from '@/hooks/api/chat/useAPILeaveChatRoomURL';
 
 type MentionState = {
   suggestions: MentionData[];
@@ -61,7 +62,7 @@ type MentionState = {
   mentionedUserData: MentionData[];
 };
 
-type MenuValue = 'editGroup' | 'editMembers';
+type MenuValue = 'editGroup' | 'editMembers' | 'leaveRoom';
 
 type MentionAction =
   | {
@@ -203,6 +204,11 @@ const ChatDetail = () => {
   });
 
   const { mutate: saveLastReadChatTime } = useAPISaveLastReadChatTime({});
+  const { mutate: leaveChatGroup } = useAPILeaveChatRoom({
+    onSuccess: () => {
+      router.push('/chat');
+    },
+  });
 
   const { getRootProps: getRootProps, getInputProps: getInputProps } =
     useDropzone({
@@ -419,6 +425,12 @@ const ChatDetail = () => {
       setEditChatGroupModalVisible(true);
       return;
     }
+    if (value === 'leaveRoom') {
+      if (confirm('このルームを退室してよろしいですか？')) {
+        leaveChatGroup({ id: Number(id) });
+      }
+      return;
+    }
   };
 
   return (
@@ -520,6 +532,7 @@ const ChatDetail = () => {
                       グループの情報を編集
                     </MenuItem>
                     <MenuItem value={'editMembers'}>メンバーを編集</MenuItem>
+                    <MenuItem value={'leaveRoom'}>ルームを退室</MenuItem>
                   </Menu>
                 </div>
               </div>

@@ -149,6 +149,25 @@ export class ChatService {
       .add(userID);
   }
 
+  public async leaveChatRoom(userID: number, chatGroupID: number) {
+    const containMembers: ChatGroup = await this.chatGroupRepository.findOne({
+      where: { id: chatGroupID },
+      relations: ['members'],
+    });
+
+    const isUserJoining = containMembers.members.filter(
+      (m) => m.id === userID,
+    ).length;
+    if (!isUserJoining) {
+      throw new BadRequestException('The user is not participant');
+    }
+    await this.chatGroupRepository
+      .createQueryBuilder()
+      .relation(ChatGroup, 'members')
+      .of(chatGroupID)
+      .remove(userID);
+  }
+
   public async saveChatGroup(
     chatGroup: Partial<ChatGroup>,
   ): Promise<ChatGroup> {
