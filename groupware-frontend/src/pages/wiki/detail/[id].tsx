@@ -20,7 +20,7 @@ import { useAPICreateBestAnswer } from '@/hooks/api/wiki/useAPICreateBestAnswer'
 import { useAPIGetProfile } from '@/hooks/api/user/useAPIGetProfile';
 import { stateToHTML } from 'draft-js-export-html';
 import { useHeaderTab } from '@/hooks/headerTab/useHeaderTab';
-import {tagColorFactory} from 'src/utils/factory/tagColorFactory';
+import { tagColorFactory } from 'src/utils/factory/tagColorFactory';
 
 const QuestionDetail = () => {
   const router = useRouter();
@@ -110,8 +110,8 @@ const QuestionDetail = () => {
             <div className={qaDetailStyles.tags_wrapper}>
               {wiki.tags.map((tag) => (
                 <Link href={`/wiki/list?tag=${tag.id}`} key={tag.id}>
-                  <a c>plassName={qaDetailStyles.tag}>
-                    <Button colorScheme={tagColorFactory(tag.type)} size='xs'>
+                  <a className={qaDetailStyles.tag}>
+                    <Button colorScheme={tagColorFactory(tag.type)} size="xs">
                       {tag.name}
                     </Button>
                   </a>
