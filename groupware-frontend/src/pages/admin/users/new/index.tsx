@@ -1,5 +1,5 @@
 import LayoutWithTab from '@/components/layout/LayoutWithTab';
-import { ScreenName } from '@/components/layout/Sidebar';
+import { SidebarScreenName } from '@/components/layout/Sidebar';
 import React, { useCallback, useMemo, useReducer, useRef } from 'react';
 import { Tab } from 'src/types/header/tab/types';
 import Head from 'next/head';
@@ -200,7 +200,7 @@ const CreateNewUser = () => {
   return (
     <LayoutWithTab
       sidebar={{
-        activeScreenName: ScreenName.ADMIN,
+        activeScreenName: SidebarScreenName.ADMIN,
       }}
       header={{
         title: '新規ユーザー作成',

@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import { Tab } from 'src/types/header/tab/types';
-import { ScreenName } from '@/components/layout/Sidebar';
+import { SidebarScreenName } from '@/components/layout/Sidebar';
 import eventListStyles from '@/styles/layouts/EventList.module.scss';
 import EventCard from '@/components/common/EventCard';
 import { useRouter } from 'next/router';
@@ -369,7 +369,7 @@ const EventList = () => {
   return (
     <LayoutWithTab
       header={initialHeaderValue}
-      sidebar={{ activeScreenName: ScreenName.EVENT }}>
+      sidebar={{ activeScreenName: SidebarScreenName.EVENT }}>
       <Head>
         <title>
           ボールド | {type ? eventTitleText[type] : '全てのイベント'}

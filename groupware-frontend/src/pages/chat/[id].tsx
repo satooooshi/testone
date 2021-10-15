@@ -1,4 +1,4 @@
-import { ScreenName } from '@/components/layout/Sidebar';
+import { SidebarScreenName } from '@/components/layout/Sidebar';
 import chatStyles from '@/styles/layouts/Chat.module.scss';
 import { IoSend } from 'react-icons/io5';
 import {
@@ -423,7 +423,7 @@ const ChatDetail = () => {
 
   return (
     <LayoutWithTab
-      sidebar={{ activeScreenName: ScreenName.CHAT }}
+      sidebar={{ activeScreenName: SidebarScreenName.CHAT }}
       header={{
         title: 'Chat',
         tabs: tabs,

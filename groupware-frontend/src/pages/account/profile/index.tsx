@@ -5,7 +5,7 @@ import React, {
   useRef,
   useReducer,
 } from 'react';
-import { ScreenName } from '@/components/layout/Sidebar';
+import { SidebarScreenName } from '@/components/layout/Sidebar';
 import { Tab } from 'src/types/header/tab/types';
 import LayoutWithTab from '@/components/layout/LayoutWithTab';
 import profileStyles from '@/styles/layouts/Profile.module.scss';
@@ -179,7 +179,7 @@ const Profile = () => {
 
   return (
     <LayoutWithTab
-      sidebar={{ activeScreenName: ScreenName.ACCOUNT }}
+      sidebar={{ activeScreenName: SidebarScreenName.ACCOUNT }}
       header={{
         title: 'Account',
         activeTabName: 'プロフィール編集',

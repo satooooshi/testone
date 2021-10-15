@@ -1,6 +1,6 @@
 import { Tab } from 'src/types/header/tab/types';
 import LayoutWithTab from '@/components/layout/LayoutWithTab';
-import { ScreenName } from '@/components/layout/Sidebar';
+import { SidebarScreenName } from '@/components/layout/Sidebar';
 import React, { useEffect, useState } from 'react';
 import { MdDelete } from 'react-icons/md';
 import userAdminStyles from '@/styles/layouts/UserAdmin.module.scss';
@@ -82,7 +82,7 @@ const UserAdmin: React.FC = () => {
 
   return (
     <LayoutWithTab
-      sidebar={{ activeScreenName: ScreenName.ADMIN }}
+      sidebar={{ activeScreenName: SidebarScreenName.ADMIN }}
       header={{
         title: 'Admin',
         activeTabName: 'ユーザー管理',

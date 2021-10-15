@@ -2,7 +2,7 @@ import React, { useMemo, useState, useEffect, useRef } from 'react';
 import qaCreateStyles from '@/styles/layouts/QACreate.module.scss';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
-import { ScreenName } from '@/components/layout/Sidebar';
+import { SidebarScreenName } from '@/components/layout/Sidebar';
 import LayoutWithTab from '@/components/layout/LayoutWithTab';
 import TagModal from '@/components/common/TagModal';
 import WrappedDraftEditor from '@/components/wiki/WrappedDraftEditor';
@@ -167,7 +167,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
   return (
     <>
       <LayoutWithTab
-        sidebar={{ activeScreenName: ScreenName.QA }}
+        sidebar={{ activeScreenName: SidebarScreenName.QA }}
         header={{
           title: headerTabName,
           activeTabName: activeTab,

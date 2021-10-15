@@ -1,4 +1,4 @@
-import { ScreenName } from '@/components/layout/Sidebar';
+import { SidebarScreenName } from '@/components/layout/Sidebar';
 import { Tab } from 'src/types/header/tab/types';
 import LayoutWithTab from '@/components/layout/LayoutWithTab';
 import homeStyles from '@/styles/layouts/Home.module.scss';
@@ -11,7 +11,7 @@ export default function Home() {
 
   return (
     <LayoutWithTab
-      sidebar={{ activeScreenName: ScreenName.HOME }}
+      sidebar={{ activeScreenName: SidebarScreenName.HOME }}
       header={{
         title: 'Home',
         activeTabName: 'ダッシュボード',

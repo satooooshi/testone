@@ -1,4 +1,4 @@
-import { ScreenName } from '@/components/layout/Sidebar';
+import { SidebarScreenName } from '@/components/layout/Sidebar';
 import { useAPIGetWikiDetail } from '@/hooks/api/wiki/useAPIGetWikiDetail';
 import { useRouter } from 'next/router';
 import qaDetailStyles from '@/styles/layouts/QADetail.module.scss';
@@ -95,7 +95,7 @@ const QuestionDetail = () => {
 
   return (
     <LayoutWithTab
-      sidebar={{ activeScreenName: ScreenName.QA }}
+      sidebar={{ activeScreenName: SidebarScreenName.QA }}
       header={{ title: headerTitle, tabs: tabs }}>
       {wiki && wiki.writer ? (
         <div className={qaDetailStyles.main}>
