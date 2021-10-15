@@ -338,7 +338,11 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
                       endAt: d,
                     }))
                   }
-                  label="終了日時"
+                  label={
+                    newEvent.type !== EventType.SUBMISSION_ETC
+                      ? '終了日時'
+                      : '締切日時'
+                  }
                   hour24
                   formatStyle={'medium'}
                 />
