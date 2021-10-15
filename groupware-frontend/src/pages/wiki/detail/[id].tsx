@@ -178,7 +178,8 @@ const QuestionDetail = () => {
                             bestAnswerButtonName={
                               wiki.bestAnswer?.id === a.id
                                 ? 'ベストアンサーに選ばれた回答'
-                                : !wiki.resolvedAt && myself?.id === a.writer.id
+                                : !wiki.resolvedAt &&
+                                  myself?.id === wiki.writer?.id
                                 ? 'ベストアンサーに選ぶ'
                                 : undefined
                             }
