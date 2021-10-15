@@ -7,7 +7,9 @@
   display: flex;
   flex-flow: row;
   justify-content: center;
+  align-items: center;
   min-width: 60%;
+  min-height: 24px;
 }
 .system_message {
   font-size: 14px;
