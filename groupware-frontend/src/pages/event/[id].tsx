@@ -258,15 +258,14 @@ const EventDetail = () => {
                   {data.title}
                 </span>
                 <div className={eventDetailStyles.event_dates_wrapper}>
-                                      {data.type !== EventType.SUBMISSION_ETC && (
-                  <span className={eventDetailStyles.start_date}>
-      
-                    {`開始: ${dateTimeFormatterFromJSDDate({
+                  {data.type !== EventType.SUBMISSION_ETC && (
+                    <span className={eventDetailStyles.start_date}>
+                      {`開始: ${dateTimeFormatterFromJSDDate({
                         dateTime: new Date(data.startAt),
                         format: 'yyyy/LL/dd HH:mm',
                       })} ~ `}
-                  </span>
-                    )}
+                    </span>
+                  )}
                   <span className={eventDetailStyles.end_date}>
                     {`
                   ${
