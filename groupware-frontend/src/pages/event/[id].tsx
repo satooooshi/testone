@@ -41,6 +41,7 @@ import studyMeeting1Image from '@/public/study_meeting_1.jpg';
 import portalLinkBoxStyles from '@/styles/components/PortalLinkBox.module.scss';
 import eventCardStyles from '@/styles/components/EventCard.module.scss';
 import { useAPISaveUserJoiningEvent } from '@/hooks/api/event/useAPISaveUserJoiningEvent';
+import { userNameFactory } from 'src/utils/factory/userNameFactory';
 
 type FileIconProps = {
   href?: string;
@@ -256,25 +257,6 @@ const EventDetail = () => {
                 <span className={eventDetailStyles.event_title}>
                   {data.title}
                 </span>
-                <span className={eventDetailStyles.sub_title}>概要</span>
-                <div className={eventDetailStyles.description_wrapper}>
-                  <Linkify>
-                    <span className={eventDetailStyles.description}>
-                      {data.description}
-                    </span>
-                  </Linkify>
-                </div>
-                <div className={eventDetailStyles.join_event_wrapper}>
-                  {data.type !== 'submission_etc' && (
-                    <Button
-                      colorScheme={data.isJoining ? 'teal' : 'pink'}
-                      onClick={() =>
-                        !data.isJoining && joinEvent({ eventID: Number(id) })
-                      }>
-                      {data.isJoining ? '参加済' : 'イベントに参加'}
-                    </Button>
-                  )}
-                </div>
                 <div className={eventDetailStyles.event_dates_wrapper}>
                   <span className={eventDetailStyles.start_date}>
                     {`開始: ${dateTimeFormatterFromJSDDate({
@@ -289,6 +271,49 @@ const EventDetail = () => {
                     })}`}
                   </span>
                 </div>
+                <span className={eventDetailStyles.sub_title}>概要</span>
+                <div className={eventDetailStyles.description_wrapper}>
+                  <Linkify>
+                    <span className={eventDetailStyles.description}>
+                      {data.description}
+                    </span>
+                  </Linkify>
+                </div>
+
+                <div className={eventDetailStyles.join_event_wrapper}>
+                  {data.type !== 'submission_etc' && (
+                    <Button
+                      colorScheme={data.isJoining ? 'teal' : 'pink'}
+                      onClick={() =>
+                        !data.isJoining && joinEvent({ eventID: Number(id) })
+                      }>
+                      {data.isJoining ? '参加済' : 'イベントに参加'}
+                    </Button>
+                  )}
+                </div>
+                {data.type !== EventType.SUBMISSION_ETC && (
+                  <>
+                    <span className={eventDetailStyles.sub_title}>
+                      開催者/講師
+                    </span>
+                    {data && data.hostUsers && data.hostUsers.length ? (
+                      <div className={eventDetailStyles.tags_wrapper}>
+                        {data.hostUsers.map((hostUser) => (
+                          <Link
+                            href={`/account/${hostUser.id}`}
+                            key={hostUser.id}>
+                            <a className={eventDetailStyles.tag}>
+                              <Button colorScheme="teal" size="xs">
+                                {userNameFactory(hostUser)}
+                              </Button>
+                            </a>
+                          </Link>
+                        ))}
+                      </div>
+                    ) : null}
+                  </>
+                )}
+                <span className={eventDetailStyles.sub_title}>タグ</span>
                 {data && data.tags && data.tags.length ? (
                   <div className={eventDetailStyles.tags_wrapper}>
                     {data.tags.map((tag) => (
