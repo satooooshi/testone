@@ -185,7 +185,6 @@ const QuestionDetail = () => {
                             onClickBestAnswerButton={() =>
                               createBestAnswer({ ...wiki, bestAnswer: a })
                             }
-                            textFormat={wiki.textFormat}
                             body={a.body}
                             date={a.createdAt}
                             writer={a.writer}
