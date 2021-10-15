@@ -41,6 +41,7 @@ import studyMeeting1Image from '@/public/study_meeting_1.jpg';
 import portalLinkBoxStyles from '@/styles/components/PortalLinkBox.module.scss';
 import eventCardStyles from '@/styles/components/EventCard.module.scss';
 import { useAPISaveUserJoiningEvent } from '@/hooks/api/event/useAPISaveUserJoiningEvent';
+import { userNameFactory } from 'src/utils/factory/userNameFactory';
 
 type FileIconProps = {
   href?: string;
@@ -256,6 +257,26 @@ const EventDetail = () => {
                 <span className={eventDetailStyles.event_title}>
                   {data.title}
                 </span>
+                <div className={eventDetailStyles.event_dates_wrapper}>
+                  {data.type !== EventType.SUBMISSION_ETC && (
+                    <span className={eventDetailStyles.start_date}>
+                      {`開始: ${dateTimeFormatterFromJSDDate({
+                        dateTime: new Date(data.startAt),
+                        format: 'yyyy/LL/dd HH:mm',
+                      })} ~ `}
+                    </span>
+                  )}
+                  <span className={eventDetailStyles.end_date}>
+                    {`
+                  ${
+                    data.type !== EventType.SUBMISSION_ETC ? '終了' : '締切'
+                  }: ${dateTimeFormatterFromJSDDate({
+                      dateTime: new Date(data.endAt),
+                      format: 'yyyy/LL/dd HH:mm',
+                    })}
+                `}
+                  </span>
+                </div>
                 <span className={eventDetailStyles.sub_title}>概要</span>
                 <div className={eventDetailStyles.description_wrapper}>
                   <Linkify>
@@ -264,6 +285,7 @@ const EventDetail = () => {
                     </span>
                   </Linkify>
                 </div>
+
                 <div className={eventDetailStyles.join_event_wrapper}>
                   {data.type !== 'submission_etc' && (
                     <Button
@@ -275,20 +297,29 @@ const EventDetail = () => {
                     </Button>
                   )}
                 </div>
-                <div className={eventDetailStyles.event_dates_wrapper}>
-                  <span className={eventDetailStyles.start_date}>
-                    {`開始: ${dateTimeFormatterFromJSDDate({
-                      dateTime: new Date(data.startAt),
-                      format: 'yyyy/LL/dd HH:mm',
-                    })} ~ `}
-                  </span>
-                  <span className={eventDetailStyles.end_date}>
-                    {`終了: ${dateTimeFormatterFromJSDDate({
-                      dateTime: new Date(data.endAt),
-                      format: 'yyyy/LL/dd HH:mm',
-                    })}`}
-                  </span>
-                </div>
+                {data.type !== EventType.SUBMISSION_ETC && (
+                  <>
+                    <span className={eventDetailStyles.sub_title}>
+                      開催者/講師
+                    </span>
+                    {data && data.hostUsers && data.hostUsers.length ? (
+                      <div className={eventDetailStyles.tags_wrapper}>
+                        {data.hostUsers.map((hostUser) => (
+                          <Link
+                            href={`/account/${hostUser.id}`}
+                            key={hostUser.id}>
+                            <a className={eventDetailStyles.tag}>
+                              <Button colorScheme="teal" size="xs">
+                                {userNameFactory(hostUser)}
+                              </Button>
+                            </a>
+                          </Link>
+                        ))}
+                      </div>
+                    ) : null}
+                  </>
+                )}
+                <span className={eventDetailStyles.sub_title}>タグ</span>
                 {data && data.tags && data.tags.length ? (
                   <div className={eventDetailStyles.tags_wrapper}>
                     {data.tags.map((tag) => (
