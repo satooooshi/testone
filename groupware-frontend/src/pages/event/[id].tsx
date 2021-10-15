@@ -180,10 +180,11 @@ const EventDetail = () => {
       refetch();
     },
   });
+  const isCommonUser = user?.role === UserRole.COMMON;
 
   const isEditable = useMemo(
-    () => user?.id === data?.author?.id || user?.role === 'admin',
-    [user, data],
+    () => user?.id === data?.author?.id || !isCommonUser,
+    [user?.id, data?.author?.id, isCommonUser],
   );
 
   const tabs: Tab[] = useHeaderTab({
@@ -229,8 +230,7 @@ const EventDetail = () => {
                 )}
               </div>
               <div className={eventDetailStyles.event_info_right}>
-                {user?.role === UserRole.ADMIN &&
-                data.type === EventType.SUBMISSION_ETC ? (
+                {!isCommonUser && data.type === EventType.SUBMISSION_ETC ? (
                   <div className={eventDetailStyles.admin_buttons_wrapper}>
                     <Button
                       colorScheme={'green'}
@@ -244,8 +244,7 @@ const EventDetail = () => {
                     </Button>
                   </div>
                 ) : null}
-                {user?.role === UserRole.ADMIN &&
-                data.type !== EventType.SUBMISSION_ETC ? (
+                {!isCommonUser && data.type !== EventType.SUBMISSION_ETC ? (
                   <div className={eventDetailStyles.admin_buttons_wrapper}>
                     <Button
                       colorScheme={'green'}
