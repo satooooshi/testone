@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 import createEventModalStyle from '@/styles/components/CreateEventModal.module.scss';
 import clsx from 'clsx';
 import Modal from 'react-modal';
@@ -10,6 +10,7 @@ import {
   EventVideo,
   Tag,
   User,
+  UserRole,
 } from 'src/types';
 import { IoMdAddCircle } from 'react-icons/io';
 import { useAPIGetTag } from '@/hooks/api/tag/useAPIGetTag';
@@ -41,6 +42,7 @@ import { createEventSchema } from 'src/utils/validation/schema';
 import { useImageCrop } from '@/hooks/crop/useImageCrop';
 import { DateTime } from 'luxon';
 import { tagColorFactory } from 'src/utils/factory/tagColorFactory';
+import { useAuthenticate } from 'src/contexts/useAuthenticate';
 
 type ExcludeFilesAndVideos = Pick<
   EventSchedule,
@@ -90,6 +92,7 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
 }) => {
   const { data: tags } = useAPIGetTag();
   const { data: users } = useAPIGetUsers();
+  const { user } = useAuthenticate();
   const toast = useToast();
 
   const {
@@ -242,6 +245,10 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
       tags: e.tags ? [...e.tags, clickedTag] : [clickedTag],
     }));
   };
+
+  const isCreatableAllEvent = useMemo(() => {
+    return user?.role !== UserRole.COMMON;
+  }, [user?.role]);
 
   const pushYoutube = () => {
     const youtubeRegex =
@@ -452,14 +459,22 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
                   }))
                 }
                 defaultValue={newEvent.type}>
-                <option value={EventType.IMPRESSIVE_UNIVERSITY}>
-                  感動大学
-                </option>
+                {isCreatableAllEvent && (
+                  <option value={EventType.IMPRESSIVE_UNIVERSITY}>
+                    感動大学
+                  </option>
+                )}
                 <option value={EventType.STUDY_MEETING}>勉強会</option>
-                <option value={EventType.BOLDAY}>BOLDay</option>
-                <option value={EventType.COACH}>コーチ制度</option>
+                {isCreatableAllEvent && (
+                  <option value={EventType.BOLDAY}>BOLDay</option>
+                )}
+                {isCreatableAllEvent && (
+                  <option value={EventType.COACH}>コーチ制度</option>
+                )}
                 <option value={EventType.CLUB}>部活動</option>
-                <option value={EventType.SUBMISSION_ETC}>提出物等</option>
+                {isCreatableAllEvent && (
+                  <option value={EventType.SUBMISSION_ETC}>提出物等</option>
+                )}
               </Select>
             </FormControl>
           </div>
