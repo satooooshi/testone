@@ -97,6 +97,30 @@ const WikiForm: React.FC<WikiFormProps> = ({
     }
   }, [wiki?.type]);
 
+  const saveButtonName = useMemo(() => {
+    switch (newQuestion.type) {
+      case WikiType.QA:
+        return '質問';
+      case WikiType.KNOWLEDGE:
+        return 'ナレッジ';
+      case WikiType.RULES:
+        switch (newQuestion.ruleCategory) {
+          case RuleCategory.PHILOSOPHY:
+            return '会社理念';
+          case RuleCategory.RULES:
+            return '社内規則';
+          case RuleCategory.ABC:
+            return 'ABC制度';
+          case RuleCategory.BENEFITS:
+            return '福利厚生等';
+          case RuleCategory.DOCUMENT:
+            return '各種申請書';
+        }
+      default:
+        return '質問';
+    }
+  }, [newQuestion.ruleCategory, newQuestion.type]);
+
   const toggleTag = (t: Tag) => {
     const isExist = newQuestion.tags?.filter(
       (existT) => existT.id === t.id,
@@ -141,6 +165,14 @@ const WikiForm: React.FC<WikiFormProps> = ({
           : newQuestion.body,
     });
   };
+
+  useEffect(() => {
+    setNewQuestion({
+      ...newQuestion,
+      type: type || WikiType.QA,
+      ruleCategory: type === WikiType.RULES ? RuleCategory.RULES : undefined,
+    });
+  }, [type]);
 
   useEffect(() => {
     if (wiki) {
@@ -209,7 +241,13 @@ const WikiForm: React.FC<WikiFormProps> = ({
               <Select
                 colorScheme="teal"
                 bg="white"
-                defaultValue={type ? type : WikiType.QA}
+                defaultValue={
+                  type === WikiType.RULES
+                    ? RuleCategory.RULES
+                    : type
+                    ? type
+                    : WikiType.QA
+                }
                 onChange={(e) => {
                   if (e.target.value === (WikiType.KNOWLEDGE || WikiType.QA)) {
                     setNewQuestion((prev) => ({
@@ -280,7 +318,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
                 タグを編集
               </Button>
               <Button colorScheme="pink" onClick={() => handleSaveButton()}>
-                {wiki ? '質問を更新' : '質問を投稿'}
+                {wiki ? `${saveButtonName}を更新` : `${saveButtonName}を投稿`}
               </Button>
             </div>
           </div>

@@ -9,7 +9,7 @@ const CreateQA = () => {
 
   const { mutate: createQuestion } = useAPICreateWiki({
     onSuccess: () => {
-      router.push('/wiki/list');
+      router.push('/wiki/list?page=1&tag=&word=&status=new&type=');
     },
   });
 
