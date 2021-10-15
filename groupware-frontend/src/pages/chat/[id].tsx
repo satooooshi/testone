@@ -10,7 +10,6 @@ import {
   useState,
 } from 'react';
 import { useAPIGetUsers } from '@/hooks/api/user/useAPIGetUsers';
-import 'rc-checkbox/assets/index.css';
 import {
   ChatGroup,
   ChatMessage,
