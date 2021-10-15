@@ -13,7 +13,6 @@ import {
 import { useDropzone } from 'react-dropzone';
 import { imageExtensions } from 'src/utils/imageExtensions';
 import ReactCrop, { Crop } from 'react-image-crop';
-import 'react-image-crop/dist/ReactCrop.css';
 import { getCroppedImageURL } from 'src/utils/getCroppedImageURL';
 import { useAPIUploadStorage } from '@/hooks/api/storage/useAPIUploadStorage';
 import { dataURLToFile } from 'src/utils/dataURLToFile';

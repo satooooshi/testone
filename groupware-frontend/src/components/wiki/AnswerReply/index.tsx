@@ -1,7 +1,5 @@
 import React from 'react';
 import { QAAnswerReply } from 'src/types';
-import '@uiw/react-md-editor/dist/markdown-editor.css';
-import '@uiw/react-markdown-preview/dist/markdown.css';
 import answerReplyStyles from '@/styles/components/AnswerReply.module.scss';
 import { dateTimeFormatterFromJSDDate } from 'src/utils/dateTimeFormatter';
 import { Avatar } from '@chakra-ui/react';

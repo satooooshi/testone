@@ -26,7 +26,6 @@ import noImage from '@/public/no-image.jpg';
 import { useAPIUploadStorage } from '@/hooks/api/storage/useAPIUploadStorage';
 import Head from 'next/head';
 import ReactCrop from 'react-image-crop';
-import 'react-image-crop/dist/ReactCrop.css';
 import { dataURLToFile } from 'src/utils/dataURLToFile';
 import { useAPIGetProfile } from '@/hooks/api/user/useAPIGetProfile';
 import { useImageCrop } from '@/hooks/crop/useImageCrop';

@@ -13,7 +13,6 @@ import '@draft-js-plugins/image/lib/plugin.css';
 import wrappedDraftEditorStyles from '@/styles/components/WrappedDraftEditor.module.scss';
 import { useDropzone } from 'react-dropzone';
 import { useAPIUploadStorage } from '@/hooks/api/storage/useAPIUploadStorage';
-import 'draft-js/dist/Draft.css';
 import {
   FaRedoAlt,
   FaRegTrashAlt,

@@ -29,7 +29,6 @@ import { registerSchema } from 'src/utils/validation/schema';
 import validationErrorStyles from '@/styles/components/ValidationError.module.scss';
 import ReactCrop from 'react-image-crop';
 import { dataURLToFile } from 'src/utils/dataURLToFile';
-import 'react-image-crop/dist/ReactCrop.css';
 import { useImageCrop } from '@/hooks/crop/useImageCrop';
 import { useHeaderTab } from '@/hooks/headerTab/useHeaderTab';
 
