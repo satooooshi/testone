@@ -32,7 +32,7 @@ export class UserService {
         return '一般社員';
       case UserRole.INSTRUCTOR:
         return '講師';
-      case UserRole.HEAD_OFFICE:
+      case UserRole.COACH:
         return '本社勤務';
     }
   }

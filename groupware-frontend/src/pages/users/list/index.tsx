@@ -72,9 +72,9 @@ const UserList = () => {
     {
       tabName: '本社勤務',
       onClick: () => {
-        queryRefresh({ role: UserRole.HEAD_OFFICE });
+        queryRefresh({ role: UserRole.COACH });
       },
-      isActiveTab: query.role === UserRole.HEAD_OFFICE,
+      isActiveTab: query.role === UserRole.COACH,
     },
     {
       tabName: '講師',

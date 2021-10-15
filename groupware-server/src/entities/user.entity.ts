@@ -24,7 +24,7 @@ import { UserJoiningEvent } from './userJoiningEvent.entity';
 export enum UserRole {
   ADMIN = 'admin',
   INSTRUCTOR = 'instructor',
-  HEAD_OFFICE = 'head_office',
+  COACH = 'coach',
   COMMON = 'common',
 }
 
