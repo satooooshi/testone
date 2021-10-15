@@ -90,17 +90,25 @@ const EventCard: React.FC<EventCardProps> = ({
               </p>
             </div>
             <div className={eventCardStyles.event_card_title_date__wrapper}>
+              {eventSchedule.type !== EventType.SUBMISSION_ETC && (
+                <p className={eventCardStyles.event_card_date}>
+                  {dateTimeFormatterFromJSDDate({
+                    dateTime: new Date(eventSchedule.startAt),
+                    format: '開始: yyyy/LL/dd HH:mm ~',
+                  })}
+                </p>
+              )}
               <p className={eventCardStyles.event_card_date}>
-                {dateTimeFormatterFromJSDDate({
-                  dateTime: new Date(eventSchedule.startAt),
-                  format: '開始: yyyy/LL/dd HH:mm ~',
-                })}
-              </p>
-              <p className={eventCardStyles.event_card_date}>
-                {dateTimeFormatterFromJSDDate({
+                {`
+                  ${
+                    eventSchedule.type !== EventType.SUBMISSION_ETC
+                      ? '終了'
+                      : '締切'
+                  }: ${dateTimeFormatterFromJSDDate({
                   dateTime: new Date(eventSchedule.endAt),
-                  format: '終了: yyyy/LL/dd HH:mm',
+                  format: 'yyyy/LL/dd HH:mm',
                 })}
+                `}
               </p>
             </div>
           </div>

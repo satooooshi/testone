@@ -258,17 +258,23 @@ const EventDetail = () => {
                   {data.title}
                 </span>
                 <div className={eventDetailStyles.event_dates_wrapper}>
-                  <span className={eventDetailStyles.start_date}>
-                    {`開始: ${dateTimeFormatterFromJSDDate({
-                      dateTime: new Date(data.startAt),
-                      format: 'yyyy/LL/dd HH:mm',
-                    })} ~ `}
-                  </span>
+                  {data.type !== EventType.SUBMISSION_ETC && (
+                    <span className={eventDetailStyles.start_date}>
+                      {`開始: ${dateTimeFormatterFromJSDDate({
+                        dateTime: new Date(data.startAt),
+                        format: 'yyyy/LL/dd HH:mm',
+                      })} ~ `}
+                    </span>
+                  )}
                   <span className={eventDetailStyles.end_date}>
-                    {`終了: ${dateTimeFormatterFromJSDDate({
+                    {`
+                  ${
+                    data.type !== EventType.SUBMISSION_ETC ? '終了' : '締切'
+                  }: ${dateTimeFormatterFromJSDDate({
                       dateTime: new Date(data.endAt),
                       format: 'yyyy/LL/dd HH:mm',
-                    })}`}
+                    })}
+                `}
                   </span>
                 </div>
                 <span className={eventDetailStyles.sub_title}>概要</span>
