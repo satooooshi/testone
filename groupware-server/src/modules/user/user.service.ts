@@ -3,6 +3,7 @@ import {
   Injectable,
   InternalServerErrorException,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User, UserRole } from 'src/entities/user.entity';
@@ -16,7 +17,6 @@ import { WikiType } from 'src/entities/wiki.entity';
 import { Parser } from 'json2csv';
 import { SearchQueryToGetUsers } from './user.controller';
 import { Tag, TagType } from 'src/entities/tag.entity';
-import { request } from 'http';
 
 @Injectable()
 export class UserService {
@@ -362,13 +362,13 @@ export class UserService {
 
   async getById(id: number) {
     const user = await this.userRepository.findOne({ id });
+    if (!user || user.deletedAt) {
+      throw new UnauthorizedException('You are not alloed');
+    }
     if (!user.verifiedAt) {
       throw new BadRequestException('The user is not verified');
     }
-    if (user) {
-      return user;
-    }
-    throw new NotFoundException('User with this id does not exist');
+    return user;
   }
 
   async getByIdArr(ids: number[]): Promise<User[]> {
