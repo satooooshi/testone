@@ -433,13 +433,24 @@ const EventList = () => {
               />
             </div>
             <div className={eventListStyles.event_list_wrapper}>
-              <div className={eventListStyles.event_card__row}>
-                {events?.events.map((e) => (
-                  <div key={e.id} className={eventListStyles.event_card_margin}>
-                    <EventCard hrefTagClick={hrefTagClick} eventSchedule={e} />
-                  </div>
-                ))}
-              </div>
+              {events?.events.length ? (
+                <div className={eventListStyles.event_card__row}>
+                  {events.events.map((e) => (
+                    <div
+                      key={e.id}
+                      className={eventListStyles.event_card_margin}>
+                      <EventCard
+                        hrefTagClick={hrefTagClick}
+                        eventSchedule={e}
+                      />
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className={eventListStyles.no_result_text}>
+                  検索結果が見つかりませんでした
+                </p>
+              )}
             </div>
           </>
         )}
