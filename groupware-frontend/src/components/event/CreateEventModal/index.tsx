@@ -40,6 +40,7 @@ import { useFormik } from 'formik';
 import { createEventSchema } from 'src/utils/validation/schema';
 import { useImageCrop } from '@/hooks/crop/useImageCrop';
 import { DateTime } from 'luxon';
+import { tagColorFactory } from 'src/utils/factory/tagColorFactory';
 
 type ExcludeFilesAndVideos = Pick<
   EventSchedule,
@@ -400,7 +401,7 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
                 key={t.id}
                 size="xs"
                 className={createEventModalStyle.tag__item}
-                colorScheme="purple">
+                colorScheme={tagColorFactory(t.type)}>
                 {t.name}
               </Button>
             ))}

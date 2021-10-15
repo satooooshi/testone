@@ -14,6 +14,7 @@ import { GiTeacher } from 'react-icons/gi';
 import portalLinkBoxStyles from '@/styles/components/PortalLinkBox.module.scss';
 import { MdAssignment } from 'react-icons/md';
 import { FcSportsMode } from 'react-icons/fc';
+import { tagColorFactory } from 'src/utils/factory/tagColorFactory';
 
 type EventCardProps = {
   eventSchedule: EventSchedule;
@@ -126,7 +127,7 @@ const EventCard: React.FC<EventCardProps> = ({
                       hrefTagClick ? hrefTagClick(t) : `/event/list?tag=${t.id}`
                     }
                     key={t.id}>
-                    <Button size="sm" colorScheme="purple">
+                    <Button size="sm" colorScheme={tagColorFactory(t.type)}>
                       {t.name}
                     </Button>
                   </Link>
