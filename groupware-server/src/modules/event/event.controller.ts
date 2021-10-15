@@ -208,7 +208,7 @@ export class EventScheduleController {
       const eventChatGroup = new ChatGroup();
       eventChatGroup.name = savedEvent.title;
       eventChatGroup.imageURL = savedEvent.imageURL || '';
-      eventChatGroup.members = savedEvent.hostUsers;
+      eventChatGroup.members = [...savedEvent.hostUsers, savedEvent.author];
       const eventGroup = await this.chatService.saveChatGroup(eventChatGroup);
       const groupSavedEvent = await this.eventService.saveEvent({
         ...savedEvent,

@@ -46,7 +46,7 @@ const EventParticipants: React.FC<EventParticipantsProps> = ({
         <p className={eventParticipantsStyles.participant_list_title}>
           参加者一覧
         </p>
-        {!allVisible && userJoiningEvent.length > 15 ? (
+        {!allVisible && userJoiningEvent && userJoiningEvent.length > 15 ? (
           <button
             className={eventParticipantsStyles.see_all_text}
             onClick={() => setAllVisible(true)}>
