@@ -4,7 +4,6 @@ import {
   Controller,
   Get,
   Param,
-  ParseIntPipe,
   Patch,
   Post,
   Query,
@@ -125,5 +124,16 @@ export class ChatController {
     @Param() chatGroupId: number,
   ): Promise<LastReadChatTime> {
     return await this.chatService.saveLastReadChatTime(req.user, chatGroupId);
+  }
+
+  @Post('leave-room')
+  @UseGuards(JwtAuthenticationGuard)
+  async leaveGroup(
+    @Req() req: RequestWithUser,
+    @Body() chatGroup: Partial<ChatGroup>,
+  ) {
+    const { id } = req.user;
+    const { id: chatGroupId } = chatGroup;
+    await this.chatService.leaveChatRoom(id, chatGroupId);
   }
 }

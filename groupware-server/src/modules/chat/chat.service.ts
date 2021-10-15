@@ -6,9 +6,10 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ChatGroup } from 'src/entities/chatGroup.entity';
-import { ChatMessage } from 'src/entities/chatMessage.entity';
+import { ChatMessage, ChatMessageType } from 'src/entities/chatMessage.entity';
 import { LastReadChatTime } from 'src/entities/lastReadChatTime.entity';
 import { User } from 'src/entities/user.entity';
+import { userNameFactory } from 'src/utils/factory/userNameFactory';
 import { In, Repository } from 'typeorm';
 import { GetMessagesQuery } from './chat.controller';
 
@@ -147,6 +148,34 @@ export class ChatService {
       .relation(ChatGroup, 'members')
       .of(chatGroupID)
       .add(userID);
+  }
+
+  public async leaveChatRoom(userID: number, chatGroupID: number) {
+    const containMembers: ChatGroup = await this.chatGroupRepository.findOne({
+      where: { id: chatGroupID },
+      relations: ['members'],
+    });
+    const targetGroup = await this.chatGroupRepository.findOne(chatGroupID);
+    const user = await this.userRepository.findOne(userID);
+
+    const isUserJoining = containMembers.members.filter(
+      (m) => m.id === userID,
+    ).length;
+    if (!isUserJoining) {
+      throw new BadRequestException('The user is not participant');
+    }
+    await this.chatGroupRepository
+      .createQueryBuilder()
+      .relation(ChatGroup, 'members')
+      .of(chatGroupID)
+      .remove(userID);
+    const systemMessage = new ChatMessage();
+    const userName = userNameFactory(user);
+    systemMessage.content = `${userName}さんが退出しました`;
+    systemMessage.type = ChatMessageType.SYSTEM_TEXT;
+    systemMessage.createdAt = new Date();
+    systemMessage.chatGroup = targetGroup;
+    await this.chatMessageRepository.save(systemMessage);
   }
 
   public async saveChatGroup(
