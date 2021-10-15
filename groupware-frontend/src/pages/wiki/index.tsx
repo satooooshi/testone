@@ -1,5 +1,5 @@
 import LayoutWithTab from '@/components/layout/LayoutWithTab';
-import { ScreenName } from '@/components/layout/Sidebar';
+import { SidebarScreenName } from '@/components/layout/Sidebar';
 import Head from 'next/head';
 import React from 'react';
 import homeStyles from '@/styles/layouts/Home.module.scss';
@@ -12,7 +12,7 @@ const Wiki = () => {
 
   return (
     <LayoutWithTab
-      sidebar={{ activeScreenName: ScreenName.QA }}
+      sidebar={{ activeScreenName: SidebarScreenName.QA }}
       header={{
         title: '社内Wiki',
         tabs,

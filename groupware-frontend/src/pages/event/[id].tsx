@@ -1,5 +1,5 @@
 import LayoutWithTab from '@/components/layout/LayoutWithTab';
-import { ScreenName } from '@/components/layout/Sidebar';
+import { SidebarScreenName } from '@/components/layout/Sidebar';
 import { useAPIGetEventDetail } from '@/hooks/api/event/useAPIGetEventDetail';
 import { useRouter } from 'next/router';
 import eventDetailStyles from '@/styles/layouts/EventDetail.module.scss';
@@ -206,7 +206,7 @@ const EventDetail = () => {
 
   return (
     <LayoutWithTab
-      sidebar={{ activeScreenName: ScreenName.EVENT }}
+      sidebar={{ activeScreenName: SidebarScreenName.EVENT }}
       header={initialHeaderValue}>
       <CreateEventModal
         enabled={editModal}

@@ -1,4 +1,4 @@
-import { ScreenName } from '@/components/layout/Sidebar';
+import { SidebarScreenName } from '@/components/layout/Sidebar';
 import { Tab } from 'src/types/header/tab/types';
 import { useRouter } from 'next/router';
 import WikiCard from '@/components/common/WikiCard';
@@ -146,7 +146,7 @@ const QAQuestionList = () => {
 
   return (
     <LayoutWithTab
-      sidebar={{ activeScreenName: ScreenName.QA }}
+      sidebar={{ activeScreenName: SidebarScreenName.QA }}
       header={initialHeaderValue}>
       <Head>
         <title>ボールド | Wiki</title>

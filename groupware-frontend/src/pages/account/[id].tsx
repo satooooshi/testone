@@ -1,4 +1,4 @@
-import { ScreenName } from '@/components/layout/Sidebar';
+import { SidebarScreenName } from '@/components/layout/Sidebar';
 import accountInfoStyles from '@/styles/layouts/AccountInfo.module.scss';
 import { useRouter } from 'next/router';
 import LayoutWithTab from '@/components/layout/LayoutWithTab';
@@ -132,7 +132,7 @@ const MyAccountInfo = () => {
   return (
     <LayoutWithTab
       sidebar={{
-        activeScreenName: ScreenName.ACCOUNT,
+        activeScreenName: SidebarScreenName.ACCOUNT,
       }}
       header={{
         title: 'Account',

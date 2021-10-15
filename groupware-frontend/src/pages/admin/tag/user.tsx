@@ -1,6 +1,6 @@
 import { Tab } from 'src/types/header/tab/types';
 import LayoutWithTab from '@/components/layout/LayoutWithTab';
-import { ScreenName } from '@/components/layout/Sidebar';
+import { SidebarScreenName } from '@/components/layout/Sidebar';
 import React, { useEffect } from 'react';
 import { Tag, TagType, UserRole, UserTag } from 'src/types';
 import { useRouter } from 'next/router';
@@ -37,15 +37,9 @@ const UserTagAdmin: React.FC = () => {
     createTag(t);
   };
 
-  useEffect(() => {
-    if (user?.role !== UserRole.ADMIN) {
-      router.back();
-    }
-  }, [user, router]);
-
   return (
     <LayoutWithTab
-      sidebar={{ activeScreenName: ScreenName.ADMIN }}
+      sidebar={{ activeScreenName: SidebarScreenName.ADMIN }}
       header={{
         title: 'Admin',
         activeTabName: 'タグ管理(ユーザー)',
@@ -65,26 +59,30 @@ const UserTagAdmin: React.FC = () => {
           }}
           onClickSaveButton={(t) => handleCreate(t)}
         />
-        <TagListBox
-          tagType={TagType.QUALIFICATION}
-          tags={tags}
-          onClickDeleteButton={(t) => {
-            if (confirm(`${t.name}を削除します。よろしいですか？`)) {
-              deleteTag(t);
-            }
-          }}
-          onClickSaveButton={(t) => handleCreate(t)}
-        />
-        <TagListBox
-          tagType={TagType.CLUB}
-          tags={tags}
-          onClickDeleteButton={(t) => {
-            if (confirm(`${t.name}を削除します。よろしいですか？`)) {
-              deleteTag(t);
-            }
-          }}
-          onClickSaveButton={(t) => handleCreate(t)}
-        />
+        {user?.role === UserRole.ADMIN && (
+          <TagListBox
+            tagType={TagType.QUALIFICATION}
+            tags={tags}
+            onClickDeleteButton={(t) => {
+              if (confirm(`${t.name}を削除します。よろしいですか？`)) {
+                deleteTag(t);
+              }
+            }}
+            onClickSaveButton={(t) => handleCreate(t)}
+          />
+        )}
+        {user?.role === UserRole.ADMIN && (
+          <TagListBox
+            tagType={TagType.CLUB}
+            tags={tags}
+            onClickDeleteButton={(t) => {
+              if (confirm(`${t.name}を削除します。よろしいですか？`)) {
+                deleteTag(t);
+              }
+            }}
+            onClickSaveButton={(t) => handleCreate(t)}
+          />
+        )}
         <TagListBox
           tagType={TagType.HOBBY}
           tags={tags}
@@ -95,16 +93,18 @@ const UserTagAdmin: React.FC = () => {
           }}
           onClickSaveButton={(t) => handleCreate(t)}
         />
-        <TagListBox
-          tagType={TagType.OTHER}
-          tags={tags}
-          onClickDeleteButton={(t) => {
-            if (confirm(`${t.name}を削除します。よろしいですか？`)) {
-              deleteTag(t);
-            }
-          }}
-          onClickSaveButton={(t) => handleCreate(t)}
-        />
+        {user?.role === UserRole.ADMIN && (
+          <TagListBox
+            tagType={TagType.OTHER}
+            tags={tags}
+            onClickDeleteButton={(t) => {
+              if (confirm(`${t.name}を削除します。よろしいですか？`)) {
+                deleteTag(t);
+              }
+            }}
+            onClickSaveButton={(t) => handleCreate(t)}
+          />
+        )}
       </div>
     </LayoutWithTab>
   );

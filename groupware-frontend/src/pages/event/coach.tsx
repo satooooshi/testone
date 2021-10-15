@@ -1,5 +1,5 @@
 import LayoutWithTab from '@/components/layout/LayoutWithTab';
-import { ScreenName } from '@/components/layout/Sidebar';
+import { SidebarScreenName } from '@/components/layout/Sidebar';
 import { useRouter } from 'next/router';
 import React from 'react';
 import eventPRStyles from '@/styles/layouts/EventPR.module.scss';
@@ -20,7 +20,7 @@ const Coach: React.FC = () => {
 
   return (
     <LayoutWithTab
-      sidebar={{ activeScreenName: ScreenName.EVENT }}
+      sidebar={{ activeScreenName: SidebarScreenName.EVENT }}
       header={initialHeaderValue}>
       <div className={eventPRStyles.main}>
         <div className={eventPRStyles.top_title_wrapper}>

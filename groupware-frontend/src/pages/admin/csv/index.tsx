@@ -1,5 +1,5 @@
 import LayoutWithTab from '@/components/layout/LayoutWithTab';
-import { ScreenName } from '@/components/layout/Sidebar';
+import { SidebarScreenName } from '@/components/layout/Sidebar';
 import {
   QueryToGetEventCsv,
   useAPIDownloadEventCsv,
@@ -28,7 +28,7 @@ const ExportCsv = () => {
 
   return (
     <LayoutWithTab
-      sidebar={{ activeScreenName: ScreenName.ADMIN }}
+      sidebar={{ activeScreenName: SidebarScreenName.ADMIN }}
       header={{
         title: 'Admin',
         activeTabName: 'CSV出力',

@@ -9,11 +9,11 @@ import clsx from 'clsx';
 import { useAuthenticate } from 'src/contexts/useAuthenticate';
 import { UserRole } from 'src/types';
 import Link from 'next/link';
-import { AiOutlineGlobal } from 'react-icons/ai';
+import { AiFillTags, AiOutlineGlobal } from 'react-icons/ai';
 import { GiCancel } from 'react-icons/gi';
 import { useMediaQuery } from '@chakra-ui/media-query';
 
-export enum ScreenName {
+export enum SidebarScreenName {
   ACCOUNT = 'アカウント',
   HOME = 'Home',
   EVENT = 'イベント',
@@ -22,10 +22,11 @@ export enum ScreenName {
   USERS = '社員名鑑',
   CHAT = 'チャット',
   ADMIN = '管理',
+  TAGADMIN = 'タグ編集',
 }
 
 export type SidebarProps = {
-  activeScreenName?: ScreenName;
+  activeScreenName?: SidebarScreenName;
   isDrawerOpen?: boolean;
   hideDrawer?: () => void;
 };
@@ -96,66 +97,90 @@ const Sidebar: React.FC<SidebarProps> = ({
             screenName="/"
             icon={
               <HiHome
-                className={iconClass(activeScreenName === ScreenName.HOME)}
+                className={iconClass(
+                  activeScreenName === SidebarScreenName.HOME,
+                )}
               />
             }
-            iconName={ScreenName.HOME}
+            iconName={SidebarScreenName.HOME}
           />
           <LinkWithIcon
             screenName="/event/list?from=&to="
             icon={
               <BiCalendarEvent
-                className={iconClass(activeScreenName === ScreenName.EVENT)}
+                className={iconClass(
+                  activeScreenName === SidebarScreenName.EVENT,
+                )}
               />
             }
-            iconName={ScreenName.EVENT}
+            iconName={SidebarScreenName.EVENT}
           />
           <LinkWithIcon
             screenName="/wiki"
             icon={
               <AiOutlineGlobal
-                className={iconClass(activeScreenName === ScreenName.QA)}
+                className={iconClass(activeScreenName === SidebarScreenName.QA)}
               />
             }
-            iconName={ScreenName.WIKI}
+            iconName={SidebarScreenName.WIKI}
           />
           <LinkWithIcon
             screenName="/users/list"
             icon={
               <FaUsers
-                className={iconClass(activeScreenName === ScreenName.USERS)}
+                className={iconClass(
+                  activeScreenName === SidebarScreenName.USERS,
+                )}
               />
             }
-            iconName={ScreenName.USERS}
+            iconName={SidebarScreenName.USERS}
           />
           <LinkWithIcon
             screenName="/chat"
             icon={
               <BsChatDotsFill
-                className={iconClass(activeScreenName === ScreenName.CHAT)}
+                className={iconClass(
+                  activeScreenName === SidebarScreenName.CHAT,
+                )}
               />
             }
-            iconName={ScreenName.CHAT}
+            iconName={SidebarScreenName.CHAT}
           />
           <LinkWithIcon
             screenName={`/account/${user?.id}`}
             icon={
               <RiAccountCircleFill
-                className={iconClass(activeScreenName === ScreenName.ACCOUNT)}
+                className={iconClass(
+                  activeScreenName === SidebarScreenName.ACCOUNT,
+                )}
               />
             }
-            iconName={ScreenName.ACCOUNT}
+            iconName={SidebarScreenName.ACCOUNT}
           />
         </div>
-        {user?.role === UserRole.ADMIN && (
+        {user?.role === UserRole.ADMIN ? (
           <LinkWithIcon
             screenName="/admin/users"
             icon={
               <FaUserCog
-                className={iconClass(activeScreenName === ScreenName.ADMIN)}
+                className={iconClass(
+                  activeScreenName === SidebarScreenName.ADMIN,
+                )}
               />
             }
-            iconName={ScreenName.ADMIN}
+            iconName={SidebarScreenName.ADMIN}
+          />
+        ) : (
+          <LinkWithIcon
+            screenName="/admin/tag"
+            icon={
+              <AiFillTags
+                className={iconClass(
+                  activeScreenName === SidebarScreenName.TAGADMIN,
+                )}
+              />
+            }
+            iconName={SidebarScreenName.TAGADMIN}
           />
         )}
       </div>
