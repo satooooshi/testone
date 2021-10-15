@@ -198,6 +198,13 @@ const EventDetail = () => {
     tabs: tabs,
   };
 
+  const isFinished = useMemo(() => {
+    if (data?.endAt) {
+      return new Date(data.endAt) >= new Date();
+    }
+    return false;
+  }, [data?.endAt]);
+
   useEffect(() => {
     if (data && data.submissionFiles && data.submissionFiles.length) {
       setSubmitFiles(data.submissionFiles);
@@ -287,15 +294,23 @@ const EventDetail = () => {
                 </div>
 
                 <div className={eventDetailStyles.join_event_wrapper}>
-                  {data.type !== 'submission_etc' && (
+                  {data.type !== 'submission_etc' && data.isJoining ? (
                     <Button
-                      colorScheme={data.isJoining ? 'teal' : 'pink'}
+                      colorScheme={'teal'}
                       onClick={() =>
                         !data.isJoining && joinEvent({ eventID: Number(id) })
                       }>
-                      {data.isJoining ? '参加済' : 'イベントに参加'}
+                      {'参加済'}
                     </Button>
-                  )}
+                  ) : data.type !== 'submission_etc' && !isFinished ? (
+                    <Button
+                      colorScheme={'pink'}
+                      onClick={() =>
+                        !data.isJoining && joinEvent({ eventID: Number(id) })
+                      }>
+                      {'イベントに参加'}
+                    </Button>
+                  ) : null}
                 </div>
                 {data.type !== EventType.SUBMISSION_ETC && (
                   <>
@@ -420,7 +435,7 @@ const EventDetail = () => {
                 </div>
               </div>
             )}
-            {data.type === EventType.SUBMISSION_ETC && (
+            {data.type === EventType.SUBMISSION_ETC && !isFinished ? (
               <>
                 <div className={eventDetailStyles.count_and_button_wrapper}>
                   <div className={eventDetailStyles.submission_bar_left}>
@@ -486,7 +501,7 @@ const EventDetail = () => {
                   <></>
                 )}
               </>
-            )}
+            ) : null}
           </div>
         </div>
       )}
