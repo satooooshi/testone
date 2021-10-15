@@ -1,0 +1,108 @@
+@import '../../variables.scss';
+
+.system_message_wrapper {
+  background: $header_background_color;
+  border-radius: 10px;
+  align-self: center;
+  display: flex;
+  flex-flow: row;
+  justify-content: center;
+  min-width: 60%;
+}
+.system_message {
+  font-size: 14px;
+}
+
+.massage_sender_name {
+  font-size: 14px;
+}
+.message_text__other {
+  color: $dark_font_color;
+  background: $header_background_color;
+}
+
+.message_image_or_video {
+  display: flex;
+  max-width: 300px;
+  max-height: 300px;
+}
+
+.message_other_file {
+  margin-right: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border: 1px solid $header_background_color;
+  border-radius: 10px;
+  padding: 10px;
+}
+
+.other_file_icon {
+  height: 48px;
+  width: 48px;
+  color: $dark_font_color;
+}
+
+.message_content {
+  border-radius: 8px;
+  padding: 8px;
+  max-width: 40vw;
+  min-width: 10vw;
+  word-wrap: break-word;
+  font-size: 14px;
+  @media (max-width: 576px) {
+    font-size: 14px;
+  }
+}
+
+.message_text__self {
+  color: $white_color;
+  background: $blue_color;
+}
+
+.message_user_info_wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  &__self {
+    align-items: flex-end;
+  }
+}
+
+.send_time {
+  margin: 0 8px;
+  color: gray;
+  font-size: 14px;
+}
+
+.read_count {
+  margin: 0 8px;
+  color: gray;
+  font-size: 12px;
+}
+
+.message_wrapper {
+  display: flex;
+  align-items: flex-end;
+}
+
+.group_card_avatar_image {
+  height: 40px;
+  width: 40px;
+  cursor: pointer;
+}
+
+.message__item {
+  display: flex;
+  margin-bottom: 16px;
+  max-width: 50vw;
+}
+
+.message__self {
+  align-self: flex-end;
+  flex-direction: row-reverse;
+}
+
+.message__other {
+  align-self: flex-start;
+}

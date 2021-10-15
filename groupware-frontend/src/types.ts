@@ -9,6 +9,7 @@ export enum ChatMessageType {
   VIDEO = 'video',
   IMAGE = 'image',
   TEXT = 'text',
+  SYSTEM_TEXT = 'system_text',
   OTHER_FILE = 'other_file',
 }
 

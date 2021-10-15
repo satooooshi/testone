@@ -50,15 +50,15 @@ export class ChatService {
     const existMessages = await this.chatMessageRepository
       .createQueryBuilder('chat_messages')
       .withDeleted()
-      .innerJoin('chat_messages.chatGroup', 'chat_group')
-      .innerJoinAndSelect('chat_messages.sender', 'sender')
+      .leftJoin('chat_messages.chatGroup', 'chat_group')
+      .leftJoinAndSelect('chat_messages.sender', 'sender')
       .where('chat_group.id = :chatGroupID', { chatGroupID: query.group })
       .orderBy('chat_messages.created_at', 'DESC')
       .limit(limit)
       .offset(offset)
       .getMany();
     const messages = existMessages.map((m) => {
-      if (m.sender.id === userID) {
+      if (m.sender && m.sender.id === userID) {
         m.isSender = true;
         return m;
       }
