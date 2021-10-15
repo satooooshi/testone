@@ -157,7 +157,7 @@ export class EventScheduleController {
     const { id } = params;
     const { user } = req;
     const eventSchedule = await this.eventService.getEventDetail(id, user.id);
-    const isExist = eventSchedule.userJoiningEvent?.filter(
+    const isExist = eventSchedule?.userJoiningEvent?.filter(
       (userJoiningEvent) => user.id === userJoiningEvent.user.id,
     ).length;
     if (isExist) {
@@ -233,7 +233,8 @@ export class EventScheduleController {
       req.user.id,
     );
     if (
-      (existEvent.author && existEvent.author.id !== req.user.id) ||
+      existEvent.author &&
+      existEvent.author.id !== req.user.id &&
       req.user.role !== UserRole.ADMIN
     ) {
       throw new BadRequestException(

@@ -4,6 +4,7 @@ import { dateTimeFormatterFromJSDDate } from 'src/utils/dateTimeFormatter';
 import { Wiki, WikiType } from 'src/types';
 import Link from 'next/link';
 import { Avatar, Button } from '@chakra-ui/react';
+import boldMascot from '@/public/bold-mascot.png';
 
 type WikiCardProps = {
   wiki: Wiki;
@@ -28,14 +29,21 @@ const WikiCard: React.FC<WikiCardProps> = ({ wiki }) => {
         <div className={qaCardStyles.qa_card__top}>
           <div className={qaCardStyles.qa_card_user_info_wrapper}>
             {wiki.type !== WikiType.RULES && writer ? (
-              <Link href={`/account/${writer?.id}`} passHref>
-                <a>
-                  <Avatar
-                    src={writer?.avatarUrl}
-                    className={qaCardStyles.qa_card__avatar}
-                  />
-                </a>
-              </Link>
+              writer.existence ? (
+                <Link href={`/account/${writer.id}`} passHref>
+                  <a>
+                    <Avatar
+                      src={writer.avatarUrl}
+                      className={qaCardStyles.qa_card__avatar}
+                    />
+                  </a>
+                </Link>
+              ) : (
+                <Avatar
+                  src={boldMascot.src}
+                  className={qaCardStyles.qa_card__avatar}
+                />
+              )
             ) : null}
             <p className={qaCardStyles.qa_card__title}>{title}</p>
           </div>

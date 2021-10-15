@@ -3,6 +3,7 @@ import {
   Injectable,
   InternalServerErrorException,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User, UserRole } from 'src/entities/user.entity';
@@ -332,6 +333,8 @@ export class UserService {
         employeeId: u.user_employee_id,
         createdAt: u.user_created_at,
         updatedAt: u.user_updated_at,
+        deletedAt: u.user_deleted_at,
+        existence: u.user_existence,
         eventCount: u.eventCount,
         questionCount: u.questionCount,
         answerCount: u.answerCount,
@@ -359,13 +362,13 @@ export class UserService {
 
   async getById(id: number) {
     const user = await this.userRepository.findOne({ id });
+    if (!user || user.deletedAt) {
+      throw new UnauthorizedException('You are not alloed');
+    }
     if (!user.verifiedAt) {
       throw new BadRequestException('The user is not verified');
     }
-    if (user) {
-      return user;
-    }
-    throw new NotFoundException('User with this id does not exist');
+    return user;
   }
 
   async getByIdArr(ids: number[]): Promise<User[]> {
@@ -461,9 +464,10 @@ export class UserService {
     }
   }
 
-  async deleteUser(userID: number) {
+  async deleteUser(user: User) {
     try {
-      await this.userRepository.delete(userID);
+      await this.userRepository.save({ ...user, existence: null });
+      await this.userRepository.softDelete(user.id);
     } catch (err) {
       console.log(err);
       throw new InternalServerErrorException(

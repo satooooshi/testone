@@ -64,6 +64,8 @@ export interface User {
   employeeId: string | null;
   createdAt: Date;
   updatedAt: Date;
+  deletedAt: Date | null;
+  existence: boolean | null;
   tags?: Tag[];
   submissionFiles?: SubmissionFile[];
   hostingEvents?: EventSchedule[];

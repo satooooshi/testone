@@ -49,6 +49,7 @@ export class ChatService {
     const offset = (Number(page) - 1) * limit;
     const existMessages = await this.chatMessageRepository
       .createQueryBuilder('chat_messages')
+      .withDeleted()
       .innerJoin('chat_messages.chatGroup', 'chat_group')
       .innerJoinAndSelect('chat_messages.sender', 'sender')
       .where('chat_group.id = :chatGroupID', { chatGroupID: query.group })
@@ -94,6 +95,7 @@ export class ChatService {
   ): Promise<LastReadChatTime[]> {
     const chatGroup = await this.chatGroupRepository.findOne(chatGroupId, {
       relations: ['members', 'lastReadChatTime', 'lastReadChatTime.user'],
+      withDeleted: true,
     });
     if (!chatGroup) {
       return;

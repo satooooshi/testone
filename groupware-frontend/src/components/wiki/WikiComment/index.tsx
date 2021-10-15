@@ -10,6 +10,7 @@ import Editor from 'react-markdown-editor-lite';
 import 'react-markdown-editor-lite/lib/index.css';
 import DraftMarkup from '../DraftMarkup';
 import Link from 'next/link';
+import boldMascot from '@/public/bold-mascot.png';
 
 type WikiCommentProps = {
   textFormat: TextFormat;
@@ -42,17 +43,29 @@ const WikiComment: React.FC<WikiCommentProps> = ({
       {date && writer && (
         <div className={qaCommentStyles.question_uploader__info}>
           <div className={qaCommentStyles.user_info_wrapper}>
-            <Link href={`/account/${writer?.id}`} passHref>
-              <a>
+            {writer.existence ? (
+              <>
+                <Link href={`/account/${writer?.id}`} passHref>
+                  <a>
+                    <Avatar
+                      className={qaCommentStyles.user_avatar}
+                      src={writer.avatarUrl}
+                    />
+                  </a>
+                </Link>
+                <p className={qaCommentStyles.user_name}>
+                  {writer.lastName + ' ' + writer.firstName}
+                </p>
+              </>
+            ) : (
+              <>
                 <Avatar
                   className={qaCommentStyles.user_avatar}
-                  src={writer.avatarUrl}
+                  src={boldMascot.src}
                 />
-              </a>
-            </Link>
-            <p className={qaCommentStyles.user_name}>
-              {writer.lastName + ' ' + writer.firstName}
-            </p>
+                <p className={qaCommentStyles.user_name}>ボールドくん</p>
+              </>
+            )}
           </div>
           <div className={qaCommentStyles.info_left}>
             <p className={qaCommentStyles.wrote_date}>

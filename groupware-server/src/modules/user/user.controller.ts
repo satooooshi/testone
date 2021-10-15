@@ -111,6 +111,6 @@ export class UserController {
   @UseGuards(JwtAuthenticationGuard)
   @Post('delete-user')
   async deleteUser(@Body() user: User) {
-    return await this.userService.deleteUser(user.id);
+    return await this.userService.deleteUser(user);
   }
 }

@@ -11,6 +11,7 @@ import {
   MenuOptionGroup,
 } from '@chakra-ui/react';
 import Link from 'next/link';
+import boldMascot from '@/public/bold-mascot.png';
 import { useAuthenticate } from 'src/contexts/useAuthenticate';
 
 type EventParticipantsProps = {
@@ -64,45 +65,57 @@ const EventParticipants: React.FC<EventParticipantsProps> = ({
       )}
       {userJoiningEvent.map((u, index) =>
         index <= 15 || allVisible ? (
-          <div className={eventParticipantsStyles.participant_name_wrapper}>
-            <Link key={u.user.id} href={`/account/${u.user.id}`}>
-              <a className={eventParticipantsStyles.user_info_wrapper}>
-                <Avatar
-                  src={u.user.avatarUrl}
-                  className={eventParticipantsStyles.participant_avatar}
-                />
-                <p className={eventParticipantsStyles.participant_name}>
-                  {u.user.lastName + ' ' + u.user.firstName}
-                </p>
-              </a>
-            </Link>
-            {user?.role === UserRole.ADMIN && (
-              <Menu>
-                <MenuButton as={Button} colorScheme="red" size="sm">
-                  {u.lateMinutes
-                    ? lateMinutesText(Number(u.lateMinutes))
-                    : '遅刻を記録'}
-                </MenuButton>
-                <MenuList>
-                  <MenuOptionGroup
-                    onChange={(v) =>
-                      onChangeJoiningData({ ...u, lateMinutes: Number(v) })
-                    }
-                    defaultValue={''}
-                    value={u.lateMinutes.toString()}
-                    type="radio">
-                    <MenuItemOption value="">記録しない</MenuItemOption>
-                    <MenuItemOption value="15">15分遅刻</MenuItemOption>
-                    <MenuItemOption value="30">30分遅刻</MenuItemOption>
-                    <MenuItemOption value="45">45分遅刻</MenuItemOption>
-                    <MenuItemOption value="60">1時間遅刻</MenuItemOption>
-                    <MenuItemOption value="90">1時間半遅刻</MenuItemOption>
-                    <MenuItemOption value="120">2時間遅刻</MenuItemOption>
-                  </MenuOptionGroup>
-                </MenuList>
-              </Menu>
-            )}
-          </div>
+          u.user.existence ? (
+            <>
+              <Link key={u.user.id} href={`/account/${u.user.id}`}>
+                <a className={eventParticipantsStyles.participant_name_wrapper}>
+                  <Avatar
+                    src={u.user.avatarUrl}
+                    className={eventParticipantsStyles.participant_avatar}
+                  />
+                  <p className={eventParticipantsStyles.participant_name}>
+                    {u.user.lastName + ' ' + u.user.firstName}
+                  </p>
+                </a>
+              </Link>
+              {user?.role === UserRole.ADMIN && (
+                <Menu>
+                  <MenuButton as={Button} colorScheme="red" size="sm">
+                    {u.lateMinutes
+                      ? lateMinutesText(Number(u.lateMinutes))
+                      : '遅刻を記録'}
+                  </MenuButton>
+                  <MenuList>
+                    <MenuOptionGroup
+                      onChange={(v) =>
+                        onChangeJoiningData({ ...u, lateMinutes: Number(v) })
+                      }
+                      defaultValue={''}
+                      value={u.lateMinutes.toString()}
+                      type="radio">
+                      <MenuItemOption value="">記録しない</MenuItemOption>
+                      <MenuItemOption value="15">15分遅刻</MenuItemOption>
+                      <MenuItemOption value="30">30分遅刻</MenuItemOption>
+                      <MenuItemOption value="45">45分遅刻</MenuItemOption>
+                      <MenuItemOption value="60">1時間遅刻</MenuItemOption>
+                      <MenuItemOption value="90">1時間半遅刻</MenuItemOption>
+                      <MenuItemOption value="120">2時間遅刻</MenuItemOption>
+                    </MenuOptionGroup>
+                  </MenuList>
+                </Menu>
+              )}
+            </>
+          ) : (
+            <div className={eventParticipantsStyles.participant_name_wrapper}>
+              <Avatar
+                src={boldMascot.src}
+                className={eventParticipantsStyles.participant_avatar}
+              />
+              <p className={eventParticipantsStyles.participant_name}>
+                ボールドくん
+              </p>
+            </div>
+          )
         ) : (
           <></>
         ),

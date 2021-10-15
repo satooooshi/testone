@@ -8,6 +8,7 @@ import { dateTimeFormatterFromJSDDate } from 'src/utils/dateTimeFormatter';
 import { userNameFactory } from 'src/utils/factory/userNameFactory';
 import { mentionTransform } from 'src/utils/mentionTransform';
 import chatStyles from '@/styles/layouts/Chat.module.scss';
+import boldMascot from '@/public/bold-mascot.png';
 
 type ChatMessageItemProps = {
   message: ChatMessage;
@@ -40,7 +41,11 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
           <Link href={`/account/${message.sender?.id}`} passHref>
             <Avatar
               className={chatStyles.group_card_avatar_image}
-              src={message.sender?.avatarUrl}
+              src={
+                message.sender?.existence
+                  ? boldMascot.src
+                  : message.sender?.avatarUrl
+              }
             />
           </Link>
         ) : null}
@@ -67,7 +72,9 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
               message.isSender && chatStyles.message_user_info_wrapper__self,
             )}>
             <p className={chatStyles.massage_sender_name}>
-              {message.sender ? userNameFactory(message.sender) : ''}
+              {message.sender && !message.sender?.existence
+                ? userNameFactory(message.sender)
+                : 'ボールドくん'}
             </p>
             {message.type === ChatMessageType.TEXT ? (
               <p

@@ -103,6 +103,7 @@ export class EventScheduleService {
     const csvEvents: any[] = [];
     const events = await this.eventRepository
       .createQueryBuilder('events')
+      .withDeleted()
       .leftJoinAndSelect('events.userJoiningEvent', 'userJoiningEvent')
       .leftJoinAndSelect('userJoiningEvent.user', 'user')
       .leftJoinAndSelect('events.hostUsers', 'hostUsers')
@@ -177,6 +178,7 @@ export class EventScheduleService {
         'tags',
       ],
       where: { type: Not(EventType.SUBMISSION_ETC), id },
+      withDeleted: true,
     });
 
     for (const e of events) {
@@ -280,6 +282,7 @@ export class EventScheduleService {
       order: { createdAt: 'DESC' },
       take: limit,
       skip: offset,
+      withDeleted: true,
     });
 
     const count = await searchQuery.getCount();
@@ -333,6 +336,7 @@ export class EventScheduleService {
   ): Promise<EventSchedule> {
     const existEvent = await this.eventRepository
       .createQueryBuilder('events')
+      .withDeleted()
       .leftJoinAndSelect('events.userJoiningEvent', 'userJoiningEvent')
       .leftJoinAndSelect('userJoiningEvent.user', 'user')
       .leftJoinAndSelect('userJoiningEvent.event', 'event')
@@ -422,6 +426,7 @@ export class EventScheduleService {
     const joinedEvent = await this.eventRepository.findOne({
       where: { id: eventID },
       relations: ['chatGroup', 'userJoiningEvent', 'userJoiningEvent.user'],
+      withDeleted: true,
     });
     const userJoiningEvent: UserJoiningEvent = {
       user: user,
