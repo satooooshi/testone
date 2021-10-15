@@ -12,11 +12,29 @@ import { useAPIGetTag } from '@/hooks/api/tag/useAPIGetTag';
 import TagListBox from '@/components/admin/TagListCard';
 import { useAPICreateTag } from '@/hooks/api/tag/useAPICreateTag';
 import { useAPIDeleteTag } from '@/hooks/api/tag/useAPIDeleteTag';
+import { useToast } from '@chakra-ui/react';
 
 const TagAdmin: React.FC = () => {
   const router = useRouter();
+  const toast = useToast();
   const { user } = useAuthenticate();
   const { data: tags, refetch } = useAPIGetTag();
+  const a = (targetString: string) => {
+    const deleteSymbolFromStr = (str: string) => {
+      return str.replace(/[^a-zA-Z ]/g, '');
+    };
+    const hiraToKana = (str: string) => {
+      return str.replace(/[\u3041-\u3096]/g, (match) => {
+        const chr = match.charCodeAt(0) + 0x60;
+        return String.fromCharCode(chr);
+      });
+    };
+    const escaped = deleteSymbolFromStr(targetString);
+    const changedToLowerCamel = escaped.toLowerCase();
+    const changedToKana = hiraToKana(changedToLowerCamel);
+    return changedToKana;
+  };
+  const tagNames: string[] = tags?.map((t) => a(t.name)) || [''];
   const { mutate: createTag } = useAPICreateTag({
     onSuccess: () => {
       refetch();
@@ -30,8 +48,25 @@ const TagAdmin: React.FC = () => {
   const tabs: Tab[] = useHeaderTab({ headerTabType: 'admin' });
 
   const handleCreate = (t: Partial<UserTag | Tag>) => {
-    if (t.name && t.name.length >= 60) {
-      alert('タグは60文字以内で入力してください');
+    if (!t.name) {
+      return;
+    }
+    if (t.name.length >= 60) {
+      toast({
+        description: 'タグは60文字以内で入力してください',
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      });
+      return;
+    }
+    if (tagNames.includes(a(t.name))) {
+      toast({
+        description: 'タグがすでに存在します',
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      });
       return;
     }
     createTag(t);

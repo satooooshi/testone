@@ -43,6 +43,7 @@ import { useImageCrop } from '@/hooks/crop/useImageCrop';
 import { DateTime } from 'luxon';
 import { tagColorFactory } from 'src/utils/factory/tagColorFactory';
 import { useAuthenticate } from 'src/contexts/useAuthenticate';
+import { formikErrorMsgFactory } from 'src/utils/factory/formikErrorMsgFactory';
 
 type ExcludeFilesAndVideos = Pick<
   EventSchedule,
@@ -121,13 +122,7 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
 
   const checkErrors = async () => {
     const errors = await validateForm();
-    const keys = Object.keys(errors) as (keyof CreateEventRequest)[];
-    let messages = '';
-    for (const k of keys) {
-      if (errors[k]) {
-        messages += `${errors[k]}\n`;
-      }
-    }
+    const messages = formikErrorMsgFactory(errors);
     if (messages) {
       toast({
         description: messages,
