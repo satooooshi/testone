@@ -336,7 +336,7 @@ const CreateNewUser = () => {
               defaultValue={UserRole.COMMON}>
               <option value={UserRole.ADMIN}>管理者</option>
               <option value={UserRole.INSTRUCTOR}>講師</option>
-              <option value={UserRole.HEAD_OFFICE}>本社勤務</option>
+              <option value={UserRole.COACH}>コーチ</option>
               <option value={UserRole.COMMON}>一般社員</option>
             </Select>
           </FormControl>
