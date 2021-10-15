@@ -280,6 +280,13 @@ const EventList = () => {
     }
   };
 
+  const initialCalendarDate: Date = useMemo(() => {
+    if (from && to) {
+      return DateTime.fromFormat(from, 'yyyy-LL-dd').toJSDate();
+    }
+    return new Date();
+  }, [from, to]);
+
   useEffect(() => {
     calendarRef?.current?.scrollIntoView();
   }, []);
@@ -387,7 +394,7 @@ const EventList = () => {
               selectable
               resizable
               scrollToTime={DateTime.now()
-                .set({ hour: 8, minute: 0 })
+                .set({ hour: 10, minute: 0 })
                 .toJSDate()}
               views={['month', 'week', 'day']}
               className={bigCalendarStyles.big_calendar}
@@ -401,7 +408,7 @@ const EventList = () => {
                 handleCalendarRangeChange(range);
               }}
               popup={true}
-              defaultDate={new Date()}
+              defaultDate={initialCalendarDate}
               onSelectSlot={handleNewEventFromCalendar}
               onSelectEvent={(e) => {
                 const eventSchedule = e as EventSchedule;
