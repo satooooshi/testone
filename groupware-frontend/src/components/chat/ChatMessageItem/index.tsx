@@ -54,7 +54,7 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
               <Avatar
                 className={chatMessageItemStyles.group_card_avatar_image}
                 src={
-                  message.sender?.existence
+                  !message.sender?.existence
                     ? boldMascot.src
                     : message.sender?.avatarUrl
                 }
@@ -81,7 +81,7 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
             <div
               className={clsx(chatMessageItemStyles.message_user_info_wrapper)}>
               <p className={chatMessageItemStyles.massage_sender_name}>
-                {message.sender && !message.sender?.existence
+                {message.sender && message.sender?.existence
                   ? userNameFactory(message.sender)
                   : 'ボールドくん'}
               </p>
