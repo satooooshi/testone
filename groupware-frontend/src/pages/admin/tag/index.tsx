@@ -19,7 +19,7 @@ const TagAdmin: React.FC = () => {
   const toast = useToast();
   const { user } = useAuthenticate();
   const { data: tags, refetch } = useAPIGetTag();
-  const a = (targetString: string) => {
+  const modifyStrToFlat = (targetString: string) => {
     const deleteSymbolFromStr = (str: string) => {
       return str.replace(/[^a-zA-Z ]/g, '');
     };
@@ -34,7 +34,7 @@ const TagAdmin: React.FC = () => {
     const changedToKana = hiraToKana(changedToLowerCamel);
     return changedToKana;
   };
-  const tagNames: string[] = tags?.map((t) => a(t.name)) || [''];
+  const tagNames: string[] = tags?.map((t) => modifyStrToFlat(t.name)) || [''];
   const { mutate: createTag } = useAPICreateTag({
     onSuccess: () => {
       refetch();
@@ -60,7 +60,7 @@ const TagAdmin: React.FC = () => {
       });
       return;
     }
-    if (tagNames.includes(a(t.name))) {
+    if (tagNames.includes(modifyStrToFlat(t.name))) {
       toast({
         description: 'タグがすでに存在します',
         status: 'error',
