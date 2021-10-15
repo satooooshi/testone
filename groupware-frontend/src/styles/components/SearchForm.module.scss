@@ -11,6 +11,7 @@
   flex-direction: row;
   width: 70vw;
   align-items: center;
+  margin-bottom: 8px;
   // position: relative;
   @media (max-width: 768px) {
     margin-bottom: 0;
@@ -135,6 +136,7 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+  margin-bottom: 8px;
 }
 
 .search_button {
