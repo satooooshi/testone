@@ -90,15 +90,7 @@ const WikiComment: React.FC<WikiCommentProps> = ({
         </div>
       )}
       <div className={qaCommentStyles.markdown}>
-        {textFormat === 'markdown' ? (
-          <Editor
-            style={{ border: 'none' }}
-            view={{ html: true, menu: false, md: false }}
-            renderHTML={() => mdParser.render(body)}
-          />
-        ) : (
-          <DraftMarkup renderHTML={body} />
-        )}
+        <DraftMarkup renderHTML={body} />
         {bestAnswerButtonName && onClickBestAnswerButton ? (
           <div className={qaCommentStyles.best_answer_button_wrapper}>
             <Button
