@@ -13,7 +13,7 @@ import Link from 'next/link';
 import boldMascot from '@/public/bold-mascot.png';
 
 type WikiCommentProps = {
-  textFormat: TextFormat;
+  textFormat?: TextFormat;
   body: string;
   date?: Date;
   writer?: User;
@@ -90,7 +90,7 @@ const WikiComment: React.FC<WikiCommentProps> = ({
         </div>
       )}
       <div className={qaCommentStyles.markdown}>
-        {textFormat === 'markdown' ? (
+        {textFormat && textFormat === 'markdown' ? (
           <Editor
             style={{ border: 'none' }}
             view={{ html: true, menu: false, md: false }}
