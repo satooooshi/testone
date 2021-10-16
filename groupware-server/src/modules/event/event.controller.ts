@@ -157,13 +157,26 @@ export class EventScheduleController {
     const { id } = params;
     const { user } = req;
     const eventSchedule = await this.eventService.getEventDetail(id, user.id);
-    const isExist = eventSchedule?.userJoiningEvent?.filter(
+    const isJoining = eventSchedule.userJoiningEvent?.filter(
       (userJoiningEvent) => user.id === userJoiningEvent.user.id,
     ).length;
-    if (isExist) {
-      return { ...eventSchedule, isJoining: true };
+    const isCanceled = eventSchedule.userJoiningEvent?.filter(
+      (userJoiningEvent) =>
+        user.id === userJoiningEvent.user.id && userJoiningEvent.canceledAt,
+    ).length;
+
+    const returnData: GetEventDetailResopnse = {
+      ...eventSchedule,
+      isJoining: false,
+      isCanceled: false,
+    };
+    if (isJoining) {
+      returnData.isJoining = true;
     }
-    return { ...eventSchedule, isJoining: false };
+    if (isCanceled) {
+      returnData.isCanceled = true;
+    }
+    return returnData;
   }
 
   @Post('create-event')
