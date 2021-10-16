@@ -2,8 +2,6 @@ import React from 'react';
 import { TextFormat, User } from 'src/types';
 import qaCommentStyles from '@/styles/components/QAComment.module.scss';
 import { dateTimeFormatterFromJSDDate } from 'src/utils/dateTimeFormatter';
-import '@uiw/react-md-editor/dist/markdown-editor.css';
-import '@uiw/react-markdown-preview/dist/markdown.css';
 import { Avatar, Button } from '@chakra-ui/react';
 import MarkdownIt from 'markdown-it';
 import Editor from 'react-markdown-editor-lite';

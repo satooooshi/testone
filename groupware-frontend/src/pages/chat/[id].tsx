@@ -43,8 +43,6 @@ import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { HiOutlineDotsCircleHorizontal } from 'react-icons/hi';
 import { Menu, MenuItem, MenuButton } from '@szhsin/react-menu';
-import '@szhsin/react-menu/dist/index.css';
-import '@szhsin/react-menu/dist/transitions/slide.css';
 import EditChatGroupModal from '@/components/chat/EditChatGroupModal';
 import EditChatGroupMembersModal from '@/components/chat/EditChatGroupMembersModal';
 import { useAPISaveChatGroup } from '@/hooks/api/chat/useAPISaveChatGroup';

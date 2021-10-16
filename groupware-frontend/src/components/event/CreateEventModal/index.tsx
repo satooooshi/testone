@@ -19,7 +19,6 @@ import { DateTimePicker } from 'react-rainbow-components';
 import { useDropzone } from 'react-dropzone';
 import { useAPIUploadStorage } from '@/hooks/api/storage/useAPIUploadStorage';
 import ReactCrop from 'react-image-crop';
-import 'react-image-crop/dist/ReactCrop.css';
 import { dataURLToFile } from 'src/utils/dataURLToFile';
 import {
   Button,
