@@ -310,7 +310,7 @@ const EventDetail = () => {
                       </Button>
                       {data.isJoining && (
                         <Button
-                          colorScheme={data.isCanceled ? 'teal' : 'pink'}
+                          colorScheme={data.isCanceled ? 'pink' : 'red'}
                           onClick={() =>
                             !data.isCanceled &&
                             cancelEvent({ eventID: Number(id) })
