@@ -43,6 +43,7 @@ import eventCardStyles from '@/styles/components/EventCard.module.scss';
 import { useAPISaveUserJoiningEvent } from '@/hooks/api/event/useAPISaveUserJoiningEvent';
 import { userNameFactory } from 'src/utils/factory/userNameFactory';
 import { tagColorFactory } from 'src/utils/factory/tagColorFactory';
+import { useAPICancelEvent } from '@/hooks/api/event/useAPICancelEvent';
 
 type FileIconProps = {
   href?: string;
@@ -150,6 +151,9 @@ const EventDetail = () => {
   });
 
   const { mutate: joinEvent } = useAPIJoinEvent({ onSuccess: () => refetch() });
+  const { mutate: cancelEvent } = useAPICancelEvent({
+    onSuccess: () => refetch(),
+  });
   const { mutate: saveEvent } = useAPIUpdateEvent({
     onSuccess: () => {
       setEditModal(false);
