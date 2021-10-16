@@ -88,8 +88,6 @@ const MyAccountInfo = () => {
   const { id } = router.query as { id: string };
   const { data: profile } = useAPIGetUserInfoById(id);
   const { data: events } = useAPIGetEventList({ participant_id: id });
-  console.log(events);
-
   const { data: wikiList } = useAPIGetWikiList({ writer: id });
   const { user } = useAuthenticate();
   const [activeTab, setActiveTab] = useState<TabName>(TabName.DETAIL);
