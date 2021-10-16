@@ -265,7 +265,7 @@ export class EventScheduleService {
           ? 'events.start_at < now() AND events.end_at < now()'
           : 'events.start_at < now() AND events.end_at > now()',
       )
-      .andWhere(query.participant_id ? 'user = :userID' : '1=1', {
+      .andWhere(query.participant_id ? 'user_id = :userID' : '1=1', {
         userID: query.participant_id,
       })
       .andWhere(query.host_user_id ? 'host_user = :hostUserID' : '1=1', {
@@ -274,6 +274,7 @@ export class EventScheduleService {
       .andWhere(tag ? 'tag.id IN (:...tagIDs)' : '1=1', {
         tagIDs,
       });
+
     const events = await searchQuery.getMany();
     const ids = events.map((e) => e.id);
     const eventsWithRelation = await this.eventRepository.find({
