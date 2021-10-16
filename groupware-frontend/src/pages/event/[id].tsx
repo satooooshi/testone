@@ -298,23 +298,30 @@ const EventDetail = () => {
                 </div>
 
                 <div className={eventDetailStyles.join_event_wrapper}>
-                  {data.type !== 'submission_etc' && data.isJoining ? (
-                    <Button
-                      colorScheme={'teal'}
-                      onClick={() =>
-                        !data.isJoining && joinEvent({ eventID: Number(id) })
-                      }>
-                      {'参加済'}
-                    </Button>
-                  ) : data.type !== 'submission_etc' && !isFinished ? (
-                    <Button
-                      colorScheme={'pink'}
-                      onClick={() =>
-                        !data.isJoining && joinEvent({ eventID: Number(id) })
-                      }>
-                      {'イベントに参加'}
-                    </Button>
-                  ) : null}
+                  {data.type !== 'submission_etc' && !isFinished ? (
+                    <>
+                      <Button
+                        className={eventDetailStyles.join_event_button}
+                        colorScheme={data.isJoining ? 'teal' : 'pink'}
+                        onClick={() =>
+                          !data.isJoining && joinEvent({ eventID: Number(id) })
+                        }>
+                        {data.isJoining ? '参加済' : 'イベントに参加'}
+                      </Button>
+                      {data.isJoining && (
+                        <Button
+                          colorScheme={data.isCanceled ? 'teal' : 'pink'}
+                          onClick={() =>
+                            !data.isCanceled &&
+                            cancelEvent({ eventID: Number(id) })
+                          }>
+                          {data.isCanceled ? 'キャンセル済' : 'キャンセルする'}
+                        </Button>
+                      )}
+                    </>
+                  ) : (
+                    <Button colorScheme={'pink'}>イベント終了</Button>
+                  )}
                 </div>
                 {data.type !== EventType.SUBMISSION_ETC && (
                   <>
