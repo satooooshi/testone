@@ -206,7 +206,7 @@ const EventDetail = () => {
 
   const isFinished = useMemo(() => {
     if (data?.endAt) {
-      return new Date(data.endAt) >= new Date();
+      return new Date(data.endAt) <= new Date();
     }
     return false;
   }, [data?.endAt]);
