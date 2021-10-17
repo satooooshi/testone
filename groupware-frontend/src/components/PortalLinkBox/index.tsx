@@ -16,7 +16,7 @@ export enum PortalLinkType {
   IMPRESSIVE_UNIVERSITY = '/event/impressive_university',
   STUDY_MEETING = '/event/study_meeting',
   BOLDAY = '/event/bolday',
-  COACH = '/event/list?type=coach&from=&to=',
+  COACH = '/event/coach',
   CLUB = '/event/club',
   SUBMISSION_ETC = '/event/list?type=submission_etc&from=&to=',
   WIKI = '/wiki',
