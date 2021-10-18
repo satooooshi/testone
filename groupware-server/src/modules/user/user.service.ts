@@ -189,6 +189,7 @@ export class UserService {
       verified,
       duration,
     } = query;
+    console.log('query', query);
     let offset: number;
     let fromDate: Date;
     if (duration === 'month') {
@@ -299,6 +300,7 @@ export class UserService {
       .offset(offset)
       .limit(limit)
       .getRawMany();
+    console.log('users.length', users.length);
     let entityUsers: User[] = [];
     for (const u of users) {
       const tag: UserTag = {
