@@ -66,9 +66,9 @@ const EventParticipants: React.FC<EventParticipantsProps> = ({
       {userJoiningEvent.map((u, index) =>
         index <= 15 || allVisible ? (
           u.user.existence ? (
-            <>
+            <div className={eventParticipantsStyles.participant_name_wrapper}>
               <Link key={u.user.id} href={`/account/${u.user.id}`}>
-                <a className={eventParticipantsStyles.participant_name_wrapper}>
+                <a className={eventParticipantsStyles.participant_info_wrapper}>
                   <Avatar
                     src={u.user.avatarUrl}
                     className={eventParticipantsStyles.participant_avatar}
@@ -104,7 +104,7 @@ const EventParticipants: React.FC<EventParticipantsProps> = ({
                   </MenuList>
                 </Menu>
               )}
-            </>
+            </div>
           ) : (
             <div className={eventParticipantsStyles.participant_name_wrapper}>
               <Avatar
