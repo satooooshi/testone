@@ -7,13 +7,6 @@
   min-height: 100vh;
 }
 
-.header_bottom_margin {
-  margin-bottom: 24px;
-  @media (max-width: 768px) {
-    margin-bottom: 3vh;
-  }
-}
-
 .right_contents {
   width: 100%;
   display: flex;
@@ -39,12 +32,15 @@
 }
 
 .main_padding_with_tab {
+  width: 100%;
+  padding-top: 24px;
   @media (max-width: 768px) {
-    padding-top: 14vh;
+    padding-top: 17vh;
   }
 }
 .main_padding_no_tab {
+  padding-top: 24px;
   @media (max-width: 768px) {
-    padding-top: 24px;
+    padding-top: 8vh;
   }
 }

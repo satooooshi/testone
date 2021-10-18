@@ -210,6 +210,7 @@ export class UserService {
     const searchQuery = this.userRepository
       .createQueryBuilder('user')
       .select()
+      .leftJoinAndSelect('user.tags', 'relatedTags')
       .leftJoinAndSelect('user.tags', 'tag')
       .where(
         word && word.length !== 1
@@ -282,6 +283,7 @@ export class UserService {
       }, 'answerCount')
       .groupBy('user.id')
       .addGroupBy('tag.id')
+      .addGroupBy('relatedTags.id')
       .orderBy(
         sort === 'event'
           ? 'eventCount'
@@ -299,12 +301,13 @@ export class UserService {
       .getRawMany();
     let entityUsers: User[] = [];
     for (const u of users) {
+      console.log(u.relatedTags_id);
       const tag: UserTag = {
-        id: u.tag_id,
-        name: u.tag_name,
-        type: u.tag_type,
-        createdAt: u.tag_created_at,
-        updatedAt: u.tag_updated_at,
+        id: u.relatedTags_id,
+        name: u.relatedTags_name,
+        type: u.relatedTags_type,
+        createdAt: u.relatedTags_created_at,
+        updatedAt: u.relatedTags_updated_at,
       };
       let tags: UserTag[] = [];
       const repeatedUsers = entityUsers.filter(
@@ -344,6 +347,7 @@ export class UserService {
     const count = await searchQuery.getCount();
     const pageCount =
       count % limit === 0 ? count / limit : Math.floor(count / limit) + 1;
+    // console.log(entityUsers[0].tags);
     return { users: entityUsers, pageCount };
   }
 
