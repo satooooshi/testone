@@ -192,7 +192,7 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
         url: f,
       }));
       createEvent({ ...newEvent, files: linkedFiles });
-      !event && resetForm({ values: initialValues });
+      resetForm({ values: initialValues });
       setNewFiles([]);
     },
   });
