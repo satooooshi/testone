@@ -301,7 +301,6 @@ export class UserService {
       .getRawMany();
     let entityUsers: User[] = [];
     for (const u of users) {
-      console.log(u.relatedTags_id);
       const tag: UserTag = {
         id: u.relatedTags_id,
         name: u.relatedTags_name,
@@ -315,7 +314,7 @@ export class UserService {
       );
       if (repeatedUsers.length) {
         const existTags = repeatedUsers[0].tags;
-        tags = [...existTags, tag];
+        tags = [...existTags.filter((t) => t.id !== tag.id), tag];
 
         //remove repeated user
         entityUsers = entityUsers.filter(
