@@ -300,14 +300,17 @@ const EventDetail = () => {
                 <div className={eventDetailStyles.join_event_wrapper}>
                   {data.type !== 'submission_etc' && !isFinished ? (
                     <>
-                      <Button
-                        className={eventDetailStyles.join_event_button}
-                        colorScheme={data.isJoining ? 'teal' : 'pink'}
-                        onClick={() =>
-                          !data.isJoining && joinEvent({ eventID: Number(id) })
-                        }>
-                        {data.isJoining ? '参加済' : 'イベントに参加'}
-                      </Button>
+                      {!data.isCanceled && (
+                        <Button
+                          className={eventDetailStyles.join_event_button}
+                          colorScheme={data.isJoining ? 'teal' : 'pink'}
+                          onClick={() =>
+                            !data.isJoining &&
+                            joinEvent({ eventID: Number(id) })
+                          }>
+                          {data.isJoining ? '参加済' : 'イベントに参加'}
+                        </Button>
+                      )}
                       {data.isJoining && (
                         <Button
                           colorScheme={data.isCanceled ? 'pink' : 'red'}
@@ -320,7 +323,7 @@ const EventDetail = () => {
                       )}
                     </>
                   ) : (
-                    <Button colorScheme={'pink'}>イベント終了</Button>
+                    <Button colorScheme={'pink'}>イベント終了済み</Button>
                   )}
                 </div>
                 {data.type !== EventType.SUBMISSION_ETC && (
