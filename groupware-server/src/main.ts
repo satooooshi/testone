@@ -32,6 +32,8 @@ async function bootstrap() {
       'https://groupware-frontend-git-develop-valleyin-dev.vercel.app',
       'https://groupware-frontend-theta.vercel.app',
       'https://groupware-seven.vercel.app',
+      'https://groupware-frontend-sgzkfl3uyq-an.a.run.app',
+      '*',
       process.env.CLIENT_DOMAIN,
     ],
   });
