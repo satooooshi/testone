@@ -265,7 +265,7 @@ export class EventScheduleService {
           ? 'events.start_at < now() AND events.end_at < now()'
           : 'events.start_at < now() AND events.end_at > now()',
       )
-      .andWhere(query.participant_id ? 'user_id = :userID' : '1=1', {
+      .andWhere(query.participant_id ? 'user.id = :userID' : '1=1', {
         userID: query.participant_id,
       })
       .andWhere(query.host_user_id ? 'host_user = :hostUserID' : '1=1', {
