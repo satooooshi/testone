@@ -44,7 +44,27 @@ const QAQuestionList = () => {
   const [searchWord, setSearchWord] = useState('');
   const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
   const { data: tags } = useAPIGetTag();
-  const topTabBehaviorList: TopTabBehavior[] = [
+  const qaTopTab: TopTabBehavior[] = [
+    {
+      tabName: '新着',
+      onClick: () =>
+        queryRefresh({
+          type: WikiType.QA,
+          status: 'new',
+        }),
+      isActiveTab: status === 'new',
+    },
+    {
+      tabName: '解決済み',
+      onClick: () =>
+        queryRefresh({
+          type: WikiType.QA,
+          status: 'resolved',
+        }),
+      isActiveTab: status === 'resolved',
+    },
+  ];
+  const rulesTopTab: TopTabBehavior[] = [
     {
       tabName: '会社理念',
       onClick: () =>
@@ -153,7 +173,12 @@ const QAQuestionList = () => {
       </Head>
       {type === WikiType.RULES && (
         <div className={topTabBarStyles.component_wrapper}>
-          <TopTabBar topTabBehaviorList={topTabBehaviorList} />
+          <TopTabBar topTabBehaviorList={rulesTopTab} />
+        </div>
+      )}
+      {type === WikiType.QA && (
+        <div className={topTabBarStyles.component_wrapper}>
+          <TopTabBar topTabBehaviorList={qaTopTab} />
         </div>
       )}
       <div className={qaListStyles.top_contents_wrapper}>

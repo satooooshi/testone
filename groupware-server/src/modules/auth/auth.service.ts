@@ -36,6 +36,7 @@ export class AuthService {
 
   public async getAuthenticatedUser(email: string, plainTextPassword: string) {
     try {
+      console.log('called');
       const user = await this.userService.getByEmail(email, true);
       if (!user.verifiedAt) {
         throw new BadRequestException('The user is not verified');
@@ -44,6 +45,7 @@ export class AuthService {
       user.password = undefined;
       return user;
     } catch (err) {
+      console.log(err);
       throw new BadRequestException('Wrong credentials provided');
     }
   }

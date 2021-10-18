@@ -242,29 +242,6 @@ const EventDetail = () => {
                 )}
               </div>
               <div className={eventDetailStyles.event_info_right}>
-                {!isCommonUser && data.type === EventType.SUBMISSION_ETC ? (
-                  <div className={eventDetailStyles.admin_buttons_wrapper}>
-                    <Button
-                      colorScheme={'green'}
-                      onClick={() =>
-                        downloadZip({
-                          id: data.id.toString(),
-                          name: data.title,
-                        })
-                      }>
-                      提出物を一括ダウンロード
-                    </Button>
-                  </div>
-                ) : null}
-                {!isCommonUser && data.type !== EventType.SUBMISSION_ETC ? (
-                  <div className={eventDetailStyles.admin_buttons_wrapper}>
-                    <Button
-                      colorScheme={'green'}
-                      onClick={() => downloadEvent({ id, name: data.title })}>
-                      イベントデータをCSV出力
-                    </Button>
-                  </div>
-                ) : null}
                 <span className={eventDetailStyles.event_title}>
                   {data.title}
                 </span>
@@ -295,36 +272,6 @@ const EventDetail = () => {
                       {data.description}
                     </span>
                   </Linkify>
-                </div>
-
-                <div className={eventDetailStyles.join_event_wrapper}>
-                  {data.type !== 'submission_etc' && !isFinished ? (
-                    <>
-                      {!data.isCanceled && (
-                        <Button
-                          className={eventDetailStyles.join_event_button}
-                          colorScheme={data.isJoining ? 'teal' : 'pink'}
-                          onClick={() =>
-                            !data.isJoining &&
-                            joinEvent({ eventID: Number(id) })
-                          }>
-                          {data.isJoining ? '参加済' : 'イベントに参加'}
-                        </Button>
-                      )}
-                      {data.isJoining && (
-                        <Button
-                          colorScheme={data.isCanceled ? 'pink' : 'red'}
-                          onClick={() =>
-                            !data.isCanceled &&
-                            cancelEvent({ eventID: Number(id) })
-                          }>
-                          {data.isCanceled ? 'キャンセル済' : 'キャンセルする'}
-                        </Button>
-                      )}
-                    </>
-                  ) : (
-                    <Button colorScheme={'pink'}>イベント終了済み</Button>
-                  )}
                 </div>
                 {data.type !== EventType.SUBMISSION_ETC && (
                   <>
@@ -362,6 +309,58 @@ const EventDetail = () => {
                         </a>
                       </Link>
                     ))}
+                  </div>
+                ) : null}
+                <div className={eventDetailStyles.join_event_wrapper}>
+                  {data.type !== 'submission_etc' && !isFinished ? (
+                    <>
+                      {!data.isCanceled && (
+                        <Button
+                          className={eventDetailStyles.join_event_button}
+                          colorScheme={data.isJoining ? 'teal' : 'pink'}
+                          onClick={() =>
+                            !data.isJoining &&
+                            joinEvent({ eventID: Number(id) })
+                          }>
+                          {data.isJoining ? '参加済' : 'イベントに参加'}
+                        </Button>
+                      )}
+                      {data.isJoining && (
+                        <Button
+                          colorScheme={data.isCanceled ? 'pink' : 'red'}
+                          onClick={() =>
+                            !data.isCanceled &&
+                            cancelEvent({ eventID: Number(id) })
+                          }>
+                          {data.isCanceled ? 'キャンセル済' : 'キャンセルする'}
+                        </Button>
+                      )}
+                    </>
+                  ) : (
+                    <Button colorScheme={'pink'}>イベント終了済み</Button>
+                  )}
+                </div>
+                {!isCommonUser && data.type === EventType.SUBMISSION_ETC ? (
+                  <div className={eventDetailStyles.admin_buttons_wrapper}>
+                    <Button
+                      colorScheme={'green'}
+                      onClick={() =>
+                        downloadZip({
+                          id: data.id.toString(),
+                          name: data.title,
+                        })
+                      }>
+                      提出物を一括ダウンロード
+                    </Button>
+                  </div>
+                ) : null}
+                {!isCommonUser && data.type !== EventType.SUBMISSION_ETC ? (
+                  <div className={eventDetailStyles.admin_buttons_wrapper}>
+                    <Button
+                      colorScheme={'green'}
+                      onClick={() => downloadEvent({ id, name: data.title })}>
+                      イベントデータをCSV出力
+                    </Button>
                   </div>
                 ) : null}
               </div>

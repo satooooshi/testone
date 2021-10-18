@@ -19,7 +19,6 @@ import { DateTimePicker } from 'react-rainbow-components';
 import { useDropzone } from 'react-dropzone';
 import { useAPIUploadStorage } from '@/hooks/api/storage/useAPIUploadStorage';
 import ReactCrop from 'react-image-crop';
-import 'react-image-crop/dist/ReactCrop.css';
 import { dataURLToFile } from 'src/utils/dataURLToFile';
 import {
   Button,
@@ -70,11 +69,18 @@ type CreateEventModalProps = {
   createEvent: (newEvent: CreateEventRequest) => void;
 };
 
+const setDateTime = (addDays: number, hours: number, minutes: number) => {
+  const today = new Date();
+  today.setDate(today.getDate() + addDays);
+  today.setHours(hours, minutes);
+  return today;
+};
+
 const initialEventValue = {
   title: '',
   description: '',
-  startAt: new Date(),
-  endAt: new Date(),
+  startAt: setDateTime(1, 20, 0),
+  endAt: setDateTime(1, 21, 0),
   type: EventType.STUDY_MEETING,
   imageURL: '',
   chatNeeded: true,
