@@ -297,6 +297,7 @@ const EventList = () => {
     tabs: tabs,
     rightButtonName: 'イベントを追加',
     onClickRightButton: () => setModalVisible(true),
+    resetEventForm: () => setNewEvent(initialEventValue),
   };
 
   useEffect(() => {

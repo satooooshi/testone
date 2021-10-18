@@ -23,6 +23,10 @@ type UseImageCropAction =
   | {
       type: 'setImageFile';
       value: File | undefined;
+    }
+  | {
+      type: 'resetImage';
+      value: 'resetImage';
     };
 
 const cropReducer = (
@@ -57,6 +61,15 @@ const cropReducer = (
       const imageURL = URL.createObjectURL(action.value);
       const imageName = action.value.name;
       return { ...state, imageURL, imageName };
+    }
+    case 'resetImage': {
+      return {
+        ...state,
+        imageURL: undefined,
+        imageName: undefined,
+        completedCrop: undefined,
+        croppedImageURL: undefined,
+      };
     }
   }
 };
