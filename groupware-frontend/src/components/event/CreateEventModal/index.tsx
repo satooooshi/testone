@@ -194,6 +194,7 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
       createEvent({ ...newEvent, files: linkedFiles });
       resetForm({ values: initialValues });
       setNewFiles([]);
+      dispatchCrop({ type: 'resetImage', value: 'resetImage' });
     },
   });
 
