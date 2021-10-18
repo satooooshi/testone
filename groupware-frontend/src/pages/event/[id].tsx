@@ -43,6 +43,7 @@ import eventCardStyles from '@/styles/components/EventCard.module.scss';
 import { useAPISaveUserJoiningEvent } from '@/hooks/api/event/useAPISaveUserJoiningEvent';
 import { userNameFactory } from 'src/utils/factory/userNameFactory';
 import { tagColorFactory } from 'src/utils/factory/tagColorFactory';
+import { useAPICancelEvent } from '@/hooks/api/event/useAPICancelEvent';
 
 type FileIconProps = {
   href?: string;
@@ -150,6 +151,9 @@ const EventDetail = () => {
   });
 
   const { mutate: joinEvent } = useAPIJoinEvent({ onSuccess: () => refetch() });
+  const { mutate: cancelEvent } = useAPICancelEvent({
+    onSuccess: () => refetch(),
+  });
   const { mutate: saveEvent } = useAPIUpdateEvent({
     onSuccess: () => {
       setEditModal(false);
@@ -202,7 +206,7 @@ const EventDetail = () => {
 
   const isFinished = useMemo(() => {
     if (data?.endAt) {
-      return new Date(data.endAt) >= new Date();
+      return new Date(data.endAt) <= new Date();
     }
     return false;
   }, [data?.endAt]);
@@ -269,7 +273,6 @@ const EventDetail = () => {
                     </span>
                   </Linkify>
                 </div>
-
                 {data.type !== EventType.SUBMISSION_ETC && (
                   <>
                     <span className={eventDetailStyles.sub_title}>
@@ -309,23 +312,33 @@ const EventDetail = () => {
                   </div>
                 ) : null}
                 <div className={eventDetailStyles.join_event_wrapper}>
-                  {data.type !== 'submission_etc' && data.isJoining ? (
-                    <Button
-                      colorScheme={'teal'}
-                      onClick={() =>
-                        !data.isJoining && joinEvent({ eventID: Number(id) })
-                      }>
-                      {'参加済'}
-                    </Button>
-                  ) : data.type !== 'submission_etc' && !isFinished ? (
-                    <Button
-                      colorScheme={'pink'}
-                      onClick={() =>
-                        !data.isJoining && joinEvent({ eventID: Number(id) })
-                      }>
-                      {'イベントに参加'}
-                    </Button>
-                  ) : null}
+                  {data.type !== 'submission_etc' && !isFinished ? (
+                    <>
+                      {!data.isCanceled && (
+                        <Button
+                          className={eventDetailStyles.join_event_button}
+                          colorScheme={data.isJoining ? 'teal' : 'pink'}
+                          onClick={() =>
+                            !data.isJoining &&
+                            joinEvent({ eventID: Number(id) })
+                          }>
+                          {data.isJoining ? '参加済' : 'イベントに参加'}
+                        </Button>
+                      )}
+                      {data.isJoining && (
+                        <Button
+                          colorScheme={data.isCanceled ? 'pink' : 'red'}
+                          onClick={() =>
+                            !data.isCanceled &&
+                            cancelEvent({ eventID: Number(id) })
+                          }>
+                          {data.isCanceled ? 'キャンセル済' : 'キャンセルする'}
+                        </Button>
+                      )}
+                    </>
+                  ) : (
+                    <Button colorScheme={'pink'}>イベント終了済み</Button>
+                  )}
                 </div>
                 {!isCommonUser && data.type === EventType.SUBMISSION_ETC ? (
                   <div className={eventDetailStyles.admin_buttons_wrapper}>
