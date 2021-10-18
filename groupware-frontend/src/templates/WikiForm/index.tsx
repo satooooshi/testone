@@ -31,7 +31,7 @@ import MarkdownEditor from 'react-markdown-editor-lite';
 import { liteEditorPlugins } from 'src/utils/liteEditorPlugins';
 import MarkdownIt from 'markdown-it';
 import { uploadStorage } from '@/hooks/api/storage/useAPIUploadStorage';
-import MDEditor from '@uiw/react-md-editor';
+// import MDEditor from '@uiw/react-md-editor';
 import { tagColorFactory } from 'src/utils/factory/tagColorFactory';
 
 type WikiFormProps = {
@@ -365,13 +365,13 @@ const WikiForm: React.FC<WikiFormProps> = ({
             renderHTML={(text: string) => mdParser.render(text)}
           />
         ) : null}
-        {newQuestion.textFormat === 'markdown' &&
-        activeTab === TabName.PREVIEW ? (
-          <MDEditor.Markdown
-            source={newQuestion.body}
-            className={qaCreateStyles.markdown_preview}
-          />
-        ) : null}
+        {/* {newQuestion.textFormat === 'markdown' && */}
+        {/* activeTab === TabName.PREVIEW ? ( */}
+        {/*   <MDEditor.Markdown */}
+        {/*     source={newQuestion.body} */}
+        {/*     className={qaCreateStyles.markdown_preview} */}
+        {/*   /> */}
+        {/* ) : null} */}
       </LayoutWithTab>
     </>
   );
