@@ -9,7 +9,7 @@ define(User, (): User => {
     UserRole.COMMON,
     UserRole.ADMIN,
     UserRole.INSTRUCTOR,
-    UserRole.HEAD_OFFICE,
+    UserRole.COACH,
   ];
   user.email = faker.internet.email();
   user.lastName = faker.name.lastName();

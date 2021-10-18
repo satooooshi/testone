@@ -1,7 +1,7 @@
 export enum UserRole {
   ADMIN = 'admin',
   INSTRUCTOR = 'instructor',
-  HEAD_OFFICE = 'head_office',
+  COACH = 'coach',
   COMMON = 'common',
 }
 
@@ -9,6 +9,7 @@ export enum ChatMessageType {
   VIDEO = 'video',
   IMAGE = 'image',
   TEXT = 'text',
+  SYSTEM_TEXT = 'system_text',
   OTHER_FILE = 'other_file',
 }
 
@@ -64,6 +65,8 @@ export interface User {
   employeeId: string | null;
   createdAt: Date;
   updatedAt: Date;
+  deletedAt: Date | null;
+  existence: boolean | null;
   tags?: Tag[];
   submissionFiles?: SubmissionFile[];
   hostingEvents?: EventSchedule[];
@@ -157,12 +160,23 @@ export interface EventSchedule {
   chatGroup?: ChatGroup;
   comments?: EventComment[];
   users?: User[];
+  userJoiningEvent?: UserJoiningEvent[];
   hostUsers?: User[];
   tags?: Tag[];
   files?: EventFile[];
   submissionFiles?: SubmissionFile[];
   videos?: EventVideo[];
   author?: User;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface UserJoiningEvent {
+  id?: number;
+  lateMinutes: number;
+  canceledAt: Date | null;
+  user: User;
+  event: EventSchedule;
   createdAt: Date;
   updatedAt: Date;
 }

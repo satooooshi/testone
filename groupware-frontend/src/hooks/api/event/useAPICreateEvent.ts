@@ -1,4 +1,4 @@
-import { CreateEventRequest } from '@/components/CreateEventModal';
+import { CreateEventRequest } from '@/components/event/CreateEventModal';
 import { useMutation, UseMutationOptions } from 'react-query';
 import { EventSchedule } from 'src/types';
 import { axiosInstance } from 'src/utils/url';

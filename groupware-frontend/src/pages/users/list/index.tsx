@@ -1,7 +1,7 @@
-import LayoutWithTab from '@/components/LayoutWithTab';
+import LayoutWithTab from '@/components/layout/LayoutWithTab';
 import ReactPaginate from 'react-paginate';
-import SearchForm from '@/components/SearchForm';
-import UserCard from '@/components/UserCard';
+import SearchForm from '@/components/common/SearchForm';
+import UserCard from '@/components/user/UserCard';
 import userListStyles from '@/styles/layouts/UserList.module.scss';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
@@ -10,9 +10,9 @@ import { Tag, UserRole } from 'src/types';
 import { toggleTag } from 'src/utils/toggleTag';
 import paginationStyles from '@/styles/components/Pagination.module.scss';
 import { userQueryRefresh } from 'src/utils/userQueryRefresh';
-import { ScreenName } from '@/components/Sidebar';
+import { SidebarScreenName } from '@/components/layout/Sidebar';
 import { FormControl, FormLabel, Select } from '@chakra-ui/react';
-import TopTabBar, { TopTabBehavior } from '@/components/TopTabBar';
+import TopTabBar, { TopTabBehavior } from '@/components/layout/TopTabBar';
 import { useAPIGetUserTag } from '@/hooks/api/tag/useAPIGetUserTag';
 import {
   SearchQueryToGetUsers,
@@ -72,9 +72,9 @@ const UserList = () => {
     {
       tabName: '本社勤務',
       onClick: () => {
-        queryRefresh({ role: UserRole.HEAD_OFFICE });
+        queryRefresh({ role: UserRole.COACH });
       },
-      isActiveTab: query.role === UserRole.HEAD_OFFICE,
+      isActiveTab: query.role === UserRole.COACH,
     },
     {
       tabName: '講師',
@@ -87,7 +87,7 @@ const UserList = () => {
 
   return (
     <LayoutWithTab
-      sidebar={{ activeScreenName: ScreenName.USERS }}
+      sidebar={{ activeScreenName: SidebarScreenName.USERS }}
       header={{
         title: '社員名鑑',
       }}>
@@ -95,6 +95,9 @@ const UserList = () => {
         <title>ボールド | 社員名鑑</title>
       </Head>
       <div className={userListStyles.above_pagination}>
+        <div className={topTabBarStyles.component_wrapper}>
+          <TopTabBar topTabBehaviorList={topTabBehaviorList} />
+        </div>
         <div className={userListStyles.search_form_wrapper}>
           <SearchForm
             onCancelTagModal={() => setSelectedTags([])}
@@ -106,55 +109,58 @@ const UserList = () => {
             toggleTag={onToggleTag}
           />
         </div>
+        {!users?.users.length && (
+          <p className={userListStyles.no_result_text}>
+            検索結果が見つかりませんでした
+          </p>
+        )}
 
-        <div className={topTabBarStyles.component_wrapper}>
-          <TopTabBar topTabBehaviorList={topTabBehaviorList} />
-        </div>
+        {users && users.users.length ? (
+          <>
+            <div className={userListStyles.sort_select_row}>
+              <div className={userListStyles.sort_select_wrapper}>
+                <FormControl>
+                  <FormLabel>ソート</FormLabel>
+                  <Select
+                    bg="white"
+                    onChange={(e) => {
+                      queryRefresh({
+                        sort:
+                          (e.target.value as 'event' | 'question' | 'answer') ||
+                          undefined,
+                      });
+                      return;
+                    }}>
+                    <option value="">指定なし</option>
+                    <option value="event">イベント参加数順</option>
+                    <option value="question">質問数順</option>
+                    <option value="answer">回答数順</option>
+                    <option value="knowledge">ナレッジ投稿数順</option>
+                  </Select>
+                </FormControl>
+              </div>
+              <div className={userListStyles.sort_select_wrapper}>
+                <FormControl>
+                  <FormLabel>期間</FormLabel>
+                  <Select
+                    bg="white"
+                    onChange={(e) => {
+                      queryRefresh({
+                        duration:
+                          (e.target.value as 'week' | 'month') || undefined,
+                      });
+                      return;
+                    }}>
+                    <option value="">指定なし</option>
+                    <option value="week">週間</option>
+                    <option value="month">月間</option>
+                  </Select>
+                </FormControl>
+              </div>
+            </div>
 
-        <div className={userListStyles.sort_select_row}>
-          <div className={userListStyles.sort_select_wrapper}>
-            <FormControl>
-              <FormLabel>ソート</FormLabel>
-              <Select
-                bg="white"
-                onChange={(e) => {
-                  queryRefresh({
-                    sort:
-                      (e.target.value as 'event' | 'question' | 'answer') ||
-                      undefined,
-                  });
-                  return;
-                }}>
-                <option value="">指定なし</option>
-                <option value="event">イベント参加数順</option>
-                <option value="question">質問数順</option>
-                <option value="answer">回答数順</option>
-                <option value="knowledge">ナレッジ投稿数順</option>
-              </Select>
-            </FormControl>
-          </div>
-          <div className={userListStyles.sort_select_wrapper}>
-            <FormControl>
-              <FormLabel>期間</FormLabel>
-              <Select
-                bg="white"
-                onChange={(e) => {
-                  queryRefresh({
-                    duration: (e.target.value as 'week' | 'month') || undefined,
-                  });
-                  return;
-                }}>
-                <option value="">指定なし</option>
-                <option value="week">週間</option>
-                <option value="month">月間</option>
-              </Select>
-            </FormControl>
-          </div>
-        </div>
-
-        <div className={userListStyles.user_card_row}>
-          {users && users.users.length
-            ? users.users.map((u) => (
+            <div className={userListStyles.user_card_row}>
+              {users.users.map((u) => (
                 <div key={u.id} className={userListStyles.user_card_wrapper}>
                   <UserCard
                     user={u}
@@ -168,11 +174,12 @@ const UserList = () => {
                     duration={query.duration}
                   />
                 </div>
-              ))
-            : null}
-        </div>
+              ))}
+            </div>
+          </>
+        ) : null}
       </div>
-      {users && users.pageCount ? (
+      {users?.pageCount ? (
         <div className={paginationStyles.pagination_wrap_layout}>
           <ReactPaginate
             pageCount={users.pageCount}

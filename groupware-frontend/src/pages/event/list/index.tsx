@@ -1,18 +1,18 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import { Tab } from 'src/types/header/tab/types';
-import { ScreenName } from '@/components/Sidebar';
+import { SidebarScreenName } from '@/components/layout/Sidebar';
 import eventListStyles from '@/styles/layouts/EventList.module.scss';
-import EventCard from '@/components/EventCard';
+import EventCard from '@/components/common/EventCard';
 import { useRouter } from 'next/router';
 import paginationStyles from '@/styles/components/Pagination.module.scss';
 import ReactPaginate from 'react-paginate';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
-import LayoutWithTab from '@/components/LayoutWithTab';
+import LayoutWithTab from '@/components/layout/LayoutWithTab';
 import CreateEventModal, {
   CreateEventRequest,
-} from '@/components/CreateEventModal';
-import SearchForm from '@/components/SearchForm';
+} from '@/components/event/CreateEventModal';
+import SearchForm from '@/components/common/SearchForm';
 import { EventSchedule, EventType, Tag } from 'src/types';
 import { EventTab } from 'src/types/header/tab/types';
 import { toggleTag } from 'src/utils/toggleTag';
@@ -27,7 +27,7 @@ import { dateTimeFormatterFromJSDDate } from 'src/utils/dateTimeFormatter';
 import { DateTime } from 'luxon';
 import Head from 'next/head';
 import { useAuthenticate } from 'src/contexts/useAuthenticate';
-import TopTabBar, { TopTabBehavior } from '@/components/TopTabBar';
+import TopTabBar, { TopTabBehavior } from '@/components/layout/TopTabBar';
 import { useAPICreateEvent } from '@/hooks/api/event/useAPICreateEvent';
 import {
   SearchQueryToGetEvents,
@@ -280,6 +280,13 @@ const EventList = () => {
     }
   };
 
+  const initialCalendarDate: Date = useMemo(() => {
+    if (from && to) {
+      return DateTime.fromFormat(from, 'yyyy-LL-dd').toJSDate();
+    }
+    return new Date();
+  }, [from, to]);
+
   useEffect(() => {
     calendarRef?.current?.scrollIntoView();
   }, []);
@@ -290,6 +297,7 @@ const EventList = () => {
     tabs: tabs,
     rightButtonName: 'イベントを追加',
     onClickRightButton: () => setModalVisible(true),
+    resetEventForm: () => setNewEvent(initialEventValue),
   };
 
   useEffect(() => {
@@ -362,7 +370,7 @@ const EventList = () => {
   return (
     <LayoutWithTab
       header={initialHeaderValue}
-      sidebar={{ activeScreenName: ScreenName.EVENT }}>
+      sidebar={{ activeScreenName: SidebarScreenName.EVENT }}>
       <Head>
         <title>
           ボールド | {type ? eventTitleText[type] : '全てのイベント'}
@@ -386,6 +394,9 @@ const EventList = () => {
             <BigCalendar
               selectable
               resizable
+              scrollToTime={DateTime.now()
+                .set({ hour: 10, minute: 0 })
+                .toJSDate()}
               views={['month', 'week', 'day']}
               className={bigCalendarStyles.big_calendar}
               localizer={localizer}
@@ -398,7 +409,7 @@ const EventList = () => {
                 handleCalendarRangeChange(range);
               }}
               popup={true}
-              defaultDate={new Date()}
+              defaultDate={initialCalendarDate}
               onSelectSlot={handleNewEventFromCalendar}
               onSelectEvent={(e) => {
                 const eventSchedule = e as EventSchedule;
@@ -423,13 +434,24 @@ const EventList = () => {
               />
             </div>
             <div className={eventListStyles.event_list_wrapper}>
-              <div className={eventListStyles.event_card__row}>
-                {events?.events.map((e) => (
-                  <div key={e.id} className={eventListStyles.event_card_margin}>
-                    <EventCard hrefTagClick={hrefTagClick} eventSchedule={e} />
-                  </div>
-                ))}
-              </div>
+              {events?.events.length ? (
+                <div className={eventListStyles.event_card__row}>
+                  {events.events.map((e) => (
+                    <div
+                      key={e.id}
+                      className={eventListStyles.event_card_margin}>
+                      <EventCard
+                        hrefTagClick={hrefTagClick}
+                        eventSchedule={e}
+                      />
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className={eventListStyles.no_result_text}>
+                  検索結果が見つかりませんでした
+                </p>
+              )}
             </div>
           </>
         )}

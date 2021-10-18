@@ -6,7 +6,7 @@ const blankMixedMessage = '空白文字は使用できません';
 const minEightTextMessage = '8文字以上で入力してください';
 const minDateMessage = '開始日時は終了日時より前に設定して下さい';
 const minTagsMessage = 'タグは一つ以上設定してください';
-const minHostUsersMessage = '開催者/講師は一人以上設定してください';
+// const minHostUsersMessage = '開催者/講師は一人以上設定してください';
 
 export const loginSchema = Yup.object().shape({
   email: Yup.string().email(emailFormatMessage).required(requireMessage),
@@ -28,11 +28,9 @@ export const registerSchema = Yup.object().shape({
 
 export const createEventSchema = Yup.object().shape({
   title: Yup.string().required(`タイトルは${requireMessage}`),
-  description: Yup.string().required(`概要は${requireMessage}`),
   startAt: Yup.date().required(`開始日時は${requireMessage}`),
   endAt: Yup.date()
     .min(Yup.ref('startAt'), minDateMessage)
     .required(`終了日時は${requireMessage}`),
-  hostUsers: Yup.array().min(1, minHostUsersMessage),
   tags: Yup.array().min(1, minTagsMessage),
 });

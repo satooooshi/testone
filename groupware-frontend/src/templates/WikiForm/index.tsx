@@ -2,10 +2,10 @@ import React, { useMemo, useState, useEffect, useRef } from 'react';
 import qaCreateStyles from '@/styles/layouts/QACreate.module.scss';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
-import { ScreenName } from '@/components/Sidebar';
-import LayoutWithTab from '@/components/LayoutWithTab';
-import TagModal from '@/components/TagModal';
-import WrappedDraftEditor from '@/components/WrappedDraftEditor';
+import { SidebarScreenName } from '@/components/layout/Sidebar';
+import LayoutWithTab from '@/components/layout/LayoutWithTab';
+import TagModal from '@/components/common/TagModal';
+import WrappedDraftEditor from '@/components/wiki/WrappedDraftEditor';
 import {
   Wiki,
   Tag,
@@ -26,12 +26,13 @@ import {
 import { useAuthenticate } from 'src/contexts/useAuthenticate';
 import { ContentState, convertFromHTML, Editor, EditorState } from 'draft-js';
 import { stateToHTML } from 'draft-js-export-html';
-import WrappedEditor from '@/components/WrappedEditor';
+import WrappedEditor from '@/components/wiki/WrappedEditor';
 import MarkdownEditor from 'react-markdown-editor-lite';
 import { liteEditorPlugins } from 'src/utils/liteEditorPlugins';
 import MarkdownIt from 'markdown-it';
 import { uploadStorage } from '@/hooks/api/storage/useAPIUploadStorage';
 import MDEditor from '@uiw/react-md-editor';
+import { tagColorFactory } from 'src/utils/factory/tagColorFactory';
 
 type WikiFormProps = {
   wiki?: Wiki;
@@ -97,6 +98,30 @@ const WikiForm: React.FC<WikiFormProps> = ({
     }
   }, [wiki?.type]);
 
+  const saveButtonName = useMemo(() => {
+    switch (newQuestion.type) {
+      case WikiType.QA:
+        return '質問';
+      case WikiType.KNOWLEDGE:
+        return 'ナレッジ';
+      case WikiType.RULES:
+        switch (newQuestion.ruleCategory) {
+          case RuleCategory.PHILOSOPHY:
+            return '会社理念';
+          case RuleCategory.RULES:
+            return '社内規則';
+          case RuleCategory.ABC:
+            return 'ABC制度';
+          case RuleCategory.BENEFITS:
+            return '福利厚生等';
+          case RuleCategory.DOCUMENT:
+            return '各種申請書';
+        }
+      default:
+        return '質問';
+    }
+  }, [newQuestion.ruleCategory, newQuestion.type]);
+
   const toggleTag = (t: Tag) => {
     const isExist = newQuestion.tags?.filter(
       (existT) => existT.id === t.id,
@@ -143,6 +168,14 @@ const WikiForm: React.FC<WikiFormProps> = ({
   };
 
   useEffect(() => {
+    setNewQuestion({
+      ...newQuestion,
+      type: type || WikiType.QA,
+      ruleCategory: type === WikiType.RULES ? RuleCategory.RULES : undefined,
+    });
+  }, [type]);
+
+  useEffect(() => {
     if (wiki) {
       setNewQuestion(wiki);
       if (wiki.textFormat === 'html') {
@@ -167,7 +200,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
   return (
     <>
       <LayoutWithTab
-        sidebar={{ activeScreenName: ScreenName.QA }}
+        sidebar={{ activeScreenName: SidebarScreenName.QA }}
         header={{
           title: headerTabName,
           activeTabName: activeTab,
@@ -209,7 +242,13 @@ const WikiForm: React.FC<WikiFormProps> = ({
               <Select
                 colorScheme="teal"
                 bg="white"
-                defaultValue={type ? type : WikiType.QA}
+                defaultValue={
+                  type === WikiType.RULES
+                    ? RuleCategory.RULES
+                    : type
+                    ? type
+                    : WikiType.QA
+                }
                 onChange={(e) => {
                   if (e.target.value === (WikiType.KNOWLEDGE || WikiType.QA)) {
                     setNewQuestion((prev) => ({
@@ -280,7 +319,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
                 タグを編集
               </Button>
               <Button colorScheme="pink" onClick={() => handleSaveButton()}>
-                {wiki ? '質問を更新' : '質問を投稿'}
+                {wiki ? `${saveButtonName}を更新` : `${saveButtonName}を投稿`}
               </Button>
             </div>
           </div>
@@ -289,7 +328,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
           <div className={qaCreateStyles.tags}>
             {newQuestion.tags.map((t) => (
               <div key={t.id} className={qaCreateStyles.tag__item}>
-                <Button colorScheme="purple" height="28px">
+                <Button colorScheme={tagColorFactory(t.type)} size="xs">
                   {t.name}
                 </Button>
               </div>

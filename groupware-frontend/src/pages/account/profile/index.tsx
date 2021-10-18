@@ -5,9 +5,9 @@ import React, {
   useRef,
   useReducer,
 } from 'react';
-import { ScreenName } from '@/components/Sidebar';
+import { SidebarScreenName } from '@/components/layout/Sidebar';
 import { Tab } from 'src/types/header/tab/types';
-import LayoutWithTab from '@/components/LayoutWithTab';
+import LayoutWithTab from '@/components/layout/LayoutWithTab';
 import profileStyles from '@/styles/layouts/Profile.module.scss';
 import { useAPIUpdateUser } from '@/hooks/api/user/useAPIUpdateUser';
 import { TagType, User, UserTag } from 'src/types';
@@ -26,14 +26,13 @@ import noImage from '@/public/no-image.jpg';
 import { useAPIUploadStorage } from '@/hooks/api/storage/useAPIUploadStorage';
 import Head from 'next/head';
 import ReactCrop from 'react-image-crop';
-import 'react-image-crop/dist/ReactCrop.css';
 import { dataURLToFile } from 'src/utils/dataURLToFile';
 import { useAPIGetProfile } from '@/hooks/api/user/useAPIGetProfile';
 import { useImageCrop } from '@/hooks/crop/useImageCrop';
 import { useHeaderTab } from '@/hooks/headerTab/useHeaderTab';
 import createNewUserStyles from '@/styles/layouts/admin/CreateNewUser.module.scss';
 import clsx from 'clsx';
-import TagModal from '@/components/TagModal';
+import TagModal from '@/components/common/TagModal';
 import { toggleTag } from 'src/utils/toggleTag';
 import { useAPIGetUserTag } from '@/hooks/api/tag/useAPIGetUserTag';
 
@@ -179,7 +178,7 @@ const Profile = () => {
 
   return (
     <LayoutWithTab
-      sidebar={{ activeScreenName: ScreenName.ACCOUNT }}
+      sidebar={{ activeScreenName: SidebarScreenName.ACCOUNT }}
       header={{
         title: 'Account',
         activeTabName: 'プロフィール編集',
@@ -320,8 +319,7 @@ const Profile = () => {
                   key={t.id}
                   size="xs"
                   colorScheme="teal"
-                  className={createNewUserStyles.selected_tag_item}
-                  height="28px">
+                  className={createNewUserStyles.selected_tag_item}>
                   {t.name}
                 </Button>
               ))}

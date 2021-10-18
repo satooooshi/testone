@@ -1,12 +1,14 @@
 import {
   Column,
   CreateDateColumn,
+  DeleteDateColumn,
   Entity,
   Index,
   JoinTable,
   ManyToMany,
   OneToMany,
   PrimaryGeneratedColumn,
+  Unique,
   UpdateDateColumn,
 } from 'typeorm';
 import { ChatGroup } from './chatGroup.entity';
@@ -19,21 +21,22 @@ import { QAAnswerReply } from './qaAnswerReply.entity';
 import { Wiki } from './wiki.entity';
 import { SubmissionFile } from './submissionFiles.entity';
 import { UserTag } from './userTag.entity';
+import { UserJoiningEvent } from './userJoiningEvent.entity';
 
 export enum UserRole {
   ADMIN = 'admin',
   INSTRUCTOR = 'instructor',
-  HEAD_OFFICE = 'head_office',
+  COACH = 'coach',
   COMMON = 'common',
 }
 
 @Entity({ name: 'users' })
 @Index(['lastName', 'firstName', 'email'], { fulltext: true })
+@Unique(['email', 'existence'])
 export class User {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Index({ unique: true })
   @Column({
     type: 'varchar',
     name: 'email',
@@ -115,6 +118,21 @@ export class User {
   })
   updatedAt: Date;
 
+  @DeleteDateColumn({
+    type: 'timestamp',
+    name: 'deleted_at',
+    nullable: true,
+  })
+  deletedAt: Date;
+
+  @Column({
+    type: 'boolean',
+    name: 'existence',
+    nullable: true,
+    default: true,
+  })
+  existence: boolean | null;
+
   @OneToMany(() => EventComment, (e) => e.writer)
   eventComments?: EventComment[];
 
@@ -154,11 +172,11 @@ export class User {
   })
   hostingEvents?: EventSchedule[];
 
-  @ManyToMany(() => EventSchedule, (events) => events.users, {
-    onUpdate: 'CASCADE',
-    onDelete: 'CASCADE',
-  })
-  events?: EventSchedule[];
+  @OneToMany(
+    () => UserJoiningEvent,
+    (userJoiningEvent) => userJoiningEvent.user,
+  )
+  userJoiningEvent?: UserJoiningEvent[];
 
   @OneToMany(() => EventSchedule, (eventSchedule) => eventSchedule.author)
   eventsCreated?: EventSchedule[];

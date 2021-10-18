@@ -44,9 +44,21 @@
   }
 }
 
+.comment_participants_wrapper {
+  display: flex;
+  flex-flow: row;
+  width: 80vw;
+  justify-content: center;
+  @media (max-width: 768px) {
+    width: 90vw;
+    flex-flow: column;
+  }
+}
+
 .event_info_left {
   width: 40%;
   aspect-ratio: 1;
+  max-height: 30vw;
   display: flex;
   flex-direction: row;
   justify-content: center;
@@ -63,7 +75,7 @@
 .event_dates_wrapper {
   display: flex;
   flex-flow: column;
-  margin-bottom: 16px;
+  margin-bottom: 8px;
 }
 
 .videos {
@@ -131,15 +143,17 @@
 .join_event_wrapper {
   display: flex;
   flex-direction: row;
-  padding-bottom: 16px;
   justify-content: flex-end;
   margin-bottom: 16px;
+}
+
+.join_event_button {
+  margin-right: 8px;
 }
 
 .admin_buttons_wrapper {
   display: flex;
   flex-direction: row;
-  padding-bottom: 16px;
   justify-content: flex-end;
   margin-bottom: 16px;
 }
@@ -214,7 +228,7 @@
 
 .sub_title {
   font-size: 16px;
-  margin-bottom: 16px;
+  margin-bottom: 8px;
   display: block;
 }
 
@@ -275,8 +289,14 @@
   align-self: center;
 }
 
+.width {
+  width: 45%;
+  @media (max-width: 768px) {
+    width: 100%;
+  }
+}
+
 .count_and_button_wrapper {
-  width: 80vw;
   border-bottom: 1px $green_color solid;
   display: flex;
   flex-direction: row;
@@ -286,8 +306,14 @@
 }
 
 .event_participants_wrapper {
-  width: 80vw;
+  width: 45%;
   margin-bottom: 16px;
+  @media (min-width: 768px) {
+    margin-right: 4%;
+  }
+  @media (max-width: 768px) {
+    width: 100%;
+  }
 }
 
 .comment_input {

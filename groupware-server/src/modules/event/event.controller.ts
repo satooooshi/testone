@@ -4,6 +4,7 @@ import {
   Controller,
   Get,
   Param,
+  Patch,
   Post,
   Query,
   Req,
@@ -17,6 +18,7 @@ import { EventSchedule, EventType } from 'src/entities/event.entity';
 import { EventComment } from 'src/entities/eventComment.entity';
 import { SubmissionFile } from 'src/entities/submissionFiles.entity';
 import { UserRole } from 'src/entities/user.entity';
+import { UserJoiningEvent } from 'src/entities/userJoiningEvent.entity';
 import { dateTimeFormatterFromJSDDate } from 'src/utils/dateTimeFormatter';
 import JwtAuthenticationGuard from '../auth/jwtAuthentication.guard';
 import RequestWithUser from '../auth/requestWithUser.interface';
@@ -155,12 +157,28 @@ export class EventScheduleController {
     const { id } = params;
     const { user } = req;
     const eventSchedule = await this.eventService.getEventDetail(id, user.id);
-    const isExist = eventSchedule.users?.filter((u) => user.id === u.id).length;
-    if (isExist) {
-      return { ...eventSchedule, isJoining: true };
+    const isJoining = eventSchedule.userJoiningEvent?.filter(
+      (userJoiningEvent) => user.id === userJoiningEvent.user.id,
+    ).length;
+    const isCanceled = eventSchedule.userJoiningEvent?.filter(
+      (userJoiningEvent) =>
+        user.id === userJoiningEvent.user.id && userJoiningEvent.canceledAt,
+    ).length;
+
+    const returnData: GetEventDetailResopnse = {
+      ...eventSchedule,
+      isJoining: false,
+      isCanceled: false,
+    };
+    if (isJoining) {
+      returnData.isJoining = true;
     }
-    return { ...eventSchedule, isJoining: false };
+    if (isCanceled) {
+      returnData.isCanceled = true;
+    }
+    return returnData;
   }
+
   @Post('create-event')
   @UseGuards(JwtAuthenticationGuard)
   async createEvent(
@@ -184,7 +202,9 @@ export class EventScheduleController {
         dateTime: savedEvent.endAt,
       });
       const emailContent = `${title} 開始日時: ${startAtStr} 終了日時: ${endAtStr} \n ${description}`;
-      const subject = `新規${eventTypeName(savedEvent.type)}が作成されました`;
+      const subject = `新規イベント: ${eventTypeName(
+        savedEvent.type,
+      )}が登録されました`;
       const buttonName = `作成された${eventTypeName(savedEvent.type)}を見る`;
       this.notifService.sendEmailNotification({
         to: emailArr,
@@ -201,7 +221,7 @@ export class EventScheduleController {
       const eventChatGroup = new ChatGroup();
       eventChatGroup.name = savedEvent.title;
       eventChatGroup.imageURL = savedEvent.imageURL || '';
-      eventChatGroup.members = savedEvent.hostUsers;
+      eventChatGroup.members = [...savedEvent.hostUsers, savedEvent.author];
       const eventGroup = await this.chatService.saveChatGroup(eventChatGroup);
       const groupSavedEvent = await this.eventService.saveEvent({
         ...savedEvent,
@@ -226,7 +246,8 @@ export class EventScheduleController {
       req.user.id,
     );
     if (
-      (existEvent.author && existEvent.author.id !== req.user.id) ||
+      existEvent.author &&
+      existEvent.author.id !== req.user.id &&
       req.user.role !== UserRole.ADMIN
     ) {
       throw new BadRequestException(
@@ -234,6 +255,15 @@ export class EventScheduleController {
       );
     }
     return await this.eventService.saveEvent(eventSchedule);
+  }
+
+  @Post('save-user-joining-event')
+  @UseGuards(JwtAuthenticationGuard)
+  async saveUserJoiningEvent(@Body() userJoiningEvent: UserJoiningEvent) {
+    const savedResponse = await this.eventService.saveUserJoiningEvent(
+      userJoiningEvent,
+    );
+    return savedResponse;
   }
 
   @Post('join-event')
@@ -244,7 +274,7 @@ export class EventScheduleController {
   ) {
     const joinedEvent = await this.eventService.joinEvent(
       body.eventID,
-      req.user.id,
+      req.user,
     );
     if (joinedEvent.chatNeeded && joinedEvent.chatGroup) {
       await this.chatService.joinChatGroup(
@@ -253,6 +283,22 @@ export class EventScheduleController {
       );
     }
     return joinedEvent;
+  }
+
+  @Patch('cancel-event/:id')
+  @UseGuards(JwtAuthenticationGuard)
+  async cancelEvent(@Req() req: RequestWithUser, @Param() eventId: number) {
+    const userJoiningEvent = await this.eventService.cancelEvent(
+      eventId,
+      req.user,
+    );
+    // if (userJoiningEvent.event.chatNeeded && userJoiningEvent.event.chatGroup) {
+    //   await this.chatService.joinChatGroup(
+    //     req.user.id,
+    //     userJoiningEvent.event.chatGroup.id,
+    //   );
+    // }
+    return userJoiningEvent.event;
   }
 
   @Post('delete-event')

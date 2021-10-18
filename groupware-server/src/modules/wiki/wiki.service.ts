@@ -53,19 +53,10 @@ export class WikiService {
       .leftJoin('wiki.writer', 'writer')
       .leftJoin('wiki.answers', 'answer')
       .leftJoin('answer.writer', 'answer_writer')
-      .where(
-        word && word.length !== 1
-          ? 'MATCH(title, wiki.body) AGAINST (:word IN NATURAL LANGUAGE MODE)'
-          : '1=1',
-        {
-          word,
-        },
-      )
       .andWhere(type ? 'wiki.type = :type' : '1=1', { type })
-      .andWhere(
-        word.length === 1 ? 'CONCAT(title, wiki.body) LIKE :queryWord' : '1=1',
-        { queryWord: `%${word}%` },
-      )
+      .andWhere(word ? 'CONCAT(title, wiki.body) LIKE :queryWord' : '1=1', {
+        queryWord: `%${word}%`,
+      })
       .andWhere(
         status === 'new'
           ? 'wiki.resolved_at is null'
@@ -95,6 +86,7 @@ export class WikiService {
     const wikiWithRelation = await this.wikiRepository.find({
       where: { id: In(ids) },
       relations: ['writer', 'answers', 'tags'],
+      withDeleted: true,
       order: { createdAt: 'DESC' },
       take: limit,
       skip: offset,
@@ -175,6 +167,7 @@ export class WikiService {
         id: In(ids),
       },
       relations: ['answers', 'writer', 'tags'],
+      withDeleted: true,
       order: { createdAt: 'DESC' },
       take: limit,
     });
@@ -204,6 +197,7 @@ export class WikiService {
   public async getWikiDetail(id: number): Promise<Wiki> {
     const existWiki = await this.wikiRepository
       .createQueryBuilder('wiki')
+      .withDeleted()
       .innerJoinAndSelect('wiki.writer', 'writer')
       .leftJoinAndSelect('wiki.bestAnswer', 'bestAnswer')
       .leftJoinAndSelect('wiki.answers', 'answer')

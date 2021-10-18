@@ -1,7 +1,6 @@
 @import '../variables.scss';
 
 .card_wrapper {
-  width: 80vw;
 }
 
 .comment_uploader_info {
@@ -16,8 +15,13 @@
   flex-direction: row;
   align-items: center;
 }
+.comment_name_wrapper {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+}
 .user_avatar {
-  cursor: pointer;
   height: 40px;
   aspect-ratio: 1/1;
   border-radius: 100px;

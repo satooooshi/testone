@@ -1,20 +1,20 @@
-import { ScreenName } from '@/components/Sidebar';
+import { SidebarScreenName } from '@/components/layout/Sidebar';
 import accountInfoStyles from '@/styles/layouts/AccountInfo.module.scss';
 import { useRouter } from 'next/router';
-import LayoutWithTab from '@/components/LayoutWithTab';
+import LayoutWithTab from '@/components/layout/LayoutWithTab';
 import { useAPIGetUserInfoById } from '@/hooks/api/user/useAPIGetUserInfoById';
 import Image from 'next/image';
 import noImage from '@/public/no-image.jpg';
 import React, { useMemo, useState } from 'react';
-import EventCard from '@/components/EventCard';
-import WikiCard from '@/components/WikiCard';
+import EventCard from '@/components/common/EventCard';
+import WikiCard from '@/components/common/WikiCard';
 import { axiosInstance } from 'src/utils/url';
 import { jsonHeader } from 'src/utils/url/header';
 import { useAPILogout } from '@/hooks/api/auth/useAPILogout';
 import { useAuthenticate } from 'src/contexts/useAuthenticate';
 import { Tab, TabName } from 'src/types/header/tab/types';
 import Head from 'next/head';
-import TopTabBar, { TopTabBehavior } from '@/components/TopTabBar';
+import TopTabBar, { TopTabBehavior } from '@/components/layout/TopTabBar';
 import { useAPIGetEventList } from '@/hooks/api/event/useAPIGetEventList';
 import { useAPIGetWikiList } from '@/hooks/api/wiki/useAPIGetWikiList';
 import { useHeaderTab } from '@/hooks/headerTab/useHeaderTab';
@@ -132,7 +132,7 @@ const MyAccountInfo = () => {
   return (
     <LayoutWithTab
       sidebar={{
-        activeScreenName: ScreenName.ACCOUNT,
+        activeScreenName: SidebarScreenName.ACCOUNT,
       }}
       header={{
         title: 'Account',

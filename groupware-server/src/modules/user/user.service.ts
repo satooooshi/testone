@@ -3,6 +3,7 @@ import {
   Injectable,
   InternalServerErrorException,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User, UserRole } from 'src/entities/user.entity';
@@ -32,7 +33,7 @@ export class UserService {
         return '一般社員';
       case UserRole.INSTRUCTOR:
         return '講師';
-      case UserRole.HEAD_OFFICE:
+      case UserRole.COACH:
         return '本社勤務';
     }
   }
@@ -67,7 +68,8 @@ export class UserService {
         return subQuery
           .select('COUNT( DISTINCT event.id )', 'eventCount')
           .from(User, 'u')
-          .leftJoin('u.events', 'event')
+          .leftJoin('u.userJoiningEvent', 'userJoiningEvent')
+          .leftJoin('userJoiningEvent.event', 'event')
           .where(fromDate ? 'event.endAt > :fromDate' : '1=1', { fromDate })
           .andWhere(toDate ? 'event.endAt < :toDate' : '1=1', { toDate })
           .andWhere('u.id = user.id');
@@ -80,8 +82,8 @@ export class UserService {
           .where(fromDate ? 'wiki.createdAt > :fromDate' : '1=1', {
             fromDate,
           })
-          .andWhere('wiki.type < :wikiType', {
-            wikiType: WikiType.QA,
+          .andWhere('wiki.type = :qa', {
+            qa: WikiType.QA,
           })
           .andWhere(fromDate ? 'wiki.createdAt < :toDate' : '1=1', {
             toDate,
@@ -109,8 +111,8 @@ export class UserService {
           .where(fromDate ? 'wiki.createdAt < :fromDate' : '1=1', {
             fromDate,
           })
-          .andWhere('wiki.type < :wikiType', {
-            wikiType: WikiType.KNOWLEDGE,
+          .andWhere('wiki.type = :knowledge', {
+            knowledge: WikiType.KNOWLEDGE,
           })
           .andWhere('u.id = user.id');
       }, 'knowledgeCount')
@@ -126,65 +128,42 @@ export class UserService {
         createdAt: u.tag_created_at,
         updatedAt: u.tag_updated_at,
       };
-      //sort is safe
-      const isExist = entityUsers.filter((a) => a.id === u.user_id).length;
-      if (isExist) {
-        const existTags = entityUsers.filter((a) => a.id === u.user_id)[0].tags;
-        const tags: UserTag[] = tag.id
-          ? [...existTags, tag]
-          : [...existTags, tag];
-        entityUsers = entityUsers.filter((e) => e.id !== u.user_id);
-        entityUsers.push({
-          id: u.user_id,
-          email: u.user_email,
-          lastName: u.user_last_name,
-          firstName: u.user_first_name,
-          introduce: u.user_introduce,
-          role: this.userRoleNameFactory(u.user_role),
-          technologyTag: tags.filter((t) => t.type === TagType.TECH),
-          qualificationTag: tags.filter(
-            (t) => t.type === TagType.QUALIFICATION,
-          ),
-          clubTag: tags.filter((t) => t.type === TagType.CLUB),
-          hobbyTag: tags.filter((t) => t.type === TagType.HOBBY),
-          otherTag: tags.filter((t) => t.type === TagType.OTHER),
-          verifiedAt: u.user_verified_at,
-          avatarUrl: u.user_avatar_url,
-          employeeId: u.user_employee_id,
-          createdAt: u.user_created_at,
-          updatedAt: u.user_updated_at,
-          eventCount: u.eventCount,
-          questionCount: u.questionCount,
-          answerCount: u.answerCount,
-          knowledgeCount: u.knowledgeCount,
-        });
-      } else {
-        entityUsers.push({
-          id: u.user_id,
-          email: u.user_email,
-          lastName: u.user_last_name,
-          firstName: u.user_first_name,
-          introduce: u.user_introduce,
-          role: this.userRoleNameFactory(u.user_role),
-          // tags: tag.id ? [tag] : [],
-          technologyTag: [tag].filter((t) => t.type === TagType.TECH),
-          qualificationTag: [tag].filter(
-            (t) => t.type === TagType.QUALIFICATION,
-          ),
-          clubTag: [tag].filter((t) => t.type === TagType.CLUB),
-          hobbyTag: [tag].filter((t) => t.type === TagType.HOBBY),
-          otherTag: [tag].filter((t) => t.type === TagType.OTHER),
-          verifiedAt: u.user_verified_at,
-          avatarUrl: u.user_avatar_url,
-          employeeId: u.user_employee_id,
-          createdAt: u.user_created_at,
-          updatedAt: u.user_updated_at,
-          eventCount: u.eventCount,
-          questionCount: u.questionCount,
-          answerCount: u.answerCount,
-          knowledgeCount: u.knowledgeCount,
-        });
+      let tags: UserTag[] = [];
+      const repeatedUsers = entityUsers.filter(
+        (existUesrInArr) => existUesrInArr.id === u.user_id,
+      );
+      if (repeatedUsers.length) {
+        const existTags = repeatedUsers[0].tags || [];
+        tags = [...existTags, tag];
+
+        //remove repeated user
+        entityUsers = entityUsers.filter(
+          (existUesrInArr) => existUesrInArr.id !== u.user_id,
+        );
       }
+      entityUsers = entityUsers.filter((e) => e.id !== u.user_id);
+      entityUsers.push({
+        id: u.user_id,
+        email: u.user_email,
+        lastName: u.user_last_name,
+        firstName: u.user_first_name,
+        introduce: u.user_introduce,
+        role: this.userRoleNameFactory(u.user_role),
+        technologyTag: tags.filter((t) => t.type === TagType.TECH),
+        qualificationTag: tags.filter((t) => t.type === TagType.QUALIFICATION),
+        clubTag: tags.filter((t) => t.type === TagType.CLUB),
+        hobbyTag: tags.filter((t) => t.type === TagType.HOBBY),
+        otherTag: tags.filter((t) => t.type === TagType.OTHER),
+        verifiedAt: u.user_verified_at,
+        avatarUrl: u.user_avatar_url,
+        employeeId: u.user_employee_id,
+        createdAt: u.user_created_at,
+        updatedAt: u.user_updated_at,
+        eventCount: u.eventCount,
+        questionCount: u.questionCount,
+        answerCount: u.answerCount,
+        knowledgeCount: u.knowledgeCount,
+      });
     }
 
     const tagModified = entityUsers.map((u) => {
@@ -210,6 +189,7 @@ export class UserService {
       verified,
       duration,
     } = query;
+    console.log('query', query);
     let offset: number;
     let fromDate: Date;
     if (duration === 'month') {
@@ -231,6 +211,7 @@ export class UserService {
     const searchQuery = this.userRepository
       .createQueryBuilder('user')
       .select()
+      .leftJoinAndSelect('user.tags', 'relatedTags')
       .leftJoinAndSelect('user.tags', 'tag')
       .where(
         word && word.length !== 1
@@ -256,7 +237,8 @@ export class UserService {
         return subQuery
           .select('COUNT( DISTINCT event.id )', 'eventCount')
           .from(User, 'u')
-          .leftJoin('u.events', 'event')
+          .leftJoin('u.userJoiningEvent', 'userJoiningEvent')
+          .leftJoin('userJoiningEvent.event', 'event')
           .where(fromDate ? 'event.endAt > :fromDate' : '1=1', { fromDate })
           .andWhere('event.endAt < :toDate', { toDate })
           .andWhere('u.id = user.id');
@@ -269,8 +251,8 @@ export class UserService {
           .where(fromDate ? 'wiki.createdAt > :fromDate' : '1=1', {
             fromDate,
           })
-          .andWhere('wiki.type < :wikiType', {
-            wikiType: WikiType.QA,
+          .andWhere('wiki.type = :qa', {
+            qa: WikiType.QA,
           })
           .andWhere('wiki.createdAt < :toDate', { toDate })
           .andWhere('u.id = user.id');
@@ -283,8 +265,8 @@ export class UserService {
           .where(fromDate ? 'wiki.createdAt > :fromDate' : '1=1', {
             fromDate,
           })
-          .andWhere('wiki.type < :wikiType', {
-            wikiType: WikiType.KNOWLEDGE,
+          .andWhere('wiki.type = :knwoledge', {
+            knwoledge: WikiType.KNOWLEDGE,
           })
           .andWhere('wiki.createdAt < :toDate', { toDate })
           .andWhere('u.id = user.id');
@@ -302,6 +284,7 @@ export class UserService {
       }, 'answerCount')
       .groupBy('user.id')
       .addGroupBy('tag.id')
+      .addGroupBy('relatedTags.id')
       .orderBy(
         sort === 'event'
           ? 'eventCount'
@@ -317,61 +300,55 @@ export class UserService {
       .offset(offset)
       .limit(limit)
       .getRawMany();
+    console.log('users.length', users.length);
     let entityUsers: User[] = [];
     for (const u of users) {
       const tag: UserTag = {
-        id: u.tag_id,
-        name: u.tag_name,
-        type: u.tag_type,
-        createdAt: u.tag_created_at,
-        updatedAt: u.tag_updated_at,
+        id: u.relatedTags_id,
+        name: u.relatedTags_name,
+        type: u.relatedTags_type,
+        createdAt: u.relatedTags_created_at,
+        updatedAt: u.relatedTags_updated_at,
       };
-      //sort is safe
-      const isExist = entityUsers.filter((a) => a.id === u.user_id).length;
-      if (isExist) {
-        const existTags = entityUsers.filter((a) => a.id === u.user_id)[0].tags;
-        const tags: UserTag[] = tag.id ? [...existTags] : [...existTags, tag];
-        entityUsers = entityUsers.filter((e) => e.id !== u.user_id);
-        entityUsers.push({
-          id: u.user_id,
-          email: u.user_email,
-          lastName: u.user_last_name,
-          firstName: u.user_first_name,
-          introduce: u.user_introduce,
-          role: u.user_role,
-          tags: tags,
-          verifiedAt: u.user_verified_at,
-          avatarUrl: u.user_avatar_url,
-          employeeId: u.user_employee_id,
-          createdAt: u.user_created_at,
-          updatedAt: u.user_updated_at,
-          eventCount: u.eventCount,
-          questionCount: u.questionCount,
-          answerCount: u.answerCount,
-        });
-      } else {
-        entityUsers.push({
-          id: u.user_id,
-          email: u.user_email,
-          lastName: u.user_last_name,
-          firstName: u.user_first_name,
-          introduce: u.user_introduce,
-          role: u.user_role,
-          tags: tag.id ? [tag] : [],
-          verifiedAt: u.user_verified_at,
-          avatarUrl: u.user_avatar_url,
-          employeeId: u.user_employee_id,
-          createdAt: u.user_created_at,
-          updatedAt: u.user_updated_at,
-          eventCount: u.eventCount,
-          questionCount: u.questionCount,
-          answerCount: u.answerCount,
-        });
+      let tags: UserTag[] = [];
+      const repeatedUsers = entityUsers.filter(
+        (existUesrInArr) => existUesrInArr.id === u.user_id,
+      );
+      if (repeatedUsers.length) {
+        const existTags = repeatedUsers[0].tags;
+        tags = [...existTags.filter((t) => t.id !== tag.id), tag];
+
+        //remove repeated user
+        entityUsers = entityUsers.filter(
+          (existUesrInArr) => existUesrInArr.id !== u.user_id,
+        );
       }
+      entityUsers = entityUsers.filter((e) => e.id !== u.user_id);
+      entityUsers.push({
+        id: u.user_id,
+        email: u.user_email,
+        lastName: u.user_last_name,
+        firstName: u.user_first_name,
+        introduce: u.user_introduce,
+        role: u.user_role,
+        tags,
+        verifiedAt: u.user_verified_at,
+        avatarUrl: u.user_avatar_url,
+        employeeId: u.user_employee_id,
+        createdAt: u.user_created_at,
+        updatedAt: u.user_updated_at,
+        deletedAt: u.user_deleted_at,
+        existence: u.user_existence,
+        eventCount: u.eventCount,
+        questionCount: u.questionCount,
+        answerCount: u.answerCount,
+        knowledgeCount: u.knowledgeCount,
+      });
     }
     const count = await searchQuery.getCount();
     const pageCount =
       count % limit === 0 ? count / limit : Math.floor(count / limit) + 1;
+    // console.log(entityUsers[0].tags);
     return { users: entityUsers, pageCount };
   }
 
@@ -390,13 +367,13 @@ export class UserService {
 
   async getById(id: number) {
     const user = await this.userRepository.findOne({ id });
+    if (!user || user.deletedAt) {
+      throw new UnauthorizedException('You are not alloed');
+    }
     if (!user.verifiedAt) {
       throw new BadRequestException('The user is not verified');
     }
-    if (user) {
-      return user;
-    }
-    throw new NotFoundException('User with this id does not exist');
+    return user;
   }
 
   async getByIdArr(ids: number[]): Promise<User[]> {
@@ -492,9 +469,10 @@ export class UserService {
     }
   }
 
-  async deleteUser(userID: number) {
+  async deleteUser(user: User) {
     try {
-      await this.userRepository.delete(userID);
+      await this.userRepository.save({ ...user, existence: null });
+      await this.userRepository.softDelete(user.id);
     } catch (err) {
       console.log(err);
       throw new InternalServerErrorException(

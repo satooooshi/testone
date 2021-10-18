@@ -1,9 +1,9 @@
-import LayoutWithTab from '@/components/LayoutWithTab';
+import LayoutWithTab from '@/components/layout/LayoutWithTab';
 import React from 'react';
-import { ScreenName } from '@/components/Sidebar';
+import { SidebarScreenName } from '@/components/layout/Sidebar';
 import mentionStyles from '@/styles/layouts/Mention.module.scss';
 import { Tab } from 'src/types/header/tab/types';
-import MentionMessageCard from '@/components/MentionMessageCard';
+import MentionMessageCard from '@/components/common/MentionMessageCard';
 import Link from 'next/link';
 import { useAPIGetLatestMentionedChatMessage } from '@/hooks/api/chat/useAPIGetLatestMentionedChatMessage';
 import { useHeaderTab } from '@/hooks/headerTab/useHeaderTab';
@@ -14,7 +14,7 @@ const MentionList = () => {
 
   return (
     <LayoutWithTab
-      sidebar={{ activeScreenName: ScreenName.HOME }}
+      sidebar={{ activeScreenName: SidebarScreenName.HOME }}
       header={{
         title: 'Home',
         activeTabName: 'メンション一覧',

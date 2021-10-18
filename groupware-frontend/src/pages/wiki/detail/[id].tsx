@@ -1,16 +1,16 @@
-import { ScreenName } from '@/components/Sidebar';
+import { SidebarScreenName } from '@/components/layout/Sidebar';
 import { useAPIGetWikiDetail } from '@/hooks/api/wiki/useAPIGetWikiDetail';
 import { useRouter } from 'next/router';
 import qaDetailStyles from '@/styles/layouts/QADetail.module.scss';
-import WikiComment from '@/components/WikiComment';
+import WikiComment from '@/components/wiki/WikiComment';
 import React, { useMemo, useRef, useState } from 'react';
 import 'react-markdown-editor-lite/lib/index.css';
 import { useAPICreateAnswer } from '@/hooks/api/wiki/useAPICreateAnswer';
-import LayoutWithTab from '@/components/LayoutWithTab';
-import AnswerReply from '@/components/AnswerReply';
+import LayoutWithTab from '@/components/layout/LayoutWithTab';
+import AnswerReply from '@/components/wiki/AnswerReply';
 import { QAAnswerReply, WikiType } from 'src/types';
 import { Button, useMediaQuery } from '@chakra-ui/react';
-import WrappedDraftEditor from '@/components/WrappedDraftEditor';
+import WrappedDraftEditor from '@/components/wiki/WrappedDraftEditor';
 import { ContentState, Editor, EditorState } from 'draft-js';
 import Head from 'next/head';
 import Link from 'next/link';
@@ -20,6 +20,7 @@ import { useAPICreateBestAnswer } from '@/hooks/api/wiki/useAPICreateBestAnswer'
 import { useAPIGetProfile } from '@/hooks/api/user/useAPIGetProfile';
 import { stateToHTML } from 'draft-js-export-html';
 import { useHeaderTab } from '@/hooks/headerTab/useHeaderTab';
+import { tagColorFactory } from 'src/utils/factory/tagColorFactory';
 
 const QuestionDetail = () => {
   const router = useRouter();
@@ -95,7 +96,7 @@ const QuestionDetail = () => {
 
   return (
     <LayoutWithTab
-      sidebar={{ activeScreenName: ScreenName.QA }}
+      sidebar={{ activeScreenName: SidebarScreenName.QA }}
       header={{ title: headerTitle, tabs: tabs }}>
       {wiki && wiki.writer ? (
         <div className={qaDetailStyles.main}>
@@ -110,7 +111,7 @@ const QuestionDetail = () => {
               {wiki.tags.map((tag) => (
                 <Link href={`/wiki/list?tag=${tag.id}`} key={tag.id}>
                   <a className={qaDetailStyles.tag}>
-                    <Button colorScheme="purple" height="28px">
+                    <Button colorScheme={tagColorFactory(tag.type)} size="xs">
                       {tag.name}
                     </Button>
                   </a>
@@ -178,14 +179,14 @@ const QuestionDetail = () => {
                             bestAnswerButtonName={
                               wiki.bestAnswer?.id === a.id
                                 ? 'ベストアンサーに選ばれた回答'
-                                : !wiki.resolvedAt && myself?.id === a.writer.id
+                                : !wiki.resolvedAt &&
+                                  myself?.id === wiki.writer?.id
                                 ? 'ベストアンサーに選ぶ'
                                 : undefined
                             }
                             onClickBestAnswerButton={() =>
                               createBestAnswer({ ...wiki, bestAnswer: a })
                             }
-                            textFormat={wiki.textFormat}
                             body={a.body}
                             date={a.createdAt}
                             writer={a.writer}

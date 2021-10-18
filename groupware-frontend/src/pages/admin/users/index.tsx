@@ -1,6 +1,6 @@
 import { Tab } from 'src/types/header/tab/types';
-import LayoutWithTab from '@/components/LayoutWithTab';
-import { ScreenName } from '@/components/Sidebar';
+import LayoutWithTab from '@/components/layout/LayoutWithTab';
+import { SidebarScreenName } from '@/components/layout/Sidebar';
 import React, { useEffect, useState } from 'react';
 import { MdDelete } from 'react-icons/md';
 import userAdminStyles from '@/styles/layouts/UserAdmin.module.scss';
@@ -15,7 +15,7 @@ import {
   SearchQueryToGetUsers,
   useAPISearchUsers,
 } from '@/hooks/api/user/useAPISearchUsers';
-import SearchForm from '@/components/SearchForm';
+import SearchForm from '@/components/common/SearchForm';
 import { toggleTag } from 'src/utils/toggleTag';
 import paginationStyles from '@/styles/components/Pagination.module.scss';
 import ReactPaginate from 'react-paginate';
@@ -82,7 +82,7 @@ const UserAdmin: React.FC = () => {
 
   return (
     <LayoutWithTab
-      sidebar={{ activeScreenName: ScreenName.ADMIN }}
+      sidebar={{ activeScreenName: SidebarScreenName.ADMIN }}
       header={{
         title: 'Admin',
         activeTabName: 'ユーザー管理',
@@ -141,7 +141,7 @@ const UserAdmin: React.FC = () => {
                     defaultValue={u.role}>
                     <option value={UserRole.ADMIN}>管理者</option>
                     <option value={UserRole.INSTRUCTOR}>講師</option>
-                    <option value={UserRole.HEAD_OFFICE}>本社勤務</option>
+                    <option value={UserRole.COACH}>本社勤務</option>
                     <option value={UserRole.COMMON}>一般社員</option>
                   </Select>
                 </td>

@@ -1,5 +1,5 @@
-import LayoutWithTab from '@/components/LayoutWithTab';
-import { ScreenName } from '@/components/Sidebar';
+import LayoutWithTab from '@/components/layout/LayoutWithTab';
+import { SidebarScreenName } from '@/components/layout/Sidebar';
 import { useAPIGetEventDetail } from '@/hooks/api/event/useAPIGetEventDetail';
 import { useRouter } from 'next/router';
 import eventDetailStyles from '@/styles/layouts/EventDetail.module.scss';
@@ -7,8 +7,8 @@ import Youtube from 'react-youtube';
 import { useAPIJoinEvent } from '@/hooks/api/event/useAPIJoinEvent';
 import { useEffect, useRef, useState } from 'react';
 import { AiOutlineFileProtect } from 'react-icons/ai';
-import CreateEventModal from '@/components/CreateEventModal';
-import EventParticipants from '@/components/EventParticepants';
+import CreateEventModal from '@/components/event/CreateEventModal';
+import EventParticipants from '@/components/event/EventParticepants';
 import Linkify from 'react-linkify';
 import { Button, Textarea, useToast } from '@chakra-ui/react';
 import Head from 'next/head';
@@ -16,7 +16,7 @@ import { useAuthenticate } from 'src/contexts/useAuthenticate';
 import Link from 'next/link';
 import React from 'react';
 import { useAPICreateComment } from '@/hooks/api/event/useAPICreateComment';
-import EventCommentCard from '@/components/EventComment';
+import EventCommentCard from '@/components/event/EventComment';
 import { Tab } from 'src/types/header/tab/types';
 import { dateTimeFormatterFromJSDDate } from 'src/utils/dateTimeFormatter';
 import generateYoutubeId from 'src/utils/generateYoutubeId';
@@ -40,6 +40,10 @@ import impressiveUnivertyImage from '@/public/impressive_university_1.png';
 import studyMeeting1Image from '@/public/study_meeting_1.jpg';
 import portalLinkBoxStyles from '@/styles/components/PortalLinkBox.module.scss';
 import eventCardStyles from '@/styles/components/EventCard.module.scss';
+import { useAPISaveUserJoiningEvent } from '@/hooks/api/event/useAPISaveUserJoiningEvent';
+import { userNameFactory } from 'src/utils/factory/userNameFactory';
+import { tagColorFactory } from 'src/utils/factory/tagColorFactory';
+import { useAPICancelEvent } from '@/hooks/api/event/useAPICancelEvent';
 
 type FileIconProps = {
   href?: string;
@@ -147,9 +151,17 @@ const EventDetail = () => {
   });
 
   const { mutate: joinEvent } = useAPIJoinEvent({ onSuccess: () => refetch() });
+  const { mutate: cancelEvent } = useAPICancelEvent({
+    onSuccess: () => refetch(),
+  });
   const { mutate: saveEvent } = useAPIUpdateEvent({
     onSuccess: () => {
       setEditModal(false);
+      refetch();
+    },
+  });
+  const { mutate: handleChangeJoiningData } = useAPISaveUserJoiningEvent({
+    onSuccess: () => {
       refetch();
     },
   });
@@ -173,10 +185,11 @@ const EventDetail = () => {
       refetch();
     },
   });
+  const isCommonUser = user?.role === UserRole.COMMON;
 
   const isEditable = useMemo(
-    () => user?.id === data?.author?.id || user?.role === 'admin',
-    [user, data],
+    () => user?.id === data?.author?.id || !isCommonUser,
+    [user?.id, data?.author?.id, isCommonUser],
   );
 
   const tabs: Tab[] = useHeaderTab({
@@ -191,6 +204,13 @@ const EventDetail = () => {
     tabs: tabs,
   };
 
+  const isFinished = useMemo(() => {
+    if (data?.endAt) {
+      return new Date(data.endAt) <= new Date();
+    }
+    return false;
+  }, [data?.endAt]);
+
   useEffect(() => {
     if (data && data.submissionFiles && data.submissionFiles.length) {
       setSubmitFiles(data.submissionFiles);
@@ -199,7 +219,7 @@ const EventDetail = () => {
 
   return (
     <LayoutWithTab
-      sidebar={{ activeScreenName: ScreenName.EVENT }}
+      sidebar={{ activeScreenName: SidebarScreenName.EVENT }}
       header={initialHeaderValue}>
       <CreateEventModal
         enabled={editModal}
@@ -222,8 +242,105 @@ const EventDetail = () => {
                 )}
               </div>
               <div className={eventDetailStyles.event_info_right}>
-                {user?.role === UserRole.ADMIN &&
-                data.type === EventType.SUBMISSION_ETC ? (
+                <span className={eventDetailStyles.event_title}>
+                  {data.title}
+                </span>
+                <div className={eventDetailStyles.event_dates_wrapper}>
+                  {data.type !== EventType.SUBMISSION_ETC && (
+                    <span className={eventDetailStyles.start_date}>
+                      {`開始: ${dateTimeFormatterFromJSDDate({
+                        dateTime: new Date(data.startAt),
+                        format: 'yyyy/LL/dd HH:mm',
+                      })} ~ `}
+                    </span>
+                  )}
+                  <span className={eventDetailStyles.end_date}>
+                    {`
+                  ${
+                    data.type !== EventType.SUBMISSION_ETC ? '終了' : '締切'
+                  }: ${dateTimeFormatterFromJSDDate({
+                      dateTime: new Date(data.endAt),
+                      format: 'yyyy/LL/dd HH:mm',
+                    })}
+                `}
+                  </span>
+                </div>
+                <span className={eventDetailStyles.sub_title}>概要</span>
+                <div className={eventDetailStyles.description_wrapper}>
+                  <Linkify>
+                    <span className={eventDetailStyles.description}>
+                      {data.description}
+                    </span>
+                  </Linkify>
+                </div>
+                {data.type !== EventType.SUBMISSION_ETC && (
+                  <>
+                    <span className={eventDetailStyles.sub_title}>
+                      開催者/講師
+                    </span>
+                    {data && data.hostUsers && data.hostUsers.length ? (
+                      <div className={eventDetailStyles.tags_wrapper}>
+                        {data.hostUsers.map((hostUser) => (
+                          <Link
+                            href={`/account/${hostUser.id}`}
+                            key={hostUser.id}>
+                            <a className={eventDetailStyles.tag}>
+                              <Button colorScheme="teal" size="xs">
+                                {userNameFactory(hostUser)}
+                              </Button>
+                            </a>
+                          </Link>
+                        ))}
+                      </div>
+                    ) : null}
+                  </>
+                )}
+                <span className={eventDetailStyles.sub_title}>タグ</span>
+                {data && data.tags && data.tags.length ? (
+                  <div className={eventDetailStyles.tags_wrapper}>
+                    {data.tags.map((tag) => (
+                      <Link href={`/event/list?tag=${tag.id}`} key={tag.id}>
+                        <a className={eventDetailStyles.tag}>
+                          <Button
+                            colorScheme={tagColorFactory(tag.type)}
+                            size="xs">
+                            {tag.name}
+                          </Button>
+                        </a>
+                      </Link>
+                    ))}
+                  </div>
+                ) : null}
+                <div className={eventDetailStyles.join_event_wrapper}>
+                  {data.type !== 'submission_etc' && !isFinished ? (
+                    <>
+                      {!data.isCanceled && (
+                        <Button
+                          className={eventDetailStyles.join_event_button}
+                          colorScheme={data.isJoining ? 'teal' : 'pink'}
+                          onClick={() =>
+                            !data.isJoining &&
+                            joinEvent({ eventID: Number(id) })
+                          }>
+                          {data.isJoining ? '参加済' : 'イベントに参加'}
+                        </Button>
+                      )}
+                      {data.isJoining && (
+                        <Button
+                          colorScheme={data.isCanceled ? 'pink' : 'red'}
+                          onClick={() =>
+                            !data.isCanceled &&
+                            cancelEvent({ eventID: Number(id) })
+                          }>
+                          {data.isCanceled ? 'キャンセル済' : 'キャンセルする'}
+                        </Button>
+                      )}
+                    </>
+                  ) : (
+                    <Button colorScheme={'pink'}>イベント終了済み</Button>
+                  )}
+                </div>
+                {!isCommonUser && data.type === EventType.SUBMISSION_ETC ? (
                   <div className={eventDetailStyles.admin_buttons_wrapper}>
                     <Button
                       colorScheme={'green'}
@@ -237,63 +354,13 @@ const EventDetail = () => {
                     </Button>
                   </div>
                 ) : null}
-                {user?.role === UserRole.ADMIN &&
-                data.type !== EventType.SUBMISSION_ETC ? (
+                {!isCommonUser && data.type !== EventType.SUBMISSION_ETC ? (
                   <div className={eventDetailStyles.admin_buttons_wrapper}>
                     <Button
                       colorScheme={'green'}
                       onClick={() => downloadEvent({ id, name: data.title })}>
                       イベントデータをCSV出力
                     </Button>
-                  </div>
-                ) : null}
-                <span className={eventDetailStyles.event_title}>
-                  {data.title}
-                </span>
-                <span className={eventDetailStyles.sub_title}>概要</span>
-                <div className={eventDetailStyles.description_wrapper}>
-                  <Linkify>
-                    <span className={eventDetailStyles.description}>
-                      {data.description}
-                    </span>
-                  </Linkify>
-                </div>
-                <div className={eventDetailStyles.join_event_wrapper}>
-                  {data.type !== 'submission_etc' && (
-                    <Button
-                      colorScheme={data.isJoining ? 'teal' : 'pink'}
-                      onClick={() =>
-                        !data.isJoining && joinEvent({ eventID: Number(id) })
-                      }>
-                      {data.isJoining ? '参加済' : 'イベントに参加'}
-                    </Button>
-                  )}
-                </div>
-                <div className={eventDetailStyles.event_dates_wrapper}>
-                  <span className={eventDetailStyles.start_date}>
-                    {`開始: ${dateTimeFormatterFromJSDDate({
-                      dateTime: new Date(data.startAt),
-                      format: 'yyyy/LL/dd HH:mm',
-                    })} ~ `}
-                  </span>
-                  <span className={eventDetailStyles.end_date}>
-                    {`終了: ${dateTimeFormatterFromJSDDate({
-                      dateTime: new Date(data.endAt),
-                      format: 'yyyy/LL/dd HH:mm',
-                    })}`}
-                  </span>
-                </div>
-                {data && data.tags && data.tags.length ? (
-                  <div className={eventDetailStyles.tags_wrapper}>
-                    {data.tags.map((tag) => (
-                      <Link href={`/event/list?tag=${tag.id}`} key={tag.id}>
-                        <a className={eventDetailStyles.tag}>
-                          <Button colorScheme="purple" height="28px">
-                            {tag.name}
-                          </Button>
-                        </a>
-                      </Link>
-                    ))}
                   </div>
                 ) : null}
               </div>
@@ -326,12 +393,64 @@ const EventDetail = () => {
                 関連動画はありません
               </p>
             )}
-            <div className={eventDetailStyles.event_participants_wrapper}>
-              {data.type !== 'submission_etc' && (
-                <EventParticipants participants={data.users} />
-              )}
-            </div>
-            {data.type === EventType.SUBMISSION_ETC ? (
+            {data.type !== EventType.SUBMISSION_ETC && (
+              <div className={eventDetailStyles.comment_participants_wrapper}>
+                <div className={eventDetailStyles.event_participants_wrapper}>
+                  <EventParticipants
+                    onChangeJoiningData={(uje) => handleChangeJoiningData(uje)}
+                    userJoiningEvent={data.userJoiningEvent}
+                  />
+                </div>
+                <div className={eventDetailStyles.width}>
+                  <div className={eventDetailStyles.count_and_button_wrapper}>
+                    <p className={eventDetailStyles.comment_count}>
+                      コメント{data.comments?.length ? data.comments.length : 0}
+                      件
+                    </p>
+                    <Button
+                      size="sm"
+                      colorScheme="teal"
+                      onClick={() => {
+                        commentVisible && newComment
+                          ? createComment({
+                              body: newComment,
+                              eventSchedule: data,
+                            })
+                          : setCommentVisible(true);
+                      }}>
+                      {commentVisible ? 'コメントを投稿する' : 'コメントを追加'}
+                    </Button>
+                  </div>
+                  {commentVisible && (
+                    <Textarea
+                      height="56"
+                      background="white"
+                      placeholder="コメントを記入してください。"
+                      value={newComment}
+                      onChange={(e) => setNewComment(e.target.value)}
+                      className={eventDetailStyles.comment_input}
+                      autoFocus
+                    />
+                  )}
+                  {data.comments && data.comments.length
+                    ? data.comments.map(
+                        (comment) =>
+                          comment.writer && (
+                            <>
+                              <EventCommentCard
+                                key={comment.id}
+                                body={comment.body}
+                                date={comment.createdAt}
+                                writer={comment.writer}
+                              />
+                            </>
+                          ),
+                      )
+                    : null}
+                </div>
+              </div>
+            )}
+            {data.type === EventType.SUBMISSION_ETC && !isFinished ? (
               <>
                 <div className={eventDetailStyles.count_and_button_wrapper}>
                   <div className={eventDetailStyles.submission_bar_left}>
@@ -397,54 +516,7 @@ const EventDetail = () => {
                   <></>
                 )}
               </>
-            ) : (
-              <>
-                <div className={eventDetailStyles.count_and_button_wrapper}>
-                  <p className={eventDetailStyles.comment_count}>
-                    コメント{data.comments?.length ? data.comments.length : 0}件
-                  </p>
-                  <Button
-                    size="sm"
-                    colorScheme="teal"
-                    onClick={() => {
-                      commentVisible && newComment
-                        ? createComment({
-                            body: newComment,
-                            eventSchedule: data,
-                          })
-                        : setCommentVisible(true);
-                    }}>
-                    {commentVisible ? 'コメントを投稿する' : 'コメントを追加'}
-                  </Button>
-                </div>
-                {commentVisible && (
-                  <Textarea
-                    height="56"
-                    background="white"
-                    placeholder="コメントを記入してください。"
-                    value={newComment}
-                    onChange={(e) => setNewComment(e.target.value)}
-                    className={eventDetailStyles.comment_input}
-                    autoFocus
-                  />
-                )}
-                {data.comments && data.comments.length
-                  ? data.comments.map(
-                      (comment) =>
-                        comment.writer && (
-                          <>
-                            <EventCommentCard
-                              key={comment.id}
-                              body={comment.body}
-                              date={comment.createdAt}
-                              writer={comment.writer}
-                            />
-                          </>
-                        ),
-                    )
-                  : null}
-              </>
-            )}
+            ) : null}
           </div>
         </div>
       )}

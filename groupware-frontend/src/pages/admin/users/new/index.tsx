@@ -1,5 +1,5 @@
-import LayoutWithTab from '@/components/LayoutWithTab';
-import { ScreenName } from '@/components/Sidebar';
+import LayoutWithTab from '@/components/layout/LayoutWithTab';
+import { SidebarScreenName } from '@/components/layout/Sidebar';
 import React, { useCallback, useMemo, useReducer, useRef } from 'react';
 import { Tab } from 'src/types/header/tab/types';
 import Head from 'next/head';
@@ -22,16 +22,16 @@ import { useAPIRegister } from '@/hooks/api/auth/useAPIRegister';
 import createNewUserStyles from '@/styles/layouts/admin/CreateNewUser.module.scss';
 import clsx from 'clsx';
 import { toggleTag } from 'src/utils/toggleTag';
-import TagModal from '@/components/TagModal';
+import TagModal from '@/components/common/TagModal';
 import { useAPIGetUserTag } from '@/hooks/api/tag/useAPIGetUserTag';
 import { useFormik } from 'formik';
 import { registerSchema } from 'src/utils/validation/schema';
 import validationErrorStyles from '@/styles/components/ValidationError.module.scss';
 import ReactCrop from 'react-image-crop';
 import { dataURLToFile } from 'src/utils/dataURLToFile';
-import 'react-image-crop/dist/ReactCrop.css';
 import { useImageCrop } from '@/hooks/crop/useImageCrop';
 import { useHeaderTab } from '@/hooks/headerTab/useHeaderTab';
+import { tagColorFactory } from 'src/utils/factory/tagColorFactory';
 
 type ModalState = {
   isOpen: boolean;
@@ -187,7 +187,7 @@ const CreateNewUser = () => {
     },
   });
 
-  const tabs: Tab[] = useHeaderTab({ headerTabType: 'newUser' });
+  const tabs: Tab[] = useHeaderTab({ headerTabType: 'admin' });
 
   const toggleSelectedTag = (t: UserTag) => {
     const toggledTag = toggleTag(values.tags, t);
@@ -200,11 +200,12 @@ const CreateNewUser = () => {
   return (
     <LayoutWithTab
       sidebar={{
-        activeScreenName: ScreenName.ADMIN,
+        activeScreenName: SidebarScreenName.ADMIN,
       }}
       header={{
         title: '新規ユーザー作成',
         tabs: tabs,
+        activeTabName: 'ユーザー作成',
       }}>
       <Head>
         <title>ボールド | ユーザー作成</title>
@@ -335,7 +336,7 @@ const CreateNewUser = () => {
               defaultValue={UserRole.COMMON}>
               <option value={UserRole.ADMIN}>管理者</option>
               <option value={UserRole.INSTRUCTOR}>講師</option>
-              <option value={UserRole.HEAD_OFFICE}>本社勤務</option>
+              <option value={UserRole.COACH}>コーチ</option>
               <option value={UserRole.COMMON}>一般社員</option>
             </Select>
           </FormControl>
@@ -417,9 +418,8 @@ const CreateNewUser = () => {
                 <Button
                   key={t.id}
                   size="xs"
-                  colorScheme="teal"
-                  className={createNewUserStyles.selected_tag_item}
-                  height="28px">
+                  colorScheme={tagColorFactory(t.type)}
+                  className={createNewUserStyles.selected_tag_item}>
                   {t.name}
                 </Button>
               ))}
@@ -443,7 +443,7 @@ const CreateNewUser = () => {
                 <Button
                   key={t.id}
                   size="xs"
-                  colorScheme="blue"
+                  colorScheme={tagColorFactory(t.type)}
                   className={createNewUserStyles.selected_tag_item}
                   height="28px">
                   {t.name}
@@ -469,7 +469,7 @@ const CreateNewUser = () => {
                 <Button
                   key={t.id}
                   size="xs"
-                  colorScheme="green"
+                  colorScheme={tagColorFactory(t.type)}
                   className={createNewUserStyles.selected_tag_item}
                   height="28px">
                   {t.name}
@@ -495,7 +495,7 @@ const CreateNewUser = () => {
                 <Button
                   key={t.id}
                   size="xs"
-                  colorScheme="pink"
+                  colorScheme={tagColorFactory(t.type)}
                   className={createNewUserStyles.selected_tag_item}
                   height="28px">
                   {t.name}

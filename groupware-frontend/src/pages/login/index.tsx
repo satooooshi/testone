@@ -13,7 +13,7 @@ import textInputStyles from '@/styles/components/TextInput.module.scss';
 import textLinkStyles from '@/styles/components/TextLink.module.scss';
 import clsx from 'clsx';
 import authFormStyles from '@/styles/components/AuthForm.module.scss';
-import AuthButton from '@/components/AuthButton';
+import AuthButton from '@/components/common/AuthButton';
 import { Input } from '@chakra-ui/react';
 
 const Login: React.FC = () => {

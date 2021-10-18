@@ -1,13 +1,13 @@
-import { ScreenName } from '@/components/Sidebar';
+import { SidebarScreenName } from '@/components/layout/Sidebar';
 import { Tab } from 'src/types/header/tab/types';
 import { useRouter } from 'next/router';
-import WikiCard from '@/components/WikiCard';
+import WikiCard from '@/components/common/WikiCard';
 import ReactPaginate from 'react-paginate';
 import paginationStyles from '@/styles/components/Pagination.module.scss';
 import qaListStyles from '@/styles/layouts/QAList.module.scss';
 import { useMemo, useState } from 'react';
-import LayoutWithTab from '@/components/LayoutWithTab';
-import SearchForm from '@/components/SearchForm';
+import LayoutWithTab from '@/components/layout/LayoutWithTab';
+import SearchForm from '@/components/common/SearchForm';
 import { useAPIGetTag } from '@/hooks/api/tag/useAPIGetTag';
 import { toggleTag } from 'src/utils/toggleTag';
 import { RuleCategory, Tag, UserRole, WikiType } from 'src/types';
@@ -19,7 +19,7 @@ import {
 } from '@/hooks/api/wiki/useAPIGetWikiList';
 import { useAuthenticate } from 'src/contexts/useAuthenticate';
 import { useHeaderTab } from '@/hooks/headerTab/useHeaderTab';
-import TopTabBar, { TopTabBehavior } from '@/components/TopTabBar';
+import TopTabBar, { TopTabBehavior } from '@/components/layout/TopTabBar';
 import topTabBarStyles from '@/styles/components/TopTabBar.module.scss';
 
 const QAQuestionList = () => {
@@ -44,7 +44,27 @@ const QAQuestionList = () => {
   const [searchWord, setSearchWord] = useState('');
   const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
   const { data: tags } = useAPIGetTag();
-  const topTabBehaviorList: TopTabBehavior[] = [
+  const qaTopTab: TopTabBehavior[] = [
+    {
+      tabName: '新着',
+      onClick: () =>
+        queryRefresh({
+          type: WikiType.QA,
+          status: 'new',
+        }),
+      isActiveTab: status === 'new',
+    },
+    {
+      tabName: '解決済み',
+      onClick: () =>
+        queryRefresh({
+          type: WikiType.QA,
+          status: 'resolved',
+        }),
+      isActiveTab: status === 'resolved',
+    },
+  ];
+  const rulesTopTab: TopTabBehavior[] = [
     {
       tabName: '会社理念',
       onClick: () =>
@@ -146,14 +166,19 @@ const QAQuestionList = () => {
 
   return (
     <LayoutWithTab
-      sidebar={{ activeScreenName: ScreenName.QA }}
+      sidebar={{ activeScreenName: SidebarScreenName.QA }}
       header={initialHeaderValue}>
       <Head>
         <title>ボールド | Wiki</title>
       </Head>
       {type === WikiType.RULES && (
         <div className={topTabBarStyles.component_wrapper}>
-          <TopTabBar topTabBehaviorList={topTabBehaviorList} />
+          <TopTabBar topTabBehaviorList={rulesTopTab} />
+        </div>
+      )}
+      {type === WikiType.QA && (
+        <div className={topTabBarStyles.component_wrapper}>
+          <TopTabBar topTabBehaviorList={qaTopTab} />
         </div>
       )}
       <div className={qaListStyles.top_contents_wrapper}>
@@ -163,7 +188,7 @@ const QAQuestionList = () => {
             value={searchWord}
             onChange={(e) => setSearchWord(e.currentTarget.value)}
             onClickButton={() =>
-              queryRefresh({ page, tag, status, word: searchWord })
+              queryRefresh({ page, tag, status, word: searchWord, type })
             }
             tags={tags || []}
             selectedTags={selectedTags}

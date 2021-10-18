@@ -3,12 +3,12 @@ import tagAdminStyles from '@/styles/layouts/admin/TagAdmin.module.scss';
 import { Button, ButtonGroup, IconButton, Input } from '@chakra-ui/react';
 import { HiPencilAlt } from 'react-icons/hi';
 import { MdCancel } from 'react-icons/md';
-import { tagColorFactory } from 'src/utils/tagColorFactory';
 import { Tag, TagType, UserTag } from 'src/types';
+import { tagColorFactory } from 'src/utils/factory/tagColorFactory';
 
 type TagListBoxProps = {
   tagType: TagType;
-  tags?: Tag[];
+  tags?: (Tag | UserTag)[];
   onClickSaveButton: (t: Partial<Tag | UserTag>) => void;
   onClickDeleteButton: (t: Tag | UserTag) => void;
 };

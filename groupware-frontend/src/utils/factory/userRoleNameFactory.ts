@@ -8,7 +8,7 @@ export const userRoleNameFactory = (role: UserRole): string => {
       return '一般社員';
     case UserRole.INSTRUCTOR:
       return '講師';
-    case UserRole.HEAD_OFFICE:
-      return '本社勤務';
+    case UserRole.COACH:
+      return 'コーチ';
   }
 };
