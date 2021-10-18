@@ -9,7 +9,6 @@ export const uploadStorage = async (files: File[]): Promise<string[]> => {
       formData.append('files', file);
     }
     const res = await axiosInstance.post(uploadStorageURL, formData);
-    console.log(res.status);
     return res.data;
   } catch (err) {
     if (err instanceof Error) {
