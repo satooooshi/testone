@@ -389,11 +389,17 @@ const ChatDetail = () => {
   const handleMenuSelected = (e: any) => {
     const value = e.value as MenuValue;
     if (value === 'editMembers') {
-      setEditMembersModalVisible(true);
+      dispatchModal({
+        type: 'editMembersModalVisible',
+        value: true,
+      });
       return;
     }
     if (value === 'editGroup') {
-      setEditChatGroupModalVisible(true);
+      dispatchModal({
+        type: 'editChatGroupModalVisible',
+        value: true,
+      });
       return;
     }
     if (value === 'leaveRoom') {
