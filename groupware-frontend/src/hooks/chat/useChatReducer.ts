@@ -106,44 +106,40 @@ const chatReducer = (state: ChatState, action: ChatAction): ChatState => {
         : { ...state };
     }
     case 'latestMessages': {
-      if (action.value && action.value.length) {
-        if (
-          state.messages.length &&
-          state.messages[0].id &&
-          action.value[0].id
-        ) {
-          const ascSorted = action.value.concat().reverse();
-          for (const newMessage of ascSorted) {
-            if (
-              new Date(state.messages[0].createdAt) <
-                new Date(newMessage.createdAt) &&
-              state.messages[0].id !== Number(newMessage.id)
-            ) {
-              state.messages.unshift(newMessage);
-            }
-          }
-          return { ...state, messages: state.messages };
-        }
+      if (!action.value?.length) {
+        return { ...state };
+      }
+      if (!state.messages.length) {
         return { ...state, messages: action.value };
       }
-      return { ...state };
+      const ascSorted = action.value.concat().reverse();
+      for (const newMessage of ascSorted) {
+        if (
+          new Date(state.messages[0].createdAt) <
+            new Date(newMessage.createdAt) &&
+          state.messages[0].id !== Number(newMessage.id)
+        ) {
+          state.messages.unshift(newMessage);
+        }
+      }
+      return { ...state, messages: state.messages };
     }
     case 'fetchedMessages': {
-      if (action.value) {
-        if (state.messages.length) {
-          for (const oldMessage of action.value) {
-            if (
-              new Date(state.messages[state.messages.length - 1].createdAt) >
-              new Date(oldMessage.createdAt)
-            ) {
-              state.messages.push(oldMessage);
-            }
-          }
-          return { ...state, messages: state.messages };
-        }
+      if (!action.value?.length) {
+        return { ...state };
+      }
+      if (!state.messages.length) {
         return { ...state, messages: action.value };
       }
-      return { ...state };
+      for (const oldMessage of action.value) {
+        if (
+          new Date(state.messages[state.messages.length - 1].createdAt) >
+          new Date(oldMessage.createdAt)
+        ) {
+          state.messages.push(oldMessage);
+        }
+      }
+      return { ...state, messages: state.messages };
     }
   }
 };
