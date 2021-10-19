@@ -231,7 +231,7 @@ export class UserService {
       .andWhere(tag ? 'tag.id IN (:...tagIDs)' : '1=1', {
         tagIDs,
       })
-      .offset(offset)
+      .skip(offset)
       .take(limit);
     const users = await searchQuery.getMany();
     const userIDs = users.map((u) => u.id);
@@ -284,10 +284,6 @@ export class UserService {
       .where('user.id IN (:...userIDs)', { userIDs })
       .getMany();
     const userWithEachCount = users.map((u) => {
-      // const targetUserWithEvent = userObjWithEvent.filter(
-      //   (user) => user.id === u.id,
-      // );
-      // console.log(targetUserWithEvent);
       const eventCount =
         userObjWithEvent.filter((user) => user.id === u.id)[0].userJoiningEvent
           .length || 0;

@@ -236,7 +236,7 @@ export class EventScheduleService {
       offset = (Number(page) - 1) * limit;
     }
     const tagIDs = tag.split('+');
-    const searchQuery = this.eventRepository
+    const [eventsWithRelation, count] = await this.eventRepository
       .createQueryBuilder('events')
       .select()
       .leftJoinAndSelect('events.userJoiningEvent', 'userJoiningEvent')
@@ -272,22 +272,13 @@ export class EventScheduleService {
       })
       .andWhere(tag ? 'tag.id IN (:...tagIDs)' : '1=1', {
         tagIDs,
-      });
-
-    const events = await searchQuery.getMany();
-    const ids = events.map((e) => e.id);
-    const eventsWithRelation = await this.eventRepository.find({
-      where: { id: In(ids) },
-      relations: ['userJoiningEvent', 'userJoiningEvent.user', 'tags'],
-      order: { createdAt: 'DESC' },
-      take: limit,
-      skip: offset,
-      withDeleted: true,
-    });
-
-    const count = await searchQuery.getCount();
+      })
+      .skip(offset)
+      .take(limit)
+      .getManyAndCount();
     const pageCount =
       count % limit === 0 ? count / limit : Math.floor(count / limit) + 1;
+
     return { pageCount, events: eventsWithRelation };
   }
 
