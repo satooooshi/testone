@@ -123,6 +123,8 @@ const UserList = () => {
                   <FormLabel>ソート</FormLabel>
                   <Select
                     bg="white"
+                    defaultValue={query.sort}
+                    value={query.sort}
                     onChange={(e) => {
                       queryRefresh({
                         sort:
@@ -144,6 +146,8 @@ const UserList = () => {
                   <FormLabel>期間</FormLabel>
                   <Select
                     bg="white"
+                    defaultValue={query.duration}
+                    value={query.duration}
                     onChange={(e) => {
                       queryRefresh({
                         duration:
