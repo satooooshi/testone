@@ -33,6 +33,8 @@ async function bootstrap() {
       'https://groupware-frontend-theta.vercel.app',
       'https://groupware-seven.vercel.app',
       'https://groupware-frontend-sgzkfl3uyq-an.a.run.app',
+      'https://frontend-bold-groupware-zznmsfdywq-an.a.run.app',
+      'https://portal.bold.ne.jp',
       '*',
       process.env.CLIENT_DOMAIN,
     ],
