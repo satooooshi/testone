@@ -118,7 +118,9 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
                       />
                     </span>
                   ) : (
-                    <div className={chatMessageItemStyles.message_other_file}>
+                    <a
+                      href={message.content}
+                      className={chatMessageItemStyles.message_other_file}>
                       <AiOutlineFileProtect
                         className={chatMessageItemStyles.other_file_icon}
                       />
@@ -130,7 +132,7 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
                           ])[1]
                         }
                       </p>
-                    </div>
+                    </a>
                   )}
                 </span>
               )}
