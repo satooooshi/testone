@@ -11,6 +11,7 @@ import { LastReadChatTime } from 'src/entities/lastReadChatTime.entity';
 import { User } from 'src/entities/user.entity';
 import { userNameFactory } from 'src/utils/factory/userNameFactory';
 import { In, Repository } from 'typeorm';
+import { StorageService } from '../storage/storage.service';
 import { GetMessagesQuery } from './chat.controller';
 
 @Injectable()
@@ -24,7 +25,28 @@ export class ChatService {
     private readonly chatGroupRepository: Repository<ChatGroup>,
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    private readonly storageService: StorageService,
   ) {}
+
+  public async generateSignedStorageURLsFromChatMessageObj(
+    chatMessage: ChatMessage,
+  ): Promise<ChatMessage> {
+    chatMessage.content = await this.storageService.parseStorageURLToSignedURL(
+      chatMessage.content,
+    );
+    return chatMessage;
+  }
+
+  public async generateSignedStorageURLsFromChatMessageArr(
+    chatMessages: ChatMessage[],
+  ): Promise<ChatMessage[]> {
+    const parsedMessages = [];
+    for (const m of chatMessages) {
+      const parsed = await this.generateSignedStorageURLsFromChatMessageObj(m);
+      parsedMessages.push(parsed);
+    }
+    return parsedMessages;
+  }
 
   public async getChatGroup(userID: number): Promise<ChatGroup[]> {
     const groups = await this.chatGroupRepository
@@ -66,7 +88,9 @@ export class ChatService {
       m.isSender = false;
       return m;
     });
-    return messages;
+    const parsedMessages =
+      await this.generateSignedStorageURLsFromChatMessageArr(messages);
+    return parsedMessages;
   }
 
   public async getMenthionedChatMessage(user: User): Promise<ChatMessage[]> {
@@ -86,8 +110,9 @@ export class ChatService {
       })
       .limit(limit)
       .getMany();
-
-    return mentioned;
+    const parsedMessages =
+      await this.generateSignedStorageURLsFromChatMessageArr(mentioned);
+    return parsedMessages;
   }
 
   public async getLastReadChatTime(
@@ -120,6 +145,9 @@ export class ChatService {
     if (!existGroup) {
       throw new BadRequestException('That group id is incorrect');
     }
+    message.content = this.storageService.parseSignedURLToStorageURL(
+      message.content,
+    );
     const savedMessage = await this.chatMessageRepository.save(message);
     existGroup.updatedAt = new Date();
     await this.chatGroupRepository.save({

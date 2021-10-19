@@ -8,7 +8,6 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { User, UserRole } from 'src/entities/user.entity';
 import { Repository } from 'typeorm';
-import RegisterDto from './dto/registerDto';
 import RequestWithUser from '../auth/requestWithUser.interface';
 import { compare, hash } from 'bcrypt';
 import updatePasswordDto from './dto/updatePasswordDto';
@@ -18,12 +17,14 @@ import { Parser } from 'json2csv';
 import { SearchQueryToGetUsers } from './user.controller';
 import { Tag, TagType } from 'src/entities/tag.entity';
 import { sortBy } from 'lodash';
+import { StorageService } from '../storage/storage.service';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User)
     private userRepository: Repository<User>,
+    private storageService: StorageService,
   ) {}
 
   public userRoleNameFactory(userRole: UserRole): string {
@@ -180,6 +181,26 @@ export class UserService {
     return csvData;
   }
 
+  public async generateSignedStorageURLsFromUserObj(user: User): Promise<User> {
+    if (user.avatarUrl) {
+      user.avatarUrl = await this.storageService.parseStorageURLToSignedURL(
+        user.avatarUrl,
+      );
+    }
+    return user;
+  }
+
+  public async generateSignedStorageURLsFromUserArr(
+    users: User[],
+  ): Promise<User[]> {
+    const parsedUsers: User[] = [];
+    for (const u of users) {
+      const parsed = await this.generateSignedStorageURLsFromUserObj(u);
+      parsedUsers.push(parsed);
+    }
+    return parsedUsers;
+  }
+
   async search(query: SearchQueryToGetUsers) {
     const {
       page = 1,
@@ -211,7 +232,7 @@ export class UserService {
     const searchQuery = this.userRepository
       .createQueryBuilder('user')
       .select()
-      .leftJoin('user.tags', 'tag')
+      .leftJoinAndSelect('user.tags', 'tag')
       .where(
         word && word.length !== 1
           ? 'MATCH(user.firstName, user.lastName, user.email) AGAINST (:word IN NATURAL LANGUAGE MODE)'
@@ -320,15 +341,19 @@ export class UserService {
     const count = await searchQuery.getCount();
     const pageCount =
       count % limit === 0 ? count / limit : Math.floor(count / limit) + 1;
-    return { users: sortedArr, pageCount };
+    const urlParsedUsers = await this.generateSignedStorageURLsFromUserArr(
+      sortedArr,
+    );
+    return { users: urlParsedUsers, pageCount };
   }
 
   async getProfile(id: number): Promise<User> {
-    const users = await this.userRepository.findOne({
+    const user = await this.userRepository.findOne({
       relations: ['tags'],
       where: { id },
     });
-    return users;
+    const urlParsedUser = await this.generateSignedStorageURLsFromUserObj(user);
+    return urlParsedUser;
   }
 
   async getUsers(): Promise<User[]> {
@@ -361,7 +386,10 @@ export class UserService {
       throw new BadRequestException('The user is not verified');
     }
     if (user) {
-      return user;
+      const urlParsedUser = await this.generateSignedStorageURLsFromUserObj(
+        user,
+      );
+      return urlParsedUser;
     }
     throw new NotFoundException('User with this id does not exist');
   }
@@ -397,7 +425,10 @@ export class UserService {
     throw new NotFoundException('User with this email does not exist');
   }
 
-  async create(userData: RegisterDto) {
+  async create(userData: User) {
+    userData.avatarUrl = this.storageService.parseSignedURLToStorageURL(
+      userData.avatarUrl,
+    );
     const newUser = this.userRepository.create(userData);
     await this.userRepository.save(newUser);
     return newUser;
@@ -410,7 +441,14 @@ export class UserService {
     if (!existUser) {
       throw new InternalServerErrorException('Something went wrong');
     }
-    const newUserObj = { ...existUser, ...newUserProfile };
+    const parsedAvatarURL = this.storageService.parseSignedURLToStorageURL(
+      newUserProfile.avatarUrl || existUser.avatarUrl,
+    );
+    const newUserObj: User = {
+      ...existUser,
+      ...newUserProfile,
+      avatarUrl: parsedAvatarURL,
+    };
     const updatedUser = await this.userRepository.save(newUserObj);
     return updatedUser;
   }
