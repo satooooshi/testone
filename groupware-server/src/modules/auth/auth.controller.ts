@@ -27,7 +27,7 @@ export class AuthController {
   ) {}
 
   @Post('register')
-  async register(@Body() registrationData: RegisterDto): Promise<User> {
+  async register(@Body() registrationData: User): Promise<User> {
     const registeredUser = await this.authService.register(registrationData);
 
     const notifTitle = 'ボールドのポータルに登録されました';
