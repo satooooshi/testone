@@ -46,13 +46,13 @@ export class WikiService {
       offset = (Number(page) - 1) * limit;
     }
     const tagIDs = tag.split('+');
-    const searchQuery = this.wikiRepository
+    const [wikiWithRelation, count] = await this.wikiRepository
       .createQueryBuilder('wiki')
       .select()
       .leftJoinAndSelect('wiki.tags', 'tag')
-      .leftJoin('wiki.writer', 'writer')
-      .leftJoin('wiki.answers', 'answer')
-      .leftJoin('answer.writer', 'answer_writer')
+      .leftJoinAndSelect('wiki.writer', 'writer')
+      .leftJoinAndSelect('wiki.answers', 'answer')
+      .leftJoinAndSelect('answer.writer', 'answer_writer')
       .andWhere(type ? 'wiki.type = :type' : '1=1', { type })
       .andWhere(word ? 'CONCAT(title, wiki.body) LIKE :queryWord' : '1=1', {
         queryWord: `%${word}%`,
@@ -80,19 +80,10 @@ export class WikiService {
       )
       .andWhere(tag ? 'tag.id IN (:...tagIDs)' : '1=1', {
         tagIDs,
-      });
-    const wikis = await searchQuery.getMany();
-    const ids = wikis.map((q) => q.id);
-    const wikiWithRelation = await this.wikiRepository.find({
-      where: { id: In(ids) },
-      relations: ['writer', 'answers', 'tags'],
-      withDeleted: true,
-      order: { createdAt: 'DESC' },
-      take: limit,
-      skip: offset,
-    });
-
-    const count = await searchQuery.getCount();
+      })
+      .skip(offset)
+      .take(limit)
+      .getManyAndCount();
     const pageCount =
       count % limit === 0 ? count / limit : Math.floor(count / limit) + 1;
     return { pageCount, wiki: wikiWithRelation };
