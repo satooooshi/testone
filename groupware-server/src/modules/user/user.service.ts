@@ -211,8 +211,7 @@ export class UserService {
     const searchQuery = this.userRepository
       .createQueryBuilder('user')
       .select()
-      .leftJoinAndSelect('user.tags', 'relatedTags')
-      .leftJoinAndSelect('user.tags', 'tag')
+      .leftJoin('user.tags', 'tag')
       .where(
         word && word.length !== 1
           ? 'MATCH(user.firstName, user.lastName, user.email) AGAINST (:word IN NATURAL LANGUAGE MODE)'
@@ -284,7 +283,6 @@ export class UserService {
       }, 'answerCount')
       .groupBy('user.id')
       .addGroupBy('tag.id')
-      .addGroupBy('relatedTags.id')
       .orderBy(
         sort === 'event'
           ? 'eventCount'
@@ -300,24 +298,12 @@ export class UserService {
       .offset(offset)
       .limit(limit)
       .getRawMany();
-    console.log('users.length', users.length);
     let entityUsers: User[] = [];
     for (const u of users) {
-      const tag: UserTag = {
-        id: u.relatedTags_id,
-        name: u.relatedTags_name,
-        type: u.relatedTags_type,
-        createdAt: u.relatedTags_created_at,
-        updatedAt: u.relatedTags_updated_at,
-      };
-      let tags: UserTag[] = [];
       const repeatedUsers = entityUsers.filter(
         (existUesrInArr) => existUesrInArr.id === u.user_id,
       );
       if (repeatedUsers.length) {
-        const existTags = repeatedUsers[0].tags;
-        tags = [...existTags.filter((t) => t.id !== tag.id), tag];
-
         //remove repeated user
         entityUsers = entityUsers.filter(
           (existUesrInArr) => existUesrInArr.id !== u.user_id,
@@ -331,7 +317,6 @@ export class UserService {
         firstName: u.user_first_name,
         introduce: u.user_introduce,
         role: u.user_role,
-        tags,
         verifiedAt: u.user_verified_at,
         avatarUrl: u.user_avatar_url,
         employeeId: u.user_employee_id,
@@ -345,6 +330,18 @@ export class UserService {
         knowledgeCount: u.knowledgeCount,
       });
     }
+    const userIDs = entityUsers.map((u) => u.id);
+    const userWithTags = await this.userRepository.findByIds(userIDs, {
+      relations: ['tags'],
+    });
+    entityUsers = entityUsers.map((u) => {
+      const tags =
+        userWithTags.filter((user) => user.id === u.id)[0].tags || [];
+      return {
+        ...u,
+        tags,
+      };
+    });
     const count = await searchQuery.getCount();
     const pageCount =
       count % limit === 0 ? count / limit : Math.floor(count / limit) + 1;

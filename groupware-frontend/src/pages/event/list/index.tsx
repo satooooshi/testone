@@ -229,7 +229,9 @@ const EventList = () => {
       if (ev) {
         if (personal === 'true') {
           ev = ev.filter((e) => {
-            if (e.users?.filter((u) => u.id === user?.id).length) {
+            if (
+              e.userJoiningEvent?.filter((u) => u.user.id === user?.id).length
+            ) {
               return true;
             }
           });

@@ -12,8 +12,8 @@ import 'react-big-calendar/lib/addons/dragAndDrop/styles.scss';
 import { useAPIAuthenticate } from '@/hooks/api/auth/useAPIAuthenticate';
 import 'react-image-crop/dist/ReactCrop.css';
 import 'draft-js/dist/Draft.css';
-import '@uiw/react-md-editor/dist/markdown-editor.css';
-import '@uiw/react-markdown-preview/dist/markdown.css';
+// import '@uiw/react-md-editor/dist/markdown-editor.css';
+// import '@uiw/react-markdown-preview/dist/markdown.css';
 import '@szhsin/react-menu/dist/index.css';
 import '@szhsin/react-menu/dist/transitions/slide.css';
 
