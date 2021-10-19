@@ -211,7 +211,7 @@ export class UserService {
     const searchQuery = this.userRepository
       .createQueryBuilder('user')
       .select()
-      .leftJoin('user.tags', 'tag')
+      .leftJoinAndSelect('user.tags', 'tag')
       .where(
         word && word.length !== 1
           ? 'MATCH(user.firstName, user.lastName, user.email) AGAINST (:word IN NATURAL LANGUAGE MODE)'
