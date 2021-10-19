@@ -9,6 +9,7 @@ import { User } from 'src/entities/user.entity';
 import { In, Repository } from 'typeorm';
 import { NotificationService } from '../notification/notification.service';
 import { SearchQueryToGetWiki, SearchResultToGetWiki } from './wiki.controller';
+import { StorageService } from '../storage/storage.service';
 
 @Injectable()
 export class WikiService {
@@ -27,7 +28,30 @@ export class WikiService {
 
     @InjectRepository(QAAnswerReply)
     private readonly qaAnswerReplyRepository: Repository<QAAnswerReply>,
+
+    private readonly storageService: StorageService,
   ) {}
+
+  public async generateSignedStorageURLsFromWikiObj(wiki: Wiki): Promise<Wiki> {
+    if (wiki.body) {
+      wiki.body = await this.storageService.parseStorageURLToSignedURL(
+        wiki.body,
+      );
+    }
+    return wiki;
+  }
+
+  public async generateSignedStorageURLsFromWikiArr(
+    wiki: Wiki[],
+  ): Promise<Wiki[]> {
+    const parsedWiki = [];
+    for (const w of wiki) {
+      const parsed = await this.generateSignedStorageURLsFromWikiObj(w);
+      parsedWiki.push(parsed);
+    }
+
+    return parsedWiki;
+  }
 
   public async getWikiList(
     query: SearchQueryToGetWiki,
@@ -46,13 +70,13 @@ export class WikiService {
       offset = (Number(page) - 1) * limit;
     }
     const tagIDs = tag.split('+');
-    const searchQuery = this.wikiRepository
+    const [wikiWithRelation, count] = await this.wikiRepository
       .createQueryBuilder('wiki')
       .select()
       .leftJoinAndSelect('wiki.tags', 'tag')
-      .leftJoin('wiki.writer', 'writer')
-      .leftJoin('wiki.answers', 'answer')
-      .leftJoin('answer.writer', 'answer_writer')
+      .leftJoinAndSelect('wiki.writer', 'writer')
+      .leftJoinAndSelect('wiki.answers', 'answer')
+      .leftJoinAndSelect('answer.writer', 'answer_writer')
       .andWhere(type ? 'wiki.type = :type' : '1=1', { type })
       .andWhere(word ? 'CONCAT(title, wiki.body) LIKE :queryWord' : '1=1', {
         queryWord: `%${word}%`,
@@ -80,27 +104,23 @@ export class WikiService {
       )
       .andWhere(tag ? 'tag.id IN (:...tagIDs)' : '1=1', {
         tagIDs,
-      });
-    const wikis = await searchQuery.getMany();
-    const ids = wikis.map((q) => q.id);
-    const wikiWithRelation = await this.wikiRepository.find({
-      where: { id: In(ids) },
-      relations: ['writer', 'answers', 'tags'],
-      withDeleted: true,
-      order: { createdAt: 'DESC' },
-      take: limit,
-      skip: offset,
-    });
-
-    const count = await searchQuery.getCount();
+      })
+      .skip(offset)
+      .take(limit)
+      .getManyAndCount();
     const pageCount =
       count % limit === 0 ? count / limit : Math.floor(count / limit) + 1;
-    return { pageCount, wiki: wikiWithRelation };
+    const urlParsedWiki = await this.generateSignedStorageURLsFromWikiArr(
+      wikiWithRelation,
+    );
+    return { pageCount, wiki: urlParsedWiki };
   }
 
   public async saveWiki(wiki: Partial<Wiki>): Promise<Wiki> {
     try {
-      const newWiki = await this.wikiRepository.save(wiki);
+      wiki.body = this.storageService.parseSignedURLToStorageURL(wiki.body);
+      let newWiki = await this.wikiRepository.save(wiki);
+      newWiki = await this.generateSignedStorageURLsFromWikiObj(newWiki);
       if (newWiki.type !== WikiType.RULES) {
         let mailContent = '';
         const allUsers = await this.userRepository.find();
@@ -143,6 +163,7 @@ export class WikiService {
       }
       const existWiki = await this.wikiRepository.findOne(answer.wiki.id);
       answer.wiki = existWiki;
+      answer.body = this.storageService.parseSignedURLToStorageURL(answer.body);
       const newAnswer = await this.qaAnswerRepository.save(answer);
       return newAnswer;
     } catch (err) {
@@ -171,7 +192,8 @@ export class WikiService {
       order: { createdAt: 'DESC' },
       take: limit,
     });
-    return filteredWikis;
+    const parsedWiki = this.generateSignedStorageURLsFromWikiArr(filteredWikis);
+    return parsedWiki;
   }
 
   public async createAnswerReply(
@@ -185,6 +207,7 @@ export class WikiService {
         reply.answer.id,
       );
       reply.answer = existAnswer;
+      reply.body = this.storageService.parseSignedURLToStorageURL(reply.body);
       const newAnswer = await this.qaAnswerReplyRepository.save(reply);
       return newAnswer;
     } catch (err) {
@@ -208,6 +231,9 @@ export class WikiService {
       .where('wiki.id = :id', { id })
       .orderBy({ 'answer.created_at': 'ASC', 'reply.created_at': 'ASC' })
       .getOne();
-    return existWiki;
+    const parsedWiki = await this.generateSignedStorageURLsFromWikiObj(
+      existWiki,
+    );
+    return parsedWiki;
   }
 }
