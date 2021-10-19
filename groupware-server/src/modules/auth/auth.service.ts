@@ -6,7 +6,7 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { compare, hash } from 'bcrypt';
-import RegisterDto from '../user/dto/registerDto';
+import { User } from 'src/entities/user.entity';
 import { UserService } from '../user/user.service';
 import TokenPayload from './tokenPayload.interface';
 
@@ -19,7 +19,7 @@ export class AuthService {
     private readonly configService: ConfigService,
   ) {}
 
-  public async register(registrationData: RegisterDto) {
+  public async register(registrationData: User) {
     const hashedPassword = await hash(registrationData.password, 10);
     try {
       const createdUser = await this.userService.create({
