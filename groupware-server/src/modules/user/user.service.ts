@@ -17,6 +17,7 @@ import { WikiType } from 'src/entities/wiki.entity';
 import { Parser } from 'json2csv';
 import { SearchQueryToGetUsers } from './user.controller';
 import { Tag, TagType } from 'src/entities/tag.entity';
+import { sortBy } from 'lodash';
 
 @Injectable()
 export class UserService {
@@ -189,7 +190,6 @@ export class UserService {
       verified,
       duration,
     } = query;
-    console.log('query', query);
     let offset: number;
     let fromDate: Date;
     if (duration === 'month') {
@@ -230,123 +230,101 @@ export class UserService {
       )
       .andWhere(tag ? 'tag.id IN (:...tagIDs)' : '1=1', {
         tagIDs,
-      });
-    const users: any[] = await searchQuery
-      .addSelect((subQuery) => {
-        return subQuery
-          .select('COUNT( DISTINCT event.id )', 'eventCount')
-          .from(User, 'u')
-          .leftJoin('u.userJoiningEvent', 'userJoiningEvent')
-          .leftJoin('userJoiningEvent.event', 'event')
-          .where(fromDate ? 'event.endAt > :fromDate' : '1=1', { fromDate })
-          .andWhere('event.endAt < :toDate', { toDate })
-          .andWhere('u.id = user.id');
-      }, 'eventCount')
-      .addSelect((subQuery) => {
-        return subQuery
-          .select('COUNT( DISTINCT wiki.id )', 'questionCount')
-          .from(User, 'u')
-          .leftJoin('u.wiki', 'wiki')
-          .where(fromDate ? 'wiki.createdAt > :fromDate' : '1=1', {
-            fromDate,
-          })
-          .andWhere('wiki.type = :qa', {
-            qa: WikiType.QA,
-          })
-          .andWhere('wiki.createdAt < :toDate', { toDate })
-          .andWhere('u.id = user.id');
-      }, 'questionCount')
-      .addSelect((subQuery) => {
-        return subQuery
-          .select('COUNT( DISTINCT wiki.id )', 'questionCount')
-          .from(User, 'u')
-          .leftJoin('u.wiki', 'wiki')
-          .where(fromDate ? 'wiki.createdAt > :fromDate' : '1=1', {
-            fromDate,
-          })
-          .andWhere('wiki.type = :knwoledge', {
-            knwoledge: WikiType.KNOWLEDGE,
-          })
-          .andWhere('wiki.createdAt < :toDate', { toDate })
-          .andWhere('u.id = user.id');
-      }, 'knowledgeCount')
-      .addSelect((subQuery) => {
-        return subQuery
-          .select('COUNT( DISTINCT answer.id )', 'answerCount')
-          .from(User, 'u')
-          .leftJoin('u.qaAnswers', 'answer')
-          .where(fromDate ? 'answer.createdAt > :fromDate' : '1=1', {
-            fromDate,
-          })
-          .andWhere('answer.createdAt < :toDate', { toDate })
-          .andWhere('u.id = user.id');
-      }, 'answerCount')
-      .groupBy('user.id')
-      .addGroupBy('tag.id')
-      .orderBy(
-        sort === 'event'
-          ? 'eventCount'
-          : sort === 'question'
-          ? 'questionCount'
-          : sort === 'answer'
-          ? 'answerCount'
-          : sort === 'knowledge'
-          ? 'knowledgeCount'
-          : 'user.createdAt',
-        'DESC',
-      )
+      })
       .offset(offset)
-      .limit(limit)
-      .getRawMany();
-    let entityUsers: User[] = [];
-    for (const u of users) {
-      const repeatedUsers = entityUsers.filter(
-        (existUesrInArr) => existUesrInArr.id === u.user_id,
-      );
-      if (repeatedUsers.length) {
-        //remove repeated user
-        entityUsers = entityUsers.filter(
-          (existUesrInArr) => existUesrInArr.id !== u.user_id,
-        );
-      }
-      entityUsers = entityUsers.filter((e) => e.id !== u.user_id);
-      entityUsers.push({
-        id: u.user_id,
-        email: u.user_email,
-        lastName: u.user_last_name,
-        firstName: u.user_first_name,
-        introduce: u.user_introduce,
-        role: u.user_role,
-        verifiedAt: u.user_verified_at,
-        avatarUrl: u.user_avatar_url,
-        employeeId: u.user_employee_id,
-        createdAt: u.user_created_at,
-        updatedAt: u.user_updated_at,
-        deletedAt: u.user_deleted_at,
-        existence: u.user_existence,
-        eventCount: u.eventCount,
-        questionCount: u.questionCount,
-        answerCount: u.answerCount,
-        knowledgeCount: u.knowledgeCount,
-      });
-    }
-    const userIDs = entityUsers.map((u) => u.id);
-    const userWithTags = await this.userRepository.findByIds(userIDs, {
-      relations: ['tags'],
-    });
-    entityUsers = entityUsers.map((u) => {
-      const tags =
-        userWithTags.filter((user) => user.id === u.id)[0].tags || [];
+      .take(limit);
+    const users = await searchQuery.getMany();
+    const userIDs = users.map((u) => u.id);
+    const userObjWithEvent = await this.userRepository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.userJoiningEvent', 'userJoiningEvent')
+      .leftJoin(
+        'userJoiningEvent.event',
+        'event',
+        fromDate ? 'event.endAt > :fromDate AND event.endAt < :toDate' : '1=1',
+        { fromDate, toDate },
+      )
+      .where('user.id IN (:...userIDs)', { userIDs })
+      .getMany();
+
+    const userObjWithQuestion = await this.userRepository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect(
+        'user.wiki',
+        'wiki',
+        fromDate
+          ? 'wiki.createdAt > :fromDate AND wiki.createdAt < :toDate AND wiki.type = :qa'
+          : 'wiki.type = :qa',
+        { fromDate, toDate, qa: WikiType.QA },
+      )
+      .where('user.id IN (:...userIDs)', { userIDs })
+      .getMany();
+    const userObjWithKnowledge = await this.userRepository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect(
+        'user.wiki',
+        'wiki',
+        fromDate
+          ? 'wiki.createdAt > :fromDate AND wiki.createdAt < :toDate AND wiki.type = :qa'
+          : 'wiki.type = :knowledge',
+        { fromDate, toDate, knowledge: WikiType.KNOWLEDGE },
+      )
+      .where('user.id IN (:...userIDs)', { userIDs })
+      .getMany();
+    const userObjWithAnswer = await this.userRepository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect(
+        'user.qaAnswers',
+        'answer',
+        fromDate
+          ? 'answer.createdAt > :fromDate AND answer.createdAt < :toDate'
+          : '1=1',
+        { fromDate, toDate },
+      )
+      .where('user.id IN (:...userIDs)', { userIDs })
+      .getMany();
+    const userWithEachCount = users.map((u) => {
+      // const targetUserWithEvent = userObjWithEvent.filter(
+      //   (user) => user.id === u.id,
+      // );
+      // console.log(targetUserWithEvent);
+      const eventCount =
+        userObjWithEvent.filter((user) => user.id === u.id)[0].userJoiningEvent
+          .length || 0;
+      const questionCount =
+        userObjWithQuestion.filter((user) => user.id === u.id)[0].wiki.length ||
+        0;
+      const knowledgeCount =
+        userObjWithKnowledge.filter((user) => user.id === u.id)[0].wiki
+          .length || 0;
+      const answerCount =
+        userObjWithAnswer.filter((user) => user.id === u.id)[0].qaAnswers
+          .length || 0;
       return {
         ...u,
-        tags,
+        questionCount,
+        eventCount,
+        knowledgeCount,
+        answerCount,
       };
     });
+    let sortedArr = [];
+    switch (sort) {
+      case 'event':
+        sortedArr = sortBy(userWithEachCount, 'eventCount');
+      case 'question':
+        sortedArr = sortBy(userWithEachCount, 'questionCount');
+      case 'answer':
+        sortedArr = sortBy(userWithEachCount, 'answerCount');
+      case 'knowledge':
+        sortedArr = sortBy(userWithEachCount, 'knowledgeCount');
+      default:
+        sortedArr = sortBy(userWithEachCount, 'createdAt');
+    }
     const count = await searchQuery.getCount();
     const pageCount =
       count % limit === 0 ? count / limit : Math.floor(count / limit) + 1;
-    // console.log(entityUsers[0].tags);
-    return { users: entityUsers, pageCount };
+    return { users: sortedArr, pageCount };
   }
 
   async getProfile(id: number): Promise<User> {
