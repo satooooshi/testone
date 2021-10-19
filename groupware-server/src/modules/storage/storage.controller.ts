@@ -1,37 +1,28 @@
 import {
-  Body,
   Controller,
   Post,
   UploadedFiles,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { StorageService } from './storage.service';
 import { FilesInterceptor } from '@nestjs/platform-express';
+import JwtAuthenticationGuard from '../auth/jwtAuthentication.guard';
 
 @Controller('storage')
 export class StorageController {
   constructor(private readonly storageService: StorageService) {}
 
   @Post('upload')
+  @UseGuards(JwtAuthenticationGuard)
   @UseInterceptors(FilesInterceptor('files'))
   async upload(@UploadedFiles() files: Express.Multer.File[]) {
-    return await this.storageService.upload(files);
-  }
-
-  @Post('get-signed-url-map')
-  async getSignedUrlFromUnSignedUrl(@Body() body: { text: string[] }): Promise<
-    {
-      [unsignedURL: string]: string;
-    }[]
-  > {
-    const { text } = body;
-    const urlMaps = [];
-    for await (const unsignedURL of text) {
-      const signedURL = await this.storageService.parseStorageURLToSignedURL(
-        unsignedURL,
-      );
-      urlMaps.push({ [unsignedURL]: signedURL });
+    const fileURLs = await this.storageService.upload(files);
+    const signedURLs: string[] = [];
+    for (const u of fileURLs) {
+      const parsedURL = await this.storageService.parseStorageURLToSignedURL(u);
+      signedURLs.push(parsedURL);
     }
-    return urlMaps;
+    return signedURLs;
   }
 }
