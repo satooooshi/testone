@@ -441,10 +441,14 @@ export class UserService {
     if (!existUser) {
       throw new InternalServerErrorException('Something went wrong');
     }
-    const newUserObj = await this.generateSignedStorageURLsFromUserObj({
+    const parsedAvatarURL = this.storageService.parseSignedURLToStorageURL(
+      newUserProfile.avatarUrl || existUser.avatarUrl,
+    );
+    const newUserObj: User = {
       ...existUser,
       ...newUserProfile,
-    });
+      avatarUrl: parsedAvatarURL,
+    };
     const updatedUser = await this.userRepository.save(newUserObj);
     return updatedUser;
   }
