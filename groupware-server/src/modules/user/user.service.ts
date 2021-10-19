@@ -265,7 +265,7 @@ export class UserService {
         'user.wiki',
         'wiki',
         fromDate
-          ? 'wiki.createdAt > :fromDate AND wiki.createdAt < :toDate AND wiki.type = :qa'
+          ? 'wiki.createdAt > :fromDate AND wiki.createdAt < :toDate AND wiki.type = :knowledge'
           : 'wiki.type = :knowledge',
         { fromDate, toDate, knowledge: WikiType.KNOWLEDGE },
       )
