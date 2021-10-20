@@ -228,11 +228,11 @@ export class UserService {
     if (page) {
       offset = (Number(page) - 1) * limit;
     }
-    const tagIDs = tag.split('+');
+    const tagIDs = tag.split(' ');
     const searchQuery = this.userRepository
       .createQueryBuilder('user')
-      .select()
-      .leftJoinAndSelect('user.tags', 'tag')
+      .select('user.id')
+      .leftJoin('user.tags', 'tag')
       .where(
         word && word.length !== 1
           ? 'MATCH(user.firstName, user.lastName, user.email) AGAINST (:word IN NATURAL LANGUAGE MODE)'
@@ -249,13 +249,17 @@ export class UserService {
           : '1=1',
         { queryWord: `%${word}%` },
       )
-      .andWhere(tag ? 'tag.id IN (:...tagIDs)' : '1=1', {
+      .where(tag ? 'tag.id IN (:...tagIDs)' : '1=1', {
         tagIDs,
       })
       .skip(offset)
+      .withDeleted()
       .take(limit);
-    const users = await searchQuery.getMany();
-    const userIDs = users.map((u) => u.id);
+    const userObjOnlyId = await searchQuery.getMany();
+    const userIDs = userObjOnlyId.map((u) => u.id);
+    const users = await this.userRepository.findByIds(userIDs, {
+      relations: ['tags'],
+    });
     const userObjWithEvent = await this.userRepository
       .createQueryBuilder('user')
       .leftJoinAndSelect('user.userJoiningEvent', 'userJoiningEvent')
@@ -265,7 +269,7 @@ export class UserService {
         fromDate ? 'event.endAt > :fromDate AND event.endAt < :toDate' : '1=1',
         { fromDate, toDate },
       )
-      .where('user.id IN (:...userIDs)', { userIDs })
+      .where(userIDs.length ? 'user.id IN (:...userIDs)' : '1=1', { userIDs })
       .getMany();
 
     const userObjWithQuestion = await this.userRepository
@@ -278,7 +282,7 @@ export class UserService {
           : 'wiki.type = :qa',
         { fromDate, toDate, qa: WikiType.QA },
       )
-      .where('user.id IN (:...userIDs)', { userIDs })
+      .where(userIDs.length ? 'user.id IN (:...userIDs)' : '1=1', { userIDs })
       .getMany();
     const userObjWithKnowledge = await this.userRepository
       .createQueryBuilder('user')
@@ -290,7 +294,7 @@ export class UserService {
           : 'wiki.type = :knowledge',
         { fromDate, toDate, knowledge: WikiType.KNOWLEDGE },
       )
-      .where('user.id IN (:...userIDs)', { userIDs })
+      .where(userIDs.length ? 'user.id IN (:...userIDs)' : '1=1', { userIDs })
       .getMany();
     const userObjWithAnswer = await this.userRepository
       .createQueryBuilder('user')
@@ -302,7 +306,7 @@ export class UserService {
           : '1=1',
         { fromDate, toDate },
       )
-      .where('user.id IN (:...userIDs)', { userIDs })
+      .where(userIDs.length ? 'user.id IN (:...userIDs)' : '1=1', { userIDs })
       .getMany();
     const userWithEachCount = users.map((u) => {
       const eventCount =
