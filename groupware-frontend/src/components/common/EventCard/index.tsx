@@ -136,7 +136,7 @@ const EventCard: React.FC<EventCardProps> = ({
             ) : (
               <Button
                 size="xs"
-                colorScheme="purple"
+                colorScheme="orange"
                 className={eventCardStyles.event_card_tag__item}>
                 {'タグなし'}
               </Button>

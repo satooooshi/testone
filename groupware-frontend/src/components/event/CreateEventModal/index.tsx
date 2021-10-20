@@ -391,7 +391,7 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
                 key={u.id}
                 className={createEventModalStyle.tag__item}
                 size="xs"
-                colorScheme="teal">
+                colorScheme="purple">
                 {u.lastName + u.firstName}
               </Button>
             ))}
