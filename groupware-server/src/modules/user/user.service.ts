@@ -462,20 +462,20 @@ export class UserService {
     content: updatePasswordDto,
   ): Promise<User> {
     try {
-      const exitUser = await this.userRepository.findOne({
+      const existUser = await this.userRepository.findOne({
         where: { id: request.user.id },
         select: ['id', 'password'],
       });
       const hashedPassword = await hash(content.newPassword, 10);
       const isPasswordMatching = await compare(
         content.currentPassword,
-        exitUser.password,
+        existUser.password,
       );
       if (!isPasswordMatching) {
         throw new BadRequestException('unmatch password');
       }
-      exitUser.password = hashedPassword;
-      const user = await this.userRepository.save(exitUser);
+      existUser.password = hashedPassword;
+      const user = await this.userRepository.save(existUser);
       return user;
     } catch (e) {
       throw new InternalServerErrorException('Failed to change password');
@@ -484,7 +484,10 @@ export class UserService {
 
   async deleteUser(user: User) {
     try {
-      await this.userRepository.save({ ...user, existence: null });
+      const existUser = await this.userRepository.findOne({
+        where: { id: user.id },
+      });
+      await this.userRepository.save({ ...existUser, existence: null });
       await this.userRepository.softDelete(user.id);
     } catch (err) {
       console.log(err);
