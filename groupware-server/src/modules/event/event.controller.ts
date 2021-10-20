@@ -221,7 +221,11 @@ export class EventScheduleController {
       const eventChatGroup = new ChatGroup();
       eventChatGroup.name = savedEvent.title;
       eventChatGroup.imageURL = savedEvent.imageURL || '';
-      eventChatGroup.members = [...savedEvent.hostUsers, savedEvent.author];
+      if (savedEvent.hostUsers && savedEvent.hostUsers.length) {
+        eventChatGroup.members = [...savedEvent.hostUsers, savedEvent.author];
+      } else {
+        eventChatGroup.members = [savedEvent.author];
+      }
       const eventGroup = await this.chatService.saveChatGroup(eventChatGroup);
       const groupSavedEvent = await this.eventService.saveEvent({
         ...savedEvent,
@@ -254,6 +258,7 @@ export class EventScheduleController {
         'Events are able to be editted by only the user created',
       );
     }
+    console.log(eventSchedule);
     return await this.eventService.saveEvent(eventSchedule);
   }
 

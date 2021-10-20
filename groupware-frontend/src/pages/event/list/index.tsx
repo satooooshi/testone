@@ -36,6 +36,7 @@ import {
 import { useAPIGetTag } from '@/hooks/api/tag/useAPIGetTag';
 import { useHeaderTab } from '@/hooks/headerTab/useHeaderTab';
 import topTabBarStyles from '@/styles/components/TopTabBar.module.scss';
+import { useAPIUpdateEvent } from '@/hooks/api/event/useAPIUpdateEvent';
 
 const localizer = momentLocalizer(moment);
 //@ts-ignore
@@ -103,6 +104,12 @@ const EventList = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const calendarRef = useRef<HTMLDivElement | null>(null);
   const { mutate: createEvent } = useAPICreateEvent({
+    onSuccess: () => {
+      setModalVisible(false);
+      refetch();
+    },
+  });
+  const { mutate: updateEvent } = useAPIUpdateEvent({
     onSuccess: () => {
       setModalVisible(false);
       refetch();
@@ -191,7 +198,7 @@ const EventList = () => {
     }
     if (confirm('イベント日時が変更されます。よろしいですか？')) {
       const newEventInfo = { ...event, startAt: start, endAt: end };
-      createEvent(newEventInfo);
+      updateEvent(newEventInfo);
     }
   };
 
@@ -202,7 +209,7 @@ const EventList = () => {
     }
     if (confirm('イベント日時が変更されます。よろしいですか？')) {
       const newEventInfo = { ...event, startAt: start, endAt: end };
-      createEvent(newEventInfo);
+      updateEvent(newEventInfo);
     }
   };
 

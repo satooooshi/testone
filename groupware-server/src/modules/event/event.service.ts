@@ -241,6 +241,7 @@ export class EventScheduleService {
       .select()
       .leftJoinAndSelect('events.userJoiningEvent', 'userJoiningEvent')
       .leftJoinAndSelect('userJoiningEvent.user', 'user')
+      .leftJoinAndSelect('userJoiningEvent.event', 'event')
       .leftJoinAndSelect('events.tags', 'tag')
       .where(
         word && word.length !== 1
@@ -295,6 +296,7 @@ export class EventScheduleService {
       .select()
       .leftJoinAndSelect('events.userJoiningEvent', 'userJoiningEvent')
       .leftJoinAndSelect('userJoiningEvent.user', 'user')
+      .leftJoinAndSelect('userJoiningEvent.event', 'event')
       .leftJoinAndSelect('events.tags', 'tag')
       .leftJoin('events.hostUsers', 'host_user')
       .where(
@@ -457,6 +459,10 @@ export class EventScheduleService {
         eventSchedule.videos,
       );
     }
+    eventSchedule.imageURL = this.storageService.parseSignedURLToStorageURL(
+      eventSchedule.imageURL,
+    );
+    console.log(eventSchedule.id);
     const savedEvent = await this.eventRepository.save(eventSchedule);
     return savedEvent;
   }
