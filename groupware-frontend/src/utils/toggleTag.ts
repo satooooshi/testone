@@ -5,8 +5,6 @@ export const toggleTag = (
   clickedTag: Tag | UserTag,
 ): Tag[] => {
   const isExist = existTag?.filter((t) => t.id === clickedTag.id).length;
-  console.log(isExist);
-  console.log(clickedTag);
   if (isExist) {
     return existTag ? existTag.filter((t) => t.id !== clickedTag.id) : [];
   }
