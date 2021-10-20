@@ -420,7 +420,9 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
           {!newEvent.id && newEvent.type !== EventType.SUBMISSION_ETC ? (
             <div className={createEventModalStyle.type_select_wrapper}>
               <FormControl>
-                <FormLabel>チャットルームの作成</FormLabel>
+                <FormLabel>
+                  チャットルームの作成(作成後に変更することはできません)
+                </FormLabel>
                 <RadioGroup
                   defaultValue={newEvent.chatNeeded ? 'needed' : 'unneeded'}>
                   <Stack spacing={5} direction="row">
