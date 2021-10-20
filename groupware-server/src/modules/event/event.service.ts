@@ -462,7 +462,6 @@ export class EventScheduleService {
     eventSchedule.imageURL = this.storageService.parseSignedURLToStorageURL(
       eventSchedule.imageURL,
     );
-    console.log(eventSchedule.id);
     const savedEvent = await this.eventRepository.save(eventSchedule);
     return savedEvent;
   }

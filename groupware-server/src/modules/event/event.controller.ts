@@ -258,7 +258,6 @@ export class EventScheduleController {
         'Events are able to be editted by only the user created',
       );
     }
-    console.log(eventSchedule);
     return await this.eventService.saveEvent(eventSchedule);
   }
 
