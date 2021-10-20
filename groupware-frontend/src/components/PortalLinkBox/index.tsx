@@ -20,7 +20,7 @@ export enum PortalLinkType {
   CLUB = '/event/club',
   SUBMISSION_ETC = '/event/list?type=submission_etc&from=&to=',
   WIKI = '/wiki',
-  RULES = '/wiki/list?type=rule',
+  RULES = '/wiki/list?type=rule&rule_category=philosophy',
   KNOWLEDGE = '/wiki/list?type=knowledge',
   QA = `/wiki/list?type=qa`,
   CHAT = '/chat',
