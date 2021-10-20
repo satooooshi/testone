@@ -69,7 +69,7 @@ export class WikiService {
     if (page) {
       offset = (Number(page) - 1) * limit;
     }
-    const tagIDs = tag.split('+');
+    const tagIDs = tag.split(' ');
     const [wikiWithRelation, count] = await this.wikiRepository
       .createQueryBuilder('wiki')
       .select()

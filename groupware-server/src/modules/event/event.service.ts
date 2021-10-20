@@ -235,7 +235,7 @@ export class EventScheduleService {
     if (page) {
       offset = (Number(page) - 1) * limit;
     }
-    const tagIDs = tag.split('+');
+    const tagIDs = tag.split(' ');
     const [eventsWithRelation, count] = await this.eventRepository
       .createQueryBuilder('events')
       .select()
