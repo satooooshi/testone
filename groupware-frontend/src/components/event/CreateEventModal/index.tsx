@@ -417,7 +417,7 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
         </div>
         <div className={createEventModalStyle.right}>
           {/* chat group is able to be created only on creation */}
-          {!newEvent.id && (
+          {!newEvent.id && newEvent.type !== EventType.SUBMISSION_ETC ? (
             <div className={createEventModalStyle.type_select_wrapper}>
               <FormControl>
                 <FormLabel>チャットルームの作成</FormLabel>
@@ -446,19 +446,24 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
                 </RadioGroup>
               </FormControl>
             </div>
-          )}
+          ) : null}
           <div className={createEventModalStyle.type_select_wrapper}>
             <FormControl>
               <FormLabel>タイプ</FormLabel>
               <Select
                 colorScheme="teal"
                 bg="white"
-                onChange={(e) =>
+                onChange={(e) => {
+                  const type = e.target.value as EventType;
                   setNewEvent((prev) => ({
                     ...prev,
-                    type: e.target.value as EventType,
-                  }))
-                }
+                    type,
+                    chatNeeded:
+                      type === EventType.SUBMISSION_ETC
+                        ? false
+                        : prev.chatNeeded,
+                  }));
+                }}
                 defaultValue={newEvent.type}>
                 {isCreatableAllEvent && (
                   <option value={EventType.IMPRESSIVE_UNIVERSITY}>
