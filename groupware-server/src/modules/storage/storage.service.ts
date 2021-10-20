@@ -60,7 +60,7 @@ export class StorageService {
     let parseText = text;
     const bucketName = this.configService.get('CLOUD_STORAGE_BUCKET');
     const url = 'https://storage.googleapis.com/' + bucketName + '/';
-    const regex = new RegExp(`${url}[^'"\\s]+`, 'g');
+    const regex = new RegExp(`${url}[^'")\\s]+`, 'g');
     const storageURLs = text.match(regex);
     if (!storageURLs || !storageURLs.length) {
       return text;
@@ -93,7 +93,7 @@ export class StorageService {
     let parseText = text;
     const bucketName = this.configService.get('CLOUD_STORAGE_BUCKET');
     const url = 'https://storage.googleapis.com/' + bucketName + '/';
-    const regex = new RegExp(`${url}[^'"\\s]+`, 'g');
+    const regex = new RegExp(`${url}[^'")\\s]+`, 'g');
     const urls = text.match(regex);
     if (!urls || !urls.length) {
       return text;

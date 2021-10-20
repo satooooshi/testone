@@ -33,7 +33,7 @@ export class WikiService {
   ) {}
 
   public async generateSignedStorageURLsFromWikiObj(wiki: Wiki): Promise<Wiki> {
-    if (wiki.body) {
+    if (wiki?.body) {
       wiki.body = await this.storageService.parseStorageURLToSignedURL(
         wiki.body,
       );
