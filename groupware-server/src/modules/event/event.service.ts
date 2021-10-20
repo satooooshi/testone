@@ -403,6 +403,12 @@ export class EventScheduleService {
   public async saveSubmission(
     submissionFiles: Partial<SubmissionFile>[],
   ): Promise<SubmissionFile[]> {
+    if (submissionFiles && submissionFiles.length) {
+      submissionFiles = submissionFiles.map((f) => ({
+        ...f,
+        url: this.storageService.parseSignedURLToStorageURL(f.url),
+      }));
+    }
     const submittedFiles = await this.submissionFileRepository.save(
       submissionFiles,
     );
