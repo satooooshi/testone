@@ -228,7 +228,7 @@ export class UserService {
     if (page) {
       offset = (Number(page) - 1) * limit;
     }
-    const tagIDs = tag.split('+');
+    const tagIDs = tag.split(' ');
     const searchQuery = this.userRepository
       .createQueryBuilder('user')
       .select()
