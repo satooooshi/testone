@@ -7,7 +7,7 @@ import {
   AuthenticateProvider,
   useAuthenticate,
 } from 'src/contexts/useAuthenticate';
-import { ChakraProvider, extendTheme } from '@chakra-ui/react';
+import { ChakraProvider, extendTheme, Progress } from '@chakra-ui/react';
 import 'react-big-calendar/lib/addons/dragAndDrop/styles.scss';
 import { useAPIAuthenticate } from '@/hooks/api/auth/useAPIAuthenticate';
 import 'react-image-crop/dist/ReactCrop.css';
@@ -47,7 +47,7 @@ const AuthProvder: React.FC = ({ children }) => {
       router.pathname !== '/login' &&
       router.pathname !== '/forgot-password')
   ) {
-    return <div>Loading...</div>;
+    return <Progress isIndeterminate size="lg" />;
   }
 
   return children as React.ReactElement;
