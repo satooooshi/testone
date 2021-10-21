@@ -70,18 +70,25 @@ const UserList = () => {
       isActiveTab: query.role === UserRole.COMMON,
     },
     {
-      tabName: '本社勤務',
+      tabName: 'コーチ',
       onClick: () => {
         queryRefresh({ role: UserRole.COACH });
       },
       isActiveTab: query.role === UserRole.COACH,
     },
     {
-      tabName: '講師',
+      tabName: '講師(社員)',
       onClick: () => {
-        queryRefresh({ role: UserRole.INSTRUCTOR });
+        queryRefresh({ role: UserRole.INTERNAL_INSTRUCTOR });
       },
-      isActiveTab: query.role === UserRole.INSTRUCTOR,
+      isActiveTab: query.role === UserRole.INTERNAL_INSTRUCTOR,
+    },
+    {
+      tabName: '講師(外部)',
+      onClick: () => {
+        queryRefresh({ role: UserRole.EXTERNAL_INSTRUCTOR });
+      },
+      isActiveTab: query.role === UserRole.EXTERNAL_INSTRUCTOR,
     },
   ];
 

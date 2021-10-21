@@ -23,6 +23,7 @@ import { searchUserQueryParamFactory } from 'src/utils/userQueryRefresh';
 import { useAPIGetUserTag } from '@/hooks/api/tag/useAPIGetUserTag';
 import { useHeaderTab } from '@/hooks/headerTab/useHeaderTab';
 import Link from 'next/link';
+import { userRoleNameFactory } from 'src/utils/factory/userRoleNameFactory';
 
 const UserAdmin: React.FC = () => {
   const router = useRouter();
@@ -140,7 +141,12 @@ const UserAdmin: React.FC = () => {
                     }
                     defaultValue={u.role}>
                     <option value={UserRole.ADMIN}>管理者</option>
-                    <option value={UserRole.INSTRUCTOR}>講師</option>
+                    <option value={UserRole.EXTERNAL_INSTRUCTOR}>
+                      {userRoleNameFactory(UserRole.EXTERNAL_INSTRUCTOR)}
+                    </option>
+                    <option value={UserRole.INTERNAL_INSTRUCTOR}>
+                      {userRoleNameFactory(UserRole.INTERNAL_INSTRUCTOR)}
+                    </option>
                     <option value={UserRole.COACH}>コーチ</option>
                     <option value={UserRole.COMMON}>一般社員</option>
                   </Select>
