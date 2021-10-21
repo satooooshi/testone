@@ -82,8 +82,8 @@ const Login: React.FC = () => {
               Login to Service
             </h1>
             <p className={authFormStyles.form_margin}>
-              アカウントをお持ちでない方は
-              <Link href="/register">
+              パスワードをお忘れの方は
+              <Link href="/forgot-password">
                 <a className={textLinkStyles.link}>こちら</a>
               </Link>
             </p>

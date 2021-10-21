@@ -36,6 +36,12 @@ export interface QueryToGetUserCsv {
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
+  //@TODO this endpoint is for inputting data
+  @Post('register-users')
+  async registerUsers(@Body() users: User[]) {
+    return await this.userService.registerUsers(users);
+  }
+
   @Get('csv')
   @UseGuards(JwtAuthenticationGuard)
   async getCsv(@Query() query: QueryToGetUserCsv, @Res() res: Response) {

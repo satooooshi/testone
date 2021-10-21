@@ -411,6 +411,7 @@ export class UserService {
           'firstName',
           'introduce',
           'password',
+          'refreshedPassword',
           'role',
           'avatarUrl',
           'verifiedAt',
@@ -436,6 +437,16 @@ export class UserService {
     const newUser = this.userRepository.create(userData);
     await this.userRepository.save(newUser);
     return newUser;
+  }
+
+  async registerUsers(userData: User[]) {
+    const usersArr: User[] = [];
+    for (const u of userData) {
+      const hashedPassword = await hash(u.password, 10);
+      usersArr.push({ ...u, password: hashedPassword, verifiedAt: new Date() });
+    }
+    const newUsers = await this.userRepository.save(usersArr);
+    return newUsers;
   }
 
   async saveUser(newUserProfile: Partial<User>): Promise<User> {
