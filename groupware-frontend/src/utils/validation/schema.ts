@@ -16,6 +16,14 @@ export const loginSchema = Yup.object().shape({
     .required(requireMessage),
 });
 
+export const updatePasswordSchema = Yup.object().shape({
+  currentPassword: Yup.string().required(requireMessage),
+  newPassword: Yup.string()
+    .matches(/^([^ ]*)$/, blankMixedMessage)
+    .min(8, minEightTextMessage)
+    .required(requireMessage),
+});
+
 export const registerSchema = Yup.object().shape({
   firstName: Yup.string().required(requireMessage),
   lastName: Yup.string().required(requireMessage),

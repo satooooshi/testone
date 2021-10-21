@@ -160,6 +160,11 @@ const headerTab = (headerTabBehavior: HeaderTabBehavior): Tab[] => {
           name: 'プロフィール編集',
           href: '/account/profile',
         },
+        {
+          type: 'link',
+          name: 'パスワード更新',
+          href: '/account/update-password',
+        },
       ];
     case 'home':
       return [

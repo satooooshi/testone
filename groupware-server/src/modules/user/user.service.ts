@@ -472,25 +472,21 @@ export class UserService {
     request: RequestWithUser,
     content: updatePasswordDto,
   ): Promise<User> {
-    try {
-      const existUser = await this.userRepository.findOne({
-        where: { id: request.user.id },
-        select: ['id', 'password'],
-      });
-      const hashedPassword = await hash(content.newPassword, 10);
-      const isPasswordMatching = await compare(
-        content.currentPassword,
-        existUser.password,
-      );
-      if (!isPasswordMatching) {
-        throw new BadRequestException('unmatch password');
-      }
-      existUser.password = hashedPassword;
-      const user = await this.userRepository.save(existUser);
-      return user;
-    } catch (e) {
-      throw new InternalServerErrorException('Failed to change password');
+    const existUser = await this.userRepository.findOne({
+      where: { id: request.user.id },
+      select: ['id', 'password'],
+    });
+    const hashedNewPassword = await hash(content.newPassword, 10);
+    const isPasswordMatching = await compare(
+      content.currentPassword,
+      existUser.password,
+    );
+    if (!isPasswordMatching) {
+      throw new BadRequestException('unmatch password');
     }
+    existUser.password = hashedNewPassword;
+    const user = await this.userRepository.save(existUser);
+    return user;
   }
 
   async deleteUser(user: User) {
