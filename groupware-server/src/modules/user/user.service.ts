@@ -411,6 +411,7 @@ export class UserService {
           'firstName',
           'introduce',
           'password',
+          'refreshedPassword',
           'role',
           'avatarUrl',
           'verifiedAt',
