@@ -7,6 +7,7 @@ import MentionMessageCard from '@/components/common/MentionMessageCard';
 import Link from 'next/link';
 import { useAPIGetLatestMentionedChatMessage } from '@/hooks/api/chat/useAPIGetLatestMentionedChatMessage';
 import { useHeaderTab } from '@/hooks/headerTab/useHeaderTab';
+import Head from 'next/head';
 
 const MentionList = () => {
   const { data: messages } = useAPIGetLatestMentionedChatMessage();
@@ -20,6 +21,9 @@ const MentionList = () => {
         activeTabName: 'メンション一覧',
         tabs: tabs,
       }}>
+      <Head>
+        <title>ボールド | メンション一覧</title>
+      </Head>
       <div className={mentionStyles.mention_list}>
         {messages && messages.length ? (
           messages.map((m) => (
@@ -30,7 +34,7 @@ const MentionList = () => {
             </Link>
           ))
         ) : (
-          <p>直近のメンション履歴はありません</p>
+          <p>直近一週間にメンション履歴はありません</p>
         )}
       </div>
     </LayoutWithTab>
