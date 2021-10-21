@@ -88,12 +88,15 @@ export class WikiService {
           ? 'wiki.resolved_at is not null'
           : '1=1',
       )
-      .andWhere(query.writer ? 'writer = :writer' : '1=1', {
+      .andWhere(query.writer ? 'writer.id = :writer' : '1=1', {
         writer: query.writer,
       })
-      .andWhere(query.answer_writer ? 'answer_writer = :answerWriter' : '1=1', {
-        answerWriter: query.answer_writer,
-      })
+      .andWhere(
+        query.answer_writer ? 'answer_writer.id = :answerWriter' : '1=1',
+        {
+          answerWriter: query.answer_writer,
+        },
+      )
       .andWhere(
         rule_category && type === WikiType.RULES
           ? 'wiki.ruleCategory = :ruleCategory'
@@ -107,6 +110,7 @@ export class WikiService {
       })
       .skip(offset)
       .take(limit)
+      .orderBy('wiki.createdAt', 'DESC')
       .getManyAndCount();
     const pageCount =
       count % limit === 0 ? count / limit : Math.floor(count / limit) + 1;
