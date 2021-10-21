@@ -28,5 +28,6 @@ export enum TabName {
   DETAIL = 'detail',
   EVENT = 'event',
   QUESTION = 'question',
+  KNOWLEDGE = 'knowledge',
   ANSWER = 'answer', // FIXME: 使用されている箇所がないかもしれないです...
 }
