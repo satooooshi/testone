@@ -42,7 +42,9 @@ const UserTagAdmin: React.FC = () => {
     return changedToKana;
   };
   const tagNames: string[] = tags?.map((t) => modifyStrToFlat(t.name)) || [''];
-  const tabs: Tab[] = useHeaderTab({ headerTabType: 'admin' });
+  const tabs: Tab[] = useHeaderTab({
+    headerTabType: user?.role === UserRole.ADMIN ? 'admin' : 'tagEdit',
+  });
 
   const handleCreate = (t: Partial<UserTag | Tag>) => {
     if (!t.name) {

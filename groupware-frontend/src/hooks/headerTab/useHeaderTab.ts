@@ -15,6 +15,7 @@ type HeaderTab =
   | 'qaForm'
   | 'eventDetail'
   | 'wikiDetail'
+  | 'tagEdit'
   | 'wikiList';
 
 type HeaderTabBehavior = {
@@ -207,6 +208,19 @@ const headerTab = (headerTabBehavior: HeaderTabBehavior): Tab[] => {
           type: 'link',
           name: 'CSV出力',
           href: '/admin/csv',
+        },
+      ];
+    case 'tagEdit':
+      return [
+        {
+          type: 'link',
+          name: 'タグ管理',
+          href: '/admin/tag',
+        },
+        {
+          type: 'link',
+          name: 'タグ管理(ユーザー)',
+          href: '/admin/tag/user',
         },
       ];
     case 'mention':
