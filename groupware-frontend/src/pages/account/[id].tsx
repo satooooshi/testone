@@ -20,7 +20,7 @@ import { useAPIGetWikiList } from '@/hooks/api/wiki/useAPIGetWikiList';
 import { useHeaderTab } from '@/hooks/headerTab/useHeaderTab';
 import topTabBarStyles from '@/styles/components/TopTabBar.module.scss';
 import { Button, ThemeTypings } from '@chakra-ui/react';
-import { TagType, UserTag } from 'src/types';
+import { TagType, UserTag, WikiType } from 'src/types';
 import { userRoleNameFactory } from 'src/utils/factory/userRoleNameFactory';
 
 type UserTagListProps = {
@@ -88,7 +88,14 @@ const MyAccountInfo = () => {
   const { id } = router.query as { id: string };
   const { data: profile } = useAPIGetUserInfoById(id);
   const { data: events } = useAPIGetEventList({ participant_id: id });
-  const { data: wikiList } = useAPIGetWikiList({ writer: id });
+  const { data: questionList } = useAPIGetWikiList({
+    writer: id,
+    type: WikiType.QA,
+  });
+  const { data: knowledgeList } = useAPIGetWikiList({
+    writer: id,
+    type: WikiType.KNOWLEDGE,
+  });
   const { user } = useAuthenticate();
   const [activeTab, setActiveTab] = useState<TabName>(TabName.DETAIL);
   const { mutate: logout } = useAPILogout({
@@ -114,18 +121,25 @@ const MyAccountInfo = () => {
       isActiveTab: activeTab === TabName.DETAIL,
     },
     {
-      tabName: '参加したイベント',
+      tabName: '参加したイベント (直近20件)',
       onClick: () => {
         setActiveTab(TabName.EVENT);
       },
       isActiveTab: activeTab === TabName.EVENT,
     },
     {
-      tabName: '質問',
+      tabName: '質問 (直近20件)',
       onClick: () => {
         setActiveTab(TabName.QUESTION);
       },
       isActiveTab: activeTab === TabName.QUESTION,
+    },
+    {
+      tabName: 'ナレッジ (直近20件)',
+      onClick: () => {
+        setActiveTab(TabName.KNOWLEDGE);
+      },
+      isActiveTab: activeTab === TabName.KNOWLEDGE,
     },
   ];
 
@@ -224,10 +238,24 @@ const MyAccountInfo = () => {
             ) : null}
 
             {activeTab === TabName.QUESTION &&
-            wikiList &&
-            wikiList.wiki.length ? (
+            questionList &&
+            questionList.wiki.length ? (
               <div className={accountInfoStyles.question_wrapper}>
-                {wikiList.wiki.map((w) => (
+                {questionList.wiki.map((w) => (
+                  <div
+                    key={w.id}
+                    className={accountInfoStyles.question_card_wrapper}>
+                    <WikiCard wiki={w} />
+                  </div>
+                ))}
+              </div>
+            ) : null}
+
+            {activeTab === TabName.KNOWLEDGE &&
+            knowledgeList &&
+            knowledgeList.wiki.length ? (
+              <div className={accountInfoStyles.question_wrapper}>
+                {knowledgeList.wiki.map((w) => (
                   <div
                     key={w.id}
                     className={accountInfoStyles.question_card_wrapper}>
