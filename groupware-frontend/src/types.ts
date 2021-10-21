@@ -1,6 +1,7 @@
 export enum UserRole {
   ADMIN = 'admin',
-  INSTRUCTOR = 'instructor',
+  EXTERNAL_INSTRUCTOR = 'external_instructor',
+  INTERNAL_INSTRUCTOR = 'internal_instructor',
   COACH = 'coach',
   COMMON = 'common',
 }

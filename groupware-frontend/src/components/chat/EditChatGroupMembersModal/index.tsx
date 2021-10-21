@@ -11,6 +11,7 @@ import {
   Select,
 } from '@chakra-ui/react';
 import { useAuthenticate } from 'src/contexts/useAuthenticate';
+import { userRoleNameFactory } from 'src/utils/factory/userRoleNameFactory';
 
 type EditChatGroupMambersModalProps = {
   isOpen: boolean;
@@ -28,7 +29,7 @@ const EditChatGroupMembersModal: React.FC<EditChatGroupMambersModalProps> = ({
   onCancel,
 }) => {
   const [selectedRole, setSelectedRole] = useState<UserRole | 'all'>(
-    UserRole.INSTRUCTOR,
+    UserRole.INTERNAL_INSTRUCTOR,
   );
   const [selectedUsers, setSelectedUsers] = useState<User[]>([]);
   const [previousMembers, setPreviousMembers] = useState<User[]>([]);
@@ -67,7 +68,12 @@ const EditChatGroupMembersModal: React.FC<EditChatGroupMambersModalProps> = ({
           defaultValue={selectedRole}>
           <option value={'all'}>全て</option>
           <option value={UserRole.ADMIN}>管理者</option>
-          <option value={UserRole.INSTRUCTOR}>講師</option>
+          <option value={UserRole.EXTERNAL_INSTRUCTOR}>
+            {userRoleNameFactory(UserRole.EXTERNAL_INSTRUCTOR)}
+          </option>
+          <option value={UserRole.INTERNAL_INSTRUCTOR}>
+            {userRoleNameFactory(UserRole.INTERNAL_INSTRUCTOR)}
+          </option>
           <option value={UserRole.COACH}>コーチ</option>
           <option value={UserRole.COMMON}>一般社員</option>
         </Select>

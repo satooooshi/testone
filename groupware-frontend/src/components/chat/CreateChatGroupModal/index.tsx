@@ -16,6 +16,7 @@ import ReactCrop, { Crop } from 'react-image-crop';
 import { getCroppedImageURL } from 'src/utils/getCroppedImageURL';
 import { useAPIUploadStorage } from '@/hooks/api/storage/useAPIUploadStorage';
 import { dataURLToFile } from 'src/utils/dataURLToFile';
+import { userRoleNameFactory } from 'src/utils/factory/userRoleNameFactory';
 
 type CreateChatGroupModalProps = {
   isOpen: boolean;
@@ -139,7 +140,12 @@ const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
               defaultValue={selectedUserRole}>
               <option value={'all'}>全て</option>
               <option value={UserRole.ADMIN}>管理者</option>
-              <option value={UserRole.INSTRUCTOR}>講師</option>
+              <option value={UserRole.EXTERNAL_INSTRUCTOR}>
+                {userRoleNameFactory(UserRole.EXTERNAL_INSTRUCTOR)}
+              </option>
+              <option value={UserRole.INTERNAL_INSTRUCTOR}>
+                {userRoleNameFactory(UserRole.INTERNAL_INSTRUCTOR)}
+              </option>
               <option value={UserRole.COACH}>コーチ</option>
               <option value={UserRole.COMMON}>一般社員</option>
             </Select>
