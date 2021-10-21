@@ -42,7 +42,8 @@ export const searchUserQueryParamFactory = (
     verified,
     duration,
   } = query;
-  let refreshURL = `?page=${newPage}&word=${newWord}&tag=${newTag}`;
+  const parsedWord = newWord.split(' ').join('+');
+  let refreshURL = `?page=${newPage}&word=${parsedWord}&tag=${newTag}`;
   if (sort) {
     refreshURL = `${refreshURL}&sort=${sort}`;
   }
