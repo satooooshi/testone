@@ -153,14 +153,14 @@ const SearchInput: React.FC<SearchFormProps> = ({
               選択したタグ
             </p>
           </div>
-          <div className={searchFormStyles.selected_items_wrapper}>
+          <div className={searchFormStyles.selected_tags_wrapper}>
             {selectedTags.map((tag) => {
               return (
                 <Button
                   colorScheme={tagColorFactory(tag.type)}
                   size="xs"
                   key={tag.id}
-                  className={searchFormStyles.item}>
+                  className={searchFormStyles.tag_item}>
                   {tag.name}
                 </Button>
               );
