@@ -8,9 +8,9 @@ import { Button } from '@chakra-ui/react';
 import noImage from '@/public/no-image.jpg';
 import boldayImage1 from '@/public/bolday_1.jpg';
 import impressiveUnivertyImage from '@/public/impressive_university_1.png';
+import coachImage from '@/public/coach_1.jpg';
 import studyMeeting1Image from '@/public/study_meeting_1.jpg';
 import Image from 'next/image';
-import { GiTeacher } from 'react-icons/gi';
 import portalLinkBoxStyles from '@/styles/components/PortalLinkBox.module.scss';
 import { MdAssignment } from 'react-icons/md';
 import { FcSportsMode } from 'react-icons/fc';
@@ -43,14 +43,7 @@ const EventCard: React.FC<EventCardProps> = ({
       case EventType.IMPRESSIVE_UNIVERSITY:
         return <Image src={impressiveUnivertyImage} alt="イベント画像" />;
       case EventType.COACH:
-        return (
-          <GiTeacher
-            className={clsx(
-              eventCardStyles.icon,
-              portalLinkBoxStyles.coach_icon,
-            )}
-          />
-        );
+        return <Image src={coachImage} alt="イベント画像" />;
       case EventType.SUBMISSION_ETC:
         return (
           <MdAssignment

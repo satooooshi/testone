@@ -33,7 +33,6 @@ import { useAPISaveSubmission } from '@/hooks/api/event/useAPISaveSubmission';
 import clsx from 'clsx';
 import { useAPIDonwloadSubmissionZip } from '@/hooks/api/event/useAPIDonwloadSubmissionZip';
 import { FcSportsMode } from 'react-icons/fc';
-import { GiTeacher } from 'react-icons/gi';
 import { MdAssignment } from 'react-icons/md';
 import boldayImage1 from '@/public/bolday_1.jpg';
 import impressiveUnivertyImage from '@/public/impressive_university_1.png';
@@ -44,6 +43,7 @@ import { useAPISaveUserJoiningEvent } from '@/hooks/api/event/useAPISaveUserJoin
 import { userNameFactory } from 'src/utils/factory/userNameFactory';
 import { tagColorFactory } from 'src/utils/factory/tagColorFactory';
 import { useAPICancelEvent } from '@/hooks/api/event/useAPICancelEvent';
+import coachImage from '@/public/coach_1.jpg';
 
 type FileIconProps = {
   href?: string;
@@ -100,14 +100,7 @@ const EventDetail = () => {
       case EventType.IMPRESSIVE_UNIVERSITY:
         return <Image src={impressiveUnivertyImage} alt="イベント画像" />;
       case EventType.COACH:
-        return (
-          <GiTeacher
-            className={clsx(
-              eventCardStyles.icon,
-              portalLinkBoxStyles.coach_icon,
-            )}
-          />
-        );
+        return <Image src={coachImage} alt="イベント画像" />;
       case EventType.SUBMISSION_ETC:
         return (
           <MdAssignment
