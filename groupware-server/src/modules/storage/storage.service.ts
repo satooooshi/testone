@@ -83,9 +83,14 @@ export class StorageService {
         .getSignedUrl(options);
       const replaceRegWithSpace = new RegExp(`${unsignedURL}\\s`, 'g');
       const replaceRegWithQuote = new RegExp(`${unsignedURL}"`, 'g');
+      const replaceRegWithBracketEnd = new RegExp(`${unsignedURL}\\)`, 'g');
       const replaceRegWithEnd = new RegExp(`${unsignedURL}$`, 'g');
       parseText = parseText.replace(replaceRegWithSpace, signedURL[0] + ' ');
       parseText = parseText.replace(replaceRegWithQuote, signedURL[0] + '"');
+      parseText = parseText.replace(
+        replaceRegWithBracketEnd,
+        signedURL[0] + ')',
+      );
       parseText = parseText.replace(replaceRegWithEnd, signedURL[0]);
     }
     return parseText;
