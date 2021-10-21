@@ -276,6 +276,7 @@ export class EventScheduleService {
       })
       .skip(offset)
       .take(limit)
+      .orderBy('events.startAt', 'DESC')
       .getManyAndCount();
     const pageCount =
       count % limit === 0 ? count / limit : Math.floor(count / limit) + 1;
