@@ -45,7 +45,7 @@ const AuthProvder: React.FC = ({ children }) => {
     isLoading ||
     (!isAuthenticated &&
       router.pathname !== '/login' &&
-      router.pathname !== '/register')
+      router.pathname !== '/forgot-password')
   ) {
     return <div>Loading...</div>;
   }

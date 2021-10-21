@@ -53,7 +53,7 @@ const ForgotPassword: React.FC = () => {
               }
             </p>
             <p className={authFormStyles.form_margin}>
-              <Link href="/forgot-password">
+              <Link href="/login">
                 <a className={textLinkStyles.link}>ログイン画面へ</a>
               </Link>
             </p>
