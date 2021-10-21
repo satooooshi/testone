@@ -33,8 +33,10 @@ export class UserService {
         return '管理者';
       case UserRole.COMMON:
         return '一般社員';
-      case UserRole.INSTRUCTOR:
-        return '講師';
+      case UserRole.EXTERNAL_INSTRUCTOR:
+        return '講師(外部)';
+      case UserRole.INTERNAL_INSTRUCTOR:
+        return '講師(社員)';
       case UserRole.COACH:
         return '本社勤務';
     }
@@ -249,11 +251,10 @@ export class UserService {
           : '1=1',
         { queryWord: `%${word}%` },
       )
-      .where(tag ? 'tag.id IN (:...tagIDs)' : '1=1', {
+      .andWhere(tag ? 'tag.id IN (:...tagIDs)' : '1=1', {
         tagIDs,
       })
       .skip(offset)
-      .withDeleted()
       .take(limit);
     const userObjOnlyId = await searchQuery.getMany();
     const userIDs = userObjOnlyId.map((u) => u.id);

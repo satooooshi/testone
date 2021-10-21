@@ -10,6 +10,7 @@ import {
   FormLabel,
   Select,
 } from '@chakra-ui/react';
+import { userRoleNameFactory } from 'src/utils/factory/userRoleNameFactory';
 
 type SelectUserModalProps = {
   isOpen: boolean;
@@ -57,7 +58,7 @@ const SelectUserModal: React.FC<SelectUserModalProps> = ({
   onComplete,
 }) => {
   const [selectedRole, setSelectedRole] = useState<UserRole | 'all'>(
-    UserRole.INSTRUCTOR,
+    UserRole.INTERNAL_INSTRUCTOR,
   );
   return (
     <ReactModal
@@ -73,7 +74,12 @@ const SelectUserModal: React.FC<SelectUserModalProps> = ({
           defaultValue={selectedRole}>
           <option value={'all'}>全て</option>
           <option value={UserRole.ADMIN}>管理者</option>
-          <option value={UserRole.INSTRUCTOR}>講師</option>
+          <option value={UserRole.EXTERNAL_INSTRUCTOR}>
+            {userRoleNameFactory(UserRole.EXTERNAL_INSTRUCTOR)}
+          </option>
+          <option value={UserRole.INTERNAL_INSTRUCTOR}>
+            {userRoleNameFactory(UserRole.INTERNAL_INSTRUCTOR)}
+          </option>
           <option value={UserRole.COACH}>コーチ</option>
           <option value={UserRole.COMMON}>一般社員</option>
         </Select>

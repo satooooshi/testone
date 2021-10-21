@@ -247,8 +247,31 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
     }));
   };
 
-  const isCreatableAllEvent = useMemo(() => {
-    return user?.role !== UserRole.COMMON;
+  const isCreatableImpressiveUniversity = useMemo(() => {
+    return user?.role === UserRole.ADMIN;
+  }, [user?.role]);
+
+  const isCreatableStudyMeeting = useMemo(() => {
+    return user?.role === (UserRole.ADMIN || UserRole.INTERNAL_INSTRUCTOR);
+  }, [user?.role]);
+
+  const isCreatableBolday = useMemo(() => {
+    return user?.role === UserRole.ADMIN;
+  }, [user?.role]);
+
+  const isCreatableCoach = useMemo(() => {
+    return user?.role === (UserRole.ADMIN || UserRole.COACH);
+  }, [user?.role]);
+
+  const isCreatableClub = useMemo(() => {
+    return (
+      user?.role ===
+      (UserRole.ADMIN || UserRole.INTERNAL_INSTRUCTOR || UserRole.COMMON)
+    );
+  }, [user?.role]);
+
+  const isCreatableSubmissionEtc = useMemo(() => {
+    return user?.role === UserRole.ADMIN;
   }, [user?.role]);
 
   const pushYoutube = () => {
@@ -467,20 +490,24 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
                   }));
                 }}
                 defaultValue={newEvent.type}>
-                {isCreatableAllEvent && (
+                {isCreatableImpressiveUniversity && (
                   <option value={EventType.IMPRESSIVE_UNIVERSITY}>
                     感動大学
                   </option>
                 )}
-                <option value={EventType.STUDY_MEETING}>勉強会</option>
-                {isCreatableAllEvent && (
+                {isCreatableStudyMeeting && (
+                  <option value={EventType.STUDY_MEETING}>勉強会</option>
+                )}
+                {isCreatableBolday && (
                   <option value={EventType.BOLDAY}>BOLDay</option>
                 )}
-                {isCreatableAllEvent && (
+                {isCreatableCoach && (
                   <option value={EventType.COACH}>コーチ制度</option>
                 )}
-                <option value={EventType.CLUB}>部活動</option>
-                {isCreatableAllEvent && (
+                {isCreatableClub && (
+                  <option value={EventType.CLUB}>部活動</option>
+                )}
+                {isCreatableSubmissionEtc && (
                   <option value={EventType.SUBMISSION_ETC}>提出物等</option>
                 )}
               </Select>

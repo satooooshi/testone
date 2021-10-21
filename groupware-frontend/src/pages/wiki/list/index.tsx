@@ -117,6 +117,7 @@ const QAQuestionList = () => {
     const selectedTagIDs = selectedTags.map((t) => t.id.toString());
     const tagQuery = selectedTagIDs.join('+');
     const refreshedQueryStrings = wikiQueryRefresh({
+      ...router.query,
       ...query,
       tag: tagQuery,
     });

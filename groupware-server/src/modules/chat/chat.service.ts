@@ -96,7 +96,7 @@ export class ChatService {
   public async getMenthionedChatMessage(user: User): Promise<ChatMessage[]> {
     const now = new Date();
     // const oneDayAgo = new Date(now.setDate(now.getDate() - 1));
-    const oneDayAgo = new Date(now.setDate(now.getDate() - 1));
+    const oneWeekAgo = new Date(now.setDate(now.getDate() - 7));
     const limit = 10;
     const mentioned = await this.chatMessageRepository
       .createQueryBuilder('chat_messages')
@@ -104,7 +104,9 @@ export class ChatService {
       .innerJoinAndSelect('chat_messages.sender', 'sender')
       .innerJoinAndSelect('chat_messages.chatGroup', 'chat_group')
       .where('chat_messages.created_at < now()')
-      .andWhere(`chat_messages.created_at > :oneDayAgo`, { oneDayAgo })
+      .andWhere(`chat_messages.created_at > :oneWeekAgo`, {
+        oneWeekAgo: oneWeekAgo,
+      })
       .andWhere(`chat_messages.content LIKE :mentionWord`, {
         mentionWord: `%\\@\\[${user.lastName} ${user.firstName}\\]\\(${user.id}\\)%`,
       })

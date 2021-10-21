@@ -53,7 +53,7 @@
   }
 }
 
-.selected_items_wrapper {
+.selected_tags_wrapper {
   width: 70vw;
   @media (max-width: 576px) {
     margin-bottom: 0;
@@ -73,11 +73,11 @@
 .result_text {
 }
 
-.item {
-  margin-bottom: 8px;
-  margin-right: 16px;
+.tag_item {
+  margin-bottom: 4px;
+  margin-right: 4px;
   @media (max-width: 768px) {
-    margin-right: 8px;
+    margin-right: 4px;
   }
 }
 

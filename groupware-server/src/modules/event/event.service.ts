@@ -245,7 +245,7 @@ export class EventScheduleService {
       .leftJoinAndSelect('events.tags', 'tag')
       .where(
         word && word.length !== 1
-          ? 'MATCH(title, description) AGAINST (:word IN NATURAL LANGUAGE MODE)'
+          ? 'MATCH(events.title, events.description) AGAINST (:word IN NATURAL LANGUAGE MODE)'
           : '1=1',
         { word },
       )
@@ -254,7 +254,7 @@ export class EventScheduleService {
       })
       .andWhere(
         word.length === 1
-          ? 'CONCAT(title, description) LIKE :queryWord'
+          ? 'CONCAT(events.title, events.description) LIKE :queryWord'
           : '1=1',
         { queryWord: `%${word}%` },
       )
@@ -341,13 +341,13 @@ export class EventScheduleService {
   public async generateSignedStorageURLsFromEventObj(
     eventSchedule: EventSchedule,
   ): Promise<EventSchedule> {
-    if (eventSchedule.imageURL) {
+    if (eventSchedule?.imageURL) {
       eventSchedule.imageURL =
         await this.storageService.parseStorageURLToSignedURL(
           eventSchedule.imageURL,
         );
     }
-    if (eventSchedule.files && eventSchedule.files.length) {
+    if (eventSchedule?.files && eventSchedule.files.length) {
       const parsedFiles: EventFile[] = [];
       for (const f of eventSchedule.files) {
         const signedURL = await this.storageService.parseStorageURLToSignedURL(

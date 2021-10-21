@@ -8,7 +8,8 @@ define(User, (): User => {
   const userRoleArray = [
     UserRole.COMMON,
     UserRole.ADMIN,
-    UserRole.INSTRUCTOR,
+    UserRole.EXTERNAL_INSTRUCTOR,
+    UserRole.INTERNAL_INSTRUCTOR,
     UserRole.COACH,
   ];
   user.email = faker.internet.email();
