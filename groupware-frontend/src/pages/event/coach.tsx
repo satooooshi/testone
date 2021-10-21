@@ -6,6 +6,7 @@ import eventPRStyles from '@/styles/layouts/EventPR.module.scss';
 import { useAPIGetLatestEvent } from '@/hooks/api/event/useAPIGetLatestEvent';
 import { EventType } from 'src/types';
 import { EventTab } from 'src/types/header/tab/types';
+import coachImage1 from '@/public/coach_1.jpg';
 import EventIntroduction from 'src/templates/event/EventIntroduction';
 
 const Coach: React.FC = () => {
@@ -18,9 +19,6 @@ const Coach: React.FC = () => {
   const { data: recommendedEvents } = useAPIGetLatestEvent({
     type: EventType.COACH,
   });
-
-  const headlineImgSource =
-    'https://www.bold.ne.jp/assets/assets_recruit/images/enviroment/img_coach_main.png';
 
   const bottomImgSources = [''];
 
@@ -35,7 +33,7 @@ const Coach: React.FC = () => {
       <div className={eventPRStyles.main}>
         <EventIntroduction
           recommendedEvents={recommendedEvents}
-          headlineImgSource={headlineImgSource}
+          headlineImgSource={coachImage1}
           bottomImgSources={bottomImgSources}
           heading={EventTab.COACH}
           subHeading={subHeading}
