@@ -24,6 +24,14 @@ const ForgotPassword: React.FC = () => {
         isClosable: true,
       });
     },
+    onError: () => {
+      toast({
+        description: 'エラーが発生しました\n入力内容をお確かめください',
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      });
+    },
   });
 
   return (
