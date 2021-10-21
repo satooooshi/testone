@@ -45,7 +45,7 @@ export default class CreateInit implements Seeder {
             lastName: 'たけだ',
             firstName: 'けんた',
             password: hashSync('password', 10),
-            role: UserRole.INSTRUCTOR,
+            role: UserRole.EXTERNAL_INSTRUCTOR,
             avatarUrl:
               'https://eowesttokyo.org/wp-content/uploads/2019/03/valleyin.jpg',
             verifiedAt: new Date(),
