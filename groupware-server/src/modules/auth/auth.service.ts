@@ -89,11 +89,14 @@ export class AuthService {
       existUser.refreshedPassword,
     );
     if (!isPasswordMatching && isRefreshedPasswordMatching) {
-      await this.userService.saveUser({ ...existUser, refreshedPassword: '' });
-    } else if (isPasswordMatching && !isRefreshedPasswordMatching) {
       await this.userService.saveUser({
         ...existUser,
         password: existUser.refreshedPassword,
+        refreshedPassword: '',
+      });
+    } else if (isPasswordMatching && !isRefreshedPasswordMatching) {
+      await this.userService.saveUser({
+        ...existUser,
         refreshedPassword: '',
       });
     }
