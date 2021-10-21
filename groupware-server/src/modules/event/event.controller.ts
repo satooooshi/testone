@@ -83,6 +83,12 @@ export class EventScheduleController {
     private readonly configService: ConfigService,
   ) {}
 
+  //@TODO this endpoint is for inputting data
+  @Post('create-from-array')
+  async registerUsers(@Body() events: EventSchedule[]) {
+    return await this.eventService.createFromArr(events);
+  }
+
   @Get('submission-zip')
   @UseGuards(JwtAuthenticationGuard)
   async getSubmissionZip(

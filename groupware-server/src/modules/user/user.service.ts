@@ -438,6 +438,16 @@ export class UserService {
     return newUser;
   }
 
+  async registerUsers(userData: User[]) {
+    const usersArr: User[] = [];
+    for (const u of userData) {
+      const hashedPassword = await hash(u.password, 10);
+      usersArr.push({ ...u, password: hashedPassword });
+    }
+    const newUsers = await this.userRepository.save(usersArr);
+    return newUsers;
+  }
+
   async saveUser(newUserProfile: Partial<User>): Promise<User> {
     const existUser = await this.userRepository.findOne({
       where: { id: newUserProfile.id },

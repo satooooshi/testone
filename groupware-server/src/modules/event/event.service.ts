@@ -287,6 +287,12 @@ export class EventScheduleService {
     return { pageCount, events: urlParsedEvents };
   }
 
+  public async createFromArr(
+    events: EventSchedule[],
+  ): Promise<EventSchedule[]> {
+    return await this.eventRepository.save(events);
+  }
+
   public async getEventAtSpecificTime(
     query: SearchQueryToGetEvents,
   ): Promise<SearchResultToGetEvents> {
