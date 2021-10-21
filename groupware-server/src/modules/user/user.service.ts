@@ -442,7 +442,7 @@ export class UserService {
     const usersArr: User[] = [];
     for (const u of userData) {
       const hashedPassword = await hash(u.password, 10);
-      usersArr.push({ ...u, password: hashedPassword });
+      usersArr.push({ ...u, password: hashedPassword, verifiedAt: new Date() });
     }
     const newUsers = await this.userRepository.save(usersArr);
     return newUsers;
