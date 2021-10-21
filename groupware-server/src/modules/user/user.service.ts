@@ -249,11 +249,10 @@ export class UserService {
           : '1=1',
         { queryWord: `%${word}%` },
       )
-      .where(tag ? 'tag.id IN (:...tagIDs)' : '1=1', {
+      .andWhere(tag ? 'tag.id IN (:...tagIDs)' : '1=1', {
         tagIDs,
       })
       .skip(offset)
-      .withDeleted()
       .take(limit);
     const userObjOnlyId = await searchQuery.getMany();
     const userIDs = userObjOnlyId.map((u) => u.id);
