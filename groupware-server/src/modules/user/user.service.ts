@@ -8,7 +8,6 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { User, UserRole } from 'src/entities/user.entity';
 import { Repository } from 'typeorm';
-import RegisterDto from './dto/registerDto';
 import RequestWithUser from '../auth/requestWithUser.interface';
 import { compare, hash } from 'bcrypt';
 import updatePasswordDto from './dto/updatePasswordDto';
@@ -17,12 +16,15 @@ import { WikiType } from 'src/entities/wiki.entity';
 import { Parser } from 'json2csv';
 import { SearchQueryToGetUsers } from './user.controller';
 import { Tag, TagType } from 'src/entities/tag.entity';
+import { sortBy } from 'lodash';
+import { StorageService } from '../storage/storage.service';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User)
     private userRepository: Repository<User>,
+    private storageService: StorageService,
   ) {}
 
   public userRoleNameFactory(userRole: UserRole): string {
@@ -179,6 +181,26 @@ export class UserService {
     return csvData;
   }
 
+  public async generateSignedStorageURLsFromUserObj(user: User): Promise<User> {
+    if (user.avatarUrl) {
+      user.avatarUrl = await this.storageService.parseStorageURLToSignedURL(
+        user.avatarUrl,
+      );
+    }
+    return user;
+  }
+
+  public async generateSignedStorageURLsFromUserArr(
+    users: User[],
+  ): Promise<User[]> {
+    const parsedUsers: User[] = [];
+    for (const u of users) {
+      const parsed = await this.generateSignedStorageURLsFromUserObj(u);
+      parsedUsers.push(parsed);
+    }
+    return parsedUsers;
+  }
+
   async search(query: SearchQueryToGetUsers) {
     const {
       page = 1,
@@ -206,11 +228,11 @@ export class UserService {
     if (page) {
       offset = (Number(page) - 1) * limit;
     }
-    const tagIDs = tag.split('+');
+    const tagIDs = tag.split(' ');
     const searchQuery = this.userRepository
       .createQueryBuilder('user')
-      .select()
-      .leftJoinAndSelect('user.tags', 'tag')
+      .select('user.id')
+      .leftJoin('user.tags', 'tag')
       .where(
         word && word.length !== 1
           ? 'MATCH(user.firstName, user.lastName, user.email) AGAINST (:word IN NATURAL LANGUAGE MODE)'
@@ -227,132 +249,115 @@ export class UserService {
           : '1=1',
         { queryWord: `%${word}%` },
       )
-      .andWhere(tag ? 'tag.id IN (:...tagIDs)' : '1=1', {
+      .where(tag ? 'tag.id IN (:...tagIDs)' : '1=1', {
         tagIDs,
-      });
-    const users: any[] = await searchQuery
-      .addSelect((subQuery) => {
-        return subQuery
-          .select('COUNT( DISTINCT event.id )', 'eventCount')
-          .from(User, 'u')
-          .leftJoin('u.userJoiningEvent', 'userJoiningEvent')
-          .leftJoin('userJoiningEvent.event', 'event')
-          .where(fromDate ? 'event.endAt > :fromDate' : '1=1', { fromDate })
-          .andWhere('event.endAt < :toDate', { toDate })
-          .andWhere('u.id = user.id');
-      }, 'eventCount')
-      .addSelect((subQuery) => {
-        return subQuery
-          .select('COUNT( DISTINCT wiki.id )', 'questionCount')
-          .from(User, 'u')
-          .leftJoin('u.wiki', 'wiki')
-          .where(fromDate ? 'wiki.createdAt > :fromDate' : '1=1', {
-            fromDate,
-          })
-          .andWhere('wiki.type = :qa', {
-            qa: WikiType.QA,
-          })
-          .andWhere('wiki.createdAt < :toDate', { toDate })
-          .andWhere('u.id = user.id');
-      }, 'questionCount')
-      .addSelect((subQuery) => {
-        return subQuery
-          .select('COUNT( DISTINCT wiki.id )', 'questionCount')
-          .from(User, 'u')
-          .leftJoin('u.wiki', 'wiki')
-          .where(fromDate ? 'wiki.createdAt > :fromDate' : '1=1', {
-            fromDate,
-          })
-          .andWhere('wiki.type = :knwoledge', {
-            knwoledge: WikiType.KNOWLEDGE,
-          })
-          .andWhere('wiki.createdAt < :toDate', { toDate })
-          .andWhere('u.id = user.id');
-      }, 'knowledgeCount')
-      .addSelect((subQuery) => {
-        return subQuery
-          .select('COUNT( DISTINCT answer.id )', 'answerCount')
-          .from(User, 'u')
-          .leftJoin('u.qaAnswers', 'answer')
-          .where(fromDate ? 'answer.createdAt > :fromDate' : '1=1', {
-            fromDate,
-          })
-          .andWhere('answer.createdAt < :toDate', { toDate })
-          .andWhere('u.id = user.id');
-      }, 'answerCount')
-      .groupBy('user.id')
-      .addGroupBy('tag.id')
-      .orderBy(
-        sort === 'event'
-          ? 'eventCount'
-          : sort === 'question'
-          ? 'questionCount'
-          : sort === 'answer'
-          ? 'answerCount'
-          : sort === 'knowledge'
-          ? 'knowledgeCount'
-          : 'user.createdAt',
-        'DESC',
+      })
+      .skip(offset)
+      .withDeleted()
+      .take(limit);
+    const userObjOnlyId = await searchQuery.getMany();
+    const userIDs = userObjOnlyId.map((u) => u.id);
+    const users = await this.userRepository.findByIds(userIDs, {
+      relations: ['tags'],
+    });
+    const userObjWithEvent = await this.userRepository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.userJoiningEvent', 'userJoiningEvent')
+      .leftJoin(
+        'userJoiningEvent.event',
+        'event',
+        fromDate ? 'event.endAt > :fromDate AND event.endAt < :toDate' : '1=1',
+        { fromDate, toDate },
       )
-      .offset(offset)
-      .limit(limit)
-      .getRawMany();
-    let entityUsers: User[] = [];
-    for (const u of users) {
-      const tag: UserTag = {
-        id: u.tag_id,
-        name: u.tag_name,
-        type: u.tag_type,
-        createdAt: u.tag_created_at,
-        updatedAt: u.tag_updated_at,
-      };
-      let tags: UserTag[] = [];
-      const repeatedUsers = entityUsers.filter(
-        (existUesrInArr) => existUesrInArr.id === u.user_id,
-      );
-      if (repeatedUsers.length) {
-        const existTags = repeatedUsers[0].tags;
-        tags = [...existTags, tag];
+      .where(userIDs.length ? 'user.id IN (:...userIDs)' : '1=1', { userIDs })
+      .getMany();
 
-        //remove repeated user
-        entityUsers = entityUsers.filter(
-          (existUesrInArr) => existUesrInArr.id !== u.user_id,
-        );
-      }
-      entityUsers = entityUsers.filter((e) => e.id !== u.user_id);
-      entityUsers.push({
-        id: u.user_id,
-        email: u.user_email,
-        lastName: u.user_last_name,
-        firstName: u.user_first_name,
-        introduce: u.user_introduce,
-        role: u.user_role,
-        tags,
-        verifiedAt: u.user_verified_at,
-        avatarUrl: u.user_avatar_url,
-        employeeId: u.user_employee_id,
-        createdAt: u.user_created_at,
-        updatedAt: u.user_updated_at,
-        deletedAt: u.user_deleted_at,
-        existence: u.user_existence,
-        eventCount: u.eventCount,
-        questionCount: u.questionCount,
-        answerCount: u.answerCount,
-        knowledgeCount: u.knowledgeCount,
-      });
+    const userObjWithQuestion = await this.userRepository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect(
+        'user.wiki',
+        'wiki',
+        fromDate
+          ? 'wiki.createdAt > :fromDate AND wiki.createdAt < :toDate AND wiki.type = :qa'
+          : 'wiki.type = :qa',
+        { fromDate, toDate, qa: WikiType.QA },
+      )
+      .where(userIDs.length ? 'user.id IN (:...userIDs)' : '1=1', { userIDs })
+      .getMany();
+    const userObjWithKnowledge = await this.userRepository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect(
+        'user.wiki',
+        'wiki',
+        fromDate
+          ? 'wiki.createdAt > :fromDate AND wiki.createdAt < :toDate AND wiki.type = :knowledge'
+          : 'wiki.type = :knowledge',
+        { fromDate, toDate, knowledge: WikiType.KNOWLEDGE },
+      )
+      .where(userIDs.length ? 'user.id IN (:...userIDs)' : '1=1', { userIDs })
+      .getMany();
+    const userObjWithAnswer = await this.userRepository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect(
+        'user.qaAnswers',
+        'answer',
+        fromDate
+          ? 'answer.createdAt > :fromDate AND answer.createdAt < :toDate'
+          : '1=1',
+        { fromDate, toDate },
+      )
+      .where(userIDs.length ? 'user.id IN (:...userIDs)' : '1=1', { userIDs })
+      .getMany();
+    const userWithEachCount = users.map((u) => {
+      const eventCount =
+        userObjWithEvent.filter((user) => user.id === u.id)[0].userJoiningEvent
+          .length || 0;
+      const questionCount =
+        userObjWithQuestion.filter((user) => user.id === u.id)[0].wiki.length ||
+        0;
+      const knowledgeCount =
+        userObjWithKnowledge.filter((user) => user.id === u.id)[0].wiki
+          .length || 0;
+      const answerCount =
+        userObjWithAnswer.filter((user) => user.id === u.id)[0].qaAnswers
+          .length || 0;
+      return {
+        ...u,
+        questionCount,
+        eventCount,
+        knowledgeCount,
+        answerCount,
+      };
+    });
+    let sortedArr = [];
+    switch (sort) {
+      case 'event':
+        sortedArr = sortBy(userWithEachCount, 'eventCount');
+      case 'question':
+        sortedArr = sortBy(userWithEachCount, 'questionCount');
+      case 'answer':
+        sortedArr = sortBy(userWithEachCount, 'answerCount');
+      case 'knowledge':
+        sortedArr = sortBy(userWithEachCount, 'knowledgeCount');
+      default:
+        sortedArr = sortBy(userWithEachCount, 'createdAt');
     }
     const count = await searchQuery.getCount();
     const pageCount =
       count % limit === 0 ? count / limit : Math.floor(count / limit) + 1;
-    return { users: entityUsers, pageCount };
+    const urlParsedUsers = await this.generateSignedStorageURLsFromUserArr(
+      sortedArr,
+    );
+    return { users: urlParsedUsers, pageCount };
   }
 
   async getProfile(id: number): Promise<User> {
-    const users = await this.userRepository.findOne({
+    const user = await this.userRepository.findOne({
       relations: ['tags'],
       where: { id },
     });
-    return users;
+    const urlParsedUser = await this.generateSignedStorageURLsFromUserObj(user);
+    return urlParsedUser;
   }
 
   async getUsers(): Promise<User[]> {
@@ -385,7 +390,10 @@ export class UserService {
       throw new BadRequestException('The user is not verified');
     }
     if (user) {
-      return user;
+      const urlParsedUser = await this.generateSignedStorageURLsFromUserObj(
+        user,
+      );
+      return urlParsedUser;
     }
     throw new NotFoundException('User with this id does not exist');
   }
@@ -403,6 +411,7 @@ export class UserService {
           'firstName',
           'introduce',
           'password',
+          'refreshedPassword',
           'role',
           'avatarUrl',
           'verifiedAt',
@@ -421,10 +430,23 @@ export class UserService {
     throw new NotFoundException('User with this email does not exist');
   }
 
-  async create(userData: RegisterDto) {
+  async create(userData: User) {
+    userData.avatarUrl = this.storageService.parseSignedURLToStorageURL(
+      userData.avatarUrl,
+    );
     const newUser = this.userRepository.create(userData);
     await this.userRepository.save(newUser);
     return newUser;
+  }
+
+  async registerUsers(userData: User[]) {
+    const usersArr: User[] = [];
+    for (const u of userData) {
+      const hashedPassword = await hash(u.password, 10);
+      usersArr.push({ ...u, password: hashedPassword, verifiedAt: new Date() });
+    }
+    const newUsers = await this.userRepository.save(usersArr);
+    return newUsers;
   }
 
   async saveUser(newUserProfile: Partial<User>): Promise<User> {
@@ -434,7 +456,14 @@ export class UserService {
     if (!existUser) {
       throw new InternalServerErrorException('Something went wrong');
     }
-    const newUserObj = { ...existUser, ...newUserProfile };
+    const parsedAvatarURL = this.storageService.parseSignedURLToStorageURL(
+      newUserProfile.avatarUrl || existUser.avatarUrl,
+    );
+    const newUserObj: User = {
+      ...existUser,
+      ...newUserProfile,
+      avatarUrl: parsedAvatarURL,
+    };
     const updatedUser = await this.userRepository.save(newUserObj);
     return updatedUser;
   }
@@ -443,30 +472,29 @@ export class UserService {
     request: RequestWithUser,
     content: updatePasswordDto,
   ): Promise<User> {
-    try {
-      const exitUser = await this.userRepository.findOne({
-        where: { id: request.user.id },
-        select: ['id', 'password'],
-      });
-      const hashedPassword = await hash(content.newPassword, 10);
-      const isPasswordMatching = await compare(
-        content.currentPassword,
-        exitUser.password,
-      );
-      if (!isPasswordMatching) {
-        throw new BadRequestException('unmatch password');
-      }
-      exitUser.password = hashedPassword;
-      const user = await this.userRepository.save(exitUser);
-      return user;
-    } catch (e) {
-      throw new InternalServerErrorException('Failed to change password');
+    const existUser = await this.userRepository.findOne({
+      where: { id: request.user.id },
+      select: ['id', 'password'],
+    });
+    const hashedNewPassword = await hash(content.newPassword, 10);
+    const isPasswordMatching = await compare(
+      content.currentPassword,
+      existUser.password,
+    );
+    if (!isPasswordMatching) {
+      throw new BadRequestException('unmatch password');
     }
+    existUser.password = hashedNewPassword;
+    const user = await this.userRepository.save(existUser);
+    return user;
   }
 
   async deleteUser(user: User) {
     try {
-      await this.userRepository.save({ ...user, existence: null });
+      const existUser = await this.userRepository.findOne({
+        where: { id: user.id },
+      });
+      await this.userRepository.save({ ...existUser, existence: null });
       await this.userRepository.softDelete(user.id);
     } catch (err) {
       console.log(err);

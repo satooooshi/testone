@@ -5,11 +5,12 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  white-space: pre-wrap;
 }
 
 .auth_title {
   font-weight: bold;
-  font-size: 48px;
+  font-size: 32px;
   color: $dark_font_color;
   @media (max-width: 768px) {
     font-size: 32px;

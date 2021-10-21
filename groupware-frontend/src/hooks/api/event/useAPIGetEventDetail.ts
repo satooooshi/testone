@@ -5,6 +5,7 @@ import { getEventDetailURL } from 'src/utils/url/event.url';
 
 export type GetEventDetailResponse = Required<EventSchedule> & {
   isJoining: boolean;
+  isCanceled: boolean;
 };
 
 const getEventDetail = async (id: string) => {

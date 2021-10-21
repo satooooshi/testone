@@ -302,6 +302,19 @@ const Profile = () => {
               createNewUserStyles.input_wrapper,
               createNewUserStyles.edit_tags_button_wrapper,
             )}>
+            <div className={createNewUserStyles.selected_tags_wrapper}>
+              {userInfo?.tags
+                ?.filter((t) => t.type === TagType.TECH)
+                .map((t) => (
+                  <Button
+                    key={t.id}
+                    size="xs"
+                    colorScheme="teal"
+                    className={createNewUserStyles.selected_tag_item}>
+                    {t.name}
+                  </Button>
+                ))}
+            </div>
             <Button
               size="sm"
               colorScheme="teal"
@@ -311,24 +324,25 @@ const Profile = () => {
               技術を編集
             </Button>
           </FormControl>
-          <div className={createNewUserStyles.selected_tags_wrapper}>
-            {userInfo?.tags
-              ?.filter((t) => t.type === TagType.TECH)
-              .map((t) => (
-                <Button
-                  key={t.id}
-                  size="xs"
-                  colorScheme="teal"
-                  className={createNewUserStyles.selected_tag_item}>
-                  {t.name}
-                </Button>
-              ))}
-          </div>
           <FormControl
             className={clsx(
               createNewUserStyles.input_wrapper,
               createNewUserStyles.edit_tags_button_wrapper,
             )}>
+            <div className={createNewUserStyles.selected_tags_wrapper}>
+              {userInfo?.tags
+                ?.filter((t) => t.type === TagType.QUALIFICATION)
+                .map((t) => (
+                  <Button
+                    key={t.id}
+                    size="xs"
+                    colorScheme="blue"
+                    className={createNewUserStyles.selected_tag_item}
+                    height="28px">
+                    {t.name}
+                  </Button>
+                ))}
+            </div>
             <Button
               size="sm"
               colorScheme="blue"
@@ -336,25 +350,25 @@ const Profile = () => {
               資格を編集
             </Button>
           </FormControl>
-          <div className={createNewUserStyles.selected_tags_wrapper}>
-            {userInfo?.tags
-              ?.filter((t) => t.type === TagType.QUALIFICATION)
-              .map((t) => (
-                <Button
-                  key={t.id}
-                  size="xs"
-                  colorScheme="blue"
-                  className={createNewUserStyles.selected_tag_item}
-                  height="28px">
-                  {t.name}
-                </Button>
-              ))}
-          </div>
           <FormControl
             className={clsx(
               createNewUserStyles.input_wrapper,
               createNewUserStyles.edit_tags_button_wrapper,
             )}>
+            <div className={createNewUserStyles.selected_tags_wrapper}>
+              {userInfo?.tags
+                ?.filter((t) => t.type === TagType.CLUB)
+                .map((t) => (
+                  <Button
+                    key={t.id}
+                    size="xs"
+                    colorScheme="green"
+                    className={createNewUserStyles.selected_tag_item}
+                    height="28px">
+                    {t.name}
+                  </Button>
+                ))}
+            </div>
             <Button
               size="sm"
               colorScheme="green"
@@ -362,25 +376,25 @@ const Profile = () => {
               部活動を編集
             </Button>
           </FormControl>
-          <div className={createNewUserStyles.selected_tags_wrapper}>
-            {userInfo?.tags
-              ?.filter((t) => t.type === TagType.CLUB)
-              .map((t) => (
-                <Button
-                  key={t.id}
-                  size="xs"
-                  colorScheme="green"
-                  className={createNewUserStyles.selected_tag_item}
-                  height="28px">
-                  {t.name}
-                </Button>
-              ))}
-          </div>
           <FormControl
             className={clsx(
               createNewUserStyles.input_wrapper,
               createNewUserStyles.edit_tags_button_wrapper,
             )}>
+            <div className={createNewUserStyles.selected_tags_wrapper}>
+              {userInfo?.tags
+                ?.filter((t) => t.type === TagType.HOBBY)
+                .map((t) => (
+                  <Button
+                    key={t.id}
+                    size="xs"
+                    colorScheme="pink"
+                    className={createNewUserStyles.selected_tag_item}
+                    height="28px">
+                    {t.name}
+                  </Button>
+                ))}
+            </div>
             <Button
               size="sm"
               colorScheme="pink"
@@ -388,20 +402,6 @@ const Profile = () => {
               趣味を編集
             </Button>
           </FormControl>
-          <div className={createNewUserStyles.selected_tags_wrapper}>
-            {userInfo?.tags
-              ?.filter((t) => t.type === TagType.HOBBY)
-              .map((t) => (
-                <Button
-                  key={t.id}
-                  size="xs"
-                  colorScheme="pink"
-                  className={createNewUserStyles.selected_tag_item}
-                  height="28px">
-                  {t.name}
-                </Button>
-              ))}
-          </div>
         </div>
       </div>
       <Button

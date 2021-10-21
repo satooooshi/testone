@@ -26,6 +26,8 @@
 }
 
 .pagination_wrap_layout {
+  display: flex;
+  justify-content: center;
   position: absolute;
   bottom: 16px;
   right: auto;

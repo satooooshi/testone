@@ -15,6 +15,7 @@ type HeaderTab =
   | 'qaForm'
   | 'eventDetail'
   | 'wikiDetail'
+  | 'tagEdit'
   | 'wikiList';
 
 type HeaderTabBehavior = {
@@ -159,6 +160,11 @@ const headerTab = (headerTabBehavior: HeaderTabBehavior): Tab[] => {
           name: 'プロフィール編集',
           href: '/account/profile',
         },
+        {
+          type: 'link',
+          name: 'パスワード更新',
+          href: '/account/update-password',
+        },
       ];
     case 'home':
       return [
@@ -207,6 +213,19 @@ const headerTab = (headerTabBehavior: HeaderTabBehavior): Tab[] => {
           type: 'link',
           name: 'CSV出力',
           href: '/admin/csv',
+        },
+      ];
+    case 'tagEdit':
+      return [
+        {
+          type: 'link',
+          name: 'タグ管理',
+          href: '/admin/tag',
+        },
+        {
+          type: 'link',
+          name: 'タグ管理(ユーザー)',
+          href: '/admin/tag/user',
         },
       ];
     case 'mention':

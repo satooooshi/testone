@@ -3,6 +3,7 @@ import { AppModule } from './app.module';
 import * as cookieParser from 'cookie-parser';
 import * as fs from 'fs';
 import { ValidationPipe } from '@nestjs/common';
+import { json, urlencoded } from 'express';
 
 const cloud_storage_settings = {
   type: process.env.CLOUD_STORAGE_TYPE,
@@ -32,6 +33,10 @@ async function bootstrap() {
       'https://groupware-frontend-git-develop-valleyin-dev.vercel.app',
       'https://groupware-frontend-theta.vercel.app',
       'https://groupware-seven.vercel.app',
+      'https://groupware-frontend-sgzkfl3uyq-an.a.run.app',
+      'https://frontend-bold-groupware-zznmsfdywq-an.a.run.app',
+      'https://portal.bold.ne.jp',
+      '*',
       process.env.CLIENT_DOMAIN,
     ],
   });
@@ -41,6 +46,8 @@ async function bootstrap() {
       console.log(err);
     }
   });
+  app.use(json({ limit: '50mb' }));
+  app.use(urlencoded({ extended: true, limit: '50mb' }));
 
   await app.listen(process.env.PORT);
 }

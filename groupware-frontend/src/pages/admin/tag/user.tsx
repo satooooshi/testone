@@ -1,9 +1,8 @@
 import { Tab } from 'src/types/header/tab/types';
 import LayoutWithTab from '@/components/layout/LayoutWithTab';
 import { SidebarScreenName } from '@/components/layout/Sidebar';
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Tag, TagType, UserRole, UserTag } from 'src/types';
-import { useRouter } from 'next/router';
 import Head from 'next/head';
 import { useAuthenticate } from 'src/contexts/useAuthenticate';
 import { useHeaderTab } from '@/hooks/headerTab/useHeaderTab';
@@ -15,7 +14,6 @@ import TagListBox from '@/components/admin/TagListCard';
 import { useToast } from '@chakra-ui/react';
 
 const UserTagAdmin: React.FC = () => {
-  const router = useRouter();
   const { user } = useAuthenticate();
   const { data: tags, refetch } = useAPIGetUserTag();
   const toast = useToast();
@@ -31,12 +29,11 @@ const UserTagAdmin: React.FC = () => {
   });
   const modifyStrToFlat = (targetString: string) => {
     const deleteSymbolFromStr = (str: string) => {
-      return str.replace(/[^a-zA-Z ]/g, '');
+      return str.replace(/[^ぁ-んァ-ンーa-zA-Z0-9一-龠０-９\-\r]/g, '');
     };
     const hiraToKana = (str: string) => {
-      return str.replace(/[\u3041-\u3096]/g, (match) => {
-        const chr = match.charCodeAt(0) + 0x60;
-        return String.fromCharCode(chr);
+      return str.replace(/[ぁ-ん]/g, (s) => {
+        return String.fromCharCode(s.charCodeAt(0) - 0x60);
       });
     };
     const escaped = deleteSymbolFromStr(targetString);
@@ -45,7 +42,9 @@ const UserTagAdmin: React.FC = () => {
     return changedToKana;
   };
   const tagNames: string[] = tags?.map((t) => modifyStrToFlat(t.name)) || [''];
-  const tabs: Tab[] = useHeaderTab({ headerTabType: 'admin' });
+  const tabs: Tab[] = useHeaderTab({
+    headerTabType: user?.role === UserRole.ADMIN ? 'admin' : 'tagEdit',
+  });
 
   const handleCreate = (t: Partial<UserTag | Tag>) => {
     if (!t.name) {

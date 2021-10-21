@@ -6,7 +6,6 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Parser } from 'json2csv';
 import * as JSZip from 'jszip';
-import { DateTime } from 'luxon';
 import { EventSchedule, EventType } from 'src/entities/event.entity';
 import { EventComment } from 'src/entities/eventComment.entity';
 import { EventFile } from 'src/entities/eventFile.entity';
@@ -15,7 +14,7 @@ import { SubmissionFile } from 'src/entities/submissionFiles.entity';
 import { User } from 'src/entities/user.entity';
 import { UserJoiningEvent } from 'src/entities/userJoiningEvent.entity';
 import { dateTimeFormatterFromJSDDate } from 'src/utils/dateTimeFormatter';
-import { In, Not, Repository } from 'typeorm';
+import { Not, Repository } from 'typeorm';
 import { StorageService } from '../storage/storage.service';
 import {
   SearchQueryToGetEvents,
@@ -236,12 +235,13 @@ export class EventScheduleService {
     if (page) {
       offset = (Number(page) - 1) * limit;
     }
-    const tagIDs = tag.split('+');
-    const searchQuery = this.eventRepository
+    const tagIDs = tag.split(' ');
+    const [eventsWithRelation, count] = await this.eventRepository
       .createQueryBuilder('events')
       .select()
       .leftJoinAndSelect('events.userJoiningEvent', 'userJoiningEvent')
       .leftJoinAndSelect('userJoiningEvent.user', 'user')
+      .leftJoinAndSelect('userJoiningEvent.event', 'event')
       .leftJoinAndSelect('events.tags', 'tag')
       .where(
         word && word.length !== 1
@@ -265,7 +265,7 @@ export class EventScheduleService {
           ? 'events.start_at < now() AND events.end_at < now()'
           : 'events.start_at < now() AND events.end_at > now()',
       )
-      .andWhere(query.participant_id ? 'user = :userID' : '1=1', {
+      .andWhere(query.participant_id ? 'user.id = :userID' : '1=1', {
         userID: query.participant_id,
       })
       .andWhere(query.host_user_id ? 'host_user = :hostUserID' : '1=1', {
@@ -273,25 +273,29 @@ export class EventScheduleService {
       })
       .andWhere(tag ? 'tag.id IN (:...tagIDs)' : '1=1', {
         tagIDs,
-      });
-    const events = await searchQuery.getMany();
-    const ids = events.map((e) => e.id);
-    const eventsWithRelation = await this.eventRepository.find({
-      where: { id: In(ids) },
-      relations: ['userJoiningEvent', 'userJoiningEvent.user', 'tags'],
-      order: { createdAt: 'DESC' },
-      take: limit,
-      skip: offset,
-      withDeleted: true,
-    });
-
-    const count = await searchQuery.getCount();
+      })
+      .skip(offset)
+      .take(limit)
+      .orderBy('events.startAt', 'ASC')
+      .getManyAndCount();
     const pageCount =
       count % limit === 0 ? count / limit : Math.floor(count / limit) + 1;
-    return { pageCount, events: eventsWithRelation };
+    const urlParsedEvents = await this.generateSignedStorageURLsFromEventArr(
+      eventsWithRelation,
+    );
+
+    return { pageCount, events: urlParsedEvents };
   }
 
-  public async getEventAtSpecificTime(query: SearchQueryToGetEvents) {
+  public async createFromArr(
+    events: EventSchedule[],
+  ): Promise<EventSchedule[]> {
+    return await this.eventRepository.save(events);
+  }
+
+  public async getEventAtSpecificTime(
+    query: SearchQueryToGetEvents,
+  ): Promise<SearchResultToGetEvents> {
     const fromDate = new Date(query.from);
     const toDate = new Date(query.to);
     const events = await this.eventRepository
@@ -299,6 +303,7 @@ export class EventScheduleService {
       .select()
       .leftJoinAndSelect('events.userJoiningEvent', 'userJoiningEvent')
       .leftJoinAndSelect('userJoiningEvent.user', 'user')
+      .leftJoinAndSelect('userJoiningEvent.event', 'event')
       .leftJoinAndSelect('events.tags', 'tag')
       .leftJoin('events.hostUsers', 'host_user')
       .where(
@@ -327,7 +332,43 @@ export class EventScheduleService {
         hostUserID: query.host_user_id,
       })
       .getMany();
-    return { pageCount: 0, events };
+    const urlParsedEvents = await this.generateSignedStorageURLsFromEventArr(
+      events,
+    );
+    return { pageCount: 0, events: urlParsedEvents };
+  }
+
+  public async generateSignedStorageURLsFromEventObj(
+    eventSchedule: EventSchedule,
+  ): Promise<EventSchedule> {
+    if (eventSchedule.imageURL) {
+      eventSchedule.imageURL =
+        await this.storageService.parseStorageURLToSignedURL(
+          eventSchedule.imageURL,
+        );
+    }
+    if (eventSchedule.files && eventSchedule.files.length) {
+      const parsedFiles: EventFile[] = [];
+      for (const f of eventSchedule.files) {
+        const signedURL = await this.storageService.parseStorageURLToSignedURL(
+          f.url,
+        );
+        parsedFiles.push({ ...f, url: signedURL });
+      }
+      eventSchedule.files = parsedFiles;
+    }
+    return eventSchedule;
+  }
+
+  public async generateSignedStorageURLsFromEventArr(
+    events: EventSchedule[],
+  ): Promise<EventSchedule[]> {
+    const parsedEvents: EventSchedule[] = [];
+    for (const e of events) {
+      const parsed = await this.generateSignedStorageURLsFromEventObj(e);
+      parsedEvents.push(parsed);
+    }
+    return parsedEvents;
   }
 
   public async getEventDetail(
@@ -356,7 +397,10 @@ export class EventScheduleService {
       )
       .where('events.id = :id', { id })
       .getOne();
-    return existEvent;
+    const urlParsedEvents = await this.generateSignedStorageURLsFromEventObj(
+      existEvent,
+    );
+    return urlParsedEvents;
   }
 
   public async saveUserJoiningEvent(userJoiningEvent: UserJoiningEvent) {
@@ -366,6 +410,12 @@ export class EventScheduleService {
   public async saveSubmission(
     submissionFiles: Partial<SubmissionFile>[],
   ): Promise<SubmissionFile[]> {
+    if (submissionFiles && submissionFiles.length) {
+      submissionFiles = submissionFiles.map((f) => ({
+        ...f,
+        url: this.storageService.parseSignedURLToStorageURL(f.url),
+      }));
+    }
     const submittedFiles = await this.submissionFileRepository.save(
       submissionFiles,
     );
@@ -409,6 +459,10 @@ export class EventScheduleService {
     eventSchedule: Partial<EventSchedule>,
   ): Promise<EventSchedule> {
     if (eventSchedule.files && eventSchedule.files.length) {
+      eventSchedule.files = eventSchedule.files.map((f) => ({
+        ...f,
+        url: this.storageService.parseSignedURLToStorageURL(f.url),
+      }));
       eventSchedule.files = await this.eventtFileRepository.save(
         eventSchedule.files,
       );
@@ -418,6 +472,9 @@ export class EventScheduleService {
         eventSchedule.videos,
       );
     }
+    eventSchedule.imageURL = this.storageService.parseSignedURLToStorageURL(
+      eventSchedule.imageURL,
+    );
     const savedEvent = await this.eventRepository.save(eventSchedule);
     return savedEvent;
   }

@@ -60,9 +60,9 @@ export class StorageService {
     let parseText = text;
     const bucketName = this.configService.get('CLOUD_STORAGE_BUCKET');
     const url = 'https://storage.googleapis.com/' + bucketName + '/';
-    const regex = new RegExp(`${url}\\S+`, 'g');
+    const regex = new RegExp(`${url}[^'")\\s]+`, 'g');
     const storageURLs = text.match(regex);
-    if (!storageURLs.length) {
+    if (!storageURLs || !storageURLs.length) {
       return text;
     }
     const options: any = {
@@ -72,15 +72,49 @@ export class StorageService {
     };
 
     for await (const unsignedURL of storageURLs) {
-      const fileName = unsignedURL.replace(url, '');
+      let fileName = unsignedURL.replace(url, '');
+      const isQueryParamExists = fileName.includes('?');
+      if (isQueryParamExists) {
+        fileName = fileName.substr(0, fileName.indexOf('?'));
+      }
       const signedURL = await this.storage
         .bucket(bucketName)
         .file(fileName)
         .getSignedUrl(options);
       const replaceRegWithSpace = new RegExp(`${unsignedURL}\\s`, 'g');
+      const replaceRegWithQuote = new RegExp(`${unsignedURL}"`, 'g');
+      const replaceRegWithBracketEnd = new RegExp(`${unsignedURL}\\)`, 'g');
       const replaceRegWithEnd = new RegExp(`${unsignedURL}$`, 'g');
       parseText = parseText.replace(replaceRegWithSpace, signedURL[0] + ' ');
+      parseText = parseText.replace(replaceRegWithQuote, signedURL[0] + '"');
+      parseText = parseText.replace(
+        replaceRegWithBracketEnd,
+        signedURL[0] + ')',
+      );
       parseText = parseText.replace(replaceRegWithEnd, signedURL[0]);
+    }
+    return parseText;
+  }
+
+  public parseSignedURLToStorageURL(text: string): string {
+    let parseText = text;
+    const bucketName = this.configService.get('CLOUD_STORAGE_BUCKET');
+    const url = 'https://storage.googleapis.com/' + bucketName + '/';
+    const regex = new RegExp(`${url}[^'")\\s]+`, 'g');
+    const urls = text.match(regex);
+    if (!urls || !urls.length) {
+      return text;
+    }
+    for (const matchedSignedURL of urls) {
+      let unsignedURL = matchedSignedURL;
+      const isQueryParamExists = unsignedURL.includes('?');
+      if (isQueryParamExists) {
+        unsignedURL = unsignedURL.substr(0, unsignedURL.indexOf('?'));
+      }
+      if (matchedSignedURL.slice(-1) === '"') {
+        unsignedURL += '"';
+      }
+      parseText = parseText.replace(matchedSignedURL, unsignedURL);
     }
     return parseText;
   }

@@ -5,6 +5,7 @@ import { Wiki, WikiType } from 'src/types';
 import Link from 'next/link';
 import { Avatar, Button } from '@chakra-ui/react';
 import boldMascot from '@/public/bold-mascot.png';
+import { tagColorFactory } from 'src/utils/factory/tagColorFactory';
 
 type WikiCardProps = {
   wiki: Wiki;
@@ -15,11 +16,11 @@ const WikiCard: React.FC<WikiCardProps> = ({ wiki }) => {
   const tagButtonColor = useMemo(() => {
     switch (wiki.type) {
       case WikiType.QA:
-        return '#00b5d8';
+        return 'cyan';
       case WikiType.KNOWLEDGE:
-        return '#ecc94b';
+        return 'yellow';
       case WikiType.RULES:
-        return '#38a169';
+        return 'green';
     }
   }, [wiki.type]);
 
@@ -59,7 +60,7 @@ const WikiCard: React.FC<WikiCardProps> = ({ wiki }) => {
         <div className={qaCardStyles.qa_card__below}>
           <div className={qaCardStyles.qa_card__tags}>
             <a className={qaCardStyles.qa_card_tag__item}>
-              <Button background={tagButtonColor} color="white" size="xs">
+              <Button colorScheme={tagButtonColor} color="white" size="xs">
                 {wiki.type === WikiType.QA
                   ? 'Q&A'
                   : wiki.type === WikiType.RULES
@@ -71,10 +72,7 @@ const WikiCard: React.FC<WikiCardProps> = ({ wiki }) => {
               ? tags.map((t) => (
                   <Link href={`/wiki/list?tag=${t.id}`} key={t.id}>
                     <a className={qaCardStyles.qa_card_tag__item} key={t.id}>
-                      <Button
-                        background={tagButtonColor}
-                        color="white"
-                        size="xs">
+                      <Button colorScheme={tagColorFactory(t.type)} size="xs">
                         {t.name}
                       </Button>
                     </a>

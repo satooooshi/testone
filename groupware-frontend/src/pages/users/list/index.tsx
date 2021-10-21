@@ -123,6 +123,8 @@ const UserList = () => {
                   <FormLabel>ソート</FormLabel>
                   <Select
                     bg="white"
+                    defaultValue={query.sort}
+                    value={query.sort}
                     onChange={(e) => {
                       queryRefresh({
                         sort:
@@ -144,6 +146,8 @@ const UserList = () => {
                   <FormLabel>期間</FormLabel>
                   <Select
                     bg="white"
+                    defaultValue={query.duration}
+                    value={query.duration}
                     onChange={(e) => {
                       queryRefresh({
                         duration:
@@ -176,29 +180,29 @@ const UserList = () => {
                 </div>
               ))}
             </div>
-            {users.pageCount ? (
-              <div className={paginationStyles.pagination_wrap_layout}>
-                <ReactPaginate
-                  pageCount={users.pageCount}
-                  onPageChange={({ selected }) => {
-                    queryRefresh({ page: (selected + 1).toString() });
-                  }}
-                  initialPage={query.page ? Number(query.page) - 1 : 0}
-                  forcePage={query.page ? Number(query.page) - 1 : 0}
-                  disableInitialCallback={true}
-                  previousLabel={'前へ'}
-                  nextLabel={'次へ'}
-                  marginPagesDisplayed={2}
-                  pageRangeDisplayed={5}
-                  containerClassName={paginationStyles.pagination}
-                  activeClassName={paginationStyles.active}
-                  disabledClassName={paginationStyles.button__disabled}
-                />
-              </div>
-            ) : null}
           </>
         ) : null}
       </div>
+      {users?.pageCount ? (
+        <div className={paginationStyles.pagination_wrap_layout}>
+          <ReactPaginate
+            pageCount={users.pageCount}
+            onPageChange={({ selected }) => {
+              queryRefresh({ page: (selected + 1).toString() });
+            }}
+            initialPage={query.page ? Number(query.page) - 1 : 0}
+            forcePage={query.page ? Number(query.page) - 1 : 0}
+            disableInitialCallback={true}
+            previousLabel={'前へ'}
+            nextLabel={'次へ'}
+            marginPagesDisplayed={2}
+            pageRangeDisplayed={5}
+            containerClassName={paginationStyles.pagination}
+            activeClassName={paginationStyles.active}
+            disabledClassName={paginationStyles.button__disabled}
+          />
+        </div>
+      ) : null}
     </LayoutWithTab>
   );
 };
