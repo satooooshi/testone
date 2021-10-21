@@ -341,13 +341,13 @@ export class EventScheduleService {
   public async generateSignedStorageURLsFromEventObj(
     eventSchedule: EventSchedule,
   ): Promise<EventSchedule> {
-    if (eventSchedule.imageURL) {
+    if (eventSchedule?.imageURL) {
       eventSchedule.imageURL =
         await this.storageService.parseStorageURLToSignedURL(
           eventSchedule.imageURL,
         );
     }
-    if (eventSchedule.files && eventSchedule.files.length) {
+    if (eventSchedule?.files && eventSchedule.files.length) {
       const parsedFiles: EventFile[] = [];
       for (const f of eventSchedule.files) {
         const signedURL = await this.storageService.parseStorageURLToSignedURL(
