@@ -245,7 +245,7 @@ export class EventScheduleService {
       .leftJoinAndSelect('events.tags', 'tag')
       .where(
         word && word.length !== 1
-          ? 'MATCH(title, description) AGAINST (:word IN NATURAL LANGUAGE MODE)'
+          ? 'MATCH(events.title, events.description) AGAINST (:word IN NATURAL LANGUAGE MODE)'
           : '1=1',
         { word },
       )
@@ -254,7 +254,7 @@ export class EventScheduleService {
       })
       .andWhere(
         word.length === 1
-          ? 'CONCAT(title, description) LIKE :queryWord'
+          ? 'CONCAT(events.title, events.description) LIKE :queryWord'
           : '1=1',
         { queryWord: `%${word}%` },
       )
