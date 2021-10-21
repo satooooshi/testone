@@ -391,7 +391,7 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
                 key={u.id}
                 className={createEventModalStyle.tag__item}
                 size="xs"
-                colorScheme="teal">
+                colorScheme="purple">
                 {u.lastName + u.firstName}
               </Button>
             ))}
@@ -417,10 +417,12 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
         </div>
         <div className={createEventModalStyle.right}>
           {/* chat group is able to be created only on creation */}
-          {!newEvent.id && (
+          {!newEvent.id && newEvent.type !== EventType.SUBMISSION_ETC ? (
             <div className={createEventModalStyle.type_select_wrapper}>
               <FormControl>
-                <FormLabel>チャットルームの作成</FormLabel>
+                <FormLabel>
+                  チャットルームの作成(作成後に変更することはできません)
+                </FormLabel>
                 <RadioGroup
                   defaultValue={newEvent.chatNeeded ? 'needed' : 'unneeded'}>
                   <Stack spacing={5} direction="row">
@@ -446,19 +448,24 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
                 </RadioGroup>
               </FormControl>
             </div>
-          )}
+          ) : null}
           <div className={createEventModalStyle.type_select_wrapper}>
             <FormControl>
               <FormLabel>タイプ</FormLabel>
               <Select
                 colorScheme="teal"
                 bg="white"
-                onChange={(e) =>
+                onChange={(e) => {
+                  const type = e.target.value as EventType;
                   setNewEvent((prev) => ({
                     ...prev,
-                    type: e.target.value as EventType,
-                  }))
-                }
+                    type,
+                    chatNeeded:
+                      type === EventType.SUBMISSION_ETC
+                        ? false
+                        : prev.chatNeeded,
+                  }));
+                }}
                 defaultValue={newEvent.type}>
                 {isCreatableAllEvent && (
                   <option value={EventType.IMPRESSIVE_UNIVERSITY}>

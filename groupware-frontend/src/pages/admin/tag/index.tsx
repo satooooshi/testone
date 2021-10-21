@@ -45,7 +45,9 @@ const TagAdmin: React.FC = () => {
       refetch();
     },
   });
-  const tabs: Tab[] = useHeaderTab({ headerTabType: 'admin' });
+  const tabs: Tab[] = useHeaderTab({
+    headerTabType: user?.role === UserRole.ADMIN ? 'admin' : 'tagEdit',
+  });
 
   const handleCreate = (t: Partial<UserTag | Tag>) => {
     if (!t.name) {
@@ -74,7 +76,12 @@ const TagAdmin: React.FC = () => {
 
   return (
     <LayoutWithTab
-      sidebar={{ activeScreenName: SidebarScreenName.ADMIN }}
+      sidebar={{
+        activeScreenName:
+          user?.role === UserRole.ADMIN
+            ? SidebarScreenName.ADMIN
+            : SidebarScreenName.TAGADMIN,
+      }}
       header={{
         title: 'Admin',
         activeTabName: 'タグ管理',

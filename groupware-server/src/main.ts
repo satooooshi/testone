@@ -3,6 +3,7 @@ import { AppModule } from './app.module';
 import * as cookieParser from 'cookie-parser';
 import * as fs from 'fs';
 import { ValidationPipe } from '@nestjs/common';
+import { json, urlencoded } from 'express';
 
 const cloud_storage_settings = {
   type: process.env.CLOUD_STORAGE_TYPE,
@@ -45,6 +46,8 @@ async function bootstrap() {
       console.log(err);
     }
   });
+  app.use(json({ limit: '50mb' }));
+  app.use(urlencoded({ extended: true, limit: '50mb' }));
 
   await app.listen(process.env.PORT);
 }

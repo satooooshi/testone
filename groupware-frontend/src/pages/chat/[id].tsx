@@ -1,22 +1,11 @@
 import { SidebarScreenName } from '@/components/layout/Sidebar';
 import chatStyles from '@/styles/layouts/Chat.module.scss';
 import { IoSend } from 'react-icons/io5';
-import {
-  useCallback,
-  useEffect,
-  useMemo,
-  useReducer,
-  useRef,
-  useState,
-} from 'react';
+import { useChatReducer } from '@/hooks/chat/useChatReducer';
+import { useModalReducer } from '@/hooks/chat/useModalReducer';
+import { useCallback, useEffect, useMemo, useReducer, useRef } from 'react';
 import { useAPIGetUsers } from '@/hooks/api/user/useAPIGetUsers';
-import {
-  ChatGroup,
-  ChatMessage,
-  ChatMessageType,
-  LastReadChatTime,
-  User,
-} from 'src/types';
+import { ChatGroup, ChatMessageType, User } from 'src/types';
 import { useAPIGetChatGroupList } from '@/hooks/api/chat/useAPIGetChatGroupList';
 import { useAPIGetMessages } from '@/hooks/api/chat/useAPIGetMessages';
 import { useAPISendChatMessage } from '@/hooks/api/chat/useAPISendChatMessage';
@@ -72,11 +61,11 @@ type MentionAction =
     }
   | {
       type: 'allMentionUserData';
-      value: MentionData[];
+      value?: User[];
     }
   | {
       type: 'mentionedUserData';
-      value: MentionData[];
+      value: MentionData;
     };
 
 const mentionReducer = (
@@ -100,16 +89,30 @@ const mentionReducer = (
       };
     }
     case 'allMentionUserData': {
-      return {
-        ...state,
-        allMentionUserData: action.value,
-      };
+      return action.value?.length
+        ? {
+            ...state,
+            allMentionUserData: action.value.map((u) => ({
+              id: u.id,
+              name: u.lastName + ' ' + u.firstName,
+              avatar: u.avatarUrl,
+            })),
+          }
+        : {
+            ...state,
+          };
     }
     case 'mentionedUserData': {
-      return {
-        ...state,
-        mentionedUserData: action.value,
-      };
+      return !state.mentionedUserData.filter(
+        (prev) => prev.id === action.value.id,
+      ).length
+        ? {
+            ...state,
+            mentionedUserData: [...state.mentionedUserData, action.value],
+          }
+        : {
+            ...state,
+          };
     }
   }
 };
@@ -117,7 +120,6 @@ const mentionReducer = (
 const ChatDetail = () => {
   const router = useRouter();
   const { id } = router.query as { id: string };
-  const [page, setPage] = useState(1);
   const [{ popup, suggestions, mentionedUserData }, dispatchMention] =
     useReducer(mentionReducer, {
       popup: false,
@@ -125,20 +127,22 @@ const ChatDetail = () => {
       allMentionUserData: [],
       mentionedUserData: [],
     });
-  const [editChatGroupModalVisible, setEditChatGroupModalVisible] =
-    useState(false);
+  const [
+    { page, messages, lastReadChatTime, newChatMessage, newGroup, editorState },
+    dispatchChat,
+  ] = useChatReducer();
+  const [
+    {
+      editChatGroupModalVisible,
+      createGroupWindow,
+      selectChatGroupWindow,
+      editMembersModalVisible,
+    },
+    dispatchModal,
+  ] = useModalReducer();
   const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const { data: chatGroups, refetch } = useAPIGetChatGroupList();
   const { data: users } = useAPIGetUsers();
-  const [lastReadChatTime, setLastReadChatTime] = useState<LastReadChatTime[]>(
-    [],
-  );
-
-  const [newChatMessage, setNewChatMessage] = useState<Partial<ChatMessage>>({
-    content: '',
-    type: ChatMessageType.TEXT,
-  });
   const { data: lastestLastReadChatTime } = useAPIGetLastReadChatTime(
     newChatMessage.chatGroup ? newChatMessage.chatGroup.id : 0,
     { refetchInterval: 1000 },
@@ -155,46 +159,43 @@ const ChatDetail = () => {
       },
       { refetchInterval: 1000 },
     );
-  const [createGroupWindow, setCreateGroupWindow] = useState(false);
-  const [selectChatGroupWindow, setSelectChatGroupWindow] = useState(false);
-  const [editMembersModalVisible, setEditMembersModalVisible] = useState(false);
-  const [newGroup, setNewGroup] = useState<Partial<ChatGroup>>({
-    name: '',
-    members: [],
-  });
   const editorRef = useRef<Editor>(null);
   const messageWrapperDivRef = useRef<HTMLDivElement | null>(null);
-  const [editorState, setEditorState] = useState(() =>
-    EditorState.createEmpty(),
-  );
   const { mutate: createGroup } = useAPISaveChatGroup({
     onSuccess: () => {
-      setCreateGroupWindow(false);
-      setNewGroup({ name: '', members: [] });
+      dispatchModal({ type: 'createGroupWindow', value: false });
+      dispatchChat({ type: 'newGroup', value: { ...newGroup, members: [] } });
       refetch();
     },
   });
 
   const { mutate: saveGroup } = useAPISaveChatGroup({
     onSuccess: (newInfo) => {
-      setEditChatGroupModalVisible(false);
-      setNewChatMessage((m) => ({ ...m, chatGroup: newInfo }));
+      dispatchModal({ type: 'editChatGroupModalVisible', value: false });
+      dispatchChat({
+        type: 'newChatMessage',
+        value: { ...newChatMessage, chatGroup: newInfo },
+      });
       refetch();
     },
   });
 
   const { mutate: sendChatMessage } = useAPISendChatMessage({
     onSuccess: (data) => {
-      setNewChatMessage((m) => ({ ...m, content: '' }));
+      dispatchChat({
+        type: 'newChatMessage',
+        value: { ...newChatMessage, content: '' },
+      });
       if (!isLoadingLatestMsg) {
-        setMessages((m) => {
-          if (m.length && m[m.length - 1].id !== data.id) {
-            m.unshift(data);
-          }
-          return m;
-        });
+        if (messages.length && messages[messages.length - 1].id !== data.id) {
+          messages.unshift(data);
+        }
+        dispatchChat({ type: 'messages', value: messages });
       }
-      setEditorState(() => EditorState.createEmpty());
+      dispatchChat({
+        type: 'editorState',
+        value: EditorState.createEmpty(),
+      });
       messageWrapperDivRef.current &&
         messageWrapperDivRef.current.scrollIntoView();
     },
@@ -241,95 +242,54 @@ const ChatDetail = () => {
         messageWrapperDivRef.current.scrollTo({ top: 0 });
     },
   });
-
-  useEffect(() => {
+  const isExist = useMemo(() => {
     if (id) {
-      const isExist = chatGroups?.filter((g) => g.id.toString() === id);
-      setNewChatMessage((m) => {
-        if (isExist?.length) {
-          return { ...m, chatGroup: isExist[0] };
-        }
-        return m;
-      });
-
-      if (isExist?.length) {
-        saveLastReadChatTime(isExist[0].id);
-      }
+      return chatGroups?.filter((g) => g.id.toString() === id);
     }
-  }, [chatGroups, id, saveLastReadChatTime]);
+  }, [id, chatGroups]);
 
   useEffect(() => {
-    if (lastestLastReadChatTime) {
-      setLastReadChatTime(lastestLastReadChatTime);
+    if (isExist?.length) {
+      dispatchChat({
+        type: 'newChatMessage',
+        value: { ...newChatMessage, chatGroup: isExist[0] },
+      });
+      saveLastReadChatTime(isExist[0].id);
     }
-  }, [id, lastestLastReadChatTime]);
+  }, [isExist]);
 
   useEffect(() => {
-    if (
-      newChatMessage &&
-      newChatMessage.chatGroup &&
-      newChatMessage.chatGroup.members &&
-      newChatMessage.chatGroup.members.length
-    ) {
-      const suggestionDataItem: MentionData[] =
-        newChatMessage.chatGroup.members.map((u) => ({
-          id: u.id,
-          name: u.lastName + ' ' + u.firstName,
-          avatar: u.avatarUrl,
-        }));
-      dispatchMention({
-        type: 'allMentionUserData',
-        value: suggestionDataItem,
-      });
-    }
-  }, [newChatMessage]);
+    dispatchChat({
+      type: 'lastReadChatTime',
+      value: lastestLastReadChatTime,
+    });
+  }, [lastestLastReadChatTime]);
+
+  useEffect(() => {
+    dispatchMention({
+      type: 'allMentionUserData',
+      value: newChatMessage?.chatGroup?.members,
+    });
+  }, [newChatMessage?.chatGroup?.members]);
 
   //append new message to array
   useEffect(() => {
-    if (latestMessage && latestMessage.length) {
-      setMessages((m) => {
-        if (m.length && m[0].id && latestMessage[0].id) {
-          const ascSorted = latestMessage.concat().reverse();
-          for (const newMessage of ascSorted) {
-            if (
-              new Date(m[0].createdAt) < new Date(newMessage.createdAt) &&
-              m[0].id !== Number(newMessage.id)
-            ) {
-              m.unshift(newMessage);
-            }
-          }
-          return m;
-        }
-        return latestMessage;
-      });
-    }
+    dispatchChat({ type: 'latestMessages', value: latestMessage });
   }, [latestMessage]);
 
   useEffect(() => {
-    if (fetchedMessage) {
-      setMessages((m) => {
-        if (m.length) {
-          for (const oldMessage of fetchedMessage) {
-            if (
-              new Date(m[m.length - 1].createdAt) >
-              new Date(oldMessage.createdAt)
-            ) {
-              m.push(oldMessage);
-            }
-          }
-          return m;
-        }
-        return fetchedMessage;
-      });
-    }
+    dispatchChat({ type: 'fetchedMessages', value: fetchedMessage });
   }, [fetchedMessage]);
 
   const onChange = (newState: EditorState) => {
-    setEditorState(newState);
+    dispatchChat({ type: 'editorState', value: newState });
     const content = newState.getCurrentContent();
     const rawObject = convertToRaw(content);
     const markdownString = draftToMarkdown(rawObject);
-    setNewChatMessage((m) => ({ ...m, content: markdownString }));
+    dispatchChat({
+      type: 'newChatMessage',
+      value: { ...newChatMessage, content: markdownString },
+    });
   };
 
   const onOpenChange = useCallback((_open: boolean) => {
@@ -346,16 +306,22 @@ const ChatDetail = () => {
   const toggleUserIDs = (user: User) => {
     const isExist = newGroup.members?.filter((u) => u.id === user.id);
     if (isExist && isExist.length) {
-      setNewGroup((g) => ({
-        ...g,
-        members: g.members?.filter((u) => u.id !== user.id),
-      }));
+      dispatchChat({
+        type: 'newGroup',
+        value: {
+          ...newGroup,
+          members: newGroup.members?.filter((u) => u.id !== user.id),
+        },
+      });
       return;
     }
-    setNewGroup((g) => ({
-      ...g,
-      members: g.members ? [...g.members, user] : [user],
-    }));
+    dispatchChat({
+      type: 'newGroup',
+      value: {
+        ...newGroup,
+        members: newGroup.members ? [...newGroup.members, user] : [user],
+      },
+    });
   };
 
   const nameOfEmptyNameGroup = (members?: User[]): string => {
@@ -370,11 +336,11 @@ const ChatDetail = () => {
   };
 
   const toggleChatGroups = (selectGroup: ChatGroup) => {
-    setNewChatMessage({
-      ...newChatMessage,
-      chatGroup: selectGroup,
+    dispatchChat({
+      type: 'newChatMessage',
+      value: { ...newChatMessage, chatGroup: selectGroup },
     });
-    setSelectChatGroupWindow(false);
+    dispatchModal({ type: 'selectChatGroupWindow', value: false });
   };
 
   const onSend = () => {
@@ -391,15 +357,13 @@ const ChatDetail = () => {
     }
   };
 
-  const onAddMention = (m: MentionData) => {
+  const onAddMention = useCallback((m: MentionData) => {
     // get the mention object selected
-    if (!mentionedUserData.filter((prev) => prev.id === m.id).length) {
-      dispatchMention({
-        type: 'mentionedUserData',
-        value: [...mentionedUserData, m],
-      });
-    }
-  };
+    dispatchMention({
+      type: 'mentionedUserData',
+      value: m,
+    });
+  }, []);
 
   const onScrollTopOnChat = (e: any) => {
     if (
@@ -407,7 +371,7 @@ const ChatDetail = () => {
       (e.target.scrollHeight * 2) / 3
     ) {
       if (fetchedMessage?.length) {
-        setPage((p) => p + 1);
+        dispatchChat({ type: 'page', value: page + 1 });
       }
     }
   };
@@ -415,11 +379,17 @@ const ChatDetail = () => {
   const handleMenuSelected = (e: any) => {
     const value = e.value as MenuValue;
     if (value === 'editMembers') {
-      setEditMembersModalVisible(true);
+      dispatchModal({
+        type: 'editMembersModalVisible',
+        value: true,
+      });
       return;
     }
     if (value === 'editGroup') {
-      setEditChatGroupModalVisible(true);
+      dispatchModal({
+        type: 'editChatGroupModalVisible',
+        value: true,
+      });
       return;
     }
     if (value === 'leaveRoom') {
@@ -437,7 +407,8 @@ const ChatDetail = () => {
         title: 'Chat',
         tabs: tabs,
         rightButtonName: 'ルームを作成',
-        onClickRightButton: () => setCreateGroupWindow(true),
+        onClickRightButton: () =>
+          dispatchModal({ type: 'createGroupWindow', value: true }),
       }}>
       <Head>
         <title>ボールド | Chat</title>
@@ -446,12 +417,15 @@ const ChatDetail = () => {
         <CreateChatGroupModal
           isOpen={createGroupWindow}
           closeModal={() => {
-            setCreateGroupWindow(false);
-            setNewGroup({});
+            dispatchModal({ type: 'createGroupWindow', value: false });
+            dispatchChat({ type: 'newGroup', value: {} });
           }}
           newGroup={newGroup}
           onChangeNewGroupName={(groupName) =>
-            setNewGroup((g) => ({ ...g, name: groupName }))
+            dispatchChat({
+              type: 'newGroup',
+              value: { ...newGroup, name: groupName },
+            })
           }
           toggleNewGroupMember={toggleUserIDs}
           users={users}
@@ -462,7 +436,9 @@ const ChatDetail = () => {
         <SelectChatGroupModal
           isOpen={selectChatGroupWindow}
           chatGroups={chatGroups}
-          onClose={() => setSelectChatGroupWindow(false)}
+          onClose={() =>
+            dispatchModal({ type: 'selectChatGroupWindow', value: false })
+          }
           selectedChatGroups={newChatMessage}
           toggleChatGroups={(group) => toggleChatGroups(group)}
         />
@@ -475,11 +451,11 @@ const ChatDetail = () => {
                 chatGroups.map((g) => (
                   <a
                     onClick={() => {
-                      setMessages([]);
+                      dispatchChat({ type: 'messages', value: [] });
                       router.push(`/chat/${g.id.toString()}`, undefined, {
                         shallow: true,
                       });
-                      setPage(1);
+                      dispatchChat({ type: 'page', value: 1 });
                     }}
                     key={g.id}
                     style={{ marginBottom: 8 }}>
@@ -546,19 +522,32 @@ const ChatDetail = () => {
                       isOpen={editChatGroupModalVisible}
                       chatGroup={newChatMessage.chatGroup}
                       saveGroup={saveGroup}
-                      closeModal={() => setEditChatGroupModalVisible(false)}
+                      closeModal={() =>
+                        dispatchModal({
+                          type: 'editChatGroupModalVisible',
+                          value: false,
+                        })
+                      }
                     />
                     <EditChatGroupMembersModal
                       isOpen={editMembersModalVisible}
                       users={users || []}
                       previousUsers={newChatMessage.chatGroup.members || []}
-                      onCancel={() => setEditMembersModalVisible(false)}
+                      onCancel={() =>
+                        dispatchModal({
+                          type: 'editMembersModalVisible',
+                          value: false,
+                        })
+                      }
                       onComplete={(newMembers) => {
                         saveGroup({
                           ...newChatMessage.chatGroup,
                           members: newMembers,
                         });
-                        setEditMembersModalVisible(false);
+                        dispatchModal({
+                          type: 'editMembersModalVisible',
+                          value: false,
+                        });
                       }}
                     />
                     {messages.map((m) => (

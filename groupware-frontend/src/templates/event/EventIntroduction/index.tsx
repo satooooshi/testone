@@ -69,15 +69,16 @@ const EventIntroduction: React.FC<EventIntroductionProps> = ({
           </div>
         </div>
         <div className={eventPRStyles.bottom_images_row}>
-          {bottomImgSources.map((bottomImgSource, id) => (
-            <div key={id} className={eventPRStyles.bottom_image_wrapper}>
-              {typeof bottomImgSource === 'string' ? (
-                <img src={bottomImgSource} alt="" />
-              ) : (
-                <Image src={bottomImgSource} alt="" />
-              )}
-            </div>
-          ))}
+          {bottomImgSources !== [''] &&
+            bottomImgSources.map((bottomImgSource, id) => (
+              <div key={id} className={eventPRStyles.bottom_image_wrapper}>
+                {typeof bottomImgSource === 'string' ? (
+                  <img src={bottomImgSource} alt="" />
+                ) : (
+                  <Image src={bottomImgSource} alt="" />
+                )}
+              </div>
+            ))}
         </div>
       </div>
     </>

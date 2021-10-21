@@ -12,8 +12,8 @@ import { ConfigService } from '@nestjs/config';
 import { Response } from 'express';
 import { User } from 'src/entities/user.entity';
 import { NotificationService } from '../notification/notification.service';
-import RegisterDto from '../user/dto/registerDto';
 import { AuthService } from './auth.service';
+import { ForgotPasswordDto } from './dto/forgotPassword.dto';
 import JwtAuthenticationGuard from './jwtAuthentication.guard';
 import { LocalAuthenticationGuard } from './localAuthenticationGuard';
 import RequestWithUser from './requestWithUser.interface';
@@ -71,6 +71,13 @@ ${registrationData.password}
     const user = request.user;
     user.password = undefined;
     return user;
+  }
+
+  @Post('refresh-password')
+  @HttpCode(200)
+  async forgotPassword(@Body() body: ForgotPasswordDto) {
+    const { email } = body;
+    await this.authService.sendEmailToRefreshPass(email);
   }
 
   @UseGuards(JwtAuthenticationGuard)

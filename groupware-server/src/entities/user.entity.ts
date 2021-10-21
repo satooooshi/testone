@@ -83,6 +83,16 @@ export class User {
   })
   password?: string;
 
+  @Column({
+    type: 'varchar',
+    name: 'refreshed_password',
+    length: 200,
+    nullable: false,
+    default: '',
+    select: false,
+  })
+  refreshedPassword?: string;
+
   @Column({ type: 'enum', enum: UserRole, default: UserRole.COMMON })
   role: UserRole;
 

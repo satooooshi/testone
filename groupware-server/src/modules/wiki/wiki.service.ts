@@ -33,7 +33,7 @@ export class WikiService {
   ) {}
 
   public async generateSignedStorageURLsFromWikiObj(wiki: Wiki): Promise<Wiki> {
-    if (wiki.body) {
+    if (wiki?.body) {
       wiki.body = await this.storageService.parseStorageURLToSignedURL(
         wiki.body,
       );
@@ -69,7 +69,7 @@ export class WikiService {
     if (page) {
       offset = (Number(page) - 1) * limit;
     }
-    const tagIDs = tag.split('+');
+    const tagIDs = tag.split(' ');
     const [wikiWithRelation, count] = await this.wikiRepository
       .createQueryBuilder('wiki')
       .select()
@@ -88,12 +88,15 @@ export class WikiService {
           ? 'wiki.resolved_at is not null'
           : '1=1',
       )
-      .andWhere(query.writer ? 'writer = :writer' : '1=1', {
+      .andWhere(query.writer ? 'writer.id = :writer' : '1=1', {
         writer: query.writer,
       })
-      .andWhere(query.answer_writer ? 'answer_writer = :answerWriter' : '1=1', {
-        answerWriter: query.answer_writer,
-      })
+      .andWhere(
+        query.answer_writer ? 'answer_writer.id = :answerWriter' : '1=1',
+        {
+          answerWriter: query.answer_writer,
+        },
+      )
       .andWhere(
         rule_category && type === WikiType.RULES
           ? 'wiki.ruleCategory = :ruleCategory'
@@ -107,6 +110,7 @@ export class WikiService {
       })
       .skip(offset)
       .take(limit)
+      .orderBy('wiki.createdAt', 'DESC')
       .getManyAndCount();
     const pageCount =
       count % limit === 0 ? count / limit : Math.floor(count / limit) + 1;

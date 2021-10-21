@@ -235,12 +235,13 @@ export class EventScheduleService {
     if (page) {
       offset = (Number(page) - 1) * limit;
     }
-    const tagIDs = tag.split('+');
+    const tagIDs = tag.split(' ');
     const [eventsWithRelation, count] = await this.eventRepository
       .createQueryBuilder('events')
       .select()
       .leftJoinAndSelect('events.userJoiningEvent', 'userJoiningEvent')
       .leftJoinAndSelect('userJoiningEvent.user', 'user')
+      .leftJoinAndSelect('userJoiningEvent.event', 'event')
       .leftJoinAndSelect('events.tags', 'tag')
       .where(
         word && word.length !== 1
@@ -275,6 +276,7 @@ export class EventScheduleService {
       })
       .skip(offset)
       .take(limit)
+      .orderBy('events.startAt', 'ASC')
       .getManyAndCount();
     const pageCount =
       count % limit === 0 ? count / limit : Math.floor(count / limit) + 1;
@@ -283,6 +285,12 @@ export class EventScheduleService {
     );
 
     return { pageCount, events: urlParsedEvents };
+  }
+
+  public async createFromArr(
+    events: EventSchedule[],
+  ): Promise<EventSchedule[]> {
+    return await this.eventRepository.save(events);
   }
 
   public async getEventAtSpecificTime(
@@ -295,6 +303,7 @@ export class EventScheduleService {
       .select()
       .leftJoinAndSelect('events.userJoiningEvent', 'userJoiningEvent')
       .leftJoinAndSelect('userJoiningEvent.user', 'user')
+      .leftJoinAndSelect('userJoiningEvent.event', 'event')
       .leftJoinAndSelect('events.tags', 'tag')
       .leftJoin('events.hostUsers', 'host_user')
       .where(
@@ -401,6 +410,12 @@ export class EventScheduleService {
   public async saveSubmission(
     submissionFiles: Partial<SubmissionFile>[],
   ): Promise<SubmissionFile[]> {
+    if (submissionFiles && submissionFiles.length) {
+      submissionFiles = submissionFiles.map((f) => ({
+        ...f,
+        url: this.storageService.parseSignedURLToStorageURL(f.url),
+      }));
+    }
     const submittedFiles = await this.submissionFileRepository.save(
       submissionFiles,
     );
@@ -457,6 +472,9 @@ export class EventScheduleService {
         eventSchedule.videos,
       );
     }
+    eventSchedule.imageURL = this.storageService.parseSignedURLToStorageURL(
+      eventSchedule.imageURL,
+    );
     const savedEvent = await this.eventRepository.save(eventSchedule);
     return savedEvent;
   }
