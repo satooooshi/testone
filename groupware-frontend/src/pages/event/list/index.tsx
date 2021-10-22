@@ -327,6 +327,7 @@ const EventList = () => {
       tabName: 'カレンダー(個人)',
       onClick: () => {
         queryRefresh({
+          page: '1',
           personal: 'true',
           from: from || '',
           to: to || '',
@@ -337,7 +338,12 @@ const EventList = () => {
     {
       tabName: 'カレンダー',
       onClick: () => {
-        queryRefresh({ personal: '', from: from || '', to: to || '' });
+        queryRefresh({
+          personal: '',
+          page: '1',
+          from: from || '',
+          to: to || '',
+        });
       },
       isActiveTab: !!(isCalendar && !personal),
     },
@@ -345,6 +351,7 @@ const EventList = () => {
       tabName: '今後のイベント',
       onClick: () => {
         queryRefresh({
+          page: '1',
           status: 'future',
           from: undefined,
           to: undefined,
@@ -356,6 +363,7 @@ const EventList = () => {
       tabName: '過去のイベント',
       onClick: () => {
         queryRefresh({
+          page: '1',
           status: 'past',
           from: undefined,
           to: undefined,
@@ -367,6 +375,7 @@ const EventList = () => {
       tabName: '進行中イベント',
       onClick: () => {
         queryRefresh({
+          page: '1',
           status: 'current',
           from: undefined,
           to: undefined,
@@ -436,7 +445,9 @@ const EventList = () => {
                 onCancelTagModal={() => setSelectedTags([])}
                 value={searchWord || ''}
                 onChange={(e) => setSearchWord(e.currentTarget.value)}
-                onClickButton={() => queryRefresh({ word: searchWord })}
+                onClickButton={() =>
+                  queryRefresh({ page: '1', word: searchWord })
+                }
                 tags={tags || []}
                 selectedTags={selectedTags}
                 toggleTag={onToggleTag}

@@ -97,7 +97,7 @@ const UserAdmin: React.FC = () => {
           onCancelTagModal={() => setSelectedTags([])}
           value={searchWord || ''}
           onChange={(e) => setSearchWord(e.currentTarget.value)}
-          onClickButton={() => queryRefresh({ word: searchWord })}
+          onClickButton={() => queryRefresh({ page: '1', word: searchWord })}
           tags={tags || []}
           selectedTags={selectedTags}
           toggleTag={onToggleTag}

@@ -69,6 +69,7 @@ const headerTab = (headerTabBehavior: HeaderTabBehavior): Tab[] => {
           onClick: () => {
             if (queryRefresh)
               queryRefresh({
+                page: '1',
                 type: '',
                 personal,
                 from,
@@ -81,6 +82,7 @@ const headerTab = (headerTabBehavior: HeaderTabBehavior): Tab[] => {
           onClick: () => {
             if (queryRefresh)
               queryRefresh({
+                page: '1',
                 type: EventType.IMPRESSIVE_UNIVERSITY,
                 personal,
                 from,
@@ -93,6 +95,7 @@ const headerTab = (headerTabBehavior: HeaderTabBehavior): Tab[] => {
           onClick: () => {
             if (queryRefresh)
               queryRefresh({
+                page: '1',
                 type: EventType.STUDY_MEETING,
                 personal,
                 from,
@@ -105,6 +108,7 @@ const headerTab = (headerTabBehavior: HeaderTabBehavior): Tab[] => {
           onClick: () => {
             if (queryRefresh)
               queryRefresh({
+                page: '1',
                 type: EventType.BOLDAY,
                 personal,
                 from,
@@ -117,6 +121,7 @@ const headerTab = (headerTabBehavior: HeaderTabBehavior): Tab[] => {
           onClick: () => {
             if (queryRefresh)
               queryRefresh({
+                page: '1',
                 type: EventType.COACH,
                 personal,
                 from,
@@ -129,6 +134,7 @@ const headerTab = (headerTabBehavior: HeaderTabBehavior): Tab[] => {
           onClick: () => {
             if (queryRefresh)
               queryRefresh({
+                page: '1',
                 type: EventType.CLUB,
                 personal,
                 from,
@@ -141,6 +147,7 @@ const headerTab = (headerTabBehavior: HeaderTabBehavior): Tab[] => {
           onClick: () => {
             if (queryRefresh)
               queryRefresh({
+                page: '1',
                 type: EventType.SUBMISSION_ETC,
                 personal,
                 from,
@@ -333,7 +340,8 @@ const headerTab = (headerTabBehavior: HeaderTabBehavior): Tab[] => {
           name: 'ナレッジ',
           onClick: () => {
             {
-              if (queryRefresh) queryRefresh({ type: WikiType.KNOWLEDGE });
+              if (queryRefresh)
+                queryRefresh({ page: '1', type: WikiType.KNOWLEDGE });
             }
           },
         },
@@ -341,7 +349,7 @@ const headerTab = (headerTabBehavior: HeaderTabBehavior): Tab[] => {
           name: 'Q&A',
           onClick: () => {
             {
-              if (queryRefresh) queryRefresh({ type: WikiType.QA });
+              if (queryRefresh) queryRefresh({ page: '1', type: WikiType.QA });
             }
           },
         },

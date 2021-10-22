@@ -189,7 +189,13 @@ const QAQuestionList = () => {
             value={searchWord}
             onChange={(e) => setSearchWord(e.currentTarget.value)}
             onClickButton={() =>
-              queryRefresh({ page, tag, status, word: searchWord, type })
+              queryRefresh({
+                page: '1',
+                tag,
+                status,
+                word: searchWord,
+                type,
+              })
             }
             tags={tags || []}
             selectedTags={selectedTags}
