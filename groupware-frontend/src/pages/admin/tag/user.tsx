@@ -29,7 +29,7 @@ const UserTagAdmin: React.FC = () => {
   });
   const modifyStrToFlat = (targetString: string) => {
     const deleteSymbolFromStr = (str: string) => {
-      return str.replace(/[^ぁ-んァ-ンーa-zA-Z0-9一-龠０-９\-\r]/g, '');
+      return str.replace(/[^#+ぁ-んァ-ンーa-zA-Z0-9一-龠０-９\-\r]/g, '');
     };
     const hiraToKana = (str: string) => {
       return str.replace(/[ぁ-ん]/g, (s) => {
@@ -41,7 +41,8 @@ const UserTagAdmin: React.FC = () => {
     const changedToKana = hiraToKana(changedToLowerCamel);
     return changedToKana;
   };
-  const tagNames: string[] = tags?.map((t) => modifyStrToFlat(t.name)) || [''];
+  const modifiedTags: Tag[] =
+    tags?.map((t) => ({ ...t, name: modifyStrToFlat(t.name) })) || [];
   const tabs: Tab[] = useHeaderTab({
     headerTabType: user?.role === UserRole.ADMIN ? 'admin' : 'tagEdit',
   });
@@ -50,6 +51,9 @@ const UserTagAdmin: React.FC = () => {
     if (!t.name) {
       return;
     }
+    const tagNames: string[] = modifiedTags
+      .filter((modifiedT) => modifiedT.type === t.type)
+      .map((t) => modifyStrToFlat(t.name)) || [''];
     if (t.name.length >= 60) {
       toast({
         description: 'タグは60文字以内で入力してください',
