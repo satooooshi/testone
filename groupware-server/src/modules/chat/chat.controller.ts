@@ -65,29 +65,6 @@ export class ChatController {
   ): Promise<ChatMessage> {
     const user = req.user;
     message.sender = user;
-    const mentionRegex = /@\[(.*?)\]\(([0-9]+)+\)/g;
-    const matchedMentions = message.content.match(mentionRegex);
-    if (matchedMentions) {
-      const ids = matchedMentions.map((m) => {
-        const idStr = m.replace(mentionRegex, '$2');
-        return Number(idStr);
-      });
-      console.log(ids);
-      const users = await this.userService.getByIdArr(ids);
-      const title = `${message.sender.lastName} ${message.sender.firstName}さんからあなたにメンションされた新着メッセージが届きました`;
-      const emails = users.map((u) => u.email);
-      const mentionParsedMsg = message.content.replace(mentionRegex, '@$1');
-      this.notifService.sendEmailNotification({
-        to: emails,
-        subject: title,
-        title,
-        content: mentionParsedMsg,
-        buttonLink: `${this.configService.get('CLIENT_DOMAIN')}/chat/${
-          message.chatGroup.id
-        }`,
-        buttonName: 'チャットを確認する',
-      });
-    }
     return await this.chatService.sendMessage(message);
   }
 
