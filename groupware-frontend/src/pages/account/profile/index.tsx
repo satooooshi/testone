@@ -141,6 +141,7 @@ const Profile = () => {
     onSuccess: (responseData) => {
       if (responseData) {
         alert('プロフィールを更新しました。');
+        dispatchCrop({ type: 'setImageFile', value: undefined });
       }
     },
   });
@@ -153,7 +154,6 @@ const Profile = () => {
       return;
     }
     const result = await dataURLToFile(croppedImageURL, selectImageName);
-    dispatchCrop({ type: 'setImageFile', value: undefined });
     uploadImage([result]);
     return;
   };
