@@ -334,9 +334,9 @@ const EventDetail = () => {
                         <Text color="tomato">キャンセル済み</Text>
                       ) : null}
                     </>
-                  ) : (
-                    <Text color="tomato">イベント終了済み</Text>
-                  )}
+                  ) : isFinished ? (
+                    <Text color="tomato">締切済み</Text>
+                  ) : null}
                 </div>
                 {!isCommonUser && data.type === EventType.SUBMISSION_ETC ? (
                   <div className={eventDetailStyles.admin_buttons_wrapper}>
