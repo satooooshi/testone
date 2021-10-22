@@ -73,13 +73,15 @@ export class StorageService {
 
     for await (const unsignedURL of storageURLs) {
       let fileName = unsignedURL.replace(url, '');
+      const urlDecodedFileName = decodeURI(fileName);
+
       const isQueryParamExists = fileName.includes('?');
       if (isQueryParamExists) {
         fileName = fileName.substr(0, fileName.indexOf('?'));
       }
       const signedURL = await this.storage
         .bucket(bucketName)
-        .file(fileName)
+        .file(urlDecodedFileName)
         .getSignedUrl(options);
       const replaceRegWithSpace = new RegExp(`${unsignedURL}\\s`, 'g');
       const replaceRegWithQuote = new RegExp(`${unsignedURL}"`, 'g');
