@@ -67,7 +67,7 @@ export class EventScheduleService {
       .getMany();
     const fileURLs = submissionFiles.map((f) => f.url);
     const fileNames = submissionFiles.map(
-      (f) => (f.url.match('.+/(.+?)([?#;].*)?$') || ['', f.url])[1],
+      (f) => (decodeURI(f.url).match('.+/(.+?)([?#;].*)?$') || ['', f.url])[1],
     );
 
     const downloadedFiles = await this.storageService.downloadFile(fileURLs);
@@ -351,6 +351,19 @@ export class EventScheduleService {
       }
       eventSchedule.files = parsedFiles;
     }
+    if (
+      eventSchedule?.submissionFiles &&
+      eventSchedule.submissionFiles.length
+    ) {
+      const parsedFiles: SubmissionFile[] = [];
+      for (const f of eventSchedule.submissionFiles) {
+        const signedURL = await this.storageService.parseStorageURLToSignedURL(
+          f.url,
+        );
+        parsedFiles.push({ ...f, url: signedURL });
+      }
+      eventSchedule.submissionFiles = parsedFiles;
+    }
     return eventSchedule;
   }
 
@@ -377,18 +390,17 @@ export class EventScheduleService {
       .leftJoinAndSelect('userJoiningEvent.event', 'event')
       .leftJoinAndSelect('events.tags', 'tags')
       .leftJoinAndSelect('events.files', 'files')
-      .leftJoinAndSelect('events.submissionFiles', 'submissionFiles')
+      .leftJoinAndSelect(
+        'events.submissionFiles',
+        'submissionFiles',
+        'submissionFiles.userSubmitted.id = :userID',
+        { userID },
+      )
       .leftJoinAndSelect('events.videos', 'videos')
       .leftJoinAndSelect('events.author', 'author')
       .leftJoinAndSelect('events.hostUsers', 'hostUsers')
       .leftJoinAndSelect('events.comments', 'comments')
       .leftJoinAndSelect('comments.writer', 'writer')
-      .leftJoinAndSelect(
-        'submissionFiles.userSubmitted',
-        'userSubmitted',
-        'userSubmitted.id = :userID',
-        { userID },
-      )
       .where('events.id = :id', { id })
       .getOne();
     const urlParsedEvents = await this.generateSignedStorageURLsFromEventObj(
