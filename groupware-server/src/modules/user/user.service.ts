@@ -431,7 +431,7 @@ export class UserService {
       where: { id },
       relations: ['tags'],
     });
-    if (!user.verifiedAt) {
+    if (!user?.verifiedAt) {
       throw new BadRequestException('The user is not verified');
     }
     if (user) {
@@ -476,9 +476,11 @@ export class UserService {
   }
 
   async create(userData: User) {
-    userData.avatarUrl = this.storageService.parseSignedURLToStorageURL(
-      userData.avatarUrl,
-    );
+    if (userData?.avatarUrl) {
+      userData.avatarUrl = this.storageService.parseSignedURLToStorageURL(
+        userData.avatarUrl,
+      );
+    }
     const newUser = this.userRepository.create(userData);
     await this.userRepository.save(newUser);
     return newUser;

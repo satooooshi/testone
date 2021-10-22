@@ -29,8 +29,8 @@ const WikiCard: React.FC<WikiCardProps> = ({ wiki }) => {
       <a className={qaCardStyles.qa_card__item}>
         <div className={qaCardStyles.qa_card__top}>
           <div className={qaCardStyles.qa_card_user_info_wrapper}>
-            {wiki.type !== WikiType.RULES && writer ? (
-              writer.existence ? (
+            {wiki.type !== WikiType.RULES ? (
+              writer && writer.existence ? (
                 <Link href={`/account/${writer.id}`} passHref>
                   <a>
                     <Avatar

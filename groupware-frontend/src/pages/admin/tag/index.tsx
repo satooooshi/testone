@@ -1,9 +1,8 @@
 import { Tab } from 'src/types/header/tab/types';
 import LayoutWithTab from '@/components/layout/LayoutWithTab';
 import { SidebarScreenName } from '@/components/layout/Sidebar';
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Tag, TagType, UserRole, UserTag } from 'src/types';
-import { useRouter } from 'next/router';
 import Head from 'next/head';
 import { useAuthenticate } from 'src/contexts/useAuthenticate';
 import { useHeaderTab } from '@/hooks/headerTab/useHeaderTab';
@@ -15,18 +14,16 @@ import { useAPIDeleteTag } from '@/hooks/api/tag/useAPIDeleteTag';
 import { useToast } from '@chakra-ui/react';
 
 const TagAdmin: React.FC = () => {
-  const router = useRouter();
   const toast = useToast();
   const { user } = useAuthenticate();
   const { data: tags, refetch } = useAPIGetTag();
   const modifyStrToFlat = (targetString: string) => {
     const deleteSymbolFromStr = (str: string) => {
-      return str.replace(/[^a-zA-Z ]/g, '');
+      return str.replace(/[^#+ぁ-んァ-ンーa-zA-Z0-9一-龠０-９\-\r]/g, '');
     };
     const hiraToKana = (str: string) => {
-      return str.replace(/[\u3041-\u3096]/g, (match) => {
-        const chr = match.charCodeAt(0) + 0x60;
-        return String.fromCharCode(chr);
+      return str.replace(/[ぁ-ん]/g, (s) => {
+        return String.fromCharCode(s.charCodeAt(0) - 0x60);
       });
     };
     const escaped = deleteSymbolFromStr(targetString);
@@ -34,7 +31,8 @@ const TagAdmin: React.FC = () => {
     const changedToKana = hiraToKana(changedToLowerCamel);
     return changedToKana;
   };
-  const tagNames: string[] = tags?.map((t) => modifyStrToFlat(t.name)) || [''];
+  const modifiedTags: Tag[] =
+    tags?.map((t) => ({ ...t, name: modifyStrToFlat(t.name) })) || [];
   const { mutate: createTag } = useAPICreateTag({
     onSuccess: () => {
       refetch();
@@ -53,6 +51,9 @@ const TagAdmin: React.FC = () => {
     if (!t.name) {
       return;
     }
+    const tagNames: string[] = modifiedTags
+      .filter((modifiedT) => modifiedT.type === t.type)
+      .map((t) => modifyStrToFlat(t.name)) || [''];
     if (t.name.length >= 60) {
       toast({
         description: 'タグは60文字以内で入力してください',
