@@ -69,6 +69,7 @@ const CreateNewUser = () => {
     handleBlur,
     setValues: setUserInfo,
     values,
+    resetForm,
   } = useFormik({
     initialValues: initialUserValues,
     onSubmit: async (submitted, { resetForm }) => {
@@ -183,6 +184,7 @@ const CreateNewUser = () => {
           duration: 3000,
           isClosable: true,
         });
+        resetForm();
         setUserInfo(initialUserValues);
       }
     },
@@ -329,7 +331,8 @@ const CreateNewUser = () => {
               ) : null}
             </FormLabel>
             <Select
-              name="roles"
+              name="role"
+              value={values.role}
               colorScheme="teal"
               bg="white"
               onChange={handleChange}
