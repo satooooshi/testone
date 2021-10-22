@@ -476,9 +476,11 @@ export class UserService {
   }
 
   async create(userData: User) {
-    userData.avatarUrl = this.storageService.parseSignedURLToStorageURL(
-      userData.avatarUrl,
-    );
+    if (userData?.avatarUrl) {
+      userData.avatarUrl = this.storageService.parseSignedURLToStorageURL(
+        userData.avatarUrl,
+      );
+    }
     const newUser = this.userRepository.create(userData);
     await this.userRepository.save(newUser);
     return newUser;
