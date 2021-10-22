@@ -488,7 +488,7 @@ const ChatDetail = () => {
                       : nameOfEmptyNameGroup(
                           newChatMessage?.chatGroup?.members,
                         )}
-                    {`(${newChatMessage.chatGroup?.members?.length})`}
+                    {`(${newChatMessage.chatGroup?.members?.length || 0})`}
                   </p>
                 </div>
                 <div className={chatStyles.chat_header_right}>
