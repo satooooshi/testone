@@ -334,17 +334,18 @@ const WikiForm: React.FC<WikiFormProps> = ({
           </div>
         ) : null}
         {newQuestion.textFormat === 'html' && (
-          <WrappedDraftEditor
-            style={{
-              width: isSmallerThan768 ? '90vw' : '80vw',
-              maxWidth: '1980px',
-              marginBottom: 40,
-            }}
-            placeholder="質問内容を入力して下さい"
-            editorRef={draftEditor}
-            editorState={editorState}
-            setEditorState={setEditorState}
-          />
+          <div style={{ marginBottom: 40 }}>
+            <WrappedDraftEditor
+              style={{
+                width: isSmallerThan768 ? '90vw' : '80vw',
+                maxWidth: '1980px',
+              }}
+              placeholder="質問内容を入力して下さい"
+              editorRef={draftEditor}
+              editorState={editorState}
+              setEditorState={setEditorState}
+            />
+          </div>
         )}
         {newQuestion.textFormat === 'markdown' && activeTab === TabName.EDIT ? (
           <WrappedEditor
