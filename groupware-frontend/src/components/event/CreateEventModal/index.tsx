@@ -252,7 +252,10 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
   }, [user?.role]);
 
   const isCreatableStudyMeeting = useMemo(() => {
-    return user?.role === (UserRole.ADMIN || UserRole.INTERNAL_INSTRUCTOR);
+    return (
+      user?.role === UserRole.ADMIN ||
+      user?.role === UserRole.INTERNAL_INSTRUCTOR
+    );
   }, [user?.role]);
 
   const isCreatableBolday = useMemo(() => {
@@ -260,13 +263,14 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
   }, [user?.role]);
 
   const isCreatableCoach = useMemo(() => {
-    return user?.role === (UserRole.ADMIN || UserRole.COACH);
+    return user?.role === UserRole.ADMIN || user?.role === UserRole.COACH;
   }, [user?.role]);
 
   const isCreatableClub = useMemo(() => {
     return (
-      user?.role ===
-      (UserRole.ADMIN || UserRole.INTERNAL_INSTRUCTOR || UserRole.COMMON)
+      user?.role === UserRole.ADMIN ||
+      user?.role === UserRole.INTERNAL_INSTRUCTOR ||
+      user?.role === UserRole.COMMON
     );
   }, [user?.role]);
 
