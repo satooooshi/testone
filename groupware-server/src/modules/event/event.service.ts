@@ -223,13 +223,7 @@ export class EventScheduleService {
   public async getEvents(
     query: SearchQueryToGetEvents,
   ): Promise<SearchResultToGetEvents> {
-    const {
-      page = 1,
-      word = '',
-      status = 'future',
-      tag = '',
-      type = EventType.STUDY_MEETING,
-    } = query;
+    const { page = 1, word = '', status = 'future', tag = '', type } = query;
     let offset: number;
     const limit = 20;
     if (page) {
