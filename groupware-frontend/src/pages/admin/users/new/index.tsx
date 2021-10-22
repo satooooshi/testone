@@ -229,7 +229,6 @@ const CreateNewUser = () => {
         <div className={createNewUserStyles.image_wrapper}>
           {imageURL ? (
             <ReactCrop
-              imageStyle={{ maxHeight: '100vh', maxWidth: '90vw' }}
               src={imageURL}
               crop={crop}
               onChange={(newCrop) =>
