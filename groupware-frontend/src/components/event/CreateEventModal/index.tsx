@@ -79,7 +79,7 @@ const setDateTime = (addDays: number, hours: number, minutes: number) => {
 const initialEventValue = {
   title: '',
   description: '',
-  startAt: setDateTime(1, 20, 0),
+  startAt: setDateTime(1, 19, 0),
   endAt: setDateTime(1, 21, 0),
   type: EventType.STUDY_MEETING,
   imageURL: '',
