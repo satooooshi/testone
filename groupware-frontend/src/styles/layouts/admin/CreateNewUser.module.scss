@@ -29,8 +29,10 @@
   justify-content: center;
   align-items: center;
   margin-right: 40px;
+  width: 30vw;
   @media (max-width: 576px) {
     margin-right: 0;
+    width: 70vw;
   }
 }
 
@@ -102,6 +104,6 @@
 }
 
 .selected_tag_item {
-  margin-bottom: 8px;
-  margin-right: 8px;
+  margin-bottom: 4px;
+  margin-right: 4px;
 }

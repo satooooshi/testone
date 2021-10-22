@@ -51,42 +51,42 @@ const UserList = () => {
     {
       tabName: '全て',
       onClick: () => {
-        queryRefresh({ sort: query.sort, role: undefined });
+        queryRefresh({ sort: query.sort, role: undefined, page: '1' });
       },
       isActiveTab: !query.role,
     },
     {
       tabName: '管理者',
       onClick: () => {
-        queryRefresh({ role: UserRole.ADMIN });
+        queryRefresh({ page: '1', role: UserRole.ADMIN });
       },
       isActiveTab: query.role === UserRole.ADMIN,
     },
     {
       tabName: '一般社員',
       onClick: () => {
-        queryRefresh({ role: UserRole.COMMON });
+        queryRefresh({ page: '1', role: UserRole.COMMON });
       },
       isActiveTab: query.role === UserRole.COMMON,
     },
     {
       tabName: 'コーチ',
       onClick: () => {
-        queryRefresh({ role: UserRole.COACH });
+        queryRefresh({ page: '1', role: UserRole.COACH });
       },
       isActiveTab: query.role === UserRole.COACH,
     },
     {
       tabName: '講師(社員)',
       onClick: () => {
-        queryRefresh({ role: UserRole.INTERNAL_INSTRUCTOR });
+        queryRefresh({ page: '1', role: UserRole.INTERNAL_INSTRUCTOR });
       },
       isActiveTab: query.role === UserRole.INTERNAL_INSTRUCTOR,
     },
     {
       tabName: '講師(外部)',
       onClick: () => {
-        queryRefresh({ role: UserRole.EXTERNAL_INSTRUCTOR });
+        queryRefresh({ page: '1', role: UserRole.EXTERNAL_INSTRUCTOR });
       },
       isActiveTab: query.role === UserRole.EXTERNAL_INSTRUCTOR,
     },
@@ -110,7 +110,7 @@ const UserList = () => {
             onCancelTagModal={() => setSelectedTags([])}
             value={searchWord || ''}
             onChange={(e) => setSearchWord(e.currentTarget.value)}
-            onClickButton={() => queryRefresh({ word: searchWord })}
+            onClickButton={() => queryRefresh({ page: '1', word: searchWord })}
             tags={tags || []}
             selectedTags={selectedTags}
             toggleTag={onToggleTag}

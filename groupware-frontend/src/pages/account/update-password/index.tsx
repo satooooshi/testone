@@ -76,7 +76,7 @@ const UpdatePassword = () => {
             />
           </FormControl>
           <FormControl className={profileStyles.input_wrapper}>
-            <FormLabel fontWeight={'bold'}>現在のパスワード</FormLabel>
+            <FormLabel fontWeight={'bold'}>新しいパスワード</FormLabel>
             {errors.currentPassword && touched.currentPassword ? (
               <Text fontSize="sm" color="red">
                 {errors.newPassword}

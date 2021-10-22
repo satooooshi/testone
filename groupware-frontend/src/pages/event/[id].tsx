@@ -10,7 +10,7 @@ import { AiOutlineFileProtect } from 'react-icons/ai';
 import CreateEventModal from '@/components/event/CreateEventModal';
 import EventParticipants from '@/components/event/EventParticepants';
 import Linkify from 'react-linkify';
-import { Button, Textarea, useToast } from '@chakra-ui/react';
+import { Button, Text, Textarea, useToast } from '@chakra-ui/react';
 import Head from 'next/head';
 import { useAuthenticate } from 'src/contexts/useAuthenticate';
 import Link from 'next/link';
@@ -185,10 +185,16 @@ const EventDetail = () => {
     [user?.id, data?.author?.id, isCommonUser],
   );
 
-  const tabs: Tab[] = useHeaderTab({
-    headerTabType: 'eventDetail',
-    onDeleteClicked,
-  });
+  const tabs: Tab[] = useHeaderTab(
+    user?.role === UserRole.ADMIN
+      ? {
+          headerTabType: 'adminEventDetail',
+          onDeleteClicked,
+        }
+      : {
+          headerTabType: 'eventDetail',
+        },
+  );
 
   const initialHeaderValue = {
     title: 'イベント詳細',
@@ -278,7 +284,7 @@ const EventDetail = () => {
                             href={`/account/${hostUser.id}`}
                             key={hostUser.id}>
                             <a className={eventDetailStyles.tag}>
-                              <Button colorScheme="teal" size="xs">
+                              <Button colorScheme="purple" size="xs">
                                 {userNameFactory(hostUser)}
                               </Button>
                             </a>
@@ -318,20 +324,19 @@ const EventDetail = () => {
                           {data.isJoining ? '参加済' : 'イベントに参加'}
                         </Button>
                       )}
-                      {data.isJoining && (
+                      {data.isJoining && !data.isCanceled ? (
                         <Button
-                          colorScheme={data.isCanceled ? 'pink' : 'red'}
-                          onClick={() =>
-                            !data.isCanceled &&
-                            cancelEvent({ eventID: Number(id) })
-                          }>
-                          {data.isCanceled ? 'キャンセル済' : 'キャンセルする'}
+                          colorScheme={'red'}
+                          onClick={() => cancelEvent({ eventID: Number(id) })}>
+                          キャンセルする
                         </Button>
-                      )}
+                      ) : data.isJoining && data.isCanceled ? (
+                        <Text color="tomato">キャンセル済み</Text>
+                      ) : null}
                     </>
-                  ) : (
-                    <Button colorScheme={'pink'}>イベント終了済み</Button>
-                  )}
+                  ) : isFinished ? (
+                    <Text color="tomato">締切済み</Text>
+                  ) : null}
                 </div>
                 {!isCommonUser && data.type === EventType.SUBMISSION_ETC ? (
                   <div className={eventDetailStyles.admin_buttons_wrapper}>

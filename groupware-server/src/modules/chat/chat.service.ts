@@ -28,6 +28,26 @@ export class ChatService {
     private readonly storageService: StorageService,
   ) {}
 
+  public async generateSignedStorageURLsFromChatGroupObj(
+    chatGroup: ChatGroup,
+  ): Promise<ChatGroup> {
+    chatGroup.imageURL = await this.storageService.parseStorageURLToSignedURL(
+      chatGroup.imageURL,
+    );
+    return chatGroup;
+  }
+
+  public async generateSignedStorageURLsFromChatGroupArr(
+    chatGroups: ChatGroup[],
+  ): Promise<ChatGroup[]> {
+    const parsedGroups = [];
+    for (const c of chatGroups) {
+      const parsed = await this.generateSignedStorageURLsFromChatGroupObj(c);
+      parsedGroups.push(parsed);
+    }
+    return parsedGroups;
+  }
+
   public async generateSignedStorageURLsFromChatMessageObj(
     chatMessage: ChatMessage,
   ): Promise<ChatMessage> {
@@ -60,7 +80,9 @@ export class ChatService {
       relations: ['members', 'lastReadChatTime', 'lastReadChatTime.user'],
       order: { updatedAt: 'DESC' },
     });
-    return groupsAndUsers;
+    const urlParsedGroups =
+      await this.generateSignedStorageURLsFromChatGroupArr(groupsAndUsers);
+    return urlParsedGroups;
   }
 
   public async getChatMessage(
@@ -217,6 +239,9 @@ export class ChatService {
     const userIds = chatGroup.members.map((u) => u.id);
     const users = await this.userRepository.findByIds(userIds);
     chatGroup.members = users;
+    chatGroup.imageURL = this.storageService.parseSignedURLToStorageURL(
+      chatGroup.imageURL,
+    );
 
     const newGroup = await this.chatGroupRepository.save(chatGroup);
     return newGroup;

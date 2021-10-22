@@ -125,32 +125,6 @@ export class WikiService {
       wiki.body = this.storageService.parseSignedURLToStorageURL(wiki.body);
       let newWiki = await this.wikiRepository.save(wiki);
       newWiki = await this.generateSignedStorageURLsFromWikiObj(newWiki);
-      if (newWiki.type !== WikiType.RULES) {
-        let mailContent = '';
-        const allUsers = await this.userRepository.find();
-        const emails = allUsers.map((u) => u.email);
-        const postedWikiType =
-          newWiki.type === WikiType.QA ? 'Q&A' : 'ナレッジ';
-        if (newWiki.textFormat === 'markdown') {
-          const md = MarkdownIt({
-            breaks: true,
-          });
-          mailContent = md.render(newWiki.body);
-        }
-        if (newWiki.textFormat === 'html') {
-          mailContent = newWiki.body;
-        }
-        this.notifService.sendEmailNotification({
-          to: emails,
-          subject: `新規${postedWikiType}が投稿されました`,
-          title: `${newWiki.title}`,
-          content: mailContent,
-          buttonLink: `${this.configService.get('CLIENT_DOMAIN')}/wiki/${
-            newWiki.id
-          }`,
-          buttonName: `${postedWikiType}を見る`,
-        });
-      }
       return newWiki;
     } catch (err) {
       console.log(err);

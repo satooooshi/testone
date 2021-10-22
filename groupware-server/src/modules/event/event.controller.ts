@@ -163,13 +163,15 @@ export class EventScheduleController {
     const { id } = params;
     const { user } = req;
     const eventSchedule = await this.eventService.getEventDetail(id, user.id);
-    const isJoining = eventSchedule.userJoiningEvent?.filter(
-      (userJoiningEvent) => user.id === userJoiningEvent.user.id,
-    ).length;
-    const isCanceled = eventSchedule.userJoiningEvent?.filter(
-      (userJoiningEvent) =>
-        user.id === userJoiningEvent.user.id && userJoiningEvent.canceledAt,
-    ).length;
+    const isJoining =
+      eventSchedule?.userJoiningEvent?.filter(
+        (userJoiningEvent) => user.id === userJoiningEvent.user.id,
+      ).length || false;
+    const isCanceled =
+      eventSchedule?.userJoiningEvent?.filter(
+        (userJoiningEvent) =>
+          user.id === userJoiningEvent.user.id && userJoiningEvent.canceledAt,
+      ).length || false;
 
     const returnData: GetEventDetailResopnse = {
       ...eventSchedule,
@@ -198,31 +200,6 @@ export class EventScheduleController {
     eventSchedule.author = req.user;
 
     const savedEvent = await this.eventService.saveEvent(eventSchedule);
-    if (savedEvent.type !== EventType.SUBMISSION_ETC) {
-      const users = await this.userService.getUsers();
-      const emailArr = users.map((u) => u.email);
-      const startAtStr = dateTimeFormatterFromJSDDate({
-        dateTime: savedEvent.startAt,
-      });
-      const endAtStr = dateTimeFormatterFromJSDDate({
-        dateTime: savedEvent.endAt,
-      });
-      const emailContent = `${title} 開始日時: ${startAtStr} 終了日時: ${endAtStr} \n ${description}`;
-      const subject = `新規イベント: ${eventTypeName(
-        savedEvent.type,
-      )}が登録されました`;
-      const buttonName = `作成された${eventTypeName(savedEvent.type)}を見る`;
-      this.notifService.sendEmailNotification({
-        to: emailArr,
-        subject,
-        title: subject,
-        content: emailContent,
-        buttonLink: `${this.configService.get('CLIENT_DOMAIN')}/event/${
-          savedEvent.id
-        }`,
-        buttonName,
-      });
-    }
     if (savedEvent.chatNeeded) {
       const eventChatGroup = new ChatGroup();
       eventChatGroup.name = savedEvent.title;
