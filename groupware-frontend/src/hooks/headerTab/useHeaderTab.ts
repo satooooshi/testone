@@ -14,6 +14,7 @@ type HeaderTab =
   | 'chatDetail'
   | 'qaForm'
   | 'eventDetail'
+  | 'adminEventDetail'
   | 'wikiDetail'
   | 'tagEdit'
   | 'wikiList';
@@ -276,6 +277,14 @@ const headerTab = (headerTabBehavior: HeaderTabBehavior): Tab[] => {
         },
       ];
     case 'eventDetail':
+      return [
+        {
+          type: 'link',
+          name: '一覧に戻る',
+          href: '/event/list',
+        },
+      ];
+    case 'adminEventDetail':
       return [
         {
           type: 'link',
