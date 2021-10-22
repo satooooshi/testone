@@ -61,7 +61,7 @@ export class StorageService {
     let parseText = text;
     const bucketName = this.configService.get('CLOUD_STORAGE_BUCKET');
     const url = 'https://storage.googleapis.com/' + bucketName + '/';
-    const regex = new RegExp(`${url}\\S+\.[^'")\\s]+`, 'g');
+    const regex = new RegExp(`${url}\\S+\\.[^'")\\s]+`, 'g');
     const storageURLs = text.match(regex);
     if (!storageURLs || !storageURLs.length) {
       return text;
@@ -84,26 +84,23 @@ export class StorageService {
         .bucket(bucketName)
         .file(urlDecodedFileName)
         .getSignedUrl(options);
-      const replaceRegWithSpace = new RegExp(`${unsignedURL}\\s`, 'g');
-      const replaceRegWithQuote = new RegExp(`${unsignedURL}"`, 'g');
-      const replaceRegWithBracketEnd = new RegExp(`${unsignedURL}\\)`, 'g');
-      const replaceRegWithEnd = new RegExp(`${unsignedURL}\$`, 'g');
-      const isMatched =
-        parseText.match(replaceRegWithSpace) ||
-        parseText.match(replaceRegWithQuote) ||
-        parseText.match(replaceRegWithEnd) ||
-        parseText.match(replaceRegWithEnd);
-      if (isMatched) {
-        parseText = parseText.replace(replaceRegWithSpace, signedURL[0] + ' ');
-        parseText = parseText.replace(replaceRegWithQuote, signedURL[0] + '"');
-        parseText = parseText.replace(
-          replaceRegWithBracketEnd,
-          signedURL[0] + ')',
-        );
-        parseText = parseText.replace(replaceRegWithEnd, signedURL[0]);
-      } else {
-        parseText = parseText.replace(unsignedURL, signedURL[0]);
-      }
+      const unsignedURLForRegex = unsignedURL
+        .replace('(', '\\(')
+        .replace(')', '\\)');
+      const replaceRegWithSpace = new RegExp(`${unsignedURLForRegex}\\s`, 'g');
+      const replaceRegWithQuote = new RegExp(`${unsignedURLForRegex}"`, 'g');
+      const replaceRegWithBracketEnd = new RegExp(
+        `${unsignedURLForRegex}\\)`,
+        'g',
+      );
+      const replaceRegWithEnd = new RegExp(`${unsignedURLForRegex}\$`, 'g');
+      parseText = parseText.replace(replaceRegWithSpace, signedURL[0] + ' ');
+      parseText = parseText.replace(replaceRegWithQuote, signedURL[0] + '"');
+      parseText = parseText.replace(
+        replaceRegWithBracketEnd,
+        signedURL[0] + ')',
+      );
+      parseText = parseText.replace(replaceRegWithEnd, signedURL[0]);
     }
     return parseText;
   }
@@ -112,7 +109,7 @@ export class StorageService {
     let parseText = text;
     const bucketName = this.configService.get('CLOUD_STORAGE_BUCKET');
     const url = 'https://storage.googleapis.com/' + bucketName + '/';
-    const regex = new RegExp(`${url}\\S+\.[^'"\\s]+`, 'g');
+    const regex = new RegExp(`${url}\\S+\\.[^'")\\s]+`, 'g');
     const urls = text.match(regex);
     if (!urls || !urls.length) {
       return text;
