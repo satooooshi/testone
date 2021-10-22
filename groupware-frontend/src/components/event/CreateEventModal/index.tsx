@@ -450,8 +450,7 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
                 <FormLabel>
                   チャットルームの作成(作成後に変更することはできません)
                 </FormLabel>
-                <RadioGroup
-                  defaultValue={newEvent.chatNeeded ? 'needed' : 'unneeded'}>
+                <RadioGroup defaultValue={'unneeded'}>
                   <Stack spacing={5} direction="row">
                     <Radio
                       colorScheme="green"
