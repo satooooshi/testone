@@ -431,7 +431,7 @@ export class UserService {
       where: { id },
       relations: ['tags'],
     });
-    if (!user.verifiedAt) {
+    if (!user?.verifiedAt) {
       throw new BadRequestException('The user is not verified');
     }
     if (user) {
