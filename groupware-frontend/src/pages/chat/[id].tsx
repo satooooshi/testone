@@ -141,7 +141,7 @@ const ChatDetail = () => {
     dispatchModal,
   ] = useModalReducer();
   const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
-  const { data: chatGroups, refetch } = useAPIGetChatGroupList();
+  const { data: chatGroups, refetch: refetchGroups } = useAPIGetChatGroupList();
   const { data: users } = useAPIGetUsers();
   const { data: lastestLastReadChatTime } = useAPIGetLastReadChatTime(
     newChatMessage.chatGroup ? newChatMessage.chatGroup.id : 0,
@@ -165,7 +165,7 @@ const ChatDetail = () => {
     onSuccess: () => {
       dispatchModal({ type: 'createGroupWindow', value: false });
       dispatchChat({ type: 'newGroup', value: { ...newGroup, members: [] } });
-      refetch();
+      refetchGroups();
     },
   });
 
@@ -176,12 +176,13 @@ const ChatDetail = () => {
         type: 'newChatMessage',
         value: { ...newChatMessage, chatGroup: newInfo },
       });
-      refetch();
+      refetchGroups();
     },
   });
 
   const { mutate: sendChatMessage } = useAPISendChatMessage({
     onSuccess: (data) => {
+      refetchGroups();
       dispatchChat({
         type: 'newChatMessage',
         value: { ...newChatMessage, content: '' },
@@ -197,7 +198,7 @@ const ChatDetail = () => {
         value: EditorState.createEmpty(),
       });
       messageWrapperDivRef.current &&
-        messageWrapperDivRef.current.scrollIntoView();
+        messageWrapperDivRef.current.scrollTo({ top: 0 });
     },
   });
 
@@ -330,7 +331,7 @@ const ChatDetail = () => {
     }
     const strMembers = members?.map((m) => m.lastName + m.firstName).toString();
     if (strMembers.length > 15) {
-      return strMembers.slice(0, 15) + '...(' + members.length + ')';
+      return strMembers.slice(0, 15) + '...(' + (members.length || 0) + ')';
     }
     return strMembers.toString();
   };
@@ -488,7 +489,6 @@ const ChatDetail = () => {
                       : nameOfEmptyNameGroup(
                           newChatMessage?.chatGroup?.members,
                         )}
-                    {`(${newChatMessage.chatGroup?.members?.length || 0})`}
                   </p>
                 </div>
                 <div className={chatStyles.chat_header_right}>
