@@ -284,7 +284,7 @@ const EventDetail = () => {
                             href={`/account/${hostUser.id}`}
                             key={hostUser.id}>
                             <a className={eventDetailStyles.tag}>
-                              <Button colorScheme="teal" size="xs">
+                              <Button colorScheme="purple" size="xs">
                                 {userNameFactory(hostUser)}
                               </Button>
                             </a>
