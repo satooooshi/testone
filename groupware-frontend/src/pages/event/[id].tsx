@@ -185,10 +185,16 @@ const EventDetail = () => {
     [user?.id, data?.author?.id, isCommonUser],
   );
 
-  const tabs: Tab[] = useHeaderTab({
-    headerTabType: 'eventDetail',
-    onDeleteClicked,
-  });
+  const tabs: Tab[] = useHeaderTab(
+    user?.role === UserRole.ADMIN
+      ? {
+          headerTabType: 'adminEventDetail',
+          onDeleteClicked,
+        }
+      : {
+          headerTabType: 'eventDetail',
+        },
+  );
 
   const initialHeaderValue = {
     title: 'イベント詳細',
