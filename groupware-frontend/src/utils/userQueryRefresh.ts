@@ -64,6 +64,6 @@ export const userQueryRefresh = (
 ): string => {
   const queryParam = searchUserQueryParamFactory(query);
 
-  const refreshURL = `/users/list?${queryParam}`;
+  const refreshURL = `/users/list${queryParam}`;
   return refreshURL;
 };
