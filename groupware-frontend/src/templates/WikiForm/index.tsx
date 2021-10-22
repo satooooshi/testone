@@ -31,7 +31,6 @@ import MarkdownEditor from 'react-markdown-editor-lite';
 import { liteEditorPlugins } from 'src/utils/liteEditorPlugins';
 import MarkdownIt from 'markdown-it';
 import { uploadStorage } from '@/hooks/api/storage/useAPIUploadStorage';
-// import MDEditor from '@uiw/react-md-editor';
 import { tagColorFactory } from 'src/utils/factory/tagColorFactory';
 
 type WikiFormProps = {
@@ -45,7 +44,9 @@ const WikiForm: React.FC<WikiFormProps> = ({
   tags,
   onClickSaveButton,
 }) => {
-  const mdParser = new MarkdownIt();
+  const mdParser = new MarkdownIt({
+    breaks: true,
+  });
   const draftEditor = useRef<Editor | null>(null);
   const router = useRouter();
   const { type } = router.query as { type: WikiType };
@@ -66,24 +67,12 @@ const WikiForm: React.FC<WikiFormProps> = ({
   const formTopRef = useRef<HTMLDivElement | null>(null);
   const editorRef = useRef<MarkdownEditor | null>(null);
 
-  const tabs: Tab[] =
-    newQuestion.textFormat === 'html'
-      ? [
-          {
-            onClick: () => setActiveTab(TabName.EDIT),
-            name: '内容の編集',
-          },
-        ]
-      : [
-          {
-            onClick: () => setActiveTab(TabName.EDIT),
-            name: '内容の編集',
-          },
-          {
-            onClick: () => setActiveTab(TabName.PREVIEW),
-            name: 'プレビュー',
-          },
-        ];
+  const tabs: Tab[] = [
+    {
+      onClick: () => setActiveTab(TabName.EDIT),
+      name: '内容の編集',
+    },
+  ];
 
   const headerTabName = useMemo(() => {
     switch (wiki?.type) {
