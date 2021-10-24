@@ -268,9 +268,14 @@ export class UserService {
           .from(User, 'u')
           .leftJoin('u.userJoiningEvent', 'userJoiningEvent')
           .leftJoin('userJoiningEvent.event', 'event')
-          .where(fromDate ? 'event.endAt > :fromDate' : '1=1', { fromDate })
-          .andWhere(toDate ? 'event.endAt < :toDate' : '1=1', { toDate })
-          .andWhere('u.id = user.id');
+          .where('u.id = user.id')
+          .andWhere('userJoiningEvent.canceledAt IS NULL')
+          .andWhere(
+            fromDate && toDate
+              ? 'event.endAt > :fromDate AND event.endAt < :toDate'
+              : '1=1',
+            { fromDate, toDate },
+          );
       }, 'eventCount')
       .addSelect((subQuery) => {
         return subQuery
@@ -322,13 +327,15 @@ export class UserService {
     const userObjWithEvent = await this.userRepository
       .createQueryBuilder('user')
       .leftJoinAndSelect('user.userJoiningEvent', 'userJoiningEvent')
-      .leftJoin(
-        'userJoiningEvent.event',
-        'event',
-        fromDate ? 'event.endAt > :fromDate AND event.endAt < :toDate' : '1=1',
+      .leftJoin('userJoiningEvent.event', 'event')
+      .where(userIDs.length ? 'user.id IN (:...userIDs)' : '1=1', { userIDs })
+      .andWhere('userJoiningEvent.canceledAt IS NULL')
+      .andWhere(
+        fromDate && toDate
+          ? 'event.endAt > :fromDate AND event.endAt < :toDate'
+          : '1=1',
         { fromDate, toDate },
       )
-      .where(userIDs.length ? 'user.id IN (:...userIDs)' : '1=1', { userIDs })
       .getMany();
 
     const userObjWithQuestion = await this.userRepository
@@ -369,7 +376,7 @@ export class UserService {
       .getMany();
     const usersArrWithEachCount = users.map((u) => {
       const eventCount =
-        userObjWithEvent.filter((user) => user.id === u.id)[0].userJoiningEvent
+        userObjWithEvent.filter((user) => user.id === u.id)[0]?.userJoiningEvent
           .length || 0;
       const questionCount =
         userObjWithQuestion.filter((user) => user.id === u.id)[0].wiki.length ||

@@ -11,7 +11,6 @@ import {
   Res,
   UseGuards,
 } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { Response } from 'express';
 import { ChatGroup } from 'src/entities/chatGroup.entity';
 import { EventSchedule, EventType } from 'src/entities/event.entity';
@@ -19,12 +18,9 @@ import { EventComment } from 'src/entities/eventComment.entity';
 import { SubmissionFile } from 'src/entities/submissionFiles.entity';
 import { UserRole } from 'src/entities/user.entity';
 import { UserJoiningEvent } from 'src/entities/userJoiningEvent.entity';
-import { dateTimeFormatterFromJSDDate } from 'src/utils/dateTimeFormatter';
 import JwtAuthenticationGuard from '../auth/jwtAuthentication.guard';
 import RequestWithUser from '../auth/requestWithUser.interface';
 import { ChatService } from '../chat/chat.service';
-import { NotificationService } from '../notification/notification.service';
-import { UserService } from '../user/user.service';
 import { EventScheduleService } from './event.service';
 import { GetEventDetailResopnse } from './eventDetail.type';
 
@@ -78,9 +74,6 @@ export class EventScheduleController {
   constructor(
     private readonly eventService: EventScheduleService,
     private readonly chatService: ChatService,
-    private readonly userService: UserService,
-    private readonly notifService: NotificationService,
-    private readonly configService: ConfigService,
   ) {}
 
   //@TODO this endpoint is for inputting data
@@ -196,7 +189,6 @@ export class EventScheduleController {
     if (!eventSchedule.tags || !eventSchedule.tags.length) {
       throw new BadRequestException('Event must links one or more tags');
     }
-    const { title, description } = eventSchedule;
     eventSchedule.author = req.user;
 
     const savedEvent = await this.eventService.saveEvent(eventSchedule);
