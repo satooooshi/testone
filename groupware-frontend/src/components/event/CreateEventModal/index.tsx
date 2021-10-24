@@ -79,7 +79,7 @@ const setDateTime = (addDays: number, hours: number, minutes: number) => {
 const initialEventValue = {
   title: '',
   description: '',
-  startAt: setDateTime(1, 20, 0),
+  startAt: setDateTime(1, 19, 0),
   endAt: setDateTime(1, 21, 0),
   type: EventType.STUDY_MEETING,
   imageURL: '',
@@ -450,8 +450,7 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
                 <FormLabel>
                   チャットルームの作成(作成後に変更することはできません)
                 </FormLabel>
-                <RadioGroup
-                  defaultValue={newEvent.chatNeeded ? 'needed' : 'unneeded'}>
+                <RadioGroup defaultValue={'unneeded'}>
                   <Stack spacing={5} direction="row">
                     <Radio
                       colorScheme="green"

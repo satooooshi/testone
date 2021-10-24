@@ -64,7 +64,9 @@ const FileIcon: React.FC<FileIconProps> = ({ href, submitted }) => {
           : eventDetailStyles.submitted_file_color,
       )}>
       <AiOutlineFileProtect className={eventDetailStyles.file_icon} />
-      <span>{(href?.match('.+/(.+?)([?#;].*)?$') || ['', href])[1]}</span>
+      <span>
+        {decodeURI((href?.match('.+/(.+?)([?#;].*)?$') || ['', href])[1] || '')}
+      </span>
     </a>
   );
 };
@@ -181,6 +183,7 @@ const EventDetail = () => {
     },
   });
   const isCommonUser = user?.role === UserRole.COMMON;
+  const isAdminUser = user?.role === UserRole.ADMIN;
 
   const isEditable = useMemo(
     () => user?.id === data?.author?.id || !isCommonUser,
@@ -293,7 +296,7 @@ const EventDetail = () => {
                             href={`/account/${hostUser.id}`}
                             key={hostUser.id}>
                             <a className={eventDetailStyles.tag}>
-                              <Button colorScheme="teal" size="xs">
+                              <Button colorScheme="purple" size="xs">
                                 {userNameFactory(hostUser)}
                               </Button>
                             </a>
@@ -347,7 +350,7 @@ const EventDetail = () => {
                     <Text color="tomato">締切済み</Text>
                   ) : null}
                 </div>
-                {!isCommonUser && data.type === EventType.SUBMISSION_ETC ? (
+                {isAdminUser && data.type === EventType.SUBMISSION_ETC ? (
                   <div className={eventDetailStyles.admin_buttons_wrapper}>
                     <Button
                       colorScheme={'green'}

@@ -27,7 +27,7 @@ export const useAPIUploadStorage = (
       alert(
         err.message.includes('413')
           ? 'ファイルの容量が大きい為、アップロード出来ませんでした。\n容量が大きくないファイルを使用して下さい。'
-          : 'ファイルアップロード失敗しました',
+          : 'ファイルのアップロードに失敗しました',
       );
       mutationOptions?.onError &&
         mutationOptions.onError(err, variables, context);

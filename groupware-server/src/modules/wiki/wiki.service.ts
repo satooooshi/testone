@@ -1,25 +1,15 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
-import * as MarkdownIt from 'markdown-it';
 import { QAAnswer } from 'src/entities/qaAnswer.entity';
 import { QAAnswerReply } from 'src/entities/qaAnswerReply.entity';
 import { Wiki, WikiType } from 'src/entities/wiki.entity';
-import { User } from 'src/entities/user.entity';
 import { In, Repository } from 'typeorm';
-import { NotificationService } from '../notification/notification.service';
 import { SearchQueryToGetWiki, SearchResultToGetWiki } from './wiki.controller';
 import { StorageService } from '../storage/storage.service';
 
 @Injectable()
 export class WikiService {
   constructor(
-    private readonly configService: ConfigService,
-    private readonly notifService: NotificationService,
-
-    @InjectRepository(User)
-    private readonly userRepository: Repository<User>,
-
     @InjectRepository(Wiki)
     private readonly wikiRepository: Repository<Wiki>,
 
@@ -37,6 +27,23 @@ export class WikiService {
       wiki.body = await this.storageService.parseStorageURLToSignedURL(
         wiki.body,
       );
+    }
+    if (wiki?.writer) {
+      wiki.writer.avatarUrl =
+        await this.storageService.parseStorageURLToSignedURL(
+          wiki.writer.avatarUrl,
+        );
+    }
+    if (wiki?.answers) {
+      const parsedAnswers = [];
+      for (const a of wiki.answers) {
+        const parsedAnswer =
+          await this.storageService.parseStorageURLToSignedURL(
+            a.writer?.avatarUrl || '',
+          );
+        parsedAnswers.push({ ...a, parsedAnswer });
+      }
+      wiki.answers = parsedAnswers;
     }
     return wiki;
   }
@@ -125,32 +132,6 @@ export class WikiService {
       wiki.body = this.storageService.parseSignedURLToStorageURL(wiki.body);
       let newWiki = await this.wikiRepository.save(wiki);
       newWiki = await this.generateSignedStorageURLsFromWikiObj(newWiki);
-      if (newWiki.type !== WikiType.RULES) {
-        let mailContent = '';
-        const allUsers = await this.userRepository.find();
-        const emails = allUsers.map((u) => u.email);
-        const postedWikiType =
-          newWiki.type === WikiType.QA ? 'Q&A' : 'ナレッジ';
-        if (newWiki.textFormat === 'markdown') {
-          const md = MarkdownIt({
-            breaks: true,
-          });
-          mailContent = md.render(newWiki.body);
-        }
-        if (newWiki.textFormat === 'html') {
-          mailContent = newWiki.body;
-        }
-        this.notifService.sendEmailNotification({
-          to: emails,
-          subject: `新規${postedWikiType}が投稿されました`,
-          title: `${newWiki.title}`,
-          content: mailContent,
-          buttonLink: `${this.configService.get('CLIENT_DOMAIN')}/wiki/${
-            newWiki.id
-          }`,
-          buttonName: `${postedWikiType}を見る`,
-        });
-      }
       return newWiki;
     } catch (err) {
       console.log(err);
