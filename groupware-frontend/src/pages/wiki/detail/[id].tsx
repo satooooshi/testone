@@ -113,12 +113,9 @@ const QuestionDetail = () => {
 
   const enableReplyToAnswer = useCallback(
     (answer: QAAnswer): boolean => {
-      return (
-        answerReply.answer?.id === answer.id &&
-        (wiki?.writer?.id === user?.id || answer?.writer?.id === user?.id)
-      );
+      return wiki?.writer?.id === user?.id || answer?.writer?.id === user?.id;
     },
-    [answerReply.answer?.id, user?.id, wiki?.writer?.id],
+    [user?.id, wiki?.writer?.id],
   );
 
   const headerTitle = useMemo(() => {
@@ -234,7 +231,8 @@ const QuestionDetail = () => {
                             writer={answer.writer}
                             isWriter={myself?.id === answer.writer.id}
                             replyButtonName={
-                              enableReplyToAnswer(answer)
+                              answerReply.answer?.id === answer.id ||
+                              !enableReplyToAnswer(answer)
                                 ? undefined
                                 : '返信/追記'
                             }
