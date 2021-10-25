@@ -22,6 +22,7 @@ import {
   useMediaQuery,
   FormControl,
   FormLabel,
+  Text,
 } from '@chakra-ui/react';
 import { useAuthenticate } from 'src/contexts/useAuthenticate';
 import { ContentState, convertFromHTML, Editor, EditorState } from 'draft-js';
@@ -32,6 +33,8 @@ import { liteEditorPlugins } from 'src/utils/liteEditorPlugins';
 import MarkdownIt from 'markdown-it';
 import { uploadStorage } from '@/hooks/api/storage/useAPIUploadStorage';
 import { tagColorFactory } from 'src/utils/factory/tagColorFactory';
+import { useFormik } from 'formik';
+import { wikiSchema } from 'src/utils/validation/schema';
 
 type WikiFormProps = {
   wiki?: Wiki;
@@ -57,11 +60,47 @@ const WikiForm: React.FC<WikiFormProps> = ({
     EditorState.createEmpty(),
   );
   const [activeTab, setActiveTab] = useState<TabName>(TabName.EDIT);
-  const [newQuestion, setNewQuestion] = useState<Partial<Wiki>>({
+  // const [newQuestion, setNewQuestion] = useState<Partial<Wiki>>({
+  //   title: '',
+  //   body: '',
+  //   tags: [],
+  //   textFormat: 'html',
+  // });
+  const initialValues: Partial<Wiki> = {
     title: '',
     body: '',
     tags: [],
     textFormat: 'html',
+  };
+  const {
+    values: newQuestion,
+    setValues: setNewQuestion,
+    errors,
+    touched,
+    handleSubmit,
+  } = useFormik({
+    initialValues,
+    validationSchema: wikiSchema,
+    onSubmit: (q) => {
+      if (wiki) {
+        onClickSaveButton({
+          ...wiki,
+          ...q,
+          body:
+            q.textFormat === 'html'
+              ? stateToHTML(editorState.getCurrentContent())
+              : q.body,
+        });
+        return;
+      }
+      onClickSaveButton({
+        ...q,
+        body:
+          q.textFormat === 'html'
+            ? stateToHTML(editorState.getCurrentContent())
+            : q.body,
+      });
+    },
   });
   const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
   const formTopRef = useRef<HTMLDivElement | null>(null);
@@ -117,7 +156,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
     ).length;
     if (isExist) {
       setNewQuestion((q) => ({
-        ...q,
+        ...newQuestion,
         tags: q.tags ? q.tags.filter((existT) => existT.id !== t.id) : [],
       }));
       return;
@@ -144,34 +183,13 @@ const WikiForm: React.FC<WikiFormProps> = ({
     }
   };
 
-  const handleSaveButton = () => {
-    if (wiki) {
-      onClickSaveButton({
-        ...wiki,
-        ...newQuestion,
-        body:
-          newQuestion.textFormat === 'html'
-            ? stateToHTML(editorState.getCurrentContent())
-            : newQuestion.body,
-      });
-      return;
-    }
-    onClickSaveButton({
-      ...newQuestion,
-      body:
-        newQuestion.textFormat === 'html'
-          ? stateToHTML(editorState.getCurrentContent())
-          : newQuestion.body,
-    });
-  };
-
   useEffect(() => {
-    setNewQuestion({
-      ...newQuestion,
+    setNewQuestion((q) => ({
+      ...q,
       type: type || WikiType.QA,
       ruleCategory: type === WikiType.RULES ? RuleCategory.RULES : undefined,
-    });
-  }, [type]);
+    }));
+  }, [setNewQuestion, type]);
 
   useEffect(() => {
     if (wiki) {
@@ -189,7 +207,14 @@ const WikiForm: React.FC<WikiFormProps> = ({
         );
       }
     }
-  }, [wiki]);
+  }, [setNewQuestion, wiki]);
+
+  useEffect(() => {
+    setNewQuestion((q) => ({
+      ...q,
+      body: stateToHTML(editorState.getCurrentContent()),
+    }));
+  }, [editorState, setNewQuestion]);
 
   useEffect(() => {
     formTopRef.current?.scrollIntoView();
@@ -221,6 +246,10 @@ const WikiForm: React.FC<WikiFormProps> = ({
         <div ref={formTopRef} className={qaCreateStyles.type_select_wrapper}>
           <FormControl className={qaCreateStyles.title_input}>
             <FormLabel>タイトル</FormLabel>
+            {errors.title && touched.title ? (
+              <Text color="tomato">{errors.title}</Text>
+            ) : null}
+            <Text></Text>
             <Input
               type="text"
               width="100%"
@@ -316,7 +345,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
                 marginRight="16px">
                 タグを編集
               </Button>
-              <Button colorScheme="pink" onClick={() => handleSaveButton()}>
+              <Button colorScheme="pink" onClick={() => handleSubmit()}>
                 {wiki ? `${saveButtonName}を更新` : `${saveButtonName}を投稿`}
               </Button>
             </div>
@@ -332,6 +361,9 @@ const WikiForm: React.FC<WikiFormProps> = ({
               </div>
             ))}
           </div>
+        ) : null}
+        {errors.body && touched.body ? (
+          <Text color="tomato">{errors.body}</Text>
         ) : null}
         {newQuestion.textFormat === 'html' && (
           <div style={{ marginBottom: 40 }}>
