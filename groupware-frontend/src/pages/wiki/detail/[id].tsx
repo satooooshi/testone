@@ -3,12 +3,12 @@ import { useAPIGetWikiDetail } from '@/hooks/api/wiki/useAPIGetWikiDetail';
 import { useRouter } from 'next/router';
 import qaDetailStyles from '@/styles/layouts/QADetail.module.scss';
 import WikiComment from '@/components/wiki/WikiComment';
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 import 'react-markdown-editor-lite/lib/index.css';
 import { useAPICreateAnswer } from '@/hooks/api/wiki/useAPICreateAnswer';
 import LayoutWithTab from '@/components/layout/LayoutWithTab';
 import AnswerReply from '@/components/wiki/AnswerReply';
-import { QAAnswerReply, WikiType } from 'src/types';
+import { QAAnswer, QAAnswerReply, WikiType } from 'src/types';
 import { Button, useMediaQuery } from '@chakra-ui/react';
 import WrappedDraftEditor from '@/components/wiki/WrappedDraftEditor';
 import { ContentState, Editor, EditorState } from 'draft-js';
@@ -21,11 +21,13 @@ import { useAPIGetProfile } from '@/hooks/api/user/useAPIGetProfile';
 import { stateToHTML } from 'draft-js-export-html';
 import { useHeaderTab } from '@/hooks/headerTab/useHeaderTab';
 import { tagColorFactory } from 'src/utils/factory/tagColorFactory';
+import { useAuthenticate } from 'src/contexts/useAuthenticate';
 
 const QuestionDetail = () => {
   const router = useRouter();
 
   const { id } = router.query;
+  const { user } = useAuthenticate();
   const { data: wiki, refetch } = useAPIGetWikiDetail(
     typeof id === 'string' ? id : '0',
   );
@@ -80,6 +82,41 @@ const QuestionDetail = () => {
   };
 
   const tabs: Tab[] = useHeaderTab({ headerTabType: 'wikiDetail' });
+
+  const handleClickStartInputtingReplyButton = (answer: QAAnswer) => {
+    if (answerReply.answer?.id !== answer.id) {
+      setAnswerReply((r) => ({
+        ...r,
+        answer: answer,
+        body: '',
+      }));
+      setAnswerReplyEditorState(
+        EditorState.push(
+          answerReplyEditorState,
+          ContentState.createFromText(''),
+          'delete-character',
+        ),
+      );
+      return;
+    }
+  };
+
+  const handleClickSendReplyButton = () => {
+    if (answerReplyEditorState.getCurrentContent()) {
+      createAnswerReply({
+        ...answerReply,
+        textFormat: 'html',
+        body: stateToHTML(answerReplyEditorState.getCurrentContent()),
+      });
+    }
+  };
+
+  const enableReplyToAnswer = useCallback(
+    (answer: QAAnswer): boolean => {
+      return wiki?.writer?.id === user?.id || answer?.writer?.id === user?.id;
+    },
+    [user?.id, wiki?.writer?.id],
+  );
 
   const headerTitle = useMemo(() => {
     if (wiki?.type === WikiType.QA) {
@@ -170,14 +207,16 @@ const QuestionDetail = () => {
           )}
           {wiki.answers && wiki.answers.length
             ? wiki.answers.map(
-                (a) =>
-                  a.writer && (
-                    <div key={a.id} className={qaDetailStyles.answers_wrapper}>
+                (answer) =>
+                  answer.writer && (
+                    <div
+                      key={answer.id}
+                      className={qaDetailStyles.answers_wrapper}>
                       <div className={qaDetailStyles.qa_comment_wrapper}>
                         <div className={qaDetailStyles.qa_wrapper}>
                           <WikiComment
                             bestAnswerButtonName={
-                              wiki.bestAnswer?.id === a.id
+                              wiki.bestAnswer?.id === answer.id
                                 ? 'ベストアンサーに選ばれた回答'
                                 : !wiki.resolvedAt &&
                                   myself?.id === wiki.writer?.id
@@ -185,38 +224,26 @@ const QuestionDetail = () => {
                                 : undefined
                             }
                             onClickBestAnswerButton={() =>
-                              createBestAnswer({ ...wiki, bestAnswer: a })
+                              createBestAnswer({ ...wiki, bestAnswer: answer })
                             }
-                            body={a.body}
-                            date={a.createdAt}
-                            writer={a.writer}
-                            isWriter={myself?.id === a.writer.id}
+                            body={answer.body}
+                            date={answer.createdAt}
+                            writer={answer.writer}
+                            isWriter={myself?.id === answer.writer.id}
                             replyButtonName={
-                              answerReply.answer?.id === a.id
+                              answerReply.answer?.id === answer.id ||
+                              !enableReplyToAnswer(answer)
                                 ? undefined
-                                : '返信する'
+                                : '返信/追記'
                             }
-                            onClickReplyButton={() => {
-                              if (answerReply.answer?.id !== a.id) {
-                                setAnswerReply((r) => ({
-                                  ...r,
-                                  answer: a,
-                                  body: '',
-                                }));
-                                setAnswerReplyEditorState(
-                                  EditorState.push(
-                                    answerReplyEditorState,
-                                    ContentState.createFromText(''),
-                                    'delete-character',
-                                  ),
-                                );
-                                return;
-                              }
-                            }}
+                            onClickReplyButton={() =>
+                              handleClickStartInputtingReplyButton(answer)
+                            }
                           />
                         </div>
                       </div>
-                      {answerReply.answer && answerReply.answer.id === a.id ? (
+                      {answerReply.answer &&
+                      answerReply.answer.id === answer.id ? (
                         <WrappedDraftEditor
                           style={{
                             marginBottom: 10,
@@ -228,26 +255,17 @@ const QuestionDetail = () => {
                           setEditorState={setAnswerReplyEditorState}
                         />
                       ) : null}
-                      {answerReply.answer && answerReply.answer.id === a.id ? (
+                      {answerReply.answer &&
+                      answerReply.answer.id === answer.id ? (
                         <Button
                           colorScheme="orange"
                           width="24"
                           className={qaDetailStyles.reply_button}
-                          onClick={() => {
-                            if (answerReplyEditorState.getCurrentContent()) {
-                              createAnswerReply({
-                                ...answerReply,
-                                textFormat: 'html',
-                                body: stateToHTML(
-                                  answerReplyEditorState.getCurrentContent(),
-                                ),
-                              });
-                            }
-                          }}>
+                          onClick={handleClickSendReplyButton}>
                           返信を送信
                         </Button>
                       ) : null}
-                      {a.replies?.map((r) => (
+                      {answer.replies?.map((r) => (
                         <div key={r.id} className={qaDetailStyles.reply}>
                           <AnswerReply reply={r} />
                         </div>
