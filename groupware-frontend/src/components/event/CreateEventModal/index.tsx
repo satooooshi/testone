@@ -564,7 +564,7 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
               <p>クリックかドラッグアンドドロップで投稿</p>
             </div>
           </div>
-          {newFiles.length || newEvent.files.length ? (
+          {newFiles.length || newEvent.files?.length ? (
             <div className={createEventModalStyle.related_files_wrapper}>
               {newFiles.map((f) => (
                 <div className={createEventModalStyle.url_wrapper} key={f.name}>
@@ -619,7 +619,7 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
             />
           </div>
           <div className={createEventModalStyle.related_files_wrapper}>
-            {newEvent.videos.map((y) => (
+            {newEvent?.videos?.map((y) => (
               <div className={createEventModalStyle.url_wrapper} key={y.url}>
                 <p className={createEventModalStyle.url}>{y.url}</p>
                 <MdCancel

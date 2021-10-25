@@ -3,7 +3,7 @@ import chatStyles from '@/styles/layouts/Chat.module.scss';
 import { IoSend } from 'react-icons/io5';
 import { useChatReducer } from '@/hooks/chat/useChatReducer';
 import { useModalReducer } from '@/hooks/chat/useModalReducer';
-import { useCallback, useEffect, useMemo, useReducer, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { useAPIGetUsers } from '@/hooks/api/user/useAPIGetUsers';
 import { ChatGroup, ChatMessageType, User } from 'src/types';
 import { useAPIGetChatGroupList } from '@/hooks/api/chat/useAPIGetChatGroupList';
@@ -40,6 +40,7 @@ import { useAPISaveLastReadChatTime } from '@/hooks/api/chat/useAPISaveLastReadC
 import { useHeaderTab } from '@/hooks/headerTab/useHeaderTab';
 import ChatMessageItem from '@/components/chat/ChatMessageItem';
 import { useAPILeaveChatRoom } from '@/hooks/api/chat/useAPILeaveChatRoomURL';
+import { useMention } from '@/hooks/chat/useMention';
 
 type MentionState = {
   suggestions: MentionData[];
@@ -121,12 +122,7 @@ const ChatDetail = () => {
   const router = useRouter();
   const { id } = router.query as { id: string };
   const [{ popup, suggestions, mentionedUserData }, dispatchMention] =
-    useReducer(mentionReducer, {
-      popup: false,
-      suggestions: [],
-      allMentionUserData: [],
-      mentionedUserData: [],
-    });
+    useMention();
   const [
     { page, messages, lastReadChatTime, newChatMessage, newGroup, editorState },
     dispatchChat,
@@ -293,16 +289,22 @@ const ChatDetail = () => {
     });
   };
 
-  const onOpenChange = useCallback((_open: boolean) => {
-    dispatchMention({ type: 'popup', value: _open });
-  }, []);
+  const onOpenChange = useCallback(
+    (_open: boolean) => {
+      dispatchMention({ type: 'popup', value: _open });
+    },
+    [dispatchMention],
+  );
 
-  const onSearchChange = useCallback(({ value }: { value: string }) => {
-    dispatchMention({
-      type: 'suggestions',
-      value,
-    });
-  }, []);
+  const onSearchChange = useCallback(
+    ({ value }: { value: string }) => {
+      dispatchMention({
+        type: 'suggestions',
+        value,
+      });
+    },
+    [dispatchMention],
+  );
 
   const toggleUserIDs = (user: User) => {
     const isExist = newGroup.members?.filter((u) => u.id === user.id);
@@ -358,13 +360,16 @@ const ChatDetail = () => {
     }
   };
 
-  const onAddMention = useCallback((m: MentionData) => {
-    // get the mention object selected
-    dispatchMention({
-      type: 'mentionedUserData',
-      value: m,
-    });
-  }, []);
+  const onAddMention = useCallback(
+    (m: MentionData) => {
+      // get the mention object selected
+      dispatchMention({
+        type: 'mentionedUserData',
+        value: m,
+      });
+    },
+    [dispatchMention],
+  );
 
   const onScrollTopOnChat = (e: any) => {
     if (

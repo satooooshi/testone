@@ -59,6 +59,7 @@
   width: 40%;
   aspect-ratio: 1;
   max-height: 30vw;
+  min-width: 30vw;
   display: flex;
   flex-direction: row;
   justify-content: center;
@@ -149,6 +150,19 @@
 
 .join_event_button {
   margin-right: 8px;
+}
+
+.event_type_tag {
+  margin-right: 16px;
+  display: inline-block;
+  margin: 0 0.1em 0.6em 0;
+  padding: 0.6em;
+  line-height: 1;
+  text-decoration: none;
+  color: white;
+  font-weight: bold;
+  background-color: aqua;
+  border-radius: 0.5rem;
 }
 
 .admin_buttons_wrapper {
