@@ -191,7 +191,7 @@ const EventDetail = () => {
   );
 
   const tabs: Tab[] = useHeaderTab(
-    user?.role === UserRole.ADMIN
+    user?.role === UserRole.ADMIN && data
       ? {
           headerTabType: 'adminEventDetail',
           onDeleteClicked,
@@ -225,13 +225,18 @@ const EventDetail = () => {
     <LayoutWithTab
       sidebar={{ activeScreenName: SidebarScreenName.EVENT }}
       header={initialHeaderValue}>
+      {!data || !data?.id ? (
+        <div>
+          <Text>このイベントは存在しないか、権限がありません。</Text>
+        </div>
+      ) : null}
       <CreateEventModal
         enabled={editModal}
         onCancelPressed={() => setEditModal(false)}
         event={data}
         createEvent={(newEvent) => saveEvent(newEvent)}
       />
-      {data && (
+      {data && data.id ? (
         <div className={eventDetailStyles.main}>
           <Head>
             <title>ボールド | {data.title}</title>
@@ -529,7 +534,7 @@ const EventDetail = () => {
             ) : null}
           </div>
         </div>
-      )}
+      ) : null}
     </LayoutWithTab>
   );
 };
