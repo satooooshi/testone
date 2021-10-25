@@ -60,12 +60,6 @@ const WikiForm: React.FC<WikiFormProps> = ({
     EditorState.createEmpty(),
   );
   const [activeTab, setActiveTab] = useState<TabName>(TabName.EDIT);
-  // const [newQuestion, setNewQuestion] = useState<Partial<Wiki>>({
-  //   title: '',
-  //   body: '',
-  //   tags: [],
-  //   textFormat: 'html',
-  // });
   const initialValues: Partial<Wiki> = {
     title: '',
     body: '',
@@ -210,13 +204,6 @@ const WikiForm: React.FC<WikiFormProps> = ({
   }, [setNewQuestion, wiki]);
 
   useEffect(() => {
-    setNewQuestion((q) => ({
-      ...q,
-      body: stateToHTML(editorState.getCurrentContent()),
-    }));
-  }, [editorState, setNewQuestion]);
-
-  useEffect(() => {
     formTopRef.current?.scrollIntoView();
   }, []);
 
@@ -326,7 +313,6 @@ const WikiForm: React.FC<WikiFormProps> = ({
                       setEditorState(EditorState.createEmpty());
                       setNewQuestion((prev) => ({
                         ...prev,
-                        body: '',
                         textFormat: e.target.value as TextFormat,
                       }));
                     }
@@ -396,13 +382,6 @@ const WikiForm: React.FC<WikiFormProps> = ({
             renderHTML={(text: string) => mdParser.render(text)}
           />
         ) : null}
-        {/* {newQuestion.textFormat === 'markdown' && */}
-        {/* activeTab === TabName.PREVIEW ? ( */}
-        {/*   <MDEditor.Markdown */}
-        {/*     source={newQuestion.body} */}
-        {/*     className={qaCreateStyles.markdown_preview} */}
-        {/*   /> */}
-        {/* ) : null} */}
       </LayoutWithTab>
     </>
   );

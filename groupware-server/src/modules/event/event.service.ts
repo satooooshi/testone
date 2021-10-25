@@ -223,7 +223,7 @@ export class EventScheduleService {
   public async getEvents(
     query: SearchQueryToGetEvents,
   ): Promise<SearchResultToGetEvents> {
-    const { page = 1, word = '', status = 'future', tag = '', type } = query;
+    const { page = 1, word = '', status, tag = '', type } = query;
     let offset: number;
     const limit = 20;
     if (page) {
@@ -257,11 +257,16 @@ export class EventScheduleService {
           ? 'events.start_at > now()'
           : status === 'past'
           ? 'events.start_at < now() AND events.end_at < now()'
-          : 'events.start_at < now() AND events.end_at > now()',
+          : status === 'current'
+          ? 'events.start_at < now() AND events.end_at > now()'
+          : '1=1',
       )
       .andWhere(query.participant_id ? 'user.id = :userID' : '1=1', {
         userID: query.participant_id,
       })
+      .andWhere(
+        query.participant_id ? 'userJoiningEvent.canceledAt IS NULL' : '1=1',
+      )
       .andWhere(query.host_user_id ? 'host_user = :hostUserID' : '1=1', {
         hostUserID: query.host_user_id,
       })

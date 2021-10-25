@@ -191,7 +191,7 @@ const EventDetail = () => {
   );
 
   const tabs: Tab[] = useHeaderTab(
-    user?.role === UserRole.ADMIN
+    user?.role === UserRole.ADMIN && data
       ? {
           headerTabType: 'adminEventDetail',
           onDeleteClicked,
@@ -225,13 +225,18 @@ const EventDetail = () => {
     <LayoutWithTab
       sidebar={{ activeScreenName: SidebarScreenName.EVENT }}
       header={initialHeaderValue}>
+      {!data || !data?.id ? (
+        <div>
+          <Text>このイベントは存在しないか、権限がありません。</Text>
+        </div>
+      ) : null}
       <CreateEventModal
         enabled={editModal}
         onCancelPressed={() => setEditModal(false)}
         event={data}
         createEvent={(newEvent) => saveEvent(newEvent)}
       />
-      {data && (
+      {data && data.id ? (
         <div className={eventDetailStyles.main}>
           <Head>
             <title>ボールド | {data.title}</title>
@@ -249,13 +254,15 @@ const EventDetail = () => {
                 <span className={eventDetailStyles.event_title}>
                   {data.title}
                 </span>
-                <Button
-                  background={eventTypeColorFactory(data.type)}
-                  _hover={{}}
-                  size="sm"
-                  color="white">
-                  {eventTypeNameFactory(data.type)}
-                </Button>
+                <div className={eventDetailStyles.type_wrapper}>
+                  <Button
+                    background={eventTypeColorFactory(data.type)}
+                    _hover={{}}
+                    size="sm"
+                    color="white">
+                    {eventTypeNameFactory(data.type)}
+                  </Button>
+                </div>
                 <div className={eventDetailStyles.event_dates_wrapper}>
                   {data.type !== EventType.SUBMISSION_ETC && (
                     <span className={eventDetailStyles.start_date}>
@@ -529,7 +536,7 @@ const EventDetail = () => {
             ) : null}
           </div>
         </div>
-      )}
+      ) : null}
     </LayoutWithTab>
   );
 };

@@ -70,6 +70,7 @@ export class WikiService {
       tag = '',
       type,
       rule_category,
+      writer,
     } = query;
     let offset: number;
     const limit = 20;
@@ -89,14 +90,14 @@ export class WikiService {
         queryWord: `%${word}%`,
       })
       .andWhere(
-        status === 'new'
+        status === 'new' && !writer
           ? 'wiki.resolved_at is null'
-          : status === 'resolved'
+          : status === 'resolved' && !writer
           ? 'wiki.resolved_at is not null'
           : '1=1',
       )
-      .andWhere(query.writer ? 'writer.id = :writer' : '1=1', {
-        writer: query.writer,
+      .andWhere(writer ? 'writer.id = :writer' : '1=1', {
+        writer: writer,
       })
       .andWhere(
         query.answer_writer ? 'answer_writer.id = :answerWriter' : '1=1',
