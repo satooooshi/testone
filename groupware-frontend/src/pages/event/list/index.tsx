@@ -17,7 +17,13 @@ import { EventSchedule, EventType, Tag } from 'src/types';
 import { EventTab } from 'src/types/header/tab/types';
 import { toggleTag } from 'src/utils/toggleTag';
 import { generateEventSearchQueryString } from 'src/utils/eventQueryRefresh';
-import { Calendar, Formats, momentLocalizer, Views } from 'react-big-calendar';
+import {
+  Calendar,
+  DateRange,
+  Formats,
+  momentLocalizer,
+  Views,
+} from 'react-big-calendar';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import withDragAndDrop from 'react-big-calendar/lib/addons/dragAndDrop';
 import bigCalendarStyles from '@/styles/components/BigCalendar.module.scss';
@@ -45,6 +51,18 @@ const formats: Formats = {
   dateFormat: 'D',
   dayFormat: 'D(ddd)',
   monthHeaderFormat: 'YYYY年M月',
+  dayRangeHeaderFormat: (range: DateRange) => {
+    return (
+      dateTimeFormatterFromJSDDate({
+        dateTime: new Date(range.start),
+        format: 'yyyy年LL月dd日 - ',
+      }) +
+      dateTimeFormatterFromJSDDate({
+        dateTime: new Date(range.end),
+        format: 'LL月dd日',
+      })
+    );
+  },
   dayHeaderFormat: 'M月D日(ddd)',
 };
 
