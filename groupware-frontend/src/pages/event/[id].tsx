@@ -254,13 +254,15 @@ const EventDetail = () => {
                 <span className={eventDetailStyles.event_title}>
                   {data.title}
                 </span>
-                <Button
-                  background={eventTypeColorFactory(data.type)}
-                  _hover={{}}
-                  size="sm"
-                  color="white">
-                  {eventTypeNameFactory(data.type)}
-                </Button>
+                <div className={eventDetailStyles.type_wrapper}>
+                  <Button
+                    background={eventTypeColorFactory(data.type)}
+                    _hover={{}}
+                    size="sm"
+                    color="white">
+                    {eventTypeNameFactory(data.type)}
+                  </Button>
+                </div>
                 <div className={eventDetailStyles.event_dates_wrapper}>
                   {data.type !== EventType.SUBMISSION_ETC && (
                     <span className={eventDetailStyles.start_date}>
