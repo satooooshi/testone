@@ -16,6 +16,11 @@ export const loginSchema = Yup.object().shape({
     .required(requireMessage),
 });
 
+export const wikiSchema = Yup.object().shape({
+  title: Yup.string().required(requireMessage),
+  body: Yup.string().required(requireMessage),
+});
+
 export const updatePasswordSchema = Yup.object().shape({
   currentPassword: Yup.string().required(requireMessage),
   newPassword: Yup.string()
