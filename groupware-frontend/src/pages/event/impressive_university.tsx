@@ -9,6 +9,7 @@ import { useAPIGetLatestEvent } from '@/hooks/api/event/useAPIGetLatestEvent';
 import { EventType } from 'src/types';
 import { EventTab } from 'src/types/header/tab/types';
 import EventIntroduction from 'src/templates/event/EventIntroduction';
+import Head from 'next/head';
 
 const ImpressionUniversity: React.FC = () => {
   const router = useRouter();
@@ -38,6 +39,9 @@ const ImpressionUniversity: React.FC = () => {
     <LayoutWithTab
       sidebar={{ activeScreenName: SidebarScreenName.EVENT }}
       header={initialHeaderValue}>
+      <Head>
+        <title>ボールド | 感動大学</title>
+      </Head>
       <div className={eventPRStyles.main}>
         <EventIntroduction
           recommendedEvents={recommendedEvents}

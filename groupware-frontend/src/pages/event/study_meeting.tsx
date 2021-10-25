@@ -9,6 +9,7 @@ import { useAPIGetLatestEvent } from '@/hooks/api/event/useAPIGetLatestEvent';
 import { EventType } from 'src/types';
 import { EventTab } from 'src/types/header/tab/types';
 import EventIntroduction from 'src/templates/event/EventIntroduction';
+import Head from 'next/head';
 
 const StudyMeeting: React.FC = () => {
   const router = useRouter();
@@ -34,6 +35,9 @@ const StudyMeeting: React.FC = () => {
     <LayoutWithTab
       sidebar={{ activeScreenName: SidebarScreenName.EVENT }}
       header={initialHeaderValue}>
+      <Head>
+        <title>ボールド | 勉強会</title>
+      </Head>
       <div className={eventPRStyles.main}>
         <EventIntroduction
           recommendedEvents={recommendedEvents}
