@@ -364,6 +364,22 @@ export class EventScheduleService {
       }
       eventSchedule.submissionFiles = parsedFiles;
     }
+    if (eventSchedule?.comments && eventSchedule.comments.length) {
+      const parsedComments: EventComment[] = [];
+      for (const c of eventSchedule.comments) {
+        const userImageURL =
+          await this.storageService.parseStorageURLToSignedURL(
+            c?.writer?.avatarUrl || '',
+          );
+        const parsedCommentObj: EventComment = {
+          ...c,
+          writer: { ...c.writer, avatarUrl: userImageURL },
+        };
+        parsedComments.push(parsedCommentObj);
+      }
+      eventSchedule.comments = parsedComments;
+    }
+
     return eventSchedule;
   }
 
