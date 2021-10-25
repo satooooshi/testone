@@ -437,28 +437,20 @@ export class EventScheduleService {
     const limit = 10;
     const latestEvents = await this.eventRepository
       .createQueryBuilder('event')
+      .leftJoinAndSelect('event.userJoiningEvent', 'userJoiningEvent')
+      .leftJoinAndSelect('userJoiningEvent.user', 'user')
+      .leftJoinAndSelect('event.tags', 'tags')
       .where('event.startAt > now()')
       .andWhere('event.startAt < :oneWeekLater', { oneWeekLater })
       .andWhere(type ? 'event.type = :type' : '1=1', {
         type,
       })
-      .getMany();
-    if (!latestEvents.length) {
-      return [];
-    }
-
-    const ids = latestEvents.map((l) => l.id);
-    const filteredLatestEvents = await this.eventRepository
-      .createQueryBuilder('event')
-      .leftJoinAndSelect('events.userJoiningEvent', 'userJoiningEvent')
-      .leftJoinAndSelect('userJoiningEvent.user', 'user')
-      .leftJoinAndSelect('event.tags', 'tags')
-      .where('event.id IN (:ids)', { ids })
       .orderBy('RAND()')
-      .limit(limit)
+      .take(limit)
       .getMany();
-
-    return filteredLatestEvents;
+    const urlParsedEvents =
+      this.generateSignedStorageURLsFromEventArr(latestEvents);
+    return urlParsedEvents;
   }
 
   public async saveEvent(
