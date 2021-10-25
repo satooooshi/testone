@@ -54,7 +54,7 @@ const EventParticipants: React.FC<EventParticipantsProps> = ({
           </button>
         ) : null}
       </div>
-      {!userJoiningEvent.length && (
+      {!userJoiningEvent?.length && (
         <div className={eventParticipantsStyles.participant_name_wrapper}>
           <a className={eventParticipantsStyles.user_info_wrapper}>
             <p className={eventParticipantsStyles.participant_name}>
@@ -63,7 +63,7 @@ const EventParticipants: React.FC<EventParticipantsProps> = ({
           </a>
         </div>
       )}
-      {userJoiningEvent.map((u, index) =>
+      {userJoiningEvent?.map((u, index) =>
         index <= 15 || allVisible ? (
           u.user.existence ? (
             <div className={eventParticipantsStyles.participant_name_wrapper}>
