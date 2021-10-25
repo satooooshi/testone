@@ -240,7 +240,7 @@ export class ChatService {
     const users = await this.userRepository.findByIds(userIds);
     chatGroup.members = users;
     chatGroup.imageURL = this.storageService.parseSignedURLToStorageURL(
-      chatGroup.imageURL,
+      chatGroup.imageURL || '',
     );
 
     const newGroup = await this.chatGroupRepository.save(chatGroup);

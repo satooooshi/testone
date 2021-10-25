@@ -73,7 +73,7 @@ const Chat = () => {
           }
           toggleNewGroupMember={toggleUserIDs}
           users={users}
-          createGroup={() => createGroup(newGroup)}
+          createGroup={(g) => createGroup(g)}
         />
       )}
       {chatGroups && isSmallerThan768 ? (
