@@ -1,7 +1,6 @@
 import { EventType } from 'src/types';
 
-const eventTypeNameGetter = (event: any): any => {
-  const type = event.type;
+const eventTypeNameFactory = (type: EventType): any => {
   switch (type) {
     case EventType.IMPRESSIVE_UNIVERSITY:
       return '感動大学';
@@ -18,4 +17,4 @@ const eventTypeNameGetter = (event: any): any => {
   }
 };
 
-export default eventTypeNameGetter;
+export default eventTypeNameFactory;

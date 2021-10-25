@@ -44,8 +44,8 @@ import { userNameFactory } from 'src/utils/factory/userNameFactory';
 import { tagColorFactory } from 'src/utils/factory/tagColorFactory';
 import { useAPICancelEvent } from '@/hooks/api/event/useAPICancelEvent';
 import coachImage from '@/public/coach_1.jpg';
-import eventTypeColorGetter from 'src/utils/event/eventTypeColorGetter';
-import eventTypeNameGetter from 'src/utils/event/eventTypeNameGetter';
+import { eventTypeColorFactory } from 'src/utils/factory/eventTypeColorFactory';
+import eventTypeNameFactory from 'src/utils/factory/eventTypeNameFactory';
 
 type FileIconProps = {
   href?: string;
@@ -246,16 +246,16 @@ const EventDetail = () => {
                 )}
               </div>
               <div className={eventDetailStyles.event_info_right}>
-                <div className={eventDetailStyles.event_title_type_wrapper}>
-                  <span className={eventDetailStyles.event_title}>
-                    {data.title}
-                  </span>
-                  <span
-                    className={eventDetailStyles.event_type_tag}
-                    style={{ backgroundColor: eventTypeColorGetter(data) }}>
-                    {eventTypeNameGetter(data)}
-                  </span>
-                </div>
+                <span className={eventDetailStyles.event_title}>
+                  {data.title}
+                </span>
+                <Button
+                  background={eventTypeColorFactory(data.type)}
+                  _hover={{}}
+                  size="sm"
+                  color="white">
+                  {eventTypeNameFactory(data.type)}
+                </Button>
                 <div className={eventDetailStyles.event_dates_wrapper}>
                   {data.type !== EventType.SUBMISSION_ETC && (
                     <span className={eventDetailStyles.start_date}>

@@ -1,7 +1,6 @@
 import { EventType } from 'src/types';
 
-const eventTypeColorGetter = (event: any): any => {
-  const type = event.type;
+export const eventTypeColorFactory = (type: EventType): string => {
   switch (type) {
     case EventType.IMPRESSIVE_UNIVERSITY:
       return '#3182ce';
@@ -17,5 +16,3 @@ const eventTypeColorGetter = (event: any): any => {
       return '#086f83';
   }
 };
-
-export default eventTypeColorGetter;
