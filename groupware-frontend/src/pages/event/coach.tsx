@@ -8,6 +8,7 @@ import { EventType } from 'src/types';
 import { EventTab } from 'src/types/header/tab/types';
 import coachImage1 from '@/public/coach_1.jpg';
 import EventIntroduction from 'src/templates/event/EventIntroduction';
+import Head from 'next/head';
 
 const Coach: React.FC = () => {
   const router = useRouter();
@@ -30,6 +31,9 @@ const Coach: React.FC = () => {
     <LayoutWithTab
       sidebar={{ activeScreenName: SidebarScreenName.EVENT }}
       header={initialHeaderValue}>
+      <Head>
+        <title>ボールド | コーチ制度</title>
+      </Head>
       <div className={eventPRStyles.main}>
         <EventIntroduction
           recommendedEvents={recommendedEvents}

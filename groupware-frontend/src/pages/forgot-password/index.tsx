@@ -37,7 +37,7 @@ const ForgotPassword: React.FC = () => {
   return (
     <div className={loginLayoutStyles.screen_wrapper}>
       <Head>
-        <title>ログイン</title>
+        <title>ボールド | パスワード再発行</title>
       </Head>
       <div className={loginLayoutStyles.logo_image}>
         <Image src={boldLogo} alt="bold logo" />
