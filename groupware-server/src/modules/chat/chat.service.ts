@@ -12,6 +12,7 @@ import { User } from 'src/entities/user.entity';
 import { userNameFactory } from 'src/utils/factory/userNameFactory';
 import { In, Repository } from 'typeorm';
 import { StorageService } from '../storage/storage.service';
+import { UserService } from '../user/user.service';
 import { GetMessagesQuery } from './chat.controller';
 
 @Injectable()
@@ -26,14 +27,23 @@ export class ChatService {
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
     private readonly storageService: StorageService,
+    private readonly userService: UserService,
   ) {}
 
   public async generateSignedStorageURLsFromChatGroupObj(
     chatGroup: ChatGroup,
   ): Promise<ChatGroup> {
-    chatGroup.imageURL = await this.storageService.parseStorageURLToSignedURL(
-      chatGroup.imageURL,
-    );
+    if (chatGroup?.imageURL) {
+      chatGroup.imageURL = await this.storageService.parseStorageURLToSignedURL(
+        chatGroup.imageURL,
+      );
+    }
+    if (chatGroup?.members && chatGroup?.members.length) {
+      chatGroup.members =
+        await this.userService.generateSignedStorageURLsFromUserArr(
+          chatGroup.members,
+        );
+    }
     return chatGroup;
   }
 
