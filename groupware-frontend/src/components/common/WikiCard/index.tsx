@@ -80,7 +80,7 @@ const WikiCard: React.FC<WikiCardProps> = ({ wiki }) => {
                 ))
               : null}
           </div>
-          {wiki.type === WikiType.QA && (
+          {wiki.type !== WikiType.RULES && (
             <p className={qaCardStyles.qa_card__date}>
               {dateTimeFormatterFromJSDDate({ dateTime: new Date(createdAt) })}
             </p>
