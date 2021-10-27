@@ -215,16 +215,6 @@ const QuestionDetail = () => {
                 size="sm"
                 colorScheme="teal"
                 onClick={() => {
-                  // answerVisible && checkErrors();
-                  // answerVisible && answerEditorState.getCurrentContent()
-                  //   ? createAnswer({
-                  //       textFormat: 'html',
-                  //       body: stateToHTML(
-                  //         answerEditorState.getCurrentContent(),
-                  //       ),
-                  //       wiki: wiki,
-                  //     })
-                  //   : setAnswerVisible(true);
                   checkErrors('answer');
                 }}>
                 {answerVisible ? '回答を投稿する' : '回答を追加'}
