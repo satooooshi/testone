@@ -273,7 +273,10 @@ const WikiForm: React.FC<WikiFormProps> = ({
                     : WikiType.QA
                 }
                 onChange={(e) => {
-                  if (e.target.value === (WikiType.KNOWLEDGE || WikiType.QA)) {
+                  if (
+                    e.target.value === WikiType.KNOWLEDGE ||
+                    e.target.value === WikiType.QA
+                  ) {
                     setNewQuestion((prev) => ({
                       ...prev,
                       type: e.target.value as WikiType,
