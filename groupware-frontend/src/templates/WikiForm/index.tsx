@@ -65,7 +65,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
     title: '',
     body: '',
     tags: [],
-    type,
+    type: type ?? WikiType.QA,
     ruleCategory: type ? RuleCategory.RULES : undefined,
     textFormat: 'html',
   };
