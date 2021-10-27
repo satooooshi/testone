@@ -215,23 +215,9 @@ export class EventScheduleController {
   @UseGuards(JwtAuthenticationGuard)
   async updateEvent(
     @Body() eventSchedule: Partial<EventSchedule>,
-    @Req() req: RequestWithUser,
   ): Promise<EventSchedule> {
     if (!eventSchedule.tags || !eventSchedule.tags.length) {
       throw new BadRequestException('Event must links one or more tags');
-    }
-    const existEvent = await this.eventService.getEventDetail(
-      eventSchedule.id,
-      req.user.id,
-    );
-    if (
-      existEvent.author &&
-      existEvent.author.id !== req.user.id &&
-      req.user.role !== UserRole.ADMIN
-    ) {
-      throw new BadRequestException(
-        'Events are able to be editted by only the user created',
-      );
     }
     return await this.eventService.saveEvent(eventSchedule);
   }

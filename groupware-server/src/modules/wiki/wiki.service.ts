@@ -35,13 +35,31 @@ export class WikiService {
         );
     }
     if (wiki?.answers) {
-      const parsedAnswers = [];
+      const parsedAnswers: QAAnswer[] = [];
       for (const a of wiki.answers) {
-        const parsedAnswer =
+        const parsedAvatar =
           await this.storageService.parseStorageURLToSignedURL(
             a.writer?.avatarUrl || '',
           );
-        parsedAnswers.push({ ...a, parsedAnswer });
+        const parsedReplies: QAAnswerReply[] = [];
+        if (a?.replies && a.replies.length) {
+          for (const r of a.replies) {
+            const parsedReplyAvatar =
+              await this.storageService.parseStorageURLToSignedURL(
+                a.writer?.avatarUrl || '',
+              );
+            const replyObj: QAAnswerReply = {
+              ...r,
+              writer: { ...r.writer, avatarUrl: parsedReplyAvatar },
+            };
+            parsedReplies.push(replyObj);
+          }
+        }
+        parsedAnswers.push({
+          ...a,
+          writer: { ...a.writer, avatarUrl: parsedAvatar },
+          replies: parsedReplies,
+        });
       }
       wiki.answers = parsedAnswers;
     }

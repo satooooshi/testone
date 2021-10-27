@@ -185,10 +185,32 @@ const EventDetail = () => {
   const isCommonUser = user?.role === UserRole.COMMON;
   const isAdminUser = user?.role === UserRole.ADMIN;
 
-  const isEditable = useMemo(
-    () => user?.id === data?.author?.id || !isCommonUser,
-    [user?.id, data?.author?.id, isCommonUser],
-  );
+  const isEditable = useMemo(() => {
+    const isEditableEvent = (type: EventType): boolean => {
+      switch (type) {
+        case EventType.IMPRESSIVE_UNIVERSITY:
+          return user?.role === UserRole.ADMIN;
+        case EventType.STUDY_MEETING:
+          return (
+            user?.role === UserRole.ADMIN ||
+            user?.role === UserRole.INTERNAL_INSTRUCTOR
+          );
+        case EventType.BOLDAY:
+          return user?.role === UserRole.ADMIN;
+        case EventType.COACH:
+          return user?.role === UserRole.ADMIN || user?.role === UserRole.COACH;
+        case EventType.CLUB:
+          return (
+            user?.role === UserRole.ADMIN ||
+            user?.role === UserRole.INTERNAL_INSTRUCTOR ||
+            user?.role === UserRole.COMMON
+          );
+        case EventType.SUBMISSION_ETC:
+          return user?.role === UserRole.ADMIN;
+      }
+    };
+    return data?.type ? isEditableEvent(data?.type) : false;
+  }, [data?.type, user?.role]);
 
   const tabs: Tab[] = useHeaderTab(
     user?.role === UserRole.ADMIN && data
