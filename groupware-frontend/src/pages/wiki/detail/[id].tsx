@@ -25,6 +25,7 @@ import { useAuthenticate } from 'src/contexts/useAuthenticate';
 
 const QuestionDetail = () => {
   const router = useRouter();
+  const toast = useToast();
 
   const { id } = router.query;
   const { user } = useAuthenticate();
@@ -101,7 +102,6 @@ const QuestionDetail = () => {
     }
   };
 
-  const toast = useToast();
   const checkErrors = async (isBody: string) => {
     const editorBody =
       isBody === 'answer'
@@ -127,13 +127,14 @@ const QuestionDetail = () => {
   };
 
   const handleClickSendAnswer = () => {
-    answerVisible && answerEditorState.getCurrentContent()
-      ? createAnswer({
-          textFormat: 'html',
-          body: stateToHTML(answerEditorState.getCurrentContent()),
-          wiki: wiki,
-        })
-      : setAnswerVisible(true);
+    if (answerVisible && answerEditorState.getCurrentContent()) {
+      createAnswer({
+        textFormat: 'html',
+        body: stateToHTML(answerEditorState.getCurrentContent()),
+        wiki: wiki,
+      });
+    }
+    setAnswerVisible(true);
   };
 
   const handleClickSendReply = () => {
