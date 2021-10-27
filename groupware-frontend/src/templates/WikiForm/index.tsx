@@ -25,7 +25,7 @@ import {
   Text,
 } from '@chakra-ui/react';
 import { useAuthenticate } from 'src/contexts/useAuthenticate';
-import { ContentState, convertFromHTML, Editor, EditorState } from 'draft-js';
+import { Editor, EditorState } from 'draft-js';
 import { stateToHTML } from 'draft-js-export-html';
 import WrappedEditor from '@/components/wiki/WrappedEditor';
 import MarkdownEditor from 'react-markdown-editor-lite';
@@ -35,6 +35,7 @@ import { uploadStorage } from '@/hooks/api/storage/useAPIUploadStorage';
 import { tagColorFactory } from 'src/utils/factory/tagColorFactory';
 import { useFormik } from 'formik';
 import { wikiSchema } from 'src/utils/validation/schema';
+import { stateFromHTML } from 'draft-js-import-html';
 
 type WikiFormProps = {
   wiki?: Wiki;
@@ -64,6 +65,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
     title: '',
     body: '',
     tags: [],
+    type,
     textFormat: 'html',
   };
   const {
@@ -178,27 +180,10 @@ const WikiForm: React.FC<WikiFormProps> = ({
   };
 
   useEffect(() => {
-    setNewQuestion((q) => ({
-      ...q,
-      type: type || WikiType.QA,
-      ruleCategory: type === WikiType.RULES ? RuleCategory.RULES : undefined,
-    }));
-  }, [setNewQuestion, type]);
-
-  useEffect(() => {
     if (wiki) {
       setNewQuestion(wiki);
       if (wiki.textFormat === 'html') {
-        setEditorState((e) =>
-          EditorState.push(
-            e,
-            ContentState.createFromBlockArray(
-              convertFromHTML(wiki.body).contentBlocks,
-              convertFromHTML(wiki.body).entityMap,
-            ),
-            'apply-entity',
-          ),
-        );
+        setEditorState(EditorState.createWithContent(stateFromHTML(wiki.body)));
       }
     }
   }, [setNewQuestion, wiki]);
@@ -280,6 +265,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
                     setNewQuestion((prev) => ({
                       ...prev,
                       type: e.target.value as WikiType,
+                      ruleCategory: undefined,
                     }));
                     return;
                   }
