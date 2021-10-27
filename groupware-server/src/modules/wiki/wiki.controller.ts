@@ -12,6 +12,7 @@ import {
 import { QAAnswer } from 'src/entities/qaAnswer.entity';
 import { QAAnswerReply } from 'src/entities/qaAnswerReply.entity';
 import { RuleCategory, Wiki, WikiType } from 'src/entities/wiki.entity';
+import { existTextCheckerExceptTags } from 'src/utils/existTextCheckerExceptTags';
 import JwtAuthenticationGuard from '../auth/jwtAuthentication.guard';
 import RequestWithUser from '../auth/requestWithUser.interface';
 import { WikiService } from './wiki.service';
@@ -62,7 +63,7 @@ export class WikiController {
     @Req() request: RequestWithUser,
     @Body() wiki: Partial<Wiki>,
   ): Promise<Wiki> {
-    if (!wiki.title || !wiki.body) {
+    if (!wiki.title || !existTextCheckerExceptTags(wiki.body)) {
       throw new BadRequestException('title and body is necessary');
     }
     wiki.writer = request.user;

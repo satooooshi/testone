@@ -11,6 +11,9 @@ const CreateQA = () => {
     onSuccess: () => {
       router.push('/wiki/list?page=1&tag=&word=&status=new&type=');
     },
+    onError: () => {
+      alert('質問内容には空白以外の文字を入力してください。');
+    },
   });
 
   return (
