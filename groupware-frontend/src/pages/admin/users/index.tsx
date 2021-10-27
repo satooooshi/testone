@@ -183,7 +183,7 @@ const UserAdmin: React.FC = () => {
           </tbody>
         </table>
       </div>
-      {users && users.pageCount ? (
+      {typeof window !== 'undefined' && users && users.pageCount ? (
         <div className={paginationStyles.pagination_wrap_layout}>
           <ReactPaginate
             pageCount={users.pageCount}

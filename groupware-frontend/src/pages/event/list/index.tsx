@@ -526,7 +526,10 @@ const EventList = () => {
         )}
       </div>
       <div className={eventListStyles.pagination_wrapper}>
-        {!isCalendar && events && events.pageCount ? (
+        {typeof window !== 'undefined' &&
+        !isCalendar &&
+        events &&
+        events.pageCount ? (
           <ReactPaginate
             pageCount={events.pageCount}
             onPageChange={({ selected }) => {

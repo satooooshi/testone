@@ -210,7 +210,7 @@ const QAQuestionList = () => {
         </div>
       </div>
       <div className={paginationStyles.pagination_wrap_layout}>
-        {questions && questions.pageCount ? (
+        {typeof window !== 'undefined' && questions && questions.pageCount ? (
           <ReactPaginate
             pageCount={questions.pageCount}
             onPageChange={({ selected }) => {
