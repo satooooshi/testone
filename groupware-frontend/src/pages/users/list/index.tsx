@@ -1,5 +1,6 @@
 import LayoutWithTab from '@/components/layout/LayoutWithTab';
-import ReactPaginate from 'react-paginate';
+import dynamic from 'next/dynamic';
+const ReactPaginate = dynamic(() => import('react-paginate'), { ssr: false });
 import SearchForm from '@/components/common/SearchForm';
 import UserCard from '@/components/user/UserCard';
 import userListStyles from '@/styles/layouts/UserList.module.scss';
