@@ -280,6 +280,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
                     setNewQuestion((prev) => ({
                       ...prev,
                       type: e.target.value as WikiType,
+                      ruleCategory: undefined,
                     }));
                     return;
                   }
