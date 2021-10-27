@@ -204,6 +204,15 @@ const WikiForm: React.FC<WikiFormProps> = ({
   }, [setNewQuestion, wiki]);
 
   useEffect(() => {
+    if (editorState) {
+      setNewQuestion((q) => ({
+        ...q,
+        body: stateToHTML(editorState.getCurrentContent()),
+      }));
+    }
+  }, [editorState, setNewQuestion]);
+
+  useEffect(() => {
     formTopRef.current?.scrollIntoView();
   }, []);
 
