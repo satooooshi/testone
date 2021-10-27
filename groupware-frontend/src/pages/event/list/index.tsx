@@ -5,7 +5,8 @@ import eventListStyles from '@/styles/layouts/EventList.module.scss';
 import EventCard from '@/components/common/EventCard';
 import { useRouter } from 'next/router';
 import paginationStyles from '@/styles/components/Pagination.module.scss';
-import ReactPaginate from 'react-paginate';
+import dynamic from 'next/dynamic';
+const ReactPaginate = dynamic(() => import('react-paginate'), { ssr: false });
 import { useEffect, useMemo, useRef, useState } from 'react';
 
 import LayoutWithTab from '@/components/layout/LayoutWithTab';

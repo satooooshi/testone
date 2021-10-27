@@ -18,7 +18,8 @@ import {
 import SearchForm from '@/components/common/SearchForm';
 import { toggleTag } from 'src/utils/toggleTag';
 import paginationStyles from '@/styles/components/Pagination.module.scss';
-import ReactPaginate from 'react-paginate';
+import dynamic from 'next/dynamic';
+const ReactPaginate = dynamic(() => import('react-paginate'), { ssr: false });
 import { searchUserQueryParamFactory } from 'src/utils/userQueryRefresh';
 import { useAPIGetUserTag } from '@/hooks/api/tag/useAPIGetUserTag';
 import { useHeaderTab } from '@/hooks/headerTab/useHeaderTab';
