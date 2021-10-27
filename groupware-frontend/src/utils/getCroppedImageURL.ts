@@ -4,6 +4,9 @@ export const getCroppedImageURL = (
   image: HTMLImageElement,
   crop: Crop,
 ): string | undefined => {
+  if (typeof window === 'undefined') {
+    return;
+  }
   if (
     crop.width === undefined ||
     crop.height === undefined ||

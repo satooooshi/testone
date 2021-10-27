@@ -18,7 +18,8 @@ import {
 import SearchForm from '@/components/common/SearchForm';
 import { toggleTag } from 'src/utils/toggleTag';
 import paginationStyles from '@/styles/components/Pagination.module.scss';
-import ReactPaginate from 'react-paginate';
+import dynamic from 'next/dynamic';
+const ReactPaginate = dynamic(() => import('react-paginate'), { ssr: false });
 import { searchUserQueryParamFactory } from 'src/utils/userQueryRefresh';
 import { useAPIGetUserTag } from '@/hooks/api/tag/useAPIGetUserTag';
 import { useHeaderTab } from '@/hooks/headerTab/useHeaderTab';
@@ -183,7 +184,7 @@ const UserAdmin: React.FC = () => {
           </tbody>
         </table>
       </div>
-      {users && users.pageCount ? (
+      {typeof window !== 'undefined' && users && users.pageCount ? (
         <div className={paginationStyles.pagination_wrap_layout}>
           <ReactPaginate
             pageCount={users.pageCount}

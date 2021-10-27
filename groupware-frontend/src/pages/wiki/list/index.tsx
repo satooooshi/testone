@@ -2,7 +2,8 @@ import { SidebarScreenName } from '@/components/layout/Sidebar';
 import { Tab } from 'src/types/header/tab/types';
 import { useRouter } from 'next/router';
 import WikiCard from '@/components/common/WikiCard';
-import ReactPaginate from 'react-paginate';
+import dynamic from 'next/dynamic';
+const ReactPaginate = dynamic(() => import('react-paginate'), { ssr: false });
 import paginationStyles from '@/styles/components/Pagination.module.scss';
 import qaListStyles from '@/styles/layouts/QAList.module.scss';
 import { useMemo, useState } from 'react';
@@ -210,7 +211,7 @@ const QAQuestionList = () => {
         </div>
       </div>
       <div className={paginationStyles.pagination_wrap_layout}>
-        {questions && questions.pageCount ? (
+        {typeof window !== 'undefined' && questions && questions.pageCount ? (
           <ReactPaginate
             pageCount={questions.pageCount}
             onPageChange={({ selected }) => {
