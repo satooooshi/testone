@@ -9,7 +9,7 @@ import { useAPICreateAnswer } from '@/hooks/api/wiki/useAPICreateAnswer';
 import LayoutWithTab from '@/components/layout/LayoutWithTab';
 import AnswerReply from '@/components/wiki/AnswerReply';
 import { QAAnswer, QAAnswerReply, WikiType } from 'src/types';
-import { Button, useMediaQuery } from '@chakra-ui/react';
+import { Button, useMediaQuery, useToast } from '@chakra-ui/react';
 import WrappedDraftEditor from '@/components/wiki/WrappedDraftEditor';
 import { ContentState, Editor, EditorState } from 'draft-js';
 import Head from 'next/head';
@@ -101,7 +101,42 @@ const QuestionDetail = () => {
     }
   };
 
-  const handleClickSendReplyButton = () => {
+  const toast = useToast();
+  const checkErrors = async (isBody: string) => {
+    const editorBody =
+      isBody === 'answer'
+        ? stateToHTML(answerEditorState.getCurrentContent())
+        : stateToHTML(answerReplyEditorState.getCurrentContent());
+    const removeHTMLBody = editorBody.replace(/(<([^>]+)>)/gi, '');
+
+    if (
+      (isBody === 'answer' && answerVisible && removeHTMLBody === '') ||
+      (isBody === 'reply' && removeHTMLBody === '')
+    ) {
+      const messages =
+        (isBody === 'answer' ? '回答' : '返信') + 'を記入してください';
+      toast({
+        description: messages,
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      });
+    } else {
+      isBody === 'answer' ? handleClickSendAnswer() : handleClickSendReply();
+    }
+  };
+
+  const handleClickSendAnswer = () => {
+    answerVisible && answerEditorState.getCurrentContent()
+      ? createAnswer({
+          textFormat: 'html',
+          body: stateToHTML(answerEditorState.getCurrentContent()),
+          wiki: wiki,
+        })
+      : setAnswerVisible(true);
+  };
+
+  const handleClickSendReply = () => {
     if (answerReplyEditorState.getCurrentContent()) {
       createAnswerReply({
         ...answerReply,
@@ -179,15 +214,17 @@ const QuestionDetail = () => {
                 size="sm"
                 colorScheme="teal"
                 onClick={() => {
-                  answerVisible && answerEditorState.getCurrentContent()
-                    ? createAnswer({
-                        textFormat: 'html',
-                        body: stateToHTML(
-                          answerEditorState.getCurrentContent(),
-                        ),
-                        wiki: wiki,
-                      })
-                    : setAnswerVisible(true);
+                  // answerVisible && checkErrors();
+                  // answerVisible && answerEditorState.getCurrentContent()
+                  //   ? createAnswer({
+                  //       textFormat: 'html',
+                  //       body: stateToHTML(
+                  //         answerEditorState.getCurrentContent(),
+                  //       ),
+                  //       wiki: wiki,
+                  //     })
+                  //   : setAnswerVisible(true);
+                  checkErrors('answer');
                 }}>
                 {answerVisible ? '回答を投稿する' : '回答を追加'}
               </Button>
@@ -261,7 +298,7 @@ const QuestionDetail = () => {
                           colorScheme="orange"
                           width="24"
                           className={qaDetailStyles.reply_button}
-                          onClick={handleClickSendReplyButton}>
+                          onClick={() => checkErrors('reply')}>
                           返信を送信
                         </Button>
                       ) : null}
