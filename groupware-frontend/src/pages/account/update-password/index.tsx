@@ -37,6 +37,7 @@ const UpdatePassword = () => {
       initialValues: {
         currentPassword: '',
         newPassword: '',
+        newPasswordConfirmation: '',
       },
       validationSchema: updatePasswordSchema,
       onSubmit: (values) => {
@@ -88,6 +89,23 @@ const UpdatePassword = () => {
               value={values.newPassword}
               background="white"
               name="newPassword"
+              onChange={handleChange}
+            />
+          </FormControl>
+          <FormControl className={profileStyles.input_wrapper}>
+            <FormLabel fontWeight={'bold'}>新しいパスワード(再入力)</FormLabel>
+            {errors.newPasswordConfirmation &&
+            touched.newPasswordConfirmation ? (
+              <Text fontSize="sm" color="red">
+                {errors.newPasswordConfirmation}
+              </Text>
+            ) : null}
+            <Input
+              type="password"
+              placeholder="新しいパスワードを入力してください"
+              value={values.newPasswordConfirmation}
+              background="white"
+              name="newPasswordConfirmation"
               onChange={handleChange}
             />
           </FormControl>
