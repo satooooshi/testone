@@ -5,7 +5,7 @@ import { useAPIGetUsers } from '@/hooks/api/user/useAPIGetUsers';
 import { ChatGroup, User } from 'src/types';
 import { useAPIGetChatGroupList } from '@/hooks/api/chat/useAPIGetChatGroupList';
 import CreateChatGroupModal from '@/components/chat/CreateChatGroupModal';
-import { useMediaQuery } from '@chakra-ui/react';
+import { useMediaQuery, useToast } from '@chakra-ui/react';
 import '@draft-js-plugins/mention/lib/plugin.css';
 import '@draft-js-plugins/image/lib/plugin.css';
 import ChatGroupCard from '@/components/chat/ChatGroupCard';
@@ -17,6 +17,7 @@ import { useAPISaveChatGroup } from '@/hooks/api/chat/useAPISaveChatGroup';
 
 const Chat = () => {
   const router = useRouter();
+  const toast = useToast();
   const { data: chatGroups, refetch } = useAPIGetChatGroupList();
   const { data: users } = useAPIGetUsers();
   const [createGroupWindow, setCreateGroupWindow] = useState(false);
@@ -30,6 +31,12 @@ const Chat = () => {
       setCreateGroupWindow(false);
       setNewGroup({ name: '', members: [] });
       refetch();
+      toast({
+        description: 'チャットグループの作成が完了しました。',
+        status: 'success',
+        duration: 3000,
+        isClosable: true,
+      });
     },
   });
   const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
