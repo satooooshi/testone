@@ -54,7 +54,13 @@ const AuthProvder: React.FC = ({ children }) => {
 };
 
 function MyApp({ Component, pageProps }: AppProps) {
-  const queryClient = new QueryClient();
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: {
+        refetchOnWindowFocus: false,
+      },
+    },
+  });
   const theme = {
     styles: {
       global: {
