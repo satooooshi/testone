@@ -19,16 +19,18 @@ import { useAPIGetEventList } from '@/hooks/api/event/useAPIGetEventList';
 import { useAPIGetWikiList } from '@/hooks/api/wiki/useAPIGetWikiList';
 import { useHeaderTab } from '@/hooks/headerTab/useHeaderTab';
 import topTabBarStyles from '@/styles/components/TopTabBar.module.scss';
-import { Button, ThemeTypings } from '@chakra-ui/react';
+import { Text, Box, Button, ThemeTypings } from '@chakra-ui/react';
 import { TagType, UserTag, WikiType } from 'src/types';
 import { userRoleNameFactory } from 'src/utils/factory/userRoleNameFactory';
+import { darkFontColor } from 'src/utils/colors';
 
 type UserTagListProps = {
   tags?: UserTag[];
   type: TagType;
+  introduce: string;
 };
 
-const UserTagList: React.FC<UserTagListProps> = ({ tags, type }) => {
+const UserTagList: React.FC<UserTagListProps> = ({ tags, type, introduce }) => {
   const color: ThemeTypings['colorSchemes'] = useMemo(() => {
     switch (type) {
       case TagType.TECH:
@@ -60,9 +62,9 @@ const UserTagList: React.FC<UserTagListProps> = ({ tags, type }) => {
   }, [type]);
 
   return (
-    <div className={accountInfoStyles.tag_list_wrapper}>
-      <p className={accountInfoStyles.tag_label_text}>{labelName}</p>
-      <div className={accountInfoStyles.tags_wrapper}>
+    <Box bg="white" rounded="md" p={2}>
+      <Text fontWeight="bold" mb={2} fontSize={14}>{`${labelName}タグ`}</Text>
+      <Box display="flex" flexFlow="row" flexWrap="wrap" mb={4}>
         {tags?.length ? (
           tags
             ?.filter((t) => t.type === type)
@@ -78,8 +80,14 @@ const UserTagList: React.FC<UserTagListProps> = ({ tags, type }) => {
             未設定
           </Button>
         )}
-      </div>
-    </div>
+      </Box>
+      <Box>
+        <Text mb={2} fontSize={14}>{`${labelName}の紹介`}</Text>
+        <Text fontSize={16} color={darkFontColor} fontWeight="bold">
+          {introduce || '未入力'}
+        </Text>
+      </Box>
+    </Box>
   );
 };
 
@@ -191,35 +199,74 @@ const MyAccountInfo = () => {
             </div>
 
             {activeTab === TabName.DETAIL && (
-              <div className={accountInfoStyles.info_wrapper}>
-                <div className={accountInfoStyles.tag_list_area}>
-                  <UserTagList tags={profile.tags} type={TagType.TECH} />
-                  <UserTagList
-                    tags={profile.tags}
-                    type={TagType.QUALIFICATION}
-                  />
-                  <UserTagList tags={profile.tags} type={TagType.CLUB} />
-                  <UserTagList tags={profile.tags} type={TagType.HOBBY} />
-                </div>
-                <div className={accountInfoStyles.info_texts_wrapper}>
-                  <div className={accountInfoStyles.introduce_wrapper}>
-                    <p className={accountInfoStyles.introduce_title_text}>
-                      社員区分
-                    </p>
-                    <p className={accountInfoStyles.introduce}>
+              <>
+                <Box w="80vw">
+                  <Box
+                    display="flex"
+                    mb={5}
+                    flexDir="row"
+                    alignItems="center"
+                    w="100%">
+                    <Text fontSize={14} w={'10%'}>
+                      社員区分:
+                    </Text>
+                    <Text
+                      fontWeight="bold"
+                      w="85%"
+                      fontSize={18}
+                      color={darkFontColor}>
                       {userRoleNameFactory(profile.role)}
-                    </p>
-                  </div>
-                  <div className={accountInfoStyles.introduce_wrapper}>
-                    <p className={accountInfoStyles.introduce_title_text}>
-                      自己紹介
-                    </p>
-                    <p className={accountInfoStyles.introduce}>
-                      {profile.introduce || '自己紹介が未記入です'}
-                    </p>
-                  </div>
-                </div>
-              </div>
+                    </Text>
+                  </Box>
+                  <Box
+                    display="flex"
+                    flexDir="row"
+                    alignItems="center"
+                    mb={8}
+                    w="100%">
+                    <Text fontSize={14} w={'10%'}>
+                      自己紹介:
+                    </Text>
+                    <Text
+                      fontWeight="bold"
+                      w="85%"
+                      fontSize={18}
+                      color={darkFontColor}>
+                      {profile.introduceOther || '未入力'}
+                    </Text>
+                  </Box>
+                  <Box w={'100%'} display="flex" flexDir="row" flexWrap="wrap">
+                    <Box mb={8} mr={4} w={'49%'}>
+                      <UserTagList
+                        tags={profile.tags}
+                        type={TagType.TECH}
+                        introduce={profile.introduceTech}
+                      />
+                    </Box>
+                    <Box mb={8} w={'49%'}>
+                      <UserTagList
+                        tags={profile.tags}
+                        type={TagType.QUALIFICATION}
+                        introduce={profile.introduceQualification}
+                      />
+                    </Box>
+                    <Box mb={8} mr={4} w={'49%'}>
+                      <UserTagList
+                        tags={profile.tags}
+                        type={TagType.CLUB}
+                        introduce={profile.introduceClub}
+                      />
+                    </Box>
+                    <Box mb={8} w={'49%'}>
+                      <UserTagList
+                        tags={profile.tags}
+                        type={TagType.HOBBY}
+                        introduce={profile.introduceHobby}
+                      />
+                    </Box>
+                  </Box>
+                </Box>
+              </>
             )}
 
             {activeTab === TabName.EVENT && events && events.events.length ? (

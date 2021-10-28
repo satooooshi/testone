@@ -68,11 +68,47 @@ export class User {
   @Column({
     type: 'varchar',
     length: 1000,
-    name: 'introduce',
+    name: 'introduce_tech',
     default: '',
     nullable: false,
   })
-  introduce: string;
+  introduceTech: string;
+
+  @Column({
+    type: 'varchar',
+    length: 1000,
+    name: 'introduce_qualification',
+    default: '',
+    nullable: false,
+  })
+  introduceQualification: string;
+
+  @Column({
+    type: 'varchar',
+    length: 1000,
+    name: 'introduce_hobby',
+    default: '',
+    nullable: false,
+  })
+  introduceHobby: string;
+
+  @Column({
+    type: 'varchar',
+    length: 1000,
+    name: 'introduce_club',
+    default: '',
+    nullable: false,
+  })
+  introduceClub: string;
+
+  @Column({
+    type: 'varchar',
+    length: 1000,
+    name: 'introduce_other',
+    default: '',
+    nullable: false,
+  })
+  introduceOther: string;
 
   @Column({
     type: 'varchar',

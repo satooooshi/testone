@@ -58,7 +58,11 @@ export interface User {
   email: string;
   lastName: string;
   firstName: string;
-  introduce: string;
+  introduceTech: string;
+  introduceQualification: string;
+  introduceHobby: string;
+  introduceClub: string;
+  introduceOther: string;
   password?: string;
   role: UserRole;
   avatarUrl: string;

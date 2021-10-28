@@ -67,7 +67,7 @@ const UserCard: React.FC<UserCardProps> = ({ user, onClickTag, duration }) => {
               }>{`${user.lastName} ${user.firstName}`}</p>
             <div className={userCardStyles.introduce_text_wrapper}>
               <p className={userCardStyles.introduce_text}>{`${
-                user.introduce || '自己紹介未入力'
+                user.introduceOther || '自己紹介未入力'
               }`}</p>
             </div>
             <UserPointCounter
