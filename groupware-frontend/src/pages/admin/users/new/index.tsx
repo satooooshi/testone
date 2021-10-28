@@ -390,6 +390,7 @@ const CreateNewUser = () => {
           <FormControl mb={4}>
             <FormLabel fontWeight={'bold'}>自己紹介</FormLabel>
             <Textarea
+              placeholder="自己紹介を入力してください"
               type="text"
               height="10"
               value={values.introduceOther}
@@ -409,6 +410,7 @@ const CreateNewUser = () => {
           <FormControl mb={6}>
             <FormLabel fontWeight={'bold'}>技術紹介</FormLabel>
             <Textarea
+              placeholder="技術についての紹介を入力してください"
               type="text"
               height="10"
               background="white"
@@ -430,6 +432,7 @@ const CreateNewUser = () => {
             <FormLabel fontWeight={'bold'}>資格の紹介</FormLabel>
             <Textarea
               type="text"
+              placeholder="資格についての紹介を入力してください"
               height="10"
               value={values.introduceQualification}
               background="white"
@@ -448,6 +451,7 @@ const CreateNewUser = () => {
             <FormLabel fontWeight={'bold'}>部活動の紹介</FormLabel>
             <Textarea
               type="text"
+              placeholder="部活動についての紹介を入力してください"
               height="10"
               value={values.introduceClub}
               background="white"
@@ -465,6 +469,7 @@ const CreateNewUser = () => {
           <FormControl mb={8}>
             <FormLabel fontWeight={'bold'}>趣味の紹介</FormLabel>
             <Textarea
+              placeholder="趣味についての紹介を入力してください"
               type="text"
               height="10"
               value={values.introduceHobby}

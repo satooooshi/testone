@@ -18,6 +18,7 @@ import {
   FormLabel,
   Input,
   Textarea,
+  useToast,
 } from '@chakra-ui/react';
 import { useAuthenticate } from 'src/contexts/useAuthenticate';
 import { imageExtensions } from 'src/utils/imageExtensions';
@@ -138,11 +139,18 @@ const Profile = () => {
     onDrop: onEventImageDrop,
     accept: imageExtensions,
   });
+  const toast = useToast();
 
   const { mutate: updateUser } = useAPIUpdateUser({
     onSuccess: (responseData) => {
       if (responseData) {
         alert('プロフィールを更新しました。');
+        toast({
+          title: 'プロフィールを更新しました。',
+          status: 'success',
+          duration: 3000,
+          isClosable: true,
+        });
         dispatchCrop({ type: 'setImageFile', value: undefined });
       }
     },
@@ -292,6 +300,7 @@ const Profile = () => {
             <Textarea
               type="text"
               height="10"
+              placeholder="自己紹介を入力してください"
               value={userInfo.introduceOther}
               background="white"
               onChange={(e) =>
@@ -309,6 +318,7 @@ const Profile = () => {
           <FormControl mb={6}>
             <FormLabel fontWeight={'bold'}>技術紹介</FormLabel>
             <Textarea
+              placeholder="技術についての紹介を入力してください"
               type="text"
               height="10"
               value={userInfo.introduceTech}
@@ -330,6 +340,7 @@ const Profile = () => {
           <FormControl mb={6}>
             <FormLabel fontWeight={'bold'}>資格の紹介</FormLabel>
             <Textarea
+              placeholder="資格についての紹介を入力してください"
               type="text"
               height="10"
               value={userInfo.introduceQualification}
@@ -352,6 +363,7 @@ const Profile = () => {
           <FormControl mb={6}>
             <FormLabel fontWeight={'bold'}>部活動の紹介</FormLabel>
             <Textarea
+              placeholder="部活動についての紹介を入力してください"
               type="text"
               height="10"
               value={userInfo.introduceClub}
@@ -374,6 +386,7 @@ const Profile = () => {
           <FormControl mb={8}>
             <FormLabel fontWeight={'bold'}>趣味の紹介</FormLabel>
             <Textarea
+              placeholder="趣味についての紹介を入力してください"
               type="text"
               height="10"
               value={userInfo.introduceHobby}
