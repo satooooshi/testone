@@ -65,10 +65,11 @@ const WikiForm: React.FC<WikiFormProps> = ({
     title: '',
     body: '',
     tags: [],
-    type,
+    type: type || WikiType.QA,
     ruleCategory: type ? RuleCategory.RULES : undefined,
     textFormat: 'html',
   };
+  const draftJsEmptyError = '入力必須です';
   const {
     values: newQuestion,
     setValues: setNewQuestion,
@@ -346,6 +347,9 @@ const WikiForm: React.FC<WikiFormProps> = ({
               </div>
             ))}
           </div>
+        ) : null}
+        {touched.body && !editorState.getCurrentContent().hasText() ? (
+          <Text color="tomato">{draftJsEmptyError}</Text>
         ) : null}
         {errors.body && touched.body ? (
           <Text color="tomato">{errors.body}</Text>

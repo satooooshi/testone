@@ -316,7 +316,7 @@ const Profile = () => {
             />
           </Box>
           <FormControl mb={6}>
-            <FormLabel fontWeight={'bold'}>技術紹介</FormLabel>
+            <FormLabel fontWeight={'bold'}>技術の紹介</FormLabel>
             <Textarea
               placeholder="技術についての紹介を入力してください"
               type="text"
