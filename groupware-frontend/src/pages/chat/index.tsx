@@ -32,7 +32,7 @@ const Chat = () => {
       setNewGroup({ name: '', members: [] });
       refetch();
       toast({
-        description: 'チャットグループの作成が完了しました。',
+        description: 'チャットルームの作成が完了しました。',
         status: 'success',
         duration: 3000,
         isClosable: true,

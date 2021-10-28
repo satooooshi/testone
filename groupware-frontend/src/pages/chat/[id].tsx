@@ -164,7 +164,7 @@ const ChatDetail = () => {
       dispatchChat({ type: 'newGroup', value: { ...newGroup, members: [] } });
       refetchGroups();
       toast({
-        description: 'チャットグループの作成が完了しました。',
+        description: 'チャットルームの作成が完了しました。',
         status: 'success',
         duration: 3000,
         isClosable: true,
