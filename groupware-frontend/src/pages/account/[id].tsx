@@ -215,7 +215,7 @@ const MyAccountInfo = () => {
                       自己紹介
                     </p>
                     <p className={accountInfoStyles.introduce}>
-                      {profile.introduce || '自己紹介が未記入です'}
+                      {profile.introduceOther || '自己紹介が未記入です'}
                     </p>
                   </div>
                 </div>

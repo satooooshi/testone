@@ -389,16 +389,16 @@ const CreateNewUser = () => {
           <FormControl className={createNewUserStyles.input_wrapper}>
             <FormLabel fontWeight={'bold'}>
               <p>自己紹介</p>
-              {errors.introduce && touched.introduce ? (
+              {errors.introduceOther && touched.introduceOther ? (
                 <p className={validationErrorStyles.error_text}>
-                  {errors.introduce}
+                  {errors.introduceOther}
                 </p>
               ) : null}
             </FormLabel>
             <Textarea
               type="text"
               height="40"
-              value={values.introduce}
+              value={values.introduceOther}
               background="white"
               name="introduce"
               onChange={handleChange}

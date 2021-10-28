@@ -54,7 +54,7 @@ const Profile = () => {
     lastName: '',
     firstName: '',
     avatarUrl: '',
-    introduce: '',
+    introduceOther: '',
   });
 
   const modalReducer = (
@@ -290,7 +290,7 @@ const Profile = () => {
             <Textarea
               type="text"
               height="40"
-              value={userInfo.introduce}
+              value={userInfo.introduceOther}
               background="white"
               onChange={(e) =>
                 setUserInfo((i) => ({ ...i, introduce: e.target.value }))
