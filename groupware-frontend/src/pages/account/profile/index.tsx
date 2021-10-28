@@ -12,11 +12,13 @@ import profileStyles from '@/styles/layouts/Profile.module.scss';
 import { useAPIUpdateUser } from '@/hooks/api/user/useAPIUpdateUser';
 import { TagType, User, UserTag } from 'src/types';
 import {
+  Box,
   Button,
   FormControl,
   FormLabel,
   Input,
   Textarea,
+  useToast,
 } from '@chakra-ui/react';
 import { useAuthenticate } from 'src/contexts/useAuthenticate';
 import { imageExtensions } from 'src/utils/imageExtensions';
@@ -35,6 +37,7 @@ import clsx from 'clsx';
 import TagModal from '@/components/common/TagModal';
 import { toggleTag } from 'src/utils/toggleTag';
 import { useAPIGetUserTag } from '@/hooks/api/tag/useAPIGetUserTag';
+import FormToLinkTag from '@/components/FormToLinkTag';
 
 type ModalState = {
   isOpen: boolean;
@@ -54,7 +57,7 @@ const Profile = () => {
     lastName: '',
     firstName: '',
     avatarUrl: '',
-    introduce: '',
+    introduceOther: '',
   });
 
   const modalReducer = (
@@ -136,11 +139,18 @@ const Profile = () => {
     onDrop: onEventImageDrop,
     accept: imageExtensions,
   });
+  const toast = useToast();
 
   const { mutate: updateUser } = useAPIUpdateUser({
     onSuccess: (responseData) => {
       if (responseData) {
         alert('プロフィールを更新しました。');
+        toast({
+          title: 'プロフィールを更新しました。',
+          status: 'success',
+          duration: 3000,
+          isClosable: true,
+        });
         dispatchCrop({ type: 'setImageFile', value: undefined });
       }
     },
@@ -285,122 +295,109 @@ const Profile = () => {
               }
             />
           </FormControl>
-          <FormControl className={profileStyles.input_wrapper}>
+          <FormControl mb={4}>
             <FormLabel fontWeight={'bold'}>自己紹介</FormLabel>
             <Textarea
               type="text"
-              height="40"
-              value={userInfo.introduce}
+              height="10"
+              placeholder="自己紹介を入力してください"
+              value={userInfo.introduceOther}
               background="white"
               onChange={(e) =>
-                setUserInfo((i) => ({ ...i, introduce: e.target.value }))
+                setUserInfo((i) => ({ ...i, introduceOther: e.target.value }))
               }
             />
           </FormControl>
-          <FormControl
-            className={clsx(
-              createNewUserStyles.input_wrapper,
-              createNewUserStyles.edit_tags_button_wrapper,
-            )}>
-            <div className={createNewUserStyles.selected_tags_wrapper}>
-              {userInfo?.tags
-                ?.filter((t) => t.type === TagType.TECH)
-                .map((t) => (
-                  <Button
-                    key={t.id}
-                    size="xs"
-                    colorScheme="teal"
-                    className={createNewUserStyles.selected_tag_item}>
-                    {t.name}
-                  </Button>
-                ))}
-            </div>
-            <Button
-              size="sm"
-              colorScheme="teal"
-              onClick={() => {
-                dispatchModal({ type: 'openTech' });
-              }}>
-              技術を編集
-            </Button>
+          <Box mb={2} w={'100%'}>
+            <FormToLinkTag
+              tags={userInfo?.tags || []}
+              tagType={TagType.TECH}
+              onEditButtonClick={() => dispatchModal({ type: 'openTech' })}
+            />
+          </Box>
+          <FormControl mb={6}>
+            <FormLabel fontWeight={'bold'}>技術の紹介</FormLabel>
+            <Textarea
+              placeholder="技術についての紹介を入力してください"
+              type="text"
+              height="10"
+              value={userInfo.introduceTech}
+              background="white"
+              onChange={(e) =>
+                setUserInfo((i) => ({ ...i, introduceTech: e.target.value }))
+              }
+            />
           </FormControl>
-          <FormControl
-            className={clsx(
-              createNewUserStyles.input_wrapper,
-              createNewUserStyles.edit_tags_button_wrapper,
-            )}>
-            <div className={createNewUserStyles.selected_tags_wrapper}>
-              {userInfo?.tags
-                ?.filter((t) => t.type === TagType.QUALIFICATION)
-                .map((t) => (
-                  <Button
-                    key={t.id}
-                    size="xs"
-                    colorScheme="blue"
-                    className={createNewUserStyles.selected_tag_item}
-                    height="28px">
-                    {t.name}
-                  </Button>
-                ))}
-            </div>
-            <Button
-              size="sm"
-              colorScheme="blue"
-              onClick={() => dispatchModal({ type: 'openQualification' })}>
-              資格を編集
-            </Button>
+          <Box mb={2} w={'100%'}>
+            <FormToLinkTag
+              tags={userInfo?.tags || []}
+              tagType={TagType.QUALIFICATION}
+              onEditButtonClick={() =>
+                dispatchModal({ type: 'openQualification' })
+              }
+            />
+          </Box>
+          <FormControl mb={6}>
+            <FormLabel fontWeight={'bold'}>資格の紹介</FormLabel>
+            <Textarea
+              placeholder="資格についての紹介を入力してください"
+              type="text"
+              height="10"
+              value={userInfo.introduceQualification}
+              background="white"
+              onChange={(e) =>
+                setUserInfo((i) => ({
+                  ...i,
+                  introduceQualification: e.target.value,
+                }))
+              }
+            />
           </FormControl>
-          <FormControl
-            className={clsx(
-              createNewUserStyles.input_wrapper,
-              createNewUserStyles.edit_tags_button_wrapper,
-            )}>
-            <div className={createNewUserStyles.selected_tags_wrapper}>
-              {userInfo?.tags
-                ?.filter((t) => t.type === TagType.CLUB)
-                .map((t) => (
-                  <Button
-                    key={t.id}
-                    size="xs"
-                    colorScheme="green"
-                    className={createNewUserStyles.selected_tag_item}
-                    height="28px">
-                    {t.name}
-                  </Button>
-                ))}
-            </div>
-            <Button
-              size="sm"
-              colorScheme="green"
-              onClick={() => dispatchModal({ type: 'openClub' })}>
-              部活動を編集
-            </Button>
+          <Box mb={2} w={'100%'}>
+            <FormToLinkTag
+              tags={userInfo?.tags || []}
+              tagType={TagType.CLUB}
+              onEditButtonClick={() => dispatchModal({ type: 'openClub' })}
+            />
+          </Box>
+          <FormControl mb={6}>
+            <FormLabel fontWeight={'bold'}>部活動の紹介</FormLabel>
+            <Textarea
+              placeholder="部活動についての紹介を入力してください"
+              type="text"
+              height="10"
+              value={userInfo.introduceClub}
+              background="white"
+              onChange={(e) =>
+                setUserInfo((i) => ({
+                  ...i,
+                  introduceClub: e.target.value,
+                }))
+              }
+            />
           </FormControl>
-          <FormControl
-            className={clsx(
-              createNewUserStyles.input_wrapper,
-              createNewUserStyles.edit_tags_button_wrapper,
-            )}>
-            <div className={createNewUserStyles.selected_tags_wrapper}>
-              {userInfo?.tags
-                ?.filter((t) => t.type === TagType.HOBBY)
-                .map((t) => (
-                  <Button
-                    key={t.id}
-                    size="xs"
-                    colorScheme="pink"
-                    className={createNewUserStyles.selected_tag_item}
-                    height="28px">
-                    {t.name}
-                  </Button>
-                ))}
-            </div>
-            <Button
-              size="sm"
-              colorScheme="pink"
-              onClick={() => dispatchModal({ type: 'openHobby' })}>
-              趣味を編集
-            </Button>
+          <Box mb={2} w={'100%'}>
+            <FormToLinkTag
+              tags={userInfo?.tags || []}
+              tagType={TagType.HOBBY}
+              onEditButtonClick={() => dispatchModal({ type: 'openHobby' })}
+            />
+          </Box>
+          <FormControl mb={8}>
+            <FormLabel fontWeight={'bold'}>趣味の紹介</FormLabel>
+            <Textarea
+              placeholder="趣味についての紹介を入力してください"
+              type="text"
+              height="10"
+              value={userInfo.introduceHobby}
+              background="white"
+              onChange={(e) =>
+                setUserInfo((i) => ({
+                  ...i,
+                  introduceHobby: e.target.value,
+                }))
+              }
+            />
           </FormControl>
         </div>
       </div>
