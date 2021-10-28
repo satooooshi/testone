@@ -9,6 +9,7 @@ import {
   FormControl,
   FormLabel,
   Select,
+  useToast,
 } from '@chakra-ui/react';
 import { useDropzone } from 'react-dropzone';
 import { imageExtensions } from 'src/utils/imageExtensions';
@@ -37,6 +38,7 @@ const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
   users,
   createGroup,
 }) => {
+  const toast = useToast();
   const [selectedUserRole, setSelectedUserRole] = useState<UserRole | 'all'>(
     'all',
   );
@@ -72,6 +74,15 @@ const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
   }, []);
 
   const onFinish = async () => {
+    if (!newGroup.members?.length) {
+      toast({
+        title: 'ルームに参加する社員を一人以上選択してください',
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      });
+      return;
+    }
     if (imgRef.current && completedCrop) {
       const img = getCroppedImageURL(imgRef.current, completedCrop);
       if (!img) {
@@ -81,9 +92,7 @@ const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
       uploadImage([result]);
       return;
     }
-    if (newGroup.members?.length) {
-      createGroup(newGroup);
-    }
+    createGroup(newGroup);
   };
 
   return (
