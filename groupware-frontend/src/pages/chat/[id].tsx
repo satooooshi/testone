@@ -160,7 +160,10 @@ const ChatDetail = () => {
   const { mutate: createGroup } = useAPISaveChatGroup({
     onSuccess: () => {
       dispatchModal({ type: 'createGroupWindow', value: false });
-      dispatchChat({ type: 'newGroup', value: { ...newGroup, members: [] } });
+      dispatchChat({
+        type: 'newGroup',
+        value: { ...newGroup, name: '', members: [] },
+      });
       refetchGroups();
     },
   });
