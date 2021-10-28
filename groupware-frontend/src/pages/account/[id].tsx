@@ -84,7 +84,7 @@ const UserTagList: React.FC<UserTagListProps> = ({ tags, type, introduce }) => {
       <Box>
         <Text mb={2} fontSize={14}>{`${labelName}の紹介`}</Text>
         <Text fontSize={16} color={darkFontColor} fontWeight="bold">
-          {introduce}
+          {introduce || '未入力'}
         </Text>
       </Box>
     </Box>
@@ -229,12 +229,10 @@ const MyAccountInfo = () => {
                     </Text>
                     <Text
                       fontWeight="bold"
-                      bg="white"
                       w="85%"
-                      rounded="md"
                       fontSize={18}
                       color={darkFontColor}>
-                      {profile.introduceOther}
+                      {profile.introduceOther || '未入力'}
                     </Text>
                   </Box>
                   <Box w={'100%'} display="flex" flexDir="row" flexWrap="wrap">
