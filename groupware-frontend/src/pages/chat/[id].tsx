@@ -10,7 +10,7 @@ import { useAPIGetChatGroupList } from '@/hooks/api/chat/useAPIGetChatGroupList'
 import { useAPIGetMessages } from '@/hooks/api/chat/useAPIGetMessages';
 import { useAPISendChatMessage } from '@/hooks/api/chat/useAPISendChatMessage';
 import CreateChatGroupModal from '@/components/chat/CreateChatGroupModal';
-import { Avatar, useMediaQuery } from '@chakra-ui/react';
+import { Avatar, useMediaQuery, useToast } from '@chakra-ui/react';
 import { convertToRaw, EditorState } from 'draft-js';
 import Editor from '@draft-js-plugins/editor';
 import createMentionPlugin, {
@@ -119,6 +119,7 @@ const mentionReducer = (
 };
 
 const ChatDetail = () => {
+  const toast = useToast();
   const router = useRouter();
   const { id } = router.query as { id: string };
   const [{ popup, suggestions, mentionedUserData }, dispatchMention] =
@@ -162,6 +163,12 @@ const ChatDetail = () => {
       dispatchModal({ type: 'createGroupWindow', value: false });
       dispatchChat({ type: 'newGroup', value: { ...newGroup, members: [] } });
       refetchGroups();
+      toast({
+        description: 'チャットルームの作成が完了しました。',
+        status: 'success',
+        duration: 3000,
+        isClosable: true,
+      });
     },
   });
 
