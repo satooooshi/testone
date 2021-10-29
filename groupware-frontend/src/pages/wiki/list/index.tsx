@@ -22,6 +22,7 @@ import { useAuthenticate } from 'src/contexts/useAuthenticate';
 import { useHeaderTab } from '@/hooks/headerTab/useHeaderTab';
 import TopTabBar, { TopTabBehavior } from '@/components/layout/TopTabBar';
 import topTabBarStyles from '@/styles/components/TopTabBar.module.scss';
+import { Text } from '@chakra-ui/react';
 
 const QAQuestionList = () => {
   const router = useRouter();
@@ -34,7 +35,7 @@ const QAQuestionList = () => {
     rule_category,
   } = router.query as SearchQueryToGetWiki;
   const { user } = useAuthenticate();
-  const { data: questions } = useAPIGetWikiList({
+  const { data: questions, isLoading } = useAPIGetWikiList({
     page,
     tag,
     word,
@@ -213,11 +214,15 @@ const QAQuestionList = () => {
             toggleTag={onToggleTag}
           />
         </div>
+        {!isLoading && !questions?.wiki.length && (
+          <Text alignItems="center" textAlign="center" mb={4}>
+            検索結果が見つかりませんでした
+          </Text>
+        )}
         <div className={qaListStyles.qa_list}>
           {questions?.wiki.map((q) => (
             <WikiCard key={q.id} wiki={q} />
           ))}
-          {!questions?.wiki.length && <p>検索結果が見つかりませんでした</p>}
         </div>
       </div>
       <div className={paginationStyles.pagination_wrap_layout}>

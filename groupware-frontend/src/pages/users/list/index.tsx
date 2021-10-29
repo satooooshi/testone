@@ -12,7 +12,7 @@ import { toggleTag } from 'src/utils/toggleTag';
 import paginationStyles from '@/styles/components/Pagination.module.scss';
 import { userQueryRefresh } from 'src/utils/userQueryRefresh';
 import { SidebarScreenName } from '@/components/layout/Sidebar';
-import { FormControl, FormLabel, Select } from '@chakra-ui/react';
+import { FormControl, FormLabel, Select, Text } from '@chakra-ui/react';
 import TopTabBar, { TopTabBehavior } from '@/components/layout/TopTabBar';
 import { useAPIGetUserTag } from '@/hooks/api/tag/useAPIGetUserTag';
 import {
@@ -27,7 +27,7 @@ const UserList = () => {
   const { data: tags } = useAPIGetUserTag();
   const [searchWord, setSearchWord] = useState(query.word);
   const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
-  const { data: users } = useAPISearchUsers(query);
+  const { data: users, isLoading } = useAPISearchUsers(query);
 
   const onToggleTag = (t: Tag) => {
     setSelectedTags((s) => toggleTag(s, t));
@@ -127,10 +127,10 @@ const UserList = () => {
             toggleTag={onToggleTag}
           />
         </div>
-        {!users?.users.length && (
-          <p className={userListStyles.no_result_text}>
+        {!isLoading && !users?.users.length && (
+          <Text alignItems="center" textAlign="center" mb={4}>
             検索結果が見つかりませんでした
-          </p>
+          </Text>
         )}
 
         {users && users.users.length ? (

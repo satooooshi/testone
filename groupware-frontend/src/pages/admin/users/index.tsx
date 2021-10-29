@@ -7,7 +7,7 @@ import userAdminStyles from '@/styles/layouts/UserAdmin.module.scss';
 import { Tag, User, UserRole } from 'src/types';
 import { useAPIUpdateUser } from '@/hooks/api/user/useAPIUpdateUser';
 import { useAPIDeleteUser } from '@/hooks/api/user/useAPIDeleteUser';
-import { Avatar, Button, Select } from '@chakra-ui/react';
+import { Avatar, Button, Progress, Select, Text } from '@chakra-ui/react';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
 import { useAuthenticate } from 'src/contexts/useAuthenticate';
@@ -32,13 +32,14 @@ const UserAdmin: React.FC = () => {
   const { data: tags } = useAPIGetUserTag();
   const [searchWord, setSearchWord] = useState(query.word);
   const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
-  const { data: users, refetch } = useAPISearchUsers(query);
+  const { data: users, refetch, isLoading } = useAPISearchUsers(query);
   const { user } = useAuthenticate();
   const { mutate: updateUser } = useAPIUpdateUser({
     onSuccess: () => {
       refetch();
     },
   });
+  const [loadingUserRole, setLoadingUserRole] = useState(true);
 
   const onToggleTag = (t: Tag) => {
     setSelectedTags((s) => toggleTag(s, t));
@@ -79,7 +80,9 @@ const UserAdmin: React.FC = () => {
   useEffect(() => {
     if (user?.role !== UserRole.ADMIN) {
       router.back();
+      return;
     }
+    setLoadingUserRole(false);
   }, [user, router]);
 
   useEffect(() => {
@@ -91,6 +94,10 @@ const UserAdmin: React.FC = () => {
       setSelectedTags(searchedTags);
     }
   }, [query.tag, tags]);
+
+  if (loadingUserRole) {
+    return <Progress isIndeterminate size="lg" />;
+  }
 
   return (
     <LayoutWithTab
@@ -113,6 +120,11 @@ const UserAdmin: React.FC = () => {
           selectedTags={selectedTags}
           toggleTag={onToggleTag}
         />
+        {!isLoading && !users?.users.length && (
+          <Text alignItems="center" textAlign="center" mb={4}>
+            検索結果が見つかりませんでした
+          </Text>
+        )}
       </div>
       <div className={userAdminStyles.table_wrapper}>
         <table className={userAdminStyles.table}>

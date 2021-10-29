@@ -534,7 +534,15 @@ const EventDetail = () => {
                           return;
                         }
                         for (let i = 0; i < files.length; i++) {
-                          fileArr.push(files[i]);
+                          const renamedFile = new File(
+                            [files[i]],
+                            userNameFactory(user) + ' ' + files[i].name,
+                            {
+                              type: files[i].type,
+                              lastModified: files[i].lastModified,
+                            },
+                          );
+                          fileArr.push(renamedFile);
                         }
                         uploadStorage(fileArr);
                       }}
