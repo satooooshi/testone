@@ -40,12 +40,14 @@ import { stateFromHTML } from 'draft-js-import-html';
 type WikiFormProps = {
   wiki?: Wiki;
   tags?: Tag[];
+  setWikiType: React.Dispatch<React.SetStateAction<string>>;
   onClickSaveButton: (wiki: Partial<Wiki>) => void;
 };
 
 const WikiForm: React.FC<WikiFormProps> = ({
   wiki,
   tags,
+  setWikiType,
   onClickSaveButton,
 }) => {
   const mdParser = new MarkdownIt({
@@ -80,6 +82,8 @@ const WikiForm: React.FC<WikiFormProps> = ({
     initialValues,
     validationSchema: wikiSchema,
     onSubmit: (q) => {
+      setWikiType(saveButtonName);
+
       if (wiki) {
         onClickSaveButton({
           ...wiki,
@@ -100,6 +104,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
       });
     },
   });
+
   const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
   const formTopRef = useRef<HTMLDivElement | null>(null);
   const editorRef = useRef<MarkdownEditor | null>(null);
