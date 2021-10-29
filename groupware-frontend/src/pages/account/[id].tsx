@@ -123,7 +123,7 @@ const MyAccountInfo = () => {
       router.push('/login');
     },
   });
-  const isSmallerThan1024 = useMediaQuery('(max-width: 1024px)');
+  const [isSmallerThan1024] = useMediaQuery('(max-width: 1024px)');
 
   const tabs: Tab[] = useHeaderTab({ headerTabType: 'account', user });
 
