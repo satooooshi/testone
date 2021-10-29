@@ -214,8 +214,15 @@ const EventList = () => {
     setModalVisible(true);
   };
 
+  const isAuthor = (event: EventSchedule) => {
+    if (event?.author?.id === user?.id) {
+      return true;
+    }
+    return false;
+  };
+
   const resizeEvent = async ({ event, start, end }: any) => {
-    if (!isEditableEvent(event.type)) {
+    if (!isEditableEvent(event.type) && !isAuthor(event)) {
       alert('イベントを編集する権限がありません');
       return;
     }
@@ -253,7 +260,7 @@ const EventList = () => {
   };
 
   const moveEvent = async ({ event, start, end }: any) => {
-    if (!isEditableEvent(event.type)) {
+    if (!isEditableEvent(event.type) && !isAuthor(event)) {
       alert('イベントを編集する権限がありません');
       return;
     }

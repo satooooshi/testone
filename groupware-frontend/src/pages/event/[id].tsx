@@ -26,7 +26,7 @@ import { useAPIUpdateEvent } from '@/hooks/api/event/useAPIUpdateEvent';
 import Image from 'next/image';
 import noImage from '@/public/no-image.jpg';
 import { useHeaderTab } from '@/hooks/headerTab/useHeaderTab';
-import { EventType, SubmissionFile, UserRole } from 'src/types';
+import { EventSchedule, EventType, SubmissionFile, UserRole } from 'src/types';
 import { useAPIDownloadEventCsv } from '@/hooks/api/event/useAPIDownloadEventCsv';
 import { useAPIUploadStorage } from '@/hooks/api/storage/useAPIUploadStorage';
 import { useAPISaveSubmission } from '@/hooks/api/event/useAPISaveSubmission';
@@ -202,6 +202,12 @@ const EventDetail = () => {
   const isAdminUser = user?.role === UserRole.ADMIN;
 
   const isEditable = useMemo(() => {
+    const isAuthor = (event: EventSchedule) => {
+      if (event?.author?.id === user?.id) {
+        return true;
+      }
+      return false;
+    };
     const isEditableEvent = (type: EventType): boolean => {
       switch (type) {
         case EventType.IMPRESSIVE_UNIVERSITY:
@@ -225,8 +231,11 @@ const EventDetail = () => {
           return user?.role === UserRole.ADMIN;
       }
     };
-    return data?.type ? isEditableEvent(data?.type) : false;
-  }, [data?.type, user?.role]);
+    if (data) {
+      return data?.type ? isEditableEvent(data?.type) : isAuthor(data);
+    }
+    return false;
+  }, [data, user?.id, user?.role]);
 
   const doesntExist = !isLoading && (!data || !data?.id);
 
