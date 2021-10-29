@@ -8,6 +8,7 @@ const minDateMessage = '開始日時は終了日時より前に設定してく�
 const minTagsMessage = 'タグは一つ以上設定してください';
 const unmatchPasswordConfirmation = '再入力と新しいパスワードが一致しません';
 const nWordLimitMessage = (len: number) => `${len}文字以内で入力してください`;
+const afterNowMessage = '現在の日時以降に設定してください';
 // const minHostUsersMessage = '開催者/講師は一人以上設定してください';
 
 export const loginSchema = Yup.object().shape({
@@ -49,7 +50,9 @@ export const createEventSchema = Yup.object().shape({
   title: Yup.string()
     .required(`タイトルは${requireMessage}`)
     .max(100, `タイトルは${nWordLimitMessage(100)}`),
-  startAt: Yup.date().required(`開始日時は${requireMessage}`),
+  startAt: Yup.date()
+    .required(`開始日時は${requireMessage}`)
+    .min(new Date(), `開始日時は${afterNowMessage}`),
   endAt: Yup.date()
     .min(Yup.ref('startAt'), minDateMessage)
     .required(`終了日時は${requireMessage}`),
