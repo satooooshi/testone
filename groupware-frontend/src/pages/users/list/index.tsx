@@ -6,7 +6,7 @@ import UserCard from '@/components/user/UserCard';
 import userListStyles from '@/styles/layouts/UserList.module.scss';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Tag, UserRole } from 'src/types';
 import { toggleTag } from 'src/utils/toggleTag';
 import paginationStyles from '@/styles/components/Pagination.module.scss';
@@ -25,7 +25,7 @@ const UserList = () => {
   const router = useRouter();
   const query = router.query as SearchQueryToGetUsers;
   const { data: tags } = useAPIGetUserTag();
-  const [searchWord, setSearchWord] = useState('');
+  const [searchWord, setSearchWord] = useState(query.word);
   const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
   const { data: users } = useAPISearchUsers(query);
 
@@ -93,6 +93,16 @@ const UserList = () => {
     },
   ];
 
+  useEffect(() => {
+    if (tags) {
+      const tagParam = query.tag || '';
+      const tagsInQueryParams = tagParam.split(' ');
+      const searchedTags =
+        tags.filter((t) => tagsInQueryParams.includes(t.id.toString())) || [];
+      setSelectedTags(searchedTags);
+    }
+  }, [query.tag, tags]);
+
   return (
     <LayoutWithTab
       sidebar={{ activeScreenName: SidebarScreenName.USERS }}
@@ -108,7 +118,7 @@ const UserList = () => {
         </div>
         <div className={userListStyles.search_form_wrapper}>
           <SearchForm
-            onCancelTagModal={() => setSelectedTags([])}
+            onClear={() => setSelectedTags([])}
             value={searchWord || ''}
             onChange={(e) => setSearchWord(e.currentTarget.value)}
             onClickButton={() => queryRefresh({ page: '1', word: searchWord })}

@@ -6,7 +6,7 @@ import dynamic from 'next/dynamic';
 const ReactPaginate = dynamic(() => import('react-paginate'), { ssr: false });
 import paginationStyles from '@/styles/components/Pagination.module.scss';
 import qaListStyles from '@/styles/layouts/QAList.module.scss';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import LayoutWithTab from '@/components/layout/LayoutWithTab';
 import SearchForm from '@/components/common/SearchForm';
 import { useAPIGetTag } from '@/hooks/api/tag/useAPIGetTag';
@@ -42,7 +42,7 @@ const QAQuestionList = () => {
     type,
     rule_category,
   });
-  const [searchWord, setSearchWord] = useState('');
+  const [searchWord, setSearchWord] = useState(word);
   const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
   const { data: tags } = useAPIGetTag();
   const qaTopTab: TopTabBehavior[] = [
@@ -166,6 +166,16 @@ const QAQuestionList = () => {
     onClickRightButton: onClickCreateButton,
   };
 
+  useEffect(() => {
+    if (tags) {
+      const tagParam = tag;
+      const tagsInQueryParams = tagParam.split(' ');
+      const searchedTags =
+        tags.filter((t) => tagsInQueryParams.includes(t.id.toString())) || [];
+      setSelectedTags(searchedTags);
+    }
+  }, [tag, tags]);
+
   return (
     <LayoutWithTab
       sidebar={{ activeScreenName: SidebarScreenName.QA }}
@@ -186,7 +196,7 @@ const QAQuestionList = () => {
       <div className={qaListStyles.top_contents_wrapper}>
         <div className={qaListStyles.search_form_wrapper}>
           <SearchForm
-            onCancelTagModal={() => setSelectedTags([])}
+            onClear={() => setSelectedTags([])}
             value={searchWord}
             onChange={(e) => setSearchWord(e.currentTarget.value)}
             onClickButton={() =>

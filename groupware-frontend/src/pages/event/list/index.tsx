@@ -107,7 +107,11 @@ const EventList = () => {
     personal,
   } = router.query as EventListGetParams;
 
-  const { data: events, refetch } = useAPIGetEventList({
+  const {
+    data: events,
+    refetch,
+    isLoading: isLoadingEvents,
+  } = useAPIGetEventList({
     page,
     word,
     tag,
@@ -119,7 +123,7 @@ const EventList = () => {
   const { user } = useAuthenticate();
   const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
   const { data: tags } = useAPIGetTag();
-  const [searchWord, setSearchWord] = useState('');
+  const [searchWord, setSearchWord] = useState(word);
   const [modalVisible, setModalVisible] = useState(false);
   const calendarRef = useRef<HTMLDivElement | null>(null);
   const { mutate: createEvent } = useAPICreateEvent({
@@ -368,10 +372,6 @@ const EventList = () => {
     }
   }, [tag, tags]);
 
-  useEffect(() => {
-    setSearchWord(word || '');
-  }, [word]);
-
   const topTabBehaviorList: TopTabBehavior[] = [
     {
       tabName: 'カレンダー(個人)',
@@ -422,7 +422,7 @@ const EventList = () => {
       isActiveTab: !isCalendar && status === 'past',
     },
     {
-      tabName: '進行中イベント',
+      tabName: '進行中のイベント',
       onClick: () => {
         queryRefresh({
           page: '1',
@@ -492,7 +492,7 @@ const EventList = () => {
           <>
             <div className={eventListStyles.search_form_wrapper}>
               <SearchForm
-                onCancelTagModal={() => setSelectedTags([])}
+                onClear={() => setSelectedTags([])}
                 value={searchWord || ''}
                 onChange={(e) => setSearchWord(e.currentTarget.value)}
                 onClickButton={() =>
@@ -517,11 +517,11 @@ const EventList = () => {
                     </div>
                   ))}
                 </div>
-              ) : (
+              ) : !isLoadingEvents ? (
                 <p className={eventListStyles.no_result_text}>
                   検索結果が見つかりませんでした
                 </p>
-              )}
+              ) : null}
             </div>
           </>
         )}

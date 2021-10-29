@@ -80,7 +80,7 @@ const EventDetail = () => {
   const [commentVisible, setCommentVisible] = useState(false);
   const [newComment, setNewComment] = useState<string>('');
   const { user } = useAuthenticate();
-  const { data, refetch } = useAPIGetEventDetail(id);
+  const { data, refetch, isLoading } = useAPIGetEventDetail(id);
   const submissionRef = useRef<HTMLInputElement | null>(null);
   const toast = useToast();
   const [submitFiles, setSubmitFiles] = useState<
@@ -212,8 +212,10 @@ const EventDetail = () => {
     return data?.type ? isEditableEvent(data?.type) : false;
   }, [data?.type, user?.role]);
 
+  const doesntExist = !isLoading && (!data || !data?.id);
+
   const tabs: Tab[] = useHeaderTab(
-    user?.role === UserRole.ADMIN && data
+    user?.role === UserRole.ADMIN && !doesntExist
       ? {
           headerTabType: 'adminEventDetail',
           onDeleteClicked,
@@ -247,7 +249,7 @@ const EventDetail = () => {
     <LayoutWithTab
       sidebar={{ activeScreenName: SidebarScreenName.EVENT }}
       header={initialHeaderValue}>
-      {!data || !data?.id ? (
+      {doesntExist ? (
         <div>
           <Text>このイベントは存在しないか、権限がありません。</Text>
         </div>

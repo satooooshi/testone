@@ -19,7 +19,13 @@ import { useAPIGetEventList } from '@/hooks/api/event/useAPIGetEventList';
 import { useAPIGetWikiList } from '@/hooks/api/wiki/useAPIGetWikiList';
 import { useHeaderTab } from '@/hooks/headerTab/useHeaderTab';
 import topTabBarStyles from '@/styles/components/TopTabBar.module.scss';
-import { Text, Box, Button, ThemeTypings } from '@chakra-ui/react';
+import {
+  Text,
+  Box,
+  Button,
+  ThemeTypings,
+  useMediaQuery,
+} from '@chakra-ui/react';
 import { TagType, UserTag, WikiType } from 'src/types';
 import { userRoleNameFactory } from 'src/utils/factory/userRoleNameFactory';
 import { darkFontColor } from 'src/utils/colors';
@@ -117,6 +123,7 @@ const MyAccountInfo = () => {
       router.push('/login');
     },
   });
+  const isSmallerThan1024 = useMediaQuery('(max-width: 1024px)');
 
   const tabs: Tab[] = useHeaderTab({ headerTabType: 'account', user });
 
@@ -236,28 +243,28 @@ const MyAccountInfo = () => {
                     </Text>
                   </Box>
                   <Box w={'100%'} display="flex" flexDir="row" flexWrap="wrap">
-                    <Box mb={8} mr={4} w={'49%'}>
+                    <Box mb={8} mr={4} w={isSmallerThan1024 ? '100%' : '49%'}>
                       <UserTagList
                         tags={profile.tags}
                         type={TagType.TECH}
                         introduce={profile.introduceTech}
                       />
                     </Box>
-                    <Box mb={8} w={'49%'}>
+                    <Box mb={8} w={isSmallerThan1024 ? '100%' : '49%'}>
                       <UserTagList
                         tags={profile.tags}
                         type={TagType.QUALIFICATION}
                         introduce={profile.introduceQualification}
                       />
                     </Box>
-                    <Box mb={8} mr={4} w={'49%'}>
+                    <Box mb={8} mr={4} w={isSmallerThan1024 ? '100%' : '49%'}>
                       <UserTagList
                         tags={profile.tags}
                         type={TagType.CLUB}
                         introduce={profile.introduceClub}
                       />
                     </Box>
-                    <Box mb={8} w={'49%'}>
+                    <Box mb={8} w={isSmallerThan1024 ? '100%' : '49%'}>
                       <UserTagList
                         tags={profile.tags}
                         type={TagType.HOBBY}
