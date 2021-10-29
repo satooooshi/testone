@@ -6,6 +6,7 @@ const blankMixedMessage = '空白文字は使用できません';
 const minEightTextMessage = '8文字以上で入力してください';
 const minDateMessage = '開始日時は終了日時より前に設定して下さい';
 const minTagsMessage = 'タグは一つ以上設定してください';
+const unmatchPasswordConfirmation = '再入力と新しいパスワードが一致しません';
 // const minHostUsersMessage = '開催者/講師は一人以上設定してください';
 
 export const loginSchema = Yup.object().shape({
@@ -27,6 +28,10 @@ export const updatePasswordSchema = Yup.object().shape({
     .matches(/^([^ ]*)$/, blankMixedMessage)
     .min(8, minEightTextMessage)
     .required(requireMessage),
+  newPasswordConfirmation: Yup.string().oneOf(
+    [Yup.ref('newPassword'), null],
+    unmatchPasswordConfirmation,
+  ),
 });
 
 export const registerSchema = Yup.object().shape({
