@@ -48,7 +48,7 @@ export const registerSchema = Yup.object().shape({
 export const createEventSchema = Yup.object().shape({
   title: Yup.string()
     .required(`タイトルは${requireMessage}`)
-    .max(100, nWordLimitMessage(100)),
+    .max(100, `タイトルは${nWordLimitMessage(100)}`),
   startAt: Yup.date().required(`開始日時は${requireMessage}`),
   endAt: Yup.date()
     .min(Yup.ref('startAt'), minDateMessage)
