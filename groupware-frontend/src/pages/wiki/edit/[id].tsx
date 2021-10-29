@@ -23,12 +23,11 @@ const EditQuestion = () => {
   });
 
   const isAllWikiEditable = user?.role === UserRole.ADMIN;
-  console.log('wiki', wiki);
 
   useEffect(() => {
     if (wiki) {
       if (!isLoading && wiki?.writer?.id !== user?.id && !isAllWikiEditable) {
-        // router.back();
+        router.back();
         return;
       }
       setVisible(true);
