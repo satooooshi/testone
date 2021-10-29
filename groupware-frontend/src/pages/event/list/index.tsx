@@ -426,7 +426,7 @@ const EventList = () => {
       isActiveTab: !isCalendar && status === 'past',
     },
     {
-      tabName: '進行中イベント',
+      tabName: '進行中のイベント',
       onClick: () => {
         queryRefresh({
           page: '1',
