@@ -83,7 +83,7 @@ const initialEventValue = {
   endAt: setDateTime(1, 21, 0),
   type: EventType.STUDY_MEETING,
   imageURL: '',
-  chatNeeded: true,
+  chatNeeded: false,
   hostUsers: [],
   tags: [],
   files: [],
