@@ -301,7 +301,7 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
       className={createEventModalStyle.modal}>
       <TagModal
         onComplete={closeTagModal}
-        onCancel={() => {
+        onClear={() => {
           setNewEvent((e) => ({ ...e, tags: [] }));
           closeTagModal();
         }}

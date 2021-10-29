@@ -12,7 +12,7 @@ type TagModalProps = {
   selectedTags: (Tag | UserTag)[];
   filteredTagType?: TagType;
   toggleTag: (t: Tag) => void;
-  onCancel: () => void;
+  onClear: () => void;
   onComplete: () => void;
 };
 
@@ -50,7 +50,7 @@ const TagModal: React.FC<TagModalProps> = ({
   selectedTags,
   filteredTagType,
   toggleTag,
-  onCancel: closeTagModal,
+  onClear: closeTagModal,
   onComplete,
 }) => {
   const [tags, setTags] = useState(savedTags);
@@ -126,7 +126,7 @@ const TagModal: React.FC<TagModalProps> = ({
           borderRadius={5}
           className={tagModalStyles.modal_cancel_button}
           onClick={closeTagModal}>
-          キャンセル
+          クリア
         </Button>
         <Button
           size="md"
@@ -134,7 +134,7 @@ const TagModal: React.FC<TagModalProps> = ({
           colorScheme="green"
           borderRadius={5}
           onClick={onComplete}>
-          タグを選択
+          確定
         </Button>
       </div>
     </Modal>

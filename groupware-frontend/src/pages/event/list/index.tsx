@@ -123,7 +123,7 @@ const EventList = () => {
   const { user } = useAuthenticate();
   const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
   const { data: tags } = useAPIGetTag();
-  const [searchWord, setSearchWord] = useState('');
+  const [searchWord, setSearchWord] = useState(word);
   const [modalVisible, setModalVisible] = useState(false);
   const calendarRef = useRef<HTMLDivElement | null>(null);
   const { mutate: createEvent } = useAPICreateEvent({
@@ -372,10 +372,6 @@ const EventList = () => {
     }
   }, [tag, tags]);
 
-  useEffect(() => {
-    setSearchWord(word || '');
-  }, [word]);
-
   const topTabBehaviorList: TopTabBehavior[] = [
     {
       tabName: 'カレンダー(個人)',
@@ -496,7 +492,7 @@ const EventList = () => {
           <>
             <div className={eventListStyles.search_form_wrapper}>
               <SearchForm
-                onCancelTagModal={() => setSelectedTags([])}
+                onClear={() => setSelectedTags([])}
                 value={searchWord || ''}
                 onChange={(e) => setSearchWord(e.currentTarget.value)}
                 onClickButton={() =>

@@ -1,6 +1,6 @@
 import LayoutWithTab from '@/components/layout/LayoutWithTab';
 import { SidebarScreenName } from '@/components/layout/Sidebar';
-import React, { useCallback, useMemo, useReducer, useRef } from 'react';
+import React, { useCallback, useReducer, useRef } from 'react';
 import { Tab } from 'src/types/header/tab/types';
 import Head from 'next/head';
 import Image from 'next/image';
@@ -222,7 +222,7 @@ const CreateNewUser = () => {
           selectedTags={values.tags || []}
           filteredTagType={filteredTagType}
           toggleTag={toggleSelectedTag}
-          onCancel={() => {
+          onClear={() => {
             dispatchModal({ type: 'close' });
           }}
           onComplete={() => dispatchModal({ type: 'close' })}

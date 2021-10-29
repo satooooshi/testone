@@ -221,7 +221,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
           selectedTags={newQuestion.tags ? newQuestion.tags : []}
           toggleTag={toggleTag}
           onComplete={() => setTagModal(false)}
-          onCancel={() => {
+          onClear={() => {
             setNewQuestion((q) => ({ ...q, tags: [] }));
             setTagModal(false);
           }}
