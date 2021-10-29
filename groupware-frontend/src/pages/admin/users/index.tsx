@@ -7,7 +7,7 @@ import userAdminStyles from '@/styles/layouts/UserAdmin.module.scss';
 import { Tag, User, UserRole } from 'src/types';
 import { useAPIUpdateUser } from '@/hooks/api/user/useAPIUpdateUser';
 import { useAPIDeleteUser } from '@/hooks/api/user/useAPIDeleteUser';
-import { Avatar, Button, Select, Text } from '@chakra-ui/react';
+import { Avatar, Button, Progress, Select, Text } from '@chakra-ui/react';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
 import { useAuthenticate } from 'src/contexts/useAuthenticate';
@@ -39,6 +39,7 @@ const UserAdmin: React.FC = () => {
       refetch();
     },
   });
+  const [loadingUserRole, setLoadingUserRole] = useState(true);
 
   const onToggleTag = (t: Tag) => {
     setSelectedTags((s) => toggleTag(s, t));
@@ -79,7 +80,9 @@ const UserAdmin: React.FC = () => {
   useEffect(() => {
     if (user?.role !== UserRole.ADMIN) {
       router.back();
+      return;
     }
+    setLoadingUserRole(false);
   }, [user, router]);
 
   useEffect(() => {
@@ -91,6 +94,10 @@ const UserAdmin: React.FC = () => {
       setSelectedTags(searchedTags);
     }
   }, [query.tag, tags]);
+
+  if (loadingUserRole) {
+    return <Progress isIndeterminate size="lg" />;
+  }
 
   return (
     <LayoutWithTab
