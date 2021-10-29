@@ -108,9 +108,9 @@ export class WikiService {
         queryWord: `%${word}%`,
       })
       .andWhere(
-        status === 'new' && !writer
+        status === 'new' && !writer && type === WikiType.QA
           ? 'wiki.resolved_at is null'
-          : status === 'resolved' && !writer
+          : status === 'resolved' && !writer && type === WikiType.QA
           ? 'wiki.resolved_at is not null'
           : '1=1',
       )
