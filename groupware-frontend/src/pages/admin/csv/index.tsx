@@ -8,16 +8,21 @@ import {
   QueryToGetUserCsv,
   useAPIDownloadUserCsv,
 } from '@/hooks/api/user/useAPIDownloadUserCsv';
-import { Button } from '@chakra-ui/react';
+import { Button, Progress } from '@chakra-ui/react';
 import Head from 'next/head';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { DatePicker } from 'react-rainbow-components';
 import { Tab } from 'src/types/header/tab/types';
 import exportCsvStyles from '@/styles/layouts/admin/ExportCsv.module.scss';
 import clsx from 'clsx';
 import { useHeaderTab } from '@/hooks/headerTab/useHeaderTab';
+import { useRouter } from 'next/router';
+import { useAuthenticate } from 'src/contexts/useAuthenticate';
+import { UserRole } from 'src/types';
 
 const ExportCsv = () => {
+  const router = useRouter();
+  const { user } = useAuthenticate();
   const [eventDuration, setEventDuration] =
     useState<Partial<QueryToGetEventCsv>>();
   const [userDuration, setUserDuration] =
@@ -25,6 +30,19 @@ const ExportCsv = () => {
   const { mutate: downloadEvent } = useAPIDownloadEventCsv();
   const { mutate: downloadUser } = useAPIDownloadUserCsv();
   const tabs: Tab[] = useHeaderTab({ headerTabType: 'admin' });
+  const [loadingUserRole, setLoadingUserRole] = useState(true);
+
+  useEffect(() => {
+    if (user?.role !== UserRole.ADMIN) {
+      router.back();
+      return;
+    }
+    setLoadingUserRole(false);
+  }, [user, router]);
+
+  if (loadingUserRole) {
+    return <Progress isIndeterminate size="lg" />;
+  }
 
   return (
     <LayoutWithTab
