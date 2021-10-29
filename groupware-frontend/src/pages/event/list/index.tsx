@@ -107,7 +107,11 @@ const EventList = () => {
     personal,
   } = router.query as EventListGetParams;
 
-  const { data: events, refetch } = useAPIGetEventList({
+  const {
+    data: events,
+    refetch,
+    isLoading: isLoadingEvents,
+  } = useAPIGetEventList({
     page,
     word,
     tag,
@@ -517,11 +521,11 @@ const EventList = () => {
                     </div>
                   ))}
                 </div>
-              ) : (
+              ) : !isLoadingEvents ? (
                 <p className={eventListStyles.no_result_text}>
                   検索結果が見つかりませんでした
                 </p>
-              )}
+              ) : null}
             </div>
           </>
         )}
