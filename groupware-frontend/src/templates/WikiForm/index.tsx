@@ -61,7 +61,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
     EditorState.createEmpty(),
   );
   const [activeTab, setActiveTab] = useState<TabName>(TabName.EDIT);
-  const initialValues: Partial<Wiki> = {
+  const initialValues: Partial<Wiki> = wiki || {
     title: '',
     body: '',
     tags: [],
@@ -77,6 +77,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
     touched,
     handleSubmit,
   } = useFormik({
+    enableReinitialize: true,
     initialValues,
     validationSchema: wikiSchema,
     onSubmit: (q) => {
@@ -183,12 +184,11 @@ const WikiForm: React.FC<WikiFormProps> = ({
 
   useEffect(() => {
     if (wiki) {
-      setNewQuestion(wiki);
       if (wiki.textFormat === 'html') {
         setEditorState(EditorState.createWithContent(stateFromHTML(wiki.body)));
       }
     }
-  }, [setNewQuestion, wiki]);
+  }, [wiki]);
 
   useEffect(() => {
     if (editorState) {
@@ -197,7 +197,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
         body: stateToHTML(editorState.getCurrentContent()),
       }));
     }
-  }, [editorState, setNewQuestion]);
+  }, [editorState, setNewQuestion, wiki]);
 
   useEffect(() => {
     formTopRef.current?.scrollIntoView();
