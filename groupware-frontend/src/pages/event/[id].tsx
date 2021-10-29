@@ -43,7 +43,7 @@ import { useAPISaveUserJoiningEvent } from '@/hooks/api/event/useAPISaveUserJoin
 import { userNameFactory } from 'src/utils/factory/userNameFactory';
 import { tagColorFactory } from 'src/utils/factory/tagColorFactory';
 import { useAPICancelEvent } from '@/hooks/api/event/useAPICancelEvent';
-import coachImage from '@/public/coach_1.jpg';
+import coachImage from '@/public/coach_1.jpeg';
 import { eventTypeColorFactory } from 'src/utils/factory/eventTypeColorFactory';
 import eventTypeNameFactory from 'src/utils/factory/eventTypeNameFactory';
 
