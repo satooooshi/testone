@@ -454,7 +454,6 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
                   <Stack spacing={5} direction="row">
                     <Radio
                       colorScheme="green"
-                      bg="white"
                       value="needed"
                       onChange={() =>
                         setNewEvent((v) => ({ ...v, chatNeeded: true }))
@@ -463,7 +462,6 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
                     </Radio>
                     <Radio
                       colorScheme="green"
-                      bg="white"
                       value="unneeded"
                       onChange={() =>
                         setNewEvent((v) => ({ ...v, chatNeeded: false }))
