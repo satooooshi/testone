@@ -182,6 +182,22 @@ const EventDetail = () => {
       refetch();
     },
   });
+
+  const handleCreateComment = () => {
+    if (newComment.length > 500) {
+      toast({
+        description: 'コメントは500文字以内で入力してください',
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      });
+      return;
+    }
+    createComment({
+      body: newComment,
+      eventSchedule: data,
+    });
+  };
   const isCommonUser = user?.role === UserRole.COMMON;
   const isAdminUser = user?.role === UserRole.ADMIN;
 
@@ -453,10 +469,7 @@ const EventDetail = () => {
                       colorScheme="teal"
                       onClick={() => {
                         commentVisible && newComment
-                          ? createComment({
-                              body: newComment,
-                              eventSchedule: data,
-                            })
+                          ? handleCreateComment()
                           : setCommentVisible(true);
                       }}>
                       {commentVisible ? 'コメントを投稿する' : 'コメントを追加'}
