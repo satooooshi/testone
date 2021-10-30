@@ -26,7 +26,7 @@ const EditQuestion = () => {
 
   useEffect(() => {
     if (wiki) {
-      if ((!isLoading && wiki?.writer?.id !== user?.id) || !isAllWikiEditable) {
+      if (!isLoading && wiki?.writer?.id !== user?.id && !isAllWikiEditable) {
         router.back();
         return;
       }

@@ -56,7 +56,7 @@ type SearchFormProps = {
   tags?: Tag[];
   selectedTags?: Tag[];
   toggleTag: (t: Tag) => void;
-  onCancelTagModal: () => void;
+  onClear: () => void;
 };
 
 const SearchInput: React.FC<SearchFormProps> = ({
@@ -66,10 +66,10 @@ const SearchInput: React.FC<SearchFormProps> = ({
   tags = [],
   selectedTags = [],
   toggleTag,
-  onCancelTagModal,
+  onClear,
 }) => {
   const [tagModal, setTagModal] = useState(false);
-  const [searchedWord, setSearchedWord] = useState('');
+  const [searchedWord, setSearchedWord] = useState(value);
   const { isSmallerThan768, hideSearchModal } = useSearchForm();
 
   const handleModalSearchButton = () => {
@@ -118,9 +118,8 @@ const SearchInput: React.FC<SearchFormProps> = ({
           tags={tags || []}
           selectedTags={selectedTags}
           toggleTag={toggleTag}
-          onCancel={() => {
-            onCancelTagModal();
-            setTagModal(false);
+          onClear={() => {
+            onClear();
           }}
           onComplete={() => setTagModal(false)}
           isSearch={true}
@@ -137,9 +136,8 @@ const SearchInput: React.FC<SearchFormProps> = ({
             tags={tags || []}
             selectedTags={selectedTags}
             toggleTag={toggleTag}
-            onCancel={() => {
-              onCancelTagModal();
-              setTagModal(false);
+            onClear={() => {
+              onClear();
             }}
             onComplete={() => setTagModal(false)}
             isSearch={true}

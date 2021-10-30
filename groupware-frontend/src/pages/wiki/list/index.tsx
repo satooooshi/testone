@@ -6,7 +6,7 @@ import dynamic from 'next/dynamic';
 const ReactPaginate = dynamic(() => import('react-paginate'), { ssr: false });
 import paginationStyles from '@/styles/components/Pagination.module.scss';
 import qaListStyles from '@/styles/layouts/QAList.module.scss';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import LayoutWithTab from '@/components/layout/LayoutWithTab';
 import SearchForm from '@/components/common/SearchForm';
 import { useAPIGetTag } from '@/hooks/api/tag/useAPIGetTag';
@@ -22,6 +22,7 @@ import { useAuthenticate } from 'src/contexts/useAuthenticate';
 import { useHeaderTab } from '@/hooks/headerTab/useHeaderTab';
 import TopTabBar, { TopTabBehavior } from '@/components/layout/TopTabBar';
 import topTabBarStyles from '@/styles/components/TopTabBar.module.scss';
+import { Text } from '@chakra-ui/react';
 
 const QAQuestionList = () => {
   const router = useRouter();
@@ -34,7 +35,7 @@ const QAQuestionList = () => {
     rule_category,
   } = router.query as SearchQueryToGetWiki;
   const { user } = useAuthenticate();
-  const { data: questions } = useAPIGetWikiList({
+  const { data: questions, isLoading } = useAPIGetWikiList({
     page,
     tag,
     word,
@@ -42,7 +43,7 @@ const QAQuestionList = () => {
     type,
     rule_category,
   });
-  const [searchWord, setSearchWord] = useState('');
+  const [searchWord, setSearchWord] = useState(word);
   const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
   const { data: tags } = useAPIGetTag();
   const qaTopTab: TopTabBehavior[] = [
@@ -166,6 +167,16 @@ const QAQuestionList = () => {
     onClickRightButton: onClickCreateButton,
   };
 
+  useEffect(() => {
+    if (tags) {
+      const tagParam = tag;
+      const tagsInQueryParams = tagParam.split(' ');
+      const searchedTags =
+        tags.filter((t) => tagsInQueryParams.includes(t.id.toString())) || [];
+      setSelectedTags(searchedTags);
+    }
+  }, [tag, tags]);
+
   return (
     <LayoutWithTab
       sidebar={{ activeScreenName: SidebarScreenName.QA }}
@@ -186,7 +197,7 @@ const QAQuestionList = () => {
       <div className={qaListStyles.top_contents_wrapper}>
         <div className={qaListStyles.search_form_wrapper}>
           <SearchForm
-            onCancelTagModal={() => setSelectedTags([])}
+            onClear={() => setSelectedTags([])}
             value={searchWord}
             onChange={(e) => setSearchWord(e.currentTarget.value)}
             onClickButton={() =>
@@ -203,11 +214,15 @@ const QAQuestionList = () => {
             toggleTag={onToggleTag}
           />
         </div>
+        {!isLoading && !questions?.wiki.length && (
+          <Text alignItems="center" textAlign="center" mb={4}>
+            検索結果が見つかりませんでした
+          </Text>
+        )}
         <div className={qaListStyles.qa_list}>
           {questions?.wiki.map((q) => (
             <WikiCard key={q.id} wiki={q} />
           ))}
-          {!questions?.wiki.length && <p>検索結果が見つかりませんでした</p>}
         </div>
       </div>
       <div className={paginationStyles.pagination_wrap_layout}>

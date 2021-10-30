@@ -205,7 +205,7 @@ const Profile = () => {
           selectedTags={userInfo?.tags || []}
           filteredTagType={filteredTagType}
           toggleTag={toggleSelectedTag}
-          onCancel={() => {
+          onClear={() => {
             dispatchModal({ type: 'close' });
           }}
           onComplete={() => dispatchModal({ type: 'close' })}

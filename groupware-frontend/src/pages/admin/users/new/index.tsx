@@ -1,6 +1,12 @@
 import LayoutWithTab from '@/components/layout/LayoutWithTab';
 import { SidebarScreenName } from '@/components/layout/Sidebar';
-import React, { useCallback, useMemo, useReducer, useRef } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useReducer,
+  useRef,
+  useState,
+} from 'react';
 import { Tab } from 'src/types/header/tab/types';
 import Head from 'next/head';
 import Image from 'next/image';
@@ -13,6 +19,7 @@ import {
   FormControl,
   FormLabel,
   Input,
+  Progress,
   Select,
   Textarea,
   useToast,
@@ -33,6 +40,8 @@ import { useImageCrop } from '@/hooks/crop/useImageCrop';
 import { useHeaderTab } from '@/hooks/headerTab/useHeaderTab';
 import { userRoleNameFactory } from 'src/utils/factory/userRoleNameFactory';
 import FormToLinkTag from '@/components/FormToLinkTag';
+import { useRouter } from 'next/router';
+import { useAuthenticate } from 'src/contexts/useAuthenticate';
 
 type ModalState = {
   isOpen: boolean;
@@ -46,6 +55,9 @@ type ModalAction = {
 const CreateNewUser = () => {
   const toast = useToast();
   const { data: tags } = useAPIGetUserTag();
+  const router = useRouter();
+  const { user } = useAuthenticate();
+  const [loadingUserRole, setLoadingUserRole] = useState(true);
   const initialUserValues: Partial<User> = {
     email: '',
     lastName: '',
@@ -201,6 +213,18 @@ const CreateNewUser = () => {
     }));
   };
 
+  useEffect(() => {
+    if (user?.role !== UserRole.ADMIN) {
+      router.back();
+      return;
+    }
+    setLoadingUserRole(false);
+  }, [user, router]);
+
+  if (loadingUserRole) {
+    return <Progress isIndeterminate size="lg" />;
+  }
+
   return (
     <LayoutWithTab
       sidebar={{
@@ -222,7 +246,7 @@ const CreateNewUser = () => {
           selectedTags={values.tags || []}
           filteredTagType={filteredTagType}
           toggleTag={toggleSelectedTag}
-          onCancel={() => {
+          onClear={() => {
             dispatchModal({ type: 'close' });
           }}
           onComplete={() => dispatchModal({ type: 'close' })}
