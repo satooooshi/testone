@@ -12,7 +12,7 @@ const CreateQA = () => {
       router.push('/wiki/list?page=1&tag=&word=&status=new&type=');
     },
     onError: () => {
-      alert('質問内容には空白以外の文字を入力してください。');
+      alert('Wiki作成が失敗しました。入力内容をご確認ください。');
     },
   });
 

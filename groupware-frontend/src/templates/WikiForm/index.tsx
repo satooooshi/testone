@@ -361,7 +361,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
                 width: isSmallerThan768 ? '90vw' : '80vw',
                 maxWidth: '1980px',
               }}
-              placeholder="質問内容を入力して下さい"
+              placeholder="質問内容を入力して下さい(空白のみは不可)"
               editorRef={draftEditor}
               editorState={editorState}
               setEditorState={setEditorState}
@@ -376,7 +376,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
               height: '80vh',
               marginBottom: 40,
             }}
-            placeholder="質問内容を入力して下さい"
+            placeholder="質問内容を入力して下さい(空白のみは不可)"
             editorRef={editorRef}
             onImageUpload={handleImageUpload}
             plugins={liteEditorPlugins}
