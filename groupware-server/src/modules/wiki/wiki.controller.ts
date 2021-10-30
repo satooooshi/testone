@@ -12,9 +12,9 @@ import {
 import { QAAnswer } from 'src/entities/qaAnswer.entity';
 import { QAAnswerReply } from 'src/entities/qaAnswerReply.entity';
 import { RuleCategory, Wiki, WikiType } from 'src/entities/wiki.entity';
-import { existTextCheckerExceptTags } from 'src/utils/existTextCheckerExceptTags';
 import JwtAuthenticationGuard from '../auth/jwtAuthentication.guard';
 import RequestWithUser from '../auth/requestWithUser.interface';
+import saveWikiDto from './dto/saveWikiDto';
 import { WikiService } from './wiki.service';
 
 export interface SearchQueryToGetWiki {
@@ -62,10 +62,8 @@ export class WikiController {
   async createWiki(
     @Req() request: RequestWithUser,
     @Body() wiki: Partial<Wiki>,
+    @Body() saveWikiDto: saveWikiDto,
   ): Promise<Wiki> {
-    if (!wiki.title || !existTextCheckerExceptTags(wiki.body)) {
-      throw new BadRequestException('title and body is necessary');
-    }
     wiki.writer = request.user;
     return await this.qaService.saveWiki(wiki);
   }
