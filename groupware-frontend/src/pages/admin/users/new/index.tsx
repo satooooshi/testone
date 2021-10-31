@@ -269,6 +269,7 @@ const CreateNewUser = () => {
                 })
               }
               onImageLoaded={onLoad}
+              circularCrop={true}
             />
           ) : (
             <div
