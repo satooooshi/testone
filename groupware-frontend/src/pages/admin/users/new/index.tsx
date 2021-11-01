@@ -269,6 +269,7 @@ const CreateNewUser = () => {
                 })
               }
               onImageLoaded={onLoad}
+              circularCrop={true}
             />
           ) : (
             <div
@@ -276,11 +277,13 @@ const CreateNewUser = () => {
                 className: createNewUserStyles.image_dropzone,
               })}>
               <input {...getEventImageInputProps()} />
-              <Image
-                className={createNewUserStyles.avatar}
-                src={noImage}
-                alt="アバター画像"
-              />
+              <div className={createNewUserStyles.next_image_wrapper}>
+                <Image
+                  className={createNewUserStyles.avatar}
+                  src={noImage}
+                  alt="アバター画像"
+                />
+              </div>
             </div>
           )}
         </div>

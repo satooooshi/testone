@@ -229,11 +229,13 @@ const Profile = () => {
                 className: profileStyles.image_dropzone,
               })}>
               <input {...getEventImageInputProps()} />
-              <Image
-                className={profileStyles.avatar}
-                src={noImage}
-                alt="アバター画像"
-              />
+              <div className={createNewUserStyles.next_image_wrapper}>
+                <Image
+                  className={profileStyles.avatar}
+                  src={noImage}
+                  alt="アバター画像"
+                />
+              </div>
             </div>
           ) : null}
           {selectImageUrl ? (

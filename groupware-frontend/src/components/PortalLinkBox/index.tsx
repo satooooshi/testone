@@ -11,6 +11,7 @@ import { MdAssignment } from 'react-icons/md';
 import { CgLoadbarDoc } from 'react-icons/cg';
 import { AiOutlineGlobal, AiFillBulb } from 'react-icons/ai';
 import clsx from 'clsx';
+import { useAuthenticate } from 'src/contexts/useAuthenticate';
 
 export enum PortalLinkType {
   IMPRESSIVE_UNIVERSITY = '/event/impressive_university',
@@ -226,8 +227,15 @@ const descriptionText = (href: PortalLinkType): string => {
 };
 
 const PortalLinkBox: React.FC<PortarlLinkBoxProps> = ({ href }) => {
+  const { user } = useAuthenticate();
+  const hrefFactory = () => {
+    if (href === PortalLinkType.ACCOUNT) {
+      return PortalLinkType.ACCOUNT + `/${user?.id}`;
+    }
+    return href;
+  };
   return (
-    <Link href={href}>
+    <Link href={hrefFactory()}>
       <a className={portalLinkBoxStyles.box_wrapper}>
         <PortalIcon href={href} />
         <div className={portalLinkBoxStyles.title_wrapper}>
