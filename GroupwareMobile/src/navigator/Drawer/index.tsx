@@ -11,6 +11,7 @@ import EventDetail from '../../screens/event/EventDetail';
 import WikiDetail from '../../screens/wiki/WikiDetail';
 import WikiList from '../../screens/wiki/WikiList';
 import {createStackNavigator} from '@react-navigation/stack';
+import PostWiki from '../../screens/wiki/PostWiki';
 
 const Drawer = createDrawerNavigator();
 const Stack = createStackNavigator();
@@ -26,6 +27,11 @@ const WikiStack = () => (
     <Stack.Screen
       name="WikiList"
       component={WikiList}
+      options={{headerShown: false}}
+    />
+    <Stack.Screen
+      name="PostWiki"
+      component={PostWiki}
       options={{headerShown: false}}
     />
   </Stack.Navigator>
