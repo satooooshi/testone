@@ -24,10 +24,7 @@ export const imagePickerResponseToFormData = (
         ? imagePickerResponse.path.split('/').slice(-1)[0]
         : imagePickerResponse.filename,
     type: imagePickerResponse.mime,
-    uri:
-      Platform.OS === 'android'
-        ? imagePickerResponse.path
-        : imagePickerResponse.sourceURL?.replace('file://', ''),
+    uri: imagePickerResponse.path,
   });
   return formData;
 };
