@@ -130,6 +130,9 @@ android {
     ndkVersion rootProject.ext.ndkVersion
 
     compileSdkVersion rootProject.ext.compileSdkVersion
+    compileSdkVersion 27
+    //react-native-image-crop-picker
+    buildToolsVersion "27.0.3"
 
     defaultConfig {
         applicationId "com.groupwaremobile"
@@ -137,6 +140,9 @@ android {
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
         versionName "1.0"
+        //react-native-image-crop-picker
+        vectorDrawables.useSupportLibrary = true
+        targetSdkVersion 27
     }
     splits {
         abi {
