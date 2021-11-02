@@ -9,12 +9,7 @@ import {
   PostWikiRouteProps,
 } from '../../../types/navigator/screenProps/Wiki';
 import {actions, RichEditor, RichToolbar} from 'react-native-pell-rich-editor';
-import {
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
-  useWindowDimensions,
-} from 'react-native';
+import {useWindowDimensions} from 'react-native';
 import {
   Input,
   ScrollDiv,
@@ -22,13 +17,14 @@ import {
   Dropdown,
   Button,
   Div,
+  DropdownProps,
 } from 'react-native-magnus';
-import ImageCropPicker from 'react-native-image-crop-picker';
 import {uploadImageFromGallery} from '../../../utils/cropImage/uploadImageFromGallery';
 import {useAPIUploadStorage} from '../../../hooks/api/storage/useAPIUploadStorage';
 import {useFormik} from 'formik';
 import {wikiSchema} from '../../../utils/validation/schema';
 import {wikiTypeNameFactory} from '../../../utils/factory/wiki/wikiTypeNameFactory';
+import {DropdownOptionProps} from 'react-native-magnus/lib/typescript/src/ui/dropdown/dropdown.option.type';
 
 const PostWiki: React.FC = () => {
   const navigation = useNavigation<PostWikiNavigationProps>();
@@ -59,8 +55,6 @@ const PostWiki: React.FC = () => {
   const {
     values: newWiki,
     setValues: setNewWiki,
-    errors,
-    touched,
     handleSubmit,
   } = useFormik({
     enableReinitialize: true,
@@ -70,6 +64,22 @@ const PostWiki: React.FC = () => {
       saveWiki(w);
     },
   });
+  const defaultDropdownProps: Partial<DropdownProps> = {
+    m: 'md',
+    pb: 'md',
+    showSwipeIndicator: false,
+    roundedTop: 'xl',
+  };
+  const defaultDropdownOptionProps: Partial<DropdownOptionProps> = {
+    bg: 'gray100',
+    color: 'blue600',
+    py: 'lg',
+    px: 'xl',
+    borderBottomWidth: 1,
+    borderBottomColor: 'gray200',
+    justifyContent: 'center',
+    roundedTop: 'lg',
+  };
 
   const editorInitializedCallback = () => {
     editorRef.current?.registerToolbar(function () {});
@@ -128,13 +138,11 @@ const PostWiki: React.FC = () => {
           </Button>
         </Div>
         <Dropdown
+          {...defaultDropdownProps}
           title="タイプを選択"
-          ref={typeDropdownRef}
-          m="md"
-          pb="md"
-          showSwipeIndicator={false}
-          roundedTop="xl">
+          ref={typeDropdownRef}>
           <Dropdown.Option
+            {...defaultDropdownOptionProps}
             onPress={() =>
               setNewWiki(w => ({
                 ...w,
@@ -142,18 +150,11 @@ const PostWiki: React.FC = () => {
                 ruleCategory: RuleCategory.RULES,
               }))
             }
-            value={RuleCategory.RULES}
-            bg="gray100"
-            color="blue600"
-            py="lg"
-            px="xl"
-            borderBottomWidth={1}
-            borderBottomColor="gray200"
-            justifyContent="center"
-            roundedTop="lg">
+            value={RuleCategory.RULES}>
             {wikiTypeNameFactory(WikiType.RULES, RuleCategory.RULES)}
           </Dropdown.Option>
           <Dropdown.Option
+            {...defaultDropdownOptionProps}
             onPress={() =>
               setNewWiki(w => ({
                 ...w,
@@ -161,18 +162,11 @@ const PostWiki: React.FC = () => {
                 ruleCategory: RuleCategory.PHILOSOPHY,
               }))
             }
-            value={RuleCategory.PHILOSOPHY}
-            bg="gray100"
-            color="blue600"
-            py="lg"
-            px="xl"
-            borderBottomWidth={1}
-            borderBottomColor="gray200"
-            justifyContent="center"
-            roundedTop="lg">
+            value={RuleCategory.PHILOSOPHY}>
             {wikiTypeNameFactory(WikiType.RULES, RuleCategory.PHILOSOPHY)}
           </Dropdown.Option>
           <Dropdown.Option
+            {...defaultDropdownOptionProps}
             onPress={() =>
               setNewWiki(w => ({
                 ...w,
@@ -180,18 +174,11 @@ const PostWiki: React.FC = () => {
                 ruleCategory: RuleCategory.ABC,
               }))
             }
-            value={RuleCategory.ABC}
-            bg="gray100"
-            color="blue600"
-            py="lg"
-            px="xl"
-            borderBottomWidth={1}
-            borderBottomColor="gray200"
-            justifyContent="center"
-            roundedTop="lg">
+            value={RuleCategory.ABC}>
             {wikiTypeNameFactory(WikiType.RULES, RuleCategory.ABC)}
           </Dropdown.Option>
           <Dropdown.Option
+            {...defaultDropdownOptionProps}
             onPress={() =>
               setNewWiki(w => ({
                 ...w,
@@ -199,18 +186,11 @@ const PostWiki: React.FC = () => {
                 ruleCategory: RuleCategory.BENEFITS,
               }))
             }
-            value={RuleCategory.BENEFITS}
-            bg="gray100"
-            color="blue600"
-            py="lg"
-            px="xl"
-            borderBottomWidth={1}
-            borderBottomColor="gray200"
-            justifyContent="center"
-            roundedTop="lg">
+            value={RuleCategory.BENEFITS}>
             {wikiTypeNameFactory(WikiType.RULES, RuleCategory.BENEFITS)}
           </Dropdown.Option>
           <Dropdown.Option
+            {...defaultDropdownOptionProps}
             onPress={() =>
               setNewWiki(w => ({
                 ...w,
@@ -218,18 +198,11 @@ const PostWiki: React.FC = () => {
                 ruleCategory: RuleCategory.DOCUMENT,
               }))
             }
-            value={RuleCategory.DOCUMENT}
-            bg="gray100"
-            color="blue600"
-            py="lg"
-            px="xl"
-            borderBottomWidth={1}
-            borderBottomColor="gray200"
-            justifyContent="center"
-            roundedTop="lg">
+            value={RuleCategory.DOCUMENT}>
             {wikiTypeNameFactory(WikiType.RULES, RuleCategory.DOCUMENT)}
           </Dropdown.Option>
           <Dropdown.Option
+            {...defaultDropdownOptionProps}
             onPress={() =>
               setNewWiki(w => ({
                 ...w,
@@ -237,18 +210,11 @@ const PostWiki: React.FC = () => {
                 ruleCategory: RuleCategory.OTHERS,
               }))
             }
-            value={WikiType.QA}
-            bg="gray100"
-            color="blue600"
-            py="lg"
-            px="xl"
-            borderBottomWidth={1}
-            borderBottomColor="gray200"
-            justifyContent="center"
-            roundedTop="lg">
+            value={WikiType.QA}>
             {wikiTypeNameFactory(WikiType.QA)}
           </Dropdown.Option>
           <Dropdown.Option
+            {...defaultDropdownOptionProps}
             onPress={() =>
               setNewWiki(w => ({
                 ...w,
@@ -256,59 +222,34 @@ const PostWiki: React.FC = () => {
                 ruleCategory: RuleCategory.OTHERS,
               }))
             }
-            value={WikiType.KNOWLEDGE}
-            bg="gray100"
-            color="blue600"
-            py="lg"
-            px="xl"
-            borderBottomWidth={1}
-            borderBottomColor="gray200"
-            justifyContent="center"
-            roundedTop="lg">
+            value={WikiType.KNOWLEDGE}>
             {wikiTypeNameFactory(WikiType.KNOWLEDGE)}
           </Dropdown.Option>
         </Dropdown>
         <Dropdown
+          {...defaultDropdownProps}
           title="入力形式を選択"
-          ref={textFormatDropdownRef}
-          m="md"
-          pb="md"
-          showSwipeIndicator={false}
-          roundedTop="xl">
+          ref={textFormatDropdownRef}>
           <Dropdown.Option
+            {...defaultDropdownOptionProps}
             onPress={() =>
               setNewWiki(w => ({
                 ...w,
                 textFormat: 'html',
               }))
             }
-            value={'html'}
-            bg="gray100"
-            color="blue600"
-            py="lg"
-            px="xl"
-            borderBottomWidth={1}
-            borderBottomColor="gray200"
-            justifyContent="center"
-            roundedTop="lg">
+            value={'html'}>
             デフォルト
           </Dropdown.Option>
           <Dropdown.Option
+            {...defaultDropdownOptionProps}
+            value={'markdown'}
             onPress={() =>
               setNewWiki(w => ({
                 ...w,
                 textFormat: 'markdown',
               }))
-            }
-            value={'html'}
-            bg="gray100"
-            color="blue600"
-            py="lg"
-            px="xl"
-            borderBottomWidth={1}
-            borderBottomColor="gray200"
-            justifyContent="center"
-            roundedTop="lg">
+            }>
             マークダウン
           </Dropdown.Option>
         </Dropdown>
@@ -351,6 +292,7 @@ const PostWiki: React.FC = () => {
           }}
         />
         <RichEditor
+          placeholder="本文を入力してください"
           ref={editorRef}
           style={{height: windowHeight * 0.6}}
           initialContentHTML={newWiki.body}
