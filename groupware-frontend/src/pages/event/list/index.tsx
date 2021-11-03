@@ -44,6 +44,8 @@ import { useAPIGetTag } from '@/hooks/api/tag/useAPIGetTag';
 import { useHeaderTab } from '@/hooks/headerTab/useHeaderTab';
 import topTabBarStyles from '@/styles/components/TopTabBar.module.scss';
 import { useAPIUpdateEvent } from '@/hooks/api/event/useAPIUpdateEvent';
+import { useToast } from '@chakra-ui/react';
+import { responseErrorMsgFactory } from 'src/utils/factory/responseErrorMsgFactory';
 
 const localizer = momentLocalizer(moment);
 //@ts-ignore
@@ -96,6 +98,8 @@ type EventListGetParams = SearchQueryToGetEvents & {
 
 const EventList = () => {
   const router = useRouter();
+  const toast = useToast();
+
   const {
     page = '1',
     word = '',
@@ -130,6 +134,16 @@ const EventList = () => {
     onSuccess: () => {
       setModalVisible(false);
       refetch();
+    },
+    onError: (e) => {
+      const messages = responseErrorMsgFactory(e.response.data.message);
+      toast({
+        description: messages,
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      });
+      return;
     },
   });
   const { mutate: updateEvent } = useAPIUpdateEvent({
