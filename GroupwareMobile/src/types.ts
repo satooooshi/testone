@@ -105,6 +105,8 @@ export interface UserTag {
   users?: User[];
 }
 
+export type AllTag = Tag | UserTag;
+
 export interface Wiki {
   id: number;
   title: string;
