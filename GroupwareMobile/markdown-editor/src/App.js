@@ -1,4 +1,3 @@
-import logo from './logo.svg';
 import './App.css';
 import Editor from 'react-markdown-editor-lite';
 import MarkdownIt from 'markdown-it';
@@ -36,7 +35,6 @@ function App() {
         const res = await axios.post(uploadStorageURL, formData, {
           headers: window.JWT_HEADER,
         });
-        alert(res.data[0]);
         return res.data[0];
       } catch (err) {
         if (err instanceof Error) {
@@ -50,6 +48,7 @@ function App() {
   return (
     <Editor
       style={{height: '80vh', width: '100vw'}}
+      defaultValue={window.INIT_TEXT ? window.INIT_TEXT : ''}
       onImageUpload={file => {
         return uploadStorage([file]);
       }}

@@ -25,6 +25,7 @@ import {useFormik} from 'formik';
 import {wikiSchema} from '../../../utils/validation/schema';
 import {wikiTypeNameFactory} from '../../../utils/factory/wiki/wikiTypeNameFactory';
 import {DropdownOptionProps} from 'react-native-magnus/lib/typescript/src/ui/dropdown/dropdown.option.type';
+import MarkdownEditorWebView from '../../../components/MarkdownEditorWebView';
 
 const PostWiki: React.FC = () => {
   const navigation = useNavigation<PostWikiNavigationProps>();
@@ -253,51 +254,61 @@ const PostWiki: React.FC = () => {
             マークダウン
           </Dropdown.Option>
         </Dropdown>
-        <RichToolbar
-          editor={editorRef}
-          selectedIconTint={'#2095F2'}
-          onPressAddImage={async () => {
-            const {formData} = await uploadImageFromGallery();
-            if (formData) {
-              uploadImage(formData);
-            }
-          }}
-          disabledIconTint={'#bfbfbf'}
-          actions={[
-            actions.heading1,
-            actions.heading2,
-            actions.heading3,
-            actions.heading4,
-            actions.heading5,
-            actions.heading6,
-            'bold',
-            actions.setStrikethrough,
-            actions.insertOrderedList,
-            actions.blockquote,
-            actions.code,
-            actions.insertImage,
-            actions.undo,
-            actions.redo,
-          ]}
-          iconMap={{
-            [actions.heading1]: () => <Text>H1</Text>,
-            [actions.heading2]: () => <Text>H2</Text>,
-            [actions.heading3]: () => <Text>H3</Text>,
-            [actions.heading4]: () => <Text>H4</Text>,
-            [actions.heading5]: () => <Text>H5</Text>,
-            [actions.heading6]: () => <Text>H6</Text>,
-            [actions.bold]: () => <Text fontWeight="bold">B</Text>,
-          }}
-        />
-        <RichEditor
-          placeholder="本文を入力してください"
-          ref={editorRef}
-          style={{height: windowHeight * 0.6}}
-          initialContentHTML={newWiki.body}
-          useContainer={false}
-          editorInitializedCallback={editorInitializedCallback}
-          onChange={text => setNewWiki(w => ({...w, body: text}))}
-        />
+        {newWiki.textFormat === 'html' ? (
+          <>
+            <RichToolbar
+              editor={editorRef}
+              selectedIconTint={'#2095F2'}
+              onPressAddImage={async () => {
+                const {formData} = await uploadImageFromGallery();
+                if (formData) {
+                  uploadImage(formData);
+                }
+              }}
+              disabledIconTint={'#bfbfbf'}
+              actions={[
+                actions.heading1,
+                actions.heading2,
+                actions.heading3,
+                actions.heading4,
+                actions.heading5,
+                actions.heading6,
+                'bold',
+                actions.setStrikethrough,
+                actions.insertOrderedList,
+                actions.blockquote,
+                actions.code,
+                actions.insertImage,
+                actions.undo,
+                actions.redo,
+              ]}
+              iconMap={{
+                [actions.heading1]: () => <Text>H1</Text>,
+                [actions.heading2]: () => <Text>H2</Text>,
+                [actions.heading3]: () => <Text>H3</Text>,
+                [actions.heading4]: () => <Text>H4</Text>,
+                [actions.heading5]: () => <Text>H5</Text>,
+                [actions.heading6]: () => <Text>H6</Text>,
+                [actions.bold]: () => <Text fontWeight="bold">B</Text>,
+              }}
+            />
+            <RichEditor
+              placeholder="本文を入力してください"
+              ref={editorRef}
+              style={{height: windowHeight * 0.6}}
+              initialContentHTML={newWiki.body}
+              useContainer={false}
+              editorInitializedCallback={editorInitializedCallback}
+              onChange={text => setNewWiki(w => ({...w, body: text}))}
+            />
+          </>
+        ) : newWiki.textFormat === 'markdown' ? (
+          <Div h={windowHeight * 0.9}>
+            <MarkdownEditorWebView
+              onChange={text => setNewWiki(w => ({...w, body: text}))}
+            />
+          </Div>
+        ) : null}
       </ScrollDiv>
     </WholeContainer>
   );

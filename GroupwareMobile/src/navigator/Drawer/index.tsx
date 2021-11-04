@@ -1,6 +1,5 @@
 import React from 'react';
 import {createDrawerNavigator} from '@react-navigation/drawer';
-import Home from '../../screens/Home';
 import {darkFontColor} from '../../utils/colors';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
@@ -12,6 +11,7 @@ import WikiDetail from '../../screens/wiki/WikiDetail';
 import WikiList from '../../screens/wiki/WikiList';
 import {createStackNavigator} from '@react-navigation/stack';
 import PostWiki from '../../screens/wiki/PostWiki';
+import Home from '../../screens/Home';
 
 const Drawer = createDrawerNavigator();
 const Stack = createStackNavigator();

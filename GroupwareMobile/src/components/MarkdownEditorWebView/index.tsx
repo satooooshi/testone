@@ -5,23 +5,28 @@ import {uploadStorageURL} from '../../utils/url/storage.url';
 
 type MarkdownEditorProps = {
   onChange: (markdownText: string) => void;
+  value?: string;
 };
 
-const MarkdownEditorWebView: React.FC<MarkdownEditorProps> = ({onChange}) => {
+const MarkdownEditorWebView: React.FC<MarkdownEditorProps> = ({
+  onChange,
+  value,
+}) => {
   const injectedJavaScript: string = `
   window.UPLOAD_STORAGE_URL = '${baseURL}${uploadStorageURL}';
   window.JWT_HEADER = ${JSON.stringify(jwtFormDataHeader)};
+  window.INIT_TEXT = '${value || ''}';
   `;
   const webViewRef = useRef<WebView | null>(null);
   return (
     <WebView
+      scrollEnabled={false}
       ref={webViewRef}
       source={{
         uri: markdownEditorURL,
       }}
       injectedJavaScriptBeforeContentLoaded={injectedJavaScript}
       onMessage={event => {
-        // event.nativeEvent.data is markdown text string
         const markdownText = event.nativeEvent.data as string;
         onChange(markdownText);
       }}
