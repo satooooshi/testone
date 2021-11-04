@@ -63,7 +63,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
     EditorState.createEmpty(),
   );
   const [activeTab, setActiveTab] = useState<TabName>(TabName.EDIT);
-  const initialValues: Partial<Wiki> = {
+  const initialValues: Partial<Wiki> = wiki || {
     title: '',
     body: '',
     tags: [],
@@ -79,6 +79,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
     touched,
     handleSubmit,
   } = useFormik({
+    enableReinitialize: true,
     initialValues,
     validationSchema: wikiSchema,
     onSubmit: (q) => {
@@ -188,12 +189,11 @@ const WikiForm: React.FC<WikiFormProps> = ({
 
   useEffect(() => {
     if (wiki) {
-      setNewQuestion(wiki);
       if (wiki.textFormat === 'html') {
         setEditorState(EditorState.createWithContent(stateFromHTML(wiki.body)));
       }
     }
-  }, [setNewQuestion, wiki]);
+  }, [wiki]);
 
   useEffect(() => {
     if (editorState) {
@@ -202,7 +202,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
         body: stateToHTML(editorState.getCurrentContent()),
       }));
     }
-  }, [editorState, setNewQuestion]);
+  }, [editorState, setNewQuestion, wiki]);
 
   useEffect(() => {
     formTopRef.current?.scrollIntoView();
@@ -366,7 +366,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
                 width: isSmallerThan768 ? '90vw' : '80vw',
                 maxWidth: '1980px',
               }}
-              placeholder="質問内容を入力して下さい"
+              placeholder="質問内容を入力して下さい(空白のみは不可)"
               editorRef={draftEditor}
               editorState={editorState}
               setEditorState={setEditorState}
@@ -381,7 +381,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
               height: '80vh',
               marginBottom: 40,
             }}
-            placeholder="質問内容を入力して下さい"
+            placeholder="質問内容を入力して下さい(空白のみは不可)"
             editorRef={editorRef}
             onImageUpload={handleImageUpload}
             plugins={liteEditorPlugins}

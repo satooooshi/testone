@@ -21,6 +21,9 @@ const CreateQA = () => {
         isClosable: true,
       });
     },
+    onError: () => {
+      alert('Wiki作成が失敗しました。入力内容をご確認ください。');
+    },
   });
 
   return (

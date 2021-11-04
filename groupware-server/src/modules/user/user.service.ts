@@ -17,6 +17,7 @@ import { Parser } from 'json2csv';
 import { SearchQueryToGetUsers } from './user.controller';
 import { Tag, TagType } from 'src/entities/tag.entity';
 import { StorageService } from '../storage/storage.service';
+import { DateTime } from 'luxon';
 
 @Injectable()
 export class UserService {
@@ -227,12 +228,16 @@ export class UserService {
     if (duration === 'month') {
       fromDate = new Date();
       fromDate.setDate(1);
-      fromDate.setHours(0, 0, 0, 0);
+      fromDate = DateTime.fromJSDate(fromDate)
+        .set({ hour: 0, minute: 0, second: 0 })
+        .toJSDate();
     }
     if (duration === 'week') {
       fromDate = new Date();
-      fromDate.setDate(-7);
-      fromDate.setHours(0, 0, 0, 0);
+      fromDate = DateTime.fromJSDate(fromDate)
+        .minus({ days: 7 })
+        .set({ hour: 0, minute: 0, second: 0 })
+        .toJSDate();
     }
     const toDate = new Date();
     const limit = 20;

@@ -23,6 +23,13 @@
   }
 }
 
+.next_image_wrapper {
+  border-radius: 100%;
+  div {
+    border-radius: 100%;
+  }
+}
+
 .image_wrapper {
   display: flex;
   flex-direction: column;
