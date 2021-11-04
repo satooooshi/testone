@@ -26,30 +26,36 @@ export class saveEventDto {
   description: string;
 
   @ArrayNotEmpty({ message: 'タグは必須項目です。' })
-  @IsArray({ message: '不正なリクエストです。' })
+  @IsArray({ message: 'タグのリクエストは配列型に限られています。' })
   tags: [];
 
-  @IsNotEmpty({ message: '不正なリクエストです。' })
-  @IsEnum(EventType, { message: '不正なリクエストです。' })
+  @IsNotEmpty({ message: 'タイプは必須項目です。' })
+  @IsEnum(EventType, {
+    message: 'タイプのリクエストは列挙型に限られています。',
+  })
   type: Date;
 
   @Type(() => Date)
-  @IsNotEmpty({ message: '不正なリクエストです。' })
-  @IsDate({ message: '不正なリクエストです。' })
-  @MinDate(new Date(), { message: '不正なリクエストです。' })
+  @IsNotEmpty({ message: '開始日時は必須項目です。' })
+  @IsDate({ message: '開始日時のリクエストは日付型に限られています。' })
+  @MinDate(new Date(), {
+    message: '開始日時は現在日時よりも後に設定してください。',
+  })
   startAt: Date;
 
   @Type(() => Date)
-  @IsNotEmpty({ message: '不正なリクエストです。' })
-  @IsDate({ message: '不正なリクエストです。' })
+  @IsNotEmpty({ message: '終了日時は必須項目です。' })
+  @IsDate({ message: '終了日時のリクエストは日付型に限られています。' })
   endAt: Date;
 
-  @IsNotEmpty({ message: '不正なリクエストです。' })
-  @IsBoolean({ message: '不正なリクエストです。' })
+  @IsNotEmpty({ message: 'チャットルームの作成有無は必須項目です。' })
+  @IsBoolean({
+    message: 'チャットルームの作成有無のリクエストは真偽値に限られています。',
+  })
   chatNeeded: boolean;
 
   @ValidateIf((o, v) => v != null && v.length)
-  @IsArray({ message: '不正なリクエストです。' })
+  @IsArray({ message: 'YouTubeリンクのリクエストは配列型に限られています。' })
   @isYoutubeLink({ message: 'Youtubeの動画URLが不正です。ご確認ください。' })
   videos: [];
 }
