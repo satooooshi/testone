@@ -229,7 +229,7 @@ const Profile = () => {
                 className: profileStyles.image_dropzone,
               })}>
               <input {...getEventImageInputProps()} />
-              <div className={createNewUserStyles.next_image_wrapper}>
+              <div className={profileStyles.next_image_wrapper}>
                 <Image
                   className={profileStyles.avatar}
                   src={noImage}
