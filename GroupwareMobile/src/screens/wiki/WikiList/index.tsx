@@ -30,7 +30,13 @@ const WikiList: React.FC<WikiListProps> = ({navigation}) => {
   ];
   return (
     <WholeContainer>
-      <AppHeader tabs={tabs} title="社内Wiki" activeTabName="All" />
+      <AppHeader
+        tabs={tabs}
+        title="社内Wiki"
+        activeTabName="All"
+        rightButtonName="新規作成"
+        onPressRightButton={() => navigation.navigate('PostWiki')}
+      />
       <WikiCardList type={type} navigation={navigation} />
     </WholeContainer>
   );

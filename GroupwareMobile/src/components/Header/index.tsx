@@ -51,7 +51,7 @@ const AppHeader: React.FC<AppHeaderProps> = ({
             resizeMode="contain"
             source={require('../../../assets/bold-logo.png')}
           />
-          <Text fontSize={24} ml="lg" fontWeight="bold" color={darkFontColor}>
+          <Text fontSize={20} ml="lg" fontWeight="bold" color={darkFontColor}>
             {title}
           </Text>
         </Div>
@@ -59,10 +59,9 @@ const AppHeader: React.FC<AppHeaderProps> = ({
           <Button
             alignSelf="center"
             h={32}
-            w="30%"
             fontSize={16}
             py={0}
-            px={0}
+            px={10}
             onPress={onPressRightButton}
             bg={blueColor}
             color="white">
