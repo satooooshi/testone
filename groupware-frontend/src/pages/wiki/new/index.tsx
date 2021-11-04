@@ -11,9 +11,6 @@ const CreateQA = () => {
     onSuccess: () => {
       router.push('/wiki/list?page=1&tag=&word=&status=new&type=');
     },
-    onError: () => {
-      alert('Wiki作成が失敗しました。入力内容をご確認ください。');
-    },
   });
 
   return (
