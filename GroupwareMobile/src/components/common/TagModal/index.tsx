@@ -129,7 +129,7 @@ const TagModal: React.FC<TagModalProps> = props => {
       </Dropdown>
       <ScrollDiv>
         {tags.map(t => (
-          <TouchableOpacity onPress={() => onPressTag(t)}>
+          <TouchableOpacity key={t.id} onPress={() => onPressTag(t)}>
             <Div
               w={windowWidth}
               minH={40}
