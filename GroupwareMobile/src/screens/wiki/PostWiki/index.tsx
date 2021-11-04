@@ -257,10 +257,8 @@ const PostWiki: React.FC = () => {
           editor={editorRef}
           selectedIconTint={'#2095F2'}
           onPressAddImage={async () => {
-            // ImageCropPicker.openPicker({cropping: true, mediaType: 'photo'});
             const {formData} = await uploadImageFromGallery();
             if (formData) {
-              // console.log(formData);
               uploadImage(formData);
             }
           }}
