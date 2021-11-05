@@ -31,7 +31,7 @@ export class saveEventDto {
 
   @IsNotEmpty({ message: 'タイプは必須項目です。' })
   @IsEnum(EventType, {
-    message: 'タイプのリクエストは列挙型に限られています。',
+    message: 'タイプのリクエストの値が不正です。',
   })
   type: string;
 
@@ -56,7 +56,7 @@ export class saveEventDto {
 
   @ValidateIf((o, v) => v != null && v.length)
   @IsArray({ message: 'YouTubeリンクのリクエストは配列型に限られています。' })
-  @isYoutubeLink({ message: 'Youtubeの動画URLが不正です。ご確認ください。' })
+  @isYoutubeLink({ message: 'Youtubeの動画URLが不正です。' })
   videos: [];
 }
 export default saveEventDto;

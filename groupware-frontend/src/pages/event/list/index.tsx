@@ -69,18 +69,32 @@ const formats: Formats = {
   dayHeaderFormat: 'M月D日(ddd)',
 };
 
-const setDateTime = (addDays: number, hours: number, minutes: number) => {
+export interface DatetimeSettings {
+  addDays: number;
+  hours: number;
+  minutes: number;
+}
+
+const setDateTime = (setting: DatetimeSettings) => {
   const today = new Date();
-  today.setDate(today.getDate() + addDays);
-  today.setHours(hours, minutes);
+  today.setDate(today.getDate() + setting.addDays);
+  today.setHours(setting.hours, setting.minutes);
   return today;
 };
 
 const initialEventValue = {
   title: '',
   description: '',
-  startAt: setDateTime(1, 19, 0),
-  endAt: setDateTime(1, 21, 0),
+  startAt: setDateTime({
+    addDays: 1,
+    hours: 19,
+    minutes: 0,
+  }),
+  endAt: setDateTime({
+    addDays: 1,
+    hours: 21,
+    minutes: 0,
+  }),
   type: EventType.STUDY_MEETING,
   imageURL: '',
   chatNeeded: true,
