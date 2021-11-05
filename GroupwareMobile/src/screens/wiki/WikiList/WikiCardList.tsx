@@ -13,6 +13,7 @@ import {useNavigation} from '@react-navigation/native';
 import {useIsFocused} from '@react-navigation/native';
 import SearchForm from '../../../components/common/SearchForm';
 import {useAPIGetTag} from '../../../hooks/api/tag/useAPIGetTag';
+import SearchFormOpenerButton from '../../../components/common/SearchForm/SearchFormOpenerButton';
 
 const TopTab = createMaterialTopTabNavigator();
 
@@ -113,7 +114,6 @@ const WikiCardList: React.FC<WikiCardListProps> = ({type}) => {
   useEffect(() => {
     setSearchQuery(q => ({...q, type}));
   }, [type]);
-  console.log(customLoading);
 
   return (
     <Div flexDir="column" h="100%" pb={80}>
@@ -129,23 +129,7 @@ const WikiCardList: React.FC<WikiCardListProps> = ({type}) => {
           queryRefresh({word: values.word}, values.selectedTags);
         }}
       />
-      <Button
-        bg="purple600"
-        position="absolute"
-        right={10}
-        bottom={80}
-        h={60}
-        zIndex={20}
-        rounded="circle"
-        onPress={() => setVisibleSearchFormModal(true)}
-        w={60}>
-        <Icon
-          color="white"
-          fontFamily="FontAwesome5"
-          fontSize="6xl"
-          name="search"
-        />
-      </Button>
+      <SearchFormOpenerButton onPress={() => setVisibleSearchFormModal(true)} />
       {type === WikiType.RULES ? (
         <TopTab.Navigator
           screenOptions={{
