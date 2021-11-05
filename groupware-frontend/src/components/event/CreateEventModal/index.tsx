@@ -105,8 +105,6 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
     values: newEvent,
     handleSubmit: onFinish,
     setValues: setNewEvent,
-    resetForm,
-    initialValues,
     validateForm,
   } = useFormik<CreateEventRequest | Required<EventSchedule>>({
     initialValues: event ? event : initialEventValue,
@@ -192,7 +190,6 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
         url: f,
       }));
       createEvent({ ...newEvent, files: linkedFiles });
-      resetForm({ values: initialValues });
       setNewFiles([]);
       dispatchCrop({ type: 'resetImage', value: 'resetImage' });
     },

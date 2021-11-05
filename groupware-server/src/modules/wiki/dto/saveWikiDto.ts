@@ -1,5 +1,5 @@
 import { IsNotEmpty, IsString } from 'class-validator';
-import { isNotEmptyExceptTags } from './custom/isNotEmptyExceptTags';
+import { isNotEmptyExceptTags } from 'src/utils/dto/isNotEmptyExceptTags';
 
 export class saveWikiDto {
   @IsNotEmpty()
