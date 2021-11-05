@@ -69,11 +69,18 @@ const formats: Formats = {
   dayHeaderFormat: 'M月D日(ddd)',
 };
 
+const setDateTime = (addDays: number, hours: number, minutes: number) => {
+  const today = new Date();
+  today.setDate(today.getDate() + addDays);
+  today.setHours(hours, minutes);
+  return today;
+};
+
 const initialEventValue = {
   title: '',
   description: '',
-  startAt: new Date(),
-  endAt: new Date(),
+  startAt: setDateTime(1, 19, 0),
+  endAt: setDateTime(1, 21, 0),
   type: EventType.STUDY_MEETING,
   imageURL: '',
   chatNeeded: true,
@@ -132,6 +139,7 @@ const EventList = () => {
   const calendarRef = useRef<HTMLDivElement | null>(null);
   const { mutate: createEvent } = useAPICreateEvent({
     onSuccess: () => {
+      setNewEvent(initialEventValue);
       setModalVisible(false);
       refetch();
     },
