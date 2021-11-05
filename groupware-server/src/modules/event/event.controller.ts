@@ -217,6 +217,7 @@ export class EventScheduleController {
   @UseGuards(JwtAuthenticationGuard)
   async updateEvent(
     @Body() eventSchedule: Partial<EventSchedule>,
+    @Body() saveEventDto: saveEventDto,
   ): Promise<EventSchedule> {
     if (!eventSchedule.tags || !eventSchedule.tags.length) {
       throw new BadRequestException('Event must links one or more tags');
