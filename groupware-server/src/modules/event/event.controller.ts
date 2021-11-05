@@ -21,6 +21,7 @@ import { UserJoiningEvent } from 'src/entities/userJoiningEvent.entity';
 import JwtAuthenticationGuard from '../auth/jwtAuthentication.guard';
 import RequestWithUser from '../auth/requestWithUser.interface';
 import { ChatService } from '../chat/chat.service';
+import createCommentDto from './dto/createCommentDto';
 import saveEventDto from './dto/saveEventDto';
 import { EventScheduleService } from './event.service';
 import { GetEventDetailResopnse } from './eventDetail.type';
@@ -280,6 +281,7 @@ export class EventScheduleController {
   async createAnswer(
     @Req() request: RequestWithUser,
     @Body() comment: EventComment,
+    @Body() createCommentDto: createCommentDto,
   ): Promise<EventComment> {
     comment.writer = request.user;
     return await this.eventService.createComment(comment);
