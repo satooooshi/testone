@@ -33,7 +33,7 @@ export class saveEventDto {
   @IsEnum(EventType, {
     message: 'タイプのリクエストは列挙型に限られています。',
   })
-  type: Date;
+  type: string;
 
   @Type(() => Date)
   @IsNotEmpty({ message: '開始日時は必須項目です。' })
