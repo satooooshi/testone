@@ -6,7 +6,7 @@ export const wikiTypeNameFactory = (
 ) => {
   switch (wikiType) {
     case WikiType.QA:
-      return '質問';
+      return 'Q&A';
     case WikiType.KNOWLEDGE:
       return 'ナレッジ';
     case WikiType.RULES:
