@@ -8,8 +8,6 @@ import {
   Query,
   Req,
   UseGuards,
-  UsePipes,
-  ValidationPipe,
 } from '@nestjs/common';
 import { QAAnswer } from 'src/entities/qaAnswer.entity';
 import { QAAnswerReply } from 'src/entities/qaAnswerReply.entity';
@@ -75,6 +73,7 @@ export class WikiController {
   async updateWiki(
     @Req() request: RequestWithUser,
     @Body() wiki: Wiki,
+    @Body() saveWikiDto: saveWikiDto,
   ): Promise<Wiki> {
     if (!wiki.id || !wiki.title || !wiki.body) {
       throw new BadRequestException('title and body is necessary');
