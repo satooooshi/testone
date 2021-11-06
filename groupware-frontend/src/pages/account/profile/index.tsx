@@ -424,11 +424,6 @@ const Profile = () => {
           </FormControl>
         </div>
       </div>
-      {/* <Button
-        className={profileStyles.update_button_wrapper}
-        width="40"
-        colorScheme="blue"
-        onClick={handleUpdateUser}> */}
       <Button
         className={profileStyles.update_button_wrapper}
         width="40"
