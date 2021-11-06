@@ -138,22 +138,46 @@ const Profile = () => {
     accept: imageExtensions,
   });
   const toast = useToast();
+  const displayToast = (
+    title: string,
+    status?: 'info' | 'warning' | 'success' | 'error',
+    duration?: number | null,
+    isClosable?: boolean,
+  ) => {
+    toast({
+      title: title,
+      status: status,
+      duration: duration,
+      isClosable: isClosable,
+    });
+  };
 
   const { mutate: updateUser } = useAPIUpdateUser({
     onSuccess: (responseData) => {
       if (responseData) {
-        toast({
-          title: 'プロフィールを更新しました。',
-          status: 'success',
-          duration: 3000,
-          isClosable: true,
-        });
+        const message = 'プロフィールを更新しました。';
+        displayToast(message, 'success', 3000, true);
         dispatchCrop({ type: 'setImageFile', value: undefined });
       }
     },
   });
 
   const tabs: Tab[] = useHeaderTab({ headerTabType: 'account', user });
+
+  const onClickUpdateRegex = () => {
+    const emailRegex =
+      /^[a-zA-Z0-9]{1}[a-zA-Z0-9_.-]*[a-zA-Z0-9]{1}@{1}[a-zA-Z0-9]{1}[a-zA-Z0-9_-]{1,}\.[a-zA-Z]{1,}$/;
+
+    if (!userInfo.email) {
+      const message = 'メールアドレスは必ず入力してください。';
+      displayToast(message, 'error', 3000, true);
+    } else if (!emailRegex.test(userInfo.email)) {
+      const message = '正しいメールアドレスを指定してください。';
+      displayToast(message, 'error', 3000, true);
+    } else {
+      handleUpdateUser();
+    }
+  };
 
   const handleUpdateUser = async () => {
     if (!croppedImageURL || !completedCrop || !selectImageName) {
@@ -400,11 +424,16 @@ const Profile = () => {
           </FormControl>
         </div>
       </div>
+      {/* <Button
+        className={profileStyles.update_button_wrapper}
+        width="40"
+        colorScheme="blue"
+        onClick={handleUpdateUser}> */}
       <Button
         className={profileStyles.update_button_wrapper}
         width="40"
         colorScheme="blue"
-        onClick={handleUpdateUser}>
+        onClick={onClickUpdateRegex}>
         更新
       </Button>
     </LayoutWithTab>
