@@ -9,6 +9,18 @@ export const defaultCalendarEventQuery = (): {from: string; to: string} => {
   const to = DateTime.fromJSDate(now).plus({days: 31}).toFormat('yyyy-LL-dd');
   return {from, to};
 };
+export const defaultWeekQuery = (): {from: string; to: string} => {
+  const now = new Date();
+  const from = DateTime.fromJSDate(now, {zone: 'Asia/Tokyo'})
+    .minus({days: 3})
+    .set({hour: 0, minute: 0, second: 0})
+    .toFormat('yyyy-LL-dd');
+  const to = DateTime.fromJSDate(now)
+    .plus({days: 3})
+    .set({hour: 0, minute: 0, second: 0})
+    .toFormat('yyyy-LL-dd');
+  return {from, to};
+};
 
 export const generateEventSearchQueryString = (
   query: Partial<SearchQueryToGetEvents>,

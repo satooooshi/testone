@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import WholeContainer from '../../../components/WholeContainer';
-import AppHeader from '../../../components/Header';
+import AppHeader, {Tab} from '../../../components/Header';
 import {EventListProps} from '../../../types/navigator/screenProps/Event';
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
 import EventCalendar from './EventCalendar';
@@ -14,15 +14,16 @@ import {
 } from '../../../hooks/api/event/useAPIGetEventList';
 import {AllTag, EventType} from '../../../types';
 import eventTypeNameFactory from '../../../utils/factory/eventTypeNameFactory';
+import {defaultWeekQuery} from '../../../utils/eventQueryRefresh';
 
-const Tab = createMaterialTopTabNavigator();
+const TopTab = createMaterialTopTabNavigator();
 
 const EventList: React.FC<EventListProps> = ({navigation}) => {
   const [visibleSearchFormModal, setVisibleSearchFormModal] = useState(false);
   const {data: tags} = useAPIGetTag();
-  const [searchQuery, setSearchQuery] = useState<SearchQueryToGetEvents>({
-    page: '1',
-  });
+  const [searchQuery, setSearchQuery] = useState<SearchQueryToGetEvents>(
+    defaultWeekQuery(),
+  );
   const {data: events} = useAPIGetEventList(searchQuery);
   const tabs: Tab[] = [
     {
@@ -62,7 +63,7 @@ const EventList: React.FC<EventListProps> = ({navigation}) => {
     const selectedTagIDs = selectedTags?.map(t => t.id.toString());
     const tagQuery = selectedTagIDs?.join('+');
 
-    setSearchQuery({...query, tag: tagQuery || ''});
+    setSearchQuery(q => ({...q, ...query, tag: tagQuery || ''}));
   };
 
   return (
@@ -74,30 +75,51 @@ const EventList: React.FC<EventListProps> = ({navigation}) => {
           searchQuery.type ? eventTypeNameFactory(searchQuery.type) : 'All'
         }
       />
-      <SearchFormOpenerButton onPress={() => setVisibleSearchFormModal(true)} />
+      <SearchFormOpenerButton
+        bottom={10}
+        right={10}
+        onPress={() => setVisibleSearchFormModal(true)}
+      />
       <SearchForm
         isVisible={visibleSearchFormModal}
         onCloseModal={() => setVisibleSearchFormModal(false)}
         tags={tags || []}
-        onSubmit={values =>
-          queryRefresh({word: values.word}, values.selectedTags)
-        }
+        onSubmit={values => {
+          queryRefresh({word: values.word}, values.selectedTags);
+          setVisibleSearchFormModal(false);
+        }}
       />
-      <Tab.Navigator
+      <TopTab.Navigator
+        initialRouteName={'EventCalendar'}
         screenOptions={{
           tabBarScrollEnabled: true,
         }}>
-        <Tab.Screen
+        <TopTab.Screen
           name="PersonalCalendar"
-          children={() => <EventCalendar personal={true} />}
+          children={() => (
+            <EventCalendar
+              searchResult={events}
+              navigation={navigation}
+              searchQuery={searchQuery}
+              setSearchQuery={setSearchQuery}
+              personal={true}
+            />
+          )}
           options={{title: 'カレンダー(個人)'}}
         />
-        <Tab.Screen
+        <TopTab.Screen
           name="EventCalendar"
-          component={EventCalendar}
+          children={() => (
+            <EventCalendar
+              searchResult={events}
+              navigation={navigation}
+              searchQuery={searchQuery}
+              setSearchQuery={setSearchQuery}
+            />
+          )}
           options={{title: 'カレンダー'}}
         />
-        <Tab.Screen
+        <TopTab.Screen
           name="FutureEvents"
           children={() => (
             <EventCardList
@@ -110,7 +132,7 @@ const EventList: React.FC<EventListProps> = ({navigation}) => {
           )}
           options={{title: '今後のイベント'}}
         />
-        <Tab.Screen
+        <TopTab.Screen
           name="PastEvents"
           children={() => (
             <EventCardList
@@ -123,7 +145,7 @@ const EventList: React.FC<EventListProps> = ({navigation}) => {
           )}
           options={{title: '過去のイベント'}}
         />
-        <Tab.Screen
+        <TopTab.Screen
           name="CurrentEvents"
           children={() => (
             <EventCardList
@@ -136,7 +158,7 @@ const EventList: React.FC<EventListProps> = ({navigation}) => {
           )}
           options={{title: '現在のイベント'}}
         />
-      </Tab.Navigator>
+      </TopTab.Navigator>
     </WholeContainer>
   );
 };
