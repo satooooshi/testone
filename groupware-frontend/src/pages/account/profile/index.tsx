@@ -288,7 +288,7 @@ const Profile = () => {
             <FormLabel fontWeight={'bold'}>メールアドレス</FormLabel>
             <Input
               type="email"
-              placeholder="山田"
+              placeholder="sample@sample.com"
               value={userInfo.email}
               background="white"
               onChange={(e) =>
