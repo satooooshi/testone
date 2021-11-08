@@ -4,6 +4,7 @@ import React, {
   useCallback,
   useRef,
   useReducer,
+  Profiler,
 } from 'react';
 import { SidebarScreenName } from '@/components/layout/Sidebar';
 import { Tab } from 'src/types/header/tab/types';
@@ -23,6 +24,7 @@ import {
 import { useAuthenticate } from 'src/contexts/useAuthenticate';
 import { imageExtensions } from 'src/utils/imageExtensions';
 import { useDropzone } from 'react-dropzone';
+import { useFormik } from 'formik';
 import Image from 'next/image';
 import noImage from '@/public/no-image.jpg';
 import { useAPIUploadStorage } from '@/hooks/api/storage/useAPIUploadStorage';
@@ -57,6 +59,18 @@ const Profile = () => {
     avatarUrl: '',
     introduceOther: '',
   });
+
+  const initialUserValues = {
+    email: '',
+    lastName: '',
+    firstName: '',
+    avatarUrl: '',
+    introduceOther: '',
+    introduceTech: '',
+    introduceQualification: '',
+    introduceClub: '',
+    introduceHobby: '',
+  };
 
   const modalReducer = (
     _state: ModalState,
@@ -152,6 +166,15 @@ const Profile = () => {
     });
   };
 
+  const { handleChange, handleSubmit, values } = useFormik<Partial<User>>({
+    enableReinitialize: true,
+
+    initialValues: profile ? profile : initialUserValues,
+    onSubmit: () => {
+      handleUpdateUser();
+    },
+  });
+
   const toastMessages = {
     success: 'プロフィールを更新しました。',
     requiredEmail: 'メールアドレスは必ず入力してください。',
@@ -183,7 +206,7 @@ const Profile = () => {
 
   const handleUpdateUser = async () => {
     if (!croppedImageURL || !completedCrop || !selectImageName) {
-      updateUser(userInfo);
+      updateUser(values);
       return;
     }
     const result = await dataURLToFile(croppedImageURL, selectImageName);
@@ -268,9 +291,7 @@ const Profile = () => {
             <ReactCrop
               src={selectImageUrl}
               crop={crop}
-              onChange={(newCrop) => {
-                dispatchCrop({ type: 'setCrop', value: newCrop });
-              }}
+              onChange={handleChange}
               onComplete={(c) => {
                 dispatchCrop({
                   type: 'setCompletedCrop',
@@ -288,49 +309,45 @@ const Profile = () => {
             <FormLabel fontWeight={'bold'}>メールアドレス</FormLabel>
             <Input
               type="email"
-              placeholder="sample@sample.com"
-              value={userInfo.email}
+              name="email"
+              placeholder="email@example.com"
+              value={values.email}
               background="white"
-              onChange={(e) =>
-                setUserInfo((i) => ({ ...i, email: e.target.value }))
-              }
+              onChange={handleChange}
             />
           </FormControl>
           <FormControl className={profileStyles.input_wrapper}>
             <FormLabel fontWeight={'bold'}>姓</FormLabel>
             <Input
               type="text"
+              name="lastName"
               placeholder="山田"
-              value={userInfo.lastName}
+              value={values.lastName}
               background="white"
-              onChange={(e) =>
-                setUserInfo((i) => ({ ...i, lastName: e.target.value }))
-              }
+              onChange={handleChange}
             />
           </FormControl>
           <FormControl className={profileStyles.input_wrapper}>
             <FormLabel fontWeight={'bold'}>名</FormLabel>
             <Input
               type="text"
+              name="firstName"
               placeholder="太郎"
-              value={userInfo.firstName}
+              value={values.firstName}
               background="white"
-              onChange={(e) =>
-                setUserInfo((i) => ({ ...i, firstName: e.target.value }))
-              }
+              onChange={handleChange}
             />
           </FormControl>
           <FormControl mb={4}>
             <FormLabel fontWeight={'bold'}>自己紹介</FormLabel>
             <Textarea
               type="text"
+              name="introduceOther"
               height="10"
               placeholder="自己紹介を入力してください"
-              value={userInfo.introduceOther}
+              value={values.introduceOther}
               background="white"
-              onChange={(e) =>
-                setUserInfo((i) => ({ ...i, introduceOther: e.target.value }))
-              }
+              onChange={handleChange}
             />
           </FormControl>
           <Box mb={2} w={'100%'}>
@@ -345,12 +362,11 @@ const Profile = () => {
             <Textarea
               placeholder="技術についての紹介を入力してください"
               type="text"
+              name="introduceTech"
               height="10"
-              value={userInfo.introduceTech}
+              value={values.introduceTech}
               background="white"
-              onChange={(e) =>
-                setUserInfo((i) => ({ ...i, introduceTech: e.target.value }))
-              }
+              onChange={handleChange}
             />
           </FormControl>
           <Box mb={2} w={'100%'}>
@@ -367,15 +383,11 @@ const Profile = () => {
             <Textarea
               placeholder="資格についての紹介を入力してください"
               type="text"
+              name="introduceQualification"
               height="10"
-              value={userInfo.introduceQualification}
+              value={values.introduceQualification}
               background="white"
-              onChange={(e) =>
-                setUserInfo((i) => ({
-                  ...i,
-                  introduceQualification: e.target.value,
-                }))
-              }
+              onChange={handleChange}
             />
           </FormControl>
           <Box mb={2} w={'100%'}>
@@ -390,15 +402,11 @@ const Profile = () => {
             <Textarea
               placeholder="部活動についての紹介を入力してください"
               type="text"
+              name="introduceClub"
               height="10"
-              value={userInfo.introduceClub}
+              value={values.introduceClub}
               background="white"
-              onChange={(e) =>
-                setUserInfo((i) => ({
-                  ...i,
-                  introduceClub: e.target.value,
-                }))
-              }
+              onChange={handleChange}
             />
           </FormControl>
           <Box mb={2} w={'100%'}>
@@ -413,15 +421,11 @@ const Profile = () => {
             <Textarea
               placeholder="趣味についての紹介を入力してください"
               type="text"
+              name="introduceHobby"
               height="10"
-              value={userInfo.introduceHobby}
+              value={values.introduceHobby}
               background="white"
-              onChange={(e) =>
-                setUserInfo((i) => ({
-                  ...i,
-                  introduceHobby: e.target.value,
-                }))
-              }
+              onChange={handleChange}
             />
           </FormControl>
         </div>
@@ -430,7 +434,8 @@ const Profile = () => {
         className={profileStyles.update_button_wrapper}
         width="40"
         colorScheme="blue"
-        onClick={onClickValidations}>
+        // onClick={onClickValidations}>
+        onClick={() => handleSubmit()}>
         更新
       </Button>
     </LayoutWithTab>
