@@ -1,0 +1,17 @@
+.App {
+  text-align: center;
+  display: flex;
+  flex-flow: row;
+  justify-content: center;
+}
+.editor {
+  width: 100vw;
+  max-width: 1980px;
+  height: 80vh;
+}
+.editor-container > .sec-md {
+  border-right: 1px solid #b0b0b0;
+}
+p {
+  word-break: break-all;
+}

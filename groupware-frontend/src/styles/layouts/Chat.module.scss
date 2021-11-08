@@ -214,13 +214,16 @@
   padding: 16px;
   background: #fefefe;
   overflow: scroll;
-  width: 100%;
+  width: 92%;
   height: 20%;
   background: $white_color;
   scrollbar-width: none;
   -ms-overflow-style: none;
   &::-webkit-scrollbar {
     display: none;
+  }
+  @media (max-width: 768px) {
+    width: 85%;
   }
 }
 

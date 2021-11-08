@@ -1,4 +1,4 @@
-import {useQuery} from 'react-query';
+import {QueryKey, useQuery, UseQueryOptions} from 'react-query';
 import {WikiType, RuleCategory, Wiki} from '../../../types';
 import {axiosInstance} from '../../../utils/url';
 import {getWikiListURL} from '../../../utils/url/wiki.url';
@@ -31,8 +31,21 @@ const getWikiList = async (
   return response.data;
 };
 
-export const useAPIGetWikiList = (query: SearchQueryToGetWiki) => {
-  return useQuery<SearchResultToGetWiki, Error>(['QAs', query], () =>
-    getWikiList(query),
+export const useAPIGetWikiList = (
+  query: SearchQueryToGetWiki,
+  useQueryOptions?: Omit<
+    UseQueryOptions<
+      SearchResultToGetWiki,
+      Error,
+      SearchResultToGetWiki,
+      QueryKey
+    >,
+    'queryKey' | 'queryFn'
+  >,
+) => {
+  return useQuery<SearchResultToGetWiki, Error>(
+    ['QAs', query],
+    () => getWikiList(query),
+    useQueryOptions,
   );
 };

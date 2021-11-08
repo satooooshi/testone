@@ -3,9 +3,6 @@ import {createStackNavigator} from '@react-navigation/stack';
 import {NavigationContainer} from '@react-navigation/native';
 import Login from '../screens/auth/Login';
 import {useAuthenticate} from '../contexts/useAuthenticate';
-import EventDetail from '../screens/event/EventDetail';
-import WikiList from '../screens/wiki/WikiList';
-import WikiDetail from '../screens/wiki/WikiDetail';
 import {RootStackParamList} from '../types/navigator/RootStackParamList';
 import DrawerTab from './Drawer';
 

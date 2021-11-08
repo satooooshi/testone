@@ -1,3 +1,4 @@
+import { AxiosError } from 'axios';
 import { useMutation, UseMutationOptions } from 'react-query';
 import { Wiki } from 'src/types';
 import { axiosInstance } from 'src/utils/url';
@@ -12,9 +13,14 @@ const updateWiki = async (question: Partial<Wiki>) => {
 };
 
 export const useAPIUpdateWiki = (
-  mutationOptions?: UseMutationOptions<Wiki, Error, Partial<Wiki>, unknown>,
+  mutationOptions?: UseMutationOptions<
+    Wiki,
+    AxiosError,
+    Partial<Wiki>,
+    unknown
+  >,
 ) => {
-  return useMutation<Wiki, Error, Partial<Wiki>>(
+  return useMutation<Wiki, AxiosError, Partial<Wiki>>(
     (q) => updateWiki(q),
     mutationOptions,
   );

@@ -238,7 +238,8 @@ const MyAccountInfo = () => {
                       fontWeight="bold"
                       w="85%"
                       fontSize={18}
-                      color={darkFontColor}>
+                      color={darkFontColor}
+                      className={accountInfoStyles.introduce}>
                       {profile.introduceOther || '未入力'}
                     </Text>
                   </Box>

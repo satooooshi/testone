@@ -15,6 +15,9 @@ export type RootStackParamList = {
   WikiDetail: {
     id: number;
   };
+  PostWiki: {
+    type?: WikiType;
+  };
   EditWiki: {
     id: number;
   };

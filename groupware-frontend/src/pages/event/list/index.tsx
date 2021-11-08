@@ -44,6 +44,8 @@ import { useAPIGetTag } from '@/hooks/api/tag/useAPIGetTag';
 import { useHeaderTab } from '@/hooks/headerTab/useHeaderTab';
 import topTabBarStyles from '@/styles/components/TopTabBar.module.scss';
 import { useAPIUpdateEvent } from '@/hooks/api/event/useAPIUpdateEvent';
+import { useToast } from '@chakra-ui/react';
+import { responseErrorMsgFactory } from 'src/utils/factory/responseErrorMsgFactory';
 
 const localizer = momentLocalizer(moment);
 //@ts-ignore
@@ -67,11 +69,32 @@ const formats: Formats = {
   dayHeaderFormat: 'M月D日(ddd)',
 };
 
+export interface DatetimeSettings {
+  addDays: number;
+  hours: number;
+  minutes: number;
+}
+
+const setDateTime = (setting: DatetimeSettings) => {
+  const today = new Date();
+  today.setDate(today.getDate() + setting.addDays);
+  today.setHours(setting.hours, setting.minutes);
+  return today;
+};
+
 const initialEventValue = {
   title: '',
   description: '',
-  startAt: new Date(),
-  endAt: new Date(),
+  startAt: setDateTime({
+    addDays: 1,
+    hours: 19,
+    minutes: 0,
+  }),
+  endAt: setDateTime({
+    addDays: 1,
+    hours: 21,
+    minutes: 0,
+  }),
   type: EventType.STUDY_MEETING,
   imageURL: '',
   chatNeeded: true,
@@ -96,6 +119,8 @@ type EventListGetParams = SearchQueryToGetEvents & {
 
 const EventList = () => {
   const router = useRouter();
+  const toast = useToast();
+
   const {
     page = '1',
     word = '',
@@ -128,8 +153,19 @@ const EventList = () => {
   const calendarRef = useRef<HTMLDivElement | null>(null);
   const { mutate: createEvent } = useAPICreateEvent({
     onSuccess: () => {
+      setNewEvent(initialEventValue);
       setModalVisible(false);
       refetch();
+    },
+    onError: (e) => {
+      const messages = responseErrorMsgFactory(e?.response?.data.message);
+      toast({
+        description: messages,
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      });
+      return;
     },
   });
   const { mutate: updateEvent } = useAPIUpdateEvent({
