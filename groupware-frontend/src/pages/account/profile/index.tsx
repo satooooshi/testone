@@ -1,11 +1,4 @@
-import React, {
-  useState,
-  useEffect,
-  useCallback,
-  useRef,
-  useReducer,
-  Profiler,
-} from 'react';
+import React, { useCallback, useRef, useReducer } from 'react';
 import { SidebarScreenName } from '@/components/layout/Sidebar';
 import { Tab } from 'src/types/header/tab/types';
 import LayoutWithTab from '@/components/layout/LayoutWithTab';
@@ -52,14 +45,6 @@ const Profile = () => {
   const { data: profile } = useAPIGetProfile();
   const { user } = useAuthenticate();
   const { data: tags } = useAPIGetUserTag();
-  const [userInfo, setUserInfo] = useState<Partial<User>>({
-    email: '',
-    lastName: '',
-    firstName: '',
-    avatarUrl: '',
-    introduceOther: '',
-  });
-
   const initialUserValues = {
     email: '',
     lastName: '',
@@ -166,9 +151,13 @@ const Profile = () => {
     });
   };
 
-  const { handleChange, handleSubmit, values } = useFormik<Partial<User>>({
+  const {
+    values: userInfo,
+    setValues: setUserInfo,
+    handleChange,
+    handleSubmit,
+  } = useFormik<Partial<User>>({
     enableReinitialize: true,
-
     initialValues: profile ? profile : initialUserValues,
     onSubmit: () => {
       handleUpdateUser();
@@ -206,7 +195,7 @@ const Profile = () => {
 
   const handleUpdateUser = async () => {
     if (!croppedImageURL || !completedCrop || !selectImageName) {
-      updateUser(values);
+      updateUser(userInfo);
       return;
     }
     const result = await dataURLToFile(croppedImageURL, selectImageName);
@@ -217,12 +206,6 @@ const Profile = () => {
   const onLoad = useCallback((img) => {
     imgRef.current = img;
   }, []);
-
-  useEffect(() => {
-    if (profile) {
-      setUserInfo(profile);
-    }
-  }, [profile]);
 
   const toggleSelectedTag = (t: UserTag) => {
     const toggledTag = toggleTag(userInfo?.tags, t);
@@ -291,7 +274,9 @@ const Profile = () => {
             <ReactCrop
               src={selectImageUrl}
               crop={crop}
-              onChange={handleChange}
+              onChange={(newCrop) => {
+                dispatchCrop({ type: 'setCrop', value: newCrop });
+              }}
               onComplete={(c) => {
                 dispatchCrop({
                   type: 'setCompletedCrop',
@@ -311,7 +296,7 @@ const Profile = () => {
               type="email"
               name="email"
               placeholder="email@example.com"
-              value={values.email}
+              value={userInfo.email}
               background="white"
               onChange={handleChange}
             />
@@ -322,7 +307,7 @@ const Profile = () => {
               type="text"
               name="lastName"
               placeholder="山田"
-              value={values.lastName}
+              value={userInfo.lastName}
               background="white"
               onChange={handleChange}
             />
@@ -333,7 +318,7 @@ const Profile = () => {
               type="text"
               name="firstName"
               placeholder="太郎"
-              value={values.firstName}
+              value={userInfo.firstName}
               background="white"
               onChange={handleChange}
             />
@@ -345,7 +330,7 @@ const Profile = () => {
               name="introduceOther"
               height="10"
               placeholder="自己紹介を入力してください"
-              value={values.introduceOther}
+              value={userInfo.introduceOther}
               background="white"
               onChange={handleChange}
             />
@@ -364,7 +349,7 @@ const Profile = () => {
               type="text"
               name="introduceTech"
               height="10"
-              value={values.introduceTech}
+              value={userInfo.introduceTech}
               background="white"
               onChange={handleChange}
             />
@@ -385,7 +370,7 @@ const Profile = () => {
               type="text"
               name="introduceQualification"
               height="10"
-              value={values.introduceQualification}
+              value={userInfo.introduceQualification}
               background="white"
               onChange={handleChange}
             />
@@ -404,7 +389,7 @@ const Profile = () => {
               type="text"
               name="introduceClub"
               height="10"
-              value={values.introduceClub}
+              value={userInfo.introduceClub}
               background="white"
               onChange={handleChange}
             />
@@ -423,7 +408,7 @@ const Profile = () => {
               type="text"
               name="introduceHobby"
               height="10"
-              value={values.introduceHobby}
+              value={userInfo.introduceHobby}
               background="white"
               onChange={handleChange}
             />
@@ -434,7 +419,6 @@ const Profile = () => {
         className={profileStyles.update_button_wrapper}
         width="40"
         colorScheme="blue"
-        // onClick={onClickValidations}>
         onClick={() => handleSubmit()}>
         更新
       </Button>
