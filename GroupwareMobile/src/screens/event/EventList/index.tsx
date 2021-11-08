@@ -66,6 +66,10 @@ const EventList: React.FC<EventListProps> = ({navigation}) => {
     setSearchQuery(q => ({...q, ...query, tag: tagQuery || ''}));
   };
 
+  const isCalendar =
+    typeof searchQuery.from !== undefined &&
+    typeof searchQuery.to !== undefined;
+
   return (
     <WholeContainer>
       <AppHeader
@@ -75,11 +79,13 @@ const EventList: React.FC<EventListProps> = ({navigation}) => {
           searchQuery.type ? eventTypeNameFactory(searchQuery.type) : 'All'
         }
       />
-      <SearchFormOpenerButton
-        bottom={10}
-        right={10}
-        onPress={() => setVisibleSearchFormModal(true)}
-      />
+      {!isCalendar && (
+        <SearchFormOpenerButton
+          bottom={10}
+          right={10}
+          onPress={() => setVisibleSearchFormModal(true)}
+        />
+      )}
       <SearchForm
         isVisible={visibleSearchFormModal}
         onCloseModal={() => setVisibleSearchFormModal(false)}
