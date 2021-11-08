@@ -1,6 +1,6 @@
 import React, {useMemo} from 'react';
 import {EventSchedule} from '../../../types';
-import {Div, Button, Text} from 'react-native-magnus';
+import {Div, Text, Tag} from 'react-native-magnus';
 import FastImage from 'react-native-fast-image';
 import {tagColorFactory} from '../../../utils/factory/tagColorFactory';
 import {FlatList, useWindowDimensions, TouchableHighlight} from 'react-native';
@@ -38,11 +38,11 @@ const EventCard: React.FC<EventCardProps> = ({event, onPress}) => {
         h={cardWidth * 0.5}
         bg={grayColor}
         shadow="md"
-        py={8}
+        py={4}
         justifyContent="space-between"
         flexDir="column">
-        <Div px={8} flexDir="row" h={'70%'}>
-          <Div w="50%">
+        <Div px={8} flexDir="row" h={'75%'}>
+          <Div w="48%" mr={4}>
             <FastImage
               style={eventCardStyles.image}
               resizeMode="contain"
@@ -53,7 +53,7 @@ const EventCard: React.FC<EventCardProps> = ({event, onPress}) => {
               }
             />
           </Div>
-          <Div w="40%">
+          <Div w="50%">
             <Text
               numberOfLines={2}
               fontWeight="bold"
@@ -74,22 +74,24 @@ const EventCard: React.FC<EventCardProps> = ({event, onPress}) => {
               fontWeight="bold">{`終了: ${endAtText}`}</Text>
           </Div>
         </Div>
-        <FlatList
-          horizontal
-          style={eventCardStyles.tagList}
-          data={event.tags || []}
-          renderItem={({item: t}) => (
-            <Button
-              fontSize={'xs'}
-              h={28}
-              py={0}
-              bg={tagColorFactory(t.type)}
-              color="white"
-              mr={4}>
-              {t.name}
-            </Button>
-          )}
-        />
+        <Div h={'20%'}>
+          <FlatList
+            horizontal
+            style={eventCardStyles.tagList}
+            data={event.tags || []}
+            renderItem={({item: t}) => (
+              <Tag
+                fontSize={'lg'}
+                h={28}
+                py={0}
+                bg={tagColorFactory(t.type)}
+                color="white"
+                mr={4}>
+                {t.name}
+              </Tag>
+            )}
+          />
+        </Div>
       </Div>
     </TouchableHighlight>
   );

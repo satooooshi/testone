@@ -1,17 +1,7 @@
 import React, {useState} from 'react';
-import {FlatList} from 'react-native';
-import {
-  Button,
-  Div,
-  Icon,
-  Input,
-  Modal,
-  Overlay,
-  Tag,
-} from 'react-native-magnus';
+import {Button, Div, Icon, Input, Modal, Tag} from 'react-native-magnus';
 import {useSelectedTags} from '../../../hooks/tag/useSelectedTags';
 import {useTagType} from '../../../hooks/tag/useTagType';
-import {searchFormStyles} from '../../../styles/component/common/searchFormModal.style';
 import {AllTag} from '../../../types';
 import {tagColorFactory} from '../../../utils/factory/tagColorFactory';
 import TagModal from '../TagModal';
