@@ -1,4 +1,10 @@
-import React, {useState, useMemo, Dispatch, SetStateAction} from 'react';
+import React, {
+  useState,
+  useMemo,
+  Dispatch,
+  SetStateAction,
+  useEffect,
+} from 'react';
 import {
   Calendar,
   CalendarHeader,
@@ -20,6 +26,11 @@ import {Button, Div, Icon} from 'react-native-magnus';
 import {darkFontColor} from '../../../utils/colors';
 import {calendarStyles} from '../../../styles/component/event/eventCalendar.style';
 import {DateTime} from 'luxon';
+import {
+  daysQueryFactoryFromTargetDate,
+  monthQueryFactoryFromTargetDate,
+  weekQueryFactoryFromTargetDate,
+} from '../../../utils/eventQueryRefresh';
 
 type PersonalCalendarProps = {
   personal?: boolean;
@@ -35,6 +46,7 @@ const EventCalendar: React.FC<PersonalCalendarProps> = ({
   navigation,
   personal,
   searchResult,
+  setSearchQuery,
 }) => {
   const {user} = useAuthenticate();
   const [calendarMode, setCalendarMode] = useState<{
@@ -168,6 +180,24 @@ const EventCalendar: React.FC<PersonalCalendarProps> = ({
   const onPressTodayButton = () => {
     setCalendarMode(m => ({...m, targetDate: new Date()}));
   };
+
+  useEffect(() => {
+    let queryObj: Partial<SearchQueryToGetEvents>;
+    switch (calendarMode.mode) {
+      case 'month':
+        queryObj = monthQueryFactoryFromTargetDate(calendarMode.targetDate);
+        setSearchQuery(q => ({...q, ...queryObj}));
+        break;
+      case 'week':
+        queryObj = weekQueryFactoryFromTargetDate(calendarMode.targetDate);
+        setSearchQuery(q => ({...q, ...queryObj}));
+        break;
+      case 'day':
+        queryObj = daysQueryFactoryFromTargetDate(calendarMode.targetDate);
+        setSearchQuery(q => ({...q, ...queryObj}));
+        break;
+    }
+  }, [calendarMode.mode, calendarMode.targetDate, setSearchQuery]);
 
   return (
     <>

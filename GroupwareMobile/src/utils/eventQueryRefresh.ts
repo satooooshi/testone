@@ -21,6 +21,47 @@ export const defaultWeekQuery = (): {from: string; to: string} => {
     .toFormat('yyyy-LL-dd');
   return {from, to};
 };
+export const monthQueryFactoryFromTargetDate = (
+  date: Date,
+): {from: string; to: string} => {
+  const fromDate = DateTime.fromJSDate(date, {zone: 'Asia/Tokyo'}).set({
+    day: 0,
+    hour: 0,
+    minute: 0,
+    second: 0,
+  });
+  const from = fromDate.toFormat('yyyy-LL-dd');
+  const to = DateTime.fromJSDate(fromDate.toJSDate())
+    .plus({months: 1})
+    .minus({days: 1})
+    .toFormat('yyyy-LL-dd');
+  return {from, to};
+};
+export const weekQueryFactoryFromTargetDate = (
+  date: Date,
+): {from: string; to: string} => {
+  const from = DateTime.fromJSDate(date, {zone: 'Asia/Tokyo'})
+    .minus({days: 3})
+    .set({hour: 0, minute: 0, second: 0})
+    .toFormat('yyyy-LL-dd');
+  const to = DateTime.fromJSDate(date)
+    .plus({days: 3})
+    .set({hour: 0, minute: 0, second: 0})
+    .toFormat('yyyy-LL-dd');
+  return {from, to};
+};
+export const daysQueryFactoryFromTargetDate = (
+  date: Date,
+): {from: string; to: string} => {
+  const from = DateTime.fromJSDate(date, {zone: 'Asia/Tokyo'})
+    .set({hour: 0, minute: 0, second: 0})
+    .toFormat('yyyy-LL-dd');
+  const to = DateTime.fromJSDate(date)
+    .plus({days: 1})
+    .minus({seconds: 1})
+    .toFormat('yyyy-LL-dd');
+  return {from, to};
+};
 
 export const generateEventSearchQueryString = (
   query: Partial<SearchQueryToGetEvents>,
