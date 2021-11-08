@@ -168,7 +168,7 @@ const Profile = () => {
 
   const onClickValidations = () => {
     const emailRegex =
-      /^[a-zA-Z0-9]{1}[a-zA-Z0-9_.-]*[a-zA-Z0-9]{1}@{1}[a-zA-Z0-9]{1}[a-zA-Z0-9_-]{1,}\.[a-zA-Z]{1,}$/;
+      /^(?:(?:(?:(?:[a-zA-Z0-9_!#\$\%&'*+/=?\^`{}~|\-]+)(?:\.(?:[a-zA-Z0-9_!#\$\%&'*+/=?\^`{}~|\-]+))*)|(?:"(?:\\[^\r\n]|[^\\"])*")))\@(?:(?:(?:(?:[a-zA-Z0-9_!#\$\%&'*+/=?\^`{}~|\-]+)(?:\.(?:[a-zA-Z0-9_!#\$\%&'*+/=?\^`{}~|\-]+))*)|(?:\[(?:\\\S|[\x21-\x5a\x5e-\x7e])*\])))$/;
 
     if (!userInfo.email) {
       displayToast(toastMessages['requiredEmail'], 'error', 3000, true);
