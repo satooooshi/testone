@@ -27,4 +27,5 @@ export type RootStackParamList = {
       }
     | undefined;
   Profile: undefined;
+  UpdatePassword: undefined;
 };

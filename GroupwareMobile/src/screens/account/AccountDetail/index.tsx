@@ -139,7 +139,7 @@ const AccountDetail: React.FC<AccountDetailProps> = ({navigation, route}) => {
     },
     {
       name: 'パスワード更新',
-      onPress: () => {},
+      onPress: () => navigation.navigate('UpdatePassword'),
     },
   ];
 
