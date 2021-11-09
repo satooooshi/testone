@@ -139,19 +139,6 @@ const Profile = () => {
     accept: imageExtensions,
   });
   const toast = useToast();
-  // const displayToast = (
-  //   title: string,
-  //   status?: 'info' | 'warning' | 'success' | 'error',
-  //   duration?: number | null,
-  //   isClosable?: boolean,
-  // ) => {
-  //   toast({
-  //     title: title,
-  //     status: status,
-  //     duration: duration,
-  //     isClosable: isClosable,
-  //   });
-  // };
 
   const checkErrors = async () => {
     const errors = await validateForm();
