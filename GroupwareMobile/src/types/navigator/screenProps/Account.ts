@@ -20,3 +20,12 @@ export type ProfileProps = {
   navigation: ProfileNavigationProps;
   route: ProfileRouteProps;
 };
+type UpdatePasswordNavigationProps = StackNavigationProp<
+  RootStackParamList,
+  'UpdatePassword'
+>;
+type UpdatePasswordRouteProps = RouteProp<RootStackParamList, 'UpdatePassword'>;
+export type UpdatePasswordProps = {
+  navigation: UpdatePasswordNavigationProps;
+  route: UpdatePasswordRouteProps;
+};

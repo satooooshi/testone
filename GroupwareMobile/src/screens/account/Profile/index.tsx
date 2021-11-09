@@ -94,7 +94,7 @@ const Profile: React.FC<ProfileProps> = ({navigation}) => {
     },
     {
       name: 'パスワード更新',
-      onPress: () => {},
+      onPress: () => navigation.navigate('UpdatePassword'),
     },
   ];
 
