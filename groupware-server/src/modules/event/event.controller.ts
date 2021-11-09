@@ -186,8 +186,7 @@ export class EventScheduleController {
   @UseGuards(JwtAuthenticationGuard)
   async createEvent(
     @Req() req: RequestWithUser,
-    @Body() eventSchedule: Partial<EventSchedule>,
-    @Body() saveEventDto: saveEventDto,
+    @Body() eventSchedule: saveEventDto,
   ): Promise<EventSchedule> {
     if (!eventSchedule.tags || !eventSchedule.tags.length) {
       throw new BadRequestException('Event must links one or more tags');
@@ -217,8 +216,7 @@ export class EventScheduleController {
   @Post('update-event')
   @UseGuards(JwtAuthenticationGuard)
   async updateEvent(
-    @Body() eventSchedule: Partial<EventSchedule>,
-    @Body() saveEventDto: saveEventDto,
+    @Body() eventSchedule: saveEventDto,
   ): Promise<EventSchedule> {
     if (!eventSchedule.tags || !eventSchedule.tags.length) {
       throw new BadRequestException('Event must links one or more tags');
@@ -280,8 +278,7 @@ export class EventScheduleController {
   @UseGuards(JwtAuthenticationGuard)
   async createAnswer(
     @Req() request: RequestWithUser,
-    @Body() comment: EventComment,
-    @Body() createCommentDto: createCommentDto,
+    @Body() comment: createCommentDto,
   ): Promise<EventComment> {
     comment.writer = request.user;
     return await this.eventService.createComment(comment);
