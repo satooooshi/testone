@@ -65,8 +65,8 @@ export const profileSchema = Yup.object().shape({
     .required(`姓は${requireMessage}`)
     .max(50, `姓は${nWordLimitMessage(50)}`),
   firstName: Yup.string()
-    .required(`名前は${requireMessage}`)
-    .max(50, `名前は${nWordLimitMessage(50)}`),
+    .required(`名は${requireMessage}`)
+    .max(50, `名は${nWordLimitMessage(50)}`),
   introduceOther: Yup.string().max(
     1000,
     `自己紹介は${nWordLimitMessage(1000)}`,
