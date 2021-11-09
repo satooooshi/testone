@@ -14,6 +14,7 @@ import PostWiki from '../../screens/wiki/PostWiki';
 import Home from '../../screens/Home';
 import {Icon} from 'react-native-magnus';
 import AccountDetail from '../../screens/account/AccountDetail';
+import Profile from '../../screens/account/Profile';
 
 const Drawer = createDrawerNavigator();
 const Stack = createStackNavigator();
@@ -59,6 +60,11 @@ const AccountStack = () => (
     <Stack.Screen
       name="AccountDetail"
       component={AccountDetail}
+      options={{headerShown: false}}
+    />
+    <Stack.Screen
+      name="Profile"
+      component={Profile}
       options={{headerShown: false}}
     />
   </Stack.Navigator>
