@@ -54,7 +54,7 @@ const DetailScreen: React.FC<DetailScreenProps> = ({profile}) => {
           自己紹介
         </Text>
         <Text color={darkFontColor} fontWeight="bold" fontSize={20}>
-          {profile.introduce || '未設定'}
+          {profile.introduceOther || '未設定'}
         </Text>
       </Div>
       <TagListBox

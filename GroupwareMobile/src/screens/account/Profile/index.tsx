@@ -1,3 +1,4 @@
+import {useIsFocused} from '@react-navigation/native';
 import {useFormik} from 'formik';
 import React, {useEffect, useState} from 'react';
 import {
@@ -42,7 +43,8 @@ const initialValues: Partial<User> = {
 };
 
 const Profile: React.FC<ProfileProps> = ({navigation}) => {
-  const {data: profile} = useAPIGetProfile();
+  const {data: profile, refetch} = useAPIGetProfile();
+  const isFocused = useIsFocused();
   const {mutate: updateUser} = useAPIUpdateUser({
     onSuccess: responseData => {
       if (responseData) {
@@ -50,7 +52,7 @@ const Profile: React.FC<ProfileProps> = ({navigation}) => {
       }
     },
   });
-  const {values, setValues, handleSubmit} = useFormik({
+  const {values, setValues, handleSubmit} = useFormik<Partial<User>>({
     initialValues: profile || initialValues,
     enableReinitialize: true,
     onSubmit: v => updateUser(v),
@@ -107,6 +109,12 @@ const Profile: React.FC<ProfileProps> = ({navigation}) => {
     selectTagType(tagType);
     setVisibleTagModal(true);
   };
+
+  useEffect(() => {
+    if (isFocused) {
+      refetch();
+    }
+  }, [isFocused, refetch]);
 
   useEffect(() => {
     setValues(v => ({...v, tags: selectedTags}));
@@ -196,8 +204,8 @@ const Profile: React.FC<ProfileProps> = ({navigation}) => {
               自己紹介
             </Text>
             <TextInput
-              value={values.introduce}
-              onChangeText={t => setValues({...values, introduce: t})}
+              value={values.introduceOther}
+              onChangeText={t => setValues({...values, introduceOther: t})}
               multiline={true}
               placeholder="新しく入社した山田太郎です。よろしくお願いします！"
               autoCapitalize="none"
