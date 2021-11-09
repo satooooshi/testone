@@ -139,25 +139,30 @@ const Profile = () => {
     accept: imageExtensions,
   });
   const toast = useToast();
-  const displayToast = (
-    title: string,
-    status?: 'info' | 'warning' | 'success' | 'error',
-    duration?: number | null,
-    isClosable?: boolean,
-  ) => {
-    toast({
-      title: title,
-      status: status,
-      duration: duration,
-      isClosable: isClosable,
-    });
-  };
+  // const displayToast = (
+  //   title: string,
+  //   status?: 'info' | 'warning' | 'success' | 'error',
+  //   duration?: number | null,
+  //   isClosable?: boolean,
+  // ) => {
+  //   toast({
+  //     title: title,
+  //     status: status,
+  //     duration: duration,
+  //     isClosable: isClosable,
+  //   });
+  // };
 
   const checkErrors = async () => {
     const errors = await validateForm();
     const messages = formikErrorMsgFactory(errors);
     if (messages) {
-      displayToast(messages, 'error', 3000, true);
+      toast({
+        title: messages,
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      });
     } else {
       onFinish();
     }
@@ -178,13 +183,15 @@ const Profile = () => {
     },
   });
 
-  const toastMessages = {
-    success: 'プロフィールを更新しました。',
-  };
   const { mutate: updateUser } = useAPIUpdateUser({
     onSuccess: (responseData) => {
       if (responseData) {
-        displayToast(toastMessages['success'], 'success', 3000, true);
+        toast({
+          title: 'プロフィールを更新しました。',
+          status: 'success',
+          duration: 3000,
+          isClosable: true,
+        });
         dispatchCrop({ type: 'setImageFile', value: undefined });
       }
     },
