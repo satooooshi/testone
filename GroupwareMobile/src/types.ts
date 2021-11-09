@@ -70,6 +70,11 @@ export interface User {
   email: string;
   lastName: string;
   firstName: string;
+  introduceTech: string;
+  introduceQualification: string;
+  introduceHobby: string;
+  introduceClub: string;
+  introduceOther: string;
   introduce: string;
   password?: string;
   role: UserRole;
