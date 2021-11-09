@@ -499,6 +499,13 @@ export class EventScheduleService {
   }
 
   public async joinEvent(eventID: number, user: User): Promise<EventSchedule> {
+    const alreadyJoined = await this.userJoiningEventRepository.findOne({
+      where: { user: user, event: eventID },
+      withDeleted: true,
+    });
+    if (alreadyJoined) {
+      throw new BadRequestException('参加申し込み済みのイベントです');
+    }
     const joinedEvent = await this.eventRepository.findOne({
       where: { id: eventID },
       relations: ['chatGroup', 'userJoiningEvent', 'userJoiningEvent.user'],

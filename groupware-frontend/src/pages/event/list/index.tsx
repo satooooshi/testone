@@ -97,7 +97,7 @@ const initialEventValue = {
   }),
   type: EventType.STUDY_MEETING,
   imageURL: '',
-  chatNeeded: true,
+  chatNeeded: false,
   hostUsers: [],
   tags: [],
   files: [],
