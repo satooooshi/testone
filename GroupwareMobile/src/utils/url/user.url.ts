@@ -6,3 +6,4 @@ export const updateProfileURL = `/${userURL}/update-user`;
 export const deleteUserURL = `/${userURL}/delete-user`;
 export const searchUsersURL = `/${userURL}/search`;
 export const downloadUserCsvURL = `/${userURL}/csv`;
+export const updatePasswordURL = `/${userURL}/update-password`;

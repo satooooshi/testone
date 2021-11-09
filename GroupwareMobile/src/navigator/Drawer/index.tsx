@@ -14,6 +14,8 @@ import PostWiki from '../../screens/wiki/PostWiki';
 import Home from '../../screens/Home';
 import {Icon} from 'react-native-magnus';
 import AccountDetail from '../../screens/account/AccountDetail';
+import Profile from '../../screens/account/Profile';
+import UpdatePassword from '../../screens/account/UpdatePassword';
 
 const Drawer = createDrawerNavigator();
 const Stack = createStackNavigator();
@@ -61,6 +63,16 @@ const AccountStack = () => (
       component={AccountDetail}
       options={{headerShown: false}}
     />
+    <Stack.Screen
+      name="Profile"
+      component={Profile}
+      options={{headerShown: false}}
+    />
+    <Stack.Screen
+      name="UpdatePassword"
+      component={UpdatePassword}
+      options={{headerShown: false}}
+    />
   </Stack.Navigator>
 );
 
@@ -70,6 +82,8 @@ const DrawerTab = () => {
       initialRouteName="Home"
       screenOptions={{
         headerShown: false,
+        drawerLabelStyle: {color: 'white'},
+        drawerActiveTintColor: 'green400',
         drawerStyle: {
           backgroundColor: darkFontColor,
           width: 240,
