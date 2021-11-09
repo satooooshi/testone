@@ -11,3 +11,12 @@ export type AccountDetailProps = {
   navigation: AccountDetailNavigationProps;
   route: AccountDetailRouteProps;
 };
+type ProfileNavigationProps = StackNavigationProp<
+  RootStackParamList,
+  'Profile'
+>;
+type ProfileRouteProps = RouteProp<RootStackParamList, 'Profile'>;
+export type ProfileProps = {
+  navigation: ProfileNavigationProps;
+  route: ProfileRouteProps;
+};
