@@ -200,7 +200,7 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
   };
 
   useEffect(() => {
-    setNewEvent(e => ({...e, users: selectedUsers}));
+    setNewEvent(e => ({...e, hostUsers: selectedUsers}));
   }, [selectedUsers, setNewEvent]);
 
   useEffect(() => {
@@ -331,7 +331,7 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
             開催者/講師を編集
           </Button>
           <Div flexDir="row" flexWrap="wrap" mb={8}>
-            {newEvent.users?.map(u => (
+            {newEvent.hostUsers?.map(u => (
               <TagButton
                 key={u.id}
                 mr={4}
