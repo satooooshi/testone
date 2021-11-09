@@ -1,7 +1,6 @@
-import React, {Dispatch, SetStateAction, useEffect, useState} from 'react';
+import React, {Dispatch, SetStateAction, useEffect} from 'react';
 import {FlatList} from 'react-native';
 import {
-  useAPIGetEventList,
   SearchQueryToGetEvents,
   EventStatus,
   SearchResultToGetEvents,
@@ -29,7 +28,7 @@ const EventCardList: React.FC<EventCardListProps> = ({
 
   useEffect(() => {
     if (isFocused) {
-      setSearchQuery(q => ({...q, status}));
+      setSearchQuery(q => ({...q, from: undefined, to: undefined, status}));
     }
   }, [isFocused, setSearchQuery, status]);
 

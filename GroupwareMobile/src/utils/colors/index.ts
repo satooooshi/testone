@@ -1,3 +1,4 @@
+export const layoutBackgroundGrayColor = '#F2F4FA';
 export const darkFontColor = '#65657d';
 export const blueColor = '#4a72d3';
 

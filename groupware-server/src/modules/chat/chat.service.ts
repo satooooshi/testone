@@ -203,7 +203,8 @@ export class ChatService {
       (m) => m.id === userID,
     ).length;
     if (isUserJoining) {
-      throw new BadRequestException('The user is already participant');
+      console.log('The user is already participant');
+      return;
     }
     await this.chatGroupRepository
       .createQueryBuilder()

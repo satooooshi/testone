@@ -11,7 +11,7 @@ export const tagTypeNameFactory = (tagType: TagTypeInApp): string => {
     case TagType.HOBBY:
       return '趣味';
     case TagType.OTHER:
-      return '趣味';
+      return 'その他';
     case 'All':
       return '全て';
   }
