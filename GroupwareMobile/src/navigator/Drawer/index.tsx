@@ -82,6 +82,8 @@ const DrawerTab = () => {
       initialRouteName="Home"
       screenOptions={{
         headerShown: false,
+        drawerLabelStyle: {color: 'white'},
+        drawerActiveTintColor: 'green400',
         drawerStyle: {
           backgroundColor: darkFontColor,
           width: 240,
