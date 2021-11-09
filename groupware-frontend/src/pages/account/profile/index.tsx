@@ -29,6 +29,8 @@ import { useImageCrop } from '@/hooks/crop/useImageCrop';
 import { useHeaderTab } from '@/hooks/headerTab/useHeaderTab';
 import TagModal from '@/components/common/TagModal';
 import { toggleTag } from 'src/utils/toggleTag';
+import { profileSchema } from 'src/utils/validation/schema';
+import { formikErrorMsgFactory } from 'src/utils/factory/formikErrorMsgFactory';
 import { useAPIGetUserTag } from '@/hooks/api/tag/useAPIGetUserTag';
 import FormToLinkTag from '@/components/FormToLinkTag';
 
@@ -151,14 +153,26 @@ const Profile = () => {
     });
   };
 
+  const checkErrors = async () => {
+    const errors = await validateForm();
+    const messages = formikErrorMsgFactory(errors);
+    if (messages) {
+      displayToast(messages, 'error', 3000, true);
+    } else {
+      onFinish();
+    }
+  };
+
   const {
     values: userInfo,
     setValues: setUserInfo,
+    handleSubmit: onFinish,
     handleChange,
-    handleSubmit,
+    validateForm,
   } = useFormik<Partial<User>>({
-    enableReinitialize: true,
     initialValues: profile ? profile : initialUserValues,
+    enableReinitialize: true,
+    validationSchema: profileSchema,
     onSubmit: () => {
       handleUpdateUser();
     },
@@ -166,8 +180,6 @@ const Profile = () => {
 
   const toastMessages = {
     success: 'プロフィールを更新しました。',
-    requiredEmail: 'メールアドレスは必ず入力してください。',
-    regexEmail: '正しいメールアドレスを指定してください。',
   };
   const { mutate: updateUser } = useAPIUpdateUser({
     onSuccess: (responseData) => {
@@ -177,19 +189,6 @@ const Profile = () => {
       }
     },
   });
-
-  const onClickValidations = () => {
-    const emailRegex =
-      /^(?:(?:(?:(?:[a-zA-Z0-9_!#\$\%&'*+/=?\^`{}~|\-]+)(?:\.(?:[a-zA-Z0-9_!#\$\%&'*+/=?\^`{}~|\-]+))*)|(?:"(?:\\[^\r\n]|[^\\"])*")))\@(?:(?:(?:(?:[a-zA-Z0-9_!#\$\%&'*+/=?\^`{}~|\-]+)(?:\.(?:[a-zA-Z0-9_!#\$\%&'*+/=?\^`{}~|\-]+))*)|(?:\[(?:\\\S|[\x21-\x5a\x5e-\x7e])*\])))$/;
-
-    if (!userInfo.email) {
-      displayToast(toastMessages['requiredEmail'], 'error', 3000, true);
-    } else if (!emailRegex.test(userInfo.email)) {
-      displayToast(toastMessages['regexEmail'], 'error', 3000, true);
-    } else {
-      handleUpdateUser();
-    }
-  };
 
   const tabs: Tab[] = useHeaderTab({ headerTabType: 'account', user });
 
@@ -419,7 +418,9 @@ const Profile = () => {
         className={profileStyles.update_button_wrapper}
         width="40"
         colorScheme="blue"
-        onClick={() => handleSubmit()}>
+        onClick={() => {
+          checkErrors();
+        }}>
         更新
       </Button>
     </LayoutWithTab>
