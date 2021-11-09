@@ -102,7 +102,7 @@ const QuestionDetail = () => {
     }
   };
 
-  const checkErrors = async (isBody: string) => {
+  const checkErrors = (isBody: string) => {
     const editorBody =
       isBody === 'answer'
         ? stateToHTML(answerEditorState.getCurrentContent())
