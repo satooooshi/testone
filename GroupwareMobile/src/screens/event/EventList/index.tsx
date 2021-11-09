@@ -15,16 +15,28 @@ import {
 import {AllTag, EventType} from '../../../types';
 import eventTypeNameFactory from '../../../utils/factory/eventTypeNameFactory';
 import {defaultWeekQuery} from '../../../utils/eventQueryRefresh';
+import EventFormModal from '../../../components/events/EventFormModal';
+import {useAPIGetUsers} from '../../../hooks/api/user/useAPIGetUsers';
+import {useAPICreateEvent} from '../../../hooks/api/event/useAPICreateEvent';
 
 const TopTab = createMaterialTopTabNavigator();
 
 const EventList: React.FC<EventListProps> = ({navigation}) => {
   const [visibleSearchFormModal, setVisibleSearchFormModal] = useState(false);
   const {data: tags} = useAPIGetTag();
+  const {data: users} = useAPIGetUsers();
   const [searchQuery, setSearchQuery] = useState<SearchQueryToGetEvents>(
     defaultWeekQuery(),
   );
-  const {data: events} = useAPIGetEventList(searchQuery);
+  const {data: events, refetch: refetchEvents} =
+    useAPIGetEventList(searchQuery);
+  const [visibleEventFormModal, setEventFormModal] = useState(false);
+  const {mutate: saveEvent} = useAPICreateEvent({
+    onSuccess: () => {
+      setEventFormModal(false);
+      refetchEvents();
+    },
+  });
   const tabs: Tab[] = [
     {
       name: 'All',
@@ -78,6 +90,15 @@ const EventList: React.FC<EventListProps> = ({navigation}) => {
         activeTabName={
           searchQuery.type ? eventTypeNameFactory(searchQuery.type) : 'All'
         }
+        rightButtonName="新規イベント"
+        onPressRightButton={() => setEventFormModal(true)}
+      />
+      <EventFormModal
+        isVisible={visibleEventFormModal}
+        onCloseModal={() => setEventFormModal(false)}
+        onSubmit={event => saveEvent(event)}
+        users={users || []}
+        tags={tags || []}
       />
       {!isCalendar && (
         <SearchFormOpenerButton

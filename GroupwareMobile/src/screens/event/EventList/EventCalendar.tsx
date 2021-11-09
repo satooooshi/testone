@@ -116,9 +116,12 @@ const EventCalendar: React.FC<PersonalCalendarProps> = ({
   };
   const eventPosition = (event: any): number => {
     const maxLeftMarginNum = windowWidth * 0.8;
-    const filteredEvents = memorizedEvent.filter(
-      e => e.startAt === event.startAt,
-    );
+    const filteredEvents = memorizedEvent.filter(e => {
+      return (
+        DateTime.fromJSDate(e.startAt).toFormat('yyyy/LL/dd HH:mm') ===
+        DateTime.fromJSDate(event.startAt).toFormat('yyyy/LL/dd HH:mm')
+      );
+    });
     const existCount = filteredEvents.length;
     if (existCount) {
       const filteredEventIds = filteredEvents.map(e => e.id);

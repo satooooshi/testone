@@ -46,7 +46,7 @@ export const registerSchema = Yup.object().shape({
     .required(requireMessage),
 });
 
-export const createEventSchema = Yup.object().shape({
+export const savingEventSchema = Yup.object().shape({
   title: Yup.string()
     .required(`タイトルは${requireMessage}`)
     .max(100, `タイトルは${nWordLimitMessage(100)}`),
