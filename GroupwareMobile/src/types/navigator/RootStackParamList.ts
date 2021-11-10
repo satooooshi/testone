@@ -21,4 +21,7 @@ export type RootStackParamList = {
   EditWiki: {
     id: number;
   };
+  AccountDetail: {
+    id?: number;
+  };
 };

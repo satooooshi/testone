@@ -4,6 +4,7 @@ import { useAPICreateWiki } from '@/hooks/api/wiki/useAPICreateWiki';
 import { useAPIGetTag } from '@/hooks/api/tag/useAPIGetTag';
 import { useToast } from '@chakra-ui/react';
 import QADraftForm from 'src/templates/WikiForm';
+import { responseErrorMsgFactory } from 'src/utils/factory/responseErrorMsgFactory';
 
 const CreateQA = () => {
   const router = useRouter();
@@ -21,8 +22,15 @@ const CreateQA = () => {
         isClosable: true,
       });
     },
-    onError: () => {
-      alert('Wiki作成が失敗しました。入力内容をご確認ください。');
+    onError: (e) => {
+      const messages = responseErrorMsgFactory(e?.response?.data.message);
+      toast({
+        description: messages,
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      });
+      return;
     },
   });
 

@@ -12,6 +12,8 @@ import WikiList from '../../screens/wiki/WikiList';
 import {createStackNavigator} from '@react-navigation/stack';
 import PostWiki from '../../screens/wiki/PostWiki';
 import Home from '../../screens/Home';
+import {Icon} from 'react-native-magnus';
+import AccountDetail from '../../screens/account/AccountDetail';
 
 const Drawer = createDrawerNavigator();
 const Stack = createStackNavigator();
@@ -47,6 +49,16 @@ const EventStack = () => (
     <Stack.Screen
       name="EventDetail"
       component={EventDetail}
+      options={{headerShown: false}}
+    />
+  </Stack.Navigator>
+);
+
+const AccountStack = () => (
+  <Stack.Navigator initialRouteName="AccountDetail">
+    <Stack.Screen
+      name="AccountDetail"
+      component={AccountDetail}
       options={{headerShown: false}}
     />
   </Stack.Navigator>
@@ -90,6 +102,21 @@ const DrawerTab = () => {
           drawerLabel: '社内Wiki',
           drawerIcon: ({color}) => (
             <Ionicons name="globe-outline" color={color} size={26} />
+          ),
+        }}
+      />
+      <Drawer.Screen
+        name="Account"
+        component={AccountStack}
+        options={{
+          drawerLabel: 'アカウント',
+          drawerIcon: ({color}) => (
+            <Icon
+              name="user-alt"
+              fontFamily="FontAwesome5"
+              color={color}
+              fontSize={26}
+            />
           ),
         }}
       />

@@ -7,6 +7,7 @@ import WikiForm from 'src/templates/WikiForm';
 import { Progress, useToast } from '@chakra-ui/react';
 import { useAuthenticate } from 'src/contexts/useAuthenticate';
 import { UserRole } from 'src/types';
+import { responseErrorMsgFactory } from 'src/utils/factory/responseErrorMsgFactory';
 
 const EditQuestion = () => {
   const router = useRouter();
@@ -27,6 +28,16 @@ const EditQuestion = () => {
         duration: 3000,
         isClosable: true,
       });
+    },
+    onError: (e) => {
+      const messages = responseErrorMsgFactory(e?.response?.data.message);
+      toast({
+        description: messages,
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      });
+      return;
     },
   });
 
