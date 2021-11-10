@@ -11,6 +11,7 @@ import { MdAssignment } from 'react-icons/md';
 import { CgLoadbarDoc } from 'react-icons/cg';
 import { AiOutlineGlobal, AiFillBulb } from 'react-icons/ai';
 import clsx from 'clsx';
+import { useAuthenticate } from 'src/contexts/useAuthenticate';
 
 export enum PortalLinkType {
   IMPRESSIVE_UNIVERSITY = '/event/impressive_university',
@@ -203,7 +204,7 @@ const descriptionText = (href: PortalLinkType): string => {
     case PortalLinkType.COACH:
       return '現場経験の豊富なエキスパート陣が、様々な視点から社員へアドバイスや指導を行います。';
     case PortalLinkType.CLUB:
-      return '12部活、11サークルが活動中。部活として認定された活動には部費を支給しています。フットサルやマラソン等のスポーツ系から、写真や料理等の文化系の部活まで様々な部活動があります。';
+      return '17部活、14サークルが活動中。部活として認定された活動には懇親会費を支給しています。フットサルやマラソン等のスポーツ系から、写真や料理等の文化系の部活まで様々な部活動があります。';
     case PortalLinkType.SUBMISSION_ETC:
       return '社内での提出物の日程を確認します';
     case PortalLinkType.WIKI:
@@ -226,8 +227,15 @@ const descriptionText = (href: PortalLinkType): string => {
 };
 
 const PortalLinkBox: React.FC<PortarlLinkBoxProps> = ({ href }) => {
+  const { user } = useAuthenticate();
+  const hrefFactory = () => {
+    if (href === PortalLinkType.ACCOUNT) {
+      return PortalLinkType.ACCOUNT + `/${user?.id}`;
+    }
+    return href;
+  };
   return (
-    <Link href={href}>
+    <Link href={hrefFactory()}>
       <a className={portalLinkBoxStyles.box_wrapper}>
         <PortalIcon href={href} />
         <div className={portalLinkBoxStyles.title_wrapper}>

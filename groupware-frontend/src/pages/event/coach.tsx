@@ -6,7 +6,7 @@ import eventPRStyles from '@/styles/layouts/EventPR.module.scss';
 import { useAPIGetLatestEvent } from '@/hooks/api/event/useAPIGetLatestEvent';
 import { EventType } from 'src/types';
 import { EventTab } from 'src/types/header/tab/types';
-import coachImage1 from '@/public/coach_1.jpg';
+import coachImage1 from '@/public/coach_1.jpeg';
 import EventIntroduction from 'src/templates/event/EventIntroduction';
 import Head from 'next/head';
 

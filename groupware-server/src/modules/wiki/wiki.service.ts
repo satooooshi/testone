@@ -42,16 +42,18 @@ export class WikiService {
             a.writer?.avatarUrl || '',
           );
         const parsedReplies: QAAnswerReply[] = [];
-        for (const r of a.replies) {
-          const parsedReplyAvatar =
-            await this.storageService.parseStorageURLToSignedURL(
-              a.writer?.avatarUrl || '',
-            );
-          const replyObj: QAAnswerReply = {
-            ...r,
-            writer: { ...r.writer, avatarUrl: parsedReplyAvatar },
-          };
-          parsedReplies.push(replyObj);
+        if (a?.replies && a.replies.length) {
+          for (const r of a.replies) {
+            const parsedReplyAvatar =
+              await this.storageService.parseStorageURLToSignedURL(
+                a.writer?.avatarUrl || '',
+              );
+            const replyObj: QAAnswerReply = {
+              ...r,
+              writer: { ...r.writer, avatarUrl: parsedReplyAvatar },
+            };
+            parsedReplies.push(replyObj);
+          }
         }
         parsedAnswers.push({
           ...a,
@@ -106,9 +108,9 @@ export class WikiService {
         queryWord: `%${word}%`,
       })
       .andWhere(
-        status === 'new' && !writer
+        status === 'new' && !writer && type === WikiType.QA
           ? 'wiki.resolved_at is null'
-          : status === 'resolved' && !writer
+          : status === 'resolved' && !writer && type === WikiType.QA
           ? 'wiki.resolved_at is not null'
           : '1=1',
       )

@@ -8,7 +8,7 @@ import { Button } from '@chakra-ui/react';
 import noImage from '@/public/no-image.jpg';
 import boldayImage1 from '@/public/bolday_1.jpg';
 import impressiveUnivertyImage from '@/public/impressive_university_1.png';
-import coachImage from '@/public/coach_1.jpg';
+import coachImage from '@/public/coach_1.jpeg';
 import studyMeeting1Image from '@/public/study_meeting_1.jpg';
 import Image from 'next/image';
 import portalLinkBoxStyles from '@/styles/components/PortalLinkBox.module.scss';

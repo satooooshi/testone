@@ -5,7 +5,8 @@ import eventListStyles from '@/styles/layouts/EventList.module.scss';
 import EventCard from '@/components/common/EventCard';
 import { useRouter } from 'next/router';
 import paginationStyles from '@/styles/components/Pagination.module.scss';
-import ReactPaginate from 'react-paginate';
+import dynamic from 'next/dynamic';
+const ReactPaginate = dynamic(() => import('react-paginate'), { ssr: false });
 import { useEffect, useMemo, useRef, useState } from 'react';
 
 import LayoutWithTab from '@/components/layout/LayoutWithTab';
@@ -43,6 +44,8 @@ import { useAPIGetTag } from '@/hooks/api/tag/useAPIGetTag';
 import { useHeaderTab } from '@/hooks/headerTab/useHeaderTab';
 import topTabBarStyles from '@/styles/components/TopTabBar.module.scss';
 import { useAPIUpdateEvent } from '@/hooks/api/event/useAPIUpdateEvent';
+import { useToast } from '@chakra-ui/react';
+import { responseErrorMsgFactory } from 'src/utils/factory/responseErrorMsgFactory';
 
 const localizer = momentLocalizer(moment);
 //@ts-ignore
@@ -66,14 +69,35 @@ const formats: Formats = {
   dayHeaderFormat: 'M月D日(ddd)',
 };
 
+export interface DatetimeSettings {
+  addDays: number;
+  hours: number;
+  minutes: number;
+}
+
+const setDateTime = (setting: DatetimeSettings) => {
+  const today = new Date();
+  today.setDate(today.getDate() + setting.addDays);
+  today.setHours(setting.hours, setting.minutes);
+  return today;
+};
+
 const initialEventValue = {
   title: '',
   description: '',
-  startAt: new Date(),
-  endAt: new Date(),
+  startAt: setDateTime({
+    addDays: 1,
+    hours: 19,
+    minutes: 0,
+  }),
+  endAt: setDateTime({
+    addDays: 1,
+    hours: 21,
+    minutes: 0,
+  }),
   type: EventType.STUDY_MEETING,
   imageURL: '',
-  chatNeeded: true,
+  chatNeeded: false,
   hostUsers: [],
   tags: [],
   files: [],
@@ -95,6 +119,8 @@ type EventListGetParams = SearchQueryToGetEvents & {
 
 const EventList = () => {
   const router = useRouter();
+  const toast = useToast();
+
   const {
     page = '1',
     word = '',
@@ -106,7 +132,11 @@ const EventList = () => {
     personal,
   } = router.query as EventListGetParams;
 
-  const { data: events, refetch } = useAPIGetEventList({
+  const {
+    data: events,
+    refetch,
+    isLoading: isLoadingEvents,
+  } = useAPIGetEventList({
     page,
     word,
     tag,
@@ -118,13 +148,24 @@ const EventList = () => {
   const { user } = useAuthenticate();
   const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
   const { data: tags } = useAPIGetTag();
-  const [searchWord, setSearchWord] = useState('');
+  const [searchWord, setSearchWord] = useState(word);
   const [modalVisible, setModalVisible] = useState(false);
   const calendarRef = useRef<HTMLDivElement | null>(null);
   const { mutate: createEvent } = useAPICreateEvent({
     onSuccess: () => {
+      setNewEvent(initialEventValue);
       setModalVisible(false);
       refetch();
+    },
+    onError: (e) => {
+      const messages = responseErrorMsgFactory(e?.response?.data.message);
+      toast({
+        description: messages,
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      });
+      return;
     },
   });
   const { mutate: updateEvent } = useAPIUpdateEvent({
@@ -209,8 +250,15 @@ const EventList = () => {
     setModalVisible(true);
   };
 
+  const isAuthor = (event: EventSchedule) => {
+    if (event?.author?.id === user?.id) {
+      return true;
+    }
+    return false;
+  };
+
   const resizeEvent = async ({ event, start, end }: any) => {
-    if (!isEditableEvent(event.type)) {
+    if (!isEditableEvent(event.type) && !isAuthor(event)) {
       alert('イベントを編集する権限がありません');
       return;
     }
@@ -248,7 +296,7 @@ const EventList = () => {
   };
 
   const moveEvent = async ({ event, start, end }: any) => {
-    if (!isEditableEvent(event.type)) {
+    if (!isEditableEvent(event.type) && !isAuthor(event)) {
       alert('イベントを編集する権限がありません');
       return;
     }
@@ -286,7 +334,7 @@ const EventList = () => {
         if (personal === 'true') {
           ev = ev.filter((e) => {
             if (
-              e.userJoiningEvent?.filter((u) => u.user.id === user?.id).length
+              e.userJoiningEvent?.filter((u) => u?.user?.id === user?.id).length
             ) {
               return true;
             }
@@ -367,10 +415,6 @@ const EventList = () => {
     }
   }, [tag, tags]);
 
-  useEffect(() => {
-    setSearchWord(word || '');
-  }, [word]);
-
   const topTabBehaviorList: TopTabBehavior[] = [
     {
       tabName: 'カレンダー(個人)',
@@ -421,7 +465,7 @@ const EventList = () => {
       isActiveTab: !isCalendar && status === 'past',
     },
     {
-      tabName: '進行中イベント',
+      tabName: '進行中のイベント',
       onClick: () => {
         queryRefresh({
           page: '1',
@@ -491,7 +535,7 @@ const EventList = () => {
           <>
             <div className={eventListStyles.search_form_wrapper}>
               <SearchForm
-                onCancelTagModal={() => setSelectedTags([])}
+                onClear={() => setSelectedTags([])}
                 value={searchWord || ''}
                 onChange={(e) => setSearchWord(e.currentTarget.value)}
                 onClickButton={() =>
@@ -516,17 +560,20 @@ const EventList = () => {
                     </div>
                   ))}
                 </div>
-              ) : (
+              ) : !isLoadingEvents ? (
                 <p className={eventListStyles.no_result_text}>
                   検索結果が見つかりませんでした
                 </p>
-              )}
+              ) : null}
             </div>
           </>
         )}
       </div>
       <div className={eventListStyles.pagination_wrapper}>
-        {!isCalendar && events && events.pageCount ? (
+        {typeof window !== 'undefined' &&
+        !isCalendar &&
+        events &&
+        events.pageCount ? (
           <ReactPaginate
             pageCount={events.pageCount}
             onPageChange={({ selected }) => {

@@ -83,7 +83,7 @@ const initialEventValue = {
   endAt: setDateTime(1, 21, 0),
   type: EventType.STUDY_MEETING,
   imageURL: '',
-  chatNeeded: true,
+  chatNeeded: false,
   hostUsers: [],
   tags: [],
   files: [],
@@ -105,8 +105,6 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
     values: newEvent,
     handleSubmit: onFinish,
     setValues: setNewEvent,
-    resetForm,
-    initialValues,
     validateForm,
   } = useFormik<CreateEventRequest | Required<EventSchedule>>({
     initialValues: event ? event : initialEventValue,
@@ -192,7 +190,6 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
         url: f,
       }));
       createEvent({ ...newEvent, files: linkedFiles });
-      resetForm({ values: initialValues });
       setNewFiles([]);
       dispatchCrop({ type: 'resetImage', value: 'resetImage' });
     },
@@ -301,7 +298,7 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
       className={createEventModalStyle.modal}>
       <TagModal
         onComplete={closeTagModal}
-        onCancel={() => {
+        onClear={() => {
           setNewEvent((e) => ({ ...e, tags: [] }));
           closeTagModal();
         }}
@@ -450,11 +447,10 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
                 <FormLabel>
                   チャットルームの作成(作成後に変更することはできません)
                 </FormLabel>
-                <RadioGroup defaultValue={'unneeded'}>
+                <RadioGroup ml={1} defaultValue={'unneeded'}>
                   <Stack spacing={5} direction="row">
                     <Radio
                       colorScheme="green"
-                      background="white"
                       value="needed"
                       onChange={() =>
                         setNewEvent((v) => ({ ...v, chatNeeded: true }))
@@ -463,7 +459,6 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
                     </Radio>
                     <Radio
                       colorScheme="green"
-                      background="white"
                       value="unneeded"
                       onChange={() =>
                         setNewEvent((v) => ({ ...v, chatNeeded: false }))

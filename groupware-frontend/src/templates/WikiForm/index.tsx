@@ -25,7 +25,7 @@ import {
   Text,
 } from '@chakra-ui/react';
 import { useAuthenticate } from 'src/contexts/useAuthenticate';
-import { ContentState, convertFromHTML, Editor, EditorState } from 'draft-js';
+import { Editor, EditorState } from 'draft-js';
 import { stateToHTML } from 'draft-js-export-html';
 import WrappedEditor from '@/components/wiki/WrappedEditor';
 import MarkdownEditor from 'react-markdown-editor-lite';
@@ -35,6 +35,7 @@ import { uploadStorage } from '@/hooks/api/storage/useAPIUploadStorage';
 import { tagColorFactory } from 'src/utils/factory/tagColorFactory';
 import { useFormik } from 'formik';
 import { wikiSchema } from 'src/utils/validation/schema';
+import { stateFromHTML } from 'draft-js-import-html';
 
 type WikiFormProps = {
   wiki?: Wiki;
@@ -60,12 +61,15 @@ const WikiForm: React.FC<WikiFormProps> = ({
     EditorState.createEmpty(),
   );
   const [activeTab, setActiveTab] = useState<TabName>(TabName.EDIT);
-  const initialValues: Partial<Wiki> = {
+  const initialValues: Partial<Wiki> = wiki || {
     title: '',
     body: '',
     tags: [],
+    type: type || WikiType.QA,
+    ruleCategory: type ? RuleCategory.RULES : undefined,
     textFormat: 'html',
   };
+  const draftJsEmptyError = '入力必須です';
   const {
     values: newQuestion,
     setValues: setNewQuestion,
@@ -73,6 +77,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
     touched,
     handleSubmit,
   } = useFormik({
+    enableReinitialize: true,
     initialValues,
     validationSchema: wikiSchema,
     onSubmit: (q) => {
@@ -178,30 +183,21 @@ const WikiForm: React.FC<WikiFormProps> = ({
   };
 
   useEffect(() => {
-    setNewQuestion((q) => ({
-      ...q,
-      type: type || WikiType.QA,
-      ruleCategory: type === WikiType.RULES ? RuleCategory.RULES : undefined,
-    }));
-  }, [setNewQuestion, type]);
-
-  useEffect(() => {
     if (wiki) {
-      setNewQuestion(wiki);
       if (wiki.textFormat === 'html') {
-        setEditorState((e) =>
-          EditorState.push(
-            e,
-            ContentState.createFromBlockArray(
-              convertFromHTML(wiki.body).contentBlocks,
-              convertFromHTML(wiki.body).entityMap,
-            ),
-            'apply-entity',
-          ),
-        );
+        setEditorState(EditorState.createWithContent(stateFromHTML(wiki.body)));
       }
     }
-  }, [setNewQuestion, wiki]);
+  }, [wiki]);
+
+  useEffect(() => {
+    if (editorState) {
+      setNewQuestion((q) => ({
+        ...q,
+        body: stateToHTML(editorState.getCurrentContent()),
+      }));
+    }
+  }, [editorState, setNewQuestion, wiki]);
 
   useEffect(() => {
     formTopRef.current?.scrollIntoView();
@@ -225,7 +221,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
           selectedTags={newQuestion.tags ? newQuestion.tags : []}
           toggleTag={toggleTag}
           onComplete={() => setTagModal(false)}
-          onCancel={() => {
+          onClear={() => {
             setNewQuestion((q) => ({ ...q, tags: [] }));
             setTagModal(false);
           }}
@@ -264,10 +260,14 @@ const WikiForm: React.FC<WikiFormProps> = ({
                     : WikiType.QA
                 }
                 onChange={(e) => {
-                  if (e.target.value === (WikiType.KNOWLEDGE || WikiType.QA)) {
+                  if (
+                    e.target.value === WikiType.KNOWLEDGE ||
+                    e.target.value === WikiType.QA
+                  ) {
                     setNewQuestion((prev) => ({
                       ...prev,
                       type: e.target.value as WikiType,
+                      ruleCategory: undefined,
                     }));
                     return;
                   }
@@ -348,6 +348,9 @@ const WikiForm: React.FC<WikiFormProps> = ({
             ))}
           </div>
         ) : null}
+        {touched.body && !editorState.getCurrentContent().hasText() ? (
+          <Text color="tomato">{draftJsEmptyError}</Text>
+        ) : null}
         {errors.body && touched.body ? (
           <Text color="tomato">{errors.body}</Text>
         ) : null}
@@ -358,7 +361,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
                 width: isSmallerThan768 ? '90vw' : '80vw',
                 maxWidth: '1980px',
               }}
-              placeholder="質問内容を入力して下さい"
+              placeholder="質問内容を入力して下さい(空白のみは不可)"
               editorRef={draftEditor}
               editorState={editorState}
               setEditorState={setEditorState}
@@ -373,7 +376,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
               height: '80vh',
               marginBottom: 40,
             }}
-            placeholder="質問内容を入力して下さい"
+            placeholder="質問内容を入力して下さい(空白のみは不可)"
             editorRef={editorRef}
             onImageUpload={handleImageUpload}
             plugins={liteEditorPlugins}

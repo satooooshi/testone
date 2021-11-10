@@ -26,7 +26,7 @@ import { useAPIUpdateEvent } from '@/hooks/api/event/useAPIUpdateEvent';
 import Image from 'next/image';
 import noImage from '@/public/no-image.jpg';
 import { useHeaderTab } from '@/hooks/headerTab/useHeaderTab';
-import { EventType, SubmissionFile, UserRole } from 'src/types';
+import { EventSchedule, EventType, SubmissionFile, UserRole } from 'src/types';
 import { useAPIDownloadEventCsv } from '@/hooks/api/event/useAPIDownloadEventCsv';
 import { useAPIUploadStorage } from '@/hooks/api/storage/useAPIUploadStorage';
 import { useAPISaveSubmission } from '@/hooks/api/event/useAPISaveSubmission';
@@ -43,7 +43,7 @@ import { useAPISaveUserJoiningEvent } from '@/hooks/api/event/useAPISaveUserJoin
 import { userNameFactory } from 'src/utils/factory/userNameFactory';
 import { tagColorFactory } from 'src/utils/factory/tagColorFactory';
 import { useAPICancelEvent } from '@/hooks/api/event/useAPICancelEvent';
-import coachImage from '@/public/coach_1.jpg';
+import coachImage from '@/public/coach_1.jpeg';
 import { eventTypeColorFactory } from 'src/utils/factory/eventTypeColorFactory';
 import eventTypeNameFactory from 'src/utils/factory/eventTypeNameFactory';
 
@@ -80,7 +80,7 @@ const EventDetail = () => {
   const [commentVisible, setCommentVisible] = useState(false);
   const [newComment, setNewComment] = useState<string>('');
   const { user } = useAuthenticate();
-  const { data, refetch } = useAPIGetEventDetail(id);
+  const { data, refetch, isLoading } = useAPIGetEventDetail(id);
   const submissionRef = useRef<HTMLInputElement | null>(null);
   const toast = useToast();
   const [submitFiles, setSubmitFiles] = useState<
@@ -147,7 +147,19 @@ const EventDetail = () => {
     },
   });
 
-  const { mutate: joinEvent } = useAPIJoinEvent({ onSuccess: () => refetch() });
+  const { mutate: joinEvent } = useAPIJoinEvent({
+    onSuccess: () => refetch(),
+    onError: (err) => {
+      if (err.response?.data?.message) {
+        toast({
+          description: err.response?.data?.message,
+          status: 'error',
+          duration: 3000,
+          isClosable: true,
+        });
+      }
+    },
+  });
   const { mutate: cancelEvent } = useAPICancelEvent({
     onSuccess: () => refetch(),
   });
@@ -182,10 +194,32 @@ const EventDetail = () => {
       refetch();
     },
   });
+
+  const handleCreateComment = () => {
+    if (newComment.length > 500) {
+      toast({
+        description: 'コメントは500文字以内で入力してください',
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      });
+      return;
+    }
+    createComment({
+      body: newComment,
+      eventSchedule: data,
+    });
+  };
   const isCommonUser = user?.role === UserRole.COMMON;
   const isAdminUser = user?.role === UserRole.ADMIN;
 
   const isEditable = useMemo(() => {
+    const isAuthor = (event: EventSchedule) => {
+      if (event?.author?.id === user?.id) {
+        return true;
+      }
+      return false;
+    };
     const isEditableEvent = (type: EventType): boolean => {
       switch (type) {
         case EventType.IMPRESSIVE_UNIVERSITY:
@@ -209,11 +243,16 @@ const EventDetail = () => {
           return user?.role === UserRole.ADMIN;
       }
     };
-    return data?.type ? isEditableEvent(data?.type) : false;
-  }, [data?.type, user?.role]);
+    if (data) {
+      return data?.type ? isEditableEvent(data?.type) : isAuthor(data);
+    }
+    return false;
+  }, [data, user?.id, user?.role]);
+
+  const doesntExist = !isLoading && (!data || !data?.id);
 
   const tabs: Tab[] = useHeaderTab(
-    user?.role === UserRole.ADMIN && data
+    user?.role === UserRole.ADMIN && !doesntExist
       ? {
           headerTabType: 'adminEventDetail',
           onDeleteClicked,
@@ -247,7 +286,7 @@ const EventDetail = () => {
     <LayoutWithTab
       sidebar={{ activeScreenName: SidebarScreenName.EVENT }}
       header={initialHeaderValue}>
-      {!data || !data?.id ? (
+      {doesntExist ? (
         <div>
           <Text>このイベントは存在しないか、権限がありません。</Text>
         </div>
@@ -451,10 +490,7 @@ const EventDetail = () => {
                       colorScheme="teal"
                       onClick={() => {
                         commentVisible && newComment
-                          ? createComment({
-                              body: newComment,
-                              eventSchedule: data,
-                            })
+                          ? handleCreateComment()
                           : setCommentVisible(true);
                       }}>
                       {commentVisible ? 'コメントを投稿する' : 'コメントを追加'}
@@ -532,7 +568,15 @@ const EventDetail = () => {
                           return;
                         }
                         for (let i = 0; i < files.length; i++) {
-                          fileArr.push(files[i]);
+                          const renamedFile = new File(
+                            [files[i]],
+                            userNameFactory(user) + ' ' + files[i].name,
+                            {
+                              type: files[i].type,
+                              lastModified: files[i].lastModified,
+                            },
+                          );
+                          fileArr.push(renamedFile);
                         }
                         uploadStorage(fileArr);
                       }}

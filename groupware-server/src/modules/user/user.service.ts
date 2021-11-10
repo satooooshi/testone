@@ -17,6 +17,7 @@ import { Parser } from 'json2csv';
 import { SearchQueryToGetUsers } from './user.controller';
 import { Tag, TagType } from 'src/entities/tag.entity';
 import { StorageService } from '../storage/storage.service';
+import { DateTime } from 'luxon';
 
 @Injectable()
 export class UserService {
@@ -227,12 +228,16 @@ export class UserService {
     if (duration === 'month') {
       fromDate = new Date();
       fromDate.setDate(1);
-      fromDate.setHours(0, 0, 0, 0);
+      fromDate = DateTime.fromJSDate(fromDate)
+        .set({ hour: 0, minute: 0, second: 0 })
+        .toJSDate();
     }
     if (duration === 'week') {
       fromDate = new Date();
-      fromDate.setDate(-7);
-      fromDate.setHours(0, 0, 0, 0);
+      fromDate = DateTime.fromJSDate(fromDate)
+        .minus({ days: 7 })
+        .set({ hour: 0, minute: 0, second: 0 })
+        .toJSDate();
     }
     const toDate = new Date();
     const limit = 20;
@@ -414,7 +419,8 @@ export class UserService {
 
   async getUsers(): Promise<User[]> {
     const users = await this.userRepository.find();
-    return users;
+    const urlParsedUsers = this.generateSignedStorageURLsFromUserArr(users);
+    return urlParsedUsers;
   }
 
   async getById(id: number) {
@@ -425,12 +431,14 @@ export class UserService {
     if (!user.verifiedAt) {
       throw new BadRequestException('The user is not verified');
     }
-    return user;
+    const urlParsedUser = await this.generateSignedStorageURLsFromUserObj(user);
+    return urlParsedUser;
   }
 
   async getByIdArr(ids: number[]): Promise<User[]> {
     const user = await this.userRepository.findByIds(ids);
-    return user;
+    const urlParsedUser = await this.generateSignedStorageURLsFromUserArr(user);
+    return urlParsedUser;
   }
 
   async getAllInfoById(id: number): Promise<User> {
@@ -461,7 +469,11 @@ export class UserService {
           'email',
           'lastName',
           'firstName',
-          'introduce',
+          'introduceTech',
+          'introduceQualification',
+          'introduceClub',
+          'introduceHobby',
+          'introduceOther',
           'password',
           'refreshedPassword',
           'role',
@@ -476,6 +488,7 @@ export class UserService {
         where: { email },
       });
     }
+    user = await this.generateSignedStorageURLsFromUserObj(user);
     if (user) {
       return user;
     }
@@ -490,7 +503,10 @@ export class UserService {
     }
     const newUser = this.userRepository.create(userData);
     await this.userRepository.save(newUser);
-    return newUser;
+    const urlParsedUser = await this.generateSignedStorageURLsFromUserObj(
+      newUser,
+    );
+    return urlParsedUser;
   }
 
   async registerUsers(userData: User[]) {
@@ -500,7 +516,10 @@ export class UserService {
       usersArr.push({ ...u, password: hashedPassword, verifiedAt: new Date() });
     }
     const newUsers = await this.userRepository.save(usersArr);
-    return newUsers;
+    const urlParsedUser = await this.generateSignedStorageURLsFromUserArr(
+      newUsers,
+    );
+    return urlParsedUser;
   }
 
   async saveUser(newUserProfile: Partial<User>): Promise<User> {
@@ -519,7 +538,10 @@ export class UserService {
       avatarUrl: parsedAvatarURL,
     };
     const updatedUser = await this.userRepository.save(newUserObj);
-    return updatedUser;
+    const urlParsedUser = await this.generateSignedStorageURLsFromUserObj(
+      updatedUser,
+    );
+    return urlParsedUser;
   }
 
   async updatePassword(

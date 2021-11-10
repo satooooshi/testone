@@ -1,6 +1,12 @@
 import LayoutWithTab from '@/components/layout/LayoutWithTab';
 import { SidebarScreenName } from '@/components/layout/Sidebar';
-import React, { useCallback, useMemo, useReducer, useRef } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useReducer,
+  useRef,
+  useState,
+} from 'react';
 import { Tab } from 'src/types/header/tab/types';
 import Head from 'next/head';
 import Image from 'next/image';
@@ -8,10 +14,12 @@ import { TagType, User, UserRole, UserTag } from 'src/types';
 import { useAPIUploadStorage } from '@/hooks/api/storage/useAPIUploadStorage';
 import { useDropzone } from 'react-dropzone';
 import {
+  Box,
   Button,
   FormControl,
   FormLabel,
   Input,
+  Progress,
   Select,
   Textarea,
   useToast,
@@ -20,7 +28,6 @@ import { imageExtensions } from 'src/utils/imageExtensions';
 import noImage from '@/public/no-image.jpg';
 import { useAPIRegister } from '@/hooks/api/auth/useAPIRegister';
 import createNewUserStyles from '@/styles/layouts/admin/CreateNewUser.module.scss';
-import clsx from 'clsx';
 import { toggleTag } from 'src/utils/toggleTag';
 import TagModal from '@/components/common/TagModal';
 import { useAPIGetUserTag } from '@/hooks/api/tag/useAPIGetUserTag';
@@ -31,8 +38,10 @@ import ReactCrop from 'react-image-crop';
 import { dataURLToFile } from 'src/utils/dataURLToFile';
 import { useImageCrop } from '@/hooks/crop/useImageCrop';
 import { useHeaderTab } from '@/hooks/headerTab/useHeaderTab';
-import { tagColorFactory } from 'src/utils/factory/tagColorFactory';
 import { userRoleNameFactory } from 'src/utils/factory/userRoleNameFactory';
+import FormToLinkTag from '@/components/FormToLinkTag';
+import { useRouter } from 'next/router';
+import { useAuthenticate } from 'src/contexts/useAuthenticate';
 
 type ModalState = {
   isOpen: boolean;
@@ -46,21 +55,25 @@ type ModalAction = {
 const CreateNewUser = () => {
   const toast = useToast();
   const { data: tags } = useAPIGetUserTag();
-  const initialUserValues: Partial<User> = useMemo(
-    () => ({
-      email: '',
-      lastName: '',
-      firstName: '',
-      password: '',
-      role: UserRole.COMMON,
-      avatarUrl: '',
-      employeeId: '',
-      introduce: '',
-      verifiedAt: new Date(),
-      tags: [],
-    }),
-    [],
-  );
+  const router = useRouter();
+  const { user } = useAuthenticate();
+  const [loadingUserRole, setLoadingUserRole] = useState(true);
+  const initialUserValues: Partial<User> = {
+    email: '',
+    lastName: '',
+    firstName: '',
+    password: '',
+    role: UserRole.COMMON,
+    avatarUrl: '',
+    employeeId: '',
+    introduceOther: '',
+    introduceTech: '',
+    introduceClub: '',
+    introduceHobby: '',
+    introduceQualification: '',
+    verifiedAt: new Date(),
+    tags: [],
+  };
   const {
     errors,
     touched,
@@ -200,6 +213,18 @@ const CreateNewUser = () => {
     }));
   };
 
+  useEffect(() => {
+    if (user?.role !== UserRole.ADMIN) {
+      router.back();
+      return;
+    }
+    setLoadingUserRole(false);
+  }, [user, router]);
+
+  if (loadingUserRole) {
+    return <Progress isIndeterminate size="lg" />;
+  }
+
   return (
     <LayoutWithTab
       sidebar={{
@@ -221,7 +246,7 @@ const CreateNewUser = () => {
           selectedTags={values.tags || []}
           filteredTagType={filteredTagType}
           toggleTag={toggleSelectedTag}
-          onCancel={() => {
+          onClear={() => {
             dispatchModal({ type: 'close' });
           }}
           onComplete={() => dispatchModal({ type: 'close' })}
@@ -244,6 +269,7 @@ const CreateNewUser = () => {
                 })
               }
               onImageLoaded={onLoad}
+              circularCrop={true}
             />
           ) : (
             <div
@@ -251,11 +277,13 @@ const CreateNewUser = () => {
                 className: createNewUserStyles.image_dropzone,
               })}>
               <input {...getEventImageInputProps()} />
-              <Image
-                className={createNewUserStyles.avatar}
-                src={noImage}
-                alt="アバター画像"
-              />
+              <div className={createNewUserStyles.next_image_wrapper}>
+                <Image
+                  className={createNewUserStyles.avatar}
+                  src={noImage}
+                  alt="アバター画像"
+                />
+              </div>
             </div>
           )}
         </div>
@@ -386,130 +414,97 @@ const CreateNewUser = () => {
               onBlur={handleBlur}
             />
           </FormControl>
-          <FormControl className={createNewUserStyles.input_wrapper}>
-            <FormLabel fontWeight={'bold'}>
-              <p>自己紹介</p>
-              {errors.introduce && touched.introduce ? (
-                <p className={validationErrorStyles.error_text}>
-                  {errors.introduce}
-                </p>
-              ) : null}
-            </FormLabel>
+          <FormControl mb={4}>
+            <FormLabel fontWeight={'bold'}>自己紹介</FormLabel>
             <Textarea
+              placeholder="自己紹介を入力してください"
               type="text"
-              height="40"
-              value={values.introduce}
+              height="10"
+              value={values.introduceOther}
               background="white"
-              name="introduce"
+              name="introduceOther"
               onChange={handleChange}
-              onBlur={handleBlur}
             />
           </FormControl>
-          <FormControl
-            className={clsx(
-              createNewUserStyles.input_wrapper,
-              createNewUserStyles.edit_tags_button_wrapper,
-            )}>
-            <Button
-              size="sm"
-              colorScheme="teal"
-              onClick={() => {
-                dispatchModal({ type: 'openTech' });
-              }}>
-              技術を編集
-            </Button>
+
+          <Box mb={2} w={'100%'}>
+            <FormToLinkTag
+              tags={values?.tags || []}
+              tagType={TagType.TECH}
+              onEditButtonClick={() => dispatchModal({ type: 'openTech' })}
+            />
+          </Box>
+          <FormControl mb={6}>
+            <FormLabel fontWeight={'bold'}>技術の紹介</FormLabel>
+            <Textarea
+              placeholder="技術についての紹介を入力してください"
+              type="text"
+              height="10"
+              background="white"
+              value={values.introduceTech}
+              name="introduceTech"
+              onChange={handleChange}
+            />
           </FormControl>
-          <div className={createNewUserStyles.selected_tags_wrapper}>
-            {values.tags
-              ?.filter((t) => t.type === TagType.TECH)
-              .map((t) => (
-                <Button
-                  key={t.id}
-                  size="xs"
-                  colorScheme={tagColorFactory(t.type)}
-                  className={createNewUserStyles.selected_tag_item}>
-                  {t.name}
-                </Button>
-              ))}
-          </div>
-          <FormControl
-            className={clsx(
-              createNewUserStyles.input_wrapper,
-              createNewUserStyles.edit_tags_button_wrapper,
-            )}>
-            <Button
-              size="sm"
-              colorScheme="blue"
-              onClick={() => dispatchModal({ type: 'openQualification' })}>
-              資格を編集
-            </Button>
+          <Box mb={2} w={'100%'}>
+            <FormToLinkTag
+              tags={values?.tags || []}
+              tagType={TagType.QUALIFICATION}
+              onEditButtonClick={() =>
+                dispatchModal({ type: 'openQualification' })
+              }
+            />
+          </Box>
+          <FormControl mb={6}>
+            <FormLabel fontWeight={'bold'}>資格の紹介</FormLabel>
+            <Textarea
+              type="text"
+              placeholder="資格についての紹介を入力してください"
+              height="10"
+              value={values.introduceQualification}
+              background="white"
+              name="introduceQualification"
+              onChange={handleChange}
+            />
           </FormControl>
-          <div className={createNewUserStyles.selected_tags_wrapper}>
-            {values.tags
-              ?.filter((t) => t.type === TagType.QUALIFICATION)
-              .map((t) => (
-                <Button
-                  key={t.id}
-                  size="xs"
-                  colorScheme={tagColorFactory(t.type)}
-                  className={createNewUserStyles.selected_tag_item}
-                  height="28px">
-                  {t.name}
-                </Button>
-              ))}
-          </div>
-          <FormControl
-            className={clsx(
-              createNewUserStyles.input_wrapper,
-              createNewUserStyles.edit_tags_button_wrapper,
-            )}>
-            <Button
-              size="sm"
-              colorScheme="green"
-              onClick={() => dispatchModal({ type: 'openClub' })}>
-              部活動を編集
-            </Button>
+          <Box mb={2} w={'100%'}>
+            <FormToLinkTag
+              tags={values?.tags || []}
+              tagType={TagType.CLUB}
+              onEditButtonClick={() => dispatchModal({ type: 'openClub' })}
+            />
+          </Box>
+          <FormControl mb={6}>
+            <FormLabel fontWeight={'bold'}>部活動の紹介</FormLabel>
+            <Textarea
+              type="text"
+              placeholder="部活動についての紹介を入力してください"
+              height="10"
+              value={values.introduceClub}
+              background="white"
+              name="introduceClub"
+              onChange={handleChange}
+            />
           </FormControl>
-          <div className={createNewUserStyles.selected_tags_wrapper}>
-            {values.tags
-              ?.filter((t) => t.type === TagType.CLUB)
-              .map((t) => (
-                <Button
-                  key={t.id}
-                  size="xs"
-                  colorScheme={tagColorFactory(t.type)}
-                  className={createNewUserStyles.selected_tag_item}
-                  height="28px">
-                  {t.name}
-                </Button>
-              ))}
-          </div>
-          <FormControl
-            className={clsx(
-              createNewUserStyles.input_wrapper,
-              createNewUserStyles.edit_tags_button_wrapper,
-            )}>
-            <Button
-              size="sm"
-              colorScheme="pink"
-              onClick={() => dispatchModal({ type: 'openHobby' })}>
-              趣味を編集
-            </Button>
+          <Box mb={2} w={'100%'}>
+            <FormToLinkTag
+              tags={values?.tags || []}
+              tagType={TagType.HOBBY}
+              onEditButtonClick={() => dispatchModal({ type: 'openHobby' })}
+            />
+          </Box>
+          <FormControl mb={8}>
+            <FormLabel fontWeight={'bold'}>趣味の紹介</FormLabel>
+            <Textarea
+              placeholder="趣味についての紹介を入力してください"
+              type="text"
+              height="10"
+              value={values.introduceHobby}
+              background="white"
+              name="introduceHobby"
+              onChange={handleChange}
+            />
           </FormControl>
-          <div className={createNewUserStyles.selected_tags_wrapper}>
-            {values.tags
-              ?.filter((t) => t.type === TagType.HOBBY)
-              .map((t) => (
-                <Button
-                  key={t.id}
-                  size="xs"
-                  colorScheme={tagColorFactory(t.type)}
-                  className={createNewUserStyles.selected_tag_item}
-                  height="28px">
-                  {t.name}
-                </Button>
-              ))}
-          </div>
         </div>
       </div>
       <div className={createNewUserStyles.finish_button_wrapper}>

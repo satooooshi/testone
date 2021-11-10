@@ -192,7 +192,7 @@ const headerTab = (headerTabBehavior: HeaderTabBehavior): Tab[] => {
         {
           type: 'link',
           name: '社内Wiki Home',
-          href: '/qa/wiki',
+          href: '/wiki',
         },
       ];
     case 'admin':

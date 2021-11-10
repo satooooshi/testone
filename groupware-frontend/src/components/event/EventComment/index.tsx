@@ -1,9 +1,9 @@
 import { User } from 'src/types';
 import eventCommentStyles from '@/styles/components/EventComment.module.scss';
 import { dateTimeFormatterFromJSDDate } from 'src/utils/dateTimeFormatter';
-import { Avatar } from 'react-rainbow-components';
 import Link from 'next/link';
 import boldMascot from '@/public/bold-mascot.png';
+import { Avatar } from '@chakra-ui/react';
 
 type EventCommentCardProps = {
   body: string;

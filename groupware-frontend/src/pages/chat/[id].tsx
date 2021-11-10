@@ -2,7 +2,7 @@ import { SidebarScreenName } from '@/components/layout/Sidebar';
 import chatStyles from '@/styles/layouts/Chat.module.scss';
 import { IoSend } from 'react-icons/io5';
 import { useChatReducer } from '@/hooks/chat/useChatReducer';
-import { useModalReducer } from '@/hooks/chat/useModalReducer';
+import { MenuValue, useModalReducer } from '@/hooks/chat/useModalReducer';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { useAPIGetUsers } from '@/hooks/api/user/useAPIGetUsers';
 import { ChatGroup, ChatMessageType, User } from 'src/types';
@@ -10,12 +10,10 @@ import { useAPIGetChatGroupList } from '@/hooks/api/chat/useAPIGetChatGroupList'
 import { useAPIGetMessages } from '@/hooks/api/chat/useAPIGetMessages';
 import { useAPISendChatMessage } from '@/hooks/api/chat/useAPISendChatMessage';
 import CreateChatGroupModal from '@/components/chat/CreateChatGroupModal';
-import { Avatar, useMediaQuery } from '@chakra-ui/react';
+import { Avatar, useMediaQuery, useToast } from '@chakra-ui/react';
 import { convertToRaw, EditorState } from 'draft-js';
 import Editor from '@draft-js-plugins/editor';
-import createMentionPlugin, {
-  defaultSuggestionsFilter,
-} from '@draft-js-plugins/mention';
+import createMentionPlugin from '@draft-js-plugins/mention';
 import { MentionData } from '@draft-js-plugins/mention';
 import '@draft-js-plugins/mention/lib/plugin.css';
 import { draftToMarkdown } from 'markdown-draft-js';
@@ -42,83 +40,8 @@ import ChatMessageItem from '@/components/chat/ChatMessageItem';
 import { useAPILeaveChatRoom } from '@/hooks/api/chat/useAPILeaveChatRoomURL';
 import { useMention } from '@/hooks/chat/useMention';
 
-type MentionState = {
-  suggestions: MentionData[];
-  allMentionUserData: MentionData[];
-  popup: boolean;
-  mentionedUserData: MentionData[];
-};
-
-type MenuValue = 'editGroup' | 'editMembers' | 'leaveRoom';
-
-type MentionAction =
-  | {
-      type: 'popup';
-      value: boolean;
-    }
-  | {
-      type: 'suggestions';
-      value: string;
-    }
-  | {
-      type: 'allMentionUserData';
-      value?: User[];
-    }
-  | {
-      type: 'mentionedUserData';
-      value: MentionData;
-    };
-
-const mentionReducer = (
-  state: MentionState,
-  action: MentionAction,
-): MentionState => {
-  switch (action.type) {
-    case 'popup': {
-      return {
-        ...state,
-        popup: action.value,
-      };
-    }
-    case 'suggestions': {
-      return {
-        ...state,
-        suggestions: defaultSuggestionsFilter(
-          action.value,
-          state.allMentionUserData,
-        ),
-      };
-    }
-    case 'allMentionUserData': {
-      return action.value?.length
-        ? {
-            ...state,
-            allMentionUserData: action.value.map((u) => ({
-              id: u.id,
-              name: u.lastName + ' ' + u.firstName,
-              avatar: u.avatarUrl,
-            })),
-          }
-        : {
-            ...state,
-          };
-    }
-    case 'mentionedUserData': {
-      return !state.mentionedUserData.filter(
-        (prev) => prev.id === action.value.id,
-      ).length
-        ? {
-            ...state,
-            mentionedUserData: [...state.mentionedUserData, action.value],
-          }
-        : {
-            ...state,
-          };
-    }
-  }
-};
-
 const ChatDetail = () => {
+  const toast = useToast();
   const router = useRouter();
   const { id } = router.query as { id: string };
   const [{ popup, suggestions, mentionedUserData }, dispatchMention] =
@@ -160,8 +83,17 @@ const ChatDetail = () => {
   const { mutate: createGroup } = useAPISaveChatGroup({
     onSuccess: () => {
       dispatchModal({ type: 'createGroupWindow', value: false });
-      dispatchChat({ type: 'newGroup', value: { ...newGroup, members: [] } });
+      dispatchChat({
+        type: 'newGroup',
+        value: { ...newGroup, name: '', members: [] },
+      });
       refetchGroups();
+      toast({
+        description: 'チャットルームの作成が完了しました。',
+        status: 'success',
+        duration: 3000,
+        isClosable: true,
+      });
     },
   });
 

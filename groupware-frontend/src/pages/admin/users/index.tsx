@@ -7,7 +7,7 @@ import userAdminStyles from '@/styles/layouts/UserAdmin.module.scss';
 import { Tag, User, UserRole } from 'src/types';
 import { useAPIUpdateUser } from '@/hooks/api/user/useAPIUpdateUser';
 import { useAPIDeleteUser } from '@/hooks/api/user/useAPIDeleteUser';
-import { Avatar, Button, Select } from '@chakra-ui/react';
+import { Avatar, Button, Progress, Select, Text } from '@chakra-ui/react';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
 import { useAuthenticate } from 'src/contexts/useAuthenticate';
@@ -18,7 +18,8 @@ import {
 import SearchForm from '@/components/common/SearchForm';
 import { toggleTag } from 'src/utils/toggleTag';
 import paginationStyles from '@/styles/components/Pagination.module.scss';
-import ReactPaginate from 'react-paginate';
+import dynamic from 'next/dynamic';
+const ReactPaginate = dynamic(() => import('react-paginate'), { ssr: false });
 import { searchUserQueryParamFactory } from 'src/utils/userQueryRefresh';
 import { useAPIGetUserTag } from '@/hooks/api/tag/useAPIGetUserTag';
 import { useHeaderTab } from '@/hooks/headerTab/useHeaderTab';
@@ -29,15 +30,16 @@ const UserAdmin: React.FC = () => {
   const router = useRouter();
   const query = router.query as SearchQueryToGetUsers;
   const { data: tags } = useAPIGetUserTag();
-  const [searchWord, setSearchWord] = useState('');
+  const [searchWord, setSearchWord] = useState(query.word);
   const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
-  const { data: users, refetch } = useAPISearchUsers(query);
+  const { data: users, refetch, isLoading } = useAPISearchUsers(query);
   const { user } = useAuthenticate();
   const { mutate: updateUser } = useAPIUpdateUser({
     onSuccess: () => {
       refetch();
     },
   });
+  const [loadingUserRole, setLoadingUserRole] = useState(true);
 
   const onToggleTag = (t: Tag) => {
     setSelectedTags((s) => toggleTag(s, t));
@@ -78,8 +80,24 @@ const UserAdmin: React.FC = () => {
   useEffect(() => {
     if (user?.role !== UserRole.ADMIN) {
       router.back();
+      return;
     }
+    setLoadingUserRole(false);
   }, [user, router]);
+
+  useEffect(() => {
+    if (tags) {
+      const tagParam = query.tag || '';
+      const tagsInQueryParams = tagParam.split(' ');
+      const searchedTags =
+        tags.filter((t) => tagsInQueryParams.includes(t.id.toString())) || [];
+      setSelectedTags(searchedTags);
+    }
+  }, [query.tag, tags]);
+
+  if (loadingUserRole) {
+    return <Progress isIndeterminate size="lg" />;
+  }
 
   return (
     <LayoutWithTab
@@ -94,7 +112,7 @@ const UserAdmin: React.FC = () => {
       </Head>
       <div className={userAdminStyles.search_form_wrapper}>
         <SearchForm
-          onCancelTagModal={() => setSelectedTags([])}
+          onClear={() => setSelectedTags([])}
           value={searchWord || ''}
           onChange={(e) => setSearchWord(e.currentTarget.value)}
           onClickButton={() => queryRefresh({ page: '1', word: searchWord })}
@@ -102,6 +120,11 @@ const UserAdmin: React.FC = () => {
           selectedTags={selectedTags}
           toggleTag={onToggleTag}
         />
+        {!isLoading && !users?.users.length && (
+          <Text alignItems="center" textAlign="center" mb={4}>
+            検索結果が見つかりませんでした
+          </Text>
+        )}
       </div>
       <div className={userAdminStyles.table_wrapper}>
         <table className={userAdminStyles.table}>
@@ -183,7 +206,7 @@ const UserAdmin: React.FC = () => {
           </tbody>
         </table>
       </div>
-      {users && users.pageCount ? (
+      {typeof window !== 'undefined' && users && users.pageCount ? (
         <div className={paginationStyles.pagination_wrap_layout}>
           <ReactPaginate
             pageCount={users.pageCount}

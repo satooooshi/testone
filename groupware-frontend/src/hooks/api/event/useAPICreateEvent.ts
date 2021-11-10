@@ -1,4 +1,5 @@
 import { CreateEventRequest } from '@/components/event/CreateEventModal';
+import { AxiosError } from 'axios';
 import { useMutation, UseMutationOptions } from 'react-query';
 import { EventSchedule } from 'src/types';
 import { axiosInstance } from 'src/utils/url';
@@ -17,12 +18,12 @@ const createEvent = async (
 export const useAPICreateEvent = (
   mutationOptions?: UseMutationOptions<
     EventSchedule,
-    Error,
+    AxiosError,
     CreateEventRequest,
     unknown
   >,
 ) => {
-  return useMutation<EventSchedule, Error, CreateEventRequest>(
+  return useMutation<EventSchedule, AxiosError, CreateEventRequest>(
     createEvent,
     mutationOptions,
   );
