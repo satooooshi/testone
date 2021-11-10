@@ -11,3 +11,15 @@ export type UserAdminProps = {
   navigation: UserAdminNavigationProps;
   route: UserAdminRouteProps;
 };
+type UserRegisteringAdminNavigationProps = StackNavigationProp<
+  RootStackParamList,
+  'UserRegisteringAdmin'
+>;
+type UserRegisteringAdminRouteProps = RouteProp<
+  RootStackParamList,
+  'UserRegisteringAdmin'
+>;
+export type UserRegisteringAdminProps = {
+  navigation: UserRegisteringAdminNavigationProps;
+  route: UserRegisteringAdminRouteProps;
+};

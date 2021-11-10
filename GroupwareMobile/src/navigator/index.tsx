@@ -10,6 +10,7 @@ import Profile from '../screens/account/Profile';
 import UpdatePassword from '../screens/account/UpdatePassword';
 import EventDetail from '../screens/event/EventDetail';
 import WikiDetail from '../screens/wiki/WikiDetail';
+import UserRegisteringAdmin from '../screens/admin/UserRegisteringAdmin';
 
 const Stack = createStackNavigator<RootStackParamList>();
 
@@ -51,6 +52,11 @@ const Navigator = () => {
         <Stack.Screen
           name="WikiDetail"
           component={WikiDetail}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name="UserRegisteringAdmin"
+          component={UserRegisteringAdmin}
           options={{headerShown: false}}
         />
       </Stack.Navigator>

@@ -18,6 +18,7 @@ import Profile from '../../screens/account/Profile';
 import UpdatePassword from '../../screens/account/UpdatePassword';
 import UserList from '../../screens/UserList';
 import UserAdmin from '../../screens/admin/UserAdmin';
+import UserRegisteringAdmin from '../../screens/admin/UserRegisteringAdmin';
 
 const Drawer = createDrawerNavigator();
 const Stack = createStackNavigator();
@@ -103,6 +104,11 @@ const AdminStack = () => (
     <Stack.Screen
       name="AccountDetail"
       component={AccountDetail}
+      options={{headerShown: false}}
+    />
+    <Stack.Screen
+      name="UserRegisteringAdmin"
+      component={UserRegisteringAdmin}
       options={{headerShown: false}}
     />
   </Stack.Navigator>
