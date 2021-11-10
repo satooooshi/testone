@@ -107,16 +107,14 @@ const QuestionDetail = () => {
       isBody === 'answer'
         ? stateToHTML(answerEditorState.getCurrentContent())
         : stateToHTML(answerReplyEditorState.getCurrentContent());
-    const removeHTMLBody = editorBody.replace(/(<([^>]+)>)/gi, '');
+    const isTextExist =
+      editorBody.replace(/<("[^"]*"|'[^']*'|[^'">])*>|&nbsp;|\s|\n/g, '')
+        .length === 0;
 
-    if (
-      (isBody === 'answer' && answerVisible && removeHTMLBody === '') ||
-      (isBody === 'reply' && removeHTMLBody === '')
-    ) {
-      const messages =
-        (isBody === 'answer' ? '回答' : '返信') + 'を記入してください';
+    if (answerVisible && isTextExist) {
       toast({
-        description: messages,
+        description:
+          (isBody === 'answer' ? '回答' : '返信') + 'を記入してください',
         status: 'error',
         duration: 3000,
         isClosable: true,
