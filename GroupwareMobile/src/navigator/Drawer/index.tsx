@@ -16,6 +16,7 @@ import {Icon} from 'react-native-magnus';
 import AccountDetail from '../../screens/account/AccountDetail';
 import Profile from '../../screens/account/Profile';
 import UpdatePassword from '../../screens/account/UpdatePassword';
+import UserList from '../../screens/UserList';
 
 const Drawer = createDrawerNavigator();
 const Stack = createStackNavigator();
@@ -76,6 +77,21 @@ const AccountStack = () => (
   </Stack.Navigator>
 );
 
+const UserListStack = () => (
+  <Stack.Navigator initialRouteName="UserList">
+    <Stack.Screen
+      name="UserList"
+      component={UserList}
+      options={{headerShown: false}}
+    />
+    <Stack.Screen
+      name="AccountDetail"
+      component={AccountDetail}
+      options={{headerShown: false}}
+    />
+  </Stack.Navigator>
+);
+
 const DrawerTab = () => {
   return (
     <Drawer.Navigator
@@ -116,6 +132,21 @@ const DrawerTab = () => {
           drawerLabel: '社内Wiki',
           drawerIcon: ({color}) => (
             <Ionicons name="globe-outline" color={color} size={26} />
+          ),
+        }}
+      />
+      <Drawer.Screen
+        name="Users"
+        component={UserListStack}
+        options={{
+          drawerLabel: '社員名鑑',
+          drawerIcon: ({color}) => (
+            <Icon
+              name="users"
+              fontFamily="FontAwesome5"
+              color={color}
+              fontSize={21}
+            />
           ),
         }}
       />
