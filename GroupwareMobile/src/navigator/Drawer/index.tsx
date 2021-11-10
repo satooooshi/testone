@@ -17,6 +17,7 @@ import AccountDetail from '../../screens/account/AccountDetail';
 import Profile from '../../screens/account/Profile';
 import UpdatePassword from '../../screens/account/UpdatePassword';
 import UserList from '../../screens/UserList';
+import UserAdmin from '../../screens/admin/UserAdmin';
 
 const Drawer = createDrawerNavigator();
 const Stack = createStackNavigator();
@@ -92,6 +93,21 @@ const UserListStack = () => (
   </Stack.Navigator>
 );
 
+const AdminStack = () => (
+  <Stack.Navigator initialRouteName="UserAdmin">
+    <Stack.Screen
+      name="UserAdmin"
+      component={UserAdmin}
+      options={{headerShown: false}}
+    />
+    <Stack.Screen
+      name="AccountDetail"
+      component={AccountDetail}
+      options={{headerShown: false}}
+    />
+  </Stack.Navigator>
+);
+
 const DrawerTab = () => {
   return (
     <Drawer.Navigator
@@ -155,6 +171,21 @@ const DrawerTab = () => {
         component={AccountStack}
         options={{
           drawerLabel: 'アカウント',
+          drawerIcon: ({color}) => (
+            <Icon
+              name="user-alt"
+              fontFamily="FontAwesome5"
+              color={color}
+              fontSize={26}
+            />
+          ),
+        }}
+      />
+      <Drawer.Screen
+        name="Admin"
+        component={AdminStack}
+        options={{
+          drawerLabel: '管理',
           drawerIcon: ({color}) => (
             <Icon
               name="user-alt"

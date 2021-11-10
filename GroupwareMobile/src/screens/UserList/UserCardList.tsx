@@ -143,6 +143,7 @@ const UserCardList: React.FC<UserCardListProps> = ({
         <FlatList
           data={searchResult.users}
           contentContainerStyle={userListStyles.flatlist}
+          keyExtractor={item => item.id.toString()}
           renderItem={({item: u}) => (
             <Div mb={'lg'}>
               <UserCard
