@@ -1,10 +1,5 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {
-  Alert,
-  FlatList,
-  TouchableOpacity,
-  useWindowDimensions,
-} from 'react-native';
+import {Alert, FlatList, TouchableOpacity} from 'react-native';
 import {Text, Div, Image, Icon, Dropdown} from 'react-native-magnus';
 import DropdownOpenerButton from '../../../components/common/DropdownOpenerButton';
 import SearchForm from '../../../components/common/SearchForm';
@@ -81,7 +76,7 @@ const UserAdmin: React.FC<UserAdminProps> = ({navigation}) => {
     },
     {
       name: 'ユーザー作成',
-      onPress: () => {},
+      onPress: () => navigation.navigate('UserRegisteringAdmin'),
     },
     {
       name: 'タグ管理',
