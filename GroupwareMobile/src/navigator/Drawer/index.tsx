@@ -16,6 +16,9 @@ import {Icon} from 'react-native-magnus';
 import AccountDetail from '../../screens/account/AccountDetail';
 import Profile from '../../screens/account/Profile';
 import UpdatePassword from '../../screens/account/UpdatePassword';
+import UserList from '../../screens/UserList';
+import UserAdmin from '../../screens/admin/UserAdmin';
+import UserRegisteringAdmin from '../../screens/admin/UserRegisteringAdmin';
 
 const Drawer = createDrawerNavigator();
 const Stack = createStackNavigator();
@@ -76,6 +79,41 @@ const AccountStack = () => (
   </Stack.Navigator>
 );
 
+const UserListStack = () => (
+  <Stack.Navigator initialRouteName="UserList">
+    <Stack.Screen
+      name="UserList"
+      component={UserList}
+      options={{headerShown: false}}
+    />
+    <Stack.Screen
+      name="AccountDetail"
+      component={AccountDetail}
+      options={{headerShown: false}}
+    />
+  </Stack.Navigator>
+);
+
+const AdminStack = () => (
+  <Stack.Navigator initialRouteName="UserAdmin">
+    <Stack.Screen
+      name="UserAdmin"
+      component={UserAdmin}
+      options={{headerShown: false}}
+    />
+    <Stack.Screen
+      name="AccountDetail"
+      component={AccountDetail}
+      options={{headerShown: false}}
+    />
+    <Stack.Screen
+      name="UserRegisteringAdmin"
+      component={UserRegisteringAdmin}
+      options={{headerShown: false}}
+    />
+  </Stack.Navigator>
+);
+
 const DrawerTab = () => {
   return (
     <Drawer.Navigator
@@ -120,10 +158,40 @@ const DrawerTab = () => {
         }}
       />
       <Drawer.Screen
+        name="Users"
+        component={UserListStack}
+        options={{
+          drawerLabel: '社員名鑑',
+          drawerIcon: ({color}) => (
+            <Icon
+              name="users"
+              fontFamily="FontAwesome5"
+              color={color}
+              fontSize={21}
+            />
+          ),
+        }}
+      />
+      <Drawer.Screen
         name="Account"
         component={AccountStack}
         options={{
           drawerLabel: 'アカウント',
+          drawerIcon: ({color}) => (
+            <Icon
+              name="user-alt"
+              fontFamily="FontAwesome5"
+              color={color}
+              fontSize={26}
+            />
+          ),
+        }}
+      />
+      <Drawer.Screen
+        name="Admin"
+        component={AdminStack}
+        options={{
+          drawerLabel: '管理',
           drawerIcon: ({color}) => (
             <Icon
               name="user-alt"

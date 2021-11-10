@@ -28,4 +28,7 @@ export type RootStackParamList = {
     | undefined;
   Profile: undefined;
   UpdatePassword: undefined;
+  UserList: undefined;
+  UserAdmin: undefined;
+  UserRegisteringAdmin: undefined;
 };

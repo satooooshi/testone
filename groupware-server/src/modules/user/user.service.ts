@@ -247,7 +247,7 @@ export class UserService {
     const tagIDs = tag.split(' ');
     const [users, count] = await this.userRepository
       .createQueryBuilder('user')
-      .leftJoinAndSelect('user.tags', 'tag')
+      .leftJoin('user.tags', 'tag')
       .where(
         word && word.length !== 1
           ? 'MATCH(user.firstName, user.lastName, user.email) AGAINST (:word IN NATURAL LANGUAGE MODE)'

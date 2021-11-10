@@ -1,5 +1,5 @@
 import React, {useMemo} from 'react';
-import {Text, Div, Button} from 'react-native-magnus';
+import {Text, Div, Button, Icon} from 'react-native-magnus';
 import {darkFontColor, blueColor} from '../../utils/colors';
 import FastImage from 'react-native-fast-image';
 import {FlatList, TouchableOpacity} from 'react-native';
@@ -19,6 +19,7 @@ export type AppHeaderProps = {
   tabs?: Tab[];
   rightButtonName?: string;
   onPressRightButton?: () => void;
+  enableBackButton?: boolean;
 };
 
 const AppHeader: React.FC<AppHeaderProps> = ({
@@ -27,6 +28,7 @@ const AppHeader: React.FC<AppHeaderProps> = ({
   tabs,
   rightButtonName,
   onPressRightButton,
+  enableBackButton = false,
 }) => {
   const navigation = useNavigation();
   const boolToDisplayRightButton = useMemo(() => {
@@ -42,6 +44,11 @@ const AppHeader: React.FC<AppHeaderProps> = ({
         row
         justifyContent="space-between">
         <Div h="100%" row alignItems="center">
+          {enableBackButton && (
+            <TouchableOpacity onPress={() => navigation.goBack()}>
+              <Icon name="left" fontSize={26} mr={4} />
+            </TouchableOpacity>
+          )}
           <TouchableOpacity
             onPress={() => navigation.dispatch(DrawerActions.toggleDrawer())}>
             <Ionicons name="menu-outline" size={26} />
