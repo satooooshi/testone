@@ -2,7 +2,7 @@ import React from 'react';
 import {FlatList, TouchableOpacity, useWindowDimensions} from 'react-native';
 import {Image, Text, Div, Avatar, Icon, Tag} from 'react-native-magnus';
 import {useTagType} from '../../../hooks/tag/useTagType';
-import {wikiCardStyles} from '../../../styles/component/wiki/wikiCard.style';
+import {userCardStyles} from '../../../styles/component/user/userCard.style';
 import {TagType, User} from '../../../types';
 import {grayColor, darkFontColor} from '../../../utils/colors';
 import {tagTypeNameFactory} from '../../../utils/factory/tag/tagTypeNameFactory';
@@ -27,13 +27,8 @@ const UserCard: React.FC<UserCardProps> = ({user, onPress}) => {
 
   return (
     <TouchableOpacity onPress={onPress}>
-      <Div
-        px="xs"
-        bg={grayColor}
-        w={windowWidth * 0.9}
-        rounded="md"
-        shadow="md">
-        <Div justifyContent="space-between" flexDir="row">
+      <Div bg={grayColor} w={windowWidth * 0.9} rounded="md" shadow="md">
+        <Div px="xs" justifyContent="space-between" flexDir="row">
           {user.avatarUrl ? (
             <Image
               source={{uri: user.avatarUrl}}
@@ -100,13 +95,13 @@ const UserCard: React.FC<UserCardProps> = ({user, onPress}) => {
             </Div>
           </Div>
         </Div>
-        <Div mb={'xs'} flexDir="row" alignItems="center">
+        <Div pl="xs" mb={'xs'} flexDir="row" alignItems="center">
           <Text w={'13%'} fontSize={14}>{`${tagTypeNameFactory(
             TagType.TECH,
           )}:`}</Text>
           {techTags?.length ? (
             <FlatList
-              style={wikiCardStyles.tagList}
+              style={userCardStyles.tagList}
               horizontal
               data={techTags}
               renderItem={({item: t}) => (
@@ -135,13 +130,13 @@ const UserCard: React.FC<UserCardProps> = ({user, onPress}) => {
             </Tag>
           )}
         </Div>
-        <Div mb={'xs'} flexDir="row" alignItems="center">
+        <Div pl="xs" mb={'xs'} flexDir="row" alignItems="center">
           <Text w={'13%'} fontSize={14}>{`${tagTypeNameFactory(
             TagType.QUALIFICATION,
           )}:`}</Text>
           {qualificationTags?.length ? (
             <FlatList
-              style={wikiCardStyles.tagList}
+              style={userCardStyles.tagList}
               horizontal
               data={qualificationTags}
               renderItem={({item: t}) => (
@@ -170,13 +165,13 @@ const UserCard: React.FC<UserCardProps> = ({user, onPress}) => {
             </Tag>
           )}
         </Div>
-        <Div mb={'xs'} flexDir="row" alignItems="center">
+        <Div pl="xs" mb={'xs'} flexDir="row" alignItems="center">
           <Text w={'13%'} fontSize={14}>{`${tagTypeNameFactory(
             TagType.CLUB,
           )}:`}</Text>
           {clubTags?.length ? (
             <FlatList
-              style={wikiCardStyles.tagList}
+              style={userCardStyles.tagList}
               horizontal
               data={clubTags}
               renderItem={({item: t}) => (
@@ -205,13 +200,13 @@ const UserCard: React.FC<UserCardProps> = ({user, onPress}) => {
             </Tag>
           )}
         </Div>
-        <Div mb={'xs'} flexDir="row" alignItems="center">
+        <Div pl="xs" mb={'xs'} flexDir="row" alignItems="center">
           <Text w={'13%'} fontSize={14}>{`${tagTypeNameFactory(
             TagType.HOBBY,
           )}:`}</Text>
           {hobbyTags?.length ? (
             <FlatList
-              style={wikiCardStyles.tagList}
+              style={userCardStyles.tagList}
               horizontal
               data={hobbyTags}
               renderItem={({item: t}) => (
