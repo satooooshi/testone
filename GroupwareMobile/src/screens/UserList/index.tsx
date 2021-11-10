@@ -1,5 +1,5 @@
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import SearchForm from '../../components/common/SearchForm';
 import SearchFormOpenerButton from '../../components/common/SearchForm/SearchFormOpenerButton';
 import AppHeader from '../../components/Header';
@@ -31,19 +31,28 @@ const UserList: React.FC<UserListProps> = ({navigation}) => {
     UserRole.INTERNAL_INSTRUCTOR,
     UserRole.EXTERNAL_INSTRUCTOR,
   ];
+  const [selectedTags, setSelectedTags] = useState<UserTag[]>([]);
   const queryRefresh = (
     query: Partial<SearchQueryToGetUsers>,
-    selectedTags?: UserTag[],
+    selected?: UserTag[],
   ) => {
-    const selectedTagIDs = selectedTags?.map(t => t.id.toString());
+    const selectedTagIDs = selected?.map(t => t.id.toString());
     const tagQuery = selectedTagIDs?.join('+');
 
     setSearchQuery(q => ({...q, ...query, tag: tagQuery || ''}));
   };
 
+  useEffect(() => {
+    const tagIDs = searchQuery.tag?.split('+') || [];
+    if (tags?.length && tagIDs.length) {
+      setSelectedTags(tags.filter(t => tagIDs.includes(t.id.toString())));
+    }
+  }, [searchQuery.tag, tags]);
+
   return (
     <WholeContainer>
       <SearchForm
+        defaultValue={{word: '', selectedTags}}
         isVisible={visibleSearchFormModal}
         onCloseModal={() => setVisibleSearchFormModal(false)}
         tags={tags || []}

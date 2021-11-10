@@ -148,6 +148,9 @@ const UserCardList: React.FC<UserCardListProps> = ({
               <UserCard
                 filteredDuration={searchQuery.duration}
                 onPress={() => navigation.navigate('AccountDetail', {id: u.id})}
+                onPressTag={tag =>
+                  setSearchQuery(q => ({...q, tag: tag.id.toString()}))
+                }
                 user={u}
               />
             </Div>

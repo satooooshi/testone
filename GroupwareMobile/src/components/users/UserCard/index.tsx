@@ -3,7 +3,7 @@ import {FlatList, TouchableOpacity, useWindowDimensions} from 'react-native';
 import {Image, Text, Div, Avatar, Icon, Tag} from 'react-native-magnus';
 import {useTagType} from '../../../hooks/tag/useTagType';
 import {userCardStyles} from '../../../styles/component/user/userCard.style';
-import {TagType, User} from '../../../types';
+import {TagType, User, UserTag} from '../../../types';
 import {grayColor, darkFontColor} from '../../../utils/colors';
 import {tagTypeNameFactory} from '../../../utils/factory/tag/tagTypeNameFactory';
 import {tagColorFactory} from '../../../utils/factory/tagColorFactory';
@@ -12,12 +12,14 @@ import {userNameFactory} from '../../../utils/factory/userNameFactory';
 type UserCardProps = {
   user: User;
   onPress: () => void;
+  onPressTag: (tag: UserTag) => void;
   filteredDuration: 'week' | 'month' | undefined;
 };
 
 const UserCard: React.FC<UserCardProps> = ({
   user,
   onPress,
+  onPressTag,
   filteredDuration,
 }) => {
   const {width: windowWidth} = useWindowDimensions();
@@ -120,17 +122,16 @@ const UserCard: React.FC<UserCardProps> = ({
               horizontal
               data={techTags}
               renderItem={({item: t}) => (
-                <TouchableOpacity>
-                  <Tag
-                    fontSize={'lg'}
-                    h={28}
-                    py={0}
-                    bg={tagColorFactory(t.type)}
-                    color="white"
-                    mr={4}>
-                    {t.name}
-                  </Tag>
-                </TouchableOpacity>
+                <Tag
+                  onPress={() => onPressTag(t)}
+                  fontSize={'lg'}
+                  h={28}
+                  py={0}
+                  bg={tagColorFactory(t.type)}
+                  color="white"
+                  mr={4}>
+                  {t.name}
+                </Tag>
               )}
             />
           ) : (
@@ -155,17 +156,16 @@ const UserCard: React.FC<UserCardProps> = ({
               horizontal
               data={qualificationTags}
               renderItem={({item: t}) => (
-                <TouchableOpacity>
-                  <Tag
-                    fontSize={'lg'}
-                    h={28}
-                    py={0}
-                    bg={tagColorFactory(t.type)}
-                    color="white"
-                    mr={4}>
-                    {t.name}
-                  </Tag>
-                </TouchableOpacity>
+                <Tag
+                  onPress={() => onPressTag(t)}
+                  fontSize={'lg'}
+                  h={28}
+                  py={0}
+                  bg={tagColorFactory(t.type)}
+                  color="white"
+                  mr={4}>
+                  {t.name}
+                </Tag>
               )}
             />
           ) : (
@@ -190,17 +190,16 @@ const UserCard: React.FC<UserCardProps> = ({
               horizontal
               data={clubTags}
               renderItem={({item: t}) => (
-                <TouchableOpacity>
-                  <Tag
-                    fontSize={'lg'}
-                    h={28}
-                    py={0}
-                    bg={tagColorFactory(t.type)}
-                    color="white"
-                    mr={4}>
-                    {t.name}
-                  </Tag>
-                </TouchableOpacity>
+                <Tag
+                  onPress={() => onPressTag(t)}
+                  fontSize={'lg'}
+                  h={28}
+                  py={0}
+                  bg={tagColorFactory(t.type)}
+                  color="white"
+                  mr={4}>
+                  {t.name}
+                </Tag>
               )}
             />
           ) : (
@@ -225,17 +224,16 @@ const UserCard: React.FC<UserCardProps> = ({
               horizontal
               data={hobbyTags}
               renderItem={({item: t}) => (
-                <TouchableOpacity>
-                  <Tag
-                    fontSize={'lg'}
-                    h={28}
-                    py={0}
-                    bg={tagColorFactory(t.type)}
-                    color="white"
-                    mr={4}>
-                    {t.name}
-                  </Tag>
-                </TouchableOpacity>
+                <Tag
+                  onPress={() => onPressTag(t)}
+                  fontSize={'lg'}
+                  h={28}
+                  py={0}
+                  bg={tagColorFactory(t.type)}
+                  color="white"
+                  mr={4}>
+                  {t.name}
+                </Tag>
               )}
             />
           ) : (
