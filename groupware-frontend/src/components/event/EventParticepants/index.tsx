@@ -25,6 +25,10 @@ const EventParticipants: React.FC<EventParticipantsProps> = ({
 }) => {
   const [allVisible, setAllVisible] = useState(false);
   const { user } = useAuthenticate();
+  const participantsExceptCanceled = userJoiningEvent.filter(
+    (uje) => uje.canceledAt === null,
+  );
+
   const lateMinutesText = (v: number) => {
     if (!v) {
       return '遅刻を記録';
@@ -46,7 +50,7 @@ const EventParticipants: React.FC<EventParticipantsProps> = ({
         <p className={eventParticipantsStyles.participant_list_title}>
           参加者一覧
         </p>
-        {!allVisible && userJoiningEvent && userJoiningEvent.length > 15 ? (
+        {!allVisible && participantsExceptCanceled.length > 15 ? (
           <button
             className={eventParticipantsStyles.see_all_text}
             onClick={() => setAllVisible(true)}>
@@ -54,7 +58,7 @@ const EventParticipants: React.FC<EventParticipantsProps> = ({
           </button>
         ) : null}
       </div>
-      {!userJoiningEvent?.length && (
+      {!participantsExceptCanceled?.length && (
         <div className={eventParticipantsStyles.participant_name_wrapper}>
           <a className={eventParticipantsStyles.user_info_wrapper}>
             <p className={eventParticipantsStyles.participant_name}>
@@ -63,7 +67,7 @@ const EventParticipants: React.FC<EventParticipantsProps> = ({
           </a>
         </div>
       )}
-      {userJoiningEvent?.map((u, index) =>
+      {participantsExceptCanceled?.map((u, index) =>
         index <= 15 || allVisible ? (
           u.user.existence ? (
             <div className={eventParticipantsStyles.participant_name_wrapper}>
