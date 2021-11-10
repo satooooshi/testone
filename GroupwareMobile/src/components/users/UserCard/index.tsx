@@ -12,11 +12,15 @@ import {userNameFactory} from '../../../utils/factory/userNameFactory';
 type UserCardProps = {
   user: User;
   onPress: () => void;
+  filteredDuration: 'week' | 'month' | undefined;
 };
 
-const UserCard: React.FC<UserCardProps> = ({user, onPress}) => {
+const UserCard: React.FC<UserCardProps> = ({
+  user,
+  onPress,
+  filteredDuration,
+}) => {
   const {width: windowWidth} = useWindowDimensions();
-  console.log(user.tags);
   const {filteredTags: techTags} = useTagType(TagType.TECH, user?.tags || []);
   const {filteredTags: qualificationTags} = useTagType(
     TagType.QUALIFICATION,
@@ -24,6 +28,17 @@ const UserCard: React.FC<UserCardProps> = ({user, onPress}) => {
   );
   const {filteredTags: clubTags} = useTagType(TagType.CLUB, user?.tags || []);
   const {filteredTags: hobbyTags} = useTagType(TagType.HOBBY, user?.tags || []);
+
+  const durationText = () => {
+    switch (filteredDuration) {
+      case 'week':
+        return '(週間)';
+      case 'month':
+        return '(月間)';
+      default:
+        return '';
+    }
+  };
 
   return (
     <TouchableOpacity onPress={onPress}>
@@ -55,40 +70,40 @@ const UserCard: React.FC<UserCardProps> = ({user, onPress}) => {
             </Text>
             <Div
               flexDir="row"
-              w={'60%'}
+              w={'80%'}
               justifyContent="space-between"
               alignItems="center">
-              <Text fontSize={14}>イベント参加数</Text>
+              <Text fontSize={14}>イベント参加数{durationText()}</Text>
               <Text color="blue700" fontWeight="bold" fontSize={18}>
                 {user.eventCount || 0}
               </Text>
             </Div>
             <Div
               flexDir="row"
-              w={'60%'}
+              w={'80%'}
               justifyContent="space-between"
               alignItems="center">
-              <Text fontSize={14}>質問数</Text>
+              <Text fontSize={14}>質問数{durationText()}</Text>
               <Text color="blue700" fontWeight="bold" fontSize={18}>
                 {user.questionCount || 0}
               </Text>
             </Div>
             <Div
               flexDir="row"
-              w={'60%'}
+              w={'80%'}
               justifyContent="space-between"
               alignItems="center">
-              <Text fontSize={14}>質問回答数</Text>
+              <Text fontSize={14}>質問回答数{durationText()}</Text>
               <Text color="blue700" fontWeight="bold" fontSize={18}>
                 {user.answerCount || 0}
               </Text>
             </Div>
             <Div
               flexDir="row"
-              w={'60%'}
+              w={'80%'}
               justifyContent="space-between"
               alignItems="center">
-              <Text fontSize={14}>ナレッジ投稿数</Text>
+              <Text fontSize={14}>ナレッジ投稿数{durationText()}</Text>
               <Text color="blue700" fontWeight="bold" fontSize={18}>
                 {user.knowledgeCount || 0}
               </Text>
