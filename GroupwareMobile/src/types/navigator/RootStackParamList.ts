@@ -32,4 +32,5 @@ export type RootStackParamList = {
   UserAdmin: undefined;
   UserRegisteringAdmin: undefined;
   TagAdmin: undefined;
+  UserTagAdmin: undefined;
 };

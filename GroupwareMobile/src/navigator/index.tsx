@@ -12,6 +12,7 @@ import EventDetail from '../screens/event/EventDetail';
 import WikiDetail from '../screens/wiki/WikiDetail';
 import UserRegisteringAdmin from '../screens/admin/UserRegisteringAdmin';
 import TagAdmin from '../screens/admin/TagAdmin';
+import UserTagAdmin from '../screens/admin/UserTagAdmin';
 
 const Stack = createStackNavigator<RootStackParamList>();
 
@@ -63,6 +64,11 @@ const Navigator = () => {
         <Stack.Screen
           name="TagAdmin"
           component={TagAdmin}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name="UserTagAdmin"
+          component={UserTagAdmin}
           options={{headerShown: false}}
         />
       </Stack.Navigator>

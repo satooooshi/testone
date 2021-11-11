@@ -78,13 +78,15 @@ const TagCollapse: React.FC<TagCollapseProps> = ({
               bg={'white'}
               color="green700"
               borderColor="green700"
-              onPress={() =>
+              onPress={() => {
                 onPressSaveButton({
                   ...tagEditted,
                   name: newTagName,
                   type: tagEditted.type,
-                })
-              }
+                });
+                setNewTagName('');
+                setTagEditted(undefined);
+              }}
               borderWidth={1}>
               保存
             </Button>
@@ -108,7 +110,10 @@ const TagCollapse: React.FC<TagCollapseProps> = ({
             bg={'white'}
             color="green700"
             borderColor="green700"
-            onPress={() => onPressSaveButton({name: newTagName, type: tagType})}
+            onPress={() => {
+              onPressSaveButton({name: newTagName, type: tagType});
+              setNewTagName('');
+            }}
             borderWidth={1}>
             新規追加
           </Button>

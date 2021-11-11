@@ -116,7 +116,7 @@ const UserRegisteringAdmin: React.FC<UserRegisteringAdminProps> = ({
     },
     {
       name: 'タグ管理(ユーザー)',
-      onPress: () => {},
+      onPress: () => navigation.navigate('UserRegisteringAdmin'),
     },
     {
       name: 'CSV出力',
