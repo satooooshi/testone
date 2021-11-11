@@ -80,7 +80,7 @@ const UserAdmin: React.FC<UserAdminProps> = ({navigation}) => {
     },
     {
       name: 'タグ管理',
-      onPress: () => {},
+      onPress: () => navigation.navigate('TagAdmin'),
     },
     {
       name: 'タグ管理(ユーザー)',

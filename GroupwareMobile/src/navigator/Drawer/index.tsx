@@ -19,6 +19,7 @@ import UpdatePassword from '../../screens/account/UpdatePassword';
 import UserList from '../../screens/UserList';
 import UserAdmin from '../../screens/admin/UserAdmin';
 import UserRegisteringAdmin from '../../screens/admin/UserRegisteringAdmin';
+import TagAdmin from '../../screens/admin/TagAdmin';
 
 const Drawer = createDrawerNavigator();
 const Stack = createStackNavigator();
@@ -109,6 +110,11 @@ const AdminStack = () => (
     <Stack.Screen
       name="UserRegisteringAdmin"
       component={UserRegisteringAdmin}
+      options={{headerShown: false}}
+    />
+    <Stack.Screen
+      name="TagAdmin"
+      component={TagAdmin}
       options={{headerShown: false}}
     />
   </Stack.Navigator>
