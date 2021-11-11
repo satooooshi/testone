@@ -32,3 +32,12 @@ export type TagAdminProps = {
   navigation: TagAdminNavigationProps;
   route: TagAdminRouteProps;
 };
+type UserTagAdminNavigationProps = StackNavigationProp<
+  RootStackParamList,
+  'UserTagAdmin'
+>;
+type UserTagAdminRouteProps = RouteProp<RootStackParamList, 'UserTagAdmin'>;
+export type UserTagAdminProps = {
+  navigation: UserTagAdminNavigationProps;
+  route: UserTagAdminRouteProps;
+};

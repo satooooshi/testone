@@ -4,22 +4,22 @@ import {ScrollDiv} from 'react-native-magnus';
 import TagCollapse from '../../../components/admin/TagCollapse';
 import AppHeader, {Tab} from '../../../components/Header';
 import WholeContainer from '../../../components/WholeContainer';
-import {useAPICreateTag} from '../../../hooks/api/tag/useAPICreateTag';
-import {useAPIDeleteTag} from '../../../hooks/api/tag/useAPIDeleteTag';
-import {useAPIGetTag} from '../../../hooks/api/tag/useAPIGetTag';
+import {useAPICreateUserTag} from '../../../hooks/api/tag/useAPICreateUesrTag';
+import {useAPIDeleteUserTag} from '../../../hooks/api/tag/useAPIDelteUserTag';
+import {useAPIGetUserTag} from '../../../hooks/api/tag/useAPIGetUserTag';
 import {useTagType} from '../../../hooks/tag/useTagType';
 import {tagAdminStyles} from '../../../styles/screen/admin/tagAdmin.style';
-import {Tag, TagType} from '../../../types';
+import {TagType, UserTag} from '../../../types';
 import {TagAdminProps} from '../../../types/navigator/screenProps/Admin';
 
-const TagAdmin: React.FC<TagAdminProps> = ({navigation}) => {
-  const {data: tags, refetch} = useAPIGetTag();
-  const {mutate: createTag} = useAPICreateTag({
+const UserTagAdmin: React.FC<TagAdminProps> = ({navigation}) => {
+  const {data: tags, refetch} = useAPIGetUserTag();
+  const {mutate: createTag} = useAPICreateUserTag({
     onSuccess: () => {
       refetch();
     },
   });
-  const {mutate: deleteTag} = useAPIDeleteTag({
+  const {mutate: deleteTag} = useAPIDeleteUserTag({
     onSuccess: () => {
       refetch();
     },
@@ -47,7 +47,7 @@ const TagAdmin: React.FC<TagAdminProps> = ({navigation}) => {
     const changedToKana = hiraToKana(changedToLowerCamel);
     return changedToKana;
   };
-  const modifiedTags: Tag[] =
+  const modifiedTags: UserTag[] =
     tags?.map(t => ({...t, name: modifyStrToFlat(t.name)})) || [];
 
   const tabs: Tab[] = [
@@ -61,11 +61,11 @@ const TagAdmin: React.FC<TagAdminProps> = ({navigation}) => {
     },
     {
       name: 'タグ管理',
-      onPress: () => {},
+      onPress: () => navigation.navigate('TagAdmin'),
     },
     {
       name: 'タグ管理(ユーザー)',
-      onPress: () => navigation.navigate('UserTagAdmin'),
+      onPress: () => {},
     },
     {
       name: 'CSV出力',
@@ -73,7 +73,7 @@ const TagAdmin: React.FC<TagAdminProps> = ({navigation}) => {
     },
   ];
 
-  const handleDelete = (t: Tag) => {
+  const handleDelete = (t: UserTag) => {
     if (t.name) {
       Alert.alert(`${t.name}を削除してよろしいですか？`, undefined, [
         {
@@ -88,7 +88,7 @@ const TagAdmin: React.FC<TagAdminProps> = ({navigation}) => {
     }
   };
 
-  const handleCreate = (t: Partial<Tag>) => {
+  const handleCreate = (t: Partial<UserTag>) => {
     if (!t.name) {
       return;
     }
@@ -108,7 +108,11 @@ const TagAdmin: React.FC<TagAdminProps> = ({navigation}) => {
 
   return (
     <WholeContainer>
-      <AppHeader title={'タグ管理'} tabs={tabs} activeTabName={'タグ管理'} />
+      <AppHeader
+        title={'タグ管理'}
+        tabs={tabs}
+        activeTabName={'タグ管理(ユーザー)'}
+      />
       <ScrollDiv
         contentContainerStyle={{
           ...tagAdminStyles.scrollView,
@@ -154,4 +158,4 @@ const TagAdmin: React.FC<TagAdminProps> = ({navigation}) => {
   );
 };
 
-export default TagAdmin;
+export default UserTagAdmin;
