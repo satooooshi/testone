@@ -6,9 +6,12 @@ import {
   IsOptional,
   IsString,
 } from 'class-validator';
-import { WikiType } from 'src/entities/wiki.entity';
+import { Wiki, WikiType } from 'src/entities/wiki.entity';
+import { User } from 'src/entities/user.entity';
 
-export class saveWikiDto {
+export class SaveWikiDto implements Partial<Wiki> {
+  id: number;
+  writer?: User;
   @isNotEmptyExceptTags({
     message: 'タイトルは必須項目です。空白のみは設定できません。',
   })
@@ -17,7 +20,7 @@ export class saveWikiDto {
 
   @IsNotEmpty({ message: 'タイプは必須項目です。' })
   @IsEnum(WikiType, { message: 'タイプのリクエストは列挙型に限られています。' })
-  type: string;
+  type: WikiType;
 
   @IsOptional()
   @IsArray({ message: 'タグのリクエストは配列型に限られています。' })
@@ -31,4 +34,4 @@ export class saveWikiDto {
   })
   body: string;
 }
-export default saveWikiDto;
+export default SaveWikiDto;
