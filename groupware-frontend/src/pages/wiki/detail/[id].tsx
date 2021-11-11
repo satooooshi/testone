@@ -109,9 +109,11 @@ const QuestionDetail = () => {
         : stateToHTML(answerReplyEditorState.getCurrentContent());
     const isTextExist =
       editorBody.replace(/<("[^"]*"|'[^']*'|[^'">])*>|&nbsp;|\s|\n/g, '')
-        .length === 0;
+        .length > 0;
 
-    if (answerVisible && isTextExist) {
+    if ((isBody === 'answer' && !answerVisible) || isTextExist) {
+      isBody === 'answer' ? handleClickSendAnswer() : handleClickSendReply();
+    } else {
       toast({
         description:
           (isBody === 'answer' ? '回答' : '返信') + 'を記入してください',
@@ -119,8 +121,6 @@ const QuestionDetail = () => {
         duration: 3000,
         isClosable: true,
       });
-    } else {
-      isBody === 'answer' ? handleClickSendAnswer() : handleClickSendReply();
     }
   };
 
