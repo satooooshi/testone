@@ -24,7 +24,6 @@ import WholeContainer from '../../../components/WholeContainer';
 import {useAPIRegister} from '../../../hooks/api/auth/useAPIRegister';
 import {useAPIUploadStorage} from '../../../hooks/api/storage/useAPIUploadStorage';
 import {useAPIGetUserTag} from '../../../hooks/api/tag/useAPIGetUserTag';
-import {useAPIUpdateUser} from '../../../hooks/api/user/useAPIUpdateUser';
 import {useSelectedTags} from '../../../hooks/tag/useSelectedTags';
 import {useTagType} from '../../../hooks/tag/useTagType';
 import {userRegisteringAdminStyles} from '../../../styles/screen/admin/userRegisteringAdmin.style';
@@ -113,7 +112,7 @@ const UserRegisteringAdmin: React.FC<UserRegisteringAdminProps> = ({
     },
     {
       name: 'タグ管理',
-      onPress: () => {},
+      onPress: () => navigation.navigate('TagAdmin'),
     },
     {
       name: 'タグ管理(ユーザー)',

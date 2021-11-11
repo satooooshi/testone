@@ -23,3 +23,12 @@ export type UserRegisteringAdminProps = {
   navigation: UserRegisteringAdminNavigationProps;
   route: UserRegisteringAdminRouteProps;
 };
+type TagAdminNavigationProps = StackNavigationProp<
+  RootStackParamList,
+  'TagAdmin'
+>;
+type TagAdminRouteProps = RouteProp<RootStackParamList, 'TagAdmin'>;
+export type TagAdminProps = {
+  navigation: TagAdminNavigationProps;
+  route: TagAdminRouteProps;
+};
