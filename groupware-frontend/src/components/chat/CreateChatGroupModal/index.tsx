@@ -14,6 +14,7 @@ import {
 import { useDropzone } from 'react-dropzone';
 import { imageExtensions } from 'src/utils/imageExtensions';
 import ReactCrop, { Crop } from 'react-image-crop';
+import { useFormik } from 'formik';
 import { getCroppedImageURL } from 'src/utils/getCroppedImageURL';
 import { useAPIUploadStorage } from '@/hooks/api/storage/useAPIUploadStorage';
 import { dataURLToFile } from 'src/utils/dataURLToFile';
@@ -73,6 +74,32 @@ const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
     imgRef.current = img;
   }, []);
 
+  // ---------------------------------------------------------------
+
+  const initialChatValues = {
+    name: '',
+    members: [],
+  };
+
+  // console.log(newGroup);
+  const {
+    values: test,
+    // setValues: setTest,
+    handleSubmit: onTest,
+    handleChange,
+    // validateForm,
+  } = useFormik<Partial<ChatGroup>>({
+    initialValues: initialChatValues,
+    enableReinitialize: true,
+    // validationSchema: profileSchema,
+    onSubmit: () => {
+      alert('test');
+      // handleUpdateUser();
+      // onFinish();
+    },
+  });
+  console.log(test);
+
   const onFinish = async () => {
     if (!newGroup.members?.length) {
       toast({
@@ -83,6 +110,8 @@ const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
       });
       return;
     }
+
+    // ---------------------------------------------------------------
     if (imgRef.current && completedCrop) {
       const img = getCroppedImageURL(imgRef.current, completedCrop);
       if (!img) {
@@ -107,9 +136,13 @@ const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
             <FormLabel>グループ名</FormLabel>
             <input
               type="text"
+              // 下記追加
+              name="name"
               className={selectUserModalStyles.modal_input_name}
-              value={newGroup.name}
-              onChange={(e) => onChangeNewGroupName(e.target.value)}
+              // value={newGroup.name}
+              value={test.name}
+              // onChange={(e) => onChangeNewGroupName(e.target.value)}
+              onChange={handleChange}
               placeholder="グループ名を入力して下さい"
             />
           </div>
@@ -223,7 +256,8 @@ const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
             width="140px"
             colorScheme="green"
             borderRadius={5}
-            onClick={onFinish}>
+            onClick={() => onTest()}>
+            {/* onClick={onFinish}> */}
             作成
           </Button>
         </div>
