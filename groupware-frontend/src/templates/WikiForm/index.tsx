@@ -118,6 +118,8 @@ const WikiForm: React.FC<WikiFormProps> = ({
         return '質問を編集';
       case WikiType.RULES:
         return '社内規則を編集';
+      case WikiType.ALL_POSTAL:
+        return 'オール便を編集';
       case WikiType.KNOWLEDGE:
         return 'ナレッジを編集';
       default:
@@ -126,11 +128,14 @@ const WikiForm: React.FC<WikiFormProps> = ({
   }, [wiki?.type]);
 
   const saveButtonName = useMemo(() => {
+    console.log(newQuestion.type);
     switch (newQuestion.type) {
       case WikiType.QA:
         return '質問';
       case WikiType.KNOWLEDGE:
         return 'ナレッジ';
+      case WikiType.ALL_POSTAL:
+        return 'オール便';
       case WikiType.RULES:
         switch (newQuestion.ruleCategory) {
           case RuleCategory.PHILOSOPHY:
@@ -262,7 +267,8 @@ const WikiForm: React.FC<WikiFormProps> = ({
                 onChange={(e) => {
                   if (
                     e.target.value === WikiType.KNOWLEDGE ||
-                    e.target.value === WikiType.QA
+                    e.target.value === WikiType.QA ||
+                    e.target.value === WikiType.ALL_POSTAL
                   ) {
                     setNewQuestion((prev) => ({
                       ...prev,
@@ -284,6 +290,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
                     <option value={RuleCategory.ABC}>ABC制度</option>
                     <option value={RuleCategory.BENEFITS}>福利厚生等</option>
                     <option value={RuleCategory.DOCUMENT}>各種申請書</option>
+                    <option value={WikiType.ALL_POSTAL}>オール便</option>
                   </>
                 )}
                 <option value={WikiType.KNOWLEDGE}>ナレッジ</option>
@@ -313,6 +320,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
                       setEditorState(EditorState.createEmpty());
                       setNewQuestion((prev) => ({
                         ...prev,
+                        body: '',
                         textFormat: e.target.value as TextFormat,
                       }));
                     }
