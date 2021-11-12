@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { TextFormat, User } from 'src/types';
 import qaCommentStyles from '@/styles/components/QAComment.module.scss';
 import { dateTimeFormatterFromJSDDate } from 'src/utils/dateTimeFormatter';
@@ -36,6 +36,7 @@ const WikiComment: React.FC<WikiCommentProps> = ({
   onClickBestAnswerButton,
 }) => {
   const mdParser = new MarkdownIt({ breaks: true });
+
   return (
     <>
       {date && writer && (

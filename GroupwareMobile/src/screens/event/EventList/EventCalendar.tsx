@@ -283,10 +283,12 @@ const EventCalendar: React.FC<PersonalCalendarProps> = ({
                   cellHeight={headerCellHeight}
                   allDayEvents={allDayEvents}
                   style={calendarStyles.container}
+                  activeDate={calendarMode.targetDate}
                 />
               )
             : undefined
         }
+        activeDate={calendarMode.targetDate}
         date={calendarMode.targetDate}
         events={memorizedEvent}
         mode={calendarMode.mode}
