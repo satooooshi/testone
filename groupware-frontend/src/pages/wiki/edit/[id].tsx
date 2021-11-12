@@ -23,7 +23,7 @@ const EditQuestion = () => {
       wiki && router.push('/wiki/detail/' + wiki.id);
     },
     onError: (e) => {
-      const messages = responseErrorMsgFactory(e?.response?.data.message);
+      const messages = responseErrorMsgFactory(e);
       toast({
         description: messages,
         status: 'error',

@@ -15,7 +15,7 @@ const CreateQA = () => {
       router.push('/wiki/list?page=1&tag=&word=&status=new&type=');
     },
     onError: (e) => {
-      const messages = responseErrorMsgFactory(e?.response?.data.message);
+      const messages = responseErrorMsgFactory(e);
       toast({
         description: messages,
         status: 'error',
