@@ -5976,6 +5976,11 @@ react-native-controlled-mentions@^2.2.5:
     diff "5.0.0"
     string.prototype.matchall "4.0.3"
 
+react-native-create-thumbnail@^1.4.1:
+  version "1.4.1"
+  resolved "https://registry.yarnpkg.com/react-native-create-thumbnail/-/react-native-create-thumbnail-1.4.1.tgz#bd5d6c23a73373602b6795901ac3f78ea4ad8a53"
+  integrity sha512-JcxVsoA5u53xilWn67AvRVVtqR8Pz21uCSBxwlmqeqByecsPw414eqrnbfD1NUy6CzBVJXYmyq3hljUUV0pGCw==
+
 react-native-document-picker@^7.1.1:
   version "7.1.1"
   resolved "https://registry.yarnpkg.com/react-native-document-picker/-/react-native-document-picker-7.1.1.tgz#87f573918eb46681d1a0be4292f3325c7feda5c2"
