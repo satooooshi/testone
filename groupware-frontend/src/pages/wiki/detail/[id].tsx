@@ -21,6 +21,7 @@ import {
   useMediaQuery,
   Link as ChakraLink,
   Flex,
+  useToast,
 } from '@chakra-ui/react';
 import WrappedDraftEditor from '@/components/wiki/WrappedDraftEditor';
 import { ContentState, Editor, EditorState } from 'draft-js';
@@ -39,6 +40,7 @@ type TOCHead = string[];
 
 const QuestionDetail = () => {
   const router = useRouter();
+  const toast = useToast();
 
   const { id } = router.query;
   const { user } = useAuthenticate();
@@ -116,7 +118,41 @@ const QuestionDetail = () => {
     }
   };
 
-  const handleClickSendReplyButton = () => {
+  const checkErrors = (isBody: string) => {
+    const editorBody =
+      isBody === 'answer'
+        ? stateToHTML(answerEditorState.getCurrentContent())
+        : stateToHTML(answerReplyEditorState.getCurrentContent());
+    const isTextExist =
+      editorBody.replace(/<("[^"]*"|'[^']*'|[^'">])*>|&nbsp;|\s|\n/g, '')
+        .length > 0;
+
+    if ((isBody === 'answer' && !answerVisible) || isTextExist)
+      return isBody === 'answer'
+        ? handleClickSendAnswer()
+        : handleClickSendReply();
+
+    toast({
+      description:
+        (isBody === 'answer' ? '回答' : '返信') + 'を記入してください',
+      status: 'error',
+      duration: 3000,
+      isClosable: true,
+    });
+  };
+
+  const handleClickSendAnswer = () => {
+    if (answerVisible && answerEditorState.getCurrentContent()) {
+      createAnswer({
+        textFormat: 'html',
+        body: stateToHTML(answerEditorState.getCurrentContent()),
+        wiki: wiki,
+      });
+    }
+    setAnswerVisible(true);
+  };
+
+  const handleClickSendReply = () => {
     if (answerReplyEditorState.getCurrentContent()) {
       createAnswerReply({
         ...answerReply,
@@ -285,15 +321,7 @@ const QuestionDetail = () => {
                 size="sm"
                 colorScheme="teal"
                 onClick={() => {
-                  answerVisible && answerEditorState.getCurrentContent()
-                    ? createAnswer({
-                        textFormat: 'html',
-                        body: stateToHTML(
-                          answerEditorState.getCurrentContent(),
-                        ),
-                        wiki: wiki,
-                      })
-                    : setAnswerVisible(true);
+                  checkErrors('answer');
                 }}>
                 {answerVisible ? '回答を投稿する' : '回答を追加'}
               </Button>
@@ -367,7 +395,7 @@ const QuestionDetail = () => {
                           colorScheme="orange"
                           width="24"
                           className={qaDetailStyles.reply_button}
-                          onClick={handleClickSendReplyButton}>
+                          onClick={() => checkErrors('reply')}>
                           返信を送信
                         </Button>
                       ) : null}
