@@ -1,3 +1,15 @@
+interface _DeepPartialArray<T> extends Array<DeepPartial<T>> {}
+/** @private */
+type _DeepPartialObject<T> = {[P in keyof T]?: DeepPartial<T[P]>};
+
+export type DeepPartial<T> = T extends Function
+  ? T
+  : T extends Array<infer U>
+  ? _DeepPartialArray<U>
+  : T extends object
+  ? _DeepPartialObject<T>
+  : T | undefined;
+
 export enum UserRole {
   ADMIN = 'admin',
   EXTERNAL_INSTRUCTOR = 'external_instructor',
@@ -58,7 +70,11 @@ export interface User {
   email: string;
   lastName: string;
   firstName: string;
-  introduce: string;
+  introduceTech: string;
+  introduceQualification: string;
+  introduceHobby: string;
+  introduceClub: string;
+  introduceOther: string;
   password?: string;
   role: UserRole;
   avatarUrl: string;
@@ -108,6 +124,7 @@ export interface UserTag {
 export type AllTag = Tag | UserTag;
 
 export type TagTypeInApp = 'All' | TagType;
+export type UserRoleInApp = 'All' | UserRole;
 
 export interface Wiki {
   id: number;
@@ -166,12 +183,12 @@ export interface EventSchedule {
   comments?: EventComment[];
   users?: User[];
   userJoiningEvent?: UserJoiningEvent[];
-  hostUsers?: User[];
+  hostUsers?: Partial<User>[];
   tags?: Tag[];
-  files?: EventFile[];
-  submissionFiles?: SubmissionFile[];
-  videos?: EventVideo[];
-  author?: User;
+  files?: Partial<EventFile>[];
+  submissionFiles?: Partial<SubmissionFile>[];
+  videos?: Partial<EventVideo>[];
+  author?: Partial<User>;
   createdAt: Date;
   updatedAt: Date;
 }

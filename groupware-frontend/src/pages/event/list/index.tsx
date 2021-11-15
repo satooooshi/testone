@@ -97,7 +97,7 @@ const initialEventValue = {
   }),
   type: EventType.STUDY_MEETING,
   imageURL: '',
-  chatNeeded: true,
+  chatNeeded: false,
   hostUsers: [],
   tags: [],
   files: [],
@@ -158,7 +158,7 @@ const EventList = () => {
       refetch();
     },
     onError: (e) => {
-      const messages = responseErrorMsgFactory(e?.response?.data.message);
+      const messages = responseErrorMsgFactory(e);
       toast({
         description: messages,
         status: 'error',

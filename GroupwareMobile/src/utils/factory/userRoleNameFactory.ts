@@ -1,6 +1,6 @@
-import {UserRole} from '../../types';
+import {UserRole, UserRoleInApp} from '../../types';
 
-export const userRoleNameFactory = (role: UserRole): string => {
+export const userRoleNameFactory = (role: UserRoleInApp): string => {
   switch (role) {
     case UserRole.ADMIN:
       return '管理者';
@@ -12,5 +12,7 @@ export const userRoleNameFactory = (role: UserRole): string => {
       return '講師(社員)';
     case UserRole.COACH:
       return 'コーチ';
+    default:
+      return '全て';
   }
 };

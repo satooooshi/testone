@@ -1,29 +1,42 @@
-import React, {useState} from 'react';
+import React, {Dispatch, SetStateAction, useEffect} from 'react';
 import {FlatList} from 'react-native';
 import {
-  useAPIGetEventList,
   SearchQueryToGetEvents,
   EventStatus,
+  SearchResultToGetEvents,
 } from '../../../hooks/api/event/useAPIGetEventList';
 import EventCard from '../../../components/events/EventCard';
 import {Div} from 'react-native-magnus';
 import {EventListNavigationProps} from '../../../types/navigator/screenProps/Event';
+import {useIsFocused} from '@react-navigation/native';
 
 type EventCardListProps = {
-  type: EventStatus;
+  status: EventStatus;
+  searchResult?: SearchResultToGetEvents;
   navigation: EventListNavigationProps;
+  searchQuery: SearchQueryToGetEvents;
+  setSearchQuery: Dispatch<SetStateAction<SearchQueryToGetEvents>>;
 };
 
-const EventCardList: React.FC<EventCardListProps> = ({type, navigation}) => {
-  const [searchQuery] = useState<SearchQueryToGetEvents>({
-    page: '1',
-    status: type,
-  });
-  const {data: events} = useAPIGetEventList(searchQuery);
+const EventCardList: React.FC<EventCardListProps> = ({
+  status,
+  navigation,
+  searchResult,
+  setSearchQuery,
+}) => {
+  const isFocused = useIsFocused();
+
+  useEffect(() => {
+    if (isFocused) {
+      setSearchQuery(q => ({...q, from: undefined, to: undefined, status}));
+    }
+  }, [isFocused, setSearchQuery, status]);
+
   return (
     <Div flexDir="column" alignItems="center">
       <FlatList
-        data={events?.events || []}
+        data={searchResult?.events || []}
+        keyExtractor={item => item.id.toString()}
         renderItem={({item: eventSchedule}) => (
           <Div mb={16}>
             <EventCard

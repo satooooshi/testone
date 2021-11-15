@@ -337,6 +337,15 @@ const headerTab = (headerTabBehavior: HeaderTabBehavior): Tab[] => {
           },
         },
         {
+          name: 'オール便',
+          onClick: () => {
+            {
+              if (queryRefresh)
+                queryRefresh({ page: '1', type: WikiType.ALL_POSTAL });
+            }
+          },
+        },
+        {
           name: 'ナレッジ',
           onClick: () => {
             {

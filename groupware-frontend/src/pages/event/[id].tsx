@@ -148,7 +148,19 @@ const EventDetail = () => {
     },
   });
 
-  const { mutate: joinEvent } = useAPIJoinEvent({ onSuccess: () => refetch() });
+  const { mutate: joinEvent } = useAPIJoinEvent({
+    onSuccess: () => refetch(),
+    onError: (err) => {
+      if (err.response?.data?.message) {
+        toast({
+          description: err.response?.data?.message,
+          status: 'error',
+          duration: 3000,
+          isClosable: true,
+        });
+      }
+    },
+  });
   const { mutate: cancelEvent } = useAPICancelEvent({
     onSuccess: () => refetch(),
   });
