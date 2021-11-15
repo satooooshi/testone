@@ -200,7 +200,7 @@ const DrawerTab = () => {
           drawerLabel: '管理',
           drawerIcon: ({color}) => (
             <Icon
-              name="user-alt"
+              name="user-cog"
               fontFamily="FontAwesome5"
               color={color}
               fontSize={26}

@@ -40,12 +40,14 @@ import { stateFromHTML } from 'draft-js-import-html';
 type WikiFormProps = {
   wiki?: Wiki;
   tags?: Tag[];
+  setWikiType: React.Dispatch<React.SetStateAction<string>>;
   onClickSaveButton: (wiki: Partial<Wiki>) => void;
 };
 
 const WikiForm: React.FC<WikiFormProps> = ({
   wiki,
   tags,
+  setWikiType,
   onClickSaveButton,
 }) => {
   const mdParser = new MarkdownIt({
@@ -81,6 +83,8 @@ const WikiForm: React.FC<WikiFormProps> = ({
     initialValues,
     validationSchema: wikiSchema,
     onSubmit: (q) => {
+      setWikiType(saveButtonName);
+
       if (wiki) {
         onClickSaveButton({
           ...wiki,
@@ -101,6 +105,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
       });
     },
   });
+
   const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
   const formTopRef = useRef<HTMLDivElement | null>(null);
   const editorRef = useRef<MarkdownEditor | null>(null);
@@ -118,6 +123,8 @@ const WikiForm: React.FC<WikiFormProps> = ({
         return '質問を編集';
       case WikiType.RULES:
         return '社内規則を編集';
+      case WikiType.ALL_POSTAL:
+        return 'オール便を編集';
       case WikiType.KNOWLEDGE:
         return 'ナレッジを編集';
       default:
@@ -126,11 +133,14 @@ const WikiForm: React.FC<WikiFormProps> = ({
   }, [wiki?.type]);
 
   const saveButtonName = useMemo(() => {
+    console.log(newQuestion.type);
     switch (newQuestion.type) {
       case WikiType.QA:
         return '質問';
       case WikiType.KNOWLEDGE:
         return 'ナレッジ';
+      case WikiType.ALL_POSTAL:
+        return 'オール便';
       case WikiType.RULES:
         switch (newQuestion.ruleCategory) {
           case RuleCategory.PHILOSOPHY:
@@ -262,7 +272,8 @@ const WikiForm: React.FC<WikiFormProps> = ({
                 onChange={(e) => {
                   if (
                     e.target.value === WikiType.KNOWLEDGE ||
-                    e.target.value === WikiType.QA
+                    e.target.value === WikiType.QA ||
+                    e.target.value === WikiType.ALL_POSTAL
                   ) {
                     setNewQuestion((prev) => ({
                       ...prev,
@@ -284,6 +295,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
                     <option value={RuleCategory.ABC}>ABC制度</option>
                     <option value={RuleCategory.BENEFITS}>福利厚生等</option>
                     <option value={RuleCategory.DOCUMENT}>各種申請書</option>
+                    <option value={WikiType.ALL_POSTAL}>オール便</option>
                   </>
                 )}
                 <option value={WikiType.KNOWLEDGE}>ナレッジ</option>
@@ -313,6 +325,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
                       setEditorState(EditorState.createEmpty());
                       setNewQuestion((prev) => ({
                         ...prev,
+                        body: '',
                         textFormat: e.target.value as TextFormat,
                       }));
                     }
@@ -361,7 +374,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
                 width: isSmallerThan768 ? '90vw' : '80vw',
                 maxWidth: '1980px',
               }}
-              placeholder="質問内容を入力して下さい(空白のみは不可)"
+              placeholder="内容を入力して下さい(空白のみは不可)"
               editorRef={draftEditor}
               editorState={editorState}
               setEditorState={setEditorState}
@@ -376,7 +389,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
               height: '80vh',
               marginBottom: 40,
             }}
-            placeholder="質問内容を入力して下さい(空白のみは不可)"
+            placeholder="内容を入力して下さい(空白のみは不可)"
             editorRef={editorRef}
             onImageUpload={handleImageUpload}
             plugins={liteEditorPlugins}

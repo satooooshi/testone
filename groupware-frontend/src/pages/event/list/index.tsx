@@ -158,7 +158,7 @@ const EventList = () => {
       refetch();
     },
     onError: (e) => {
-      const messages = responseErrorMsgFactory(e?.response?.data.message);
+      const messages = responseErrorMsgFactory(e);
       toast({
         description: messages,
         status: 'error',
@@ -172,6 +172,16 @@ const EventList = () => {
     onSuccess: () => {
       setModalVisible(false);
       refetch();
+    },
+    onError: (e) => {
+      const messages = responseErrorMsgFactory(e);
+      toast({
+        description: messages,
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      });
+      return;
     },
   });
   const [newEvent, setNewEvent] = useState<CreateEventRequest>();

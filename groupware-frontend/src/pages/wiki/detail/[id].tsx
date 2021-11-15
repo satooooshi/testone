@@ -3,7 +3,13 @@ import { useAPIGetWikiDetail } from '@/hooks/api/wiki/useAPIGetWikiDetail';
 import { useRouter } from 'next/router';
 import qaDetailStyles from '@/styles/layouts/QADetail.module.scss';
 import WikiComment from '@/components/wiki/WikiComment';
-import React, { useCallback, useMemo, useRef, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import 'react-markdown-editor-lite/lib/index.css';
 import { useAPICreateAnswer } from '@/hooks/api/wiki/useAPICreateAnswer';
 import LayoutWithTab from '@/components/layout/LayoutWithTab';
@@ -30,6 +36,8 @@ import { useHeaderTab } from '@/hooks/headerTab/useHeaderTab';
 import { tagColorFactory } from 'src/utils/factory/tagColorFactory';
 import { useAuthenticate } from 'src/contexts/useAuthenticate';
 
+type TOCHead = string[];
+
 const QuestionDetail = () => {
   const router = useRouter();
   const toast = useToast();
@@ -48,6 +56,7 @@ const QuestionDetail = () => {
   const [answerReplyEditorState, setAnswerReplyEditorState] = useState(() =>
     EditorState.createEmpty(),
   );
+  const [headLinkContents, setHeadLinkContents] = useState<TOCHead>([]);
 
   const { mutate: createAnswerReply } = useAPICreateAnswerReply({
     onSuccess: () => {
@@ -173,6 +182,76 @@ const QuestionDetail = () => {
     return '詳細';
   }, [wiki?.type]);
 
+  const isH2Str = (id: string) => {
+    const target = document.getElementById(id);
+    if (
+      target?.nextElementSibling &&
+      target.nextElementSibling.tagName === 'H2' &&
+      target?.nextElementSibling.textContent
+    ) {
+      return true;
+    }
+    return false;
+  };
+
+  useEffect(() => {
+    //wait for rendering body
+    setTimeout(() => {
+      const h1s = document.querySelectorAll('#wiki-body h1');
+      const contentsSetter = (element: Element) => {
+        const contents: TOCHead = [];
+        const elements: Element[] = [];
+        const head = element;
+        let next = head.nextElementSibling;
+        elements.push(element);
+        while (next && next.nodeType === 1) {
+          if (
+            next.textContent &&
+            (next.tagName === 'H2' || next.tagName === 'H1')
+          ) {
+            elements.push(next);
+          }
+          next = next.nextElementSibling;
+        }
+        for (let i = 0; i < elements.length; i++) {
+          const textContent = elements[i].textContent;
+          if (textContent) {
+            const idA = document.createElement('a');
+            idA.id = (i + 1).toString();
+            elements[i].before(idA);
+            contents.push(textContent);
+          }
+        }
+        setHeadLinkContents(contents);
+      };
+      if (h1s && h1s.length) {
+        let firstH1: Element | null = null;
+        h1s.forEach((h1) => {
+          if (h1.textContent && h1.textContent !== 'H1' && !firstH1) {
+            firstH1 = h1;
+          }
+        });
+        if (firstH1) {
+          contentsSetter(firstH1);
+        }
+      } else {
+        const h2s = document.querySelectorAll('#wiki-body h2');
+        let firstH2: Element | null = null;
+        h1s.forEach((h2) => {
+          if (h2.textContent && h2.textContent !== 'H2' && !firstH2) {
+            firstH2 = h2;
+          }
+        });
+        if (firstH2) {
+          contentsSetter(firstH2);
+        }
+        if (h2s && h2s.length) {
+          contentsSetter(h2s[0]);
+        }
+      }
+    }, 50);
+  }, [wiki?.body]);
+
   return (
     <LayoutWithTab
       sidebar={{ activeScreenName: SidebarScreenName.QA }}
@@ -198,8 +277,29 @@ const QuestionDetail = () => {
               ))}
             </div>
           ) : null}
+          {headLinkContents &&
+          headLinkContents.length &&
+          wiki.type === WikiType.ALL_POSTAL ? (
+            <Flex mb={'8px'} rounded="md" bg="white" flexDir="column" p="40px">
+              <Text fontWeight="bold" mb="16px" alignSelf="center">
+                目次
+              </Text>
+              {headLinkContents.map((content, index) => (
+                <ChakraLink
+                  mb={'8px'}
+                  pb={'2px'}
+                  pl={isH2Str((index + 1).toString()) ? '24px' : 0}
+                  _hover={{ borderBottom: '1px solid #b0b0b0' }}
+                  key={content}
+                  href={`#${index + 1}`}>
+                  {content}
+                </ChakraLink>
+              ))}
+            </Flex>
+          ) : null}
+
           <div className={qaDetailStyles.question_wrapper}>
-            <div className={qaDetailStyles.qa_wrapper}>
+            <div id="wiki-body" className={qaDetailStyles.qa_wrapper}>
               <WikiComment
                 textFormat={wiki.textFormat}
                 body={wiki.body}

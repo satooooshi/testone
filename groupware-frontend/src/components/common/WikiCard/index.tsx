@@ -19,6 +19,8 @@ const WikiCard: React.FC<WikiCardProps> = ({ wiki }) => {
         return 'cyan';
       case WikiType.KNOWLEDGE:
         return 'yellow';
+      case WikiType.ALL_POSTAL:
+        return 'orange';
       case WikiType.RULES:
         return 'green';
     }
@@ -65,6 +67,8 @@ const WikiCard: React.FC<WikiCardProps> = ({ wiki }) => {
                   ? 'Q&A'
                   : wiki.type === WikiType.RULES
                   ? '社内規則'
+                  : wiki.type === WikiType.ALL_POSTAL
+                  ? 'オール便'
                   : 'ナレッジ'}
               </Button>
             </a>
