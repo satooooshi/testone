@@ -11,16 +11,23 @@ import { responseErrorMsgFactory } from 'src/utils/factory/responseErrorMsgFacto
 
 const EditQuestion = () => {
   const router = useRouter();
+  const toast = useToast();
   const { id } = router.query as { id: string };
   const { data: wiki, isLoading } = useAPIGetWikiDetail(id);
   const { data: tags } = useAPIGetTag();
   const { user } = useAuthenticate();
   const [visible, setVisible] = useState(false);
-  const toast = useToast();
+  const [wikiType, setWikiType] = useState('');
 
   const { mutate: updateQuestion } = useAPIUpdateWiki({
     onSuccess: () => {
       wiki && router.push('/wiki/detail/' + wiki.id);
+      toast({
+        description: wikiType + 'の更新が完了しました。',
+        status: 'success',
+        duration: 3000,
+        isClosable: true,
+      });
     },
     onError: (e) => {
       const messages = responseErrorMsgFactory(e);
@@ -51,7 +58,12 @@ const EditQuestion = () => {
   }
 
   return (
-    <WikiForm wiki={wiki} tags={tags} onClickSaveButton={updateQuestion} />
+    <WikiForm
+      wiki={wiki}
+      tags={tags}
+      setWikiType={setWikiType}
+      onClickSaveButton={updateQuestion}
+    />
   );
 };
 export default EditQuestion;
