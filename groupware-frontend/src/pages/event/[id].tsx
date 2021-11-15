@@ -170,7 +170,7 @@ const EventDetail = () => {
       refetch();
     },
     onError: (e) => {
-      const messages = responseErrorMsgFactory(e?.response?.data.message);
+      const messages = responseErrorMsgFactory(e);
       toast({
         description: messages,
         status: 'error',
@@ -205,7 +205,7 @@ const EventDetail = () => {
       refetch();
     },
     onError: (e) => {
-      const messages = responseErrorMsgFactory(e?.response?.data.message);
+      const messages = responseErrorMsgFactory(e);
       toast({
         description: messages,
         status: 'error',
