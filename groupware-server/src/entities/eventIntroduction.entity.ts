@@ -19,6 +19,7 @@ export class EventIntroduction {
     type: 'enum',
     enum: EventType,
     default: EventType.STUDY_MEETING,
+    nullable: false,
   })
   type: EventType;
 
@@ -47,7 +48,7 @@ export class EventIntroduction {
     type: 'varchar',
     name: 'image_url_sub_1',
     length: 500,
-    nullable: false,
+    nullable: true,
     default: '',
   })
   imageUrlSub1: string;
@@ -56,7 +57,7 @@ export class EventIntroduction {
     type: 'varchar',
     name: 'image_url_sub_2',
     length: 500,
-    nullable: false,
+    nullable: true,
     default: '',
   })
   imageUrlSub2: string;
@@ -65,7 +66,7 @@ export class EventIntroduction {
     type: 'varchar',
     name: 'image_url_sub_3',
     length: 500,
-    nullable: false,
+    nullable: true,
     default: '',
   })
   imageUrlSub3: string;
@@ -74,7 +75,7 @@ export class EventIntroduction {
     type: 'varchar',
     name: 'image_url_sub_4',
     length: 500,
-    nullable: false,
+    nullable: true,
     default: '',
   })
   imageUrlSub4: string;
