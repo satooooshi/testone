@@ -69,7 +69,6 @@ const WikiForm: React.FC<WikiFormProps> = ({
     ruleCategory: type ? RuleCategory.RULES : undefined,
     textFormat: 'html',
   };
-
   const draftJsEmptyError = '入力必須です';
   const {
     values: newQuestion,
@@ -102,17 +101,6 @@ const WikiForm: React.FC<WikiFormProps> = ({
       });
     },
   });
-  console.log(newQuestion.body);
-  const isTextExist: number | boolean =
-    newQuestion.body !== undefined
-      ? newQuestion.body.replace(
-          /<("[^"]*"|'[^']*'|[^'">])*>|&nbsp;|\s|\n/g,
-          '',
-        ).length === 0
-        ? true
-        : false
-      : false;
-
   const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
   const formTopRef = useRef<HTMLDivElement | null>(null);
   const editorRef = useRef<MarkdownEditor | null>(null);
@@ -360,12 +348,9 @@ const WikiForm: React.FC<WikiFormProps> = ({
             ))}
           </div>
         ) : null}
-        {/* {touched.body && !editorState.getCurrentContent().hasText() ? ( */}
-        {touched.body && isTextExist ? (
+        {touched.body && !editorState.getCurrentContent().hasText() ? (
           <Text color="tomato">{draftJsEmptyError}</Text>
         ) : null}
-        {console.log(errors)}
-        {console.log(touched)}
         {errors.body && touched.body ? (
           <Text color="tomato">{errors.body}</Text>
         ) : null}
@@ -405,14 +390,3 @@ const WikiForm: React.FC<WikiFormProps> = ({
   );
 };
 export default WikiForm;
-
-// <Input
-//     type="text"
-//     width="100%"
-//     placeholder="タイトルを入力してください"
-//     value={newQuestion.title}
-//     background="white"
-//     onChange={(e) =>
-//       setNewQuestion((q) => ({ ...q, title: e.target.value }))
-//     }
-//   />
