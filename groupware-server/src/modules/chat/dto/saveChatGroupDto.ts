@@ -4,10 +4,10 @@ import { ChatMessage } from 'src/entities/chatMessage.entity';
 import { EventSchedule } from 'src/entities/event.entity';
 import { LastReadChatTime } from 'src/entities/lastReadChatTime.entity';
 import { User } from 'src/entities/user.entity';
-import { isNotEmptyExceptTags } from 'src/utils/dto/isNotEmptyExceptTags';
+import { IsNotEmptyExceptTags } from 'src/utils/dto/IsNotEmptyExceptTags';
 
 export class saveChatGroupDto implements Partial<ChatGroup> {
-  @isNotEmptyExceptTags({
+  @IsNotEmptyExceptTags({
     message: 'タイトルは必須項目です。空白のみは設定できません。',
   })
   @IsString()

@@ -1,11 +1,11 @@
 import { ValidateBy, ValidationOptions } from 'class-validator';
 
-export function isYoutubeLink(
+export function IsYoutubeLink(
   validationOptions?: ValidationOptions,
 ): PropertyDecorator {
   return ValidateBy(
     {
-      name: 'isYoutubeLink',
+      name: 'IsYoutubeLink',
       validator: {
         validate(value): boolean {
           const youtubeRegex =

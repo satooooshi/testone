@@ -11,18 +11,18 @@ import {
   ValidateIf,
 } from 'class-validator';
 import { EventType } from 'src/entities/event.entity';
-import { isNotEmptyExceptTags } from 'src/utils/dto/isNotEmptyExceptTags';
-import { isYoutubeLink } from 'src/utils/dto/isYoutubeLink';
+import { IsNotEmptyExceptTags } from 'src/utils/dto/IsNotEmptyExceptTags';
+import { IsYoutubeLink } from 'src/utils/dto/IsYoutubeLink';
 
 export class saveEventDto {
-  @isNotEmptyExceptTags({
+  @IsNotEmptyExceptTags({
     message: 'タイトルは必須項目です。空白のみは設定できません。',
   })
   @IsString()
   title: string;
 
   @ValidateIf((o, v) => v != null && v.length)
-  @isNotEmptyExceptTags({ message: '空白のみの概要は設定できません。' })
+  @IsNotEmptyExceptTags({ message: '空白のみの概要は設定できません。' })
   description: string;
 
   @ArrayNotEmpty({ message: 'タグは必須項目です。' })
@@ -56,7 +56,7 @@ export class saveEventDto {
 
   @ValidateIf((o, v) => v != null && v.length)
   @IsArray({ message: 'YouTubeリンクのリクエストは配列型に限られています。' })
-  @isYoutubeLink({ message: 'Youtubeの動画URLが不正です。' })
+  @IsYoutubeLink({ message: 'Youtubeの動画URLが不正です。' })
   videos: [];
 }
 export default saveEventDto;

@@ -1,4 +1,4 @@
-import { isNotEmptyExceptTags } from 'src/utils/dto/isNotEmptyExceptTags';
+import { IsNotEmptyExceptTags } from 'src/utils/dto/IsNotEmptyExceptTags';
 import {
   IsArray,
   IsEnum,
@@ -9,7 +9,7 @@ import {
 import { WikiType } from 'src/entities/wiki.entity';
 
 export class saveWikiDto {
-  @isNotEmptyExceptTags({
+  @IsNotEmptyExceptTags({
     message: 'タイトルは必須項目です。空白のみは設定できません。',
   })
   @IsString({ message: 'タイトルのリクエストは文字列型に限られています。' })
@@ -23,7 +23,7 @@ export class saveWikiDto {
   @IsArray({ message: 'タグのリクエストは配列型に限られています。' })
   tags: [];
 
-  @isNotEmptyExceptTags({
+  @IsNotEmptyExceptTags({
     message: '質問内容は必須項目です。空白のみは設定できません。',
   })
   @IsString({
