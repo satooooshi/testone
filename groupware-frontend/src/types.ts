@@ -34,6 +34,7 @@ export enum TagType {
 export enum WikiType {
   RULES = 'rule',
   KNOWLEDGE = 'knowledge',
+  ALL_POSTAL = 'all-postal',
   QA = 'qa',
 }
 

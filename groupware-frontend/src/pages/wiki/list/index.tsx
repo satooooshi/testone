@@ -129,7 +129,7 @@ const QAQuestionList = () => {
   const tabs: Tab[] = useHeaderTab({ headerTabType: 'wikiList', queryRefresh });
 
   const onClickCreateButton =
-    type === WikiType.RULES
+    type === WikiType.RULES || type === WikiType.ALL_POSTAL
       ? user?.role === UserRole.ADMIN
         ? () => {
             router.push('/wiki/new?type=' + type || '');
@@ -145,6 +145,8 @@ const QAQuestionList = () => {
         return '社内規則を新規作成';
       case WikiType.KNOWLEDGE:
         return 'ナレッジを新規作成';
+      case WikiType.ALL_POSTAL:
+        return 'オール便を新規作成';
       case WikiType.QA:
         return '質問を新規作成';
       default:
@@ -161,6 +163,8 @@ const QAQuestionList = () => {
         ? 'ナレッジ'
         : type === WikiType.QA
         ? 'Q&A'
+        : type === WikiType.ALL_POSTAL
+        ? 'オール便'
         : 'All',
     tabs,
     rightButtonName: headerRightButtonName,

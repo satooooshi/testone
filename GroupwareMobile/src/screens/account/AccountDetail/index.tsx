@@ -139,7 +139,7 @@ const AccountDetail: React.FC<AccountDetailProps> = ({navigation, route}) => {
     },
     {
       name: 'パスワード更新',
-      onPress: () => {},
+      onPress: () => navigation.navigate('UpdatePassword'),
     },
   ];
 
@@ -162,6 +162,7 @@ const AccountDetail: React.FC<AccountDetailProps> = ({navigation, route}) => {
         activeTabName={'アカウント情報'}
         rightButtonName={'ログアウト'}
         onPressRightButton={handleLogout}
+        enableBackButton
       />
       <ScrollDiv contentContainerStyle={accountDetailStyles.scrollView}>
         {profile && (

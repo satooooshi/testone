@@ -5,6 +5,14 @@ import Login from '../screens/auth/Login';
 import {useAuthenticate} from '../contexts/useAuthenticate';
 import {RootStackParamList} from '../types/navigator/RootStackParamList';
 import DrawerTab from './Drawer';
+import AccountDetail from '../screens/account/AccountDetail';
+import Profile from '../screens/account/Profile';
+import UpdatePassword from '../screens/account/UpdatePassword';
+import EventDetail from '../screens/event/EventDetail';
+import WikiDetail from '../screens/wiki/WikiDetail';
+import UserRegisteringAdmin from '../screens/admin/UserRegisteringAdmin';
+import TagAdmin from '../screens/admin/TagAdmin';
+import UserTagAdmin from '../screens/admin/UserTagAdmin';
 
 const Stack = createStackNavigator<RootStackParamList>();
 
@@ -21,6 +29,46 @@ const Navigator = () => {
         <Stack.Screen
           name="Main"
           component={DrawerTab}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name="AccountDetail"
+          component={AccountDetail}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name="Profile"
+          component={Profile}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name="UpdatePassword"
+          component={UpdatePassword}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name="EventDetail"
+          component={EventDetail}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name="WikiDetail"
+          component={WikiDetail}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name="UserRegisteringAdmin"
+          component={UserRegisteringAdmin}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name="TagAdmin"
+          component={TagAdmin}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name="UserTagAdmin"
+          component={UserTagAdmin}
           options={{headerShown: false}}
         />
       </Stack.Navigator>

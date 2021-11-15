@@ -40,6 +40,7 @@ const initialValues: Partial<User> = {
   introduceQualification: '',
   introduceClub: '',
   introduceHobby: '',
+  tags: [],
 };
 
 const Profile: React.FC<ProfileProps> = ({navigation}) => {
@@ -94,7 +95,7 @@ const Profile: React.FC<ProfileProps> = ({navigation}) => {
     },
     {
       name: 'パスワード更新',
-      onPress: () => {},
+      onPress: () => navigation.navigate('UpdatePassword'),
     },
   ];
 

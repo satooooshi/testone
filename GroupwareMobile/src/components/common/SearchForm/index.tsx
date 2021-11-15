@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Button, Div, Icon, Input, Modal, Tag} from 'react-native-magnus';
 import {useSelectedTags} from '../../../hooks/tag/useSelectedTags';
 import {useTagType} from '../../../hooks/tag/useTagType';
@@ -28,13 +28,19 @@ const SearchForm: React.FC<SearchFormProps> = ({
 }) => {
   const [word, setWord] = useState(defaultValue?.word || '');
   const [visibleTagModal, setVisibleTagModal] = useState(false);
-  const {selectedTags, toggleTag, isSelected} = useSelectedTags(
-    defaultValue?.selectedTags,
-  );
+  const {selectedTags, toggleTag, isSelected, setSelectedTags} =
+    useSelectedTags(defaultValue?.selectedTags);
   const {selectedTagType, selectTagType, filteredTags} = useTagType(
     'All',
     tags,
   );
+
+  useEffect(() => {
+    if (defaultValue && defaultValue.selectedTags.length) {
+      setSelectedTags(defaultValue.selectedTags);
+    }
+  }, [defaultValue, setSelectedTags]);
+
   return (
     <Modal
       px={16}
