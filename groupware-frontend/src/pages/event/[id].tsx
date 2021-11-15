@@ -46,6 +46,7 @@ import { useAPICancelEvent } from '@/hooks/api/event/useAPICancelEvent';
 import coachImage from '@/public/coach_1.jpeg';
 import { eventTypeColorFactory } from 'src/utils/factory/eventTypeColorFactory';
 import eventTypeNameFactory from 'src/utils/factory/eventTypeNameFactory';
+import { responseErrorMsgFactory } from 'src/utils/factory/responseErrorMsgFactory';
 
 type FileIconProps = {
   href?: string;
@@ -168,6 +169,16 @@ const EventDetail = () => {
       setEditModal(false);
       refetch();
     },
+    onError: (e) => {
+      const messages = responseErrorMsgFactory(e);
+      toast({
+        description: messages,
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      });
+      return;
+    },
   });
   const { mutate: handleChangeJoiningData } = useAPISaveUserJoiningEvent({
     onSuccess: () => {
@@ -192,6 +203,16 @@ const EventDetail = () => {
       setCommentVisible(false);
       setNewComment('');
       refetch();
+    },
+    onError: (e) => {
+      const messages = responseErrorMsgFactory(e);
+      toast({
+        description: messages,
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      });
+      return;
     },
   });
 
