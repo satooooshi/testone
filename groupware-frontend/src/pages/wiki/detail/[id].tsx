@@ -117,17 +117,18 @@ const QuestionDetail = () => {
       editorBody.replace(/<("[^"]*"|'[^']*'|[^'">])*>|&nbsp;|\s|\n/g, '')
         .length > 0;
 
-    if ((isBody === 'answer' && !answerVisible) || isTextExist) {
-      isBody === 'answer' ? handleClickSendAnswer() : handleClickSendReply();
-    } else {
-      toast({
-        description:
-          (isBody === 'answer' ? '回答' : '返信') + 'を記入してください',
-        status: 'error',
-        duration: 3000,
-        isClosable: true,
-      });
-    }
+    if ((isBody === 'answer' && !answerVisible) || isTextExist)
+      return isBody === 'answer'
+        ? handleClickSendAnswer()
+        : handleClickSendReply();
+
+    toast({
+      description:
+        (isBody === 'answer' ? '回答' : '返信') + 'を記入してください',
+      status: 'error',
+      duration: 3000,
+      isClosable: true,
+    });
   };
 
   const handleClickSendAnswer = () => {
