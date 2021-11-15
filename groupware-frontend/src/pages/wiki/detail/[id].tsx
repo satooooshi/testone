@@ -15,6 +15,7 @@ import {
   useMediaQuery,
   Link as ChakraLink,
   Flex,
+  useToast,
 } from '@chakra-ui/react';
 import WrappedDraftEditor from '@/components/wiki/WrappedDraftEditor';
 import { ContentState, Editor, EditorState } from 'draft-js';
