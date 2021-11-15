@@ -11,3 +11,21 @@ export type AccountDetailProps = {
   navigation: AccountDetailNavigationProps;
   route: AccountDetailRouteProps;
 };
+type ProfileNavigationProps = StackNavigationProp<
+  RootStackParamList,
+  'Profile'
+>;
+type ProfileRouteProps = RouteProp<RootStackParamList, 'Profile'>;
+export type ProfileProps = {
+  navigation: ProfileNavigationProps;
+  route: ProfileRouteProps;
+};
+type UpdatePasswordNavigationProps = StackNavigationProp<
+  RootStackParamList,
+  'UpdatePassword'
+>;
+type UpdatePasswordRouteProps = RouteProp<RootStackParamList, 'UpdatePassword'>;
+export type UpdatePasswordProps = {
+  navigation: UpdatePasswordNavigationProps;
+  route: UpdatePasswordRouteProps;
+};

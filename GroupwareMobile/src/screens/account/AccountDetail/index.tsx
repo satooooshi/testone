@@ -1,5 +1,6 @@
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
-import React, {useState} from 'react';
+import {useIsFocused} from '@react-navigation/native';
+import React, {useEffect, useState} from 'react';
 import {useWindowDimensions} from 'react-native';
 import {Text, Div, ScrollDiv, Image} from 'react-native-magnus';
 import TagListBox from '../../../components/account/TagListBox';
@@ -10,7 +11,6 @@ import WikiCard from '../../../components/wiki/WikiCard';
 import {useAuthenticate} from '../../../contexts/useAuthenticate';
 import {useAPIGetEventList} from '../../../hooks/api/event/useAPIGetEventList';
 import {useAPIGetTag} from '../../../hooks/api/tag/useAPIGetTag';
-import {useAPIGetProfile} from '../../../hooks/api/user/useAPIGetProfile';
 import {useAPIGetUserInfoById} from '../../../hooks/api/user/useAPIGetUserInfoById';
 import {useAPIGetWikiList} from '../../../hooks/api/wiki/useAPIGetWikiList';
 import {useTagType} from '../../../hooks/tag/useTagType';
@@ -54,7 +54,7 @@ const DetailScreen: React.FC<DetailScreenProps> = ({profile}) => {
           自己紹介
         </Text>
         <Text color={darkFontColor} fontWeight="bold" fontSize={20}>
-          {profile.introduce || '未設定'}
+          {profile.introduceOther || '未設定'}
         </Text>
       </Div>
       <TagListBox
@@ -95,7 +95,9 @@ const AccountDetail: React.FC<AccountDetailProps> = ({navigation, route}) => {
   const questionScreenName = `${screenName}-question`;
   const knowledgeScreenName = `${screenName}-knowledge`;
   const {width: windowWidth, height: windowHeight} = useWindowDimensions();
-  const {data: profile} = useAPIGetUserInfoById(userID?.toString() || '0');
+  const {data: profile, refetch} = useAPIGetUserInfoById(
+    userID?.toString() || '0',
+  );
   const {data: events} = useAPIGetEventList({
     participant_id: userID?.toString(),
   });
@@ -107,6 +109,7 @@ const AccountDetail: React.FC<AccountDetailProps> = ({navigation, route}) => {
     writer: userID?.toString() || '0',
     type: WikiType.KNOWLEDGE,
   });
+  const isFocused = useIsFocused();
   const [activeScreen, setActiveScreen] = useState(defaultScreenName);
 
   const bottomContentsHeight = () => {
@@ -132,11 +135,11 @@ const AccountDetail: React.FC<AccountDetailProps> = ({navigation, route}) => {
     },
     {
       name: 'プロフィール編集',
-      onPress: () => {},
+      onPress: () => navigation.navigate('Profile'),
     },
     {
       name: 'パスワード更新',
-      onPress: () => {},
+      onPress: () => navigation.navigate('UpdatePassword'),
     },
   ];
 
@@ -145,16 +148,23 @@ const AccountDetail: React.FC<AccountDetailProps> = ({navigation, route}) => {
     setUser({});
   };
 
+  useEffect(() => {
+    if (isFocused) {
+      refetch();
+    }
+  }, [isFocused, refetch]);
+
   return (
     <WholeContainer>
+      <AppHeader
+        title={'Account'}
+        tabs={tabs}
+        activeTabName={'アカウント情報'}
+        rightButtonName={'ログアウト'}
+        onPressRightButton={handleLogout}
+        enableBackButton
+      />
       <ScrollDiv contentContainerStyle={accountDetailStyles.scrollView}>
-        <AppHeader
-          title={'Account'}
-          tabs={tabs}
-          activeTabName={'アカウント情報'}
-          rightButtonName={'ログアウト'}
-          onPressRightButton={handleLogout}
-        />
         {profile && (
           <>
             <Div alignItems="center">

@@ -5,11 +5,11 @@ export const tagColorFactory = (type: TagType): string => {
     case TagType.TECH:
       return 'teal';
     case TagType.QUALIFICATION:
-      return 'blue';
+      return 'blue700';
     case TagType.CLUB:
-      return 'green';
+      return 'green700';
     case TagType.HOBBY:
-      return 'pink';
+      return 'pink600';
     case TagType.OTHER:
       return 'orange';
   }

@@ -75,7 +75,6 @@ export interface User {
   introduceHobby: string;
   introduceClub: string;
   introduceOther: string;
-  introduce: string;
   password?: string;
   role: UserRole;
   avatarUrl: string;
