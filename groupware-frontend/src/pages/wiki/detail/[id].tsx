@@ -9,7 +9,13 @@ import { useAPICreateAnswer } from '@/hooks/api/wiki/useAPICreateAnswer';
 import LayoutWithTab from '@/components/layout/LayoutWithTab';
 import AnswerReply from '@/components/wiki/AnswerReply';
 import { QAAnswer, QAAnswerReply, WikiType } from 'src/types';
-import { Button, useMediaQuery, useToast } from '@chakra-ui/react';
+import {
+  Text,
+  Button,
+  useMediaQuery,
+  Link as ChakraLink,
+  Flex,
+} from '@chakra-ui/react';
 import WrappedDraftEditor from '@/components/wiki/WrappedDraftEditor';
 import { ContentState, Editor, EditorState } from 'draft-js';
 import Head from 'next/head';
