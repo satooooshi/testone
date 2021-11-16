@@ -20,6 +20,8 @@ import UserList from '../../screens/UserList';
 import UserAdmin from '../../screens/admin/UserAdmin';
 import UserRegisteringAdmin from '../../screens/admin/UserRegisteringAdmin';
 import TagAdmin from '../../screens/admin/TagAdmin';
+import Chat from '../../screens/Chat';
+import RoomList from '../../screens/Chat/RoomList';
 
 const Drawer = createDrawerNavigator();
 const Stack = createStackNavigator();
@@ -120,6 +122,17 @@ const AdminStack = () => (
   </Stack.Navigator>
 );
 
+const ChatStack = () => (
+  <Stack.Navigator initialRouteName="ChatStack">
+    <Stack.Screen
+      name="RoomList"
+      component={RoomList}
+      options={{headerShown: false}}
+    />
+    <Stack.Screen name="Chat" component={Chat} options={{headerShown: false}} />
+  </Stack.Navigator>
+);
+
 const DrawerTab = () => {
   return (
     <Drawer.Navigator
@@ -174,6 +187,21 @@ const DrawerTab = () => {
               fontFamily="FontAwesome5"
               color={color}
               fontSize={21}
+            />
+          ),
+        }}
+      />
+      <Drawer.Screen
+        name="ChatStack"
+        component={ChatStack}
+        options={{
+          drawerLabel: 'チャット',
+          drawerIcon: ({color}) => (
+            <Icon
+              name="ios-chatbubble-ellipses"
+              fontFamily="Ionicons"
+              color={color}
+              fontSize={26}
             />
           ),
         }}

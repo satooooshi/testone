@@ -1,0 +1,236 @@
+import React, {useEffect, useState} from 'react';
+import {
+  FlatList,
+  Keyboard,
+  KeyboardAvoidingView,
+  Modal,
+  Platform,
+  TouchableOpacity,
+  useWindowDimensions,
+} from 'react-native';
+import {Div, Icon} from 'react-native-magnus';
+import AppHeader from '../../components/Header';
+import WholeContainer from '../../components/WholeContainer';
+import {useAPIGetMessages} from '../../hooks/api/chat/useAPIGetMessages';
+import {useAPISendChatMessage} from '../../hooks/api/chat/useAPISendChatMessage';
+import {useAPIUploadStorage} from '../../hooks/api/storage/useAPIUploadStorage';
+import {chatStyles} from '../../styles/screen/chat/chat.style';
+import {ChatMessage, ChatMessageType} from '../../types';
+import {ChatProps} from '../../types/navigator/screenProps/Chat';
+import {uploadImageFromGallery} from '../../utils/cropImage/uploadImageFromGallery';
+import DocumentPicker from 'react-native-document-picker';
+import ImageView from 'react-native-image-viewing';
+import Video from 'react-native-video';
+import TextMessage from '../../components/chat/ChatMessage/TextMessage';
+import ImageMessage from '../../components/chat/ChatMessage/ImageMessage';
+import VideoMessage from '../../components/chat/ChatMessage/VideoMessage';
+import ChatFooter from '../../components/chat/ChatFooter';
+import {userNameFactory} from '../../utils/factory/userNameFactory';
+import {Suggestion} from 'react-native-controlled-mentions';
+
+type ImageSource = {
+  uri: string;
+};
+
+const Chat: React.FC<ChatProps> = ({route}) => {
+  const {height: windowHeight} = useWindowDimensions();
+  const {room} = route.params;
+  const [page] = useState(1);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [newMessage, setNewMessage] = useState('');
+  const [imageModal, setImageModal] = useState(false);
+  const [images, setImages] = useState<ImageSource[]>([]);
+  const [nowImageIndex, setNowImageIndex] = useState<number>(0);
+  const [video, setVideo] = useState('');
+  const {data: fetchedMessage} = useAPIGetMessages({
+    group: room.id,
+    page: page.toString(),
+  });
+  const suggestions = (): Suggestion[] => {
+    if (!room.members) {
+      return [];
+    }
+    return room.members.map(m => ({
+      id: m.id.toString(),
+      name: userNameFactory(m),
+    }));
+  };
+  const {mutate: sendChatMessage} = useAPISendChatMessage({
+    onSuccess: () => {
+      setNewMessage('');
+    },
+  });
+  const {mutate: uploaFile} = useAPIUploadStorage();
+
+  const showImageOnModal = (url: string) => {
+    const isNowUri = (element: ImageSource) => element.uri === url;
+    setNowImageIndex(images.findIndex(isNowUri));
+    setImageModal(true);
+  };
+
+  const handleSend = () => {
+    if (newMessage.length) {
+      Keyboard.dismiss();
+      sendChatMessage({
+        content: newMessage,
+        chatGroup: room,
+      });
+    }
+  };
+
+  const handleUploadImage = async () => {
+    const {formData} = await uploadImageFromGallery({
+      mediaType: 'photo',
+      cropping: false,
+    });
+    if (formData) {
+      uploaFile(formData, {
+        onSuccess: imageURL => {
+          sendChatMessage({
+            content: imageURL[0],
+            type: ChatMessageType.IMAGE,
+            chatGroup: room,
+          });
+        },
+      });
+    }
+  };
+
+  const handleUploadVideo = async () => {
+    const {formData} = await uploadImageFromGallery({
+      mediaType: 'video',
+      multiple: false,
+    });
+    if (formData) {
+      uploaFile(formData, {
+        onSuccess: imageURL => {
+          sendChatMessage({
+            content: imageURL[0],
+            type: ChatMessageType.VIDEO,
+            chatGroup: room,
+          });
+        },
+      });
+    }
+  };
+
+  const handleUploadFile = async () => {
+    const res = await DocumentPicker.pickSingle({
+      type: [DocumentPicker.types.allFiles],
+    });
+    const formData = new FormData();
+    formData.append('files', {
+      name: res.name,
+      uri: res.uri,
+      type: res.type,
+    });
+    uploaFile(formData);
+    if (formData) {
+      uploaFile(formData, {
+        onSuccess: imageURL => {
+          sendChatMessage({
+            content: imageURL[0],
+            type: ChatMessageType.OTHER_FILE,
+            chatGroup: room,
+          });
+        },
+      });
+    }
+  };
+
+  const playVideoOnModal = (url: string) => {
+    setVideo(url);
+  };
+
+  useEffect(() => {
+    if (fetchedMessage?.length) {
+      setMessages(fetchedMessage);
+      const fetchedImages: ImageSource[] = fetchedMessage
+        .filter(m => m.type === ChatMessageType.IMAGE)
+        .map(m => ({uri: m.content}))
+        .reverse();
+      setImages(fetchedImages);
+    }
+  }, [fetchedMessage]);
+
+  return (
+    <WholeContainer>
+      {/* @TODO add seeking bar */}
+      <Modal visible={!!video} animationType="slide">
+        <TouchableOpacity
+          style={chatStyles.cancelIcon}
+          onPress={() => {
+            setVideo('');
+          }}>
+          <Icon
+            position="absolute"
+            name={'cancel'}
+            fontFamily="MaterialIcons"
+            fontSize={30}
+            color="#fff"
+          />
+        </TouchableOpacity>
+        <Video source={{uri: video}} style={chatStyles.video} />
+      </Modal>
+      <ImageView
+        animationType="slide"
+        images={images}
+        imageIndex={nowImageIndex}
+        visible={imageModal}
+        onRequestClose={() => setImageModal(false)}
+        swipeToCloseEnabled={false}
+        doubleTapToZoomEnabled={true}
+      />
+      <AppHeader title="チャット" />
+      <KeyboardAvoidingView
+        keyboardVerticalOffset={
+          Platform.OS === 'ios' ? windowHeight * 0.16 : windowHeight * 0.03
+        }
+        style={[
+          chatStyles.keyboardAvoidingView,
+          Platform.OS === 'ios'
+            ? chatStyles.keyboardAvoidingViewIOS
+            : chatStyles.keyboardAvoidingViewAndroid,
+        ]}
+        behavior={Platform.OS === 'ios' ? 'height' : undefined}>
+        <FlatList
+          keyboardShouldPersistTaps={false}
+          style={chatStyles.flatlist}
+          contentContainerStyle={chatStyles.flatlistContent}
+          inverted
+          data={messages}
+          renderItem={({item: message}) => (
+            <Div
+              alignSelf={message?.isSender ? 'flex-end' : 'flex-start'}
+              mb={'sm'}>
+              {message.type === ChatMessageType.TEXT ? (
+                <TextMessage message={message} />
+              ) : message.type === ChatMessageType.IMAGE ? (
+                <ImageMessage
+                  onPress={() => showImageOnModal(message.content)}
+                  message={message}
+                />
+              ) : message.type === ChatMessageType.VIDEO ? (
+                <VideoMessage
+                  message={message}
+                  onPress={() => playVideoOnModal(message.content)}
+                />
+              ) : null}
+            </Div>
+          )}
+        />
+        <ChatFooter
+          onUploadFile={handleUploadFile}
+          onUploadVideo={handleUploadVideo}
+          onUploadImage={handleUploadImage}
+          text={newMessage}
+          onChangeText={t => setNewMessage(t)}
+          onSend={handleSend}
+          mentionSuggestions={suggestions()}
+        />
+      </KeyboardAvoidingView>
+    </WholeContainer>
+  );
+};
+
+export default Chat;
