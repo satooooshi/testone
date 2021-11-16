@@ -12,6 +12,7 @@ import {
   useToast,
 } from '@chakra-ui/react';
 import { useDropzone } from 'react-dropzone';
+import { chatGroupSchema } from 'src/utils/validation/schema';
 import { imageExtensions } from 'src/utils/imageExtensions';
 import ReactCrop, { Crop } from 'react-image-crop';
 import { useFormik } from 'formik';
@@ -19,6 +20,7 @@ import { getCroppedImageURL } from 'src/utils/getCroppedImageURL';
 import { useAPIUploadStorage } from '@/hooks/api/storage/useAPIUploadStorage';
 import { dataURLToFile } from 'src/utils/dataURLToFile';
 import { userRoleNameFactory } from 'src/utils/factory/userRoleNameFactory';
+import { formikErrorMsgFactory } from 'src/utils/factory/formikErrorMsgFactory';
 
 type CreateChatGroupModalProps = {
   isOpen: boolean;
@@ -86,18 +88,42 @@ const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
   const {
     values: newGroup,
     setValues: setNewGroup,
-    handleSubmit: handleSubmit,
+    handleSubmit: onFinish,
     handleChange,
     resetForm,
-    // validateForm,
+    validateForm,
   } = useFormik<Partial<ChatGroup>>({
     initialValues: initialChatValues,
     enableReinitialize: true,
-    // validationSchema: chatSchema,
-    onSubmit: () => {
-      onFinish();
+    validationSchema: chatGroupSchema,
+    onSubmit: async () => {
+      if (imgRef.current && completedCrop) {
+        const img = getCroppedImageURL(imgRef.current, completedCrop);
+        if (!img) {
+          return;
+        }
+        const result = await dataURLToFile(img, selectImageName);
+        uploadImage([result]);
+        return;
+      }
+      createGroup(newGroup);
     },
   });
+
+  const checkErrors = async () => {
+    const errors = await validateForm();
+    const messages = formikErrorMsgFactory(errors);
+    if (messages) {
+      toast({
+        description: messages,
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      });
+    } else {
+      onFinish();
+    }
+  };
 
   const toggleNewGroupMember = (user: User) => {
     const isExist = newGroup.members?.filter((u) => u.id === user.id);
@@ -114,28 +140,28 @@ const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
     }));
   };
 
-  const onFinish = async () => {
-    if (!newGroup.members?.length) {
-      toast({
-        title: 'ルームに参加する社員を一人以上選択してください',
-        status: 'error',
-        duration: 3000,
-        isClosable: true,
-      });
-      return;
-    }
+  // const onFinish = async () => {
+  //   if (!newGroup.members?.length) {
+  //     toast({
+  //       title: 'ルームに参加する社員を一人以上選択してください',
+  //       status: 'error',
+  //       duration: 3000,
+  //       isClosable: true,
+  //     });
+  //     return;
+  //   }
 
-    if (imgRef.current && completedCrop) {
-      const img = getCroppedImageURL(imgRef.current, completedCrop);
-      if (!img) {
-        return;
-      }
-      const result = await dataURLToFile(img, selectImageName);
-      uploadImage([result]);
-      return;
-    }
-    createGroup(newGroup);
-  };
+  //   if (imgRef.current && completedCrop) {
+  //     const img = getCroppedImageURL(imgRef.current, completedCrop);
+  //     if (!img) {
+  //       return;
+  //     }
+  //     const result = await dataURLToFile(img, selectImageName);
+  //     uploadImage([result]);
+  //     return;
+  //   }
+  //   createGroup(newGroup);
+  // };
 
   useEffect(() => {
     resetForm();
@@ -278,7 +304,7 @@ const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
             width="140px"
             colorScheme="green"
             borderRadius={5}
-            onClick={() => handleSubmit()}>
+            onClick={() => checkErrors()}>
             作成
           </Button>
         </div>
