@@ -85,10 +85,6 @@ const ChatDetail = () => {
     onSuccess: () => {
       dispatchModal({ type: 'createGroupWindow', value: false });
       setResetFormTrigger(true);
-      // dispatchChat({
-      //   type: 'newGroup',
-      //   value: { ...newGroup, name: '', members: [] },
-      // });
       refetchGroups();
       toast({
         description: 'チャットルームの作成が完了しました。',
@@ -362,15 +358,7 @@ const ChatDetail = () => {
           closeModal={() => {
             dispatchModal({ type: 'createGroupWindow', value: false });
             dispatchChat({ type: 'newGroup', value: {} });
-          }}
-          // newGroup={newGroup}
-          // onChangeNewGroupName={(groupName) =>
-          //   dispatchChat({
-          //     type: 'newGroup',
-          //     value: { ...newGroup, name: groupName },
-          //   })
-          // }
-          // toggleNewGroupMember={toggleUserIDs}
+          }}       
           createGroup={(g) => createGroup(g)}
         />
       )}

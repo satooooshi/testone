@@ -2,7 +2,6 @@ import { SidebarScreenName } from '@/components/layout/Sidebar';
 import chatStyles from '@/styles/layouts/Chat.module.scss';
 import { useState } from 'react';
 import { useAPIGetUsers } from '@/hooks/api/user/useAPIGetUsers';
-// import { ChatGroup, User } from 'src/types';
 import { useAPIGetChatGroupList } from '@/hooks/api/chat/useAPIGetChatGroupList';
 import CreateChatGroupModal from '@/components/chat/CreateChatGroupModal';
 import { useMediaQuery, useToast } from '@chakra-ui/react';
@@ -14,7 +13,6 @@ import Head from 'next/head';
 import { useRouter } from 'next/router';
 import selectChatGroupModalStyles from '@/styles/components/SelectChatGroupModal.module.scss';
 import { useAPISaveChatGroup } from '@/hooks/api/chat/useAPISaveChatGroup';
-// import { useAPIUploadStorage } from '@/hooks/api/storage/useAPIUploadStorage';
 
 const Chat = () => {
   const router = useRouter();
@@ -24,15 +22,10 @@ const Chat = () => {
   const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
   const [createGroupWindow, setCreateGroupWindow] = useState(false);
   const [resetFormTrigger, setResetFormTrigger] = useState(false);
-  // const [newGroup, setNewGroup] = useState<Partial<ChatGroup>>({
-  //   name: '',
-  //   members: [],
-  // });
 
   const { mutate: createGroup } = useAPISaveChatGroup({
     onSuccess: () => {
       setCreateGroupWindow(false);
-      // setNewGroup({ name: '', members: [] });
       setResetFormTrigger(true);
       refetch();
       toast({
@@ -68,16 +61,8 @@ const Chat = () => {
           setResetFormTrigger={setResetFormTrigger}
           closeModal={() => {
             setCreateGroupWindow(false);
-            // setNewGroup({});
           }}
-          // newGroup={newGroup}
-          // onChangeNewGroupName={(groupName) =>
-          //   setNewGroup((g) => ({ ...g, name: groupName }))
-          // }
-          // toggleNewGroupMember={toggleUserIDs}
           createGroup={(g) => createGroup(g)}
-          // test={test}
-          // handleSubmit={() => handleSubmit()}
         />
       )}
       {chatGroups && isSmallerThan768 ? (
