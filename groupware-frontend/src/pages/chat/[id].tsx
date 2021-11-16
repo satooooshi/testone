@@ -236,27 +236,6 @@ const ChatDetail = () => {
     [dispatchMention],
   );
 
-  // const toggleUserIDs = (user: User) => {
-  //   const isExist = newGroup.members?.filter((u) => u.id === user.id);
-  //   if (isExist && isExist.length) {
-  //     dispatchChat({
-  //       type: 'newGroup',
-  //       value: {
-  //         ...newGroup,
-  //         members: newGroup.members?.filter((u) => u.id !== user.id),
-  //       },
-  //     });
-  //     return;
-  //   }
-  //   dispatchChat({
-  //     type: 'newGroup',
-  //     value: {
-  //       ...newGroup,
-  //       members: newGroup.members ? [...newGroup.members, user] : [user],
-  //     },
-  //   });
-  // };
-
   const nameOfEmptyNameGroup = (members?: User[]): string => {
     if (!members) {
       return 'メンバーがいません';
@@ -358,7 +337,7 @@ const ChatDetail = () => {
           closeModal={() => {
             dispatchModal({ type: 'createGroupWindow', value: false });
             dispatchChat({ type: 'newGroup', value: {} });
-          }}       
+          }}
           createGroup={(g) => createGroup(g)}
         />
       )}
