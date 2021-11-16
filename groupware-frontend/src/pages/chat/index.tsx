@@ -63,6 +63,9 @@ const Chat = () => {
       {users && (
         <CreateChatGroupModal
           isOpen={createGroupWindow}
+          users={users}
+          resetFormTrigger={resetFormTrigger}
+          setResetFormTrigger={setResetFormTrigger}
           closeModal={() => {
             setCreateGroupWindow(false);
             // setNewGroup({});
@@ -72,9 +75,7 @@ const Chat = () => {
           //   setNewGroup((g) => ({ ...g, name: groupName }))
           // }
           // toggleNewGroupMember={toggleUserIDs}
-          users={users}
           createGroup={(g) => createGroup(g)}
-          resetFormTrigger={resetFormTrigger}
           // test={test}
           // handleSubmit={() => handleSubmit()}
         />

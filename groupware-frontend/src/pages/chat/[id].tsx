@@ -356,6 +356,9 @@ const ChatDetail = () => {
       {users && (
         <CreateChatGroupModal
           isOpen={createGroupWindow}
+          users={users}
+          resetFormTrigger={resetFormTrigger}
+          setResetFormTrigger={setResetFormTrigger}
           closeModal={() => {
             dispatchModal({ type: 'createGroupWindow', value: false });
             dispatchChat({ type: 'newGroup', value: {} });
@@ -368,9 +371,7 @@ const ChatDetail = () => {
           //   })
           // }
           // toggleNewGroupMember={toggleUserIDs}
-          users={users}
           createGroup={(g) => createGroup(g)}
-          resetFormTrigger={resetFormTrigger}
         />
       )}
       {chatGroups && (

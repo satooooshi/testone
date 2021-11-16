@@ -31,7 +31,7 @@ type CreateChatGroupModalProps = {
   // onChangeNewGroupName: (groupName: string) => void;
   // toggleNewGroupMember: (u: User) => void;
   createGroup: (g: Partial<ChatGroup>) => void;
-  // handleSubmit: () => void;
+  setResetFormTrigger: any;
 };
 
 const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
@@ -43,6 +43,7 @@ const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
   // onChangeNewGroupName,
   // toggleNewGroupMember,
   createGroup,
+  setResetFormTrigger,
   // handleSubmit,
 }) => {
   const toast = useToast();
@@ -164,7 +165,10 @@ const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
   // };
 
   useEffect(() => {
-    resetForm();
+    if (resetFormTrigger) {
+      resetForm();
+    }
+    setResetFormTrigger(false);
   }, [resetFormTrigger]);
 
   // useEffect(() => {
