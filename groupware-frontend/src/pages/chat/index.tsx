@@ -14,12 +14,14 @@ import Head from 'next/head';
 import { useRouter } from 'next/router';
 import selectChatGroupModalStyles from '@/styles/components/SelectChatGroupModal.module.scss';
 import { useAPISaveChatGroup } from '@/hooks/api/chat/useAPISaveChatGroup';
+// import { useAPIUploadStorage } from '@/hooks/api/storage/useAPIUploadStorage';
 
 const Chat = () => {
   const router = useRouter();
   const toast = useToast();
   const { data: chatGroups, refetch } = useAPIGetChatGroupList();
   const { data: users } = useAPIGetUsers();
+  const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
   const [createGroupWindow, setCreateGroupWindow] = useState(false);
   const [resetFormTrigger, setResetFormTrigger] = useState(false);
   // const [newGroup, setNewGroup] = useState<Partial<ChatGroup>>({
@@ -41,22 +43,11 @@ const Chat = () => {
       });
     },
   });
-  const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
-
-  // const toggleUserIDs = (user: User) => {
-  //   const isExist = newGroup.members?.filter((u) => u.id === user.id);
-  //   if (isExist && isExist.length) {
-  //     setNewGroup((g) => ({
-  //       ...g,
-  //       members: g.members?.filter((u) => u.id !== user.id),
-  //     }));
-  //     return;
-  //   }
-  //   setNewGroup((g) => ({
-  //     ...g,
-  //     members: g.members ? [...g.members, user] : [user],
-  //   }));
-  // };
+  // const { mutate: uploadImage } = useAPIUploadStorage({
+  //   onSuccess: async (fileURLs) => {
+  //     setTest(fileURLs[0]);
+  //   },
+  // });
 
   return (
     <LayoutWithTab
@@ -84,6 +75,7 @@ const Chat = () => {
           users={users}
           createGroup={(g) => createGroup(g)}
           resetFormTrigger={resetFormTrigger}
+          // test={test}
           // handleSubmit={() => handleSubmit()}
         />
       )}

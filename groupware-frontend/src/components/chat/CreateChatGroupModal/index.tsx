@@ -141,6 +141,11 @@ const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
     resetForm();
   }, [resetFormTrigger]);
 
+  // useEffect(() => {
+  //   createGroup({ ...newGroup, imageURL: fileURLs[0] });
+  //   setSelectImageUrl('');
+  // }, [test]);
+
   return (
     <ReactModal
       ariaHideApp={false}
