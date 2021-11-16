@@ -2,7 +2,7 @@ import { SidebarScreenName } from '@/components/layout/Sidebar';
 import chatStyles from '@/styles/layouts/Chat.module.scss';
 import { useState } from 'react';
 import { useAPIGetUsers } from '@/hooks/api/user/useAPIGetUsers';
-import { ChatGroup, User } from 'src/types';
+// import { ChatGroup, User } from 'src/types';
 import { useAPIGetChatGroupList } from '@/hooks/api/chat/useAPIGetChatGroupList';
 import CreateChatGroupModal from '@/components/chat/CreateChatGroupModal';
 import { useMediaQuery, useToast } from '@chakra-ui/react';
@@ -21,15 +21,17 @@ const Chat = () => {
   const { data: chatGroups, refetch } = useAPIGetChatGroupList();
   const { data: users } = useAPIGetUsers();
   const [createGroupWindow, setCreateGroupWindow] = useState(false);
-  const [newGroup, setNewGroup] = useState<Partial<ChatGroup>>({
-    name: '',
-    members: [],
-  });
+  const [resetFormTrigger, setResetFormTrigger] = useState(false);
+  // const [newGroup, setNewGroup] = useState<Partial<ChatGroup>>({
+  //   name: '',
+  //   members: [],
+  // });
 
   const { mutate: createGroup } = useAPISaveChatGroup({
     onSuccess: () => {
       setCreateGroupWindow(false);
-      setNewGroup({ name: '', members: [] });
+      // setNewGroup({ name: '', members: [] });
+      setResetFormTrigger(true);
       refetch();
       toast({
         description: 'チャットルームの作成が完了しました。',
@@ -41,20 +43,20 @@ const Chat = () => {
   });
   const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
 
-  const toggleUserIDs = (user: User) => {
-    const isExist = newGroup.members?.filter((u) => u.id === user.id);
-    if (isExist && isExist.length) {
-      setNewGroup((g) => ({
-        ...g,
-        members: g.members?.filter((u) => u.id !== user.id),
-      }));
-      return;
-    }
-    setNewGroup((g) => ({
-      ...g,
-      members: g.members ? [...g.members, user] : [user],
-    }));
-  };
+  // const toggleUserIDs = (user: User) => {
+  //   const isExist = newGroup.members?.filter((u) => u.id === user.id);
+  //   if (isExist && isExist.length) {
+  //     setNewGroup((g) => ({
+  //       ...g,
+  //       members: g.members?.filter((u) => u.id !== user.id),
+  //     }));
+  //     return;
+  //   }
+  //   setNewGroup((g) => ({
+  //     ...g,
+  //     members: g.members ? [...g.members, user] : [user],
+  //   }));
+  // };
 
   return (
     <LayoutWithTab
@@ -72,15 +74,17 @@ const Chat = () => {
           isOpen={createGroupWindow}
           closeModal={() => {
             setCreateGroupWindow(false);
-            setNewGroup({});
+            // setNewGroup({});
           }}
-          newGroup={newGroup}
-          onChangeNewGroupName={(groupName) =>
-            setNewGroup((g) => ({ ...g, name: groupName }))
-          }
-          toggleNewGroupMember={toggleUserIDs}
+          // newGroup={newGroup}
+          // onChangeNewGroupName={(groupName) =>
+          //   setNewGroup((g) => ({ ...g, name: groupName }))
+          // }
+          // toggleNewGroupMember={toggleUserIDs}
           users={users}
           createGroup={(g) => createGroup(g)}
+          resetFormTrigger={resetFormTrigger}
+          // handleSubmit={() => handleSubmit()}
         />
       )}
       {chatGroups && isSmallerThan768 ? (

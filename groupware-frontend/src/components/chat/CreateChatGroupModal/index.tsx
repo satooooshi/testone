@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useCallback, useRef, useState, useEffect } from 'react';
 import ReactModal from 'react-modal';
 import { ChatGroup, User, UserRole } from 'src/types';
 import selectUserModalStyles from '@/styles/components/SelectUserModal.module.scss';
@@ -22,22 +22,26 @@ import { userRoleNameFactory } from 'src/utils/factory/userRoleNameFactory';
 
 type CreateChatGroupModalProps = {
   isOpen: boolean;
-  closeModal: () => void;
-  newGroup: Partial<ChatGroup>;
-  onChangeNewGroupName: (groupName: string) => void;
-  toggleNewGroupMember: (u: User) => void;
+  resetFormTrigger: boolean;
   users: User[];
+  closeModal: () => void;
+  // newGroup: Partial<ChatGroup>;
+  // onChangeNewGroupName: (groupName: string) => void;
+  // toggleNewGroupMember: (u: User) => void;
   createGroup: (g: Partial<ChatGroup>) => void;
+  // handleSubmit: () => void;
 };
 
 const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
   isOpen,
-  closeModal,
-  newGroup,
-  onChangeNewGroupName,
-  toggleNewGroupMember,
+  resetFormTrigger,
   users,
+  closeModal,
+  // newGroup,
+  // onChangeNewGroupName,
+  // toggleNewGroupMember,
   createGroup,
+  // handleSubmit,
 }) => {
   const toast = useToast();
   const [selectedUserRole, setSelectedUserRole] = useState<UserRole | 'all'>(
@@ -74,31 +78,41 @@ const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
     imgRef.current = img;
   }, []);
 
-  // ---------------------------------------------------------------
-
   const initialChatValues = {
     name: '',
     members: [],
   };
 
-  // console.log(newGroup);
   const {
-    values: test,
-    // setValues: setTest,
-    handleSubmit: onTest,
+    values: newGroup,
+    setValues: setNewGroup,
+    handleSubmit: handleSubmit,
     handleChange,
+    resetForm,
     // validateForm,
   } = useFormik<Partial<ChatGroup>>({
     initialValues: initialChatValues,
     enableReinitialize: true,
-    // validationSchema: profileSchema,
+    // validationSchema: chatSchema,
     onSubmit: () => {
-      alert('test');
-      // handleUpdateUser();
-      // onFinish();
+      onFinish();
     },
   });
-  console.log(test);
+
+  const toggleNewGroupMember = (user: User) => {
+    const isExist = newGroup.members?.filter((u) => u.id === user.id);
+    if (isExist && isExist.length) {
+      setNewGroup((g) => ({
+        ...g,
+        members: g.members?.filter((u) => u.id !== user.id),
+      }));
+      return;
+    }
+    setNewGroup((g) => ({
+      ...g,
+      members: g.members ? [...g.members, user] : [user],
+    }));
+  };
 
   const onFinish = async () => {
     if (!newGroup.members?.length) {
@@ -111,7 +125,6 @@ const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
       return;
     }
 
-    // ---------------------------------------------------------------
     if (imgRef.current && completedCrop) {
       const img = getCroppedImageURL(imgRef.current, completedCrop);
       if (!img) {
@@ -123,6 +136,10 @@ const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
     }
     createGroup(newGroup);
   };
+
+  useEffect(() => {
+    resetForm();
+  }, [resetFormTrigger]);
 
   return (
     <ReactModal
@@ -136,12 +153,9 @@ const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
             <FormLabel>グループ名</FormLabel>
             <input
               type="text"
-              // 下記追加
               name="name"
               className={selectUserModalStyles.modal_input_name}
-              // value={newGroup.name}
-              value={test.name}
-              // onChange={(e) => onChangeNewGroupName(e.target.value)}
+              value={newGroup.name}
               onChange={handleChange}
               placeholder="グループ名を入力して下さい"
             />
@@ -248,7 +262,10 @@ const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
             colorScheme="blue"
             borderRadius={5}
             className={selectUserModalStyles.modal_cancel_button}
-            onClick={closeModal}>
+            onClick={() => {
+              resetForm();
+              closeModal();
+            }}>
             キャンセル
           </Button>
           <Button
@@ -256,8 +273,7 @@ const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
             width="140px"
             colorScheme="green"
             borderRadius={5}
-            onClick={() => onTest()}>
-            {/* onClick={onFinish}> */}
+            onClick={() => handleSubmit()}>
             作成
           </Button>
         </div>
