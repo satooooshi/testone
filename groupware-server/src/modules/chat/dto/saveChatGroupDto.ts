@@ -6,7 +6,7 @@ import { LastReadChatTime } from 'src/entities/lastReadChatTime.entity';
 import { User } from 'src/entities/user.entity';
 import { IsNotEmptyExceptTags } from 'src/utils/dto/IsNotEmptyExceptTags';
 
-export class saveChatGroupDto implements Partial<ChatGroup> {
+export class SaveChatGroupDto implements Partial<ChatGroup> {
   @IsNotEmptyExceptTags({
     message: 'タイトルは必須項目です。空白のみは設定できません。',
   })
@@ -25,4 +25,4 @@ export class saveChatGroupDto implements Partial<ChatGroup> {
   createdAt: Date;
   updatedAt: Date;
 }
-export default saveChatGroupDto;
+export default SaveChatGroupDto;

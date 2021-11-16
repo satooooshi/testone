@@ -19,7 +19,7 @@ import RequestWithUser from '../auth/requestWithUser.interface';
 import { NotificationService } from '../notification/notification.service';
 import { UserService } from '../user/user.service';
 import { ChatService } from './chat.service';
-import saveChatGroupDto from './dto/saveChatGroupDto';
+import SaveChatGroupDto from './dto/saveChatGroupDto';
 
 export interface GetMessagesQuery {
   group: number;
@@ -73,7 +73,7 @@ export class ChatController {
   @UseGuards(JwtAuthenticationGuard)
   async createChatGroup(
     @Req() req: RequestWithUser,
-    @Body() chatGroup: saveChatGroupDto,
+    @Body() chatGroup: SaveChatGroupDto,
   ): Promise<ChatGroup> {
     const user = req.user;
     if (!chatGroup.members || !chatGroup.members.length) {
