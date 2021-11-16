@@ -39,6 +39,7 @@ import { useHeaderTab } from '@/hooks/headerTab/useHeaderTab';
 import ChatMessageItem from '@/components/chat/ChatMessageItem';
 import { useAPILeaveChatRoom } from '@/hooks/api/chat/useAPILeaveChatRoomURL';
 import { useMention } from '@/hooks/chat/useMention';
+import { responseErrorMsgFactory } from 'src/utils/factory/responseErrorMsgFactory';
 
 const ChatDetail = () => {
   const toast = useToast();
@@ -95,6 +96,16 @@ const ChatDetail = () => {
         isClosable: true,
       });
     },
+    onError: (e) => {
+      const messages = responseErrorMsgFactory(e?.response?.data.message);
+      toast({
+        description: messages,
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      });
+      return;
+    },
   });
 
   const { mutate: saveGroup } = useAPISaveChatGroup({
@@ -105,6 +116,16 @@ const ChatDetail = () => {
         value: { ...newChatMessage, chatGroup: newInfo },
       });
       refetchGroups();
+    },
+    onError: (e) => {
+      const messages = responseErrorMsgFactory(e?.response?.data.message);
+      toast({
+        description: messages,
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      });
+      return;
     },
   });
 
