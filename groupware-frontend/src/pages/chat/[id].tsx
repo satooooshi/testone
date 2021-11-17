@@ -85,6 +85,7 @@ const ChatDetail = () => {
     onSuccess: () => {
       dispatchModal({ type: 'createGroupWindow', value: false });
       setResetFormTrigger(true);
+      groupImageURL && setGroupImageURL('');
       refetchGroups();
       toast({
         description: 'チャットルームの作成が完了しました。',
@@ -132,6 +133,13 @@ const ChatDetail = () => {
   const { mutate: leaveChatGroup } = useAPILeaveChatRoom({
     onSuccess: () => {
       router.push('/chat');
+    },
+  });
+
+  const [groupImageURL, setGroupImageURL] = useState('');
+  const { mutate: uploadImage } = useAPIUploadStorage({
+    onSuccess: async (fileURLs) => {
+      setGroupImageURL(fileURLs[0]);
     },
   });
 
