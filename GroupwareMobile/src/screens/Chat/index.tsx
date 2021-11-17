@@ -28,6 +28,9 @@ import ChatFooter from '../../components/chat/ChatFooter';
 import {userNameFactory} from '../../utils/factory/userNameFactory';
 import {Suggestion} from 'react-native-controlled-mentions';
 import FileMessage from '../../components/chat/ChatMessage/FileMessage';
+import RNFetchBlob from 'rn-fetch-blob';
+const {fs, config} = RNFetchBlob;
+import FileViewer from 'react-native-file-viewer';
 
 type ImageSource = {
   uri: string;
@@ -161,6 +164,26 @@ const Chat: React.FC<ChatProps> = ({route}) => {
     return false;
   };
 
+  const downloadFile = async () => {
+    const date = new Date();
+    let PictureDir =
+      Platform.OS === 'ios' ? fs.dirs.DocumentDir : fs.dirs.PictureDir;
+    let options = {
+      fileCache: true,
+      addAndroidDownloads: {
+        useDownloadManager: true, // setting it to true will use the device's native download manager and will be shown in the notification bar.
+        notification: false,
+        description: 'ファイルをダウンロードします',
+      },
+      path:
+        PictureDir +
+        '/me_' +
+        Math.floor(date.getTime() + date.getSeconds() / 2), // this is the path where your downloaded file will live in
+    };
+    const {path} = await config(options).fetch('GET', message.content);
+    FileViewer.open(path());
+  };
+
   useEffect(() => {
     if (latestMessage && latestMessage.length) {
       setMessages(m => {
@@ -261,10 +284,7 @@ const Chat: React.FC<ChatProps> = ({route}) => {
                   onPress={() => playVideoOnModal(message.content)}
                 />
               ) : message.type === ChatMessageType.OTHER_FILE ? (
-                <FileMessage
-                  message={message}
-                  onPress={() => playVideoOnModal(message.content)}
-                />
+                <FileMessage message={message} onPress={downloadFile} />
               ) : null}
             </Div>
           )}

@@ -50,7 +50,6 @@ const ChatFooter: React.FC<ChatFooterProps> = ({
   const [selection, setSelection] = useState({start: 0, end: 0});
   const [mentionAdded, setMentionAdded] = useState(false);
   const inputRef = useRef<TextInput>(null);
-  console.log(value);
 
   const renderSuggestions: React.FC<MentionSuggestionsProps> = ({
     keyword,
