@@ -80,7 +80,6 @@ const Profile: React.FC<ProfileProps> = ({navigation}) => {
   );
   const {mutate: uploadImage} = useAPIUploadStorage({
     onSuccess: async fileURLs => {
-      console.log(fileURLs[0]);
       setValues(v => ({...v, avatarUrl: fileURLs[0]}));
     },
   });
