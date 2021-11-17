@@ -11,9 +11,17 @@ import {RoomListProps} from '../../../types/navigator/screenProps/Chat';
 const RoomList: React.FC<RoomListProps> = ({navigation}) => {
   const {data: chatRooms} = useAPIGetChatGroupList();
 
+  const onPressRightButton = () => {
+    navigation.navigate('NewRoom');
+  };
+
   return (
     <WholeContainer>
-      <AppHeader title="ルーム一覧" />
+      <AppHeader
+        title="ルーム一覧"
+        rightButtonName={'新規作成'}
+        {...{onPressRightButton}}
+      />
       <FlatList
         contentContainerStyle={roomListStyles.flatlistContent}
         data={chatRooms}

@@ -22,6 +22,7 @@ import UserRegisteringAdmin from '../../screens/admin/UserRegisteringAdmin';
 import TagAdmin from '../../screens/admin/TagAdmin';
 import Chat from '../../screens/Chat';
 import RoomList from '../../screens/Chat/RoomList';
+import NewRoom from '../../screens/Chat/NewRoom';
 
 const Drawer = createDrawerNavigator();
 const Stack = createStackNavigator();
@@ -127,6 +128,11 @@ const ChatStack = () => (
     <Stack.Screen
       name="RoomList"
       component={RoomList}
+      options={{headerShown: false}}
+    />
+    <Stack.Screen
+      name="NewRoom"
+      component={NewRoom}
       options={{headerShown: false}}
     />
     <Stack.Screen name="Chat" component={Chat} options={{headerShown: false}} />

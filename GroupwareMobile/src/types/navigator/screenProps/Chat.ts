@@ -12,6 +12,16 @@ export type RoomListProps = {
   route: RoomListRouteProps;
 };
 
+type NewRoomNavigationProps = StackNavigationProp<
+  RootStackParamList,
+  'NewRoom'
+>;
+type NewRoomRouteProps = RouteProp<RootStackParamList, 'NewRoom'>;
+export type NewRoomProps = {
+  navigation: NewRoomNavigationProps;
+  route: NewRoomRouteProps;
+};
+
 type ChatNavigationProps = StackNavigationProp<RootStackParamList, 'Chat'>;
 type ChatRouteProps = RouteProp<RootStackParamList, 'Chat'>;
 export type ChatProps = {
