@@ -13,7 +13,7 @@ import {Formik} from 'formik';
 
 const Login: React.FC<LoginProps> = ({navigation}) => {
   const windowWidth = useWindowDimensions().width;
-  const {user, setUser} = useAuthenticate();
+  const {setUser} = useAuthenticate();
   const {mutate: mutateLogin} = useAPILogin({
     onSuccess: data => {
       axiosInstance.defaults.headers.common = {
@@ -28,12 +28,6 @@ const Login: React.FC<LoginProps> = ({navigation}) => {
       Alert.alert('認証に失敗しました。入力内容をご確認ください');
     },
   });
-
-  useEffect(() => {
-    if (user?.id) {
-      navigation.navigate('Main');
-    }
-  }, [navigation, user?.id]);
 
   return (
     <WholeContainer>
@@ -93,7 +87,7 @@ const Login: React.FC<LoginProps> = ({navigation}) => {
                 py="lg"
                 bg="green700"
                 color="white">
-                Login
+                ログイン
               </Button>
             </>
           )}

@@ -252,6 +252,7 @@ export interface ChatMessage {
   createdAt: Date;
   updatedAt: Date;
   isSender?: boolean;
+  thumbnail?: string;
 }
 
 export interface ChatGroup {

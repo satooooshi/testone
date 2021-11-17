@@ -1,6 +1,6 @@
 import {User} from '../../types';
 
-export const userNameFactory = (user: User | undefined) => {
+export const userNameFactory = (user: Partial<User> | undefined) => {
   if (!user) {
     return 'ボールドくん';
   }

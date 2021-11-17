@@ -1,3 +1,4 @@
+import { AxiosError } from 'axios';
 import { useMutation, UseMutationOptions } from 'react-query';
 import { ChatGroup } from 'src/types';
 import { axiosInstance } from 'src/utils/url';
@@ -16,12 +17,12 @@ const saveChatGroup = async (
 export const useAPISaveChatGroup = (
   mutationOptions?: UseMutationOptions<
     ChatGroup,
-    Error,
+    AxiosError,
     Partial<ChatGroup>,
     unknown
   >,
 ) => {
-  return useMutation<ChatGroup, Error, Partial<ChatGroup>>(
+  return useMutation<ChatGroup, AxiosError, Partial<ChatGroup>>(
     saveChatGroup,
     mutationOptions,
   );

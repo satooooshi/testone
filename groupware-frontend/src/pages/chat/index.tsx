@@ -14,6 +14,7 @@ import { useRouter } from 'next/router';
 import selectChatGroupModalStyles from '@/styles/components/SelectChatGroupModal.module.scss';
 import { useAPISaveChatGroup } from '@/hooks/api/chat/useAPISaveChatGroup';
 import { useAPIUploadStorage } from '@/hooks/api/storage/useAPIUploadStorage';
+import { responseErrorMsgFactory } from 'src/utils/factory/responseErrorMsgFactory';
 
 const Chat = () => {
   const router = useRouter();
@@ -36,6 +37,16 @@ const Chat = () => {
         duration: 3000,
         isClosable: true,
       });
+    },
+    onError: (e) => {
+      const messages = responseErrorMsgFactory(e?.response?.data.message);
+      toast({
+        description: messages,
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      });
+      return;
     },
   });
   const [groupImageURL, setGroupImageURL] = useState('');

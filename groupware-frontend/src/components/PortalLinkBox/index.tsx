@@ -9,6 +9,7 @@ import { FcSportsMode } from 'react-icons/fc';
 import { RiAccountCircleFill, RiQuestionnaireFill } from 'react-icons/ri';
 import { MdAssignment } from 'react-icons/md';
 import { CgLoadbarDoc } from 'react-icons/cg';
+import { GrMail } from 'react-icons/gr';
 import { AiOutlineGlobal, AiFillBulb } from 'react-icons/ai';
 import clsx from 'clsx';
 import { useAuthenticate } from 'src/contexts/useAuthenticate';
@@ -22,6 +23,7 @@ export enum PortalLinkType {
   SUBMISSION_ETC = '/event/list?type=submission_etc&from=&to=',
   WIKI = '/wiki',
   RULES = '/wiki/list?type=rule&rule_category=philosophy',
+  ALL_POSTAL = '/wiki/list?type=all-postal',
   KNOWLEDGE = '/wiki/list?type=knowledge',
   QA = `/wiki/list?type=qa`,
   CHAT = '/chat',
@@ -102,6 +104,15 @@ const PortalIcon: React.FC<PortalProps> = ({ href }) => {
           )}
         />
       );
+    case PortalLinkType.ALL_POSTAL:
+      return (
+        <GrMail
+          className={clsx(
+            portalLinkBoxStyles.icon,
+            portalLinkBoxStyles.all_postal,
+          )}
+        />
+      );
     case PortalLinkType.RULES:
       return (
         <CgLoadbarDoc
@@ -178,6 +189,8 @@ export const eventTitleText = (href: PortalLinkType): string => {
       return '社内Wiki';
     case PortalLinkType.RULES:
       return '社内規則';
+    case PortalLinkType.ALL_POSTAL:
+      return 'オール便';
     case PortalLinkType.KNOWLEDGE:
       return 'ナレッジ';
     case PortalLinkType.QA:
@@ -211,6 +224,9 @@ const descriptionText = (href: PortalLinkType): string => {
       return '社内規則/ナレッジ/Q&Aを共有する総合的な情報共有スペースです';
     case PortalLinkType.RULES:
       return '社内規則を共有し、社員の業務を促進します';
+    case PortalLinkType.ALL_POSTAL:
+      return `会社から全社員に向けての重要連絡事項です。今後の提出期限や重要なお知らせを記載しています。
+毎週金曜日に更新しますので必ず確認してください。`;
     case PortalLinkType.KNOWLEDGE:
       return '社員がお互いに効率的な業務を促進し知識共有スペースです。業務での不明点解決に役立ちます';
     case PortalLinkType.QA:

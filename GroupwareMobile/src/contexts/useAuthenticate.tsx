@@ -2,6 +2,7 @@ import React, {useEffect} from 'react';
 import {createContext, useContext, useState} from 'react';
 import {User} from '../types';
 import {useAPIAuthenticate} from '../hooks/api/auth/useAPIAuthenticate';
+import {storage} from '../utils/url';
 
 const AuthenticateContext = createContext({
   isAuthenticated: false,
@@ -21,6 +22,9 @@ export const AuthenticateProvider: React.FC = ({children}) => {
         setUser(userData);
       }
     },
+    onError: () => {
+      logout();
+    },
   });
 
   useEffect(() => {
@@ -36,6 +40,7 @@ export const AuthenticateProvider: React.FC = ({children}) => {
   };
 
   const logout = () => {
+    storage.delete('userToken');
     setProfile(undefined);
     setIsAuthenticated(false);
   };

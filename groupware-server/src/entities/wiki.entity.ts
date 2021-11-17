@@ -19,6 +19,7 @@ import { User } from './user.entity';
 export enum WikiType {
   RULES = 'rule',
   KNOWLEDGE = 'knowledge',
+  ALL_POSTAL = 'all-postal',
   QA = 'qa',
 }
 

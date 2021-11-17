@@ -10,30 +10,37 @@ import {
   MinDate,
   ValidateIf,
 } from 'class-validator';
-import { EventType } from 'src/entities/event.entity';
-import { isNotEmptyExceptTags } from 'src/utils/dto/isNotEmptyExceptTags';
-import { isYoutubeLink } from 'src/utils/dto/isYoutubeLink';
+import { IsNotEmptyExceptTags } from 'src/utils/dto/IsNotEmptyExceptTags';
+import { IsYoutubeLink } from 'src/utils/dto/IsYoutubeLink';
+import { ChatGroup } from 'src/entities/chatGroup.entity';
+import { EventSchedule, EventType } from 'src/entities/event.entity';
+import { EventFile } from 'src/entities/eventFile.entity';
+import { EventVideo } from 'src/entities/eventVideo.entity';
+import { SubmissionFile } from 'src/entities/submissionFiles.entity';
+import { Tag } from 'src/entities/tag.entity';
+import { User } from 'src/entities/user.entity';
+import { UserJoiningEvent } from 'src/entities/userJoiningEvent.entity';
 
-export class saveEventDto {
-  @isNotEmptyExceptTags({
+export class saveEventDto implements Partial<EventSchedule> {
+  @IsNotEmptyExceptTags({
     message: 'タイトルは必須項目です。空白のみは設定できません。',
   })
   @IsString()
   title: string;
 
   @ValidateIf((o, v) => v != null && v.length)
-  @isNotEmptyExceptTags({ message: '空白のみの概要は設定できません。' })
+  @IsNotEmptyExceptTags({ message: '空白のみの概要は設定できません。' })
   description: string;
 
   @ArrayNotEmpty({ message: 'タグは必須項目です。' })
   @IsArray({ message: 'タグのリクエストは配列型に限られています。' })
-  tags: [];
+  tags: Tag[];
 
   @IsNotEmpty({ message: 'タイプは必須項目です。' })
   @IsEnum(EventType, {
     message: 'タイプのリクエストの値が不正です。',
   })
-  type: string;
+  type: EventType;
 
   @Type(() => Date)
   @IsNotEmpty({ message: '開始日時は必須項目です。' })
@@ -56,7 +63,16 @@ export class saveEventDto {
 
   @ValidateIf((o, v) => v != null && v.length)
   @IsArray({ message: 'YouTubeリンクのリクエストは配列型に限られています。' })
-  @isYoutubeLink({ message: 'Youtubeの動画URLが不正です。' })
-  videos: [];
+  @IsYoutubeLink({ message: 'Youtubeの動画URLが不正です。' })
+  videos: EventVideo[];
+
+  id: number;
+  imageURL: string;
+  chatGroup?: ChatGroup;
+  hostUsers?: User[];
+  userJoiningEvent?: UserJoiningEvent[];
+  author?: User;
+  files: EventFile[];
+  submissionFiles?: SubmissionFile[];
 }
 export default saveEventDto;
