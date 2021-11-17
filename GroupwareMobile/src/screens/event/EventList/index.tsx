@@ -25,8 +25,8 @@ const TopTab = createMaterialTopTabNavigator();
 
 const EventList: React.FC<EventListProps> = ({navigation}) => {
   const [visibleSearchFormModal, setVisibleSearchFormModal] = useState(false);
-  const {data: tags, isLoading: isLoadingGetTags} = useAPIGetTag();
-  const {data: users, isLoading: isLoadingGetUsers} = useAPIGetUsers();
+  const {data: tags} = useAPIGetTag();
+  const {data: users} = useAPIGetUsers();
   const [searchQuery, setSearchQuery] = useState<SearchQueryToGetEvents>(
     defaultWeekQuery(),
   );
@@ -35,7 +35,7 @@ const EventList: React.FC<EventListProps> = ({navigation}) => {
     refetch: refetchEvents,
     isLoading: isLoadingGetEventList,
   } = useAPIGetEventList(searchQuery);
-  const [eventsForInfinitScroll, setEventsForInfinitSroll] = useState(
+  const [eventsForInfinitScroll, setEventsForInfiniteScroll] = useState(
     events?.events || [],
   );
   const [visibleEventFormModal, setEventFormModal] = useState(false);
@@ -94,7 +94,7 @@ const EventList: React.FC<EventListProps> = ({navigation}) => {
 
   useEffect(() => {
     if (events?.events && events?.events.length) {
-      setEventsForInfinitSroll(e => {
+      setEventsForInfiniteScroll(e => {
         if (e.length) {
           return [...e, ...events.events];
         }
@@ -104,26 +104,16 @@ const EventList: React.FC<EventListProps> = ({navigation}) => {
   }, [events?.events]);
 
   useEffect(() => {
-    if (
-      isLoadingGetEventList ||
-      isLoadingGetUsers ||
-      isLoadingGetTags ||
-      isLoadingSaveEvent
-    ) {
+    if (isLoadingGetEventList || isLoadingSaveEvent) {
       setScreenLoading(true);
       return;
     }
     setScreenLoading(false);
-  }, [
-    isLoadingGetEventList,
-    isLoadingGetTags,
-    isLoadingGetUsers,
-    isLoadingSaveEvent,
-  ]);
+  }, [isLoadingGetEventList, isLoadingSaveEvent]);
 
   useEffect(() => {
     if (!isCalendar) {
-      setEventsForInfinitSroll([]);
+      setEventsForInfiniteScroll([]);
     }
   }, [
     searchQuery.word,

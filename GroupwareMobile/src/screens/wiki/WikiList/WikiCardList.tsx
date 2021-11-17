@@ -1,10 +1,10 @@
 import React, {useState, useEffect, Dispatch, SetStateAction} from 'react';
-import {AllTag, RuleCategory, WikiType} from '../../../types';
+import {AllTag, RuleCategory, Wiki, WikiType} from '../../../types';
 import {
   SearchQueryToGetWiki,
   useAPIGetWikiList,
 } from '../../../hooks/api/wiki/useAPIGetWikiList';
-import {Button, Div, Icon, Overlay, Text} from 'react-native-magnus';
+import {Div, Overlay, Text} from 'react-native-magnus';
 import WikiCard from '../../../components/wiki/WikiCard';
 import {WikiListNavigationProps} from '../../../types/navigator/screenProps/Wiki';
 import {ActivityIndicator, FlatList} from 'react-native';
@@ -23,8 +23,7 @@ type WikiCardListProps = {
 };
 
 type RenderWikiCardListProps = {
-  screenLoading: boolean;
-  setScreenLoading: Dispatch<SetStateAction<boolean>>;
+  wiki: Wiki[];
   type?: WikiType;
   ruleCategory?: RuleCategory;
   status?: 'new' | 'resolved';
@@ -33,24 +32,21 @@ type RenderWikiCardListProps = {
 };
 
 const RenderWikiCardList: React.FC<RenderWikiCardListProps> = ({
-  screenLoading,
-  setScreenLoading,
+  wiki,
   type,
   ruleCategory,
   status,
-  searchQuery,
   setSearchQuery,
 }) => {
   const navigation = useNavigation<any>();
-  const {data: fetchedWiki, isLoading: isLoadingWiki} = useAPIGetWikiList(
-    searchQuery,
-    {
-      onSuccess: () => {
-        setScreenLoading(false);
-      },
-    },
-  );
   const isFocsed = useIsFocused();
+
+  const onEndReached = () => {
+    setSearchQuery(q => ({
+      ...q,
+      page: q.page ? (Number(q.page) + 1).toString() : '1',
+    }));
+  };
 
   useEffect(() => {
     if (isFocsed) {
@@ -63,27 +59,21 @@ const RenderWikiCardList: React.FC<RenderWikiCardListProps> = ({
     }
   }, [isFocsed, ruleCategory, setSearchQuery, status, type]);
 
-  useEffect(() => {
-    if (isLoadingWiki) {
-      setScreenLoading(true);
-    } else {
-      setScreenLoading(false);
-    }
-  }, [isLoadingWiki, setScreenLoading]);
-
   return (
     <Div>
-      {!screenLoading && fetchedWiki?.wiki.length ? (
+      {wiki.length ? (
         <FlatList
-          data={fetchedWiki?.wiki || []}
-          renderItem={({item: wiki}) => (
+          onEndReached={onEndReached}
+          data={wiki || []}
+          keyExtractor={item => item.id.toString()}
+          renderItem={({item}) => (
             <WikiCard
               onPress={w => navigation.navigate('WikiDetail', {id: w.id})}
-              wiki={wiki}
+              wiki={item}
             />
           )}
         />
-      ) : !screenLoading && !fetchedWiki?.wiki.length ? (
+      ) : !wiki.length ? (
         <Text fontSize={16} textAlign="center">
           検索結果が見つかりませんでした
         </Text>
@@ -97,6 +87,11 @@ const WikiCardList: React.FC<WikiCardListProps> = ({type}) => {
     page: '1',
     type,
   });
+  const {data: fetchedWiki, isLoading: isLoadingWiki} =
+    useAPIGetWikiList(searchQuery);
+  const [wikiForInfiniteScroll, setWikiForInfiniteScroll] = useState(
+    fetchedWiki?.wiki || [],
+  );
   const [visibleSearchFormModal, setVisibleSearchFormModal] = useState(false);
   const {data: tags} = useAPIGetTag();
   const [customLoading, setCustomLoading] = useState(false);
@@ -112,8 +107,31 @@ const WikiCardList: React.FC<WikiCardListProps> = ({type}) => {
   };
 
   useEffect(() => {
+    if (isLoadingWiki) {
+      setCustomLoading(true);
+    } else {
+      setCustomLoading(false);
+    }
+  }, [isLoadingWiki]);
+
+  useEffect(() => {
     setSearchQuery(q => ({...q, type}));
   }, [type]);
+
+  useEffect(() => {
+    if (fetchedWiki?.wiki && fetchedWiki?.wiki.length) {
+      setWikiForInfiniteScroll(w => {
+        if (w.length) {
+          return [...w, ...fetchedWiki.wiki];
+        }
+        return fetchedWiki.wiki;
+      });
+    }
+  }, [fetchedWiki?.wiki]);
+
+  useEffect(() => {
+    setWikiForInfiniteScroll([]);
+  }, [searchQuery.word, searchQuery.status, searchQuery.type, searchQuery.tag]);
 
   return (
     <Div flexDir="column" h="100%" pb={80}>
@@ -139,8 +157,7 @@ const WikiCardList: React.FC<WikiCardListProps> = ({type}) => {
             name={'WikiList-' + RuleCategory.PHILOSOPHY}
             children={() => (
               <RenderWikiCardList
-                screenLoading={customLoading}
-                setScreenLoading={setCustomLoading}
+                wiki={wikiForInfiniteScroll}
                 type={WikiType.RULES}
                 ruleCategory={RuleCategory.PHILOSOPHY}
                 status={undefined}
@@ -154,8 +171,7 @@ const WikiCardList: React.FC<WikiCardListProps> = ({type}) => {
             name={'WikiList-' + RuleCategory.RULES}
             children={() => (
               <RenderWikiCardList
-                screenLoading={customLoading}
-                setScreenLoading={setCustomLoading}
+                wiki={wikiForInfiniteScroll}
                 type={WikiType.RULES}
                 ruleCategory={RuleCategory.RULES}
                 status={undefined}
@@ -169,8 +185,7 @@ const WikiCardList: React.FC<WikiCardListProps> = ({type}) => {
             name={'WikiList-' + RuleCategory.ABC}
             children={() => (
               <RenderWikiCardList
-                screenLoading={customLoading}
-                setScreenLoading={setCustomLoading}
+                wiki={wikiForInfiniteScroll}
                 type={WikiType.RULES}
                 ruleCategory={RuleCategory.ABC}
                 status={undefined}
@@ -184,8 +199,7 @@ const WikiCardList: React.FC<WikiCardListProps> = ({type}) => {
             name={'WikiList-' + RuleCategory.BENEFITS}
             children={() => (
               <RenderWikiCardList
-                screenLoading={customLoading}
-                setScreenLoading={setCustomLoading}
+                wiki={wikiForInfiniteScroll}
                 type={WikiType.RULES}
                 ruleCategory={RuleCategory.BENEFITS}
                 status={undefined}
@@ -199,8 +213,7 @@ const WikiCardList: React.FC<WikiCardListProps> = ({type}) => {
             name={'WikiList-' + RuleCategory.DOCUMENT}
             children={() => (
               <RenderWikiCardList
-                screenLoading={customLoading}
-                setScreenLoading={setCustomLoading}
+                wiki={wikiForInfiniteScroll}
                 type={WikiType.RULES}
                 ruleCategory={RuleCategory.DOCUMENT}
                 status={undefined}
@@ -217,8 +230,7 @@ const WikiCardList: React.FC<WikiCardListProps> = ({type}) => {
             name={'WikiList-' + WikiType.QA + '-new'}
             children={() => (
               <RenderWikiCardList
-                screenLoading={customLoading}
-                setScreenLoading={setCustomLoading}
+                wiki={wikiForInfiniteScroll}
                 type={WikiType.QA}
                 ruleCategory={undefined}
                 status={'new'}
@@ -232,8 +244,7 @@ const WikiCardList: React.FC<WikiCardListProps> = ({type}) => {
             name={'WikiList-' + WikiType.QA + '-resolved'}
             children={() => (
               <RenderWikiCardList
-                screenLoading={customLoading}
-                setScreenLoading={setCustomLoading}
+                wiki={wikiForInfiniteScroll}
                 type={WikiType.QA}
                 ruleCategory={undefined}
                 status={'resolved'}
@@ -246,8 +257,7 @@ const WikiCardList: React.FC<WikiCardListProps> = ({type}) => {
         </TopTab.Navigator>
       ) : (
         <RenderWikiCardList
-          screenLoading={customLoading}
-          setScreenLoading={setCustomLoading}
+          wiki={wikiForInfiniteScroll}
           type={WikiType.KNOWLEDGE}
           ruleCategory={undefined}
           status={undefined}
