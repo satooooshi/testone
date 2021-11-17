@@ -2,10 +2,10 @@ import { IsString } from 'class-validator';
 import { EventSchedule } from 'src/entities/event.entity';
 import { EventComment } from 'src/entities/eventComment.entity';
 import { User } from 'src/entities/user.entity';
-import { IsNotEmptyExceptTags } from 'src/utils/dto/IsNotEmptyExceptTags';
+import { isNotEmptyExceptTags } from 'src/utils/dto/isNotEmptyExceptTags';
 
 export class createCommentDto implements EventComment {
-  @IsNotEmptyExceptTags({
+  @isNotEmptyExceptTags({
     message: '空白のみのコメントは送信できません。',
   })
   @IsString()
