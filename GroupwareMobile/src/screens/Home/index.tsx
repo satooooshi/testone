@@ -1,14 +1,12 @@
-import React, {useEffect} from 'react';
+import React from 'react';
 import WholeContainer from '../../components/WholeContainer';
 import AppHeader, {Tab} from '../../components/Header';
 import PortalLinkBox from '../../components/PortalLinkBox';
 import {Div} from 'react-native-magnus';
 import {ScrollView} from 'react-native';
-import {useAuthenticate} from '../../contexts/useAuthenticate';
 import {HomeProps} from '../../types/navigator/screenProps/Login';
 
-const Home: React.FC<HomeProps> = ({navigation}) => {
-  const {user} = useAuthenticate();
+const Home: React.FC<HomeProps> = () => {
   const tabs: Tab[] = [
     {
       name: 'ダッシュボード',
@@ -19,12 +17,6 @@ const Home: React.FC<HomeProps> = ({navigation}) => {
       onPress: console.log,
     },
   ];
-
-  useEffect(() => {
-    if (!user?.id) {
-      navigation.navigate('Login');
-    }
-  }, [navigation, user?.id]);
 
   return (
     <WholeContainer>

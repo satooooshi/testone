@@ -80,7 +80,6 @@ const Profile: React.FC<ProfileProps> = ({navigation}) => {
   );
   const {mutate: uploadImage} = useAPIUploadStorage({
     onSuccess: async fileURLs => {
-      console.log(fileURLs[0]);
       setValues(v => ({...v, avatarUrl: fileURLs[0]}));
     },
   });
@@ -162,7 +161,11 @@ const Profile: React.FC<ProfileProps> = ({navigation}) => {
               mt={'lg'}
               h={windowWidth * 0.6}
               w={windowWidth * 0.6}
-              source={{uri: values.avatarUrl}}
+              source={
+                values.avatarUrl
+                  ? {uri: values.avatarUrl}
+                  : require('../../../../assets/no-image-avatar.png')
+              }
               rounded="circle"
               mb={'lg'}
             />

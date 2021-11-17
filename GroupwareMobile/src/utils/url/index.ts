@@ -4,7 +4,7 @@ import Config from 'react-native-config';
 
 export const storage = new MMKV();
 
-const tokenString = (): string => {
+export const tokenString = (): string => {
   return storage.getString('userToken') || '';
 };
 export const jsonHeader = {

@@ -54,7 +54,14 @@ const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
               {wikiInfo.title}
             </Text>
             <Div flexDir="row" alignItems="center" mb={16}>
-              <Avatar mr={8} source={{uri: wikiInfo.writer?.avatarUrl}} />
+              <Avatar
+                mr={8}
+                source={
+                  wikiInfo.writer?.avatarUrl
+                    ? {uri: wikiInfo.writer?.avatarUrl}
+                    : require('../../../../assets/no-image-avatar.png')
+                }
+              />
               <Text fontSize={18} color={darkFontColor}>
                 {userNameFactory(wikiInfo.writer)}
               </Text>

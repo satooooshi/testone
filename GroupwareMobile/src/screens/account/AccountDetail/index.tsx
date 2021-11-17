@@ -172,7 +172,11 @@ const AccountDetail: React.FC<AccountDetailProps> = ({navigation, route}) => {
                 mt={'lg'}
                 h={windowWidth * 0.6}
                 w={windowWidth * 0.6}
-                source={{uri: profile.avatarUrl}}
+                source={
+                  profile.avatarUrl
+                    ? {uri: profile.avatarUrl}
+                    : require('../../../../assets/no-image-avatar.png')
+                }
                 rounded="circle"
                 mb={'lg'}
               />

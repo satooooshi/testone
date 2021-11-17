@@ -9,10 +9,11 @@ import EventCard from '../../../components/events/EventCard';
 import {Div} from 'react-native-magnus';
 import {EventListNavigationProps} from '../../../types/navigator/screenProps/Event';
 import {useIsFocused} from '@react-navigation/native';
+import {EventSchedule} from '../../../types';
 
 type EventCardListProps = {
   status: EventStatus;
-  searchResult?: SearchResultToGetEvents;
+  searchResult?: EventSchedule[];
   navigation: EventListNavigationProps;
   searchQuery: SearchQueryToGetEvents;
   setSearchQuery: Dispatch<SetStateAction<SearchQueryToGetEvents>>;
@@ -26,6 +27,13 @@ const EventCardList: React.FC<EventCardListProps> = ({
 }) => {
   const isFocused = useIsFocused();
 
+  const onEndReached = () => {
+    setSearchQuery(q => ({
+      ...q,
+      page: q.page ? (Number(q.page) + 1).toString() : '1',
+    }));
+  };
+
   useEffect(() => {
     if (isFocused) {
       setSearchQuery(q => ({...q, from: undefined, to: undefined, status}));
@@ -35,7 +43,8 @@ const EventCardList: React.FC<EventCardListProps> = ({
   return (
     <Div flexDir="column" alignItems="center">
       <FlatList
-        data={searchResult?.events || []}
+        onEndReached={onEndReached}
+        data={searchResult || []}
         keyExtractor={item => item.id.toString()}
         renderItem={({item: eventSchedule}) => (
           <Div mb={16}>
