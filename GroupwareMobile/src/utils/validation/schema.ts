@@ -10,6 +10,7 @@ const unmatchPasswordConfirmation = '再入力と新しいパスワードが一�
 const nWordLimitMessage = (len: number) => `${len}文字以内で入力してください`;
 const afterNowMessage = '現在の日時以降に設定してください';
 // const minHostUsersMessage = '開催者/講師は一人以上設定してください';
+const minRoomUserMessage = 'トークルームには一人以上の社員を招待してください';
 
 export const loginSchema = Yup.object().shape({
   email: Yup.string().email(emailFormatMessage).required(requireMessage),
@@ -57,4 +58,7 @@ export const savingEventSchema = Yup.object().shape({
     .min(Yup.ref('startAt'), minDateMessage)
     .required(`終了日時は${requireMessage}`),
   tags: Yup.array().min(1, minTagsMessage),
+});
+export const savingRoomSchema = Yup.object().shape({
+  members: Yup.array().min(1, minRoomUserMessage),
 });

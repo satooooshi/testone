@@ -13,6 +13,8 @@ import WikiDetail from '../screens/wiki/WikiDetail';
 import UserRegisteringAdmin from '../screens/admin/UserRegisteringAdmin';
 import TagAdmin from '../screens/admin/TagAdmin';
 import UserTagAdmin from '../screens/admin/UserTagAdmin';
+import Chat from '../screens/Chat';
+import {tokenString} from '../utils/url';
 
 const Stack = createStackNavigator<RootStackParamList>();
 
@@ -20,57 +22,68 @@ const Navigator = () => {
   const {user} = useAuthenticate();
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName={user?.id ? 'Main' : 'Login'}>
-        <Stack.Screen
-          name="Login"
-          component={Login}
-          options={{headerShown: false}}
-        />
-        <Stack.Screen
-          name="Main"
-          component={DrawerTab}
-          options={{headerShown: false}}
-        />
-        <Stack.Screen
-          name="AccountDetail"
-          component={AccountDetail}
-          options={{headerShown: false}}
-        />
-        <Stack.Screen
-          name="Profile"
-          component={Profile}
-          options={{headerShown: false}}
-        />
-        <Stack.Screen
-          name="UpdatePassword"
-          component={UpdatePassword}
-          options={{headerShown: false}}
-        />
-        <Stack.Screen
-          name="EventDetail"
-          component={EventDetail}
-          options={{headerShown: false}}
-        />
-        <Stack.Screen
-          name="WikiDetail"
-          component={WikiDetail}
-          options={{headerShown: false}}
-        />
-        <Stack.Screen
-          name="UserRegisteringAdmin"
-          component={UserRegisteringAdmin}
-          options={{headerShown: false}}
-        />
-        <Stack.Screen
-          name="TagAdmin"
-          component={TagAdmin}
-          options={{headerShown: false}}
-        />
-        <Stack.Screen
-          name="UserTagAdmin"
-          component={UserTagAdmin}
-          options={{headerShown: false}}
-        />
+      <Stack.Navigator
+        initialRouteName={user?.id || tokenString() ? 'Main' : 'Login'}>
+        {user?.id ? (
+          <>
+            <Stack.Screen
+              name="Main"
+              component={DrawerTab}
+              options={{headerShown: false}}
+            />
+            <Stack.Screen
+              name="AccountDetail"
+              component={AccountDetail}
+              options={{headerShown: false}}
+            />
+            <Stack.Screen
+              name="Profile"
+              component={Profile}
+              options={{headerShown: false}}
+            />
+            <Stack.Screen
+              name="UpdatePassword"
+              component={UpdatePassword}
+              options={{headerShown: false}}
+            />
+            <Stack.Screen
+              name="EventDetail"
+              component={EventDetail}
+              options={{headerShown: false}}
+            />
+            <Stack.Screen
+              name="WikiDetail"
+              component={WikiDetail}
+              options={{headerShown: false}}
+            />
+            <Stack.Screen
+              name="UserRegisteringAdmin"
+              component={UserRegisteringAdmin}
+              options={{headerShown: false}}
+            />
+            <Stack.Screen
+              name="TagAdmin"
+              component={TagAdmin}
+              options={{headerShown: false}}
+            />
+            <Stack.Screen
+              name="UserTagAdmin"
+              component={UserTagAdmin}
+              options={{headerShown: false}}
+            />
+            <Stack.Screen
+              name="Chat"
+              component={Chat}
+              options={{headerShown: false}}
+            />
+          </>
+        ) : (
+          <Stack.Screen
+            name="Login"
+            component={Login}
+            options={{headerShown: false}}
+          />
+        )}
       </Stack.Navigator>
     </NavigationContainer>
   );

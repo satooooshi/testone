@@ -2,6 +2,7 @@ import {useMutation, UseMutationOptions} from 'react-query';
 import {axiosInstance, jsonHeader} from '../../../utils/url';
 import {User} from '../../../types';
 import {loginURL} from '../../../utils/url/auth.url';
+import {AxiosError} from 'axios';
 
 export type LoginRequest = {
   email: string;
@@ -18,12 +19,12 @@ const login = async (values: LoginRequest) => {
 export const useAPILogin = (
   mutationOptions?: UseMutationOptions<
     Partial<User>,
-    Error,
+    AxiosError,
     LoginRequest,
     unknown
   >,
 ) => {
-  return useMutation<Partial<User>, Error, LoginRequest>(
+  return useMutation<Partial<User>, AxiosError, LoginRequest>(
     login,
     mutationOptions,
   );

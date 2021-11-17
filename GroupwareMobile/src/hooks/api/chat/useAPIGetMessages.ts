@@ -1,7 +1,8 @@
 import {useQuery, UseQueryOptions} from 'react-query';
 import {axiosInstance} from '../../../utils/url';
-import {ChatMessage} from '../../../types';
+import {ChatMessage, ChatMessageType} from '../../../types';
 import {getChatMessagesURL} from '../../../utils/url/chat.url';
+import {getThumbnailOfVideo} from '../../../utils/getThumbnailOfVideo';
 
 export interface GetMessagesQuery {
   group: number;
@@ -12,6 +13,19 @@ const getMessages = async (query: GetMessagesQuery) => {
   const {group, page = 1} = query;
   const res = await axiosInstance.get<ChatMessage[]>(
     `${getChatMessagesURL}?group=${group}&page=${page}`,
+  );
+  await Promise.all(
+    res.data.map(async m => {
+      if (m.type === ChatMessageType.VIDEO) {
+        try {
+          const thumbnail = await getThumbnailOfVideo(m.content);
+          console.log(thumbnail);
+          m.thumbnail = thumbnail;
+        } catch {
+          m.thumbnail = '';
+        }
+      }
+    }),
   );
   return res.data;
 };
