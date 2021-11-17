@@ -161,7 +161,11 @@ const Profile: React.FC<ProfileProps> = ({navigation}) => {
               mt={'lg'}
               h={windowWidth * 0.6}
               w={windowWidth * 0.6}
-              source={{uri: values.avatarUrl}}
+              source={
+                values.avatarUrl
+                  ? {uri: values.avatarUrl}
+                  : require('../../../../assets/no-image-avatar.png')
+              }
               rounded="circle"
               mb={'lg'}
             />

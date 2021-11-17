@@ -112,9 +112,7 @@ const EventList: React.FC<EventListProps> = ({navigation}) => {
   }, [isLoadingGetEventList, isLoadingSaveEvent]);
 
   useEffect(() => {
-    if (!isCalendar) {
-      setEventsForInfiniteScroll([]);
-    }
+    setEventsForInfiniteScroll([]);
   }, [
     searchQuery.word,
     searchQuery.status,
