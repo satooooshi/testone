@@ -36,7 +36,7 @@ type ImageSource = {
 const Chat: React.FC<ChatProps> = ({route}) => {
   const {height: windowHeight} = useWindowDimensions();
   const {room} = route.params;
-  const [page] = useState(1);
+  const [page, setPage] = useState(1);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const [imageModal, setImageModal] = useState(false);
@@ -47,6 +47,13 @@ const Chat: React.FC<ChatProps> = ({route}) => {
     group: room.id,
     page: page.toString(),
   });
+  const {data: latestMessage} = useAPIGetMessages(
+    {
+      group: room.id,
+      page: '1',
+    },
+    {refetchInterval: 1000},
+  );
   const suggestions = (): Suggestion[] => {
     if (!room.members) {
       return [];
@@ -143,9 +150,45 @@ const Chat: React.FC<ChatProps> = ({route}) => {
     setVideo(url);
   };
 
+  const onEndReached = () => {
+    setPage(p => p + 1);
+  };
+
+  const isRecent = (created: ChatMessage, target: ChatMessage): boolean => {
+    if (new Date(created.createdAt) > new Date(target.createdAt)) {
+      return true;
+    }
+    return false;
+  };
+
+  useEffect(() => {
+    if (latestMessage && latestMessage.length) {
+      setMessages(m => {
+        if (
+          m &&
+          m.length &&
+          isRecent(latestMessage[latestMessage.length - 1], m[0])
+        ) {
+          return [...latestMessage, ...m];
+        } else {
+          return m;
+        }
+      });
+    }
+  }, [latestMessage]);
+
   useEffect(() => {
     if (fetchedMessage?.length) {
-      setMessages(fetchedMessage);
+      setMessages(m => {
+        if (
+          m.length &&
+          isRecent(m[m.length - 1], fetchedMessage[fetchedMessage.length - 1])
+        ) {
+          return [...m, ...fetchedMessage];
+        } else {
+          return fetchedMessage;
+        }
+      });
       const fetchedImages: ImageSource[] = fetchedMessage
         .filter(m => m.type === ChatMessageType.IMAGE)
         .map(m => ({uri: m.content}))
@@ -200,6 +243,7 @@ const Chat: React.FC<ChatProps> = ({route}) => {
           contentContainerStyle={chatStyles.flatlistContent}
           inverted
           data={messages}
+          {...{onEndReached}}
           renderItem={({item: message}) => (
             <Div
               alignSelf={message?.isSender ? 'flex-end' : 'flex-start'}
