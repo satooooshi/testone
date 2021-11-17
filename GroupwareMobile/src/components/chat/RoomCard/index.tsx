@@ -37,7 +37,11 @@ const RoomCard: React.FC<RoomCardProps> = ({room, onPress}) => {
         flexDir="row">
         <Image
           h={'90%'}
-          source={{uri: room.imageURL}}
+          source={
+            room.imageURL
+              ? {uri: room.imageURL}
+              : require('../../../../assets/no-image-avatar.png')
+          }
           rounded="circle"
           mr={'lg'}
           style={roomCardStyles.image}

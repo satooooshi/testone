@@ -1,6 +1,6 @@
 import React, {useMemo} from 'react';
-import {EventSchedule} from '../../../types';
-import {Div, Text, Tag} from 'react-native-magnus';
+import {EventSchedule, EventType} from '../../../types';
+import {Div, Text, Tag, Icon} from 'react-native-magnus';
 import FastImage from 'react-native-fast-image';
 import {tagColorFactory} from '../../../utils/factory/tagColorFactory';
 import {FlatList, useWindowDimensions, TouchableHighlight} from 'react-native';
@@ -30,6 +30,22 @@ const EventCard: React.FC<EventCardProps> = ({event, onPress}) => {
       format: 'yyyy/LL/dd HH:mm',
     });
   }, [event.endAt]);
+  const defaultImage = () => {
+    switch (event.type) {
+      case EventType.STUDY_MEETING:
+        return require('../../../../assets/study_meeting_1.jpg');
+      case EventType.IMPRESSIVE_UNIVERSITY:
+        return require('../../../../assets/impressive_university_1.png');
+      case EventType.BOLDAY:
+        return require('../../../../assets/bolday_1.jpg');
+      case EventType.COACH:
+        return require('../../../../assets/coach_1.jpeg');
+      case EventType.CLUB:
+        return require('../../../../assets/club_3.png');
+      default:
+        return undefined;
+    }
+  };
 
   return (
     <TouchableHighlight onPress={() => onPress(event)}>
@@ -42,17 +58,19 @@ const EventCard: React.FC<EventCardProps> = ({event, onPress}) => {
         justifyContent="space-between"
         flexDir="column">
         <Div px={8} flexDir="row" h={'75%'}>
-          <Div w="48%" mr={4}>
-            <FastImage
-              style={eventCardStyles.image}
-              resizeMode="contain"
-              source={
-                event.imageURL
-                  ? {uri: event.imageURL}
-                  : require('../../../../assets/study_meeting_1.jpg')
-              }
-            />
-          </Div>
+          {event.type !== EventType.SUBMISSION_ETC ? (
+            <Div w="48%" mr={4}>
+              <FastImage
+                style={eventCardStyles.image}
+                resizeMode="contain"
+                source={event.imageURL ? {uri: event.imageURL} : defaultImage()}
+              />
+            </Div>
+          ) : (
+            <Div w="48%" mr={4} justifyContent="center" alignItems="center">
+              <Icon name="filetext1" fontSize={80} />
+            </Div>
+          )}
           <Div w="50%">
             <Text
               numberOfLines={2}

@@ -21,7 +21,7 @@ export type AppHeaderProps = {
   rightButtonName?: string;
   onPressRightButton?: () => void;
   enableBackButton?: boolean;
-  screenForBack: keyof RootStackParamList;
+  screenForBack?: keyof RootStackParamList;
 };
 
 const AppHeader: React.FC<AppHeaderProps> = ({
