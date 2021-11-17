@@ -31,6 +31,7 @@ import FileMessage from '../../components/chat/ChatMessage/FileMessage';
 import RNFetchBlob from 'rn-fetch-blob';
 const {fs, config} = RNFetchBlob;
 import FileViewer from 'react-native-file-viewer';
+import {useIsFocused} from '@react-navigation/native';
 
 type ImageSource = {
   uri: string;
@@ -46,10 +47,11 @@ const Chat: React.FC<ChatProps> = ({route}) => {
   const [images, setImages] = useState<ImageSource[]>([]);
   const [nowImageIndex, setNowImageIndex] = useState<number>(0);
   const [video, setVideo] = useState('');
-  const {data: fetchedMessage} = useAPIGetMessages({
+  const {data: fetchedMessage, refetch: refetchMessages} = useAPIGetMessages({
     group: room.id,
     page: page.toString(),
   });
+  const isFocused = useIsFocused();
   const {data: latestMessage} = useAPIGetMessages(
     {
       group: room.id,
@@ -164,7 +166,7 @@ const Chat: React.FC<ChatProps> = ({route}) => {
     return false;
   };
 
-  const downloadFile = async () => {
+  const downloadFile = async (message: ChatMessage) => {
     const date = new Date();
     let PictureDir =
       Platform.OS === 'ios' ? fs.dirs.DocumentDir : fs.dirs.PictureDir;
@@ -261,7 +263,6 @@ const Chat: React.FC<ChatProps> = ({route}) => {
         ]}
         behavior={Platform.OS === 'ios' ? 'height' : undefined}>
         <FlatList
-          keyboardShouldPersistTaps={false}
           style={chatStyles.flatlist}
           contentContainerStyle={chatStyles.flatlistContent}
           inverted
@@ -284,7 +285,10 @@ const Chat: React.FC<ChatProps> = ({route}) => {
                   onPress={() => playVideoOnModal(message.content)}
                 />
               ) : message.type === ChatMessageType.OTHER_FILE ? (
-                <FileMessage message={message} onPress={downloadFile} />
+                <FileMessage
+                  message={message}
+                  onPress={() => downloadFile(message)}
+                />
               ) : null}
             </Div>
           )}
