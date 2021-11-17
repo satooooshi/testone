@@ -27,6 +27,7 @@ import VideoMessage from '../../components/chat/ChatMessage/VideoMessage';
 import ChatFooter from '../../components/chat/ChatFooter';
 import {userNameFactory} from '../../utils/factory/userNameFactory';
 import {Suggestion} from 'react-native-controlled-mentions';
+import FileMessage from '../../components/chat/ChatMessage/FileMessage';
 
 type ImageSource = {
   uri: string;
@@ -212,6 +213,11 @@ const Chat: React.FC<ChatProps> = ({route}) => {
                 />
               ) : message.type === ChatMessageType.VIDEO ? (
                 <VideoMessage
+                  message={message}
+                  onPress={() => playVideoOnModal(message.content)}
+                />
+              ) : message.type === ChatMessageType.OTHER_FILE ? (
+                <FileMessage
                   message={message}
                   onPress={() => playVideoOnModal(message.content)}
                 />
