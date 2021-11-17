@@ -13,6 +13,7 @@ import Head from 'next/head';
 import { useRouter } from 'next/router';
 import selectChatGroupModalStyles from '@/styles/components/SelectChatGroupModal.module.scss';
 import { useAPISaveChatGroup } from '@/hooks/api/chat/useAPISaveChatGroup';
+import { useAPIUploadStorage } from '@/hooks/api/storage/useAPIUploadStorage';
 
 const Chat = () => {
   const router = useRouter();
@@ -27,6 +28,7 @@ const Chat = () => {
     onSuccess: () => {
       setCreateGroupWindow(false);
       setResetFormTrigger(true);
+      groupImageURL && setGroupImageURL('');
       refetch();
       toast({
         description: 'チャットルームの作成が完了しました。',
@@ -36,11 +38,12 @@ const Chat = () => {
       });
     },
   });
-  // const { mutate: uploadImage } = useAPIUploadStorage({
-  //   onSuccess: async (fileURLs) => {
-  //     setTest(fileURLs[0]);
-  //   },
-  // });
+  const [groupImageURL, setGroupImageURL] = useState('');
+  const { mutate: uploadImage } = useAPIUploadStorage({
+    onSuccess: async (fileURLs) => {
+      setGroupImageURL(fileURLs[0]);
+    },
+  });
 
   return (
     <LayoutWithTab
@@ -62,7 +65,9 @@ const Chat = () => {
           closeModal={() => {
             setCreateGroupWindow(false);
           }}
-          createGroup={(g) => createGroup(g)}
+          createGroup={(g) => createGroup({ ...g, imageURL: groupImageURL })}
+          uploadImage={(r) => uploadImage(r)}
+          groupImageURL={groupImageURL}
         />
       )}
       {chatGroups && isSmallerThan768 ? (

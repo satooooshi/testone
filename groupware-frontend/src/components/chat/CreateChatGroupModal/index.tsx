@@ -17,7 +17,6 @@ import { imageExtensions } from 'src/utils/imageExtensions';
 import ReactCrop, { Crop } from 'react-image-crop';
 import { useFormik } from 'formik';
 import { getCroppedImageURL } from 'src/utils/getCroppedImageURL';
-import { useAPIUploadStorage } from '@/hooks/api/storage/useAPIUploadStorage';
 import { dataURLToFile } from 'src/utils/dataURLToFile';
 import { userRoleNameFactory } from 'src/utils/factory/userRoleNameFactory';
 import { formikErrorMsgFactory } from 'src/utils/factory/formikErrorMsgFactory';
@@ -29,6 +28,8 @@ type CreateChatGroupModalProps = {
   setResetFormTrigger: React.Dispatch<React.SetStateAction<boolean>>;
   closeModal: () => void;
   createGroup: (g: Partial<ChatGroup>) => void;
+  uploadImage: (r: any) => void;
+  groupImageURL: string;
 };
 
 const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
@@ -38,18 +39,14 @@ const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
   setResetFormTrigger,
   closeModal,
   createGroup,
+  uploadImage,
+  groupImageURL,
 }) => {
   const toast = useToast();
   const [selectedUserRole, setSelectedUserRole] = useState<UserRole | 'all'>(
     'all',
   );
   const [selectImageUrl, setSelectImageUrl] = useState<string>('');
-  const { mutate: uploadImage } = useAPIUploadStorage({
-    onSuccess: async (fileURLs) => {
-      createGroup({ ...newGroup, imageURL: fileURLs[0] });
-      setSelectImageUrl('');
-    },
-  });
   const [selectImageName, setSelectImageName] = useState<string>('');
   const [crop, setCrop] = useState<Crop>({
     unit: 'px',
@@ -61,6 +58,7 @@ const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
   });
   const [completedCrop, setCompletedCrop] = useState<Crop>();
   const imgRef = useRef<HTMLImageElement>();
+  const [imgUploaded, setImgUploaded] = useState(false);
   const onEventImageDrop = useCallback((f: File[]) => {
     setSelectImageUrl(URL.createObjectURL(f[0]));
     setSelectImageName(f[0].name);
@@ -72,6 +70,7 @@ const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
 
   const onLoad = useCallback((img) => {
     imgRef.current = img;
+    setImgUploaded(false);
   }, []);
 
   const initialChatValues = {
@@ -91,14 +90,13 @@ const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
     enableReinitialize: true,
     validationSchema: chatGroupSchema,
     onSubmit: async () => {
-      if (imgRef.current && completedCrop) {
+      if (imgRef.current && completedCrop && imgUploaded === false) {
         const img = getCroppedImageURL(imgRef.current, completedCrop);
         if (!img) {
           return;
         }
         const result = await dataURLToFile(img, selectImageName);
-        uploadImage([result]);
-        return;
+        return uploadImage([result]);
       }
       createGroup(newGroup);
     },
@@ -141,10 +139,13 @@ const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
     setResetFormTrigger(false);
   }, [resetFormTrigger]);
 
-  // useEffect(() => {
-  //   createGroup({ ...newGroup, imageURL: fileURLs[0] });
-  //   setSelectImageUrl('');
-  // }, [test]);
+  useEffect(() => {
+    if (groupImageURL.length !== 0) {
+      createGroup(newGroup);
+      setSelectImageUrl('');
+      setImgUploaded(true);
+    }
+  }, [groupImageURL]);
 
   return (
     <ReactModal
