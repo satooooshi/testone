@@ -19,7 +19,6 @@ const getMessages = async (query: GetMessagesQuery) => {
       if (m.type === ChatMessageType.VIDEO) {
         try {
           const thumbnail = await getThumbnailOfVideo(m.content);
-          console.log(thumbnail);
           m.thumbnail = thumbnail;
         } catch {
           m.thumbnail = '';

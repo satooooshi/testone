@@ -1,5 +1,5 @@
 import React from 'react';
-import {TouchableOpacity} from 'react-native';
+import {TouchableOpacity, Platform, Alert, Linking} from 'react-native';
 import {Icon, Text} from 'react-native-magnus';
 import {fileMessageStyles} from '../../../../styles/component/chat/fileMessage.style';
 import {ChatMessage} from '../../../../types';
