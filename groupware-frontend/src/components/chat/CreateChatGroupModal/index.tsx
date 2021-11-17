@@ -140,7 +140,7 @@ const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
   }, [resetFormTrigger]);
 
   useEffect(() => {
-    if (groupImageURL.length !== 0) {
+    if (groupImageURL) {
       createGroup(newGroup);
       setSelectImageUrl('');
       setImgUploaded(true);

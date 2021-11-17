@@ -337,7 +337,10 @@ const ChatDetail = () => {
           closeModal={() => {
             dispatchModal({ type: 'createGroupWindow', value: false });
           }}
-          createGroup={(g) => createGroup(g)}
+          // createGroup={(g) => createGroup(g)}
+          createGroup={(g) => createGroup({ ...g, imageURL: groupImageURL })}
+          uploadImage={(r) => uploadImage(r)}
+          groupImageURL={groupImageURL}
         />
       )}
       {chatGroups && (
