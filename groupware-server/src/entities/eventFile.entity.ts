@@ -17,7 +17,7 @@ export class EventFile {
   @Column({
     name: 'url',
     type: 'varchar',
-    length: 255,
+    length: 2083,
     default: '',
     nullable: false,
   })

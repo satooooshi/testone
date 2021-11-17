@@ -139,7 +139,7 @@ export class User {
   @Column({
     type: 'varchar',
     name: 'avatar_url',
-    length: 200,
+    length: 2083,
     nullable: false,
     default: '',
   })
