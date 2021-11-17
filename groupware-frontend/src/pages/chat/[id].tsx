@@ -62,6 +62,7 @@ const ChatDetail = () => {
   ] = useModalReducer();
   const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
   const [resetFormTrigger, setResetFormTrigger] = useState(false);
+  const [groupImageURL, setGroupImageURL] = useState('');
   const { data: chatGroups, refetch: refetchGroups } = useAPIGetChatGroupList();
   const { data: users } = useAPIGetUsers();
   const { data: lastestLastReadChatTime } = useAPIGetLastReadChatTime(
@@ -157,7 +158,6 @@ const ChatDetail = () => {
     },
   });
 
-  const [groupImageURL, setGroupImageURL] = useState('');
   const { mutate: uploadImage } = useAPIUploadStorage({
     onSuccess: async (fileURLs) => {
       setGroupImageURL(fileURLs[0]);
@@ -362,14 +362,13 @@ const ChatDetail = () => {
           isOpen={createGroupWindow}
           users={users}
           resetFormTrigger={resetFormTrigger}
+          groupImageURL={groupImageURL}
           setResetFormTrigger={setResetFormTrigger}
           closeModal={() => {
             dispatchModal({ type: 'createGroupWindow', value: false });
           }}
-          // createGroup={(g) => createGroup(g)}
           createGroup={(g) => createGroup({ ...g, imageURL: groupImageURL })}
           uploadImage={(r) => uploadImage(r)}
-          groupImageURL={groupImageURL}
         />
       )}
       {chatGroups && (

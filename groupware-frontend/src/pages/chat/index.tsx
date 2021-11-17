@@ -24,6 +24,7 @@ const Chat = () => {
   const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
   const [createGroupWindow, setCreateGroupWindow] = useState(false);
   const [resetFormTrigger, setResetFormTrigger] = useState(false);
+  const [groupImageURL, setGroupImageURL] = useState('');
 
   const { mutate: createGroup } = useAPISaveChatGroup({
     onSuccess: () => {
@@ -49,7 +50,7 @@ const Chat = () => {
       return;
     },
   });
-  const [groupImageURL, setGroupImageURL] = useState('');
+
   const { mutate: uploadImage } = useAPIUploadStorage({
     onSuccess: async (fileURLs) => {
       setGroupImageURL(fileURLs[0]);
@@ -72,13 +73,13 @@ const Chat = () => {
           isOpen={createGroupWindow}
           users={users}
           resetFormTrigger={resetFormTrigger}
+          groupImageURL={groupImageURL}
           setResetFormTrigger={setResetFormTrigger}
           closeModal={() => {
             setCreateGroupWindow(false);
           }}
           createGroup={(g) => createGroup({ ...g, imageURL: groupImageURL })}
           uploadImage={(r) => uploadImage(r)}
-          groupImageURL={groupImageURL}
         />
       )}
       {chatGroups && isSmallerThan768 ? (

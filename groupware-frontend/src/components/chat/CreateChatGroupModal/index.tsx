@@ -25,24 +25,28 @@ type CreateChatGroupModalProps = {
   isOpen: boolean;
   users: User[];
   resetFormTrigger: boolean;
+  groupImageURL: string;
   setResetFormTrigger: React.Dispatch<React.SetStateAction<boolean>>;
   closeModal: () => void;
   createGroup: (g: Partial<ChatGroup>) => void;
-  uploadImage: (r: any) => void;
-  groupImageURL: string;
+  uploadImage: (r: File[]) => void;
 };
 
 const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
   isOpen,
   users,
   resetFormTrigger,
+  groupImageURL,
   setResetFormTrigger,
   closeModal,
   createGroup,
   uploadImage,
-  groupImageURL,
 }) => {
   const toast = useToast();
+  const initialChatValues = {
+    name: '',
+    members: [],
+  };
   const [selectedUserRole, setSelectedUserRole] = useState<UserRole | 'all'>(
     'all',
   );
@@ -72,11 +76,6 @@ const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
     imgRef.current = img;
     setImgUploaded(false);
   }, []);
-
-  const initialChatValues = {
-    name: '',
-    members: [],
-  };
 
   const {
     values: newGroup,
