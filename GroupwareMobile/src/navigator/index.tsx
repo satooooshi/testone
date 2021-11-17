@@ -24,7 +24,7 @@ const Navigator = () => {
     <NavigationContainer>
       <Stack.Navigator
         initialRouteName={user?.id || tokenString() ? 'Main' : 'Login'}>
-        {user?.id ? (
+        {user?.id || tokenString() ? (
           <>
             <Stack.Screen
               name="Main"
