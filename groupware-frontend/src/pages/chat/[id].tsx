@@ -47,7 +47,7 @@ const ChatDetail = () => {
   const [{ popup, suggestions, mentionedUserData }, dispatchMention] =
     useMention();
   const [
-    { page, messages, lastReadChatTime, newChatMessage, newGroup, editorState },
+    { page, messages, lastReadChatTime, newChatMessage, editorState },
     dispatchChat,
   ] = useChatReducer();
   const [
@@ -336,7 +336,6 @@ const ChatDetail = () => {
           setResetFormTrigger={setResetFormTrigger}
           closeModal={() => {
             dispatchModal({ type: 'createGroupWindow', value: false });
-            dispatchChat({ type: 'newGroup', value: {} });
           }}
           createGroup={(g) => createGroup(g)}
         />

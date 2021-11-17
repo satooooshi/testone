@@ -24,27 +24,20 @@ import { formikErrorMsgFactory } from 'src/utils/factory/formikErrorMsgFactory';
 
 type CreateChatGroupModalProps = {
   isOpen: boolean;
-  resetFormTrigger: boolean;
   users: User[];
+  resetFormTrigger: boolean;
+  setResetFormTrigger: React.Dispatch<React.SetStateAction<boolean>>;
   closeModal: () => void;
-  // newGroup: Partial<ChatGroup>;
-  // onChangeNewGroupName: (groupName: string) => void;
-  // toggleNewGroupMember: (u: User) => void;
   createGroup: (g: Partial<ChatGroup>) => void;
-  setResetFormTrigger: any;
 };
 
 const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
   isOpen,
-  resetFormTrigger,
   users,
-  closeModal,
-  // newGroup,
-  // onChangeNewGroupName,
-  // toggleNewGroupMember,
-  createGroup,
+  resetFormTrigger,
   setResetFormTrigger,
-  // handleSubmit,
+  closeModal,
+  createGroup,
 }) => {
   const toast = useToast();
   const [selectedUserRole, setSelectedUserRole] = useState<UserRole | 'all'>(
@@ -140,29 +133,6 @@ const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
       members: g.members ? [...g.members, user] : [user],
     }));
   };
-
-  // const onFinish = async () => {
-  //   if (!newGroup.members?.length) {
-  //     toast({
-  //       title: 'ルームに参加する社員を一人以上選択してください',
-  //       status: 'error',
-  //       duration: 3000,
-  //       isClosable: true,
-  //     });
-  //     return;
-  //   }
-
-  //   if (imgRef.current && completedCrop) {
-  //     const img = getCroppedImageURL(imgRef.current, completedCrop);
-  //     if (!img) {
-  //       return;
-  //     }
-  //     const result = await dataURLToFile(img, selectImageName);
-  //     uploadImage([result]);
-  //     return;
-  //   }
-  //   createGroup(newGroup);
-  // };
 
   useEffect(() => {
     if (resetFormTrigger) {
