@@ -6,6 +6,7 @@ import {FlatList, TouchableOpacity} from 'react-native';
 import {headerStyles} from '../../styles/component/header.style';
 import {DrawerActions, useNavigation} from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import {RootStackParamList} from '../../types/navigator/RootStackParamList';
 
 export type Tab = {
   name: string;
@@ -20,6 +21,7 @@ export type AppHeaderProps = {
   rightButtonName?: string;
   onPressRightButton?: () => void;
   enableBackButton?: boolean;
+  screenForBack?: keyof RootStackParamList;
 };
 
 const AppHeader: React.FC<AppHeaderProps> = ({
@@ -29,6 +31,7 @@ const AppHeader: React.FC<AppHeaderProps> = ({
   rightButtonName,
   onPressRightButton,
   enableBackButton = false,
+  screenForBack,
 }) => {
   const navigation = useNavigation();
   const boolToDisplayRightButton = useMemo(() => {
@@ -45,7 +48,14 @@ const AppHeader: React.FC<AppHeaderProps> = ({
         justifyContent="space-between">
         <Div h="100%" row alignItems="center">
           {enableBackButton && (
-            <TouchableOpacity onPress={() => navigation.goBack()}>
+            <TouchableOpacity
+              onPress={() => {
+                if (screenForBack) {
+                  navigation.navigate(screenForBack as any);
+                } else {
+                  navigation.goBack();
+                }
+              }}>
               <Icon name="left" fontSize={26} mr={4} />
             </TouchableOpacity>
           )}

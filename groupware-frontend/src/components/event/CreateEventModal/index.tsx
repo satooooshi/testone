@@ -450,6 +450,7 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
                 <RadioGroup ml={1} defaultValue={'unneeded'}>
                   <Stack spacing={5} direction="row">
                     <Radio
+                      bg="white"
                       colorScheme="green"
                       value="needed"
                       onChange={() =>
@@ -458,6 +459,7 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
                       On
                     </Radio>
                     <Radio
+                      bg="white"
                       colorScheme="green"
                       value="unneeded"
                       onChange={() =>

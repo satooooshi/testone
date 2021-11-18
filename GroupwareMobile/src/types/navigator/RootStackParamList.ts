@@ -1,4 +1,4 @@
-import {WikiType} from '../../types';
+import {ChatGroup, WikiType} from '../../types';
 
 export type RootStackParamList = {
   Home: undefined;
@@ -33,4 +33,9 @@ export type RootStackParamList = {
   UserRegisteringAdmin: undefined;
   TagAdmin: undefined;
   UserTagAdmin: undefined;
+  Chat: {
+    room: ChatGroup;
+  };
+  RoomList: undefined;
+  NewRoom: undefined;
 };

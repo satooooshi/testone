@@ -361,7 +361,9 @@ const WikiForm: React.FC<WikiFormProps> = ({
             ))}
           </div>
         ) : null}
-        {touched.body && !editorState.getCurrentContent().hasText() ? (
+        {touched.body &&
+        newQuestion.textFormat === 'html' &&
+        !editorState.getCurrentContent().hasText() ? (
           <Text color="tomato">{draftJsEmptyError}</Text>
         ) : null}
         {errors.body && touched.body ? (

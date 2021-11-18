@@ -45,6 +45,7 @@ export enum TagType {
 
 export enum WikiType {
   RULES = 'rule',
+  ALL_POSTAL = 'all-postal',
   KNOWLEDGE = 'knowledge',
   QA = 'qa',
 }
@@ -252,6 +253,7 @@ export interface ChatMessage {
   createdAt: Date;
   updatedAt: Date;
   isSender?: boolean;
+  thumbnail?: string;
 }
 
 export interface ChatGroup {

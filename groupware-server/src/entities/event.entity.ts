@@ -75,7 +75,7 @@ export class EventSchedule {
   @Column({
     name: 'image_url',
     type: 'varchar',
-    length: 200,
+    length: 2083,
     nullable: false,
     default: '',
   })

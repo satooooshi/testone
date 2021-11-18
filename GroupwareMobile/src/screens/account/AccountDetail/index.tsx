@@ -1,8 +1,8 @@
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
 import {useIsFocused} from '@react-navigation/native';
 import React, {useEffect, useState} from 'react';
-import {useWindowDimensions} from 'react-native';
-import {Text, Div, ScrollDiv, Image} from 'react-native-magnus';
+import {ActivityIndicator, useWindowDimensions} from 'react-native';
+import {Text, Div, ScrollDiv, Image, Overlay} from 'react-native-magnus';
 import TagListBox from '../../../components/account/TagListBox';
 import EventCard from '../../../components/events/EventCard';
 import AppHeader, {Tab} from '../../../components/Header';
@@ -95,9 +95,11 @@ const AccountDetail: React.FC<AccountDetailProps> = ({navigation, route}) => {
   const questionScreenName = `${screenName}-question`;
   const knowledgeScreenName = `${screenName}-knowledge`;
   const {width: windowWidth, height: windowHeight} = useWindowDimensions();
-  const {data: profile, refetch} = useAPIGetUserInfoById(
-    userID?.toString() || '0',
-  );
+  const {
+    data: profile,
+    refetch,
+    isLoading: loadingProfile,
+  } = useAPIGetUserInfoById(userID?.toString() || '0');
   const {data: events} = useAPIGetEventList({
     participant_id: userID?.toString(),
   });
@@ -156,6 +158,9 @@ const AccountDetail: React.FC<AccountDetailProps> = ({navigation, route}) => {
 
   return (
     <WholeContainer>
+      <Overlay visible={loadingProfile} p="xl">
+        <ActivityIndicator />
+      </Overlay>
       <AppHeader
         title={'Account'}
         tabs={tabs}
@@ -172,7 +177,11 @@ const AccountDetail: React.FC<AccountDetailProps> = ({navigation, route}) => {
                 mt={'lg'}
                 h={windowWidth * 0.6}
                 w={windowWidth * 0.6}
-                source={{uri: profile.avatarUrl}}
+                source={
+                  profile.avatarUrl
+                    ? {uri: profile.avatarUrl}
+                    : require('../../../../assets/no-image-avatar.png')
+                }
                 rounded="circle"
                 mb={'lg'}
               />

@@ -32,7 +32,7 @@ export class ChatGroup {
   @Column({
     type: 'varchar',
     name: 'image_url',
-    length: 500,
+    length: 2083,
     nullable: false,
     default: '',
   })

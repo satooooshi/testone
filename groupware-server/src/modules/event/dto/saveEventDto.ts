@@ -10,8 +10,6 @@ import {
   MinDate,
   ValidateIf,
 } from 'class-validator';
-import { isNotEmptyExceptTags } from 'src/utils/dto/isNotEmptyExceptTags';
-import { isYoutubeLink } from 'src/utils/dto/isYoutubeLink';
 import { ChatGroup } from 'src/entities/chatGroup.entity';
 import { EventSchedule, EventType } from 'src/entities/event.entity';
 import { EventFile } from 'src/entities/eventFile.entity';
@@ -20,6 +18,8 @@ import { SubmissionFile } from 'src/entities/submissionFiles.entity';
 import { Tag } from 'src/entities/tag.entity';
 import { User } from 'src/entities/user.entity';
 import { UserJoiningEvent } from 'src/entities/userJoiningEvent.entity';
+import { isNotEmptyExceptTags } from 'src/utils/dto/isNotEmptyExceptTags';
+import { isYoutubeLink } from 'src/utils/dto/isYoutubeLink';
 
 export class saveEventDto implements Partial<EventSchedule> {
   @isNotEmptyExceptTags({

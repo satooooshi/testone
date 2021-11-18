@@ -12,7 +12,6 @@ import { User } from 'src/entities/user.entity';
 export class SaveWikiDto implements Partial<Wiki> {
   id: number;
   writer?: User;
-
   @isNotEmptyExceptTags({
     message: 'タイトルは必須項目です。空白のみは設定できません。',
   })
