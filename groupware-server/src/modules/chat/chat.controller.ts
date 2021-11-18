@@ -10,14 +10,11 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { ChatGroup } from 'src/entities/chatGroup.entity';
 import { ChatMessage } from 'src/entities/chatMessage.entity';
 import { LastReadChatTime } from 'src/entities/lastReadChatTime.entity';
 import JwtAuthenticationGuard from '../auth/jwtAuthentication.guard';
 import RequestWithUser from '../auth/requestWithUser.interface';
-import { NotificationService } from '../notification/notification.service';
-import { UserService } from '../user/user.service';
 import { ChatService } from './chat.service';
 
 export interface GetMessagesQuery {
@@ -25,19 +22,33 @@ export interface GetMessagesQuery {
   page?: string;
 }
 
+export interface GetRoomsQuery {
+  page?: string;
+}
+
+export interface GetRoomsResult {
+  rooms: ChatGroup[];
+  pageCount: number;
+}
+
 @Controller('chat')
 export class ChatController {
-  constructor(
-    private readonly userService: UserService,
-    private readonly configService: ConfigService,
-    private readonly notifService: NotificationService,
-    private readonly chatService: ChatService,
-  ) {}
+  constructor(private readonly chatService: ChatService) {}
 
   @Get('group-list')
   @UseGuards(JwtAuthenticationGuard)
   async getChatGroup(@Req() req: RequestWithUser): Promise<ChatGroup[]> {
     return await this.chatService.getChatGroup(req.user.id);
+  }
+
+  @Get('/v2/rooms')
+  @UseGuards(JwtAuthenticationGuard)
+  async getChatGroupByPage(
+    @Req() req: RequestWithUser,
+    @Query() query: GetMessagesQuery,
+  ): Promise<GetRoomsResult> {
+    const page = Number(query?.page) || 1;
+    return await this.chatService.getRoomsByPage(req.user.id, page);
   }
 
   @Get('get-messages')
