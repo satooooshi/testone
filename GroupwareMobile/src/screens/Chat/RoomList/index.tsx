@@ -1,10 +1,10 @@
+import {useIsFocused} from '@react-navigation/native';
 import React, {useEffect, useState} from 'react';
 import {ActivityIndicator, FlatList} from 'react-native';
 import {Div, Overlay} from 'react-native-magnus';
 import RoomCard from '../../../components/chat/RoomCard';
 import AppHeader from '../../../components/Header';
 import WholeContainer from '../../../components/WholeContainer';
-import {useAPIGetChatGroupList} from '../../../hooks/api/chat/useAPIGetChatGroupList';
 import {useAPIGetRooms} from '../../../hooks/api/chat/useAPIGetRoomsByPage';
 import {roomListStyles} from '../../../styles/screen/chat/roomList.style';
 import {ChatGroup} from '../../../types';
@@ -15,9 +15,14 @@ const RoomList: React.FC<RoomListProps> = ({navigation}) => {
   const [roomsForInfiniteScroll, setRoomsForInfiniteScroll] = useState<
     ChatGroup[]
   >([]);
-  const {data: chatRooms, isLoading: loadingGetChatGroupList} = useAPIGetRooms({
+  const {
+    data: chatRooms,
+    isLoading: loadingGetChatGroupList,
+    refetch,
+  } = useAPIGetRooms({
     page,
   });
+  const isFocused = useIsFocused();
 
   const onPressRightButton = () => {
     navigation.navigate('NewRoom');
@@ -26,6 +31,13 @@ const RoomList: React.FC<RoomListProps> = ({navigation}) => {
   const onEndReached = () => {
     setPage(p => (Number(p) + 1).toString());
   };
+
+  useEffect(() => {
+    if (isFocused) {
+      setRoomsForInfiniteScroll([]);
+      refetch();
+    }
+  }, [isFocused, refetch]);
 
   useEffect(() => {
     if (chatRooms?.rooms?.length) {
