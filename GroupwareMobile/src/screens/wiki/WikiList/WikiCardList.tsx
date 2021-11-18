@@ -52,6 +52,7 @@ const RenderWikiCardList: React.FC<RenderWikiCardListProps> = ({
     if (isFocsed) {
       setSearchQuery(q => ({
         ...q,
+        page: '1',
         type,
         rule_category: ruleCategory,
         status: status,
@@ -115,7 +116,7 @@ const WikiCardList: React.FC<WikiCardListProps> = ({type}) => {
   }, [isLoadingWiki]);
 
   useEffect(() => {
-    setSearchQuery(q => ({...q, type}));
+    setSearchQuery(q => ({...q, page: '1', type}));
   }, [type]);
 
   useEffect(() => {
