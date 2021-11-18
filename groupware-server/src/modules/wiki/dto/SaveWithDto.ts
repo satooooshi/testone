@@ -1,4 +1,4 @@
-import { IsNotEmptyExceptTags } from 'src/utils/dto/IsNotEmptyExceptTags';
+import { isNotEmptyExceptTags } from 'src/utils/dto/isNotEmptyExceptTags';
 import {
   IsArray,
   IsEnum,
@@ -13,7 +13,7 @@ export class SaveWikiDto implements Partial<Wiki> {
   id: number;
   writer?: User;
 
-  @IsNotEmptyExceptTags({
+  @isNotEmptyExceptTags({
     message: 'タイトルは必須項目です。空白のみは設定できません。',
   })
   @IsString({ message: 'タイトルのリクエストは文字列型に限られています。' })
@@ -27,7 +27,7 @@ export class SaveWikiDto implements Partial<Wiki> {
   @IsArray({ message: 'タグのリクエストは配列型に限られています。' })
   tags: [];
 
-  @IsNotEmptyExceptTags({
+  @isNotEmptyExceptTags({
     message: '質問内容は必須項目です。空白のみは設定できません。',
   })
   @IsString({

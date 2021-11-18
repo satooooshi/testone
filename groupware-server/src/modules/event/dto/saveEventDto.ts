@@ -10,8 +10,8 @@ import {
   MinDate,
   ValidateIf,
 } from 'class-validator';
-import { IsNotEmptyExceptTags } from 'src/utils/dto/IsNotEmptyExceptTags';
-import { IsYoutubeLink } from 'src/utils/dto/IsYoutubeLink';
+import { isNotEmptyExceptTags } from 'src/utils/dto/isNotEmptyExceptTags';
+import { isYoutubeLink } from 'src/utils/dto/isYoutubeLink';
 import { ChatGroup } from 'src/entities/chatGroup.entity';
 import { EventSchedule, EventType } from 'src/entities/event.entity';
 import { EventFile } from 'src/entities/eventFile.entity';
@@ -22,14 +22,14 @@ import { User } from 'src/entities/user.entity';
 import { UserJoiningEvent } from 'src/entities/userJoiningEvent.entity';
 
 export class saveEventDto implements Partial<EventSchedule> {
-  @IsNotEmptyExceptTags({
+  @isNotEmptyExceptTags({
     message: 'タイトルは必須項目です。空白のみは設定できません。',
   })
   @IsString()
   title: string;
 
   @ValidateIf((o, v) => v != null && v.length)
-  @IsNotEmptyExceptTags({ message: '空白のみの概要は設定できません。' })
+  @isNotEmptyExceptTags({ message: '空白のみの概要は設定できません。' })
   description: string;
 
   @ArrayNotEmpty({ message: 'タグは必須項目です。' })
@@ -63,7 +63,7 @@ export class saveEventDto implements Partial<EventSchedule> {
 
   @ValidateIf((o, v) => v != null && v.length)
   @IsArray({ message: 'YouTubeリンクのリクエストは配列型に限られています。' })
-  @IsYoutubeLink({ message: 'Youtubeの動画URLが不正です。' })
+  @isYoutubeLink({ message: 'Youtubeの動画URLが不正です。' })
   videos: EventVideo[];
 
   id: number;
