@@ -1,6 +1,11 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {Alert, FlatList, TouchableOpacity} from 'react-native';
-import {Text, Div, Image, Icon, Dropdown} from 'react-native-magnus';
+import {
+  ActivityIndicator,
+  Alert,
+  FlatList,
+  TouchableOpacity,
+} from 'react-native';
+import {Text, Div, Image, Icon, Dropdown, Overlay} from 'react-native-magnus';
 import DropdownOpenerButton from '../../../components/common/DropdownOpenerButton';
 import SearchForm from '../../../components/common/SearchForm';
 import SearchFormOpenerButton from '../../../components/common/SearchForm/SearchFormOpenerButton';
@@ -28,7 +33,11 @@ const UserAdmin: React.FC<UserAdminProps> = ({navigation}) => {
     page: '1',
   });
   const [selectedTags, setSelectedTags] = useState<UserTag[]>([]);
-  const {data: users, refetch} = useAPISearchUsers(searchQuery);
+  const {
+    data: users,
+    refetch,
+    isLoading: loadingUsers,
+  } = useAPISearchUsers(searchQuery);
   const {data: tags} = useAPIGetUserTag();
   const [currentUpdatingUser, setCurrentUpdatingUser] = useState<User>();
   const [visibleSearchFormModal, setVisibleSearchFormModal] = useState(false);
@@ -41,16 +50,17 @@ const UserAdmin: React.FC<UserAdminProps> = ({navigation}) => {
 
     setSearchQuery(q => ({...q, ...query, tag: tagQuery || ''}));
   };
-  const {mutate: updateUser} = useAPIUpdateUser({
+  const {mutate: updateUser, isLoading: loadingUpdate} = useAPIUpdateUser({
     onSuccess: () => {
       refetch();
     },
   });
-  const {mutate: deleteUser} = useAPIDeleteUser({
+  const {mutate: deleteUser, isLoading: loadingDelete} = useAPIDeleteUser({
     onSuccess: () => {
       refetch();
     },
   });
+  const isLoading = loadingUsers || loadingUpdate || loadingDelete;
   const dropdownRef = useRef<any | null>(null);
 
   const handleDeleteUser = (u: User) => {
@@ -101,6 +111,9 @@ const UserAdmin: React.FC<UserAdminProps> = ({navigation}) => {
 
   return (
     <WholeContainer>
+      <Overlay visible={isLoading} p="xl">
+        <ActivityIndicator />
+      </Overlay>
       <AppHeader title="Admin" tabs={tabs} activeTabName={'ユーザー管理'} />
       <SearchForm
         defaultValue={{word: '', selectedTags}}

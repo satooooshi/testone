@@ -1,5 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {
+  ActivityIndicator,
   FlatList,
   Keyboard,
   KeyboardAvoidingView,
@@ -8,7 +9,7 @@ import {
   TouchableOpacity,
   useWindowDimensions,
 } from 'react-native';
-import {Div, Icon} from 'react-native-magnus';
+import {Div, Icon, Overlay} from 'react-native-magnus';
 import AppHeader from '../../components/Header';
 import WholeContainer from '../../components/WholeContainer';
 import {useAPIGetMessages} from '../../hooks/api/chat/useAPIGetMessages';
@@ -46,7 +47,7 @@ const Chat: React.FC<ChatProps> = ({route}) => {
   const [images, setImages] = useState<ImageSource[]>([]);
   const [nowImageIndex, setNowImageIndex] = useState<number>(0);
   const [video, setVideo] = useState('');
-  const {data: fetchedMessage} = useAPIGetMessages({
+  const {data: fetchedMessage, isLoading: loadingMessages} = useAPIGetMessages({
     group: room.id,
     page: page.toString(),
   });
@@ -66,18 +67,21 @@ const Chat: React.FC<ChatProps> = ({route}) => {
       name: userNameFactory(m),
     }));
   };
-  const {mutate: sendChatMessage} = useAPISendChatMessage({
-    onSuccess: () => {
-      setNewMessage('');
-    },
-  });
-  const {mutate: uploaFile} = useAPIUploadStorage();
+  const {mutate: sendChatMessage, isLoading: loadingSendMessage} =
+    useAPISendChatMessage({
+      onSuccess: () => {
+        setNewMessage('');
+      },
+    });
+  const {mutate: uploadFile, isLoading: loadingUploadFile} =
+    useAPIUploadStorage();
 
   const showImageOnModal = (url: string) => {
     const isNowUri = (element: ImageSource) => element.uri === url;
     setNowImageIndex(images.findIndex(isNowUri));
     setImageModal(true);
   };
+  const isLoading = loadingMessages || loadingSendMessage || loadingUploadFile;
 
   const handleSend = () => {
     if (newMessage.length) {
@@ -95,7 +99,7 @@ const Chat: React.FC<ChatProps> = ({route}) => {
       cropping: false,
     });
     if (formData) {
-      uploaFile(formData, {
+      uploadFile(formData, {
         onSuccess: imageURL => {
           sendChatMessage({
             content: imageURL[0],
@@ -113,7 +117,7 @@ const Chat: React.FC<ChatProps> = ({route}) => {
       multiple: false,
     });
     if (formData) {
-      uploaFile(formData, {
+      uploadFile(formData, {
         onSuccess: imageURL => {
           sendChatMessage({
             content: imageURL[0],
@@ -135,9 +139,9 @@ const Chat: React.FC<ChatProps> = ({route}) => {
       uri: res.uri,
       type: res.type,
     });
-    uploaFile(formData);
+    uploadFile(formData);
     if (formData) {
-      uploaFile(formData, {
+      uploadFile(formData, {
         onSuccess: imageURL => {
           sendChatMessage({
             content: imageURL[0],
@@ -222,6 +226,9 @@ const Chat: React.FC<ChatProps> = ({route}) => {
 
   return (
     <WholeContainer>
+      <Overlay visible={isLoading} p="xl">
+        <ActivityIndicator />
+      </Overlay>
       {/* @TODO add seeking bar */}
       <Modal visible={!!video} animationType="slide">
         <TouchableOpacity
