@@ -60,6 +60,9 @@ const UserAdmin: React.FC<UserAdminProps> = ({navigation}) => {
       refetch();
     },
   });
+  const [usersForInfiniteScroll, setUsersForInfiniteScroll] = useState<User[]>(
+    [],
+  );
   const isLoading = loadingUsers || loadingUpdate || loadingDelete;
   const dropdownRef = useRef<any | null>(null);
 
@@ -101,6 +104,22 @@ const UserAdmin: React.FC<UserAdminProps> = ({navigation}) => {
       onPress: () => {},
     },
   ];
+
+  const onEndReached = () => {
+    setSearchQuery(q => ({...q, page: (Number(q.page) + 1).toString()}));
+  };
+
+  useEffect(() => {
+    if (users?.users?.length) {
+      setUsersForInfiniteScroll(u => {
+        return [...u, ...users.users];
+      });
+    }
+  }, [users?.users]);
+
+  useEffect(() => {
+    setUsersForInfiniteScroll([]);
+  }, [searchQuery.tag, searchQuery.role, searchQuery.sort, searchQuery.word]);
 
   useEffect(() => {
     const tagIDs = searchQuery.tag?.split('+') || [];
@@ -213,7 +232,8 @@ const UserAdmin: React.FC<UserAdminProps> = ({navigation}) => {
       </Dropdown>
 
       <FlatList
-        data={users?.users || []}
+        data={usersForInfiniteScroll}
+        {...{onEndReached}}
         keyExtractor={item => item.id.toString()}
         renderItem={({item}) => (
           <Div
@@ -233,7 +253,11 @@ const UserAdmin: React.FC<UserAdminProps> = ({navigation}) => {
                 w={'100%'}
                 h={'100%'}
                 rounded="circle"
-                source={{uri: item.avatarUrl}}
+                source={
+                  item.avatarUrl
+                    ? {uri: item.avatarUrl}
+                    : require('../../../../assets/no-image-avatar.png')
+                }
               />
             </TouchableOpacity>
             <Text w={'29%'} mr={'1%'}>{`${userNameFactory(item)}\n${

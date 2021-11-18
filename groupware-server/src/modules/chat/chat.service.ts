@@ -95,6 +95,30 @@ export class ChatService {
     return urlParsedGroups;
   }
 
+  public async getRoomsByPage(
+    userID: number,
+    page: number,
+  ): Promise<ChatGroup[]> {
+    const limit = 20;
+    const offset = limit * page;
+    const groups = await this.chatGroupRepository
+      .createQueryBuilder('chat_groups')
+      .innerJoinAndSelect('chat_groups.members', 'member')
+      .where('member.id = :memberId', { memberId: userID })
+      .skip(offset)
+      .take(limit)
+      .getMany();
+    const groupIDs = groups.map((g) => g.id);
+    const groupsAndUsers = await this.chatGroupRepository.find({
+      where: { id: In(groupIDs) },
+      relations: ['members', 'lastReadChatTime', 'lastReadChatTime.user'],
+      order: { updatedAt: 'DESC' },
+    });
+    const urlParsedGroups =
+      await this.generateSignedStorageURLsFromChatGroupArr(groupsAndUsers);
+    return urlParsedGroups;
+  }
+
   public async getChatMessage(
     userID: number,
     query: GetMessagesQuery,
