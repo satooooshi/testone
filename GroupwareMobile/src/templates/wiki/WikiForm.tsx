@@ -389,6 +389,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
           ) : newWiki.textFormat === 'markdown' ? (
             <Div h={windowHeight * 0.9}>
               <MarkdownEditorWebView
+                value={wiki?.body || ''}
                 onChange={text => setNewWiki(w => ({...w, body: text}))}
               />
             </Div>

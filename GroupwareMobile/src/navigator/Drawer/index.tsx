@@ -23,6 +23,7 @@ import TagAdmin from '../../screens/admin/TagAdmin';
 import Chat from '../../screens/Chat';
 import RoomList from '../../screens/Chat/RoomList';
 import NewRoom from '../../screens/Chat/NewRoom';
+import EditWiki from '../../screens/wiki/EditWiki';
 
 const Drawer = createDrawerNavigator();
 const Stack = createStackNavigator();
@@ -43,6 +44,11 @@ const WikiStack = () => (
     <Stack.Screen
       name="PostWiki"
       component={PostWiki}
+      options={{headerShown: false}}
+    />
+    <Stack.Screen
+      name="EditWiki"
+      component={EditWiki}
       options={{headerShown: false}}
     />
   </Stack.Navigator>
