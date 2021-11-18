@@ -6,7 +6,6 @@ export const imageExtensions = [
   '.jfif',
   '.jfi',
   '.png',
-  '.png',
   '.gif',
   '.webp',
   '.tiff',

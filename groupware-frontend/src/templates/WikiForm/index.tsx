@@ -63,6 +63,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
     EditorState.createEmpty(),
   );
   const [activeTab, setActiveTab] = useState<TabName>(TabName.EDIT);
+  // const [test, setTest] = useState(false);
   const initialValues: Partial<Wiki> = wiki || {
     title: '',
     body: '',
@@ -179,6 +180,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
     setNewQuestion((q) => ({ ...q, body: text }));
   };
   const handleImageUpload = async (file: File) => {
+    // setTest(true);
     try {
       const uploadedImageURL = await uploadStorage([file]);
       return uploadedImageURL[0];
@@ -367,6 +369,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
         {errors.body && touched.body ? (
           <Text color="tomato">{errors.body}</Text>
         ) : null}
+        {/* {test ? <Text color="tomato">画像ファイルを添付してください</Text> : null} */}
         {newQuestion.textFormat === 'html' && (
           <div style={{ marginBottom: 40 }}>
             <WrappedDraftEditor
