@@ -28,7 +28,7 @@ const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
   }, [wikiInfo]);
 
   const headerTitle = wikiTypeName + '詳細';
-  const headerRightButtonName = wikiTypeName + 'を新規作成';
+  const headerRightButtonName = wikiTypeName + 'を編集';
 
   const onPressHeaderRightButton = () => {
     if (wikiInfo) {
