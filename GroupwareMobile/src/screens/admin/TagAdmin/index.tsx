@@ -1,6 +1,6 @@
 import React from 'react';
-import {Alert, useWindowDimensions} from 'react-native';
-import {ScrollDiv} from 'react-native-magnus';
+import {ActivityIndicator, Alert, useWindowDimensions} from 'react-native';
+import {Overlay, ScrollDiv} from 'react-native-magnus';
 import TagCollapse from '../../../components/admin/TagCollapse';
 import AppHeader, {Tab} from '../../../components/Header';
 import WholeContainer from '../../../components/WholeContainer';
@@ -13,13 +13,13 @@ import {Tag, TagType} from '../../../types';
 import {TagAdminProps} from '../../../types/navigator/screenProps/Admin';
 
 const TagAdmin: React.FC<TagAdminProps> = ({navigation}) => {
-  const {data: tags, refetch} = useAPIGetTag();
-  const {mutate: createTag} = useAPICreateTag({
+  const {data: tags, refetch, isLoading: loadingTags} = useAPIGetTag();
+  const {mutate: createTag, isLoading: loadingCreateTag} = useAPICreateTag({
     onSuccess: () => {
       refetch();
     },
   });
-  const {mutate: deleteTag} = useAPIDeleteTag({
+  const {mutate: deleteTag, isLoading: loadingDeleteTag} = useAPIDeleteTag({
     onSuccess: () => {
       refetch();
     },
@@ -30,6 +30,7 @@ const TagAdmin: React.FC<TagAdminProps> = ({navigation}) => {
     TagType.QUALIFICATION,
     tags || [],
   );
+  const isLoading = loadingTags || loadingCreateTag || loadingDeleteTag;
   const {filteredTags: clubTags} = useTagType(TagType.CLUB, tags || []);
   const {filteredTags: hobbyTags} = useTagType(TagType.HOBBY, tags || []);
   const {filteredTags: otherTags} = useTagType(TagType.OTHER, tags || []);
@@ -108,6 +109,9 @@ const TagAdmin: React.FC<TagAdminProps> = ({navigation}) => {
 
   return (
     <WholeContainer>
+      <Overlay visible={isLoading} p="xl">
+        <ActivityIndicator />
+      </Overlay>
       <AppHeader title={'タグ管理'} tabs={tabs} activeTabName={'タグ管理'} />
       <ScrollDiv
         contentContainerStyle={{

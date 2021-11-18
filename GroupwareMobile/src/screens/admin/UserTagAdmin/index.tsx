@@ -1,6 +1,6 @@
 import React from 'react';
-import {Alert, useWindowDimensions} from 'react-native';
-import {ScrollDiv} from 'react-native-magnus';
+import {ActivityIndicator, Alert, useWindowDimensions} from 'react-native';
+import {Overlay, ScrollDiv} from 'react-native-magnus';
 import TagCollapse from '../../../components/admin/TagCollapse';
 import AppHeader, {Tab} from '../../../components/Header';
 import WholeContainer from '../../../components/WholeContainer';
@@ -13,17 +13,18 @@ import {TagType, UserTag} from '../../../types';
 import {TagAdminProps} from '../../../types/navigator/screenProps/Admin';
 
 const UserTagAdmin: React.FC<TagAdminProps> = ({navigation}) => {
-  const {data: tags, refetch} = useAPIGetUserTag();
-  const {mutate: createTag} = useAPICreateUserTag({
+  const {data: tags, refetch, isLoading: loadingTags} = useAPIGetUserTag();
+  const {mutate: createTag, isLoading: loadingCreateTag} = useAPICreateUserTag({
     onSuccess: () => {
       refetch();
     },
   });
-  const {mutate: deleteTag} = useAPIDeleteUserTag({
+  const {mutate: deleteTag, isLoading: loadingDeleteTag} = useAPIDeleteUserTag({
     onSuccess: () => {
       refetch();
     },
   });
+  const isLoading = loadingTags || loadingCreateTag || loadingDeleteTag;
   const {filteredTags: techTags} = useTagType(TagType.TECH, tags || []);
   const {width: windowWidth} = useWindowDimensions();
   const {filteredTags: qualificationTags} = useTagType(
@@ -108,6 +109,9 @@ const UserTagAdmin: React.FC<TagAdminProps> = ({navigation}) => {
 
   return (
     <WholeContainer>
+      <Overlay visible={isLoading} p="xl">
+        <ActivityIndicator />
+      </Overlay>
       <AppHeader
         title={'タグ管理'}
         tabs={tabs}
