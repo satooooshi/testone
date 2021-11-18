@@ -133,7 +133,11 @@ const EventDetail: React.FC<EventDetailProps> = ({route}) => {
 
   return (
     <WholeContainer>
-      <AppHeader title="イベント詳細" activeTabName="一覧に戻る" />
+      <AppHeader
+        enableBackButton={true}
+        title="イベント詳細"
+        activeTabName="一覧に戻る"
+      />
       <Overlay visible={screenLoading} p="xl">
         <ActivityIndicator />
       </Overlay>

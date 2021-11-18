@@ -1,7 +1,7 @@
 import React from 'react';
 import {useWindowDimensions, FlatList, TouchableOpacity} from 'react-native';
 import {Wiki} from '../../../types';
-import {Div, Avatar, Text, Tag, Icon} from 'react-native-magnus';
+import {Div, Avatar, Text, Tag} from 'react-native-magnus';
 import {tagColorFactory} from '../../../utils/factory/tagColorFactory';
 import {wikiCardStyles} from '../../../styles/component/wiki/wikiCard.style';
 
@@ -26,7 +26,9 @@ const WikiCard: React.FC<WikiCardProps> = ({wiki, onPress}) => {
           <Avatar
             mr={8}
             source={
-              wiki.writer?.avatarUrl
+              !wiki.writer?.existence
+                ? require('../../../../assets/bold-mascot.png')
+                : wiki.writer?.avatarUrl
                 ? {uri: wiki.writer?.avatarUrl}
                 : require('../../../../assets/no-image-avatar.png')
             }
