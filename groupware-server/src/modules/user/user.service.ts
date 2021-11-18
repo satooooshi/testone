@@ -446,16 +446,14 @@ export class UserService {
       where: { id },
       relations: ['tags'],
     });
+    if (!user) {
+      throw new NotFoundException('User with this id does not exist');
+    }
     if (!user?.verifiedAt) {
       throw new BadRequestException('The user is not verified');
     }
-    if (user) {
-      const urlParsedUser = await this.generateSignedStorageURLsFromUserObj(
-        user,
-      );
-      return urlParsedUser;
-    }
-    throw new NotFoundException('User with this id does not exist');
+    const urlParsedUser = await this.generateSignedStorageURLsFromUserObj(user);
+    return urlParsedUser;
   }
 
   async getByEmail(email: string, passwordSelect?: boolean) {

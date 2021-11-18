@@ -95,9 +95,7 @@ const AccountDetail: React.FC<AccountDetailProps> = ({navigation, route}) => {
   const questionScreenName = `${screenName}-question`;
   const knowledgeScreenName = `${screenName}-knowledge`;
   const {width: windowWidth, height: windowHeight} = useWindowDimensions();
-  const {data: profile, refetch} = useAPIGetUserInfoById(
-    userID?.toString() || '0',
-  );
+  const {data: profile, refetch} = useAPIGetUserInfoById(id);
   const {data: events} = useAPIGetEventList({
     participant_id: userID?.toString(),
   });
