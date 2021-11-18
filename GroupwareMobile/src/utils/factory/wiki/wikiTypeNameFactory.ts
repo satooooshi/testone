@@ -9,6 +9,8 @@ export const wikiTypeNameFactory = (
       return 'Q&A';
     case WikiType.KNOWLEDGE:
       return 'ナレッジ';
+    case WikiType.ALL_POSTAL:
+      return 'オール便';
     case WikiType.RULES:
       switch (ruleCategory) {
         case RuleCategory.RULES:

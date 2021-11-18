@@ -209,6 +209,18 @@ const WikiForm: React.FC<WikiFormProps> = (
         onPress={() =>
           setNewWiki(w => ({
             ...w,
+            type: WikiType.ALL_POSTAL,
+            ruleCategory: RuleCategory.OTHERS,
+          }))
+        }
+        value={WikiType.ALL_POSTAL}>
+        {wikiTypeNameFactory(WikiType.ALL_POSTAL)}
+      </Dropdown.Option>
+      <Dropdown.Option
+        {...defaultDropdownOptionProps}
+        onPress={() =>
+          setNewWiki(w => ({
+            ...w,
             type: WikiType.QA,
             ruleCategory: RuleCategory.OTHERS,
           }))
