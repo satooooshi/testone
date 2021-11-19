@@ -24,7 +24,6 @@ type WikiCardListProps = {
 
 type RenderWikiCardListProps = {
   wiki: Wiki[];
-  type?: WikiType;
   ruleCategory?: RuleCategory;
   status?: 'new' | 'resolved';
   searchQuery: SearchQueryToGetWiki;
@@ -33,13 +32,12 @@ type RenderWikiCardListProps = {
 
 const RenderWikiCardList: React.FC<RenderWikiCardListProps> = ({
   wiki,
-  type,
   ruleCategory,
   status,
   setSearchQuery,
 }) => {
   const navigation = useNavigation<any>();
-  const isFocsed = useIsFocused();
+  const isFocused = useIsFocused();
 
   const onEndReached = () => {
     setSearchQuery(q => ({
@@ -49,15 +47,15 @@ const RenderWikiCardList: React.FC<RenderWikiCardListProps> = ({
   };
 
   useEffect(() => {
-    if (isFocsed) {
+    if (isFocused) {
       setSearchQuery(q => ({
         ...q,
-        type,
+        page: '1',
         rule_category: ruleCategory,
         status: status,
       }));
     }
-  }, [isFocsed, ruleCategory, setSearchQuery, status, type]);
+  }, [isFocused, ruleCategory, setSearchQuery, status, wiki]);
 
   return (
     <Div>
@@ -115,7 +113,7 @@ const WikiCardList: React.FC<WikiCardListProps> = ({type}) => {
   }, [isLoadingWiki]);
 
   useEffect(() => {
-    setSearchQuery(q => ({...q, type}));
+    setSearchQuery(q => ({...q, page: '1', type}));
   }, [type]);
 
   useEffect(() => {
@@ -158,7 +156,6 @@ const WikiCardList: React.FC<WikiCardListProps> = ({type}) => {
             children={() => (
               <RenderWikiCardList
                 wiki={wikiForInfiniteScroll}
-                type={WikiType.RULES}
                 ruleCategory={RuleCategory.PHILOSOPHY}
                 status={undefined}
                 setSearchQuery={setSearchQuery}
@@ -172,7 +169,6 @@ const WikiCardList: React.FC<WikiCardListProps> = ({type}) => {
             children={() => (
               <RenderWikiCardList
                 wiki={wikiForInfiniteScroll}
-                type={WikiType.RULES}
                 ruleCategory={RuleCategory.RULES}
                 status={undefined}
                 setSearchQuery={setSearchQuery}
@@ -186,7 +182,6 @@ const WikiCardList: React.FC<WikiCardListProps> = ({type}) => {
             children={() => (
               <RenderWikiCardList
                 wiki={wikiForInfiniteScroll}
-                type={WikiType.RULES}
                 ruleCategory={RuleCategory.ABC}
                 status={undefined}
                 setSearchQuery={setSearchQuery}
@@ -200,7 +195,6 @@ const WikiCardList: React.FC<WikiCardListProps> = ({type}) => {
             children={() => (
               <RenderWikiCardList
                 wiki={wikiForInfiniteScroll}
-                type={WikiType.RULES}
                 ruleCategory={RuleCategory.BENEFITS}
                 status={undefined}
                 setSearchQuery={setSearchQuery}
@@ -214,7 +208,6 @@ const WikiCardList: React.FC<WikiCardListProps> = ({type}) => {
             children={() => (
               <RenderWikiCardList
                 wiki={wikiForInfiniteScroll}
-                type={WikiType.RULES}
                 ruleCategory={RuleCategory.DOCUMENT}
                 status={undefined}
                 setSearchQuery={setSearchQuery}
@@ -231,7 +224,6 @@ const WikiCardList: React.FC<WikiCardListProps> = ({type}) => {
             children={() => (
               <RenderWikiCardList
                 wiki={wikiForInfiniteScroll}
-                type={WikiType.QA}
                 ruleCategory={undefined}
                 status={'new'}
                 setSearchQuery={setSearchQuery}
@@ -245,7 +237,6 @@ const WikiCardList: React.FC<WikiCardListProps> = ({type}) => {
             children={() => (
               <RenderWikiCardList
                 wiki={wikiForInfiniteScroll}
-                type={WikiType.QA}
                 ruleCategory={undefined}
                 status={'resolved'}
                 setSearchQuery={setSearchQuery}
@@ -258,7 +249,6 @@ const WikiCardList: React.FC<WikiCardListProps> = ({type}) => {
       ) : (
         <RenderWikiCardList
           wiki={wikiForInfiniteScroll}
-          type={WikiType.KNOWLEDGE}
           ruleCategory={undefined}
           status={undefined}
           setSearchQuery={setSearchQuery}

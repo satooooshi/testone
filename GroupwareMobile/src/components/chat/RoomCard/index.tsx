@@ -46,14 +46,14 @@ const RoomCard: React.FC<RoomCardProps> = ({room, onPress}) => {
           mr={'lg'}
           style={roomCardStyles.image}
         />
-        <Div w={'90%'}>
-          <Text mb={'xs'} fontWeight="bold" fontSize={16}>
+        <Div w={'75%'} pr={'sm'}>
+          <Text numberOfLines={1} mb={'xs'} fontWeight="bold" fontSize={16}>
             {room.name || nameOfEmptyNameGroup(room.members)}
           </Text>
           <Text mb={'xs'} fontSize={14} color={darkFontColor}>
             TODO 最新メッセージを表示
           </Text>
-          <Div flexDir="row" w={'80%'} justifyContent="space-between">
+          <Div flexDir="row" justifyContent="space-between">
             <Text>{`${room.members?.length || 0}人のメンバー`}</Text>
             <Text>
               {dateTimeFormatterFromJSDDate({

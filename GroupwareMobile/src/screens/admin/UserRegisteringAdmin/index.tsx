@@ -1,6 +1,7 @@
 import {useFormik} from 'formik';
 import React, {useEffect, useRef, useState} from 'react';
 import {
+  ActivityIndicator,
   Alert,
   TextInput,
   TouchableOpacity,
@@ -13,6 +14,7 @@ import {
   Icon,
   Image,
   Input,
+  Overlay,
   ScrollDiv,
   Text,
 } from 'react-native-magnus';
@@ -57,7 +59,7 @@ const UserRegisteringAdmin: React.FC<UserRegisteringAdminProps> = ({
   navigation,
 }) => {
   const dropdownRef = useRef<any | null>(null);
-  const {mutate: register} = useAPIRegister({
+  const {mutate: register, isLoading} = useAPIRegister({
     onSuccess: responseData => {
       if (responseData) {
         const password = values.password;
@@ -141,6 +143,9 @@ const UserRegisteringAdmin: React.FC<UserRegisteringAdminProps> = ({
   }, [selectedTags, setValues]);
   return (
     <WholeContainer>
+      <Overlay visible={isLoading} p="xl">
+        <ActivityIndicator />
+      </Overlay>
       <AppHeader
         title="ユーザー作成"
         tabs={tabs}

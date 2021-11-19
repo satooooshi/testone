@@ -198,14 +198,18 @@ const WikiForm: React.FC<WikiFormProps> = ({
         setEditorState(EditorState.createWithContent(stateFromHTML(wiki.body)));
       }
     }
-  }, [wiki]);
+  }, [setNewQuestion, wiki]);
 
   useEffect(() => {
     if (editorState) {
-      setNewQuestion((q) => ({
-        ...q,
-        body: stateToHTML(editorState.getCurrentContent()),
-      }));
+      setNewQuestion((q) =>
+        q.textFormat === 'html'
+          ? {
+              ...q,
+              body: stateToHTML(editorState.getCurrentContent()),
+            }
+          : q,
+      );
     }
   }, [editorState, setNewQuestion, wiki]);
 
@@ -361,7 +365,9 @@ const WikiForm: React.FC<WikiFormProps> = ({
             ))}
           </div>
         ) : null}
-        {touched.body && !editorState.getCurrentContent().hasText() ? (
+        {touched.body &&
+        newQuestion.textFormat === 'html' &&
+        !editorState.getCurrentContent().hasText() ? (
           <Text color="tomato">{draftJsEmptyError}</Text>
         ) : null}
         {errors.body && touched.body ? (

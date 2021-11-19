@@ -1,11 +1,7 @@
-import {useNavigation, useRoute} from '@react-navigation/native';
 import React, {useEffect} from 'react';
 import {useAPICreateWiki} from '../../../hooks/api/wiki/useAPICreateWiki';
 import {RuleCategory, Wiki, WikiType} from '../../../types';
-import {
-  PostWikiNavigationProps,
-  PostWikiRouteProps,
-} from '../../../types/navigator/screenProps/Wiki';
+import {EditWikiProps} from '../../../types/navigator/screenProps/Wiki';
 import {useFormik} from 'formik';
 import {wikiSchema} from '../../../utils/validation/schema';
 import {useAPIGetTag} from '../../../hooks/api/tag/useAPIGetTag';
@@ -15,11 +11,11 @@ import {useAPIUploadStorage} from '../../../hooks/api/storage/useAPIUploadStorag
 import {uploadImageFromGallery} from '../../../utils/cropImage/uploadImageFromGallery';
 import {ActivityIndicator} from 'react-native';
 import {Overlay} from 'react-native-magnus';
+import {useAPIGetWikiDetail} from '../../../hooks/api/wiki/useAPIGetWikiDetail';
 
-const PostWiki: React.FC = () => {
-  const navigation = useNavigation<PostWikiNavigationProps>();
-  const route = useRoute<PostWikiRouteProps>();
-  const type = route.params?.type;
+const EditWiki: React.FC<EditWikiProps> = ({route, navigation}) => {
+  const {id} = route.params;
+  const {data: wiki} = useAPIGetWikiDetail(id);
   const {mutate: saveWiki, isLoading: loadingSaveWiki} = useAPICreateWiki({
     onSuccess: () => {
       navigation.goBack();
@@ -34,8 +30,8 @@ const PostWiki: React.FC = () => {
     title: '',
     body: '',
     tags: [],
-    type: type || WikiType.QA,
-    ruleCategory: type ? RuleCategory.RULES : RuleCategory.OTHERS,
+    type: WikiType.QA,
+    ruleCategory: RuleCategory.OTHERS,
     textFormat: 'html',
   };
   const {setValues: setNewWiki} = useFormik({
@@ -64,13 +60,13 @@ const PostWiki: React.FC = () => {
         <ActivityIndicator />
       </Overlay>
       <WikiForm
+        wiki={wiki}
         onUploadImage={handleUploadImage}
         tags={tags || []}
-        type={type}
         saveWiki={saveWiki}
       />
     </>
   );
 };
 
-export default PostWiki;
+export default EditWiki;

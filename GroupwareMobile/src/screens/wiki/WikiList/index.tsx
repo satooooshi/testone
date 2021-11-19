@@ -18,6 +18,10 @@ const WikiList: React.FC<WikiListProps> = ({navigation}) => {
       onPress: () => setType(WikiType.RULES),
     },
     {
+      name: 'オール便',
+      onPress: () => setType(WikiType.ALL_POSTAL),
+    },
+    {
       name: 'ナレッジ',
       onPress: () => setType(WikiType.KNOWLEDGE),
     },

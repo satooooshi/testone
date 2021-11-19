@@ -13,7 +13,7 @@ import { userNameFactory } from 'src/utils/factory/userNameFactory';
 import { In, Repository } from 'typeorm';
 import { StorageService } from '../storage/storage.service';
 import { UserService } from '../user/user.service';
-import { GetMessagesQuery } from './chat.controller';
+import { GetMessagesQuery, GetRoomsResult } from './chat.controller';
 
 @Injectable()
 export class ChatService {
@@ -93,6 +93,30 @@ export class ChatService {
     const urlParsedGroups =
       await this.generateSignedStorageURLsFromChatGroupArr(groupsAndUsers);
     return urlParsedGroups;
+  }
+
+  public async getRoomsByPage(
+    userID: number,
+    page: number,
+  ): Promise<GetRoomsResult> {
+    const limit = 20;
+    const offset = limit * (page - 1);
+    const [urlUnparsedRooms, count] = await this.chatGroupRepository
+      .createQueryBuilder('chat_groups')
+      .leftJoinAndSelect('chat_groups.members', 'member')
+      .leftJoinAndSelect('chat_groups.lastReadChatTime', 'lastReadChatTime')
+      .leftJoinAndSelect('lastReadChatTime.user', 'lastReadChatTime.user')
+      .where('member.id = :memberId', { memberId: userID })
+      .skip(offset)
+      .take(limit)
+      .orderBy('chat_groups.updatedAt', 'DESC')
+      .getManyAndCount();
+    const rooms = await this.generateSignedStorageURLsFromChatGroupArr(
+      urlUnparsedRooms,
+    );
+    const pageCount = Math.floor(count / limit) + 1;
+    console.log(rooms);
+    return { rooms, pageCount };
   }
 
   public async getChatMessage(

@@ -5,12 +5,13 @@ import RenderHtml from 'react-native-render-html';
 import {WikiDetailProps} from '../../../types/navigator/screenProps/Wiki';
 import {useAPIGetWikiDetail} from '../../../hooks/api/wiki/useAPIGetWikiDetail';
 import MarkdownIt from 'markdown-it';
-import {useWindowDimensions} from 'react-native';
+import {TouchableOpacity, useWindowDimensions} from 'react-native';
 import AppHeader from '../../../components/Header';
 import {wikiTypeNameFactory} from '../../../utils/factory/wiki/wikiTypeNameFactory';
 import {darkFontColor} from '../../../utils/colors';
 import {userNameFactory} from '../../../utils/factory/userNameFactory';
 import {wikiDetailStyles} from '../../../styles/screen/wiki/wikiDetail.style';
+import {User} from '../../../types';
 
 const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
   const {id} = route.params;
@@ -27,7 +28,7 @@ const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
   }, [wikiInfo]);
 
   const headerTitle = wikiTypeName + '詳細';
-  const headerRightButtonName = wikiTypeName + 'を新規作成';
+  const headerRightButtonName = wikiTypeName + 'を編集';
 
   const onPressHeaderRightButton = () => {
     if (wikiInfo) {
@@ -36,32 +37,46 @@ const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
     // else error handling
   };
 
+  const onPressAvatar = (user: User) => {
+    navigation.navigate('AccountDetail', {id: user.id});
+  };
+
   return (
     <WholeContainer>
       <AppHeader
         title={headerTitle}
         rightButtonName={headerRightButtonName}
         onPressRightButton={onPressHeaderRightButton}
+        enableBackButton={true}
       />
       <ScrollDiv
         contentContainerStyle={{
           ...wikiDetailStyles.wrapper,
           width: windowWidth * 0.9,
         }}>
-        {wikiInfo && (
+        {wikiInfo && wikiInfo.writer ? (
           <Div flexDir="column" w={'100%'}>
             <Text fontWeight="bold" fontSize={24} color={darkFontColor} mb={16}>
               {wikiInfo.title}
             </Text>
             <Div flexDir="row" alignItems="center" mb={16}>
-              <Avatar
-                mr={8}
-                source={
-                  wikiInfo.writer?.avatarUrl
-                    ? {uri: wikiInfo.writer?.avatarUrl}
-                    : require('../../../../assets/no-image-avatar.png')
-                }
-              />
+              <TouchableOpacity
+                onPress={() => {
+                  if (wikiInfo.writer && wikiInfo.writer.existence) {
+                    onPressAvatar(wikiInfo.writer);
+                  }
+                }}>
+                <Avatar
+                  mr={8}
+                  source={
+                    !wikiInfo.writer.existence
+                      ? {uri: wikiInfo.writer?.avatarUrl}
+                      : wikiInfo.writer?.avatarUrl
+                      ? require('../../../../assets/bold-mascot.png')
+                      : require('../../../../assets/no-image-avatar.png')
+                  }
+                />
+              </TouchableOpacity>
               <Text fontSize={18} color={darkFontColor}>
                 {userNameFactory(wikiInfo.writer)}
               </Text>
@@ -78,7 +93,7 @@ const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
               />
             </Div>
           </Div>
-        )}
+        ) : null}
       </ScrollDiv>
     </WholeContainer>
   );

@@ -17,11 +17,9 @@ import TagModal from '../../components/common/TagModal';
 import AppHeader from '../../components/Header';
 import MarkdownEditorWebView from '../../components/MarkdownEditorWebView';
 import WholeContainer from '../../components/WholeContainer';
-import {useAPIUploadStorage} from '../../hooks/api/storage/useAPIUploadStorage';
 import {useSelectedTags} from '../../hooks/tag/useSelectedTags';
 import {useTagType} from '../../hooks/tag/useTagType';
 import {RuleCategory, Tag, TextFormat, Wiki, WikiType} from '../../types';
-import {uploadImageFromGallery} from '../../utils/cropImage/uploadImageFromGallery';
 import {tagColorFactory} from '../../utils/factory/tagColorFactory';
 import {wikiTypeNameFactory} from '../../utils/factory/wiki/wikiTypeNameFactory';
 import {wikiSchema} from '../../utils/validation/schema';
@@ -31,11 +29,16 @@ type WikiFormProps = {
   tags: Tag[];
   type?: WikiType;
   saveWiki: (wiki: Partial<Wiki>) => void;
+  onUploadImage: (onSuccess: (imageURL: string[]) => void) => void;
 };
 
-const WikiForm: React.FC<WikiFormProps> = (
-  /* {wiki: existWiki} */ {wiki, tags, type, saveWiki},
-) => {
+const WikiForm: React.FC<WikiFormProps> = ({
+  wiki,
+  tags,
+  type,
+  saveWiki,
+  onUploadImage,
+}) => {
   const initialValues: Partial<Wiki> = {
     title: '',
     body: '',
@@ -76,11 +79,6 @@ const WikiForm: React.FC<WikiFormProps> = (
     justifyContent: 'center',
     roundedTop: 'lg',
   };
-  const {mutate: uploadImage} = useAPIUploadStorage({
-    onSuccess: imageUrl => {
-      editorRef.current?.insertImage(imageUrl[0]);
-    },
-  });
   const {selectedTags, toggleTag, isSelected} = useSelectedTags();
   const {selectedTagType, selectTagType, filteredTags} = useTagType(
     'All',
@@ -209,6 +207,18 @@ const WikiForm: React.FC<WikiFormProps> = (
         onPress={() =>
           setNewWiki(w => ({
             ...w,
+            type: WikiType.ALL_POSTAL,
+            ruleCategory: RuleCategory.OTHERS,
+          }))
+        }
+        value={WikiType.ALL_POSTAL}>
+        {wikiTypeNameFactory(WikiType.ALL_POSTAL)}
+      </Dropdown.Option>
+      <Dropdown.Option
+        {...defaultDropdownOptionProps}
+        onPress={() =>
+          setNewWiki(w => ({
+            ...w,
             type: WikiType.QA,
             ruleCategory: RuleCategory.OTHERS,
           }))
@@ -331,10 +341,12 @@ const WikiForm: React.FC<WikiFormProps> = (
               <RichToolbar
                 editor={editorRef}
                 selectedIconTint={'#2095F2'}
-                onPressAddImage={async () => {
-                  const {formData} = await uploadImageFromGallery();
-                  if (formData) {
-                    uploadImage(formData);
+                onPressAddImage={() => {
+                  if (editorRef.current) {
+                    onUploadImage(imageUrl =>
+                      //@ts-ignore If write this like editorRef.current?.insertImage it doesn't work on initial uploading.
+                      editorRef.current.insertImage(imageUrl[0]),
+                    );
                   }
                 }}
                 disabledIconTint={'#bfbfbf'}
@@ -377,6 +389,7 @@ const WikiForm: React.FC<WikiFormProps> = (
           ) : newWiki.textFormat === 'markdown' ? (
             <Div h={windowHeight * 0.9}>
               <MarkdownEditorWebView
+                value={wiki?.body || ''}
                 onChange={text => setNewWiki(w => ({...w, body: text}))}
               />
             </Div>
