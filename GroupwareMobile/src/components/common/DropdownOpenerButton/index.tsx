@@ -13,14 +13,15 @@ const DropdownOpenerButton: React.FC<DropdownOpenerButtonProps> = ({
   return (
     <Button
       block
-      suffix={<Icon position="absolute" right={8} name="down" color="black" />}
+      suffix={<Icon position="absolute" right={0} name="down" color="black" />}
       bg="white"
       borderWidth={1}
       borderColor={'#e0e0e0'}
       p={12}
       color="black"
       onPress={onPress}
-      rounded="md">
+      rounded="md"
+      justifyContent="flex-start">
       {name}
     </Button>
   );
