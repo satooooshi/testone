@@ -8,6 +8,7 @@ import { FormControl, FormLabel } from '@chakra-ui/form-control';
 import { Button } from '@chakra-ui/button';
 import { formikErrorMsgFactory } from 'src/utils/factory/formikErrorMsgFactory';
 import { useToast } from '@chakra-ui/toast';
+import eventTypeNameFactory from 'src/utils/factory/eventTypeNameFactory';
 
 const EventIntroductionEditor: React.FC<Partial<EventIntroduction>> = ({
   type,
@@ -43,6 +44,7 @@ const EventIntroductionEditor: React.FC<Partial<EventIntroduction>> = ({
     },
     validationSchema: editEventIntroductionSchema,
   });
+  const eventTypeName = type ? eventTypeNameFactory(type) : '';
 
   const checkErrors = async () => {
     const errors = await validateForm();
@@ -63,7 +65,7 @@ const EventIntroductionEditor: React.FC<Partial<EventIntroduction>> = ({
     <div className={eventPRStyles.main_wrapper}>
       <div className={eventPRStyles.top_title_wrapper}>
         <p className={eventPRStyles.culture}>culture</p>
-        <p className={eventPRStyles.top_title}>{type}</p>
+        <p className={eventPRStyles.top_title}>{eventTypeName}</p>
       </div>
       <div className={eventPRStyles.top_images_wrapper}>
         <div className={eventPRStyles.main_image_wrapper}>

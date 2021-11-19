@@ -1,6 +1,7 @@
 import eventPRStyles from '@/styles/layouts/EventPR.module.scss';
 import EventCard from '@/components/common/EventCard';
 import { EventIntroduction, EventSchedule } from 'src/types';
+import eventTypeNameFactory from 'src/utils/factory/eventTypeNameFactory';
 
 export interface EventIntroductionProps {
   recommendedEvents?: EventSchedule[];
@@ -19,11 +20,12 @@ const EventIntroductionDisplayer: React.FC<
   imageUrlSub3,
   imageUrlSub4,
 }) => {
+  const eventTypeName = type ? eventTypeNameFactory(type) : '';
   return (
     <div className={eventPRStyles.main_wrapper}>
       <div className={eventPRStyles.top_title_wrapper}>
         <p className={eventPRStyles.culture}>culture</p>
-        <p className={eventPRStyles.top_title}>{type}</p>
+        <p className={eventPRStyles.top_title}>{eventTypeName}</p>
       </div>
       <div className={eventPRStyles.top_images_wrapper}>
         <div className={eventPRStyles.main_image_wrapper}>
