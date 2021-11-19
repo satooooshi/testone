@@ -10,7 +10,6 @@ import WholeContainer from '../../../components/WholeContainer';
 import WikiCard from '../../../components/wiki/WikiCard';
 import {useAuthenticate} from '../../../contexts/useAuthenticate';
 import {useAPIGetEventList} from '../../../hooks/api/event/useAPIGetEventList';
-import {useAPIGetTag} from '../../../hooks/api/tag/useAPIGetTag';
 import {useAPIGetUserInfoById} from '../../../hooks/api/user/useAPIGetUserInfoById';
 import {useAPIGetWikiList} from '../../../hooks/api/wiki/useAPIGetWikiList';
 import {useTagType} from '../../../hooks/tag/useTagType';
@@ -30,14 +29,16 @@ type DetailScreenProps = {
 
 const DetailScreen: React.FC<DetailScreenProps> = ({profile}) => {
   const {width: windowWidth} = useWindowDimensions();
-  const {data: tags} = useAPIGetTag();
-  const {filteredTags: techTags} = useTagType(TagType.TECH, tags || []);
+  const {filteredTags: techTags} = useTagType(TagType.TECH, profile.tags || []);
   const {filteredTags: qualificationTags} = useTagType(
     TagType.QUALIFICATION,
-    tags || [],
+    profile.tags || [],
   );
-  const {filteredTags: clubTags} = useTagType(TagType.CLUB, tags || []);
-  const {filteredTags: hobbyTags} = useTagType(TagType.HOBBY, tags || []);
+  const {filteredTags: clubTags} = useTagType(TagType.CLUB, profile.tags || []);
+  const {filteredTags: hobbyTags} = useTagType(
+    TagType.HOBBY,
+    profile.tags || [],
+  );
 
   return (
     <Div w={windowWidth * 0.9} alignSelf="center">
@@ -66,7 +67,7 @@ const DetailScreen: React.FC<DetailScreenProps> = ({profile}) => {
       <TagListBox
         mb={'lg'}
         tags={qualificationTags || []}
-        tagType={TagType.TECH}
+        tagType={TagType.QUALIFICATION}
         introduce={profile.introduceQualification}
       />
       <TagListBox
