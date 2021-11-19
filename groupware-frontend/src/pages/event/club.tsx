@@ -31,9 +31,15 @@ const Club: React.FC = () => {
     type: EventType.CLUB,
   });
 
-  const headlineImgSource = clubImage5;
+  const headlineImgSource =
+    'https://eowesttokyo.org/wp-content/uploads/2019/03/valleyin.jpg';
 
-  const bottomImgSources = [clubImage3, clubImage4, clubImage6, clubImage2];
+  const bottomImgSources = [
+    'https://eowesttokyo.org/wp-content/uploads/2019/03/valleyin.jpg',
+    'https://eowesttokyo.org/wp-content/uploads/2019/03/valleyin.jpg',
+    'https://eowesttokyo.org/wp-content/uploads/2019/03/valleyin.jpg',
+    'https://eowesttokyo.org/wp-content/uploads/2019/03/valleyin.jpg',
+  ];
 
   const subHeading = '31の部活動、サークル';
   const content = `ボールドでは現在、ボルダリング、バスケ、バドミントンといった運動系の部活をはじめ、麻雀、アナログゲーム、写真といった文化系など、全部で17の部活と14のサークルがあり、月1程度で週末に集まって活動しています。

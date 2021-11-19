@@ -12,8 +12,8 @@ import { formikErrorMsgFactory } from 'src/utils/factory/formikErrorMsgFactory';
 import { useToast } from '@chakra-ui/toast';
 
 export interface EventIntroductionEditorProps {
-  headlineImgSource: StaticImageData | string;
-  bottomImgSources: (StaticImageData | string)[];
+  headlineImgSource: string;
+  bottomImgSources: string[];
   heading: EventTab;
   subHeading: string;
   content: string;
@@ -31,15 +31,14 @@ const EventIntroductionEditor: React.FC<EventIntroductionEditorProps> = ({
     type: EventType.CLUB,
     title: subHeading,
     description: content,
-    image_url: '',
-    image_url_sub_1: '',
-    image_url_sub_2: '',
-    image_url_sub_3: '',
-    image_url_sub_4: '',
+    imageUrl: headlineImgSource.toString(),
+    imageUrlSub1: bottomImgSources[0].toString(),
+    imageUrlSub2: bottomImgSources[1].toString(),
+    imageUrlSub3: bottomImgSources[2].toString(),
+    imageUrlSub4: bottomImgSources[3].toString(),
   };
   const {
     handleSubmit,
-    handleChange,
     handleBlur,
     setValues: setEventIntroductionInfo,
     values,
@@ -75,11 +74,7 @@ const EventIntroductionEditor: React.FC<EventIntroductionEditorProps> = ({
       </div>
       <div className={eventPRStyles.top_images_wrapper}>
         <div className={eventPRStyles.main_image_wrapper}>
-          {typeof headlineImgSource === 'string' ? (
-            <img src={headlineImgSource} alt="" />
-          ) : (
-            <Image src={headlineImgSource} alt="" />
-          )}
+          <img src={initialEventIntroductionValues.imageUrl} alt="" />
         </div>
       </div>
       <div className={eventPRStyles.latest_events_wrapper}>
@@ -138,11 +133,7 @@ const EventIntroductionEditor: React.FC<EventIntroductionEditorProps> = ({
           {bottomImgSources !== [''] &&
             bottomImgSources.map((bottomImgSource, id) => (
               <div key={id} className={eventPRStyles.bottom_image_wrapper}>
-                {typeof bottomImgSource === 'string' ? (
-                  <img src={bottomImgSource} alt="" />
-                ) : (
-                  <Image src={bottomImgSource} alt="" />
-                )}
+                <img src={bottomImgSource} alt="" />
               </div>
             ))}
         </div>
