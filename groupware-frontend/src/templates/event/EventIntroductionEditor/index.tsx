@@ -100,7 +100,6 @@ const EventIntroductionEditor: React.FC<EventIntroductionEditorProps> = ({
                 }
                 name="title"
                 onBlur={handleBlur}
-                isRequired={true}
               />
             </FormControl>
           </div>
@@ -121,7 +120,6 @@ const EventIntroductionEditor: React.FC<EventIntroductionEditorProps> = ({
                 }
                 name="description"
                 onBlur={handleBlur}
-                isRequired={true}
               />
             </FormControl>
           </div>
