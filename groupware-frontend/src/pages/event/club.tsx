@@ -1,7 +1,7 @@
 import LayoutWithTab from '@/components/layout/LayoutWithTab';
 import { SidebarScreenName } from '@/components/layout/Sidebar';
 import { useRouter } from 'next/router';
-import React from 'react';
+import React, { useState } from 'react';
 import eventPRStyles from '@/styles/layouts/EventPR.module.scss';
 import clubImage2 from '@/public/club_2.jpg';
 import clubImage3 from '@/public/club_3.png';
@@ -9,13 +9,19 @@ import clubImage4 from '@/public/club_4.jpg';
 import clubImage5 from '@/public/club_5.jpg';
 import clubImage6 from '@/public/club_6.jpg';
 import { useAPIGetLatestEvent } from '@/hooks/api/event/useAPIGetLatestEvent';
-import { EventType } from 'src/types';
+import { EventType, UserRole } from 'src/types';
 import { EventTab } from 'src/types/header/tab/types';
 import EventIntroduction from 'src/templates/event/EventIntroduction';
 import Head from 'next/head';
+import { Button } from '@chakra-ui/button';
+import { useAuthenticate } from 'src/contexts/useAuthenticate';
+import EventIntroductionEditor from 'src/templates/event/EventIntroductionEditor';
 
 const Club: React.FC = () => {
   const router = useRouter();
+  const [editMode, setEditMode] = useState<boolean>(false);
+  const { user } = useAuthenticate();
+
   const initialHeaderValue = {
     title: '部活動',
     rightButtonName: '予定を見る',
@@ -41,15 +47,36 @@ const Club: React.FC = () => {
       <Head>
         <title>ボールド | 部活動</title>
       </Head>
+      {user?.role === UserRole.ADMIN && (
+        <div className={eventPRStyles.edit_button_wrapper}>
+          <Button
+            colorScheme={'green'}
+            onClick={() => {
+              editMode ? setEditMode(false) : setEditMode(true);
+            }}>
+            {editMode ? '編集モード' : '編集する'}
+          </Button>
+        </div>
+      )}
       <div className={eventPRStyles.main}>
-        <EventIntroduction
-          recommendedEvents={recommendedEvents}
-          headlineImgSource={headlineImgSource}
-          bottomImgSources={bottomImgSources}
-          heading={EventTab.CLUB}
-          subHeading={subHeading}
-          content={content}
-        />
+        {editMode ? (
+          <EventIntroductionEditor
+            headlineImgSource={headlineImgSource}
+            bottomImgSources={bottomImgSources}
+            heading={EventTab.CLUB}
+            subHeading={subHeading}
+            content={content}
+          />
+        ) : (
+          <EventIntroduction
+            recommendedEvents={recommendedEvents}
+            headlineImgSource={headlineImgSource}
+            bottomImgSources={bottomImgSources}
+            heading={EventTab.CLUB}
+            subHeading={subHeading}
+            content={content}
+          />
+        )}
       </div>
     </LayoutWithTab>
   );

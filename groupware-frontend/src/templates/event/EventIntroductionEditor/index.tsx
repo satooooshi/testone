@@ -1,11 +1,8 @@
 import eventPRStyles from '@/styles/layouts/EventPR.module.scss';
-import EventCard from '@/components/common/EventCard';
-import { EventSchedule } from 'src/types';
 import { EventTab } from 'src/types/header/tab/types';
 import Image from 'next/image';
 
-export interface EventIntroductionProps {
-  recommendedEvents?: EventSchedule[];
+export interface EventIntroductionEditorProps {
   headlineImgSource: StaticImageData | string;
   bottomImgSources: (StaticImageData | string)[];
   heading: EventTab;
@@ -13,8 +10,7 @@ export interface EventIntroductionProps {
   content: string;
 }
 
-const EventIntroduction: React.FC<EventIntroductionProps> = ({
-  recommendedEvents,
+const EventIntroductionEditor: React.FC<EventIntroductionEditorProps> = ({
   headlineImgSource,
   bottomImgSources,
   heading,
@@ -37,27 +33,6 @@ const EventIntroduction: React.FC<EventIntroductionProps> = ({
         </div>
       </div>
       <div className={eventPRStyles.latest_events_wrapper}>
-        {recommendedEvents?.length ? (
-          <p className={eventPRStyles.latest_events_text}>
-            直近のおすすめイベント
-          </p>
-        ) : (
-          <p className={eventPRStyles.no_latest_event_text}>
-            直近一週間にイベントはありません
-          </p>
-        )}
-        <div className={eventPRStyles.event_card_list}>
-          {recommendedEvents?.map(
-            (eventSchedule, index) =>
-              index <= 4 && (
-                <div
-                  key={eventSchedule.id}
-                  className={eventPRStyles.event_card}>
-                  <EventCard eventSchedule={eventSchedule} />
-                </div>
-              ),
-          )}
-        </div>
         <div className={eventPRStyles.info_wrapper}>
           <div className={eventPRStyles.title_wrapper}>
             <p className={eventPRStyles.title}>{subHeading}</p>
@@ -83,4 +58,4 @@ const EventIntroduction: React.FC<EventIntroductionProps> = ({
   );
 };
 
-export default EventIntroduction;
+export default EventIntroductionEditor;
