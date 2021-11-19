@@ -180,7 +180,6 @@ const WikiForm: React.FC<WikiFormProps> = ({
     setNewQuestion((q) => ({ ...q, body: text }));
   };
   const handleImageUpload = async (file: File) => {
-    // setTest(true);
     try {
       const uploadedImageURL = await uploadStorage([file]);
       return uploadedImageURL[0];
