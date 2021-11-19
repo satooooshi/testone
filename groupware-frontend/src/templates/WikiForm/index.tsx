@@ -36,6 +36,7 @@ import { tagColorFactory } from 'src/utils/factory/tagColorFactory';
 import { useFormik } from 'formik';
 import { wikiSchema } from 'src/utils/validation/schema';
 import { stateFromHTML } from 'draft-js-import-html';
+import { imageExtensionsForMarkDownEditor } from 'src/utils/imageExtensions';
 
 type WikiFormProps = {
   wiki?: Wiki;
@@ -63,7 +64,6 @@ const WikiForm: React.FC<WikiFormProps> = ({
     EditorState.createEmpty(),
   );
   const [activeTab, setActiveTab] = useState<TabName>(TabName.EDIT);
-  // const [test, setTest] = useState(false);
   const initialValues: Partial<Wiki> = wiki || {
     title: '',
     body: '',
@@ -369,7 +369,6 @@ const WikiForm: React.FC<WikiFormProps> = ({
         {errors.body && touched.body ? (
           <Text color="tomato">{errors.body}</Text>
         ) : null}
-        {/* {test ? <Text color="tomato">画像ファイルを添付してください</Text> : null} */}
         {newQuestion.textFormat === 'html' && (
           <div style={{ marginBottom: 40 }}>
             <WrappedDraftEditor
@@ -397,6 +396,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
             onImageUpload={handleImageUpload}
             plugins={liteEditorPlugins}
             value={newQuestion.body}
+            imageAccept={imageExtensionsForMarkDownEditor}
             onChange={handleEditorChange}
             renderHTML={(text: string) => mdParser.render(text)}
           />
