@@ -1,8 +1,6 @@
 import eventPRStyles from '@/styles/layouts/EventPR.module.scss';
-import { EventTab } from 'src/types/header/tab/types';
-import Image from 'next/image';
 import { useFormik } from 'formik';
-import { EventIntroduction, EventType } from 'src/types';
+import { EventIntroduction } from 'src/types';
 import { editEventIntroductionSchema } from 'src/utils/validation/schema';
 import { Input } from '@chakra-ui/input';
 import { Textarea } from '@chakra-ui/textarea';
@@ -11,31 +9,26 @@ import { Button } from '@chakra-ui/button';
 import { formikErrorMsgFactory } from 'src/utils/factory/formikErrorMsgFactory';
 import { useToast } from '@chakra-ui/toast';
 
-export interface EventIntroductionEditorProps {
-  headlineImgSource: string;
-  bottomImgSources: string[];
-  heading: EventTab;
-  subHeading: string;
-  content: string;
-}
-
-const EventIntroductionEditor: React.FC<EventIntroductionEditorProps> = ({
-  headlineImgSource,
-  bottomImgSources,
-  heading,
-  subHeading,
-  content,
+const EventIntroductionEditor: React.FC<Partial<EventIntroduction>> = ({
+  type,
+  title,
+  description,
+  imageUrl,
+  imageUrlSub1,
+  imageUrlSub2,
+  imageUrlSub3,
+  imageUrlSub4,
 }) => {
   const toast = useToast();
   const initialEventIntroductionValues: Partial<EventIntroduction> = {
-    type: EventType.CLUB,
-    title: subHeading,
-    description: content,
-    imageUrl: headlineImgSource.toString(),
-    imageUrlSub1: bottomImgSources[0].toString(),
-    imageUrlSub2: bottomImgSources[1].toString(),
-    imageUrlSub3: bottomImgSources[2].toString(),
-    imageUrlSub4: bottomImgSources[3].toString(),
+    type: type,
+    title: title,
+    description: description,
+    imageUrl: imageUrl,
+    imageUrlSub1: imageUrlSub1,
+    imageUrlSub2: imageUrlSub2,
+    imageUrlSub3: imageUrlSub3,
+    imageUrlSub4: imageUrlSub4,
   };
   const {
     handleSubmit,
@@ -70,7 +63,7 @@ const EventIntroductionEditor: React.FC<EventIntroductionEditorProps> = ({
     <div className={eventPRStyles.main_wrapper}>
       <div className={eventPRStyles.top_title_wrapper}>
         <p className={eventPRStyles.culture}>culture</p>
-        <p className={eventPRStyles.top_title}>{heading}</p>
+        <p className={eventPRStyles.top_title}>{type}</p>
       </div>
       <div className={eventPRStyles.top_images_wrapper}>
         <div className={eventPRStyles.main_image_wrapper}>
@@ -130,12 +123,18 @@ const EventIntroductionEditor: React.FC<EventIntroductionEditorProps> = ({
           </div>
         </div>
         <div className={eventPRStyles.bottom_images_row}>
-          {bottomImgSources !== [''] &&
-            bottomImgSources.map((bottomImgSource, id) => (
-              <div key={id} className={eventPRStyles.bottom_image_wrapper}>
-                <img src={bottomImgSource} alt="" />
-              </div>
-            ))}
+          <div className={eventPRStyles.bottom_image_wrapper}>
+            <img src={imageUrlSub1} alt="" />
+          </div>
+          <div className={eventPRStyles.bottom_image_wrapper}>
+            <img src={imageUrlSub2} alt="" />
+          </div>
+          <div className={eventPRStyles.bottom_image_wrapper}>
+            <img src={imageUrlSub3} alt="" />
+          </div>
+          <div className={eventPRStyles.bottom_image_wrapper}>
+            <img src={imageUrlSub4} alt="" />
+          </div>
         </div>
       </div>
     </div>

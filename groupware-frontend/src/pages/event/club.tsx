@@ -10,12 +10,12 @@ import clubImage5 from '@/public/club_5.jpg';
 import clubImage6 from '@/public/club_6.jpg';
 import { useAPIGetLatestEvent } from '@/hooks/api/event/useAPIGetLatestEvent';
 import { EventType, UserRole } from 'src/types';
-import { EventTab } from 'src/types/header/tab/types';
-import EventIntroduction from 'src/templates/event/EventIntroduction';
 import Head from 'next/head';
 import { Button } from '@chakra-ui/button';
 import { useAuthenticate } from 'src/contexts/useAuthenticate';
 import EventIntroductionEditor from 'src/templates/event/EventIntroductionEditor';
+import { useAPIGetEventIntroduction } from '@/hooks/api/event/useAPIGetEventIntroduction';
+import EventIntroductionDisplayer from 'src/templates/event/EventIntroduction';
 
 const Club: React.FC = () => {
   const router = useRouter();
@@ -30,21 +30,9 @@ const Club: React.FC = () => {
   const { data: recommendedEvents } = useAPIGetLatestEvent({
     type: EventType.CLUB,
   });
-
-  const headlineImgSource =
-    'https://eowesttokyo.org/wp-content/uploads/2019/03/valleyin.jpg';
-
-  const bottomImgSources = [
-    'https://eowesttokyo.org/wp-content/uploads/2019/03/valleyin.jpg',
-    'https://eowesttokyo.org/wp-content/uploads/2019/03/valleyin.jpg',
-    'https://eowesttokyo.org/wp-content/uploads/2019/03/valleyin.jpg',
-    'https://eowesttokyo.org/wp-content/uploads/2019/03/valleyin.jpg',
-  ];
-
-  const subHeading = '31の部活動、サークル';
-  const content = `ボールドでは現在、ボルダリング、バスケ、バドミントンといった運動系の部活をはじめ、麻雀、アナログゲーム、写真といった文化系など、全部で17の部活と14のサークルがあり、月1程度で週末に集まって活動しています。
-（ちなみに時々新しいサークルが生まれ、だんだんと増え続けています。先日は囲碁・将棋サークルが発足しました）
-メンバーはもちろん、その部に所属していない人も自由に参加できるので、毎回違うメンバーで盛り上がっています！`;
+  const { data: eventIntroduction } = useAPIGetEventIntroduction(
+    EventType.CLUB,
+  );
 
   return (
     <LayoutWithTab
@@ -69,20 +57,26 @@ const Club: React.FC = () => {
       <div className={eventPRStyles.main}>
         {editMode ? (
           <EventIntroductionEditor
-            headlineImgSource={headlineImgSource}
-            bottomImgSources={bottomImgSources}
-            heading={EventTab.CLUB}
-            subHeading={subHeading}
-            content={content}
+            type={eventIntroduction?.type}
+            title={eventIntroduction?.title}
+            description={eventIntroduction?.description}
+            imageUrl={eventIntroduction?.imageUrl}
+            imageUrlSub1={eventIntroduction?.imageUrlSub1}
+            imageUrlSub2={eventIntroduction?.imageUrlSub2}
+            imageUrlSub3={eventIntroduction?.imageUrlSub3}
+            imageUrlSub4={eventIntroduction?.imageUrlSub4}
           />
         ) : (
-          <EventIntroduction
+          <EventIntroductionDisplayer
             recommendedEvents={recommendedEvents}
-            headlineImgSource={headlineImgSource}
-            bottomImgSources={bottomImgSources}
-            heading={EventTab.CLUB}
-            subHeading={subHeading}
-            content={content}
+            type={eventIntroduction?.type}
+            title={eventIntroduction?.title}
+            description={eventIntroduction?.description}
+            imageUrl={eventIntroduction?.imageUrl}
+            imageUrlSub1={eventIntroduction?.imageUrlSub1}
+            imageUrlSub2={eventIntroduction?.imageUrlSub2}
+            imageUrlSub3={eventIntroduction?.imageUrlSub3}
+            imageUrlSub4={eventIntroduction?.imageUrlSub4}
           />
         )}
       </div>

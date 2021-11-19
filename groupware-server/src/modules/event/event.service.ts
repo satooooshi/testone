@@ -9,6 +9,7 @@ import * as JSZip from 'jszip';
 import { EventSchedule, EventType } from 'src/entities/event.entity';
 import { EventComment } from 'src/entities/eventComment.entity';
 import { EventFile } from 'src/entities/eventFile.entity';
+import { EventIntroduction } from 'src/entities/eventIntroduction.entity';
 import { EventVideo } from 'src/entities/eventVideo.entity';
 import { SubmissionFile } from 'src/entities/submissionFiles.entity';
 import { User } from 'src/entities/user.entity';
@@ -26,6 +27,8 @@ export class EventScheduleService {
   constructor(
     @InjectRepository(EventSchedule)
     private readonly eventRepository: Repository<EventSchedule>,
+    @InjectRepository(EventIntroduction)
+    private readonly eventIntroductionRepository: Repository<EventIntroduction>,
     @InjectRepository(UserJoiningEvent)
     private readonly userJoiningEventRepository: Repository<UserJoiningEvent>,
     @InjectRepository(EventFile)
@@ -284,6 +287,15 @@ export class EventScheduleService {
     );
 
     return { pageCount, events: urlParsedEvents };
+  }
+
+  public async getEventIntroductions(
+    type: EventType,
+  ): Promise<EventIntroduction> {
+    const eventIntroduction = await this.eventIntroductionRepository.findOne({
+      type: type,
+    });
+    return eventIntroduction;
   }
 
   public async createFromArr(

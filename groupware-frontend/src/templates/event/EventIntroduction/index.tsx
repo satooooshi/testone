@@ -1,39 +1,33 @@
 import eventPRStyles from '@/styles/layouts/EventPR.module.scss';
 import EventCard from '@/components/common/EventCard';
-import { EventSchedule } from 'src/types';
-import { EventTab } from 'src/types/header/tab/types';
-import Image from 'next/image';
+import { EventIntroduction, EventSchedule } from 'src/types';
 
 export interface EventIntroductionProps {
   recommendedEvents?: EventSchedule[];
-  headlineImgSource: StaticImageData | string;
-  bottomImgSources: (StaticImageData | string)[];
-  heading: EventTab;
-  subHeading: string;
-  content: string;
 }
 
-const EventIntroduction: React.FC<EventIntroductionProps> = ({
+const EventIntroductionDisplayer: React.FC<
+  EventIntroductionProps & Partial<EventIntroduction>
+> = ({
   recommendedEvents,
-  headlineImgSource,
-  bottomImgSources,
-  heading,
-  subHeading,
-  content,
+  type,
+  title,
+  description,
+  imageUrl,
+  imageUrlSub1,
+  imageUrlSub2,
+  imageUrlSub3,
+  imageUrlSub4,
 }) => {
   return (
     <div className={eventPRStyles.main_wrapper}>
       <div className={eventPRStyles.top_title_wrapper}>
         <p className={eventPRStyles.culture}>culture</p>
-        <p className={eventPRStyles.top_title}>{heading}</p>
+        <p className={eventPRStyles.top_title}>{type}</p>
       </div>
       <div className={eventPRStyles.top_images_wrapper}>
         <div className={eventPRStyles.main_image_wrapper}>
-          {typeof headlineImgSource === 'string' ? (
-            <img src={headlineImgSource} alt="" />
-          ) : (
-            <Image src={headlineImgSource} alt="" />
-          )}
+          <img src={imageUrl} alt="" />
         </div>
       </div>
       <div className={eventPRStyles.latest_events_wrapper}>
@@ -60,27 +54,29 @@ const EventIntroduction: React.FC<EventIntroductionProps> = ({
         </div>
         <div className={eventPRStyles.info_wrapper}>
           <div className={eventPRStyles.title_wrapper}>
-            <p className={eventPRStyles.title}>{subHeading}</p>
+            <p className={eventPRStyles.title}>{title}</p>
           </div>
           <div className={eventPRStyles.description_wrapper}>
-            <p className={eventPRStyles.description}>{content}</p>
+            <p className={eventPRStyles.description}>{description}</p>
           </div>
         </div>
         <div className={eventPRStyles.bottom_images_row}>
-          {bottomImgSources !== [''] &&
-            bottomImgSources.map((bottomImgSource, id) => (
-              <div key={id} className={eventPRStyles.bottom_image_wrapper}>
-                {typeof bottomImgSource === 'string' ? (
-                  <img src={bottomImgSource} alt="" />
-                ) : (
-                  <Image src={bottomImgSource} alt="" />
-                )}
-              </div>
-            ))}
+          <div className={eventPRStyles.bottom_image_wrapper}>
+            <img src={imageUrlSub1} alt="" />
+          </div>
+          <div className={eventPRStyles.bottom_image_wrapper}>
+            <img src={imageUrlSub2} alt="" />
+          </div>
+          <div className={eventPRStyles.bottom_image_wrapper}>
+            <img src={imageUrlSub3} alt="" />
+          </div>
+          <div className={eventPRStyles.bottom_image_wrapper}>
+            <img src={imageUrlSub4} alt="" />
+          </div>
         </div>
       </div>
     </div>
   );
 };
 
-export default EventIntroduction;
+export default EventIntroductionDisplayer;

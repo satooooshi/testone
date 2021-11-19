@@ -197,8 +197,8 @@ export interface EventComment {
 export interface EventIntroduction {
   type: EventType;
   title: string;
-  description?: string;
-  imageUrl?: string;
+  description: string;
+  imageUrl: string;
   imageUrlSub1?: string;
   imageUrlSub2?: string;
   imageUrlSub3?: string;

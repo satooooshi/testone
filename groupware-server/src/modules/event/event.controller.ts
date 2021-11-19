@@ -15,6 +15,7 @@ import { Response } from 'express';
 import { ChatGroup } from 'src/entities/chatGroup.entity';
 import { EventSchedule, EventType } from 'src/entities/event.entity';
 import { EventComment } from 'src/entities/eventComment.entity';
+import { EventIntroduction } from 'src/entities/eventIntroduction.entity';
 import { SubmissionFile } from 'src/entities/submissionFiles.entity';
 import { UserRole } from 'src/entities/user.entity';
 import { UserJoiningEvent } from 'src/entities/userJoiningEvent.entity';
@@ -130,6 +131,14 @@ export class EventScheduleController {
       return await this.eventService.getEventAtSpecificTime(query);
     }
     return await this.eventService.getEvents(query);
+  }
+
+  @Get('introduction/:type')
+  @UseGuards(JwtAuthenticationGuard)
+  async getEventIntroductions(
+    @Param() params: { type: EventType },
+  ): Promise<EventIntroduction> {
+    return await this.eventService.getEventIntroductions(params.type);
   }
 
   @Post('save-submission')
