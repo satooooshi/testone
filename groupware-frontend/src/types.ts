@@ -194,6 +194,18 @@ export interface EventComment {
   createdAt: Date;
   updatedAt: Date;
 }
+export interface EventIntroduction {
+  type: EventType;
+  title: string;
+  description?: string;
+  image_url?: string;
+  image_url_sub_1?: string;
+  image_url_sub_2?: string;
+  image_url_sub_3?: string;
+  image_url_sub_4?: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
 
 export interface EventVideo {
   id: number;

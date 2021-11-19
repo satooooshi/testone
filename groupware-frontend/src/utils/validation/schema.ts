@@ -58,3 +58,10 @@ export const createEventSchema = Yup.object().shape({
     .required(`終了日時は${requireMessage}`),
   tags: Yup.array().min(1, minTagsMessage),
 });
+
+export const editEventIntroductionSchema = Yup.object().shape({
+  title: Yup.string()
+    .required(`タイトルは${requireMessage}`)
+    .max(100, `タイトルは${nWordLimitMessage(100)}`),
+  description: Yup.string().required(`説明文は${requireMessage}`),
+});

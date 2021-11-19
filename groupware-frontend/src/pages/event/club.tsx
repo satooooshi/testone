@@ -49,13 +49,15 @@ const Club: React.FC = () => {
       </Head>
       {user?.role === UserRole.ADMIN && (
         <div className={eventPRStyles.edit_button_wrapper}>
-          <Button
-            colorScheme={'green'}
-            onClick={() => {
-              editMode ? setEditMode(false) : setEditMode(true);
-            }}>
-            {editMode ? '編集モード' : '編集する'}
-          </Button>
+          {!editMode && (
+            <Button
+              colorScheme={'green'}
+              onClick={() => {
+                editMode ? setEditMode(false) : setEditMode(true);
+              }}>
+              編集する
+            </Button>
+          )}
         </div>
       )}
       <div className={eventPRStyles.main}>
