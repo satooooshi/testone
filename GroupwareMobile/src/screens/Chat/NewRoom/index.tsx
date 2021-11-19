@@ -49,7 +49,7 @@ const NewRoom: React.FC<NewRoomProps> = ({navigation}) => {
         {
           text: 'OK',
           onPress: () => {
-            navigation.navigate('RoomList');
+            navigation.navigate('RoomList', {needRefetch: true});
           },
         },
       ]);
