@@ -1,17 +1,22 @@
 import LayoutWithTab from '@/components/layout/LayoutWithTab';
 import { SidebarScreenName } from '@/components/layout/Sidebar';
 import { useRouter } from 'next/router';
-import React from 'react';
+import React, { useState } from 'react';
 import eventPRStyles from '@/styles/layouts/EventPR.module.scss';
 import { useAPIGetLatestEvent } from '@/hooks/api/event/useAPIGetLatestEvent';
-import { EventType } from 'src/types';
-import { EventTab } from 'src/types/header/tab/types';
-import coachImage1 from '@/public/coach_1.jpeg';
-import EventIntroduction from 'src/templates/event/EventIntroduction';
+import { EventType, UserRole } from 'src/types';
 import Head from 'next/head';
+import { useAuthenticate } from 'src/contexts/useAuthenticate';
+import EventIntroductionEditor from 'src/templates/event/EventIntroductionEditor';
+import EventIntroductionDisplayer from 'src/templates/event/EventIntroduction';
+import { Button } from '@chakra-ui/button';
+import { useAPIGetEventIntroduction } from '@/hooks/api/event/useAPIGetEventIntroduction';
 
 const Coach: React.FC = () => {
   const router = useRouter();
+  const [editMode, setEditMode] = useState<boolean>(false);
+  const { user } = useAuthenticate();
+
   const initialHeaderValue = {
     title: 'コーチ制度',
     rightButtonName: '予定を見る',
@@ -20,29 +25,55 @@ const Coach: React.FC = () => {
   const { data: recommendedEvents } = useAPIGetLatestEvent({
     type: EventType.COACH,
   });
-
-  const bottomImgSources = [''];
-
-  const subHeading = `エキスパート陣が社員一人ひとりを
-  マンツーマンでサポート`;
-  const content = `大手メーカーやSIにてエンジニアの経験を積み、豊富なマネジメント経験を持つ、アクティブシニアを専任コーチとして再雇用し、社員のスキルアップや現場でのパフォーマンスの最大化を目的にマンツーマンのサポート体制を構築しています。現場経験の豊富なエキスパート陣が、様々な視点から社員へアドバイスや指導を行う事により、お客様へ最高のサービスが実現出来ています。テクニカル面だけでなくメンタルケアの観点からも社員のパフォーマンスに良い影響を与えています。`;
+  const { data: eventIntroduction } = useAPIGetEventIntroduction(
+    EventType.COACH,
+  );
 
   return (
     <LayoutWithTab
       sidebar={{ activeScreenName: SidebarScreenName.EVENT }}
       header={initialHeaderValue}>
       <Head>
-        <title>ボールド | コーチ制度</title>
+        <title>ボールド | 部活動</title>
       </Head>
+      {user?.role === UserRole.ADMIN && (
+        <div className={eventPRStyles.edit_button_wrapper}>
+          {!editMode && (
+            <Button
+              colorScheme={'green'}
+              onClick={() => {
+                editMode ? setEditMode(false) : setEditMode(true);
+              }}>
+              編集する
+            </Button>
+          )}
+        </div>
+      )}
       <div className={eventPRStyles.main}>
-        <EventIntroduction
-          recommendedEvents={recommendedEvents}
-          headlineImgSource={coachImage1}
-          bottomImgSources={bottomImgSources}
-          heading={EventTab.COACH}
-          subHeading={subHeading}
-          content={content}
-        />
+        {editMode ? (
+          <EventIntroductionEditor
+            type={eventIntroduction?.type}
+            title={eventIntroduction?.title}
+            description={eventIntroduction?.description}
+            imageUrl={eventIntroduction?.imageUrl}
+            imageUrlSub1={eventIntroduction?.imageUrlSub1}
+            imageUrlSub2={eventIntroduction?.imageUrlSub2}
+            imageUrlSub3={eventIntroduction?.imageUrlSub3}
+            imageUrlSub4={eventIntroduction?.imageUrlSub4}
+          />
+        ) : (
+          <EventIntroductionDisplayer
+            recommendedEvents={recommendedEvents}
+            type={eventIntroduction?.type}
+            title={eventIntroduction?.title}
+            description={eventIntroduction?.description}
+            imageUrl={eventIntroduction?.imageUrl}
+            imageUrlSub1={eventIntroduction?.imageUrlSub1}
+            imageUrlSub2={eventIntroduction?.imageUrlSub2}
+            imageUrlSub3={eventIntroduction?.imageUrlSub3}
+            imageUrlSub4={eventIntroduction?.imageUrlSub4}
+          />
+        )}
       </div>
     </LayoutWithTab>
   );
