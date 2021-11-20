@@ -79,9 +79,6 @@ const EditChatGroupMembersModal: React.FC<EditChatGroupMambersModalProps> = ({
         </Select>
       </FormControl>
       <div className={selectUserModalStyles.users}>
-        {console.log('DBから取得したユーザー', users)}
-        {console.log('グループにいる既存ユーザー', previousMembers)}
-        {console.log('選択したユーザー', selectedUsers)}
         {previousMembers
           ?.filter((u) => u.id !== myProfile?.id)
           .map((u) => (
