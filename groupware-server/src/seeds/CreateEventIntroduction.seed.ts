@@ -27,10 +27,8 @@ export default class CreateEventIntroduction implements Seeder {
               'https://storage.googleapis.com/groupware-bucket-development/1637378765645/impressive_university_1.png',
             imageUrlSub2:
               'https://storage.googleapis.com/groupware-bucket-development/1637378770502/impressive_university_2.png',
-            // imageUrlSub3:
-            //   'https://storage.googleapis.com/groupware-bucket-development/1637378525371/bolday_3.jpg',
-            // imageUrlSub4:
-            //   'https://storage.googleapis.com/groupware-bucket-development/1637378530305/bolday_4.jpg',
+            imageUrlSub3: '',
+            imageUrlSub4: '',
             createdAt: new Date(),
           },
           {
@@ -70,14 +68,10 @@ export default class CreateEventIntroduction implements Seeder {
               '大手メーカーやSIにてエンジニアの経験を積み、豊富なマネジメント経験を持つ、アクティブシニアを専任コーチとして再雇用し、社員のスキルアップや現場でのパフォーマンスの最大化を目的にマンツーマンのサポート体制を構築しています。現場経験の豊富なエキスパート陣が、様々な視点から社員へアドバイスや指導を行う事により、お客様へ最高のサービスが実現出来ています。テクニカル面だけでなくメンタルケアの観点からも社員のパフォーマンスに良い影響を与えています。',
             imageUrl:
               'https://storage.googleapis.com/groupware-bucket-development/1637378677895/coach_1.jpeg',
-            // imageUrlSub1:
-            //   'https://storage.googleapis.com/groupware-bucket-development/1637378512243/bolday_1.jpg',
-            // imageUrlSub2:
-            //   'https://storage.googleapis.com/groupware-bucket-development/1637378521513/bolday_2.jpg',
-            // imageUrlSub3:
-            //   'https://storage.googleapis.com/groupware-bucket-development/1637378525371/bolday_3.jpg',
-            // imageUrlSub4:
-            //   'https://storage.googleapis.com/groupware-bucket-development/1637378530305/bolday_4.jpg',
+            imageUrlSub1: '',
+            imageUrlSub2: '',
+            imageUrlSub3: '',
+            imageUrlSub4: '',
             createdAt: new Date(),
           },
           {
