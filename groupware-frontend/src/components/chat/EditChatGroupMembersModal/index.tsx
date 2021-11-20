@@ -79,6 +79,9 @@ const EditChatGroupMembersModal: React.FC<EditChatGroupMambersModalProps> = ({
         </Select>
       </FormControl>
       <div className={selectUserModalStyles.users}>
+        {console.log('DBから取得したユーザー', users)}
+        {console.log('グループにいる既存ユーザー', previousMembers)}
+        {console.log('選択したユーザー', selectedUsers)}
         {previousMembers
           ?.filter((u) => u.id !== myProfile?.id)
           .map((u) => (
@@ -92,13 +95,11 @@ const EditChatGroupMembersModal: React.FC<EditChatGroupMambersModalProps> = ({
                     '既存ユーザーがグループから退室します。よろしいですか？',
                   )
                 ) {
-                  toggleSelectedUsers(u);
                   setPreviousMembers((m) =>
                     m.filter((member) => member.id !== u.id),
                   );
                   return;
                 }
-                toggleSelectedUsers(u);
               }}
               className={clsx(
                 selectUserModalStyles.user_card,
@@ -183,7 +184,10 @@ const EditChatGroupMembersModal: React.FC<EditChatGroupMambersModalProps> = ({
           width="140px"
           colorScheme="green"
           borderRadius={5}
-          onClick={() => onComplete([...previousMembers, ...selectedUsers])}>
+          onClick={() => {
+            onComplete([...previousMembers, ...selectedUsers]);
+            setSelectedUsers([]);
+          }}>
           完了
         </Button>
       </div>
