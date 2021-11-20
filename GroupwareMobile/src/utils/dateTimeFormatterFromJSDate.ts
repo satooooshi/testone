@@ -7,5 +7,5 @@ export function dateTimeFormatterFromJSDDate({
   dateTime: Date;
   format?: string;
 }): string {
-  return DateTime.fromJSDate(dateTime, {zone: 'Asia/Tokyo'}).toFormat(format);
+  return DateTime.fromJSDate(dateTime).toFormat(format);
 }

@@ -1,8 +1,8 @@
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
 import {useIsFocused} from '@react-navigation/native';
 import React, {useEffect, useState} from 'react';
-import {useWindowDimensions} from 'react-native';
-import {Text, Div, ScrollDiv, Image} from 'react-native-magnus';
+import {ActivityIndicator, useWindowDimensions} from 'react-native';
+import {Text, Div, ScrollDiv, Image, Overlay} from 'react-native-magnus';
 import TagListBox from '../../../components/account/TagListBox';
 import EventCard from '../../../components/events/EventCard';
 import AppHeader, {Tab} from '../../../components/Header';
@@ -10,7 +10,6 @@ import WholeContainer from '../../../components/WholeContainer';
 import WikiCard from '../../../components/wiki/WikiCard';
 import {useAuthenticate} from '../../../contexts/useAuthenticate';
 import {useAPIGetEventList} from '../../../hooks/api/event/useAPIGetEventList';
-import {useAPIGetTag} from '../../../hooks/api/tag/useAPIGetTag';
 import {useAPIGetUserInfoById} from '../../../hooks/api/user/useAPIGetUserInfoById';
 import {useAPIGetWikiList} from '../../../hooks/api/wiki/useAPIGetWikiList';
 import {useTagType} from '../../../hooks/tag/useTagType';
@@ -30,14 +29,16 @@ type DetailScreenProps = {
 
 const DetailScreen: React.FC<DetailScreenProps> = ({profile}) => {
   const {width: windowWidth} = useWindowDimensions();
-  const {data: tags} = useAPIGetTag();
-  const {filteredTags: techTags} = useTagType(TagType.TECH, tags || []);
+  const {filteredTags: techTags} = useTagType(TagType.TECH, profile.tags || []);
   const {filteredTags: qualificationTags} = useTagType(
     TagType.QUALIFICATION,
-    tags || [],
+    profile.tags || [],
   );
-  const {filteredTags: clubTags} = useTagType(TagType.CLUB, tags || []);
-  const {filteredTags: hobbyTags} = useTagType(TagType.HOBBY, tags || []);
+  const {filteredTags: clubTags} = useTagType(TagType.CLUB, profile.tags || []);
+  const {filteredTags: hobbyTags} = useTagType(
+    TagType.HOBBY,
+    profile.tags || [],
+  );
 
   return (
     <Div w={windowWidth * 0.9} alignSelf="center">
@@ -66,7 +67,7 @@ const DetailScreen: React.FC<DetailScreenProps> = ({profile}) => {
       <TagListBox
         mb={'lg'}
         tags={qualificationTags || []}
-        tagType={TagType.TECH}
+        tagType={TagType.QUALIFICATION}
         introduce={profile.introduceQualification}
       />
       <TagListBox
@@ -95,9 +96,11 @@ const AccountDetail: React.FC<AccountDetailProps> = ({navigation, route}) => {
   const questionScreenName = `${screenName}-question`;
   const knowledgeScreenName = `${screenName}-knowledge`;
   const {width: windowWidth, height: windowHeight} = useWindowDimensions();
-  const {data: profile, refetch} = useAPIGetUserInfoById(
-    userID?.toString() || '0',
-  );
+  const {
+    data: profile,
+    refetch,
+    isLoading: loadingProfile,
+  } = useAPIGetUserInfoById(userID?.toString() || '0');
   const {data: events} = useAPIGetEventList({
     participant_id: userID?.toString(),
   });
@@ -156,6 +159,9 @@ const AccountDetail: React.FC<AccountDetailProps> = ({navigation, route}) => {
 
   return (
     <WholeContainer>
+      <Overlay visible={loadingProfile} p="xl">
+        <ActivityIndicator />
+      </Overlay>
       <AppHeader
         title={'Account'}
         tabs={tabs}
@@ -172,7 +178,11 @@ const AccountDetail: React.FC<AccountDetailProps> = ({navigation, route}) => {
                 mt={'lg'}
                 h={windowWidth * 0.6}
                 w={windowWidth * 0.6}
-                source={{uri: profile.avatarUrl}}
+                source={
+                  profile.avatarUrl
+                    ? {uri: profile.avatarUrl}
+                    : require('../../../../assets/no-image-avatar.png')
+                }
                 rounded="circle"
                 mb={'lg'}
               />

@@ -1,6 +1,11 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {Alert, FlatList, TouchableOpacity} from 'react-native';
-import {Text, Div, Image, Icon, Dropdown} from 'react-native-magnus';
+import {
+  ActivityIndicator,
+  Alert,
+  FlatList,
+  TouchableOpacity,
+} from 'react-native';
+import {Text, Div, Image, Icon, Dropdown, Overlay} from 'react-native-magnus';
 import DropdownOpenerButton from '../../../components/common/DropdownOpenerButton';
 import SearchForm from '../../../components/common/SearchForm';
 import SearchFormOpenerButton from '../../../components/common/SearchForm/SearchFormOpenerButton';
@@ -28,7 +33,11 @@ const UserAdmin: React.FC<UserAdminProps> = ({navigation}) => {
     page: '1',
   });
   const [selectedTags, setSelectedTags] = useState<UserTag[]>([]);
-  const {data: users, refetch} = useAPISearchUsers(searchQuery);
+  const {
+    data: users,
+    refetch,
+    isLoading: loadingUsers,
+  } = useAPISearchUsers(searchQuery);
   const {data: tags} = useAPIGetUserTag();
   const [currentUpdatingUser, setCurrentUpdatingUser] = useState<User>();
   const [visibleSearchFormModal, setVisibleSearchFormModal] = useState(false);
@@ -41,16 +50,20 @@ const UserAdmin: React.FC<UserAdminProps> = ({navigation}) => {
 
     setSearchQuery(q => ({...q, ...query, tag: tagQuery || ''}));
   };
-  const {mutate: updateUser} = useAPIUpdateUser({
+  const {mutate: updateUser, isLoading: loadingUpdate} = useAPIUpdateUser({
     onSuccess: () => {
       refetch();
     },
   });
-  const {mutate: deleteUser} = useAPIDeleteUser({
+  const {mutate: deleteUser, isLoading: loadingDelete} = useAPIDeleteUser({
     onSuccess: () => {
       refetch();
     },
   });
+  const [usersForInfiniteScroll, setUsersForInfiniteScroll] = useState<User[]>(
+    [],
+  );
+  const isLoading = loadingUsers || loadingUpdate || loadingDelete;
   const dropdownRef = useRef<any | null>(null);
 
   const handleDeleteUser = (u: User) => {
@@ -92,6 +105,22 @@ const UserAdmin: React.FC<UserAdminProps> = ({navigation}) => {
     },
   ];
 
+  const onEndReached = () => {
+    setSearchQuery(q => ({...q, page: (Number(q.page) + 1).toString()}));
+  };
+
+  useEffect(() => {
+    if (users?.users?.length) {
+      setUsersForInfiniteScroll(u => {
+        return [...u, ...users.users];
+      });
+    }
+  }, [users?.users]);
+
+  useEffect(() => {
+    setUsersForInfiniteScroll([]);
+  }, [searchQuery.tag, searchQuery.role, searchQuery.sort, searchQuery.word]);
+
   useEffect(() => {
     const tagIDs = searchQuery.tag?.split('+') || [];
     if (tags?.length && tagIDs.length) {
@@ -101,6 +130,9 @@ const UserAdmin: React.FC<UserAdminProps> = ({navigation}) => {
 
   return (
     <WholeContainer>
+      <Overlay visible={isLoading} p="xl">
+        <ActivityIndicator />
+      </Overlay>
       <AppHeader title="Admin" tabs={tabs} activeTabName={'ユーザー管理'} />
       <SearchForm
         defaultValue={{word: '', selectedTags}}
@@ -200,7 +232,8 @@ const UserAdmin: React.FC<UserAdminProps> = ({navigation}) => {
       </Dropdown>
 
       <FlatList
-        data={users?.users || []}
+        data={usersForInfiniteScroll}
+        {...{onEndReached}}
         keyExtractor={item => item.id.toString()}
         renderItem={({item}) => (
           <Div
@@ -220,7 +253,11 @@ const UserAdmin: React.FC<UserAdminProps> = ({navigation}) => {
                 w={'100%'}
                 h={'100%'}
                 rounded="circle"
-                source={{uri: item.avatarUrl}}
+                source={
+                  item.avatarUrl
+                    ? {uri: item.avatarUrl}
+                    : require('../../../../assets/no-image-avatar.png')
+                }
               />
             </TouchableOpacity>
             <Text w={'29%'} mr={'1%'}>{`${userNameFactory(item)}\n${

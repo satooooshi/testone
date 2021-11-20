@@ -1,7 +1,7 @@
 import React from 'react';
 import {useWindowDimensions, FlatList, TouchableOpacity} from 'react-native';
 import {Wiki} from '../../../types';
-import {Div, Avatar, Text, Tag, Icon} from 'react-native-magnus';
+import {Div, Avatar, Text, Tag} from 'react-native-magnus';
 import {tagColorFactory} from '../../../utils/factory/tagColorFactory';
 import {wikiCardStyles} from '../../../styles/component/wiki/wikiCard.style';
 
@@ -23,18 +23,16 @@ const WikiCard: React.FC<WikiCardProps> = ({wiki, onPress}) => {
         bg="#eceeec"
         borderColor="#b0b0b0">
         <Div px={8} h={'60%'} mb={16} flexDir="row" alignItems="center">
-          {wiki.writer?.avatarUrl ? (
-            <Avatar mr={8} source={{uri: wiki.writer?.avatarUrl}} />
-          ) : (
-            <Avatar mr={8} bg="gray500" rounded="circle">
-              <Icon
-                name="user"
-                color="white"
-                fontSize="6xl"
-                fontFamily="Feather"
-              />
-            </Avatar>
-          )}
+          <Avatar
+            mr={8}
+            source={
+              !wiki.writer?.existence
+                ? require('../../../../assets/bold-mascot.png')
+                : wiki.writer?.avatarUrl
+                ? {uri: wiki.writer?.avatarUrl}
+                : require('../../../../assets/no-image-avatar.png')
+            }
+          />
           <Text numberOfLines={2} fontWeight="bold" fontSize={22}>
             {wiki.title}
           </Text>

@@ -2,7 +2,7 @@ import React, {useEffect, useMemo, useState} from 'react';
 import WholeContainer from '../../../components/WholeContainer';
 import {FlatList, useWindowDimensions, ActivityIndicator} from 'react-native';
 import AppHeader from '../../../components/Header';
-import {Div, Text, Button, Overlay} from 'react-native-magnus';
+import {Div, Text, Button, Overlay, ScrollDiv} from 'react-native-magnus';
 import FastImage from 'react-native-fast-image';
 import {eventDetailStyles} from '../../../styles/screen/event/eventDetail.style';
 import {EventDetailProps} from '../../../types/navigator/screenProps/Event';
@@ -133,31 +133,33 @@ const EventDetail: React.FC<EventDetailProps> = ({route}) => {
 
   return (
     <WholeContainer>
-      <AppHeader title="イベント詳細" activeTabName="一覧に戻る" />
+      <AppHeader
+        enableBackButton={true}
+        title="イベント詳細"
+        activeTabName="一覧に戻る"
+      />
       <Overlay visible={screenLoading} p="xl">
         <ActivityIndicator />
       </Overlay>
-      {eventInfo ? (
-        <Div flexDir="column">
-          {eventInfo.videos.length ? (
-            <FlatList
-              data={eventInfo.videos}
-              ListHeaderComponent={AboveYoutubeVideos}
-              renderItem={({item: video}) => (
+      <ScrollDiv>
+        {eventInfo ? (
+          <Div flexDir="column">
+            {eventInfo.videos.length ? (
+              eventInfo.videos.map(v => (
                 <YoutubePlayer
                   height={300}
-                  videoId={generateYoutubeId(video.url || '')}
+                  videoId={generateYoutubeId(v.url || '')}
                 />
-              )}
-            />
-          ) : (
-            <>
-              <AboveYoutubeVideos />
-              <Text mx={16}>関連動画はありません</Text>
-            </>
-          )}
-        </Div>
-      ) : null}
+              ))
+            ) : (
+              <>
+                <AboveYoutubeVideos />
+                <Text mx={16}>関連動画はありません</Text>
+              </>
+            )}
+          </Div>
+        ) : null}
+      </ScrollDiv>
     </WholeContainer>
   );
 };

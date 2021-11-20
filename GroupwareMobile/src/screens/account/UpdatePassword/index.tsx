@@ -1,7 +1,7 @@
 import {useFormik} from 'formik';
 import React from 'react';
-import {Alert, useWindowDimensions} from 'react-native';
-import {Button, Div, Icon, Input, Text} from 'react-native-magnus';
+import {ActivityIndicator, Alert, useWindowDimensions} from 'react-native';
+import {Button, Div, Icon, Input, Overlay, Text} from 'react-native-magnus';
 import AppHeader, {Tab} from '../../../components/Header';
 import WholeContainer from '../../../components/WholeContainer';
 import {useAPIUpdatePassword} from '../../../hooks/api/user/useAPIUpdatePassword';
@@ -10,12 +10,13 @@ import {updatePasswordSchema} from '../../../utils/validation/schema';
 
 const UpdatePassword: React.FC<UpdatePasswordProps> = ({navigation}) => {
   const {width: windowWidth} = useWindowDimensions();
-  const {mutate: updatePassword} = useAPIUpdatePassword({
-    onSuccess: () => {
-      Alert.alert('パスワードの更新が完了しました');
-      resetForm();
-    },
-  });
+  const {mutate: updatePassword, isLoading: loadingUpdate} =
+    useAPIUpdatePassword({
+      onSuccess: () => {
+        Alert.alert('パスワードの更新が完了しました');
+        resetForm();
+      },
+    });
   const tabs: Tab[] = [
     {
       name: 'アカウント情報',
@@ -45,6 +46,9 @@ const UpdatePassword: React.FC<UpdatePasswordProps> = ({navigation}) => {
 
   return (
     <WholeContainer>
+      <Overlay visible={loadingUpdate} p="xl">
+        <ActivityIndicator />
+      </Overlay>
       <AppHeader
         title={'Account'}
         tabs={tabs}

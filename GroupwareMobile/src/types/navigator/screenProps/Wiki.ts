@@ -31,3 +31,13 @@ export type PostWikiNavigationProps = DrawerNavigationProp<
   'PostWiki'
 >;
 export type PostWikiRouteProps = RouteProp<RootStackParamList, 'PostWiki'>;
+
+export type EditWikiNavigationProps = StackNavigationProp<
+  RootStackParamList,
+  'EditWiki'
+>;
+export type EditWikiRouteProps = RouteProp<RootStackParamList, 'EditWiki'>;
+export type EditWikiProps = {
+  navigation: EditWikiNavigationProps;
+  route: EditWikiRouteProps;
+};

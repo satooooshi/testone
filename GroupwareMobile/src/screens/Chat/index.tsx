@@ -1,14 +1,13 @@
 import React, {useEffect, useState} from 'react';
 import {
-  FlatList,
+  ActivityIndicator,
   Keyboard,
-  KeyboardAvoidingView,
   Modal,
   Platform,
   TouchableOpacity,
   useWindowDimensions,
 } from 'react-native';
-import {Div, Icon} from 'react-native-magnus';
+import {Div, Icon, Overlay} from 'react-native-magnus';
 import AppHeader from '../../components/Header';
 import WholeContainer from '../../components/WholeContainer';
 import {useAPIGetMessages} from '../../hooks/api/chat/useAPIGetMessages';
@@ -31,14 +30,13 @@ import FileMessage from '../../components/chat/ChatMessage/FileMessage';
 import RNFetchBlob from 'rn-fetch-blob';
 const {fs, config} = RNFetchBlob;
 import FileViewer from 'react-native-file-viewer';
-import {useIsFocused} from '@react-navigation/native';
+import {KeyboardAwareFlatList} from 'react-native-keyboard-aware-scroll-view';
 
 type ImageSource = {
   uri: string;
 };
 
 const Chat: React.FC<ChatProps> = ({route}) => {
-  const {height: windowHeight} = useWindowDimensions();
   const {room} = route.params;
   const [page, setPage] = useState(1);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -47,17 +45,16 @@ const Chat: React.FC<ChatProps> = ({route}) => {
   const [images, setImages] = useState<ImageSource[]>([]);
   const [nowImageIndex, setNowImageIndex] = useState<number>(0);
   const [video, setVideo] = useState('');
-  const {data: fetchedMessage, refetch: refetchMessages} = useAPIGetMessages({
+  const {data: fetchedMessage, isLoading: loadingMessages} = useAPIGetMessages({
     group: room.id,
     page: page.toString(),
   });
-  const isFocused = useIsFocused();
   const {data: latestMessage} = useAPIGetMessages(
     {
       group: room.id,
       page: '1',
     },
-    {refetchInterval: 1000},
+    {refetchInterval: 3000},
   );
   const suggestions = (): Suggestion[] => {
     if (!room.members) {
@@ -68,18 +65,21 @@ const Chat: React.FC<ChatProps> = ({route}) => {
       name: userNameFactory(m),
     }));
   };
-  const {mutate: sendChatMessage} = useAPISendChatMessage({
-    onSuccess: () => {
-      setNewMessage('');
-    },
-  });
-  const {mutate: uploaFile} = useAPIUploadStorage();
+  const {mutate: sendChatMessage, isLoading: loadingSendMessage} =
+    useAPISendChatMessage({
+      onSuccess: () => {
+        setNewMessage('');
+      },
+    });
+  const {mutate: uploadFile, isLoading: loadingUploadFile} =
+    useAPIUploadStorage();
 
   const showImageOnModal = (url: string) => {
     const isNowUri = (element: ImageSource) => element.uri === url;
     setNowImageIndex(images.findIndex(isNowUri));
     setImageModal(true);
   };
+  const isLoading = loadingMessages || loadingSendMessage || loadingUploadFile;
 
   const handleSend = () => {
     if (newMessage.length) {
@@ -97,7 +97,7 @@ const Chat: React.FC<ChatProps> = ({route}) => {
       cropping: false,
     });
     if (formData) {
-      uploaFile(formData, {
+      uploadFile(formData, {
         onSuccess: imageURL => {
           sendChatMessage({
             content: imageURL[0],
@@ -115,7 +115,7 @@ const Chat: React.FC<ChatProps> = ({route}) => {
       multiple: false,
     });
     if (formData) {
-      uploaFile(formData, {
+      uploadFile(formData, {
         onSuccess: imageURL => {
           sendChatMessage({
             content: imageURL[0],
@@ -137,9 +137,9 @@ const Chat: React.FC<ChatProps> = ({route}) => {
       uri: res.uri,
       type: res.type,
     });
-    uploaFile(formData);
+    uploadFile(formData);
     if (formData) {
-      uploaFile(formData, {
+      uploadFile(formData, {
         onSuccess: imageURL => {
           sendChatMessage({
             content: imageURL[0],
@@ -187,43 +187,53 @@ const Chat: React.FC<ChatProps> = ({route}) => {
   };
 
   useEffect(() => {
-    if (latestMessage && latestMessage.length) {
-      setMessages(m => {
-        if (
-          m &&
-          m.length &&
-          isRecent(latestMessage[latestMessage.length - 1], m[0])
-        ) {
-          return [...latestMessage, ...m];
-        } else {
-          return m;
+    if (latestMessage?.length && messages?.length) {
+      const msgToAppend: ChatMessage[] = [];
+      for (const sentMsg of latestMessage) {
+        if (isRecent(sentMsg, messages[0])) {
+          msgToAppend.unshift(sentMsg);
         }
+      }
+      setMessages(m => {
+        return [...msgToAppend, ...m];
       });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [latestMessage]);
 
   useEffect(() => {
     if (fetchedMessage?.length) {
-      setMessages(m => {
-        if (
-          m.length &&
-          isRecent(m[m.length - 1], fetchedMessage[fetchedMessage.length - 1])
-        ) {
+      const handleImages = () => {
+        const fetchedImages: ImageSource[] = fetchedMessage
+          .filter(m => m.type === ChatMessageType.IMAGE)
+          .map(m => ({uri: m.content}))
+          .reverse();
+        setImages(fetchedImages);
+      };
+      if (
+        messages?.length &&
+        isRecent(
+          messages[messages.length - 1],
+          fetchedMessage[fetchedMessage.length - 1],
+        )
+      ) {
+        setMessages(m => {
           return [...m, ...fetchedMessage];
-        } else {
-          return fetchedMessage;
-        }
-      });
-      const fetchedImages: ImageSource[] = fetchedMessage
-        .filter(m => m.type === ChatMessageType.IMAGE)
-        .map(m => ({uri: m.content}))
-        .reverse();
-      setImages(fetchedImages);
+        });
+        handleImages();
+      } else if (!messages?.length) {
+        setMessages(fetchedMessage);
+        handleImages();
+      }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fetchedMessage]);
 
   return (
     <WholeContainer>
+      <Overlay visible={isLoading} p="xl">
+        <ActivityIndicator />
+      </Overlay>
       {/* @TODO add seeking bar */}
       <Modal visible={!!video} animationType="slide">
         <TouchableOpacity
@@ -250,59 +260,53 @@ const Chat: React.FC<ChatProps> = ({route}) => {
         swipeToCloseEnabled={false}
         doubleTapToZoomEnabled={true}
       />
-      <AppHeader title="チャット" />
-      <KeyboardAvoidingView
-        keyboardVerticalOffset={
-          Platform.OS === 'ios' ? windowHeight * 0.16 : windowHeight * 0.03
-        }
-        style={[
-          chatStyles.keyboardAvoidingView,
-          Platform.OS === 'ios'
-            ? chatStyles.keyboardAvoidingViewIOS
-            : chatStyles.keyboardAvoidingViewAndroid,
-        ]}
-        behavior={Platform.OS === 'ios' ? 'height' : undefined}>
-        <FlatList
-          style={chatStyles.flatlist}
-          contentContainerStyle={chatStyles.flatlistContent}
-          inverted
-          data={messages}
-          {...{onEndReached}}
-          renderItem={({item: message}) => (
-            <Div
-              alignSelf={message?.isSender ? 'flex-end' : 'flex-start'}
-              mb={'sm'}>
-              {message.type === ChatMessageType.TEXT ? (
-                <TextMessage message={message} />
-              ) : message.type === ChatMessageType.IMAGE ? (
-                <ImageMessage
-                  onPress={() => showImageOnModal(message.content)}
-                  message={message}
-                />
-              ) : message.type === ChatMessageType.VIDEO ? (
-                <VideoMessage
-                  message={message}
-                  onPress={() => playVideoOnModal(message.content)}
-                />
-              ) : message.type === ChatMessageType.OTHER_FILE ? (
-                <FileMessage
-                  message={message}
-                  onPress={() => downloadFile(message)}
-                />
-              ) : null}
-            </Div>
-          )}
-        />
-        <ChatFooter
-          onUploadFile={handleUploadFile}
-          onUploadVideo={handleUploadVideo}
-          onUploadImage={handleUploadImage}
-          text={newMessage}
-          onChangeText={t => setNewMessage(t)}
-          onSend={handleSend}
-          mentionSuggestions={suggestions()}
-        />
-      </KeyboardAvoidingView>
+      <AppHeader
+        title="チャット"
+        enableBackButton={true}
+        screenForBack={'RoomList'}
+      />
+      <KeyboardAwareFlatList
+        refreshing={true}
+        style={chatStyles.flatlist}
+        contentContainerStyle={chatStyles.flatlistContent}
+        inverted
+        data={messages}
+        {...{onEndReached}}
+        keyExtractor={item => item.id.toString()}
+        renderItem={({item: message}) => (
+          <Div
+            alignSelf={message?.isSender ? 'flex-end' : 'flex-start'}
+            mb={'sm'}>
+            {message.type === ChatMessageType.TEXT ? (
+              <TextMessage message={message} />
+            ) : message.type === ChatMessageType.IMAGE ? (
+              <ImageMessage
+                onPress={() => showImageOnModal(message.content)}
+                message={message}
+              />
+            ) : message.type === ChatMessageType.VIDEO ? (
+              <VideoMessage
+                message={message}
+                onPress={() => playVideoOnModal(message.content)}
+              />
+            ) : message.type === ChatMessageType.OTHER_FILE ? (
+              <FileMessage
+                message={message}
+                onPress={() => downloadFile(message)}
+              />
+            ) : null}
+          </Div>
+        )}
+      />
+      <ChatFooter
+        onUploadFile={handleUploadFile}
+        onUploadVideo={handleUploadVideo}
+        onUploadImage={handleUploadImage}
+        text={newMessage}
+        onChangeText={t => setNewMessage(t)}
+        onSend={handleSend}
+        mentionSuggestions={suggestions()}
+      />
     </WholeContainer>
   );
 };

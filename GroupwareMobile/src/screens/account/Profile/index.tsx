@@ -2,6 +2,7 @@ import {useIsFocused} from '@react-navigation/native';
 import {useFormik} from 'formik';
 import React, {useEffect, useState} from 'react';
 import {
+  ActivityIndicator,
   Alert,
   TextInput,
   TouchableOpacity,
@@ -15,6 +16,7 @@ import {
   Input,
   Button,
   Icon,
+  Overlay,
 } from 'react-native-magnus';
 import TagModal from '../../../components/common/TagModal';
 import AppHeader, {Tab} from '../../../components/Header';
@@ -44,9 +46,13 @@ const initialValues: Partial<User> = {
 };
 
 const Profile: React.FC<ProfileProps> = ({navigation}) => {
-  const {data: profile, refetch} = useAPIGetProfile();
+  const {
+    data: profile,
+    refetch,
+    isLoading: loadingProfile,
+  } = useAPIGetProfile();
   const isFocused = useIsFocused();
-  const {mutate: updateUser} = useAPIUpdateUser({
+  const {mutate: updateUser, isLoading: loadingUpdate} = useAPIUpdateUser({
     onSuccess: responseData => {
       if (responseData) {
         Alert.alert('プロフィールを更新しました');
@@ -122,6 +128,9 @@ const Profile: React.FC<ProfileProps> = ({navigation}) => {
 
   return (
     <WholeContainer>
+      <Overlay visible={loadingProfile || loadingUpdate} p="xl">
+        <ActivityIndicator />
+      </Overlay>
       <AppHeader
         title={'Account'}
         tabs={tabs}
@@ -161,7 +170,11 @@ const Profile: React.FC<ProfileProps> = ({navigation}) => {
               mt={'lg'}
               h={windowWidth * 0.6}
               w={windowWidth * 0.6}
-              source={{uri: values.avatarUrl}}
+              source={
+                values.avatarUrl
+                  ? {uri: values.avatarUrl}
+                  : require('../../../../assets/no-image-avatar.png')
+              }
               rounded="circle"
               mb={'lg'}
             />

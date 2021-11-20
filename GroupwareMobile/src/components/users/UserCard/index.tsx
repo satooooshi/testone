@@ -46,23 +46,16 @@ const UserCard: React.FC<UserCardProps> = ({
     <TouchableOpacity onPress={onPress}>
       <Div bg={grayColor} w={windowWidth * 0.9} rounded="md" shadow="md">
         <Div px="xs" justifyContent="space-between" flexDir="row">
-          {user.avatarUrl ? (
-            <Image
-              source={{uri: user.avatarUrl}}
-              w={120}
-              h={120}
-              rounded="circle"
-            />
-          ) : (
-            <Avatar size={120} bg="gray500" rounded="circle">
-              <Icon
-                name="user"
-                color="white"
-                fontSize="6xl"
-                fontFamily="Feather"
-              />
-            </Avatar>
-          )}
+          <Image
+            source={
+              user.avatarUrl
+                ? {uri: user.avatarUrl}
+                : require('../../../../assets/no-image-avatar.png')
+            }
+            w={120}
+            h={120}
+            rounded="circle"
+          />
           <Div w={'60%'}>
             <Text fontSize={18} fontWeight="bold" color={darkFontColor}>
               {userNameFactory(user)}
