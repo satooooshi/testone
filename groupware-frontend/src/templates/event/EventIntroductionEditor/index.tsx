@@ -9,6 +9,8 @@ import { Button } from '@chakra-ui/button';
 import { formikErrorMsgFactory } from 'src/utils/factory/formikErrorMsgFactory';
 import { useToast } from '@chakra-ui/toast';
 import eventTypeNameFactory from 'src/utils/factory/eventTypeNameFactory';
+import { useAPISaveEventIntroduction } from '@/hooks/api/event/useAPISaveEventIntroduction';
+import { responseErrorMsgFactory } from 'src/utils/factory/responseErrorMsgFactory';
 
 const EventIntroductionEditor: React.FC<Partial<EventIntroduction>> = ({
   type,
@@ -31,6 +33,29 @@ const EventIntroductionEditor: React.FC<Partial<EventIntroduction>> = ({
     imageUrlSub3: imageUrlSub3,
     imageUrlSub4: imageUrlSub4,
   };
+
+  const { mutate: saveEventIntroduction } = useAPISaveEventIntroduction({
+    onSuccess: async () => {
+      toast({
+        description: 'イベント説明の編集が完了しました。',
+        status: 'success',
+        duration: 3000,
+        isClosable: true,
+      });
+      // location.reload();
+    },
+    onError: (e) => {
+      const messages = responseErrorMsgFactory(e);
+      toast({
+        description: messages,
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      });
+      return;
+    },
+  });
+
   const {
     handleSubmit,
     handleBlur,
@@ -39,11 +64,14 @@ const EventIntroductionEditor: React.FC<Partial<EventIntroduction>> = ({
     validateForm,
   } = useFormik({
     initialValues: initialEventIntroductionValues,
-    onSubmit: async (submitted, { resetForm }) => {
-      resetForm;
+    onSubmit: async (submitted) => {
+      if (confirm('イベント説明内容を更新しますか？')) {
+        saveEventIntroduction(submitted);
+      }
     },
     validationSchema: editEventIntroductionSchema,
   });
+
   const eventTypeName = type ? eventTypeNameFactory(type) : '';
 
   const checkErrors = async () => {

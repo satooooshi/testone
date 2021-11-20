@@ -2,6 +2,7 @@ const eventURL = `event`;
 
 export const getEventURL = `/${eventURL}/list`;
 export const getEventIntroductionURL = `/${eventURL}/introduction`;
+export const saveEventIntroductionURL = `/${eventURL}/save-introduction`;
 export const getEventDetailURL = `/${eventURL}/detail`;
 export const getLatestEventURL = `/${eventURL}/latest`;
 export const downloadEventCsvURL = `/${eventURL}/csv`;

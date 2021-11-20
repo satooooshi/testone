@@ -289,7 +289,7 @@ export class EventScheduleService {
     return { pageCount, events: urlParsedEvents };
   }
 
-  public async getEventIntroductions(
+  public async getEventIntroduction(
     type: EventType,
   ): Promise<EventIntroduction> {
     const eventIntroduction = await this.eventIntroductionRepository.findOne({
@@ -300,6 +300,17 @@ export class EventScheduleService {
         eventIntroduction,
       );
     return urlParsedEventIntroduction;
+  }
+
+  public async saveEventIntroduction(
+    eventIntroduction: EventIntroduction,
+  ): Promise<EventIntroduction> {
+    const target = await this.eventIntroductionRepository.findOne({
+      type: eventIntroduction.type,
+    });
+    target.title = eventIntroduction.title;
+    target.description = eventIntroduction.description;
+    return await this.eventIntroductionRepository.save(target);
   }
 
   public async createFromArr(

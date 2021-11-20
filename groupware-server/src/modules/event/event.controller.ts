@@ -24,6 +24,7 @@ import RequestWithUser from '../auth/requestWithUser.interface';
 import { ChatService } from '../chat/chat.service';
 import createCommentDto from './dto/createCommentDto';
 import saveEventDto from './dto/saveEventDto';
+import SaveEventIntroductionDto from './dto/saveEventIntroductionDto';
 import { EventScheduleService } from './event.service';
 import { GetEventDetailResopnse } from './eventDetail.type';
 
@@ -135,10 +136,19 @@ export class EventScheduleController {
 
   @Get('introduction/:type')
   @UseGuards(JwtAuthenticationGuard)
-  async getEventIntroductions(
+  async getEventIntroduction(
     @Param() params: { type: EventType },
   ): Promise<EventIntroduction> {
-    return await this.eventService.getEventIntroductions(params.type);
+    return await this.eventService.getEventIntroduction(params.type);
+  }
+
+  @Patch('save-introduction')
+  @UseGuards(JwtAuthenticationGuard)
+  async saveEventIntroduction(
+    @Req() req: RequestWithUser,
+    @Body() eventIntroduction: SaveEventIntroductionDto,
+  ): Promise<EventIntroduction> {
+    return await this.eventService.saveEventIntroduction(eventIntroduction);
   }
 
   @Post('save-submission')
