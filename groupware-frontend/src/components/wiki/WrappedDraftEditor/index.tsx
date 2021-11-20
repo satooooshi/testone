@@ -28,6 +28,7 @@ import {
   FaHeading,
 } from 'react-icons/fa';
 import { GoCode } from 'react-icons/go';
+import { imageExtensions } from 'src/utils/imageExtensions';
 
 type WrappedDraftEditorProps = {
   style?: React.CSSProperties;
@@ -200,6 +201,7 @@ const WrappedDraftEditor: React.FC<WrappedDraftEditorProps> = ({
     getInputProps: getinsertImageInputProps,
   } = useDropzone({
     onDrop: onInsertImageDrop,
+    accept: imageExtensions,
   });
 
   const mediaBlockRenderer = (block: ContentBlock) => {
