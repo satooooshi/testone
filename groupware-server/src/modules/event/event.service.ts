@@ -295,7 +295,11 @@ export class EventScheduleService {
     const eventIntroduction = await this.eventIntroductionRepository.findOne({
       type: type,
     });
-    return eventIntroduction;
+    const urlParsedEventIntroduction =
+      await this.generateSignedStorageURLsFromEventIntroductionObj(
+        eventIntroduction,
+      );
+    return urlParsedEventIntroduction;
   }
 
   public async createFromArr(
@@ -398,6 +402,42 @@ export class EventScheduleService {
     }
 
     return eventSchedule;
+  }
+
+  public async generateSignedStorageURLsFromEventIntroductionObj(
+    eventIntroduction: EventIntroduction,
+  ): Promise<EventIntroduction> {
+    if (eventIntroduction?.imageUrl) {
+      eventIntroduction.imageUrl =
+        await this.storageService.parseStorageURLToSignedURL(
+          eventIntroduction.imageUrl,
+        );
+    }
+    if (eventIntroduction?.imageUrlSub1) {
+      eventIntroduction.imageUrlSub1 =
+        await this.storageService.parseStorageURLToSignedURL(
+          eventIntroduction.imageUrlSub1,
+        );
+    }
+    if (eventIntroduction?.imageUrlSub2) {
+      eventIntroduction.imageUrlSub2 =
+        await this.storageService.parseStorageURLToSignedURL(
+          eventIntroduction.imageUrlSub2,
+        );
+    }
+    if (eventIntroduction?.imageUrlSub3) {
+      eventIntroduction.imageUrlSub3 =
+        await this.storageService.parseStorageURLToSignedURL(
+          eventIntroduction.imageUrlSub3,
+        );
+    }
+    if (eventIntroduction?.imageUrlSub4) {
+      eventIntroduction.imageUrlSub4 =
+        await this.storageService.parseStorageURLToSignedURL(
+          eventIntroduction.imageUrlSub4,
+        );
+    }
+    return eventIntroduction;
   }
 
   public async generateSignedStorageURLsFromEventArr(
