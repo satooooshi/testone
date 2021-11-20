@@ -22,7 +22,7 @@ import JwtAuthenticationGuard from '../auth/jwtAuthentication.guard';
 import RequestWithUser from '../auth/requestWithUser.interface';
 import { ChatService } from '../chat/chat.service';
 import createCommentDto from './dto/createCommentDto';
-import saveEventDto from './dto/saveEventDto';
+import SaveEventDto from './dto/saveEventDto';
 import { EventScheduleService } from './event.service';
 import { GetEventDetailResopnse } from './eventDetail.type';
 
@@ -186,7 +186,7 @@ export class EventScheduleController {
   @UseGuards(JwtAuthenticationGuard)
   async createEvent(
     @Req() req: RequestWithUser,
-    @Body() eventSchedule: saveEventDto,
+    @Body() eventSchedule: SaveEventDto,
   ): Promise<EventSchedule> {
     if (!eventSchedule.tags || !eventSchedule.tags.length) {
       throw new BadRequestException('Event must links one or more tags');
@@ -216,7 +216,7 @@ export class EventScheduleController {
   @Post('update-event')
   @UseGuards(JwtAuthenticationGuard)
   async updateEvent(
-    @Body() eventSchedule: saveEventDto,
+    @Body() eventSchedule: SaveEventDto,
   ): Promise<EventSchedule> {
     if (!eventSchedule.tags || !eventSchedule.tags.length) {
       throw new BadRequestException('Event must links one or more tags');
