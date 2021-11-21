@@ -35,6 +35,7 @@ import { stateToHTML } from 'draft-js-export-html';
 import { useHeaderTab } from '@/hooks/headerTab/useHeaderTab';
 import { tagColorFactory } from 'src/utils/factory/tagColorFactory';
 import { useAuthenticate } from 'src/contexts/useAuthenticate';
+import { responseErrorMsgFactory } from 'src/utils/factory/responseErrorMsgFactory';
 
 type TOCHead = string[];
 
@@ -69,6 +70,16 @@ const QuestionDetail = () => {
         ),
       );
       refetch();
+    },
+    onError: (e) => {
+      const messages = responseErrorMsgFactory(e);
+      toast({
+        description: messages,
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      });
+      return;
     },
   });
   const { mutate: createAnswer } = useAPICreateAnswer({
