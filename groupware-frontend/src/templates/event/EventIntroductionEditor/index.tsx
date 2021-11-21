@@ -149,7 +149,7 @@ const EventIntroductionEditor: React.FC<EventIntroductionEditorProps> = ({
           </div>
         </div>
         <div className={eventPRStyles.bottom_images_row}>
-          {eventIntroduction.eventIntroductionSubImages.map((e) => {
+          {eventIntroduction.eventIntroductionSubImages?.map((e) => {
             <div className={eventPRStyles.bottom_image_wrapper}>
               <img src={e.imageUrl} alt="" />
             </div>;
