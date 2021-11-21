@@ -16,6 +16,7 @@ import { LastReadChatTime } from 'src/entities/lastReadChatTime.entity';
 import JwtAuthenticationGuard from '../auth/jwtAuthentication.guard';
 import RequestWithUser from '../auth/requestWithUser.interface';
 import { ChatService } from './chat.service';
+import SaveChatGroupDto from './dto/saveChatGroupDto';
 
 export interface GetMessagesQuery {
   group: number;
@@ -83,14 +84,9 @@ export class ChatController {
   @UseGuards(JwtAuthenticationGuard)
   async createChatGroup(
     @Req() req: RequestWithUser,
-    @Body() chatGroup: Partial<ChatGroup>,
+    @Body() chatGroup: SaveChatGroupDto,
   ): Promise<ChatGroup> {
     const user = req.user;
-    if (!chatGroup.members || !chatGroup.members.length) {
-      throw new BadRequestException(
-        'Group member is necessary at least 1 person',
-      );
-    }
     if (!chatGroup.members.filter((u) => u.id === user.id).length) {
       chatGroup.members.push(user);
     }
