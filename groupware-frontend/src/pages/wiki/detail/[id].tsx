@@ -94,6 +94,16 @@ const QuestionDetail = () => {
       );
       refetch();
     },
+    onError: (e) => {
+      const messages = responseErrorMsgFactory(e);
+      toast({
+        description: messages,
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      });
+      return;
+    },
   });
 
   const { mutate: createBestAnswer } = useAPICreateBestAnswer({
