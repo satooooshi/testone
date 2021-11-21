@@ -14,7 +14,7 @@ import { QAAnswerReply } from 'src/entities/qaAnswerReply.entity';
 import { RuleCategory, Wiki, WikiType } from 'src/entities/wiki.entity';
 import JwtAuthenticationGuard from '../auth/jwtAuthentication.guard';
 import RequestWithUser from '../auth/requestWithUser.interface';
-import SaveWikiDto from './dto/SaveWithDto';
+import SaveWikiDto from './dto/SaveWikiDto';
 import { WikiService } from './wiki.service';
 
 export interface SearchQueryToGetWiki {
