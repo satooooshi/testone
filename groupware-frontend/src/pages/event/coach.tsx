@@ -50,28 +50,13 @@ const Coach: React.FC = () => {
         </div>
       )}
       <div className={eventPRStyles.main}>
-        {editMode ? (
-          <EventIntroductionEditor
-            type={eventIntroduction?.type}
-            title={eventIntroduction?.title}
-            description={eventIntroduction?.description}
-            imageUrl={eventIntroduction?.imageUrl}
-            imageUrlSub1={eventIntroduction?.imageUrlSub1}
-            imageUrlSub2={eventIntroduction?.imageUrlSub2}
-            imageUrlSub3={eventIntroduction?.imageUrlSub3}
-            imageUrlSub4={eventIntroduction?.imageUrlSub4}
-          />
-        ) : (
+        {editMode && eventIntroduction && (
+          <EventIntroductionEditor eventIntroduction={eventIntroduction} />
+        )}
+        {!editMode && eventIntroduction && (
           <EventIntroductionDisplayer
             recommendedEvents={recommendedEvents}
-            type={eventIntroduction?.type}
-            title={eventIntroduction?.title}
-            description={eventIntroduction?.description}
-            imageUrl={eventIntroduction?.imageUrl}
-            imageUrlSub1={eventIntroduction?.imageUrlSub1}
-            imageUrlSub2={eventIntroduction?.imageUrlSub2}
-            imageUrlSub3={eventIntroduction?.imageUrlSub3}
-            imageUrlSub4={eventIntroduction?.imageUrlSub4}
+            eventIntroduction={eventIntroduction}
           />
         )}
       </div>

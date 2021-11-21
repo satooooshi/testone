@@ -12,26 +12,20 @@ import eventTypeNameFactory from 'src/utils/factory/eventTypeNameFactory';
 import { useAPISaveEventIntroduction } from '@/hooks/api/event/useAPISaveEventIntroduction';
 import { responseErrorMsgFactory } from 'src/utils/factory/responseErrorMsgFactory';
 
-const EventIntroductionEditor: React.FC<Partial<EventIntroduction>> = ({
-  type,
-  title,
-  description,
-  imageUrl,
-  imageUrlSub1,
-  imageUrlSub2,
-  imageUrlSub3,
-  imageUrlSub4,
+export interface EventIntroductionEditorProps {
+  eventIntroduction: EventIntroduction;
+}
+
+const EventIntroductionEditor: React.FC<EventIntroductionEditorProps> = ({
+  eventIntroduction,
 }) => {
   const toast = useToast();
   const initialEventIntroductionValues: Partial<EventIntroduction> = {
-    type: type,
-    title: title,
-    description: description,
-    imageUrl: imageUrl,
-    imageUrlSub1: imageUrlSub1,
-    imageUrlSub2: imageUrlSub2,
-    imageUrlSub3: imageUrlSub3,
-    imageUrlSub4: imageUrlSub4,
+    type: eventIntroduction.type,
+    title: eventIntroduction.title,
+    description: eventIntroduction.description,
+    imageUrl: eventIntroduction.imageUrl,
+    eventIntroductionSubImages: eventIntroduction.eventIntroductionSubImages,
   };
 
   const { mutate: saveEventIntroduction } = useAPISaveEventIntroduction({
@@ -72,7 +66,9 @@ const EventIntroductionEditor: React.FC<Partial<EventIntroduction>> = ({
     validationSchema: editEventIntroductionSchema,
   });
 
-  const eventTypeName = type ? eventTypeNameFactory(type) : '';
+  const eventTypeName = eventIntroduction.type
+    ? eventTypeNameFactory(eventIntroduction.type)
+    : '';
 
   const checkErrors = async () => {
     const errors = await validateForm();
@@ -153,18 +149,11 @@ const EventIntroductionEditor: React.FC<Partial<EventIntroduction>> = ({
           </div>
         </div>
         <div className={eventPRStyles.bottom_images_row}>
-          <div className={eventPRStyles.bottom_image_wrapper}>
-            <img src={imageUrlSub1} alt="" />
-          </div>
-          <div className={eventPRStyles.bottom_image_wrapper}>
-            <img src={imageUrlSub2} alt="" />
-          </div>
-          <div className={eventPRStyles.bottom_image_wrapper}>
-            <img src={imageUrlSub3} alt="" />
-          </div>
-          <div className={eventPRStyles.bottom_image_wrapper}>
-            <img src={imageUrlSub4} alt="" />
-          </div>
+          {eventIntroduction.eventIntroductionSubImages.map((e) => {
+            <div className={eventPRStyles.bottom_image_wrapper}>
+              <img src={e.imageUrl} alt="" />
+            </div>;
+          })}
         </div>
       </div>
     </div>

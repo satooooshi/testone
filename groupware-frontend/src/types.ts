@@ -199,10 +199,13 @@ export interface EventIntroduction {
   title: string;
   description: string;
   imageUrl: string;
-  imageUrlSub1?: string;
-  imageUrlSub2?: string;
-  imageUrlSub3?: string;
-  imageUrlSub4?: string;
+  eventIntroductionSubImages: EventIntroductionSubImage[];
+  createdAt: Date;
+  updatedAt: Date;
+}
+export interface EventIntroductionSubImage {
+  eventIntruduction: EventIntroduction;
+  imageUrl: string;
   createdAt: Date;
   updatedAt: Date;
 }

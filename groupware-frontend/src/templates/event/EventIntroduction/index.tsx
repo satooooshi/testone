@@ -5,22 +5,16 @@ import eventTypeNameFactory from 'src/utils/factory/eventTypeNameFactory';
 
 export interface EventIntroductionProps {
   recommendedEvents?: EventSchedule[];
+  eventIntroduction: EventIntroduction;
 }
 
-const EventIntroductionDisplayer: React.FC<
-  EventIntroductionProps & Partial<EventIntroduction>
-> = ({
+const EventIntroductionDisplayer: React.FC<EventIntroductionProps> = ({
   recommendedEvents,
-  type,
-  title,
-  description,
-  imageUrl,
-  imageUrlSub1,
-  imageUrlSub2,
-  imageUrlSub3,
-  imageUrlSub4,
+  eventIntroduction,
 }) => {
-  const eventTypeName = type ? eventTypeNameFactory(type) : '';
+  const eventTypeName = eventIntroduction.type
+    ? eventTypeNameFactory(eventIntroduction.type)
+    : '';
   return (
     <div className={eventPRStyles.main_wrapper}>
       <div className={eventPRStyles.top_title_wrapper}>
@@ -29,7 +23,7 @@ const EventIntroductionDisplayer: React.FC<
       </div>
       <div className={eventPRStyles.top_images_wrapper}>
         <div className={eventPRStyles.main_image_wrapper}>
-          <img src={imageUrl} alt="" />
+          <img src={eventIntroduction.imageUrl} alt="" />
         </div>
       </div>
       <div className={eventPRStyles.latest_events_wrapper}>
@@ -56,25 +50,20 @@ const EventIntroductionDisplayer: React.FC<
         </div>
         <div className={eventPRStyles.info_wrapper}>
           <div className={eventPRStyles.title_wrapper}>
-            <p className={eventPRStyles.title}>{title}</p>
+            <p className={eventPRStyles.title}>{eventIntroduction.title}</p>
           </div>
           <div className={eventPRStyles.description_wrapper}>
-            <p className={eventPRStyles.description}>{description}</p>
+            <p className={eventPRStyles.description}>
+              {eventIntroduction.description}
+            </p>
           </div>
         </div>
         <div className={eventPRStyles.bottom_images_row}>
-          <div className={eventPRStyles.bottom_image_wrapper}>
-            <img src={imageUrlSub1} alt="" />
-          </div>
-          <div className={eventPRStyles.bottom_image_wrapper}>
-            <img src={imageUrlSub2} alt="" />
-          </div>
-          <div className={eventPRStyles.bottom_image_wrapper}>
-            <img src={imageUrlSub3} alt="" />
-          </div>
-          <div className={eventPRStyles.bottom_image_wrapper}>
-            <img src={imageUrlSub4} alt="" />
-          </div>
+          {eventIntroduction.eventIntroductionSubImages.map((e) => {
+            <div className={eventPRStyles.bottom_image_wrapper}>
+              <img src={e.imageUrl} alt="" />
+            </div>;
+          })}
         </div>
       </div>
     </div>
