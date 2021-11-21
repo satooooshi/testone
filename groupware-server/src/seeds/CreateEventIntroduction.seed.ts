@@ -5,7 +5,7 @@ import { Factory, Seeder } from 'typeorm-seeding';
 
 export default class CreateEventIntroduction implements Seeder {
   public async run(factory: Factory, connection: Connection): Promise<void> {
-    await connection.getRepository(EventIntroduction).clear();
+    // await connection.getRepository(EventIntroduction).clear();
     const isExistInitEventIntroduction = await connection
       .getRepository(EventIntroduction)
       .findOne();
