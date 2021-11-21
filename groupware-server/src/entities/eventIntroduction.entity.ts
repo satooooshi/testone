@@ -2,11 +2,13 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
   Unique,
   UpdateDateColumn,
 } from 'typeorm';
 import { EventType } from './event.entity';
+import { EventIntroductionSubImage } from './eventIntroductionSubImage.entity';
 
 @Entity({ name: 'event_introductions' })
 @Unique(['type'])
@@ -44,41 +46,11 @@ export class EventIntroduction {
   })
   imageUrl: string;
 
-  @Column({
-    type: 'varchar',
-    name: 'image_url_sub_1',
-    length: 500,
-    nullable: true,
-    default: '',
-  })
-  imageUrlSub1: string;
-
-  @Column({
-    type: 'varchar',
-    name: 'image_url_sub_2',
-    length: 500,
-    nullable: true,
-    default: '',
-  })
-  imageUrlSub2: string;
-
-  @Column({
-    type: 'varchar',
-    name: 'image_url_sub_3',
-    length: 500,
-    nullable: true,
-    default: '',
-  })
-  imageUrlSub3: string;
-
-  @Column({
-    type: 'varchar',
-    name: 'image_url_sub_4',
-    length: 500,
-    nullable: true,
-    default: '',
-  })
-  imageUrlSub4: string;
+  @OneToMany(
+    () => EventIntroductionSubImage,
+    (eventIntroductionSubImage) => eventIntroductionSubImage.eventIntroduction,
+  )
+  eventIntroductionSubImages?: EventIntroductionSubImage[];
 
   @CreateDateColumn({
     type: 'timestamp',

@@ -424,30 +424,12 @@ export class EventScheduleService {
           eventIntroduction.imageUrl,
         );
     }
-    if (eventIntroduction?.imageUrlSub1) {
-      eventIntroduction.imageUrlSub1 =
-        await this.storageService.parseStorageURLToSignedURL(
-          eventIntroduction.imageUrlSub1,
-        );
-    }
-    if (eventIntroduction?.imageUrlSub2) {
-      eventIntroduction.imageUrlSub2 =
-        await this.storageService.parseStorageURLToSignedURL(
-          eventIntroduction.imageUrlSub2,
-        );
-    }
-    if (eventIntroduction?.imageUrlSub3) {
-      eventIntroduction.imageUrlSub3 =
-        await this.storageService.parseStorageURLToSignedURL(
-          eventIntroduction.imageUrlSub3,
-        );
-    }
-    if (eventIntroduction?.imageUrlSub4) {
-      eventIntroduction.imageUrlSub4 =
-        await this.storageService.parseStorageURLToSignedURL(
-          eventIntroduction.imageUrlSub4,
-        );
-    }
+    // if (eventIntroduction?.eventIntroductionSubImages) {
+    //   eventIntroduction.eventIntroductionSubImages =
+    //     await this.storageService.parseStorageURLToSignedURL(
+    //       eventIntroduction.imageUrlSub1,
+    //     );
+    // }
     return eventIntroduction;
   }
 
