@@ -6,10 +6,10 @@ import {
   IsOptional,
   IsString,
 } from 'class-validator';
-import { Wiki, WikiType } from 'src/entities/wiki.entity';
+import { WikiType } from 'src/entities/wiki.entity';
 import { User } from 'src/entities/user.entity';
 
-export class SaveWikiDto implements Partial<Wiki> {
+export class SaveWikiDto {
   id: number;
   writer?: User;
   @isNotEmptyExceptTags({
