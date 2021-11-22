@@ -27,7 +27,7 @@ const Chat = () => {
   const [groupImageURL, setGroupImageURL] = useState('');
 
   const { mutate: createGroup } = useAPISaveChatGroup({
-    onSuccess: () => {
+    onSuccess: (data) => {
       setCreateGroupWindow(false);
       setResetFormTrigger(true);
       groupImageURL && setGroupImageURL('');
@@ -37,6 +37,9 @@ const Chat = () => {
         status: 'success',
         duration: 3000,
         isClosable: true,
+      });
+      router.push(`/chat/${data.id.toString()}`, undefined, {
+        shallow: true,
       });
     },
     onError: (e) => {
