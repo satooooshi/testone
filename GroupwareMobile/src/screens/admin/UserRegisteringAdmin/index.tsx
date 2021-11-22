@@ -1,3 +1,4 @@
+import {useNavigation} from '@react-navigation/native';
 import {useFormik} from 'formik';
 import React, {useEffect, useRef, useState} from 'react';
 import {
@@ -30,7 +31,7 @@ import {useSelectedTags} from '../../../hooks/tag/useSelectedTags';
 import {useTagType} from '../../../hooks/tag/useTagType';
 import {userRegisteringAdminStyles} from '../../../styles/screen/admin/userRegisteringAdmin.style';
 import {User, TagType, UserRole} from '../../../types';
-import {UserRegisteringAdminProps} from '../../../types/navigator/screenProps/Admin';
+import {UserRegisteringAdminNavigationProps} from '../../../types/navigator/drawerScreenProps';
 import {uploadImageFromGallery} from '../../../utils/cropImage/uploadImageFromGallery';
 import {
   defaultDropdownOptionProps,
@@ -55,9 +56,8 @@ const initialValues: Partial<User> = {
   tags: [],
 };
 
-const UserRegisteringAdmin: React.FC<UserRegisteringAdminProps> = ({
-  navigation,
-}) => {
+const UserRegisteringAdmin: React.FC = () => {
+  const navigation = useNavigation<UserRegisteringAdminNavigationProps>();
   const dropdownRef = useRef<any | null>(null);
   const {mutate: register, isLoading} = useAPIRegister({
     onSuccess: responseData => {
@@ -106,7 +106,7 @@ const UserRegisteringAdmin: React.FC<UserRegisteringAdminProps> = ({
   const tabs: Tab[] = [
     {
       name: 'ユーザー管理',
-      onPress: () => navigation.navigate('UserAdmin'),
+      onPress: () => navigation.navigate('AdminStack', {screen: 'UserAdmin'}),
     },
     {
       name: 'ユーザー作成',
@@ -114,11 +114,12 @@ const UserRegisteringAdmin: React.FC<UserRegisteringAdminProps> = ({
     },
     {
       name: 'タグ管理',
-      onPress: () => navigation.navigate('TagAdmin'),
+      onPress: () => navigation.navigate('AdminStack', {screen: 'TagAdmin'}),
     },
     {
       name: 'タグ管理(ユーザー)',
-      onPress: () => navigation.navigate('UserRegisteringAdmin'),
+      onPress: () =>
+        navigation.navigate('AdminStack', {screen: 'UserRegisteringAdmin'}),
     },
     {
       name: 'CSV出力',

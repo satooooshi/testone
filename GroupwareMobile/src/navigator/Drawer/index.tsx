@@ -164,27 +164,42 @@ const DrawerTab = () => {
         options={{
           drawerLabel: 'ホーム',
           drawerIcon: ({color}) => (
-            <MaterialCommunityIcons name="home" color={color} size={26} />
+            <Icon
+              name="home"
+              fontFamily="MaterialCommunityIcons"
+              color={color}
+              fontSize={26}
+            />
           ),
         }}
       />
       <Drawer.Screen
-        name="EventDrawer"
+        name="EventStack"
         component={EventStack}
         options={{
           drawerLabel: 'イベント',
           drawerIcon: ({color}) => (
-            <MaterialIcons name="event" color={color} size={26} />
+            <Icon
+              name="event"
+              fontFamily="MaterialIcons"
+              color={color}
+              fontSize={26}
+            />
           ),
         }}
       />
       <Drawer.Screen
-        name="WikiDrawer"
+        name="WikiStack"
         component={WikiStack}
         options={{
           drawerLabel: '社内Wiki',
           drawerIcon: ({color}) => (
-            <Ionicons name="globe-outline" color={color} size={26} />
+            <Icon
+              name="globe-outline"
+              fontFamily="Ionicons"
+              color={color}
+              fontSize={26}
+            />
           ),
         }}
       />
@@ -219,7 +234,7 @@ const DrawerTab = () => {
         }}
       />
       <Drawer.Screen
-        name="Account"
+        name="AccountStack"
         component={AccountStack}
         options={{
           drawerLabel: 'アカウント',
@@ -234,7 +249,7 @@ const DrawerTab = () => {
         }}
       />
       <Drawer.Screen
-        name="Admin"
+        name="AdminStack"
         component={AdminStack}
         options={{
           drawerLabel: '管理',

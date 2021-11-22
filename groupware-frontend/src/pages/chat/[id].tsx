@@ -3,7 +3,7 @@ import chatStyles from '@/styles/layouts/Chat.module.scss';
 import { IoSend } from 'react-icons/io5';
 import { useChatReducer } from '@/hooks/chat/useChatReducer';
 import { MenuValue, useModalReducer } from '@/hooks/chat/useModalReducer';
-import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useAPIGetUsers } from '@/hooks/api/user/useAPIGetUsers';
 import { ChatGroup, ChatMessageType, User } from 'src/types';
 import { useAPIGetChatGroupList } from '@/hooks/api/chat/useAPIGetChatGroupList';
@@ -47,7 +47,7 @@ const ChatDetail = () => {
   const [{ popup, suggestions, mentionedUserData }, dispatchMention] =
     useMention();
   const [
-    { page, messages, lastReadChatTime, newChatMessage, newGroup, editorState },
+    { page, messages, lastReadChatTime, newChatMessage, editorState },
     dispatchChat,
   ] = useChatReducer();
   const [
@@ -60,6 +60,8 @@ const ChatDetail = () => {
     dispatchModal,
   ] = useModalReducer();
   const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
+  const [resetFormTrigger, setResetFormTrigger] = useState(false);
+  const [groupImageURL, setGroupImageURL] = useState('');
   const { data: chatGroups, refetch: refetchGroups } = useAPIGetChatGroupList();
   const { data: users } = useAPIGetUsers();
   const { data: lastestLastReadChatTime } = useAPIGetLastReadChatTime(
@@ -81,12 +83,10 @@ const ChatDetail = () => {
   const editorRef = useRef<Editor>(null);
   const messageWrapperDivRef = useRef<HTMLDivElement | null>(null);
   const { mutate: createGroup } = useAPISaveChatGroup({
-    onSuccess: () => {
+    onSuccess: (data) => {
       dispatchModal({ type: 'createGroupWindow', value: false });
-      dispatchChat({
-        type: 'newGroup',
-        value: { ...newGroup, name: '', members: [] },
-      });
+      setResetFormTrigger(true);
+      groupImageURL && setGroupImageURL('');
       refetchGroups();
       toast({
         description: 'チャットルームの作成が完了しました。',
@@ -94,6 +94,11 @@ const ChatDetail = () => {
         duration: 3000,
         isClosable: true,
       });
+      dispatchChat({ type: 'messages', value: [] });
+      router.push(`/chat/${data.id.toString()}`, undefined, {
+        shallow: true,
+      });
+      dispatchChat({ type: 'page', value: 1 });
     },
   });
 
@@ -134,6 +139,12 @@ const ChatDetail = () => {
   const { mutate: leaveChatGroup } = useAPILeaveChatRoom({
     onSuccess: () => {
       router.push('/chat');
+    },
+  });
+
+  const { mutate: uploadImage } = useAPIUploadStorage({
+    onSuccess: async (fileURLs) => {
+      setGroupImageURL(fileURLs[0]);
     },
   });
 
@@ -238,27 +249,6 @@ const ChatDetail = () => {
     [dispatchMention],
   );
 
-  const toggleUserIDs = (user: User) => {
-    const isExist = newGroup.members?.filter((u) => u.id === user.id);
-    if (isExist && isExist.length) {
-      dispatchChat({
-        type: 'newGroup',
-        value: {
-          ...newGroup,
-          members: newGroup.members?.filter((u) => u.id !== user.id),
-        },
-      });
-      return;
-    }
-    dispatchChat({
-      type: 'newGroup',
-      value: {
-        ...newGroup,
-        members: newGroup.members ? [...newGroup.members, user] : [user],
-      },
-    });
-  };
-
   const nameOfEmptyNameGroup = (members?: User[]): string => {
     if (!members) {
       return 'メンバーがいません';
@@ -354,20 +344,15 @@ const ChatDetail = () => {
       {users && (
         <CreateChatGroupModal
           isOpen={createGroupWindow}
+          users={users}
+          resetFormTrigger={resetFormTrigger}
+          groupImageURL={groupImageURL}
+          setResetFormTrigger={setResetFormTrigger}
           closeModal={() => {
             dispatchModal({ type: 'createGroupWindow', value: false });
-            dispatchChat({ type: 'newGroup', value: {} });
           }}
-          newGroup={newGroup}
-          onChangeNewGroupName={(groupName) =>
-            dispatchChat({
-              type: 'newGroup',
-              value: { ...newGroup, name: groupName },
-            })
-          }
-          toggleNewGroupMember={toggleUserIDs}
-          users={users}
-          createGroup={(g) => createGroup(g)}
+          createGroup={(g) => createGroup({ ...g, imageURL: groupImageURL })}
+          uploadImage={(r) => uploadImage(r)}
         />
       )}
       {chatGroups && (

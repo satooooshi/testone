@@ -1,3 +1,4 @@
+import { AxiosError } from 'axios';
 import { useMutation, UseMutationOptions } from 'react-query';
 import { LastReadChatTime } from 'src/types';
 import { axiosInstance } from 'src/utils/url';
@@ -20,12 +21,12 @@ const saveLastReadChatTime = async (
 export const useAPISaveLastReadChatTime = (
   mutationOptions?: UseMutationOptions<
     LastReadChatTime,
-    Error,
+    AxiosError,
     number,
     unknown
   >,
 ) => {
-  return useMutation<LastReadChatTime, Error, number>(
+  return useMutation<LastReadChatTime, AxiosError, number>(
     saveLastReadChatTime,
     mutationOptions,
   );

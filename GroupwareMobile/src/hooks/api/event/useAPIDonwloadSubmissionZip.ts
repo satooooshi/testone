@@ -1,6 +1,7 @@
 import {axiosInstance} from '../../../utils/url';
 import {downloadSubmissionZipURL} from '../../../utils/url/event.url';
 import {useMutation} from 'react-query';
+import {AxiosError} from 'axios';
 
 export interface QueryToGetZipSubmission {
   id?: string;
@@ -18,7 +19,7 @@ const downloadZip = async (query: QueryToGetZipSubmission) => {
 };
 
 export const useAPIDonwloadSubmissionZip = () => {
-  return useMutation<any, Error, QueryToGetZipSubmission>(downloadZip, {
+  return useMutation<any, AxiosError, QueryToGetZipSubmission>(downloadZip, {
     // onSuccess: async (data, variables) => {
     // const {name} = variables;
     // const fileName = name;

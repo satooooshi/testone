@@ -567,7 +567,7 @@ export class UserService {
       existUser.password,
     );
     if (!isPasswordMatching) {
-      throw new BadRequestException('unmatch password');
+      throw new BadRequestException('現在のパスワードが正しくありません');
     }
     existUser.password = hashedNewPassword;
     const user = await this.userRepository.save(existUser);

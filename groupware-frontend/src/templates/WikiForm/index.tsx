@@ -36,6 +36,7 @@ import { tagColorFactory } from 'src/utils/factory/tagColorFactory';
 import { useFormik } from 'formik';
 import { wikiSchema } from 'src/utils/validation/schema';
 import { stateFromHTML } from 'draft-js-import-html';
+import { imageExtensionsForMarkDownEditor } from 'src/utils/imageExtensions';
 
 type WikiFormProps = {
   wiki?: Wiki;
@@ -400,6 +401,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
             onImageUpload={handleImageUpload}
             plugins={liteEditorPlugins}
             value={newQuestion.body}
+            imageAccept={imageExtensionsForMarkDownEditor}
             onChange={handleEditorChange}
             renderHTML={(text: string) => mdParser.render(text)}
           />

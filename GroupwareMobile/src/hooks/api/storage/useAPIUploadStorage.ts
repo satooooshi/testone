@@ -2,6 +2,7 @@ import {axiosInstance} from '../../../utils/url';
 import {uploadStorageURL} from '../../../utils/url/storage.url';
 import {UseMutationOptions, useMutation} from 'react-query';
 import {Alert} from 'react-native';
+import {AxiosError} from 'axios';
 
 export const uploadStorage = async (formData: FormData): Promise<string[]> => {
   try {
@@ -16,9 +17,9 @@ export const uploadStorage = async (formData: FormData): Promise<string[]> => {
 };
 
 export const useAPIUploadStorage = (
-  mutationOptions?: UseMutationOptions<string[], Error, FormData, unknown>,
+  mutationOptions?: UseMutationOptions<string[], AxiosError, FormData, unknown>,
 ) => {
-  return useMutation<string[], Error, FormData>(uploadStorage, {
+  return useMutation<string[], AxiosError, FormData>(uploadStorage, {
     ...mutationOptions,
     onError: (err, variables, context) => {
       Alert.alert(

@@ -311,6 +311,7 @@ const Profile = () => {
             <FormToLinkTag
               tags={userInfo?.tags || []}
               tagType={TagType.TECH}
+              toggleTag={toggleSelectedTag}
               onEditButtonClick={() => dispatchModal({ type: 'openTech' })}
             />
           </Box>
@@ -331,6 +332,7 @@ const Profile = () => {
             <FormToLinkTag
               tags={userInfo?.tags || []}
               tagType={TagType.QUALIFICATION}
+              toggleTag={toggleSelectedTag}
               onEditButtonClick={() =>
                 dispatchModal({ type: 'openQualification' })
               }
@@ -356,6 +358,7 @@ const Profile = () => {
             <FormToLinkTag
               tags={userInfo?.tags || []}
               tagType={TagType.CLUB}
+              toggleTag={toggleSelectedTag}
               onEditButtonClick={() => dispatchModal({ type: 'openClub' })}
             />
           </Box>
@@ -379,6 +382,7 @@ const Profile = () => {
             <FormToLinkTag
               tags={userInfo?.tags || []}
               tagType={TagType.HOBBY}
+              toggleTag={toggleSelectedTag}
               onEditButtonClick={() => dispatchModal({ type: 'openHobby' })}
             />
           </Box>

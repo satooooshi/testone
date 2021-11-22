@@ -1,3 +1,4 @@
+import {AxiosError} from 'axios';
 import {useMutation, UseMutationOptions} from 'react-query';
 import {EventComment} from '../../../types';
 import {axiosInstance, jsonHeader} from '../../../utils/url';
@@ -19,12 +20,12 @@ const createComment = async (
 export const useAPICreateComment = (
   mutationOptions?: UseMutationOptions<
     EventComment,
-    Error,
+    AxiosError,
     Partial<EventComment>,
     unknown
   >,
 ) => {
-  return useMutation<EventComment, Error, Partial<EventComment>>(
+  return useMutation<EventComment, AxiosError, Partial<EventComment>>(
     createComment,
     mutationOptions,
   );

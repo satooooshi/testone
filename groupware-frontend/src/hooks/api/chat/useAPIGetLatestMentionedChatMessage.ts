@@ -1,3 +1,4 @@
+import { AxiosError } from 'axios';
 import { useQuery } from 'react-query';
 import { ChatMessage } from 'src/types';
 import { axiosInstance } from 'src/utils/url';
@@ -9,7 +10,7 @@ const getLatestMentionedChatMessage = async () => {
 };
 
 export const useAPIGetLatestMentionedChatMessage = () => {
-  return useQuery<ChatMessage[], Error>(
+  return useQuery<ChatMessage[], AxiosError>(
     'getLatestMentionedChatMessage',
     getLatestMentionedChatMessage,
   );

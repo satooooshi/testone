@@ -1,7 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import WholeContainer from '../../../components/WholeContainer';
 import AppHeader, {Tab} from '../../../components/Header';
-import {EventListProps} from '../../../types/navigator/screenProps/Event';
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
 import EventCalendar from './EventCalendar';
 import EventCardList from './EventCardList';
@@ -23,7 +22,7 @@ import {Overlay} from 'react-native-magnus';
 
 const TopTab = createMaterialTopTabNavigator();
 
-const EventList: React.FC<EventListProps> = ({navigation}) => {
+const EventList: React.FC = () => {
   const [visibleSearchFormModal, setVisibleSearchFormModal] = useState(false);
   const {data: tags} = useAPIGetTag();
   const {data: users} = useAPIGetUsers();
@@ -168,7 +167,6 @@ const EventList: React.FC<EventListProps> = ({navigation}) => {
           children={() => (
             <EventCalendar
               searchResult={events}
-              navigation={navigation}
               searchQuery={searchQuery}
               setSearchQuery={setSearchQuery}
               personal={true}
@@ -181,7 +179,6 @@ const EventList: React.FC<EventListProps> = ({navigation}) => {
           children={() => (
             <EventCalendar
               searchResult={events}
-              navigation={navigation}
               searchQuery={searchQuery}
               setSearchQuery={setSearchQuery}
             />
@@ -194,7 +191,6 @@ const EventList: React.FC<EventListProps> = ({navigation}) => {
             <EventCardList
               searchResult={eventsForInfinitScroll}
               status="future"
-              navigation={navigation}
               searchQuery={searchQuery}
               setSearchQuery={setSearchQuery}
             />
@@ -207,7 +203,6 @@ const EventList: React.FC<EventListProps> = ({navigation}) => {
             <EventCardList
               searchResult={eventsForInfinitScroll}
               status="past"
-              navigation={navigation}
               searchQuery={searchQuery}
               setSearchQuery={setSearchQuery}
             />
@@ -220,7 +215,6 @@ const EventList: React.FC<EventListProps> = ({navigation}) => {
             <EventCardList
               searchResult={eventsForInfinitScroll}
               status="current"
-              navigation={navigation}
               searchQuery={searchQuery}
               setSearchQuery={setSearchQuery}
             />

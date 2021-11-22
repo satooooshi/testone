@@ -1,3 +1,4 @@
+import {AxiosError} from 'axios';
 import {useQuery} from 'react-query';
 import {UserTag} from '../../../types';
 import {axiosInstance} from '../../../utils/url';
@@ -9,5 +10,5 @@ const getUserTag = async (): Promise<UserTag[]> => {
 };
 
 export const useAPIGetUserTag = () => {
-  return useQuery<UserTag[], Error>('userTags', getUserTag);
+  return useQuery<UserTag[], AxiosError>('userTags', getUserTag);
 };

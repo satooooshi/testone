@@ -1,3 +1,4 @@
+import {AxiosError} from 'axios';
 import {useMutation, UseMutationOptions} from 'react-query';
 import {EventSchedule} from '../../../types';
 import {axiosInstance, jsonHeader} from '../../../utils/url';
@@ -19,12 +20,12 @@ const apiDeleteEvent = async (
 export const useAPIDeleteEvent = (
   mutationOptions?: UseMutationOptions<
     EventSchedule,
-    Error,
+    AxiosError,
     deleteEventRequest,
     unknown
   >,
 ) => {
-  return useMutation<EventSchedule, Error, deleteEventRequest>(
+  return useMutation<EventSchedule, AxiosError, deleteEventRequest>(
     apiDeleteEvent,
     mutationOptions,
   );

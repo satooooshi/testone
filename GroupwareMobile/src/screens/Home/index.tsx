@@ -4,9 +4,8 @@ import AppHeader, {Tab} from '../../components/Header';
 import PortalLinkBox from '../../components/PortalLinkBox';
 import {Div} from 'react-native-magnus';
 import {ScrollView} from 'react-native';
-import {HomeProps} from '../../types/navigator/screenProps/Login';
 
-const Home: React.FC<HomeProps> = () => {
+const Home: React.FC = () => {
   const tabs: Tab[] = [
     {
       name: 'ダッシュボード',

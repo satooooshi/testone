@@ -1,5 +1,5 @@
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
-import {useIsFocused} from '@react-navigation/native';
+import {useIsFocused, useNavigation, useRoute} from '@react-navigation/native';
 import React, {useEffect, useState} from 'react';
 import {ActivityIndicator, useWindowDimensions} from 'react-native';
 import {Text, Div, ScrollDiv, Image, Overlay} from 'react-native-magnus';
@@ -15,7 +15,10 @@ import {useAPIGetWikiList} from '../../../hooks/api/wiki/useAPIGetWikiList';
 import {useTagType} from '../../../hooks/tag/useTagType';
 import {accountDetailStyles} from '../../../styles/screen/account/accountDetail.style';
 import {TagType, User, WikiType} from '../../../types';
-import {AccountDetailProps} from '../../../types/navigator/screenProps/Account';
+import {
+  AccountDetailNavigationProps,
+  AccountDetailRouteProps,
+} from '../../../types/navigator/drawerScreenProps';
 import {darkFontColor} from '../../../utils/colors';
 import {userNameFactory} from '../../../utils/factory/userNameFactory';
 import {userRoleNameFactory} from '../../../utils/factory/userRoleNameFactory';
@@ -86,7 +89,9 @@ const DetailScreen: React.FC<DetailScreenProps> = ({profile}) => {
   );
 };
 
-const AccountDetail: React.FC<AccountDetailProps> = ({navigation, route}) => {
+const AccountDetail: React.FC = () => {
+  const navigation = useNavigation<AccountDetailNavigationProps>();
+  const route = useRoute<AccountDetailRouteProps>();
   const {user, setUser} = useAuthenticate();
   const id = route.params?.id;
   const userID = id || user?.id;
@@ -138,11 +143,12 @@ const AccountDetail: React.FC<AccountDetailProps> = ({navigation, route}) => {
     },
     {
       name: 'プロフィール編集',
-      onPress: () => navigation.navigate('Profile'),
+      onPress: () => navigation.navigate('AccountStack', {screen: 'Profile'}),
     },
     {
       name: 'パスワード更新',
-      onPress: () => navigation.navigate('UpdatePassword'),
+      onPress: () =>
+        navigation.navigate('AccountStack', {screen: 'UpdatePassword'}),
     },
   ];
 
@@ -216,7 +222,10 @@ const AccountDetail: React.FC<AccountDetailProps> = ({navigation, route}) => {
                           <EventCard
                             event={e}
                             onPress={() =>
-                              navigation.navigate('EventDetail', {id: e.id})
+                              navigation.navigate('EventStack', {
+                                screen: 'EventDetail',
+                                params: {id: e.id},
+                              })
                             }
                           />
                         </Div>
@@ -234,7 +243,10 @@ const AccountDetail: React.FC<AccountDetailProps> = ({navigation, route}) => {
                         <WikiCard
                           wiki={w}
                           onPress={() =>
-                            navigation.navigate('WikiDetail', {id: w.id})
+                            navigation.navigate('WikiStack', {
+                              screen: 'WikiDetail',
+                              params: {id: w.id},
+                            })
                           }
                         />
                       ))}
@@ -253,7 +265,10 @@ const AccountDetail: React.FC<AccountDetailProps> = ({navigation, route}) => {
                         <WikiCard
                           wiki={w}
                           onPress={() =>
-                            navigation.navigate('WikiDetail', {id: w.id})
+                            navigation.navigate('WikiStack', {
+                              screen: 'WikiDetail',
+                              params: {id: w.id},
+                            })
                           }
                         />
                       ))}

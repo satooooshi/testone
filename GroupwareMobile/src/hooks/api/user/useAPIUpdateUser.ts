@@ -1,3 +1,4 @@
+import {AxiosError} from 'axios';
 import {useMutation, UseMutationOptions} from 'react-query';
 import {User} from '../../../types';
 import {axiosInstance, jsonHeader} from '../../../utils/url';
@@ -11,7 +12,15 @@ const updateUser = async (user: Partial<User>): Promise<User> => {
 };
 
 export const useAPIUpdateUser = (
-  mutationOptions?: UseMutationOptions<User, Error, Partial<User>, unknown>,
+  mutationOptions?: UseMutationOptions<
+    User,
+    AxiosError,
+    Partial<User>,
+    unknown
+  >,
 ) => {
-  return useMutation<User, Error, Partial<User>>(updateUser, mutationOptions);
+  return useMutation<User, AxiosError, Partial<User>>(
+    updateUser,
+    mutationOptions,
+  );
 };
