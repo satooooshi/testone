@@ -17,12 +17,13 @@ import { useHeaderTab } from '@/hooks/headerTab/useHeaderTab';
 import { useFormik } from 'formik';
 import { useAPIUpdatePassword } from '@/hooks/api/user/useAPIUpdatePassword';
 import { updatePasswordSchema } from 'src/utils/validation/schema';
+import router from 'next/router';
 
 const UpdatePassword = () => {
   const { user } = useAuthenticate();
   const toast = useToast();
   const { mutate: updatePassword } = useAPIUpdatePassword({
-    onSuccess: () => {
+    onSuccess: (data) => {
       toast({
         title: 'パスワードの更新が完了しました',
         status: 'success',
@@ -30,6 +31,7 @@ const UpdatePassword = () => {
         isClosable: true,
       });
       resetForm();
+      router.push(`/account/${data.id.toString()}`);
     },
   });
   const { handleChange, handleSubmit, values, resetForm, errors, touched } =
