@@ -84,7 +84,7 @@ const ChatDetail = () => {
   const editorRef = useRef<Editor>(null);
   const messageWrapperDivRef = useRef<HTMLDivElement | null>(null);
   const { mutate: createGroup } = useAPISaveChatGroup({
-    onSuccess: () => {
+    onSuccess: (data) => {
       dispatchModal({ type: 'createGroupWindow', value: false });
       setResetFormTrigger(true);
       groupImageURL && setGroupImageURL('');
@@ -95,6 +95,11 @@ const ChatDetail = () => {
         duration: 3000,
         isClosable: true,
       });
+      dispatchChat({ type: 'messages', value: [] });
+      router.push(`/chat/${data.id.toString()}`, undefined, {
+        shallow: true,
+      });
+      dispatchChat({ type: 'page', value: 1 });
     },
     onError: (e) => {
       const messages = responseErrorMsgFactory(e);
