@@ -28,7 +28,7 @@ const WikiComment: React.FC<WikiCommentProps> = ({
   body,
   date,
   writer,
-  isWriter = false,
+  isWriter,
   onClickEditButton,
   replyButtonName,
   onClickReplyButton,
