@@ -22,6 +22,7 @@ import ReactCrop from 'react-image-crop';
 import { dataURLToFile } from 'src/utils/dataURLToFile';
 import {
   Button,
+  ButtonGroup,
   FormControl,
   FormLabel,
   Input,
@@ -31,6 +32,7 @@ import {
   Radio,
   Stack,
   useToast,
+  IconButton,
 } from '@chakra-ui/react';
 import SelectUserModal from '../SelectUserModal';
 import { useAPIGetUsers } from '@/hooks/api/user/useAPIGetUsers';
@@ -411,13 +413,18 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
           />
           <div className={createEventModalStyle.tags}>
             {newEvent.hostUsers?.map((u) => (
-              <Button
-                key={u.id}
-                className={createEventModalStyle.tag__item}
-                size="xs"
-                colorScheme="purple">
-                {u.lastName + u.firstName}
-              </Button>
+              <div
+                className={createEventModalStyle.selected_tags_wrapper}
+                key={u.id}>
+                <ButtonGroup isAttached size="xs" colorScheme="purple">
+                  <Button mr="-px">{u.lastName + u.firstName}</Button>
+                  <IconButton
+                    onClick={() => toggleHostUser(u)}
+                    aria-label="削除"
+                    icon={<MdCancel size={18} />}
+                  />
+                </ButtonGroup>
+              </div>
             ))}
           </div>
           <Button
@@ -429,13 +436,21 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
           </Button>
           <div className={createEventModalStyle.tags}>
             {newEvent.tags?.map((t) => (
-              <Button
-                key={t.id}
-                size="xs"
-                className={createEventModalStyle.tag__item}
-                colorScheme={tagColorFactory(t.type)}>
-                {t.name}
-              </Button>
+              <div
+                className={createEventModalStyle.selected_tags_wrapper}
+                key={t.id}>
+                <ButtonGroup
+                  isAttached
+                  size="xs"
+                  colorScheme={tagColorFactory(t.type)}>
+                  <Button mr="-px">{t.name}</Button>
+                  <IconButton
+                    onClick={() => toggleTag(t)}
+                    aria-label="削除"
+                    icon={<MdCancel size={18} />}
+                  />
+                </ButtonGroup>
+              </div>
             ))}
           </div>
         </div>
