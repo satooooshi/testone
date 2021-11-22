@@ -18,7 +18,7 @@ const StudyMeeting: React.FC = () => {
   const { user } = useAuthenticate();
 
   const initialHeaderValue = {
-    title: '勉強会',
+    title: '技術勉強会',
     rightButtonName: '予定を見る',
     onClickRightButton: () =>
       router.push('/event/list?type=study_meeting&from=&to='),
@@ -35,7 +35,7 @@ const StudyMeeting: React.FC = () => {
       sidebar={{ activeScreenName: SidebarScreenName.EVENT }}
       header={initialHeaderValue}>
       <Head>
-        <title>ボールド | 勉強会</title>
+        <title>ボールド | 技術勉強会</title>
       </Head>
       {user?.role === UserRole.ADMIN && (
         <div className={eventPRStyles.edit_button_wrapper}>
