@@ -87,7 +87,7 @@ const Login: React.FC = () => {
     onSubmit: (values) => mutateLogin(values),
   });
 
-  const checkErrors = async (e) => {
+  const checkErrors = async (e: React.FormEvent<Element>) => {
     e.preventDefault();
     const errors = await validateForm();
     const messages = formikErrorMsgFactory(errors);
