@@ -1,3 +1,4 @@
+import {useNavigation} from '@react-navigation/native';
 import {useFormik} from 'formik';
 import React from 'react';
 import {ActivityIndicator, Alert, useWindowDimensions} from 'react-native';
@@ -5,10 +6,11 @@ import {Button, Div, Icon, Input, Overlay, Text} from 'react-native-magnus';
 import AppHeader, {Tab} from '../../../components/Header';
 import WholeContainer from '../../../components/WholeContainer';
 import {useAPIUpdatePassword} from '../../../hooks/api/user/useAPIUpdatePassword';
-import {UpdatePasswordProps} from '../../../types/navigator/screenProps/Account';
+import {UpdatePasswordNavigationProps} from '../../../types/navigator/drawerScreenProps';
 import {updatePasswordSchema} from '../../../utils/validation/schema';
 
-const UpdatePassword: React.FC<UpdatePasswordProps> = ({navigation}) => {
+const UpdatePassword: React.FC = () => {
+  const navigation = useNavigation<UpdatePasswordNavigationProps>();
   const {width: windowWidth} = useWindowDimensions();
   const {mutate: updatePassword, isLoading: loadingUpdate} =
     useAPIUpdatePassword({
@@ -20,11 +22,12 @@ const UpdatePassword: React.FC<UpdatePasswordProps> = ({navigation}) => {
   const tabs: Tab[] = [
     {
       name: 'アカウント情報',
-      onPress: () => navigation.navigate('AccountDetail'),
+      onPress: () =>
+        navigation.navigate('AccountStack', {screen: 'AccountDetail'}),
     },
     {
       name: 'プロフィール編集',
-      onPress: () => navigation.navigate('Profile'),
+      onPress: () => navigation.navigate('AccountStack', {screen: 'Profile'}),
     },
     {
       name: 'パスワード更新',

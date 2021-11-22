@@ -1,7 +1,6 @@
 import React, {useEffect} from 'react';
 import {useAPICreateWiki} from '../../../hooks/api/wiki/useAPICreateWiki';
 import {RuleCategory, Wiki, WikiType} from '../../../types';
-import {EditWikiProps} from '../../../types/navigator/screenProps/Wiki';
 import {useFormik} from 'formik';
 import {wikiSchema} from '../../../utils/validation/schema';
 import {useAPIGetTag} from '../../../hooks/api/tag/useAPIGetTag';
@@ -12,8 +11,15 @@ import {uploadImageFromGallery} from '../../../utils/cropImage/uploadImageFromGa
 import {ActivityIndicator} from 'react-native';
 import {Overlay} from 'react-native-magnus';
 import {useAPIGetWikiDetail} from '../../../hooks/api/wiki/useAPIGetWikiDetail';
+import {useNavigation, useRoute} from '@react-navigation/native';
+import {
+  EditWikiNavigationProps,
+  EditWikiRouteProps,
+} from '../../../types/navigator/drawerScreenProps';
 
-const EditWiki: React.FC<EditWikiProps> = ({route, navigation}) => {
+const EditWiki: React.FC = () => {
+  const navigation = useNavigation<EditWikiNavigationProps>();
+  const route = useRoute<EditWikiRouteProps>();
   const {id} = route.params;
   const {data: wiki} = useAPIGetWikiDetail(id);
   const {mutate: saveWiki, isLoading: loadingSaveWiki} = useAPICreateWiki({

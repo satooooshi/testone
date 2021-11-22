@@ -1,11 +1,10 @@
-import {CreateEventRequest} from './useAPICreateEvent';
 import {EventSchedule} from '../../../types';
 import {axiosInstance, jsonHeader} from '../../../utils/url';
 import {updateEventURL} from '../../../utils/url/event.url';
 import {UseMutationOptions, useMutation} from 'react-query';
 
 const updateEvent = async (
-  eventSchedule: CreateEventRequest,
+  eventSchedule: Partial<EventSchedule>,
 ): Promise<EventSchedule> => {
   const res = await axiosInstance.post<EventSchedule>(
     updateEventURL,
@@ -21,11 +20,11 @@ export const useAPIUpdateEvent = (
   mutationOptions?: UseMutationOptions<
     EventSchedule,
     Error,
-    CreateEventRequest,
+    Partial<EventSchedule>,
     unknown
   >,
 ) => {
-  return useMutation<EventSchedule, Error, CreateEventRequest>(
+  return useMutation<EventSchedule, Error, Partial<EventSchedule>>(
     updateEvent,
     mutationOptions,
   );

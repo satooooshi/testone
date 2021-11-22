@@ -5,7 +5,6 @@ import {
   Modal,
   Platform,
   TouchableOpacity,
-  useWindowDimensions,
 } from 'react-native';
 import {Div, Icon, Overlay} from 'react-native-magnus';
 import AppHeader from '../../components/Header';
@@ -15,7 +14,6 @@ import {useAPISendChatMessage} from '../../hooks/api/chat/useAPISendChatMessage'
 import {useAPIUploadStorage} from '../../hooks/api/storage/useAPIUploadStorage';
 import {chatStyles} from '../../styles/screen/chat/chat.style';
 import {ChatMessage, ChatMessageType} from '../../types';
-import {ChatProps} from '../../types/navigator/screenProps/Chat';
 import {uploadImageFromGallery} from '../../utils/cropImage/uploadImageFromGallery';
 import DocumentPicker from 'react-native-document-picker';
 import ImageView from 'react-native-image-viewing';
@@ -31,12 +29,15 @@ import RNFetchBlob from 'rn-fetch-blob';
 const {fs, config} = RNFetchBlob;
 import FileViewer from 'react-native-file-viewer';
 import {KeyboardAwareFlatList} from 'react-native-keyboard-aware-scroll-view';
+import {useRoute} from '@react-navigation/native';
+import {ChatRouteProps} from '../../types/navigator/drawerScreenProps';
 
 type ImageSource = {
   uri: string;
 };
 
-const Chat: React.FC<ChatProps> = ({route}) => {
+const Chat: React.FC = () => {
+  const route = useRoute<ChatRouteProps>();
   const {room} = route.params;
   const [page, setPage] = useState(1);
   const [messages, setMessages] = useState<ChatMessage[]>([]);

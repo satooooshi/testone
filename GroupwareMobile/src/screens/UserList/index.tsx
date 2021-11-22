@@ -10,13 +10,12 @@ import {
   useAPISearchUsers,
 } from '../../hooks/api/user/useAPISearchUsers';
 import {UserRole, UserTag} from '../../types';
-import {UserListProps} from '../../types/navigator/screenProps/UserList';
 import {userRoleNameFactory} from '../../utils/factory/userRoleNameFactory';
 import UserCardList from './UserCardList';
 
 const TopTab = createMaterialTopTabNavigator();
 
-const UserList: React.FC<UserListProps> = ({navigation}) => {
+const UserList: React.FC = () => {
   const {data: tags} = useAPIGetUserTag();
   const [searchQuery, setSearchQuery] = useState<SearchQueryToGetUsers>({
     page: '1',
@@ -76,7 +75,6 @@ const UserList: React.FC<UserListProps> = ({navigation}) => {
             <UserCardList
               userRole={'All'}
               searchResult={users}
-              navigation={navigation}
               searchQuery={searchQuery}
               setSearchQuery={setSearchQuery}
             />
@@ -89,7 +87,6 @@ const UserList: React.FC<UserListProps> = ({navigation}) => {
             <UserCardList
               userRole={UserRole.ADMIN}
               searchResult={users}
-              navigation={navigation}
               searchQuery={searchQuery}
               setSearchQuery={setSearchQuery}
             />
@@ -102,7 +99,6 @@ const UserList: React.FC<UserListProps> = ({navigation}) => {
             <UserCardList
               userRole={UserRole.COMMON}
               searchResult={users}
-              navigation={navigation}
               searchQuery={searchQuery}
               setSearchQuery={setSearchQuery}
             />
@@ -115,7 +111,6 @@ const UserList: React.FC<UserListProps> = ({navigation}) => {
             <UserCardList
               userRole={UserRole.COACH}
               searchResult={users}
-              navigation={navigation}
               searchQuery={searchQuery}
               setSearchQuery={setSearchQuery}
             />
@@ -128,7 +123,6 @@ const UserList: React.FC<UserListProps> = ({navigation}) => {
             <UserCardList
               userRole={UserRole.INTERNAL_INSTRUCTOR}
               searchResult={users}
-              navigation={navigation}
               searchQuery={searchQuery}
               setSearchQuery={setSearchQuery}
             />
@@ -141,7 +135,6 @@ const UserList: React.FC<UserListProps> = ({navigation}) => {
             <UserCardList
               userRole={UserRole.EXTERNAL_INSTRUCTOR}
               searchResult={users}
-              navigation={navigation}
               searchQuery={searchQuery}
               setSearchQuery={setSearchQuery}
             />
