@@ -1,3 +1,4 @@
+import { AxiosError } from 'axios';
 import { useMutation, UseMutationOptions } from 'react-query';
 import { ChatMessage } from 'src/types';
 import { axiosInstance } from 'src/utils/url';
@@ -16,12 +17,12 @@ const sendChatMessage = async (
 export const useAPISendChatMessage = (
   mutationOptions?: UseMutationOptions<
     ChatMessage,
-    Error,
+    AxiosError,
     Partial<ChatMessage>,
     unknown
   >,
 ) => {
-  return useMutation<ChatMessage, Error, Partial<ChatMessage>>(
+  return useMutation<ChatMessage, AxiosError, Partial<ChatMessage>>(
     sendChatMessage,
     mutationOptions,
   );

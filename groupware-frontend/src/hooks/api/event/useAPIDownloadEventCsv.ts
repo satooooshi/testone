@@ -1,3 +1,4 @@
+import { AxiosError } from 'axios';
 import { useMutation } from 'react-query';
 import { dateTimeFormatterFromJSDDate } from 'src/utils/dateTimeFormatter';
 import { axiosInstance } from 'src/utils/url';
@@ -33,7 +34,7 @@ const downloadCsv = async (query: QueryToGetEventCsv) => {
 };
 
 export const useAPIDownloadEventCsv = () => {
-  return useMutation<string, Error, QueryToGetEventCsv>(downloadCsv, {
+  return useMutation<string, AxiosError, QueryToGetEventCsv>(downloadCsv, {
     onSuccess: (data, variables) => {
       const { from, to, name } = variables;
       let fileName = name || '';

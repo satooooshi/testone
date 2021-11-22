@@ -1,3 +1,4 @@
+import { AxiosError } from 'axios';
 import { useMutation, UseMutationOptions } from 'react-query';
 import { SubmissionFile } from 'src/types';
 import { axiosInstance } from 'src/utils/url';
@@ -16,12 +17,12 @@ const saveSubmission = async (
 export const useAPISaveSubmission = (
   mutationOptions?: UseMutationOptions<
     SubmissionFile[],
-    Error,
+    AxiosError,
     Partial<SubmissionFile>[],
     unknown
   >,
 ) => {
-  return useMutation<SubmissionFile[], Error, Partial<SubmissionFile>[]>(
+  return useMutation<SubmissionFile[], AxiosError, Partial<SubmissionFile>[]>(
     saveSubmission,
     mutationOptions,
   );
