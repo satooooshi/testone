@@ -14,9 +14,7 @@ import { QAAnswerReply } from 'src/entities/qaAnswerReply.entity';
 import { RuleCategory, Wiki, WikiType } from 'src/entities/wiki.entity';
 import JwtAuthenticationGuard from '../auth/jwtAuthentication.guard';
 import RequestWithUser from '../auth/requestWithUser.interface';
-import CreateAnswerDto from './dto/createAnswerDto';
-import CreateAnswerReplyDto from './dto/createAnswerReplyDto';
-import SaveWikiDto from './dto/saveWikiDto';
+import SaveWikiDto from './dto/SaveWithDto';
 import { WikiService } from './wiki.service';
 
 export interface SearchQueryToGetWiki {
@@ -86,7 +84,7 @@ export class WikiController {
   @Post('create-answer')
   async createAnswer(
     @Req() request: RequestWithUser,
-    @Body() answer: CreateAnswerDto,
+    @Body() answer: QAAnswer,
   ): Promise<QAAnswer> {
     answer.writer = request.user;
     return await this.qaService.createAnswer(answer);
@@ -96,7 +94,7 @@ export class WikiController {
   @Post('create-answer-reply')
   async createAnswerReply(
     @Req() request: RequestWithUser,
-    @Body() reply: CreateAnswerReplyDto,
+    @Body() reply: QAAnswerReply,
   ): Promise<QAAnswerReply> {
     reply.writer = request.user;
     return await this.qaService.createAnswerReply(reply);

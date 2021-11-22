@@ -42,16 +42,6 @@ const Chat = () => {
         shallow: true,
       });
     },
-    onError: (e) => {
-      const messages = responseErrorMsgFactory(e);
-      toast({
-        description: messages,
-        status: 'error',
-        duration: 3000,
-        isClosable: true,
-      });
-      return;
-    },
   });
 
   const { mutate: uploadImage } = useAPIUploadStorage({

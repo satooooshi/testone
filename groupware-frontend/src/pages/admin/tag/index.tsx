@@ -12,7 +12,6 @@ import TagListBox from '@/components/admin/TagListCard';
 import { useAPICreateTag } from '@/hooks/api/tag/useAPICreateTag';
 import { useAPIDeleteTag } from '@/hooks/api/tag/useAPIDeleteTag';
 import { useToast } from '@chakra-ui/react';
-import { responseErrorMsgFactory } from 'src/utils/factory/responseErrorMsgFactory';
 
 const TagAdmin: React.FC = () => {
   const toast = useToast();
@@ -37,16 +36,6 @@ const TagAdmin: React.FC = () => {
   const { mutate: createTag } = useAPICreateTag({
     onSuccess: () => {
       refetch();
-    },
-    onError: (e) => {
-      const messages = responseErrorMsgFactory(e);
-      toast({
-        description: messages,
-        status: 'error',
-        duration: 3000,
-        isClosable: true,
-      });
-      return;
     },
   });
   const { mutate: deleteTag } = useAPIDeleteTag({
