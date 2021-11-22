@@ -11,7 +11,6 @@ const AuthButton: React.FC<AuthButtonProps> = ({ name, isActive, onClick }) => {
   return (
     <button
       type="submit"
-      onClick={onClick}
       className={clsx(
         styles.button_oblong,
         isActive

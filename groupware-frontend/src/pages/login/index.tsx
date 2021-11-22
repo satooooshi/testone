@@ -87,7 +87,8 @@ const Login: React.FC = () => {
     onSubmit: (values) => mutateLogin(values),
   });
 
-  const checkErrors = async () => {
+  const checkErrors = async (e) => {
+    e.preventDefault();
     const errors = await validateForm();
     const messages = formikErrorMsgFactory(errors);
     if (messages) {
@@ -110,7 +111,14 @@ const Login: React.FC = () => {
       <div className={loginLayoutStyles.logo_image}>
         <Image src={boldLogo} alt="bold logo" />
       </div>
-      <div className={authFormStyles.login_form}>
+      <form
+        className={authFormStyles.login_form}
+        onSubmit={checkErrors}
+        onKeyDown={(e: React.KeyboardEvent) => {
+          if (e.key === 'Enter') {
+            checkErrors(e);
+          }
+        }}>
         <h1
           className={clsx(
             authFormStyles.auth_title,
@@ -120,12 +128,10 @@ const Login: React.FC = () => {
         </h1>
         <p className={authFormStyles.form_margin}>
           パスワードをお忘れの方は
-          <Link href="/forgot-password">
+          <Link href="/forgot-password" passHref>
             <a className={textLinkStyles.link}>こちら</a>
           </Link>
         </p>
-
-        <button />
         <Input
           type="email"
           name="email"
@@ -135,7 +141,6 @@ const Login: React.FC = () => {
           background="white"
           className={clsx(textInputStyles.input, authFormStyles.form_margin)}
         />
-
         <Input
           type="password"
           name="password"
@@ -145,12 +150,8 @@ const Login: React.FC = () => {
           background="white"
           className={clsx(textInputStyles.input, authFormStyles.form_margin)}
         />
-        <AuthButton
-          name="Login"
-          isActive={true}
-          onClick={() => checkErrors()}
-        />
-      </div>
+        <AuthButton name="Login" isActive={true} />
+      </form>
     </div>
   );
 };
