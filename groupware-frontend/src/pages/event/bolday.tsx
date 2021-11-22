@@ -34,7 +34,7 @@ const Bolday: React.FC = () => {
       sidebar={{ activeScreenName: SidebarScreenName.EVENT }}
       header={initialHeaderValue}>
       <Head>
-        <title>ボールド | 部活動</title>
+        <title>ボールド | BOLDay</title>
       </Head>
       {user?.role === UserRole.ADMIN && (
         <div className={eventPRStyles.edit_button_wrapper}>

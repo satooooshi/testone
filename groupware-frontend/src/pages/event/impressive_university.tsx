@@ -36,7 +36,7 @@ const ImpressionUniversity: React.FC = () => {
       sidebar={{ activeScreenName: SidebarScreenName.EVENT }}
       header={initialHeaderValue}>
       <Head>
-        <title>ボールド | 部活動</title>
+        <title>ボールド | 感動大学</title>
       </Head>
       {user?.role === UserRole.ADMIN && (
         <div className={eventPRStyles.edit_button_wrapper}>
