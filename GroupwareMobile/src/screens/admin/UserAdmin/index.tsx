@@ -1,3 +1,4 @@
+import {useNavigation} from '@react-navigation/native';
 import React, {useEffect, useRef, useState} from 'react';
 import {
   ActivityIndicator,
@@ -20,7 +21,7 @@ import {
 import {useAPIUpdateUser} from '../../../hooks/api/user/useAPIUpdateUser';
 import {userAdminStyles} from '../../../styles/screen/admin/userAdmin.style';
 import {User, UserRole, UserTag} from '../../../types';
-import {UserAdminProps} from '../../../types/navigator/screenProps/Admin';
+import {UserAdminNavigationProps} from '../../../types/navigator/drawerScreenProps';
 import {
   defaultDropdownOptionProps,
   defaultDropdownProps,
@@ -28,7 +29,8 @@ import {
 import {userNameFactory} from '../../../utils/factory/userNameFactory';
 import {userRoleNameFactory} from '../../../utils/factory/userRoleNameFactory';
 
-const UserAdmin: React.FC<UserAdminProps> = ({navigation}) => {
+const UserAdmin: React.FC = () => {
+  const navigation = useNavigation<UserAdminNavigationProps>();
   const [searchQuery, setSearchQuery] = useState<SearchQueryToGetUsers>({
     page: '1',
   });
@@ -89,15 +91,17 @@ const UserAdmin: React.FC<UserAdminProps> = ({navigation}) => {
     },
     {
       name: 'ユーザー作成',
-      onPress: () => navigation.navigate('UserRegisteringAdmin'),
+      onPress: () =>
+        navigation.navigate('AdminStack', {screen: 'UserRegisteringAdmin'}),
     },
     {
       name: 'タグ管理',
-      onPress: () => navigation.navigate('TagAdmin'),
+      onPress: () => navigation.navigate('AdminStack', {screen: 'TagAdmin'}),
     },
     {
       name: 'タグ管理(ユーザー)',
-      onPress: () => navigation.navigate('UserTagAdmin'),
+      onPress: () =>
+        navigation.navigate('AdminStack', {screen: 'UserTagAdmin'}),
     },
     {
       name: 'CSV出力',
@@ -247,7 +251,10 @@ const UserAdmin: React.FC<UserAdminProps> = ({navigation}) => {
             <TouchableOpacity
               style={userAdminStyles.avatar}
               onPress={() =>
-                navigation.navigate('AccountDetail', {id: item.id})
+                navigation.navigate('AccountStack', {
+                  screen: 'AccountDetail',
+                  params: {id: item.id},
+                })
               }>
               <Image
                 w={'100%'}

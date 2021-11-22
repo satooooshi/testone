@@ -3,29 +3,27 @@ import {FlatList} from 'react-native';
 import {
   SearchQueryToGetEvents,
   EventStatus,
-  SearchResultToGetEvents,
 } from '../../../hooks/api/event/useAPIGetEventList';
 import EventCard from '../../../components/events/EventCard';
 import {Div} from 'react-native-magnus';
-import {EventListNavigationProps} from '../../../types/navigator/screenProps/Event';
-import {useIsFocused} from '@react-navigation/native';
+import {useIsFocused, useNavigation} from '@react-navigation/native';
 import {EventSchedule} from '../../../types';
+import {EventListNavigationProps} from '../../../types/navigator/drawerScreenProps';
 
 type EventCardListProps = {
   status: EventStatus;
   searchResult?: EventSchedule[];
-  navigation: EventListNavigationProps;
   searchQuery: SearchQueryToGetEvents;
   setSearchQuery: Dispatch<SetStateAction<SearchQueryToGetEvents>>;
 };
 
 const EventCardList: React.FC<EventCardListProps> = ({
   status,
-  navigation,
   searchResult,
   setSearchQuery,
 }) => {
   const isFocused = useIsFocused();
+  const navigation = useNavigation<EventListNavigationProps>();
 
   const onEndReached = () => {
     setSearchQuery(q => ({
@@ -49,7 +47,12 @@ const EventCardList: React.FC<EventCardListProps> = ({
         renderItem={({item: eventSchedule}) => (
           <Div mb={16}>
             <EventCard
-              onPress={e => navigation.navigate('EventDetail', {id: e.id})}
+              onPress={e =>
+                navigation.navigate('EventStack', {
+                  screen: 'EventDetail',
+                  params: {id: e.id},
+                })
+              }
               event={eventSchedule}
             />
           </Div>

@@ -169,7 +169,7 @@ const DrawerTab = () => {
         }}
       />
       <Drawer.Screen
-        name="EventDrawer"
+        name="EventStack"
         component={EventStack}
         options={{
           drawerLabel: 'イベント',
@@ -179,7 +179,7 @@ const DrawerTab = () => {
         }}
       />
       <Drawer.Screen
-        name="WikiDrawer"
+        name="WikiStack"
         component={WikiStack}
         options={{
           drawerLabel: '社内Wiki',
@@ -219,7 +219,7 @@ const DrawerTab = () => {
         }}
       />
       <Drawer.Screen
-        name="Account"
+        name="AccountStack"
         component={AccountStack}
         options={{
           drawerLabel: 'アカウント',
@@ -234,7 +234,7 @@ const DrawerTab = () => {
         }}
       />
       <Drawer.Screen
-        name="Admin"
+        name="AdminStack"
         component={AdminStack}
         options={{
           drawerLabel: '管理',
