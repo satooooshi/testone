@@ -57,6 +57,8 @@ const FileIcon: React.FC<FileIconProps> = ({ href, submitted }) => {
   return (
     <a
       href={href}
+      target="_blank"
+      rel="noreferrer noopener"
       download
       className={clsx(
         eventDetailStyles.file,
