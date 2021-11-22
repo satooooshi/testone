@@ -39,6 +39,7 @@ import { useHeaderTab } from '@/hooks/headerTab/useHeaderTab';
 import ChatMessageItem from '@/components/chat/ChatMessageItem';
 import { useAPILeaveChatRoom } from '@/hooks/api/chat/useAPILeaveChatRoomURL';
 import { useMention } from '@/hooks/chat/useMention';
+import { responseErrorMsgFactory } from 'src/utils/factory/responseErrorMsgFactory';
 
 const ChatDetail = () => {
   const toast = useToast();
@@ -94,6 +95,16 @@ const ChatDetail = () => {
         duration: 3000,
         isClosable: true,
       });
+    },
+    onError: (e) => {
+      const messages = responseErrorMsgFactory(e);
+      toast({
+        description: messages,
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      });
+      return;
     },
   });
 
