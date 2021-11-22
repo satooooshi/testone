@@ -36,6 +36,7 @@ import TagModal from '@/components/common/TagModal';
 import { toggleTag } from 'src/utils/toggleTag';
 import { useAPIGetUserTag } from '@/hooks/api/tag/useAPIGetUserTag';
 import FormToLinkTag from '@/components/FormToLinkTag';
+import router from 'next/router';
 
 type ModalState = {
   isOpen: boolean;
@@ -149,6 +150,7 @@ const Profile = () => {
           isClosable: true,
         });
         dispatchCrop({ type: 'setImageFile', value: undefined });
+        router.push(`/account/${responseData.id.toString()}`);
       }
     },
   });
