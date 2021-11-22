@@ -3,6 +3,7 @@ import { User } from 'src/types';
 import { axiosInstance } from 'src/utils/url';
 import { deleteUserURL } from 'src/utils/url/user.url';
 import { jsonHeader } from 'src/utils/url/header';
+import { AxiosError } from 'axios';
 
 const deleteUser = async (user: User): Promise<User> => {
   const res = await axiosInstance.post(deleteUserURL, user, {
@@ -12,7 +13,7 @@ const deleteUser = async (user: User): Promise<User> => {
 };
 
 export const useAPIDeleteUser = (
-  mutationOptions?: UseMutationOptions<User, Error, User, unknown>,
+  mutationOptions?: UseMutationOptions<User, AxiosError, User, unknown>,
 ) => {
-  return useMutation<User, Error, User>(deleteUser, mutationOptions);
+  return useMutation<User, AxiosError, User>(deleteUser, mutationOptions);
 };

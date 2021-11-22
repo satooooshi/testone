@@ -1,3 +1,4 @@
+import { AxiosError } from 'axios';
 import { useQuery } from 'react-query';
 import { Wiki } from 'src/types';
 import { axiosInstance } from 'src/utils/url';
@@ -9,7 +10,7 @@ const getWikiDetail = async (id: string) => {
 };
 
 export const useAPIGetWikiDetail = (id: string) => {
-  return useQuery<Wiki, Error>(['questionDetail', { id }], () =>
+  return useQuery<Wiki, AxiosError>(['questionDetail', { id }], () =>
     getWikiDetail(id),
   );
 };

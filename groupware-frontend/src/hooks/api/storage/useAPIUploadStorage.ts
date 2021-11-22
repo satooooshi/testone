@@ -1,3 +1,4 @@
+import { AxiosError } from 'axios';
 import { useMutation, UseMutationOptions } from 'react-query';
 import { axiosInstance } from 'src/utils/url';
 import { uploadStorageURL } from 'src/utils/url/storage.url';
@@ -19,9 +20,9 @@ export const uploadStorage = async (files: File[]): Promise<string[]> => {
 };
 
 export const useAPIUploadStorage = (
-  mutationOptions?: UseMutationOptions<string[], Error, File[], unknown>,
+  mutationOptions?: UseMutationOptions<string[], AxiosError, File[], unknown>,
 ) => {
-  return useMutation<string[], Error, File[]>(uploadStorage, {
+  return useMutation<string[], AxiosError, File[]>(uploadStorage, {
     ...mutationOptions,
     onError: (err, variables, context) => {
       alert(

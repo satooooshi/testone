@@ -3,6 +3,7 @@ import { RuleCategory, Wiki, WikiType } from 'src/types';
 import { wikiQueryRefresh } from 'src/utils/wikiQueryRefresh';
 import { axiosInstance } from 'src/utils/url';
 import { getWikiListURL } from 'src/utils/url/wiki.url';
+import { AxiosError } from 'axios';
 
 export interface SearchQueryToGetWiki {
   page?: string;
@@ -30,7 +31,7 @@ const getWikiList = async (
 };
 
 export const useAPIGetWikiList = (query: SearchQueryToGetWiki) => {
-  return useQuery<SearchResultToGetWiki, Error>(['QAs', query], () =>
+  return useQuery<SearchResultToGetWiki, AxiosError>(['QAs', query], () =>
     getWikiList(query),
   );
 };

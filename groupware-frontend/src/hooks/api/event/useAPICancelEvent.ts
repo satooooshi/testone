@@ -1,3 +1,4 @@
+import { AxiosError } from 'axios';
 import { useMutation, UseMutationOptions } from 'react-query';
 import { axiosInstance } from 'src/utils/url';
 import { cancelEventURL } from 'src/utils/url/event.url';
@@ -14,12 +15,12 @@ const CancelEvent = async (body: CancelEventRequest) => {
 export const useAPICancelEvent = (
   mutationOptions: UseMutationOptions<
     unknown,
-    Error,
+    AxiosError,
     CancelEventRequest,
     unknown
   >,
 ) => {
-  return useMutation<unknown, Error, CancelEventRequest>(
+  return useMutation<unknown, AxiosError, CancelEventRequest>(
     CancelEvent,
     mutationOptions,
   );
