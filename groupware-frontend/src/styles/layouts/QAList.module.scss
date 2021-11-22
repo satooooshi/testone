@@ -24,8 +24,11 @@
 }
 
 .search_form_wrapper {
-  margin-bottom: 24px;
   display: flex;
+  margin-bottom: 24px;
   flex-direction: row;
   justify-content: center;
+  @media (max-width: 768px) {
+    margin-bottom: 0;
+  }
 }
