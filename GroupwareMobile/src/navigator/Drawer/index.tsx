@@ -164,7 +164,12 @@ const DrawerTab = () => {
         options={{
           drawerLabel: 'ホーム',
           drawerIcon: ({color}) => (
-            <MaterialCommunityIcons name="home" color={color} size={26} />
+            <Icon
+              name="home"
+              fontFamily="MaterialCommunityIcons"
+              color={color}
+              fontSize={26}
+            />
           ),
         }}
       />
@@ -174,7 +179,12 @@ const DrawerTab = () => {
         options={{
           drawerLabel: 'イベント',
           drawerIcon: ({color}) => (
-            <MaterialIcons name="event" color={color} size={26} />
+            <Icon
+              name="event"
+              fontFamily="MaterialIcons"
+              color={color}
+              fontSize={26}
+            />
           ),
         }}
       />
@@ -184,7 +194,12 @@ const DrawerTab = () => {
         options={{
           drawerLabel: '社内Wiki',
           drawerIcon: ({color}) => (
-            <Ionicons name="globe-outline" color={color} size={26} />
+            <Icon
+              name="globe-outline"
+              fontFamily="Ionicons"
+              color={color}
+              fontSize={26}
+            />
           ),
         }}
       />
