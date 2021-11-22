@@ -31,10 +31,9 @@ export const updatePasswordSchema = Yup.object().shape({
     .matches(/^([^ ]*)$/, blankMixedMessage)
     .min(8, minEightTextMessage)
     .required(requireMessage),
-  newPasswordConfirmation: Yup.string().oneOf(
-    [Yup.ref('newPassword'), null],
-    unmatchPasswordConfirmation,
-  ),
+  newPasswordConfirmation: Yup.string()
+    .required(requireMessage)
+    .oneOf([Yup.ref('newPassword'), null], unmatchPasswordConfirmation),
 });
 
 export const registerSchema = Yup.object().shape({
