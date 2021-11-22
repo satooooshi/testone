@@ -293,7 +293,8 @@ export class EventScheduleService {
     type: EventType,
   ): Promise<EventIntroduction> {
     const eventIntroduction = await this.eventIntroductionRepository.findOne({
-      type: type,
+      where: { type: type },
+      relations: ['eventIntroductionSubImages'],
     });
     const urlParsedEventIntroduction =
       await this.generateSignedStorageURLsFromEventIntroductionObj(
@@ -424,12 +425,17 @@ export class EventScheduleService {
           eventIntroduction.imageUrl,
         );
     }
-    // if (eventIntroduction?.eventIntroductionSubImages) {
-    //   eventIntroduction.eventIntroductionSubImages =
-    //     await this.storageService.parseStorageURLToSignedURL(
-    //       eventIntroduction.imageUrlSub1,
-    //     );
-    // }
+    if (eventIntroduction?.eventIntroductionSubImages) {
+      eventIntroduction.eventIntroductionSubImages = await Promise.all(
+        eventIntroduction.eventIntroductionSubImages.map(async (e) => ({
+          ...e,
+          imageUrl: await this.storageService.parseStorageURLToSignedURL(
+            e.imageUrl,
+          ),
+        })),
+      );
+    }
+
     return eventIntroduction;
   }
 

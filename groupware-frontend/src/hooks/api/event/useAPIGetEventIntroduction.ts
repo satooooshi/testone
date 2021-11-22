@@ -1,3 +1,4 @@
+import { AxiosError } from 'axios';
 import { useQuery } from 'react-query';
 import { EventIntroduction, EventType } from 'src/types';
 import { axiosInstance } from 'src/utils/url';
@@ -11,7 +12,7 @@ const getEventIntroduction = async (type: EventType) => {
 };
 
 export const useAPIGetEventIntroduction = (type: EventType) => {
-  return useQuery<GetEventIntroductionResponse, Error>(
+  return useQuery<GetEventIntroductionResponse, AxiosError>(
     ['getEventIntroduction', { type }],
     () => getEventIntroduction(type),
   );
