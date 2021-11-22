@@ -1,3 +1,4 @@
+import {AxiosError} from 'axios';
 import {useMutation} from 'react-query';
 import {dateTimeFormatterFromJSDDate} from '../../../utils/dateTimeFormatterFromJSDate';
 import {axiosInstance} from '../../../utils/url';
@@ -28,7 +29,7 @@ const donwloadCsv = async (query: QueryToGetUserCsv) => {
 };
 
 export const useAPIDownloadUserCsv = () => {
-  return useMutation<string, Error, QueryToGetUserCsv>(donwloadCsv, {
+  return useMutation<string, AxiosError, QueryToGetUserCsv>(donwloadCsv, {
     //@TODO download
     // onSuccess: (data, variables) => {
     //   const {from, to} = variables;

@@ -3,6 +3,7 @@ import {axiosInstance} from '../../../utils/url';
 import {ChatMessage, ChatMessageType} from '../../../types';
 import {getChatMessagesURL} from '../../../utils/url/chat.url';
 import {getThumbnailOfVideo} from '../../../utils/getThumbnailOfVideo';
+import {AxiosError} from 'axios';
 
 export interface GetMessagesQuery {
   group: number;
@@ -31,9 +32,9 @@ const getMessages = async (query: GetMessagesQuery) => {
 
 export const useAPIGetMessages = (
   query: GetMessagesQuery,
-  options?: UseQueryOptions<ChatMessage[], Error>,
+  options?: UseQueryOptions<ChatMessage[], AxiosError>,
 ) => {
-  return useQuery<ChatMessage[], Error>(
+  return useQuery<ChatMessage[], AxiosError>(
     ['getMessages', query],
     () => getMessages(query),
     options,

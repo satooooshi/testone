@@ -1,3 +1,4 @@
+import {AxiosError} from 'axios';
 import {useQuery} from 'react-query';
 import {Wiki} from '../../../types';
 import {axiosInstance} from '../../../utils/url';
@@ -9,5 +10,5 @@ const getLatestQuestion = async (): Promise<Wiki[]> => {
 };
 
 export const useAPIGetLatestQuestion = () => {
-  return useQuery<Wiki[], Error>('getLatestQuestion', getLatestQuestion);
+  return useQuery<Wiki[], AxiosError>('getLatestQuestion', getLatestQuestion);
 };

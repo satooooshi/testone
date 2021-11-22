@@ -1,3 +1,4 @@
+import {AxiosError} from 'axios';
 import {useQuery, UseQueryOptions} from 'react-query';
 import {ChatGroup} from '../../../types';
 import {axiosInstance} from '../../../utils/url';
@@ -22,9 +23,9 @@ const getRooms = async (query: GetRoomsQuery) => {
 
 export const useAPIGetRooms = (
   query: GetRoomsQuery,
-  options?: UseQueryOptions<GetRoomsResult, Error>,
+  options?: UseQueryOptions<GetRoomsResult, AxiosError>,
 ) => {
-  return useQuery<GetRoomsResult, Error>(
+  return useQuery<GetRoomsResult, AxiosError>(
     ['getMessages', query],
     () => getRooms(query),
     options,
