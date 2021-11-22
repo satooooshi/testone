@@ -19,6 +19,7 @@ import MarkdownEditorWebView from '../../components/MarkdownEditorWebView';
 import WholeContainer from '../../components/WholeContainer';
 import {useSelectedTags} from '../../hooks/tag/useSelectedTags';
 import {useTagType} from '../../hooks/tag/useTagType';
+import {wikiFormStyles} from '../../styles/component/wiki/wikiForm.style';
 import {RuleCategory, Tag, TextFormat, Wiki, WikiType} from '../../types';
 import {tagColorFactory} from '../../utils/factory/tagColorFactory';
 import {wikiTypeNameFactory} from '../../utils/factory/wiki/wikiTypeNameFactory';
@@ -257,9 +258,15 @@ const WikiForm: React.FC<WikiFormProps> = ({
         selectedTagType={selectedTagType}
         selectTagType={selectTagType}
       />
-      {typeDropdown}
       {formatDropdown}
-      <ScrollDiv w={windowWidth * 0.9} alignSelf="center" pt={10}>
+      {typeDropdown}
+      <ScrollDiv
+        nestedScrollEnabled={true}
+        scrollEventThrottle={20}
+        keyboardDismissMode={'none'}
+        w={windowWidth * 0.9}
+        alignSelf="center"
+        pt={10}>
         <Text fontSize={16}>タイトル</Text>
         {errors.title && touched.title ? (
           <Text fontSize={16} color="tomato">
@@ -379,9 +386,14 @@ const WikiForm: React.FC<WikiFormProps> = ({
               <RichEditor
                 placeholder="本文を入力してください"
                 ref={editorRef}
-                style={{height: windowHeight * 0.6}}
+                style={{
+                  ...wikiFormStyles.richEditor,
+                  height: windowHeight * 0.6,
+                }}
+                initialHeight={300}
                 initialContentHTML={newWiki.body}
-                useContainer={false}
+                useContainer={true}
+                scrollEnabled={false}
                 editorInitializedCallback={editorInitializedCallback}
                 onChange={text => setNewWiki(w => ({...w, body: text}))}
               />

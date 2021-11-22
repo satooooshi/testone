@@ -1,3 +1,4 @@
+import { AxiosError } from 'axios';
 import { useQuery } from 'react-query';
 import { EventSchedule } from 'src/types';
 import { axiosInstance } from 'src/utils/url';
@@ -14,7 +15,7 @@ const getEventDetail = async (id: string) => {
 };
 
 export const useAPIGetEventDetail = (id: string) => {
-  return useQuery<GetEventDetailResponse, Error>(
+  return useQuery<GetEventDetailResponse, AxiosError>(
     ['getEventDetail', { id }],
     () => getEventDetail(id),
   );

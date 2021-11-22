@@ -16,6 +16,7 @@ interface EditorProps extends EditorConfig {
   readOnly?: boolean;
   config?: any;
   plugins?: string[];
+  imageAccept: string;
   onChange?: (
     data: {
       text: string;

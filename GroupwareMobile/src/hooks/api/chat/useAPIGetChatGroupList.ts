@@ -1,3 +1,4 @@
+import {AxiosError} from 'axios';
 import {useQuery} from 'react-query';
 import {ChatGroup} from '../../../types';
 import {axiosInstance} from '../../../utils/url';
@@ -9,5 +10,5 @@ const getChatGroupList = async (): Promise<ChatGroup[]> => {
 };
 
 export const useAPIGetChatGroupList = () => {
-  return useQuery<ChatGroup[], Error>('chatGroups', getChatGroupList);
+  return useQuery<ChatGroup[], AxiosError>('chatGroups', getChatGroupList);
 };

@@ -25,6 +25,8 @@
     "deepmerge": "^4.2.2",
     "diff": "^5.0.0",
     "formik": "^2.2.9",
+    "intl": "^1.2.5",
+    "jsc-android": "^250230.2.1",
     "jszip": "^3.7.1",
     "luxon": "^2.0.2",
     "markdown-it": "^12.2.0",

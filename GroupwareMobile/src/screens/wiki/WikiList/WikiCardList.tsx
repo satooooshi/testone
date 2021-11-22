@@ -6,7 +6,6 @@ import {
 } from '../../../hooks/api/wiki/useAPIGetWikiList';
 import {Div, Overlay, Text} from 'react-native-magnus';
 import WikiCard from '../../../components/wiki/WikiCard';
-import {WikiListNavigationProps} from '../../../types/navigator/screenProps/Wiki';
 import {ActivityIndicator, FlatList} from 'react-native';
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
 import {useNavigation} from '@react-navigation/native';
@@ -14,12 +13,12 @@ import {useIsFocused} from '@react-navigation/native';
 import SearchForm from '../../../components/common/SearchForm';
 import {useAPIGetTag} from '../../../hooks/api/tag/useAPIGetTag';
 import SearchFormOpenerButton from '../../../components/common/SearchForm/SearchFormOpenerButton';
+import {WikiListNavigationProps} from '../../../types/navigator/drawerScreenProps';
 
 const TopTab = createMaterialTopTabNavigator();
 
 type WikiCardListProps = {
   type?: WikiType;
-  navigation: WikiListNavigationProps;
 };
 
 type RenderWikiCardListProps = {
@@ -36,7 +35,8 @@ const RenderWikiCardList: React.FC<RenderWikiCardListProps> = ({
   status,
   setSearchQuery,
 }) => {
-  const navigation = useNavigation<any>();
+  const navigation: WikiListNavigationProps =
+    useNavigation<WikiListNavigationProps>();
   const isFocused = useIsFocused();
 
   const onEndReached = () => {
@@ -66,7 +66,12 @@ const RenderWikiCardList: React.FC<RenderWikiCardListProps> = ({
           keyExtractor={item => item.id.toString()}
           renderItem={({item}) => (
             <WikiCard
-              onPress={w => navigation.navigate('WikiDetail', {id: w.id})}
+              onPress={w =>
+                navigation.navigate('WikiStack', {
+                  screen: 'WikiDetail',
+                  params: {id: w.id},
+                })
+              }
               wiki={item}
             />
           )}

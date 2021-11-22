@@ -1,3 +1,4 @@
+import { AxiosError } from 'axios';
 import { useQuery } from 'react-query';
 import { User } from 'src/types';
 import { axiosInstance } from 'src/utils/url';
@@ -9,5 +10,5 @@ const getProfile = async (): Promise<User> => {
 };
 
 export const useAPIGetProfile = () => {
-  return useQuery<User, Error>('getProfile', getProfile);
+  return useQuery<User, AxiosError>('getProfile', getProfile);
 };

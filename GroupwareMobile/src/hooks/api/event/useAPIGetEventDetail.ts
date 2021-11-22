@@ -2,6 +2,7 @@ import {EventSchedule} from '../../../types';
 import {axiosInstance} from '../../../utils/url';
 import {getEventDetailURL} from '../../../utils/url/event.url';
 import {useQuery} from 'react-query';
+import {AxiosError} from 'axios';
 
 export type GetEventDetailResponse = Required<EventSchedule> & {
   isJoining: boolean;
@@ -15,7 +16,8 @@ const getEventDetail = async (id: number) => {
 };
 
 export const useAPIGetEventDetail = (id: number) => {
-  return useQuery<GetEventDetailResponse, Error>(['getEventDetail', {id}], () =>
-    getEventDetail(id),
+  return useQuery<GetEventDetailResponse, AxiosError>(
+    ['getEventDetail', {id}],
+    () => getEventDetail(id),
   );
 };

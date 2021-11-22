@@ -2,12 +2,14 @@ import React from 'react';
 import WholeContainer from '../../components/WholeContainer';
 import {ScrollDiv, Div} from 'react-native-magnus';
 import PortalLinkBox from '../../components/PortalLinkBox';
-import {WikiProps} from '../../types/navigator/screenProps/Wiki';
 import {WikiType} from '../../types';
 import {wikiStyles} from '../../styles/screen/wiki/wiki.style';
 import AppHeader, {Tab} from '../../components/Header';
+import {useNavigation} from '@react-navigation/native';
+import {WikiNavigationProps} from '../../types/navigator/drawerScreenProps';
 
-const Wiki: React.FC<WikiProps> = ({navigation}) => {
+const Wiki: React.FC = () => {
+  const navigation = useNavigation<WikiNavigationProps>();
   const tabs: Tab[] = [
     {
       name: '社内Wiki Home',
@@ -24,21 +26,32 @@ const Wiki: React.FC<WikiProps> = ({navigation}) => {
           <PortalLinkBox
             type="rules"
             onPress={() =>
-              navigation.navigate('WikiList', {type: WikiType.RULES})
+              navigation.navigate('WikiStack', {
+                screen: 'WikiList',
+                params: {type: WikiType.RULES},
+              })
             }
           />
         </Div>
         <Div mb={8}>
           <PortalLinkBox
             type="knowledge"
-            onPress={() => navigation.navigate('WikiList', {type: WikiType.QA})}
+            onPress={() =>
+              navigation.navigate('WikiStack', {
+                screen: 'WikiList',
+                params: {type: WikiType.QA},
+              })
+            }
           />
         </Div>
         <Div mb={8}>
           <PortalLinkBox
             type="qa"
             onPress={() =>
-              navigation.navigate('WikiList', {type: WikiType.KNOWLEDGE})
+              navigation.navigate('WikiStack', {
+                screen: 'WikiList',
+                params: {type: WikiType.KNOWLEDGE},
+              })
             }
           />
         </Div>

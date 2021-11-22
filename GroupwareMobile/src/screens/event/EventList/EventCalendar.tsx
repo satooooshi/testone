@@ -21,7 +21,6 @@ import {
 } from '../../../hooks/api/event/useAPIGetEventList';
 import {useAuthenticate} from '../../../contexts/useAuthenticate';
 import {eventTypeColorFactory} from '../../../utils/factory/eventTypeColorFactory';
-import {EventListNavigationProps} from '../../../types/navigator/screenProps/Event';
 import {Button, Div, Icon} from 'react-native-magnus';
 import {darkFontColor} from '../../../utils/colors';
 import {calendarStyles} from '../../../styles/component/event/eventCalendar.style';
@@ -31,11 +30,12 @@ import {
   monthQueryFactoryFromTargetDate,
   weekQueryFactoryFromTargetDate,
 } from '../../../utils/eventQueryRefresh';
+import {useNavigation} from '@react-navigation/native';
+import {EventListNavigationProps} from '../../../types/navigator/drawerScreenProps';
 
 type PersonalCalendarProps = {
   personal?: boolean;
   searchResult?: SearchResultToGetEvents;
-  navigation: EventListNavigationProps;
   searchQuery: SearchQueryToGetEvents;
   setSearchQuery: Dispatch<SetStateAction<SearchQueryToGetEvents>>;
 };
@@ -43,11 +43,11 @@ type PersonalCalendarProps = {
 type CustomMode = 'week' | 'day' | 'month';
 
 const EventCalendar: React.FC<PersonalCalendarProps> = ({
-  navigation,
   personal,
   searchResult,
   setSearchQuery,
 }) => {
+  const navigation = useNavigation<EventListNavigationProps>();
   const {user} = useAuthenticate();
   const [calendarMode, setCalendarMode] = useState<{
     mode: CustomMode;
@@ -212,6 +212,10 @@ const EventCalendar: React.FC<PersonalCalendarProps> = ({
             borderColor="#e0e0e0"
             borderWidth={1}
             h={40}
+            w={80}
+            justifyContent="center"
+            alignItems="center"
+            p={0}
             onPress={onPressTodayButton}
             color={darkFontColor}>
             今日
@@ -222,6 +226,10 @@ const EventCalendar: React.FC<PersonalCalendarProps> = ({
             borderColor="#e0e0e0"
             borderWidth={1}
             h={40}
+            w={40}
+            justifyContent="center"
+            alignItems="center"
+            p={0}
             onPress={() => onPressNextOrPreviousButton('previous')}
             color={darkFontColor}>
             <Icon name="left" />
@@ -232,6 +240,10 @@ const EventCalendar: React.FC<PersonalCalendarProps> = ({
             borderColor="#e0e0e0"
             borderWidth={1}
             h={40}
+            w={40}
+            justifyContent="center"
+            alignItems="center"
+            p={0}
             onPress={() => onPressNextOrPreviousButton('next')}
             color={darkFontColor}>
             <Icon name="right" />
@@ -244,6 +256,10 @@ const EventCalendar: React.FC<PersonalCalendarProps> = ({
             borderColor="#e0e0e0"
             borderWidth={1}
             h={40}
+            w={40}
+            justifyContent="center"
+            alignItems="center"
+            p={0}
             onPress={() => onPressModeChangerButton('month')}
             color={darkFontColor}>
             月
@@ -254,6 +270,10 @@ const EventCalendar: React.FC<PersonalCalendarProps> = ({
             borderColor="#e0e0e0"
             borderWidth={1}
             h={40}
+            w={40}
+            justifyContent="center"
+            alignItems="center"
+            p={0}
             onPress={() => onPressModeChangerButton('week')}
             color={darkFontColor}>
             週
@@ -264,6 +284,10 @@ const EventCalendar: React.FC<PersonalCalendarProps> = ({
             borderColor="#e0e0e0"
             borderWidth={1}
             h={40}
+            w={40}
+            justifyContent="center"
+            alignItems="center"
+            p={0}
             onPress={() => onPressModeChangerButton('day')}
             color={darkFontColor}>
             日
@@ -293,7 +317,10 @@ const EventCalendar: React.FC<PersonalCalendarProps> = ({
         events={memorizedEvent}
         mode={calendarMode.mode}
         onPressEvent={event => {
-          navigation.navigate('EventDetail', {id: event.id});
+          navigation.navigate('EventStack', {
+            screen: 'EventDetail',
+            params: {id: event.id},
+          });
         }}
         onPressCell={date => setCalendarMode({mode: 'day', targetDate: date})}
         height={calendarHeight}

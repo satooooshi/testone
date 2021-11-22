@@ -1,3 +1,4 @@
+import {AxiosError} from 'axios';
 import {useMutation, UseMutationOptions} from 'react-query';
 import {EventSchedule} from '../../../types';
 import {axiosInstance, jsonHeader} from '../../../utils/url';
@@ -19,12 +20,12 @@ const createEvent = async (
 export const useAPICreateEvent = (
   mutationOptions?: UseMutationOptions<
     EventSchedule,
-    Error,
+    AxiosError,
     Partial<EventSchedule>,
     unknown
   >,
 ) => {
-  return useMutation<EventSchedule, Error, Partial<EventSchedule>>(
+  return useMutation<EventSchedule, AxiosError, Partial<EventSchedule>>(
     createEvent,
     mutationOptions,
   );

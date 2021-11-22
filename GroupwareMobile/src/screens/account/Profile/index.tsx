@@ -1,4 +1,4 @@
-import {useIsFocused} from '@react-navigation/native';
+import {useIsFocused, useNavigation} from '@react-navigation/native';
 import {useFormik} from 'formik';
 import React, {useEffect, useState} from 'react';
 import {
@@ -30,7 +30,7 @@ import {useSelectedTags} from '../../../hooks/tag/useSelectedTags';
 import {useTagType} from '../../../hooks/tag/useTagType';
 import {profileStyles} from '../../../styles/screen/account/profile.style';
 import {TagType, User} from '../../../types';
-import {ProfileProps} from '../../../types/navigator/screenProps/Account';
+import {ProfileNavigationProps} from '../../../types/navigator/drawerScreenProps/account';
 import {uploadImageFromGallery} from '../../../utils/cropImage/uploadImageFromGallery';
 const initialValues: Partial<User> = {
   email: '',
@@ -45,7 +45,8 @@ const initialValues: Partial<User> = {
   tags: [],
 };
 
-const Profile: React.FC<ProfileProps> = ({navigation}) => {
+const Profile: React.FC = () => {
+  const navigation = useNavigation<ProfileNavigationProps>();
   const {
     data: profile,
     refetch,
@@ -92,7 +93,8 @@ const Profile: React.FC<ProfileProps> = ({navigation}) => {
   const tabs: Tab[] = [
     {
       name: 'アカウント情報',
-      onPress: () => navigation.navigate('AccountDetail'),
+      onPress: () =>
+        navigation.navigate('AccountStack', {screen: 'AccountDetail'}),
     },
     {
       name: 'プロフィール編集',
@@ -100,7 +102,8 @@ const Profile: React.FC<ProfileProps> = ({navigation}) => {
     },
     {
       name: 'パスワード更新',
-      onPress: () => navigation.navigate('UpdatePassword'),
+      onPress: () =>
+        navigation.navigate('AccountStack', {screen: 'UpdatePassword'}),
     },
   ];
 

@@ -1,3 +1,4 @@
+import { AxiosError } from 'axios';
 import { useQuery } from 'react-query';
 import { QABestAnswer } from 'src/types';
 import { axiosInstance } from 'src/utils/url';
@@ -9,7 +10,7 @@ const getBestAnswer = async (id: string): Promise<QABestAnswer> => {
 };
 
 export const useAPIGetBestAnswer = (id: string) => {
-  return useQuery<QABestAnswer, Error>('getBestAnswer', () =>
+  return useQuery<QABestAnswer, AxiosError>('getBestAnswer', () =>
     getBestAnswer(id),
   );
 };

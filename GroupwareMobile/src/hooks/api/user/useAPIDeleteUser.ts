@@ -1,3 +1,4 @@
+import {AxiosError} from 'axios';
 import {useMutation, UseMutationOptions} from 'react-query';
 import {User} from '../../../types';
 import {axiosInstance, jsonHeader} from '../../../utils/url';
@@ -11,7 +12,7 @@ const deleteUser = async (user: User): Promise<User> => {
 };
 
 export const useAPIDeleteUser = (
-  mutationOptions?: UseMutationOptions<User, Error, User, unknown>,
+  mutationOptions?: UseMutationOptions<User, AxiosError, User, unknown>,
 ) => {
-  return useMutation<User, Error, User>(deleteUser, mutationOptions);
+  return useMutation<User, AxiosError, User>(deleteUser, mutationOptions);
 };

@@ -431,6 +431,7 @@ const CreateNewUser = () => {
             <FormToLinkTag
               tags={values?.tags || []}
               tagType={TagType.TECH}
+              toggleTag={toggleSelectedTag}
               onEditButtonClick={() => dispatchModal({ type: 'openTech' })}
             />
           </Box>
@@ -450,6 +451,7 @@ const CreateNewUser = () => {
             <FormToLinkTag
               tags={values?.tags || []}
               tagType={TagType.QUALIFICATION}
+              toggleTag={toggleSelectedTag}
               onEditButtonClick={() =>
                 dispatchModal({ type: 'openQualification' })
               }
@@ -471,6 +473,7 @@ const CreateNewUser = () => {
             <FormToLinkTag
               tags={values?.tags || []}
               tagType={TagType.CLUB}
+              toggleTag={toggleSelectedTag}
               onEditButtonClick={() => dispatchModal({ type: 'openClub' })}
             />
           </Box>
@@ -490,6 +493,7 @@ const CreateNewUser = () => {
             <FormToLinkTag
               tags={values?.tags || []}
               tagType={TagType.HOBBY}
+              toggleTag={toggleSelectedTag}
               onEditButtonClick={() => dispatchModal({ type: 'openHobby' })}
             />
           </Box>

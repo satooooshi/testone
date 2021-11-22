@@ -1,4 +1,4 @@
-import {useIsFocused} from '@react-navigation/native';
+import {useIsFocused, useNavigation} from '@react-navigation/native';
 import React, {Dispatch, SetStateAction, useEffect, useRef} from 'react';
 import {FlatList} from 'react-native';
 import {Div, Dropdown} from 'react-native-magnus';
@@ -10,7 +10,7 @@ import {
 } from '../../hooks/api/user/useAPISearchUsers';
 import {userListStyles} from '../../styles/screen/user/userList.style';
 import {UserRoleInApp} from '../../types';
-import {UserListNavigationProps} from '../../types/navigator/screenProps/UserList';
+import {UsersListNavigationProps} from '../../types/navigator/drawerScreenProps';
 import {
   defaultDropdownProps,
   defaultDropdownOptionProps,
@@ -19,7 +19,6 @@ import {
 type UserCardListProps = {
   userRole: UserRoleInApp;
   searchResult: SearchResultToGetUsers | undefined;
-  navigation: UserListNavigationProps;
   searchQuery: SearchQueryToGetUsers;
   setSearchQuery: Dispatch<SetStateAction<SearchQueryToGetUsers>>;
 };
@@ -27,10 +26,10 @@ type UserCardListProps = {
 const UserCardList: React.FC<UserCardListProps> = ({
   userRole,
   searchResult,
-  navigation,
   searchQuery,
   setSearchQuery,
 }) => {
+  const navigation = useNavigation<UsersListNavigationProps>();
   const isFocused = useIsFocused();
   const sortDropdownRef = useRef<any | null>(null);
   const durationDropdownRef = useRef<any | null>(null);
@@ -148,7 +147,12 @@ const UserCardList: React.FC<UserCardListProps> = ({
             <Div mb={'lg'}>
               <UserCard
                 filteredDuration={searchQuery.duration}
-                onPress={() => navigation.navigate('AccountDetail', {id: u.id})}
+                onPress={() =>
+                  navigation.navigate('AccountStack', {
+                    screen: 'AccountDetail',
+                    params: {id: u.id},
+                  })
+                }
                 onPressTag={tag =>
                   setSearchQuery(q => ({...q, tag: tag.id.toString()}))
                 }

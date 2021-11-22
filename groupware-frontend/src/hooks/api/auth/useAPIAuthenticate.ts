@@ -1,3 +1,4 @@
+import { AxiosError } from 'axios';
 import { useMutation, UseMutationOptions } from 'react-query';
 import { User } from 'src/types';
 import { axiosInstance } from 'src/utils/url';
@@ -11,7 +12,15 @@ const apiAuthenticate = async (): Promise<Partial<User>> => {
 };
 
 export const useAPIAuthenticate = (
-  mutationOptions?: UseMutationOptions<Partial<User>, Error, unknown, unknown>,
+  mutationOptions?: UseMutationOptions<
+    Partial<User>,
+    AxiosError,
+    unknown,
+    unknown
+  >,
 ) => {
-  return useMutation<Partial<User>, Error>(apiAuthenticate, mutationOptions);
+  return useMutation<Partial<User>, AxiosError>(
+    apiAuthenticate,
+    mutationOptions,
+  );
 };

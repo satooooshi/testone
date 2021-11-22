@@ -1,3 +1,4 @@
+import {useNavigation} from '@react-navigation/native';
 import {useFormik} from 'formik';
 import React, {useEffect, useState} from 'react';
 import {Alert, TouchableOpacity, useWindowDimensions} from 'react-native';
@@ -21,12 +22,13 @@ import {useSelectedUsers} from '../../../hooks/user/useSelectedUsers';
 import {useUserRole} from '../../../hooks/user/useUserRole';
 import {newRoomStyles} from '../../../styles/screen/chat/newRoom.style';
 import {ChatGroup} from '../../../types';
-import {NewRoomProps} from '../../../types/navigator/screenProps/Chat';
+import {NewRoomNavigationProps} from '../../../types/navigator/drawerScreenProps';
 import {uploadImageFromGallery} from '../../../utils/cropImage/uploadImageFromGallery';
 import {userNameFactory} from '../../../utils/factory/userNameFactory';
 import {savingRoomSchema} from '../../../utils/validation/schema';
 
-const NewRoom: React.FC<NewRoomProps> = ({navigation}) => {
+const NewRoom: React.FC = () => {
+  const navigation = useNavigation<NewRoomNavigationProps>();
   const {width: windowWidth} = useWindowDimensions();
   const {mutate: uploadImage} = useAPIUploadStorage();
   const [visibleUserModal, setVisibleUserModal] = useState(false);
@@ -49,7 +51,10 @@ const NewRoom: React.FC<NewRoomProps> = ({navigation}) => {
         {
           text: 'OK',
           onPress: () => {
-            navigation.navigate('RoomList');
+            navigation.navigate('ChatStack', {
+              screen: 'RoomList',
+              params: {needRefetch: true},
+            });
           },
         },
       ]);

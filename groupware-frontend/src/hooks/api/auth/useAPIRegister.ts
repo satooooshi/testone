@@ -1,3 +1,4 @@
+import { AxiosError } from 'axios';
 import { useMutation, UseMutationOptions } from 'react-query';
 import { User } from 'src/types';
 import { axiosInstance } from 'src/utils/url';
@@ -16,9 +17,14 @@ const register = async (data: Partial<User>) => {
 };
 
 export const useAPIRegister = (
-  mutationOptions?: UseMutationOptions<User, Error, Partial<User>, unknown>,
+  mutationOptions?: UseMutationOptions<
+    User,
+    AxiosError,
+    Partial<User>,
+    unknown
+  >,
 ) => {
-  return useMutation<User, Error, Partial<User>>(
+  return useMutation<User, AxiosError, Partial<User>>(
     (dto) => register(dto),
     mutationOptions,
   );

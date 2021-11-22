@@ -1,3 +1,4 @@
+import { AxiosError } from 'axios';
 import { useQuery, UseQueryOptions } from 'react-query';
 import { ChatMessage } from 'src/types';
 import { axiosInstance } from 'src/utils/url';
@@ -18,9 +19,9 @@ const getMessages = async (query: GetMessagesQuery) => {
 
 export const useAPIGetMessages = (
   query: GetMessagesQuery,
-  options?: UseQueryOptions<ChatMessage[], Error>,
+  options?: UseQueryOptions<ChatMessage[], AxiosError>,
 ) => {
-  return useQuery<ChatMessage[], Error>(
+  return useQuery<ChatMessage[], AxiosError>(
     ['getMessages', query],
     () => getMessages(query),
     options,

@@ -1,4 +1,4 @@
-import {useIsFocused} from '@react-navigation/native';
+import {useNavigation} from '@react-navigation/native';
 import React, {useEffect, useState} from 'react';
 import {ActivityIndicator, FlatList} from 'react-native';
 import {Div, Overlay} from 'react-native-magnus';
@@ -8,9 +8,15 @@ import WholeContainer from '../../../components/WholeContainer';
 import {useAPIGetRooms} from '../../../hooks/api/chat/useAPIGetRoomsByPage';
 import {roomListStyles} from '../../../styles/screen/chat/roomList.style';
 import {ChatGroup} from '../../../types';
-import {RoomListProps} from '../../../types/navigator/screenProps/Chat';
+import {
+  RoomListNavigationProps,
+  RoomListRouteProps,
+} from '../../../types/navigator/drawerScreenProps';
 
-const RoomList: React.FC<RoomListProps> = ({navigation}) => {
+const RoomList: React.FC = () => {
+  const navigation = useNavigation<RoomListNavigationProps>();
+  const route = useNavigation<RoomListRouteProps>();
+  const needRefetch = route.params?.needRefetch;
   const [page, setPage] = useState('1');
   const [roomsForInfiniteScroll, setRoomsForInfiniteScroll] = useState<
     ChatGroup[]
@@ -22,10 +28,9 @@ const RoomList: React.FC<RoomListProps> = ({navigation}) => {
   } = useAPIGetRooms({
     page,
   });
-  const isFocused = useIsFocused();
 
   const onPressRightButton = () => {
-    navigation.navigate('NewRoom');
+    navigation.navigate('ChatStack', {screen: 'NewRoom'});
   };
 
   const onEndReached = () => {
@@ -33,11 +38,11 @@ const RoomList: React.FC<RoomListProps> = ({navigation}) => {
   };
 
   useEffect(() => {
-    if (isFocused) {
+    if (needRefetch) {
       setRoomsForInfiniteScroll([]);
       refetch();
     }
-  }, [isFocused, refetch]);
+  }, [refetch, needRefetch]);
 
   useEffect(() => {
     if (chatRooms?.rooms?.length) {
@@ -63,7 +68,12 @@ const RoomList: React.FC<RoomListProps> = ({navigation}) => {
           <Div mb="lg">
             <RoomCard
               room={room}
-              onPress={() => navigation.navigate('Chat', {room})}
+              onPress={() =>
+                navigation.navigate('ChatStack', {
+                  screen: 'Chat',
+                  params: {room},
+                })
+              }
             />
           </Div>
         )}

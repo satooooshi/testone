@@ -2,6 +2,7 @@ import { useMutation, UseMutationOptions } from 'react-query';
 import { axiosInstance } from 'src/utils/url';
 import { updatePasswordURL } from 'src/utils/url/user.url';
 import { jsonHeader } from 'src/utils/url/header';
+import { AxiosError } from 'axios';
 
 type UpdatePasswordDto = {
   currentPassword: string;
@@ -16,9 +17,14 @@ const updatePassword = async (user: UpdatePasswordDto) => {
 };
 
 export const useAPIUpdatePassword = (
-  mutationOptions?: UseMutationOptions<void, Error, UpdatePasswordDto, unknown>,
+  mutationOptions?: UseMutationOptions<
+    void,
+    AxiosError,
+    UpdatePasswordDto,
+    unknown
+  >,
 ) => {
-  return useMutation<void, Error, UpdatePasswordDto>(
+  return useMutation<void, AxiosError, UpdatePasswordDto>(
     updatePassword,
     mutationOptions,
   );

@@ -2,7 +2,6 @@ import React, {useEffect, useState} from 'react';
 import WholeContainer from '../../../components/WholeContainer';
 import {ScrollDiv, Div, Text, Avatar} from 'react-native-magnus';
 import RenderHtml from 'react-native-render-html';
-import {WikiDetailProps} from '../../../types/navigator/screenProps/Wiki';
 import {useAPIGetWikiDetail} from '../../../hooks/api/wiki/useAPIGetWikiDetail';
 import MarkdownIt from 'markdown-it';
 import {TouchableOpacity, useWindowDimensions} from 'react-native';
@@ -12,6 +11,7 @@ import {darkFontColor} from '../../../utils/colors';
 import {userNameFactory} from '../../../utils/factory/userNameFactory';
 import {wikiDetailStyles} from '../../../styles/screen/wiki/wikiDetail.style';
 import {User} from '../../../types';
+import {WikiDetailProps} from '../../../types/navigator/drawerScreenProps';
 
 const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
   const {id} = route.params;
@@ -32,13 +32,19 @@ const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
 
   const onPressHeaderRightButton = () => {
     if (wikiInfo) {
-      navigation.navigate('EditWiki', {id: wikiInfo.id});
+      navigation.navigate('WikiStack', {
+        screen: 'EditWiki',
+        params: {id: wikiInfo.id},
+      });
     }
     // else error handling
   };
 
   const onPressAvatar = (user: User) => {
-    navigation.navigate('AccountDetail', {id: user.id});
+    navigation.navigate('AccountStack', {
+      screen: 'AccountDetail',
+      params: {id: user.id},
+    });
   };
 
   return (

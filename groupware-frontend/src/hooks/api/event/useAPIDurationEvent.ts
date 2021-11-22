@@ -1,3 +1,4 @@
+import { AxiosError } from 'axios';
 import { useQuery } from 'react-query';
 import { EventSchedule } from 'src/types';
 import { axiosInstance } from 'src/utils/url';
@@ -17,7 +18,7 @@ const getDurationEvent = async (status: Status): Promise<EventSchedule[]> => {
 };
 
 export const useAPIDurationEvent = (status: Status) => {
-  return useQuery<SearchResultToGetEvents | EventSchedule[], Error>(
+  return useQuery<SearchResultToGetEvents | EventSchedule[], AxiosError>(
     ['events', status],
     () => getDurationEvent(status),
   );

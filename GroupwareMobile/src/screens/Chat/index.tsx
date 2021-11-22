@@ -17,7 +17,6 @@ import {useAPISendChatMessage} from '../../hooks/api/chat/useAPISendChatMessage'
 import {useAPIUploadStorage} from '../../hooks/api/storage/useAPIUploadStorage';
 import {chatStyles} from '../../styles/screen/chat/chat.style';
 import {ChatMessage, ChatMessageType} from '../../types';
-import {ChatProps} from '../../types/navigator/screenProps/Chat';
 import {uploadImageFromGallery} from '../../utils/cropImage/uploadImageFromGallery';
 import DocumentPicker from 'react-native-document-picker';
 import ImageView from 'react-native-image-viewing';
@@ -32,13 +31,17 @@ import FileMessage from '../../components/chat/ChatMessage/FileMessage';
 import RNFetchBlob from 'rn-fetch-blob';
 const {fs, config} = RNFetchBlob;
 import FileViewer from 'react-native-file-viewer';
+import {KeyboardAwareFlatList} from 'react-native-keyboard-aware-scroll-view';
+import {useRoute} from '@react-navigation/native';
+import {ChatRouteProps} from '../../types/navigator/drawerScreenProps';
 
 type ImageSource = {
   uri: string;
 };
 
-const Chat: React.FC<ChatProps> = ({route}) => {
+const Chat: React.FC = () => {
   const {height: windowHeight} = useWindowDimensions();
+  const route = useRoute<ChatRouteProps>();
   const {room} = route.params;
   const [page, setPage] = useState(1);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -56,7 +59,7 @@ const Chat: React.FC<ChatProps> = ({route}) => {
       group: room.id,
       page: '1',
     },
-    {refetchInterval: 1000},
+    {refetchInterval: 3000},
   );
   const suggestions = (): Suggestion[] => {
     if (!room.members) {
@@ -189,40 +192,151 @@ const Chat: React.FC<ChatProps> = ({route}) => {
   };
 
   useEffect(() => {
-    if (latestMessage && latestMessage.length) {
-      setMessages(m => {
-        if (
-          m &&
-          m.length &&
-          isRecent(latestMessage[latestMessage.length - 1], m[0])
-        ) {
-          return [...latestMessage, ...m];
-        } else {
-          return m;
+    if (latestMessage?.length && messages?.length) {
+      const msgToAppend: ChatMessage[] = [];
+      for (const sentMsg of latestMessage) {
+        if (isRecent(sentMsg, messages[0])) {
+          msgToAppend.unshift(sentMsg);
         }
+      }
+      setMessages(m => {
+        return [...msgToAppend, ...m];
       });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [latestMessage]);
 
   useEffect(() => {
     if (fetchedMessage?.length) {
-      setMessages(m => {
-        if (
-          m.length &&
-          isRecent(m[m.length - 1], fetchedMessage[fetchedMessage.length - 1])
-        ) {
+      const handleImages = () => {
+        const fetchedImages: ImageSource[] = fetchedMessage
+          .filter(m => m.type === ChatMessageType.IMAGE)
+          .map(m => ({uri: m.content}))
+          .reverse();
+        setImages(fetchedImages);
+      };
+      if (
+        messages?.length &&
+        isRecent(
+          messages[messages.length - 1],
+          fetchedMessage[fetchedMessage.length - 1],
+        )
+      ) {
+        setMessages(m => {
           return [...m, ...fetchedMessage];
-        } else {
-          return fetchedMessage;
-        }
-      });
-      const fetchedImages: ImageSource[] = fetchedMessage
-        .filter(m => m.type === ChatMessageType.IMAGE)
-        .map(m => ({uri: m.content}))
-        .reverse();
-      setImages(fetchedImages);
+        });
+        handleImages();
+      } else if (!messages?.length) {
+        setMessages(fetchedMessage);
+        handleImages();
+      }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fetchedMessage]);
+
+  const messageListAvoidngKeyboardDisturb = (
+    <>
+      {Platform.OS === 'ios' ? (
+        <KeyboardAvoidingView
+          keyboardVerticalOffset={
+            Platform.OS === 'ios' ? windowHeight * 0.16 : windowHeight * 0.03
+          }
+          style={[
+            chatStyles.keyboardAvoidingView,
+            Platform.OS === 'ios'
+              ? chatStyles.keyboardAvoidingViewIOS
+              : chatStyles.keyboardAvoidingViewAndroid,
+          ]}
+          behavior={Platform.OS === 'ios' ? 'height' : undefined}>
+          <FlatList
+            style={chatStyles.flatlist}
+            contentContainerStyle={chatStyles.flatlistContent}
+            inverted
+            data={messages}
+            {...{onEndReached}}
+            renderItem={({item: message}) => (
+              <Div
+                alignSelf={message?.isSender ? 'flex-end' : 'flex-start'}
+                mb={'sm'}>
+                {message.type === ChatMessageType.TEXT ? (
+                  <TextMessage message={message} />
+                ) : message.type === ChatMessageType.IMAGE ? (
+                  <ImageMessage
+                    onPress={() => showImageOnModal(message.content)}
+                    message={message}
+                  />
+                ) : message.type === ChatMessageType.VIDEO ? (
+                  <VideoMessage
+                    message={message}
+                    onPress={() => playVideoOnModal(message.content)}
+                  />
+                ) : message.type === ChatMessageType.OTHER_FILE ? (
+                  <FileMessage
+                    message={message}
+                    onPress={() => downloadFile(message)}
+                  />
+                ) : null}
+              </Div>
+            )}
+          />
+          <ChatFooter
+            onUploadFile={handleUploadFile}
+            onUploadVideo={handleUploadVideo}
+            onUploadImage={handleUploadImage}
+            text={newMessage}
+            onChangeText={t => setNewMessage(t)}
+            onSend={handleSend}
+            mentionSuggestions={suggestions()}
+          />
+        </KeyboardAvoidingView>
+      ) : (
+        <>
+          <KeyboardAwareFlatList
+            refreshing={true}
+            style={chatStyles.flatlist}
+            contentContainerStyle={chatStyles.flatlistContent}
+            inverted
+            data={messages}
+            {...{onEndReached}}
+            keyExtractor={item => item.id.toString()}
+            renderItem={({item: message}) => (
+              <Div
+                alignSelf={message?.isSender ? 'flex-end' : 'flex-start'}
+                mb={'sm'}>
+                {message.type === ChatMessageType.TEXT ? (
+                  <TextMessage message={message} />
+                ) : message.type === ChatMessageType.IMAGE ? (
+                  <ImageMessage
+                    onPress={() => showImageOnModal(message.content)}
+                    message={message}
+                  />
+                ) : message.type === ChatMessageType.VIDEO ? (
+                  <VideoMessage
+                    message={message}
+                    onPress={() => playVideoOnModal(message.content)}
+                  />
+                ) : message.type === ChatMessageType.OTHER_FILE ? (
+                  <FileMessage
+                    message={message}
+                    onPress={() => downloadFile(message)}
+                  />
+                ) : null}
+              </Div>
+            )}
+          />
+          <ChatFooter
+            onUploadFile={handleUploadFile}
+            onUploadVideo={handleUploadVideo}
+            onUploadImage={handleUploadImage}
+            text={newMessage}
+            onChangeText={t => setNewMessage(t)}
+            onSend={handleSend}
+            mentionSuggestions={suggestions()}
+          />
+        </>
+      )}
+    </>
+  );
 
   return (
     <WholeContainer>
@@ -260,58 +374,7 @@ const Chat: React.FC<ChatProps> = ({route}) => {
         enableBackButton={true}
         screenForBack={'RoomList'}
       />
-      <KeyboardAvoidingView
-        keyboardVerticalOffset={
-          Platform.OS === 'ios' ? windowHeight * 0.16 : windowHeight * 0.03
-        }
-        style={[
-          chatStyles.keyboardAvoidingView,
-          Platform.OS === 'ios'
-            ? chatStyles.keyboardAvoidingViewIOS
-            : chatStyles.keyboardAvoidingViewAndroid,
-        ]}
-        behavior={Platform.OS === 'ios' ? 'height' : undefined}>
-        <FlatList
-          style={chatStyles.flatlist}
-          contentContainerStyle={chatStyles.flatlistContent}
-          inverted
-          data={messages}
-          {...{onEndReached}}
-          renderItem={({item: message}) => (
-            <Div
-              alignSelf={message?.isSender ? 'flex-end' : 'flex-start'}
-              mb={'sm'}>
-              {message.type === ChatMessageType.TEXT ? (
-                <TextMessage message={message} />
-              ) : message.type === ChatMessageType.IMAGE ? (
-                <ImageMessage
-                  onPress={() => showImageOnModal(message.content)}
-                  message={message}
-                />
-              ) : message.type === ChatMessageType.VIDEO ? (
-                <VideoMessage
-                  message={message}
-                  onPress={() => playVideoOnModal(message.content)}
-                />
-              ) : message.type === ChatMessageType.OTHER_FILE ? (
-                <FileMessage
-                  message={message}
-                  onPress={() => downloadFile(message)}
-                />
-              ) : null}
-            </Div>
-          )}
-        />
-        <ChatFooter
-          onUploadFile={handleUploadFile}
-          onUploadVideo={handleUploadVideo}
-          onUploadImage={handleUploadImage}
-          text={newMessage}
-          onChangeText={t => setNewMessage(t)}
-          onSend={handleSend}
-          mentionSuggestions={suggestions()}
-        />
-      </KeyboardAvoidingView>
+      {messageListAvoidngKeyboardDisturb}
     </WholeContainer>
   );
 };

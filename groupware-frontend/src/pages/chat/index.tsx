@@ -2,7 +2,6 @@ import { SidebarScreenName } from '@/components/layout/Sidebar';
 import chatStyles from '@/styles/layouts/Chat.module.scss';
 import { useState } from 'react';
 import { useAPIGetUsers } from '@/hooks/api/user/useAPIGetUsers';
-import { ChatGroup, User } from 'src/types';
 import { useAPIGetChatGroupList } from '@/hooks/api/chat/useAPIGetChatGroupList';
 import CreateChatGroupModal from '@/components/chat/CreateChatGroupModal';
 import { useMediaQuery, useToast } from '@chakra-ui/react';
@@ -14,22 +13,24 @@ import Head from 'next/head';
 import { useRouter } from 'next/router';
 import selectChatGroupModalStyles from '@/styles/components/SelectChatGroupModal.module.scss';
 import { useAPISaveChatGroup } from '@/hooks/api/chat/useAPISaveChatGroup';
+import { useAPIUploadStorage } from '@/hooks/api/storage/useAPIUploadStorage';
+import { responseErrorMsgFactory } from 'src/utils/factory/responseErrorMsgFactory';
 
 const Chat = () => {
   const router = useRouter();
   const toast = useToast();
   const { data: chatGroups, refetch } = useAPIGetChatGroupList();
   const { data: users } = useAPIGetUsers();
+  const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
   const [createGroupWindow, setCreateGroupWindow] = useState(false);
-  const [newGroup, setNewGroup] = useState<Partial<ChatGroup>>({
-    name: '',
-    members: [],
-  });
+  const [resetFormTrigger, setResetFormTrigger] = useState(false);
+  const [groupImageURL, setGroupImageURL] = useState('');
 
   const { mutate: createGroup } = useAPISaveChatGroup({
-    onSuccess: () => {
+    onSuccess: (data) => {
       setCreateGroupWindow(false);
-      setNewGroup({ name: '', members: [] });
+      setResetFormTrigger(true);
+      groupImageURL && setGroupImageURL('');
       refetch();
       toast({
         description: 'チャットルームの作成が完了しました。',
@@ -37,24 +38,17 @@ const Chat = () => {
         duration: 3000,
         isClosable: true,
       });
+      router.push(`/chat/${data.id.toString()}`, undefined, {
+        shallow: true,
+      });
     },
   });
-  const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
 
-  const toggleUserIDs = (user: User) => {
-    const isExist = newGroup.members?.filter((u) => u.id === user.id);
-    if (isExist && isExist.length) {
-      setNewGroup((g) => ({
-        ...g,
-        members: g.members?.filter((u) => u.id !== user.id),
-      }));
-      return;
-    }
-    setNewGroup((g) => ({
-      ...g,
-      members: g.members ? [...g.members, user] : [user],
-    }));
-  };
+  const { mutate: uploadImage } = useAPIUploadStorage({
+    onSuccess: async (fileURLs) => {
+      setGroupImageURL(fileURLs[0]);
+    },
+  });
 
   return (
     <LayoutWithTab
@@ -70,17 +64,15 @@ const Chat = () => {
       {users && (
         <CreateChatGroupModal
           isOpen={createGroupWindow}
+          users={users}
+          resetFormTrigger={resetFormTrigger}
+          groupImageURL={groupImageURL}
+          setResetFormTrigger={setResetFormTrigger}
           closeModal={() => {
             setCreateGroupWindow(false);
-            setNewGroup({});
           }}
-          newGroup={newGroup}
-          onChangeNewGroupName={(groupName) =>
-            setNewGroup((g) => ({ ...g, name: groupName }))
-          }
-          toggleNewGroupMember={toggleUserIDs}
-          users={users}
-          createGroup={(g) => createGroup(g)}
+          createGroup={(g) => createGroup({ ...g, imageURL: groupImageURL })}
+          uploadImage={(r) => uploadImage(r)}
         />
       )}
       {chatGroups && isSmallerThan768 ? (

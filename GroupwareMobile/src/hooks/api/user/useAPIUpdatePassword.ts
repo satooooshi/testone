@@ -1,3 +1,4 @@
+import {AxiosError} from 'axios';
 import {useMutation, UseMutationOptions} from 'react-query';
 import {axiosInstance} from '../../../utils/url';
 import {updatePasswordURL} from '../../../utils/url/user.url';
@@ -13,9 +14,14 @@ const updatePassword = async (user: UpdatePasswordDto) => {
 };
 
 export const useAPIUpdatePassword = (
-  mutationOptions?: UseMutationOptions<void, Error, UpdatePasswordDto, unknown>,
+  mutationOptions?: UseMutationOptions<
+    void,
+    AxiosError,
+    UpdatePasswordDto,
+    unknown
+  >,
 ) => {
-  return useMutation<void, Error, UpdatePasswordDto>(
+  return useMutation<void, AxiosError, UpdatePasswordDto>(
     updatePassword,
     mutationOptions,
   );

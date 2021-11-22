@@ -1,3 +1,4 @@
+import {useNavigation} from '@react-navigation/native';
 import React from 'react';
 import {ActivityIndicator, Alert, useWindowDimensions} from 'react-native';
 import {Overlay, ScrollDiv} from 'react-native-magnus';
@@ -10,9 +11,10 @@ import {useAPIGetUserTag} from '../../../hooks/api/tag/useAPIGetUserTag';
 import {useTagType} from '../../../hooks/tag/useTagType';
 import {tagAdminStyles} from '../../../styles/screen/admin/tagAdmin.style';
 import {TagType, UserTag} from '../../../types';
-import {TagAdminProps} from '../../../types/navigator/screenProps/Admin';
+import {UserTagAdminNavigationProps} from '../../../types/navigator/drawerScreenProps';
 
-const UserTagAdmin: React.FC<TagAdminProps> = ({navigation}) => {
+const UserTagAdmin: React.FC = () => {
+  const navigation = useNavigation<UserTagAdminNavigationProps>();
   const {data: tags, refetch, isLoading: loadingTags} = useAPIGetUserTag();
   const {mutate: createTag, isLoading: loadingCreateTag} = useAPICreateUserTag({
     onSuccess: () => {
@@ -54,15 +56,16 @@ const UserTagAdmin: React.FC<TagAdminProps> = ({navigation}) => {
   const tabs: Tab[] = [
     {
       name: 'ユーザー管理',
-      onPress: () => navigation.navigate('UserAdmin'),
+      onPress: () => navigation.navigate('AdminStack', {screen: 'UserAdmin'}),
     },
     {
       name: 'ユーザー作成',
-      onPress: () => navigation.navigate('UserRegisteringAdmin'),
+      onPress: () =>
+        navigation.navigate('AdminStack', {screen: 'UserRegisteringAdmin'}),
     },
     {
       name: 'タグ管理',
-      onPress: () => navigation.navigate('TagAdmin'),
+      onPress: () => navigation.navigate('AdminStack', {screen: 'TagAdmin'}),
     },
     {
       name: 'タグ管理(ユーザー)',

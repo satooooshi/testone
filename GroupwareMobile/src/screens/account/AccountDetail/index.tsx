@@ -1,5 +1,5 @@
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
-import {useIsFocused} from '@react-navigation/native';
+import {useIsFocused, useNavigation, useRoute} from '@react-navigation/native';
 import React, {useEffect, useState} from 'react';
 import {ActivityIndicator, useWindowDimensions} from 'react-native';
 import {Text, Div, ScrollDiv, Image, Overlay} from 'react-native-magnus';
@@ -10,13 +10,15 @@ import WholeContainer from '../../../components/WholeContainer';
 import WikiCard from '../../../components/wiki/WikiCard';
 import {useAuthenticate} from '../../../contexts/useAuthenticate';
 import {useAPIGetEventList} from '../../../hooks/api/event/useAPIGetEventList';
-import {useAPIGetTag} from '../../../hooks/api/tag/useAPIGetTag';
 import {useAPIGetUserInfoById} from '../../../hooks/api/user/useAPIGetUserInfoById';
 import {useAPIGetWikiList} from '../../../hooks/api/wiki/useAPIGetWikiList';
 import {useTagType} from '../../../hooks/tag/useTagType';
 import {accountDetailStyles} from '../../../styles/screen/account/accountDetail.style';
 import {TagType, User, WikiType} from '../../../types';
-import {AccountDetailProps} from '../../../types/navigator/screenProps/Account';
+import {
+  AccountDetailNavigationProps,
+  AccountDetailRouteProps,
+} from '../../../types/navigator/drawerScreenProps';
 import {darkFontColor} from '../../../utils/colors';
 import {userNameFactory} from '../../../utils/factory/userNameFactory';
 import {userRoleNameFactory} from '../../../utils/factory/userRoleNameFactory';
@@ -30,14 +32,16 @@ type DetailScreenProps = {
 
 const DetailScreen: React.FC<DetailScreenProps> = ({profile}) => {
   const {width: windowWidth} = useWindowDimensions();
-  const {data: tags} = useAPIGetTag();
-  const {filteredTags: techTags} = useTagType(TagType.TECH, tags || []);
+  const {filteredTags: techTags} = useTagType(TagType.TECH, profile.tags || []);
   const {filteredTags: qualificationTags} = useTagType(
     TagType.QUALIFICATION,
-    tags || [],
+    profile.tags || [],
   );
-  const {filteredTags: clubTags} = useTagType(TagType.CLUB, tags || []);
-  const {filteredTags: hobbyTags} = useTagType(TagType.HOBBY, tags || []);
+  const {filteredTags: clubTags} = useTagType(TagType.CLUB, profile.tags || []);
+  const {filteredTags: hobbyTags} = useTagType(
+    TagType.HOBBY,
+    profile.tags || [],
+  );
 
   return (
     <Div w={windowWidth * 0.9} alignSelf="center">
@@ -66,7 +70,7 @@ const DetailScreen: React.FC<DetailScreenProps> = ({profile}) => {
       <TagListBox
         mb={'lg'}
         tags={qualificationTags || []}
-        tagType={TagType.TECH}
+        tagType={TagType.QUALIFICATION}
         introduce={profile.introduceQualification}
       />
       <TagListBox
@@ -85,7 +89,9 @@ const DetailScreen: React.FC<DetailScreenProps> = ({profile}) => {
   );
 };
 
-const AccountDetail: React.FC<AccountDetailProps> = ({navigation, route}) => {
+const AccountDetail: React.FC = () => {
+  const navigation = useNavigation<AccountDetailNavigationProps>();
+  const route = useRoute<AccountDetailRouteProps>();
   const {user, setUser} = useAuthenticate();
   const id = route.params?.id;
   const userID = id || user?.id;
@@ -137,11 +143,12 @@ const AccountDetail: React.FC<AccountDetailProps> = ({navigation, route}) => {
     },
     {
       name: 'プロフィール編集',
-      onPress: () => navigation.navigate('Profile'),
+      onPress: () => navigation.navigate('AccountStack', {screen: 'Profile'}),
     },
     {
       name: 'パスワード更新',
-      onPress: () => navigation.navigate('UpdatePassword'),
+      onPress: () =>
+        navigation.navigate('AccountStack', {screen: 'UpdatePassword'}),
     },
   ];
 
@@ -215,7 +222,10 @@ const AccountDetail: React.FC<AccountDetailProps> = ({navigation, route}) => {
                           <EventCard
                             event={e}
                             onPress={() =>
-                              navigation.navigate('EventDetail', {id: e.id})
+                              navigation.navigate('EventStack', {
+                                screen: 'EventDetail',
+                                params: {id: e.id},
+                              })
                             }
                           />
                         </Div>
@@ -233,7 +243,10 @@ const AccountDetail: React.FC<AccountDetailProps> = ({navigation, route}) => {
                         <WikiCard
                           wiki={w}
                           onPress={() =>
-                            navigation.navigate('WikiDetail', {id: w.id})
+                            navigation.navigate('WikiStack', {
+                              screen: 'WikiDetail',
+                              params: {id: w.id},
+                            })
                           }
                         />
                       ))}
@@ -252,7 +265,10 @@ const AccountDetail: React.FC<AccountDetailProps> = ({navigation, route}) => {
                         <WikiCard
                           wiki={w}
                           onPress={() =>
-                            navigation.navigate('WikiDetail', {id: w.id})
+                            navigation.navigate('WikiStack', {
+                              screen: 'WikiDetail',
+                              params: {id: w.id},
+                            })
                           }
                         />
                       ))}

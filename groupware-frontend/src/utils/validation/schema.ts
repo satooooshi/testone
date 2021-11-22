@@ -6,6 +6,7 @@ const blankMixedMessage = '空白文字は使用できません';
 const minEightTextMessage = '8文字以上で入力してください';
 const minDateMessage = '開始日時は終了日時より前に設定してください';
 const minTagsMessage = 'タグは一つ以上設定してください';
+const minUsersMessage = 'チャットメンバーは一人以上設定してください';
 const unmatchPasswordConfirmation = '再入力と新しいパスワードが一致しません';
 const nWordLimitMessage = (len: number) => `${len}文字以内で入力してください`;
 const afterNowMessage = '現在の日時以降に設定してください';
@@ -30,10 +31,9 @@ export const updatePasswordSchema = Yup.object().shape({
     .matches(/^([^ ]*)$/, blankMixedMessage)
     .min(8, minEightTextMessage)
     .required(requireMessage),
-  newPasswordConfirmation: Yup.string().oneOf(
-    [Yup.ref('newPassword'), null],
-    unmatchPasswordConfirmation,
-  ),
+  newPasswordConfirmation: Yup.string()
+    .required(requireMessage)
+    .oneOf([Yup.ref('newPassword'), null], unmatchPasswordConfirmation),
 });
 
 export const registerSchema = Yup.object().shape({
@@ -57,4 +57,11 @@ export const createEventSchema = Yup.object().shape({
     .min(Yup.ref('startAt'), minDateMessage)
     .required(`終了日時は${requireMessage}`),
   tags: Yup.array().min(1, minTagsMessage),
+});
+
+export const chatGroupSchema = Yup.object().shape({
+  name: Yup.string()
+    .required(`グループ名は${requireMessage}`)
+    .max(50, `グループ名は${nWordLimitMessage(50)}`),
+  members: Yup.array().min(1, minUsersMessage),
 });

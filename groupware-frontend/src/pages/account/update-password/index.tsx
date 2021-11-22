@@ -31,6 +31,14 @@ const UpdatePassword = () => {
       });
       resetForm();
     },
+    onError: (err) => {
+      toast({
+        title: err.response?.data?.message,
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      });
+    },
   });
   const { handleChange, handleSubmit, values, resetForm, errors, touched } =
     useFormik({

@@ -1,3 +1,4 @@
+import { AxiosError } from 'axios';
 import { useMutation, UseMutationOptions } from 'react-query';
 import { Tag } from 'src/types';
 import { axiosInstance } from 'src/utils/url';
@@ -9,7 +10,7 @@ const deleteTag = async (tag: Tag) => {
 };
 
 export const useAPIDeleteTag = (
-  mutationOptions?: UseMutationOptions<Tag, Error, Tag, unknown>,
+  mutationOptions?: UseMutationOptions<Tag, AxiosError, Tag, unknown>,
 ) => {
-  return useMutation<Tag, Error, Tag>(deleteTag, mutationOptions);
+  return useMutation<Tag, AxiosError, Tag>(deleteTag, mutationOptions);
 };
