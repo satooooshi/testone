@@ -13,7 +13,6 @@ import { Response } from 'express';
 import { Tag } from 'src/entities/tag.entity';
 import { UserTag } from 'src/entities/userTag.entity';
 import JwtAuthenticationGuard from '../auth/jwtAuthentication.guard';
-import CreateTagDto from './dto/createTagDto';
 import { TagService } from './tag.service';
 
 @Controller('tag')
@@ -34,7 +33,10 @@ export class TagController {
 
   @Post('create')
   @UseGuards(JwtAuthenticationGuard)
-  async createTag(@Body() body: CreateTagDto): Promise<Tag> {
+  async createTag(@Body() body: Partial<Tag>): Promise<Tag> {
+    if (!body.name) {
+      throw new BadRequestException('tag name is required');
+    }
     return await this.tagService.createTag(body);
   }
 

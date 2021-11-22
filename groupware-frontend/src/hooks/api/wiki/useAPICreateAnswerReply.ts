@@ -1,4 +1,3 @@
-import { AxiosError } from 'axios';
 import { useMutation, UseMutationOptions } from 'react-query';
 import { QAAnswerReply } from 'src/types';
 import { axiosInstance } from 'src/utils/url';
@@ -16,12 +15,12 @@ const createAnswerReply = async (
 export const useAPICreateAnswerReply = (
   mutationOptions?: UseMutationOptions<
     QAAnswerReply,
-    AxiosError,
+    Error,
     Partial<QAAnswerReply>,
     unknown
   >,
 ) => {
-  return useMutation<QAAnswerReply, AxiosError, Partial<QAAnswerReply>>(
+  return useMutation<QAAnswerReply, Error, Partial<QAAnswerReply>>(
     createAnswerReply,
     mutationOptions,
   );
