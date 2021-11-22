@@ -1,6 +1,7 @@
 import {axiosInstance} from '../../../utils/url';
 import {joinEventURL} from '../../../utils/url/event.url';
 import {UseMutationOptions, useMutation} from 'react-query';
+import {AxiosError} from 'axios';
 
 interface JoinEventRequest {
   eventID: number;
@@ -14,12 +15,12 @@ const joinEvent = async (body: JoinEventRequest) => {
 export const useAPIJoinEvent = (
   mutationOptions: UseMutationOptions<
     unknown,
-    Error,
+    AxiosError,
     JoinEventRequest,
     unknown
   >,
 ) => {
-  return useMutation<unknown, Error, JoinEventRequest>(
+  return useMutation<unknown, AxiosError, JoinEventRequest>(
     joinEvent,
     mutationOptions,
   );

@@ -1,3 +1,4 @@
+import {AxiosError} from 'axios';
 import {QueryKey, useQuery, UseQueryOptions} from 'react-query';
 import {WikiType, RuleCategory, Wiki} from '../../../types';
 import {axiosInstance} from '../../../utils/url';
@@ -36,14 +37,14 @@ export const useAPIGetWikiList = (
   useQueryOptions?: Omit<
     UseQueryOptions<
       SearchResultToGetWiki,
-      Error,
+      AxiosError,
       SearchResultToGetWiki,
       QueryKey
     >,
     'queryKey' | 'queryFn'
   >,
 ) => {
-  return useQuery<SearchResultToGetWiki, Error>(
+  return useQuery<SearchResultToGetWiki, AxiosError>(
     ['QAs', query],
     () => getWikiList(query),
     useQueryOptions,
