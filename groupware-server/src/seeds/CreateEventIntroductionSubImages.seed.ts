@@ -51,11 +51,13 @@ export default class CreateEventIntroductionSubImages implements Seeder {
           {
             imageUrl:
               'https://storage.googleapis.com/groupware-bucket-development/1637378765645/impressive_university_1.png',
+            displayOrder: 1,
             eventIntroduction: implessiveUniversityEventIntroduction,
           },
           {
             imageUrl:
               'https://storage.googleapis.com/groupware-bucket-development/1637378770502/impressive_university_2.png',
+            displayOrder: 2,
             eventIntroduction: implessiveUniversityEventIntroduction,
           },
         ])
@@ -74,11 +76,13 @@ export default class CreateEventIntroductionSubImages implements Seeder {
           {
             imageUrl:
               'https://storage.googleapis.com/groupware-bucket-development/1637378894978/study_meeting_1.jpg',
+            displayOrder: 1,
             eventIntroduction: studyMeetingEventIntroduction,
           },
           {
             imageUrl:
               'https://storage.googleapis.com/groupware-bucket-development/1637378899485/study_meeting_2.jpg',
+            displayOrder: 2,
             eventIntroduction: studyMeetingEventIntroduction,
           },
         ])
@@ -94,21 +98,25 @@ export default class CreateEventIntroductionSubImages implements Seeder {
           {
             imageUrl:
               'https://storage.googleapis.com/groupware-bucket-development/1637378512243/bolday_1.jpg',
+            displayOrder: 1,
             eventIntroduction: boldayEventIntroduction,
           },
           {
             imageUrl:
               'https://storage.googleapis.com/groupware-bucket-development/1637378521513/bolday_2.jpg',
+            displayOrder: 2,
             eventIntroduction: boldayEventIntroduction,
           },
           {
             imageUrl:
               'https://storage.googleapis.com/groupware-bucket-development/1637378525371/bolday_3.jpg',
+            displayOrder: 3,
             eventIntroduction: boldayEventIntroduction,
           },
           {
             imageUrl:
               'https://storage.googleapis.com/groupware-bucket-development/1637378530305/bolday_4.jpg',
+            displayOrder: 4,
             eventIntroduction: boldayEventIntroduction,
           },
         ])
@@ -154,21 +162,25 @@ export default class CreateEventIntroductionSubImages implements Seeder {
           {
             imageUrl:
               'https://storage.googleapis.com/groupware-bucket-development/1637377008205/club_3.png',
+            displayOrder: 1,
             eventIntroduction: clubEventIntroduction,
           },
           {
             imageUrl:
               'https://storage.googleapis.com/groupware-bucket-development/1637377012334/club_4.jpg',
+            displayOrder: 2,
             eventIntroduction: clubEventIntroduction,
           },
           {
             imageUrl:
               'https://storage.googleapis.com/groupware-bucket-development/1637377020446/club_6.jpg',
+            displayOrder: 3,
             eventIntroduction: clubEventIntroduction,
           },
           {
             imageUrl:
               'https://storage.googleapis.com/groupware-bucket-development/1637376999970/club_2.jpg',
+            displayOrder: 4,
             eventIntroduction: clubEventIntroduction,
           },
         ])

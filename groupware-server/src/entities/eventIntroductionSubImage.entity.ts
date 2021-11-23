@@ -2,6 +2,7 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  Index,
   JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
@@ -10,6 +11,7 @@ import {
 import { EventIntroduction } from './eventIntroduction.entity';
 
 @Entity({ name: 'event_introduction_sub_images' })
+@Index(['displayOrder', 'eventIntroduction'], { unique: true })
 export class EventIntroductionSubImage {
   @PrimaryGeneratedColumn()
   id: number;
@@ -22,6 +24,13 @@ export class EventIntroductionSubImage {
     default: '',
   })
   imageUrl: string;
+
+  @Column({
+    type: 'int',
+    name: 'display_order',
+    nullable: false,
+  })
+  displayOrder: number;
 
   @ManyToOne(
     () => EventIntroduction,
