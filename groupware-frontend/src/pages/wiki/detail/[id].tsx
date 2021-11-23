@@ -384,7 +384,9 @@ const QuestionDetail = () => {
                                 ? 'ベストアンサーに選ぶ'
                                 : undefined
                             }
+                            isExistsBestAnswer={wiki.bestAnswer ? true : false}
                             onClickBestAnswerButton={() =>
+                              !wiki.bestAnswer &&
                               createBestAnswer({ ...wiki, bestAnswer: answer })
                             }
                             body={answer.body}

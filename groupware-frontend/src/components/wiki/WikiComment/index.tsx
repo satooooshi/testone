@@ -16,6 +16,7 @@ type WikiCommentProps = {
   date?: Date;
   writer?: User;
   isWriter?: boolean;
+  isExistsBestAnswer?: boolean;
   onClickEditButton?: () => void;
   replyButtonName?: string;
   onClickReplyButton?: () => void;
@@ -29,6 +30,7 @@ const WikiComment: React.FC<WikiCommentProps> = ({
   date,
   writer,
   isWriter,
+  isExistsBestAnswer,
   onClickEditButton,
   replyButtonName,
   onClickReplyButton,
@@ -101,7 +103,7 @@ const WikiComment: React.FC<WikiCommentProps> = ({
         {bestAnswerButtonName && onClickBestAnswerButton ? (
           <div className={qaCommentStyles.best_answer_button_wrapper}>
             <Button
-              colorScheme="pink"
+              colorScheme={isExistsBestAnswer ? 'whatsapp' : 'pink'}
               classnames={[qaCommentStyles.best_answer_button]}
               onClick={isWriter ? onClickBestAnswerButton : undefined}>
               {bestAnswerButtonName}
