@@ -5,9 +5,24 @@ import homeStyles from '@/styles/layouts/Home.module.scss';
 import PortalLinkBox, { PortalLinkType } from '@/components/PortalLinkBox';
 import Head from 'next/head';
 import { useHeaderTab } from '@/hooks/headerTab/useHeaderTab';
+import { useAPILogout } from '@/hooks/api/auth/useAPILogout';
+import { axiosInstance } from 'src/utils/url';
+import { jsonHeader } from 'src/utils/url/header';
+import router from 'next/router';
 
 export default function Home() {
   const tabs: Tab[] = useHeaderTab({ headerTabType: 'home' });
+  const { mutate: logout } = useAPILogout({
+    onSuccess: () => {
+      const removeLocalStorage = async () => {
+        await Promise.resolve();
+        localStorage.removeItem('userToken');
+        axiosInstance.defaults.headers = jsonHeader;
+      };
+      removeLocalStorage();
+      router.push('/login');
+    },
+  });
 
   return (
     <LayoutWithTab
@@ -16,6 +31,8 @@ export default function Home() {
         title: 'Home',
         activeTabName: 'ダッシュボード',
         tabs: tabs,
+        rightButtonName: 'ログアウト',
+        onClickRightButton: () => logout(),
       }}>
       <Head>
         <title>ボールド | Home</title>
