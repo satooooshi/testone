@@ -50,7 +50,7 @@ export class EventIntroduction {
     () => EventIntroductionSubImage,
     (eventIntroductionSubImage) => eventIntroductionSubImage.eventIntroduction,
   )
-  eventIntroductionSubImages?: EventIntroductionSubImage[];
+  subImages?: EventIntroductionSubImage[];
 
   @CreateDateColumn({
     type: 'timestamp',

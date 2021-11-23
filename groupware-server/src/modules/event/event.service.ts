@@ -294,7 +294,7 @@ export class EventScheduleService {
   ): Promise<EventIntroduction> {
     const eventIntroduction = await this.eventIntroductionRepository.findOne({
       where: { type: type },
-      relations: ['eventIntroductionSubImages'],
+      relations: ['subImages'],
     });
     const urlParsedEventIntroduction =
       await this.generateSignedStorageURLsFromEventIntroductionObj(
@@ -425,9 +425,9 @@ export class EventScheduleService {
           eventIntroduction.imageUrl,
         );
     }
-    if (eventIntroduction?.eventIntroductionSubImages) {
-      eventIntroduction.eventIntroductionSubImages = await Promise.all(
-        eventIntroduction.eventIntroductionSubImages.map(async (e) => ({
+    if (eventIntroduction?.subImages) {
+      eventIntroduction.subImages = await Promise.all(
+        eventIntroduction.subImages.map(async (e) => ({
           ...e,
           imageUrl: await this.storageService.parseStorageURLToSignedURL(
             e.imageUrl,

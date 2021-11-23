@@ -11,6 +11,7 @@ import { useToast } from '@chakra-ui/toast';
 import eventTypeNameFactory from 'src/utils/factory/eventTypeNameFactory';
 import { useAPISaveEventIntroduction } from '@/hooks/api/event/useAPISaveEventIntroduction';
 import { responseErrorMsgFactory } from 'src/utils/factory/responseErrorMsgFactory';
+import { useRouter } from 'next/router';
 
 export interface EventIntroductionEditorProps {
   eventIntroduction: EventIntroduction;
@@ -19,24 +20,25 @@ export interface EventIntroductionEditorProps {
 const EventIntroductionEditor: React.FC<EventIntroductionEditorProps> = ({
   eventIntroduction,
 }) => {
+  const router = useRouter();
   const toast = useToast();
   const initialEventIntroductionValues: Partial<EventIntroduction> = {
     type: eventIntroduction.type,
     title: eventIntroduction.title,
     description: eventIntroduction.description,
     imageUrl: eventIntroduction.imageUrl,
-    eventIntroductionSubImages: eventIntroduction.eventIntroductionSubImages,
+    subImages: eventIntroduction.subImages,
   };
 
   const { mutate: saveEventIntroduction } = useAPISaveEventIntroduction({
-    onSuccess: async () => {
+    onSuccess: async (data) => {
       toast({
         description: 'イベント説明の編集が完了しました。',
         status: 'success',
         duration: 3000,
         isClosable: true,
       });
-      // location.reload();
+      router.reload();
     },
     onError: (e) => {
       const messages = responseErrorMsgFactory(e);
@@ -149,7 +151,7 @@ const EventIntroductionEditor: React.FC<EventIntroductionEditorProps> = ({
           </div>
         </div>
         <div className={eventPRStyles.bottom_images_row}>
-          {eventIntroduction.eventIntroductionSubImages?.map((e, i) => {
+          {eventIntroduction.subImages?.map((e, i) => {
             return (
               <div key={i} className={eventPRStyles.bottom_image_wrapper}>
                 <img src={e.imageUrl} alt="" />

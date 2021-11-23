@@ -7,7 +7,7 @@ import { jsonHeader } from 'src/utils/url/header';
 
 const saveEventIntroduction = async (
   eventIntroduction: Partial<EventIntroduction>,
-): Promise<EventIntroduction[]> => {
+): Promise<EventIntroduction> => {
   const res = await axiosInstance.patch(
     saveEventIntroductionURL,
     eventIntroduction,
@@ -20,15 +20,14 @@ const saveEventIntroduction = async (
 
 export const useAPISaveEventIntroduction = (
   mutationOptions?: UseMutationOptions<
-    EventIntroduction[],
+    EventIntroduction,
     AxiosError,
     Partial<EventIntroduction>,
     unknown
   >,
 ) => {
-  return useMutation<
-    EventIntroduction[],
-    AxiosError,
-    Partial<EventIntroduction>
-  >(saveEventIntroduction, mutationOptions);
+  return useMutation<EventIntroduction, AxiosError, Partial<EventIntroduction>>(
+    saveEventIntroduction,
+    mutationOptions,
+  );
 };

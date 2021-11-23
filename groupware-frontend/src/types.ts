@@ -199,7 +199,7 @@ export interface EventIntroduction {
   title: string;
   description: string;
   imageUrl: string;
-  eventIntroductionSubImages: EventIntroductionSubImage[];
+  subImages: EventIntroductionSubImage[];
   createdAt: Date;
   updatedAt: Date;
 }

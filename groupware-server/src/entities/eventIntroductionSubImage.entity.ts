@@ -25,7 +25,7 @@ export class EventIntroductionSubImage {
 
   @ManyToOne(
     () => EventIntroduction,
-    (eventIntroduction) => eventIntroduction.eventIntroductionSubImages,
+    (eventIntroduction) => eventIntroduction.subImages,
     {
       onDelete: 'CASCADE',
     },
