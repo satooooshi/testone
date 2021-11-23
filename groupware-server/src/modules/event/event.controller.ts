@@ -144,7 +144,6 @@ export class EventScheduleController {
   @Patch('save-introduction')
   @UseGuards(JwtAuthenticationGuard)
   async saveEventIntroduction(
-    @Req() req: RequestWithUser,
     @Body() eventIntroduction: SaveEventIntroductionDto,
   ): Promise<EventIntroduction> {
     return await this.eventService.saveEventIntroduction(eventIntroduction);

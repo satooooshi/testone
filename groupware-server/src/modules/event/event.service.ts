@@ -304,7 +304,7 @@ export class EventScheduleService {
   }
 
   public async saveEventIntroduction(
-    eventIntroduction: EventIntroduction,
+    eventIntroduction: Partial<EventIntroduction>,
   ): Promise<EventIntroduction> {
     const target = await this.eventIntroductionRepository.findOne({
       type: eventIntroduction.type,
