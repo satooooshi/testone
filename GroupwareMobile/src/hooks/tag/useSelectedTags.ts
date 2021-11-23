@@ -24,6 +24,7 @@ export const useSelectedTags = (alreadySelectedTags?: AllTag[]) => {
 
   return {
     selectedTags,
+    setSelectedTags,
     toggleTag,
     isSelected,
   };

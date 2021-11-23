@@ -1,3 +1,4 @@
+import {AxiosError} from 'axios';
 import {useMutation, UseMutationOptions} from 'react-query';
 import {ChatGroup} from '../../../types';
 import {axiosInstance, jsonHeader} from '../../../utils/url';
@@ -13,12 +14,12 @@ const leaveChatGroup = async (chatGroup: Partial<ChatGroup>) => {
 export const useAPILeaveChatRoom = (
   mutationOptions?: UseMutationOptions<
     void,
-    Error,
+    AxiosError,
     Partial<ChatGroup>,
     unknown
   >,
 ) => {
-  return useMutation<void, Error, Partial<ChatGroup>>(
+  return useMutation<void, AxiosError, Partial<ChatGroup>>(
     leaveChatGroup,
     mutationOptions,
   );

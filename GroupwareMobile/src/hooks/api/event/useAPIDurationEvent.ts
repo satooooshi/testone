@@ -2,6 +2,7 @@ import {EventSchedule} from '../../../types';
 import {axiosInstance} from '../../../utils/url';
 import {getEventURL} from '../../../utils/url/event.url';
 import {useQuery} from 'react-query';
+import {AxiosError} from 'axios';
 
 type Status = 'day' | 'week' | 'month';
 
@@ -19,7 +20,7 @@ const getDurationEvent = async (status: Status) => {
 };
 
 export const useAPIDurationEvent = (status: Status) => {
-  return useQuery<SearchResultToGetEvents | EventSchedule[], Error>(
+  return useQuery<SearchResultToGetEvents | EventSchedule[], AxiosError>(
     ['events', status],
     () => getDurationEvent(status),
   );

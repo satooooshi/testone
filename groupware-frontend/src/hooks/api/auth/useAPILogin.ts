@@ -1,3 +1,4 @@
+import { AxiosError } from 'axios';
 import { useMutation, UseMutationOptions } from 'react-query';
 import { User } from 'src/types';
 import { axiosInstance } from 'src/utils/url';
@@ -19,12 +20,12 @@ const login = async (values: LoginRequest): Promise<Partial<User>> => {
 export const useAPILogin = (
   mutationOptions?: UseMutationOptions<
     Partial<User>,
-    Error,
+    AxiosError,
     LoginRequest,
     unknown
   >,
 ) => {
-  return useMutation<Partial<User>, Error, LoginRequest>(
+  return useMutation<Partial<User>, AxiosError, LoginRequest>(
     login,
     mutationOptions,
   );

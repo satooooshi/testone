@@ -1,3 +1,4 @@
+import { AxiosError } from 'axios';
 import { useQuery } from 'react-query';
 import { User, UserRole } from 'src/types';
 import { axiosInstance } from 'src/utils/url';
@@ -7,7 +8,7 @@ export interface SearchQueryToGetUsers {
   page?: string;
   word?: string;
   tag?: string;
-  sort?: 'event' | 'question' | 'answer';
+  sort?: 'event' | 'question' | 'answer' | 'knowledge';
   role?: UserRole;
   verified?: boolean;
   duration?: 'month' | 'week';
@@ -28,7 +29,8 @@ const searchUsers = async (
 };
 
 export const useAPISearchUsers = (query: SearchQueryToGetUsers) => {
-  return useQuery<SearchResultToGetUsers, Error>(['searchUsers', query], () =>
-    searchUsers(query),
+  return useQuery<SearchResultToGetUsers, AxiosError>(
+    ['searchUsers', query],
+    () => searchUsers(query),
   );
 };

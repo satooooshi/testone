@@ -1,51 +1,227 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import WholeContainer from '../../../components/WholeContainer';
-import AppHeader from '../../../components/Header';
-import {EventListProps} from '../../../types/navigator/screenProps/Event';
+import AppHeader, {Tab} from '../../../components/Header';
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
 import EventCalendar from './EventCalendar';
 import EventCardList from './EventCardList';
+import SearchFormOpenerButton from '../../../components/common/SearchForm/SearchFormOpenerButton';
+import SearchForm from '../../../components/common/SearchForm';
+import {useAPIGetTag} from '../../../hooks/api/tag/useAPIGetTag';
+import {
+  SearchQueryToGetEvents,
+  useAPIGetEventList,
+} from '../../../hooks/api/event/useAPIGetEventList';
+import {AllTag, EventType} from '../../../types';
+import eventTypeNameFactory from '../../../utils/factory/eventTypeNameFactory';
+import {defaultWeekQuery} from '../../../utils/eventQueryRefresh';
+import EventFormModal from '../../../components/events/EventFormModal';
+import {useAPIGetUsers} from '../../../hooks/api/user/useAPIGetUsers';
+import {useAPICreateEvent} from '../../../hooks/api/event/useAPICreateEvent';
+import {ActivityIndicator} from 'react-native';
+import {Overlay} from 'react-native-magnus';
 
-const Tab = createMaterialTopTabNavigator();
+const TopTab = createMaterialTopTabNavigator();
 
-const EventList: React.FC<EventListProps> = ({navigation}) => {
+const EventList: React.FC = () => {
+  const [visibleSearchFormModal, setVisibleSearchFormModal] = useState(false);
+  const {data: tags} = useAPIGetTag();
+  const {data: users} = useAPIGetUsers();
+  const [searchQuery, setSearchQuery] = useState<SearchQueryToGetEvents>(
+    defaultWeekQuery(),
+  );
+  const {
+    data: events,
+    refetch: refetchEvents,
+    isLoading: isLoadingGetEventList,
+  } = useAPIGetEventList(searchQuery);
+  const [eventsForInfinitScroll, setEventsForInfiniteScroll] = useState(
+    events?.events || [],
+  );
+  const [visibleEventFormModal, setEventFormModal] = useState(false);
+  const [screenLoading, setScreenLoading] = useState(false);
+  const {mutate: saveEvent, isLoading: isLoadingSaveEvent} = useAPICreateEvent({
+    onSuccess: () => {
+      setEventFormModal(false);
+      refetchEvents();
+    },
+  });
+  const tabs: Tab[] = [
+    {
+      name: 'All',
+      onPress: () => queryRefresh({page: '1', type: undefined}),
+    },
+    {
+      name: eventTypeNameFactory(EventType.IMPRESSIVE_UNIVERSITY),
+      onPress: () =>
+        queryRefresh({page: '1', type: EventType.IMPRESSIVE_UNIVERSITY}),
+    },
+    {
+      name: eventTypeNameFactory(EventType.STUDY_MEETING),
+      onPress: () => queryRefresh({page: '1', type: EventType.STUDY_MEETING}),
+    },
+    {
+      name: eventTypeNameFactory(EventType.BOLDAY),
+      onPress: () => queryRefresh({page: '1', type: EventType.BOLDAY}),
+    },
+    {
+      name: eventTypeNameFactory(EventType.COACH),
+      onPress: () => queryRefresh({page: '1', type: EventType.COACH}),
+    },
+    {
+      name: eventTypeNameFactory(EventType.CLUB),
+      onPress: () => queryRefresh({page: '1', type: EventType.CLUB}),
+    },
+    {
+      name: eventTypeNameFactory(EventType.SUBMISSION_ETC),
+      onPress: () => queryRefresh({page: '1', type: EventType.SUBMISSION_ETC}),
+    },
+  ];
+
+  const queryRefresh = (
+    query: Partial<SearchQueryToGetEvents>,
+    selectedTags?: AllTag[],
+  ) => {
+    const selectedTagIDs = selectedTags?.map(t => t.id.toString());
+    const tagQuery = selectedTagIDs?.join('+');
+
+    setSearchQuery(q => ({...q, ...query, tag: tagQuery || ''}));
+  };
+
+  const isCalendar =
+    typeof searchQuery.from !== undefined &&
+    typeof searchQuery.to !== undefined;
+
+  useEffect(() => {
+    if (events?.events && events?.events.length) {
+      setEventsForInfiniteScroll(e => {
+        if (e.length) {
+          return [...e, ...events.events];
+        }
+        return events.events;
+      });
+    }
+  }, [events?.events]);
+
+  useEffect(() => {
+    if (isLoadingGetEventList || isLoadingSaveEvent) {
+      setScreenLoading(true);
+      return;
+    }
+    setScreenLoading(false);
+  }, [isLoadingGetEventList, isLoadingSaveEvent]);
+
+  useEffect(() => {
+    setEventsForInfiniteScroll([]);
+  }, [
+    searchQuery.word,
+    searchQuery.status,
+    searchQuery.type,
+    searchQuery.tag,
+    isCalendar,
+  ]);
+
   return (
     <WholeContainer>
-      <AppHeader title="Events" activeTabName="All" />
-      <Tab.Navigator
+      <AppHeader
+        title="Events"
+        tabs={tabs}
+        activeTabName={
+          searchQuery.type ? eventTypeNameFactory(searchQuery.type) : 'All'
+        }
+        rightButtonName="新規イベント"
+        onPressRightButton={() => setEventFormModal(true)}
+      />
+      <Overlay visible={screenLoading} p="xl">
+        <ActivityIndicator />
+      </Overlay>
+      <EventFormModal
+        isVisible={visibleEventFormModal}
+        onCloseModal={() => setEventFormModal(false)}
+        onSubmit={event => saveEvent(event)}
+        users={users || []}
+        tags={tags || []}
+      />
+      {!isCalendar && (
+        <SearchFormOpenerButton
+          bottom={10}
+          right={10}
+          onPress={() => setVisibleSearchFormModal(true)}
+        />
+      )}
+      <SearchForm
+        isVisible={visibleSearchFormModal}
+        onCloseModal={() => setVisibleSearchFormModal(false)}
+        tags={tags || []}
+        onSubmit={values => {
+          queryRefresh({word: values.word}, values.selectedTags);
+          setVisibleSearchFormModal(false);
+        }}
+      />
+      <TopTab.Navigator
+        initialRouteName={'EventCalendar'}
         screenOptions={{
           tabBarScrollEnabled: true,
         }}>
-        <Tab.Screen
+        <TopTab.Screen
           name="PersonalCalendar"
-          children={() => <EventCalendar personal={true} />}
+          children={() => (
+            <EventCalendar
+              searchResult={events}
+              searchQuery={searchQuery}
+              setSearchQuery={setSearchQuery}
+              personal={true}
+            />
+          )}
           options={{title: 'カレンダー(個人)'}}
         />
-        <Tab.Screen
+        <TopTab.Screen
           name="EventCalendar"
-          component={EventCalendar}
+          children={() => (
+            <EventCalendar
+              searchResult={events}
+              searchQuery={searchQuery}
+              setSearchQuery={setSearchQuery}
+            />
+          )}
           options={{title: 'カレンダー'}}
         />
-        <Tab.Screen
+        <TopTab.Screen
           name="FutureEvents"
           children={() => (
-            <EventCardList type="future" navigation={navigation} />
+            <EventCardList
+              searchResult={eventsForInfinitScroll}
+              status="future"
+              searchQuery={searchQuery}
+              setSearchQuery={setSearchQuery}
+            />
           )}
           options={{title: '今後のイベント'}}
         />
-        <Tab.Screen
+        <TopTab.Screen
           name="PastEvents"
-          children={() => <EventCardList type="past" navigation={navigation} />}
-          options={{title: '今後のイベント'}}
+          children={() => (
+            <EventCardList
+              searchResult={eventsForInfinitScroll}
+              status="past"
+              searchQuery={searchQuery}
+              setSearchQuery={setSearchQuery}
+            />
+          )}
+          options={{title: '過去のイベント'}}
         />
-        <Tab.Screen
+        <TopTab.Screen
           name="CurrentEvents"
           children={() => (
-            <EventCardList type="current" navigation={navigation} />
+            <EventCardList
+              searchResult={eventsForInfinitScroll}
+              status="current"
+              searchQuery={searchQuery}
+              setSearchQuery={setSearchQuery}
+            />
           )}
           options={{title: '現在のイベント'}}
         />
-      </Tab.Navigator>
+      </TopTab.Navigator>
     </WholeContainer>
   );
 };

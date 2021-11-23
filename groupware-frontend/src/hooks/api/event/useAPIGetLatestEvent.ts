@@ -1,3 +1,4 @@
+import { AxiosError } from 'axios';
 import { useQuery } from 'react-query';
 import { EventSchedule } from 'src/types';
 import { axiosInstance } from 'src/utils/url';
@@ -16,7 +17,7 @@ const getLatestEvent = async (
 };
 
 export const useAPIGetLatestEvent = (query?: SearchQueryToGetLatestEvents) => {
-  return useQuery<EventSchedule[], Error>('getLatestEvent', () =>
+  return useQuery<EventSchedule[], AxiosError>('getLatestEvent', () =>
     getLatestEvent(query),
   );
 };

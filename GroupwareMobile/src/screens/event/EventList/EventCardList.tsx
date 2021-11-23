@@ -1,33 +1,58 @@
-import React, {useState} from 'react';
+import React, {Dispatch, SetStateAction, useEffect} from 'react';
 import {FlatList} from 'react-native';
 import {
-  useAPIGetEventList,
   SearchQueryToGetEvents,
   EventStatus,
 } from '../../../hooks/api/event/useAPIGetEventList';
 import EventCard from '../../../components/events/EventCard';
 import {Div} from 'react-native-magnus';
-import {EventListNavigationProps} from '../../../types/navigator/screenProps/Event';
+import {useIsFocused, useNavigation} from '@react-navigation/native';
+import {EventSchedule} from '../../../types';
+import {EventListNavigationProps} from '../../../types/navigator/drawerScreenProps';
 
 type EventCardListProps = {
-  type: EventStatus;
-  navigation: EventListNavigationProps;
+  status: EventStatus;
+  searchResult?: EventSchedule[];
+  searchQuery: SearchQueryToGetEvents;
+  setSearchQuery: Dispatch<SetStateAction<SearchQueryToGetEvents>>;
 };
 
-const EventCardList: React.FC<EventCardListProps> = ({type, navigation}) => {
-  const [searchQuery] = useState<SearchQueryToGetEvents>({
-    page: '1',
-    status: type,
-  });
-  const {data: events} = useAPIGetEventList(searchQuery);
+const EventCardList: React.FC<EventCardListProps> = ({
+  status,
+  searchResult,
+  setSearchQuery,
+}) => {
+  const isFocused = useIsFocused();
+  const navigation = useNavigation<EventListNavigationProps>();
+
+  const onEndReached = () => {
+    setSearchQuery(q => ({
+      ...q,
+      page: q.page ? (Number(q.page) + 1).toString() : '1',
+    }));
+  };
+
+  useEffect(() => {
+    if (isFocused) {
+      setSearchQuery(q => ({...q, from: undefined, to: undefined, status}));
+    }
+  }, [isFocused, setSearchQuery, status]);
+
   return (
     <Div flexDir="column" alignItems="center">
       <FlatList
-        data={events?.events || []}
+        onEndReached={onEndReached}
+        data={searchResult || []}
+        keyExtractor={item => item.id.toString()}
         renderItem={({item: eventSchedule}) => (
           <Div mb={16}>
             <EventCard
-              onPress={e => navigation.navigate('EventDetail', {id: e.id})}
+              onPress={e =>
+                navigation.navigate('EventStack', {
+                  screen: 'EventDetail',
+                  params: {id: e.id},
+                })
+              }
               event={eventSchedule}
             />
           </Div>

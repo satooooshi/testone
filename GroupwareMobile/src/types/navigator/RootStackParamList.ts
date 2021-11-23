@@ -1,4 +1,4 @@
-import {WikiType} from '../../types';
+import {ChatGroup, WikiType} from '../../types';
 
 export type RootStackParamList = {
   Home: undefined;
@@ -21,4 +21,25 @@ export type RootStackParamList = {
   EditWiki: {
     id: number;
   };
+  AccountDetail:
+    | {
+        id?: number;
+      }
+    | undefined;
+  Profile: undefined;
+  UpdatePassword: undefined;
+  UserList: undefined;
+  UserAdmin: undefined;
+  UserRegisteringAdmin: undefined;
+  TagAdmin: undefined;
+  UserTagAdmin: undefined;
+  Chat: {
+    room: ChatGroup;
+  };
+  RoomList:
+    | {
+        needRefetch: boolean;
+      }
+    | undefined;
+  NewRoom: undefined;
 };

@@ -1,18 +1,12 @@
 import { EditorState } from 'draft-js';
 import { useReducer } from 'react';
-import {
-  ChatGroup,
-  ChatMessage,
-  ChatMessageType,
-  LastReadChatTime,
-} from 'src/types';
+import { ChatMessage, ChatMessageType, LastReadChatTime } from 'src/types';
 
 type ChatState = {
   page: number;
   messages: ChatMessage[];
   lastReadChatTime: LastReadChatTime[];
   newChatMessage: Partial<ChatMessage>;
-  newGroup: Partial<ChatGroup>;
   editorState: EditorState;
 };
 
@@ -28,10 +22,6 @@ type ChatAction =
   | {
       type: 'newChatMessage';
       value: Partial<ChatMessage>;
-    }
-  | {
-      type: 'newGroup';
-      value: Partial<ChatGroup>;
     }
   | {
       type: 'editorState';
@@ -58,10 +48,6 @@ const chatInitialValue: ChatState = {
     content: '',
     type: ChatMessageType.TEXT,
   },
-  newGroup: {
-    name: '',
-    members: [],
-  },
   editorState: EditorState.createEmpty(),
 };
 
@@ -83,12 +69,6 @@ const chatReducer = (state: ChatState, action: ChatAction): ChatState => {
       return {
         ...state,
         newChatMessage: action.value,
-      };
-    }
-    case 'newGroup': {
-      return {
-        ...state,
-        newGroup: action.value,
       };
     }
     case 'editorState': {

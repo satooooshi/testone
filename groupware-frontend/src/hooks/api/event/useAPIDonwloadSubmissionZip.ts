@@ -3,6 +3,7 @@ import { axiosInstance } from 'src/utils/url';
 import { downloadSubmissionZipURL } from 'src/utils/url/event.url';
 import { saveAs } from 'file-saver';
 import JSZip from 'jszip';
+import { AxiosError } from 'axios';
 
 export interface QueryToGetZipSubmission {
   id?: string;
@@ -20,7 +21,7 @@ const downloadZip = async (query: QueryToGetZipSubmission) => {
 };
 
 export const useAPIDonwloadSubmissionZip = () => {
-  return useMutation<any, Error, QueryToGetZipSubmission>(downloadZip, {
+  return useMutation<any, AxiosError, QueryToGetZipSubmission>(downloadZip, {
     onSuccess: async (data, variables) => {
       const { name } = variables;
       const fileName = name;

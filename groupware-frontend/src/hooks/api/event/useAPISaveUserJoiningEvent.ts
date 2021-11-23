@@ -1,3 +1,4 @@
+import { AxiosError } from 'axios';
 import { useMutation, UseMutationOptions } from 'react-query';
 import { UserJoiningEvent } from 'src/types';
 import { axiosInstance } from 'src/utils/url';
@@ -16,12 +17,12 @@ const saveUserJoiningEvent = async (
 export const useAPISaveUserJoiningEvent = (
   mutationOptions?: UseMutationOptions<
     UserJoiningEvent,
-    Error,
+    AxiosError,
     UserJoiningEvent,
     unknown
   >,
 ) => {
-  return useMutation<UserJoiningEvent, Error, UserJoiningEvent>(
+  return useMutation<UserJoiningEvent, AxiosError, UserJoiningEvent>(
     saveUserJoiningEvent,
     mutationOptions,
   );

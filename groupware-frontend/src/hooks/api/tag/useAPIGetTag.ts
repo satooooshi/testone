@@ -1,3 +1,4 @@
+import { AxiosError } from 'axios';
 import { useQuery } from 'react-query';
 import { Tag } from 'src/types';
 import { axiosInstance } from 'src/utils/url';
@@ -9,5 +10,5 @@ const getTag = async (): Promise<Tag[]> => {
 };
 
 export const useAPIGetTag = () => {
-  return useQuery<Tag[], Error>('tags', getTag);
+  return useQuery<Tag[], AxiosError>('tags', getTag);
 };

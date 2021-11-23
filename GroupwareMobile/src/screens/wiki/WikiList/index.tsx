@@ -1,10 +1,10 @@
 import React, {useState} from 'react';
-import {WikiListProps} from '../../../types/navigator/screenProps/Wiki';
 import WholeContainer from '../../../components/WholeContainer';
 import AppHeader, {Tab} from '../../../components/Header';
 import {WikiType} from '../../../types';
 import WikiCardList from './WikiCardList';
 import {wikiTypeNameFactory} from '../../../utils/factory/wiki/wikiTypeNameFactory';
+import {WikiListProps} from '../../../types/navigator/drawerScreenProps';
 
 const WikiList: React.FC<WikiListProps> = ({navigation}) => {
   const [type, setType] = useState<WikiType>();
@@ -16,6 +16,10 @@ const WikiList: React.FC<WikiListProps> = ({navigation}) => {
     {
       name: '社内規則',
       onPress: () => setType(WikiType.RULES),
+    },
+    {
+      name: 'オール便',
+      onPress: () => setType(WikiType.ALL_POSTAL),
     },
     {
       name: 'ナレッジ',
@@ -35,10 +39,13 @@ const WikiList: React.FC<WikiListProps> = ({navigation}) => {
         activeTabName={type ? wikiTypeNameFactory(type) : 'All'}
         rightButtonName="新規作成"
         onPressRightButton={() =>
-          navigation.navigate('PostWiki', {type: undefined})
+          navigation.navigate('WikiStack', {
+            screen: 'PostWiki',
+            params: {type: undefined},
+          })
         }
       />
-      <WikiCardList type={type} navigation={navigation} />
+      <WikiCardList type={type} />
     </WholeContainer>
   );
 };

@@ -92,13 +92,11 @@ const EditChatGroupMembersModal: React.FC<EditChatGroupMambersModalProps> = ({
                     '既存ユーザーがグループから退室します。よろしいですか？',
                   )
                 ) {
-                  toggleSelectedUsers(u);
                   setPreviousMembers((m) =>
                     m.filter((member) => member.id !== u.id),
                   );
                   return;
                 }
-                toggleSelectedUsers(u);
               }}
               className={clsx(
                 selectUserModalStyles.user_card,
@@ -183,7 +181,10 @@ const EditChatGroupMembersModal: React.FC<EditChatGroupMambersModalProps> = ({
           width="140px"
           colorScheme="green"
           borderRadius={5}
-          onClick={() => onComplete([...previousMembers, ...selectedUsers])}>
+          onClick={() => {
+            onComplete([...previousMembers, ...selectedUsers]);
+            setSelectedUsers([]);
+          }}>
           完了
         </Button>
       </div>

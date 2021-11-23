@@ -1,3 +1,4 @@
+import { AxiosError } from 'axios';
 import { useMutation, UseMutationOptions } from 'react-query';
 import { Tag } from 'src/types';
 import { axiosInstance } from 'src/utils/url';
@@ -9,7 +10,7 @@ const createTag = async (tag: Partial<Tag>) => {
 };
 
 export const useAPICreateUserTag = (
-  mutationOptions?: UseMutationOptions<Tag, Error, Partial<Tag>, unknown>,
+  mutationOptions?: UseMutationOptions<Tag, AxiosError, Partial<Tag>, unknown>,
 ) => {
-  return useMutation<Tag, Error, Partial<Tag>>(createTag, mutationOptions);
+  return useMutation<Tag, AxiosError, Partial<Tag>>(createTag, mutationOptions);
 };

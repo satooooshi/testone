@@ -11,10 +11,13 @@ import {
   ValidateIf,
 } from 'class-validator';
 import { EventType } from 'src/entities/event.entity';
+import { EventVideo } from 'src/entities/eventVideo.entity';
+import { Tag } from 'src/entities/tag.entity';
+import { User } from 'src/entities/user.entity';
 import { isNotEmptyExceptTags } from 'src/utils/dto/isNotEmptyExceptTags';
 import { isYoutubeLink } from 'src/utils/dto/isYoutubeLink';
 
-export class saveEventDto {
+export class SaveEventDto {
   @isNotEmptyExceptTags({
     message: 'タイトルは必須項目です。空白のみは設定できません。',
   })
@@ -27,13 +30,13 @@ export class saveEventDto {
 
   @ArrayNotEmpty({ message: 'タグは必須項目です。' })
   @IsArray({ message: 'タグのリクエストは配列型に限られています。' })
-  tags: [];
+  tags: Tag[];
 
   @IsNotEmpty({ message: 'タイプは必須項目です。' })
   @IsEnum(EventType, {
     message: 'タイプのリクエストの値が不正です。',
   })
-  type: string;
+  type: EventType;
 
   @Type(() => Date)
   @IsNotEmpty({ message: '開始日時は必須項目です。' })
@@ -57,6 +60,8 @@ export class saveEventDto {
   @ValidateIf((o, v) => v != null && v.length)
   @IsArray({ message: 'YouTubeリンクのリクエストは配列型に限られています。' })
   @isYoutubeLink({ message: 'Youtubeの動画URLが不正です。' })
-  videos: [];
+  videos: EventVideo[];
+
+  author?: User;
 }
-export default saveEventDto;
+export default SaveEventDto;

@@ -1,29 +1,11 @@
+import {AxiosError} from 'axios';
 import {useMutation, UseMutationOptions} from 'react-query';
-import {EventSchedule, EventVideo, EventFile} from '../../../types';
+import {EventSchedule} from '../../../types';
 import {axiosInstance, jsonHeader} from '../../../utils/url';
 import {createEventURL} from '../../../utils/url/event.url';
 
-type ExcludeFilesAndVideos = Pick<
-  EventSchedule,
-  | 'title'
-  | 'description'
-  | 'startAt'
-  | 'endAt'
-  | 'tags'
-  | 'imageURL'
-  | 'type'
-  | 'hostUsers'
-  | 'chatNeeded'
->;
-
-export type CreateEventRequest = ExcludeFilesAndVideos & {
-  id?: number;
-  videos: Partial<EventVideo>[];
-  files: Partial<EventFile>[];
-};
-
 const createEvent = async (
-  eventSchedule: CreateEventRequest,
+  eventSchedule: Partial<EventSchedule>,
 ): Promise<EventSchedule> => {
   const res = await axiosInstance.post<EventSchedule>(
     createEventURL,
@@ -38,12 +20,12 @@ const createEvent = async (
 export const useAPICreateEvent = (
   mutationOptions?: UseMutationOptions<
     EventSchedule,
-    Error,
-    CreateEventRequest,
+    AxiosError,
+    Partial<EventSchedule>,
     unknown
   >,
 ) => {
-  return useMutation<EventSchedule, Error, CreateEventRequest>(
+  return useMutation<EventSchedule, AxiosError, Partial<EventSchedule>>(
     createEvent,
     mutationOptions,
   );

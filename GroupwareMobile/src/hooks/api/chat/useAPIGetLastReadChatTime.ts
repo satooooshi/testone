@@ -2,6 +2,7 @@ import {useQuery, UseQueryOptions} from 'react-query';
 import {axiosInstance} from '../../../utils/url';
 import {getLastReadChatTimeURL} from '../../../utils/url/chat.url';
 import {LastReadChatTime} from '../../../types';
+import {AxiosError} from 'axios';
 
 const getLastReadChatTime = async (query: number) => {
   const res = await axiosInstance.get<LastReadChatTime[]>(
@@ -12,9 +13,9 @@ const getLastReadChatTime = async (query: number) => {
 
 export const useAPIGetLastReadChatTime = (
   query: number,
-  options?: UseQueryOptions<LastReadChatTime[], Error>,
+  options?: UseQueryOptions<LastReadChatTime[], AxiosError>,
 ) => {
-  return useQuery<LastReadChatTime[], Error>(
+  return useQuery<LastReadChatTime[], AxiosError>(
     ['getLastReadChatTime', query],
     () => getLastReadChatTime(query),
     options,

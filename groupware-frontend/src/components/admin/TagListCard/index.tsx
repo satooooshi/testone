@@ -21,6 +21,7 @@ const TagListBox: React.FC<TagListBoxProps> = ({
 }) => {
   const [newTagName, setNewTagName] = useState('');
   const [tagEditted, setTagEditted] = useState<Tag>();
+  const [isVisibleAllTags, setIsVisibleAllTags] = useState(false);
 
   const tagLabelName = useMemo(() => {
     switch (tagType) {
@@ -37,10 +38,15 @@ const TagListBox: React.FC<TagListBoxProps> = ({
     }
   }, [tagType]);
 
-  const tagsDisplayed = useMemo(() => {
-    const filteredTags = tags?.filter((t) => t.type === tagType);
-    return filteredTags;
+  const filteredTags = useMemo(() => {
+    return tags?.filter((t) => t.type === tagType);
   }, [tagType, tags]);
+
+  const tagsDisplayed = useMemo(() => {
+    return !isVisibleAllTags && filteredTags?.length && filteredTags.length > 4
+      ? filteredTags.slice(0, 4)
+      : filteredTags;
+  }, [filteredTags, isVisibleAllTags]);
 
   useEffect(() => {
     if (tagEditted) {
@@ -81,10 +87,12 @@ const TagListBox: React.FC<TagListBoxProps> = ({
                     onClickSaveButton({ ...tagEditted, name: newTagName });
                     setTagEditted(undefined);
                     setNewTagName('');
+                    setIsVisibleAllTags(true);
                     return;
                   }
                   onClickSaveButton({ name: newTagName, type: tagType });
                   setNewTagName('');
+                  setIsVisibleAllTags(true);
                 }}
                 size="sm"
                 colorScheme="green"
@@ -128,6 +136,17 @@ const TagListBox: React.FC<TagListBoxProps> = ({
           </div>
         ))}
       </div>
+      {filteredTags?.length && filteredTags.length > 4 ? (
+        <Button
+          onClick={() => setIsVisibleAllTags(!isVisibleAllTags)}
+          size="md"
+          type="button"
+          _focus={{ boxShadow: 'none' }}
+          isFullWidth={true}
+          colorScheme="blackAlpha">
+          {!isVisibleAllTags ? '全て表示' : '折りたたむ'}
+        </Button>
+      ) : null}
     </div>
   );
 };

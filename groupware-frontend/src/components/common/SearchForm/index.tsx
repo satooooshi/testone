@@ -7,12 +7,19 @@ import React, {
 import searchFormStyles from '@/styles/components/SearchForm.module.scss';
 import TagModal from '../TagModal';
 import { Tag } from 'src/types';
-import { Button, Input, useMediaQuery } from '@chakra-ui/react';
+import {
+  Button,
+  ButtonGroup,
+  IconButton,
+  Input,
+  useMediaQuery,
+} from '@chakra-ui/react';
 import { GiCancel } from 'react-icons/gi';
 import ReactModal from 'react-modal';
 import { AiOutlineSearch } from 'react-icons/ai';
 import clsx from 'clsx';
 import { tagColorFactory } from 'src/utils/factory/tagColorFactory';
+import { MdCancel } from 'react-icons/md';
 
 const SearchFormContext = createContext({
   isSmallerThan768: false,
@@ -152,17 +159,23 @@ const SearchInput: React.FC<SearchFormProps> = ({
             </p>
           </div>
           <div className={searchFormStyles.selected_tags_wrapper}>
-            {selectedTags.map((tag) => {
-              return (
-                <Button
-                  colorScheme={tagColorFactory(tag.type)}
-                  size="xs"
-                  key={tag.id}
-                  className={searchFormStyles.tag_item}>
-                  {tag.name}
-                </Button>
-              );
-            })}
+            {selectedTags.map((tag) => (
+              <div
+                className={searchFormStyles.selected_tag_item_wrapper}
+                key={tag.id}>
+                <ButtonGroup
+                  isAttached
+                  size="sm"
+                  colorScheme={tagColorFactory(tag.type)}>
+                  <Button mr="-px">{tag.name}</Button>
+                  <IconButton
+                    onClick={() => toggleTag(tag)}
+                    aria-label="削除"
+                    icon={<MdCancel size={18} />}
+                  />
+                </ButtonGroup>
+              </div>
+            ))}
           </div>
         </div>
       ) : null}

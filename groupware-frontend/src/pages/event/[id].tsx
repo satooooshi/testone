@@ -46,6 +46,7 @@ import { useAPICancelEvent } from '@/hooks/api/event/useAPICancelEvent';
 import coachImage from '@/public/coach_1.jpeg';
 import { eventTypeColorFactory } from 'src/utils/factory/eventTypeColorFactory';
 import eventTypeNameFactory from 'src/utils/factory/eventTypeNameFactory';
+import { responseErrorMsgFactory } from 'src/utils/factory/responseErrorMsgFactory';
 
 type FileIconProps = {
   href?: string;
@@ -56,6 +57,8 @@ const FileIcon: React.FC<FileIconProps> = ({ href, submitted }) => {
   return (
     <a
       href={href}
+      target="_blank"
+      rel="noreferrer noopener"
       download
       className={clsx(
         eventDetailStyles.file,
@@ -147,7 +150,19 @@ const EventDetail = () => {
     },
   });
 
-  const { mutate: joinEvent } = useAPIJoinEvent({ onSuccess: () => refetch() });
+  const { mutate: joinEvent } = useAPIJoinEvent({
+    onSuccess: () => refetch(),
+    onError: (err) => {
+      if (err.response?.data?.message) {
+        toast({
+          description: err.response?.data?.message,
+          status: 'error',
+          duration: 3000,
+          isClosable: true,
+        });
+      }
+    },
+  });
   const { mutate: cancelEvent } = useAPICancelEvent({
     onSuccess: () => refetch(),
   });
@@ -155,6 +170,16 @@ const EventDetail = () => {
     onSuccess: () => {
       setEditModal(false);
       refetch();
+    },
+    onError: (e) => {
+      const messages = responseErrorMsgFactory(e);
+      toast({
+        description: messages,
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      });
+      return;
     },
   });
   const { mutate: handleChangeJoiningData } = useAPISaveUserJoiningEvent({
@@ -180,6 +205,16 @@ const EventDetail = () => {
       setCommentVisible(false);
       setNewComment('');
       refetch();
+    },
+    onError: (e) => {
+      const messages = responseErrorMsgFactory(e);
+      toast({
+        description: messages,
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      });
+      return;
     },
   });
 

@@ -18,6 +18,7 @@ import { SearchQueryToGetUsers } from './user.controller';
 import { Tag, TagType } from 'src/entities/tag.entity';
 import { StorageService } from '../storage/storage.service';
 import { DateTime } from 'luxon';
+import { userNameFactory } from 'src/utils/factory/userNameFactory';
 
 @Injectable()
 export class UserService {
@@ -329,6 +330,9 @@ export class UserService {
       .orderBy(sortKey, 'DESC')
       .getManyAndCount();
     const userIDs = users.map((u) => u.id);
+    const userArrWithTags = await this.userRepository.findByIds(userIDs, {
+      relations: ['tags'],
+    });
     const userObjWithEvent = await this.userRepository
       .createQueryBuilder('user')
       .leftJoinAndSelect('user.userJoiningEvent', 'userJoiningEvent')
@@ -380,6 +384,12 @@ export class UserService {
       .where(userIDs.length ? 'user.id IN (:...userIDs)' : '1=1', { userIDs })
       .getMany();
     const usersArrWithEachCount = users.map((u) => {
+      const tags = userArrWithTags.filter((user) => user.id === u.id)[0]?.tags;
+      console.log('user: ', userNameFactory(u));
+      console.log(
+        'tag: ',
+        tags?.map((t) => t.name),
+      );
       const eventCount =
         userObjWithEvent.filter((user) => user.id === u.id)[0]?.userJoiningEvent
           .length || 0;
@@ -394,6 +404,7 @@ export class UserService {
           .length || 0;
       return {
         ...u,
+        tags,
         questionCount,
         eventCount,
         knowledgeCount,
@@ -446,16 +457,14 @@ export class UserService {
       where: { id },
       relations: ['tags'],
     });
+    if (!user) {
+      throw new NotFoundException('User with this id does not exist');
+    }
     if (!user?.verifiedAt) {
       throw new BadRequestException('The user is not verified');
     }
-    if (user) {
-      const urlParsedUser = await this.generateSignedStorageURLsFromUserObj(
-        user,
-      );
-      return urlParsedUser;
-    }
-    throw new NotFoundException('User with this id does not exist');
+    const urlParsedUser = await this.generateSignedStorageURLsFromUserObj(user);
+    return urlParsedUser;
   }
 
   async getByEmail(email: string, passwordSelect?: boolean) {
@@ -558,7 +567,7 @@ export class UserService {
       existUser.password,
     );
     if (!isPasswordMatching) {
-      throw new BadRequestException('unmatch password');
+      throw new BadRequestException('現在のパスワードが正しくありません');
     }
     existUser.password = hashedNewPassword;
     const user = await this.userRepository.save(existUser);

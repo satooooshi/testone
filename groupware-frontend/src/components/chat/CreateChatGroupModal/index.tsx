@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useCallback, useRef, useState, useEffect } from 'react';
 import ReactModal from 'react-modal';
 import { ChatGroup, User, UserRole } from 'src/types';
 import selectUserModalStyles from '@/styles/components/SelectUserModal.module.scss';
@@ -12,43 +12,45 @@ import {
   useToast,
 } from '@chakra-ui/react';
 import { useDropzone } from 'react-dropzone';
+import { chatGroupSchema } from 'src/utils/validation/schema';
 import { imageExtensions } from 'src/utils/imageExtensions';
 import ReactCrop, { Crop } from 'react-image-crop';
+import { useFormik } from 'formik';
 import { getCroppedImageURL } from 'src/utils/getCroppedImageURL';
-import { useAPIUploadStorage } from '@/hooks/api/storage/useAPIUploadStorage';
 import { dataURLToFile } from 'src/utils/dataURLToFile';
 import { userRoleNameFactory } from 'src/utils/factory/userRoleNameFactory';
+import { formikErrorMsgFactory } from 'src/utils/factory/formikErrorMsgFactory';
 
 type CreateChatGroupModalProps = {
   isOpen: boolean;
-  closeModal: () => void;
-  newGroup: Partial<ChatGroup>;
-  onChangeNewGroupName: (groupName: string) => void;
-  toggleNewGroupMember: (u: User) => void;
   users: User[];
+  resetFormTrigger: boolean;
+  groupImageURL: string;
+  setResetFormTrigger: React.Dispatch<React.SetStateAction<boolean>>;
+  closeModal: () => void;
   createGroup: (g: Partial<ChatGroup>) => void;
+  uploadImage: (r: File[]) => void;
 };
 
 const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
   isOpen,
-  closeModal,
-  newGroup,
-  onChangeNewGroupName,
-  toggleNewGroupMember,
   users,
+  resetFormTrigger,
+  groupImageURL,
+  setResetFormTrigger,
+  closeModal,
   createGroup,
+  uploadImage,
 }) => {
   const toast = useToast();
+  const initialChatValues = {
+    name: '',
+    members: [],
+  };
   const [selectedUserRole, setSelectedUserRole] = useState<UserRole | 'all'>(
     'all',
   );
   const [selectImageUrl, setSelectImageUrl] = useState<string>('');
-  const { mutate: uploadImage } = useAPIUploadStorage({
-    onSuccess: async (fileURLs) => {
-      createGroup({ ...newGroup, imageURL: fileURLs[0] });
-      setSelectImageUrl('');
-    },
-  });
   const [selectImageName, setSelectImageName] = useState<string>('');
   const [crop, setCrop] = useState<Crop>({
     unit: 'px',
@@ -60,6 +62,7 @@ const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
   });
   const [completedCrop, setCompletedCrop] = useState<Crop>();
   const imgRef = useRef<HTMLImageElement>();
+  const [imgUploaded, setImgUploaded] = useState(false);
   const onEventImageDrop = useCallback((f: File[]) => {
     setSelectImageUrl(URL.createObjectURL(f[0]));
     setSelectImageName(f[0].name);
@@ -71,29 +74,77 @@ const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
 
   const onLoad = useCallback((img) => {
     imgRef.current = img;
+    setImgUploaded(false);
   }, []);
 
-  const onFinish = async () => {
-    if (!newGroup.members?.length) {
+  const {
+    values: newGroup,
+    setValues: setNewGroup,
+    handleSubmit: onFinish,
+    handleChange,
+    resetForm,
+    validateForm,
+  } = useFormik<Partial<ChatGroup>>({
+    initialValues: initialChatValues,
+    enableReinitialize: true,
+    validationSchema: chatGroupSchema,
+    onSubmit: async () => {
+      if (imgRef.current && completedCrop && imgUploaded === false) {
+        const img = getCroppedImageURL(imgRef.current, completedCrop);
+        if (!img) {
+          return;
+        }
+        const result = await dataURLToFile(img, selectImageName);
+        return uploadImage([result]);
+      }
+      createGroup(newGroup);
+    },
+  });
+
+  const checkErrors = async () => {
+    const errors = await validateForm();
+    const messages = formikErrorMsgFactory(errors);
+    if (messages) {
       toast({
-        title: 'ルームに参加する社員を一人以上選択してください',
+        description: messages,
         status: 'error',
         duration: 3000,
         isClosable: true,
       });
-      return;
+    } else {
+      onFinish();
     }
-    if (imgRef.current && completedCrop) {
-      const img = getCroppedImageURL(imgRef.current, completedCrop);
-      if (!img) {
-        return;
-      }
-      const result = await dataURLToFile(img, selectImageName);
-      uploadImage([result]);
-      return;
-    }
-    createGroup(newGroup);
   };
+
+  const toggleNewGroupMember = (user: User) => {
+    const isExist = newGroup.members?.filter((u) => u.id === user.id);
+    if (isExist && isExist.length) {
+      setNewGroup((g) => ({
+        ...g,
+        members: g.members?.filter((u) => u.id !== user.id),
+      }));
+      return;
+    }
+    setNewGroup((g) => ({
+      ...g,
+      members: g.members ? [...g.members, user] : [user],
+    }));
+  };
+
+  useEffect(() => {
+    if (resetFormTrigger) {
+      resetForm();
+    }
+    setResetFormTrigger(false);
+  }, [resetFormTrigger]);
+
+  useEffect(() => {
+    if (groupImageURL) {
+      createGroup(newGroup);
+      setSelectImageUrl('');
+      setImgUploaded(true);
+    }
+  }, [groupImageURL]);
 
   return (
     <ReactModal
@@ -107,9 +158,10 @@ const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
             <FormLabel>グループ名</FormLabel>
             <input
               type="text"
+              name="name"
               className={selectUserModalStyles.modal_input_name}
               value={newGroup.name}
-              onChange={(e) => onChangeNewGroupName(e.target.value)}
+              onChange={handleChange}
               placeholder="グループ名を入力して下さい"
             />
           </div>
@@ -215,7 +267,10 @@ const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
             colorScheme="blue"
             borderRadius={5}
             className={selectUserModalStyles.modal_cancel_button}
-            onClick={closeModal}>
+            onClick={() => {
+              resetForm();
+              closeModal();
+            }}>
             キャンセル
           </Button>
           <Button
@@ -223,7 +278,7 @@ const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
             width="140px"
             colorScheme="green"
             borderRadius={5}
-            onClick={onFinish}>
+            onClick={() => checkErrors()}>
             作成
           </Button>
         </div>

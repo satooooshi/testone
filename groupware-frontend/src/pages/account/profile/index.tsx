@@ -33,6 +33,7 @@ import { profileSchema } from 'src/utils/validation/schema';
 import { formikErrorMsgFactory } from 'src/utils/factory/formikErrorMsgFactory';
 import { useAPIGetUserTag } from '@/hooks/api/tag/useAPIGetUserTag';
 import FormToLinkTag from '@/components/FormToLinkTag';
+import router from 'next/router';
 
 type ModalState = {
   isOpen: boolean;
@@ -180,6 +181,7 @@ const Profile = () => {
           isClosable: true,
         });
         dispatchCrop({ type: 'setImageFile', value: undefined });
+        router.push(`/account/${responseData.id.toString()}`);
       }
     },
   });
@@ -332,6 +334,7 @@ const Profile = () => {
             <FormToLinkTag
               tags={userInfo?.tags || []}
               tagType={TagType.TECH}
+              toggleTag={toggleSelectedTag}
               onEditButtonClick={() => dispatchModal({ type: 'openTech' })}
             />
           </Box>
@@ -351,6 +354,7 @@ const Profile = () => {
             <FormToLinkTag
               tags={userInfo?.tags || []}
               tagType={TagType.QUALIFICATION}
+              toggleTag={toggleSelectedTag}
               onEditButtonClick={() =>
                 dispatchModal({ type: 'openQualification' })
               }
@@ -372,6 +376,7 @@ const Profile = () => {
             <FormToLinkTag
               tags={userInfo?.tags || []}
               tagType={TagType.CLUB}
+              toggleTag={toggleSelectedTag}
               onEditButtonClick={() => dispatchModal({ type: 'openClub' })}
             />
           </Box>
@@ -391,6 +396,7 @@ const Profile = () => {
             <FormToLinkTag
               tags={userInfo?.tags || []}
               tagType={TagType.HOBBY}
+              toggleTag={toggleSelectedTag}
               onEditButtonClick={() => dispatchModal({ type: 'openHobby' })}
             />
           </Box>

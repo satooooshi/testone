@@ -123,6 +123,7 @@ export class StorageService {
       if (matchedSignedURL.slice(-1) === '"') {
         unsignedURL += '"';
       }
+      unsignedURL = decodeURI(unsignedURL);
       parseText = parseText.replace(matchedSignedURL, unsignedURL);
     }
     return parseText;

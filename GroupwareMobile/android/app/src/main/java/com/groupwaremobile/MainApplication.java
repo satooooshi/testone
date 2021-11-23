@@ -10,6 +10,9 @@ import com.facebook.react.ReactPackage;
 import com.facebook.soloader.SoLoader;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
+import com.facebook.react.bridge.JSIModulePackage;
+import com.lugg.ReactNativeConfig.ReactNativeConfigPackage;
+
 
 public class MainApplication extends Application implements ReactApplication {
 
@@ -24,6 +27,8 @@ public class MainApplication extends Application implements ReactApplication {
         protected List<ReactPackage> getPackages() {
           @SuppressWarnings("UnnecessaryLocalVariable")
           List<ReactPackage> packages = new PackageList(this).getPackages();
+          new ReactNativeConfigPackage();
+           // packages.add(new ReactNativeConfigPackage());
           // Packages that cannot be autolinked yet can be added manually here, for example:
           // packages.add(new MyReactNativePackage());
           return packages;
@@ -32,6 +37,10 @@ public class MainApplication extends Application implements ReactApplication {
         @Override
         protected String getJSMainModuleName() {
           return "index";
+        }
+        @Override
+        protected JSIModulePackage getJSIModulePackage() {
+            return new GroupwareMobileJSIPackage(); // <-- your package's name
         }
       };
 
