@@ -87,6 +87,8 @@ export const profileSchema = Yup.object().shape({
     1000,
     `趣味の紹介は${nWordLimitMessage(1000)}`,
   ),
+});
+
 export const chatGroupSchema = Yup.object().shape({
   name: Yup.string()
     .required(`グループ名は${requireMessage}`)
