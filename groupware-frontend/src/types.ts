@@ -236,6 +236,7 @@ export interface ChatMessage {
   createdAt: Date;
   updatedAt: Date;
   isSender?: boolean;
+  replayParentMessage?: ChatMessage;
 }
 
 export interface ChatGroup {

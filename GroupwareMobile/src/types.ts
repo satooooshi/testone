@@ -254,6 +254,7 @@ export interface ChatMessage {
   updatedAt: Date;
   isSender?: boolean;
   thumbnail?: string;
+  replyParentMessage?: ChatMessage | null;
 }
 
 export interface ChatGroup {
