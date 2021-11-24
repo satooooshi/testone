@@ -64,6 +64,16 @@ export class ChatService {
     chatMessage.content = await this.storageService.parseStorageURLToSignedURL(
       chatMessage.content,
     );
+    const avatarUrl = await this.storageService.parseStorageURLToSignedURL(
+      chatMessage.sender?.avatarUrl,
+    );
+    chatMessage.sender = { ...chatMessage.sender, avatarUrl };
+    if (chatMessage.replyParentMessage) {
+      chatMessage.replyParentMessage =
+        await this.generateSignedStorageURLsFromChatMessageObj(
+          chatMessage.replyParentMessage,
+        );
+    }
     return chatMessage;
   }
 
@@ -115,7 +125,6 @@ export class ChatService {
       urlUnparsedRooms,
     );
     const pageCount = Math.floor(count / limit) + 1;
-    console.log(rooms);
     return { rooms, pageCount };
   }
 
@@ -131,6 +140,11 @@ export class ChatService {
       .withDeleted()
       .leftJoin('chat_messages.chatGroup', 'chat_group')
       .leftJoinAndSelect('chat_messages.sender', 'sender')
+      .leftJoinAndSelect(
+        'chat_messages.replyParentMessage',
+        'replyParentMessage',
+      )
+      .leftJoinAndSelect('replyParentMessage.sender', 'reply_sender')
       .where('chat_group.id = :chatGroupID', { chatGroupID: query.group })
       .orderBy('chat_messages.created_at', 'DESC')
       .limit(limit)
