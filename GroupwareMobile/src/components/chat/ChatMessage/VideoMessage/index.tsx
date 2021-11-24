@@ -7,12 +7,17 @@ import {blueColor} from '../../../../utils/colors';
 type VideMessageProps = {
   message: ChatMessage;
   onPress: () => void;
+  onLongPress: () => void;
 };
 
-const VideoMessage: React.FC<VideMessageProps> = ({onPress, message}) => {
+const VideoMessage: React.FC<VideMessageProps> = ({
+  onPress,
+  message,
+  onLongPress,
+}) => {
   const {width: windowWidth} = useWindowDimensions();
   return (
-    <TouchableOpacity onPress={onPress}>
+    <TouchableOpacity onPress={onPress} onLongPress={onLongPress}>
       <Image
         source={{uri: message.thumbnail}}
         w={windowWidth * 0.6}
