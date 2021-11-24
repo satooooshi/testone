@@ -1,7 +1,7 @@
 import React, {useEffect, useMemo, useState} from 'react';
 import WholeContainer from '../../../components/WholeContainer';
 import {FlatList, useWindowDimensions, ActivityIndicator} from 'react-native';
-import AppHeader from '../../../components/Header';
+import HeaderWithTextButton from '../../../components/Header';
 import {Div, Text, Button, Overlay, ScrollDiv} from 'react-native-magnus';
 import FastImage from 'react-native-fast-image';
 import {eventDetailStyles} from '../../../styles/screen/event/eventDetail.style';
@@ -135,7 +135,7 @@ const EventDetail: React.FC = () => {
 
   return (
     <WholeContainer>
-      <AppHeader
+      <HeaderWithTextButton
         enableBackButton={true}
         title="イベント詳細"
         activeTabName="一覧に戻る"

@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import WholeContainer from '../../../components/WholeContainer';
-import AppHeader, {Tab} from '../../../components/Header';
+import HeaderWithTextButton, {Tab} from '../../../components/Header';
 import {WikiType} from '../../../types';
 import WikiCardList from './WikiCardList';
 import {wikiTypeNameFactory} from '../../../utils/factory/wiki/wikiTypeNameFactory';
@@ -33,7 +33,7 @@ const WikiList: React.FC<WikiListProps> = ({navigation}) => {
 
   return (
     <WholeContainer>
-      <AppHeader
+      <HeaderWithTextButton
         tabs={tabs}
         title="社内Wiki"
         activeTabName={type ? wikiTypeNameFactory(type) : 'All'}

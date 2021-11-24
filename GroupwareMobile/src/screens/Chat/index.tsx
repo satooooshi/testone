@@ -32,16 +32,23 @@ import RNFetchBlob from 'rn-fetch-blob';
 const {fs, config} = RNFetchBlob;
 import FileViewer from 'react-native-file-viewer';
 import {KeyboardAwareFlatList} from 'react-native-keyboard-aware-scroll-view';
-import {useRoute} from '@react-navigation/native';
-import {ChatRouteProps} from '../../types/navigator/drawerScreenProps';
+import {useNavigation, useRoute} from '@react-navigation/native';
+import {
+  ChatNavigationProps,
+  ChatRouteProps,
+} from '../../types/navigator/drawerScreenProps';
 import {useFormik} from 'formik';
 import ReplyTarget from '../../components/chat/ChatFooter/ReplyTarget';
+import HeaderWithIconButton from '../../components/Header/HeaderWithIconButton';
+import {darkFontColor} from '../../utils/colors';
+import tailwind from 'tailwind-rn';
 
 type ImageSource = {
   uri: string;
 };
 
 const Chat: React.FC = () => {
+  const navigation = useNavigation<ChatNavigationProps>();
   const {height: windowHeight} = useWindowDimensions();
   const route = useRoute<ChatRouteProps>();
   const {room} = route.params;
@@ -104,6 +111,20 @@ const Chat: React.FC = () => {
     setImageModal(true);
   };
   const isLoading = loadingMessages || loadingSendMessage || loadingUploadFile;
+  const headerRightIcon = (
+    <TouchableOpacity
+      style={tailwind('flex flex-row items-center')}
+      onPress={() =>
+        navigation.navigate('ChatStack', {screen: 'ChatMenu', params: {room}})
+      }>
+      <Icon
+        name="pencil"
+        fontFamily="Entypo"
+        fontSize={24}
+        color={darkFontColor}
+      />
+    </TouchableOpacity>
+  );
 
   const handleUploadImage = async () => {
     const {formData} = await uploadImageFromGallery({
@@ -381,10 +402,11 @@ const Chat: React.FC = () => {
         swipeToCloseEnabled={false}
         doubleTapToZoomEnabled={true}
       />
-      <AppHeader
+      <HeaderWithIconButton
         title="チャット"
         enableBackButton={true}
         screenForBack={'RoomList'}
+        icon={headerRightIcon}
       />
       {messageListAvoidngKeyboardDisturb}
     </WholeContainer>

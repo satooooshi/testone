@@ -19,7 +19,7 @@ import {
   Overlay,
 } from 'react-native-magnus';
 import TagModal from '../../../components/common/TagModal';
-import AppHeader, {Tab} from '../../../components/Header';
+import HeaderWithTextButton, {Tab} from '../../../components/Header';
 import TagEditLine from '../../../components/TagEditLine';
 import WholeContainer from '../../../components/WholeContainer';
 import {useAPIUploadStorage} from '../../../hooks/api/storage/useAPIUploadStorage';
@@ -134,7 +134,7 @@ const Profile: React.FC = () => {
       <Overlay visible={loadingProfile || loadingUpdate} p="xl">
         <ActivityIndicator />
       </Overlay>
-      <AppHeader
+      <HeaderWithTextButton
         title={'Account'}
         tabs={tabs}
         activeTabName={'プロフィール編集'}

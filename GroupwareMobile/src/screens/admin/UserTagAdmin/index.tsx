@@ -3,7 +3,7 @@ import React from 'react';
 import {ActivityIndicator, Alert, useWindowDimensions} from 'react-native';
 import {Overlay, ScrollDiv} from 'react-native-magnus';
 import TagCollapse from '../../../components/admin/TagCollapse';
-import AppHeader, {Tab} from '../../../components/Header';
+import HeaderWithTextButton, {Tab} from '../../../components/Header';
 import WholeContainer from '../../../components/WholeContainer';
 import {useAPICreateUserTag} from '../../../hooks/api/tag/useAPICreateUesrTag';
 import {useAPIDeleteUserTag} from '../../../hooks/api/tag/useAPIDelteUserTag';
@@ -115,7 +115,7 @@ const UserTagAdmin: React.FC = () => {
       <Overlay visible={isLoading} p="xl">
         <ActivityIndicator />
       </Overlay>
-      <AppHeader
+      <HeaderWithTextButton
         title={'タグ管理'}
         tabs={tabs}
         activeTabName={'タグ管理(ユーザー)'}

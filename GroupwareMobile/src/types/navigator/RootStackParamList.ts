@@ -42,4 +42,7 @@ export type RootStackParamList = {
       }
     | undefined;
   NewRoom: undefined;
+  ChatMenu: {
+    room: ChatGroup;
+  };
 };

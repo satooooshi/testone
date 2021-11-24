@@ -4,7 +4,7 @@ import {ScrollDiv, Div} from 'react-native-magnus';
 import PortalLinkBox from '../../components/PortalLinkBox';
 import {WikiType} from '../../types';
 import {wikiStyles} from '../../styles/screen/wiki/wiki.style';
-import AppHeader, {Tab} from '../../components/Header';
+import HeaderWithTextButton, {Tab} from '../../components/Header';
 import {useNavigation} from '@react-navigation/native';
 import {WikiNavigationProps} from '../../types/navigator/drawerScreenProps';
 
@@ -18,7 +18,11 @@ const Wiki: React.FC = () => {
   ];
   return (
     <WholeContainer>
-      <AppHeader title="社内Wiki" activeTabName="社内Wiki Home" tabs={tabs} />
+      <HeaderWithTextButton
+        title="社内Wiki"
+        activeTabName="社内Wiki Home"
+        tabs={tabs}
+      />
       <ScrollDiv
         flexDir="column"
         contentContainerStyle={wikiStyles.portalBoxList}>

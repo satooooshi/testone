@@ -5,7 +5,7 @@ import RenderHtml from 'react-native-render-html';
 import {useAPIGetWikiDetail} from '../../../hooks/api/wiki/useAPIGetWikiDetail';
 import MarkdownIt from 'markdown-it';
 import {TouchableOpacity, useWindowDimensions} from 'react-native';
-import AppHeader from '../../../components/Header';
+import HeaderWithTextButton from '../../../components/Header';
 import {wikiTypeNameFactory} from '../../../utils/factory/wiki/wikiTypeNameFactory';
 import {darkFontColor} from '../../../utils/colors';
 import {userNameFactory} from '../../../utils/factory/userNameFactory';
@@ -49,7 +49,7 @@ const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
 
   return (
     <WholeContainer>
-      <AppHeader
+      <HeaderWithTextButton
         title={headerTitle}
         rightButtonName={headerRightButtonName}
         onPressRightButton={onPressHeaderRightButton}
