@@ -52,4 +52,9 @@ export const chatStyles = StyleSheet.create({
     zIndex: 1,
     backgroundColor: 'transparent',
   },
+  closeReplyIcon: {
+    position: 'absolute',
+    right: 5,
+    top: 5,
+  },
 });

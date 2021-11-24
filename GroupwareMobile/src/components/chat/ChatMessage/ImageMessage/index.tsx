@@ -6,12 +6,17 @@ import {ChatMessage} from '../../../../types';
 type ImageMessageProps = {
   onPress: () => void;
   message: ChatMessage;
+  onLongPress: () => void;
 };
 
-const ImageMessage: React.FC<ImageMessageProps> = ({onPress, message}) => {
+const ImageMessage: React.FC<ImageMessageProps> = ({
+  onPress,
+  message,
+  onLongPress,
+}) => {
   const {width: windowWidth} = useWindowDimensions();
   return (
-    <TouchableOpacity onPress={onPress}>
+    <TouchableOpacity onPress={onPress} onLongPress={onLongPress}>
       <Image
         source={{uri: message.content}}
         w={windowWidth * 0.6}

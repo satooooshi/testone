@@ -60,4 +60,11 @@ export class ChatMessage {
   updatedAt: Date;
 
   isSender?: boolean;
+
+  // @Column({ nullable: true })
+  // reply?: string;
+  //
+  @ManyToOne(() => ChatMessage, (chatMessage) => chatMessage.id)
+  @JoinColumn({ name: 'reply_parent_id' })
+  replyParentMessage?: ChatMessage;
 }
