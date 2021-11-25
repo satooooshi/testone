@@ -147,14 +147,23 @@ export class ChatController {
 
   @Post('/v2/room/:roomId/note')
   @UseGuards(JwtAuthenticationGuard)
-  async createChatNotes(@Body() body: Partial<ChatNote>) {
+  async createChatNotes(
+    @Body() body: Partial<ChatNote>,
+    @Req() req: RequestWithUser,
+  ) {
+    const { user } = req;
+    body.editors = [user];
     const notes = await this.chatService.saveChatNotes(body);
     return notes;
   }
 
   @Patch('/v2/room/:roomId/note/:noteId')
   @UseGuards(JwtAuthenticationGuard)
-  async updateChatNotes(@Body() body: ChatNote) {
+  async updateChatNotes(@Body() body: ChatNote, @Req() req: RequestWithUser) {
+    const { user } = req;
+    body.editors = body?.editors?.length
+      ? [...body.editors.filter((e) => e.id !== user.id), user]
+      : [user];
     const notes = await this.chatService.saveChatNotes(body);
     return notes;
   }
