@@ -404,6 +404,7 @@ export class ChatService {
   ): Promise<ChatNote> {
     let noteDetail = await this.noteRepository.findOne(noteID, {
       relations: ['chatGroup', 'editors', 'images'],
+      withDeleted: true,
     });
     noteDetail = await this.generateSignedStorageURLsFromChatNoteObj(
       noteDetail,
@@ -426,6 +427,7 @@ export class ChatService {
       .leftJoinAndSelect('chat_notes.editors', 'editors')
       .leftJoinAndSelect('chat_notes.images', 'images')
       .where('chat_groups.id = :chatGroupId', { chatGroupId: group })
+      .withDeleted()
       .skip(offset)
       .take(limit)
       .orderBy('chat_notes.createdAt', 'DESC')
