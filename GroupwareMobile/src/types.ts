@@ -279,8 +279,22 @@ export interface ChatNote {
   id: number;
   content: string;
   chatGroup?: ChatGroup;
-  editor?: User[];
+  editors?: User[];
+  images?: Partial<ChatNoteImage>[];
   createdAt: Date;
   updatedAt: Date;
   isEditor?: boolean;
 }
+
+export interface ChatNoteImage {
+  id: number;
+  imageURL: string;
+  chatNote?: ChatNote;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+//this is for react-native-image-viewing
+export type ImageSource = {
+  uri: string;
+};
