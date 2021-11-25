@@ -15,7 +15,7 @@ import {useAPIGetMessages} from '../../hooks/api/chat/useAPIGetMessages';
 import {useAPISendChatMessage} from '../../hooks/api/chat/useAPISendChatMessage';
 import {useAPIUploadStorage} from '../../hooks/api/storage/useAPIUploadStorage';
 import {chatStyles} from '../../styles/screen/chat/chat.style';
-import {ChatMessage, ChatMessageType} from '../../types';
+import {ChatMessage, ChatMessageType, ImageSource} from '../../types';
 import {uploadImageFromGallery} from '../../utils/cropImage/uploadImageFromGallery';
 import DocumentPicker from 'react-native-document-picker';
 import ImageView from 'react-native-image-viewing';
@@ -41,10 +41,6 @@ import ReplyTarget from '../../components/chat/ChatFooter/ReplyTarget';
 import HeaderWithIconButton from '../../components/Header/HeaderWithIconButton';
 import {darkFontColor} from '../../utils/colors';
 import tailwind from 'tailwind-rn';
-
-type ImageSource = {
-  uri: string;
-};
 
 const Chat: React.FC = () => {
   const navigation = useNavigation<ChatNavigationProps>();

@@ -1,6 +1,7 @@
 import {useNavigation, useRoute} from '@react-navigation/native';
 import React from 'react';
 import {useAPICreateChatNote} from '../../../../../hooks/api/chat/useAPICreateChatNote';
+import {useAPIUploadStorage} from '../../../../../hooks/api/storage/useAPIUploadStorage';
 import ChatNoteForm from '../../../../../templates/chat/notes/ChatNoteForm';
 import {ChatNote} from '../../../../../types';
 import {
@@ -11,6 +12,7 @@ import {
 const PostChatNote: React.FC = () => {
   const {mutate: createChatNote} = useAPICreateChatNote();
   const navigation = useNavigation<PostChatNotesNavigationProps>();
+  const {mutate: uploadImage} = useAPIUploadStorage();
   const {room} = useRoute<ChatRouteProps>().params;
   const initialValues: Partial<ChatNote> = {
     content: '',
@@ -21,6 +23,7 @@ const PostChatNote: React.FC = () => {
       rightButtonNameOnHeader={'保存'}
       room={room}
       note={initialValues}
+      onUploadImage={uploadImage}
       onSubmit={submittedValues => {
         createChatNote(submittedValues, {
           onSuccess: () => {
