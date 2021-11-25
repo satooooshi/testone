@@ -1,65 +1,86 @@
 import React from 'react';
 import {TouchableHighlight} from 'react-native';
 import {Button, Div, Icon, Image, Text} from 'react-native-magnus';
-import {ChatNote} from '../../../../types';
+import {ChatNote, ChatNoteImage} from '../../../../types';
 import {darkFontColor} from '../../../../utils/colors';
 import {dateTimeFormatterFromJSDDate} from '../../../../utils/dateTimeFormatterFromJSDate';
 import {userNameFactory} from '../../../../utils/factory/userNameFactory';
 
 type ChatNoteCardProps = {
   note: ChatNote;
-  onPress: () => void;
+  onPressEditButton: () => void;
+  onPressImage: (
+    images: Partial<ChatNoteImage>[],
+    targetImage: Partial<ChatNoteImage>,
+  ) => void;
 };
 
-const ChatNoteCard: React.FC<ChatNoteCardProps> = ({note, onPress}) => {
+const ChatNoteCard: React.FC<ChatNoteCardProps> = ({
+  note,
+  onPressEditButton,
+  onPressImage,
+}) => {
   return (
-    <TouchableHighlight onPress={onPress} underlayColor="none">
-      <Div
-        bg="white"
-        py="lg"
-        px="sm"
-        borderBottomWidth={0.5}
-        borderBottomColor={darkFontColor}>
-        <Div flexDir="row" justifyContent="space-between" mb="lg">
-          <Div flexDir="row" alignItems="center">
-            <Image
-              mr="sm"
-              rounded="circle"
-              h={40}
-              w={40}
-              source={
-                note.editor?.length && note.editor[0].avatarUrl
-                  ? {uri: note.editor[0].avatarUrl}
-                  : require('../../../../../assets/no-image-avatar.png')
-              }
+    <Div
+      bg="white"
+      py="lg"
+      px="sm"
+      borderBottomWidth={0.5}
+      borderBottomColor={darkFontColor}>
+      <Div flexDir="row" justifyContent="space-between" mb="lg">
+        <Div flexDir="row" alignItems="center">
+          <Image
+            mr="sm"
+            rounded="circle"
+            h={40}
+            w={40}
+            source={
+              note.editors?.length && note.editors[0].avatarUrl
+                ? {uri: note.editors[0].avatarUrl}
+                : require('../../../../../assets/no-image-avatar.png')
+            }
+          />
+          <Text fontWeight="bold" fontSize={16}>
+            {note.editors?.length
+              ? userNameFactory(note.editors[0])
+              : 'ボールドくん'}
+          </Text>
+        </Div>
+        {note.isEditor && (
+          <Button rounded="circle" onPress={onPressEditButton}>
+            <Icon
+              name="pencil"
+              fontFamily="Entypo"
+              fontSize={20}
+              color="white"
             />
-            <Text fontWeight="bold" fontSize={16}>
-              {note.editor?.length
-                ? userNameFactory(note.editor[0])
-                : 'ボールドくん'}
-            </Text>
-          </Div>
-          {note.isEditor && (
-            <Button rounded="circle">
-              <Icon
-                name="pencil"
-                fontFamily="Entypo"
-                fontSize={20}
-                color="white"
-              />
-            </Button>
-          )}
-        </Div>
-        <Div mb="lg">
-          <Text fontSize={16}>{note.content}</Text>
-        </Div>
-        <Text fontSize={12} color={darkFontColor}>
-          {dateTimeFormatterFromJSDDate({
-            dateTime: new Date(note.createdAt),
-          })}
-        </Text>
+          </Button>
+        )}
       </Div>
-    </TouchableHighlight>
+      <Div flexDir="row" flexWrap="wrap">
+        {note.images?.map(i => (
+          <TouchableHighlight
+            underlayColor="none"
+            onPress={() => note.images && onPressImage(note.images, i)}>
+            <Image
+              h={96}
+              w={96}
+              source={{uri: i.imageURL}}
+              borderWidth={1}
+              borderColor="white"
+            />
+          </TouchableHighlight>
+        ))}
+      </Div>
+      <Div mb="lg">
+        <Text fontSize={16}>{note.content}</Text>
+      </Div>
+      <Text fontSize={12} color={darkFontColor}>
+        {dateTimeFormatterFromJSDDate({
+          dateTime: new Date(note.createdAt),
+        })}
+      </Text>
+    </Div>
   );
 };
 
