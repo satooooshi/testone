@@ -261,6 +261,7 @@ export interface ChatGroup {
   id: number;
   name: string;
   imageURL: string;
+  chatNotes?: ChatNote[];
   chatMessages?: ChatMessage[];
   members?: User[];
   lastReadChatTime?: LastReadChatTime[];
