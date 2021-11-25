@@ -40,7 +40,7 @@ export class ChatNote {
       name: 'user_id',
     },
   })
-  editor?: User[];
+  editors?: User[];
 
   @CreateDateColumn({
     type: 'datetime',

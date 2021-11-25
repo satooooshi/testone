@@ -7,6 +7,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { ChatGroup } from 'src/entities/chatGroup.entity';
 import { ChatMessage, ChatMessageType } from 'src/entities/chatMessage.entity';
+import { ChatNote } from 'src/entities/chatNote.entity';
 import { LastReadChatTime } from 'src/entities/lastReadChatTime.entity';
 import { User } from 'src/entities/user.entity';
 import { userNameFactory } from 'src/utils/factory/userNameFactory';
@@ -14,6 +15,16 @@ import { In, Repository } from 'typeorm';
 import { StorageService } from '../storage/storage.service';
 import { UserService } from '../user/user.service';
 import { GetMessagesQuery, GetRoomsResult } from './chat.controller';
+
+export interface GetChatNotesQuery {
+  group: number;
+  page?: string;
+}
+
+export interface GetChatNotesResult {
+  notes: ChatNote[];
+  pageCount: number;
+}
 
 @Injectable()
 export class ChatService {
@@ -26,6 +37,8 @@ export class ChatService {
     private readonly chatGroupRepository: Repository<ChatGroup>,
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    @InjectRepository(ChatNote)
+    private readonly noteRepository: Repository<ChatNote>,
     private readonly storageService: StorageService,
     private readonly userService: UserService,
   ) {}
@@ -329,5 +342,51 @@ export class ChatService {
       chatGroup: chatGroup,
     });
     return newLastReadChatTime;
+  }
+
+  public async saveChatNotes(dto: Partial<ChatNote>): Promise<ChatNote> {
+    const savedNote = await this.noteRepository.save(dto);
+    return savedNote;
+  }
+
+  public async deleteChatNotes(noteId: number) {
+    await this.noteRepository.delete(noteId);
+  }
+
+  public async getChatNoteDetail(
+    noteID: number,
+    userID: number,
+  ): Promise<ChatNote> {
+    const noteDetail = await this.noteRepository.findOne(noteID, {
+      relations: ['chatGroup', 'editors'],
+    });
+    noteDetail.isEditor = !!noteDetail.editors.filter((e) => e.id === userID)
+      .length;
+    return noteDetail;
+  }
+
+  public async getChatNotes(
+    query: GetChatNotesQuery,
+    userID: number,
+  ): Promise<GetChatNotesResult> {
+    const { page, group } = query;
+    const limit = 20;
+    const offset = limit * (Number(page) - 1);
+    const [existNotes, count] = await this.noteRepository
+      .createQueryBuilder('chat_notes')
+      .leftJoinAndSelect('chat_notes.chatGroup', 'chat_groups')
+      .leftJoinAndSelect('chat_notes.editors', 'editors')
+      .where('chat_groups.id = :chatGroupId', { chatGroupId: group })
+      .skip(offset)
+      .take(limit)
+      .orderBy('chat_notes.updatedAt', 'DESC')
+      .getManyAndCount();
+
+    const notes = existNotes.map((n) => ({
+      ...n,
+      isEditor: !!n.editors?.filter((e) => e.id === userID).length,
+    }));
+    const pageCount = Math.floor(count / limit) + 1;
+    return { notes, pageCount };
   }
 }

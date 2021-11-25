@@ -36,5 +36,8 @@ export class addChatNotesTable1637738183470 implements MigrationInterface {
     );
     await queryRunner.query(`DROP TABLE chat_user_editted`);
     await queryRunner.query(`DROP TABLE chat_notes`);
+    await queryRunner.query(
+      `ALTER TABLE chat_groups ADD CONSTRAINT FK_43f7705b7297ca296329e506ea4 FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE SET NULL ON UPDATE CASCADE`,
+    );
   }
 }
