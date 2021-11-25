@@ -1,6 +1,6 @@
 import React from 'react';
 import WholeContainer from '../../components/WholeContainer';
-import AppHeader, {Tab} from '../../components/Header';
+import HeaderWithTextButton, {Tab} from '../../components/Header';
 import PortalLinkBox from '../../components/PortalLinkBox';
 import {Div} from 'react-native-magnus';
 import {ScrollView} from 'react-native';
@@ -19,7 +19,11 @@ const Home: React.FC = () => {
 
   return (
     <WholeContainer>
-      <AppHeader title="Home" tabs={tabs} activeTabName="ダッシュボード" />
+      <HeaderWithTextButton
+        title="Home"
+        tabs={tabs}
+        activeTabName="ダッシュボード"
+      />
       <ScrollView>
         <Div flexDir="column" justifyContent="center" alignItems="center">
           <Div mb={8}>

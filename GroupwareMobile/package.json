@@ -63,6 +63,7 @@
     "react-query": "^3.27.0",
     "rn-fetch-blob": "^0.12.0",
     "string.prototype.matchall": "^4.0.6",
+    "tailwind-rn": "^3.0.1",
     "validate-color": "^2.1.1",
     "yup": "^0.32.11"
   },

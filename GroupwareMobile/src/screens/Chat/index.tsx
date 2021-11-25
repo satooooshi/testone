@@ -10,13 +10,12 @@ import {
   useWindowDimensions,
 } from 'react-native';
 import {Div, Icon, Overlay} from 'react-native-magnus';
-import AppHeader from '../../components/Header';
 import WholeContainer from '../../components/WholeContainer';
 import {useAPIGetMessages} from '../../hooks/api/chat/useAPIGetMessages';
 import {useAPISendChatMessage} from '../../hooks/api/chat/useAPISendChatMessage';
 import {useAPIUploadStorage} from '../../hooks/api/storage/useAPIUploadStorage';
 import {chatStyles} from '../../styles/screen/chat/chat.style';
-import {ChatMessage, ChatMessageType} from '../../types';
+import {ChatMessage, ChatMessageType, ImageSource} from '../../types';
 import {uploadImageFromGallery} from '../../utils/cropImage/uploadImageFromGallery';
 import DocumentPicker from 'react-native-document-picker';
 import ImageView from 'react-native-image-viewing';
@@ -32,16 +31,19 @@ import RNFetchBlob from 'rn-fetch-blob';
 const {fs, config} = RNFetchBlob;
 import FileViewer from 'react-native-file-viewer';
 import {KeyboardAwareFlatList} from 'react-native-keyboard-aware-scroll-view';
-import {useRoute} from '@react-navigation/native';
-import {ChatRouteProps} from '../../types/navigator/drawerScreenProps';
+import {useNavigation, useRoute} from '@react-navigation/native';
+import {
+  ChatNavigationProps,
+  ChatRouteProps,
+} from '../../types/navigator/drawerScreenProps';
 import {useFormik} from 'formik';
 import ReplyTarget from '../../components/chat/ChatFooter/ReplyTarget';
-
-type ImageSource = {
-  uri: string;
-};
+import HeaderWithIconButton from '../../components/Header/HeaderWithIconButton';
+import {darkFontColor} from '../../utils/colors';
+import tailwind from 'tailwind-rn';
 
 const Chat: React.FC = () => {
+  const navigation = useNavigation<ChatNavigationProps>();
   const {height: windowHeight} = useWindowDimensions();
   const route = useRoute<ChatRouteProps>();
   const {room} = route.params;
@@ -104,6 +106,20 @@ const Chat: React.FC = () => {
     setImageModal(true);
   };
   const isLoading = loadingMessages || loadingSendMessage || loadingUploadFile;
+  const headerRightIcon = (
+    <TouchableOpacity
+      style={tailwind('flex flex-row items-center')}
+      onPress={() =>
+        navigation.navigate('ChatStack', {screen: 'ChatMenu', params: {room}})
+      }>
+      <Icon
+        name="pencil"
+        fontFamily="Entypo"
+        fontSize={24}
+        color={darkFontColor}
+      />
+    </TouchableOpacity>
+  );
 
   const handleUploadImage = async () => {
     const {formData} = await uploadImageFromGallery({
@@ -381,10 +397,11 @@ const Chat: React.FC = () => {
         swipeToCloseEnabled={false}
         doubleTapToZoomEnabled={true}
       />
-      <AppHeader
+      <HeaderWithIconButton
         title="チャット"
         enableBackButton={true}
         screenForBack={'RoomList'}
+        icon={headerRightIcon}
       />
       {messageListAvoidngKeyboardDisturb}
     </WholeContainer>

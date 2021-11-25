@@ -11,6 +11,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { ChatMessage } from './chatMessage.entity';
+import { ChatNote } from './chatNote.entity';
 import { EventSchedule } from './event.entity';
 import { LastReadChatTime } from './lastReadChatTime.entity';
 import { User } from './user.entity';
@@ -46,6 +47,9 @@ export class ChatGroup {
 
   @OneToMany(() => ChatMessage, (chatMessage) => chatMessage.chatGroup)
   chatMessages?: ChatMessage[];
+
+  @OneToMany(() => ChatNote, (chatNote) => chatNote.chatGroup)
+  chatNotes?: ChatNote[];
 
   @OneToMany(() => LastReadChatTime, (t) => t.chatGroup)
   lastReadChatTime?: LastReadChatTime[];

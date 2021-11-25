@@ -5,7 +5,7 @@ import {ActivityIndicator, useWindowDimensions} from 'react-native';
 import {Text, Div, ScrollDiv, Image, Overlay} from 'react-native-magnus';
 import TagListBox from '../../../components/account/TagListBox';
 import EventCard from '../../../components/events/EventCard';
-import AppHeader, {Tab} from '../../../components/Header';
+import HeaderWithTextButton, {Tab} from '../../../components/Header';
 import WholeContainer from '../../../components/WholeContainer';
 import WikiCard from '../../../components/wiki/WikiCard';
 import {useAuthenticate} from '../../../contexts/useAuthenticate';
@@ -168,7 +168,7 @@ const AccountDetail: React.FC = () => {
       <Overlay visible={loadingProfile} p="xl">
         <ActivityIndicator />
       </Overlay>
-      <AppHeader
+      <HeaderWithTextButton
         title={'Account'}
         tabs={tabs}
         activeTabName={'アカウント情報'}

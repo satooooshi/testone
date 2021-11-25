@@ -7,6 +7,8 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { ChatGroup } from 'src/entities/chatGroup.entity';
 import { ChatMessage, ChatMessageType } from 'src/entities/chatMessage.entity';
+import { ChatNote } from 'src/entities/chatNote.entity';
+import { ChatNoteImage } from 'src/entities/chatNoteImage.entity';
 import { LastReadChatTime } from 'src/entities/lastReadChatTime.entity';
 import { User } from 'src/entities/user.entity';
 import { userNameFactory } from 'src/utils/factory/userNameFactory';
@@ -14,6 +16,16 @@ import { In, Repository } from 'typeorm';
 import { StorageService } from '../storage/storage.service';
 import { UserService } from '../user/user.service';
 import { GetMessagesQuery, GetRoomsResult } from './chat.controller';
+
+export interface GetChatNotesQuery {
+  group: number;
+  page?: string;
+}
+
+export interface GetChatNotesResult {
+  notes: ChatNote[];
+  pageCount: number;
+}
 
 @Injectable()
 export class ChatService {
@@ -26,6 +38,10 @@ export class ChatService {
     private readonly chatGroupRepository: Repository<ChatGroup>,
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    @InjectRepository(ChatNote)
+    private readonly noteRepository: Repository<ChatNote>,
+    @InjectRepository(ChatNoteImage)
+    private readonly noteImageRepository: Repository<ChatNoteImage>,
     private readonly storageService: StorageService,
     private readonly userService: UserService,
   ) {}
@@ -56,6 +72,39 @@ export class ChatService {
       parsedGroups.push(parsed);
     }
     return parsedGroups;
+  }
+  public async generateSignedStorageURLsFromChatNoteObj(
+    chatNote: ChatNote,
+  ): Promise<ChatNote> {
+    const images: ChatNoteImage[] = [];
+    const editors: User[] = [];
+    for (const i of chatNote.images) {
+      const parsedImageUrl =
+        await this.storageService.parseStorageURLToSignedURL(i.imageURL);
+      const parsedImageObj = { ...i, imageURL: parsedImageUrl };
+      images.push(parsedImageObj);
+    }
+    for (const e of chatNote.editors) {
+      const parsedAvatarUrl =
+        await this.storageService.parseStorageURLToSignedURL(e.avatarUrl);
+      const parsedAvatarObj = { ...e, avatarUrl: parsedAvatarUrl };
+      editors.push(parsedAvatarObj);
+    }
+    chatNote.images = images;
+    chatNote.editors = editors;
+
+    return chatNote;
+  }
+
+  public async generateSignedStorageURLsFromChatNoteArr(
+    chatNotes: ChatNote[],
+  ): Promise<ChatNote[]> {
+    const parsedNotes = [];
+    for (const n of chatNotes) {
+      const parsed = await this.generateSignedStorageURLsFromChatNoteObj(n);
+      parsedNotes.push(parsed);
+    }
+    return parsedNotes;
   }
 
   public async generateSignedStorageURLsFromChatMessageObj(
@@ -329,5 +378,67 @@ export class ChatService {
       chatGroup: chatGroup,
     });
     return newLastReadChatTime;
+  }
+
+  public async saveChatNotes(dto: Partial<ChatNote>): Promise<ChatNote> {
+    const savedNote = await this.noteRepository.save(dto);
+    if (dto.images?.length) {
+      const sentImages = dto.images.map((i) => ({
+        ...i,
+        imageURL: this.storageService.parseSignedURLToStorageURL(i.imageURL),
+        chatNote: savedNote,
+      }));
+
+      await this.noteImageRepository.save(sentImages);
+    }
+    return savedNote;
+  }
+
+  public async deleteChatNotes(noteId: number) {
+    await this.noteRepository.delete(noteId);
+  }
+
+  public async getChatNoteDetail(
+    noteID: number,
+    userID: number,
+  ): Promise<ChatNote> {
+    let noteDetail = await this.noteRepository.findOne(noteID, {
+      relations: ['chatGroup', 'editors', 'images'],
+      withDeleted: true,
+    });
+    noteDetail = await this.generateSignedStorageURLsFromChatNoteObj(
+      noteDetail,
+    );
+    noteDetail.isEditor = !!noteDetail.editors.filter((e) => e.id === userID)
+      .length;
+    return noteDetail;
+  }
+
+  public async getChatNotes(
+    query: GetChatNotesQuery,
+    userID: number,
+  ): Promise<GetChatNotesResult> {
+    const { page, group } = query;
+    const limit = 20;
+    const offset = limit * (Number(page) - 1);
+    const [existNotes, count] = await this.noteRepository
+      .createQueryBuilder('chat_notes')
+      .leftJoinAndSelect('chat_notes.chatGroup', 'chat_groups')
+      .leftJoinAndSelect('chat_notes.editors', 'editors')
+      .leftJoinAndSelect('chat_notes.images', 'images')
+      .where('chat_groups.id = :chatGroupId', { chatGroupId: group })
+      .withDeleted()
+      .skip(offset)
+      .take(limit)
+      .orderBy('chat_notes.createdAt', 'DESC')
+      .getManyAndCount();
+
+    let notes = await this.generateSignedStorageURLsFromChatNoteArr(existNotes);
+    notes = existNotes.map((n) => ({
+      ...n,
+      isEditor: !!n.editors?.filter((e) => e.id === userID).length,
+    }));
+    const pageCount = Math.floor(count / limit) + 1;
+    return { notes, pageCount };
   }
 }

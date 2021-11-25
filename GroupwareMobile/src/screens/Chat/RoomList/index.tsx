@@ -3,7 +3,7 @@ import React, {useEffect, useState} from 'react';
 import {ActivityIndicator, FlatList} from 'react-native';
 import {Div, Overlay} from 'react-native-magnus';
 import RoomCard from '../../../components/chat/RoomCard';
-import AppHeader from '../../../components/Header';
+import HeaderWithTextButton from '../../../components/Header';
 import WholeContainer from '../../../components/WholeContainer';
 import {useAPIGetRooms} from '../../../hooks/api/chat/useAPIGetRoomsByPage';
 import {roomListStyles} from '../../../styles/screen/chat/roomList.style';
@@ -55,7 +55,7 @@ const RoomList: React.FC = () => {
       <Overlay visible={loadingGetChatGroupList} p="xl">
         <ActivityIndicator />
       </Overlay>
-      <AppHeader
+      <HeaderWithTextButton
         title="ルーム一覧"
         rightButtonName={'新規作成'}
         {...{onPressRightButton}}

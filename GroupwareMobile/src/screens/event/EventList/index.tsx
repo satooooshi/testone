@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import WholeContainer from '../../../components/WholeContainer';
-import AppHeader, {Tab} from '../../../components/Header';
+import HeaderWithTextButton, {Tab} from '../../../components/Header';
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
 import EventCalendar from './EventCalendar';
 import EventCardList from './EventCardList';
@@ -122,7 +122,7 @@ const EventList: React.FC = () => {
 
   return (
     <WholeContainer>
-      <AppHeader
+      <HeaderWithTextButton
         title="Events"
         tabs={tabs}
         activeTabName={

@@ -10,7 +10,7 @@ import {Text, Div, Image, Icon, Dropdown, Overlay} from 'react-native-magnus';
 import DropdownOpenerButton from '../../../components/common/DropdownOpenerButton';
 import SearchForm from '../../../components/common/SearchForm';
 import SearchFormOpenerButton from '../../../components/common/SearchForm/SearchFormOpenerButton';
-import AppHeader, {Tab} from '../../../components/Header';
+import HeaderWithTextButton, {Tab} from '../../../components/Header';
 import WholeContainer from '../../../components/WholeContainer';
 import {useAPIGetUserTag} from '../../../hooks/api/tag/useAPIGetUserTag';
 import {useAPIDeleteUser} from '../../../hooks/api/user/useAPIDeleteUser';
@@ -137,7 +137,11 @@ const UserAdmin: React.FC = () => {
       <Overlay visible={isLoading} p="xl">
         <ActivityIndicator />
       </Overlay>
-      <AppHeader title="Admin" tabs={tabs} activeTabName={'ユーザー管理'} />
+      <HeaderWithTextButton
+        title="Admin"
+        tabs={tabs}
+        activeTabName={'ユーザー管理'}
+      />
       <SearchForm
         defaultValue={{word: '', selectedTags}}
         isVisible={visibleSearchFormModal}

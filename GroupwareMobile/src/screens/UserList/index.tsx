@@ -2,7 +2,7 @@ import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs
 import React, {useEffect, useState} from 'react';
 import SearchForm from '../../components/common/SearchForm';
 import SearchFormOpenerButton from '../../components/common/SearchForm/SearchFormOpenerButton';
-import AppHeader from '../../components/Header';
+import HeaderWithTextButton from '../../components/Header';
 import WholeContainer from '../../components/WholeContainer';
 import {useAPIGetUserTag} from '../../hooks/api/tag/useAPIGetUserTag';
 import {
@@ -65,7 +65,7 @@ const UserList: React.FC = () => {
         right={10}
         onPress={() => setVisibleSearchFormModal(true)}
       />
-      <AppHeader title="社員名鑑" />
+      <HeaderWithTextButton title="社員名鑑" />
       <TopTab.Navigator
         initialRouteName={topTabNames[0]}
         screenOptions={{tabBarScrollEnabled: true}}>
