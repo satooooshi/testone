@@ -10,7 +10,6 @@ import {
   useWindowDimensions,
 } from 'react-native';
 import {Div, Icon, Overlay} from 'react-native-magnus';
-import AppHeader from '../../components/Header';
 import WholeContainer from '../../components/WholeContainer';
 import {useAPIGetMessages} from '../../hooks/api/chat/useAPIGetMessages';
 import {useAPISendChatMessage} from '../../hooks/api/chat/useAPISendChatMessage';

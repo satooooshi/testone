@@ -22,6 +22,9 @@ import RoomList from '../../screens/Chat/RoomList';
 import NewRoom from '../../screens/Chat/NewRoom';
 import EditWiki from '../../screens/wiki/EditWiki';
 import ChatMenu from '../../screens/Chat/ChatMenu';
+import ChatNotes from '../../screens/Chat/ChatMenu/ChatNote';
+import PostChatNote from '../../screens/Chat/ChatMenu/ChatNote/PostChatNote';
+import EditChatNote from '../../screens/Chat/ChatMenu/ChatNote/EditChatNote';
 
 const Drawer = createDrawerNavigator();
 const Stack = createStackNavigator();
@@ -143,6 +146,21 @@ const ChatStack = () => (
     <Stack.Screen
       name="ChatMenu"
       component={ChatMenu}
+      options={{headerShown: false}}
+    />
+    <Stack.Screen
+      name="ChatNotes"
+      component={ChatNotes}
+      options={{headerShown: false}}
+    />
+    <Stack.Screen
+      name="PostChatNote"
+      component={PostChatNote}
+      options={{headerShown: false}}
+    />
+    <Stack.Screen
+      name="EditChatNote"
+      component={EditChatNote}
       options={{headerShown: false}}
     />
   </Stack.Navigator>

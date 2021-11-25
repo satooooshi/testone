@@ -274,3 +274,13 @@ export interface LastReadChatTime {
   chatGroup: ChatGroup;
   user: User;
 }
+
+export interface ChatNote {
+  id: number;
+  content: string;
+  chatGroup?: ChatGroup;
+  editor?: User[];
+  createdAt: Date;
+  updatedAt: Date;
+  isEditor?: boolean;
+}

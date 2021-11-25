@@ -28,3 +28,29 @@ export type ChatMenuNavigationProps = StackNavigationProp<
 >;
 
 export type ChatMenuRouteProps = RouteProp<RootStackParamList, 'ChatMenu'>;
+
+export type ChatNotesNavigationProps = StackNavigationProp<
+  DrawerTabParamList,
+  'ChatStack'
+>;
+
+export type ChatNotesRouteProps = RouteProp<RootStackParamList, 'ChatNotes'>;
+
+export type PostChatNotesNavigationProps = StackNavigationProp<
+  DrawerTabParamList,
+  'ChatStack'
+>;
+
+export type PostChatNotesRouteProps = RouteProp<
+  RootStackParamList,
+  'PostChatNote'
+>;
+
+export type EditChatNotesNavigationProps = StackNavigationProp<
+  DrawerTabParamList,
+  'ChatStack'
+>;
+export type EditChatNotesRouteProps = RouteProp<
+  RootStackParamList,
+  'EditChatNote'
+>;
