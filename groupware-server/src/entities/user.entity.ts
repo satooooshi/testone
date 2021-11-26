@@ -228,7 +228,13 @@ export class User {
   @OneToMany(() => EventSchedule, (eventSchedule) => eventSchedule.author)
   eventsCreated?: EventSchedule[];
 
-  @ManyToMany(() => ChatMessage, (chatMessage) => chatMessage.sender, {
+  @ManyToMany(() => ChatGroup, (chatGroup) => chatGroup.pinnedUsers, {
+    onUpdate: 'CASCADE',
+    onDelete: 'CASCADE',
+  })
+  pinnedChatGroups?: ChatGroup[];
+
+  @ManyToMany(() => ChatGroup, (chatGroup) => chatGroup.members, {
     onUpdate: 'CASCADE',
     onDelete: 'CASCADE',
   })
