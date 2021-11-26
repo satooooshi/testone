@@ -98,7 +98,7 @@ export class ChatController {
     if (!chatGroup.members.filter((u) => u.id === user.id).length) {
       chatGroup.members.push(user);
     }
-    return await this.chatService.saveChatGroup(chatGroup);
+    return await this.chatService.saveChatGroup(chatGroup, user.id);
   }
 
   @Get('get-last-read-chat-time/:id')
