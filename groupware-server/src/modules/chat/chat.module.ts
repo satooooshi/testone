@@ -1,6 +1,8 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ChatAlbum } from 'src/entities/chatAlbum.entity';
+import { ChatAlbumImage } from 'src/entities/chatAlbumImage.entity';
 import { ChatGroup } from 'src/entities/chatGroup.entity';
 import { ChatMessage } from 'src/entities/chatMessage.entity';
 import { ChatNote } from 'src/entities/chatNote.entity';
@@ -26,6 +28,8 @@ import { ChatService } from './chat.service';
       LastReadChatTime,
       ChatNote,
       ChatNoteImage,
+      ChatAlbum,
+      ChatAlbumImage,
     ]),
   ],
   controllers: [ChatController],
