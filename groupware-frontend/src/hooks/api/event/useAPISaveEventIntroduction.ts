@@ -26,7 +26,7 @@ export const useAPISaveEventIntroduction = (
     unknown
   >,
 ) => {
-  return useMutation<EventIntroduction, AxiosError, Partial<EventIntroduction>>(
+  return useMutation<EventIntroduction, AxiosError, EventIntroduction>(
     saveEventIntroduction,
     mutationOptions,
   );
