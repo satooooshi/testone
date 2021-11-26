@@ -14,6 +14,7 @@ import { StorageModule } from '../storage/storage.module';
 import { UserModule } from '../user/user.module';
 import { ChatController } from './chat.controller';
 import { ChatService } from './chat.service';
+import { ChatAlbumService } from './chatAlbum.service';
 
 @Module({
   imports: [
@@ -33,7 +34,7 @@ import { ChatService } from './chat.service';
     ]),
   ],
   controllers: [ChatController],
-  providers: [ChatService],
+  providers: [ChatService, ChatAlbumService],
   exports: [ChatService],
 })
 export class ChatModule {}
