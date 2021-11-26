@@ -52,8 +52,8 @@ export class ChatGroup {
   @OneToMany(() => ChatAlbum, (chatAlbum) => chatAlbum.chatGroup)
   chatAlbums?: ChatAlbum[];
 
-  @OneToMany(() => ChatNote, (chatNote) => chatNote.chatGroup)
-  chatNotes?: ChatNote[];
+  @OneToMany(() => ChatAlbum, (chatNote) => chatNote.chatGroup)
+  chatNotes?: ChatAlbum[];
 
   @OneToMany(() => LastReadChatTime, (t) => t.chatGroup)
   lastReadChatTime?: LastReadChatTime[];

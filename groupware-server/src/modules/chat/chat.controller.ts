@@ -246,12 +246,11 @@ export class ChatController {
   @UseGuards(JwtAuthenticationGuard)
   async getChatAlbumDetail(
     @Param('albumId') albumId: string,
-    @Req() req: RequestWithUser,
+    @Query('page') page: string,
   ) {
-    const { id: userID } = req.user;
-    const albums = await this.chatAlbumService.getChatAlbumDetail(
+    const albums = await this.chatAlbumService.getChatAlbumImages(
       Number(albumId),
-      userID,
+      page,
     );
     return albums;
   }

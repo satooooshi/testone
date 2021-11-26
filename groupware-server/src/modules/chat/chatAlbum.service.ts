@@ -18,6 +18,11 @@ export interface GetChatAlbumsResult {
   pageCount: number;
 }
 
+export interface GetChatAlbumImagesResult {
+  images: ChatAlbumImage[];
+  pageCount: number;
+}
+
 @Injectable()
 export class ChatAlbumService {
   constructor(
@@ -65,6 +70,22 @@ export class ChatAlbumService {
     return parsedAlbums;
   }
 
+  public async generateSignedStorageURLsFromAlbumImageArr(
+    albumImage: ChatAlbumImage[],
+  ): Promise<ChatAlbumImage[]> {
+    albumImage = await Promise.all(
+      albumImage.map(async (i) => {
+        const parsedImage =
+          await this.storageService.parseStorageURLToSignedURL(i.imageURL);
+        return {
+          ...i,
+          imageURL: parsedImage,
+        };
+      }),
+    );
+    return albumImage;
+  }
+
   public async saveChatAlbums(dto: Partial<ChatAlbum>): Promise<ChatAlbum> {
     const savedAlbum = await this.albumRepository.save(dto);
     if (dto.images?.length) {
@@ -83,20 +104,25 @@ export class ChatAlbumService {
     await this.albumRepository.delete(albumId);
   }
 
-  public async getChatAlbumDetail(
+  public async getChatAlbumImages(
     albumID: number,
-    userID: number,
-  ): Promise<ChatAlbum> {
-    let albumDetail = await this.albumRepository.findOne(albumID, {
-      relations: ['chatGroup', 'editors', 'images'],
-      withDeleted: true,
-    });
-    albumDetail = await this.generateSignedStorageURLsFromChatAlbumObj(
-      albumDetail,
-    );
-    albumDetail.isEditor = !!albumDetail.editors.filter((e) => e.id === userID)
-      .length;
-    return albumDetail;
+    page: string,
+  ): Promise<GetChatAlbumImagesResult> {
+    const limit = 20;
+    const offset = limit * (Number(page) - 1);
+    const [albumImages, count] = await this.albumImageRepository
+      .createQueryBuilder('album_images')
+      .leftJoinAndSelect('album_images.chatAlbum', 'chat_album')
+      .where('chat_album.id = :albumID', { albumID })
+      .withDeleted()
+      .skip(offset)
+      .take(limit)
+      .orderBy('chat_albums.createdAt', 'DESC')
+      .getManyAndCount();
+    const urlParsedImages =
+      await this.generateSignedStorageURLsFromAlbumImageArr(albumImages);
+    const pageCount = Math.floor(count / limit) + 1;
+    return { images: urlParsedImages, pageCount };
   }
 
   public async getChatAlbums(
@@ -104,8 +130,9 @@ export class ChatAlbumService {
     userID: number,
   ): Promise<GetChatAlbumsResult> {
     const { page, group } = query;
-    const limit = 60;
+    const limit = 20;
     const offset = limit * (Number(page) - 1);
+    //@TODO limit images
     const [existAlbums, count] = await this.albumRepository
       .createQueryBuilder('chat_albums')
       .leftJoinAndSelect('chat_albums.chatGroup', 'chat_groups')
