@@ -202,7 +202,10 @@ export class EventScheduleController {
       } else {
         eventChatGroup.members = [savedEvent.author];
       }
-      const eventGroup = await this.chatService.saveChatGroup(eventChatGroup);
+      const eventGroup = await this.chatService.saveChatGroup(
+        eventChatGroup,
+        req.user.id,
+      );
       const groupSavedEvent = await this.eventService.saveEvent({
         ...savedEvent,
         chatGroup: eventGroup,

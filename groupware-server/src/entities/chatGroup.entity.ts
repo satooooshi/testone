@@ -54,6 +54,21 @@ export class ChatGroup {
   @OneToMany(() => LastReadChatTime, (t) => t.chatGroup)
   lastReadChatTime?: LastReadChatTime[];
 
+  @ManyToMany(() => User, (user) => user.pinnedChatGroups, {
+    onUpdate: 'CASCADE',
+    onDelete: 'CASCADE',
+  })
+  @JoinTable({
+    name: 'chat_user_pin',
+    joinColumn: {
+      name: 'chat_group_id',
+    },
+    inverseJoinColumn: {
+      name: 'user_id',
+    },
+  })
+  pinnedUsers?: User[];
+
   @ManyToMany(() => User, (user) => user.chatGroups, {
     onUpdate: 'CASCADE',
     onDelete: 'CASCADE',
@@ -80,4 +95,6 @@ export class ChatGroup {
     name: 'updated_at',
   })
   updatedAt: Date;
+
+  isPinned?: boolean;
 }

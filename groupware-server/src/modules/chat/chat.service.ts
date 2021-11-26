@@ -5,6 +5,7 @@ import {
   NotAcceptableException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { orderBy } from 'lodash';
 import { ChatGroup } from 'src/entities/chatGroup.entity';
 import { ChatMessage, ChatMessageType } from 'src/entities/chatMessage.entity';
 import { ChatNote } from 'src/entities/chatNote.entity';
@@ -144,11 +145,29 @@ export class ChatService {
       .where('member.id = :memberId', { memberId: userID })
       .getMany();
     const groupIDs = groups.map((g) => g.id);
-    const groupsAndUsers = await this.chatGroupRepository.find({
+    let groupsAndUsers = await this.chatGroupRepository.find({
       where: { id: In(groupIDs) },
-      relations: ['members', 'lastReadChatTime', 'lastReadChatTime.user'],
+      relations: [
+        'members',
+        'lastReadChatTime',
+        'lastReadChatTime.user',
+        'pinnedUsers',
+      ],
       order: { updatedAt: 'DESC' },
     });
+    groupsAndUsers = groupsAndUsers.map((g) => {
+      const isPinned = !!g.pinnedUsers.filter((u) => u.id === userID).length;
+      return {
+        ...g,
+        pinnedUsers: undefined,
+        isPinned,
+      };
+    });
+    groupsAndUsers = orderBy(groupsAndUsers, [
+      'isPinned',
+      'updatedAt',
+      ['desc', 'desc'],
+    ]).reverse();
     const urlParsedGroups =
       await this.generateSignedStorageURLsFromChatGroupArr(groupsAndUsers);
     return urlParsedGroups;
@@ -163,6 +182,12 @@ export class ChatService {
     const [urlUnparsedRooms, count] = await this.chatGroupRepository
       .createQueryBuilder('chat_groups')
       .leftJoinAndSelect('chat_groups.members', 'member')
+      .leftJoinAndSelect(
+        'chat_groups.pinnedUsers',
+        'pinnedUsers',
+        'pinnedUsers.id = :pinnedUserID',
+        { pinnedUserID: userID },
+      )
       .leftJoinAndSelect('chat_groups.lastReadChatTime', 'lastReadChatTime')
       .leftJoinAndSelect('lastReadChatTime.user', 'lastReadChatTime.user')
       .where('member.id = :memberId', { memberId: userID })
@@ -170,9 +195,22 @@ export class ChatService {
       .take(limit)
       .orderBy('chat_groups.updatedAt', 'DESC')
       .getManyAndCount();
-    const rooms = await this.generateSignedStorageURLsFromChatGroupArr(
+    let rooms = await this.generateSignedStorageURLsFromChatGroupArr(
       urlUnparsedRooms,
     );
+    rooms = rooms.map((g) => {
+      const isPinned = !!g.pinnedUsers.length;
+      return {
+        ...g,
+        pinnedUsers: undefined,
+        isPinned,
+      };
+    });
+    rooms = orderBy(rooms, [
+      'isPinned',
+      'updatedAt',
+      ['desc', 'desc'],
+    ]).reverse();
     const pageCount = Math.floor(count / limit) + 1;
     return { rooms, pageCount };
   }
@@ -330,6 +368,7 @@ export class ChatService {
 
   public async saveChatGroup(
     chatGroup: Partial<ChatGroup>,
+    userID: number,
   ): Promise<ChatGroup> {
     if (!chatGroup.members || !chatGroup.members.length) {
       throw new InternalServerErrorException('Something went wrong');
@@ -342,6 +381,21 @@ export class ChatService {
     );
 
     const newGroup = await this.chatGroupRepository.save(chatGroup);
+    if (typeof chatGroup.isPinned !== 'undefined') {
+      if (chatGroup.isPinned) {
+        await this.chatGroupRepository
+          .createQueryBuilder('chat_groups')
+          .relation('pinnedUsers')
+          .of(newGroup.id)
+          .add(userID);
+      } else {
+        await this.chatGroupRepository
+          .createQueryBuilder('chat_groups')
+          .relation('pinnedUsers')
+          .of(newGroup.id)
+          .remove(userID);
+      }
+    }
     return newGroup;
   }
 
