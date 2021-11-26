@@ -1,7 +1,7 @@
 import {useNavigation, useRoute} from '@react-navigation/native';
 import React from 'react';
-import {TouchableHighlight} from 'react-native';
-import {Div, Icon, Text} from 'react-native-magnus';
+import {Icon} from 'react-native-magnus';
+import ChatMenuRow from '../../../components/chat/ChatMenuRow';
 import HeaderWithTextButton from '../../../components/Header';
 import WholeContainer from '../../../components/WholeContainer';
 import {
@@ -17,27 +17,34 @@ const ChatMenu: React.FC = () => {
   return (
     <WholeContainer>
       <HeaderWithTextButton title="メニュー" />
-      <TouchableHighlight
+      <ChatMenuRow
+        name="ノート"
+        icon={<Icon name="filetext1" fontSize={20} mr={'lg'} color="black" />}
         onPress={() =>
           navigation.navigate('ChatStack', {
             screen: 'ChatNotes',
             params: {room},
           })
-        }>
-        <Div
-          flexDir="row"
-          justifyContent="space-between"
-          minH={48}
-          px={'lg'}
-          bg="white"
-          alignItems="center">
-          <Div flexDir="row">
-            <Icon name="filetext1" fontSize={20} mr={'lg'} color="black" />
-            <Text fontSize={16}>ノート</Text>
-          </Div>
-          <Icon name="right" fontSize={16} />
-        </Div>
-      </TouchableHighlight>
+        }
+      />
+      <ChatMenuRow
+        name="アルバム"
+        icon={
+          <Icon
+            name="photo"
+            fontSize={20}
+            fontFamily="FontAwesome"
+            mr={'lg'}
+            color="black"
+          />
+        }
+        onPress={() =>
+          navigation.navigate('ChatStack', {
+            screen: 'ChatAlbums',
+            params: {room},
+          })
+        }
+      />
     </WholeContainer>
   );
 };

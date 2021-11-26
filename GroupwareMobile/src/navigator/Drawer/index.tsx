@@ -25,6 +25,7 @@ import ChatMenu from '../../screens/Chat/ChatMenu';
 import ChatNotes from '../../screens/Chat/ChatMenu/ChatNote';
 import PostChatNote from '../../screens/Chat/ChatMenu/ChatNote/PostChatNote';
 import EditChatNote from '../../screens/Chat/ChatMenu/ChatNote/EditChatNote';
+import ChatAlbums from '../../screens/Chat/ChatMenu/ChatAlbum';
 
 const Drawer = createDrawerNavigator();
 const Stack = createStackNavigator();
@@ -161,6 +162,11 @@ const ChatStack = () => (
     <Stack.Screen
       name="EditChatNote"
       component={EditChatNote}
+      options={{headerShown: false}}
+    />
+    <Stack.Screen
+      name="ChatAlbums"
+      component={ChatAlbums}
       options={{headerShown: false}}
     />
   </Stack.Navigator>

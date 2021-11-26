@@ -55,4 +55,7 @@ export type RootStackParamList = {
     room: ChatGroup;
     note: ChatNote;
   };
+  ChatAlbums: {
+    room: ChatGroup;
+  };
 };
