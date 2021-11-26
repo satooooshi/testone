@@ -1,8 +1,8 @@
 import {AxiosError} from 'axios';
 import {useMutation, UseQueryOptions} from 'react-query';
-import {ChatNote} from '../../../types';
-import {axiosInstance} from '../../../utils/url';
-import {noteURL} from '../../../utils/url/chat.url';
+import {ChatNote} from '../../../../types';
+import {axiosInstance} from '../../../../utils/url';
+import {noteURL} from '../../../../utils/url/chat.url';
 
 const createNote = async (query: Partial<ChatNote>) => {
   const res = await axiosInstance.post<ChatNote>(
