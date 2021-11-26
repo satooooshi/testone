@@ -4,8 +4,8 @@ import { useAPIGetLatestEvent } from '@/hooks/api/event/useAPIGetLatestEvent';
 import { EventType } from 'src/types';
 import EventIntroductionTemplate from 'src/templates/event/EventIntroduction';
 import { useAPIGetEventIntroduction } from '@/hooks/api/event/useAPIGetEventIntroduction';
-import impressiveUniversityImage1 from '@/public/impressive_university_1.png';
-import impressiveUniversityImage2 from '@/public/impressive_university_2.png';
+import studyMeetingImage1 from '@/public/study_meeting_1.jpg';
+import studyMeetingImage2 from '@/public/study_meeting_2.jpg';
 import { useAPISaveEventIntroduction } from '@/hooks/api/event/useAPISaveEventIntroduction';
 
 const StudyMeeting: React.FC = () => {
@@ -25,12 +25,9 @@ const StudyMeeting: React.FC = () => {
   );
   const { mutate: saveEventIntroduction } = useAPISaveEventIntroduction();
   const headlineImgSource =
-    'https://www.bold.ne.jp/assets/assets_recruit/images/enviroment/img_univ_main.png';
+    'https://www.bold.ne.jp/assets/assets_recruit/images/enviroment/img_studygroup_main.png';
 
-  const bottomImgSources = [
-    impressiveUniversityImage1,
-    impressiveUniversityImage2,
-  ];
+  const bottomImgSources = [studyMeetingImage1, studyMeetingImage2];
 
   return (
     <EventIntroductionTemplate
