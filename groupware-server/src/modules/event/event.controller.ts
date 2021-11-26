@@ -15,11 +15,13 @@ import { Response } from 'express';
 import { ChatGroup } from 'src/entities/chatGroup.entity';
 import { EventSchedule, EventType } from 'src/entities/event.entity';
 import { EventComment } from 'src/entities/eventComment.entity';
+import { EventIntroduction } from 'src/entities/eventIntroduction.entity';
 import { SubmissionFile } from 'src/entities/submissionFiles.entity';
 import { UserJoiningEvent } from 'src/entities/userJoiningEvent.entity';
 import JwtAuthenticationGuard from '../auth/jwtAuthentication.guard';
 import RequestWithUser from '../auth/requestWithUser.interface';
 import { ChatService } from '../chat/chat.service';
+import SaveEventIntroductionDto from './dto/saveEventIntroductionDto';
 import CreateCommentDto from './dto/createCommentDto';
 import SaveEventDto from './dto/saveEventDto';
 import { EventScheduleService } from './event.service';
@@ -129,6 +131,22 @@ export class EventScheduleController {
       return await this.eventService.getEventAtSpecificTime(query);
     }
     return await this.eventService.getEvents(query);
+  }
+
+  @Get('introduction/:type')
+  @UseGuards(JwtAuthenticationGuard)
+  async getEventIntroduction(
+    @Param() params: { type: EventType },
+  ): Promise<EventIntroduction> {
+    return await this.eventService.getEventIntroduction(params.type);
+  }
+
+  @Patch('save-introduction')
+  @UseGuards(JwtAuthenticationGuard)
+  async saveEventIntroduction(
+    @Body() eventIntroduction: SaveEventIntroductionDto,
+  ): Promise<EventIntroduction> {
+    return await this.eventService.saveEventIntroduction(eventIntroduction);
   }
 
   @Post('save-submission')

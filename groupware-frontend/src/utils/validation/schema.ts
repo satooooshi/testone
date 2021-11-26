@@ -61,6 +61,13 @@ export const createEventSchema = Yup.object().shape({
   tags: Yup.array().min(1, minTagsMessage),
 });
 
+export const editEventIntroductionSchema = Yup.object().shape({
+  title: Yup.string()
+    .required(`タイトルは${requireMessage}`)
+    .max(100, `タイトルは${nWordLimitMessage(100)}`),
+  description: Yup.string().required(`説明文は${requireMessage}`),
+});
+
 export const chatGroupSchema = Yup.object().shape({
   name: Yup.string()
     .required(`グループ名は${requireMessage}`)
