@@ -1,66 +1,45 @@
-import LayoutWithTab from '@/components/layout/LayoutWithTab';
-import { SidebarScreenName } from '@/components/layout/Sidebar';
 import { useRouter } from 'next/router';
-import React, { useState } from 'react';
-import eventPRStyles from '@/styles/layouts/EventPR.module.scss';
+import React from 'react';
 import { useAPIGetLatestEvent } from '@/hooks/api/event/useAPIGetLatestEvent';
-import { EventType, UserRole } from 'src/types';
-import Head from 'next/head';
-import { Button } from '@chakra-ui/button';
-import { useAuthenticate } from 'src/contexts/useAuthenticate';
-import EventIntroductionEditor from 'src/templates/event/EventIntroductionEditor';
+import { EventType } from 'src/types';
 import { useAPIGetEventIntroduction } from '@/hooks/api/event/useAPIGetEventIntroduction';
-import EventIntroductionDisplayer from 'src/templates/event/EventIntroduction';
+import clubImage2 from '@/public/club_2.jpg';
+import clubImage3 from '@/public/club_3.png';
+import clubImage4 from '@/public/club_4.jpg';
+import clubImage5 from '@/public/club_5.jpg';
+import clubImage6 from '@/public/club_6.jpg';
+import { useAPISaveEventIntroduction } from '@/hooks/api/event/useAPISaveEventIntroduction';
+import EventIntroductionTemplate from 'src/templates/event/EventIntroduction';
 
 const Club: React.FC = () => {
   const router = useRouter();
-  const [editMode, setEditMode] = useState<boolean>(false);
-  const { user } = useAuthenticate();
-
   const initialHeaderValue = {
     title: '部活動',
     rightButtonName: '予定を見る',
     onClickRightButton: () => router.push('/event/list?type=club&from=&to='),
   };
+  const type = EventType.CLUB;
   const { data: recommendedEvents } = useAPIGetLatestEvent({
-    type: EventType.CLUB,
+    type,
   });
-  const { data: eventIntroduction } = useAPIGetEventIntroduction(
+  const { data: eventIntroduction, refetch } = useAPIGetEventIntroduction(
     EventType.CLUB,
   );
+  const headlineImgSource = clubImage5;
+  const bottomImgSources = [clubImage3, clubImage4, clubImage6, clubImage2];
+  const { mutate: saveEventIntroduction } = useAPISaveEventIntroduction();
 
   return (
-    <LayoutWithTab
-      sidebar={{ activeScreenName: SidebarScreenName.EVENT }}
-      header={initialHeaderValue}>
-      <Head>
-        <title>ボールド | 部活動</title>
-      </Head>
-      {user?.role === UserRole.ADMIN && (
-        <div className={eventPRStyles.edit_button_wrapper}>
-          {!editMode && (
-            <Button
-              colorScheme={'green'}
-              onClick={() => {
-                editMode ? setEditMode(false) : setEditMode(true);
-              }}>
-              編集する
-            </Button>
-          )}
-        </div>
-      )}
-      <div className={eventPRStyles.main}>
-        {editMode && eventIntroduction && (
-          <EventIntroductionEditor eventIntroduction={eventIntroduction} />
-        )}
-        {!editMode && eventIntroduction && (
-          <EventIntroductionDisplayer
-            recommendedEvents={recommendedEvents}
-            eventIntroduction={eventIntroduction}
-          />
-        )}
-      </div>
-    </LayoutWithTab>
+    <EventIntroductionTemplate
+      recommendedEvents={recommendedEvents}
+      type={type}
+      eventIntroduction={eventIntroduction}
+      headlineImgSource={headlineImgSource}
+      bottomImgSources={bottomImgSources}
+      onSaveIntroduction={saveEventIntroduction}
+      onSuccessToSaveIntroduction={() => refetch()}
+      headerProps={initialHeaderValue}
+    />
   );
 };
 

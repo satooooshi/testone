@@ -1,66 +1,52 @@
-import LayoutWithTab from '@/components/layout/LayoutWithTab';
-import { SidebarScreenName } from '@/components/layout/Sidebar';
 import { useRouter } from 'next/router';
-import React, { useState } from 'react';
-import eventPRStyles from '@/styles/layouts/EventPR.module.scss';
+import React from 'react';
 import { useAPIGetLatestEvent } from '@/hooks/api/event/useAPIGetLatestEvent';
-import { EventType, UserRole } from 'src/types';
-import Head from 'next/head';
+import { EventType } from 'src/types';
 import { useAPIGetEventIntroduction } from '@/hooks/api/event/useAPIGetEventIntroduction';
-import { useAuthenticate } from 'src/contexts/useAuthenticate';
-import { Button } from '@chakra-ui/button';
-import EventIntroductionEditor from 'src/templates/event/EventIntroductionEditor';
-import EventIntroductionDisplayer from 'src/templates/event/EventIntroduction';
+import boldayImage1 from '@/public/bolday_1.jpg';
+import boldayImage2 from '@/public/bolday_2.jpg';
+import boldayImage3 from '@/public/bolday_3.jpg';
+import boldayImage4 from '@/public/bolday_4.jpg';
+import { useAPISaveEventIntroduction } from '@/hooks/api/event/useAPISaveEventIntroduction';
+import EventIntroductionTemplate from 'src/templates/event/EventIntroduction';
 
 const Bolday: React.FC = () => {
   const router = useRouter();
-  const [editMode, setEditMode] = useState<boolean>(false);
-  const { user } = useAuthenticate();
+  const { data: recommendedEvents } = useAPIGetLatestEvent({
+    type: EventType.BOLDAY,
+  });
+  const { data: eventIntroduction, refetch } = useAPIGetEventIntroduction(
+    EventType.BOLDAY,
+  );
+  const type = EventType.BOLDAY;
+  const { mutate: saveEventIntroduction } = useAPISaveEventIntroduction();
 
   const initialHeaderValue = {
     title: 'BOLDay',
     rightButtonName: '予定を見る',
     onClickRightButton: () => router.push('/event/list?type=bolday&from=&to='),
   };
-  const { data: recommendedEvents } = useAPIGetLatestEvent({
-    type: EventType.BOLDAY,
-  });
-  const { data: eventIntroduction } = useAPIGetEventIntroduction(
-    EventType.BOLDAY,
-  );
+  const headlineImgSource =
+    'https://www.bold.ne.jp/assets/assets_recruit/images/enviroment/img_balday_main.png';
+
+  const bottomImgSources = [
+    boldayImage1,
+    boldayImage2,
+    boldayImage4,
+    boldayImage3,
+  ];
 
   return (
-    <LayoutWithTab
-      sidebar={{ activeScreenName: SidebarScreenName.EVENT }}
-      header={initialHeaderValue}>
-      <Head>
-        <title>ボールド | BOLDay</title>
-      </Head>
-      {user?.role === UserRole.ADMIN && (
-        <div className={eventPRStyles.edit_button_wrapper}>
-          {!editMode && (
-            <Button
-              colorScheme={'green'}
-              onClick={() => {
-                editMode ? setEditMode(false) : setEditMode(true);
-              }}>
-              編集する
-            </Button>
-          )}
-        </div>
-      )}
-      <div className={eventPRStyles.main}>
-        {editMode && eventIntroduction && (
-          <EventIntroductionEditor eventIntroduction={eventIntroduction} />
-        )}
-        {!editMode && eventIntroduction && (
-          <EventIntroductionDisplayer
-            recommendedEvents={recommendedEvents}
-            eventIntroduction={eventIntroduction}
-          />
-        )}
-      </div>
-    </LayoutWithTab>
+    <EventIntroductionTemplate
+      recommendedEvents={recommendedEvents}
+      type={type}
+      eventIntroduction={eventIntroduction}
+      headlineImgSource={headlineImgSource}
+      bottomImgSources={bottomImgSources}
+      onSaveIntroduction={saveEventIntroduction}
+      onSuccessToSaveIntroduction={() => refetch()}
+      headerProps={initialHeaderValue}
+    />
   );
 };
 
