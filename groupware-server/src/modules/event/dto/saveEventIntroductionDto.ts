@@ -9,18 +9,14 @@ export class SaveEventIntroductionDto {
   @IsString()
   title: string;
 
-  @ValidateIf((o, v) => v != null && v.length)
+  @ValidateIf((_, v) => v != null && v.length)
   @isNotEmptyExceptTags({ message: '空白のみの説明文は設定できません。' })
   description: string;
 
-  @IsNotEmpty({ message: 'タイプは必須項目です。' })
+  @IsNotEmpty({ message: 'タイプは必須項目です' })
   @IsEnum(EventType, {
-    message: 'タイプのリクエストの値が不正です。',
+    message: '不正なリクエストが送信されました',
   })
   type: EventType;
-
-  @IsNotEmpty({ message: 'メイン画像は必須項目です。' })
-  @IsString()
-  imageUrl: string;
 }
 export default SaveEventIntroductionDto;
