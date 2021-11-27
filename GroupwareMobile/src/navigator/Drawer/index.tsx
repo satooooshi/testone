@@ -25,6 +25,7 @@ import ChatMenu from '../../screens/Chat/ChatMenu';
 import ChatNotes from '../../screens/Chat/ChatMenu/ChatNote';
 import PostChatNote from '../../screens/Chat/ChatMenu/ChatNote/PostChatNote';
 import EditChatNote from '../../screens/Chat/ChatMenu/ChatNote/EditChatNote';
+import PostAnswer from '../../screens/wiki/PostAnswer';
 
 const Drawer = createDrawerNavigator();
 const Stack = createStackNavigator();
@@ -50,6 +51,11 @@ const WikiStack = () => (
     <Stack.Screen
       name="EditWiki"
       component={EditWiki}
+      options={{headerShown: false}}
+    />
+    <Stack.Screen
+      name="PostAnswer"
+      component={PostAnswer}
       options={{headerShown: false}}
     />
   </Stack.Navigator>
