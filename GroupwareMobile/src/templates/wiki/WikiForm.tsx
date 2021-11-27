@@ -12,14 +12,12 @@ import {
   Text,
 } from 'react-native-magnus';
 import {DropdownOptionProps} from 'react-native-magnus/lib/typescript/src/ui/dropdown/dropdown.option.type';
-import {RichToolbar, actions, RichEditor} from 'react-native-pell-rich-editor';
 import TagModal from '../../components/common/TagModal';
 import HeaderWithTextButton from '../../components/Header';
-import MarkdownEditorWebView from '../../components/MarkdownEditorWebView';
 import WholeContainer from '../../components/WholeContainer';
+import TextEditor from '../../components/wiki/TextEditor';
 import {useSelectedTags} from '../../hooks/tag/useSelectedTags';
 import {useTagType} from '../../hooks/tag/useTagType';
-import {wikiFormStyles} from '../../styles/component/wiki/wikiForm.style';
 import {RuleCategory, Tag, TextFormat, Wiki, WikiType} from '../../types';
 import {tagColorFactory} from '../../utils/factory/tagColorFactory';
 import {wikiTypeNameFactory} from '../../utils/factory/wiki/wikiTypeNameFactory';
@@ -62,14 +60,13 @@ const WikiForm: React.FC<WikiFormProps> = ({
       saveWiki(w);
     },
   });
-  const {height: windowHeight, width: windowWidth} = useWindowDimensions();
+  const {width: windowWidth} = useWindowDimensions();
   const defaultDropdownProps: Partial<DropdownProps> = {
     m: 'md',
     pb: 'md',
     showSwipeIndicator: false,
     roundedTop: 'xl',
   };
-  const editorRef = useRef<RichEditor | null>(null);
   const defaultDropdownOptionProps: Partial<DropdownOptionProps> = {
     bg: 'gray100',
     color: 'blue600',
@@ -112,10 +109,6 @@ const WikiForm: React.FC<WikiFormProps> = ({
         },
       ],
     );
-  };
-
-  const editorInitializedCallback = () => {
-    editorRef.current?.registerToolbar(function () {});
   };
 
   const formatDropdown = (
@@ -342,71 +335,12 @@ const WikiForm: React.FC<WikiFormProps> = ({
             {errors.body}
           </Text>
         ) : null}
-        <Div mb={16}>
-          {newWiki.textFormat === 'html' ? (
-            <>
-              <RichToolbar
-                editor={editorRef}
-                selectedIconTint={'#2095F2'}
-                onPressAddImage={() => {
-                  if (editorRef.current) {
-                    onUploadImage(imageUrl =>
-                      //@ts-ignore If write this like editorRef.current?.insertImage it doesn't work on initial uploading.
-                      editorRef.current.insertImage(imageUrl[0]),
-                    );
-                  }
-                }}
-                disabledIconTint={'#bfbfbf'}
-                actions={[
-                  actions.heading1,
-                  actions.heading2,
-                  actions.heading3,
-                  actions.heading4,
-                  actions.heading5,
-                  actions.heading6,
-                  'bold',
-                  actions.setStrikethrough,
-                  actions.insertOrderedList,
-                  actions.blockquote,
-                  actions.code,
-                  actions.insertImage,
-                  actions.undo,
-                  actions.redo,
-                ]}
-                iconMap={{
-                  [actions.heading1]: () => <Text>H1</Text>,
-                  [actions.heading2]: () => <Text>H2</Text>,
-                  [actions.heading3]: () => <Text>H3</Text>,
-                  [actions.heading4]: () => <Text>H4</Text>,
-                  [actions.heading5]: () => <Text>H5</Text>,
-                  [actions.heading6]: () => <Text>H6</Text>,
-                  [actions.bold]: () => <Text fontWeight="bold">B</Text>,
-                }}
-              />
-              <RichEditor
-                placeholder="本文を入力してください"
-                ref={editorRef}
-                style={{
-                  ...wikiFormStyles.richEditor,
-                  height: windowHeight * 0.6,
-                }}
-                initialHeight={300}
-                initialContentHTML={newWiki.body}
-                useContainer={true}
-                scrollEnabled={false}
-                editorInitializedCallback={editorInitializedCallback}
-                onChange={text => setNewWiki(w => ({...w, body: text}))}
-              />
-            </>
-          ) : newWiki.textFormat === 'markdown' ? (
-            <Div h={windowHeight * 0.9}>
-              <MarkdownEditorWebView
-                value={wiki?.body || ''}
-                onChange={text => setNewWiki(w => ({...w, body: text}))}
-              />
-            </Div>
-          ) : null}
-        </Div>
+        <TextEditor
+          textFormat={newWiki.textFormat}
+          onUploadImage={onUploadImage}
+          initialBody={newWiki.body}
+          onChange={text => setNewWiki(w => ({...w, body: text}))}
+        />
       </ScrollDiv>
     </WholeContainer>
   );
