@@ -21,10 +21,13 @@ export const chatNoteDetailURL = (roomId: string, noteId: string) =>
   `${noteURL(roomId)}/${noteId}`;
 //GET
 export const getChatAlbumsURL = (roomId: string, page: string) =>
-  `${noteURL(roomId)}?page=${page}`;
+  `${albumURL(roomId)}?page=${page}`;
 //DELETE
 export const chatAlbumImageURL = (
   roomId: string,
   albumId: string,
   page: string,
-) => `${albumURL(roomId)}/${albumId}/page=${page}`;
+) => `${albumURL(roomId)}/${albumId}?page=${page}`;
+
+export const chatAlbumDetailURL = (roomId: string, albumId: string) =>
+  `${albumURL(roomId)}/${albumId}`;
