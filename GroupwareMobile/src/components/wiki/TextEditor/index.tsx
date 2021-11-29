@@ -80,7 +80,7 @@ const TextEditor: React.FC<TextEditorProps> = ({
             initialHeight={300}
             initialContentHTML={initialBody}
             useContainer={true}
-            scrollEnabled={false}
+            scrollEnabled={true}
             editorInitializedCallback={editorInitializedCallback}
             onChange={onChange}
           />
@@ -135,7 +135,7 @@ const TextEditor: React.FC<TextEditorProps> = ({
             initialHeight={400}
             initialContentHTML={markdownit.render(initialBody || '')}
             useContainer={true}
-            scrollEnabled={false}
+            scrollEnabled={true}
             editorInitializedCallback={editorInitializedCallback}
             onCursorPosition={scrollY =>
               scrollRef?.current?.scrollTo({y: scrollY - 30, animated: true})
