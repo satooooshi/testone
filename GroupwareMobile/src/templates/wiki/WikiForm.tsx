@@ -21,7 +21,6 @@ import {RuleCategory, Tag, TextFormat, Wiki, WikiType} from '../../types';
 import {tagColorFactory} from '../../utils/factory/tagColorFactory';
 import {wikiTypeNameFactory} from '../../utils/factory/wiki/wikiTypeNameFactory';
 import {wikiSchema} from '../../utils/validation/schema';
-import MarkdownIt from 'markdown-it';
 import tailwind from 'tailwind-rn';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 
