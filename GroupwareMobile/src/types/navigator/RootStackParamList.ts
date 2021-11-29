@@ -1,4 +1,4 @@
-import {ChatGroup, WikiType} from '../../types';
+import {ChatGroup, ChatNote, WikiType} from '../../types';
 
 export type RootStackParamList = {
   Home: undefined;
@@ -42,4 +42,17 @@ export type RootStackParamList = {
       }
     | undefined;
   NewRoom: undefined;
+  ChatMenu: {
+    room: ChatGroup;
+  };
+  ChatNotes: {
+    room: ChatGroup;
+  };
+  PostChatNote: {
+    room: ChatGroup;
+  };
+  EditChatNote: {
+    room: ChatGroup;
+    note: ChatNote;
+  };
 };

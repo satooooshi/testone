@@ -10,13 +10,12 @@ import {
   useWindowDimensions,
 } from 'react-native';
 import {Div, Icon, Overlay} from 'react-native-magnus';
-import AppHeader from '../../components/Header';
 import WholeContainer from '../../components/WholeContainer';
 import {useAPIGetMessages} from '../../hooks/api/chat/useAPIGetMessages';
 import {useAPISendChatMessage} from '../../hooks/api/chat/useAPISendChatMessage';
 import {useAPIUploadStorage} from '../../hooks/api/storage/useAPIUploadStorage';
 import {chatStyles} from '../../styles/screen/chat/chat.style';
-import {ChatMessage, ChatMessageType} from '../../types';
+import {ChatMessage, ChatMessageType, ImageSource} from '../../types';
 import {uploadImageFromGallery} from '../../utils/cropImage/uploadImageFromGallery';
 import DocumentPicker from 'react-native-document-picker';
 import ImageView from 'react-native-image-viewing';
@@ -32,24 +31,41 @@ import RNFetchBlob from 'rn-fetch-blob';
 const {fs, config} = RNFetchBlob;
 import FileViewer from 'react-native-file-viewer';
 import {KeyboardAwareFlatList} from 'react-native-keyboard-aware-scroll-view';
-import {useRoute} from '@react-navigation/native';
-import {ChatRouteProps} from '../../types/navigator/drawerScreenProps';
-
-type ImageSource = {
-  uri: string;
-};
+import {useNavigation, useRoute} from '@react-navigation/native';
+import {
+  ChatNavigationProps,
+  ChatRouteProps,
+} from '../../types/navigator/drawerScreenProps';
+import {useFormik} from 'formik';
+import ReplyTarget from '../../components/chat/ChatFooter/ReplyTarget';
+import HeaderWithIconButton from '../../components/Header/HeaderWithIconButton';
+import {darkFontColor} from '../../utils/colors';
+import tailwind from 'tailwind-rn';
 
 const Chat: React.FC = () => {
+  const navigation = useNavigation<ChatNavigationProps>();
   const {height: windowHeight} = useWindowDimensions();
   const route = useRoute<ChatRouteProps>();
   const {room} = route.params;
   const [page, setPage] = useState(1);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [newMessage, setNewMessage] = useState('');
   const [imageModal, setImageModal] = useState(false);
   const [images, setImages] = useState<ImageSource[]>([]);
   const [nowImageIndex, setNowImageIndex] = useState<number>(0);
   const [video, setVideo] = useState('');
+  const {values, handleSubmit, setValues} = useFormik<Partial<ChatMessage>>({
+    initialValues: {
+      content: '',
+      type: ChatMessageType.TEXT,
+      replyParentMessage: null,
+      chatGroup: room,
+    },
+    enableReinitialize: true,
+    onSubmit: submittedValues => {
+      Keyboard.dismiss();
+      sendChatMessage(submittedValues);
+    },
+  });
   const {data: fetchedMessage, isLoading: loadingMessages} = useAPIGetMessages({
     group: room.id,
     page: page.toString(),
@@ -73,7 +89,12 @@ const Chat: React.FC = () => {
   const {mutate: sendChatMessage, isLoading: loadingSendMessage} =
     useAPISendChatMessage({
       onSuccess: () => {
-        setNewMessage('');
+        setValues(v => ({
+          ...v,
+          content: '',
+          type: ChatMessageType.TEXT,
+          replyParentMessage: undefined,
+        }));
       },
     });
   const {mutate: uploadFile, isLoading: loadingUploadFile} =
@@ -85,16 +106,20 @@ const Chat: React.FC = () => {
     setImageModal(true);
   };
   const isLoading = loadingMessages || loadingSendMessage || loadingUploadFile;
-
-  const handleSend = () => {
-    if (newMessage.length) {
-      Keyboard.dismiss();
-      sendChatMessage({
-        content: newMessage,
-        chatGroup: room,
-      });
-    }
-  };
+  const headerRightIcon = (
+    <TouchableOpacity
+      style={tailwind('flex flex-row items-center')}
+      onPress={() =>
+        navigation.navigate('ChatStack', {screen: 'ChatMenu', params: {room}})
+      }>
+      <Icon
+        name="pencil"
+        fontFamily="Entypo"
+        fontSize={24}
+        color={darkFontColor}
+      />
+    </TouchableOpacity>
+  );
 
   const handleUploadImage = async () => {
     const {formData} = await uploadImageFromGallery({
@@ -234,6 +259,43 @@ const Chat: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fetchedMessage]);
 
+  const renderMessage = (message: ChatMessage) => (
+    <Div alignSelf={message?.isSender ? 'flex-end' : 'flex-start'} mb={'sm'}>
+      {message.type === ChatMessageType.TEXT ? (
+        <TextMessage
+          message={message}
+          onLongPress={() =>
+            setValues(v => ({...v, replyParentMessage: message}))
+          }
+        />
+      ) : message.type === ChatMessageType.IMAGE ? (
+        <ImageMessage
+          onPress={() => showImageOnModal(message.content)}
+          message={message}
+          onLongPress={() =>
+            setValues(v => ({...v, replyParentMessage: message}))
+          }
+        />
+      ) : message.type === ChatMessageType.VIDEO ? (
+        <VideoMessage
+          message={message}
+          onPress={() => playVideoOnModal(message.content)}
+          onLongPress={() =>
+            setValues(v => ({...v, replyParentMessage: message}))
+          }
+        />
+      ) : message.type === ChatMessageType.OTHER_FILE ? (
+        <FileMessage
+          message={message}
+          onPress={() => downloadFile(message)}
+          onLongPress={() =>
+            setValues(v => ({...v, replyParentMessage: message}))
+          }
+        />
+      ) : null}
+    </Div>
+  );
+
   const messageListAvoidngKeyboardDisturb = (
     <>
       {Platform.OS === 'ios' ? (
@@ -254,38 +316,25 @@ const Chat: React.FC = () => {
             inverted
             data={messages}
             {...{onEndReached}}
-            renderItem={({item: message}) => (
-              <Div
-                alignSelf={message?.isSender ? 'flex-end' : 'flex-start'}
-                mb={'sm'}>
-                {message.type === ChatMessageType.TEXT ? (
-                  <TextMessage message={message} />
-                ) : message.type === ChatMessageType.IMAGE ? (
-                  <ImageMessage
-                    onPress={() => showImageOnModal(message.content)}
-                    message={message}
-                  />
-                ) : message.type === ChatMessageType.VIDEO ? (
-                  <VideoMessage
-                    message={message}
-                    onPress={() => playVideoOnModal(message.content)}
-                  />
-                ) : message.type === ChatMessageType.OTHER_FILE ? (
-                  <FileMessage
-                    message={message}
-                    onPress={() => downloadFile(message)}
-                  />
-                ) : null}
-              </Div>
-            )}
+            renderItem={({item: message}) => renderMessage(message)}
           />
+          {values.replyParentMessage && (
+            <ReplyTarget
+              onPressCloseIcon={() =>
+                setValues(v => ({...v, replyParentMessage: undefined}))
+              }
+              replyParentMessage={values.replyParentMessage}
+            />
+          )}
           <ChatFooter
             onUploadFile={handleUploadFile}
             onUploadVideo={handleUploadVideo}
             onUploadImage={handleUploadImage}
-            text={newMessage}
-            onChangeText={t => setNewMessage(t)}
-            onSend={handleSend}
+            text={values.content || ''}
+            onChangeText={t =>
+              setValues(v => ({...v, type: ChatMessageType.TEXT, content: t}))
+            }
+            onSend={handleSubmit}
             mentionSuggestions={suggestions()}
           />
         </KeyboardAvoidingView>
@@ -299,38 +348,17 @@ const Chat: React.FC = () => {
             data={messages}
             {...{onEndReached}}
             keyExtractor={item => item.id.toString()}
-            renderItem={({item: message}) => (
-              <Div
-                alignSelf={message?.isSender ? 'flex-end' : 'flex-start'}
-                mb={'sm'}>
-                {message.type === ChatMessageType.TEXT ? (
-                  <TextMessage message={message} />
-                ) : message.type === ChatMessageType.IMAGE ? (
-                  <ImageMessage
-                    onPress={() => showImageOnModal(message.content)}
-                    message={message}
-                  />
-                ) : message.type === ChatMessageType.VIDEO ? (
-                  <VideoMessage
-                    message={message}
-                    onPress={() => playVideoOnModal(message.content)}
-                  />
-                ) : message.type === ChatMessageType.OTHER_FILE ? (
-                  <FileMessage
-                    message={message}
-                    onPress={() => downloadFile(message)}
-                  />
-                ) : null}
-              </Div>
-            )}
+            renderItem={({item: message}) => renderMessage(message)}
           />
           <ChatFooter
             onUploadFile={handleUploadFile}
             onUploadVideo={handleUploadVideo}
             onUploadImage={handleUploadImage}
-            text={newMessage}
-            onChangeText={t => setNewMessage(t)}
-            onSend={handleSend}
+            text={values.content || ''}
+            onChangeText={t =>
+              setValues(v => ({...v, type: ChatMessageType.TEXT, content: t}))
+            }
+            onSend={handleSubmit}
             mentionSuggestions={suggestions()}
           />
         </>
@@ -369,10 +397,11 @@ const Chat: React.FC = () => {
         swipeToCloseEnabled={false}
         doubleTapToZoomEnabled={true}
       />
-      <AppHeader
+      <HeaderWithIconButton
         title="チャット"
         enableBackButton={true}
         screenForBack={'RoomList'}
+        icon={headerRightIcon}
       />
       {messageListAvoidngKeyboardDisturb}
     </WholeContainer>

@@ -13,11 +13,13 @@ const afterNowMessage = '現在の日時以降に設定してください';
 // const minHostUsersMessage = '開催者/講師は一人以上設定してください';
 
 export const loginSchema = Yup.object().shape({
-  email: Yup.string().email(emailFormatMessage).required(requireMessage),
+  email: Yup.string()
+    .email(emailFormatMessage)
+    .required(`メールアドレスは${requireMessage}`),
   password: Yup.string()
     .matches(/^([^ ]*)$/, blankMixedMessage)
     .min(8, minEightTextMessage)
-    .required(requireMessage),
+    .required(`パスワードは${requireMessage}`),
 });
 
 export const wikiSchema = Yup.object().shape({
@@ -87,6 +89,13 @@ export const profileSchema = Yup.object().shape({
     1000,
     `趣味の紹介は${nWordLimitMessage(1000)}`,
   ),
+});
+
+export const editEventIntroductionSchema = Yup.object().shape({
+  title: Yup.string()
+    .required(`タイトルは${requireMessage}`)
+    .max(100, `タイトルは${nWordLimitMessage(100)}`),
+  description: Yup.string().required(`説明文は${requireMessage}`),
 });
 
 export const chatGroupSchema = Yup.object().shape({

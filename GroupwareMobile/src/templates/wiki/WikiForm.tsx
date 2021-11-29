@@ -14,7 +14,7 @@ import {
 import {DropdownOptionProps} from 'react-native-magnus/lib/typescript/src/ui/dropdown/dropdown.option.type';
 import {RichToolbar, actions, RichEditor} from 'react-native-pell-rich-editor';
 import TagModal from '../../components/common/TagModal';
-import AppHeader from '../../components/Header';
+import HeaderWithTextButton from '../../components/Header';
 import MarkdownEditorWebView from '../../components/MarkdownEditorWebView';
 import WholeContainer from '../../components/WholeContainer';
 import {useSelectedTags} from '../../hooks/tag/useSelectedTags';
@@ -248,7 +248,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
 
   return (
     <WholeContainer>
-      <AppHeader title="Wiki作成" />
+      <HeaderWithTextButton title="Wiki作成" />
       <TagModal
         isVisible={visibleTagModal}
         tags={filteredTags || []}

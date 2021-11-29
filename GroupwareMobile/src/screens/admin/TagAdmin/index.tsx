@@ -3,7 +3,7 @@ import React from 'react';
 import {ActivityIndicator, Alert, useWindowDimensions} from 'react-native';
 import {Overlay, ScrollDiv} from 'react-native-magnus';
 import TagCollapse from '../../../components/admin/TagCollapse';
-import AppHeader, {Tab} from '../../../components/Header';
+import HeaderWithTextButton, {Tab} from '../../../components/Header';
 import WholeContainer from '../../../components/WholeContainer';
 import {useAPICreateTag} from '../../../hooks/api/tag/useAPICreateTag';
 import {useAPIDeleteTag} from '../../../hooks/api/tag/useAPIDeleteTag';
@@ -116,7 +116,11 @@ const TagAdmin: React.FC = () => {
       <Overlay visible={isLoading} p="xl">
         <ActivityIndicator />
       </Overlay>
-      <AppHeader title={'タグ管理'} tabs={tabs} activeTabName={'タグ管理'} />
+      <HeaderWithTextButton
+        title={'タグ管理'}
+        tabs={tabs}
+        activeTabName={'タグ管理'}
+      />
       <ScrollDiv
         contentContainerStyle={{
           ...tagAdminStyles.scrollView,

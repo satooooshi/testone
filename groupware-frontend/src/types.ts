@@ -194,6 +194,21 @@ export interface EventComment {
   createdAt: Date;
   updatedAt: Date;
 }
+export interface EventIntroduction {
+  type: EventType;
+  title: string;
+  description: string;
+  imageUrl: string;
+  subImages: EventIntroductionSubImage[];
+  createdAt: Date;
+  updatedAt: Date;
+}
+export interface EventIntroductionSubImage {
+  eventIntruduction: EventIntroduction;
+  imageUrl: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
 
 export interface EventVideo {
   id: number;
@@ -236,12 +251,14 @@ export interface ChatMessage {
   createdAt: Date;
   updatedAt: Date;
   isSender?: boolean;
+  replyParentMessage?: ChatMessage;
 }
 
 export interface ChatGroup {
   id: number;
   name: string;
   imageURL: string;
+  chatNotes?: ChatNote[];
   chatMessages?: ChatMessage[];
   members?: User[];
   lastReadChatTime?: LastReadChatTime[];
@@ -254,4 +271,23 @@ export interface LastReadChatTime {
   readTime: Date;
   chatGroup: ChatGroup;
   user: User;
+}
+
+export interface ChatNote {
+  id: number;
+  content: string;
+  chatGroup?: ChatGroup;
+  editors?: User[];
+  images?: Partial<ChatNoteImage>[];
+  createdAt: Date;
+  updatedAt: Date;
+  isEditor?: boolean;
+}
+
+export interface ChatNoteImage {
+  id: number;
+  imageURL: string;
+  chatNote?: ChatNote;
+  createdAt: Date;
+  updatedAt: Date;
 }

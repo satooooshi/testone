@@ -254,12 +254,16 @@ export interface ChatMessage {
   updatedAt: Date;
   isSender?: boolean;
   thumbnail?: string;
+  replyParentMessage?: ChatMessage | null;
 }
 
 export interface ChatGroup {
   id: number;
   name: string;
   imageURL: string;
+  pinnedUsers?: User[];
+  isPinned?: boolean;
+  chatNotes?: ChatNote[];
   chatMessages?: ChatMessage[];
   members?: User[];
   lastReadChatTime?: LastReadChatTime[];
@@ -273,3 +277,27 @@ export interface LastReadChatTime {
   chatGroup: ChatGroup;
   user: User;
 }
+
+export interface ChatNote {
+  id: number;
+  content: string;
+  chatGroup?: ChatGroup;
+  editors?: User[];
+  images?: Partial<ChatNoteImage>[];
+  createdAt: Date;
+  updatedAt: Date;
+  isEditor?: boolean;
+}
+
+export interface ChatNoteImage {
+  id: number;
+  imageURL: string;
+  chatNote?: ChatNote;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+//this is for react-native-image-viewing
+export type ImageSource = {
+  uri: string;
+};

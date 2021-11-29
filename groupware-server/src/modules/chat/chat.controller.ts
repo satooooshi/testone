@@ -2,20 +2,24 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Patch,
   Post,
   Query,
   Req,
+  Res,
   UseGuards,
 } from '@nestjs/common';
+import { Response } from 'express';
 import { ChatGroup } from 'src/entities/chatGroup.entity';
 import { ChatMessage } from 'src/entities/chatMessage.entity';
+import { ChatNote } from 'src/entities/chatNote.entity';
 import { LastReadChatTime } from 'src/entities/lastReadChatTime.entity';
 import JwtAuthenticationGuard from '../auth/jwtAuthentication.guard';
 import RequestWithUser from '../auth/requestWithUser.interface';
-import { ChatService } from './chat.service';
+import { ChatService, GetChatNotesResult } from './chat.service';
 
 export interface GetMessagesQuery {
   group: number;
@@ -94,7 +98,7 @@ export class ChatController {
     if (!chatGroup.members.filter((u) => u.id === user.id).length) {
       chatGroup.members.push(user);
     }
-    return await this.chatService.saveChatGroup(chatGroup);
+    return await this.chatService.saveChatGroup(chatGroup, user.id);
   }
 
   @Get('get-last-read-chat-time/:id')
@@ -124,5 +128,64 @@ export class ChatController {
     const { id } = req.user;
     const { id: chatGroupId } = chatGroup;
     await this.chatService.leaveChatRoom(id, chatGroupId);
+  }
+
+  @Get('/v2/room/:roomId/note')
+  @UseGuards(JwtAuthenticationGuard)
+  async getChatNotes(
+    @Param('roomId') roomId: string,
+    @Query('page') page: string,
+    @Req() req: RequestWithUser,
+  ): Promise<GetChatNotesResult> {
+    const { user } = req;
+    const notes = await this.chatService.getChatNotes(
+      { group: Number(roomId), page },
+      user.id,
+    );
+    return notes;
+  }
+
+  @Post('/v2/room/:roomId/note')
+  @UseGuards(JwtAuthenticationGuard)
+  async createChatNotes(
+    @Body() body: Partial<ChatNote>,
+    @Req() req: RequestWithUser,
+  ) {
+    const { user } = req;
+    body.editors = [user];
+    const notes = await this.chatService.saveChatNotes(body);
+    return notes;
+  }
+
+  @Patch('/v2/room/:roomId/note/:noteId')
+  @UseGuards(JwtAuthenticationGuard)
+  async updateChatNotes(@Body() body: ChatNote, @Req() req: RequestWithUser) {
+    const { user } = req;
+    body.editors = body?.editors?.length
+      ? [...body.editors.filter((e) => e.id !== user.id), user]
+      : [user];
+    const notes = await this.chatService.saveChatNotes(body);
+    return notes;
+  }
+
+  @Delete('/v2/room/:roomId/note/:noteId')
+  @UseGuards(JwtAuthenticationGuard)
+  async deleteChatNotes(@Param('noteId') noteId: number, @Res() res: Response) {
+    await this.chatService.deleteChatNotes(noteId);
+    res.send(200);
+  }
+
+  @Get('/v2/room/:roomId/note/:noteId')
+  @UseGuards(JwtAuthenticationGuard)
+  async getChatNoteDetail(
+    @Param('noteId') noteId: string,
+    @Req() req: RequestWithUser,
+  ) {
+    const { id: userID } = req.user;
+    const notes = await this.chatService.getChatNoteDetail(
+      Number(noteId),
+      userID,
+    );
+    return notes;
   }
 }
