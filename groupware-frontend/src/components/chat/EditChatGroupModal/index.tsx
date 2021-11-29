@@ -1,8 +1,9 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import ReactModal from 'react-modal';
 import editChatGroupModalStyles from '@/styles/components/EditChatGroupModal.module.scss';
+import validationErrorStyles from '@/styles/components/ValidationError.module.scss';
 import { ChatGroup } from 'src/types';
-import { Button, FormLabel, Input, useToast } from '@chakra-ui/react';
+import { Button, FormLabel, Input } from '@chakra-ui/react';
 // import selectUserModalStyles from '@/styles/components/SelectUserModal.module.scss';
 import { useAPIUploadStorage } from '@/hooks/api/storage/useAPIUploadStorage';
 import { useDropzone } from 'react-dropzone';
@@ -12,7 +13,6 @@ import { chatGroupSchema } from 'src/utils/validation/schema';
 import { dataURLToFile } from 'src/utils/dataURLToFile';
 import { getCroppedImageURL } from 'src/utils/getCroppedImageURL';
 import { imageExtensions } from 'src/utils/imageExtensions';
-import { formikErrorMsgFactory } from 'src/utils/factory/formikErrorMsgFactory';
 
 type EditChatGroupModalProps = {
   isOpen: boolean;
@@ -27,7 +27,6 @@ const EditChatGroupModal: React.FC<EditChatGroupModalProps> = ({
   chatGroup,
   saveGroup,
 }) => {
-  const toast = useToast();
   const [selectImageUrl, setSelectImageUrl] = useState<string>('');
   const { mutate: uploadImage } = useAPIUploadStorage({
     onSuccess: async (fileURLs) => {
@@ -60,27 +59,13 @@ const EditChatGroupModal: React.FC<EditChatGroupModalProps> = ({
     imgRef.current = img;
   }, []);
 
-  const checkErrors = async () => {
-    const errors = await validateForm();
-    const messages = formikErrorMsgFactory(errors);
-    if (messages) {
-      toast({
-        description: messages,
-        status: 'error',
-        duration: 3000,
-        isClosable: true,
-      });
-    } else {
-      onFinish();
-    }
-  };
-
   const {
     values: newGroupInfo,
     setValues: setNewGroupInfo,
     handleSubmit: onFinish,
     handleChange,
-    validateForm,
+    errors,
+    touched,
   } = useFormik<Partial<ChatGroup>>({
     initialValues: { name: chatGroup.name },
     validationSchema: chatGroupSchema,
@@ -110,7 +95,12 @@ const EditChatGroupModal: React.FC<EditChatGroupModalProps> = ({
       className={editChatGroupModalStyles.modal}>
       <div className={editChatGroupModalStyles.top}>
         <div className={editChatGroupModalStyles.modal_input_wrapper}>
-          <FormLabel>グループ名</FormLabel>
+          <FormLabel>
+            <p>グループ名</p>
+            {errors.name && touched.name ? (
+              <p className={validationErrorStyles.error_text}>{errors.name}</p>
+            ) : null}
+          </FormLabel>
           <Input
             type="text"
             name="name"
@@ -159,7 +149,7 @@ const EditChatGroupModal: React.FC<EditChatGroupModalProps> = ({
             width="140px"
             colorScheme="green"
             borderRadius={5}
-            onClick={() => checkErrors()}>
+            onClick={() => onFinish()}>
             更新
           </Button>
         </div>
