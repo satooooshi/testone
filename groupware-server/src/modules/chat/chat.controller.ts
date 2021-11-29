@@ -100,9 +100,10 @@ export class ChatController {
         'Group member is necessary at least 1 person',
       );
     }
-    if (!chatGroup.members.filter((u) => u.id === user.id).length) {
-      chatGroup.members.push(user);
-    }
+    chatGroup.members = [
+      ...chatGroup.members.filter((u) => u.id !== user.id),
+      user,
+    ];
     return await this.chatService.saveChatGroup(chatGroup, user.id);
   }
 

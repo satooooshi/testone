@@ -181,7 +181,8 @@ export class ChatService {
     const offset = limit * (page - 1);
     const [urlUnparsedRooms, count] = await this.chatGroupRepository
       .createQueryBuilder('chat_groups')
-      .leftJoinAndSelect('chat_groups.members', 'member')
+      .leftJoinAndSelect('chat_groups.members', 'members')
+      .leftJoin('chat_groups.members', 'member')
       .leftJoinAndSelect(
         'chat_groups.pinnedUsers',
         'pinnedUsers',
