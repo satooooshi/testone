@@ -13,6 +13,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { Response } from 'express';
+import { ChatAlbum } from 'src/entities/chatAlbum.entity';
 import { ChatGroup } from 'src/entities/chatGroup.entity';
 import { ChatMessage } from 'src/entities/chatMessage.entity';
 import { ChatNote } from 'src/entities/chatNote.entity';
@@ -20,6 +21,7 @@ import { LastReadChatTime } from 'src/entities/lastReadChatTime.entity';
 import JwtAuthenticationGuard from '../auth/jwtAuthentication.guard';
 import RequestWithUser from '../auth/requestWithUser.interface';
 import { ChatService, GetChatNotesResult } from './chat.service';
+import { ChatAlbumService, GetChatAlbumsResult } from './chatAlbum.service';
 
 export interface GetMessagesQuery {
   group: number;
@@ -37,7 +39,10 @@ export interface GetRoomsResult {
 
 @Controller('chat')
 export class ChatController {
-  constructor(private readonly chatService: ChatService) {}
+  constructor(
+    private readonly chatService: ChatService,
+    private readonly chatAlbumService: ChatAlbumService,
+  ) {}
 
   @Get('group-list')
   @UseGuards(JwtAuthenticationGuard)
@@ -187,5 +192,66 @@ export class ChatController {
       userID,
     );
     return notes;
+  }
+
+  @Get('/v2/room/:roomId/album')
+  @UseGuards(JwtAuthenticationGuard)
+  async getChatAlbums(
+    @Param('roomId') roomId: string,
+    @Query('page') page: string,
+    @Req() req: RequestWithUser,
+  ): Promise<GetChatAlbumsResult> {
+    const { user } = req;
+    const albums = await this.chatAlbumService.getChatAlbums(
+      { group: Number(roomId), page },
+      user.id,
+    );
+    return albums;
+  }
+
+  @Post('/v2/room/:roomId/album')
+  @UseGuards(JwtAuthenticationGuard)
+  async createChatAlbums(
+    @Body() body: Partial<ChatAlbum>,
+    @Req() req: RequestWithUser,
+  ) {
+    const { user } = req;
+    body.editors = [user];
+    const albums = await this.chatAlbumService.saveChatAlbums(body);
+    return albums;
+  }
+
+  @Patch('/v2/room/:roomId/album/:albumId')
+  @UseGuards(JwtAuthenticationGuard)
+  async updateChatAlbums(@Body() body: ChatAlbum, @Req() req: RequestWithUser) {
+    const { user } = req;
+    body.editors = body?.editors?.length
+      ? [...body.editors.filter((e) => e.id !== user.id), user]
+      : [user];
+    const albums = await this.chatAlbumService.saveChatAlbums(body);
+    return albums;
+  }
+
+  @Delete('/v2/room/:roomId/album/:albumId')
+  @UseGuards(JwtAuthenticationGuard)
+  async deleteChatAlbums(
+    @Param('albumId') albumId: number,
+    @Res() res: Response,
+  ) {
+    await this.chatAlbumService.deleteChatAlbums(albumId);
+    res.send(200);
+  }
+
+  @Get('/v2/room/:roomId/album/:albumId')
+  @UseGuards(JwtAuthenticationGuard)
+  async getChatAlbumDetail(
+    @Param('albumId') albumId: string,
+    @Query('page') page: string,
+  ) {
+    const albums = await this.chatAlbumService.getChatAlbumImages(
+      Number(albumId),
+      page,
+    );
+    return albums;
   }
 }

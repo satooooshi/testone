@@ -69,7 +69,8 @@ export class StorageService {
     const options: any = {
       version: 'v4',
       action: 'read',
-      expires: Date.now() + 15 * 60 * 1000, // 15 minutes
+      //1 hour
+      expires: Date.now() + 30 * 60 * 1000,
     };
 
     for await (const unsignedURL of storageURLs) {

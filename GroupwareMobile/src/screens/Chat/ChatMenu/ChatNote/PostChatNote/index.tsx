@@ -1,6 +1,6 @@
 import {useNavigation, useRoute} from '@react-navigation/native';
 import React from 'react';
-import {useAPICreateChatNote} from '../../../../../hooks/api/chat/useAPICreateChatNote';
+import {useAPICreateChatNote} from '../../../../../hooks/api/chat/note/useAPICreateChatNote';
 import {useAPIUploadStorage} from '../../../../../hooks/api/storage/useAPIUploadStorage';
 import ChatNoteForm from '../../../../../templates/chat/notes/ChatNoteForm';
 import {ChatNote} from '../../../../../types';

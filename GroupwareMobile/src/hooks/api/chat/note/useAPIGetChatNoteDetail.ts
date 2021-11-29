@@ -1,8 +1,8 @@
 import {AxiosError} from 'axios';
 import {useQuery, UseQueryOptions} from 'react-query';
-import {ChatNote} from '../../../types';
-import {axiosInstance} from '../../../utils/url';
-import {chatNoteDetailURL} from '../../../utils/url/chat.url';
+import {ChatNote} from '../../../../types';
+import {axiosInstance} from '../../../../utils/url';
+import {chatNoteDetailURL} from '../../../../utils/url/chat.url';
 
 export interface GetChatNotesQuery {
   roomId: string;

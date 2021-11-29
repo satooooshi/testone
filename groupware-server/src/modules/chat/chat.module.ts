@@ -1,6 +1,8 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ChatAlbum } from 'src/entities/chatAlbum.entity';
+import { ChatAlbumImage } from 'src/entities/chatAlbumImage.entity';
 import { ChatGroup } from 'src/entities/chatGroup.entity';
 import { ChatMessage } from 'src/entities/chatMessage.entity';
 import { ChatNote } from 'src/entities/chatNote.entity';
@@ -12,6 +14,7 @@ import { StorageModule } from '../storage/storage.module';
 import { UserModule } from '../user/user.module';
 import { ChatController } from './chat.controller';
 import { ChatService } from './chat.service';
+import { ChatAlbumService } from './chatAlbum.service';
 
 @Module({
   imports: [
@@ -26,10 +29,12 @@ import { ChatService } from './chat.service';
       LastReadChatTime,
       ChatNote,
       ChatNoteImage,
+      ChatAlbum,
+      ChatAlbumImage,
     ]),
   ],
   controllers: [ChatController],
-  providers: [ChatService],
+  providers: [ChatService, ChatAlbumService],
   exports: [ChatService],
 })
 export class ChatModule {}

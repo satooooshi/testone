@@ -301,3 +301,22 @@ export interface ChatNoteImage {
 export type ImageSource = {
   uri: string;
 };
+
+export interface ChatAlbum {
+  id: number;
+  title: string;
+  chatGroup?: ChatGroup;
+  editors?: User[];
+  images?: Partial<ChatAlbumImage>[];
+  createdAt: Date;
+  updatedAt: Date;
+  isEditor?: boolean;
+}
+
+export interface ChatAlbumImage {
+  id: number;
+  imageURL: string;
+  chatAlbum?: ChatAlbum;
+  createdAt: Date;
+  updatedAt: Date;
+}

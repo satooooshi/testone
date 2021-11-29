@@ -1,7 +1,7 @@
 import {useNavigation, useRoute} from '@react-navigation/native';
 import React from 'react';
-import {useAPIGetChatDetail} from '../../../../../hooks/api/chat/useAPIGetChatNoteDetail';
-import {useAPIUpdateNote} from '../../../../../hooks/api/chat/useAPIUpdateChatNote';
+import {useAPIGetChatDetail} from '../../../../../hooks/api/chat/note/useAPIGetChatNoteDetail';
+import {useAPIUpdateNote} from '../../../../../hooks/api/chat/note/useAPIUpdateChatNote';
 import {ChatNote} from '../../../../../types';
 import {
   EditChatNotesRouteProps,

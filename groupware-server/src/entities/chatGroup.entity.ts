@@ -10,6 +10,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { ChatAlbum } from './chatAlbum.entity';
 import { ChatMessage } from './chatMessage.entity';
 import { ChatNote } from './chatNote.entity';
 import { EventSchedule } from './event.entity';
@@ -48,8 +49,11 @@ export class ChatGroup {
   @OneToMany(() => ChatMessage, (chatMessage) => chatMessage.chatGroup)
   chatMessages?: ChatMessage[];
 
-  @OneToMany(() => ChatNote, (chatNote) => chatNote.chatGroup)
-  chatNotes?: ChatNote[];
+  @OneToMany(() => ChatAlbum, (chatAlbum) => chatAlbum.chatGroup)
+  chatAlbums?: ChatAlbum[];
+
+  @OneToMany(() => ChatAlbum, (chatNote) => chatNote.chatGroup)
+  chatNotes?: ChatAlbum[];
 
   @OneToMany(() => LastReadChatTime, (t) => t.chatGroup)
   lastReadChatTime?: LastReadChatTime[];

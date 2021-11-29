@@ -1,7 +1,7 @@
 import {AxiosError} from 'axios';
 import {useMutation, UseQueryOptions} from 'react-query';
-import {axiosInstance} from '../../../utils/url';
-import {chatNoteDetailURL} from '../../../utils/url/chat.url';
+import {axiosInstance} from '../../../../utils/url';
+import {chatNoteDetailURL} from '../../../../utils/url/chat.url';
 
 export type DeleteNoteDto = {
   roomId: string;

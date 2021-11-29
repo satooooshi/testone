@@ -25,6 +25,10 @@ import ChatMenu from '../../screens/Chat/ChatMenu';
 import ChatNotes from '../../screens/Chat/ChatMenu/ChatNote';
 import PostChatNote from '../../screens/Chat/ChatMenu/ChatNote/PostChatNote';
 import EditChatNote from '../../screens/Chat/ChatMenu/ChatNote/EditChatNote';
+import ChatAlbums from '../../screens/Chat/ChatMenu/ChatAlbum';
+import PostChatAlbum from '../../screens/Chat/ChatMenu/ChatAlbum/PostAlbum';
+import AlbumDetail from '../../screens/Chat/ChatMenu/ChatAlbum/AlbumDetail';
+import EditChatAlbum from '../../screens/Chat/ChatMenu/ChatAlbum/EditAlbum';
 
 const Drawer = createDrawerNavigator();
 const Stack = createStackNavigator();
@@ -161,6 +165,26 @@ const ChatStack = () => (
     <Stack.Screen
       name="EditChatNote"
       component={EditChatNote}
+      options={{headerShown: false}}
+    />
+    <Stack.Screen
+      name="ChatAlbums"
+      component={ChatAlbums}
+      options={{headerShown: false}}
+    />
+    <Stack.Screen
+      name="PostChatAlbum"
+      component={PostChatAlbum}
+      options={{headerShown: false}}
+    />
+    <Stack.Screen
+      name="ChatAlbumDetail"
+      component={AlbumDetail}
+      options={{headerShown: false}}
+    />
+    <Stack.Screen
+      name="EditChatAlbum"
+      component={EditChatAlbum}
       options={{headerShown: false}}
     />
   </Stack.Navigator>
