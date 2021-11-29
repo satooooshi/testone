@@ -1,4 +1,4 @@
-import {ChatGroup, ChatNote, WikiType} from '../../types';
+import {ChatAlbum, ChatGroup, ChatNote, WikiType} from '../../types';
 
 export type RootStackParamList = {
   Home: undefined;
@@ -57,5 +57,18 @@ export type RootStackParamList = {
   EditChatNote: {
     room: ChatGroup;
     note: ChatNote;
+  };
+  ChatAlbums: {
+    room: ChatGroup;
+  };
+  PostChatAlbum: {
+    room: ChatGroup;
+  };
+  ChatAlbumDetail: {
+    room: ChatGroup;
+    album: ChatAlbum;
+  };
+  EditChatAlbum: {
+    album: ChatAlbum;
   };
 };

@@ -1,10 +1,4 @@
-import React, {
-  useState,
-  useEffect,
-  useCallback,
-  useRef,
-  useReducer,
-} from 'react';
+import React, { useCallback, useRef, useReducer } from 'react';
 import { SidebarScreenName } from '@/components/layout/Sidebar';
 import { Tab } from 'src/types/header/tab/types';
 import LayoutWithTab from '@/components/layout/LayoutWithTab';
@@ -23,6 +17,7 @@ import {
 import { useAuthenticate } from 'src/contexts/useAuthenticate';
 import { imageExtensions } from 'src/utils/imageExtensions';
 import { useDropzone } from 'react-dropzone';
+import { useFormik } from 'formik';
 import Image from 'next/image';
 import noImage from '@/public/no-image.jpg';
 import { useAPIUploadStorage } from '@/hooks/api/storage/useAPIUploadStorage';
@@ -34,6 +29,8 @@ import { useImageCrop } from '@/hooks/crop/useImageCrop';
 import { useHeaderTab } from '@/hooks/headerTab/useHeaderTab';
 import TagModal from '@/components/common/TagModal';
 import { toggleTag } from 'src/utils/toggleTag';
+import { profileSchema } from 'src/utils/validation/schema';
+import { formikErrorMsgFactory } from 'src/utils/factory/formikErrorMsgFactory';
 import { useAPIGetUserTag } from '@/hooks/api/tag/useAPIGetUserTag';
 import FormToLinkTag from '@/components/FormToLinkTag';
 import router from 'next/router';
@@ -51,13 +48,17 @@ const Profile = () => {
   const { data: profile } = useAPIGetProfile();
   const { user } = useAuthenticate();
   const { data: tags } = useAPIGetUserTag();
-  const [userInfo, setUserInfo] = useState<Partial<User>>({
+  const initialUserValues = {
     email: '',
     lastName: '',
     firstName: '',
     avatarUrl: '',
     introduceOther: '',
-  });
+    introduceTech: '',
+    introduceQualification: '',
+    introduceClub: '',
+    introduceHobby: '',
+  };
 
   const modalReducer = (
     _state: ModalState,
@@ -140,6 +141,36 @@ const Profile = () => {
   });
   const toast = useToast();
 
+  const checkErrors = async () => {
+    const errors = await validateForm();
+    const messages = formikErrorMsgFactory(errors);
+    if (messages) {
+      toast({
+        title: messages,
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      });
+    } else {
+      onFinish();
+    }
+  };
+
+  const {
+    values: userInfo,
+    setValues: setUserInfo,
+    handleSubmit: onFinish,
+    handleChange,
+    validateForm,
+  } = useFormik<Partial<User>>({
+    initialValues: profile ? profile : initialUserValues,
+    enableReinitialize: true,
+    validationSchema: profileSchema,
+    onSubmit: () => {
+      handleUpdateUser();
+    },
+  });
+
   const { mutate: updateUser } = useAPIUpdateUser({
     onSuccess: (responseData) => {
       if (responseData) {
@@ -170,12 +201,6 @@ const Profile = () => {
   const onLoad = useCallback((img) => {
     imgRef.current = img;
   }, []);
-
-  useEffect(() => {
-    if (profile) {
-      setUserInfo(profile);
-    }
-  }, [profile]);
 
   const toggleSelectedTag = (t: UserTag) => {
     const toggledTag = toggleTag(userInfo?.tags, t);
@@ -264,49 +289,45 @@ const Profile = () => {
             <FormLabel fontWeight={'bold'}>メールアドレス</FormLabel>
             <Input
               type="email"
-              placeholder="山田"
+              name="email"
+              placeholder="email@example.com"
               value={userInfo.email}
               background="white"
-              onChange={(e) =>
-                setUserInfo((i) => ({ ...i, email: e.target.value }))
-              }
+              onChange={handleChange}
             />
           </FormControl>
           <FormControl className={profileStyles.input_wrapper}>
             <FormLabel fontWeight={'bold'}>姓</FormLabel>
             <Input
               type="text"
+              name="lastName"
               placeholder="山田"
               value={userInfo.lastName}
               background="white"
-              onChange={(e) =>
-                setUserInfo((i) => ({ ...i, lastName: e.target.value }))
-              }
+              onChange={handleChange}
             />
           </FormControl>
           <FormControl className={profileStyles.input_wrapper}>
             <FormLabel fontWeight={'bold'}>名</FormLabel>
             <Input
               type="text"
+              name="firstName"
               placeholder="太郎"
               value={userInfo.firstName}
               background="white"
-              onChange={(e) =>
-                setUserInfo((i) => ({ ...i, firstName: e.target.value }))
-              }
+              onChange={handleChange}
             />
           </FormControl>
           <FormControl mb={4}>
             <FormLabel fontWeight={'bold'}>自己紹介</FormLabel>
             <Textarea
               type="text"
+              name="introduceOther"
               height="10"
               placeholder="自己紹介を入力してください"
               value={userInfo.introduceOther}
               background="white"
-              onChange={(e) =>
-                setUserInfo((i) => ({ ...i, introduceOther: e.target.value }))
-              }
+              onChange={handleChange}
             />
           </FormControl>
           <Box mb={2} w={'100%'}>
@@ -322,12 +343,11 @@ const Profile = () => {
             <Textarea
               placeholder="技術についての紹介を入力してください"
               type="text"
+              name="introduceTech"
               height="10"
               value={userInfo.introduceTech}
               background="white"
-              onChange={(e) =>
-                setUserInfo((i) => ({ ...i, introduceTech: e.target.value }))
-              }
+              onChange={handleChange}
             />
           </FormControl>
           <Box mb={2} w={'100%'}>
@@ -345,15 +365,11 @@ const Profile = () => {
             <Textarea
               placeholder="資格についての紹介を入力してください"
               type="text"
+              name="introduceQualification"
               height="10"
               value={userInfo.introduceQualification}
               background="white"
-              onChange={(e) =>
-                setUserInfo((i) => ({
-                  ...i,
-                  introduceQualification: e.target.value,
-                }))
-              }
+              onChange={handleChange}
             />
           </FormControl>
           <Box mb={2} w={'100%'}>
@@ -369,15 +385,11 @@ const Profile = () => {
             <Textarea
               placeholder="部活動についての紹介を入力してください"
               type="text"
+              name="introduceClub"
               height="10"
               value={userInfo.introduceClub}
               background="white"
-              onChange={(e) =>
-                setUserInfo((i) => ({
-                  ...i,
-                  introduceClub: e.target.value,
-                }))
-              }
+              onChange={handleChange}
             />
           </FormControl>
           <Box mb={2} w={'100%'}>
@@ -393,15 +405,11 @@ const Profile = () => {
             <Textarea
               placeholder="趣味についての紹介を入力してください"
               type="text"
+              name="introduceHobby"
               height="10"
               value={userInfo.introduceHobby}
               background="white"
-              onChange={(e) =>
-                setUserInfo((i) => ({
-                  ...i,
-                  introduceHobby: e.target.value,
-                }))
-              }
+              onChange={handleChange}
             />
           </FormControl>
         </div>
@@ -410,7 +418,9 @@ const Profile = () => {
         className={profileStyles.update_button_wrapper}
         width="40"
         colorScheme="blue"
-        onClick={handleUpdateUser}>
+        onClick={() => {
+          checkErrors();
+        }}>
         更新
       </Button>
     </LayoutWithTab>

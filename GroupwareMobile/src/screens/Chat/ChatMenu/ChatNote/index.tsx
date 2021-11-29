@@ -6,13 +6,13 @@ import tailwind from 'tailwind-rn';
 import ChatNoteCard from '../../../../components/chat/Note/ChatNoteCard';
 import HeaderWithTextButton from '../../../../components/Header';
 import WholeContainer from '../../../../components/WholeContainer';
-import {useAPIGetChatNotes} from '../../../../hooks/api/chat/useAPIGetNotes';
 import {ChatNote, ChatNoteImage, ImageSource} from '../../../../types';
 import {
   ChatNotesNavigationProps,
   ChatRouteProps,
 } from '../../../../types/navigator/drawerScreenProps';
 import ImageView from 'react-native-image-viewing';
+import {useAPIGetChatNotes} from '../../../../hooks/api/chat/note/useAPIGetNotes';
 
 const ChatNotes: React.FC = () => {
   const navigation = useNavigation<ChatNotesNavigationProps>();

@@ -7,7 +7,6 @@ import {
   Dropdown,
   DropdownProps,
   Input,
-  ScrollDiv,
   Tag as TagButton,
   Text,
 } from 'react-native-magnus';
@@ -22,6 +21,9 @@ import {RuleCategory, Tag, TextFormat, Wiki, WikiType} from '../../types';
 import {tagColorFactory} from '../../utils/factory/tagColorFactory';
 import {wikiTypeNameFactory} from '../../utils/factory/wiki/wikiTypeNameFactory';
 import {wikiSchema} from '../../utils/validation/schema';
+import MarkdownIt from 'markdown-it';
+import tailwind from 'tailwind-rn';
+import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 
 type WikiFormProps = {
   wiki?: Wiki;
@@ -38,6 +40,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
   saveWiki,
   onUploadImage,
 }) => {
+  const scrollRef = useRef<KeyboardAwareScrollView | null>(null);
   const initialValues: Partial<Wiki> = {
     title: '',
     body: '',
@@ -110,6 +113,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
       ],
     );
   };
+  const isEdit = !!wiki?.id;
 
   const formatDropdown = (
     <Dropdown
@@ -120,16 +124,26 @@ const WikiForm: React.FC<WikiFormProps> = ({
         {...defaultDropdownOptionProps}
         onPress={() => handleChangeTextFormat('html')}
         value={'html'}>
-        デフォルト
+        <Text fontSize={16} color="blue700">
+          デフォルト
+        </Text>
       </Dropdown.Option>
       <Dropdown.Option
         {...defaultDropdownOptionProps}
         value={'markdown'}
         onPress={() => handleChangeTextFormat('markdown')}>
-        マークダウン
+        <Div justifyContent="center" alignItems="center">
+          <Text fontSize={16} color="blue700">
+            マークダウン
+          </Text>
+          <Text color="tomato">
+            ※WEB上で編集する際にマークダウン記法で編集できます
+          </Text>
+        </Div>
       </Dropdown.Option>
     </Dropdown>
   );
+  console.log(newWiki.body);
 
   const typeDropdown = (
     <Dropdown
@@ -253,13 +267,12 @@ const WikiForm: React.FC<WikiFormProps> = ({
       />
       {formatDropdown}
       {typeDropdown}
-      <ScrollDiv
+      <KeyboardAwareScrollView
+        ref={scrollRef}
         nestedScrollEnabled={true}
         scrollEventThrottle={20}
         keyboardDismissMode={'none'}
-        w={windowWidth * 0.9}
-        alignSelf="center"
-        pt={10}>
+        style={{width: windowWidth * 0.9, ...tailwind('self-center pt-4')}}>
         <Text fontSize={16}>タイトル</Text>
         {errors.title && touched.title ? (
           <Text fontSize={16} color="tomato">
@@ -283,28 +296,30 @@ const WikiForm: React.FC<WikiFormProps> = ({
               borderColor={'#ececec'}
               p="md"
               color="black"
-              w={windowWidth * 0.4}
+              w={!isEdit ? windowWidth * 0.4 : windowWidth * 0.9}
               onPress={() => typeDropdownRef.current.open()}>
               {newWiki.type
                 ? wikiTypeNameFactory(newWiki.type, newWiki.ruleCategory)
                 : 'タイプを選択してください'}
             </Button>
           </Div>
-          <Div>
-            <Text fontSize={16} fontWeight="bold" mb={4}>
-              入力形式を選択
-            </Text>
-            <Button
-              bg="white"
-              borderWidth={1}
-              borderColor={'#ececec'}
-              p="md"
-              color="black"
-              w={windowWidth * 0.4}
-              onPress={() => textFormatDropdownRef.current.open()}>
-              {newWiki.textFormat === 'html' ? 'デフォルト' : 'マークダウン'}
-            </Button>
-          </Div>
+          {!isEdit && (
+            <Div>
+              <Text fontSize={16} fontWeight="bold" mb={4}>
+                入力形式を選択
+              </Text>
+              <Button
+                bg="white"
+                borderWidth={1}
+                borderColor={'#ececec'}
+                p="md"
+                color="black"
+                w={windowWidth * 0.4}
+                onPress={() => textFormatDropdownRef.current.open()}>
+                {newWiki.textFormat === 'html' ? 'デフォルト' : 'マークダウン'}
+              </Button>
+            </Div>
+          )}
         </Div>
         <Button
           bg="green600"
@@ -340,8 +355,9 @@ const WikiForm: React.FC<WikiFormProps> = ({
           onUploadImage={onUploadImage}
           initialBody={newWiki.body}
           onChange={text => setNewWiki(w => ({...w, body: text}))}
+          scrollRef={scrollRef}
         />
-      </ScrollDiv>
+      </KeyboardAwareScrollView>
     </WholeContainer>
   );
 };

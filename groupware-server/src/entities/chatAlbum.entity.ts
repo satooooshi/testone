@@ -10,19 +10,19 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { ChatAlbumImage } from './chatAlbumImage.entity';
 import { ChatGroup } from './chatGroup.entity';
-import { ChatNoteImage } from './chatNoteImage.entity';
 import { User } from './user.entity';
 
-@Entity({ name: 'chat_notes' })
-export class ChatNote {
+@Entity({ name: 'chat_albums' })
+export class ChatAlbum {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: 'longtext', name: 'content' })
-  content: string;
+  @Column({ type: 'varchar', length: 255, name: 'title' })
+  title: string;
 
-  @ManyToOne(() => ChatGroup, (chatGroup) => chatGroup.chatNotes, {
+  @ManyToOne(() => ChatGroup, (chatGroup) => chatGroup.chatAlbums, {
     onUpdate: 'CASCADE',
     onDelete: 'CASCADE',
   })
@@ -34,9 +34,9 @@ export class ChatNote {
     onDelete: 'CASCADE',
   })
   @JoinTable({
-    name: 'chat_user_editted',
+    name: 'album_user_editted',
     joinColumn: {
-      name: 'chat_group_id',
+      name: 'chat_album_id',
     },
     inverseJoinColumn: {
       name: 'user_id',
@@ -44,8 +44,8 @@ export class ChatNote {
   })
   editors?: User[];
 
-  @OneToMany(() => ChatNoteImage, (chatNoteImage) => chatNoteImage.chatNote)
-  images?: ChatNoteImage[];
+  @OneToMany(() => ChatAlbumImage, (chatAlbumImage) => chatAlbumImage.chatAlbum)
+  images?: ChatAlbumImage[];
 
   @CreateDateColumn({
     type: 'datetime',

@@ -54,3 +54,40 @@ export type EditChatNotesRouteProps = RouteProp<
   RootStackParamList,
   'EditChatNote'
 >;
+
+export type ChatAlbumsNavigationProps = StackNavigationProp<
+  DrawerTabParamList,
+  'ChatStack'
+>;
+
+export type ChatAlbumsRouteProps = RouteProp<RootStackParamList, 'ChatAlbums'>;
+
+export type PostChatAlbumsNavigationProps = StackNavigationProp<
+  DrawerTabParamList,
+  'ChatStack'
+>;
+
+export type PostChatAlbumsRouteProps = RouteProp<
+  RootStackParamList,
+  'PostChatAlbum'
+>;
+
+export type ChatAlbumDetailNavigationProps = StackNavigationProp<
+  DrawerTabParamList,
+  'ChatStack'
+>;
+
+export type ChatAlbumDetailRouteProps = RouteProp<
+  RootStackParamList,
+  'ChatAlbumDetail'
+>;
+
+export type EditChatAlbumNavigationProps = StackNavigationProp<
+  DrawerTabParamList,
+  'ChatStack'
+>;
+
+export type EditChatAlbumRouteProps = RouteProp<
+  RootStackParamList,
+  'EditChatAlbum'
+>;
