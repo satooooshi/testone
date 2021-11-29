@@ -307,7 +307,7 @@ export interface ChatAlbum {
   title: string;
   chatGroup?: ChatGroup;
   editors?: User[];
-  images?: ChatAlbumImage[];
+  images?: Partial<ChatAlbumImage>[];
   createdAt: Date;
   updatedAt: Date;
   isEditor?: boolean;

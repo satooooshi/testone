@@ -61,3 +61,23 @@ export type ChatAlbumsNavigationProps = StackNavigationProp<
 >;
 
 export type ChatAlbumsRouteProps = RouteProp<RootStackParamList, 'ChatAlbums'>;
+
+export type PostChatAlbumsNavigationProps = StackNavigationProp<
+  DrawerTabParamList,
+  'ChatStack'
+>;
+
+export type PostChatAlbumsRouteProps = RouteProp<
+  RootStackParamList,
+  'PostChatAlbum'
+>;
+
+export type ChatAlbumDetailNavigationProps = StackNavigationProp<
+  DrawerTabParamList,
+  'ChatStack'
+>;
+
+export type ChatAlbumDetailRouteProps = RouteProp<
+  RootStackParamList,
+  'ChatAlbumDetail'
+>;
