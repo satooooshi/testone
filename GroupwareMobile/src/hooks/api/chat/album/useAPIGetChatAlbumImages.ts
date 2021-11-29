@@ -23,7 +23,7 @@ const getAlbumImages = async (query: GetChatAlbumImagesQuery) => {
   return res.data;
 };
 
-export const useAPIGetChatImages = (
+export const useAPIGetChatAlbumImages = (
   query: GetChatAlbumImagesQuery,
   options?: UseQueryOptions<GetChatAlbumImagesResult, AxiosError>,
 ) => {

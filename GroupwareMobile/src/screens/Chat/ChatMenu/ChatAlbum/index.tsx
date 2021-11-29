@@ -1,13 +1,11 @@
 import {useNavigation, useRoute} from '@react-navigation/native';
 import React, {useEffect, useState} from 'react';
-import {FlatList, useWindowDimensions} from 'react-native';
-import {Button, Div, Icon, Image, Text} from 'react-native-magnus';
+import {FlatList} from 'react-native';
+import {Button, Icon, Text} from 'react-native-magnus';
+import AlbumBox from '../../../../components/chat/AlbumBox';
 import HeaderWithTextButton from '../../../../components/Header';
 import WholeContainer from '../../../../components/WholeContainer';
-import {
-  GetChatAlbumsQuery,
-  useAPIGetChatAlbums,
-} from '../../../../hooks/api/chat/album/useAPIGetAlbums';
+import {useAPIGetChatAlbums} from '../../../../hooks/api/chat/album/useAPIGetAlbums';
 import {ChatAlbum} from '../../../../types';
 import {
   ChatAlbumsNavigationProps,
@@ -17,7 +15,6 @@ import {
 const ChatAlbums: React.FC = () => {
   const navigation = useNavigation<ChatAlbumsNavigationProps>();
   const {room} = useRoute<ChatAlbumsRouteProps>().params;
-  const {width: windowWidth} = useWindowDimensions();
   const [notesForInfiniteScroll, setNotesForInfiniteScroll] = useState<
     ChatAlbum[]
   >([]);
@@ -57,6 +54,12 @@ const ChatAlbums: React.FC = () => {
         h={60}
         zIndex={20}
         rounded="circle"
+        onPress={() =>
+          navigation.navigate('ChatStack', {
+            screen: 'PostChatAlbum',
+            params: {room},
+          })
+        }
         w={60}>
         <Icon
           fontSize={'6xl'}
@@ -71,24 +74,15 @@ const ChatAlbums: React.FC = () => {
           {...{onEndReached}}
           data={notesForInfiniteScroll}
           renderItem={({item}) => (
-            <Div bg="white">
-              {item?.images?.length ? (
-                <Image
-                  source={{uri: item.images[0].imageURL}}
-                  w={windowWidth}
-                  h={windowWidth}
-                />
-              ) : (
-                <Image
-                  source={require('../../../../../assets/no-image.jpg')}
-                  w={windowWidth}
-                  h={windowWidth}
-                />
-              )}
-              <Text fontWeight={'bold'} fontSize={16}>
-                {item.title}
-              </Text>
-            </Div>
+            <AlbumBox
+              album={item}
+              onPress={() =>
+                navigation.navigate('ChatStack', {
+                  screen: 'ChatAlbumDetail',
+                  params: {room, album: item},
+                })
+              }
+            />
           )}
         />
       ) : (
