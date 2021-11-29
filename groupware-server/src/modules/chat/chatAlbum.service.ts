@@ -112,8 +112,8 @@ export class ChatAlbumService {
     const offset = limit * (Number(page) - 1);
     const [albumImages, count] = await this.albumImageRepository
       .createQueryBuilder('album_images')
-      .leftJoinAndSelect('album_images.chatAlbum', 'chat_album')
-      .where('chat_album.id = :albumID', { albumID })
+      .leftJoinAndSelect('album_images.chatAlbum', 'chat_albums')
+      .where('chat_albums.id = :albumID', { albumID })
       .withDeleted()
       .skip(offset)
       .take(limit)
