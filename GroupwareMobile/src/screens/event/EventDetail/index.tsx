@@ -50,28 +50,36 @@ const EventDetail: React.FC = () => {
     }
     return (
       <>
-        <FastImage
-          style={{
-            ...eventDetailStyles.image,
-            width: windowWidth,
-            minHeight: windowWidth * 0.8,
-          }}
-          resizeMode="cover"
-          source={
-            eventInfo.imageURL
-              ? {uri: eventInfo.imageURL}
-              : require('../../../../assets/study_meeting_1.jpg')
-          }
-        />
+        <Div>
+          <FastImage
+            style={{
+              ...eventDetailStyles.image,
+              width: windowWidth,
+              minHeight: windowWidth * 0.8,
+            }}
+            resizeMode="cover"
+            source={
+              eventInfo.imageURL
+                ? {uri: eventInfo.imageURL}
+                : require('../../../../assets/study_meeting_1.jpg')
+            }
+          />
+          <Button
+            mb={16}
+            bg={eventTypeColorFactory(eventInfo.type)}
+            position="absolute"
+            bottom={0}
+            right={10}
+            color="white">
+            {eventTypeNameFactory(eventInfo.type)}
+          </Button>
+        </Div>
         <Div mx={16}>
           <Text mb={16} fontSize={24} color={darkFontColor} fontWeight="900">
             {eventInfo.title}
           </Text>
-          <Button
-            mb={16}
-            bg={eventTypeColorFactory(eventInfo.type)}
-            color="white">
-            {eventTypeNameFactory(eventInfo.type)}
+          <Button mb={16} bg={'pink600'} color="white" alignSelf="flex-end">
+            イベントに参加
           </Button>
           <Text
             mb={8}
@@ -117,6 +125,7 @@ const EventDetail: React.FC = () => {
               </Button>
             )}
           />
+
           <Text mb={8}>参考資料</Text>
           {/* TODO list files */}
           <Text mb={8}>関連動画</Text>
