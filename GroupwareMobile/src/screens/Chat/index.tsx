@@ -8,8 +8,17 @@ import {
   Platform,
   TouchableOpacity,
   useWindowDimensions,
+  View,
 } from 'react-native';
-import {Div, Icon, Overlay} from 'react-native-magnus';
+import {
+  Div,
+  Icon,
+  Image,
+  Overlay,
+  Text,
+  Modal as MagnusModal,
+  Button,
+} from 'react-native-magnus';
 import WholeContainer from '../../components/WholeContainer';
 import {useAPIGetMessages} from '../../hooks/api/chat/useAPIGetMessages';
 import {useAPISendChatMessage} from '../../hooks/api/chat/useAPISendChatMessage';
@@ -41,6 +50,7 @@ import ReplyTarget from '../../components/chat/ChatFooter/ReplyTarget';
 import HeaderWithIconButton from '../../components/Header/HeaderWithIconButton';
 import {darkFontColor} from '../../utils/colors';
 import tailwind from 'tailwind-rn';
+import {useAPIGetLastReadChatTime} from '../../hooks/api/chat/useAPIGetLastReadChatTime';
 
 const Chat: React.FC = () => {
   const navigation = useNavigation<ChatNavigationProps>();
@@ -53,6 +63,7 @@ const Chat: React.FC = () => {
   const [images, setImages] = useState<ImageSource[]>([]);
   const [nowImageIndex, setNowImageIndex] = useState<number>(0);
   const [video, setVideo] = useState('');
+  const {data: lastReadChatTime} = useAPIGetLastReadChatTime(room.id);
   const {values, handleSubmit, setValues} = useFormik<Partial<ChatMessage>>({
     initialValues: {
       content: '',
@@ -99,6 +110,8 @@ const Chat: React.FC = () => {
     });
   const {mutate: uploadFile, isLoading: loadingUploadFile} =
     useAPIUploadStorage();
+  const [selectedMessageForCheckLastRead, setSelectedMessageForCheckLastRead] =
+    useState<ChatMessage>();
 
   const showImageOnModal = (url: string) => {
     const isNowUri = (element: ImageSource) => element.uri === url;
@@ -216,6 +229,13 @@ const Chat: React.FC = () => {
     FileViewer.open(path());
   };
 
+  const numbersOfRead = (message: ChatMessage) => {
+    return (
+      lastReadChatTime?.filter(time => time.readTime >= message.createdAt)
+        .length || 0
+    );
+  };
+
   useEffect(() => {
     if (latestMessage?.length && messages?.length) {
       const msgToAppend: ChatMessage[] = [];
@@ -260,7 +280,19 @@ const Chat: React.FC = () => {
   }, [fetchedMessage]);
 
   const renderMessage = (message: ChatMessage) => (
-    <Div alignSelf={message?.isSender ? 'flex-end' : 'flex-start'} mb={'sm'}>
+    <Div
+      flexDir="row"
+      alignSelf={message?.isSender ? 'flex-end' : 'flex-start'}
+      alignItems="flex-end"
+      mb={'sm'}>
+      {readUsers.length ? (
+        <TouchableOpacity
+          onPress={() => setSelectedMessageForCheckLastRead(message)}>
+          <Text mb="sm" mr={message?.isSender ? 'sm' : undefined}>
+            {`既読\n${numbersOfRead(message)}人`}
+          </Text>
+        </TouchableOpacity>
+      ) : null}
       {message.type === ChatMessageType.TEXT ? (
         <TextMessage
           message={message}
@@ -350,6 +382,14 @@ const Chat: React.FC = () => {
             keyExtractor={item => item.id.toString()}
             renderItem={({item: message}) => renderMessage(message)}
           />
+          {values.replyParentMessage && (
+            <ReplyTarget
+              onPressCloseIcon={() =>
+                setValues(v => ({...v, replyParentMessage: undefined}))
+              }
+              replyParentMessage={values.replyParentMessage}
+            />
+          )}
           <ChatFooter
             onUploadFile={handleUploadFile}
             onUploadVideo={handleUploadVideo}
@@ -365,12 +405,53 @@ const Chat: React.FC = () => {
       )}
     </>
   );
+  const readUsers =
+    selectedMessageForCheckLastRead && lastReadChatTime
+      ? lastReadChatTime
+          .filter(t => t.readTime >= selectedMessageForCheckLastRead.createdAt)
+          .map(t => t.user)
+      : [];
 
   return (
     <WholeContainer>
       <Overlay visible={isLoading} p="xl">
         <ActivityIndicator />
       </Overlay>
+      <MagnusModal isVisible={!!selectedMessageForCheckLastRead}>
+        <Button
+          bg="gray400"
+          h={35}
+          w={35}
+          right={15}
+          alignSelf="flex-end"
+          rounded="circle"
+          onPress={() => {
+            setSelectedMessageForCheckLastRead(undefined);
+          }}>
+          <Icon color="black" name="close" />
+        </Button>
+        <FlatList
+          data={readUsers}
+          renderItem={({item}) => (
+            <View style={tailwind('flex-row bg-white items-center px-4 mb-2')}>
+              <>
+                <Image
+                  mr={'sm'}
+                  rounded="circle"
+                  h={64}
+                  w={64}
+                  source={
+                    item.avatarUrl
+                      ? {uri: item.avatarUrl}
+                      : require('../../../assets/no-image-avatar.png')
+                  }
+                />
+                <Text fontSize={18}>{userNameFactory(item)}</Text>
+              </>
+            </View>
+          )}
+        />
+      </MagnusModal>
       {/* @TODO add seeking bar */}
       <Modal visible={!!video} animationType="slide">
         <TouchableOpacity
