@@ -270,7 +270,9 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
             <Text fontSize={16}>開始日時</Text>
             <DropdownOpenerButton
               name={dateTimeFormatterFromJSDDate({
-                dateTime: newEvent?.startAt || new Date(),
+                dateTime: newEvent.startAt
+                  ? new Date(newEvent.startAt)
+                  : new Date(),
                 format: 'yyyy/LL/dd HH:mm',
               })}
               onPress={() =>
@@ -287,30 +289,20 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
             alignSelf="center"
             mb={'lg'}>
             <Text fontSize={16}>終了日時</Text>
-            <Button
-              alignSelf="center"
-              block
-              w={windowWidth * 0.9}
-              suffix={
-                <Icon position="absolute" right={8} name="down" color="black" />
-              }
-              bg="white"
-              borderWidth={1}
-              borderColor={'#e0e0e0'}
-              p={12}
-              color="black"
-              onPress={() => {
+            <DropdownOpenerButton
+              name={dateTimeFormatterFromJSDDate({
+                dateTime: newEvent.endAt
+                  ? new Date(newEvent.endAt)
+                  : new Date(),
+                format: 'yyyy/LL/dd HH:mm',
+              })}
+              onPress={() =>
                 setDateTimeModal({
                   visible: 'endAt',
                   date: newEvent.endAt || new Date(),
-                });
-              }}
-              rounded="md">
-              {dateTimeFormatterFromJSDDate({
-                dateTime: newEvent.endAt || new Date(),
-                format: 'yyyy/LL/dd HH:mm',
-              })}
-            </Button>
+                })
+              }
+            />
           </Div>
           <TextInput
             value={newEvent.description}

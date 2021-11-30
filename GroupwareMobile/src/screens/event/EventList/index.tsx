@@ -19,10 +19,12 @@ import {useAPIGetUsers} from '../../../hooks/api/user/useAPIGetUsers';
 import {useAPICreateEvent} from '../../../hooks/api/event/useAPICreateEvent';
 import {ActivityIndicator} from 'react-native';
 import {Overlay} from 'react-native-magnus';
+import {useIsFocused} from '@react-navigation/core';
 
 const TopTab = createMaterialTopTabNavigator();
 
 const EventList: React.FC = () => {
+  const isFocused = useIsFocused();
   const [visibleSearchFormModal, setVisibleSearchFormModal] = useState(false);
   const {data: tags} = useAPIGetTag();
   const {data: users} = useAPIGetUsers();
@@ -119,6 +121,12 @@ const EventList: React.FC = () => {
     searchQuery.tag,
     isCalendar,
   ]);
+
+  useEffect(() => {
+    if (isFocused) {
+      refetchEvents();
+    }
+  }, [isFocused, refetchEvents]);
 
   return (
     <WholeContainer>
