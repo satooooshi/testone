@@ -4,6 +4,7 @@ import {
   FlatList,
   useWindowDimensions,
   ActivityIndicator,
+  TextInput,
   Alert,
 } from 'react-native';
 import HeaderWithTextButton from '../../../components/Header';
@@ -28,6 +29,10 @@ import {useAPIUpdateEvent} from '../../../hooks/api/event/useAPIUpdateEvent';
 import {useAPIJoinEvent} from '../../../hooks/api/event/useAPIJoinEvent';
 import {useAPICancelEvent} from '../../../hooks/api/event/useAPICancelEvent';
 import {AxiosError} from 'axios';
+import {useFormik} from 'formik';
+import {EventComment, EventType} from '../../../types';
+import {useAPICreateComment} from '../../../hooks/api/event/useAPICreateComment';
+import EventCommentCard from '../EventComment';
 
 const EventDetail: React.FC = () => {
   const route = useRoute<EventDetailRouteProps>();
@@ -39,6 +44,10 @@ const EventDetail: React.FC = () => {
     refetch: refetchEvents,
     isLoading: isLoadingGetEventDetail,
   } = useAPIGetEventDetail(id);
+
+  const initialValues: Partial<EventComment> = {
+    body: '',
+  };
   const [screenLoading, setScreenLoading] = useState(false);
   const [visibleEventFormModal, setEventFormModal] = useState(false);
   const {mutate: saveEvent, isLoading: isLoadingSaveEvent} = useAPIUpdateEvent({
@@ -77,6 +86,27 @@ const EventDetail: React.FC = () => {
       format: 'yyyy/LL/dd HH:mm',
     });
   }, [eventInfo]);
+  const {mutate: createComment, isLoading} = useAPICreateComment({
+    onSuccess: responseData => {
+      if (responseData) {
+        Alert.alert('コメントを投稿しました。');
+      }
+    },
+    onError: responseData => {
+      if (responseData) {
+        Alert.alert(responseData.message);
+      }
+    },
+  });
+  const {values, setValues, handleSubmit} = useFormik<Partial<EventComment>>({
+    initialValues: initialValues,
+    enableReinitialize: true,
+    onSubmit: v =>
+      createComment({
+        body: v.body,
+        eventSchedule: eventInfo,
+      }),
+  });
 
   const isFinished = eventInfo?.endAt
     ? new Date(eventInfo.endAt) <= new Date()
@@ -215,6 +245,73 @@ const EventDetail: React.FC = () => {
     );
   };
 
+  const Comments = () => {
+    //   <div className={eventDetailStyles.count_and_button_wrapper}>
+    //   <p className={eventDetailStyles.comment_count}>
+    //     コメント{data.comments?.length ? data.comments.length : 0}
+    //     件
+    //   </p>
+    //   <Button
+    //     size="sm"
+    //     colorScheme="teal"
+    //     onClick={() => {
+    //       commentVisible && newComment
+    //         ? handleCreateComment()
+    //         : setCommentVisible(true);
+    //     }}>
+    //     {commentVisible ? 'コメントを投稿する' : 'コメントを追加'}
+    //   </Button>
+    // </div>
+
+    return (
+      <Div mx={16}>
+        <Text mb={8}>
+          コメント{eventInfo?.comments.length ? eventInfo.comments.length : 0}件
+        </Text>
+        {eventInfo?.comments && eventInfo?.comments.length
+          ? eventInfo?.comments.map(
+              comment =>
+                comment.writer && (
+                  <>
+                    {/* <EventCommentCard
+                      key={comment.id}
+                      body={comment.body}
+                      date={comment.createdAt}
+                      writer={comment.writer}
+                    /> */}
+                    <Text>{comment.body}</Text>
+                  </>
+                ),
+            )
+          : null}
+      </Div>
+    );
+  };
+  const CreateCommentForm = () => {
+    return (
+      <Div m={16}>
+        <TextInput
+          value={values.body}
+          onChangeText={t => setValues(e => ({...e, body: t}))}
+          placeholder="コメントを記入してください。"
+          numberOfLines={10}
+          textAlignVertical={'top'}
+          multiline={true}
+          // style={eventFormModalStyles.descriptionInput}
+        />
+        <Button
+          fontSize={'xs'}
+          h={28}
+          py={0}
+          color="white"
+          mr={4}
+          onPress={() => handleSubmit()}>
+          コメントを投稿
+        </Button>
+      </Div>
+    );
+  };
+
   useEffect(() => {
     if (isLoadingGetEventDetail || isLoadingSaveEvent) {
       setScreenLoading(true);
@@ -257,6 +354,12 @@ const EventDetail: React.FC = () => {
               <>
                 <AboveYoutubeVideos />
                 <Text mx={16}>関連動画はありません</Text>
+              </>
+            )}
+            {eventInfo.type !== EventType.SUBMISSION_ETC && (
+              <>
+                <Comments />
+                <CreateCommentForm />
               </>
             )}
           </Div>
