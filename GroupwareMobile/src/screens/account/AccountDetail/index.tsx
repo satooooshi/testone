@@ -174,7 +174,6 @@ const AccountDetail: React.FC = () => {
         activeTabName={'アカウント情報'}
         rightButtonName={'ログアウト'}
         onPressRightButton={handleLogout}
-        enableBackButton
       />
       <ScrollDiv contentContainerStyle={accountDetailStyles.scrollView}>
         {profile && (
