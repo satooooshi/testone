@@ -1,6 +1,11 @@
 import React, {useEffect, useMemo, useState} from 'react';
 import WholeContainer from '../../../components/WholeContainer';
-import {FlatList, useWindowDimensions, ActivityIndicator} from 'react-native';
+import {
+  FlatList,
+  useWindowDimensions,
+  ActivityIndicator,
+  Alert,
+} from 'react-native';
 import HeaderWithTextButton from '../../../components/Header';
 import {Div, Text, Button, Overlay, ScrollDiv} from 'react-native-magnus';
 import FastImage from 'react-native-fast-image';
@@ -20,6 +25,9 @@ import EventFormModal from '../../../components/events/EventFormModal';
 import {useAPIGetTag} from '../../../hooks/api/tag/useAPIGetTag';
 import {useAPIGetUsers} from '../../../hooks/api/user/useAPIGetUsers';
 import {useAPIUpdateEvent} from '../../../hooks/api/event/useAPIUpdateEvent';
+import {useAPIJoinEvent} from '../../../hooks/api/event/useAPIJoinEvent';
+import {useAPICancelEvent} from '../../../hooks/api/event/useAPICancelEvent';
+import {AxiosError} from 'axios';
 
 const EventDetail: React.FC = () => {
   const route = useRoute<EventDetailRouteProps>();
@@ -38,6 +46,17 @@ const EventDetail: React.FC = () => {
       setEventFormModal(false);
       refetchEvents();
     },
+  });
+  const {mutate: joinEvent} = useAPIJoinEvent({
+    onSuccess: () => refetchEvents(),
+    onError: err => {
+      if (err.response?.data) {
+        Alert.alert((err.response?.data as AxiosError)?.message);
+      }
+    },
+  });
+  const {mutate: cancelEvent} = useAPICancelEvent({
+    onSuccess: () => refetchEvents(),
   });
   const windowWidth = useWindowDimensions().width;
   const startAtText = useMemo(() => {
@@ -58,6 +77,10 @@ const EventDetail: React.FC = () => {
       format: 'yyyy/LL/dd HH:mm',
     });
   }, [eventInfo]);
+
+  const isFinished = eventInfo?.endAt
+    ? new Date(eventInfo.endAt) <= new Date()
+    : false;
 
   const AboveYoutubeVideos = () => {
     if (!eventInfo) {
@@ -93,9 +116,52 @@ const EventDetail: React.FC = () => {
           <Text mb={16} fontSize={24} color={darkFontColor} fontWeight="900">
             {eventInfo.title}
           </Text>
-          <Button mb={16} bg={'pink600'} color="white" alignSelf="flex-end">
-            イベントに参加
-          </Button>
+          <Div alignSelf="flex-end">
+            {eventInfo.type !== 'submission_etc' &&
+            !isFinished &&
+            !eventInfo.isCanceled &&
+            eventInfo.isJoining ? (
+              <Button
+                mb={16}
+                bg={'pink600'}
+                color="white"
+                onPress={() => joinEvent({eventID: Number(id)})}>
+                イベントに参加
+              </Button>
+            ) : eventInfo.type !== 'submission_etc' &&
+              !isFinished &&
+              !eventInfo.isCanceled &&
+              !eventInfo.isJoining ? (
+              <Div flexDir="row">
+                <Button
+                  mb={16}
+                  bg={'pink600'}
+                  color="white"
+                  alignSelf="flex-end">
+                  参加済み
+                </Button>
+                <Button
+                  mb={16}
+                  bg={'pink600'}
+                  color="white"
+                  onPress={() => cancelEvent({eventID: Number(id)})}
+                  alignSelf="flex-end">
+                  キャンセルする
+                </Button>
+              </Div>
+            ) : eventInfo.type !== 'submission_etc' &&
+              !isFinished &&
+              eventInfo.isCanceled &&
+              eventInfo.isJoining ? (
+              <Text color="tomato" fontSize={16}>
+                キャンセル済み
+              </Text>
+            ) : isFinished ? (
+              <Text color="tomato" fontSize={16}>
+                締切済み
+              </Text>
+            ) : null}
+          </Div>
           <Text
             mb={8}
             fontSize={16}
