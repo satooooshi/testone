@@ -69,11 +69,8 @@ const UserTagAdmin: React.FC = () => {
     },
     {
       name: 'タグ管理(ユーザー)',
-      onPress: () => {},
-    },
-    {
-      name: 'CSV出力',
-      onPress: () => {},
+      onPress: () =>
+        navigation.navigate('AdminStack', {screen: 'UserTagAdmin'}),
     },
   ];
 

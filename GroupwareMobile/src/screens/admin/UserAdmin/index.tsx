@@ -103,10 +103,6 @@ const UserAdmin: React.FC = () => {
       onPress: () =>
         navigation.navigate('AdminStack', {screen: 'UserTagAdmin'}),
     },
-    {
-      name: 'CSV出力',
-      onPress: () => {},
-    },
   ];
 
   const onEndReached = () => {

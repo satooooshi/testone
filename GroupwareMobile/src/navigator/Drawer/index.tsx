@@ -29,6 +29,7 @@ import ChatAlbums from '../../screens/Chat/ChatMenu/ChatAlbum';
 import PostChatAlbum from '../../screens/Chat/ChatMenu/ChatAlbum/PostAlbum';
 import AlbumDetail from '../../screens/Chat/ChatMenu/ChatAlbum/AlbumDetail';
 import EditChatAlbum from '../../screens/Chat/ChatMenu/ChatAlbum/EditAlbum';
+import UserTagAdmin from '../../screens/admin/UserTagAdmin';
 
 const Drawer = createDrawerNavigator();
 const Stack = createStackNavigator();
@@ -114,6 +115,11 @@ const AdminStack = () => (
     <Stack.Screen
       name="UserAdmin"
       component={UserAdmin}
+      options={{headerShown: false}}
+    />
+    <Stack.Screen
+      name="UserTagAdmin"
+      component={UserTagAdmin}
       options={{headerShown: false}}
     />
     <Stack.Screen

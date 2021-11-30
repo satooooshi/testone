@@ -121,10 +121,6 @@ const UserRegisteringAdmin: React.FC = () => {
       onPress: () =>
         navigation.navigate('AdminStack', {screen: 'UserRegisteringAdmin'}),
     },
-    {
-      name: 'CSV出力',
-      onPress: () => {},
-    },
   ];
 
   const handleUploadImage = async () => {
