@@ -6,6 +6,7 @@ import {
   ActivityIndicator,
   TextInput,
   Alert,
+  View,
 } from 'react-native';
 import HeaderWithTextButton from '../../../components/Header';
 import {Div, Text, Button, Overlay, ScrollDiv} from 'react-native-magnus';
@@ -32,7 +33,8 @@ import {AxiosError} from 'axios';
 import {useFormik} from 'formik';
 import {EventComment, EventType} from '../../../types';
 import {useAPICreateComment} from '../../../hooks/api/event/useAPICreateComment';
-import EventCommentCard from '../EventComment';
+import EventCommentCard from '../EventCommentCard';
+import {eventDetail} from '../../../styles/component/event/eventDetail.style';
 
 const EventDetail: React.FC = () => {
   const route = useRoute<EventDetailRouteProps>();
@@ -50,6 +52,7 @@ const EventDetail: React.FC = () => {
   };
   const [screenLoading, setScreenLoading] = useState(false);
   const [visibleEventFormModal, setEventFormModal] = useState(false);
+  const [commentVisible, setCommentVisible] = useState(false);
   const {mutate: saveEvent, isLoading: isLoadingSaveEvent} = useAPIUpdateEvent({
     onSuccess: () => {
       setEventFormModal(false);
@@ -246,40 +249,37 @@ const EventDetail: React.FC = () => {
   };
 
   const Comments = () => {
-    //   <div className={eventDetailStyles.count_and_button_wrapper}>
-    //   <p className={eventDetailStyles.comment_count}>
-    //     コメント{data.comments?.length ? data.comments.length : 0}
-    //     件
-    //   </p>
-    //   <Button
-    //     size="sm"
-    //     colorScheme="teal"
-    //     onClick={() => {
-    //       commentVisible && newComment
-    //         ? handleCreateComment()
-    //         : setCommentVisible(true);
-    //     }}>
-    //     {commentVisible ? 'コメントを投稿する' : 'コメントを追加'}
-    //   </Button>
-    // </div>
-
     return (
-      <Div mx={16}>
-        <Text mb={8}>
-          コメント{eventInfo?.comments.length ? eventInfo.comments.length : 0}件
-        </Text>
+      <Div m={16}>
+        <View style={eventDetail.comment_count_wrapper}>
+          <Text>
+            コメント{eventInfo?.comments.length ? eventInfo.comments.length : 0}
+            件
+          </Text>
+          <Button
+            fontSize={'xs'}
+            h={21}
+            py={0}
+            color="white"
+            onPress={() => {
+              commentVisible && newComment
+                ? handleCreateComment()
+                : setCommentVisible(true);
+            }}>
+            {commentVisible ? 'コメントを投稿する' : 'コメントを追加'}
+          </Button>
+        </View>
         {eventInfo?.comments && eventInfo?.comments.length
           ? eventInfo?.comments.map(
               comment =>
                 comment.writer && (
                   <>
-                    {/* <EventCommentCard
+                    <EventCommentCard
                       key={comment.id}
                       body={comment.body}
                       date={comment.createdAt}
                       writer={comment.writer}
-                    /> */}
-                    <Text>{comment.body}</Text>
+                    />
                   </>
                 ),
             )
@@ -287,6 +287,7 @@ const EventDetail: React.FC = () => {
       </Div>
     );
   };
+
   const CreateCommentForm = () => {
     return (
       <Div m={16}>
@@ -299,6 +300,17 @@ const EventDetail: React.FC = () => {
           multiline={true}
           // style={eventFormModalStyles.descriptionInput}
         />
+        {/* {commentVisible && (
+          <Textarea
+            height="56"
+            background="white"
+            placeholder="コメントを記入してください。"
+            value={newComment}
+            onChange={e => setNewComment(e.target.value)}
+            className={eventDetailStyles.comment_input}
+            autoFocus
+          />
+        )} */}
         <Button
           fontSize={'xs'}
           h={28}
