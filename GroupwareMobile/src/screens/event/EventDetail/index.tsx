@@ -16,14 +16,29 @@ import YoutubePlayer from 'react-native-youtube-iframe';
 import generateYoutubeId from '../../../utils/generateYoutubeId';
 import {useRoute} from '@react-navigation/native';
 import {EventDetailRouteProps} from '../../../types/navigator/drawerScreenProps';
+import EventFormModal from '../../../components/events/EventFormModal';
+import {useAPIGetTag} from '../../../hooks/api/tag/useAPIGetTag';
+import {useAPIGetUsers} from '../../../hooks/api/user/useAPIGetUsers';
+import {useAPIUpdateEvent} from '../../../hooks/api/event/useAPIUpdateEvent';
 
 const EventDetail: React.FC = () => {
   const route = useRoute<EventDetailRouteProps>();
   const {id} = route.params;
-
-  const {data: eventInfo, isLoading: isLoadingGetEventDetail} =
-    useAPIGetEventDetail(id);
+  const {data: tags} = useAPIGetTag();
+  const {data: users} = useAPIGetUsers();
+  const {
+    data: eventInfo,
+    refetch: refetchEvents,
+    isLoading: isLoadingGetEventDetail,
+  } = useAPIGetEventDetail(id);
   const [screenLoading, setScreenLoading] = useState(false);
+  const [visibleEventFormModal, setEventFormModal] = useState(false);
+  const {mutate: saveEvent, isLoading: isLoadingSaveEvent} = useAPIUpdateEvent({
+    onSuccess: () => {
+      setEventFormModal(false);
+      refetchEvents();
+    },
+  });
   const windowWidth = useWindowDimensions().width;
   const startAtText = useMemo(() => {
     if (!eventInfo) {
@@ -135,12 +150,12 @@ const EventDetail: React.FC = () => {
   };
 
   useEffect(() => {
-    if (isLoadingGetEventDetail) {
+    if (isLoadingGetEventDetail || isLoadingSaveEvent) {
       setScreenLoading(true);
       return;
     }
     setScreenLoading(false);
-  }, [isLoadingGetEventDetail]);
+  }, [isLoadingGetEventDetail, isLoadingSaveEvent]);
 
   return (
     <WholeContainer>
@@ -148,10 +163,20 @@ const EventDetail: React.FC = () => {
         enableBackButton={true}
         title="イベント詳細"
         activeTabName="一覧に戻る"
+        rightButtonName="イベント編集"
+        onPressRightButton={() => setEventFormModal(true)}
       />
       <Overlay visible={screenLoading} p="xl">
         <ActivityIndicator />
       </Overlay>
+      <EventFormModal
+        event={eventInfo}
+        isVisible={visibleEventFormModal}
+        onCloseModal={() => setEventFormModal(false)}
+        onSubmit={event => saveEvent({...event, id: eventInfo?.id})}
+        users={users || []}
+        tags={tags || []}
+      />
       <ScrollDiv>
         {eventInfo ? (
           <Div flexDir="column">
