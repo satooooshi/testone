@@ -6,6 +6,7 @@ import {AxiosError} from 'axios';
 
 export type GetEventDetailResponse = Required<EventSchedule> & {
   isJoining: boolean;
+  isCanceled: boolean;
 };
 
 const getEventDetail = async (id: number) => {
