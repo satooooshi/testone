@@ -27,8 +27,7 @@ const ReplyParent: React.FC<ReplyParentProps> = ({parentMessage}) => {
       alignItems="center"
       borderBottomWidth={0.5}
       borderBottomColor="white"
-      pb="sm"
-      mb="sm">
+      pb="sm">
       <Image
         w={32}
         h={32}
