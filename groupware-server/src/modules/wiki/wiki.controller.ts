@@ -90,6 +90,11 @@ export class WikiController {
     return await this.qaService.createAnswer(answer);
   }
 
+  @Get('/v2/answer-detail/:id')
+  async getAnswerDetail(@Param() params: { id: number }): Promise<QAAnswer> {
+    return await this.qaService.getAnswerDetail(params.id);
+  }
+
   @UseGuards(JwtAuthenticationGuard)
   @Post('create-answer-reply')
   async createAnswerReply(
