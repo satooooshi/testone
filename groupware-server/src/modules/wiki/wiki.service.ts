@@ -48,7 +48,7 @@ export class WikiService {
           for (const r of a.replies) {
             const parsedReplyAvatar =
               await this.storageService.parseStorageURLToSignedURL(
-                a.writer?.avatarUrl || '',
+                r.writer?.avatarUrl || '',
               );
             const parsedReplyBody =
               await this.storageService.parseStorageURLToSignedURL(r.body);
@@ -82,6 +82,50 @@ export class WikiService {
     }
 
     return parsedWiki;
+  }
+
+  public async generateSignedStorageURLsFromQAAnswerObj(
+    answer: QAAnswer,
+  ): Promise<QAAnswer> {
+    if (answer?.body) {
+      answer.body = await this.storageService.parseStorageURLToSignedURL(
+        answer.body,
+      );
+    }
+    if (answer?.writer) {
+      answer.writer.avatarUrl =
+        await this.storageService.parseStorageURLToSignedURL(
+          answer.writer.avatarUrl,
+        );
+    }
+    if (answer?.wiki) {
+      answer.wiki.body = await this.storageService.parseStorageURLToSignedURL(
+        answer.wiki.body,
+      );
+      answer.wiki.writer.avatarUrl =
+        await this.storageService.parseStorageURLToSignedURL(
+          answer.wiki.writer.avatarUrl,
+        );
+    }
+    const parsedReplies: QAAnswerReply[] = [];
+    if (answer?.replies && answer.replies.length) {
+      for (const r of answer.replies) {
+        const parsedReplyBody =
+          await this.storageService.parseStorageURLToSignedURL(r.body);
+        const parsedReplyAvatar =
+          await this.storageService.parseStorageURLToSignedURL(
+            r.writer?.avatarUrl || '',
+          );
+        const replyObj: QAAnswerReply = {
+          ...r,
+          body: parsedReplyBody,
+          writer: { ...r.writer, avatarUrl: parsedReplyAvatar },
+        };
+        parsedReplies.push(replyObj);
+      }
+      answer.replies = parsedReplies;
+    }
+    return answer;
   }
 
   public async getWikiList(
@@ -245,5 +289,25 @@ export class WikiService {
       existWiki,
     );
     return parsedWiki;
+  }
+
+  public async getAnswerDetail(id: number): Promise<QAAnswer> {
+    const existAnswer = await this.qaAnswerRepository
+      .createQueryBuilder('answer')
+      .withDeleted()
+      .innerJoinAndSelect('answer.writer', 'writer')
+      .leftJoinAndSelect('answer.wiki', 'wiki')
+      .leftJoinAndSelect('wiki.writer', 'wiki_writer')
+      .leftJoinAndSelect('wiki.bestAnswer', 'bestAnswer')
+      .leftJoinAndSelect('wiki.tags', 'tags')
+      .leftJoinAndSelect('answer.replies', 'reply')
+      .leftJoinAndSelect('reply.writer', 'reply_writer')
+      .where('answer.id = :id', { id })
+      .orderBy({ 'reply.created_at': 'ASC' })
+      .getOne();
+    const parsedAnswer = await this.generateSignedStorageURLsFromQAAnswerObj(
+      existAnswer,
+    );
+    return parsedAnswer;
   }
 }
