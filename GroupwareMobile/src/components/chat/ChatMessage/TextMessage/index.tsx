@@ -19,7 +19,6 @@ const TextMessage: React.FC<TextMessageProps> = ({message, onLongPress}) => {
         bg="blue700"
         px={8}
         py={8}
-        mb={'sm'}
         justifyContent="center">
         {message.replyParentMessage && (
           <ReplyParent parentMessage={message.replyParentMessage} />

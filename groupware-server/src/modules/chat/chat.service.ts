@@ -8,6 +8,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { orderBy } from 'lodash';
 import { ChatGroup } from 'src/entities/chatGroup.entity';
 import { ChatMessage, ChatMessageType } from 'src/entities/chatMessage.entity';
+import { ChatMessageReaction } from 'src/entities/chatMessageReaction.entity';
 import { ChatNote } from 'src/entities/chatNote.entity';
 import { ChatNoteImage } from 'src/entities/chatNoteImage.entity';
 import { LastReadChatTime } from 'src/entities/lastReadChatTime.entity';
@@ -43,6 +44,8 @@ export class ChatService {
     private readonly noteRepository: Repository<ChatNote>,
     @InjectRepository(ChatNoteImage)
     private readonly noteImageRepository: Repository<ChatNoteImage>,
+    @InjectRepository(ChatMessageReaction)
+    private readonly chatMessageReactionRepository: Repository<ChatMessageReaction>,
     private readonly storageService: StorageService,
     private readonly userService: UserService,
   ) {}
@@ -118,6 +121,18 @@ export class ChatService {
       chatMessage.sender?.avatarUrl,
     );
     chatMessage.sender = { ...chatMessage.sender, avatarUrl };
+    chatMessage.reactions = await Promise.all(
+      chatMessage.reactions?.map(async (r) => {
+        const parsedReactionedAvatarUrl =
+          await this.storageService.parseStorageURLToSignedURL(
+            r.user.avatarUrl,
+          );
+        return {
+          ...r,
+          user: { ...r.user, avatarUrl: parsedReactionedAvatarUrl },
+        };
+      }) || [],
+    );
     if (chatMessage.replyParentMessage) {
       chatMessage.replyParentMessage =
         await this.generateSignedStorageURLsFromChatMessageObj(
@@ -228,17 +243,25 @@ export class ChatService {
       .withDeleted()
       .leftJoin('chat_messages.chatGroup', 'chat_group')
       .leftJoinAndSelect('chat_messages.sender', 'sender')
+      .leftJoinAndSelect('chat_messages.reactions', 'reactions')
+      .leftJoinAndSelect('reactions.user', 'user')
       .leftJoinAndSelect(
         'chat_messages.replyParentMessage',
         'replyParentMessage',
       )
       .leftJoinAndSelect('replyParentMessage.sender', 'reply_sender')
       .where('chat_group.id = :chatGroupID', { chatGroupID: query.group })
-      .orderBy('chat_messages.created_at', 'DESC')
-      .limit(limit)
-      .offset(offset)
+      .take(limit)
+      .skip(offset)
+      .orderBy('chat_messages.createdAt', 'DESC')
       .getMany();
     const messages = existMessages.map((m) => {
+      m.reactions = m.reactions.map((r) => {
+        if (r.user?.id === userID) {
+          return { ...r, isSender: true };
+        }
+        return r;
+      });
       if (m.sender && m.sender.id === userID) {
         m.isSender = true;
         return m;
@@ -467,6 +490,23 @@ export class ChatService {
     noteDetail.isEditor = !!noteDetail.editors.filter((e) => e.id === userID)
       .length;
     return noteDetail;
+  }
+
+  public async deleteReaction(reactionId: number): Promise<number> {
+    await this.chatMessageReactionRepository.delete(reactionId);
+    return reactionId;
+  }
+
+  public async postReaction(
+    reaction: Partial<ChatMessageReaction>,
+    userID: number,
+  ): Promise<ChatMessageReaction> {
+    const existUser = await this.userRepository.findOne(userID);
+    const reactionWithUser = { ...reaction, user: existUser };
+    const savedReaction = await this.chatMessageReactionRepository.save(
+      reactionWithUser,
+    );
+    return { ...savedReaction, isSender: true };
   }
 
   public async getChatNotes(

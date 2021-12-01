@@ -16,6 +16,7 @@ import { Response } from 'express';
 import { ChatAlbum } from 'src/entities/chatAlbum.entity';
 import { ChatGroup } from 'src/entities/chatGroup.entity';
 import { ChatMessage } from 'src/entities/chatMessage.entity';
+import { ChatMessageReaction } from 'src/entities/chatMessageReaction.entity';
 import { ChatNote } from 'src/entities/chatNote.entity';
 import { LastReadChatTime } from 'src/entities/lastReadChatTime.entity';
 import JwtAuthenticationGuard from '../auth/jwtAuthentication.guard';
@@ -134,6 +135,29 @@ export class ChatController {
     const { id } = req.user;
     const { id: chatGroupId } = chatGroup;
     await this.chatService.leaveChatRoom(id, chatGroupId);
+  }
+
+  @Delete('/v2/reaction/:reactionId')
+  @UseGuards(JwtAuthenticationGuard)
+  async deleteReaction(
+    @Param('reactionId') reactionId: number,
+  ): Promise<number> {
+    const deletedReaction = await this.chatService.deleteReaction(reactionId);
+    return deletedReaction;
+  }
+
+  @Post('/v2/reaction')
+  @UseGuards(JwtAuthenticationGuard)
+  async postReaction(
+    @Req() req: RequestWithUser,
+    @Body() postedReaction: Partial<ChatMessageReaction>,
+  ): Promise<ChatMessageReaction> {
+    const { user } = req;
+    const reaction = await this.chatService.postReaction(
+      postedReaction,
+      user.id,
+    );
+    return reaction;
   }
 
   @Get('/v2/room/:roomId/note')
