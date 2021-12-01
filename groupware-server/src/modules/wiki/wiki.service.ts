@@ -41,6 +41,8 @@ export class WikiService {
           await this.storageService.parseStorageURLToSignedURL(
             a.writer?.avatarUrl || '',
           );
+        const parsedAnswerBody =
+          await this.storageService.parseStorageURLToSignedURL(a.body);
         const parsedReplies: QAAnswerReply[] = [];
         if (a?.replies && a.replies.length) {
           for (const r of a.replies) {
@@ -48,8 +50,11 @@ export class WikiService {
               await this.storageService.parseStorageURLToSignedURL(
                 a.writer?.avatarUrl || '',
               );
+            const parsedReplyBody =
+              await this.storageService.parseStorageURLToSignedURL(r.body);
             const replyObj: QAAnswerReply = {
               ...r,
+              body: parsedReplyBody,
               writer: { ...r.writer, avatarUrl: parsedReplyAvatar },
             };
             parsedReplies.push(replyObj);
@@ -57,6 +62,7 @@ export class WikiService {
         }
         parsedAnswers.push({
           ...a,
+          body: parsedAnswerBody,
           writer: { ...a.writer, avatarUrl: parsedAvatar },
           replies: parsedReplies,
         });
