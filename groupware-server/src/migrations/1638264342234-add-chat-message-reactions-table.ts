@@ -13,7 +13,7 @@ export class addChatMessageReactionsTable1638264342234
       `ALTER TABLE chat_message_reactions ADD CONSTRAINT FK_fb41ef3d282a5ccda057f0c856f FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE`,
     );
     await queryRunner.query(
-      `ALTER TABLE chat_message_reactions ADD CONSTRAINT FK_604ef75940ff33f718859e44640 FOREIGN KEY (chatMessage_id) REFERENCES chat_messages(id) ON DELETE CASCADE ON UPDATE CASCADE`,
+      `ALTER TABLE chat_message_reactions ADD CONSTRAINT FK_604ef75940ff33f718859e44640 FOREIGN KEY (chat_message_id) REFERENCES chat_messages(id) ON DELETE CASCADE ON UPDATE CASCADE`,
     );
   }
 
