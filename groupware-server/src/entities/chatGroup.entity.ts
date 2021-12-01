@@ -12,7 +12,6 @@ import {
 } from 'typeorm';
 import { ChatAlbum } from './chatAlbum.entity';
 import { ChatMessage } from './chatMessage.entity';
-import { ChatNote } from './chatNote.entity';
 import { EventSchedule } from './event.entity';
 import { LastReadChatTime } from './lastReadChatTime.entity';
 import { User } from './user.entity';
