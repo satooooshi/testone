@@ -10,6 +10,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { ChatAlbum } from './chatAlbum.entity';
 import { ChatMessage } from './chatMessage.entity';
 import { EventSchedule } from './event.entity';
 import { LastReadChatTime } from './lastReadChatTime.entity';
@@ -47,8 +48,29 @@ export class ChatGroup {
   @OneToMany(() => ChatMessage, (chatMessage) => chatMessage.chatGroup)
   chatMessages?: ChatMessage[];
 
+  @OneToMany(() => ChatAlbum, (chatAlbum) => chatAlbum.chatGroup)
+  chatAlbums?: ChatAlbum[];
+
+  @OneToMany(() => ChatAlbum, (chatNote) => chatNote.chatGroup)
+  chatNotes?: ChatAlbum[];
+
   @OneToMany(() => LastReadChatTime, (t) => t.chatGroup)
   lastReadChatTime?: LastReadChatTime[];
+
+  @ManyToMany(() => User, (user) => user.pinnedChatGroups, {
+    onUpdate: 'CASCADE',
+    onDelete: 'CASCADE',
+  })
+  @JoinTable({
+    name: 'chat_user_pin',
+    joinColumn: {
+      name: 'chat_group_id',
+    },
+    inverseJoinColumn: {
+      name: 'user_id',
+    },
+  })
+  pinnedUsers?: User[];
 
   @ManyToMany(() => User, (user) => user.chatGroups, {
     onUpdate: 'CASCADE',
@@ -76,4 +98,6 @@ export class ChatGroup {
     name: 'updated_at',
   })
   updatedAt: Date;
+
+  isPinned?: boolean;
 }

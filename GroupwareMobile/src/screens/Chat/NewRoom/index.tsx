@@ -13,7 +13,7 @@ import {
   Tag as TagButton,
 } from 'react-native-magnus';
 import UserModal from '../../../components/common/UserModal';
-import AppHeader from '../../../components/Header';
+import HeaderWithTextButton from '../../../components/Header';
 import WholeContainer from '../../../components/WholeContainer';
 import {useAPISaveChatGroup} from '../../../hooks/api/chat/useAPISaveChatGroup';
 import {useAPIUploadStorage} from '../../../hooks/api/storage/useAPIUploadStorage';
@@ -97,7 +97,7 @@ const NewRoom: React.FC = () => {
         selectedUserRole={selectedUserRole}
         selectUserRole={selectUserRole}
       />
-      <AppHeader title={'ルーム新規作成'} />
+      <HeaderWithTextButton title={'ルーム新規作成'} />
       <Button
         bg="blue700"
         h={60}

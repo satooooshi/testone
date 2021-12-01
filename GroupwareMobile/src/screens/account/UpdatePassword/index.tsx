@@ -3,7 +3,7 @@ import {useFormik} from 'formik';
 import React from 'react';
 import {ActivityIndicator, Alert, useWindowDimensions} from 'react-native';
 import {Button, Div, Icon, Input, Overlay, Text} from 'react-native-magnus';
-import AppHeader, {Tab} from '../../../components/Header';
+import HeaderWithTextButton, {Tab} from '../../../components/Header';
 import WholeContainer from '../../../components/WholeContainer';
 import {useAPIUpdatePassword} from '../../../hooks/api/user/useAPIUpdatePassword';
 import {UpdatePasswordNavigationProps} from '../../../types/navigator/drawerScreenProps';
@@ -52,7 +52,7 @@ const UpdatePassword: React.FC = () => {
       <Overlay visible={loadingUpdate} p="xl">
         <ActivityIndicator />
       </Overlay>
-      <AppHeader
+      <HeaderWithTextButton
         title={'Account'}
         tabs={tabs}
         activeTabName={'パスワード更新'}

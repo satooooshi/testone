@@ -4,6 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { EventSchedule } from 'src/entities/event.entity';
 import { EventComment } from 'src/entities/eventComment.entity';
 import { EventFile } from 'src/entities/eventFile.entity';
+import { EventIntroduction } from 'src/entities/eventIntroduction.entity';
 import { EventVideo } from 'src/entities/eventVideo.entity';
 import { SubmissionFile } from 'src/entities/submissionFiles.entity';
 import { Tag } from 'src/entities/tag.entity';
@@ -25,6 +26,7 @@ import { EventScheduleService } from './event.service';
     TypeOrmModule.forFeature([
       UserJoiningEvent,
       EventSchedule,
+      EventIntroduction,
       EventFile,
       EventVideo,
       Tag,

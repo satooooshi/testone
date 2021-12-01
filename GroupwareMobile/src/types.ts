@@ -85,6 +85,7 @@ export interface User {
   updatedAt: Date;
   deletedAt: Date | null;
   existence: boolean | null;
+  chatMessageReactions?: ChatMessageReaction[];
   tags?: Tag[];
   submissionFiles?: SubmissionFile[];
   hostingEvents?: EventSchedule[];
@@ -250,16 +251,21 @@ export interface ChatMessage {
   type: ChatMessageType;
   chatGroup?: ChatGroup;
   sender?: User;
+  reactions?: ChatMessageReaction[];
   createdAt: Date;
   updatedAt: Date;
   isSender?: boolean;
   thumbnail?: string;
+  replyParentMessage?: ChatMessage | null;
 }
 
 export interface ChatGroup {
   id: number;
   name: string;
   imageURL: string;
+  pinnedUsers?: User[];
+  isPinned?: boolean;
+  chatNotes?: ChatNote[];
   chatMessages?: ChatMessage[];
   members?: User[];
   lastReadChatTime?: LastReadChatTime[];
@@ -272,4 +278,57 @@ export interface LastReadChatTime {
   readTime: Date;
   chatGroup: ChatGroup;
   user: User;
+}
+
+export interface ChatNote {
+  id: number;
+  content: string;
+  chatGroup?: ChatGroup;
+  editors?: User[];
+  images?: Partial<ChatNoteImage>[];
+  createdAt: Date;
+  updatedAt: Date;
+  isEditor?: boolean;
+}
+
+export interface ChatNoteImage {
+  id: number;
+  imageURL: string;
+  chatNote?: ChatNote;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+//this is for react-native-image-viewing
+export type ImageSource = {
+  uri: string;
+};
+
+export interface ChatAlbum {
+  id: number;
+  title: string;
+  chatGroup?: ChatGroup;
+  editors?: User[];
+  images?: Partial<ChatAlbumImage>[];
+  createdAt: Date;
+  updatedAt: Date;
+  isEditor?: boolean;
+}
+
+export interface ChatAlbumImage {
+  id: number;
+  imageURL: string;
+  chatAlbum?: ChatAlbum;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface ChatMessageReaction {
+  id: number;
+  emoji: string;
+  user?: User;
+  chatMessage?: ChatMessage;
+  createdAt: Date;
+  updatedAt: Date;
+  isSender?: boolean;
 }

@@ -1,5 +1,7 @@
 import React from 'react';
 import {SafeAreaView, StyleSheet, StatusBar} from 'react-native';
+import {GestureHandlerRootView} from 'react-native-gesture-handler';
+import tailwind from 'tailwind-rn';
 
 type WholeContainerProps = {
   color?: 'auth' | 'white' | 'gray';
@@ -14,7 +16,9 @@ const WholeContainer: React.FC<WholeContainerProps> = props => {
       <SafeAreaView
         {...props}
         style={[WholeContainerStyle.safeArea, WholeContainerStyle.grayColor]}>
-        {children}
+        <GestureHandlerRootView style={tailwind('flex-1')}>
+          {children}
+        </GestureHandlerRootView>
       </SafeAreaView>
     </>
   );

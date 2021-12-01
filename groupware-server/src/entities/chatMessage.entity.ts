@@ -4,10 +4,12 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { ChatGroup } from './chatGroup.entity';
+import { ChatMessageReaction } from './chatMessageReaction.entity';
 import { User } from './user.entity';
 
 export enum ChatMessageType {
@@ -47,6 +49,9 @@ export class ChatMessage {
   @JoinColumn({ name: 'sender_id' })
   sender?: User;
 
+  @OneToMany(() => ChatMessageReaction, (reaction) => reaction.chatMessage)
+  reactions?: ChatMessageReaction[];
+
   @CreateDateColumn({
     type: 'datetime',
     name: 'created_at',
@@ -60,4 +65,8 @@ export class ChatMessage {
   updatedAt: Date;
 
   isSender?: boolean;
+
+  @ManyToOne(() => ChatMessage, (chatMessage) => chatMessage.id)
+  @JoinColumn({ name: 'reply_parent_id' })
+  replyParentMessage?: ChatMessage;
 }

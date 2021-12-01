@@ -8,6 +8,7 @@ export const createEventURL = `/${eventURL}/create-event`;
 export const updateEventURL = `/${eventURL}/update-event`;
 export const joinEventURL = `/${eventURL}/join-event`;
 export const saveUserJoiningEventURL = `/${eventURL}/save-user-joining-event`;
+export const cancelEventURL = `/${eventURL}/cancel-event`;
 export const deleteEventURL = `/${eventURL}/delete-event`;
 export const createCommentURL = `/${eventURL}/create-comment`;
 export const saveSubmissionURL = `/${eventURL}/save-submission`;

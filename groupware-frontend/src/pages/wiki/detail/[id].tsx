@@ -88,6 +88,12 @@ const QuestionDetail = () => {
   const { mutate: createBestAnswer } = useAPICreateBestAnswer({
     onSuccess: () => {
       refetch();
+      toast({
+        description: 'ベストアンサーを選びました',
+        status: 'success',
+        duration: 3000,
+        isClosable: true,
+      });
     },
   });
 
@@ -357,13 +363,15 @@ const QuestionDetail = () => {
                                 ? 'ベストアンサーに選ぶ'
                                 : undefined
                             }
+                            isExistsBestAnswer={wiki.bestAnswer ? true : false}
                             onClickBestAnswerButton={() =>
+                              !wiki.bestAnswer &&
                               createBestAnswer({ ...wiki, bestAnswer: answer })
                             }
                             body={answer.body}
                             date={answer.createdAt}
                             writer={answer.writer}
-                            isWriter={myself?.id === answer.writer.id}
+                            isWriter={myself?.id === wiki.writer?.id}
                             replyButtonName={
                               answerReply.answer?.id === answer.id ||
                               !enableReplyToAnswer(answer)

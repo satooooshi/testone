@@ -13,11 +13,13 @@ const afterNowMessage = '現在の日時以降に設定してください';
 // const minHostUsersMessage = '開催者/講師は一人以上設定してください';
 
 export const loginSchema = Yup.object().shape({
-  email: Yup.string().email(emailFormatMessage).required(requireMessage),
+  email: Yup.string()
+    .email(emailFormatMessage)
+    .required(`メールアドレスは${requireMessage}`),
   password: Yup.string()
     .matches(/^([^ ]*)$/, blankMixedMessage)
     .min(8, minEightTextMessage)
-    .required(requireMessage),
+    .required(`パスワードは${requireMessage}`),
 });
 
 export const wikiSchema = Yup.object().shape({
@@ -57,6 +59,43 @@ export const createEventSchema = Yup.object().shape({
     .min(Yup.ref('startAt'), minDateMessage)
     .required(`終了日時は${requireMessage}`),
   tags: Yup.array().min(1, minTagsMessage),
+});
+
+export const profileSchema = Yup.object().shape({
+  email: Yup.string().email(emailFormatMessage).required(requireMessage),
+  lastName: Yup.string()
+    .required(`姓は${requireMessage}`)
+    .max(50, `姓は${nWordLimitMessage(50)}`),
+  firstName: Yup.string()
+    .required(`名は${requireMessage}`)
+    .max(50, `名は${nWordLimitMessage(50)}`),
+  introduceOther: Yup.string().max(
+    1000,
+    `自己紹介は${nWordLimitMessage(1000)}`,
+  ),
+  introduceTech: Yup.string().max(
+    1000,
+    `技術の紹介は${nWordLimitMessage(1000)}`,
+  ),
+  introduceQualification: Yup.string().max(
+    1000,
+    `資格の紹介は${nWordLimitMessage(1000)}`,
+  ),
+  introduceClub: Yup.string().max(
+    1000,
+    `部活動の紹介は${nWordLimitMessage(1000)}`,
+  ),
+  introduceHobby: Yup.string().max(
+    1000,
+    `趣味の紹介は${nWordLimitMessage(1000)}`,
+  ),
+});
+
+export const editEventIntroductionSchema = Yup.object().shape({
+  title: Yup.string()
+    .required(`タイトルは${requireMessage}`)
+    .max(100, `タイトルは${nWordLimitMessage(100)}`),
+  description: Yup.string().required(`説明文は${requireMessage}`),
 });
 
 export const chatGroupSchema = Yup.object().shape({

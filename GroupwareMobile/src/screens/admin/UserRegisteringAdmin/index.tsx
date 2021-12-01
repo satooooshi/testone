@@ -21,7 +21,7 @@ import {
 } from 'react-native-magnus';
 import DropdownOpenerButton from '../../../components/common/DropdownOpenerButton';
 import TagModal from '../../../components/common/TagModal';
-import AppHeader, {Tab} from '../../../components/Header';
+import HeaderWithTextButton, {Tab} from '../../../components/Header';
 import TagEditLine from '../../../components/TagEditLine';
 import WholeContainer from '../../../components/WholeContainer';
 import {useAPIRegister} from '../../../hooks/api/auth/useAPIRegister';
@@ -121,10 +121,6 @@ const UserRegisteringAdmin: React.FC = () => {
       onPress: () =>
         navigation.navigate('AdminStack', {screen: 'UserRegisteringAdmin'}),
     },
-    {
-      name: 'CSV出力',
-      onPress: () => {},
-    },
   ];
 
   const handleUploadImage = async () => {
@@ -147,7 +143,7 @@ const UserRegisteringAdmin: React.FC = () => {
       <Overlay visible={isLoading} p="xl">
         <ActivityIndicator />
       </Overlay>
-      <AppHeader
+      <HeaderWithTextButton
         title="ユーザー作成"
         tabs={tabs}
         activeTabName={'ユーザー作成'}

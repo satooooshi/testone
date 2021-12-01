@@ -2,20 +2,27 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Patch,
   Post,
   Query,
   Req,
+  Res,
   UseGuards,
 } from '@nestjs/common';
+import { Response } from 'express';
+import { ChatAlbum } from 'src/entities/chatAlbum.entity';
 import { ChatGroup } from 'src/entities/chatGroup.entity';
 import { ChatMessage } from 'src/entities/chatMessage.entity';
+import { ChatMessageReaction } from 'src/entities/chatMessageReaction.entity';
+import { ChatNote } from 'src/entities/chatNote.entity';
 import { LastReadChatTime } from 'src/entities/lastReadChatTime.entity';
 import JwtAuthenticationGuard from '../auth/jwtAuthentication.guard';
 import RequestWithUser from '../auth/requestWithUser.interface';
-import { ChatService } from './chat.service';
+import { ChatService, GetChatNotesResult } from './chat.service';
+import { ChatAlbumService, GetChatAlbumsResult } from './chatAlbum.service';
 
 export interface GetMessagesQuery {
   group: number;
@@ -33,7 +40,10 @@ export interface GetRoomsResult {
 
 @Controller('chat')
 export class ChatController {
-  constructor(private readonly chatService: ChatService) {}
+  constructor(
+    private readonly chatService: ChatService,
+    private readonly chatAlbumService: ChatAlbumService,
+  ) {}
 
   @Get('group-list')
   @UseGuards(JwtAuthenticationGuard)
@@ -91,10 +101,11 @@ export class ChatController {
         'Group member is necessary at least 1 person',
       );
     }
-    if (!chatGroup.members.filter((u) => u.id === user.id).length) {
-      chatGroup.members.push(user);
-    }
-    return await this.chatService.saveChatGroup(chatGroup);
+    chatGroup.members = [
+      ...chatGroup.members.filter((u) => u.id !== user.id),
+      user,
+    ];
+    return await this.chatService.saveChatGroup(chatGroup, user.id);
   }
 
   @Get('get-last-read-chat-time/:id')
@@ -124,5 +135,148 @@ export class ChatController {
     const { id } = req.user;
     const { id: chatGroupId } = chatGroup;
     await this.chatService.leaveChatRoom(id, chatGroupId);
+  }
+
+  @Delete('/v2/reaction/:reactionId')
+  @UseGuards(JwtAuthenticationGuard)
+  async deleteReaction(
+    @Param('reactionId') reactionId: number,
+  ): Promise<number> {
+    const deletedReaction = await this.chatService.deleteReaction(reactionId);
+    return deletedReaction;
+  }
+
+  @Post('/v2/reaction')
+  @UseGuards(JwtAuthenticationGuard)
+  async postReaction(
+    @Req() req: RequestWithUser,
+    @Body() postedReaction: Partial<ChatMessageReaction>,
+  ): Promise<ChatMessageReaction> {
+    const { user } = req;
+    const reaction = await this.chatService.postReaction(
+      postedReaction,
+      user.id,
+    );
+    return reaction;
+  }
+
+  @Get('/v2/room/:roomId/note')
+  @UseGuards(JwtAuthenticationGuard)
+  async getChatNotes(
+    @Param('roomId') roomId: string,
+    @Query('page') page: string,
+    @Req() req: RequestWithUser,
+  ): Promise<GetChatNotesResult> {
+    const { user } = req;
+    const notes = await this.chatService.getChatNotes(
+      { group: Number(roomId), page },
+      user.id,
+    );
+    return notes;
+  }
+
+  @Post('/v2/room/:roomId/note')
+  @UseGuards(JwtAuthenticationGuard)
+  async createChatNotes(
+    @Body() body: Partial<ChatNote>,
+    @Req() req: RequestWithUser,
+  ) {
+    const { user } = req;
+    body.editors = [user];
+    const notes = await this.chatService.saveChatNotes(body);
+    return notes;
+  }
+
+  @Patch('/v2/room/:roomId/note/:noteId')
+  @UseGuards(JwtAuthenticationGuard)
+  async updateChatNotes(@Body() body: ChatNote, @Req() req: RequestWithUser) {
+    const { user } = req;
+    body.editors = body?.editors?.length
+      ? [...body.editors.filter((e) => e.id !== user.id), user]
+      : [user];
+    const notes = await this.chatService.saveChatNotes(body);
+    return notes;
+  }
+
+  @Delete('/v2/room/:roomId/note/:noteId')
+  @UseGuards(JwtAuthenticationGuard)
+  async deleteChatNotes(@Param('noteId') noteId: number, @Res() res: Response) {
+    await this.chatService.deleteChatNotes(noteId);
+    res.send(200);
+  }
+
+  @Get('/v2/room/:roomId/note/:noteId')
+  @UseGuards(JwtAuthenticationGuard)
+  async getChatNoteDetail(
+    @Param('noteId') noteId: string,
+    @Req() req: RequestWithUser,
+  ) {
+    const { id: userID } = req.user;
+    const notes = await this.chatService.getChatNoteDetail(
+      Number(noteId),
+      userID,
+    );
+    return notes;
+  }
+
+  @Get('/v2/room/:roomId/album')
+  @UseGuards(JwtAuthenticationGuard)
+  async getChatAlbums(
+    @Param('roomId') roomId: string,
+    @Query('page') page: string,
+    @Req() req: RequestWithUser,
+  ): Promise<GetChatAlbumsResult> {
+    const { user } = req;
+    const albums = await this.chatAlbumService.getChatAlbums(
+      { group: Number(roomId), page },
+      user.id,
+    );
+    return albums;
+  }
+
+  @Post('/v2/room/:roomId/album')
+  @UseGuards(JwtAuthenticationGuard)
+  async createChatAlbums(
+    @Body() body: Partial<ChatAlbum>,
+    @Req() req: RequestWithUser,
+  ) {
+    const { user } = req;
+    body.editors = [user];
+    const albums = await this.chatAlbumService.saveChatAlbums(body);
+    return albums;
+  }
+
+  @Patch('/v2/room/:roomId/album/:albumId')
+  @UseGuards(JwtAuthenticationGuard)
+  async updateChatAlbums(@Body() body: ChatAlbum, @Req() req: RequestWithUser) {
+    const { user } = req;
+    body.editors = body?.editors?.length
+      ? [...body.editors.filter((e) => e.id !== user.id), user]
+      : [user];
+    const albums = await this.chatAlbumService.saveChatAlbums(body);
+    return albums;
+  }
+
+  @Delete('/v2/room/:roomId/album/:albumId')
+  @UseGuards(JwtAuthenticationGuard)
+  async deleteChatAlbums(
+    @Param('albumId') albumId: number,
+    @Res() res: Response,
+  ) {
+    await this.chatAlbumService.deleteChatAlbums(albumId);
+    res.send(200);
+  }
+
+  @Get('/v2/room/:roomId/album/:albumId')
+  @UseGuards(JwtAuthenticationGuard)
+  async getChatAlbumDetail(
+    @Param('albumId') albumId: string,
+    @Query('page') page: string,
+  ) {
+    const albums = await this.chatAlbumService.getChatAlbumImages(
+      Number(albumId),
+      page,
+    );
+    return albums;
   }
 }

@@ -1,4 +1,4 @@
-import {ChatGroup, WikiType} from '../../types';
+import {ChatAlbum, ChatGroup, ChatNote, WikiType} from '../../types';
 
 export type RootStackParamList = {
   Home: undefined;
@@ -19,6 +19,9 @@ export type RootStackParamList = {
     type?: WikiType;
   };
   EditWiki: {
+    id: number;
+  };
+  PostAnswer: {
     id: number;
   };
   AccountDetail:
@@ -42,4 +45,30 @@ export type RootStackParamList = {
       }
     | undefined;
   NewRoom: undefined;
+  ChatMenu: {
+    room: ChatGroup;
+  };
+  ChatNotes: {
+    room: ChatGroup;
+  };
+  PostChatNote: {
+    room: ChatGroup;
+  };
+  EditChatNote: {
+    room: ChatGroup;
+    note: ChatNote;
+  };
+  ChatAlbums: {
+    room: ChatGroup;
+  };
+  PostChatAlbum: {
+    room: ChatGroup;
+  };
+  ChatAlbumDetail: {
+    room: ChatGroup;
+    album: ChatAlbum;
+  };
+  EditChatAlbum: {
+    album: ChatAlbum;
+  };
 };

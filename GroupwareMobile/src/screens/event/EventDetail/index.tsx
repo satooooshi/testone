@@ -1,7 +1,12 @@
 import React, {useEffect, useMemo, useState} from 'react';
 import WholeContainer from '../../../components/WholeContainer';
-import {FlatList, useWindowDimensions, ActivityIndicator} from 'react-native';
-import AppHeader from '../../../components/Header';
+import {
+  FlatList,
+  useWindowDimensions,
+  ActivityIndicator,
+  Alert,
+} from 'react-native';
+import HeaderWithTextButton from '../../../components/Header';
 import {Div, Text, Button, Overlay, ScrollDiv} from 'react-native-magnus';
 import FastImage from 'react-native-fast-image';
 import {eventDetailStyles} from '../../../styles/screen/event/eventDetail.style';
@@ -16,14 +21,43 @@ import YoutubePlayer from 'react-native-youtube-iframe';
 import generateYoutubeId from '../../../utils/generateYoutubeId';
 import {useRoute} from '@react-navigation/native';
 import {EventDetailRouteProps} from '../../../types/navigator/drawerScreenProps';
+import EventFormModal from '../../../components/events/EventFormModal';
+import {useAPIGetTag} from '../../../hooks/api/tag/useAPIGetTag';
+import {useAPIGetUsers} from '../../../hooks/api/user/useAPIGetUsers';
+import {useAPIUpdateEvent} from '../../../hooks/api/event/useAPIUpdateEvent';
+import {useAPIJoinEvent} from '../../../hooks/api/event/useAPIJoinEvent';
+import {useAPICancelEvent} from '../../../hooks/api/event/useAPICancelEvent';
+import {AxiosError} from 'axios';
 
 const EventDetail: React.FC = () => {
   const route = useRoute<EventDetailRouteProps>();
   const {id} = route.params;
-
-  const {data: eventInfo, isLoading: isLoadingGetEventDetail} =
-    useAPIGetEventDetail(id);
+  const {data: tags} = useAPIGetTag();
+  const {data: users} = useAPIGetUsers();
+  const {
+    data: eventInfo,
+    refetch: refetchEvents,
+    isLoading: isLoadingGetEventDetail,
+  } = useAPIGetEventDetail(id);
   const [screenLoading, setScreenLoading] = useState(false);
+  const [visibleEventFormModal, setEventFormModal] = useState(false);
+  const {mutate: saveEvent, isLoading: isLoadingSaveEvent} = useAPIUpdateEvent({
+    onSuccess: () => {
+      setEventFormModal(false);
+      refetchEvents();
+    },
+  });
+  const {mutate: joinEvent} = useAPIJoinEvent({
+    onSuccess: () => refetchEvents(),
+    onError: err => {
+      if (err.response?.data) {
+        Alert.alert((err.response?.data as AxiosError)?.message);
+      }
+    },
+  });
+  const {mutate: cancelEvent} = useAPICancelEvent({
+    onSuccess: () => refetchEvents(),
+  });
   const windowWidth = useWindowDimensions().width;
   const startAtText = useMemo(() => {
     if (!eventInfo) {
@@ -44,35 +78,90 @@ const EventDetail: React.FC = () => {
     });
   }, [eventInfo]);
 
+  const isFinished = eventInfo?.endAt
+    ? new Date(eventInfo.endAt) <= new Date()
+    : false;
+
   const AboveYoutubeVideos = () => {
     if (!eventInfo) {
       return <></>;
     }
     return (
       <>
-        <FastImage
-          style={{
-            ...eventDetailStyles.image,
-            width: windowWidth,
-            minHeight: windowWidth * 0.8,
-          }}
-          resizeMode="cover"
-          source={
-            eventInfo.imageURL
-              ? {uri: eventInfo.imageURL}
-              : require('../../../../assets/study_meeting_1.jpg')
-          }
-        />
+        <Div>
+          <FastImage
+            style={{
+              ...eventDetailStyles.image,
+              width: windowWidth,
+              minHeight: windowWidth * 0.8,
+            }}
+            resizeMode="cover"
+            source={
+              eventInfo.imageURL
+                ? {uri: eventInfo.imageURL}
+                : require('../../../../assets/study_meeting_1.jpg')
+            }
+          />
+          <Button
+            mb={16}
+            bg={eventTypeColorFactory(eventInfo.type)}
+            position="absolute"
+            bottom={0}
+            right={10}
+            color="white">
+            {eventTypeNameFactory(eventInfo.type)}
+          </Button>
+        </Div>
         <Div mx={16}>
           <Text mb={16} fontSize={24} color={darkFontColor} fontWeight="900">
             {eventInfo.title}
           </Text>
-          <Button
-            mb={16}
-            bg={eventTypeColorFactory(eventInfo.type)}
-            color="white">
-            {eventTypeNameFactory(eventInfo.type)}
-          </Button>
+          <Div alignSelf="flex-end">
+            {eventInfo.type !== 'submission_etc' &&
+            !isFinished &&
+            !eventInfo.isCanceled &&
+            eventInfo.isJoining ? (
+              <Button
+                mb={16}
+                bg={'pink600'}
+                color="white"
+                onPress={() => joinEvent({eventID: Number(id)})}>
+                イベントに参加
+              </Button>
+            ) : eventInfo.type !== 'submission_etc' &&
+              !isFinished &&
+              !eventInfo.isCanceled &&
+              !eventInfo.isJoining ? (
+              <Div flexDir="row">
+                <Button
+                  mb={16}
+                  bg={'pink600'}
+                  color="white"
+                  alignSelf="flex-end">
+                  参加済み
+                </Button>
+                <Button
+                  mb={16}
+                  bg={'pink600'}
+                  color="white"
+                  onPress={() => cancelEvent({eventID: Number(id)})}
+                  alignSelf="flex-end">
+                  キャンセルする
+                </Button>
+              </Div>
+            ) : eventInfo.type !== 'submission_etc' &&
+              !isFinished &&
+              eventInfo.isCanceled &&
+              eventInfo.isJoining ? (
+              <Text color="tomato" fontSize={16}>
+                キャンセル済み
+              </Text>
+            ) : isFinished ? (
+              <Text color="tomato" fontSize={16}>
+                締切済み
+              </Text>
+            ) : null}
+          </Div>
           <Text
             mb={8}
             fontSize={16}
@@ -117,6 +206,7 @@ const EventDetail: React.FC = () => {
               </Button>
             )}
           />
+
           <Text mb={8}>参考資料</Text>
           {/* TODO list files */}
           <Text mb={8}>関連動画</Text>
@@ -126,23 +216,33 @@ const EventDetail: React.FC = () => {
   };
 
   useEffect(() => {
-    if (isLoadingGetEventDetail) {
+    if (isLoadingGetEventDetail || isLoadingSaveEvent) {
       setScreenLoading(true);
       return;
     }
     setScreenLoading(false);
-  }, [isLoadingGetEventDetail]);
+  }, [isLoadingGetEventDetail, isLoadingSaveEvent]);
 
   return (
     <WholeContainer>
-      <AppHeader
+      <HeaderWithTextButton
         enableBackButton={true}
         title="イベント詳細"
         activeTabName="一覧に戻る"
+        rightButtonName="イベント編集"
+        onPressRightButton={() => setEventFormModal(true)}
       />
       <Overlay visible={screenLoading} p="xl">
         <ActivityIndicator />
       </Overlay>
+      <EventFormModal
+        event={eventInfo}
+        isVisible={visibleEventFormModal}
+        onCloseModal={() => setEventFormModal(false)}
+        onSubmit={event => saveEvent({...event, id: eventInfo?.id})}
+        users={users || []}
+        tags={tags || []}
+      />
       <ScrollDiv>
         {eventInfo ? (
           <Div flexDir="column">

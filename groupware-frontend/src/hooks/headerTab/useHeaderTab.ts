@@ -311,7 +311,7 @@ const headerTab = (headerTabBehavior: HeaderTabBehavior): Tab[] => {
         {
           type: 'link',
           name: 'Wiki一覧画面へ',
-          href: `/wiki/list`,
+          href: '/wiki/list?page=1&tag=&word=&status=new&type=',
         },
       ];
     case 'wikiList':

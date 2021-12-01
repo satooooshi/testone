@@ -385,11 +385,6 @@ export class UserService {
       .getMany();
     const usersArrWithEachCount = users.map((u) => {
       const tags = userArrWithTags.filter((user) => user.id === u.id)[0]?.tags;
-      console.log('user: ', userNameFactory(u));
-      console.log(
-        'tag: ',
-        tags?.map((t) => t.name),
-      );
       const eventCount =
         userObjWithEvent.filter((user) => user.id === u.id)[0]?.userJoiningEvent
           .length || 0;

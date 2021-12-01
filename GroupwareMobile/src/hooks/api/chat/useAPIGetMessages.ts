@@ -25,6 +25,15 @@ const getMessages = async (query: GetMessagesQuery) => {
           m.thumbnail = '';
         }
       }
+
+      if (
+        m.replyParentMessage &&
+        m.replyParentMessage.type === ChatMessageType.VIDEO
+      ) {
+        m.replyParentMessage.thumbnail = await getThumbnailOfVideo(
+          m.replyParentMessage.content,
+        );
+      }
     }),
   );
   return res.data;

@@ -1,9 +1,6 @@
 import React from 'react';
 import {createDrawerNavigator} from '@react-navigation/drawer';
 import {darkFontColor} from '../../utils/colors';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import Ionicons from 'react-native-vector-icons/Ionicons';
 import Wiki from '../../screens/wiki';
 import EventList from '../../screens/event/EventList';
 import EventDetail from '../../screens/event/EventDetail';
@@ -24,6 +21,16 @@ import Chat from '../../screens/Chat';
 import RoomList from '../../screens/Chat/RoomList';
 import NewRoom from '../../screens/Chat/NewRoom';
 import EditWiki from '../../screens/wiki/EditWiki';
+import ChatMenu from '../../screens/Chat/ChatMenu';
+import ChatNotes from '../../screens/Chat/ChatMenu/ChatNote';
+import PostChatNote from '../../screens/Chat/ChatMenu/ChatNote/PostChatNote';
+import EditChatNote from '../../screens/Chat/ChatMenu/ChatNote/EditChatNote';
+import PostAnswer from '../../screens/wiki/PostAnswer';
+import ChatAlbums from '../../screens/Chat/ChatMenu/ChatAlbum';
+import PostChatAlbum from '../../screens/Chat/ChatMenu/ChatAlbum/PostAlbum';
+import AlbumDetail from '../../screens/Chat/ChatMenu/ChatAlbum/AlbumDetail';
+import EditChatAlbum from '../../screens/Chat/ChatMenu/ChatAlbum/EditAlbum';
+import UserTagAdmin from '../../screens/admin/UserTagAdmin';
 
 const Drawer = createDrawerNavigator();
 const Stack = createStackNavigator();
@@ -49,6 +56,11 @@ const WikiStack = () => (
     <Stack.Screen
       name="EditWiki"
       component={EditWiki}
+      options={{headerShown: false}}
+    />
+    <Stack.Screen
+      name="PostAnswer"
+      component={PostAnswer}
       options={{headerShown: false}}
     />
   </Stack.Navigator>
@@ -112,6 +124,11 @@ const AdminStack = () => (
       options={{headerShown: false}}
     />
     <Stack.Screen
+      name="UserTagAdmin"
+      component={UserTagAdmin}
+      options={{headerShown: false}}
+    />
+    <Stack.Screen
       name="AccountDetail"
       component={AccountDetail}
       options={{headerShown: false}}
@@ -142,6 +159,46 @@ const ChatStack = () => (
       options={{headerShown: false}}
     />
     <Stack.Screen name="Chat" component={Chat} options={{headerShown: false}} />
+    <Stack.Screen
+      name="ChatMenu"
+      component={ChatMenu}
+      options={{headerShown: false}}
+    />
+    <Stack.Screen
+      name="ChatNotes"
+      component={ChatNotes}
+      options={{headerShown: false}}
+    />
+    <Stack.Screen
+      name="PostChatNote"
+      component={PostChatNote}
+      options={{headerShown: false}}
+    />
+    <Stack.Screen
+      name="EditChatNote"
+      component={EditChatNote}
+      options={{headerShown: false}}
+    />
+    <Stack.Screen
+      name="ChatAlbums"
+      component={ChatAlbums}
+      options={{headerShown: false}}
+    />
+    <Stack.Screen
+      name="PostChatAlbum"
+      component={PostChatAlbum}
+      options={{headerShown: false}}
+    />
+    <Stack.Screen
+      name="ChatAlbumDetail"
+      component={AlbumDetail}
+      options={{headerShown: false}}
+    />
+    <Stack.Screen
+      name="EditChatAlbum"
+      component={EditChatAlbum}
+      options={{headerShown: false}}
+    />
   </Stack.Navigator>
 );
 

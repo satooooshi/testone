@@ -22,6 +22,7 @@ import { Wiki } from './wiki.entity';
 import { SubmissionFile } from './submissionFiles.entity';
 import { UserTag } from './userTag.entity';
 import { UserJoiningEvent } from './userJoiningEvent.entity';
+import { ChatMessageReaction } from './chatMessageReaction.entity';
 
 export enum UserRole {
   ADMIN = 'admin',
@@ -228,7 +229,13 @@ export class User {
   @OneToMany(() => EventSchedule, (eventSchedule) => eventSchedule.author)
   eventsCreated?: EventSchedule[];
 
-  @ManyToMany(() => ChatMessage, (chatMessage) => chatMessage.sender, {
+  @ManyToMany(() => ChatGroup, (chatGroup) => chatGroup.pinnedUsers, {
+    onUpdate: 'CASCADE',
+    onDelete: 'CASCADE',
+  })
+  pinnedChatGroups?: ChatGroup[];
+
+  @ManyToMany(() => ChatGroup, (chatGroup) => chatGroup.members, {
     onUpdate: 'CASCADE',
     onDelete: 'CASCADE',
   })
@@ -242,6 +249,9 @@ export class User {
 
   @OneToMany(() => QAAnswerReply, (qaAnswerReply) => qaAnswerReply.writer)
   qaAnswerReplies?: QAAnswerReply[];
+
+  @OneToMany(() => ChatMessageReaction, (reaction) => reaction.user)
+  chatMessageReactions?: ChatMessageReaction[];
 
   //this is jwt token send when login or authenticate
   token?: string;

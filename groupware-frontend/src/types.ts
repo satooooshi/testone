@@ -73,6 +73,7 @@ export interface User {
   updatedAt: Date;
   deletedAt: Date | null;
   existence: boolean | null;
+  chatMessageReactions?: ChatMessageReaction[];
   tags?: Tag[];
   submissionFiles?: SubmissionFile[];
   hostingEvents?: EventSchedule[];
@@ -194,6 +195,21 @@ export interface EventComment {
   createdAt: Date;
   updatedAt: Date;
 }
+export interface EventIntroduction {
+  type: EventType;
+  title: string;
+  description: string;
+  imageUrl: string;
+  subImages: EventIntroductionSubImage[];
+  createdAt: Date;
+  updatedAt: Date;
+}
+export interface EventIntroductionSubImage {
+  eventIntruduction: EventIntroduction;
+  imageUrl: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
 
 export interface EventVideo {
   id: number;
@@ -232,16 +248,19 @@ export interface ChatMessage {
   content: string;
   type: ChatMessageType;
   chatGroup?: ChatGroup;
+  chatMessages?: ChatMessage[];
   sender?: User;
   createdAt: Date;
   updatedAt: Date;
   isSender?: boolean;
+  replyParentMessage?: ChatMessage;
 }
 
 export interface ChatGroup {
   id: number;
   name: string;
   imageURL: string;
+  chatNotes?: ChatNote[];
   chatMessages?: ChatMessage[];
   members?: User[];
   lastReadChatTime?: LastReadChatTime[];
@@ -254,4 +273,52 @@ export interface LastReadChatTime {
   readTime: Date;
   chatGroup: ChatGroup;
   user: User;
+}
+
+export interface ChatNote {
+  id: number;
+  content: string;
+  chatGroup?: ChatGroup;
+  editors?: User[];
+  images?: Partial<ChatNoteImage>[];
+  createdAt: Date;
+  updatedAt: Date;
+  isEditor?: boolean;
+}
+
+export interface ChatNoteImage {
+  id: number;
+  imageURL: string;
+  chatNote?: ChatNote;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface ChatAlbum {
+  id: number;
+  title: string;
+  chatGroup?: ChatGroup;
+  editors?: User[];
+  images?: ChatAlbumImage[];
+  createdAt: Date;
+  updatedAt: Date;
+  isEditor?: boolean;
+}
+
+export interface ChatAlbumImage {
+  id: number;
+  imageURL: string;
+  chatAlbum?: ChatAlbum;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface ChatMessageReaction {
+  id: number;
+  emoji: string;
+  user?: User;
+  chatMessage?: ChatMessage;
+  createdAt: Date;
+  updatedAt: Date;
+  isSender?: boolean;
 }
