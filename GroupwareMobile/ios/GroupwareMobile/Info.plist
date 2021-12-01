@@ -85,6 +85,8 @@
 	<false/>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>イベント/Wikiなどの画像アップロードに使用します</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+  <string>チャットで送信された画像/動画の保存をします</string>
 	<key>NSCameraUsageDescription</key>
 	<string>イベント/Wikiなどの画像アップロードに使用します</string>
 	<key>NSMicrophoneUsageDescription</key>

@@ -67,6 +67,7 @@ import {useAPIDeleteReaction} from '../../hooks/api/chat/useAPIDeleteReaction';
 import ReactionToMessage from '../../components/chat/ChatMessage/ReactionToMessage';
 import ReactionsModal from '../../components/chat/ReactionsModal';
 import {numbersOfSameValueInKeyOfObjArr} from '../../utils/numbersOfSameValueInKeyOfObjArr';
+import {saveToCameraRoll} from '../../utils/storage/saveToCameraRoll';
 
 const Chat: React.FC = () => {
   const typeDropdownRef = useRef<any | null>(null);
@@ -274,14 +275,17 @@ const Chat: React.FC = () => {
 
   const downloadFile = async (message: ChatMessage) => {
     const date = new Date();
-    let PictureDir =
-      Platform.OS === 'ios' ? fs.dirs.DocumentDir : fs.dirs.PictureDir;
+    let PictureDir = fs.dirs.DocumentDir;
     let options = {
       fileCache: true,
       addAndroidDownloads: {
         useDownloadManager: true, // setting it to true will use the device's native download manager and will be shown in the notification bar.
-        notification: false,
+        notification: true,
         description: 'ファイルをダウンロードします',
+        path:
+          PictureDir +
+          '/me_' +
+          Math.floor(date.getTime() + date.getSeconds() / 2), // this is the path where your downloaded file will live in
       },
       path:
         PictureDir +
@@ -289,7 +293,9 @@ const Chat: React.FC = () => {
         Math.floor(date.getTime() + date.getSeconds() / 2), // this is the path where your downloaded file will live in
     };
     const {path} = await config(options).fetch('GET', message.content);
+    // console.log(res);
     FileViewer.open(path());
+    // console.log(path());
   };
 
   const numbersOfRead = (message: ChatMessage) => {
@@ -535,13 +541,15 @@ const Chat: React.FC = () => {
             renderItem={({item: message}) => renderMessage(message)}
           />
           {reactionTarget ? (
-            <EmojiSelector
-              onEmojiSelected={emoji => handleSaveReaction(emoji)}
-              showHistory={false}
-              showSearchBar={false}
-              placeholder="検索"
-              showSectionTitles={false}
-            />
+            <Div h={'50%'}>
+              <EmojiSelector
+                onEmojiSelected={emoji => handleSaveReaction(emoji)}
+                showHistory={false}
+                showSearchBar={false}
+                placeholder="検索"
+                showSectionTitles={false}
+              />
+            </Div>
           ) : (
             <>
               {values.replyParentMessage && (
@@ -648,6 +656,13 @@ const Chat: React.FC = () => {
           />
         </TouchableOpacity>
         <Video source={{uri: video}} style={chatStyles.video} />
+        <TouchableOpacity
+          style={tailwind('absolute bottom-5 right-5')}
+          onPress={async () =>
+            await saveToCameraRoll({url: video, type: 'video'})
+          }>
+          <Icon color="white" name="download" fontSize={24} />
+        </TouchableOpacity>
       </Modal>
       <ImageView
         animationType="slide"
@@ -657,6 +672,15 @@ const Chat: React.FC = () => {
         onRequestClose={() => setImageModal(false)}
         swipeToCloseEnabled={false}
         doubleTapToZoomEnabled={true}
+        FooterComponent={({imageIndex}) => (
+          <TouchableOpacity
+            style={tailwind('absolute bottom-5 right-5')}
+            onPress={() =>
+              saveToCameraRoll({url: images[imageIndex].uri, type: 'image'})
+            }>
+            <Icon color="white" name="download" fontSize={24} />
+          </TouchableOpacity>
+        )}
       />
       <HeaderWithIconButton
         title="チャット"
