@@ -60,7 +60,7 @@ const Profile: React.FC = () => {
       }
     },
   });
-  const {values, setValues, handleSubmit} = useFormik<Partial<User>>({
+  const {values, setValues, handleChange, handleSubmit} = useFormik<Partial<User>>({
     initialValues: profile || initialValues,
     enableReinitialize: true,
     onSubmit: v => updateUser(v),
@@ -188,7 +188,7 @@ const Profile: React.FC = () => {
             </Text>
             <Input
               value={values.email}
-              onChangeText={t => setValues({...values, email: t})}
+              onChangeText={handleChange('email')}
               placeholder="bold@example.com"
               autoCapitalize="none"
             />
@@ -199,7 +199,7 @@ const Profile: React.FC = () => {
             </Text>
             <Input
               value={values.lastName}
-              onChangeText={t => setValues({...values, lastName: t})}
+              onChangeText={handleChange('lastName')}
               placeholder="山田"
               autoCapitalize="none"
             />
@@ -210,7 +210,7 @@ const Profile: React.FC = () => {
             </Text>
             <Input
               value={values.firstName}
-              onChangeText={t => setValues({...values, firstName: t})}
+              onChangeText={handleChange('firstName')}
               placeholder="太郎"
               autoCapitalize="none"
             />
@@ -221,7 +221,7 @@ const Profile: React.FC = () => {
             </Text>
             <TextInput
               value={values.introduceOther}
-              onChangeText={t => setValues({...values, introduceOther: t})}
+              onChangeText={handleChange('introduceOther')}
               multiline={true}
               placeholder="新しく入社した山田太郎です。よろしくお願いします！"
               autoCapitalize="none"
@@ -240,7 +240,7 @@ const Profile: React.FC = () => {
             </Text>
             <TextInput
               value={values.introduceTech}
-              onChangeText={t => setValues({...values, introduceTech: t})}
+              onChangeText={handleChange('introduceTech')}
               multiline={true}
               placeholder="自分の技術についての紹介を入力してください"
               autoCapitalize="none"
@@ -260,9 +260,9 @@ const Profile: React.FC = () => {
             </Text>
             <TextInput
               value={values.introduceQualification}
-              onChangeText={t =>
-                setValues({...values, introduceQualification: t})
-              }
+              onChangeText={handleChange('introduceQualification')}
+              //   setValues({...values, introduceQualification: t})
+              // }
               multiline={true}
               placeholder="自分の資格についての紹介を入力してください"
               autoCapitalize="none"
@@ -280,7 +280,7 @@ const Profile: React.FC = () => {
             </Text>
             <TextInput
               value={values.introduceClub}
-              onChangeText={t => setValues({...values, introduceClub: t})}
+              onChangeText={handleChange('introduceClub')}
               multiline={true}
               placeholder="自分の部活動についての紹介を入力してください"
               autoCapitalize="none"
@@ -298,7 +298,7 @@ const Profile: React.FC = () => {
             </Text>
             <TextInput
               value={values.introduceHobby}
-              onChangeText={t => setValues({...values, introduceHobby: t})}
+              onChangeText={handleChange('introduceHobby')}
               multiline={true}
               placeholder="自分の趣味についての紹介を入力してください"
               autoCapitalize="none"
