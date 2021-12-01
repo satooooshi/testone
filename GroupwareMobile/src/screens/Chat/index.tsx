@@ -68,6 +68,7 @@ import ReactionToMessage from '../../components/chat/ChatMessage/ReactionToMessa
 import ReactionsModal from '../../components/chat/ReactionsModal';
 import {numbersOfSameValueInKeyOfObjArr} from '../../utils/numbersOfSameValueInKeyOfObjArr';
 import {saveToCameraRoll} from '../../utils/storage/saveToCameraRoll';
+import VideoPlayer from 'react-native-video-player';
 
 const Chat: React.FC = () => {
   const typeDropdownRef = useRef<any | null>(null);
@@ -293,9 +294,7 @@ const Chat: React.FC = () => {
         Math.floor(date.getTime() + date.getSeconds() / 2), // this is the path where your downloaded file will live in
     };
     const {path} = await config(options).fetch('GET', message.content);
-    // console.log(res);
     FileViewer.open(path());
-    // console.log(path());
   };
 
   const numbersOfRead = (message: ChatMessage) => {
@@ -309,6 +308,7 @@ const Chat: React.FC = () => {
     <Dropdown
       {...defaultDropdownProps}
       title="アクションを選択"
+      onBackdropPress={() => typeDropdownRef.current?.close()}
       ref={typeDropdownRef}>
       <Dropdown.Option
         {...defaultDropdownOptionProps}
@@ -641,7 +641,7 @@ const Chat: React.FC = () => {
         />
       </MagnusModal>
       {/* @TODO add seeking bar */}
-      <Modal visible={!!video} animationType="slide">
+      <MagnusModal isVisible={!!video} bg="black">
         <TouchableOpacity
           style={chatStyles.cancelIcon}
           onPress={() => {
@@ -655,7 +655,13 @@ const Chat: React.FC = () => {
             color="#fff"
           />
         </TouchableOpacity>
-        <Video source={{uri: video}} style={chatStyles.video} />
+        <VideoPlayer
+          video={{
+            uri: video,
+          }}
+          autoplay
+          videoWidth={windowWidth}
+        />
         <TouchableOpacity
           style={tailwind('absolute bottom-5 right-5')}
           onPress={async () =>
@@ -663,7 +669,7 @@ const Chat: React.FC = () => {
           }>
           <Icon color="white" name="download" fontSize={24} />
         </TouchableOpacity>
-      </Modal>
+      </MagnusModal>
       <ImageView
         animationType="slide"
         images={images}
