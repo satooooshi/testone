@@ -5,7 +5,7 @@ import {QueryClientProvider, QueryClient} from 'react-query';
 import 'react-native-gesture-handler';
 import {requestIOSMsgPermission} from './utils/permission/requestIOSMsgPermisson';
 import messaging from '@react-native-firebase/messaging';
-import {Platform} from 'react-native';
+import {Alert, Platform} from 'react-native';
 
 const App = () => {
   const queryClient = new QueryClient();
@@ -13,11 +13,12 @@ const App = () => {
   useEffect(() => {
     const handleMessaging = async () => {
       await requestIOSMsgPermission();
-      const token =
-        Platform.OS === 'android'
-          ? await messaging().getToken()
-          : await messaging().getAPNSToken();
-      console.log(token);
+      // const token =
+      //   Platform.OS === 'android'
+      //     ? await messaging().getToken()
+      //     : await messaging().getAPNSToken();
+      const token = await messaging().getToken();
+      console.log('token:', token);
 
       // Listen to whether the token changes
       return messaging().onTokenRefresh(tokenChanged => {
@@ -26,6 +27,14 @@ const App = () => {
       });
     };
     handleMessaging();
+  }, []);
+
+  useEffect(() => {
+    const unsubscribe = messaging().onMessage(async remoteMessage => {
+      Alert.alert('A new FCM message arrived!', JSON.stringify(remoteMessage));
+    });
+
+    return unsubscribe;
   }, []);
 
   return (
