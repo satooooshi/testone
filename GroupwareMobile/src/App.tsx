@@ -5,7 +5,8 @@ import {QueryClientProvider, QueryClient} from 'react-query';
 import 'react-native-gesture-handler';
 import {requestIOSMsgPermission} from './utils/permission/requestIOSMsgPermisson';
 import messaging from '@react-native-firebase/messaging';
-import {Alert, Platform} from 'react-native';
+import {Alert} from 'react-native';
+import PushNotification from 'react-native-push-notification';
 
 const App = () => {
   const queryClient = new QueryClient();
@@ -31,7 +32,13 @@ const App = () => {
 
   useEffect(() => {
     const unsubscribe = messaging().onMessage(async remoteMessage => {
-      Alert.alert('A new FCM message arrived!', JSON.stringify(remoteMessage));
+      PushNotification.localNotification({
+        id: remoteMessage.messageId,
+        message: remoteMessage.notification?.body || '',
+        title: remoteMessage.notification?.title,
+        bigPictureUrl: remoteMessage.notification?.android?.imageUrl,
+        userInfo: remoteMessage.data,
+      });
     });
 
     return unsubscribe;
