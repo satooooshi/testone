@@ -32,6 +32,7 @@ import {profileStyles} from '../../../styles/screen/account/profile.style';
 import {TagType, User} from '../../../types';
 import {ProfileNavigationProps} from '../../../types/navigator/drawerScreenProps/account';
 import {uploadImageFromGallery} from '../../../utils/cropImage/uploadImageFromGallery';
+import {profileSchema} from '../../../utils/validation/schema';
 const initialValues: Partial<User> = {
   email: '',
   lastName: '',
@@ -60,9 +61,12 @@ const Profile: React.FC = () => {
       }
     },
   });
-  const {values, setValues, handleChange, handleSubmit} = useFormik<Partial<User>>({
+  const {values, setValues, handleChange, handleSubmit} = useFormik<
+    Partial<User>
+  >({
     initialValues: profile || initialValues,
     enableReinitialize: true,
+    validationSchema: profileSchema,
     onSubmit: v => updateUser(v),
   });
   const {width: windowWidth} = useWindowDimensions();
@@ -261,8 +265,6 @@ const Profile: React.FC = () => {
             <TextInput
               value={values.introduceQualification}
               onChangeText={handleChange('introduceQualification')}
-              //   setValues({...values, introduceQualification: t})
-              // }
               multiline={true}
               placeholder="自分の資格についての紹介を入力してください"
               autoCapitalize="none"
