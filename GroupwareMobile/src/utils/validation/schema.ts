@@ -68,7 +68,9 @@ export const savingRoomSchema = Yup.object().shape({
 });
 
 export const profileSchema = Yup.object().shape({
-  email: Yup.string().email(emailFormatMessage).required(requireMessage),
+  email: Yup.string()
+    .email(emailFormatMessage)
+    .required(`メールアドレスは${requireMessage}`),
   lastName: Yup.string()
     .required(`姓は${requireMessage}`)
     .max(50, `姓は${nWordLimitMessage(50)}`),

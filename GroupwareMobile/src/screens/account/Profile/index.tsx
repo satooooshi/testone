@@ -32,6 +32,7 @@ import {profileStyles} from '../../../styles/screen/account/profile.style';
 import {TagType, User} from '../../../types';
 import {ProfileNavigationProps} from '../../../types/navigator/drawerScreenProps/account';
 import {uploadImageFromGallery} from '../../../utils/cropImage/uploadImageFromGallery';
+import {formikErrorMsgFactory} from '../../../utils/factory/formikEroorMsgFactory';
 import {profileSchema} from '../../../utils/validation/schema';
 const initialValues: Partial<User> = {
   email: '',
@@ -61,14 +62,22 @@ const Profile: React.FC = () => {
       }
     },
   });
-  const {values, setValues, handleChange, handleSubmit} = useFormik<
-    Partial<User>
-  >({
-    initialValues: profile || initialValues,
-    enableReinitialize: true,
-    validationSchema: profileSchema,
-    onSubmit: v => updateUser(v),
-  });
+  const {values, setValues, handleChange, handleSubmit, validateForm} =
+    useFormik<Partial<User>>({
+      initialValues: profile || initialValues,
+      enableReinitialize: true,
+      validationSchema: profileSchema,
+      onSubmit: v => updateUser(v),
+    });
+  const checkValidateErrors = async () => {
+    const errors = await validateForm();
+    const messages = formikErrorMsgFactory(errors);
+    if (messages) {
+      Alert.alert(messages);
+    } else {
+      handleSubmit();
+    }
+  };
   const {width: windowWidth} = useWindowDimensions();
   const {data: tags} = useAPIGetUserTag();
   const [visibleTagModal, setVisibleTagModal] = useState(false);
@@ -162,7 +171,7 @@ const Profile: React.FC = () => {
         bottom={10}
         alignSelf="flex-end"
         rounded="circle"
-        onPress={() => handleSubmit()}>
+        onPress={() => checkValidateErrors()}>
         <Icon color="white" name="check" fontSize={32} />
       </Button>
       {profile && (
