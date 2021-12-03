@@ -1,4 +1,6 @@
 apply plugin: "com.android.application"
+//firebase
+apply plugin: 'com.google.gms.google-services'
 apply from: project(':react-native-config').projectDir.getPath() + "/dotenv.gradle"
 
 import com.android.build.OutputFile
@@ -208,6 +210,8 @@ dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
     //noinspection GradleDynamicVersion
     implementation "com.facebook.react:react-native:+"  // From node_modules
+		implementation "androidx.core:core-splashscreen:1.0.0-alpha02" // Add this line
+
     implementation project(':react-native-config')
 
 

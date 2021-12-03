@@ -25,6 +25,7 @@ import ChatMenu from '../../screens/Chat/ChatMenu';
 import ChatNotes from '../../screens/Chat/ChatMenu/ChatNote';
 import PostChatNote from '../../screens/Chat/ChatMenu/ChatNote/PostChatNote';
 import EditChatNote from '../../screens/Chat/ChatMenu/ChatNote/EditChatNote';
+import PostAnswer from '../../screens/wiki/PostAnswer';
 import ChatAlbums from '../../screens/Chat/ChatMenu/ChatAlbum';
 import PostChatAlbum from '../../screens/Chat/ChatMenu/ChatAlbum/PostAlbum';
 import AlbumDetail from '../../screens/Chat/ChatMenu/ChatAlbum/AlbumDetail';
@@ -55,6 +56,11 @@ const WikiStack = () => (
     <Stack.Screen
       name="EditWiki"
       component={EditWiki}
+      options={{headerShown: false}}
+    />
+    <Stack.Screen
+      name="PostAnswer"
+      component={PostAnswer}
       options={{headerShown: false}}
     />
   </Stack.Navigator>

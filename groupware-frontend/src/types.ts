@@ -73,6 +73,7 @@ export interface User {
   updatedAt: Date;
   deletedAt: Date | null;
   existence: boolean | null;
+  chatMessageReactions?: ChatMessageReaction[];
   tags?: Tag[];
   submissionFiles?: SubmissionFile[];
   hostingEvents?: EventSchedule[];
@@ -247,6 +248,7 @@ export interface ChatMessage {
   content: string;
   type: ChatMessageType;
   chatGroup?: ChatGroup;
+  chatMessages?: ChatMessage[];
   sender?: User;
   createdAt: Date;
   updatedAt: Date;
@@ -309,4 +311,14 @@ export interface ChatAlbumImage {
   chatAlbum?: ChatAlbum;
   createdAt: Date;
   updatedAt: Date;
+}
+
+export interface ChatMessageReaction {
+  id: number;
+  emoji: string;
+  user?: User;
+  chatMessage?: ChatMessage;
+  createdAt: Date;
+  updatedAt: Date;
+  isSender?: boolean;
 }

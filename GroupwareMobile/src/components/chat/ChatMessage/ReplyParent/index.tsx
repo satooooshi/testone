@@ -27,8 +27,7 @@ const ReplyParent: React.FC<ReplyParentProps> = ({parentMessage}) => {
       alignItems="center"
       borderBottomWidth={0.5}
       borderBottomColor="white"
-      pb="sm"
-      mb="sm">
+      pb="sm">
       <Image
         w={32}
         h={32}
@@ -40,19 +39,10 @@ const ReplyParent: React.FC<ReplyParentProps> = ({parentMessage}) => {
         }
       />
       <Div w={'65%'}>
-        <Text
-          color="white"
-          fontWeight="bold"
-          fontSize={14}
-          borderBottomWidth={1}
-          borderBottomColor="white">
+        <Text color="white" fontWeight="bold" fontSize={14}>
           {userNameFactory(parentMessage.sender)}
         </Text>
-        <Text
-          color="white"
-          fontSize={14}
-          borderBottomWidth={1}
-          borderBottomColor="white">
+        <Text color="white" fontSize={14}>
           {content(parentMessage.type)}
         </Text>
       </Div>
