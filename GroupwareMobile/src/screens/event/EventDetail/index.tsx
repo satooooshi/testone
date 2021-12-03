@@ -271,56 +271,6 @@ const EventDetail: React.FC = () => {
       </>
     );
   };
-
-  const Comments = () => {
-    return (
-      <Div m={16}>
-        <View style={eventDetail.comment_count_wrapper}>
-          <Text>
-            コメント{eventInfo?.comments.length ? eventInfo.comments.length : 0}
-            件
-          </Text>
-          <Button
-            fontSize={'xs'}
-            h={21}
-            py={0}
-            color="white"
-            onPress={() => {
-              commentVisible ? checkValidateErrors() : setCommentVisible(true);
-            }}>
-            {commentVisible ? 'コメントを投稿する' : 'コメントを追加'}
-          </Button>
-        </View>
-        {commentVisible && (
-          <TextInput
-            value={values.body}
-            onChangeText={t => setValues({...values, body: t})}
-            placeholder="コメントを記入してください。"
-            textAlignVertical={'top'}
-            multiline={true}
-            autoCapitalize="none"
-            style={eventDetail.create_comment_form}
-          />
-        )}
-        {eventInfo?.comments && eventInfo?.comments.length
-          ? eventInfo?.comments.map(
-              comment =>
-                comment.writer && (
-                  <>
-                    <EventCommentCard
-                      key={comment.id}
-                      body={comment.body}
-                      date={comment.createdAt}
-                      writer={comment.writer}
-                    />
-                  </>
-                ),
-            )
-          : null}
-      </Div>
-    );
-  };
-
   useEffect(() => {
     if (isLoadingGetEventDetail || isLoadingSaveEvent) {
       setScreenLoading(true);
@@ -366,9 +316,53 @@ const EventDetail: React.FC = () => {
               </>
             )}
             {eventInfo.type !== EventType.SUBMISSION_ETC && (
-              <>
-                <Comments />
-              </>
+              <Div m={16}>
+                <View style={eventDetail.comment_count_wrapper}>
+                  <Text>
+                    コメント
+                    {eventInfo?.comments.length ? eventInfo.comments.length : 0}
+                    件
+                  </Text>
+                  <Button
+                    fontSize={'xs'}
+                    h={21}
+                    py={0}
+                    color="white"
+                    onPress={() => {
+                      commentVisible
+                        ? checkValidateErrors()
+                        : setCommentVisible(true);
+                    }}>
+                    {commentVisible ? 'コメントを投稿する' : 'コメントを追加'}
+                  </Button>
+                </View>
+                {commentVisible && (
+                  <TextInput
+                    value={values.body}
+                    onChangeText={t => setValues({...values, body: t})}
+                    placeholder="コメントを記入してください。"
+                    textAlignVertical={'top'}
+                    multiline={true}
+                    autoCapitalize="none"
+                    style={eventDetail.create_comment_form}
+                  />
+                )}
+                {eventInfo?.comments && eventInfo?.comments.length
+                  ? eventInfo?.comments.map(
+                      comment =>
+                        comment.writer && (
+                          <>
+                            <EventCommentCard
+                              key={comment.id}
+                              body={comment.body}
+                              date={comment.createdAt}
+                              writer={comment.writer}
+                            />
+                          </>
+                        ),
+                    )
+                  : null}
+              </Div>
             )}
           </Div>
         ) : null}
