@@ -63,6 +63,10 @@ export const savingEventSchema = Yup.object().shape({
     .required(`終了日時は${requireMessage}`),
   tags: Yup.array().min(1, minTagsMessage),
 });
+
 export const savingRoomSchema = Yup.object().shape({
+  name: Yup.string()
+    .required(`グループ名は${requireMessage}`)
+    .max(50, `グループ名は${nWordLimitMessage(50)}`),
   members: Yup.array().min(1, minRoomUserMessage),
 });

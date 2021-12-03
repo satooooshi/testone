@@ -38,13 +38,14 @@ const NewRoom: React.FC = () => {
     imageURL: '',
     members: [],
   };
-  const {values, handleSubmit, setValues} = useFormik({
-    initialValues,
-    onSubmit: submittedValues => {
-      createGroup(submittedValues);
-    },
-    validationSchema: savingRoomSchema,
-  });
+  const {values, setValues, handleChange, handleSubmit, errors, touched} =
+    useFormik({
+      initialValues,
+      onSubmit: submittedValues => {
+        createGroup(submittedValues);
+      },
+      validationSchema: savingRoomSchema,
+    });
   const {mutate: createGroup} = useAPISaveChatGroup({
     onSuccess: () => {
       Alert.alert('チャットルームの作成が完了しました。', undefined, [
@@ -135,9 +136,14 @@ const NewRoom: React.FC = () => {
           <Text fontSize={16} fontWeight="bold">
             ルーム名
           </Text>
+          {errors.name && touched.name ? (
+            <Text fontSize={16} color="tomato">
+              {errors.name}
+            </Text>
+          ) : null}
           <Input
             value={values.name}
-            onChangeText={t => setValues({...values, name: t})}
+            onChangeText={handleChange('name')}
             placeholder="ルーム名を入力してください"
             autoCapitalize="none"
           />
@@ -152,6 +158,11 @@ const NewRoom: React.FC = () => {
             メンバーを編集
           </Button>
         </Div>
+        {errors.members && touched.members ? (
+          <Text fontSize={16} color="tomato">
+            {errors.members}
+          </Text>
+        ) : null}
         <Div flexDir="row" flexWrap="wrap" mb={'lg'}>
           {values.members?.map(u => (
             <TagButton key={u.id} mr={4} mb={8} color="white" bg={'purple800'}>
