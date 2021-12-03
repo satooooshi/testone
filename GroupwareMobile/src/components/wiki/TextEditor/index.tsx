@@ -32,6 +32,20 @@ const TextEditor: React.FC<TextEditorProps> = ({
     <Div mb={16}>
       {textFormat === 'html' ? (
         <>
+          <RichEditor
+            placeholder="本文を入力してください"
+            ref={editorRef}
+            style={{
+              ...textEditorStyles.richEditor,
+              height: windowHeight * 0.6,
+            }}
+            initialHeight={300}
+            initialContentHTML={initialBody}
+            useContainer={true}
+            scrollEnabled={true}
+            editorInitializedCallback={editorInitializedCallback}
+            onChange={onChange}
+          />
           <RichToolbar
             editor={editorRef}
             selectedIconTint={'#2095F2'}
@@ -39,7 +53,9 @@ const TextEditor: React.FC<TextEditorProps> = ({
               if (editorRef.current) {
                 onUploadImage(imageUrl =>
                   //@ts-ignore If write this like editorRef.current?.insertImage it doesn't work on initial uploading.
-                  editorRef.current.insertImage(imageUrl[0]),
+                  {
+                    editorRef.current?.insertImage(imageUrl[0]);
+                  },
                 );
               }
             }}
@@ -53,7 +69,7 @@ const TextEditor: React.FC<TextEditorProps> = ({
               actions.heading6,
               'bold',
               actions.setStrikethrough,
-              actions.insertOrderedList,
+              // actions.insertOrderedList,
               actions.blockquote,
               actions.code,
               actions.insertImage,
@@ -69,20 +85,6 @@ const TextEditor: React.FC<TextEditorProps> = ({
               [actions.heading6]: () => <Text>H6</Text>,
               [actions.bold]: () => <Text fontWeight="bold">B</Text>,
             }}
-          />
-          <RichEditor
-            placeholder="本文を入力してください"
-            ref={editorRef}
-            style={{
-              ...textEditorStyles.richEditor,
-              height: windowHeight * 0.6,
-            }}
-            initialHeight={300}
-            initialContentHTML={initialBody}
-            useContainer={true}
-            scrollEnabled={true}
-            editorInitializedCallback={editorInitializedCallback}
-            onChange={onChange}
           />
         </>
       ) : textFormat === 'markdown' ? (
@@ -108,7 +110,7 @@ const TextEditor: React.FC<TextEditorProps> = ({
               actions.heading6,
               'bold',
               actions.setStrikethrough,
-              actions.insertOrderedList,
+              // actions.insertOrderedList,
               actions.blockquote,
               actions.code,
               actions.insertImage,
