@@ -21,7 +21,7 @@ import {
 } from '../../../hooks/api/event/useAPIGetEventList';
 import {useAuthenticate} from '../../../contexts/useAuthenticate';
 import {eventTypeColorFactory} from '../../../utils/factory/eventTypeColorFactory';
-import {Button, Div, Icon} from 'react-native-magnus';
+import {Button, Div, Icon, ScrollDiv} from 'react-native-magnus';
 import {darkFontColor} from '../../../utils/colors';
 import {calendarStyles} from '../../../styles/component/event/eventCalendar.style';
 import {DateTime} from 'luxon';
@@ -125,11 +125,11 @@ const EventCalendar: React.FC<PersonalCalendarProps> = ({
     const existCount = filteredEvents.length;
     if (existCount) {
       const filteredEventIds = filteredEvents.map(e => e.id);
-
-      return (
+      const marginLeft =
         filteredEventIds.indexOf(event.id) *
-        Math.floor(maxLeftMarginNum / filteredEvents.length)
-      );
+        Math.floor(maxLeftMarginNum / filteredEvents.length);
+
+      return marginLeft;
     }
     return 0;
   };
@@ -294,53 +294,55 @@ const EventCalendar: React.FC<PersonalCalendarProps> = ({
           </Button>
         </Div>
       </Div>
-      <Calendar
-        bodyContainerStyle={calendarStyles.container}
-        headerContainerStyle={calendarStyles.container}
-        onPressDateHeader={onPressDateHeader}
-        renderHeader={
-          calendarMode.mode === 'day'
-            ? () => (
-                <CalendarHeader
-                  onPressDateHeader={onPressDateHeader}
-                  dateRange={dateRange}
-                  cellHeight={headerCellHeight}
-                  allDayEvents={allDayEvents}
-                  style={calendarStyles.container}
-                  activeDate={calendarMode.targetDate}
-                />
-              )
-            : undefined
-        }
-        activeDate={calendarMode.targetDate}
-        date={calendarMode.targetDate}
-        events={memorizedEvent}
-        mode={calendarMode.mode}
-        onPressEvent={event => {
-          navigation.navigate('EventStack', {
-            screen: 'EventDetail',
-            params: {id: event.id},
-          });
-        }}
-        onPressCell={date => setCalendarMode({mode: 'day', targetDate: date})}
-        height={calendarHeight}
-        eventCellStyle={
-          calendarMode.mode === 'day'
-            ? event => ({
-                backgroundColor: eventTypeColorFactory(event.type),
-                borderColor: '#e0e0e0',
-                borderWidth: 1,
-                width: `${eventWidth(event)} %`,
-                minWidth: '33%',
-                marginLeft: eventPosition(event),
-              })
-            : event => ({
-                backgroundColor: eventTypeColorFactory(event.type),
-                borderColor: '#e0e0e0',
-                borderWidth: 1,
-              })
-        }
-      />
+      <ScrollDiv>
+        <Calendar
+          bodyContainerStyle={calendarStyles.container}
+          headerContainerStyle={calendarStyles.container}
+          onPressDateHeader={onPressDateHeader}
+          renderHeader={
+            calendarMode.mode === 'day'
+              ? () => (
+                  <CalendarHeader
+                    onPressDateHeader={onPressDateHeader}
+                    dateRange={dateRange}
+                    cellHeight={headerCellHeight}
+                    allDayEvents={allDayEvents}
+                    style={calendarStyles.container}
+                    activeDate={calendarMode.targetDate}
+                  />
+                )
+              : undefined
+          }
+          activeDate={calendarMode.targetDate}
+          date={calendarMode.targetDate}
+          events={memorizedEvent}
+          mode={calendarMode.mode}
+          onPressEvent={event => {
+            navigation.navigate('EventStack', {
+              screen: 'EventDetail',
+              params: {id: event.id},
+            });
+          }}
+          onPressCell={date => setCalendarMode({mode: 'day', targetDate: date})}
+          height={calendarHeight + 120}
+          eventCellStyle={
+            calendarMode.mode === 'day'
+              ? event => ({
+                  backgroundColor: eventTypeColorFactory(event.type),
+                  borderColor: '#e0e0e0',
+                  borderWidth: 1,
+                  width: `${eventWidth(event)} %`,
+                  minWidth: '33%',
+                  marginLeft: eventPosition(event),
+                })
+              : event => ({
+                  backgroundColor: eventTypeColorFactory(event.type),
+                  borderColor: '#e0e0e0',
+                  borderWidth: 1,
+                })
+          }
+        />
+      </ScrollDiv>
     </>
   );
 };
