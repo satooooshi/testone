@@ -37,7 +37,6 @@ import EventCommentCard from '../EventCommentCard';
 import {eventDetail} from '../../../styles/component/event/eventDetail.style';
 import {createCommentSchema} from '../../../utils/validation/schema';
 import {formikErrorMsgFactory} from '../../../utils/factory/formikEroorMsgFactory';
-import {responseErrorMsgFactory} from '../../../utils/factory/responseErrorMsgFactory';
 
 const EventDetail: React.FC = () => {
   const route = useRoute<EventDetailRouteProps>();
