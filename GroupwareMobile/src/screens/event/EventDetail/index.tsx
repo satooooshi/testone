@@ -35,6 +35,9 @@ import {EventComment, EventType} from '../../../types';
 import {useAPICreateComment} from '../../../hooks/api/event/useAPICreateComment';
 import EventCommentCard from '../EventCommentCard';
 import {eventDetail} from '../../../styles/component/event/eventDetail.style';
+import {createCommentSchema} from '../../../utils/validation/schema';
+import {formikErrorMsgFactory} from '../../../utils/factory/formikEroorMsgFactory';
+import {responseErrorMsgFactory} from '../../../utils/factory/responseErrorMsgFactory';
 
 const EventDetail: React.FC = () => {
   const route = useRoute<EventDetailRouteProps>();
@@ -89,26 +92,47 @@ const EventDetail: React.FC = () => {
       format: 'yyyy/LL/dd HH:mm',
     });
   }, [eventInfo]);
-  const {mutate: createComment, isLoading} = useAPICreateComment({
+  const {mutate: createComment} = useAPICreateComment({
     onSuccess: responseData => {
       if (responseData) {
         Alert.alert('コメントを投稿しました。');
+        setValues(t => ({...t, body: ''}));
+        setCommentVisible(false);
+        refetchEvents();
       }
     },
-    onError: responseData => {
-      if (responseData) {
-        Alert.alert(responseData.message);
+    onError: err => {
+      if (err.response?.data) {
+        Alert.alert((err.response?.data as AxiosError)?.message.toString());
       }
     },
   });
-  const {values, setValues, handleSubmit} = useFormik<Partial<EventComment>>({
+
+  const checkValidateErrors = async () => {
+    const errors = await validateForm();
+    const messages = formikErrorMsgFactory(errors);
+    if (messages) {
+      Alert.alert(messages);
+    } else {
+      onComplete();
+    }
+  };
+
+  const {
+    values,
+    setValues,
+    handleSubmit: onComplete,
+    validateForm,
+  } = useFormik<Partial<EventComment>>({
     initialValues: initialValues,
     enableReinitialize: true,
-    onSubmit: v =>
+    validationSchema: createCommentSchema,
+    onSubmit: v => {
       createComment({
         body: v.body,
         eventSchedule: eventInfo,
-      }),
+      });
+    },
   });
 
   const isFinished = eventInfo?.endAt
@@ -262,13 +286,22 @@ const EventDetail: React.FC = () => {
             py={0}
             color="white"
             onPress={() => {
-              commentVisible && newComment
-                ? handleCreateComment()
-                : setCommentVisible(true);
+              commentVisible ? checkValidateErrors() : setCommentVisible(true);
             }}>
             {commentVisible ? 'コメントを投稿する' : 'コメントを追加'}
           </Button>
         </View>
+        {commentVisible && (
+          <TextInput
+            value={values.body}
+            onChangeText={t => setValues({...values, body: t})}
+            placeholder="コメントを記入してください。"
+            textAlignVertical={'top'}
+            multiline={true}
+            autoCapitalize="none"
+            style={eventDetail.create_comment_form}
+          />
+        )}
         {eventInfo?.comments && eventInfo?.comments.length
           ? eventInfo?.comments.map(
               comment =>
@@ -284,42 +317,6 @@ const EventDetail: React.FC = () => {
                 ),
             )
           : null}
-      </Div>
-    );
-  };
-
-  const CreateCommentForm = () => {
-    return (
-      <Div m={16}>
-        <TextInput
-          value={values.body}
-          onChangeText={t => setValues(e => ({...e, body: t}))}
-          placeholder="コメントを記入してください。"
-          numberOfLines={10}
-          textAlignVertical={'top'}
-          multiline={true}
-          // style={eventFormModalStyles.descriptionInput}
-        />
-        {/* {commentVisible && (
-          <Textarea
-            height="56"
-            background="white"
-            placeholder="コメントを記入してください。"
-            value={newComment}
-            onChange={e => setNewComment(e.target.value)}
-            className={eventDetailStyles.comment_input}
-            autoFocus
-          />
-        )} */}
-        <Button
-          fontSize={'xs'}
-          h={28}
-          py={0}
-          color="white"
-          mr={4}
-          onPress={() => handleSubmit()}>
-          コメントを投稿
-        </Button>
       </Div>
     );
   };
@@ -371,7 +368,6 @@ const EventDetail: React.FC = () => {
             {eventInfo.type !== EventType.SUBMISSION_ETC && (
               <>
                 <Comments />
-                <CreateCommentForm />
               </>
             )}
           </Div>

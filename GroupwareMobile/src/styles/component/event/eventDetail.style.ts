@@ -33,4 +33,12 @@ export const eventDetail = StyleSheet.create({
     borderRadius: 8,
     backgroundColor: 'white',
   },
+  create_comment_form: {
+    borderRadius: 8,
+    height: 100,
+    padding: 8,
+    backgroundColor: 'white',
+    borderColor: 'rgb(49, 130, 206)',
+    borderWidth: 1,
+  },
 });
