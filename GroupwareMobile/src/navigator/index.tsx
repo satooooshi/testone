@@ -10,7 +10,7 @@ import {RootStackParamList} from '../types/navigator/RootStackParamList';
 import DrawerTab from './Drawer';
 import {tokenString} from '../utils/url';
 import messaging from '@react-native-firebase/messaging';
-import PushNotification, {Importance} from 'react-native-push-notification';
+import PushNotification from 'react-native-push-notification';
 import {Platform} from 'react-native';
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -59,22 +59,8 @@ const Navigator = () => {
           naviateByNotif(notification);
         }
       },
-      onAction: notification => {
-        // naviateByNotif(notification);
-        // console.log('pressed?', notification);
-      },
       requestPermissions: true,
     });
-    // PushNotification.createChannel(
-    //   {
-    //     channelId: 'default-channel-id',
-    //     channelName: 'ボールドからの通知',
-    //     importance: Importance.DEFAULT,
-    //   },
-    //   result => {
-    //     console.log('result', result);
-    //   },
-    // );
     const unsubscribe = messaging().onMessage(async remoteMessage => {
       console.log(remoteMessage);
       PushNotification.localNotification({
