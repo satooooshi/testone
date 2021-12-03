@@ -3,6 +3,8 @@
 #import <Firebase.h>
 #import "AppDelegate.h"
 
+#import "RNBootSplash.h"
+
 #import <React/RCTBridge.h>
 #import <React/RCTBundleURLProvider.h>
 #import <React/RCTRootView.h>
@@ -53,6 +55,7 @@ static void InitializeFlipper(UIApplication *application) {
   [self.window makeKeyAndVisible];
   UNUserNotificationCenter *center = [UNUserNotificationCenter currentNotificationCenter];
     center.delegate = self;
+  [RNBootSplash initWithStoryboard:@"BootSplash" rootView:rootView]; 
   return YES;
 }
 

@@ -5,6 +5,7 @@ import {QueryClientProvider, QueryClient} from 'react-query';
 import 'react-native-gesture-handler';
 import {requestIOSMsgPermission} from './utils/permission/requestIOSMsgPermisson';
 import messaging from '@react-native-firebase/messaging';
+import RNBootSplash from 'react-native-bootsplash';
 
 const App = () => {
   const queryClient = new QueryClient();
@@ -26,6 +27,12 @@ const App = () => {
       });
     };
     handleMessaging();
+  }, []);
+
+  useEffect(() => {
+    (async () => {
+      await RNBootSplash.hide({fade: true});
+    })();
   }, []);
 
   return (
