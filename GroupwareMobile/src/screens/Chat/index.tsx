@@ -4,7 +4,6 @@ import {
   FlatList,
   Keyboard,
   KeyboardAvoidingView,
-  Modal,
   Platform,
   TouchableOpacity,
   useWindowDimensions,
@@ -34,7 +33,6 @@ import {
 import {uploadImageFromGallery} from '../../utils/cropImage/uploadImageFromGallery';
 import DocumentPicker from 'react-native-document-picker';
 import ImageView from 'react-native-image-viewing';
-import Video from 'react-native-video';
 import TextMessage from '../../components/chat/ChatMessage/TextMessage';
 import ImageMessage from '../../components/chat/ChatMessage/ImageMessage';
 import VideoMessage from '../../components/chat/ChatMessage/VideoMessage';
@@ -108,10 +106,11 @@ const Chat: React.FC = () => {
       sendChatMessage(submittedValues);
     },
   });
-  const {data: fetchedMessage, isLoading: loadingMessages} = useAPIGetMessages({
-    group: room.id,
-    page: page.toString(),
-  });
+  const {data: fetchedPastMessages, isLoading: loadingMessages} =
+    useAPIGetMessages({
+      group: room.id,
+      page: page.toString(),
+    });
   const {data: latestMessage} = useAPIGetMessages(
     {
       group: room.id,
@@ -353,9 +352,9 @@ const Chat: React.FC = () => {
   }, [latestMessage]);
 
   useEffect(() => {
-    if (fetchedMessage?.length) {
+    if (fetchedPastMessages?.length) {
       const handleImages = () => {
-        const fetchedImages: ImageSource[] = fetchedMessage
+        const fetchedImages: ImageSource[] = fetchedPastMessages
           .filter(m => m.type === ChatMessageType.IMAGE)
           .map(m => ({uri: m.content}))
           .reverse();
@@ -365,20 +364,20 @@ const Chat: React.FC = () => {
         messages?.length &&
         isRecent(
           messages[messages.length - 1],
-          fetchedMessage[fetchedMessage.length - 1],
+          fetchedPastMessages[fetchedPastMessages.length - 1],
         )
       ) {
         setMessages(m => {
-          return [...m, ...fetchedMessage];
+          return [...m, ...fetchedPastMessages];
         });
         handleImages();
       } else if (!messages?.length) {
-        setMessages(fetchedMessage);
+        setMessages(fetchedPastMessages);
         handleImages();
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [fetchedMessage]);
+  }, [fetchedPastMessages]);
 
   const reactionRemovedDuplicates = (reactions: ChatMessageReaction[]) => {
     const reactionsNoDuplicates: ChatMessageReaction[] = [];
