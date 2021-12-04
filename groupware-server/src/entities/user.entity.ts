@@ -23,6 +23,7 @@ import { SubmissionFile } from './submissionFiles.entity';
 import { UserTag } from './userTag.entity';
 import { UserJoiningEvent } from './userJoiningEvent.entity';
 import { ChatMessageReaction } from './chatMessageReaction.entity';
+import { NotificationDevice } from './device.entity';
 
 export enum UserRole {
   ADMIN = 'admin',
@@ -219,6 +220,12 @@ export class User {
     onDelete: 'CASCADE',
   })
   hostingEvents?: EventSchedule[];
+
+  @OneToMany(
+    () => NotificationDevice,
+    (notificationDevices) => notificationDevices.user,
+  )
+  notificationDevices?: NotificationDevice[];
 
   @OneToMany(
     () => UserJoiningEvent,
