@@ -1,7 +1,7 @@
 import {useNavigation, useRoute} from '@react-navigation/native';
 import React, {useEffect, useState} from 'react';
 import {FlatList} from 'react-native';
-import {Button, Icon, Text} from 'react-native-magnus';
+import {Button, Div, Icon, Text} from 'react-native-magnus';
 import AlbumBox from '../../../../components/chat/AlbumBox';
 import HeaderWithTextButton from '../../../../components/Header';
 import WholeContainer from '../../../../components/WholeContainer';
@@ -86,7 +86,9 @@ const ChatAlbums: React.FC = () => {
           )}
         />
       ) : (
-        <Text fontSize={16}>まだアルバムが投稿されていません</Text>
+        <Div p={'sm'}>
+          <Text fontSize={16}>まだアルバムが投稿されていません</Text>
+        </Div>
       )}
     </WholeContainer>
   );

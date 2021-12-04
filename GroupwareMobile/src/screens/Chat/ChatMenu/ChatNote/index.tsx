@@ -115,8 +115,8 @@ const ChatNotes: React.FC = () => {
           )}
         />
       ) : (
-        <Div bg="white">
-          <Text>まだノートが投稿されていません</Text>
+        <Div p={'sm'}>
+          <Text fontSize={16}>まだノートが投稿されていません</Text>
         </Div>
       )}
     </WholeContainer>
