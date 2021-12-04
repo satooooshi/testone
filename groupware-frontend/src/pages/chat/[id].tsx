@@ -1,9 +1,8 @@
 import { SidebarScreenName } from '@/components/layout/Sidebar';
-import { useChatReducer } from '@/hooks/chat/useChatReducer';
 import { MenuValue, useModalReducer } from '@/hooks/chat/useModalReducer';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useAPIGetUsers } from '@/hooks/api/user/useAPIGetUsers';
-import { ChatGroup, ChatMessageType } from 'src/types';
+import { ChatGroup, ChatMessage, ChatMessageType } from 'src/types';
 import { useAPIGetChatGroupList } from '@/hooks/api/chat/useAPIGetChatGroupList';
 import { useAPIGetMessages } from '@/hooks/api/chat/useAPIGetMessages';
 import { useAPISendChatMessage } from '@/hooks/api/chat/useAPISendChatMessage';
@@ -38,10 +37,12 @@ const ChatDetail = () => {
   const { id } = router.query as { id: string };
   const [{ popup, suggestions, mentionedUserData }, dispatchMention] =
     useMention();
-  const [
-    { page, messages, lastReadChatTime, newChatMessage, editorState },
-    dispatchChat,
-  ] = useChatReducer();
+  const [page, setPage] = useState(1);
+  const [newChatMessage, setNewChatMessage] = useState<Partial<ChatMessage>>({
+    content: '',
+    type: ChatMessageType.TEXT,
+  });
+  const [editorState, setEditorState] = useState(EditorState.createEmpty());
   const [
     {
       editChatGroupModalVisible,
@@ -56,15 +57,16 @@ const ChatDetail = () => {
   const [groupImageURL, setGroupImageURL] = useState('');
   const { data: chatGroups, refetch: refetchGroups } = useAPIGetChatGroupList();
   const { data: users } = useAPIGetUsers();
-  const { data: lastestLastReadChatTime } = useAPIGetLastReadChatTime(
+  const { data: lastReadChatTime } = useAPIGetLastReadChatTime(
     newChatMessage.chatGroup ? newChatMessage.chatGroup.id : 0,
     { refetchInterval: 1000 },
   );
   const [isLargerTahn1024] = useMediaQuery('(min-width: 1024px)');
-  const { data: fetchedMessage } = useAPIGetMessages({
+  const { data: fetchedPastMessages } = useAPIGetMessages({
     group: newChatMessage.chatGroup ? newChatMessage.chatGroup.id : 0,
     page: page.toString(),
   });
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const { data: latestMessage, isLoading: isLoadingLatestMsg } =
     useAPIGetMessages(
       {
@@ -86,21 +88,18 @@ const ChatDetail = () => {
         duration: 3000,
         isClosable: true,
       });
-      dispatchChat({ type: 'messages', value: [] });
+      setMessages([]);
       router.push(`/chat/${data.id.toString()}`, undefined, {
         shallow: true,
       });
-      dispatchChat({ type: 'page', value: 1 });
+      setPage(1);
     },
   });
 
   const { mutate: saveGroup } = useAPISaveChatGroup({
     onSuccess: (newInfo) => {
       dispatchModal({ type: 'editChatGroupModalVisible', value: false });
-      dispatchChat({
-        type: 'newChatMessage',
-        value: { ...newChatMessage, chatGroup: newInfo },
-      });
+      setNewChatMessage((m) => ({ ...m, chatGroup: newInfo }));
       refetchGroups();
     },
   });
@@ -108,26 +107,20 @@ const ChatDetail = () => {
   const { mutate: sendChatMessage } = useAPISendChatMessage({
     onSuccess: (data) => {
       refetchGroups();
-      dispatchChat({
-        type: 'newChatMessage',
-        value: { ...newChatMessage, content: '' },
-      });
       if (!isLoadingLatestMsg) {
         if (messages.length && messages[messages.length - 1].id !== data.id) {
           messages.unshift(data);
         }
-        dispatchChat({ type: 'messages', value: messages });
+        setMessages(messages);
       }
-      dispatchChat({
-        type: 'editorState',
-        value: EditorState.createEmpty(),
-      });
+      setNewChatMessage((m) => ({ ...m, content: '' }));
+      setEditorState(EditorState.createEmpty());
       messageWrapperDivRef.current &&
         messageWrapperDivRef.current.scrollTo({ top: 0 });
     },
   });
 
-  const { mutate: saveLastReadChatTime } = useAPISaveLastReadChatTime({});
+  const { mutate: saveLastReadChatTime } = useAPISaveLastReadChatTime();
   const { mutate: leaveChatGroup } = useAPILeaveChatRoom({
     onSuccess: () => {
       router.push('/chat');
@@ -161,54 +154,73 @@ const ChatDetail = () => {
         messageWrapperDivRef.current.scrollTo({ top: 0 });
     },
   });
-  const isExist = useMemo(() => {
+  const focusedGroup = useMemo(() => {
     if (id) {
       return chatGroups?.filter((g) => g.id.toString() === id);
     }
   }, [id, chatGroups]);
 
   useEffect(() => {
-    if (isExist?.length) {
-      dispatchChat({
-        type: 'newChatMessage',
-        value: { ...newChatMessage, chatGroup: isExist[0] },
-      });
-      saveLastReadChatTime(isExist[0].id);
+    if (focusedGroup?.length) {
+      setNewChatMessage((m) => ({ ...m, chatGroup: focusedGroup[0] }));
+      saveLastReadChatTime(focusedGroup[0].id);
     }
-  }, [isExist]);
+  }, [focusedGroup, saveLastReadChatTime]);
+
+  const isRecent = (created: ChatMessage, target: ChatMessage): boolean => {
+    if (new Date(created.createdAt) > new Date(target.createdAt)) {
+      return true;
+    }
+    return false;
+  };
 
   useEffect(() => {
-    dispatchChat({
-      type: 'lastReadChatTime',
-      value: lastestLastReadChatTime,
-    });
-  }, [lastestLastReadChatTime]);
+    if (latestMessage?.length && messages?.length) {
+      const msgToAppend: ChatMessage[] = [];
+      for (const sentMsg of latestMessage) {
+        if (isRecent(sentMsg, messages[0])) {
+          msgToAppend.unshift(sentMsg);
+        }
+      }
+      setMessages((m) => {
+        return [...msgToAppend, ...m];
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [latestMessage]);
+
+  useEffect(() => {
+    if (fetchedPastMessages?.length) {
+      if (
+        messages?.length &&
+        isRecent(
+          messages[messages.length - 1],
+          fetchedPastMessages[fetchedPastMessages.length - 1],
+        )
+      ) {
+        setMessages((m) => {
+          return [...m, ...fetchedPastMessages];
+        });
+      } else if (!messages?.length) {
+        setMessages(fetchedPastMessages);
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fetchedPastMessages]);
 
   useEffect(() => {
     dispatchMention({
       type: 'allMentionUserData',
       value: newChatMessage?.chatGroup?.members,
     });
-  }, [newChatMessage?.chatGroup?.members]);
-
-  //append new message to array
-  useEffect(() => {
-    dispatchChat({ type: 'latestMessages', value: latestMessage });
-  }, [latestMessage]);
-
-  useEffect(() => {
-    dispatchChat({ type: 'fetchedMessages', value: fetchedMessage });
-  }, [fetchedMessage]);
+  }, [dispatchMention, newChatMessage?.chatGroup?.members]);
 
   const onChange = (newState: EditorState) => {
-    dispatchChat({ type: 'editorState', value: newState });
+    setEditorState(newState);
     const content = newState.getCurrentContent();
     const rawObject = convertToRaw(content);
     const markdownString = draftToMarkdown(rawObject);
-    dispatchChat({
-      type: 'newChatMessage',
-      value: { ...newChatMessage, content: markdownString },
-    });
+    setNewChatMessage((m) => ({ ...m, content: markdownString }));
   };
 
   const onOpenChange = useCallback(
@@ -229,10 +241,7 @@ const ChatDetail = () => {
   );
 
   const toggleChatGroups = (selectGroup: ChatGroup) => {
-    dispatchChat({
-      type: 'newChatMessage',
-      value: { ...newChatMessage, chatGroup: selectGroup },
-    });
+    setNewChatMessage((m) => ({ ...m, chatGroup: selectGroup }));
     dispatchModal({ type: 'selectChatGroupWindow', value: false });
   };
 
@@ -266,8 +275,8 @@ const ChatDetail = () => {
       e.target.clientHeight - e.target.scrollTop >=
       (e.target.scrollHeight * 2) / 3
     ) {
-      if (fetchedMessage?.length) {
-        dispatchChat({ type: 'page', value: page + 1 });
+      if (fetchedPastMessages?.length) {
+        setPage((p) => p + 1);
       }
     }
   };
@@ -413,7 +422,7 @@ const ChatDetail = () => {
                 messages={messages}
                 onSend={onSend}
                 suggestions={suggestions}
-                lastReadChatTime={lastReadChatTime}
+                lastReadChatTime={lastReadChatTime || []}
                 editorState={editorState}
                 onEditorChange={onChange}
                 onUploadFile={(f) => uploadFiles(f)}
