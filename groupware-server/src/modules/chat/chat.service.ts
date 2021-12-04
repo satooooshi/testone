@@ -411,6 +411,11 @@ export class ChatService {
           .createQueryBuilder('chat_groups')
           .relation('pinnedUsers')
           .of(newGroup.id)
+          .remove(userID);
+        await this.chatGroupRepository
+          .createQueryBuilder('chat_groups')
+          .relation('pinnedUsers')
+          .of(newGroup.id)
           .add(userID);
       } else {
         await this.chatGroupRepository

@@ -18,6 +18,16 @@ const ChatMenu: React.FC = () => {
     <WholeContainer>
       <HeaderWithTextButton title="メニュー" />
       <ChatMenuRow
+        name="ルームを編集"
+        icon={<Icon name="setting" fontSize={20} mr={'lg'} color="black" />}
+        onPress={() =>
+          navigation.navigate('ChatStack', {
+            screen: 'EditRoom',
+            params: {room},
+          })
+        }
+      />
+      <ChatMenuRow
         name="ノート"
         icon={<Icon name="filetext1" fontSize={20} mr={'lg'} color="black" />}
         onPress={() =>

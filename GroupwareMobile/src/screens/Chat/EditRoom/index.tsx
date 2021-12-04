@@ -1,26 +1,30 @@
-import {useNavigation} from '@react-navigation/native';
+import {useNavigation, useRoute} from '@react-navigation/native';
 import React from 'react';
 import {Alert} from 'react-native';
 import {useAPISaveChatGroup} from '../../../hooks/api/chat/useAPISaveChatGroup';
 import {useAPIUploadStorage} from '../../../hooks/api/storage/useAPIUploadStorage';
 import {useAPIGetUsers} from '../../../hooks/api/user/useAPIGetUsers';
 import RoomForm from '../../../templates/chat/room/RoomForm';
-import {NewRoomNavigationProps} from '../../../types/navigator/drawerScreenProps';
+import {
+  EditRoomNavigationProps,
+  EditRoomRouteProps,
+} from '../../../types/navigator/drawerScreenProps';
 
-const NewRoom: React.FC = () => {
-  const navigation = useNavigation<NewRoomNavigationProps>();
+const EditRoom: React.FC = () => {
+  const navigation = useNavigation<EditRoomNavigationProps>();
+  const {room} = useRoute<EditRoomRouteProps>().params;
   const {mutate: uploadImage} = useAPIUploadStorage();
   const {data: users} = useAPIGetUsers();
-  const headerTitle = 'ルーム新規作成';
-  const {mutate: createGroup} = useAPISaveChatGroup({
+  const headerTitle = 'ルーム編集';
+  const {mutate: updateGroup} = useAPISaveChatGroup({
     onSuccess: () => {
-      Alert.alert('チャットルームの作成が完了しました。', undefined, [
+      Alert.alert('ルームの更新が完了しました。', undefined, [
         {
           text: 'OK',
           onPress: () => {
             navigation.navigate('ChatStack', {
-              screen: 'RoomList',
-              params: {needRefetch: true},
+              screen: 'ChatMenu',
+              params: {room},
             });
           },
         },
@@ -31,7 +35,8 @@ const NewRoom: React.FC = () => {
     <RoomForm
       users={users || []}
       headerTitle={headerTitle}
-      onSubmit={submittedRoom => createGroup(submittedRoom)}
+      initialRoom={room}
+      onSubmit={submittedRoom => updateGroup(submittedRoom)}
       onUploadImage={(formData, onSuccessFunc) =>
         uploadImage(formData, {onSuccess: onSuccessFunc})
       }
@@ -39,4 +44,4 @@ const NewRoom: React.FC = () => {
   );
 };
 
-export default NewRoom;
+export default EditRoom;

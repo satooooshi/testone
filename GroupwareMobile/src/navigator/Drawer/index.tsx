@@ -31,6 +31,7 @@ import PostChatAlbum from '../../screens/Chat/ChatMenu/ChatAlbum/PostAlbum';
 import AlbumDetail from '../../screens/Chat/ChatMenu/ChatAlbum/AlbumDetail';
 import EditChatAlbum from '../../screens/Chat/ChatMenu/ChatAlbum/EditAlbum';
 import UserTagAdmin from '../../screens/admin/UserTagAdmin';
+import EditRoom from '../../screens/Chat/EditRoom';
 
 const Drawer = createDrawerNavigator();
 const Stack = createStackNavigator();
@@ -156,6 +157,11 @@ const ChatStack = () => (
     <Stack.Screen
       name="NewRoom"
       component={NewRoom}
+      options={{headerShown: false}}
+    />
+    <Stack.Screen
+      name="EditRoom"
+      component={EditRoom}
       options={{headerShown: false}}
     />
     <Stack.Screen name="Chat" component={Chat} options={{headerShown: false}} />
