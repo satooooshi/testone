@@ -4,24 +4,24 @@ import { useState } from 'react';
 import { useAPIGetUsers } from '@/hooks/api/user/useAPIGetUsers';
 import { useAPIGetChatGroupList } from '@/hooks/api/chat/useAPIGetChatGroupList';
 import CreateChatGroupModal from '@/components/chat/CreateChatGroupModal';
-import { useMediaQuery, useToast } from '@chakra-ui/react';
+import { Box, Text, useMediaQuery, useToast, Link } from '@chakra-ui/react';
 import '@draft-js-plugins/mention/lib/plugin.css';
 import '@draft-js-plugins/image/lib/plugin.css';
 import ChatGroupCard from '@/components/chat/ChatGroupCard';
 import LayoutWithTab from '@/components/layout/LayoutWithTab';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import selectChatGroupModalStyles from '@/styles/components/SelectChatGroupModal.module.scss';
 import { useAPISaveChatGroup } from '@/hooks/api/chat/useAPISaveChatGroup';
 import { useAPIUploadStorage } from '@/hooks/api/storage/useAPIUploadStorage';
-import { responseErrorMsgFactory } from 'src/utils/factory/responseErrorMsgFactory';
+import { darkFontColor } from 'src/utils/colors';
 
 const Chat = () => {
   const router = useRouter();
   const toast = useToast();
+  const [isLargerTahn1024] = useMediaQuery('(min-width: 1024px)');
+  const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
   const { data: chatGroups, refetch } = useAPIGetChatGroupList();
   const { data: users } = useAPIGetUsers();
-  const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
   const [createGroupWindow, setCreateGroupWindow] = useState(false);
   const [resetFormTrigger, setResetFormTrigger] = useState(false);
   const [groupImageURL, setGroupImageURL] = useState('');
@@ -77,9 +77,11 @@ const Chat = () => {
       )}
       {chatGroups && isSmallerThan768 ? (
         <>
-          <div className={selectChatGroupModalStyles.title_wrapper}>
-            <p className={selectChatGroupModalStyles.title}>ルームを選択</p>
-          </div>
+          <Box alignSelf="center">
+            <Text fontWeight="bold" color={darkFontColor} fontSize="14px">
+              ルームを選択
+            </Text>
+          </Box>
           <div className={chatStyles.groups_responsive}>
             {chatGroups.map((g) => (
               <a
@@ -97,39 +99,60 @@ const Chat = () => {
         </>
       ) : null}
       {!isSmallerThan768 && (
-        <div className={chatStyles.main}>
+        <Box
+          w="100%"
+          display="flex"
+          flexDir="row"
+          h="83vh"
+          justifyContent="center">
           {chatGroups && chatGroups.length ? (
             <>
-              <div className={chatStyles.groups}>
+              <Box
+                display={'flex'}
+                flexDir="column"
+                alignItems="center"
+                h="100%"
+                overflow="scroll"
+                w={isLargerTahn1024 ? '30%' : '40%'}>
                 {chatGroups ? (
                   chatGroups.map((g) => (
-                    <a
+                    <Link
                       onClick={() =>
                         router.push(`/chat/${g.id.toString()}`, undefined, {
                           shallow: true,
                         })
                       }
                       key={g.id}
-                      style={{ marginBottom: 8 }}>
+                      mb={'8px'}>
                       <ChatGroupCard chatGroup={g} key={g.id} />
-                    </a>
+                    </Link>
                   ))
                 ) : (
-                  <p>ルームを作成するか、招待をお待ちください</p>
+                  <Text>ルームを作成するか、招待をお待ちください</Text>
                 )}
-              </div>
-              <div className={chatStyles.empty_group_window}>
-                <p className={chatStyles.empty_group_message}>
+              </Box>
+
+              <Box
+                w="60vw"
+                h="100%"
+                display="flex"
+                flexDir="row"
+                justifyContent="center"
+                alignItems="center"
+                boxShadow="md"
+                bg="white"
+                borderRadius="md">
+                <Text position="absolute" top="auto" bottom="auto">
                   ルームを選択してください
-                </p>
-              </div>
+                </Text>
+              </Box>
             </>
           ) : (
-            <p className={chatStyles.empty_group_message}>
+            <Text position="absolute" top="auto" bottom="auto">
               ルームを作成するか、招待をお待ちください
-            </p>
+            </Text>
           )}
-        </div>
+        </Box>
       )}
     </LayoutWithTab>
   );

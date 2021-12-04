@@ -1,19 +1,15 @@
 import { SidebarScreenName } from '@/components/layout/Sidebar';
-import chatStyles from '@/styles/layouts/Chat.module.scss';
-import { IoSend } from 'react-icons/io5';
 import { useChatReducer } from '@/hooks/chat/useChatReducer';
 import { MenuValue, useModalReducer } from '@/hooks/chat/useModalReducer';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useAPIGetUsers } from '@/hooks/api/user/useAPIGetUsers';
-import { ChatGroup, ChatMessageType, User } from 'src/types';
+import { ChatGroup, ChatMessageType } from 'src/types';
 import { useAPIGetChatGroupList } from '@/hooks/api/chat/useAPIGetChatGroupList';
 import { useAPIGetMessages } from '@/hooks/api/chat/useAPIGetMessages';
 import { useAPISendChatMessage } from '@/hooks/api/chat/useAPISendChatMessage';
 import CreateChatGroupModal from '@/components/chat/CreateChatGroupModal';
-import { Avatar, useMediaQuery, useToast } from '@chakra-ui/react';
+import { useMediaQuery, useToast, Box, Link } from '@chakra-ui/react';
 import { convertToRaw, EditorState } from 'draft-js';
-import Editor from '@draft-js-plugins/editor';
-import createMentionPlugin from '@draft-js-plugins/mention';
 import { MentionData } from '@draft-js-plugins/mention';
 import '@draft-js-plugins/mention/lib/plugin.css';
 import { draftToMarkdown } from 'markdown-draft-js';
@@ -21,24 +17,20 @@ import '@draft-js-plugins/image/lib/plugin.css';
 import ChatGroupCard from '@/components/chat/ChatGroupCard';
 import LayoutWithTab from '@/components/layout/LayoutWithTab';
 import { Tab } from 'src/types/header/tab/types';
-import { AiOutlinePaperClip } from 'react-icons/ai';
-import { useDropzone } from 'react-dropzone';
 import { useAPIUploadStorage } from '@/hooks/api/storage/useAPIUploadStorage';
 import { isImage, isVideo } from '../../utils/indecateChatMessageType';
 import SelectChatGroupModal from '@/components/chat/SelectChatGroupModal';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import { HiOutlineDotsCircleHorizontal } from 'react-icons/hi';
-import { Menu, MenuItem, MenuButton } from '@szhsin/react-menu';
 import EditChatGroupModal from '@/components/chat/EditChatGroupModal';
 import EditChatGroupMembersModal from '@/components/chat/EditChatGroupMembersModal';
 import { useAPISaveChatGroup } from '@/hooks/api/chat/useAPISaveChatGroup';
 import { useAPIGetLastReadChatTime } from '@/hooks/api/chat/useAPIGetLastReadChatTime';
 import { useAPISaveLastReadChatTime } from '@/hooks/api/chat/useAPISaveLastReadChatTime';
 import { useHeaderTab } from '@/hooks/headerTab/useHeaderTab';
-import ChatMessageItem from '@/components/chat/ChatMessageItem';
 import { useAPILeaveChatRoom } from '@/hooks/api/chat/useAPILeaveChatRoomURL';
 import { useMention } from '@/hooks/chat/useMention';
+import ChatBox from '@/components/chat/ChatBox';
 
 const ChatDetail = () => {
   const toast = useToast();
@@ -68,6 +60,7 @@ const ChatDetail = () => {
     newChatMessage.chatGroup ? newChatMessage.chatGroup.id : 0,
     { refetchInterval: 1000 },
   );
+  const [isLargerTahn1024] = useMediaQuery('(min-width: 1024px)');
   const { data: fetchedMessage } = useAPIGetMessages({
     group: newChatMessage.chatGroup ? newChatMessage.chatGroup.id : 0,
     page: page.toString(),
@@ -80,7 +73,6 @@ const ChatDetail = () => {
       },
       { refetchInterval: 1000 },
     );
-  const editorRef = useRef<Editor>(null);
   const messageWrapperDivRef = useRef<HTMLDivElement | null>(null);
   const { mutate: createGroup } = useAPISaveChatGroup({
     onSuccess: (data) => {
@@ -147,19 +139,6 @@ const ChatDetail = () => {
       setGroupImageURL(fileURLs[0]);
     },
   });
-
-  const { getRootProps: getRootProps, getInputProps: getInputProps } =
-    useDropzone({
-      noDrag: true,
-      onDrop: (f) => uploadFiles(f),
-    });
-
-  const { MentionSuggestions, plugins } = useMemo(() => {
-    const mentionPlugin = createMentionPlugin();
-    const { MentionSuggestions } = mentionPlugin;
-    const plugins = [mentionPlugin];
-    return { plugins, MentionSuggestions };
-  }, []);
 
   const tabs: Tab[] = useHeaderTab({
     headerTabType: 'chatDetail',
@@ -249,17 +228,6 @@ const ChatDetail = () => {
     [dispatchMention],
   );
 
-  const nameOfEmptyNameGroup = (members?: User[]): string => {
-    if (!members) {
-      return 'メンバーがいません';
-    }
-    const strMembers = members?.map((m) => m.lastName + m.firstName).toString();
-    if (strMembers.length > 15) {
-      return strMembers.slice(0, 15) + '...(' + (members.length || 0) + ')';
-    }
-    return strMembers.toString();
-  };
-
   const toggleChatGroups = (selectGroup: ChatGroup) => {
     dispatchChat({
       type: 'newChatMessage',
@@ -304,23 +272,22 @@ const ChatDetail = () => {
     }
   };
 
-  const handleMenuSelected = (e: any) => {
-    const value = e.value as MenuValue;
-    if (value === 'editMembers') {
+  const handleMenuSelected = (menuValue: MenuValue) => {
+    if (menuValue === 'editMembers') {
       dispatchModal({
         type: 'editMembersModalVisible',
         value: true,
       });
       return;
     }
-    if (value === 'editGroup') {
+    if (menuValue === 'editGroup') {
       dispatchModal({
         type: 'editChatGroupModalVisible',
         value: true,
       });
       return;
     }
-    if (value === 'leaveRoom') {
+    if (menuValue === 'leaveRoom') {
       if (confirm('このルームを退室してよろしいですか？')) {
         leaveChatGroup({ id: Number(id) });
       }
@@ -366,170 +333,104 @@ const ChatDetail = () => {
           toggleChatGroups={(group) => toggleChatGroups(group)}
         />
       )}
-      <div className={chatStyles.main}>
+      {messages && newChatMessage.chatGroup ? (
+        <>
+          <EditChatGroupModal
+            isOpen={editChatGroupModalVisible}
+            chatGroup={newChatMessage.chatGroup}
+            saveGroup={saveGroup}
+            closeModal={() =>
+              dispatchModal({
+                type: 'editChatGroupModalVisible',
+                value: false,
+              })
+            }
+          />
+          <EditChatGroupMembersModal
+            isOpen={editMembersModalVisible}
+            users={users || []}
+            previousUsers={newChatMessage.chatGroup.members || []}
+            onCancel={() =>
+              dispatchModal({
+                type: 'editMembersModalVisible',
+                value: false,
+              })
+            }
+            onComplete={(newMembers) => {
+              saveGroup({
+                ...newChatMessage.chatGroup,
+                members: newMembers,
+              });
+              dispatchModal({
+                type: 'editMembersModalVisible',
+                value: false,
+              });
+            }}
+          />
+        </>
+      ) : null}
+      <Box
+        w="100%"
+        display="flex"
+        flexDir="row"
+        h="83vh"
+        justifyContent="center">
         {chatGroups && chatGroups.length ? (
           <>
-            <div className={chatStyles.groups}>
+            <Box
+              display={'flex'}
+              flexDir="column"
+              alignItems="center"
+              h="100%"
+              overflow="scroll"
+              w={isLargerTahn1024 ? '30%' : '40%'}>
               {chatGroups ? (
                 chatGroups.map((g) => (
-                  <a
-                    onClick={() => {
-                      dispatchChat({ type: 'messages', value: [] });
+                  <Link
+                    onClick={() =>
                       router.push(`/chat/${g.id.toString()}`, undefined, {
                         shallow: true,
-                      });
-                      dispatchChat({ type: 'page', value: 1 });
-                    }}
+                      })
+                    }
                     key={g.id}
-                    style={{ marginBottom: 8 }}>
+                    mb={'8px'}>
                     <ChatGroupCard
                       isSelected={newChatMessage.chatGroup?.id === g.id}
                       chatGroup={g}
                       key={g.id}
                     />
-                  </a>
+                  </Link>
                 ))
               ) : (
                 <p>ルームを作成するか、招待をお待ちください</p>
               )}
-            </div>
-            <div className={chatStyles.chat}>
-              {/*
-               * Header
-               */}
-              <div className={chatStyles.chat_header}>
-                <div className={chatStyles.chat_header_left}>
-                  <div className={chatStyles.chat_header_avatar_wrapper}>
-                    <Avatar
-                      size="sm"
-                      src={newChatMessage.chatGroup?.imageURL}
-                    />
-                  </div>
-                  <p className={chatStyles.chat_header_group_name}>
-                    {newChatMessage?.chatGroup?.name
-                      ? newChatMessage.chatGroup.name
-                      : nameOfEmptyNameGroup(
-                          newChatMessage?.chatGroup?.members,
-                        )}
-                  </p>
-                </div>
-                <div className={chatStyles.chat_header_right}>
-                  <Menu
-                    direction="left"
-                    onItemClick={handleMenuSelected}
-                    menuButton={
-                      <MenuButton>
-                        <HiOutlineDotsCircleHorizontal size={24} />
-                      </MenuButton>
-                    }
-                    transition>
-                    <MenuItem value={'editGroup'}>
-                      グループの情報を編集
-                    </MenuItem>
-                    <MenuItem value={'editMembers'}>メンバーを編集</MenuItem>
-                    <MenuItem value={'leaveRoom'}>ルームを退室</MenuItem>
-                  </Menu>
-                </div>
-              </div>
-              {/*
-               * Messages
-               */}
-              <div
-                ref={messageWrapperDivRef}
-                className={chatStyles.messages}
-                onScroll={onScrollTopOnChat}>
-                {messages && newChatMessage.chatGroup ? (
-                  <>
-                    <EditChatGroupModal
-                      isOpen={editChatGroupModalVisible}
-                      chatGroup={newChatMessage.chatGroup}
-                      saveGroup={saveGroup}
-                      closeModal={() =>
-                        dispatchModal({
-                          type: 'editChatGroupModalVisible',
-                          value: false,
-                        })
-                      }
-                    />
-                    <EditChatGroupMembersModal
-                      isOpen={editMembersModalVisible}
-                      users={users || []}
-                      previousUsers={newChatMessage.chatGroup.members || []}
-                      onCancel={() =>
-                        dispatchModal({
-                          type: 'editMembersModalVisible',
-                          value: false,
-                        })
-                      }
-                      onComplete={(newMembers) => {
-                        saveGroup({
-                          ...newChatMessage.chatGroup,
-                          members: newMembers,
-                        });
-                        dispatchModal({
-                          type: 'editMembersModalVisible',
-                          value: false,
-                        });
-                      }}
-                    />
-                    {messages.map((m) => (
-                      <ChatMessageItem
-                        key={m.id}
-                        message={m}
-                        lastReadChatTime={lastReadChatTime}
-                      />
-                    ))}
-                  </>
-                ) : (
-                  <div className={chatStyles.empty_meesages_wrapper}>
-                    <p className={chatStyles.empty_message}>
-                      このルームは存在しないか権限がありません
-                    </p>
-                  </div>
-                )}
-              </div>
-              <div
-                className={chatStyles.editor}
-                onClick={() => {
-                  editorRef.current?.focus();
-                }}>
-                <Editor
-                  editorKey={'editor'}
-                  placeholder="メッセージを入力"
-                  editorState={editorState}
-                  onChange={onChange}
-                  plugins={plugins}
-                  ref={editorRef}
-                />
-                <MentionSuggestions
-                  open={popup}
-                  onOpenChange={onOpenChange}
-                  suggestions={suggestions}
-                  onSearchChange={onSearchChange}
-                  onAddMention={onAddMention}
-                />
-              </div>
-              <div {...getRootProps()}>
-                <input {...getInputProps()} />
-                <AiOutlinePaperClip
-                  size={20}
-                  className={chatStyles.clip_icon}
-                />
-              </div>
-
-              <IoSend
-                size={20}
-                onClick={onSend}
-                className={chatStyles.send_icon}
+            </Box>
+            {newChatMessage.chatGroup && (
+              <ChatBox
+                room={newChatMessage.chatGroup}
+                onMenuClicked={handleMenuSelected}
+                onScrollTopOnChat={onScrollTopOnChat}
+                messages={messages}
+                onSend={onSend}
+                suggestions={suggestions}
+                lastReadChatTime={lastReadChatTime}
+                editorState={editorState}
+                onEditorChange={onChange}
+                onUploadFile={(f) => uploadFiles(f)}
+                popupOpened={popup}
+                onSuggestionOpenChange={onOpenChange}
+                editorSuggestions={suggestions}
+                onSuggestionSearchChange={onSearchChange}
+                onAddMention={onAddMention}
               />
-            </div>
+            )}
           </>
         ) : (
-          <p className={chatStyles.empty_group_message}>
+          <Box position="absolute" top="auto" bottom="auto">
             ルームを作成するか、招待をお待ちください
-          </p>
+          </Box>
         )}
-      </div>
+      </Box>
     </LayoutWithTab>
   );
 };
