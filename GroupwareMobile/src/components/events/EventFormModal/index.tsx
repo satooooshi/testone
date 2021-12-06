@@ -91,11 +91,13 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
     handleSubmit: onComplete,
     setValues: setNewEvent,
     validateForm,
+    resetForm,
   } = useFormik<Partial<EventSchedule>>({
     initialValues: event || initialEventValue,
     validationSchema: savingEventSchema,
     onSubmit: async values => {
       onSubmit(values);
+      resetForm();
     },
   });
 
