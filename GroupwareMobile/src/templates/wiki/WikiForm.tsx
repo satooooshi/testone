@@ -142,7 +142,6 @@ const WikiForm: React.FC<WikiFormProps> = ({
       </Dropdown.Option>
     </Dropdown>
   );
-  console.log(newWiki.body);
 
   const typeDropdown = (
     <Dropdown

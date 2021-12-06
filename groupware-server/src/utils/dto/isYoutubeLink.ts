@@ -1,4 +1,5 @@
 import { ValidateBy, ValidationOptions } from 'class-validator';
+import { EventVideo } from 'src/entities/eventVideo.entity';
 
 export function isYoutubeLink(
   validationOptions?: ValidationOptions,
@@ -7,10 +8,10 @@ export function isYoutubeLink(
     {
       name: 'isYoutubeLink',
       validator: {
-        validate(value): boolean {
+        validate(value: Partial<EventVideo>[]): boolean {
           const youtubeRegex =
-            /^(?:https?:\/\/)?(?:www\.)?(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))((\w|-){11})(?:\S+)?$/;
-          return youtubeRegex.test(value);
+            /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
+          return value.some((v) => youtubeRegex.test(v.url));
         },
       },
     },

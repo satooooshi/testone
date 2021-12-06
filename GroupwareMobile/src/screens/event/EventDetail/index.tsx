@@ -28,9 +28,16 @@ import {useAPIUpdateEvent} from '../../../hooks/api/event/useAPIUpdateEvent';
 import {useAPIJoinEvent} from '../../../hooks/api/event/useAPIJoinEvent';
 import {useAPICancelEvent} from '../../../hooks/api/event/useAPICancelEvent';
 import {AxiosError} from 'axios';
+import {useAPIDeleteEvent} from '../../../hooks/api/event/useAPIDeleteEvent';
+import {useAuthenticate} from '../../../contexts/useAuthenticate';
+import {UserRole} from '../../../types';
+import {useNavigation} from '@react-navigation/native';
 
 const EventDetail: React.FC = () => {
   const route = useRoute<EventDetailRouteProps>();
+  const {user} = useAuthenticate();
+  const navigation = useNavigation();
+
   const {id} = route.params;
   const {data: tags} = useAPIGetTag();
   const {data: users} = useAPIGetUsers();
@@ -78,6 +85,36 @@ const EventDetail: React.FC = () => {
     });
   }, [eventInfo]);
 
+  const {mutate: deleteEvent} = useAPIDeleteEvent({
+    onSuccess: () => {
+      Alert.alert('削除が完了しました。');
+      navigation.goBack();
+    },
+    onError: err => {
+      if (err.response?.data) {
+        Alert.alert((err.response?.data as AxiosError)?.message);
+      }
+    },
+  });
+
+  const onDeleteButtonlicked = () => {
+    if (!eventInfo) {
+      return;
+    }
+    Alert.alert(
+      '確認',
+      'イベントの削除をしますか？',
+      [
+        {
+          text: '削除する',
+          onPress: () => deleteEvent({eventId: eventInfo.id}),
+        },
+        {text: 'キャンセル'},
+      ],
+      {cancelable: false},
+    );
+  };
+
   const isFinished = eventInfo?.endAt
     ? new Date(eventInfo.endAt) <= new Date()
     : false;
@@ -111,6 +148,18 @@ const EventDetail: React.FC = () => {
             color="white">
             {eventTypeNameFactory(eventInfo.type)}
           </Button>
+          {user?.role === UserRole.ADMIN && (
+            <Button
+              mt={16}
+              bg="red"
+              position="absolute"
+              top={0}
+              right={10}
+              onPress={() => onDeleteButtonlicked()}
+              color="white">
+              イベントを削除する
+            </Button>
+          )}
         </Div>
         <Div mx={16}>
           <Text mb={16} fontSize={24} color={darkFontColor} fontWeight="900">
@@ -120,7 +169,7 @@ const EventDetail: React.FC = () => {
             {eventInfo.type !== 'submission_etc' &&
             !isFinished &&
             !eventInfo.isCanceled &&
-            eventInfo.isJoining ? (
+            !eventInfo.isJoining ? (
               <Button
                 mb={16}
                 bg={'pink600'}
@@ -131,7 +180,7 @@ const EventDetail: React.FC = () => {
             ) : eventInfo.type !== 'submission_etc' &&
               !isFinished &&
               !eventInfo.isCanceled &&
-              !eventInfo.isJoining ? (
+              eventInfo.isJoining ? (
               <Div flexDir="row">
                 <Button
                   mb={16}

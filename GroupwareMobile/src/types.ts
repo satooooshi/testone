@@ -332,3 +332,10 @@ export interface ChatMessageReaction {
   updatedAt: Date;
   isSender?: boolean;
 }
+
+export type NotificationRouting = 'chat' | 'event' | 'wiki' | 'users';
+
+export type NotificationNavigator = {
+  id?: string;
+  screen: NotificationRouting;
+};

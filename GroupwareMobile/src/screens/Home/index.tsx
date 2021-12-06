@@ -4,8 +4,12 @@ import HeaderWithTextButton, {Tab} from '../../components/Header';
 import PortalLinkBox from '../../components/PortalLinkBox';
 import {Div} from 'react-native-magnus';
 import {ScrollView} from 'react-native';
+import {storage} from '../../utils/url';
+import {useAuthenticate} from '../../contexts/useAuthenticate';
 
 const Home: React.FC = () => {
+  const {setUser} = useAuthenticate();
+
   const tabs: Tab[] = [
     {
       name: 'ダッシュボード',
@@ -16,6 +20,10 @@ const Home: React.FC = () => {
       onPress: console.log,
     },
   ];
+  const handleLogout = () => {
+    storage.delete('userToken');
+    setUser({});
+  };
 
   return (
     <WholeContainer>
@@ -23,6 +31,8 @@ const Home: React.FC = () => {
         title="Home"
         tabs={tabs}
         activeTabName="ダッシュボード"
+        rightButtonName={'ログアウト'}
+        onPressRightButton={handleLogout}
       />
       <ScrollView>
         <Div flexDir="column" justifyContent="center" alignItems="center">

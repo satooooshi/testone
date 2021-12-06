@@ -26,19 +26,6 @@
 	<true/>
 	<key>NSAppTransportSecurity</key>
 	<dict>
-		<key>NSExceptionDomains</key>
-		<dict>
-			<key>localhost</key>
-			<dict>
-				<key>NSExceptionAllowsInsecureHTTPLoads</key>
-				<true/>
-			</dict>
-		</dict>
-	</dict>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string></string>
-  <key>NSAppTransportSecurity</key>
-	<dict>
 		<key>NSAllowsArbitraryLoads</key>
 		<true/>
 		<key>NSExceptionDomains</key>
@@ -50,6 +37,16 @@
 			</dict>
 		</dict>
 	</dict>
+	<key>NSCameraUsageDescription</key>
+	<string>イベント/Wikiなどの画像アップロードに使用します</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string></string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>イベント/Wikiなどの画像アップロードに使用します</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>チャットで送信された画像/動画の保存をします</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>イベント/Wikiなどの画像アップロードに使用します</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>AntDesign.ttf</string>
@@ -69,8 +66,13 @@
 		<string>Octicons.ttf</string>
 		<string>Zocial.ttf</string>
 	</array>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>fetch</string>
+		<string>remote-notification</string>
+	</array>
 	<key>UILaunchStoryboardName</key>
-	<string>LaunchScreen</string>
+	<string>BootSplash</string>
 	<key>UIRequiredDeviceCapabilities</key>
 	<array>
 		<string>armv7</string>
@@ -83,13 +85,5 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
-	<key>NSPhotoLibraryUsageDescription</key>
-	<string>イベント/Wikiなどの画像アップロードに使用します</string>
-	<key>NSPhotoLibraryAddUsageDescription</key>
-  <string>チャットで送信された画像/動画の保存をします</string>
-	<key>NSCameraUsageDescription</key>
-	<string>イベント/Wikiなどの画像アップロードに使用します</string>
-	<key>NSMicrophoneUsageDescription</key>
-	<string>イベント/Wikiなどの画像アップロードに使用します</string>
 </dict>
 </plist>

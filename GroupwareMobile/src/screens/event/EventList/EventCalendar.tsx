@@ -21,7 +21,7 @@ import {
 } from '../../../hooks/api/event/useAPIGetEventList';
 import {useAuthenticate} from '../../../contexts/useAuthenticate';
 import {eventTypeColorFactory} from '../../../utils/factory/eventTypeColorFactory';
-import {Button, Div, Icon} from 'react-native-magnus';
+import {Button, Div, Icon, ScrollDiv, Text} from 'react-native-magnus';
 import {darkFontColor} from '../../../utils/colors';
 import {calendarStyles} from '../../../styles/component/event/eventCalendar.style';
 import {DateTime} from 'luxon';
@@ -32,6 +32,7 @@ import {
 } from '../../../utils/eventQueryRefresh';
 import {useNavigation} from '@react-navigation/native';
 import {EventListNavigationProps} from '../../../types/navigator/drawerScreenProps';
+import {dateTimeFormatterFromJSDDate} from '../../../utils/dateTimeFormatterFromJSDate';
 
 type PersonalCalendarProps = {
   personal?: boolean;
@@ -53,7 +54,7 @@ const EventCalendar: React.FC<PersonalCalendarProps> = ({
     mode: CustomMode;
     targetDate: Date;
   }>({
-    mode: 'day',
+    mode: 'month',
     targetDate: new Date(),
   });
   const {height: windowHeight, width: windowWidth} = useWindowDimensions();
@@ -125,11 +126,11 @@ const EventCalendar: React.FC<PersonalCalendarProps> = ({
     const existCount = filteredEvents.length;
     if (existCount) {
       const filteredEventIds = filteredEvents.map(e => e.id);
-
-      return (
+      const marginLeft =
         filteredEventIds.indexOf(event.id) *
-        Math.floor(maxLeftMarginNum / filteredEvents.length)
-      );
+        Math.floor(maxLeftMarginNum / filteredEvents.length);
+
+      return marginLeft;
     }
     return 0;
   };
@@ -204,7 +205,11 @@ const EventCalendar: React.FC<PersonalCalendarProps> = ({
 
   return (
     <>
-      <Div flexDir="row" justifyContent="space-between" w={'100%'}>
+      <Div
+        flexDir="row"
+        justifyContent="space-between"
+        w={'100%'}
+        alignItems="center">
         <Div flexDir="row">
           <Button
             rounded="sm"
@@ -249,6 +254,12 @@ const EventCalendar: React.FC<PersonalCalendarProps> = ({
             <Icon name="right" />
           </Button>
         </Div>
+        <Text fontSize={16} fontWeight="bold" color={darkFontColor}>
+          {`${dateTimeFormatterFromJSDDate({
+            dateTime: calendarMode.targetDate,
+            format: 'L月',
+          })}`}
+        </Text>
         <Div flexDir="row">
           <Button
             rounded="sm"
@@ -294,53 +305,55 @@ const EventCalendar: React.FC<PersonalCalendarProps> = ({
           </Button>
         </Div>
       </Div>
-      <Calendar
-        bodyContainerStyle={calendarStyles.container}
-        headerContainerStyle={calendarStyles.container}
-        onPressDateHeader={onPressDateHeader}
-        renderHeader={
-          calendarMode.mode === 'day'
-            ? () => (
-                <CalendarHeader
-                  onPressDateHeader={onPressDateHeader}
-                  dateRange={dateRange}
-                  cellHeight={headerCellHeight}
-                  allDayEvents={allDayEvents}
-                  style={calendarStyles.container}
-                  activeDate={calendarMode.targetDate}
-                />
-              )
-            : undefined
-        }
-        activeDate={calendarMode.targetDate}
-        date={calendarMode.targetDate}
-        events={memorizedEvent}
-        mode={calendarMode.mode}
-        onPressEvent={event => {
-          navigation.navigate('EventStack', {
-            screen: 'EventDetail',
-            params: {id: event.id},
-          });
-        }}
-        onPressCell={date => setCalendarMode({mode: 'day', targetDate: date})}
-        height={calendarHeight}
-        eventCellStyle={
-          calendarMode.mode === 'day'
-            ? event => ({
-                backgroundColor: eventTypeColorFactory(event.type),
-                borderColor: '#e0e0e0',
-                borderWidth: 1,
-                width: `${eventWidth(event)} %`,
-                minWidth: '33%',
-                marginLeft: eventPosition(event),
-              })
-            : event => ({
-                backgroundColor: eventTypeColorFactory(event.type),
-                borderColor: '#e0e0e0',
-                borderWidth: 1,
-              })
-        }
-      />
+      <ScrollDiv>
+        <Calendar
+          bodyContainerStyle={calendarStyles.container}
+          headerContainerStyle={calendarStyles.container}
+          onPressDateHeader={onPressDateHeader}
+          renderHeader={
+            calendarMode.mode === 'day'
+              ? () => (
+                  <CalendarHeader
+                    onPressDateHeader={onPressDateHeader}
+                    dateRange={dateRange}
+                    cellHeight={headerCellHeight}
+                    allDayEvents={allDayEvents}
+                    style={calendarStyles.container}
+                    activeDate={calendarMode.targetDate}
+                  />
+                )
+              : undefined
+          }
+          activeDate={calendarMode.targetDate}
+          date={calendarMode.targetDate}
+          events={memorizedEvent}
+          mode={calendarMode.mode}
+          onPressEvent={event => {
+            navigation.navigate('EventStack', {
+              screen: 'EventDetail',
+              params: {id: event.id},
+            });
+          }}
+          onPressCell={date => setCalendarMode({mode: 'day', targetDate: date})}
+          height={calendarHeight + 120}
+          eventCellStyle={
+            calendarMode.mode === 'day'
+              ? event => ({
+                  backgroundColor: eventTypeColorFactory(event.type),
+                  borderColor: '#e0e0e0',
+                  borderWidth: 1,
+                  width: `${eventWidth(event)} %`,
+                  minWidth: '33%',
+                  marginLeft: eventPosition(event),
+                })
+              : event => ({
+                  backgroundColor: eventTypeColorFactory(event.type),
+                  borderColor: '#e0e0e0',
+                  borderWidth: 1,
+                })
+          }
+        />
+      </ScrollDiv>
     </>
   );
 };

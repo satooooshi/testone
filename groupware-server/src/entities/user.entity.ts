@@ -23,6 +23,7 @@ import { SubmissionFile } from './submissionFiles.entity';
 import { UserTag } from './userTag.entity';
 import { UserJoiningEvent } from './userJoiningEvent.entity';
 import { ChatMessageReaction } from './chatMessageReaction.entity';
+import { NotificationDevice } from './device.entity';
 
 export enum UserRole {
   ADMIN = 'admin',
@@ -33,7 +34,7 @@ export enum UserRole {
 }
 
 @Entity({ name: 'users' })
-@Index(['lastName', 'firstName', 'email'], { fulltext: true })
+@Index(['lastName', 'firstName'], { fulltext: true })
 @Unique(['email', 'existence'])
 export class User {
   @PrimaryGeneratedColumn()
@@ -219,6 +220,12 @@ export class User {
     onDelete: 'CASCADE',
   })
   hostingEvents?: EventSchedule[];
+
+  @OneToMany(
+    () => NotificationDevice,
+    (notificationDevices) => notificationDevices.user,
+  )
+  notificationDevices?: NotificationDevice[];
 
   @OneToMany(
     () => UserJoiningEvent,

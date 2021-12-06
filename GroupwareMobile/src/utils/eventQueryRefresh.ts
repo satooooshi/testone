@@ -3,15 +3,13 @@ import {SearchQueryToGetEvents} from '../hooks/api/event/useAPIGetEventList';
 
 export const defaultCalendarEventQuery = (): {from: string; to: string} => {
   const now = new Date();
-  const from = DateTime.fromJSDate(now, {zone: 'Asia/Tokyo'})
-    .minus({days: 7})
-    .toFormat('yyyy-LL-dd');
+  const from = DateTime.fromJSDate(now).minus({days: 7}).toFormat('yyyy-LL-dd');
   const to = DateTime.fromJSDate(now).plus({days: 31}).toFormat('yyyy-LL-dd');
   return {from, to};
 };
 export const defaultWeekQuery = (): {from: string; to: string} => {
   const now = new Date();
-  const from = DateTime.fromJSDate(now, {zone: 'Asia/Tokyo'})
+  const from = DateTime.fromJSDate(now)
     .minus({days: 3})
     .set({hour: 0, minute: 0, second: 0})
     .toFormat('yyyy-LL-dd');
@@ -24,7 +22,7 @@ export const defaultWeekQuery = (): {from: string; to: string} => {
 export const monthQueryFactoryFromTargetDate = (
   date: Date,
 ): {from: string; to: string} => {
-  const fromDate = DateTime.fromJSDate(date, {zone: 'Asia/Tokyo'}).set({
+  const fromDate = DateTime.fromJSDate(date).set({
     day: 0,
     hour: 0,
     minute: 0,
@@ -40,7 +38,7 @@ export const monthQueryFactoryFromTargetDate = (
 export const weekQueryFactoryFromTargetDate = (
   date: Date,
 ): {from: string; to: string} => {
-  const from = DateTime.fromJSDate(date, {zone: 'Asia/Tokyo'})
+  const from = DateTime.fromJSDate(date)
     .minus({days: 3})
     .set({hour: 0, minute: 0, second: 0})
     .toFormat('yyyy-LL-dd');
@@ -53,7 +51,7 @@ export const weekQueryFactoryFromTargetDate = (
 export const daysQueryFactoryFromTargetDate = (
   date: Date,
 ): {from: string; to: string} => {
-  const from = DateTime.fromJSDate(date, {zone: 'Asia/Tokyo'})
+  const from = DateTime.fromJSDate(date)
     .set({hour: 0, minute: 0, second: 0})
     .toFormat('yyyy-LL-dd');
   const to = DateTime.fromJSDate(date)
