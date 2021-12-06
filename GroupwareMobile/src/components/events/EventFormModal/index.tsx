@@ -184,19 +184,26 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
 
   const addYoutubeURL = () => {
     const newVideo: Partial<EventVideo> = {url: youtubeURL};
-    setNewEvent(e => {
-      if (e.videos && e.videos.length) {
+    const regExp =
+      /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
+    const isYoutubeURLFormat = regExp.test(newVideo.url || '');
+    if (isYoutubeURLFormat) {
+      setNewEvent(e => {
+        if (e.videos && e.videos.length) {
+          return {
+            ...e,
+            videos: [...e.videos, newVideo],
+          };
+        }
         return {
           ...e,
-          videos: [...e.videos, newVideo],
+          videos: [newVideo],
         };
-      }
-      return {
-        ...e,
-        videos: [newVideo],
-      };
-    });
-    setYoutubeURL('');
+      });
+      setYoutubeURL('');
+    } else {
+      Alert.alert('youtubeのURL形式で入力してください。');
+    }
   };
 
   useEffect(() => {
