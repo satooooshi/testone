@@ -251,7 +251,7 @@ export class UserService {
       .leftJoin('user.tags', 'tag')
       .where(
         word && word.length !== 1
-          ? 'MATCH(user.firstName, user.lastName, user.email) AGAINST (:word IN NATURAL LANGUAGE MODE)'
+          ? 'MATCH(user.firstName, user.lastName) AGAINST (:word IN NATURAL LANGUAGE MODE)'
           : '1=1',
         {
           word,
