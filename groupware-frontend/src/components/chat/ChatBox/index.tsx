@@ -1,17 +1,18 @@
-import { Avatar, Box, useMediaQuery, Text } from '@chakra-ui/react';
+import { Avatar, Box, useMediaQuery, Text, Link } from '@chakra-ui/react';
 import { MentionData } from '@draft-js-plugins/mention';
 import { darkFontColor } from 'src/utils/colors';
 import { Menu, MenuItem, MenuButton } from '@szhsin/react-menu';
 import { HiOutlineDotsCircleHorizontal } from 'react-icons/hi';
 import Editor from '@draft-js-plugins/editor';
 import { EditorState } from 'draft-js';
-import { AiOutlinePaperClip } from 'react-icons/ai';
+import { AiOutlinePaperClip, AiOutlinePicture } from 'react-icons/ai';
 import { ChatGroup, ChatMessage, LastReadChatTime, User } from 'src/types';
 import { MenuValue } from '@/hooks/chat/useModalReducer';
 import React, { useMemo, useRef } from 'react';
 import ChatMessageItem from '../ChatMessageItem';
 import chatStyles from '@/styles/layouts/Chat.module.scss';
 import { IoSend } from 'react-icons/io5';
+import { FiFileText } from 'react-icons/fi';
 import createMentionPlugin from '@draft-js-plugins/mention';
 import { useDropzone } from 'react-dropzone';
 
@@ -21,6 +22,8 @@ type ChatBoxProps = {
   onScrollTopOnChat: (scrollEvent: any) => void;
   messages: ChatMessage[];
   onSend: () => void;
+  onClickNoteIcon: () => void;
+  onClickAlbumIcon: () => void;
   suggestions: MentionData[];
   lastReadChatTime: LastReadChatTime[];
   editorState: EditorState;
@@ -41,6 +44,8 @@ const ChatBox: React.FC<ChatBoxProps> = ({
   onSend,
   lastReadChatTime,
   editorState,
+  onClickAlbumIcon,
+  onClickNoteIcon,
   onEditorChange,
   onUploadFile,
   popupOpened,
@@ -105,7 +110,13 @@ const ChatBox: React.FC<ChatBoxProps> = ({
             {room?.name ? room.name : nameOfEmptyNameGroup(room?.members)}
           </Text>
         </Box>
-        <Box>
+        <Box display="flex" flexDir="row" alignItems="center">
+          <Link mr="4px" onClick={onClickNoteIcon}>
+            <FiFileText size={24} />
+          </Link>
+          <Link mr="4px" onClick={onClickAlbumIcon}>
+            <AiOutlinePicture size={24} />
+          </Link>
           <Menu
             direction="left"
             onItemClick={(e) => onMenuClicked(e.value as MenuValue)}

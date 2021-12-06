@@ -30,6 +30,8 @@ import { useHeaderTab } from '@/hooks/headerTab/useHeaderTab';
 import { useAPILeaveChatRoom } from '@/hooks/api/chat/useAPILeaveChatRoomURL';
 import { useMention } from '@/hooks/chat/useMention';
 import ChatBox from '@/components/chat/ChatBox';
+import { useAPIGetChatAlbums } from '@/hooks/api/chat/album/useAPIGetAlbums';
+import AlbumModal from '@/components/chat/AlbumModal';
 
 const ChatDetail = () => {
   const toast = useToast();
@@ -53,6 +55,13 @@ const ChatDetail = () => {
     dispatchModal,
   ] = useModalReducer();
   const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
+  const [albumListPage, setAlbumListPage] = useState(1);
+  const { data: albums } = useAPIGetChatAlbums({
+    roomId: id,
+    page: albumListPage.toString(),
+  });
+  const [visibleAlbumModal, setVisibleAlbumModal] = useState(false);
+  const [visibleNoteModal, setVisibleNoteModal] = useState(false);
   const [resetFormTrigger, setResetFormTrigger] = useState(false);
   const [groupImageURL, setGroupImageURL] = useState('');
   const { data: chatGroups, refetch: refetchGroups } = useAPIGetChatGroupList();
@@ -317,6 +326,13 @@ const ChatDetail = () => {
       <Head>
         <title>ボールド | Chat</title>
       </Head>
+
+      <AlbumModal
+        isOpen={visibleAlbumModal}
+        onClose={() => setVisibleAlbumModal(false)}
+        headerName="アルバム一覧"
+        albums={albums?.albums || []}
+      />
       {users && (
         <CreateChatGroupModal
           isOpen={createGroupWindow}
@@ -416,6 +432,8 @@ const ChatDetail = () => {
             </Box>
             {newChatMessage.chatGroup && (
               <ChatBox
+                onClickNoteIcon={() => setVisibleNoteModal(true)}
+                onClickAlbumIcon={() => setVisibleAlbumModal(true)}
                 room={newChatMessage.chatGroup}
                 onMenuClicked={handleMenuSelected}
                 onScrollTopOnChat={onScrollTopOnChat}
