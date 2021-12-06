@@ -129,7 +129,10 @@ const Chat: React.FC = () => {
   };
   const {mutate: sendChatMessage, isLoading: loadingSendMessage} =
     useAPISendChatMessage({
-      onSuccess: () => {
+      onSuccess: sentMsg => {
+        setMessages(m => {
+          return [sentMsg, ...m];
+        });
         setValues(v => ({
           ...v,
           content: '',
