@@ -134,7 +134,13 @@ const WikiCardList: React.FC<WikiCardListProps> = ({type}) => {
 
   useEffect(() => {
     setWikiForInfiniteScroll([]);
-  }, [searchQuery.word, searchQuery.status, searchQuery.type, searchQuery.tag]);
+  }, [
+    searchQuery.word,
+    searchQuery.status,
+    searchQuery.type,
+    searchQuery.tag,
+    searchQuery.rule_category,
+  ]);
 
   return (
     <Div flexDir="column" h="100%" pb={80}>

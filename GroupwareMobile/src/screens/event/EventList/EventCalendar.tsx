@@ -21,7 +21,7 @@ import {
 } from '../../../hooks/api/event/useAPIGetEventList';
 import {useAuthenticate} from '../../../contexts/useAuthenticate';
 import {eventTypeColorFactory} from '../../../utils/factory/eventTypeColorFactory';
-import {Button, Div, Icon, ScrollDiv} from 'react-native-magnus';
+import {Button, Div, Icon, ScrollDiv, Text} from 'react-native-magnus';
 import {darkFontColor} from '../../../utils/colors';
 import {calendarStyles} from '../../../styles/component/event/eventCalendar.style';
 import {DateTime} from 'luxon';
@@ -32,6 +32,7 @@ import {
 } from '../../../utils/eventQueryRefresh';
 import {useNavigation} from '@react-navigation/native';
 import {EventListNavigationProps} from '../../../types/navigator/drawerScreenProps';
+import {dateTimeFormatterFromJSDDate} from '../../../utils/dateTimeFormatterFromJSDate';
 
 type PersonalCalendarProps = {
   personal?: boolean;
@@ -53,7 +54,7 @@ const EventCalendar: React.FC<PersonalCalendarProps> = ({
     mode: CustomMode;
     targetDate: Date;
   }>({
-    mode: 'day',
+    mode: 'month',
     targetDate: new Date(),
   });
   const {height: windowHeight, width: windowWidth} = useWindowDimensions();
@@ -204,7 +205,11 @@ const EventCalendar: React.FC<PersonalCalendarProps> = ({
 
   return (
     <>
-      <Div flexDir="row" justifyContent="space-between" w={'100%'}>
+      <Div
+        flexDir="row"
+        justifyContent="space-between"
+        w={'100%'}
+        alignItems="center">
         <Div flexDir="row">
           <Button
             rounded="sm"
@@ -249,6 +254,12 @@ const EventCalendar: React.FC<PersonalCalendarProps> = ({
             <Icon name="right" />
           </Button>
         </Div>
+        <Text fontSize={16} fontWeight="bold" color={darkFontColor}>
+          {`${dateTimeFormatterFromJSDDate({
+            dateTime: calendarMode.targetDate,
+            format: 'L月',
+          })}`}
+        </Text>
         <Div flexDir="row">
           <Button
             rounded="sm"
