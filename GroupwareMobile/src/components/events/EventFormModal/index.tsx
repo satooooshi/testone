@@ -200,11 +200,11 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
   };
 
   const cancelAddingYoutubeURL = (index: number) => {
-    setNewEvent(prevValues => {
-      if (prevValues.videos?.length) {
-        ({...prevValues, videos: prevValues.videos.splice(index, 1)});
+    setNewEvent(e => {
+      if (e.videos?.length) {
+        ({...e, videos: e.videos.splice(index, 1)});
       }
-      return prevValues;
+      return e;
     });
   };
 
