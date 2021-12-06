@@ -206,6 +206,15 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
     setYoutubeURL('');
   };
 
+  const cancelAddingYoutubeURL = (index: number) => {
+    setNewEvent(e => {
+      if (e.videos?.length) {
+        ({...e, videos: e.videos.splice(index, 1)});
+      }
+      return e;
+    });
+  };
+
   useEffect(() => {
     setNewEvent(e => ({...e, hostUsers: selectedUsers}));
   }, [selectedUsers, setNewEvent]);
@@ -502,7 +511,7 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
                 </TouchableOpacity>
               }
             />
-            {newEvent.videos?.map(v => (
+            {newEvent.videos?.map((v, index) => (
               <Div
                 mb={'lg'}
                 w={'100%'}
@@ -513,10 +522,10 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
                 flexDir="row"
                 justifyContent="space-between"
                 rounded="md">
-                <Text fontSize={16} color={blueColor}>
+                <Text w={'90%'} fontSize={16} color={blueColor}>
                   {v.url}
                 </Text>
-                <TouchableOpacity>
+                <TouchableOpacity onPress={() => cancelAddingYoutubeURL(index)}>
                   <Icon name="closecircle" color="gray900" fontSize={24} />
                 </TouchableOpacity>
               </Div>
