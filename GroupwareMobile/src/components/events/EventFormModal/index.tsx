@@ -200,10 +200,10 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
           videos: [newVideo],
         };
       });
-      setYoutubeURL('');
     } else {
       Alert.alert('youtubeのURL形式で入力してください。');
     }
+    setYoutubeURL('');
   };
 
   useEffect(() => {
