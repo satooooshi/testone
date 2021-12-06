@@ -120,7 +120,7 @@ const EventDetail: React.FC = () => {
             {eventInfo.type !== 'submission_etc' &&
             !isFinished &&
             !eventInfo.isCanceled &&
-            eventInfo.isJoining ? (
+            !eventInfo.isJoining ? (
               <Button
                 mb={16}
                 bg={'pink600'}
@@ -131,7 +131,7 @@ const EventDetail: React.FC = () => {
             ) : eventInfo.type !== 'submission_etc' &&
               !isFinished &&
               !eventInfo.isCanceled &&
-              !eventInfo.isJoining ? (
+              eventInfo.isJoining ? (
               <Div flexDir="row">
                 <Button
                   mb={16}
