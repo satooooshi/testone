@@ -57,9 +57,9 @@ export class SaveEventDto {
   })
   chatNeeded: boolean;
 
-  @ValidateIf((o, v) => v != null && v.length)
-  @IsArray({ message: 'YouTubeリンクのリクエストは配列型に限られています。' })
-  @isYoutubeLink({ message: 'Youtubeの動画URLが不正です。' })
+  // @ValidateIf((o, v) => v != null && v.length)
+  // @IsArray({ message: 'YouTubeリンクのリクエストは配列型に限られています。' })
+  // @isYoutubeLink({ message: 'Youtubeの動画URLが不正です。' })
   videos: EventVideo[];
 
   author?: User;
