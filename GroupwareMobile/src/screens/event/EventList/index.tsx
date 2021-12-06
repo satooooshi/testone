@@ -20,6 +20,7 @@ import {useAPICreateEvent} from '../../../hooks/api/event/useAPICreateEvent';
 import {ActivityIndicator} from 'react-native';
 import {Overlay} from 'react-native-magnus';
 import {useIsFocused} from '@react-navigation/core';
+import {eventTypeColorFactory} from '../../../utils/factory/eventTypeColorFactory';
 
 const TopTab = createMaterialTopTabNavigator();
 
@@ -56,26 +57,32 @@ const EventList: React.FC = () => {
       name: eventTypeNameFactory(EventType.IMPRESSIVE_UNIVERSITY),
       onPress: () =>
         queryRefresh({page: '1', type: EventType.IMPRESSIVE_UNIVERSITY}),
+      color: eventTypeColorFactory(EventType.IMPRESSIVE_UNIVERSITY),
     },
     {
       name: eventTypeNameFactory(EventType.STUDY_MEETING),
       onPress: () => queryRefresh({page: '1', type: EventType.STUDY_MEETING}),
+      color: eventTypeColorFactory(EventType.STUDY_MEETING),
     },
     {
       name: eventTypeNameFactory(EventType.BOLDAY),
       onPress: () => queryRefresh({page: '1', type: EventType.BOLDAY}),
+      color: eventTypeColorFactory(EventType.BOLDAY),
     },
     {
       name: eventTypeNameFactory(EventType.COACH),
       onPress: () => queryRefresh({page: '1', type: EventType.COACH}),
+      color: eventTypeColorFactory(EventType.COACH),
     },
     {
       name: eventTypeNameFactory(EventType.CLUB),
       onPress: () => queryRefresh({page: '1', type: EventType.CLUB}),
+      color: eventTypeColorFactory(EventType.CLUB),
     },
     {
       name: eventTypeNameFactory(EventType.SUBMISSION_ETC),
       onPress: () => queryRefresh({page: '1', type: EventType.SUBMISSION_ETC}),
+      color: eventTypeColorFactory(EventType.SUBMISSION_ETC),
     },
   ];
 

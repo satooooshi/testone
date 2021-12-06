@@ -88,6 +88,8 @@ const HeaderTemplate: React.FC<HeaderTemplateProps> = ({
                 onPress={t.onPress}
                 bg="transparent"
                 fontWeight="bold"
+                borderBottomWidth={t.color ? 1 : undefined}
+                borderBottomColor={t.color}
                 color={activeTabName === t.name ? blueColor : darkFontColor}>
                 {t.name}
               </Button>
