@@ -34,13 +34,13 @@ import {useFormik} from 'formik';
 import {EventComment, EventType} from '../../../types';
 import {useAPICreateComment} from '../../../hooks/api/event/useAPICreateComment';
 import EventCommentCard from '../EventCommentCard';
-import {eventDetail} from '../../../styles/component/event/eventDetail.style';
 import {createCommentSchema} from '../../../utils/validation/schema';
 import {formikErrorMsgFactory} from '../../../utils/factory/formikEroorMsgFactory';
 import {useAPIDeleteEvent} from '../../../hooks/api/event/useAPIDeleteEvent';
 import {useAuthenticate} from '../../../contexts/useAuthenticate';
 import {UserRole} from '../../../types';
 import {useNavigation} from '@react-navigation/native';
+import tailwind from 'tailwind-rn';
 
 const EventDetail: React.FC = () => {
   const route = useRoute<EventDetailRouteProps>();
@@ -365,7 +365,10 @@ const EventDetail: React.FC = () => {
             )}
             {eventInfo.type !== EventType.SUBMISSION_ETC && (
               <Div m={16}>
-                <View style={eventDetail.commentCountWrapper}>
+                <View
+                  style={tailwind(
+                    'border-b border-green-400 flex-row justify-between mb-4 pb-2',
+                  )}>
                   <Text>
                     コメント
                     {eventInfo?.comments.length ? eventInfo.comments.length : 0}
@@ -392,7 +395,9 @@ const EventDetail: React.FC = () => {
                     textAlignVertical={'top'}
                     multiline={true}
                     autoCapitalize="none"
-                    style={eventDetail.createCommentForm}
+                    style={tailwind(
+                      'border border-green-400 bg-white rounded border-blue-500	 p-2 h-24',
+                    )}
                   />
                 )}
                 {eventInfo?.comments && eventInfo?.comments.length

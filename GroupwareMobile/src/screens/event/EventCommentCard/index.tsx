@@ -3,7 +3,7 @@ import {User} from '../../../types';
 import {dateTimeFormatterFromJSDDate} from '../../../utils/dateTimeFormatterFromJSDate';
 import React from 'react';
 import {useWindowDimensions} from 'react-native';
-import {eventDetail} from '../../../styles/component/event/eventDetail.style';
+import tailwind from 'tailwind-rn';
 
 type EventCommentCardProps = {
   body: string;
@@ -19,10 +19,10 @@ const EventCommentCard: React.FC<EventCommentCardProps> = ({
   const {width: windowWidth} = useWindowDimensions();
 
   return (
-    <Div style={eventDetail.commentCardWrapper}>
+    <Div style={tailwind('flex-col justify-between mb-4')}>
       {writer.existence ? (
-        <Div style={eventDetail.commentInfoWrapper}>
-          <Div style={eventDetail.commentWriterInfoWrapper}>
+        <Div style={tailwind('flex-row justify-between items-center')}>
+          <Div style={tailwind('flex-row justify-between items-center')}>
             <Image
               mt={'lg'}
               h={windowWidth * 0.1}
@@ -43,8 +43,8 @@ const EventCommentCard: React.FC<EventCommentCardProps> = ({
           </Text>
         </Div>
       ) : (
-        <Div style={eventDetail.commentInfoWrapper}>
-          <Div style={eventDetail.commentWriterInfoWrapper}>
+        <Div style={tailwind('flex-row justify-between items-center')}>
+          <Div style={tailwind('flex-row justify-between items-center')}>
             <Image
               mt={'lg'}
               h={windowWidth * 0.1}
@@ -61,7 +61,7 @@ const EventCommentCard: React.FC<EventCommentCardProps> = ({
           </Text>
         </Div>
       )}
-      <Div style={eventDetail.commentBody}>
+      <Div style={tailwind('p-4 bg-white rounded')}>
         <Text>{body}</Text>
       </Div>
     </Div>
