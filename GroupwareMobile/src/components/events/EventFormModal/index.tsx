@@ -277,6 +277,7 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
             mb="lg"
             placeholder="タイトルを入力してください"
             bg="white"
+            autoCapitalize="none"
             rounded="md"
             fontSize={16}
           />
@@ -329,6 +330,7 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
             numberOfLines={10}
             textAlignVertical={'top'}
             multiline={true}
+            autoCapitalize="none"
             style={eventFormModalStyles.descriptionInput}
           />
           <Div mb="lg" />
