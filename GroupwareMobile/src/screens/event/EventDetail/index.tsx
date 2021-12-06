@@ -365,7 +365,7 @@ const EventDetail: React.FC = () => {
             )}
             {eventInfo.type !== EventType.SUBMISSION_ETC && (
               <Div m={16}>
-                <View style={eventDetail.comment_count_wrapper}>
+                <View style={eventDetail.commentCountWrapper}>
                   <Text>
                     コメント
                     {eventInfo?.comments.length ? eventInfo.comments.length : 0}
@@ -392,7 +392,7 @@ const EventDetail: React.FC = () => {
                     textAlignVertical={'top'}
                     multiline={true}
                     autoCapitalize="none"
-                    style={eventDetail.create_comment_form}
+                    style={eventDetail.createCommentForm}
                   />
                 )}
                 {eventInfo?.comments && eventInfo?.comments.length

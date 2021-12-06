@@ -19,10 +19,10 @@ const EventCommentCard: React.FC<EventCommentCardProps> = ({
   const {width: windowWidth} = useWindowDimensions();
 
   return (
-    <Div style={eventDetail.comment_card_wrapper}>
+    <Div style={eventDetail.commentCardWrapper}>
       {writer.existence ? (
-        <Div style={eventDetail.comment_info_wrapper}>
-          <Div style={eventDetail.comment_writer_info_wrapper}>
+        <Div style={eventDetail.commentInfoWrapper}>
+          <Div style={eventDetail.commentWriterInfoWrapper}>
             <Image
               mt={'lg'}
               h={windowWidth * 0.1}
@@ -43,8 +43,8 @@ const EventCommentCard: React.FC<EventCommentCardProps> = ({
           </Text>
         </Div>
       ) : (
-        <Div style={eventDetail.comment_info_wrapper}>
-          <Div style={eventDetail.comment_writer_info_wrapper}>
+        <Div style={eventDetail.commentInfoWrapper}>
+          <Div style={eventDetail.commentWriterInfoWrapper}>
             <Image
               mt={'lg'}
               h={windowWidth * 0.1}
@@ -61,7 +61,7 @@ const EventCommentCard: React.FC<EventCommentCardProps> = ({
           </Text>
         </Div>
       )}
-      <Div style={eventDetail.comment_body}>
+      <Div style={eventDetail.commentBody}>
         <Text>{body}</Text>
       </Div>
     </Div>
