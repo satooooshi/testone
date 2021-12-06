@@ -77,17 +77,27 @@ export class ChatService {
     }
     return parsedGroups;
   }
-  public async generateSignedStorageURLsFromChatNoteObj(
-    chatNote: ChatNote,
-  ): Promise<ChatNote> {
+
+  public async generateSignedStorageURLsFromNoteImageArr(
+    noteImages: ChatNoteImage[],
+  ): Promise<ChatNoteImage[]> {
     const images: ChatNoteImage[] = [];
-    const editors: User[] = [];
-    for (const i of chatNote.images) {
+    for (const i of noteImages) {
       const parsedImageUrl =
         await this.storageService.parseStorageURLToSignedURL(i.imageURL);
       const parsedImageObj = { ...i, imageURL: parsedImageUrl };
       images.push(parsedImageObj);
     }
+    return images;
+  }
+
+  public async generateSignedStorageURLsFromChatNoteObj(
+    chatNote: ChatNote,
+  ): Promise<ChatNote> {
+    const editors: User[] = [];
+    const images = await this.generateSignedStorageURLsFromNoteImageArr(
+      chatNote.images,
+    );
     for (const e of chatNote.editors) {
       const parsedAvatarUrl =
         await this.storageService.parseStorageURLToSignedURL(e.avatarUrl);
@@ -540,5 +550,19 @@ export class ChatService {
     }));
     const pageCount = Math.floor(count / limit) + 1;
     return { notes, pageCount };
+  }
+
+  public async saveChatNoteImages(
+    dto: Partial<ChatNoteImage[]>,
+  ): Promise<ChatNoteImage[]> {
+    const sentImages = dto.map((i) => ({
+      ...i,
+      imageURL: this.storageService.parseSignedURLToStorageURL(i.imageURL),
+    }));
+
+    const urlParsedImages =
+      await this.generateSignedStorageURLsFromNoteImageArr(sentImages);
+
+    return await this.noteImageRepository.save(urlParsedImages);
   }
 }

@@ -8,6 +8,8 @@ import {
   ChatGroup,
   ChatMessage,
   ChatMessageType,
+  ChatNote,
+  ChatNoteImage,
 } from 'src/types';
 import { useAPIGetChatGroupList } from '@/hooks/api/chat/useAPIGetChatGroupList';
 import { useAPIGetMessages } from '@/hooks/api/chat/useAPIGetMessages';
@@ -39,8 +41,12 @@ import ChatBox from '@/components/chat/ChatBox';
 import { useAPIGetChatAlbums } from '@/hooks/api/chat/album/useAPIGetAlbums';
 import AlbumModal from '@/components/chat/AlbumModal';
 import { useAPIGetChatAlbumImages } from '@/hooks/api/chat/album/useAPIGetChatAlbumImages';
-import { useAPIUpdateAlbum } from '@/hooks/api/chat/album/useAPIUpdateChatAlbum';
 import { useAPISaveAlbumImage } from '@/hooks/api/chat/album/useAPISaveChatImages';
+import NoteModal from '@/components/chat/NoteModal';
+import { useAPIGetChatNotes } from '@/hooks/api/chat/note/useAPIGetNotes';
+import { useAPIUpdateNote } from '@/hooks/api/chat/note/useAPIUpdateChatNote';
+import { useAPISaveNoteImage } from '@/hooks/api/chat/note/useAPISaveChatNoteImages';
+import { useAPIDeleteChatNote } from '@/hooks/api/chat/note/useAPIDeleteChatNote';
 
 const ChatDetail = () => {
   const toast = useToast();
@@ -49,11 +55,31 @@ const ChatDetail = () => {
   const [{ popup, suggestions, mentionedUserData }, dispatchMention] =
     useMention();
   const [page, setPage] = useState(1);
+  const [albumListPage, setAlbumListPage] = useState(1);
+  const [noteListPage, setNoteListPage] = useState(1);
+  const { mutate: updateNote } = useAPIUpdateNote({
+    onSuccess: () => {
+      setEdittedNote(undefined);
+      toast({
+        title: 'ノートを更新しました',
+        status: 'success',
+        duration: 3000,
+        isClosable: true,
+      });
+    },
+  });
+  const { mutate: deleteNote } = useAPIDeleteChatNote();
+  const { mutate: saveNoteImage } = useAPISaveNoteImage();
+  const [edittedNote, setEdittedNote] = useState<ChatNote>();
   const [newChatMessage, setNewChatMessage] = useState<Partial<ChatMessage>>({
     content: '',
     type: ChatMessageType.TEXT,
   });
   const [editorState, setEditorState] = useState(EditorState.createEmpty());
+  const { data: notes, refetch: refetchNotes } = useAPIGetChatNotes({
+    roomId: id,
+    page: noteListPage.toString(),
+  });
   const [
     {
       editChatGroupModalVisible,
@@ -64,7 +90,6 @@ const ChatDetail = () => {
     dispatchModal,
   ] = useModalReducer();
   const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
-  const [albumListPage, setAlbumListPage] = useState(1);
   const [albumImageListPage, setAlbumImageListPage] = useState(1);
   const { data: albums } = useAPIGetChatAlbums({
     roomId: id,
@@ -72,6 +97,7 @@ const ChatDetail = () => {
   });
   const [selectedAlbum, setSelectedAlbum] = useState<ChatAlbum>();
   const [albumImages, setAlbumImages] = useState<ChatAlbumImage[]>([]);
+
   useAPIGetChatAlbumImages(
     {
       roomId: id,
@@ -89,6 +115,7 @@ const ChatDetail = () => {
       },
     },
   );
+
   const [visibleAlbumModal, setVisibleAlbumModal] = useState(false);
   const [visibleNoteModal, setVisibleNoteModal] = useState(false);
   const [resetFormTrigger, setResetFormTrigger] = useState(false);
@@ -339,6 +366,77 @@ const ChatDetail = () => {
     }
   };
 
+  const handleUploadNoteImage = (files: File[]) => {
+    uploadImage(files, {
+      onSuccess: (imageURLs) => {
+        const noteImages: Partial<ChatNoteImage>[] = imageURLs.map((i) => ({
+          imageURL: i,
+          chatAlbum: selectedAlbum,
+        }));
+        saveNoteImage(noteImages, {
+          onSuccess: (savedImages) => {
+            if (edittedNote) {
+              setEdittedNote({
+                ...edittedNote,
+                images: edittedNote.images?.length
+                  ? [...savedImages, ...edittedNote.images]
+                  : [...savedImages],
+              });
+            }
+          },
+        });
+      },
+    });
+  };
+
+  const handleUploadAlbumImage = (files: File[]) => {
+    uploadImage(files, {
+      onSuccess: (imageURLs) => {
+        if (selectedAlbum) {
+          const albumImages: Partial<ChatAlbumImage>[] = imageURLs.map((i) => ({
+            imageURL: i,
+            chatAlbum: selectedAlbum,
+          }));
+          saveAlbumImage(albumImages, {
+            onSuccess: (savedImages) => {
+              setAlbumImages((i) => [...savedImages, ...i]);
+            },
+          });
+        }
+      },
+    });
+  };
+
+  const handleNoteDelete = (note: ChatNote) => {
+    if (confirm('ノートを削除します。よろしいですa?')) {
+      deleteNote(
+        { roomId: id, noteId: note.id.toString() },
+        {
+          onSuccess: () => {
+            toast({
+              description: 'ノートを削除しました。',
+              status: 'success',
+              duration: 3000,
+              isClosable: true,
+            });
+            setNoteListPage(1);
+            refetchNotes();
+          },
+        },
+      );
+    }
+  };
+
+  useEffect(() => {
+    const refreshNotes = () => {
+      setNoteListPage(1);
+      refetchNotes();
+    };
+    if (!edittedNote && visibleNoteModal) {
+      refreshNotes();
+    }
+  }, [edittedNote, refetchNotes, visibleNoteModal]);
+
   return (
     <LayoutWithTab
       sidebar={{ activeScreenName: SidebarScreenName.CHAT }}
@@ -353,6 +451,19 @@ const ChatDetail = () => {
         <title>ボールド | Chat</title>
       </Head>
 
+      <NoteModal
+        onClickBackButton={() => setEdittedNote(undefined)}
+        onClickEdit={(note) => setEdittedNote(note)}
+        edittedNote={edittedNote}
+        isOpen={visibleNoteModal}
+        onClose={() => setVisibleNoteModal(false)}
+        headerName={'ノート一覧'}
+        notes={notes?.notes || []}
+        onUploadImage={handleUploadNoteImage}
+        onSubmitEdittedNote={(note) => updateNote(note)}
+        onClickDelete={handleNoteDelete}
+      />
+
       <AlbumModal
         isOpen={visibleAlbumModal}
         onClose={() => setVisibleAlbumModal(false)}
@@ -365,27 +476,7 @@ const ChatDetail = () => {
           setSelectedAlbum(undefined);
           setAlbumImages([]);
         }}
-        onUploadImage={(files) => {
-          uploadImage(files, {
-            onSuccess: (imageURLs) => {
-              if (selectedAlbum) {
-                const albumImages: Partial<ChatAlbumImage>[] = imageURLs.map(
-                  (i) => ({ imageURL: i, chatAlbum: selectedAlbum }),
-                );
-                saveAlbumImage(albumImages, {
-                  onSuccess: (savedImages) => {
-                    setSelectedAlbum({
-                      ...selectedAlbum,
-                      images: selectedAlbum?.images?.length
-                        ? [...savedImages, ...selectedAlbum.images]
-                        : [...savedImages],
-                    });
-                  },
-                });
-              }
-            },
-          });
-        }}
+        onUploadImage={handleUploadAlbumImage}
       />
       {users && (
         <CreateChatGroupModal

@@ -42,8 +42,9 @@ const AlbumModal: React.FC<AlbumModalProps> = ({
   onUploadImage,
 }) => {
   const imageUploaderRef = useRef<HTMLInputElement | null>(null);
+
   return (
-    <Modal onClose={onClose} isOpen={isOpen}>
+    <Modal onClose={onClose} isOpen={isOpen} scrollBehavior="inside">
       <ModalOverlay />
       <ModalContent h="80vh" bg={'#f9fafb'}>
         <ModalHeader>{headerName}</ModalHeader>
@@ -131,7 +132,7 @@ const AlbumModal: React.FC<AlbumModalProps> = ({
                 />
               </Box>
               <SimpleGrid spacing="8px" columns={2}>
-                {selectedAlbum?.images?.map((i) => (
+                {images?.map((i) => (
                   <Image
                     key={i.id}
                     src={i.imageURL}
