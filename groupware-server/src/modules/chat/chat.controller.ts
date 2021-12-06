@@ -14,6 +14,7 @@ import {
 } from '@nestjs/common';
 import { Response } from 'express';
 import { ChatAlbum } from 'src/entities/chatAlbum.entity';
+import { ChatAlbumImage } from 'src/entities/chatAlbumImage.entity';
 import { ChatGroup } from 'src/entities/chatGroup.entity';
 import { ChatMessage } from 'src/entities/chatMessage.entity';
 import { ChatMessageReaction } from 'src/entities/chatMessageReaction.entity';
@@ -243,6 +244,15 @@ export class ChatController {
     const { user } = req;
     body.editors = [user];
     const albums = await this.chatAlbumService.saveChatAlbums(body);
+    return albums;
+  }
+
+  @Post('/v2/room/album/images')
+  @UseGuards(JwtAuthenticationGuard)
+  async saveImages(
+    @Body() body: Partial<ChatAlbumImage[]>,
+  ): Promise<ChatAlbumImage[]> {
+    const albums = await this.chatAlbumService.saveChatAlbumImages(body);
     return albums;
   }
 

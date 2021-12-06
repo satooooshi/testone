@@ -2,7 +2,13 @@ import { SidebarScreenName } from '@/components/layout/Sidebar';
 import { MenuValue, useModalReducer } from '@/hooks/chat/useModalReducer';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useAPIGetUsers } from '@/hooks/api/user/useAPIGetUsers';
-import { ChatGroup, ChatMessage, ChatMessageType } from 'src/types';
+import {
+  ChatAlbum,
+  ChatAlbumImage,
+  ChatGroup,
+  ChatMessage,
+  ChatMessageType,
+} from 'src/types';
 import { useAPIGetChatGroupList } from '@/hooks/api/chat/useAPIGetChatGroupList';
 import { useAPIGetMessages } from '@/hooks/api/chat/useAPIGetMessages';
 import { useAPISendChatMessage } from '@/hooks/api/chat/useAPISendChatMessage';
@@ -32,6 +38,9 @@ import { useMention } from '@/hooks/chat/useMention';
 import ChatBox from '@/components/chat/ChatBox';
 import { useAPIGetChatAlbums } from '@/hooks/api/chat/album/useAPIGetAlbums';
 import AlbumModal from '@/components/chat/AlbumModal';
+import { useAPIGetChatAlbumImages } from '@/hooks/api/chat/album/useAPIGetChatAlbumImages';
+import { useAPIUpdateAlbum } from '@/hooks/api/chat/album/useAPIUpdateChatAlbum';
+import { useAPISaveAlbumImage } from '@/hooks/api/chat/album/useAPISaveChatImages';
 
 const ChatDetail = () => {
   const toast = useToast();
@@ -56,10 +65,30 @@ const ChatDetail = () => {
   ] = useModalReducer();
   const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
   const [albumListPage, setAlbumListPage] = useState(1);
+  const [albumImageListPage, setAlbumImageListPage] = useState(1);
   const { data: albums } = useAPIGetChatAlbums({
     roomId: id,
     page: albumListPage.toString(),
   });
+  const [selectedAlbum, setSelectedAlbum] = useState<ChatAlbum>();
+  const [albumImages, setAlbumImages] = useState<ChatAlbumImage[]>([]);
+  useAPIGetChatAlbumImages(
+    {
+      roomId: id,
+      albumId: selectedAlbum?.id.toString() || '0',
+      page: albumImageListPage.toString(),
+    },
+    {
+      onSuccess: (data) => {
+        setAlbumImages((existImage) => {
+          if (existImage.length) {
+            return [...existImage, ...data.images];
+          }
+          return data?.images || [];
+        });
+      },
+    },
+  );
   const [visibleAlbumModal, setVisibleAlbumModal] = useState(false);
   const [visibleNoteModal, setVisibleNoteModal] = useState(false);
   const [resetFormTrigger, setResetFormTrigger] = useState(false);
@@ -136,11 +165,8 @@ const ChatDetail = () => {
     },
   });
 
-  const { mutate: uploadImage } = useAPIUploadStorage({
-    onSuccess: async (fileURLs) => {
-      setGroupImageURL(fileURLs[0]);
-    },
-  });
+  const { mutate: uploadImage } = useAPIUploadStorage();
+  const { mutate: saveAlbumImage } = useAPISaveAlbumImage();
 
   const tabs: Tab[] = useHeaderTab({
     headerTabType: 'chatDetail',
@@ -332,6 +358,34 @@ const ChatDetail = () => {
         onClose={() => setVisibleAlbumModal(false)}
         headerName="アルバム一覧"
         albums={albums?.albums || []}
+        images={albumImages}
+        selectedAlbum={selectedAlbum}
+        onClickAlbum={(album) => setSelectedAlbum(album)}
+        onClickBackButton={() => {
+          setSelectedAlbum(undefined);
+          setAlbumImages([]);
+        }}
+        onUploadImage={(files) => {
+          uploadImage(files, {
+            onSuccess: (imageURLs) => {
+              if (selectedAlbum) {
+                const albumImages: Partial<ChatAlbumImage>[] = imageURLs.map(
+                  (i) => ({ imageURL: i, chatAlbum: selectedAlbum }),
+                );
+                saveAlbumImage(albumImages, {
+                  onSuccess: (savedImages) => {
+                    setSelectedAlbum({
+                      ...selectedAlbum,
+                      images: selectedAlbum?.images?.length
+                        ? [...savedImages, ...selectedAlbum.images]
+                        : [...savedImages],
+                    });
+                  },
+                });
+              }
+            },
+          });
+        }}
       />
       {users && (
         <CreateChatGroupModal
@@ -344,7 +398,13 @@ const ChatDetail = () => {
             dispatchModal({ type: 'createGroupWindow', value: false });
           }}
           createGroup={(g) => createGroup({ ...g, imageURL: groupImageURL })}
-          uploadImage={(r) => uploadImage(r)}
+          uploadImage={(r) =>
+            uploadImage(r, {
+              onSuccess: async (fileURLs) => {
+                setGroupImageURL(fileURLs[0]);
+              },
+            })
+          }
         />
       )}
       {chatGroups && (

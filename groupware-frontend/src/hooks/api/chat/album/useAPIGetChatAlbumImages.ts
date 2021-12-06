@@ -2,7 +2,7 @@ import { AxiosError } from 'axios';
 import { useQuery, UseQueryOptions } from 'react-query';
 import { ChatAlbumImage } from 'src/types';
 import { axiosInstance } from 'src/utils/url';
-import { chatAlbumImageURL } from 'src/utils/url/chat.url';
+import { getChatAlbumImageURL } from 'src/utils/url/chat.url';
 
 export interface GetChatAlbumImagesQuery {
   roomId: string;
@@ -18,7 +18,7 @@ export interface GetChatAlbumImagesResult {
 const getAlbumImages = async (query: GetChatAlbumImagesQuery) => {
   const { roomId, albumId, page } = query;
   const res = await axiosInstance.get<GetChatAlbumImagesResult>(
-    chatAlbumImageURL(roomId, albumId, page),
+    getChatAlbumImageURL(roomId, albumId, page),
   );
   return res.data;
 };

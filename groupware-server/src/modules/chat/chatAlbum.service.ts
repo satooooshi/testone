@@ -87,8 +87,12 @@ export class ChatAlbumService {
   }
 
   public async saveChatAlbums(dto: Partial<ChatAlbum>): Promise<ChatAlbum> {
-    const savedAlbum = await this.albumRepository.save(dto);
+    const savedAlbum = await this.albumRepository.save({
+      ...dto,
+      images: undefined,
+    });
     if (dto.images?.length) {
+      console.log('called');
       const sentImages = dto.images.map((i) => ({
         ...i,
         imageURL: this.storageService.parseSignedURLToStorageURL(i.imageURL),
@@ -96,8 +100,23 @@ export class ChatAlbumService {
       }));
 
       await this.albumImageRepository.save(sentImages);
+      return { ...savedAlbum, images: sentImages };
     }
     return savedAlbum;
+  }
+
+  public async saveChatAlbumImages(
+    dto: Partial<ChatAlbumImage[]>,
+  ): Promise<ChatAlbumImage[]> {
+    const sentImages = dto.map((i) => ({
+      ...i,
+      imageURL: this.storageService.parseSignedURLToStorageURL(i.imageURL),
+    }));
+
+    const urlParsedImages =
+      await this.generateSignedStorageURLsFromAlbumImageArr(sentImages);
+
+    return await this.albumImageRepository.save(urlParsedImages);
   }
 
   public async deleteChatAlbums(albumId: number) {

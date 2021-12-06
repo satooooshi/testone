@@ -14,6 +14,7 @@ export const leaveChatRoomURL = `/${chatURL}/leave-room`;
 export const noteURL = (roomId: string) => `${chatURL}/v2/room/${roomId}/note`;
 export const albumURL = (roomId: string) =>
   `${chatURL}/v2/room/${roomId}/album`;
+export const albumImageURL = `${chatURL}/v2/room/album/images`;
 
 //GET
 export const getChatNotesURL = (roomId: string, page: string) =>
@@ -25,7 +26,7 @@ export const chatNoteDetailURL = (roomId: string, noteId: string) =>
 export const getChatAlbumsURL = (roomId: string, page: string) =>
   `${albumURL(roomId)}?page=${page}`;
 //DELETE
-export const chatAlbumImageURL = (
+export const getChatAlbumImageURL = (
   roomId: string,
   albumId: string,
   page: string,
