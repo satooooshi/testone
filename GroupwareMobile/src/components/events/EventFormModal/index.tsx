@@ -506,7 +506,7 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
                 flexDir="row"
                 justifyContent="space-between"
                 rounded="md">
-                <Text fontSize={16} color={blueColor}>
+                <Text w={'90%'} fontSize={16} color={blueColor}>
                   {v.url}
                 </Text>
                 <TouchableOpacity>
