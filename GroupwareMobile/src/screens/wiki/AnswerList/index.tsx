@@ -6,6 +6,7 @@ import {QAAnswer, User} from '../../../types';
 import {darkFontColor} from '../../../utils/colors';
 import {userNameFactory} from '../../../utils/factory/userNameFactory';
 import MarkdownIt from 'markdown-it';
+import ReplyList from '../ReplyList';
 
 type AnswerListProps = {
   answers?: QAAnswer[];
@@ -18,43 +19,44 @@ const AnswerList: React.FC<AnswerListProps> = ({answers, onPressAvatar}) => {
   return (
     <FlatList
       data={answers || []}
-      keyExtractor={item => item.id.toString()}
-      renderItem={({item}) => (
-        <>
-          <Div flexDir="row" alignItems="center" mb={16}>
+      keyExtractor={answer => answer.id.toString()}
+      renderItem={({item: answer}) => (
+        <Div mb={26}>
+          <Div flexDir="row" alignItems="center" mb={8}>
             <TouchableOpacity
               onPress={() => {
-                if (item.writer && item.writer.existence) {
-                  onPressAvatar(item.writer);
+                if (answer.writer && answer.writer.existence) {
+                  onPressAvatar(answer.writer);
                 }
               }}>
               <Avatar
                 mr={8}
                 source={
-                  item.writer?.existence
-                    ? {uri: item.writer?.avatarUrl}
-                    : item.writer?.avatarUrl
+                  answer.writer?.existence
+                    ? {uri: answer.writer?.avatarUrl}
+                    : answer.writer?.avatarUrl
                     ? require('../../../../assets/bold-mascot.png')
                     : require('../../../../assets/no-image-avatar.png')
                 }
               />
             </TouchableOpacity>
             <Text fontSize={18} color={darkFontColor}>
-              {userNameFactory(item.writer)}
+              {userNameFactory(answer.writer)}
             </Text>
           </Div>
-          <Div bg="white" rounded="md" p={8} mb={16}>
+          <Div bg="white" rounded="md" p={8} mb={8}>
             <RenderHtml
               contentWidth={windowWidth * 0.9}
               source={{
                 html:
-                  item.textFormat === 'html'
-                    ? item.body
-                    : mdParser.render(item.body),
+                  answer.textFormat === 'html'
+                    ? answer.body
+                    : mdParser.render(answer.body),
               }}
             />
           </Div>
-        </>
+          <ReplyList answer={answer} onPressAvatar={onPressAvatar} />
+        </Div>
       )}
       ListEmptyComponent={
         <Text fontSize={16} textAlign="center">
