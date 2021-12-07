@@ -273,7 +273,7 @@ const NoteModal: React.FC<NoteModalProps> = ({
                   <MenuItem onClick={() => onClickEdit(n)}>編集</MenuItem>
                   <MenuItem onClick={() => onClickDelete(n)}>削除</MenuItem>
                 </MenuList>
-              </Menu>{' '}
+              </Menu>
             </Box>
             <SimpleGrid spacing="4px" columns={3} w="100%">
               {n.images?.map((i) => (

@@ -1,12 +1,19 @@
 import { SidebarScreenName } from '@/components/layout/Sidebar';
 import { MenuValue, useModalReducer } from '@/hooks/chat/useModalReducer';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { useAPIGetUsers } from '@/hooks/api/user/useAPIGetUsers';
 import {
   ChatAlbum,
   ChatAlbumImage,
   ChatGroup,
   ChatMessage,
+  ChatMessageReaction,
   ChatMessageType,
   ChatNote,
   ChatNoteImage,
@@ -15,7 +22,18 @@ import { useAPIGetChatGroupList } from '@/hooks/api/chat/useAPIGetChatGroupList'
 import { useAPIGetMessages } from '@/hooks/api/chat/useAPIGetMessages';
 import { useAPISendChatMessage } from '@/hooks/api/chat/useAPISendChatMessage';
 import CreateChatGroupModal from '@/components/chat/CreateChatGroupModal';
-import { useMediaQuery, useToast, Box, Link } from '@chakra-ui/react';
+import {
+  useMediaQuery,
+  useToast,
+  Box,
+  Link,
+  Modal,
+  ModalHeader,
+  ModalCloseButton,
+  ModalBody,
+  ModalContent,
+  ModalOverlay,
+} from '@chakra-ui/react';
 import { convertToRaw, EditorState } from 'draft-js';
 import { MentionData } from '@draft-js-plugins/mention';
 import '@draft-js-plugins/mention/lib/plugin.css';
@@ -48,6 +66,10 @@ import { useAPIUpdateNote } from '@/hooks/api/chat/note/useAPIUpdateChatNote';
 import { useAPISaveNoteImage } from '@/hooks/api/chat/note/useAPISaveChatNoteImages';
 import { useAPIDeleteChatNote } from '@/hooks/api/chat/note/useAPIDeleteChatNote';
 import { useAPICreateChatAlbum } from '@/hooks/api/chat/album/useAPICreateChatAlbum';
+import 'emoji-mart/css/emoji-mart.css';
+import { Picker } from 'emoji-mart';
+import { useAPISaveReaction } from '@/hooks/api/chat/useAPISaveReaction';
+import { useAPIDeleteReaction } from '@/hooks/api/chat/useAPIDeleteReaction';
 
 const ChatDetail = () => {
   const toast = useToast();
@@ -56,7 +78,19 @@ const ChatDetail = () => {
   const [{ popup, suggestions, mentionedUserData }, dispatchMention] =
     useMention();
   const [page, setPage] = useState(1);
+  const [selectedMsgForReaction, setSelectedMsgForReaction] =
+    useState<ChatMessage>();
+  const { mutate: saveReaction } = useAPISaveReaction();
+  const { mutate: deleteReaction } = useAPIDeleteReaction({
+    onSuccess: (reactionId) => {
+      setDeletedReactionIds((r) => [...r, reactionId]);
+    },
+  });
   const [albumListPage, setAlbumListPage] = useState(1);
+  const [deletedReactionIds, setDeletedReactionIds] = useState<number[]>([]);
+  const [selectedReactions, setSelectedReactions] = useState<
+    ChatMessageReaction[] | undefined
+  >();
   const [noteListPage, setNoteListPage] = useState(1);
   const { mutate: updateNote } = useAPIUpdateNote({
     onSuccess: () => {
@@ -452,6 +486,32 @@ const ChatDetail = () => {
       <Head>
         <title>ボールド | Chat</title>
       </Head>
+      <Modal
+        isOpen={!!selectedMsgForReaction}
+        onClose={() => setSelectedMsgForReaction(undefined)}>
+        <ModalOverlay />
+        <ModalContent h="90vh" bg={'#f9fafb'}>
+          <ModalHeader>emoji</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <Picker
+              title=""
+              emoji="point_up"
+              skin={1}
+              defaultSkin={1}
+              onSelect={(emoji) => {
+                saveReaction({
+                  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                  //@ts-ignore
+                  emoji: emoji?.native,
+                  chatMessage: selectedMsgForReaction,
+                });
+                setSelectedMsgForReaction(undefined);
+              }}
+            />
+          </ModalBody>
+        </ModalContent>
+      </Modal>
 
       {newChatMessage.chatGroup && (
         <NoteModal
@@ -591,6 +651,15 @@ const ChatDetail = () => {
             </Box>
             {newChatMessage.chatGroup && (
               <ChatBox
+                deletedReactionIds={deletedReactionIds}
+                onClickReaction={(message) =>
+                  setSelectedMsgForReaction(message)
+                }
+                onClickSpecificReaction={(reaction) => {
+                  reaction.isSender
+                    ? deleteReaction(reaction)
+                    : saveReaction(reaction);
+                }}
                 onClickNoteIcon={() => setVisibleNoteModal(true)}
                 onClickAlbumIcon={() => setVisibleAlbumModal(true)}
                 room={newChatMessage.chatGroup}

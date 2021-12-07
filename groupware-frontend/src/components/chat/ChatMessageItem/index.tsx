@@ -1,23 +1,51 @@
-import { Box, Image, Link, Text } from '@chakra-ui/react';
+import { Box, Button, Image, Link, Text } from '@chakra-ui/react';
 import React, { useCallback } from 'react';
 import { AiOutlineFileProtect } from 'react-icons/ai';
 import { Avatar } from '@chakra-ui/react';
-import { ChatMessage, ChatMessageType, LastReadChatTime } from 'src/types';
+import {
+  ChatMessage,
+  ChatMessageReaction,
+  ChatMessageType,
+  LastReadChatTime,
+} from 'src/types';
 import { dateTimeFormatterFromJSDDate } from 'src/utils/dateTimeFormatter';
 import { userNameFactory } from 'src/utils/factory/userNameFactory';
 import { mentionTransform } from 'src/utils/mentionTransform';
 import boldMascot from '@/public/bold-mascot.png';
 import { darkFontColor } from 'src/utils/colors';
+import { Menu, MenuItem, MenuButton } from '@szhsin/react-menu';
+import { HiOutlineDotsCircleHorizontal } from 'react-icons/hi';
+import { numbersOfSameValueInKeyOfObjArr } from 'src/utils/numbersOfSameValueInKeyOfObjArr';
 
 type ChatMessageItemProps = {
   message: ChatMessage;
   lastReadChatTime: LastReadChatTime[];
+  onClickReaction: () => void;
+  onClickSpecificReaction: (reaction: ChatMessageReaction) => void;
+  deletedReactionIds: number[];
 };
 
 const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
   message,
   lastReadChatTime,
+  onClickReaction,
+  onClickSpecificReaction,
+  deletedReactionIds = [],
 }) => {
+  const reactionRemovedDuplicates = (reactions: ChatMessageReaction[]) => {
+    const reactionsNoDuplicates: ChatMessageReaction[] = [];
+    for (const r of reactions) {
+      if (
+        reactionsNoDuplicates.filter(
+          (duplicated) => duplicated.isSender || duplicated.emoji !== r.emoji,
+        )
+      ) {
+        reactionsNoDuplicates.push(r);
+      }
+    }
+    return reactionsNoDuplicates;
+  };
+
   const messageReadCount = useCallback(
     (message: ChatMessage): number => {
       return lastReadChatTime?.filter((l) => l.readTime >= message.updatedAt)
@@ -39,7 +67,7 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
           alignItems="center"
           minW="60%"
           minH={'24px'}
-          mb={'16px'}
+          mb={'8px'}
           maxW="50vw">
           <Text fontSize={'14px'}>{message.content}</Text>
         </Box>
@@ -47,7 +75,7 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
       {message.type !== ChatMessageType.SYSTEM_TEXT && (
         <Box
           display="flex"
-          mb="16px"
+          mb="4px"
           maxW="50vw"
           key={message.id}
           alignSelf={message.isSender ? 'flex-end' : 'flex-start'}
@@ -68,20 +96,36 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
           ) : null}
           <Box display="flex" alignItems="flex-end">
             {message.isSender && (
-              <Box>
-                {messageReadCount(message) ? (
+              <>
+                <Menu
+                  direction="left"
+                  onItemClick={console.log}
+                  menuButton={
+                    <MenuButton>
+                      <HiOutlineDotsCircleHorizontal size={24} />
+                    </MenuButton>
+                  }
+                  transition>
+                  <MenuItem value={'reply'}>返信</MenuItem>
+                  <MenuItem value={'reaction'} onClick={onClickReaction}>
+                    リアクション
+                  </MenuItem>
+                </Menu>
+                <Box>
+                  {messageReadCount(message) ? (
+                    <Text mx="8px" color="gray" fontSize="12px">
+                      既読
+                      {messageReadCount(message)}
+                    </Text>
+                  ) : null}
                   <Text mx="8px" color="gray" fontSize="12px">
-                    既読
-                    {messageReadCount(message)}
+                    {dateTimeFormatterFromJSDDate({
+                      dateTime: new Date(message.createdAt),
+                      format: 'HH:mm',
+                    })}
                   </Text>
-                ) : null}
-                <Text mx="8px" color="gray" fontSize="12px">
-                  {dateTimeFormatterFromJSDDate({
-                    dateTime: new Date(message.createdAt),
-                    format: 'HH:mm',
-                  })}
-                </Text>
-              </Box>
+                </Box>
+              </>
             )}
             <Box display="flex" flexDir="column" alignItems="flex-start">
               <Text>
@@ -165,6 +209,39 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
           </Box>
         </Box>
       )}
+      <Box
+        flexDir="row"
+        flexWrap="wrap"
+        display="flex"
+        maxW={'50vw'}
+        alignSelf={message.isSender ? 'flex-end' : 'flex-start'}>
+        {message.reactions?.length
+          ? reactionRemovedDuplicates(message.reactions)
+              .filter((r) => !deletedReactionIds.includes(r.id))
+              .map((r) => (
+                <Box key={r.id} mb="4px" mr="4px">
+                  <Button
+                    onClick={() => onClickSpecificReaction(r)}
+                    bg={r.isSender ? 'blue.600' : undefined}
+                    flexDir="row"
+                    borderColor={'blue.600'}
+                    borderWidth={1}
+                    size="sm">
+                    <Text fontSize={16}>{r.emoji}</Text>
+                    <Text
+                      fontSize={16}
+                      color={r.isSender ? 'white' : undefined}>
+                      {numbersOfSameValueInKeyOfObjArr(
+                        message.reactions as ChatMessageReaction[],
+                        r,
+                        'emoji',
+                      )}
+                    </Text>
+                  </Button>
+                </Box>
+              ))
+          : null}
+      </Box>
     </>
   );
 };

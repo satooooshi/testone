@@ -6,7 +6,13 @@ import { HiOutlineDotsCircleHorizontal } from 'react-icons/hi';
 import Editor from '@draft-js-plugins/editor';
 import { EditorState } from 'draft-js';
 import { AiOutlinePaperClip, AiOutlinePicture } from 'react-icons/ai';
-import { ChatGroup, ChatMessage, LastReadChatTime, User } from 'src/types';
+import {
+  ChatGroup,
+  ChatMessage,
+  ChatMessageReaction,
+  LastReadChatTime,
+  User,
+} from 'src/types';
 import { MenuValue } from '@/hooks/chat/useModalReducer';
 import React, { useMemo, useRef } from 'react';
 import ChatMessageItem from '../ChatMessageItem';
@@ -24,6 +30,9 @@ type ChatBoxProps = {
   onSend: () => void;
   onClickNoteIcon: () => void;
   onClickAlbumIcon: () => void;
+  onClickReaction: (chatMessage: ChatMessage) => void;
+  onClickSpecificReaction: (reaction: ChatMessageReaction) => void;
+  deletedReactionIds: number[];
   suggestions: MentionData[];
   lastReadChatTime: LastReadChatTime[];
   editorState: EditorState;
@@ -46,6 +55,9 @@ const ChatBox: React.FC<ChatBoxProps> = ({
   editorState,
   onClickAlbumIcon,
   onClickNoteIcon,
+  onClickReaction,
+  onClickSpecificReaction,
+  deletedReactionIds,
   onEditorChange,
   onUploadFile,
   popupOpened,
@@ -150,9 +162,12 @@ const ChatBox: React.FC<ChatBoxProps> = ({
           <>
             {messages.map((m) => (
               <ChatMessageItem
+                onClickSpecificReaction={onClickSpecificReaction}
+                onClickReaction={() => onClickReaction(m)}
                 key={m.id}
                 message={m}
                 lastReadChatTime={lastReadChatTime}
+                deletedReactionIds={deletedReactionIds}
               />
             ))}
           </>
