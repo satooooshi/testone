@@ -91,11 +91,13 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
     handleSubmit: onComplete,
     setValues: setNewEvent,
     validateForm,
+    resetForm,
   } = useFormik<Partial<EventSchedule>>({
     initialValues: event || initialEventValue,
     validationSchema: savingEventSchema,
     onSubmit: async values => {
       onSubmit(values);
+      resetForm();
     },
   });
 
@@ -275,6 +277,7 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
             mb="lg"
             placeholder="タイトルを入力してください"
             bg="white"
+            autoCapitalize="none"
             rounded="md"
             fontSize={16}
           />
@@ -327,6 +330,7 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
             numberOfLines={10}
             textAlignVertical={'top'}
             multiline={true}
+            autoCapitalize="none"
             style={eventFormModalStyles.descriptionInput}
           />
           <Div mb="lg" />
