@@ -6,7 +6,6 @@ import { ChatMessage, ChatMessageType, LastReadChatTime } from 'src/types';
 import { dateTimeFormatterFromJSDDate } from 'src/utils/dateTimeFormatter';
 import { userNameFactory } from 'src/utils/factory/userNameFactory';
 import { mentionTransform } from 'src/utils/mentionTransform';
-import chatMessageItemStyles from '@/styles/components/chat/ChatMessageItem.module.scss';
 import boldMascot from '@/public/bold-mascot.png';
 import { darkFontColor } from 'src/utils/colors';
 
@@ -56,7 +55,9 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
           {!message.isSender ? (
             <Link href={`/account/${message.sender?.id}`} passHref>
               <Avatar
-                className={chatMessageItemStyles.group_card_avatar_image}
+                h="40px"
+                w="40px"
+                cursor="pointer"
                 src={
                   !message.sender?.existence
                     ? boldMascot.src
@@ -125,11 +126,20 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
                       />
                     </Box>
                   ) : (
-                    <a
+                    <Link
                       href={message.content}
-                      className={chatMessageItemStyles.message_other_file}>
+                      mr="8px"
+                      display="flex"
+                      flexDir="column"
+                      alignItems="center"
+                      borderWidth={'1px'}
+                      borderColor="gray"
+                      borderRadius="8px"
+                      p="8px">
                       <AiOutlineFileProtect
-                        className={chatMessageItemStyles.other_file_icon}
+                        height="48px"
+                        width="48px"
+                        color={darkFontColor}
                       />
                       <p>
                         {
@@ -139,7 +149,7 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
                           ])[1]
                         }
                       </p>
-                    </a>
+                    </Link>
                   )}
                 </Box>
               )}
