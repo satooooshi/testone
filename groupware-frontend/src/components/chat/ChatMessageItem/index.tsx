@@ -22,6 +22,7 @@ type ChatMessageItemProps = {
   lastReadChatTime: LastReadChatTime[];
   onClickReaction: () => void;
   onClickSpecificReaction: (reaction: ChatMessageReaction) => void;
+  onClickReply: () => void;
   deletedReactionIds: number[];
 };
 
@@ -30,6 +31,7 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
   lastReadChatTime,
   onClickReaction,
   onClickSpecificReaction,
+  onClickReply,
   deletedReactionIds = [],
 }) => {
   const reactionRemovedDuplicates = (reactions: ChatMessageReaction[]) => {
@@ -106,7 +108,9 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
                     </MenuButton>
                   }
                   transition>
-                  <MenuItem value={'reply'}>返信</MenuItem>
+                  <MenuItem value={'reply'} onClick={onClickReply}>
+                    返信
+                  </MenuItem>
                   <MenuItem value={'reaction'} onClick={onClickReaction}>
                     リアクション
                   </MenuItem>

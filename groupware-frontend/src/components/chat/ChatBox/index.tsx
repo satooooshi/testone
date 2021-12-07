@@ -17,10 +17,11 @@ import { MenuValue } from '@/hooks/chat/useModalReducer';
 import React, { useMemo, useRef } from 'react';
 import ChatMessageItem from '../ChatMessageItem';
 import chatStyles from '@/styles/layouts/Chat.module.scss';
-import { IoSend } from 'react-icons/io5';
+import { IoCloseSharp, IoSend } from 'react-icons/io5';
 import { FiFileText } from 'react-icons/fi';
 import createMentionPlugin from '@draft-js-plugins/mention';
 import { useDropzone } from 'react-dropzone';
+import { userNameFactory } from 'src/utils/factory/userNameFactory';
 
 type ChatBoxProps = {
   room: ChatGroup;
@@ -28,10 +29,13 @@ type ChatBoxProps = {
   onScrollTopOnChat: (scrollEvent: any) => void;
   messages: ChatMessage[];
   onSend: () => void;
+  replyParentMessage?: ChatMessage;
   onClickNoteIcon: () => void;
   onClickAlbumIcon: () => void;
   onClickReaction: (chatMessage: ChatMessage) => void;
   onClickSpecificReaction: (reaction: ChatMessageReaction) => void;
+  onClickReply: (chatMessage: ChatMessage) => void;
+  onCloseReply: () => void;
   deletedReactionIds: number[];
   suggestions: MentionData[];
   lastReadChatTime: LastReadChatTime[];
@@ -53,10 +57,13 @@ const ChatBox: React.FC<ChatBoxProps> = ({
   onSend,
   lastReadChatTime,
   editorState,
+  replyParentMessage,
   onClickAlbumIcon,
   onClickNoteIcon,
   onClickReaction,
   onClickSpecificReaction,
+  onCloseReply,
+  onClickReply,
   deletedReactionIds,
   onEditorChange,
   onUploadFile,
@@ -149,7 +156,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({
        */}
       <Box
         ref={messageWrapperDivRef}
-        h="73%"
+        h={!replyParentMessage ? '73%' : '60%'}
         bg="white"
         display="flex"
         flexDir="column-reverse"
@@ -164,6 +171,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({
               <ChatMessageItem
                 onClickSpecificReaction={onClickSpecificReaction}
                 onClickReaction={() => onClickReaction(m)}
+                onClickReply={() => onClickReply(m)}
                 key={m.id}
                 message={m}
                 lastReadChatTime={lastReadChatTime}
@@ -187,6 +195,39 @@ const ChatBox: React.FC<ChatBoxProps> = ({
           </Box>
         )}
       </Box>
+      {replyParentMessage && (
+        <Box
+          display="flex"
+          flexDir="row"
+          alignItems="center"
+          h="13%"
+          borderBottomWidth={1}
+          px="8px"
+          position="relative"
+          borderBottomColor="gray">
+          <Link
+            onClick={onCloseReply}
+            position="absolute"
+            bg="transparent"
+            rounded="full"
+            size="sm"
+            top={0}
+            right={0}>
+            <IoCloseSharp size={24} color={darkFontColor} />
+          </Link>
+          <Avatar
+            mr="8px"
+            src={replyParentMessage.sender?.avatarUrl}
+            size="md"
+          />
+          <Box display="flex" justifyContent="center" flexDir="column">
+            <Text fontWeight="bold">
+              {userNameFactory(replyParentMessage.sender)}
+            </Text>
+            <Text noOfLines={1}>{replyParentMessage.content}</Text>
+          </Box>
+        </Box>
+      )}
       <Box
         boxSizing="border-box"
         cursor="text"

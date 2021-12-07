@@ -65,7 +65,6 @@ import { useAPIGetChatNotes } from '@/hooks/api/chat/note/useAPIGetNotes';
 import { useAPIUpdateNote } from '@/hooks/api/chat/note/useAPIUpdateChatNote';
 import { useAPISaveNoteImage } from '@/hooks/api/chat/note/useAPISaveChatNoteImages';
 import { useAPIDeleteChatNote } from '@/hooks/api/chat/note/useAPIDeleteChatNote';
-import { useAPICreateChatAlbum } from '@/hooks/api/chat/album/useAPICreateChatAlbum';
 import 'emoji-mart/css/emoji-mart.css';
 import { Picker } from 'emoji-mart';
 import { useAPISaveReaction } from '@/hooks/api/chat/useAPISaveReaction';
@@ -130,7 +129,6 @@ const ChatDetail = () => {
     roomId: id,
     page: albumListPage.toString(),
   });
-  const { mutate: createAlbum } = useAPICreateChatAlbum();
   const [selectedAlbum, setSelectedAlbum] = useState<ChatAlbum>();
   const [albumImages, setAlbumImages] = useState<ChatAlbumImage[]>([]);
 
@@ -651,6 +649,19 @@ const ChatDetail = () => {
             </Box>
             {newChatMessage.chatGroup && (
               <ChatBox
+                replyParentMessage={newChatMessage.replyParentMessage}
+                onClickReply={(chatMessage) =>
+                  setNewChatMessage((m) => ({
+                    ...m,
+                    replyParentMessage: chatMessage,
+                  }))
+                }
+                onCloseReply={() =>
+                  setNewChatMessage((m) => ({
+                    ...m,
+                    replyParentMessage: undefined,
+                  }))
+                }
                 deletedReactionIds={deletedReactionIds}
                 onClickReaction={(message) =>
                   setSelectedMsgForReaction(message)
