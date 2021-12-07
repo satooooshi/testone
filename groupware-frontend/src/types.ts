@@ -250,6 +250,7 @@ export interface ChatMessage {
   chatGroup?: ChatGroup;
   chatMessages?: ChatMessage[];
   sender?: User;
+  reactions?: ChatMessageReaction[];
   createdAt: Date;
   updatedAt: Date;
   isSender?: boolean;
