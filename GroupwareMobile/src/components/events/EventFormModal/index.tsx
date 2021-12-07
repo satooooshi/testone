@@ -91,11 +91,13 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
     handleSubmit: onComplete,
     setValues: setNewEvent,
     validateForm,
+    resetForm,
   } = useFormik<Partial<EventSchedule>>({
     initialValues: event || initialEventValue,
     validationSchema: savingEventSchema,
     onSubmit: async values => {
       onSubmit(values);
+      resetForm();
     },
   });
 
@@ -184,19 +186,35 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
 
   const addYoutubeURL = () => {
     const newVideo: Partial<EventVideo> = {url: youtubeURL};
-    setNewEvent(e => {
-      if (e.videos && e.videos.length) {
+    const regExp =
+      /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
+    const isYoutubeURLFormat = regExp.test(newVideo.url || '');
+    if (isYoutubeURLFormat) {
+      setNewEvent(e => {
+        if (e.videos && e.videos.length) {
+          return {
+            ...e,
+            videos: [...e.videos, newVideo],
+          };
+        }
         return {
           ...e,
-          videos: [...e.videos, newVideo],
+          videos: [newVideo],
         };
-      }
-      return {
-        ...e,
-        videos: [newVideo],
-      };
-    });
+      });
+    } else {
+      Alert.alert('youtubeのURL形式で入力してください。');
+    }
     setYoutubeURL('');
+  };
+
+  const cancelAddingYoutubeURL = (index: number) => {
+    setNewEvent(e => {
+      if (e.videos?.length) {
+        ({...e, videos: e.videos.splice(index, 1)});
+      }
+      return e;
+    });
   };
 
   useEffect(() => {
@@ -259,6 +277,7 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
             mb="lg"
             placeholder="タイトルを入力してください"
             bg="white"
+            autoCapitalize="none"
             rounded="md"
             fontSize={16}
           />
@@ -311,6 +330,7 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
             numberOfLines={10}
             textAlignVertical={'top'}
             multiline={true}
+            autoCapitalize="none"
             style={eventFormModalStyles.descriptionInput}
           />
           <Div mb="lg" />
@@ -495,7 +515,7 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
                 </TouchableOpacity>
               }
             />
-            {newEvent.videos?.map(v => (
+            {newEvent.videos?.map((v, index) => (
               <Div
                 mb={'lg'}
                 w={'100%'}
@@ -506,10 +526,10 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
                 flexDir="row"
                 justifyContent="space-between"
                 rounded="md">
-                <Text fontSize={16} color={blueColor}>
+                <Text w={'90%'} fontSize={16} color={blueColor}>
                   {v.url}
                 </Text>
-                <TouchableOpacity>
+                <TouchableOpacity onPress={() => cancelAddingYoutubeURL(index)}>
                   <Icon name="closecircle" color="gray900" fontSize={24} />
                 </TouchableOpacity>
               </Div>

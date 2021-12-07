@@ -23,6 +23,7 @@ import {wikiTypeNameFactory} from '../../utils/factory/wiki/wikiTypeNameFactory'
 import {wikiSchema} from '../../utils/validation/schema';
 import tailwind from 'tailwind-rn';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+import {NodeHtmlMarkdown} from 'node-html-markdown';
 
 type WikiFormProps = {
   wiki?: Wiki;
@@ -59,6 +60,10 @@ const WikiForm: React.FC<WikiFormProps> = ({
     initialValues: wiki || initialValues,
     validationSchema: wikiSchema,
     onSubmit: w => {
+      if (w.textFormat === 'markdown') {
+        saveWiki({...w, body: NodeHtmlMarkdown.translate(w.body as string)});
+        return;
+      }
       saveWiki(w);
     },
   });

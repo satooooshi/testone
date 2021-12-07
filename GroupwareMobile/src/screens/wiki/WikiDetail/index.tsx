@@ -1,10 +1,8 @@
-import React, {useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import WholeContainer from '../../../components/WholeContainer';
-import {ScrollDiv, Div, Text, Avatar, Button} from 'react-native-magnus';
-import RenderHtml from 'react-native-render-html';
+import {Div, Text, Avatar, Button} from 'react-native-magnus';
 import {useAPIGetWikiDetail} from '../../../hooks/api/wiki/useAPIGetWikiDetail';
-import MarkdownIt from 'markdown-it';
-import {TouchableOpacity, useWindowDimensions} from 'react-native';
+import {StyleSheet, TouchableOpacity, useWindowDimensions} from 'react-native';
 import HeaderWithTextButton from '../../../components/Header';
 import {wikiTypeNameFactory} from '../../../utils/factory/wiki/wikiTypeNameFactory';
 import {
@@ -18,14 +16,48 @@ import {User, WikiType} from '../../../types';
 import {WikiDetailProps} from '../../../types/navigator/drawerScreenProps';
 import {useIsFocused} from '@react-navigation/core';
 import AnswerList from '../AnswerList';
+import {ScrollerProvider} from '../../../utils/htmlScroll/scroller';
+import {DrawerLayout, ScrollView} from 'react-native-gesture-handler';
+import WikiBodyRenderer from '../../../components/wiki/WikiBodyRenderer';
+import TOC from '../../../components/wiki/TOC';
+import {FAB} from 'react-native-paper';
+import MarkdownIt from 'markdown-it';
+import {useHTMLScrollFeature} from '../../../hooks/scroll/useHTMLScrollFeature';
+import {useDom} from '../../../hooks/dom/useDom';
+import {useMinimumDrawer} from '../../../hooks/minimumDrawer/useMinimumDrawer';
 
 const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
   const isFocused = useIsFocused();
   const {id} = route.params;
-  const mdParser = new MarkdownIt({breaks: true});
+  const {drawerRef, openDrawer, closeDrawer} = useMinimumDrawer();
   const {width: windowWidth, height: windowHeight} = useWindowDimensions();
   const {data: wikiInfo, refetch: refetchWikiInfo} = useAPIGetWikiDetail(id);
   const [wikiTypeName, setWikiTypeName] = useState('Wiki');
+  const mdParser = new MarkdownIt({breaks: true});
+  const wikiBody =
+    wikiInfo?.textFormat === 'html'
+      ? wikiInfo?.body
+      : wikiInfo?.textFormat === 'markdown'
+      ? mdParser.render(wikiInfo?.body || '')
+      : '';
+  const {dom, headings} = useDom(wikiBody);
+  const {scrollViewRef, scroller} = useHTMLScrollFeature(wikiInfo?.body);
+  const onPressEntry = useCallback(
+    (entry: string) => {
+      closeDrawer();
+      scroller.scrollToEntry(entry);
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [scroller],
+  );
+
+  const renderToc = useCallback(
+    function renderToc() {
+      return <TOC headings={headings} onPressEntry={onPressEntry} />;
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [headings],
+  );
 
   useEffect(() => {
     if (wikiInfo) {
@@ -70,15 +102,14 @@ const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
     });
   };
 
-  return (
-    <WholeContainer>
-      <HeaderWithTextButton
-        title={headerTitle}
-        rightButtonName={headerRightButtonName}
-        onPressRightButton={onPressHeaderRightButton}
-        enableBackButton={true}
-      />
-      <ScrollDiv
+  const renderingTOCNeeded = wikiInfo?.type !== WikiType.QA && headings.length;
+
+  const article = (
+    <ScrollerProvider scroller={scroller}>
+      <ScrollView
+        {...scroller.handlers}
+        ref={scrollViewRef}
+        scrollEventThrottle={100}
         contentContainerStyle={{
           ...wikiDetailStyles.wrapper,
           width: windowWidth * 0.9,
@@ -111,53 +142,84 @@ const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
               </Text>
             </Div>
             <Div bg="white" rounded="md" p={8} mb={16}>
-              <RenderHtml
-                contentWidth={windowWidth * 0.9}
-                source={{
-                  html:
-                    wikiInfo.textFormat === 'html'
-                      ? wikiInfo.body
-                      : mdParser.render(wikiInfo.body),
-                }}
-              />
+              {dom && <WikiBodyRenderer dom={dom} />}
             </Div>
           </Div>
         ) : null}
-      </ScrollDiv>
-      {wikiInfo?.type === WikiType.QA ? (
-        <Div h={windowHeight * 0.5} w={windowWidth * 0.9} alignSelf="center">
-          <Div
-            justifyContent="space-between"
-            alignItems="center"
-            flexDir="row"
-            mb={10}
-            pb={10}
-            borderBottomWidth={1}
-            borderBottomColor={wikiBorderColor}>
-            <Text fontWeight="bold" fontSize={24} color={darkFontColor}>
-              回答
-              {wikiInfo?.answers?.length ? wikiInfo.answers.length : 0}件
-            </Text>
-            <Button
-              alignSelf="center"
-              h={32}
-              fontSize={16}
-              py={0}
-              px={10}
-              onPress={onPressPostAnswerButton}
-              bg={wikiAnswerButtonColor}
-              color="white">
-              {wikiInfo?.answers?.length ? '回答を追加する' : '回答を投稿する'}
-            </Button>
+        {wikiInfo?.type === WikiType.QA ? (
+          <Div h={windowHeight * 0.5} w={windowWidth * 0.9} alignSelf="center">
+            <Div
+              justifyContent="space-between"
+              alignItems="center"
+              flexDir="row"
+              mb={10}
+              pb={10}
+              borderBottomWidth={1}
+              borderBottomColor={wikiBorderColor}>
+              <Text fontWeight="bold" fontSize={24} color={darkFontColor}>
+                回答
+                {wikiInfo?.answers?.length ? wikiInfo.answers.length : 0}件
+              </Text>
+              <Button
+                alignSelf="center"
+                h={32}
+                fontSize={16}
+                py={0}
+                px={10}
+                onPress={onPressPostAnswerButton}
+                bg={wikiAnswerButtonColor}
+                color="white">
+                {wikiInfo?.answers?.length
+                  ? '回答を追加する'
+                  : '回答を投稿する'}
+              </Button>
+            </Div>
+            <AnswerList
+              answers={wikiInfo.answers}
+              onPressAvatar={onPressAvatar}
+            />
           </Div>
-          <AnswerList
-            answers={wikiInfo.answers}
-            onPressAvatar={onPressAvatar}
+        ) : null}
+      </ScrollView>
+    </ScrollerProvider>
+  );
+
+  return (
+    <WholeContainer>
+      <HeaderWithTextButton
+        title={headerTitle}
+        rightButtonName={headerRightButtonName}
+        onPressRightButton={onPressHeaderRightButton}
+        enableBackButton={true}
+      />
+      {renderingTOCNeeded ? (
+        <DrawerLayout
+          drawerPosition="right"
+          drawerWidth={300}
+          renderNavigationView={renderToc}
+          ref={drawerRef}>
+          {article}
+          <FAB
+            style={styles.fab}
+            color="#61dafb"
+            icon="format-list-bulleted-square"
+            onPress={openDrawer}
           />
-        </Div>
-      ) : null}
+        </DrawerLayout>
+      ) : (
+        article
+      )}
     </WholeContainer>
   );
 };
 
 export default WikiDetail;
+
+const styles = StyleSheet.create({
+  fab: {
+    position: 'absolute',
+    bottom: 15,
+    right: 15,
+    backgroundColor: 'white',
+  },
+});

@@ -27,7 +27,7 @@ export class SaveWikiDto {
   tags: [];
 
   @isNotEmptyExceptTags({
-    message: '質問内容は必須項目です。空白のみは設定できません。',
+    message: '本文は必須項目です。空白のみは設定できません。',
   })
   @IsString({
     message: '質問内容のリクエストは文字列型に限られています。',

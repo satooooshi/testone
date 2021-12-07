@@ -34,7 +34,7 @@ export enum UserRole {
 }
 
 @Entity({ name: 'users' })
-@Index(['lastName', 'firstName', 'email'], { fulltext: true })
+@Index(['lastName', 'firstName'], { fulltext: true })
 @Unique(['email', 'existence'])
 export class User {
   @PrimaryGeneratedColumn()

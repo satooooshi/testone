@@ -24,6 +24,9 @@ export type RootStackParamList = {
   PostAnswer: {
     id: number;
   };
+  PostReply: {
+    id: number;
+  };
   AccountDetail:
     | {
         id?: number;

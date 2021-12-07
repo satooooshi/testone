@@ -32,6 +32,7 @@ import AlbumDetail from '../../screens/Chat/ChatMenu/ChatAlbum/AlbumDetail';
 import EditChatAlbum from '../../screens/Chat/ChatMenu/ChatAlbum/EditAlbum';
 import UserTagAdmin from '../../screens/admin/UserTagAdmin';
 import EditRoom from '../../screens/Chat/EditRoom';
+import PostReply from '../../screens/wiki/PostReply';
 
 const Drawer = createDrawerNavigator();
 const Stack = createStackNavigator();
@@ -62,6 +63,11 @@ const WikiStack = () => (
     <Stack.Screen
       name="PostAnswer"
       component={PostAnswer}
+      options={{headerShown: false}}
+    />
+    <Stack.Screen
+      name="PostReply"
+      component={PostReply}
       options={{headerShown: false}}
     />
   </Stack.Navigator>
