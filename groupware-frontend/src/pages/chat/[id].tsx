@@ -453,18 +453,21 @@ const ChatDetail = () => {
         <title>ボールド | Chat</title>
       </Head>
 
-      <NoteModal
-        onClickBackButton={() => setEdittedNote(undefined)}
-        onClickEdit={(note) => setEdittedNote(note)}
-        edittedNote={edittedNote}
-        isOpen={visibleNoteModal}
-        onClose={() => setVisibleNoteModal(false)}
-        headerName={'ノート一覧'}
-        notes={notes?.notes || []}
-        onUploadImage={handleUploadImageToExisNote}
-        onSubmitEdittedNote={(note) => updateNote(note)}
-        onClickDelete={handleNoteDelete}
-      />
+      {newChatMessage.chatGroup && (
+        <NoteModal
+          room={newChatMessage.chatGroup}
+          onClickBackButton={() => setEdittedNote(undefined)}
+          onClickEdit={(note) => setEdittedNote(note)}
+          edittedNote={edittedNote}
+          isOpen={visibleNoteModal}
+          onClose={() => setVisibleNoteModal(false)}
+          headerName={'ノート一覧'}
+          notes={notes?.notes || []}
+          onUploadImage={handleUploadImageToExisNote}
+          onSubmitEdittedNote={(note) => updateNote(note)}
+          onClickDelete={handleNoteDelete}
+        />
+      )}
 
       {newChatMessage.chatGroup && (
         <AlbumModal

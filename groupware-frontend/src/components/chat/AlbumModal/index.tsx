@@ -231,20 +231,21 @@ const AlbumModal: React.FC<AlbumModalProps> = ({
 
   const listMode = (
     <>
-      <Box flexDir="row" justifyContent="flex-end" display="flex">
+      <Box flexDir="row" justifyContent="flex-end" display="flex" mb={'40px'}>
         <Button
           size="sm"
           flexDir="row"
           onClick={() => setMode('post')}
+          position="absolute"
           mb="8px"
           colorScheme="green"
           alignItems="center">
-          <Text display="inline">アルバムを追加</Text>
+          <Text display="inline">アルバムを作成</Text>
         </Button>
       </Box>
 
       {albums.map((a) => (
-        <Box mb="sm" key={a.id}>
+        <Box mb="16px" key={a.id}>
           <AlbumBox album={a} onClick={onClickAlbum} />
         </Box>
       ))}

@@ -92,7 +92,6 @@ export class ChatAlbumService {
       images: undefined,
     });
     if (dto.images?.length) {
-      console.log('called');
       const sentImages = dto.images.map((i) => ({
         ...i,
         imageURL: this.storageService.parseSignedURLToStorageURL(i.imageURL),
