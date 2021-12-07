@@ -1,5 +1,4 @@
-import { Link } from '@chakra-ui/react';
-import clsx from 'clsx';
+import { Box, Image, Link, Text } from '@chakra-ui/react';
 import React, { useCallback } from 'react';
 import { AiOutlineFileProtect } from 'react-icons/ai';
 import { Avatar } from '@chakra-ui/react';
@@ -9,6 +8,7 @@ import { userNameFactory } from 'src/utils/factory/userNameFactory';
 import { mentionTransform } from 'src/utils/mentionTransform';
 import chatMessageItemStyles from '@/styles/components/chat/ChatMessageItem.module.scss';
 import boldMascot from '@/public/bold-mascot.png';
+import { darkFontColor } from 'src/utils/colors';
 
 type ChatMessageItemProps = {
   message: ChatMessage;
@@ -30,25 +30,29 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
   return (
     <>
       {message.type === ChatMessageType.SYSTEM_TEXT && (
-        <div
-          className={clsx(
-            chatMessageItemStyles.system_message_wrapper,
-            chatMessageItemStyles.message__item,
-          )}>
-          <p className={chatMessageItemStyles.system_message}>
-            {message.content}
-          </p>
-        </div>
+        <Box
+          bg="#ececec"
+          borderRadius="md"
+          alignSelf="center"
+          display="flex"
+          flexDir="row"
+          justifyContent="center"
+          alignItems="center"
+          minW="60%"
+          minH={'24px'}
+          mb={'16px'}
+          maxW="50vw">
+          <Text fontSize={'14px'}>{message.content}</Text>
+        </Box>
       )}
       {message.type !== ChatMessageType.SYSTEM_TEXT && (
-        <div
+        <Box
+          display="flex"
+          mb="16px"
+          maxW="50vw"
           key={message.id}
-          className={clsx(
-            chatMessageItemStyles.message__item,
-            message.isSender
-              ? chatMessageItemStyles.message__self
-              : chatMessageItemStyles.message__other,
-          )}>
+          alignSelf={message.isSender ? 'flex-end' : 'flex-start'}
+          flexDir={message.isSender ? 'row-reverse' : undefined}>
           {!message.isSender ? (
             <Link href={`/account/${message.sender?.id}`} passHref>
               <Avatar
@@ -61,62 +65,65 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
               />
             </Link>
           ) : null}
-          <div className={chatMessageItemStyles.message_wrapper}>
+          <Box display="flex" alignItems="flex-end">
             {message.isSender && (
-              <div>
+              <Box>
                 {messageReadCount(message) ? (
-                  <p className={chatMessageItemStyles.read_count}>
+                  <Text mx="8px" color="gray" fontSize="12px">
                     既読
                     {messageReadCount(message)}
-                  </p>
+                  </Text>
                 ) : null}
-                <p className={chatMessageItemStyles.send_time}>
+                <Text mx="8px" color="gray" fontSize="12px">
                   {dateTimeFormatterFromJSDDate({
                     dateTime: new Date(message.createdAt),
                     format: 'HH:mm',
                   })}
-                </p>
-              </div>
+                </Text>
+              </Box>
             )}
-            <div
-              className={clsx(chatMessageItemStyles.message_user_info_wrapper)}>
-              <p className={chatMessageItemStyles.massage_sender_name}>
+            <Box display="flex" flexDir="column" alignItems="flex-start">
+              <Text>
                 {message.sender && message.sender?.existence
                   ? userNameFactory(message.sender)
                   : 'ボールドくん'}
-              </p>
+              </Text>
               {message.type === ChatMessageType.TEXT ? (
-                <p
-                  className={clsx(
-                    chatMessageItemStyles.message_content,
-                    message.isSender
-                      ? chatMessageItemStyles.message_text__self
-                      : chatMessageItemStyles.message_text__other,
-                  )}>
+                <Text
+                  borderRadius="8px"
+                  p="8px"
+                  maxW={'40vw'}
+                  minW={'10vw'}
+                  wordBreak={'break-word'}
+                  color={message.isSender ? 'white' : darkFontColor}
+                  bg={message.isSender ? 'blue.500' : '#ececec'}>
                   {mentionTransform(message.content)}
-                </p>
+                </Text>
               ) : (
-                <span className={chatMessageItemStyles.message_content}>
+                <Box
+                  borderRadius="8px"
+                  p="8px"
+                  maxW="40vw"
+                  minW="10vw"
+                  wordBreak="break-word">
                   {message.type === ChatMessageType.IMAGE ? (
-                    <span
-                      className={chatMessageItemStyles.message_image_or_video}>
-                      <img
+                    <Box display="flex" maxW="300px" maxH={'300px'}>
+                      <Image
                         src={message.content}
-                        width={300}
-                        height={300}
-                        alt="image"
+                        w={300}
+                        h={300}
+                        alt="送信された画像"
                       />
-                    </span>
+                    </Box>
                   ) : message.type === ChatMessageType.VIDEO ? (
-                    <span
-                      className={chatMessageItemStyles.message_image_or_video}>
+                    <Box display="flex" maxW="300px" maxH={'300px'}>
                       <video
                         src={message.content}
                         controls
                         width={300}
                         height={300}
                       />
-                    </span>
+                    </Box>
                   ) : (
                     <a
                       href={message.content}
@@ -134,19 +141,19 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
                       </p>
                     </a>
                   )}
-                </span>
+                </Box>
               )}
-            </div>
+            </Box>
             {!message.isSender && (
-              <p className={chatMessageItemStyles.send_time}>
+              <Text mx="8px" color="gray">
                 {dateTimeFormatterFromJSDDate({
                   dateTime: new Date(message.createdAt),
                   format: 'HH:mm',
                 })}
-              </p>
+              </Text>
             )}
-          </div>
-        </div>
+          </Box>
+        </Box>
       )}
     </>
   );
