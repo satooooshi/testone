@@ -1799,6 +1799,13 @@
     "@types/react" "*"
     immutable "~3.7.4"
 
+"@types/emoji-mart@^3.0.8":
+  version "3.0.8"
+  resolved "https://registry.yarnpkg.com/@types/emoji-mart/-/emoji-mart-3.0.8.tgz#b0de7aabf39b5c4b6e378432bb3b99dbf903bc04"
+  integrity sha512-jmNew3D9XAVchIpyXHEZjR3Sa0uP8qD5TILk9U6Ev/Fcp43V6K1UFZ07KWtVVLjzyCMXaFB9UD3/3Y/2vVdGmQ==
+  dependencies:
+    "@types/react" "*"
+
 "@types/file-saver@^2.0.3":
   version "2.0.3"
   resolved "https://registry.yarnpkg.com/@types/file-saver/-/file-saver-2.0.3.tgz#b734c4f5a04d20615eaed3dc106e2ab321082009"
