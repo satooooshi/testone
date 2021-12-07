@@ -28,6 +28,7 @@
     "dayjs": "^1.10.7",
     "deepmerge": "^4.2.2",
     "diff": "^5.0.0",
+    "domutils": "^2.8.0",
     "formik": "^2.2.9",
     "intl": "^1.2.5",
     "jsc-android": "^250230.2.1",
