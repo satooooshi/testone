@@ -47,6 +47,7 @@ import { useAPIGetChatNotes } from '@/hooks/api/chat/note/useAPIGetNotes';
 import { useAPIUpdateNote } from '@/hooks/api/chat/note/useAPIUpdateChatNote';
 import { useAPISaveNoteImage } from '@/hooks/api/chat/note/useAPISaveChatNoteImages';
 import { useAPIDeleteChatNote } from '@/hooks/api/chat/note/useAPIDeleteChatNote';
+import { useAPICreateChatAlbum } from '@/hooks/api/chat/album/useAPICreateChatAlbum';
 
 const ChatDetail = () => {
   const toast = useToast();
@@ -95,6 +96,7 @@ const ChatDetail = () => {
     roomId: id,
     page: albumListPage.toString(),
   });
+  const { mutate: createAlbum } = useAPICreateChatAlbum();
   const [selectedAlbum, setSelectedAlbum] = useState<ChatAlbum>();
   const [albumImages, setAlbumImages] = useState<ChatAlbumImage[]>([]);
 
@@ -366,7 +368,7 @@ const ChatDetail = () => {
     }
   };
 
-  const handleUploadNoteImage = (files: File[]) => {
+  const handleUploadImageToExisNote = (files: File[]) => {
     uploadImage(files, {
       onSuccess: (imageURLs) => {
         const noteImages: Partial<ChatNoteImage>[] = imageURLs.map((i) => ({
@@ -389,7 +391,7 @@ const ChatDetail = () => {
     });
   };
 
-  const handleUploadAlbumImage = (files: File[]) => {
+  const handleUploadImageToExistAlbum = (files: File[]) => {
     uploadImage(files, {
       onSuccess: (imageURLs) => {
         if (selectedAlbum) {
@@ -459,25 +461,28 @@ const ChatDetail = () => {
         onClose={() => setVisibleNoteModal(false)}
         headerName={'ノート一覧'}
         notes={notes?.notes || []}
-        onUploadImage={handleUploadNoteImage}
+        onUploadImage={handleUploadImageToExisNote}
         onSubmitEdittedNote={(note) => updateNote(note)}
         onClickDelete={handleNoteDelete}
       />
 
-      <AlbumModal
-        isOpen={visibleAlbumModal}
-        onClose={() => setVisibleAlbumModal(false)}
-        headerName="アルバム一覧"
-        albums={albums?.albums || []}
-        images={albumImages}
-        selectedAlbum={selectedAlbum}
-        onClickAlbum={(album) => setSelectedAlbum(album)}
-        onClickBackButton={() => {
-          setSelectedAlbum(undefined);
-          setAlbumImages([]);
-        }}
-        onUploadImage={handleUploadAlbumImage}
-      />
+      {newChatMessage.chatGroup && (
+        <AlbumModal
+          room={newChatMessage.chatGroup}
+          isOpen={visibleAlbumModal}
+          onClose={() => setVisibleAlbumModal(false)}
+          headerName="アルバム一覧"
+          albums={albums?.albums || []}
+          images={albumImages}
+          selectedAlbum={selectedAlbum}
+          onClickAlbum={(album) => setSelectedAlbum(album)}
+          onClickBackButton={() => {
+            setSelectedAlbum(undefined);
+            setAlbumImages([]);
+          }}
+          onUploadImage={handleUploadImageToExistAlbum}
+        />
+      )}
       {users && (
         <CreateChatGroupModal
           isOpen={createGroupWindow}
