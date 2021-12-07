@@ -38,3 +38,8 @@ export type EditWikiNavigationProps = StackNavigationProp<
 export type EditWikiRouteProps = RouteProp<RootStackParamList, 'EditWiki'>;
 
 export type PostAnswerRouteProps = RouteProp<RootStackParamList, 'PostAnswer'>;
+
+export type PostReplyNavigationProps = StackNavigationProp<
+  DrawerTabParamList,
+  'WikiStack'
+>;

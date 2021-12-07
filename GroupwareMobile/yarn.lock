@@ -6949,6 +6949,11 @@ react-native-bootsplash@^4.0.2:
     fs-extra "^10.0.0"
     jimp "^0.16.1"
 
+react-native-cn-quill@^0.7.15:
+  version "0.7.15"
+  resolved "https://registry.yarnpkg.com/react-native-cn-quill/-/react-native-cn-quill-0.7.15.tgz#f32270dcd9ff31aae69172ecb599ecb65bc1ed34"
+  integrity sha512-JX32hXVP0vqwxLwn0v6LIr3x2l0dHmjyH/+c8//3fFVc+Bvqrn04mfgNB1ieF3vXsJnJiskFwr4aaS+M33Dctw==
+
 react-native-codegen@^0.0.7:
   version "0.0.7"
   resolved "https://registry.yarnpkg.com/react-native-codegen/-/react-native-codegen-0.0.7.tgz#86651c5c5fec67a8077ef7f4e36f7ed459043e14"

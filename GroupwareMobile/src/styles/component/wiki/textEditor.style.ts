@@ -7,4 +7,8 @@ export const textEditorStyles = StyleSheet.create({
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderColor: '#e3e3e3',
   },
+  quillEditor: {
+    flex: 1,
+    minHeight: 100,
+  },
 });

@@ -47,8 +47,8 @@ export class WikiController {
   }
 
   @Get('detail/:id')
-  async getWikiDetail(@Param() params: { id: number }): Promise<Wiki> {
-    return await this.qaService.getWikiDetail(params.id);
+  async getWikiDetail(@Param('id') id: number): Promise<Wiki> {
+    return await this.qaService.getWikiDetail(id);
   }
 
   @Get('latest')
@@ -88,6 +88,11 @@ export class WikiController {
   ): Promise<QAAnswer> {
     answer.writer = request.user;
     return await this.qaService.createAnswer(answer);
+  }
+
+  @Get('/v2/answer-detail/:id')
+  async getAnswerDetail(@Param('id') id: number): Promise<QAAnswer> {
+    return await this.qaService.getAnswerDetail(id);
   }
 
   @UseGuards(JwtAuthenticationGuard)
