@@ -1,5 +1,5 @@
 import React from 'react';
-import {FlatList, TouchableOpacity, useWindowDimensions} from 'react-native';
+import {TouchableOpacity, useWindowDimensions} from 'react-native';
 import RenderHtml from 'react-native-render-html';
 import {Div, Avatar, Text} from 'react-native-magnus';
 import {QAAnswer, User} from '../../../types';
@@ -17,53 +17,52 @@ const AnswerList: React.FC<AnswerListProps> = ({answers, onPressAvatar}) => {
   const mdParser = new MarkdownIt({breaks: true});
   const {width: windowWidth} = useWindowDimensions();
   return (
-    <FlatList
-      data={answers || []}
-      keyExtractor={answer => answer.id.toString()}
-      renderItem={({item: answer}) => (
-        <Div mb={26}>
-          <Div flexDir="row" alignItems="center" mb={8}>
-            <TouchableOpacity
-              onPress={() => {
-                if (answer.writer && answer.writer.existence) {
-                  onPressAvatar(answer.writer);
-                }
-              }}>
-              <Avatar
-                mr={8}
-                source={
-                  answer.writer?.existence
-                    ? {uri: answer.writer?.avatarUrl}
-                    : answer.writer?.avatarUrl
-                    ? require('../../../../assets/bold-mascot.png')
-                    : require('../../../../assets/no-image-avatar.png')
-                }
+    <>
+      {answers?.length ? (
+        answers.map(answer => (
+          <Div mb={26}>
+            <Div flexDir="row" alignItems="center" mb={8}>
+              <TouchableOpacity
+                onPress={() => {
+                  if (answer.writer && answer.writer.existence) {
+                    onPressAvatar(answer.writer);
+                  }
+                }}>
+                <Avatar
+                  mr={8}
+                  source={
+                    answer.writer?.existence
+                      ? {uri: answer.writer?.avatarUrl}
+                      : answer.writer?.avatarUrl
+                      ? require('../../../../assets/bold-mascot.png')
+                      : require('../../../../assets/no-image-avatar.png')
+                  }
+                />
+              </TouchableOpacity>
+              <Text fontSize={18} color={darkFontColor}>
+                {userNameFactory(answer.writer)}
+              </Text>
+            </Div>
+            <Div bg="white" rounded="md" p={8} mb={8}>
+              <RenderHtml
+                contentWidth={windowWidth * 0.9}
+                source={{
+                  html:
+                    answer.textFormat === 'html'
+                      ? answer.body
+                      : mdParser.render(answer.body),
+                }}
               />
-            </TouchableOpacity>
-            <Text fontSize={18} color={darkFontColor}>
-              {userNameFactory(answer.writer)}
-            </Text>
+            </Div>
+            <ReplyList answer={answer} onPressAvatar={onPressAvatar} />
           </Div>
-          <Div bg="white" rounded="md" p={8} mb={8}>
-            <RenderHtml
-              contentWidth={windowWidth * 0.9}
-              source={{
-                html:
-                  answer.textFormat === 'html'
-                    ? answer.body
-                    : mdParser.render(answer.body),
-              }}
-            />
-          </Div>
-          <ReplyList answer={answer} onPressAvatar={onPressAvatar} />
-        </Div>
-      )}
-      ListEmptyComponent={
+        ))
+      ) : (
         <Text fontSize={16} textAlign="center">
           回答を投稿してください
         </Text>
-      }
-    />
+      )}
+    </>
   );
 };
 
