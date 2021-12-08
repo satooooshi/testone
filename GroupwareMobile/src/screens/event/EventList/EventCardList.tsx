@@ -1,5 +1,5 @@
-import React, {Dispatch, SetStateAction, useEffect} from 'react';
-import {FlatList} from 'react-native';
+import React, {Dispatch, SetStateAction, useEffect, useState} from 'react';
+import {FlatList, Text} from 'react-native';
 import {
   SearchQueryToGetEvents,
   EventStatus,
@@ -9,6 +9,10 @@ import {Div} from 'react-native-magnus';
 import {useIsFocused, useNavigation} from '@react-navigation/native';
 import {EventSchedule} from '../../../types';
 import {EventListNavigationProps} from '../../../types/navigator/drawerScreenProps';
+import {genKeyQueryFromObjArr} from '../../../utils/genKeyQueryFromObjArr';
+import SearchForm from '../../../components/common/SearchForm';
+import {useAPIGetTag} from '../../../hooks/api/tag/useAPIGetTag';
+import SearchFormOpenerButton from '../../../components/common/SearchForm/SearchFormOpenerButton';
 
 type EventCardListProps = {
   status: EventStatus;
@@ -24,6 +28,8 @@ const EventCardList: React.FC<EventCardListProps> = ({
 }) => {
   const isFocused = useIsFocused();
   const navigation = useNavigation<EventListNavigationProps>();
+  const {data: tags} = useAPIGetTag();
+  const [visibleSearchFormModal, setVisibleSearchFormModal] = useState(false);
 
   const onEndReached = () => {
     setSearchQuery(q => ({
@@ -40,9 +46,24 @@ const EventCardList: React.FC<EventCardListProps> = ({
 
   return (
     <Div flexDir="column" alignItems="center">
+      <SearchFormOpenerButton onPress={() => setVisibleSearchFormModal(true)} />
+      <SearchForm
+        isVisible={visibleSearchFormModal}
+        onCloseModal={() => setVisibleSearchFormModal(false)}
+        tags={tags || []}
+        onSubmit={values => {
+          setVisibleSearchFormModal(false);
+          setSearchQuery(q => ({
+            ...q,
+            word: values.word,
+            tag: genKeyQueryFromObjArr(values.selectedTags, 'id'),
+          }));
+        }}
+      />
       <FlatList
         onEndReached={onEndReached}
         data={searchResult || []}
+        ListEmptyComponent={<Text>検索結果が見つかりませんでした</Text>}
         keyExtractor={item => item.id.toString()}
         renderItem={({item: eventSchedule}) => (
           <Div mb={16}>
