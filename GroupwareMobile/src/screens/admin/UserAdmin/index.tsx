@@ -1,12 +1,8 @@
 import {useNavigation} from '@react-navigation/native';
 import React, {useEffect, useRef, useState} from 'react';
-import {
-  ActivityIndicator,
-  Alert,
-  FlatList,
-  TouchableOpacity,
-} from 'react-native';
+import {Alert, FlatList, TouchableOpacity} from 'react-native';
 import {Text, Div, Image, Icon, Dropdown, Overlay} from 'react-native-magnus';
+import {ActivityIndicator} from 'react-native-paper';
 import DropdownOpenerButton from '../../../components/common/DropdownOpenerButton';
 import SearchForm from '../../../components/common/SearchForm';
 import SearchFormOpenerButton from '../../../components/common/SearchForm/SearchFormOpenerButton';
@@ -130,9 +126,6 @@ const UserAdmin: React.FC = () => {
 
   return (
     <WholeContainer>
-      <Overlay visible={isLoading} p="xl">
-        <ActivityIndicator />
-      </Overlay>
       <HeaderWithTextButton
         title="Admin"
         tabs={tabs}
@@ -235,56 +228,61 @@ const UserAdmin: React.FC = () => {
         </Dropdown.Option>
       </Dropdown>
 
-      <FlatList
-        data={usersForInfiniteScroll}
-        {...{onEndReached}}
-        keyExtractor={item => item.id.toString()}
-        renderItem={({item}) => (
-          <Div
-            py="xs"
-            w={'100%'}
-            borderBottomWidth={1}
-            borderBottomColor={'#b0b0b0'}
-            flexDir="row"
-            alignItems="center"
-            minH={40}>
-            <TouchableOpacity
-              style={userAdminStyles.avatar}
-              onPress={() =>
-                navigation.navigate('AccountStack', {
-                  screen: 'AccountDetail',
-                  params: {id: item.id},
-                })
-              }>
-              <Image
-                w={'100%'}
-                h={'100%'}
-                rounded="circle"
-                source={
-                  item.avatarUrl
-                    ? {uri: item.avatarUrl}
-                    : require('../../../../assets/no-image-avatar.png')
-                }
-              />
-            </TouchableOpacity>
-            <Text w={'29%'} mr={'1%'}>{`${userNameFactory(item)}\n${
-              item.email
-            }`}</Text>
-            <Div w={'39%'} mr={'1%'}>
-              <DropdownOpenerButton
-                onPress={() => {
-                  setCurrentUpdatingUser(item);
-                  dropdownRef.current?.open();
-                }}
-                name={userRoleNameFactory(item.role)}
-              />
+      {usersForInfiniteScroll.length ? (
+        <FlatList
+          data={usersForInfiniteScroll}
+          {...{onEndReached}}
+          keyExtractor={item => item.id.toString()}
+          renderItem={({item}) => (
+            <Div
+              py="xs"
+              w={'100%'}
+              borderBottomWidth={1}
+              borderBottomColor={'#b0b0b0'}
+              flexDir="row"
+              alignItems="center"
+              minH={40}>
+              <TouchableOpacity
+                style={userAdminStyles.avatar}
+                onPress={() =>
+                  navigation.navigate('AccountStack', {
+                    screen: 'AccountDetail',
+                    params: {id: item.id},
+                  })
+                }>
+                <Image
+                  w={'100%'}
+                  h={'100%'}
+                  rounded="circle"
+                  source={
+                    item.avatarUrl
+                      ? {uri: item.avatarUrl}
+                      : require('../../../../assets/no-image-avatar.png')
+                  }
+                />
+              </TouchableOpacity>
+              <Text w={'29%'} mr={'1%'}>{`${userNameFactory(item)}\n${
+                item.email
+              }`}</Text>
+              <Div w={'39%'} mr={'1%'}>
+                <DropdownOpenerButton
+                  onPress={() => {
+                    setCurrentUpdatingUser(item);
+                    dropdownRef.current?.open();
+                  }}
+                  name={userRoleNameFactory(item.role)}
+                />
+              </Div>
+              <TouchableOpacity onPress={() => handleDeleteUser(item)}>
+                <Icon name="delete" fontSize={26} />
+              </TouchableOpacity>
             </Div>
-            <TouchableOpacity onPress={() => handleDeleteUser(item)}>
-              <Icon name="delete" fontSize={26} />
-            </TouchableOpacity>
-          </Div>
-        )}
-      />
+          )}
+        />
+      ) : (
+        <Text fontSize={16}>検索結果が見つかりませんでした</Text>
+      )}
+      {isLoading && <ActivityIndicator />}
     </WholeContainer>
   );
 };

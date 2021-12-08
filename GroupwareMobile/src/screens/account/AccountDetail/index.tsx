@@ -1,8 +1,9 @@
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
 import {useIsFocused, useNavigation, useRoute} from '@react-navigation/native';
 import React, {useEffect, useState} from 'react';
-import {ActivityIndicator, useWindowDimensions} from 'react-native';
-import {Text, Div, ScrollDiv, Image, Overlay} from 'react-native-magnus';
+import {useWindowDimensions} from 'react-native';
+import {Text, Div, ScrollDiv, Image} from 'react-native-magnus';
+import {ActivityIndicator} from 'react-native-paper';
 import TagListBox from '../../../components/account/TagListBox';
 import EventCard from '../../../components/events/EventCard';
 import HeaderWithTextButton, {Tab} from '../../../components/Header';
@@ -28,9 +29,10 @@ const TopTab = createMaterialTopTabNavigator();
 
 type DetailScreenProps = {
   profile: User;
+  isLoading: boolean;
 };
 
-const DetailScreen: React.FC<DetailScreenProps> = ({profile}) => {
+const DetailScreen: React.FC<DetailScreenProps> = ({profile, isLoading}) => {
   const {width: windowWidth} = useWindowDimensions();
   const {filteredTags: techTags} = useTagType(TagType.TECH, profile.tags || []);
   const {filteredTags: qualificationTags} = useTagType(
@@ -44,47 +46,53 @@ const DetailScreen: React.FC<DetailScreenProps> = ({profile}) => {
   );
 
   return (
-    <Div w={windowWidth * 0.9} alignSelf="center">
-      <Div mb={'lg'} flexDir="row">
-        <Text mr="lg" fontSize={16}>
-          社員区分
-        </Text>
-        <Text color={darkFontColor} fontWeight="bold" fontSize={20}>
-          {userRoleNameFactory(profile.role)}
-        </Text>
-      </Div>
-      <Div flexDir="row" mb={'lg'}>
-        <Text mr="lg" fontSize={16}>
-          自己紹介
-        </Text>
-        <Text color={darkFontColor} fontWeight="bold" fontSize={20}>
-          {profile.introduceOther || '未設定'}
-        </Text>
-      </Div>
-      <TagListBox
-        mb={'lg'}
-        tags={techTags || []}
-        tagType={TagType.TECH}
-        introduce={profile.introduceTech}
-      />
-      <TagListBox
-        mb={'lg'}
-        tags={qualificationTags || []}
-        tagType={TagType.QUALIFICATION}
-        introduce={profile.introduceQualification}
-      />
-      <TagListBox
-        mb={'lg'}
-        tags={clubTags || []}
-        tagType={TagType.CLUB}
-        introduce={profile.introduceClub}
-      />
-      <TagListBox
-        mb={'lg'}
-        tags={hobbyTags || []}
-        tagType={TagType.HOBBY}
-        introduce={profile.introduceHobby}
-      />
+    <Div w={windowWidth * 0.9} alignSelf="center" mt="lg">
+      {!isLoading ? (
+        <>
+          <Div mb={'lg'} flexDir="row">
+            <Text mr="lg" fontSize={16}>
+              社員区分
+            </Text>
+            <Text color={darkFontColor} fontWeight="bold" fontSize={20}>
+              {userRoleNameFactory(profile.role)}
+            </Text>
+          </Div>
+          <Div flexDir="row" mb={'lg'}>
+            <Text mr="lg" fontSize={16}>
+              自己紹介
+            </Text>
+            <Text color={darkFontColor} fontWeight="bold" fontSize={20}>
+              {profile.introduceOther || '未設定'}
+            </Text>
+          </Div>
+          <TagListBox
+            mb={'lg'}
+            tags={techTags || []}
+            tagType={TagType.TECH}
+            introduce={profile.introduceTech}
+          />
+          <TagListBox
+            mb={'lg'}
+            tags={qualificationTags || []}
+            tagType={TagType.QUALIFICATION}
+            introduce={profile.introduceQualification}
+          />
+          <TagListBox
+            mb={'lg'}
+            tags={clubTags || []}
+            tagType={TagType.CLUB}
+            introduce={profile.introduceClub}
+          />
+          <TagListBox
+            mb={'lg'}
+            tags={hobbyTags || []}
+            tagType={TagType.HOBBY}
+            introduce={profile.introduceHobby}
+          />
+        </>
+      ) : (
+        <ActivityIndicator />
+      )}
     </Div>
   );
 };
@@ -136,21 +144,30 @@ const AccountDetail: React.FC = () => {
     return windowHeight;
   };
 
-  const tabs: Tab[] = [
-    {
-      name: 'アカウント情報',
-      onPress: () => {},
-    },
-    {
-      name: 'プロフィール編集',
-      onPress: () => navigation.navigate('AccountStack', {screen: 'Profile'}),
-    },
-    {
-      name: 'パスワード更新',
-      onPress: () =>
-        navigation.navigate('AccountStack', {screen: 'UpdatePassword'}),
-    },
-  ];
+  const tabs: Tab[] =
+    userID !== user?.id
+      ? [
+          {
+            name: 'アカウント情報',
+            onPress: () => {},
+          },
+        ]
+      : [
+          {
+            name: 'アカウント情報',
+            onPress: () => {},
+          },
+          {
+            name: 'プロフィール編集',
+            onPress: () =>
+              navigation.navigate('AccountStack', {screen: 'Profile'}),
+          },
+          {
+            name: 'パスワード更新',
+            onPress: () =>
+              navigation.navigate('AccountStack', {screen: 'UpdatePassword'}),
+          },
+        ];
 
   const handleLogout = () => {
     storage.delete('userToken');
@@ -165,15 +182,13 @@ const AccountDetail: React.FC = () => {
 
   return (
     <WholeContainer>
-      <Overlay visible={loadingProfile} p="xl">
-        <ActivityIndicator />
-      </Overlay>
       <HeaderWithTextButton
         title={'Account'}
         tabs={tabs}
         activeTabName={'アカウント情報'}
-        rightButtonName={'ログアウト'}
-        onPressRightButton={handleLogout}
+        enableBackButton={userID !== user?.id}
+        rightButtonName={!id ? 'ログアウト' : undefined}
+        onPressRightButton={id ? handleLogout : undefined}
       />
       <ScrollDiv contentContainerStyle={accountDetailStyles.scrollView}>
         {profile && (
@@ -208,7 +223,12 @@ const AccountDetail: React.FC = () => {
                 <TopTab.Screen
                   listeners={{focus: () => setActiveScreen(defaultScreenName)}}
                   name={defaultScreenName}
-                  children={() => <DetailScreen profile={profile} />}
+                  children={() => (
+                    <DetailScreen
+                      isLoading={loadingProfile}
+                      profile={profile}
+                    />
+                  )}
                   options={{title: '詳細'}}
                 />
                 <TopTab.Screen
@@ -216,19 +236,25 @@ const AccountDetail: React.FC = () => {
                   name={eventScreenName}
                   children={() => (
                     <Div alignItems="center" mt="lg">
-                      {events?.events?.map(e => (
-                        <Div mb={'lg'}>
-                          <EventCard
-                            event={e}
-                            onPress={() =>
-                              navigation.navigate('EventStack', {
-                                screen: 'EventDetail',
-                                params: {id: e.id},
-                              })
-                            }
-                          />
-                        </Div>
-                      ))}
+                      {events?.events?.length ? (
+                        events?.events?.map(e => (
+                          <Div mb={'lg'}>
+                            <EventCard
+                              event={e}
+                              onPress={() =>
+                                navigation.navigate('EventStack', {
+                                  screen: 'EventDetail',
+                                  params: {id: e.id},
+                                })
+                              }
+                            />
+                          </Div>
+                        ))
+                      ) : (
+                        <Text fontSize={16}>
+                          参加したイベントが見つかりませんでした
+                        </Text>
+                      )}
                     </Div>
                   )}
                   options={{title: '参加したイベント'}}
@@ -238,17 +264,23 @@ const AccountDetail: React.FC = () => {
                   name={questionScreenName}
                   children={() => (
                     <Div alignItems="center" mt="lg">
-                      {questionList?.wiki?.map(w => (
-                        <WikiCard
-                          wiki={w}
-                          onPress={() =>
-                            navigation.navigate('WikiStack', {
-                              screen: 'WikiDetail',
-                              params: {id: w.id},
-                            })
-                          }
-                        />
-                      ))}
+                      {questionList?.wiki?.length ? (
+                        questionList?.wiki?.map(w => (
+                          <WikiCard
+                            wiki={w}
+                            onPress={() =>
+                              navigation.navigate('WikiStack', {
+                                screen: 'WikiDetail',
+                                params: {id: w.id},
+                              })
+                            }
+                          />
+                        ))
+                      ) : (
+                        <Text fontSize={16}>
+                          投稿した質問が見つかりませんでした
+                        </Text>
+                      )}
                     </Div>
                   )}
                   options={{title: '質問'}}
@@ -260,17 +292,23 @@ const AccountDetail: React.FC = () => {
                   name={knowledgeScreenName}
                   children={() => (
                     <Div alignItems="center" mt="lg">
-                      {knowledgeList?.wiki?.map(w => (
-                        <WikiCard
-                          wiki={w}
-                          onPress={() =>
-                            navigation.navigate('WikiStack', {
-                              screen: 'WikiDetail',
-                              params: {id: w.id},
-                            })
-                          }
-                        />
-                      ))}
+                      {knowledgeList?.wiki?.length ? (
+                        knowledgeList?.wiki?.map(w => (
+                          <WikiCard
+                            wiki={w}
+                            onPress={() =>
+                              navigation.navigate('WikiStack', {
+                                screen: 'WikiDetail',
+                                params: {id: w.id},
+                              })
+                            }
+                          />
+                        ))
+                      ) : (
+                        <Text fontSize={16}>
+                          投稿したナレッジが見つかりませんでした
+                        </Text>
+                      )}
                     </Div>
                   )}
                   options={{title: 'ナレッジ'}}

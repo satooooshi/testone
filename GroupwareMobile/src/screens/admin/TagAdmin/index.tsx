@@ -1,7 +1,8 @@
 import {useNavigation} from '@react-navigation/native';
 import React from 'react';
-import {ActivityIndicator, Alert, useWindowDimensions} from 'react-native';
+import {Alert, useWindowDimensions} from 'react-native';
 import {Overlay, ScrollDiv} from 'react-native-magnus';
+import {ActivityIndicator} from 'react-native-paper';
 import TagCollapse from '../../../components/admin/TagCollapse';
 import HeaderWithTextButton, {Tab} from '../../../components/Header';
 import WholeContainer from '../../../components/WholeContainer';
