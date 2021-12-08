@@ -219,6 +219,11 @@ const headerTab = (headerTabBehavior: HeaderTabBehavior): Tab[] => {
         },
         {
           type: 'link',
+          name: '特集管理',
+          href: '/admin/top-news',
+        },
+        {
+          type: 'link',
           name: 'CSV出力',
           href: '/admin/csv',
         },

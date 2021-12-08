@@ -9,7 +9,7 @@ const updateNews = async (news: TopNews): Promise<TopNews> => {
   return res.data;
 };
 
-export const useAPICreateNews = (
+export const useAPIUpdateNews = (
   mutationOptions?: UseMutationOptions<TopNews, AxiosError, TopNews, unknown>,
 ) => {
   return useMutation<TopNews, AxiosError, TopNews>(updateNews, mutationOptions);
