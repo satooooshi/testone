@@ -15,14 +15,11 @@ import {AllTag, EventType} from '../../../types';
 import eventTypeNameFactory from '../../../utils/factory/eventTypeNameFactory';
 import {defaultWeekQuery} from '../../../utils/eventQueryRefresh';
 import EventFormModal from '../../../components/events/EventFormModal';
-import {useAPIGetUsers} from '../../../hooks/api/user/useAPIGetUsers';
 import {useAPICreateEvent} from '../../../hooks/api/event/useAPICreateEvent';
 import {useIsFocused} from '@react-navigation/core';
 import {eventTypeColorFactory} from '../../../utils/factory/eventTypeColorFactory';
 import {useRoute} from '@react-navigation/native';
 import {EventListRouteProps} from '../../../types/navigator/drawerScreenProps';
-import {ActivityIndicator} from 'react-native';
-import {Overlay} from 'react-native-magnus';
 
 const TopTab = createMaterialTopTabNavigator();
 
@@ -31,7 +28,6 @@ const EventList: React.FC = () => {
   const typePassedByRoute = useRoute<EventListRouteProps>()?.params?.type;
   const [visibleSearchFormModal, setVisibleSearchFormModal] = useState(false);
   const {data: tags} = useAPIGetTag();
-  const {data: users} = useAPIGetUsers();
   const [searchQuery, setSearchQuery] = useState<SearchQueryToGetEvents>(
     defaultWeekQuery(),
   );
@@ -40,15 +36,15 @@ const EventList: React.FC = () => {
     refetch: refetchEvents,
     isLoading: isLoadingGetEventList,
   } = useAPIGetEventList(searchQuery);
-  const [eventsForInfinitScroll, setEventsForInfiniteScroll] = useState(
-    events?.events || [],
-  );
   const [visibleEventFormModal, setEventFormModal] = useState(false);
   const [screenLoading, setScreenLoading] = useState(false);
   const {mutate: saveEvent, isLoading: isLoadingSaveEvent} = useAPICreateEvent({
     onSuccess: () => {
       setEventFormModal(false);
-      refetchEvents();
+      if (isCalendar) {
+        refetchEvents();
+      } else {
+      }
     },
   });
   const tabs: Tab[] = [
@@ -104,33 +100,12 @@ const EventList: React.FC = () => {
     typeof searchQuery.to !== undefined;
 
   useEffect(() => {
-    if (events?.events && events?.events.length) {
-      setEventsForInfiniteScroll(e => {
-        if (e.length) {
-          return [...e, ...events.events];
-        }
-        return events.events;
-      });
-    }
-  }, [events?.events]);
-
-  useEffect(() => {
     if (isLoadingGetEventList || isLoadingSaveEvent) {
       setScreenLoading(true);
       return;
     }
     setScreenLoading(false);
   }, [isLoadingGetEventList, isLoadingSaveEvent]);
-
-  useEffect(() => {
-    setEventsForInfiniteScroll([]);
-  }, [
-    searchQuery.word,
-    searchQuery.status,
-    searchQuery.type,
-    searchQuery.tag,
-    isCalendar,
-  ]);
 
   // useEffect(() => {
   //   if (typePassedByRoute) {
@@ -146,14 +121,6 @@ const EventList: React.FC = () => {
 
   return (
     <WholeContainer>
-      <Overlay visible={screenLoading} p="xl">
-        <ActivityIndicator />
-      </Overlay>
-      <SearchFormOpenerButton
-        bottom={0}
-        right={0}
-        onPress={() => setVisibleSearchFormModal(true)}
-      />
       <HeaderWithTextButton
         title="Events"
         tabs={tabs}
@@ -167,8 +134,6 @@ const EventList: React.FC = () => {
         isVisible={visibleEventFormModal}
         onCloseModal={() => setEventFormModal(false)}
         onSubmit={event => saveEvent(event)}
-        users={users || []}
-        tags={tags || []}
       />
       {!isCalendar && (
         <SearchFormOpenerButton
@@ -221,7 +186,7 @@ const EventList: React.FC = () => {
           children={() => (
             <EventCardList
               isLoading={screenLoading}
-              searchResult={eventsForInfinitScroll}
+              searchResult={events}
               status="future"
               searchQuery={searchQuery}
               setSearchQuery={setSearchQuery}
@@ -234,7 +199,7 @@ const EventList: React.FC = () => {
           children={() => (
             <EventCardList
               isLoading={screenLoading}
-              searchResult={eventsForInfinitScroll}
+              searchResult={events}
               status="past"
               searchQuery={searchQuery}
               setSearchQuery={setSearchQuery}
@@ -247,7 +212,7 @@ const EventList: React.FC = () => {
           children={() => (
             <EventCardList
               isLoading={screenLoading}
-              searchResult={eventsForInfinitScroll}
+              searchResult={events}
               status="current"
               searchQuery={searchQuery}
               setSearchQuery={setSearchQuery}

@@ -6,7 +6,6 @@ import {
   ActivityIndicator,
   TextInput,
   Alert,
-  View,
 } from 'react-native';
 import HeaderWithTextButton from '../../../components/Header';
 import {Div, Text, Button, Overlay, ScrollDiv} from 'react-native-magnus';
@@ -48,8 +47,6 @@ const EventDetail: React.FC = () => {
   const navigation = useNavigation();
 
   const {id} = route.params;
-  const {data: tags} = useAPIGetTag();
-  const {data: users} = useAPIGetUsers();
   const {
     data: eventInfo,
     refetch: refetchEvents,
@@ -158,14 +155,15 @@ const EventDetail: React.FC = () => {
       return;
     }
     Alert.alert(
-      '確認',
-      'イベントの削除をしますか？',
+      'イベントを削除してよろしいですか？',
+      '',
       [
+        {text: 'キャンセル', style: 'cancel'},
         {
           text: '削除する',
+          style: 'destructive',
           onPress: () => deleteEvent({eventId: eventInfo.id}),
         },
-        {text: 'キャンセル'},
       ],
       {cancelable: false},
     );
@@ -237,16 +235,11 @@ const EventDetail: React.FC = () => {
               !isFinished &&
               !eventInfo.isCanceled &&
               eventInfo.isJoining ? (
-              <Div flexDir="row">
-                <Button
-                  mb={16}
-                  bg={'pink600'}
-                  color="white"
-                  alignSelf="flex-end">
+              <Div flexDir="row" alignItems="flex-end" mb={16}>
+                <Text color="tomato" fontSize={16} mr="sm">
                   参加済み
-                </Button>
+                </Text>
                 <Button
-                  mb={16}
                   bg={'pink600'}
                   color="white"
                   onPress={() => cancelEvent({eventID: Number(id)})}
@@ -344,8 +337,6 @@ const EventDetail: React.FC = () => {
         isVisible={visibleEventFormModal}
         onCloseModal={() => setEventFormModal(false)}
         onSubmit={event => saveEvent({...event, id: eventInfo?.id})}
-        users={users || []}
-        tags={tags || []}
       />
       <ScrollDiv>
         {eventInfo ? (
@@ -365,19 +356,22 @@ const EventDetail: React.FC = () => {
             )}
             {eventInfo.type !== EventType.SUBMISSION_ETC && (
               <Div m={16}>
-                <View
-                  style={tailwind(
-                    'border-b border-green-400 flex-row justify-between mb-4 pb-2',
-                  )}>
+                <Div
+                  borderBottomWidth={1}
+                  borderColor="green400"
+                  flexDir="row"
+                  justifyContent="space-between"
+                  alignItems="flex-end"
+                  mb="lg"
+                  pb="md">
                   <Text>
                     コメント
                     {eventInfo?.comments.length ? eventInfo.comments.length : 0}
                     件
                   </Text>
                   <Button
-                    fontSize={'xs'}
-                    h={21}
-                    py={0}
+                    fontSize={16}
+                    py={4}
                     color="white"
                     onPress={() => {
                       commentVisible
@@ -386,7 +380,7 @@ const EventDetail: React.FC = () => {
                     }}>
                     {commentVisible ? 'コメントを投稿する' : 'コメントを追加'}
                   </Button>
-                </View>
+                </Div>
                 {commentVisible && (
                   <TextInput
                     value={values.body}
