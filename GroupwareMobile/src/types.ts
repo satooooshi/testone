@@ -339,3 +339,11 @@ export type NotificationNavigator = {
   id?: string;
   screen: NotificationRouting;
 };
+
+export interface TopNews {
+  id: number;
+  title: string;
+  urlPath: string;
+  createdAt: Date;
+  updatedAt: Date;
+}

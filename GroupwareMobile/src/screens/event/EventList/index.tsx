@@ -21,11 +21,14 @@ import {ActivityIndicator} from 'react-native';
 import {Overlay} from 'react-native-magnus';
 import {useIsFocused} from '@react-navigation/core';
 import {eventTypeColorFactory} from '../../../utils/factory/eventTypeColorFactory';
+import {useRoute} from '@react-navigation/native';
+import {EventListRouteProps} from '../../../types/navigator/drawerScreenProps';
 
 const TopTab = createMaterialTopTabNavigator();
 
 const EventList: React.FC = () => {
   const isFocused = useIsFocused();
+  const {type: typePassedByRoute} = useRoute<EventListRouteProps>().params;
   const [visibleSearchFormModal, setVisibleSearchFormModal] = useState(false);
   const {data: tags} = useAPIGetTag();
   const {data: users} = useAPIGetUsers();
@@ -128,6 +131,12 @@ const EventList: React.FC = () => {
     searchQuery.tag,
     isCalendar,
   ]);
+
+  useEffect(() => {
+    if (typePassedByRoute) {
+      setSearchQuery(q => ({...q, type: typePassedByRoute}));
+    }
+  }, [typePassedByRoute]);
 
   useEffect(() => {
     if (isFocused) {

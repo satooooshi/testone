@@ -322,3 +322,11 @@ export interface ChatMessageReaction {
   updatedAt: Date;
   isSender?: boolean;
 }
+
+export interface TopNews {
+  id: number;
+  title: string;
+  urlPath: string;
+  createdAt: Date;
+  updatedAt: Date;
+}

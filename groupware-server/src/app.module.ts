@@ -11,6 +11,7 @@ import { WikiModule } from './modules/wiki/wiki.module';
 import { NotificationModule } from './modules/notification/notification.module';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
+import { TopNewsModule } from './modules/top-news/top-news.module';
 
 @Module({
   imports: [
@@ -68,6 +69,7 @@ import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handleba
     StorageModule,
     ChatModule,
     NotificationModule,
+    TopNewsModule,
   ],
   controllers: [],
   providers: [],

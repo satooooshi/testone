@@ -45,7 +45,7 @@ type PortalLinkIconProps = {
 
 const PortalLinkIcon: React.FC<PortalLinkIconProps> = ({type}) => {
   const windowWidth = useWindowDimensions().width;
-  const iconSize = windowWidth * 0.5;
+  const iconSize = windowWidth * 0.1;
   switch (type) {
     case 'impressive_university':
       return (
@@ -135,7 +135,7 @@ type PortarlLinkBoxProps = {
 
 const PortalLinkBox: React.FC<PortarlLinkBoxProps> = ({type, onPress}) => {
   const windowWidth = useWindowDimensions().width;
-  const boxWidth = windowWidth * 0.9;
+  const boxWidth = windowWidth * 0.3;
   const eventTitleText = (href: PortalType): string => {
     switch (href) {
       case 'impressive_university':
@@ -210,11 +210,13 @@ const PortalLinkBox: React.FC<PortarlLinkBoxProps> = ({type, onPress}) => {
         justifyContent="center"
         p={8}
         alignItems="center">
-        <PortalLinkIcon type={type} />
-        <Text fontWeight="bold" fontSize="4xl">
+        <Div mb={4}>
+          <PortalLinkIcon type={type} />
+        </Div>
+        <Text fontWeight="bold" fontSize={20}>
           {eventTitleText(type)}
         </Text>
-        <Text fontSize="lg">{descriptionText(type)}</Text>
+        {/* <Text fontSize="lg">{descriptionText(type)}</Text> */}
       </Div>
     </TouchableHighlight>
   );
