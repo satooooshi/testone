@@ -128,7 +128,7 @@ export class ChatService {
       chatMessage.content,
     );
     const avatarUrl = await this.storageService.parseStorageURLToSignedURL(
-      chatMessage.sender?.avatarUrl,
+      chatMessage?.sender?.avatarUrl || '',
     );
     chatMessage.sender = { ...chatMessage.sender, avatarUrl };
     chatMessage.reactions = await Promise.all(

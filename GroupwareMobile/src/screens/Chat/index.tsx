@@ -18,6 +18,7 @@ import {
   Modal as MagnusModal,
   Button,
   Dropdown,
+  Box,
 } from 'react-native-magnus';
 import WholeContainer from '../../components/WholeContainer';
 import {useAPIGetMessages} from '../../hooks/api/chat/useAPIGetMessages';
@@ -398,6 +399,18 @@ const Chat: React.FC = () => {
 
   const renderMessage = (message: ChatMessage) => (
     <Div mb={'sm'}>
+      {message.type === ChatMessageType.SYSTEM_TEXT && (
+        <Box
+          alignSelf="center"
+          bg="gray300"
+          w={windowWidth * 0.8}
+          rounded={'md'}
+          py={4}
+          justifyContent="center"
+          alignItems="center">
+          <Text color="black">{message.content}</Text>
+        </Box>
+      )}
       <Div
         flexDir="row"
         mb={'xs'}
