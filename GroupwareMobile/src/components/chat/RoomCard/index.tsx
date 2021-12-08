@@ -1,5 +1,5 @@
 import React from 'react';
-import {TouchableOpacity, useWindowDimensions} from 'react-native';
+import {Platform, TouchableOpacity, useWindowDimensions} from 'react-native';
 import {Swipeable} from 'react-native-gesture-handler';
 import {Button, Div, Icon, Image, Text} from 'react-native-magnus';
 import tailwind from 'tailwind-rn';
@@ -80,7 +80,7 @@ const RoomCard: React.FC<RoomCardProps> = ({
                 borderWidth={1}
                 borderColor={'green500'}
                 fontFamily="MaterialCommunityIcons"
-                style={roomCardStyles.pinIcon}
+                style={Platform.OS === 'android' && roomCardStyles.pinIcon}
                 position="absolute"
                 bottom={0}
                 right={10}
