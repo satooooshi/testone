@@ -6,7 +6,7 @@ import {
 } from '../../../hooks/api/wiki/useAPIGetWikiList';
 import {Div, Overlay, Text} from 'react-native-magnus';
 import WikiCard from '../../../components/wiki/WikiCard';
-import {ActivityIndicator, FlatList} from 'react-native';
+import {FlatList} from 'react-native';
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
 import {useNavigation} from '@react-navigation/native';
 import {useIsFocused} from '@react-navigation/native';
@@ -14,6 +14,7 @@ import SearchForm from '../../../components/common/SearchForm';
 import {useAPIGetTag} from '../../../hooks/api/tag/useAPIGetTag';
 import SearchFormOpenerButton from '../../../components/common/SearchForm/SearchFormOpenerButton';
 import {WikiListNavigationProps} from '../../../types/navigator/drawerScreenProps';
+import {ActivityIndicator} from 'react-native-paper';
 
 const TopTab = createMaterialTopTabNavigator();
 
@@ -27,6 +28,7 @@ type RenderWikiCardListProps = {
   status?: 'new' | 'resolved';
   searchQuery: SearchQueryToGetWiki;
   setSearchQuery: Dispatch<SetStateAction<SearchQueryToGetWiki>>;
+  isLoading: boolean;
 };
 
 const RenderWikiCardList: React.FC<RenderWikiCardListProps> = ({
@@ -34,6 +36,7 @@ const RenderWikiCardList: React.FC<RenderWikiCardListProps> = ({
   ruleCategory,
   status,
   setSearchQuery,
+  isLoading,
 }) => {
   const navigation: WikiListNavigationProps =
     useNavigation<WikiListNavigationProps>();
@@ -81,6 +84,7 @@ const RenderWikiCardList: React.FC<RenderWikiCardListProps> = ({
           検索結果が見つかりませんでした
         </Text>
       ) : null}
+      {isLoading && <ActivityIndicator />}
     </Div>
   );
 };
@@ -97,7 +101,6 @@ const WikiCardList: React.FC<WikiCardListProps> = ({type}) => {
   );
   const [visibleSearchFormModal, setVisibleSearchFormModal] = useState(false);
   const {data: tags} = useAPIGetTag();
-  const [customLoading, setCustomLoading] = useState(false);
 
   const queryRefresh = (
     query: Partial<SearchQueryToGetWiki>,
@@ -108,14 +111,6 @@ const WikiCardList: React.FC<WikiCardListProps> = ({type}) => {
 
     setSearchQuery({...query, tag: tagQuery});
   };
-
-  useEffect(() => {
-    if (isLoadingWiki) {
-      setCustomLoading(true);
-    } else {
-      setCustomLoading(false);
-    }
-  }, [isLoadingWiki]);
 
   useEffect(() => {
     setSearchQuery(q => ({...q, page: '1', type}));
@@ -144,9 +139,6 @@ const WikiCardList: React.FC<WikiCardListProps> = ({type}) => {
 
   return (
     <Div flexDir="column" h="100%" pb={80}>
-      <Overlay visible={customLoading} p="xl">
-        <ActivityIndicator />
-      </Overlay>
       <SearchForm
         isVisible={visibleSearchFormModal}
         onCloseModal={() => setVisibleSearchFormModal(false)}
@@ -166,6 +158,7 @@ const WikiCardList: React.FC<WikiCardListProps> = ({type}) => {
             name={'WikiList-' + RuleCategory.PHILOSOPHY}
             children={() => (
               <RenderWikiCardList
+                isLoading={isLoadingWiki}
                 wiki={wikiForInfiniteScroll}
                 ruleCategory={RuleCategory.PHILOSOPHY}
                 status={undefined}
@@ -179,6 +172,7 @@ const WikiCardList: React.FC<WikiCardListProps> = ({type}) => {
             name={'WikiList-' + RuleCategory.RULES}
             children={() => (
               <RenderWikiCardList
+                isLoading={isLoadingWiki}
                 wiki={wikiForInfiniteScroll}
                 ruleCategory={RuleCategory.RULES}
                 status={undefined}
@@ -192,6 +186,7 @@ const WikiCardList: React.FC<WikiCardListProps> = ({type}) => {
             name={'WikiList-' + RuleCategory.ABC}
             children={() => (
               <RenderWikiCardList
+                isLoading={isLoadingWiki}
                 wiki={wikiForInfiniteScroll}
                 ruleCategory={RuleCategory.ABC}
                 status={undefined}
@@ -205,6 +200,7 @@ const WikiCardList: React.FC<WikiCardListProps> = ({type}) => {
             name={'WikiList-' + RuleCategory.BENEFITS}
             children={() => (
               <RenderWikiCardList
+                isLoading={isLoadingWiki}
                 wiki={wikiForInfiniteScroll}
                 ruleCategory={RuleCategory.BENEFITS}
                 status={undefined}
@@ -218,6 +214,7 @@ const WikiCardList: React.FC<WikiCardListProps> = ({type}) => {
             name={'WikiList-' + RuleCategory.DOCUMENT}
             children={() => (
               <RenderWikiCardList
+                isLoading={isLoadingWiki}
                 wiki={wikiForInfiniteScroll}
                 ruleCategory={RuleCategory.DOCUMENT}
                 status={undefined}
@@ -234,6 +231,7 @@ const WikiCardList: React.FC<WikiCardListProps> = ({type}) => {
             name={'WikiList-' + WikiType.QA + '-new'}
             children={() => (
               <RenderWikiCardList
+                isLoading={isLoadingWiki}
                 wiki={wikiForInfiniteScroll}
                 ruleCategory={undefined}
                 status={'new'}
@@ -247,6 +245,7 @@ const WikiCardList: React.FC<WikiCardListProps> = ({type}) => {
             name={'WikiList-' + WikiType.QA + '-resolved'}
             children={() => (
               <RenderWikiCardList
+                isLoading={isLoadingWiki}
                 wiki={wikiForInfiniteScroll}
                 ruleCategory={undefined}
                 status={'resolved'}
@@ -259,6 +258,7 @@ const WikiCardList: React.FC<WikiCardListProps> = ({type}) => {
         </TopTab.Navigator>
       ) : (
         <RenderWikiCardList
+          isLoading={isLoadingWiki}
           wiki={wikiForInfiniteScroll}
           ruleCategory={undefined}
           status={undefined}

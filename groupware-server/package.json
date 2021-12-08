@@ -24,6 +24,7 @@
     "seed:run": "ts-node ./node_modules/typeorm-seeding/dist/cli.js seed",
     "seed:init": "ts-node ./node_modules/typeorm-seeding/dist/cli.js seed -s CreateInit",
     "seed:user": "ts-node ./node_modules/typeorm-seeding/dist/cli.js seed -s CreateUser",
+    "seed:news": "ts-node ./node_modules/typeorm-seeding/dist/cli.js seed -s CreateNews",
     "seed:group": "ts-node ./node_modules/typeorm-seeding/dist/cli.js seed -s CreateChatGroup",
     "seed:eventIntroduction": "ts-node ./node_modules/typeorm-seeding/dist/cli.js seed -s CreateEventIntroduction",
     "seed:event": "ts-node ./node_modules/typeorm-seeding/dist/cli.js seed -s CreateEvents",

@@ -9,7 +9,7 @@ import {
   SearchQueryToGetUsers,
   useAPISearchUsers,
 } from '../../hooks/api/user/useAPISearchUsers';
-import {UserRole, UserTag} from '../../types';
+import {User, UserRole, UserTag} from '../../types';
 import {userRoleNameFactory} from '../../utils/factory/userRoleNameFactory';
 import UserCardList from './UserCardList';
 
@@ -20,7 +20,10 @@ const UserList: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState<SearchQueryToGetUsers>({
     page: '1',
   });
-  const {data: users} = useAPISearchUsers(searchQuery);
+  const {data: users, isLoading} = useAPISearchUsers(searchQuery);
+  const [usersForInfiniteScroll, setUsersForInfiniteScroll] = useState<User[]>(
+    [],
+  );
   const [visibleSearchFormModal, setVisibleSearchFormModal] = useState(false);
   const topTabNames = [
     'AllRole',
@@ -40,6 +43,17 @@ const UserList: React.FC = () => {
 
     setSearchQuery(q => ({...q, ...query, tag: tagQuery || ''}));
   };
+
+  useEffect(() => {
+    if (users?.users) {
+      setUsersForInfiniteScroll(u => {
+        if (u.length) {
+          return [...u, ...users.users];
+        }
+        return users?.users;
+      });
+    }
+  }, [users?.users]);
 
   useEffect(() => {
     const tagIDs = searchQuery.tag?.split('+') || [];
@@ -73,10 +87,12 @@ const UserList: React.FC = () => {
           name={topTabNames[0]}
           children={() => (
             <UserCardList
+              isLoading={isLoading}
               userRole={'All'}
-              searchResult={users}
+              searchResult={usersForInfiniteScroll}
               searchQuery={searchQuery}
               setSearchQuery={setSearchQuery}
+              setUsers={setUsersForInfiniteScroll}
             />
           )}
           options={{title: '全て'}}
@@ -85,10 +101,12 @@ const UserList: React.FC = () => {
           name={topTabNames[1]}
           children={() => (
             <UserCardList
+              isLoading={isLoading}
               userRole={UserRole.ADMIN}
-              searchResult={users}
+              searchResult={usersForInfiniteScroll}
               searchQuery={searchQuery}
               setSearchQuery={setSearchQuery}
+              setUsers={setUsersForInfiniteScroll}
             />
           )}
           options={{title: userRoleNameFactory(UserRole.ADMIN)}}
@@ -97,10 +115,12 @@ const UserList: React.FC = () => {
           name={topTabNames[2]}
           children={() => (
             <UserCardList
+              isLoading={isLoading}
               userRole={UserRole.COMMON}
-              searchResult={users}
+              searchResult={usersForInfiniteScroll}
               searchQuery={searchQuery}
               setSearchQuery={setSearchQuery}
+              setUsers={setUsersForInfiniteScroll}
             />
           )}
           options={{title: userRoleNameFactory(UserRole.COMMON)}}
@@ -109,10 +129,12 @@ const UserList: React.FC = () => {
           name={topTabNames[3]}
           children={() => (
             <UserCardList
+              isLoading={isLoading}
               userRole={UserRole.COACH}
-              searchResult={users}
+              searchResult={usersForInfiniteScroll}
               searchQuery={searchQuery}
               setSearchQuery={setSearchQuery}
+              setUsers={setUsersForInfiniteScroll}
             />
           )}
           options={{title: userRoleNameFactory(UserRole.COACH)}}
@@ -121,10 +143,12 @@ const UserList: React.FC = () => {
           name={topTabNames[4]}
           children={() => (
             <UserCardList
+              isLoading={isLoading}
               userRole={UserRole.INTERNAL_INSTRUCTOR}
-              searchResult={users}
+              searchResult={usersForInfiniteScroll}
               searchQuery={searchQuery}
               setSearchQuery={setSearchQuery}
+              setUsers={setUsersForInfiniteScroll}
             />
           )}
           options={{title: userRoleNameFactory(UserRole.INTERNAL_INSTRUCTOR)}}
@@ -133,10 +157,12 @@ const UserList: React.FC = () => {
           name={topTabNames[5]}
           children={() => (
             <UserCardList
+              isLoading={isLoading}
               userRole={UserRole.EXTERNAL_INSTRUCTOR}
-              searchResult={users}
+              searchResult={usersForInfiniteScroll}
               searchQuery={searchQuery}
               setSearchQuery={setSearchQuery}
+              setUsers={setUsersForInfiniteScroll}
             />
           )}
           options={{title: userRoleNameFactory(UserRole.EXTERNAL_INSTRUCTOR)}}

@@ -1,10 +1,12 @@
-import {ChatAlbum, ChatGroup, ChatNote, WikiType} from '../../types';
+import {ChatAlbum, ChatGroup, ChatNote, EventType, WikiType} from '../../types';
 
 export type RootStackParamList = {
   Home: undefined;
   Login: undefined;
   Main: undefined;
-  EventList: undefined;
+  EventList: {
+    type?: EventType;
+  };
   EventDetail: {
     id: number;
   };

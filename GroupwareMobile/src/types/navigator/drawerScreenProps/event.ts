@@ -7,6 +7,7 @@ export type EventListNavigationProps = StackNavigationProp<
   DrawerTabParamList,
   'EventStack'
 >;
+export type EventListRouteProps = RouteProp<RootStackParamList, 'EventList'>;
 
 export type EventDetailNavigationProps = StackNavigationProp<
   DrawerTabParamList,

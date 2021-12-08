@@ -1,7 +1,8 @@
 import {useIsFocused, useNavigation} from '@react-navigation/native';
 import React, {Dispatch, SetStateAction, useEffect, useRef} from 'react';
 import {FlatList} from 'react-native';
-import {Div, Dropdown} from 'react-native-magnus';
+import {Div, Dropdown, Text} from 'react-native-magnus';
+import {ActivityIndicator} from 'react-native-paper';
 import DropdownOpenerButton from '../../components/common/DropdownOpenerButton';
 import UserCard from '../../components/users/UserCard';
 import {
@@ -9,7 +10,7 @@ import {
   SearchResultToGetUsers,
 } from '../../hooks/api/user/useAPISearchUsers';
 import {userListStyles} from '../../styles/screen/user/userList.style';
-import {UserRoleInApp} from '../../types';
+import {User, UserRoleInApp} from '../../types';
 import {UsersListNavigationProps} from '../../types/navigator/drawerScreenProps';
 import {
   defaultDropdownProps,
@@ -18,9 +19,11 @@ import {
 
 type UserCardListProps = {
   userRole: UserRoleInApp;
-  searchResult: SearchResultToGetUsers | undefined;
+  searchResult: User[];
   searchQuery: SearchQueryToGetUsers;
   setSearchQuery: Dispatch<SetStateAction<SearchQueryToGetUsers>>;
+  isLoading: boolean;
+  setUsers: Dispatch<SetStateAction<User[]>>;
 };
 
 const UserCardList: React.FC<UserCardListProps> = ({
@@ -28,21 +31,28 @@ const UserCardList: React.FC<UserCardListProps> = ({
   searchResult,
   searchQuery,
   setSearchQuery,
+  isLoading,
+  setUsers,
 }) => {
   const navigation = useNavigation<UsersListNavigationProps>();
   const isFocused = useIsFocused();
   const sortDropdownRef = useRef<any | null>(null);
   const durationDropdownRef = useRef<any | null>(null);
 
+  const onEndReached = () => {
+    setSearchQuery(q => ({...q, page: (Number(q?.page) + 1).toString()}));
+  };
+
   useEffect(() => {
     if (isFocused) {
+      setUsers([]);
       if (userRole === 'All') {
         setSearchQuery(q => ({...q, role: undefined}));
       } else {
         setSearchQuery(q => ({...q, role: userRole}));
       }
     }
-  }, [isFocused, setSearchQuery, userRole]);
+  }, [isFocused, setSearchQuery, setUsers, userRole]);
 
   const sortDropdownButtonName = () => {
     switch (searchQuery.sort) {
@@ -138,9 +148,10 @@ const UserCardList: React.FC<UserCardListProps> = ({
           </Dropdown.Option>
         </Dropdown>
       </Div>
-      {searchResult && searchResult.users ? (
+      {searchResult?.length ? (
         <FlatList
-          data={searchResult.users}
+          data={searchResult}
+          onEndReached={onEndReached}
           contentContainerStyle={userListStyles.flatlist}
           keyExtractor={item => item.id.toString()}
           renderItem={({item: u}) => (
@@ -161,7 +172,12 @@ const UserCardList: React.FC<UserCardListProps> = ({
             </Div>
           )}
         />
-      ) : null}
+      ) : (
+        <Div alignSelf="center">
+          <Text fontSize={16}>検索結果が見つかりませんでした</Text>
+        </Div>
+      )}
+      {isLoading && <ActivityIndicator />}
     </>
   );
 };

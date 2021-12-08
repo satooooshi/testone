@@ -11,24 +11,23 @@ import {
   SearchQueryToGetEvents,
   useAPIGetEventList,
 } from '../../../hooks/api/event/useAPIGetEventList';
-import {AllTag, EventType} from '../../../types';
+import {AllTag, EventSchedule, EventType} from '../../../types';
 import eventTypeNameFactory from '../../../utils/factory/eventTypeNameFactory';
 import {defaultWeekQuery} from '../../../utils/eventQueryRefresh';
 import EventFormModal from '../../../components/events/EventFormModal';
-import {useAPIGetUsers} from '../../../hooks/api/user/useAPIGetUsers';
 import {useAPICreateEvent} from '../../../hooks/api/event/useAPICreateEvent';
-import {ActivityIndicator} from 'react-native';
-import {Overlay} from 'react-native-magnus';
 import {useIsFocused} from '@react-navigation/core';
 import {eventTypeColorFactory} from '../../../utils/factory/eventTypeColorFactory';
+import {useRoute} from '@react-navigation/native';
+import {EventListRouteProps} from '../../../types/navigator/drawerScreenProps';
 
 const TopTab = createMaterialTopTabNavigator();
 
 const EventList: React.FC = () => {
   const isFocused = useIsFocused();
+  const typePassedByRoute = useRoute<EventListRouteProps>()?.params?.type;
   const [visibleSearchFormModal, setVisibleSearchFormModal] = useState(false);
   const {data: tags} = useAPIGetTag();
-  const {data: users} = useAPIGetUsers();
   const [searchQuery, setSearchQuery] = useState<SearchQueryToGetEvents>(
     defaultWeekQuery(),
   );
@@ -37,17 +36,20 @@ const EventList: React.FC = () => {
     refetch: refetchEvents,
     isLoading: isLoadingGetEventList,
   } = useAPIGetEventList(searchQuery);
-  const [eventsForInfinitScroll, setEventsForInfiniteScroll] = useState(
-    events?.events || [],
-  );
   const [visibleEventFormModal, setEventFormModal] = useState(false);
   const [screenLoading, setScreenLoading] = useState(false);
   const {mutate: saveEvent, isLoading: isLoadingSaveEvent} = useAPICreateEvent({
     onSuccess: () => {
       setEventFormModal(false);
-      refetchEvents();
+      if (isCalendar) {
+        refetchEvents();
+      } else {
+      }
     },
   });
+  const [eventsForInfinitScroll, setEventsForInfiniteScroll] = useState<
+    EventSchedule[]
+  >(events?.events || []);
   const tabs: Tab[] = [
     {
       name: 'All',
@@ -85,6 +87,7 @@ const EventList: React.FC = () => {
       color: eventTypeColorFactory(EventType.SUBMISSION_ETC),
     },
   ];
+  console.log(searchQuery);
 
   const queryRefresh = (
     query: Partial<SearchQueryToGetEvents>,
@@ -92,6 +95,7 @@ const EventList: React.FC = () => {
   ) => {
     const selectedTagIDs = selectedTags?.map(t => t.id.toString());
     const tagQuery = selectedTagIDs?.join('+');
+    setEventsForInfiniteScroll([]);
 
     setSearchQuery(q => ({...q, ...query, tag: tagQuery || ''}));
   };
@@ -99,17 +103,6 @@ const EventList: React.FC = () => {
   const isCalendar =
     typeof searchQuery.from !== undefined &&
     typeof searchQuery.to !== undefined;
-
-  useEffect(() => {
-    if (events?.events && events?.events.length) {
-      setEventsForInfiniteScroll(e => {
-        if (e.length) {
-          return [...e, ...events.events];
-        }
-        return events.events;
-      });
-    }
-  }, [events?.events]);
 
   useEffect(() => {
     if (isLoadingGetEventList || isLoadingSaveEvent) {
@@ -120,14 +113,15 @@ const EventList: React.FC = () => {
   }, [isLoadingGetEventList, isLoadingSaveEvent]);
 
   useEffect(() => {
-    setEventsForInfiniteScroll([]);
-  }, [
-    searchQuery.word,
-    searchQuery.status,
-    searchQuery.type,
-    searchQuery.tag,
-    isCalendar,
-  ]);
+    if (events?.events) {
+      setEventsForInfiniteScroll(e => {
+        if (e.length) {
+          return [...e, ...events.events];
+        }
+        return events.events;
+      });
+    }
+  }, [events?.events]);
 
   useEffect(() => {
     if (isFocused) {
@@ -146,15 +140,10 @@ const EventList: React.FC = () => {
         rightButtonName="新規イベント"
         onPressRightButton={() => setEventFormModal(true)}
       />
-      <Overlay visible={screenLoading} p="xl">
-        <ActivityIndicator />
-      </Overlay>
       <EventFormModal
         isVisible={visibleEventFormModal}
         onCloseModal={() => setEventFormModal(false)}
         onSubmit={event => saveEvent(event)}
-        users={users || []}
-        tags={tags || []}
       />
       {!isCalendar && (
         <SearchFormOpenerButton
@@ -181,6 +170,7 @@ const EventList: React.FC = () => {
           name="PersonalCalendar"
           children={() => (
             <EventCalendar
+              isLoading={screenLoading}
               searchResult={events}
               searchQuery={searchQuery}
               setSearchQuery={setSearchQuery}
@@ -193,6 +183,7 @@ const EventList: React.FC = () => {
           name="EventCalendar"
           children={() => (
             <EventCalendar
+              isLoading={screenLoading}
               searchResult={events}
               searchQuery={searchQuery}
               setSearchQuery={setSearchQuery}
@@ -204,6 +195,8 @@ const EventList: React.FC = () => {
           name="FutureEvents"
           children={() => (
             <EventCardList
+              setEvents={setEventsForInfiniteScroll}
+              isLoading={screenLoading}
               searchResult={eventsForInfinitScroll}
               status="future"
               searchQuery={searchQuery}
@@ -216,6 +209,8 @@ const EventList: React.FC = () => {
           name="PastEvents"
           children={() => (
             <EventCardList
+              setEvents={setEventsForInfiniteScroll}
+              isLoading={screenLoading}
               searchResult={eventsForInfinitScroll}
               status="past"
               searchQuery={searchQuery}
@@ -228,6 +223,8 @@ const EventList: React.FC = () => {
           name="CurrentEvents"
           children={() => (
             <EventCardList
+              setEvents={setEventsForInfiniteScroll}
+              isLoading={screenLoading}
               searchResult={eventsForInfinitScroll}
               status="current"
               searchQuery={searchQuery}

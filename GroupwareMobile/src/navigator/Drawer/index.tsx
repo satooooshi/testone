@@ -89,7 +89,12 @@ const EventStack = () => (
 );
 
 const AccountStack = () => (
-  <Stack.Navigator initialRouteName="AccountDetail">
+  <Stack.Navigator initialRouteName="MyProfile">
+    <Stack.Screen
+      name="MyProfile"
+      component={AccountDetail}
+      options={{headerShown: false}}
+    />
     <Stack.Screen
       name="AccountDetail"
       component={AccountDetail}

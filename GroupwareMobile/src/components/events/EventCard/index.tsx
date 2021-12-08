@@ -51,7 +51,7 @@ const EventCard: React.FC<EventCardProps> = ({event, onPress}) => {
     <TouchableHighlight onPress={() => onPress(event)}>
       <Div
         w={cardWidth}
-        h={cardWidth * 0.5}
+        h={cardWidth * 0.45}
         bg={grayColor}
         shadow="md"
         py={4}
@@ -95,6 +95,17 @@ const EventCard: React.FC<EventCardProps> = ({event, onPress}) => {
         <Div h={'20%'}>
           <FlatList
             horizontal
+            ListEmptyComponent={
+              <Tag
+                fontSize={'lg'}
+                h={28}
+                py={0}
+                bg={'orange'}
+                color="white"
+                mr={4}>
+                タグなし
+              </Tag>
+            }
             style={eventCardStyles.tagList}
             data={event.tags || []}
             renderItem={({item: t}) => (
