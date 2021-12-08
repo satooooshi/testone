@@ -21,13 +21,7 @@ import {
 } from 'react-native-magnus';
 import DateTimePicker from 'react-native-modal-datetime-picker';
 import {eventFormModalStyles} from '../../../styles/component/event/eventFormModal.style';
-import {
-  AllTag,
-  EventSchedule,
-  EventType,
-  EventVideo,
-  User,
-} from '../../../types';
+import {EventSchedule, EventType, EventVideo} from '../../../types';
 import {blueColor} from '../../../utils/colors';
 import {dateTimeFormatterFromJSDDate} from '../../../utils/dateTimeFormatterFromJSDate';
 import DropdownOpenerButton from '../../common/DropdownOpenerButton';
@@ -48,6 +42,8 @@ import {userNameFactory} from '../../../utils/factory/userNameFactory';
 import {tagColorFactory} from '../../../utils/factory/tagColorFactory';
 import WholeContainer from '../../WholeContainer';
 import {magnusDropdownOptions} from '../../../utils/factory/magnusDropdownOptions';
+import {useAPIGetTag} from '../../../hooks/api/tag/useAPIGetTag';
+import {useAPIGetUsers} from '../../../hooks/api/user/useAPIGetUsers';
 
 type CustomModalProps = Omit<ModalProps, 'children'>;
 
@@ -55,8 +51,6 @@ type EventFormModalProps = CustomModalProps & {
   event?: EventSchedule;
   onCloseModal: () => void;
   onSubmit: (event: Partial<EventSchedule>) => void;
-  users: User[];
-  tags: AllTag[];
 };
 
 type DateTimeModalStateValue = {
@@ -65,8 +59,10 @@ type DateTimeModalStateValue = {
 };
 
 const EventFormModal: React.FC<EventFormModalProps> = props => {
-  const {onCloseModal, event, onSubmit, tags, users} = props;
+  const {onCloseModal, event, onSubmit} = props;
   const dropdownRef = useRef<any | null>(null);
+  const {data: tags} = useAPIGetTag();
+  const {data: users} = useAPIGetUsers();
   const [visibleTagModal, setVisibleTagModal] = useState(false);
   const [visibleUserModal, setVisibleUserModal] = useState(false);
   const initialEventValue = {
@@ -216,6 +212,12 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
       return e;
     });
   };
+
+  useEffect(() => {
+    if (event) {
+      setNewEvent(event);
+    }
+  }, [event, setNewEvent]);
 
   useEffect(() => {
     setNewEvent(e => ({...e, hostUsers: selectedUsers}));
