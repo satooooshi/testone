@@ -28,7 +28,7 @@ const TopTab = createMaterialTopTabNavigator();
 
 const EventList: React.FC = () => {
   const isFocused = useIsFocused();
-  const {type: typePassedByRoute} = useRoute<EventListRouteProps>().params;
+  const typePassedByRoute = useRoute<EventListRouteProps>()?.params?.type;
   const [visibleSearchFormModal, setVisibleSearchFormModal] = useState(false);
   const {data: tags} = useAPIGetTag();
   const {data: users} = useAPIGetUsers();
