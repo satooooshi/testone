@@ -1,5 +1,5 @@
 import React, {Dispatch, SetStateAction, useEffect, useState} from 'react';
-import {FlatList, Text} from 'react-native';
+import {ActivityIndicator, FlatList, Text} from 'react-native';
 import {
   SearchQueryToGetEvents,
   EventStatus,
@@ -19,12 +19,14 @@ type EventCardListProps = {
   searchResult?: EventSchedule[];
   searchQuery: SearchQueryToGetEvents;
   setSearchQuery: Dispatch<SetStateAction<SearchQueryToGetEvents>>;
+  isLoading: boolean;
 };
 
 const EventCardList: React.FC<EventCardListProps> = ({
   status,
   searchResult,
   setSearchQuery,
+  isLoading,
 }) => {
   const isFocused = useIsFocused();
   const navigation = useNavigation<EventListNavigationProps>();
@@ -60,25 +62,28 @@ const EventCardList: React.FC<EventCardListProps> = ({
           }));
         }}
       />
-      <FlatList
-        onEndReached={onEndReached}
-        data={searchResult || []}
-        ListEmptyComponent={<Text>検索結果が見つかりませんでした</Text>}
-        keyExtractor={item => item.id.toString()}
-        renderItem={({item: eventSchedule}) => (
-          <Div mb={16}>
-            <EventCard
-              onPress={e =>
-                navigation.navigate('EventStack', {
-                  screen: 'EventDetail',
-                  params: {id: e.id},
-                })
-              }
-              event={eventSchedule}
-            />
-          </Div>
-        )}
-      />
+      {searchResult ? (
+        <FlatList
+          onEndReached={onEndReached}
+          data={searchResult || []}
+          ListEmptyComponent={<Text>検索結果が見つかりませんでした</Text>}
+          keyExtractor={item => item.id.toString()}
+          renderItem={({item: eventSchedule}) => (
+            <Div mb={16}>
+              <EventCard
+                onPress={e =>
+                  navigation.navigate('EventStack', {
+                    screen: 'EventDetail',
+                    params: {id: e.id},
+                  })
+                }
+                event={eventSchedule}
+              />
+            </Div>
+          )}
+        />
+      ) : null}
+      {isLoading && <ActivityIndicator />}
     </Div>
   );
 };

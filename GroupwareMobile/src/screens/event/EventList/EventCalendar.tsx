@@ -13,7 +13,7 @@ import {
   MIN_HEIGHT,
   WeekNum,
 } from 'react-native-big-calendar';
-import {useWindowDimensions} from 'react-native';
+import {ActivityIndicator, useWindowDimensions} from 'react-native';
 import {EventSchedule} from '../../../types';
 import {
   SearchQueryToGetEvents,
@@ -21,7 +21,7 @@ import {
 } from '../../../hooks/api/event/useAPIGetEventList';
 import {useAuthenticate} from '../../../contexts/useAuthenticate';
 import {eventTypeColorFactory} from '../../../utils/factory/eventTypeColorFactory';
-import {Button, Div, Icon, ScrollDiv, Text} from 'react-native-magnus';
+import {Button, Div, Icon, Overlay, ScrollDiv, Text} from 'react-native-magnus';
 import {darkFontColor} from '../../../utils/colors';
 import {calendarStyles} from '../../../styles/component/event/eventCalendar.style';
 import {DateTime} from 'luxon';
@@ -34,19 +34,21 @@ import {useNavigation} from '@react-navigation/native';
 import {EventListNavigationProps} from '../../../types/navigator/drawerScreenProps';
 import {dateTimeFormatterFromJSDDate} from '../../../utils/dateTimeFormatterFromJSDate';
 
-type PersonalCalendarProps = {
+type EventCalendarProps = {
   personal?: boolean;
   searchResult?: SearchResultToGetEvents;
   searchQuery: SearchQueryToGetEvents;
   setSearchQuery: Dispatch<SetStateAction<SearchQueryToGetEvents>>;
+  isLoading: boolean;
 };
 
 type CustomMode = 'week' | 'day' | 'month';
 
-const EventCalendar: React.FC<PersonalCalendarProps> = ({
+const EventCalendar: React.FC<EventCalendarProps> = ({
   personal,
   searchResult,
   setSearchQuery,
+  isLoading,
 }) => {
   const navigation = useNavigation<EventListNavigationProps>();
   const {user} = useAuthenticate();
@@ -205,6 +207,9 @@ const EventCalendar: React.FC<PersonalCalendarProps> = ({
 
   return (
     <>
+      <Overlay visible={isLoading} p="xl">
+        <ActivityIndicator />
+      </Overlay>
       <Div
         flexDir="row"
         justifyContent="space-between"

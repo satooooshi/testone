@@ -17,8 +17,6 @@ import {defaultWeekQuery} from '../../../utils/eventQueryRefresh';
 import EventFormModal from '../../../components/events/EventFormModal';
 import {useAPIGetUsers} from '../../../hooks/api/user/useAPIGetUsers';
 import {useAPICreateEvent} from '../../../hooks/api/event/useAPICreateEvent';
-import {ActivityIndicator} from 'react-native';
-import {Overlay} from 'react-native-magnus';
 import {useIsFocused} from '@react-navigation/core';
 import {eventTypeColorFactory} from '../../../utils/factory/eventTypeColorFactory';
 import {useRoute} from '@react-navigation/native';
@@ -155,9 +153,6 @@ const EventList: React.FC = () => {
         rightButtonName="新規イベント"
         onPressRightButton={() => setEventFormModal(true)}
       />
-      <Overlay visible={screenLoading} p="xl">
-        <ActivityIndicator />
-      </Overlay>
       <EventFormModal
         isVisible={visibleEventFormModal}
         onCloseModal={() => setEventFormModal(false)}
@@ -190,6 +185,7 @@ const EventList: React.FC = () => {
           name="PersonalCalendar"
           children={() => (
             <EventCalendar
+              isLoading={screenLoading}
               searchResult={events}
               searchQuery={searchQuery}
               setSearchQuery={setSearchQuery}
@@ -202,6 +198,7 @@ const EventList: React.FC = () => {
           name="EventCalendar"
           children={() => (
             <EventCalendar
+              isLoading={screenLoading}
               searchResult={events}
               searchQuery={searchQuery}
               setSearchQuery={setSearchQuery}
@@ -213,6 +210,7 @@ const EventList: React.FC = () => {
           name="FutureEvents"
           children={() => (
             <EventCardList
+              isLoading={screenLoading}
               searchResult={eventsForInfinitScroll}
               status="future"
               searchQuery={searchQuery}
@@ -225,6 +223,7 @@ const EventList: React.FC = () => {
           name="PastEvents"
           children={() => (
             <EventCardList
+              isLoading={screenLoading}
               searchResult={eventsForInfinitScroll}
               status="past"
               searchQuery={searchQuery}
@@ -237,6 +236,7 @@ const EventList: React.FC = () => {
           name="CurrentEvents"
           children={() => (
             <EventCardList
+              isLoading={screenLoading}
               searchResult={eventsForInfinitScroll}
               status="current"
               searchQuery={searchQuery}
