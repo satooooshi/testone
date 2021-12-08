@@ -2,14 +2,7 @@ import { SidebarScreenName } from '@/components/layout/Sidebar';
 import { MenuValue, useModalReducer } from '@/hooks/chat/useModalReducer';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useAPIGetUsers } from '@/hooks/api/user/useAPIGetUsers';
-import {
-  ChatAlbum,
-  ChatAlbumImage,
-  ChatGroup,
-  ChatMessage,
-  ChatNote,
-  ChatNoteImage,
-} from 'src/types';
+import { ChatAlbum, ChatAlbumImage, ChatGroup, ChatMessage } from 'src/types';
 import { useAPIGetChatGroupList } from '@/hooks/api/chat/useAPIGetChatGroupList';
 import CreateChatGroupModal from '@/components/chat/CreateChatGroupModal';
 import {
@@ -45,10 +38,6 @@ import AlbumModal from '@/components/chat/AlbumModal';
 import { useAPIGetChatAlbumImages } from '@/hooks/api/chat/album/useAPIGetChatAlbumImages';
 import { useAPISaveAlbumImage } from '@/hooks/api/chat/album/useAPISaveChatImages';
 import NoteModal from '@/components/chat/NoteModal';
-import { useAPIGetChatNotes } from '@/hooks/api/chat/note/useAPIGetNotes';
-import { useAPIUpdateNote } from '@/hooks/api/chat/note/useAPIUpdateChatNote';
-import { useAPISaveNoteImage } from '@/hooks/api/chat/note/useAPISaveChatNoteImages';
-import { useAPIDeleteChatNote } from '@/hooks/api/chat/note/useAPIDeleteChatNote';
 import 'emoji-mart/css/emoji-mart.css';
 import { Picker } from 'emoji-mart';
 import { useAPISaveReaction } from '@/hooks/api/chat/useAPISaveReaction';
@@ -62,25 +51,6 @@ const ChatDetail = () => {
     useState<ChatMessage>();
   const [room, setCurrentRoom] = useState<ChatGroup>();
   const [albumListPage, setAlbumListPage] = useState(1);
-  const [noteListPage, setNoteListPage] = useState(1);
-  const { mutate: updateNote } = useAPIUpdateNote({
-    onSuccess: () => {
-      setEdittedNote(undefined);
-      toast({
-        title: 'ノートを更新しました',
-        status: 'success',
-        duration: 3000,
-        isClosable: true,
-      });
-    },
-  });
-  const { mutate: deleteNote } = useAPIDeleteChatNote();
-  const { mutate: saveNoteImage } = useAPISaveNoteImage();
-  const [edittedNote, setEdittedNote] = useState<ChatNote>();
-  const { data: notes, refetch: refetchNotes } = useAPIGetChatNotes({
-    roomId: id,
-    page: noteListPage.toString(),
-  });
   const [
     {
       editChatGroupModalVisible,
@@ -206,29 +176,6 @@ const ChatDetail = () => {
     }
   };
 
-  const handleUploadImageToExisNote = (files: File[]) => {
-    uploadImage(files, {
-      onSuccess: (imageURLs) => {
-        const noteImages: Partial<ChatNoteImage>[] = imageURLs.map((i) => ({
-          imageURL: i,
-          chatAlbum: selectedAlbum,
-        }));
-        saveNoteImage(noteImages, {
-          onSuccess: (savedImages) => {
-            if (edittedNote) {
-              setEdittedNote({
-                ...edittedNote,
-                images: edittedNote.images?.length
-                  ? [...savedImages, ...edittedNote.images]
-                  : [...savedImages],
-              });
-            }
-          },
-        });
-      },
-    });
-  };
-
   const handleUploadImageToExistAlbum = (files: File[]) => {
     uploadImage(files, {
       onSuccess: (imageURLs) => {
@@ -246,36 +193,6 @@ const ChatDetail = () => {
       },
     });
   };
-
-  const handleNoteDelete = (note: ChatNote) => {
-    if (confirm('ノートを削除します。よろしいですa?')) {
-      deleteNote(
-        { roomId: id, noteId: note.id.toString() },
-        {
-          onSuccess: () => {
-            toast({
-              description: 'ノートを削除しました。',
-              status: 'success',
-              duration: 3000,
-              isClosable: true,
-            });
-            setNoteListPage(1);
-            refetchNotes();
-          },
-        },
-      );
-    }
-  };
-
-  useEffect(() => {
-    const refreshNotes = () => {
-      setNoteListPage(1);
-      refetchNotes();
-    };
-    if (!edittedNote && visibleNoteModal) {
-      refreshNotes();
-    }
-  }, [edittedNote, refetchNotes, visibleNoteModal]);
 
   return (
     <LayoutWithTab
@@ -320,16 +237,8 @@ const ChatDetail = () => {
       {room && (
         <NoteModal
           room={room}
-          onClickBackButton={() => setEdittedNote(undefined)}
-          onClickEdit={(note) => setEdittedNote(note)}
-          edittedNote={edittedNote}
           isOpen={visibleNoteModal}
           onClose={() => setVisibleNoteModal(false)}
-          headerName={'ノート一覧'}
-          notes={notes?.notes || []}
-          onUploadImage={handleUploadImageToExisNote}
-          onSubmitEdittedNote={(note) => updateNote(note)}
-          onClickDelete={handleNoteDelete}
         />
       )}
 

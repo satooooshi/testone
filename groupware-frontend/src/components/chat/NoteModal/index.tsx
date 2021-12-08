@@ -18,6 +18,7 @@ import {
   SimpleGrid,
   Text,
   Textarea,
+  useToast,
 } from '@chakra-ui/react';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { ChatGroup, ChatNote, ChatNoteImage } from 'src/types';
@@ -30,36 +31,84 @@ import { ImageDecorator } from 'react-viewer/lib/ViewerProps';
 import dynamic from 'next/dynamic';
 import { useAPIUploadStorage } from '@/hooks/api/storage/useAPIUploadStorage';
 import { useAPICreateChatNote } from '@/hooks/api/chat/note/useAPICreateChatNote';
+import { useAPIGetChatNotes } from '@/hooks/api/chat/note/useAPIGetNotes';
+import { useAPIDeleteChatNote } from '@/hooks/api/chat/note/useAPIDeleteChatNote';
+import { useAPISaveNoteImage } from '@/hooks/api/chat/note/useAPISaveChatNoteImages';
+import { useAPIUpdateNote } from '@/hooks/api/chat/note/useAPIUpdateChatNote';
 
 const Viewer = dynamic(() => import('react-viewer'), { ssr: false });
 
 type NoteModalProps = {
   isOpen: boolean;
   onClose: () => void;
-  headerName: string;
-  notes: ChatNote[];
-  edittedNote?: ChatNote;
-  onClickEdit: (note: ChatNote) => void;
-  onClickBackButton: () => void;
-  onClickDelete: (note: ChatNote) => void;
-  onUploadImage: (files: File[]) => void;
   room: ChatGroup;
-  onSubmitEdittedNote: (note: ChatNote) => void;
 };
 
-const NoteModal: React.FC<NoteModalProps> = ({
-  isOpen,
-  onClose,
-  headerName,
-  notes,
-  edittedNote,
-  onClickEdit,
-  onClickBackButton,
-  onClickDelete,
-  onUploadImage,
-  room,
-  onSubmitEdittedNote,
-}) => {
+const NoteModal: React.FC<NoteModalProps> = ({ isOpen, onClose, room }) => {
+  const toast = useToast();
+  const headerName = 'ノート一覧';
+  const [noteListPage, setNoteListPage] = useState(1);
+  const [edittedNote, setEdittedNote] = useState<ChatNote>();
+  const { data: notes, refetch: refetchNotes } = useAPIGetChatNotes({
+    roomId: room.id.toString(),
+    page: noteListPage.toString(),
+  });
+  const { mutate: deleteNote } = useAPIDeleteChatNote();
+  const { mutate: saveNoteImage } = useAPISaveNoteImage();
+  const { mutate: updateNote } = useAPIUpdateNote({
+    onSuccess: () => {
+      setEdittedNote(undefined);
+      toast({
+        title: 'ノートを更新しました',
+        status: 'success',
+        duration: 3000,
+        isClosable: true,
+      });
+    },
+  });
+
+  const handleNoteDelete = (note: ChatNote) => {
+    if (confirm('ノートを削除します。よろしいですa?')) {
+      deleteNote(
+        { roomId: room.id.toString(), noteId: note.id.toString() },
+        {
+          onSuccess: () => {
+            toast({
+              description: 'ノートを削除しました。',
+              status: 'success',
+              duration: 3000,
+              isClosable: true,
+            });
+            setNoteListPage(1);
+            refetchNotes();
+          },
+        },
+      );
+    }
+  };
+
+  const onUploadImage = (files: File[]) => {
+    uploadImage(files, {
+      onSuccess: (imageURLs) => {
+        const noteImages: Partial<ChatNoteImage>[] = imageURLs.map((i) => ({
+          imageURL: i,
+          chatNote: edittedNote,
+        }));
+        saveNoteImage(noteImages, {
+          onSuccess: (savedImages) => {
+            if (edittedNote) {
+              setEdittedNote({
+                ...edittedNote,
+                images: edittedNote.images?.length
+                  ? [...savedImages, ...edittedNote.images]
+                  : [...savedImages],
+              });
+            }
+          },
+        });
+      },
+    });
+  };
   const initialValues: Partial<ChatNote> = {
     content: '',
     chatGroup: room,
@@ -75,7 +124,7 @@ const NoteModal: React.FC<NoteModalProps> = ({
         if (mode === 'new') {
           createNote(submittedValues);
         } else {
-          onSubmitEdittedNote(submittedValues as ChatNote);
+          updateNote(submittedValues as ChatNote);
         }
       },
     });
@@ -124,6 +173,16 @@ const NoteModal: React.FC<NoteModalProps> = ({
   const isNowUri = (element: ImageDecorator) =>
     element.src === selectedImage?.imageURL;
   const activeIndex = imagesInViewer.findIndex(isNowUri);
+
+  useEffect(() => {
+    const refreshNotes = () => {
+      setNoteListPage(1);
+      refetchNotes();
+    };
+    if (!edittedNote) {
+      refreshNotes();
+    }
+  }, [edittedNote, refetchNotes]);
 
   const postNote = (
     <Box>
@@ -221,8 +280,8 @@ const NoteModal: React.FC<NoteModalProps> = ({
           <Text display="inline">ノートを作成</Text>
         </Button>
       </Box>
-      {!edittedNote ? (
-        notes.map((n) => (
+      {!edittedNote && notes?.notes ? (
+        notes.notes.map((n) => (
           <Box
             mb="16px"
             p={'4px'}
@@ -270,8 +329,8 @@ const NoteModal: React.FC<NoteModalProps> = ({
                   variant="outline"
                 />
                 <MenuList>
-                  <MenuItem onClick={() => onClickEdit(n)}>編集</MenuItem>
-                  <MenuItem onClick={() => onClickDelete(n)}>削除</MenuItem>
+                  <MenuItem onClick={() => setEdittedNote(n)}>編集</MenuItem>
+                  <MenuItem onClick={() => handleNoteDelete(n)}>削除</MenuItem>
                 </MenuList>
               </Menu>
             </Box>
@@ -292,7 +351,7 @@ const NoteModal: React.FC<NoteModalProps> = ({
               <Button
                 size="sm"
                 flexDir="row"
-                onClick={onClickBackButton}
+                onClick={() => setEdittedNote(undefined)}
                 mb="8px"
                 alignItems="center">
                 <AiOutlineLeft size={24} style={{ display: 'inline' }} />
