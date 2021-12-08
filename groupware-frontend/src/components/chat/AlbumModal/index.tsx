@@ -18,7 +18,6 @@ import React, { useMemo, useRef, useState } from 'react';
 import { ChatAlbum, ChatAlbumImage, ChatGroup } from 'src/types';
 import { AiOutlineLeft, AiOutlinePlus } from 'react-icons/ai';
 import dynamic from 'next/dynamic';
-
 const Viewer = dynamic(() => import('react-viewer'), { ssr: false });
 import { ImageDecorator } from 'react-viewer/lib/ViewerProps';
 import AlbumBox from './AlbumBox';
@@ -27,32 +26,69 @@ import { useFormik } from 'formik';
 import { darkFontColor } from 'src/utils/colors';
 import { useAPIUploadStorage } from '@/hooks/api/storage/useAPIUploadStorage';
 import { useAPICreateChatAlbum } from '@/hooks/api/chat/album/useAPICreateChatAlbum';
+import { useAPIGetChatAlbums } from '@/hooks/api/chat/album/useAPIGetAlbums';
+import { useAPIGetChatAlbumImages } from '@/hooks/api/chat/album/useAPIGetChatAlbumImages';
+import { useAPISaveAlbumImage } from '@/hooks/api/chat/album/useAPISaveChatImages';
 
 type AlbumModalProps = {
   isOpen: boolean;
   onClose: () => void;
-  headerName: string;
-  albums: ChatAlbum[];
-  images: ChatAlbumImage[];
   room: ChatGroup;
-  selectedAlbum?: ChatAlbum;
-  onClickAlbum: (album: ChatAlbum) => void;
-  onClickBackButton: () => void;
-  onUploadImage: (files: File[]) => void;
 };
 
-const AlbumModal: React.FC<AlbumModalProps> = ({
-  isOpen,
-  onClose,
-  headerName,
-  albums,
-  images,
-  room,
-  selectedAlbum,
-  onClickAlbum,
-  onClickBackButton,
-  onUploadImage,
-}) => {
+const AlbumModal: React.FC<AlbumModalProps> = ({ isOpen, onClose, room }) => {
+  const headerName = 'アルバム一覧';
+  const [albumListPage, setAlbumListPage] = useState(1);
+  const [albumImageListPage, setAlbumImageListPage] = useState(1);
+  const { data: albums } = useAPIGetChatAlbums({
+    roomId: room.id.toString(),
+    page: albumListPage.toString(),
+  });
+  const [selectedAlbum, setSelectedAlbum] = useState<ChatAlbum>();
+  const [albumImages, setAlbumImages] = useState<ChatAlbumImage[]>([]);
+  const { mutate: saveAlbumImage } = useAPISaveAlbumImage();
+
+  const onClickBackButton = () => {
+    setSelectedAlbum(undefined);
+    setAlbumImages([]);
+  };
+
+  const onUploadImage = (files: File[]) => {
+    uploadImage(files, {
+      onSuccess: (imageURLs) => {
+        if (selectedAlbum) {
+          const albumImages: Partial<ChatAlbumImage>[] = imageURLs.map((i) => ({
+            imageURL: i,
+            chatAlbum: selectedAlbum,
+          }));
+          saveAlbumImage(albumImages, {
+            onSuccess: (savedImages) => {
+              setAlbumImages((i) => [...savedImages, ...i]);
+            },
+          });
+        }
+      },
+    });
+  };
+
+  useAPIGetChatAlbumImages(
+    {
+      roomId: room.id.toString(),
+      albumId: selectedAlbum?.id.toString() || '0',
+      page: albumImageListPage.toString(),
+    },
+    {
+      onSuccess: (data) => {
+        setAlbumImages((existImage) => {
+          if (existImage.length) {
+            return [...existImage, ...data.images];
+          }
+          return data?.images || [];
+        });
+      },
+    },
+  );
+
   const imageUploaderRef = useRef<HTMLInputElement | null>(null);
   const [selectedImage, setSelectedImage] = useState<Partial<ChatAlbumImage>>();
   const [mode, setMode] = useState<'post' | 'list'>('list');
@@ -105,11 +141,12 @@ const AlbumModal: React.FC<AlbumModalProps> = ({
       return [];
     }
   }, [selectedAlbum, selectedImage]);
+
   const activeIndex = useMemo(() => {
     if (selectedImage) {
       const isNowUri = (element: ImageDecorator) =>
         element.src === selectedImage?.imageURL;
-      return imagesInDetailViewer.findIndex(isNowUri) + 1;
+      return imagesInDetailViewer.findIndex(isNowUri) + 2;
     }
   }, [imagesInDetailViewer, selectedImage]);
 
@@ -244,9 +281,9 @@ const AlbumModal: React.FC<AlbumModalProps> = ({
         </Button>
       </Box>
 
-      {albums.map((a) => (
+      {albums?.albums.map((a) => (
         <Box mb="16px" key={a.id}>
-          <AlbumBox album={a} onClick={onClickAlbum} />
+          <AlbumBox album={a} onClick={() => setSelectedAlbum(a)} />
         </Box>
       ))}
     </>
@@ -310,7 +347,7 @@ const AlbumModal: React.FC<AlbumModalProps> = ({
                   />
                 </Box>
                 <SimpleGrid spacing="8px" columns={2}>
-                  {images?.map((i) => (
+                  {albumImages?.map((i) => (
                     <Link key={i.id} onClick={() => setSelectedImage(i)}>
                       <Image src={i.imageURL} alt="アルバム画像" w="100%" />
                     </Link>

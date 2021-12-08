@@ -2,7 +2,7 @@ import { SidebarScreenName } from '@/components/layout/Sidebar';
 import { MenuValue, useModalReducer } from '@/hooks/chat/useModalReducer';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useAPIGetUsers } from '@/hooks/api/user/useAPIGetUsers';
-import { ChatAlbum, ChatAlbumImage, ChatGroup, ChatMessage } from 'src/types';
+import { ChatGroup, ChatMessage } from 'src/types';
 import { useAPIGetChatGroupList } from '@/hooks/api/chat/useAPIGetChatGroupList';
 import CreateChatGroupModal from '@/components/chat/CreateChatGroupModal';
 import {
@@ -33,10 +33,7 @@ import { useAPISaveLastReadChatTime } from '@/hooks/api/chat/useAPISaveLastReadC
 import { useHeaderTab } from '@/hooks/headerTab/useHeaderTab';
 import { useAPILeaveChatRoom } from '@/hooks/api/chat/useAPILeaveChatRoomURL';
 import ChatBox from '@/components/chat/ChatBox';
-import { useAPIGetChatAlbums } from '@/hooks/api/chat/album/useAPIGetAlbums';
 import AlbumModal from '@/components/chat/AlbumModal';
-import { useAPIGetChatAlbumImages } from '@/hooks/api/chat/album/useAPIGetChatAlbumImages';
-import { useAPISaveAlbumImage } from '@/hooks/api/chat/album/useAPISaveChatImages';
 import NoteModal from '@/components/chat/NoteModal';
 import 'emoji-mart/css/emoji-mart.css';
 import { Picker } from 'emoji-mart';
@@ -50,7 +47,6 @@ const ChatDetail = () => {
   const [selectedMsgForReaction, setSelectedMsgForReaction] =
     useState<ChatMessage>();
   const [room, setCurrentRoom] = useState<ChatGroup>();
-  const [albumListPage, setAlbumListPage] = useState(1);
   const [
     {
       editChatGroupModalVisible,
@@ -61,32 +57,6 @@ const ChatDetail = () => {
     dispatchModal,
   ] = useModalReducer();
   const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
-  const [albumImageListPage, setAlbumImageListPage] = useState(1);
-  const { data: albums } = useAPIGetChatAlbums({
-    roomId: id,
-    page: albumListPage.toString(),
-  });
-  const [selectedAlbum, setSelectedAlbum] = useState<ChatAlbum>();
-  const [albumImages, setAlbumImages] = useState<ChatAlbumImage[]>([]);
-
-  useAPIGetChatAlbumImages(
-    {
-      roomId: id,
-      albumId: selectedAlbum?.id.toString() || '0',
-      page: albumImageListPage.toString(),
-    },
-    {
-      onSuccess: (data) => {
-        setAlbumImages((existImage) => {
-          if (existImage.length) {
-            return [...existImage, ...data.images];
-          }
-          return data?.images || [];
-        });
-      },
-    },
-  );
-
   const [visibleAlbumModal, setVisibleAlbumModal] = useState(false);
   const [visibleNoteModal, setVisibleNoteModal] = useState(false);
   const [resetFormTrigger, setResetFormTrigger] = useState(false);
@@ -128,7 +98,6 @@ const ChatDetail = () => {
   });
 
   const { mutate: uploadImage } = useAPIUploadStorage();
-  const { mutate: saveAlbumImage } = useAPISaveAlbumImage();
 
   const tabs: Tab[] = useHeaderTab({
     headerTabType: 'chatDetail',
@@ -174,24 +143,6 @@ const ChatDetail = () => {
       }
       return;
     }
-  };
-
-  const handleUploadImageToExistAlbum = (files: File[]) => {
-    uploadImage(files, {
-      onSuccess: (imageURLs) => {
-        if (selectedAlbum) {
-          const albumImages: Partial<ChatAlbumImage>[] = imageURLs.map((i) => ({
-            imageURL: i,
-            chatAlbum: selectedAlbum,
-          }));
-          saveAlbumImage(albumImages, {
-            onSuccess: (savedImages) => {
-              setAlbumImages((i) => [...savedImages, ...i]);
-            },
-          });
-        }
-      },
-    });
   };
 
   return (
@@ -247,16 +198,6 @@ const ChatDetail = () => {
           room={room}
           isOpen={visibleAlbumModal}
           onClose={() => setVisibleAlbumModal(false)}
-          headerName="アルバム一覧"
-          albums={albums?.albums || []}
-          images={albumImages}
-          selectedAlbum={selectedAlbum}
-          onClickAlbum={(album) => setSelectedAlbum(album)}
-          onClickBackButton={() => {
-            setSelectedAlbum(undefined);
-            setAlbumImages([]);
-          }}
-          onUploadImage={handleUploadImageToExistAlbum}
         />
       )}
       {users && (
