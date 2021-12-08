@@ -11,6 +11,7 @@ import {TopNews} from '../../types';
 import {useNavigation} from '@react-navigation/native';
 import {HomeNavigationProps} from '../../types/navigator/drawerScreenProps/home';
 import tailwind from 'tailwind-rn';
+import {ActivityIndicator} from 'react-native-paper';
 
 const Home: React.FC = () => {
   const {setUser} = useAuthenticate();
@@ -18,7 +19,9 @@ const Home: React.FC = () => {
   const {width: windowWidth} = useWindowDimensions();
   const [page, setPage] = useState(1);
   const [newsIndex, setNewsIndex] = useState(1);
-  const {data} = useAPIGetTopNews({page: page.toString()});
+  const {data, isLoading: loadingNews} = useAPIGetTopNews({
+    page: page.toString(),
+  });
   const [newsForScroll, setNewsForScroll] = useState<TopNews[]>([]);
 
   const tabs: Tab[] = [
@@ -131,6 +134,7 @@ const Home: React.FC = () => {
           ) : (
             <></>
           )}
+          {loadingNews && <ActivityIndicator />}
           <TouchableHighlight
             underlayColor="none"
             style={tailwind('self-end')}
@@ -142,9 +146,13 @@ const Home: React.FC = () => {
                 return i + 1;
               });
             }}>
-            <Text color="blue" fontWeight="bold" fontSize={16}>
-              もっと見る
-            </Text>
+            {data?.pageCount && newsIndex !== data.pageCount * 4 ? (
+              <Text color="blue" fontWeight="bold" fontSize={16}>
+                もっと見る
+              </Text>
+            ) : (
+              <></>
+            )}
           </TouchableHighlight>
         </Div>
         <Div flexDir="row" justifyContent="center" alignItems="center">

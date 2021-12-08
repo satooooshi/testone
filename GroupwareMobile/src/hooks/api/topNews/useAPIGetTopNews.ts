@@ -8,7 +8,7 @@ export type GetTopNewsQuery = {
   page?: string;
 };
 export type GetTopNewsResult = {
-  pageCount?: number;
+  pageCount: number;
   news: TopNews[];
 };
 const getTopNews = async (query: GetTopNewsQuery) => {
