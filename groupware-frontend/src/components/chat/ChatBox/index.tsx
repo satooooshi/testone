@@ -4,17 +4,17 @@ import { darkFontColor } from 'src/utils/colors';
 import { Menu, MenuItem, MenuButton } from '@szhsin/react-menu';
 import { HiOutlineDotsCircleHorizontal } from 'react-icons/hi';
 import Editor from '@draft-js-plugins/editor';
-import { EditorState } from 'draft-js';
+import { convertToRaw, EditorState } from 'draft-js';
 import { AiOutlinePaperClip, AiOutlinePicture } from 'react-icons/ai';
-import {
-  ChatGroup,
-  ChatMessage,
-  ChatMessageReaction,
-  LastReadChatTime,
-  User,
-} from 'src/types';
+import { ChatGroup, ChatMessage, ChatMessageType, User } from 'src/types';
 import { MenuValue } from '@/hooks/chat/useModalReducer';
-import React, { useMemo, useRef } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import ChatMessageItem from '../ChatMessageItem';
 import chatStyles from '@/styles/layouts/Chat.module.scss';
 import { IoCloseSharp, IoSend } from 'react-icons/io5';
@@ -22,65 +22,162 @@ import { FiFileText } from 'react-icons/fi';
 import createMentionPlugin from '@draft-js-plugins/mention';
 import { useDropzone } from 'react-dropzone';
 import { userNameFactory } from 'src/utils/factory/userNameFactory';
+import { draftToMarkdown } from 'markdown-draft-js';
+import { useMention } from '@/hooks/chat/useMention';
+import { useAPIGetLastReadChatTime } from '@/hooks/api/chat/useAPIGetLastReadChatTime';
+import { useAPIGetMessages } from '@/hooks/api/chat/useAPIGetMessages';
+import { useAPISendChatMessage } from '@/hooks/api/chat/useAPISendChatMessage';
+import { useFormik } from 'formik';
+import { useAPIDeleteReaction } from '@/hooks/api/chat/useAPIDeleteReaction';
+import { useAPISaveReaction } from '@/hooks/api/chat/useAPISaveReaction';
+import { useAPIUploadStorage } from '@/hooks/api/storage/useAPIUploadStorage';
+import { isImage, isVideo } from 'src/utils/indecateChatMessageType';
+import { mentionTransform } from 'src/utils/mentionTransform';
 
 type ChatBoxProps = {
   room: ChatGroup;
   onMenuClicked: (menuValue: MenuValue) => void;
-  onScrollTopOnChat: (scrollEvent: any) => void;
-  messages: ChatMessage[];
-  onSend: () => void;
-  replyParentMessage?: ChatMessage;
   onClickNoteIcon: () => void;
   onClickAlbumIcon: () => void;
-  onClickReaction: (chatMessage: ChatMessage) => void;
-  onClickSpecificReaction: (reaction: ChatMessageReaction) => void;
-  onClickReply: (chatMessage: ChatMessage) => void;
-  onCloseReply: () => void;
-  deletedReactionIds: number[];
-  suggestions: MentionData[];
-  lastReadChatTime: LastReadChatTime[];
-  editorState: EditorState;
-  onEditorChange: (editorState: EditorState) => void;
-  onUploadFile: (file: File[]) => void;
-  popupOpened: boolean;
-  onSuggestionOpenChange(open: boolean): void;
-  editorSuggestions: MentionData[];
-  onSuggestionSearchChange(event: { trigger: string; value: string }): void;
-  onAddMention: (Mention: MentionData) => void;
+  onClickMessageForReaction: (chatMessage: ChatMessage) => void;
 };
 
 const ChatBox: React.FC<ChatBoxProps> = ({
   room,
   onMenuClicked,
-  onScrollTopOnChat,
-  messages,
-  onSend,
-  lastReadChatTime,
-  editorState,
-  replyParentMessage,
   onClickAlbumIcon,
   onClickNoteIcon,
-  onClickReaction,
-  onClickSpecificReaction,
-  onCloseReply,
-  onClickReply,
-  deletedReactionIds,
-  onEditorChange,
-  onUploadFile,
-  popupOpened,
-  onSuggestionOpenChange,
-  editorSuggestions,
-  onSuggestionSearchChange,
-  onAddMention,
+  onClickMessageForReaction: onClickReaction,
 }) => {
+  const [page, setPage] = useState(1);
+  const { mutate: saveReaction } = useAPISaveReaction();
+  const { mutate: deleteReaction } = useAPIDeleteReaction({
+    onSuccess: (reactionId) => {
+      setDeletedReactionIds((r) => [...r, reactionId]);
+    },
+  });
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [deletedReactionIds, setDeletedReactionIds] = useState<number[]>([]);
+  const {
+    values: newChatMessage,
+    setValues: setNewChatMessage,
+    handleSubmit,
+  } = useFormik<Partial<ChatMessage>>({
+    initialValues: {
+      content: '',
+      type: ChatMessageType.TEXT,
+      chatGroup: room,
+    },
+    enableReinitialize: true,
+    onSubmit: () => onSend(),
+  });
+  const { data: lastReadChatTime } = useAPIGetLastReadChatTime(room.id, {
+    refetchInterval: 1000,
+  });
+  const [{ popup, suggestions, mentionedUserData }, dispatchMention] =
+    useMention();
+  const { data: fetchedPastMessages } = useAPIGetMessages({
+    group: room.id,
+    page: page.toString(),
+  });
+  const { data: latestMessage, isLoading: isLoadingLatestMsg } =
+    useAPIGetMessages(
+      {
+        group: room.id,
+        page: '1',
+      },
+      { refetchInterval: 1000 },
+    );
+
+  const { mutate: sendChatMessage } = useAPISendChatMessage({
+    onSuccess: (data) => {
+      if (!isLoadingLatestMsg) {
+        if (messages.length && messages[messages.length - 1].id !== data.id) {
+          messages.unshift(data);
+        }
+        setMessages(messages);
+      }
+      setNewChatMessage((m) => ({ ...m, content: '' }));
+      setEditorState(EditorState.createEmpty());
+      messageWrapperDivRef.current &&
+        messageWrapperDivRef.current.scrollTo({ top: 0 });
+    },
+  });
+
+  const { mutate: uploadFiles } = useAPIUploadStorage({
+    onSuccess: (fileURLs) => {
+      sendChatMessage({
+        content: fileURLs[0],
+        chatGroup: newChatMessage.chatGroup,
+        type: isImage(fileURLs[0])
+          ? ChatMessageType.IMAGE
+          : isVideo(fileURLs[0])
+          ? ChatMessageType.VIDEO
+          : ChatMessageType.OTHER_FILE,
+      });
+      messageWrapperDivRef.current &&
+        messageWrapperDivRef.current.scrollTo({ top: 0 });
+    },
+  });
+
+  const onSend = () => {
+    if (newChatMessage.content) {
+      let parsedMessage = newChatMessage.content;
+      for (const m of mentionedUserData) {
+        const regexp = new RegExp(`\\s${m.name}|^${m.name}`, 'g');
+        parsedMessage = parsedMessage.replace(regexp, `@[${m.name}](${m.id})`);
+      }
+      sendChatMessage({
+        ...newChatMessage,
+        content: parsedMessage,
+      });
+    }
+  };
+
+  const onSuggestionOpenChange = useCallback(
+    (_open: boolean) => {
+      dispatchMention({ type: 'popup', value: _open });
+    },
+    [dispatchMention],
+  );
+
+  const onSuggestionSearchChange = useCallback(
+    ({ value }: { value: string }) => {
+      dispatchMention({
+        type: 'suggestions',
+        value,
+      });
+    },
+    [dispatchMention],
+  );
+
+  const onAddMention = useCallback(
+    (m: MentionData) => {
+      // get the mention object selected
+      dispatchMention({
+        type: 'mentionedUserData',
+        value: m,
+      });
+    },
+    [dispatchMention],
+  );
+  const [editorState, setEditorState] = useState(EditorState.createEmpty());
   const messageWrapperDivRef = useRef<HTMLDivElement | null>(null);
   const editorRef = useRef<Editor>(null);
   const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
   const { getRootProps: getRootProps, getInputProps: getInputProps } =
     useDropzone({
       noDrag: true,
-      onDrop: (f) => onUploadFile(f),
+      onDrop: (f) => uploadFiles(f),
     });
+
+  const onEditorChange = (newState: EditorState) => {
+    setEditorState(newState);
+    const content = newState.getCurrentContent();
+    const rawObject = convertToRaw(content);
+    const markdownString = draftToMarkdown(rawObject);
+    setNewChatMessage((v) => ({ ...v, content: markdownString }));
+  };
 
   const nameOfEmptyNameGroup = (members?: User[]): string => {
     if (!members) {
@@ -93,12 +190,76 @@ const ChatBox: React.FC<ChatBoxProps> = ({
     return strMembers.toString();
   };
 
+  const isRecent = (created: ChatMessage, target: ChatMessage): boolean => {
+    if (new Date(created.createdAt) > new Date(target.createdAt)) {
+      return true;
+    }
+    return false;
+  };
+
   const { MentionSuggestions, plugins } = useMemo(() => {
     const mentionPlugin = createMentionPlugin();
     const { MentionSuggestions } = mentionPlugin;
     const plugins = [mentionPlugin];
     return { plugins, MentionSuggestions };
   }, []);
+
+  const onScrollTopOnChat = (e: any) => {
+    if (
+      e.target.clientHeight - e.target.scrollTop >=
+      (e.target.scrollHeight * 2) / 3
+    ) {
+      if (fetchedPastMessages?.length) {
+        setPage((p) => p + 1);
+      }
+    }
+  };
+
+  useEffect(() => {
+    dispatchMention({
+      type: 'allMentionUserData',
+      value: room?.members,
+    });
+  }, [dispatchMention, room?.members]);
+
+  useEffect(() => {
+    setMessages([]);
+    setPage(1);
+  }, [room]);
+
+  useEffect(() => {
+    if (fetchedPastMessages?.length) {
+      if (
+        messages?.length &&
+        isRecent(
+          messages[messages.length - 1],
+          fetchedPastMessages[fetchedPastMessages.length - 1],
+        )
+      ) {
+        setMessages((m) => {
+          return [...m, ...fetchedPastMessages];
+        });
+      } else if (!messages?.length) {
+        setMessages(fetchedPastMessages);
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fetchedPastMessages]);
+
+  useEffect(() => {
+    if (latestMessage?.length && messages?.length) {
+      const msgToAppend: ChatMessage[] = [];
+      for (const sentMsg of latestMessage) {
+        if (isRecent(sentMsg, messages[0])) {
+          msgToAppend.unshift(sentMsg);
+        }
+      }
+      setMessages((m) => {
+        return [...msgToAppend, ...m];
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [latestMessage]);
 
   return (
     <Box
@@ -156,7 +317,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({
        */}
       <Box
         ref={messageWrapperDivRef}
-        h={!replyParentMessage ? '73%' : '60%'}
+        h={!newChatMessage.replyParentMessage ? '73%' : '60%'}
         bg="white"
         display="flex"
         flexDir="column-reverse"
@@ -169,12 +330,21 @@ const ChatBox: React.FC<ChatBoxProps> = ({
           <>
             {messages.map((m) => (
               <ChatMessageItem
-                onClickSpecificReaction={onClickSpecificReaction}
+                onClickSpecificReaction={(reaction) => {
+                  reaction.isSender
+                    ? deleteReaction(reaction)
+                    : saveReaction(reaction);
+                }}
                 onClickReaction={() => onClickReaction(m)}
-                onClickReply={() => onClickReply(m)}
+                onClickReply={() =>
+                  setNewChatMessage((pre) => ({
+                    ...pre,
+                    replyParentMessage: m,
+                  }))
+                }
                 key={m.id}
                 message={m}
-                lastReadChatTime={lastReadChatTime}
+                lastReadChatTime={lastReadChatTime || []}
                 deletedReactionIds={deletedReactionIds}
               />
             ))}
@@ -195,7 +365,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({
           </Box>
         )}
       </Box>
-      {replyParentMessage && (
+      {newChatMessage.replyParentMessage && (
         <Box
           display="flex"
           flexDir="row"
@@ -206,7 +376,12 @@ const ChatBox: React.FC<ChatBoxProps> = ({
           position="relative"
           borderBottomColor="gray">
           <Link
-            onClick={onCloseReply}
+            onClick={() =>
+              setNewChatMessage((pre) => ({
+                ...pre,
+                replyParentMessage: undefined,
+              }))
+            }
             position="absolute"
             bg="transparent"
             rounded="full"
@@ -217,14 +392,16 @@ const ChatBox: React.FC<ChatBoxProps> = ({
           </Link>
           <Avatar
             mr="8px"
-            src={replyParentMessage.sender?.avatarUrl}
+            src={newChatMessage.replyParentMessage.sender?.avatarUrl}
             size="md"
           />
           <Box display="flex" justifyContent="center" flexDir="column">
             <Text fontWeight="bold">
-              {userNameFactory(replyParentMessage.sender)}
+              {userNameFactory(newChatMessage.replyParentMessage.sender)}
             </Text>
-            <Text noOfLines={1}>{replyParentMessage.content}</Text>
+            <Text noOfLines={1}>
+              {mentionTransform(newChatMessage.replyParentMessage.content)}
+            </Text>
           </Box>
         </Box>
       )}
@@ -248,9 +425,9 @@ const ChatBox: React.FC<ChatBoxProps> = ({
           ref={editorRef}
         />
         <MentionSuggestions
-          open={popupOpened}
+          open={popup}
           onOpenChange={onSuggestionOpenChange}
-          suggestions={editorSuggestions}
+          suggestions={suggestions}
           onSearchChange={onSuggestionSearchChange}
           onAddMention={onAddMention}
         />
@@ -260,7 +437,11 @@ const ChatBox: React.FC<ChatBoxProps> = ({
         <AiOutlinePaperClip size={20} className={chatStyles.clip_icon} />
       </Box>
 
-      <IoSend size={20} onClick={onSend} className={chatStyles.send_icon} />
+      <IoSend
+        size={20}
+        onClick={() => handleSubmit()}
+        className={chatStyles.send_icon}
+      />
     </Box>
   );
 };

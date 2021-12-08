@@ -8,7 +8,7 @@ import ChatGroupCard from '../ChatGroupCard';
 type SelectChatGroupModal = {
   isOpen: boolean;
   chatGroups: ChatGroup[];
-  selectedChatGroups: Partial<ChatMessage>;
+  selectedChatGroup: ChatGroup;
   toggleChatGroups: (g: ChatGroup) => void;
   onClose: () => void;
 };
@@ -16,7 +16,7 @@ type SelectChatGroupModal = {
 const SelectChatGroupModal: React.FC<SelectChatGroupModal> = ({
   isOpen,
   chatGroups,
-  selectedChatGroups,
+  selectedChatGroup,
   toggleChatGroups,
   onClose,
 }) => {
@@ -38,7 +38,7 @@ const SelectChatGroupModal: React.FC<SelectChatGroupModal> = ({
             style={{ marginBottom: 10 }}
             onClick={() => toggleChatGroups(g)}>
             <ChatGroupCard
-              isSelected={selectedChatGroups.chatGroup?.id === g.id}
+              isSelected={selectedChatGroup.id === g.id}
               chatGroup={g}
               key={g.id}
             />
