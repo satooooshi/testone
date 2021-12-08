@@ -7,14 +7,14 @@ import {createCommentURL} from '../../../utils/url/event.url';
 const createComment = async (
   answer: Partial<EventComment>,
 ): Promise<EventComment> => {
-  const resposne = await axiosInstance.post<EventComment>(
+  const response = await axiosInstance.post<EventComment>(
     createCommentURL,
     answer,
     {
       headers: jsonHeader,
     },
   );
-  return resposne.data;
+  return response.data;
 };
 
 export const useAPICreateComment = (

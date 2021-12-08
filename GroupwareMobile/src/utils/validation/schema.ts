@@ -24,6 +24,9 @@ export const wikiSchema = Yup.object().shape({
   title: Yup.string().required(requireMessage).max(100, nWordLimitMessage(100)),
   body: Yup.string().required(requireMessage),
 });
+export const createCommentSchema = Yup.object().shape({
+  body: Yup.string().required('コメントは' + requireMessage),
+});
 
 export const answerSchema = Yup.object().shape({
   body: Yup.string().required(requireMessage),

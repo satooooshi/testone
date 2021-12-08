@@ -4,7 +4,9 @@ import {
   FlatList,
   useWindowDimensions,
   ActivityIndicator,
+  TextInput,
   Alert,
+  View,
 } from 'react-native';
 import HeaderWithTextButton from '../../../components/Header';
 import {Div, Text, Button, Overlay, ScrollDiv} from 'react-native-magnus';
@@ -28,10 +30,17 @@ import {useAPIUpdateEvent} from '../../../hooks/api/event/useAPIUpdateEvent';
 import {useAPIJoinEvent} from '../../../hooks/api/event/useAPIJoinEvent';
 import {useAPICancelEvent} from '../../../hooks/api/event/useAPICancelEvent';
 import {AxiosError} from 'axios';
+import {useFormik} from 'formik';
+import {EventComment, EventType} from '../../../types';
+import {useAPICreateComment} from '../../../hooks/api/event/useAPICreateComment';
+import EventCommentCard from '../EventCommentCard';
+import {createCommentSchema} from '../../../utils/validation/schema';
+import {formikErrorMsgFactory} from '../../../utils/factory/formikEroorMsgFactory';
 import {useAPIDeleteEvent} from '../../../hooks/api/event/useAPIDeleteEvent';
 import {useAuthenticate} from '../../../contexts/useAuthenticate';
 import {UserRole} from '../../../types';
 import {useNavigation} from '@react-navigation/native';
+import tailwind from 'tailwind-rn';
 
 const EventDetail: React.FC = () => {
   const route = useRoute<EventDetailRouteProps>();
@@ -46,8 +55,13 @@ const EventDetail: React.FC = () => {
     refetch: refetchEvents,
     isLoading: isLoadingGetEventDetail,
   } = useAPIGetEventDetail(id);
+
+  const initialValues: Partial<EventComment> = {
+    body: '',
+  };
   const [screenLoading, setScreenLoading] = useState(false);
   const [visibleEventFormModal, setEventFormModal] = useState(false);
+  const [commentVisible, setCommentVisible] = useState(false);
   const {mutate: saveEvent, isLoading: isLoadingSaveEvent} = useAPIUpdateEvent({
     onSuccess: () => {
       setEventFormModal(false);
@@ -84,6 +98,48 @@ const EventDetail: React.FC = () => {
       format: 'yyyy/LL/dd HH:mm',
     });
   }, [eventInfo]);
+  const {mutate: createComment} = useAPICreateComment({
+    onSuccess: responseData => {
+      if (responseData) {
+        Alert.alert('コメントを投稿しました。');
+        setValues(t => ({...t, body: ''}));
+        setCommentVisible(false);
+        refetchEvents();
+      }
+    },
+    onError: err => {
+      if (err.response?.data) {
+        Alert.alert((err.response?.data as AxiosError)?.message.toString());
+      }
+    },
+  });
+
+  const checkValidateErrors = async () => {
+    const errors = await validateForm();
+    const messages = formikErrorMsgFactory(errors);
+    if (messages) {
+      Alert.alert(messages);
+    } else {
+      onComplete();
+    }
+  };
+
+  const {
+    values,
+    setValues,
+    handleSubmit: onComplete,
+    validateForm,
+  } = useFormik<Partial<EventComment>>({
+    initialValues: initialValues,
+    enableReinitialize: true,
+    validationSchema: createCommentSchema,
+    onSubmit: v => {
+      createComment({
+        body: v.body,
+        eventSchedule: eventInfo,
+      });
+    },
+  });
 
   const {mutate: deleteEvent} = useAPIDeleteEvent({
     onSuccess: () => {
@@ -263,7 +319,6 @@ const EventDetail: React.FC = () => {
       </>
     );
   };
-
   useEffect(() => {
     if (isLoadingGetEventDetail || isLoadingSaveEvent) {
       setScreenLoading(true);
@@ -307,6 +362,60 @@ const EventDetail: React.FC = () => {
                 <AboveYoutubeVideos />
                 <Text mx={16}>関連動画はありません</Text>
               </>
+            )}
+            {eventInfo.type !== EventType.SUBMISSION_ETC && (
+              <Div m={16}>
+                <View
+                  style={tailwind(
+                    'border-b border-green-400 flex-row justify-between mb-4 pb-2',
+                  )}>
+                  <Text>
+                    コメント
+                    {eventInfo?.comments.length ? eventInfo.comments.length : 0}
+                    件
+                  </Text>
+                  <Button
+                    fontSize={'xs'}
+                    h={21}
+                    py={0}
+                    color="white"
+                    onPress={() => {
+                      commentVisible
+                        ? checkValidateErrors()
+                        : setCommentVisible(true);
+                    }}>
+                    {commentVisible ? 'コメントを投稿する' : 'コメントを追加'}
+                  </Button>
+                </View>
+                {commentVisible && (
+                  <TextInput
+                    value={values.body}
+                    onChangeText={t => setValues({...values, body: t})}
+                    placeholder="コメントを記入してください。"
+                    textAlignVertical={'top'}
+                    multiline={true}
+                    autoCapitalize="none"
+                    style={tailwind(
+                      'border border-green-400 bg-white rounded border-blue-500	 p-2 h-24',
+                    )}
+                  />
+                )}
+                {eventInfo?.comments && eventInfo?.comments.length
+                  ? eventInfo?.comments.map(
+                      comment =>
+                        comment.writer && (
+                          <>
+                            <EventCommentCard
+                              key={comment.id}
+                              body={comment.body}
+                              date={comment.createdAt}
+                              writer={comment.writer}
+                            />
+                          </>
+                        ),
+                    )
+                  : null}
+              </Div>
             )}
           </Div>
         ) : null}
