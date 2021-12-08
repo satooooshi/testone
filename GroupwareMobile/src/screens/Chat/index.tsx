@@ -396,6 +396,13 @@ const Chat: React.FC = () => {
     }
     return reactionsNoDuplicates;
   };
+  const readUsers = (targetMsg: ChatMessage) => {
+    return lastReadChatTime
+      ? lastReadChatTime
+          .filter(t => t.readTime >= targetMsg.createdAt)
+          .map(t => t.user)
+      : [];
+  };
 
   const renderMessage = (message: ChatMessage) => (
     <Div mb={'sm'}>
@@ -412,14 +419,18 @@ const Chat: React.FC = () => {
         </Box>
       )}
       <Div
-        flexDir="row"
+        flexDir={message.isSender ? 'row' : 'row-reverse'}
         mb={'xs'}
         alignSelf={message?.isSender ? 'flex-end' : 'flex-start'}
         alignItems="flex-end">
-        {readUsers.length ? (
+        {readUsers(message).length &&
+        message.type !== ChatMessageType.SYSTEM_TEXT ? (
           <TouchableOpacity
             onPress={() => setSelectedMessageForCheckLastRead(message)}>
-            <Text mb="sm" mr={message?.isSender ? 'sm' : undefined}>
+            <Text
+              mb="sm"
+              mr={message?.isSender ? 'sm' : undefined}
+              ml={!message?.isSender ? 'sm' : undefined}>
               {`既読\n${numbersOfRead(message)}人`}
             </Text>
           </TouchableOpacity>
@@ -596,12 +607,6 @@ const Chat: React.FC = () => {
       )}
     </>
   );
-  const readUsers =
-    selectedMessageForCheckLastRead && lastReadChatTime
-      ? lastReadChatTime
-          .filter(t => t.readTime >= selectedMessageForCheckLastRead.createdAt)
-          .map(t => t.user)
-      : [];
 
   return (
     <WholeContainer>
@@ -633,27 +638,32 @@ const Chat: React.FC = () => {
           }}>
           <Icon color="black" name="close" />
         </Button>
-        <FlatList
-          data={readUsers}
-          renderItem={({item}) => (
-            <View style={tailwind('flex-row bg-white items-center px-4 mb-2')}>
-              <>
-                <Image
-                  mr={'sm'}
-                  rounded="circle"
-                  h={64}
-                  w={64}
-                  source={
-                    item.avatarUrl
-                      ? {uri: item.avatarUrl}
-                      : require('../../../assets/no-image-avatar.png')
-                  }
-                />
-                <Text fontSize={18}>{userNameFactory(item)}</Text>
-              </>
-            </View>
-          )}
-        />
+        {selectedMessageForCheckLastRead ? (
+          <FlatList
+            data={readUsers(selectedMessageForCheckLastRead)}
+            renderItem={({item}) => (
+              <View
+                style={tailwind('flex-row bg-white items-center px-4 mb-2')}>
+                <>
+                  <Image
+                    mr={'sm'}
+                    rounded="circle"
+                    h={64}
+                    w={64}
+                    source={
+                      item.avatarUrl
+                        ? {uri: item.avatarUrl}
+                        : require('../../../assets/no-image-avatar.png')
+                    }
+                  />
+                  <Text fontSize={18}>{userNameFactory(item)}</Text>
+                </>
+              </View>
+            )}
+          />
+        ) : (
+          <></>
+        )}
       </MagnusModal>
       {/* @TODO add seeking bar */}
       <MagnusModal isVisible={!!video} bg="black">
