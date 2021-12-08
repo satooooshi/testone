@@ -11,7 +11,7 @@ import {
   SearchQueryToGetEvents,
   useAPIGetEventList,
 } from '../../../hooks/api/event/useAPIGetEventList';
-import {AllTag, EventType} from '../../../types';
+import {AllTag, EventSchedule, EventType} from '../../../types';
 import eventTypeNameFactory from '../../../utils/factory/eventTypeNameFactory';
 import {defaultWeekQuery} from '../../../utils/eventQueryRefresh';
 import EventFormModal from '../../../components/events/EventFormModal';
@@ -47,6 +47,9 @@ const EventList: React.FC = () => {
       }
     },
   });
+  const [eventsForInfinitScroll, setEventsForInfiniteScroll] = useState<
+    EventSchedule[]
+  >(events?.events || []);
   const tabs: Tab[] = [
     {
       name: 'All',
@@ -84,6 +87,7 @@ const EventList: React.FC = () => {
       color: eventTypeColorFactory(EventType.SUBMISSION_ETC),
     },
   ];
+  console.log(searchQuery);
 
   const queryRefresh = (
     query: Partial<SearchQueryToGetEvents>,
@@ -91,6 +95,7 @@ const EventList: React.FC = () => {
   ) => {
     const selectedTagIDs = selectedTags?.map(t => t.id.toString());
     const tagQuery = selectedTagIDs?.join('+');
+    setEventsForInfiniteScroll([]);
 
     setSearchQuery(q => ({...q, ...query, tag: tagQuery || ''}));
   };
@@ -107,11 +112,16 @@ const EventList: React.FC = () => {
     setScreenLoading(false);
   }, [isLoadingGetEventList, isLoadingSaveEvent]);
 
-  // useEffect(() => {
-  //   if (typePassedByRoute) {
-  //     setSearchQuery(q => ({...q, type: typePassedByRoute}));
-  //   }
-  // }, [typePassedByRoute]);
+  useEffect(() => {
+    if (events?.events) {
+      setEventsForInfiniteScroll(e => {
+        if (e.length) {
+          return [...e, ...events.events];
+        }
+        return events.events;
+      });
+    }
+  }, [events?.events]);
 
   useEffect(() => {
     if (isFocused) {
@@ -185,8 +195,9 @@ const EventList: React.FC = () => {
           name="FutureEvents"
           children={() => (
             <EventCardList
+              setEvents={setEventsForInfiniteScroll}
               isLoading={screenLoading}
-              searchResult={events}
+              searchResult={eventsForInfinitScroll}
               status="future"
               searchQuery={searchQuery}
               setSearchQuery={setSearchQuery}
@@ -198,8 +209,9 @@ const EventList: React.FC = () => {
           name="PastEvents"
           children={() => (
             <EventCardList
+              setEvents={setEventsForInfiniteScroll}
               isLoading={screenLoading}
-              searchResult={events}
+              searchResult={eventsForInfinitScroll}
               status="past"
               searchQuery={searchQuery}
               setSearchQuery={setSearchQuery}
@@ -211,8 +223,9 @@ const EventList: React.FC = () => {
           name="CurrentEvents"
           children={() => (
             <EventCardList
+              setEvents={setEventsForInfiniteScroll}
               isLoading={screenLoading}
-              searchResult={events}
+              searchResult={eventsForInfinitScroll}
               status="current"
               searchQuery={searchQuery}
               setSearchQuery={setSearchQuery}

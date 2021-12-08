@@ -1,15 +1,8 @@
-import React, {
-  Dispatch,
-  SetStateAction,
-  useCallback,
-  useEffect,
-  useState,
-} from 'react';
+import React, {Dispatch, SetStateAction, useCallback} from 'react';
 import {FlatList, Text} from 'react-native';
 import {
   SearchQueryToGetEvents,
   EventStatus,
-  SearchResultToGetEvents,
 } from '../../../hooks/api/event/useAPIGetEventList';
 import EventCard from '../../../components/events/EventCard';
 import {Div} from 'react-native-magnus';
@@ -21,7 +14,8 @@ import {ActivityIndicator} from 'react-native-paper';
 
 type EventCardListProps = {
   status: EventStatus;
-  searchResult?: SearchResultToGetEvents;
+  searchResult?: EventSchedule[];
+  setEvents: Dispatch<SetStateAction<EventSchedule[]>>;
   searchQuery: SearchQueryToGetEvents;
   setSearchQuery: Dispatch<SetStateAction<SearchQueryToGetEvents>>;
   isLoading: boolean;
@@ -30,14 +24,12 @@ type EventCardListProps = {
 const EventCardList: React.FC<EventCardListProps> = ({
   status,
   searchResult,
+  setEvents,
   searchQuery,
   setSearchQuery,
   isLoading,
 }) => {
   const navigation = useNavigation<EventListNavigationProps>();
-  const [eventsForInfinitScroll, setEventsForInfiniteScroll] = useState<
-    EventSchedule[]
-  >(searchResult?.events || []);
 
   const onEndReached = () => {
     setSearchQuery(q => ({
@@ -46,25 +38,10 @@ const EventCardList: React.FC<EventCardListProps> = ({
     }));
   };
 
-  useEffect(() => {
-    if (searchResult?.events.length) {
-      setEventsForInfiniteScroll(e => {
-        if (e.length) {
-          return [...e, ...searchResult.events];
-        }
-        return searchResult.events;
-      });
-    }
-  }, [searchResult?.events]);
-
-  useEffect(() => {
-    setEventsForInfiniteScroll([]);
-  }, [searchQuery.type]);
-
   useFocusEffect(
     useCallback(() => {
       if (searchQuery.status !== status) {
-        setEventsForInfiniteScroll([]);
+        setEvents([]);
         setSearchQuery(q => ({
           ...q,
           page: '1',
@@ -73,32 +50,34 @@ const EventCardList: React.FC<EventCardListProps> = ({
           status,
         }));
       }
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [setSearchQuery, status]),
+    }, [searchQuery.status, setEvents, setSearchQuery, status]),
   );
 
   return (
     <Div flexDir="column" alignItems="center">
-      <FlatList
-        style={tailwind('h-full')}
-        onEndReached={onEndReached}
-        data={eventsForInfinitScroll}
-        ListEmptyComponent={<Text>検索結果が見つかりませんでした</Text>}
-        keyExtractor={item => item.id.toString()}
-        renderItem={({item: eventSchedule}) => (
-          <Div mb={16}>
-            <EventCard
-              onPress={e =>
-                navigation.navigate('EventStack', {
-                  screen: 'EventDetail',
-                  params: {id: e.id},
-                })
-              }
-              event={eventSchedule}
-            />
-          </Div>
-        )}
-      />
+      {searchResult?.length ? (
+        <FlatList
+          style={tailwind('h-full')}
+          onEndReached={onEndReached}
+          data={searchResult}
+          keyExtractor={item => item.id.toString()}
+          renderItem={({item: eventSchedule}) => (
+            <Div mb={16}>
+              <EventCard
+                onPress={e =>
+                  navigation.navigate('EventStack', {
+                    screen: 'EventDetail',
+                    params: {id: e.id},
+                  })
+                }
+                event={eventSchedule}
+              />
+            </Div>
+          )}
+        />
+      ) : (
+        <Text>検索結果が見つかりませんでした</Text>
+      )}
       {isLoading && <ActivityIndicator />}
     </Div>
   );
