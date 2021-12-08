@@ -21,6 +21,8 @@ import {useIsFocused} from '@react-navigation/core';
 import {eventTypeColorFactory} from '../../../utils/factory/eventTypeColorFactory';
 import {useRoute} from '@react-navigation/native';
 import {EventListRouteProps} from '../../../types/navigator/drawerScreenProps';
+import {ActivityIndicator} from 'react-native';
+import {Overlay} from 'react-native-magnus';
 
 const TopTab = createMaterialTopTabNavigator();
 
@@ -130,11 +132,11 @@ const EventList: React.FC = () => {
     isCalendar,
   ]);
 
-  useEffect(() => {
-    if (typePassedByRoute) {
-      setSearchQuery(q => ({...q, type: typePassedByRoute}));
-    }
-  }, [typePassedByRoute]);
+  // useEffect(() => {
+  //   if (typePassedByRoute) {
+  //     setSearchQuery(q => ({...q, type: typePassedByRoute}));
+  //   }
+  // }, [typePassedByRoute]);
 
   useEffect(() => {
     if (isFocused) {
@@ -144,6 +146,14 @@ const EventList: React.FC = () => {
 
   return (
     <WholeContainer>
+      <Overlay visible={screenLoading} p="xl">
+        <ActivityIndicator />
+      </Overlay>
+      <SearchFormOpenerButton
+        bottom={0}
+        right={0}
+        onPress={() => setVisibleSearchFormModal(true)}
+      />
       <HeaderWithTextButton
         title="Events"
         tabs={tabs}

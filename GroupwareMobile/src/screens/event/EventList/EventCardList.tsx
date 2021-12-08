@@ -13,6 +13,7 @@ import {genKeyQueryFromObjArr} from '../../../utils/genKeyQueryFromObjArr';
 import SearchForm from '../../../components/common/SearchForm';
 import {useAPIGetTag} from '../../../hooks/api/tag/useAPIGetTag';
 import SearchFormOpenerButton from '../../../components/common/SearchForm/SearchFormOpenerButton';
+import tailwind from 'tailwind-rn';
 
 type EventCardListProps = {
   status: EventStatus;
@@ -30,8 +31,6 @@ const EventCardList: React.FC<EventCardListProps> = ({
 }) => {
   const isFocused = useIsFocused();
   const navigation = useNavigation<EventListNavigationProps>();
-  const {data: tags} = useAPIGetTag();
-  const [visibleSearchFormModal, setVisibleSearchFormModal] = useState(false);
 
   const onEndReached = () => {
     setSearchQuery(q => ({
@@ -42,28 +41,21 @@ const EventCardList: React.FC<EventCardListProps> = ({
 
   useEffect(() => {
     if (isFocused) {
-      setSearchQuery(q => ({...q, from: undefined, to: undefined, status}));
+      setSearchQuery(q => ({
+        ...q,
+        page: '1',
+        from: undefined,
+        to: undefined,
+        status,
+      }));
     }
   }, [isFocused, setSearchQuery, status]);
 
   return (
     <Div flexDir="column" alignItems="center">
-      <SearchFormOpenerButton onPress={() => setVisibleSearchFormModal(true)} />
-      <SearchForm
-        isVisible={visibleSearchFormModal}
-        onCloseModal={() => setVisibleSearchFormModal(false)}
-        tags={tags || []}
-        onSubmit={values => {
-          setVisibleSearchFormModal(false);
-          setSearchQuery(q => ({
-            ...q,
-            word: values.word,
-            tag: genKeyQueryFromObjArr(values.selectedTags, 'id'),
-          }));
-        }}
-      />
-      {searchResult ? (
+      {!isLoading && searchResult ? (
         <FlatList
+          style={tailwind('h-full')}
           onEndReached={onEndReached}
           data={searchResult || []}
           ListEmptyComponent={<Text>検索結果が見つかりませんでした</Text>}
