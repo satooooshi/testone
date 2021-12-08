@@ -56,24 +56,85 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
     [lastReadChatTime],
   );
 
+  const reactionList = (
+    <Box flexDir="row" flexWrap="wrap" display="flex" maxW={'50vw'}>
+      {message.reactions?.length
+        ? reactionRemovedDuplicates(message.reactions)
+            .filter((r) => !deletedReactionIds.includes(r.id))
+            .map((r) => (
+              <Box key={r.id} mb="4px" mr="4px">
+                <Button
+                  onClick={() => onClickSpecificReaction(r)}
+                  bg={r.isSender ? 'blue.600' : undefined}
+                  flexDir="row"
+                  borderColor={'blue.600'}
+                  borderWidth={1}
+                  size="sm">
+                  <Text fontSize={16}>{r.emoji}</Text>
+                  <Text fontSize={16} color={r.isSender ? 'white' : undefined}>
+                    {numbersOfSameValueInKeyOfObjArr(
+                      message.reactions as ChatMessageReaction[],
+                      r,
+                      'emoji',
+                    )}
+                  </Text>
+                </Button>
+              </Box>
+            ))
+        : null}
+    </Box>
+  );
+
+  const sysmtemText = (
+    <Box
+      bg="#ececec"
+      borderRadius="md"
+      alignSelf="center"
+      display="flex"
+      flexDir="row"
+      justifyContent="center"
+      alignItems="center"
+      minW="60%"
+      minH={'24px'}
+      mb={'8px'}
+      maxW="50vw">
+      <Text fontSize={'14px'}>{message.content}</Text>
+    </Box>
+  );
+
+  const createdAtText = (
+    <Text mx="8px" color="gray" fontSize={'12px'}>
+      {dateTimeFormatterFromJSDDate({
+        dateTime: new Date(message.createdAt),
+        format: 'LL/dd HH:mm',
+      })}
+    </Text>
+  );
+
+  const menuOpener = (
+    <Menu
+      direction="left"
+      menuButton={
+        <MenuButton>
+          <HiOutlineDotsCircleHorizontal size={24} />
+        </MenuButton>
+      }
+      transition>
+      <MenuItem value={'reply'} onClick={onClickReply}>
+        返信
+      </MenuItem>
+      <MenuItem value={'reaction'} onClick={onClickReaction}>
+        リアクション
+      </MenuItem>
+    </Menu>
+  );
+
   return (
-    <>
-      {message.type === ChatMessageType.SYSTEM_TEXT && (
-        <Box
-          bg="#ececec"
-          borderRadius="md"
-          alignSelf="center"
-          display="flex"
-          flexDir="row"
-          justifyContent="center"
-          alignItems="center"
-          minW="60%"
-          minH={'24px'}
-          mb={'8px'}
-          maxW="50vw">
-          <Text fontSize={'14px'}>{message.content}</Text>
-        </Box>
-      )}
+    <Box
+      display="flex"
+      flexDir="column"
+      alignItems={message.isSender ? 'flex-end' : 'flex-start'}>
+      {message.type === ChatMessageType.SYSTEM_TEXT && sysmtemText}
       {message.type !== ChatMessageType.SYSTEM_TEXT && (
         <Box
           display="flex"
@@ -99,22 +160,7 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
           <Box display="flex" alignItems="flex-end">
             {message.isSender && (
               <>
-                <Menu
-                  direction="left"
-                  onItemClick={console.log}
-                  menuButton={
-                    <MenuButton>
-                      <HiOutlineDotsCircleHorizontal size={24} />
-                    </MenuButton>
-                  }
-                  transition>
-                  <MenuItem value={'reply'} onClick={onClickReply}>
-                    返信
-                  </MenuItem>
-                  <MenuItem value={'reaction'} onClick={onClickReaction}>
-                    リアクション
-                  </MenuItem>
-                </Menu>
+                {menuOpener}
                 <Box>
                   {messageReadCount(message) ? (
                     <Text mx="8px" color="gray" fontSize="12px">
@@ -122,12 +168,7 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
                       {messageReadCount(message)}
                     </Text>
                   ) : null}
-                  <Text mx="8px" color="gray" fontSize="12px">
-                    {dateTimeFormatterFromJSDDate({
-                      dateTime: new Date(message.createdAt),
-                      format: 'HH:mm',
-                    })}
-                  </Text>
+                  {createdAtText}
                 </Box>
               </>
             )}
@@ -203,50 +244,16 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
               )}
             </Box>
             {!message.isSender && (
-              <Text mx="8px" color="gray">
-                {dateTimeFormatterFromJSDDate({
-                  dateTime: new Date(message.createdAt),
-                  format: 'HH:mm',
-                })}
-              </Text>
+              <>
+                {createdAtText}
+                {menuOpener}
+              </>
             )}
           </Box>
         </Box>
       )}
-      <Box
-        flexDir="row"
-        flexWrap="wrap"
-        display="flex"
-        maxW={'50vw'}
-        alignSelf={message.isSender ? 'flex-end' : 'flex-start'}>
-        {message.reactions?.length
-          ? reactionRemovedDuplicates(message.reactions)
-              .filter((r) => !deletedReactionIds.includes(r.id))
-              .map((r) => (
-                <Box key={r.id} mb="4px" mr="4px">
-                  <Button
-                    onClick={() => onClickSpecificReaction(r)}
-                    bg={r.isSender ? 'blue.600' : undefined}
-                    flexDir="row"
-                    borderColor={'blue.600'}
-                    borderWidth={1}
-                    size="sm">
-                    <Text fontSize={16}>{r.emoji}</Text>
-                    <Text
-                      fontSize={16}
-                      color={r.isSender ? 'white' : undefined}>
-                      {numbersOfSameValueInKeyOfObjArr(
-                        message.reactions as ChatMessageReaction[],
-                        r,
-                        'emoji',
-                      )}
-                    </Text>
-                  </Button>
-                </Box>
-              ))
-          : null}
-      </Box>
-    </>
+      {reactionList}
+    </Box>
   );
 };
 

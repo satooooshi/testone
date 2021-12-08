@@ -2,7 +2,6 @@ import React from 'react';
 import {TouchableHighlight, useWindowDimensions} from 'react-native';
 import {Div, Text} from 'react-native-magnus';
 import {ChatMessage} from '../../../../types';
-import {darkFontColor} from '../../../../utils/colors';
 import {mentionTransform} from '../../../../utils/messageTransform';
 import ReplyParent from '../ReplyParent';
 

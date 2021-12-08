@@ -437,7 +437,7 @@ const Chat: React.FC = () => {
         ) : null}
       </Div>
       <Div
-        w={windowWidth * 0.6}
+        maxW={windowWidth * 0.6}
         flexDir="row"
         flexWrap="wrap"
         alignSelf={message?.isSender ? 'flex-end' : 'flex-start'}>
