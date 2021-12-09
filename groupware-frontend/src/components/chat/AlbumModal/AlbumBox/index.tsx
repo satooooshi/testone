@@ -1,17 +1,23 @@
 import React from 'react';
-import { Box, Image, Link, Text } from '@chakra-ui/react';
+import { Box, Button, Image, Link, LinkBox, Text } from '@chakra-ui/react';
 import NextImage from 'next/image';
 import { ChatAlbum } from 'src/types';
 import noImage from '@/public/no-image.jpg';
+import { RiDeleteBin6Line } from 'react-icons/ri';
 
 type AlbumBoxProps = {
   album: ChatAlbum;
-  onClick: (album: ChatAlbum) => void;
+  onClick: () => void;
+  onClickDeleteButton: () => void;
 };
 
-const AlbumBox: React.FC<AlbumBoxProps> = ({ album, onClick }) => {
+const AlbumBox: React.FC<AlbumBoxProps> = ({
+  album,
+  onClick,
+  onClickDeleteButton,
+}) => {
   return (
-    <Link
+    <LinkBox
       bg="white"
       borderColor="gray.300"
       borderWidth={1}
@@ -20,12 +26,24 @@ const AlbumBox: React.FC<AlbumBoxProps> = ({ album, onClick }) => {
       maxWidth={'400px'}
       display="flex"
       flexDir="column"
-      onClick={() => onClick(album)}
+      onClick={onClick}
       alignItems="center">
-      <Box p="8px" flexDir="row" w={'100%'} justifyContent="flex-start">
-        <Text noOfLines={1} mr="4px" display="inline">
+      <Box
+        p="8px"
+        display="flex"
+        flexDir="row"
+        w={'100%'}
+        justifyContent="space-between">
+        <Text maxW="80%" noOfLines={1} mr="4px" display="inline">
           {album.title}
         </Text>
+        <Link
+          onClick={(e) => {
+            e.stopPropagation();
+            onClickDeleteButton();
+          }}>
+          <RiDeleteBin6Line fontSize={24} color="red" />
+        </Link>
       </Box>
       {album.images?.length ? (
         <Image
@@ -37,7 +55,7 @@ const AlbumBox: React.FC<AlbumBoxProps> = ({ album, onClick }) => {
       ) : (
         <NextImage src={noImage} alt="アルバム画像" />
       )}
-    </Link>
+    </LinkBox>
   );
 };
 

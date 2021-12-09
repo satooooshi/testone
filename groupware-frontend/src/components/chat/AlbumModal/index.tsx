@@ -12,9 +12,10 @@ import {
   ModalHeader,
   ModalOverlay,
   SimpleGrid,
+  Spinner,
   Text,
 } from '@chakra-ui/react';
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { ChatAlbum, ChatAlbumImage, ChatGroup } from 'src/types';
 import { AiOutlineLeft, AiOutlinePlus } from 'react-icons/ai';
 import dynamic from 'next/dynamic';
@@ -29,6 +30,7 @@ import { useAPICreateChatAlbum } from '@/hooks/api/chat/album/useAPICreateChatAl
 import { useAPIGetChatAlbums } from '@/hooks/api/chat/album/useAPIGetAlbums';
 import { useAPIGetChatAlbumImages } from '@/hooks/api/chat/album/useAPIGetChatAlbumImages';
 import { useAPISaveAlbumImage } from '@/hooks/api/chat/album/useAPISaveChatImages';
+import { useAPIDeleteChatAlbum } from '@/hooks/api/chat/album/useAPIDeleteChatAlbum';
 
 type AlbumModalProps = {
   isOpen: boolean;
@@ -38,15 +40,23 @@ type AlbumModalProps = {
 
 const AlbumModal: React.FC<AlbumModalProps> = ({ isOpen, onClose, room }) => {
   const headerName = 'アルバム一覧';
+  const { mutate: deleteAlbum } = useAPIDeleteChatAlbum();
   const [albumListPage, setAlbumListPage] = useState(1);
   const [albumImageListPage, setAlbumImageListPage] = useState(1);
-  const { data: albums } = useAPIGetChatAlbums({
+  const {
+    data: albums,
+    isLoading,
+    refetch: refetchAlbums,
+  } = useAPIGetChatAlbums({
     roomId: room.id.toString(),
     page: albumListPage.toString(),
   });
   const [selectedAlbum, setSelectedAlbum] = useState<ChatAlbum>();
   const [albumImages, setAlbumImages] = useState<ChatAlbumImage[]>([]);
   const { mutate: saveAlbumImage } = useAPISaveAlbumImage();
+  const [notesForInfiniteScroll, setNotesForInfiniteScroll] = useState<
+    ChatAlbum[]
+  >([]);
 
   const onClickBackButton = () => {
     setSelectedAlbum(undefined);
@@ -146,7 +156,7 @@ const AlbumModal: React.FC<AlbumModalProps> = ({ isOpen, onClose, room }) => {
     if (selectedImage) {
       const isNowUri = (element: ImageDecorator) =>
         element.src === selectedImage?.imageURL;
-      return imagesInDetailViewer.findIndex(isNowUri) + 2;
+      return imagesInDetailViewer.findIndex(isNowUri) + 1;
     }
   }, [imagesInDetailViewer, selectedImage]);
 
@@ -191,6 +201,31 @@ const AlbumModal: React.FC<AlbumModalProps> = ({ isOpen, onClose, room }) => {
       },
     });
   };
+
+  const onScroll = (e: any) => {
+    if (e.target.scrollHeight - e.target.scrollTop === e.target.clientHeight) {
+      if (selectedAlbum) {
+        setAlbumImageListPage((p) => p + 1);
+      } else {
+        setAlbumListPage((p) => p + 1);
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (albums?.albums?.length) {
+      setNotesForInfiniteScroll((n) => {
+        if (
+          n.length &&
+          new Date(n[n.length - 1].createdAt) >
+            new Date(albums.albums[0].createdAt)
+        ) {
+          return [...n, ...albums?.albums];
+        }
+        return albums?.albums;
+      });
+    }
+  }, [albums?.albums]);
 
   const postMode = (
     <Box>
@@ -268,26 +303,45 @@ const AlbumModal: React.FC<AlbumModalProps> = ({ isOpen, onClose, room }) => {
 
   const listMode = (
     <>
-      <Box flexDir="row" justifyContent="flex-end" display="flex" mb={'40px'}>
-        <Button
-          size="sm"
-          flexDir="row"
-          onClick={() => setMode('post')}
-          position="absolute"
-          mb="8px"
-          colorScheme="green"
-          alignItems="center">
-          <Text display="inline">アルバムを作成</Text>
-        </Button>
-      </Box>
-
-      {albums?.albums.map((a) => (
+      {notesForInfiniteScroll.map((a) => (
         <Box mb="16px" key={a.id}>
-          <AlbumBox album={a} onClick={() => setSelectedAlbum(a)} />
+          <AlbumBox
+            album={a}
+            onClick={() => setSelectedAlbum(a)}
+            onClickDeleteButton={() => {
+              if (confirm('アルバムを削除してよろしいですか？')) {
+                deleteAlbum(
+                  {
+                    roomId: room.id.toString(),
+                    albumId: a.id.toString(),
+                  },
+                  {
+                    onSuccess: () => {
+                      setAlbumListPage(1);
+                      refetchAlbums();
+                    },
+                  },
+                );
+              }
+            }}
+          />
         </Box>
       ))}
+      {isLoading && <Spinner />}
     </>
   );
+
+  useEffect(() => {
+    const refreshNotes = () => {
+      setNotesForInfiniteScroll([]);
+      setAlbumListPage(1);
+      refetchAlbums();
+      setAlbumImageListPage(1);
+    };
+    if (!selectedAlbum || mode === 'list') {
+      refreshNotes();
+    }
+  }, [mode, refetchAlbums, selectedAlbum]);
 
   return (
     <>
@@ -305,9 +359,26 @@ const AlbumModal: React.FC<AlbumModalProps> = ({ isOpen, onClose, room }) => {
         scrollBehavior="inside">
         <ModalOverlay />
         <ModalContent h="80vh" bg={'#f9fafb'}>
-          <ModalHeader>{headerName}</ModalHeader>
+          <ModalHeader
+            flexDir="row"
+            justifyContent="space-between"
+            display="flex"
+            mr="24px">
+            <Text>{headerName}</Text>
+            {mode !== 'post' && (
+              <Button
+                size="sm"
+                flexDir="row"
+                onClick={() => setMode('post')}
+                mb="8px"
+                colorScheme="green"
+                alignItems="center">
+                <Text display="inline">アルバムを作成</Text>
+              </Button>
+            )}
+          </ModalHeader>
           <ModalCloseButton />
-          <ModalBody>
+          <ModalBody onScroll={onScroll}>
             {!selectedAlbum && mode === 'list' ? (
               listMode
             ) : !selectedAlbum && mode === 'post' ? (
