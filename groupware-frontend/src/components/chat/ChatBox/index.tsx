@@ -16,7 +16,6 @@ import React, {
   useState,
 } from 'react';
 import ChatMessageItem from '../ChatMessageItem';
-import chatStyles from '@/styles/layouts/Chat.module.scss';
 import { IoCloseSharp, IoSend } from 'react-icons/io5';
 import { FiFileText } from 'react-icons/fi';
 import createMentionPlugin from '@draft-js-plugins/mention';
@@ -408,16 +407,31 @@ const ChatBox: React.FC<ChatBoxProps> = ({
           onAddMention={onAddMention}
         />
       </Box>
-      <Box {...getRootProps()}>
+      <Link
+        {...getRootProps()}
+        color={darkFontColor}
+        position="absolute"
+        zIndex={1}
+        bottom={'8px'}
+        cursor="pointer"
+        right="50px">
         <input {...getInputProps()} />
-        <AiOutlinePaperClip size={20} className={chatStyles.clip_icon} />
-      </Box>
+        <AiOutlinePaperClip size={20} color={darkFontColor} />
+      </Link>
 
-      <IoSend
-        size={20}
-        onClick={() => handleSubmit()}
-        className={chatStyles.send_icon}
-      />
+      <Link
+        color={darkFontColor}
+        position="absolute"
+        zIndex={1}
+        bottom={'8px'}
+        cursor="pointer"
+        right="8px">
+        <IoSend
+          size={20}
+          onClick={() => handleSubmit()}
+          color={darkFontColor}
+        />
+      </Link>
     </Box>
   );
 };

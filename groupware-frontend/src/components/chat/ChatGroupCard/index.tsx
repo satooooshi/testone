@@ -47,15 +47,7 @@ const ChatGroupCard: React.FC<ChatGroupCardProps> = ({
       px="12px"
       alignItems="center"
       boxShadow="md"
-      w={
-        isSmallerThan768
-          ? '90vw'
-          : isSmalerThan1024
-          ? '26vw'
-          : isLargerTahn1024
-          ? '22vw'
-          : undefined
-      }
+      w={'100%'}
       bg={isSelected ? '#f2f1f2' : 'white'}>
       <Avatar src={chatGroup.imageURL} size="md" mr="8px" />
       <Box

@@ -12,10 +12,10 @@ import {
 } from '@chakra-ui/react';
 import { useAuthenticate } from 'src/contexts/useAuthenticate';
 import { userRoleNameFactory } from 'src/utils/factory/userRoleNameFactory';
+import { useAPIGetUsers } from '@/hooks/api/user/useAPIGetUsers';
 
 type EditChatGroupMambersModalProps = {
   isOpen: boolean;
-  users: User[];
   previousUsers: User[];
   onComplete: (selectedUsers: User[]) => void;
   onCancel: () => void;
@@ -23,11 +23,11 @@ type EditChatGroupMambersModalProps = {
 
 const EditChatGroupMembersModal: React.FC<EditChatGroupMambersModalProps> = ({
   isOpen,
-  users,
   previousUsers,
   onComplete,
   onCancel,
 }) => {
+  const { data: users } = useAPIGetUsers();
   const [selectedRole, setSelectedRole] = useState<UserRole | 'all'>(
     UserRole.INTERNAL_INSTRUCTOR,
   );
@@ -115,7 +115,7 @@ const EditChatGroupMembersModal: React.FC<EditChatGroupMambersModalProps> = ({
           ))}
         {selectedRole !== 'all'
           ? users
-              .filter((u) => u.role === selectedRole)
+              ?.filter((u) => u.role === selectedRole)
               .filter((u) => !previousUserIDs().includes(u.id))
               .map((u) => (
                 <a
@@ -140,7 +140,7 @@ const EditChatGroupMembersModal: React.FC<EditChatGroupMambersModalProps> = ({
                 </a>
               ))
           : users
-              .filter((u) => !previousUserIDs().includes(u.id))
+              ?.filter((u) => !previousUserIDs().includes(u.id))
               .map((u) => (
                 <a
                   key={u.id}
