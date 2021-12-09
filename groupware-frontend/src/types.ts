@@ -317,7 +317,7 @@ export interface ChatAlbumImage {
 export interface ChatMessageReaction {
   id: number;
   emoji: string;
-  user?: User;
+  user?: Partial<User>;
   chatMessage?: ChatMessage;
   createdAt: Date;
   updatedAt: Date;

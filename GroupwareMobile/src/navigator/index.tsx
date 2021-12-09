@@ -62,9 +62,9 @@ const Navigator = () => {
       requestPermissions: true,
     });
     const unsubscribe = messaging().onMessage(async remoteMessage => {
-      console.log(remoteMessage);
+      console.log('sent', remoteMessage);
       PushNotification.localNotification({
-        channelId: remoteMessage.notification?.android?.channelId,
+        channelId: 'default-channel-id',
         ignoreInForeground: false,
         id: remoteMessage.messageId,
         message: remoteMessage.notification?.body || '',

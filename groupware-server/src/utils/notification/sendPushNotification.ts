@@ -63,7 +63,7 @@ const sendPushNotifToSpecificDevices = async (
     delayWhileIdle: true, // gcm for android
     restrictedPackageName: '', // gcm for android
     dryRun: false, // gcm for android
-    icon: '', // gcm for android
+    icon: 'https://portal.bold.ne.jp/_next/image?url=%2F_next%2Fstatic%2Fimage%2Fpublic%2Fbold-logo.22bda447bf8117298663d36dd31fcf59.png&w=1080&q=75', // gcm for android
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     //@ts-ignore
     image:

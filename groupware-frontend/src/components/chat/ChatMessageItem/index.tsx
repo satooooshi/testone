@@ -16,23 +16,82 @@ import { darkFontColor } from 'src/utils/colors';
 import { Menu, MenuItem, MenuButton } from '@szhsin/react-menu';
 import { HiOutlineDotsCircleHorizontal } from 'react-icons/hi';
 import { numbersOfSameValueInKeyOfObjArr } from 'src/utils/numbersOfSameValueInKeyOfObjArr';
+import { useState } from 'react';
+import { useAPISaveReaction } from '@/hooks/api/chat/useAPISaveReaction';
+import { useAPIDeleteReaction } from '@/hooks/api/chat/useAPIDeleteReaction';
+import { useAuthenticate } from 'src/contexts/useAuthenticate';
 
 type ChatMessageItemProps = {
   message: ChatMessage;
   lastReadChatTime: LastReadChatTime[];
   onClickReaction: () => void;
-  onClickSpecificReaction: (reaction: ChatMessageReaction) => void;
   onClickReply: () => void;
-  deletedReactionIds: number[];
+};
+
+const ReactionButton = ({
+  reactions,
+  reaction,
+}: {
+  reactions: ChatMessageReaction[];
+  reaction: ChatMessageReaction;
+}) => {
+  const { user } = useAuthenticate();
+  const [count, setCount] = useState(
+    numbersOfSameValueInKeyOfObjArr(
+      reactions as ChatMessageReaction[],
+      reaction,
+      'emoji',
+    ),
+  );
+  const [isSender, setIsSender] = useState(reaction.isSender || false);
+  const { mutate: saveReaction } = useAPISaveReaction();
+  const { mutate: deleteReaction } = useAPIDeleteReaction();
+
+  return (
+    <Button
+      onClick={() => {
+        if (user) {
+          if (isSender) {
+            deleteReaction(
+              { ...reaction, user },
+              {
+                onSuccess: () => {
+                  setIsSender(!isSender);
+                  setCount((c) => c - 1);
+                },
+              },
+            );
+          } else {
+            saveReaction(
+              { ...reaction, user },
+              {
+                onSuccess: () => {
+                  setIsSender(!isSender);
+                  setCount((c) => c + 1);
+                },
+              },
+            );
+          }
+        }
+      }}
+      bg={isSender ? 'blue.600' : undefined}
+      flexDir="row"
+      borderColor={'blue.600'}
+      borderWidth={1}
+      size="sm">
+      <Text fontSize={16}>{reaction.emoji}</Text>
+      <Text fontSize={16} color={reaction.isSender ? 'white' : undefined}>
+        {count}
+      </Text>
+    </Button>
+  );
 };
 
 const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
   message,
   lastReadChatTime,
   onClickReaction,
-  onClickSpecificReaction,
   onClickReply,
-  deletedReactionIds = [],
 }) => {
   const reactionRemovedDuplicates = (reactions: ChatMessageReaction[]) => {
     const reactionsNoDuplicates: ChatMessageReaction[] = [];
@@ -59,28 +118,14 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
   const reactionList = (
     <Box flexDir="row" flexWrap="wrap" display="flex" maxW={'50vw'}>
       {message.reactions?.length
-        ? reactionRemovedDuplicates(message.reactions)
-            .filter((r) => !deletedReactionIds.includes(r.id))
-            .map((r) => (
-              <Box key={r.id} mb="4px" mr="4px">
-                <Button
-                  onClick={() => onClickSpecificReaction(r)}
-                  bg={r.isSender ? 'blue.600' : undefined}
-                  flexDir="row"
-                  borderColor={'blue.600'}
-                  borderWidth={1}
-                  size="sm">
-                  <Text fontSize={16}>{r.emoji}</Text>
-                  <Text fontSize={16} color={r.isSender ? 'white' : undefined}>
-                    {numbersOfSameValueInKeyOfObjArr(
-                      message.reactions as ChatMessageReaction[],
-                      r,
-                      'emoji',
-                    )}
-                  </Text>
-                </Button>
-              </Box>
-            ))
+        ? reactionRemovedDuplicates(message.reactions).map((r) => (
+            <Box key={r.id} mb="4px" mr="4px">
+              <ReactionButton
+                reaction={r}
+                reactions={message.reactions || []}
+              />
+            </Box>
+          ))
         : null}
     </Box>
   );

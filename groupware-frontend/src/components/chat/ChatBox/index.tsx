@@ -36,6 +36,7 @@ type ChatBoxProps = {
   onMenuClicked: (menuValue: MenuValue) => void;
   onClickNoteIcon: () => void;
   onClickAlbumIcon: () => void;
+  onClickReaction: (message: ChatMessage) => void;
 };
 
 const ChatBox: React.FC<ChatBoxProps> = ({
@@ -43,6 +44,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({
   onMenuClicked,
   onClickAlbumIcon,
   onClickNoteIcon,
+  onClickReaction,
 }) => {
   const [page, setPage] = useState(1);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -321,6 +323,13 @@ const ChatBox: React.FC<ChatBoxProps> = ({
                 key={m.id}
                 message={m}
                 lastReadChatTime={lastReadChatTime || []}
+                onClickReply={() =>
+                  setNewChatMessage((pre) => ({
+                    ...pre,
+                    replyParentMessage: m,
+                  }))
+                }
+                onClickReaction={() => onClickReaction(m)}
               />
             ))}
           </>
