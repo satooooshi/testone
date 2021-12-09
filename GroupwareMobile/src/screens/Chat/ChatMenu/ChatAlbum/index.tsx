@@ -1,10 +1,11 @@
 import {useNavigation, useRoute} from '@react-navigation/native';
 import React, {useEffect, useState} from 'react';
-import {FlatList} from 'react-native';
+import {Alert, FlatList} from 'react-native';
 import {Button, Div, Icon, Text} from 'react-native-magnus';
 import AlbumBox from '../../../../components/chat/AlbumBox';
 import HeaderWithTextButton from '../../../../components/Header';
 import WholeContainer from '../../../../components/WholeContainer';
+import {useAPIDeleteChatAlbum} from '../../../../hooks/api/chat/album/useAPIDeleteChatAlbum';
 import {useAPIGetChatAlbums} from '../../../../hooks/api/chat/album/useAPIGetAlbums';
 import {ChatAlbum} from '../../../../types';
 import {
@@ -19,10 +20,11 @@ const ChatAlbums: React.FC = () => {
     ChatAlbum[]
   >([]);
   const [page, setPage] = useState<string>('1');
-  const {data} = useAPIGetChatAlbums({
+  const {data, refetch} = useAPIGetChatAlbums({
     roomId: room.id.toString(),
     page: page,
   });
+  const {mutate: deleteAlbum} = useAPIDeleteChatAlbum();
 
   const onEndReached = () => {
     setPage(p => (Number(p) + 1).toString());
@@ -82,6 +84,32 @@ const ChatAlbums: React.FC = () => {
                   params: {room, album: item},
                 })
               }
+              onPressDeleteButton={() => {
+                Alert.alert('アルバムを削除してよろしいですか？', undefined, [
+                  {
+                    text: 'キャンセル',
+                    style: 'cancel',
+                  },
+                  {
+                    text: '削除',
+                    style: 'destructive',
+                    onPress: () => {
+                      deleteAlbum(
+                        {
+                          roomId: room.id.toString(),
+                          albumId: item.id.toString(),
+                        },
+                        {
+                          onSuccess: () => {
+                            setPage('1');
+                            refetch();
+                          },
+                        },
+                      );
+                    },
+                  },
+                ]);
+              }}
             />
           )}
         />
