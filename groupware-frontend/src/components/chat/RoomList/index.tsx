@@ -6,7 +6,7 @@ import ChatGroupCard from '../ChatGroupCard';
 
 type RoomListProps = {
   currentId?: string;
-  currentRoom: ChatGroup | undefined;
+  currentRoom?: ChatGroup | undefined;
   setCurrentRoom?: React.Dispatch<SetStateAction<ChatGroup | undefined>>;
   onClickRoom: (room: ChatGroup) => void;
 };
