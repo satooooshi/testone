@@ -2,7 +2,7 @@ import React from 'react';
 import {Text, Div, Button, Icon} from 'react-native-magnus';
 import {darkFontColor, blueColor} from '../../utils/colors';
 import FastImage from 'react-native-fast-image';
-import {FlatList, TouchableOpacity} from 'react-native';
+import {FlatList, TouchableHighlight, TouchableOpacity} from 'react-native';
 import {headerStyles} from '../../styles/component/header.style';
 import {DrawerActions, useNavigation} from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -62,11 +62,15 @@ const HeaderTemplate: React.FC<HeaderTemplateProps> = ({
             onPress={() => navigation.dispatch(DrawerActions.toggleDrawer())}>
             <Ionicons name="menu-outline" size={26} />
           </TouchableOpacity>
-          <FastImage
-            style={headerStyles.logoImage}
-            resizeMode="contain"
-            source={require('../../../assets/bold-logo.png')}
-          />
+          <TouchableHighlight
+            onPress={() => navigation.navigate('Home' as any)}
+            underlayColor="none">
+            <FastImage
+              style={headerStyles.logoImage}
+              resizeMode="contain"
+              source={require('../../../assets/bold-logo.png')}
+            />
+          </TouchableHighlight>
           <Text fontSize={20} ml="lg" fontWeight="bold" color={darkFontColor}>
             {title}
           </Text>
