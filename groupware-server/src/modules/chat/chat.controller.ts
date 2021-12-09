@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -24,6 +23,7 @@ import JwtAuthenticationGuard from '../auth/jwtAuthentication.guard';
 import RequestWithUser from '../auth/requestWithUser.interface';
 import { ChatService, GetChatNotesResult } from './chat.service';
 import { ChatAlbumService, GetChatAlbumsResult } from './chatAlbum.service';
+import { ChatNoteService } from './chatNote.service';
 
 export interface GetMessagesQuery {
   group: number;
@@ -44,6 +44,7 @@ export class ChatController {
   constructor(
     private readonly chatService: ChatService,
     private readonly chatAlbumService: ChatAlbumService,
+    private readonly chatNoteService: ChatNoteService,
   ) {}
 
   @Get('group-list')
@@ -177,7 +178,7 @@ export class ChatController {
     @Req() req: RequestWithUser,
   ): Promise<GetChatNotesResult> {
     const { user } = req;
-    const notes = await this.chatService.getChatNotes(
+    const notes = await this.chatNoteService.getChatNotes(
       { group: Number(roomId), page },
       user.id,
     );
@@ -192,7 +193,7 @@ export class ChatController {
   ) {
     const { user } = req;
     body.editors = [user];
-    const notes = await this.chatService.saveChatNotes(body);
+    const notes = await this.chatNoteService.saveChatNotes(body);
     return notes;
   }
 
@@ -203,14 +204,14 @@ export class ChatController {
     body.editors = body?.editors?.length
       ? [...body.editors.filter((e) => e.id !== user.id), user]
       : [user];
-    const notes = await this.chatService.saveChatNotes(body);
+    const notes = await this.chatNoteService.saveChatNotes(body);
     return notes;
   }
 
   @Delete('/v2/room/:roomId/note/:noteId')
   @UseGuards(JwtAuthenticationGuard)
   async deleteChatNotes(@Param('noteId') noteId: number, @Res() res: Response) {
-    await this.chatService.deleteChatNotes(noteId);
+    await this.chatNoteService.deleteChatNotes(noteId);
     res.send(200);
   }
 
@@ -221,7 +222,7 @@ export class ChatController {
     @Req() req: RequestWithUser,
   ) {
     const { id: userID } = req.user;
-    const notes = await this.chatService.getChatNoteDetail(
+    const notes = await this.chatNoteService.getChatNoteDetail(
       Number(noteId),
       userID,
     );

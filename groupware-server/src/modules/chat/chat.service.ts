@@ -10,7 +10,6 @@ import { ChatGroup } from 'src/entities/chatGroup.entity';
 import { ChatMessage, ChatMessageType } from 'src/entities/chatMessage.entity';
 import { ChatMessageReaction } from 'src/entities/chatMessageReaction.entity';
 import { ChatNote } from 'src/entities/chatNote.entity';
-import { ChatNoteImage } from 'src/entities/chatNoteImage.entity';
 import { LastReadChatTime } from 'src/entities/lastReadChatTime.entity';
 import { User } from 'src/entities/user.entity';
 import { userNameFactory } from 'src/utils/factory/userNameFactory';
@@ -39,10 +38,6 @@ export class ChatService {
     private readonly chatGroupRepository: Repository<ChatGroup>,
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
-    @InjectRepository(ChatNote)
-    private readonly noteRepository: Repository<ChatNote>,
-    @InjectRepository(ChatNoteImage)
-    private readonly noteImageRepository: Repository<ChatNoteImage>,
     @InjectRepository(ChatMessageReaction)
     private readonly chatMessageReactionRepository: Repository<ChatMessageReaction>,
     private readonly storageService: StorageService,
@@ -219,9 +214,6 @@ export class ChatService {
     if (!existGroup) {
       throw new BadRequestException('That group id is incorrect');
     }
-    message.content = this.storageService.parseSignedURLToStorageURL(
-      message.content,
-    );
     const savedMessage = await this.chatMessageRepository.save(message);
     existGroup.updatedAt = new Date();
     await this.chatGroupRepository.save({
@@ -352,6 +344,23 @@ export class ChatService {
     return newGroup;
   }
 
+  public async deleteReaction(reactionId: number): Promise<number> {
+    await this.chatMessageReactionRepository.delete(reactionId);
+    return reactionId;
+  }
+
+  public async postReaction(
+    reaction: Partial<ChatMessageReaction>,
+    userID: number,
+  ): Promise<ChatMessageReaction> {
+    const existUser = await this.userRepository.findOne(userID);
+    const reactionWithUser = { ...reaction, user: existUser };
+    const savedReaction = await this.chatMessageReactionRepository.save(
+      reactionWithUser,
+    );
+    return { ...savedReaction, isSender: true };
+  }
+
   public async saveLastReadChatTime(
     user: User,
     chatGroupId: number,
@@ -385,91 +394,5 @@ export class ChatService {
       chatGroup: chatGroup,
     });
     return newLastReadChatTime;
-  }
-
-  public async saveChatNotes(dto: Partial<ChatNote>): Promise<ChatNote> {
-    const savedNote = await this.noteRepository.save(dto);
-    if (dto.images?.length) {
-      const sentImages = dto.images.map((i) => ({
-        ...i,
-        imageURL: this.storageService.parseSignedURLToStorageURL(i.imageURL),
-        chatNote: savedNote,
-      }));
-
-      await this.noteImageRepository.save(sentImages);
-    }
-    return savedNote;
-  }
-
-  public async deleteChatNotes(noteId: number) {
-    await this.noteRepository.delete(noteId);
-  }
-
-  public async getChatNoteDetail(
-    noteID: number,
-    userID: number,
-  ): Promise<ChatNote> {
-    const noteDetail = await this.noteRepository.findOne(noteID, {
-      relations: ['chatGroup', 'editors', 'images'],
-      withDeleted: true,
-    });
-    noteDetail.isEditor = !!noteDetail.editors.filter((e) => e.id === userID)
-      .length;
-    return noteDetail;
-  }
-
-  public async deleteReaction(reactionId: number): Promise<number> {
-    await this.chatMessageReactionRepository.delete(reactionId);
-    return reactionId;
-  }
-
-  public async postReaction(
-    reaction: Partial<ChatMessageReaction>,
-    userID: number,
-  ): Promise<ChatMessageReaction> {
-    const existUser = await this.userRepository.findOne(userID);
-    const reactionWithUser = { ...reaction, user: existUser };
-    const savedReaction = await this.chatMessageReactionRepository.save(
-      reactionWithUser,
-    );
-    return { ...savedReaction, isSender: true };
-  }
-
-  public async getChatNotes(
-    query: GetChatNotesQuery,
-    userID: number,
-  ): Promise<GetChatNotesResult> {
-    const { page, group } = query;
-    const limit = 20;
-    const offset = limit * (Number(page) - 1);
-    const [existNotes, count] = await this.noteRepository
-      .createQueryBuilder('chat_notes')
-      .leftJoinAndSelect('chat_notes.chatGroup', 'chat_groups')
-      .leftJoinAndSelect('chat_notes.editors', 'editors')
-      .leftJoinAndSelect('chat_notes.images', 'images')
-      .where('chat_groups.id = :chatGroupId', { chatGroupId: group })
-      .withDeleted()
-      .skip(offset)
-      .take(limit)
-      .orderBy('chat_notes.createdAt', 'DESC')
-      .getManyAndCount();
-
-    const notes = existNotes.map((n) => ({
-      ...n,
-      isEditor: !!n.editors?.filter((e) => e.id === userID).length,
-    }));
-    const pageCount = Math.floor(count / limit) + 1;
-    return { notes, pageCount };
-  }
-
-  public async saveChatNoteImages(
-    dto: Partial<ChatNoteImage[]>,
-  ): Promise<ChatNoteImage[]> {
-    const sentImages = dto.map((i) => ({
-      ...i,
-      imageURL: this.storageService.parseSignedURLToStorageURL(i.imageURL),
-    }));
-
-    return await this.noteImageRepository.save(sentImages);
   }
 }

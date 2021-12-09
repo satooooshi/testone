@@ -16,6 +16,7 @@ import { UserModule } from '../user/user.module';
 import { ChatController } from './chat.controller';
 import { ChatService } from './chat.service';
 import { ChatAlbumService } from './chatAlbum.service';
+import { ChatNoteService } from './chatNote.service';
 
 @Module({
   imports: [
@@ -36,7 +37,7 @@ import { ChatAlbumService } from './chatAlbum.service';
     ]),
   ],
   controllers: [ChatController],
-  providers: [ChatService, ChatAlbumService],
+  providers: [ChatService, ChatAlbumService, ChatNoteService],
   exports: [ChatService],
 })
 export class ChatModule {}
