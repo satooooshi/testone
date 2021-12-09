@@ -22,6 +22,17 @@ const ReplyList: React.FC<ReplyListProps> = ({answer, onPressAvatar}) => {
   const [repliesHeight, setRepliesHeight] = useState<number>(100);
   return (
     <>
+      <Button
+        bg="pink600"
+        w={'100%'}
+        onPress={() => {
+          navigation.navigate('WikiStack', {
+            screen: 'PostReply',
+            params: {id: answer.id},
+          });
+        }}>
+        返信する
+      </Button>
       {answer.replies?.length ? (
         <Collapse mb={8}>
           <Collapse.Header
@@ -84,18 +95,6 @@ const ReplyList: React.FC<ReplyListProps> = ({answer, onPressAvatar}) => {
           </Collapse.Body>
         </Collapse>
       ) : null}
-      <Button
-        mb={16}
-        bg="pink600"
-        w={'100%'}
-        onPress={() => {
-          navigation.navigate('WikiStack', {
-            screen: 'PostReply',
-            params: {id: answer.id},
-          });
-        }}>
-        返信する
-      </Button>
     </>
   );
 };

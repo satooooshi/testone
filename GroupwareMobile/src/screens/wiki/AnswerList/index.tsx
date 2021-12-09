@@ -1,25 +1,42 @@
 import React from 'react';
-import {TouchableOpacity, useWindowDimensions} from 'react-native';
+import {
+  ActivityIndicator,
+  TouchableOpacity,
+  useWindowDimensions,
+} from 'react-native';
 import RenderHtml from 'react-native-render-html';
-import {Div, Avatar, Text} from 'react-native-magnus';
-import {QAAnswer, User} from '../../../types';
+import {Div, Avatar, Text, Button, Overlay} from 'react-native-magnus';
+import {User, Wiki} from '../../../types';
 import {darkFontColor} from '../../../utils/colors';
 import {userNameFactory} from '../../../utils/factory/userNameFactory';
 import MarkdownIt from 'markdown-it';
 import ReplyList from '../ReplyList';
+import {useAPICreateBestAnswer} from '../../../hooks/api/wiki/useAPICreateBestAnswer';
+import {useAuthenticate} from '../../../contexts/useAuthenticate';
+import {useAPIGetWikiDetail} from '../../../hooks/api/wiki/useAPIGetWikiDetail';
 
 type AnswerListProps = {
-  answers?: QAAnswer[];
+  wiki: Wiki;
   onPressAvatar: (user: User) => void;
 };
 
-const AnswerList: React.FC<AnswerListProps> = ({answers, onPressAvatar}) => {
+const AnswerList: React.FC<AnswerListProps> = ({wiki, onPressAvatar}) => {
   const mdParser = new MarkdownIt({breaks: true});
   const {width: windowWidth} = useWindowDimensions();
+  const {user} = useAuthenticate();
+  const {mutate: saveBestAnswer, isLoading: loadingSaveBestAnswer} =
+    useAPICreateBestAnswer({
+      onSuccess: () => refetchWikiInfo(),
+    });
+  const {refetch: refetchWikiInfo} = useAPIGetWikiDetail(wiki.id);
+
   return (
     <>
-      {answers?.length ? (
-        answers.map(answer => (
+      <Overlay visible={loadingSaveBestAnswer} p="xl">
+        <ActivityIndicator />
+      </Overlay>
+      {wiki.answers?.length ? (
+        wiki.answers.map(answer => (
           <Div mb={26}>
             <Div flexDir="row" alignItems="center" mb={8}>
               <TouchableOpacity
@@ -54,6 +71,19 @@ const AnswerList: React.FC<AnswerListProps> = ({answers, onPressAvatar}) => {
                 }}
               />
             </Div>
+            {wiki.bestAnswer?.id === answer.id ? (
+              <Button mb={8} bg="green600" w={'100%'}>
+                ベストアンサー
+              </Button>
+            ) : !wiki.resolvedAt && wiki.writer?.id === user?.id ? (
+              <Button
+                mb={8}
+                bg="orange600"
+                w={'100%'}
+                onPress={() => saveBestAnswer({...wiki, bestAnswer: answer})}>
+                ベストアンサーに選ぶ
+              </Button>
+            ) : null}
             <ReplyList answer={answer} onPressAvatar={onPressAvatar} />
           </Div>
         ))

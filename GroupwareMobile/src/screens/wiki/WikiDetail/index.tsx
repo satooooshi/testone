@@ -174,10 +174,7 @@ const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
                   : '回答を投稿する'}
               </Button>
             </Div>
-            <AnswerList
-              answers={wikiInfo.answers}
-              onPressAvatar={onPressAvatar}
-            />
+            <AnswerList wiki={wikiInfo} onPressAvatar={onPressAvatar} />
           </Div>
         ) : null}
       </ScrollView>
