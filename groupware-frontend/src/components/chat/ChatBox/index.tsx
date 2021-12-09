@@ -261,7 +261,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({
        * Header
        */}
       <Box
-        h="7%"
+        h="40px"
         bg="white"
         borderBottomColor="#b0b0b0"
         borderWidth={'0.5px'}

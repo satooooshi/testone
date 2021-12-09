@@ -171,23 +171,14 @@ const ChatDetail = () => {
           />
           <EditChatGroupMembersModal
             isOpen={editMembersModalVisible}
-            previousUsers={currentRoom.members || []}
-            onCancel={() =>
+            room={currentRoom}
+            setRoom={setCurrentRoom}
+            onClose={() =>
               dispatchModal({
                 type: 'editMembersModalVisible',
                 value: false,
               })
             }
-            onComplete={(newMembers) => {
-              saveGroup({
-                ...currentRoom,
-                members: newMembers,
-              });
-              dispatchModal({
-                type: 'editMembersModalVisible',
-                value: false,
-              });
-            }}
           />
         </>
       ) : null}

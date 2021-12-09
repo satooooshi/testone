@@ -1,6 +1,6 @@
 import React from 'react';
 import {TouchableOpacity, useWindowDimensions} from 'react-native';
-import {Box, Div, Text} from 'react-native-magnus';
+import {Box, Div, Image, Text} from 'react-native-magnus';
 import {
   ChatMessage,
   ChatMessageReaction,
@@ -103,6 +103,18 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
             message={message}
             onPress={onPressFile}
             onLongPress={onLongPress}
+          />
+        ) : null}
+        {!message.isSender && message.type !== ChatMessageType.SYSTEM_TEXT ? (
+          <Image
+            source={
+              message?.sender?.avatarUrl
+                ? {uri: message?.sender?.avatarUrl}
+                : require('../../../../assets/no-image-avatar.png')
+            }
+            h={40}
+            w={40}
+            rounded="circle"
           />
         ) : null}
       </Div>

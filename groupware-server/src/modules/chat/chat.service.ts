@@ -405,6 +405,39 @@ export class ChatService {
     await this.chatMessageRepository.save(systemMessage);
   }
 
+  public async editChatMembers(roomId: number, members: User[]) {
+    const targetRoom = await this.chatGroupRepository.findOne(roomId, {
+      relations: ['members'],
+    });
+    await this.chatGroupRepository.save({ ...targetRoom, members });
+    const existMemberIds = targetRoom.members.map((m) => m.id);
+    const newMemberIds = targetRoom.members.map((m) => m.id);
+    const newMembers = members.filter((m) => !existMemberIds.includes(m.id));
+    const removedMembers = targetRoom.members.filter(
+      (m) => !newMemberIds.includes(m.id),
+    );
+    if (removedMembers.length) {
+      const removedMemberMsg = new ChatMessage();
+      removedMemberMsg.content =
+        removedMembers.map((m) => userNameFactory(m)).join(', ') +
+        'が退出しました';
+      removedMemberMsg.type = ChatMessageType.SYSTEM_TEXT;
+      removedMemberMsg.chatGroup = targetRoom;
+
+      await this.chatMessageRepository.save(removedMemberMsg);
+    }
+    if (newMembers.length) {
+      const newMemberMsg = new ChatMessage();
+      newMemberMsg.content =
+        newMembers.map((m) => userNameFactory(m)).join(', ') + 'が参加しました';
+      newMemberMsg.type = ChatMessageType.SYSTEM_TEXT;
+      newMemberMsg.chatGroup = targetRoom;
+      await this.chatMessageRepository.save(newMemberMsg);
+    }
+
+    return targetRoom;
+  }
+
   public async saveChatGroup(
     chatGroup: Partial<ChatGroup>,
     userID: number,

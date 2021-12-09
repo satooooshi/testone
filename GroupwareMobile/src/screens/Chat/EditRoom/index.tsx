@@ -1,6 +1,7 @@
 import {useNavigation, useRoute} from '@react-navigation/native';
 import React from 'react';
 import {Alert} from 'react-native';
+import {useAPIEditMembers} from '../../../hooks/api/chat/useAPIEditMembers';
 import {useAPISaveChatGroup} from '../../../hooks/api/chat/useAPISaveChatGroup';
 import {useAPIUploadStorage} from '../../../hooks/api/storage/useAPIUploadStorage';
 import {useAPIGetUsers} from '../../../hooks/api/user/useAPIGetUsers';
@@ -15,6 +16,7 @@ const EditRoom: React.FC = () => {
   const {room} = useRoute<EditRoomRouteProps>().params;
   const {mutate: uploadImage} = useAPIUploadStorage();
   const {data: users} = useAPIGetUsers();
+  const {mutate: editMembers} = useAPIEditMembers();
   const headerTitle = 'ルーム編集';
   const {mutate: updateGroup} = useAPISaveChatGroup({
     onSuccess: () => {
@@ -36,7 +38,12 @@ const EditRoom: React.FC = () => {
       users={users || []}
       headerTitle={headerTitle}
       initialRoom={room}
-      onSubmit={submittedRoom => updateGroup(submittedRoom)}
+      onSubmit={submittedRoom => {
+        if (submittedRoom.members) {
+          editMembers({roomId: room.id, members: submittedRoom.members});
+          updateGroup({...submittedRoom, members: undefined});
+        }
+      }}
       onUploadImage={(formData, onSuccessFunc) =>
         uploadImage(formData, {onSuccess: onSuccessFunc})
       }

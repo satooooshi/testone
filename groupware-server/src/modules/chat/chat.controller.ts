@@ -14,13 +14,12 @@ import {
 } from '@nestjs/common';
 import { Response } from 'express';
 import { ChatAlbum } from 'src/entities/chatAlbum.entity';
-import { ChatAlbumImage } from 'src/entities/chatAlbumImage.entity';
 import { ChatGroup } from 'src/entities/chatGroup.entity';
 import { ChatMessage } from 'src/entities/chatMessage.entity';
 import { ChatMessageReaction } from 'src/entities/chatMessageReaction.entity';
 import { ChatNote } from 'src/entities/chatNote.entity';
-import { ChatNoteImage } from 'src/entities/chatNoteImage.entity';
 import { LastReadChatTime } from 'src/entities/lastReadChatTime.entity';
+import { User } from 'src/entities/user.entity';
 import JwtAuthenticationGuard from '../auth/jwtAuthentication.guard';
 import RequestWithUser from '../auth/requestWithUser.interface';
 import { ChatService, GetChatNotesResult } from './chat.service';
@@ -98,16 +97,24 @@ export class ChatController {
     @Body() chatGroup: Partial<ChatGroup>,
   ): Promise<ChatGroup> {
     const user = req.user;
-    if (!chatGroup.members || !chatGroup.members.length) {
-      throw new BadRequestException(
-        'Group member is necessary at least 1 person',
-      );
-    }
     chatGroup.members = [
-      ...chatGroup.members.filter((u) => u.id !== user.id),
+      ...(chatGroup?.members?.filter((u) => u.id !== user.id) || []),
       user,
     ];
     return await this.chatService.saveChatGroup(chatGroup, user.id);
+  }
+
+  @Patch('/v2/room/:roomId/members')
+  @UseGuards(JwtAuthenticationGuard)
+  async editRoomMembers(
+    @Param('roomId') roomId: number,
+    @Body() members: User[],
+  ): Promise<ChatGroup> {
+    const newGroupInfo = await this.chatService.editChatMembers(
+      roomId,
+      members,
+    );
+    return newGroupInfo;
   }
 
   @Get('get-last-read-chat-time/:id')
@@ -221,15 +228,6 @@ export class ChatController {
     return notes;
   }
 
-  @Post('/v2/room/note/images')
-  @UseGuards(JwtAuthenticationGuard)
-  async saveNoteImages(
-    @Body() body: Partial<ChatNoteImage[]>,
-  ): Promise<ChatNoteImage[]> {
-    const albums = await this.chatAlbumService.saveChatAlbumImages(body);
-    return albums;
-  }
-
   @Get('/v2/room/:roomId/album')
   @UseGuards(JwtAuthenticationGuard)
   async getChatAlbums(
@@ -254,15 +252,6 @@ export class ChatController {
     const { user } = req;
     body.editors = [user];
     const albums = await this.chatAlbumService.saveChatAlbums(body);
-    return albums;
-  }
-
-  @Post('/v2/room/album/images')
-  @UseGuards(JwtAuthenticationGuard)
-  async saveAlbumImages(
-    @Body() body: Partial<ChatAlbumImage[]>,
-  ): Promise<ChatAlbumImage[]> {
-    const albums = await this.chatAlbumService.saveChatAlbumImages(body);
     return albums;
   }
 
