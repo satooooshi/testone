@@ -4,7 +4,7 @@ import {Swipeable} from 'react-native-gesture-handler';
 import {Button, Div, Icon, Image, Text} from 'react-native-magnus';
 import tailwind from 'tailwind-rn';
 import {roomCardStyles} from '../../../styles/component/chat/roomCard.style';
-import {ChatGroup, User} from '../../../types';
+import {ChatGroup, ChatMessage, ChatMessageType, User} from '../../../types';
 import {darkFontColor} from '../../../utils/colors';
 import {dateTimeFormatterFromJSDDate} from '../../../utils/dateTimeFormatterFromJSDate';
 
@@ -42,6 +42,18 @@ const RoomCard: React.FC<RoomCardProps> = ({
         />
       </Button>
     );
+  };
+  const latestMessage = (chatMessage: ChatMessage) => {
+    switch (chatMessage.type) {
+      case ChatMessageType.IMAGE:
+        return '画像が送信されました';
+      case ChatMessageType.VIDEO:
+        return '動画が送信されました';
+      case ChatMessageType.OTHER_FILE:
+        return 'ファイルが送信されました';
+      default:
+        return chatMessage.content;
+    }
   };
 
   return (
@@ -92,7 +104,9 @@ const RoomCard: React.FC<RoomCardProps> = ({
               {room.name || nameOfEmptyNameGroup(room.members)}
             </Text>
             <Text mb={'xs'} fontSize={14} color={darkFontColor}>
-              {room.chatMessages?.length ? room.chatMessages[0].content : ''}
+              {room.chatMessages?.length
+                ? latestMessage(room.chatMessages[0])
+                : ''}
             </Text>
             <Div flexDir="row" justifyContent="space-between">
               <Text>{`${room.members?.length || 0}人のメンバー`}</Text>

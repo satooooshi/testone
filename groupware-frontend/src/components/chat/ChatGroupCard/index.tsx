@@ -1,5 +1,5 @@
 import React from 'react';
-import { ChatGroup, User } from 'src/types';
+import { ChatGroup, ChatMessage, ChatMessageType, User } from 'src/types';
 import { dateTimeFormatterFromJSDDate } from 'src/utils/dateTimeFormatter';
 import { Avatar, Box, useMediaQuery, Text } from '@chakra-ui/react';
 import { darkFontColor } from 'src/utils/colors';
@@ -25,6 +25,18 @@ const ChatGroupCard: React.FC<ChatGroupCardProps> = ({
       return strMembers.slice(0, 15) + '...(' + members.length + ')';
     }
     return strMembers.toString();
+  };
+  const latestMessage = (chatMessage: ChatMessage) => {
+    switch (chatMessage.type) {
+      case ChatMessageType.IMAGE:
+        return '画像が送信されました';
+      case ChatMessageType.VIDEO:
+        return '動画が送信されました';
+      case ChatMessageType.OTHER_FILE:
+        return 'ファイルが送信されました';
+      default:
+        return chatMessage.content;
+    }
   };
 
   return (
@@ -68,7 +80,7 @@ const ChatGroupCard: React.FC<ChatGroupCardProps> = ({
         <Box display="flex" flexDir="row" alignItems="center">
           <Text fontSize="12px" color={darkFontColor} noOfLines={1}>
             {chatGroup?.chatMessages?.length
-              ? chatGroup.chatMessages[0].content
+              ? latestMessage(chatGroup.chatMessages[0])
               : ' '}
           </Text>
         </Box>
