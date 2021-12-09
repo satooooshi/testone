@@ -91,11 +91,9 @@ const RoomCard: React.FC<RoomCardProps> = ({
             <Text numberOfLines={1} mb={'xs'} fontWeight="bold" fontSize={16}>
               {room.name || nameOfEmptyNameGroup(room.members)}
             </Text>
-            {room.chatMessages?.length && (
-              <Text mb={'xs'} fontSize={14} color={darkFontColor}>
-                {room.chatMessages[0].content}
-              </Text>
-            )}
+            <Text mb={'xs'} fontSize={14} color={darkFontColor}>
+              {room.chatMessages?.length ? room.chatMessages[0].content : ''}
+            </Text>
             <Div flexDir="row" justifyContent="space-between">
               <Text>{`${room.members?.length || 0}人のメンバー`}</Text>
               <Text>
