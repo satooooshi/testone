@@ -27,13 +27,11 @@ import { useAPISaveChatGroup } from '@/hooks/api/chat/useAPISaveChatGroup';
 type CreateChatGroupModalProps = {
   isOpen: boolean;
   closeModal: () => void;
-  onSuccess: (g: ChatGroup) => void;
 };
 
 const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
   isOpen,
   closeModal,
-  onSuccess,
 }) => {
   const { data: users } = useAPIGetUsers();
   const toast = useToast();
@@ -72,7 +70,7 @@ const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
   }, []);
 
   const { mutate: createGroup } = useAPISaveChatGroup({
-    onSuccess: (data) => {
+    onSuccess: () => {
       closeModal();
       toast({
         description: 'チャットルームの作成が完了しました。',
@@ -80,7 +78,6 @@ const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
         duration: 3000,
         isClosable: true,
       });
-      onSuccess(data);
     },
   });
 

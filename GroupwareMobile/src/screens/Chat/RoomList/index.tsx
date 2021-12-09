@@ -23,6 +23,17 @@ const RoomList: React.FC = () => {
   const [roomsForInfiniteScroll, setRoomsForInfiniteScroll] = useState<
     ChatGroup[]
   >([]);
+  useAPIGetRooms(
+    {
+      page: '1',
+      limit: (20 * Number(page)).toString(),
+    },
+    {
+      refetchInterval: 3000,
+      onSuccess: data => setRoomsForInfiniteScroll(data.rooms),
+    },
+  );
+
   const {
     data: chatRooms,
     isLoading: loadingGetChatGroupList,

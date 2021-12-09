@@ -6,12 +6,14 @@ import ChatGroupCard from '../ChatGroupCard';
 
 type RoomListProps = {
   currentId?: string;
+  currentRoom: ChatGroup | undefined;
   setCurrentRoom?: React.Dispatch<SetStateAction<ChatGroup | undefined>>;
   onClickRoom: (room: ChatGroup) => void;
 };
 
 const RoomList: React.FC<RoomListProps> = ({
   currentId,
+  currentRoom,
   setCurrentRoom,
   onClickRoom,
 }) => {
@@ -20,9 +22,18 @@ const RoomList: React.FC<RoomListProps> = ({
     ChatGroup[]
   >([]);
   const { data: chatRooms, isLoading: loadingGetChatGroupList } =
-    useAPIGetRoomsByPage({
-      page,
-    });
+    useAPIGetRoomsByPage(
+      {
+        page,
+      },
+      {
+        onSuccess: (data) => {
+          if (data.rooms.length) {
+            setRoomsForInfiniteScroll((r) => [...r, ...data.rooms]);
+          }
+        },
+      },
+    );
   const onScroll = (e: any) => {
     if (
       e.target.clientHeight - e.target.scrollTop >=
@@ -36,23 +47,30 @@ const RoomList: React.FC<RoomListProps> = ({
       }
     }
   };
+  useAPIGetRoomsByPage(
+    {
+      page: '1',
+      limit: (20 * Number(page)).toString(),
+    },
+    {
+      refetchInterval: 3000,
+      onSuccess: (data) => {
+        setRoomsForInfiniteScroll(data.rooms);
+      },
+    },
+  );
 
   useEffect(() => {
-    if (currentId) {
-      const currentRoom = roomsForInfiniteScroll?.filter(
+    if (!currentRoom || currentRoom?.id.toString() !== currentId) {
+      const matchedRoom = roomsForInfiniteScroll?.filter(
         (r) => r.id.toString() === currentId,
       );
-      if (currentRoom.length && setCurrentRoom) {
-        setCurrentRoom(currentRoom[0]);
+      if (matchedRoom.length && setCurrentRoom) {
+        setCurrentRoom(matchedRoom[0]);
       }
     }
-  }, [currentId, roomsForInfiniteScroll, setCurrentRoom]);
-
-  useEffect(() => {
-    if (chatRooms?.rooms?.length) {
-      setRoomsForInfiniteScroll((r) => [...r, ...chatRooms.rooms]);
-    }
-  }, [chatRooms?.rooms]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentId, currentRoom, setCurrentRoom]);
 
   return (
     <Box

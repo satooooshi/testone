@@ -78,10 +78,10 @@ export class ChatService {
 
   public async getRoomsByPage(
     userID: number,
-    page: number,
+    query: GetMessagesQuery,
   ): Promise<GetRoomsResult> {
-    const limit = 20;
-    const offset = limit * (page - 1);
+    const { page, limit = '20' } = query;
+    const offset = Number(limit) * (Number(page) - 1);
     const [urlUnparsedRooms, count] = await this.chatGroupRepository
       .createQueryBuilder('chat_groups')
       .leftJoinAndSelect('chat_groups.members', 'members')
@@ -101,7 +101,7 @@ export class ChatService {
       .leftJoinAndSelect('lastReadChatTime.user', 'lastReadChatTime.user')
       .where('member.id = :memberId', { memberId: userID })
       .skip(offset)
-      .take(limit)
+      .take(Number(limit))
       .orderBy('chat_groups.updatedAt', 'DESC')
       .getManyAndCount();
     let rooms = urlUnparsedRooms.map((g) => {
@@ -117,7 +117,7 @@ export class ChatService {
       'updatedAt',
       ['desc', 'desc'],
     ]).reverse();
-    const pageCount = Math.floor(count / limit) + 1;
+    const pageCount = Math.floor(count / Number(limit)) + 1;
     return { rooms, pageCount };
   }
 

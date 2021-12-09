@@ -6,6 +6,7 @@ import { getRoomsByPageURL } from 'src/utils/url/chat.url';
 
 export interface GetRoomsQuery {
   page?: string;
+  limit?: string;
 }
 
 export interface GetRoomsResult {

@@ -150,11 +150,6 @@ const ChatDetail = () => {
         closeModal={() => {
           dispatchModal({ type: 'createGroupWindow', value: false });
         }}
-        onSuccess={(g) => {
-          router.push(`/chat/${g.id.toString()}`, undefined, {
-            shallow: true,
-          });
-        }}
       />
       {currentRoom ? (
         <>
@@ -193,6 +188,7 @@ const ChatDetail = () => {
             <Box w="30vw">
               <RoomList
                 currentId={id}
+                currentRoom={currentRoom}
                 setCurrentRoom={setCurrentRoom}
                 onClickRoom={(g) =>
                   router.push(`/chat/${g.id.toString()}`, undefined, {

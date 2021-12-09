@@ -28,6 +28,7 @@ import { ChatNoteService } from './chatNote.service';
 export interface GetMessagesQuery {
   group: number;
   page?: string;
+  limit?: string;
 }
 
 export interface GetRoomsQuery {
@@ -59,8 +60,7 @@ export class ChatController {
     @Req() req: RequestWithUser,
     @Query() query: GetMessagesQuery,
   ): Promise<GetRoomsResult> {
-    const page = Number(query?.page) || 1;
-    return await this.chatService.getRoomsByPage(req.user.id, page);
+    return await this.chatService.getRoomsByPage(req.user.id, query);
   }
 
   @Get('get-messages')
