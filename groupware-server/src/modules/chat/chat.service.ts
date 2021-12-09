@@ -204,6 +204,7 @@ export class ChatService {
   ): Promise<GetRoomsResult> {
     const limit = 20;
     const offset = limit * (page - 1);
+    console.log('slow?');
     const [urlUnparsedRooms, count] = await this.chatGroupRepository
       .createQueryBuilder('chat_groups')
       .leftJoinAndSelect('chat_groups.members', 'members')
@@ -215,6 +216,11 @@ export class ChatService {
         { pinnedUserID: userID },
       )
       .leftJoinAndSelect('chat_groups.lastReadChatTime', 'lastReadChatTime')
+      .leftJoinAndSelect(
+        'chat_groups.chatMessages',
+        'm',
+        'm.id = ( SELECT id FROM chat_messages WHERE chat_group_id = chat_groups.id ORDER BY updated_at DESC LIMIT 1 )',
+      )
       .leftJoinAndSelect('lastReadChatTime.user', 'lastReadChatTime.user')
       .where('member.id = :memberId', { memberId: userID })
       .skip(offset)
