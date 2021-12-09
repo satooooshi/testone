@@ -16,6 +16,7 @@ import {
   ModalHeader,
   ModalOverlay,
   SimpleGrid,
+  Spinner,
   Text,
   Textarea,
   useToast,
@@ -46,13 +47,21 @@ type NoteModalProps = {
 
 const NoteModal: React.FC<NoteModalProps> = ({ isOpen, onClose, room }) => {
   const toast = useToast();
+  const modalRef = useRef<HTMLDivElement | null>(null);
   const headerName = 'ノート一覧';
   const [noteListPage, setNoteListPage] = useState(1);
   const [edittedNote, setEdittedNote] = useState<ChatNote>();
-  const { data: notes, refetch: refetchNotes } = useAPIGetChatNotes({
+  const {
+    data: notes,
+    refetch: refetchNotes,
+    isLoading,
+  } = useAPIGetChatNotes({
     roomId: room.id.toString(),
     page: noteListPage.toString(),
   });
+  const [notesForInfiniteScroll, setNotesForInfiniteScroll] = useState<
+    ChatNote[]
+  >([]);
   const { mutate: deleteNote } = useAPIDeleteChatNote();
   const { mutate: saveNoteImage } = useAPISaveNoteImage();
   const { mutate: updateNote } = useAPIUpdateNote({
@@ -114,8 +123,6 @@ const NoteModal: React.FC<NoteModalProps> = ({ isOpen, onClose, room }) => {
     chatGroup: room,
     editors: [],
     images: [],
-    createdAt: new Date(),
-    updatedAt: new Date(),
   };
   const { values, setValues, handleChange, handleSubmit, resetForm } =
     useFormik<ChatNote | Partial<ChatNote>>({
@@ -177,12 +184,28 @@ const NoteModal: React.FC<NoteModalProps> = ({ isOpen, onClose, room }) => {
   useEffect(() => {
     const refreshNotes = () => {
       setNoteListPage(1);
+      setNotesForInfiniteScroll([]);
       refetchNotes();
     };
     if (!edittedNote) {
       refreshNotes();
     }
   }, [edittedNote, refetchNotes]);
+
+  useEffect(() => {
+    if (notes?.notes?.length) {
+      setNotesForInfiniteScroll((n) => {
+        if (
+          n.length &&
+          new Date(n[n.length - 1].createdAt) >
+            new Date(notes.notes[0].createdAt)
+        ) {
+          return [...n, ...notes?.notes];
+        }
+        return notes?.notes;
+      });
+    }
+  }, [notes?.notes]);
 
   const postNote = (
     <Box>
@@ -268,82 +291,75 @@ const NoteModal: React.FC<NoteModalProps> = ({ isOpen, onClose, room }) => {
 
   const noteList = (
     <>
-      <Box flexDir="row" justifyContent="flex-end" display="flex" mb={'40px'}>
-        <Button
-          size="sm"
-          flexDir="row"
-          onClick={() => setMode('new')}
-          position="absolute"
-          mb="8px"
-          colorScheme="green"
-          alignItems="center">
-          <Text display="inline">ノートを作成</Text>
-        </Button>
-      </Box>
-      {!edittedNote && notes?.notes ? (
-        notes.notes.map((n) => (
-          <Box
-            mb="16px"
-            p={'4px'}
-            key={n.id}
-            bg="white"
-            borderColor="gray.300"
-            borderWidth={1}
-            borderRadius="md"
-            w={'100%'}
-            maxWidth={'400px'}
-            display="flex"
-            flexDir="column"
-            alignItems="center">
+      {!edittedNote && notesForInfiniteScroll ? (
+        <Box mb={!isLoading ? '24px' : undefined}>
+          {notesForInfiniteScroll.map((n) => (
             <Box
-              mb="8px"
-              flexDir="row"
+              mb="16px"
+              p={'4px'}
+              key={n.id}
+              bg="white"
+              borderColor="gray.300"
+              borderWidth={1}
+              borderRadius="md"
+              w={'100%'}
+              maxWidth={'400px'}
               display="flex"
-              alignItems="center"
-              w="100%"
-              justifyContent="space-between">
-              <Box flexDir="row" display="flex">
-                <Avatar
-                  src={n.editors?.length ? n.editors[0].avatarUrl : undefined}
-                  size="md"
-                  mr="4px"
-                />
-                <Box justifyContent="center" display="flex" flexDir="column">
-                  <Text mb="4px">
-                    {userNameFactory(
-                      n.editors?.length ? n.editors[0] : undefined,
-                    )}
-                  </Text>
-                  <Text color="gray">
-                    {dateTimeFormatterFromJSDDate({
-                      dateTime: new Date(n.createdAt),
-                    })}
-                  </Text>
+              flexDir="column"
+              alignItems="center">
+              <Box
+                mb="8px"
+                flexDir="row"
+                display="flex"
+                alignItems="center"
+                w="100%"
+                justifyContent="space-between">
+                <Box flexDir="row" display="flex">
+                  <Avatar
+                    src={n.editors?.length ? n.editors[0].avatarUrl : undefined}
+                    size="md"
+                    mr="4px"
+                  />
+                  <Box justifyContent="center" display="flex" flexDir="column">
+                    <Text mb="4px">
+                      {userNameFactory(
+                        n.editors?.length ? n.editors[0] : undefined,
+                      )}
+                    </Text>
+                    <Text color="gray">
+                      {dateTimeFormatterFromJSDDate({
+                        dateTime: new Date(n.createdAt),
+                      })}
+                    </Text>
+                  </Box>
                 </Box>
+                <Menu>
+                  <MenuButton
+                    as={IconButton}
+                    aria-label="Options"
+                    icon={<FiMenu />}
+                    variant="outline"
+                  />
+                  <MenuList>
+                    <MenuItem onClick={() => setEdittedNote(n)}>編集</MenuItem>
+                    <MenuItem onClick={() => handleNoteDelete(n)}>
+                      削除
+                    </MenuItem>
+                  </MenuList>
+                </Menu>
               </Box>
-              <Menu>
-                <MenuButton
-                  as={IconButton}
-                  aria-label="Options"
-                  icon={<FiMenu />}
-                  variant="outline"
-                />
-                <MenuList>
-                  <MenuItem onClick={() => setEdittedNote(n)}>編集</MenuItem>
-                  <MenuItem onClick={() => handleNoteDelete(n)}>削除</MenuItem>
-                </MenuList>
-              </Menu>
+              <SimpleGrid spacing="4px" columns={3} w="100%">
+                {n.images?.map((i) => (
+                  <Link onClick={() => setSelectedImage(i)} key={i.id}>
+                    <Image src={i.imageURL} alt="関連画像" />
+                  </Link>
+                ))}
+              </SimpleGrid>
+              <Text alignSelf="flex-start">{n.content}</Text>
             </Box>
-            <SimpleGrid spacing="4px" columns={3} w="100%">
-              {n.images?.map((i) => (
-                <Link onClick={() => setSelectedImage(i)} key={i.id}>
-                  <Image src={i.imageURL} alt="関連画像" />
-                </Link>
-              ))}
-            </SimpleGrid>
-            <Text alignSelf="flex-start">{n.content}</Text>
-          </Box>
-        ))
+          ))}
+          {isLoading && <Spinner />}
+        </Box>
       ) : (
         <Box>
           <Box mb="8px">
@@ -416,6 +432,12 @@ const NoteModal: React.FC<NoteModalProps> = ({ isOpen, onClose, room }) => {
     </>
   );
 
+  const onScroll = (e: any) => {
+    if (e.target.scrollHeight - e.target.scrollTop === e.target.clientHeight) {
+      setNoteListPage((p) => p + 1);
+    }
+  };
+
   useEffect(() => {
     if (edittedNote) {
       setValues(edittedNote);
@@ -438,9 +460,26 @@ const NoteModal: React.FC<NoteModalProps> = ({ isOpen, onClose, room }) => {
         scrollBehavior="inside">
         <ModalOverlay />
         <ModalContent h="90vh" bg={'#f9fafb'}>
-          <ModalHeader>{headerName}</ModalHeader>
+          <ModalHeader
+            flexDir="row"
+            justifyContent="space-between"
+            display="flex"
+            mr="24px">
+            <Text>{headerName}</Text>
+            <Button
+              size="sm"
+              flexDir="row"
+              onClick={() => setMode('new')}
+              mb="8px"
+              colorScheme="green"
+              alignItems="center">
+              <Text display="inline">ノートを作成</Text>
+            </Button>
+          </ModalHeader>
           <ModalCloseButton />
-          <ModalBody>{mode === 'edit' ? noteList : postNote}</ModalBody>
+          <ModalBody ref={modalRef} onScroll={onScroll}>
+            {mode === 'edit' ? noteList : postNote}
+          </ModalBody>
         </ModalContent>
       </Modal>
     </>

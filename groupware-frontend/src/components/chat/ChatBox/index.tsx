@@ -28,8 +28,6 @@ import { useAPIGetLastReadChatTime } from '@/hooks/api/chat/useAPIGetLastReadCha
 import { useAPIGetMessages } from '@/hooks/api/chat/useAPIGetMessages';
 import { useAPISendChatMessage } from '@/hooks/api/chat/useAPISendChatMessage';
 import { useFormik } from 'formik';
-import { useAPIDeleteReaction } from '@/hooks/api/chat/useAPIDeleteReaction';
-import { useAPISaveReaction } from '@/hooks/api/chat/useAPISaveReaction';
 import { useAPIUploadStorage } from '@/hooks/api/storage/useAPIUploadStorage';
 import { isImage, isVideo } from 'src/utils/indecateChatMessageType';
 import { mentionTransform } from 'src/utils/mentionTransform';
@@ -39,7 +37,6 @@ type ChatBoxProps = {
   onMenuClicked: (menuValue: MenuValue) => void;
   onClickNoteIcon: () => void;
   onClickAlbumIcon: () => void;
-  onClickMessageForReaction: (chatMessage: ChatMessage) => void;
 };
 
 const ChatBox: React.FC<ChatBoxProps> = ({
@@ -47,17 +44,9 @@ const ChatBox: React.FC<ChatBoxProps> = ({
   onMenuClicked,
   onClickAlbumIcon,
   onClickNoteIcon,
-  onClickMessageForReaction: onClickReaction,
 }) => {
   const [page, setPage] = useState(1);
-  const { mutate: saveReaction } = useAPISaveReaction();
-  const { mutate: deleteReaction } = useAPIDeleteReaction({
-    onSuccess: (reactionId) => {
-      setDeletedReactionIds((r) => [...r, reactionId]);
-    },
-  });
   const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [deletedReactionIds, setDeletedReactionIds] = useState<number[]>([]);
   const {
     values: newChatMessage,
     setValues: setNewChatMessage,
@@ -330,22 +319,9 @@ const ChatBox: React.FC<ChatBoxProps> = ({
           <>
             {messages.map((m) => (
               <ChatMessageItem
-                onClickSpecificReaction={(reaction) => {
-                  reaction.isSender
-                    ? deleteReaction(reaction)
-                    : saveReaction(reaction);
-                }}
-                onClickReaction={() => onClickReaction(m)}
-                onClickReply={() =>
-                  setNewChatMessage((pre) => ({
-                    ...pre,
-                    replyParentMessage: m,
-                  }))
-                }
                 key={m.id}
                 message={m}
                 lastReadChatTime={lastReadChatTime || []}
-                deletedReactionIds={deletedReactionIds}
               />
             ))}
           </>
