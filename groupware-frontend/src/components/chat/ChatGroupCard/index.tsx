@@ -1,9 +1,8 @@
 import React from 'react';
 import { ChatGroup, User } from 'src/types';
-import chatGroupStyles from '@/styles/components/ChatGroupCard.module.scss';
 import { dateTimeFormatterFromJSDDate } from 'src/utils/dateTimeFormatter';
-import { Avatar } from '@chakra-ui/react';
-import clsx from 'clsx';
+import { Avatar, Box, useMediaQuery, Text } from '@chakra-ui/react';
+import { darkFontColor } from 'src/utils/colors';
 
 type ChatGroupCardProps = {
   chatGroup: ChatGroup;
@@ -14,6 +13,9 @@ const ChatGroupCard: React.FC<ChatGroupCardProps> = ({
   chatGroup,
   isSelected = false,
 }) => {
+  const [isSmalerThan1024] = useMediaQuery('(max-width: 1024px)');
+  const [isLargerTahn1024] = useMediaQuery('(min-width: 1024px)');
+  const [isSmallerThan768] = useMediaQuery('max-width: 768px');
   const nameOfEmptyNameGroup = (members?: User[]): string => {
     if (!members) {
       return 'メンバーがいません';
@@ -26,38 +28,63 @@ const ChatGroupCard: React.FC<ChatGroupCardProps> = ({
   };
 
   return (
-    <div
-      className={clsx(
-        chatGroupStyles.group_card,
-        isSelected && chatGroupStyles.group_card__selected,
-      )}>
-      <div className={chatGroupStyles.avatar}>
-        <Avatar src={chatGroup.imageURL} size="md" />
-      </div>
-      <div className={chatGroupStyles.right}>
-        <div className={chatGroupStyles.top}>
-          <p className={chatGroupStyles.name}>
+    <Box
+      display="flex"
+      flexDir="row"
+      py="16px"
+      px="12px"
+      alignItems="center"
+      boxShadow="md"
+      w={
+        isSmallerThan768
+          ? '90vw'
+          : isSmalerThan1024
+          ? '26vw'
+          : isLargerTahn1024
+          ? '22vw'
+          : undefined
+      }
+      bg={isSelected ? '#f2f1f2' : 'white'}>
+      <Avatar src={chatGroup.imageURL} size="md" mr="8px" />
+      <Box
+        display="flex"
+        flexDir="column"
+        overflow="hidden"
+        w={isSmallerThan768 ? '100%' : '80%'}
+        h="60px"
+        justifyContent="space-around">
+        <Box
+          display="flex"
+          flexDir="row"
+          justifyContent="space-between"
+          alignItems="center"
+          w="100%">
+          <Text fontWeight="bold" color={darkFontColor} noOfLines={1}>
             {chatGroup.name
               ? chatGroup.name
               : nameOfEmptyNameGroup(chatGroup.members)}
-          </p>
-        </div>
-        <div className={chatGroupStyles.middle}>
-          <p className={chatGroupStyles.latest_message}>
-            {chatGroup.chatMessages && chatGroup.chatMessages.length
+          </Text>
+        </Box>
+        <Box display="flex" flexDir="row" alignItems="center">
+          <Text fontSize="12px" color={darkFontColor} noOfLines={1}>
+            {chatGroup?.chatMessages?.length
               ? chatGroup.chatMessages[0].content
               : ' '}
-          </p>
-        </div>
-        <div className={chatGroupStyles.bottom}>
-          <p className={chatGroupStyles.date}>
+          </Text>
+        </Box>
+        <Box
+          display="flex"
+          flexDir="row"
+          justifyContent="flex-end"
+          alignItems="center">
+          <Text color={darkFontColor} fontSize="12px">
             {dateTimeFormatterFromJSDDate({
               dateTime: new Date(chatGroup.updatedAt),
             })}
-          </p>
-        </div>
-      </div>
-    </div>
+          </Text>
+        </Box>
+      </Box>
+    </Box>
   );
 };
 

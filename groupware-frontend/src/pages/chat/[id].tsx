@@ -305,9 +305,6 @@ const ChatDetail = () => {
             </Box>
             {room && (
               <ChatBox
-                onClickMessageForReaction={(message) =>
-                  setSelectedMsgForReaction(message)
-                }
                 onClickNoteIcon={() => setVisibleNoteModal(true)}
                 onClickAlbumIcon={() => setVisibleAlbumModal(true)}
                 room={room}
