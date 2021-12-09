@@ -147,7 +147,7 @@ const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
           </Div>
         ) : null}
         {wikiInfo?.type === WikiType.QA ? (
-          <Div h={windowHeight * 0.5} w={windowWidth * 0.9} alignSelf="center">
+          <Div w={windowWidth * 0.9} alignSelf="center">
             <Div
               justifyContent="space-between"
               alignItems="center"
