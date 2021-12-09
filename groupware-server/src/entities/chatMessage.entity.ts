@@ -79,7 +79,7 @@ export class ChatMessage {
 
   @AfterInsert()
   async sendPushNotification() {
-    if (this.chatGroup.id && this.sender.id) {
+    if (this.chatGroup?.id && this.sender?.id) {
       const mentionRegex = /@\[.*?\]\(([0-9]+)\)/g;
       const mentionedIds: number[] = [];
       let mentionArr = [];
