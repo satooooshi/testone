@@ -204,7 +204,6 @@ export class ChatService {
   ): Promise<GetRoomsResult> {
     const limit = 20;
     const offset = limit * (page - 1);
-    console.log('slow?');
     const [urlUnparsedRooms, count] = await this.chatGroupRepository
       .createQueryBuilder('chat_groups')
       .leftJoinAndSelect('chat_groups.members', 'members')
