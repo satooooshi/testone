@@ -1,4 +1,9 @@
 import {
+  AfterInsert,
+  AfterLoad,
+  AfterUpdate,
+  BeforeInsert,
+  BeforeUpdate,
   Column,
   CreateDateColumn,
   Entity,
@@ -11,6 +16,8 @@ import {
 import { QAAnswerReply } from './qaAnswerReply.entity';
 import { TextFormat, Wiki } from './wiki.entity';
 import { User } from './user.entity';
+import { genSignedURL } from 'src/utils/storage/genSignedURL';
+import { genStorageURL } from 'src/utils/storage/genStorageURL';
 
 @Entity({ name: 'qa_answers' })
 export class QAAnswer {
@@ -55,4 +62,17 @@ export class QAAnswer {
     name: 'updated_at',
   })
   updatedAt: Date;
+
+  @BeforeInsert()
+  @BeforeUpdate()
+  changeToStorageURL?() {
+    this.body = genStorageURL(this.body);
+  }
+
+  @AfterInsert()
+  @AfterLoad()
+  @AfterUpdate()
+  async changeToSignedURL?() {
+    this.body = await genSignedURL(this.body);
+  }
 }

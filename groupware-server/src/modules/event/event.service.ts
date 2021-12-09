@@ -282,11 +282,8 @@ export class EventScheduleService {
       .getManyAndCount();
     const pageCount =
       count % limit === 0 ? count / limit : Math.floor(count / limit) + 1;
-    const urlParsedEvents = await this.generateSignedStorageURLsFromEventArr(
-      eventsWithRelation,
-    );
 
-    return { pageCount, events: urlParsedEvents };
+    return { pageCount, events: eventsWithRelation };
   }
 
   public async getEventIntroduction(
@@ -296,11 +293,7 @@ export class EventScheduleService {
       where: { type: type },
       relations: ['subImages'],
     });
-    const urlParsedEventIntroduction =
-      await this.generateSignedStorageURLsFromEventIntroductionObj(
-        eventIntroduction,
-      );
-    return urlParsedEventIntroduction;
+    return eventIntroduction;
   }
 
   public async saveEventIntroduction(
@@ -359,95 +352,7 @@ export class EventScheduleService {
         hostUserID: query.host_user_id,
       })
       .getMany();
-    const urlParsedEvents = await this.generateSignedStorageURLsFromEventArr(
-      events,
-    );
-    return { pageCount: 0, events: urlParsedEvents };
-  }
-
-  public async generateSignedStorageURLsFromEventObj(
-    eventSchedule: EventSchedule,
-  ): Promise<EventSchedule> {
-    if (eventSchedule?.imageURL) {
-      eventSchedule.imageURL =
-        await this.storageService.parseStorageURLToSignedURL(
-          eventSchedule.imageURL,
-        );
-    }
-    if (eventSchedule?.files && eventSchedule.files.length) {
-      const parsedFiles: EventFile[] = [];
-      for (const f of eventSchedule.files) {
-        const signedURL = await this.storageService.parseStorageURLToSignedURL(
-          f.url,
-        );
-        parsedFiles.push({ ...f, url: signedURL });
-      }
-      eventSchedule.files = parsedFiles;
-    }
-    if (
-      eventSchedule?.submissionFiles &&
-      eventSchedule.submissionFiles.length
-    ) {
-      const parsedFiles: SubmissionFile[] = [];
-      for (const f of eventSchedule.submissionFiles) {
-        const signedURL = await this.storageService.parseStorageURLToSignedURL(
-          f.url,
-        );
-        parsedFiles.push({ ...f, url: signedURL });
-      }
-      eventSchedule.submissionFiles = parsedFiles;
-    }
-    if (eventSchedule?.comments && eventSchedule.comments.length) {
-      const parsedComments: EventComment[] = [];
-      for (const c of eventSchedule.comments) {
-        const userImageURL =
-          await this.storageService.parseStorageURLToSignedURL(
-            c?.writer?.avatarUrl || '',
-          );
-        const parsedCommentObj: EventComment = {
-          ...c,
-          writer: { ...c.writer, avatarUrl: userImageURL },
-        };
-        parsedComments.push(parsedCommentObj);
-      }
-      eventSchedule.comments = parsedComments;
-    }
-
-    return eventSchedule;
-  }
-
-  public async generateSignedStorageURLsFromEventIntroductionObj(
-    eventIntroduction: EventIntroduction,
-  ): Promise<EventIntroduction> {
-    if (eventIntroduction?.imageUrl) {
-      eventIntroduction.imageUrl =
-        await this.storageService.parseStorageURLToSignedURL(
-          eventIntroduction.imageUrl,
-        );
-    }
-    if (eventIntroduction?.subImages) {
-      eventIntroduction.subImages = await Promise.all(
-        eventIntroduction.subImages.map(async (e) => ({
-          ...e,
-          imageUrl: await this.storageService.parseStorageURLToSignedURL(
-            e.imageUrl,
-          ),
-        })),
-      );
-    }
-
-    return eventIntroduction;
-  }
-
-  public async generateSignedStorageURLsFromEventArr(
-    events: EventSchedule[],
-  ): Promise<EventSchedule[]> {
-    const parsedEvents: EventSchedule[] = [];
-    for (const e of events) {
-      const parsed = await this.generateSignedStorageURLsFromEventObj(e);
-      parsedEvents.push(parsed);
-    }
-    return parsedEvents;
+    return { pageCount: 0, events };
   }
 
   public async getEventDetail(
@@ -475,10 +380,7 @@ export class EventScheduleService {
       .leftJoinAndSelect('comments.writer', 'writer')
       .where('events.id = :id', { id })
       .getOne();
-    const urlParsedEvents = await this.generateSignedStorageURLsFromEventObj(
-      existEvent,
-    );
-    return urlParsedEvents;
+    return existEvent;
   }
 
   public async saveUserJoiningEvent(userJoiningEvent: UserJoiningEvent) {
@@ -520,9 +422,7 @@ export class EventScheduleService {
       .orderBy('RAND()')
       .take(limit)
       .getMany();
-    const urlParsedEvents =
-      this.generateSignedStorageURLsFromEventArr(latestEvents);
-    return urlParsedEvents;
+    return latestEvents;
   }
 
   public async saveEvent(

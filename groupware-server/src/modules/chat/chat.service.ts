@@ -16,7 +16,6 @@ import { User } from 'src/entities/user.entity';
 import { userNameFactory } from 'src/utils/factory/userNameFactory';
 import { In, Repository } from 'typeorm';
 import { StorageService } from '../storage/storage.service';
-import { UserService } from '../user/user.service';
 import { GetMessagesQuery, GetRoomsResult } from './chat.controller';
 
 export interface GetChatNotesQuery {
@@ -47,121 +46,7 @@ export class ChatService {
     @InjectRepository(ChatMessageReaction)
     private readonly chatMessageReactionRepository: Repository<ChatMessageReaction>,
     private readonly storageService: StorageService,
-    private readonly userService: UserService,
   ) {}
-
-  public async generateSignedStorageURLsFromChatGroupObj(
-    chatGroup: ChatGroup,
-  ): Promise<ChatGroup> {
-    if (chatGroup?.imageURL) {
-      chatGroup.imageURL = await this.storageService.parseStorageURLToSignedURL(
-        chatGroup.imageURL,
-      );
-    }
-    if (chatGroup?.members && chatGroup?.members.length) {
-      chatGroup.members =
-        await this.userService.generateSignedStorageURLsFromUserArr(
-          chatGroup.members,
-        );
-    }
-    return chatGroup;
-  }
-
-  public async generateSignedStorageURLsFromChatGroupArr(
-    chatGroups: ChatGroup[],
-  ): Promise<ChatGroup[]> {
-    const parsedGroups = [];
-    for (const c of chatGroups) {
-      const parsed = await this.generateSignedStorageURLsFromChatGroupObj(c);
-      parsedGroups.push(parsed);
-    }
-    return parsedGroups;
-  }
-
-  public async generateSignedStorageURLsFromNoteImageArr(
-    noteImages: ChatNoteImage[],
-  ): Promise<ChatNoteImage[]> {
-    const images: ChatNoteImage[] = [];
-    for (const i of noteImages) {
-      const parsedImageUrl =
-        await this.storageService.parseStorageURLToSignedURL(i.imageURL);
-      const parsedImageObj = { ...i, imageURL: parsedImageUrl };
-      images.push(parsedImageObj);
-    }
-    return images;
-  }
-
-  public async generateSignedStorageURLsFromChatNoteObj(
-    chatNote: ChatNote,
-  ): Promise<ChatNote> {
-    const editors: User[] = [];
-    const images = await this.generateSignedStorageURLsFromNoteImageArr(
-      chatNote.images,
-    );
-    for (const e of chatNote.editors) {
-      const parsedAvatarUrl =
-        await this.storageService.parseStorageURLToSignedURL(e.avatarUrl);
-      const parsedAvatarObj = { ...e, avatarUrl: parsedAvatarUrl };
-      editors.push(parsedAvatarObj);
-    }
-    chatNote.images = images;
-    chatNote.editors = editors;
-
-    return chatNote;
-  }
-
-  public async generateSignedStorageURLsFromChatNoteArr(
-    chatNotes: ChatNote[],
-  ): Promise<ChatNote[]> {
-    const parsedNotes = [];
-    for (const n of chatNotes) {
-      const parsed = await this.generateSignedStorageURLsFromChatNoteObj(n);
-      parsedNotes.push(parsed);
-    }
-    return parsedNotes;
-  }
-
-  public async generateSignedStorageURLsFromChatMessageObj(
-    chatMessage: ChatMessage,
-  ): Promise<ChatMessage> {
-    chatMessage.content = await this.storageService.parseStorageURLToSignedURL(
-      chatMessage.content,
-    );
-    const avatarUrl = await this.storageService.parseStorageURLToSignedURL(
-      chatMessage?.sender?.avatarUrl || '',
-    );
-    chatMessage.sender = { ...chatMessage.sender, avatarUrl };
-    chatMessage.reactions = await Promise.all(
-      chatMessage.reactions?.map(async (r) => {
-        const parsedReactionedAvatarUrl =
-          await this.storageService.parseStorageURLToSignedURL(
-            r.user.avatarUrl,
-          );
-        return {
-          ...r,
-          user: { ...r.user, avatarUrl: parsedReactionedAvatarUrl },
-        };
-      }) || [],
-    );
-    if (chatMessage.replyParentMessage) {
-      chatMessage.replyParentMessage =
-        await this.generateSignedStorageURLsFromChatMessageObj(
-          chatMessage.replyParentMessage,
-        );
-    }
-    return chatMessage;
-  }
-
-  public async generateSignedStorageURLsFromChatMessageArr(
-    chatMessages: ChatMessage[],
-  ): Promise<ChatMessage[]> {
-    const parsedMessages = [];
-    for (const m of chatMessages) {
-      const parsed = await this.generateSignedStorageURLsFromChatMessageObj(m);
-      parsedMessages.push(parsed);
-    }
-    return parsedMessages;
-  }
 
   public async getChatGroup(userID: number): Promise<ChatGroup[]> {
     const groups = await this.chatGroupRepository
@@ -193,9 +78,7 @@ export class ChatService {
       'updatedAt',
       ['desc', 'desc'],
     ]).reverse();
-    const urlParsedGroups =
-      await this.generateSignedStorageURLsFromChatGroupArr(groupsAndUsers);
-    return urlParsedGroups;
+    return groupsAndUsers;
   }
 
   public async getRoomsByPage(
@@ -226,10 +109,7 @@ export class ChatService {
       .take(limit)
       .orderBy('chat_groups.updatedAt', 'DESC')
       .getManyAndCount();
-    let rooms = await this.generateSignedStorageURLsFromChatGroupArr(
-      urlUnparsedRooms,
-    );
-    rooms = rooms.map((g) => {
+    let rooms = urlUnparsedRooms.map((g) => {
       const isPinned = !!g.pinnedUsers.length;
       return {
         ...g,
@@ -284,9 +164,7 @@ export class ChatService {
       m.isSender = false;
       return m;
     });
-    const parsedMessages =
-      await this.generateSignedStorageURLsFromChatMessageArr(messages);
-    return parsedMessages;
+    return messages;
   }
 
   public async getMenthionedChatMessage(user: User): Promise<ChatMessage[]> {
@@ -308,9 +186,7 @@ export class ChatService {
       })
       .limit(limit)
       .getMany();
-    const parsedMessages =
-      await this.generateSignedStorageURLsFromChatMessageArr(mentioned);
-    return parsedMessages;
+    return mentioned;
   }
 
   public async getLastReadChatTime(
@@ -533,13 +409,10 @@ export class ChatService {
     noteID: number,
     userID: number,
   ): Promise<ChatNote> {
-    let noteDetail = await this.noteRepository.findOne(noteID, {
+    const noteDetail = await this.noteRepository.findOne(noteID, {
       relations: ['chatGroup', 'editors', 'images'],
       withDeleted: true,
     });
-    noteDetail = await this.generateSignedStorageURLsFromChatNoteObj(
-      noteDetail,
-    );
     noteDetail.isEditor = !!noteDetail.editors.filter((e) => e.id === userID)
       .length;
     return noteDetail;
@@ -581,8 +454,7 @@ export class ChatService {
       .orderBy('chat_notes.createdAt', 'DESC')
       .getManyAndCount();
 
-    let notes = await this.generateSignedStorageURLsFromChatNoteArr(existNotes);
-    notes = existNotes.map((n) => ({
+    const notes = existNotes.map((n) => ({
       ...n,
       isEditor: !!n.editors?.filter((e) => e.id === userID).length,
     }));
@@ -598,9 +470,6 @@ export class ChatService {
       imageURL: this.storageService.parseSignedURLToStorageURL(i.imageURL),
     }));
 
-    const urlParsedImages =
-      await this.generateSignedStorageURLsFromNoteImageArr(sentImages);
-
-    return await this.noteImageRepository.save(urlParsedImages);
+    return await this.noteImageRepository.save(sentImages);
   }
 }

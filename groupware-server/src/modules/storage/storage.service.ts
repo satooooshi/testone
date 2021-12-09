@@ -59,7 +59,7 @@ export class StorageService {
 
   public async parseStorageURLToSignedURL(text: string): Promise<string> {
     let parseText = text;
-    const bucketName = this.configService.get('CLOUD_STORAGE_BUCKET');
+    const bucketName = process.env.CLOUD_STORAGE_BUCKET;
     const url = 'https://storage.googleapis.com/' + bucketName + '/';
     const regex = new RegExp(`${url}\\S+\\.[^'")\\s]+`, 'g');
     const storageURLs = text.match(regex);
@@ -108,7 +108,7 @@ export class StorageService {
 
   public parseSignedURLToStorageURL(text: string): string {
     let parseText = text;
-    const bucketName = this.configService.get('CLOUD_STORAGE_BUCKET');
+    const bucketName = process.env.CLOUD_STORAGE_BUCKET;
     const url = 'https://storage.googleapis.com/' + bucketName + '/';
     const regex = new RegExp(`${url}\\S+\\.[^'")\\s]+`, 'g');
     const urls = text.match(regex);

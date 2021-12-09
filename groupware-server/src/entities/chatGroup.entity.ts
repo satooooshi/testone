@@ -1,5 +1,11 @@
-import { Transform } from 'class-transformer';
+import { genSignedURL } from 'src/utils/storage/genSignedURL';
+import { genStorageURL } from 'src/utils/storage/genStorageURL';
 import {
+  AfterInsert,
+  AfterLoad,
+  AfterUpdate,
+  BeforeInsert,
+  BeforeUpdate,
   Column,
   CreateDateColumn,
   Entity,
@@ -101,4 +107,17 @@ export class ChatGroup {
   updatedAt: Date;
 
   isPinned?: boolean;
+
+  @BeforeInsert()
+  @BeforeUpdate()
+  changeToStorageURL?() {
+    this.imageURL = genStorageURL(this.imageURL);
+  }
+
+  @AfterInsert()
+  @AfterLoad()
+  @AfterUpdate()
+  async changeToSignedURL?() {
+    this.imageURL = await genSignedURL(this.imageURL);
+  }
 }
