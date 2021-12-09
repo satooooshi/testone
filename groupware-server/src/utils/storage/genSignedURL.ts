@@ -1,6 +1,9 @@
 import { Storage } from '@google-cloud/storage';
 
 export const genSignedURL = async (text: string): Promise<string> => {
+  if (!text) {
+    return text;
+  }
   const storage = new Storage({
     keyFilename: __dirname + '../../../cloud_storage.json',
   });

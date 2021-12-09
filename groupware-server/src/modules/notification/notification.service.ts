@@ -1,5 +1,8 @@
 import { MailerService } from '@nestjs-modules/mailer';
 import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { NotificationDevice } from 'src/entities/device.entity';
+import { Repository } from 'typeorm';
 
 export type EmailTemplateContext = {
   to: string | string[];
@@ -12,7 +15,18 @@ export type EmailTemplateContext = {
 
 @Injectable()
 export class NotificationService {
-  constructor(private readonly mailerService: MailerService) {}
+  constructor(
+    private readonly mailerService: MailerService,
+    @InjectRepository(NotificationDevice)
+    private readonly deviceRepository: Repository<NotificationDevice>,
+  ) {}
+
+  async registerDevice(
+    device: Partial<NotificationDevice>,
+  ): Promise<NotificationDevice> {
+    const savedDevice = await this.deviceRepository.save(device);
+    return savedDevice;
+  }
   async sendEmailNotification({
     to,
     subject,

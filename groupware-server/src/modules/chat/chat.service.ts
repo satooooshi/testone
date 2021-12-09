@@ -214,7 +214,9 @@ export class ChatService {
     if (!existGroup) {
       throw new BadRequestException('That group id is incorrect');
     }
-    const savedMessage = await this.chatMessageRepository.save(message);
+    const savedMessage = await this.chatMessageRepository.save(
+      this.chatMessageRepository.create(message),
+    );
     existGroup.updatedAt = new Date();
     await this.chatGroupRepository.save({
       ...existGroup,
