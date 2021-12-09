@@ -91,7 +91,7 @@ const RoomForm: React.FC<RoomFormProps> = ({
         selectedUserRole={selectedUserRole}
         selectUserRole={selectUserRole}
       />
-      <HeaderWithTextButton title={headerTitle} />
+      <HeaderWithTextButton enableBackButton={true} title={headerTitle} />
       <Button
         bg="blue700"
         h={60}

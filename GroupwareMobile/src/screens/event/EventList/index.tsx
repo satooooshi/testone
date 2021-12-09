@@ -87,7 +87,6 @@ const EventList: React.FC = () => {
       color: eventTypeColorFactory(EventType.SUBMISSION_ETC),
     },
   ];
-  console.log(searchQuery);
 
   const queryRefresh = (
     query: Partial<SearchQueryToGetEvents>,
@@ -128,6 +127,12 @@ const EventList: React.FC = () => {
       refetchEvents();
     }
   }, [isFocused, refetchEvents]);
+
+  useEffect(() => {
+    if (typePassedByRoute) {
+      setSearchQuery(q => ({...q, type: typePassedByRoute}));
+    }
+  }, [typePassedByRoute]);
 
   return (
     <WholeContainer>

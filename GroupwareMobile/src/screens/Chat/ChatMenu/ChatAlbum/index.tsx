@@ -47,7 +47,7 @@ const ChatAlbums: React.FC = () => {
 
   return (
     <WholeContainer>
-      <HeaderWithTextButton title="メニュー" />
+      <HeaderWithTextButton title="アルバム" enableBackButton={true} />
       <Button
         bg="purple600"
         position="absolute"

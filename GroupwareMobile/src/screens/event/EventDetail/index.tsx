@@ -23,8 +23,6 @@ import generateYoutubeId from '../../../utils/generateYoutubeId';
 import {useRoute} from '@react-navigation/native';
 import {EventDetailRouteProps} from '../../../types/navigator/drawerScreenProps';
 import EventFormModal from '../../../components/events/EventFormModal';
-import {useAPIGetTag} from '../../../hooks/api/tag/useAPIGetTag';
-import {useAPIGetUsers} from '../../../hooks/api/user/useAPIGetUsers';
 import {useAPIUpdateEvent} from '../../../hooks/api/event/useAPIUpdateEvent';
 import {useAPIJoinEvent} from '../../../hooks/api/event/useAPIJoinEvent';
 import {useAPICancelEvent} from '../../../hooks/api/event/useAPICancelEvent';
@@ -292,6 +290,7 @@ const EventDetail: React.FC = () => {
           <FlatList
             horizontal
             data={eventInfo.tags}
+            keyExtractor={item => item.id.toString()}
             renderItem={({item: t}) => (
               <Button
                 fontSize={'xs'}

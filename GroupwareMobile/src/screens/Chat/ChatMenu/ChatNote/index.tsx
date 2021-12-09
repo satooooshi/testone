@@ -75,7 +75,7 @@ const ChatNotes: React.FC = () => {
         swipeToCloseEnabled={false}
         doubleTapToZoomEnabled={true}
       />
-      <HeaderWithTextButton title="メニュー" />
+      <HeaderWithTextButton enableBackButton={true} title="ノート" />
       <Button
         bg="purple600"
         position="absolute"

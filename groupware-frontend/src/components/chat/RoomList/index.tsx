@@ -69,8 +69,7 @@ const RoomList: React.FC<RoomListProps> = ({
         setCurrentRoom(matchedRoom[0]);
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentId, currentRoom, setCurrentRoom]);
+  }, [currentId, currentRoom, roomsForInfiniteScroll, setCurrentRoom]);
 
   return (
     <Box

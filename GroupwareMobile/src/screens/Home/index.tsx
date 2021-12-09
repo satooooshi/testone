@@ -7,7 +7,7 @@ import {Alert, TouchableHighlight, useWindowDimensions} from 'react-native';
 import {storage} from '../../utils/url';
 import {useAuthenticate} from '../../contexts/useAuthenticate';
 import {useAPIGetTopNews} from '../../hooks/api/topNews/useAPIGetTopNews';
-import {TopNews} from '../../types';
+import {EventType, TopNews} from '../../types';
 import {useNavigation} from '@react-navigation/native';
 import {HomeNavigationProps} from '../../types/navigator/drawerScreenProps/home';
 import tailwind from 'tailwind-rn';
@@ -24,16 +24,6 @@ const Home: React.FC = () => {
   });
   const [newsForScroll, setNewsForScroll] = useState<TopNews[]>([]);
 
-  const tabs: Tab[] = [
-    {
-      name: 'ダッシュボード',
-      onPress: console.log,
-    },
-    {
-      name: 'メンション一覧',
-      onPress: console.log,
-    },
-  ];
   const handleLogout = () => {
     storage.delete('userToken');
     setUser({});
@@ -88,7 +78,6 @@ const Home: React.FC = () => {
     <WholeContainer>
       <HeaderWithTextButton
         title="Home"
-        tabs={tabs}
         activeTabName="ダッシュボード"
         rightButtonName={'ログアウト'}
         onPressRightButton={handleLogout}
@@ -157,35 +146,105 @@ const Home: React.FC = () => {
         </Div>
         <Div flexDir="row" justifyContent="center" alignItems="center">
           <Div mb={8} mr={4}>
-            <PortalLinkBox type="impressive_university" onPress={console.log} />
+            <PortalLinkBox
+              type="impressive_university"
+              onPress={() =>
+                navigation.navigate('EventStack', {
+                  screen: 'EventList',
+                  params: {type: EventType.IMPRESSIVE_UNIVERSITY},
+                })
+              }
+            />
           </Div>
           <Div mb={8} mr={4}>
-            <PortalLinkBox type="study_meeting" onPress={console.log} />
+            <PortalLinkBox
+              type="study_meeting"
+              onPress={() =>
+                navigation.navigate('EventStack', {
+                  screen: 'EventList',
+                  params: {type: EventType.STUDY_MEETING},
+                })
+              }
+            />
           </Div>
           <Div mb={8}>
-            <PortalLinkBox type="bolday" onPress={console.log} />
+            <PortalLinkBox
+              type="bolday"
+              onPress={() =>
+                navigation.navigate('EventStack', {
+                  screen: 'EventList',
+                  params: {type: EventType.BOLDAY},
+                })
+              }
+            />
           </Div>
         </Div>
         <Div flexDir="row" justifyContent="center" alignItems="center">
           <Div mb={8} mr={4}>
-            <PortalLinkBox type="coach" onPress={console.log} />
+            <PortalLinkBox
+              type="coach"
+              onPress={() =>
+                navigation.navigate('EventStack', {
+                  screen: 'EventList',
+                  params: {type: EventType.COACH},
+                })
+              }
+            />
           </Div>
           <Div mb={8} mr={4}>
-            <PortalLinkBox type="club" onPress={console.log} />
+            <PortalLinkBox
+              type="club"
+              onPress={() =>
+                navigation.navigate('EventStack', {
+                  screen: 'EventList',
+                  params: {type: EventType.CLUB},
+                })
+              }
+            />
           </Div>
           <Div mb={8}>
-            <PortalLinkBox type="submission_etc" onPress={console.log} />
+            <PortalLinkBox
+              type="submission_etc"
+              onPress={() =>
+                navigation.navigate('EventStack', {
+                  screen: 'EventList',
+                  params: {type: EventType.SUBMISSION_ETC},
+                })
+              }
+            />
           </Div>
         </Div>
         <Div flexDir="row" justifyContent="center" alignItems="center">
           <Div mb={8} mr={4}>
-            <PortalLinkBox type="wiki" onPress={console.log} />
+            <PortalLinkBox
+              type="wiki"
+              onPress={() => {
+                navigation.navigate('WikiStack', {
+                  screen: 'WikiList',
+                  params: {},
+                });
+              }}
+            />
           </Div>
           <Div mb={8} mr={4}>
-            <PortalLinkBox type="chat" onPress={console.log} />
+            <PortalLinkBox
+              type="chat"
+              onPress={() => {
+                navigation.navigate('ChatStack', {
+                  screen: 'RoomList',
+                });
+              }}
+            />
           </Div>
           <Div mb={8}>
-            <PortalLinkBox type="account" onPress={console.log} />
+            <PortalLinkBox
+              type="account"
+              onPress={() => {
+                navigation.navigate('AccountStack', {
+                  screen: 'AccountDetail',
+                });
+              }}
+            />
           </Div>
         </Div>
       </ScrollDiv>

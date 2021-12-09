@@ -1,5 +1,6 @@
 import React from 'react';
 import {Platform, TouchableOpacity, useWindowDimensions} from 'react-native';
+import FastImage from 'react-native-fast-image';
 import {Swipeable} from 'react-native-gesture-handler';
 import {Button, Div, Icon, Image, Text} from 'react-native-magnus';
 import tailwind from 'tailwind-rn';
@@ -70,16 +71,12 @@ const RoomCard: React.FC<RoomCardProps> = ({
           alignItems="center"
           flexDir="row">
           <Div>
-            <Image
-              h={'90%'}
+            <FastImage
               source={
                 room.imageURL
                   ? {uri: room.imageURL}
                   : require('../../../../assets/no-image-avatar.png')
               }
-              rounded="circle"
-              shadow="xs"
-              mr={'lg'}
               style={roomCardStyles.image}
             />
             {room.isPinned && (

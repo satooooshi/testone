@@ -3,6 +3,7 @@ import React, {useCallback, useEffect, useState} from 'react';
 import {FlatList} from 'react-native';
 import {Div} from 'react-native-magnus';
 import {ActivityIndicator} from 'react-native-paper';
+import tailwind from 'tailwind-rn';
 import RoomCard from '../../../components/chat/RoomCard';
 import HeaderWithTextButton from '../../../components/Header';
 import WholeContainer from '../../../components/WholeContainer';
@@ -86,7 +87,7 @@ const RoomList: React.FC = () => {
       />
       <FlatList
         {...{onEndReached}}
-        contentContainerStyle={roomListStyles.flatlistContent}
+        contentContainerStyle={tailwind('self-center mt-4')}
         data={roomsForInfiniteScroll}
         renderItem={({item: room}) => (
           <Div mb="lg">

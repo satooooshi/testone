@@ -12,7 +12,7 @@ export type RootStackParamList = {
   };
   Wiki: undefined;
   WikiList: {
-    type: WikiType;
+    type?: WikiType;
   };
   WikiDetail: {
     id: number;

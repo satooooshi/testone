@@ -51,7 +51,7 @@ const Chat = () => {
           </Box>
         </>
       ) : null}
-      {!isSmallerThan768 ? (
+      {!isSmallerThan768 && (
         <Box
           w="100%"
           display="flex"
@@ -85,10 +85,6 @@ const Chat = () => {
             </Box>
           </>
         </Box>
-      ) : (
-        <Text position="absolute" top="auto" bottom="auto">
-          ルームを作成するか、招待をお待ちください
-        </Text>
       )}
     </LayoutWithTab>
   );

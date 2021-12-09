@@ -26,7 +26,7 @@ const ChatMenu: React.FC = () => {
 
   return (
     <WholeContainer>
-      <HeaderWithTextButton title="メニュー" />
+      <HeaderWithTextButton enableBackButton={true} title="メニュー" />
       <ChatMenuRow
         name="ルームを編集"
         icon={<Icon name="setting" fontSize={20} mr={'lg'} color="black" />}

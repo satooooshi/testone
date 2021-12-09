@@ -71,7 +71,7 @@ const HeaderTemplate: React.FC<HeaderTemplateProps> = ({
               source={require('../../../assets/bold-logo.png')}
             />
           </TouchableHighlight>
-          <Text fontSize={20} ml="lg" fontWeight="bold" color={darkFontColor}>
+          <Text fontSize={18} ml="lg" fontWeight="bold" color={darkFontColor}>
             {title}
           </Text>
         </Div>

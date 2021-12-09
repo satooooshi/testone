@@ -5,10 +5,7 @@ import {Div, Dropdown, Text} from 'react-native-magnus';
 import {ActivityIndicator} from 'react-native-paper';
 import DropdownOpenerButton from '../../components/common/DropdownOpenerButton';
 import UserCard from '../../components/users/UserCard';
-import {
-  SearchQueryToGetUsers,
-  SearchResultToGetUsers,
-} from '../../hooks/api/user/useAPISearchUsers';
+import {SearchQueryToGetUsers} from '../../hooks/api/user/useAPISearchUsers';
 import {userListStyles} from '../../styles/screen/user/userList.style';
 import {User, UserRoleInApp} from '../../types';
 import {UsersListNavigationProps} from '../../types/navigator/drawerScreenProps';

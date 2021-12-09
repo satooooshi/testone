@@ -87,12 +87,16 @@ const Navigator = () => {
         //     ? await messaging().getToken()
         //     : await messaging().getAPNSToken();
         const token = await messaging().getToken();
-        console.log('token:', token);
-        registerDevice({token});
+        console.log('token', token);
+        if (token) {
+          registerDevice({token});
+        }
 
         // Listen to whether the token changes
         return messaging().onTokenRefresh(tokenChanged => {
-          registerDevice({token: tokenChanged});
+          if (token) {
+            registerDevice({token: tokenChanged});
+          }
           // saveTokenToDatabase(token);
           console.log('token changed: ', tokenChanged);
         });
