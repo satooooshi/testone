@@ -84,7 +84,12 @@ const ChatDetail = () => {
     }
     if (menuValue === 'leaveRoom') {
       if (confirm('このルームを退室してよろしいですか？')) {
-        leaveChatGroup({ id: Number(id) });
+        leaveChatGroup(
+          { id: Number(id) },
+          {
+            onSuccess: () => router.push('/chat', undefined, { shallow: true }),
+          },
+        );
       }
       return;
     }

@@ -384,7 +384,7 @@ const Chat: React.FC = () => {
   };
 
   const renderMessage = (message: ChatMessage) => (
-    <Div mb={'sm'}>
+    <Div mb={'sm'} mx="md">
       <ChatMessageItem
         message={message}
         readUsers={readUsers(message)}
