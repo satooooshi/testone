@@ -16,6 +16,7 @@ import {
   ModalBody,
   ModalContent,
   ModalOverlay,
+  Spinner,
 } from '@chakra-ui/react';
 import '@draft-js-plugins/mention/lib/plugin.css';
 import '@draft-js-plugins/image/lib/plugin.css';
@@ -38,6 +39,7 @@ import NoteModal from '@/components/chat/NoteModal';
 import 'emoji-mart/css/emoji-mart.css';
 import { Picker } from 'emoji-mart';
 import { useAPISaveReaction } from '@/hooks/api/chat/useAPISaveReaction';
+import { useAPIGetRoomsByPage } from '@/hooks/api/chat/useAPIGetRoomsByPage';
 
 const ChatDetail = () => {
   const toast = useToast();
@@ -46,7 +48,7 @@ const ChatDetail = () => {
   const { mutate: saveReaction } = useAPISaveReaction();
   const [selectedMsgForReaction, setSelectedMsgForReaction] =
     useState<ChatMessage>();
-  const [room, setCurrentRoom] = useState<ChatGroup>();
+  const [currentRoom, setCurrentRoom] = useState<ChatGroup>();
   const [
     {
       editChatGroupModalVisible,
@@ -56,6 +58,15 @@ const ChatDetail = () => {
     },
     dispatchModal,
   ] = useModalReducer();
+  const [page, setPage] = useState('1');
+  const { data: chatRooms, isLoading: loadingGetChatGroupList } =
+    useAPIGetRoomsByPage({
+      page,
+    });
+  const [roomsForInfiniteScroll, setRoomsForInfiniteScroll] = useState<
+    ChatGroup[]
+  >([]);
+
   const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
   const [visibleAlbumModal, setVisibleAlbumModal] = useState(false);
   const [visibleNoteModal, setVisibleNoteModal] = useState(false);
@@ -82,6 +93,19 @@ const ChatDetail = () => {
     },
   });
 
+  const onScroll = (e: any) => {
+    if (
+      e.target.clientHeight - e.target.scrollTop >=
+      (e.target.scrollHeight * 2) / 3
+    ) {
+      if (
+        typeof Number(chatRooms?.pageCount) === 'number' &&
+        Number(page + 1) <= Number(chatRooms?.pageCount)
+      ) {
+        setPage((p) => (Number(p) + 1).toString());
+      }
+    }
+  };
   const { mutate: saveGroup } = useAPISaveChatGroup({
     onSuccess: (newInfo) => {
       dispatchModal({ type: 'editChatGroupModalVisible', value: false });
@@ -145,6 +169,12 @@ const ChatDetail = () => {
     }
   };
 
+  useEffect(() => {
+    if (chatRooms?.rooms?.length) {
+      setRoomsForInfiniteScroll((r) => [...r, ...chatRooms.rooms]);
+    }
+  }, [chatRooms?.rooms]);
+
   return (
     <LayoutWithTab
       sidebar={{ activeScreenName: SidebarScreenName.CHAT }}
@@ -185,17 +215,17 @@ const ChatDetail = () => {
         </ModalContent>
       </Modal>
 
-      {room && (
+      {currentRoom && (
         <NoteModal
-          room={room}
+          room={currentRoom}
           isOpen={visibleNoteModal}
           onClose={() => setVisibleNoteModal(false)}
         />
       )}
 
-      {room && (
+      {currentRoom && (
         <AlbumModal
-          room={room}
+          room={currentRoom}
           isOpen={visibleAlbumModal}
           onClose={() => setVisibleAlbumModal(false)}
         />
@@ -220,22 +250,22 @@ const ChatDetail = () => {
           }
         />
       )}
-      {chatGroups && room ? (
+      {chatGroups && currentRoom ? (
         <SelectChatGroupModal
           isOpen={selectChatGroupWindow}
           chatGroups={chatGroups}
           onClose={() =>
             dispatchModal({ type: 'selectChatGroupWindow', value: false })
           }
-          selectedChatGroup={room}
+          selectedChatGroup={currentRoom}
           toggleChatGroups={(group) => toggleChatGroups(group)}
         />
       ) : null}
-      {room ? (
+      {currentRoom ? (
         <>
           <EditChatGroupModal
             isOpen={editChatGroupModalVisible}
-            chatGroup={room}
+            chatGroup={currentRoom}
             saveGroup={saveGroup}
             closeModal={() =>
               dispatchModal({
@@ -247,7 +277,7 @@ const ChatDetail = () => {
           <EditChatGroupMembersModal
             isOpen={editMembersModalVisible}
             users={users || []}
-            previousUsers={room.members || []}
+            previousUsers={currentRoom.members || []}
             onCancel={() =>
               dispatchModal({
                 type: 'editMembersModalVisible',
@@ -256,7 +286,7 @@ const ChatDetail = () => {
             }
             onComplete={(newMembers) => {
               saveGroup({
-                ...room,
+                ...currentRoom,
                 members: newMembers,
               });
               dispatchModal({
@@ -272,8 +302,9 @@ const ChatDetail = () => {
         display="flex"
         flexDir="row"
         h="83vh"
+        onScroll={onScroll}
         justifyContent="center">
-        {chatGroups && chatGroups.length ? (
+        {roomsForInfiniteScroll.length ? (
           <>
             <Box
               display={'flex'}
@@ -282,32 +313,28 @@ const ChatDetail = () => {
               h="100%"
               overflow="scroll"
               w={isLargerTahn1024 ? '30%' : '40%'}>
-              {chatGroups ? (
-                chatGroups.map((g) => (
-                  <Link
-                    onClick={() =>
-                      router.push(`/chat/${g.id.toString()}`, undefined, {
-                        shallow: true,
-                      })
-                    }
+              {roomsForInfiniteScroll.map((g) => (
+                <Link
+                  onClick={() =>
+                    router.push(`/chat/${g.id.toString()}`, undefined, {
+                      shallow: true,
+                    })
+                  }
+                  key={g.id}
+                  mb={'8px'}>
+                  <ChatGroupCard
+                    isSelected={currentRoom?.id === g.id}
+                    chatGroup={g}
                     key={g.id}
-                    mb={'8px'}>
-                    <ChatGroupCard
-                      isSelected={room?.id === g.id}
-                      chatGroup={g}
-                      key={g.id}
-                    />
-                  </Link>
-                ))
-              ) : (
-                <p>ルームを作成するか、招待をお待ちください</p>
-              )}
+                  />
+                </Link>
+              ))}
             </Box>
-            {room && (
+            {currentRoom && (
               <ChatBox
                 onClickNoteIcon={() => setVisibleNoteModal(true)}
                 onClickAlbumIcon={() => setVisibleAlbumModal(true)}
-                room={room}
+                room={currentRoom}
                 onMenuClicked={handleMenuSelected}
               />
             )}
@@ -317,6 +344,7 @@ const ChatDetail = () => {
             ルームを作成するか、招待をお待ちください
           </Box>
         )}
+        {loadingGetChatGroupList && <Spinner />}
       </Box>
     </LayoutWithTab>
   );

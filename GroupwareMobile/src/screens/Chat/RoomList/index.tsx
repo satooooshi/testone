@@ -1,7 +1,8 @@
 import {useNavigation} from '@react-navigation/native';
 import React, {useCallback, useEffect, useState} from 'react';
-import {ActivityIndicator, FlatList} from 'react-native';
-import {Div, Overlay} from 'react-native-magnus';
+import {FlatList} from 'react-native';
+import {Div} from 'react-native-magnus';
+import {ActivityIndicator} from 'react-native-paper';
 import RoomCard from '../../../components/chat/RoomCard';
 import HeaderWithTextButton from '../../../components/Header';
 import WholeContainer from '../../../components/WholeContainer';
@@ -45,7 +46,12 @@ const RoomList: React.FC = () => {
   };
 
   const onEndReached = () => {
-    setPage(p => (Number(p) + 1).toString());
+    if (
+      typeof Number(chatRooms?.pageCount) === 'number' &&
+      Number(page + 1) <= Number(chatRooms?.pageCount)
+    ) {
+      setPage(p => (Number(p) + 1).toString());
+    }
   };
 
   useEffect(() => {
@@ -62,9 +68,6 @@ const RoomList: React.FC = () => {
 
   return (
     <WholeContainer>
-      <Overlay visible={loadingGetChatGroupList} p="xl">
-        <ActivityIndicator />
-      </Overlay>
       <HeaderWithTextButton
         title="ルーム一覧"
         rightButtonName={'新規作成'}
@@ -91,6 +94,7 @@ const RoomList: React.FC = () => {
           </Div>
         )}
       />
+      {loadingGetChatGroupList && <ActivityIndicator />}
     </WholeContainer>
   );
 };

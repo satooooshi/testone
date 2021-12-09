@@ -1,4 +1,5 @@
 const chatURL = 'chat';
+export const getRoomsByPageURL = `/${chatURL}/v2/rooms`;
 
 export const getChatGroupListURL = `/${chatURL}/group-list`;
 export const getChatMessagesURL = `/${chatURL}/get-messages`;

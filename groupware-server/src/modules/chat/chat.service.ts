@@ -219,7 +219,7 @@ export class ChatService {
       .leftJoinAndSelect(
         'chat_groups.chatMessages',
         'm',
-        'm.id = ( SELECT id FROM chat_messages WHERE chat_group_id = chat_groups.id ORDER BY updated_at DESC LIMIT 1 )',
+        'm.id = ( SELECT id FROM chat_messages WHERE chat_group_id = chat_groups.id AND type <> "system_text" ORDER BY updated_at DESC LIMIT 1 )',
       )
       .leftJoinAndSelect('lastReadChatTime.user', 'lastReadChatTime.user')
       .where('member.id = :memberId', { memberId: userID })
