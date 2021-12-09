@@ -12,13 +12,6 @@ export type CustomPushNotificationData = {
   };
 };
 
-const pushNotifSettings: PushNotifications.Settings = {
-  gcm: {
-    id: process.env.FCM_API_KEY,
-  },
-  isAlwaysUseFCM: true,
-};
-
 export const sendPushNotifToAllUsers = async (
   data: CustomPushNotificationData,
 ) => {
@@ -26,7 +19,6 @@ export const sendPushNotifToAllUsers = async (
   const devices = await deviceRepository.find();
   sendPushNotifToSpecificDevices(devices, data);
 };
-const pushNotifService = new PushNotifications(pushNotifSettings);
 
 export const sendPushNotifToSpecificUsers = async (
   user: User[],
@@ -34,18 +26,27 @@ export const sendPushNotifToSpecificUsers = async (
 ) => {
   const deviceRepository = getRepository(NotificationDevice);
   const userIds = user.map((u) => u.id);
-  const devices = await deviceRepository
-    .createQueryBuilder('devices')
-    .leftJoinAndSelect('devices.user', 'user')
-    .where('user.id IN (:...userIds)', { userIds })
-    .getMany();
-  await sendPushNotifToSpecificDevices(devices, data);
+  if (userIds.length) {
+    const devices = await deviceRepository
+      .createQueryBuilder('devices')
+      .leftJoin('devices.user', 'user')
+      .where('user.id IN (:...userIds)', { userIds })
+      .getMany();
+    await sendPushNotifToSpecificDevices(devices, data);
+  }
 };
 
 const sendPushNotifToSpecificDevices = async (
   devices: NotificationDevice[],
   data: CustomPushNotificationData,
 ) => {
+  const pushNotifSettings: PushNotifications.Settings = {
+    gcm: {
+      id: process.env.FCM_API_KEY,
+    },
+    isAlwaysUseFCM: true,
+  };
+  const pushNotifService = new PushNotifications(pushNotifSettings);
   const tokens = devices.map((d) => d.token);
   const dataToSend: PushNotifications.Data = {
     title: data.title, // REQUIRED for Android
@@ -112,6 +113,9 @@ const sendPushNotifToSpecificDevices = async (
       console.log(err);
     } else {
       console.log(result);
+      for (const e of result) {
+        console.log(e.message);
+      }
     }
   });
 };

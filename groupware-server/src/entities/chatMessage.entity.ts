@@ -80,7 +80,16 @@ export class ChatMessage {
   @AfterInsert()
   async sendPushNotification() {
     if (this.chatGroup.id && this.sender.id) {
-      const users = await getRepository(User)
+      const mentionRegex = /@\[.*?\]\(([0-9]+)\)/g;
+      const mentionedIds: number[] = [];
+      let mentionArr = [];
+      while ((mentionArr = mentionRegex.exec(this.content)) !== null) {
+        if (mentionArr[1] && typeof Number(mentionArr[1]) === 'number') {
+          mentionedIds.push(Number(mentionArr[1]));
+        }
+      }
+      // console.log(mentionedIds);
+      const allUsersInRoom = await getRepository(User)
         .createQueryBuilder('user')
         .select('user.id')
         .leftJoin('user.chatGroups', 'chatGroups')
@@ -88,8 +97,12 @@ export class ChatMessage {
           chatGroupId: this.chatGroup.id,
         })
         .andWhere('user.id <> :senderId', { senderId: this.sender.id })
+        .andWhere(
+          mentionedIds?.length ? 'user.id NOT IN (:...mentionedIds)' : '1=1',
+          { mentionedIds },
+        )
         .getMany();
-      const notificationData: CustomPushNotificationData = {
+      const notificationDataWithNoMention: CustomPushNotificationData = {
         title: `新着メッセージが届きました`,
         body: `${this.content}`,
         custom: {
@@ -97,40 +110,34 @@ export class ChatMessage {
           id: this.chatGroup.id.toString(),
         },
       };
-      await sendPushNotifToSpecificUsers(users, notificationData);
-    }
-  }
-
-  @AfterInsert()
-  async sendPushNotificationByMention() {
-    const mentionRegex = /@\[(.*?)\]\([0-9]+\)/g;
-    const mentionedIds: number[] = [];
-    let mentionArr = [];
-    while ((mentionArr = mentionRegex.exec(this.content)) !== null) {
-      if (mentionArr[1] && typeof Number(mentionArr[1]) === 'number') {
-        mentionedIds.push(Number(mentionArr[1]));
+      await sendPushNotifToSpecificUsers(
+        allUsersInRoom,
+        notificationDataWithNoMention,
+      );
+      if (mentionedIds?.length) {
+        const mentionedUsers = await getRepository(User)
+          .createQueryBuilder('user')
+          .select('user.id')
+          .leftJoin('user.chatGroups', 'chatGroups')
+          .where('chatGroups.id = :chatGroupId', {
+            chatGroupId: this.chatGroup.id,
+          })
+          .andWhere('user.id <> :senderId', { senderId: this.sender.id })
+          .andWhere('user.id IN (:...mentionedIds)', { mentionedIds })
+          .getMany();
+        const notificationDataWithMention: CustomPushNotificationData = {
+          title: `あなたをメンションした新着メッセージが届きました`,
+          body: `${mentionTransform(this.content)}`,
+          custom: {
+            screen: 'chat',
+            id: this.chatGroup.id.toString(),
+          },
+        };
+        await sendPushNotifToSpecificUsers(
+          mentionedUsers,
+          notificationDataWithMention,
+        );
       }
-    }
-    if (this.chatGroup.id && this.sender.id && mentionedIds.length) {
-      const users = await getRepository(User)
-        .createQueryBuilder('user')
-        .select('user.id')
-        .leftJoin('user.chatGroups', 'chatGroups')
-        .where('chatGroups.id = :chatGroupId', {
-          chatGroupId: this.chatGroup.id,
-        })
-        .andWhere('user.id <> :senderId', { senderId: this.sender.id })
-        .andWhere('user.id = (:...mentionedIds)', { mentionedIds })
-        .getMany();
-      const notificationData: CustomPushNotificationData = {
-        title: `あなたをメンションした新着メッセージが届きました`,
-        body: `${mentionTransform(this.content)}`,
-        custom: {
-          screen: 'chat',
-          id: this.chatGroup.id.toString(),
-        },
-      };
-      await sendPushNotifToSpecificUsers(users, notificationData);
     }
   }
 }

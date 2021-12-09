@@ -5,11 +5,13 @@ import {
   JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
+  Unique,
   UpdateDateColumn,
 } from 'typeorm';
 import { User } from './user.entity';
 
 @Entity({ name: 'notification_devices' })
+@Unique(['token'])
 export class NotificationDevice {
   @PrimaryGeneratedColumn()
   id: number;

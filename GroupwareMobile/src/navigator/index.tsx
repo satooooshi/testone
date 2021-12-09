@@ -12,12 +12,15 @@ import {tokenString} from '../utils/url';
 import messaging from '@react-native-firebase/messaging';
 import PushNotification from 'react-native-push-notification';
 import {Platform} from 'react-native';
+import {requestIOSMsgPermission} from '../utils/permission/requestIOSMsgPermisson';
+import {useAPIRegisterDevice} from '../hooks/api/notification/useAPIRegisterDevice';
 
 const Stack = createStackNavigator<RootStackParamList>();
 
 const Navigator = () => {
   const {user} = useAuthenticate();
   const navigationRef = useNavigationContainerRef<any>();
+  const {mutate: registerDevice} = useAPIRegisterDevice();
 
   useEffect(() => {
     const naviateByNotif = (notification: any) => {
@@ -52,10 +55,7 @@ const Navigator = () => {
     };
     PushNotification.configure({
       onNotification: notification => {
-        if (
-          Platform.OS !== 'android' ||
-          (Platform.OS === 'android' && notification.userInteraction)
-        ) {
+        if (notification.userInteraction) {
           naviateByNotif(notification);
         }
       },
@@ -77,6 +77,29 @@ const Navigator = () => {
     return unsubscribe;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    const handleMessaging = async () => {
+      if (user) {
+        await requestIOSMsgPermission();
+        // const token =
+        //   Platform.OS === 'android'
+        //     ? await messaging().getToken()
+        //     : await messaging().getAPNSToken();
+        const token = await messaging().getToken();
+        console.log('token:', token);
+        registerDevice({token});
+
+        // Listen to whether the token changes
+        return messaging().onTokenRefresh(tokenChanged => {
+          registerDevice({token: tokenChanged});
+          // saveTokenToDatabase(token);
+          console.log('token changed: ', tokenChanged);
+        });
+      }
+    };
+    handleMessaging();
+  }, [registerDevice, user]);
 
   return (
     <NavigationContainer ref={navigationRef}>
