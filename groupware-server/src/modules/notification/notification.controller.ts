@@ -11,7 +11,7 @@ export class NotificationController {
   @Post('/devices')
   @UseGuards(JwtAuthenticationGuard)
   async registerDevice(
-    @Body() device: NotificationDevice,
+    @Body() device: Partial<NotificationDevice>,
     @Req() req: RequestWithUser,
   ): Promise<NotificationDevice> {
     const { user } = req;

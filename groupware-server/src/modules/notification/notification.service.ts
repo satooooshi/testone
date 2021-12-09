@@ -25,18 +25,26 @@ export class NotificationService {
     device: Partial<NotificationDevice>,
   ): Promise<NotificationDevice> {
     const existDevice = await this.deviceRepository.findOne({
-      where: { token: device.token },
+      where: { token: device?.token },
       relations: ['user'],
     });
     if (existDevice?.user?.id === device?.user?.id) {
       return existDevice;
     }
-    const savedDevice = await this.deviceRepository.save({
-      ...existDevice,
+    if (existDevice) {
+      const savedDevice = await this.deviceRepository.save({
+        ...existDevice,
+        user: device.user,
+      });
+      return savedDevice;
+    }
+    const newDevice = await this.deviceRepository.save({
+      ...device,
       user: device.user,
     });
-    return savedDevice;
+    return newDevice;
   }
+
   async sendEmailNotification({
     to,
     subject,

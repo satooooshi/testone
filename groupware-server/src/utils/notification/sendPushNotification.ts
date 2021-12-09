@@ -81,7 +81,7 @@ const sendPushNotifToSpecificDevices = async (
     retries: 1, // gcm, apn
     encoding: '', // apn
     badge: 2, // gcm for ios, apn
-    android_channel_id: '', // gcm - Android Channel ID
+    android_channel_id: 'default-channel-id', // gcm - Android Channel ID
     notificationCount: 0, // fcm for android. badge can be used for both fcm and apn
     alert: {
       // apn, will take precedence over title and body
