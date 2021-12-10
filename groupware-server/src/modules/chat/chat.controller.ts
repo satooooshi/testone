@@ -122,7 +122,7 @@ export class ChatController {
   @UseGuards(JwtAuthenticationGuard)
   async getLastReadChatTime(
     @Req() req: RequestWithUser,
-    @Param() chatGroupId: string,
+    @Param('id') chatGroupId: string,
   ): Promise<LastReadChatTime[]> {
     return await this.chatService.getLastReadChatTime(req.user, chatGroupId);
   }
@@ -131,7 +131,7 @@ export class ChatController {
   @UseGuards(JwtAuthenticationGuard)
   async saveLastReadChatTime(
     @Req() req: RequestWithUser,
-    @Param() chatGroupId: number,
+    @Param('id') chatGroupId: number,
   ): Promise<LastReadChatTime> {
     return await this.chatService.saveLastReadChatTime(req.user, chatGroupId);
   }

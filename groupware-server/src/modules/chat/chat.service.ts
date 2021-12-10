@@ -351,27 +351,26 @@ export class ChatService {
     if (!isMember) {
       throw new NotAcceptableException('Something went wrong');
     }
-    const target = await this.lastReadChatTimeRepository.findOne({
-      where: {
-        user: user,
-        chatGroup: chatGroup,
-      },
-      relations: ['user', 'chatGroup'],
-    });
+    const existTime = await this.lastReadChatTimeRepository
+      .createQueryBuilder('time')
+      .leftJoin('time.chatGroup', 'g')
+      .leftJoin('time.user', 'u')
+      .where('g.id = :chatGroupId', { chatGroupId })
+      .andWhere('u.id = :userId', { userId: user.id })
+      .getMany();
 
-    if (target) {
-      target.readTime = new Date();
-      const newLastReadChatTime = await this.lastReadChatTimeRepository.save(
-        target,
-      );
-      return newLastReadChatTime;
+    if (existTime.length) {
+      await this.lastReadChatTimeRepository.remove(existTime);
     }
 
-    const newLastReadChatTime = await this.lastReadChatTimeRepository.save({
+    const newTarget = this.lastReadChatTimeRepository.create({
       readTime: new Date(),
-      user: user,
-      chatGroup: chatGroup,
+      user,
+      chatGroup: { id: chatGroupId },
     });
+    const newLastReadChatTime = await this.lastReadChatTimeRepository.save(
+      newTarget,
+    );
     return newLastReadChatTime;
   }
 }
