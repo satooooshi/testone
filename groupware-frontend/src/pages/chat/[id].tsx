@@ -113,9 +113,9 @@ const ChatDetail = () => {
         onClose={() => setSelectedMsgForReaction(undefined)}>
         <ModalOverlay />
         <ModalContent h="90vh" bg={'#f9fafb'}>
-          <ModalHeader>emoji</ModalHeader>
+          <ModalHeader>リアクションを選択</ModalHeader>
           <ModalCloseButton />
-          <ModalBody>
+          <ModalBody display="flex" flexDir="row" justifyContent="center">
             <Picker
               title=""
               emoji="point_up"
@@ -129,6 +129,22 @@ const ChatDetail = () => {
                   chatMessage: selectedMsgForReaction,
                 });
                 setSelectedMsgForReaction(undefined);
+              }}
+              i18n={{
+                search: '検索',
+                categories: {
+                  search: '検索結果',
+                  recent: 'よく使われる絵文字',
+                  people: '顔 & 人',
+                  nature: '動物 & 自然',
+                  foods: '食べ物 & 飲み物',
+                  activity: 'アクティビティ',
+                  places: '旅行 & 場所',
+                  objects: 'オブジェクト',
+                  symbols: '記号',
+                  flags: '旗',
+                  custom: 'カスタム',
+                },
               }}
             />
           </ModalBody>
