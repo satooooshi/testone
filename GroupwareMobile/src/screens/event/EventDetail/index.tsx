@@ -28,7 +28,7 @@ import {useAPIJoinEvent} from '../../../hooks/api/event/useAPIJoinEvent';
 import {useAPICancelEvent} from '../../../hooks/api/event/useAPICancelEvent';
 import {AxiosError} from 'axios';
 import {useFormik} from 'formik';
-import {EventComment, EventType, User} from '../../../types';
+import {EventComment, EventType} from '../../../types';
 import {useAPICreateComment} from '../../../hooks/api/event/useAPICreateComment';
 import EventCommentCard from '../EventCommentCard';
 import {createCommentSchema} from '../../../utils/validation/schema';
@@ -83,7 +83,6 @@ const EventDetail: React.FC = () => {
     return getJoiningUsers(eventInfo?.userJoiningEvent);
   }, [eventInfo]);
 
-  console.log(eventInfo?.users);
   const windowWidth = useWindowDimensions().width;
   const startAtText = useMemo(() => {
     if (!eventInfo) {
@@ -408,25 +407,23 @@ const EventDetail: React.FC = () => {
                     multiline={true}
                     autoCapitalize="none"
                     style={tailwind(
-                      'border border-green-400 bg-white rounded border-blue-500	 p-2 h-24',
+                      'border border-green-400 bg-white rounded border-blue-500 p-2 h-24',
                     )}
                   />
                 )}
-                {eventInfo?.comments &&
-                  eventInfo?.comments.length &&
-                  eventInfo?.comments.map(
-                    comment =>
-                      comment.writer && (
-                        <>
+                {eventInfo?.comments && eventInfo?.comments.length
+                  ? eventInfo?.comments.map(
+                      comment =>
+                        comment.writer && (
                           <EventCommentCard
                             key={comment.id}
                             body={comment.body}
                             date={comment.createdAt}
                             writer={comment.writer}
                           />
-                        </>
-                      ),
-                  )}
+                        ),
+                    )
+                  : null}
               </Div>
             )}
           </Div>
