@@ -147,7 +147,7 @@ const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
           </Div>
         ) : null}
         {wikiInfo?.type === WikiType.QA ? (
-          <Div h={windowHeight * 0.5} w={windowWidth * 0.9} alignSelf="center">
+          <Div w={windowWidth * 0.9} alignSelf="center">
             <Div
               justifyContent="space-between"
               alignItems="center"
@@ -174,10 +174,7 @@ const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
                   : '回答を投稿する'}
               </Button>
             </Div>
-            <AnswerList
-              answers={wikiInfo.answers}
-              onPressAvatar={onPressAvatar}
-            />
+            <AnswerList wiki={wikiInfo} onPressAvatar={onPressAvatar} />
           </Div>
         ) : null}
       </ScrollView>
