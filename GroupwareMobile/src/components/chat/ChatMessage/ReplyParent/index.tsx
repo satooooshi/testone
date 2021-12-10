@@ -39,10 +39,10 @@ const ReplyParent: React.FC<ReplyParentProps> = ({parentMessage}) => {
         }
       />
       <Div w={'65%'}>
-        <Text color="white" fontWeight="bold" fontSize={14}>
+        <Text color="black" fontWeight="bold" fontSize={14}>
           {userNameFactory(parentMessage.sender)}
         </Text>
-        <Text color="white" fontSize={14}>
+        <Text color="black" fontSize={14}>
           {content(parentMessage.type)}
         </Text>
       </Div>
