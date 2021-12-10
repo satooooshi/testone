@@ -5,6 +5,9 @@ export const getJoiningUsers = (
 ): User[] => {
   const users: User[] = [];
   userJoiningEvents.map(u => {
+    if (u.canceledAt) {
+      return;
+    }
     users.push(u.user);
   });
   return users;

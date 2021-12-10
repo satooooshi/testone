@@ -8,7 +8,14 @@ import {
   Alert,
 } from 'react-native';
 import HeaderWithTextButton from '../../../components/Header';
-import {Div, Text, Button, Overlay, ScrollDiv} from 'react-native-magnus';
+import {
+  Div,
+  Text,
+  Button,
+  Overlay,
+  ScrollDiv,
+  Image,
+} from 'react-native-magnus';
 import FastImage from 'react-native-fast-image';
 import {eventDetailStyles} from '../../../styles/screen/event/eventDetail.style';
 import {useAPIGetEventDetail} from '../../../hooks/api/event/useAPIGetEventDetail';
@@ -38,7 +45,6 @@ import {useAuthenticate} from '../../../contexts/useAuthenticate';
 import {UserRole} from '../../../types';
 import {useNavigation} from '@react-navigation/native';
 import tailwind from 'tailwind-rn';
-import UserCollapse from '../../../components/users/UserCollapse';
 import {getJoiningUsers} from '../../../utils/factory/event/getJoiningUsersFactory';
 
 const EventDetail: React.FC = () => {
@@ -80,8 +86,10 @@ const EventDetail: React.FC = () => {
     if (!eventInfo?.userJoiningEvent) {
       return;
     }
+    console.log(getJoiningUsers(eventInfo?.userJoiningEvent));
+
     return getJoiningUsers(eventInfo?.userJoiningEvent);
-  }, [eventInfo]);
+  }, [eventInfo?.userJoiningEvent]);
 
   const windowWidth = useWindowDimensions().width;
   const startAtText = useMemo(() => {
@@ -363,12 +371,48 @@ const EventDetail: React.FC = () => {
             )}
             <Div m={16}>
               {joiningUsers && (
-                <UserCollapse
-                  title="参加者一覧"
-                  displayCount={true}
-                  users={joiningUsers}
-                  bgColor="teal500"
-                />
+                // <UserCollapse
+                //   title="参加者一覧"
+                //   displayCount={true}
+                //   users={joiningUsers}
+                //   bgColor="teal500"
+                // />
+                <>
+                  <Div
+                    borderBottomWidth={1}
+                    borderColor="green400"
+                    flexDir="row"
+                    justifyContent="space-between"
+                    alignItems="flex-end"
+                    mb="lg"
+                    pb="md">
+                    <Text>
+                      参加者一覧
+                      {joiningUsers.length || 0}名
+                    </Text>
+                  </Div>
+                  {joiningUsers.map(u => (
+                    <Div
+                      borderBottomWidth={0.5}
+                      borderBottomColor="gray400"
+                      style={tailwind('flex-row items-center')}>
+                      <Image
+                        mt={'lg'}
+                        h={windowWidth * 0.1}
+                        w={windowWidth * 0.1}
+                        source={
+                          u.avatarUrl
+                            ? {uri: u.avatarUrl}
+                            : require('../../../../assets/no-image-avatar.png')
+                        }
+                        rounded="circle"
+                        mb={'lg'}
+                        mr={16}
+                      />
+                      <Text>{u.lastName + ' ' + u.firstName}</Text>
+                    </Div>
+                  ))}
+                </>
               )}
             </Div>
             {eventInfo.type !== EventType.SUBMISSION_ETC && (
@@ -383,8 +427,7 @@ const EventDetail: React.FC = () => {
                   pb="md">
                   <Text>
                     コメント
-                    {eventInfo?.comments.length ? eventInfo.comments.length : 0}
-                    件
+                    {eventInfo?.comments.length || 0}件
                   </Text>
                   <Button
                     fontSize={16}
