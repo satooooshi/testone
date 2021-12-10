@@ -147,13 +147,12 @@ android {
     defaultConfig {
         resValue "string", "build_config_package", "com.groupwaremobile"
         applicationId "com.groupwaremobile"
-        minSdkVersion rootProject.ext.minSdkVersion
-        targetSdkVersion rootProject.ext.targetSdkVersion
+        minSdkVersion 31
+        targetSdkVersion 31
         versionCode 1
         versionName "1.0"
         //react-native-image-crop-picker
         vectorDrawables.useSupportLibrary = true
-        targetSdkVersion 27
     }
     splits {
         abi {

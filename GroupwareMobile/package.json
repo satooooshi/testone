@@ -75,11 +75,13 @@
     "rn-fetch-blob": "^0.12.0",
     "string.prototype.matchall": "^4.0.6",
     "tailwind-rn": "^3.0.1",
+    "uglify-js": "^3.14.4",
     "validate-color": "^2.1.1",
     "yup": "^0.32.11"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",
+    "@babel/plugin-proposal-numeric-separator": "^7.16.0",
     "@babel/runtime": "^7.12.5",
     "@react-native-community/eslint-config": "^2.0.0",
     "@types/diff": "^5.0.1",
