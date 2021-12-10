@@ -23,14 +23,12 @@ import generateYoutubeId from '../../../utils/generateYoutubeId';
 import {useRoute} from '@react-navigation/native';
 import {EventDetailRouteProps} from '../../../types/navigator/drawerScreenProps';
 import EventFormModal from '../../../components/events/EventFormModal';
-import {useAPIGetTag} from '../../../hooks/api/tag/useAPIGetTag';
-import {useAPIGetUsers} from '../../../hooks/api/user/useAPIGetUsers';
 import {useAPIUpdateEvent} from '../../../hooks/api/event/useAPIUpdateEvent';
 import {useAPIJoinEvent} from '../../../hooks/api/event/useAPIJoinEvent';
 import {useAPICancelEvent} from '../../../hooks/api/event/useAPICancelEvent';
 import {AxiosError} from 'axios';
 import {useFormik} from 'formik';
-import {EventComment, EventType} from '../../../types';
+import {EventComment, EventType, User} from '../../../types';
 import {useAPICreateComment} from '../../../hooks/api/event/useAPICreateComment';
 import EventCommentCard from '../EventCommentCard';
 import {createCommentSchema} from '../../../utils/validation/schema';
@@ -40,6 +38,8 @@ import {useAuthenticate} from '../../../contexts/useAuthenticate';
 import {UserRole} from '../../../types';
 import {useNavigation} from '@react-navigation/native';
 import tailwind from 'tailwind-rn';
+import UserCollapse from '../../../components/users/UserCollapse';
+import {getJoiningUsers} from '../../../utils/factory/event/getJoiningUsersFactory';
 
 const EventDetail: React.FC = () => {
   const route = useRoute<EventDetailRouteProps>();
@@ -52,7 +52,6 @@ const EventDetail: React.FC = () => {
     refetch: refetchEvents,
     isLoading: isLoadingGetEventDetail,
   } = useAPIGetEventDetail(id);
-
   const initialValues: Partial<EventComment> = {
     body: '',
   };
@@ -76,6 +75,15 @@ const EventDetail: React.FC = () => {
   const {mutate: cancelEvent} = useAPICancelEvent({
     onSuccess: () => refetchEvents(),
   });
+
+  const joiningUsers = useMemo(() => {
+    if (!eventInfo?.userJoiningEvent) {
+      return;
+    }
+    return getJoiningUsers(eventInfo?.userJoiningEvent);
+  }, [eventInfo]);
+
+  console.log(eventInfo?.users);
   const windowWidth = useWindowDimensions().width;
   const startAtText = useMemo(() => {
     if (!eventInfo) {
@@ -339,7 +347,7 @@ const EventDetail: React.FC = () => {
         onSubmit={event => saveEvent({...event, id: eventInfo?.id})}
       />
       <ScrollDiv>
-        {eventInfo ? (
+        {eventInfo && (
           <Div flexDir="column">
             {eventInfo.videos.length ? (
               eventInfo.videos.map(v => (
@@ -354,8 +362,18 @@ const EventDetail: React.FC = () => {
                 <Text mx={16}>関連動画はありません</Text>
               </>
             )}
+            <Div m={16}>
+              {joiningUsers && (
+                <UserCollapse
+                  title="参加者一覧"
+                  displayCount={true}
+                  users={joiningUsers}
+                  bgColor="teal500"
+                />
+              )}
+            </Div>
             {eventInfo.type !== EventType.SUBMISSION_ETC && (
-              <Div m={16}>
+              <Div mx={16}>
                 <Div
                   borderBottomWidth={1}
                   borderColor="green400"
@@ -394,25 +412,25 @@ const EventDetail: React.FC = () => {
                     )}
                   />
                 )}
-                {eventInfo?.comments && eventInfo?.comments.length
-                  ? eventInfo?.comments.map(
-                      comment =>
-                        comment.writer && (
-                          <>
-                            <EventCommentCard
-                              key={comment.id}
-                              body={comment.body}
-                              date={comment.createdAt}
-                              writer={comment.writer}
-                            />
-                          </>
-                        ),
-                    )
-                  : null}
+                {eventInfo?.comments &&
+                  eventInfo?.comments.length &&
+                  eventInfo?.comments.map(
+                    comment =>
+                      comment.writer && (
+                        <>
+                          <EventCommentCard
+                            key={comment.id}
+                            body={comment.body}
+                            date={comment.createdAt}
+                            writer={comment.writer}
+                          />
+                        </>
+                      ),
+                  )}
               </Div>
             )}
           </Div>
-        ) : null}
+        )}
       </ScrollDiv>
     </WholeContainer>
   );
