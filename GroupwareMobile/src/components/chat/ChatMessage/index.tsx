@@ -85,37 +85,41 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
           {!message.isSender && message.type !== ChatMessageType.SYSTEM_TEXT ? (
             <Text>{userNameFactory(message.sender)}</Text>
           ) : null}
-          {readUsers.length && message.type !== ChatMessageType.SYSTEM_TEXT ? (
-            <TouchableOpacity onPress={onCheckLastRead}>
-              <Text
-                mb="sm"
-                mr={message?.isSender ? 'sm' : undefined}
-                ml={!message?.isSender ? 'sm' : undefined}>
-                {numbersOfRead ? `既読\n${numbersOfRead}人` : ''}
-              </Text>
-            </TouchableOpacity>
-          ) : null}
-          {message.type === ChatMessageType.TEXT ? (
-            <TextMessage message={message} onLongPress={onLongPress} />
-          ) : message.type === ChatMessageType.IMAGE ? (
-            <ImageMessage
-              onPress={onPressImage}
-              message={message}
-              onLongPress={onLongPress}
-            />
-          ) : message.type === ChatMessageType.VIDEO ? (
-            <VideoMessage
-              message={message}
-              onPress={onPressVideo}
-              onLongPress={onLongPress}
-            />
-          ) : message.type === ChatMessageType.OTHER_FILE ? (
-            <FileMessage
-              message={message}
-              onPress={onPressFile}
-              onLongPress={onLongPress}
-            />
-          ) : null}
+          <Div flexDir="row" alignItems="flex-end">
+            {message.isSender &&
+            readUsers.length &&
+            message.type !== ChatMessageType.SYSTEM_TEXT ? (
+              <TouchableOpacity onPress={onCheckLastRead}>
+                <Text
+                  mb="sm"
+                  mr={message?.isSender ? 'sm' : undefined}
+                  ml={!message?.isSender ? 'sm' : undefined}>
+                  {numbersOfRead ? `既読\n${numbersOfRead}人` : ''}
+                </Text>
+              </TouchableOpacity>
+            ) : null}
+            {message.type === ChatMessageType.TEXT ? (
+              <TextMessage message={message} onLongPress={onLongPress} />
+            ) : message.type === ChatMessageType.IMAGE ? (
+              <ImageMessage
+                onPress={onPressImage}
+                message={message}
+                onLongPress={onLongPress}
+              />
+            ) : message.type === ChatMessageType.VIDEO ? (
+              <VideoMessage
+                message={message}
+                onPress={onPressVideo}
+                onLongPress={onLongPress}
+              />
+            ) : message.type === ChatMessageType.OTHER_FILE ? (
+              <FileMessage
+                message={message}
+                onPress={onPressFile}
+                onLongPress={onLongPress}
+              />
+            ) : null}
+          </Div>
         </Div>
         {!message.isSender && message.type !== ChatMessageType.SYSTEM_TEXT ? (
           <TouchableHighlight

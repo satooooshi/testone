@@ -61,6 +61,7 @@ import {saveToCameraRoll} from '../../utils/storage/saveToCameraRoll';
 import VideoPlayer from 'react-native-video-player';
 import ChatMessageItem from '../../components/chat/ChatMessage';
 import {ActivityIndicator} from 'react-native-paper';
+import {useAPISaveLastReadChatTime} from '../../hooks/api/chat/useAPISaveLastReadChatTime';
 
 const Chat: React.FC = () => {
   const typeDropdownRef = useRef<any | null>(null);
@@ -85,6 +86,7 @@ const Chat: React.FC = () => {
     ChatMessageReaction[] | undefined
   >();
   const [selectedEmoji, setSelectedEmoji] = useState<string>();
+  const {mutate: saveLastReadChatTime} = useAPISaveLastReadChatTime();
   const [selectedMessageForCheckLastRead, setSelectedMessageForCheckLastRead] =
     useState<ChatMessage>();
   const {values, handleSubmit, setValues} = useFormik<Partial<ChatMessage>>({
@@ -522,6 +524,12 @@ const Chat: React.FC = () => {
       )}
     </>
   );
+
+  useEffect(() => {
+    saveLastReadChatTime(room.id, {
+      onError: err => console.log(err.response?.data),
+    });
+  }, [room.id, saveLastReadChatTime]);
 
   return (
     <WholeContainer>
