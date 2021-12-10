@@ -173,6 +173,18 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
       </MenuItem>
     </Menu>
   );
+  const replyContent = (parentMsg: ChatMessage) => {
+    switch (parentMsg.type) {
+      case ChatMessageType.TEXT:
+        return mentionTransform(parentMsg.content);
+      case ChatMessageType.IMAGE:
+        return '写真';
+      case ChatMessageType.VIDEO:
+        return '動画';
+      case ChatMessageType.OTHER_FILE:
+        return 'ファイル';
+    }
+  };
 
   return (
     <Box
@@ -224,16 +236,49 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
                   : 'ボールドくん'}
               </Text>
               {message.type === ChatMessageType.TEXT ? (
-                <Text
-                  borderRadius="8px"
-                  p="8px"
+                <Box
                   maxW={'40vw'}
                   minW={'10vw'}
-                  wordBreak={'break-word'}
-                  color={message.isSender ? 'white' : darkFontColor}
-                  bg={message.isSender ? 'blue.500' : '#ececec'}>
-                  {mentionTransform(message.content)}
-                </Text>
+                  bg={message.isSender ? 'blue.500' : '#ececec'}
+                  p="8px"
+                  rounded="md">
+                  {message.replyParentMessage && (
+                    <Box
+                      flexDir="row"
+                      display="flex"
+                      borderBottomWidth={1}
+                      borderBottomColor={'white'}
+                      pb="4px"
+                      color={'black'}>
+                      <Avatar
+                        h="32px"
+                        w="32px"
+                        mr="4px"
+                        cursor="pointer"
+                        src={
+                          !message.replyParentMessage.sender?.existence
+                            ? boldMascot.src
+                            : message.replyParentMessage?.sender.avatarUrl
+                        }
+                      />
+                      <Box>
+                        <Text fontWeight="bold">
+                          {userNameFactory(message.replyParentMessage?.sender)}
+                        </Text>
+                        <Text>{replyContent(message.replyParentMessage)}</Text>
+                      </Box>
+                    </Box>
+                  )}
+                  <Text
+                    borderRadius="8px"
+                    maxW={'40vw'}
+                    minW={'10vw'}
+                    wordBreak={'break-word'}
+                    color={message.isSender ? 'white' : darkFontColor}
+                    bg={message.isSender ? 'blue.500' : '#ececec'}>
+                    {mentionTransform(message.content)}
+                  </Text>
+                </Box>
               ) : (
                 <Box
                   borderRadius="8px"
