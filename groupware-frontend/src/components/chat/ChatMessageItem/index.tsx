@@ -1,12 +1,24 @@
-import { Box, Button, Image, Link, Text } from '@chakra-ui/react';
-import React, { useCallback } from 'react';
+import {
+  Box,
+  Button,
+  Image,
+  Link,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalHeader,
+  ModalOverlay,
+  Text,
+} from '@chakra-ui/react';
+import React from 'react';
 import { AiOutlineFileProtect } from 'react-icons/ai';
 import { Avatar } from '@chakra-ui/react';
 import {
   ChatMessage,
   ChatMessageReaction,
   ChatMessageType,
-  LastReadChatTime,
+  User,
 } from 'src/types';
 import { dateTimeFormatterFromJSDDate } from 'src/utils/dateTimeFormatter';
 import { userNameFactory } from 'src/utils/factory/userNameFactory';
@@ -23,9 +35,9 @@ import { useAuthenticate } from 'src/contexts/useAuthenticate';
 
 type ChatMessageItemProps = {
   message: ChatMessage;
-  lastReadChatTime: LastReadChatTime[];
   onClickReaction: () => void;
   onClickReply: () => void;
+  readUsers: User[];
 };
 
 const ReactionButton = ({
@@ -89,10 +101,11 @@ const ReactionButton = ({
 
 const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
   message,
-  lastReadChatTime,
   onClickReaction,
   onClickReply,
+  readUsers,
 }) => {
+  const [visibleReadModal, setVisibleLastReadModal] = useState(false);
   const reactionRemovedDuplicates = (reactions: ChatMessageReaction[]) => {
     const reactionsNoDuplicates: ChatMessageReaction[] = [];
     for (const r of reactions) {
@@ -106,14 +119,6 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
     }
     return reactionsNoDuplicates;
   };
-
-  const messageReadCount = useCallback(
-    (message: ChatMessage): number => {
-      return lastReadChatTime?.filter((l) => l.readTime >= message.updatedAt)
-        .length;
-    },
-    [lastReadChatTime],
-  );
 
   const reactionList = (
     <Box flexDir="row" flexWrap="wrap" display="flex" maxW={'50vw'}>
@@ -191,6 +196,34 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
       display="flex"
       flexDir="column"
       alignItems={message.isSender ? 'flex-end' : 'flex-start'}>
+      <Modal
+        isOpen={visibleReadModal}
+        onClose={() => setVisibleLastReadModal(false)}>
+        <ModalOverlay />
+        <ModalContent h="90vh" bg={'#f9fafb'}>
+          <ModalHeader>既読一覧</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            {readUsers.map((u) => (
+              <Link
+                key={u.id}
+                display="flex"
+                flexDir="row"
+                borderBottom={'1px'}
+                py="8px"
+                alignItems="center"
+                justifyContent="space-between"
+                href={`/account/${u?.id}`}
+                passHref>
+                <Box display="flex" flexDir="row" alignItems="center">
+                  <Avatar src={u.avatarUrl} w="40px" h="40px" mr="16px" />
+                  <Text fontSize={darkFontColor}>{userNameFactory(u)}</Text>
+                </Box>
+              </Link>
+            ))}
+          </ModalBody>
+        </ModalContent>
+      </Modal>
       {message.type === ChatMessageType.SYSTEM_TEXT && sysmtemText}
       {message.type !== ChatMessageType.SYSTEM_TEXT && (
         <Box
@@ -219,11 +252,15 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
               <>
                 {menuOpener}
                 <Box>
-                  {messageReadCount(message) ? (
-                    <Text mx="8px" color="gray" fontSize="12px">
+                  {readUsers.length ? (
+                    <Link
+                      onClick={() => setVisibleLastReadModal(true)}
+                      mx="8px"
+                      color="gray"
+                      fontSize="12px">
                       既読
-                      {messageReadCount(message)}
-                    </Text>
+                      {readUsers.length}
+                    </Link>
                   ) : null}
                   {createdAtText}
                 </Box>

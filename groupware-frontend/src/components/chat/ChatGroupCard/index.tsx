@@ -13,8 +13,6 @@ const ChatGroupCard: React.FC<ChatGroupCardProps> = ({
   chatGroup,
   isSelected = false,
 }) => {
-  const [isSmalerThan1024] = useMediaQuery('(max-width: 1024px)');
-  const [isLargerTahn1024] = useMediaQuery('(min-width: 1024px)');
   const [isSmallerThan768] = useMediaQuery('max-width: 768px');
   const nameOfEmptyNameGroup = (members?: User[]): string => {
     if (!members) {

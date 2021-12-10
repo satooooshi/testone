@@ -30,6 +30,7 @@ import { useFormik } from 'formik';
 import { useAPIUploadStorage } from '@/hooks/api/storage/useAPIUploadStorage';
 import { isImage, isVideo } from 'src/utils/indecateChatMessageType';
 import { mentionTransform } from 'src/utils/mentionTransform';
+import { useAPISaveLastReadChatTime } from '@/hooks/api/chat/useAPISaveLastReadChatTime';
 
 type ChatBoxProps = {
   room: ChatGroup;
@@ -61,6 +62,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({
     enableReinitialize: true,
     onSubmit: () => onSend(),
   });
+  const { mutate: saveLastReadChatTime } = useAPISaveLastReadChatTime();
   const { data: lastReadChatTime } = useAPIGetLastReadChatTime(room.id, {
     refetchInterval: 1000,
   });
@@ -236,6 +238,18 @@ const ChatBox: React.FC<ChatBoxProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fetchedPastMessages]);
 
+  const readUsers = (targetMsg: ChatMessage) => {
+    return lastReadChatTime
+      ? lastReadChatTime
+          .filter((t) => t.readTime >= targetMsg.createdAt)
+          .map((t) => t.user)
+      : [];
+  };
+
+  useEffect(() => {
+    saveLastReadChatTime(room.id);
+  }, [room.id, saveLastReadChatTime]);
+
   useEffect(() => {
     if (latestMessage?.length && messages?.length) {
       const msgToAppend: ChatMessage[] = [];
@@ -322,7 +336,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({
               <ChatMessageItem
                 key={m.id}
                 message={m}
-                lastReadChatTime={lastReadChatTime || []}
+                readUsers={readUsers(m)}
                 onClickReply={() =>
                   setNewChatMessage((pre) => ({
                     ...pre,
