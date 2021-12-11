@@ -387,7 +387,7 @@ const EventDetail: React.FC = () => {
                     mb="lg"
                     pb="md">
                     <Text>
-                      参加者一覧
+                      参加者:
                       {joiningUsers.length || 0}名
                     </Text>
                   </Div>
@@ -426,11 +426,11 @@ const EventDetail: React.FC = () => {
                   mb="lg"
                   pb="md">
                   <Text>
-                    コメント
+                    コメント:
                     {eventInfo?.comments.length || 0}件
                   </Text>
                   <Button
-                    fontSize={16}
+                    fontSize={12}
                     py={4}
                     color="white"
                     onPress={() => {
