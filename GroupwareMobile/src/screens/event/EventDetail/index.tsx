@@ -86,7 +86,6 @@ const EventDetail: React.FC = () => {
     if (!eventInfo?.userJoiningEvent) {
       return;
     }
-    console.log(getJoiningUsers(eventInfo?.userJoiningEvent));
 
     return getJoiningUsers(eventInfo?.userJoiningEvent);
   }, [eventInfo?.userJoiningEvent]);
@@ -455,7 +454,7 @@ const EventDetail: React.FC = () => {
                     multiline={true}
                     autoCapitalize="none"
                     style={tailwind(
-                      'border border-green-400 bg-white rounded border-blue-500 p-2 h-24',
+                      'border border-green-400 mb-4 bg-white rounded border-blue-500 p-2 h-24',
                     )}
                   />
                 )}
