@@ -371,12 +371,6 @@ const EventDetail: React.FC = () => {
             )}
             <Div m={16}>
               {joiningUsers && (
-                // <UserCollapse
-                //   title="参加者一覧"
-                //   displayCount={true}
-                //   users={joiningUsers}
-                //   bgColor="teal500"
-                // />
                 <>
                   <Div
                     borderBottomWidth={1}
@@ -391,27 +385,38 @@ const EventDetail: React.FC = () => {
                       {joiningUsers.length || 0}名
                     </Text>
                   </Div>
-                  {joiningUsers.map(u => (
-                    <Div
-                      borderBottomWidth={0.5}
-                      borderBottomColor="gray400"
-                      style={tailwind('flex-row items-center')}>
-                      <Image
-                        mt={'lg'}
-                        h={windowWidth * 0.1}
-                        w={windowWidth * 0.1}
-                        source={
-                          u.avatarUrl
-                            ? {uri: u.avatarUrl}
-                            : require('../../../../assets/no-image-avatar.png')
-                        }
-                        rounded="circle"
-                        mb={'lg'}
-                        mr={16}
-                      />
-                      <Text>{u.lastName + ' ' + u.firstName}</Text>
-                    </Div>
-                  ))}
+                  <Div
+                    flexDir="row"
+                    justifyContent="space-between"
+                    alignItems="center"
+                    flexWrap="wrap">
+                    {joiningUsers.map(u => (
+                      <Div
+                        bg="white"
+                        flexDir="row"
+                        alignItems="center"
+                        rounded="sm"
+                        w="45%"
+                        borderWidth={1}
+                        borderColor="gray400"
+                        mx={8}
+                        my={4}>
+                        <Image
+                          my={'lg'}
+                          mx={16}
+                          h={windowWidth * 0.1}
+                          w={windowWidth * 0.1}
+                          source={
+                            u.avatarUrl
+                              ? {uri: u.avatarUrl}
+                              : require('../../../../assets/no-image-avatar.png')
+                          }
+                          rounded="circle"
+                        />
+                        <Text>{u.lastName + ' ' + u.firstName}</Text>
+                      </Div>
+                    ))}
+                  </Div>
                 </>
               )}
             </Div>
