@@ -9,7 +9,6 @@ import HeaderWithTextButton from '../../../components/Header';
 import WholeContainer from '../../../components/WholeContainer';
 import {useAPIGetRooms} from '../../../hooks/api/chat/useAPIGetRoomsByPage';
 import {useAPISaveChatGroup} from '../../../hooks/api/chat/useAPISaveChatGroup';
-import {roomListStyles} from '../../../styles/screen/chat/roomList.style';
 import {ChatGroup} from '../../../types';
 import {
   RoomListNavigationProps,
