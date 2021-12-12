@@ -261,6 +261,8 @@ export interface ChatGroup {
   id: number;
   name: string;
   imageURL: string;
+  pinnedUsers?: User[];
+  isPinned?: boolean;
   chatNotes?: ChatNote[];
   chatMessages?: ChatMessage[];
   members?: User[];
