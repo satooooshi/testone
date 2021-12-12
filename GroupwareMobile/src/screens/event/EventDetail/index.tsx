@@ -15,6 +15,8 @@ import {
   Overlay,
   ScrollDiv,
   Image,
+  Modal,
+  Icon,
 } from 'react-native-magnus';
 import FastImage from 'react-native-fast-image';
 import {eventDetailStyles} from '../../../styles/screen/event/eventDetail.style';
@@ -51,6 +53,8 @@ const EventDetail: React.FC = () => {
   const route = useRoute<EventDetailRouteProps>();
   const {user} = useAuthenticate();
   const navigation = useNavigation();
+
+  const [joiningUserVisiable, setJoiningUserVisiable] = useState(false);
 
   const {id} = route.params;
   const {
@@ -352,6 +356,66 @@ const EventDetail: React.FC = () => {
         onCloseModal={() => setEventFormModal(false)}
         onSubmit={event => saveEvent({...event, id: eventInfo?.id})}
       />
+      <Modal isVisible={joiningUserVisiable}>
+        <Text fontSize={16} ml={24} mt={16}>
+          参加者一覧 : {joiningUsers?.length}名
+        </Text>
+        <Button
+          bg="gray400"
+          h={35}
+          w={35}
+          position="absolute"
+          top={50}
+          right={15}
+          rounded="circle"
+          onPress={() => {
+            setJoiningUserVisiable(false);
+          }}>
+          <Icon color="black900" name="close" />
+        </Button>
+        <Div my={16} mx={12}>
+          <ScrollDiv>
+            <Div
+              flexDir="row"
+              justifyContent="space-between"
+              alignItems="center"
+              flexWrap="wrap">
+              {joiningUsers?.map(u => {
+                return (
+                  <Div
+                    bg="white"
+                    flexDir="row"
+                    flexWrap="wrap"
+                    rounded="sm"
+                    alignItems="center"
+                    w="45%"
+                    borderWidth={1}
+                    borderColor="gray400"
+                    mx={8}
+                    my={4}>
+                    <Div pl={16} alignItems="center" flex={2}>
+                      <Image
+                        my={'lg'}
+                        h={windowWidth * 0.09}
+                        w={windowWidth * 0.09}
+                        source={
+                          u.avatarUrl
+                            ? {uri: u.avatarUrl}
+                            : require('../../../../assets/no-image-avatar.png')
+                        }
+                        rounded="circle"
+                      />
+                    </Div>
+                    <Div alignItems="center" flex={5}>
+                      <Text>{u.lastName + ' ' + u.firstName}</Text>
+                    </Div>
+                  </Div>
+                );
+              })}
+            </Div>
+          </ScrollDiv>
+        </Div>
+      </Modal>
       <ScrollDiv>
         {eventInfo && (
           <Div flexDir="column">
@@ -389,32 +453,56 @@ const EventDetail: React.FC = () => {
                     justifyContent="space-between"
                     alignItems="center"
                     flexWrap="wrap">
-                    {joiningUsers.map(u => (
-                      <Div
-                        bg="white"
-                        flexDir="row"
-                        alignItems="center"
-                        rounded="sm"
-                        w="45%"
-                        borderWidth={1}
-                        borderColor="gray400"
-                        mx={8}
-                        my={4}>
-                        <Image
-                          my={'lg'}
-                          mx={16}
-                          h={windowWidth * 0.1}
-                          w={windowWidth * 0.1}
-                          source={
-                            u.avatarUrl
-                              ? {uri: u.avatarUrl}
-                              : require('../../../../assets/no-image-avatar.png')
-                          }
-                          rounded="circle"
-                        />
-                        <Text>{u.lastName + ' ' + u.firstName}</Text>
-                      </Div>
-                    ))}
+                    {joiningUsers.map((u, index) => {
+                      if (index > 6) {
+                        return;
+                      } else if (index === 6) {
+                        return (
+                          <Div
+                            flexDir="row"
+                            alignItems="center"
+                            rounded="sm"
+                            w="45%"
+                            mx={8}
+                            my={4}>
+                            <Button
+                              block
+                              m={10}
+                              fontSize={12}
+                              onPress={() => setJoiningUserVisiable(true)}>
+                              参加者を一覧表示
+                            </Button>
+                          </Div>
+                        );
+                      } else {
+                        return (
+                          <Div
+                            bg="white"
+                            flexDir="row"
+                            alignItems="center"
+                            rounded="sm"
+                            w="45%"
+                            borderWidth={1}
+                            borderColor="gray400"
+                            mx={8}
+                            my={4}>
+                            <Image
+                              my={'lg'}
+                              mx={16}
+                              h={windowWidth * 0.09}
+                              w={windowWidth * 0.09}
+                              source={
+                                u.avatarUrl
+                                  ? {uri: u.avatarUrl}
+                                  : require('../../../../assets/no-image-avatar.png')
+                              }
+                              rounded="circle"
+                            />
+                            <Text>{u.lastName + ' ' + u.firstName}</Text>
+                          </Div>
+                        );
+                      }
+                    })}
                   </Div>
                 </>
               )}
