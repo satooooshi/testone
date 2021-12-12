@@ -30,7 +30,9 @@ const RoomList: React.FC = () => {
     },
     {
       refetchInterval: 3000,
-      onSuccess: data => setRoomsForInfiniteScroll(data.rooms),
+      onSuccess: data => {
+        stateUpdateNeeeded(data.rooms);
+      },
     },
   );
 
@@ -62,6 +64,23 @@ const RoomList: React.FC = () => {
       Number(page + 1) <= Number(chatRooms?.pageCount)
     ) {
       setPage(p => (Number(p) + 1).toString());
+    }
+  };
+
+  const stateUpdateNeeeded = (newData: ChatGroup[]) => {
+    let updateNeeded = false;
+    if (roomsForInfiniteScroll.length !== chatRooms?.rooms?.length) {
+      updateNeeded = true;
+    }
+    if (roomsForInfiniteScroll.length || chatRooms?.rooms?.length) {
+      for (let i = 0; i < roomsForInfiniteScroll.length; i++) {
+        if (roomsForInfiniteScroll[0].id !== chatRooms?.rooms[0].id) {
+          updateNeeded = true;
+        }
+      }
+    }
+    if (updateNeeded) {
+      setRoomsForInfiniteScroll(newData);
     }
   };
 

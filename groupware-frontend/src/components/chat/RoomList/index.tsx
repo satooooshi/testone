@@ -47,6 +47,24 @@ const RoomList: React.FC<RoomListProps> = ({
       }
     }
   };
+
+  const stateUpdateNeeeded = (newData: ChatGroup[]) => {
+    let updateNeeded = false;
+    if (roomsForInfiniteScroll.length !== chatRooms?.rooms?.length) {
+      updateNeeded = true;
+    }
+    if (roomsForInfiniteScroll.length || chatRooms?.rooms?.length) {
+      for (let i = 0; i < roomsForInfiniteScroll.length; i++) {
+        if (roomsForInfiniteScroll[0].id !== chatRooms?.rooms[0].id) {
+          updateNeeded = true;
+        }
+      }
+    }
+    if (updateNeeded) {
+      setRoomsForInfiniteScroll(newData);
+    }
+  };
+
   useAPIGetRoomsByPage(
     {
       page: '1',
@@ -55,7 +73,7 @@ const RoomList: React.FC<RoomListProps> = ({
     {
       refetchInterval: 3000,
       onSuccess: (data) => {
-        setRoomsForInfiniteScroll(data.rooms);
+        stateUpdateNeeeded(data.rooms);
       },
     },
   );
