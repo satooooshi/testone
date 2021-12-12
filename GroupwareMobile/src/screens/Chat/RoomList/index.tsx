@@ -69,12 +69,15 @@ const RoomList: React.FC = () => {
 
   const stateUpdateNeeeded = (newData: ChatGroup[]) => {
     let updateNeeded = false;
-    if (roomsForInfiniteScroll.length !== chatRooms?.rooms?.length) {
+    if (roomsForInfiniteScroll.length !== newData?.length) {
       updateNeeded = true;
     }
-    if (roomsForInfiniteScroll.length || chatRooms?.rooms?.length) {
+    if (roomsForInfiniteScroll.length || newData?.length) {
       for (let i = 0; i < roomsForInfiniteScroll.length; i++) {
-        if (roomsForInfiniteScroll[0].id !== chatRooms?.rooms[0].id) {
+        if (updateNeeded) {
+          break;
+        }
+        if (roomsForInfiniteScroll[i]?.id !== newData[i]?.id) {
           updateNeeded = true;
         }
       }
