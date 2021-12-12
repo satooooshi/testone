@@ -347,3 +347,11 @@ export interface TopNews {
   createdAt: Date;
   updatedAt: Date;
 }
+
+export interface NotificationDevice {
+  id: number;
+  token: string;
+  user?: Partial<User>;
+  createdAt: Date;
+  updatedAt: Date;
+}

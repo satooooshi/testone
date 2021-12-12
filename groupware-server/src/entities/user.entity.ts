@@ -1,4 +1,9 @@
 import {
+  AfterInsert,
+  AfterLoad,
+  AfterUpdate,
+  BeforeInsert,
+  BeforeUpdate,
   Column,
   CreateDateColumn,
   DeleteDateColumn,
@@ -24,6 +29,8 @@ import { UserTag } from './userTag.entity';
 import { UserJoiningEvent } from './userJoiningEvent.entity';
 import { ChatMessageReaction } from './chatMessageReaction.entity';
 import { NotificationDevice } from './device.entity';
+import { genSignedURL } from 'src/utils/storage/genSignedURL';
+import { genStorageURL } from 'src/utils/storage/genStorageURL';
 
 export enum UserRole {
   ADMIN = 'admin',
@@ -267,4 +274,17 @@ export class User {
   questionCount?: number;
   answerCount?: number;
   knowledgeCount?: number;
+
+  @BeforeInsert()
+  @BeforeUpdate()
+  changeToStorageURL?() {
+    this.avatarUrl = genStorageURL(this.avatarUrl);
+  }
+
+  @AfterInsert()
+  @AfterLoad()
+  @AfterUpdate()
+  async changeToSignedURL?() {
+    this.avatarUrl = await genSignedURL(this.avatarUrl);
+  }
 }

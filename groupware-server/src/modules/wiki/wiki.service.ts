@@ -22,112 +22,6 @@ export class WikiService {
     private readonly storageService: StorageService,
   ) {}
 
-  public async generateSignedStorageURLsFromWikiObj(wiki: Wiki): Promise<Wiki> {
-    if (wiki?.body) {
-      wiki.body = await this.storageService.parseStorageURLToSignedURL(
-        wiki.body,
-      );
-    }
-    if (wiki?.writer) {
-      wiki.writer.avatarUrl =
-        await this.storageService.parseStorageURLToSignedURL(
-          wiki.writer.avatarUrl,
-        );
-    }
-    if (wiki?.answers) {
-      const parsedAnswers: QAAnswer[] = [];
-      for (const a of wiki.answers) {
-        const parsedAvatar =
-          await this.storageService.parseStorageURLToSignedURL(
-            a.writer?.avatarUrl || '',
-          );
-        const parsedAnswerBody =
-          await this.storageService.parseStorageURLToSignedURL(a.body);
-        const parsedReplies: QAAnswerReply[] = [];
-        if (a?.replies && a.replies.length) {
-          for (const r of a.replies) {
-            const parsedReplyAvatar =
-              await this.storageService.parseStorageURLToSignedURL(
-                r.writer?.avatarUrl || '',
-              );
-            const parsedReplyBody =
-              await this.storageService.parseStorageURLToSignedURL(r.body);
-            const replyObj: QAAnswerReply = {
-              ...r,
-              body: parsedReplyBody,
-              writer: { ...r.writer, avatarUrl: parsedReplyAvatar },
-            };
-            parsedReplies.push(replyObj);
-          }
-        }
-        parsedAnswers.push({
-          ...a,
-          body: parsedAnswerBody,
-          writer: { ...a.writer, avatarUrl: parsedAvatar },
-          replies: parsedReplies,
-        });
-      }
-      wiki.answers = parsedAnswers;
-    }
-    return wiki;
-  }
-
-  public async generateSignedStorageURLsFromWikiArr(
-    wiki: Wiki[],
-  ): Promise<Wiki[]> {
-    const parsedWiki = [];
-    for (const w of wiki) {
-      const parsed = await this.generateSignedStorageURLsFromWikiObj(w);
-      parsedWiki.push(parsed);
-    }
-
-    return parsedWiki;
-  }
-
-  public async generateSignedStorageURLsFromQAAnswerObj(
-    answer: QAAnswer,
-  ): Promise<QAAnswer> {
-    if (answer?.body) {
-      answer.body = await this.storageService.parseStorageURLToSignedURL(
-        answer.body,
-      );
-    }
-    if (answer?.writer) {
-      answer.writer.avatarUrl =
-        await this.storageService.parseStorageURLToSignedURL(
-          answer.writer.avatarUrl,
-        );
-    }
-    if (answer?.wiki) {
-      answer.wiki.body = await this.storageService.parseStorageURLToSignedURL(
-        answer.wiki.body,
-      );
-      answer.wiki.writer.avatarUrl =
-        await this.storageService.parseStorageURLToSignedURL(
-          answer.wiki.writer.avatarUrl,
-        );
-    }
-    const parsedReplies: QAAnswerReply[] = [];
-    if (answer?.replies && answer.replies.length) {
-      for (const r of answer.replies) {
-        const parsedReplyBody =
-          await this.storageService.parseStorageURLToSignedURL(r.body);
-        const parsedReplyAvatar =
-          await this.storageService.parseStorageURLToSignedURL(
-            r.writer?.avatarUrl || '',
-          );
-        const replyObj: QAAnswerReply = {
-          ...r,
-          body: parsedReplyBody,
-          writer: { ...r.writer, avatarUrl: parsedReplyAvatar },
-        };
-        parsedReplies.push(replyObj);
-      }
-      answer.replies = parsedReplies;
-    }
-    return answer;
-  }
-
   public async getWikiList(
     query: SearchQueryToGetWiki,
   ): Promise<SearchResultToGetWiki> {
@@ -190,17 +84,13 @@ export class WikiService {
       .getManyAndCount();
     const pageCount =
       count % limit === 0 ? count / limit : Math.floor(count / limit) + 1;
-    const urlParsedWiki = await this.generateSignedStorageURLsFromWikiArr(
-      wikiWithRelation,
-    );
-    return { pageCount, wiki: urlParsedWiki };
+    return { pageCount, wiki: wikiWithRelation };
   }
 
   public async saveWiki(wiki: Partial<Wiki>): Promise<Wiki> {
     try {
       wiki.body = this.storageService.parseSignedURLToStorageURL(wiki.body);
-      let newWiki = await this.wikiRepository.save(wiki);
-      newWiki = await this.generateSignedStorageURLsFromWikiObj(newWiki);
+      const newWiki = await this.wikiRepository.save(wiki);
       return newWiki;
     } catch (err) {
       console.log(err);
@@ -246,8 +136,7 @@ export class WikiService {
       order: { createdAt: 'DESC' },
       take: limit,
     });
-    const parsedWiki = this.generateSignedStorageURLsFromWikiArr(filteredWikis);
-    return parsedWiki;
+    return filteredWikis;
   }
 
   public async createAnswerReply(
@@ -285,10 +174,7 @@ export class WikiService {
       .where('wiki.id = :id', { id })
       .orderBy({ 'answer.created_at': 'ASC', 'reply.created_at': 'ASC' })
       .getOne();
-    const parsedWiki = await this.generateSignedStorageURLsFromWikiObj(
-      existWiki,
-    );
-    return parsedWiki;
+    return existWiki;
   }
 
   public async getAnswerDetail(id: number): Promise<QAAnswer> {
@@ -305,9 +191,6 @@ export class WikiService {
       .where('answer.id = :id', { id })
       .orderBy({ 'reply.created_at': 'ASC' })
       .getOne();
-    const parsedAnswer = await this.generateSignedStorageURLsFromQAAnswerObj(
-      existAnswer,
-    );
-    return parsedAnswer;
+    return existAnswer;
   }
 }

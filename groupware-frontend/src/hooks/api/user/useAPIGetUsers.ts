@@ -1,4 +1,5 @@
-import { useQuery } from 'react-query';
+import { AxiosError } from 'axios';
+import { useQuery, UseQueryOptions } from 'react-query';
 import { User } from 'src/types';
 import { axiosInstance } from 'src/utils/url';
 import { getUsersURL } from 'src/utils/url/user.url';
@@ -8,6 +9,8 @@ const getUsers = async (): Promise<User[]> => {
   return res.data;
 };
 
-export const useAPIGetUsers = () => {
-  return useQuery('getUsers', getUsers);
+export const useAPIGetUsers = (
+  useQueryOptions?: UseQueryOptions<User[], AxiosError>,
+) => {
+  return useQuery('getUsers', getUsers, useQueryOptions);
 };

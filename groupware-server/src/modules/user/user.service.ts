@@ -18,7 +18,6 @@ import { SearchQueryToGetUsers } from './user.controller';
 import { Tag, TagType } from 'src/entities/tag.entity';
 import { StorageService } from '../storage/storage.service';
 import { DateTime } from 'luxon';
-import { userNameFactory } from 'src/utils/factory/userNameFactory';
 
 @Injectable()
 export class UserService {
@@ -182,26 +181,6 @@ export class UserService {
 
     const csvData = csvParser.parse(tagModified);
     return csvData;
-  }
-
-  public async generateSignedStorageURLsFromUserObj(user: User): Promise<User> {
-    if (user.avatarUrl) {
-      user.avatarUrl = await this.storageService.parseStorageURLToSignedURL(
-        user.avatarUrl,
-      );
-    }
-    return user;
-  }
-
-  public async generateSignedStorageURLsFromUserArr(
-    users: User[],
-  ): Promise<User[]> {
-    const parsedUsers: User[] = [];
-    for (const u of users) {
-      const parsed = await this.generateSignedStorageURLsFromUserObj(u);
-      parsedUsers.push(parsed);
-    }
-    return parsedUsers;
   }
 
   async search(query: SearchQueryToGetUsers) {
@@ -408,10 +387,7 @@ export class UserService {
     });
     const pageCount =
       count % limit === 0 ? count / limit : Math.floor(count / limit) + 1;
-    const urlParsedUsers = await this.generateSignedStorageURLsFromUserArr(
-      usersArrWithEachCount,
-    );
-    return { users: urlParsedUsers, pageCount };
+    return { users: usersArrWithEachCount, pageCount };
   }
 
   async getProfile(id: number): Promise<User> {
@@ -419,14 +395,12 @@ export class UserService {
       relations: ['tags'],
       where: { id },
     });
-    const urlParsedUser = await this.generateSignedStorageURLsFromUserObj(user);
-    return urlParsedUser;
+    return user;
   }
 
   async getUsers(): Promise<User[]> {
     const users = await this.userRepository.find();
-    const urlParsedUsers = this.generateSignedStorageURLsFromUserArr(users);
-    return urlParsedUsers;
+    return users;
   }
 
   async getById(id: number) {
@@ -437,14 +411,12 @@ export class UserService {
     if (!user.verifiedAt) {
       throw new BadRequestException('The user is not verified');
     }
-    const urlParsedUser = await this.generateSignedStorageURLsFromUserObj(user);
-    return urlParsedUser;
+    return user;
   }
 
   async getByIdArr(ids: number[]): Promise<User[]> {
     const user = await this.userRepository.findByIds(ids);
-    const urlParsedUser = await this.generateSignedStorageURLsFromUserArr(user);
-    return urlParsedUser;
+    return user;
   }
 
   async getAllInfoById(id: number): Promise<User> {
@@ -458,8 +430,7 @@ export class UserService {
     if (!user?.verifiedAt) {
       throw new BadRequestException('The user is not verified');
     }
-    const urlParsedUser = await this.generateSignedStorageURLsFromUserObj(user);
-    return urlParsedUser;
+    return user;
   }
 
   async getByEmail(email: string, passwordSelect?: boolean) {
@@ -492,7 +463,6 @@ export class UserService {
         where: { email },
       });
     }
-    user = await this.generateSignedStorageURLsFromUserObj(user);
     if (user) {
       return user;
     }
@@ -507,10 +477,7 @@ export class UserService {
     }
     const newUser = this.userRepository.create(userData);
     await this.userRepository.save(newUser);
-    const urlParsedUser = await this.generateSignedStorageURLsFromUserObj(
-      newUser,
-    );
-    return urlParsedUser;
+    return newUser;
   }
 
   async registerUsers(userData: User[]) {
@@ -520,10 +487,7 @@ export class UserService {
       usersArr.push({ ...u, password: hashedPassword, verifiedAt: new Date() });
     }
     const newUsers = await this.userRepository.save(usersArr);
-    const urlParsedUser = await this.generateSignedStorageURLsFromUserArr(
-      newUsers,
-    );
-    return urlParsedUser;
+    return newUsers;
   }
 
   async saveUser(newUserProfile: Partial<User>): Promise<User> {
@@ -541,11 +505,7 @@ export class UserService {
       ...newUserProfile,
       avatarUrl: parsedAvatarURL,
     };
-    const updatedUser = await this.userRepository.save(newUserObj);
-    const urlParsedUser = await this.generateSignedStorageURLsFromUserObj(
-      updatedUser,
-    );
-    return urlParsedUser;
+    return newUserObj;
   }
 
   async updatePassword(

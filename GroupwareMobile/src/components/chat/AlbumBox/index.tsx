@@ -1,15 +1,20 @@
 import React from 'react';
 import {TouchableHighlight, useWindowDimensions} from 'react-native';
-import {Div, Image, Text} from 'react-native-magnus';
+import {Button, Div, Icon, Image, Text} from 'react-native-magnus';
 import {ChatAlbum} from '../../../types';
 import {darkFontColor} from '../../../utils/colors';
 
 type AlbumBoxProps = {
   onPress: () => void;
+  onPressDeleteButton: () => void;
   album: ChatAlbum;
 };
 
-const AlbumBox: React.FC<AlbumBoxProps> = ({onPress, album}) => {
+const AlbumBox: React.FC<AlbumBoxProps> = ({
+  onPress,
+  album,
+  onPressDeleteButton,
+}) => {
   const {width: windowWidth} = useWindowDimensions();
 
   return (
@@ -34,12 +39,25 @@ const AlbumBox: React.FC<AlbumBoxProps> = ({onPress, album}) => {
               />
             )}
           </Div>
-          <Text fontWeight={'bold'} fontSize={18} mb="sm">
-            {album.title}
-          </Text>
-          <Text fontSize={14} color={darkFontColor}>
-            {album.images?.length || '0'}
-          </Text>
+          <Div flexDir="row" justifyContent="space-between">
+            <Div maxW="80%">
+              <Text fontWeight={'bold'} fontSize={18} mb="sm">
+                {album.title}
+              </Text>
+              <Text fontSize={14} color={darkFontColor}>
+                {album.images?.length || '0'}
+              </Text>
+            </Div>
+            <Button
+              bg="white"
+              borderColor="red"
+              borderWidth={1}
+              rounded="circle"
+              onPress={onPressDeleteButton}
+              mr="sm">
+              <Icon name="delete" fontSize={20} color="red" />
+            </Button>
+          </Div>
         </Div>
       </Div>
     </TouchableHighlight>

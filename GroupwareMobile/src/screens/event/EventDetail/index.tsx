@@ -310,6 +310,7 @@ const EventDetail: React.FC = () => {
           <FlatList
             horizontal
             data={eventInfo.tags}
+            keyExtractor={item => item.id.toString()}
             renderItem={({item: t}) => (
               <Button
                 fontSize={'xs'}

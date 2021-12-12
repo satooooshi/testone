@@ -1,54 +1,20 @@
 import { SidebarScreenName } from '@/components/layout/Sidebar';
-import chatStyles from '@/styles/layouts/Chat.module.scss';
 import { useState } from 'react';
-import { useAPIGetUsers } from '@/hooks/api/user/useAPIGetUsers';
-import { useAPIGetChatGroupList } from '@/hooks/api/chat/useAPIGetChatGroupList';
 import CreateChatGroupModal from '@/components/chat/CreateChatGroupModal';
-import { useMediaQuery, useToast } from '@chakra-ui/react';
+import { Box, Text, useMediaQuery } from '@chakra-ui/react';
 import '@draft-js-plugins/mention/lib/plugin.css';
 import '@draft-js-plugins/image/lib/plugin.css';
-import ChatGroupCard from '@/components/chat/ChatGroupCard';
 import LayoutWithTab from '@/components/layout/LayoutWithTab';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import selectChatGroupModalStyles from '@/styles/components/SelectChatGroupModal.module.scss';
-import { useAPISaveChatGroup } from '@/hooks/api/chat/useAPISaveChatGroup';
-import { useAPIUploadStorage } from '@/hooks/api/storage/useAPIUploadStorage';
-import { responseErrorMsgFactory } from 'src/utils/factory/responseErrorMsgFactory';
+import { darkFontColor } from 'src/utils/colors';
+import RoomList from '@/components/chat/RoomList';
 
 const Chat = () => {
   const router = useRouter();
-  const toast = useToast();
-  const { data: chatGroups, refetch } = useAPIGetChatGroupList();
-  const { data: users } = useAPIGetUsers();
+  const [isLargerTahn1024] = useMediaQuery('(min-width: 1024px)');
   const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
   const [createGroupWindow, setCreateGroupWindow] = useState(false);
-  const [resetFormTrigger, setResetFormTrigger] = useState(false);
-  const [groupImageURL, setGroupImageURL] = useState('');
-
-  const { mutate: createGroup } = useAPISaveChatGroup({
-    onSuccess: (data) => {
-      setCreateGroupWindow(false);
-      setResetFormTrigger(true);
-      groupImageURL && setGroupImageURL('');
-      refetch();
-      toast({
-        description: 'チャットルームの作成が完了しました。',
-        status: 'success',
-        duration: 3000,
-        isClosable: true,
-      });
-      router.push(`/chat/${data.id.toString()}`, undefined, {
-        shallow: true,
-      });
-    },
-  });
-
-  const { mutate: uploadImage } = useAPIUploadStorage({
-    onSuccess: async (fileURLs) => {
-      setGroupImageURL(fileURLs[0]);
-    },
-  });
 
   return (
     <LayoutWithTab
@@ -61,75 +27,64 @@ const Chat = () => {
       <Head>
         <title>ボールド | Chat</title>
       </Head>
-      {users && (
-        <CreateChatGroupModal
-          isOpen={createGroupWindow}
-          users={users}
-          resetFormTrigger={resetFormTrigger}
-          groupImageURL={groupImageURL}
-          setResetFormTrigger={setResetFormTrigger}
-          closeModal={() => {
-            setCreateGroupWindow(false);
-          }}
-          createGroup={(g) => createGroup({ ...g, imageURL: groupImageURL })}
-          uploadImage={(r) => uploadImage(r)}
-        />
-      )}
-      {chatGroups && isSmallerThan768 ? (
+      <CreateChatGroupModal
+        isOpen={createGroupWindow}
+        closeModal={() => {
+          setCreateGroupWindow(false);
+        }}
+      />
+      {isSmallerThan768 ? (
         <>
-          <div className={selectChatGroupModalStyles.title_wrapper}>
-            <p className={selectChatGroupModalStyles.title}>ルームを選択</p>
-          </div>
-          <div className={chatStyles.groups_responsive}>
-            {chatGroups.map((g) => (
-              <a
-                key={g.id}
-                style={{ marginBottom: 8 }}
-                onClick={() =>
-                  router.push(`/chat/${g.id.toString()}`, undefined, {
-                    shallow: true,
-                  })
-                }>
-                <ChatGroupCard chatGroup={g} key={g.id} />
-              </a>
-            ))}
-          </div>
+          <Box alignSelf="center">
+            <Text fontWeight="bold" color={darkFontColor} fontSize="14px">
+              ルームを選択
+            </Text>
+          </Box>
+          <Box w={'85%'}>
+            <RoomList
+              onClickRoom={(g) => {
+                router.push(`/chat/${g.id.toString()}`, undefined, {
+                  shallow: true,
+                });
+              }}
+            />
+          </Box>
         </>
       ) : null}
       {!isSmallerThan768 && (
-        <div className={chatStyles.main}>
-          {chatGroups && chatGroups.length ? (
-            <>
-              <div className={chatStyles.groups}>
-                {chatGroups ? (
-                  chatGroups.map((g) => (
-                    <a
-                      onClick={() =>
-                        router.push(`/chat/${g.id.toString()}`, undefined, {
-                          shallow: true,
-                        })
-                      }
-                      key={g.id}
-                      style={{ marginBottom: 8 }}>
-                      <ChatGroupCard chatGroup={g} key={g.id} />
-                    </a>
-                  ))
-                ) : (
-                  <p>ルームを作成するか、招待をお待ちください</p>
-                )}
-              </div>
-              <div className={chatStyles.empty_group_window}>
-                <p className={chatStyles.empty_group_message}>
-                  ルームを選択してください
-                </p>
-              </div>
-            </>
-          ) : (
-            <p className={chatStyles.empty_group_message}>
-              ルームを作成するか、招待をお待ちください
-            </p>
-          )}
-        </div>
+        <Box
+          w="100%"
+          display="flex"
+          flexDir="row"
+          h="83vh"
+          justifyContent="center">
+          <>
+            <Box w={isLargerTahn1024 ? '30%' : '40%'}>
+              <RoomList
+                onClickRoom={(g) => {
+                  router.push(`/chat/${g.id.toString()}`, undefined, {
+                    shallow: true,
+                  });
+                }}
+              />
+            </Box>
+
+            <Box
+              w="60vw"
+              h="100%"
+              display="flex"
+              flexDir="row"
+              justifyContent="center"
+              alignItems="center"
+              boxShadow="md"
+              bg="white"
+              borderRadius="md">
+              <Text position="absolute" top="auto" bottom="auto">
+                ルームを選択してください
+              </Text>
+            </Box>
+          </>
+        </Box>
       )}
     </LayoutWithTab>
   );

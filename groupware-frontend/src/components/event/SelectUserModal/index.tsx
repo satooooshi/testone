@@ -2,15 +2,18 @@ import React, { useState } from 'react';
 import ReactModal from 'react-modal';
 import { User, UserRole } from 'src/types';
 import selectUserModalStyles from '@/styles/components/SelectUserModal.module.scss';
-import clsx from 'clsx';
 import {
   Avatar,
+  Box,
   Button,
   FormControl,
   FormLabel,
+  Link,
   Select,
+  Text,
 } from '@chakra-ui/react';
 import { userRoleNameFactory } from 'src/utils/factory/userRoleNameFactory';
+import { darkFontColor } from 'src/utils/colors';
 
 type SelectUserModalProps = {
   isOpen: boolean;
@@ -31,23 +34,26 @@ const SelectableUser: React.FC<SelectableUserProps> = ({
   selectedUsers,
   toggleUser,
 }) => (
-  <a
+  <Link
+    display="flex"
+    flexDir="row"
+    borderBottom={'1px'}
+    py="8px"
+    alignItems="center"
+    justifyContent="space-between"
     onClick={() => toggleUser(user)}
-    className={clsx(
-      selectUserModalStyles.user_card,
-      selectedUsers.filter((s) => s.id === user.id).length &&
-        selectUserModalStyles.selected_member,
-    )}>
-    <div className={selectUserModalStyles.user_card_left}>
-      <Avatar
-        src={user.avatarUrl}
-        className={selectUserModalStyles.user_card_avatar}
-      />
-      <p className={selectUserModalStyles.user_card_name}>
+    bg={
+      selectedUsers.filter((s) => s.id === user.id).length
+        ? '#f4f3f3'
+        : undefined
+    }>
+    <Box display="flex" flexDir="row" alignItems="center">
+      <Avatar src={user.avatarUrl} w="40px" h="40px" mr="16px" />
+      <Text fontSize={darkFontColor}>
         {user.lastName + ' ' + user.firstName}
-      </p>
-    </div>
-  </a>
+      </Text>
+    </Box>
+  </Link>
 );
 
 const SelectUserModal: React.FC<SelectUserModalProps> = ({
@@ -84,7 +90,7 @@ const SelectUserModal: React.FC<SelectUserModalProps> = ({
           <option value={UserRole.COMMON}>一般社員</option>
         </Select>
       </FormControl>
-      <div className={selectUserModalStyles.users}>
+      <Box display="flex" flexDir="column" mb="16px" h="80%" overflow="scroll">
         {selectedRole !== 'all'
           ? users
               .filter((u) => u.role === selectedRole)
@@ -104,7 +110,7 @@ const SelectUserModal: React.FC<SelectUserModalProps> = ({
                 toggleUser={toggleUser}
               />
             ))}
-      </div>
+      </Box>
       <div className={selectUserModalStyles.modal_bottom_buttons}>
         <Button
           size="md"

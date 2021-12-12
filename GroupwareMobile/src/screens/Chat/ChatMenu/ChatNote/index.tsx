@@ -1,6 +1,6 @@
 import {useNavigation, useRoute} from '@react-navigation/native';
 import React, {useEffect, useState} from 'react';
-import {FlatList} from 'react-native';
+import {Alert, FlatList} from 'react-native';
 import {Button, Div, Icon, Text} from 'react-native-magnus';
 import tailwind from 'tailwind-rn';
 import ChatNoteCard from '../../../../components/chat/Note/ChatNoteCard';
@@ -13,18 +13,20 @@ import {
 } from '../../../../types/navigator/drawerScreenProps';
 import ImageView from 'react-native-image-viewing';
 import {useAPIGetChatNotes} from '../../../../hooks/api/chat/note/useAPIGetNotes';
+import {useAPIDeleteChatNote} from '../../../../hooks/api/chat/note/useAPIDeleteChatNote';
 
 const ChatNotes: React.FC = () => {
   const navigation = useNavigation<ChatNotesNavigationProps>();
   const {room} = useRoute<ChatRouteProps>().params;
   const [page, setPage] = useState<string>('1');
-  const {data} = useAPIGetChatNotes({
+  const {data, refetch} = useAPIGetChatNotes({
     roomId: room.id.toString(),
     page,
   });
   const [notesForInfiniteScroll, setNotesForInfiniteScroll] = useState<
     ChatNote[]
   >([]);
+  const {mutate: deleteNote} = useAPIDeleteChatNote();
   const [imageModal, setImageModal] = useState(false);
   const [images, setImages] = useState<ImageSource[]>([]);
   const [nowImageIndex, setNowImageIndex] = useState<number>(0);
@@ -73,7 +75,7 @@ const ChatNotes: React.FC = () => {
         swipeToCloseEnabled={false}
         doubleTapToZoomEnabled={true}
       />
-      <HeaderWithTextButton title="メニュー" />
+      <HeaderWithTextButton enableBackButton={true} title="ノート" />
       <Button
         bg="purple600"
         position="absolute"
@@ -110,13 +112,39 @@ const ChatNotes: React.FC = () => {
                   params: {room, note: item},
                 })
               }
+              onPressDeleteButton={() => {
+                Alert.alert('ノートを削除してよろしいですか？', undefined, [
+                  {
+                    text: 'キャンセル',
+                    style: 'cancel',
+                  },
+                  {
+                    text: '削除',
+                    style: 'destructive',
+                    onPress: () => {
+                      deleteNote(
+                        {
+                          roomId: room.id.toString(),
+                          noteId: item.id.toString(),
+                        },
+                        {
+                          onSuccess: () => {
+                            setPage('1');
+                            refetch();
+                          },
+                        },
+                      );
+                    },
+                  },
+                ]);
+              }}
               onPressImage={handlePressImage}
             />
           )}
         />
       ) : (
-        <Div bg="white">
-          <Text>まだノートが投稿されていません</Text>
+        <Div p={'sm'}>
+          <Text fontSize={16}>まだノートが投稿されていません</Text>
         </Div>
       )}
     </WholeContainer>

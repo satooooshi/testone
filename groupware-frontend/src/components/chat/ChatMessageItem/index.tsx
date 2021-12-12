@@ -1,58 +1,244 @@
-import { Link } from '@chakra-ui/react';
-import clsx from 'clsx';
-import React, { useCallback } from 'react';
+import {
+  Box,
+  Button,
+  Image,
+  Link,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalHeader,
+  ModalOverlay,
+  Text,
+} from '@chakra-ui/react';
+import React from 'react';
 import { AiOutlineFileProtect } from 'react-icons/ai';
 import { Avatar } from '@chakra-ui/react';
-import { ChatMessage, ChatMessageType, LastReadChatTime } from 'src/types';
+import {
+  ChatMessage,
+  ChatMessageReaction,
+  ChatMessageType,
+  User,
+} from 'src/types';
 import { dateTimeFormatterFromJSDDate } from 'src/utils/dateTimeFormatter';
 import { userNameFactory } from 'src/utils/factory/userNameFactory';
 import { mentionTransform } from 'src/utils/mentionTransform';
-import chatMessageItemStyles from '@/styles/components/chat/ChatMessageItem.module.scss';
 import boldMascot from '@/public/bold-mascot.png';
+import { darkFontColor } from 'src/utils/colors';
+import { Menu, MenuItem, MenuButton } from '@szhsin/react-menu';
+import { HiOutlineDotsCircleHorizontal } from 'react-icons/hi';
+import { numbersOfSameValueInKeyOfObjArr } from 'src/utils/numbersOfSameValueInKeyOfObjArr';
+import { useState } from 'react';
+import { useAPISaveReaction } from '@/hooks/api/chat/useAPISaveReaction';
+import { useAPIDeleteReaction } from '@/hooks/api/chat/useAPIDeleteReaction';
+import { useAuthenticate } from 'src/contexts/useAuthenticate';
 
 type ChatMessageItemProps = {
   message: ChatMessage;
-  lastReadChatTime: LastReadChatTime[];
+  onClickReaction: () => void;
+  onClickReply: () => void;
+  readUsers: User[];
+};
+
+const ReactionButton = ({
+  reactions,
+  reaction,
+}: {
+  reactions: ChatMessageReaction[];
+  reaction: ChatMessageReaction;
+}) => {
+  const { user } = useAuthenticate();
+  const [count, setCount] = useState(
+    numbersOfSameValueInKeyOfObjArr(
+      reactions as ChatMessageReaction[],
+      reaction,
+      'emoji',
+    ),
+  );
+  const [isSender, setIsSender] = useState(reaction.isSender || false);
+  const { mutate: saveReaction } = useAPISaveReaction();
+  const { mutate: deleteReaction } = useAPIDeleteReaction();
+
+  return (
+    <Button
+      onClick={() => {
+        if (user) {
+          if (isSender) {
+            deleteReaction(
+              { ...reaction, user },
+              {
+                onSuccess: () => {
+                  setIsSender(!isSender);
+                  setCount((c) => c - 1);
+                },
+              },
+            );
+          } else {
+            saveReaction(
+              { ...reaction, user },
+              {
+                onSuccess: () => {
+                  setIsSender(!isSender);
+                  setCount((c) => c + 1);
+                },
+              },
+            );
+          }
+        }
+      }}
+      bg={isSender ? 'blue.600' : undefined}
+      flexDir="row"
+      borderColor={'blue.600'}
+      borderWidth={1}
+      size="sm">
+      <Text fontSize={16}>{reaction.emoji}</Text>
+      <Text fontSize={16} color={reaction.isSender ? 'white' : undefined}>
+        {count}
+      </Text>
+    </Button>
+  );
 };
 
 const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
   message,
-  lastReadChatTime,
+  onClickReaction,
+  onClickReply,
+  readUsers,
 }) => {
-  const messageReadCount = useCallback(
-    (message: ChatMessage): number => {
-      return lastReadChatTime?.filter((l) => l.readTime >= message.updatedAt)
-        .length;
-    },
-    [lastReadChatTime],
+  const [visibleReadModal, setVisibleLastReadModal] = useState(false);
+  const reactionRemovedDuplicates = (reactions: ChatMessageReaction[]) => {
+    const reactionsNoDuplicates: ChatMessageReaction[] = [];
+    for (const r of reactions) {
+      if (
+        reactionsNoDuplicates.filter(
+          (duplicated) => duplicated.isSender || duplicated.emoji !== r.emoji,
+        )
+      ) {
+        reactionsNoDuplicates.push(r);
+      }
+    }
+    return reactionsNoDuplicates;
+  };
+
+  const reactionList = (
+    <Box flexDir="row" flexWrap="wrap" display="flex" maxW={'50vw'}>
+      {message.reactions?.length
+        ? reactionRemovedDuplicates(message.reactions).map((r) => (
+            <Box key={r.id} mb="4px" mr="4px">
+              <ReactionButton
+                reaction={r}
+                reactions={message.reactions || []}
+              />
+            </Box>
+          ))
+        : null}
+    </Box>
   );
 
+  const sysmtemText = (
+    <Box
+      bg="#ececec"
+      borderRadius="md"
+      alignSelf="center"
+      display="flex"
+      flexDir="row"
+      justifyContent="center"
+      alignItems="center"
+      minW="60%"
+      minH={'24px'}
+      mb={'8px'}
+      maxW="50vw">
+      <Text fontSize={'14px'}>{message.content}</Text>
+    </Box>
+  );
+
+  const createdAtText = (
+    <Text mx="8px" color="gray" fontSize={'12px'}>
+      {dateTimeFormatterFromJSDDate({
+        dateTime: new Date(message.createdAt),
+        format: 'LL/dd HH:mm',
+      })}
+    </Text>
+  );
+
+  const menuOpener = (
+    <Menu
+      direction="left"
+      menuButton={
+        <MenuButton>
+          <HiOutlineDotsCircleHorizontal size={24} />
+        </MenuButton>
+      }
+      transition>
+      <MenuItem value={'reply'} onClick={onClickReply}>
+        返信
+      </MenuItem>
+      <MenuItem value={'reaction'} onClick={onClickReaction}>
+        リアクション
+      </MenuItem>
+    </Menu>
+  );
+  const replyContent = (parentMsg: ChatMessage) => {
+    switch (parentMsg.type) {
+      case ChatMessageType.TEXT:
+        return mentionTransform(parentMsg.content);
+      case ChatMessageType.IMAGE:
+        return '写真';
+      case ChatMessageType.VIDEO:
+        return '動画';
+      case ChatMessageType.OTHER_FILE:
+        return 'ファイル';
+    }
+  };
+
   return (
-    <>
-      {message.type === ChatMessageType.SYSTEM_TEXT && (
-        <div
-          className={clsx(
-            chatMessageItemStyles.system_message_wrapper,
-            chatMessageItemStyles.message__item,
-          )}>
-          <p className={chatMessageItemStyles.system_message}>
-            {message.content}
-          </p>
-        </div>
-      )}
+    <Box
+      display="flex"
+      flexDir="column"
+      alignItems={message.isSender ? 'flex-end' : 'flex-start'}>
+      <Modal
+        isOpen={visibleReadModal}
+        onClose={() => setVisibleLastReadModal(false)}>
+        <ModalOverlay />
+        <ModalContent h="90vh" bg={'#f9fafb'}>
+          <ModalHeader>既読一覧</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            {readUsers.map((u) => (
+              <Link
+                key={u.id}
+                display="flex"
+                flexDir="row"
+                borderBottom={'1px'}
+                py="8px"
+                alignItems="center"
+                justifyContent="space-between"
+                href={`/account/${u?.id}`}
+                passHref>
+                <Box display="flex" flexDir="row" alignItems="center">
+                  <Avatar src={u.avatarUrl} w="40px" h="40px" mr="16px" />
+                  <Text fontSize={darkFontColor}>{userNameFactory(u)}</Text>
+                </Box>
+              </Link>
+            ))}
+          </ModalBody>
+        </ModalContent>
+      </Modal>
+      {message.type === ChatMessageType.SYSTEM_TEXT && sysmtemText}
       {message.type !== ChatMessageType.SYSTEM_TEXT && (
-        <div
+        <Box
+          display="flex"
+          mb="4px"
+          maxW="50vw"
           key={message.id}
-          className={clsx(
-            chatMessageItemStyles.message__item,
-            message.isSender
-              ? chatMessageItemStyles.message__self
-              : chatMessageItemStyles.message__other,
-          )}>
+          alignSelf={message.isSender ? 'flex-end' : 'flex-start'}
+          flexDir={message.isSender ? 'row-reverse' : undefined}>
           {!message.isSender ? (
             <Link href={`/account/${message.sender?.id}`} passHref>
               <Avatar
-                className={chatMessageItemStyles.group_card_avatar_image}
+                h="40px"
+                w="40px"
+                cursor="pointer"
                 src={
                   !message.sender?.existence
                     ? boldMascot.src
@@ -61,68 +247,115 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
               />
             </Link>
           ) : null}
-          <div className={chatMessageItemStyles.message_wrapper}>
+          <Box display="flex" alignItems="flex-end">
             {message.isSender && (
-              <div>
-                {messageReadCount(message) ? (
-                  <p className={chatMessageItemStyles.read_count}>
-                    既読
-                    {messageReadCount(message)}
-                  </p>
-                ) : null}
-                <p className={chatMessageItemStyles.send_time}>
-                  {dateTimeFormatterFromJSDDate({
-                    dateTime: new Date(message.createdAt),
-                    format: 'HH:mm',
-                  })}
-                </p>
-              </div>
+              <>
+                {menuOpener}
+                <Box>
+                  {readUsers.length ? (
+                    <Link
+                      onClick={() => setVisibleLastReadModal(true)}
+                      mx="8px"
+                      color="gray"
+                      fontSize="12px">
+                      既読
+                      {readUsers.length}
+                    </Link>
+                  ) : null}
+                  {createdAtText}
+                </Box>
+              </>
             )}
-            <div
-              className={clsx(chatMessageItemStyles.message_user_info_wrapper)}>
-              <p className={chatMessageItemStyles.massage_sender_name}>
+            <Box display="flex" flexDir="column" alignItems="flex-start">
+              <Text>
                 {message.sender && message.sender?.existence
                   ? userNameFactory(message.sender)
                   : 'ボールドくん'}
-              </p>
+              </Text>
               {message.type === ChatMessageType.TEXT ? (
-                <p
-                  className={clsx(
-                    chatMessageItemStyles.message_content,
-                    message.isSender
-                      ? chatMessageItemStyles.message_text__self
-                      : chatMessageItemStyles.message_text__other,
-                  )}>
-                  {mentionTransform(message.content)}
-                </p>
-              ) : (
-                <span className={chatMessageItemStyles.message_content}>
-                  {message.type === ChatMessageType.IMAGE ? (
-                    <span
-                      className={chatMessageItemStyles.message_image_or_video}>
-                      <img
-                        src={message.content}
-                        width={300}
-                        height={300}
-                        alt="image"
+                <Box
+                  maxW={'40vw'}
+                  minW={'10vw'}
+                  bg={message.isSender ? 'blue.500' : '#ececec'}
+                  p="8px"
+                  rounded="md">
+                  {message.replyParentMessage && (
+                    <Box
+                      flexDir="row"
+                      display="flex"
+                      borderBottomWidth={1}
+                      borderBottomColor={'white'}
+                      pb="4px"
+                      color={'black'}>
+                      <Avatar
+                        h="32px"
+                        w="32px"
+                        mr="4px"
+                        cursor="pointer"
+                        src={
+                          !message.replyParentMessage.sender?.existence
+                            ? boldMascot.src
+                            : message.replyParentMessage?.sender.avatarUrl
+                        }
                       />
-                    </span>
+                      <Box>
+                        <Text fontWeight="bold">
+                          {userNameFactory(message.replyParentMessage?.sender)}
+                        </Text>
+                        <Text>{replyContent(message.replyParentMessage)}</Text>
+                      </Box>
+                    </Box>
+                  )}
+                  <Text
+                    borderRadius="8px"
+                    maxW={'40vw'}
+                    minW={'10vw'}
+                    wordBreak={'break-word'}
+                    color={message.isSender ? 'white' : darkFontColor}
+                    bg={message.isSender ? 'blue.500' : '#ececec'}>
+                    {mentionTransform(message.content)}
+                  </Text>
+                </Box>
+              ) : (
+                <Box
+                  borderRadius="8px"
+                  p="8px"
+                  maxW="40vw"
+                  minW="10vw"
+                  wordBreak="break-word">
+                  {message.type === ChatMessageType.IMAGE ? (
+                    <Box display="flex" maxW="300px" maxH={'300px'}>
+                      <Image
+                        src={message.content}
+                        w={300}
+                        h={300}
+                        alt="送信された画像"
+                      />
+                    </Box>
                   ) : message.type === ChatMessageType.VIDEO ? (
-                    <span
-                      className={chatMessageItemStyles.message_image_or_video}>
+                    <Box display="flex" maxW="300px" maxH={'300px'}>
                       <video
                         src={message.content}
                         controls
                         width={300}
                         height={300}
                       />
-                    </span>
+                    </Box>
                   ) : (
-                    <a
+                    <Link
                       href={message.content}
-                      className={chatMessageItemStyles.message_other_file}>
+                      mr="8px"
+                      display="flex"
+                      flexDir="column"
+                      alignItems="center"
+                      borderWidth={'1px'}
+                      borderColor="gray"
+                      borderRadius="8px"
+                      p="8px">
                       <AiOutlineFileProtect
-                        className={chatMessageItemStyles.other_file_icon}
+                        height="48px"
+                        width="48px"
+                        color={darkFontColor}
                       />
                       <p>
                         {
@@ -132,23 +365,22 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
                           ])[1]
                         }
                       </p>
-                    </a>
+                    </Link>
                   )}
-                </span>
+                </Box>
               )}
-            </div>
+            </Box>
             {!message.isSender && (
-              <p className={chatMessageItemStyles.send_time}>
-                {dateTimeFormatterFromJSDDate({
-                  dateTime: new Date(message.createdAt),
-                  format: 'HH:mm',
-                })}
-              </p>
+              <>
+                {createdAtText}
+                {menuOpener}
+              </>
             )}
-          </div>
-        </div>
+          </Box>
+        </Box>
       )}
-    </>
+      {reactionList}
+    </Box>
   );
 };
 

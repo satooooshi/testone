@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -19,14 +18,17 @@ import { ChatMessage } from 'src/entities/chatMessage.entity';
 import { ChatMessageReaction } from 'src/entities/chatMessageReaction.entity';
 import { ChatNote } from 'src/entities/chatNote.entity';
 import { LastReadChatTime } from 'src/entities/lastReadChatTime.entity';
+import { User } from 'src/entities/user.entity';
 import JwtAuthenticationGuard from '../auth/jwtAuthentication.guard';
 import RequestWithUser from '../auth/requestWithUser.interface';
 import { ChatService, GetChatNotesResult } from './chat.service';
 import { ChatAlbumService, GetChatAlbumsResult } from './chatAlbum.service';
+import { ChatNoteService } from './chatNote.service';
 
 export interface GetMessagesQuery {
   group: number;
   page?: string;
+  limit?: string;
 }
 
 export interface GetRoomsQuery {
@@ -43,6 +45,7 @@ export class ChatController {
   constructor(
     private readonly chatService: ChatService,
     private readonly chatAlbumService: ChatAlbumService,
+    private readonly chatNoteService: ChatNoteService,
   ) {}
 
   @Get('group-list')
@@ -57,8 +60,7 @@ export class ChatController {
     @Req() req: RequestWithUser,
     @Query() query: GetMessagesQuery,
   ): Promise<GetRoomsResult> {
-    const page = Number(query?.page) || 1;
-    return await this.chatService.getRoomsByPage(req.user.id, page);
+    return await this.chatService.getRoomsByPage(req.user.id, query);
   }
 
   @Get('get-messages')
@@ -96,23 +98,31 @@ export class ChatController {
     @Body() chatGroup: Partial<ChatGroup>,
   ): Promise<ChatGroup> {
     const user = req.user;
-    if (!chatGroup.members || !chatGroup.members.length) {
-      throw new BadRequestException(
-        'Group member is necessary at least 1 person',
-      );
-    }
     chatGroup.members = [
-      ...chatGroup.members.filter((u) => u.id !== user.id),
+      ...(chatGroup?.members?.filter((u) => u.id !== user.id) || []),
       user,
     ];
     return await this.chatService.saveChatGroup(chatGroup, user.id);
+  }
+
+  @Patch('/v2/room/:roomId/members')
+  @UseGuards(JwtAuthenticationGuard)
+  async editRoomMembers(
+    @Param('roomId') roomId: number,
+    @Body() members: User[],
+  ): Promise<ChatGroup> {
+    const newGroupInfo = await this.chatService.editChatMembers(
+      roomId,
+      members,
+    );
+    return newGroupInfo;
   }
 
   @Get('get-last-read-chat-time/:id')
   @UseGuards(JwtAuthenticationGuard)
   async getLastReadChatTime(
     @Req() req: RequestWithUser,
-    @Param() chatGroupId: string,
+    @Param('id') chatGroupId: string,
   ): Promise<LastReadChatTime[]> {
     return await this.chatService.getLastReadChatTime(req.user, chatGroupId);
   }
@@ -121,7 +131,7 @@ export class ChatController {
   @UseGuards(JwtAuthenticationGuard)
   async saveLastReadChatTime(
     @Req() req: RequestWithUser,
-    @Param() chatGroupId: number,
+    @Param('id') chatGroupId: number,
   ): Promise<LastReadChatTime> {
     return await this.chatService.saveLastReadChatTime(req.user, chatGroupId);
   }
@@ -168,7 +178,7 @@ export class ChatController {
     @Req() req: RequestWithUser,
   ): Promise<GetChatNotesResult> {
     const { user } = req;
-    const notes = await this.chatService.getChatNotes(
+    const notes = await this.chatNoteService.getChatNotes(
       { group: Number(roomId), page },
       user.id,
     );
@@ -183,7 +193,7 @@ export class ChatController {
   ) {
     const { user } = req;
     body.editors = [user];
-    const notes = await this.chatService.saveChatNotes(body);
+    const notes = await this.chatNoteService.saveChatNotes(body);
     return notes;
   }
 
@@ -194,14 +204,14 @@ export class ChatController {
     body.editors = body?.editors?.length
       ? [...body.editors.filter((e) => e.id !== user.id), user]
       : [user];
-    const notes = await this.chatService.saveChatNotes(body);
+    const notes = await this.chatNoteService.saveChatNotes(body);
     return notes;
   }
 
   @Delete('/v2/room/:roomId/note/:noteId')
   @UseGuards(JwtAuthenticationGuard)
   async deleteChatNotes(@Param('noteId') noteId: number, @Res() res: Response) {
-    await this.chatService.deleteChatNotes(noteId);
+    await this.chatNoteService.deleteChatNotes(noteId);
     res.send(200);
   }
 
@@ -212,7 +222,7 @@ export class ChatController {
     @Req() req: RequestWithUser,
   ) {
     const { id: userID } = req.user;
-    const notes = await this.chatService.getChatNoteDetail(
+    const notes = await this.chatNoteService.getChatNoteDetail(
       Number(noteId),
       userID,
     );

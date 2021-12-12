@@ -22,6 +22,13 @@ export type NewRoomNavigationProps = StackNavigationProp<
   'ChatStack'
 >;
 
+export type EditRoomNavigationProps = StackNavigationProp<
+  DrawerTabParamList,
+  'ChatStack'
+>;
+
+export type EditRoomRouteProps = RouteProp<RootStackParamList, 'EditRoom'>;
+
 export type ChatMenuNavigationProps = StackNavigationProp<
   DrawerTabParamList,
   'ChatStack'

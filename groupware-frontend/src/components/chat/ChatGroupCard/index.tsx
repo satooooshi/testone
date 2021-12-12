@@ -1,9 +1,10 @@
-import React from 'react';
-import { ChatGroup, User } from 'src/types';
-import chatGroupStyles from '@/styles/components/ChatGroupCard.module.scss';
+import React, { useState } from 'react';
+import { ChatGroup, ChatMessage, ChatMessageType, User } from 'src/types';
 import { dateTimeFormatterFromJSDDate } from 'src/utils/dateTimeFormatter';
-import { Avatar } from '@chakra-ui/react';
-import clsx from 'clsx';
+import { Avatar, Box, useMediaQuery, Text, Link } from '@chakra-ui/react';
+import { darkFontColor } from 'src/utils/colors';
+import { useAPISaveChatGroup } from '@/hooks/api/chat/useAPISaveChatGroup';
+import { RiPushpin2Fill, RiPushpin2Line } from 'react-icons/ri';
 
 type ChatGroupCardProps = {
   chatGroup: ChatGroup;
@@ -14,6 +15,13 @@ const ChatGroupCard: React.FC<ChatGroupCardProps> = ({
   chatGroup,
   isSelected = false,
 }) => {
+  const [isPinned, setIsPinned] = useState<boolean>(!!chatGroup.isPinned);
+  const { mutate: saveGroup } = useAPISaveChatGroup({
+    onSuccess: () => {
+      setIsPinned(!isPinned);
+    },
+  });
+  const [isSmallerThan768] = useMediaQuery('max-width: 768px');
   const nameOfEmptyNameGroup = (members?: User[]): string => {
     if (!members) {
       return 'メンバーがいません';
@@ -24,40 +32,87 @@ const ChatGroupCard: React.FC<ChatGroupCardProps> = ({
     }
     return strMembers.toString();
   };
+  const latestMessage = (chatMessage: ChatMessage) => {
+    switch (chatMessage.type) {
+      case ChatMessageType.IMAGE:
+        return '画像が送信されました';
+      case ChatMessageType.VIDEO:
+        return '動画が送信されました';
+      case ChatMessageType.OTHER_FILE:
+        return 'ファイルが送信されました';
+      default:
+        return chatMessage.content;
+    }
+  };
 
   return (
-    <div
-      className={clsx(
-        chatGroupStyles.group_card,
-        isSelected && chatGroupStyles.group_card__selected,
-      )}>
-      <div className={chatGroupStyles.avatar}>
-        <Avatar src={chatGroup.imageURL} size="md" />
-      </div>
-      <div className={chatGroupStyles.right}>
-        <div className={chatGroupStyles.top}>
-          <p className={chatGroupStyles.name}>
+    <Box
+      display="flex"
+      flexDir="row"
+      py="16px"
+      px="12px"
+      alignItems="center"
+      boxShadow="md"
+      w={'100%'}
+      h="fit-content"
+      bg={isSelected ? '#f2f1f2' : 'white'}>
+      <Avatar src={chatGroup.imageURL} size="md" mr="8px" />
+      <Box
+        display="flex"
+        flexDir="column"
+        overflow="hidden"
+        w={isSmallerThan768 ? '100%' : '80%'}
+        h="60px"
+        justifyContent="space-around">
+        <Box
+          display="flex"
+          flexDir="row"
+          justifyContent="space-between"
+          alignItems="center"
+          w="100%">
+          <Text fontWeight="bold" color={darkFontColor} noOfLines={1}>
             {chatGroup.name
               ? chatGroup.name
               : nameOfEmptyNameGroup(chatGroup.members)}
-          </p>
-        </div>
-        <div className={chatGroupStyles.middle}>
-          <p className={chatGroupStyles.latest_message}>
-            {chatGroup.chatMessages && chatGroup.chatMessages.length
-              ? chatGroup.chatMessages[0].content
+          </Text>
+          {isPinned ? (
+            <Link
+              onClick={(e) => {
+                e.stopPropagation();
+                saveGroup({ ...chatGroup, isPinned: !chatGroup.isPinned });
+              }}>
+              <RiPushpin2Fill size={24} color="green" />
+            </Link>
+          ) : (
+            <Link
+              onClick={(e) => {
+                e.stopPropagation();
+                saveGroup({ ...chatGroup, isPinned: !chatGroup.isPinned });
+              }}>
+              <RiPushpin2Line size={24} color="green" />
+            </Link>
+          )}
+        </Box>
+        <Box display="flex" flexDir="row" alignItems="center">
+          <Text fontSize="12px" color={darkFontColor} noOfLines={1}>
+            {chatGroup?.chatMessages?.length
+              ? latestMessage(chatGroup.chatMessages[0])
               : ' '}
-          </p>
-        </div>
-        <div className={chatGroupStyles.bottom}>
-          <p className={chatGroupStyles.date}>
+          </Text>
+        </Box>
+        <Box
+          display="flex"
+          flexDir="row"
+          justifyContent="flex-end"
+          alignItems="center">
+          <Text color={darkFontColor} fontSize="12px">
             {dateTimeFormatterFromJSDDate({
               dateTime: new Date(chatGroup.updatedAt),
             })}
-          </p>
-        </div>
-      </div>
-    </div>
+          </Text>
+        </Box>
+      </Box>
+    </Box>
   );
 };
 

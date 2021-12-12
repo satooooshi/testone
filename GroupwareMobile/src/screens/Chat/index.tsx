@@ -1,10 +1,8 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {
-  ActivityIndicator,
   FlatList,
   Keyboard,
   KeyboardAvoidingView,
-  Modal,
   Platform,
   TouchableOpacity,
   useWindowDimensions,
@@ -14,7 +12,6 @@ import {
   Div,
   Icon,
   Image,
-  Overlay,
   Text,
   Modal as MagnusModal,
   Button,
@@ -34,14 +31,9 @@ import {
 import {uploadImageFromGallery} from '../../utils/cropImage/uploadImageFromGallery';
 import DocumentPicker from 'react-native-document-picker';
 import ImageView from 'react-native-image-viewing';
-import Video from 'react-native-video';
-import TextMessage from '../../components/chat/ChatMessage/TextMessage';
-import ImageMessage from '../../components/chat/ChatMessage/ImageMessage';
-import VideoMessage from '../../components/chat/ChatMessage/VideoMessage';
 import ChatFooter from '../../components/chat/ChatFooter';
 import {userNameFactory} from '../../utils/factory/userNameFactory';
 import {Suggestion} from 'react-native-controlled-mentions';
-import FileMessage from '../../components/chat/ChatMessage/FileMessage';
 import RNFetchBlob from 'rn-fetch-blob';
 const {fs, config} = RNFetchBlob;
 import FileViewer from 'react-native-file-viewer';
@@ -64,11 +56,12 @@ import {
 import EmojiSelector from 'react-native-emoji-selector';
 import {useAPISaveReaction} from '../../hooks/api/chat/useAPISaveReaction';
 import {useAPIDeleteReaction} from '../../hooks/api/chat/useAPIDeleteReaction';
-import ReactionToMessage from '../../components/chat/ChatMessage/ReactionToMessage';
 import ReactionsModal from '../../components/chat/ReactionsModal';
-import {numbersOfSameValueInKeyOfObjArr} from '../../utils/numbersOfSameValueInKeyOfObjArr';
 import {saveToCameraRoll} from '../../utils/storage/saveToCameraRoll';
 import VideoPlayer from 'react-native-video-player';
+import ChatMessageItem from '../../components/chat/ChatMessage';
+import {ActivityIndicator} from 'react-native-paper';
+import {useAPISaveLastReadChatTime} from '../../hooks/api/chat/useAPISaveLastReadChatTime';
 
 const Chat: React.FC = () => {
   const typeDropdownRef = useRef<any | null>(null);
@@ -93,6 +86,7 @@ const Chat: React.FC = () => {
     ChatMessageReaction[] | undefined
   >();
   const [selectedEmoji, setSelectedEmoji] = useState<string>();
+  const {mutate: saveLastReadChatTime} = useAPISaveLastReadChatTime();
   const [selectedMessageForCheckLastRead, setSelectedMessageForCheckLastRead] =
     useState<ChatMessage>();
   const {values, handleSubmit, setValues} = useFormik<Partial<ChatMessage>>({
@@ -108,10 +102,11 @@ const Chat: React.FC = () => {
       sendChatMessage(submittedValues);
     },
   });
-  const {data: fetchedMessage, isLoading: loadingMessages} = useAPIGetMessages({
-    group: room.id,
-    page: page.toString(),
-  });
+  const {data: fetchedPastMessages, isLoading: loadingMessages} =
+    useAPIGetMessages({
+      group: room.id,
+      page: page.toString(),
+    });
   const {data: latestMessage} = useAPIGetMessages(
     {
       group: room.id,
@@ -130,7 +125,10 @@ const Chat: React.FC = () => {
   };
   const {mutate: sendChatMessage, isLoading: loadingSendMessage} =
     useAPISendChatMessage({
-      onSuccess: () => {
+      onSuccess: sentMsg => {
+        setMessages(m => {
+          return [sentMsg, ...m];
+        });
         setValues(v => ({
           ...v,
           content: '',
@@ -141,13 +139,13 @@ const Chat: React.FC = () => {
     });
   const {mutate: uploadFile, isLoading: loadingUploadFile} =
     useAPIUploadStorage();
+  const isLoadingSending = loadingSendMessage || loadingUploadFile;
 
   const showImageOnModal = (url: string) => {
     const isNowUri = (element: ImageSource) => element.uri === url;
     setNowImageIndex(images.findIndex(isNowUri));
     setImageModal(true);
   };
-  const isLoading = loadingMessages || loadingSendMessage || loadingUploadFile;
   const headerRightIcon = (
     <TouchableOpacity
       style={tailwind('flex flex-row items-center')}
@@ -353,9 +351,9 @@ const Chat: React.FC = () => {
   }, [latestMessage]);
 
   useEffect(() => {
-    if (fetchedMessage?.length) {
+    if (fetchedPastMessages?.length) {
       const handleImages = () => {
-        const fetchedImages: ImageSource[] = fetchedMessage
+        const fetchedImages: ImageSource[] = fetchedPastMessages
           .filter(m => m.type === ChatMessageType.IMAGE)
           .map(m => ({uri: m.content}))
           .reverse();
@@ -365,106 +363,49 @@ const Chat: React.FC = () => {
         messages?.length &&
         isRecent(
           messages[messages.length - 1],
-          fetchedMessage[fetchedMessage.length - 1],
+          fetchedPastMessages[fetchedPastMessages.length - 1],
         )
       ) {
         setMessages(m => {
-          return [...m, ...fetchedMessage];
+          return [...m, ...fetchedPastMessages];
         });
         handleImages();
       } else if (!messages?.length) {
-        setMessages(fetchedMessage);
+        setMessages(fetchedPastMessages);
         handleImages();
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [fetchedMessage]);
-
-  const reactionRemovedDuplicates = (reactions: ChatMessageReaction[]) => {
-    const reactionsNoDuplicates: ChatMessageReaction[] = [];
-    for (const r of reactions) {
-      if (
-        reactionsNoDuplicates.filter(
-          duplicated => duplicated.isSender || duplicated.emoji !== r.emoji,
-        )
-      ) {
-        reactionsNoDuplicates.push(r);
-      }
-    }
-    return reactionsNoDuplicates;
+  }, [fetchedPastMessages]);
+  const readUsers = (targetMsg: ChatMessage) => {
+    return lastReadChatTime
+      ? lastReadChatTime
+          .filter(t => t.readTime >= targetMsg.createdAt)
+          .map(t => t.user)
+      : [];
   };
 
   const renderMessage = (message: ChatMessage) => (
-    <Div mb={'sm'}>
-      <Div
-        flexDir="row"
-        mb={'xs'}
-        alignSelf={message?.isSender ? 'flex-end' : 'flex-start'}
-        alignItems="flex-end">
-        {readUsers.length ? (
-          <TouchableOpacity
-            onPress={() => setSelectedMessageForCheckLastRead(message)}>
-            <Text mb="sm" mr={message?.isSender ? 'sm' : undefined}>
-              {`既読\n${numbersOfRead(message)}人`}
-            </Text>
-          </TouchableOpacity>
-        ) : null}
-        {message.type === ChatMessageType.TEXT ? (
-          <TextMessage
-            message={message}
-            onLongPress={() => setLongPressedMgg(message)}
-          />
-        ) : message.type === ChatMessageType.IMAGE ? (
-          <ImageMessage
-            onPress={() => showImageOnModal(message.content)}
-            message={message}
-            onLongPress={() => setLongPressedMgg(message)}
-          />
-        ) : message.type === ChatMessageType.VIDEO ? (
-          <VideoMessage
-            message={message}
-            onPress={() => playVideoOnModal(message.content)}
-            onLongPress={() => setLongPressedMgg(message)}
-          />
-        ) : message.type === ChatMessageType.OTHER_FILE ? (
-          <FileMessage
-            message={message}
-            onPress={() => downloadFile(message)}
-            onLongPress={() => setLongPressedMgg(message)}
-          />
-        ) : null}
-      </Div>
-      <Div
-        w={windowWidth * 0.6}
-        flexDir="row"
-        flexWrap="wrap"
-        alignSelf={message?.isSender ? 'flex-end' : 'flex-start'}>
-        {message.reactions?.length
-          ? reactionRemovedDuplicates(message.reactions)
-              .filter(r => !deletedReactionIds.includes(r.id))
-              .map(r => (
-                <Div mr="xs" mb="xs">
-                  <ReactionToMessage
-                    onPress={() => {
-                      r.isSender
-                        ? handleDeleteReaction(r)
-                        : handleSaveReaction(r.emoji, message);
-                    }}
-                    onLongPress={() =>
-                      message.reactions?.length &&
-                      setSelectedReactions(message.reactions)
-                    }
-                    reaction={r}
-                    numbersOfReaction={numbersOfSameValueInKeyOfObjArr(
-                      message.reactions as ChatMessageReaction[],
-                      r,
-                      'emoji',
-                    )}
-                  />
-                </Div>
-              ))
-          : null}
-      </Div>
+    <Div mb={'sm'} mx="md">
+      <ChatMessageItem
+        message={message}
+        readUsers={readUsers(message)}
+        onCheckLastRead={() => setSelectedMessageForCheckLastRead(message)}
+        numbersOfRead={numbersOfRead(message)}
+        onLongPress={() => setLongPressedMgg(message)}
+        onPressImage={() => showImageOnModal(message.content)}
+        onPressVideo={() => playVideoOnModal(message.content)}
+        onPressFile={() => downloadFile(message)}
+        onPressReaction={r =>
+          r.isSender
+            ? handleDeleteReaction(r)
+            : handleSaveReaction(r.emoji, message)
+        }
+        onLongPressReation={() =>
+          message.reactions?.length && setSelectedReactions(message.reactions)
+        }
+        deletedReactionIds={deletedReactionIds}
+      />
     </Div>
   );
 
@@ -482,9 +423,9 @@ const Chat: React.FC = () => {
               : chatStyles.keyboardAvoidingViewAndroid,
           ]}
           behavior={Platform.OS === 'ios' ? 'height' : undefined}>
+          {loadingMessages && <ActivityIndicator />}
           <FlatList
             style={chatStyles.flatlist}
-            contentContainerStyle={chatStyles.flatlistContent}
             inverted
             data={messages}
             {...{onEndReached}}
@@ -524,6 +465,7 @@ const Chat: React.FC = () => {
                 }
                 onSend={handleSubmit}
                 mentionSuggestions={suggestions()}
+                isLoading={isLoadingSending}
               />
             </>
           )}
@@ -574,6 +516,7 @@ const Chat: React.FC = () => {
                 }
                 onSend={handleSubmit}
                 mentionSuggestions={suggestions()}
+                isLoading={isLoadingSending}
               />
             </>
           )}
@@ -581,18 +524,15 @@ const Chat: React.FC = () => {
       )}
     </>
   );
-  const readUsers =
-    selectedMessageForCheckLastRead && lastReadChatTime
-      ? lastReadChatTime
-          .filter(t => t.readTime >= selectedMessageForCheckLastRead.createdAt)
-          .map(t => t.user)
-      : [];
+
+  useEffect(() => {
+    saveLastReadChatTime(room.id, {
+      onError: err => console.log(err.response?.data),
+    });
+  }, [room.id, saveLastReadChatTime]);
 
   return (
     <WholeContainer>
-      <Overlay visible={isLoading} p="xl">
-        <ActivityIndicator />
-      </Overlay>
       {typeDropdown}
       <ReactionsModal
         isVisible={!!selectedReactions}
@@ -618,27 +558,32 @@ const Chat: React.FC = () => {
           }}>
           <Icon color="black" name="close" />
         </Button>
-        <FlatList
-          data={readUsers}
-          renderItem={({item}) => (
-            <View style={tailwind('flex-row bg-white items-center px-4 mb-2')}>
-              <>
-                <Image
-                  mr={'sm'}
-                  rounded="circle"
-                  h={64}
-                  w={64}
-                  source={
-                    item.avatarUrl
-                      ? {uri: item.avatarUrl}
-                      : require('../../../assets/no-image-avatar.png')
-                  }
-                />
-                <Text fontSize={18}>{userNameFactory(item)}</Text>
-              </>
-            </View>
-          )}
-        />
+        {selectedMessageForCheckLastRead ? (
+          <FlatList
+            data={readUsers(selectedMessageForCheckLastRead)}
+            renderItem={({item}) => (
+              <View
+                style={tailwind('flex-row bg-white items-center px-4 mb-2')}>
+                <>
+                  <Image
+                    mr={'sm'}
+                    rounded="circle"
+                    h={64}
+                    w={64}
+                    source={
+                      item.avatarUrl
+                        ? {uri: item.avatarUrl}
+                        : require('../../../assets/no-image-avatar.png')
+                    }
+                  />
+                  <Text fontSize={18}>{userNameFactory(item)}</Text>
+                </>
+              </View>
+            )}
+          />
+        ) : (
+          <></>
+        )}
       </MagnusModal>
       {/* @TODO add seeking bar */}
       <MagnusModal isVisible={!!video} bg="black">

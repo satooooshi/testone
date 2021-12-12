@@ -1,13 +1,14 @@
 import {useNavigation} from '@react-navigation/native';
 import React, {useCallback, useEffect, useState} from 'react';
-import {ActivityIndicator, FlatList} from 'react-native';
-import {Div, Overlay} from 'react-native-magnus';
+import {FlatList} from 'react-native';
+import {Div} from 'react-native-magnus';
+import {ActivityIndicator} from 'react-native-paper';
+import tailwind from 'tailwind-rn';
 import RoomCard from '../../../components/chat/RoomCard';
 import HeaderWithTextButton from '../../../components/Header';
 import WholeContainer from '../../../components/WholeContainer';
 import {useAPIGetRooms} from '../../../hooks/api/chat/useAPIGetRoomsByPage';
 import {useAPISaveChatGroup} from '../../../hooks/api/chat/useAPISaveChatGroup';
-import {roomListStyles} from '../../../styles/screen/chat/roomList.style';
 import {ChatGroup} from '../../../types';
 import {
   RoomListNavigationProps,
@@ -22,6 +23,19 @@ const RoomList: React.FC = () => {
   const [roomsForInfiniteScroll, setRoomsForInfiniteScroll] = useState<
     ChatGroup[]
   >([]);
+  useAPIGetRooms(
+    {
+      page: '1',
+      limit: (20 * Number(page)).toString(),
+    },
+    {
+      refetchInterval: 3000,
+      onSuccess: data => {
+        stateUpdateNeeeded(data.rooms);
+      },
+    },
+  );
+
   const {
     data: chatRooms,
     isLoading: loadingGetChatGroupList,
@@ -45,7 +59,32 @@ const RoomList: React.FC = () => {
   };
 
   const onEndReached = () => {
-    setPage(p => (Number(p) + 1).toString());
+    if (
+      typeof Number(chatRooms?.pageCount) === 'number' &&
+      Number(page + 1) <= Number(chatRooms?.pageCount)
+    ) {
+      setPage(p => (Number(p) + 1).toString());
+    }
+  };
+
+  const stateUpdateNeeeded = (newData: ChatGroup[]) => {
+    let updateNeeded = false;
+    if (roomsForInfiniteScroll.length !== newData?.length) {
+      updateNeeded = true;
+    }
+    if (roomsForInfiniteScroll.length || newData?.length) {
+      for (let i = 0; i < roomsForInfiniteScroll.length; i++) {
+        if (updateNeeded) {
+          break;
+        }
+        if (roomsForInfiniteScroll[i]?.id !== newData[i]?.id) {
+          updateNeeded = true;
+        }
+      }
+    }
+    if (updateNeeded) {
+      setRoomsForInfiniteScroll(newData);
+    }
   };
 
   useEffect(() => {
@@ -62,9 +101,6 @@ const RoomList: React.FC = () => {
 
   return (
     <WholeContainer>
-      <Overlay visible={loadingGetChatGroupList} p="xl">
-        <ActivityIndicator />
-      </Overlay>
       <HeaderWithTextButton
         title="ルーム一覧"
         rightButtonName={'新規作成'}
@@ -72,7 +108,7 @@ const RoomList: React.FC = () => {
       />
       <FlatList
         {...{onEndReached}}
-        contentContainerStyle={roomListStyles.flatlistContent}
+        contentContainerStyle={tailwind('self-center mt-4')}
         data={roomsForInfiniteScroll}
         renderItem={({item: room}) => (
           <Div mb="lg">
@@ -91,6 +127,7 @@ const RoomList: React.FC = () => {
           </Div>
         )}
       />
+      {loadingGetChatGroupList && <ActivityIndicator />}
     </WholeContainer>
   );
 };

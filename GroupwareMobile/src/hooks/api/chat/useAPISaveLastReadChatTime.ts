@@ -9,10 +9,6 @@ const saveLastReadChatTime = async (
 ): Promise<LastReadChatTime> => {
   const response = await axiosInstance.patch<LastReadChatTime>(
     saveLastReadChatTimeURL + '/' + chatGroupId,
-    null,
-    {
-      headers: jsonHeader,
-    },
   );
   return response.data;
 };

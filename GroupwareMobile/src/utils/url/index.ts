@@ -22,11 +22,12 @@ export const jwtFormDataHeader = {
   Authorization: `Bearer ${tokenString()}`,
 };
 
-export const baseURL = Config.API_URL
-  ? Config.API_URL
-  : Config.NODE_ENV === 'production'
-  ? 'https://groupware-development-sgzkfl3uyq-an.a.run.app'
-  : 'http://localhost:9000';
+export const baseURL =
+  __DEV__ && Config.API_URL
+    ? Config.API_URL
+    : !__DEV__
+    ? 'https://groupware-development-sgzkfl3uyq-an.a.run.app'
+    : 'http://localhost:9000';
 
 export const markdownEditorURL =
   Config.MARKDOWN_EDITOR_URL || 'http://localhost:8080';

@@ -10,13 +10,11 @@ import { ChatGroup } from 'src/entities/chatGroup.entity';
 import { ChatMessage, ChatMessageType } from 'src/entities/chatMessage.entity';
 import { ChatMessageReaction } from 'src/entities/chatMessageReaction.entity';
 import { ChatNote } from 'src/entities/chatNote.entity';
-import { ChatNoteImage } from 'src/entities/chatNoteImage.entity';
 import { LastReadChatTime } from 'src/entities/lastReadChatTime.entity';
 import { User } from 'src/entities/user.entity';
 import { userNameFactory } from 'src/utils/factory/userNameFactory';
 import { In, Repository } from 'typeorm';
 import { StorageService } from '../storage/storage.service';
-import { UserService } from '../user/user.service';
 import { GetMessagesQuery, GetRoomsResult } from './chat.controller';
 
 export interface GetChatNotesQuery {
@@ -40,118 +38,10 @@ export class ChatService {
     private readonly chatGroupRepository: Repository<ChatGroup>,
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
-    @InjectRepository(ChatNote)
-    private readonly noteRepository: Repository<ChatNote>,
-    @InjectRepository(ChatNoteImage)
-    private readonly noteImageRepository: Repository<ChatNoteImage>,
     @InjectRepository(ChatMessageReaction)
     private readonly chatMessageReactionRepository: Repository<ChatMessageReaction>,
     private readonly storageService: StorageService,
-    private readonly userService: UserService,
   ) {}
-
-  public async generateSignedStorageURLsFromChatGroupObj(
-    chatGroup: ChatGroup,
-  ): Promise<ChatGroup> {
-    if (chatGroup?.imageURL) {
-      chatGroup.imageURL = await this.storageService.parseStorageURLToSignedURL(
-        chatGroup.imageURL,
-      );
-    }
-    if (chatGroup?.members && chatGroup?.members.length) {
-      chatGroup.members =
-        await this.userService.generateSignedStorageURLsFromUserArr(
-          chatGroup.members,
-        );
-    }
-    return chatGroup;
-  }
-
-  public async generateSignedStorageURLsFromChatGroupArr(
-    chatGroups: ChatGroup[],
-  ): Promise<ChatGroup[]> {
-    const parsedGroups = [];
-    for (const c of chatGroups) {
-      const parsed = await this.generateSignedStorageURLsFromChatGroupObj(c);
-      parsedGroups.push(parsed);
-    }
-    return parsedGroups;
-  }
-  public async generateSignedStorageURLsFromChatNoteObj(
-    chatNote: ChatNote,
-  ): Promise<ChatNote> {
-    const images: ChatNoteImage[] = [];
-    const editors: User[] = [];
-    for (const i of chatNote.images) {
-      const parsedImageUrl =
-        await this.storageService.parseStorageURLToSignedURL(i.imageURL);
-      const parsedImageObj = { ...i, imageURL: parsedImageUrl };
-      images.push(parsedImageObj);
-    }
-    for (const e of chatNote.editors) {
-      const parsedAvatarUrl =
-        await this.storageService.parseStorageURLToSignedURL(e.avatarUrl);
-      const parsedAvatarObj = { ...e, avatarUrl: parsedAvatarUrl };
-      editors.push(parsedAvatarObj);
-    }
-    chatNote.images = images;
-    chatNote.editors = editors;
-
-    return chatNote;
-  }
-
-  public async generateSignedStorageURLsFromChatNoteArr(
-    chatNotes: ChatNote[],
-  ): Promise<ChatNote[]> {
-    const parsedNotes = [];
-    for (const n of chatNotes) {
-      const parsed = await this.generateSignedStorageURLsFromChatNoteObj(n);
-      parsedNotes.push(parsed);
-    }
-    return parsedNotes;
-  }
-
-  public async generateSignedStorageURLsFromChatMessageObj(
-    chatMessage: ChatMessage,
-  ): Promise<ChatMessage> {
-    chatMessage.content = await this.storageService.parseStorageURLToSignedURL(
-      chatMessage.content,
-    );
-    const avatarUrl = await this.storageService.parseStorageURLToSignedURL(
-      chatMessage.sender?.avatarUrl,
-    );
-    chatMessage.sender = { ...chatMessage.sender, avatarUrl };
-    chatMessage.reactions = await Promise.all(
-      chatMessage.reactions?.map(async (r) => {
-        const parsedReactionedAvatarUrl =
-          await this.storageService.parseStorageURLToSignedURL(
-            r.user.avatarUrl,
-          );
-        return {
-          ...r,
-          user: { ...r.user, avatarUrl: parsedReactionedAvatarUrl },
-        };
-      }) || [],
-    );
-    if (chatMessage.replyParentMessage) {
-      chatMessage.replyParentMessage =
-        await this.generateSignedStorageURLsFromChatMessageObj(
-          chatMessage.replyParentMessage,
-        );
-    }
-    return chatMessage;
-  }
-
-  public async generateSignedStorageURLsFromChatMessageArr(
-    chatMessages: ChatMessage[],
-  ): Promise<ChatMessage[]> {
-    const parsedMessages = [];
-    for (const m of chatMessages) {
-      const parsed = await this.generateSignedStorageURLsFromChatMessageObj(m);
-      parsedMessages.push(parsed);
-    }
-    return parsedMessages;
-  }
 
   public async getChatGroup(userID: number): Promise<ChatGroup[]> {
     const groups = await this.chatGroupRepository
@@ -183,17 +73,15 @@ export class ChatService {
       'updatedAt',
       ['desc', 'desc'],
     ]).reverse();
-    const urlParsedGroups =
-      await this.generateSignedStorageURLsFromChatGroupArr(groupsAndUsers);
-    return urlParsedGroups;
+    return groupsAndUsers;
   }
 
   public async getRoomsByPage(
     userID: number,
-    page: number,
+    query: GetMessagesQuery,
   ): Promise<GetRoomsResult> {
-    const limit = 20;
-    const offset = limit * (page - 1);
+    const { page, limit = '20' } = query;
+    const offset = Number(limit) * (Number(page) - 1);
     const [urlUnparsedRooms, count] = await this.chatGroupRepository
       .createQueryBuilder('chat_groups')
       .leftJoinAndSelect('chat_groups.members', 'members')
@@ -205,16 +93,18 @@ export class ChatService {
         { pinnedUserID: userID },
       )
       .leftJoinAndSelect('chat_groups.lastReadChatTime', 'lastReadChatTime')
+      .leftJoinAndSelect(
+        'chat_groups.chatMessages',
+        'm',
+        'm.id = ( SELECT id FROM chat_messages WHERE chat_group_id = chat_groups.id AND type <> "system_text" ORDER BY updated_at DESC LIMIT 1 )',
+      )
       .leftJoinAndSelect('lastReadChatTime.user', 'lastReadChatTime.user')
       .where('member.id = :memberId', { memberId: userID })
       .skip(offset)
-      .take(limit)
+      .take(Number(limit))
       .orderBy('chat_groups.updatedAt', 'DESC')
       .getManyAndCount();
-    let rooms = await this.generateSignedStorageURLsFromChatGroupArr(
-      urlUnparsedRooms,
-    );
-    rooms = rooms.map((g) => {
+    let rooms = urlUnparsedRooms.map((g) => {
       const isPinned = !!g.pinnedUsers.length;
       return {
         ...g,
@@ -227,7 +117,7 @@ export class ChatService {
       'updatedAt',
       ['desc', 'desc'],
     ]).reverse();
-    const pageCount = Math.floor(count / limit) + 1;
+    const pageCount = Math.floor(count / Number(limit)) + 1;
     return { rooms, pageCount };
   }
 
@@ -269,9 +159,7 @@ export class ChatService {
       m.isSender = false;
       return m;
     });
-    const parsedMessages =
-      await this.generateSignedStorageURLsFromChatMessageArr(messages);
-    return parsedMessages;
+    return messages;
   }
 
   public async getMenthionedChatMessage(user: User): Promise<ChatMessage[]> {
@@ -293,9 +181,7 @@ export class ChatService {
       })
       .limit(limit)
       .getMany();
-    const parsedMessages =
-      await this.generateSignedStorageURLsFromChatMessageArr(mentioned);
-    return parsedMessages;
+    return mentioned;
   }
 
   public async getLastReadChatTime(
@@ -328,10 +214,9 @@ export class ChatService {
     if (!existGroup) {
       throw new BadRequestException('That group id is incorrect');
     }
-    message.content = this.storageService.parseSignedURLToStorageURL(
-      message.content,
+    const savedMessage = await this.chatMessageRepository.save(
+      this.chatMessageRepository.create(message),
     );
-    const savedMessage = await this.chatMessageRepository.save(message);
     existGroup.updatedAt = new Date();
     await this.chatGroupRepository.save({
       ...existGroup,
@@ -390,6 +275,14 @@ export class ChatService {
     await this.chatMessageRepository.save(systemMessage);
   }
 
+  public async editChatMembers(roomId: number, members: User[]) {
+    const targetRoom = await this.chatGroupRepository.findOne(roomId, {
+      relations: ['members'],
+    });
+    await this.chatGroupRepository.save(targetRoom);
+    return targetRoom;
+  }
+
   public async saveChatGroup(
     chatGroup: Partial<ChatGroup>,
     userID: number,
@@ -404,9 +297,16 @@ export class ChatService {
       chatGroup.imageURL || '',
     );
 
-    const newGroup = await this.chatGroupRepository.save(chatGroup);
+    const newGroup = await this.chatGroupRepository.save(
+      this.chatGroupRepository.create(chatGroup),
+    );
     if (typeof chatGroup.isPinned !== 'undefined') {
       if (chatGroup.isPinned) {
+        await this.chatGroupRepository
+          .createQueryBuilder('chat_groups')
+          .relation('pinnedUsers')
+          .of(newGroup.id)
+          .remove(userID);
         await this.chatGroupRepository
           .createQueryBuilder('chat_groups')
           .relation('pinnedUsers')
@@ -421,75 +321,6 @@ export class ChatService {
       }
     }
     return newGroup;
-  }
-
-  public async saveLastReadChatTime(
-    user: User,
-    chatGroupId: number,
-  ): Promise<LastReadChatTime> {
-    const chatGroup = await this.chatGroupRepository.findOne(chatGroupId, {
-      relations: ['members'],
-    });
-    const isMember = chatGroup.members.filter((m) => m.id === user.id).length;
-    if (!isMember) {
-      throw new NotAcceptableException('Something went wrong');
-    }
-    const target = await this.lastReadChatTimeRepository.findOne({
-      where: {
-        user: user,
-        chatGroup: chatGroup,
-      },
-      relations: ['user', 'chatGroup'],
-    });
-
-    if (target) {
-      target.readTime = new Date();
-      const newLastReadChatTime = await this.lastReadChatTimeRepository.save(
-        target,
-      );
-      return newLastReadChatTime;
-    }
-
-    const newLastReadChatTime = await this.lastReadChatTimeRepository.save({
-      readTime: new Date(),
-      user: user,
-      chatGroup: chatGroup,
-    });
-    return newLastReadChatTime;
-  }
-
-  public async saveChatNotes(dto: Partial<ChatNote>): Promise<ChatNote> {
-    const savedNote = await this.noteRepository.save(dto);
-    if (dto.images?.length) {
-      const sentImages = dto.images.map((i) => ({
-        ...i,
-        imageURL: this.storageService.parseSignedURLToStorageURL(i.imageURL),
-        chatNote: savedNote,
-      }));
-
-      await this.noteImageRepository.save(sentImages);
-    }
-    return savedNote;
-  }
-
-  public async deleteChatNotes(noteId: number) {
-    await this.noteRepository.delete(noteId);
-  }
-
-  public async getChatNoteDetail(
-    noteID: number,
-    userID: number,
-  ): Promise<ChatNote> {
-    let noteDetail = await this.noteRepository.findOne(noteID, {
-      relations: ['chatGroup', 'editors', 'images'],
-      withDeleted: true,
-    });
-    noteDetail = await this.generateSignedStorageURLsFromChatNoteObj(
-      noteDetail,
-    );
-    noteDetail.isEditor = !!noteDetail.editors.filter((e) => e.id === userID)
-      .length;
-    return noteDetail;
   }
 
   public async deleteReaction(reactionId: number): Promise<number> {
@@ -509,31 +340,37 @@ export class ChatService {
     return { ...savedReaction, isSender: true };
   }
 
-  public async getChatNotes(
-    query: GetChatNotesQuery,
-    userID: number,
-  ): Promise<GetChatNotesResult> {
-    const { page, group } = query;
-    const limit = 20;
-    const offset = limit * (Number(page) - 1);
-    const [existNotes, count] = await this.noteRepository
-      .createQueryBuilder('chat_notes')
-      .leftJoinAndSelect('chat_notes.chatGroup', 'chat_groups')
-      .leftJoinAndSelect('chat_notes.editors', 'editors')
-      .leftJoinAndSelect('chat_notes.images', 'images')
-      .where('chat_groups.id = :chatGroupId', { chatGroupId: group })
-      .withDeleted()
-      .skip(offset)
-      .take(limit)
-      .orderBy('chat_notes.createdAt', 'DESC')
-      .getManyAndCount();
+  public async saveLastReadChatTime(
+    user: User,
+    chatGroupId: number,
+  ): Promise<LastReadChatTime> {
+    const chatGroup = await this.chatGroupRepository.findOne(chatGroupId, {
+      relations: ['members'],
+    });
+    const isMember = chatGroup.members.filter((m) => m.id === user.id).length;
+    if (!isMember) {
+      throw new NotAcceptableException('Something went wrong');
+    }
+    const existTime = await this.lastReadChatTimeRepository
+      .createQueryBuilder('time')
+      .leftJoin('time.chatGroup', 'g')
+      .leftJoin('time.user', 'u')
+      .where('g.id = :chatGroupId', { chatGroupId })
+      .andWhere('u.id = :userId', { userId: user.id })
+      .getMany();
 
-    let notes = await this.generateSignedStorageURLsFromChatNoteArr(existNotes);
-    notes = existNotes.map((n) => ({
-      ...n,
-      isEditor: !!n.editors?.filter((e) => e.id === userID).length,
-    }));
-    const pageCount = Math.floor(count / limit) + 1;
-    return { notes, pageCount };
+    if (existTime.length) {
+      await this.lastReadChatTimeRepository.remove(existTime);
+    }
+
+    const newTarget = this.lastReadChatTimeRepository.create({
+      readTime: new Date(),
+      user,
+      chatGroup: { id: chatGroupId },
+    });
+    const newLastReadChatTime = await this.lastReadChatTimeRepository.save(
+      newTarget,
+    );
+    return newLastReadChatTime;
   }
 }

@@ -1,6 +1,6 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { SetStateAction, useCallback, useEffect, useState } from 'react';
 import ReactModal from 'react-modal';
-import { User, UserRole } from 'src/types';
+import { ChatGroup, User, UserRole } from 'src/types';
 import selectUserModalStyles from '@/styles/components/SelectUserModal.module.scss';
 import clsx from 'clsx';
 import {
@@ -12,28 +12,30 @@ import {
 } from '@chakra-ui/react';
 import { useAuthenticate } from 'src/contexts/useAuthenticate';
 import { userRoleNameFactory } from 'src/utils/factory/userRoleNameFactory';
+import { useAPIGetUsers } from '@/hooks/api/user/useAPIGetUsers';
+import { useAPIEditMembers } from '@/hooks/api/chat/useAPIEditMembers';
 
 type EditChatGroupMambersModalProps = {
+  room: ChatGroup;
+  setRoom: React.Dispatch<SetStateAction<ChatGroup | undefined>>;
   isOpen: boolean;
-  users: User[];
-  previousUsers: User[];
-  onComplete: (selectedUsers: User[]) => void;
-  onCancel: () => void;
+  onClose: () => void;
 };
 
 const EditChatGroupMembersModal: React.FC<EditChatGroupMambersModalProps> = ({
+  room,
+  setRoom,
   isOpen,
-  users,
-  previousUsers,
-  onComplete,
-  onCancel,
+  onClose: onCancel,
 }) => {
+  const { data: users } = useAPIGetUsers();
   const [selectedRole, setSelectedRole] = useState<UserRole | 'all'>(
     UserRole.INTERNAL_INSTRUCTOR,
   );
   const [selectedUsers, setSelectedUsers] = useState<User[]>([]);
   const [previousMembers, setPreviousMembers] = useState<User[]>([]);
   const { user: myProfile } = useAuthenticate();
+  const { mutate: editMembers } = useAPIEditMembers();
 
   const toggleSelectedUsers = (user: User) => {
     const isExist = selectedUsers.filter((u) => u.id === user.id).length;
@@ -51,8 +53,8 @@ const EditChatGroupMembersModal: React.FC<EditChatGroupMambersModalProps> = ({
   }, [previousMembers]);
 
   useEffect(() => {
-    setPreviousMembers(previousUsers);
-  }, [previousUsers]);
+    setPreviousMembers(room?.members || []);
+  }, [room?.members]);
 
   return (
     <ReactModal
@@ -115,7 +117,7 @@ const EditChatGroupMembersModal: React.FC<EditChatGroupMambersModalProps> = ({
           ))}
         {selectedRole !== 'all'
           ? users
-              .filter((u) => u.role === selectedRole)
+              ?.filter((u) => u.role === selectedRole)
               .filter((u) => !previousUserIDs().includes(u.id))
               .map((u) => (
                 <a
@@ -140,7 +142,7 @@ const EditChatGroupMembersModal: React.FC<EditChatGroupMambersModalProps> = ({
                 </a>
               ))
           : users
-              .filter((u) => !previousUserIDs().includes(u.id))
+              ?.filter((u) => !previousUserIDs().includes(u.id))
               .map((u) => (
                 <a
                   key={u.id}
@@ -170,7 +172,6 @@ const EditChatGroupMembersModal: React.FC<EditChatGroupMambersModalProps> = ({
           borderRadius={5}
           className={selectUserModalStyles.modal_cancel_button}
           onClick={() => {
-            setPreviousMembers(previousUsers);
             setSelectedUsers([]);
             onCancel();
           }}>
@@ -182,8 +183,20 @@ const EditChatGroupMembersModal: React.FC<EditChatGroupMambersModalProps> = ({
           colorScheme="green"
           borderRadius={5}
           onClick={() => {
-            onComplete([...previousMembers, ...selectedUsers]);
-            setSelectedUsers([]);
+            console.log(selectedUsers);
+            editMembers(
+              {
+                roomId: room.id,
+                members: [...previousMembers, ...selectedUsers],
+              },
+              {
+                onSuccess: (newGroupInfo) => {
+                  onCancel();
+                  setRoom(newGroupInfo);
+                  setSelectedUsers([]);
+                },
+              },
+            );
           }}>
           完了
         </Button>

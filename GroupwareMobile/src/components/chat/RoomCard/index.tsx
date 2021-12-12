@@ -1,10 +1,11 @@
 import React from 'react';
-import {TouchableOpacity, useWindowDimensions} from 'react-native';
+import {Platform, TouchableOpacity, useWindowDimensions} from 'react-native';
+import FastImage from 'react-native-fast-image';
 import {Swipeable} from 'react-native-gesture-handler';
 import {Button, Div, Icon, Image, Text} from 'react-native-magnus';
 import tailwind from 'tailwind-rn';
 import {roomCardStyles} from '../../../styles/component/chat/roomCard.style';
-import {ChatGroup, User} from '../../../types';
+import {ChatGroup, ChatMessage, ChatMessageType, User} from '../../../types';
 import {darkFontColor} from '../../../utils/colors';
 import {dateTimeFormatterFromJSDDate} from '../../../utils/dateTimeFormatterFromJSDate';
 
@@ -43,6 +44,18 @@ const RoomCard: React.FC<RoomCardProps> = ({
       </Button>
     );
   };
+  const latestMessage = (chatMessage: ChatMessage) => {
+    switch (chatMessage.type) {
+      case ChatMessageType.IMAGE:
+        return '画像が送信されました';
+      case ChatMessageType.VIDEO:
+        return '動画が送信されました';
+      case ChatMessageType.OTHER_FILE:
+        return 'ファイルが送信されました';
+      default:
+        return chatMessage.content;
+    }
+  };
 
   return (
     <TouchableOpacity onPress={onPress}>
@@ -58,16 +71,12 @@ const RoomCard: React.FC<RoomCardProps> = ({
           alignItems="center"
           flexDir="row">
           <Div>
-            <Image
-              h={'90%'}
+            <FastImage
               source={
                 room.imageURL
                   ? {uri: room.imageURL}
                   : require('../../../../assets/no-image-avatar.png')
               }
-              rounded="circle"
-              shadow="xs"
-              mr={'lg'}
               style={roomCardStyles.image}
             />
             {room.isPinned && (
@@ -80,7 +89,7 @@ const RoomCard: React.FC<RoomCardProps> = ({
                 borderWidth={1}
                 borderColor={'green500'}
                 fontFamily="MaterialCommunityIcons"
-                style={roomCardStyles.pinIcon}
+                style={Platform.OS === 'android' && roomCardStyles.pinIcon}
                 position="absolute"
                 bottom={0}
                 right={10}
@@ -91,11 +100,11 @@ const RoomCard: React.FC<RoomCardProps> = ({
             <Text numberOfLines={1} mb={'xs'} fontWeight="bold" fontSize={16}>
               {room.name || nameOfEmptyNameGroup(room.members)}
             </Text>
-            {room.chatMessages?.length && (
-              <Text mb={'xs'} fontSize={14} color={darkFontColor}>
-                {room.chatMessages[0].content}
-              </Text>
-            )}
+            <Text mb={'xs'} fontSize={14} color={darkFontColor}>
+              {room.chatMessages?.length
+                ? latestMessage(room.chatMessages[0])
+                : ''}
+            </Text>
             <Div flexDir="row" justifyContent="space-between">
               <Text>{`${room.members?.length || 0}人のメンバー`}</Text>
               <Text>

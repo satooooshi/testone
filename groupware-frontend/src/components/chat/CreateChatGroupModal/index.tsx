@@ -20,28 +20,20 @@ import { getCroppedImageURL } from 'src/utils/getCroppedImageURL';
 import { dataURLToFile } from 'src/utils/dataURLToFile';
 import { userRoleNameFactory } from 'src/utils/factory/userRoleNameFactory';
 import { formikErrorMsgFactory } from 'src/utils/factory/formikErrorMsgFactory';
+import { useAPIGetUsers } from '@/hooks/api/user/useAPIGetUsers';
+import { useAPIUploadStorage } from '@/hooks/api/storage/useAPIUploadStorage';
+import { useAPISaveChatGroup } from '@/hooks/api/chat/useAPISaveChatGroup';
 
 type CreateChatGroupModalProps = {
   isOpen: boolean;
-  users: User[];
-  resetFormTrigger: boolean;
-  groupImageURL: string;
-  setResetFormTrigger: React.Dispatch<React.SetStateAction<boolean>>;
   closeModal: () => void;
-  createGroup: (g: Partial<ChatGroup>) => void;
-  uploadImage: (r: File[]) => void;
 };
 
 const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
   isOpen,
-  users,
-  resetFormTrigger,
-  groupImageURL,
-  setResetFormTrigger,
   closeModal,
-  createGroup,
-  uploadImage,
 }) => {
+  const { data: users } = useAPIGetUsers();
   const toast = useToast();
   const initialChatValues = {
     name: '',
@@ -77,6 +69,18 @@ const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
     setImgUploaded(false);
   }, []);
 
+  const { mutate: createGroup } = useAPISaveChatGroup({
+    onSuccess: () => {
+      closeModal();
+      toast({
+        description: 'チャットルームの作成が完了しました。',
+        status: 'success',
+        duration: 3000,
+        isClosable: true,
+      });
+    },
+  });
+
   const {
     values: newGroup,
     setValues: setNewGroup,
@@ -98,6 +102,11 @@ const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
         return uploadImage([result]);
       }
       createGroup(newGroup);
+    },
+  });
+  const { mutate: uploadImage } = useAPIUploadStorage({
+    onSuccess: async (fileURLs) => {
+      setNewGroup((g) => ({ ...g, imageURL: fileURLs[0] }));
     },
   });
 
@@ -132,19 +141,9 @@ const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
   };
 
   useEffect(() => {
-    if (resetFormTrigger) {
-      resetForm();
-    }
-    setResetFormTrigger(false);
-  }, [resetFormTrigger]);
-
-  useEffect(() => {
-    if (groupImageURL) {
-      createGroup(newGroup);
-      setSelectImageUrl('');
-      setImgUploaded(true);
-    }
-  }, [groupImageURL]);
+    setSelectImageUrl('');
+    setImgUploaded(true);
+  }, [newGroup]);
 
   return (
     <ReactModal
@@ -213,7 +212,7 @@ const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
           </FormControl>
           <div className={selectUserModalStyles.users}>
             {selectedUserRole === 'all'
-              ? users.map((u) => (
+              ? users?.map((u) => (
                   <a
                     key={u.id}
                     onClick={() => toggleNewGroupMember(u)}
@@ -233,7 +232,7 @@ const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
                     </div>
                   </a>
                 ))
-              : users.map(
+              : users?.map(
                   (u) =>
                     u.role === selectedUserRole && (
                       <a

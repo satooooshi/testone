@@ -250,6 +250,7 @@ export interface ChatMessage {
   chatGroup?: ChatGroup;
   chatMessages?: ChatMessage[];
   sender?: User;
+  reactions?: ChatMessageReaction[];
   createdAt: Date;
   updatedAt: Date;
   isSender?: boolean;
@@ -260,6 +261,8 @@ export interface ChatGroup {
   id: number;
   name: string;
   imageURL: string;
+  pinnedUsers?: User[];
+  isPinned?: boolean;
   chatNotes?: ChatNote[];
   chatMessages?: ChatMessage[];
   members?: User[];
@@ -299,7 +302,7 @@ export interface ChatAlbum {
   title: string;
   chatGroup?: ChatGroup;
   editors?: User[];
-  images?: ChatAlbumImage[];
+  images?: Partial<ChatAlbumImage>[];
   createdAt: Date;
   updatedAt: Date;
   isEditor?: boolean;
@@ -316,7 +319,7 @@ export interface ChatAlbumImage {
 export interface ChatMessageReaction {
   id: number;
   emoji: string;
-  user?: User;
+  user?: Partial<User>;
   chatMessage?: ChatMessage;
   createdAt: Date;
   updatedAt: Date;

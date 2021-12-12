@@ -1,4 +1,11 @@
+import { genSignedURL } from 'src/utils/storage/genSignedURL';
+import { genStorageURL } from 'src/utils/storage/genStorageURL';
 import {
+  AfterInsert,
+  AfterLoad,
+  AfterUpdate,
+  BeforeInsert,
+  BeforeUpdate,
   Column,
   CreateDateColumn,
   Entity,
@@ -53,4 +60,17 @@ export class SubmissionFile {
     name: 'updated_at',
   })
   updatedAt: Date;
+
+  @BeforeInsert()
+  @BeforeUpdate()
+  changeToStorageURL?() {
+    this.url = genStorageURL(this.url);
+  }
+
+  @AfterInsert()
+  @AfterLoad()
+  @AfterUpdate()
+  async changeToSignedURL?() {
+    this.url = await genSignedURL(this.url);
+  }
 }

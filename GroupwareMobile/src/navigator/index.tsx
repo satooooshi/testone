@@ -10,14 +10,17 @@ import {RootStackParamList} from '../types/navigator/RootStackParamList';
 import DrawerTab from './Drawer';
 import {tokenString} from '../utils/url';
 import messaging from '@react-native-firebase/messaging';
-import PushNotification from 'react-native-push-notification';
+import PushNotification, {Importance} from 'react-native-push-notification';
 import {Platform} from 'react-native';
+import {requestIOSMsgPermission} from '../utils/permission/requestIOSMsgPermisson';
+import {useAPIRegisterDevice} from '../hooks/api/notification/useAPIRegisterDevice';
 
 const Stack = createStackNavigator<RootStackParamList>();
 
 const Navigator = () => {
   const {user} = useAuthenticate();
   const navigationRef = useNavigationContainerRef<any>();
+  const {mutate: registerDevice} = useAPIRegisterDevice();
 
   useEffect(() => {
     const naviateByNotif = (notification: any) => {
@@ -52,19 +55,26 @@ const Navigator = () => {
     };
     PushNotification.configure({
       onNotification: notification => {
-        if (
-          Platform.OS !== 'android' ||
-          (Platform.OS === 'android' && notification.userInteraction)
-        ) {
+        if (notification.userInteraction) {
           naviateByNotif(notification);
         }
       },
       requestPermissions: true,
     });
+    PushNotification.createChannel(
+      {
+        channelId: 'default-channel-id',
+        channelName: '通知全般',
+        importance: Importance.HIGH,
+      },
+      result => {
+        console.log(result);
+      },
+    );
     const unsubscribe = messaging().onMessage(async remoteMessage => {
-      console.log(remoteMessage);
+      console.log('sent', remoteMessage);
       PushNotification.localNotification({
-        channelId: remoteMessage.notification?.android?.channelId,
+        channelId: 'default-channel-id',
         ignoreInForeground: false,
         id: remoteMessage.messageId,
         message: remoteMessage.notification?.body || '',
@@ -77,6 +87,33 @@ const Navigator = () => {
     return unsubscribe;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    const handleMessaging = async () => {
+      if (user) {
+        await requestIOSMsgPermission();
+        // const token =
+        //   Platform.OS === 'android'
+        //     ? await messaging().getToken()
+        //     : await messaging().getAPNSToken();
+        const token = await messaging().getToken();
+        console.log('token', token);
+        if (token) {
+          registerDevice({token});
+        }
+
+        // Listen to whether the token changes
+        return messaging().onTokenRefresh(tokenChanged => {
+          if (token) {
+            registerDevice({token: tokenChanged});
+          }
+          // saveTokenToDatabase(token);
+          console.log('token changed: ', tokenChanged);
+        });
+      }
+    };
+    handleMessaging();
+  }, [registerDevice, user]);
 
   return (
     <NavigationContainer ref={navigationRef}>

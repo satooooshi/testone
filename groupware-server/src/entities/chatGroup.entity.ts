@@ -1,7 +1,16 @@
+import { userNameFactory } from 'src/utils/factory/userNameFactory';
+import { genSignedURL } from 'src/utils/storage/genSignedURL';
+import { genStorageURL } from 'src/utils/storage/genStorageURL';
 import {
+  AfterInsert,
+  AfterLoad,
+  AfterUpdate,
+  BeforeInsert,
+  BeforeUpdate,
   Column,
   CreateDateColumn,
   Entity,
+  getRepository,
   JoinColumn,
   JoinTable,
   ManyToMany,
@@ -11,7 +20,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { ChatAlbum } from './chatAlbum.entity';
-import { ChatMessage } from './chatMessage.entity';
+import { ChatMessage, ChatMessageType } from './chatMessage.entity';
 import { EventSchedule } from './event.entity';
 import { LastReadChatTime } from './lastReadChatTime.entity';
 import { User } from './user.entity';
@@ -100,4 +109,35 @@ export class ChatGroup {
   updatedAt: Date;
 
   isPinned?: boolean;
+
+  @AfterInsert()
+  async saveNewSystemMessage?() {
+    console.log('called');
+    if (this.id && this.members?.length) {
+      if (this.members.length) {
+        const newMemberMsg = new ChatMessage();
+        newMemberMsg.content =
+          this.members.map((m) => userNameFactory(m)).join(', ') +
+          'が参加しました';
+        newMemberMsg.type = ChatMessageType.SYSTEM_TEXT;
+        newMemberMsg.chatGroup = this;
+        getRepository(ChatMessage).save(
+          getRepository(ChatMessage).create(newMemberMsg),
+        );
+      }
+    }
+  }
+
+  @BeforeInsert()
+  @BeforeUpdate()
+  changeToStorageURL?() {
+    this.imageURL = genStorageURL(this.imageURL);
+  }
+
+  @AfterInsert()
+  @AfterLoad()
+  @AfterUpdate()
+  async changeToSignedURL?() {
+    this.imageURL = await genSignedURL(this.imageURL);
+  }
 }

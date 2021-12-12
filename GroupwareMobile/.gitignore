@@ -63,3 +63,7 @@ buck-out/
 
 google-services.json
 GoogleService-Info.plist
+
+*.aab
+*.apk
+output-metadata.json

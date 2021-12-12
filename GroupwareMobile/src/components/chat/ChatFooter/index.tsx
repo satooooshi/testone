@@ -25,6 +25,7 @@ import {
   isMentionPartType,
 } from 'react-native-controlled-mentions/dist/utils';
 import {Div, Icon} from 'react-native-magnus';
+import {ActivityIndicator} from 'react-native-paper';
 import {chatStyles} from '../../../styles/screen/chat/chat.style';
 
 type ChatFooterProps = {
@@ -35,6 +36,7 @@ type ChatFooterProps = {
   onUploadImage: () => void;
   onSend: () => void;
   mentionSuggestions: Suggestion[];
+  isLoading: boolean;
 };
 
 const ChatFooter: React.FC<ChatFooterProps> = ({
@@ -45,6 +47,7 @@ const ChatFooter: React.FC<ChatFooterProps> = ({
   onUploadImage,
   onSend,
   mentionSuggestions,
+  isLoading,
 }) => {
   const {width: windowWidth, height: windowHeight} = useWindowDimensions();
   const [selection, setSelection] = useState({start: 0, end: 0});
@@ -231,9 +234,13 @@ const ChatFooter: React.FC<ChatFooterProps> = ({
             </Text>
           </TextInput>
         </Div>
-        <TouchableOpacity onPress={onSend}>
-          <Icon name="send" fontFamily="Ionicons" fontSize={21} />
-        </TouchableOpacity>
+        {isLoading ? (
+          <ActivityIndicator />
+        ) : (
+          <TouchableOpacity onPress={onSend}>
+            <Icon name="send" fontFamily="Ionicons" fontSize={21} />
+          </TouchableOpacity>
+        )}
       </Div>
     </Div>
   );

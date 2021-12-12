@@ -12,7 +12,7 @@ export type RootStackParamList = {
   };
   Wiki: undefined;
   WikiList: {
-    type: WikiType;
+    type?: WikiType;
   };
   WikiDetail: {
     id: number;
@@ -50,6 +50,7 @@ export type RootStackParamList = {
       }
     | undefined;
   NewRoom: undefined;
+  EditRoom: {room: ChatGroup};
   ChatMenu: {
     room: ChatGroup;
   };

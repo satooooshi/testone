@@ -1,4 +1,11 @@
+import { genSignedURL } from 'src/utils/storage/genSignedURL';
+import { genStorageURL } from 'src/utils/storage/genStorageURL';
 import {
+  AfterInsert,
+  AfterLoad,
+  AfterUpdate,
+  BeforeInsert,
+  BeforeUpdate,
   Column,
   CreateDateColumn,
   Entity,
@@ -122,4 +129,17 @@ export class Wiki {
     },
   })
   tags?: Tag[];
+
+  @BeforeInsert()
+  @BeforeUpdate()
+  changeToStorageURL?() {
+    this.body = genStorageURL(this.body);
+  }
+
+  @AfterInsert()
+  @AfterLoad()
+  @AfterUpdate()
+  async changeToSignedURL?() {
+    this.body = await genSignedURL(this.body);
+  }
 }

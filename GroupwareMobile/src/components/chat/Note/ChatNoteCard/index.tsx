@@ -9,6 +9,7 @@ import {userNameFactory} from '../../../../utils/factory/userNameFactory';
 type ChatNoteCardProps = {
   note: ChatNote;
   onPressEditButton: () => void;
+  onPressDeleteButton: () => void;
   onPressImage: (
     images: Partial<ChatNoteImage>[],
     targetImage: Partial<ChatNoteImage>,
@@ -18,6 +19,7 @@ type ChatNoteCardProps = {
 const ChatNoteCard: React.FC<ChatNoteCardProps> = ({
   note,
   onPressEditButton,
+  onPressDeleteButton,
   onPressImage,
 }) => {
   return (
@@ -47,14 +49,25 @@ const ChatNoteCard: React.FC<ChatNoteCardProps> = ({
           </Text>
         </Div>
         {note.isEditor && (
-          <Button rounded="circle" onPress={onPressEditButton}>
-            <Icon
-              name="pencil"
-              fontFamily="Entypo"
-              fontSize={20}
-              color="white"
-            />
-          </Button>
+          <Div flexDir="row">
+            <Button rounded="circle" onPress={onPressEditButton} mr="sm">
+              <Icon
+                name="pencil"
+                fontFamily="Entypo"
+                fontSize={20}
+                color="white"
+              />
+            </Button>
+            <Button
+              bg="white"
+              borderColor="red"
+              borderWidth={1}
+              rounded="circle"
+              onPress={onPressDeleteButton}
+              mr="sm">
+              <Icon name="delete" fontSize={20} color="red" />
+            </Button>
+          </Div>
         )}
       </Div>
       <Div flexDir="row" flexWrap="wrap">
