@@ -1,8 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { ChatGroup, ChatMessage, ChatMessageType, User } from 'src/types';
 import { dateTimeFormatterFromJSDDate } from 'src/utils/dateTimeFormatter';
-import { Avatar, Box, useMediaQuery, Text } from '@chakra-ui/react';
+import { Avatar, Box, useMediaQuery, Text, Link } from '@chakra-ui/react';
 import { darkFontColor } from 'src/utils/colors';
+import { useAPISaveChatGroup } from '@/hooks/api/chat/useAPISaveChatGroup';
+import { RiPushpin2Fill, RiPushpin2Line } from 'react-icons/ri';
 
 type ChatGroupCardProps = {
   chatGroup: ChatGroup;
@@ -13,6 +15,12 @@ const ChatGroupCard: React.FC<ChatGroupCardProps> = ({
   chatGroup,
   isSelected = false,
 }) => {
+  const [isPinned, setIsPinned] = useState<boolean>(!!chatGroup.isPinned);
+  const { mutate: saveGroup } = useAPISaveChatGroup({
+    onSuccess: () => {
+      setIsPinned(!isPinned);
+    },
+  });
   const [isSmallerThan768] = useMediaQuery('max-width: 768px');
   const nameOfEmptyNameGroup = (members?: User[]): string => {
     if (!members) {
@@ -46,6 +54,7 @@ const ChatGroupCard: React.FC<ChatGroupCardProps> = ({
       alignItems="center"
       boxShadow="md"
       w={'100%'}
+      h="fit-content"
       bg={isSelected ? '#f2f1f2' : 'white'}>
       <Avatar src={chatGroup.imageURL} size="md" mr="8px" />
       <Box
@@ -66,6 +75,23 @@ const ChatGroupCard: React.FC<ChatGroupCardProps> = ({
               ? chatGroup.name
               : nameOfEmptyNameGroup(chatGroup.members)}
           </Text>
+          {isPinned ? (
+            <Link
+              onClick={(e) => {
+                e.stopPropagation();
+                saveGroup({ ...chatGroup, isPinned: !chatGroup.isPinned });
+              }}>
+              <RiPushpin2Fill size={24} color="green" />
+            </Link>
+          ) : (
+            <Link
+              onClick={(e) => {
+                e.stopPropagation();
+                saveGroup({ ...chatGroup, isPinned: !chatGroup.isPinned });
+              }}>
+              <RiPushpin2Line size={24} color="green" />
+            </Link>
+          )}
         </Box>
         <Box display="flex" flexDir="row" alignItems="center">
           <Text fontSize="12px" color={darkFontColor} noOfLines={1}>
