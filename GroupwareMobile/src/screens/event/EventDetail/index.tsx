@@ -407,7 +407,7 @@ const EventDetail: React.FC = () => {
                       />
                     </Div>
                     <Div alignItems="center" flex={5}>
-                      <Text>{u.lastName + ' ' + u.firstName}</Text>
+                      <Text numberOfLines={1}>{userNameFactory(u)}</Text>
                     </Div>
                   </Div>
                 );
@@ -479,26 +479,32 @@ const EventDetail: React.FC = () => {
                           <Div
                             bg="white"
                             flexDir="row"
-                            alignItems="center"
+                            flexWrap="wrap"
                             rounded="sm"
+                            alignItems="center"
                             w="45%"
                             borderWidth={1}
                             borderColor="gray400"
                             mx={8}
                             my={4}>
-                            <Image
-                              my={'lg'}
-                              mx={16}
-                              h={windowWidth * 0.09}
-                              w={windowWidth * 0.09}
-                              source={
-                                u.avatarUrl
-                                  ? {uri: u.avatarUrl}
-                                  : require('../../../../assets/no-image-avatar.png')
-                              }
-                              rounded="circle"
-                            />
-                            <Text>{u.lastName + ' ' + u.firstName}</Text>
+                            <Div pl={16} alignItems="center" flex={2}>
+                              <Image
+                                my={'lg'}
+                                h={windowWidth * 0.09}
+                                w={windowWidth * 0.09}
+                                source={
+                                  u.avatarUrl
+                                    ? {uri: u.avatarUrl}
+                                    : require('../../../../assets/no-image-avatar.png')
+                                }
+                                rounded="circle"
+                              />
+                            </Div>
+                            <Div alignItems="center" flex={5}>
+                              <Text numberOfLines={1}>
+                                {userNameFactory(u)}
+                              </Text>
+                            </Div>
                           </Div>
                         );
                       }
