@@ -407,9 +407,7 @@ const EventDetail: React.FC = () => {
                       />
                     </Div>
                     <Div alignItems="center" flex={5}>
-                      <Text numberOfLines={1}>
-                        {u.lastName + ' ' + u.firstName}
-                      </Text>
+                      <Text numberOfLines={1}>{userNameFactory(u)}</Text>
                     </Div>
                   </Div>
                 );
@@ -504,7 +502,7 @@ const EventDetail: React.FC = () => {
                             </Div>
                             <Div alignItems="center" flex={5}>
                               <Text numberOfLines={1}>
-                                {u.lastName + ' ' + u.firstName}
+                                {userNameFactory(u)}
                               </Text>
                             </Div>
                           </Div>
