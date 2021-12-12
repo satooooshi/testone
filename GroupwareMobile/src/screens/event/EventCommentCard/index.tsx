@@ -3,7 +3,6 @@ import {User} from '../../../types';
 import {dateTimeFormatterFromJSDDate} from '../../../utils/dateTimeFormatterFromJSDate';
 import React from 'react';
 import {useWindowDimensions} from 'react-native';
-import tailwind from 'tailwind-rn';
 
 type EventCommentCardProps = {
   body: string;
@@ -17,52 +16,42 @@ const EventCommentCard: React.FC<EventCommentCardProps> = ({
   writer,
 }) => {
   const {width: windowWidth} = useWindowDimensions();
+  const avatarProps = {
+    mt: 'sm',
+    mb: 'sm',
+    h: windowWidth * 0.09,
+    w: windowWidth * 0.09,
+    rounded: 'circle',
+    ...(writer.existence
+      ? {
+          source: writer.avatarUrl
+            ? {uri: writer.avatarUrl}
+            : require('../../../../assets/no-image-avatar.png'),
+        }
+      : {
+          source: require('../../../../assets/bold-mascot.png'),
+        }),
+  };
 
   return (
-    <Div style={tailwind('flex-col justify-between mb-4')}>
-      {writer.existence ? (
-        <Div style={tailwind('flex-row justify-between items-center')}>
-          <Div style={tailwind('flex-row justify-between items-center')}>
-            <Image
-              mt={'lg'}
-              h={windowWidth * 0.1}
-              w={windowWidth * 0.1}
-              source={
-                writer.avatarUrl
-                  ? {uri: writer.avatarUrl}
-                  : require('../../../../assets/no-image-avatar.png')
-              }
-              rounded="circle"
-              mb={'lg'}
-              mr={16}
-            />
-            <Text mr={64}>{writer.lastName + ' ' + writer.firstName}</Text>
-          </Div>
-          <Text>
-            {dateTimeFormatterFromJSDDate({dateTime: new Date(date)})}
+    <Div flexDir="column" justifyContent="space-between" mb={16}>
+      <Div alignItems="center" flexDir="row" justifyContent="space-between">
+        <Div flex={1} alignItems="center">
+          <Image {...avatarProps} />
+          <Text fontSize={12} color="gray800">
+            {writer.existence
+              ? writer.lastName + ' ' + writer.firstName
+              : 'ボールドくん'}
           </Text>
         </Div>
-      ) : (
-        <Div style={tailwind('flex-row justify-between items-center')}>
-          <Div style={tailwind('flex-row justify-between items-center')}>
-            <Image
-              mt={'lg'}
-              h={windowWidth * 0.1}
-              w={windowWidth * 0.1}
-              source={require('../../../../assets/bold-mascot.png')}
-              rounded="circle"
-              mb={'lg'}
-              mr={16}
-            />
-            <Text mr={64}>ボールドくん</Text>
+        <Div p={20} bg="white" rounded="sm" flex={3}>
+          <Text>{body}</Text>
+          <Div position="absolute" right={4} bottom={4}>
+            <Text fontSize={10} color="gray500">
+              {dateTimeFormatterFromJSDDate({dateTime: new Date(date)})}
+            </Text>
           </Div>
-          <Text>
-            {dateTimeFormatterFromJSDDate({dateTime: new Date(date)})}
-          </Text>
         </Div>
-      )}
-      <Div style={tailwind('p-4 bg-white rounded')}>
-        <Text>{body}</Text>
       </Div>
     </Div>
   );

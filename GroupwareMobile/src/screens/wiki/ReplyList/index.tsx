@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {FlatList, TouchableOpacity, useWindowDimensions} from 'react-native';
+import {TouchableOpacity, useWindowDimensions} from 'react-native';
 import {Div, Avatar, Text, Collapse, Button} from 'react-native-magnus';
 import {QAAnswer, User} from '../../../types';
 import MarkdownIt from 'markdown-it';
@@ -22,6 +22,17 @@ const ReplyList: React.FC<ReplyListProps> = ({answer, onPressAvatar}) => {
   const [repliesHeight, setRepliesHeight] = useState<number>(100);
   return (
     <>
+      <Button
+        bg="pink600"
+        w={'100%'}
+        onPress={() => {
+          navigation.navigate('WikiStack', {
+            screen: 'PostReply',
+            params: {id: answer.id},
+          });
+        }}>
+        返信する
+      </Button>
       {answer.replies?.length ? (
         <Collapse mb={8}>
           <Collapse.Header
@@ -37,10 +48,8 @@ const ReplyList: React.FC<ReplyListProps> = ({answer, onPressAvatar}) => {
           </Collapse.Header>
           <Collapse.Body mb={8} h={repliesHeight}>
             <Div onLayout={e => setRepliesHeight(e.nativeEvent.layout.height)}>
-              <FlatList
-                data={answer.replies || []}
-                keyExtractor={reply => reply.id.toString()}
-                renderItem={({item: reply}) => (
+              {answer.replies.length ? (
+                answer.replies.map(reply => (
                   <>
                     <Div flexDir="row" alignItems="center" mb={16}>
                       <TouchableOpacity
@@ -76,29 +85,16 @@ const ReplyList: React.FC<ReplyListProps> = ({answer, onPressAvatar}) => {
                       />
                     </Div>
                   </>
-                )}
-                ListEmptyComponent={
-                  <Text fontSize={16} textAlign="center">
-                    返信を投稿してください
-                  </Text>
-                }
-              />
+                ))
+              ) : (
+                <Text fontSize={16} textAlign="center">
+                  返信を投稿してください
+                </Text>
+              )}
             </Div>
           </Collapse.Body>
         </Collapse>
       ) : null}
-      <Button
-        mb={16}
-        bg="pink600"
-        w={'100%'}
-        onPress={() => {
-          navigation.navigate('WikiStack', {
-            screen: 'PostReply',
-            params: {id: answer.id},
-          });
-        }}>
-        返信する
-      </Button>
     </>
   );
 };

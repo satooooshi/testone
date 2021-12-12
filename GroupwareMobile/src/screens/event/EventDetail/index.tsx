@@ -8,7 +8,16 @@ import {
   Alert,
 } from 'react-native';
 import HeaderWithTextButton from '../../../components/Header';
-import {Div, Text, Button, Overlay, ScrollDiv} from 'react-native-magnus';
+import {
+  Div,
+  Text,
+  Button,
+  Overlay,
+  ScrollDiv,
+  Image,
+  Modal,
+  Icon,
+} from 'react-native-magnus';
 import FastImage from 'react-native-fast-image';
 import {eventDetailStyles} from '../../../styles/screen/event/eventDetail.style';
 import {useAPIGetEventDetail} from '../../../hooks/api/event/useAPIGetEventDetail';
@@ -38,11 +47,14 @@ import {useAuthenticate} from '../../../contexts/useAuthenticate';
 import {UserRole} from '../../../types';
 import {useNavigation} from '@react-navigation/native';
 import tailwind from 'tailwind-rn';
+import {getJoiningUsers} from '../../../utils/factory/event/getJoiningUsersFactory';
 
 const EventDetail: React.FC = () => {
   const route = useRoute<EventDetailRouteProps>();
   const {user} = useAuthenticate();
   const navigation = useNavigation();
+
+  const [joiningUserVisiable, setJoiningUserVisiable] = useState(false);
 
   const {id} = route.params;
   const {
@@ -50,7 +62,6 @@ const EventDetail: React.FC = () => {
     refetch: refetchEvents,
     isLoading: isLoadingGetEventDetail,
   } = useAPIGetEventDetail(id);
-
   const initialValues: Partial<EventComment> = {
     body: '',
   };
@@ -74,6 +85,15 @@ const EventDetail: React.FC = () => {
   const {mutate: cancelEvent} = useAPICancelEvent({
     onSuccess: () => refetchEvents(),
   });
+
+  const joiningUsers = useMemo(() => {
+    if (!eventInfo?.userJoiningEvent) {
+      return;
+    }
+
+    return getJoiningUsers(eventInfo?.userJoiningEvent);
+  }, [eventInfo?.userJoiningEvent]);
+
   const windowWidth = useWindowDimensions().width;
   const startAtText = useMemo(() => {
     if (!eventInfo) {
@@ -337,8 +357,68 @@ const EventDetail: React.FC = () => {
         onCloseModal={() => setEventFormModal(false)}
         onSubmit={event => saveEvent({...event, id: eventInfo?.id})}
       />
+      <Modal isVisible={joiningUserVisiable}>
+        <Text fontSize={16} ml={24} mt={16}>
+          参加者一覧 : {joiningUsers?.length}名
+        </Text>
+        <Button
+          bg="gray400"
+          h={35}
+          w={35}
+          position="absolute"
+          top={50}
+          right={15}
+          rounded="circle"
+          onPress={() => {
+            setJoiningUserVisiable(false);
+          }}>
+          <Icon color="black900" name="close" />
+        </Button>
+        <Div my={16} mx={12}>
+          <ScrollDiv>
+            <Div
+              flexDir="row"
+              justifyContent="space-between"
+              alignItems="center"
+              flexWrap="wrap">
+              {joiningUsers?.map(u => {
+                return (
+                  <Div
+                    bg="white"
+                    flexDir="row"
+                    flexWrap="wrap"
+                    rounded="sm"
+                    alignItems="center"
+                    w="45%"
+                    borderWidth={1}
+                    borderColor="gray400"
+                    mx={8}
+                    my={4}>
+                    <Div pl={16} alignItems="center" flex={2}>
+                      <Image
+                        my={'lg'}
+                        h={windowWidth * 0.09}
+                        w={windowWidth * 0.09}
+                        source={
+                          u.avatarUrl
+                            ? {uri: u.avatarUrl}
+                            : require('../../../../assets/no-image-avatar.png')
+                        }
+                        rounded="circle"
+                      />
+                    </Div>
+                    <Div alignItems="center" flex={5}>
+                      <Text>{u.lastName + ' ' + u.firstName}</Text>
+                    </Div>
+                  </Div>
+                );
+              })}
+            </Div>
+          </ScrollDiv>
+        </Div>
+      </Modal>
       <ScrollDiv>
-        {eventInfo ? (
+        {eventInfo && (
           <Div flexDir="column">
             {eventInfo.videos.length ? (
               eventInfo.videos.map(v => (
@@ -353,8 +433,83 @@ const EventDetail: React.FC = () => {
                 <Text mx={16}>関連動画はありません</Text>
               </>
             )}
+            <Div m={16}>
+              {joiningUsers && (
+                <>
+                  <Div
+                    borderBottomWidth={1}
+                    borderColor="green400"
+                    flexDir="row"
+                    justifyContent="space-between"
+                    alignItems="flex-end"
+                    mb="lg"
+                    pb="md">
+                    <Text>
+                      参加者:
+                      {joiningUsers.length || 0}名
+                    </Text>
+                  </Div>
+                  <Div
+                    flexDir="row"
+                    justifyContent="space-between"
+                    alignItems="center"
+                    flexWrap="wrap">
+                    {joiningUsers.map((u, index) => {
+                      if (index > 6) {
+                        return;
+                      } else if (index === 6) {
+                        return (
+                          <Div
+                            flexDir="row"
+                            alignItems="center"
+                            rounded="sm"
+                            w="45%"
+                            mx={8}
+                            my={4}>
+                            <Button
+                              block
+                              m={10}
+                              fontSize={12}
+                              onPress={() => setJoiningUserVisiable(true)}>
+                              参加者を一覧表示
+                            </Button>
+                          </Div>
+                        );
+                      } else {
+                        return (
+                          <Div
+                            bg="white"
+                            flexDir="row"
+                            alignItems="center"
+                            rounded="sm"
+                            w="45%"
+                            borderWidth={1}
+                            borderColor="gray400"
+                            mx={8}
+                            my={4}>
+                            <Image
+                              my={'lg'}
+                              mx={16}
+                              h={windowWidth * 0.09}
+                              w={windowWidth * 0.09}
+                              source={
+                                u.avatarUrl
+                                  ? {uri: u.avatarUrl}
+                                  : require('../../../../assets/no-image-avatar.png')
+                              }
+                              rounded="circle"
+                            />
+                            <Text>{u.lastName + ' ' + u.firstName}</Text>
+                          </Div>
+                        );
+                      }
+                    })}
+                  </Div>
+                </>
+              )}
+            </Div>
             {eventInfo.type !== EventType.SUBMISSION_ETC && (
-              <Div m={16}>
+              <Div mx={16}>
                 <Div
                   borderBottomWidth={1}
                   borderColor="green400"
@@ -364,12 +519,11 @@ const EventDetail: React.FC = () => {
                   mb="lg"
                   pb="md">
                   <Text>
-                    コメント
-                    {eventInfo?.comments.length ? eventInfo.comments.length : 0}
-                    件
+                    コメント:
+                    {eventInfo?.comments.length || 0}件
                   </Text>
                   <Button
-                    fontSize={16}
+                    fontSize={12}
                     py={4}
                     color="white"
                     onPress={() => {
@@ -389,7 +543,7 @@ const EventDetail: React.FC = () => {
                     multiline={true}
                     autoCapitalize="none"
                     style={tailwind(
-                      'border border-green-400 bg-white rounded border-blue-500	 p-2 h-24',
+                      'border border-green-400 mb-4 bg-white rounded border-blue-500 p-2 h-24',
                     )}
                   />
                 )}
@@ -397,21 +551,19 @@ const EventDetail: React.FC = () => {
                   ? eventInfo?.comments.map(
                       comment =>
                         comment.writer && (
-                          <>
-                            <EventCommentCard
-                              key={comment.id}
-                              body={comment.body}
-                              date={comment.createdAt}
-                              writer={comment.writer}
-                            />
-                          </>
+                          <EventCommentCard
+                            key={comment.id}
+                            body={comment.body}
+                            date={comment.createdAt}
+                            writer={comment.writer}
+                          />
                         ),
                     )
                   : null}
               </Div>
             )}
           </Div>
-        ) : null}
+        )}
       </ScrollDiv>
     </WholeContainer>
   );
