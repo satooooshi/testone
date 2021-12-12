@@ -10,7 +10,7 @@ import {RootStackParamList} from '../types/navigator/RootStackParamList';
 import DrawerTab from './Drawer';
 import {tokenString} from '../utils/url';
 import messaging from '@react-native-firebase/messaging';
-import PushNotification from 'react-native-push-notification';
+import PushNotification, {Importance} from 'react-native-push-notification';
 import {Platform} from 'react-native';
 import {requestIOSMsgPermission} from '../utils/permission/requestIOSMsgPermisson';
 import {useAPIRegisterDevice} from '../hooks/api/notification/useAPIRegisterDevice';
@@ -61,6 +61,16 @@ const Navigator = () => {
       },
       requestPermissions: true,
     });
+    PushNotification.createChannel(
+      {
+        channelId: 'default-channel-id',
+        channelName: '通知全般',
+        importance: Importance.HIGH,
+      },
+      result => {
+        console.log(result);
+      },
+    );
     const unsubscribe = messaging().onMessage(async remoteMessage => {
       console.log('sent', remoteMessage);
       PushNotification.localNotification({
