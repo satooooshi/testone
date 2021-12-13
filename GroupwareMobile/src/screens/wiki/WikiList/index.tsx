@@ -37,11 +37,13 @@ const WikiList: React.FC<WikiListProps> = ({navigation}) => {
         tabs={tabs}
         title="社内Wiki"
         activeTabName={type ? wikiTypeNameFactory(type) : 'All'}
-        rightButtonName="新規作成"
+        rightButtonName={
+          type ? `${wikiTypeNameFactory(type)}新規作成` : '新規作成'
+        }
         onPressRightButton={() =>
           navigation.navigate('WikiStack', {
             screen: 'PostWiki',
-            params: {type: undefined},
+            params: {type: type ? type : undefined},
           })
         }
       />
