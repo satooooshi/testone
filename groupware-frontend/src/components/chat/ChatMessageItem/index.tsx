@@ -355,8 +355,7 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
                       borderRadius="8px"
                       p="8px">
                       <AiOutlineFileProtect
-                        height="48px"
-                        width="48px"
+                        style={{ height: '48px', width: '48px' }}
                         color={darkFontColor}
                       />
                       <p>
