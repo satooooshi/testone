@@ -9,23 +9,12 @@ import { orderBy } from 'lodash';
 import { ChatGroup } from 'src/entities/chatGroup.entity';
 import { ChatMessage, ChatMessageType } from 'src/entities/chatMessage.entity';
 import { ChatMessageReaction } from 'src/entities/chatMessageReaction.entity';
-import { ChatNote } from 'src/entities/chatNote.entity';
 import { LastReadChatTime } from 'src/entities/lastReadChatTime.entity';
 import { User } from 'src/entities/user.entity';
 import { userNameFactory } from 'src/utils/factory/userNameFactory';
 import { In, Repository } from 'typeorm';
 import { StorageService } from '../storage/storage.service';
 import { GetMessagesQuery, GetRoomsResult } from './chat.controller';
-
-export interface GetChatNotesQuery {
-  group: number;
-  page?: string;
-}
-
-export interface GetChatNotesResult {
-  notes: ChatNote[];
-  pageCount: number;
-}
 
 @Injectable()
 export class ChatService {
@@ -279,7 +268,7 @@ export class ChatService {
     const targetRoom = await this.chatGroupRepository.findOne(roomId, {
       relations: ['members'],
     });
-    await this.chatGroupRepository.save(targetRoom);
+    await this.chatGroupRepository.save({ ...targetRoom, members });
     return targetRoom;
   }
 
