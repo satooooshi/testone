@@ -58,7 +58,10 @@ const RoomList: React.FC<RoomListProps> = ({
         if (updateNeeded) {
           break;
         }
-        if (roomsForInfiniteScroll[i]?.id !== newData[i]?.id) {
+        if (
+          new Date(roomsForInfiniteScroll[i]?.updatedAt).getTime() !==
+          new Date(newData[i]?.updatedAt).getTime()
+        ) {
           updateNeeded = true;
         }
       }
