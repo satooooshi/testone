@@ -1,4 +1,7 @@
 export const genStorageURL = (text: string): string => {
+  if (!text) {
+    return text;
+  }
   let parseText = text;
   const bucketName = process.env.CLOUD_STORAGE_BUCKET;
   const url = 'https://storage.googleapis.com/' + bucketName + '/';
