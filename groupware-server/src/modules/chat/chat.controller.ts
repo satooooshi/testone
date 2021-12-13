@@ -105,6 +105,20 @@ export class ChatController {
     return await this.chatService.saveChatGroup(chatGroup, user.id);
   }
 
+  @Post('/v2/room')
+  @UseGuards(JwtAuthenticationGuard)
+  async v2SaveChatGroup(
+    @Req() req: RequestWithUser,
+    @Body() chatGroup: Partial<ChatGroup>,
+  ): Promise<ChatGroup> {
+    const user = req.user;
+    chatGroup.members = [
+      ...(chatGroup?.members?.filter((u) => u.id !== user.id) || []),
+      user,
+    ];
+    return await this.chatService.v2SaveChatGroup(chatGroup, user.id);
+  }
+
   @Patch('/v2/room/:roomId/members')
   @UseGuards(JwtAuthenticationGuard)
   async editRoomMembers(

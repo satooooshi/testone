@@ -8,7 +8,7 @@ export const getLastReadChatTimeURL = `/${chatURL}/get-last-read-chat-time`;
 export const editMembersURL = (roomId: number) =>
   `/${chatURL}/v2/room/${roomId.toString()}/members`;
 export const sendChantMessageURL = `/${chatURL}/send-message`;
-export const saveChatGroupURL = `/${chatURL}/save-chat-group`;
+export const saveChatGroupURL = `/${chatURL}/v2/room`;
 export const saveLastReadChatTimeURL = `/${chatURL}/save-last-read-chat-time`;
 export const saveReactionURL = `/${chatURL}/v2/reaction`;
 export const deleteReactionURL = (reactionId: string) =>

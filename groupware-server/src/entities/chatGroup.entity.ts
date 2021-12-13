@@ -112,7 +112,6 @@ export class ChatGroup {
 
   @AfterInsert()
   async saveNewSystemMessage?() {
-    console.log('called');
     if (this.id && this.members?.length) {
       if (this.members.length) {
         const newMemberMsg = new ChatMessage();

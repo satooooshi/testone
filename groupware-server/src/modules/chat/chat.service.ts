@@ -323,6 +323,63 @@ export class ChatService {
     return newGroup;
   }
 
+  public async v2SaveChatGroup(
+    chatGroup: Partial<ChatGroup>,
+    userID: number,
+  ): Promise<ChatGroup> {
+    if (!chatGroup.members || !chatGroup.members.length) {
+      throw new InternalServerErrorException('Something went wrong');
+    }
+    // const userIds = chatGroup.members.map((u) => u.id);
+    const userIds: number[] = [14, 16, 19, 1321];
+    const users = await this.userRepository.findByIds(userIds);
+    const maybeExistGroup = await this.chatGroupRepository
+      .createQueryBuilder('g')
+      .leftJoinAndSelect('g.members', 'u')
+      .where('u.id IN (:...userIds)', { userIds })
+      .andWhere('g.name = :name', { name: chatGroup.name })
+      .getMany();
+
+    const existGroup = maybeExistGroup
+      .filter((g) => g.members.length === userIds.length)
+      .filter((g) =>
+        g.members.map((m) => m.id).filter((id) => userIds.includes(id)),
+      );
+
+    if (existGroup.length) {
+      return existGroup[0];
+    }
+    chatGroup.members = users;
+    chatGroup.imageURL = this.storageService.parseSignedURLToStorageURL(
+      chatGroup.imageURL || '',
+    );
+
+    const newGroup = await this.chatGroupRepository.save(
+      this.chatGroupRepository.create(chatGroup),
+    );
+    if (typeof chatGroup.isPinned !== 'undefined') {
+      if (chatGroup.isPinned) {
+        await this.chatGroupRepository
+          .createQueryBuilder('chat_groups')
+          .relation('pinnedUsers')
+          .of(newGroup.id)
+          .remove(userID);
+        await this.chatGroupRepository
+          .createQueryBuilder('chat_groups')
+          .relation('pinnedUsers')
+          .of(newGroup.id)
+          .add(userID);
+      } else {
+        await this.chatGroupRepository
+          .createQueryBuilder('chat_groups')
+          .relation('pinnedUsers')
+          .of(newGroup.id)
+          .remove(userID);
+      }
+    }
+    return newGroup;
+  }
+
   public async deleteReaction(reactionId: number): Promise<number> {
     await this.chatMessageReactionRepository.delete(reactionId);
     return reactionId;
