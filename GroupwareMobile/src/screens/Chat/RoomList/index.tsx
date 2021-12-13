@@ -109,6 +109,7 @@ const RoomList: React.FC = () => {
       <FlatList
         {...{onEndReached}}
         contentContainerStyle={tailwind('self-center mt-4')}
+        keyExtractor={item => item.id.toString()}
         data={roomsForInfiniteScroll}
         renderItem={({item: room}) => (
           <Div mb="lg">
