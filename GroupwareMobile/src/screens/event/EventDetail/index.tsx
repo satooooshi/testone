@@ -420,6 +420,7 @@ const EventDetail: React.FC = () => {
       <ScrollDiv>
         {eventInfo && (
           <Div flexDir="column">
+            <AboveYoutubeVideos />
             {eventInfo.videos.length ? (
               eventInfo.videos.map(v => (
                 <YoutubePlayer
@@ -429,14 +430,14 @@ const EventDetail: React.FC = () => {
               ))
             ) : (
               <>
-                <AboveYoutubeVideos />
                 <Text mx={16}>関連動画はありません</Text>
               </>
             )}
-            <Div m={16}>
+            <Div>
               {joiningUsers && (
                 <>
                   <Div
+                    mx={16}
                     borderBottomWidth={1}
                     borderColor="green400"
                     flexDir="row"
@@ -444,7 +445,7 @@ const EventDetail: React.FC = () => {
                     alignItems="flex-end"
                     mb="lg"
                     pb="md">
-                    <Text>
+                    <Text fontSize={16}>
                       参加者:
                       {joiningUsers.length || 0}名
                     </Text>
@@ -524,12 +525,12 @@ const EventDetail: React.FC = () => {
                   alignItems="flex-end"
                   mb="lg"
                   pb="md">
-                  <Text>
+                  <Text fontSize={16}>
                     コメント:
                     {eventInfo?.comments.length || 0}件
                   </Text>
                   <Button
-                    fontSize={12}
+                    fontSize={16}
                     py={4}
                     color="white"
                     onPress={() => {
