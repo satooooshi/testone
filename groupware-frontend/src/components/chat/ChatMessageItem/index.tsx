@@ -267,11 +267,13 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
               </>
             )}
             <Box display="flex" flexDir="column" alignItems="flex-start">
-              <Text>
-                {message.sender && message.sender?.existence
-                  ? userNameFactory(message.sender)
-                  : 'ボールドくん'}
-              </Text>
+              {!message.isSender && (
+                <Text>
+                  {message.sender && message.sender?.existence
+                    ? userNameFactory(message.sender)
+                    : 'ボールドくん'}
+                </Text>
+              )}
               {message.type === ChatMessageType.TEXT ? (
                 <Box
                   maxW={'40vw'}
