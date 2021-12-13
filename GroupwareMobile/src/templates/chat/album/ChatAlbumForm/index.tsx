@@ -58,7 +58,7 @@ const ChatAlbumForm: React.FC<ChatAlbumFormProps> = ({
     const {formData} = await uploadImageFromGallery({
       cropping: true,
       mediaType: 'photo',
-      multiple: false,
+      multiple: true,
     });
     if (formData) {
       uploadImage(formData, {
