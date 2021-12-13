@@ -12,6 +12,7 @@ import {
   ChatMessageType,
   User,
 } from '../../../types';
+import {dateTimeFormatterFromJSDDate} from '../../../utils/dateTimeFormatterFromJSDate';
 import {userNameFactory} from '../../../utils/factory/userNameFactory';
 import {numbersOfSameValueInKeyOfObjArr} from '../../../utils/numbersOfSameValueInKeyOfObjArr';
 import FileMessage from './FileMessage';
@@ -62,6 +63,35 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
     }
     return reactionsNoDuplicates;
   };
+
+  const timesAndReadCounts = (
+    <Div justifyContent="flex-end" alignItems="center">
+      {message.isSender &&
+      readUsers.length &&
+      message.type !== ChatMessageType.SYSTEM_TEXT ? (
+        <TouchableOpacity onPress={onCheckLastRead}>
+          <Text
+            mb="sm"
+            mr={message?.isSender ? 'sm' : undefined}
+            ml={!message?.isSender ? 'sm' : undefined}>
+            {numbersOfRead ? `既読${numbersOfRead}人` : ''}
+          </Text>
+        </TouchableOpacity>
+      ) : null}
+      {message.type !== ChatMessageType.SYSTEM_TEXT ? (
+        <Text
+          fontSize={12}
+          mr={message?.isSender ? 'sm' : undefined}
+          ml={!message?.isSender ? 'sm' : undefined}>
+          {dateTimeFormatterFromJSDDate({
+            dateTime: new Date(message.createdAt),
+            format: 'LL/dd HH:mm',
+          })}
+        </Text>
+      ) : null}
+    </Div>
+  );
+
   return (
     <>
       {message.type === ChatMessageType.SYSTEM_TEXT && (
@@ -86,18 +116,7 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
             <Text>{userNameFactory(message.sender)}</Text>
           ) : null}
           <Div flexDir="row" alignItems="flex-end">
-            {message.isSender &&
-            readUsers.length &&
-            message.type !== ChatMessageType.SYSTEM_TEXT ? (
-              <TouchableOpacity onPress={onCheckLastRead}>
-                <Text
-                  mb="sm"
-                  mr={message?.isSender ? 'sm' : undefined}
-                  ml={!message?.isSender ? 'sm' : undefined}>
-                  {numbersOfRead ? `既読\n${numbersOfRead}人` : ''}
-                </Text>
-              </TouchableOpacity>
-            ) : null}
+            {message.isSender && timesAndReadCounts}
             {message.type === ChatMessageType.TEXT ? (
               <TextMessage message={message} onLongPress={onLongPress} />
             ) : message.type === ChatMessageType.IMAGE ? (
@@ -119,6 +138,7 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
                 onLongPress={onLongPress}
               />
             ) : null}
+            {!message.isSender && timesAndReadCounts}
           </Div>
         </Div>
         {!message.isSender && message.type !== ChatMessageType.SYSTEM_TEXT ? (
