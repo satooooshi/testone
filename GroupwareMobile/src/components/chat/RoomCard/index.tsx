@@ -22,14 +22,11 @@ const RoomCard: React.FC<RoomCardProps> = ({
 }) => {
   const {width: windowWidth} = useWindowDimensions();
   const nameOfEmptyNameGroup = (members?: User[]): string => {
-    if (!members) {
+    if (!members?.length) {
       return 'メンバーがいません';
     }
-    const strMembers = members?.map(m => m.lastName + m.firstName).toString();
-    if (strMembers.length > 15) {
-      return strMembers.slice(0, 15) + '...(' + members.length + ')';
-    }
-    return strMembers.toString();
+    const strMembers = members?.map(m => m.lastName + m.firstName).join();
+    return strMembers;
   };
   const rightSwipeActions = () => {
     return (
@@ -100,7 +97,11 @@ const RoomCard: React.FC<RoomCardProps> = ({
             <Text numberOfLines={1} mb={'xs'} fontWeight="bold" fontSize={16}>
               {room.name || nameOfEmptyNameGroup(room.members)}
             </Text>
-            <Text mb={'xs'} fontSize={14} color={darkFontColor}>
+            <Text
+              mb={'xs'}
+              fontSize={14}
+              color={darkFontColor}
+              numberOfLines={1}>
               {room.chatMessages?.length
                 ? latestMessage(room.chatMessages[0])
                 : ''}
