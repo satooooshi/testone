@@ -66,11 +66,9 @@ const sendPushNotifToSpecificDevices = async (
     icon: 'https://portal.bold.ne.jp/_next/image?url=%2F_next%2Fstatic%2Fimage%2Fpublic%2Fbold-logo.22bda447bf8117298663d36dd31fcf59.png&w=1080&q=75', // gcm for android
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     //@ts-ignore
-    image:
-      'https://portal.bold.ne.jp/_next/image?url=%2F_next%2Fstatic%2Fimage%2Fpublic%2Fbold-logo.22bda447bf8117298663d36dd31fcf59.png&w=1080&q=75', // gcm for android
+    image: '', // gcm for android
     style: '', // gcm for android
-    picture:
-      'https://portal.bold.ne.jp/_next/image?url=%2F_next%2Fstatic%2Fimage%2Fpublic%2Fbold-logo.22bda447bf8117298663d36dd31fcf59.png&w=1080&q=75', // gcm for android
+    picture: '', // gcm for android
     tag: '', // gcm for android
     color: '', // gcm for android
     clickAction: '', // gcm for android. In ios, category will be used if not supplied
