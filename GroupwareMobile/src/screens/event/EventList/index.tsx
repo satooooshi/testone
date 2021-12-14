@@ -146,6 +146,7 @@ const EventList: React.FC = () => {
         onPressRightButton={() => setEventFormModal(true)}
       />
       <EventFormModal
+        type={searchQuery.type || undefined}
         isVisible={visibleEventFormModal}
         onCloseModal={() => setEventFormModal(false)}
         onSubmit={event => saveEvent(event)}
