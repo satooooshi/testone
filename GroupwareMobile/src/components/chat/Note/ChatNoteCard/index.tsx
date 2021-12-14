@@ -73,6 +73,7 @@ const ChatNoteCard: React.FC<ChatNoteCardProps> = ({
       <Div flexDir="row" flexWrap="wrap">
         {note.images?.map(i => (
           <TouchableHighlight
+            key={i.id}
             underlayColor="none"
             onPress={() => note.images && onPressImage(note.images, i)}>
             <Image

@@ -103,8 +103,10 @@ const ChatNotes: React.FC = () => {
           {...{onEndReached}}
           style={tailwind('h-full bg-white')}
           data={notesForInfiniteScroll}
+          keyExtractor={item => item.id.toString()}
           renderItem={({item}) => (
             <ChatNoteCard
+              key={item.id.toString()}
               note={item}
               onPressEditButton={() =>
                 navigation.navigate('ChatStack', {

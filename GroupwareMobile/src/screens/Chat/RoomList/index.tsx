@@ -31,7 +31,7 @@ const RoomList: React.FC = () => {
     {
       refetchInterval: 3000,
       onSuccess: data => {
-        stateUpdateNeeeded(data.rooms);
+        stateRefreshNeeded(data.rooms);
       },
     },
   );
@@ -67,7 +67,7 @@ const RoomList: React.FC = () => {
     }
   };
 
-  const stateUpdateNeeeded = (newData: ChatGroup[]) => {
+  const stateRefreshNeeded = (newData: ChatGroup[]) => {
     let updateNeeded = false;
     if (roomsForInfiniteScroll.length !== newData?.length) {
       updateNeeded = true;
@@ -95,12 +95,6 @@ const RoomList: React.FC = () => {
       handleRefetch();
     }
   }, [needRefetch, handleRefetch]);
-
-  useEffect(() => {
-    if (chatRooms?.rooms?.length) {
-      setRoomsForInfiniteScroll(r => [...r, ...chatRooms.rooms]);
-    }
-  }, [chatRooms?.rooms]);
 
   return (
     <WholeContainer>
