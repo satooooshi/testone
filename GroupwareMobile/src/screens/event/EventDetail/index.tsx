@@ -393,6 +393,8 @@ const EventDetail: React.FC = () => {
         onSuccess: fileURL => {
           const unSavedFiles: Partial<SubmissionFile>[] = fileURL.map(f => ({
             url: f,
+            eventSchedule: eventInfo,
+            userSubmitted: user,
           }));
           setUnsavedSubmissions(f => [...f, ...unSavedFiles]);
         },
