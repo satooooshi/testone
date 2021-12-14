@@ -20,6 +20,7 @@ const PostWiki: React.FC = () => {
   const navigation = useNavigation<PostWikiNavigationProps>();
   const route = useRoute<PostWikiRouteProps>();
   const type = route.params?.type;
+  const ruleCategory = route.params?.ruleCategory;
   const {mutate: saveWiki, isLoading: loadingSaveWiki} = useAPICreateWiki({
     onSuccess: () => {
       navigation.goBack();
@@ -35,7 +36,7 @@ const PostWiki: React.FC = () => {
     body: '',
     tags: [],
     type: type || WikiType.QA,
-    ruleCategory: type ? RuleCategory.RULES : RuleCategory.OTHERS,
+    ruleCategory: ruleCategory || RuleCategory.OTHERS,
     textFormat: 'html',
   };
   const {setValues: setNewWiki} = useFormik({
@@ -67,6 +68,7 @@ const PostWiki: React.FC = () => {
         onUploadImage={handleUploadImage}
         tags={tags || []}
         type={type}
+        ruleCategory={ruleCategory}
         saveWiki={saveWiki}
       />
     </>

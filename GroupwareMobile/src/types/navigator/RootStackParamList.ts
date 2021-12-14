@@ -1,4 +1,11 @@
-import {ChatAlbum, ChatGroup, ChatNote, EventType, WikiType} from '../../types';
+import {
+  ChatAlbum,
+  ChatGroup,
+  ChatNote,
+  EventType,
+  RuleCategory,
+  WikiType,
+} from '../../types';
 
 export type RootStackParamList = {
   Home: undefined;
@@ -19,6 +26,7 @@ export type RootStackParamList = {
   };
   PostWiki: {
     type?: WikiType;
+    ruleCategory?: RuleCategory;
   };
   EditWiki: {
     id: number;
