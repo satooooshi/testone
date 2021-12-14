@@ -328,8 +328,7 @@ export class ChatService {
     if (!chatGroup.members || !chatGroup.members.length) {
       throw new InternalServerErrorException('Something went wrong');
     }
-    // const userIds = chatGroup.members.map((u) => u.id);
-    const userIds: number[] = [14, 16, 19, 1321];
+    const userIds = chatGroup.members.map((u) => u.id);
     const users = await this.userRepository.findByIds(userIds);
     const maybeExistGroup = await this.chatGroupRepository
       .createQueryBuilder('g')
