@@ -342,7 +342,16 @@ const EventDetail: React.FC = () => {
           />
 
           <Text mb={8}>参考資料</Text>
-          {/* TODO list files */}
+          <Div flexDir="row" flexWrap="wrap">
+            {eventInfo?.files?.map(
+              f =>
+                f.url && (
+                  <Div mr={4} mb={4}>
+                    <FileIcon url={f.url} />
+                  </Div>
+                ),
+            )}
+          </Div>
           <Text mb={8}>関連動画</Text>
         </Div>
       </>
