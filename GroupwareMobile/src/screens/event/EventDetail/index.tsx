@@ -1,4 +1,4 @@
-import React, {useEffect, useMemo, useState} from 'react';
+import React, {useEffect, useMemo, useRef, useState} from 'react';
 import WholeContainer from '../../../components/WholeContainer';
 import {
   FlatList,
@@ -6,6 +6,7 @@ import {
   ActivityIndicator,
   TextInput,
   Alert,
+  TouchableOpacity,
 } from 'react-native';
 import HeaderWithTextButton from '../../../components/Header';
 import {
@@ -15,8 +16,9 @@ import {
   Overlay,
   ScrollDiv,
   Image,
-  Modal,
   Icon,
+  Select,
+  SelectRef,
 } from 'react-native-magnus';
 import FastImage from 'react-native-fast-image';
 import {eventDetailStyles} from '../../../styles/screen/event/eventDetail.style';
@@ -37,7 +39,7 @@ import {useAPIJoinEvent} from '../../../hooks/api/event/useAPIJoinEvent';
 import {useAPICancelEvent} from '../../../hooks/api/event/useAPICancelEvent';
 import {AxiosError} from 'axios';
 import {useFormik} from 'formik';
-import {EventComment, EventType} from '../../../types';
+import {EventComment, EventType, UserJoiningEvent} from '../../../types';
 import {useAPICreateComment} from '../../../hooks/api/event/useAPICreateComment';
 import EventCommentCard from '../EventCommentCard';
 import {createCommentSchema} from '../../../utils/validation/schema';
@@ -47,15 +49,22 @@ import {useAuthenticate} from '../../../contexts/useAuthenticate';
 import {UserRole} from '../../../types';
 import {useNavigation} from '@react-navigation/native';
 import tailwind from 'tailwind-rn';
-import {getJoiningUsers} from '../../../utils/factory/event/getJoiningUsersFactory';
+import {useAPISaveUserJoiningEvent} from '../../../hooks/api/event/useAPISaveUserJoiningEvent';
+import {getUserJoiningEventExceptCanceledFactory} from '../../../utils/factory/event/getUserJoiningEventExceptCanceledFactory';
 
 const EventDetail: React.FC = () => {
   const route = useRoute<EventDetailRouteProps>();
   const {user} = useAuthenticate();
   const navigation = useNavigation();
 
-  const [joiningUserVisiable, setJoiningUserVisiable] = useState(false);
-
+  const [joiningUserVisiable, setJoiningUserVisiable] =
+    useState<boolean>(false);
+  const [
+    lateRecordTargetUserJoiningEvent,
+    setLateRecordTargetUserJoiningEvent,
+  ] = useState<UserJoiningEvent>();
+  const lateRecorderRef = useRef<SelectRef>(null);
+  const lateRecorderInOverLayRef = useRef<SelectRef>(null);
   const {id} = route.params;
   const {
     data: eventInfo,
@@ -65,6 +74,12 @@ const EventDetail: React.FC = () => {
   const initialValues: Partial<EventComment> = {
     body: '',
   };
+  const {mutate: handleChangeJoiningData} = useAPISaveUserJoiningEvent({
+    onSuccess: () => {
+      refetchEvents();
+      Alert.alert('遅刻を記録しました。');
+    },
+  });
   const [screenLoading, setScreenLoading] = useState(false);
   const [visibleEventFormModal, setEventFormModal] = useState(false);
   const [commentVisible, setCommentVisible] = useState(false);
@@ -86,12 +101,13 @@ const EventDetail: React.FC = () => {
     onSuccess: () => refetchEvents(),
   });
 
-  const joiningUsers = useMemo(() => {
+  const userJoiningEvents = useMemo(() => {
     if (!eventInfo?.userJoiningEvent) {
       return;
     }
-
-    return getJoiningUsers(eventInfo?.userJoiningEvent);
+    return getUserJoiningEventExceptCanceledFactory(
+      eventInfo?.userJoiningEvent,
+    );
   }, [eventInfo?.userJoiningEvent]);
 
   const windowWidth = useWindowDimensions().width;
@@ -357,16 +373,20 @@ const EventDetail: React.FC = () => {
         onCloseModal={() => setEventFormModal(false)}
         onSubmit={event => saveEvent({...event, id: eventInfo?.id})}
       />
-      <Modal isVisible={joiningUserVisiable}>
-        <Text fontSize={16} ml={24} mt={16}>
-          参加者一覧 : {joiningUsers?.length}名
+      <Overlay
+        w="90%"
+        visible={joiningUserVisiable}
+        onBackdropPress={() => setJoiningUserVisiable(false)}>
+        <Text fontSize={14} ml={24} mt={16}>
+          参加者一覧 : {userJoiningEvents?.length}名
+          {user?.role === UserRole.ADMIN && '(タップで遅刻を記録)'}
         </Text>
         <Button
           bg="gray400"
           h={35}
           w={35}
           position="absolute"
-          top={50}
+          top={15}
           right={15}
           rounded="circle"
           onPress={() => {
@@ -374,49 +394,105 @@ const EventDetail: React.FC = () => {
           }}>
           <Icon color="black900" name="close" />
         </Button>
-        <Div my={16} mx={12}>
+        <Div my={16} mx={24}>
           <ScrollDiv>
             <Div
               flexDir="row"
               justifyContent="space-between"
               alignItems="center"
               flexWrap="wrap">
-              {joiningUsers?.map(u => {
+              {userJoiningEvents?.map(uje => {
                 return (
-                  <Div
-                    bg="white"
-                    flexDir="row"
-                    flexWrap="wrap"
-                    rounded="sm"
-                    alignItems="center"
-                    w="45%"
-                    borderWidth={1}
-                    borderColor="gray400"
-                    mx={8}
-                    my={4}>
-                    <Div pl={16} alignItems="center" flex={2}>
+                  <TouchableOpacity
+                    style={tailwind(
+                      'bg-white flex-row flex-wrap rounded items-center border border-gray-400 mx-2 my-1',
+                    )}
+                    onPress={() => {
+                      if (
+                        user?.role === UserRole.ADMIN &&
+                        lateRecorderInOverLayRef.current
+                      ) {
+                        setLateRecordTargetUserJoiningEvent(uje);
+                        lateRecorderInOverLayRef.current.open();
+                      }
+                    }}>
+                    <Div pl={16} alignItems="center" flex={1}>
                       <Image
                         my={'lg'}
                         h={windowWidth * 0.09}
                         w={windowWidth * 0.09}
                         source={
-                          u.avatarUrl
-                            ? {uri: u.avatarUrl}
+                          uje.user.avatarUrl
+                            ? {uri: uje.user.avatarUrl}
                             : require('../../../../assets/no-image-avatar.png')
                         }
                         rounded="circle"
                       />
                     </Div>
-                    <Div alignItems="center" flex={5}>
-                      <Text numberOfLines={1}>{userNameFactory(u)}</Text>
+                    <Div alignItems="center" flex={4}>
+                      <Text numberOfLines={1}>{userNameFactory(uje.user)}</Text>
+                      {user?.role === UserRole.ADMIN &&
+                        uje.lateMinutes !== 0 && (
+                          <Text color="red">{uje.lateMinutes}分遅刻</Text>
+                        )}
                     </Div>
-                  </Div>
+                  </TouchableOpacity>
                 );
               })}
             </Div>
           </ScrollDiv>
         </Div>
-      </Modal>
+        <Select
+          onSelect={v => {
+            if (lateRecordTargetUserJoiningEvent) {
+              handleChangeJoiningData({
+                ...lateRecordTargetUserJoiningEvent,
+                lateMinutes: v,
+              });
+            }
+          }}
+          ref={lateRecorderInOverLayRef}
+          value={lateRecordTargetUserJoiningEvent?.lateMinutes}
+          title={
+            userNameFactory(lateRecordTargetUserJoiningEvent?.user) +
+            'さんの遅刻を記録'
+          }
+          message="遅刻時間を選択してください。"
+          roundedTop="xl"
+          style={tailwind('z-50')}
+          data={[15, 30, 45, 60, 90, 120]}
+          renderItem={item => (
+            <Select.Option value={item} py="md" px="xl">
+              <Text>{item}分遅刻</Text>
+            </Select.Option>
+          )}
+        />
+      </Overlay>
+      <Select
+        onSelect={v => {
+          if (lateRecordTargetUserJoiningEvent) {
+            handleChangeJoiningData({
+              ...lateRecordTargetUserJoiningEvent,
+              lateMinutes: v,
+            });
+          }
+        }}
+        ref={lateRecorderRef}
+        value={lateRecordTargetUserJoiningEvent?.lateMinutes}
+        title={
+          userNameFactory(lateRecordTargetUserJoiningEvent?.user) +
+          'さんの遅刻を記録'
+        }
+        message="遅刻時間を選択してください。"
+        roundedTop="xl"
+        style={tailwind('z-50')}
+        data={[15, 30, 45, 60, 90, 120]}
+        renderItem={item => (
+          <Select.Option value={item} py="md" px="xl">
+            <Text>{item}分遅刻</Text>
+          </Select.Option>
+        )}
+      />
       <ScrollDiv>
         {eventInfo && (
           <Div flexDir="column">
@@ -434,7 +510,7 @@ const EventDetail: React.FC = () => {
               </>
             )}
             <Div m={16}>
-              {joiningUsers && (
+              {userJoiningEvents && (
                 <>
                   <Div
                     borderBottomWidth={1}
@@ -446,7 +522,8 @@ const EventDetail: React.FC = () => {
                     pb="md">
                     <Text>
                       参加者:
-                      {joiningUsers.length || 0}名
+                      {userJoiningEvents.length || 0}名
+                      {user?.role === UserRole.ADMIN && '(タップで遅刻を記録)'}
                     </Text>
                   </Div>
                   <Div
@@ -454,7 +531,7 @@ const EventDetail: React.FC = () => {
                     justifyContent="space-between"
                     alignItems="center"
                     flexWrap="wrap">
-                    {joiningUsers.map((u, index) => {
+                    {userJoiningEvents.map((uje, index) => {
                       if (index > 6) {
                         return;
                       } else if (index === 6) {
@@ -477,36 +554,44 @@ const EventDetail: React.FC = () => {
                         );
                       } else {
                         return (
-                          <Div
-                            bg="white"
-                            flexDir="row"
-                            flexWrap="wrap"
-                            rounded="sm"
-                            alignItems="center"
-                            w="45%"
-                            borderWidth={1}
-                            borderColor="gray400"
-                            mx={8}
-                            my={4}>
-                            <Div pl={16} alignItems="center" flex={2}>
+                          <TouchableOpacity
+                            style={tailwind(
+                              'bg-white flex-row flex-wrap rounded items-center w-40 border border-gray-400 mx-2 my-1',
+                            )}
+                            onPress={() => {
+                              if (
+                                user?.role === UserRole.ADMIN &&
+                                lateRecorderRef.current
+                              ) {
+                                setLateRecordTargetUserJoiningEvent(uje);
+                                lateRecorderRef.current.open();
+                              }
+                            }}>
+                            <Div pl={16} alignItems="center" flex={1}>
                               <Image
                                 my={'lg'}
                                 h={windowWidth * 0.09}
                                 w={windowWidth * 0.09}
                                 source={
-                                  u.avatarUrl
-                                    ? {uri: u.avatarUrl}
+                                  uje.user.avatarUrl
+                                    ? {uri: uje.user.avatarUrl}
                                     : require('../../../../assets/no-image-avatar.png')
                                 }
                                 rounded="circle"
                               />
                             </Div>
-                            <Div alignItems="center" flex={5}>
+                            <Div alignItems="center" flex={4}>
                               <Text numberOfLines={1}>
-                                {userNameFactory(u)}
+                                {userNameFactory(uje.user)}
                               </Text>
+                              {user?.role === UserRole.ADMIN &&
+                                uje.lateMinutes !== 0 && (
+                                  <Text color="red">
+                                    {uje.lateMinutes}分遅刻
+                                  </Text>
+                                )}
                             </Div>
-                          </Div>
+                          </TouchableOpacity>
                         );
                       }
                     })}
