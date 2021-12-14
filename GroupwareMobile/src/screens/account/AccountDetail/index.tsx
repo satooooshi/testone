@@ -238,7 +238,7 @@ const AccountDetail: React.FC = () => {
                     <Div alignItems="center" mt="lg">
                       {events?.events?.length ? (
                         events?.events?.map(e => (
-                          <Div mb={'lg'}>
+                          <Div mb={'lg'} key={e.id}>
                             <EventCard
                               event={e}
                               onPress={() =>
@@ -267,6 +267,7 @@ const AccountDetail: React.FC = () => {
                       {questionList?.wiki?.length ? (
                         questionList?.wiki?.map(w => (
                           <WikiCard
+                            key={w.id}
                             wiki={w}
                             onPress={() =>
                               navigation.navigate('WikiStack', {
@@ -295,6 +296,7 @@ const AccountDetail: React.FC = () => {
                       {knowledgeList?.wiki?.length ? (
                         knowledgeList?.wiki?.map(w => (
                           <WikiCard
+                            key={w.id}
                             wiki={w}
                             onPress={() =>
                               navigation.navigate('WikiStack', {

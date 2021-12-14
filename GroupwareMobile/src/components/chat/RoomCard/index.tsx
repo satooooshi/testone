@@ -2,7 +2,7 @@ import React from 'react';
 import {Platform, TouchableOpacity, useWindowDimensions} from 'react-native';
 import FastImage from 'react-native-fast-image';
 import {Swipeable} from 'react-native-gesture-handler';
-import {Button, Div, Icon, Image, Text} from 'react-native-magnus';
+import {Button, Div, Icon, Text} from 'react-native-magnus';
 import tailwind from 'tailwind-rn';
 import {roomCardStyles} from '../../../styles/component/chat/roomCard.style';
 import {ChatGroup, ChatMessage, ChatMessageType, User} from '../../../types';

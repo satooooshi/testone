@@ -478,6 +478,7 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
           </Div>
           {newEvent.files?.map(f => (
             <Div
+              key={f.id}
               mb={'lg'}
               w={'100%'}
               borderColor={blueColor}
@@ -524,6 +525,7 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
             />
             {newEvent.videos?.map((v, index) => (
               <Div
+                key={v.id}
                 mb={'lg'}
                 w={'100%'}
                 borderColor={blueColor}

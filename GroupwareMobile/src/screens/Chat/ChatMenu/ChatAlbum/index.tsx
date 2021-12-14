@@ -75,6 +75,7 @@ const ChatAlbums: React.FC = () => {
         <FlatList
           {...{onEndReached}}
           data={notesForInfiniteScroll}
+          keyExtractor={item => item.id.toString()}
           renderItem={({item}) => (
             <AlbumBox
               album={item}

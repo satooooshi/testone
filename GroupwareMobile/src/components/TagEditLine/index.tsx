@@ -23,6 +23,7 @@ const TagEditLine: React.FC<TagEditLineProps> = props => {
       <Div w={'70%'} flexWrap="wrap" flexDir="row">
         {tags?.map(t => (
           <Tag
+            key={t.id}
             px={'sm'}
             h={28}
             bg={tagColorFactory(tagType)}

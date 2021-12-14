@@ -100,6 +100,7 @@ const Home: React.FC = () => {
             newsForScroll.map((news, index) =>
               index < newsIndex * 5 ? (
                 <TouchableHighlight
+                  key={news.id.toString()}
                   underlayColor="none"
                   style={tailwind('w-full')}
                   onPress={() => onPressNews(news)}>
@@ -117,7 +118,7 @@ const Home: React.FC = () => {
                   </Div>
                 </TouchableHighlight>
               ) : (
-                <></>
+                <React.Fragment key={news.id.toString()} />
               ),
             )
           ) : (

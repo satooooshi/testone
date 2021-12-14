@@ -384,6 +384,7 @@ const EventDetail: React.FC = () => {
               {joiningUsers?.map(u => {
                 return (
                   <Div
+                    key={u.id}
                     bg="white"
                     flexDir="row"
                     flexWrap="wrap"
@@ -424,6 +425,7 @@ const EventDetail: React.FC = () => {
             {eventInfo.videos.length ? (
               eventInfo.videos.map(v => (
                 <YoutubePlayer
+                  key={v.id}
                   height={300}
                   videoId={generateYoutubeId(v.url || '')}
                 />
@@ -461,6 +463,7 @@ const EventDetail: React.FC = () => {
                       } else if (index === 6) {
                         return (
                           <Div
+                            key={u.id}
                             flexDir="row"
                             alignItems="center"
                             rounded="sm"
@@ -554,19 +557,17 @@ const EventDetail: React.FC = () => {
                     )}
                   />
                 )}
-                {eventInfo?.comments && eventInfo?.comments.length
-                  ? eventInfo?.comments.map(
-                      comment =>
-                        comment.writer && (
-                          <EventCommentCard
-                            key={comment.id}
-                            body={comment.body}
-                            date={comment.createdAt}
-                            writer={comment.writer}
-                          />
-                        ),
-                    )
-                  : null}
+                {eventInfo?.comments.map(
+                  comment =>
+                    comment.writer && (
+                      <EventCommentCard
+                        key={comment.id}
+                        body={comment.body}
+                        date={comment.createdAt}
+                        writer={comment.writer}
+                      />
+                    ),
+                )}
               </Div>
             )}
           </Div>
