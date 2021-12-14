@@ -107,6 +107,11 @@ const EventDetail: React.FC = () => {
       Alert.alert('提出状況を保存しました');
       refetchEvents();
     },
+    onError: err => {
+      if (err.response?.data) {
+        Alert.alert((err.response?.data as AxiosError)?.message);
+      }
+    },
   });
   const {mutate: joinEvent} = useAPIJoinEvent({
     onSuccess: () => refetchEvents(),
