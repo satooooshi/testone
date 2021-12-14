@@ -1,5 +1,5 @@
 import {useNavigation} from '@react-navigation/native';
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useCallback, useState} from 'react';
 import {FlatList} from 'react-native';
 import {Div} from 'react-native-magnus';
 import {ActivityIndicator} from 'react-native-paper';
@@ -10,15 +10,10 @@ import WholeContainer from '../../../components/WholeContainer';
 import {useAPIGetRooms} from '../../../hooks/api/chat/useAPIGetRoomsByPage';
 import {useAPISaveChatGroup} from '../../../hooks/api/chat/useAPISaveChatGroup';
 import {ChatGroup} from '../../../types';
-import {
-  RoomListNavigationProps,
-  RoomListRouteProps,
-} from '../../../types/navigator/drawerScreenProps';
+import {RoomListNavigationProps} from '../../../types/navigator/drawerScreenProps';
 
 const RoomList: React.FC = () => {
   const navigation = useNavigation<RoomListNavigationProps>();
-  const route = useNavigation<RoomListRouteProps>();
-  const needRefetch = route.params?.needRefetch;
   const [page, setPage] = useState('1');
   const [roomsForInfiniteScroll, setRoomsForInfiniteScroll] = useState<
     ChatGroup[]
@@ -91,12 +86,6 @@ const RoomList: React.FC = () => {
     }
   };
 
-  useEffect(() => {
-    if (needRefetch) {
-      handleRefetch();
-    }
-  }, [needRefetch, handleRefetch]);
-
   return (
     <WholeContainer>
       <HeaderWithTextButton
@@ -110,7 +99,7 @@ const RoomList: React.FC = () => {
         keyExtractor={item => item.id.toString()}
         data={roomsForInfiniteScroll}
         renderItem={({item: room}) => (
-          <Div mb="lg">
+          <Div mb="sm">
             <RoomCard
               room={room}
               onPress={() =>

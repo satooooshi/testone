@@ -44,11 +44,7 @@ export type RootStackParamList = {
   Chat: {
     room: ChatGroup;
   };
-  RoomList:
-    | {
-        needRefetch: boolean;
-      }
-    | undefined;
+  RoomList: undefined;
   NewRoom: undefined;
   EditRoom: {room: ChatGroup};
   ChatMenu: {
