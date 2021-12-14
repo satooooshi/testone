@@ -49,6 +49,7 @@ import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 type CustomModalProps = Omit<ModalProps, 'children'>;
 
 type EventFormModalProps = CustomModalProps & {
+  type?: EventType;
   event?: EventSchedule;
   onCloseModal: () => void;
   onSubmit: (event: Partial<EventSchedule>) => void;
@@ -60,7 +61,7 @@ type DateTimeModalStateValue = {
 };
 
 const EventFormModal: React.FC<EventFormModalProps> = props => {
-  const {onCloseModal, event, onSubmit} = props;
+  const {onCloseModal, event, onSubmit, type} = props;
   const dropdownRef = useRef<any | null>(null);
   const {data: tags} = useAPIGetTag();
   const {data: users} = useAPIGetUsers();
@@ -227,6 +228,12 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
   useEffect(() => {
     setNewEvent(e => ({...e, tags: selectedTags}));
   }, [selectedTags, setNewEvent]);
+
+  useEffect(() => {
+    if (type) {
+      setNewEvent(e => ({...e, type}));
+    }
+  }, [setNewEvent, type]);
 
   return (
     <Modal {...props}>
