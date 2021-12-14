@@ -267,6 +267,7 @@ export interface ChatGroup {
   chatMessages?: ChatMessage[];
   members?: User[];
   lastReadChatTime?: LastReadChatTime[];
+  hasBeenRead?: boolean;
   createdAt: Date;
   updatedAt: Date;
 }

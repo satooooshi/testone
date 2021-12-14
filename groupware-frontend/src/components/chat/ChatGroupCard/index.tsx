@@ -52,7 +52,9 @@ const ChatGroupCard: React.FC<ChatGroupCardProps> = ({
       boxShadow="md"
       w={'100%'}
       h="fit-content"
-      bg={isSelected ? '#f2f1f2' : 'white'}>
+      bg={
+        isSelected ? 'gray.200' : chatGroup.hasBeenRead ? '#f2f1f2' : 'white'
+      }>
       <Avatar src={chatGroup.imageURL} size="md" mr="8px" />
       <Box
         display="flex"
