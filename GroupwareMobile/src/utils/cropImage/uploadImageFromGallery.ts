@@ -1,4 +1,4 @@
-import {Platform} from 'react-native';
+import {Alert, Platform} from 'react-native';
 import ImagePicker, {Image, Options} from 'react-native-image-crop-picker';
 
 export const uploadImageFromGallery = async (
@@ -7,12 +7,17 @@ export const uploadImageFromGallery = async (
     mediaType: 'photo',
     multiple: false,
   },
-): Promise<{formData: FormData | undefined; mime: string}> => {
-  const photo = await ImagePicker.openPicker(options);
-  console.log(photo);
-  const mime = photo.mime;
-  const formData = imagePickerResponseToFormData(photo);
-  return {formData, mime};
+): Promise<undefined | {formData: FormData | undefined; mime: string}> => {
+  try {
+    const photo = await ImagePicker.openPicker(options);
+    const mime = photo.mime;
+    const formData = imagePickerResponseToFormData(photo);
+    return {formData, mime};
+  } catch (err) {
+    Alert.alert(
+      'ギャラリーの表示に失敗しました。\n端末の設定からアプリにアクセスの許可がされているかご確認ください。',
+    );
+  }
 };
 
 export const imagePickerResponseToFormData = (
