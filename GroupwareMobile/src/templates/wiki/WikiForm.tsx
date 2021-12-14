@@ -29,6 +29,7 @@ type WikiFormProps = {
   wiki?: Wiki;
   tags: Tag[];
   type?: WikiType;
+  ruleCategory?: RuleCategory;
   saveWiki: (wiki: Partial<Wiki>) => void;
   onUploadImage: (onSuccess: (imageURL: string[]) => void) => void;
 };
@@ -37,6 +38,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
   wiki,
   tags,
   type,
+  ruleCategory,
   saveWiki,
   onUploadImage,
 }) => {
@@ -46,7 +48,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
     body: '',
     tags: [],
     type: type || WikiType.QA,
-    ruleCategory: type ? RuleCategory.RULES : RuleCategory.OTHERS,
+    ruleCategory: ruleCategory || RuleCategory.OTHERS,
     textFormat: 'html',
   };
   const {
