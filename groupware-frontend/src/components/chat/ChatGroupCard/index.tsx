@@ -26,11 +26,8 @@ const ChatGroupCard: React.FC<ChatGroupCardProps> = ({
     if (!members) {
       return 'メンバーがいません';
     }
-    const strMembers = members?.map((m) => m.lastName + m.firstName).toString();
-    if (strMembers.length > 15) {
-      return strMembers.slice(0, 15) + '...(' + members.length + ')';
-    }
-    return strMembers.toString();
+    const strMembers = members?.map((m) => m.lastName + m.firstName).join();
+    return strMembers;
   };
   const latestMessage = (chatMessage: ChatMessage) => {
     switch (chatMessage.type) {
@@ -55,7 +52,9 @@ const ChatGroupCard: React.FC<ChatGroupCardProps> = ({
       boxShadow="md"
       w={'100%'}
       h="fit-content"
-      bg={isSelected ? '#f2f1f2' : 'white'}>
+      bg={
+        isSelected ? 'gray.200' : chatGroup.hasBeenRead ? '#f2f1f2' : 'white'
+      }>
       <Avatar src={chatGroup.imageURL} size="md" mr="8px" />
       <Box
         display="flex"
@@ -69,6 +68,7 @@ const ChatGroupCard: React.FC<ChatGroupCardProps> = ({
           flexDir="row"
           justifyContent="space-between"
           alignItems="center"
+          mb="4px"
           w="100%">
           <Text fontWeight="bold" color={darkFontColor} noOfLines={1}>
             {chatGroup.name
@@ -93,7 +93,7 @@ const ChatGroupCard: React.FC<ChatGroupCardProps> = ({
             </Link>
           )}
         </Box>
-        <Box display="flex" flexDir="row" alignItems="center">
+        <Box display="flex" flexDir="row" alignItems="center" mb="4px">
           <Text fontSize="12px" color={darkFontColor} noOfLines={1}>
             {chatGroup?.chatMessages?.length
               ? latestMessage(chatGroup.chatMessages[0])
@@ -103,8 +103,11 @@ const ChatGroupCard: React.FC<ChatGroupCardProps> = ({
         <Box
           display="flex"
           flexDir="row"
-          justifyContent="flex-end"
+          justifyContent="space-between"
           alignItems="center">
+          <Text color={darkFontColor} fontSize="14px">
+            {`${chatGroup.members?.length || 0}人のメンバー`}
+          </Text>
           <Text color={darkFontColor} fontSize="12px">
             {dateTimeFormatterFromJSDDate({
               dateTime: new Date(chatGroup.updatedAt),

@@ -172,13 +172,10 @@ const ChatBox: React.FC<ChatBoxProps> = ({
   };
 
   const nameOfEmptyNameGroup = (members?: User[]): string => {
-    if (!members) {
+    if (!members?.length) {
       return 'メンバーがいません';
     }
-    const strMembers = members?.map((m) => m.lastName + m.firstName).toString();
-    if (strMembers.length > 15) {
-      return strMembers.slice(0, 15) + '...(' + (members.length || 0) + ')';
-    }
+    const strMembers = members?.map((m) => m.lastName + m.firstName).join();
     return strMembers.toString();
   };
 
@@ -290,9 +287,23 @@ const ChatBox: React.FC<ChatBoxProps> = ({
           <Box mr="8px">
             <Avatar size="sm" src={room.imageURL} />
           </Box>
-          <Text fontWeight="bold" fontSize="18px" color={darkFontColor}>
-            {room?.name ? room.name : nameOfEmptyNameGroup(room?.members)}
-          </Text>
+          <Box display="flex" flexDir="row">
+            <Text
+              mr={'4px'}
+              fontWeight="bold"
+              fontSize="18px"
+              color={darkFontColor}
+              noOfLines={1}>
+              {room?.name ? room.name : nameOfEmptyNameGroup(room?.members)}
+            </Text>
+            <Text
+              fontWeight="bold"
+              fontSize="18px"
+              color={darkFontColor}
+              noOfLines={1}>
+              {`(${room?.members?.length || 0})`}
+            </Text>
+          </Box>
         </Box>
         <Box display="flex" flexDir="row" alignItems="center">
           <Link mr="4px" onClick={onClickNoteIcon}>

@@ -44,6 +44,7 @@ import WholeContainer from '../../WholeContainer';
 import {magnusDropdownOptions} from '../../../utils/factory/magnusDropdownOptions';
 import {useAPIGetTag} from '../../../hooks/api/tag/useAPIGetTag';
 import {useAPIGetUsers} from '../../../hooks/api/user/useAPIGetUsers';
+import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 
 type CustomModalProps = Omit<ModalProps, 'children'>;
 
@@ -261,7 +262,11 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
           onPress={() => checkValidateErrors()}>
           <Icon color="white" name="check" fontSize={32} />
         </Button>
-        <ScrollDiv w={windowWidth * 0.9} alignSelf="center">
+        <KeyboardAwareScrollView
+          contentContainerStyle={{
+            width: windowWidth * 0.9,
+            alignSelf: 'center',
+          }}>
           <Button
             bg="gray400"
             h={35}
@@ -473,6 +478,7 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
           </Div>
           {newEvent.files?.map(f => (
             <Div
+              key={f.id}
               mb={'lg'}
               w={'100%'}
               borderColor={blueColor}
@@ -519,6 +525,7 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
             />
             {newEvent.videos?.map((v, index) => (
               <Div
+                key={v.id}
                 mb={'lg'}
                 w={'100%'}
                 borderColor={blueColor}
@@ -563,7 +570,7 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
             }}
             onCancel={() => setDateTimeModal(m => ({...m, visible: undefined}))}
           />
-        </ScrollDiv>
+        </KeyboardAwareScrollView>
       </WholeContainer>
     </Modal>
   );

@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ChatAlbum } from 'src/entities/chatAlbum.entity';
 import { ChatAlbumImage } from 'src/entities/chatAlbumImage.entity';
-import { ChatGroup } from 'src/entities/chatGroup.entity';
 import { Repository } from 'typeorm';
 import { StorageService } from '../storage/storage.service';
 
@@ -24,8 +23,6 @@ export interface GetChatAlbumImagesResult {
 @Injectable()
 export class ChatAlbumService {
   constructor(
-    @InjectRepository(ChatGroup)
-    private readonly chatGroupRepository: Repository<ChatGroup>,
     @InjectRepository(ChatAlbum)
     private readonly albumRepository: Repository<ChatAlbum>,
     @InjectRepository(ChatAlbumImage)

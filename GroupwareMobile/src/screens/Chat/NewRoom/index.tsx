@@ -13,18 +13,15 @@ const NewRoom: React.FC = () => {
   const {data: users} = useAPIGetUsers();
   const headerTitle = 'ルーム新規作成';
   const {mutate: createGroup} = useAPISaveChatGroup({
-    onSuccess: () => {
-      Alert.alert('チャットルームの作成が完了しました。', undefined, [
-        {
-          text: 'OK',
-          onPress: () => {
-            navigation.navigate('ChatStack', {
-              screen: 'RoomList',
-              params: {needRefetch: true},
-            });
-          },
-        },
-      ]);
+    onSuccess: createdData => {
+      navigation.navigate('ChatStack', {
+        screen: 'Chat',
+        params: {room: createdData},
+        initial: false,
+      });
+    },
+    onError: () => {
+      Alert.alert('チャットルームの作成に失敗しました');
     },
   });
   return (

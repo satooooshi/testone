@@ -2,7 +2,7 @@ import React from 'react';
 import {Platform, TouchableOpacity, useWindowDimensions} from 'react-native';
 import FastImage from 'react-native-fast-image';
 import {Swipeable} from 'react-native-gesture-handler';
-import {Button, Div, Icon, Image, Text} from 'react-native-magnus';
+import {Button, Div, Icon, Text} from 'react-native-magnus';
 import tailwind from 'tailwind-rn';
 import {roomCardStyles} from '../../../styles/component/chat/roomCard.style';
 import {ChatGroup, ChatMessage, ChatMessageType, User} from '../../../types';
@@ -22,14 +22,11 @@ const RoomCard: React.FC<RoomCardProps> = ({
 }) => {
   const {width: windowWidth} = useWindowDimensions();
   const nameOfEmptyNameGroup = (members?: User[]): string => {
-    if (!members) {
+    if (!members?.length) {
       return 'メンバーがいません';
     }
-    const strMembers = members?.map(m => m.lastName + m.firstName).toString();
-    if (strMembers.length > 15) {
-      return strMembers.slice(0, 15) + '...(' + members.length + ')';
-    }
-    return strMembers.toString();
+    const strMembers = members?.map(m => m.lastName + m.firstName).join();
+    return strMembers;
   };
   const rightSwipeActions = () => {
     return (
@@ -57,13 +54,19 @@ const RoomCard: React.FC<RoomCardProps> = ({
     }
   };
 
+  const readOrNot = room?.lastReadChatTime?.[0]?.readTime
+    ? new Date(room?.lastReadChatTime?.[0]?.readTime) > new Date(room.updatedAt)
+    : false;
+
   return (
     <TouchableOpacity onPress={onPress}>
       <Swipeable
         containerStyle={tailwind('rounded-sm')}
         renderRightActions={rightSwipeActions}>
         <Div
-          bg="white"
+          bg={!readOrNot ? 'white' : 'gray300'}
+          borderColor={'white'}
+          borderWidth={1}
           w={windowWidth * 0.9}
           shadow="sm"
           p={4}
@@ -100,7 +103,11 @@ const RoomCard: React.FC<RoomCardProps> = ({
             <Text numberOfLines={1} mb={'xs'} fontWeight="bold" fontSize={16}>
               {room.name || nameOfEmptyNameGroup(room.members)}
             </Text>
-            <Text mb={'xs'} fontSize={14} color={darkFontColor}>
+            <Text
+              mb={'xs'}
+              fontSize={14}
+              color={darkFontColor}
+              numberOfLines={1}>
               {room.chatMessages?.length
                 ? latestMessage(room.chatMessages[0])
                 : ''}

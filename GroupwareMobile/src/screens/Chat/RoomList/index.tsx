@@ -1,5 +1,5 @@
 import {useNavigation} from '@react-navigation/native';
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useCallback, useState} from 'react';
 import {FlatList} from 'react-native';
 import {Div} from 'react-native-magnus';
 import {ActivityIndicator} from 'react-native-paper';
@@ -10,15 +10,10 @@ import WholeContainer from '../../../components/WholeContainer';
 import {useAPIGetRooms} from '../../../hooks/api/chat/useAPIGetRoomsByPage';
 import {useAPISaveChatGroup} from '../../../hooks/api/chat/useAPISaveChatGroup';
 import {ChatGroup} from '../../../types';
-import {
-  RoomListNavigationProps,
-  RoomListRouteProps,
-} from '../../../types/navigator/drawerScreenProps';
+import {RoomListNavigationProps} from '../../../types/navigator/drawerScreenProps';
 
 const RoomList: React.FC = () => {
   const navigation = useNavigation<RoomListNavigationProps>();
-  const route = useNavigation<RoomListRouteProps>();
-  const needRefetch = route.params?.needRefetch;
   const [page, setPage] = useState('1');
   const [roomsForInfiniteScroll, setRoomsForInfiniteScroll] = useState<
     ChatGroup[]
@@ -31,7 +26,7 @@ const RoomList: React.FC = () => {
     {
       refetchInterval: 3000,
       onSuccess: data => {
-        stateUpdateNeeeded(data.rooms);
+        stateRefreshNeeded(data.rooms);
       },
     },
   );
@@ -67,7 +62,7 @@ const RoomList: React.FC = () => {
     }
   };
 
-  const stateUpdateNeeeded = (newData: ChatGroup[]) => {
+  const stateRefreshNeeded = (newData: ChatGroup[]) => {
     let updateNeeded = false;
     if (roomsForInfiniteScroll.length !== newData?.length) {
       updateNeeded = true;
@@ -77,7 +72,11 @@ const RoomList: React.FC = () => {
         if (updateNeeded) {
           break;
         }
-        if (roomsForInfiniteScroll[i]?.id !== newData[i]?.id) {
+        if (
+          new Date(roomsForInfiniteScroll[i]?.updatedAt).getTime() !==
+            new Date(newData?.[i]?.updatedAt).getTime() ||
+          roomsForInfiniteScroll[i].hasBeenRead !== newData?.[i]?.hasBeenRead
+        ) {
           updateNeeded = true;
         }
       }
@@ -86,18 +85,6 @@ const RoomList: React.FC = () => {
       setRoomsForInfiniteScroll(newData);
     }
   };
-
-  useEffect(() => {
-    if (needRefetch) {
-      handleRefetch();
-    }
-  }, [needRefetch, handleRefetch]);
-
-  useEffect(() => {
-    if (chatRooms?.rooms?.length) {
-      setRoomsForInfiniteScroll(r => [...r, ...chatRooms.rooms]);
-    }
-  }, [chatRooms?.rooms]);
 
   return (
     <WholeContainer>
@@ -109,9 +96,10 @@ const RoomList: React.FC = () => {
       <FlatList
         {...{onEndReached}}
         contentContainerStyle={tailwind('self-center mt-4')}
+        keyExtractor={item => item.id.toString()}
         data={roomsForInfiniteScroll}
         renderItem={({item: room}) => (
-          <Div mb="lg">
+          <Div mb="sm">
             <RoomCard
               room={room}
               onPress={() =>

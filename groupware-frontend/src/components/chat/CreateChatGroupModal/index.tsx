@@ -23,6 +23,7 @@ import { formikErrorMsgFactory } from 'src/utils/factory/formikErrorMsgFactory';
 import { useAPIGetUsers } from '@/hooks/api/user/useAPIGetUsers';
 import { useAPIUploadStorage } from '@/hooks/api/storage/useAPIUploadStorage';
 import { useAPISaveChatGroup } from '@/hooks/api/chat/useAPISaveChatGroup';
+import { useRouter } from 'next/router';
 
 type CreateChatGroupModalProps = {
   isOpen: boolean;
@@ -63,6 +64,7 @@ const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
     onDrop: onEventImageDrop,
     accept: imageExtensions,
   });
+  const router = useRouter();
 
   const onLoad = useCallback((img) => {
     imgRef.current = img;
@@ -70,13 +72,10 @@ const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
   }, []);
 
   const { mutate: createGroup } = useAPISaveChatGroup({
-    onSuccess: () => {
+    onSuccess: (createdData) => {
       closeModal();
-      toast({
-        description: 'チャットルームの作成が完了しました。',
-        status: 'success',
-        duration: 3000,
-        isClosable: true,
+      router.push(`/chat/${createdData.id.toString()}`, undefined, {
+        shallow: true,
       });
     },
   });

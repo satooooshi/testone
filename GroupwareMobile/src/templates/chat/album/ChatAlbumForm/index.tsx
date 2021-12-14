@@ -58,7 +58,7 @@ const ChatAlbumForm: React.FC<ChatAlbumFormProps> = ({
     const {formData} = await uploadImageFromGallery({
       cropping: true,
       mediaType: 'photo',
-      multiple: false,
+      multiple: true,
     });
     if (formData) {
       uploadImage(formData, {
@@ -113,6 +113,7 @@ const ChatAlbumForm: React.FC<ChatAlbumFormProps> = ({
         <Div flexDir="row" flexWrap="wrap" w={windowWidth}>
           {values.images?.map(i => (
             <TouchableHighlight
+              key={i.id}
               underlayColor="none"
               onPress={() => i.imageURL && handlePressImage(i.imageURL)}>
               <Image

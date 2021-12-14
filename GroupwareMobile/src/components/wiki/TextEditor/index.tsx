@@ -70,7 +70,7 @@ const TextEditor: React.FC<TextEditorProps> = ({
       <QuillToolbar
         editor={quillRef}
         options={[
-          ['bold', 'italic', 'underline'],
+          ['bold', 'italic', 'strike'],
           ['blockquote'],
           [{list: 'ordered'}, {list: 'bullet'}],
 

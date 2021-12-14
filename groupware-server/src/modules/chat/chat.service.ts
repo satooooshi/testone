@@ -9,23 +9,12 @@ import { orderBy } from 'lodash';
 import { ChatGroup } from 'src/entities/chatGroup.entity';
 import { ChatMessage, ChatMessageType } from 'src/entities/chatMessage.entity';
 import { ChatMessageReaction } from 'src/entities/chatMessageReaction.entity';
-import { ChatNote } from 'src/entities/chatNote.entity';
 import { LastReadChatTime } from 'src/entities/lastReadChatTime.entity';
 import { User } from 'src/entities/user.entity';
 import { userNameFactory } from 'src/utils/factory/userNameFactory';
 import { In, Repository } from 'typeorm';
 import { StorageService } from '../storage/storage.service';
 import { GetMessagesQuery, GetRoomsResult } from './chat.controller';
-
-export interface GetChatNotesQuery {
-  group: number;
-  page?: string;
-}
-
-export interface GetChatNotesResult {
-  notes: ChatNote[];
-  pageCount: number;
-}
 
 @Injectable()
 export class ChatService {
@@ -92,7 +81,12 @@ export class ChatService {
         'pinnedUsers.id = :pinnedUserID',
         { pinnedUserID: userID },
       )
-      .leftJoinAndSelect('chat_groups.lastReadChatTime', 'lastReadChatTime')
+      .leftJoinAndSelect(
+        'chat_groups.lastReadChatTime',
+        'lastReadChatTime',
+        'lastReadChatTime.user_id = :userID',
+        { userID },
+      )
       .leftJoinAndSelect(
         'chat_groups.chatMessages',
         'm',
@@ -106,10 +100,14 @@ export class ChatService {
       .getManyAndCount();
     let rooms = urlUnparsedRooms.map((g) => {
       const isPinned = !!g.pinnedUsers.length;
+      const hasBeenRead = g?.lastReadChatTime?.[0]?.readTime
+        ? g?.lastReadChatTime?.[0]?.readTime > g.updatedAt
+        : false;
       return {
         ...g,
         pinnedUsers: undefined,
         isPinned,
+        hasBeenRead,
       };
     });
     rooms = orderBy(rooms, [
@@ -279,7 +277,7 @@ export class ChatService {
     const targetRoom = await this.chatGroupRepository.findOne(roomId, {
       relations: ['members'],
     });
-    await this.chatGroupRepository.save(targetRoom);
+    await this.chatGroupRepository.save({ ...targetRoom, members });
     return targetRoom;
   }
 
@@ -292,6 +290,62 @@ export class ChatService {
     }
     const userIds = chatGroup.members.map((u) => u.id);
     const users = await this.userRepository.findByIds(userIds);
+    chatGroup.members = users;
+    chatGroup.imageURL = this.storageService.parseSignedURLToStorageURL(
+      chatGroup.imageURL || '',
+    );
+
+    const newGroup = await this.chatGroupRepository.save(
+      this.chatGroupRepository.create(chatGroup),
+    );
+    if (typeof chatGroup.isPinned !== 'undefined') {
+      if (chatGroup.isPinned) {
+        await this.chatGroupRepository
+          .createQueryBuilder('chat_groups')
+          .relation('pinnedUsers')
+          .of(newGroup.id)
+          .remove(userID);
+        await this.chatGroupRepository
+          .createQueryBuilder('chat_groups')
+          .relation('pinnedUsers')
+          .of(newGroup.id)
+          .add(userID);
+      } else {
+        await this.chatGroupRepository
+          .createQueryBuilder('chat_groups')
+          .relation('pinnedUsers')
+          .of(newGroup.id)
+          .remove(userID);
+      }
+    }
+    return newGroup;
+  }
+
+  public async v2SaveChatGroup(
+    chatGroup: Partial<ChatGroup>,
+    userID: number,
+  ): Promise<ChatGroup> {
+    if (!chatGroup.members || !chatGroup.members.length) {
+      throw new InternalServerErrorException('Something went wrong');
+    }
+    const userIds = chatGroup.members.map((u) => u.id);
+    const users = await this.userRepository.findByIds(userIds);
+    const maybeExistGroup = await this.chatGroupRepository
+      .createQueryBuilder('g')
+      .leftJoinAndSelect('g.members', 'u')
+      .where('u.id IN (:...userIds)', { userIds })
+      .andWhere('g.name = :name', { name: chatGroup.name })
+      .getMany();
+
+    const existGroup = maybeExistGroup
+      .filter((g) => g.members.length === userIds.length)
+      .filter((g) =>
+        g.members.map((m) => m.id).filter((id) => userIds.includes(id)),
+      );
+
+    if (existGroup.length) {
+      return existGroup[0];
+    }
     chatGroup.members = users;
     chatGroup.imageURL = this.storageService.parseSignedURLToStorageURL(
       chatGroup.imageURL || '',

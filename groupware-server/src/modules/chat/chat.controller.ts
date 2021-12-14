@@ -21,9 +21,9 @@ import { LastReadChatTime } from 'src/entities/lastReadChatTime.entity';
 import { User } from 'src/entities/user.entity';
 import JwtAuthenticationGuard from '../auth/jwtAuthentication.guard';
 import RequestWithUser from '../auth/requestWithUser.interface';
-import { ChatService, GetChatNotesResult } from './chat.service';
+import { ChatService } from './chat.service';
 import { ChatAlbumService, GetChatAlbumsResult } from './chatAlbum.service';
-import { ChatNoteService } from './chatNote.service';
+import { ChatNoteService, GetChatNotesResult } from './chatNote.service';
 
 export interface GetMessagesQuery {
   group: number;
@@ -103,6 +103,20 @@ export class ChatController {
       user,
     ];
     return await this.chatService.saveChatGroup(chatGroup, user.id);
+  }
+
+  @Post('/v2/room')
+  @UseGuards(JwtAuthenticationGuard)
+  async v2SaveChatGroup(
+    @Req() req: RequestWithUser,
+    @Body() chatGroup: Partial<ChatGroup>,
+  ): Promise<ChatGroup> {
+    const user = req.user;
+    chatGroup.members = [
+      ...(chatGroup?.members?.filter((u) => u.id !== user.id) || []),
+      user,
+    ];
+    return await this.chatService.v2SaveChatGroup(chatGroup, user.id);
   }
 
   @Patch('/v2/room/:roomId/members')
