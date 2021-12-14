@@ -109,6 +109,7 @@ export class ChatGroup {
   updatedAt: Date;
 
   isPinned?: boolean;
+  hasBeenRead?: boolean;
 
   @AfterInsert()
   async saveNewSystemMessage?() {

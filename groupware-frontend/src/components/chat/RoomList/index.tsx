@@ -48,7 +48,7 @@ const RoomList: React.FC<RoomListProps> = ({
     }
   };
 
-  const stateUpdateNeeeded = (newData: ChatGroup[]) => {
+  const stateRefreshNeeded = (newData: ChatGroup[]) => {
     let updateNeeded = false;
     if (roomsForInfiniteScroll.length !== newData?.length) {
       updateNeeded = true;
@@ -60,7 +60,8 @@ const RoomList: React.FC<RoomListProps> = ({
         }
         if (
           new Date(roomsForInfiniteScroll[i]?.updatedAt).getTime() !==
-          new Date(newData[i]?.updatedAt).getTime()
+            new Date(newData?.[i]?.updatedAt).getTime() ||
+          roomsForInfiniteScroll[i].hasBeenRead !== newData?.[i]?.hasBeenRead
         ) {
           updateNeeded = true;
         }
@@ -79,7 +80,7 @@ const RoomList: React.FC<RoomListProps> = ({
     {
       refetchInterval: 3000,
       onSuccess: (data) => {
-        stateUpdateNeeeded(data.rooms);
+        stateRefreshNeeded(data.rooms);
       },
     },
   );

@@ -54,13 +54,19 @@ const RoomCard: React.FC<RoomCardProps> = ({
     }
   };
 
+  const readOrNot = room?.lastReadChatTime?.[0]?.readTime
+    ? new Date(room?.lastReadChatTime?.[0]?.readTime) > new Date(room.updatedAt)
+    : false;
+
   return (
     <TouchableOpacity onPress={onPress}>
       <Swipeable
         containerStyle={tailwind('rounded-sm')}
         renderRightActions={rightSwipeActions}>
         <Div
-          bg="white"
+          bg={!readOrNot ? 'white' : 'gray300'}
+          borderColor={'white'}
+          borderWidth={1}
           w={windowWidth * 0.9}
           shadow="sm"
           p={4}

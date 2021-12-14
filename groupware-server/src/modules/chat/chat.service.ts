@@ -81,7 +81,12 @@ export class ChatService {
         'pinnedUsers.id = :pinnedUserID',
         { pinnedUserID: userID },
       )
-      .leftJoinAndSelect('chat_groups.lastReadChatTime', 'lastReadChatTime')
+      .leftJoinAndSelect(
+        'chat_groups.lastReadChatTime',
+        'lastReadChatTime',
+        'lastReadChatTime.user_id = :userID',
+        { userID },
+      )
       .leftJoinAndSelect(
         'chat_groups.chatMessages',
         'm',
@@ -95,10 +100,14 @@ export class ChatService {
       .getManyAndCount();
     let rooms = urlUnparsedRooms.map((g) => {
       const isPinned = !!g.pinnedUsers.length;
+      const hasBeenRead = g?.lastReadChatTime?.[0]?.readTime
+        ? g?.lastReadChatTime?.[0]?.readTime > g.updatedAt
+        : false;
       return {
         ...g,
         pinnedUsers: undefined,
         isPinned,
+        hasBeenRead,
       };
     });
     rooms = orderBy(rooms, [
