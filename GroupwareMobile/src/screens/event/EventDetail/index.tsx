@@ -37,7 +37,7 @@ import {useAPIJoinEvent} from '../../../hooks/api/event/useAPIJoinEvent';
 import {useAPICancelEvent} from '../../../hooks/api/event/useAPICancelEvent';
 import {AxiosError} from 'axios';
 import {useFormik} from 'formik';
-import {EventComment, EventType} from '../../../types';
+import {EventComment, EventType, SubmissionFile} from '../../../types';
 import {useAPICreateComment} from '../../../hooks/api/event/useAPICreateComment';
 import EventCommentCard from '../EventCommentCard';
 import {createCommentSchema} from '../../../utils/validation/schema';
@@ -48,6 +48,12 @@ import {UserRole} from '../../../types';
 import {useNavigation} from '@react-navigation/native';
 import tailwind from 'tailwind-rn';
 import {getJoiningUsers} from '../../../utils/factory/event/getJoiningUsersFactory';
+import DocumentPicker from 'react-native-document-picker';
+import {useAPIUploadStorage} from '../../../hooks/api/storage/useAPIUploadStorage';
+import {useAPISaveSubmission} from '../../../hooks/api/event/useAPISaveSubmission';
+import RNFetchBlob from 'rn-fetch-blob';
+import FileIcon from '../../../components/common/FileIcon';
+const {fs, config} = RNFetchBlob;
 
 const EventDetail: React.FC = () => {
   const route = useRoute<EventDetailRouteProps>();
@@ -71,6 +77,16 @@ const EventDetail: React.FC = () => {
   const {mutate: saveEvent, isLoading: isLoadingSaveEvent} = useAPIUpdateEvent({
     onSuccess: () => {
       setEventFormModal(false);
+      refetchEvents();
+    },
+  });
+  const [unsavedSubmissions, setUnsavedSubmissions] = useState<
+    Partial<SubmissionFile>[]
+  >([]);
+  const {mutate: saveSubmission} = useAPISaveSubmission({
+    onSuccess: () => {
+      setUnsavedSubmissions([]);
+      Alert.alert('提出状況を保存しました');
       refetchEvents();
     },
   });
@@ -128,6 +144,7 @@ const EventDetail: React.FC = () => {
       }
     },
   });
+  const {mutate: uploadFile} = useAPIUploadStorage();
 
   const checkValidateErrors = async () => {
     const errors = await validateForm();
@@ -331,6 +348,30 @@ const EventDetail: React.FC = () => {
       </>
     );
   };
+
+  const handleUploadSubmission = async () => {
+    const res = await DocumentPicker.pickSingle({
+      type: [DocumentPicker.types.allFiles],
+    });
+    const formData = new FormData();
+    formData.append('files', {
+      name: res.name,
+      uri: res.uri,
+      type: res.type,
+    });
+    uploadFile(formData);
+    if (formData) {
+      uploadFile(formData, {
+        onSuccess: fileURL => {
+          const unSavedFiles: Partial<SubmissionFile>[] = fileURL.map(f => ({
+            url: f,
+          }));
+          setUnsavedSubmissions(f => [...f, ...unSavedFiles]);
+        },
+      });
+    }
+  };
+
   useEffect(() => {
     if (isLoadingGetEventDetail || isLoadingSaveEvent) {
       setScreenLoading(true);
@@ -435,11 +476,94 @@ const EventDetail: React.FC = () => {
                 <Text mx={16}>関連動画はありません</Text>
               </>
             )}
-            <Div>
-              {joiningUsers && (
-                <>
+
+            {eventInfo.type !== EventType.SUBMISSION_ETC && (
+              <>
+                <Div>
+                  {joiningUsers && (
+                    <>
+                      <Div
+                        mx={16}
+                        borderBottomWidth={1}
+                        borderColor="green400"
+                        flexDir="row"
+                        justifyContent="space-between"
+                        alignItems="flex-end"
+                        mb="lg"
+                        pb="md">
+                        <Text fontSize={16}>
+                          参加者:
+                          {joiningUsers.length || 0}名
+                        </Text>
+                      </Div>
+                      <Div
+                        flexDir="row"
+                        justifyContent="space-between"
+                        alignItems="center"
+                        flexWrap="wrap">
+                        {joiningUsers.map((u, index) => {
+                          if (index > 6) {
+                            return;
+                          } else if (index === 6) {
+                            return (
+                              <Div
+                                key={u.id}
+                                flexDir="row"
+                                alignItems="center"
+                                rounded="sm"
+                                w="45%"
+                                mx={8}
+                                my={4}>
+                                <Button
+                                  block
+                                  m={10}
+                                  fontSize={12}
+                                  onPress={() => setJoiningUserVisiable(true)}>
+                                  参加者を一覧表示
+                                </Button>
+                              </Div>
+                            );
+                          } else {
+                            return (
+                              <Div
+                                bg="white"
+                                flexDir="row"
+                                flexWrap="wrap"
+                                rounded="sm"
+                                alignItems="center"
+                                w="45%"
+                                borderWidth={1}
+                                borderColor="gray400"
+                                mx={8}
+                                my={4}>
+                                <Div pl={16} alignItems="center" flex={2}>
+                                  <Image
+                                    my={'lg'}
+                                    h={windowWidth * 0.09}
+                                    w={windowWidth * 0.09}
+                                    source={
+                                      u.avatarUrl
+                                        ? {uri: u.avatarUrl}
+                                        : require('../../../../assets/no-image-avatar.png')
+                                    }
+                                    rounded="circle"
+                                  />
+                                </Div>
+                                <Div alignItems="center" flex={5}>
+                                  <Text numberOfLines={1}>
+                                    {userNameFactory(u)}
+                                  </Text>
+                                </Div>
+                              </Div>
+                            );
+                          }
+                        })}
+                      </Div>
+                    </>
+                  )}
+                </Div>
+                <Div mx={16}>
                   <Div
-                    mx={16}
                     borderBottomWidth={1}
                     borderColor="green400"
                     flexDir="row"
@@ -448,128 +572,102 @@ const EventDetail: React.FC = () => {
                     mb="lg"
                     pb="md">
                     <Text fontSize={16}>
-                      参加者:
-                      {joiningUsers.length || 0}名
+                      コメント:
+                      {eventInfo?.comments.length || 0}件
                     </Text>
+                    <Button
+                      fontSize={16}
+                      py={4}
+                      color="white"
+                      onPress={() => {
+                        commentVisible
+                          ? checkValidateErrors()
+                          : setCommentVisible(true);
+                      }}>
+                      {commentVisible ? 'コメントを投稿する' : 'コメントを追加'}
+                    </Button>
                   </Div>
-                  <Div
-                    flexDir="row"
-                    justifyContent="space-between"
-                    alignItems="center"
-                    flexWrap="wrap">
-                    {joiningUsers.map((u, index) => {
-                      if (index > 6) {
-                        return;
-                      } else if (index === 6) {
-                        return (
-                          <Div
-                            key={u.id}
-                            flexDir="row"
-                            alignItems="center"
-                            rounded="sm"
-                            w="45%"
-                            mx={8}
-                            my={4}>
-                            <Button
-                              block
-                              m={10}
-                              fontSize={12}
-                              onPress={() => setJoiningUserVisiable(true)}>
-                              参加者を一覧表示
-                            </Button>
-                          </Div>
-                        );
-                      } else {
-                        return (
-                          <Div
-                            bg="white"
-                            flexDir="row"
-                            flexWrap="wrap"
-                            rounded="sm"
-                            alignItems="center"
-                            w="45%"
-                            borderWidth={1}
-                            borderColor="gray400"
-                            mx={8}
-                            my={4}>
-                            <Div pl={16} alignItems="center" flex={2}>
-                              <Image
-                                my={'lg'}
-                                h={windowWidth * 0.09}
-                                w={windowWidth * 0.09}
-                                source={
-                                  u.avatarUrl
-                                    ? {uri: u.avatarUrl}
-                                    : require('../../../../assets/no-image-avatar.png')
-                                }
-                                rounded="circle"
-                              />
-                            </Div>
-                            <Div alignItems="center" flex={5}>
-                              <Text numberOfLines={1}>
-                                {userNameFactory(u)}
-                              </Text>
-                            </Div>
-                          </Div>
-                        );
-                      }
-                    })}
-                  </Div>
-                </>
+                  {commentVisible && (
+                    <TextInput
+                      value={values.body}
+                      onChangeText={t => setValues({...values, body: t})}
+                      placeholder="コメントを記入してください。"
+                      textAlignVertical={'top'}
+                      multiline={true}
+                      autoCapitalize="none"
+                      style={tailwind(
+                        'border border-green-400 mb-4 bg-white rounded border-blue-500 p-2 h-24',
+                      )}
+                    />
+                  )}
+                  {eventInfo?.comments.map(
+                    comment =>
+                      comment.writer && (
+                        <EventCommentCard
+                          key={comment.id}
+                          body={comment.body}
+                          date={comment.createdAt}
+                          writer={comment.writer}
+                        />
+                      ),
+                  )}
+                </Div>
+              </>
+            )}
+            <Div
+              mx={16}
+              borderBottomWidth={1}
+              borderColor="green400"
+              mb="lg"
+              pb="md">
+              <Div
+                flexDir="row"
+                justifyContent="space-between"
+                alignItems="flex-end">
+                <Div>
+                  <Button
+                    bg="blue600"
+                    color="white"
+                    h={40}
+                    rounded="lg"
+                    onPress={() => handleUploadSubmission()}>
+                    提出物を追加
+                  </Button>
+                  <Text fontWeight="bold">{`${eventInfo?.submissionFiles?.length}件のファイルを提出済み`}</Text>
+                </Div>
+                <Button
+                  bg="pink600"
+                  color="white"
+                  h={40}
+                  rounded="lg"
+                  onPress={() => {
+                    saveSubmission(unsavedSubmissions);
+                  }}>
+                  提出状況を保存
+                </Button>
+              </Div>
+              <Text color="tomato" fontSize={12}>
+                {'※水色のアイコンのファイルはまだ提出状況が保存されていません'}
+              </Text>
+            </Div>
+            <Div flexDir="row" flexWrap="wrap" mx={16}>
+              {eventInfo?.submissionFiles?.map(
+                f =>
+                  f.url && (
+                    <Div mr={4} mb={4}>
+                      <FileIcon url={f.url} />
+                    </Div>
+                  ),
+              )}
+              {unsavedSubmissions?.map(
+                f =>
+                  f.url && (
+                    <Div mr={4} mb={4}>
+                      <FileIcon url={f.url} />
+                    </Div>
+                  ),
               )}
             </Div>
-            {eventInfo.type !== EventType.SUBMISSION_ETC && (
-              <Div mx={16}>
-                <Div
-                  borderBottomWidth={1}
-                  borderColor="green400"
-                  flexDir="row"
-                  justifyContent="space-between"
-                  alignItems="flex-end"
-                  mb="lg"
-                  pb="md">
-                  <Text fontSize={16}>
-                    コメント:
-                    {eventInfo?.comments.length || 0}件
-                  </Text>
-                  <Button
-                    fontSize={16}
-                    py={4}
-                    color="white"
-                    onPress={() => {
-                      commentVisible
-                        ? checkValidateErrors()
-                        : setCommentVisible(true);
-                    }}>
-                    {commentVisible ? 'コメントを投稿する' : 'コメントを追加'}
-                  </Button>
-                </Div>
-                {commentVisible && (
-                  <TextInput
-                    value={values.body}
-                    onChangeText={t => setValues({...values, body: t})}
-                    placeholder="コメントを記入してください。"
-                    textAlignVertical={'top'}
-                    multiline={true}
-                    autoCapitalize="none"
-                    style={tailwind(
-                      'border border-green-400 mb-4 bg-white rounded border-blue-500 p-2 h-24',
-                    )}
-                  />
-                )}
-                {eventInfo?.comments.map(
-                  comment =>
-                    comment.writer && (
-                      <EventCommentCard
-                        key={comment.id}
-                        body={comment.body}
-                        date={comment.createdAt}
-                        writer={comment.writer}
-                      />
-                    ),
-                )}
-              </Div>
-            )}
           </Div>
         )}
       </ScrollDiv>
