@@ -523,7 +523,7 @@ const EventList = () => {
               localizer={localizer}
               events={memorizedEvent}
               formats={formats}
-              defaultView={Views.WEEK}
+              defaultView={Views.MONTH}
               onEventResize={resizeEvent}
               onEventDrop={moveEvent}
               onRangeChange={(range) => {
