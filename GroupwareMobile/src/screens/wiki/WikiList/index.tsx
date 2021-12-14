@@ -1,13 +1,16 @@
 import React, {useState} from 'react';
 import WholeContainer from '../../../components/WholeContainer';
 import HeaderWithTextButton, {Tab} from '../../../components/Header';
-import {WikiType} from '../../../types';
+import {RuleCategory, WikiType} from '../../../types';
 import WikiCardList from './WikiCardList';
 import {wikiTypeNameFactory} from '../../../utils/factory/wiki/wikiTypeNameFactory';
 import {WikiListProps} from '../../../types/navigator/drawerScreenProps';
 
 const WikiList: React.FC<WikiListProps> = ({navigation}) => {
   const [type, setType] = useState<WikiType>();
+  const [ruleCategory, setRuleCategory] = useState<RuleCategory>(
+    RuleCategory.OTHERS,
+  );
   const tabs: Tab[] = [
     {
       name: 'All',
@@ -36,18 +39,20 @@ const WikiList: React.FC<WikiListProps> = ({navigation}) => {
       <HeaderWithTextButton
         tabs={tabs}
         title="社内Wiki"
-        activeTabName={type ? wikiTypeNameFactory(type) : 'All'}
+        activeTabName={type ? wikiTypeNameFactory(type, ruleCategory) : 'All'}
         rightButtonName={
-          type ? `${wikiTypeNameFactory(type)}新規作成` : '新規作成'
+          type
+            ? `${wikiTypeNameFactory(type, ruleCategory)}新規作成`
+            : '新規作成'
         }
         onPressRightButton={() =>
           navigation.navigate('WikiStack', {
             screen: 'PostWiki',
-            params: {type: type ? type : undefined},
+            params: {type, ruleCategory},
           })
         }
       />
-      <WikiCardList type={type} />
+      <WikiCardList type={type} setRuleCategory={setRuleCategory} />
     </WholeContainer>
   );
 };
