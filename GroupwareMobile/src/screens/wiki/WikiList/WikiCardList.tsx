@@ -121,6 +121,16 @@ const WikiCardList: React.FC<WikiCardListProps> = ({type, setRuleCategory}) => {
   }, [type]);
 
   useEffect(() => {
+    setWikiForInfiniteScroll([]);
+  }, [
+    searchQuery.word,
+    searchQuery.status,
+    searchQuery.type,
+    searchQuery.tag,
+    searchQuery.rule_category,
+  ]);
+
+  useEffect(() => {
     if (fetchedWiki?.wiki && fetchedWiki?.wiki.length) {
       setWikiForInfiniteScroll(w => {
         if (w.length) {
@@ -130,16 +140,6 @@ const WikiCardList: React.FC<WikiCardListProps> = ({type, setRuleCategory}) => {
       });
     }
   }, [fetchedWiki?.wiki]);
-
-  useEffect(() => {
-    setWikiForInfiniteScroll([]);
-  }, [
-    searchQuery.word,
-    searchQuery.status,
-    searchQuery.type,
-    searchQuery.tag,
-    searchQuery.rule_category,
-  ]);
 
   return (
     <Div flexDir="column" h="100%" pb={80}>
