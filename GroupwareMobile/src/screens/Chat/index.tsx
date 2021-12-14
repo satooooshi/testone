@@ -409,19 +409,6 @@ const Chat: React.FC = () => {
     </Div>
   );
 
-  const emojiVersion = (() => {
-    const version = parseFloat(Platform.Version);
-    if (Platform.OS === 'ios') {
-      return version < 13.2 ? 11 : 12.1;
-    }
-    if (Platform.OS === 'android') {
-      return version < 29 ? 11 : 12.1;
-    }
-  })();
-
-  const hasImageOS = `has_img_${Platform.OS === 'ios' ? 'apple' : 'google'}`;
-  console.log(emojiVersion);
-
   const messageListAvoidngKeyboardDisturb = (
     <>
       {Platform.OS === 'ios' ? (
