@@ -121,6 +121,7 @@ const ChatDetail = () => {
               emoji="point_up"
               skin={1}
               defaultSkin={1}
+              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
               //@ts-ignore for Android suport
               emojisToShowFilter={(e) => parseFloat(e['added_in']) <= 6}
               onSelect={(emoji) => {
