@@ -485,6 +485,7 @@ const Chat: React.FC = () => {
           {reactionTarget ? (
             <Div h={'50%'}>
               <EmojiSelector
+                shouldInclude={e => parseFloat(e.added_in) <= 6}
                 onEmojiSelected={emoji => handleSaveReaction(emoji)}
                 showHistory={false}
                 showSearchBar={false}
