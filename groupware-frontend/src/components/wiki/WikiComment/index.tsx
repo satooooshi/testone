@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { TextFormat, User } from 'src/types';
 import qaCommentStyles from '@/styles/components/QAComment.module.scss';
 import { dateTimeFormatterFromJSDDate } from 'src/utils/dateTimeFormatter';
@@ -9,6 +9,7 @@ import 'react-markdown-editor-lite/lib/index.css';
 import DraftMarkup from '../DraftMarkup';
 import Link from 'next/link';
 import boldMascot from '@/public/bold-mascot.png';
+import Linkify from 'react-linkify';
 
 type WikiCommentProps = {
   textFormat?: TextFormat;
@@ -91,15 +92,13 @@ const WikiComment: React.FC<WikiCommentProps> = ({
         </div>
       )}
       <div className={qaCommentStyles.markdown}>
-        {textFormat && textFormat === 'markdown' ? (
-          <Editor
-            style={{ border: 'none' }}
-            view={{ html: true, menu: false, md: false }}
-            renderHTML={() => mdParser.render(body)}
-          />
-        ) : (
-          <DraftMarkup renderHTML={body} />
-        )}
+        <DraftMarkup
+          renderHTML={
+            textFormat && textFormat === 'markdown'
+              ? mdParser.render(body)
+              : body
+          }
+        />
         {bestAnswerButtonName && onClickBestAnswerButton ? (
           <div className={qaCommentStyles.best_answer_button_wrapper}>
             <Button

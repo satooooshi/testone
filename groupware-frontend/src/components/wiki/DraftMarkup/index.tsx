@@ -1,6 +1,8 @@
 import React from 'react';
 import DOMPurify from 'dompurify';
 import DraftMarkupStyles from '@/styles/components/DraftMarkup.module.scss';
+import linkifyHtml from 'linkifyjs/html';
+import { Box } from '@chakra-ui/react';
 
 type DraftMarkupProps = {
   renderHTML: string;
@@ -8,11 +10,11 @@ type DraftMarkupProps = {
 
 const DraftMarkup: React.FC<DraftMarkupProps> = ({ renderHTML }) => {
   return (
-    <div
+    <Box
       className={DraftMarkupStyles.editor_wrapper}
       dangerouslySetInnerHTML={{
-        __html: DOMPurify.sanitize(renderHTML),
-      }}></div>
+        __html: linkifyHtml(DOMPurify.sanitize(renderHTML)),
+      }}></Box>
   );
 };
 
