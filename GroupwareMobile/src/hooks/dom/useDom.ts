@@ -2,13 +2,14 @@ import {findAll} from 'domutils';
 import {useEffect, useMemo, useState} from 'react';
 import {useAmbientTRenderEngine} from 'react-native-render-html';
 import {Element} from 'domhandler';
+import linkifyHtml from 'linkifyjs/html';
 
 export const useDom = (html: string) => {
   const engine = useAmbientTRenderEngine();
   const [headings, setHeadings] = useState<Element[]>([]);
   const dom = useMemo(() => {
     if (typeof html === 'string') {
-      const parsedDom = engine.parseDocument(html);
+      const parsedDom = engine.parseDocument(linkifyHtml(html));
       return parsedDom;
     }
     return null;
