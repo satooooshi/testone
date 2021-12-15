@@ -81,4 +81,5 @@ export type RootStackParamList = {
   EditChatAlbum: {
     album: ChatAlbum;
   };
+  ForgotPassword: undefined;
 };

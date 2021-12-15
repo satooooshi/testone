@@ -11,9 +11,9 @@ import DrawerTab from './Drawer';
 import {tokenString} from '../utils/url';
 import messaging from '@react-native-firebase/messaging';
 import PushNotification, {Importance} from 'react-native-push-notification';
-import {Platform} from 'react-native';
 import {requestIOSMsgPermission} from '../utils/permission/requestIOSMsgPermisson';
 import {useAPIRegisterDevice} from '../hooks/api/notification/useAPIRegisterDevice';
+import ForgotPassword from '../screens/auth/ForgotPassword';
 
 const Stack = createStackNavigator<RootStackParamList>();
 
@@ -128,11 +128,18 @@ const Navigator = () => {
             />
           </>
         ) : (
-          <Stack.Screen
-            name="Login"
-            component={Login}
-            options={{headerShown: false}}
-          />
+          <>
+            <Stack.Screen
+              name="Login"
+              component={Login}
+              options={{headerShown: false}}
+            />
+            <Stack.Screen
+              name="ForgotPassword"
+              component={ForgotPassword}
+              options={{headerShown: false}}
+            />
+          </>
         )}
       </Stack.Navigator>
     </NavigationContainer>
