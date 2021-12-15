@@ -60,7 +60,7 @@ const UserCard: React.FC<UserCardProps> = ({
             <Text fontSize={18} fontWeight="bold" color={darkFontColor}>
               {userNameFactory(user)}
             </Text>
-            <Text fontSize={16} color={darkFontColor}>
+            <Text fontSize={16} color={darkFontColor} numberOfLines={2}>
               {user.introduceOther || '未設定'}
             </Text>
             <Div
