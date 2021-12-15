@@ -153,9 +153,9 @@ const Chat: React.FC = () => {
         navigation.navigate('ChatStack', {screen: 'ChatMenu', params: {room}})
       }>
       <Icon
-        name="pencil"
-        fontFamily="Entypo"
-        fontSize={24}
+        name="dots-horizontal-circle-outline"
+        fontFamily="MaterialCommunityIcons"
+        fontSize={26}
         color={darkFontColor}
       />
     </TouchableOpacity>
