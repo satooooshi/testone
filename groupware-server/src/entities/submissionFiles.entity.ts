@@ -35,6 +35,7 @@ export class SubmissionFile {
     () => EventSchedule,
     (eventSchedule) => eventSchedule.submissionFiles,
     {
+      nullable: false,
       onUpdate: 'CASCADE',
       onDelete: 'CASCADE',
     },
@@ -43,6 +44,7 @@ export class SubmissionFile {
   eventSchedule: EventSchedule;
 
   @ManyToOne(() => User, (user) => user.submissionFiles, {
+    nullable: false,
     onUpdate: 'CASCADE',
     onDelete: 'CASCADE',
   })
