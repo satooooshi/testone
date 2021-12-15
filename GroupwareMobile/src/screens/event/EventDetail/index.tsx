@@ -60,6 +60,8 @@ import DocumentPicker from 'react-native-document-picker';
 import {useAPIUploadStorage} from '../../../hooks/api/storage/useAPIUploadStorage';
 import {useAPISaveSubmission} from '../../../hooks/api/event/useAPISaveSubmission';
 import FileIcon from '../../../components/common/FileIcon';
+import ShareButton from '../../../components/common/ShareButton';
+import {generateClientURL} from '../../../utils/url';
 
 const EventDetail: React.FC = () => {
   const route = useRoute<EventDetailRouteProps>();
@@ -275,9 +277,15 @@ const EventDetail: React.FC = () => {
           )}
         </Div>
         <Div mx={16}>
-          <Text mb={16} fontSize={24} color={darkFontColor} fontWeight="900">
-            {eventInfo.title}
-          </Text>
+          <Div flexDir="row" justifyContent="space-between" mb={8}>
+            <Text mr={8} fontSize={22} color={darkFontColor} fontWeight="900">
+              {eventInfo.title}
+            </Text>
+            <ShareButton
+              text={eventInfo.title}
+              urlPath={generateClientURL(`/event/${eventInfo.id}`)}
+            />
+          </Div>
           <Div alignSelf="flex-end">
             {eventInfo.type !== 'submission_etc' &&
             !isFinished &&

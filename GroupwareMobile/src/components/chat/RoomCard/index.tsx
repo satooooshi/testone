@@ -13,12 +13,15 @@ type RoomCardProps = {
   room: ChatGroup;
   onPress: () => void;
   onPressPinButton: () => void;
+  //this param overrides every background color
+  dangerousBgColor?: string;
 };
 
 const RoomCard: React.FC<RoomCardProps> = ({
   room,
   onPress,
   onPressPinButton,
+  dangerousBgColor,
 }) => {
   const {width: windowWidth} = useWindowDimensions();
   const nameOfEmptyNameGroup = (members?: User[]): string => {
@@ -64,7 +67,13 @@ const RoomCard: React.FC<RoomCardProps> = ({
         containerStyle={tailwind('rounded-sm')}
         renderRightActions={rightSwipeActions}>
         <Div
-          bg={!readOrNot ? 'white' : 'gray300'}
+          bg={
+            dangerousBgColor
+              ? dangerousBgColor
+              : !readOrNot
+              ? 'white'
+              : 'gray300'
+          }
           borderColor={'white'}
           borderWidth={1}
           w={windowWidth * 0.9}

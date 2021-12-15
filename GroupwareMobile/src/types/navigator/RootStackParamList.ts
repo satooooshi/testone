@@ -82,4 +82,8 @@ export type RootStackParamList = {
     album: ChatAlbum;
   };
   ForgotPassword: undefined;
+  Share: {
+    urlPath: string;
+    text: string;
+  };
 };

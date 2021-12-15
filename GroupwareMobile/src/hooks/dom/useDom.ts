@@ -2,7 +2,7 @@ import {findAll} from 'domutils';
 import {useEffect, useMemo, useState} from 'react';
 import {useAmbientTRenderEngine} from 'react-native-render-html';
 import {Element} from 'domhandler';
-import linkifyHtml from 'linkifyjs/html';
+import linkifyHtml from 'linkify-html';
 
 export const useDom = (html: string) => {
   const engine = useAmbientTRenderEngine();

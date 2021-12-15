@@ -8,8 +8,10 @@ import {
   TRenderEngineProvider,
 } from 'react-native-render-html';
 import {textContent} from 'domutils';
-import {LayoutChangeEvent} from 'react-native';
+import {LayoutChangeEvent, Linking} from 'react-native';
 import {useScroller} from '../../utils/htmlScroll/scroller';
+import {useNavigation} from '@react-navigation/native';
+import {linkOpen} from '../../utils/linkHelper';
 
 const HeadingRenderer: CustomBlockRenderer = function HeaderRenderer({
   TDefaultRenderer,
@@ -68,10 +70,46 @@ const baseStyle: MixedStyleDeclaration = {
 };
 
 const WebEngine = ({children}: React.PropsWithChildren<{}>) => {
+  const navigation = useNavigation<any>();
+  const handlePressAnchor = (url: string) => {
+    const screenInfo = linkOpen(url);
+    if (screenInfo) {
+      const {screenName, idParams} = screenInfo;
+      switch (screenName) {
+        case 'AccountDetail':
+          navigation.navigate('AccountStack', {
+            screen: screenName,
+            params: {id: idParams},
+          });
+          break;
+        case 'WikiDetail':
+          navigation.navigate('WikiStack', {
+            screen: screenName,
+            params: {id: idParams},
+          });
+          break;
+        case 'EventDetail':
+          navigation.navigate('EventStack', {
+            screen: screenName,
+            params: {id: idParams},
+          });
+          break;
+      }
+    } else {
+      Linking.openURL(url);
+    }
+  };
   return (
     <TRenderEngineProvider tagsStyles={tagsStyles} baseStyle={baseStyle}>
       <RenderHTMLConfigProvider
         renderers={renderers}
+        renderersProps={{
+          a: {
+            onPress: (_, href) => {
+              handlePressAnchor(href);
+            },
+          },
+        }}
         enableExperimentalMarginCollapsing>
         {children}
       </RenderHTMLConfigProvider>
