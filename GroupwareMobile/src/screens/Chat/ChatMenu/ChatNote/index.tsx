@@ -147,7 +147,7 @@ const ChatNotes: React.FC = () => {
                         {
                           onSuccess: () => {
                             setPage('1');
-                            refetch();
+                            refetchNotes();
                           },
                         },
                       );
