@@ -336,7 +336,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({
         bg="white"
         display="flex"
         flexDir="column-reverse"
-        overflow="scroll"
+        overflowY="auto"
         borderBottom="1px #ececec solid"
         px="8px"
         whiteSpace="pre-wrap"
@@ -419,8 +419,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({
         cursor="text"
         p="16px"
         bg="#fefefe"
-        overflow="scroll"
-        w={isSmallerThan768 ? '85%' : '92%'}
+        overflowY="auto"
         h="20%"
         onClick={() => {
           editorRef.current?.focus();

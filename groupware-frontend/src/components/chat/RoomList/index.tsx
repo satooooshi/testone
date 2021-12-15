@@ -102,7 +102,7 @@ const RoomList: React.FC<RoomListProps> = ({
       flexDir="column"
       alignItems="center"
       h="100%"
-      overflow="scroll"
+      overflowY="auto"
       onScroll={onScroll}>
       {roomsForInfiniteScroll.length ? (
         roomsForInfiniteScroll.map((g) => (

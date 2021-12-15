@@ -84,7 +84,7 @@ const SelectChatGroupModal: React.FC<SelectChatGroupModal> = ({
         alignItems="center"
         mb="16px"
         h="80%"
-        overflow="scroll">
+        overflowY="auto">
         {roomsForInfiniteScroll.map((g) => (
           <a
             key={g.id}

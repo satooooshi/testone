@@ -90,7 +90,7 @@ const SelectUserModal: React.FC<SelectUserModalProps> = ({
           <option value={UserRole.COMMON}>一般社員</option>
         </Select>
       </FormControl>
-      <Box display="flex" flexDir="column" mb="16px" h="80%" overflow="scroll">
+      <Box display="flex" flexDir="column" mb="16px" h="80%" overflowY="auto">
         {selectedRole !== 'all'
           ? users
               .filter((u) => u.role === selectedRole)

@@ -201,8 +201,7 @@ const NewsAdmin: React.VFC = () => {
         justifyContent={!isSmallerThan768 ? 'center' : 'flex-start'}
         alignItems="center"
         w={!isSmallerThan768 ? '100%' : '100vw'}
-        mb="72px"
-        overflow="scroll">
+        mb="72px">
         <Text color="blue.500" fontSize="16px" mb="8px">
           特集管理ではアプリのTOP画面に表示されるリンクの管理ができます
         </Text>
@@ -233,59 +232,66 @@ const NewsAdmin: React.VFC = () => {
                 </Button>
               </Box>
             )}
-            <Table
-              variant="simple"
-              alignSelf="center"
-              w="85vw"
+            <Box
+              w={isSmallerThan768 ? '100vw' : '100%'}
+              justifyContent={isSmallerThan768 ? 'flex-start' : 'center'}
+              display="flex"
+              overflowX="auto"
               maxW="1980px"
-              overflow="scroll">
-              <Thead bg="white">
-                <Tr>
-                  <Th>URL</Th>
-                  <Th>タイトル</Th>
-                  <Th>作成日</Th>
-                  <Th />
-                  <Th />
-                </Tr>
-              </Thead>
-              {!isLoading && (
-                <Tbody
-                  position="relative"
-                  borderColor="gray.300"
-                  borderWidth={1}>
-                  {data?.news?.map((n) => (
-                    <Tr key={n.id}>
-                      <Td w={'fit-content'} color="blue">
-                        <NextLink href={location.href + n.urlPath}>
-                          <a target="_blank">{location.origin + n.urlPath}</a>
-                        </NextLink>
-                      </Td>
-                      <Td>{n.title}</Td>
-                      <Td>
-                        {dateTimeFormatterFromJSDDate({
-                          dateTime: new Date(n.createdAt),
-                          format: 'yyyy/LL/dd HH:mm',
-                        })}
-                      </Td>
-                      <Td>
-                        <Link
-                          onClick={() => {
-                            setValues(n);
-                            setFormOpened(true);
-                          }}>
-                          <BsPencilSquare size={24} color={darkFontColor} />
-                        </Link>
-                      </Td>
-                      <Td>
-                        <Link onClick={() => onDeleteNews(n)}>
-                          <MdDelete size={24} color={darkFontColor} />
-                        </Link>
-                      </Td>
-                    </Tr>
-                  ))}
-                </Tbody>
-              )}
-            </Table>
+              alignSelf="center">
+              <Table
+                variant="simple"
+                alignSelf="center"
+                w="100%"
+                overflowX="auto">
+                <Thead bg="white">
+                  <Tr>
+                    <Th>URL</Th>
+                    <Th>タイトル</Th>
+                    <Th>作成日</Th>
+                    <Th />
+                    <Th />
+                  </Tr>
+                </Thead>
+                {!isLoading && (
+                  <Tbody
+                    position="relative"
+                    borderColor="gray.300"
+                    borderWidth={1}>
+                    {data?.news?.map((n) => (
+                      <Tr key={n.id}>
+                        <Td w={'fit-content'} color="blue">
+                          <NextLink href={location.href + n.urlPath}>
+                            <a target="_blank">{location.origin + n.urlPath}</a>
+                          </NextLink>
+                        </Td>
+                        <Td>{n.title}</Td>
+                        <Td>
+                          {dateTimeFormatterFromJSDDate({
+                            dateTime: new Date(n.createdAt),
+                            format: 'yyyy/LL/dd HH:mm',
+                          })}
+                        </Td>
+                        <Td>
+                          <Link
+                            onClick={() => {
+                              setValues(n);
+                              setFormOpened(true);
+                            }}>
+                            <BsPencilSquare size={24} color={darkFontColor} />
+                          </Link>
+                        </Td>
+                        <Td>
+                          <Link onClick={() => onDeleteNews(n)}>
+                            <MdDelete size={24} color={darkFontColor} />
+                          </Link>
+                        </Td>
+                      </Tr>
+                    ))}
+                  </Tbody>
+                )}
+              </Table>
+            </Box>
             {isLoading && <Spinner />}
           </>
         )}
