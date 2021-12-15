@@ -36,6 +36,7 @@ const WikiList: React.FC<WikiListProps> = ({navigation}) => {
 
   return (
     <WholeContainer>
+      {/* <SearchFormOpenerButton onPress={console.log} /> */}
       <HeaderWithTextButton
         tabs={tabs}
         title="社内Wiki"
