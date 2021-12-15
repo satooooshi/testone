@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React from 'react';
 import {LoginProps} from '../../../types/navigator/screenProps/Login';
 import WholeContainer from '../../../components/WholeContainer';
 import {Input, Button, Text} from 'react-native-magnus';
@@ -11,28 +11,18 @@ import {
   TouchableHighlight,
 } from 'react-native';
 import {loginStyles} from '../../../styles/screen/auth/login.style';
-import {useAuthenticate} from '../../../contexts/useAuthenticate';
-import {useAPILogin} from '../../../hooks/api/auth/useAPILogin';
-import {axiosInstance, storage} from '../../../utils/url';
 import {Formik} from 'formik';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
-import tailwind from 'tailwind-rn';
+import {useAPIRefreshPassword} from '../../../hooks/api/auth/useAPIRefreshPassword';
 
-const Login: React.FC<LoginProps> = ({navigation}) => {
+const ForgotPassword: React.FC<LoginProps> = ({navigation}) => {
   const windowWidth = useWindowDimensions().width;
-  const {setUser} = useAuthenticate();
-  const {mutate: mutateLogin} = useAPILogin({
-    onSuccess: data => {
-      axiosInstance.defaults.headers.common = {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${data.token || ''}`,
-      };
-      storage.set('userToken', data.token || '');
-      setUser(data);
-      navigation.navigate('Main');
+  const {mutate: refreshPassword} = useAPIRefreshPassword({
+    onSuccess: () => {
+      Alert.alert('パスワード再発行メールを送信しました');
     },
     onError: () => {
-      Alert.alert('認証に失敗しました。入力内容をご確認ください');
+      Alert.alert('エラーが発生しました\n入力内容をお確かめください');
     },
   });
 
@@ -50,8 +40,8 @@ const Login: React.FC<LoginProps> = ({navigation}) => {
             source={require('../../../../assets/bold-logo.png')}
           />
           <Formik
-            initialValues={{email: '', password: ''}}
-            onSubmit={values => mutateLogin(values)}>
+            initialValues={{email: ''}}
+            onSubmit={values => refreshPassword(values)}>
             {({values, handleBlur, handleChange, handleSubmit}) => (
               <>
                 <Text
@@ -62,45 +52,29 @@ const Login: React.FC<LoginProps> = ({navigation}) => {
                   style={loginStyles.centerize}>
                   Login to Service
                 </Text>
-                <Text
-                  fontSize={16}
-                  fontWeight="bold"
-                  color={darkFontColor}
-                  mb={24}
-                  style={loginStyles.centerize}>
-                  パスワードをお忘れの方は
-                  <TouchableHighlight
-                    underlayColor="none"
-                    style={tailwind('justify-center')}
-                    onPress={() => navigation.navigate('ForgotPassword')}>
-                    <Text color="green600" fontSize={16}>
-                      こちら
-                    </Text>
-                  </TouchableHighlight>
-                </Text>
+                <TouchableHighlight
+                  underlayColor="none"
+                  style={loginStyles.centerize}
+                  onPress={() => navigation.navigate('Login')}>
+                  <Text
+                    color="green600"
+                    fontSize={16}
+                    fontWeight="bold"
+                    mb={24}>
+                    ログイン画面へ
+                  </Text>
+                </TouchableHighlight>
                 <Input
                   h={48}
                   fontSize={16}
                   style={loginStyles.fontSize}
                   autoCapitalize="none"
-                  placeholder="email@example.com"
+                  placeholder="登録済みのメールアドレスを入力してください"
                   p={10}
                   mb="lg"
                   value={values.email}
                   onBlur={handleBlur('email')}
                   onChangeText={handleChange('email')}
-                />
-                <Input
-                  h={48}
-                  fontSize={16}
-                  placeholder="password"
-                  autoCapitalize="none"
-                  secureTextEntry={true}
-                  p={10}
-                  mb={'lg'}
-                  value={values.password}
-                  onChangeText={handleChange('password')}
-                  onBlur={handleBlur('password')}
                 />
                 <Button
                   onPress={() => handleSubmit()}
@@ -112,7 +86,7 @@ const Login: React.FC<LoginProps> = ({navigation}) => {
                   bg="green700"
                   fontWeight="bold"
                   color="white">
-                  ログイン
+                  再発行メールを送信
                 </Button>
               </>
             )}
@@ -123,4 +97,4 @@ const Login: React.FC<LoginProps> = ({navigation}) => {
   );
 };
 
-export default Login;
+export default ForgotPassword;
