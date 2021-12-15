@@ -55,7 +55,6 @@ import {UserRole} from '../../../types';
 import {useNavigation} from '@react-navigation/native';
 import tailwind from 'tailwind-rn';
 import {useAPISaveUserJoiningEvent} from '../../../hooks/api/event/useAPISaveUserJoiningEvent';
-import {getUserJoiningEventExceptCanceledFactory} from '../../../utils/factory/event/getUserJoiningEventExceptCanceledFactory';
 import DocumentPicker from 'react-native-document-picker';
 import {useAPIUploadStorage} from '../../../hooks/api/storage/useAPIUploadStorage';
 import {useAPISaveSubmission} from '../../../hooks/api/event/useAPISaveSubmission';
@@ -131,9 +130,7 @@ const EventDetail: React.FC = () => {
     if (!eventInfo?.userJoiningEvent) {
       return;
     }
-    return getUserJoiningEventExceptCanceledFactory(
-      eventInfo?.userJoiningEvent,
-    );
+    return eventInfo?.userJoiningEvent.filter(uje => !uje.canceledAt);
   }, [eventInfo?.userJoiningEvent]);
 
   const windowWidth = useWindowDimensions().width;
