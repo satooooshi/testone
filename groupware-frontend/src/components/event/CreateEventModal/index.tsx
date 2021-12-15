@@ -191,7 +191,7 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
       const linkedFiles: Partial<EventFile>[] = fileURLs.map((f) => ({
         url: f,
       }));
-      createEvent({ ...newEvent, files: linkedFiles });
+      createEvent({ ...newEvent, files: [...newEvent.files, ...linkedFiles] });
       setNewFiles([]);
       dispatchCrop({ type: 'resetImage', value: 'resetImage' });
     },
@@ -594,7 +594,10 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
               {newEvent.files.map((f) => (
                 <div className={createEventModalStyle.url_wrapper} key={f.url}>
                   <span className={createEventModalStyle.url}>
-                    {(f.url?.match('.+/(.+?)([?#;].*)?$') || ['', f.url])[1]}
+                    {decodeURIComponent(
+                      (f.url?.match('.+/(.+?)([?#;].*)?$') || ['', f.url])[1] ||
+                        '',
+                    )}
                   </span>
                   <MdCancel
                     className={createEventModalStyle.url_delete_button}
