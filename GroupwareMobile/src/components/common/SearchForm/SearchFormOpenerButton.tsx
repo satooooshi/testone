@@ -11,7 +11,7 @@ const SearchFormOpenerButton: React.FC<SearchFormOpenerButtonProps> = props => {
       bg="purple600"
       position="absolute"
       right={10}
-      bottom={80}
+      bottom={10}
       h={60}
       zIndex={20}
       rounded="circle"

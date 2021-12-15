@@ -215,8 +215,8 @@ export default WikiDetail;
 const styles = StyleSheet.create({
   fab: {
     position: 'absolute',
-    bottom: 15,
-    right: 15,
+    bottom: 10,
+    right: 10,
     backgroundColor: 'white',
   },
 });

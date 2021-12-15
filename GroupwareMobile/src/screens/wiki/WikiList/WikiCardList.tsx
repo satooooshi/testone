@@ -142,143 +142,145 @@ const WikiCardList: React.FC<WikiCardListProps> = ({type, setRuleCategory}) => {
   }, [fetchedWiki?.wiki]);
 
   return (
-    <Div flexDir="column" h="100%" pb={80}>
-      <SearchForm
-        isVisible={visibleSearchFormModal}
-        onCloseModal={() => setVisibleSearchFormModal(false)}
-        tags={tags || []}
-        onSubmit={values => {
-          setVisibleSearchFormModal(false);
-          queryRefresh({word: values.word}, values.selectedTags);
-        }}
-      />
+    <>
       <SearchFormOpenerButton onPress={() => setVisibleSearchFormModal(true)} />
-      {type === WikiType.RULES ? (
-        <TopTab.Navigator
-          screenOptions={{
-            tabBarScrollEnabled: true,
-          }}>
-          <TopTab.Screen
-            name={'WikiList-' + RuleCategory.RULES}
-            children={() => (
-              <RenderWikiCardList
-                isLoading={isLoadingWiki}
-                wiki={wikiForInfiniteScroll}
-                ruleCategory={RuleCategory.RULES}
-                status={undefined}
-                setSearchQuery={setSearchQuery}
-                searchQuery={searchQuery}
-                setRuleCategory={setRuleCategory}
-              />
-            )}
-            options={{title: '社内規則'}}
-          />
-          <TopTab.Screen
-            name={'WikiList-' + RuleCategory.PHILOSOPHY}
-            children={() => (
-              <RenderWikiCardList
-                isLoading={isLoadingWiki}
-                wiki={wikiForInfiniteScroll}
-                ruleCategory={RuleCategory.PHILOSOPHY}
-                status={undefined}
-                setSearchQuery={setSearchQuery}
-                searchQuery={searchQuery}
-                setRuleCategory={setRuleCategory}
-              />
-            )}
-            options={{title: '会社理念'}}
-          />
-          <TopTab.Screen
-            name={'WikiList-' + RuleCategory.ABC}
-            children={() => (
-              <RenderWikiCardList
-                isLoading={isLoadingWiki}
-                wiki={wikiForInfiniteScroll}
-                ruleCategory={RuleCategory.ABC}
-                status={undefined}
-                setSearchQuery={setSearchQuery}
-                searchQuery={searchQuery}
-                setRuleCategory={setRuleCategory}
-              />
-            )}
-            options={{title: 'ABC制度'}}
-          />
-          <TopTab.Screen
-            name={'WikiList-' + RuleCategory.BENEFITS}
-            children={() => (
-              <RenderWikiCardList
-                isLoading={isLoadingWiki}
-                wiki={wikiForInfiniteScroll}
-                ruleCategory={RuleCategory.BENEFITS}
-                status={undefined}
-                setSearchQuery={setSearchQuery}
-                searchQuery={searchQuery}
-                setRuleCategory={setRuleCategory}
-              />
-            )}
-            options={{title: '福利厚生等'}}
-          />
-          <TopTab.Screen
-            name={'WikiList-' + RuleCategory.DOCUMENT}
-            children={() => (
-              <RenderWikiCardList
-                isLoading={isLoadingWiki}
-                wiki={wikiForInfiniteScroll}
-                ruleCategory={RuleCategory.DOCUMENT}
-                status={undefined}
-                setSearchQuery={setSearchQuery}
-                searchQuery={searchQuery}
-                setRuleCategory={setRuleCategory}
-              />
-            )}
-            options={{title: '各種申請書'}}
-          />
-        </TopTab.Navigator>
-      ) : type === WikiType.QA ? (
-        <TopTab.Navigator>
-          <TopTab.Screen
-            name={'WikiList-' + WikiType.QA + '-new'}
-            children={() => (
-              <RenderWikiCardList
-                isLoading={isLoadingWiki}
-                wiki={wikiForInfiniteScroll}
-                ruleCategory={undefined}
-                status={'new'}
-                setSearchQuery={setSearchQuery}
-                searchQuery={searchQuery}
-                setRuleCategory={setRuleCategory}
-              />
-            )}
-            options={{title: '新着'}}
-          />
-          <TopTab.Screen
-            name={'WikiList-' + WikiType.QA + '-resolved'}
-            children={() => (
-              <RenderWikiCardList
-                isLoading={isLoadingWiki}
-                wiki={wikiForInfiniteScroll}
-                ruleCategory={undefined}
-                status={'resolved'}
-                setSearchQuery={setSearchQuery}
-                searchQuery={searchQuery}
-                setRuleCategory={setRuleCategory}
-              />
-            )}
-            options={{title: '解決済み'}}
-          />
-        </TopTab.Navigator>
-      ) : (
-        <RenderWikiCardList
-          isLoading={isLoadingWiki}
-          wiki={wikiForInfiniteScroll}
-          ruleCategory={undefined}
-          status={undefined}
-          setSearchQuery={setSearchQuery}
-          searchQuery={searchQuery}
-          setRuleCategory={setRuleCategory}
+      <Div flexDir="column" h="100%" pb={80}>
+        <SearchForm
+          isVisible={visibleSearchFormModal}
+          onCloseModal={() => setVisibleSearchFormModal(false)}
+          tags={tags || []}
+          onSubmit={values => {
+            setVisibleSearchFormModal(false);
+            queryRefresh({word: values.word}, values.selectedTags);
+          }}
         />
-      )}
-    </Div>
+        {type === WikiType.RULES ? (
+          <TopTab.Navigator
+            screenOptions={{
+              tabBarScrollEnabled: true,
+            }}>
+            <TopTab.Screen
+              name={'WikiList-' + RuleCategory.RULES}
+              children={() => (
+                <RenderWikiCardList
+                  isLoading={isLoadingWiki}
+                  wiki={wikiForInfiniteScroll}
+                  ruleCategory={RuleCategory.RULES}
+                  status={undefined}
+                  setSearchQuery={setSearchQuery}
+                  searchQuery={searchQuery}
+                  setRuleCategory={setRuleCategory}
+                />
+              )}
+              options={{title: '社内規則'}}
+            />
+            <TopTab.Screen
+              name={'WikiList-' + RuleCategory.PHILOSOPHY}
+              children={() => (
+                <RenderWikiCardList
+                  isLoading={isLoadingWiki}
+                  wiki={wikiForInfiniteScroll}
+                  ruleCategory={RuleCategory.PHILOSOPHY}
+                  status={undefined}
+                  setSearchQuery={setSearchQuery}
+                  searchQuery={searchQuery}
+                  setRuleCategory={setRuleCategory}
+                />
+              )}
+              options={{title: '会社理念'}}
+            />
+            <TopTab.Screen
+              name={'WikiList-' + RuleCategory.ABC}
+              children={() => (
+                <RenderWikiCardList
+                  isLoading={isLoadingWiki}
+                  wiki={wikiForInfiniteScroll}
+                  ruleCategory={RuleCategory.ABC}
+                  status={undefined}
+                  setSearchQuery={setSearchQuery}
+                  searchQuery={searchQuery}
+                  setRuleCategory={setRuleCategory}
+                />
+              )}
+              options={{title: 'ABC制度'}}
+            />
+            <TopTab.Screen
+              name={'WikiList-' + RuleCategory.BENEFITS}
+              children={() => (
+                <RenderWikiCardList
+                  isLoading={isLoadingWiki}
+                  wiki={wikiForInfiniteScroll}
+                  ruleCategory={RuleCategory.BENEFITS}
+                  status={undefined}
+                  setSearchQuery={setSearchQuery}
+                  searchQuery={searchQuery}
+                  setRuleCategory={setRuleCategory}
+                />
+              )}
+              options={{title: '福利厚生等'}}
+            />
+            <TopTab.Screen
+              name={'WikiList-' + RuleCategory.DOCUMENT}
+              children={() => (
+                <RenderWikiCardList
+                  isLoading={isLoadingWiki}
+                  wiki={wikiForInfiniteScroll}
+                  ruleCategory={RuleCategory.DOCUMENT}
+                  status={undefined}
+                  setSearchQuery={setSearchQuery}
+                  searchQuery={searchQuery}
+                  setRuleCategory={setRuleCategory}
+                />
+              )}
+              options={{title: '各種申請書'}}
+            />
+          </TopTab.Navigator>
+        ) : type === WikiType.QA ? (
+          <TopTab.Navigator>
+            <TopTab.Screen
+              name={'WikiList-' + WikiType.QA + '-new'}
+              children={() => (
+                <RenderWikiCardList
+                  isLoading={isLoadingWiki}
+                  wiki={wikiForInfiniteScroll}
+                  ruleCategory={undefined}
+                  status={'new'}
+                  setSearchQuery={setSearchQuery}
+                  searchQuery={searchQuery}
+                  setRuleCategory={setRuleCategory}
+                />
+              )}
+              options={{title: '新着'}}
+            />
+            <TopTab.Screen
+              name={'WikiList-' + WikiType.QA + '-resolved'}
+              children={() => (
+                <RenderWikiCardList
+                  isLoading={isLoadingWiki}
+                  wiki={wikiForInfiniteScroll}
+                  ruleCategory={undefined}
+                  status={'resolved'}
+                  setSearchQuery={setSearchQuery}
+                  searchQuery={searchQuery}
+                  setRuleCategory={setRuleCategory}
+                />
+              )}
+              options={{title: '解決済み'}}
+            />
+          </TopTab.Navigator>
+        ) : (
+          <RenderWikiCardList
+            isLoading={isLoadingWiki}
+            wiki={wikiForInfiniteScroll}
+            ruleCategory={undefined}
+            status={undefined}
+            setSearchQuery={setSearchQuery}
+            searchQuery={searchQuery}
+            setRuleCategory={setRuleCategory}
+          />
+        )}
+      </Div>
+    </>
   );
 };
 
