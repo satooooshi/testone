@@ -25,12 +25,14 @@ import MarkdownIt from 'markdown-it';
 import {useHTMLScrollFeature} from '../../../hooks/scroll/useHTMLScrollFeature';
 import {useDom} from '../../../hooks/dom/useDom';
 import {useMinimumDrawer} from '../../../hooks/minimumDrawer/useMinimumDrawer';
+import ShareButton from '../../../components/common/ShareButton';
+import {generateClientURL} from '../../../utils/url';
 
 const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
   const isFocused = useIsFocused();
   const {id} = route.params;
   const {drawerRef, openDrawer, closeDrawer} = useMinimumDrawer();
-  const {width: windowWidth, height: windowHeight} = useWindowDimensions();
+  const {width: windowWidth} = useWindowDimensions();
   const {data: wikiInfo, refetch: refetchWikiInfo} = useAPIGetWikiDetail(id);
   const [wikiTypeName, setWikiTypeName] = useState('Wiki');
   const mdParser = new MarkdownIt({breaks: true});
@@ -116,9 +118,19 @@ const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
         }}>
         {wikiInfo && wikiInfo.writer ? (
           <Div flexDir="column" w={'100%'}>
-            <Text fontWeight="bold" fontSize={24} color={darkFontColor} mb={16}>
-              {wikiInfo.title}
-            </Text>
+            <Div mb={16} flexDir="row" justifyContent="space-between">
+              <Text
+                fontWeight="bold"
+                fontSize={24}
+                color={darkFontColor}
+                mb={8}>
+                {wikiInfo.title}
+              </Text>
+              <ShareButton
+                urlPath={generateClientURL(`/wiki/detail/${wikiInfo.id}`)}
+                text={wikiInfo.title}
+              />
+            </Div>
             <Div flexDir="row" alignItems="center" mb={16}>
               <TouchableOpacity
                 onPress={() => {

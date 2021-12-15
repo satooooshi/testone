@@ -26,7 +26,7 @@ const ShareButton: React.FC<ShareButtonProps> = ({urlPath, text}) => {
       underlayColor="none"
       onPress={onPress}
       style={tailwind(
-        'bg-white rounded-md p-2 justify-center items-center w-32',
+        'bg-white rounded-md justify-center items-center w-28 h-16',
       )}>
       <>
         <Icon name="share" fontFamily="MaterialCommunityIcons" fontSize={24} />

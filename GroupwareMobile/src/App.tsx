@@ -4,7 +4,6 @@ import {AuthenticateProvider} from './contexts/useAuthenticate';
 import {QueryClientProvider, QueryClient} from 'react-query';
 import 'react-native-gesture-handler';
 import RNBootSplash from 'react-native-bootsplash';
-import WebEngine from './components/WebEngine';
 
 const App = () => {
   const queryClient = new QueryClient();
@@ -16,13 +15,11 @@ const App = () => {
   }, []);
 
   return (
-    <WebEngine>
-      <QueryClientProvider client={queryClient}>
-        <AuthenticateProvider>
-          <Navigator />
-        </AuthenticateProvider>
-      </QueryClientProvider>
-    </WebEngine>
+    <QueryClientProvider client={queryClient}>
+      <AuthenticateProvider>
+        <Navigator />
+      </AuthenticateProvider>
+    </QueryClientProvider>
   );
 };
 

@@ -14,6 +14,8 @@ import PushNotification, {Importance} from 'react-native-push-notification';
 import {requestIOSMsgPermission} from '../utils/permission/requestIOSMsgPermisson';
 import {useAPIRegisterDevice} from '../hooks/api/notification/useAPIRegisterDevice';
 import ForgotPassword from '../screens/auth/ForgotPassword';
+import WebEngine from '../components/WebEngine';
+import Share from '../screens/Chat/Share';
 
 const Stack = createStackNavigator<RootStackParamList>();
 
@@ -117,31 +119,38 @@ const Navigator = () => {
 
   return (
     <NavigationContainer ref={navigationRef}>
-      <Stack.Navigator
-        initialRouteName={user?.id || tokenString() ? 'Main' : 'Login'}>
-        {user?.id || tokenString() ? (
-          <>
-            <Stack.Screen
-              name="Main"
-              component={DrawerTab}
-              options={{headerShown: false}}
-            />
-          </>
-        ) : (
-          <>
-            <Stack.Screen
-              name="Login"
-              component={Login}
-              options={{headerShown: false}}
-            />
-            <Stack.Screen
-              name="ForgotPassword"
-              component={ForgotPassword}
-              options={{headerShown: false}}
-            />
-          </>
-        )}
-      </Stack.Navigator>
+      <WebEngine>
+        <Stack.Navigator
+          initialRouteName={user?.id || tokenString() ? 'Main' : 'Login'}>
+          {user?.id || tokenString() ? (
+            <>
+              <Stack.Screen
+                name="Main"
+                component={DrawerTab}
+                options={{headerShown: false}}
+              />
+              <Stack.Screen
+                name="Share"
+                component={Share}
+                options={{headerShown: false}}
+              />
+            </>
+          ) : (
+            <>
+              <Stack.Screen
+                name="Login"
+                component={Login}
+                options={{headerShown: false}}
+              />
+              <Stack.Screen
+                name="ForgotPassword"
+                component={ForgotPassword}
+                options={{headerShown: false}}
+              />
+            </>
+          )}
+        </Stack.Navigator>
+      </WebEngine>
     </NavigationContainer>
   );
 };

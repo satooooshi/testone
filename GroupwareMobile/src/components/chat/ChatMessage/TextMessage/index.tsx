@@ -1,9 +1,10 @@
 import React from 'react';
 import {TouchableHighlight, useWindowDimensions} from 'react-native';
-import {Div, Text} from 'react-native-magnus';
+import {Div} from 'react-native-magnus';
 import {ChatMessage} from '../../../../types';
-import {mentionTransform} from '../../../../utils/messageTransform';
 import ReplyParent from '../ReplyParent';
+import tailwind from 'tailwind-rn';
+import AutoLinkedText from '../../../common/AutoLinkedText';
 
 export type TextMessageProps = {
   message: ChatMessage;
@@ -18,15 +19,17 @@ const TextMessage: React.FC<TextMessageProps> = ({message, onLongPress}) => {
         rounded="xl"
         maxW={windowWidth * 0.6}
         minW={windowWidth * 0.4}
-        bg={message.isSender ? 'blue700' : 'gray400'}
+        bg={message.isSender ? 'blue600' : 'gray400'}
         p={8}
         justifyContent="center">
         {message.replyParentMessage && (
           <ReplyParent parentMessage={message.replyParentMessage} />
         )}
-        <Text color={message.isSender ? 'white' : 'black'} fontSize={16}>
-          {mentionTransform(message?.content)}
-        </Text>
+        <AutoLinkedText
+          text={message.content}
+          linkStyle={tailwind('font-bold text-pink-300 text-base')}
+          style={tailwind('text-white')}
+        />
       </Div>
     </TouchableHighlight>
   );

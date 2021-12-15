@@ -278,14 +278,14 @@ const EventDetail: React.FC = () => {
         </Div>
         <Div mx={16}>
           <Div flexDir="row" justifyContent="space-between" mb={8}>
-            <Text fontSize={22} color={darkFontColor} fontWeight="900">
+            <Text mr={8} fontSize={22} color={darkFontColor} fontWeight="900">
               {eventInfo.title}
             </Text>
+            <ShareButton
+              text={eventInfo.title}
+              urlPath={generateClientURL(`/event/${eventInfo.id}`)}
+            />
           </Div>
-          <ShareButton
-            text={eventInfo.title}
-            urlPath={generateClientURL(`/event/${eventInfo.id}`)}
-          />
           <Div alignSelf="flex-end">
             {eventInfo.type !== 'submission_etc' &&
             !isFinished &&
