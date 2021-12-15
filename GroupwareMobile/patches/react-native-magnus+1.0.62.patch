@@ -1,0 +1,15 @@
+diff --git a/node_modules/react-native-magnus/src/ui/select/select.component.tsx b/node_modules/react-native-magnus/src/ui/select/select.component.tsx
+index 3f0e3e5..c7b0649 100644
+--- a/node_modules/react-native-magnus/src/ui/select/select.component.tsx
++++ b/node_modules/react-native-magnus/src/ui/select/select.component.tsx
+@@ -53,7 +53,9 @@ const Select = React.forwardRef<SelectRef, SelectProps>(
+     const isSearchable = useMemo(() => !!searchableProps?.length, [
+       searchableProps,
+     ]);
+-
++    useEffect(() => {
++      setSelectedValue(value)
++    }, [value])
+     const computedStyle = getStyle(theme, props);
+ 
+     const resolveMultiLevelAccess = (obj: any, key: string) => {

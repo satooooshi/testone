@@ -1,4 +1,4 @@
-import React, {useEffect, useMemo, useState} from 'react';
+import React, {useEffect, useMemo, useRef, useState} from 'react';
 import WholeContainer from '../../../components/WholeContainer';
 import {
   FlatList,
@@ -6,6 +6,7 @@ import {
   ActivityIndicator,
   TextInput,
   Alert,
+  TouchableOpacity,
 } from 'react-native';
 import HeaderWithTextButton from '../../../components/Header';
 import {
@@ -15,8 +16,9 @@ import {
   Overlay,
   ScrollDiv,
   Image,
-  Modal,
   Icon,
+  Select,
+  SelectRef,
 } from 'react-native-magnus';
 import FastImage from 'react-native-fast-image';
 import {eventDetailStyles} from '../../../styles/screen/event/eventDetail.style';
@@ -37,7 +39,12 @@ import {useAPIJoinEvent} from '../../../hooks/api/event/useAPIJoinEvent';
 import {useAPICancelEvent} from '../../../hooks/api/event/useAPICancelEvent';
 import {AxiosError} from 'axios';
 import {useFormik} from 'formik';
-import {EventComment, EventType, SubmissionFile} from '../../../types';
+import {
+  EventComment,
+  EventType,
+  SubmissionFile,
+  UserJoiningEvent,
+} from '../../../types';
 import {useAPICreateComment} from '../../../hooks/api/event/useAPICreateComment';
 import EventCommentCard from '../EventCommentCard';
 import {createCommentSchema} from '../../../utils/validation/schema';
@@ -47,21 +54,26 @@ import {useAuthenticate} from '../../../contexts/useAuthenticate';
 import {UserRole} from '../../../types';
 import {useNavigation} from '@react-navigation/native';
 import tailwind from 'tailwind-rn';
-import {getJoiningUsers} from '../../../utils/factory/event/getJoiningUsersFactory';
+import {useAPISaveUserJoiningEvent} from '../../../hooks/api/event/useAPISaveUserJoiningEvent';
+import {getUserJoiningEventExceptCanceledFactory} from '../../../utils/factory/event/getUserJoiningEventExceptCanceledFactory';
 import DocumentPicker from 'react-native-document-picker';
 import {useAPIUploadStorage} from '../../../hooks/api/storage/useAPIUploadStorage';
 import {useAPISaveSubmission} from '../../../hooks/api/event/useAPISaveSubmission';
-import RNFetchBlob from 'rn-fetch-blob';
 import FileIcon from '../../../components/common/FileIcon';
-const {fs, config} = RNFetchBlob;
 
 const EventDetail: React.FC = () => {
   const route = useRoute<EventDetailRouteProps>();
   const {user} = useAuthenticate();
   const navigation = useNavigation();
 
-  const [joiningUserVisiable, setJoiningUserVisiable] = useState(false);
-
+  const [joiningUserVisiable, setJoiningUserVisiable] =
+    useState<boolean>(false);
+  const [
+    lateRecordTargetUserJoiningEvent,
+    setLateRecordTargetUserJoiningEvent,
+  ] = useState<UserJoiningEvent>();
+  const lateRecorderRef = useRef<SelectRef>(null);
+  const lateRecorderInOverLayRef = useRef<SelectRef>(null);
   const {id} = route.params;
   const {
     data: eventInfo,
@@ -71,6 +83,12 @@ const EventDetail: React.FC = () => {
   const initialValues: Partial<EventComment> = {
     body: '',
   };
+  const {mutate: handleChangeJoiningData} = useAPISaveUserJoiningEvent({
+    onSuccess: () => {
+      refetchEvents();
+      Alert.alert('遅刻を記録しました。');
+    },
+  });
   const [screenLoading, setScreenLoading] = useState(false);
   const [visibleEventFormModal, setEventFormModal] = useState(false);
   const [commentVisible, setCommentVisible] = useState(false);
@@ -89,6 +107,11 @@ const EventDetail: React.FC = () => {
       Alert.alert('提出状況を保存しました');
       refetchEvents();
     },
+    onError: err => {
+      if (err.response?.data) {
+        Alert.alert((err.response?.data as AxiosError)?.message);
+      }
+    },
   });
   const {mutate: joinEvent} = useAPIJoinEvent({
     onSuccess: () => refetchEvents(),
@@ -102,12 +125,13 @@ const EventDetail: React.FC = () => {
     onSuccess: () => refetchEvents(),
   });
 
-  const joiningUsers = useMemo(() => {
+  const userJoiningEvents = useMemo(() => {
     if (!eventInfo?.userJoiningEvent) {
       return;
     }
-
-    return getJoiningUsers(eventInfo?.userJoiningEvent);
+    return getUserJoiningEventExceptCanceledFactory(
+      eventInfo?.userJoiningEvent,
+    );
   }, [eventInfo?.userJoiningEvent]);
 
   const windowWidth = useWindowDimensions().width;
@@ -374,6 +398,8 @@ const EventDetail: React.FC = () => {
         onSuccess: fileURL => {
           const unSavedFiles: Partial<SubmissionFile>[] = fileURL.map(f => ({
             url: f,
+            eventSchedule: eventInfo,
+            userSubmitted: user,
           }));
           setUnsavedSubmissions(f => [...f, ...unSavedFiles]);
         },
@@ -407,16 +433,20 @@ const EventDetail: React.FC = () => {
         onCloseModal={() => setEventFormModal(false)}
         onSubmit={event => saveEvent({...event, id: eventInfo?.id})}
       />
-      <Modal isVisible={joiningUserVisiable}>
-        <Text fontSize={16} ml={24} mt={16}>
-          参加者一覧 : {joiningUsers?.length}名
+      <Overlay
+        w="90%"
+        visible={joiningUserVisiable}
+        onBackdropPress={() => setJoiningUserVisiable(false)}>
+        <Text fontSize={14} ml={24} mt={16}>
+          参加者一覧 : {userJoiningEvents?.length}名
+          {user?.role === UserRole.ADMIN && '(タップで遅刻を記録)'}
         </Text>
         <Button
           bg="gray400"
           h={35}
           w={35}
           position="absolute"
-          top={50}
+          top={15}
           right={15}
           rounded="circle"
           onPress={() => {
@@ -424,50 +454,106 @@ const EventDetail: React.FC = () => {
           }}>
           <Icon color="black900" name="close" />
         </Button>
-        <Div my={16} mx={12}>
+        <Div my={16} mx={24}>
           <ScrollDiv>
             <Div
               flexDir="row"
               justifyContent="space-between"
               alignItems="center"
               flexWrap="wrap">
-              {joiningUsers?.map(u => {
+              {userJoiningEvents?.map(uje => {
                 return (
-                  <Div
-                    key={u.id}
-                    bg="white"
-                    flexDir="row"
-                    flexWrap="wrap"
-                    rounded="sm"
-                    alignItems="center"
-                    w="45%"
-                    borderWidth={1}
-                    borderColor="gray400"
-                    mx={8}
-                    my={4}>
-                    <Div pl={16} alignItems="center" flex={2}>
+                  <TouchableOpacity
+                    key={uje.id}
+                    style={tailwind(
+                      'bg-white flex-row flex-wrap rounded items-center border border-gray-400 mx-2 my-1',
+                    )}
+                    onPress={() => {
+                      if (
+                        user?.role === UserRole.ADMIN &&
+                        lateRecorderInOverLayRef.current
+                      ) {
+                        setLateRecordTargetUserJoiningEvent(uje);
+                        lateRecorderInOverLayRef.current.open();
+                      }
+                    }}>
+                    <Div pl={16} alignItems="center" flex={1}>
                       <Image
                         my={'lg'}
                         h={windowWidth * 0.09}
                         w={windowWidth * 0.09}
                         source={
-                          u.avatarUrl
-                            ? {uri: u.avatarUrl}
+                          uje.user.avatarUrl
+                            ? {uri: uje.user.avatarUrl}
                             : require('../../../../assets/no-image-avatar.png')
                         }
                         rounded="circle"
                       />
                     </Div>
-                    <Div alignItems="center" flex={5}>
-                      <Text numberOfLines={1}>{userNameFactory(u)}</Text>
+                    <Div alignItems="center" flex={4}>
+                      <Text numberOfLines={1}>{userNameFactory(uje.user)}</Text>
+                      {user?.role === UserRole.ADMIN &&
+                        uje.lateMinutes !== 0 && (
+                          <Text color="red">{uje.lateMinutes}分遅刻</Text>
+                        )}
                     </Div>
-                  </Div>
+                  </TouchableOpacity>
                 );
               })}
             </Div>
           </ScrollDiv>
         </Div>
-      </Modal>
+        <Select
+          onSelect={v => {
+            if (lateRecordTargetUserJoiningEvent) {
+              handleChangeJoiningData({
+                ...lateRecordTargetUserJoiningEvent,
+                lateMinutes: v,
+              });
+            }
+          }}
+          ref={lateRecorderInOverLayRef}
+          value={lateRecordTargetUserJoiningEvent?.lateMinutes}
+          title={
+            userNameFactory(lateRecordTargetUserJoiningEvent?.user) +
+            'さんの遅刻を記録'
+          }
+          message="遅刻時間を選択してください。"
+          roundedTop="xl"
+          style={tailwind('z-50')}
+          data={[15, 30, 45, 60, 90, 120]}
+          renderItem={item => (
+            <Select.Option value={item} py="md" px="xl">
+              <Text>{item}分遅刻</Text>
+            </Select.Option>
+          )}
+        />
+      </Overlay>
+      <Select
+        onSelect={v => {
+          if (lateRecordTargetUserJoiningEvent) {
+            handleChangeJoiningData({
+              ...lateRecordTargetUserJoiningEvent,
+              lateMinutes: v,
+            });
+          }
+        }}
+        ref={lateRecorderRef}
+        value={lateRecordTargetUserJoiningEvent?.lateMinutes}
+        title={
+          userNameFactory(lateRecordTargetUserJoiningEvent?.user) +
+          'さんの遅刻を記録'
+        }
+        message="遅刻時間を選択してください。"
+        roundedTop="xl"
+        style={tailwind('z-50')}
+        data={[15, 30, 45, 60, 90, 120]}
+        renderItem={item => (
+          <Select.Option value={item} py="md" px="xl">
+            <Text>{item}分遅刻</Text>
+          </Select.Option>
+        )}
+      />
       <ScrollDiv>
         {eventInfo && (
           <Div flexDir="column">
@@ -485,198 +571,210 @@ const EventDetail: React.FC = () => {
                 <Text mx={16}>関連動画はありません</Text>
               </>
             )}
+            {eventInfo.type !== EventType.SUBMISSION_ETC ? (
+              <Div m={16}>
+                {userJoiningEvents && (
+                  <>
+                    <Div
+                      borderBottomWidth={1}
+                      borderColor="green400"
+                      flexDir="row"
+                      justifyContent="space-between"
+                      alignItems="flex-end"
+                      mb="lg"
+                      pb="md">
+                      <Text>
+                        参加者:
+                        {userJoiningEvents.length || 0}名
+                        {user?.role === UserRole.ADMIN &&
+                          '(タップで遅刻を記録)'}
+                      </Text>
+                    </Div>
+                    <Div
+                      flexDir="row"
+                      justifyContent="space-between"
+                      alignItems="center"
+                      flexWrap="wrap">
+                      {userJoiningEvents.map((uje, index) => {
+                        if (index > 6) {
+                          return;
+                        } else if (index === 6) {
+                          return (
+                            <Div
+                              flexDir="row"
+                              alignItems="center"
+                              rounded="sm"
+                              w="45%"
+                              mx={8}
+                              my={4}>
+                              <Button
+                                block
+                                m={10}
+                                fontSize={12}
+                                onPress={() => setJoiningUserVisiable(true)}>
+                                参加者を一覧表示
+                              </Button>
+                            </Div>
+                          );
+                        } else {
+                          return (
+                            <TouchableOpacity
+                              style={tailwind(
+                                'bg-white flex-row flex-wrap rounded items-center w-40 border border-gray-400 mx-2 my-1',
+                              )}
+                              onPress={() => {
+                                if (
+                                  user?.role === UserRole.ADMIN &&
+                                  lateRecorderRef.current
+                                ) {
+                                  setLateRecordTargetUserJoiningEvent(uje);
+                                  lateRecorderRef.current.open();
+                                }
+                              }}>
+                              <Div pl={16} alignItems="center" flex={1}>
+                                <Image
+                                  my={'lg'}
+                                  h={windowWidth * 0.09}
+                                  w={windowWidth * 0.09}
+                                  source={
+                                    uje.user.avatarUrl
+                                      ? {uri: uje.user.avatarUrl}
+                                      : require('../../../../assets/no-image-avatar.png')
+                                  }
+                                  rounded="circle"
+                                />
+                              </Div>
+                              <Div alignItems="center" flex={4}>
+                                <Text numberOfLines={1}>
+                                  {userNameFactory(uje.user)}
+                                </Text>
+                                {user?.role === UserRole.ADMIN &&
+                                  uje.lateMinutes !== 0 && (
+                                    <Text color="red">
+                                      {uje.lateMinutes}分遅刻
+                                    </Text>
+                                  )}
+                              </Div>
+                            </TouchableOpacity>
+                          );
+                        }
+                      })}
+                    </Div>
+                  </>
+                )}
 
-            {eventInfo.type !== EventType.SUBMISSION_ETC && (
-              <>
-                <Div>
-                  {joiningUsers && (
-                    <>
-                      <Div
-                        mx={16}
-                        borderBottomWidth={1}
-                        borderColor="green400"
-                        flexDir="row"
-                        justifyContent="space-between"
-                        alignItems="flex-end"
-                        mb="lg"
-                        pb="md">
-                        <Text fontSize={16}>
-                          参加者:
-                          {joiningUsers.length || 0}名
-                        </Text>
-                      </Div>
-                      <Div
-                        flexDir="row"
-                        justifyContent="space-between"
-                        alignItems="center"
-                        flexWrap="wrap">
-                        {joiningUsers.map((u, index) => {
-                          if (index > 6) {
-                            return;
-                          } else if (index === 6) {
-                            return (
-                              <Div
-                                key={u.id}
-                                flexDir="row"
-                                alignItems="center"
-                                rounded="sm"
-                                w="45%"
-                                mx={8}
-                                my={4}>
-                                <Button
-                                  block
-                                  m={10}
-                                  fontSize={12}
-                                  onPress={() => setJoiningUserVisiable(true)}>
-                                  参加者を一覧表示
-                                </Button>
-                              </Div>
-                            );
-                          } else {
-                            return (
-                              <Div
-                                bg="white"
-                                flexDir="row"
-                                flexWrap="wrap"
-                                rounded="sm"
-                                alignItems="center"
-                                w="45%"
-                                borderWidth={1}
-                                borderColor="gray400"
-                                mx={8}
-                                my={4}>
-                                <Div pl={16} alignItems="center" flex={2}>
-                                  <Image
-                                    my={'lg'}
-                                    h={windowWidth * 0.09}
-                                    w={windowWidth * 0.09}
-                                    source={
-                                      u.avatarUrl
-                                        ? {uri: u.avatarUrl}
-                                        : require('../../../../assets/no-image-avatar.png')
-                                    }
-                                    rounded="circle"
-                                  />
-                                </Div>
-                                <Div alignItems="center" flex={5}>
-                                  <Text numberOfLines={1}>
-                                    {userNameFactory(u)}
-                                  </Text>
-                                </Div>
-                              </Div>
-                            );
-                          }
-                        })}
-                      </Div>
-                    </>
-                  )}
+                <Div
+                  borderBottomWidth={1}
+                  borderColor="green400"
+                  flexDir="row"
+                  justifyContent="space-between"
+                  alignItems="flex-end"
+                  mb="lg"
+                  pb="md"
+                  mt={16}>
+                  <Text>
+                    コメント:
+                    {eventInfo?.comments.length || 0}件
+                  </Text>
+                  <Button
+                    fontSize={12}
+                    py={4}
+                    color="white"
+                    onPress={() => {
+                      commentVisible
+                        ? checkValidateErrors()
+                        : setCommentVisible(true);
+                    }}>
+                    {commentVisible ? 'コメントを投稿する' : 'コメントを追加'}
+                  </Button>
                 </Div>
-                <Div mx={16}>
+                {commentVisible && (
+                  <TextInput
+                    value={values.body}
+                    onChangeText={t => setValues({...values, body: t})}
+                    placeholder="コメントを記入してください。"
+                    textAlignVertical={'top'}
+                    multiline={true}
+                    autoCapitalize="none"
+                    style={tailwind(
+                      'border border-green-400 mb-4 bg-white rounded border-blue-500 p-2 h-24',
+                    )}
+                  />
+                )}
+                {eventInfo?.comments && eventInfo?.comments.length
+                  ? eventInfo?.comments.map(
+                      comment =>
+                        comment.writer && (
+                          <EventCommentCard
+                            key={comment.id}
+                            body={comment.body}
+                            date={comment.createdAt}
+                            writer={comment.writer}
+                          />
+                        ),
+                    )
+                  : null}
+              </Div>
+            ) : (
+              <>
+                <Div
+                  m={16}
+                  borderBottomWidth={1}
+                  borderColor="green400"
+                  mb="lg"
+                  pb="md">
                   <Div
-                    borderBottomWidth={1}
-                    borderColor="green400"
                     flexDir="row"
                     justifyContent="space-between"
-                    alignItems="flex-end"
-                    mb="lg"
-                    pb="md">
-                    <Text fontSize={16}>
-                      コメント:
-                      {eventInfo?.comments.length || 0}件
-                    </Text>
+                    alignItems="flex-end">
+                    <Div>
+                      <Button
+                        bg="blue600"
+                        color="white"
+                        h={40}
+                        rounded="lg"
+                        onPress={() => handleUploadSubmission()}>
+                        提出物を追加
+                      </Button>
+                      <Text fontWeight="bold">{`${eventInfo?.submissionFiles?.length}件のファイルを提出済み`}</Text>
+                    </Div>
                     <Button
-                      fontSize={16}
-                      py={4}
+                      bg="pink600"
                       color="white"
+                      h={40}
+                      rounded="lg"
                       onPress={() => {
-                        commentVisible
-                          ? checkValidateErrors()
-                          : setCommentVisible(true);
+                        saveSubmission(unsavedSubmissions);
                       }}>
-                      {commentVisible ? 'コメントを投稿する' : 'コメントを追加'}
+                      提出状況を保存
                     </Button>
                   </Div>
-                  {commentVisible && (
-                    <TextInput
-                      value={values.body}
-                      onChangeText={t => setValues({...values, body: t})}
-                      placeholder="コメントを記入してください。"
-                      textAlignVertical={'top'}
-                      multiline={true}
-                      autoCapitalize="none"
-                      style={tailwind(
-                        'border border-green-400 mb-4 bg-white rounded border-blue-500 p-2 h-24',
-                      )}
-                    />
+                  <Text color="tomato" fontSize={12}>
+                    {
+                      '※水色のアイコンのファイルはまだ提出状況が保存されていません'
+                    }
+                  </Text>
+                </Div>
+                <Div flexDir="row" flexWrap="wrap" mx={16}>
+                  {eventInfo?.submissionFiles?.map(
+                    f =>
+                      f.url && (
+                        <Div mr={4} mb={4}>
+                          <FileIcon url={f.url} />
+                        </Div>
+                      ),
                   )}
-                  {eventInfo?.comments.map(
-                    comment =>
-                      comment.writer && (
-                        <EventCommentCard
-                          key={comment.id}
-                          body={comment.body}
-                          date={comment.createdAt}
-                          writer={comment.writer}
-                        />
+                  {unsavedSubmissions?.map(
+                    f =>
+                      f.url && (
+                        <Div mr={4} mb={4}>
+                          <FileIcon url={f.url} />
+                        </Div>
                       ),
                   )}
                 </Div>
               </>
             )}
-            <Div
-              mx={16}
-              borderBottomWidth={1}
-              borderColor="green400"
-              mb="lg"
-              pb="md">
-              <Div
-                flexDir="row"
-                justifyContent="space-between"
-                alignItems="flex-end">
-                <Div>
-                  <Button
-                    bg="blue600"
-                    color="white"
-                    h={40}
-                    rounded="lg"
-                    onPress={() => handleUploadSubmission()}>
-                    提出物を追加
-                  </Button>
-                  <Text fontWeight="bold">{`${eventInfo?.submissionFiles?.length}件のファイルを提出済み`}</Text>
-                </Div>
-                <Button
-                  bg="pink600"
-                  color="white"
-                  h={40}
-                  rounded="lg"
-                  onPress={() => {
-                    saveSubmission(unsavedSubmissions);
-                  }}>
-                  提出状況を保存
-                </Button>
-              </Div>
-              <Text color="tomato" fontSize={12}>
-                {'※水色のアイコンのファイルはまだ提出状況が保存されていません'}
-              </Text>
-            </Div>
-            <Div flexDir="row" flexWrap="wrap" mx={16}>
-              {eventInfo?.submissionFiles?.map(
-                f =>
-                  f.url && (
-                    <Div mr={4} mb={4}>
-                      <FileIcon url={f.url} />
-                    </Div>
-                  ),
-              )}
-              {unsavedSubmissions?.map(
-                f =>
-                  f.url && (
-                    <Div mr={4} mb={4}>
-                      <FileIcon url={f.url} />
-                    </Div>
-                  ),
-              )}
-            </Div>
           </Div>
         )}
       </ScrollDiv>

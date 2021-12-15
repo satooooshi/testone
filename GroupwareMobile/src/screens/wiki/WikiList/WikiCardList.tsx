@@ -4,7 +4,7 @@ import {
   SearchQueryToGetWiki,
   useAPIGetWikiList,
 } from '../../../hooks/api/wiki/useAPIGetWikiList';
-import {Div, Overlay, Text} from 'react-native-magnus';
+import {Div, Text} from 'react-native-magnus';
 import WikiCard from '../../../components/wiki/WikiCard';
 import {FlatList} from 'react-native';
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
@@ -20,6 +20,7 @@ const TopTab = createMaterialTopTabNavigator();
 
 type WikiCardListProps = {
   type?: WikiType;
+  setRuleCategory: Dispatch<SetStateAction<RuleCategory>>;
 };
 
 type RenderWikiCardListProps = {
@@ -29,6 +30,7 @@ type RenderWikiCardListProps = {
   searchQuery: SearchQueryToGetWiki;
   setSearchQuery: Dispatch<SetStateAction<SearchQueryToGetWiki>>;
   isLoading: boolean;
+  setRuleCategory: Dispatch<SetStateAction<RuleCategory>>;
 };
 
 const RenderWikiCardList: React.FC<RenderWikiCardListProps> = ({
@@ -37,6 +39,7 @@ const RenderWikiCardList: React.FC<RenderWikiCardListProps> = ({
   status,
   setSearchQuery,
   isLoading,
+  setRuleCategory,
 }) => {
   const navigation: WikiListNavigationProps =
     useNavigation<WikiListNavigationProps>();
@@ -57,8 +60,9 @@ const RenderWikiCardList: React.FC<RenderWikiCardListProps> = ({
         rule_category: ruleCategory,
         status: status,
       }));
+      ruleCategory && setRuleCategory(ruleCategory);
     }
-  }, [isFocused, ruleCategory, setSearchQuery, status, wiki]);
+  }, [isFocused, ruleCategory, setRuleCategory, setSearchQuery, status, wiki]);
 
   return (
     <Div>
@@ -89,7 +93,7 @@ const RenderWikiCardList: React.FC<RenderWikiCardListProps> = ({
   );
 };
 
-const WikiCardList: React.FC<WikiCardListProps> = ({type}) => {
+const WikiCardList: React.FC<WikiCardListProps> = ({type, setRuleCategory}) => {
   const [searchQuery, setSearchQuery] = useState<SearchQueryToGetWiki>({
     page: '1',
     type,
@@ -117,6 +121,16 @@ const WikiCardList: React.FC<WikiCardListProps> = ({type}) => {
   }, [type]);
 
   useEffect(() => {
+    setWikiForInfiniteScroll([]);
+  }, [
+    searchQuery.word,
+    searchQuery.status,
+    searchQuery.type,
+    searchQuery.tag,
+    searchQuery.rule_category,
+  ]);
+
+  useEffect(() => {
     if (fetchedWiki?.wiki && fetchedWiki?.wiki.length) {
       setWikiForInfiniteScroll(w => {
         if (w.length) {
@@ -126,16 +140,6 @@ const WikiCardList: React.FC<WikiCardListProps> = ({type}) => {
       });
     }
   }, [fetchedWiki?.wiki]);
-
-  useEffect(() => {
-    setWikiForInfiniteScroll([]);
-  }, [
-    searchQuery.word,
-    searchQuery.status,
-    searchQuery.type,
-    searchQuery.tag,
-    searchQuery.rule_category,
-  ]);
 
   return (
     <Div flexDir="column" h="100%" pb={80}>
@@ -155,20 +159,6 @@ const WikiCardList: React.FC<WikiCardListProps> = ({type}) => {
             tabBarScrollEnabled: true,
           }}>
           <TopTab.Screen
-            name={'WikiList-' + RuleCategory.PHILOSOPHY}
-            children={() => (
-              <RenderWikiCardList
-                isLoading={isLoadingWiki}
-                wiki={wikiForInfiniteScroll}
-                ruleCategory={RuleCategory.PHILOSOPHY}
-                status={undefined}
-                setSearchQuery={setSearchQuery}
-                searchQuery={searchQuery}
-              />
-            )}
-            options={{title: '会社理念'}}
-          />
-          <TopTab.Screen
             name={'WikiList-' + RuleCategory.RULES}
             children={() => (
               <RenderWikiCardList
@@ -178,9 +168,25 @@ const WikiCardList: React.FC<WikiCardListProps> = ({type}) => {
                 status={undefined}
                 setSearchQuery={setSearchQuery}
                 searchQuery={searchQuery}
+                setRuleCategory={setRuleCategory}
               />
             )}
             options={{title: '社内規則'}}
+          />
+          <TopTab.Screen
+            name={'WikiList-' + RuleCategory.PHILOSOPHY}
+            children={() => (
+              <RenderWikiCardList
+                isLoading={isLoadingWiki}
+                wiki={wikiForInfiniteScroll}
+                ruleCategory={RuleCategory.PHILOSOPHY}
+                status={undefined}
+                setSearchQuery={setSearchQuery}
+                searchQuery={searchQuery}
+                setRuleCategory={setRuleCategory}
+              />
+            )}
+            options={{title: '会社理念'}}
           />
           <TopTab.Screen
             name={'WikiList-' + RuleCategory.ABC}
@@ -192,6 +198,7 @@ const WikiCardList: React.FC<WikiCardListProps> = ({type}) => {
                 status={undefined}
                 setSearchQuery={setSearchQuery}
                 searchQuery={searchQuery}
+                setRuleCategory={setRuleCategory}
               />
             )}
             options={{title: 'ABC制度'}}
@@ -206,6 +213,7 @@ const WikiCardList: React.FC<WikiCardListProps> = ({type}) => {
                 status={undefined}
                 setSearchQuery={setSearchQuery}
                 searchQuery={searchQuery}
+                setRuleCategory={setRuleCategory}
               />
             )}
             options={{title: '福利厚生等'}}
@@ -220,6 +228,7 @@ const WikiCardList: React.FC<WikiCardListProps> = ({type}) => {
                 status={undefined}
                 setSearchQuery={setSearchQuery}
                 searchQuery={searchQuery}
+                setRuleCategory={setRuleCategory}
               />
             )}
             options={{title: '各種申請書'}}
@@ -237,6 +246,7 @@ const WikiCardList: React.FC<WikiCardListProps> = ({type}) => {
                 status={'new'}
                 setSearchQuery={setSearchQuery}
                 searchQuery={searchQuery}
+                setRuleCategory={setRuleCategory}
               />
             )}
             options={{title: '新着'}}
@@ -251,6 +261,7 @@ const WikiCardList: React.FC<WikiCardListProps> = ({type}) => {
                 status={'resolved'}
                 setSearchQuery={setSearchQuery}
                 searchQuery={searchQuery}
+                setRuleCategory={setRuleCategory}
               />
             )}
             options={{title: '解決済み'}}
@@ -264,6 +275,7 @@ const WikiCardList: React.FC<WikiCardListProps> = ({type}) => {
           status={undefined}
           setSearchQuery={setSearchQuery}
           searchQuery={searchQuery}
+          setRuleCategory={setRuleCategory}
         />
       )}
     </Div>
