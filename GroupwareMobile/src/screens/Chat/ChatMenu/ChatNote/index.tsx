@@ -1,5 +1,9 @@
-import {useNavigation, useRoute} from '@react-navigation/native';
-import React, {useEffect, useState} from 'react';
+import {
+  useFocusEffect,
+  useNavigation,
+  useRoute,
+} from '@react-navigation/native';
+import React, {useCallback, useEffect, useState} from 'react';
 import {Alert, FlatList} from 'react-native';
 import {Button, Div, Icon, Text} from 'react-native-magnus';
 import tailwind from 'tailwind-rn';
@@ -19,7 +23,7 @@ const ChatNotes: React.FC = () => {
   const navigation = useNavigation<ChatNotesNavigationProps>();
   const {room} = useRoute<ChatRouteProps>().params;
   const [page, setPage] = useState<string>('1');
-  const {data, refetch} = useAPIGetChatNotes({
+  const {data, refetch: refetchNotes} = useAPIGetChatNotes({
     roomId: room.id.toString(),
     page,
   });
@@ -63,6 +67,17 @@ const ChatNotes: React.FC = () => {
       });
     }
   }, [data?.notes]);
+
+  useFocusEffect(
+    useCallback(() => {
+      if (page !== '1') {
+        setPage('1');
+      } else {
+        refetchNotes();
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [refetchNotes]),
+  );
 
   return (
     <WholeContainer>
