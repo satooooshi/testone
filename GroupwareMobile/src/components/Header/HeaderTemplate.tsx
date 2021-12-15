@@ -12,6 +12,7 @@ export type Tab = {
   name: string;
   onPress: () => void;
   color?: string;
+  borderBottomColor?: string;
 };
 
 export type HeaderTemplateProps = {
@@ -92,9 +93,15 @@ const HeaderTemplate: React.FC<HeaderTemplateProps> = ({
                 onPress={t.onPress}
                 bg="transparent"
                 fontWeight="bold"
-                borderBottomWidth={t.color ? 1 : undefined}
-                borderBottomColor={t.color}
-                color={activeTabName === t.name ? blueColor : darkFontColor}>
+                borderBottomWidth={t.borderBottomColor ? 2 : undefined}
+                borderBottomColor={t.borderBottomColor}
+                color={
+                  t.color
+                    ? t.color
+                    : activeTabName === t.name
+                    ? blueColor
+                    : darkFontColor
+                }>
                 {t.name}
               </Button>
             )}

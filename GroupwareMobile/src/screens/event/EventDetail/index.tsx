@@ -61,6 +61,7 @@ import {useAPISaveSubmission} from '../../../hooks/api/event/useAPISaveSubmissio
 import FileIcon from '../../../components/common/FileIcon';
 import ShareButton from '../../../components/common/ShareButton';
 import {generateClientURL} from '../../../utils/url';
+import {Tab} from '../../../components/Header/HeaderTemplate';
 
 const EventDetail: React.FC = () => {
   const route = useRoute<EventDetailRouteProps>();
@@ -227,165 +228,17 @@ const EventDetail: React.FC = () => {
     );
   };
 
+  const tabs: Tab[] = [
+    {
+      name: 'イベントを削除',
+      onPress: onDeleteButtonlicked,
+      color: 'red',
+    },
+  ];
+
   const isFinished = eventInfo?.endAt
     ? new Date(eventInfo.endAt) <= new Date()
     : false;
-
-  const AboveYoutubeVideos = () => {
-    if (!eventInfo) {
-      return <></>;
-    }
-    return (
-      <>
-        <Div>
-          <FastImage
-            style={{
-              ...eventDetailStyles.image,
-              width: windowWidth,
-              minHeight: windowWidth * 0.8,
-            }}
-            resizeMode="cover"
-            source={
-              eventInfo.imageURL
-                ? {uri: eventInfo.imageURL}
-                : require('../../../../assets/study_meeting_1.jpg')
-            }
-          />
-          <Button
-            mb={16}
-            bg={eventTypeColorFactory(eventInfo.type)}
-            position="absolute"
-            bottom={0}
-            right={10}
-            color="white">
-            {eventTypeNameFactory(eventInfo.type)}
-          </Button>
-          {user?.role === UserRole.ADMIN && (
-            <Button
-              mt={16}
-              bg="red"
-              position="absolute"
-              top={0}
-              right={10}
-              onPress={() => onDeleteButtonlicked()}
-              color="white">
-              イベントを削除する
-            </Button>
-          )}
-        </Div>
-        <Div mx={16}>
-          <Div flexDir="row" justifyContent="space-between" mb={8}>
-            <Text mr={8} fontSize={22} color={darkFontColor} fontWeight="900">
-              {eventInfo.title}
-            </Text>
-            <ShareButton
-              text={eventInfo.title}
-              urlPath={generateClientURL(`/event/${eventInfo.id}`)}
-            />
-          </Div>
-          <Div alignSelf="flex-end">
-            {eventInfo.type !== 'submission_etc' &&
-            !isFinished &&
-            !eventInfo.isCanceled &&
-            !eventInfo.isJoining ? (
-              <Button
-                mb={16}
-                bg={'pink600'}
-                color="white"
-                onPress={() => joinEvent({eventID: Number(id)})}>
-                イベントに参加
-              </Button>
-            ) : eventInfo.type !== 'submission_etc' &&
-              !isFinished &&
-              !eventInfo.isCanceled &&
-              eventInfo.isJoining ? (
-              <Div flexDir="row" alignItems="flex-end" mb={16}>
-                <Text color="tomato" fontSize={16} mr="sm">
-                  参加済み
-                </Text>
-                <Button
-                  bg={'pink600'}
-                  color="white"
-                  onPress={() => cancelEvent({eventID: Number(id)})}
-                  alignSelf="flex-end">
-                  キャンセルする
-                </Button>
-              </Div>
-            ) : eventInfo.type !== 'submission_etc' &&
-              !isFinished &&
-              eventInfo.isCanceled &&
-              eventInfo.isJoining ? (
-              <Text color="tomato" fontSize={16}>
-                キャンセル済み
-              </Text>
-            ) : isFinished ? (
-              <Text color="tomato" fontSize={16}>
-                締切済み
-              </Text>
-            ) : null}
-          </Div>
-          <Text
-            mb={8}
-            fontSize={16}
-            fontWeight="bold">{`開始: ${startAtText}`}</Text>
-          <Text
-            mb={16}
-            fontSize={16}
-            fontWeight="bold">{`終了: ${endAtText}`}</Text>
-          <Text mb={8}>概要</Text>
-          <Text mb={16} color={darkFontColor} fontWeight="bold" fontSize={18}>
-            {eventInfo.description}
-          </Text>
-          <Text mb={8}>開催者/講師</Text>
-          <FlatList
-            horizontal
-            data={eventInfo.hostUsers}
-            renderItem={({item: u}) => (
-              <Button
-                fontSize={'xs'}
-                h={28}
-                py={0}
-                bg="purple"
-                color="white"
-                mr={4}>
-                {userNameFactory(u)}
-              </Button>
-            )}
-          />
-          <Text mb={8}>タグ</Text>
-          <FlatList
-            horizontal
-            data={eventInfo.tags}
-            keyExtractor={item => item.id.toString()}
-            renderItem={({item: t}) => (
-              <Button
-                fontSize={'xs'}
-                h={28}
-                py={0}
-                bg={tagColorFactory(t.type)}
-                color="white"
-                mr={4}>
-                {t.name}
-              </Button>
-            )}
-          />
-
-          <Text mb={8}>参考資料</Text>
-          <Div flexDir="row" flexWrap="wrap">
-            {eventInfo?.files?.map(
-              f =>
-                f.url && (
-                  <Div mr={4} mb={4}>
-                    <FileIcon url={f.url} />
-                  </Div>
-                ),
-            )}
-          </Div>
-          <Text mb={8}>関連動画</Text>
-        </Div>
-      </>
-    );
-  };
 
   const handleUploadSubmission = async () => {
     const res = await DocumentPicker.pickSingle({
@@ -424,6 +277,7 @@ const EventDetail: React.FC = () => {
     <WholeContainer>
       <HeaderWithTextButton
         enableBackButton={true}
+        tabs={tabs}
         title="イベント詳細"
         activeTabName="一覧に戻る"
         rightButtonName="イベント編集"
@@ -562,20 +416,159 @@ const EventDetail: React.FC = () => {
       <ScrollDiv>
         {eventInfo && (
           <Div flexDir="column">
-            <AboveYoutubeVideos />
-            {eventInfo.videos.length ? (
-              eventInfo.videos.map(v => (
-                <YoutubePlayer
-                  key={v.id}
-                  height={300}
-                  videoId={generateYoutubeId(v.url || '')}
+            <Div>
+              <FastImage
+                style={{
+                  ...eventDetailStyles.image,
+                  width: windowWidth,
+                  minHeight: windowWidth * 0.8,
+                }}
+                resizeMode="cover"
+                source={
+                  eventInfo.imageURL
+                    ? {uri: eventInfo.imageURL}
+                    : require('../../../../assets/study_meeting_1.jpg')
+                }
+              />
+              <Button
+                mb={16}
+                bg={eventTypeColorFactory(eventInfo.type)}
+                position="absolute"
+                bottom={0}
+                right={10}
+                color="white">
+                {eventTypeNameFactory(eventInfo.type)}
+              </Button>
+            </Div>
+            <Div mx={16}>
+              <Div flexDir="row" justifyContent="space-between" mb={8}>
+                <Text
+                  fontSize={22}
+                  color={darkFontColor}
+                  w={windowWidth * 0.65}
+                  fontWeight="900">
+                  {eventInfo.title}
+                </Text>
+                <ShareButton
+                  text={eventInfo.title}
+                  urlPath={generateClientURL(`/event/${eventInfo.id}`)}
                 />
-              ))
-            ) : (
-              <>
-                <Text mx={16}>関連動画はありません</Text>
-              </>
-            )}
+              </Div>
+              <Div alignSelf="flex-end">
+                {eventInfo.type !== 'submission_etc' &&
+                !isFinished &&
+                !eventInfo.isCanceled &&
+                !eventInfo.isJoining ? (
+                  <Button
+                    mb={16}
+                    bg={'pink600'}
+                    color="white"
+                    onPress={() => joinEvent({eventID: Number(id)})}>
+                    イベントに参加
+                  </Button>
+                ) : eventInfo.type !== 'submission_etc' &&
+                  !isFinished &&
+                  !eventInfo.isCanceled &&
+                  eventInfo.isJoining ? (
+                  <Div flexDir="row" alignItems="flex-end" mb={16}>
+                    <Text color="tomato" fontSize={16} mr="sm">
+                      参加済み
+                    </Text>
+                    <Button
+                      bg={'pink600'}
+                      color="white"
+                      onPress={() => cancelEvent({eventID: Number(id)})}
+                      alignSelf="flex-end">
+                      キャンセルする
+                    </Button>
+                  </Div>
+                ) : eventInfo.type !== 'submission_etc' &&
+                  !isFinished &&
+                  eventInfo.isCanceled &&
+                  eventInfo.isJoining ? (
+                  <Text color="tomato" fontSize={16}>
+                    キャンセル済み
+                  </Text>
+                ) : isFinished ? (
+                  <Text color="tomato" fontSize={16}>
+                    締切済み
+                  </Text>
+                ) : null}
+              </Div>
+              <Text
+                mb={8}
+                fontSize={16}
+                fontWeight="bold">{`開始: ${startAtText}`}</Text>
+              <Text
+                mb={16}
+                fontSize={16}
+                fontWeight="bold">{`終了: ${endAtText}`}</Text>
+              <Text mb={8}>概要</Text>
+              <Text
+                mb={16}
+                color={darkFontColor}
+                fontWeight="bold"
+                fontSize={18}>
+                {eventInfo.description}
+              </Text>
+              <Text mb={8}>開催者/講師</Text>
+              <FlatList
+                horizontal
+                data={eventInfo.hostUsers}
+                renderItem={({item: u}) => (
+                  <Button
+                    fontSize={'xs'}
+                    h={28}
+                    py={0}
+                    bg="purple"
+                    color="white"
+                    mr={4}>
+                    {userNameFactory(u)}
+                  </Button>
+                )}
+              />
+              <Text mb={8}>タグ</Text>
+              <FlatList
+                horizontal
+                data={eventInfo.tags}
+                keyExtractor={item => item.id.toString()}
+                renderItem={({item: t}) => (
+                  <Button
+                    fontSize={'xs'}
+                    h={28}
+                    py={0}
+                    bg={tagColorFactory(t.type)}
+                    color="white"
+                    mr={4}>
+                    {t.name}
+                  </Button>
+                )}
+              />
+
+              <Text mb={8}>
+                {eventInfo?.files?.length ? '参考資料' : '参考資料はありません'}
+              </Text>
+              {eventInfo?.files?.map(
+                f =>
+                  f.url && (
+                    <Div mr={4} mb={4}>
+                      <FileIcon url={f.url} />
+                    </Div>
+                  ),
+              )}
+            </Div>
+            <Text mb={8}>
+              {eventInfo?.files?.length ? '関連動画' : '関連動画はありません'}
+            </Text>
+            {eventInfo.videos.length
+              ? eventInfo.videos.map(v => (
+                  <YoutubePlayer
+                    key={v.id}
+                    height={300}
+                    videoId={generateYoutubeId(v.url || '')}
+                  />
+                ))
+              : null}
             {eventInfo.type !== EventType.SUBMISSION_ETC ? (
               <Div m={16}>
                 {userJoiningEvents && (

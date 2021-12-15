@@ -121,7 +121,13 @@ const Profile: React.FC = () => {
   ];
 
   const handleUploadImage = async () => {
-    const {formData} = await uploadImageFromGallery();
+    const {formData} = await uploadImageFromGallery({
+      cropping: true,
+      mediaType: 'photo',
+      multiple: false,
+      width: 300,
+      height: 300,
+    });
     if (formData) {
       uploadImage(formData);
     }

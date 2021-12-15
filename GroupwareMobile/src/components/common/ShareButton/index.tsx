@@ -1,6 +1,6 @@
 import {useNavigation} from '@react-navigation/native';
 import React from 'react';
-import {TouchableHighlight} from 'react-native';
+import {TouchableHighlight, useWindowDimensions} from 'react-native';
 import {Icon, Text} from 'react-native-magnus';
 import tailwind from 'tailwind-rn';
 
@@ -18,6 +18,7 @@ type ShareButtonProps = {
 
 const ShareButton: React.FC<ShareButtonProps> = ({urlPath, text}) => {
   const navigation = useNavigation<any>();
+  const windowWidth = useWindowDimensions().width;
   const onPress = () => {
     navigation.navigate('Share', {urlPath, text});
   };
@@ -25,9 +26,12 @@ const ShareButton: React.FC<ShareButtonProps> = ({urlPath, text}) => {
     <TouchableHighlight
       underlayColor="none"
       onPress={onPress}
-      style={tailwind(
-        'bg-white rounded-md justify-center items-center w-28 h-16',
-      )}>
+      style={{
+        ...tailwind(
+          'bg-white rounded-md justify-center items-center w-28 h-16',
+        ),
+        width: windowWidth * 0.3,
+      }}>
       <>
         <Icon name="share" fontFamily="MaterialCommunityIcons" fontSize={24} />
         <Text color="blue800">チャットで共有</Text>

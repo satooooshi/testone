@@ -33,6 +33,7 @@ import EditChatAlbum from '../../screens/Chat/ChatMenu/ChatAlbum/EditAlbum';
 import UserTagAdmin from '../../screens/admin/UserTagAdmin';
 import EditRoom from '../../screens/Chat/EditRoom';
 import PostReply from '../../screens/wiki/PostReply';
+import Share from '../../screens/Chat/Share';
 
 const Drawer = createDrawerNavigator();
 const Stack = createStackNavigator();
@@ -70,6 +71,11 @@ const WikiStack = () => (
       component={PostReply}
       options={{headerShown: false}}
     />
+    <Stack.Screen
+      name="Share"
+      component={Share}
+      options={{headerShown: false}}
+    />
   </Stack.Navigator>
 );
 
@@ -83,6 +89,11 @@ const EventStack = () => (
     <Stack.Screen
       name="EventDetail"
       component={EventDetail}
+      options={{headerShown: false}}
+    />
+    <Stack.Screen
+      name="Share"
+      component={Share}
       options={{headerShown: false}}
     />
   </Stack.Navigator>
@@ -108,6 +119,11 @@ const AccountStack = () => (
     <Stack.Screen
       name="UpdatePassword"
       component={UpdatePassword}
+      options={{headerShown: false}}
+    />
+    <Stack.Screen
+      name="Share"
+      component={Share}
       options={{headerShown: false}}
     />
   </Stack.Navigator>
@@ -214,6 +230,11 @@ const ChatStack = () => (
     <Stack.Screen
       name="EditChatAlbum"
       component={EditChatAlbum}
+      options={{headerShown: false}}
+    />
+    <Stack.Screen
+      name="Share"
+      component={Share}
       options={{headerShown: false}}
     />
   </Stack.Navigator>
