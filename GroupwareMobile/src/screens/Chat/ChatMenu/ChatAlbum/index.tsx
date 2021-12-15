@@ -1,5 +1,9 @@
-import {useNavigation, useRoute} from '@react-navigation/native';
-import React, {useEffect, useState} from 'react';
+import {
+  useFocusEffect,
+  useNavigation,
+  useRoute,
+} from '@react-navigation/native';
+import React, {useCallback, useEffect, useState} from 'react';
 import {Alert, FlatList} from 'react-native';
 import {Button, Div, Icon, Text} from 'react-native-magnus';
 import AlbumBox from '../../../../components/chat/AlbumBox';
@@ -20,7 +24,7 @@ const ChatAlbums: React.FC = () => {
     ChatAlbum[]
   >([]);
   const [page, setPage] = useState<string>('1');
-  const {data, refetch} = useAPIGetChatAlbums({
+  const {data, refetch: refetchAlbums} = useAPIGetChatAlbums({
     roomId: room.id.toString(),
     page: page,
   });
@@ -44,6 +48,17 @@ const ChatAlbums: React.FC = () => {
       });
     }
   }, [data?.albums]);
+
+  useFocusEffect(
+    useCallback(() => {
+      if (page !== '1') {
+        setPage('1');
+      } else {
+        refetchAlbums();
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [refetchAlbums]),
+  );
 
   return (
     <WholeContainer>
@@ -103,7 +118,7 @@ const ChatAlbums: React.FC = () => {
                         {
                           onSuccess: () => {
                             setPage('1');
-                            refetch();
+                            refetchAlbums();
                           },
                         },
                       );
