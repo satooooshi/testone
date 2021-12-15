@@ -35,3 +35,11 @@ export const markdownEditorURL =
 export const axiosInstance = axios.create({baseURL});
 axiosInstance.defaults.withCredentials = true;
 axiosInstance.defaults.headers.common = jwtJsonHeader;
+
+export const generateClientURL = (path: string) => {
+  if (__DEV__) {
+    return 'http://localhost:3000' + path;
+  } else {
+    return 'https://groupware-frontend-theta.vercel.app/' + path;
+  }
+};
