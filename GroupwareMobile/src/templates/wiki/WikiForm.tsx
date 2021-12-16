@@ -260,7 +260,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
 
   return (
     <WholeContainer>
-      <HeaderWithTextButton title="Wiki作成" />
+      <HeaderWithTextButton title="Wiki作成" enableBackButton={true} />
       <TagModal
         isVisible={visibleTagModal}
         tags={filteredTags || []}
