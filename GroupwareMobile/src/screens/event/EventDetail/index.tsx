@@ -503,59 +503,67 @@ const EventDetail: React.FC = () => {
                 mb={16}
                 fontSize={16}
                 fontWeight="bold">{`終了: ${endAtText}`}</Text>
-              <Text mb={8}>概要</Text>
-              <Text
-                mb={16}
-                color={darkFontColor}
-                fontWeight="bold"
-                fontSize={18}>
-                {eventInfo.description}
-              </Text>
-              <Text mb={8}>開催者/講師</Text>
-              <FlatList
-                horizontal
-                data={eventInfo.hostUsers}
-                renderItem={({item: u}) => (
-                  <Button
-                    fontSize={'xs'}
-                    h={28}
-                    py={0}
-                    bg="purple"
-                    color="white"
-                    mr={4}>
-                    {userNameFactory(u)}
-                  </Button>
-                )}
-              />
-              <Text mb={8}>タグ</Text>
-              <FlatList
-                horizontal
-                data={eventInfo.tags}
-                keyExtractor={item => item.id.toString()}
-                renderItem={({item: t}) => (
-                  <Button
-                    fontSize={'xs'}
-                    h={28}
-                    py={0}
-                    bg={tagColorFactory(t.type)}
-                    color="white"
-                    mr={4}>
-                    {t.name}
-                  </Button>
-                )}
-              />
+              <Div mb={8}>
+                <Text>概要</Text>
+                <Text
+                  mb={16}
+                  color={darkFontColor}
+                  fontWeight="bold"
+                  fontSize={18}>
+                  {eventInfo.description}
+                </Text>
+              </Div>
+              <Div mb={8}>
+                <Text>開催者/講師</Text>
+                <FlatList
+                  horizontal
+                  data={eventInfo.hostUsers}
+                  renderItem={({item: u}) => (
+                    <Button
+                      fontSize={'xs'}
+                      h={28}
+                      py={0}
+                      bg="purple"
+                      color="white"
+                      mr={4}>
+                      {userNameFactory(u)}
+                    </Button>
+                  )}
+                />
+              </Div>
+              <Div mb={8}>
+                <Text>タグ</Text>
+                <FlatList
+                  horizontal
+                  data={eventInfo.tags}
+                  keyExtractor={item => item.id.toString()}
+                  renderItem={({item: t}) => (
+                    <Button
+                      fontSize={'xs'}
+                      h={28}
+                      py={0}
+                      bg={tagColorFactory(t.type)}
+                      color="white"
+                      mr={4}>
+                      {t.name}
+                    </Button>
+                  )}
+                />
+              </Div>
 
               <Text mb={8}>
                 {eventInfo?.files?.length ? '参考資料' : '参考資料はありません'}
               </Text>
-              {eventInfo?.files?.map(
-                f =>
-                  f.url && (
-                    <Div mr={4} mb={4}>
-                      <FileIcon url={f.url} />
-                    </Div>
-                  ),
-              )}
+              <Div flexDir="row" flexWrap="wrap">
+                {eventInfo?.files?.map(
+                  f =>
+                    f.url && (
+                      <Div mr={4} mb={4}>
+                        <FileIcon url={f.url} />
+                      </Div>
+                    ),
+                )}
+              </Div>
             </Div>
             <Text mb={8}>
               {eventInfo?.files?.length ? '関連動画' : '関連動画はありません'}
