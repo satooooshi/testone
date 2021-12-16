@@ -76,7 +76,7 @@ export const savingRoomSchema = Yup.object().shape({
   members: Yup.array().min(1, minRoomUserMessage),
 });
 
-const userValidation = {
+const profileValidation = {
   email: Yup.string()
     .email(emailFormatMessage)
     .required(`メールアドレスは${requireMessage}`),
@@ -109,11 +109,11 @@ const userValidation = {
 };
 
 export const profileSchema = Yup.object().shape({
-  ...userValidation,
+  ...profileValidation,
 });
 
 export const createUserSchema = Yup.object().shape({
-  ...userValidation,
+  ...profileValidation,
   employeeId: Yup.string().required('社員コードは' + requireMessage),
   password: Yup.string()
     .matches(/^([^ ]*)$/, 'パスワードは' + blankMixedMessage)
