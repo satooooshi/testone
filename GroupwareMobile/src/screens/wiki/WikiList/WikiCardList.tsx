@@ -148,7 +148,6 @@ const WikiCardList: React.FC<WikiCardListProps> = ({type, setRuleCategory}) => {
         <SearchForm
           isVisible={visibleSearchFormModal}
           onCloseModal={() => setVisibleSearchFormModal(false)}
-          tags={tags || []}
           onSubmit={values => {
             setVisibleSearchFormModal(false);
             queryRefresh({word: values.word}, values.selectedTags);
