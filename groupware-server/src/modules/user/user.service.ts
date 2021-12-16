@@ -497,14 +497,12 @@ export class UserService {
     if (!existUser) {
       throw new InternalServerErrorException('Something went wrong');
     }
-    const parsedAvatarURL = this.storageService.parseSignedURLToStorageURL(
-      newUserProfile.avatarUrl || existUser.avatarUrl,
+    const newUserObj = await this.userRepository.save(
+      this.userRepository.create({
+        ...existUser,
+        ...newUserProfile,
+      }),
     );
-    const newUserObj: User = {
-      ...existUser,
-      ...newUserProfile,
-      avatarUrl: parsedAvatarURL,
-    };
     return newUserObj;
   }
 
