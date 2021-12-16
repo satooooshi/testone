@@ -1,35 +1,58 @@
-import React, {Dispatch, SetStateAction, useCallback} from 'react';
+import React, {useEffect, useState} from 'react';
 import {FlatList, Text} from 'react-native';
 import {
   SearchQueryToGetEvents,
   EventStatus,
+  useAPIGetEventList,
 } from '../../../hooks/api/event/useAPIGetEventList';
 import EventCard from '../../../components/events/EventCard';
 import {Div} from 'react-native-magnus';
-import {useFocusEffect, useNavigation} from '@react-navigation/native';
-import {EventSchedule} from '../../../types';
+import {useNavigation} from '@react-navigation/native';
+import {AllTag, EventSchedule} from '../../../types';
 import {EventListNavigationProps} from '../../../types/navigator/drawerScreenProps';
 import tailwind from 'tailwind-rn';
 import {ActivityIndicator} from 'react-native-paper';
+import {useEventCardListSearchQuery} from '../../../contexts/event/useEventSearchQuery';
+import SearchFormOpenerButton from '../../../components/common/SearchForm/SearchFormOpenerButton';
+import SearchForm from '../../../components/common/SearchForm';
+import EventFormModal from '../../../components/events/EventFormModal';
+import {useAPICreateEvent} from '../../../hooks/api/event/useAPICreateEvent';
 
 type EventCardListProps = {
   status: EventStatus;
-  searchResult?: EventSchedule[];
-  setEvents: Dispatch<SetStateAction<EventSchedule[]>>;
-  searchQuery: SearchQueryToGetEvents;
-  setSearchQuery: Dispatch<SetStateAction<SearchQueryToGetEvents>>;
-  isLoading: boolean;
+  visibleEventFormModal: boolean;
+  hideEventFormModal: () => void;
 };
 
 const EventCardList: React.FC<EventCardListProps> = ({
   status,
-  searchResult,
-  setEvents,
-  searchQuery,
-  setSearchQuery,
-  isLoading,
+  visibleEventFormModal,
+  hideEventFormModal,
 }) => {
   const navigation = useNavigation<EventListNavigationProps>();
+  const {partOfSearchQuery, setPartOfSearchQuery} =
+    useEventCardListSearchQuery();
+  const {mutate: saveEvent} = useAPICreateEvent({
+    onSuccess: newEvent => {
+      hideEventFormModal();
+      if (newEvent.type === partOfSearchQuery.type) {
+        setSearchQuery(q => ({...q, page: '1'}));
+      }
+    },
+  });
+  const {word, tag, type} = partOfSearchQuery;
+  const [searchQuery, setSearchQuery] = useState<SearchQueryToGetEvents>({
+    page: '1',
+    word,
+    tag,
+    status,
+    type,
+  });
+  const {data: events, isLoading} = useAPIGetEventList(searchQuery);
+  const [visibleSearchFormModal, setVisibleSearchFormModal] = useState(false);
+  const [eventsForInfinitScroll, setEventsForInfiniteScroll] = useState<
+    EventSchedule[]
+  >(events?.events || []);
 
   const onEndReached = () => {
     setSearchQuery(q => ({
@@ -38,48 +61,83 @@ const EventCardList: React.FC<EventCardListProps> = ({
     }));
   };
 
-  useFocusEffect(
-    useCallback(() => {
-      if (searchQuery.status !== status) {
-        setEvents([]);
-        setSearchQuery(q => ({
-          ...q,
-          page: '1',
-          from: undefined,
-          to: undefined,
-          status,
-        }));
-      }
-    }, [searchQuery.status, setEvents, setSearchQuery, status]),
-  );
+  useEffect(() => {
+    if (events?.events) {
+      setEventsForInfiniteScroll(e => {
+        if (e.length) {
+          return [...e, ...events.events];
+        }
+        return events.events;
+      });
+    }
+  }, [events?.events]);
+
+  const queryRefresh = (
+    query: Partial<SearchQueryToGetEvents>,
+    selectedTags?: AllTag[],
+  ) => {
+    const selectedTagIDs = selectedTags?.map(t => t.id.toString());
+    const tagQuery = selectedTagIDs?.join('+');
+
+    setPartOfSearchQuery({...query, tag: tagQuery || ''});
+  };
+
+  useEffect(() => {
+    setEventsForInfiniteScroll([]);
+    setSearchQuery(q => ({...q, ...partOfSearchQuery, page: '1'}));
+  }, [partOfSearchQuery]);
 
   return (
-    <Div flexDir="column" alignItems="center">
-      {searchResult?.length ? (
-        <FlatList
-          style={tailwind('h-full')}
-          onEndReached={onEndReached}
-          data={searchResult}
-          keyExtractor={item => item.id.toString()}
-          renderItem={({item: eventSchedule}) => (
-            <Div mb={16}>
-              <EventCard
-                onPress={e =>
-                  navigation.navigate('EventStack', {
-                    screen: 'EventDetail',
-                    params: {id: e.id},
-                  })
-                }
-                event={eventSchedule}
-              />
-            </Div>
-          )}
-        />
-      ) : (
-        <Text>検索結果が見つかりませんでした</Text>
-      )}
-      {isLoading && <ActivityIndicator />}
-    </Div>
+    <>
+      <EventFormModal
+        type={partOfSearchQuery.type || undefined}
+        isVisible={visibleEventFormModal}
+        onCloseModal={hideEventFormModal}
+        onSubmit={event => saveEvent(event)}
+      />
+      <SearchForm
+        isVisible={visibleSearchFormModal}
+        onCloseModal={() => setVisibleSearchFormModal(false)}
+        onSubmit={values => {
+          queryRefresh({word: values.word}, values.selectedTags);
+          setVisibleSearchFormModal(false);
+        }}
+        defaultSelectedTagIds={partOfSearchQuery.tag
+          ?.split('+')
+          .map(t => Number(t))}
+      />
+      <SearchFormOpenerButton
+        bottom={10}
+        right={10}
+        onPress={() => setVisibleSearchFormModal(true)}
+      />
+      <Div flexDir="column" alignItems="center">
+        {eventsForInfinitScroll?.length ? (
+          <FlatList
+            style={tailwind('h-full')}
+            onEndReached={onEndReached}
+            data={eventsForInfinitScroll}
+            keyExtractor={item => item.id.toString()}
+            renderItem={({item: eventSchedule}) => (
+              <Div mb={16}>
+                <EventCard
+                  onPress={e =>
+                    navigation.navigate('EventStack', {
+                      screen: 'EventDetail',
+                      params: {id: e.id},
+                    })
+                  }
+                  event={eventSchedule}
+                />
+              </Div>
+            )}
+          />
+        ) : (
+          <Text>検索結果が見つかりませんでした</Text>
+        )}
+        {isLoading && <ActivityIndicator />}
+      </Div>
+    </>
   );
 };
 
