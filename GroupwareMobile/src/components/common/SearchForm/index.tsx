@@ -1,5 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {Button, Div, Icon, Input, Modal, Tag} from 'react-native-magnus';
+import {useAPIGetTag} from '../../../hooks/api/tag/useAPIGetTag';
 import {useSelectedTags} from '../../../hooks/tag/useSelectedTags';
 import {useTagType} from '../../../hooks/tag/useTagType';
 import {AllTag} from '../../../types';
@@ -15,17 +16,18 @@ type SearchFormProps = {
   defaultValue?: SearchFormValue;
   isVisible: boolean;
   onCloseModal: () => void;
-  tags: AllTag[];
   onSubmit: (value: SearchFormValue) => void;
+  defaultSelectedTagIds?: number[];
 };
 
 const SearchForm: React.FC<SearchFormProps> = ({
   defaultValue,
   isVisible,
   onCloseModal,
-  tags,
   onSubmit,
+  defaultSelectedTagIds = [],
 }) => {
+  const {data: tags} = useAPIGetTag();
   const [word, setWord] = useState(defaultValue?.word || '');
   const [visibleTagModal, setVisibleTagModal] = useState(false);
   const {selectedTags, toggleTag, isSelected, setSelectedTags} =
@@ -34,6 +36,14 @@ const SearchForm: React.FC<SearchFormProps> = ({
     'All',
     tags,
   );
+  useEffect(() => {
+    if (defaultSelectedTagIds.length && !selectedTags.length) {
+      setSelectedTags(previousTags =>
+        previousTags.filter(t => defaultSelectedTagIds.includes(t.id)),
+      );
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [defaultSelectedTagIds, setSelectedTags]);
 
   useEffect(() => {
     if (defaultValue && defaultValue.selectedTags.length) {
