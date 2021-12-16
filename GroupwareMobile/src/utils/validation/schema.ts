@@ -76,7 +76,7 @@ export const savingRoomSchema = Yup.object().shape({
   members: Yup.array().min(1, minRoomUserMessage),
 });
 
-export const profileSchema = Yup.object().shape({
+const userValidation = {
   email: Yup.string()
     .email(emailFormatMessage)
     .required(`メールアドレスは${requireMessage}`),
@@ -106,4 +106,17 @@ export const profileSchema = Yup.object().shape({
     1000,
     `趣味の紹介は${nWordLimitMessage(1000)}`,
   ),
+};
+
+export const profileSchema = Yup.object().shape({
+  ...userValidation,
+});
+
+export const createUserSchema = Yup.object().shape({
+  ...userValidation,
+  employeeId: Yup.string().required('社員コードは' + requireMessage),
+  password: Yup.string()
+    .matches(/^([^ ]*)$/, 'パスワードは' + blankMixedMessage)
+    .min(8, 'パスワードは' + minEightTextMessage)
+    .required('パスワードは' + requireMessage),
 });
