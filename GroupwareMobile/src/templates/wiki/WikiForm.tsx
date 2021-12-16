@@ -21,7 +21,6 @@ import {RuleCategory, Tag, TextFormat, Wiki, WikiType} from '../../types';
 import {tagColorFactory} from '../../utils/factory/tagColorFactory';
 import {wikiTypeNameFactory} from '../../utils/factory/wiki/wikiTypeNameFactory';
 import {wikiSchema} from '../../utils/validation/schema';
-import tailwind from 'tailwind-rn';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import {NodeHtmlMarkdown} from 'node-html-markdown';
 
@@ -274,10 +273,8 @@ const WikiForm: React.FC<WikiFormProps> = ({
       {typeDropdown}
       <KeyboardAwareScrollView
         ref={scrollRef}
-        nestedScrollEnabled={true}
         scrollEventThrottle={20}
-        keyboardDismissMode={'none'}
-        style={{width: windowWidth * 0.9, ...tailwind('self-center pt-4')}}>
+        keyboardDismissMode={'none'}>
         <Text fontSize={16}>タイトル</Text>
         {errors.title && touched.title ? (
           <Text fontSize={16} color="tomato">
@@ -355,13 +352,14 @@ const WikiForm: React.FC<WikiFormProps> = ({
             {errors.body}
           </Text>
         ) : null}
-        <TextEditor
-          textFormat={newWiki.textFormat}
-          onUploadImage={onUploadImage}
-          initialBody={newWiki.body}
-          onChange={text => setNewWiki(w => ({...w, body: text}))}
-          scrollRef={scrollRef}
-        />
+        <Div mb={60}>
+          <TextEditor
+            textFormat={newWiki.textFormat}
+            onUploadImage={onUploadImage}
+            initialBody={newWiki.body}
+            onChange={text => setNewWiki(w => ({...w, body: text}))}
+          />
+        </Div>
       </KeyboardAwareScrollView>
     </WholeContainer>
   );
