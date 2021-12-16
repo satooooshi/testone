@@ -4,9 +4,10 @@ import {ScrollDiv, Div} from 'react-native-magnus';
 import PortalLinkBox from '../../components/PortalLinkBox';
 import {WikiType} from '../../types';
 import {wikiStyles} from '../../styles/screen/wiki/wiki.style';
-import HeaderWithTextButton, {Tab} from '../../components/Header';
+import HeaderWithTextButton from '../../components/Header';
 import {useNavigation} from '@react-navigation/native';
 import {WikiNavigationProps} from '../../types/navigator/drawerScreenProps';
+import {Tab} from '../../components/Header/HeaderTemplate';
 
 const Wiki: React.FC = () => {
   const navigation = useNavigation<WikiNavigationProps>();

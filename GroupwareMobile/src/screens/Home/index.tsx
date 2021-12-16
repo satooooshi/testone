@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import WholeContainer from '../../components/WholeContainer';
-import HeaderWithTextButton, {Tab} from '../../components/Header';
+import HeaderWithTextButton from '../../components/Header';
 import PortalLinkBox from '../../components/PortalLinkBox';
 import {Div, ScrollDiv, Text} from 'react-native-magnus';
 import {Alert, TouchableHighlight, useWindowDimensions} from 'react-native';

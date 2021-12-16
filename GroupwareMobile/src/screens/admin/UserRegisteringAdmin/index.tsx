@@ -21,7 +21,8 @@ import {
 } from 'react-native-magnus';
 import DropdownOpenerButton from '../../../components/common/DropdownOpenerButton';
 import TagModal from '../../../components/common/TagModal';
-import HeaderWithTextButton, {Tab} from '../../../components/Header';
+import HeaderWithTextButton from '../../../components/Header';
+import {Tab} from '../../../components/Header/HeaderTemplate';
 import TagEditLine from '../../../components/TagEditLine';
 import WholeContainer from '../../../components/WholeContainer';
 import {useAPIRegister} from '../../../hooks/api/auth/useAPIRegister';

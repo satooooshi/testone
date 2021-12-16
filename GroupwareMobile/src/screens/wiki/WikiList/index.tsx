@@ -1,10 +1,11 @@
 import React, {useState} from 'react';
 import WholeContainer from '../../../components/WholeContainer';
-import HeaderWithTextButton, {Tab} from '../../../components/Header';
+import HeaderWithTextButton from '../../../components/Header';
 import {RuleCategory, WikiType} from '../../../types';
 import WikiCardList from './WikiCardList';
 import {wikiTypeNameFactory} from '../../../utils/factory/wiki/wikiTypeNameFactory';
 import {WikiListProps} from '../../../types/navigator/drawerScreenProps';
+import {Tab} from '../../../components/Header/HeaderTemplate';
 
 const WikiList: React.FC<WikiListProps> = ({navigation}) => {
   const [type, setType] = useState<WikiType>();

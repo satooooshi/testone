@@ -3,12 +3,6 @@ import {Button} from 'react-native-magnus';
 import {blueColor} from '../../utils/colors';
 import HeaderTemplate, {HeaderTemplateProps} from './HeaderTemplate';
 
-export type Tab = {
-  name: string;
-  onPress: () => void;
-  color?: string;
-};
-
 export type HeaderWithTextButtonProps = HeaderTemplateProps & {
   rightButtonName?: string;
   onPressRightButton?: () => void;

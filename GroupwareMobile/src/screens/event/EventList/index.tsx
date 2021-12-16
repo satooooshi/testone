@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import WholeContainer from '../../../components/WholeContainer';
-import HeaderWithTextButton, {Tab} from '../../../components/Header';
+import HeaderWithTextButton from '../../../components/Header';
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
 import EventCalendar from './EventCalendar';
 import EventCardList from './EventCardList';
@@ -20,6 +20,7 @@ import {useIsFocused} from '@react-navigation/core';
 import {eventTypeColorFactory} from '../../../utils/factory/eventTypeColorFactory';
 import {useRoute} from '@react-navigation/native';
 import {EventListRouteProps} from '../../../types/navigator/drawerScreenProps';
+import {Tab} from '../../../components/Header/HeaderTemplate';
 
 const TopTab = createMaterialTopTabNavigator();
 
@@ -59,32 +60,32 @@ const EventList: React.FC = () => {
       name: eventTypeNameFactory(EventType.IMPRESSIVE_UNIVERSITY),
       onPress: () =>
         queryRefresh({page: '1', type: EventType.IMPRESSIVE_UNIVERSITY}),
-      color: eventTypeColorFactory(EventType.IMPRESSIVE_UNIVERSITY),
+      borderBottomColor: eventTypeColorFactory(EventType.IMPRESSIVE_UNIVERSITY),
     },
     {
       name: eventTypeNameFactory(EventType.STUDY_MEETING),
       onPress: () => queryRefresh({page: '1', type: EventType.STUDY_MEETING}),
-      color: eventTypeColorFactory(EventType.STUDY_MEETING),
+      borderBottomColor: eventTypeColorFactory(EventType.STUDY_MEETING),
     },
     {
       name: eventTypeNameFactory(EventType.BOLDAY),
       onPress: () => queryRefresh({page: '1', type: EventType.BOLDAY}),
-      color: eventTypeColorFactory(EventType.BOLDAY),
+      borderBottomColor: eventTypeColorFactory(EventType.BOLDAY),
     },
     {
       name: eventTypeNameFactory(EventType.COACH),
       onPress: () => queryRefresh({page: '1', type: EventType.COACH}),
-      color: eventTypeColorFactory(EventType.COACH),
+      borderBottomColor: eventTypeColorFactory(EventType.COACH),
     },
     {
       name: eventTypeNameFactory(EventType.CLUB),
       onPress: () => queryRefresh({page: '1', type: EventType.CLUB}),
-      color: eventTypeColorFactory(EventType.CLUB),
+      borderBottomColor: eventTypeColorFactory(EventType.CLUB),
     },
     {
       name: eventTypeNameFactory(EventType.SUBMISSION_ETC),
       onPress: () => queryRefresh({page: '1', type: EventType.SUBMISSION_ETC}),
-      color: eventTypeColorFactory(EventType.SUBMISSION_ETC),
+      borderBottomColor: eventTypeColorFactory(EventType.SUBMISSION_ETC),
     },
   ];
 
