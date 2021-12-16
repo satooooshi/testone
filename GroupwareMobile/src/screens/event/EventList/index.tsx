@@ -101,8 +101,7 @@ const EventList: React.FC = () => {
   };
 
   const isCalendar =
-    typeof searchQuery.from !== undefined &&
-    typeof searchQuery.to !== undefined;
+    searchQuery.from !== undefined && searchQuery.to !== undefined;
 
   useEffect(() => {
     if (isLoadingGetEventList || isLoadingSaveEvent) {
