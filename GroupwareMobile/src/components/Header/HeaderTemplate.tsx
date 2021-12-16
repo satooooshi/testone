@@ -91,7 +91,7 @@ const HeaderTemplate: React.FC<HeaderTemplateProps> = ({
                 py={0}
                 px={10}
                 onPress={t.onPress}
-                bg="transparent"
+                bg={t.name === activeTabName ? 'blue100' : 'transparent'}
                 fontWeight="bold"
                 borderBottomWidth={t.borderBottomColor ? 2 : undefined}
                 borderBottomColor={t.borderBottomColor}
