@@ -79,7 +79,7 @@ const ChatAlbumForm: React.FC<ChatAlbumFormProps> = ({
     <WholeContainer>
       <HeaderWithTextButton
         title="アルバム"
-        rightButtonName="投稿"
+        rightButtonName={album ? '更新' : '投稿'}
         onPressRightButton={() => handleSubmit()}
       />
       <ImageView
