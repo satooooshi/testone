@@ -184,6 +184,12 @@ export class ChatController {
     return reaction;
   }
 
+  @Get('/v2/room/:roomId')
+  @UseGuards(JwtAuthenticationGuard)
+  async getRoomDetail(@Param('roomId') roomId: string): Promise<ChatGroup> {
+    return await this.chatService.getRoomDetail(Number(roomId));
+  }
+
   @Get('/v2/room/:roomId/note')
   @UseGuards(JwtAuthenticationGuard)
   async getChatNotes(
