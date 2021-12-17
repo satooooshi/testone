@@ -1,6 +1,6 @@
 import React, {useMemo} from 'react';
-import {EventSchedule, EventType} from '../../../types';
-import {Div, Text, Tag, Icon} from 'react-native-magnus';
+import {EventSchedule, EventType, Tag} from '../../../types';
+import {Div, Text, Tag as TagButton, Icon} from 'react-native-magnus';
 import FastImage from 'react-native-fast-image';
 import {tagColorFactory} from '../../../utils/factory/tagColorFactory';
 import {FlatList, useWindowDimensions, TouchableHighlight} from 'react-native';
@@ -46,6 +46,13 @@ const EventCard: React.FC<EventCardProps> = ({event}) => {
       default:
         return undefined;
     }
+  };
+
+  const onPressTagButton = (tag: Tag) => {
+    navigation.navigate('EventStack', {
+      screen: 'EventList',
+      params: {tag: tag.id.toString()},
+    });
   };
 
   return (
@@ -103,7 +110,7 @@ const EventCard: React.FC<EventCardProps> = ({event}) => {
           <FlatList
             horizontal
             ListEmptyComponent={
-              <Tag
+              <TagButton
                 fontSize={'lg'}
                 h={28}
                 py={0}
@@ -111,20 +118,21 @@ const EventCard: React.FC<EventCardProps> = ({event}) => {
                 color="white"
                 mr={4}>
                 タグなし
-              </Tag>
+              </TagButton>
             }
             style={eventCardStyles.tagList}
             data={event.tags || []}
             renderItem={({item: t}) => (
-              <Tag
+              <TagButton
                 fontSize={'lg'}
                 h={28}
                 py={0}
+                onPress={() => onPressTagButton(t)}
                 bg={tagColorFactory(t.type)}
                 color="white"
                 mr={4}>
                 {t.name}
-              </Tag>
+              </TagButton>
             )}
           />
         </Div>

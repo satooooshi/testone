@@ -16,6 +16,7 @@ const TopTab = createMaterialTopTabNavigator();
 
 const EventSearcher: React.FC = () => {
   const typePassedByRoute = useRoute<EventListRouteProps>()?.params?.type;
+  const tagPassedByRoute = useRoute<EventListRouteProps>()?.params?.tag;
   const personalPassedByRoute =
     useRoute<EventListRouteProps>()?.params?.personal;
   const {partOfSearchQuery, setPartOfSearchQuery} =
@@ -65,6 +66,13 @@ const EventSearcher: React.FC = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [setPartOfSearchQuery, typePassedByRoute]);
+
+  useEffect(() => {
+    if (tagPassedByRoute && tagPassedByRoute !== partOfSearchQuery.tag) {
+      setPartOfSearchQuery({tag: tagPassedByRoute});
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tagPassedByRoute]);
 
   return (
     <WholeContainer>

@@ -13,6 +13,7 @@ export type RootStackParamList = {
   Main: undefined;
   EventList: {
     type?: EventType;
+    tag?: string;
     personal?: boolean;
   };
   EventDetail: {

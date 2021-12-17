@@ -120,15 +120,7 @@ const EventCardList: React.FC<EventCardListProps> = ({
             keyExtractor={item => item.id.toString()}
             renderItem={({item: eventSchedule}) => (
               <Div mb={16}>
-                <EventCard
-                  onPress={e =>
-                    navigation.navigate('EventStack', {
-                      screen: 'EventDetail',
-                      params: {id: e.id},
-                    })
-                  }
-                  event={eventSchedule}
-                />
+                <EventCard event={eventSchedule} />
               </Div>
             )}
           />
