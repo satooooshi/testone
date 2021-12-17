@@ -19,7 +19,7 @@ const TextMessage: React.FC<TextMessageProps> = ({message, onLongPress}) => {
         rounded="xl"
         maxW={windowWidth * 0.6}
         minW={windowWidth * 0.4}
-        bg={message.isSender ? 'blue600' : 'gray400'}
+        bg={message.isSender ? 'blue600' : 'gray500'}
         p={8}
         justifyContent="center">
         {message.replyParentMessage && (
