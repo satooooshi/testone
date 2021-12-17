@@ -551,7 +551,7 @@ const EventDetail: React.FC = () => {
                 />
               </Div>
 
-              <Text mb={8}>
+              <Text>
                 {eventInfo?.files?.length ? '参考資料' : '参考資料はありません'}
               </Text>
               <Div flexDir="row" flexWrap="wrap">
@@ -564,19 +564,19 @@ const EventDetail: React.FC = () => {
                     ),
                 )}
               </Div>
+              <Text>
+                {eventInfo?.files?.length ? '関連動画' : '関連動画はありません'}
+              </Text>
+              {eventInfo.videos.length
+                ? eventInfo.videos.map(v => (
+                    <YoutubePlayer
+                      key={v.id}
+                      height={240}
+                      videoId={generateYoutubeId(v.url || '')}
+                    />
+                  ))
+                : null}
             </Div>
-            <Text mb={8}>
-              {eventInfo?.files?.length ? '関連動画' : '関連動画はありません'}
-            </Text>
-            {eventInfo.videos.length
-              ? eventInfo.videos.map(v => (
-                  <YoutubePlayer
-                    key={v.id}
-                    height={300}
-                    videoId={generateYoutubeId(v.url || '')}
-                  />
-                ))
-              : null}
             {eventInfo.type !== EventType.SUBMISSION_ETC ? (
               <Div m={16}>
                 {userJoiningEvents && (
