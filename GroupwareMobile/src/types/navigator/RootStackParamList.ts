@@ -88,4 +88,7 @@ export type RootStackParamList = {
     urlPath: string;
     text: string;
   };
+  EventIntroduction: {
+    type: EventType;
+  };
 };

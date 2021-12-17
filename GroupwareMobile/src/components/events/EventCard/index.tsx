@@ -7,14 +7,15 @@ import {FlatList, useWindowDimensions, TouchableHighlight} from 'react-native';
 import {dateTimeFormatterFromJSDDate} from '../../../utils/dateTimeFormatterFromJSDate';
 import {grayColor, darkFontColor} from '../../../utils/colors';
 import {eventCardStyles} from '../../../styles/component/eventCard.style';
+import {useNavigation} from '@react-navigation/native';
 
 type EventCardProps = {
   event: EventSchedule;
-  onPress: (event: EventSchedule) => void;
 };
 
-const EventCard: React.FC<EventCardProps> = ({event, onPress}) => {
+const EventCard: React.FC<EventCardProps> = ({event}) => {
   const windowWidth = useWindowDimensions().width;
+  const navigation = useNavigation<any>();
   const cardWidth = useMemo(() => {
     return windowWidth * 0.9;
   }, [windowWidth]);
@@ -48,7 +49,13 @@ const EventCard: React.FC<EventCardProps> = ({event, onPress}) => {
   };
 
   return (
-    <TouchableHighlight onPress={() => onPress(event)}>
+    <TouchableHighlight
+      onPress={() =>
+        navigation.navigate('EventStack', {
+          screen: 'EventDetail',
+          params: {id: event.id},
+        })
+      }>
       <Div
         w={cardWidth}
         h={cardWidth * 0.45}

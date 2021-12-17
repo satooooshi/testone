@@ -34,6 +34,7 @@ import UserTagAdmin from '../../screens/admin/UserTagAdmin';
 import EditRoom from '../../screens/Chat/EditRoom';
 import PostReply from '../../screens/wiki/PostReply';
 import Share from '../../screens/Chat/Share';
+import EventIntroduction from '../../screens/event/EventIntroduction';
 
 const Drawer = createDrawerNavigator();
 const Stack = createStackNavigator();
@@ -84,6 +85,11 @@ const EventStack = () => (
     <Stack.Screen
       name="EventList"
       component={EventList}
+      options={{headerShown: false}}
+    />
+    <Stack.Screen
+      name="EventIntroduction"
+      component={EventIntroduction}
       options={{headerShown: false}}
     />
     <Stack.Screen

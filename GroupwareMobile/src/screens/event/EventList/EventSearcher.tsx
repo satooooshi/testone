@@ -59,18 +59,10 @@ const EventSearcher: React.FC = () => {
   ];
 
   useEffect(() => {
-    if (typePassedByRoute) {
-      const queryRefresh = (
-        query: Partial<SearchQueryToGetEvents>,
-        selectedTags?: AllTag[],
-      ) => {
-        const selectedTagIDs = selectedTags?.map(t => t.id.toString());
-        const tagQuery = selectedTagIDs?.join('+');
-
-        setPartOfSearchQuery({...query, tag: tagQuery || ''});
-      };
-      queryRefresh({type: typePassedByRoute});
+    if (typePassedByRoute && typePassedByRoute !== partOfSearchQuery.type) {
+      setPartOfSearchQuery({type: typePassedByRoute});
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [setPartOfSearchQuery, typePassedByRoute]);
 
   return (
