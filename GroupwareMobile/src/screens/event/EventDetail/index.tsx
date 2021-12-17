@@ -229,13 +229,16 @@ const EventDetail: React.FC = () => {
     );
   };
 
-  const tabs: Tab[] = [
-    {
-      name: 'イベントを削除',
-      onPress: onDeleteButtonlicked,
-      color: 'red',
-    },
-  ];
+  const tabs: Tab[] | undefined =
+    user?.role === UserRole.ADMIN
+      ? [
+          {
+            name: 'イベントを削除',
+            onPress: onDeleteButtonlicked,
+            color: 'red',
+          },
+        ]
+      : undefined;
 
   const isFinished = eventInfo?.endAt
     ? new Date(eventInfo.endAt) <= new Date()
