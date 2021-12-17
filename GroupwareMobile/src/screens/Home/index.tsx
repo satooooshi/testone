@@ -264,9 +264,7 @@ const Home: React.FC = () => {
             <PortalLinkBox
               type="safety_confirmation"
               onPress={() => {
-                navigation.navigate('AccountStack', {
-                  screen: 'AccountDetail',
-                });
+                Alert.alert('2022年4月実装予定です');
               }}
             />
           </Div>
