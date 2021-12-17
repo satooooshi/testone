@@ -470,7 +470,7 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
               alignItems="flex-start"
               alignSelf="center"
               mb={'lg'}>
-              <Text fontSize={16}>画像を選択</Text>
+              <Text fontSize={16}>サムネイルを選択</Text>
               <DropdownOpenerButton
                 name={'タップで画像を選択'}
                 onPress={handlePickImage}
