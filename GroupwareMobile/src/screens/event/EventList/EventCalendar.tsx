@@ -1,4 +1,4 @@
-import React, {useState, useMemo, useEffect} from 'react';
+import React, {useState, useMemo, useEffect, useCallback} from 'react';
 import {
   Calendar,
   CalendarHeader,
@@ -206,6 +206,16 @@ const EventCalendar: React.FC<EventCalendarProps> = ({
     setCalendarMode(m => ({...m, targetDate: new Date()}));
   };
 
+  const isSelectedMode = useCallback(
+    (whichMode: CustomMode) => {
+      if (calendarMode.mode === whichMode) {
+        return true;
+      }
+      return false;
+    },
+    [calendarMode.mode],
+  );
+
   useEffect(() => {
     let queryObj: Partial<SearchQueryToGetEvents>;
     switch (calendarMode.mode) {
@@ -294,7 +304,7 @@ const EventCalendar: React.FC<EventCalendarProps> = ({
         <Div flexDir="row">
           <Button
             rounded="sm"
-            bg="white"
+            bg={isSelectedMode('month') ? 'gray200' : 'white'}
             borderColor="#e0e0e0"
             borderWidth={1}
             h={40}
@@ -308,7 +318,7 @@ const EventCalendar: React.FC<EventCalendarProps> = ({
           </Button>
           <Button
             rounded="sm"
-            bg="white"
+            bg={isSelectedMode('week') ? 'gray200' : 'white'}
             borderColor="#e0e0e0"
             borderWidth={1}
             h={40}
@@ -322,7 +332,7 @@ const EventCalendar: React.FC<EventCalendarProps> = ({
           </Button>
           <Button
             rounded="sm"
-            bg="white"
+            bg={isSelectedMode('day') ? 'gray200' : 'white'}
             borderColor="#e0e0e0"
             borderWidth={1}
             h={40}
