@@ -1,9 +1,11 @@
 import { Storage } from '@google-cloud/storage';
+import { genStorageURL } from './genStorageURL';
 
 export const genSignedURL = async (text: string): Promise<string> => {
   if (!text) {
     return text;
   }
+  text = genStorageURL(text);
   const storage = new Storage({
     keyFilename: __dirname + '../../../cloud_storage.json',
   });
@@ -24,6 +26,7 @@ export const genSignedURL = async (text: string): Promise<string> => {
 
   for await (const unsignedURL of storageURLs) {
     let fileName = unsignedURL.replace(url, '');
+    fileName = fileName.split('?')[0];
     const urlDecodedFileName = decodeURI(fileName);
 
     const isQueryParamExists = fileName.includes('?');
