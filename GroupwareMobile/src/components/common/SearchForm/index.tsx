@@ -36,11 +36,15 @@ const SearchForm: React.FC<SearchFormProps> = ({
     'All',
     tags,
   );
+
   useEffect(() => {
     if (defaultSelectedTagIds.length && !selectedTags.length) {
-      setSelectedTags(previousTags =>
-        previousTags.filter(t => defaultSelectedTagIds.includes(t.id)),
+      const def = tags?.filter(t =>
+        defaultSelectedTagIds.includes(Number(t.id)),
       );
+      if (def?.length) {
+        setSelectedTags(def);
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [defaultSelectedTagIds, setSelectedTags]);

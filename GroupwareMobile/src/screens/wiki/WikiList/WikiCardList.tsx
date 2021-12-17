@@ -8,10 +8,13 @@ import {Div, Text} from 'react-native-magnus';
 import WikiCard from '../../../components/wiki/WikiCard';
 import {FlatList} from 'react-native';
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
-import {useNavigation} from '@react-navigation/native';
+import {useNavigation, useRoute} from '@react-navigation/native';
 import SearchForm from '../../../components/common/SearchForm';
 import SearchFormOpenerButton from '../../../components/common/SearchForm/SearchFormOpenerButton';
-import {WikiListNavigationProps} from '../../../types/navigator/drawerScreenProps';
+import {
+  WikiListNavigationProps,
+  WikiListRouteProps,
+} from '../../../types/navigator/drawerScreenProps';
 import {ActivityIndicator} from 'react-native-paper';
 
 const TopTab = createMaterialTopTabNavigator();
@@ -115,9 +118,17 @@ const RenderWikiCardList: React.FC<RenderWikiCardListProps> = ({
 };
 
 const WikiCardList: React.FC<WikiCardListProps> = ({type}) => {
+  const routeParams = useRoute<WikiListRouteProps>().params;
+  console.log('routeParams', routeParams);
   const [visibleSearchFormModal, setVisibleSearchFormModal] = useState(false);
   const [word, setWord] = useState('');
   const [tag, setTag] = useState('');
+
+  useEffect(() => {
+    if (routeParams.tag) {
+      setTag(routeParams.tag);
+    }
+  }, [routeParams.tag]);
 
   return (
     <>

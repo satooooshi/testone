@@ -20,6 +20,8 @@ export type RootStackParamList = {
   Wiki: undefined;
   WikiList: {
     type?: WikiType;
+    tag?: string;
+    word?: string;
   };
   WikiDetail: {
     id: number;
