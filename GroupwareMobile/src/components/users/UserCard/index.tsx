@@ -1,6 +1,6 @@
 import React from 'react';
 import {FlatList, TouchableOpacity, useWindowDimensions} from 'react-native';
-import {Image, Text, Div, Avatar, Icon, Tag} from 'react-native-magnus';
+import {Image, Text, Div, Tag} from 'react-native-magnus';
 import {useTagType} from '../../../hooks/tag/useTagType';
 import {userCardStyles} from '../../../styles/component/user/userCard.style';
 import {TagType, User, UserTag} from '../../../types';
