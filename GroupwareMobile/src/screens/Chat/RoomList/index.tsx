@@ -1,7 +1,7 @@
 import {useNavigation} from '@react-navigation/native';
 import React, {useCallback, useState} from 'react';
 import {FlatList} from 'react-native';
-import {Div} from 'react-native-magnus';
+import {Div, Text} from 'react-native-magnus';
 import {ActivityIndicator} from 'react-native-paper';
 import tailwind from 'tailwind-rn';
 import RoomCard from '../../../components/chat/RoomCard';
@@ -94,28 +94,34 @@ const RoomList: React.FC = () => {
         {...{onPressRightButton}}
       />
       {loadingGetChatGroupList && <ActivityIndicator />}
-      <FlatList
-        {...{onEndReached}}
-        contentContainerStyle={tailwind('self-center mt-4')}
-        keyExtractor={item => item.id.toString()}
-        data={roomsForInfiniteScroll}
-        renderItem={({item: room}) => (
-          <Div mb="sm">
-            <RoomCard
-              room={room}
-              onPress={() =>
-                navigation.navigate('ChatStack', {
-                  screen: 'Chat',
-                  params: {room},
-                })
-              }
-              onPressPinButton={() =>
-                saveGroup({...room, isPinned: !room.isPinned})
-              }
-            />
-          </Div>
-        )}
-      />
+      {!loadingGetChatGroupList && roomsForInfiniteScroll.length ? (
+        <FlatList
+          {...{onEndReached}}
+          contentContainerStyle={tailwind('self-center mt-4')}
+          keyExtractor={item => item.id.toString()}
+          data={roomsForInfiniteScroll}
+          renderItem={({item: room}) => (
+            <Div mb="sm">
+              <RoomCard
+                room={room}
+                onPress={() =>
+                  navigation.navigate('ChatStack', {
+                    screen: 'Chat',
+                    params: {room},
+                  })
+                }
+                onPressPinButton={() =>
+                  saveGroup({...room, isPinned: !room.isPinned})
+                }
+              />
+            </Div>
+          )}
+        />
+      ) : !loadingGetChatGroupList ? (
+        <Text fontSize={16} textAlign="center">
+          ルームを作成するか、招待をお待ちください
+        </Text>
+      ) : null}
     </WholeContainer>
   );
 };
