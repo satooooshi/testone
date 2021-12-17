@@ -21,7 +21,8 @@ import {
 } from 'react-native-magnus';
 import DropdownOpenerButton from '../../../components/common/DropdownOpenerButton';
 import TagModal from '../../../components/common/TagModal';
-import HeaderWithTextButton, {Tab} from '../../../components/Header';
+import HeaderWithTextButton from '../../../components/Header';
+import {Tab} from '../../../components/Header/HeaderTemplate';
 import TagEditLine from '../../../components/TagEditLine';
 import WholeContainer from '../../../components/WholeContainer';
 import {useAPIRegister} from '../../../hooks/api/auth/useAPIRegister';
@@ -39,6 +40,8 @@ import {
 } from '../../../utils/dropdown/helper';
 import {userNameFactory} from '../../../utils/factory/userNameFactory';
 import {userRoleNameFactory} from '../../../utils/factory/userRoleNameFactory';
+import {formikErrorMsgFactory} from '../../../utils/factory/formikEroorMsgFactory';
+import {createUserSchema} from '../../../utils/validation/schema';
 
 const initialValues: Partial<User> = {
   email: '',
@@ -71,13 +74,23 @@ const UserRegisteringAdmin: React.FC = () => {
       }
     },
   });
-  const {values, setValues, handleSubmit, resetForm} = useFormik<Partial<User>>(
-    {
-      initialValues: initialValues,
-      enableReinitialize: true,
-      onSubmit: v => register(v),
-    },
-  );
+  const {values, setValues, handleSubmit, validateForm, resetForm} = useFormik<
+    Partial<User>
+  >({
+    initialValues: initialValues,
+    validationSchema: createUserSchema,
+    enableReinitialize: true,
+    onSubmit: v => register(v),
+  });
+  const checkValidateErrors = async () => {
+    const errors = await validateForm();
+    const messages = formikErrorMsgFactory(errors);
+    if (messages) {
+      Alert.alert(messages);
+    } else {
+      handleSubmit();
+    }
+  };
   const {width: windowWidth} = useWindowDimensions();
   const {data: tags} = useAPIGetUserTag();
   const [visibleTagModal, setVisibleTagModal] = useState(false);
@@ -124,7 +137,13 @@ const UserRegisteringAdmin: React.FC = () => {
   ];
 
   const handleUploadImage = async () => {
-    const {formData} = await uploadImageFromGallery();
+    const {formData} = await uploadImageFromGallery({
+      cropping: true,
+      mediaType: 'photo',
+      multiple: false,
+      width: 300,
+      height: 300,
+    });
     if (formData) {
       uploadImage(formData);
     }
@@ -167,7 +186,7 @@ const UserRegisteringAdmin: React.FC = () => {
         bottom={10}
         alignSelf="flex-end"
         rounded="circle"
-        onPress={() => handleSubmit()}>
+        onPress={() => checkValidateErrors()}>
         <Icon color="white" name="check" fontSize={32} />
       </Button>
       <Dropdown {...defaultDropdownProps} ref={dropdownRef}>
@@ -223,7 +242,11 @@ const UserRegisteringAdmin: React.FC = () => {
             mt={'lg'}
             h={windowWidth * 0.6}
             w={windowWidth * 0.6}
-            source={{uri: values.avatarUrl}}
+            source={
+              values.avatarUrl
+                ? {uri: values.avatarUrl}
+                : require('../../../../assets/no-image-avatar.png')
+            }
             rounded="circle"
             mb={'lg'}
           />

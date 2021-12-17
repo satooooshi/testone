@@ -13,7 +13,6 @@ import {
   Input,
   Modal,
   ModalProps,
-  ScrollDiv,
   Text,
   Image,
   Tag as TagButton,
@@ -176,7 +175,13 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
   };
 
   const handlePickImage = async () => {
-    const {formData} = await uploadImageFromGallery();
+    const {formData} = await uploadImageFromGallery({
+      cropping: true,
+      mediaType: 'photo',
+      multiple: false,
+      width: 300,
+      height: 300,
+    });
     if (formData) {
       uploadImage(formData);
     }
@@ -465,7 +470,7 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
               alignItems="flex-start"
               alignSelf="center"
               mb={'lg'}>
-              <Text fontSize={16}>画像を選択</Text>
+              <Text fontSize={16}>サムネイルを選択</Text>
               <DropdownOpenerButton
                 name={'タップで画像を選択'}
                 onPress={handlePickImage}
@@ -477,7 +482,7 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
             alignItems="flex-start"
             alignSelf="center"
             mb={'lg'}>
-            <Text fontSize={16}>ファイルを選択</Text>
+            <Text fontSize={16}>参考資料を選択</Text>
             <DropdownOpenerButton
               name={'タップでファイルを選択'}
               onPress={() => handlePickDocument()}

@@ -1,20 +1,21 @@
 import React, {useMemo} from 'react';
-import {EventSchedule, EventType} from '../../../types';
-import {Div, Text, Tag, Icon} from 'react-native-magnus';
+import {EventSchedule, EventType, Tag} from '../../../types';
+import {Div, Text, Tag as TagButton, Icon} from 'react-native-magnus';
 import FastImage from 'react-native-fast-image';
 import {tagColorFactory} from '../../../utils/factory/tagColorFactory';
 import {FlatList, useWindowDimensions, TouchableHighlight} from 'react-native';
 import {dateTimeFormatterFromJSDDate} from '../../../utils/dateTimeFormatterFromJSDate';
 import {grayColor, darkFontColor} from '../../../utils/colors';
 import {eventCardStyles} from '../../../styles/component/eventCard.style';
+import {useNavigation} from '@react-navigation/native';
 
 type EventCardProps = {
   event: EventSchedule;
-  onPress: (event: EventSchedule) => void;
 };
 
-const EventCard: React.FC<EventCardProps> = ({event, onPress}) => {
+const EventCard: React.FC<EventCardProps> = ({event}) => {
   const windowWidth = useWindowDimensions().width;
+  const navigation = useNavigation<any>();
   const cardWidth = useMemo(() => {
     return windowWidth * 0.9;
   }, [windowWidth]);
@@ -47,8 +48,21 @@ const EventCard: React.FC<EventCardProps> = ({event, onPress}) => {
     }
   };
 
+  const onPressTagButton = (tag: Tag) => {
+    navigation.navigate('EventStack', {
+      screen: 'EventList',
+      params: {tag: tag.id.toString()},
+    });
+  };
+
   return (
-    <TouchableHighlight onPress={() => onPress(event)}>
+    <TouchableHighlight
+      onPress={() =>
+        navigation.navigate('EventStack', {
+          screen: 'EventDetail',
+          params: {id: event.id},
+        })
+      }>
       <Div
         w={cardWidth}
         h={cardWidth * 0.45}
@@ -96,7 +110,7 @@ const EventCard: React.FC<EventCardProps> = ({event, onPress}) => {
           <FlatList
             horizontal
             ListEmptyComponent={
-              <Tag
+              <TagButton
                 fontSize={'lg'}
                 h={28}
                 py={0}
@@ -104,20 +118,21 @@ const EventCard: React.FC<EventCardProps> = ({event, onPress}) => {
                 color="white"
                 mr={4}>
                 タグなし
-              </Tag>
+              </TagButton>
             }
             style={eventCardStyles.tagList}
             data={event.tags || []}
             renderItem={({item: t}) => (
-              <Tag
+              <TagButton
                 fontSize={'lg'}
                 h={28}
                 py={0}
+                onPress={() => onPressTagButton(t)}
                 bg={tagColorFactory(t.type)}
                 color="white"
                 mr={4}>
                 {t.name}
-              </Tag>
+              </TagButton>
             )}
           />
         </Div>

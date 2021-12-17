@@ -129,11 +129,6 @@ const Navigator = () => {
                 component={DrawerTab}
                 options={{headerShown: false}}
               />
-              <Stack.Screen
-                name="Share"
-                component={Share}
-                options={{headerShown: false}}
-              />
             </>
           ) : (
             <>

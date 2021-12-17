@@ -6,6 +6,7 @@ import {tagColorFactory} from '../../../utils/factory/tagColorFactory';
 import {wikiCardStyles} from '../../../styles/component/wiki/wikiCard.style';
 import {wikiTypeColorFactory} from '../../../utils/factory/wiki/wikiTypeColorFactory';
 import {wikiTypeNameFactory} from '../../../utils/factory/wiki/wikiTypeNameFactory';
+import {useNavigation} from '@react-navigation/native';
 
 type WikiCardProps = {
   wiki: Wiki;
@@ -14,6 +15,7 @@ type WikiCardProps = {
 
 const WikiCard: React.FC<WikiCardProps> = ({wiki, onPress}) => {
   const windowWidth = useWindowDimensions().width;
+  const navigation = useNavigation<any>();
   return (
     <TouchableHighlight underlayColor="none" onPress={() => onPress(wiki)}>
       <Div
@@ -61,6 +63,12 @@ const WikiCard: React.FC<WikiCardProps> = ({wiki, onPress}) => {
               data={wiki?.tags || []}
               renderItem={({item: t}) => (
                 <Tag
+                  onPress={() =>
+                    navigation.navigate('WikiStack', {
+                      screen: 'WikiList',
+                      params: {tag: t.id.toString()},
+                    })
+                  }
                   fontSize={'lg'}
                   h={28}
                   py={0}

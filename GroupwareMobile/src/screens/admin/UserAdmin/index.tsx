@@ -1,12 +1,13 @@
 import {useNavigation} from '@react-navigation/native';
 import React, {useEffect, useRef, useState} from 'react';
 import {Alert, FlatList, TouchableOpacity} from 'react-native';
-import {Text, Div, Image, Icon, Dropdown, Overlay} from 'react-native-magnus';
+import {Text, Div, Image, Icon, Dropdown} from 'react-native-magnus';
 import {ActivityIndicator} from 'react-native-paper';
 import DropdownOpenerButton from '../../../components/common/DropdownOpenerButton';
 import SearchForm from '../../../components/common/SearchForm';
 import SearchFormOpenerButton from '../../../components/common/SearchForm/SearchFormOpenerButton';
-import HeaderWithTextButton, {Tab} from '../../../components/Header';
+import HeaderWithTextButton from '../../../components/Header';
+import {Tab} from '../../../components/Header/HeaderTemplate';
 import WholeContainer from '../../../components/WholeContainer';
 import {useAPIGetUserTag} from '../../../hooks/api/tag/useAPIGetUserTag';
 import {useAPIDeleteUser} from '../../../hooks/api/user/useAPIDeleteUser';
@@ -135,7 +136,6 @@ const UserAdmin: React.FC = () => {
         defaultValue={{word: '', selectedTags}}
         isVisible={visibleSearchFormModal}
         onCloseModal={() => setVisibleSearchFormModal(false)}
-        tags={tags || []}
         onSubmit={values => {
           queryRefresh({word: values.word}, values.selectedTags);
           setVisibleSearchFormModal(false);

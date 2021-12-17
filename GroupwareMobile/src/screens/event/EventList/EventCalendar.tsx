@@ -1,10 +1,4 @@
-import React, {
-  useState,
-  useMemo,
-  Dispatch,
-  SetStateAction,
-  useEffect,
-} from 'react';
+import React, {useState, useMemo, useEffect, useCallback} from 'react';
 import {
   Calendar,
   CalendarHeader,
@@ -17,7 +11,7 @@ import {useWindowDimensions} from 'react-native';
 import {EventSchedule} from '../../../types';
 import {
   SearchQueryToGetEvents,
-  SearchResultToGetEvents,
+  useAPIGetEventList,
 } from '../../../hooks/api/event/useAPIGetEventList';
 import {useAuthenticate} from '../../../contexts/useAuthenticate';
 import {eventTypeColorFactory} from '../../../utils/factory/eventTypeColorFactory';
@@ -27,6 +21,7 @@ import {calendarStyles} from '../../../styles/component/event/eventCalendar.styl
 import {DateTime} from 'luxon';
 import {
   daysQueryFactoryFromTargetDate,
+  defaultWeekQuery,
   monthQueryFactoryFromTargetDate,
   weekQueryFactoryFromTargetDate,
 } from '../../../utils/eventQueryRefresh';
@@ -34,22 +29,29 @@ import {useNavigation} from '@react-navigation/native';
 import {EventListNavigationProps} from '../../../types/navigator/drawerScreenProps';
 import {dateTimeFormatterFromJSDDate} from '../../../utils/dateTimeFormatterFromJSDate';
 import {ActivityIndicator} from 'react-native-paper';
+import {useAPICreateEvent} from '../../../hooks/api/event/useAPICreateEvent';
+import EventFormModal from '../../../components/events/EventFormModal';
+import {useEventCardListSearchQuery} from '../../../contexts/event/useEventSearchQuery';
 
 type EventCalendarProps = {
   personal?: boolean;
-  searchResult?: SearchResultToGetEvents;
-  searchQuery: SearchQueryToGetEvents;
-  setSearchQuery: Dispatch<SetStateAction<SearchQueryToGetEvents>>;
-  isLoading: boolean;
+  visibleEventFormModal: boolean;
+  hideEventFormModal: () => void;
+  // searchResult?: SearchResultToGetEvents;
+  // searchQuery: SearchQueryToGetEvents;
+  // setSearchQuery: Dispatch<SetStateAction<SearchQueryToGetEvents>>;
+  // isLoading: boolean;
 };
 
 type CustomMode = 'week' | 'day' | 'month';
 
 const EventCalendar: React.FC<EventCalendarProps> = ({
   personal,
-  searchResult,
-  setSearchQuery,
-  isLoading,
+  visibleEventFormModal,
+  hideEventFormModal,
+  // searchResult,
+  // setSearchQuery,
+  // isLoading,
 }) => {
   const navigation = useNavigation<EventListNavigationProps>();
   const {user} = useAuthenticate();
@@ -60,6 +62,22 @@ const EventCalendar: React.FC<EventCalendarProps> = ({
     mode: 'month',
     targetDate: new Date(),
   });
+  const [searchQuery, setSearchQuery] = useState<SearchQueryToGetEvents>(
+    defaultWeekQuery(),
+  );
+  const {partOfSearchQuery} = useEventCardListSearchQuery();
+  const {mutate: saveEvent} = useAPICreateEvent({
+    onSuccess: () => {
+      hideEventFormModal();
+      refetchEvents();
+    },
+  });
+
+  const {
+    data: searchResult,
+    refetch: refetchEvents,
+    isLoading,
+  } = useAPIGetEventList(searchQuery);
   const {height: windowHeight, width: windowWidth} = useWindowDimensions();
 
   const memorizedEvent = useMemo<any[]>(() => {
@@ -188,6 +206,16 @@ const EventCalendar: React.FC<EventCalendarProps> = ({
     setCalendarMode(m => ({...m, targetDate: new Date()}));
   };
 
+  const isSelectedMode = useCallback(
+    (whichMode: CustomMode) => {
+      if (calendarMode.mode === whichMode) {
+        return true;
+      }
+      return false;
+    },
+    [calendarMode.mode],
+  );
+
   useEffect(() => {
     let queryObj: Partial<SearchQueryToGetEvents>;
     switch (calendarMode.mode) {
@@ -206,8 +234,18 @@ const EventCalendar: React.FC<EventCalendarProps> = ({
     }
   }, [calendarMode.mode, calendarMode.targetDate, setSearchQuery]);
 
+  useEffect(() => {
+    setSearchQuery(q => ({...q, type: partOfSearchQuery.type}));
+  }, [partOfSearchQuery.type]);
+
   return (
     <>
+      <EventFormModal
+        type={partOfSearchQuery.type || undefined}
+        isVisible={visibleEventFormModal}
+        onCloseModal={hideEventFormModal}
+        onSubmit={event => saveEvent(event)}
+      />
       <Div
         flexDir="row"
         justifyContent="space-between"
@@ -266,7 +304,7 @@ const EventCalendar: React.FC<EventCalendarProps> = ({
         <Div flexDir="row">
           <Button
             rounded="sm"
-            bg="white"
+            bg={isSelectedMode('month') ? 'gray200' : 'white'}
             borderColor="#e0e0e0"
             borderWidth={1}
             h={40}
@@ -280,7 +318,7 @@ const EventCalendar: React.FC<EventCalendarProps> = ({
           </Button>
           <Button
             rounded="sm"
-            bg="white"
+            bg={isSelectedMode('week') ? 'gray200' : 'white'}
             borderColor="#e0e0e0"
             borderWidth={1}
             h={40}
@@ -294,7 +332,7 @@ const EventCalendar: React.FC<EventCalendarProps> = ({
           </Button>
           <Button
             rounded="sm"
-            bg="white"
+            bg={isSelectedMode('day') ? 'gray200' : 'white'}
             borderColor="#e0e0e0"
             borderWidth={1}
             h={40}

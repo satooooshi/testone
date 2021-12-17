@@ -1,7 +1,7 @@
 import React, {useEffect} from 'react';
 import {LoginProps} from '../../../types/navigator/screenProps/Login';
 import WholeContainer from '../../../components/WholeContainer';
-import {Input, Button, Text} from 'react-native-magnus';
+import {Input, Button, Text, Div} from 'react-native-magnus';
 import {darkFontColor} from '../../../utils/colors';
 import FastImage from 'react-native-fast-image';
 import {
@@ -62,22 +62,26 @@ const Login: React.FC<LoginProps> = ({navigation}) => {
                   style={loginStyles.centerize}>
                   Login to Service
                 </Text>
-                <Text
-                  fontSize={16}
-                  fontWeight="bold"
-                  color={darkFontColor}
-                  mb={24}
-                  style={loginStyles.centerize}>
-                  パスワードをお忘れの方は
+                <Div
+                  flexDir="row"
+                  alignItems="center"
+                  justifyContent="center"
+                  mb={24}>
+                  <Text
+                    fontSize={16}
+                    fontWeight="bold"
+                    color={darkFontColor}
+                    style={loginStyles.centerize}>
+                    パスワードをお忘れの方は
+                  </Text>
                   <TouchableHighlight
                     underlayColor="none"
-                    style={tailwind('justify-center')}
                     onPress={() => navigation.navigate('ForgotPassword')}>
                     <Text color="green600" fontSize={16}>
                       こちら
                     </Text>
                   </TouchableHighlight>
-                </Text>
+                </Div>
                 <Input
                   h={48}
                   fontSize={16}

@@ -1,7 +1,4 @@
-import React, {useCallback, useRef, useState} from 'react';
-import {useWindowDimensions} from 'react-native';
-import {Div} from 'react-native-magnus';
-import {RichEditor} from 'react-native-pell-rich-editor';
+import React, {useRef, useState} from 'react';
 import {textEditorStyles} from '../../../styles/component/wiki/textEditor.style';
 import {TextFormat} from '../../../types';
 import MarkdownIt from 'markdown-it';
@@ -14,7 +11,6 @@ type TextEditorProps = {
   onUploadImage: (onSuccess: (imageURL: string[]) => void) => void;
   initialBody?: string;
   onChange: (text: string) => void;
-  scrollRef?: React.MutableRefObject<KeyboardAwareScrollView | null>;
 };
 
 const TextEditor: React.FC<TextEditorProps> = ({
@@ -22,16 +18,9 @@ const TextEditor: React.FC<TextEditorProps> = ({
   onUploadImage,
   initialBody,
   onChange,
-  // scrollRef,
 }) => {
   const markdownit = new MarkdownIt();
   const quillRef = useRef<QuillEditor | null>(null);
-  const [height, setHeight] = useState<number>(100);
-  // const editorRef = useRef<RichEditor | null>(null);
-  // const {height: windowHeight} = useWindowDimensions();
-  // const editorInitializedCallback = useCallback(() => {
-  //     editorRef.current?.registerToolbar(function () {});
-  //     }, [editorRef]);
 
   const customHandler = (name: string) => {
     if (name === 'image') {
@@ -43,8 +32,9 @@ const TextEditor: React.FC<TextEditorProps> = ({
   };
 
   return (
-    <Div>
+    <>
       <QuillEditor
+        autoSize
         ref={quillRef}
         initialHtml={
           textFormat === 'markdown' && initialBody
@@ -53,7 +43,7 @@ const TextEditor: React.FC<TextEditorProps> = ({
             ? initialBody
             : undefined
         }
-        style={{...textEditorStyles.quillEditor, height}}
+        style={{...textEditorStyles.quillEditor, minHeight: 300}}
         quill={{
           // not required just for to show how to pass this props
           placeholder: '本文を入力',
@@ -63,9 +53,6 @@ const TextEditor: React.FC<TextEditorProps> = ({
           theme: 'snow', // this is default value
         }}
         onHtmlChange={({html}) => onChange(html)}
-        onDimensionsChange={({height: changedHeight}) =>
-          setHeight(changedHeight)
-        }
       />
       <QuillToolbar
         editor={quillRef}
@@ -95,7 +82,7 @@ const TextEditor: React.FC<TextEditorProps> = ({
           actions: ['image'],
         }}
       />
-    </Div>
+    </>
   );
 };
 

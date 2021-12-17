@@ -19,7 +19,7 @@ import {
   Overlay,
 } from 'react-native-magnus';
 import TagModal from '../../../components/common/TagModal';
-import HeaderWithTextButton, {Tab} from '../../../components/Header';
+import HeaderWithTextButton from '../../../components/Header';
 import TagEditLine from '../../../components/TagEditLine';
 import WholeContainer from '../../../components/WholeContainer';
 import {useAPIUploadStorage} from '../../../hooks/api/storage/useAPIUploadStorage';
@@ -34,6 +34,7 @@ import {ProfileNavigationProps} from '../../../types/navigator/drawerScreenProps
 import {uploadImageFromGallery} from '../../../utils/cropImage/uploadImageFromGallery';
 import {formikErrorMsgFactory} from '../../../utils/factory/formikEroorMsgFactory';
 import {profileSchema} from '../../../utils/validation/schema';
+import {Tab} from '../../../components/Header/HeaderTemplate';
 const initialValues: Partial<User> = {
   email: '',
   lastName: '',
@@ -121,7 +122,13 @@ const Profile: React.FC = () => {
   ];
 
   const handleUploadImage = async () => {
-    const {formData} = await uploadImageFromGallery();
+    const {formData} = await uploadImageFromGallery({
+      cropping: true,
+      mediaType: 'photo',
+      multiple: false,
+      width: 300,
+      height: 300,
+    });
     if (formData) {
       uploadImage(formData);
     }

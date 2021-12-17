@@ -12,8 +12,10 @@ export type WikiListNavigationProps = StackNavigationProp<
   DrawerTabParamList,
   'WikiStack'
 >;
+export type WikiListRouteProps = RouteProp<RootStackParamList, 'WikiList'>;
 export type WikiListProps = {
   navigation: WikiListNavigationProps;
+  route: RouteProp<RootStackParamList, 'WikiList'>;
 };
 
 export type WikiDetailRouteProps = RouteProp<RootStackParamList, 'WikiDetail'>;

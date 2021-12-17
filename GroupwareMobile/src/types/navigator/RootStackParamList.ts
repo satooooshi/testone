@@ -13,6 +13,8 @@ export type RootStackParamList = {
   Main: undefined;
   EventList: {
     type?: EventType;
+    tag?: string;
+    personal?: boolean;
   };
   EventDetail: {
     id: number;
@@ -20,6 +22,8 @@ export type RootStackParamList = {
   Wiki: undefined;
   WikiList: {
     type?: WikiType;
+    tag?: string;
+    word?: string;
   };
   WikiDetail: {
     id: number;
@@ -80,10 +84,14 @@ export type RootStackParamList = {
   };
   EditChatAlbum: {
     album: ChatAlbum;
+    room: ChatGroup;
   };
   ForgotPassword: undefined;
   Share: {
     urlPath: string;
     text: string;
+  };
+  EventIntroduction: {
+    type: EventType;
   };
 };

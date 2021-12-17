@@ -18,3 +18,13 @@ export type EventDetailRouteProps = RouteProp<
   RootStackParamList,
   'EventDetail'
 >;
+
+export type EventIntroductionNavigationProps = StackNavigationProp<
+  DrawerTabParamList,
+  'EventStack'
+>;
+
+export type EventIntroductionRouteProps = RouteProp<
+  RootStackParamList,
+  'EventIntroduction'
+>;

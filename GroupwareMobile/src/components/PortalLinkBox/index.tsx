@@ -20,7 +20,7 @@ import {
   ruleColor,
   qaColor,
 } from '../../utils/colors';
-import {Text, Div} from 'react-native-magnus';
+import {Text, Div, Icon} from 'react-native-magnus';
 import {TouchableHighlight, useWindowDimensions} from 'react-native';
 import {portalLinkBoxStyles} from '../../styles/component/portalLinkBox.style';
 
@@ -37,6 +37,8 @@ type PortalType =
   | 'qa'
   | 'chat'
   | 'admin'
+  | 'my_schedule'
+  | 'safety_confirmation'
   | 'account';
 
 type PortalLinkIconProps = {
@@ -125,6 +127,17 @@ const PortalLinkIcon: React.FC<PortalLinkIconProps> = ({type}) => {
       return (
         <FontAwesome5 name="user-cog" color={adminColor} size={iconSize} />
       );
+    case 'my_schedule':
+      return <Icon name="calendar" color="orange500" fontSize={iconSize} />;
+    case 'safety_confirmation':
+      return (
+        <Icon
+          name="hand-holding-heart"
+          fontFamily="FontAwesome5"
+          fontSize={iconSize}
+          color="pink600"
+        />
+      );
   }
 };
 
@@ -149,7 +162,7 @@ const PortalLinkBox: React.FC<PortarlLinkBoxProps> = ({type, onPress}) => {
       case 'club':
         return '部活動';
       case 'submission_etc':
-        return '提出物等';
+        return '〆切一覧';
       case 'wiki':
         return '社内Wiki';
       case 'rules':
@@ -164,6 +177,10 @@ const PortalLinkBox: React.FC<PortarlLinkBoxProps> = ({type, onPress}) => {
         return '管理者ページ';
       case 'account':
         return 'アカウント';
+      case 'my_schedule':
+        return 'Myスケジュール';
+      case 'safety_confirmation':
+        return '安否確認';
       default:
         return '';
     }

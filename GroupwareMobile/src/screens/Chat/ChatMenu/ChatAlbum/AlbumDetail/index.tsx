@@ -140,7 +140,7 @@ const AlbumDetail: React.FC = () => {
         onPress={() =>
           navigation.navigate('ChatStack', {
             screen: 'EditChatAlbum',
-            params: {album},
+            params: {album, room},
           })
         }
         w={60}>
