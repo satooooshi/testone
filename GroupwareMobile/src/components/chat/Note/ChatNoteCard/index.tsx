@@ -92,7 +92,7 @@ const ChatNoteCard: React.FC<ChatNoteCardProps> = ({
         <AutoLinkedText
           text={note.content}
           style={tailwind('text-base')}
-          linkStyle={tailwind('text-blue-500 text-md text-base')}
+          linkStyle={tailwind('text-blue-500 text-base text-base')}
         />
       </Div>
       <Text fontSize={12} color={darkFontColor}>

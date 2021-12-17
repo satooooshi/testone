@@ -39,7 +39,7 @@ const TagListBox: React.FC<TagListBoxProps> = props => {
         <AutoLinkedText
           text={introduce}
           style={tailwind('text-base weight-bold')}
-          linkStyle={tailwind('text-blue-500 text-md text-base')}
+          linkStyle={tailwind('text-blue-500 text-base text-base')}
         />
       </Div>
     </Div>

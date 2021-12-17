@@ -1,5 +1,9 @@
-import {useNavigation, useRoute} from '@react-navigation/native';
-import React, {useEffect, useState} from 'react';
+import {
+  useFocusEffect,
+  useNavigation,
+  useRoute,
+} from '@react-navigation/native';
+import React, {useCallback, useEffect, useState} from 'react';
 import {FlatList, TouchableHighlight, useWindowDimensions} from 'react-native';
 import {
   Button,
@@ -23,6 +27,7 @@ import ImageView from 'react-native-image-viewing';
 import {darkFontColor} from '../../../../../utils/colors';
 import {useFormik} from 'formik';
 import {useAPIUpdateAlbum} from '../../../../../hooks/api/chat/album/useAPIUpdateChatAlbum';
+import FastImage from 'react-native-fast-image';
 
 const AlbumDetail: React.FC = () => {
   const {width: windowWidth} = useWindowDimensions();
@@ -45,7 +50,7 @@ const AlbumDetail: React.FC = () => {
       setEditModal(false);
     },
   });
-  const {data} = useAPIGetChatAlbumImages({
+  const {data, refetch} = useAPIGetChatAlbumImages({
     roomId: room.id.toString(),
     albumId: album.id.toString(),
     page: page.toString(),
@@ -69,6 +74,13 @@ const AlbumDetail: React.FC = () => {
     setImageModal(true);
   };
 
+  useFocusEffect(
+    useCallback(() => {
+      setImagesForInfiniteScroll([]);
+      refetch();
+    }, [refetch]),
+  );
+
   useEffect(() => {
     if (data?.images?.length) {
       setImagesForInfiniteScroll(n => {
@@ -84,7 +96,6 @@ const AlbumDetail: React.FC = () => {
     }
   }, [data?.images]);
 
-  console.log(data);
   return (
     <WholeContainer>
       <HeaderWithTextButton
@@ -198,7 +209,10 @@ const AlbumDetail: React.FC = () => {
             style={tailwind('border border-white')}
             underlayColor="none"
             onPress={() => handlePressImage(i.imageURL)}>
-            <Image w={imageWidth} h={imageWidth} source={{uri: i.imageURL}} />
+            <FastImage
+              style={{width: imageWidth, height: imageWidth}}
+              source={{uri: i.imageURL}}
+            />
           </TouchableHighlight>
         )}
       />

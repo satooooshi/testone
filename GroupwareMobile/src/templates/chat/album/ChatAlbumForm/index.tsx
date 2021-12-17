@@ -75,6 +75,16 @@ const ChatAlbumForm: React.FC<ChatAlbumFormProps> = ({
     }
   };
 
+  const removeImage = (image: Partial<ChatAlbumImage>) => {
+    if (!image.imageURL) {
+      return;
+    }
+    setValues(v => ({
+      ...v,
+      images: v.images?.filter(i => i.imageURL !== image.imageURL) || [],
+    }));
+  };
+
   return (
     <WholeContainer>
       <HeaderWithTextButton
@@ -116,13 +126,24 @@ const ChatAlbumForm: React.FC<ChatAlbumFormProps> = ({
               key={i.id}
               underlayColor="none"
               onPress={() => i.imageURL && handlePressImage(i.imageURL)}>
-              <Image
-                source={{uri: i.imageURL}}
-                w={windowWidth / 3}
-                h={windowWidth / 3}
-                borderWidth={0.5}
-                borderColor={'white'}
-              />
+              <>
+                <Button
+                  position="absolute"
+                  zIndex={100}
+                  top={-16}
+                  right={-16}
+                  bg="transparent"
+                  onPress={() => removeImage(i)}>
+                  <Icon name="close" color="white" fontSize={32} />
+                </Button>
+                <Image
+                  source={{uri: i.imageURL}}
+                  w={windowWidth / 3}
+                  h={windowWidth / 3}
+                  borderWidth={0.5}
+                  borderColor={'white'}
+                />
+              </>
             </TouchableHighlight>
           ))}
         </Div>
