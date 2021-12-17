@@ -93,7 +93,7 @@ const RoomList: React.FC = () => {
         rightButtonName={'新規作成'}
         {...{onPressRightButton}}
       />
-      {loadingGetChatGroupList && <ActivityIndicator />}
+      {loadingGetChatGroupList ? <ActivityIndicator /> : null}
       {!loadingGetChatGroupList && roomsForInfiniteScroll.length ? (
         <FlatList
           {...{onEndReached}}

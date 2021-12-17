@@ -82,6 +82,7 @@ export type RootStackParamList = {
   };
   EditChatAlbum: {
     album: ChatAlbum;
+    room: ChatGroup;
   };
   ForgotPassword: undefined;
   Share: {
