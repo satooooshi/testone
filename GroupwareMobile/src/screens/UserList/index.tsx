@@ -65,6 +65,7 @@ const UserList: React.FC = () => {
   return (
     <WholeContainer>
       <SearchForm
+        searchTarget="user"
         defaultValue={{word: '', selectedTags}}
         isVisible={visibleSearchFormModal}
         onCloseModal={() => setVisibleSearchFormModal(false)}

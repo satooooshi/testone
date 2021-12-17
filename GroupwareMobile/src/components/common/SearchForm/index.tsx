@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {Button, Div, Icon, Input, Modal, Tag} from 'react-native-magnus';
-import {useAPIGetTag} from '../../../hooks/api/tag/useAPIGetTag';
+import {useGetTagsBySearchTarget} from '../../../hooks/tag/useGetTagsBySearchTarget';
 import {useSelectedTags} from '../../../hooks/tag/useSelectedTags';
 import {useTagType} from '../../../hooks/tag/useTagType';
 import {AllTag} from '../../../types';
@@ -12,7 +12,10 @@ export type SearchFormValue = {
   selectedTags: AllTag[];
 };
 
+export type SearchTarget = 'user' | 'other';
+
 type SearchFormProps = {
+  searchTarget: SearchTarget;
   defaultValue?: SearchFormValue;
   isVisible: boolean;
   onCloseModal: () => void;
@@ -21,13 +24,14 @@ type SearchFormProps = {
 };
 
 const SearchForm: React.FC<SearchFormProps> = ({
+  searchTarget,
   defaultValue,
   isVisible,
   onCloseModal,
   onSubmit,
   defaultSelectedTagIds = [],
 }) => {
-  const {data: tags} = useAPIGetTag();
+  const {data: tags} = useGetTagsBySearchTarget(searchTarget)();
   const [word, setWord] = useState(defaultValue?.word || '');
   const [visibleTagModal, setVisibleTagModal] = useState(false);
   const {selectedTags, toggleTag, isSelected, setSelectedTags} =
@@ -99,6 +103,7 @@ const SearchForm: React.FC<SearchFormProps> = ({
         <Div flexDir="row" flexWrap="wrap">
           {selectedTags.map(t => (
             <Tag
+              key={t.id}
               fontSize={'lg'}
               h={28}
               py={0}

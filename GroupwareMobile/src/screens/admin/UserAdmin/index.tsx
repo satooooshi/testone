@@ -133,6 +133,7 @@ const UserAdmin: React.FC = () => {
         activeTabName={'ユーザー管理'}
       />
       <SearchForm
+        searchTarget="user"
         defaultValue={{word: '', selectedTags}}
         isVisible={visibleSearchFormModal}
         onCloseModal={() => setVisibleSearchFormModal(false)}

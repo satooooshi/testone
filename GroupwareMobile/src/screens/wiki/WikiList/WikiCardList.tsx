@@ -122,6 +122,7 @@ const WikiCardList: React.FC<WikiCardListProps> = ({type}) => {
   return (
     <>
       <SearchForm
+        searchTarget="other"
         isVisible={visibleSearchFormModal}
         onCloseModal={() => setVisibleSearchFormModal(false)}
         onSubmit={values => {
