@@ -119,16 +119,15 @@ const RenderWikiCardList: React.FC<RenderWikiCardListProps> = ({
 
 const WikiCardList: React.FC<WikiCardListProps> = ({type}) => {
   const routeParams = useRoute<WikiListRouteProps>().params;
-  console.log('routeParams', routeParams);
   const [visibleSearchFormModal, setVisibleSearchFormModal] = useState(false);
   const [word, setWord] = useState('');
   const [tag, setTag] = useState('');
 
   useEffect(() => {
-    if (routeParams.tag) {
-      setTag(routeParams.tag);
+    if (routeParams?.tag) {
+      setTag(routeParams?.tag);
     }
-  }, [routeParams.tag]);
+  }, [routeParams?.tag]);
 
   return (
     <>
