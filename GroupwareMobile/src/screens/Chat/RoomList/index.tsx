@@ -93,6 +93,7 @@ const RoomList: React.FC = () => {
         rightButtonName={'新規作成'}
         {...{onPressRightButton}}
       />
+      {loadingGetChatGroupList && <ActivityIndicator />}
       <FlatList
         {...{onEndReached}}
         contentContainerStyle={tailwind('self-center mt-4')}
@@ -115,7 +116,6 @@ const RoomList: React.FC = () => {
           </Div>
         )}
       />
-      {loadingGetChatGroupList && <ActivityIndicator />}
     </WholeContainer>
   );
 };
