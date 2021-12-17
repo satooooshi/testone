@@ -240,15 +240,7 @@ const AccountDetail: React.FC = () => {
                       {events?.events?.length ? (
                         events?.events?.map(e => (
                           <Div mb={'lg'} key={e.id}>
-                            <EventCard
-                              event={e}
-                              onPress={() =>
-                                navigation.navigate('EventStack', {
-                                  screen: 'EventDetail',
-                                  params: {id: e.id},
-                                })
-                              }
-                            />
+                            <EventCard event={e} />
                           </Div>
                         ))
                       ) : (

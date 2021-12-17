@@ -1,10 +1,12 @@
 import React from 'react';
 import {TouchableHighlight} from 'react-native';
 import {Button, Div, Icon, Image, Text} from 'react-native-magnus';
+import tailwind from 'tailwind-rn';
 import {ChatNote, ChatNoteImage} from '../../../../types';
 import {darkFontColor} from '../../../../utils/colors';
 import {dateTimeFormatterFromJSDDate} from '../../../../utils/dateTimeFormatterFromJSDate';
 import {userNameFactory} from '../../../../utils/factory/userNameFactory';
+import AutoLinkedText from '../../../common/AutoLinkedText';
 
 type ChatNoteCardProps = {
   note: ChatNote;
@@ -87,7 +89,11 @@ const ChatNoteCard: React.FC<ChatNoteCardProps> = ({
         ))}
       </Div>
       <Div mb="lg">
-        <Text fontSize={16}>{note.content}</Text>
+        <AutoLinkedText
+          text={note.content}
+          style={tailwind('text-base')}
+          linkStyle={tailwind('text-blue-500 text-md text-base')}
+        />
       </Div>
       <Text fontSize={12} color={darkFontColor}>
         {dateTimeFormatterFromJSDDate({

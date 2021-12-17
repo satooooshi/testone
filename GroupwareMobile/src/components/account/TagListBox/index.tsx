@@ -1,9 +1,11 @@
 import React from 'react';
 import {Div, DivProps, Tag as TagButton, Text} from 'react-native-magnus';
+import tailwind from 'tailwind-rn';
 import {TagType, UserTag} from '../../../types';
 import {darkFontColor} from '../../../utils/colors';
 import {tagTypeNameFactory} from '../../../utils/factory/tag/tagTypeNameFactory';
 import {tagColorFactory} from '../../../utils/factory/tagColorFactory';
+import AutoLinkedText from '../../common/AutoLinkedText';
 
 type TagListBoxProps = DivProps & {
   tags: UserTag[];
@@ -34,6 +36,11 @@ const TagListBox: React.FC<TagListBoxProps> = props => {
         <Text fontSize={16} fontWeight="bold" color={darkFontColor}>
           {introduce || '未設定'}
         </Text>
+        <AutoLinkedText
+          text={introduce}
+          style={tailwind('text-base weight-bold')}
+          linkStyle={tailwind('text-blue-500 text-md text-base')}
+        />
       </Div>
     </Div>
   );

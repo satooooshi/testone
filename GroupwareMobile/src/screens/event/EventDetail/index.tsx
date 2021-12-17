@@ -62,6 +62,7 @@ import FileIcon from '../../../components/common/FileIcon';
 import ShareButton from '../../../components/common/ShareButton';
 import {generateClientURL} from '../../../utils/url';
 import {Tab} from '../../../components/Header/HeaderTemplate';
+import AutoLinkedText from '../../../components/common/AutoLinkedText';
 
 const EventDetail: React.FC = () => {
   const route = useRoute<EventDetailRouteProps>();
@@ -505,13 +506,15 @@ const EventDetail: React.FC = () => {
                 fontWeight="bold">{`終了: ${endAtText}`}</Text>
               <Div mb={8}>
                 <Text>概要</Text>
-                <Text
-                  mb={16}
-                  color={darkFontColor}
-                  fontWeight="bold"
-                  fontSize={18}>
-                  {eventInfo.description}
-                </Text>
+                <AutoLinkedText
+                  text={eventInfo.description}
+                  style={{
+                    fontSize: 16,
+                    fontWeight: 'bold',
+                    color: darkFontColor,
+                  }}
+                  linkStyle={{color: 'blue'}}
+                />
               </Div>
               <Div mb={8}>
                 <Text>開催者/講師</Text>
