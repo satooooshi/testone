@@ -482,7 +482,7 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
             alignItems="flex-start"
             alignSelf="center"
             mb={'lg'}>
-            <Text fontSize={16}>ファイルを選択</Text>
+            <Text fontSize={16}>参考資料を選択</Text>
             <DropdownOpenerButton
               name={'タップでファイルを選択'}
               onPress={() => handlePickDocument()}
