@@ -248,6 +248,29 @@ const Home: React.FC = () => {
             />
           </Div>
         </Div>
+        <Div flexDir="row" justifyContent="center" alignItems="center">
+          <Div mb={8} mr={4}>
+            <PortalLinkBox
+              type="my_schedule"
+              onPress={() => {
+                navigation.navigate('EventStack', {
+                  screen: 'EventList',
+                  params: {personal: true},
+                });
+              }}
+            />
+          </Div>
+          <Div mb={8}>
+            <PortalLinkBox
+              type="safety_confirmation"
+              onPress={() => {
+                navigation.navigate('AccountStack', {
+                  screen: 'AccountDetail',
+                });
+              }}
+            />
+          </Div>
+        </Div>
       </ScrollDiv>
     </WholeContainer>
   );

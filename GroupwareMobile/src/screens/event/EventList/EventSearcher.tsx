@@ -5,8 +5,7 @@ import HeaderWithTextButton from '../../../components/Header';
 import {Tab} from '../../../components/Header/HeaderTemplate';
 import WholeContainer from '../../../components/WholeContainer';
 import {useEventCardListSearchQuery} from '../../../contexts/event/useEventSearchQuery';
-import {SearchQueryToGetEvents} from '../../../hooks/api/event/useAPIGetEventList';
-import {AllTag, EventType} from '../../../types';
+import {EventType} from '../../../types';
 import {EventListRouteProps} from '../../../types/navigator/drawerScreenProps';
 import {eventTypeColorFactory} from '../../../utils/factory/eventTypeColorFactory';
 import eventTypeNameFactory from '../../../utils/factory/eventTypeNameFactory';
@@ -17,6 +16,8 @@ const TopTab = createMaterialTopTabNavigator();
 
 const EventSearcher: React.FC = () => {
   const typePassedByRoute = useRoute<EventListRouteProps>()?.params?.type;
+  const personalPassedByRoute =
+    useRoute<EventListRouteProps>()?.params?.personal;
   const {partOfSearchQuery, setPartOfSearchQuery} =
     useEventCardListSearchQuery();
   const [visibleEventFormModal, setEventFormModal] = useState(false);
@@ -79,7 +80,9 @@ const EventSearcher: React.FC = () => {
         onPressRightButton={() => setEventFormModal(true)}
       />
       <TopTab.Navigator
-        initialRouteName={'EventCalendar'}
+        initialRouteName={
+          personalPassedByRoute ? 'PersonalCalendar' : 'EventCalendar'
+        }
         screenOptions={{
           tabBarScrollEnabled: true,
         }}>
