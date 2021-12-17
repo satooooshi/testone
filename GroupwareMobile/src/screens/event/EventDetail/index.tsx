@@ -288,7 +288,7 @@ const EventDetail: React.FC = () => {
         <ActivityIndicator />
       </Overlay>
       <EventFormModal
-        event={eventInfo}
+        event={eventInfo ? Object.assign(eventInfo) : undefined}
         isVisible={visibleEventFormModal}
         onCloseModal={() => setEventFormModal(false)}
         onSubmit={event => saveEvent({...event, id: eventInfo?.id})}
@@ -568,7 +568,9 @@ const EventDetail: React.FC = () => {
                 )}
               </Div>
               <Text>
-                {eventInfo?.files?.length ? '関連動画' : '関連動画はありません'}
+                {eventInfo?.videos?.length
+                  ? '関連動画'
+                  : '関連動画はありません'}
               </Text>
               {eventInfo.videos.length
                 ? eventInfo.videos.map(v => (

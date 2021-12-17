@@ -90,7 +90,7 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
     validateForm,
     resetForm,
   } = useFormik<Partial<EventSchedule>>({
-    initialValues: event || initialEventValue,
+    initialValues: event ? Object.assign(event) : initialEventValue,
     validationSchema: savingEventSchema,
     onSubmit: async values => {
       onSubmit(values);
@@ -211,10 +211,10 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
     setYoutubeURL('');
   };
 
-  const cancelAddingYoutubeURL = (index: number) => {
+  const cancelAddingYoutubeURL = (videoUrl: string) => {
     setNewEvent(e => {
       if (e.videos?.length) {
-        ({...e, videos: e.videos.splice(index, 1)});
+        return {...e, videos: e.videos.filter(v => v.url !== videoUrl)};
       }
       return e;
     });
@@ -500,8 +500,13 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
               flexDir="row"
               justifyContent="space-between"
               rounded="md">
-              <Text fontSize={16} color={blueColor}>
-                {(f.url?.match('.+/(.+?)([?#;].*)?$') || ['', f.url])[1]}
+              <Text fontSize={16} color={blueColor} w="80%">
+                {
+                  (decodeURI(f.url || '')?.match('.+/(.+?)([?#;].*)?$') || [
+                    '',
+                    f.url,
+                  ])[1]
+                }
               </Text>
               <TouchableOpacity>
                 <Icon name="closecircle" color="gray900" fontSize={24} />
@@ -550,7 +555,10 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
                 <Text w={'90%'} fontSize={16} color={blueColor}>
                   {v.url}
                 </Text>
-                <TouchableOpacity onPress={() => cancelAddingYoutubeURL(index)}>
+                <TouchableOpacity
+                  onPress={() => {
+                    v?.url && cancelAddingYoutubeURL(v?.url);
+                  }}>
                   <Icon name="closecircle" color="gray900" fontSize={24} />
                 </TouchableOpacity>
               </Div>
