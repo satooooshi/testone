@@ -17,6 +17,7 @@ import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import {Button, Div, Icon, Image, Input, Text} from 'react-native-magnus';
 import tailwind from 'tailwind-rn';
 import {dateTimeFormatterFromJSDDate} from '../../../../utils/dateTimeFormatterFromJSDate';
+import DownloadIcon from '../../../../components/common/DownLoadIcon';
 
 type ChatAlbumFormProps = {
   album?: ChatAlbum;
@@ -100,6 +101,11 @@ const ChatAlbumForm: React.FC<ChatAlbumFormProps> = ({
         onRequestClose={() => setImageModal(false)}
         swipeToCloseEnabled={false}
         doubleTapToZoomEnabled={true}
+        FooterComponent={({imageIndex}) => (
+          <Div position="absolute" bottom={5} right={5}>
+            <DownloadIcon url={images[imageIndex].uri} />
+          </Div>
+        )}
       />
       <KeyboardAwareScrollView
         contentContainerStyle={tailwind('h-full bg-white')}

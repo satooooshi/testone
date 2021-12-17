@@ -62,6 +62,7 @@ import VideoPlayer from 'react-native-video-player';
 import ChatMessageItem from '../../components/chat/ChatMessage';
 import {ActivityIndicator} from 'react-native-paper';
 import {useAPISaveLastReadChatTime} from '../../hooks/api/chat/useAPISaveLastReadChatTime';
+import DownloadIcon from '../../components/common/DownLoadIcon';
 
 const Chat: React.FC = () => {
   const typeDropdownRef = useRef<any | null>(null);
@@ -625,13 +626,9 @@ const Chat: React.FC = () => {
         swipeToCloseEnabled={false}
         doubleTapToZoomEnabled={true}
         FooterComponent={({imageIndex}) => (
-          <TouchableOpacity
-            style={tailwind('absolute bottom-5 right-5')}
-            onPress={() =>
-              saveToCameraRoll({url: images[imageIndex].uri, type: 'image'})
-            }>
-            <Icon color="white" name="download" fontSize={24} />
-          </TouchableOpacity>
+          <Div position="absolute" bottom={5} right={5}>
+            <DownloadIcon url={images[imageIndex].uri} />
+          </Div>
         )}
       />
       <HeaderWithIconButton

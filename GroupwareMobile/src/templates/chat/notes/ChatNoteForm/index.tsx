@@ -16,6 +16,7 @@ import {
 } from '../../../../types';
 import {uploadImageFromGallery} from '../../../../utils/cropImage/uploadImageFromGallery';
 import ImageView from 'react-native-image-viewing';
+import DownloadIcon from '../../../../components/common/DownLoadIcon';
 
 type ChatNoteFormProps = {
   rightButtonNameOnHeader: string;
@@ -99,6 +100,11 @@ const ChatNoteForm: React.FC<ChatNoteFormProps> = ({
         onRequestClose={() => setImageModal(false)}
         swipeToCloseEnabled={false}
         doubleTapToZoomEnabled={true}
+        FooterComponent={({imageIndex}) => (
+          <Div position="absolute" bottom={5} right={5}>
+            <DownloadIcon url={images[imageIndex].uri} />
+          </Div>
+        )}
       />
       <KeyboardAwareScrollView
         contentContainerStyle={tailwind('h-full bg-white')}

@@ -28,6 +28,7 @@ import {darkFontColor} from '../../../../../utils/colors';
 import {useFormik} from 'formik';
 import {useAPIUpdateAlbum} from '../../../../../hooks/api/chat/album/useAPIUpdateChatAlbum';
 import FastImage from 'react-native-fast-image';
+import DownloadIcon from '../../../../../components/common/DownLoadIcon';
 
 const AlbumDetail: React.FC = () => {
   const {width: windowWidth} = useWindowDimensions();
@@ -139,6 +140,11 @@ const AlbumDetail: React.FC = () => {
         onRequestClose={() => setImageModal(false)}
         swipeToCloseEnabled={false}
         doubleTapToZoomEnabled={true}
+        FooterComponent={({imageIndex}) => (
+          <Div position="absolute" bottom={5} right={5}>
+            <DownloadIcon url={images[imageIndex].uri} />
+          </Div>
+        )}
       />
       <Button
         bg="purple600"
