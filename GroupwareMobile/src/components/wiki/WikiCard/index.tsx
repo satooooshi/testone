@@ -4,6 +4,8 @@ import {Wiki} from '../../../types';
 import {Div, Text, Tag} from 'react-native-magnus';
 import {tagColorFactory} from '../../../utils/factory/tagColorFactory';
 import {wikiCardStyles} from '../../../styles/component/wiki/wikiCard.style';
+import {wikiTypeColorFactory} from '../../../utils/factory/wiki/wikiTypeColorFactory';
+import {wikiTypeNameFactory} from '../../../utils/factory/wiki/wikiTypeNameFactory';
 import {useNavigation} from '@react-navigation/native';
 import UserAvatar from '../../common/UserAvatar';
 
@@ -45,34 +47,51 @@ const WikiCard: React.FC<WikiCardProps> = ({wiki}) => {
             {wiki.title}
           </Text>
         </Div>
-        {wiki?.tags?.length ? (
-          <FlatList
-            style={wikiCardStyles.tagList}
-            horizontal
-            data={wiki?.tags || []}
-            renderItem={({item: t}) => (
-              <Tag
-                onPress={() =>
-                  navigation.navigate('WikiStack', {
-                    screen: 'WikiList',
-                    params: {tag: t.id.toString()},
-                  })
-                }
-                fontSize={'lg'}
-                h={28}
-                py={0}
-                bg={tagColorFactory(t.type)}
-                color="white"
-                mr={4}>
-                {t.name}
-              </Tag>
-            )}
-          />
-        ) : (
-          <Tag fontSize={'lg'} h={28} py={0} bg={'orange'} color="white" ml={4}>
-            タグなし
+        <Div flexDir="row">
+          <Tag
+            fontSize={'lg'}
+            h={28}
+            py={0}
+            bg={wikiTypeColorFactory(wiki.type, wiki.ruleCategory)}
+            color="white"
+            ml={4}>
+            {wikiTypeNameFactory(wiki.type, wiki.ruleCategory)}
           </Tag>
-        )}
+          {wiki?.tags?.length ? (
+            <FlatList
+              style={wikiCardStyles.tagList}
+              horizontal
+              data={wiki?.tags || []}
+              renderItem={({item: t}) => (
+                <Tag
+                  onPress={() =>
+                    navigation.navigate('WikiStack', {
+                      screen: 'WikiList',
+                      params: {tag: t.id.toString()},
+                    })
+                  }
+                  fontSize={'lg'}
+                  h={28}
+                  py={0}
+                  bg={tagColorFactory(t.type)}
+                  color="white"
+                  mr={4}>
+                  {t.name}
+                </Tag>
+              )}
+            />
+          ) : (
+            <Tag
+              fontSize={'lg'}
+              h={28}
+              py={0}
+              bg={'orange'}
+              color="white"
+              ml={4}>
+              タグなし
+            </Tag>
+          )}
+        </Div>
       </Div>
     </TouchableHighlight>
   );
