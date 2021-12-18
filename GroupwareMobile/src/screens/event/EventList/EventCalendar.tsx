@@ -37,10 +37,6 @@ type EventCalendarProps = {
   personal?: boolean;
   visibleEventFormModal: boolean;
   hideEventFormModal: () => void;
-  // searchResult?: SearchResultToGetEvents;
-  // searchQuery: SearchQueryToGetEvents;
-  // setSearchQuery: Dispatch<SetStateAction<SearchQueryToGetEvents>>;
-  // isLoading: boolean;
 };
 
 type CustomMode = 'week' | 'day' | 'month';
@@ -49,9 +45,6 @@ const EventCalendar: React.FC<EventCalendarProps> = ({
   personal,
   visibleEventFormModal,
   hideEventFormModal,
-  // searchResult,
-  // setSearchQuery,
-  // isLoading,
 }) => {
   const navigation = useNavigation<EventListNavigationProps>();
   const {user} = useAuthenticate();
@@ -65,7 +58,8 @@ const EventCalendar: React.FC<EventCalendarProps> = ({
   const [searchQuery, setSearchQuery] = useState<SearchQueryToGetEvents>(
     defaultWeekQuery(),
   );
-  const {partOfSearchQuery} = useEventCardListSearchQuery();
+  const {partOfSearchQuery, setPartOfSearchQuery} =
+    useEventCardListSearchQuery();
   const {mutate: saveEvent} = useAPICreateEvent({
     onSuccess: () => {
       hideEventFormModal();
@@ -215,6 +209,13 @@ const EventCalendar: React.FC<EventCalendarProps> = ({
     },
     [calendarMode.mode],
   );
+
+  useEffect(() => {
+    if (partOfSearchQuery.refetchNeeded) {
+      refetchEvents();
+      setPartOfSearchQuery({refetchNeeded: false});
+    }
+  }, [partOfSearchQuery.refetchNeeded, refetchEvents, setPartOfSearchQuery]);
 
   useEffect(() => {
     let queryObj: Partial<SearchQueryToGetEvents>;

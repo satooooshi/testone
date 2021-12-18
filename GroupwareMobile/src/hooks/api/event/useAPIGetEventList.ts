@@ -2,7 +2,8 @@ import {EventType, EventSchedule} from '../../../types';
 import {getEventURL} from '../../../utils/url/event.url';
 import {generateEventSearchQueryString} from '../../../utils/eventQueryRefresh';
 import {axiosInstance} from '../../../utils/url';
-import {useQuery} from 'react-query';
+import {useQuery, UseQueryOptions} from 'react-query';
+import {AxiosError} from 'axios';
 
 export type EventStatus = 'future' | 'past' | 'current';
 
@@ -32,8 +33,13 @@ const getEventList = async (
   return response.data;
 };
 
-export const useAPIGetEventList = (query: SearchQueryToGetEvents) => {
-  return useQuery<SearchResultToGetEvents>(['events', query], () =>
-    getEventList(query),
+export const useAPIGetEventList = (
+  query: SearchQueryToGetEvents,
+  useQueryOptions?: UseQueryOptions<SearchResultToGetEvents, AxiosError>,
+) => {
+  return useQuery<SearchResultToGetEvents, AxiosError>(
+    ['events', query],
+    () => getEventList(query),
+    useQueryOptions,
   );
 };

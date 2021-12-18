@@ -5,7 +5,9 @@ import {SearchQueryToGetEvents} from '../../hooks/api/event/useAPIGetEventList';
 type Query = Pick<
   SearchQueryToGetEvents,
   'word' | 'tag' | 'type' | 'participant_id'
->;
+> & {
+  refetchNeeded?: boolean;
+};
 
 // eslint-disable-next-line no-spaced-func
 const EventCardListSearchQueryContext = createContext<{
