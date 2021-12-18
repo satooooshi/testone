@@ -1,11 +1,12 @@
 import {useNavigation} from '@react-navigation/native';
 import React, {useEffect, useRef, useState} from 'react';
 import {Alert, FlatList, TouchableOpacity} from 'react-native';
-import {Text, Div, Image, Icon, Dropdown} from 'react-native-magnus';
+import {Text, Div, Icon, Dropdown} from 'react-native-magnus';
 import {ActivityIndicator} from 'react-native-paper';
 import DropdownOpenerButton from '../../../components/common/DropdownOpenerButton';
 import SearchForm from '../../../components/common/SearchForm';
 import SearchFormOpenerButton from '../../../components/common/SearchForm/SearchFormOpenerButton';
+import UserAvatar from '../../../components/common/UserAvatar';
 import HeaderWithTextButton from '../../../components/Header';
 import {Tab} from '../../../components/Header/HeaderTemplate';
 import WholeContainer from '../../../components/WholeContainer';
@@ -250,16 +251,7 @@ const UserAdmin: React.FC = () => {
                     params: {id: item.id},
                   })
                 }>
-                <Image
-                  w={'100%'}
-                  h={'100%'}
-                  rounded="circle"
-                  source={
-                    item.avatarUrl
-                      ? {uri: item.avatarUrl}
-                      : require('../../../../assets/no-image-avatar.png')
-                  }
-                />
+                <UserAvatar w={'100%'} h={'100%'} user={item} />
               </TouchableOpacity>
               <Text w={'29%'} mr={'1%'}>{`${userNameFactory(item)}\n${
                 item.email

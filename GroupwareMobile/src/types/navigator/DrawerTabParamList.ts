@@ -9,4 +9,5 @@ export type DrawerTabParamList = {
   ChatStack: NavigatorScreenParams<RootStackParamList>;
   AccountStack: NavigatorScreenParams<RootStackParamList>;
   AdminStack: NavigatorScreenParams<RootStackParamList>;
+  UserListStack: NavigatorScreenParams<RootStackParamList>;
 };

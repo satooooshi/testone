@@ -8,6 +8,7 @@ import {grayColor, darkFontColor} from '../../../utils/colors';
 import {tagTypeNameFactory} from '../../../utils/factory/tag/tagTypeNameFactory';
 import {tagColorFactory} from '../../../utils/factory/tagColorFactory';
 import {userNameFactory} from '../../../utils/factory/userNameFactory';
+import UserAvatar from '../../common/UserAvatar';
 
 type UserCardProps = {
   user: User;
@@ -46,16 +47,7 @@ const UserCard: React.FC<UserCardProps> = ({
     <TouchableOpacity onPress={onPress}>
       <Div bg={grayColor} w={windowWidth * 0.9} rounded="md" shadow="md">
         <Div px="xs" justifyContent="space-between" flexDir="row">
-          <Image
-            source={
-              user.avatarUrl
-                ? {uri: user.avatarUrl}
-                : require('../../../../assets/no-image-avatar.png')
-            }
-            w={120}
-            h={120}
-            rounded="circle"
-          />
+          <UserAvatar user={user} w={120} h={120} />
           <Div w={'60%'}>
             <Text fontSize={18} fontWeight="bold" color={darkFontColor}>
               {userNameFactory(user)}

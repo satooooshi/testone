@@ -63,6 +63,7 @@ import ChatMessageItem from '../../components/chat/ChatMessage';
 import {ActivityIndicator} from 'react-native-paper';
 import {useAPISaveLastReadChatTime} from '../../hooks/api/chat/useAPISaveLastReadChatTime';
 import DownloadIcon from '../../components/common/DownLoadIcon';
+import UserAvatar from '../../components/common/UserAvatar';
 
 const Chat: React.FC = () => {
   const typeDropdownRef = useRef<any | null>(null);
@@ -567,17 +568,9 @@ const Chat: React.FC = () => {
               <View
                 style={tailwind('flex-row bg-white items-center px-4 mb-2')}>
                 <>
-                  <Image
-                    mr={'sm'}
-                    rounded="circle"
-                    h={64}
-                    w={64}
-                    source={
-                      item.avatarUrl
-                        ? {uri: item.avatarUrl}
-                        : require('../../../assets/no-image-avatar.png')
-                    }
-                  />
+                  <Div mr={'sm'}>
+                    <UserAvatar user={item} h={64} w={64} />
+                  </Div>
                   <Text fontSize={18}>{userNameFactory(item)}</Text>
                 </>
               </View>

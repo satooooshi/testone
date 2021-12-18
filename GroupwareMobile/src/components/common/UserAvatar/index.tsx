@@ -5,28 +5,29 @@ import {Image} from 'react-native-magnus';
 import {User} from '../../../types';
 
 type UserAvatarProps = {
-  user: User;
-  h: number;
-  w: number;
+  user?: Partial<User>;
+  h: number | string;
+  w: number | string;
 };
 
 const UserAvatar: React.FC<UserAvatarProps> = ({user, h, w}) => {
   const navigation = useNavigation<any>();
   return (
     <TouchableHighlight
+      underlayColor="none"
       onPress={() =>
-        navigation.navigate('AccountStack', {
+        navigation.navigate('UserListStack', {
           screen: 'AccountDetail',
-          params: {id: user.id},
+          params: {id: user?.id},
         })
       }>
       <Image
         {...{h, w}}
         rounded="circle"
         source={
-          !user.existence
+          !user?.existence
             ? require('../../../../assets/bold-mascot.png')
-            : user.avatarUrl
+            : user?.avatarUrl
             ? {uri: user.avatarUrl}
             : require('../../../../assets/no-image-avatar.png')
         }

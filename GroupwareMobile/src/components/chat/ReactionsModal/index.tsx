@@ -12,6 +12,7 @@ import tailwind from 'tailwind-rn';
 import {ChatMessageReaction} from '../../../types';
 import {userNameFactory} from '../../../utils/factory/userNameFactory';
 import {numbersOfSameValueInKeyOfObjArr} from '../../../utils/numbersOfSameValueInKeyOfObjArr';
+import UserAvatar from '../../common/UserAvatar';
 
 type ReactionsModalProps = {
   isVisible: boolean;
@@ -117,17 +118,10 @@ const ReactionsModal: React.FC<ReactionsModalProps> = ({
               <View
                 style={tailwind('flex-row bg-white items-center px-4 mb-2')}>
                 <>
-                  <Image
-                    mr={'sm'}
-                    rounded="circle"
-                    h={64}
-                    w={64}
-                    source={
-                      item.user?.avatarUrl
-                        ? {uri: item.user.avatarUrl}
-                        : require('../../../../assets/no-image-avatar.png')
-                    }
-                  />
+                  <Div mr={'sm'}>
+                    <UserAvatar user={item.user} h={64} w={64} />
+                  </Div>
+
                   <Text fontSize={18}>{userNameFactory(item.user)}</Text>
                 </>
               </View>

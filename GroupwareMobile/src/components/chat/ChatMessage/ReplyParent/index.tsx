@@ -2,6 +2,7 @@ import React from 'react';
 import {Div, Image, Text} from 'react-native-magnus';
 import {ChatMessage, ChatMessageType} from '../../../../types';
 import {userNameFactory} from '../../../../utils/factory/userNameFactory';
+import UserAvatar from '../../../common/UserAvatar';
 
 type ReplyParentProps = {
   parentMessage: ChatMessage;
@@ -28,16 +29,9 @@ const ReplyParent: React.FC<ReplyParentProps> = ({parentMessage}) => {
       borderBottomWidth={0.5}
       borderBottomColor="white"
       pb="sm">
-      <Image
-        w={32}
-        h={32}
-        mr={'sm'}
-        source={
-          parentMessage.sender?.avatarUrl
-            ? {uri: parentMessage.sender?.avatarUrl}
-            : require('../../../../../assets/no-image-avatar.png')
-        }
-      />
+      <Div mr={'sm'}>
+        <UserAvatar w={32} h={32} user={parentMessage.sender} />
+      </Div>
       <Div w={'65%'}>
         <Text color="black" fontWeight="bold" fontSize={14}>
           {userNameFactory(parentMessage.sender)}

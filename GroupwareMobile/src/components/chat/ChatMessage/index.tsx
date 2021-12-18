@@ -15,6 +15,7 @@ import {
 import {dateTimeFormatterFromJSDDate} from '../../../utils/dateTimeFormatterFromJSDate';
 import {userNameFactory} from '../../../utils/factory/userNameFactory';
 import {numbersOfSameValueInKeyOfObjArr} from '../../../utils/numbersOfSameValueInKeyOfObjArr';
+import UserAvatar from '../../common/UserAvatar';
 import FileMessage from './FileMessage';
 import ImageMessage from './ImageMessage';
 import ReactionToMessage from './ReactionToMessage';
@@ -150,17 +151,9 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
               })
             }
             underlayColor="none">
-            <Image
-              source={
-                message?.sender?.avatarUrl
-                  ? {uri: message?.sender?.avatarUrl}
-                  : require('../../../../assets/no-image-avatar.png')
-              }
-              h={40}
-              w={40}
-              rounded="circle"
-              mr="xs"
-            />
+            <Div mr="xs">
+              <UserAvatar h={40} w={40} user={message?.sender} />
+            </Div>
           </TouchableHighlight>
         ) : null}
       </Div>

@@ -27,6 +27,7 @@ import {useDom} from '../../../hooks/dom/useDom';
 import {useMinimumDrawer} from '../../../hooks/minimumDrawer/useMinimumDrawer';
 import ShareButton from '../../../components/common/ShareButton';
 import {generateClientURL} from '../../../utils/url';
+import UserAvatar from '../../../components/common/UserAvatar';
 
 const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
   const isFocused = useIsFocused();
@@ -138,16 +139,9 @@ const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
                     onPressAvatar(wikiInfo.writer);
                   }
                 }}>
-                <Avatar
-                  mr={8}
-                  source={
-                    wikiInfo.writer.existence
-                      ? {uri: wikiInfo.writer?.avatarUrl}
-                      : wikiInfo.writer?.avatarUrl
-                      ? require('../../../../assets/bold-mascot.png')
-                      : require('../../../../assets/no-image-avatar.png')
-                  }
-                />
+                <Div mr={8}>
+                  <UserAvatar h={48} w={48} user={wikiInfo.writer} />
+                </Div>
               </TouchableOpacity>
               <Text fontSize={18} color={darkFontColor}>
                 {userNameFactory(wikiInfo.writer)}

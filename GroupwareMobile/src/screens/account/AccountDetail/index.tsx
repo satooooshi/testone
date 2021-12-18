@@ -5,6 +5,7 @@ import {useWindowDimensions} from 'react-native';
 import {Text, Div, ScrollDiv, Image} from 'react-native-magnus';
 import {ActivityIndicator} from 'react-native-paper';
 import TagListBox from '../../../components/account/TagListBox';
+import UserAvatar from '../../../components/common/UserAvatar';
 import EventCard from '../../../components/events/EventCard';
 import HeaderWithTextButton from '../../../components/Header';
 import {Tab} from '../../../components/Header/HeaderTemplate';
@@ -195,18 +196,13 @@ const AccountDetail: React.FC = () => {
         {profile && (
           <>
             <Div alignItems="center">
-              <Image
-                mt={'lg'}
-                h={windowWidth * 0.6}
-                w={windowWidth * 0.6}
-                source={
-                  profile.avatarUrl
-                    ? {uri: profile.avatarUrl}
-                    : require('../../../../assets/no-image-avatar.png')
-                }
-                rounded="circle"
-                mb={'lg'}
-              />
+              <Div my={'lg'}>
+                <UserAvatar
+                  user={profile}
+                  h={windowWidth * 0.6}
+                  w={windowWidth * 0.6}
+                />
+              </Div>
               <Text
                 fontWeight="bold"
                 mb={'lg'}

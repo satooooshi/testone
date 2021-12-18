@@ -7,6 +7,7 @@ import {darkFontColor} from '../../../../utils/colors';
 import {dateTimeFormatterFromJSDDate} from '../../../../utils/dateTimeFormatterFromJSDate';
 import {userNameFactory} from '../../../../utils/factory/userNameFactory';
 import AutoLinkedText from '../../../common/AutoLinkedText';
+import UserAvatar from '../../../common/UserAvatar';
 
 type ChatNoteCardProps = {
   note: ChatNote;
@@ -33,17 +34,9 @@ const ChatNoteCard: React.FC<ChatNoteCardProps> = ({
       borderBottomColor={darkFontColor}>
       <Div flexDir="row" justifyContent="space-between" mb="lg">
         <Div flexDir="row" alignItems="center">
-          <Image
-            mr="sm"
-            rounded="circle"
-            h={40}
-            w={40}
-            source={
-              note.editors?.length && note.editors[0].avatarUrl
-                ? {uri: note.editors[0].avatarUrl}
-                : require('../../../../../assets/no-image-avatar.png')
-            }
-          />
+          <Div mr="sm">
+            <UserAvatar h={40} w={40} user={note.editors?.[0]} />
+          </Div>
           <Text fontWeight="bold" fontSize={16}>
             {note.editors?.length
               ? userNameFactory(note.editors[0])

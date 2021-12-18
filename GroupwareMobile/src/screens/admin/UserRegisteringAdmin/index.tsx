@@ -42,6 +42,7 @@ import {userNameFactory} from '../../../utils/factory/userNameFactory';
 import {userRoleNameFactory} from '../../../utils/factory/userRoleNameFactory';
 import {formikErrorMsgFactory} from '../../../utils/factory/formikEroorMsgFactory';
 import {createUserSchema} from '../../../utils/validation/schema';
+import UserAvatar from '../../../components/common/UserAvatar';
 
 const initialValues: Partial<User> = {
   email: '',
@@ -237,19 +238,20 @@ const UserRegisteringAdmin: React.FC = () => {
           width: windowWidth * 0.9,
         }}>
         <TouchableOpacity onPress={handleUploadImage}>
-          <Image
-            alignSelf="center"
-            mt={'lg'}
-            h={windowWidth * 0.6}
-            w={windowWidth * 0.6}
-            source={
-              values.avatarUrl
-                ? {uri: values.avatarUrl}
-                : require('../../../../assets/no-image-avatar.png')
-            }
-            rounded="circle"
-            mb={'lg'}
-          />
+          <Div my={'lg'}>
+            <UserAvatar
+              h={windowWidth * 0.6}
+              w={windowWidth * 0.6}
+              user={values}
+            />
+          </Div>
+          <Div my={'lg'}>
+            <UserAvatar
+              h={windowWidth * 0.6}
+              w={windowWidth * 0.6}
+              user={values}
+            />
+          </Div>
         </TouchableOpacity>
         <Div mb="lg">
           <Text fontSize={16} fontWeight="bold">

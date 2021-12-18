@@ -36,6 +36,7 @@ const Home: React.FC = () => {
         navigation.navigate('EventStack', {
           screen: 'EventDetail',
           params: {id: Number(id)},
+          initial: false,
         });
       } else {
         Alert.alert('情報の取得に失敗しました');
@@ -43,9 +44,10 @@ const Home: React.FC = () => {
     } else if (news.urlPath.includes('wiki')) {
       const id: string = news.urlPath.replace('/wiki/', '');
       if (typeof Number(id) === 'number') {
-        navigation.navigate('EventStack', {
-          screen: 'EventDetail',
+        navigation.navigate('WikiStack', {
+          screen: 'WikiDetail',
           params: {id: Number(id)},
+          initial: false,
         });
       } else {
         Alert.alert('情報の取得に失敗しました');
@@ -53,9 +55,10 @@ const Home: React.FC = () => {
     } else if (news.urlPath.includes('account')) {
       const id: string = news.urlPath.replace('/account/', '');
       if (typeof Number(id) === 'number') {
-        navigation.navigate('EventStack', {
-          screen: 'EventDetail',
+        navigation.navigate('UserListStack', {
+          screen: 'AccountDetail',
           params: {id: Number(id)},
+          initial: false,
         });
       } else {
         Alert.alert('情報の取得に失敗しました');

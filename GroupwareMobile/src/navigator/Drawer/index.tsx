@@ -113,11 +113,6 @@ const AccountStack = () => (
       options={{headerShown: false}}
     />
     <Stack.Screen
-      name="AccountDetail"
-      component={AccountDetail}
-      options={{headerShown: false}}
-    />
-    <Stack.Screen
       name="Profile"
       component={Profile}
       options={{headerShown: false}}
@@ -160,11 +155,6 @@ const AdminStack = () => (
     <Stack.Screen
       name="UserTagAdmin"
       component={UserTagAdmin}
-      options={{headerShown: false}}
-    />
-    <Stack.Screen
-      name="AccountDetail"
-      component={AccountDetail}
       options={{headerShown: false}}
     />
     <Stack.Screen

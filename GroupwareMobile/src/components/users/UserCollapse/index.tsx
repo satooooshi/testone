@@ -3,6 +3,7 @@ import {useWindowDimensions} from 'react-native';
 import {Collapse, CollapseProps, Div, Image, Text} from 'react-native-magnus';
 import tailwind from 'tailwind-rn';
 import {User} from '../../../types';
+import UserAvatar from '../../common/UserAvatar';
 
 type UserCollapseProps = CollapseProps & {
   users: User[];
@@ -37,19 +38,13 @@ const UserCollapse: React.FC<UserCollapseProps> = ({
             borderBottomWidth={0.5}
             borderBottomColor="gray400"
             style={tailwind('flex-row items-center')}>
-            <Image
-              mt={'lg'}
-              h={windowWidth * 0.1}
-              w={windowWidth * 0.1}
-              source={
-                u.avatarUrl
-                  ? {uri: u.avatarUrl}
-                  : require('../../../../assets/no-image-avatar.png')
-              }
-              rounded="circle"
-              mb={'lg'}
-              mr={16}
-            />
+            <Div my={'lg'} mr={16}>
+              <UserAvatar
+                h={windowWidth * 0.1}
+                w={windowWidth * 0.1}
+                user={u}
+              />
+            </Div>
             <Text>{u.lastName + ' ' + u.firstName}</Text>
           </Div>
         ))}

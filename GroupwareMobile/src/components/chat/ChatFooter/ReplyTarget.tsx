@@ -5,6 +5,7 @@ import {replyTargetStyles} from '../../../styles/component/chat/replyTarget.styl
 import {ChatMessage, ChatMessageType} from '../../../types';
 import {darkFontColor} from '../../../utils/colors';
 import {userNameFactory} from '../../../utils/factory/userNameFactory';
+import UserAvatar from '../../common/UserAvatar';
 
 type ReplyTargetProps = {
   onPressCloseIcon: () => void;
@@ -41,17 +42,10 @@ const ReplyTarget: React.FC<ReplyTargetProps> = ({
         onPress={onPressCloseIcon}>
         <Icon name="close" fontSize={24} />
       </TouchableOpacity>
-      <Image
-        mr={'lg'}
-        w={40}
-        h={40}
-        rounded="circle"
-        source={
-          replyParentMessage?.sender?.avatarUrl
-            ? {uri: replyParentMessage.sender.avatarUrl}
-            : require('../../../../assets/no-image-avatar.png')
-        }
-      />
+      <Div mr="lg">
+        <UserAvatar w={40} h={40} user={replyParentMessage.sender} />
+      </Div>
+      <UserAvatar w={40} h={40} user={replyParentMessage?.sender} />
       <Div alignSelf="center" w={'70%'}>
         <Text fontSize={12} fontWeight={'bold'} numberOfLines={1}>
           {userNameFactory(replyParentMessage?.sender)}

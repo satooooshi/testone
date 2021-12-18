@@ -10,6 +10,7 @@ import {Div, Avatar, Text, Tag} from 'react-native-magnus';
 import {tagColorFactory} from '../../../utils/factory/tagColorFactory';
 import {wikiCardStyles} from '../../../styles/component/wiki/wikiCard.style';
 import {useNavigation} from '@react-navigation/native';
+import UserAvatar from '../../common/UserAvatar';
 
 type WikiCardProps = {
   wiki: Wiki;
@@ -35,16 +36,9 @@ const WikiCard: React.FC<WikiCardProps> = ({wiki, onPress}) => {
           mb={4}
           flexDir="row"
           alignItems="center">
-          <Avatar
-            mr={8}
-            source={
-              !wiki.writer?.existence
-                ? require('../../../../assets/bold-mascot.png')
-                : wiki.writer?.avatarUrl
-                ? {uri: wiki.writer?.avatarUrl}
-                : require('../../../../assets/no-image-avatar.png')
-            }
-          />
+          <Div mr={8}>
+            <UserAvatar user={wiki.writer} h={48} w={48} />
+          </Div>
           <Text w={'80%'} numberOfLines={2} fontWeight="bold" fontSize={22}>
             {wiki.title}
           </Text>
