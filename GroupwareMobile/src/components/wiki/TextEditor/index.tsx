@@ -19,7 +19,7 @@ const TextEditor: React.FC<TextEditorProps> = ({
   initialBody,
   onChange,
 }) => {
-  const [height, setHeight] = useState<number>(100);
+  const [height, setHeight] = useState<number>(200);
   const markdownit = new MarkdownIt();
   const quillRef = useRef<QuillEditor | null>(null);
 
@@ -27,7 +27,7 @@ const TextEditor: React.FC<TextEditorProps> = ({
     if (name === 'image') {
       onUploadImage(async imageURL => {
         const range = await quillRef.current?.getSelection();
-        quillRef.current?.insertEmbed(range.index, 'image', imageURL[0]);
+        quillRef.current?.insertEmbed(range?.index, 'image', imageURL[0]);
       });
     }
   };
@@ -44,7 +44,7 @@ const TextEditor: React.FC<TextEditorProps> = ({
             ? initialBody
             : undefined
         }
-        style={{...textEditorStyles.quillEditor, height}}
+        style={{...textEditorStyles.quillEditor, minHeight: height}}
         quill={{
           // not required just for to show how to pass this props
           placeholder: '本文を入力',
@@ -61,11 +61,11 @@ const TextEditor: React.FC<TextEditorProps> = ({
       <QuillToolbar
         editor={quillRef}
         options={[
+          [{header: 1}, {header: 2}, {header: 3}],
           ['bold', 'italic', 'strike'],
-          ['blockquote'],
+          ['blockquote', 'code-block'],
           [{list: 'ordered'}, {list: 'bullet'}],
 
-          [{header: 1}, {header: 2}, {header: 3}],
           ['image', 'clock'],
         ]}
         theme="light"

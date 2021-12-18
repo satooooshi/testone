@@ -209,7 +209,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({
       type: 'allMentionUserData',
       value: room?.members,
     });
-  }, [dispatchMention, room?.members]);
+  }, [dispatchMention, room]);
 
   useEffect(() => {
     setMessages([]);
@@ -338,7 +338,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({
         flexDir="column-reverse"
         overflowY="auto"
         borderBottom="1px #ececec solid"
-        px="8px"
+        p="8px"
         whiteSpace="pre-wrap"
         onScroll={onScrollTopOnChat}>
         {messages ? (

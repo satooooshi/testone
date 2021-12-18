@@ -355,7 +355,9 @@ const NoteModal: React.FC<NoteModalProps> = ({ isOpen, onClose, room }) => {
                   </Link>
                 ))}
               </SimpleGrid>
-              <Text alignSelf="flex-start">{n.content}</Text>
+              <Text alignSelf="flex-start" whiteSpace="pre-wrap">
+                {n.content}
+              </Text>
             </Box>
           ))}
           {isLoading && <Spinner />}

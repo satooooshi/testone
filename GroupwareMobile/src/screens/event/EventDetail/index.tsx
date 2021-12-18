@@ -30,7 +30,6 @@ import {AxiosError} from 'axios';
 import {useFormik} from 'formik';
 import {EventComment, EventType, SubmissionFile} from '../../../types';
 import {useAPICreateComment} from '../../../hooks/api/event/useAPICreateComment';
-import EventCommentCard from '../EventCommentCard';
 import {createCommentSchema} from '../../../utils/validation/schema';
 import {formikErrorMsgFactory} from '../../../utils/factory/formikEroorMsgFactory';
 import {useAPIDeleteEvent} from '../../../hooks/api/event/useAPIDeleteEvent';
@@ -48,6 +47,7 @@ import AutoLinkedText from '../../../components/common/AutoLinkedText';
 import {isFinishedEvent} from '../../../utils/factory/event/isFinishedEvent';
 import {isEditableEvent} from '../../../utils/factory/event/isCreatableEvent';
 import EventParticipants from '../../../components/events/EventParticipants';
+import EventCommentCard from '../EventCommentCard';
 
 const EventDetail: React.FC = () => {
   const route = useRoute<EventDetailRouteProps>();
