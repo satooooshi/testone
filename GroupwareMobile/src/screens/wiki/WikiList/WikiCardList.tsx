@@ -1,4 +1,10 @@
-import React, {useState, useEffect, Dispatch, SetStateAction} from 'react';
+import React, {
+  useState,
+  useEffect,
+  Dispatch,
+  SetStateAction,
+  useCallback,
+} from 'react';
 import {RuleCategory, WikiType} from '../../../types';
 import {
   SearchQueryToGetWiki,
@@ -8,7 +14,11 @@ import {Div, Text} from 'react-native-magnus';
 import WikiCard from '../../../components/wiki/WikiCard';
 import {FlatList} from 'react-native';
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
-import {useNavigation, useRoute} from '@react-navigation/native';
+import {
+  useFocusEffect,
+  useNavigation,
+  useRoute,
+} from '@react-navigation/native';
 import SearchForm from '../../../components/common/SearchForm';
 import SearchFormOpenerButton from '../../../components/common/SearchForm/SearchFormOpenerButton';
 import {
@@ -47,12 +57,14 @@ const RenderWikiCardList: React.FC<RenderWikiCardListProps> = ({
     type,
     status,
   });
-  const {data: fetchedWiki, isLoading} = useAPIGetWikiList(searchQuery);
+  const {
+    data: fetchedWiki,
+    isLoading,
+    refetch,
+  } = useAPIGetWikiList(searchQuery);
   const [wikiForInfiniteScroll, setWikiForInfiniteScroll] = useState(
     fetchedWiki?.wiki || [],
   );
-  const navigation: WikiListNavigationProps =
-    useNavigation<WikiListNavigationProps>();
 
   const onEndReached = () => {
     setSearchQuery(q => ({
@@ -86,6 +98,19 @@ const RenderWikiCardList: React.FC<RenderWikiCardListProps> = ({
     }
   }, [fetchedWiki?.wiki]);
 
+  useFocusEffect(
+    useCallback(() => {
+      setWikiForInfiniteScroll([]);
+      if (searchQuery.page !== '1') {
+        setSearchQuery(q => ({...q, page: '1'}));
+      } else {
+        setWikiForInfiniteScroll([]);
+        refetch();
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []),
+  );
+
   return (
     <>
       <Div>
@@ -94,17 +119,7 @@ const RenderWikiCardList: React.FC<RenderWikiCardListProps> = ({
             onEndReached={onEndReached}
             data={wikiForInfiniteScroll || []}
             keyExtractor={item => item.id.toString()}
-            renderItem={({item}) => (
-              <WikiCard
-                onPress={w =>
-                  navigation.navigate('WikiStack', {
-                    screen: 'WikiDetail',
-                    params: {id: w.id},
-                  })
-                }
-                wiki={item}
-              />
-            )}
+            renderItem={({item}) => <WikiCard wiki={item} />}
           />
         ) : !wikiForInfiniteScroll.length ? (
           <Text fontSize={16} textAlign="center">
