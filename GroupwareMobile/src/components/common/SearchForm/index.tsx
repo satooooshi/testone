@@ -1,17 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {useGetTagsBySearchTarget} from '../../../hooks/tag/useGetTagsBySearchTarget';
-import {KeyboardAvoidingView} from 'react-native';
-import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
-import {
-  Button,
-  Div,
-  Icon,
-  Input,
-  Modal,
-  Overlay,
-  Tag,
-} from 'react-native-magnus';
-import {useAPIGetTag} from '../../../hooks/api/tag/useAPIGetTag';
+import {Button, Div, Icon, Input, Overlay, Tag} from 'react-native-magnus';
 import {useSelectedTags} from '../../../hooks/tag/useSelectedTags';
 import {useTagType} from '../../../hooks/tag/useTagType';
 import {AllTag} from '../../../types';

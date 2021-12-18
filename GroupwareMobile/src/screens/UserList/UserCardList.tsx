@@ -1,11 +1,14 @@
-import {useIsFocused, useNavigation} from '@react-navigation/native';
-import React, {Dispatch, SetStateAction, useEffect, useRef} from 'react';
+import {useNavigation} from '@react-navigation/native';
+import React, {useEffect, useRef, useState} from 'react';
 import {FlatList} from 'react-native';
 import {Div, Dropdown, Text} from 'react-native-magnus';
 import {ActivityIndicator} from 'react-native-paper';
 import DropdownOpenerButton from '../../components/common/DropdownOpenerButton';
 import UserCard from '../../components/users/UserCard';
-import {SearchQueryToGetUsers} from '../../hooks/api/user/useAPISearchUsers';
+import {
+  SearchQueryToGetUsers,
+  useAPISearchUsers,
+} from '../../hooks/api/user/useAPISearchUsers';
 import {userListStyles} from '../../styles/screen/user/userList.style';
 import {User, UserRoleInApp} from '../../types';
 import {UsersListNavigationProps} from '../../types/navigator/drawerScreenProps';
@@ -16,23 +19,25 @@ import {
 
 type UserCardListProps = {
   userRole: UserRoleInApp;
-  searchResult: User[];
-  searchQuery: SearchQueryToGetUsers;
-  setSearchQuery: Dispatch<SetStateAction<SearchQueryToGetUsers>>;
-  isLoading: boolean;
-  setUsers: Dispatch<SetStateAction<User[]>>;
+  word: string;
+  tag: string;
 };
 
-const UserCardList: React.FC<UserCardListProps> = ({
-  userRole,
-  searchResult,
-  searchQuery,
-  setSearchQuery,
-  isLoading,
-  setUsers,
-}) => {
+const UserCardList: React.FC<UserCardListProps> = ({userRole, word, tag}) => {
+  const [searchQuery, setSearchQuery] = useState<SearchQueryToGetUsers>({
+    page: '1',
+  });
+  const {data: users, isLoading} = useAPISearchUsers({
+    ...searchQuery,
+    role: userRole !== 'All' ? userRole : undefined,
+    page: searchQuery?.page || '1',
+    word,
+    tag,
+  });
+  const [usersForInfiniteScroll, setUsersForInfiniteScroll] = useState<User[]>(
+    [],
+  );
   const navigation = useNavigation<UsersListNavigationProps>();
-  const isFocused = useIsFocused();
   const sortDropdownRef = useRef<any | null>(null);
   const durationDropdownRef = useRef<any | null>(null);
 
@@ -41,15 +46,15 @@ const UserCardList: React.FC<UserCardListProps> = ({
   };
 
   useEffect(() => {
-    if (isFocused) {
-      setUsers([]);
-      if (userRole === 'All') {
-        setSearchQuery(q => ({...q, role: undefined}));
-      } else {
-        setSearchQuery(q => ({...q, role: userRole}));
-      }
+    if (users?.users) {
+      setUsersForInfiniteScroll(u => {
+        if (u.length) {
+          return [...u, ...users.users];
+        }
+        return users?.users;
+      });
     }
-  }, [isFocused, setSearchQuery, setUsers, userRole]);
+  }, [users?.users]);
 
   const sortDropdownButtonName = () => {
     switch (searchQuery.sort) {
@@ -145,9 +150,9 @@ const UserCardList: React.FC<UserCardListProps> = ({
           </Dropdown.Option>
         </Dropdown>
       </Div>
-      {searchResult?.length ? (
+      {usersForInfiniteScroll?.length ? (
         <FlatList
-          data={searchResult}
+          data={usersForInfiniteScroll}
           onEndReached={onEndReached}
           contentContainerStyle={userListStyles.flatlist}
           keyExtractor={item => item.id.toString()}
@@ -161,8 +166,8 @@ const UserCardList: React.FC<UserCardListProps> = ({
                     params: {id: u.id},
                   })
                 }
-                onPressTag={tag =>
-                  setSearchQuery(q => ({...q, tag: tag.id.toString()}))
+                onPressTag={t =>
+                  setSearchQuery(q => ({...q, tag: t.id.toString()}))
                 }
                 user={u}
               />
