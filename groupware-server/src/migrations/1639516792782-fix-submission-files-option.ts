@@ -16,6 +16,9 @@ export class fixSubmissionFilesOption1639516792782
       `ALTER TABLE submission_files CHANGE url url varchar(2083) NOT NULL DEFAULT ''`,
     );
     await queryRunner.query(
+      `DELETE FROM submission_files WHERE event_id IS NULL`,
+    );
+    await queryRunner.query(
       `ALTER TABLE submission_files CHANGE event_id event_id int NOT NULL`,
     );
     await queryRunner.query(
