@@ -1,4 +1,5 @@
 import React, {useEffect, useState} from 'react';
+import {useGetTagsBySearchTarget} from '../../../hooks/tag/useGetTagsBySearchTarget';
 import {KeyboardAvoidingView} from 'react-native';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import {
@@ -22,7 +23,10 @@ export type SearchFormValue = {
   selectedTags: AllTag[];
 };
 
+export type SearchTarget = 'user' | 'other';
+
 type SearchFormProps = {
+  searchTarget: SearchTarget;
   defaultValue?: SearchFormValue;
   isVisible: boolean;
   onCloseModal: () => void;
@@ -31,13 +35,14 @@ type SearchFormProps = {
 };
 
 const SearchForm: React.FC<SearchFormProps> = ({
+  searchTarget,
   defaultValue,
   isVisible,
   onCloseModal,
   onSubmit,
   defaultSelectedTagIds = [],
 }) => {
-  const {data: tags} = useAPIGetTag();
+  const {data: tags} = useGetTagsBySearchTarget(searchTarget)();
   const [word, setWord] = useState(defaultValue?.word || '');
   const [visibleTagModal, setVisibleTagModal] = useState(false);
   const {selectedTags, toggleTag, isSelected, setSelectedTags} =
@@ -113,6 +118,7 @@ const SearchForm: React.FC<SearchFormProps> = ({
         <Div flexDir="row" flexWrap="wrap">
           {selectedTags.map(t => (
             <Tag
+              key={t.id}
               fontSize={'lg'}
               h={28}
               py={0}

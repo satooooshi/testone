@@ -109,6 +109,7 @@ const EventCardList: React.FC<EventCardListProps> = ({
         />
       ) : null}
       <SearchForm
+        searchTarget="other"
         isVisible={visibleSearchFormModal}
         onCloseModal={() => setVisibleSearchFormModal(false)}
         onSubmit={values => {
