@@ -64,6 +64,7 @@ import {generateClientURL} from '../../../utils/url';
 import {Tab} from '../../../components/Header/HeaderTemplate';
 import AutoLinkedText from '../../../components/common/AutoLinkedText';
 import {isFinishedEvent} from '../../../utils/factory/event/isFinishedEvent';
+import {isEditableEvent} from '../../../utils/factory/event/isCreatableEvent';
 
 const EventDetail: React.FC = () => {
   const route = useRoute<EventDetailRouteProps>();
@@ -283,9 +284,17 @@ const EventDetail: React.FC = () => {
         tabs={tabs}
         title="イベント詳細"
         activeTabName="一覧に戻る"
-        rightButtonName="イベント編集"
+        rightButtonName={
+          eventInfo && isEditableEvent(eventInfo, user)
+            ? 'イベント編集'
+            : undefined
+        }
         screenForBack="EventList"
-        onPressRightButton={() => setEventFormModal(true)}
+        onPressRightButton={
+          eventInfo && isEditableEvent(eventInfo, user)
+            ? () => setEventFormModal(true)
+            : undefined
+        }
       />
       <Overlay visible={screenLoading} p="xl">
         <ActivityIndicator />

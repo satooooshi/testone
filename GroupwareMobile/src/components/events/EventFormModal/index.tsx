@@ -44,6 +44,8 @@ import {magnusDropdownOptions} from '../../../utils/factory/magnusDropdownOption
 import {useAPIGetTag} from '../../../hooks/api/tag/useAPIGetTag';
 import {useAPIGetUsers} from '../../../hooks/api/user/useAPIGetUsers';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+import {isCreatableEvent} from '../../../utils/factory/event/isCreatableEvent';
+import {useAuthenticate} from '../../../contexts/useAuthenticate';
 
 type CustomModalProps = Omit<ModalProps, 'children'>;
 
@@ -61,6 +63,7 @@ type DateTimeModalStateValue = {
 
 const EventFormModal: React.FC<EventFormModalProps> = props => {
   const {onCloseModal, event, onSubmit, type} = props;
+  const {user} = useAuthenticate();
   const dropdownRef = useRef<any | null>(null);
   const {data: tags} = useAPIGetTag();
   const {data: users} = useAPIGetUsers();
@@ -74,7 +77,7 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
       .set({hour: 19, minute: 0})
       .toJSDate(),
     endAt: DateTime.now().plus({days: 1}).set({hour: 21, minute: 0}).toJSDate(),
-    type: EventType.STUDY_MEETING,
+    type: EventType.CLUB,
     imageURL: '',
     chatNeeded: false,
     hostUsers: [],
@@ -409,51 +412,79 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
             />
           </Div>
           <Dropdown ref={dropdownRef} title="タイプの選択">
-            <Dropdown.Option
-              {...magnusDropdownOptions}
-              onPress={() =>
-                setNewEvent(e => ({
-                  ...e,
-                  type: EventType.IMPRESSIVE_UNIVERSITY,
-                }))
-              }
-              value={EventType.IMPRESSIVE_UNIVERSITY}>
-              {eventTypeNameFactory(EventType.IMPRESSIVE_UNIVERSITY)}
-            </Dropdown.Option>
-            <Dropdown.Option
-              {...magnusDropdownOptions}
-              onPress={() =>
-                setNewEvent(e => ({...e, type: EventType.STUDY_MEETING}))
-              }
-              value={EventType.STUDY_MEETING}>
-              {eventTypeNameFactory(EventType.STUDY_MEETING)}
-            </Dropdown.Option>
-            <Dropdown.Option
-              {...magnusDropdownOptions}
-              onPress={() => setNewEvent(e => ({...e, type: EventType.BOLDAY}))}
-              value={EventType.BOLDAY}>
-              {eventTypeNameFactory(EventType.BOLDAY)}
-            </Dropdown.Option>
-            <Dropdown.Option
-              {...magnusDropdownOptions}
-              onPress={() => setNewEvent(e => ({...e, type: EventType.COACH}))}
-              value={EventType.COACH}>
-              {eventTypeNameFactory(EventType.COACH)}
-            </Dropdown.Option>
-            <Dropdown.Option
-              {...magnusDropdownOptions}
-              onPress={() => setNewEvent(e => ({...e, type: EventType.CLUB}))}
-              value={EventType.CLUB}>
-              {eventTypeNameFactory(EventType.CLUB)}
-            </Dropdown.Option>
-            <Dropdown.Option
-              {...magnusDropdownOptions}
-              onPress={() =>
-                setNewEvent(e => ({...e, type: EventType.SUBMISSION_ETC}))
-              }
-              value={EventType.SUBMISSION_ETC}>
-              {eventTypeNameFactory(EventType.SUBMISSION_ETC)}
-            </Dropdown.Option>
+            {isCreatableEvent(EventType.IMPRESSIVE_UNIVERSITY, user?.role) ? (
+              <Dropdown.Option
+                {...magnusDropdownOptions}
+                onPress={() =>
+                  setNewEvent(e => ({
+                    ...e,
+                    type: EventType.IMPRESSIVE_UNIVERSITY,
+                  }))
+                }
+                value={EventType.IMPRESSIVE_UNIVERSITY}>
+                {eventTypeNameFactory(EventType.IMPRESSIVE_UNIVERSITY)}
+              </Dropdown.Option>
+            ) : (
+              <></>
+            )}
+            {isCreatableEvent(EventType.STUDY_MEETING, user?.role) ? (
+              <Dropdown.Option
+                {...magnusDropdownOptions}
+                onPress={() =>
+                  setNewEvent(e => ({...e, type: EventType.STUDY_MEETING}))
+                }
+                value={EventType.STUDY_MEETING}>
+                {eventTypeNameFactory(EventType.STUDY_MEETING)}
+              </Dropdown.Option>
+            ) : (
+              <></>
+            )}
+            {isCreatableEvent(EventType.BOLDAY, user?.role) ? (
+              <Dropdown.Option
+                {...magnusDropdownOptions}
+                onPress={() =>
+                  setNewEvent(e => ({...e, type: EventType.BOLDAY}))
+                }
+                value={EventType.BOLDAY}>
+                {eventTypeNameFactory(EventType.BOLDAY)}
+              </Dropdown.Option>
+            ) : (
+              <></>
+            )}
+            {isCreatableEvent(EventType.COACH, user?.role) ? (
+              <Dropdown.Option
+                {...magnusDropdownOptions}
+                onPress={() =>
+                  setNewEvent(e => ({...e, type: EventType.COACH}))
+                }
+                value={EventType.COACH}>
+                {eventTypeNameFactory(EventType.COACH)}
+              </Dropdown.Option>
+            ) : (
+              <></>
+            )}
+            {isCreatableEvent(EventType.CLUB, user?.role) ? (
+              <Dropdown.Option
+                {...magnusDropdownOptions}
+                onPress={() => setNewEvent(e => ({...e, type: EventType.CLUB}))}
+                value={EventType.CLUB}>
+                {eventTypeNameFactory(EventType.CLUB)}
+              </Dropdown.Option>
+            ) : (
+              <></>
+            )}
+            {isCreatableEvent(EventType.SUBMISSION_ETC, user?.role) ? (
+              <Dropdown.Option
+                {...magnusDropdownOptions}
+                onPress={() =>
+                  setNewEvent(e => ({...e, type: EventType.SUBMISSION_ETC}))
+                }
+                value={EventType.SUBMISSION_ETC}>
+                {eventTypeNameFactory(EventType.SUBMISSION_ETC)}
+              </Dropdown.Option>
+            ) : (
+              <></>
+            )}
           </Dropdown>
           {newEvent.imageURL ? (
             <Image

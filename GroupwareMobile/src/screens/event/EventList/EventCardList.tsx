@@ -15,6 +15,8 @@ import SearchFormOpenerButton from '../../../components/common/SearchForm/Search
 import SearchForm from '../../../components/common/SearchForm';
 import EventFormModal from '../../../components/events/EventFormModal';
 import {useAPICreateEvent} from '../../../hooks/api/event/useAPICreateEvent';
+import {isEventCreatableUser} from '../../../utils/factory/event/isCreatableEvent';
+import {useAuthenticate} from '../../../contexts/useAuthenticate';
 
 type EventCardListProps = {
   status: EventStatus;
@@ -27,6 +29,7 @@ const EventCardList: React.FC<EventCardListProps> = ({
   visibleEventFormModal,
   hideEventFormModal,
 }) => {
+  const {user} = useAuthenticate();
   const {partOfSearchQuery, setPartOfSearchQuery} =
     useEventCardListSearchQuery();
   const {mutate: saveEvent} = useAPICreateEvent({
@@ -97,12 +100,14 @@ const EventCardList: React.FC<EventCardListProps> = ({
 
   return (
     <>
-      <EventFormModal
-        type={partOfSearchQuery.type || undefined}
-        isVisible={visibleEventFormModal}
-        onCloseModal={hideEventFormModal}
-        onSubmit={event => saveEvent(event)}
-      />
+      {isEventCreatableUser(user?.role) ? (
+        <EventFormModal
+          type={partOfSearchQuery.type || undefined}
+          isVisible={visibleEventFormModal}
+          onCloseModal={hideEventFormModal}
+          onSubmit={event => saveEvent(event)}
+        />
+      ) : null}
       <SearchForm
         isVisible={visibleSearchFormModal}
         onCloseModal={() => setVisibleSearchFormModal(false)}
