@@ -19,6 +19,7 @@ const TextEditor: React.FC<TextEditorProps> = ({
   initialBody,
   onChange,
 }) => {
+  const [height, setHeight] = useState<number>(100);
   const markdownit = new MarkdownIt();
   const quillRef = useRef<QuillEditor | null>(null);
 
@@ -43,7 +44,7 @@ const TextEditor: React.FC<TextEditorProps> = ({
             ? initialBody
             : undefined
         }
-        style={{...textEditorStyles.quillEditor, minHeight: 300}}
+        style={{...textEditorStyles.quillEditor, height}}
         quill={{
           // not required just for to show how to pass this props
           placeholder: '本文を入力',
@@ -52,6 +53,9 @@ const TextEditor: React.FC<TextEditorProps> = ({
           },
           theme: 'snow', // this is default value
         }}
+        onDimensionsChange={({height: changedHeight}) =>
+          setHeight(changedHeight)
+        }
         onHtmlChange={({html}) => onChange(html)}
       />
       <QuillToolbar
