@@ -11,7 +11,6 @@ import {
 import {
   Div,
   Icon,
-  Image,
   Text,
   Modal as MagnusModal,
   Button,
@@ -274,29 +273,6 @@ const Chat: React.FC = () => {
     return false;
   };
 
-  const downloadFile = async (message: ChatMessage) => {
-    const date = new Date();
-    let PictureDir = fs.dirs.DocumentDir;
-    let options = {
-      fileCache: true,
-      addAndroidDownloads: {
-        useDownloadManager: true, // setting it to true will use the device's native download manager and will be shown in the notification bar.
-        notification: true,
-        description: 'ファイルをダウンロードします',
-        path:
-          PictureDir +
-          '/me_' +
-          Math.floor(date.getTime() + date.getSeconds() / 2), // this is the path where your downloaded file will live in
-      },
-      path:
-        PictureDir +
-        '/me_' +
-        Math.floor(date.getTime() + date.getSeconds() / 2), // this is the path where your downloaded file will live in
-    };
-    const {path} = await config(options).fetch('GET', message.content);
-    FileViewer.open(path());
-  };
-
   const numbersOfRead = (message: ChatMessage) => {
     return (
       lastReadChatTime?.filter(time => time.readTime >= message.createdAt)
@@ -397,7 +373,6 @@ const Chat: React.FC = () => {
         onLongPress={() => setLongPressedMgg(message)}
         onPressImage={() => showImageOnModal(message.content)}
         onPressVideo={() => playVideoOnModal(message.content)}
-        onPressFile={() => downloadFile(message)}
         onPressReaction={r =>
           r.isSender
             ? handleDeleteReaction(r)
@@ -625,7 +600,7 @@ const Chat: React.FC = () => {
         )}
       />
       <HeaderWithIconButton
-        title="チャット"
+        title={room?.name}
         enableBackButton={true}
         screenForBack={'RoomList'}
         icon={headerRightIcon}

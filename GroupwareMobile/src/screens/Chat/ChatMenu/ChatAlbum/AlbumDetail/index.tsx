@@ -75,19 +75,12 @@ const AlbumDetail: React.FC = () => {
     setImageModal(true);
   };
 
-  useFocusEffect(
-    useCallback(() => {
-      setImagesForInfiniteScroll([]);
-      refetch();
-    }, [refetch]),
-  );
-
   useEffect(() => {
     if (data?.images?.length) {
       setImagesForInfiniteScroll(n => {
         if (
           n.length &&
-          new Date(n[n.length - 1].createdAt) >
+          new Date(n[n.length - 1].createdAt) <
             new Date(data.images[0].createdAt)
         ) {
           return [...n, ...data?.images];
@@ -100,6 +93,7 @@ const AlbumDetail: React.FC = () => {
   return (
     <WholeContainer>
       <HeaderWithTextButton
+        enableBackButton={true}
         title={album.title}
         rightButtonName="タイトルを編集"
         onPressRightButton={() => setEditModal(true)}
@@ -163,10 +157,10 @@ const AlbumDetail: React.FC = () => {
         w={60}>
         <Icon
           fontSize={'6xl'}
-          name="pluscircle"
+          name="plus"
           rounded="circle"
-          color="purple600"
-          bg="white"
+          color="white"
+          fontFamily="Feather"
         />
       </Button>
       <FlatList

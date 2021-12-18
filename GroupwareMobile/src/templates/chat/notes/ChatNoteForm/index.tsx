@@ -90,6 +90,7 @@ const ChatNoteForm: React.FC<ChatNoteFormProps> = ({
       <HeaderWithTextButton
         title="ノート"
         rightButtonName={rightButtonNameOnHeader}
+        enableBackButton={true}
         onPressRightButton={() => handleSubmit()}
       />
       <ImageView
@@ -141,6 +142,7 @@ const ChatNoteForm: React.FC<ChatNoteFormProps> = ({
           placeholder="今なにしてる？"
           value={values.content}
           onChangeText={t => setValues(v => ({...v, content: t}))}
+          textAlignVertical="top"
           style={tailwind(' h-full p-2')}
           autoCapitalize={'none'}
         />
