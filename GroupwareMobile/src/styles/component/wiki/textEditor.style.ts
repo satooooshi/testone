@@ -9,6 +9,6 @@ export const textEditorStyles = StyleSheet.create({
   },
   quillEditor: {
     flex: 1,
-    minHeight: 100,
+    minHeight: 200,
   },
 });

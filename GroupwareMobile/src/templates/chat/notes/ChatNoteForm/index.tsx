@@ -16,6 +16,7 @@ import {
 } from '../../../../types';
 import {uploadImageFromGallery} from '../../../../utils/cropImage/uploadImageFromGallery';
 import ImageView from 'react-native-image-viewing';
+import DownloadIcon from '../../../../components/common/DownLoadIcon';
 
 type ChatNoteFormProps = {
   rightButtonNameOnHeader: string;
@@ -89,6 +90,7 @@ const ChatNoteForm: React.FC<ChatNoteFormProps> = ({
       <HeaderWithTextButton
         title="ノート"
         rightButtonName={rightButtonNameOnHeader}
+        enableBackButton={true}
         onPressRightButton={() => handleSubmit()}
       />
       <ImageView
@@ -99,6 +101,11 @@ const ChatNoteForm: React.FC<ChatNoteFormProps> = ({
         onRequestClose={() => setImageModal(false)}
         swipeToCloseEnabled={false}
         doubleTapToZoomEnabled={true}
+        FooterComponent={({imageIndex}) => (
+          <Div position="absolute" bottom={5} right={5}>
+            <DownloadIcon url={images[imageIndex].uri} />
+          </Div>
+        )}
       />
       <KeyboardAwareScrollView
         contentContainerStyle={tailwind('h-full bg-white')}
@@ -135,6 +142,7 @@ const ChatNoteForm: React.FC<ChatNoteFormProps> = ({
           placeholder="今なにしてる？"
           value={values.content}
           onChangeText={t => setValues(v => ({...v, content: t}))}
+          textAlignVertical="top"
           style={tailwind(' h-full p-2')}
           autoCapitalize={'none'}
         />

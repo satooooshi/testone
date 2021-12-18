@@ -1,6 +1,11 @@
 import React from 'react';
-import {FlatList, TouchableOpacity, useWindowDimensions} from 'react-native';
-import {Image, Text, Div, Avatar, Icon, Tag} from 'react-native-magnus';
+import {
+  FlatList,
+  TouchableHighlight,
+  TouchableOpacity,
+  useWindowDimensions,
+} from 'react-native';
+import {Image, Text, Div, Tag} from 'react-native-magnus';
 import {useTagType} from '../../../hooks/tag/useTagType';
 import {userCardStyles} from '../../../styles/component/user/userCard.style';
 import {TagType, User, UserTag} from '../../../types';
@@ -8,6 +13,7 @@ import {grayColor, darkFontColor} from '../../../utils/colors';
 import {tagTypeNameFactory} from '../../../utils/factory/tag/tagTypeNameFactory';
 import {tagColorFactory} from '../../../utils/factory/tagColorFactory';
 import {userNameFactory} from '../../../utils/factory/userNameFactory';
+import UserAvatar from '../../common/UserAvatar';
 
 type UserCardProps = {
   user: User;
@@ -43,19 +49,16 @@ const UserCard: React.FC<UserCardProps> = ({
   };
 
   return (
-    <TouchableOpacity onPress={onPress}>
-      <Div bg={grayColor} w={windowWidth * 0.9} rounded="md" shadow="md">
+    <TouchableHighlight underlayColor="none" onPress={onPress}>
+      <Div
+        bg={grayColor}
+        w={windowWidth * 0.9}
+        rounded="md"
+        shadow="md"
+        borderWidth={1}
+        borderColor={'gray500'}>
         <Div px="xs" justifyContent="space-between" flexDir="row">
-          <Image
-            source={
-              user.avatarUrl
-                ? {uri: user.avatarUrl}
-                : require('../../../../assets/no-image-avatar.png')
-            }
-            w={120}
-            h={120}
-            rounded="circle"
-          />
+          <UserAvatar user={user} w={120} h={120} />
           <Div w={'60%'}>
             <Text fontSize={18} fontWeight="bold" color={darkFontColor}>
               {userNameFactory(user)}
@@ -242,7 +245,7 @@ const UserCard: React.FC<UserCardProps> = ({
           )}
         </Div>
       </Div>
-    </TouchableOpacity>
+    </TouchableHighlight>
   );
 };
 

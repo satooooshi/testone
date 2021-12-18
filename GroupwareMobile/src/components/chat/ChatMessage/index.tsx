@@ -15,6 +15,7 @@ import {
 import {dateTimeFormatterFromJSDDate} from '../../../utils/dateTimeFormatterFromJSDate';
 import {userNameFactory} from '../../../utils/factory/userNameFactory';
 import {numbersOfSameValueInKeyOfObjArr} from '../../../utils/numbersOfSameValueInKeyOfObjArr';
+import UserAvatar from '../../common/UserAvatar';
 import FileMessage from './FileMessage';
 import ImageMessage from './ImageMessage';
 import ReactionToMessage from './ReactionToMessage';
@@ -29,7 +30,6 @@ type ChatMessageItemProps = {
   onLongPress: () => void;
   onPressImage: () => void;
   onPressVideo: () => void;
-  onPressFile: () => void;
   onPressReaction: (reaction: ChatMessageReaction) => void;
   onLongPressReation: (reaction: ChatMessageReaction) => void;
   deletedReactionIds: number[];
@@ -43,7 +43,6 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
   onLongPress,
   onPressImage,
   onPressVideo,
-  onPressFile,
   onPressReaction,
   onLongPressReation,
   deletedReactionIds,
@@ -132,11 +131,7 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
                 onLongPress={onLongPress}
               />
             ) : message.type === ChatMessageType.OTHER_FILE ? (
-              <FileMessage
-                message={message}
-                onPress={onPressFile}
-                onLongPress={onLongPress}
-              />
+              <FileMessage message={message} onLongPress={onLongPress} />
             ) : null}
             {!message.isSender && timesAndReadCounts}
           </Div>
@@ -150,17 +145,9 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
               })
             }
             underlayColor="none">
-            <Image
-              source={
-                message?.sender?.avatarUrl
-                  ? {uri: message?.sender?.avatarUrl}
-                  : require('../../../../assets/no-image-avatar.png')
-              }
-              h={40}
-              w={40}
-              rounded="circle"
-              mr="xs"
-            />
+            <Div mr="xs">
+              <UserAvatar h={40} w={40} user={message?.sender} />
+            </Div>
           </TouchableHighlight>
         ) : null}
       </Div>

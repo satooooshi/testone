@@ -1,5 +1,5 @@
 import React from 'react';
-import {Platform, TouchableHighlight} from 'react-native';
+import {Alert, Platform, TouchableHighlight} from 'react-native';
 import {Icon, Text} from 'react-native-magnus';
 import {fileIconStyles} from '../../../styles/component/common/fileIcon.style';
 import FileViewer from 'react-native-file-viewer';
@@ -13,7 +13,6 @@ type FileIconProps = {
 
 const FileIcon: React.FC<FileIconProps> = ({url, color = 'white'}) => {
   const downloadFile = async () => {
-    const date = new Date();
     let DownloadDir =
       Platform.OS === 'android' ? fs.dirs.DownloadDir : fs.dirs.DocumentDir;
     const ext = url.split(/[#?]/)[0]?.split('.')?.pop()?.trim();
@@ -25,17 +24,24 @@ const FileIcon: React.FC<FileIconProps> = ({url, color = 'white'}) => {
         path:
           DownloadDir +
           '/me_' +
-          Math.floor(date.getTime() + date.getSeconds() / 2) +
-          `.${ext}`, // this is the path where your downloaded file will live in
+          decodeURIComponent(
+            (url?.match('.+/(.+?)([?#;].*)?$') || ['', url])[1] || '',
+          ), // this is the path where your downloaded file will live in
+        appendExt: ext,
       },
       path:
         DownloadDir +
         '/me_' +
-        Math.floor(date.getTime() + date.getSeconds() / 2) +
-        `.${ext}`, // this is the path where your downloaded file will live in
+        decodeURIComponent(
+          (url?.match('.+/(.+?)([?#;].*)?$') || ['', url])[1] || '',
+        ), // this is the path where your downloaded file will live in
     };
-    const {path} = await config(options).fetch('GET', url, {type: 'photo'});
-    FileViewer.open(path());
+    const {path} = await config(options).fetch('GET', url);
+    FileViewer.open(path()).catch(err => {
+      if (err?.message === 'No app associated with this mime type') {
+        Alert.alert('このファイル形式に対応しているアプリがありません');
+      }
+    });
   };
   return (
     <TouchableHighlight

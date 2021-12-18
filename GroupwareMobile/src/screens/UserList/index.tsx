@@ -41,7 +41,8 @@ const UserList: React.FC = () => {
     const selectedTagIDs = selected?.map(t => t.id.toString());
     const tagQuery = selectedTagIDs?.join('+');
 
-    setSearchQuery(q => ({...q, ...query, tag: tagQuery || ''}));
+    setUsersForInfiniteScroll([]);
+    setSearchQuery(q => ({...q, ...query, page: '1', tag: tagQuery || ''}));
   };
 
   useEffect(() => {

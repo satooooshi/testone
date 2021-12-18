@@ -1,6 +1,17 @@
 import React, {useEffect, useState} from 'react';
-import {Button, Div, Icon, Input, Modal, Tag} from 'react-native-magnus';
 import {useGetTagsBySearchTarget} from '../../../hooks/tag/useGetTagsBySearchTarget';
+import {KeyboardAvoidingView} from 'react-native';
+import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+import {
+  Button,
+  Div,
+  Icon,
+  Input,
+  Modal,
+  Overlay,
+  Tag,
+} from 'react-native-magnus';
+import {useAPIGetTag} from '../../../hooks/api/tag/useAPIGetTag';
 import {useSelectedTags} from '../../../hooks/tag/useSelectedTags';
 import {useTagType} from '../../../hooks/tag/useTagType';
 import {AllTag} from '../../../types';
@@ -40,11 +51,15 @@ const SearchForm: React.FC<SearchFormProps> = ({
     'All',
     tags,
   );
+
   useEffect(() => {
     if (defaultSelectedTagIds.length && !selectedTags.length) {
-      setSelectedTags(previousTags =>
-        previousTags.filter(t => defaultSelectedTagIds.includes(t.id)),
+      const def = tags?.filter(t =>
+        defaultSelectedTagIds.includes(Number(t.id)),
       );
+      if (def?.length) {
+        setSelectedTags(def);
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [defaultSelectedTagIds, setSelectedTags]);
@@ -56,18 +71,18 @@ const SearchForm: React.FC<SearchFormProps> = ({
   }, [defaultValue, setSelectedTags]);
 
   return (
-    <Modal
+    <Overlay
       px={16}
       py={32}
       h={240 + selectedTags.length * 8}
-      isVisible={isVisible}>
+      visible={isVisible}>
       <Button
         bg="gray400"
         h={35}
         w={35}
         position="absolute"
-        right={-15}
-        top={-45}
+        right={-10}
+        top={-15}
         rounded="circle"
         onPress={onCloseModal}>
         <Icon color="black" name="close" />
@@ -122,7 +137,7 @@ const SearchForm: React.FC<SearchFormProps> = ({
           検索
         </Button>
       </Div>
-    </Modal>
+    </Overlay>
   );
 };
 

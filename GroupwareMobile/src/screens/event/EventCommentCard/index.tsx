@@ -1,8 +1,9 @@
-import {Div, Image, Text} from 'react-native-magnus';
+import {Div, Text} from 'react-native-magnus';
 import {User} from '../../../types';
 import {dateTimeFormatterFromJSDDate} from '../../../utils/dateTimeFormatterFromJSDate';
 import React from 'react';
 import {useWindowDimensions} from 'react-native';
+import UserAvatar from '../../../components/common/UserAvatar';
 
 type EventCommentCardProps = {
   body: string;
@@ -16,28 +17,18 @@ const EventCommentCard: React.FC<EventCommentCardProps> = ({
   writer,
 }) => {
   const {width: windowWidth} = useWindowDimensions();
-  const avatarProps = {
-    mt: 'sm',
-    mb: 'sm',
-    h: windowWidth * 0.09,
-    w: windowWidth * 0.09,
-    rounded: 'circle',
-    ...(writer.existence
-      ? {
-          source: writer.avatarUrl
-            ? {uri: writer.avatarUrl}
-            : require('../../../../assets/no-image-avatar.png'),
-        }
-      : {
-          source: require('../../../../assets/bold-mascot.png'),
-        }),
-  };
 
   return (
     <Div flexDir="column" justifyContent="space-between" mb={16}>
       <Div alignItems="center" flexDir="row" justifyContent="space-between">
         <Div flex={1} alignItems="center">
-          <Image {...avatarProps} />
+          <Div my={'sm'}>
+            <UserAvatar
+              h={windowWidth * 0.09}
+              w={windowWidth * 0.09}
+              user={writer}
+            />
+          </Div>
           <Text fontSize={12} color="gray800">
             {writer.existence
               ? writer.lastName + ' ' + writer.firstName

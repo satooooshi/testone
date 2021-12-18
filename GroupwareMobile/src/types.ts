@@ -356,3 +356,18 @@ export interface NotificationDevice {
   createdAt: Date;
   updatedAt: Date;
 }
+export interface EventIntroduction {
+  type: EventType;
+  title: string;
+  description: string;
+  imageUrl: string;
+  subImages: EventIntroductionSubImage[];
+  createdAt: Date;
+  updatedAt: Date;
+}
+export interface EventIntroductionSubImage {
+  eventIntruduction: EventIntroduction;
+  imageUrl: string;
+  createdAt: Date;
+  updatedAt: Date;
+}

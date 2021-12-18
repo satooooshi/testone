@@ -78,7 +78,7 @@ const RoomList: React.FC<RoomListProps> = ({
       limit: (20 * Number(page)).toString(),
     },
     {
-      refetchInterval: 3000,
+      refetchInterval: 1000,
       onSuccess: (data) => {
         stateRefreshNeeded(data.rooms);
       },

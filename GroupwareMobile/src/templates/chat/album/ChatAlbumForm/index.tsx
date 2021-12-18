@@ -17,6 +17,7 @@ import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import {Button, Div, Icon, Image, Input, Text} from 'react-native-magnus';
 import tailwind from 'tailwind-rn';
 import {dateTimeFormatterFromJSDDate} from '../../../../utils/dateTimeFormatterFromJSDate';
+import DownloadIcon from '../../../../components/common/DownLoadIcon';
 
 type ChatAlbumFormProps = {
   album?: ChatAlbum;
@@ -75,11 +76,22 @@ const ChatAlbumForm: React.FC<ChatAlbumFormProps> = ({
     }
   };
 
+  const removeImage = (image: Partial<ChatAlbumImage>) => {
+    if (!image.imageURL) {
+      return;
+    }
+    setValues(v => ({
+      ...v,
+      images: v.images?.filter(i => i.imageURL !== image.imageURL) || [],
+    }));
+  };
+
   return (
     <WholeContainer>
       <HeaderWithTextButton
         title="アルバム"
-        rightButtonName="投稿"
+        enableBackButton={true}
+        rightButtonName={album ? '更新' : '投稿'}
         onPressRightButton={() => handleSubmit()}
       />
       <ImageView
@@ -90,6 +102,11 @@ const ChatAlbumForm: React.FC<ChatAlbumFormProps> = ({
         onRequestClose={() => setImageModal(false)}
         swipeToCloseEnabled={false}
         doubleTapToZoomEnabled={true}
+        FooterComponent={({imageIndex}) => (
+          <Div position="absolute" bottom={5} right={5}>
+            <DownloadIcon url={images[imageIndex].uri} />
+          </Div>
+        )}
       />
       <KeyboardAwareScrollView
         contentContainerStyle={tailwind('h-full bg-white')}
@@ -116,13 +133,24 @@ const ChatAlbumForm: React.FC<ChatAlbumFormProps> = ({
               key={i.id}
               underlayColor="none"
               onPress={() => i.imageURL && handlePressImage(i.imageURL)}>
-              <Image
-                source={{uri: i.imageURL}}
-                w={windowWidth / 3}
-                h={windowWidth / 3}
-                borderWidth={0.5}
-                borderColor={'white'}
-              />
+              <>
+                <Button
+                  position="absolute"
+                  zIndex={100}
+                  top={-16}
+                  right={-16}
+                  bg="transparent"
+                  onPress={() => removeImage(i)}>
+                  <Icon name="close" color="white" fontSize={32} />
+                </Button>
+                <Image
+                  source={{uri: i.imageURL}}
+                  w={windowWidth / 3}
+                  h={windowWidth / 3}
+                  borderWidth={0.5}
+                  borderColor={'white'}
+                />
+              </>
             </TouchableHighlight>
           ))}
         </Div>

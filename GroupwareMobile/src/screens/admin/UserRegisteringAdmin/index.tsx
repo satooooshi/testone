@@ -40,6 +40,9 @@ import {
 } from '../../../utils/dropdown/helper';
 import {userNameFactory} from '../../../utils/factory/userNameFactory';
 import {userRoleNameFactory} from '../../../utils/factory/userRoleNameFactory';
+import {formikErrorMsgFactory} from '../../../utils/factory/formikEroorMsgFactory';
+import {createUserSchema} from '../../../utils/validation/schema';
+import UserAvatar from '../../../components/common/UserAvatar';
 
 const initialValues: Partial<User> = {
   email: '',
@@ -72,13 +75,23 @@ const UserRegisteringAdmin: React.FC = () => {
       }
     },
   });
-  const {values, setValues, handleSubmit, resetForm} = useFormik<Partial<User>>(
-    {
-      initialValues: initialValues,
-      enableReinitialize: true,
-      onSubmit: v => register(v),
-    },
-  );
+  const {values, setValues, handleSubmit, validateForm, resetForm} = useFormik<
+    Partial<User>
+  >({
+    initialValues: initialValues,
+    validationSchema: createUserSchema,
+    enableReinitialize: true,
+    onSubmit: v => register(v),
+  });
+  const checkValidateErrors = async () => {
+    const errors = await validateForm();
+    const messages = formikErrorMsgFactory(errors);
+    if (messages) {
+      Alert.alert(messages);
+    } else {
+      handleSubmit();
+    }
+  };
   const {width: windowWidth} = useWindowDimensions();
   const {data: tags} = useAPIGetUserTag();
   const [visibleTagModal, setVisibleTagModal] = useState(false);
@@ -174,7 +187,7 @@ const UserRegisteringAdmin: React.FC = () => {
         bottom={10}
         alignSelf="flex-end"
         rounded="circle"
-        onPress={() => handleSubmit()}>
+        onPress={() => checkValidateErrors()}>
         <Icon color="white" name="check" fontSize={32} />
       </Button>
       <Dropdown {...defaultDropdownProps} ref={dropdownRef}>
@@ -227,7 +240,7 @@ const UserRegisteringAdmin: React.FC = () => {
         <TouchableOpacity onPress={handleUploadImage}>
           <Image
             alignSelf="center"
-            mt={'lg'}
+            my={'lg'}
             h={windowWidth * 0.6}
             w={windowWidth * 0.6}
             source={
@@ -236,7 +249,6 @@ const UserRegisteringAdmin: React.FC = () => {
                 : require('../../../../assets/no-image-avatar.png')
             }
             rounded="circle"
-            mb={'lg'}
           />
         </TouchableOpacity>
         <Div mb="lg">

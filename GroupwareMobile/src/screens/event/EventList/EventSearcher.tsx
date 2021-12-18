@@ -5,9 +5,10 @@ import HeaderWithTextButton from '../../../components/Header';
 import {Tab} from '../../../components/Header/HeaderTemplate';
 import WholeContainer from '../../../components/WholeContainer';
 import {useEventCardListSearchQuery} from '../../../contexts/event/useEventSearchQuery';
-import {SearchQueryToGetEvents} from '../../../hooks/api/event/useAPIGetEventList';
-import {AllTag, EventType} from '../../../types';
+import {useAuthenticate} from '../../../contexts/useAuthenticate';
+import {EventType} from '../../../types';
 import {EventListRouteProps} from '../../../types/navigator/drawerScreenProps';
+import {isEventCreatableUser} from '../../../utils/factory/event/isCreatableEvent';
 import {eventTypeColorFactory} from '../../../utils/factory/eventTypeColorFactory';
 import eventTypeNameFactory from '../../../utils/factory/eventTypeNameFactory';
 import EventCalendar from './EventCalendar';
@@ -16,7 +17,11 @@ import EventCardList from './EventCardList';
 const TopTab = createMaterialTopTabNavigator();
 
 const EventSearcher: React.FC = () => {
+  const {user} = useAuthenticate();
   const typePassedByRoute = useRoute<EventListRouteProps>()?.params?.type;
+  const tagPassedByRoute = useRoute<EventListRouteProps>()?.params?.tag;
+  const personalPassedByRoute =
+    useRoute<EventListRouteProps>()?.params?.personal;
   const {partOfSearchQuery, setPartOfSearchQuery} =
     useEventCardListSearchQuery();
   const [visibleEventFormModal, setEventFormModal] = useState(false);
@@ -59,19 +64,18 @@ const EventSearcher: React.FC = () => {
   ];
 
   useEffect(() => {
-    if (typePassedByRoute) {
-      const queryRefresh = (
-        query: Partial<SearchQueryToGetEvents>,
-        selectedTags?: AllTag[],
-      ) => {
-        const selectedTagIDs = selectedTags?.map(t => t.id.toString());
-        const tagQuery = selectedTagIDs?.join('+');
-
-        setPartOfSearchQuery({...query, tag: tagQuery || ''});
-      };
-      queryRefresh({type: typePassedByRoute});
+    if (typePassedByRoute && typePassedByRoute !== partOfSearchQuery.type) {
+      setPartOfSearchQuery({type: typePassedByRoute});
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [setPartOfSearchQuery, typePassedByRoute]);
+
+  useEffect(() => {
+    if (tagPassedByRoute && tagPassedByRoute !== partOfSearchQuery.tag) {
+      setPartOfSearchQuery({tag: tagPassedByRoute});
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tagPassedByRoute]);
 
   return (
     <WholeContainer>
@@ -83,11 +87,19 @@ const EventSearcher: React.FC = () => {
             ? eventTypeNameFactory(partOfSearchQuery.type)
             : 'All'
         }
-        rightButtonName="新規イベント"
-        onPressRightButton={() => setEventFormModal(true)}
+        rightButtonName={
+          isEventCreatableUser(user?.role) ? '新規イベント' : undefined
+        }
+        onPressRightButton={
+          isEventCreatableUser(user?.role)
+            ? () => setEventFormModal(true)
+            : undefined
+        }
       />
       <TopTab.Navigator
-        initialRouteName={'EventCalendar'}
+        initialRouteName={
+          personalPassedByRoute ? 'PersonalCalendar' : 'EventCalendar'
+        }
         screenOptions={{
           tabBarScrollEnabled: true,
         }}>

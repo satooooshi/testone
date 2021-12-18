@@ -394,6 +394,13 @@ export class ChatService {
     return { ...savedReaction, isSender: true };
   }
 
+  public async getRoomDetail(roomId: number) {
+    const existRoom = await this.chatGroupRepository.findOne(roomId, {
+      relations: ['members'],
+    });
+    return existRoom;
+  }
+
   public async saveLastReadChatTime(
     user: User,
     chatGroupId: number,

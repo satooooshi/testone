@@ -34,6 +34,7 @@ import UserTagAdmin from '../../screens/admin/UserTagAdmin';
 import EditRoom from '../../screens/Chat/EditRoom';
 import PostReply from '../../screens/wiki/PostReply';
 import Share from '../../screens/Chat/Share';
+import EventIntroduction from '../../screens/event/EventIntroduction';
 
 const Drawer = createDrawerNavigator();
 const Stack = createStackNavigator();
@@ -87,6 +88,11 @@ const EventStack = () => (
       options={{headerShown: false}}
     />
     <Stack.Screen
+      name="EventIntroduction"
+      component={EventIntroduction}
+      options={{headerShown: false}}
+    />
+    <Stack.Screen
       name="EventDetail"
       component={EventDetail}
       options={{headerShown: false}}
@@ -103,11 +109,6 @@ const AccountStack = () => (
   <Stack.Navigator initialRouteName="MyProfile">
     <Stack.Screen
       name="MyProfile"
-      component={AccountDetail}
-      options={{headerShown: false}}
-    />
-    <Stack.Screen
-      name="AccountDetail"
       component={AccountDetail}
       options={{headerShown: false}}
     />
@@ -154,11 +155,6 @@ const AdminStack = () => (
     <Stack.Screen
       name="UserTagAdmin"
       component={UserTagAdmin}
-      options={{headerShown: false}}
-    />
-    <Stack.Screen
-      name="AccountDetail"
-      component={AccountDetail}
       options={{headerShown: false}}
     />
     <Stack.Screen
@@ -299,7 +295,7 @@ const DrawerTab = () => {
         }}
       />
       <Drawer.Screen
-        name="Users"
+        name="UsersStack"
         component={UserListStack}
         options={{
           drawerLabel: '社員名鑑',

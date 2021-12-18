@@ -3,8 +3,14 @@ import {
   CustomPushNotificationData,
   sendPushNotifToSpecificUsers,
 } from 'src/utils/notification/sendPushNotification';
+import { genSignedURL } from 'src/utils/storage/genSignedURL';
+import { genStorageURL } from 'src/utils/storage/genStorageURL';
 import {
   AfterInsert,
+  AfterLoad,
+  AfterUpdate,
+  BeforeInsert,
+  BeforeUpdate,
   Column,
   CreateDateColumn,
   Entity,
@@ -76,6 +82,29 @@ export class ChatMessage {
   @ManyToOne(() => ChatMessage, (chatMessage) => chatMessage.id)
   @JoinColumn({ name: 'reply_parent_id' })
   replyParentMessage?: ChatMessage;
+
+  @BeforeInsert()
+  @BeforeUpdate()
+  changeToStorageURL?() {
+    if (
+      this.type === ChatMessageType.IMAGE ||
+      this.type === ChatMessageType.VIDEO
+    ) {
+      this.content = genStorageURL(this.content);
+    }
+  }
+
+  @AfterInsert()
+  @AfterLoad()
+  @AfterUpdate()
+  async changeToSignedURL?() {
+    if (
+      this.type === ChatMessageType.IMAGE ||
+      this.type === ChatMessageType.VIDEO
+    ) {
+      this.content = await genSignedURL(this.content);
+    }
+  }
 
   @AfterInsert()
   async sendPushNotification() {

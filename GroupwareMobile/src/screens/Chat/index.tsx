@@ -11,7 +11,6 @@ import {
 import {
   Div,
   Icon,
-  Image,
   Text,
   Modal as MagnusModal,
   Button,
@@ -62,6 +61,8 @@ import VideoPlayer from 'react-native-video-player';
 import ChatMessageItem from '../../components/chat/ChatMessage';
 import {ActivityIndicator} from 'react-native-paper';
 import {useAPISaveLastReadChatTime} from '../../hooks/api/chat/useAPISaveLastReadChatTime';
+import DownloadIcon from '../../components/common/DownLoadIcon';
+import UserAvatar from '../../components/common/UserAvatar';
 
 const Chat: React.FC = () => {
   const typeDropdownRef = useRef<any | null>(null);
@@ -272,29 +273,6 @@ const Chat: React.FC = () => {
     return false;
   };
 
-  const downloadFile = async (message: ChatMessage) => {
-    const date = new Date();
-    let PictureDir = fs.dirs.DocumentDir;
-    let options = {
-      fileCache: true,
-      addAndroidDownloads: {
-        useDownloadManager: true, // setting it to true will use the device's native download manager and will be shown in the notification bar.
-        notification: true,
-        description: 'ファイルをダウンロードします',
-        path:
-          PictureDir +
-          '/me_' +
-          Math.floor(date.getTime() + date.getSeconds() / 2), // this is the path where your downloaded file will live in
-      },
-      path:
-        PictureDir +
-        '/me_' +
-        Math.floor(date.getTime() + date.getSeconds() / 2), // this is the path where your downloaded file will live in
-    };
-    const {path} = await config(options).fetch('GET', message.content);
-    FileViewer.open(path());
-  };
-
   const numbersOfRead = (message: ChatMessage) => {
     return (
       lastReadChatTime?.filter(time => time.readTime >= message.createdAt)
@@ -395,7 +373,6 @@ const Chat: React.FC = () => {
         onLongPress={() => setLongPressedMgg(message)}
         onPressImage={() => showImageOnModal(message.content)}
         onPressVideo={() => playVideoOnModal(message.content)}
-        onPressFile={() => downloadFile(message)}
         onPressReaction={r =>
           r.isSender
             ? handleDeleteReaction(r)
@@ -566,17 +543,9 @@ const Chat: React.FC = () => {
               <View
                 style={tailwind('flex-row bg-white items-center px-4 mb-2')}>
                 <>
-                  <Image
-                    mr={'sm'}
-                    rounded="circle"
-                    h={64}
-                    w={64}
-                    source={
-                      item.avatarUrl
-                        ? {uri: item.avatarUrl}
-                        : require('../../../assets/no-image-avatar.png')
-                    }
-                  />
+                  <Div mr={'sm'}>
+                    <UserAvatar user={item} h={64} w={64} />
+                  </Div>
                   <Text fontSize={18}>{userNameFactory(item)}</Text>
                 </>
               </View>
@@ -625,17 +594,13 @@ const Chat: React.FC = () => {
         swipeToCloseEnabled={false}
         doubleTapToZoomEnabled={true}
         FooterComponent={({imageIndex}) => (
-          <TouchableOpacity
-            style={tailwind('absolute bottom-5 right-5')}
-            onPress={() =>
-              saveToCameraRoll({url: images[imageIndex].uri, type: 'image'})
-            }>
-            <Icon color="white" name="download" fontSize={24} />
-          </TouchableOpacity>
+          <Div position="absolute" bottom={5} right={5}>
+            <DownloadIcon url={images[imageIndex].uri} />
+          </Div>
         )}
       />
       <HeaderWithIconButton
-        title="チャット"
+        title={room?.name}
         enableBackButton={true}
         screenForBack={'RoomList'}
         icon={headerRightIcon}

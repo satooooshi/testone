@@ -7,9 +7,7 @@ import {
 } from '../../../hooks/api/event/useAPIGetEventList';
 import EventCard from '../../../components/events/EventCard';
 import {Div} from 'react-native-magnus';
-import {useNavigation} from '@react-navigation/native';
 import {AllTag, EventSchedule} from '../../../types';
-import {EventListNavigationProps} from '../../../types/navigator/drawerScreenProps';
 import tailwind from 'tailwind-rn';
 import {ActivityIndicator} from 'react-native-paper';
 import {useEventCardListSearchQuery} from '../../../contexts/event/useEventSearchQuery';
@@ -17,6 +15,8 @@ import SearchFormOpenerButton from '../../../components/common/SearchForm/Search
 import SearchForm from '../../../components/common/SearchForm';
 import EventFormModal from '../../../components/events/EventFormModal';
 import {useAPICreateEvent} from '../../../hooks/api/event/useAPICreateEvent';
+import {isEventCreatableUser} from '../../../utils/factory/event/isCreatableEvent';
+import {useAuthenticate} from '../../../contexts/useAuthenticate';
 
 type EventCardListProps = {
   status: EventStatus;
@@ -29,7 +29,7 @@ const EventCardList: React.FC<EventCardListProps> = ({
   visibleEventFormModal,
   hideEventFormModal,
 }) => {
-  const navigation = useNavigation<EventListNavigationProps>();
+  const {user} = useAuthenticate();
   const {partOfSearchQuery, setPartOfSearchQuery} =
     useEventCardListSearchQuery();
   const {mutate: saveEvent} = useAPICreateEvent({
@@ -38,6 +38,7 @@ const EventCardList: React.FC<EventCardListProps> = ({
       if (newEvent.type === partOfSearchQuery.type) {
         setSearchQuery(q => ({...q, page: '1'}));
       }
+      setPartOfSearchQuery({refetchNeeded: true});
     },
   });
   const {word, tag, type} = partOfSearchQuery;
@@ -60,6 +61,16 @@ const EventCardList: React.FC<EventCardListProps> = ({
       page: q.page ? (Number(q.page) + 1).toString() : '1',
     }));
   };
+
+  useEffect(() => {
+    if (partOfSearchQuery.refetchNeeded) {
+      setSearchQuery(q => ({
+        ...q,
+        page: '1',
+      }));
+      setPartOfSearchQuery({refetchNeeded: false});
+    }
+  }, [partOfSearchQuery.refetchNeeded, setPartOfSearchQuery]);
 
   useEffect(() => {
     if (events?.events) {
@@ -89,12 +100,14 @@ const EventCardList: React.FC<EventCardListProps> = ({
 
   return (
     <>
-      <EventFormModal
-        type={partOfSearchQuery.type || undefined}
-        isVisible={visibleEventFormModal}
-        onCloseModal={hideEventFormModal}
-        onSubmit={event => saveEvent(event)}
-      />
+      {isEventCreatableUser(user?.role) ? (
+        <EventFormModal
+          type={partOfSearchQuery.type || undefined}
+          isVisible={visibleEventFormModal}
+          onCloseModal={hideEventFormModal}
+          onSubmit={event => saveEvent(event)}
+        />
+      ) : null}
       <SearchForm
         searchTarget="other"
         isVisible={visibleSearchFormModal}
@@ -121,15 +134,7 @@ const EventCardList: React.FC<EventCardListProps> = ({
             keyExtractor={item => item.id.toString()}
             renderItem={({item: eventSchedule}) => (
               <Div mb={16}>
-                <EventCard
-                  onPress={e =>
-                    navigation.navigate('EventStack', {
-                      screen: 'EventDetail',
-                      params: {id: e.id},
-                    })
-                  }
-                  event={eventSchedule}
-                />
+                <EventCard event={eventSchedule} />
               </Div>
             )}
           />

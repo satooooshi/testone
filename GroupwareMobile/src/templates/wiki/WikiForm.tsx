@@ -273,42 +273,26 @@ const WikiForm: React.FC<WikiFormProps> = ({
       {typeDropdown}
       <KeyboardAwareScrollView
         ref={scrollRef}
+        nestedScrollEnabled={true}
         scrollEventThrottle={20}
         keyboardDismissMode={'none'}>
-        <Text fontSize={16}>タイトル</Text>
-        {errors.title && touched.title ? (
-          <Text fontSize={16} color="tomato">
-            {errors.title}
-          </Text>
-        ) : null}
-        <Input
-          placeholder="タイトルを入力してください"
-          value={newWiki.title}
-          onChangeText={text => setNewWiki(w => ({...w, title: text}))}
-          mb="sm"
-        />
-        <Div mb={8} flexDir="row" justifyContent="space-evenly">
-          <Div>
-            <Text fontSize={16} mb={4}>
-              タイプを選択
+        <Div w="90%" alignItems="center" alignSelf="center">
+          <Text fontSize={16}>タイトル</Text>
+          {errors.title && touched.title ? (
+            <Text fontSize={16} color="tomato">
+              {errors.title}
             </Text>
-            <Button
-              bg="white"
-              borderWidth={1}
-              borderColor={'#ececec'}
-              p="md"
-              color="black"
-              w={!isEdit ? windowWidth * 0.4 : windowWidth * 0.9}
-              onPress={() => typeDropdownRef.current.open()}>
-              {newWiki.type
-                ? wikiTypeNameFactory(newWiki.type, newWiki.ruleCategory)
-                : 'タイプを選択してください'}
-            </Button>
-          </Div>
-          {!isEdit && (
+          ) : null}
+          <Input
+            placeholder="タイトルを入力してください"
+            value={newWiki.title}
+            onChangeText={text => setNewWiki(w => ({...w, title: text}))}
+            mb="sm"
+          />
+          <Div mb={8} flexDir="row" justifyContent="space-evenly">
             <Div>
-              <Text fontSize={16} fontWeight="bold" mb={4}>
-                入力形式を選択
+              <Text fontSize={16} mb={4}>
+                タイプを選択
               </Text>
               <Button
                 bg="white"
@@ -316,37 +300,62 @@ const WikiForm: React.FC<WikiFormProps> = ({
                 borderColor={'#ececec'}
                 p="md"
                 color="black"
-                w={windowWidth * 0.4}
-                onPress={() => textFormatDropdownRef.current.open()}>
-                {newWiki.textFormat === 'html' ? 'デフォルト' : 'マークダウン'}
+                w={!isEdit ? windowWidth * 0.4 : windowWidth * 0.9}
+                onPress={() => typeDropdownRef.current.open()}>
+                {newWiki.type
+                  ? wikiTypeNameFactory(newWiki.type, newWiki.ruleCategory)
+                  : 'タイプを選択してください'}
               </Button>
             </Div>
-          )}
+            {!isEdit && (
+              <Div>
+                <Text fontSize={16} fontWeight="bold" mb={4}>
+                  入力形式を選択
+                </Text>
+                <Button
+                  bg="white"
+                  borderWidth={1}
+                  borderColor={'#ececec'}
+                  p="md"
+                  color="black"
+                  w={windowWidth * 0.4}
+                  onPress={() => textFormatDropdownRef.current.open()}>
+                  {newWiki.textFormat === 'html'
+                    ? 'デフォルト'
+                    : 'マークダウン'}
+                </Button>
+              </Div>
+            )}
+          </Div>
+          <Button
+            bg="green600"
+            w={'100%'}
+            mb={8}
+            onPress={() => setVisibleTagModal(true)}>
+            {newWiki.tags?.length
+              ? `${newWiki.tags?.length}個のタグ`
+              : 'タグを選択'}
+          </Button>
+          <Div flexDir="row" flexWrap="wrap" mb={8}>
+            {newWiki.tags?.map(t => (
+              <TagButton
+                key={t.id}
+                mr={4}
+                mb={8}
+                color="white"
+                bg={tagColorFactory(t.type)}>
+                {t.name}
+              </TagButton>
+            ))}
+          </Div>
+          <Button
+            mb={16}
+            bg="pink600"
+            w={'100%'}
+            onPress={() => handleSubmit()}>
+            投稿
+          </Button>
         </Div>
-        <Button
-          bg="green600"
-          w={'100%'}
-          mb={8}
-          onPress={() => setVisibleTagModal(true)}>
-          {newWiki.tags?.length
-            ? `${newWiki.tags?.length}個のタグ`
-            : 'タグを選択'}
-        </Button>
-        <Div flexDir="row" flexWrap="wrap" mb={8}>
-          {newWiki.tags?.map(t => (
-            <TagButton
-              key={t.id}
-              mr={4}
-              mb={8}
-              color="white"
-              bg={tagColorFactory(t.type)}>
-              {t.name}
-            </TagButton>
-          ))}
-        </Div>
-        <Button mb={16} bg="pink600" w={'100%'} onPress={() => handleSubmit()}>
-          投稿
-        </Button>
         {errors.body && touched.body ? (
           <Text fontSize={16} color="tomato">
             {errors.body}

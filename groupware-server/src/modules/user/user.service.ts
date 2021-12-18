@@ -229,7 +229,7 @@ export class UserService {
       .createQueryBuilder('user')
       .leftJoin('user.tags', 'tag')
       .where(
-        word && word.length !== 1
+        word && word.length > 2
           ? 'MATCH(user.firstName, user.lastName) AGAINST (:word IN NATURAL LANGUAGE MODE)'
           : '1=1',
         {
@@ -239,8 +239,8 @@ export class UserService {
       .andWhere(role ? 'user.role = :role' : '1=1', { role })
       .andWhere(verified ? 'user.verifiedAt is not null' : '1=1')
       .andWhere(
-        word.length === 1
-          ? 'CONCAT(user.firstName, user.lastName, user.email) LIKE :queryWord'
+        word.length <= 2
+          ? 'CONCAT(user.firstName, user.lastName) LIKE :queryWord'
           : '1=1',
         { queryWord: `%${word}%` },
       )

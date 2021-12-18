@@ -1,6 +1,6 @@
 import React from 'react';
 import {TouchableOpacity, useWindowDimensions} from 'react-native';
-import {Image} from 'react-native-magnus';
+import FastImage from 'react-native-fast-image';
 import {ChatMessage} from '../../../../types';
 
 type ImageMessageProps = {
@@ -17,11 +17,9 @@ const ImageMessage: React.FC<ImageMessageProps> = ({
   const {width: windowWidth} = useWindowDimensions();
   return (
     <TouchableOpacity onPress={onPress} onLongPress={onLongPress}>
-      <Image
+      <FastImage
         source={{uri: message.content}}
-        w={windowWidth * 0.6}
-        h={144}
-        rounded={'md'}
+        style={{height: 144, width: windowWidth * 0.6, borderRadius: 8}}
       />
     </TouchableOpacity>
   );

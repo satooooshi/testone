@@ -18,6 +18,7 @@ import {
 import ImageView from 'react-native-image-viewing';
 import {useAPIGetChatNotes} from '../../../../hooks/api/chat/note/useAPIGetNotes';
 import {useAPIDeleteChatNote} from '../../../../hooks/api/chat/note/useAPIDeleteChatNote';
+import DownloadIcon from '../../../../components/common/DownLoadIcon';
 
 const ChatNotes: React.FC = () => {
   const navigation = useNavigation<ChatNotesNavigationProps>();
@@ -43,13 +44,13 @@ const ChatNotes: React.FC = () => {
     noteImages: Partial<ChatNoteImage>[],
     targetImage: Partial<ChatNoteImage>,
   ) => {
-    const isNowUri = (element: ImageSource) =>
-      element.uri === targetImage.imageURL;
-    const imageSources: ImageSource[] = noteImages.reverse().map(i => ({
+    const isNowUri = (element: Partial<ChatNoteImage>) =>
+      element.imageURL === targetImage.imageURL;
+    const imageSources: ImageSource[] = noteImages.map(i => ({
       uri: i.imageURL || '',
     }));
     setImages(imageSources);
-    setNowImageIndex(images.findIndex(isNowUri));
+    setNowImageIndex(noteImages.findIndex(isNowUri));
     setImageModal(true);
   };
 
@@ -89,6 +90,11 @@ const ChatNotes: React.FC = () => {
         onRequestClose={() => setImageModal(false)}
         swipeToCloseEnabled={false}
         doubleTapToZoomEnabled={true}
+        FooterComponent={({imageIndex}) => (
+          <Div position="absolute" bottom={5} right={5}>
+            <DownloadIcon url={images[imageIndex].uri} />
+          </Div>
+        )}
       />
       <HeaderWithTextButton enableBackButton={true} title="ノート" />
       <Button

@@ -1,5 +1,9 @@
-import {useNavigation, useRoute} from '@react-navigation/native';
-import React, {useEffect, useState} from 'react';
+import {
+  useFocusEffect,
+  useNavigation,
+  useRoute,
+} from '@react-navigation/native';
+import React, {useCallback, useEffect, useState} from 'react';
 import {FlatList, TouchableHighlight, useWindowDimensions} from 'react-native';
 import {
   Button,
@@ -23,6 +27,8 @@ import ImageView from 'react-native-image-viewing';
 import {darkFontColor} from '../../../../../utils/colors';
 import {useFormik} from 'formik';
 import {useAPIUpdateAlbum} from '../../../../../hooks/api/chat/album/useAPIUpdateChatAlbum';
+import FastImage from 'react-native-fast-image';
+import DownloadIcon from '../../../../../components/common/DownLoadIcon';
 
 const AlbumDetail: React.FC = () => {
   const {width: windowWidth} = useWindowDimensions();
@@ -45,7 +51,7 @@ const AlbumDetail: React.FC = () => {
       setEditModal(false);
     },
   });
-  const {data} = useAPIGetChatAlbumImages({
+  const {data, refetch} = useAPIGetChatAlbumImages({
     roomId: room.id.toString(),
     albumId: album.id.toString(),
     page: page.toString(),
@@ -74,7 +80,7 @@ const AlbumDetail: React.FC = () => {
       setImagesForInfiniteScroll(n => {
         if (
           n.length &&
-          new Date(n[n.length - 1].createdAt) >
+          new Date(n[n.length - 1].createdAt) <
             new Date(data.images[0].createdAt)
         ) {
           return [...n, ...data?.images];
@@ -84,10 +90,10 @@ const AlbumDetail: React.FC = () => {
     }
   }, [data?.images]);
 
-  console.log(data);
   return (
     <WholeContainer>
       <HeaderWithTextButton
+        enableBackButton={true}
         title={album.title}
         rightButtonName="タイトルを編集"
         onPressRightButton={() => setEditModal(true)}
@@ -128,6 +134,11 @@ const AlbumDetail: React.FC = () => {
         onRequestClose={() => setImageModal(false)}
         swipeToCloseEnabled={false}
         doubleTapToZoomEnabled={true}
+        FooterComponent={({imageIndex}) => (
+          <Div position="absolute" bottom={5} right={5}>
+            <DownloadIcon url={images[imageIndex].uri} />
+          </Div>
+        )}
       />
       <Button
         bg="purple600"
@@ -140,16 +151,16 @@ const AlbumDetail: React.FC = () => {
         onPress={() =>
           navigation.navigate('ChatStack', {
             screen: 'EditChatAlbum',
-            params: {album},
+            params: {album, room},
           })
         }
         w={60}>
         <Icon
           fontSize={'6xl'}
-          name="pluscircle"
+          name="plus"
           rounded="circle"
-          color="purple600"
-          bg="white"
+          color="white"
+          fontFamily="Feather"
         />
       </Button>
       <FlatList
@@ -198,7 +209,10 @@ const AlbumDetail: React.FC = () => {
             style={tailwind('border border-white')}
             underlayColor="none"
             onPress={() => handlePressImage(i.imageURL)}>
-            <Image w={imageWidth} h={imageWidth} source={{uri: i.imageURL}} />
+            <FastImage
+              style={{width: imageWidth, height: imageWidth}}
+              source={{uri: i.imageURL}}
+            />
           </TouchableHighlight>
         )}
       />

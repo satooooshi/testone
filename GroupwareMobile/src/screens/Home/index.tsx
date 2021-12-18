@@ -36,6 +36,7 @@ const Home: React.FC = () => {
         navigation.navigate('EventStack', {
           screen: 'EventDetail',
           params: {id: Number(id)},
+          initial: false,
         });
       } else {
         Alert.alert('情報の取得に失敗しました');
@@ -43,9 +44,10 @@ const Home: React.FC = () => {
     } else if (news.urlPath.includes('wiki')) {
       const id: string = news.urlPath.replace('/wiki/', '');
       if (typeof Number(id) === 'number') {
-        navigation.navigate('EventStack', {
-          screen: 'EventDetail',
+        navigation.navigate('WikiStack', {
+          screen: 'WikiDetail',
           params: {id: Number(id)},
+          initial: false,
         });
       } else {
         Alert.alert('情報の取得に失敗しました');
@@ -53,9 +55,10 @@ const Home: React.FC = () => {
     } else if (news.urlPath.includes('account')) {
       const id: string = news.urlPath.replace('/account/', '');
       if (typeof Number(id) === 'number') {
-        navigation.navigate('EventStack', {
-          screen: 'EventDetail',
+        navigation.navigate('UserListStack', {
+          screen: 'AccountDetail',
           params: {id: Number(id)},
+          initial: false,
         });
       } else {
         Alert.alert('情報の取得に失敗しました');
@@ -151,7 +154,7 @@ const Home: React.FC = () => {
               type="impressive_university"
               onPress={() =>
                 navigation.navigate('EventStack', {
-                  screen: 'EventList',
+                  screen: 'EventIntroduction',
                   params: {type: EventType.IMPRESSIVE_UNIVERSITY},
                 })
               }
@@ -162,7 +165,7 @@ const Home: React.FC = () => {
               type="study_meeting"
               onPress={() =>
                 navigation.navigate('EventStack', {
-                  screen: 'EventList',
+                  screen: 'EventIntroduction',
                   params: {type: EventType.STUDY_MEETING},
                 })
               }
@@ -173,7 +176,7 @@ const Home: React.FC = () => {
               type="bolday"
               onPress={() =>
                 navigation.navigate('EventStack', {
-                  screen: 'EventList',
+                  screen: 'EventIntroduction',
                   params: {type: EventType.BOLDAY},
                 })
               }
@@ -186,7 +189,7 @@ const Home: React.FC = () => {
               type="coach"
               onPress={() =>
                 navigation.navigate('EventStack', {
-                  screen: 'EventList',
+                  screen: 'EventIntroduction',
                   params: {type: EventType.COACH},
                 })
               }
@@ -197,7 +200,7 @@ const Home: React.FC = () => {
               type="club"
               onPress={() =>
                 navigation.navigate('EventStack', {
-                  screen: 'EventList',
+                  screen: 'EventIntroduction',
                   params: {type: EventType.CLUB},
                 })
               }
@@ -244,6 +247,27 @@ const Home: React.FC = () => {
                 navigation.navigate('AccountStack', {
                   screen: 'AccountDetail',
                 });
+              }}
+            />
+          </Div>
+        </Div>
+        <Div flexDir="row" justifyContent="center" alignItems="center">
+          <Div mb={8} mr={4}>
+            <PortalLinkBox
+              type="my_schedule"
+              onPress={() => {
+                navigation.navigate('EventStack', {
+                  screen: 'EventList',
+                  params: {personal: true},
+                });
+              }}
+            />
+          </Div>
+          <Div mb={8}>
+            <PortalLinkBox
+              type="safety_confirmation"
+              onPress={() => {
+                Alert.alert('2022年4月実装予定です');
               }}
             />
           </Div>

@@ -18,7 +18,6 @@ type ShareButtonProps = {
 
 const ShareButton: React.FC<ShareButtonProps> = ({urlPath, text}) => {
   const navigation = useNavigation<any>();
-  const windowWidth = useWindowDimensions().width;
   const onPress = () => {
     navigation.navigate('Share', {urlPath, text});
   };
@@ -28,9 +27,8 @@ const ShareButton: React.FC<ShareButtonProps> = ({urlPath, text}) => {
       onPress={onPress}
       style={{
         ...tailwind(
-          'bg-white rounded-md justify-center items-center w-28 h-16',
+          'bg-white rounded-md justify-center items-center h-16 px-2',
         ),
-        width: windowWidth * 0.3,
       }}>
       <>
         <Icon name="share" fontFamily="MaterialCommunityIcons" fontSize={24} />

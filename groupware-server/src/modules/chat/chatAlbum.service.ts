@@ -30,14 +30,18 @@ export class ChatAlbumService {
     private readonly storageService: StorageService,
   ) {}
   public async saveChatAlbums(dto: Partial<ChatAlbum>): Promise<ChatAlbum> {
-    const savedAlbum = await this.albumRepository.save({
-      ...dto,
-      images: undefined,
-    });
+    const savedAlbum = await this.albumRepository.save(
+      dto.id
+        ? dto
+        : {
+            ...dto,
+            images: undefined,
+          },
+    );
     if (dto.images?.length) {
       const sentImages = dto.images.map((i) => ({
         ...i,
-        imageURL: this.storageService.parseSignedURLToStorageURL(i.imageURL),
+        imageURL: i.imageURL,
         chatAlbum: savedAlbum,
       }));
 

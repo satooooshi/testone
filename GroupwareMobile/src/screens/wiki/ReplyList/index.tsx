@@ -8,6 +8,7 @@ import {userNameFactory} from '../../../utils/factory/userNameFactory';
 import {PostReplyNavigationProps} from '../../../types/navigator/drawerScreenProps';
 import {useNavigation} from '@react-navigation/native';
 import {darkFontColor} from '../../../utils/colors';
+import UserAvatar from '../../../components/common/UserAvatar';
 
 type ReplyListProps = {
   answer: QAAnswer;
@@ -49,43 +50,39 @@ const ReplyList: React.FC<ReplyListProps> = ({answer, onPressAvatar}) => {
           <Collapse.Body mb={8} h={repliesHeight}>
             <Div onLayout={e => setRepliesHeight(e.nativeEvent.layout.height)}>
               {answer.replies.length ? (
-                answer.replies.map(reply => (
-                  <>
-                    <Div flexDir="row" alignItems="center" mb={16}>
-                      <TouchableOpacity
-                        onPress={() => {
-                          if (reply.writer && reply.writer.existence) {
-                            onPressAvatar(reply.writer);
-                          }
-                        }}>
-                        <Avatar
-                          mr={8}
-                          source={
-                            reply.writer?.existence
-                              ? {uri: reply.writer?.avatarUrl}
-                              : reply.writer?.avatarUrl
-                              ? require('../../../../assets/bold-mascot.png')
-                              : require('../../../../assets/no-image-avatar.png')
-                          }
-                        />
-                      </TouchableOpacity>
-                      <Text fontSize={18} color={darkFontColor}>
-                        {userNameFactory(reply.writer)}
-                      </Text>
-                    </Div>
-                    <Div bg="white" rounded="md" p={8} mb={16}>
-                      <RenderHtml
-                        contentWidth={windowWidth * 0.9}
-                        source={{
-                          html:
-                            reply.textFormat === 'html'
-                              ? reply.body
-                              : mdParser.render(reply.body),
-                        }}
-                      />
-                    </Div>
-                  </>
-                ))
+                answer.replies.map(
+                  reply =>
+                    reply.writer && (
+                      <>
+                        <Div flexDir="row" alignItems="center" mb={16}>
+                          <TouchableOpacity
+                            onPress={() => {
+                              if (reply.writer && reply.writer.existence) {
+                                onPressAvatar(reply.writer);
+                              }
+                            }}>
+                            <Div>
+                              <UserAvatar w={64} h={64} user={reply.writer} />
+                            </Div>
+                          </TouchableOpacity>
+                          <Text fontSize={18} color={darkFontColor}>
+                            {userNameFactory(reply.writer)}
+                          </Text>
+                        </Div>
+                        <Div bg="white" rounded="md" p={8} mb={16}>
+                          <RenderHtml
+                            contentWidth={windowWidth * 0.9}
+                            source={{
+                              html:
+                                reply.textFormat === 'html'
+                                  ? reply.body
+                                  : mdParser.render(reply.body),
+                            }}
+                          />
+                        </Div>
+                      </>
+                    ),
+                )
               ) : (
                 <Text fontSize={16} textAlign="center">
                   返信を投稿してください
