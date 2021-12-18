@@ -30,7 +30,6 @@ type ChatMessageItemProps = {
   onLongPress: () => void;
   onPressImage: () => void;
   onPressVideo: () => void;
-  onPressFile: () => void;
   onPressReaction: (reaction: ChatMessageReaction) => void;
   onLongPressReation: (reaction: ChatMessageReaction) => void;
   deletedReactionIds: number[];
@@ -44,7 +43,6 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
   onLongPress,
   onPressImage,
   onPressVideo,
-  onPressFile,
   onPressReaction,
   onLongPressReation,
   deletedReactionIds,
@@ -133,11 +131,7 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
                 onLongPress={onLongPress}
               />
             ) : message.type === ChatMessageType.OTHER_FILE ? (
-              <FileMessage
-                message={message}
-                onPress={onPressFile}
-                onLongPress={onLongPress}
-              />
+              <FileMessage message={message} onLongPress={onLongPress} />
             ) : null}
             {!message.isSender && timesAndReadCounts}
           </Div>
