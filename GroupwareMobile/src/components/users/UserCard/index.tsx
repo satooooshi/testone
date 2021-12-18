@@ -1,5 +1,10 @@
 import React from 'react';
-import {FlatList, TouchableOpacity, useWindowDimensions} from 'react-native';
+import {
+  FlatList,
+  TouchableHighlight,
+  TouchableOpacity,
+  useWindowDimensions,
+} from 'react-native';
 import {Image, Text, Div, Tag} from 'react-native-magnus';
 import {useTagType} from '../../../hooks/tag/useTagType';
 import {userCardStyles} from '../../../styles/component/user/userCard.style';
@@ -44,8 +49,14 @@ const UserCard: React.FC<UserCardProps> = ({
   };
 
   return (
-    <TouchableOpacity onPress={onPress}>
-      <Div bg={grayColor} w={windowWidth * 0.9} rounded="md" shadow="md">
+    <TouchableHighlight underlayColor="none" onPress={onPress}>
+      <Div
+        bg={grayColor}
+        w={windowWidth * 0.9}
+        rounded="md"
+        shadow="md"
+        borderWidth={1}
+        borderColor={'gray500'}>
         <Div px="xs" justifyContent="space-between" flexDir="row">
           <UserAvatar user={user} w={120} h={120} />
           <Div w={'60%'}>
@@ -234,7 +245,7 @@ const UserCard: React.FC<UserCardProps> = ({
           )}
         </Div>
       </Div>
-    </TouchableOpacity>
+    </TouchableHighlight>
   );
 };
 

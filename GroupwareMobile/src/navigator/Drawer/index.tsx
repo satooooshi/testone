@@ -295,7 +295,7 @@ const DrawerTab = () => {
         }}
       />
       <Drawer.Screen
-        name="Users"
+        name="UsersStack"
         component={UserListStack}
         options={{
           drawerLabel: '社員名鑑',

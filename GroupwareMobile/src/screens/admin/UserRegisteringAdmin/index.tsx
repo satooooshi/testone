@@ -238,20 +238,18 @@ const UserRegisteringAdmin: React.FC = () => {
           width: windowWidth * 0.9,
         }}>
         <TouchableOpacity onPress={handleUploadImage}>
-          <Div my={'lg'}>
-            <UserAvatar
-              h={windowWidth * 0.6}
-              w={windowWidth * 0.6}
-              user={values}
-            />
-          </Div>
-          <Div my={'lg'}>
-            <UserAvatar
-              h={windowWidth * 0.6}
-              w={windowWidth * 0.6}
-              user={values}
-            />
-          </Div>
+          <Image
+            alignSelf="center"
+            my={'lg'}
+            h={windowWidth * 0.6}
+            w={windowWidth * 0.6}
+            source={
+              values.avatarUrl
+                ? {uri: values.avatarUrl}
+                : require('../../../../assets/no-image-avatar.png')
+            }
+            rounded="circle"
+          />
         </TouchableOpacity>
         <Div mb="lg">
           <Text fontSize={16} fontWeight="bold">

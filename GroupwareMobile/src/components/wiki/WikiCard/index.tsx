@@ -1,12 +1,7 @@
 import React from 'react';
-import {
-  useWindowDimensions,
-  FlatList,
-  TouchableOpacity,
-  TouchableHighlight,
-} from 'react-native';
+import {useWindowDimensions, FlatList, TouchableHighlight} from 'react-native';
 import {Wiki} from '../../../types';
-import {Div, Avatar, Text, Tag} from 'react-native-magnus';
+import {Div, Text, Tag} from 'react-native-magnus';
 import {tagColorFactory} from '../../../utils/factory/tagColorFactory';
 import {wikiCardStyles} from '../../../styles/component/wiki/wikiCard.style';
 import {useNavigation} from '@react-navigation/native';
@@ -14,14 +9,21 @@ import UserAvatar from '../../common/UserAvatar';
 
 type WikiCardProps = {
   wiki: Wiki;
-  onPress: (wiki: Wiki) => void;
 };
 
-const WikiCard: React.FC<WikiCardProps> = ({wiki, onPress}) => {
+const WikiCard: React.FC<WikiCardProps> = ({wiki}) => {
   const windowWidth = useWindowDimensions().width;
   const navigation = useNavigation<any>();
   return (
-    <TouchableHighlight underlayColor="none" onPress={() => onPress(wiki)}>
+    <TouchableHighlight
+      underlayColor="none"
+      onPress={() =>
+        navigation.navigate('WikiStack', {
+          screen: 'WikiDetail',
+          params: {id: wiki.id},
+          initial: false,
+        })
+      }>
       <Div
         flexDir="column"
         w={windowWidth}

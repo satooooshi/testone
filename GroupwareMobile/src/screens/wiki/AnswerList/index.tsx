@@ -87,7 +87,7 @@ const AnswerList: React.FC<AnswerListProps> = ({wiki, onPressAvatar}) => {
             ),
         )
       ) : (
-        <Text fontSize={16} textAlign="center">
+        <Text fontSize={16} textAlign="center" mb="lg">
           回答を投稿してください
         </Text>
       )}

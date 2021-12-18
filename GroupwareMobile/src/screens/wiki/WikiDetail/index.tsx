@@ -124,7 +124,7 @@ const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
                 fontWeight="bold"
                 fontSize={24}
                 color={darkFontColor}
-                mb={8}>
+                w={'70%'}>
                 {wikiInfo.title}
               </Text>
               <ShareButton

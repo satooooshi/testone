@@ -151,7 +151,7 @@ const UserAdmin: React.FC = () => {
         borderBottomWidth={1}
         borderBottomColor={'#b0b0b0'}
         flexDir="row"
-        h={40}>
+        h={60}>
         <Div minW={'20%'} />
         <Div minW={'30%'} justifyContent="center">
           <Text fontWeight="bold" fontSize={16}>

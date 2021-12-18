@@ -6,6 +6,7 @@ import {
 import React, {useCallback, useEffect, useState} from 'react';
 import {Alert, FlatList} from 'react-native';
 import {Button, Div, Icon, Text} from 'react-native-magnus';
+import tailwind from 'tailwind-rn';
 import AlbumBox from '../../../../components/chat/AlbumBox';
 import HeaderWithTextButton from '../../../../components/Header';
 import WholeContainer from '../../../../components/WholeContainer';
@@ -80,16 +81,17 @@ const ChatAlbums: React.FC = () => {
         w={60}>
         <Icon
           fontSize={'6xl'}
-          name="pluscircle"
+          name="plus"
           rounded="circle"
-          color="purple600"
-          bg="white"
+          color="white"
+          fontFamily="Feather"
         />
       </Button>
       {notesForInfiniteScroll.length ? (
         <FlatList
           {...{onEndReached}}
           data={notesForInfiniteScroll}
+          contentContainerStyle={tailwind('pb-16')}
           keyExtractor={item => item.id.toString()}
           renderItem={({item}) => (
             <AlbumBox

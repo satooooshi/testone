@@ -2,6 +2,7 @@ import {useNavigation} from '@react-navigation/native';
 import React from 'react';
 import {TouchableHighlight} from 'react-native';
 import {Image} from 'react-native-magnus';
+import {useAuthenticate} from '../../../contexts/useAuthenticate';
 import {User} from '../../../types';
 
 type UserAvatarProps = {
@@ -12,15 +13,23 @@ type UserAvatarProps = {
 
 const UserAvatar: React.FC<UserAvatarProps> = ({user, h, w}) => {
   const navigation = useNavigation<any>();
+  const {user: mySelf} = useAuthenticate();
   return (
     <TouchableHighlight
       underlayColor="none"
-      onPress={() =>
-        navigation.navigate('UserListStack', {
-          screen: 'AccountDetail',
-          params: {id: user?.id},
-        })
-      }>
+      onPress={() => {
+        if (user?.id === mySelf?.id) {
+          navigation.navigate('AccountStack', {
+            screen: 'MyProfile',
+            params: {id: user?.id},
+          });
+        } else {
+          navigation.navigate('UsersStack', {
+            screen: 'AccountDetail',
+            params: {id: user?.id},
+          });
+        }
+      }}>
       <Image
         {...{h, w}}
         rounded="circle"
