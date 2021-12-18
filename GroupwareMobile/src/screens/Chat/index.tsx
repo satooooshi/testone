@@ -73,7 +73,7 @@ const Chat: React.FC = () => {
   const [page, setPage] = useState(1);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [imageModal, setImageModal] = useState(false);
-  const [images, setImages] = useState<ImageSource[]>([]);
+  const [imagesForViewing, setImagesForViewing] = useState<ImageSource[]>([]);
   const [nowImageIndex, setNowImageIndex] = useState<number>(0);
   const [video, setVideo] = useState('');
   const {data: lastReadChatTime} = useAPIGetLastReadChatTime(room.id);
@@ -136,6 +136,9 @@ const Chat: React.FC = () => {
           type: ChatMessageType.TEXT,
           replyParentMessage: undefined,
         }));
+        if (sentMsg.type === ChatMessageType.IMAGE) {
+          setImagesForViewing(i => [...i, {uri: sentMsg.content}]);
+        }
       },
     });
   const {mutate: uploadFile, isLoading: loadingUploadFile} =
@@ -144,7 +147,7 @@ const Chat: React.FC = () => {
 
   const showImageOnModal = (url: string) => {
     const isNowUri = (element: ImageSource) => element.uri === url;
-    setNowImageIndex(images.findIndex(isNowUri));
+    setNowImageIndex(imagesForViewing.findIndex(isNowUri));
     setImageModal(true);
   };
   const headerRightIcon = (
@@ -335,7 +338,7 @@ const Chat: React.FC = () => {
           .filter(m => m.type === ChatMessageType.IMAGE)
           .map(m => ({uri: m.content}))
           .reverse();
-        setImages(fetchedImages);
+        setImagesForViewing(fetchedImages);
       };
       if (
         messages?.length &&
@@ -587,7 +590,7 @@ const Chat: React.FC = () => {
       </MagnusModal>
       <ImageView
         animationType="slide"
-        images={images}
+        images={imagesForViewing}
         imageIndex={nowImageIndex}
         visible={imageModal}
         onRequestClose={() => setImageModal(false)}
@@ -595,7 +598,7 @@ const Chat: React.FC = () => {
         doubleTapToZoomEnabled={true}
         FooterComponent={({imageIndex}) => (
           <Div position="absolute" bottom={5} right={5}>
-            <DownloadIcon url={images[imageIndex].uri} />
+            <DownloadIcon url={imagesForViewing[imageIndex].uri} />
           </Div>
         )}
       />
