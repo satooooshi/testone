@@ -63,6 +63,7 @@ import ShareButton from '../../../components/common/ShareButton';
 import {generateClientURL} from '../../../utils/url';
 import {Tab} from '../../../components/Header/HeaderTemplate';
 import AutoLinkedText from '../../../components/common/AutoLinkedText';
+import {isFinishedEvent} from '../../../utils/factory/event/isFinishedEvent';
 
 const EventDetail: React.FC = () => {
   const route = useRoute<EventDetailRouteProps>();
@@ -240,9 +241,7 @@ const EventDetail: React.FC = () => {
         ]
       : undefined;
 
-  const isFinished = eventInfo?.endAt
-    ? new Date(eventInfo.endAt) <= new Date()
-    : false;
+  const isFinished = isFinishedEvent(eventInfo);
 
   const handleUploadSubmission = async () => {
     const res = await DocumentPicker.pickSingle({
@@ -285,6 +284,7 @@ const EventDetail: React.FC = () => {
         title="イベント詳細"
         activeTabName="一覧に戻る"
         rightButtonName="イベント編集"
+        screenForBack="EventList"
         onPressRightButton={() => setEventFormModal(true)}
       />
       <Overlay visible={screenLoading} p="xl">
@@ -512,11 +512,9 @@ const EventDetail: React.FC = () => {
                 <AutoLinkedText
                   text={eventInfo.description}
                   style={{
-                    fontSize: 16,
-                    fontWeight: 'bold',
-                    color: darkFontColor,
+                    ...tailwind('text-base font-bold text-gray-700 leading-5'),
                   }}
-                  linkStyle={{color: 'blue'}}
+                  linkStyle={tailwind('text-blue-500')}
                 />
               </Div>
               <Div mb={8}>
@@ -729,7 +727,7 @@ const EventDetail: React.FC = () => {
                     )
                   : null}
               </Div>
-            ) : (
+            ) : eventInfo.type === EventType.SUBMISSION_ETC ? (
               <>
                 <Div
                   m={16}
@@ -737,32 +735,34 @@ const EventDetail: React.FC = () => {
                   borderColor="green400"
                   mb="lg"
                   pb="md">
-                  <Div
-                    flexDir="row"
-                    justifyContent="space-between"
-                    alignItems="flex-end">
-                    <Div>
+                  {!isFinishedEvent(eventInfo) && (
+                    <Div
+                      flexDir="row"
+                      justifyContent="space-between"
+                      alignItems="flex-end">
+                      <Div>
+                        <Button
+                          bg="blue600"
+                          color="white"
+                          h={40}
+                          rounded="lg"
+                          onPress={() => handleUploadSubmission()}>
+                          提出物を追加
+                        </Button>
+                      </Div>
                       <Button
-                        bg="blue600"
+                        bg="pink600"
                         color="white"
                         h={40}
                         rounded="lg"
-                        onPress={() => handleUploadSubmission()}>
-                        提出物を追加
+                        onPress={() => {
+                          saveSubmission(unsavedSubmissions);
+                        }}>
+                        提出状況を保存
                       </Button>
-                      <Text fontWeight="bold">{`${eventInfo?.submissionFiles?.length}件のファイルを提出済み`}</Text>
                     </Div>
-                    <Button
-                      bg="pink600"
-                      color="white"
-                      h={40}
-                      rounded="lg"
-                      onPress={() => {
-                        saveSubmission(unsavedSubmissions);
-                      }}>
-                      提出状況を保存
-                    </Button>
-                  </Div>
+                  )}
+                  <Text fontWeight="bold">{`${eventInfo?.submissionFiles?.length}件のファイルを提出済み`}</Text>
                   <Text color="tomato" fontSize={12}>
                     {
                       '※水色のアイコンのファイルはまだ提出状況が保存されていません'
@@ -788,7 +788,7 @@ const EventDetail: React.FC = () => {
                   )}
                 </Div>
               </>
-            )}
+            ) : null}
           </Div>
         )}
       </ScrollDiv>

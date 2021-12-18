@@ -61,6 +61,7 @@ const EventCard: React.FC<EventCardProps> = ({event}) => {
         navigation.navigate('EventStack', {
           screen: 'EventDetail',
           params: {id: event.id},
+          initial: false,
         })
       }>
       <Div
