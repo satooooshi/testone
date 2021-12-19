@@ -16,17 +16,21 @@ import {useAPILogin} from '../../../hooks/api/auth/useAPILogin';
 import {axiosInstance, storage} from '../../../utils/url';
 import {Formik} from 'formik';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
-import tailwind from 'tailwind-rn';
+import messaging from '@react-native-firebase/messaging';
+import {useAPIRegisterDevice} from '../../../hooks/api/notification/useAPIRegisterDevice';
 
 const Login: React.FC<LoginProps> = ({navigation}) => {
+  const {mutate: registerDevice} = useAPIRegisterDevice();
   const windowWidth = useWindowDimensions().width;
   const {setUser} = useAuthenticate();
   const {mutate: mutateLogin} = useAPILogin({
-    onSuccess: data => {
+    onSuccess: async data => {
       axiosInstance.defaults.headers.common = {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${data.token || ''}`,
       };
+      const token = await messaging().getToken();
+      registerDevice({token});
       storage.set('userToken', data.token || '');
       setUser(data);
       navigation.navigate('Main');
