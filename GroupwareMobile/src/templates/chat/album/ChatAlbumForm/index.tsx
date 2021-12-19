@@ -14,10 +14,19 @@ import {useFormik} from 'formik';
 import {TouchableHighlight, useWindowDimensions} from 'react-native';
 import {uploadImageFromGallery} from '../../../../utils/cropImage/uploadImageFromGallery';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
-import {Button, Div, Icon, Image, Input, Text} from 'react-native-magnus';
+import {
+  Button,
+  Div,
+  Icon,
+  Image,
+  Input,
+  Overlay,
+  Text,
+} from 'react-native-magnus';
 import tailwind from 'tailwind-rn';
 import {dateTimeFormatterFromJSDDate} from '../../../../utils/dateTimeFormatterFromJSDate';
 import DownloadIcon from '../../../../components/common/DownLoadIcon';
+import {ActivityIndicator} from 'react-native-paper';
 
 type ChatAlbumFormProps = {
   album?: ChatAlbum;
@@ -39,6 +48,7 @@ const ChatAlbumForm: React.FC<ChatAlbumFormProps> = ({
   };
   const {width: windowWidth} = useWindowDimensions();
   const [imageModal, setImageModal] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [nowImageIndex, setNowImageIndex] = useState<number>(0);
   const {values, setValues, handleSubmit} = useFormik<
     ChatAlbum | Partial<ChatAlbum>
@@ -62,8 +72,10 @@ const ChatAlbumForm: React.FC<ChatAlbumFormProps> = ({
       multiple: true,
     });
     if (formData) {
+      setUploading(true);
       uploadImage(formData, {
         onSuccess: imageURLs => {
+          setUploading(false);
           const newImages: Partial<ChatAlbumImage>[] = imageURLs.map(u => ({
             imageURL: u,
           }));
@@ -88,6 +100,9 @@ const ChatAlbumForm: React.FC<ChatAlbumFormProps> = ({
 
   return (
     <WholeContainer>
+      <Overlay visible={uploading} p="xl">
+        <ActivityIndicator />
+      </Overlay>
       <HeaderWithTextButton
         title="アルバム"
         enableBackButton={true}
