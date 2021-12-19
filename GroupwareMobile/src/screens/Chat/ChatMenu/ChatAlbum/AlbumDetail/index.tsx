@@ -1,9 +1,5 @@
-import {
-  useFocusEffect,
-  useNavigation,
-  useRoute,
-} from '@react-navigation/native';
-import React, {useCallback, useEffect, useState} from 'react';
+import {useNavigation, useRoute} from '@react-navigation/native';
+import React, {useEffect, useState} from 'react';
 import {FlatList, TouchableHighlight, useWindowDimensions} from 'react-native';
 import {
   Button,
@@ -157,10 +153,10 @@ const AlbumDetail: React.FC = () => {
         w={60}>
         <Icon
           fontSize={'6xl'}
-          name="plus"
+          name="image-edit"
           rounded="circle"
           color="white"
-          fontFamily="Feather"
+          fontFamily="MaterialCommunityIcons"
         />
       </Button>
       <FlatList
