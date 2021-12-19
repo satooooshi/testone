@@ -1,10 +1,4 @@
-import React, {
-  useState,
-  useEffect,
-  Dispatch,
-  SetStateAction,
-  useCallback,
-} from 'react';
+import React, {useState, useEffect, Dispatch, SetStateAction} from 'react';
 import {RuleCategory, WikiType} from '../../../types';
 import {
   SearchQueryToGetWiki,
@@ -14,17 +8,10 @@ import {Div, Text} from 'react-native-magnus';
 import WikiCard from '../../../components/wiki/WikiCard';
 import {FlatList} from 'react-native';
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
-import {
-  useFocusEffect,
-  useNavigation,
-  useRoute,
-} from '@react-navigation/native';
+import {useRoute} from '@react-navigation/native';
 import SearchForm from '../../../components/common/SearchForm';
 import SearchFormOpenerButton from '../../../components/common/SearchForm/SearchFormOpenerButton';
-import {
-  WikiListNavigationProps,
-  WikiListRouteProps,
-} from '../../../types/navigator/drawerScreenProps';
+import {WikiListRouteProps} from '../../../types/navigator/drawerScreenProps';
 import {ActivityIndicator} from 'react-native-paper';
 
 const TopTab = createMaterialTopTabNavigator();
@@ -74,42 +61,20 @@ const RenderWikiCardList: React.FC<RenderWikiCardListProps> = ({
   };
 
   useEffect(() => {
+    setWikiForInfiniteScroll([]);
     setSearchQuery(q => ({...q, page: '1', type, word, tag}));
   }, [tag, type, word]);
 
   useEffect(() => {
-    setWikiForInfiniteScroll([]);
-  }, [
-    searchQuery.word,
-    searchQuery.status,
-    searchQuery.type,
-    searchQuery.tag,
-    searchQuery.rule_category,
-  ]);
-
-  useEffect(() => {
     if (fetchedWiki?.wiki && fetchedWiki?.wiki.length) {
       setWikiForInfiniteScroll(w => {
-        if (w.length) {
+        if (w.length && fetchedWiki.wiki[0].id !== w[0].id) {
           return [...w, ...fetchedWiki.wiki];
         }
         return fetchedWiki.wiki;
       });
     }
   }, [fetchedWiki?.wiki]);
-
-  useFocusEffect(
-    useCallback(() => {
-      setWikiForInfiniteScroll([]);
-      if (searchQuery.page !== '1') {
-        setSearchQuery(q => ({...q, page: '1'}));
-      } else {
-        setWikiForInfiniteScroll([]);
-        refetch();
-      }
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []),
-  );
 
   return (
     <>
