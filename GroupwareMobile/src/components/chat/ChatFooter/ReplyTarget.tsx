@@ -45,7 +45,6 @@ const ReplyTarget: React.FC<ReplyTargetProps> = ({
       <Div mr="lg">
         <UserAvatar w={40} h={40} user={replyParentMessage.sender} />
       </Div>
-      <UserAvatar w={40} h={40} user={replyParentMessage?.sender} />
       <Div alignSelf="center" w={'70%'}>
         <Text fontSize={12} fontWeight={'bold'} numberOfLines={1}>
           {userNameFactory(replyParentMessage?.sender)}

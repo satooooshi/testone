@@ -33,9 +33,6 @@ import ImageView from 'react-native-image-viewing';
 import ChatFooter from '../../components/chat/ChatFooter';
 import {userNameFactory} from '../../utils/factory/userNameFactory';
 import {Suggestion} from 'react-native-controlled-mentions';
-import RNFetchBlob from 'rn-fetch-blob';
-const {fs, config} = RNFetchBlob;
-import FileViewer from 'react-native-file-viewer';
 import {KeyboardAwareFlatList} from 'react-native-keyboard-aware-scroll-view';
 import {useNavigation, useRoute} from '@react-navigation/native';
 import {
