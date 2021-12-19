@@ -82,6 +82,16 @@ const UserCardList: React.FC<UserCardListProps> = ({userRole, word, tag}) => {
     }
   };
 
+  useEffect(() => {
+    setUsersForInfiniteScroll([]);
+    setSearchQuery(q => ({...q, page: '1'}));
+  }, [
+    searchQuery.word,
+    searchQuery.tag,
+    searchQuery.sort,
+    searchQuery.duration,
+  ]);
+
   return (
     <>
       <Div flexDir="row" my="lg" justifyContent="space-evenly">
