@@ -344,6 +344,26 @@ export class ChatService {
       );
 
     if (existGroup.length) {
+      if (typeof chatGroup.isPinned !== 'undefined') {
+        if (chatGroup.isPinned) {
+          await this.chatGroupRepository
+            .createQueryBuilder('chat_groups')
+            .relation('pinnedUsers')
+            .of(existGroup[0].id)
+            .remove(userID);
+          await this.chatGroupRepository
+            .createQueryBuilder('chat_groups')
+            .relation('pinnedUsers')
+            .of(existGroup[0].id)
+            .add(userID);
+        } else {
+          await this.chatGroupRepository
+            .createQueryBuilder('chat_groups')
+            .relation('pinnedUsers')
+            .of(existGroup[0].id)
+            .remove(userID);
+        }
+      }
       return existGroup[0];
     }
     chatGroup.members = users;
