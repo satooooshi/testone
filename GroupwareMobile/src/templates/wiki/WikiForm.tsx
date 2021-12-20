@@ -85,7 +85,9 @@ const WikiForm: React.FC<WikiFormProps> = ({
     justifyContent: 'center',
     roundedTop: 'lg',
   };
-  const {selectedTags, toggleTag, isSelected} = useSelectedTags();
+  const {selectedTags, toggleTag, isSelected} = useSelectedTags(
+    wiki?.tags || [],
+  );
   const {selectedTagType, selectTagType, filteredTags} = useTagType(
     'All',
     tags,

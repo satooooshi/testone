@@ -153,10 +153,10 @@ const AlbumDetail: React.FC = () => {
         w={60}>
         <Icon
           fontSize={'6xl'}
-          name="plus"
+          name="image-edit"
           rounded="circle"
           color="white"
-          fontFamily="Feather"
+          fontFamily="MaterialCommunityIcons"
         />
       </Button>
       <FlatList
