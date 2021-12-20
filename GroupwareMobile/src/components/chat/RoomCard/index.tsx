@@ -5,9 +5,11 @@ import {Swipeable} from 'react-native-gesture-handler';
 import {Button, Div, Icon, Text} from 'react-native-magnus';
 import tailwind from 'tailwind-rn';
 import {roomCardStyles} from '../../../styles/component/chat/roomCard.style';
-import {ChatGroup, ChatMessage, ChatMessageType, User} from '../../../types';
+import {ChatGroup, ChatMessage, ChatMessageType} from '../../../types';
 import {darkFontColor} from '../../../utils/colors';
 import {dateTimeFormatterFromJSDDate} from '../../../utils/dateTimeFormatterFromJSDate';
+import {nameOfRoom} from '../../../utils/factory/chat/nameOfRoom';
+import {mentionTransform} from '../../../utils/messageTransform';
 
 type RoomCardProps = {
   room: ChatGroup;
@@ -24,13 +26,6 @@ const RoomCard: React.FC<RoomCardProps> = ({
   dangerousBgColor,
 }) => {
   const {width: windowWidth} = useWindowDimensions();
-  const nameOfEmptyNameGroup = (members?: User[]): string => {
-    if (!members?.length) {
-      return 'メンバーがいません';
-    }
-    const strMembers = members?.map(m => m.lastName + m.firstName).join();
-    return strMembers;
-  };
   const rightSwipeActions = () => {
     return (
       <Button bg="green500" h={'100%'} w={80} onPress={onPressPinButton}>
@@ -53,7 +48,7 @@ const RoomCard: React.FC<RoomCardProps> = ({
       case ChatMessageType.OTHER_FILE:
         return 'ファイルが送信されました';
       default:
-        return chatMessage.content;
+        return mentionTransform(chatMessage.content);
     }
   };
 
@@ -110,7 +105,7 @@ const RoomCard: React.FC<RoomCardProps> = ({
           </Div>
           <Div w={'75%'} pr={'sm'}>
             <Text numberOfLines={1} mb={'xs'} fontWeight="bold" fontSize={16}>
-              {room.name || nameOfEmptyNameGroup(room.members)}
+              {nameOfRoom(room)}
             </Text>
             <Text
               mb={'xs'}

@@ -55,7 +55,7 @@ const Home: React.FC = () => {
     } else if (news.urlPath.includes('account')) {
       const id: string = news.urlPath.replace('/account/', '');
       if (typeof Number(id) === 'number') {
-        navigation.navigate('UserListStack', {
+        navigation.navigate('UsersStack', {
           screen: 'AccountDetail',
           params: {id: Number(id)},
           initial: false,
@@ -224,8 +224,7 @@ const Home: React.FC = () => {
               type="wiki"
               onPress={() => {
                 navigation.navigate('WikiStack', {
-                  screen: 'WikiList',
-                  params: {},
+                  screen: 'WikiLinks',
                 });
               }}
             />

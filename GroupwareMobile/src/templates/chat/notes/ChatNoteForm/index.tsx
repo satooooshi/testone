@@ -47,6 +47,7 @@ const ChatNoteForm: React.FC<ChatNoteFormProps> = ({
     ChatNote | Partial<ChatNote>
   >({
     initialValues: note || initialValues,
+    enableReinitialize: true,
     onSubmit: submittedValues => onSubmit(submittedValues),
   });
   const images: ImageSource[] =

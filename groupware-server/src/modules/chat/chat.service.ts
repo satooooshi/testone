@@ -344,6 +344,26 @@ export class ChatService {
       );
 
     if (existGroup.length) {
+      if (typeof chatGroup.isPinned !== 'undefined') {
+        if (chatGroup.isPinned) {
+          await this.chatGroupRepository
+            .createQueryBuilder('chat_groups')
+            .relation('pinnedUsers')
+            .of(existGroup[0].id)
+            .remove(userID);
+          await this.chatGroupRepository
+            .createQueryBuilder('chat_groups')
+            .relation('pinnedUsers')
+            .of(existGroup[0].id)
+            .add(userID);
+        } else {
+          await this.chatGroupRepository
+            .createQueryBuilder('chat_groups')
+            .relation('pinnedUsers')
+            .of(existGroup[0].id)
+            .remove(userID);
+        }
+      }
       return existGroup[0];
     }
     chatGroup.members = users;
@@ -387,6 +407,19 @@ export class ChatService {
     userID: number,
   ): Promise<ChatMessageReaction> {
     const existUser = await this.userRepository.findOne(userID);
+    const existReaction = await this.chatMessageReactionRepository.findOne({
+      where: {
+        emoji: reaction.emoji,
+        user: existUser,
+        chatMessage: reaction.chatMessage,
+      },
+    });
+    if (existReaction) {
+      return {
+        ...existReaction,
+        isSender: true,
+      };
+    }
     const reactionWithUser = { ...reaction, user: existUser };
     const savedReaction = await this.chatMessageReactionRepository.save(
       reactionWithUser,

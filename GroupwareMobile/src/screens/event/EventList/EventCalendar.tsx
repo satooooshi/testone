@@ -109,7 +109,7 @@ const EventCalendar: React.FC<EventCalendarProps> = ({
     }
     return getDatesInWeek(new Date(), 0, 'ja');
   }, [calendarMode.mode, calendarMode.targetDate]);
-  const calendarHeight = windowHeight - 60;
+  const calendarHeight = windowHeight - 120;
 
   const headerCellHeight = useMemo(() => MIN_HEIGHT / 24 - 20, []);
 
@@ -354,7 +354,10 @@ const EventCalendar: React.FC<EventCalendarProps> = ({
         {!isLoading ? (
           <Calendar
             bodyContainerStyle={calendarStyles.container}
-            headerContainerStyle={calendarStyles.container}
+            headerContainerStyle={{
+              ...calendarStyles.container,
+              ...calendarStyles.header,
+            }}
             onPressDateHeader={onPressDateHeader}
             renderHeader={
               calendarMode.mode === 'day'
@@ -383,7 +386,7 @@ const EventCalendar: React.FC<EventCalendarProps> = ({
             onPressCell={date =>
               setCalendarMode({mode: 'day', targetDate: date})
             }
-            height={calendarHeight + 120}
+            height={calendarHeight}
             eventCellStyle={
               calendarMode.mode === 'day'
                 ? event => ({

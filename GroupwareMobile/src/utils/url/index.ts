@@ -40,6 +40,6 @@ export const generateClientURL = (path: string) => {
   if (__DEV__) {
     return 'http://localhost:3000' + path;
   } else {
-    return 'https://groupware-frontend-theta.vercel.app/' + path;
+    return 'https://groupware-frontend-theta.vercel.app' + path;
   }
 };

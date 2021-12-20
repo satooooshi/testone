@@ -1,11 +1,8 @@
+import {useNavigation} from '@react-navigation/native';
 import React from 'react';
-import {
-  FlatList,
-  TouchableHighlight,
-  TouchableOpacity,
-  useWindowDimensions,
-} from 'react-native';
-import {Image, Text, Div, Tag} from 'react-native-magnus';
+import {FlatList, TouchableHighlight, useWindowDimensions} from 'react-native';
+import {Text, Div, Tag} from 'react-native-magnus';
+import {useAuthenticate} from '../../../contexts/useAuthenticate';
 import {useTagType} from '../../../hooks/tag/useTagType';
 import {userCardStyles} from '../../../styles/component/user/userCard.style';
 import {TagType, User, UserTag} from '../../../types';
@@ -17,17 +14,12 @@ import UserAvatar from '../../common/UserAvatar';
 
 type UserCardProps = {
   user: User;
-  onPress: () => void;
-  onPressTag: (tag: UserTag) => void;
   filteredDuration: 'week' | 'month' | undefined;
 };
 
-const UserCard: React.FC<UserCardProps> = ({
-  user,
-  onPress,
-  onPressTag,
-  filteredDuration,
-}) => {
+const UserCard: React.FC<UserCardProps> = ({user, filteredDuration}) => {
+  const navigation = useNavigation<any>();
+  const {user: mySelf} = useAuthenticate();
   const {width: windowWidth} = useWindowDimensions();
   const {filteredTags: techTags} = useTagType(TagType.TECH, user?.tags || []);
   const {filteredTags: qualificationTags} = useTagType(
@@ -48,8 +40,29 @@ const UserCard: React.FC<UserCardProps> = ({
     }
   };
 
+  const navigateToAccountScreen = () => {
+    if (user?.id === mySelf?.id) {
+      navigation.navigate('AccountStack', {
+        screen: 'MyProfile',
+        params: {id: user?.id},
+      });
+    } else {
+      navigation.navigate('UsersStack', {
+        screen: 'AccountDetail',
+        params: {id: user?.id},
+      });
+    }
+  };
+
+  const onPressTag = (tag: UserTag) => {
+    navigation.navigate('UsersStack', {
+      screen: 'UserList',
+      params: {tag: tag.id.toString()},
+    });
+  };
+
   return (
-    <TouchableHighlight underlayColor="none" onPress={onPress}>
+    <TouchableHighlight underlayColor="none" onPress={navigateToAccountScreen}>
       <Div
         bg={grayColor}
         w={windowWidth * 0.9}

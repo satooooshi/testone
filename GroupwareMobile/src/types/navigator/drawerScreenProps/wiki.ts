@@ -3,6 +3,11 @@ import {StackNavigationProp} from '@react-navigation/stack';
 import {DrawerTabParamList} from '../DrawerTabParamList';
 import {RootStackParamList} from '../RootStackParamList';
 
+export type WikiLinksNavigationProps = StackNavigationProp<
+  DrawerTabParamList,
+  'WikiStack'
+>;
+
 export type WikiNavigationProps = StackNavigationProp<
   DrawerTabParamList,
   'WikiStack'

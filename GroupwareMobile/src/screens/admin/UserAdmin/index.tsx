@@ -43,7 +43,7 @@ const UserAdmin: React.FC = () => {
   const tabs: Tab[] = [
     {
       name: 'ユーザー管理',
-      onPress: () => {},
+      onPress: () => navigation.navigate('AdminStack', {screen: 'UserAdmin'}),
     },
     {
       name: 'ユーザー作成',

@@ -110,9 +110,9 @@ const RoomList: React.FC = () => {
                     params: {room},
                   })
                 }
-                onPressPinButton={() =>
-                  saveGroup({...room, isPinned: !room.isPinned})
-                }
+                onPressPinButton={() => {
+                  saveGroup({...room, isPinned: !room.isPinned});
+                }}
               />
             </Div>
           )}

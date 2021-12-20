@@ -56,26 +56,27 @@ const ChatNotes: React.FC = () => {
 
   useEffect(() => {
     if (data?.notes?.length) {
-      setNotesForInfiniteScroll(n => {
-        if (
-          n.length &&
-          new Date(n[n.length - 1].createdAt) >
-            new Date(data.notes[0].createdAt)
-        ) {
-          return [...n, ...data?.notes];
-        }
-        return data?.notes;
-      });
+      if (page === '1') {
+        setNotesForInfiniteScroll(data.notes);
+      } else {
+        setNotesForInfiniteScroll(n => {
+          if (
+            n.length &&
+            new Date(n[n.length - 1].createdAt) >
+              new Date(data.notes[0].createdAt)
+          ) {
+            return [...n, ...data?.notes];
+          }
+          return data?.notes;
+        });
+      }
     }
-  }, [data?.notes]);
+  }, [data?.notes, page]);
 
   useFocusEffect(
     useCallback(() => {
-      if (page !== '1') {
-        setPage('1');
-      } else {
-        refetchNotes();
-      }
+      setPage('1');
+      refetchNotes();
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [refetchNotes]),
   );

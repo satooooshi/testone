@@ -60,6 +60,7 @@ import {ActivityIndicator} from 'react-native-paper';
 import {useAPISaveLastReadChatTime} from '../../hooks/api/chat/useAPISaveLastReadChatTime';
 import DownloadIcon from '../../components/common/DownLoadIcon';
 import UserAvatar from '../../components/common/UserAvatar';
+import {nameOfRoom} from '../../utils/factory/chat/nameOfRoom';
 
 const Chat: React.FC = () => {
   const typeDropdownRef = useRef<any | null>(null);
@@ -600,7 +601,7 @@ const Chat: React.FC = () => {
         )}
       />
       <HeaderWithIconButton
-        title={room?.name}
+        title={nameOfRoom(room)}
         enableBackButton={true}
         screenForBack={'RoomList'}
         icon={headerRightIcon}

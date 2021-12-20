@@ -37,27 +37,28 @@ const ChatAlbums: React.FC = () => {
 
   useEffect(() => {
     if (data?.albums?.length) {
-      setNotesForInfiniteScroll(n => {
-        if (
-          n.length &&
-          new Date(n[n.length - 1].createdAt) >
-            new Date(data.albums[0].createdAt)
-        ) {
-          return [...n, ...data?.albums];
-        }
-        return data?.albums;
-      });
+      if (page === '1') {
+        setNotesForInfiniteScroll(data.albums);
+      } else {
+        setNotesForInfiniteScroll(n => {
+          if (
+            n.length &&
+            new Date(n[n.length - 1].createdAt) >
+              new Date(data.albums[0].createdAt)
+          ) {
+            return [...n, ...data?.albums];
+          }
+          return data?.albums;
+        });
+      }
     }
-  }, [data?.albums]);
+  }, [data?.albums, page]);
 
   useFocusEffect(
     useCallback(() => {
-      if (page !== '1') {
-        setPage('1');
-      } else {
-        refetchAlbums();
-      }
-      // eslint-disable-next-line react-hooks/exhaustive-deps
+      setNotesForInfiniteScroll([]);
+      setPage('1');
+      refetchAlbums();
     }, [refetchAlbums]),
   );
 

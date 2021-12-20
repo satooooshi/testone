@@ -42,7 +42,7 @@ import {userNameFactory} from '../../../utils/factory/userNameFactory';
 import {userRoleNameFactory} from '../../../utils/factory/userRoleNameFactory';
 import {formikErrorMsgFactory} from '../../../utils/factory/formikEroorMsgFactory';
 import {createUserSchema} from '../../../utils/validation/schema';
-import UserAvatar from '../../../components/common/UserAvatar';
+import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 
 const initialValues: Partial<User> = {
   email: '',
@@ -124,7 +124,8 @@ const UserRegisteringAdmin: React.FC = () => {
     },
     {
       name: 'ユーザー作成',
-      onPress: () => {},
+      onPress: () =>
+        navigation.navigate('AdminStack', {screen: 'UserRegisteringAdmin'}),
     },
     {
       name: 'タグ管理',
@@ -133,7 +134,7 @@ const UserRegisteringAdmin: React.FC = () => {
     {
       name: 'タグ管理(ユーザー)',
       onPress: () =>
-        navigation.navigate('AdminStack', {screen: 'UserRegisteringAdmin'}),
+        navigation.navigate('AdminStack', {screen: 'UserTagAdmin'}),
     },
   ];
 
@@ -232,7 +233,7 @@ const UserRegisteringAdmin: React.FC = () => {
           {userRoleNameFactory(UserRole.EXTERNAL_INSTRUCTOR)}
         </Dropdown.Option>
       </Dropdown>
-      <ScrollDiv
+      <KeyboardAwareScrollView
         contentContainerStyle={{
           ...userRegisteringAdminStyles.scrollView,
           width: windowWidth * 0.9,
@@ -406,7 +407,7 @@ const UserRegisteringAdmin: React.FC = () => {
             style={userRegisteringAdminStyles.textArea}
           />
         </Div>
-      </ScrollDiv>
+      </KeyboardAwareScrollView>
     </WholeContainer>
   );
 };

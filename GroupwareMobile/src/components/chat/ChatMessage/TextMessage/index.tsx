@@ -5,6 +5,7 @@ import {ChatMessage} from '../../../../types';
 import ReplyParent from '../ReplyParent';
 import tailwind from 'tailwind-rn';
 import AutoLinkedText from '../../../common/AutoLinkedText';
+import {mentionTransform} from '../../../../utils/messageTransform';
 
 export type TextMessageProps = {
   message: ChatMessage;
@@ -26,7 +27,7 @@ const TextMessage: React.FC<TextMessageProps> = ({message, onLongPress}) => {
           <ReplyParent parentMessage={message.replyParentMessage} />
         )}
         <AutoLinkedText
-          text={message.content}
+          text={mentionTransform(message.content)}
           linkStyle={tailwind('font-bold text-pink-300 text-base')}
           style={tailwind('text-white')}
         />
