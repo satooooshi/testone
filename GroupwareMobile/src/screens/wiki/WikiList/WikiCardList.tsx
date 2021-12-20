@@ -18,6 +18,7 @@ const TopTab = createMaterialTopTabNavigator();
 
 type WikiCardListProps = {
   type?: WikiType;
+  setType: Dispatch<SetStateAction<WikiType | undefined>>;
   setRuleCategory: Dispatch<SetStateAction<RuleCategory>>;
 };
 
@@ -93,7 +94,7 @@ const RenderWikiCardList: React.FC<RenderWikiCardListProps> = ({
   );
 };
 
-const WikiCardList: React.FC<WikiCardListProps> = ({type}) => {
+const WikiCardList: React.FC<WikiCardListProps> = ({type, setType}) => {
   const routeParams = useRoute<WikiListRouteProps>().params;
   const [visibleSearchFormModal, setVisibleSearchFormModal] = useState(false);
   const [word, setWord] = useState('');
@@ -113,6 +114,7 @@ const WikiCardList: React.FC<WikiCardListProps> = ({type}) => {
         onCloseModal={() => setVisibleSearchFormModal(false)}
         onSubmit={values => {
           setVisibleSearchFormModal(false);
+          setType(undefined);
           setWord(values.word);
           const selectedTagIDs = values.selectedTags.map(t => t.id.toString());
           const tagQuery = selectedTagIDs.join('+');
