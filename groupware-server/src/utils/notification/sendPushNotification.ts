@@ -103,7 +103,7 @@ const sendPushNotifToSpecificDevices = async (
     truncateAtWordEnd: true, // apn and gcm for ios
     mutableContent: 0, // apn
     threadId: '', // apn
-    pushType: undefined, // apn. valid values are 'alert' and 'background' (https://github.com/parse-community/node-apn/blob/master/doc/notification.markdown#notificationpushtype)
+    pushType: 'alert', // apn. valid values are 'alert' and 'background' (https://github.com/parse-community/node-apn/blob/master/doc/notification.markdown#notificationpushtype)
     timeToLive: 28 * 86400,
   };
   pushNotifService.send(tokens, dataToSend, (err, result) => {
