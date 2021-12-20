@@ -1,14 +1,19 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import WholeContainer from '../../../components/WholeContainer';
 import HeaderWithTextButton from '../../../components/Header';
 import {RuleCategory, WikiType} from '../../../types';
 import WikiCardList from './WikiCardList';
 import {wikiTypeNameFactory} from '../../../utils/factory/wiki/wikiTypeNameFactory';
-import {WikiListProps} from '../../../types/navigator/drawerScreenProps';
+import {
+  WikiListProps,
+  WikiListRouteProps,
+} from '../../../types/navigator/drawerScreenProps';
 import {Tab} from '../../../components/Header/HeaderTemplate';
+import {useRoute} from '@react-navigation/native';
 
 const WikiList: React.FC<WikiListProps> = ({navigation}) => {
-  const [type, setType] = useState<WikiType>();
+  const typePassedByRoute = useRoute<WikiListRouteProps>()?.params?.type;
+  const [type, setType] = useState<WikiType | undefined>(typePassedByRoute);
   const [ruleCategory, setRuleCategory] = useState<RuleCategory>(
     RuleCategory.OTHERS,
   );
@@ -35,10 +40,17 @@ const WikiList: React.FC<WikiListProps> = ({navigation}) => {
     },
   ];
 
+  useEffect(() => {
+    if (typePassedByRoute) {
+      setType(typePassedByRoute);
+    }
+  }, [typePassedByRoute]);
+
   return (
     <WholeContainer>
       {/* <SearchFormOpenerButton onPress={console.log} /> */}
       <HeaderWithTextButton
+        enableBackButton={true}
         tabs={tabs}
         title="社内Wiki"
         activeTabName={type ? wikiTypeNameFactory(type, ruleCategory) : 'All'}

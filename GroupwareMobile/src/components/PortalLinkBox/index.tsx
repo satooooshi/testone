@@ -19,6 +19,7 @@ import {
   knowledgeColor,
   ruleColor,
   qaColor,
+  allPostalColor,
 } from '../../utils/colors';
 import {Text, Div, Icon} from 'react-native-magnus';
 import {TouchableHighlight, useWindowDimensions} from 'react-native';
@@ -35,6 +36,7 @@ type PortalType =
   | 'rules'
   | 'knowledge'
   | 'qa'
+  | 'all-postal'
   | 'chat'
   | 'admin'
   | 'my_schedule'
@@ -90,6 +92,15 @@ const PortalLinkIcon: React.FC<PortalLinkIconProps> = ({type}) => {
     case 'wiki':
       return (
         <Ionicons name="globe-outline" color={wikiColor} size={iconSize} />
+      );
+    case 'all-postal':
+      return (
+        <Icon
+          name="mail"
+          fontFamily="Entypo"
+          color={allPostalColor}
+          fontSize={iconSize}
+        />
       );
     case 'knowledge':
       return (
@@ -167,6 +178,8 @@ const PortalLinkBox: React.FC<PortarlLinkBoxProps> = ({type, onPress}) => {
         return '社内Wiki';
       case 'rules':
         return '社内規則';
+      case 'all-postal':
+        return 'オール便';
       case 'knowledge':
         return 'ナレッジ';
       case 'qa':

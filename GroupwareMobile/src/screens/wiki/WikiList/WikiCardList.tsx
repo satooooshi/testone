@@ -44,11 +44,7 @@ const RenderWikiCardList: React.FC<RenderWikiCardListProps> = ({
     type,
     status,
   });
-  const {
-    data: fetchedWiki,
-    isLoading,
-    refetch,
-  } = useAPIGetWikiList(searchQuery);
+  const {data: fetchedWiki, isLoading} = useAPIGetWikiList(searchQuery);
   const [wikiForInfiniteScroll, setWikiForInfiniteScroll] = useState(
     fetchedWiki?.wiki || [],
   );

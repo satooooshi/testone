@@ -37,13 +37,18 @@ import Share from '../../screens/Chat/Share';
 import EventIntroduction from '../../screens/event/EventIntroduction';
 import {useAuthenticate} from '../../contexts/useAuthenticate';
 import {UserRole} from '../../types';
+import WikiLinks from '../../screens/wiki/WikiLinks';
 
 const Drawer = createDrawerNavigator();
 const Stack = createStackNavigator();
 
 const WikiStack = () => (
-  <Stack.Navigator initialRouteName="WikiList">
-    <Stack.Screen name="Wiki" component={Wiki} options={{headerShown: false}} />
+  <Stack.Navigator initialRouteName="WikiLinks">
+    <Stack.Screen
+      name="WikiLinks"
+      component={WikiLinks}
+      options={{headerShown: false}}
+    />
     <Stack.Screen
       name="WikiDetail"
       component={WikiDetail}

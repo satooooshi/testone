@@ -2,7 +2,7 @@ import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs
 import {useIsFocused, useNavigation, useRoute} from '@react-navigation/native';
 import React, {useEffect, useState} from 'react';
 import {useWindowDimensions} from 'react-native';
-import {Text, Div, ScrollDiv, Image} from 'react-native-magnus';
+import {Text, Div, ScrollDiv} from 'react-native-magnus';
 import {ActivityIndicator} from 'react-native-paper';
 import TagListBox from '../../../components/account/TagListBox';
 import UserAvatar from '../../../components/common/UserAvatar';
@@ -255,16 +255,7 @@ const AccountDetail: React.FC = () => {
                     <Div alignItems="center" mt="lg">
                       {questionList?.wiki?.length ? (
                         questionList?.wiki?.map(w => (
-                          <WikiCard
-                            key={w.id}
-                            wiki={w}
-                            onPress={() =>
-                              navigation.navigate('WikiStack', {
-                                screen: 'WikiDetail',
-                                params: {id: w.id},
-                              })
-                            }
-                          />
+                          <WikiCard key={w.id} wiki={w} />
                         ))
                       ) : (
                         <Text fontSize={16}>
@@ -284,16 +275,7 @@ const AccountDetail: React.FC = () => {
                     <Div alignItems="center" mt="lg">
                       {knowledgeList?.wiki?.length ? (
                         knowledgeList?.wiki?.map(w => (
-                          <WikiCard
-                            key={w.id}
-                            wiki={w}
-                            onPress={() =>
-                              navigation.navigate('WikiStack', {
-                                screen: 'WikiDetail',
-                                params: {id: w.id},
-                              })
-                            }
-                          />
+                          <WikiCard key={w.id} wiki={w} />
                         ))
                       ) : (
                         <Text fontSize={16}>

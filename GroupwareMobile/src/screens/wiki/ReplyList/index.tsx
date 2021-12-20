@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import {TouchableOpacity, useWindowDimensions} from 'react-native';
-import {Div, Avatar, Text, Collapse, Button} from 'react-native-magnus';
+import {Div, Text, Collapse, Button} from 'react-native-magnus';
 import {QAAnswer, User} from '../../../types';
 import MarkdownIt from 'markdown-it';
 import RenderHtml from 'react-native-render-html';
@@ -30,6 +30,7 @@ const ReplyList: React.FC<ReplyListProps> = ({answer, onPressAvatar}) => {
           navigation.navigate('WikiStack', {
             screen: 'PostReply',
             params: {id: answer.id},
+            initial: false,
           });
         }}>
         返信する
