@@ -475,6 +475,7 @@ export class UserService {
         userData.avatarUrl,
       );
     }
+    userData.verifiedAt = new Date();
     const newUser = this.userRepository.create(userData);
     await this.userRepository.save(newUser);
     return newUser;
