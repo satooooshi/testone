@@ -151,7 +151,8 @@ const AccountDetail: React.FC = () => {
       ? [
           {
             name: 'アカウント情報',
-            onPress: () => {},
+            onPress: () =>
+              navigation.navigate('AccountStack', {screen: 'MyProfile'}),
           },
         ]
       : [

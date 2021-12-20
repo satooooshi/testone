@@ -97,4 +97,5 @@ export type RootStackParamList = {
     type: EventType;
   };
   WikiLinks: undefined;
+  MyProfile: undefined;
 };

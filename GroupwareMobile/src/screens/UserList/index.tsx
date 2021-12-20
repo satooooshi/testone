@@ -1,5 +1,5 @@
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
-import {useRoute} from '@react-navigation/native';
+import {useIsFocused, useRoute} from '@react-navigation/native';
 import React, {useEffect, useState} from 'react';
 import SearchForm from '../../components/common/SearchForm';
 import SearchFormOpenerButton from '../../components/common/SearchForm/SearchFormOpenerButton';
@@ -17,6 +17,7 @@ const UserList: React.FC = () => {
   const [visibleSearchFormModal, setVisibleSearchFormModal] = useState(false);
   const [word, setWord] = useState('');
   const [tag, setTag] = useState(tagPassedByRouteParam || '');
+  const isFocused = useIsFocused();
   const topTabNames = [
     'AllRole',
     UserRole.ADMIN,
@@ -57,28 +58,48 @@ const UserList: React.FC = () => {
         <TopTab.Screen
           name={topTabNames[0]}
           children={() => (
-            <UserCardList word={word} tag={tag} userRole={'All'} />
+            <UserCardList
+              focused={isFocused}
+              word={word}
+              tag={tag}
+              userRole={'All'}
+            />
           )}
           options={{title: '全て'}}
         />
         <TopTab.Screen
           name={topTabNames[1]}
           children={() => (
-            <UserCardList word={word} tag={tag} userRole={UserRole.ADMIN} />
+            <UserCardList
+              focused={isFocused}
+              word={word}
+              tag={tag}
+              userRole={UserRole.ADMIN}
+            />
           )}
           options={{title: userRoleNameFactory(UserRole.ADMIN)}}
         />
         <TopTab.Screen
           name={topTabNames[2]}
           children={() => (
-            <UserCardList word={word} tag={tag} userRole={UserRole.COMMON} />
+            <UserCardList
+              focused={isFocused}
+              word={word}
+              tag={tag}
+              userRole={UserRole.COMMON}
+            />
           )}
           options={{title: userRoleNameFactory(UserRole.COMMON)}}
         />
         <TopTab.Screen
           name={topTabNames[3]}
           children={() => (
-            <UserCardList word={word} tag={tag} userRole={UserRole.COACH} />
+            <UserCardList
+              focused={isFocused}
+              word={word}
+              tag={tag}
+              userRole={UserRole.COACH}
+            />
           )}
           options={{title: userRoleNameFactory(UserRole.COACH)}}
         />
@@ -86,6 +107,7 @@ const UserList: React.FC = () => {
           name={topTabNames[4]}
           children={() => (
             <UserCardList
+              focused={isFocused}
               word={word}
               tag={tag}
               userRole={UserRole.INTERNAL_INSTRUCTOR}
@@ -97,6 +119,7 @@ const UserList: React.FC = () => {
           name={topTabNames[5]}
           children={() => (
             <UserCardList
+              focused={isFocused}
               word={word}
               tag={tag}
               userRole={UserRole.EXTERNAL_INSTRUCTOR}

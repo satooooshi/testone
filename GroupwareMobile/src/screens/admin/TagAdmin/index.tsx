@@ -67,7 +67,7 @@ const TagAdmin: React.FC = () => {
     },
     {
       name: 'タグ管理',
-      onPress: () => {},
+      onPress: () => navigation.navigate('AdminStack', {screen: 'TagAdmin'}),
     },
     {
       name: 'タグ管理(ユーザー)',

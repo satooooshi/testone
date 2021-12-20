@@ -19,13 +19,23 @@ type UserCardListProps = {
   userRole: UserRoleInApp;
   word: string;
   tag: string;
+  focused: boolean;
 };
 
-const UserCardList: React.FC<UserCardListProps> = ({userRole, word, tag}) => {
+const UserCardList: React.FC<UserCardListProps> = ({
+  userRole,
+  word,
+  tag,
+  focused,
+}) => {
   const [searchQuery, setSearchQuery] = useState<SearchQueryToGetUsers>({
     page: '1',
   });
-  const {data: users, isLoading} = useAPISearchUsers({
+  const {
+    data: users,
+    isLoading,
+    refetch,
+  } = useAPISearchUsers({
     ...searchQuery,
     role: userRole !== 'All' ? userRole : undefined,
     page: searchQuery?.page || '1',
@@ -52,6 +62,14 @@ const UserCardList: React.FC<UserCardListProps> = ({userRole, word, tag}) => {
       });
     }
   }, [users?.users]);
+
+  useEffect(() => {
+    if (focused) {
+      setUsersForInfiniteScroll([]);
+      setSearchQuery(q => ({...q, page: '1'}));
+      refetch();
+    }
+  }, [focused, refetch]);
 
   const sortDropdownButtonName = () => {
     switch (searchQuery.sort) {
