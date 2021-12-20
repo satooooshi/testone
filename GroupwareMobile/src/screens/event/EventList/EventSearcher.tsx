@@ -68,7 +68,7 @@ const EventSearcher: React.FC = () => {
       setPartOfSearchQuery({type: typePassedByRoute});
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [setPartOfSearchQuery, typePassedByRoute]);
+  }, [typePassedByRoute]);
 
   useEffect(() => {
     if (tagPassedByRoute && tagPassedByRoute !== partOfSearchQuery.tag) {
