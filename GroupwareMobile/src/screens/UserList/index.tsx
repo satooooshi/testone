@@ -32,8 +32,6 @@ const UserList: React.FC = () => {
     }
   }, [tagPassedByRouteParam]);
 
-  console.log(tagPassedByRouteParam);
-
   return (
     <WholeContainer>
       <SearchForm
