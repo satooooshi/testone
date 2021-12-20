@@ -187,15 +187,14 @@ const Profile: React.FC = () => {
             ...profileStyles.scrollView,
             width: windowWidth * 0.9,
           }}>
-          <TouchableOpacity onPress={handleUploadImage}>
-            <Div my={'lg'} justifyContent="center" alignItems="center">
-              <UserAvatar
-                h={windowWidth * 0.6}
-                w={windowWidth * 0.6}
-                user={values}
-              />
-            </Div>
-          </TouchableOpacity>
+          <Div my={'lg'} justifyContent="center" alignItems="center">
+            <UserAvatar
+              h={windowWidth * 0.6}
+              w={windowWidth * 0.6}
+              user={values}
+              onPress={handleUploadImage}
+            />
+          </Div>
           <Div mb="lg">
             <Text fontSize={16} fontWeight="bold">
               メールアドレス

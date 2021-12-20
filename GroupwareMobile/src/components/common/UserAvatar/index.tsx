@@ -9,15 +9,20 @@ type UserAvatarProps = {
   user?: Partial<User>;
   h: number | string;
   w: number | string;
+  onPress?: () => void;
 };
 
-const UserAvatar: React.FC<UserAvatarProps> = ({user, h, w}) => {
+const UserAvatar: React.FC<UserAvatarProps> = ({user, h, w, onPress}) => {
   const navigation = useNavigation<any>();
   const {user: mySelf} = useAuthenticate();
   return (
     <TouchableHighlight
       underlayColor="none"
       onPress={() => {
+        if (onPress) {
+          onPress();
+          return;
+        }
         if (user?.id === mySelf?.id) {
           navigation.navigate('AccountStack', {
             screen: 'MyProfile',
