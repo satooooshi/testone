@@ -50,6 +50,7 @@ const RoomForm: React.FC<RoomFormProps> = ({
   const {values, setValues, handleChange, handleSubmit, errors, touched} =
     useFormik({
       initialValues: initialRoom || initialValues,
+      enableReinitialize: true,
       onSubmit: submittedValues => {
         onSubmit(submittedValues);
       },
