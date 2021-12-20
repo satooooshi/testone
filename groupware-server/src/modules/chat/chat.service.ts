@@ -415,7 +415,10 @@ export class ChatService {
       },
     });
     if (existReaction) {
-      return { ...existReaction, isSender: true };
+      return {
+        ...existReaction,
+        isSender: true,
+      };
     }
     const reactionWithUser = { ...reaction, user: existUser };
     const savedReaction = await this.chatMessageReactionRepository.save(
