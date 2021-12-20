@@ -77,7 +77,7 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
       .set({hour: 19, minute: 0})
       .toJSDate(),
     endAt: DateTime.now().plus({days: 1}).set({hour: 21, minute: 0}).toJSDate(),
-    type: EventType.CLUB,
+    type: type || EventType.CLUB,
     imageURL: '',
     chatNeeded: false,
     hostUsers: [],
@@ -130,18 +130,20 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
   });
   const {
     selectedTags,
+    setSelectedTags,
     toggleTag,
     isSelected: isSelectedTag,
-  } = useSelectedTags(event?.tags || []);
+  } = useSelectedTags(event?.tags);
   const {selectedTagType, selectTagType, filteredTags} = useTagType(
     'All',
     tags,
   );
   const {
     selectedUsers,
+    setSelectedUsers,
     toggleUser,
     isSelected: isSelectedUser,
-  } = useSelectedUsers(event?.users || []);
+  } = useSelectedUsers(event?.hostUsers);
   const {selectedUserRole, selectUserRole, filteredUsers} = useUserRole(
     'All',
     users,
@@ -242,6 +244,12 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
       setNewEvent(e => ({...e, type}));
     }
   }, [setNewEvent, type, user?.role]);
+
+  useEffect(() => {
+    event?.tags && setSelectedTags(event.tags);
+    event?.hostUsers && setSelectedUsers(event.hostUsers);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [event]);
 
   return (
     <Modal {...props}>
@@ -571,7 +579,7 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
                 </TouchableOpacity>
               }
             />
-            {newEvent.videos?.map((v, index) => (
+            {newEvent.videos?.map(v => (
               <Div
                 key={v.id}
                 mb={'lg'}

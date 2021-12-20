@@ -185,7 +185,7 @@ export interface EventSchedule {
   comments?: EventComment[];
   users?: User[];
   userJoiningEvent?: UserJoiningEvent[];
-  hostUsers?: Partial<User>[];
+  hostUsers?: User[];
   tags?: Tag[];
   files?: Partial<EventFile>[];
   submissionFiles?: Partial<SubmissionFile>[];
