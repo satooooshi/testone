@@ -1,4 +1,3 @@
-import {useNavigation} from '@react-navigation/native';
 import React, {useEffect, useRef, useState} from 'react';
 import {FlatList} from 'react-native';
 import {Div, Dropdown, Text} from 'react-native-magnus';
@@ -11,7 +10,6 @@ import {
 } from '../../hooks/api/user/useAPISearchUsers';
 import {userListStyles} from '../../styles/screen/user/userList.style';
 import {User, UserRoleInApp} from '../../types';
-import {UsersListNavigationProps} from '../../types/navigator/drawerScreenProps';
 import {
   defaultDropdownProps,
   defaultDropdownOptionProps,
@@ -37,7 +35,6 @@ const UserCardList: React.FC<UserCardListProps> = ({userRole, word, tag}) => {
   const [usersForInfiniteScroll, setUsersForInfiniteScroll] = useState<User[]>(
     [],
   );
-  const navigation = useNavigation<UsersListNavigationProps>();
   const sortDropdownRef = useRef<any | null>(null);
   const durationDropdownRef = useRef<any | null>(null);
 
@@ -81,6 +78,10 @@ const UserCardList: React.FC<UserCardListProps> = ({userRole, word, tag}) => {
         return '指定なし';
     }
   };
+
+  useEffect(() => {
+    setSearchQuery(q => ({...q, word, tag}));
+  }, [tag, word]);
 
   useEffect(() => {
     setUsersForInfiniteScroll([]);
@@ -168,19 +169,7 @@ const UserCardList: React.FC<UserCardListProps> = ({userRole, word, tag}) => {
           keyExtractor={item => item.id.toString()}
           renderItem={({item: u}) => (
             <Div mb={'lg'}>
-              <UserCard
-                filteredDuration={searchQuery.duration}
-                onPress={() =>
-                  navigation.navigate('AccountStack', {
-                    screen: 'AccountDetail',
-                    params: {id: u.id},
-                  })
-                }
-                onPressTag={t =>
-                  setSearchQuery(q => ({...q, tag: t.id.toString()}))
-                }
-                user={u}
-              />
+              <UserCard filteredDuration={searchQuery.duration} user={u} />
             </Div>
           )}
         />

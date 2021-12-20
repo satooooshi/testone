@@ -1,19 +1,22 @@
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
-import React, {useState} from 'react';
+import {useRoute} from '@react-navigation/native';
+import React, {useEffect, useState} from 'react';
 import SearchForm from '../../components/common/SearchForm';
 import SearchFormOpenerButton from '../../components/common/SearchForm/SearchFormOpenerButton';
 import HeaderWithTextButton from '../../components/Header';
 import WholeContainer from '../../components/WholeContainer';
 import {UserRole} from '../../types';
+import {UsersListRouteProps} from '../../types/navigator/drawerScreenProps';
 import {userRoleNameFactory} from '../../utils/factory/userRoleNameFactory';
 import UserCardList from './UserCardList';
 
 const TopTab = createMaterialTopTabNavigator();
 
 const UserList: React.FC = () => {
+  const tagPassedByRouteParam = useRoute<UsersListRouteProps>().params?.tag;
   const [visibleSearchFormModal, setVisibleSearchFormModal] = useState(false);
   const [word, setWord] = useState('');
-  const [tag, setTag] = useState('');
+  const [tag, setTag] = useState(tagPassedByRouteParam || '');
   const topTabNames = [
     'AllRole',
     UserRole.ADMIN,
@@ -22,6 +25,14 @@ const UserList: React.FC = () => {
     UserRole.INTERNAL_INSTRUCTOR,
     UserRole.EXTERNAL_INSTRUCTOR,
   ];
+
+  useEffect(() => {
+    if (tagPassedByRouteParam) {
+      setTag(tagPassedByRouteParam);
+    }
+  }, [tagPassedByRouteParam]);
+
+  console.log(tagPassedByRouteParam);
 
   return (
     <WholeContainer>
