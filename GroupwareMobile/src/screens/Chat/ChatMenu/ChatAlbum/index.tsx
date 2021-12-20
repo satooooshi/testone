@@ -59,7 +59,6 @@ const ChatAlbums: React.FC = () => {
       setNotesForInfiniteScroll([]);
       setPage('1');
       refetchAlbums();
-      // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [refetchAlbums]),
   );
 

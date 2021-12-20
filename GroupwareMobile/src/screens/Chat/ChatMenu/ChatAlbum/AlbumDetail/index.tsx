@@ -1,9 +1,5 @@
-import {
-  useFocusEffect,
-  useNavigation,
-  useRoute,
-} from '@react-navigation/native';
-import React, {useCallback, useEffect, useState} from 'react';
+import {useNavigation, useRoute} from '@react-navigation/native';
+import React, {useEffect, useState} from 'react';
 import {FlatList, TouchableHighlight, useWindowDimensions} from 'react-native';
 import {
   Button,
@@ -11,7 +7,7 @@ import {
   Icon,
   Image,
   Input,
-  Modal,
+  Overlay,
   Text,
 } from 'react-native-magnus';
 import tailwind from 'tailwind-rn';
@@ -51,7 +47,7 @@ const AlbumDetail: React.FC = () => {
       setEditModal(false);
     },
   });
-  const {data, refetch} = useAPIGetChatAlbumImages({
+  const {data} = useAPIGetChatAlbumImages({
     roomId: room.id.toString(),
     albumId: album.id.toString(),
     page: page.toString(),
@@ -98,14 +94,14 @@ const AlbumDetail: React.FC = () => {
         rightButtonName="タイトルを編集"
         onPressRightButton={() => setEditModal(true)}
       />
-      <Modal isVisible={editModal} px={16} py={32} h={200}>
+      <Overlay visible={editModal} px={16} py={32} h={200}>
         <Button
           bg="gray400"
           h={35}
           w={35}
           position="absolute"
-          right={-15}
-          top={-45}
+          right={-10}
+          top={-15}
           rounded="circle"
           onPress={() => setEditModal(false)}>
           <Icon color="black" name="close" />
@@ -125,7 +121,7 @@ const AlbumDetail: React.FC = () => {
         <Button w={'100%'} bg="pink600" onPress={() => handleSubmit()}>
           変更
         </Button>
-      </Modal>
+      </Overlay>
       <ImageView
         animationType="slide"
         images={images}
