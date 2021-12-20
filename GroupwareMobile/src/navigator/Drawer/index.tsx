@@ -35,6 +35,8 @@ import EditRoom from '../../screens/Chat/EditRoom';
 import PostReply from '../../screens/wiki/PostReply';
 import Share from '../../screens/Chat/Share';
 import EventIntroduction from '../../screens/event/EventIntroduction';
+import {useAuthenticate} from '../../contexts/useAuthenticate';
+import {UserRole} from '../../types';
 
 const Drawer = createDrawerNavigator();
 const Stack = createStackNavigator();
@@ -145,30 +147,38 @@ const UserListStack = () => (
   </Stack.Navigator>
 );
 
-const AdminStack = () => (
-  <Stack.Navigator initialRouteName="UserAdmin">
-    <Stack.Screen
-      name="UserAdmin"
-      component={UserAdmin}
-      options={{headerShown: false}}
-    />
-    <Stack.Screen
-      name="UserTagAdmin"
-      component={UserTagAdmin}
-      options={{headerShown: false}}
-    />
-    <Stack.Screen
-      name="UserRegisteringAdmin"
-      component={UserRegisteringAdmin}
-      options={{headerShown: false}}
-    />
-    <Stack.Screen
-      name="TagAdmin"
-      component={TagAdmin}
-      options={{headerShown: false}}
-    />
-  </Stack.Navigator>
-);
+const AdminStack = () => {
+  const {user} = useAuthenticate();
+  const isAdmin = user?.role === UserRole.ADMIN;
+  return (
+    <Stack.Navigator initialRouteName={isAdmin ? 'UserAdmin' : 'TagAdmin'}>
+      {isAdmin && (
+        <>
+          <Stack.Screen
+            name="UserAdmin"
+            component={UserAdmin}
+            options={{headerShown: false}}
+          />
+          <Stack.Screen
+            name="UserRegisteringAdmin"
+            component={UserRegisteringAdmin}
+            options={{headerShown: false}}
+          />
+        </>
+      )}
+      <Stack.Screen
+        name="UserTagAdmin"
+        component={UserTagAdmin}
+        options={{headerShown: false}}
+      />
+      <Stack.Screen
+        name="TagAdmin"
+        component={TagAdmin}
+        options={{headerShown: false}}
+      />
+    </Stack.Navigator>
+  );
+};
 
 const ChatStack = () => (
   <Stack.Navigator initialRouteName="ChatStack">
@@ -237,6 +247,8 @@ const ChatStack = () => (
 );
 
 const DrawerTab = () => {
+  const {user} = useAuthenticate();
+  const isAdmin = user?.role === UserRole.ADMIN;
   return (
     <Drawer.Navigator
       initialRouteName="Home"
@@ -344,14 +356,17 @@ const DrawerTab = () => {
         component={AdminStack}
         options={{
           drawerLabel: '管理',
-          drawerIcon: ({color}) => (
-            <Icon
-              name="user-cog"
-              fontFamily="FontAwesome5"
-              color={color}
-              fontSize={26}
-            />
-          ),
+          drawerIcon: ({color}) =>
+            isAdmin ? (
+              <Icon
+                name="user-cog"
+                fontFamily="FontAwesome5"
+                color={color}
+                fontSize={26}
+              />
+            ) : (
+              <Icon name="tags" color={color} fontSize={26} />
+            ),
         }}
       />
     </Drawer.Navigator>
