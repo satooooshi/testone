@@ -11,7 +11,6 @@ import {
 import {
   Text,
   Div,
-  Image,
   ScrollDiv,
   Input,
   Button,
@@ -189,7 +188,7 @@ const Profile: React.FC = () => {
             width: windowWidth * 0.9,
           }}>
           <TouchableOpacity onPress={handleUploadImage}>
-            <Div my={'lg'}>
+            <Div my={'lg'} justifyContent="center" alignItems="center">
               <UserAvatar
                 h={windowWidth * 0.6}
                 w={windowWidth * 0.6}
