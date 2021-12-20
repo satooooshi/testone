@@ -9,6 +9,7 @@ import {ChatGroup, ChatMessage, ChatMessageType} from '../../../types';
 import {darkFontColor} from '../../../utils/colors';
 import {dateTimeFormatterFromJSDDate} from '../../../utils/dateTimeFormatterFromJSDate';
 import {nameOfRoom} from '../../../utils/factory/chat/nameOfRoom';
+import {mentionTransform} from '../../../utils/messageTransform';
 
 type RoomCardProps = {
   room: ChatGroup;
@@ -47,7 +48,7 @@ const RoomCard: React.FC<RoomCardProps> = ({
       case ChatMessageType.OTHER_FILE:
         return 'ファイルが送信されました';
       default:
-        return chatMessage.content;
+        return mentionTransform(chatMessage.content);
     }
   };
 

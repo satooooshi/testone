@@ -2,6 +2,7 @@ import React from 'react';
 import {Div, Image, Text} from 'react-native-magnus';
 import {ChatMessage, ChatMessageType} from '../../../../types';
 import {userNameFactory} from '../../../../utils/factory/userNameFactory';
+import {mentionTransform} from '../../../../utils/messageTransform';
 import UserAvatar from '../../../common/UserAvatar';
 
 type ReplyParentProps = {
@@ -12,7 +13,7 @@ const ReplyParent: React.FC<ReplyParentProps> = ({parentMessage}) => {
   const content = (type: ChatMessageType) => {
     switch (type) {
       case ChatMessageType.TEXT:
-        return parentMessage.content;
+        return mentionTransform(parentMessage.content);
       case ChatMessageType.IMAGE:
         return '写真';
       case ChatMessageType.VIDEO:
