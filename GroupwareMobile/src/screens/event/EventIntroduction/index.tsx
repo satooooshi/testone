@@ -51,7 +51,7 @@ const EventIntroduction: React.FC = () => {
       case EventType.IMPRESSIVE_UNIVERSITY:
         return [
           require('../../../../assets/impressive_university_1.png'),
-          require('../../../../assets/impressive_university_2.png'),
+          require('../../../../assets/impressive_university_2.jpg'),
         ];
       case EventType.STUDY_MEETING:
         return [
