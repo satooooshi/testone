@@ -5,7 +5,7 @@ import {
   TouchableOpacity,
   useWindowDimensions,
 } from 'react-native';
-import {Box, Div, Image, Text} from 'react-native-magnus';
+import {Box, Div, Text} from 'react-native-magnus';
 import {
   ChatMessage,
   ChatMessageReaction,
