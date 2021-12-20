@@ -1,5 +1,5 @@
-import {useNavigation} from '@react-navigation/native';
-import React, {useEffect, useState} from 'react';
+import {useFocusEffect, useNavigation} from '@react-navigation/native';
+import React, {useCallback, useEffect, useState} from 'react';
 import {FlatList} from 'react-native';
 import {Text, Div} from 'react-native-magnus';
 import {ActivityIndicator} from 'react-native-paper';
@@ -23,7 +23,12 @@ const UserAdmin: React.FC = () => {
     page: '1',
   });
   const [selectedTags, setSelectedTags] = useState<UserTag[]>([]);
-  const {data: users, isLoading} = useAPISearchUsers(searchQuery);
+  const {
+    data: users,
+    isLoading,
+    refetch,
+    isRefetching,
+  } = useAPISearchUsers(searchQuery);
   const {data: tags} = useAPIGetUserTag();
   const [visibleSearchFormModal, setVisibleSearchFormModal] = useState(false);
   const queryRefresh = (
@@ -65,13 +70,26 @@ const UserAdmin: React.FC = () => {
     setSearchQuery(q => ({...q, page: (Number(q.page) + 1).toString()}));
   };
 
+  useFocusEffect(
+    useCallback(() => {
+      setUsersForInfiniteScroll([]);
+      setSearchQuery(q => ({...q, page: '1'}));
+      refetch();
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []),
+  );
+
   useEffect(() => {
-    if (users?.users?.length) {
+    if (!isRefetching && users?.users.length) {
       setUsersForInfiniteScroll(u => {
-        return [...u, ...users.users];
+        if (u.length && u[0].id !== users.users[0].id) {
+          return [...u, ...users.users];
+        }
+        return users.users;
       });
     }
-  }, [users?.users]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isRefetching]);
 
   useEffect(() => {
     const tagIDs = searchQuery.tag?.split('+') || [];
@@ -131,7 +149,7 @@ const UserAdmin: React.FC = () => {
       ) : (
         <Text fontSize={16}>検索結果が見つかりませんでした</Text>
       )}
-      {isLoading && <ActivityIndicator />}
+      {isLoading || isRefetching ? <ActivityIndicator /> : null}
     </WholeContainer>
   );
 };
