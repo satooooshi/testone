@@ -1,9 +1,9 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class RemoveUniqueIndexOnReaction1639851620760
+export class ModifyReactionCharacterCode1639851620760
   implements MigrationInterface
 {
-  name = 'RemoveUniqueIndexOnReaction1639851620760';
+  name = 'ModifyReactionCharacterCode1639851620760';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(
