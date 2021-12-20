@@ -39,6 +39,7 @@ const UserAdmin: React.FC = () => {
     const tagQuery = selectedTagIDs?.join('+');
 
     setUsersForInfiniteScroll([]);
+    selected && setSelectedTags(selected);
     setSearchQuery(q => ({...q, ...query, page: '1', tag: tagQuery || ''}));
   };
   const [usersForInfiniteScroll, setUsersForInfiniteScroll] = useState<User[]>(
@@ -88,8 +89,7 @@ const UserAdmin: React.FC = () => {
         return users.users;
       });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isRefetching]);
+  }, [users?.users, isRefetching]);
 
   useEffect(() => {
     const tagIDs = searchQuery.tag?.split('+') || [];
@@ -149,7 +149,7 @@ const UserAdmin: React.FC = () => {
       ) : (
         <Text fontSize={16}>検索結果が見つかりませんでした</Text>
       )}
-      {isLoading || isRefetching ? <ActivityIndicator /> : null}
+      {isLoading && <ActivityIndicator />}
     </WholeContainer>
   );
 };
