@@ -1,4 +1,5 @@
 import {useNavigation, useRoute} from '@react-navigation/native';
+import {AxiosError} from 'axios';
 import React, {useCallback, useState} from 'react';
 import {ActivityIndicator, Alert, FlatList} from 'react-native';
 import {Button, Div, Icon} from 'react-native-magnus';
@@ -29,6 +30,11 @@ const Share: React.FC = () => {
       onSuccess: data => {
         stateRefreshNeeded(data.rooms);
       },
+      onError: err => {
+        if (err.response?.data) {
+          Alert.alert((err.response?.data as AxiosError)?.message);
+        }
+      },
     },
   );
   const [selectedRoom, setSelectedRoom] = useState<ChatGroup[]>([]);
@@ -44,6 +50,11 @@ const Share: React.FC = () => {
   const {mutate: saveGroup} = useAPISaveChatGroup({
     onSuccess: () => {
       handleRefetch();
+    },
+    onError: err => {
+      if (err.response?.data) {
+        Alert.alert((err.response?.data as AxiosError)?.message);
+      }
     },
   });
 
@@ -121,6 +132,11 @@ const Share: React.FC = () => {
                   onPress: () => navigation.goBack(),
                 },
               ]);
+            }
+          },
+          onError: err => {
+            if (err.response?.data) {
+              Alert.alert((err.response?.data as AxiosError)?.message);
             }
           },
         },

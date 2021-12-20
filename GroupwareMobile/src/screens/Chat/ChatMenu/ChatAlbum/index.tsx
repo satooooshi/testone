@@ -3,6 +3,7 @@ import {
   useNavigation,
   useRoute,
 } from '@react-navigation/native';
+import {AxiosError} from 'axios';
 import React, {useCallback, useEffect, useState} from 'react';
 import {Alert, FlatList} from 'react-native';
 import {Button, Div, Icon, Text} from 'react-native-magnus';
@@ -122,6 +123,13 @@ const ChatAlbums: React.FC = () => {
                           onSuccess: () => {
                             setPage('1');
                             refetchAlbums();
+                          },
+                          onError: err => {
+                            if (err.response?.data) {
+                              Alert.alert(
+                                (err.response?.data as AxiosError)?.message,
+                              );
+                            }
                           },
                         },
                       );

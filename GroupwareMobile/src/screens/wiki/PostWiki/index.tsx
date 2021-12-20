@@ -9,12 +9,13 @@ import {useSelectedTags} from '../../../hooks/tag/useSelectedTags';
 import WikiForm from '../../../templates/wiki/WikiForm';
 import {useAPIUploadStorage} from '../../../hooks/api/storage/useAPIUploadStorage';
 import {uploadImageFromGallery} from '../../../utils/cropImage/uploadImageFromGallery';
-import {ActivityIndicator} from 'react-native';
+import {ActivityIndicator, Alert} from 'react-native';
 import {Overlay} from 'react-native-magnus';
 import {
   PostWikiNavigationProps,
   PostWikiRouteProps,
 } from '../../../types/navigator/drawerScreenProps';
+import {AxiosError} from 'axios';
 
 const PostWiki: React.FC = () => {
   const navigation = useNavigation<PostWikiNavigationProps>();
@@ -24,6 +25,11 @@ const PostWiki: React.FC = () => {
   const {mutate: saveWiki, isLoading: loadingSaveWiki} = useAPICreateWiki({
     onSuccess: () => {
       navigation.goBack();
+    },
+    onError: err => {
+      if (err.response?.data) {
+        Alert.alert((err.response?.data as AxiosError)?.message);
+      }
     },
   });
   const {data: tags} = useAPIGetTag();

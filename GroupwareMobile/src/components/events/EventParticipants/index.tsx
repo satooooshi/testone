@@ -1,3 +1,4 @@
+import {AxiosError} from 'axios';
 import React, {useRef, useState} from 'react';
 import {Alert, TouchableHighlight, useWindowDimensions} from 'react-native';
 import {
@@ -40,6 +41,11 @@ const EventParticipants: React.FC<EventParticipantsProps> = ({
     onSuccess: data => {
       onSuccessSaveUserJoiningEvent(data);
       Alert.alert('遅刻を記録しました。');
+    },
+    onError: err => {
+      if (err.response?.data) {
+        Alert.alert((err.response?.data as AxiosError)?.message);
+      }
     },
   });
 

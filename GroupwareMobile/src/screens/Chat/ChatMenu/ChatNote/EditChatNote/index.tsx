@@ -9,6 +9,8 @@ import {
 } from '../../../../../types/navigator/drawerScreenProps';
 import ChatNoteForm from '../../../../../templates/chat/notes/ChatNoteForm';
 import {useAPIUploadStorage} from '../../../../../hooks/api/storage/useAPIUploadStorage';
+import {Alert} from 'react-native';
+import {AxiosError} from 'axios';
 
 const EditChatNote: React.FC = () => {
   const {room, note} = useRoute<EditChatNotesRouteProps>().params;
@@ -33,6 +35,11 @@ const EditChatNote: React.FC = () => {
               screen: 'ChatNotes',
               params: {room},
             });
+          },
+          onError: err => {
+            if (err.response?.data) {
+              Alert.alert((err.response?.data as AxiosError)?.message);
+            }
           },
         });
       }}

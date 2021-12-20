@@ -7,6 +7,8 @@ import {
   PostChatAlbumsNavigationProps,
 } from '../../../../../types/navigator/drawerScreenProps';
 import ChatAlbumForm from '../../../../../templates/chat/album/ChatAlbumForm';
+import {Alert} from 'react-native';
+import {AxiosError} from 'axios';
 
 const PostChatAlbum: React.FC = () => {
   const {mutate: createChatAlbum} = useAPICreateChatAlbum();
@@ -24,6 +26,11 @@ const PostChatAlbum: React.FC = () => {
               screen: 'ChatAlbums',
               params: {room},
             }),
+          onError: err => {
+            if (err.response?.data) {
+              Alert.alert((err.response?.data as AxiosError)?.message);
+            }
+          },
         })
       }
       uploadImage={onUploadImage}

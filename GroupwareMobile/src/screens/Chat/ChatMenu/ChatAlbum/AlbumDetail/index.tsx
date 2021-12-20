@@ -1,6 +1,11 @@
 import {useNavigation, useRoute} from '@react-navigation/native';
 import React, {useEffect, useState} from 'react';
-import {FlatList, TouchableHighlight, useWindowDimensions} from 'react-native';
+import {
+  Alert,
+  FlatList,
+  TouchableHighlight,
+  useWindowDimensions,
+} from 'react-native';
 import {
   Button,
   Div,
@@ -25,6 +30,7 @@ import {useFormik} from 'formik';
 import {useAPIUpdateAlbum} from '../../../../../hooks/api/chat/album/useAPIUpdateChatAlbum';
 import FastImage from 'react-native-fast-image';
 import DownloadIcon from '../../../../../components/common/DownLoadIcon';
+import {AxiosError} from 'axios';
 
 const AlbumDetail: React.FC = () => {
   const {width: windowWidth} = useWindowDimensions();
@@ -45,6 +51,11 @@ const AlbumDetail: React.FC = () => {
     onSuccess: updatedRoom => {
       setAlbum(updatedRoom);
       setEditModal(false);
+    },
+    onError: err => {
+      if (err.response?.data) {
+        Alert.alert((err.response?.data as AxiosError)?.message);
+      }
     },
   });
   const {data} = useAPIGetChatAlbumImages({

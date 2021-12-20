@@ -1,4 +1,5 @@
 import {useNavigation} from '@react-navigation/native';
+import {AxiosError} from 'axios';
 import {useFormik} from 'formik';
 import React from 'react';
 import {ActivityIndicator, Alert, useWindowDimensions} from 'react-native';
@@ -18,6 +19,11 @@ const UpdatePassword: React.FC = () => {
       onSuccess: () => {
         Alert.alert('パスワードの更新が完了しました');
         resetForm();
+      },
+      onError: err => {
+        if (err.response?.data) {
+          Alert.alert((err.response?.data as AxiosError)?.message);
+        }
       },
     });
   const tabs: Tab[] = [

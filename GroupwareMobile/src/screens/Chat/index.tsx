@@ -1,5 +1,6 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {
+  Alert,
   FlatList,
   Keyboard,
   KeyboardAvoidingView,
@@ -61,6 +62,7 @@ import {useAPISaveLastReadChatTime} from '../../hooks/api/chat/useAPISaveLastRea
 import DownloadIcon from '../../components/common/DownLoadIcon';
 import UserAvatar from '../../components/common/UserAvatar';
 import {nameOfRoom} from '../../utils/factory/chat/nameOfRoom';
+import {AxiosError} from 'axios';
 
 const Chat: React.FC = () => {
   const typeDropdownRef = useRef<any | null>(null);
@@ -138,6 +140,11 @@ const Chat: React.FC = () => {
           setImagesForViewing(i => [...i, {uri: sentMsg.content}]);
         }
       },
+      onError: err => {
+        if (err.response?.data) {
+          Alert.alert((err.response?.data as AxiosError)?.message);
+        }
+      },
     });
   const {mutate: uploadFile, isLoading: loadingUploadFile} =
     useAPIUploadStorage();
@@ -168,6 +175,11 @@ const Chat: React.FC = () => {
       onSuccess: reactionId => {
         setDeletedReactionIds(r => [...r, reactionId]);
       },
+      onError: err => {
+        if (err.response?.data) {
+          Alert.alert((err.response?.data as AxiosError)?.message);
+        }
+      },
     });
   };
 
@@ -195,6 +207,11 @@ const Chat: React.FC = () => {
             });
           });
         },
+        onError: err => {
+          if (err.response?.data) {
+            Alert.alert((err.response?.data as AxiosError)?.message);
+          }
+        },
       });
     }
   };
@@ -213,6 +230,11 @@ const Chat: React.FC = () => {
             chatGroup: room,
           });
         },
+        onError: err => {
+          if (err.response?.data) {
+            Alert.alert((err.response?.data as AxiosError)?.message);
+          }
+        },
       });
     }
   };
@@ -230,6 +252,11 @@ const Chat: React.FC = () => {
             type: ChatMessageType.VIDEO,
             chatGroup: room,
           });
+        },
+        onError: err => {
+          if (err.response?.data) {
+            Alert.alert((err.response?.data as AxiosError)?.message);
+          }
         },
       });
     }
@@ -254,6 +281,11 @@ const Chat: React.FC = () => {
             type: ChatMessageType.OTHER_FILE,
             chatGroup: room,
           });
+        },
+        onError: err => {
+          if (err.response?.data) {
+            Alert.alert((err.response?.data as AxiosError)?.message);
+          }
         },
       });
     }

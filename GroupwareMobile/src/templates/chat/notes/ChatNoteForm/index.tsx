@@ -1,7 +1,7 @@
 import {AxiosError} from 'axios';
 import {useFormik} from 'formik';
 import React, {useState} from 'react';
-import {TextInput, TouchableHighlight} from 'react-native';
+import {Alert, TextInput, TouchableHighlight} from 'react-native';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import {Button, Div, Icon, Image} from 'react-native-magnus';
 import {UseMutateFunction} from 'react-query';
@@ -81,6 +81,11 @@ const ChatNoteForm: React.FC<ChatNoteFormProps> = ({
             ...v,
             images: v.images?.length ? [...v.images, newImage] : [newImage],
           }));
+        },
+        onError: err => {
+          if (err.response?.data) {
+            Alert.alert((err.response?.data as AxiosError)?.message);
+          }
         },
       });
     }

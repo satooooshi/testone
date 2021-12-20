@@ -11,7 +11,7 @@ import ImageView from 'react-native-image-viewing';
 import {UseMutateFunction} from 'react-query';
 import {AxiosError} from 'axios';
 import {useFormik} from 'formik';
-import {TouchableHighlight, useWindowDimensions} from 'react-native';
+import {Alert, TouchableHighlight, useWindowDimensions} from 'react-native';
 import {uploadImageFromGallery} from '../../../../utils/cropImage/uploadImageFromGallery';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import {
@@ -83,6 +83,11 @@ const ChatAlbumForm: React.FC<ChatAlbumFormProps> = ({
             ...v,
             images: v.images?.length ? [...v.images, ...newImages] : newImages,
           }));
+        },
+        onError: err => {
+          if (err.response?.data) {
+            Alert.alert((err.response?.data as AxiosError)?.message);
+          }
         },
       });
     }

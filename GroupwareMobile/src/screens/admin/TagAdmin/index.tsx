@@ -1,4 +1,5 @@
 import {useNavigation} from '@react-navigation/native';
+import {AxiosError} from 'axios';
 import React from 'react';
 import {Alert, useWindowDimensions} from 'react-native';
 import {Overlay, ScrollDiv} from 'react-native-magnus';
@@ -22,10 +23,20 @@ const TagAdmin: React.FC = () => {
     onSuccess: () => {
       refetch();
     },
+    onError: err => {
+      if (err.response?.data) {
+        Alert.alert((err.response?.data as AxiosError)?.message);
+      }
+    },
   });
   const {mutate: deleteTag, isLoading: loadingDeleteTag} = useAPIDeleteTag({
     onSuccess: () => {
       refetch();
+    },
+    onError: err => {
+      if (err.response?.data) {
+        Alert.alert((err.response?.data as AxiosError)?.message);
+      }
     },
   });
   const {filteredTags: techTags} = useTagType(TagType.TECH, tags || []);

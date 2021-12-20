@@ -1,6 +1,7 @@
 import {useNavigation} from '@react-navigation/native';
+import {AxiosError} from 'axios';
 import React, {useCallback, useState} from 'react';
-import {FlatList} from 'react-native';
+import {Alert, FlatList} from 'react-native';
 import {Div, Text} from 'react-native-magnus';
 import {ActivityIndicator} from 'react-native-paper';
 import tailwind from 'tailwind-rn';
@@ -28,6 +29,11 @@ const RoomList: React.FC = () => {
       onSuccess: data => {
         stateRefreshNeeded(data.rooms);
       },
+      onError: err => {
+        if (err.response?.data) {
+          Alert.alert((err.response?.data as AxiosError)?.message);
+        }
+      },
     },
   );
 
@@ -41,6 +47,11 @@ const RoomList: React.FC = () => {
   const {mutate: saveGroup} = useAPISaveChatGroup({
     onSuccess: () => {
       handleRefetch();
+    },
+    onError: err => {
+      if (err.response?.data) {
+        Alert.alert((err.response?.data as AxiosError)?.message);
+      }
     },
   });
 

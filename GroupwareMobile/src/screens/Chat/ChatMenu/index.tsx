@@ -1,4 +1,5 @@
 import {useNavigation, useRoute} from '@react-navigation/native';
+import {AxiosError} from 'axios';
 import React from 'react';
 import {Alert} from 'react-native';
 import {Icon} from 'react-native-magnus';
@@ -21,6 +22,11 @@ const ChatMenu: React.FC = () => {
         screen: 'RoomList',
         params: {needRefetch: true},
       });
+    },
+    onError: err => {
+      if (err.response?.data) {
+        Alert.alert((err.response?.data as AxiosError)?.message);
+      }
     },
   });
 

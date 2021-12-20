@@ -7,7 +7,7 @@ import {
   MIN_HEIGHT,
   WeekNum,
 } from 'react-native-big-calendar';
-import {useWindowDimensions} from 'react-native';
+import {Alert, useWindowDimensions} from 'react-native';
 import {EventSchedule} from '../../../types';
 import {
   SearchQueryToGetEvents,
@@ -33,6 +33,7 @@ import {useAPICreateEvent} from '../../../hooks/api/event/useAPICreateEvent';
 import EventFormModal from '../../../components/events/EventFormModal';
 import {useEventCardListSearchQuery} from '../../../contexts/event/useEventSearchQuery';
 import {isEventCreatableUser} from '../../../utils/factory/event/isCreatableEvent';
+import {AxiosError} from 'axios';
 
 type EventCalendarProps = {
   personal?: boolean;
@@ -65,6 +66,11 @@ const EventCalendar: React.FC<EventCalendarProps> = ({
     onSuccess: () => {
       hideEventFormModal();
       refetchEvents();
+    },
+    onError: err => {
+      if (err.response?.data) {
+        Alert.alert((err.response?.data as AxiosError)?.message);
+      }
     },
   });
 

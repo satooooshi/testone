@@ -46,6 +46,7 @@ import {useAPIGetUsers} from '../../../hooks/api/user/useAPIGetUsers';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import {isCreatableEvent} from '../../../utils/factory/event/isCreatableEvent';
 import {useAuthenticate} from '../../../contexts/useAuthenticate';
+import {AxiosError} from 'axios';
 
 type CustomModalProps = Omit<ModalProps, 'children'>;
 
@@ -122,10 +123,20 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
         };
       });
     },
+    onError: err => {
+      if (err.response?.data) {
+        Alert.alert((err.response?.data as AxiosError)?.message);
+      }
+    },
   });
   const {mutate: uploadImage} = useAPIUploadStorage({
     onSuccess: uploadedURL => {
       setNewEvent(e => ({...e, imageURL: uploadedURL[0]}));
+    },
+    onError: err => {
+      if (err.response?.data) {
+        Alert.alert((err.response?.data as AxiosError)?.message);
+      }
     },
   });
   const {

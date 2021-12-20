@@ -2,7 +2,7 @@ import {useNavigation, useRoute} from '@react-navigation/native';
 import {useFormik} from 'formik';
 import MarkdownIt from 'markdown-it';
 import React from 'react';
-import {ActivityIndicator, useWindowDimensions} from 'react-native';
+import {ActivityIndicator, Alert, useWindowDimensions} from 'react-native';
 import {Button, Overlay, ScrollDiv, Text} from 'react-native-magnus';
 import HeaderWithTextButton from '../../../components/Header';
 import WholeContainer from '../../../components/WholeContainer';
@@ -18,6 +18,7 @@ import {uploadImageFromGallery} from '../../../utils/cropImage/uploadImageFromGa
 import {replySchema} from '../../../utils/validation/schema';
 import RenderHtml from 'react-native-render-html';
 import TextEditor from '../../../components/wiki/TextEditor';
+import {AxiosError} from 'axios';
 
 const PostReply: React.FC = () => {
   const navigation = useNavigation<PostWikiNavigationProps>();
@@ -29,6 +30,11 @@ const PostReply: React.FC = () => {
     useAPICreateAnswerReply({
       onSuccess: () => {
         navigation.goBack();
+      },
+      onError: err => {
+        if (err.response?.data) {
+          Alert.alert((err.response?.data as AxiosError)?.message);
+        }
       },
     });
   const {mutate: uploadImage, isLoading: loadingUploadImage} =

@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {FlatList, Text} from 'react-native';
+import {Alert, FlatList, Text} from 'react-native';
 import {
   SearchQueryToGetEvents,
   EventStatus,
@@ -17,6 +17,7 @@ import EventFormModal from '../../../components/events/EventFormModal';
 import {useAPICreateEvent} from '../../../hooks/api/event/useAPICreateEvent';
 import {isEventCreatableUser} from '../../../utils/factory/event/isCreatableEvent';
 import {useAuthenticate} from '../../../contexts/useAuthenticate';
+import {AxiosError} from 'axios';
 
 type EventCardListProps = {
   status: EventStatus;
@@ -39,6 +40,11 @@ const EventCardList: React.FC<EventCardListProps> = ({
         setSearchQuery(q => ({...q, page: '1'}));
       }
       setPartOfSearchQuery({refetchNeeded: true});
+    },
+    onError: err => {
+      if (err.response?.data) {
+        Alert.alert((err.response?.data as AxiosError)?.message);
+      }
     },
   });
   const {word, tag, type} = partOfSearchQuery;

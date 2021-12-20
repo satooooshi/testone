@@ -16,7 +16,6 @@ import {
   Image,
   Input,
   Overlay,
-  ScrollDiv,
   Text,
 } from 'react-native-magnus';
 import DropdownOpenerButton from '../../../components/common/DropdownOpenerButton';
@@ -43,6 +42,7 @@ import {userRoleNameFactory} from '../../../utils/factory/userRoleNameFactory';
 import {formikErrorMsgFactory} from '../../../utils/factory/formikEroorMsgFactory';
 import {createUserSchema} from '../../../utils/validation/schema';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+import {AxiosError} from 'axios';
 
 const initialValues: Partial<User> = {
   email: '',
@@ -72,6 +72,11 @@ const UserRegisteringAdmin: React.FC = () => {
           `パスワード: ${password}`,
         );
         resetForm();
+      }
+    },
+    onError: err => {
+      if (err.response?.data) {
+        Alert.alert((err.response?.data as AxiosError)?.message);
       }
     },
   });
@@ -115,6 +120,11 @@ const UserRegisteringAdmin: React.FC = () => {
   const {mutate: uploadImage} = useAPIUploadStorage({
     onSuccess: async fileURLs => {
       setValues(v => ({...v, avatarUrl: fileURLs[0]}));
+    },
+    onError: err => {
+      if (err.response?.data) {
+        Alert.alert((err.response?.data as AxiosError)?.message);
+      }
     },
   });
   const tabs: Tab[] = [

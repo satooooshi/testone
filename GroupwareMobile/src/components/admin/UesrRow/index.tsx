@@ -1,4 +1,5 @@
 import {useNavigation} from '@react-navigation/native';
+import {AxiosError} from 'axios';
 import React, {useRef, useState} from 'react';
 import {TouchableOpacity, Alert} from 'react-native';
 import {Div, Dropdown, Icon, Text} from 'react-native-magnus';
@@ -26,11 +27,21 @@ const UserRow: React.FC<UserRowProps> = ({user}) => {
     onSuccess: updatedInfo => {
       setCurrentUser(updatedInfo);
     },
+    onError: err => {
+      if (err.response?.data) {
+        Alert.alert((err.response?.data as AxiosError)?.message);
+      }
+    },
   });
   const [deleted, setDeleted] = useState(false);
   const {mutate: deleteUser, isLoading: loadingDelete} = useAPIDeleteUser({
     onSuccess: () => {
       setDeleted(true);
+    },
+    onError: err => {
+      if (err.response?.data) {
+        Alert.alert((err.response?.data as AxiosError)?.message);
+      }
     },
   });
   const handleDeleteUser = (u: User) => {

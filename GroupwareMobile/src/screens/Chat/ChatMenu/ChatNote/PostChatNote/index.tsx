@@ -1,5 +1,7 @@
 import {useNavigation, useRoute} from '@react-navigation/native';
+import {AxiosError} from 'axios';
 import React from 'react';
+import {Alert} from 'react-native';
 import {useAPICreateChatNote} from '../../../../../hooks/api/chat/note/useAPICreateChatNote';
 import {useAPIUploadStorage} from '../../../../../hooks/api/storage/useAPIUploadStorage';
 import ChatNoteForm from '../../../../../templates/chat/notes/ChatNoteForm';
@@ -31,6 +33,11 @@ const PostChatNote: React.FC = () => {
               screen: 'ChatNotes',
               params: {room},
             });
+          },
+          onError: err => {
+            if (err.response?.data) {
+              Alert.alert((err.response?.data as AxiosError)?.message);
+            }
           },
         });
       }}

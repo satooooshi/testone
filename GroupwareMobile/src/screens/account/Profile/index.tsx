@@ -35,6 +35,7 @@ import {formikErrorMsgFactory} from '../../../utils/factory/formikEroorMsgFactor
 import {profileSchema} from '../../../utils/validation/schema';
 import {Tab} from '../../../components/Header/HeaderTemplate';
 import UserAvatar from '../../../components/common/UserAvatar';
+import {AxiosError} from 'axios';
 const initialValues: Partial<User> = {
   email: '',
   lastName: '',
@@ -60,6 +61,11 @@ const Profile: React.FC = () => {
     onSuccess: responseData => {
       if (responseData) {
         Alert.alert('プロフィールを更新しました');
+      }
+    },
+    onError: err => {
+      if (err.response?.data) {
+        Alert.alert((err.response?.data as AxiosError)?.message);
       }
     },
   });
@@ -102,6 +108,11 @@ const Profile: React.FC = () => {
   const {mutate: uploadImage} = useAPIUploadStorage({
     onSuccess: async fileURLs => {
       setValues(v => ({...v, avatarUrl: fileURLs[0]}));
+    },
+    onError: err => {
+      if (err.response?.data) {
+        Alert.alert((err.response?.data as AxiosError)?.message);
+      }
     },
   });
   const tabs: Tab[] = [

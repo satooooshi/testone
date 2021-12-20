@@ -1,4 +1,5 @@
 import {useNavigation, useRoute} from '@react-navigation/native';
+import {AxiosError} from 'axios';
 import React from 'react';
 import {Alert} from 'react-native';
 import {useAPIEditMembers} from '../../../hooks/api/chat/useAPIEditMembers';
@@ -37,6 +38,11 @@ const EditRoom: React.FC = () => {
           },
         },
       ]);
+    },
+    onError: err => {
+      if (err.response?.data) {
+        Alert.alert((err.response?.data as AxiosError)?.message);
+      }
     },
   });
   return (

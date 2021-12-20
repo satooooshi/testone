@@ -1,6 +1,7 @@
 import React from 'react';
 import {
   ActivityIndicator,
+  Alert,
   TouchableOpacity,
   useWindowDimensions,
 } from 'react-native';
@@ -15,6 +16,7 @@ import {useAPICreateBestAnswer} from '../../../hooks/api/wiki/useAPICreateBestAn
 import {useAuthenticate} from '../../../contexts/useAuthenticate';
 import {useAPIGetWikiDetail} from '../../../hooks/api/wiki/useAPIGetWikiDetail';
 import UserAvatar from '../../../components/common/UserAvatar';
+import {AxiosError} from 'axios';
 
 type AnswerListProps = {
   wiki: Wiki;
@@ -28,6 +30,11 @@ const AnswerList: React.FC<AnswerListProps> = ({wiki, onPressAvatar}) => {
   const {mutate: saveBestAnswer, isLoading: loadingSaveBestAnswer} =
     useAPICreateBestAnswer({
       onSuccess: () => refetchWikiInfo(),
+      onError: err => {
+        if (err.response?.data) {
+          Alert.alert((err.response?.data as AxiosError)?.message);
+        }
+      },
     });
   const {refetch: refetchWikiInfo} = useAPIGetWikiDetail(wiki.id);
 

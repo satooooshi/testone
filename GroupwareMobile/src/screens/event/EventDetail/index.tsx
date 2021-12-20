@@ -70,6 +70,11 @@ const EventDetail: React.FC = () => {
       setEventFormModal(false);
       refetchEvents();
     },
+    onError: err => {
+      if (err.response?.data) {
+        Alert.alert((err.response?.data as AxiosError)?.message);
+      }
+    },
   });
   const [unsavedSubmissions, setUnsavedSubmissions] = useState<
     Partial<SubmissionFile>[]
@@ -96,6 +101,11 @@ const EventDetail: React.FC = () => {
   });
   const {mutate: cancelEvent} = useAPICancelEvent({
     onSuccess: () => refetchEvents(),
+    onError: err => {
+      if (err.response?.data) {
+        Alert.alert((err.response?.data as AxiosError)?.message);
+      }
+    },
   });
 
   const userJoiningEvents = useMemo(() => {
@@ -232,6 +242,11 @@ const EventDetail: React.FC = () => {
             userSubmitted: user,
           }));
           setUnsavedSubmissions(f => [...f, ...unSavedFiles]);
+        },
+        onError: err => {
+          if (err.response?.data) {
+            Alert.alert((err.response?.data as AxiosError)?.message);
+          }
         },
       });
     }

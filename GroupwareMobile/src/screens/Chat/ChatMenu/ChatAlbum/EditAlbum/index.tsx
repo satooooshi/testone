@@ -9,6 +9,8 @@ import {
 } from '../../../../../types/navigator/drawerScreenProps';
 import {useAPIUpdateAlbum} from '../../../../../hooks/api/chat/album/useAPIUpdateChatAlbum';
 import ChatAlbumForm from '../../../../../templates/chat/album/ChatAlbumForm';
+import {Alert} from 'react-native';
+import {AxiosError} from 'axios';
 
 const EditChatAlbum: React.FC = () => {
   const {album} = useRoute<EditChatAlbumRouteProps>().params;
@@ -28,6 +30,11 @@ const EditChatAlbum: React.FC = () => {
               screen: 'ChatAlbums',
               params: {room},
             }),
+          onError: err => {
+            if (err.response?.data) {
+              Alert.alert((err.response?.data as AxiosError)?.message);
+            }
+          },
         })
       }
       uploadImage={onUploadImage}

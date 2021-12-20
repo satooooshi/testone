@@ -3,6 +3,8 @@ import {createContext, useContext, useState} from 'react';
 import {User} from '../types';
 import {useAPIAuthenticate} from '../hooks/api/auth/useAPIAuthenticate';
 import {storage} from '../utils/url';
+import {Alert} from 'react-native';
+import {AxiosError} from 'axios';
 
 const AuthenticateContext = createContext({
   isAuthenticated: false,
@@ -22,7 +24,10 @@ export const AuthenticateProvider: React.FC = ({children}) => {
         setUser(userData);
       }
     },
-    onError: () => {
+    onError: err => {
+      if (err.response?.data) {
+        Alert.alert((err.response?.data as AxiosError)?.message);
+      }
       logout();
     },
   });
