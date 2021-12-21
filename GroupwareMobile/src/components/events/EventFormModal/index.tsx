@@ -336,7 +336,6 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
             alignSelf="center"
             mb={'lg'}>
             <Text fontSize={16}>
-              {' '}
               {newEvent.type !== EventType.SUBMISSION_ETC
                 ? '終了日時'
                 : '締切日時'}
