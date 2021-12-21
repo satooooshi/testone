@@ -562,7 +562,7 @@ const EventDetail: React.FC = () => {
                         f =>
                           f.url && (
                             <Div mr={4} mb={4}>
-                              <FileIcon url={f.url} />
+                              <FileIcon url={f.url} color="blue" />
                             </Div>
                           ),
                       )}
