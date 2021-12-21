@@ -1,5 +1,4 @@
 import {useNavigation, useRoute} from '@react-navigation/native';
-import {AxiosError} from 'axios';
 import React, {useCallback, useState} from 'react';
 import {ActivityIndicator, Alert, FlatList} from 'react-native';
 import {Button, Div, Icon} from 'react-native-magnus';
