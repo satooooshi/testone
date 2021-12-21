@@ -142,6 +142,9 @@ const NoteModal: React.FC<NoteModalProps> = ({ isOpen, onClose, room }) => {
     onSuccess: () => {
       resetForm();
       setMode('edit');
+      setNotesForInfiniteScroll([]);
+      setNoteListPage(1);
+      refetchNotes();
     },
   });
   const [mode, setMode] = useState<'new' | 'edit'>('edit');
@@ -283,7 +286,7 @@ const NoteModal: React.FC<NoteModalProps> = ({ isOpen, onClose, room }) => {
       </Box>
       <Box display="flex" justifyContent="center" alignItems="center">
         <Button colorScheme="pink" onClick={() => handleSubmit()}>
-          更新
+          作成
         </Button>
       </Box>
     </Box>
