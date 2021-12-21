@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {
   FlatList,
   Keyboard,
@@ -34,7 +34,11 @@ import ChatFooter from '../../components/chat/ChatFooter';
 import {userNameFactory} from '../../utils/factory/userNameFactory';
 import {Suggestion} from 'react-native-controlled-mentions';
 import {KeyboardAwareFlatList} from 'react-native-keyboard-aware-scroll-view';
-import {useNavigation, useRoute} from '@react-navigation/native';
+import {
+  useFocusEffect,
+  useNavigation,
+  useRoute,
+} from '@react-navigation/native';
 import {
   ChatNavigationProps,
   ChatRouteProps,
@@ -69,7 +73,9 @@ const Chat: React.FC = () => {
   const {height: windowHeight} = useWindowDimensions();
   const route = useRoute<ChatRouteProps>();
   const {room} = route.params;
-  const {data: roomDetail} = useAPIGetRoomDetail(room.id);
+  const {data: roomDetail, refetch: refetchRoomDetail} = useAPIGetRoomDetail(
+    room.id,
+  );
   const [page, setPage] = useState(1);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [imageModal, setImageModal] = useState(false);
@@ -504,6 +510,12 @@ const Chat: React.FC = () => {
         </>
       )}
     </>
+  );
+
+  useFocusEffect(
+    useCallback(() => {
+      refetchRoomDetail();
+    }, [refetchRoomDetail]),
   );
 
   useEffect(() => {
