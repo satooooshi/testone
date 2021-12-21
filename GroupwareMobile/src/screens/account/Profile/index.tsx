@@ -107,8 +107,7 @@ const Profile: React.FC = () => {
   const tabs: Tab[] = [
     {
       name: 'アカウント情報',
-      onPress: () =>
-        navigation.navigate('AccountStack', {screen: 'AccountDetail'}),
+      onPress: () => navigation.navigate('AccountStack', {screen: 'MyProfile'}),
     },
     {
       name: 'プロフィール編集',
