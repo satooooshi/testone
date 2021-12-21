@@ -46,7 +46,7 @@ const HeaderTemplate: React.FC<HeaderTemplateProps> = ({
         px="lg"
         row
         justifyContent="space-between">
-        <Div h="100%" row alignItems="center">
+        <Div maxW="60%" h="100%" row alignItems="center">
           {enableBackButton && (
             <TouchableOpacity
               onPress={() => {
@@ -77,7 +77,6 @@ const HeaderTemplate: React.FC<HeaderTemplateProps> = ({
             ml="lg"
             fontWeight="bold"
             color={darkFontColor}
-            w="50%"
             numberOfLines={1}>
             {title}
           </Text>
