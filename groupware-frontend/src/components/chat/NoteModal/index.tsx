@@ -449,11 +449,23 @@ const NoteModal: React.FC<NoteModalProps> = ({ isOpen, onClose, room }) => {
   return (
     <>
       <Viewer
+        customToolbar={(config) => {
+          return config.concat([
+            {
+              key: 'donwload',
+              render: (
+                <i
+                  className={`react-viewer-icon react-viewer-icon-download`}></i>
+              ),
+              onClick: ({ src }) => {
+                saveAs(src);
+              },
+            },
+          ]);
+        }}
         images={mode === 'edit' ? imagesInViewer : imagesInNewNoteViewer}
         visible={!!selectedImage}
         onClose={() => setSelectedImage(undefined)}
-        downloadable={true}
-        downloadInNewWindow={true}
         activeIndex={activeIndex}
       />
       <Modal
