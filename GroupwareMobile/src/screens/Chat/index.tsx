@@ -53,7 +53,6 @@ import {
   defaultDropdownOptionProps,
   defaultDropdownProps,
 } from '../../utils/dropdown/helper';
-import EmojiSelector from 'react-native-emoji-selector';
 import {useAPISaveReaction} from '../../hooks/api/chat/useAPISaveReaction';
 import {useAPIDeleteReaction} from '../../hooks/api/chat/useAPIDeleteReaction';
 import ReactionsModal from '../../components/chat/ReactionsModal';
@@ -66,6 +65,7 @@ import DownloadIcon from '../../components/common/DownLoadIcon';
 import UserAvatar from '../../components/common/UserAvatar';
 import {nameOfRoom} from '../../utils/factory/chat/nameOfRoom';
 import {useAPIGetRoomDetail} from '../../hooks/api/chat/useAPIGetRoomDetail';
+import {reactionEmojis} from '../../utils/factory/reactionEmojis';
 
 const Chat: React.FC = () => {
   const typeDropdownRef = useRef<any | null>(null);
@@ -395,6 +395,28 @@ const Chat: React.FC = () => {
     </Div>
   );
 
+  const reactionSelector = (
+    <Div
+      bg="white"
+      flexDir="row"
+      alignSelf="center"
+      w={'100%'}
+      py={32}
+      justifyContent="space-around"
+      px={'sm'}>
+      <TouchableOpacity
+        style={tailwind('absolute right-0 top-0')}
+        onPress={() => setReactionTarget(undefined)}>
+        <Icon name="close" fontSize={24} />
+      </TouchableOpacity>
+      {reactionEmojis.map(e => (
+        <Text key={e} fontSize={26} onPress={() => handleSaveReaction(e)}>
+          {e}
+        </Text>
+      ))}
+    </Div>
+  );
+
   const messageListAvoidngKeyboardDisturb = (
     <>
       {Platform.OS === 'ios' ? (
@@ -418,15 +440,7 @@ const Chat: React.FC = () => {
             renderItem={({item: message}) => renderMessage(message)}
           />
           {reactionTarget ? (
-            <Div h={'50%'}>
-              <EmojiSelector
-                onEmojiSelected={emoji => handleSaveReaction(emoji)}
-                showHistory={false}
-                showSearchBar={false}
-                placeholder="検索"
-                showSectionTitles={false}
-              />
-            </Div>
+            reactionSelector
           ) : (
             <>
               {values.replyParentMessage && (
@@ -469,16 +483,7 @@ const Chat: React.FC = () => {
             renderItem={({item: message}) => renderMessage(message)}
           />
           {reactionTarget ? (
-            <Div h={'50%'}>
-              <EmojiSelector
-                shouldInclude={e => parseFloat(e.added_in) <= 6}
-                onEmojiSelected={emoji => handleSaveReaction(emoji)}
-                showHistory={false}
-                showSearchBar={false}
-                placeholder="検索"
-                showSectionTitles={false}
-              />
-            </Div>
+            reactionSelector
           ) : (
             <>
               {values.replyParentMessage && (
