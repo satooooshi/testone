@@ -73,10 +73,11 @@ const HeaderTemplate: React.FC<HeaderTemplateProps> = ({
             />
           </TouchableHighlight>
           <Text
-            fontSize={18}
+            fontSize={16}
             ml="lg"
             fontWeight="bold"
             color={darkFontColor}
+            w="60%"
             numberOfLines={1}>
             {title}
           </Text>
