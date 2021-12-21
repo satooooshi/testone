@@ -62,6 +62,7 @@ import DownloadIcon from '../../components/common/DownLoadIcon';
 import UserAvatar from '../../components/common/UserAvatar';
 import {nameOfRoom} from '../../utils/factory/chat/nameOfRoom';
 import {useAPIGetRoomDetail} from '../../hooks/api/chat/useAPIGetRoomDetail';
+import {chatMessageSchema} from '../../utils/validation/schema';
 
 const Chat: React.FC = () => {
   const typeDropdownRef = useRef<any | null>(null);
@@ -97,6 +98,7 @@ const Chat: React.FC = () => {
       replyParentMessage: null,
       chatGroup: room,
     },
+    validationSchema: chatMessageSchema,
     enableReinitialize: true,
     onSubmit: submittedValues => {
       Keyboard.dismiss();
