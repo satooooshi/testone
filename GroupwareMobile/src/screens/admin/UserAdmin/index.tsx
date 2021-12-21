@@ -143,6 +143,7 @@ const UserAdmin: React.FC = () => {
         <FlatList
           data={usersForInfiniteScroll}
           {...{onEndReached}}
+          onEndReachedThreshold={0.5}
           keyExtractor={item => item.id.toString()}
           renderItem={({item}) => <UserRow user={item} />}
         />
