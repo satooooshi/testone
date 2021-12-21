@@ -119,7 +119,7 @@ const Chat: React.FC = () => {
     }
     return room.members.map(m => ({
       id: m.id.toString(),
-      name: userNameFactory(m),
+      name: userNameFactory(m) + 'さん',
     }));
   };
   const {mutate: sendChatMessage, isLoading: loadingSendMessage} =
