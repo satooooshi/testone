@@ -31,6 +31,7 @@ import { useAPIGetChatAlbums } from '@/hooks/api/chat/album/useAPIGetAlbums';
 import { useAPIGetChatAlbumImages } from '@/hooks/api/chat/album/useAPIGetChatAlbumImages';
 import { useAPISaveAlbumImage } from '@/hooks/api/chat/album/useAPISaveChatImages';
 import { useAPIDeleteChatAlbum } from '@/hooks/api/chat/album/useAPIDeleteChatAlbum';
+import { saveAs } from 'file-saver';
 
 type AlbumModalProps = {
   isOpen: boolean;
@@ -346,11 +347,23 @@ const AlbumModal: React.FC<AlbumModalProps> = ({ isOpen, onClose, room }) => {
   return (
     <>
       <Viewer
+        customToolbar={(config) => {
+          return config.concat([
+            {
+              key: 'donwload',
+              render: (
+                <i
+                  className={`react-viewer-icon react-viewer-icon-download`}></i>
+              ),
+              onClick: ({ src }) => {
+                saveAs(src);
+              },
+            },
+          ]);
+        }}
         images={mode === 'list' ? imagesInDetailViewer : imagesInNewAlbumViewer}
         visible={!!selectedImage}
         onClose={() => setSelectedImage(undefined)}
-        downloadable={true}
-        downloadInNewWindow={true}
         activeIndex={activeIndex}
       />
       <Modal

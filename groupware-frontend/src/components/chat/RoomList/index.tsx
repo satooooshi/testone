@@ -106,13 +106,18 @@ const RoomList: React.FC<RoomListProps> = ({
       onScroll={onScroll}>
       {roomsForInfiniteScroll.length ? (
         roomsForInfiniteScroll.map((g) => (
-          <Link w="100%" onClick={() => onClickRoom(g)} key={g.id} mb={'8px'}>
-            <ChatGroupCard
-              isSelected={Number(currentId) === g.id}
-              chatGroup={g}
-              key={g.id}
-            />
-          </Link>
+          <a
+            onClick={() => onClickRoom(g)}
+            key={g.id}
+            style={{ width: '100%' }}>
+            <Box w="100%" mb={'8px'}>
+              <ChatGroupCard
+                isSelected={Number(currentId) === g.id}
+                chatGroup={g}
+                key={g.id}
+              />
+            </Box>
+          </a>
         ))
       ) : (
         <Box position="absolute" top="auto" bottom="auto">

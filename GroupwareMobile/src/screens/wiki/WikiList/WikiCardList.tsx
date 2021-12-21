@@ -1,4 +1,10 @@
-import React, {useState, useEffect, Dispatch, SetStateAction} from 'react';
+import React, {
+  useState,
+  useEffect,
+  Dispatch,
+  SetStateAction,
+  useCallback,
+} from 'react';
 import {RuleCategory, WikiType} from '../../../types';
 import {
   SearchQueryToGetWiki,
@@ -8,7 +14,7 @@ import {Div, Text} from 'react-native-magnus';
 import WikiCard from '../../../components/wiki/WikiCard';
 import {FlatList} from 'react-native';
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
-import {useRoute} from '@react-navigation/native';
+import {useFocusEffect, useIsFocused, useRoute} from '@react-navigation/native';
 import SearchForm from '../../../components/common/SearchForm';
 import SearchFormOpenerButton from '../../../components/common/SearchForm/SearchFormOpenerButton';
 import {WikiListRouteProps} from '../../../types/navigator/drawerScreenProps';
@@ -26,16 +32,20 @@ type RenderWikiCardListProps = {
   word: string;
   tag: string;
   ruleCategory?: RuleCategory;
+  setRuleCategory: Dispatch<SetStateAction<RuleCategory>>;
   status?: 'new' | 'resolved';
   type?: WikiType;
+  focused: boolean;
 };
 
 const RenderWikiCardList: React.FC<RenderWikiCardListProps> = ({
   word,
   tag,
   ruleCategory,
+  setRuleCategory,
   type,
   status,
+  focused,
 }) => {
   const [searchQuery, setSearchQuery] = useState<SearchQueryToGetWiki>({
     page: '1',
@@ -45,7 +55,12 @@ const RenderWikiCardList: React.FC<RenderWikiCardListProps> = ({
     type,
     status,
   });
-  const {data: fetchedWiki, isLoading} = useAPIGetWikiList(searchQuery);
+  const {
+    data: fetchedWiki,
+    isLoading,
+    isFetching,
+    refetch,
+  } = useAPIGetWikiList(searchQuery);
   const [wikiForInfiniteScroll, setWikiForInfiniteScroll] = useState(
     fetchedWiki?.wiki || [],
   );
@@ -57,13 +72,22 @@ const RenderWikiCardList: React.FC<RenderWikiCardListProps> = ({
     }));
   };
 
-  useEffect(() => {
-    setWikiForInfiniteScroll([]);
-    setSearchQuery(q => ({...q, page: '1', type, word, tag}));
-  }, [tag, type, word]);
+  useFocusEffect(
+    useCallback(() => {
+      setRuleCategory(ruleCategory || RuleCategory.OTHERS);
+    }, [ruleCategory, setRuleCategory]),
+  );
 
   useEffect(() => {
-    if (fetchedWiki?.wiki && fetchedWiki?.wiki.length) {
+    if (focused) {
+      setWikiForInfiniteScroll([]);
+      setSearchQuery(q => ({...q, page: '1', type, word, tag}));
+      refetch();
+    }
+  }, [focused, refetch, tag, type, word]);
+
+  useEffect(() => {
+    if (!isFetching && fetchedWiki?.wiki && fetchedWiki?.wiki.length) {
       setWikiForInfiniteScroll(w => {
         if (w.length && fetchedWiki.wiki[0].id !== w[0].id) {
           return [...w, ...fetchedWiki.wiki];
@@ -71,7 +95,7 @@ const RenderWikiCardList: React.FC<RenderWikiCardListProps> = ({
         return fetchedWiki.wiki;
       });
     }
-  }, [fetchedWiki?.wiki]);
+  }, [fetchedWiki?.wiki, isFetching]);
 
   return (
     <>
@@ -79,6 +103,7 @@ const RenderWikiCardList: React.FC<RenderWikiCardListProps> = ({
         {wikiForInfiniteScroll.length ? (
           <FlatList
             onEndReached={onEndReached}
+            onEndReachedThreshold={0.5}
             data={wikiForInfiniteScroll || []}
             keyExtractor={item => item.id.toString()}
             renderItem={({item}) => <WikiCard wiki={item} />}
@@ -94,11 +119,13 @@ const RenderWikiCardList: React.FC<RenderWikiCardListProps> = ({
   );
 };
 
-const WikiCardList: React.FC<WikiCardListProps> = ({type, setType}) => {
+
+const WikiCardList: React.FC<WikiCardListProps> = ({type, setType, setRuleCategory}) => {
   const routeParams = useRoute<WikiListRouteProps>().params;
   const [visibleSearchFormModal, setVisibleSearchFormModal] = useState(false);
   const [word, setWord] = useState('');
   const [tag, setTag] = useState('');
+  const isFocused = useIsFocused();
 
   useEffect(() => {
     if (routeParams?.tag) {
@@ -133,6 +160,8 @@ const WikiCardList: React.FC<WikiCardListProps> = ({type, setType}) => {
               name={'WikiList-' + RuleCategory.RULES}
               children={() => (
                 <RenderWikiCardList
+                  focused={isFocused}
+                  setRuleCategory={setRuleCategory}
                   ruleCategory={RuleCategory.RULES}
                   status={undefined}
                   word={word}
@@ -146,6 +175,8 @@ const WikiCardList: React.FC<WikiCardListProps> = ({type, setType}) => {
               name={'WikiList-' + RuleCategory.PHILOSOPHY}
               children={() => (
                 <RenderWikiCardList
+                  focused={isFocused}
+                  setRuleCategory={setRuleCategory}
                   ruleCategory={RuleCategory.PHILOSOPHY}
                   status={undefined}
                   word={word}
@@ -159,6 +190,8 @@ const WikiCardList: React.FC<WikiCardListProps> = ({type, setType}) => {
               name={'WikiList-' + RuleCategory.ABC}
               children={() => (
                 <RenderWikiCardList
+                  focused={isFocused}
+                  setRuleCategory={setRuleCategory}
                   ruleCategory={RuleCategory.ABC}
                   status={undefined}
                   word={word}
@@ -172,6 +205,8 @@ const WikiCardList: React.FC<WikiCardListProps> = ({type, setType}) => {
               name={'WikiList-' + RuleCategory.BENEFITS}
               children={() => (
                 <RenderWikiCardList
+                  focused={isFocused}
+                  setRuleCategory={setRuleCategory}
                   ruleCategory={RuleCategory.BENEFITS}
                   status={undefined}
                   word={word}
@@ -185,6 +220,8 @@ const WikiCardList: React.FC<WikiCardListProps> = ({type, setType}) => {
               name={'WikiList-' + RuleCategory.DOCUMENT}
               children={() => (
                 <RenderWikiCardList
+                  focused={isFocused}
+                  setRuleCategory={setRuleCategory}
                   ruleCategory={RuleCategory.DOCUMENT}
                   status={undefined}
                   word={word}
@@ -201,6 +238,8 @@ const WikiCardList: React.FC<WikiCardListProps> = ({type, setType}) => {
               name={'WikiList-' + WikiType.QA + '-new'}
               children={() => (
                 <RenderWikiCardList
+                  focused={isFocused}
+                  setRuleCategory={setRuleCategory}
                   ruleCategory={undefined}
                   status={'new'}
                   word={word}
@@ -214,6 +253,8 @@ const WikiCardList: React.FC<WikiCardListProps> = ({type, setType}) => {
               name={'WikiList-' + WikiType.QA + '-resolved'}
               children={() => (
                 <RenderWikiCardList
+                  focused={isFocused}
+                  setRuleCategory={setRuleCategory}
                   ruleCategory={undefined}
                   status={'resolved'}
                   word={word}
@@ -226,6 +267,8 @@ const WikiCardList: React.FC<WikiCardListProps> = ({type, setType}) => {
           </TopTab.Navigator>
         ) : (
           <RenderWikiCardList
+            focused={isFocused}
+            setRuleCategory={setRuleCategory}
             ruleCategory={undefined}
             status={undefined}
             word={word}

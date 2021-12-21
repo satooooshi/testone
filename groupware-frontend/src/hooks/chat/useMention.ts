@@ -56,7 +56,7 @@ const mentionReducer = (
             ...state,
             allMentionUserData: action.value.map((u) => ({
               id: u.id,
-              name: u.lastName + ' ' + u.firstName,
+              name: u.lastName + ' ' + u.firstName + 'さん',
               avatar: u.avatarUrl,
             })),
           }

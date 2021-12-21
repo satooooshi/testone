@@ -13,8 +13,6 @@ import {
   ModalContent,
   ModalOverlay,
 } from '@chakra-ui/react';
-import '@draft-js-plugins/mention/lib/plugin.css';
-import '@draft-js-plugins/image/lib/plugin.css';
 import LayoutWithTab from '@/components/layout/LayoutWithTab';
 import { Tab } from 'src/types/header/tab/types';
 import Head from 'next/head';
