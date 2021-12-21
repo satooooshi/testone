@@ -15,7 +15,6 @@ import {requestIOSMsgPermission} from '../utils/permission/requestIOSMsgPermisso
 import {useAPIRegisterDevice} from '../hooks/api/notification/useAPIRegisterDevice';
 import ForgotPassword from '../screens/auth/ForgotPassword';
 import WebEngine from '../components/WebEngine';
-import Share from '../screens/Chat/Share';
 
 const Stack = createStackNavigator<RootStackParamList>();
 
@@ -74,21 +73,29 @@ const Navigator = () => {
       },
     );
     const unsubscribe = messaging().onMessage(async remoteMessage => {
-      console.log('sent', remoteMessage);
+      console.log('sent', remoteMessage?.data?.screen);
       PushNotification.localNotification({
         channelId: 'default-channel-id',
         ignoreInForeground: false,
         id: remoteMessage.messageId,
+        vibrate: true, // (optional) default: true
+        vibration: 300,
+        priority: 'high', // (optional) set notification priority, default: high
+
+        visibility: 'private', // (optional) set notification visibility, default: private
+
         message: remoteMessage.notification?.body || '',
         title: remoteMessage.notification?.title,
         bigPictureUrl: remoteMessage.notification?.android?.imageUrl,
-        userInfo: remoteMessage.data,
+        userInfo: {
+          screen: remoteMessage?.data?.screen,
+          id: remoteMessage?.data?.id,
+        },
       });
     });
 
     return unsubscribe;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [navigationRef]);
 
   useEffect(() => {
     const handleMessaging = async () => {
