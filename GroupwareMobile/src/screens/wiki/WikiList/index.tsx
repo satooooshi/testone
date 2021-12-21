@@ -53,7 +53,9 @@ const WikiList: React.FC<WikiListProps> = ({navigation}) => {
         enableBackButton={true}
         tabs={tabs}
         title="社内Wiki"
-        activeTabName={type ? wikiTypeNameFactory(type, ruleCategory) : 'All'}
+        activeTabName={
+          type ? wikiTypeNameFactory(type, ruleCategory, false) : 'All'
+        }
         rightButtonName={
           type
             ? `${wikiTypeNameFactory(type, ruleCategory)}新規作成`

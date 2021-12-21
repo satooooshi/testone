@@ -66,6 +66,7 @@ import DownloadIcon from '../../components/common/DownLoadIcon';
 import UserAvatar from '../../components/common/UserAvatar';
 import {nameOfRoom} from '../../utils/factory/chat/nameOfRoom';
 import {useAPIGetRoomDetail} from '../../hooks/api/chat/useAPIGetRoomDetail';
+import {chatMessageSchema} from '../../utils/validation/schema';
 import {reactionEmojis} from '../../utils/factory/reactionEmojis';
 
 const Chat: React.FC = () => {
@@ -104,6 +105,7 @@ const Chat: React.FC = () => {
       replyParentMessage: null,
       chatGroup: room,
     },
+    validationSchema: chatMessageSchema,
     enableReinitialize: true,
     onSubmit: submittedValues => {
       Keyboard.dismiss();
