@@ -13,7 +13,7 @@ const getRoomDetail = async (roomId: number) => {
 
 export const useAPIGetRoomDetail = (
   roomId: number,
-  useQueryOptions: UseQueryOptions<ChatGroup, AxiosError>,
+  useQueryOptions?: UseQueryOptions<ChatGroup, AxiosError>,
 ) => {
   return useQuery<ChatGroup, AxiosError>(
     ['getRoomDetail', roomId],

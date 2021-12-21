@@ -11,6 +11,7 @@ import {
   ModalOverlay,
   Text,
 } from '@chakra-ui/react';
+import Linkify from 'react-linkify';
 import React from 'react';
 import { AiOutlineFileProtect } from 'react-icons/ai';
 import { Avatar } from '@chakra-ui/react';
@@ -281,42 +282,48 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
                   bg={message.isSender ? 'blue.500' : '#ececec'}
                   p="8px"
                   rounded="md">
-                  {message.replyParentMessage && (
-                    <Box
-                      flexDir="row"
-                      display="flex"
-                      borderBottomWidth={1}
-                      borderBottomColor={'white'}
-                      pb="4px"
-                      color={'black'}>
-                      <Avatar
-                        h="32px"
-                        w="32px"
-                        mr="4px"
-                        cursor="pointer"
-                        src={
-                          !message.replyParentMessage.sender?.existence
-                            ? boldMascot.src
-                            : message.replyParentMessage?.sender.avatarUrl
-                        }
-                      />
-                      <Box>
-                        <Text fontWeight="bold">
-                          {userNameFactory(message.replyParentMessage?.sender)}
-                        </Text>
-                        <Text>{replyContent(message.replyParentMessage)}</Text>
+                  <Linkify>
+                    {message.replyParentMessage && (
+                      <Box
+                        flexDir="row"
+                        display="flex"
+                        borderBottomWidth={1}
+                        borderBottomColor={'white'}
+                        pb="4px"
+                        color={'black'}>
+                        <Avatar
+                          h="32px"
+                          w="32px"
+                          mr="4px"
+                          cursor="pointer"
+                          src={
+                            !message.replyParentMessage.sender?.existence
+                              ? boldMascot.src
+                              : message.replyParentMessage?.sender.avatarUrl
+                          }
+                        />
+                        <Box>
+                          <Text fontWeight="bold">
+                            {userNameFactory(
+                              message.replyParentMessage?.sender,
+                            )}
+                          </Text>
+                          <Text>
+                            {replyContent(message.replyParentMessage)}
+                          </Text>
+                        </Box>
                       </Box>
-                    </Box>
-                  )}
-                  <Text
-                    borderRadius="8px"
-                    maxW={'40vw'}
-                    minW={'10vw'}
-                    wordBreak={'break-word'}
-                    color={message.isSender ? 'white' : darkFontColor}
-                    bg={message.isSender ? 'blue.500' : '#ececec'}>
-                    {mentionTransform(message.content)}
-                  </Text>
+                    )}
+                    <Text
+                      borderRadius="8px"
+                      maxW={'40vw'}
+                      minW={'10vw'}
+                      wordBreak={'break-word'}
+                      color={message.isSender ? 'white' : darkFontColor}
+                      bg={message.isSender ? 'blue.500' : '#ececec'}>
+                      {mentionTransform(message.content)}
+                    </Text>
+                  </Linkify>
                 </Box>
               ) : (
                 <Box

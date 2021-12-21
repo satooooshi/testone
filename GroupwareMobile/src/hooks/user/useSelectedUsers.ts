@@ -1,8 +1,8 @@
 import {useState} from 'react';
 import {User} from '../../types';
 
-export const useSelectedUsers = (alreadySelectedUsers?: User[]) => {
-  const [selectedUsers, setSelectedUsers] = useState<User[]>(
+export const useSelectedUsers = (alreadySelectedUsers?: Partial<User>[]) => {
+  const [selectedUsers, setSelectedUsers] = useState<Partial<User>[]>(
     alreadySelectedUsers || [],
   );
 

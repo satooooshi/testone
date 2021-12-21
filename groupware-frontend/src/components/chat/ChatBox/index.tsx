@@ -31,6 +31,9 @@ import { useAPIUploadStorage } from '@/hooks/api/storage/useAPIUploadStorage';
 import { isImage, isVideo } from 'src/utils/indecateChatMessageType';
 import { mentionTransform } from 'src/utils/mentionTransform';
 import { useAPISaveLastReadChatTime } from '@/hooks/api/chat/useAPISaveLastReadChatTime';
+import { ImageDecorator } from 'react-viewer/lib/ViewerProps';
+import dynamic from 'next/dynamic';
+const Viewer = dynamic(() => import('react-viewer'), { ssr: false });
 
 type ChatBoxProps = {
   room: ChatGroup;
@@ -62,7 +65,11 @@ const ChatBox: React.FC<ChatBoxProps> = ({
     enableReinitialize: true,
     onSubmit: () => onSend(),
   });
+  const [imagesForViewing, setImagesForViewing] = useState<ImageDecorator[]>(
+    [],
+  );
   const { mutate: saveLastReadChatTime } = useAPISaveLastReadChatTime();
+  const [selectedImageURL, setSelectedImageURL] = useState<string>();
   const { data: lastReadChatTime } = useAPIGetLastReadChatTime(room.id, {
     refetchInterval: 1000,
   });
@@ -80,6 +87,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({
       },
       { refetchInterval: 1000 },
     );
+  console.log(imagesForViewing);
 
   const { mutate: sendChatMessage } = useAPISendChatMessage({
     onSuccess: (data) => {
@@ -89,6 +97,10 @@ const ChatBox: React.FC<ChatBoxProps> = ({
         }
         setMessages(messages);
       }
+      setImagesForViewing((i) => [
+        ...i,
+        { src: data.content, alt: '送信された画像' },
+      ]);
       setNewChatMessage((m) => ({ ...m, content: '' }));
       setEditorState(EditorState.createEmpty());
       messageWrapperDivRef.current &&
@@ -218,6 +230,12 @@ const ChatBox: React.FC<ChatBoxProps> = ({
 
   useEffect(() => {
     if (fetchedPastMessages?.length) {
+      const handleImages = () => {
+        const fetchedImages: ImageDecorator[] = fetchedPastMessages
+          .filter((m) => m.type === ChatMessageType.IMAGE)
+          .map((m) => ({ src: m.content, alt: '送信された画像' }));
+        setImagesForViewing(fetchedImages);
+      };
       if (
         messages?.length &&
         isRecent(
@@ -228,8 +246,10 @@ const ChatBox: React.FC<ChatBoxProps> = ({
         setMessages((m) => {
           return [...m, ...fetchedPastMessages];
         });
+        handleImages();
       } else if (!messages?.length) {
         setMessages(fetchedPastMessages);
+        handleImages();
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -262,6 +282,14 @@ const ChatBox: React.FC<ChatBoxProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [latestMessage]);
 
+  const activeIndex = useMemo(() => {
+    if (selectedImageURL) {
+      const isNowUri = (element: ImageDecorator) =>
+        element.src === selectedImageURL;
+      return imagesForViewing.findIndex(isNowUri);
+    }
+  }, [imagesForViewing, selectedImageURL]);
+
   return (
     <Box
       w={isSmallerThan768 ? '100%' : '60vw'}
@@ -270,6 +298,26 @@ const ChatBox: React.FC<ChatBoxProps> = ({
       position="relative"
       borderRadius="md"
       boxShadow="md">
+      <Viewer
+        customToolbar={(config) => {
+          return config.concat([
+            {
+              key: 'donwload',
+              render: (
+                <i
+                  className={`react-viewer-icon react-viewer-icon-download`}></i>
+              ),
+              onClick: ({ src }) => {
+                saveAs(src);
+              },
+            },
+          ]);
+        }}
+        images={imagesForViewing}
+        visible={!!selectedImageURL}
+        onClose={() => setSelectedImageURL(undefined)}
+        activeIndex={activeIndex}
+      />
       {/*
        * Header
        */}
@@ -344,18 +392,25 @@ const ChatBox: React.FC<ChatBoxProps> = ({
         {messages ? (
           <>
             {messages.map((m) => (
-              <ChatMessageItem
+              <a
                 key={m.id}
-                message={m}
-                readUsers={readUsers(m)}
-                onClickReply={() =>
-                  setNewChatMessage((pre) => ({
-                    ...pre,
-                    replyParentMessage: m,
-                  }))
-                }
-                onClickReaction={() => onClickReaction(m)}
-              />
+                onClick={() => {
+                  if (m.type === ChatMessageType.IMAGE) {
+                    setSelectedImageURL(m.content);
+                  }
+                }}>
+                <ChatMessageItem
+                  message={m}
+                  readUsers={readUsers(m)}
+                  onClickReply={() =>
+                    setNewChatMessage((pre) => ({
+                      ...pre,
+                      replyParentMessage: m,
+                    }))
+                  }
+                  onClickReaction={() => onClickReaction(m)}
+                />
+              </a>
             ))}
           </>
         ) : (
