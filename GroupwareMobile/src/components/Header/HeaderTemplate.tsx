@@ -77,7 +77,7 @@ const HeaderTemplate: React.FC<HeaderTemplateProps> = ({
             ml="lg"
             fontWeight="bold"
             color={darkFontColor}
-            w="60%"
+            w="50%"
             numberOfLines={1}>
             {title}
           </Text>
