@@ -23,8 +23,9 @@ export const useSelectedUsers = (alreadySelectedUsers?: User[]) => {
   };
 
   return {
-    selectedUsers: selectedUsers,
-    toggleUser: toggleUser,
+    selectedUsers,
+    setSelectedUsers,
+    toggleUser,
     isSelected,
   };
 };
