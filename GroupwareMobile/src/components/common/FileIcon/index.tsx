@@ -47,10 +47,7 @@ const FileIcon: React.FC<FileIconProps> = ({url, color = 'white'}) => {
     <TouchableHighlight
       underlayColor="none"
       onPress={downloadFile}
-      style={[
-        fileIconStyles.default,
-        color === 'blue' && fileIconStyles.default,
-      ]}>
+      style={[fileIconStyles.default, color === 'blue' && fileIconStyles.blue]}>
       <>
         <Icon name="filetext1" fontFamily="AntDesign" fontSize={64} mb={'lg'} />
         <Text color="blue700" numberOfLines={1}>

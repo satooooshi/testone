@@ -28,7 +28,11 @@ const TextMessage: React.FC<TextMessageProps> = ({message, onLongPress}) => {
         )}
         <AutoLinkedText
           text={mentionTransform(message.content)}
-          linkStyle={tailwind('font-bold text-pink-300 text-base')}
+          linkStyle={tailwind(
+            message.isSender
+              ? 'font-bold text-pink-300 text-base'
+              : 'font-bold text-blue-600 text-base',
+          )}
           style={tailwind('text-white')}
         />
       </Div>
