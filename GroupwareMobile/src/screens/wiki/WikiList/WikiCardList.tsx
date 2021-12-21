@@ -77,15 +77,6 @@ const RenderWikiCardList: React.FC<RenderWikiCardListProps> = ({
     }, [ruleCategory, setRuleCategory]),
   );
 
-  // useFocusEffect(
-  //   useCallback(() => {
-  //     setWikiForInfiniteScroll([]);
-  //     setSearchQuery(q => ({...q, page: '1', type, word, tag}));
-  //     refetch();
-  //     // eslint-disable-next-line react-hooks/exhaustive-deps
-  //   }, [tag, type, word]),
-  // );
-
   useEffect(() => {
     if (focused) {
       setWikiForInfiniteScroll([]);
