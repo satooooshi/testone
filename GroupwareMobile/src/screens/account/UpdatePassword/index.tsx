@@ -1,5 +1,4 @@
 import {useNavigation} from '@react-navigation/native';
-import {AxiosError} from 'axios';
 import {useFormik} from 'formik';
 import React from 'react';
 import {ActivityIndicator, Alert, useWindowDimensions} from 'react-native';

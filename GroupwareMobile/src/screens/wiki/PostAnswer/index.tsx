@@ -6,7 +6,7 @@ import {answerSchema} from '../../../utils/validation/schema';
 import {useAPIUploadStorage} from '../../../hooks/api/storage/useAPIUploadStorage';
 import {uploadImageFromGallery} from '../../../utils/cropImage/uploadImageFromGallery';
 import {ActivityIndicator, Alert, useWindowDimensions} from 'react-native';
-import {Button, Div, Overlay, ScrollDiv, Text} from 'react-native-magnus';
+import {Button, Overlay, ScrollDiv, Text} from 'react-native-magnus';
 import {
   PostWikiNavigationProps,
   PostAnswerRouteProps,
@@ -18,7 +18,6 @@ import WholeContainer from '../../../components/WholeContainer';
 import HeaderWithTextButton from '../../../components/Header';
 import RenderHtml from 'react-native-render-html';
 import MarkdownIt from 'markdown-it';
-import {AxiosError} from 'axios';
 
 const PostAnswer: React.FC = () => {
   const navigation = useNavigation<PostWikiNavigationProps>();

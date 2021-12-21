@@ -17,7 +17,6 @@ import EventFormModal from '../../../components/events/EventFormModal';
 import {useAPICreateEvent} from '../../../hooks/api/event/useAPICreateEvent';
 import {isEventCreatableUser} from '../../../utils/factory/event/isCreatableEvent';
 import {useAuthenticate} from '../../../contexts/useAuthenticate';
-import {AxiosError} from 'axios';
 
 type EventCardListProps = {
   status: EventStatus;

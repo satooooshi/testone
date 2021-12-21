@@ -10,7 +10,6 @@ import {
 import ChatNoteForm from '../../../../../templates/chat/notes/ChatNoteForm';
 import {useAPIUploadStorage} from '../../../../../hooks/api/storage/useAPIUploadStorage';
 import {Alert} from 'react-native';
-import {AxiosError} from 'axios';
 
 const EditChatNote: React.FC = () => {
   const {room, note} = useRoute<EditChatNotesRouteProps>().params;

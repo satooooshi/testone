@@ -15,7 +15,6 @@ import {
   PostWikiNavigationProps,
   PostWikiRouteProps,
 } from '../../../types/navigator/drawerScreenProps';
-import {AxiosError} from 'axios';
 
 const PostWiki: React.FC = () => {
   const navigation = useNavigation<PostWikiNavigationProps>();

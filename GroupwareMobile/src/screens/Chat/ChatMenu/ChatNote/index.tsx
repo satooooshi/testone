@@ -19,7 +19,6 @@ import ImageView from 'react-native-image-viewing';
 import {useAPIGetChatNotes} from '../../../../hooks/api/chat/note/useAPIGetNotes';
 import {useAPIDeleteChatNote} from '../../../../hooks/api/chat/note/useAPIDeleteChatNote';
 import DownloadIcon from '../../../../components/common/DownLoadIcon';
-import {AxiosError} from 'axios';
 
 const ChatNotes: React.FC = () => {
   const navigation = useNavigation<ChatNotesNavigationProps>();

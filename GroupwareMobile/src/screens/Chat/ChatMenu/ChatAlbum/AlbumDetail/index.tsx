@@ -30,7 +30,6 @@ import {useFormik} from 'formik';
 import {useAPIUpdateAlbum} from '../../../../../hooks/api/chat/album/useAPIUpdateChatAlbum';
 import FastImage from 'react-native-fast-image';
 import DownloadIcon from '../../../../../components/common/DownLoadIcon';
-import {AxiosError} from 'axios';
 
 const AlbumDetail: React.FC = () => {
   const {width: windowWidth} = useWindowDimensions();

@@ -16,7 +16,6 @@ import {useAPICreateBestAnswer} from '../../../hooks/api/wiki/useAPICreateBestAn
 import {useAuthenticate} from '../../../contexts/useAuthenticate';
 import {useAPIGetWikiDetail} from '../../../hooks/api/wiki/useAPIGetWikiDetail';
 import UserAvatar from '../../../components/common/UserAvatar';
-import {AxiosError} from 'axios';
 
 type AnswerListProps = {
   wiki: Wiki;

@@ -33,7 +33,6 @@ import {useAPICreateEvent} from '../../../hooks/api/event/useAPICreateEvent';
 import EventFormModal from '../../../components/events/EventFormModal';
 import {useEventCardListSearchQuery} from '../../../contexts/event/useEventSearchQuery';
 import {isEventCreatableUser} from '../../../utils/factory/event/isCreatableEvent';
-import {AxiosError} from 'axios';
 
 type EventCalendarProps = {
   personal?: boolean;

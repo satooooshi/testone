@@ -1,5 +1,4 @@
 import {useNavigation} from '@react-navigation/native';
-import {AxiosError} from 'axios';
 import React from 'react';
 import {Alert, useWindowDimensions} from 'react-native';
 import {Overlay, ScrollDiv} from 'react-native-magnus';

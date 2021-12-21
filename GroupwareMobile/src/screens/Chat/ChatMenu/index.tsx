@@ -1,5 +1,4 @@
 import {useNavigation, useRoute} from '@react-navigation/native';
-import {AxiosError} from 'axios';
 import React from 'react';
 import {Alert} from 'react-native';
 import {Icon} from 'react-native-magnus';

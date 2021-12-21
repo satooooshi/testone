@@ -8,7 +8,6 @@ import {
 } from '../../../../../types/navigator/drawerScreenProps';
 import ChatAlbumForm from '../../../../../templates/chat/album/ChatAlbumForm';
 import {Alert} from 'react-native';
-import {AxiosError} from 'axios';
 
 const PostChatAlbum: React.FC = () => {
   const {mutate: createChatAlbum} = useAPICreateChatAlbum();

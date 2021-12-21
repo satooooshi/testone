@@ -26,7 +26,6 @@ import EventFormModal from '../../../components/events/EventFormModal';
 import {useAPIUpdateEvent} from '../../../hooks/api/event/useAPIUpdateEvent';
 import {useAPIJoinEvent} from '../../../hooks/api/event/useAPIJoinEvent';
 import {useAPICancelEvent} from '../../../hooks/api/event/useAPICancelEvent';
-import {AxiosError} from 'axios';
 import {useFormik} from 'formik';
 import {EventComment, EventType, SubmissionFile} from '../../../types';
 import {useAPICreateComment} from '../../../hooks/api/event/useAPICreateComment';

@@ -35,7 +35,7 @@ import {formikErrorMsgFactory} from '../../../utils/factory/formikEroorMsgFactor
 import {profileSchema} from '../../../utils/validation/schema';
 import {Tab} from '../../../components/Header/HeaderTemplate';
 import UserAvatar from '../../../components/common/UserAvatar';
-import {AxiosError} from 'axios';
+
 const initialValues: Partial<User> = {
   email: '',
   lastName: '',

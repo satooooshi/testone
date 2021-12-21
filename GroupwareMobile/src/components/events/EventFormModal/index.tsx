@@ -46,7 +46,6 @@ import {useAPIGetUsers} from '../../../hooks/api/user/useAPIGetUsers';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import {isCreatableEvent} from '../../../utils/factory/event/isCreatableEvent';
 import {useAuthenticate} from '../../../contexts/useAuthenticate';
-import {AxiosError} from 'axios';
 
 type CustomModalProps = Omit<ModalProps, 'children'>;
 

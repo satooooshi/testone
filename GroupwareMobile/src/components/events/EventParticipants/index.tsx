@@ -1,4 +1,3 @@
-import {AxiosError} from 'axios';
 import React, {useRef, useState} from 'react';
 import {Alert, TouchableHighlight, useWindowDimensions} from 'react-native';
 import {

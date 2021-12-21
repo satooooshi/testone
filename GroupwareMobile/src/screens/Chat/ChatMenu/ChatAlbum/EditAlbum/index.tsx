@@ -10,7 +10,6 @@ import {
 import {useAPIUpdateAlbum} from '../../../../../hooks/api/chat/album/useAPIUpdateChatAlbum';
 import ChatAlbumForm from '../../../../../templates/chat/album/ChatAlbumForm';
 import {Alert} from 'react-native';
-import {AxiosError} from 'axios';
 
 const EditChatAlbum: React.FC = () => {
   const {album} = useRoute<EditChatAlbumRouteProps>().params;

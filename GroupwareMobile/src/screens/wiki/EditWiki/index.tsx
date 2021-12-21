@@ -16,7 +16,6 @@ import {
   EditWikiNavigationProps,
   EditWikiRouteProps,
 } from '../../../types/navigator/drawerScreenProps';
-import {AxiosError} from 'axios';
 
 const EditWiki: React.FC = () => {
   const navigation = useNavigation<EditWikiNavigationProps>();

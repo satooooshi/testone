@@ -1,5 +1,4 @@
 import {useNavigation} from '@react-navigation/native';
-import {AxiosError} from 'axios';
 import React, {useRef, useState} from 'react';
 import {TouchableOpacity, Alert} from 'react-native';
 import {Div, Dropdown, Icon, Text} from 'react-native-magnus';
