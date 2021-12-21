@@ -13,7 +13,13 @@ import {AxiosError} from 'axios';
 const PostChatAlbum: React.FC = () => {
   const {mutate: createChatAlbum} = useAPICreateChatAlbum();
   const navigation = useNavigation<PostChatAlbumsNavigationProps>();
-  const {mutate: onUploadImage} = useAPIUploadStorage();
+  const {mutate: onUploadImage} = useAPIUploadStorage({
+    onError: () => {
+      Alert.alert(
+        'アップロード中にエラーが発生しました。時間をおいて再実行してください。',
+      );
+    },
+  });
   const {room} = useRoute<ChatRouteProps>().params;
 
   return (

@@ -109,10 +109,10 @@ const Profile: React.FC = () => {
     onSuccess: async fileURLs => {
       setValues(v => ({...v, avatarUrl: fileURLs[0]}));
     },
-    onError: err => {
-      if (err.response?.data) {
-        Alert.alert((err.response?.data as AxiosError)?.message);
-      }
+    onError: () => {
+      Alert.alert(
+        'アップロード中にエラーが発生しました。時間をおいて再実行してください。',
+      );
     },
   });
   const tabs: Tab[] = [

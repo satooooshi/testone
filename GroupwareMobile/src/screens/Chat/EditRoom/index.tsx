@@ -21,7 +21,13 @@ const EditRoom: React.FC = () => {
       Alert.alert('ルーム情報の取得に失敗しました');
     },
   });
-  const {mutate: uploadImage} = useAPIUploadStorage();
+  const {mutate: uploadImage} = useAPIUploadStorage({
+    onError: () => {
+      Alert.alert(
+        'アップロード中にエラーが発生しました。時間をおいて再実行してください。',
+      );
+    },
+  });
   const {data: users} = useAPIGetUsers();
   const {mutate: editMembers} = useAPIEditMembers();
   const headerTitle = 'ルーム編集';

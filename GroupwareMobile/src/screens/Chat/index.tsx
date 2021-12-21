@@ -147,7 +147,13 @@ const Chat: React.FC = () => {
       },
     });
   const {mutate: uploadFile, isLoading: loadingUploadFile} =
-    useAPIUploadStorage();
+    useAPIUploadStorage({
+      onError: () => {
+        Alert.alert(
+          'アップロード中にエラーが発生しました。時間をおいて再実行してください。',
+        );
+      },
+    });
   const isLoadingSending = loadingSendMessage || loadingUploadFile;
 
   const showImageOnModal = (url: string) => {

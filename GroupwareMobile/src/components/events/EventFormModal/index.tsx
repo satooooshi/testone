@@ -123,20 +123,20 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
         };
       });
     },
-    onError: err => {
-      if (err.response?.data) {
-        Alert.alert((err.response?.data as AxiosError)?.message);
-      }
+    onError: () => {
+      Alert.alert(
+        'アップロード中にエラーが発生しました。時間をおいて再実行してください。',
+      );
     },
   });
   const {mutate: uploadImage} = useAPIUploadStorage({
     onSuccess: uploadedURL => {
       setNewEvent(e => ({...e, imageURL: uploadedURL[0]}));
     },
-    onError: err => {
-      if (err.response?.data) {
-        Alert.alert((err.response?.data as AxiosError)?.message);
-      }
+    onError: () => {
+      Alert.alert(
+        'アップロード中にエラーが発生しました。時間をおいて再実行してください。',
+      );
     },
   });
   const {

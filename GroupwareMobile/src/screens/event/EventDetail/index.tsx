@@ -149,7 +149,13 @@ const EventDetail: React.FC = () => {
       }
     },
   });
-  const {mutate: uploadFile} = useAPIUploadStorage();
+  const {mutate: uploadFile} = useAPIUploadStorage({
+    onError: () => {
+      Alert.alert(
+        'アップロード中にエラーが発生しました。時間をおいて再実行してください。',
+      );
+    },
+  });
 
   const checkValidateErrors = async () => {
     const errors = await validateForm();

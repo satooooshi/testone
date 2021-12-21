@@ -14,7 +14,13 @@ import {
 const PostChatNote: React.FC = () => {
   const {mutate: createChatNote} = useAPICreateChatNote();
   const navigation = useNavigation<PostChatNotesNavigationProps>();
-  const {mutate: uploadImage} = useAPIUploadStorage();
+  const {mutate: uploadImage} = useAPIUploadStorage({
+    onError: () => {
+      Alert.alert(
+        'アップロード中にエラーが発生しました。時間をおいて再実行してください。',
+      );
+    },
+  });
   const {room} = useRoute<ChatRouteProps>().params;
   const initialValues: Partial<ChatNote> = {
     content: '',

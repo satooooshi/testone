@@ -16,7 +16,13 @@ const EditChatAlbum: React.FC = () => {
   const {album} = useRoute<EditChatAlbumRouteProps>().params;
   const {mutate: updateChatAlbum} = useAPIUpdateAlbum();
   const navigation = useNavigation<PostChatAlbumsNavigationProps>();
-  const {mutate: onUploadImage} = useAPIUploadStorage();
+  const {mutate: onUploadImage} = useAPIUploadStorage({
+    onError: () => {
+      Alert.alert(
+        'アップロード中にエラーが発生しました。時間をおいて再実行してください。',
+      );
+    },
+  });
   const {room} = useRoute<ChatRouteProps>().params;
 
   return (

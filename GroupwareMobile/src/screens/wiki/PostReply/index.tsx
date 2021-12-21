@@ -38,7 +38,13 @@ const PostReply: React.FC = () => {
       },
     });
   const {mutate: uploadImage, isLoading: loadingUploadImage} =
-    useAPIUploadStorage();
+    useAPIUploadStorage({
+      onError: () => {
+        Alert.alert(
+          'アップロード中にエラーが発生しました。時間をおいて再実行してください。',
+        );
+      },
+    });
   const {width: windowWidth, height: windowHeight} = useWindowDimensions();
   const isLoading = loadingSaveReply || loadingUploadImage;
   const initialValues: Partial<QAAnswerReply> = {

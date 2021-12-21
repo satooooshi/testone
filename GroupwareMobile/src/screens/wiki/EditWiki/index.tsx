@@ -35,7 +35,13 @@ const EditWiki: React.FC = () => {
   });
   const {data: tags} = useAPIGetTag();
   const {mutate: uploadImage, isLoading: loadingUploadImage} =
-    useAPIUploadStorage();
+    useAPIUploadStorage({
+      onError: () => {
+        Alert.alert(
+          'アップロード中にエラーが発生しました。時間をおいて再実行してください。',
+        );
+      },
+    });
   const isLoading = loadingSaveWiki || loadingUploadImage;
   const {selectedTags} = useSelectedTags();
   const initialValues: Partial<Wiki> = {
