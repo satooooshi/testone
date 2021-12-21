@@ -32,7 +32,6 @@ import { useAPIGetChatAlbumImages } from '@/hooks/api/chat/album/useAPIGetChatAl
 import { useAPISaveAlbumImage } from '@/hooks/api/chat/album/useAPISaveChatImages';
 import { useAPIDeleteChatAlbum } from '@/hooks/api/chat/album/useAPIDeleteChatAlbum';
 import { saveAs } from 'file-saver';
-import { BiDownload } from 'react-icons/bi';
 
 type AlbumModalProps = {
   isOpen: boolean;
