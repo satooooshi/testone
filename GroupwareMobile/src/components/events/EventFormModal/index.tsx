@@ -309,27 +309,38 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
             alignSelf="center"
             mb={'lg'}>
             <Text fontSize={16}>開始日時</Text>
-            <DropdownOpenerButton
-              name={dateTimeFormatterFromJSDDate({
-                dateTime: newEvent.startAt
-                  ? new Date(newEvent.startAt)
-                  : new Date(),
-                format: 'yyyy/LL/dd HH:mm',
-              })}
-              onPress={() =>
-                setDateTimeModal({
-                  visible: 'startAt',
-                  date: newEvent.startAt || new Date(),
-                })
-              }
-            />
+            {newEvent.type !== EventType.SUBMISSION_ETC ? (
+              <DropdownOpenerButton
+                name={dateTimeFormatterFromJSDDate({
+                  dateTime: newEvent.startAt
+                    ? new Date(newEvent.startAt)
+                    : new Date(),
+                  format: 'yyyy/LL/dd HH:mm',
+                })}
+                onPress={() =>
+                  setDateTimeModal({
+                    visible: 'startAt',
+                    date: newEvent.startAt || new Date(),
+                  })
+                }
+              />
+            ) : (
+              <Text color="blue" fontSize={16}>
+                提出物イベントは終了日時の2時間前の日時に開始としてカレンダーに表示されます
+              </Text>
+            )}
           </Div>
           <Div
             flexDir="column"
             alignItems="flex-start"
             alignSelf="center"
             mb={'lg'}>
-            <Text fontSize={16}>終了日時</Text>
+            <Text fontSize={16}>
+              {' '}
+              {newEvent.type !== EventType.SUBMISSION_ETC
+                ? '終了日時'
+                : '締切日時'}
+            </Text>
             <DropdownOpenerButton
               name={dateTimeFormatterFromJSDDate({
                 dateTime: newEvent.endAt
@@ -611,7 +622,14 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
                 if (m.visible === 'startAt') {
                   setNewEvent(e => ({...e, startAt: date}));
                 } else if (m.visible === 'endAt') {
-                  setNewEvent(e => ({...e, endAt: date}));
+                  setNewEvent(e => ({
+                    ...e,
+                    endAt: date,
+                    startAt:
+                      newEvent.type === EventType.SUBMISSION_ETC
+                        ? DateTime.fromJSDate(date).minus({hours: 2}).toJSDate()
+                        : e.startAt,
+                  }));
                 }
                 return {
                   visible: undefined,
