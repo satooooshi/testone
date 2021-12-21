@@ -143,7 +143,7 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
     setSelectedUsers,
     toggleUser,
     isSelected: isSelectedUser,
-  } = useSelectedUsers(event?.hostUsers);
+  } = useSelectedUsers(event?.hostUsers || []);
   const {selectedUserRole, selectUserRole, filteredUsers} = useUserRole(
     'All',
     users,
@@ -495,14 +495,23 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
             )}
           </Dropdown>
           {newEvent.imageURL ? (
-            <Image
-              mb="lg"
-              alignSelf="center"
-              h={200}
-              w={200}
-              rounded="md"
-              source={{uri: newEvent.imageURL}}
-            />
+            <>
+              <Button
+                w="100%"
+                bg="blue700"
+                mb="lg"
+                onPress={() => setNewEvent(e => ({...e, imageURL: ''}))}>
+                既存画像を削除
+              </Button>
+              <Image
+                mb="lg"
+                alignSelf="center"
+                h={200}
+                w={200}
+                rounded="md"
+                source={{uri: newEvent.imageURL}}
+              />
+            </>
           ) : (
             <Div
               flexDir="column"
