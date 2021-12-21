@@ -1,8 +1,13 @@
 import React, {useCallback, useEffect, useState} from 'react';
 import WholeContainer from '../../../components/WholeContainer';
-import {Div, Text, Avatar, Button} from 'react-native-magnus';
+import {Div, Text, Avatar, Button, Tag} from 'react-native-magnus';
 import {useAPIGetWikiDetail} from '../../../hooks/api/wiki/useAPIGetWikiDetail';
-import {StyleSheet, TouchableOpacity, useWindowDimensions} from 'react-native';
+import {
+  StyleSheet,
+  TouchableOpacity,
+  FlatList,
+  useWindowDimensions,
+} from 'react-native';
 import HeaderWithTextButton from '../../../components/Header';
 import {wikiTypeNameFactory} from '../../../utils/factory/wiki/wikiTypeNameFactory';
 import {
@@ -28,6 +33,8 @@ import {useMinimumDrawer} from '../../../hooks/minimumDrawer/useMinimumDrawer';
 import ShareButton from '../../../components/common/ShareButton';
 import {generateClientURL} from '../../../utils/url';
 import UserAvatar from '../../../components/common/UserAvatar';
+import {tagColorFactory} from '../../../utils/factory/tagColorFactory';
+import tailwind from 'tailwind-rn';
 
 const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
   const isFocused = useIsFocused();
@@ -124,6 +131,7 @@ const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
                 fontWeight="bold"
                 fontSize={24}
                 color={darkFontColor}
+                mt={16}
                 w={'70%'}>
                 {wikiInfo.title}
               </Text>
@@ -132,6 +140,23 @@ const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
                 text={wikiInfo.title}
               />
             </Div>
+            <FlatList
+              style={tailwind('mb-4')}
+              horizontal
+              data={wikiInfo?.tags || []}
+              renderItem={({item: t}) => (
+                <Tag
+                  fontSize={'md'}
+                  h={21}
+                  py={0}
+                  px={8}
+                  bg={tagColorFactory(t.type)}
+                  color="white"
+                  mr={4}>
+                  {t.name}
+                </Tag>
+              )}
+            />
             <Div flexDir="row" alignItems="center" mb={16}>
               <TouchableOpacity
                 onPress={() => {
