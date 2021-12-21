@@ -52,7 +52,12 @@ const RenderWikiCardList: React.FC<RenderWikiCardListProps> = ({
     type,
     status,
   });
-  const {data: fetchedWiki, isLoading} = useAPIGetWikiList(searchQuery);
+  const {
+    data: fetchedWiki,
+    isLoading,
+    isFetching,
+    refetch,
+  } = useAPIGetWikiList(searchQuery);
   const [wikiForInfiniteScroll, setWikiForInfiniteScroll] = useState(
     fetchedWiki?.wiki || [],
   );
@@ -70,13 +75,17 @@ const RenderWikiCardList: React.FC<RenderWikiCardListProps> = ({
     }, [ruleCategory, setRuleCategory]),
   );
 
-  useEffect(() => {
-    setWikiForInfiniteScroll([]);
-    setSearchQuery(q => ({...q, page: '1', type, word, tag}));
-  }, [tag, type, word]);
+  useFocusEffect(
+    useCallback(() => {
+      setWikiForInfiniteScroll([]);
+      setSearchQuery(q => ({...q, page: '1', type, word, tag}));
+      refetch();
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [tag, type, word]),
+  );
 
   useEffect(() => {
-    if (fetchedWiki?.wiki && fetchedWiki?.wiki.length) {
+    if (!isFetching && fetchedWiki?.wiki && fetchedWiki?.wiki.length) {
       setWikiForInfiniteScroll(w => {
         if (w.length && fetchedWiki.wiki[0].id !== w[0].id) {
           return [...w, ...fetchedWiki.wiki];
@@ -84,7 +93,7 @@ const RenderWikiCardList: React.FC<RenderWikiCardListProps> = ({
         return fetchedWiki.wiki;
       });
     }
-  }, [fetchedWiki?.wiki]);
+  }, [fetchedWiki?.wiki, isFetching]);
 
   return (
     <>
@@ -92,6 +101,7 @@ const RenderWikiCardList: React.FC<RenderWikiCardListProps> = ({
         {wikiForInfiniteScroll.length ? (
           <FlatList
             onEndReached={onEndReached}
+            onEndReachedThreshold={0.5}
             data={wikiForInfiniteScroll || []}
             keyExtractor={item => item.id.toString()}
             renderItem={({item}) => <WikiCard wiki={item} />}
