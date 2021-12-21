@@ -181,7 +181,7 @@ const Profile: React.FC = () => {
         onPress={() => checkValidateErrors()}>
         <Icon color="white" name="check" fontSize={32} />
       </Button>
-      {profile && (
+      {values && (
         <ScrollDiv
           contentContainerStyle={{
             ...profileStyles.scrollView,
