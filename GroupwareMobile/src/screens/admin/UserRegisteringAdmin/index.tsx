@@ -73,7 +73,13 @@ const UserRegisteringAdmin: React.FC = () => {
         resetForm();
       }
     },
-    onError: () => {
+    onError: err => {
+      if (err.response?.status === 500) {
+        Alert.alert(
+          'アカウント作成中にエラーが発生しました。\nメールアドレスが既に利用されている可能性があります。',
+        );
+        return;
+      }
       Alert.alert(
         'アカウント作成中にエラーが発生しました。\n時間をおいて再度実行してください。',
       );
