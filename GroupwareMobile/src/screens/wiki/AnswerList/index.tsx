@@ -30,10 +30,10 @@ const AnswerList: React.FC<AnswerListProps> = ({wiki, onPressAvatar}) => {
   const {mutate: saveBestAnswer, isLoading: loadingSaveBestAnswer} =
     useAPICreateBestAnswer({
       onSuccess: () => refetchWikiInfo(),
-      onError: err => {
-        if (err.response?.data) {
-          Alert.alert((err.response?.data as AxiosError)?.message);
-        }
+      onError: () => {
+        Alert.alert(
+          'ベストアンサー更新中にエラーが発生しました。\n時間をおいて再実行してください。',
+        );
       },
     });
   const {refetch: refetchWikiInfo} = useAPIGetWikiDetail(wiki.id);

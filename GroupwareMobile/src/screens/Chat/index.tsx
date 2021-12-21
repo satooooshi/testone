@@ -140,20 +140,14 @@ const Chat: React.FC = () => {
           setImagesForViewing(i => [...i, {uri: sentMsg.content}]);
         }
       },
-      onError: err => {
-        if (err.response?.data) {
-          Alert.alert((err.response?.data as AxiosError)?.message);
-        }
-      },
-    });
-  const {mutate: uploadFile, isLoading: loadingUploadFile} =
-    useAPIUploadStorage({
       onError: () => {
         Alert.alert(
-          'アップロード中にエラーが発生しました。時間をおいて再実行してください。',
+          'チャットの送信中にエラーが発生しました。\n時間をおいて再度実行してください。',
         );
       },
     });
+  const {mutate: uploadFile, isLoading: loadingUploadFile} =
+    useAPIUploadStorage();
   const isLoadingSending = loadingSendMessage || loadingUploadFile;
 
   const showImageOnModal = (url: string) => {
@@ -181,10 +175,10 @@ const Chat: React.FC = () => {
       onSuccess: reactionId => {
         setDeletedReactionIds(r => [...r, reactionId]);
       },
-      onError: err => {
-        if (err.response?.data) {
-          Alert.alert((err.response?.data as AxiosError)?.message);
-        }
+      onError: () => {
+        Alert.alert(
+          'リアクションの更新中にエラーが発生しました。\n時間をおいて再実行してください。',
+        );
       },
     });
   };
@@ -213,10 +207,10 @@ const Chat: React.FC = () => {
             });
           });
         },
-        onError: err => {
-          if (err.response?.data) {
-            Alert.alert((err.response?.data as AxiosError)?.message);
-          }
+        onError: () => {
+          Alert.alert(
+            'リアクションの更新中にエラーが発生しました。\n時間をおいて再実行してください。',
+          );
         },
       });
     }
@@ -236,10 +230,10 @@ const Chat: React.FC = () => {
             chatGroup: room,
           });
         },
-        onError: err => {
-          if (err.response?.data) {
-            Alert.alert((err.response?.data as AxiosError)?.message);
-          }
+        onError: () => {
+          Alert.alert(
+            'アップロード中にエラーが発生しました。\n時間をおいて再実行してください。',
+          );
         },
       });
     }
@@ -259,10 +253,10 @@ const Chat: React.FC = () => {
             chatGroup: room,
           });
         },
-        onError: err => {
-          if (err.response?.data) {
-            Alert.alert((err.response?.data as AxiosError)?.message);
-          }
+        onError: () => {
+          Alert.alert(
+            'アップロード中にエラーが発生しました。\n時間をおいて再実行してください。',
+          );
         },
       });
     }
@@ -288,10 +282,10 @@ const Chat: React.FC = () => {
             chatGroup: room,
           });
         },
-        onError: err => {
-          if (err.response?.data) {
-            Alert.alert((err.response?.data as AxiosError)?.message);
-          }
+        onError: () => {
+          Alert.alert(
+            'アップロード中にエラーが発生しました。\n時間をおいて再実行してください。',
+          );
         },
       });
     }
@@ -544,7 +538,9 @@ const Chat: React.FC = () => {
 
   useEffect(() => {
     saveLastReadChatTime(room.id, {
-      onError: err => console.log(err.response?.data),
+      onError: () => {
+        Alert.alert('エラーが発生しました。\n時間をおいて再実行してください。');
+      },
     });
   }, [room.id, saveLastReadChatTime]);
 

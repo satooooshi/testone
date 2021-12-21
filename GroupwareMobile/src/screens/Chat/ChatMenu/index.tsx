@@ -23,10 +23,10 @@ const ChatMenu: React.FC = () => {
         params: {needRefetch: true},
       });
     },
-    onError: err => {
-      if (err.response?.data) {
-        Alert.alert((err.response?.data as AxiosError)?.message);
-      }
+    onError: () => {
+      Alert.alert(
+        '退室中にエラーが発生しました。\n時間をおいて再実行してください。',
+      );
     },
   });
 

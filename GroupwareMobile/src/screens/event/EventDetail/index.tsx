@@ -70,10 +70,10 @@ const EventDetail: React.FC = () => {
       setEventFormModal(false);
       refetchEvents();
     },
-    onError: err => {
-      if (err.response?.data) {
-        Alert.alert((err.response?.data as AxiosError)?.message);
-      }
+    onError: () => {
+      Alert.alert(
+        'イベント更新中にエラーが発生しました。\n時間をおいて再実行してください。',
+      );
     },
   });
   const [unsavedSubmissions, setUnsavedSubmissions] = useState<
@@ -85,26 +85,26 @@ const EventDetail: React.FC = () => {
       Alert.alert('提出状況を保存しました');
       refetchEvents();
     },
-    onError: err => {
-      if (err.response?.data) {
-        Alert.alert((err.response?.data as AxiosError)?.message);
-      }
+    onError: () => {
+      Alert.alert(
+        '提出中にエラーが発生しました。\n時間をおいて再実行してください。',
+      );
     },
   });
   const {mutate: joinEvent} = useAPIJoinEvent({
     onSuccess: () => refetchEvents(),
-    onError: err => {
-      if (err.response?.data) {
-        Alert.alert((err.response?.data as AxiosError)?.message);
-      }
+    onError: () => {
+      Alert.alert(
+        'イベント参加中にエラーが発生しました。\n時間をおいて再実行してください。',
+      );
     },
   });
   const {mutate: cancelEvent} = useAPICancelEvent({
     onSuccess: () => refetchEvents(),
-    onError: err => {
-      if (err.response?.data) {
-        Alert.alert((err.response?.data as AxiosError)?.message);
-      }
+    onError: () => {
+      Alert.alert(
+        'イベントキャンセル中にエラーが発生しました。\n時間をおいて再実行してください。',
+      );
     },
   });
 
@@ -143,19 +143,13 @@ const EventDetail: React.FC = () => {
         refetchEvents();
       }
     },
-    onError: err => {
-      if (err.response?.data) {
-        Alert.alert((err.response?.data as AxiosError)?.message.toString());
-      }
-    },
-  });
-  const {mutate: uploadFile} = useAPIUploadStorage({
     onError: () => {
       Alert.alert(
-        'アップロード中にエラーが発生しました。時間をおいて再実行してください。',
+        'コメント作成中にエラーが発生しました。\n時間をおいて再実行してください。',
       );
     },
   });
+  const {mutate: uploadFile} = useAPIUploadStorage();
 
   const checkValidateErrors = async () => {
     const errors = await validateForm();
@@ -189,10 +183,10 @@ const EventDetail: React.FC = () => {
       Alert.alert('削除が完了しました。');
       navigation.goBack();
     },
-    onError: err => {
-      if (err.response?.data) {
-        Alert.alert((err.response?.data as AxiosError)?.message);
-      }
+    onError: () => {
+      Alert.alert(
+        'イベント削除中にエラーが発生しました。\n時間をおいて再実行してください。',
+      );
     },
   });
 
@@ -249,10 +243,10 @@ const EventDetail: React.FC = () => {
           }));
           setUnsavedSubmissions(f => [...f, ...unSavedFiles]);
         },
-        onError: err => {
-          if (err.response?.data) {
-            Alert.alert((err.response?.data as AxiosError)?.message);
-          }
+        onError: () => {
+          Alert.alert(
+            'アップロード中にエラーが発生しました。\n時間をおいて再実行してください。',
+          );
         },
       });
     }

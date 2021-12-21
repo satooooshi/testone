@@ -21,13 +21,7 @@ const EditRoom: React.FC = () => {
       Alert.alert('ルーム情報の取得に失敗しました');
     },
   });
-  const {mutate: uploadImage} = useAPIUploadStorage({
-    onError: () => {
-      Alert.alert(
-        'アップロード中にエラーが発生しました。時間をおいて再実行してください。',
-      );
-    },
-  });
+  const {mutate: uploadImage} = useAPIUploadStorage();
   const {data: users} = useAPIGetUsers();
   const {mutate: editMembers} = useAPIEditMembers();
   const headerTitle = 'ルーム編集';
@@ -45,10 +39,10 @@ const EditRoom: React.FC = () => {
         },
       ]);
     },
-    onError: err => {
-      if (err.response?.data) {
-        Alert.alert((err.response?.data as AxiosError)?.message);
-      }
+    onError: () => {
+      Alert.alert(
+        'チャットグループ更新中にエラーが発生しました。\n時間をおいて再実行してください。',
+      );
     },
   });
   return (

@@ -63,10 +63,10 @@ const Profile: React.FC = () => {
         Alert.alert('プロフィールを更新しました');
       }
     },
-    onError: err => {
-      if (err.response?.data) {
-        Alert.alert((err.response?.data as AxiosError)?.message);
-      }
+    onError: () => {
+      Alert.alert(
+        'プロフィールの更新中にエラーが発生しました。\n時間をおいて再度実行してください。',
+      );
     },
   });
   const {values, setValues, handleChange, handleSubmit, validateForm} =
@@ -111,7 +111,7 @@ const Profile: React.FC = () => {
     },
     onError: () => {
       Alert.alert(
-        'アップロード中にエラーが発生しました。時間をおいて再実行してください。',
+        'アップロード中にエラーが発生しました。\n時間をおいて再実行してください。',
       );
     },
   });

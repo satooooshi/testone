@@ -26,21 +26,15 @@ const PostWiki: React.FC = () => {
     onSuccess: () => {
       navigation.goBack();
     },
-    onError: err => {
-      if (err.response?.data) {
-        Alert.alert((err.response?.data as AxiosError)?.message);
-      }
+    onError: () => {
+      Alert.alert(
+        'Wiki作成中にエラーが発生しました。\n時間をおいて再実行してください。',
+      );
     },
   });
   const {data: tags} = useAPIGetTag();
   const {mutate: uploadImage, isLoading: loadingUploadImage} =
-    useAPIUploadStorage({
-      onError: () => {
-        Alert.alert(
-          'アップロード中にエラーが発生しました。時間をおいて再実行してください。',
-        );
-      },
-    });
+    useAPIUploadStorage();
   const isLoading = loadingSaveWiki || loadingUploadImage;
   const {selectedTags} = useSelectedTags();
   const initialValues: Partial<Wiki> = {

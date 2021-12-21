@@ -15,13 +15,7 @@ import {AxiosError} from 'axios';
 const EditChatNote: React.FC = () => {
   const {room, note} = useRoute<EditChatNotesRouteProps>().params;
   const {mutate: updateChatNote} = useAPIUpdateNote();
-  const {mutate: uploadImage} = useAPIUploadStorage({
-    onError: () => {
-      Alert.alert(
-        'アップロード中にエラーが発生しました。時間をおいて再実行してください。',
-      );
-    },
-  });
+  const {mutate: uploadImage} = useAPIUploadStorage();
   const {data} = useAPIGetChatDetail({
     roomId: room.id.toString(),
     noteId: note.id.toString(),
@@ -42,10 +36,10 @@ const EditChatNote: React.FC = () => {
               params: {room},
             });
           },
-          onError: err => {
-            if (err.response?.data) {
-              Alert.alert((err.response?.data as AxiosError)?.message);
-            }
+          onError: () => {
+            Alert.alert(
+              'ノート更新中にエラーが発生しました。\n時間をおいて再実行してください。',
+            );
           },
         });
       }}

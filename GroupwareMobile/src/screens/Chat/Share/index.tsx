@@ -30,10 +30,10 @@ const Share: React.FC = () => {
       onSuccess: data => {
         stateRefreshNeeded(data.rooms);
       },
-      onError: err => {
-        if (err.response?.data) {
-          Alert.alert((err.response?.data as AxiosError)?.message);
-        }
+      onError: () => {
+        Alert.alert(
+          'ルーム取得中にエラーが発生しました。\n時間をおいて再実行してください。',
+        );
       },
     },
   );
@@ -51,10 +51,10 @@ const Share: React.FC = () => {
     onSuccess: () => {
       handleRefetch();
     },
-    onError: err => {
-      if (err.response?.data) {
-        Alert.alert((err.response?.data as AxiosError)?.message);
-      }
+    onError: () => {
+      Alert.alert(
+        'チャット更新中にエラーが発生しました。\n時間をおいて再実行してください。',
+      );
     },
   });
 
@@ -134,10 +134,10 @@ const Share: React.FC = () => {
               ]);
             }
           },
-          onError: err => {
-            if (err.response?.data) {
-              Alert.alert((err.response?.data as AxiosError)?.message);
-            }
+          onError: () => {
+            Alert.alert(
+              '送信中にエラーが発生しました。\n時間をおいて再実行してください。',
+            );
           },
         },
       );

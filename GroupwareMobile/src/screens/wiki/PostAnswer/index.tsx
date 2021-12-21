@@ -31,21 +31,13 @@ const PostAnswer: React.FC = () => {
       onSuccess: () => {
         navigation.goBack();
       },
-      onError: err => {
-        if (err.response?.data) {
-          Alert.alert((err.response?.data as AxiosError)?.message);
-        }
+      onError: () => {
+        Alert.alert('エラーが発生しました。\n時間をおいて再実行してください。');
       },
     },
   );
   const {mutate: uploadImage, isLoading: loadingUploadImage} =
-    useAPIUploadStorage({
-      onError: () => {
-        Alert.alert(
-          'アップロード中にエラーが発生しました。時間をおいて再実行してください。',
-        );
-      },
-    });
+    useAPIUploadStorage();
   const {width: windowWidth, height: windowHeight} = useWindowDimensions();
   const isLoading = loadingSaveAnswer || loadingUploadImage;
   const initialValues: Partial<QAAnswer> = {

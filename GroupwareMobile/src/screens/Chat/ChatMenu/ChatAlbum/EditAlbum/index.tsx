@@ -16,13 +16,7 @@ const EditChatAlbum: React.FC = () => {
   const {album} = useRoute<EditChatAlbumRouteProps>().params;
   const {mutate: updateChatAlbum} = useAPIUpdateAlbum();
   const navigation = useNavigation<PostChatAlbumsNavigationProps>();
-  const {mutate: onUploadImage} = useAPIUploadStorage({
-    onError: () => {
-      Alert.alert(
-        'アップロード中にエラーが発生しました。時間をおいて再実行してください。',
-      );
-    },
-  });
+  const {mutate: onUploadImage} = useAPIUploadStorage();
   const {room} = useRoute<ChatRouteProps>().params;
 
   return (
@@ -36,10 +30,10 @@ const EditChatAlbum: React.FC = () => {
               screen: 'ChatAlbums',
               params: {room},
             }),
-          onError: err => {
-            if (err.response?.data) {
-              Alert.alert((err.response?.data as AxiosError)?.message);
-            }
+          onError: () => {
+            Alert.alert(
+              'アルバム更新中にエラーが発生しました。\n時間をおいて再実行してください。',
+            );
           },
         })
       }

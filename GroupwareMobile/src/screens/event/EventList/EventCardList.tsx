@@ -41,10 +41,10 @@ const EventCardList: React.FC<EventCardListProps> = ({
       }
       setPartOfSearchQuery({refetchNeeded: true});
     },
-    onError: err => {
-      if (err.response?.data) {
-        Alert.alert((err.response?.data as AxiosError)?.message);
-      }
+    onError: () => {
+      Alert.alert(
+        'イベント更新中にエラーが発生しました。\n時間をおいて再実行してください。',
+      );
     },
   });
   const {word, tag, type} = partOfSearchQuery;

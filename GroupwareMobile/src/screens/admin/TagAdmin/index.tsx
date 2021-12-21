@@ -23,20 +23,20 @@ const TagAdmin: React.FC = () => {
     onSuccess: () => {
       refetch();
     },
-    onError: err => {
-      if (err.response?.data) {
-        Alert.alert((err.response?.data as AxiosError)?.message);
-      }
+    onError: () => {
+      Alert.alert(
+        'タグの作成中にエラーが発生しました。\n時間をおいて再度実行してください。',
+      );
     },
   });
   const {mutate: deleteTag, isLoading: loadingDeleteTag} = useAPIDeleteTag({
     onSuccess: () => {
       refetch();
     },
-    onError: err => {
-      if (err.response?.data) {
-        Alert.alert((err.response?.data as AxiosError)?.message);
-      }
+    onError: () => {
+      Alert.alert(
+        'タグの削除中にエラーが発生しました。\n時間をおいて再度実行してください。',
+      );
     },
   });
   const {filteredTags: techTags} = useTagType(TagType.TECH, tags || []);

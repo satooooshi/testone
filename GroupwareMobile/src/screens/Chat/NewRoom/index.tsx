@@ -9,13 +9,7 @@ import {NewRoomNavigationProps} from '../../../types/navigator/drawerScreenProps
 
 const NewRoom: React.FC = () => {
   const navigation = useNavigation<NewRoomNavigationProps>();
-  const {mutate: uploadImage} = useAPIUploadStorage({
-    onError: () => {
-      Alert.alert(
-        'アップロード中にエラーが発生しました。時間をおいて再実行してください。',
-      );
-    },
-  });
+  const {mutate: uploadImage} = useAPIUploadStorage();
   const {data: users} = useAPIGetUsers();
   const headerTitle = 'ルーム新規作成';
   const {mutate: createGroup} = useAPISaveChatGroup({

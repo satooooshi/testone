@@ -27,10 +27,10 @@ const UserRow: React.FC<UserRowProps> = ({user}) => {
     onSuccess: updatedInfo => {
       setCurrentUser(updatedInfo);
     },
-    onError: err => {
-      if (err.response?.data) {
-        Alert.alert((err.response?.data as AxiosError)?.message);
-      }
+    onError: () => {
+      Alert.alert(
+        'ユーザーの更新中にエラーが発生しました。\n時間をおいて再度実行してください。',
+      );
     },
   });
   const [deleted, setDeleted] = useState(false);
@@ -38,10 +38,10 @@ const UserRow: React.FC<UserRowProps> = ({user}) => {
     onSuccess: () => {
       setDeleted(true);
     },
-    onError: err => {
-      if (err.response?.data) {
-        Alert.alert((err.response?.data as AxiosError)?.message);
-      }
+    onError: () => {
+      Alert.alert(
+        'ユーザーの削除中にエラーが発生しました。\n時間をおいて再度実行してください。',
+      );
     },
   });
   const handleDeleteUser = (u: User) => {

@@ -42,7 +42,6 @@ import {userRoleNameFactory} from '../../../utils/factory/userRoleNameFactory';
 import {formikErrorMsgFactory} from '../../../utils/factory/formikEroorMsgFactory';
 import {createUserSchema} from '../../../utils/validation/schema';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
-import {AxiosError} from 'axios';
 
 const initialValues: Partial<User> = {
   email: '',
@@ -74,10 +73,10 @@ const UserRegisteringAdmin: React.FC = () => {
         resetForm();
       }
     },
-    onError: err => {
-      if (err.response?.data) {
-        Alert.alert((err.response?.data as AxiosError)?.message);
-      }
+    onError: () => {
+      Alert.alert(
+        'アカウント作成中にエラーが発生しました。\n時間をおいて再度実行してください。',
+      );
     },
   });
   const {values, setValues, handleSubmit, validateForm, resetForm} = useFormik<
@@ -123,7 +122,7 @@ const UserRegisteringAdmin: React.FC = () => {
     },
     onError: () => {
       Alert.alert(
-        'アップロード中にエラーが発生しました。時間をおいて再実行してください。',
+        'アップロード中にエラーが発生しました。\n時間をおいて再実行してください。',
       );
     },
   });

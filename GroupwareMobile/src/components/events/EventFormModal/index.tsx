@@ -125,7 +125,7 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
     },
     onError: () => {
       Alert.alert(
-        'アップロード中にエラーが発生しました。時間をおいて再実行してください。',
+        'アップロード中にエラーが発生しました。\n時間をおいて再実行してください。',
       );
     },
   });
@@ -135,7 +135,7 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
     },
     onError: () => {
       Alert.alert(
-        'アップロード中にエラーが発生しました。時間をおいて再実行してください。',
+        'アップロード中にエラーが発生しました。\n時間をおいて再実行してください。',
       );
     },
   });

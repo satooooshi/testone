@@ -82,10 +82,10 @@ const ChatNoteForm: React.FC<ChatNoteFormProps> = ({
             images: v.images?.length ? [...v.images, newImage] : [newImage],
           }));
         },
-        onError: err => {
-          if (err.response?.data) {
-            Alert.alert((err.response?.data as AxiosError)?.message);
-          }
+        onError: () => {
+          Alert.alert(
+            'アップロード中にエラーが発生しました。\n時間をおいて再実行してください。',
+          );
         },
       });
     }

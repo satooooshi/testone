@@ -42,10 +42,10 @@ const EventParticipants: React.FC<EventParticipantsProps> = ({
       onSuccessSaveUserJoiningEvent(data);
       Alert.alert('遅刻を記録しました。');
     },
-    onError: err => {
-      if (err.response?.data) {
-        Alert.alert((err.response?.data as AxiosError)?.message);
-      }
+    onError: () => {
+      Alert.alert(
+        '遅刻記録中にエラーが発生しました。\n時間をおいて再度実行してください。',
+      );
     },
   });
 

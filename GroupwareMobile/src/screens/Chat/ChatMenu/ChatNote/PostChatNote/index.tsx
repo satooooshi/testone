@@ -14,13 +14,7 @@ import {
 const PostChatNote: React.FC = () => {
   const {mutate: createChatNote} = useAPICreateChatNote();
   const navigation = useNavigation<PostChatNotesNavigationProps>();
-  const {mutate: uploadImage} = useAPIUploadStorage({
-    onError: () => {
-      Alert.alert(
-        'アップロード中にエラーが発生しました。時間をおいて再実行してください。',
-      );
-    },
-  });
+  const {mutate: uploadImage} = useAPIUploadStorage();
   const {room} = useRoute<ChatRouteProps>().params;
   const initialValues: Partial<ChatNote> = {
     content: '',
@@ -40,10 +34,10 @@ const PostChatNote: React.FC = () => {
               params: {room},
             });
           },
-          onError: err => {
-            if (err.response?.data) {
-              Alert.alert((err.response?.data as AxiosError)?.message);
-            }
+          onError: () => {
+            Alert.alert(
+              'ノート作成中にエラーが発生しました。\n時間をおいて再実行してください。',
+            );
           },
         });
       }}
