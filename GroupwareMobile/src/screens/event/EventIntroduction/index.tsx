@@ -110,7 +110,7 @@ const EventIntroduction: React.FC = () => {
                   直近一週間のおすすめイベント
                 </Text>
                 {recommendedEvents.map(e => (
-                  <Div mb={8}>
+                  <Div mb={8} key={e.id}>
                     <EventCard event={e} />
                   </Div>
                 ))}
@@ -135,8 +135,9 @@ const EventIntroduction: React.FC = () => {
               {eventIntroduction?.title}
             </Text>
           )}
-          {bottomSources.map(s => (
+          {bottomSources.map((s, index) => (
             <FastImage
+              key={index}
               source={s}
               style={{width: 400, height: 300, marginBottom: 8}}
             />
