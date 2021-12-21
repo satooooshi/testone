@@ -61,6 +61,7 @@ import {useAPISaveLastReadChatTime} from '../../hooks/api/chat/useAPISaveLastRea
 import DownloadIcon from '../../components/common/DownLoadIcon';
 import UserAvatar from '../../components/common/UserAvatar';
 import {nameOfRoom} from '../../utils/factory/chat/nameOfRoom';
+import {useAPIGetRoomDetail} from '../../hooks/api/chat/useAPIGetRoomDetail';
 
 const Chat: React.FC = () => {
   const typeDropdownRef = useRef<any | null>(null);
@@ -68,6 +69,7 @@ const Chat: React.FC = () => {
   const {height: windowHeight} = useWindowDimensions();
   const route = useRoute<ChatRouteProps>();
   const {room} = route.params;
+  const {data: roomDetail} = useAPIGetRoomDetail(room.id);
   const [page, setPage] = useState(1);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [imageModal, setImageModal] = useState(false);
@@ -601,7 +603,7 @@ const Chat: React.FC = () => {
         )}
       />
       <HeaderWithIconButton
-        title={nameOfRoom(room)}
+        title={roomDetail ? nameOfRoom(roomDetail) : nameOfRoom(room)}
         enableBackButton={true}
         screenForBack={'RoomList'}
         icon={headerRightIcon}
