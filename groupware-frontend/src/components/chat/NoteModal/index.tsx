@@ -36,6 +36,7 @@ import { useAPIGetChatNotes } from '@/hooks/api/chat/note/useAPIGetNotes';
 import { useAPIDeleteChatNote } from '@/hooks/api/chat/note/useAPIDeleteChatNote';
 import { useAPISaveNoteImage } from '@/hooks/api/chat/note/useAPISaveChatNoteImages';
 import { useAPIUpdateNote } from '@/hooks/api/chat/note/useAPIUpdateChatNote';
+import NoteBox from './NoteBox';
 
 const Viewer = dynamic(() => import('react-viewer'), { ssr: false });
 
@@ -147,7 +148,7 @@ const NoteModal: React.FC<NoteModalProps> = ({ isOpen, onClose, room }) => {
       refetchNotes();
     },
   });
-  const [mode, setMode] = useState<'new' | 'edit'>('edit');
+  const [mode, setMode] = useState<'new' | 'edit' | 'list'>('list');
   const imagesInNewNoteViewer = useMemo((): ImageDecorator[] => {
     return (
       values.images?.map((i) => ({
@@ -217,7 +218,7 @@ const NoteModal: React.FC<NoteModalProps> = ({ isOpen, onClose, room }) => {
           <Button
             size="sm"
             flexDir="row"
-            onClick={() => setMode('edit')}
+            onClick={() => setMode('list')}
             mb="8px"
             alignItems="center">
             <AiOutlineLeft size={24} style={{ display: 'inline' }} />
@@ -291,150 +292,97 @@ const NoteModal: React.FC<NoteModalProps> = ({ isOpen, onClose, room }) => {
       </Box>
     </Box>
   );
-
   const noteList = (
     <>
-      {!edittedNote && notesForInfiniteScroll ? (
-        <Box mb={!isLoading ? '24px' : undefined}>
-          {notesForInfiniteScroll.map((n) => (
-            <Box
-              mb="16px"
-              p={'4px'}
-              key={n.id}
-              bg="white"
-              borderColor="gray.300"
-              borderWidth={1}
-              borderRadius="md"
-              w={'100%'}
-              maxWidth={'400px'}
-              display="flex"
-              flexDir="column"
-              alignItems="center">
-              <Box
-                mb="8px"
-                flexDir="row"
-                display="flex"
-                alignItems="center"
-                w="100%"
-                justifyContent="space-between">
-                <Box flexDir="row" display="flex">
-                  <Avatar
-                    src={n.editors?.length ? n.editors[0].avatarUrl : undefined}
-                    size="md"
-                    mr="4px"
-                  />
-                  <Box justifyContent="center" display="flex" flexDir="column">
-                    <Text mb="4px">
-                      {userNameFactory(
-                        n.editors?.length ? n.editors[0] : undefined,
-                      )}
-                    </Text>
-                    <Text color="gray">
-                      {dateTimeFormatterFromJSDDate({
-                        dateTime: new Date(n.createdAt),
-                      })}
-                    </Text>
-                  </Box>
-                </Box>
-                <Menu>
-                  <MenuButton
-                    as={IconButton}
-                    aria-label="Options"
-                    icon={<FiMenu />}
-                    variant="outline"
-                  />
-                  <MenuList>
-                    <MenuItem onClick={() => setEdittedNote(n)}>編集</MenuItem>
-                    <MenuItem onClick={() => handleNoteDelete(n)}>
-                      削除
-                    </MenuItem>
-                  </MenuList>
-                </Menu>
-              </Box>
-              <SimpleGrid spacing="4px" columns={3} w="100%">
-                {n.images?.map((i) => (
-                  <Link onClick={() => setSelectedImage(i)} key={i.id}>
-                    <Image src={i.imageURL} alt="関連画像" />
-                  </Link>
-                ))}
-              </SimpleGrid>
-              <Text alignSelf="flex-start" whiteSpace="pre-wrap">
-                {n.content}
-              </Text>
-            </Box>
-          ))}
-          {isLoading && <Spinner />}
-        </Box>
-      ) : (
-        <Box>
-          <Box mb="8px">
-            <Box flexDir="row" justifyContent="space-between" display="flex">
-              <Button
-                size="sm"
-                flexDir="row"
-                onClick={() => setEdittedNote(undefined)}
-                mb="8px"
-                alignItems="center">
-                <AiOutlineLeft size={24} style={{ display: 'inline' }} />
-                <Text display="inline">一覧へ戻る</Text>
-              </Button>
-              <Button
-                size="sm"
-                flexDir="row"
-                onClick={() => imageUploaderRef.current?.click()}
-                mb="8px"
-                colorScheme="green"
-                alignItems="center">
-                <Text display="inline">写真を追加</Text>
-              </Button>
-              <input
-                multiple
-                ref={imageUploaderRef}
-                accept="image/*"
-                type="file"
-                hidden
-                name="imageUploadToAlbum"
-                onChange={() => {
-                  const files = imageUploaderRef.current?.files;
-                  const fileArr: File[] = [];
-                  if (!files) {
-                    return;
-                  }
-                  for (let i = 0; i < files.length; i++) {
-                    const renamedFile = new File([files[i]], files[i].name, {
-                      type: files[i].type,
-                      lastModified: files[i].lastModified,
-                    });
-                    fileArr.push(renamedFile);
-                  }
-                  onUploadImage(fileArr);
-                }}
-              />
-            </Box>
-            <SimpleGrid mb="8px" spacing="4px" columns={3} w="100%">
-              {values.images?.map((i) => (
-                <Link key={i.id} onClick={() => setSelectedImage(i)}>
-                  <Image src={i.imageURL} alt="関連画像" />
-                </Link>
-              ))}
-            </SimpleGrid>
-            <Textarea
-              value={values.content}
-              name="content"
-              onChange={handleChange}
-              placeholder="今なにしてる？"
-              bg="white"
-              minH={'300px'}
+      <Box mb={!isLoading ? '24px' : undefined}>
+        {notesForInfiniteScroll.map((n) => (
+          <Box mb="16px" key={n.id}>
+            <NoteBox
+              note={n}
+              onClickEdit={() => {
+                setMode('edit');
+                setEdittedNote(n);
+              }}
+              onClickDelete={() => handleNoteDelete(n)}
             />
           </Box>
-          <Box display="flex" justifyContent="center" alignItems="center">
-            <Button colorScheme="pink" onClick={() => handleSubmit()}>
-              更新
-            </Button>
-          </Box>
-        </Box>
-      )}
+        ))}
+        {isLoading && <Spinner />}
+      </Box>
     </>
+  );
+
+  const edit = (
+    <Box>
+      <Box mb="8px">
+        <Box flexDir="row" justifyContent="space-between" display="flex">
+          <Button
+            size="sm"
+            flexDir="row"
+            onClick={() => {
+              setMode('list');
+              setEdittedNote(undefined);
+            }}
+            mb="8px"
+            alignItems="center">
+            <AiOutlineLeft size={24} style={{ display: 'inline' }} />
+            <Text display="inline">一覧へ戻る</Text>
+          </Button>
+          <Button
+            size="sm"
+            flexDir="row"
+            onClick={() => imageUploaderRef.current?.click()}
+            mb="8px"
+            colorScheme="green"
+            alignItems="center">
+            <Text display="inline">写真を追加</Text>
+          </Button>
+          <input
+            multiple
+            ref={imageUploaderRef}
+            accept="image/*"
+            type="file"
+            hidden
+            name="imageUploadToAlbum"
+            onChange={() => {
+              const files = imageUploaderRef.current?.files;
+              const fileArr: File[] = [];
+              if (!files) {
+                return;
+              }
+              for (let i = 0; i < files.length; i++) {
+                const renamedFile = new File([files[i]], files[i].name, {
+                  type: files[i].type,
+                  lastModified: files[i].lastModified,
+                });
+                fileArr.push(renamedFile);
+              }
+              onUploadImage(fileArr);
+            }}
+          />
+        </Box>
+        <SimpleGrid mb="8px" spacing="4px" columns={3} w="100%">
+          {values.images?.map((i) => (
+            <Link key={i.id} onClick={() => setSelectedImage(i)}>
+              <Image src={i.imageURL} alt="関連画像" />
+            </Link>
+          ))}
+        </SimpleGrid>
+        <Textarea
+          value={values.content}
+          name="content"
+          onChange={handleChange}
+          placeholder="今なにしてる？"
+          bg="white"
+          minH={'300px'}
+        />
+      </Box>
+      <Box display="flex" justifyContent="center" alignItems="center">
+        <Button colorScheme="pink" onClick={() => handleSubmit()}>
+          更新
+        </Button>
+      </Box>
+    </Box>
   );
 
   const onScroll = (e: any) => {
@@ -448,6 +396,12 @@ const NoteModal: React.FC<NoteModalProps> = ({ isOpen, onClose, room }) => {
       setValues(edittedNote);
     }
   }, [edittedNote, setValues]);
+
+  useEffect(() => {
+    if (mode === 'new') {
+      resetForm();
+    }
+  }, [mode, resetForm]);
 
   return (
     <>
@@ -495,7 +449,7 @@ const NoteModal: React.FC<NoteModalProps> = ({ isOpen, onClose, room }) => {
           </ModalHeader>
           <ModalCloseButton />
           <ModalBody ref={modalRef} onScroll={onScroll}>
-            {mode === 'edit' ? noteList : postNote}
+            {mode === 'edit' ? edit : mode === 'new' ? postNote : noteList}
           </ModalBody>
         </ModalContent>
       </Modal>
