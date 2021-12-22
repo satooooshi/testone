@@ -13,7 +13,7 @@ import UserCardList from './UserCardList';
 const TopTab = createMaterialTopTabNavigator();
 
 const UserList: React.FC = () => {
-  const tagPassedByRouteParam = useRoute<UsersListRouteProps>().params?.tag;
+  const tagPassedByRouteParam = useRoute<UsersListRouteProps>()?.params?.tag;
   const [visibleSearchFormModal, setVisibleSearchFormModal] = useState(false);
   const [word, setWord] = useState('');
   const [tag, setTag] = useState(tagPassedByRouteParam || '');

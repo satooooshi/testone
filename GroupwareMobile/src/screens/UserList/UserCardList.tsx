@@ -35,6 +35,7 @@ const UserCardList: React.FC<UserCardListProps> = ({
     data: users,
     isLoading,
     refetch,
+    isRefetching,
   } = useAPISearchUsers({
     ...searchQuery,
     role: userRole !== 'All' ? userRole : undefined,
@@ -51,25 +52,6 @@ const UserCardList: React.FC<UserCardListProps> = ({
   const onEndReached = () => {
     setSearchQuery(q => ({...q, page: (Number(q?.page) + 1).toString()}));
   };
-
-  useEffect(() => {
-    if (users?.users) {
-      setUsersForInfiniteScroll(u => {
-        if (u.length) {
-          return [...u, ...users.users];
-        }
-        return users?.users;
-      });
-    }
-  }, [users?.users]);
-
-  useEffect(() => {
-    if (focused) {
-      setUsersForInfiniteScroll([]);
-      setSearchQuery(q => ({...q, page: '1'}));
-      refetch();
-    }
-  }, [focused, refetch]);
 
   const sortDropdownButtonName = () => {
     switch (searchQuery.sort) {
@@ -110,6 +92,25 @@ const UserCardList: React.FC<UserCardListProps> = ({
     searchQuery.sort,
     searchQuery.duration,
   ]);
+
+  useEffect(() => {
+    if (focused) {
+      setUsersForInfiniteScroll([]);
+      setSearchQuery(q => ({...q, page: '1'}));
+      refetch();
+    }
+  }, [focused, refetch]);
+
+  useEffect(() => {
+    if (!isRefetching && users?.users) {
+      setUsersForInfiniteScroll(u => {
+        if (u.length) {
+          return [...u, ...users.users];
+        }
+        return users?.users;
+      });
+    }
+  }, [users?.users, isRefetching]);
 
   return (
     <>
@@ -183,6 +184,7 @@ const UserCardList: React.FC<UserCardListProps> = ({
         <FlatList
           data={usersForInfiniteScroll}
           onEndReached={onEndReached}
+          onEndReachedThreshold={0.5}
           contentContainerStyle={userListStyles.flatlist}
           keyExtractor={item => item.id.toString()}
           renderItem={({item: u}) => (
