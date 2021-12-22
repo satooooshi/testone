@@ -156,23 +156,27 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
         flexDir="row"
         flexWrap="wrap"
         alignSelf={message?.isSender ? 'flex-end' : 'flex-start'}>
-        {message.reactions?.length
+        {/* 客先からの要望で自分が送ったリアクションもしくは送られたリアクションのみ表示したいとのこと */}
+        {message.isSender && message.reactions?.length
           ? reactionRemovedDuplicates(message.reactions)
               .filter(r => !deletedReactionIds.includes(r.id))
-              .map(r => (
-                <Div mr="xs" mb="xs">
-                  <ReactionToMessage
-                    onPress={() => onPressReaction(r)}
-                    onLongPress={() => onLongPressReation(r)}
-                    reaction={r}
-                    numbersOfReaction={numbersOfSameValueInKeyOfObjArr(
-                      message.reactions as ChatMessageReaction[],
-                      r,
-                      'emoji',
-                    )}
-                  />
-                </Div>
-              ))
+              .map(
+                r =>
+                  r.isSender && (
+                    <Div mr="xs" mb="xs">
+                      <ReactionToMessage
+                        onPress={() => onPressReaction(r)}
+                        onLongPress={() => onLongPressReation(r)}
+                        reaction={r}
+                        numbersOfReaction={numbersOfSameValueInKeyOfObjArr(
+                          message.reactions as ChatMessageReaction[],
+                          r,
+                          'emoji',
+                        )}
+                      />
+                    </Div>
+                  ),
+              )
           : null}
       </Div>
     </>

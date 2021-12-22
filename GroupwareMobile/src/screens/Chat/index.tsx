@@ -109,7 +109,9 @@ const Chat: React.FC = () => {
     enableReinitialize: true,
     onSubmit: submittedValues => {
       Keyboard.dismiss();
-      sendChatMessage(submittedValues);
+      if (submittedValues.content) {
+        sendChatMessage(submittedValues);
+      }
     },
   });
   const {data: fetchedPastMessages, isLoading: loadingMessages} =
