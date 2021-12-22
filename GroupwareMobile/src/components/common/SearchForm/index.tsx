@@ -34,16 +34,14 @@ const SearchForm: React.FC<SearchFormProps> = ({
   const {data: tags} = useGetTagsBySearchTarget(searchTarget)();
   const [word, setWord] = useState(defaultValue?.word || '');
   const [visibleTagModal, setVisibleTagModal] = useState(false);
-  const {selectedTags, toggleTag, isSelected, setSelectedTags} =
-    useSelectedTags(defaultValue?.selectedTags);
-  const {selectedTagType, selectTagType, filteredTags} = useTagType(
-    'All',
-    tags,
+  const {selectedTags, setSelectedTags} = useSelectedTags(
+    defaultValue?.selectedTags,
   );
+  const {selectedTagType} = useTagType('All', tags);
 
   useEffect(() => {
     if (defaultSelectedTagIds.length && !selectedTags.length) {
-      const def = tags?.filter(t =>
+      const def = (tags as AllTag[])?.filter(t =>
         defaultSelectedTagIds.includes(Number(t.id)),
       );
       if (def?.length) {
@@ -77,13 +75,14 @@ const SearchForm: React.FC<SearchFormProps> = ({
         <Icon color="black" name="close" />
       </Button>
       <TagModal
+        onCompleteModal={selectedTagsInModal =>
+          setSelectedTags(selectedTagsInModal)
+        }
         isVisible={visibleTagModal}
         onCloseModal={() => setVisibleTagModal(false)}
-        tags={filteredTags || []}
-        onPressTag={toggleTag}
-        isSelected={isSelected}
-        selectTagType={selectTagType}
+        tags={tags || []}
         selectedTagType={selectedTagType}
+        defaultSelectedTags={selectedTags}
       />
       <Div>
         <Input
@@ -111,7 +110,7 @@ const SearchForm: React.FC<SearchFormProps> = ({
               fontSize={'lg'}
               h={28}
               py={0}
-              bg={tagColorFactory(t.type)}
+              bg={tagColorFactory((t as AllTag).type)}
               color="white"
               mr={4}
               mb={8}>
@@ -122,7 +121,9 @@ const SearchForm: React.FC<SearchFormProps> = ({
         <Button
           w={'100%'}
           bg="pink600"
-          onPress={() => onSubmit({word, selectedTags})}>
+          onPress={() =>
+            onSubmit({word, selectedTags: selectedTags as AllTag[]})
+          }>
           検索
         </Button>
       </Div>

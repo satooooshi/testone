@@ -85,13 +85,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
     justifyContent: 'center',
     roundedTop: 'lg',
   };
-  const {selectedTags, toggleTag, isSelected} = useSelectedTags(
-    wiki?.tags || [],
-  );
-  const {selectedTagType, selectTagType, filteredTags} = useTagType(
-    'All',
-    tags,
-  );
+  const {selectedTagType, filteredTags} = useTagType('All', tags);
   const [visibleTagModal, setVisibleTagModal] = useState(false);
   const typeDropdownRef = useRef<any | null>(null);
   const textFormatDropdownRef = useRef<any | null>(null);
@@ -255,21 +249,18 @@ const WikiForm: React.FC<WikiFormProps> = ({
     </Dropdown>
   );
 
-  useEffect(() => {
-    setNewWiki(w => ({...w, tags: selectedTags}));
-  }, [selectedTags, setNewWiki]);
-
   return (
     <WholeContainer>
       <HeaderWithTextButton title="Wiki作成" enableBackButton={true} />
       <TagModal
+        onCompleteModal={selectedTagsInModal =>
+          setNewWiki(w => ({...w, tags: selectedTagsInModal}))
+        }
         isVisible={visibleTagModal}
         tags={filteredTags || []}
         onCloseModal={() => setVisibleTagModal(false)}
-        onPressTag={toggleTag}
-        isSelected={isSelected}
         selectedTagType={selectedTagType}
-        selectTagType={selectTagType}
+        defaultSelectedTags={newWiki.tags}
       />
       {formatDropdown}
       {typeDropdown}

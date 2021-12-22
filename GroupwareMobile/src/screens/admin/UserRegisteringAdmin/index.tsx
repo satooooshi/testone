@@ -1,6 +1,6 @@
 import {useNavigation} from '@react-navigation/native';
 import {useFormik} from 'formik';
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useRef, useState} from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -27,7 +27,6 @@ import WholeContainer from '../../../components/WholeContainer';
 import {useAPIRegister} from '../../../hooks/api/auth/useAPIRegister';
 import {useAPIUploadStorage} from '../../../hooks/api/storage/useAPIUploadStorage';
 import {useAPIGetUserTag} from '../../../hooks/api/tag/useAPIGetUserTag';
-import {useSelectedTags} from '../../../hooks/tag/useSelectedTags';
 import {useTagType} from '../../../hooks/tag/useTagType';
 import {userRegisteringAdminStyles} from '../../../styles/screen/admin/userRegisteringAdmin.style';
 import {User, TagType, UserRole} from '../../../types';
@@ -105,9 +104,6 @@ const UserRegisteringAdmin: React.FC = () => {
   const {width: windowWidth} = useWindowDimensions();
   const {data: tags} = useAPIGetUserTag();
   const [visibleTagModal, setVisibleTagModal] = useState(false);
-  const {selectedTags, toggleTag, isSelected} = useSelectedTags(
-    values?.tags || [],
-  );
   const {selectedTagType, selectTagType, filteredTags} = useTagType(
     'All',
     tags,
@@ -171,9 +167,6 @@ const UserRegisteringAdmin: React.FC = () => {
     setVisibleTagModal(true);
   };
 
-  useEffect(() => {
-    setValues(v => ({...v, tags: selectedTags}));
-  }, [selectedTags, setValues]);
   return (
     <WholeContainer>
       <Overlay visible={isLoading} p="xl">
@@ -185,13 +178,14 @@ const UserRegisteringAdmin: React.FC = () => {
         activeTabName={'ユーザー作成'}
       />
       <TagModal
+        onCompleteModal={selectedTagsInModal =>
+          setValues(v => ({...v, tags: selectedTagsInModal}))
+        }
         isVisible={visibleTagModal}
         tags={filteredTags || []}
         onCloseModal={() => setVisibleTagModal(false)}
-        onPressTag={toggleTag}
-        isSelected={isSelected}
         selectedTagType={selectedTagType}
-        selectTagType={selectTagType}
+        defaultSelectedTags={values.tags}
       />
       <Button
         bg="blue700"

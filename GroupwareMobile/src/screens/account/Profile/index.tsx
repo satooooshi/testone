@@ -155,10 +155,6 @@ const Profile: React.FC = () => {
     }
   }, [isFocused, refetch]);
 
-  useEffect(() => {
-    setValues(v => ({...v, tags: selectedTags}));
-  }, [selectedTags, setValues]);
-
   return (
     <WholeContainer>
       <Overlay visible={loadingProfile || loadingUpdate} p="xl">
@@ -170,13 +166,14 @@ const Profile: React.FC = () => {
         activeTabName={'プロフィール編集'}
       />
       <TagModal
+        onCompleteModal={selectedTagsInModal =>
+          setValues(v => ({...v, tags: selectedTagsInModal}))
+        }
         isVisible={visibleTagModal}
         tags={filteredTags || []}
         onCloseModal={() => setVisibleTagModal(false)}
-        onPressTag={toggleTag}
-        isSelected={isSelected}
         selectedTagType={selectedTagType}
-        selectTagType={selectTagType}
+        defaultSelectedTags={values.tags}
       />
       <Button
         bg="blue700"

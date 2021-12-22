@@ -12,6 +12,8 @@ import {
   Text,
 } from 'react-native-magnus';
 import {DropdownOptionProps} from 'react-native-magnus/lib/typescript/src/ui/dropdown/dropdown.option.type';
+import {useSelectedTags} from '../../../hooks/tag/useSelectedTags';
+import {useTagType} from '../../../hooks/tag/useTagType';
 import {AllTag, TagType, TagTypeInApp} from '../../../types';
 import {tagTypeNameFactory} from '../../../utils/factory/tag/tagTypeNameFactory';
 
@@ -20,21 +22,32 @@ type TagModalContainerProps = Omit<ModalProps, 'children'>;
 type TagModalProps = TagModalContainerProps & {
   onCloseModal: () => void;
   tags: AllTag[];
-  onPressTag: (tag: AllTag) => void;
-  isSelected: (tag: AllTag) => boolean;
+  onCompleteModal: (users: AllTag[]) => void;
+  // onPressTag: (tag: AllTag) => void;
+  // isSelected: (tag: AllTag) => boolean;
   selectedTagType: TagTypeInApp;
-  selectTagType: (tagType: TagTypeInApp) => void;
+  defaultSelectedTags?: Partial<AllTag>[];
+  // selectTagType: (tagType: TagTypeInApp) => void;
 };
 
 const TagModal: React.FC<TagModalProps> = props => {
   const {
+    onCompleteModal,
     onCloseModal,
     tags,
-    onPressTag,
-    isSelected,
-    selectedTagType,
-    selectTagType,
+    // onPressTag,
+    // isSelected,
+    selectedTagType: alreadySelectedTags,
+    // selectTagType,
+    defaultSelectedTags,
   } = props;
+  const {selectedTags, toggleTag, isSelected, clear} = useSelectedTags(
+    defaultSelectedTags || [],
+  );
+  const {selectedTagType, selectTagType, filteredTags} = useTagType(
+    alreadySelectedTags,
+    tags,
+  );
   const dropdownRef = useRef<any | null>(null);
   const defaultDropdownProps: Partial<DropdownProps> = {
     m: 'md',
@@ -56,13 +69,31 @@ const TagModal: React.FC<TagModalProps> = props => {
   return (
     <Modal {...props}>
       <Button
+        bg="purple600"
+        position="absolute"
+        right={10}
+        bottom={10}
+        h={60}
+        zIndex={20}
+        rounded="circle"
+        w={60}
+        onPress={() => {
+          onCompleteModal(selectedTags as AllTag[]);
+          onCloseModal();
+        }}>
+        <Icon color="white" fontSize="6xl" name="check" />
+      </Button>
+      <Button
         bg="gray400"
         h={35}
         w={35}
         right={15}
         alignSelf="flex-end"
         rounded="circle"
-        onPress={onCloseModal}>
+        onPress={() => {
+          clear();
+          onCloseModal();
+        }}>
         <Icon color="black" name="close" />
       </Button>
       <Div
@@ -128,8 +159,8 @@ const TagModal: React.FC<TagModalProps> = props => {
         </Dropdown.Option>
       </Dropdown>
       <ScrollDiv>
-        {tags.map(t => (
-          <TouchableOpacity key={t.id} onPress={() => onPressTag(t)}>
+        {filteredTags?.map(t => (
+          <TouchableOpacity key={t.id} onPress={() => toggleTag(t)}>
             <Div
               w={windowWidth}
               minH={40}

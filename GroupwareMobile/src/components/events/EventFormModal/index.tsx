@@ -232,10 +232,6 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
   }, [event, setNewEvent]);
 
   useEffect(() => {
-    setNewEvent(e => ({...e, tags: selectedTags}));
-  }, [selectedTags, setNewEvent]);
-
-  useEffect(() => {
     if (type && isCreatableEvent(type, user?.role)) {
       setNewEvent(e => ({...e, type}));
     }
@@ -249,13 +245,14 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
   return (
     <Modal {...props}>
       <TagModal
+        onCompleteModal={selectedTagsInModal =>
+          setNewEvent(e => ({...e, tags: selectedTagsInModal}))
+        }
         isVisible={visibleTagModal}
         tags={filteredTags || []}
         onCloseModal={() => setVisibleTagModal(false)}
-        onPressTag={toggleTag}
-        isSelected={isSelectedTag}
         selectedTagType={selectedTagType}
-        selectTagType={selectTagType}
+        defaultSelectedTags={newEvent.tags}
       />
       <UserModal
         onCompleteModal={selectedUsers =>

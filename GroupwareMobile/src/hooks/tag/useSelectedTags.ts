@@ -1,8 +1,8 @@
 import {useState} from 'react';
 import {AllTag} from '../../types';
 
-export const useSelectedTags = (alreadySelectedTags?: AllTag[]) => {
-  const [selectedTags, setSelectedTags] = useState<AllTag[]>(
+export const useSelectedTags = (alreadySelectedTags?: Partial<AllTag>[]) => {
+  const [selectedTags, setSelectedTags] = useState<Partial<AllTag>[]>(
     alreadySelectedTags || [],
   );
 
@@ -22,10 +22,15 @@ export const useSelectedTags = (alreadySelectedTags?: AllTag[]) => {
     });
   };
 
+  const clear = () => {
+    setSelectedTags(alreadySelectedTags || []);
+  };
+
   return {
     selectedTags,
     setSelectedTags,
     toggleTag,
     isSelected,
+    clear,
   };
 };
