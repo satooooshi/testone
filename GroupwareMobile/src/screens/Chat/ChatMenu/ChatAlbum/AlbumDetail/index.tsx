@@ -65,7 +65,7 @@ const AlbumDetail: React.FC = () => {
   const {values, setValues, handleSubmit} = useFormik({
     initialValues: album,
     onSubmit: v => {
-      updateAlbum(v);
+      updateAlbum({...v, images: undefined});
     },
   });
   const images: ImageSource[] =
