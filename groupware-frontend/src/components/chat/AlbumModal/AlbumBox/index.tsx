@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Button, Image, Link, LinkBox, Text } from '@chakra-ui/react';
+import { Box, Image, Link, LinkBox, Text } from '@chakra-ui/react';
 import NextImage from 'next/image';
 import { ChatAlbum } from 'src/types';
 import noImage from '@/public/no-image.jpg';
@@ -26,6 +26,7 @@ const AlbumBox: React.FC<AlbumBoxProps> = ({
       maxWidth={'400px'}
       display="flex"
       flexDir="column"
+      cursor="pointer"
       onClick={onClick}
       alignItems="center">
       <Box
