@@ -29,9 +29,9 @@ import { useAPIUploadStorage } from '@/hooks/api/storage/useAPIUploadStorage';
 import { useAPICreateChatAlbum } from '@/hooks/api/chat/album/useAPICreateChatAlbum';
 import { useAPIGetChatAlbums } from '@/hooks/api/chat/album/useAPIGetAlbums';
 import { useAPIGetChatAlbumImages } from '@/hooks/api/chat/album/useAPIGetChatAlbumImages';
-import { useAPISaveAlbumImage } from '@/hooks/api/chat/album/useAPISaveChatImages';
 import { useAPIDeleteChatAlbum } from '@/hooks/api/chat/album/useAPIDeleteChatAlbum';
 import { saveAs } from 'file-saver';
+import { useAPIUpdateAlbum } from '@/hooks/api/chat/album/useAPIUpdateChatAlbum';
 
 type AlbumModalProps = {
   isOpen: boolean;
@@ -54,29 +54,38 @@ const AlbumModal: React.FC<AlbumModalProps> = ({ isOpen, onClose, room }) => {
   });
   const [selectedAlbum, setSelectedAlbum] = useState<ChatAlbum>();
   const [albumImages, setAlbumImages] = useState<ChatAlbumImage[]>([]);
-  const { mutate: saveAlbumImage } = useAPISaveAlbumImage();
   const [notesForInfiniteScroll, setNotesForInfiniteScroll] = useState<
     ChatAlbum[]
   >([]);
+  const { mutate: updateAlbum } = useAPIUpdateAlbum();
 
   const onClickBackButton = () => {
     setSelectedAlbum(undefined);
     setAlbumImages([]);
+    setMode('list');
   };
 
   const onUploadImage = (files: File[]) => {
     uploadImage(files, {
       onSuccess: (imageURLs) => {
-        if (selectedAlbum) {
+        if (selectedAlbum && mode === 'edit') {
           const albumImages: Partial<ChatAlbumImage>[] = imageURLs.map((i) => ({
             imageURL: i,
             chatAlbum: selectedAlbum,
           }));
-          saveAlbumImage(albumImages, {
-            onSuccess: (savedImages) => {
-              setAlbumImages((i) => [...savedImages, ...i]);
+          updateAlbum(
+            {
+              ...selectedAlbum,
+              images: selectedAlbum.images
+                ? [...selectedAlbum.images, ...albumImages]
+                : albumImages,
             },
-          });
+            {
+              onSuccess: (savedAlbum) => {
+                setAlbumImages(savedAlbum.images as ChatAlbumImage[]);
+              },
+            },
+          );
         }
       },
     });
@@ -102,7 +111,7 @@ const AlbumModal: React.FC<AlbumModalProps> = ({ isOpen, onClose, room }) => {
 
   const imageUploaderRef = useRef<HTMLInputElement | null>(null);
   const [selectedImage, setSelectedImage] = useState<Partial<ChatAlbumImage>>();
-  const [mode, setMode] = useState<'post' | 'list'>('list');
+  const [mode, setMode] = useState<'post' | 'list' | 'edit'>('list');
   const initialValues: Partial<ChatAlbum> = {
     title: '',
     images: [],
@@ -308,7 +317,10 @@ const AlbumModal: React.FC<AlbumModalProps> = ({ isOpen, onClose, room }) => {
         <Box mb="16px" key={a.id}>
           <AlbumBox
             album={a}
-            onClick={() => setSelectedAlbum(a)}
+            onClick={() => {
+              setMode('edit');
+              setSelectedAlbum(a);
+            }}
             onClickDeleteButton={() => {
               if (confirm('アルバムを削除してよろしいですか？')) {
                 deleteAlbum(
@@ -392,11 +404,9 @@ const AlbumModal: React.FC<AlbumModalProps> = ({ isOpen, onClose, room }) => {
           </ModalHeader>
           <ModalCloseButton />
           <ModalBody onScroll={onScroll}>
-            {!selectedAlbum && mode === 'list' ? (
+            {mode === 'list' ? (
               listMode
-            ) : !selectedAlbum && mode === 'post' ? (
-              postMode
-            ) : (
+            ) : selectedAlbum && mode === 'edit' ? (
               <Box>
                 <Box
                   flexDir="row"
@@ -438,6 +448,8 @@ const AlbumModal: React.FC<AlbumModalProps> = ({ isOpen, onClose, room }) => {
                   ))}
                 </SimpleGrid>
               </Box>
+            ) : (
+              postMode
             )}
           </ModalBody>
         </ModalContent>

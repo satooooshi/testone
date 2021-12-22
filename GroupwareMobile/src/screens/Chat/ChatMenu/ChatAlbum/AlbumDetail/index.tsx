@@ -47,8 +47,8 @@ const AlbumDetail: React.FC = () => {
   const [imageModal, setImageModal] = useState(false);
   const [nowImageIndex, setNowImageIndex] = useState<number>(0);
   const {mutate: updateAlbum} = useAPIUpdateAlbum({
-    onSuccess: updatedRoom => {
-      setAlbum(updatedRoom);
+    onSuccess: updatedAlbum => {
+      setAlbum(updatedAlbum);
       setEditModal(false);
     },
     onError: () => {
