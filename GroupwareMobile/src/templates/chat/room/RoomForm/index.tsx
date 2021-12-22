@@ -1,5 +1,5 @@
 import {useFormik} from 'formik';
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import {TouchableOpacity, useWindowDimensions} from 'react-native';
 import {
   Button,
@@ -14,7 +14,6 @@ import {
 import UserModal from '../../../../components/common/UserModal';
 import HeaderWithTextButton from '../../../../components/Header';
 import WholeContainer from '../../../../components/WholeContainer';
-import {useSelectedUsers} from '../../../../hooks/user/useSelectedUsers';
 import {useUserRole} from '../../../../hooks/user/useUserRole';
 import {newRoomStyles} from '../../../../styles/screen/chat/newRoom.style';
 import {ChatGroup, User} from '../../../../types';
@@ -56,15 +55,7 @@ const RoomForm: React.FC<RoomFormProps> = ({
       },
       validationSchema: savingRoomSchema,
     });
-  const {
-    selectedUsers,
-    toggleUser,
-    isSelected: isSelectedUser,
-  } = useSelectedUsers(values.members || []);
-  const {selectedUserRole, selectUserRole, filteredUsers} = useUserRole(
-    'All',
-    users,
-  );
+  const {selectedUserRole, filteredUsers} = useUserRole('All', users);
 
   const handleUploadImage = async () => {
     const {formData} = await uploadImageFromGallery();
@@ -75,22 +66,17 @@ const RoomForm: React.FC<RoomFormProps> = ({
     }
   };
 
-  useEffect(() => {
-    if (selectedUsers && selectedUsers.length) {
-      setValues(v => ({...v, members: selectedUsers}));
-    }
-  }, [selectedUsers, setValues]);
-
   return (
     <WholeContainer>
       <UserModal
         isVisible={visibleUserModal}
         users={filteredUsers || []}
         onCloseModal={() => setVisibleUserModal(false)}
-        onPressUser={toggleUser}
-        isSelected={isSelectedUser}
         selectedUserRole={selectedUserRole}
-        selectUserRole={selectUserRole}
+        defaultSelectedUsers={values.members}
+        onCompleteModal={selectedUsers =>
+          setValues(v => ({...v, members: selectedUsers}))
+        }
       />
       <HeaderWithTextButton enableBackButton={true} title={headerTitle} />
       <Button

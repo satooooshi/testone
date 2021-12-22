@@ -12,6 +12,8 @@ import {
   Text,
 } from 'react-native-magnus';
 import {DropdownOptionProps} from 'react-native-magnus/lib/typescript/src/ui/dropdown/dropdown.option.type';
+import {useSelectedUsers} from '../../../hooks/user/useSelectedUsers';
+import {useUserRole} from '../../../hooks/user/useUserRole';
 import {User, UserRole, UserRoleInApp} from '../../../types';
 import {userNameFactory} from '../../../utils/factory/userNameFactory';
 import {userRoleNameFactory} from '../../../utils/factory/userRoleNameFactory';
@@ -20,22 +22,30 @@ type ModalContainerProps = Omit<ModalProps, 'children'>;
 
 type UserModalProps = ModalContainerProps & {
   onCloseModal: () => void;
+  onCompleteModal: (users: User[]) => void;
   users: User[];
-  onPressUser: (user: User) => void;
-  isSelected: (user: User) => boolean;
   selectedUserRole: UserRoleInApp;
-  selectUserRole: (tagType: UserRoleInApp) => void;
+  defaultSelectedUsers?: Partial<User>[];
 };
 
 const UserModal: React.FC<UserModalProps> = props => {
   const {
     onCloseModal,
     users,
-    onPressUser,
-    isSelected,
-    selectedUserRole,
-    selectUserRole,
+    onCompleteModal,
+    selectedUserRole: alreadySelectedUserRole,
+    defaultSelectedUsers,
   } = props;
+  const {
+    toggleUser,
+    isSelected,
+    selectedUsers: selectedUsersInModal,
+    clear,
+  } = useSelectedUsers(defaultSelectedUsers || []);
+  const {selectedUserRole, selectUserRole, filteredUsers} = useUserRole(
+    alreadySelectedUserRole,
+    users,
+  );
   const dropdownRef = useRef<any | null>(null);
   const defaultDropdownProps: Partial<DropdownProps> = {
     m: 'md',
@@ -57,13 +67,31 @@ const UserModal: React.FC<UserModalProps> = props => {
   return (
     <Modal {...props}>
       <Button
+        bg="purple600"
+        position="absolute"
+        right={10}
+        bottom={10}
+        h={60}
+        zIndex={20}
+        rounded="circle"
+        w={60}
+        onPress={() => {
+          onCompleteModal(selectedUsersInModal as User[]);
+          onCloseModal();
+        }}>
+        <Icon color="white" fontSize="6xl" name="check" />
+      </Button>
+      <Button
         bg="gray400"
         h={35}
         w={35}
         right={15}
         alignSelf="flex-end"
         rounded="circle"
-        onPress={onCloseModal}>
+        onPress={() => {
+          clear();
+          onCloseModal();
+        }}>
         <Icon color="black" name="close" />
       </Button>
       <Div
@@ -131,8 +159,8 @@ const UserModal: React.FC<UserModalProps> = props => {
         </Dropdown.Option>
       </Dropdown>
       <ScrollDiv>
-        {users.map(u => (
-          <TouchableOpacity key={u.id} onPress={() => onPressUser(u)}>
+        {filteredUsers?.map(u => (
+          <TouchableOpacity key={u.id} onPress={() => toggleUser(u)}>
             <Div
               w={windowWidth}
               minH={40}

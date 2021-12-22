@@ -22,10 +22,15 @@ export const useSelectedUsers = (alreadySelectedUsers?: Partial<User>[]) => {
     });
   };
 
+  const clear = () => {
+    setSelectedUsers(alreadySelectedUsers || []);
+  };
+
   return {
     selectedUsers,
     setSelectedUsers,
     toggleUser,
     isSelected,
+    clear,
   };
 };

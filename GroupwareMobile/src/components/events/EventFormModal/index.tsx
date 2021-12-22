@@ -34,7 +34,6 @@ import TagModal from '../../common/TagModal';
 import {useTagType} from '../../../hooks/tag/useTagType';
 import {useSelectedTags} from '../../../hooks/tag/useSelectedTags';
 import UserModal from '../../common/UserModal';
-import {useSelectedUsers} from '../../../hooks/user/useSelectedUsers';
 import {useUserRole} from '../../../hooks/user/useUserRole';
 import {formikErrorMsgFactory} from '../../../utils/factory/formikEroorMsgFactory';
 import {userNameFactory} from '../../../utils/factory/userNameFactory';
@@ -148,16 +147,7 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
     'All',
     tags,
   );
-  const {
-    selectedUsers,
-    setSelectedUsers,
-    toggleUser,
-    isSelected: isSelectedUser,
-  } = useSelectedUsers(event?.hostUsers || []);
-  const {selectedUserRole, selectUserRole, filteredUsers} = useUserRole(
-    'All',
-    users,
-  );
+  const {selectedUserRole, filteredUsers} = useUserRole('All', users);
 
   const checkValidateErrors = async () => {
     const errors = await validateForm();
@@ -242,10 +232,6 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
   }, [event, setNewEvent]);
 
   useEffect(() => {
-    setNewEvent(e => ({...e, hostUsers: selectedUsers}));
-  }, [selectedUsers, setNewEvent]);
-
-  useEffect(() => {
     setNewEvent(e => ({...e, tags: selectedTags}));
   }, [selectedTags, setNewEvent]);
 
@@ -257,7 +243,6 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
 
   useEffect(() => {
     event?.tags && setSelectedTags(event.tags);
-    event?.hostUsers && setSelectedUsers(event.hostUsers);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [event]);
 
@@ -273,13 +258,14 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
         selectTagType={selectTagType}
       />
       <UserModal
+        onCompleteModal={selectedUsers =>
+          setNewEvent(e => ({...e, hostUsers: selectedUsers}))
+        }
         isVisible={visibleUserModal}
         users={filteredUsers || []}
         onCloseModal={() => setVisibleUserModal(false)}
-        onPressUser={toggleUser}
-        isSelected={isSelectedUser}
         selectedUserRole={selectedUserRole}
-        selectUserRole={selectUserRole}
+        defaultSelectedUsers={newEvent.hostUsers}
       />
       <WholeContainer>
         <Button
