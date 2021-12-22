@@ -113,12 +113,25 @@ const ChatNoteForm: React.FC<ChatNoteFormProps> = ({
           </Div>
         )}
       />
+      <Button
+        bg="purple600"
+        position="absolute"
+        right={10}
+        bottom={10}
+        h={60}
+        zIndex={20}
+        rounded="circle"
+        onPress={handlePressImageButton}
+        w={60}>
+        <Icon fontSize={'6xl'} name="image" fontFamily="Entypo" color="white" />
+      </Button>
       <KeyboardAwareScrollView
-        contentContainerStyle={tailwind('h-full bg-white')}
-        style={tailwind('h-full bg-white')}>
+        contentContainerStyle={tailwind('bg-white')}
+        style={tailwind('flex-1 bg-white')}>
         <Div flexDir="row" flexWrap="wrap">
           {values.images?.map(i => (
             <TouchableHighlight
+              key={i.id}
               underlayColor="none"
               style={tailwind('relative')}
               onPress={() => i.imageURL && handlePressImage(i.imageURL)}>
@@ -152,23 +165,6 @@ const ChatNoteForm: React.FC<ChatNoteFormProps> = ({
           style={tailwind(' h-full p-2')}
           autoCapitalize={'none'}
         />
-        <Button
-          bg="purple600"
-          position="absolute"
-          right={10}
-          bottom={10}
-          h={60}
-          zIndex={20}
-          rounded="circle"
-          onPress={handlePressImageButton}
-          w={60}>
-          <Icon
-            fontSize={'6xl'}
-            name="image"
-            fontFamily="Entypo"
-            color="white"
-          />
-        </Button>
       </KeyboardAwareScrollView>
     </WholeContainer>
   );
