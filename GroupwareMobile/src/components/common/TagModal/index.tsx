@@ -23,11 +23,8 @@ type TagModalProps = TagModalContainerProps & {
   onCloseModal: () => void;
   tags: AllTag[];
   onCompleteModal: (users: AllTag[]) => void;
-  // onPressTag: (tag: AllTag) => void;
-  // isSelected: (tag: AllTag) => boolean;
   selectedTagType: TagTypeInApp;
   defaultSelectedTags?: Partial<AllTag>[];
-  // selectTagType: (tagType: TagTypeInApp) => void;
 };
 
 const TagModal: React.FC<TagModalProps> = props => {
@@ -35,10 +32,7 @@ const TagModal: React.FC<TagModalProps> = props => {
     onCompleteModal,
     onCloseModal,
     tags,
-    // onPressTag,
-    // isSelected,
     selectedTagType: alreadySelectedTags,
-    // selectTagType,
     defaultSelectedTags,
   } = props;
   const {selectedTags, toggleTag, isSelected, clear} = useSelectedTags(
