@@ -22,6 +22,7 @@ const HeaderWithTextButton: React.FC<HeaderWithTextButtonProps> = props => {
           fontSize={16}
           py={0}
           px={10}
+          maxW={'40%'}
           onPress={onPressRightButton}
           bg={blueColor}
           color="white">
