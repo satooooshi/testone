@@ -26,7 +26,6 @@ import EventFormModal from '../../../components/events/EventFormModal';
 import {useAPIUpdateEvent} from '../../../hooks/api/event/useAPIUpdateEvent';
 import {useAPIJoinEvent} from '../../../hooks/api/event/useAPIJoinEvent';
 import {useAPICancelEvent} from '../../../hooks/api/event/useAPICancelEvent';
-import {AxiosError} from 'axios';
 import {useFormik} from 'formik';
 import {EventComment, EventType, SubmissionFile} from '../../../types';
 import {useAPICreateComment} from '../../../hooks/api/event/useAPICreateComment';
@@ -70,6 +69,11 @@ const EventDetail: React.FC = () => {
       setEventFormModal(false);
       refetchEvents();
     },
+    onError: () => {
+      Alert.alert(
+        'イベント更新中にエラーが発生しました。\n時間をおいて再実行してください。',
+      );
+    },
   });
   const [unsavedSubmissions, setUnsavedSubmissions] = useState<
     Partial<SubmissionFile>[]
@@ -80,22 +84,27 @@ const EventDetail: React.FC = () => {
       Alert.alert('提出状況を保存しました');
       refetchEvents();
     },
-    onError: err => {
-      if (err.response?.data) {
-        Alert.alert((err.response?.data as AxiosError)?.message);
-      }
+    onError: () => {
+      Alert.alert(
+        '提出中にエラーが発生しました。\n時間をおいて再実行してください。',
+      );
     },
   });
   const {mutate: joinEvent} = useAPIJoinEvent({
     onSuccess: () => refetchEvents(),
-    onError: err => {
-      if (err.response?.data) {
-        Alert.alert((err.response?.data as AxiosError)?.message);
-      }
+    onError: () => {
+      Alert.alert(
+        'イベント参加中にエラーが発生しました。\n時間をおいて再実行してください。',
+      );
     },
   });
   const {mutate: cancelEvent} = useAPICancelEvent({
     onSuccess: () => refetchEvents(),
+    onError: () => {
+      Alert.alert(
+        'イベントキャンセル中にエラーが発生しました。\n時間をおいて再実行してください。',
+      );
+    },
   });
 
   const userJoiningEvents = useMemo(() => {
@@ -133,10 +142,10 @@ const EventDetail: React.FC = () => {
         refetchEvents();
       }
     },
-    onError: err => {
-      if (err.response?.data) {
-        Alert.alert((err.response?.data as AxiosError)?.message.toString());
-      }
+    onError: () => {
+      Alert.alert(
+        'コメント作成中にエラーが発生しました。\n時間をおいて再実行してください。',
+      );
     },
   });
   const {mutate: uploadFile} = useAPIUploadStorage();
@@ -173,10 +182,10 @@ const EventDetail: React.FC = () => {
       Alert.alert('削除が完了しました。');
       navigation.goBack();
     },
-    onError: err => {
-      if (err.response?.data) {
-        Alert.alert((err.response?.data as AxiosError)?.message);
-      }
+    onError: () => {
+      Alert.alert(
+        'イベント削除中にエラーが発生しました。\n時間をおいて再実行してください。',
+      );
     },
   });
 
@@ -232,6 +241,11 @@ const EventDetail: React.FC = () => {
             userSubmitted: user,
           }));
           setUnsavedSubmissions(f => [...f, ...unSavedFiles]);
+        },
+        onError: () => {
+          Alert.alert(
+            'アップロード中にエラーが発生しました。\n時間をおいて再実行してください。',
+          );
         },
       });
     }

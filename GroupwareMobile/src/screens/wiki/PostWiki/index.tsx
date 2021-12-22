@@ -9,7 +9,7 @@ import {useSelectedTags} from '../../../hooks/tag/useSelectedTags';
 import WikiForm from '../../../templates/wiki/WikiForm';
 import {useAPIUploadStorage} from '../../../hooks/api/storage/useAPIUploadStorage';
 import {uploadImageFromGallery} from '../../../utils/cropImage/uploadImageFromGallery';
-import {ActivityIndicator} from 'react-native';
+import {ActivityIndicator, Alert} from 'react-native';
 import {Overlay} from 'react-native-magnus';
 import {
   PostWikiNavigationProps,
@@ -24,6 +24,11 @@ const PostWiki: React.FC = () => {
   const {mutate: saveWiki, isLoading: loadingSaveWiki} = useAPICreateWiki({
     onSuccess: () => {
       navigation.goBack();
+    },
+    onError: () => {
+      Alert.alert(
+        'Wiki作成中にエラーが発生しました。\n時間をおいて再実行してください。',
+      );
     },
   });
   const {data: tags} = useAPIGetTag();

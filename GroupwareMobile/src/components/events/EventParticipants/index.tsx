@@ -41,6 +41,11 @@ const EventParticipants: React.FC<EventParticipantsProps> = ({
       onSuccessSaveUserJoiningEvent(data);
       Alert.alert('遅刻を記録しました。');
     },
+    onError: () => {
+      Alert.alert(
+        '遅刻記録中にエラーが発生しました。\n時間をおいて再度実行してください。',
+      );
+    },
   });
 
   return (

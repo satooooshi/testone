@@ -22,6 +22,11 @@ const ChatMenu: React.FC = () => {
         params: {needRefetch: true},
       });
     },
+    onError: () => {
+      Alert.alert(
+        '退室中にエラーが発生しました。\n時間をおいて再実行してください。',
+      );
+    },
   });
 
   return (

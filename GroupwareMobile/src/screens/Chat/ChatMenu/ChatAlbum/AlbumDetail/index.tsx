@@ -1,6 +1,11 @@
 import {useNavigation, useRoute} from '@react-navigation/native';
 import React, {useEffect, useState} from 'react';
-import {FlatList, TouchableHighlight, useWindowDimensions} from 'react-native';
+import {
+  Alert,
+  FlatList,
+  TouchableHighlight,
+  useWindowDimensions,
+} from 'react-native';
 import {
   Button,
   Div,
@@ -45,6 +50,11 @@ const AlbumDetail: React.FC = () => {
     onSuccess: updatedRoom => {
       setAlbum(updatedRoom);
       setEditModal(false);
+    },
+    onError: () => {
+      Alert.alert(
+        'アルバム更新中にエラーが発生しました。\n時間をおいて再実行してください。',
+      );
     },
   });
   const {data} = useAPIGetChatAlbumImages({

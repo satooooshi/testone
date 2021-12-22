@@ -7,7 +7,7 @@ import {
   MIN_HEIGHT,
   WeekNum,
 } from 'react-native-big-calendar';
-import {useWindowDimensions} from 'react-native';
+import {Alert, useWindowDimensions} from 'react-native';
 import {EventSchedule} from '../../../types';
 import {
   SearchQueryToGetEvents,
@@ -65,6 +65,11 @@ const EventCalendar: React.FC<EventCalendarProps> = ({
     onSuccess: () => {
       hideEventFormModal();
       refetchEvents();
+    },
+    onError: () => {
+      Alert.alert(
+        'イベント作成中にエラーが発生しました。\n時間をおいて再実行してください。',
+      );
     },
   });
 

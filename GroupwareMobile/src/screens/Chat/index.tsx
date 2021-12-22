@@ -1,5 +1,6 @@
 import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {
+  Alert,
   FlatList,
   Keyboard,
   KeyboardAvoidingView,
@@ -148,6 +149,11 @@ const Chat: React.FC = () => {
           setImagesForViewing(i => [...i, {uri: sentMsg.content}]);
         }
       },
+      onError: () => {
+        Alert.alert(
+          'チャットの送信中にエラーが発生しました。\n時間をおいて再度実行してください。',
+        );
+      },
     });
   const {mutate: uploadFile, isLoading: loadingUploadFile} =
     useAPIUploadStorage();
@@ -178,6 +184,11 @@ const Chat: React.FC = () => {
       onSuccess: reactionId => {
         setDeletedReactionIds(r => [...r, reactionId]);
       },
+      onError: () => {
+        Alert.alert(
+          'リアクションの更新中にエラーが発生しました。\n時間をおいて再実行してください。',
+        );
+      },
     });
   };
 
@@ -205,6 +216,11 @@ const Chat: React.FC = () => {
             });
           });
         },
+        onError: () => {
+          Alert.alert(
+            'リアクションの更新中にエラーが発生しました。\n時間をおいて再実行してください。',
+          );
+        },
       });
     }
   };
@@ -223,6 +239,11 @@ const Chat: React.FC = () => {
             chatGroup: room,
           });
         },
+        onError: () => {
+          Alert.alert(
+            'アップロード中にエラーが発生しました。\n時間をおいて再実行してください。',
+          );
+        },
       });
     }
   };
@@ -240,6 +261,11 @@ const Chat: React.FC = () => {
             type: ChatMessageType.VIDEO,
             chatGroup: room,
           });
+        },
+        onError: () => {
+          Alert.alert(
+            'アップロード中にエラーが発生しました。\n時間をおいて再実行してください。',
+          );
         },
       });
     }
@@ -264,6 +290,11 @@ const Chat: React.FC = () => {
             type: ChatMessageType.OTHER_FILE,
             chatGroup: room,
           });
+        },
+        onError: () => {
+          Alert.alert(
+            'アップロード中にエラーが発生しました。\n時間をおいて再実行してください。',
+          );
         },
       });
     }
@@ -527,7 +558,9 @@ const Chat: React.FC = () => {
 
   useEffect(() => {
     saveLastReadChatTime(room.id, {
-      onError: err => console.log(err.response?.data),
+      onError: () => {
+        Alert.alert('エラーが発生しました。\n時間をおいて再実行してください。');
+      },
     });
   }, [room.id, saveLastReadChatTime]);
 

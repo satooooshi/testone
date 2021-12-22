@@ -29,6 +29,11 @@ const Share: React.FC = () => {
       onSuccess: data => {
         stateRefreshNeeded(data.rooms);
       },
+      onError: () => {
+        Alert.alert(
+          'ルーム取得中にエラーが発生しました。\n時間をおいて再実行してください。',
+        );
+      },
     },
   );
   const [selectedRoom, setSelectedRoom] = useState<ChatGroup[]>([]);
@@ -44,6 +49,11 @@ const Share: React.FC = () => {
   const {mutate: saveGroup} = useAPISaveChatGroup({
     onSuccess: () => {
       handleRefetch();
+    },
+    onError: () => {
+      Alert.alert(
+        'チャット更新中にエラーが発生しました。\n時間をおいて再実行してください。',
+      );
     },
   });
 
@@ -122,6 +132,11 @@ const Share: React.FC = () => {
                 },
               ]);
             }
+          },
+          onError: () => {
+            Alert.alert(
+              '送信中にエラーが発生しました。\n時間をおいて再実行してください。',
+            );
           },
         },
       );

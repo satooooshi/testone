@@ -3,6 +3,7 @@ import {createContext, useContext, useState} from 'react';
 import {User} from '../types';
 import {useAPIAuthenticate} from '../hooks/api/auth/useAPIAuthenticate';
 import {storage} from '../utils/url';
+import {Alert} from 'react-native';
 
 const AuthenticateContext = createContext({
   isAuthenticated: false,
@@ -23,6 +24,9 @@ export const AuthenticateProvider: React.FC = ({children}) => {
       }
     },
     onError: () => {
+      Alert.alert(
+        '認証中にエラーが発生しました。\n時間をおいて再実行してください。',
+      );
       logout();
     },
   });

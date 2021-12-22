@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {FlatList, Text} from 'react-native';
+import {Alert, FlatList, Text} from 'react-native';
 import {
   SearchQueryToGetEvents,
   EventStatus,
@@ -39,6 +39,11 @@ const EventCardList: React.FC<EventCardListProps> = ({
         setSearchQuery(q => ({...q, page: '1'}));
       }
       setPartOfSearchQuery({refetchNeeded: true});
+    },
+    onError: () => {
+      Alert.alert(
+        'イベント更新中にエラーが発生しました。\n時間をおいて再実行してください。',
+      );
     },
   });
   const {word, tag, type} = partOfSearchQuery;

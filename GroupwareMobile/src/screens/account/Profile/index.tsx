@@ -35,6 +35,7 @@ import {formikErrorMsgFactory} from '../../../utils/factory/formikEroorMsgFactor
 import {profileSchema} from '../../../utils/validation/schema';
 import {Tab} from '../../../components/Header/HeaderTemplate';
 import UserAvatar from '../../../components/common/UserAvatar';
+
 const initialValues: Partial<User> = {
   email: '',
   lastName: '',
@@ -61,6 +62,11 @@ const Profile: React.FC = () => {
       if (responseData) {
         Alert.alert('プロフィールを更新しました');
       }
+    },
+    onError: () => {
+      Alert.alert(
+        'プロフィールの更新中にエラーが発生しました。\n時間をおいて再度実行してください。',
+      );
     },
   });
   const {values, setValues, handleChange, handleSubmit, validateForm} =
@@ -102,6 +108,11 @@ const Profile: React.FC = () => {
   const {mutate: uploadImage} = useAPIUploadStorage({
     onSuccess: async fileURLs => {
       setValues(v => ({...v, avatarUrl: fileURLs[0]}));
+    },
+    onError: () => {
+      Alert.alert(
+        'アップロード中にエラーが発生しました。\n時間をおいて再実行してください。',
+      );
     },
   });
   const tabs: Tab[] = [

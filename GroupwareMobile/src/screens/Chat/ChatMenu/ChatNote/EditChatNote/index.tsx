@@ -9,6 +9,7 @@ import {
 } from '../../../../../types/navigator/drawerScreenProps';
 import ChatNoteForm from '../../../../../templates/chat/notes/ChatNoteForm';
 import {useAPIUploadStorage} from '../../../../../hooks/api/storage/useAPIUploadStorage';
+import {Alert} from 'react-native';
 
 const EditChatNote: React.FC = () => {
   const {room, note} = useRoute<EditChatNotesRouteProps>().params;
@@ -33,6 +34,11 @@ const EditChatNote: React.FC = () => {
               screen: 'ChatNotes',
               params: {room},
             });
+          },
+          onError: () => {
+            Alert.alert(
+              'ノート更新中にエラーが発生しました。\n時間をおいて再実行してください。',
+            );
           },
         });
       }}

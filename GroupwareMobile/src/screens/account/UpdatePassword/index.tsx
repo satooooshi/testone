@@ -19,6 +19,11 @@ const UpdatePassword: React.FC = () => {
         Alert.alert('パスワードの更新が完了しました');
         resetForm();
       },
+      onError: () => {
+        Alert.alert(
+          'パスワードの更新中にエラーが発生しました。\n時間をおいて再実行してください。',
+        );
+      },
     });
   const tabs: Tab[] = [
     {

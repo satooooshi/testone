@@ -7,6 +7,7 @@ import {
   PostChatAlbumsNavigationProps,
 } from '../../../../../types/navigator/drawerScreenProps';
 import ChatAlbumForm from '../../../../../templates/chat/album/ChatAlbumForm';
+import {Alert} from 'react-native';
 
 const PostChatAlbum: React.FC = () => {
   const {mutate: createChatAlbum} = useAPICreateChatAlbum();
@@ -24,6 +25,11 @@ const PostChatAlbum: React.FC = () => {
               screen: 'ChatAlbums',
               params: {room},
             }),
+          onError: () => {
+            Alert.alert(
+              'アルバム作成中にエラーが発生しました。\n時間をおいて再実行してください。',
+            );
+          },
         })
       }
       uploadImage={onUploadImage}

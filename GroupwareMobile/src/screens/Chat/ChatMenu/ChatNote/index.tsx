@@ -156,6 +156,11 @@ const ChatNotes: React.FC = () => {
                             setPage('1');
                             refetchNotes();
                           },
+                          onError: () => {
+                            Alert.alert(
+                              'ノートの削除中にエラーが発生しました。\n時間をおいて再実行してください。',
+                            );
+                          },
                         },
                       );
                     },

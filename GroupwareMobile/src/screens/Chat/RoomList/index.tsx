@@ -1,6 +1,6 @@
 import {useNavigation} from '@react-navigation/native';
 import React, {useCallback, useState} from 'react';
-import {FlatList} from 'react-native';
+import {Alert, FlatList} from 'react-native';
 import {Div, Text} from 'react-native-magnus';
 import {ActivityIndicator} from 'react-native-paper';
 import tailwind from 'tailwind-rn';
@@ -28,6 +28,11 @@ const RoomList: React.FC = () => {
       onSuccess: data => {
         stateRefreshNeeded(data.rooms);
       },
+      onError: () => {
+        Alert.alert(
+          'チャットルーム取得中にエラーが発生しました。\n時間をおいて再実行してください。',
+        );
+      },
     },
   );
 
@@ -41,6 +46,11 @@ const RoomList: React.FC = () => {
   const {mutate: saveGroup} = useAPISaveChatGroup({
     onSuccess: () => {
       handleRefetch();
+    },
+    onError: () => {
+      Alert.alert(
+        'チャットグループ更新中にエラーが発生しました。\n時間をおいて再実行してください。',
+      );
     },
   });
 

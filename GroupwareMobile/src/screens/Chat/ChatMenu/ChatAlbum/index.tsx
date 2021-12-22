@@ -123,6 +123,11 @@ const ChatAlbums: React.FC = () => {
                             setPage('1');
                             refetchAlbums();
                           },
+                          onError: () => {
+                            Alert.alert(
+                              'アルバム削除中にエラーが発生しました。\n時間をおいて再実行してください。',
+                            );
+                          },
                         },
                       );
                     },

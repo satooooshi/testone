@@ -5,8 +5,8 @@ import {useFormik} from 'formik';
 import {answerSchema} from '../../../utils/validation/schema';
 import {useAPIUploadStorage} from '../../../hooks/api/storage/useAPIUploadStorage';
 import {uploadImageFromGallery} from '../../../utils/cropImage/uploadImageFromGallery';
-import {ActivityIndicator, useWindowDimensions} from 'react-native';
-import {Button, Div, Overlay, ScrollDiv, Text} from 'react-native-magnus';
+import {ActivityIndicator, Alert, useWindowDimensions} from 'react-native';
+import {Button, Overlay, ScrollDiv, Text} from 'react-native-magnus';
 import {
   PostWikiNavigationProps,
   PostAnswerRouteProps,
@@ -29,6 +29,9 @@ const PostAnswer: React.FC = () => {
     {
       onSuccess: () => {
         navigation.goBack();
+      },
+      onError: () => {
+        Alert.alert('エラーが発生しました。\n時間をおいて再実行してください。');
       },
     },
   );

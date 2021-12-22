@@ -16,7 +16,6 @@ import {
   Image,
   Input,
   Overlay,
-  ScrollDiv,
   Text,
 } from 'react-native-magnus';
 import DropdownOpenerButton from '../../../components/common/DropdownOpenerButton';
@@ -74,6 +73,17 @@ const UserRegisteringAdmin: React.FC = () => {
         resetForm();
       }
     },
+    onError: err => {
+      if (err.response?.status === 500) {
+        Alert.alert(
+          'アカウント作成中にエラーが発生しました。\nメールアドレスが既に利用されている可能性があります。',
+        );
+        return;
+      }
+      Alert.alert(
+        'アカウント作成中にエラーが発生しました。\n時間をおいて再度実行してください。',
+      );
+    },
   });
   const {values, setValues, handleSubmit, validateForm, resetForm} = useFormik<
     Partial<User>
@@ -115,6 +125,11 @@ const UserRegisteringAdmin: React.FC = () => {
   const {mutate: uploadImage} = useAPIUploadStorage({
     onSuccess: async fileURLs => {
       setValues(v => ({...v, avatarUrl: fileURLs[0]}));
+    },
+    onError: () => {
+      Alert.alert(
+        'アップロード中にエラーが発生しました。\n時間をおいて再実行してください。',
+      );
     },
   });
   const tabs: Tab[] = [

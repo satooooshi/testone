@@ -11,7 +11,7 @@ import ImageView from 'react-native-image-viewing';
 import {UseMutateFunction} from 'react-query';
 import {AxiosError} from 'axios';
 import {useFormik} from 'formik';
-import {TouchableHighlight, useWindowDimensions} from 'react-native';
+import {Alert, TouchableHighlight, useWindowDimensions} from 'react-native';
 import {uploadImageFromGallery} from '../../../../utils/cropImage/uploadImageFromGallery';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import {
@@ -83,6 +83,11 @@ const ChatAlbumForm: React.FC<ChatAlbumFormProps> = ({
             ...v,
             images: v.images?.length ? [...v.images, ...newImages] : newImages,
           }));
+        },
+        onError: () => {
+          Alert.alert(
+            'アップロード中にエラーが発生しました。\n時間をおいて再度実行してください。',
+          );
         },
       });
     }

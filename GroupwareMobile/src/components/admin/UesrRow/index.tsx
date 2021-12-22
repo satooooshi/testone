@@ -26,11 +26,21 @@ const UserRow: React.FC<UserRowProps> = ({user}) => {
     onSuccess: updatedInfo => {
       setCurrentUser(updatedInfo);
     },
+    onError: () => {
+      Alert.alert(
+        'ユーザーの更新中にエラーが発生しました。\n時間をおいて再度実行してください。',
+      );
+    },
   });
   const [deleted, setDeleted] = useState(false);
   const {mutate: deleteUser, isLoading: loadingDelete} = useAPIDeleteUser({
     onSuccess: () => {
       setDeleted(true);
+    },
+    onError: () => {
+      Alert.alert(
+        'ユーザーの削除中にエラーが発生しました。\n時間をおいて再度実行してください。',
+      );
     },
   });
   const handleDeleteUser = (u: User) => {

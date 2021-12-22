@@ -22,10 +22,20 @@ const UserTagAdmin: React.FC = () => {
     onSuccess: () => {
       refetch();
     },
+    onError: () => {
+      Alert.alert(
+        'タグの作成中にエラーが発生しました。\n時間をおいて再度実行してください。',
+      );
+    },
   });
   const {mutate: deleteTag, isLoading: loadingDeleteTag} = useAPIDeleteUserTag({
     onSuccess: () => {
       refetch();
+    },
+    onError: () => {
+      Alert.alert(
+        'タグの削除中にエラーが発生しました。\n時間をおいて再度実行してください。',
+      );
     },
   });
   const isLoading = loadingTags || loadingCreateTag || loadingDeleteTag;

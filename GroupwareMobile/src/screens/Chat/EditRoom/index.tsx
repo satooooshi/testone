@@ -38,6 +38,11 @@ const EditRoom: React.FC = () => {
         },
       ]);
     },
+    onError: () => {
+      Alert.alert(
+        'チャットグループ更新中にエラーが発生しました。\n時間をおいて再実行してください。',
+      );
+    },
   });
   return (
     <RoomForm
