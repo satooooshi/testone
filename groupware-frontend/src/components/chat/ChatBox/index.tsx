@@ -34,6 +34,8 @@ import { useAPISaveLastReadChatTime } from '@/hooks/api/chat/useAPISaveLastReadC
 import { ImageDecorator } from 'react-viewer/lib/ViewerProps';
 import dynamic from 'next/dynamic';
 const Viewer = dynamic(() => import('react-viewer'), { ssr: false });
+import '@draft-js-plugins/mention/lib/plugin.css';
+import '@draft-js-plugins/image/lib/plugin.css';
 
 type ChatBoxProps = {
   room: ChatGroup;
