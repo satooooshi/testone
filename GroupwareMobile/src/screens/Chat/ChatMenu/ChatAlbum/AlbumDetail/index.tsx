@@ -181,17 +181,20 @@ const AlbumDetail: React.FC = () => {
               写真 {album.images?.length.toString() || '0'}
             </Text>
             <Div flexDir="row" flexWrap="wrap">
-              {album.editors?.map((e, index) => (
-                <Image
-                  ml={index >= 1 ? -8 : undefined}
-                  source={{uri: e.avatarUrl}}
-                  h={editorAvatarSize}
-                  w={editorAvatarSize}
-                  borderWidth={1}
-                  borderColor={'white'}
-                  rounded="circle"
-                />
-              ))}
+              {album.editors?.map(
+                (e, index) =>
+                  index < 5 && (
+                    <Image
+                      ml={index >= 1 ? -8 : undefined}
+                      source={{uri: e.avatarUrl}}
+                      h={editorAvatarSize}
+                      w={editorAvatarSize}
+                      borderWidth={1}
+                      borderColor={'white'}
+                      rounded="circle"
+                    />
+                  ),
+              )}
               {album.editors?.length && (
                 <Div
                   ml={-8}
