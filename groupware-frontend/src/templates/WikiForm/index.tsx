@@ -134,7 +134,6 @@ const WikiForm: React.FC<WikiFormProps> = ({
   }, [wiki?.type]);
 
   const saveButtonName = useMemo(() => {
-    console.log(newQuestion.type);
     switch (newQuestion.type) {
       case WikiType.QA:
         return '質問';

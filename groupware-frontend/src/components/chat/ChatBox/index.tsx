@@ -89,7 +89,6 @@ const ChatBox: React.FC<ChatBoxProps> = ({
       },
       { refetchInterval: 1000 },
     );
-  console.log(imagesForViewing);
 
   const { mutate: sendChatMessage } = useAPISendChatMessage({
     onSuccess: (data) => {

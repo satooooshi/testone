@@ -1,14 +1,8 @@
 import {
-  Avatar,
   Box,
   Button,
-  IconButton,
   Image,
   Link,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuList,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -23,10 +17,7 @@ import {
 } from '@chakra-ui/react';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { ChatGroup, ChatNote, ChatNoteImage } from 'src/types';
-import { AiOutlineLeft } from 'react-icons/ai';
-import { userNameFactory } from 'src/utils/factory/userNameFactory';
-import { dateTimeFormatterFromJSDDate } from 'src/utils/dateTimeFormatter';
-import { FiMenu } from 'react-icons/fi';
+import { AiFillCloseCircle, AiOutlineLeft } from 'react-icons/ai';
 import { useFormik } from 'formik';
 import { ImageDecorator } from 'react-viewer/lib/ViewerProps';
 import dynamic from 'next/dynamic';
@@ -107,12 +98,12 @@ const NoteModal: React.FC<NoteModalProps> = ({ isOpen, onClose, room }) => {
         saveNoteImage(noteImages, {
           onSuccess: (savedImages) => {
             if (edittedNote) {
-              setEdittedNote({
-                ...edittedNote,
-                images: edittedNote.images?.length
-                  ? [...savedImages, ...edittedNote.images]
+              setValues((v) => ({
+                ...v,
+                images: v.images?.length
+                  ? [...v.images, ...savedImages]
                   : [...savedImages],
-              });
+              }));
             }
           },
         });
@@ -142,7 +133,7 @@ const NoteModal: React.FC<NoteModalProps> = ({ isOpen, onClose, room }) => {
   const { mutate: createNote } = useAPICreateChatNote({
     onSuccess: () => {
       resetForm();
-      setMode('edit');
+      setMode('list');
       setNotesForInfiniteScroll([]);
       setNoteListPage(1);
       refetchNotes();
@@ -184,6 +175,18 @@ const NoteModal: React.FC<NoteModalProps> = ({ isOpen, onClose, room }) => {
   const isNowUri = (element: ImageDecorator) =>
     element.src === selectedImage?.imageURL;
   const activeIndex = imagesInViewer.findIndex(isNowUri);
+
+  const removeImage = (image: Partial<ChatNoteImage>) => {
+    if (!image.imageURL) {
+      return;
+    }
+    if (confirm('画像をノートから削除してよろしいですか？')) {
+      setValues((v) => ({
+        ...v,
+        images: v.images?.filter((i) => i.imageURL !== image.imageURL) || [],
+      }));
+    }
+  };
 
   useEffect(() => {
     const refreshNotes = () => {
@@ -363,9 +366,24 @@ const NoteModal: React.FC<NoteModalProps> = ({ isOpen, onClose, room }) => {
         </Box>
         <SimpleGrid mb="8px" spacing="4px" columns={3} w="100%">
           {values.images?.map((i) => (
-            <Link key={i.id} onClick={() => setSelectedImage(i)}>
-              <Image src={i.imageURL} alt="関連画像" />
-            </Link>
+            <Box position="relative" key={i.id}>
+              <AiFillCloseCircle
+                onClick={() => removeImage(i)}
+                size={24}
+                style={{
+                  color: 'white',
+                  top: 0,
+                  right: 0,
+                  background: 'black',
+                  borderRadius: '100%',
+                  position: 'absolute',
+                  cursor: 'pointer',
+                }}
+              />
+              <Link key={i.id} onClick={() => setSelectedImage(i)}>
+                <Image src={i.imageURL} alt="関連画像" />
+              </Link>
+            </Box>
           ))}
         </SimpleGrid>
         <Textarea

@@ -14,10 +14,15 @@ import {
   SimpleGrid,
   Spinner,
   Text,
+  useToast,
 } from '@chakra-ui/react';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { ChatAlbum, ChatAlbumImage, ChatGroup } from 'src/types';
-import { AiOutlineLeft, AiOutlinePlus } from 'react-icons/ai';
+import {
+  AiFillCloseCircle,
+  AiOutlineLeft,
+  AiOutlinePlus,
+} from 'react-icons/ai';
 import dynamic from 'next/dynamic';
 const Viewer = dynamic(() => import('react-viewer'), { ssr: false });
 import { ImageDecorator } from 'react-viewer/lib/ViewerProps';
@@ -41,6 +46,7 @@ type AlbumModalProps = {
 
 const AlbumModal: React.FC<AlbumModalProps> = ({ isOpen, onClose, room }) => {
   const headerName = 'アルバム一覧';
+  const toast = useToast();
   const { mutate: deleteAlbum } = useAPIDeleteChatAlbum();
   const [albumListPage, setAlbumListPage] = useState(1);
   const [albumImageListPage, setAlbumImageListPage] = useState(1);
@@ -68,7 +74,7 @@ const AlbumModal: React.FC<AlbumModalProps> = ({ isOpen, onClose, room }) => {
   const onUploadImage = (files: File[]) => {
     uploadImage(files, {
       onSuccess: (imageURLs) => {
-        if (selectedAlbum && mode === 'edit') {
+        if (selectedAlbum && mode === 'editPhoto') {
           const albumImages: Partial<ChatAlbumImage>[] = imageURLs.map((i) => ({
             imageURL: i,
             chatAlbum: selectedAlbum,
@@ -111,7 +117,9 @@ const AlbumModal: React.FC<AlbumModalProps> = ({ isOpen, onClose, room }) => {
 
   const imageUploaderRef = useRef<HTMLInputElement | null>(null);
   const [selectedImage, setSelectedImage] = useState<Partial<ChatAlbumImage>>();
-  const [mode, setMode] = useState<'post' | 'list' | 'edit'>('list');
+  const [mode, setMode] = useState<'post' | 'list' | 'editPhoto' | 'editTitle'>(
+    'list',
+  );
   const initialValues: Partial<ChatAlbum> = {
     title: '',
     images: [],
@@ -119,18 +127,36 @@ const AlbumModal: React.FC<AlbumModalProps> = ({ isOpen, onClose, room }) => {
   };
   const { mutate: uploadImage } = useAPIUploadStorage();
   const { mutate: createAlbum } = useAPICreateChatAlbum();
-  const { values, handleChange, setValues, handleSubmit } = useFormik<
-    Partial<ChatAlbum>
-  >({
-    initialValues: initialValues,
-    onSubmit: (submittedValues, { resetForm }) =>
-      createAlbum(submittedValues, {
-        onSuccess: () => {
-          setMode('list');
-          resetForm();
-        },
-      }),
-  });
+  const { values, handleChange, setValues, handleSubmit, resetForm } =
+    useFormik<Partial<ChatAlbum>>({
+      initialValues: initialValues,
+      onSubmit: (submittedValues, { resetForm }) => {
+        if (mode === 'editTitle') {
+          updateAlbum(
+            { ...(submittedValues as ChatAlbum), images: undefined },
+            {
+              onSuccess: () => {
+                setMode('editPhoto');
+                toast({
+                  description: 'アルバムを名を更新しました',
+                  status: 'success',
+                  duration: 3000,
+                  isClosable: true,
+                });
+                resetForm();
+              },
+            },
+          );
+        } else {
+          createAlbum(submittedValues, {
+            onSuccess: () => {
+              setMode('list');
+              resetForm();
+            },
+          });
+        }
+      },
+    });
   const imagesInNewAlbumViewer = useMemo((): ImageDecorator[] => {
     return (
       values.images?.map((i) => ({
@@ -141,9 +167,9 @@ const AlbumModal: React.FC<AlbumModalProps> = ({ isOpen, onClose, room }) => {
     );
   }, [values]);
   const imagesInDetailViewer = useMemo((): ImageDecorator[] => {
-    if (selectedAlbum) {
+    if (albumImages?.length) {
       return (
-        selectedAlbum.images?.map((i) => ({
+        albumImages?.map((i) => ({
           src: i.imageURL || '',
           alt: 'アルバム画像',
           downloadUrl: i.imageURL || '',
@@ -160,13 +186,13 @@ const AlbumModal: React.FC<AlbumModalProps> = ({ isOpen, onClose, room }) => {
     } else {
       return [];
     }
-  }, [selectedAlbum, selectedImage]);
+  }, [albumImages, selectedImage]);
 
   const activeIndex = useMemo(() => {
     if (selectedImage) {
       const isNowUri = (element: ImageDecorator) =>
         element.src === selectedImage?.imageURL;
-      return imagesInDetailViewer.findIndex(isNowUri) + 1;
+      return imagesInDetailViewer.findIndex(isNowUri);
     }
   }, [imagesInDetailViewer, selectedImage]);
 
@@ -222,6 +248,26 @@ const AlbumModal: React.FC<AlbumModalProps> = ({ isOpen, onClose, room }) => {
     }
   };
 
+  const removeImage = (image: Partial<ChatAlbumImage>) => {
+    if (!image.imageURL) {
+      return;
+    }
+    if (confirm('画像をアルバムから削除してよろしいですか？')) {
+      setValues((v) => ({
+        ...v,
+        images: v.images?.filter((i) => i.imageURL !== image.imageURL) || [],
+      }));
+    }
+  };
+
+  useEffect(() => {
+    if (selectedAlbum) {
+      setValues(selectedAlbum);
+    } else {
+      resetForm();
+    }
+  }, [resetForm, selectedAlbum, setValues]);
+
   useEffect(() => {
     if (albums?.albums?.length) {
       setNotesForInfiniteScroll((n) => {
@@ -273,16 +319,31 @@ const AlbumModal: React.FC<AlbumModalProps> = ({ isOpen, onClose, room }) => {
       />
       <Box flexDir="row" display="flex" flexWrap="wrap">
         {values?.images?.map((i) => (
-          <Link key={i.imageURL} onClick={() => setSelectedImage(i)}>
-            <Image
-              src={i.imageURL}
-              alt="アルバム画像"
-              h={'80px'}
-              w={'80px'}
-              mr={'4px'}
-              mb={'4px'}
+          <Box position="relative" key={i.id}>
+            <AiFillCloseCircle
+              onClick={() => removeImage(i)}
+              size={24}
+              style={{
+                color: 'white',
+                top: 0,
+                right: 0,
+                background: 'black',
+                borderRadius: '100%',
+                position: 'absolute',
+                cursor: 'pointer',
+              }}
             />
-          </Link>
+            <Link key={i.imageURL} onClick={() => setSelectedImage(i)}>
+              <Image
+                src={i.imageURL}
+                alt="アルバム画像"
+                h={'80px'}
+                w={'80px'}
+                mr={'4px'}
+                mb={'4px'}
+              />
+            </Link>
+          </Box>
         ))}
         <Link
           h={'80px'}
@@ -318,7 +379,7 @@ const AlbumModal: React.FC<AlbumModalProps> = ({ isOpen, onClose, room }) => {
           <AlbumBox
             album={a}
             onClick={() => {
-              setMode('edit');
+              setMode('editPhoto');
               setSelectedAlbum(a);
             }}
             onClickDeleteButton={() => {
@@ -373,10 +434,12 @@ const AlbumModal: React.FC<AlbumModalProps> = ({ isOpen, onClose, room }) => {
             },
           ]);
         }}
-        images={mode === 'list' ? imagesInDetailViewer : imagesInNewAlbumViewer}
+        images={
+          mode === 'editPhoto' ? imagesInDetailViewer : imagesInNewAlbumViewer
+        }
         visible={!!selectedImage}
         onClose={() => setSelectedImage(undefined)}
-        activeIndex={activeIndex}
+        activeIndex={activeIndex !== -1 ? activeIndex : 0}
       />
       <Modal
         onClose={onClose}
@@ -406,11 +469,12 @@ const AlbumModal: React.FC<AlbumModalProps> = ({ isOpen, onClose, room }) => {
           <ModalBody onScroll={onScroll}>
             {mode === 'list' ? (
               listMode
-            ) : selectedAlbum && mode === 'edit' ? (
+            ) : selectedAlbum && mode === 'editPhoto' ? (
               <Box>
                 <Box
                   flexDir="row"
                   justifyContent="space-between"
+                  alignItems="center"
                   display="flex">
                   <Button
                     size="sm"
@@ -421,15 +485,28 @@ const AlbumModal: React.FC<AlbumModalProps> = ({ isOpen, onClose, room }) => {
                     <AiOutlineLeft size={24} style={{ display: 'inline' }} />
                     <Text display="inline">一覧へ戻る</Text>
                   </Button>
-                  <Button
-                    size="sm"
-                    flexDir="row"
-                    onClick={() => imageUploaderRef.current?.click()}
-                    mb="8px"
-                    colorScheme="green"
-                    alignItems="center">
-                    <Text display="inline">写真を追加</Text>
-                  </Button>
+                  <Box display="flex" flexDir="row" alignItems="center">
+                    <Button
+                      size="xs"
+                      flexDir="row"
+                      mr="4px"
+                      onClick={() => imageUploaderRef.current?.click()}
+                      mb="8px"
+                      colorScheme="green"
+                      alignItems="center">
+                      <Text display="inline">写真を追加</Text>
+                    </Button>
+                    <Button
+                      size="xs"
+                      flexDir="row"
+                      mr="4px"
+                      onClick={() => setMode('editTitle')}
+                      mb="8px"
+                      colorScheme="blue"
+                      alignItems="center">
+                      <Text display="inline">アルバム名を編集</Text>
+                    </Button>
+                  </Box>
                   <input
                     multiple
                     ref={imageUploaderRef}
@@ -442,11 +519,64 @@ const AlbumModal: React.FC<AlbumModalProps> = ({ isOpen, onClose, room }) => {
                 </Box>
                 <SimpleGrid spacing="8px" columns={2}>
                   {albumImages?.map((i) => (
-                    <Link key={i.id} onClick={() => setSelectedImage(i)}>
-                      <Image src={i.imageURL} alt="アルバム画像" w="100%" />
-                    </Link>
+                    <Box position="relative" key={i.id}>
+                      <AiFillCloseCircle
+                        onClick={() => removeImage(i)}
+                        size={24}
+                        style={{
+                          color: 'white',
+                          top: 0,
+                          right: 0,
+                          background: 'black',
+                          borderRadius: '100%',
+                          position: 'absolute',
+                          cursor: 'pointer',
+                        }}
+                      />
+                      <Link key={i.id} onClick={() => setSelectedImage(i)}>
+                        <Image src={i.imageURL} alt="アルバム画像" w="100%" />
+                      </Link>
+                    </Box>
                   ))}
                 </SimpleGrid>
+              </Box>
+            ) : mode === 'editTitle' ? (
+              <Box>
+                <Box
+                  flexDir="row"
+                  justifyContent="space-between"
+                  display="flex">
+                  <Button
+                    size="sm"
+                    flexDir="row"
+                    onClick={() => setMode('list')}
+                    mb="8px"
+                    alignItems="center">
+                    <AiOutlineLeft size={24} style={{ display: 'inline' }} />
+                    <Text display="inline">一覧へ戻る</Text>
+                  </Button>
+                  <Button
+                    size="sm"
+                    flexDir="row"
+                    onClick={() => handleSubmit()}
+                    mb="8px"
+                    colorScheme="green"
+                    alignItems="center">
+                    <Text display="inline">アルバムを更新</Text>
+                  </Button>
+                </Box>
+                <FormLabel>アルバム名</FormLabel>
+                <Input
+                  bg="white"
+                  mb="8px"
+                  value={values.title}
+                  name="title"
+                  onChange={handleChange}
+                  placeholder={dateTimeFormatterFromJSDDate({
+                    dateTime: new Date(),
+                    format: 'yyyy/LL/dd',
+                  })}
+                />
               </Box>
             ) : (
               postMode

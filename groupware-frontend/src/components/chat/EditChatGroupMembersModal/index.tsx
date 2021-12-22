@@ -183,7 +183,6 @@ const EditChatGroupMembersModal: React.FC<EditChatGroupMambersModalProps> = ({
           colorScheme="green"
           borderRadius={5}
           onClick={() => {
-            console.log(selectedUsers);
             editMembers(
               {
                 roomId: room.id,
