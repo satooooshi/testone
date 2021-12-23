@@ -36,6 +36,7 @@ import dynamic from 'next/dynamic';
 const Viewer = dynamic(() => import('react-viewer'), { ssr: false });
 import '@draft-js-plugins/mention/lib/plugin.css';
 import '@draft-js-plugins/image/lib/plugin.css';
+import UserAvatar from '@/components/common/UserAvatar';
 
 type ChatBoxProps = {
   room: ChatGroup;
@@ -50,6 +51,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({
   onClickAlbumIcon,
   onClickNoteIcon,
 }) => {
+  const [currentRoom, setCurrentRoom] = useState(room);
   const [page, setPage] = useState(1);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const {
@@ -60,7 +62,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({
     initialValues: {
       content: '',
       type: ChatMessageType.TEXT,
-      chatGroup: room,
+      chatGroup: currentRoom,
     },
     enableReinitialize: true,
     onSubmit: () => onSend(),
@@ -70,19 +72,19 @@ const ChatBox: React.FC<ChatBoxProps> = ({
   );
   const { mutate: saveLastReadChatTime } = useAPISaveLastReadChatTime();
   const [selectedImageURL, setSelectedImageURL] = useState<string>();
-  const { data: lastReadChatTime } = useAPIGetLastReadChatTime(room.id, {
+  const { data: lastReadChatTime } = useAPIGetLastReadChatTime(currentRoom.id, {
     refetchInterval: 1000,
   });
   const [{ popup, suggestions, mentionedUserData }, dispatchMention] =
     useMention();
   const { data: fetchedPastMessages } = useAPIGetMessages({
-    group: room.id,
+    group: currentRoom.id,
     page: page.toString(),
   });
   const { data: latestMessage, isLoading: isLoadingLatestMsg } =
     useAPIGetMessages(
       {
-        group: room.id,
+        group: currentRoom.id,
         page: '1',
       },
       { refetchInterval: 1000 },
@@ -223,13 +225,17 @@ const ChatBox: React.FC<ChatBoxProps> = ({
   useEffect(() => {
     dispatchMention({
       type: 'allMentionUserData',
-      value: room?.members,
+      value: currentRoom?.members,
     });
-  }, [dispatchMention, room]);
+  }, [dispatchMention, currentRoom]);
 
   useEffect(() => {
     setMessages([]);
     setPage(1);
+  }, [currentRoom]);
+
+  useEffect(() => {
+    setCurrentRoom(room);
   }, [room]);
 
   useEffect(() => {
@@ -268,8 +274,8 @@ const ChatBox: React.FC<ChatBoxProps> = ({
   };
 
   useEffect(() => {
-    saveLastReadChatTime(room.id);
-  }, [room.id, saveLastReadChatTime]);
+    saveLastReadChatTime(currentRoom.id);
+  }, [currentRoom.id, saveLastReadChatTime]);
 
   useEffect(() => {
     if (latestMessage?.length && messages?.length) {
@@ -293,6 +299,19 @@ const ChatBox: React.FC<ChatBoxProps> = ({
       return imagesForViewing.findIndex(isNowUri);
     }
   }, [imagesForViewing, selectedImageURL]);
+
+  const replyTargetContent = (replyTarget: ChatMessage) => {
+    switch (replyTarget.type) {
+      case ChatMessageType.TEXT:
+        return mentionTransform(replyTarget.content);
+      case ChatMessageType.IMAGE:
+        return '写真';
+      case ChatMessageType.VIDEO:
+        return '動画';
+      case ChatMessageType.OTHER_FILE:
+        return 'ファイル';
+    }
+  };
 
   return (
     <Box
@@ -337,7 +356,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({
         px="16px">
         <Box display="flex" flexDir="row" alignItems="center">
           <Box mr="8px">
-            <Avatar size="sm" src={room.imageURL} />
+            <Avatar size="sm" src={currentRoom.imageURL} />
           </Box>
           <Box display="flex" flexDir="row">
             <Text
@@ -346,14 +365,16 @@ const ChatBox: React.FC<ChatBoxProps> = ({
               fontSize="18px"
               color={darkFontColor}
               noOfLines={1}>
-              {room?.name ? room.name : nameOfEmptyNameGroup(room?.members)}
+              {currentRoom?.name
+                ? currentRoom.name
+                : nameOfEmptyNameGroup(currentRoom?.members)}
             </Text>
             <Text
               fontWeight="bold"
               fontSize="18px"
               color={darkFontColor}
               noOfLines={1}>
-              {`(${room?.members?.length || 0})`}
+              {`(${currentRoom?.members?.length || 0})`}
             </Text>
           </Box>
         </Box>
@@ -396,24 +417,22 @@ const ChatBox: React.FC<ChatBoxProps> = ({
         {messages ? (
           <>
             {messages.map((m) => (
-              <a
+              <ChatMessageItem
                 key={m.id}
-                onClick={() => {
+                message={m}
+                readUsers={readUsers(m)}
+                onClickReply={() =>
+                  setNewChatMessage((pre) => ({
+                    ...pre,
+                    replyParentMessage: m,
+                  }))
+                }
+                onClickImage={() => {
                   if (m.type === ChatMessageType.IMAGE) {
                     setSelectedImageURL(m.content);
                   }
-                }}>
-                <ChatMessageItem
-                  message={m}
-                  readUsers={readUsers(m)}
-                  onClickReply={() =>
-                    setNewChatMessage((pre) => ({
-                      ...pre,
-                      replyParentMessage: m,
-                    }))
-                  }
-                />
-              </a>
+                }}
+              />
             ))}
           </>
         ) : (
@@ -457,17 +476,18 @@ const ChatBox: React.FC<ChatBoxProps> = ({
             right={0}>
             <IoCloseSharp size={24} color={darkFontColor} />
           </Link>
-          <Avatar
+          <UserAvatar
             mr="8px"
             src={newChatMessage.replyParentMessage.sender?.avatarUrl}
             size="md"
+            user={newChatMessage.replyParentMessage.sender}
           />
-          <Box display="flex" justifyContent="center" flexDir="column">
+          <Box display="flex" justifyContent="center" flexDir="column" w="100%">
             <Text fontWeight="bold">
               {userNameFactory(newChatMessage.replyParentMessage.sender)}
             </Text>
-            <Text noOfLines={1}>
-              {mentionTransform(newChatMessage.replyParentMessage.content)}
+            <Text isTruncated w="90%" noOfLines={1}>
+              {replyTargetContent(newChatMessage.replyParentMessage)}
             </Text>
           </Box>
         </Box>

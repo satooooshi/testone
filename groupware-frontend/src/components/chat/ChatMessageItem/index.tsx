@@ -45,12 +45,14 @@ type ChatMessageItemProps = {
   message: ChatMessage;
   onClickReply: () => void;
   readUsers: User[];
+  onClickImage: () => void;
 };
 
 const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
   message,
   onClickReply,
   readUsers,
+  onClickImage,
 }) => {
   const [messageState, setMessageState] = useState(message);
   const [visibleReadModal, setVisibleLastReadModal] = useState(false);
@@ -271,7 +273,10 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
                   minW="10vw"
                   wordBreak="break-word">
                   {messageState.type === ChatMessageType.IMAGE ? (
-                    <ImageMessage message={messageState} />
+                    <ImageMessage
+                      message={messageState}
+                      onClick={onClickImage}
+                    />
                   ) : messageState.type === ChatMessageType.VIDEO ? (
                     <VideoMessage message={messageState} />
                   ) : (

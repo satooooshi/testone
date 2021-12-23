@@ -1,5 +1,5 @@
 import { useAPIGetRoomsByPage } from '@/hooks/api/chat/useAPIGetRoomsByPage';
-import { Box, Link, Spinner, Text } from '@chakra-ui/react';
+import { Box, Spinner, Text } from '@chakra-ui/react';
 import React, { SetStateAction, useEffect, useState } from 'react';
 import { ChatGroup } from 'src/types';
 import ChatGroupCard from '../ChatGroupCard';
@@ -61,7 +61,9 @@ const RoomList: React.FC<RoomListProps> = ({
         if (
           new Date(roomsForInfiniteScroll[i]?.updatedAt).getTime() !==
             new Date(newData?.[i]?.updatedAt).getTime() ||
-          roomsForInfiniteScroll[i].hasBeenRead !== newData?.[i]?.hasBeenRead
+          roomsForInfiniteScroll[i].hasBeenRead !== newData?.[i]?.hasBeenRead ||
+          roomsForInfiniteScroll[i]?.members?.length !==
+            newData?.[i]?.members?.length
         ) {
           updateNeeded = true;
         }

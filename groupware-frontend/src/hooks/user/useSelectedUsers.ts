@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { User } from 'src/types';
 
 export const useSelectedUsers = (alreadySelectedUsers?: Partial<User>[]) => {

@@ -80,7 +80,9 @@ const RoomList: React.FC = () => {
         if (
           new Date(roomsForInfiniteScroll[i]?.updatedAt).getTime() !==
             new Date(newData?.[i]?.updatedAt).getTime() ||
-          roomsForInfiniteScroll[i].hasBeenRead !== newData?.[i]?.hasBeenRead
+          roomsForInfiniteScroll[i].hasBeenRead !== newData?.[i]?.hasBeenRead ||
+          roomsForInfiniteScroll[i]?.members?.length !==
+            newData?.[i]?.members?.length
         ) {
           updateNeeded = true;
         }

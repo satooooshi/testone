@@ -203,7 +203,10 @@ const ChatDetail = () => {
                       duration: 3000,
                       isClosable: true,
                     });
-                    setCurrentRoom(newGroupInfo);
+                    setCurrentRoom({
+                      ...newGroupInfo,
+                      members: selectedUsersInModal,
+                    });
                   },
                   onError: () => {
                     toast({

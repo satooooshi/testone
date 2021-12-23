@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { ChatGroup, User, UserRole, UserRoleInApp } from 'src/types';
 import {
   Avatar,
@@ -81,12 +81,19 @@ const EditChatGroupMembersModal: React.FC<EditChatGroupMambersModalProps> = ({
     toggleUser,
     isSelected,
     selectedUsers: selectedUsersInModal,
+    setSelectedUsers,
     clear,
   } = useSelectedUsers(room?.members || []);
   const { selectedUserRole, selectUserRole, filteredUsers } = useUserRole(
     'All',
     users,
   );
+
+  useEffect(() => {
+    if (room?.members) {
+      setSelectedUsers(room.members);
+    }
+  }, [room?.members, setSelectedUsers]);
 
   return (
     <Modal
