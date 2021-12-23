@@ -163,7 +163,7 @@ const EditChatGroupModal: React.FC<EditChatGroupModalProps> = ({
                 </Box>
               )}
               <FormLabel>
-                <p>グループ名</p>
+                <p>ルーム名</p>
                 {errors.name && touched.name ? (
                   <Text color="tomato">{errors.name}</Text>
                 ) : null}
@@ -179,7 +179,7 @@ const EditChatGroupModal: React.FC<EditChatGroupModalProps> = ({
                 border="1px"
                 value={newGroupInfo.name}
                 onChange={handleChange}
-                placeholder="グループ名を入力して下さい"
+                placeholder="ルーム名を入力して下さい"
               />
             </Box>
           </Box>

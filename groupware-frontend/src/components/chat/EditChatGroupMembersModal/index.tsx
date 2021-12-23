@@ -100,7 +100,7 @@ const EditChatGroupMembersModal: React.FC<EditChatGroupMambersModalProps> = ({
       scrollBehavior="inside"
       isOpen={isOpen}>
       <ModalOverlay />
-      <ModalContent h="90vh" bg={'#f9fafb'} minW="480px">
+      <ModalContent h="90vh" bg={'#f9fafb'}>
         <ModalHeader
           flexDir="row"
           justifyContent="space-between"

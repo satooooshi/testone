@@ -153,14 +153,14 @@ const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
       <div className={selectUserModalStyles.top}>
         <div className={selectUserModalStyles.left}>
           <div className={selectUserModalStyles.modal_input_wrapper}>
-            <FormLabel>グループ名</FormLabel>
+            <FormLabel>ルーム名</FormLabel>
             <input
               type="text"
               name="name"
               className={selectUserModalStyles.modal_input_name}
               value={newGroup.name}
               onChange={handleChange}
-              placeholder="グループ名を入力して下さい"
+              placeholder="ルーム名を入力して下さい"
             />
           </div>
           {selectImageUrl ? (

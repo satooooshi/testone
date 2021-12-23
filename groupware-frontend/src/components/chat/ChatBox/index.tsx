@@ -372,7 +372,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({
               </MenuButton>
             }
             transition>
-            <MenuItem value={'editGroup'}>グループの情報を編集</MenuItem>
+            <MenuItem value={'editGroup'}>ルームの情報を編集</MenuItem>
             <MenuItem value={'editMembers'}>メンバーを編集</MenuItem>
             <MenuItem value={'leaveRoom'}>ルームを退室</MenuItem>
           </Menu>
