@@ -119,7 +119,7 @@ const Chat: React.FC = () => {
       group: room.id,
       page: page.toString(),
     });
-  const {data: latestMessage} = useAPIGetMessages(
+  const {data: latestMessage, isFetching} = useAPIGetMessages(
     {
       group: room.id,
       page: '1',
@@ -138,9 +138,11 @@ const Chat: React.FC = () => {
   const {mutate: sendChatMessage, isLoading: loadingSendMessage} =
     useAPISendChatMessage({
       onSuccess: sentMsg => {
-        setMessages(m => {
-          return [sentMsg, ...m];
-        });
+        if (!isFetching) {
+          setMessages(m => {
+            return [sentMsg, ...m];
+          });
+        }
         setValues(v => ({
           ...v,
           content: '',
@@ -432,9 +434,11 @@ const Chat: React.FC = () => {
             ? handleDeleteReaction(r)
             : handleSaveReaction(r.emoji, message)
         }
-        onLongPressReation={() =>
-          message.reactions?.length && setSelectedReactions(message.reactions)
-        }
+        onLongPressReation={() => {
+          if (message.reactions?.length && message.isSender) {
+            setSelectedReactions(message.reactions);
+          }
+        }}
         deletedReactionIds={deletedReactionIds}
       />
     </Div>
