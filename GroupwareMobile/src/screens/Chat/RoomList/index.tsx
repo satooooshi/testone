@@ -28,11 +28,6 @@ const RoomList: React.FC = () => {
       onSuccess: data => {
         stateRefreshNeeded(data.rooms);
       },
-      onError: () => {
-        Alert.alert(
-          'チャットルーム取得中にエラーが発生しました。\n時間をおいて再実行してください。',
-        );
-      },
     },
   );
 
@@ -49,7 +44,7 @@ const RoomList: React.FC = () => {
     },
     onError: () => {
       Alert.alert(
-        'チャットグループ更新中にエラーが発生しました。\n時間をおいて再実行してください。',
+        'チャットルーム更新中にエラーが発生しました。\n時間をおいて再実行してください。',
       );
     },
   });
