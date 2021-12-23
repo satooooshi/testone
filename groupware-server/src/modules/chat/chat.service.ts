@@ -322,16 +322,20 @@ export class ChatService {
     chatGroup: Partial<ChatGroup>,
     userID: number,
   ): Promise<ChatGroup> {
-    if (!chatGroup.members || !chatGroup.members.length) {
+    const newData: Partial<ChatGroup> = {
+      ...chatGroup,
+      chatMessages: undefined,
+    };
+    if (!newData.members || !newData.members.length) {
       throw new InternalServerErrorException('Something went wrong');
     }
-    const userIds = chatGroup.members.map((u) => u.id);
+    const userIds = newData.members.map((u) => u.id);
     const users = await this.userRepository.findByIds(userIds);
     const maybeExistGroup = await this.chatGroupRepository
       .createQueryBuilder('g')
       .leftJoinAndSelect('g.members', 'u')
       .where('u.id IN (:...userIds)', { userIds })
-      .andWhere('g.name = :name', { name: chatGroup.name })
+      .andWhere('g.name = :name', { name: newData.name })
       .getMany();
 
     const existGroup = maybeExistGroup
@@ -341,8 +345,8 @@ export class ChatService {
       );
 
     if (existGroup.length) {
-      if (typeof chatGroup.isPinned !== 'undefined') {
-        if (chatGroup.isPinned) {
+      if (typeof newData.isPinned !== 'undefined') {
+        if (newData.isPinned) {
           await this.chatGroupRepository
             .createQueryBuilder('chat_groups')
             .relation('pinnedUsers')
@@ -362,17 +366,20 @@ export class ChatService {
         }
       }
       const updatedGroup = await this.chatGroupRepository.save(
-        this.chatGroupRepository.create({ ...existGroup[0], ...chatGroup }),
+        this.chatGroupRepository.create({
+          ...existGroup[0],
+          ...newData,
+        }),
       );
       return updatedGroup;
     }
-    chatGroup.members = users;
+    newData.members = users;
 
     const newGroup = await this.chatGroupRepository.save(
-      this.chatGroupRepository.create(chatGroup),
+      this.chatGroupRepository.create(newData),
     );
-    if (typeof chatGroup.isPinned !== 'undefined') {
-      if (chatGroup.isPinned) {
+    if (typeof newData.isPinned !== 'undefined') {
+      if (newData.isPinned) {
         await this.chatGroupRepository
           .createQueryBuilder('chat_groups')
           .relation('pinnedUsers')
