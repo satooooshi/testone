@@ -1,4 +1,4 @@
-import React, {useEffect, useMemo, useRef, useState} from 'react';
+import React, {Fragment, useEffect, useMemo, useRef, useState} from 'react';
 import {
   Keyboard,
   NativeSyntheticEvent,
@@ -24,7 +24,7 @@ import {
   getMentionPartSuggestionKeywords,
   isMentionPartType,
 } from 'react-native-controlled-mentions/dist/utils';
-import {Div, Icon} from 'react-native-magnus';
+import {Div, Icon, ScrollDiv} from 'react-native-magnus';
 import {ActivityIndicator} from 'react-native-paper';
 import {chatStyles} from '../../../styles/screen/chat/chat.style';
 
@@ -63,20 +63,20 @@ const ChatFooter: React.FC<ChatFooterProps> = ({
     }
 
     return (
-      <View>
+      <ScrollDiv maxH={140} borderTopColor="blue200" borderTopWidth={1}>
         {mentionSuggestions
           .filter(one =>
             one.name.toLocaleLowerCase().includes(keyword.toLocaleLowerCase()),
           )
           .map(one => (
-            <Pressable
+            <TouchableOpacity
               key={one.id}
               onPress={() => onSuggestionPress(one)}
-              style={{padding: 12}}>
+              style={{padding: 12, width: '100%'}}>
               <Text>{one.name}</Text>
-            </Pressable>
+            </TouchableOpacity>
           ))}
-      </View>
+      </ScrollDiv>
     );
   };
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -151,20 +151,19 @@ const ChatFooter: React.FC<ChatFooterProps> = ({
 
   useEffect(() => {
     if (mentionAdded) {
-      Keyboard.dismiss();
-      inputRef.current?.focus();
-      setMentionAdded(false);
+      // Keyboard.dismiss();
+      // inputRef.current?.focus();
+      // setMentionAdded(false);
     }
   }, [mentionAdded]);
 
   const renderMentionSuggestions = (mentionType: MentionPartType) => (
-    <React.Fragment key={mentionType.trigger}>
-      {mentionType.renderSuggestions &&
-        mentionType.renderSuggestions({
-          keyword: keywordByTrigger[mentionType.trigger],
-          onSuggestionPress: onSuggestionPress(mentionType),
-        })}
-    </React.Fragment>
+    <Fragment key={mentionType.trigger}>
+      {renderSuggestions({
+        keyword: keywordByTrigger[mentionType.trigger],
+        onSuggestionPress: onSuggestionPress(mentionType),
+      })}
+    </Fragment>
   );
 
   return (

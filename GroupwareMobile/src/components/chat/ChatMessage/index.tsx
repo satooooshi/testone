@@ -156,8 +156,7 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
         flexDir="row"
         flexWrap="wrap"
         alignSelf={message?.isSender ? 'flex-end' : 'flex-start'}>
-        {/* 客先からの要望で自分が送ったリアクションもしくは送られたリアクションのみ表示したいとのこと */}
-        {message.isSender && message.reactions?.length
+        {message.reactions?.length
           ? reactionRemovedDuplicates(message.reactions)
               .filter(r => !deletedReactionIds.includes(r.id))
               .map(

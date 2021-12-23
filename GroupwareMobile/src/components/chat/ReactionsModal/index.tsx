@@ -4,7 +4,6 @@ import {
   Button,
   Div,
   Icon,
-  Image,
   Modal as MagnusModal,
   Text,
 } from 'react-native-magnus';
