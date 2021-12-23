@@ -1,15 +1,21 @@
 import React, { useCallback, useRef, useState, useEffect } from 'react';
-import ReactModal from 'react-modal';
-import { ChatGroup, User, UserRole } from 'src/types';
-import selectUserModalStyles from '@/styles/components/SelectUserModal.module.scss';
-import clsx from 'clsx';
+import { ChatGroup, User } from 'src/types';
 import {
-  Avatar,
   Button,
-  FormControl,
   FormLabel,
-  Select,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalHeader,
+  ModalOverlay,
   useToast,
+  Text,
+  Box,
+  Input,
+  ButtonGroup,
+  IconButton,
+  Avatar,
 } from '@chakra-ui/react';
 import { useDropzone } from 'react-dropzone';
 import { chatGroupSchema } from 'src/utils/validation/schema';
@@ -18,12 +24,14 @@ import ReactCrop, { Crop } from 'react-image-crop';
 import { useFormik } from 'formik';
 import { getCroppedImageURL } from 'src/utils/getCroppedImageURL';
 import { dataURLToFile } from 'src/utils/dataURLToFile';
-import { userRoleNameFactory } from 'src/utils/factory/userRoleNameFactory';
 import { formikErrorMsgFactory } from 'src/utils/factory/formikErrorMsgFactory';
-import { useAPIGetUsers } from '@/hooks/api/user/useAPIGetUsers';
 import { useAPIUploadStorage } from '@/hooks/api/storage/useAPIUploadStorage';
 import { useAPISaveChatGroup } from '@/hooks/api/chat/useAPISaveChatGroup';
 import { useRouter } from 'next/router';
+import { hideScrollbarCss } from 'src/utils/chakra/hideScrollBar.css';
+import EditChatGroupMembersModal from '../EditChatGroupMembersModal';
+import { MdCancel } from 'react-icons/md';
+import { userNameFactory } from 'src/utils/factory/userNameFactory';
 
 type CreateChatGroupModalProps = {
   isOpen: boolean;
@@ -34,15 +42,12 @@ const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
   isOpen,
   closeModal,
 }) => {
-  const { data: users } = useAPIGetUsers();
   const toast = useToast();
   const initialChatValues = {
     name: '',
     members: [],
   };
-  const [selectedUserRole, setSelectedUserRole] = useState<UserRole | 'all'>(
-    'all',
-  );
+  const [membersModal, setMembersModal] = useState(false);
   const [selectImageUrl, setSelectImageUrl] = useState<string>('');
   const [selectImageName, setSelectImageName] = useState<string>('');
   const [crop, setCrop] = useState<Crop>({
@@ -73,7 +78,7 @@ const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
 
   const { mutate: createGroup } = useAPISaveChatGroup({
     onSuccess: (createdData) => {
-      closeModal();
+      onClose();
       router.push(`/chat/${createdData.id.toString()}`, undefined, {
         shallow: true,
       });
@@ -105,7 +110,7 @@ const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
   });
   const { mutate: uploadImage } = useAPIUploadStorage({
     onSuccess: async (fileURLs) => {
-      setNewGroup((g) => ({ ...g, imageURL: fileURLs[0] }));
+      createGroup({ ...newGroup, imageURL: fileURLs[0] });
     },
   });
 
@@ -124,19 +129,15 @@ const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
     }
   };
 
-  const toggleNewGroupMember = (user: User) => {
-    const isExist = newGroup.members?.filter((u) => u.id === user.id);
-    if (isExist && isExist.length) {
-      setNewGroup((g) => ({
-        ...g,
-        members: g.members?.filter((u) => u.id !== user.id),
-      }));
-      return;
-    }
-    setNewGroup((g) => ({
-      ...g,
-      members: g.members ? [...g.members, user] : [user],
-    }));
+  const onClose = () => {
+    resetForm();
+    closeModal();
+  };
+
+  const removeFromSelectedMember = (member: User) => {
+    const newMembers =
+      newGroup.members?.filter((m) => m.id !== member.id) || [];
+    setNewGroup((g) => ({ ...g, members: newMembers }));
   };
 
   useEffect(() => {
@@ -145,143 +146,108 @@ const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
   }, [newGroup]);
 
   return (
-    <ReactModal
-      ariaHideApp={false}
-      style={{ overlay: { zIndex: 100 } }}
-      isOpen={isOpen}
-      className={selectUserModalStyles.modal}>
-      <div className={selectUserModalStyles.top}>
-        <div className={selectUserModalStyles.left}>
-          <div className={selectUserModalStyles.modal_input_wrapper}>
-            <FormLabel>ルーム名</FormLabel>
-            <input
-              type="text"
-              name="name"
-              className={selectUserModalStyles.modal_input_name}
-              value={newGroup.name}
-              onChange={handleChange}
-              placeholder="ルーム名を入力して下さい"
-            />
-          </div>
-          {selectImageUrl ? (
-            <ReactCrop
-              imageStyle={{ maxHeight: '80%' }}
-              className={selectUserModalStyles.scroll}
-              src={selectImageUrl}
-              crop={crop}
-              onChange={(newCrop) => setCrop(newCrop)}
-              onComplete={(c) => setCompletedCrop(c)}
-              onImageLoaded={onLoad}
-              circularCrop={true}
-            />
-          ) : (
-            <>
-              <FormLabel>ルーム画像</FormLabel>
-              <div
-                {...getRootProps({
-                  className: selectUserModalStyles.image_dropzone,
-                })}>
-                <input {...getInputProps()} />
-                <p>クリックかドラッグアンドドロップでアップロード</p>
-              </div>
-            </>
-          )}
-        </div>
-        <div className={selectUserModalStyles.right}>
-          <FormControl
-            className={selectUserModalStyles.user_role_select_wrapper}>
-            <FormLabel>招待するユーザーの社員区分</FormLabel>
-            <Select
-              bg="white"
-              onChange={(e) =>
-                setSelectedUserRole(e.target.value as UserRole | 'all')
-              }
-              defaultValue={selectedUserRole}>
-              <option value={'all'}>全て</option>
-              <option value={UserRole.ADMIN}>管理者</option>
-              <option value={UserRole.EXTERNAL_INSTRUCTOR}>
-                {userRoleNameFactory(UserRole.EXTERNAL_INSTRUCTOR)}
-              </option>
-              <option value={UserRole.INTERNAL_INSTRUCTOR}>
-                {userRoleNameFactory(UserRole.INTERNAL_INSTRUCTOR)}
-              </option>
-              <option value={UserRole.COACH}>コーチ</option>
-              <option value={UserRole.COMMON}>一般社員</option>
-            </Select>
-          </FormControl>
-          <div className={selectUserModalStyles.users}>
-            {selectedUserRole === 'all'
-              ? users?.map((u) => (
-                  <a
-                    key={u.id}
-                    onClick={() => toggleNewGroupMember(u)}
-                    className={clsx(
-                      selectUserModalStyles.user_card,
-                      newGroup.members?.filter((s) => s.id === u.id).length &&
-                        selectUserModalStyles.selected_member,
-                    )}>
-                    <div className={selectUserModalStyles.user_card_left}>
-                      <Avatar
-                        src={u.avatarUrl}
-                        className={selectUserModalStyles.user_card_avatar}
-                      />
-                      <p className={selectUserModalStyles.user_card_name}>
-                        {u.lastName + ' ' + u.firstName}
-                      </p>
-                    </div>
-                  </a>
-                ))
-              : users?.map(
-                  (u) =>
-                    u.role === selectedUserRole && (
-                      <a
-                        key={u.id}
-                        onClick={() => toggleNewGroupMember(u)}
-                        className={clsx(
-                          selectUserModalStyles.user_card,
-                          newGroup.members?.filter((s) => s.id === u.id)
-                            .length && selectUserModalStyles.selected_member,
-                        )}>
-                        <div className={selectUserModalStyles.user_card_left}>
-                          <Avatar
-                            src={u.avatarUrl}
-                            className={selectUserModalStyles.user_card_avatar}
-                          />
-                          <p className={selectUserModalStyles.user_card_name}>
-                            {u.lastName + ' ' + u.firstName}
-                          </p>
-                        </div>
-                      </a>
-                    ),
-                )}
-          </div>
-        </div>
-      </div>
-      <div className={selectUserModalStyles.bottom}>
-        <div className={selectUserModalStyles.modal_bottom_buttons}>
+    <Modal onClose={onClose} scrollBehavior="inside" isOpen={isOpen}>
+      <ModalOverlay />
+      <ModalContent h="90vh" bg={'#f9fafb'}>
+        <ModalHeader
+          flexDir="row"
+          justifyContent="space-between"
+          display="flex"
+          mr="24px">
+          <Text>新しいルーム</Text>
           <Button
-            size="md"
-            width="140px"
-            colorScheme="blue"
-            borderRadius={5}
-            className={selectUserModalStyles.modal_cancel_button}
-            onClick={() => {
-              resetForm();
-              closeModal();
-            }}>
-            キャンセル
-          </Button>
-          <Button
-            size="md"
-            width="140px"
+            size="sm"
+            flexDir="row"
+            onClick={checkErrors}
+            mb="8px"
             colorScheme="green"
-            borderRadius={5}
-            onClick={() => checkErrors()}>
-            作成
+            alignItems="center">
+            <Text display="inline">作成</Text>
           </Button>
-        </div>
-      </div>
-    </ReactModal>
+        </ModalHeader>
+        <ModalCloseButton />
+        <ModalBody>
+          <EditChatGroupMembersModal
+            isOpen={membersModal}
+            onClose={() => setMembersModal(false)}
+            onComplete={(selected) => {
+              setNewGroup((g) => ({ ...g, members: selected }));
+              setMembersModal(false);
+            }}
+          />
+          <Box overflowY="auto" css={hideScrollbarCss}>
+            {selectImageUrl ? (
+              <ReactCrop
+                imageStyle={{ maxHeight: '80%' }}
+                src={selectImageUrl}
+                crop={crop}
+                onChange={(newCrop) => setCrop(newCrop)}
+                onComplete={(c) => setCompletedCrop(c)}
+                onImageLoaded={onLoad}
+                circularCrop={true}
+              />
+            ) : (
+              <>
+                <FormLabel>ルーム画像</FormLabel>
+                <Box
+                  m="0 auto"
+                  textAlign="center"
+                  display="flex"
+                  alignItems="center"
+                  justifyContent="center"
+                  border="3px dashed #eeeeee"
+                  w="300px"
+                  h="300px"
+                  rounded="full"
+                  cursor="pointer"
+                  {...getRootProps()}>
+                  <input {...getInputProps()} />
+                  <Avatar
+                    src={newGroup.imageURL}
+                    h="100%"
+                    w="100%"
+                    rounded="full"
+                    alt=""
+                  />
+                </Box>
+              </>
+            )}
+            <Box mb="16px">
+              <FormLabel>ルーム名</FormLabel>
+              <Input
+                type="text"
+                name="name"
+                w="100%"
+                value={newGroup.name}
+                onChange={handleChange}
+                placeholder="ルーム名を入力して下さい"
+              />
+            </Box>
+            <Box mb="16px" display="flex" flexDir="row" flexWrap="wrap">
+              {newGroup.members?.map((u) => (
+                <Box mr={'4px'} mb={'8px'} key={u.id}>
+                  <ButtonGroup isAttached size="xs" colorScheme="purple">
+                    <Button mr="-px">{userNameFactory(u)}</Button>
+                    <IconButton
+                      onClick={() => removeFromSelectedMember(u as User)}
+                      aria-label="削除"
+                      icon={<MdCancel size={18} />}
+                    />
+                  </ButtonGroup>
+                </Box>
+              ))}
+              <Button
+                colorScheme="pink"
+                fontWeight="bold"
+                w="100%"
+                onClick={() => setMembersModal(true)}>
+                メンバーを編集
+              </Button>
+            </Box>
+          </Box>
+        </ModalBody>
+      </ModalContent>
+    </Modal>
   );
 };
 

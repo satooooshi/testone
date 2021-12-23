@@ -15,13 +15,12 @@ import {
   ModalHeader,
   ModalOverlay,
   Select,
+  Spinner,
   Text,
-  useToast,
 } from '@chakra-ui/react';
 import { useAuthenticate } from 'src/contexts/useAuthenticate';
 import { userRoleNameFactory } from 'src/utils/factory/userRoleNameFactory';
 import { useAPIGetUsers } from '@/hooks/api/user/useAPIGetUsers';
-import { useAPIEditMembers } from '@/hooks/api/chat/useAPIEditMembers';
 import { useUserRole } from '@/hooks/user/useUserRole';
 import { useSelectedUsers } from '@/hooks/user/useSelectedUsers';
 import { MdCancel } from 'react-icons/md';
@@ -29,10 +28,10 @@ import { userNameFactory } from 'src/utils/factory/userNameFactory';
 import { darkFontColor } from 'src/utils/colors';
 
 type EditChatGroupMambersModalProps = {
-  room: ChatGroup;
+  room?: ChatGroup;
   isOpen: boolean;
   onClose: () => void;
-  onComplete: (newGroupInfo: ChatGroup) => void;
+  onComplete: (selectedUsers: User[]) => void;
 };
 
 const UserRenderer = ({
@@ -76,16 +75,14 @@ const EditChatGroupMembersModal: React.FC<EditChatGroupMambersModalProps> = ({
   onClose: onCancel,
   onComplete,
 }) => {
-  const { data: users } = useAPIGetUsers();
+  const { data: users, isLoading } = useAPIGetUsers();
   const { user: myProfile } = useAuthenticate();
-  const { mutate: editMembers } = useAPIEditMembers();
-  const toast = useToast();
   const {
     toggleUser,
     isSelected,
     selectedUsers: selectedUsersInModal,
     clear,
-  } = useSelectedUsers(room.members || []);
+  } = useSelectedUsers(room?.members || []);
   const { selectedUserRole, selectUserRole, filteredUsers } = useUserRole(
     'All',
     users,
@@ -110,33 +107,11 @@ const EditChatGroupMembersModal: React.FC<EditChatGroupMambersModalProps> = ({
           <Button
             size="sm"
             flexDir="row"
-            onClick={() =>
-              editMembers(
-                {
-                  roomId: room.id,
-                  members: selectedUsersInModal as User[],
-                },
-                {
-                  onSuccess: (newGroupInfo) => {
-                    onCancel();
-                    toast({
-                      title: `メンバーを更新しました`,
-                      status: 'success',
-                      duration: 3000,
-                      isClosable: true,
-                    });
-                    onComplete(newGroupInfo);
-                  },
-                  onError: () => {
-                    alert('エラーが発生しました');
-                  },
-                },
-              )
-            }
+            onClick={() => onComplete(selectedUsersInModal as User[])}
             mb="8px"
             colorScheme="green"
             alignItems="center">
-            <Text display="inline">更新</Text>
+            <Text display="inline">{room ? '更新' : '選択'}</Text>
           </Button>
         </ModalHeader>
         <ModalCloseButton />
@@ -164,16 +139,20 @@ const EditChatGroupMembersModal: React.FC<EditChatGroupMambersModalProps> = ({
                 </Select>
               </FormControl>
               <Box h="80%" overflowY="auto">
-                {filteredUsers
-                  ?.filter((u) => u.id !== myProfile?.id)
-                  .map((u) => (
-                    <UserRenderer
-                      user={u}
-                      key={u.id}
-                      onClick={toggleUser}
-                      isSelected={isSelected(u)}
-                    />
-                  ))}
+                {isLoading ? (
+                  <Spinner />
+                ) : (
+                  filteredUsers
+                    ?.filter((u) => u.id !== myProfile?.id)
+                    .map((u) => (
+                      <UserRenderer
+                        user={u}
+                        key={u.id}
+                        onClick={toggleUser}
+                        isSelected={isSelected(u)}
+                      />
+                    ))
+                )}
               </Box>
             </Box>
             <Box>

@@ -14,6 +14,7 @@ import {
   ModalOverlay,
   Box,
   Avatar,
+  useToast,
 } from '@chakra-ui/react';
 import { useAPIUploadStorage } from '@/hooks/api/storage/useAPIUploadStorage';
 import { useDropzone } from 'react-dropzone';
@@ -154,7 +155,6 @@ const EditChatGroupModal: React.FC<EditChatGroupModalProps> = ({
                   <input {...getInputProps()} />
                   <Avatar
                     src={newGroupInfo.imageURL}
-                    className={editChatGroupModalStyles.image}
                     h="100%"
                     w="100%"
                     rounded="full"

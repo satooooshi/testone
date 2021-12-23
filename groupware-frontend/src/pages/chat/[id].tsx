@@ -12,6 +12,7 @@ import {
   ModalBody,
   ModalContent,
   ModalOverlay,
+  useToast,
 } from '@chakra-ui/react';
 import LayoutWithTab from '@/components/layout/LayoutWithTab';
 import { Tab } from 'src/types/header/tab/types';
@@ -19,7 +20,6 @@ import Head from 'next/head';
 import { useRouter } from 'next/router';
 import EditChatGroupModal from '@/components/chat/EditChatGroupModal';
 import EditChatGroupMembersModal from '@/components/chat/EditChatGroupMembersModal';
-import { useAPISaveChatGroup } from '@/hooks/api/chat/useAPISaveChatGroup';
 import { useHeaderTab } from '@/hooks/headerTab/useHeaderTab';
 import { useAPILeaveChatRoom } from '@/hooks/api/chat/useAPILeaveChatRoomURL';
 import ChatBox from '@/components/chat/ChatBox';
@@ -29,6 +29,7 @@ import 'emoji-mart/css/emoji-mart.css';
 import { Picker } from 'emoji-mart';
 import { useAPISaveReaction } from '@/hooks/api/chat/useAPISaveReaction';
 import RoomList from '@/components/chat/RoomList';
+import { useAPIEditMembers } from '@/hooks/api/chat/useAPIEditMembers';
 
 const ChatDetail = () => {
   const router = useRouter();
@@ -41,17 +42,12 @@ const ChatDetail = () => {
     { editChatGroupModalVisible, createGroupWindow, editMembersModalVisible },
     dispatchModal,
   ] = useModalReducer();
+  const { mutate: editMembers } = useAPIEditMembers();
+  const toast = useToast();
 
   const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
   const [visibleAlbumModal, setVisibleAlbumModal] = useState(false);
   const [visibleNoteModal, setVisibleNoteModal] = useState(false);
-
-  const { mutate: saveGroup } = useAPISaveChatGroup({
-    onSuccess: (newInfo) => {
-      dispatchModal({ type: 'editChatGroupModalVisible', value: false });
-      setCurrentRoom(newInfo);
-    },
-  });
 
   const { mutate: leaveChatGroup } = useAPILeaveChatRoom({
     onSuccess: () => {
@@ -189,7 +185,37 @@ const ChatDetail = () => {
           <EditChatGroupMembersModal
             isOpen={editMembersModalVisible}
             room={currentRoom}
-            onComplete={(newGroupInfo) => setCurrentRoom(newGroupInfo)}
+            onComplete={(selectedUsersInModal) => {
+              editMembers(
+                {
+                  roomId: currentRoom.id,
+                  members: selectedUsersInModal,
+                },
+                {
+                  onSuccess: (newGroupInfo) => {
+                    dispatchModal({
+                      type: 'editMembersModalVisible',
+                      value: false,
+                    });
+                    toast({
+                      title: `メンバーを更新しました`,
+                      status: 'success',
+                      duration: 3000,
+                      isClosable: true,
+                    });
+                    setCurrentRoom(newGroupInfo);
+                  },
+                  onError: () => {
+                    toast({
+                      title: `エラーが発生しました`,
+                      status: 'error',
+                      duration: 3000,
+                      isClosable: true,
+                    });
+                  },
+                },
+              );
+            }}
             onClose={() =>
               dispatchModal({
                 type: 'editMembersModalVisible',
