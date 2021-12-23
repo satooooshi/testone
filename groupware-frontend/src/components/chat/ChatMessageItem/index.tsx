@@ -15,7 +15,9 @@ import {
   PopoverHeader,
   PopoverTrigger,
   Portal,
+  SimpleGrid,
   Text,
+  useMediaQuery,
 } from '@chakra-ui/react';
 import React, { useRef } from 'react';
 import { Avatar } from '@chakra-ui/react';
@@ -56,6 +58,7 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
 }) => {
   const [messageState, setMessageState] = useState(message);
   const [visibleReadModal, setVisibleLastReadModal] = useState(false);
+  const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
   const { mutate: saveReaction } = useAPISaveReaction();
   const reactionRemovedDuplicates = (reactions: ChatMessageReaction[]) => {
     const reactionsNoDuplicates: ChatMessageReaction[] = [];
@@ -112,12 +115,11 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
               </PopoverHeader>
 
               <PopoverBody>
-                <Box flexDir="row" display="flex">
+                <SimpleGrid columns={6}>
                   {reactionEmojis.map((e) => (
                     <>
                       <Text
                         cursor="pointer"
-                        mr="4px"
                         key={e}
                         fontSize={24}
                         onClick={() => {
@@ -149,7 +151,7 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
                       </Text>
                     </>
                   ))}
-                </Box>
+                </SimpleGrid>
               </PopoverBody>
             </PopoverContent>
           </Portal>
@@ -269,8 +271,8 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
                 <Box
                   borderRadius="8px"
                   p="8px"
-                  maxW="40vw"
-                  minW="10vw"
+                  maxW={isSmallerThan768 ? undefined : '40vw'}
+                  minW={'300px'}
                   wordBreak="break-word">
                   {messageState.type === ChatMessageType.IMAGE ? (
                     <ImageMessage
