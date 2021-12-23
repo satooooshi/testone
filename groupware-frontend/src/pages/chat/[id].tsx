@@ -178,7 +178,7 @@ const ChatDetail = () => {
           <EditChatGroupModal
             isOpen={editChatGroupModalVisible}
             chatGroup={currentRoom}
-            saveGroup={saveGroup}
+            onComplete={(newInfo) => setCurrentRoom(newInfo)}
             closeModal={() =>
               dispatchModal({
                 type: 'editChatGroupModalVisible',
@@ -189,7 +189,7 @@ const ChatDetail = () => {
           <EditChatGroupMembersModal
             isOpen={editMembersModalVisible}
             room={currentRoom}
-            setRoom={setCurrentRoom}
+            onComplete={(newGroupInfo) => setCurrentRoom(newGroupInfo)}
             onClose={() =>
               dispatchModal({
                 type: 'editMembersModalVisible',

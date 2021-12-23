@@ -1,3 +1,4 @@
+export type UserRoleInApp = 'All' | UserRole;
 export enum UserRole {
   ADMIN = 'admin',
   EXTERNAL_INSTRUCTOR = 'external_instructor',

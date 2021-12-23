@@ -137,16 +137,8 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
       );
     },
   });
-  const {
-    selectedTags,
-    setSelectedTags,
-    toggleTag,
-    isSelected: isSelectedTag,
-  } = useSelectedTags(event?.tags);
-  const {selectedTagType, selectTagType, filteredTags} = useTagType(
-    'All',
-    tags,
-  );
+  const {setSelectedTags} = useSelectedTags(event?.tags);
+  const {selectedTagType, filteredTags} = useTagType('All', tags);
   const {selectedUserRole, filteredUsers} = useUserRole('All', users);
 
   const checkValidateErrors = async () => {

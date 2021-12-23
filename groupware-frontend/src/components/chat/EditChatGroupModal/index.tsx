@@ -1,10 +1,20 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import ReactModal from 'react-modal';
 import editChatGroupModalStyles from '@/styles/components/EditChatGroupModal.module.scss';
-import validationErrorStyles from '@/styles/components/ValidationError.module.scss';
 import { ChatGroup } from 'src/types';
-import { Button, FormLabel, Input } from '@chakra-ui/react';
-// import selectUserModalStyles from '@/styles/components/SelectUserModal.module.scss';
+import {
+  Text,
+  Button,
+  FormLabel,
+  Input,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalHeader,
+  ModalOverlay,
+  Box,
+  Avatar,
+} from '@chakra-ui/react';
 import { useAPIUploadStorage } from '@/hooks/api/storage/useAPIUploadStorage';
 import { useDropzone } from 'react-dropzone';
 import ReactCrop, { Crop } from 'react-image-crop';
@@ -13,20 +23,28 @@ import { chatGroupSchema } from 'src/utils/validation/schema';
 import { dataURLToFile } from 'src/utils/dataURLToFile';
 import { getCroppedImageURL } from 'src/utils/getCroppedImageURL';
 import { imageExtensions } from 'src/utils/imageExtensions';
+import { useAPISaveChatGroup } from '@/hooks/api/chat/useAPISaveChatGroup';
 
 type EditChatGroupModalProps = {
   isOpen: boolean;
   closeModal: () => void;
   chatGroup: Partial<ChatGroup>;
-  saveGroup: (g: Partial<ChatGroup>) => void;
+  onComplete: (room: ChatGroup) => void;
 };
 
 const EditChatGroupModal: React.FC<EditChatGroupModalProps> = ({
   isOpen,
   closeModal,
   chatGroup,
-  saveGroup,
+  onComplete,
 }) => {
+  const { mutate: saveGroup } = useAPISaveChatGroup({
+    onSuccess: (newInfo) => {
+      closeModal();
+      onComplete(newInfo);
+    },
+  });
+
   const [selectImageUrl, setSelectImageUrl] = useState<string>('');
   const { mutate: uploadImage } = useAPIUploadStorage({
     onSuccess: async (fileURLs) => {
@@ -85,76 +103,89 @@ const EditChatGroupModal: React.FC<EditChatGroupModalProps> = ({
 
   useEffect(() => {
     setNewGroupInfo(chatGroup);
-  }, [chatGroup]);
+  }, [chatGroup, setNewGroupInfo]);
 
   return (
-    <ReactModal
-      style={{ overlay: { zIndex: 110 } }}
-      ariaHideApp={false}
-      isOpen={isOpen}
-      className={editChatGroupModalStyles.modal}>
-      <div className={editChatGroupModalStyles.top}>
-        <div className={editChatGroupModalStyles.modal_input_wrapper}>
-          <FormLabel>
-            <p>グループ名</p>
-            {errors.name && touched.name ? (
-              <p className={validationErrorStyles.error_text}>{errors.name}</p>
-            ) : null}
-          </FormLabel>
-          <Input
-            type="text"
-            name="name"
-            className={editChatGroupModalStyles.modal_input_name}
-            value={newGroupInfo.name}
-            onChange={handleChange}
-            placeholder="グループ名を入力して下さい"
-          />
-        </div>
-        {selectImageUrl ? (
-          <ReactCrop
-            src={selectImageUrl}
-            crop={crop}
-            onChange={(newCrop) => setCrop(newCrop)}
-            onComplete={(c) => setCompletedCrop(c)}
-            onImageLoaded={onLoad}
-            circularCrop={true}
-          />
-        ) : (
-          <div
-            {...getRootProps({
-              className: editChatGroupModalStyles.image_dropzone,
-            })}>
-            <input {...getInputProps()} />
-            <img
-              src={newGroupInfo.imageURL}
-              className={editChatGroupModalStyles.image}
-              alt=""
-            />
-          </div>
-        )}
-      </div>
-      <div className={editChatGroupModalStyles.bottom}>
-        <div className={editChatGroupModalStyles.modal_bottom_buttons}>
+    <Modal onClose={closeModal} scrollBehavior="inside" isOpen={isOpen}>
+      <ModalOverlay />
+      <ModalContent h="90vh" bg={'#f9fafb'}>
+        <ModalHeader
+          flexDir="row"
+          justifyContent="space-between"
+          display="flex"
+          mr="24px">
+          <Text>ルーム情報を編集</Text>
           <Button
-            size="md"
-            width="140px"
-            colorScheme="blue"
-            borderRadius={5}
-            className={editChatGroupModalStyles.modal_cancel_button}
-            onClick={closeModal}>
-            キャンセル
-          </Button>
-          <Button
-            size="md"
-            width="140px"
+            size="sm"
+            flexDir="row"
+            onClick={() => onFinish()}
+            mb="8px"
             colorScheme="green"
-            borderRadius={5}
-            onClick={() => onFinish()}>
-            更新
+            alignItems="center">
+            <Text display="inline">更新</Text>
           </Button>
-        </div>
-      </div>
-    </ReactModal>
+        </ModalHeader>
+        <ModalCloseButton />
+        <ModalBody>
+          <Box>
+            <Box>
+              {selectImageUrl ? (
+                <ReactCrop
+                  src={selectImageUrl}
+                  crop={crop}
+                  onChange={(newCrop) => setCrop(newCrop)}
+                  onComplete={(c) => setCompletedCrop(c)}
+                  onImageLoaded={onLoad}
+                  circularCrop={true}
+                />
+              ) : (
+                <Box
+                  m="0 auto"
+                  textAlign="center"
+                  display="flex"
+                  alignItems="center"
+                  justifyContent="center"
+                  border="3px dashed #eeeeee"
+                  w="300px"
+                  h="300px"
+                  rounded="full"
+                  cursor="pointer"
+                  {...getRootProps()}>
+                  <input {...getInputProps()} />
+                  <Avatar
+                    src={newGroupInfo.imageURL}
+                    className={editChatGroupModalStyles.image}
+                    h="100%"
+                    w="100%"
+                    rounded="full"
+                    alt=""
+                  />
+                </Box>
+              )}
+              <FormLabel>
+                <p>グループ名</p>
+                {errors.name && touched.name ? (
+                  <Text color="tomato">{errors.name}</Text>
+                ) : null}
+              </FormLabel>
+              <Input
+                type="text"
+                name="name"
+                className={editChatGroupModalStyles.modal_input_name}
+                mb="16px"
+                px="8px"
+                h="40px"
+                rounded="md"
+                border="1px"
+                value={newGroupInfo.name}
+                onChange={handleChange}
+                placeholder="グループ名を入力して下さい"
+              />
+            </Box>
+          </Box>
+        </ModalBody>
+      </ModalContent>
+    </Modal>
   );
 };
 
