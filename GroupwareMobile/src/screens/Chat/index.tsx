@@ -358,7 +358,11 @@ const Chat: React.FC = () => {
   }, [longPressedMsg]);
 
   useEffect(() => {
-    if (latestMessage?.length && messages?.length) {
+    if (
+      latestMessage?.length &&
+      messages?.length &&
+      latestMessage[0].chatGroup?.id === messages[0].chatGroup?.id
+    ) {
       const msgToAppend: ChatMessage[] = [];
       for (const sentMsg of latestMessage) {
         if (isRecent(sentMsg, messages[0])) {
@@ -388,8 +392,14 @@ const Chat: React.FC = () => {
           fetchedPastMessages[fetchedPastMessages.length - 1],
         )
       ) {
+        const msgToAppend: ChatMessage[] = [];
+        for (const sentMsg of fetchedPastMessages) {
+          if (isRecent(messages[messages.length - 1], sentMsg)) {
+            msgToAppend.push(sentMsg);
+          }
+        }
         setMessages(m => {
-          return [...m, ...fetchedPastMessages];
+          return [...m, ...msgToAppend];
         });
         handleImages();
       } else if (!messages?.length) {

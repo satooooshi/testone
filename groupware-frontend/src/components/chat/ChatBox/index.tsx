@@ -51,7 +51,6 @@ const ChatBox: React.FC<ChatBoxProps> = ({
   onClickAlbumIcon,
   onClickNoteIcon,
 }) => {
-  const [currentRoom, setCurrentRoom] = useState(room);
   const [page, setPage] = useState(1);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const {
@@ -62,7 +61,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({
     initialValues: {
       content: '',
       type: ChatMessageType.TEXT,
-      chatGroup: currentRoom,
+      chatGroup: room,
     },
     enableReinitialize: true,
     onSubmit: () => onSend(),
@@ -72,19 +71,19 @@ const ChatBox: React.FC<ChatBoxProps> = ({
   );
   const { mutate: saveLastReadChatTime } = useAPISaveLastReadChatTime();
   const [selectedImageURL, setSelectedImageURL] = useState<string>();
-  const { data: lastReadChatTime } = useAPIGetLastReadChatTime(currentRoom.id, {
+  const { data: lastReadChatTime } = useAPIGetLastReadChatTime(room.id, {
     refetchInterval: 1000,
   });
   const [{ popup, suggestions, mentionedUserData }, dispatchMention] =
     useMention();
   const { data: fetchedPastMessages } = useAPIGetMessages({
-    group: currentRoom.id,
+    group: room.id,
     page: page.toString(),
   });
   const { data: latestMessage, isLoading: isLoadingLatestMsg } =
     useAPIGetMessages(
       {
-        group: currentRoom.id,
+        group: room.id,
         page: '1',
       },
       { refetchInterval: 1000 },
@@ -225,17 +224,14 @@ const ChatBox: React.FC<ChatBoxProps> = ({
   useEffect(() => {
     dispatchMention({
       type: 'allMentionUserData',
-      value: currentRoom?.members,
+      value: room?.members,
     });
-  }, [dispatchMention, currentRoom]);
+  }, [dispatchMention, room]);
 
   useEffect(() => {
     setMessages([]);
+    setImagesForViewing([]);
     setPage(1);
-  }, [currentRoom]);
-
-  useEffect(() => {
-    setCurrentRoom(room);
   }, [room]);
 
   useEffect(() => {
@@ -244,8 +240,19 @@ const ChatBox: React.FC<ChatBoxProps> = ({
         const fetchedImages: ImageDecorator[] = fetchedPastMessages
           .filter((m) => m.type === ChatMessageType.IMAGE)
           .map((m) => ({ src: m.content, alt: '送信された画像' }));
-        setImagesForViewing(fetchedImages);
+        setImagesForViewing((i) => [...i, ...fetchedImages]);
       };
+      // if (
+      //   fetchedPastMessages?.length &&
+      //   fetchedPastMessages[0].chatGroup?.id !== room.id
+      // ) {
+      //   setMessages(fetchedPastMessages);
+      //   // const fetchedImages: ImageDecorator[] = fetchedPastMessages
+      //   //   .filter((m) => m.type === ChatMessageType.IMAGE)
+      //   //   .map((m) => ({ src: m.content, alt: '送信された画像' }));
+      //   // setImagesForViewing(fetchedImages);
+      //   return;
+      // }
       if (
         messages?.length &&
         isRecent(
@@ -253,8 +260,14 @@ const ChatBox: React.FC<ChatBoxProps> = ({
           fetchedPastMessages[fetchedPastMessages.length - 1],
         )
       ) {
+        const msgToAppend: ChatMessage[] = [];
+        for (const sentMsg of fetchedPastMessages) {
+          if (isRecent(messages[messages.length - 1], sentMsg)) {
+            msgToAppend.push(sentMsg);
+          }
+        }
         setMessages((m) => {
-          return [...m, ...fetchedPastMessages];
+          return [...m, ...msgToAppend];
         });
         handleImages();
       } else if (!messages?.length) {
@@ -274,15 +287,19 @@ const ChatBox: React.FC<ChatBoxProps> = ({
   };
 
   useEffect(() => {
-    saveLastReadChatTime(currentRoom.id);
-  }, [currentRoom.id, saveLastReadChatTime]);
+    saveLastReadChatTime(room.id);
+  }, [room.id, saveLastReadChatTime]);
 
   useEffect(() => {
-    if (latestMessage?.length && messages?.length) {
+    if (
+      latestMessage?.length &&
+      messages?.length &&
+      latestMessage[0].chatGroup?.id === messages[0].chatGroup?.id
+    ) {
       const msgToAppend: ChatMessage[] = [];
       for (const sentMsg of latestMessage) {
         if (isRecent(sentMsg, messages[0])) {
-          msgToAppend.unshift(sentMsg);
+          msgToAppend.push(sentMsg);
         }
       }
       setMessages((m) => {
@@ -356,7 +373,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({
         px="16px">
         <Box display="flex" flexDir="row" alignItems="center">
           <Box mr="8px">
-            <Avatar size="sm" src={currentRoom.imageURL} />
+            <Avatar size="sm" src={room.imageURL} />
           </Box>
           <Box display="flex" flexDir="row">
             <Text
@@ -365,16 +382,14 @@ const ChatBox: React.FC<ChatBoxProps> = ({
               fontSize="18px"
               color={darkFontColor}
               noOfLines={1}>
-              {currentRoom?.name
-                ? currentRoom.name
-                : nameOfEmptyNameGroup(currentRoom?.members)}
+              {room?.name ? room.name : nameOfEmptyNameGroup(room?.members)}
             </Text>
             <Text
               fontWeight="bold"
               fontSize="18px"
               color={darkFontColor}
               noOfLines={1}>
-              {`(${currentRoom?.members?.length || 0})`}
+              {`(${room?.members?.length || 0})`}
             </Text>
           </Box>
         </Box>
@@ -418,7 +433,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({
           <>
             {messages.map((m) => (
               <ChatMessageItem
-                key={m.id}
+                key={m.id + m.content}
                 message={m}
                 readUsers={readUsers(m)}
                 onClickReply={() =>
