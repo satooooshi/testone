@@ -116,7 +116,11 @@ export class ChatController {
       ...(chatGroup?.members?.filter((u) => u.id !== user.id) || []),
       user,
     ];
-    return await this.chatService.v2SaveChatGroup(chatGroup, user.id);
+    const savedGroup = await this.chatService.v2SaveChatGroup(
+      chatGroup,
+      user.id,
+    );
+    return savedGroup;
   }
 
   @Patch('/v2/room/:roomId/members')

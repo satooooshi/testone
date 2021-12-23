@@ -291,9 +291,6 @@ export class ChatService {
     const userIds = chatGroup.members.map((u) => u.id);
     const users = await this.userRepository.findByIds(userIds);
     chatGroup.members = users;
-    chatGroup.imageURL = this.storageService.parseSignedURLToStorageURL(
-      chatGroup.imageURL || '',
-    );
 
     const newGroup = await this.chatGroupRepository.save(
       this.chatGroupRepository.create(chatGroup),
@@ -364,12 +361,12 @@ export class ChatService {
             .remove(userID);
         }
       }
-      return existGroup[0];
+      const updatedGroup = await this.chatGroupRepository.save(
+        this.chatGroupRepository.create({ ...existGroup[0], ...chatGroup }),
+      );
+      return updatedGroup;
     }
     chatGroup.members = users;
-    chatGroup.imageURL = this.storageService.parseSignedURLToStorageURL(
-      chatGroup.imageURL || '',
-    );
 
     const newGroup = await this.chatGroupRepository.save(
       this.chatGroupRepository.create(chatGroup),
