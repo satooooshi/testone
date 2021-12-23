@@ -113,14 +113,15 @@ const ChatBox: React.FC<ChatBoxProps> = ({
 
   const { mutate: uploadFiles } = useAPIUploadStorage({
     onSuccess: (fileURLs) => {
+      const type = isImage(fileURLs[0])
+        ? ChatMessageType.IMAGE
+        : isVideo(fileURLs[0])
+        ? ChatMessageType.VIDEO
+        : ChatMessageType.OTHER_FILE;
       sendChatMessage({
         content: fileURLs[0],
         chatGroup: newChatMessage.chatGroup,
-        type: isImage(fileURLs[0])
-          ? ChatMessageType.IMAGE
-          : isVideo(fileURLs[0])
-          ? ChatMessageType.VIDEO
-          : ChatMessageType.OTHER_FILE,
+        type,
       });
       messageWrapperDivRef.current &&
         messageWrapperDivRef.current.scrollTo({ top: 0 });

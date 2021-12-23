@@ -85,10 +85,11 @@ export class ChatMessage {
 
   @BeforeInsert()
   @BeforeUpdate()
-  changeToStorageURL?() {
+  async changeToStorageURL?() {
     if (
       this.type === ChatMessageType.IMAGE ||
-      this.type === ChatMessageType.VIDEO
+      this.type === ChatMessageType.VIDEO ||
+      this.type === ChatMessageType.OTHER_FILE
     ) {
       this.content = genStorageURL(this.content);
     }

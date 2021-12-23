@@ -14,7 +14,6 @@ import {
   ModalOverlay,
   Box,
   Avatar,
-  useToast,
 } from '@chakra-ui/react';
 import { useAPIUploadStorage } from '@/hooks/api/storage/useAPIUploadStorage';
 import { useDropzone } from 'react-dropzone';
