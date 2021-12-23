@@ -42,7 +42,6 @@ type ChatBoxProps = {
   onMenuClicked: (menuValue: MenuValue) => void;
   onClickNoteIcon: () => void;
   onClickAlbumIcon: () => void;
-  onClickReaction: (message: ChatMessage) => void;
 };
 
 const ChatBox: React.FC<ChatBoxProps> = ({
@@ -50,7 +49,6 @@ const ChatBox: React.FC<ChatBoxProps> = ({
   onMenuClicked,
   onClickAlbumIcon,
   onClickNoteIcon,
-  onClickReaction,
 }) => {
   const [page, setPage] = useState(1);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -102,7 +100,11 @@ const ChatBox: React.FC<ChatBoxProps> = ({
         ...i,
         { src: data.content, alt: '送信された画像' },
       ]);
-      setNewChatMessage((m) => ({ ...m, content: '' }));
+      setNewChatMessage((m) => ({
+        ...m,
+        content: '',
+        replyParentMessage: undefined,
+      }));
       setEditorState(EditorState.createEmpty());
       messageWrapperDivRef.current &&
         messageWrapperDivRef.current.scrollTo({ top: 0 });
@@ -317,7 +319,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({
         images={imagesForViewing}
         visible={!!selectedImageURL}
         onClose={() => setSelectedImageURL(undefined)}
-        activeIndex={activeIndex}
+        activeIndex={activeIndex !== -1 ? activeIndex : 0}
       />
       {/*
        * Header
@@ -409,7 +411,6 @@ const ChatBox: React.FC<ChatBoxProps> = ({
                       replyParentMessage: m,
                     }))
                   }
-                  onClickReaction={() => onClickReaction(m)}
                 />
               </a>
             ))}

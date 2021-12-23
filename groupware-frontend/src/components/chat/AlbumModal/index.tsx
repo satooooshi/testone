@@ -406,16 +406,16 @@ const AlbumModal: React.FC<AlbumModalProps> = ({ isOpen, onClose, room }) => {
   );
 
   useEffect(() => {
-    const refreshNotes = () => {
+    const refreshAlbums = () => {
       setNotesForInfiniteScroll([]);
       setAlbumListPage(1);
       refetchAlbums();
       setAlbumImageListPage(1);
     };
-    if (!selectedAlbum || mode === 'list') {
-      refreshNotes();
+    if (mode === 'list' && room) {
+      refreshAlbums();
     }
-  }, [mode, refetchAlbums, selectedAlbum]);
+  }, [mode, refetchAlbums, room, selectedAlbum]);
 
   return (
     <>

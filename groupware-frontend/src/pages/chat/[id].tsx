@@ -226,7 +226,6 @@ const ChatDetail = () => {
               onClickAlbumIcon={() => setVisibleAlbumModal(true)}
               room={currentRoom}
               onMenuClicked={handleMenuSelected}
-              onClickReaction={(m) => setSelectedMsgForReaction(m)}
             />
           )}
         </>

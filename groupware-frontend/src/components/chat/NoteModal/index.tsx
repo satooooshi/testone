@@ -194,10 +194,10 @@ const NoteModal: React.FC<NoteModalProps> = ({ isOpen, onClose, room }) => {
       setNotesForInfiniteScroll([]);
       refetchNotes();
     };
-    if (!edittedNote) {
+    if (!edittedNote && room) {
       refreshNotes();
     }
-  }, [edittedNote, refetchNotes]);
+  }, [edittedNote, refetchNotes, room]);
 
   useEffect(() => {
     if (notes?.notes?.length) {
@@ -441,7 +441,7 @@ const NoteModal: React.FC<NoteModalProps> = ({ isOpen, onClose, room }) => {
         images={mode === 'edit' ? imagesInViewer : imagesInNewNoteViewer}
         visible={!!selectedImage}
         onClose={() => setSelectedImage(undefined)}
-        activeIndex={activeIndex}
+        activeIndex={activeIndex !== -1 ? activeIndex : 0}
       />
       <Modal
         onClose={onClose}
