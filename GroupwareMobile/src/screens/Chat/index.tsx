@@ -324,7 +324,9 @@ const Chat: React.FC = () => {
   };
 
   const onEndReached = () => {
-    setPage(p => p + 1);
+    if (fetchedPastMessages?.length) {
+      setPage(p => p + 1);
+    }
   };
 
   const isRecent = (created: ChatMessage, target: ChatMessage): boolean => {
