@@ -63,7 +63,7 @@ const ChatFooter: React.FC<ChatFooterProps> = ({
     }
 
     return (
-      <ScrollDiv maxH={140} borderTopColor="blue200" borderTopWidth={1}>
+      <ScrollDiv h={140} borderTopColor="blue200" borderTopWidth={1}>
         {mentionSuggestions
           .filter(one =>
             one.name.toLocaleLowerCase().includes(keyword.toLocaleLowerCase()),
@@ -148,14 +148,6 @@ const ChatFooter: React.FC<ChatFooterProps> = ({
 
       // textInput.current?.setNativeProps({selection: {start: newCursorPosition, end: newCursorPosition}});
     };
-
-  useEffect(() => {
-    if (mentionAdded) {
-      // Keyboard.dismiss();
-      // inputRef.current?.focus();
-      // setMentionAdded(false);
-    }
-  }, [mentionAdded]);
 
   const renderMentionSuggestions = (mentionType: MentionPartType) => (
     <Fragment key={mentionType.trigger}>
