@@ -5,7 +5,6 @@ import {
 } from '@react-navigation/native';
 import React, {useCallback} from 'react';
 import {Alert} from 'react-native';
-import {useAPIEditMembers} from '../../../hooks/api/chat/useAPIEditMembers';
 import {useAPIGetRoomDetail} from '../../../hooks/api/chat/useAPIGetRoomDetail';
 import {useAPISaveChatGroup} from '../../../hooks/api/chat/useAPISaveChatGroup';
 import {useAPIUploadStorage} from '../../../hooks/api/storage/useAPIUploadStorage';

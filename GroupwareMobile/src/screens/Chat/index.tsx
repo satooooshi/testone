@@ -464,6 +464,7 @@ const Chat: React.FC = () => {
     <Div
       bg="white"
       flexDir="row"
+      flexWrap="wrap"
       alignSelf="center"
       w={'100%'}
       py={32}

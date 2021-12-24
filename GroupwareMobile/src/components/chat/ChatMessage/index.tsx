@@ -157,7 +157,7 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
         alignSelf={message?.isSender ? 'flex-end' : 'flex-start'}>
         {message.reactions?.length
           ? reactionRemovedDuplicates(message.reactions).map(r => (
-              <Div mr="xs" mb="xs">
+              <Div mr="xs" mb="xs" key={r.id}>
                 <ReactionToMessage
                   onPress={() => onPressReaction(r)}
                   onLongPress={() => onLongPressReation(r)}

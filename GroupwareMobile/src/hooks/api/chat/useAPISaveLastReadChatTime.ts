@@ -1,7 +1,7 @@
 import {AxiosError} from 'axios';
 import {useMutation, UseMutationOptions} from 'react-query';
 import {LastReadChatTime} from '../../../types';
-import {axiosInstance, jsonHeader} from '../../../utils/url';
+import {axiosInstance} from '../../../utils/url';
 import {saveLastReadChatTimeURL} from '../../../utils/url/chat.url';
 
 const saveLastReadChatTime = async (
