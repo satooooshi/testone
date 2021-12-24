@@ -8,7 +8,7 @@ import RoomCard from '../../../components/chat/RoomCard';
 import HeaderWithTextButton from '../../../components/Header';
 import WholeContainer from '../../../components/WholeContainer';
 import {useAPIGetRooms} from '../../../hooks/api/chat/useAPIGetRoomsByPage';
-import {useAPISaveChatGroup} from '../../../hooks/api/chat/useAPISaveChatGroup';
+import {useAPIUpdateChatGroup} from '../../../hooks/api/chat/useAPIUpdateChatGroup';
 import {ChatGroup} from '../../../types';
 import {RoomListNavigationProps} from '../../../types/navigator/drawerScreenProps';
 
@@ -38,7 +38,7 @@ const RoomList: React.FC = () => {
   } = useAPIGetRooms({
     page,
   });
-  const {mutate: saveGroup} = useAPISaveChatGroup({
+  const {mutate: saveGroup} = useAPIUpdateChatGroup({
     onSuccess: () => {
       handleRefetch();
     },

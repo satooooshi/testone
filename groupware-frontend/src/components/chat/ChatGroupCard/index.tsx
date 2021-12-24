@@ -3,8 +3,8 @@ import { ChatGroup, ChatMessage, ChatMessageType, User } from 'src/types';
 import { dateTimeFormatterFromJSDDate } from 'src/utils/dateTimeFormatter';
 import { Avatar, Box, useMediaQuery, Text, Link } from '@chakra-ui/react';
 import { darkFontColor } from 'src/utils/colors';
-import { useAPISaveChatGroup } from '@/hooks/api/chat/useAPISaveChatGroup';
 import { RiPushpin2Fill, RiPushpin2Line } from 'react-icons/ri';
+import { useAPIUpdateChatGroup } from '@/hooks/api/chat/useAPIUpdateChatGroup';
 
 type ChatGroupCardProps = {
   chatGroup: ChatGroup;
@@ -16,7 +16,7 @@ const ChatGroupCard: React.FC<ChatGroupCardProps> = ({
   isSelected = false,
 }) => {
   const [isPinned, setIsPinned] = useState<boolean>(!!chatGroup.isPinned);
-  const { mutate: saveGroup } = useAPISaveChatGroup({
+  const { mutate: saveGroup } = useAPIUpdateChatGroup({
     onSuccess: () => {
       setIsPinned(!isPinned);
     },

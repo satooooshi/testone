@@ -29,7 +29,7 @@ import 'emoji-mart/css/emoji-mart.css';
 import { Picker } from 'emoji-mart';
 import { useAPISaveReaction } from '@/hooks/api/chat/useAPISaveReaction';
 import RoomList from '@/components/chat/RoomList';
-import { useAPIEditMembers } from '@/hooks/api/chat/useAPIEditMembers';
+import { useAPIUpdateChatGroup } from '@/hooks/api/chat/useAPIUpdateChatGroup';
 
 const ChatDetail = () => {
   const router = useRouter();
@@ -42,7 +42,7 @@ const ChatDetail = () => {
     { editChatGroupModalVisible, createGroupWindow, editMembersModalVisible },
     dispatchModal,
   ] = useModalReducer();
-  const { mutate: editMembers } = useAPIEditMembers();
+  const { mutate: updateGroup } = useAPIUpdateChatGroup();
   const toast = useToast();
 
   const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
@@ -186,9 +186,9 @@ const ChatDetail = () => {
             isOpen={editMembersModalVisible}
             room={currentRoom}
             onComplete={(selectedUsersInModal) => {
-              editMembers(
+              updateGroup(
                 {
-                  roomId: currentRoom.id,
+                  ...currentRoom,
                   members: selectedUsersInModal,
                 },
                 {

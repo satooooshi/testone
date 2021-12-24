@@ -117,7 +117,7 @@ export class ChatGroup {
       if (this.members.length) {
         const newMemberMsg = new ChatMessage();
         newMemberMsg.content =
-          this.members.map((m) => userNameFactory(m)).join(', ') +
+          this.members.map((m) => userNameFactory(m) + 'さん').join(', ') +
           'が参加しました';
         newMemberMsg.type = ChatMessageType.SYSTEM_TEXT;
         newMemberMsg.chatGroup = this;

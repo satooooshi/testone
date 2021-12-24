@@ -6,10 +6,11 @@ import {
 import React, {useCallback} from 'react';
 import {Alert} from 'react-native';
 import {useAPIGetRoomDetail} from '../../../hooks/api/chat/useAPIGetRoomDetail';
-import {useAPISaveChatGroup} from '../../../hooks/api/chat/useAPISaveChatGroup';
+import {useAPIUpdateChatGroup} from '../../../hooks/api/chat/useAPIUpdateChatGroup';
 import {useAPIUploadStorage} from '../../../hooks/api/storage/useAPIUploadStorage';
 import {useAPIGetUsers} from '../../../hooks/api/user/useAPIGetUsers';
 import RoomForm from '../../../templates/chat/room/RoomForm';
+import {ChatGroup} from '../../../types';
 import {
   EditRoomNavigationProps,
   EditRoomRouteProps,
@@ -26,7 +27,7 @@ const EditRoom: React.FC = () => {
   const {mutate: uploadImage} = useAPIUploadStorage();
   const {data: users} = useAPIGetUsers();
   const headerTitle = 'ルーム編集';
-  const {mutate: updateGroup} = useAPISaveChatGroup({
+  const {mutate: updateGroup} = useAPIUpdateChatGroup({
     onSuccess: () => {
       Alert.alert('ルームの更新が完了しました。', undefined, [
         {
@@ -59,7 +60,7 @@ const EditRoom: React.FC = () => {
       headerTitle={headerTitle}
       initialRoom={roomDetail}
       onSubmit={submittedRoom => {
-        updateGroup({...submittedRoom, members: submittedRoom.members});
+        updateGroup(submittedRoom as ChatGroup);
       }}
       onUploadImage={(formData, onSuccessFunc) =>
         uploadImage(formData, {onSuccess: onSuccessFunc})

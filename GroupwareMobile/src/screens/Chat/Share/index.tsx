@@ -7,8 +7,8 @@ import RoomCard from '../../../components/chat/RoomCard';
 import HeaderWithTextButton from '../../../components/Header';
 import WholeContainer from '../../../components/WholeContainer';
 import {useAPIGetRooms} from '../../../hooks/api/chat/useAPIGetRoomsByPage';
-import {useAPISaveChatGroup} from '../../../hooks/api/chat/useAPISaveChatGroup';
 import {useAPISendChatMessage} from '../../../hooks/api/chat/useAPISendChatMessage';
+import {useAPIUpdateChatGroup} from '../../../hooks/api/chat/useAPIUpdateChatGroup';
 import {ChatGroup, ChatMessageType} from '../../../types';
 
 const Share: React.FC = () => {
@@ -46,7 +46,7 @@ const Share: React.FC = () => {
   } = useAPIGetRooms({
     page,
   });
-  const {mutate: saveGroup} = useAPISaveChatGroup({
+  const {mutate: saveGroup} = useAPIUpdateChatGroup({
     onSuccess: () => {
       handleRefetch();
     },

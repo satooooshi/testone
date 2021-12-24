@@ -23,7 +23,7 @@ import { chatGroupSchema } from 'src/utils/validation/schema';
 import { dataURLToFile } from 'src/utils/dataURLToFile';
 import { getCroppedImageURL } from 'src/utils/getCroppedImageURL';
 import { imageExtensions } from 'src/utils/imageExtensions';
-import { useAPISaveChatGroup } from '@/hooks/api/chat/useAPISaveChatGroup';
+import { useAPIUpdateChatGroup } from '@/hooks/api/chat/useAPIUpdateChatGroup';
 
 type EditChatGroupModalProps = {
   isOpen: boolean;
@@ -38,7 +38,7 @@ const EditChatGroupModal: React.FC<EditChatGroupModalProps> = ({
   chatGroup,
   onComplete,
 }) => {
-  const { mutate: saveGroup } = useAPISaveChatGroup({
+  const { mutate: saveGroup } = useAPIUpdateChatGroup({
     onSuccess: (newInfo) => {
       closeModal();
       onComplete(newInfo);
@@ -48,7 +48,7 @@ const EditChatGroupModal: React.FC<EditChatGroupModalProps> = ({
   const [selectImageUrl, setSelectImageUrl] = useState<string>('');
   const { mutate: uploadImage } = useAPIUploadStorage({
     onSuccess: async (fileURLs) => {
-      saveGroup({ ...newGroupInfo, imageURL: fileURLs[0] });
+      saveGroup({ ...newGroupInfo, imageURL: fileURLs[0] } as ChatGroup);
       setSelectImageUrl('');
       setSelectImageName('');
       setCompletedCrop(undefined);
@@ -97,7 +97,7 @@ const EditChatGroupModal: React.FC<EditChatGroupModalProps> = ({
         uploadImage([result]);
         return;
       }
-      saveGroup(newGroupInfo);
+      saveGroup(newGroupInfo as ChatGroup);
     },
   });
 

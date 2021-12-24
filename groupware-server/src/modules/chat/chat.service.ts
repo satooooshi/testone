@@ -142,6 +142,7 @@ export class ChatService {
       .take(limit)
       .skip(offset)
       .orderBy('chat_messages.createdAt', 'DESC')
+      .withDeleted()
       .getMany();
     const messages = existMessages.map((m) => {
       m.reactions = m.reactions.map((r) => {
@@ -318,9 +319,87 @@ export class ChatService {
     return newGroup;
   }
 
-  public async v2SaveChatGroup(
+  public async v2UpdateChatGroup(
     chatGroup: Partial<ChatGroup>,
     userID: number,
+  ): Promise<ChatGroup> {
+    const newData: Partial<ChatGroup> = {
+      ...chatGroup,
+      chatMessages: undefined,
+    };
+    if (!newData.members || !newData.members.length) {
+      throw new InternalServerErrorException('Something went wrong');
+    }
+    const userIds = newData.members.map((u) => u.id);
+    const users = await this.userRepository.findByIds(userIds);
+    const requestUser = await this.userRepository.findOne(userID);
+
+    const existGroup = await this.chatGroupRepository.findOne(newData.id, {
+      relations: ['members'],
+    });
+
+    if (typeof newData.isPinned !== 'undefined') {
+      if (newData.isPinned) {
+        await this.chatGroupRepository
+          .createQueryBuilder('chat_groups')
+          .relation('pinnedUsers')
+          .of(existGroup.id)
+          .remove(userID);
+        await this.chatGroupRepository
+          .createQueryBuilder('chat_groups')
+          .relation('pinnedUsers')
+          .of(existGroup.id)
+          .add(userID);
+      } else {
+        await this.chatGroupRepository
+          .createQueryBuilder('chat_groups')
+          .relation('pinnedUsers')
+          .of(existGroup.id)
+          .remove(userID);
+      }
+    }
+    newData.members = users;
+
+    const newGroup = await this.chatGroupRepository.save(
+      this.chatGroupRepository.create({
+        ...existGroup,
+        ...newData,
+      }),
+    );
+    const newMembers = newGroup.members.filter(
+      (newM) => !existGroup.members.map((m) => m.id).includes(newM.id),
+    );
+    const removedMembers = existGroup.members.filter(
+      (existM) => !newGroup.members.map((m) => m.id).includes(existM.id),
+    );
+    if (newMembers.length) {
+      const newMembersSystemMsg = new ChatMessage();
+      newMembersSystemMsg.type = ChatMessageType.SYSTEM_TEXT;
+      newMembersSystemMsg.content = `${userNameFactory(
+        requestUser,
+      )}さんが${newMembers
+        .map((m) => userNameFactory(m) + 'さん')
+        .join(', ')}を追加しました`;
+      newMembersSystemMsg.chatGroup = { ...newGroup, members: undefined };
+      await this.chatMessageRepository.save(newMembersSystemMsg);
+    }
+    if (removedMembers.length) {
+      const removedMembersSystemMsg = new ChatMessage();
+      removedMembersSystemMsg.type = ChatMessageType.SYSTEM_TEXT;
+      removedMembersSystemMsg.content = `${userNameFactory(
+        requestUser,
+      )}さんが${removedMembers
+        .map((m) => userNameFactory(m) + 'さん')
+        .join(', ')}を退出させました`;
+      removedMembersSystemMsg.chatGroup = { ...newGroup, members: undefined };
+      await this.chatMessageRepository.save(removedMembersSystemMsg);
+    }
+
+    return newGroup;
+  }
+
+  public async v2SaveChatGroup(
+    chatGroup: Partial<ChatGroup>,
   ): Promise<ChatGroup> {
     const newData: Partial<ChatGroup> = {
       ...chatGroup,
@@ -345,59 +424,13 @@ export class ChatService {
       );
 
     if (existGroup.length) {
-      if (typeof newData.isPinned !== 'undefined') {
-        if (newData.isPinned) {
-          await this.chatGroupRepository
-            .createQueryBuilder('chat_groups')
-            .relation('pinnedUsers')
-            .of(existGroup[0].id)
-            .remove(userID);
-          await this.chatGroupRepository
-            .createQueryBuilder('chat_groups')
-            .relation('pinnedUsers')
-            .of(existGroup[0].id)
-            .add(userID);
-        } else {
-          await this.chatGroupRepository
-            .createQueryBuilder('chat_groups')
-            .relation('pinnedUsers')
-            .of(existGroup[0].id)
-            .remove(userID);
-        }
-      }
-      const updatedGroup = await this.chatGroupRepository.save(
-        this.chatGroupRepository.create({
-          ...existGroup[0],
-          ...newData,
-        }),
-      );
-      return updatedGroup;
+      return existGroup[0];
     }
     newData.members = users;
 
     const newGroup = await this.chatGroupRepository.save(
       this.chatGroupRepository.create(newData),
     );
-    if (typeof newData.isPinned !== 'undefined') {
-      if (newData.isPinned) {
-        await this.chatGroupRepository
-          .createQueryBuilder('chat_groups')
-          .relation('pinnedUsers')
-          .of(newGroup.id)
-          .remove(userID);
-        await this.chatGroupRepository
-          .createQueryBuilder('chat_groups')
-          .relation('pinnedUsers')
-          .of(newGroup.id)
-          .add(userID);
-      } else {
-        await this.chatGroupRepository
-          .createQueryBuilder('chat_groups')
-          .relation('pinnedUsers')
-          .of(newGroup.id)
-          .remove(userID);
-      }
-    }
     return newGroup;
   }
 
