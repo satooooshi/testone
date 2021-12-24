@@ -1,4 +1,14 @@
-import { Body, Controller, Post, Req, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Param,
+  Post,
+  Req,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
+import { Response } from 'express';
 import { NotificationDevice } from 'src/entities/device.entity';
 import JwtAuthenticationGuard from '../auth/jwtAuthentication.guard';
 import RequestWithUser from '../auth/requestWithUser.interface';
@@ -16,5 +26,15 @@ export class NotificationController {
   ): Promise<NotificationDevice> {
     const { user } = req;
     return await this.notifService.registerDevice({ ...device, user });
+  }
+
+  @Delete('/devices/:deviceToken')
+  @UseGuards(JwtAuthenticationGuard)
+  async deleteDevice(
+    @Param('deviceToken') token: string,
+    @Res() res: Response,
+  ) {
+    await this.notifService.deleteDevice(token);
+    res.send(200);
   }
 }

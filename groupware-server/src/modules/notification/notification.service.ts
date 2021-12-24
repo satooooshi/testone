@@ -21,6 +21,10 @@ export class NotificationService {
     private readonly deviceRepository: Repository<NotificationDevice>,
   ) {}
 
+  async deleteDevice(token: string) {
+    await this.deviceRepository.delete({ token });
+  }
+
   async registerDevice(
     device: Partial<NotificationDevice>,
   ): Promise<NotificationDevice> {

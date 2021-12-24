@@ -4,6 +4,7 @@ import {User} from '../types';
 import {useAPIAuthenticate} from '../hooks/api/auth/useAPIAuthenticate';
 import {storage} from '../utils/url';
 import {Alert} from 'react-native';
+import {useAPIDeleteDevice} from '../hooks/api/notification/useAPIDeleteDevice';
 
 const AuthenticateContext = createContext({
   isAuthenticated: false,
@@ -30,6 +31,7 @@ export const AuthenticateProvider: React.FC = ({children}) => {
       logout();
     },
   });
+  const {mutate: deleteDevice} = useAPIDeleteDevice();
 
   useEffect(() => {
     mutateAuthenticate();
@@ -44,6 +46,10 @@ export const AuthenticateProvider: React.FC = ({children}) => {
   };
 
   const logout = () => {
+    const token = storage.getString('userToken');
+    if (token) {
+      deleteDevice(token);
+    }
     storage.delete('userToken');
     setProfile(undefined);
     setIsAuthenticated(false);
