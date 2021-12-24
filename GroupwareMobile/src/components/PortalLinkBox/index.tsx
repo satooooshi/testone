@@ -41,6 +41,7 @@ type PortalType =
   | 'admin'
   | 'my_schedule'
   | 'safety_confirmation'
+  | 'salary'
   | 'account';
 
 type PortalLinkIconProps = {
@@ -149,6 +150,8 @@ const PortalLinkIcon: React.FC<PortalLinkIconProps> = ({type}) => {
           color="pink600"
         />
       );
+    case 'salary':
+      return <Icon name="bank" fontSize={iconSize} color="yellow400" />;
   }
 };
 
@@ -194,6 +197,8 @@ const PortalLinkBox: React.FC<PortarlLinkBoxProps> = ({type, onPress}) => {
         return 'Myスケジュール';
       case 'safety_confirmation':
         return '安否確認';
+      case 'salary':
+        return '給与明細';
       default:
         return '';
     }

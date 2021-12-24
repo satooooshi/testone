@@ -270,6 +270,14 @@ const Home: React.FC = () => {
               }}
             />
           </Div>
+          <Div mb={8}>
+            <PortalLinkBox
+              type="salary"
+              onPress={() => {
+                Alert.alert('今後実装予定です');
+              }}
+            />
+          </Div>
         </Div>
       </ScrollDiv>
     </WholeContainer>
