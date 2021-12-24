@@ -9,6 +9,7 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  getRepository,
   Index,
   JoinColumn,
   JoinTable,
@@ -20,6 +21,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { ChatGroup } from './chatGroup.entity';
+import { ChatMessage } from './chatMessage.entity';
 import { EventComment } from './eventComment.entity';
 import { EventFile } from './eventFile.entity';
 import { EventVideo } from './eventVideo.entity';
@@ -168,6 +170,22 @@ export class EventSchedule {
     name: 'updated_at',
   })
   updatedAt: Date;
+
+  @AfterInsert()
+  async createEventChat?() {
+    if (this.chatNeeded) {
+      const eventChatRoom = new ChatGroup();
+      eventChatRoom.name = this.title;
+      eventChatRoom.imageURL = this.imageURL || '';
+      eventChatRoom.event = this;
+      if (this.hostUsers && this.hostUsers.length) {
+        eventChatRoom.members = [...this.hostUsers, this.author];
+      } else {
+        eventChatRoom.members = [this.author];
+      }
+      getRepository(ChatGroup).save(eventChatRoom);
+    }
+  }
 
   @BeforeInsert()
   @BeforeUpdate()

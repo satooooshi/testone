@@ -278,7 +278,7 @@ export class EventScheduleService {
       })
       .skip(offset)
       .take(limit)
-      .orderBy('events.startAt', 'ASC')
+      .orderBy('events.startAt', status === 'past' ? 'ASC' : 'DESC')
       .getManyAndCount();
     const pageCount =
       count % limit === 0 ? count / limit : Math.floor(count / limit) + 1;
@@ -445,7 +445,9 @@ export class EventScheduleService {
     eventSchedule.imageURL = this.storageService.parseSignedURLToStorageURL(
       eventSchedule.imageURL,
     );
-    const savedEvent = await this.eventRepository.save(eventSchedule);
+    const savedEvent = await this.eventRepository.save(
+      this.eventRepository.create(eventSchedule),
+    );
     return savedEvent;
   }
 

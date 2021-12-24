@@ -12,7 +12,6 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { Response } from 'express';
-import { ChatGroup } from 'src/entities/chatGroup.entity';
 import { EventSchedule, EventType } from 'src/entities/event.entity';
 import { EventComment } from 'src/entities/eventComment.entity';
 import { EventIntroduction } from 'src/entities/eventIntroduction.entity';
@@ -211,25 +210,6 @@ export class EventScheduleController {
     eventSchedule.author = req.user;
 
     const savedEvent = await this.eventService.saveEvent(eventSchedule);
-    if (savedEvent.chatNeeded) {
-      const eventChatGroup = new ChatGroup();
-      eventChatGroup.name = savedEvent.title;
-      eventChatGroup.imageURL = savedEvent.imageURL || '';
-      if (savedEvent.hostUsers && savedEvent.hostUsers.length) {
-        eventChatGroup.members = [...savedEvent.hostUsers, savedEvent.author];
-      } else {
-        eventChatGroup.members = [savedEvent.author];
-      }
-      const eventGroup = await this.chatService.saveChatGroup(
-        eventChatGroup,
-        req.user.id,
-      );
-      const groupSavedEvent = await this.eventService.saveEvent({
-        ...savedEvent,
-        chatGroup: eventGroup,
-      });
-      return groupSavedEvent;
-    }
     return savedEvent;
   }
 
