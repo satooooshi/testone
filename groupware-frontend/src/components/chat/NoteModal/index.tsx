@@ -1,6 +1,7 @@
 import {
   Box,
   Button,
+  FormLabel,
   Image,
   Link,
   Modal,
@@ -28,6 +29,7 @@ import { useAPIDeleteChatNote } from '@/hooks/api/chat/note/useAPIDeleteChatNote
 import { useAPISaveNoteImage } from '@/hooks/api/chat/note/useAPISaveChatNoteImages';
 import { useAPIUpdateNote } from '@/hooks/api/chat/note/useAPIUpdateChatNote';
 import NoteBox from './NoteBox';
+import { noteSchema } from 'src/utils/validation/schema';
 
 const Viewer = dynamic(() => import('react-viewer'), { ssr: false });
 
@@ -116,17 +118,25 @@ const NoteModal: React.FC<NoteModalProps> = ({ isOpen, onClose, room }) => {
     editors: [],
     images: [],
   };
-  const { values, setValues, handleChange, handleSubmit, resetForm } =
-    useFormik<ChatNote | Partial<ChatNote>>({
-      initialValues: initialValues,
-      onSubmit: (submittedValues) => {
-        if (mode === 'new') {
-          createNote(submittedValues);
-        } else {
-          updateNote(submittedValues as ChatNote);
-        }
-      },
-    });
+  const {
+    values,
+    setValues,
+    handleChange,
+    handleSubmit,
+    resetForm,
+    errors,
+    touched,
+  } = useFormik<ChatNote | Partial<ChatNote>>({
+    initialValues: initialValues,
+    validationSchema: noteSchema,
+    onSubmit: (submittedValues) => {
+      if (mode === 'new') {
+        createNote(submittedValues);
+      } else {
+        updateNote(submittedValues as ChatNote);
+      }
+    },
+  });
   const imageUploaderRef = useRef<HTMLInputElement | null>(null);
   const [selectedImage, setSelectedImage] = useState<Partial<ChatNoteImage>>();
   const { mutate: uploadImage } = useAPIUploadStorage();
@@ -279,6 +289,9 @@ const NoteModal: React.FC<NoteModalProps> = ({ isOpen, onClose, room }) => {
             </Link>
           ))}
         </SimpleGrid>
+        {errors.content && touched.content ? (
+          <FormLabel color="tomato">{errors.content}</FormLabel>
+        ) : null}
         <Textarea
           value={values.content}
           name="content"
@@ -386,6 +399,9 @@ const NoteModal: React.FC<NoteModalProps> = ({ isOpen, onClose, room }) => {
             </Box>
           ))}
         </SimpleGrid>
+        {errors.content && touched.content ? (
+          <FormLabel color="tomato">{errors.content}</FormLabel>
+        ) : null}
         <Textarea
           value={values.content}
           name="content"

@@ -3,7 +3,7 @@ import {useFormik} from 'formik';
 import React, {useState} from 'react';
 import {Alert, TextInput, TouchableHighlight} from 'react-native';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
-import {Button, Div, Icon, Image} from 'react-native-magnus';
+import {Button, Div, Icon, Image, Text} from 'react-native-magnus';
 import {UseMutateFunction} from 'react-query';
 import tailwind from 'tailwind-rn';
 import HeaderWithTextButton from '../../../../components/Header';
@@ -17,6 +17,7 @@ import {
 import {uploadImageFromGallery} from '../../../../utils/cropImage/uploadImageFromGallery';
 import ImageView from 'react-native-image-viewing';
 import DownloadIcon from '../../../../components/common/DownLoadIcon';
+import {noteSchema} from '../../../../utils/validation/schema';
 
 type ChatNoteFormProps = {
   rightButtonNameOnHeader: string;
@@ -43,11 +44,12 @@ const ChatNoteForm: React.FC<ChatNoteFormProps> = ({
     createdAt: new Date(),
     updatedAt: new Date(),
   };
-  const {values, setValues, handleSubmit} = useFormik<
+  const {values, setValues, handleSubmit, errors, touched} = useFormik<
     ChatNote | Partial<ChatNote>
   >({
     initialValues: note || initialValues,
     enableReinitialize: true,
+    validationSchema: noteSchema,
     onSubmit: submittedValues => onSubmit(submittedValues),
   });
   const images: ImageSource[] =
@@ -156,6 +158,11 @@ const ChatNoteForm: React.FC<ChatNoteFormProps> = ({
             </TouchableHighlight>
           ))}
         </Div>
+        {errors.content && touched.content ? (
+          <Text mb="sm" color="tomato">
+            {errors.content}
+          </Text>
+        ) : null}
         <TextInput
           multiline
           placeholder="今なにしてる？"

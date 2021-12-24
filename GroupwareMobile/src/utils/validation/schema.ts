@@ -71,6 +71,10 @@ export const savingEventSchema = Yup.object().shape({
   tags: Yup.array().min(1, minTagsMessage),
 });
 
+export const noteSchema = Yup.object().shape({
+  content: Yup.string().required(requireMessage),
+});
+
 export const albumSchema = Yup.object().shape({
   title: Yup.string().required('タイトルを設定してください'),
   images: Yup.array().min(1, '画像を一つ以上選択してください'),

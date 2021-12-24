@@ -96,6 +96,10 @@ export const albumSchema = Yup.object().shape({
   images: Yup.array().min(1, '画像を一つ以上選択してください'),
 });
 
+export const noteSchema = Yup.object().shape({
+  content: Yup.string().required(requireMessage),
+});
+
 export const editEventIntroductionSchema = Yup.object().shape({
   title: Yup.string()
     .required(`タイトルは${requireMessage}`)
