@@ -32,7 +32,6 @@ type ChatMessageItemProps = {
   onPressVideo: () => void;
   onPressReaction: (reaction: ChatMessageReaction) => void;
   onLongPressReation: (reaction: ChatMessageReaction) => void;
-  deletedReactionIds: number[];
 };
 
 const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
@@ -45,20 +44,20 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
   onPressVideo,
   onPressReaction,
   onLongPressReation,
-  deletedReactionIds,
 }) => {
   const navigation = useNavigation<any>();
   const windowWidth = useWindowDimensions().width;
+  const isSender = (emoji: string) => {
+    return message?.reactions?.filter(r => r.emoji === emoji && r.isSender)
+      .length;
+  };
   const reactionRemovedDuplicates = (reactions: ChatMessageReaction[]) => {
-    const reactionsNoDuplicates: ChatMessageReaction[] = [];
+    let reactionsNoDuplicates: ChatMessageReaction[] = [];
     for (const r of reactions) {
-      if (
-        reactionsNoDuplicates.filter(
-          duplicated => duplicated.isSender || duplicated.emoji !== r.emoji,
-        )
-      ) {
-        reactionsNoDuplicates.push(r);
-      }
+      reactionsNoDuplicates = reactionsNoDuplicates.filter(
+        duplicated => duplicated.emoji !== r.emoji,
+      );
+      reactionsNoDuplicates.push(r);
     }
     return reactionsNoDuplicates;
   };
@@ -157,25 +156,20 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
         flexWrap="wrap"
         alignSelf={message?.isSender ? 'flex-end' : 'flex-start'}>
         {message.reactions?.length
-          ? reactionRemovedDuplicates(message.reactions)
-              .filter(r => !deletedReactionIds.includes(r.id))
-              .map(
-                r =>
-                  r.isSender && (
-                    <Div mr="xs" mb="xs">
-                      <ReactionToMessage
-                        onPress={() => onPressReaction(r)}
-                        onLongPress={() => onLongPressReation(r)}
-                        reaction={r}
-                        numbersOfReaction={numbersOfSameValueInKeyOfObjArr(
-                          message.reactions as ChatMessageReaction[],
-                          r,
-                          'emoji',
-                        )}
-                      />
-                    </Div>
-                  ),
-              )
+          ? reactionRemovedDuplicates(message.reactions).map(r => (
+              <Div mr="xs" mb="xs">
+                <ReactionToMessage
+                  onPress={() => onPressReaction(r)}
+                  onLongPress={() => onLongPressReation(r)}
+                  reaction={{...r, isSender: !!isSender(r.emoji)}}
+                  numbersOfReaction={numbersOfSameValueInKeyOfObjArr(
+                    message.reactions as ChatMessageReaction[],
+                    r,
+                    'emoji',
+                  )}
+                />
+              </Div>
+            ))
           : null}
       </Div>
     </>

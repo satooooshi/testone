@@ -262,7 +262,7 @@ const Home: React.FC = () => {
               }}
             />
           </Div>
-          <Div mb={8}>
+          <Div mb={8} mr={4}>
             <PortalLinkBox
               type="safety_confirmation"
               onPress={() => {

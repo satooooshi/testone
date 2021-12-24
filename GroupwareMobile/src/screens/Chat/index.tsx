@@ -186,10 +186,25 @@ const Chat: React.FC = () => {
     </TouchableOpacity>
   );
 
-  const handleDeleteReaction = (reaction: ChatMessageReaction) => {
+  const handleDeleteReaction = (
+    reaction: ChatMessageReaction,
+    target: ChatMessage,
+  ) => {
     deleteReaction(reaction, {
       onSuccess: reactionId => {
-        setDeletedReactionIds(r => [...r, reactionId]);
+        setMessages(m => {
+          return m.map(eachMessage => {
+            if (eachMessage.id === target.id) {
+              return {
+                ...eachMessage,
+                reactions: eachMessage.reactions?.filter(
+                  r => r.id !== reactionId,
+                ),
+              };
+            }
+            return eachMessage;
+          });
+        });
       },
       onError: () => {
         Alert.alert(
@@ -200,36 +215,34 @@ const Chat: React.FC = () => {
   };
 
   const handleSaveReaction = async (emoji: string, target?: ChatMessage) => {
-    if (reactionTarget) {
-      const reaction: Partial<ChatMessageReaction> = {
-        emoji,
-        chatMessage: target || reactionTarget,
-      };
-      saveReaction(reaction, {
-        onSettled: () => setReactionTarget(undefined),
-        onSuccess: savedReaction => {
-          const reactionAdded = {...savedReaction, isSender: true};
-          setMessages(m => {
-            return m.map(eachMessage => {
-              if (eachMessage.id === savedReaction.chatMessage?.id) {
-                return {
-                  ...eachMessage,
-                  reactions: eachMessage.reactions?.length
-                    ? [...eachMessage.reactions, reactionAdded]
-                    : [reactionAdded],
-                };
-              }
-              return eachMessage;
-            });
+    const reaction: Partial<ChatMessageReaction> = {
+      emoji,
+      chatMessage: target || reactionTarget,
+    };
+    saveReaction(reaction, {
+      onSettled: () => setReactionTarget(undefined),
+      onSuccess: savedReaction => {
+        const reactionAdded = {...savedReaction, isSender: true};
+        setMessages(m => {
+          return m.map(eachMessage => {
+            if (eachMessage.id === savedReaction.chatMessage?.id) {
+              return {
+                ...eachMessage,
+                reactions: eachMessage.reactions?.length
+                  ? [...eachMessage.reactions, reactionAdded]
+                  : [reactionAdded],
+              };
+            }
+            return eachMessage;
           });
-        },
-        onError: () => {
-          Alert.alert(
-            'リアクションの更新中にエラーが発生しました。\n時間をおいて再実行してください。',
-          );
-        },
-      });
-    }
+        });
+      },
+      onError: () => {
+        Alert.alert(
+          'リアクションの更新中にエラーが発生しました。\n時間をおいて再実行してください。',
+        );
+      },
+    });
   };
 
   const handleUploadImage = async () => {
@@ -434,7 +447,7 @@ const Chat: React.FC = () => {
         onPressVideo={() => playVideoOnModal(message.content)}
         onPressReaction={r =>
           r.isSender
-            ? handleDeleteReaction(r)
+            ? handleDeleteReaction(r, message)
             : handleSaveReaction(r.emoji, message)
         }
         onLongPressReation={() => {
