@@ -90,7 +90,6 @@ const Chat: React.FC = () => {
   const {mutate: saveReaction} = useAPISaveReaction();
   const {width: windowWidth} = useWindowDimensions();
   const {mutate: deleteReaction} = useAPIDeleteReaction();
-  const [deletedReactionIds, setDeletedReactionIds] = useState<number[]>([]);
   const [selectedReactions, setSelectedReactions] = useState<
     ChatMessageReaction[] | undefined
   >();
@@ -455,7 +454,6 @@ const Chat: React.FC = () => {
             setSelectedReactions(message.reactions);
           }
         }}
-        deletedReactionIds={deletedReactionIds}
       />
     </Div>
   );
@@ -606,7 +604,6 @@ const Chat: React.FC = () => {
         onPressCloseButton={() => {
           setSelectedReactions(undefined);
         }}
-        deletedReactionIds={deletedReactionIds}
         onPressEmoji={emoji => setSelectedEmoji(emoji)}
       />
 
