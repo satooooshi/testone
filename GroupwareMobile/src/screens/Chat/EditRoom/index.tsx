@@ -1,5 +1,9 @@
-import {useNavigation, useRoute} from '@react-navigation/native';
-import React from 'react';
+import {
+  useFocusEffect,
+  useNavigation,
+  useRoute,
+} from '@react-navigation/native';
+import React, {useCallback} from 'react';
 import {Alert} from 'react-native';
 import {useAPIEditMembers} from '../../../hooks/api/chat/useAPIEditMembers';
 import {useAPIGetRoomDetail} from '../../../hooks/api/chat/useAPIGetRoomDetail';
@@ -15,14 +19,13 @@ import {
 const EditRoom: React.FC = () => {
   const navigation = useNavigation<EditRoomNavigationProps>();
   const {room} = useRoute<EditRoomRouteProps>().params;
-  const {data: roomDetail} = useAPIGetRoomDetail(room.id, {
+  const {data: roomDetail, refetch} = useAPIGetRoomDetail(room.id, {
     onError: () => {
       Alert.alert('ルーム情報の取得に失敗しました');
     },
   });
   const {mutate: uploadImage} = useAPIUploadStorage();
   const {data: users} = useAPIGetUsers();
-  const {mutate: editMembers} = useAPIEditMembers();
   const headerTitle = 'ルーム編集';
   const {mutate: updateGroup} = useAPISaveChatGroup({
     onSuccess: () => {
@@ -44,16 +47,20 @@ const EditRoom: React.FC = () => {
       );
     },
   });
+
+  useFocusEffect(
+    useCallback(() => {
+      refetch();
+    }, [refetch]),
+  );
+
   return (
     <RoomForm
       users={users || []}
       headerTitle={headerTitle}
       initialRoom={roomDetail}
       onSubmit={submittedRoom => {
-        if (submittedRoom.members) {
-          editMembers({roomId: room.id, members: submittedRoom.members});
-          updateGroup({...submittedRoom, members: undefined});
-        }
+        updateGroup({...submittedRoom, members: submittedRoom.members});
       }}
       onUploadImage={(formData, onSuccessFunc) =>
         uploadImage(formData, {onSuccess: onSuccessFunc})

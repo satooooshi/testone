@@ -1,5 +1,5 @@
 import {useFormik} from 'formik';
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {TouchableOpacity, useWindowDimensions} from 'react-native';
 import {
   Button,
@@ -49,7 +49,6 @@ const RoomForm: React.FC<RoomFormProps> = ({
   const {values, setValues, handleChange, handleSubmit, errors, touched} =
     useFormik({
       initialValues: initialRoom || initialValues,
-      enableReinitialize: true,
       onSubmit: submittedValues => {
         onSubmit(submittedValues);
       },
@@ -65,6 +64,12 @@ const RoomForm: React.FC<RoomFormProps> = ({
       );
     }
   };
+
+  useEffect(() => {
+    if (initialRoom) {
+      setValues(initialRoom);
+    }
+  }, [initialRoom, setValues]);
 
   return (
     <WholeContainer>
