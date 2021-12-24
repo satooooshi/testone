@@ -27,6 +27,7 @@ import {
   ChatMessageReaction,
   ChatMessageType,
   ImageSource,
+  User,
 } from '../../types';
 import {uploadImageFromGallery} from '../../utils/cropImage/uploadImageFromGallery';
 import DocumentPicker from 'react-native-document-picker';
@@ -68,6 +69,9 @@ import {nameOfRoom} from '../../utils/factory/chat/nameOfRoom';
 import {useAPIGetRoomDetail} from '../../hooks/api/chat/useAPIGetRoomDetail';
 import {chatMessageSchema} from '../../utils/validation/schema';
 import {reactionEmojis} from '../../utils/factory/reactionEmojis';
+import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
+
+const TopTab = createMaterialTopTabNavigator();
 
 const Chat: React.FC = () => {
   const typeDropdownRef = useRef<any | null>(null);
@@ -597,6 +601,28 @@ const Chat: React.FC = () => {
     });
   }, [room.id, saveLastReadChatTime]);
 
+  const readUserBox = (user: User) => (
+    <View style={tailwind('flex-row bg-white items-center px-4 py-2')}>
+      <>
+        <Div mr={'sm'}>
+          <UserAvatar
+            user={user}
+            h={64}
+            w={64}
+            onPress={() => {
+              setSelectedMessageForCheckLastRead(undefined);
+              navigation.navigate('UsersStack', {
+                screen: 'AccountDetail',
+                params: {id: user?.id},
+              });
+            }}
+          />
+        </Div>
+        <Text fontSize={18}>{userNameFactory(user)}</Text>
+      </>
+    </View>
+  );
+
   return (
     <WholeContainer>
       {typeDropdown}
@@ -623,24 +649,47 @@ const Chat: React.FC = () => {
           }}>
           <Icon color="black" name="close" />
         </Button>
-        {selectedMessageForCheckLastRead ? (
-          <FlatList
-            data={readUsers(selectedMessageForCheckLastRead)}
-            renderItem={({item}) => (
-              <View
-                style={tailwind('flex-row bg-white items-center px-4 mb-2')}>
-                <>
-                  <Div mr={'sm'}>
-                    <UserAvatar user={item} h={64} w={64} />
-                  </Div>
-                  <Text fontSize={18}>{userNameFactory(item)}</Text>
-                </>
-              </View>
-            )}
+        <TopTab.Navigator initialRouteName={'ReadUsers'}>
+          <TopTab.Screen
+            name="ReadUsers"
+            children={() =>
+              selectedMessageForCheckLastRead ? (
+                <FlatList
+                  data={readUsers(selectedMessageForCheckLastRead)}
+                  keyExtractor={item => item.id.toString()}
+                  renderItem={({item}) => readUserBox(item)}
+                />
+              ) : (
+                <></>
+              )
+            }
+            options={{title: '既読'}}
           />
-        ) : (
-          <></>
-        )}
+          <TopTab.Screen
+            name="UnReadUsers"
+            children={() =>
+              selectedMessageForCheckLastRead ? (
+                <FlatList
+                  data={roomDetail?.members?.filter(
+                    existMembers =>
+                      !readUsers(selectedMessageForCheckLastRead)
+                        .map(u => u.id)
+                        .includes(existMembers.id),
+                  )}
+                  keyExtractor={item => item.id.toString()}
+                  renderItem={({item}) => readUserBox(item)}
+                />
+              ) : (
+                <FlatList
+                  data={roomDetail?.members}
+                  keyExtractor={item => item.id.toString()}
+                  renderItem={({item}) => readUserBox(item)}
+                />
+              )
+            }
+            options={{title: '未読'}}
+          />
+        </TopTab.Navigator>
       </MagnusModal>
       {/* @TODO add seeking bar */}
       <MagnusModal isVisible={!!video} bg="black">
