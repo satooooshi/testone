@@ -5,6 +5,7 @@ import {QueryClientProvider, QueryClient} from 'react-query';
 import 'react-native-gesture-handler';
 import RNBootSplash from 'react-native-bootsplash';
 import PushNotificationIOS from '@react-native-community/push-notification-ios';
+import {Platform} from 'react-native';
 
 const App = () => {
   const queryClient = new QueryClient();
@@ -16,12 +17,14 @@ const App = () => {
   }, []);
 
   useEffect(() => {
-    PushNotificationIOS.getApplicationIconBadgeNumber(num => {
-      // get current number
-      if (num >= 1) {
-        PushNotificationIOS.setApplicationIconBadgeNumber(0); //set number to 0
-      }
-    });
+    if (Platform.OS === 'ios') {
+      PushNotificationIOS.getApplicationIconBadgeNumber(num => {
+        // get current number
+        if (num >= 1) {
+          PushNotificationIOS.setApplicationIconBadgeNumber(0); //set number to 0
+        }
+      });
+    }
   }, []);
 
   return (
