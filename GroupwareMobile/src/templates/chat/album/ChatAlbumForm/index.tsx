@@ -27,6 +27,7 @@ import tailwind from 'tailwind-rn';
 import {dateTimeFormatterFromJSDDate} from '../../../../utils/dateTimeFormatterFromJSDate';
 import DownloadIcon from '../../../../components/common/DownLoadIcon';
 import {ActivityIndicator} from 'react-native-paper';
+import {albumSchema} from '../../../../utils/validation/schema';
 
 type ChatAlbumFormProps = {
   album?: ChatAlbum;
@@ -50,10 +51,11 @@ const ChatAlbumForm: React.FC<ChatAlbumFormProps> = ({
   const [imageModal, setImageModal] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [nowImageIndex, setNowImageIndex] = useState<number>(0);
-  const {values, setValues, handleSubmit} = useFormik<
+  const {values, setValues, handleSubmit, errors, touched} = useFormik<
     ChatAlbum | Partial<ChatAlbum>
   >({
     initialValues: album || initialValues,
+    validationSchema: albumSchema,
     onSubmit: submittedValues => onSubmit(submittedValues),
   });
   const images: ImageSource[] =
@@ -134,6 +136,11 @@ const ChatAlbumForm: React.FC<ChatAlbumFormProps> = ({
         <Text fontWeight="bold" mb="sm">
           アルバム名
         </Text>
+        {errors.title && touched.title ? (
+          <Text mb="sm" color="tomato">
+            {errors.title}
+          </Text>
+        ) : null}
         <Input
           autoCapitalize="none"
           fontWeight="bold"
@@ -147,6 +154,11 @@ const ChatAlbumForm: React.FC<ChatAlbumFormProps> = ({
           })}
           onChangeText={t => setValues(v => ({...v, title: t}))}
         />
+        {errors.images && touched.images ? (
+          <Text mb="sm" color="tomato">
+            {errors.images}
+          </Text>
+        ) : null}
         <Div flexDir="row" flexWrap="wrap" w={windowWidth}>
           {values.images?.map(i => (
             <TouchableHighlight

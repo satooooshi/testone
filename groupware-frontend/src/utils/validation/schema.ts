@@ -91,6 +91,11 @@ export const profileSchema = Yup.object().shape({
   ),
 });
 
+export const albumSchema = Yup.object().shape({
+  title: Yup.string().required('タイトルを設定してください'),
+  images: Yup.array().min(1, '画像を一つ以上選択してください'),
+});
+
 export const editEventIntroductionSchema = Yup.object().shape({
   title: Yup.string()
     .required(`タイトルは${requireMessage}`)

@@ -30,6 +30,7 @@ import {useFormik} from 'formik';
 import {useAPIUpdateAlbum} from '../../../../../hooks/api/chat/album/useAPIUpdateChatAlbum';
 import FastImage from 'react-native-fast-image';
 import DownloadIcon from '../../../../../components/common/DownLoadIcon';
+import {albumSchema} from '../../../../../utils/validation/schema';
 
 const AlbumDetail: React.FC = () => {
   const {width: windowWidth} = useWindowDimensions();
@@ -62,8 +63,9 @@ const AlbumDetail: React.FC = () => {
     albumId: album.id.toString(),
     page: page.toString(),
   });
-  const {values, setValues, handleSubmit} = useFormik({
+  const {values, setValues, handleSubmit, errors, touched} = useFormik({
     initialValues: album,
+    validationSchema: albumSchema,
     onSubmit: v => {
       updateAlbum({...v, images: undefined});
     },
@@ -119,6 +121,11 @@ const AlbumDetail: React.FC = () => {
         <Text fontSize={16} mb="sm">
           タイトルを編集
         </Text>
+        {errors.title && touched.title ? (
+          <Text fontSize={16} mb="sm" color="tomato">
+            {errors.title}
+          </Text>
+        ) : null}
         <Input
           fontSize={16}
           value={values.title}

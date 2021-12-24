@@ -37,6 +37,7 @@ import { useAPIGetChatAlbumImages } from '@/hooks/api/chat/album/useAPIGetChatAl
 import { useAPIDeleteChatAlbum } from '@/hooks/api/chat/album/useAPIDeleteChatAlbum';
 import { saveAs } from 'file-saver';
 import { useAPIUpdateAlbum } from '@/hooks/api/chat/album/useAPIUpdateChatAlbum';
+import { albumSchema } from 'src/utils/validation/schema';
 
 type AlbumModalProps = {
   isOpen: boolean;
@@ -127,36 +128,44 @@ const AlbumModal: React.FC<AlbumModalProps> = ({ isOpen, onClose, room }) => {
   };
   const { mutate: uploadImage } = useAPIUploadStorage();
   const { mutate: createAlbum } = useAPICreateChatAlbum();
-  const { values, handleChange, setValues, handleSubmit, resetForm } =
-    useFormik<Partial<ChatAlbum>>({
-      initialValues: initialValues,
-      onSubmit: (submittedValues, { resetForm }) => {
-        if (mode === 'editTitle') {
-          updateAlbum(
-            { ...(submittedValues as ChatAlbum), images: undefined },
-            {
-              onSuccess: () => {
-                setMode('editPhoto');
-                toast({
-                  description: 'アルバムを名を更新しました',
-                  status: 'success',
-                  duration: 3000,
-                  isClosable: true,
-                });
-                resetForm();
-              },
-            },
-          );
-        } else {
-          createAlbum(submittedValues, {
+  const {
+    values,
+    handleChange,
+    setValues,
+    handleSubmit,
+    resetForm,
+    errors,
+    touched,
+  } = useFormik<Partial<ChatAlbum>>({
+    initialValues: initialValues,
+    validationSchema: albumSchema,
+    onSubmit: (submittedValues, { resetForm }) => {
+      if (mode === 'editTitle') {
+        updateAlbum(
+          { ...(submittedValues as ChatAlbum), images: undefined },
+          {
             onSuccess: () => {
-              setMode('list');
+              setMode('editPhoto');
+              toast({
+                description: 'アルバムを名を更新しました',
+                status: 'success',
+                duration: 3000,
+                isClosable: true,
+              });
               resetForm();
             },
-          });
-        }
-      },
-    });
+          },
+        );
+      } else {
+        createAlbum(submittedValues, {
+          onSuccess: () => {
+            setMode('list');
+            resetForm();
+          },
+        });
+      }
+    },
+  });
   const imagesInNewAlbumViewer = useMemo((): ImageDecorator[] => {
     return (
       values.images?.map((i) => ({
@@ -306,6 +315,9 @@ const AlbumModal: React.FC<AlbumModalProps> = ({ isOpen, onClose, room }) => {
         </Button>
       </Box>
       <FormLabel>アルバム名</FormLabel>
+      {errors.title && touched.title ? (
+        <FormLabel color="tomato">{errors.title}</FormLabel>
+      ) : null}
       <Input
         bg="white"
         mb="8px"
@@ -317,6 +329,9 @@ const AlbumModal: React.FC<AlbumModalProps> = ({ isOpen, onClose, room }) => {
           format: 'yyyy/LL/dd',
         })}
       />
+      {errors.images && touched.images ? (
+        <FormLabel color="tomato">{errors.images}</FormLabel>
+      ) : null}
       <Box flexDir="row" display="flex" flexWrap="wrap">
         {values?.images?.map((i) => (
           <Box position="relative" key={i.id}>
@@ -517,6 +532,9 @@ const AlbumModal: React.FC<AlbumModalProps> = ({ isOpen, onClose, room }) => {
                     onChange={imageUploadToAlbum}
                   />
                 </Box>
+                {errors.images && touched.images ? (
+                  <FormLabel color="tomato">{errors.images}</FormLabel>
+                ) : null}
                 <SimpleGrid spacing="8px" columns={2}>
                   {albumImages?.map((i) => (
                     <Box position="relative" key={i.id}>
@@ -566,6 +584,9 @@ const AlbumModal: React.FC<AlbumModalProps> = ({ isOpen, onClose, room }) => {
                   </Button>
                 </Box>
                 <FormLabel>アルバム名</FormLabel>
+                {errors.title && touched.title ? (
+                  <FormLabel color="tomato">{errors.title}</FormLabel>
+                ) : null}
                 <Input
                   bg="white"
                   mb="8px"

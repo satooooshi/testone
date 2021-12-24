@@ -187,29 +187,8 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
                         key={e}
                         fontSize={24}
                         onClick={() => {
-                          saveReaction(
-                            { emoji: e, chatMessage: messageState },
-                            {
-                              onSuccess: (savedReaction) => {
-                                const reactionAdded = {
-                                  ...savedReaction,
-                                  isSender: true,
-                                };
-                                setMessageState((m) => ({
-                                  ...m,
-                                  reactions: m.reactions?.length
-                                    ? [...m.reactions, reactionAdded]
-                                    : [reactionAdded],
-                                }));
-                                onClose();
-                              },
-                              onError: () => {
-                                alert(
-                                  'リアクションの更新中にエラーが発生しました。\n時間をおいて再実行してください。',
-                                );
-                              },
-                            },
-                          );
+                          handleSaveReaction(e, messageState);
+                          onClose();
                         }}>
                         {e}
                       </Text>

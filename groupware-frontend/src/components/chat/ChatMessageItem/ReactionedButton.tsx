@@ -1,6 +1,5 @@
 import { Button, Text } from '@chakra-ui/react';
-import React, { useState } from 'react';
-import { useAuthenticate } from 'src/contexts/useAuthenticate';
+import React from 'react';
 import { ChatMessageReaction } from 'src/types';
 import { numbersOfSameValueInKeyOfObjArr } from 'src/utils/numbersOfSameValueInKeyOfObjArr';
 
@@ -23,7 +22,7 @@ export const ReactionedButton = ({
         flexDir="row"
         borderColor={'blue.600'}
         borderWidth={1}
-        size="sm">
+        size="xs">
         <Text fontSize={16}>{reaction.emoji}</Text>
         <Text fontSize={16} color={reaction.isSender ? 'white' : 'blue.600'}>
           {numbersOfSameValueInKeyOfObjArr(
