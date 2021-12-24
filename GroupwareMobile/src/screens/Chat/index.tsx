@@ -114,11 +114,14 @@ const Chat: React.FC = () => {
       }
     },
   });
-  const {data: fetchedPastMessages, isLoading: loadingMessages} =
-    useAPIGetMessages({
-      group: room.id,
-      page: page.toString(),
-    });
+  const {
+    data: fetchedPastMessages,
+    isLoading: loadingMessages,
+    isFetching: fetchingMessages,
+  } = useAPIGetMessages({
+    group: room.id,
+    page: page.toString(),
+  });
   const {data: latestMessage, isFetching} = useAPIGetMessages(
     {
       group: room.id,
@@ -473,7 +476,7 @@ const Chat: React.FC = () => {
           keyboardVerticalOffset={windowHeight * 0.08}
           style={chatStyles.keyboardAvoidingViewIOS}
           behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-          {loadingMessages && <ActivityIndicator />}
+          {loadingMessages && fetchingMessages ? <ActivityIndicator /> : null}
           <FlatList
             style={chatStyles.flatlist}
             inverted
@@ -517,6 +520,13 @@ const Chat: React.FC = () => {
           <KeyboardAwareFlatList
             refreshing={true}
             style={chatStyles.flatlist}
+            ListHeaderComponent={
+              <>
+                {loadingMessages && fetchingMessages ? (
+                  <ActivityIndicator />
+                ) : null}
+              </>
+            }
             contentContainerStyle={chatStyles.flatlistContent}
             inverted
             data={messages}
