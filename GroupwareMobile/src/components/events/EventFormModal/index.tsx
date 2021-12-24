@@ -17,6 +17,7 @@ import {
   Image,
   Tag as TagButton,
   Dropdown,
+  Radio,
 } from 'react-native-magnus';
 import DateTimePicker from 'react-native-modal-datetime-picker';
 import {eventFormModalStyles} from '../../../styles/component/event/eventFormModal.style';
@@ -398,6 +399,31 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
                 {t.name}
               </TagButton>
             ))}
+          </Div>
+          <Div row justifyContent="space-between" w="100%" mb="lg">
+            <Text fontSize={16}>チャットルームの作成</Text>
+            <Div row>
+              <Div row alignItems="center" mr="sm">
+                <Text>オン</Text>
+                {/* @ts-ignore */}
+                <Radio
+                  value={1}
+                  activeColor="green500"
+                  onChange={() => setNewEvent(e => ({...e, chatNeeded: true}))}
+                  checked={newEvent.chatNeeded}
+                />
+              </Div>
+              <Div row alignItems="center">
+                <Text>オフ</Text>
+                {/* @ts-ignore */}
+                <Radio
+                  value={2}
+                  activeColor="green500"
+                  onChange={() => setNewEvent(e => ({...e, chatNeeded: false}))}
+                  checked={!newEvent.chatNeeded}
+                />
+              </Div>
+            </Div>
           </Div>
           <Div
             flexDir="column"
