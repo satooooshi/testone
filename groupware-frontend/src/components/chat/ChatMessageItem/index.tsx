@@ -18,6 +18,7 @@ import {
   SimpleGrid,
   Text,
   useMediaQuery,
+  useToast,
 } from '@chakra-ui/react';
 import React, { useRef } from 'react';
 import { Avatar } from '@chakra-ui/react';
@@ -42,6 +43,7 @@ import VideoMessage from './VideoMessage';
 import ImageMessage from './ImageMessage';
 import FileMessage from './FileMessage';
 import TextMessage from './TextMessage';
+import { useAPIDeleteReaction } from '@/hooks/api/chat/useAPIDeleteReaction';
 
 type ChatMessageItemProps = {
   message: ChatMessage;
@@ -60,16 +62,15 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
   const [visibleReadModal, setVisibleLastReadModal] = useState(false);
   const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
   const { mutate: saveReaction } = useAPISaveReaction();
+  const { mutate: deleteReaction } = useAPIDeleteReaction();
+  const toast = useToast();
   const reactionRemovedDuplicates = (reactions: ChatMessageReaction[]) => {
-    const reactionsNoDuplicates: ChatMessageReaction[] = [];
+    let reactionsNoDuplicates: ChatMessageReaction[] = [];
     for (const r of reactions) {
-      if (
-        reactionsNoDuplicates.filter(
-          (duplicated) => duplicated.isSender || duplicated.emoji !== r.emoji,
-        )
-      ) {
-        reactionsNoDuplicates.push(r);
-      }
+      reactionsNoDuplicates = reactionsNoDuplicates.filter(
+        (duplicated) => duplicated.emoji !== r.emoji,
+      );
+      reactionsNoDuplicates.push(r);
     }
     return reactionsNoDuplicates;
   };
@@ -82,6 +83,11 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
               <ReactionedButton
                 reaction={r}
                 reactions={messageState.reactions || []}
+                onClickReaction={(r) =>
+                  r.isSender
+                    ? handleDeleteReaction(r, messageState)
+                    : handleSaveReaction(r.emoji, messageState)
+                }
               />
             </Box>
           ))
@@ -100,6 +106,64 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
 
   const reactionPopOverRef = useRef(null);
   const reactionOpenerRef = useRef<HTMLButtonElement | null>(null);
+
+  const errorOnUpdatingReaction = () => {
+    toast({
+      title:
+        'リアクションの更新中にエラーが発生しました。\n時間をおいて再実行してください。',
+      status: 'error',
+      duration: 3000,
+      isClosable: true,
+    });
+  };
+
+  const handleDeleteReaction = (
+    reaction: ChatMessageReaction,
+    target: ChatMessage,
+  ) => {
+    deleteReaction(reaction, {
+      onSuccess: (reactionId) => {
+        setMessageState((m) => {
+          if (m.id === target.id) {
+            return {
+              ...m,
+              reactions: m.reactions?.filter((r) => r.id !== reactionId),
+            };
+          }
+          return m;
+        });
+      },
+      onError: () => {
+        errorOnUpdatingReaction();
+      },
+    });
+  };
+
+  const handleSaveReaction = async (emoji: string, target?: ChatMessage) => {
+    const reaction: Partial<ChatMessageReaction> = {
+      emoji,
+      chatMessage: target,
+    };
+    saveReaction(reaction, {
+      onSuccess: (savedReaction) => {
+        const reactionAdded = { ...savedReaction, isSender: true };
+        setMessageState((m) => {
+          if (m.id === savedReaction.chatMessage?.id) {
+            return {
+              ...m,
+              reactions: m.reactions?.length
+                ? [...m.reactions, reactionAdded]
+                : [reactionAdded],
+            };
+          }
+          return m;
+        });
+      },
+      onError: () => {
+        errorOnUpdatingReaction();
+      },
+    });
+  };
 
   const menuOpener = (
     <Popover
@@ -160,7 +224,13 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
             menuButton={
               <MenuButton>
                 <PopoverTrigger>
-                  <Button h={0} w={0} ref={reactionOpenerRef} />
+                  <Button
+                    h={0}
+                    w={0}
+                    minW={0}
+                    maxW={0}
+                    ref={reactionOpenerRef}
+                  />
                 </PopoverTrigger>
                 <HiOutlineDotsCircleHorizontal size={24} />
               </MenuButton>
@@ -246,7 +316,7 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
                   {readUsers.length ? (
                     <Link
                       onClick={() => setVisibleLastReadModal(true)}
-                      mx="8px"
+                      mx="4px"
                       color="gray"
                       fontSize="12px">
                       既読

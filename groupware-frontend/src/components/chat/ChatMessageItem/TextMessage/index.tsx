@@ -1,5 +1,5 @@
 import UserAvatar from '@/components/common/UserAvatar';
-import { Box, Text } from '@chakra-ui/react';
+import { Box, Text, useMediaQuery } from '@chakra-ui/react';
 import React from 'react';
 import { ChatMessage, ChatMessageType } from 'src/types';
 import { darkFontColor } from 'src/utils/colors';
@@ -12,6 +12,7 @@ type TextMessageProps = {
 };
 
 const TextMessage: React.FC<TextMessageProps> = ({ message }) => {
+  const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
   const replyContent = (parentMsg: ChatMessage) => {
     switch (parentMsg.type) {
       case ChatMessageType.TEXT:
@@ -27,7 +28,7 @@ const TextMessage: React.FC<TextMessageProps> = ({ message }) => {
 
   return (
     <Box
-      maxW={'40vw'}
+      maxW={isSmallerThan768 ? '140px' : '40vw'}
       minW={'10vw'}
       bg={message.isSender ? 'blue.500' : '#ececec'}
       p="8px"

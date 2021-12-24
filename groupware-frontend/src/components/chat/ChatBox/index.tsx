@@ -174,11 +174,17 @@ const ChatBox: React.FC<ChatBoxProps> = ({
   const messageWrapperDivRef = useRef<HTMLDivElement | null>(null);
   const editorRef = useRef<Editor>(null);
   const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
-  const { getRootProps: getRootProps, getInputProps: getInputProps } =
-    useDropzone({
-      noDrag: true,
-      onDrop: (f) => uploadFiles(f),
-    });
+  const {
+    getRootProps: noClickRootDropzone,
+    getInputProps: noClickInputDropzone,
+  } = useDropzone({
+    noClick: true,
+    onDrop: (f) => uploadFiles(f),
+  });
+  const { getRootProps: getRootProps, getInputProps } = useDropzone({
+    noClick: false,
+    onDrop: (f) => uploadFiles(f),
+  });
 
   const onEditorChange = (newState: EditorState) => {
     setEditorState(newState);
@@ -332,12 +338,14 @@ const ChatBox: React.FC<ChatBoxProps> = ({
 
   return (
     <Box
+      {...noClickRootDropzone}
       w={isSmallerThan768 ? '100%' : '60vw'}
       h="100%"
       bg="white"
       position="relative"
       borderRadius="md"
       boxShadow="md">
+      <input {...noClickInputDropzone()} />
       <Viewer
         customToolbar={(config) => {
           return config.concat([
