@@ -28,8 +28,8 @@ const TextMessage: React.FC<TextMessageProps> = ({ message }) => {
 
   return (
     <Box
-      maxW={isSmallerThan768 ? '140px' : '40vw'}
-      minW={'10vw'}
+      maxW={isSmallerThan768 ? '300px' : '40vw'}
+      minW={isSmallerThan768 ? '140px' : '10vw'}
       bg={message.isSender ? 'blue.500' : '#ececec'}
       p="8px"
       rounded="md">

@@ -20,7 +20,7 @@ import {
   useMediaQuery,
   useToast,
 } from '@chakra-ui/react';
-import React, { useRef } from 'react';
+import React, { Fragment, useRef } from 'react';
 import { Avatar } from '@chakra-ui/react';
 import {
   ChatMessage,
@@ -181,7 +181,7 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
               <PopoverBody>
                 <SimpleGrid columns={6}>
                   {reactionEmojis.map((e) => (
-                    <>
+                    <Fragment key={e}>
                       <Text
                         cursor="pointer"
                         key={e}
@@ -213,7 +213,7 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
                         }}>
                         {e}
                       </Text>
-                    </>
+                    </Fragment>
                   ))}
                 </SimpleGrid>
               </PopoverBody>
