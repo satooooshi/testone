@@ -1,5 +1,11 @@
 import React from 'react';
-import {SafeAreaView, StyleSheet, StatusBar} from 'react-native';
+import {
+  SafeAreaView,
+  StyleSheet,
+  StatusBar,
+  Appearance,
+  Platform,
+} from 'react-native';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import tailwind from 'tailwind-rn';
 
@@ -12,7 +18,13 @@ const WholeContainer: React.FC<WholeContainerProps> = props => {
   return (
     <>
       <SafeAreaView style={WholeContainerStyle.statusBar} />
-      <StatusBar />
+      <StatusBar
+        barStyle={
+          Platform.OS === 'ios' && Appearance.getColorScheme() === 'dark'
+            ? 'dark-content'
+            : 'default'
+        }
+      />
       <SafeAreaView
         {...props}
         style={[WholeContainerStyle.safeArea, WholeContainerStyle.grayColor]}>
