@@ -102,7 +102,7 @@ const DetailScreen: React.FC<DetailScreenProps> = ({profile, isLoading}) => {
 const AccountDetail: React.FC = () => {
   const navigation = useNavigation<AccountDetailNavigationProps>();
   const route = useRoute<AccountDetailRouteProps>();
-  const {user, setUser} = useAuthenticate();
+  const {user, setUser, logout} = useAuthenticate();
   const id = route.params?.id;
   const userID = id || user?.id;
   const screenName = 'AccountDetail';
@@ -146,6 +146,8 @@ const AccountDetail: React.FC = () => {
     return windowHeight;
   };
 
+  const mySelfOfNot = id === user?.id || !id;
+
   const tabs: Tab[] =
     userID !== user?.id
       ? [
@@ -173,7 +175,7 @@ const AccountDetail: React.FC = () => {
         ];
 
   const handleLogout = () => {
-    storage.delete('userToken');
+    logout();
     setUser({});
   };
 
@@ -190,8 +192,8 @@ const AccountDetail: React.FC = () => {
         tabs={tabs}
         activeTabName={'アカウント情報'}
         enableBackButton={userID !== user?.id}
-        rightButtonName={!id ? 'ログアウト' : undefined}
-        onPressRightButton={id ? handleLogout : undefined}
+        rightButtonName={mySelfOfNot ? 'ログアウト' : undefined}
+        onPressRightButton={mySelfOfNot ? handleLogout : undefined}
       />
       <ScrollDiv contentContainerStyle={accountDetailStyles.scrollView}>
         {profile && (

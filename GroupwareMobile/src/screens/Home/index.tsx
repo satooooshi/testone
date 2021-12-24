@@ -14,7 +14,7 @@ import tailwind from 'tailwind-rn';
 import {ActivityIndicator} from 'react-native-paper';
 
 const Home: React.FC = () => {
-  const {setUser} = useAuthenticate();
+  const {setUser, logout} = useAuthenticate();
   const navigation = useNavigation<HomeNavigationProps>();
   const {width: windowWidth} = useWindowDimensions();
   const [page, setPage] = useState(1);
@@ -25,7 +25,7 @@ const Home: React.FC = () => {
   const [newsForScroll, setNewsForScroll] = useState<TopNews[]>([]);
 
   const handleLogout = () => {
-    storage.delete('userToken');
+    logout();
     setUser({});
   };
 

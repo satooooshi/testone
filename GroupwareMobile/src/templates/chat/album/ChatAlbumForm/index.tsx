@@ -72,6 +72,7 @@ const ChatAlbumForm: React.FC<ChatAlbumFormProps> = ({
       cropping: true,
       mediaType: 'photo',
       multiple: true,
+      maxFiles: 300,
     });
     if (formData) {
       setUploading(true);
@@ -130,9 +131,19 @@ const ChatAlbumForm: React.FC<ChatAlbumFormProps> = ({
           </Div>
         )}
       />
-      <KeyboardAwareScrollView
-        contentContainerStyle={tailwind('h-full bg-white')}
-        style={tailwind('h-full bg-white')}>
+      <Button
+        bg="purple600"
+        position="absolute"
+        right={10}
+        bottom={10}
+        h={60}
+        zIndex={20}
+        rounded="circle"
+        onPress={handlePressImageButton}
+        w={60}>
+        <Icon fontSize={'6xl'} name="image" fontFamily="Entypo" color="white" />
+      </Button>
+      <KeyboardAwareScrollView style={tailwind('h-full bg-white')}>
         <Text fontWeight="bold" mb="sm">
           アルバム名
         </Text>
@@ -186,23 +197,6 @@ const ChatAlbumForm: React.FC<ChatAlbumFormProps> = ({
             </TouchableHighlight>
           ))}
         </Div>
-        <Button
-          bg="purple600"
-          position="absolute"
-          right={10}
-          bottom={10}
-          h={60}
-          zIndex={20}
-          rounded="circle"
-          onPress={handlePressImageButton}
-          w={60}>
-          <Icon
-            fontSize={'6xl'}
-            name="image"
-            fontFamily="Entypo"
-            color="white"
-          />
-        </Button>
       </KeyboardAwareScrollView>
     </WholeContainer>
   );

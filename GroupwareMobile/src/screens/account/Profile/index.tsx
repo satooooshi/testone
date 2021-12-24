@@ -5,7 +5,6 @@ import {
   ActivityIndicator,
   Alert,
   TextInput,
-  TouchableOpacity,
   useWindowDimensions,
 } from 'react-native';
 import {
@@ -25,7 +24,6 @@ import {useAPIUploadStorage} from '../../../hooks/api/storage/useAPIUploadStorag
 import {useAPIGetUserTag} from '../../../hooks/api/tag/useAPIGetUserTag';
 import {useAPIGetProfile} from '../../../hooks/api/user/useAPIGetProfile';
 import {useAPIUpdateUser} from '../../../hooks/api/user/useAPIUpdateUser';
-import {useSelectedTags} from '../../../hooks/tag/useSelectedTags';
 import {useTagType} from '../../../hooks/tag/useTagType';
 import {profileStyles} from '../../../styles/screen/account/profile.style';
 import {TagType, User} from '../../../types';
@@ -88,9 +86,6 @@ const Profile: React.FC = () => {
   const {width: windowWidth} = useWindowDimensions();
   const {data: tags} = useAPIGetUserTag();
   const [visibleTagModal, setVisibleTagModal] = useState(false);
-  const {selectedTags, toggleTag, isSelected} = useSelectedTags(
-    values?.tags || [],
-  );
   const {selectedTagType, selectTagType, filteredTags} = useTagType(
     'All',
     tags,
