@@ -68,7 +68,11 @@ const WikiList: React.FC<WikiListProps> = ({navigation}) => {
           })
         }
       />
-      <WikiCardList type={type} setRuleCategory={setRuleCategory} />
+      <WikiCardList
+        type={type}
+        setType={setType}
+        setRuleCategory={setRuleCategory}
+      />
     </WholeContainer>
   );
 };
