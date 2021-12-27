@@ -5,6 +5,8 @@ import {
   Storage,
 } from '@google-cloud/storage';
 import { ConfigService } from '@nestjs/config';
+import { genStorageURL } from 'src/utils/storage/genStorageURL';
+import { genSignedURL } from 'src/utils/storage/genSignedURL';
 
 @Injectable()
 export class StorageService {
@@ -12,6 +14,16 @@ export class StorageService {
   private readonly storage = new Storage({
     keyFilename: __dirname + '../../../cloud_storage.json',
   });
+
+  public async genSignedURLForRead(urls: string[]) {
+    const signedURLs: string[] = [];
+    for await (const u of urls) {
+      const normalURL = genStorageURL(u);
+      const signedURL = await genSignedURL(normalURL);
+      signedURLs.push(signedURL);
+    }
+    return signedURLs;
+  }
 
   public async genSignedURLForUpload(fileNames: string[]) {
     const options: GetSignedUrlConfig = {

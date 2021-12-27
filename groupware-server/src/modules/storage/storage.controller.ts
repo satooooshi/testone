@@ -14,6 +14,24 @@ import JwtAuthenticationGuard from '../auth/jwtAuthentication.guard';
 export class StorageController {
   constructor(private readonly storageService: StorageService) {}
 
+  @Post('read')
+  @UseGuards(JwtAuthenticationGuard)
+  // @UseInterceptors(FilesInterceptor('files'))
+  async read(
+    @Body()
+    fileNames: string[] /* @UploadedFiles() files: Express.Multer.File[] */,
+  ) {
+    const fileURLs = await this.storageService.genSignedURLForRead(
+      fileNames /* files */,
+    );
+    // const signedURLs: string[] = [];
+    // for (const u of fileURLs) {
+    //   const parsedURL = await this.storageService.parseStorageURLToSignedURL(u);
+    //   signedURLs.push(parsedURL);
+    // }
+    return fileURLs;
+  }
+
   @Post('upload')
   @UseGuards(JwtAuthenticationGuard)
   // @UseInterceptors(FilesInterceptor('files'))

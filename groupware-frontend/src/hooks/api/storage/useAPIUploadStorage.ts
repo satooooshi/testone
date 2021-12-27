@@ -1,7 +1,7 @@
 import axios, { AxiosError } from 'axios';
 import { useMutation, UseMutationOptions } from 'react-query';
 import { axiosInstance } from 'src/utils/url';
-import { uploadStorageURL } from 'src/utils/url/storage.url';
+import { readStorageURL, uploadStorageURL } from 'src/utils/url/storage.url';
 
 export const uploadStorage = async (files: File[]): Promise<string[]> => {
   const fileNames = files.map((f) => f.name);
@@ -16,7 +16,11 @@ export const uploadStorage = async (files: File[]): Promise<string[]> => {
         return signedURLMapping[f.name];
       }),
     );
-    return fileURLs;
+    const urlResponse = await axiosInstance.post<string[]>(
+      readStorageURL,
+      fileURLs,
+    );
+    return urlResponse.data;
   } catch (err) {
     if (err instanceof Error) {
       throw new Error(err.message);
