@@ -40,6 +40,8 @@ import UserAvatar from '@/components/common/UserAvatar';
 import io from 'socket.io-client';
 import { baseURL } from 'src/utils/url';
 import { useAuthenticate } from 'src/contexts/useAuthenticate';
+import AlbumModal from '../AlbumModal';
+import NoteModal from '../NoteModal';
 
 const socket = io(baseURL, {
   transports: ['websocket'],
@@ -48,16 +50,11 @@ const socket = io(baseURL, {
 type ChatBoxProps = {
   room: ChatGroup;
   onMenuClicked: (menuValue: MenuValue) => void;
-  onClickNoteIcon: () => void;
-  onClickAlbumIcon: () => void;
 };
 
-const ChatBox: React.FC<ChatBoxProps> = ({
-  room,
-  onMenuClicked,
-  onClickAlbumIcon,
-  onClickNoteIcon,
-}) => {
+const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
+  const [visibleAlbumModal, setVisibleAlbumModal] = useState(false);
+  const [visibleNoteModal, setVisibleNoteModal] = useState(false);
   const { user: myself } = useAuthenticate();
   const [page, setPage] = useState(1);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -88,6 +85,34 @@ const ChatBox: React.FC<ChatBoxProps> = ({
     group: room.id,
     page: page.toString(),
   });
+  const { refetch: refetchLatest } = useAPIGetMessages(
+    {
+      group: room.id,
+      page: '1',
+    },
+    {
+      enabled: false,
+      onSuccess: (latestData) => {
+        if (latestData?.length) {
+          const msgToAppend: ChatMessage[] = [];
+          const imagesToApped: ImageDecorator[] = [];
+          for (const latest of latestData) {
+            if (!messages?.length || isRecent(latest, messages?.[0])) {
+              msgToAppend.push(latest);
+              if (latest.type === ChatMessageType.IMAGE) {
+                imagesToApped.unshift({
+                  src: latest.content,
+                  downloadUrl: latest.content,
+                });
+              }
+            }
+          }
+          setMessages((m) => [...msgToAppend, ...m]);
+          setImagesForViewing((i) => [...i, ...imagesToApped]);
+        }
+      },
+    },
+  );
 
   const { mutate: sendChatMessage } = useAPISendChatMessage({
     onSuccess: (data) => {
@@ -238,7 +263,8 @@ const ChatBox: React.FC<ChatBoxProps> = ({
     setMessages([]);
     setImagesForViewing([]);
     setPage(1);
-  }, [room]);
+    refetchLatest();
+  }, [refetchLatest, room]);
 
   useEffect(() => {
     if (fetchedPastMessages?.length) {
@@ -355,6 +381,22 @@ const ChatBox: React.FC<ChatBoxProps> = ({
       position="relative"
       borderRadius="md"
       boxShadow="md">
+      <AlbumModal
+        room={room}
+        isOpen={visibleAlbumModal}
+        onClose={() => {
+          setVisibleAlbumModal(false);
+          refetchLatest();
+        }}
+      />
+      <NoteModal
+        room={room}
+        isOpen={visibleNoteModal}
+        onClose={() => {
+          setVisibleNoteModal(false);
+          refetchLatest();
+        }}
+      />
       <input {...noClickInputDropzone()} />
       <Viewer
         customToolbar={(config) => {
@@ -412,10 +454,10 @@ const ChatBox: React.FC<ChatBoxProps> = ({
           </Box>
         </Box>
         <Box display="flex" flexDir="row" alignItems="center">
-          <Link mr="4px" onClick={onClickNoteIcon}>
+          <Link mr="4px" onClick={() => setVisibleNoteModal(true)}>
             <FiFileText size={24} />
           </Link>
-          <Link mr="4px" onClick={onClickAlbumIcon}>
+          <Link mr="4px" onClick={() => setVisibleAlbumModal(true)}>
             <AiOutlinePicture size={24} />
           </Link>
           <Menu

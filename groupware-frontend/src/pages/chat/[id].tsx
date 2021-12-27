@@ -23,8 +23,6 @@ import EditChatGroupMembersModal from '@/components/chat/EditChatGroupMembersMod
 import { useHeaderTab } from '@/hooks/headerTab/useHeaderTab';
 import { useAPILeaveChatRoom } from '@/hooks/api/chat/useAPILeaveChatRoomURL';
 import ChatBox from '@/components/chat/ChatBox';
-import AlbumModal from '@/components/chat/AlbumModal';
-import NoteModal from '@/components/chat/NoteModal';
 import 'emoji-mart/css/emoji-mart.css';
 import { Picker } from 'emoji-mart';
 import { useAPISaveReaction } from '@/hooks/api/chat/useAPISaveReaction';
@@ -46,8 +44,6 @@ const ChatDetail = () => {
   const toast = useToast();
 
   const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
-  const [visibleAlbumModal, setVisibleAlbumModal] = useState(false);
-  const [visibleNoteModal, setVisibleNoteModal] = useState(false);
 
   const { mutate: leaveChatGroup } = useAPILeaveChatRoom({
     onSuccess: () => {
@@ -148,21 +144,6 @@ const ChatDetail = () => {
         </ModalContent>
       </Modal>
 
-      {currentRoom && (
-        <NoteModal
-          room={currentRoom}
-          isOpen={visibleNoteModal}
-          onClose={() => setVisibleNoteModal(false)}
-        />
-      )}
-
-      {currentRoom && (
-        <AlbumModal
-          room={currentRoom}
-          isOpen={visibleAlbumModal}
-          onClose={() => setVisibleAlbumModal(false)}
-        />
-      )}
       <CreateChatGroupModal
         isOpen={createGroupWindow}
         closeModal={() => {
@@ -250,12 +231,7 @@ const ChatDetail = () => {
             </Box>
           )}
           {currentRoom && (
-            <ChatBox
-              onClickNoteIcon={() => setVisibleNoteModal(true)}
-              onClickAlbumIcon={() => setVisibleAlbumModal(true)}
-              room={currentRoom}
-              onMenuClicked={handleMenuSelected}
-            />
+            <ChatBox room={currentRoom} onMenuClicked={handleMenuSelected} />
           )}
         </>
       </Box>

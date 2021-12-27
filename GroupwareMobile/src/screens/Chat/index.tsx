@@ -143,6 +143,31 @@ const Chat: React.FC = () => {
       name: userNameFactory(m) + 'さん',
     }));
   };
+  const {refetch: refetchLatest} = useAPIGetMessages(
+    {
+      group: room.id,
+      page: '1',
+    },
+    {
+      enabled: false,
+      onSuccess: latestData => {
+        if (latestData?.length) {
+          const msgToAppend: ChatMessage[] = [];
+          const imagesToApped: ImageSource[] = [];
+          for (const latest of latestData) {
+            if (!messages?.length || isRecent(latest, messages?.[0])) {
+              msgToAppend.push(latest);
+              if (latest.type === ChatMessageType.IMAGE) {
+                imagesToApped.unshift({uri: latest.content});
+              }
+            }
+          }
+          setMessages(m => [...msgToAppend, ...m]);
+          setImagesForViewing(i => [...i, ...imagesToApped]);
+        }
+      },
+    },
+  );
   const {mutate: sendChatMessage, isLoading: loadingSendMessage} =
     useAPISendChatMessage({
       onSuccess: sentMsg => {
@@ -608,8 +633,9 @@ const Chat: React.FC = () => {
 
   useFocusEffect(
     useCallback(() => {
+      refetchLatest();
       refetchRoomDetail();
-    }, [refetchRoomDetail]),
+    }, [refetchLatest, refetchRoomDetail]),
   );
 
   useEffect(() => {
