@@ -77,7 +77,6 @@ const ChatNotes: React.FC = () => {
     useCallback(() => {
       setPage('1');
       refetchNotes();
-      // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [refetchNotes]),
   );
 

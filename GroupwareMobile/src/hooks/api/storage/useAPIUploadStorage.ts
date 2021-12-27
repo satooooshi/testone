@@ -27,7 +27,6 @@ export const uploadStorage = async (formData: FormData): Promise<string[]> => {
         const myBuffer = Buffer.from(file, 'base64');
 
         await axios.put(signedURLMapping[p.name], myBuffer);
-        // console.log(res?.data);
         return signedURLMapping[p.name];
       }),
     );
@@ -52,7 +51,6 @@ export const useAPIUploadStorage = (
   return useMutation<string[], AxiosError, FormData>(uploadStorage, {
     ...mutationOptions,
     onError: (err, variables, context) => {
-      console.log(err);
       Alert.alert(
         err.message.includes('413')
           ? 'ファイルの容量が大きい為、アップロード出来ませんでした。\n容量が大きくないファイルを使用して下さい。'

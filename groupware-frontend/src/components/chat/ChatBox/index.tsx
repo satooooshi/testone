@@ -37,6 +37,13 @@ const Viewer = dynamic(() => import('react-viewer'), { ssr: false });
 import '@draft-js-plugins/mention/lib/plugin.css';
 import '@draft-js-plugins/image/lib/plugin.css';
 import UserAvatar from '@/components/common/UserAvatar';
+import io from 'socket.io-client';
+import { baseURL } from 'src/utils/url';
+import { useAuthenticate } from 'src/contexts/useAuthenticate';
+
+const socket = io(baseURL, {
+  transports: ['websocket'],
+});
 
 type ChatBoxProps = {
   room: ChatGroup;
@@ -51,6 +58,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({
   onClickAlbumIcon,
   onClickNoteIcon,
 }) => {
+  const { user: myself } = useAuthenticate();
   const [page, setPage] = useState(1);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const {
@@ -80,23 +88,15 @@ const ChatBox: React.FC<ChatBoxProps> = ({
     group: room.id,
     page: page.toString(),
   });
-  const { data: latestMessage, isLoading: isLoadingLatestMsg } =
-    useAPIGetMessages(
-      {
-        group: room.id,
-        page: '1',
-      },
-      { refetchInterval: 1000 },
-    );
 
   const { mutate: sendChatMessage } = useAPISendChatMessage({
     onSuccess: (data) => {
-      if (!isLoadingLatestMsg) {
-        if (messages.length && messages[messages.length - 1].id !== data.id) {
-          messages.unshift(data);
+      setTimeout(() => {
+        if (data.id !== messages?.[0].id) {
+          setMessages([data, ...messages]);
         }
-        setMessages(messages);
-      }
+      }, 1000);
+      socket.emit('message', { ...data, isSender: false });
       setImagesForViewing((i) => [
         ...i,
         { src: data.content, alt: '送信された画像' },
@@ -297,23 +297,33 @@ const ChatBox: React.FC<ChatBoxProps> = ({
   }, [room.id, saveLastReadChatTime]);
 
   useEffect(() => {
-    if (
-      latestMessage?.length &&
-      messages?.length &&
-      latestMessage[0].chatGroup?.id === messages[0].chatGroup?.id
-    ) {
-      const msgToAppend: ChatMessage[] = [];
-      for (const sentMsg of latestMessage) {
-        if (isRecent(sentMsg, messages[0])) {
-          msgToAppend.push(sentMsg);
+    socket.emit('joinRoom', room.id);
+    socket.on('msgToClient', async (sentMsgByOtherUsers: ChatMessage) => {
+      console.log('sent by other users', sentMsgByOtherUsers.content);
+      if (sentMsgByOtherUsers.content) {
+        sentMsgByOtherUsers.createdAt = new Date(sentMsgByOtherUsers.createdAt);
+        sentMsgByOtherUsers.updatedAt = new Date(sentMsgByOtherUsers.updatedAt);
+        if (sentMsgByOtherUsers.sender?.id === myself?.id) {
+          sentMsgByOtherUsers.isSender = true;
         }
+        setMessages((m) => {
+          return [sentMsgByOtherUsers, ...m];
+        });
       }
-      setMessages((m) => {
-        return [...msgToAppend, ...m];
-      });
-    }
+    });
+
+    socket.on('joinedRoom', (r: any) => {
+      console.log('joinedRoom', r);
+    });
+
+    socket.on('leftRoom', (r: any) => {
+      console.log('leftRoom', r);
+    });
+    return () => {
+      socket.emit('leaveRoom', room.id);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [latestMessage]);
+  }, [room.id]);
 
   const activeIndex = useMemo(() => {
     if (selectedImageURL) {

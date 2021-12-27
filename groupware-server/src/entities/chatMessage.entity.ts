@@ -105,6 +105,9 @@ export class ChatMessage {
     ) {
       this.content = await genSignedURL(this.content);
     }
+    if (this.type === ChatMessageType.OTHER_FILE) {
+      this.content = mentionTransform(this.content);
+    }
   }
 
   @AfterInsert()

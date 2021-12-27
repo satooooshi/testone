@@ -70,10 +70,19 @@ import {useAPIGetRoomDetail} from '../../hooks/api/chat/useAPIGetRoomDetail';
 import {chatMessageSchema} from '../../utils/validation/schema';
 import {reactionEmojis} from '../../utils/factory/reactionEmojis';
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
+import io from 'socket.io-client';
+import {baseURL} from '../../utils/url';
+import {getThumbnailOfVideo} from '../../utils/getThumbnailOfVideo';
+import {useAuthenticate} from '../../contexts/useAuthenticate';
+
+const socket = io(baseURL, {
+  transports: ['websocket'],
+});
 
 const TopTab = createMaterialTopTabNavigator();
 
 const Chat: React.FC = () => {
+  const {user: myself} = useAuthenticate();
   const typeDropdownRef = useRef<any | null>(null);
   const navigation = useNavigation<ChatNavigationProps>();
   const {height: windowHeight} = useWindowDimensions();
@@ -125,13 +134,6 @@ const Chat: React.FC = () => {
     group: room.id,
     page: page.toString(),
   });
-  const {data: latestMessage, isFetching} = useAPIGetMessages(
-    {
-      group: room.id,
-      page: '1',
-    },
-    {refetchInterval: 3000},
-  );
   const suggestions = (): Suggestion[] => {
     if (!room.members) {
       return [];
@@ -144,11 +146,12 @@ const Chat: React.FC = () => {
   const {mutate: sendChatMessage, isLoading: loadingSendMessage} =
     useAPISendChatMessage({
       onSuccess: sentMsg => {
-        if (!isFetching) {
-          setMessages(m => {
-            return [sentMsg, ...m];
-          });
-        }
+        socket.emit('message', {...sentMsg, isSender: false});
+        setTimeout(() => {
+          if (sentMsg.id !== messages?.[0].id) {
+            setMessages([sentMsg, ...messages]);
+          }
+        }, 1000);
         setValues(v => ({
           ...v,
           content: '',
@@ -381,23 +384,39 @@ const Chat: React.FC = () => {
   }, [longPressedMsg]);
 
   useEffect(() => {
-    if (
-      latestMessage?.length &&
-      messages?.length &&
-      latestMessage[0].chatGroup?.id === messages[0].chatGroup?.id
-    ) {
-      const msgToAppend: ChatMessage[] = [];
-      for (const sentMsg of latestMessage) {
-        if (isRecent(sentMsg, messages[0])) {
-          msgToAppend.unshift(sentMsg);
+    socket.emit('joinRoom', room.id);
+    socket.on('msgToClient', async (sentMsgByOtherUsers: ChatMessage) => {
+      if (sentMsgByOtherUsers.content) {
+        sentMsgByOtherUsers.createdAt = new Date(sentMsgByOtherUsers.createdAt);
+        sentMsgByOtherUsers.updatedAt = new Date(sentMsgByOtherUsers.updatedAt);
+        if (sentMsgByOtherUsers.sender?.id === myself?.id) {
+          sentMsgByOtherUsers.isSender = true;
         }
+        if (sentMsgByOtherUsers.type === ChatMessageType.IMAGE) {
+          setImagesForViewing(i => [...i, {uri: sentMsgByOtherUsers.content}]);
+        } else if (sentMsgByOtherUsers.type === ChatMessageType.VIDEO) {
+          sentMsgByOtherUsers.thumbnail = await getThumbnailOfVideo(
+            sentMsgByOtherUsers.content,
+          );
+        }
+        setMessages(m => {
+          return [sentMsgByOtherUsers, ...m];
+        });
       }
-      setMessages(m => {
-        return [...msgToAppend, ...m];
-      });
-    }
+    });
+
+    // socket.on('joinedRoom', (r: any) => {
+    // console.log('joinedRoom', r);
+    // });
+
+    // socket.on('leftRoom', (r: any) => {
+    // console.log('leftRoom', r);
+    // });
+    return () => {
+      // socket.emit('leaveRoom', room.id);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [latestMessage]);
+  }, [room.id]);
 
   useEffect(() => {
     if (fetchedPastMessages?.length) {

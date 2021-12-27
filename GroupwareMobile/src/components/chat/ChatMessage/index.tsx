@@ -90,6 +90,10 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
     </Div>
   );
 
+  if (!message.content) {
+    return <></>;
+  }
+
   return (
     <>
       {message.type === ChatMessageType.SYSTEM_TEXT && (

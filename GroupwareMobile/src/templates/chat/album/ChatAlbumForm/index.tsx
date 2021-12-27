@@ -60,6 +60,7 @@ const ChatAlbumForm: React.FC<ChatAlbumFormProps> = ({
   });
   const images: ImageSource[] =
     values.images?.map(i => ({uri: i.imageURL || ''})) || [];
+  // console.log(values?.images?.[0].imageURL);
 
   const handlePressImage = (url: string) => {
     const isNowUri = (element: ImageSource) => element.uri === url;

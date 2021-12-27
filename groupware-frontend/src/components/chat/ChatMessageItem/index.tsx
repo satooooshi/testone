@@ -229,6 +229,10 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
     </Popover>
   );
 
+  if (!message.content) {
+    return <></>;
+  }
+
   return (
     <Box
       display="flex"
