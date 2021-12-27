@@ -392,7 +392,20 @@ const NoteModal: React.FC<NoteModalProps> = ({ isOpen, onClose, room }) => {
                 });
                 fileArr.push(renamedFile);
               }
-              onUploadImage(fileArr);
+              uploadImage(fileArr, {
+                onSuccess: (imageURLs) => {
+                  setImageUploading(false);
+                  const images: Partial<ChatNoteImage>[] = imageURLs.map(
+                    (i) => ({ imageURL: i }),
+                  );
+                  setValues((v) => ({
+                    ...v,
+                    images: v.images?.length
+                      ? [...v.images, ...images]
+                      : [...images],
+                  }));
+                },
+              });
             }}
           />
         </Box>
