@@ -493,6 +493,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
           <>
             {messages.map((m) => (
               <ChatMessageItem
+                usersInRoom={room.members || []}
                 key={m.id + m.content}
                 message={m}
                 readUsers={readUsers(m)}

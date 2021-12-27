@@ -2,12 +2,6 @@ import {
   Box,
   Button,
   Link,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalHeader,
-  ModalOverlay,
   Popover,
   PopoverBody,
   PopoverCloseButton,
@@ -31,7 +25,6 @@ import {
 import { dateTimeFormatterFromJSDDate } from 'src/utils/dateTimeFormatter';
 import { userNameFactory } from 'src/utils/factory/userNameFactory';
 import boldMascot from '@/public/bold-mascot.png';
-import { darkFontColor } from 'src/utils/colors';
 import { Menu, MenuItem, MenuButton } from '@szhsin/react-menu';
 import { HiOutlineDotsCircleHorizontal } from 'react-icons/hi';
 import { useState } from 'react';
@@ -46,15 +39,18 @@ import TextMessage from './TextMessage';
 import { useAPIDeleteReaction } from '@/hooks/api/chat/useAPIDeleteReaction';
 import { AiOutlineUnorderedList } from 'react-icons/ai';
 import ReactionListModal from './ReactionListModal';
+import ReadUsersListModal from './ReadUsersListModal';
 
 type ChatMessageItemProps = {
   message: ChatMessage;
   onClickReply: () => void;
   readUsers: User[];
   onClickImage: () => void;
+  usersInRoom: User[];
 };
 
 const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
+  usersInRoom,
   message,
   onClickReply,
   readUsers,
@@ -256,34 +252,13 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
       display="flex"
       flexDir="column"
       alignItems={messageState.isSender ? 'flex-end' : 'flex-start'}>
-      <Modal
+      <ReadUsersListModal
+        usersInRoom={usersInRoom}
         isOpen={visibleReadModal}
-        onClose={() => setVisibleLastReadModal(false)}>
-        <ModalOverlay />
-        <ModalContent h="90vh" bg={'#f9fafb'}>
-          <ModalHeader>既読一覧</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            {readUsers.map((u) => (
-              <Link
-                key={u.id}
-                display="flex"
-                flexDir="row"
-                borderBottom={'1px'}
-                py="8px"
-                alignItems="center"
-                justifyContent="space-between"
-                href={`/account/${u?.id}`}
-                passHref>
-                <Box display="flex" flexDir="row" alignItems="center">
-                  <Avatar src={u.avatarUrl} w="40px" h="40px" mr="16px" />
-                  <Text fontSize={darkFontColor}>{userNameFactory(u)}</Text>
-                </Box>
-              </Link>
-            ))}
-          </ModalBody>
-        </ModalContent>
-      </Modal>
+        onClose={() => setVisibleLastReadModal(false)}
+        readUsers={readUsers}
+      />
+
       <ReactionListModal
         isOpen={reactionModal}
         onClose={() => setReactionModal(false)}
