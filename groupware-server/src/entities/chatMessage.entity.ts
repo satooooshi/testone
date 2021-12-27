@@ -137,7 +137,7 @@ export class ChatMessage {
         .getMany();
       const notificationDataWithNoMention: CustomPushNotificationData = {
         title: `新着メッセージが届きました`,
-        body: `${this.content}`,
+        body: `${mentionTransform(this.content)}`,
         custom: {
           screen: 'chat',
           id: this.chatGroup.id.toString(),
