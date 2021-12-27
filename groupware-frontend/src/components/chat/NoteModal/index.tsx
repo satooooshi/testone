@@ -43,6 +43,7 @@ const NoteModal: React.FC<NoteModalProps> = ({ isOpen, onClose, room }) => {
   const toast = useToast();
   const modalRef = useRef<HTMLDivElement | null>(null);
   const headerName = 'ノート一覧';
+  const [imageUploading, setImageUploading] = useState<boolean>(false);
   const [noteListPage, setNoteListPage] = useState(1);
   const [edittedNote, setEdittedNote] = useState<ChatNote>();
   const {
@@ -259,6 +260,7 @@ const NoteModal: React.FC<NoteModalProps> = ({ isOpen, onClose, room }) => {
             hidden
             name="imageUploadToAlbum"
             onChange={() => {
+              setImageUploading(true);
               const files = imageUploaderRef.current?.files;
               const fileArr: File[] = [];
               if (!files) {
@@ -273,6 +275,7 @@ const NoteModal: React.FC<NoteModalProps> = ({ isOpen, onClose, room }) => {
               }
               uploadImage(fileArr, {
                 onSuccess: (imageURLs) => {
+                  setImageUploading(false);
                   const images: Partial<ChatNoteImage>[] = imageURLs.map(
                     (i) => ({ imageURL: i }),
                   );
@@ -307,9 +310,15 @@ const NoteModal: React.FC<NoteModalProps> = ({ isOpen, onClose, room }) => {
         />
       </Box>
       <Box display="flex" justifyContent="center" alignItems="center">
-        <Button colorScheme="pink" onClick={() => handleSubmit()}>
-          作成
-        </Button>
+        {imageUploading ? (
+          <Button colorScheme="pink" disabled>
+            <Spinner />
+          </Button>
+        ) : (
+          <Button colorScheme="pink" onClick={() => handleSubmit()}>
+            作成
+          </Button>
+        )}
       </Box>
     </Box>
   );
@@ -366,6 +375,7 @@ const NoteModal: React.FC<NoteModalProps> = ({ isOpen, onClose, room }) => {
             hidden
             name="imageUploadToAlbum"
             onChange={() => {
+              setImageUploading(true);
               const files = imageUploaderRef.current?.files;
               const fileArr: File[] = [];
               if (!files) {
@@ -417,9 +427,15 @@ const NoteModal: React.FC<NoteModalProps> = ({ isOpen, onClose, room }) => {
         />
       </Box>
       <Box display="flex" justifyContent="center" alignItems="center">
-        <Button colorScheme="pink" onClick={() => handleSubmit()}>
-          更新
-        </Button>
+        {imageUploading ? (
+          <Button colorScheme="pink" disabled>
+            <Spinner />
+          </Button>
+        ) : (
+          <Button colorScheme="pink" onClick={() => handleSubmit()}>
+            更新
+          </Button>
+        )}
       </Box>
     </Box>
   );
