@@ -1,16 +1,22 @@
-import { AxiosError } from 'axios';
+import axios, { AxiosError } from 'axios';
 import { useMutation, UseMutationOptions } from 'react-query';
 import { axiosInstance } from 'src/utils/url';
 import { uploadStorageURL } from 'src/utils/url/storage.url';
 
 export const uploadStorage = async (files: File[]): Promise<string[]> => {
+  const fileNames = files.map((f) => f.name);
   try {
-    const formData = new FormData();
-    for (const file of files) {
-      formData.append('files', file);
-    }
-    const res = await axiosInstance.post(uploadStorageURL, formData);
-    return res.data;
+    const res = await axiosInstance.post(uploadStorageURL, fileNames);
+    const signedURLMapping: { [fileName: string]: string } = res.data;
+    const fileURLs = Promise.all(
+      files.map(async (f) => {
+        const formData = new FormData();
+        formData.append('file', f);
+        await axios.put(signedURLMapping[f.name], f);
+        return signedURLMapping[f.name];
+      }),
+    );
+    return fileURLs;
   } catch (err) {
     if (err instanceof Error) {
       throw new Error(err.message);

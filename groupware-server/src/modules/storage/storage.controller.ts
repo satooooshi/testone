@@ -1,4 +1,5 @@
 import {
+  Body,
   Controller,
   Post,
   UploadedFiles,
@@ -15,14 +16,19 @@ export class StorageController {
 
   @Post('upload')
   @UseGuards(JwtAuthenticationGuard)
-  @UseInterceptors(FilesInterceptor('files'))
-  async upload(@UploadedFiles() files: Express.Multer.File[]) {
-    const fileURLs = await this.storageService.upload(files);
-    const signedURLs: string[] = [];
-    for (const u of fileURLs) {
-      const parsedURL = await this.storageService.parseStorageURLToSignedURL(u);
-      signedURLs.push(parsedURL);
-    }
-    return signedURLs;
+  // @UseInterceptors(FilesInterceptor('files'))
+  async upload(
+    @Body()
+    fileNames: string[] /* @UploadedFiles() files: Express.Multer.File[] */,
+  ) {
+    const fileURLs = await this.storageService.genSignedURLForUpload(
+      fileNames /* files */,
+    );
+    // const signedURLs: string[] = [];
+    // for (const u of fileURLs) {
+    //   const parsedURL = await this.storageService.parseStorageURLToSignedURL(u);
+    //   signedURLs.push(parsedURL);
+    // }
+    return fileURLs;
   }
 }

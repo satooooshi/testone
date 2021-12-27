@@ -1,5 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { Storage } from '@google-cloud/storage';
+import {
+  GetBucketSignedUrlConfig,
+  GetSignedUrlConfig,
+  Storage,
+} from '@google-cloud/storage';
 import { ConfigService } from '@nestjs/config';
 
 @Injectable()
@@ -8,6 +12,25 @@ export class StorageService {
   private readonly storage = new Storage({
     keyFilename: __dirname + '../../../cloud_storage.json',
   });
+
+  public async genSignedURLForUpload(fileNames: string[]) {
+    const options: GetSignedUrlConfig = {
+      version: 'v4',
+      action: 'write',
+      //1 hour
+      expires: Date.now() + 30 * 60 * 1000,
+    };
+    const signedURLs: { [fileName: string]: string } = {};
+    for await (const fn of fileNames) {
+      const bucketName = this.configService.get('CLOUD_STORAGE_BUCKET');
+      const signedURL = await this.storage
+        .bucket(bucketName)
+        .file(Date.now() + '/' + fn.replace(/ /g, '_'))
+        .getSignedUrl(options);
+      signedURLs[fn] = signedURL[0];
+    }
+    return signedURLs;
+  }
 
   public async upload(files: Express.Multer.File[]) {
     const storage = new Storage({
