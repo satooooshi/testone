@@ -20,15 +20,15 @@ export class ChatGateway
   private logger: Logger = new Logger('AppGateway');
 
   afterInit() {
-    this.logger.log('Init');
+    // this.logger.log('Init');
   }
 
   handleDisconnect(client: Socket) {
-    this.logger.log(`Client disconnected: ${client.id}`);
+    // this.logger.log(`Client disconnected: ${client.id}`);
   }
 
   handleConnection(client: Socket) {
-    this.logger.log(`Client connected: ${client.id}`);
+    // this.logger.log(`Client connected: ${client.id}`);
     this.server.emit('msgToClient', 'connected');
   }
 
@@ -36,7 +36,7 @@ export class ChatGateway
   public async handleMessage(_: Socket, payload: ChatMessage) {
     this.server
       .to(payload.chatGroup?.id.toString())
-      .emit('msgToClient', payload);
+      .emit('msgToClient', { ...payload, isSender: false });
   }
 
   @SubscribeMessage('joinRoom')

@@ -15,6 +15,7 @@ import {requestIOSMsgPermission} from '../utils/permission/requestIOSMsgPermisso
 import {useAPIRegisterDevice} from '../hooks/api/notification/useAPIRegisterDevice';
 import ForgotPassword from '../screens/auth/ForgotPassword';
 import WebEngine from '../components/WebEngine';
+import {Alert} from 'react-native';
 
 const Stack = createStackNavigator<RootStackParamList>();
 
@@ -62,18 +63,7 @@ const Navigator = () => {
       },
       requestPermissions: true,
     });
-    PushNotification.createChannel(
-      {
-        channelId: 'default-channel-id',
-        channelName: '通知全般',
-        importance: Importance.HIGH,
-      },
-      result => {
-        console.log(result);
-      },
-    );
     const unsubscribe = messaging().onMessage(async remoteMessage => {
-      console.log('sent', remoteMessage?.data?.screen);
       PushNotification.localNotification({
         channelId: 'default-channel-id',
         ignoreInForeground: false,
@@ -82,7 +72,7 @@ const Navigator = () => {
         vibration: 300,
         priority: 'high', // (optional) set notification priority, default: high
 
-        visibility: 'private', // (optional) set notification visibility, default: private
+        visibility: 'public', // (optional) set notification visibility, default: private
 
         message: remoteMessage.notification?.body || '',
         title: remoteMessage.notification?.title,
