@@ -201,7 +201,6 @@ const NoteModal: React.FC<NoteModalProps> = ({ isOpen, onClose, room }) => {
   useEffect(() => {
     const refreshNotes = () => {
       setNoteListPage(1);
-      setNotesForInfiniteScroll([]);
       refetchNotes();
     };
     if (!edittedNote && room) {
