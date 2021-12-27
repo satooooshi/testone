@@ -161,6 +161,12 @@ const AlbumModal: React.FC<AlbumModalProps> = ({ isOpen, onClose, room }) => {
         createAlbum(submittedValues, {
           onSuccess: () => {
             setMode('list');
+            toast({
+              description: 'アルバムを作成しました',
+              status: 'success',
+              duration: 3000,
+              isClosable: true,
+            });
             resetForm();
           },
         });
@@ -316,6 +322,7 @@ const AlbumModal: React.FC<AlbumModalProps> = ({ isOpen, onClose, room }) => {
             disabled
             colorScheme="green"
             alignItems="center">
+            <Text display="inline">画像アップロード中</Text>
             <Spinner />
           </Button>
         ) : (
