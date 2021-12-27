@@ -49,6 +49,7 @@ const AlbumModal: React.FC<AlbumModalProps> = ({ isOpen, onClose, room }) => {
   const headerName = 'アルバム一覧';
   const toast = useToast();
   const { mutate: deleteAlbum } = useAPIDeleteChatAlbum();
+  const [imageUploading, setImageUploading] = useState<boolean>(false);
   const [albumListPage, setAlbumListPage] = useState(1);
   const [albumImageListPage, setAlbumImageListPage] = useState(1);
   const {
@@ -222,9 +223,11 @@ const AlbumModal: React.FC<AlbumModalProps> = ({ isOpen, onClose, room }) => {
   };
 
   const imageUploadToNewAlbum = () => {
+    setImageUploading(true);
     const files = imageUploaderRef.current?.files;
     const fileArr: File[] = [];
     if (!files) {
+      setImageUploading(false);
       return;
     }
     for (let i = 0; i < files.length; i++) {
@@ -236,6 +239,7 @@ const AlbumModal: React.FC<AlbumModalProps> = ({ isOpen, onClose, room }) => {
     }
     uploadImage(fileArr, {
       onSuccess: (imageURLs) => {
+        setImageUploading(false);
         const images: Partial<ChatAlbumImage>[] = imageURLs.map((i) => ({
           imageURL: i,
         }));
@@ -304,15 +308,27 @@ const AlbumModal: React.FC<AlbumModalProps> = ({ isOpen, onClose, room }) => {
           <AiOutlineLeft size={24} style={{ display: 'inline' }} />
           <Text display="inline">一覧へ戻る</Text>
         </Button>
-        <Button
-          size="sm"
-          flexDir="row"
-          onClick={() => handleSubmit()}
-          mb="8px"
-          colorScheme="green"
-          alignItems="center">
-          <Text display="inline">アルバムを作成</Text>
-        </Button>
+        {imageUploading ? (
+          <Button
+            size="sm"
+            flexDir="row"
+            mb="8px"
+            disabled
+            colorScheme="green"
+            alignItems="center">
+            <Spinner />
+          </Button>
+        ) : (
+          <Button
+            size="sm"
+            flexDir="row"
+            onClick={() => handleSubmit()}
+            mb="8px"
+            colorScheme="green"
+            alignItems="center">
+            <Text display="inline">アルバムを作成</Text>
+          </Button>
+        )}
       </Box>
       <FormLabel>アルバム名</FormLabel>
       {errors.title && touched.title ? (
