@@ -50,7 +50,7 @@ const AlbumBox: React.FC<AlbumBoxProps> = ({
         <Image
           src={album.images[0].imageURL}
           alt="アルバム画像"
-          w={'100%'}
+          maxW={'100%'}
           h={'200px'}
         />
       ) : (
