@@ -14,11 +14,12 @@ import {
 import { Response } from 'express';
 import { ChatAlbum } from 'src/entities/chatAlbum.entity';
 import { ChatGroup } from 'src/entities/chatGroup.entity';
-import { ChatMessage } from 'src/entities/chatMessage.entity';
+import { ChatMessage, ChatMessageType } from 'src/entities/chatMessage.entity';
 import { ChatMessageReaction } from 'src/entities/chatMessageReaction.entity';
 import { ChatNote } from 'src/entities/chatNote.entity';
 import { LastReadChatTime } from 'src/entities/lastReadChatTime.entity';
 import { User } from 'src/entities/user.entity';
+import { userNameFactory } from 'src/utils/factory/userNameFactory';
 import JwtAuthenticationGuard from '../auth/jwtAuthentication.guard';
 import RequestWithUser from '../auth/requestWithUser.interface';
 import { ChatService } from './chat.service';
@@ -233,6 +234,12 @@ export class ChatController {
     const { user } = req;
     body.editors = [user];
     const notes = await this.chatNoteService.saveChatNotes(body);
+    await this.chatService.sendMessage({
+      content: `${userNameFactory(user)}さんが新しいノートを作成しました`,
+      type: ChatMessageType.SYSTEM_TEXT,
+      chatGroup: body.chatGroup,
+      sender: user,
+    });
     return notes;
   }
 
@@ -292,6 +299,14 @@ export class ChatController {
     const { user } = req;
     body.editors = [user];
     const albums = await this.chatAlbumService.saveChatAlbums(body);
+    await this.chatService.sendMessage({
+      content: `${userNameFactory(user)}さんが新しいアルバム: ${
+        albums.title
+      }を作成しました`,
+      type: ChatMessageType.SYSTEM_TEXT,
+      chatGroup: body.chatGroup,
+      sender: user,
+    });
     return albums;
   }
 

@@ -297,7 +297,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({
   }, [room.id, saveLastReadChatTime]);
 
   useEffect(() => {
-    socket.emit('joinRoom', room.id);
+    socket.emit('joinRoom', room.id.toString());
     socket.on('msgToClient', async (sentMsgByOtherUsers: ChatMessage) => {
       console.log('sent by other users', sentMsgByOtherUsers.content);
       if (sentMsgByOtherUsers.content) {
@@ -312,13 +312,13 @@ const ChatBox: React.FC<ChatBoxProps> = ({
       }
     });
 
-    socket.on('joinedRoom', (r: any) => {
-      console.log('joinedRoom', r);
-    });
-
-    socket.on('leftRoom', (r: any) => {
-      console.log('leftRoom', r);
-    });
+    // socket.on('joinedRoom', (r: any) => {
+    //   console.log('joinedRoom', r);
+    // });
+    //
+    // socket.on('leftRoom', (r: any) => {
+    //   console.log('leftRoom', r);
+    // });
     return () => {
       socket.emit('leaveRoom', room.id);
     };

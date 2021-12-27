@@ -384,7 +384,7 @@ const Chat: React.FC = () => {
   }, [longPressedMsg]);
 
   useEffect(() => {
-    socket.emit('joinRoom', room.id);
+    socket.emit('joinRoom', room.id.toString());
     socket.on('msgToClient', async (sentMsgByOtherUsers: ChatMessage) => {
       if (sentMsgByOtherUsers.content) {
         sentMsgByOtherUsers.createdAt = new Date(sentMsgByOtherUsers.createdAt);
@@ -405,15 +405,15 @@ const Chat: React.FC = () => {
       }
     });
 
-    // socket.on('joinedRoom', (r: any) => {
-    // console.log('joinedRoom', r);
-    // });
+    socket.on('joinedRoom', (r: any) => {
+      console.log('joinedRoom', r);
+    });
 
-    // socket.on('leftRoom', (r: any) => {
-    // console.log('leftRoom', r);
-    // });
+    socket.on('leftRoom', (r: any) => {
+      console.log('leftRoom', r);
+    });
     return () => {
-      // socket.emit('leaveRoom', room.id);
+      socket.emit('leaveRoom', room.id);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [room.id]);

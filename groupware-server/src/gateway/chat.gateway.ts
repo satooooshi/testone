@@ -46,8 +46,9 @@ export class ChatGateway
     console.log('message');
     console.log(payload.content);
     console.log(payload.chatGroup?.id);
+    console.log(payload.chatGroup?.id.toString());
     this.server
-      // .to(payload.chatGroup?.id.toString())
+      .to(payload.chatGroup?.id.toString())
       .emit('msgToClient', payload);
   }
 
