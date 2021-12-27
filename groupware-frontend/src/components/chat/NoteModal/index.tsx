@@ -132,8 +132,10 @@ const NoteModal: React.FC<NoteModalProps> = ({ isOpen, onClose, room }) => {
     validationSchema: noteSchema,
     onSubmit: (submittedValues) => {
       if (mode === 'new') {
+        console.log('new');
         createNote(submittedValues);
       } else {
+        console.log('edit');
         updateNote(submittedValues as ChatNote);
       }
     },
@@ -260,10 +262,11 @@ const NoteModal: React.FC<NoteModalProps> = ({ isOpen, onClose, room }) => {
             hidden
             name="imageUploadToAlbum"
             onChange={() => {
-              setImageUploading(true);
               const files = imageUploaderRef.current?.files;
               const fileArr: File[] = [];
+              setImageUploading(true);
               if (!files) {
+                setImageUploading(false);
                 return;
               }
               for (let i = 0; i < files.length; i++) {
@@ -375,10 +378,11 @@ const NoteModal: React.FC<NoteModalProps> = ({ isOpen, onClose, room }) => {
             hidden
             name="imageUploadToAlbum"
             onChange={() => {
-              setImageUploading(true);
               const files = imageUploaderRef.current?.files;
               const fileArr: File[] = [];
+              setImageUploading(true);
               if (!files) {
+                setImageUploading(false);
                 return;
               }
               for (let i = 0; i < files.length; i++) {
