@@ -147,6 +147,12 @@ const NoteModal: React.FC<NoteModalProps> = ({ isOpen, onClose, room }) => {
       setNotesForInfiniteScroll([]);
       setNoteListPage(1);
       refetchNotes();
+      toast({
+        title: 'ノートを作成しました',
+        status: 'success',
+        duration: 3000,
+        isClosable: true,
+      });
     },
   });
   const [mode, setMode] = useState<'new' | 'edit' | 'list'>('list');
