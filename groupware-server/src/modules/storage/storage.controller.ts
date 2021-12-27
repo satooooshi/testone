@@ -19,10 +19,10 @@ export class StorageController {
   // @UseInterceptors(FilesInterceptor('files'))
   async read(
     @Body()
-    fileNames: string[] /* @UploadedFiles() files: Express.Multer.File[] */,
+    urls: string[] /* @UploadedFiles() files: Express.Multer.File[] */,
   ) {
     const fileURLs = await this.storageService.genSignedURLForRead(
-      fileNames /* files */,
+      urls /* files */,
     );
     // const signedURLs: string[] = [];
     // for (const u of fileURLs) {
@@ -32,10 +32,10 @@ export class StorageController {
     return fileURLs;
   }
 
-  @Post('upload')
+  @Post('write')
   @UseGuards(JwtAuthenticationGuard)
   // @UseInterceptors(FilesInterceptor('files'))
-  async upload(
+  async write(
     @Body()
     fileNames: string[] /* @UploadedFiles() files: Express.Multer.File[] */,
   ) {
@@ -48,5 +48,18 @@ export class StorageController {
     //   signedURLs.push(parsedURL);
     // }
     return fileURLs;
+  }
+
+  @Post('upload')
+  @UseGuards(JwtAuthenticationGuard)
+  @UseInterceptors(FilesInterceptor('files'))
+  async upload(@UploadedFiles() files: Express.Multer.File[]) {
+    const fileURLs = await this.storageService.upload(files);
+    const signedURLs: string[] = [];
+    for (const u of fileURLs) {
+      const parsedURL = await this.storageService.parseStorageURLToSignedURL(u);
+      signedURLs.push(parsedURL);
+    }
+    return signedURLs;
   }
 }
