@@ -95,17 +95,19 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
               />
             </Box>
           ))}
-          <Button
-            onClick={() => {
-              setReactionModal(true);
-            }}
-            bg={'blue.200'}
-            flexDir="row"
-            borderColor={'blue.600'}
-            borderWidth={1}
-            size="xs">
-            <AiOutlineUnorderedList size={24} />
-          </Button>
+          {message.isSender ? (
+            <Button
+              onClick={() => {
+                setReactionModal(true);
+              }}
+              bg={'blue.200'}
+              flexDir="row"
+              borderColor={'blue.600'}
+              borderWidth={1}
+              size="xs">
+              <AiOutlineUnorderedList size={24} />
+            </Button>
+          ) : null}
         </>
       ) : null}
     </Box>
@@ -287,7 +289,6 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
         onClose={() => setReactionModal(false)}
         reactions={messageState.reactions || []}
       />
-
       {messageState.type === ChatMessageType.SYSTEM_TEXT ? (
         <SystemMessage message={messageState} />
       ) : null}
