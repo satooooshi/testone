@@ -7,16 +7,21 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  getRepository,
   JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { QAAnswer } from './qaAnswer.entity';
-import { TextFormat } from './wiki.entity';
+import { TextFormat, Wiki } from './wiki.entity';
 import { User } from './user.entity';
 import { genSignedURL } from 'src/utils/storage/genSignedURL';
 import { genStorageURL } from 'src/utils/storage/genStorageURL';
+import {
+  CustomPushNotificationData,
+  sendPushNotifToSpecificUsers,
+} from 'src/utils/notification/sendPushNotification';
 
 @Entity({ name: 'qa_answer_replies' })
 export class QAAnswerReply {
@@ -58,6 +63,27 @@ export class QAAnswerReply {
     name: 'updated_at',
   })
   updatedAt: Date;
+
+  @AfterInsert()
+  async sendPushNotification?() {
+    const targetWiki = await getRepository(Wiki)
+      .createQueryBuilder('wiki')
+      .leftJoinAndSelect('wiki.answers', 'a')
+      .leftJoinAndSelect('wiki.writer', 'writer')
+      .where('a.id = :answerId', {
+        answerId: this.answer.id,
+      })
+      .getOne();
+    const notificationData: CustomPushNotificationData = {
+      title: `あなたの質問の回答に返信が送られました`,
+      body: '',
+      custom: {
+        screen: 'wiki',
+        id: targetWiki.id.toString(),
+      },
+    };
+    await sendPushNotifToSpecificUsers([targetWiki.writer], notificationData);
+  }
 
   @BeforeInsert()
   @BeforeUpdate()

@@ -108,7 +108,9 @@ export class WikiService {
       const existWiki = await this.wikiRepository.findOne(answer.wiki.id);
       answer.wiki = existWiki;
       answer.body = this.storageService.parseSignedURLToStorageURL(answer.body);
-      const newAnswer = await this.qaAnswerRepository.save(answer);
+      const newAnswer = await this.qaAnswerRepository.save(
+        this.qaAnswerRepository.create(answer),
+      );
       return newAnswer;
     } catch (err) {
       throw new BadRequestException(
@@ -151,7 +153,9 @@ export class WikiService {
       );
       reply.answer = existAnswer;
       reply.body = this.storageService.parseSignedURLToStorageURL(reply.body);
-      const newAnswer = await this.qaAnswerReplyRepository.save(reply);
+      const newAnswer = await this.qaAnswerReplyRepository.save(
+        this.qaAnswerReplyRepository.create(reply),
+      );
       return newAnswer;
     } catch (err) {
       throw new BadRequestException(

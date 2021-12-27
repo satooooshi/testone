@@ -7,6 +7,7 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  getRepository,
   JoinColumn,
   ManyToOne,
   OneToMany,
@@ -18,6 +19,10 @@ import { TextFormat, Wiki } from './wiki.entity';
 import { User } from './user.entity';
 import { genSignedURL } from 'src/utils/storage/genSignedURL';
 import { genStorageURL } from 'src/utils/storage/genStorageURL';
+import {
+  CustomPushNotificationData,
+  sendPushNotifToSpecificUsers,
+} from 'src/utils/notification/sendPushNotification';
 
 @Entity({ name: 'qa_answers' })
 export class QAAnswer {
@@ -62,6 +67,27 @@ export class QAAnswer {
     name: 'updated_at',
   })
   updatedAt: Date;
+
+  @AfterInsert()
+  async sendPushNotification?() {
+    const notificationData: CustomPushNotificationData = {
+      title: `あなたの質問に新しい回答が投稿されました`,
+      body: '',
+      custom: {
+        screen: 'wiki',
+        id: this.wiki.id.toString(),
+      },
+    };
+    const targetUser = await getRepository(User)
+      .createQueryBuilder('user')
+      .select('user.id')
+      .leftJoin('user.wiki', 'w')
+      .where('w.id = :wikiId', {
+        wikiId: this.wiki.id,
+      })
+      .getOne();
+    await sendPushNotifToSpecificUsers([targetUser], notificationData);
+  }
 
   @BeforeInsert()
   @BeforeUpdate()
