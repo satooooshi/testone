@@ -44,6 +44,8 @@ import ImageMessage from './ImageMessage';
 import FileMessage from './FileMessage';
 import TextMessage from './TextMessage';
 import { useAPIDeleteReaction } from '@/hooks/api/chat/useAPIDeleteReaction';
+import { AiOutlineUnorderedList } from 'react-icons/ai';
+import ReactionListModal from './ReactionListModal';
 
 type ChatMessageItemProps = {
   message: ChatMessage;
@@ -60,6 +62,7 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
 }) => {
   const [messageState, setMessageState] = useState(message);
   const [visibleReadModal, setVisibleLastReadModal] = useState(false);
+  const [reactionModal, setReactionModal] = useState(false);
   const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
   const { mutate: saveReaction } = useAPISaveReaction();
   const { mutate: deleteReaction } = useAPIDeleteReaction();
@@ -77,8 +80,9 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
 
   const reactionList = (
     <Box flexDir="row" flexWrap="wrap" display="flex" maxW={'50vw'}>
-      {messageState.reactions?.length
-        ? reactionRemovedDuplicates(messageState.reactions).map((r) => (
+      {messageState.reactions?.length ? (
+        <>
+          {reactionRemovedDuplicates(messageState.reactions).map((r) => (
             <Box key={r.id} mb="4px" mr="4px">
               <ReactionedButton
                 reaction={r}
@@ -90,8 +94,20 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
                 }
               />
             </Box>
-          ))
-        : null}
+          ))}
+          <Button
+            onClick={() => {
+              setReactionModal(true);
+            }}
+            bg={'blue.200'}
+            flexDir="row"
+            borderColor={'blue.600'}
+            borderWidth={1}
+            size="xs">
+            <AiOutlineUnorderedList size={24} />
+          </Button>
+        </>
+      ) : null}
     </Box>
   );
 
@@ -266,6 +282,12 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
           </ModalBody>
         </ModalContent>
       </Modal>
+      <ReactionListModal
+        isOpen={reactionModal}
+        onClose={() => setReactionModal(false)}
+        reactions={messageState.reactions || []}
+      />
+
       {messageState.type === ChatMessageType.SYSTEM_TEXT ? (
         <SystemMessage message={messageState} />
       ) : null}
