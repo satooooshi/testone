@@ -112,7 +112,7 @@ const EventSearcher: React.FC = () => {
               personal={true}
             />
           )}
-          options={{title: 'カレンダー(個人)'}}
+          options={{title: 'Myスケジュール'}}
         />
         <TopTab.Screen
           name="EventCalendar"
@@ -122,7 +122,7 @@ const EventSearcher: React.FC = () => {
               hideEventFormModal={() => setEventFormModal(false)}
             />
           )}
-          options={{title: 'カレンダー'}}
+          options={{title: '全体カレンダー'}}
         />
         <TopTab.Screen
           name="FutureEvents"
