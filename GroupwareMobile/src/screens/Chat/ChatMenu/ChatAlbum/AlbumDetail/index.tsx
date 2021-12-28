@@ -192,6 +192,7 @@ const AlbumDetail: React.FC = () => {
                 (e, index) =>
                   index < 5 && (
                     <Image
+                      key={e.id}
                       ml={index >= 1 ? -8 : undefined}
                       source={{uri: e.avatarUrl}}
                       h={editorAvatarSize}
