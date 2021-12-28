@@ -67,14 +67,19 @@ const ChatNotes: React.FC = () => {
           ) {
             return [...n, ...data?.notes];
           }
-          return data?.notes;
+          return n;
         });
       }
     }
   }, [data?.notes, page]);
 
+  console.log('length', data?.notes?.length);
+  console.log('exist length', notesForInfiniteScroll.length);
+  console.log('page', page);
+
   useFocusEffect(
     useCallback(() => {
+      // setNotesForInfiniteScroll([]);
       setPage('1');
       refetchNotes();
     }, [refetchNotes]),
