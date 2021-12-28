@@ -667,8 +667,18 @@ const Chat: React.FC = () => {
     </View>
   );
 
-  if (video) {
-    return (
+  return (
+    <WholeContainer>
+      {typeDropdown}
+      <ReactionsModal
+        isVisible={!!selectedReactions}
+        selectedReactions={selectedReactions}
+        selectedEmoji={selectedEmoji}
+        onPressCloseButton={() => {
+          setSelectedReactions(undefined);
+        }}
+        onPressEmoji={emoji => setSelectedEmoji(emoji)}
+      />
       <MagnusModal isVisible={!!video} bg="black">
         <TouchableOpacity
           style={chatStyles.cancelIcon}
@@ -688,8 +698,7 @@ const Chat: React.FC = () => {
             uri: video,
           }}
           autoplay
-          videoWidth={300}
-          videoHeight={400}
+          videoWidth={windowWidth}
         />
         <TouchableOpacity
           style={tailwind('absolute bottom-5 right-5')}
@@ -699,21 +708,6 @@ const Chat: React.FC = () => {
           <Icon color="white" name="download" fontSize={24} />
         </TouchableOpacity>
       </MagnusModal>
-    );
-  }
-
-  return (
-    <WholeContainer>
-      {typeDropdown}
-      <ReactionsModal
-        isVisible={!!selectedReactions}
-        selectedReactions={selectedReactions}
-        selectedEmoji={selectedEmoji}
-        onPressCloseButton={() => {
-          setSelectedReactions(undefined);
-        }}
-        onPressEmoji={emoji => setSelectedEmoji(emoji)}
-      />
 
       <MagnusModal isVisible={!!selectedMessageForCheckLastRead}>
         <Button
