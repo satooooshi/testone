@@ -175,6 +175,9 @@ const Chat: React.FC = () => {
         setTimeout(() => {
           if (sentMsg.id !== messages?.[0].id) {
             setMessages([sentMsg, ...messages]);
+            if (sentMsg.type === ChatMessageType.IMAGE) {
+              setImagesForViewing(i => [...i, {uri: sentMsg.content}]);
+            }
           }
         }, 1000);
         setValues(v => ({
@@ -183,9 +186,6 @@ const Chat: React.FC = () => {
           type: ChatMessageType.TEXT,
           replyParentMessage: undefined,
         }));
-        if (sentMsg.type === ChatMessageType.IMAGE) {
-          setImagesForViewing(i => [...i, {uri: sentMsg.content}]);
-        }
       },
       onError: () => {
         Alert.alert(
