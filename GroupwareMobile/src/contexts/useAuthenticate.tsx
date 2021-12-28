@@ -24,11 +24,14 @@ export const AuthenticateProvider: React.FC = ({children}) => {
         setUser(userData);
       }
     },
-    onError: () => {
-      Alert.alert(
-        '認証中にエラーが発生しました。\n時間をおいて再実行してください。',
-      );
-      logout();
+    onError: err => {
+      if (err.response?.status === 401) {
+        Alert.alert(
+          'ログインの有効期限が切れました',
+          '再度ログインしてください',
+        );
+        logout();
+      }
     },
   });
   const {mutate: deleteDevice} = useAPIDeleteDevice();
