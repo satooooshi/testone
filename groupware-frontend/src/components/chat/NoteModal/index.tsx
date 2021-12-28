@@ -26,7 +26,6 @@ import { useAPIUploadStorage } from '@/hooks/api/storage/useAPIUploadStorage';
 import { useAPICreateChatNote } from '@/hooks/api/chat/note/useAPICreateChatNote';
 import { useAPIGetChatNotes } from '@/hooks/api/chat/note/useAPIGetNotes';
 import { useAPIDeleteChatNote } from '@/hooks/api/chat/note/useAPIDeleteChatNote';
-import { useAPISaveNoteImage } from '@/hooks/api/chat/note/useAPISaveChatNoteImages';
 import { useAPIUpdateNote } from '@/hooks/api/chat/note/useAPIUpdateChatNote';
 import NoteBox from './NoteBox';
 import { noteSchema } from 'src/utils/validation/schema';
@@ -43,7 +42,6 @@ const NoteModal: React.FC<NoteModalProps> = ({ isOpen, onClose, room }) => {
   const toast = useToast();
   const modalRef = useRef<HTMLDivElement | null>(null);
   const headerName = 'ノート一覧';
-  const [imageUploading, setImageUploading] = useState<boolean>(false);
   const [noteListPage, setNoteListPage] = useState(1);
   const [edittedNote, setEdittedNote] = useState<ChatNote>();
   const {
@@ -58,7 +56,6 @@ const NoteModal: React.FC<NoteModalProps> = ({ isOpen, onClose, room }) => {
     ChatNote[]
   >([]);
   const { mutate: deleteNote } = useAPIDeleteChatNote();
-  const { mutate: saveNoteImage } = useAPISaveNoteImage();
   const { mutate: updateNote } = useAPIUpdateNote({
     onSuccess: () => {
       setEdittedNote(undefined);
@@ -91,28 +88,6 @@ const NoteModal: React.FC<NoteModalProps> = ({ isOpen, onClose, room }) => {
     }
   };
 
-  const onUploadImage = (files: File[]) => {
-    uploadImage(files, {
-      onSuccess: (imageURLs) => {
-        const noteImages: Partial<ChatNoteImage>[] = imageURLs.map((i) => ({
-          imageURL: i,
-          chatNote: edittedNote,
-        }));
-        saveNoteImage(noteImages, {
-          onSuccess: (savedImages) => {
-            if (edittedNote) {
-              setValues((v) => ({
-                ...v,
-                images: v.images?.length
-                  ? [...v.images, ...savedImages]
-                  : [...savedImages],
-              }));
-            }
-          },
-        });
-      },
-    });
-  };
   const initialValues: Partial<ChatNote> = {
     content: '',
     chatGroup: room,
@@ -132,17 +107,16 @@ const NoteModal: React.FC<NoteModalProps> = ({ isOpen, onClose, room }) => {
     validationSchema: noteSchema,
     onSubmit: (submittedValues) => {
       if (mode === 'new') {
-        console.log('new');
         createNote(submittedValues);
       } else {
-        console.log('edit');
         updateNote(submittedValues as ChatNote);
       }
     },
   });
   const imageUploaderRef = useRef<HTMLInputElement | null>(null);
   const [selectedImage, setSelectedImage] = useState<Partial<ChatNoteImage>>();
-  const { mutate: uploadImage } = useAPIUploadStorage();
+  const { mutate: uploadImage, isLoading: loadingUploadFile } =
+    useAPIUploadStorage();
   const { mutate: createNote } = useAPICreateChatNote({
     onSuccess: () => {
       resetForm();
@@ -264,9 +238,7 @@ const NoteModal: React.FC<NoteModalProps> = ({ isOpen, onClose, room }) => {
             onChange={() => {
               const files = imageUploaderRef.current?.files;
               const fileArr: File[] = [];
-              setImageUploading(true);
               if (!files) {
-                setImageUploading(false);
                 return;
               }
               for (let i = 0; i < files.length; i++) {
@@ -278,7 +250,6 @@ const NoteModal: React.FC<NoteModalProps> = ({ isOpen, onClose, room }) => {
               }
               uploadImage(fileArr, {
                 onSuccess: (imageURLs) => {
-                  setImageUploading(false);
                   const images: Partial<ChatNoteImage>[] = imageURLs.map(
                     (i) => ({ imageURL: i }),
                   );
@@ -313,7 +284,7 @@ const NoteModal: React.FC<NoteModalProps> = ({ isOpen, onClose, room }) => {
         />
       </Box>
       <Box display="flex" justifyContent="center" alignItems="center">
-        {imageUploading ? (
+        {loadingUploadFile ? (
           <Button colorScheme="pink" disabled>
             <Spinner />
           </Button>
@@ -380,9 +351,7 @@ const NoteModal: React.FC<NoteModalProps> = ({ isOpen, onClose, room }) => {
             onChange={() => {
               const files = imageUploaderRef.current?.files;
               const fileArr: File[] = [];
-              setImageUploading(true);
               if (!files) {
-                setImageUploading(false);
                 return;
               }
               for (let i = 0; i < files.length; i++) {
@@ -394,7 +363,6 @@ const NoteModal: React.FC<NoteModalProps> = ({ isOpen, onClose, room }) => {
               }
               uploadImage(fileArr, {
                 onSuccess: (imageURLs) => {
-                  setImageUploading(false);
                   const images: Partial<ChatNoteImage>[] = imageURLs.map(
                     (i) => ({ imageURL: i }),
                   );
@@ -444,7 +412,7 @@ const NoteModal: React.FC<NoteModalProps> = ({ isOpen, onClose, room }) => {
         />
       </Box>
       <Box display="flex" justifyContent="center" alignItems="center">
-        {imageUploading ? (
+        {loadingUploadFile ? (
           <Button colorScheme="pink" disabled>
             <Spinner />
           </Button>
