@@ -42,6 +42,7 @@ const NoteModal: React.FC<NoteModalProps> = ({ isOpen, onClose, room }) => {
   const toast = useToast();
   const modalRef = useRef<HTMLDivElement | null>(null);
   const headerName = 'ノート一覧';
+  const [mode, setMode] = useState<'new' | 'edit' | 'list'>('list');
   const [noteListPage, setNoteListPage] = useState(1);
   const [edittedNote, setEdittedNote] = useState<ChatNote>();
   const {
@@ -62,6 +63,16 @@ const NoteModal: React.FC<NoteModalProps> = ({ isOpen, onClose, room }) => {
       toast({
         title: 'ノートを更新しました',
         status: 'success',
+        duration: 3000,
+        isClosable: true,
+      });
+      setMode('list');
+    },
+    onError: () => {
+      toast({
+        title: 'ノートの更新に失敗しました',
+        description: 'しばらくしてからお試しください',
+        status: 'error',
         duration: 3000,
         isClosable: true,
       });
@@ -132,7 +143,6 @@ const NoteModal: React.FC<NoteModalProps> = ({ isOpen, onClose, room }) => {
       });
     },
   });
-  const [mode, setMode] = useState<'new' | 'edit' | 'list'>('list');
   const imagesInNewNoteViewer = useMemo((): ImageDecorator[] => {
     return (
       values.images?.map((i) => ({
@@ -193,18 +203,22 @@ const NoteModal: React.FC<NoteModalProps> = ({ isOpen, onClose, room }) => {
 
   useEffect(() => {
     if (notes?.notes?.length) {
-      setNotesForInfiniteScroll((n) => {
-        if (
-          n.length &&
-          new Date(n[n.length - 1].createdAt) >
-            new Date(notes.notes[0].createdAt)
-        ) {
-          return [...n, ...notes?.notes];
-        }
-        return notes?.notes;
-      });
+      if (noteListPage === 1) {
+        setNotesForInfiniteScroll(notes.notes);
+      } else {
+        setNotesForInfiniteScroll((n) => {
+          if (
+            n.length &&
+            new Date(n[n.length - 1].createdAt) >
+              new Date(notes.notes[0].createdAt)
+          ) {
+            return [...n, ...notes?.notes];
+          }
+          return n;
+        });
+      }
     }
-  }, [notes?.notes]);
+  }, [notes?.notes, noteListPage]);
 
   const postNote = (
     <Box>
@@ -332,15 +346,20 @@ const NoteModal: React.FC<NoteModalProps> = ({ isOpen, onClose, room }) => {
             <AiOutlineLeft size={24} style={{ display: 'inline' }} />
             <Text display="inline">一覧へ戻る</Text>
           </Button>
-          <Button
-            size="sm"
-            flexDir="row"
-            onClick={() => imageUploaderRef.current?.click()}
-            mb="8px"
-            colorScheme="green"
-            alignItems="center">
-            <Text display="inline">写真を追加</Text>
-          </Button>
+          <Box display="flex" flexDir="row" mb="8px">
+            <Button
+              size="xs"
+              mr="4px"
+              flexDir="row"
+              onClick={() => imageUploaderRef.current?.click()}
+              colorScheme="green"
+              alignItems="center">
+              <Text display="inline">写真を追加</Text>
+            </Button>
+            <Button size="xs" colorScheme="blue" onClick={() => handleSubmit()}>
+              ノートを更新
+            </Button>
+          </Box>
           <input
             multiple
             ref={imageUploaderRef}
@@ -477,15 +496,17 @@ const NoteModal: React.FC<NoteModalProps> = ({ isOpen, onClose, room }) => {
             display="flex"
             mr="24px">
             <Text>{headerName}</Text>
-            <Button
-              size="sm"
-              flexDir="row"
-              onClick={() => setMode('new')}
-              mb="8px"
-              colorScheme="green"
-              alignItems="center">
-              <Text display="inline">ノートを作成</Text>
-            </Button>
+            {mode === 'list' && (
+              <Button
+                size="sm"
+                flexDir="row"
+                onClick={() => setMode('new')}
+                mb="8px"
+                colorScheme="green"
+                alignItems="center">
+                <Text display="inline">ノートを作成</Text>
+              </Button>
+            )}
           </ModalHeader>
           <ModalCloseButton />
           <ModalBody ref={modalRef} onScroll={onScroll}>
