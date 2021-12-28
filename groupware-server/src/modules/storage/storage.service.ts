@@ -1,9 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import {
-  GetBucketSignedUrlConfig,
-  GetSignedUrlConfig,
-  Storage,
-} from '@google-cloud/storage';
+import { GetSignedUrlConfig, Storage } from '@google-cloud/storage';
 import { ConfigService } from '@nestjs/config';
 import { genStorageURL } from 'src/utils/storage/genStorageURL';
 import { genSignedURL } from 'src/utils/storage/genSignedURL';
