@@ -76,25 +76,14 @@ const AlbumModal: React.FC<AlbumModalProps> = ({ isOpen, onClose, room }) => {
   const onUploadImage = (files: File[]) => {
     uploadImage(files, {
       onSuccess: (imageURLs) => {
-        if (selectedAlbum && mode === 'edit') {
-          const albumImages: Partial<ChatAlbumImage>[] = imageURLs.map((i) => ({
-            imageURL: i,
-            chatAlbum: selectedAlbum,
-          }));
-          updateAlbum(
-            {
-              ...selectedAlbum,
-              images: selectedAlbum.images
-                ? [...selectedAlbum.images, ...albumImages]
-                : albumImages,
-            },
-            {
-              onSuccess: (savedAlbum) => {
-                setAlbumImages(savedAlbum.images as ChatAlbumImage[]);
-              },
-            },
-          );
-        }
+        setImageUploading(false);
+        const images: Partial<ChatAlbumImage>[] = imageURLs.map((i) => ({
+          imageURL: i,
+        }));
+        setValues((v) => ({
+          ...v,
+          images: v.images?.length ? [...v.images, ...images] : [...images],
+        }));
       },
     });
   };
@@ -213,9 +202,11 @@ const AlbumModal: React.FC<AlbumModalProps> = ({ isOpen, onClose, room }) => {
   }, [imagesInDetailViewer, selectedImage]);
 
   const imageUploadToAlbum = () => {
+    setImageUploading(true);
     const files = imageUploaderRef.current?.files;
     const fileArr: File[] = [];
     if (!files) {
+      setImageUploading(false);
       return;
     }
     for (let i = 0; i < files.length; i++) {
@@ -572,16 +563,41 @@ const AlbumModal: React.FC<AlbumModalProps> = ({ isOpen, onClose, room }) => {
                     <AiOutlineLeft size={24} style={{ display: 'inline' }} />
                     <Text display="inline">一覧へ戻る</Text>
                   </Button>
-                  <Button
-                    size="xs"
-                    flexDir="row"
-                    mr="4px"
-                    onClick={() => handleSubmit()}
-                    mb="8px"
-                    colorScheme="blue"
-                    alignItems="center">
-                    <Text display="inline">アルバムを更新</Text>
-                  </Button>
+                  <Box>
+                    <Button
+                      size="xs"
+                      flexDir="row"
+                      mr="4px"
+                      onClick={() => imageUploaderRef.current?.click()}
+                      mb="8px"
+                      colorScheme="green"
+                      alignItems="center">
+                      <Text display="inline">写真を追加</Text>
+                    </Button>
+                    {imageUploading ? (
+                      <Button
+                        size="xs"
+                        flexDir="row"
+                        mb="8px"
+                        disabled
+                        colorScheme="green"
+                        alignItems="center">
+                        <Text display="inline">画像アップロード中</Text>
+                        <Spinner />
+                      </Button>
+                    ) : (
+                      <Button
+                        size="xs"
+                        flexDir="row"
+                        mr="4px"
+                        onClick={() => handleSubmit()}
+                        mb="8px"
+                        colorScheme="blue"
+                        alignItems="center">
+                        <Text display="inline">アルバムを更新</Text>
+                      </Button>
+                    )}
+                  </Box>
                 </Box>
                 <FormLabel>アルバム名</FormLabel>
                 {errors.title && touched.title ? (
