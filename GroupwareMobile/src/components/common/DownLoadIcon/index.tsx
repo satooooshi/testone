@@ -12,7 +12,7 @@ const DownloadIcon: React.FC<DownloadIconProps> = ({url}) => {
   return (
     <TouchableOpacity
       style={tailwind('absolute bottom-5 right-5')}
-      onPress={() => saveToCameraRoll({url, type: 'image'})}>
+      onPress={() => console.log(url)}>
       <Icon color="white" name="download" fontSize={24} />
     </TouchableOpacity>
   );

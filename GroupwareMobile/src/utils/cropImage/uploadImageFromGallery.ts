@@ -16,7 +16,6 @@ export const uploadImageFromGallery = async (
     const optionsExec: Options =
       options.mediaType === 'photo' ? {...options, forceJpg: true} : options;
     const photo = await ImagePicker.openPicker(optionsExec);
-    console.log(photo);
     const mime = photo.mime;
     const formData = imagePickerResponseToFormData(photo);
     return {formData, mime};
@@ -87,7 +86,6 @@ export const imagePickerResponseToFormData = (
   const formData = new FormData();
   if (Array.isArray(imagePickerResponse)) {
     for (const image of imagePickerResponse) {
-      console.log(image.path);
       formData.append('files', {
         name:
           Platform.OS === 'android'
@@ -99,8 +97,6 @@ export const imagePickerResponseToFormData = (
     }
     return formData;
   }
-  // console.log(imagePickerResponse.path);
-  console.log(imagePickerResponse);
   formData.append('files', {
     name:
       Platform.OS === 'android'

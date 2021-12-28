@@ -85,7 +85,6 @@ const Chat: React.FC = () => {
   const {user: myself} = useAuthenticate();
   const typeDropdownRef = useRef<any | null>(null);
   const navigation = useNavigation<ChatNavigationProps>();
-  const {height: windowHeight} = useWindowDimensions();
   const route = useRoute<ChatRouteProps>();
   const {room} = route.params;
   const {data: roomDetail, refetch: refetchRoomDetail} = useAPIGetRoomDetail(
@@ -101,7 +100,7 @@ const Chat: React.FC = () => {
   const [longPressedMsg, setLongPressedMgg] = useState<ChatMessage>();
   const [reactionTarget, setReactionTarget] = useState<ChatMessage>();
   const {mutate: saveReaction} = useAPISaveReaction();
-  const {width: windowWidth} = useWindowDimensions();
+  const {width: windowWidth, height: windowHeight} = useWindowDimensions();
   const {mutate: deleteReaction} = useAPIDeleteReaction();
   const [selectedReactions, setSelectedReactions] = useState<
     ChatMessageReaction[] | undefined
@@ -290,11 +289,11 @@ const Chat: React.FC = () => {
             chatGroup: room,
           });
         },
-        onError: () => {
-          Alert.alert(
-            'アップロード中にエラーが発生しました。\n時間をおいて再実行してください。',
-          );
-        },
+        // onError: () => {
+        //   Alert.alert(
+        //     'アップロード中にエラーが発生しました。\n時間をおいて再実行してください。',
+        //   );
+        // },
       });
     }
   };
@@ -313,11 +312,11 @@ const Chat: React.FC = () => {
             chatGroup: room,
           });
         },
-        onError: () => {
-          Alert.alert(
-            'アップロード中にエラーが発生しました。\n時間をおいて再実行してください。',
-          );
-        },
+        // onError: () => {
+        //   Alert.alert(
+        //     'アップロード中にエラーが発生しました。\n時間をおいて再実行してください。',
+        //   );
+        // },
       });
     }
   };
@@ -668,6 +667,41 @@ const Chat: React.FC = () => {
     </View>
   );
 
+  if (video) {
+    return (
+      <MagnusModal isVisible={!!video} bg="black">
+        <TouchableOpacity
+          style={chatStyles.cancelIcon}
+          onPress={() => {
+            setVideo('');
+          }}>
+          <Icon
+            position="absolute"
+            name={'cancel'}
+            fontFamily="MaterialIcons"
+            fontSize={30}
+            color="#fff"
+          />
+        </TouchableOpacity>
+        <VideoPlayer
+          video={{
+            uri: video,
+          }}
+          autoplay
+          videoWidth={300}
+          videoHeight={400}
+        />
+        <TouchableOpacity
+          style={tailwind('absolute bottom-5 right-5')}
+          onPress={async () =>
+            await saveToCameraRoll({url: video, type: 'video'})
+          }>
+          <Icon color="white" name="download" fontSize={24} />
+        </TouchableOpacity>
+      </MagnusModal>
+    );
+  }
+
   return (
     <WholeContainer>
       {typeDropdown}
@@ -736,36 +770,7 @@ const Chat: React.FC = () => {
           />
         </TopTab.Navigator>
       </MagnusModal>
-      {/* @TODO add seeking bar */}
-      <MagnusModal isVisible={!!video} bg="black">
-        <TouchableOpacity
-          style={chatStyles.cancelIcon}
-          onPress={() => {
-            setVideo('');
-          }}>
-          <Icon
-            position="absolute"
-            name={'cancel'}
-            fontFamily="MaterialIcons"
-            fontSize={30}
-            color="#fff"
-          />
-        </TouchableOpacity>
-        <VideoPlayer
-          video={{
-            uri: video,
-          }}
-          autoplay
-          videoWidth={windowWidth}
-        />
-        <TouchableOpacity
-          style={tailwind('absolute bottom-5 right-5')}
-          onPress={async () =>
-            await saveToCameraRoll({url: video, type: 'video'})
-          }>
-          <Icon color="white" name="download" fontSize={24} />
-        </TouchableOpacity>
-      </MagnusModal>
+
       <ImageView
         animationType="slide"
         images={imagesForViewing}

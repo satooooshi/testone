@@ -76,10 +76,6 @@ const ChatNotes: React.FC = () => {
     }
   }, [data?.notes, page]);
 
-  console.log('length', data?.notes?.length);
-  console.log('exist length', notesForInfiniteScroll.length);
-  console.log('page', page);
-
   useFocusEffect(
     useCallback(() => {
       // setNotesForInfiniteScroll([]);
