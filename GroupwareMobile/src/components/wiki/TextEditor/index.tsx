@@ -35,6 +35,10 @@ const TextEditor: React.FC<TextEditorProps> = ({
   return (
     <>
       <QuillEditor
+        webview={{
+          androidHardwareAccelerationDisabled: true,
+          androidLayerType: 'software',
+        }}
         autoSize
         ref={quillRef}
         initialHtml={

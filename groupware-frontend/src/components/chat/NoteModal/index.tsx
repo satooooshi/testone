@@ -26,7 +26,6 @@ import { useAPIUploadStorage } from '@/hooks/api/storage/useAPIUploadStorage';
 import { useAPICreateChatNote } from '@/hooks/api/chat/note/useAPICreateChatNote';
 import { useAPIGetChatNotes } from '@/hooks/api/chat/note/useAPIGetNotes';
 import { useAPIDeleteChatNote } from '@/hooks/api/chat/note/useAPIDeleteChatNote';
-import { useAPISaveNoteImage } from '@/hooks/api/chat/note/useAPISaveChatNoteImages';
 import { useAPIUpdateNote } from '@/hooks/api/chat/note/useAPIUpdateChatNote';
 import NoteBox from './NoteBox';
 import { noteSchema } from 'src/utils/validation/schema';
@@ -57,7 +56,6 @@ const NoteModal: React.FC<NoteModalProps> = ({ isOpen, onClose, room }) => {
     ChatNote[]
   >([]);
   const { mutate: deleteNote } = useAPIDeleteChatNote();
-  const { mutate: saveNoteImage } = useAPISaveNoteImage();
   const { mutate: updateNote } = useAPIUpdateNote({
     onSuccess: () => {
       setEdittedNote(undefined);
@@ -90,28 +88,6 @@ const NoteModal: React.FC<NoteModalProps> = ({ isOpen, onClose, room }) => {
     }
   };
 
-  const onUploadImage = (files: File[]) => {
-    uploadImage(files, {
-      onSuccess: (imageURLs) => {
-        const noteImages: Partial<ChatNoteImage>[] = imageURLs.map((i) => ({
-          imageURL: i,
-          chatNote: edittedNote,
-        }));
-        saveNoteImage(noteImages, {
-          onSuccess: (savedImages) => {
-            if (edittedNote) {
-              setValues((v) => ({
-                ...v,
-                images: v.images?.length
-                  ? [...v.images, ...savedImages]
-                  : [...savedImages],
-              }));
-            }
-          },
-        });
-      },
-    });
-  };
   const initialValues: Partial<ChatNote> = {
     content: '',
     chatGroup: room,
@@ -139,7 +115,8 @@ const NoteModal: React.FC<NoteModalProps> = ({ isOpen, onClose, room }) => {
   });
   const imageUploaderRef = useRef<HTMLInputElement | null>(null);
   const [selectedImage, setSelectedImage] = useState<Partial<ChatNoteImage>>();
-  const { mutate: uploadImage } = useAPIUploadStorage();
+  const { mutate: uploadImage, isLoading: loadingUploadFile } =
+    useAPIUploadStorage();
   const { mutate: createNote } = useAPICreateChatNote({
     onSuccess: () => {
       resetForm();
@@ -147,6 +124,12 @@ const NoteModal: React.FC<NoteModalProps> = ({ isOpen, onClose, room }) => {
       setNotesForInfiniteScroll([]);
       setNoteListPage(1);
       refetchNotes();
+      toast({
+        title: 'ノートを作成しました',
+        status: 'success',
+        duration: 3000,
+        isClosable: true,
+      });
     },
   });
   const [mode, setMode] = useState<'new' | 'edit' | 'list'>('list');
@@ -301,9 +284,15 @@ const NoteModal: React.FC<NoteModalProps> = ({ isOpen, onClose, room }) => {
         />
       </Box>
       <Box display="flex" justifyContent="center" alignItems="center">
-        <Button colorScheme="pink" onClick={() => handleSubmit()}>
-          作成
-        </Button>
+        {loadingUploadFile ? (
+          <Button colorScheme="pink" disabled>
+            <Spinner />
+          </Button>
+        ) : (
+          <Button colorScheme="pink" onClick={() => handleSubmit()}>
+            作成
+          </Button>
+        )}
       </Box>
     </Box>
   );
@@ -372,7 +361,19 @@ const NoteModal: React.FC<NoteModalProps> = ({ isOpen, onClose, room }) => {
                 });
                 fileArr.push(renamedFile);
               }
-              onUploadImage(fileArr);
+              uploadImage(fileArr, {
+                onSuccess: (imageURLs) => {
+                  const images: Partial<ChatNoteImage>[] = imageURLs.map(
+                    (i) => ({ imageURL: i }),
+                  );
+                  setValues((v) => ({
+                    ...v,
+                    images: v.images?.length
+                      ? [...v.images, ...images]
+                      : [...images],
+                  }));
+                },
+              });
             }}
           />
         </Box>
@@ -411,9 +412,15 @@ const NoteModal: React.FC<NoteModalProps> = ({ isOpen, onClose, room }) => {
         />
       </Box>
       <Box display="flex" justifyContent="center" alignItems="center">
-        <Button colorScheme="pink" onClick={() => handleSubmit()}>
-          更新
-        </Button>
+        {loadingUploadFile ? (
+          <Button colorScheme="pink" disabled>
+            <Spinner />
+          </Button>
+        ) : (
+          <Button colorScheme="pink" onClick={() => handleSubmit()}>
+            更新
+          </Button>
+        )}
       </Box>
     </Box>
   );

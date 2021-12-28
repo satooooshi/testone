@@ -40,19 +40,22 @@ const ChatNotes: React.FC = () => {
     setPage(p => (Number(p) + 1).toString());
   };
 
-  const handlePressImage = (
-    noteImages: Partial<ChatNoteImage>[],
-    targetImage: Partial<ChatNoteImage>,
-  ) => {
-    const isNowUri = (element: Partial<ChatNoteImage>) =>
-      element.imageURL === targetImage.imageURL;
-    const imageSources: ImageSource[] = noteImages.map(i => ({
-      uri: i.imageURL || '',
-    }));
-    setImages(imageSources);
-    setNowImageIndex(noteImages.findIndex(isNowUri));
-    setImageModal(true);
-  };
+  const handlePressImage = useCallback(
+    (
+      noteImages: Partial<ChatNoteImage>[],
+      targetImage: Partial<ChatNoteImage>,
+    ) => {
+      const isNowUri = (element: Partial<ChatNoteImage>) =>
+        element.imageURL === targetImage.imageURL;
+      const imageSources: ImageSource[] = noteImages.map(i => ({
+        uri: i.imageURL || '',
+      }));
+      setImages(imageSources);
+      setNowImageIndex(noteImages.findIndex(isNowUri));
+      setImageModal(true);
+    },
+    [],
+  );
 
   useEffect(() => {
     if (data?.notes?.length) {
@@ -67,7 +70,7 @@ const ChatNotes: React.FC = () => {
           ) {
             return [...n, ...data?.notes];
           }
-          return data?.notes;
+          return n;
         });
       }
     }
@@ -75,6 +78,7 @@ const ChatNotes: React.FC = () => {
 
   useFocusEffect(
     useCallback(() => {
+      // setNotesForInfiniteScroll([]);
       setPage('1');
       refetchNotes();
     }, [refetchNotes]),

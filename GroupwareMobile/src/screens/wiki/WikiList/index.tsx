@@ -48,7 +48,6 @@ const WikiList: React.FC<WikiListProps> = ({navigation}) => {
 
   return (
     <WholeContainer>
-      {/* <SearchFormOpenerButton onPress={console.log} /> */}
       <HeaderWithTextButton
         enableBackButton={true}
         tabs={tabs}

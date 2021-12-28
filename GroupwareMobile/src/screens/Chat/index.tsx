@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {
   Alert,
   FlatList,
@@ -85,7 +85,6 @@ const Chat: React.FC = () => {
   const {user: myself} = useAuthenticate();
   const typeDropdownRef = useRef<any | null>(null);
   const navigation = useNavigation<ChatNavigationProps>();
-  const {height: windowHeight} = useWindowDimensions();
   const route = useRoute<ChatRouteProps>();
   const {room} = route.params;
   const {data: roomDetail, refetch: refetchRoomDetail} = useAPIGetRoomDetail(
@@ -94,14 +93,21 @@ const Chat: React.FC = () => {
   const [page, setPage] = useState(1);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [imageModal, setImageModal] = useState(false);
-  const [imagesForViewing, setImagesForViewing] = useState<ImageSource[]>([]);
+  const imagesForViewing: ImageSource[] = useMemo(() => {
+    return messages
+      .filter(m => m.type === ChatMessageType.IMAGE)
+      .map(m => ({
+        uri: m.content,
+      }))
+      .reverse();
+  }, [messages]);
   const [nowImageIndex, setNowImageIndex] = useState<number>(0);
   const [video, setVideo] = useState('');
   const {data: lastReadChatTime} = useAPIGetLastReadChatTime(room.id);
   const [longPressedMsg, setLongPressedMgg] = useState<ChatMessage>();
   const [reactionTarget, setReactionTarget] = useState<ChatMessage>();
   const {mutate: saveReaction} = useAPISaveReaction();
-  const {width: windowWidth} = useWindowDimensions();
+  const {width: windowWidth, height: windowHeight} = useWindowDimensions();
   const {mutate: deleteReaction} = useAPIDeleteReaction();
   const [selectedReactions, setSelectedReactions] = useState<
     ChatMessageReaction[] | undefined
@@ -163,7 +169,7 @@ const Chat: React.FC = () => {
             }
           }
           setMessages(m => [...msgToAppend, ...m]);
-          setImagesForViewing(i => [...i, ...imagesToApped]);
+          // setImagesForViewing(i => [...i, ...imagesToApped]);
         }
       },
     },
@@ -176,16 +182,13 @@ const Chat: React.FC = () => {
           if (sentMsg.id !== messages?.[0].id) {
             setMessages([sentMsg, ...messages]);
           }
-        }, 1000);
+        }, 3000);
         setValues(v => ({
           ...v,
           content: '',
           type: ChatMessageType.TEXT,
           replyParentMessage: undefined,
         }));
-        if (sentMsg.type === ChatMessageType.IMAGE) {
-          setImagesForViewing(i => [...i, {uri: sentMsg.content}]);
-        }
       },
       onError: () => {
         Alert.alert(
@@ -290,11 +293,6 @@ const Chat: React.FC = () => {
             chatGroup: room,
           });
         },
-        onError: () => {
-          Alert.alert(
-            'アップロード中にエラーが発生しました。\n時間をおいて再実行してください。',
-          );
-        },
       });
     }
   };
@@ -312,11 +310,6 @@ const Chat: React.FC = () => {
             type: ChatMessageType.VIDEO,
             chatGroup: room,
           });
-        },
-        onError: () => {
-          Alert.alert(
-            'アップロード中にエラーが発生しました。\n時間をおいて再実行してください。',
-          );
         },
       });
     }
@@ -417,9 +410,8 @@ const Chat: React.FC = () => {
         if (sentMsgByOtherUsers.sender?.id === myself?.id) {
           sentMsgByOtherUsers.isSender = true;
         }
-        if (sentMsgByOtherUsers.type === ChatMessageType.IMAGE) {
-          setImagesForViewing(i => [...i, {uri: sentMsgByOtherUsers.content}]);
-        } else if (sentMsgByOtherUsers.type === ChatMessageType.VIDEO) {
+        // setImagesForViewing(i => [...i, {uri: sentMsgByOtherUsers.content}]);
+        if (sentMsgByOtherUsers.type === ChatMessageType.VIDEO) {
           sentMsgByOtherUsers.thumbnail = await getThumbnailOfVideo(
             sentMsgByOtherUsers.content,
           );
@@ -445,13 +437,6 @@ const Chat: React.FC = () => {
 
   useEffect(() => {
     if (fetchedPastMessages?.length) {
-      const handleImages = () => {
-        const fetchedImages: ImageSource[] = fetchedPastMessages
-          .filter(m => m.type === ChatMessageType.IMAGE)
-          .map(m => ({uri: m.content}))
-          .reverse();
-        setImagesForViewing(fetchedImages);
-      };
       if (
         messages?.length &&
         isRecent(
@@ -468,10 +453,8 @@ const Chat: React.FC = () => {
         setMessages(m => {
           return [...m, ...msgToAppend];
         });
-        handleImages();
       } else if (!messages?.length) {
         setMessages(fetchedPastMessages);
-        handleImages();
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -680,6 +663,35 @@ const Chat: React.FC = () => {
         }}
         onPressEmoji={emoji => setSelectedEmoji(emoji)}
       />
+      <MagnusModal isVisible={!!video} bg="black">
+        <TouchableOpacity
+          style={chatStyles.cancelIcon}
+          onPress={() => {
+            setVideo('');
+          }}>
+          <Icon
+            position="absolute"
+            name={'cancel'}
+            fontFamily="MaterialIcons"
+            fontSize={30}
+            color="#fff"
+          />
+        </TouchableOpacity>
+        <VideoPlayer
+          video={{
+            uri: video,
+          }}
+          autoplay
+          videoWidth={windowWidth}
+        />
+        <TouchableOpacity
+          style={tailwind('absolute bottom-5 right-5')}
+          onPress={async () =>
+            await saveToCameraRoll({url: video, type: 'video'})
+          }>
+          <Icon color="white" name="download" fontSize={24} />
+        </TouchableOpacity>
+      </MagnusModal>
 
       <MagnusModal isVisible={!!selectedMessageForCheckLastRead}>
         <Button
@@ -736,36 +748,7 @@ const Chat: React.FC = () => {
           />
         </TopTab.Navigator>
       </MagnusModal>
-      {/* @TODO add seeking bar */}
-      <MagnusModal isVisible={!!video} bg="black">
-        <TouchableOpacity
-          style={chatStyles.cancelIcon}
-          onPress={() => {
-            setVideo('');
-          }}>
-          <Icon
-            position="absolute"
-            name={'cancel'}
-            fontFamily="MaterialIcons"
-            fontSize={30}
-            color="#fff"
-          />
-        </TouchableOpacity>
-        <VideoPlayer
-          video={{
-            uri: video,
-          }}
-          autoplay
-          videoWidth={windowWidth}
-        />
-        <TouchableOpacity
-          style={tailwind('absolute bottom-5 right-5')}
-          onPress={async () =>
-            await saveToCameraRoll({url: video, type: 'video'})
-          }>
-          <Icon color="white" name="download" fontSize={24} />
-        </TouchableOpacity>
-      </MagnusModal>
+
       <ImageView
         animationType="slide"
         images={imagesForViewing}

@@ -366,6 +366,15 @@ export class ChatService {
         ...newData,
       }),
     );
+    if (existGroup.name !== newGroup.name) {
+      const sysMsgSaidsUpdated = new ChatMessage();
+      sysMsgSaidsUpdated.type = ChatMessageType.SYSTEM_TEXT;
+      sysMsgSaidsUpdated.content = `${userNameFactory(
+        requestUser,
+      )}さんがルーム名を${existGroup.name}に更新しました`;
+      sysMsgSaidsUpdated.chatGroup = newGroup;
+      await this.chatMessageRepository.save(sysMsgSaidsUpdated);
+    }
     const newMembers = newGroup.members.filter(
       (newM) => !existGroup.members.map((m) => m.id).includes(newM.id),
     );

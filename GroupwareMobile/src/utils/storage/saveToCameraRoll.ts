@@ -40,7 +40,6 @@ export const saveToCameraRoll = async (obj: {
     try {
       filePath = await CameraRoll.save(data, {type: 'photo'});
       if (filePath) {
-        console.log(filePath);
         Alert.alert(successText);
       }
     } catch {

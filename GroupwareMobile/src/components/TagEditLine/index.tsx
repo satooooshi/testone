@@ -41,7 +41,7 @@ const TagEditLine: React.FC<TagEditLineProps> = props => {
         mb={4}
         fontWeight="bold"
         bg={tagColorFactory(tagType)}>
-        {`${tagTypeNameFactory(tagType)}を編集`}
+        {`${tagTypeNameFactory(tagType)}タグ`}
       </Button>
     </Div>
   );

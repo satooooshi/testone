@@ -267,20 +267,6 @@ const EventCalendar: React.FC<EventCalendarProps> = ({
             borderColor="#e0e0e0"
             borderWidth={1}
             h={40}
-            w={80}
-            justifyContent="center"
-            alignItems="center"
-            p={0}
-            onPress={onPressTodayButton}
-            color={darkFontColor}>
-            今日
-          </Button>
-          <Button
-            rounded="sm"
-            bg="white"
-            borderColor="#e0e0e0"
-            borderWidth={1}
-            h={40}
             w={40}
             justifyContent="center"
             alignItems="center"
@@ -288,6 +274,20 @@ const EventCalendar: React.FC<EventCalendarProps> = ({
             onPress={() => onPressNextOrPreviousButton('previous')}
             color={darkFontColor}>
             <Icon name="left" />
+          </Button>
+          <Button
+            rounded="sm"
+            bg="white"
+            borderColor="#e0e0e0"
+            borderWidth={1}
+            h={40}
+            w={80}
+            justifyContent="center"
+            alignItems="center"
+            p={0}
+            onPress={onPressTodayButton}
+            color={darkFontColor}>
+            今日
           </Button>
           <Button
             rounded="sm"
@@ -364,6 +364,7 @@ const EventCalendar: React.FC<EventCalendarProps> = ({
               ...calendarStyles.header,
             }}
             onPressDateHeader={onPressDateHeader}
+            scrollOffsetMinutes={1200}
             renderHeader={
               calendarMode.mode === 'day'
                 ? () => (

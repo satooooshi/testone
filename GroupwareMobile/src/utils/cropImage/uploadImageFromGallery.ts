@@ -13,7 +13,9 @@ export const uploadImageFromGallery = async (
   },
 ): Promise<{formData: FormData | undefined; mime: string | undefined}> => {
   try {
-    const photo = await ImagePicker.openPicker(options);
+    const optionsExec: Options =
+      options.mediaType === 'photo' ? {...options, forceJpg: true} : options;
+    const photo = await ImagePicker.openPicker(optionsExec);
     const mime = photo.mime;
     const formData = imagePickerResponseToFormData(photo);
     return {formData, mime};
@@ -90,7 +92,7 @@ export const imagePickerResponseToFormData = (
             ? image.path.split('/').slice(-1)[0]
             : image.filename,
         type: image.mime,
-        uri: image.path,
+        uri: image.path.replace('file://', ''),
       });
     }
     return formData;
@@ -101,7 +103,7 @@ export const imagePickerResponseToFormData = (
         ? imagePickerResponse.path.split('/').slice(-1)[0]
         : imagePickerResponse.filename,
     type: imagePickerResponse.mime,
-    uri: imagePickerResponse.path,
+    uri: imagePickerResponse.path.replace('file://', ''),
   });
   return formData;
 };

@@ -12,7 +12,6 @@ function useOnEntryChangeEffect(onEntryChange: (entryName: string) => void) {
     function updateActiveTargetOnScroll() {
       if (scroller !== null) {
         scroller.addSelectedEntryListener(onEntryChange);
-        console.log('called');
         return () => scroller.removeSelectedEntryListener(onEntryChange);
       }
     },

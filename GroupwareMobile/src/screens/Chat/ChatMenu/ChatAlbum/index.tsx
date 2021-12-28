@@ -21,9 +21,7 @@ import {
 const ChatAlbums: React.FC = () => {
   const navigation = useNavigation<ChatAlbumsNavigationProps>();
   const {room} = useRoute<ChatAlbumsRouteProps>().params;
-  const [notesForInfiniteScroll, setNotesForInfiniteScroll] = useState<
-    ChatAlbum[]
-  >([]);
+  const [albumsForScroll, setAlbumsForScroll] = useState<ChatAlbum[]>([]);
   const [page, setPage] = useState<string>('1');
   const {data, refetch: refetchAlbums} = useAPIGetChatAlbums({
     roomId: room.id.toString(),
@@ -38,17 +36,17 @@ const ChatAlbums: React.FC = () => {
   useEffect(() => {
     if (data?.albums?.length) {
       if (page === '1') {
-        setNotesForInfiniteScroll(data.albums);
+        setAlbumsForScroll(data.albums);
       } else {
-        setNotesForInfiniteScroll(n => {
+        setAlbumsForScroll(a => {
           if (
-            n.length &&
-            new Date(n[n.length - 1].createdAt) >
+            a.length &&
+            new Date(a[a.length - 1].createdAt) >
               new Date(data.albums[0].createdAt)
           ) {
-            return [...n, ...data?.albums];
+            return [...a, ...data?.albums];
           }
-          return data?.albums;
+          return a;
         });
       }
     }
@@ -56,7 +54,7 @@ const ChatAlbums: React.FC = () => {
 
   useFocusEffect(
     useCallback(() => {
-      setNotesForInfiniteScroll([]);
+      // setAlbumsForScroll([]);
       setPage('1');
       refetchAlbums();
     }, [refetchAlbums]),
@@ -88,10 +86,10 @@ const ChatAlbums: React.FC = () => {
           fontFamily="Feather"
         />
       </Button>
-      {notesForInfiniteScroll.length ? (
+      {albumsForScroll.length ? (
         <FlatList
           {...{onEndReached}}
-          data={notesForInfiniteScroll}
+          data={albumsForScroll}
           contentContainerStyle={tailwind('pb-16')}
           keyExtractor={item => item.id.toString()}
           renderItem={({item}) => (
