@@ -5,7 +5,8 @@ import {QueryClientProvider, QueryClient} from 'react-query';
 import 'react-native-gesture-handler';
 import RNBootSplash from 'react-native-bootsplash';
 import PushNotificationIOS from '@react-native-community/push-notification-ios';
-import {Platform} from 'react-native';
+import {Alert, Linking, Platform} from 'react-native';
+import VersionCheck from 'react-native-version-check';
 
 const App = () => {
   const queryClient = new QueryClient();
@@ -25,6 +26,30 @@ const App = () => {
         }
       });
     }
+  }, []);
+
+  useEffect(() => {
+    const checkVersion = async () => {
+      const needOrNot = await VersionCheck.needUpdate({
+        provider: Platform.OS === 'android' ? 'playStore' : 'appStore',
+        //@ts-ignore
+        country: 'jp',
+      });
+      if (needOrNot?.isNeeded) {
+        Alert.alert('アプリを更新してください', '', [
+          {
+            text: 'ストアを開く',
+            onPress: () => {
+              Linking.openURL(needOrNot.storeUrl);
+            },
+          },
+          {
+            text: 'キャンセル',
+          },
+        ]);
+      }
+    };
+    checkVersion();
   }, []);
 
   return (
