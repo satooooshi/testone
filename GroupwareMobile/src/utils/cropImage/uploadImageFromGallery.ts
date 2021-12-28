@@ -13,7 +13,9 @@ export const uploadImageFromGallery = async (
   },
 ): Promise<{formData: FormData | undefined; mime: string | undefined}> => {
   try {
-    const photo = await ImagePicker.openPicker(options);
+    const optionsExec: Options =
+      options.mediaType === 'photo' ? {...options, forceJpg: true} : options;
+    const photo = await ImagePicker.openPicker(optionsExec);
     const mime = photo.mime;
     const formData = imagePickerResponseToFormData(photo);
     return {formData, mime};
