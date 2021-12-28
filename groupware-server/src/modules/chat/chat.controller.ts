@@ -335,11 +335,10 @@ export class ChatController {
   @UseGuards(JwtAuthenticationGuard)
   async getChatAlbumDetail(
     @Param('albumId') albumId: string,
-    @Query('page') page: string,
+    // @Query('page') page: string,
   ) {
     const albums = await this.chatAlbumService.getChatAlbumImages(
       Number(albumId),
-      page,
     );
     return albums;
   }

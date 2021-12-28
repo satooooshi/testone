@@ -7,18 +7,16 @@ import {chatAlbumImageURL} from '../../../../utils/url/chat.url';
 export interface GetChatAlbumImagesQuery {
   roomId: string;
   albumId: string;
-  page: string;
 }
 
 export interface GetChatAlbumImagesResult {
   images: ChatAlbumImage[];
-  pageCount: number;
 }
 
 const getAlbumImages = async (query: GetChatAlbumImagesQuery) => {
-  const {roomId, albumId, page} = query;
+  const {roomId, albumId} = query;
   const res = await axiosInstance.get<GetChatAlbumImagesResult>(
-    chatAlbumImageURL(roomId, albumId, page),
+    chatAlbumImageURL(roomId, albumId),
   );
   return res.data;
 };

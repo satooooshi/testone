@@ -36,7 +36,6 @@ const AlbumDetail: React.FC = () => {
   const editorAvatarSize = 36;
   const [editModal, setEditModal] = useState(false);
   const imageWidth = windowWidth * 0.5;
-  const [page, setPage] = useState(1);
   const {room, album: passedAlbum} =
     useRoute<ChatAlbumDetailRouteProps>().params;
   const [album, setAlbum] = useState(passedAlbum);
@@ -60,7 +59,6 @@ const AlbumDetail: React.FC = () => {
   const {data} = useAPIGetChatAlbumImages({
     roomId: room.id.toString(),
     albumId: album.id.toString(),
-    page: page.toString(),
   });
   const {values, setValues, handleSubmit, errors, touched} = useFormik({
     initialValues: album,
@@ -73,10 +71,6 @@ const AlbumDetail: React.FC = () => {
     return imagesForInfiniteScroll?.map(i => ({uri: i.imageURL || ''})) || [];
   }, [imagesForInfiniteScroll]);
 
-  const onEndReached = () => {
-    setPage(p => p + 1);
-  };
-
   const handlePressImage = useCallback(
     (url: string) => {
       const isNowUri = (element: ImageSource) => element.uri === url;
@@ -88,22 +82,9 @@ const AlbumDetail: React.FC = () => {
 
   useEffect(() => {
     if (data?.images?.length) {
-      if (page === 1) {
-        setImagesForInfiniteScroll(data.images);
-      } else {
-        setImagesForInfiniteScroll(i => {
-          if (
-            i.length &&
-            new Date(i[i.length - 1].createdAt) <
-              new Date(data.images[0].createdAt)
-          ) {
-            return [...i, ...data?.images];
-          }
-          return i;
-        });
-      }
+      setImagesForInfiniteScroll(data.images);
     }
-  }, [data?.images, page]);
+  }, [data?.images]);
 
   return (
     <WholeContainer>
@@ -184,7 +165,6 @@ const AlbumDetail: React.FC = () => {
         />
       </Button>
       <FlatList
-        {...{onEndReached}}
         data={imagesForInfiniteScroll}
         ListHeaderComponent={
           <Div px={'lg'} mb={'lg'}>

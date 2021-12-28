@@ -30,11 +30,8 @@ export const chatNoteDetailURL = (roomId: string, noteId: string) =>
 export const getChatAlbumsURL = (roomId: string, page: string) =>
   `${albumURL(roomId)}?page=${page}`;
 //DELETE
-export const getChatAlbumImageURL = (
-  roomId: string,
-  albumId: string,
-  page: string,
-) => `${albumURL(roomId)}/${albumId}?page=${page}`;
+export const getChatAlbumImageURL = (roomId: string, albumId: string) =>
+  `${albumURL(roomId)}/${albumId}`;
 
 export const chatAlbumDetailURL = (roomId: string, albumId: string) =>
   `${albumURL(roomId)}/${albumId}`;

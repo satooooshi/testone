@@ -17,7 +17,7 @@ export interface GetChatAlbumsResult {
 
 export interface GetChatAlbumImagesResult {
   images: ChatAlbumImage[];
-  pageCount: number;
+  // pageCount: number;
 }
 
 @Injectable()
@@ -68,21 +68,21 @@ export class ChatAlbumService {
 
   public async getChatAlbumImages(
     albumID: number,
-    page: string,
+    // page: string,
   ): Promise<GetChatAlbumImagesResult> {
-    const limit = 20;
-    const offset = limit * (Number(page) - 1);
-    const [albumImages, count] = await this.albumImageRepository
+    // const limit = 20;
+    // const offset = limit * (Number(page) - 1);
+    const albumImages = await this.albumImageRepository
       .createQueryBuilder('album_images')
       .leftJoinAndSelect('album_images.chatAlbum', 'chat_albums')
       .where('chat_albums.id = :albumID', { albumID })
       .withDeleted()
-      .skip(offset)
-      .take(limit)
+      // .skip(offset)
+      // .take(limit)
       .orderBy('chat_albums.createdAt', 'DESC')
-      .getManyAndCount();
-    const pageCount = Math.floor(count / limit) + 1;
-    return { images: albumImages, pageCount };
+      .getMany();
+    // const pageCount = Math.floor(count / limit) + 1;
+    return { images: albumImages };
   }
 
   public async getChatAlbums(
