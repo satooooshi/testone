@@ -148,7 +148,7 @@ const AlbumModal: React.FC<AlbumModalProps> = ({ isOpen, onClose, room }) => {
             onSuccess: () => {
               setMode('editPhoto');
               toast({
-                description: 'アルバムを名を更新しました',
+                description: 'アルバム名を更新しました',
                 status: 'success',
                 duration: 3000,
                 isClosable: true,
@@ -272,6 +272,9 @@ const AlbumModal: React.FC<AlbumModalProps> = ({ isOpen, onClose, room }) => {
       return;
     }
     if (confirm('画像をアルバムから削除してよろしいですか？')) {
+      console.log(image.imageURL);
+      console.log(values.images);
+      console.log(values.images?.filter((i) => i.imageURL !== image.imageURL));
       setValues((v) => ({
         ...v,
         images: v.images?.filter((i) => i.imageURL !== image.imageURL) || [],
