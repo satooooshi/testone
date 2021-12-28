@@ -1,4 +1,4 @@
-import {useNavigation} from '@react-navigation/native';
+import {useFocusEffect, useNavigation} from '@react-navigation/native';
 import React, {useCallback, useState} from 'react';
 import {Alert, FlatList} from 'react-native';
 import {Div, Text} from 'react-native-magnus';
@@ -18,29 +18,26 @@ const RoomList: React.FC = () => {
   const [roomsForInfiniteScroll, setRoomsForInfiniteScroll] = useState<
     ChatGroup[]
   >([]);
-  useAPIGetRooms(
+
+  const {refetch: refetchAllRooms} = useAPIGetRooms(
     {
       page: '1',
       limit: (20 * Number(page)).toString(),
     },
     {
-      refetchInterval: 3000,
+      refetchInterval: 30000,
       onSuccess: data => {
         stateRefreshNeeded(data.rooms);
       },
     },
   );
 
-  const {
-    data: chatRooms,
-    isLoading: loadingGetChatGroupList,
-    refetch,
-  } = useAPIGetRooms({
+  const {data: chatRooms, isLoading: loadingGetChatGroupList} = useAPIGetRooms({
     page,
   });
   const {mutate: saveGroup} = useAPIUpdateChatGroup({
     onSuccess: () => {
-      handleRefetch();
+      refetchAllRooms();
     },
     onError: () => {
       Alert.alert(
@@ -48,11 +45,6 @@ const RoomList: React.FC = () => {
       );
     },
   });
-
-  const handleRefetch = useCallback(() => {
-    setRoomsForInfiniteScroll([]);
-    refetch();
-  }, [refetch]);
 
   const onPressRightButton = () => {
     navigation.navigate('ChatStack', {screen: 'NewRoom'});
@@ -92,6 +84,12 @@ const RoomList: React.FC = () => {
       setRoomsForInfiniteScroll(newData);
     }
   };
+
+  useFocusEffect(
+    useCallback(() => {
+      refetchAllRooms();
+    }, [refetchAllRooms]),
+  );
 
   return (
     <WholeContainer>
