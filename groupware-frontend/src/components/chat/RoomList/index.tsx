@@ -1,6 +1,7 @@
 import { useAPIGetRoomsByPage } from '@/hooks/api/chat/useAPIGetRoomsByPage';
 import { Box, Spinner, Text } from '@chakra-ui/react';
 import React, { SetStateAction, useEffect, useState } from 'react';
+import { useRoomRefetch } from 'src/contexts/chat/useRoomRefetch';
 import { ChatGroup } from 'src/types';
 import ChatGroupCard from '../ChatGroupCard';
 
@@ -17,6 +18,7 @@ const RoomList: React.FC<RoomListProps> = ({
   setCurrentRoom,
   onClickRoom,
 }) => {
+  const { clearRefetch, refetchNeeded } = useRoomRefetch();
   const [page, setPage] = useState('1');
   const [roomsForInfiniteScroll, setRoomsForInfiniteScroll] = useState<
     ChatGroup[]
@@ -74,15 +76,16 @@ const RoomList: React.FC<RoomListProps> = ({
     }
   };
 
-  useAPIGetRoomsByPage(
+  const { refetch: refreshRooms } = useAPIGetRoomsByPage(
     {
       page: '1',
       limit: (20 * Number(page)).toString(),
     },
     {
-      refetchInterval: 1000,
+      refetchInterval: 30000,
       onSuccess: (data) => {
         stateRefreshNeeded(data.rooms);
+        clearRefetch();
       },
     },
   );
@@ -97,6 +100,14 @@ const RoomList: React.FC<RoomListProps> = ({
       }
     }
   }, [currentId, currentRoom, roomsForInfiniteScroll, setCurrentRoom]);
+  console.log(refetchNeeded);
+
+  useEffect(() => {
+    if (refetchNeeded) {
+      refreshRooms();
+      clearRefetch();
+    }
+  }, [clearRefetch, refetchNeeded, refreshRooms]);
 
   return (
     <Box

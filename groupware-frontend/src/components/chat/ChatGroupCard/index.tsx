@@ -5,6 +5,7 @@ import { Avatar, Box, useMediaQuery, Text, Link } from '@chakra-ui/react';
 import { darkFontColor } from 'src/utils/colors';
 import { RiPushpin2Fill, RiPushpin2Line } from 'react-icons/ri';
 import { useAPIUpdateChatGroup } from '@/hooks/api/chat/useAPIUpdateChatGroup';
+import { useRoomRefetch } from 'src/contexts/chat/useRoomRefetch';
 
 type ChatGroupCardProps = {
   chatGroup: ChatGroup;
@@ -15,10 +16,12 @@ const ChatGroupCard: React.FC<ChatGroupCardProps> = ({
   chatGroup,
   isSelected = false,
 }) => {
+  const { needRefetch } = useRoomRefetch();
   const [isPinned, setIsPinned] = useState<boolean>(!!chatGroup.isPinned);
   const { mutate: saveGroup } = useAPIUpdateChatGroup({
     onSuccess: () => {
       setIsPinned(!isPinned);
+      needRefetch();
     },
   });
   const [isSmallerThan768] = useMediaQuery('max-width: 768px');

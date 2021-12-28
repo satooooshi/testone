@@ -42,6 +42,7 @@ import { baseURL } from 'src/utils/url';
 import { useAuthenticate } from 'src/contexts/useAuthenticate';
 import AlbumModal from '../AlbumModal';
 import NoteModal from '../NoteModal';
+import { useRoomRefetch } from 'src/contexts/chat/useRoomRefetch';
 
 const socket = io(baseURL, {
   transports: ['websocket'],
@@ -53,6 +54,7 @@ type ChatBoxProps = {
 };
 
 const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
+  const { needRefetch } = useRoomRefetch();
   const [visibleAlbumModal, setVisibleAlbumModal] = useState(false);
   const [visibleNoteModal, setVisibleNoteModal] = useState(false);
   const { user: myself } = useAuthenticate();
@@ -71,9 +73,15 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
     enableReinitialize: true,
     onSubmit: () => onSend(),
   });
-  const [imagesForViewing, setImagesForViewing] = useState<ImageDecorator[]>(
-    [],
-  );
+  const imagesForViewing: ImageDecorator[] = useMemo(() => {
+    return messages
+      .filter((m) => m.type === ChatMessageType.IMAGE)
+      .map((m) => ({
+        src: m.content,
+        downloadUrl: m.content,
+      }))
+      .reverse();
+  }, [messages]);
   const { mutate: saveLastReadChatTime } = useAPISaveLastReadChatTime();
   const [selectedImageURL, setSelectedImageURL] = useState<string>();
   const { data: lastReadChatTime } = useAPIGetLastReadChatTime(room.id, {
@@ -95,20 +103,15 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
       onSuccess: (latestData) => {
         if (latestData?.length) {
           const msgToAppend: ChatMessage[] = [];
-          const imagesToApped: ImageDecorator[] = [];
           for (const latest of latestData) {
             if (!messages?.length || isRecent(latest, messages?.[0])) {
               msgToAppend.push(latest);
-              if (latest.type === ChatMessageType.IMAGE) {
-                imagesToApped.unshift({
-                  src: latest.content,
-                  downloadUrl: latest.content,
-                });
-              }
             }
           }
-          setMessages((m) => [...msgToAppend, ...m]);
-          setImagesForViewing((i) => [...i, ...imagesToApped]);
+          if (msgToAppend.length) {
+            setMessages((m) => [...msgToAppend, ...m]);
+            needRefetch();
+          }
         }
       },
     },
@@ -116,16 +119,12 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
 
   const { mutate: sendChatMessage } = useAPISendChatMessage({
     onSuccess: (data) => {
+      socket.emit('message', { ...data, isSender: false });
       setTimeout(() => {
         if (data.id !== messages?.[0].id) {
           setMessages([data, ...messages]);
         }
-      }, 1000);
-      socket.emit('message', { ...data, isSender: false });
-      setImagesForViewing((i) => [
-        ...i,
-        { src: data.content, alt: '送信された画像' },
-      ]);
+      }, 3000);
       setNewChatMessage((m) => ({
         ...m,
         content: '',
@@ -261,30 +260,12 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
 
   useEffect(() => {
     setMessages([]);
-    setImagesForViewing([]);
     setPage(1);
     refetchLatest();
   }, [refetchLatest, room]);
 
   useEffect(() => {
     if (fetchedPastMessages?.length) {
-      const handleImages = () => {
-        const fetchedImages: ImageDecorator[] = fetchedPastMessages
-          .filter((m) => m.type === ChatMessageType.IMAGE)
-          .map((m) => ({ src: m.content, alt: '送信された画像' }));
-        setImagesForViewing((i) => [...i, ...fetchedImages]);
-      };
-      // if (
-      //   fetchedPastMessages?.length &&
-      //   fetchedPastMessages[0].chatGroup?.id !== room.id
-      // ) {
-      //   setMessages(fetchedPastMessages);
-      //   // const fetchedImages: ImageDecorator[] = fetchedPastMessages
-      //   //   .filter((m) => m.type === ChatMessageType.IMAGE)
-      //   //   .map((m) => ({ src: m.content, alt: '送信された画像' }));
-      //   // setImagesForViewing(fetchedImages);
-      //   return;
-      // }
       if (
         messages?.length &&
         isRecent(
@@ -301,10 +282,8 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
         setMessages((m) => {
           return [...m, ...msgToAppend];
         });
-        handleImages();
       } else if (!messages?.length) {
         setMessages(fetchedPastMessages);
-        handleImages();
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -325,7 +304,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
   useEffect(() => {
     socket.emit('joinRoom', room.id.toString());
     socket.on('msgToClient', async (sentMsgByOtherUsers: ChatMessage) => {
-      console.log('sent by other users', sentMsgByOtherUsers.content);
+      // console.log('sent by other users', sentMsgByOtherUsers.content);
       if (sentMsgByOtherUsers.content) {
         sentMsgByOtherUsers.createdAt = new Date(sentMsgByOtherUsers.createdAt);
         sentMsgByOtherUsers.updatedAt = new Date(sentMsgByOtherUsers.updatedAt);
@@ -335,6 +314,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
         setMessages((m) => {
           return [sentMsgByOtherUsers, ...m];
         });
+        needRefetch();
       }
     });
 
