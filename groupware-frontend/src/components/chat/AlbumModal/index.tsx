@@ -76,7 +76,7 @@ const AlbumModal: React.FC<AlbumModalProps> = ({ isOpen, onClose, room }) => {
   const onUploadImage = (files: File[]) => {
     uploadImage(files, {
       onSuccess: (imageURLs) => {
-        if (selectedAlbum && mode === 'editPhoto') {
+        if (selectedAlbum && mode === 'edit') {
           const albumImages: Partial<ChatAlbumImage>[] = imageURLs.map((i) => ({
             imageURL: i,
             chatAlbum: selectedAlbum,
@@ -119,9 +119,7 @@ const AlbumModal: React.FC<AlbumModalProps> = ({ isOpen, onClose, room }) => {
 
   const imageUploaderRef = useRef<HTMLInputElement | null>(null);
   const [selectedImage, setSelectedImage] = useState<Partial<ChatAlbumImage>>();
-  const [mode, setMode] = useState<'post' | 'list' | 'editPhoto' | 'editTitle'>(
-    'list',
-  );
+  const [mode, setMode] = useState<'post' | 'list' | 'edit' | 'detail'>('list');
   const initialValues: Partial<ChatAlbum> = {
     title: '',
     images: [],
@@ -141,18 +139,19 @@ const AlbumModal: React.FC<AlbumModalProps> = ({ isOpen, onClose, room }) => {
     initialValues: initialValues,
     validationSchema: albumSchema,
     onSubmit: (submittedValues, { resetForm }) => {
-      if (mode === 'editTitle') {
+      if (mode === 'edit') {
         updateAlbum(
-          { ...(submittedValues as ChatAlbum), images: undefined },
+          { ...(submittedValues as ChatAlbum) },
           {
             onSuccess: () => {
-              setMode('editPhoto');
+              setMode('list');
               toast({
-                description: 'アルバム名を更新しました',
+                description: 'アルバムを更新しました。',
                 status: 'success',
                 duration: 3000,
                 isClosable: true,
               });
+              setAlbumImages([]);
               resetForm();
             },
           },
@@ -167,6 +166,7 @@ const AlbumModal: React.FC<AlbumModalProps> = ({ isOpen, onClose, room }) => {
               duration: 3000,
               isClosable: true,
             });
+            setAlbumImages([]);
             resetForm();
           },
         });
@@ -272,9 +272,6 @@ const AlbumModal: React.FC<AlbumModalProps> = ({ isOpen, onClose, room }) => {
       return;
     }
     if (confirm('画像をアルバムから削除してよろしいですか？')) {
-      console.log(image.imageURL);
-      console.log(values.images);
-      console.log(values.images?.filter((i) => i.imageURL !== image.imageURL));
       setValues((v) => ({
         ...v,
         images: v.images?.filter((i) => i.imageURL !== image.imageURL) || [],
@@ -420,7 +417,7 @@ const AlbumModal: React.FC<AlbumModalProps> = ({ isOpen, onClose, room }) => {
           <AlbumBox
             album={a}
             onClick={() => {
-              setMode('editPhoto');
+              setMode('detail');
               setSelectedAlbum(a);
             }}
             onClickDeleteButton={() => {
@@ -434,6 +431,12 @@ const AlbumModal: React.FC<AlbumModalProps> = ({ isOpen, onClose, room }) => {
                     onSuccess: () => {
                       setNotesForInfiniteScroll([]);
                       setAlbumListPage(1);
+                      toast({
+                        description: 'アルバムを削除しました。',
+                        status: 'success',
+                        duration: 3000,
+                        isClosable: true,
+                      });
                       refetchAlbums();
                     },
                   },
@@ -476,9 +479,7 @@ const AlbumModal: React.FC<AlbumModalProps> = ({ isOpen, onClose, room }) => {
             },
           ]);
         }}
-        images={
-          mode === 'editPhoto' ? imagesInDetailViewer : imagesInNewAlbumViewer
-        }
+        images={mode === 'edit' ? imagesInDetailViewer : imagesInNewAlbumViewer}
         visible={!!selectedImage}
         onClose={() => setSelectedImage(undefined)}
         activeIndex={activeIndex !== -1 ? activeIndex : 0}
@@ -499,7 +500,10 @@ const AlbumModal: React.FC<AlbumModalProps> = ({ isOpen, onClose, room }) => {
               <Button
                 size="sm"
                 flexDir="row"
-                onClick={() => setMode('post')}
+                onClick={() => {
+                  resetForm();
+                  setMode('post');
+                }}
                 mb="8px"
                 colorScheme="green"
                 alignItems="center">
@@ -511,7 +515,7 @@ const AlbumModal: React.FC<AlbumModalProps> = ({ isOpen, onClose, room }) => {
           <ModalBody onScroll={onScroll}>
             {mode === 'list' ? (
               listMode
-            ) : selectedAlbum && mode === 'editPhoto' ? (
+            ) : selectedAlbum && mode === 'detail' ? (
               <Box>
                 <Box
                   flexDir="row"
@@ -532,38 +536,70 @@ const AlbumModal: React.FC<AlbumModalProps> = ({ isOpen, onClose, room }) => {
                       size="xs"
                       flexDir="row"
                       mr="4px"
-                      onClick={() => imageUploaderRef.current?.click()}
-                      mb="8px"
-                      colorScheme="green"
-                      alignItems="center">
-                      <Text display="inline">写真を追加</Text>
-                    </Button>
-                    <Button
-                      size="xs"
-                      flexDir="row"
-                      mr="4px"
-                      onClick={() => setMode('editTitle')}
+                      onClick={() => setMode('edit')}
                       mb="8px"
                       colorScheme="blue"
                       alignItems="center">
-                      <Text display="inline">アルバム名を編集</Text>
+                      <Text display="inline">アルバムを編集</Text>
                     </Button>
                   </Box>
-                  <input
-                    multiple
-                    ref={imageUploaderRef}
-                    accept="image/*"
-                    type="file"
-                    hidden
-                    name="imageUploadToAlbum"
-                    onChange={imageUploadToAlbum}
-                  />
                 </Box>
                 {errors.images && touched.images ? (
                   <FormLabel color="tomato">{errors.images}</FormLabel>
                 ) : null}
                 <SimpleGrid spacing="8px" columns={2}>
                   {albumImages?.map((i) => (
+                    <Box position="relative" key={i.id}>
+                      <Link key={i.id} onClick={() => setSelectedImage(i)}>
+                        <Image src={i.imageURL} alt="アルバム画像" w="100%" />
+                      </Link>
+                    </Box>
+                  ))}
+                </SimpleGrid>
+              </Box>
+            ) : mode === 'edit' ? (
+              <Box>
+                <Box
+                  flexDir="row"
+                  justifyContent="space-between"
+                  display="flex">
+                  <Button
+                    size="sm"
+                    flexDir="row"
+                    onClick={() => setMode('list')}
+                    mb="8px"
+                    alignItems="center">
+                    <AiOutlineLeft size={24} style={{ display: 'inline' }} />
+                    <Text display="inline">一覧へ戻る</Text>
+                  </Button>
+                  <Button
+                    size="xs"
+                    flexDir="row"
+                    mr="4px"
+                    onClick={() => handleSubmit()}
+                    mb="8px"
+                    colorScheme="blue"
+                    alignItems="center">
+                    <Text display="inline">アルバムを更新</Text>
+                  </Button>
+                </Box>
+                <FormLabel>アルバム名</FormLabel>
+                {errors.title && touched.title ? (
+                  <FormLabel color="tomato">{errors.title}</FormLabel>
+                ) : null}
+                <Input
+                  bg="white"
+                  mb="8px"
+                  value={values.title}
+                  name="title"
+                  onChange={handleChange}
+                  placeholder={dateTimeFormatterFromJSDDate({
+                    dateTime: new Date(),
+                    format: 'yyyy/LL/dd',
+                  })}
+                />
+                <SimpleGrid spacing="8px" columns={2}>
+                  {values?.images?.map((i) => (
                     <Box position="relative" key={i.id}>
                       <AiFillCloseCircle
                         onClick={() => removeImage(i)}
@@ -584,46 +620,14 @@ const AlbumModal: React.FC<AlbumModalProps> = ({ isOpen, onClose, room }) => {
                     </Box>
                   ))}
                 </SimpleGrid>
-              </Box>
-            ) : mode === 'editTitle' ? (
-              <Box>
-                <Box
-                  flexDir="row"
-                  justifyContent="space-between"
-                  display="flex">
-                  <Button
-                    size="sm"
-                    flexDir="row"
-                    onClick={() => setMode('list')}
-                    mb="8px"
-                    alignItems="center">
-                    <AiOutlineLeft size={24} style={{ display: 'inline' }} />
-                    <Text display="inline">一覧へ戻る</Text>
-                  </Button>
-                  <Button
-                    size="sm"
-                    flexDir="row"
-                    onClick={() => handleSubmit()}
-                    mb="8px"
-                    colorScheme="green"
-                    alignItems="center">
-                    <Text display="inline">アルバムを更新</Text>
-                  </Button>
-                </Box>
-                <FormLabel>アルバム名</FormLabel>
-                {errors.title && touched.title ? (
-                  <FormLabel color="tomato">{errors.title}</FormLabel>
-                ) : null}
-                <Input
-                  bg="white"
-                  mb="8px"
-                  value={values.title}
-                  name="title"
-                  onChange={handleChange}
-                  placeholder={dateTimeFormatterFromJSDDate({
-                    dateTime: new Date(),
-                    format: 'yyyy/LL/dd',
-                  })}
+                <input
+                  multiple
+                  ref={imageUploaderRef}
+                  accept="image/*"
+                  type="file"
+                  hidden
+                  name="imageUploadToAlbum"
+                  onChange={imageUploadToAlbum}
                 />
               </Box>
             ) : (
