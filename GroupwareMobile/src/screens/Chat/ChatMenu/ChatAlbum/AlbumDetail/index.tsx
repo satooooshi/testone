@@ -1,5 +1,5 @@
 import {useNavigation, useRoute} from '@react-navigation/native';
-import React, {useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {
   Alert,
   FlatList,
@@ -70,33 +70,41 @@ const AlbumDetail: React.FC = () => {
       updateAlbum({...v, images: undefined});
     },
   });
-  const images: ImageSource[] =
-    imagesForInfiniteScroll?.map(i => ({uri: i.imageURL || ''})) || [];
+  const images: ImageSource[] = useMemo(() => {
+    return imagesForInfiniteScroll?.map(i => ({uri: i.imageURL || ''})) || [];
+  }, [imagesForInfiniteScroll]);
 
   const onEndReached = () => {
     setPage(p => p + 1);
   };
 
-  const handlePressImage = (url: string) => {
-    const isNowUri = (element: ImageSource) => element.uri === url;
-    setNowImageIndex(images.findIndex(isNowUri));
-    setImageModal(true);
-  };
+  const handlePressImage = useCallback(
+    (url: string) => {
+      const isNowUri = (element: ImageSource) => element.uri === url;
+      setNowImageIndex(images.findIndex(isNowUri));
+      setImageModal(true);
+    },
+    [images],
+  );
 
   useEffect(() => {
     if (data?.images?.length) {
-      setImagesForInfiniteScroll(n => {
-        if (
-          n.length &&
-          new Date(n[n.length - 1].createdAt) <
-            new Date(data.images[0].createdAt)
-        ) {
-          return [...n, ...data?.images];
-        }
-        return data?.images;
-      });
+      if (page === 1) {
+        setImagesForInfiniteScroll(data.images);
+      } else {
+        setImagesForInfiniteScroll(i => {
+          if (
+            i.length &&
+            new Date(i[i.length - 1].createdAt) <
+              new Date(data.images[0].createdAt)
+          ) {
+            return [...i, ...data?.images];
+          }
+          return i;
+        });
+      }
     }
-  }, [data?.images]);
+  }, [data?.images, page]);
 
   return (
     <WholeContainer>
@@ -226,10 +234,7 @@ const AlbumDetail: React.FC = () => {
             style={tailwind('border border-white')}
             underlayColor="none"
             onPress={() => handlePressImage(i.imageURL)}>
-            <FastImage
-              style={{width: imageWidth, height: imageWidth}}
-              source={{uri: i.imageURL}}
-            />
+            <Image w={imageWidth} h={imageWidth} source={{uri: i.imageURL}} />
           </TouchableHighlight>
         )}
       />
