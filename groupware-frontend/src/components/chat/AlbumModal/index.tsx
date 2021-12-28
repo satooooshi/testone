@@ -429,6 +429,7 @@ const AlbumModal: React.FC<AlbumModalProps> = ({ isOpen, onClose, room }) => {
                   },
                   {
                     onSuccess: () => {
+                      setNotesForInfiniteScroll([]);
                       setAlbumListPage(1);
                       refetchAlbums();
                     },
