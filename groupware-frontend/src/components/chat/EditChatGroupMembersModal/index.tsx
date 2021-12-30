@@ -164,18 +164,20 @@ const EditChatGroupMembersModal: React.FC<EditChatGroupMambersModalProps> = ({
             </Box>
             <Box>
               <Text mb="8px">選択済みのメンバー</Text>
-              {selectedUsersInModal?.map((u) => (
-                <Box mr={'4px'} mb={'4px'} key={u.id}>
-                  <ButtonGroup isAttached size="xs" colorScheme="purple">
-                    <Button mr="-px">{userNameFactory(u)}</Button>
-                    <IconButton
-                      onClick={() => toggleUser(u as User)}
-                      aria-label="削除"
-                      icon={<MdCancel size={18} />}
-                    />
-                  </ButtonGroup>
-                </Box>
-              ))}
+              {selectedUsersInModal
+                ?.filter((m) => m.id !== myProfile?.id)
+                .map((u) => (
+                  <Box mr={'4px'} mb={'4px'} key={u.id}>
+                    <ButtonGroup isAttached size="xs" colorScheme="purple">
+                      <Button mr="-px">{userNameFactory(u)}</Button>
+                      <IconButton
+                        onClick={() => toggleUser(u as User)}
+                        aria-label="削除"
+                        icon={<MdCancel size={18} />}
+                      />
+                    </ButtonGroup>
+                  </Box>
+                ))}
             </Box>
           </Box>
         </ModalBody>
