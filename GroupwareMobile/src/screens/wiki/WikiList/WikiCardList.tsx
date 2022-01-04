@@ -10,7 +10,7 @@ import {
   SearchQueryToGetWiki,
   useAPIGetWikiList,
 } from '../../../hooks/api/wiki/useAPIGetWikiList';
-import {Div, Text} from 'react-native-magnus';
+import {Div, Radio, Text} from 'react-native-magnus';
 import WikiCard from '../../../components/wiki/WikiCard';
 import {FlatList} from 'react-native';
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
@@ -20,6 +20,7 @@ import SearchFormOpenerButton from '../../../components/common/SearchForm/Search
 import {WikiListRouteProps} from '../../../types/navigator/drawerScreenProps';
 import {ActivityIndicator} from 'react-native-paper';
 import {wikiTypeNameFactory} from '../../../utils/factory/wiki/wikiTypeNameFactory';
+import tailwind from 'tailwind-rn';
 
 const TopTab = createMaterialTopTabNavigator();
 
@@ -37,7 +38,6 @@ type RenderWikiCardListProps = {
   boardCategory?: BoardCategory;
   setRuleCategory: Dispatch<SetStateAction<RuleCategory>>;
   setBoardCategory: Dispatch<SetStateAction<BoardCategory>>;
-  status?: 'new' | 'resolved';
   type?: WikiType;
   focused: boolean;
 };
@@ -50,7 +50,6 @@ const RenderWikiCardList: React.FC<RenderWikiCardListProps> = ({
   boardCategory,
   setBoardCategory,
   type,
-  status,
   focused,
 }) => {
   const [searchQuery, setSearchQuery] = useState<SearchQueryToGetWiki>({
@@ -60,7 +59,10 @@ const RenderWikiCardList: React.FC<RenderWikiCardListProps> = ({
     rule_category: ruleCategory,
     board_category: boardCategory,
     type,
-    status,
+    status:
+      type === WikiType.BOARD && boardCategory === BoardCategory.QA
+        ? 'new'
+        : undefined,
   });
   const {
     data: fetchedWiki,
@@ -97,7 +99,7 @@ const RenderWikiCardList: React.FC<RenderWikiCardListProps> = ({
       setSearchQuery(q => ({...q, page: '1', type, word, tag}));
       refetch();
     }
-  }, [focused, refetch, tag, type, word]);
+  }, [focused, refetch, tag, type, word, searchQuery.status]);
 
   useEffect(() => {
     if (!isFetching && fetchedWiki?.wiki && fetchedWiki?.wiki.length) {
@@ -110,11 +112,35 @@ const RenderWikiCardList: React.FC<RenderWikiCardListProps> = ({
     }
   }, [fetchedWiki?.wiki, isFetching]);
 
+  const isQA = type === WikiType.BOARD && boardCategory === BoardCategory.QA;
+
   return (
     <>
       <Div>
+        {isQA ? (
+          <Div flexDir="row" justifyContent="flex-end" my="sm" mr="sm">
+            {/* @ts-ignore */}
+            <Radio
+              mr="sm"
+              activeColor="green500"
+              checked={searchQuery.status === 'new'}
+              value="new"
+              suffix={<Text>新着</Text>}
+              onChange={() => setSearchQuery(q => ({...q, status: 'new'}))}
+            />
+            {/* @ts-ignore */}
+            <Radio
+              activeColor="green500"
+              checked={searchQuery.status === 'resolved'}
+              value="resolved"
+              suffix={<Text>解決済み</Text>}
+              onChange={() => setSearchQuery(q => ({...q, status: 'resolved'}))}
+            />
+          </Div>
+        ) : null}
         {wikiForInfiniteScroll.length ? (
           <FlatList
+            contentContainerStyle={tailwind('mb-8')}
             onEndReached={onEndReached}
             onEndReachedThreshold={0.5}
             data={wikiForInfiniteScroll || []}
@@ -181,7 +207,6 @@ const WikiCardList: React.FC<WikiCardListProps> = ({
                   setRuleCategory={setRuleCategory}
                   setBoardCategory={setBoardCategory}
                   ruleCategory={RuleCategory.RULES}
-                  status={undefined}
                   word={word}
                   tag={tag}
                   type={type}
@@ -197,7 +222,6 @@ const WikiCardList: React.FC<WikiCardListProps> = ({
                   setRuleCategory={setRuleCategory}
                   setBoardCategory={setBoardCategory}
                   ruleCategory={RuleCategory.PHILOSOPHY}
-                  status={undefined}
                   word={word}
                   tag={tag}
                   type={type}
@@ -213,7 +237,6 @@ const WikiCardList: React.FC<WikiCardListProps> = ({
                   setRuleCategory={setRuleCategory}
                   setBoardCategory={setBoardCategory}
                   ruleCategory={RuleCategory.ABC}
-                  status={undefined}
                   word={word}
                   tag={tag}
                   type={type}
@@ -229,7 +252,6 @@ const WikiCardList: React.FC<WikiCardListProps> = ({
                   setRuleCategory={setRuleCategory}
                   setBoardCategory={setBoardCategory}
                   ruleCategory={RuleCategory.BENEFITS}
-                  status={undefined}
                   word={word}
                   tag={tag}
                   type={type}
@@ -245,7 +267,6 @@ const WikiCardList: React.FC<WikiCardListProps> = ({
                   setRuleCategory={setRuleCategory}
                   setBoardCategory={setBoardCategory}
                   ruleCategory={RuleCategory.DOCUMENT}
-                  status={undefined}
                   word={word}
                   tag={tag}
                   type={type}
@@ -465,7 +486,6 @@ const WikiCardList: React.FC<WikiCardListProps> = ({
             setRuleCategory={setRuleCategory}
             setBoardCategory={setBoardCategory}
             ruleCategory={undefined}
-            status={undefined}
             word={word}
             tag={tag}
             type={type}
