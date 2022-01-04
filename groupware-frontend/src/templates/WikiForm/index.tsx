@@ -1,4 +1,10 @@
-import React, { useMemo, useState, useEffect, useRef } from 'react';
+import React, {
+  useMemo,
+  useState,
+  useEffect,
+  useRef,
+  ChangeEvent,
+} from 'react';
 import qaCreateStyles from '@/styles/layouts/QACreate.module.scss';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
@@ -13,6 +19,7 @@ import {
   UserRole,
   WikiType,
   RuleCategory,
+  BoardCategory,
 } from 'src/types';
 import { Tab, TabName } from 'src/types/header/tab/types';
 import {
@@ -37,6 +44,7 @@ import { useFormik } from 'formik';
 import { wikiSchema } from 'src/utils/validation/schema';
 import { stateFromHTML } from 'draft-js-import-html';
 import { imageExtensionsForMarkDownEditor } from 'src/utils/imageExtensions';
+import { wikiTypeNameFactory } from 'src/utils/wiki/wikiTypeNameFactory';
 
 type WikiFormProps = {
   wiki?: Wiki;
@@ -68,8 +76,10 @@ const WikiForm: React.FC<WikiFormProps> = ({
     title: '',
     body: '',
     tags: [],
-    type: type || WikiType.QA,
-    ruleCategory: type ? RuleCategory.RULES : undefined,
+    type: type || WikiType.BOARD,
+    ruleCategory: type === WikiType.RULES ? RuleCategory.RULES : undefined,
+    boardCategory:
+      type === WikiType.BOARD ? BoardCategory.QA : BoardCategory.NON_BOARD,
     textFormat: 'html',
   };
   const draftJsEmptyError = '入力必須です';
@@ -118,46 +128,18 @@ const WikiForm: React.FC<WikiFormProps> = ({
     },
   ];
 
-  const headerTabName = useMemo(() => {
-    switch (wiki?.type) {
-      case WikiType.QA:
-        return '質問を編集';
-      case WikiType.RULES:
-        return '社内規則を編集';
-      case WikiType.ALL_POSTAL:
-        return 'オール便を編集';
-      case WikiType.KNOWLEDGE:
-        return 'ナレッジを編集';
-      default:
-        return '編集';
-    }
-  }, [wiki?.type]);
+  const headerTabName = '内容を編集';
 
   const saveButtonName = useMemo(() => {
-    switch (newQuestion.type) {
-      case WikiType.QA:
-        return '質問';
-      case WikiType.KNOWLEDGE:
-        return 'ナレッジ';
-      case WikiType.ALL_POSTAL:
-        return 'オール便';
-      case WikiType.RULES:
-        switch (newQuestion.ruleCategory) {
-          case RuleCategory.PHILOSOPHY:
-            return '会社理念';
-          case RuleCategory.RULES:
-            return '社内規則';
-          case RuleCategory.ABC:
-            return 'ABC制度';
-          case RuleCategory.BENEFITS:
-            return '福利厚生等';
-          case RuleCategory.DOCUMENT:
-            return '各種申請書';
-        }
-      default:
-        return '質問';
-    }
-  }, [newQuestion.ruleCategory, newQuestion.type]);
+    return newQuestion.type
+      ? wikiTypeNameFactory(
+          newQuestion.type,
+          newQuestion.ruleCategory,
+          true,
+          newQuestion.boardCategory,
+        )
+      : 'Wiki';
+  }, [newQuestion.boardCategory, newQuestion.ruleCategory, newQuestion.type]);
 
   const toggleTag = (t: Tag) => {
     const isExist = newQuestion.tags?.filter(
@@ -189,6 +171,46 @@ const WikiForm: React.FC<WikiFormProps> = ({
           : 'ファイルのアップロードに失敗しました。',
       );
       return 'ファイルアップロード失敗しました';
+    }
+  };
+
+  const onTypeSelectionChange = (e: ChangeEvent<HTMLSelectElement>) => {
+    if (
+      e.target.value === RuleCategory.RULES ||
+      e.target.value === RuleCategory.ABC ||
+      e.target.value === RuleCategory.PHILOSOPHY ||
+      e.target.value === RuleCategory.BENEFITS ||
+      e.target.value === RuleCategory.DOCUMENT
+    ) {
+      setNewQuestion((prev) => ({
+        ...prev,
+        type: WikiType.RULES,
+        ruleCategory: e.target.value as RuleCategory,
+        boardCategory: BoardCategory.NON_BOARD,
+      }));
+    } else if (
+      e.target.value === BoardCategory.KNOWLEDGE ||
+      e.target.value === BoardCategory.QA ||
+      e.target.value === BoardCategory.NEWS ||
+      e.target.value === BoardCategory.IMPRESSIVE_UNIVERSITY ||
+      e.target.value === BoardCategory.CLUB ||
+      e.target.value === BoardCategory.STUDY_MEETING ||
+      e.target.value === BoardCategory.CELEBRATION ||
+      e.target.value === BoardCategory.OTHER
+    ) {
+      setNewQuestion((prev) => ({
+        ...prev,
+        type: WikiType.BOARD,
+        ruleCategory: RuleCategory.NON_RULE,
+        boardCategory: e.target.value as BoardCategory,
+      }));
+    } else {
+      setNewQuestion((prev) => ({
+        ...prev,
+        type: e.target.value as WikiType,
+        ruleCategory: RuleCategory.NON_RULE,
+        boardCategory: BoardCategory.NON_BOARD,
+      }));
     }
   };
 
@@ -266,44 +288,120 @@ const WikiForm: React.FC<WikiFormProps> = ({
               <Select
                 colorScheme="teal"
                 bg="white"
+                onChange={onTypeSelectionChange}
                 defaultValue={
                   type === WikiType.RULES
                     ? RuleCategory.RULES
-                    : type
+                    : type === WikiType.ALL_POSTAL
                     ? type
-                    : WikiType.QA
-                }
-                onChange={(e) => {
-                  if (
-                    e.target.value === WikiType.KNOWLEDGE ||
-                    e.target.value === WikiType.QA ||
-                    e.target.value === WikiType.ALL_POSTAL
-                  ) {
-                    setNewQuestion((prev) => ({
-                      ...prev,
-                      type: e.target.value as WikiType,
-                      ruleCategory: undefined,
-                    }));
-                    return;
-                  }
-                  setNewQuestion((prev) => ({
-                    ...prev,
-                    type: WikiType.RULES,
-                    ruleCategory: e.target.value as RuleCategory,
-                  }));
-                }}>
+                    : BoardCategory.QA
+                }>
                 {user?.role === UserRole.ADMIN && (
                   <>
-                    <option value={RuleCategory.PHILOSOPHY}>会社理念</option>
-                    <option value={RuleCategory.RULES}>社内規則</option>
-                    <option value={RuleCategory.ABC}>ABC制度</option>
-                    <option value={RuleCategory.BENEFITS}>福利厚生等</option>
-                    <option value={RuleCategory.DOCUMENT}>各種申請書</option>
-                    <option value={WikiType.ALL_POSTAL}>オール便</option>
+                    <option value={RuleCategory.PHILOSOPHY}>
+                      {wikiTypeNameFactory(
+                        WikiType.RULES,
+                        RuleCategory.PHILOSOPHY,
+                        true,
+                      )}
+                    </option>
+                    <option value={RuleCategory.RULES}>
+                      {wikiTypeNameFactory(
+                        WikiType.RULES,
+                        RuleCategory.RULES,
+                        true,
+                      )}
+                    </option>
+                    <option value={RuleCategory.ABC}>
+                      {wikiTypeNameFactory(
+                        WikiType.RULES,
+                        RuleCategory.ABC,
+                        true,
+                      )}
+                    </option>
+                    <option value={RuleCategory.BENEFITS}>
+                      {wikiTypeNameFactory(
+                        WikiType.RULES,
+                        RuleCategory.BENEFITS,
+                        true,
+                      )}
+                    </option>
+                    <option value={RuleCategory.DOCUMENT}>
+                      {wikiTypeNameFactory(
+                        WikiType.RULES,
+                        RuleCategory.DOCUMENT,
+                        true,
+                      )}
+                    </option>
+                    <option value={WikiType.ALL_POSTAL}>
+                      {wikiTypeNameFactory(WikiType.ALL_POSTAL)}
+                    </option>
                   </>
                 )}
-                <option value={WikiType.KNOWLEDGE}>ナレッジ</option>
-                <option value={WikiType.QA}>質問</option>
+                <option value={BoardCategory.KNOWLEDGE}>
+                  {wikiTypeNameFactory(
+                    WikiType.BOARD,
+                    undefined,
+                    true,
+                    BoardCategory.KNOWLEDGE,
+                  )}
+                </option>
+                <option value={BoardCategory.QA}>
+                  {wikiTypeNameFactory(
+                    WikiType.BOARD,
+                    undefined,
+                    true,
+                    BoardCategory.QA,
+                  )}
+                </option>
+                <option value={BoardCategory.NEWS}>
+                  {wikiTypeNameFactory(
+                    WikiType.BOARD,
+                    undefined,
+                    true,
+                    BoardCategory.NEWS,
+                  )}
+                </option>
+                <option value={BoardCategory.IMPRESSIVE_UNIVERSITY}>
+                  {wikiTypeNameFactory(
+                    WikiType.BOARD,
+                    undefined,
+                    true,
+                    BoardCategory.IMPRESSIVE_UNIVERSITY,
+                  )}
+                </option>
+                <option value={BoardCategory.CLUB}>
+                  {wikiTypeNameFactory(
+                    WikiType.BOARD,
+                    undefined,
+                    true,
+                    BoardCategory.CLUB,
+                  )}
+                </option>
+                <option value={BoardCategory.STUDY_MEETING}>
+                  {wikiTypeNameFactory(
+                    WikiType.BOARD,
+                    undefined,
+                    true,
+                    BoardCategory.STUDY_MEETING,
+                  )}
+                </option>
+                <option value={BoardCategory.CELEBRATION}>
+                  {wikiTypeNameFactory(
+                    WikiType.BOARD,
+                    undefined,
+                    true,
+                    BoardCategory.CELEBRATION,
+                  )}
+                </option>
+                <option value={BoardCategory.OTHER}>
+                  {wikiTypeNameFactory(
+                    WikiType.BOARD,
+                    undefined,
+                    true,
+                    BoardCategory.OTHER,
+                  )}
+                </option>
               </Select>
             </FormControl>
           )}

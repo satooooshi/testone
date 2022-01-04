@@ -1,5 +1,7 @@
-import clsx from 'clsx';
-import topTagBarStyle from '@/styles/components/TopTabBar.module.scss';
+import { Box, Link, Text, useMediaQuery } from '@chakra-ui/react';
+import React from 'react';
+import { hideScrollbarCss } from 'src/utils/chakra/hideScrollBar.css';
+import { darkFontColor } from 'src/utils/colors';
 
 export type TopTabBehavior = {
   tabName: string;
@@ -12,25 +14,43 @@ type TopTabBarProps = {
 };
 const TopTabBar: React.FC<TopTabBarProps> = ({ topTabBehaviorList }) => {
   const tabCount = topTabBehaviorList.length;
+  const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
   return (
-    <div className={topTagBarStyle.tabs_wrapper}>
-      {topTabBehaviorList.map((topTabBehavior, index) => {
+    <Box
+      mx="auto"
+      alignSelf="center"
+      display="flex"
+      flexDir="row"
+      alignItems="center"
+      w={isSmallerThan768 ? '100vw' : '80vw'}
+      px={isSmallerThan768 ? '5%' : undefined}
+      h="40px"
+      overflowX="auto"
+      css={hideScrollbarCss}>
+      {topTabBehaviorList.map((topTabBehavior) => {
         return (
-          <a
-            key={index}
-            className={clsx(
-              topTagBarStyle.tab,
-              topTabBehavior.isActiveTab
-                ? topTagBarStyle.active_tab
-                : topTagBarStyle.disable_tab,
-            )}
-            style={{ width: `${Math.floor(100 / tabCount)}%` }}
-            onClick={topTabBehavior.onClick}>
-            <p className={topTagBarStyle.tab_name}>{topTabBehavior.tabName}</p>
-          </a>
+          <Link
+            onClick={topTabBehavior.onClick}
+            key={topTabBehavior.tabName}
+            display="flex"
+            flexDir="row"
+            justifyContent="center"
+            alignItems="center"
+            h="100%"
+            minW="160px"
+            w={`${Math.floor(100 / tabCount)}%`}
+            whiteSpace="nowrap"
+            color={topTabBehavior.isActiveTab ? 'blue.500' : darkFontColor}
+            borderBottomWidth={1}
+            _hover={{ textDecoration: 'none' }}
+            borderBottomColor={
+              topTabBehavior.isActiveTab ? 'blue.500' : 'gray.200'
+            }>
+            <Text pb="8px">{topTabBehavior.tabName}</Text>
+          </Link>
         );
       })}
-    </div>
+    </Box>
   );
 };
 

@@ -1,6 +1,6 @@
 import React, {useCallback, useEffect, useState} from 'react';
 import WholeContainer from '../../../components/WholeContainer';
-import {Div, Text, Avatar, Button, Tag} from 'react-native-magnus';
+import {Div, Text, Button, Tag} from 'react-native-magnus';
 import {useAPIGetWikiDetail} from '../../../hooks/api/wiki/useAPIGetWikiDetail';
 import {
   StyleSheet,
@@ -17,7 +17,7 @@ import {
 } from '../../../utils/colors';
 import {userNameFactory} from '../../../utils/factory/userNameFactory';
 import {wikiDetailStyles} from '../../../styles/screen/wiki/wikiDetail.style';
-import {User, WikiType} from '../../../types';
+import {BoardCategory, User, WikiType} from '../../../types';
 import {WikiDetailProps} from '../../../types/navigator/drawerScreenProps';
 import {useIsFocused} from '@react-navigation/core';
 import AnswerList from '../AnswerList';
@@ -112,7 +112,11 @@ const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
     });
   };
 
-  const renderingTOCNeeded = wikiInfo?.type !== WikiType.QA && headings.length;
+  const renderingTOCNeeded =
+    !(
+      wikiInfo?.type === WikiType.BOARD &&
+      wikiInfo?.boardCategory === BoardCategory.QA
+    ) && headings.length;
 
   const article = (
     <ScrollerProvider scroller={scroller}>
@@ -177,7 +181,8 @@ const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
             </Div>
           </Div>
         ) : null}
-        {wikiInfo?.type === WikiType.QA ? (
+        {wikiInfo?.type === WikiType.BOARD &&
+        wikiInfo.boardCategory === BoardCategory.QA ? (
           <Div w={windowWidth * 0.9} alignSelf="center">
             <Div
               justifyContent="space-between"

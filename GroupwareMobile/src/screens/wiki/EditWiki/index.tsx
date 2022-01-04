@@ -1,6 +1,6 @@
 import React, {useEffect} from 'react';
 import {useAPICreateWiki} from '../../../hooks/api/wiki/useAPICreateWiki';
-import {RuleCategory, Wiki, WikiType} from '../../../types';
+import {BoardCategory, RuleCategory, Tag, Wiki, WikiType} from '../../../types';
 import {useFormik} from 'formik';
 import {wikiSchema} from '../../../utils/validation/schema';
 import {useAPIGetTag} from '../../../hooks/api/tag/useAPIGetTag';
@@ -41,8 +41,9 @@ const EditWiki: React.FC = () => {
     title: '',
     body: '',
     tags: [],
-    type: WikiType.QA,
-    ruleCategory: RuleCategory.OTHERS,
+    type: WikiType.BOARD,
+    ruleCategory: RuleCategory.NON_RULE,
+    boardCategory: BoardCategory.QA,
     textFormat: 'html',
   };
   const {setValues: setNewWiki} = useFormik({
@@ -62,7 +63,7 @@ const EditWiki: React.FC = () => {
   };
 
   useEffect(() => {
-    setNewWiki(w => ({...w, tags: selectedTags}));
+    setNewWiki(w => ({...w, tags: selectedTags as Tag[]}));
   }, [selectedTags, setNewWiki]);
 
   return (

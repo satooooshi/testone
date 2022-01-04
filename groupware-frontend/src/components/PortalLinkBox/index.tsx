@@ -7,7 +7,7 @@ import { BsChatDotsFill } from 'react-icons/bs';
 import { FaUserCog } from 'react-icons/fa';
 import { FcSportsMode } from 'react-icons/fc';
 import { RiAccountCircleFill, RiQuestionnaireFill } from 'react-icons/ri';
-import { MdAssignment } from 'react-icons/md';
+import { MdAssignment, MdDeveloperBoard } from 'react-icons/md';
 import { CgLoadbarDoc } from 'react-icons/cg';
 import { GrMail } from 'react-icons/gr';
 import { AiOutlineGlobal, AiFillBulb } from 'react-icons/ai';
@@ -26,6 +26,7 @@ export enum PortalLinkType {
   ALL_POSTAL = '/wiki/list?type=all-postal',
   KNOWLEDGE = '/wiki/list?type=knowledge',
   QA = `/wiki/list?type=qa`,
+  BOARD = `/wiki/list?type=board`,
   CHAT = '/chat',
   ADMIN = '/admin/users',
   ACCOUNT = '/account',
@@ -167,6 +168,15 @@ const PortalIcon: React.FC<PortalProps> = ({ href }) => {
           )}
         />
       );
+    case PortalLinkType.BOARD:
+      return (
+        <MdDeveloperBoard
+          className={clsx(
+            portalLinkBoxStyles.icon,
+            portalLinkBoxStyles.account_icon,
+          )}
+        />
+      );
     default:
       return <GiBookCover className={portalLinkBoxStyles.icon} />;
   }
@@ -201,6 +211,8 @@ export const eventTitleText = (href: PortalLinkType): string => {
       return '管理者ページ';
     case PortalLinkType.ACCOUNT:
       return 'アカウント';
+    case PortalLinkType.BOARD:
+      return '掲示板';
     default:
       return '';
   }
@@ -237,6 +249,8 @@ const descriptionText = (href: PortalLinkType): string => {
       return '各ユーザーの管理を管理者権限で行ないます。';
     case PortalLinkType.ACCOUNT:
       return '自分のアカウント情報を編集します。';
+    case PortalLinkType.BOARD:
+      return '社内で情報共有をする掲示板です・';
     default:
       return '';
   }

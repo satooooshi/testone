@@ -1,6 +1,6 @@
 import {AxiosError} from 'axios';
 import {QueryKey, useQuery, UseQueryOptions} from 'react-query';
-import {WikiType, RuleCategory, Wiki} from '../../../types';
+import {WikiType, RuleCategory, Wiki, BoardCategory} from '../../../types';
 import {axiosInstance} from '../../../utils/url';
 import {getWikiListURL} from '../../../utils/url/wiki.url';
 import {wikiQueryRefresh} from '../../../utils/wikiQueryRefresh';
@@ -14,6 +14,7 @@ export interface SearchQueryToGetWiki {
   writer?: string;
   answer_writer?: string;
   rule_category?: RuleCategory;
+  board_category?: BoardCategory;
 }
 
 export interface SearchResultToGetWiki {

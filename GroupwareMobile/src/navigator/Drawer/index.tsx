@@ -1,7 +1,6 @@
 import React from 'react';
 import {createDrawerNavigator} from '@react-navigation/drawer';
 import {darkFontColor} from '../../utils/colors';
-import Wiki from '../../screens/wiki';
 import EventList from '../../screens/event/EventList';
 import EventDetail from '../../screens/event/EventDetail';
 import WikiDetail from '../../screens/wiki/WikiDetail';

@@ -312,7 +312,6 @@ const UserRegisteringAdmin: React.FC = () => {
           <Input
             value={values.employeeId || ''}
             onChangeText={t => setValues({...values, employeeId: t})}
-            placeholder="bold@example.com"
             autoCapitalize="none"
           />
         </Div>

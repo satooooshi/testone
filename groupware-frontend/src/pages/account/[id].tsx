@@ -18,7 +18,6 @@ import TopTabBar, { TopTabBehavior } from '@/components/layout/TopTabBar';
 import { useAPIGetEventList } from '@/hooks/api/event/useAPIGetEventList';
 import { useAPIGetWikiList } from '@/hooks/api/wiki/useAPIGetWikiList';
 import { useHeaderTab } from '@/hooks/headerTab/useHeaderTab';
-import topTabBarStyles from '@/styles/components/TopTabBar.module.scss';
 import {
   Text,
   Box,
@@ -26,7 +25,7 @@ import {
   ThemeTypings,
   useMediaQuery,
 } from '@chakra-ui/react';
-import { TagType, UserTag, WikiType } from 'src/types';
+import { BoardCategory, TagType, UserTag, WikiType } from 'src/types';
 import { userRoleNameFactory } from 'src/utils/factory/userRoleNameFactory';
 import { darkFontColor } from 'src/utils/colors';
 
@@ -104,11 +103,13 @@ const MyAccountInfo = () => {
   const { data: events } = useAPIGetEventList({ participant_id: id });
   const { data: questionList } = useAPIGetWikiList({
     writer: id,
-    type: WikiType.QA,
+    type: WikiType.BOARD,
+    board_category: BoardCategory.QA,
   });
   const { data: knowledgeList } = useAPIGetWikiList({
     writer: id,
-    type: WikiType.KNOWLEDGE,
+    type: WikiType.BOARD,
+    board_category: BoardCategory.KNOWLEDGE,
   });
   const { user } = useAuthenticate();
   const [activeTab, setActiveTab] = useState<TabName>(TabName.DETAIL);
@@ -201,9 +202,9 @@ const MyAccountInfo = () => {
               </h1>
             </div>
 
-            <div className={topTabBarStyles.component_wrapper}>
+            <Box mb="24px">
               <TopTabBar topTabBehaviorList={topTabBehaviorList} />
-            </div>
+            </Box>
 
             {activeTab === TabName.DETAIL && (
               <>

@@ -7,7 +7,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import Home from '../../screens/Home';
 import {StyleSheet} from 'react-native';
 import EventList from '../../screens/event/EventList';
-import Wiki from '../../screens/wiki';
+// import Wiki from '../../screens/wiki';
 import {RootStackParamList} from '../../types/navigator/RootStackParamList';
 
 const BottomTab = () => {
@@ -38,16 +38,16 @@ const BottomTab = () => {
           ),
         }}
       />
-      <Tab.Screen
-        name="Wiki"
-        component={Wiki}
-        options={{
-          tabBarLabel: '社内Wiki',
-          tabBarIcon: ({color}) => (
-            <Ionicons name="globe-outline" color={color} size={26} />
-          ),
-        }}
-      />
+      {/* <Tab.Screen */}
+      {/*   name="Wiki" */}
+      {/*   component={Wiki} */}
+      {/*   options={{ */}
+      {/*     tabBarLabel: '社内Wiki', */}
+      {/*     tabBarIcon: ({color}) => ( */}
+      {/*       <Ionicons name="globe-outline" color={color} size={26} /> */}
+      {/*     ), */}
+      {/*   }} */}
+      {/* /> */}
     </Tab.Navigator>
   );
 };

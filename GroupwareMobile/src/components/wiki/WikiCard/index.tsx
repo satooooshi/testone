@@ -1,6 +1,6 @@
 import React from 'react';
 import {useWindowDimensions, FlatList, TouchableHighlight} from 'react-native';
-import {Wiki} from '../../../types';
+import {BoardCategory, Wiki, WikiType} from '../../../types';
 import {Div, Text, Tag} from 'react-native-magnus';
 import {tagColorFactory} from '../../../utils/factory/tagColorFactory';
 import {wikiCardStyles} from '../../../styles/component/wiki/wikiCard.style';
@@ -8,6 +8,7 @@ import {wikiTypeColorFactory} from '../../../utils/factory/wiki/wikiTypeColorFac
 import {wikiTypeNameFactory} from '../../../utils/factory/wiki/wikiTypeNameFactory';
 import {useNavigation} from '@react-navigation/native';
 import UserAvatar from '../../common/UserAvatar';
+import {dateTimeFormatterFromJSDDate} from '../../../utils/dateTimeFormatterFromJSDate';
 
 type WikiCardProps = {
   wiki: Wiki;
@@ -16,6 +17,8 @@ type WikiCardProps = {
 const WikiCard: React.FC<WikiCardProps> = ({wiki}) => {
   const windowWidth = useWindowDimensions().width;
   const navigation = useNavigation<any>();
+  const isQA =
+    wiki.type === WikiType.BOARD && wiki.boardCategory === BoardCategory.QA;
   return (
     <TouchableHighlight
       underlayColor="none"
@@ -30,21 +33,35 @@ const WikiCard: React.FC<WikiCardProps> = ({wiki}) => {
         flexDir="column"
         w={windowWidth}
         borderBottomWidth={1}
-        h={104}
+        pt={4}
+        h={108}
         bg="#eceeec"
         borderColor="#b0b0b0">
-        <Div
-          w={'100%'}
-          px={8}
-          h={'60%'}
-          mb={4}
-          flexDir="row"
-          alignItems="center">
+        <Div w={'100%'} px={8} flexDir="row" alignItems="center">
           <Div mr={8}>
             <UserAvatar user={wiki.writer} h={48} w={48} />
           </Div>
           <Text w={'80%'} numberOfLines={2} fontWeight="bold" fontSize={22}>
             {wiki.title}
+          </Text>
+        </Div>
+        <Div flexDir="row" justifyContent="flex-end" mb={4}>
+          {isQA ? (
+            <Div mr="lg" flexDir="row">
+              <Text textAlignVertical="bottom" mr={2}>
+                回答
+              </Text>
+              <Text
+                color="green600"
+                textAlignVertical="bottom"
+                fontSize={18}
+                mt={-3}>
+                {wiki.answers?.length.toString() || 0}
+              </Text>
+            </Div>
+          ) : null}
+          <Text textAlignVertical="bottom" textAlign="center">
+            {dateTimeFormatterFromJSDDate({dateTime: new Date(wiki.createdAt)})}
           </Text>
         </Div>
         <Div flexDir="row">

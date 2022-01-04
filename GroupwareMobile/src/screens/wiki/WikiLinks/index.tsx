@@ -26,34 +26,23 @@ const WikiLinks: React.FC = () => {
               }
             />
           </Div>
-          <PortalLinkBox
-            type="all-postal"
-            onPress={() =>
-              navigation.navigate('WikiStack', {
-                screen: 'WikiList',
-                params: {type: WikiType.ALL_POSTAL},
-              })
-            }
-          />
-        </Div>
-        <Div flexDir="row" alignItems="center" justifyContent="center">
           <Div mr="lg">
             <PortalLinkBox
-              type="knowledge"
+              type="all-postal"
               onPress={() =>
                 navigation.navigate('WikiStack', {
                   screen: 'WikiList',
-                  params: {type: WikiType.KNOWLEDGE},
+                  params: {type: WikiType.ALL_POSTAL},
                 })
               }
             />
           </Div>
           <PortalLinkBox
-            type="qa"
+            type="board"
             onPress={() =>
               navigation.navigate('WikiStack', {
                 screen: 'WikiList',
-                params: {type: WikiType.QA},
+                params: {type: WikiType.BOARD},
               })
             }
           />

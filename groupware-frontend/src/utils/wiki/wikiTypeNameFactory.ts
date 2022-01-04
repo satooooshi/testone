@@ -1,4 +1,4 @@
-import {WikiType, RuleCategory, BoardCategory} from '../../../types';
+import { WikiType, RuleCategory, BoardCategory } from 'src/types';
 
 export const wikiTypeNameFactory = (
   wikiType: WikiType,

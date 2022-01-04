@@ -42,9 +42,8 @@ import {
 } from '@/hooks/api/event/useAPIGetEventList';
 import { useAPIGetTag } from '@/hooks/api/tag/useAPIGetTag';
 import { useHeaderTab } from '@/hooks/headerTab/useHeaderTab';
-import topTabBarStyles from '@/styles/components/TopTabBar.module.scss';
 import { useAPIUpdateEvent } from '@/hooks/api/event/useAPIUpdateEvent';
-import { useToast } from '@chakra-ui/react';
+import { Box, useToast } from '@chakra-ui/react';
 import { responseErrorMsgFactory } from 'src/utils/factory/responseErrorMsgFactory';
 
 const localizer = momentLocalizer(moment);
@@ -504,9 +503,9 @@ const EventList = () => {
         event={newEvent}
       />
       <div className={eventListStyles.above_pagination}>
-        <div className={topTabBarStyles.component_wrapper}>
+        <Box mb="24px">
           <TopTabBar topTabBehaviorList={topTabBehaviorList} />
-        </div>
+        </Box>
 
         {isCalendar && (
           <div

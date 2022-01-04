@@ -6,7 +6,7 @@ import {
   useWindowDimensions,
 } from 'react-native';
 import RenderHtml from 'react-native-render-html';
-import {Div, Avatar, Text, Button, Overlay} from 'react-native-magnus';
+import {Div, Text, Button, Overlay} from 'react-native-magnus';
 import {User, Wiki} from '../../../types';
 import {darkFontColor} from '../../../utils/colors';
 import {userNameFactory} from '../../../utils/factory/userNameFactory';

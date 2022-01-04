@@ -17,7 +17,7 @@ import {useAPIGetUserInfoById} from '../../../hooks/api/user/useAPIGetUserInfoBy
 import {useAPIGetWikiList} from '../../../hooks/api/wiki/useAPIGetWikiList';
 import {useTagType} from '../../../hooks/tag/useTagType';
 import {accountDetailStyles} from '../../../styles/screen/account/accountDetail.style';
-import {TagType, User, WikiType} from '../../../types';
+import {BoardCategory, TagType, User, WikiType} from '../../../types';
 import {
   AccountDetailNavigationProps,
   AccountDetailRouteProps,
@@ -25,7 +25,6 @@ import {
 import {darkFontColor} from '../../../utils/colors';
 import {userNameFactory} from '../../../utils/factory/userNameFactory';
 import {userRoleNameFactory} from '../../../utils/factory/userRoleNameFactory';
-import {storage} from '../../../utils/url';
 
 const TopTab = createMaterialTopTabNavigator();
 
@@ -121,11 +120,13 @@ const AccountDetail: React.FC = () => {
   });
   const {data: questionList} = useAPIGetWikiList({
     writer: userID?.toString() || '0',
-    type: WikiType.QA,
+    type: WikiType.BOARD,
+    board_category: BoardCategory.QA,
   });
   const {data: knowledgeList} = useAPIGetWikiList({
     writer: userID?.toString() || '0',
-    type: WikiType.KNOWLEDGE,
+    type: WikiType.BOARD,
+    board_category: BoardCategory.KNOWLEDGE,
   });
   const isFocused = useIsFocused();
   const [activeScreen, setActiveScreen] = useState(defaultScreenName);

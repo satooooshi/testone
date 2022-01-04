@@ -1,11 +1,12 @@
 import React, { useMemo } from 'react';
 import qaCardStyles from '@/styles/components/QACard.module.scss';
 import { dateTimeFormatterFromJSDDate } from 'src/utils/dateTimeFormatter';
-import { Wiki, WikiType } from 'src/types';
+import { BoardCategory, Wiki, WikiType } from 'src/types';
 import Link from 'next/link';
 import { Avatar, Button } from '@chakra-ui/react';
 import boldMascot from '@/public/bold-mascot.png';
 import { tagColorFactory } from 'src/utils/factory/tagColorFactory';
+import { wikiTypeNameFactory } from 'src/utils/wiki/wikiTypeNameFactory';
 
 type WikiCardProps = {
   wiki: Wiki;
@@ -15,9 +16,7 @@ const WikiCard: React.FC<WikiCardProps> = ({ wiki }) => {
   const { title, writer, tags, createdAt, answers } = wiki;
   const tagButtonColor = useMemo(() => {
     switch (wiki.type) {
-      case WikiType.QA:
-        return 'cyan';
-      case WikiType.KNOWLEDGE:
+      case WikiType.BOARD:
         return 'yellow';
       case WikiType.ALL_POSTAL:
         return 'orange';
@@ -50,26 +49,26 @@ const WikiCard: React.FC<WikiCardProps> = ({ wiki }) => {
             ) : null}
             <p className={qaCardStyles.qa_card__title}>{title}</p>
           </div>
-          {wiki.type === WikiType.QA && (
+          {wiki.type === WikiType.BOARD &&
+          wiki.boardCategory === BoardCategory.QA ? (
             <div className={qaCardStyles.answer}>
               <p className={qaCardStyles.answer_count_label}>回答</p>
               <p className={qaCardStyles.answer_count}>
                 {answers?.length.toString()}
               </p>
             </div>
-          )}
+          ) : null}
         </div>
         <div className={qaCardStyles.qa_card__below}>
           <div className={qaCardStyles.qa_card__tags}>
             <a className={qaCardStyles.qa_card_tag__item}>
               <Button colorScheme={tagButtonColor} color="white" size="xs">
-                {wiki.type === WikiType.QA
-                  ? 'Q&A'
-                  : wiki.type === WikiType.RULES
-                  ? '社内規則'
-                  : wiki.type === WikiType.ALL_POSTAL
-                  ? 'オール便'
-                  : 'ナレッジ'}
+                {wikiTypeNameFactory(
+                  wiki.type,
+                  wiki.ruleCategory,
+                  true,
+                  wiki.boardCategory,
+                )}
               </Button>
             </a>
             {tags && tags.length
