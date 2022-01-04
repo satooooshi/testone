@@ -426,7 +426,7 @@ const EventList = () => {
 
   const topTabBehaviorList: TopTabBehavior[] = [
     {
-      tabName: 'カレンダー(個人)',
+      tabName: 'Myカレンダー',
       onClick: () => {
         queryRefresh({
           page: '1',
@@ -438,7 +438,7 @@ const EventList = () => {
       isActiveTab: !!(isCalendar && personal),
     },
     {
-      tabName: 'カレンダー',
+      tabName: '全体カレンダー',
       onClick: () => {
         queryRefresh({
           personal: '',

@@ -259,6 +259,8 @@ const EventDetail: React.FC = () => {
     setScreenLoading(false);
   }, [isLoadingGetEventDetail, isLoadingSaveEvent]);
 
+  console.log(eventInfo?.id);
+
   return (
     <WholeContainer>
       <HeaderWithTextButton
