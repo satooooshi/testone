@@ -46,7 +46,6 @@ const DetailScreen: React.FC<DetailScreenProps> = ({profile, isLoading}) => {
     TagType.HOBBY,
     profile.tags || [],
   );
-  console.log(profile.introduceTech);
 
   return (
     <Div w={windowWidth * 0.9} alignSelf="center" mt="lg">
