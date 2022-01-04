@@ -8,6 +8,7 @@ import {wikiTypeColorFactory} from '../../../utils/factory/wiki/wikiTypeColorFac
 import {wikiTypeNameFactory} from '../../../utils/factory/wiki/wikiTypeNameFactory';
 import {useNavigation} from '@react-navigation/native';
 import UserAvatar from '../../common/UserAvatar';
+import {dateTimeFormatterFromJSDDate} from '../../../utils/dateTimeFormatterFromJSDate';
 
 type WikiCardProps = {
   wiki: Wiki;
@@ -30,21 +31,21 @@ const WikiCard: React.FC<WikiCardProps> = ({wiki}) => {
         flexDir="column"
         w={windowWidth}
         borderBottomWidth={1}
+        pt={4}
         h={104}
         bg="#eceeec"
         borderColor="#b0b0b0">
-        <Div
-          w={'100%'}
-          px={8}
-          h={'60%'}
-          mb={4}
-          flexDir="row"
-          alignItems="center">
+        <Div w={'100%'} px={8} flexDir="row" alignItems="center">
           <Div mr={8}>
             <UserAvatar user={wiki.writer} h={48} w={48} />
           </Div>
           <Text w={'80%'} numberOfLines={2} fontWeight="bold" fontSize={22}>
             {wiki.title}
+          </Text>
+        </Div>
+        <Div flexDir="row" justifyContent="flex-end" mb={4}>
+          <Text>
+            {dateTimeFormatterFromJSDDate({dateTime: new Date(wiki.createdAt)})}
           </Text>
         </Div>
         <Div flexDir="row">
