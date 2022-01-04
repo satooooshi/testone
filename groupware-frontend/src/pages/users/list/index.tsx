@@ -6,13 +6,13 @@ import UserCard from '@/components/user/UserCard';
 import userListStyles from '@/styles/layouts/UserList.module.scss';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Tag, UserRole } from 'src/types';
 import { toggleTag } from 'src/utils/toggleTag';
 import paginationStyles from '@/styles/components/Pagination.module.scss';
 import { userQueryRefresh } from 'src/utils/userQueryRefresh';
 import { SidebarScreenName } from '@/components/layout/Sidebar';
-import { FormControl, FormLabel, Select, Text } from '@chakra-ui/react';
+import { Box, FormControl, FormLabel, Select, Text } from '@chakra-ui/react';
 import TopTabBar, { TopTabBehavior } from '@/components/layout/TopTabBar';
 import { useAPIGetUserTag } from '@/hooks/api/tag/useAPIGetUserTag';
 import {
@@ -113,9 +113,9 @@ const UserList = () => {
         <title>ボールド | 社員名鑑</title>
       </Head>
       <div className={userListStyles.above_pagination}>
-        <div className={topTabBarStyles.component_wrapper}>
+        <Box mb="24px">
           <TopTabBar topTabBehaviorList={topTabBehaviorList} />
-        </div>
+        </Box>
         <div className={userListStyles.search_form_wrapper}>
           <SearchForm
             onClear={() => setSelectedTags([])}
