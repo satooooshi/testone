@@ -240,8 +240,6 @@ const EventCalendar: React.FC<EventCalendarProps> = ({
         break;
     }
   }, [calendarMode.mode, calendarMode.targetDate, setSearchQuery]);
-  console.log('from', searchQuery.from);
-  console.log('to', searchQuery.to);
 
   useEffect(() => {
     setSearchQuery(q => ({...q, type: partOfSearchQuery.type}));
