@@ -34,9 +34,8 @@ export enum TagType {
 
 export enum WikiType {
   RULES = 'rule',
-  KNOWLEDGE = 'knowledge',
   ALL_POSTAL = 'all-postal',
-  QA = 'qa',
+  BOARD = 'board',
 }
 
 export enum RuleCategory {
@@ -50,7 +49,28 @@ export enum RuleCategory {
   BENEFITS = 'benefits',
   //各種申請書
   DOCUMENT = 'document',
-  OTHERS = '',
+  NON_RULE = '',
+}
+
+export enum BoardCategory {
+  //ナレッジ
+  KNOWLEDGE = 'knowledge',
+  //Q&A
+  QA = 'question',
+  //本社からのお知らせ
+  NEWS = 'news',
+  //感動大学
+  IMPRESSIVE_UNIVERSITY = 'impressive_university',
+  //部活動・サークル
+  CLUB = 'club',
+  //勉強会
+  STUDY_MEETING = 'study_meeting',
+  //お祝い事
+  CELEBRATION = 'celebration',
+  //その他
+  OTHER = 'other',
+  //掲示板ではないもの
+  NON_BOARD = '',
 }
 
 export type TextFormat = 'markdown' | 'html';
@@ -118,6 +138,7 @@ export interface Wiki {
   body: string;
   type: WikiType;
   ruleCategory: RuleCategory;
+  boardCategory: BoardCategory;
   textFormat: TextFormat;
   resolvedAt: Date;
   writer?: User;

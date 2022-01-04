@@ -45,21 +45,9 @@ const headerTab = (headerTabBehavior: HeaderTabBehavior): Tab[] => {
     isSmallerThan768,
     setActiveTab,
     onDeleteClicked,
-    type,
   } = headerTabBehavior;
 
-  const headerTabName = () => {
-    switch (type) {
-      case WikiType.QA:
-        return '質問を編集';
-      case WikiType.RULES:
-        return '社内規則を編集';
-      case WikiType.KNOWLEDGE:
-        return 'ナレッジを編集';
-      default:
-        return '編集';
-    }
-  };
+  const headerTabName = '内容を編集';
 
   switch (headerTabType) {
     case 'event':
@@ -279,7 +267,7 @@ const headerTab = (headerTabBehavior: HeaderTabBehavior): Tab[] => {
           onClick: () => {
             if (setActiveTab) setActiveTab(TabName.EDIT);
           },
-          name: headerTabName(),
+          name: headerTabName,
         },
         {
           onClick: () => {
@@ -325,7 +313,12 @@ const headerTab = (headerTabBehavior: HeaderTabBehavior): Tab[] => {
           name: 'All',
           onClick: () => {
             {
-              if (queryRefresh) queryRefresh({ type: undefined });
+              if (queryRefresh)
+                queryRefresh({
+                  type: undefined,
+                  rule_category: undefined,
+                  board_category: undefined,
+                });
             }
           },
         },
@@ -337,6 +330,7 @@ const headerTab = (headerTabBehavior: HeaderTabBehavior): Tab[] => {
                 queryRefresh({
                   type: WikiType.RULES,
                   rule_category: RuleCategory.PHILOSOPHY,
+                  board_category: undefined,
                 });
             }
           },
@@ -346,24 +340,25 @@ const headerTab = (headerTabBehavior: HeaderTabBehavior): Tab[] => {
           onClick: () => {
             {
               if (queryRefresh)
-                queryRefresh({ page: '1', type: WikiType.ALL_POSTAL });
+                queryRefresh({
+                  page: '1',
+                  type: WikiType.ALL_POSTAL,
+                  rule_category: undefined,
+                  board_category: undefined,
+                });
             }
           },
         },
         {
-          name: 'ナレッジ',
+          name: '掲示板',
           onClick: () => {
             {
               if (queryRefresh)
-                queryRefresh({ page: '1', type: WikiType.KNOWLEDGE });
-            }
-          },
-        },
-        {
-          name: 'Q&A',
-          onClick: () => {
-            {
-              if (queryRefresh) queryRefresh({ page: '1', type: WikiType.QA });
+                queryRefresh({
+                  page: '1',
+                  type: WikiType.BOARD,
+                  rule_category: undefined,
+                });
             }
           },
         },

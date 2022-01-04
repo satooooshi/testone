@@ -11,7 +11,13 @@ import LayoutWithTab from '@/components/layout/LayoutWithTab';
 import SearchForm from '@/components/common/SearchForm';
 import { useAPIGetTag } from '@/hooks/api/tag/useAPIGetTag';
 import { toggleTag } from 'src/utils/toggleTag';
-import { RuleCategory, Tag, UserRole, WikiType } from 'src/types';
+import {
+  BoardCategory,
+  RuleCategory,
+  Tag,
+  UserRole,
+  WikiType,
+} from 'src/types';
 import { wikiQueryRefresh } from 'src/utils/wikiQueryRefresh';
 import Head from 'next/head';
 import {
@@ -23,6 +29,7 @@ import { useHeaderTab } from '@/hooks/headerTab/useHeaderTab';
 import TopTabBar, { TopTabBehavior } from '@/components/layout/TopTabBar';
 import topTabBarStyles from '@/styles/components/TopTabBar.module.scss';
 import { Text } from '@chakra-ui/react';
+import { wikiTypeNameFactory } from 'src/utils/wiki/wikiTypeNameFactory';
 
 const QAQuestionList = () => {
   const router = useRouter();
@@ -33,6 +40,7 @@ const QAQuestionList = () => {
     status = 'new',
     type,
     rule_category,
+    board_category,
   } = router.query as SearchQueryToGetWiki;
   const { user } = useAuthenticate();
   const { data: questions, isLoading } = useAPIGetWikiList({
@@ -42,30 +50,164 @@ const QAQuestionList = () => {
     status,
     type,
     rule_category,
+    board_category,
   });
   const [searchWord, setSearchWord] = useState(word);
   const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
   const { data: tags } = useAPIGetTag();
-  const qaTopTab: TopTabBehavior[] = [
+  const boardTopTab: TopTabBehavior[] = [
     {
-      tabName: '新着',
+      tabName: '全て',
       onClick: () =>
         queryRefresh({
-          type: WikiType.QA,
-          status: 'new',
+          type: WikiType.BOARD,
+          board_category: undefined,
         }),
-      isActiveTab: status === 'new',
+      isActiveTab: type === WikiType.BOARD && !board_category,
     },
     {
-      tabName: '解決済み',
+      tabName: wikiTypeNameFactory(
+        WikiType.BOARD,
+        undefined,
+        true,
+        BoardCategory.KNOWLEDGE,
+      ),
       onClick: () =>
         queryRefresh({
-          type: WikiType.QA,
-          status: 'resolved',
+          type: WikiType.BOARD,
+          board_category: BoardCategory.KNOWLEDGE,
         }),
-      isActiveTab: status === 'resolved',
+      isActiveTab:
+        type === WikiType.BOARD && board_category === BoardCategory.KNOWLEDGE,
+    },
+    {
+      tabName: wikiTypeNameFactory(
+        WikiType.BOARD,
+        undefined,
+        true,
+        BoardCategory.QA,
+      ),
+      onClick: () =>
+        queryRefresh({
+          type: WikiType.BOARD,
+          board_category: BoardCategory.QA,
+        }),
+      isActiveTab:
+        type === WikiType.BOARD && board_category === BoardCategory.QA,
+    },
+    {
+      tabName: wikiTypeNameFactory(
+        WikiType.BOARD,
+        undefined,
+        true,
+        BoardCategory.NEWS,
+      ),
+      onClick: () =>
+        queryRefresh({
+          type: WikiType.BOARD,
+          board_category: BoardCategory.NEWS,
+        }),
+      isActiveTab:
+        type === WikiType.BOARD && board_category === BoardCategory.NEWS,
+    },
+    {
+      tabName: wikiTypeNameFactory(
+        WikiType.BOARD,
+        undefined,
+        true,
+        BoardCategory.IMPRESSIVE_UNIVERSITY,
+      ),
+      onClick: () =>
+        queryRefresh({
+          type: WikiType.BOARD,
+          board_category: BoardCategory.IMPRESSIVE_UNIVERSITY,
+        }),
+      isActiveTab:
+        type === WikiType.BOARD &&
+        board_category === BoardCategory.IMPRESSIVE_UNIVERSITY,
+    },
+    {
+      tabName: wikiTypeNameFactory(
+        WikiType.BOARD,
+        undefined,
+        true,
+        BoardCategory.CLUB,
+      ),
+      onClick: () =>
+        queryRefresh({
+          type: WikiType.BOARD,
+          board_category: BoardCategory.CLUB,
+        }),
+      isActiveTab:
+        type === WikiType.BOARD && board_category === BoardCategory.CLUB,
+    },
+    {
+      tabName: wikiTypeNameFactory(
+        WikiType.BOARD,
+        undefined,
+        true,
+        BoardCategory.STUDY_MEETING,
+      ),
+      onClick: () =>
+        queryRefresh({
+          type: WikiType.BOARD,
+          board_category: BoardCategory.STUDY_MEETING,
+        }),
+      isActiveTab:
+        type === WikiType.BOARD &&
+        board_category === BoardCategory.STUDY_MEETING,
+    },
+    {
+      tabName: wikiTypeNameFactory(
+        WikiType.BOARD,
+        undefined,
+        true,
+        BoardCategory.CELEBRATION,
+      ),
+      onClick: () =>
+        queryRefresh({
+          type: WikiType.BOARD,
+          board_category: BoardCategory.CELEBRATION,
+        }),
+      isActiveTab:
+        type === WikiType.BOARD && board_category === BoardCategory.CELEBRATION,
+    },
+    {
+      tabName: wikiTypeNameFactory(
+        WikiType.BOARD,
+        undefined,
+        true,
+        BoardCategory.OTHER,
+      ),
+      onClick: () =>
+        queryRefresh({
+          type: WikiType.BOARD,
+          board_category: BoardCategory.OTHER,
+        }),
+      isActiveTab:
+        type === WikiType.BOARD && board_category === BoardCategory.OTHER,
     },
   ];
+  // const qaTopTab: TopTabBehavior[] = [
+  //   {
+  //     tabName: '新着',
+  //     onClick: () =>
+  //       queryRefresh({
+  //         type: WikiType.QA,
+  //         status: 'new',
+  //       }),
+  //     isActiveTab: status === 'new',
+  //   },
+  //   {
+  //     tabName: '解決済み',
+  //     onClick: () =>
+  //       queryRefresh({
+  //         type: WikiType.QA,
+  //         status: 'resolved',
+  //       }),
+  //     isActiveTab: status === 'resolved',
+  //   },
+  // ];
   const rulesTopTab: TopTabBehavior[] = [
     {
       tabName: '会社理念',
@@ -140,29 +282,23 @@ const QAQuestionList = () => {
         };
 
   const headerRightButtonName = useMemo(() => {
-    switch (type) {
-      case WikiType.RULES:
-        return '社内規則を新規作成';
-      case WikiType.KNOWLEDGE:
-        return 'ナレッジを新規作成';
-      case WikiType.ALL_POSTAL:
-        return 'オール便を新規作成';
-      case WikiType.QA:
-        return '質問を新規作成';
-      default:
-        return '新規作成';
-    }
-  }, [type]);
+    return type
+      ? `${wikiTypeNameFactory(
+          type,
+          rule_category,
+          true,
+          board_category,
+        )}を新規作成`
+      : 'Wikiを新規作成';
+  }, [board_category, rule_category, type]);
 
   const initialHeaderValue = {
     title: '社内Wiki',
     activeTabName:
       type === WikiType.RULES
         ? '社内規則'
-        : type === WikiType.KNOWLEDGE
-        ? 'ナレッジ'
-        : type === WikiType.QA
-        ? 'Q&A'
+        : type === WikiType.BOARD
+        ? '掲示板'
         : type === WikiType.ALL_POSTAL
         ? 'オール便'
         : 'All',
@@ -193,9 +329,9 @@ const QAQuestionList = () => {
           <TopTabBar topTabBehaviorList={rulesTopTab} />
         </div>
       )}
-      {type === WikiType.QA && (
+      {type === WikiType.BOARD && (
         <div className={topTabBarStyles.component_wrapper}>
-          <TopTabBar topTabBehaviorList={qaTopTab} />
+          <TopTabBar topTabBehaviorList={boardTopTab} />
         </div>
       )}
       <div className={qaListStyles.top_contents_wrapper}>

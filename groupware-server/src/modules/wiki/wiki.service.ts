@@ -35,6 +35,7 @@ export class WikiService {
       board_category,
       writer,
     } = query;
+    console.log(query);
     let offset: number;
     const limit = 20;
     if (page) {
@@ -84,7 +85,7 @@ export class WikiService {
       )
       .andWhere(
         board_category && type === WikiType.BOARD
-          ? 'wiki.boardCategory = :boarrdCategory'
+          ? 'wiki.boardCategory = :boardCategory'
           : '1=1',
         {
           boardCategory: board_category,

@@ -3,18 +3,12 @@ import { useAPIGetWikiDetail } from '@/hooks/api/wiki/useAPIGetWikiDetail';
 import { useRouter } from 'next/router';
 import qaDetailStyles from '@/styles/layouts/QADetail.module.scss';
 import WikiComment from '@/components/wiki/WikiComment';
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import 'react-markdown-editor-lite/lib/index.css';
 import { useAPICreateAnswer } from '@/hooks/api/wiki/useAPICreateAnswer';
 import LayoutWithTab from '@/components/layout/LayoutWithTab';
 import AnswerReply from '@/components/wiki/AnswerReply';
-import { QAAnswer, QAAnswerReply, WikiType } from 'src/types';
+import { BoardCategory, QAAnswer, QAAnswerReply, WikiType } from 'src/types';
 import {
   Text,
   Button,
@@ -175,18 +169,7 @@ const QuestionDetail = () => {
     [user?.id, wiki?.writer?.id],
   );
 
-  const headerTitle = useMemo(() => {
-    if (wiki?.type === WikiType.QA) {
-      return '質問詳細';
-    }
-    if (wiki?.type === WikiType.RULES) {
-      return '社内規則詳細';
-    }
-    if (wiki?.type === WikiType.KNOWLEDGE) {
-      return 'ナレッジ詳細';
-    }
-    return '詳細';
-  }, [wiki?.type]);
+  const headerTitle = 'Wiki詳細';
 
   const isH2Str = (id: string) => {
     const target = document.getElementById(id);
@@ -318,7 +301,8 @@ const QuestionDetail = () => {
               />
             </div>
           </div>
-          {wiki.type === WikiType.QA && (
+          {wiki.type === WikiType.BOARD &&
+          wiki.boardCategory === BoardCategory.QA ? (
             <div className={qaDetailStyles.answer_count__wrapper}>
               <p className={qaDetailStyles.answer_count}>
                 回答{wiki.answers?.length ? wiki.answers.length : 0}件
@@ -332,7 +316,7 @@ const QuestionDetail = () => {
                 {answerVisible ? '回答を投稿する' : '回答を追加'}
               </Button>
             </div>
-          )}
+          ) : null}
           {answerVisible && (
             <WrappedDraftEditor
               style={{

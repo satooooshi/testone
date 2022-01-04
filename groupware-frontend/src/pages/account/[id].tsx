@@ -26,7 +26,7 @@ import {
   ThemeTypings,
   useMediaQuery,
 } from '@chakra-ui/react';
-import { TagType, UserTag, WikiType } from 'src/types';
+import { BoardCategory, TagType, UserTag, WikiType } from 'src/types';
 import { userRoleNameFactory } from 'src/utils/factory/userRoleNameFactory';
 import { darkFontColor } from 'src/utils/colors';
 
@@ -104,11 +104,13 @@ const MyAccountInfo = () => {
   const { data: events } = useAPIGetEventList({ participant_id: id });
   const { data: questionList } = useAPIGetWikiList({
     writer: id,
-    type: WikiType.QA,
+    type: WikiType.BOARD,
+    board_category: BoardCategory.QA,
   });
   const { data: knowledgeList } = useAPIGetWikiList({
     writer: id,
-    type: WikiType.KNOWLEDGE,
+    type: WikiType.BOARD,
+    board_category: BoardCategory.KNOWLEDGE,
   });
   const { user } = useAuthenticate();
   const [activeTab, setActiveTab] = useState<TabName>(TabName.DETAIL);
