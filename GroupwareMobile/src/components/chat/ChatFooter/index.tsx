@@ -1,15 +1,12 @@
-import React, {Fragment, useEffect, useMemo, useRef, useState} from 'react';
+import React, {Fragment, useMemo, useRef, useState} from 'react';
 import {
-  Keyboard,
   NativeSyntheticEvent,
   Platform,
-  Pressable,
   Text,
   TextInput,
   TextInputSelectionChangeEventData,
   TouchableOpacity,
   useWindowDimensions,
-  View,
 } from 'react-native';
 import {
   MentionSuggestionsProps,
