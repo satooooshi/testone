@@ -68,6 +68,7 @@ const UserCard: React.FC<UserCardProps> = ({user, filteredDuration}) => {
         w={windowWidth * 0.9}
         rounded="md"
         shadow="md"
+        p="xs"
         borderWidth={1}
         borderColor={'gray500'}>
         <Div px="xs" justifyContent="space-between" flexDir="row">
