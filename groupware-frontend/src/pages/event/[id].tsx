@@ -10,7 +10,7 @@ import { AiOutlineFileProtect } from 'react-icons/ai';
 import CreateEventModal from '@/components/event/CreateEventModal';
 import EventParticipants from '@/components/event/EventParticepants';
 import Linkify from 'react-linkify';
-import { Button, Text, Textarea, useToast } from '@chakra-ui/react';
+import { Box, Button, Text, Textarea, useToast } from '@chakra-ui/react';
 import Head from 'next/head';
 import { useAuthenticate } from 'src/contexts/useAuthenticate';
 import Link from 'next/link';
@@ -47,6 +47,7 @@ import coachImage from '@/public/coach_1.jpeg';
 import { eventTypeColorFactory } from 'src/utils/factory/eventTypeColorFactory';
 import eventTypeNameFactory from 'src/utils/factory/eventTypeNameFactory';
 import { responseErrorMsgFactory } from 'src/utils/factory/responseErrorMsgFactory';
+import { darkFontColor } from 'src/utils/colors';
 
 type FileIconProps = {
   href?: string;
@@ -466,7 +467,13 @@ const EventDetail = () => {
                 ) : null}
               </div>
             </div>
-            <span className={eventDetailStyles.sub_title}>参考資料</span>
+            <Text
+              fontSize="16px"
+              mb="8px"
+              display="block"
+              alignSelf="flex-start">
+              参考資料
+            </Text>
             {data.files && data.files.length ? (
               <div className={eventDetailStyles.files_wrapper}>
                 {data.files.map((f) => (
@@ -474,11 +481,17 @@ const EventDetail = () => {
                 ))}
               </div>
             ) : (
-              <p className={eventDetailStyles.none_text}>
+              <Text mb="16px" display="block" alignSelf="flex-start">
                 参考資料はありません
-              </p>
+              </Text>
             )}
-            <p className={eventDetailStyles.sub_title}>関連動画</p>
+            <Text
+              fontSize="16px"
+              mb="8px"
+              display="block"
+              alignSelf="flex-start">
+              関連動画
+            </Text>
             {data.videos && data.videos.length ? (
               <div className={eventDetailStyles.videos}>
                 {data.videos.map((v) => (
@@ -490,9 +503,9 @@ const EventDetail = () => {
                 ))}
               </div>
             ) : (
-              <p className={eventDetailStyles.none_text}>
+              <Text mb="16px" display="block" alignSelf="flex-start">
                 関連動画はありません
-              </p>
+              </Text>
             )}
             {data.type !== EventType.SUBMISSION_ETC && (
               <div className={eventDetailStyles.comment_participants_wrapper}>
@@ -550,13 +563,15 @@ const EventDetail = () => {
             )}
             {data.type === EventType.SUBMISSION_ETC && !isFinished ? (
               <>
-                <div className={eventDetailStyles.count_and_button_wrapper}>
-                  <div className={eventDetailStyles.submission_bar_left}>
-                    <p className={eventDetailStyles.submission_bar_left_info}>
-                      {data.submissionFiles.length
-                        ? data.submissionFiles.length + '件のファイルを提出済み'
-                        : '提出物を送信してください'}
-                    </p>
+                <Box
+                  borderBottomColor="green.500"
+                  borderBottomWidth={1}
+                  pb="10px"
+                  mb="16px">
+                  <Box
+                    display="flex"
+                    flexFlow="row"
+                    justifyContent="space-between">
                     <Button
                       size="sm"
                       colorScheme="blue"
@@ -566,58 +581,58 @@ const EventDetail = () => {
                       }}>
                       提出物を追加
                     </Button>
-                    <p className={eventDetailStyles.caution_message}>
-                      ※水色のアイコンのファイルはまだ提出状況が保存されていません
-                    </p>
-                  </div>
-                  <div className={eventDetailStyles.submit_buttons_wrapper}>
                     <Button
                       size="sm"
-                      colorScheme={submitFiles.length ? 'pink' : 'blue'}
+                      colorScheme={'pink'}
                       onClick={() => {
                         saveSubmission(submitFiles);
                       }}>
                       提出状況を保存
                     </Button>
-                    <input
-                      type="file"
-                      hidden
-                      ref={submissionRef}
-                      multiple
-                      onChange={() => {
-                        const files = submissionRef.current?.files;
-                        const fileArr: File[] = [];
-                        if (!files) {
-                          return;
-                        }
-                        for (let i = 0; i < files.length; i++) {
-                          const renamedFile = new File(
-                            [files[i]],
-                            userNameFactory(user) + ' ' + files[i].name,
-                            {
-                              type: files[i].type,
-                              lastModified: files[i].lastModified,
-                            },
-                          );
-                          fileArr.push(renamedFile);
-                        }
-                        uploadStorage(fileArr);
-                      }}
-                    />
-                  </div>
-                </div>
+                  </Box>
+                  <Text
+                    color={darkFontColor}
+                    fontSize={'16px'}
+                    fontWeight="bold">
+                    {data.submissionFiles.length + '件のファイルを提出済み'}
+                  </Text>
+                  <Text color="tomato">
+                    ※水色のアイコンのファイルはまだ提出状況が保存されていません
+                  </Text>
+                  <input
+                    type="file"
+                    hidden
+                    ref={submissionRef}
+                    multiple
+                    onChange={() => {
+                      const files = submissionRef.current?.files;
+                      const fileArr: File[] = [];
+                      if (!files) {
+                        return;
+                      }
+                      for (let i = 0; i < files.length; i++) {
+                        const renamedFile = new File(
+                          [files[i]],
+                          userNameFactory(user) + ' ' + files[i].name,
+                          {
+                            type: files[i].type,
+                            lastModified: files[i].lastModified,
+                          },
+                        );
+                        fileArr.push(renamedFile);
+                      }
+                      uploadStorage(fileArr);
+                    }}
+                  />
+                </Box>
                 {submitFiles && submitFiles.length ? (
-                  <div className={eventDetailStyles.submission_files_wrapper}>
+                  <Box display="flex" flexDir="row" flexWrap="wrap" mb="16px">
                     {submitFiles.map((f) => (
-                      <div
-                        key={f.url}
-                        className={clsx(
-                          eventDetailStyles.submission_file_icon_item_wrapper,
-                        )}>
+                      <Box key={f.url} mb="4px">
                         <FileIcon href={f.url} submitted={f.submitUnFinished} />
-                      </div>
+                      </Box>
                     ))}
-                  </div>
+                  </Box>
                 ) : (
                   <></>
                 )}
