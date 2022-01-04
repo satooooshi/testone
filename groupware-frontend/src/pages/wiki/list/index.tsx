@@ -6,7 +6,7 @@ import dynamic from 'next/dynamic';
 const ReactPaginate = dynamic(() => import('react-paginate'), { ssr: false });
 import paginationStyles from '@/styles/components/Pagination.module.scss';
 import qaListStyles from '@/styles/layouts/QAList.module.scss';
-import { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import LayoutWithTab from '@/components/layout/LayoutWithTab';
 import SearchForm from '@/components/common/SearchForm';
 import { useAPIGetTag } from '@/hooks/api/tag/useAPIGetTag';
@@ -27,8 +27,7 @@ import {
 import { useAuthenticate } from 'src/contexts/useAuthenticate';
 import { useHeaderTab } from '@/hooks/headerTab/useHeaderTab';
 import TopTabBar, { TopTabBehavior } from '@/components/layout/TopTabBar';
-import topTabBarStyles from '@/styles/components/TopTabBar.module.scss';
-import { Text } from '@chakra-ui/react';
+import { Box, Text } from '@chakra-ui/react';
 import { wikiTypeNameFactory } from 'src/utils/wiki/wikiTypeNameFactory';
 
 const QAQuestionList = () => {
@@ -325,14 +324,14 @@ const QAQuestionList = () => {
         <title>ボールド | Wiki</title>
       </Head>
       {type === WikiType.RULES && (
-        <div className={topTabBarStyles.component_wrapper}>
+        <Box mb="24px">
           <TopTabBar topTabBehaviorList={rulesTopTab} />
-        </div>
+        </Box>
       )}
       {type === WikiType.BOARD && (
-        <div className={topTabBarStyles.component_wrapper}>
+        <Box mb="24px">
           <TopTabBar topTabBehaviorList={boardTopTab} />
-        </div>
+        </Box>
       )}
       <div className={qaListStyles.top_contents_wrapper}>
         <div className={qaListStyles.search_form_wrapper}>
