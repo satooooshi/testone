@@ -18,7 +18,6 @@ import TopTabBar, { TopTabBehavior } from '@/components/layout/TopTabBar';
 import { useAPIGetEventList } from '@/hooks/api/event/useAPIGetEventList';
 import { useAPIGetWikiList } from '@/hooks/api/wiki/useAPIGetWikiList';
 import { useHeaderTab } from '@/hooks/headerTab/useHeaderTab';
-import topTabBarStyles from '@/styles/components/TopTabBar.module.scss';
 import {
   Text,
   Box,
@@ -203,9 +202,9 @@ const MyAccountInfo = () => {
               </h1>
             </div>
 
-            <div className={topTabBarStyles.component_wrapper}>
+            <Box mb="24px">
               <TopTabBar topTabBehaviorList={topTabBehaviorList} />
-            </div>
+            </Box>
 
             {activeTab === TabName.DETAIL && (
               <>

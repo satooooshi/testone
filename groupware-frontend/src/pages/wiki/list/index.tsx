@@ -268,7 +268,6 @@ const QAQuestionList = () => {
   const queryRefresh = (query: Partial<SearchQueryToGetWiki>) => {
     const selectedTagIDs = selectedTags.map((t) => t.id.toString());
     const tagQuery = selectedTagIDs.join('+');
-    console.log(query.status);
     const refreshedQueryStrings = wikiQueryRefresh({
       ...router.query,
       ...query,
