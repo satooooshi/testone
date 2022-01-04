@@ -35,7 +35,6 @@ export class WikiService {
       board_category,
       writer,
     } = query;
-    console.log(query);
     let offset: number;
     const limit = 20;
     if (page) {
