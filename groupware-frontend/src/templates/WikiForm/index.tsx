@@ -200,7 +200,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
     ) {
       setNewQuestion((prev) => ({
         ...prev,
-        type: WikiType.RULES,
+        type: WikiType.BOARD,
         ruleCategory: RuleCategory.NON_RULE,
         boardCategory: e.target.value as BoardCategory,
       }));

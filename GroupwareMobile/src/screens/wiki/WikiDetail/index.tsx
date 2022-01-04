@@ -113,9 +113,10 @@ const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
   };
 
   const renderingTOCNeeded =
-    wikiInfo?.type !== WikiType.BOARD &&
-    wikiInfo?.boardCategory !== BoardCategory.QA &&
-    headings.length;
+    !(
+      wikiInfo?.type === WikiType.BOARD &&
+      wikiInfo?.boardCategory === BoardCategory.QA
+    ) && headings.length;
 
   const article = (
     <ScrollerProvider scroller={scroller}>

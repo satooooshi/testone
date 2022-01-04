@@ -173,7 +173,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
           }))
         }
         value={RuleCategory.RULES}>
-        {wikiTypeNameFactory(WikiType.RULES, RuleCategory.RULES)}
+        {wikiTypeNameFactory(WikiType.RULES, RuleCategory.RULES, true)}
       </Dropdown.Option>
       <Dropdown.Option
         {...defaultDropdownOptionProps}
@@ -185,7 +185,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
           }))
         }
         value={RuleCategory.PHILOSOPHY}>
-        {wikiTypeNameFactory(WikiType.RULES, RuleCategory.PHILOSOPHY)}
+        {wikiTypeNameFactory(WikiType.RULES, RuleCategory.PHILOSOPHY, true)}
       </Dropdown.Option>
       <Dropdown.Option
         {...defaultDropdownOptionProps}
@@ -197,7 +197,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
           }))
         }
         value={RuleCategory.ABC}>
-        {wikiTypeNameFactory(WikiType.RULES, RuleCategory.ABC)}
+        {wikiTypeNameFactory(WikiType.RULES, RuleCategory.ABC, true)}
       </Dropdown.Option>
       <Dropdown.Option
         {...defaultDropdownOptionProps}
@@ -209,7 +209,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
           }))
         }
         value={RuleCategory.BENEFITS}>
-        {wikiTypeNameFactory(WikiType.RULES, RuleCategory.BENEFITS)}
+        {wikiTypeNameFactory(WikiType.RULES, RuleCategory.BENEFITS, true)}
       </Dropdown.Option>
       <Dropdown.Option
         {...defaultDropdownOptionProps}
@@ -221,7 +221,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
           }))
         }
         value={RuleCategory.DOCUMENT}>
-        {wikiTypeNameFactory(WikiType.RULES, RuleCategory.DOCUMENT)}
+        {wikiTypeNameFactory(WikiType.RULES, RuleCategory.DOCUMENT, true)}
       </Dropdown.Option>
       <Dropdown.Option
         {...defaultDropdownOptionProps}
@@ -424,7 +424,12 @@ const WikiForm: React.FC<WikiFormProps> = ({
                 w={!isEdit ? windowWidth * 0.4 : windowWidth * 0.9}
                 onPress={() => typeDropdownRef.current.open()}>
                 {newWiki.type
-                  ? wikiTypeNameFactory(newWiki.type, newWiki.ruleCategory)
+                  ? wikiTypeNameFactory(
+                      newWiki.type,
+                      newWiki.ruleCategory,
+                      true,
+                      newWiki.boardCategory,
+                    )
                   : 'タイプを選択してください'}
               </Button>
             </Div>
@@ -457,7 +462,12 @@ const WikiForm: React.FC<WikiFormProps> = ({
               ? `${newWiki.tags?.length}個のタグ`
               : 'タグを選択'}
           </Button>
-          <Div flexDir="row" flexWrap="wrap" mb={8}>
+          <Div
+            flexDir="row"
+            flexWrap="wrap"
+            mb={8}
+            w={'100%'}
+            justifyContent="flex-start">
             {newWiki.tags?.map(t => (
               <TagButton
                 key={t.id}

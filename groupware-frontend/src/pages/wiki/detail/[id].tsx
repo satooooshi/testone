@@ -268,7 +268,10 @@ const QuestionDetail = () => {
           ) : null}
           {headLinkContents &&
           headLinkContents.length &&
-          wiki.type === WikiType.ALL_POSTAL ? (
+          !(
+            wiki.type === WikiType.BOARD &&
+            wiki.boardCategory === BoardCategory.QA
+          ) ? (
             <Flex mb={'8px'} rounded="md" bg="white" flexDir="column" p="40px">
               <Text fontWeight="bold" mb="16px" alignSelf="center">
                 目次
