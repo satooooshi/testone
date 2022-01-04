@@ -1,4 +1,5 @@
 import {
+  BoardCategory,
   ChatAlbum,
   ChatGroup,
   ChatNote,
@@ -31,6 +32,7 @@ export type RootStackParamList = {
   PostWiki: {
     type?: WikiType;
     ruleCategory?: RuleCategory;
+    boardCategory?: BoardCategory;
   };
   EditWiki: {
     id: number;

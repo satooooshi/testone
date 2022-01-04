@@ -1,15 +1,37 @@
-import {WikiType, RuleCategory} from '../../../types';
+import {WikiType, RuleCategory, BoardCategory} from '../../../types';
 
 export const wikiTypeNameFactory = (
   wikiType: WikiType,
   ruleCategory?: RuleCategory,
   nested?: boolean,
+  boardCategory?: BoardCategory,
 ) => {
   switch (wikiType) {
-    case WikiType.QA:
-      return 'Q&A';
-    case WikiType.KNOWLEDGE:
-      return 'ナレッジ';
+    case WikiType.BOARD:
+      if (nested) {
+        switch (boardCategory) {
+          case BoardCategory.KNOWLEDGE:
+            return 'ナレッジ';
+          case BoardCategory.QA:
+            return 'Q&A';
+          case BoardCategory.NEWS:
+            return '本社からのお知らせ';
+          case BoardCategory.IMPRESSIVE_UNIVERSITY:
+            return '感動大学';
+          case BoardCategory.CLUB:
+            return '部活動・サークル';
+          case BoardCategory.STUDY_MEETING:
+            return '勉強会';
+          case BoardCategory.CELEBRATION:
+            return 'お祝い事';
+          case BoardCategory.OTHER:
+            return 'その他';
+          default:
+            return '掲示板';
+        }
+      } else {
+        return '掲示板';
+      }
     case WikiType.ALL_POSTAL:
       return 'オール便';
     case WikiType.RULES:

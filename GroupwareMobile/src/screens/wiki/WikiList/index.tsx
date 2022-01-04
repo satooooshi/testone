@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import WholeContainer from '../../../components/WholeContainer';
 import HeaderWithTextButton from '../../../components/Header';
-import {RuleCategory, WikiType} from '../../../types';
+import {BoardCategory, RuleCategory, WikiType} from '../../../types';
 import WikiCardList from './WikiCardList';
 import {wikiTypeNameFactory} from '../../../utils/factory/wiki/wikiTypeNameFactory';
 import {
@@ -15,7 +15,10 @@ const WikiList: React.FC<WikiListProps> = ({navigation}) => {
   const typePassedByRoute = useRoute<WikiListRouteProps>()?.params?.type;
   const [type, setType] = useState<WikiType | undefined>(typePassedByRoute);
   const [ruleCategory, setRuleCategory] = useState<RuleCategory>(
-    RuleCategory.OTHERS,
+    RuleCategory.NON_RULE,
+  );
+  const [boardCategory, setBoardCategory] = useState<BoardCategory>(
+    BoardCategory.NON_BOARD,
   );
   const tabs: Tab[] = [
     {
@@ -31,12 +34,8 @@ const WikiList: React.FC<WikiListProps> = ({navigation}) => {
       onPress: () => setType(WikiType.ALL_POSTAL),
     },
     {
-      name: 'ナレッジ',
-      onPress: () => setType(WikiType.KNOWLEDGE),
-    },
-    {
-      name: 'Q&A',
-      onPress: () => setType(WikiType.QA),
+      name: '掲示板',
+      onPress: () => setType(WikiType.BOARD),
     },
   ];
 
@@ -63,7 +62,7 @@ const WikiList: React.FC<WikiListProps> = ({navigation}) => {
         onPressRightButton={() =>
           navigation.navigate('WikiStack', {
             screen: 'PostWiki',
-            params: {type, ruleCategory},
+            params: {type, ruleCategory, boardCategory},
           })
         }
       />
@@ -71,6 +70,7 @@ const WikiList: React.FC<WikiListProps> = ({navigation}) => {
         type={type}
         setType={setType}
         setRuleCategory={setRuleCategory}
+        setBoardCategory={setBoardCategory}
       />
     </WholeContainer>
   );

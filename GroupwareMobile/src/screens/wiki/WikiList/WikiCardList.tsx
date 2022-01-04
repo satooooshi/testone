@@ -5,7 +5,7 @@ import React, {
   SetStateAction,
   useCallback,
 } from 'react';
-import {RuleCategory, WikiType} from '../../../types';
+import {BoardCategory, RuleCategory, WikiType} from '../../../types';
 import {
   SearchQueryToGetWiki,
   useAPIGetWikiList,
@@ -19,6 +19,7 @@ import SearchForm from '../../../components/common/SearchForm';
 import SearchFormOpenerButton from '../../../components/common/SearchForm/SearchFormOpenerButton';
 import {WikiListRouteProps} from '../../../types/navigator/drawerScreenProps';
 import {ActivityIndicator} from 'react-native-paper';
+import {wikiTypeNameFactory} from '../../../utils/factory/wiki/wikiTypeNameFactory';
 
 const TopTab = createMaterialTopTabNavigator();
 
@@ -26,13 +27,16 @@ type WikiCardListProps = {
   type?: WikiType;
   setType: Dispatch<SetStateAction<WikiType | undefined>>;
   setRuleCategory: Dispatch<SetStateAction<RuleCategory>>;
+  setBoardCategory: Dispatch<SetStateAction<BoardCategory>>;
 };
 
 type RenderWikiCardListProps = {
   word: string;
   tag: string;
   ruleCategory?: RuleCategory;
+  boardCategory?: BoardCategory;
   setRuleCategory: Dispatch<SetStateAction<RuleCategory>>;
+  setBoardCategory: Dispatch<SetStateAction<BoardCategory>>;
   status?: 'new' | 'resolved';
   type?: WikiType;
   focused: boolean;
@@ -43,6 +47,8 @@ const RenderWikiCardList: React.FC<RenderWikiCardListProps> = ({
   tag,
   ruleCategory,
   setRuleCategory,
+  boardCategory,
+  setBoardCategory,
   type,
   status,
   focused,
@@ -52,6 +58,7 @@ const RenderWikiCardList: React.FC<RenderWikiCardListProps> = ({
     word,
     tag,
     rule_category: ruleCategory,
+    board_category: boardCategory,
     type,
     status,
   });
@@ -74,8 +81,14 @@ const RenderWikiCardList: React.FC<RenderWikiCardListProps> = ({
 
   useFocusEffect(
     useCallback(() => {
-      setRuleCategory(ruleCategory || RuleCategory.OTHERS);
+      setRuleCategory(ruleCategory || RuleCategory.NON_RULE);
     }, [ruleCategory, setRuleCategory]),
+  );
+
+  useFocusEffect(
+    useCallback(() => {
+      setBoardCategory(boardCategory || BoardCategory.NON_BOARD);
+    }, [boardCategory, setBoardCategory]),
   );
 
   useEffect(() => {
@@ -119,8 +132,12 @@ const RenderWikiCardList: React.FC<RenderWikiCardListProps> = ({
   );
 };
 
-
-const WikiCardList: React.FC<WikiCardListProps> = ({type, setType, setRuleCategory}) => {
+const WikiCardList: React.FC<WikiCardListProps> = ({
+  type,
+  setType,
+  setRuleCategory,
+  setBoardCategory,
+}) => {
   const routeParams = useRoute<WikiListRouteProps>().params;
   const [visibleSearchFormModal, setVisibleSearchFormModal] = useState(false);
   const [word, setWord] = useState('');
@@ -162,6 +179,7 @@ const WikiCardList: React.FC<WikiCardListProps> = ({type, setType, setRuleCatego
                 <RenderWikiCardList
                   focused={isFocused}
                   setRuleCategory={setRuleCategory}
+                  setBoardCategory={setBoardCategory}
                   ruleCategory={RuleCategory.RULES}
                   status={undefined}
                   word={word}
@@ -177,6 +195,7 @@ const WikiCardList: React.FC<WikiCardListProps> = ({type, setType, setRuleCatego
                 <RenderWikiCardList
                   focused={isFocused}
                   setRuleCategory={setRuleCategory}
+                  setBoardCategory={setBoardCategory}
                   ruleCategory={RuleCategory.PHILOSOPHY}
                   status={undefined}
                   word={word}
@@ -192,6 +211,7 @@ const WikiCardList: React.FC<WikiCardListProps> = ({type, setType, setRuleCatego
                 <RenderWikiCardList
                   focused={isFocused}
                   setRuleCategory={setRuleCategory}
+                  setBoardCategory={setBoardCategory}
                   ruleCategory={RuleCategory.ABC}
                   status={undefined}
                   word={word}
@@ -207,6 +227,7 @@ const WikiCardList: React.FC<WikiCardListProps> = ({type, setType, setRuleCatego
                 <RenderWikiCardList
                   focused={isFocused}
                   setRuleCategory={setRuleCategory}
+                  setBoardCategory={setBoardCategory}
                   ruleCategory={RuleCategory.BENEFITS}
                   status={undefined}
                   word={word}
@@ -222,6 +243,7 @@ const WikiCardList: React.FC<WikiCardListProps> = ({type, setType, setRuleCatego
                 <RenderWikiCardList
                   focused={isFocused}
                   setRuleCategory={setRuleCategory}
+                  setBoardCategory={setBoardCategory}
                   ruleCategory={RuleCategory.DOCUMENT}
                   status={undefined}
                   word={word}
@@ -232,43 +254,216 @@ const WikiCardList: React.FC<WikiCardListProps> = ({type, setType, setRuleCatego
               options={{title: '各種申請書'}}
             />
           </TopTab.Navigator>
-        ) : type === WikiType.QA ? (
-          <TopTab.Navigator>
+        ) : type === WikiType.BOARD ? (
+          <TopTab.Navigator
+            screenOptions={{
+              tabBarScrollEnabled: true,
+            }}>
             <TopTab.Screen
-              name={'WikiList-' + WikiType.QA + '-new'}
+              name={'WikiList-board'}
               children={() => (
                 <RenderWikiCardList
                   focused={isFocused}
                   setRuleCategory={setRuleCategory}
+                  setBoardCategory={setBoardCategory}
                   ruleCategory={undefined}
-                  status={'new'}
                   word={word}
                   tag={tag}
                   type={type}
                 />
               )}
-              options={{title: '新着'}}
+              options={{title: '全て'}}
             />
             <TopTab.Screen
-              name={'WikiList-' + WikiType.QA + '-resolved'}
+              name={'WikiList-' + BoardCategory.KNOWLEDGE}
               children={() => (
                 <RenderWikiCardList
                   focused={isFocused}
                   setRuleCategory={setRuleCategory}
+                  setBoardCategory={setBoardCategory}
                   ruleCategory={undefined}
-                  status={'resolved'}
+                  boardCategory={BoardCategory.KNOWLEDGE}
                   word={word}
                   tag={tag}
                   type={type}
                 />
               )}
-              options={{title: '解決済み'}}
+              options={{
+                title: wikiTypeNameFactory(
+                  WikiType.BOARD,
+                  undefined,
+                  true,
+                  BoardCategory.KNOWLEDGE,
+                ),
+              }}
+            />
+            <TopTab.Screen
+              name={'WikiList-' + BoardCategory.QA}
+              children={() => (
+                <RenderWikiCardList
+                  focused={isFocused}
+                  setRuleCategory={setRuleCategory}
+                  setBoardCategory={setBoardCategory}
+                  ruleCategory={undefined}
+                  boardCategory={BoardCategory.QA}
+                  word={word}
+                  tag={tag}
+                  type={type}
+                />
+              )}
+              options={{
+                title: wikiTypeNameFactory(
+                  WikiType.BOARD,
+                  undefined,
+                  true,
+                  BoardCategory.QA,
+                ),
+              }}
+            />
+            <TopTab.Screen
+              name={'WikiList-' + BoardCategory.NEWS}
+              children={() => (
+                <RenderWikiCardList
+                  focused={isFocused}
+                  setRuleCategory={setRuleCategory}
+                  setBoardCategory={setBoardCategory}
+                  ruleCategory={undefined}
+                  boardCategory={BoardCategory.NEWS}
+                  word={word}
+                  tag={tag}
+                  type={type}
+                />
+              )}
+              options={{
+                title: wikiTypeNameFactory(
+                  WikiType.BOARD,
+                  undefined,
+                  true,
+                  BoardCategory.NEWS,
+                ),
+              }}
+            />
+            <TopTab.Screen
+              name={'WikiList-' + BoardCategory.IMPRESSIVE_UNIVERSITY}
+              children={() => (
+                <RenderWikiCardList
+                  focused={isFocused}
+                  setRuleCategory={setRuleCategory}
+                  setBoardCategory={setBoardCategory}
+                  ruleCategory={undefined}
+                  boardCategory={BoardCategory.IMPRESSIVE_UNIVERSITY}
+                  word={word}
+                  tag={tag}
+                  type={type}
+                />
+              )}
+              options={{
+                title: wikiTypeNameFactory(
+                  WikiType.BOARD,
+                  undefined,
+                  true,
+                  BoardCategory.IMPRESSIVE_UNIVERSITY,
+                ),
+              }}
+            />
+            <TopTab.Screen
+              name={'WikiList-' + BoardCategory.CLUB}
+              children={() => (
+                <RenderWikiCardList
+                  focused={isFocused}
+                  setRuleCategory={setRuleCategory}
+                  setBoardCategory={setBoardCategory}
+                  ruleCategory={undefined}
+                  boardCategory={BoardCategory.CLUB}
+                  word={word}
+                  tag={tag}
+                  type={type}
+                />
+              )}
+              options={{
+                title: wikiTypeNameFactory(
+                  WikiType.BOARD,
+                  undefined,
+                  true,
+                  BoardCategory.CLUB,
+                ),
+              }}
+            />
+            <TopTab.Screen
+              name={'WikiList-' + BoardCategory.STUDY_MEETING}
+              children={() => (
+                <RenderWikiCardList
+                  focused={isFocused}
+                  setRuleCategory={setRuleCategory}
+                  setBoardCategory={setBoardCategory}
+                  ruleCategory={undefined}
+                  boardCategory={BoardCategory.STUDY_MEETING}
+                  word={word}
+                  tag={tag}
+                  type={type}
+                />
+              )}
+              options={{
+                title: wikiTypeNameFactory(
+                  WikiType.BOARD,
+                  undefined,
+                  true,
+                  BoardCategory.STUDY_MEETING,
+                ),
+              }}
+            />
+            <TopTab.Screen
+              name={'WikiList-' + BoardCategory.CELEBRATION}
+              children={() => (
+                <RenderWikiCardList
+                  focused={isFocused}
+                  setRuleCategory={setRuleCategory}
+                  setBoardCategory={setBoardCategory}
+                  ruleCategory={undefined}
+                  boardCategory={BoardCategory.CELEBRATION}
+                  word={word}
+                  tag={tag}
+                  type={type}
+                />
+              )}
+              options={{
+                title: wikiTypeNameFactory(
+                  WikiType.BOARD,
+                  undefined,
+                  true,
+                  BoardCategory.CELEBRATION,
+                ),
+              }}
+            />
+            <TopTab.Screen
+              name={'WikiList-' + BoardCategory.OTHER}
+              children={() => (
+                <RenderWikiCardList
+                  focused={isFocused}
+                  setRuleCategory={setRuleCategory}
+                  setBoardCategory={setBoardCategory}
+                  ruleCategory={undefined}
+                  boardCategory={BoardCategory.OTHER}
+                  word={word}
+                  tag={tag}
+                  type={type}
+                />
+              )}
+              options={{
+                title: wikiTypeNameFactory(
+                  WikiType.BOARD,
+                  undefined,
+                  true,
+                  BoardCategory.OTHER,
+                ),
+              }}
             />
           </TopTab.Navigator>
         ) : (
           <RenderWikiCardList
             focused={isFocused}
             setRuleCategory={setRuleCategory}
+            setBoardCategory={setBoardCategory}
             ruleCategory={undefined}
             status={undefined}
             word={word}

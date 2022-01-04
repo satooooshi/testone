@@ -1,5 +1,5 @@
 import {useFormik} from 'formik';
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useRef, useState} from 'react';
 import {Alert, useWindowDimensions} from 'react-native';
 import {
   Button,
@@ -15,9 +15,15 @@ import TagModal from '../../components/common/TagModal';
 import HeaderWithTextButton from '../../components/Header';
 import WholeContainer from '../../components/WholeContainer';
 import TextEditor from '../../components/wiki/TextEditor';
-import {useSelectedTags} from '../../hooks/tag/useSelectedTags';
 import {useTagType} from '../../hooks/tag/useTagType';
-import {RuleCategory, Tag, TextFormat, Wiki, WikiType} from '../../types';
+import {
+  BoardCategory,
+  RuleCategory,
+  Tag,
+  TextFormat,
+  Wiki,
+  WikiType,
+} from '../../types';
 import {tagColorFactory} from '../../utils/factory/tagColorFactory';
 import {wikiTypeNameFactory} from '../../utils/factory/wiki/wikiTypeNameFactory';
 import {wikiSchema} from '../../utils/validation/schema';
@@ -29,6 +35,7 @@ type WikiFormProps = {
   tags: Tag[];
   type?: WikiType;
   ruleCategory?: RuleCategory;
+  boardCategory?: BoardCategory;
   saveWiki: (wiki: Partial<Wiki>) => void;
   onUploadImage: (onSuccess: (imageURL: string[]) => void) => void;
 };
@@ -38,6 +45,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
   tags,
   type,
   ruleCategory,
+  boardCategory,
   saveWiki,
   onUploadImage,
 }) => {
@@ -46,8 +54,13 @@ const WikiForm: React.FC<WikiFormProps> = ({
     title: '',
     body: '',
     tags: [],
-    type: type || WikiType.QA,
-    ruleCategory: ruleCategory || RuleCategory.OTHERS,
+    type: type || WikiType.BOARD,
+    ruleCategory: ruleCategory || RuleCategory.NON_RULE,
+    boardCategory: boardCategory
+      ? boardCategory
+      : !type || type === WikiType.BOARD
+      ? BoardCategory.QA
+      : BoardCategory.NON_BOARD,
     textFormat: 'html',
   };
   const {
@@ -216,7 +229,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
           setNewWiki(w => ({
             ...w,
             type: WikiType.ALL_POSTAL,
-            ruleCategory: RuleCategory.OTHERS,
+            ruleCategory: RuleCategory.NON_RULE,
           }))
         }
         value={WikiType.ALL_POSTAL}>
@@ -227,24 +240,139 @@ const WikiForm: React.FC<WikiFormProps> = ({
         onPress={() =>
           setNewWiki(w => ({
             ...w,
-            type: WikiType.QA,
-            ruleCategory: RuleCategory.OTHERS,
+            type: WikiType.BOARD,
+            ruleCategory: RuleCategory.NON_RULE,
+            boardCategory: BoardCategory.KNOWLEDGE,
           }))
         }
-        value={WikiType.QA}>
-        {wikiTypeNameFactory(WikiType.QA)}
+        value={BoardCategory.KNOWLEDGE}>
+        {wikiTypeNameFactory(
+          WikiType.BOARD,
+          undefined,
+          true,
+          BoardCategory.KNOWLEDGE,
+        )}
       </Dropdown.Option>
       <Dropdown.Option
         {...defaultDropdownOptionProps}
         onPress={() =>
           setNewWiki(w => ({
             ...w,
-            type: WikiType.KNOWLEDGE,
-            ruleCategory: RuleCategory.OTHERS,
+            type: WikiType.BOARD,
+            ruleCategory: RuleCategory.NON_RULE,
+            boardCategory: BoardCategory.QA,
           }))
         }
-        value={WikiType.KNOWLEDGE}>
-        {wikiTypeNameFactory(WikiType.KNOWLEDGE)}
+        value={BoardCategory.QA}>
+        {wikiTypeNameFactory(WikiType.BOARD, undefined, true, BoardCategory.QA)}
+      </Dropdown.Option>
+      <Dropdown.Option
+        {...defaultDropdownOptionProps}
+        onPress={() =>
+          setNewWiki(w => ({
+            ...w,
+            type: WikiType.BOARD,
+            ruleCategory: RuleCategory.NON_RULE,
+            boardCategory: BoardCategory.NEWS,
+          }))
+        }
+        value={BoardCategory.NEWS}>
+        {wikiTypeNameFactory(
+          WikiType.BOARD,
+          undefined,
+          true,
+          BoardCategory.NEWS,
+        )}
+      </Dropdown.Option>
+      <Dropdown.Option
+        {...defaultDropdownOptionProps}
+        onPress={() =>
+          setNewWiki(w => ({
+            ...w,
+            type: WikiType.BOARD,
+            ruleCategory: RuleCategory.NON_RULE,
+            boardCategory: BoardCategory.IMPRESSIVE_UNIVERSITY,
+          }))
+        }
+        value={BoardCategory.IMPRESSIVE_UNIVERSITY}>
+        {wikiTypeNameFactory(
+          WikiType.BOARD,
+          undefined,
+          true,
+          BoardCategory.IMPRESSIVE_UNIVERSITY,
+        )}
+      </Dropdown.Option>
+      <Dropdown.Option
+        {...defaultDropdownOptionProps}
+        onPress={() =>
+          setNewWiki(w => ({
+            ...w,
+            type: WikiType.BOARD,
+            ruleCategory: RuleCategory.NON_RULE,
+            boardCategory: BoardCategory.CLUB,
+          }))
+        }
+        value={BoardCategory.CLUB}>
+        {wikiTypeNameFactory(
+          WikiType.BOARD,
+          undefined,
+          true,
+          BoardCategory.CLUB,
+        )}
+      </Dropdown.Option>
+      <Dropdown.Option
+        {...defaultDropdownOptionProps}
+        onPress={() =>
+          setNewWiki(w => ({
+            ...w,
+            type: WikiType.BOARD,
+            ruleCategory: RuleCategory.NON_RULE,
+            boardCategory: BoardCategory.STUDY_MEETING,
+          }))
+        }
+        value={BoardCategory.STUDY_MEETING}>
+        {wikiTypeNameFactory(
+          WikiType.BOARD,
+          undefined,
+          true,
+          BoardCategory.STUDY_MEETING,
+        )}
+      </Dropdown.Option>
+      <Dropdown.Option
+        {...defaultDropdownOptionProps}
+        onPress={() =>
+          setNewWiki(w => ({
+            ...w,
+            type: WikiType.BOARD,
+            ruleCategory: RuleCategory.NON_RULE,
+            boardCategory: BoardCategory.CELEBRATION,
+          }))
+        }
+        value={BoardCategory.CELEBRATION}>
+        {wikiTypeNameFactory(
+          WikiType.BOARD,
+          undefined,
+          true,
+          BoardCategory.CELEBRATION,
+        )}
+      </Dropdown.Option>
+      <Dropdown.Option
+        {...defaultDropdownOptionProps}
+        onPress={() =>
+          setNewWiki(w => ({
+            ...w,
+            type: WikiType.BOARD,
+            ruleCategory: RuleCategory.NON_RULE,
+            boardCategory: BoardCategory.OTHER,
+          }))
+        }
+        value={BoardCategory.OTHER}>
+        {wikiTypeNameFactory(
+          WikiType.BOARD,
+          undefined,
+          true,
+          BoardCategory.OTHER,
+        )}
       </Dropdown.Option>
     </Dropdown>
   );
