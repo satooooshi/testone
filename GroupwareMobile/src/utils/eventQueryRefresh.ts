@@ -30,8 +30,7 @@ export const monthQueryFactoryFromTargetDate = (
   });
   const from = fromDate.toFormat('yyyy-LL-dd');
   const to = DateTime.fromJSDate(fromDate.toJSDate())
-    .plus({months: 1})
-    .minus({days: 1})
+    .plus({months: 1, days: 3})
     .toFormat('yyyy-LL-dd');
   return {from, to};
 };
@@ -39,11 +38,11 @@ export const weekQueryFactoryFromTargetDate = (
   date: Date,
 ): {from: string; to: string} => {
   const from = DateTime.fromJSDate(date)
-    .minus({days: 3})
+    .minus({days: 4})
     .set({hour: 0, minute: 0, second: 0})
     .toFormat('yyyy-LL-dd');
   const to = DateTime.fromJSDate(date)
-    .plus({days: 3})
+    .plus({days: 4})
     .set({hour: 0, minute: 0, second: 0})
     .toFormat('yyyy-LL-dd');
   return {from, to};
