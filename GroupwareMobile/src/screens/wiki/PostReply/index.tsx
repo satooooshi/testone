@@ -3,7 +3,7 @@ import {useFormik} from 'formik';
 import MarkdownIt from 'markdown-it';
 import React from 'react';
 import {ActivityIndicator, Alert, useWindowDimensions} from 'react-native';
-import {Button, Overlay, ScrollDiv, Text} from 'react-native-magnus';
+import {Button, Overlay, ScrollDiv, Text, Div} from 'react-native-magnus';
 import HeaderWithTextButton from '../../../components/Header';
 import WholeContainer from '../../../components/WholeContainer';
 import {useAPIUploadStorage} from '../../../hooks/api/storage/useAPIUploadStorage';
@@ -18,7 +18,6 @@ import {uploadImageFromGallery} from '../../../utils/cropImage/uploadImageFromGa
 import {replySchema} from '../../../utils/validation/schema';
 import RenderHtml from 'react-native-render-html';
 import TextEditor from '../../../components/wiki/TextEditor';
-import {AxiosError} from 'axios';
 
 const PostReply: React.FC = () => {
   const navigation = useNavigation<PostWikiNavigationProps>();
@@ -113,11 +112,13 @@ const PostReply: React.FC = () => {
                 {errors.body}
               </Text>
             ) : null}
-            <TextEditor
-              textFormat={answerInfo.textFormat}
-              onUploadImage={handleUploadImage}
-              onChange={text => setNewReply(r => ({...r, body: text}))}
-            />
+            <Div mb={50}>
+              <TextEditor
+                textFormat={answerInfo.textFormat}
+                onUploadImage={handleUploadImage}
+                onChange={text => setNewReply(r => ({...r, body: text}))}
+              />
+            </Div>
           </ScrollDiv>
         </>
       ) : null}
