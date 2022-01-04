@@ -33,11 +33,8 @@ const TagListBox: React.FC<TagListBoxProps> = props => {
         <Text fontSize={16} mb={'sm'}>
           {`${tagTypeNameFactory(tagType)}の紹介`}
         </Text>
-        <Text fontSize={16} fontWeight="bold" color={darkFontColor}>
-          {introduce || '未設定'}
-        </Text>
         <AutoLinkedText
-          text={introduce}
+          text={introduce || '未設定'}
           style={tailwind('text-base font-bold')}
           linkStyle={tailwind('text-blue-500 text-base text-base')}
         />
