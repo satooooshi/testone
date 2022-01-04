@@ -18,7 +18,6 @@ import {uploadImageFromGallery} from '../../../utils/cropImage/uploadImageFromGa
 import {replySchema} from '../../../utils/validation/schema';
 import RenderHtml from 'react-native-render-html';
 import TextEditor from '../../../components/wiki/TextEditor';
-import {AxiosError} from 'axios';
 
 const PostReply: React.FC = () => {
   const navigation = useNavigation<PostWikiNavigationProps>();
