@@ -27,7 +27,7 @@ import {
 import { useAuthenticate } from 'src/contexts/useAuthenticate';
 import { useHeaderTab } from '@/hooks/headerTab/useHeaderTab';
 import TopTabBar, { TopTabBehavior } from '@/components/layout/TopTabBar';
-import { Box, Text } from '@chakra-ui/react';
+import { Box, Radio, RadioGroup, Stack, Text } from '@chakra-ui/react';
 import { wikiTypeNameFactory } from 'src/utils/wiki/wikiTypeNameFactory';
 
 const QAQuestionList = () => {
@@ -61,6 +61,7 @@ const QAQuestionList = () => {
         queryRefresh({
           type: WikiType.BOARD,
           board_category: undefined,
+          status: undefined,
         }),
       isActiveTab: type === WikiType.BOARD && !board_category,
     },
@@ -75,6 +76,7 @@ const QAQuestionList = () => {
         queryRefresh({
           type: WikiType.BOARD,
           board_category: BoardCategory.KNOWLEDGE,
+          status: undefined,
         }),
       isActiveTab:
         type === WikiType.BOARD && board_category === BoardCategory.KNOWLEDGE,
@@ -90,6 +92,7 @@ const QAQuestionList = () => {
         queryRefresh({
           type: WikiType.BOARD,
           board_category: BoardCategory.QA,
+          status: 'new',
         }),
       isActiveTab:
         type === WikiType.BOARD && board_category === BoardCategory.QA,
@@ -105,6 +108,7 @@ const QAQuestionList = () => {
         queryRefresh({
           type: WikiType.BOARD,
           board_category: BoardCategory.NEWS,
+          status: undefined,
         }),
       isActiveTab:
         type === WikiType.BOARD && board_category === BoardCategory.NEWS,
@@ -120,6 +124,7 @@ const QAQuestionList = () => {
         queryRefresh({
           type: WikiType.BOARD,
           board_category: BoardCategory.IMPRESSIVE_UNIVERSITY,
+          status: undefined,
         }),
       isActiveTab:
         type === WikiType.BOARD &&
@@ -136,6 +141,7 @@ const QAQuestionList = () => {
         queryRefresh({
           type: WikiType.BOARD,
           board_category: BoardCategory.CLUB,
+          status: undefined,
         }),
       isActiveTab:
         type === WikiType.BOARD && board_category === BoardCategory.CLUB,
@@ -151,6 +157,7 @@ const QAQuestionList = () => {
         queryRefresh({
           type: WikiType.BOARD,
           board_category: BoardCategory.STUDY_MEETING,
+          status: undefined,
         }),
       isActiveTab:
         type === WikiType.BOARD &&
@@ -167,6 +174,7 @@ const QAQuestionList = () => {
         queryRefresh({
           type: WikiType.BOARD,
           board_category: BoardCategory.CELEBRATION,
+          status: undefined,
         }),
       isActiveTab:
         type === WikiType.BOARD && board_category === BoardCategory.CELEBRATION,
@@ -182,6 +190,7 @@ const QAQuestionList = () => {
         queryRefresh({
           type: WikiType.BOARD,
           board_category: BoardCategory.OTHER,
+          status: undefined,
         }),
       isActiveTab:
         type === WikiType.BOARD && board_category === BoardCategory.OTHER,
@@ -259,6 +268,7 @@ const QAQuestionList = () => {
   const queryRefresh = (query: Partial<SearchQueryToGetWiki>) => {
     const selectedTagIDs = selectedTags.map((t) => t.id.toString());
     const tagQuery = selectedTagIDs.join('+');
+    console.log(query.status);
     const refreshedQueryStrings = wikiQueryRefresh({
       ...router.query,
       ...query,
@@ -316,6 +326,8 @@ const QAQuestionList = () => {
     }
   }, [tag, tags]);
 
+  const isQA = type === WikiType.BOARD && board_category === BoardCategory.QA;
+
   return (
     <LayoutWithTab
       sidebar={{ activeScreenName: SidebarScreenName.QA }}
@@ -359,6 +371,30 @@ const QAQuestionList = () => {
           </Text>
         )}
         <div className={qaListStyles.qa_list}>
+          {isQA ? (
+            <RadioGroup
+              bg="white"
+              p="3"
+              rounded="md"
+              mb="8px"
+              alignSelf="flex-end"
+              defaultValue={status}
+              onChange={(value) =>
+                queryRefresh({ status: value as 'new' | 'resolved' })
+              }>
+              <Stack direction="row">
+                <Radio value="new" checked={status === 'new'} cursor="pointer">
+                  新着
+                </Radio>
+                <Radio
+                  value="resolved"
+                  checked={status === 'resolved'}
+                  cursor="pointer">
+                  解決済み
+                </Radio>
+              </Stack>
+            </RadioGroup>
+          ) : null}
           {questions?.wiki.map((q) => (
             <WikiCard key={q.id} wiki={q} />
           ))}
