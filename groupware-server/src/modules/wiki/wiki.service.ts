@@ -2,7 +2,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { QAAnswer } from 'src/entities/qaAnswer.entity';
 import { QAAnswerReply } from 'src/entities/qaAnswerReply.entity';
-import { Wiki, WikiType } from 'src/entities/wiki.entity';
+import { BoardCategory, Wiki, WikiType } from 'src/entities/wiki.entity';
 import { In, Repository } from 'typeorm';
 import { SearchQueryToGetWiki, SearchResultToGetWiki } from './wiki.controller';
 import { StorageService } from '../storage/storage.service';
@@ -32,6 +32,7 @@ export class WikiService {
       tag = '',
       type,
       rule_category,
+      board_category,
       writer,
     } = query;
     let offset: number;
@@ -52,9 +53,15 @@ export class WikiService {
         queryWord: `%${word}%`,
       })
       .andWhere(
-        status === 'new' && !writer && type === WikiType.QA
+        status === 'new' &&
+          !writer &&
+          type === WikiType.BOARD &&
+          board_category === BoardCategory.QA
           ? 'wiki.resolved_at is null'
-          : status === 'resolved' && !writer && type === WikiType.QA
+          : status === 'resolved' &&
+            !writer &&
+            type === WikiType.BOARD &&
+            board_category === BoardCategory.QA
           ? 'wiki.resolved_at is not null'
           : '1=1',
       )
@@ -73,6 +80,14 @@ export class WikiService {
           : '1=1',
         {
           ruleCategory: rule_category,
+        },
+      )
+      .andWhere(
+        board_category && type === WikiType.BOARD
+          ? 'wiki.boardCategory = :boarrdCategory'
+          : '1=1',
+        {
+          boardCategory: board_category,
         },
       )
       .andWhere(tag ? 'tag.id IN (:...tagIDs)' : '1=1', {

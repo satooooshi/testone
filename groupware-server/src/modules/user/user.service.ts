@@ -12,7 +12,7 @@ import RequestWithUser from '../auth/requestWithUser.interface';
 import { compare, hash } from 'bcrypt';
 import updatePasswordDto from './dto/updatePasswordDto';
 import { UserTag } from 'src/entities/userTag.entity';
-import { WikiType } from 'src/entities/wiki.entity';
+import { BoardCategory, WikiType } from 'src/entities/wiki.entity';
 import { Parser } from 'json2csv';
 import { SearchQueryToGetUsers } from './user.controller';
 import { Tag, TagType } from 'src/entities/tag.entity';
@@ -86,8 +86,11 @@ export class UserService {
           .where(fromDate ? 'wiki.createdAt > :fromDate' : '1=1', {
             fromDate,
           })
-          .andWhere('wiki.type = :qa', {
-            qa: WikiType.QA,
+          .andWhere('wiki.type = :wikiTypeOfQa', {
+            wikiTypeOfQa: WikiType.BOARD,
+          })
+          .andWhere('wiki.board_category = :boardCategory', {
+            boardCategory: BoardCategory.QA,
           })
           .andWhere(fromDate ? 'wiki.createdAt < :toDate' : '1=1', {
             toDate,
@@ -115,8 +118,11 @@ export class UserService {
           .where(fromDate ? 'wiki.createdAt < :fromDate' : '1=1', {
             fromDate,
           })
-          .andWhere('wiki.type = :knowledge', {
-            knowledge: WikiType.KNOWLEDGE,
+          .andWhere('wiki.type = :board', {
+            board: WikiType.BOARD,
+          })
+          .andWhere('wiki.board_category = :boarrdCategory', {
+            boarrdCategory: BoardCategory.KNOWLEDGE,
           })
           .andWhere('u.id = user.id');
       }, 'knowledgeCount')
@@ -270,8 +276,11 @@ export class UserService {
           .where(fromDate ? 'wiki.createdAt > :fromDate' : '1=1', {
             fromDate,
           })
-          .andWhere('wiki.type = :qa', {
-            qa: WikiType.QA,
+          .andWhere('wiki.type = :wikiTypeOfQa', {
+            wikiTypeOfQa: WikiType.BOARD,
+          })
+          .andWhere('wiki.board_category = :boardCategory', {
+            boardCategory: BoardCategory.QA,
           })
           .andWhere(fromDate ? 'wiki.createdAt < :toDate' : '1=1', {
             toDate,
@@ -299,8 +308,11 @@ export class UserService {
           .where(fromDate ? 'wiki.createdAt < :fromDate' : '1=1', {
             fromDate,
           })
-          .andWhere('wiki.type = :knowledge', {
-            knowledge: WikiType.KNOWLEDGE,
+          .andWhere('wiki.type = :board', {
+            board: WikiType.BOARD,
+          })
+          .andWhere('wiki.board_category = :boarrdCategory', {
+            boarrdCategory: BoardCategory.KNOWLEDGE,
           })
           .andWhere('u.id = user.id');
       }, 'knowledgeCount')
@@ -332,9 +344,14 @@ export class UserService {
         'user.wiki',
         'wiki',
         fromDate
-          ? 'wiki.createdAt > :fromDate AND wiki.createdAt < :toDate AND wiki.type = :qa'
-          : 'wiki.type = :qa',
-        { fromDate, toDate, qa: WikiType.QA },
+          ? 'wiki.createdAt > :fromDate AND wiki.createdAt < :toDate AND wiki.type = :board AND wiki.boardCategory = :boardCategory'
+          : 'wiki.type = :board AND wiki.boardCategory = :boardCategory',
+        {
+          fromDate,
+          toDate,
+          board: WikiType.BOARD,
+          boardCategory: BoardCategory.QA,
+        },
       )
       .where(userIDs.length ? 'user.id IN (:...userIDs)' : '1=1', { userIDs })
       .getMany();
@@ -344,9 +361,14 @@ export class UserService {
         'user.wiki',
         'wiki',
         fromDate
-          ? 'wiki.createdAt > :fromDate AND wiki.createdAt < :toDate AND wiki.type = :knowledge'
-          : 'wiki.type = :knowledge',
-        { fromDate, toDate, knowledge: WikiType.KNOWLEDGE },
+          ? 'wiki.createdAt > :fromDate AND wiki.createdAt < :toDate AND wiki.type = :board AND wiki.boardCategory = :boardCategory'
+          : 'wiki.type = :board AND wiki.boardCategory = :boardCategory',
+        {
+          fromDate,
+          toDate,
+          board: WikiType.BOARD,
+          boardCategory: BoardCategory.KNOWLEDGE,
+        },
       )
       .where(userIDs.length ? 'user.id IN (:...userIDs)' : '1=1', { userIDs })
       .getMany();

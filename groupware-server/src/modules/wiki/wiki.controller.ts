@@ -11,7 +11,12 @@ import {
 } from '@nestjs/common';
 import { QAAnswer } from 'src/entities/qaAnswer.entity';
 import { QAAnswerReply } from 'src/entities/qaAnswerReply.entity';
-import { RuleCategory, Wiki, WikiType } from 'src/entities/wiki.entity';
+import {
+  BoardCategory,
+  RuleCategory,
+  Wiki,
+  WikiType,
+} from 'src/entities/wiki.entity';
 import JwtAuthenticationGuard from '../auth/jwtAuthentication.guard';
 import RequestWithUser from '../auth/requestWithUser.interface';
 import SaveWikiDto from './dto/saveWikiDto';
@@ -26,6 +31,7 @@ export interface SearchQueryToGetWiki {
   writer?: string;
   answer_writer?: string;
   rule_category?: RuleCategory;
+  board_category?: BoardCategory;
 }
 
 export interface SearchResultToGetWiki {
