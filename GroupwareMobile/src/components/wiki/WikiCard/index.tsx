@@ -65,17 +65,19 @@ const WikiCard: React.FC<WikiCardProps> = ({wiki}) => {
           </Text>
         </Div>
         <Div flexDir="row">
-          <Tag
-            fontSize={'lg'}
-            h={28}
-            py={0}
-            bg={wikiTypeColorFactory(wiki.type, wiki.ruleCategory)}
-            color="white"
-            ml={4}>
-            {wikiTypeNameFactory(wiki.type, wiki.ruleCategory)}
-          </Tag>
           {wiki?.tags?.length ? (
             <FlatList
+              ListHeaderComponent={
+                <Tag
+                  fontSize={'lg'}
+                  h={28}
+                  py={0}
+                  bg={wikiTypeColorFactory(wiki.type, wiki.ruleCategory)}
+                  color="white"
+                  ml={4}>
+                  {wikiTypeNameFactory(wiki.type, wiki.ruleCategory)}
+                </Tag>
+              }
               style={wikiCardStyles.tagList}
               horizontal
               data={wiki?.tags || []}
@@ -92,21 +94,32 @@ const WikiCard: React.FC<WikiCardProps> = ({wiki}) => {
                   py={0}
                   bg={tagColorFactory(t.type)}
                   color="white"
-                  mr={4}>
+                  ml={4}>
                   {t.name}
                 </Tag>
               )}
             />
           ) : (
-            <Tag
-              fontSize={'lg'}
-              h={28}
-              py={0}
-              bg={'orange'}
-              color="white"
-              ml={4}>
-              タグなし
-            </Tag>
+            <>
+              <Tag
+                fontSize={'lg'}
+                h={28}
+                py={0}
+                bg={wikiTypeColorFactory(wiki.type, wiki.ruleCategory)}
+                color="white"
+                ml={4}>
+                {wikiTypeNameFactory(wiki.type, wiki.ruleCategory)}
+              </Tag>
+              <Tag
+                fontSize={'lg'}
+                h={28}
+                py={0}
+                bg={'orange'}
+                color="white"
+                ml={4}>
+                タグなし
+              </Tag>
+            </>
           )}
         </Div>
       </Div>
