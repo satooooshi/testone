@@ -1,4 +1,11 @@
-import { Avatar, Box, useMediaQuery, Text, Link } from '@chakra-ui/react';
+import {
+  Avatar,
+  Box,
+  useMediaQuery,
+  Text,
+  Link,
+  Spinner,
+} from '@chakra-ui/react';
 import { MentionData } from '@draft-js-plugins/mention';
 import { darkFontColor } from 'src/utils/colors';
 import { Menu, MenuItem, MenuButton } from '@szhsin/react-menu';
@@ -119,37 +126,40 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
     },
   );
 
-  const { mutate: sendChatMessage } = useAPISendChatMessage({
-    onSuccess: (data) => {
-      setMessages([data, ...messages]);
-      socket.emit('message', { ...data, isSender: false });
-      setNewChatMessage((m) => ({
-        ...m,
-        content: '',
-        replyParentMessage: undefined,
-      }));
-      setEditorState(EditorState.createEmpty());
-      messageWrapperDivRef.current &&
-        messageWrapperDivRef.current.scrollTo({ top: 0 });
-    },
-  });
+  const { mutate: sendChatMessage, isLoading: loadingSend } =
+    useAPISendChatMessage({
+      onSuccess: (data) => {
+        setMessages([data, ...messages]);
+        socket.emit('message', { ...data, isSender: false });
+        setNewChatMessage((m) => ({
+          ...m,
+          content: '',
+          replyParentMessage: undefined,
+        }));
+        setEditorState(EditorState.createEmpty());
+        messageWrapperDivRef.current &&
+          messageWrapperDivRef.current.scrollTo({ top: 0 });
+      },
+    });
 
-  const { mutate: uploadFiles } = useAPIUploadStorage({
-    onSuccess: (fileURLs) => {
-      const type = isImage(fileURLs[0])
-        ? ChatMessageType.IMAGE
-        : isVideo(fileURLs[0])
-        ? ChatMessageType.VIDEO
-        : ChatMessageType.OTHER_FILE;
-      sendChatMessage({
-        content: fileURLs[0],
-        chatGroup: newChatMessage.chatGroup,
-        type,
-      });
-      messageWrapperDivRef.current &&
-        messageWrapperDivRef.current.scrollTo({ top: 0 });
+  const { mutate: uploadFiles, isLoading: loadingUplaod } = useAPIUploadStorage(
+    {
+      onSuccess: (fileURLs) => {
+        const type = isImage(fileURLs[0])
+          ? ChatMessageType.IMAGE
+          : isVideo(fileURLs[0])
+          ? ChatMessageType.VIDEO
+          : ChatMessageType.OTHER_FILE;
+        sendChatMessage({
+          content: fileURLs[0],
+          chatGroup: newChatMessage.chatGroup,
+          type,
+        });
+        messageWrapperDivRef.current &&
+          messageWrapperDivRef.current.scrollTo({ top: 0 });
+      },
     },
-  });
+  );
 
   const onSend = () => {
     if (newChatMessage.content) {
@@ -331,6 +341,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [room.id]);
 
+  const isLoading = loadingSend || loadingUplaod;
   const activeIndex = useMemo(() => {
     if (selectedImageURL) {
       const isNowUri = (element: ImageDecorator) =>
@@ -593,11 +604,15 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
         bottom={'8px'}
         cursor="pointer"
         right="8px">
-        <IoSend
-          size={20}
-          onClick={() => handleSubmit()}
-          color={darkFontColor}
-        />
+        {isLoading ? (
+          <Spinner />
+        ) : (
+          <IoSend
+            size={20}
+            onClick={() => handleSubmit()}
+            color={darkFontColor}
+          />
+        )}
       </Link>
     </Box>
   );
