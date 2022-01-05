@@ -307,9 +307,7 @@ const EventDetail = () => {
       sidebar={{ activeScreenName: SidebarScreenName.EVENT }}
       header={initialHeaderValue}>
       {doesntExist ? (
-        <div>
-          <Text>このイベントは存在しないか、権限がありません。</Text>
-        </div>
+        <Text>このイベントは存在しないか、権限がありません。</Text>
       ) : null}
       <CreateEventModal
         enabled={editModal}
@@ -471,13 +469,13 @@ const EventDetail = () => {
               参考資料
             </Text>
             {data.files && data.files.length ? (
-              <div className={eventDetailStyles.files_wrapper}>
+              <Box display="flex" flexDir="row" flexWrap="wrap" mb="16px">
                 {data.files.map((f) => (
                   <Box mr="4px" mb="4px" key={f.id}>
                     <FileIcon href={f.url} />
                   </Box>
                 ))}
-              </div>
+              </Box>
             ) : (
               <Text mb="16px" display="block" alignSelf="flex-start">
                 参考資料はありません

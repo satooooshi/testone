@@ -1,6 +1,5 @@
 import React, { useCallback, useMemo, useRef, useState } from 'react';
 import createEventModalStyle from '@/styles/components/CreateEventModal.module.scss';
-import clsx from 'clsx';
 import Modal from 'react-modal';
 import { MdCancel } from 'react-icons/md';
 import {
@@ -33,6 +32,11 @@ import {
   Stack,
   useToast,
   IconButton,
+  Spinner,
+  Text,
+  Box,
+  Image,
+  useMediaQuery,
 } from '@chakra-ui/react';
 import SelectUserModal from '../SelectUserModal';
 import { useAPIGetUsers } from '@/hooks/api/user/useAPIGetUsers';
@@ -45,6 +49,8 @@ import { tagColorFactory } from 'src/utils/factory/tagColorFactory';
 import { useAuthenticate } from 'src/contexts/useAuthenticate';
 import { formikErrorMsgFactory } from 'src/utils/factory/formikErrorMsgFactory';
 import { fileNameTransformer } from 'src/utils/factory/fileNameTransformer';
+import { hideScrollbarCss } from 'src/utils/chakra/hideScrollBar.css';
+import { darkFontColor } from 'src/utils/colors';
 
 type ExcludeFilesAndVideos = Pick<
   EventSchedule,
@@ -103,6 +109,7 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
   const { data: users } = useAPIGetUsers();
   const { user } = useAuthenticate();
   const toast = useToast();
+  const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
 
   const {
     values: newEvent,
@@ -115,14 +122,18 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
     validateOnChange: false,
     validateOnBlur: false,
     validationSchema: createEventSchema,
-    onSubmit: async () => {
+    onSubmit: async (submittedValues) => {
       if (!croppedImageURL || !selectThumbnailName || !completedCrop) {
-        uploadFiles(newFiles);
+        createEvent(submittedValues);
         return;
       }
       const result = await dataURLToFile(croppedImageURL, selectThumbnailName);
 
-      uploadThumbnail([result]);
+      uploadFiles([result], {
+        onSuccess: (fileURLs) => {
+          createEvent({ ...submittedValues, imageURL: fileURLs[0] });
+        },
+      });
     },
   });
 
@@ -144,7 +155,6 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
   const [newYoutube, setNewYoutube] = useState('');
   const [tagModal, setTagModal] = useState(false);
   const [userModal, setUserModal] = useState(false);
-  const [newFiles, setNewFiles] = useState<File[]>([]);
 
   const [
     {
@@ -165,10 +175,6 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
     [dispatchCrop],
   );
 
-  const onRelatedFileDrop = useCallback((f) => {
-    setNewFiles((prev) => [...prev, ...f]);
-  }, []);
-
   const onLoad = useCallback((img) => {
     imgRef.current = img;
   }, []);
@@ -185,29 +191,19 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
     getRootProps: getRelatedFileRootProps,
     getInputProps: getRelatedFileInputProps,
   } = useDropzone({
-    onDrop: onRelatedFileDrop,
-  });
-  const { mutate: uploadFiles } = useAPIUploadStorage({
-    onSuccess: (fileURLs) => {
-      const linkedFiles: Partial<EventFile>[] = fileURLs.map((f) => ({
-        url: f,
-      }));
-      createEvent({ ...newEvent, files: [...newEvent.files, ...linkedFiles] });
-      setNewFiles([]);
-      dispatchCrop({ type: 'resetImage', value: 'resetImage' });
+    onDrop: (files: File[]) => {
+      uploadFiles(files, {
+        onSuccess: (urls: string[]) => {
+          const newFiles: Partial<EventFile>[] = urls.map((u) => ({ url: u }));
+          setNewEvent((e) => ({
+            ...e,
+            files: [...(e.files || []), ...newFiles],
+          }));
+        },
+      });
     },
   });
-
-  const { mutate: uploadThumbnail } = useAPIUploadStorage({
-    onSuccess: async (fileURLs) => {
-      const updateEventThumbnailOnState = async () => {
-        Promise.resolve();
-        setNewEvent((e) => ({ ...e, imageURL: fileURLs[0] }));
-      };
-      await updateEventThumbnailOnState();
-      uploadFiles(newFiles);
-    },
-  });
+  const { mutate: uploadFiles, isLoading } = useAPIUploadStorage();
 
   const toggleHostUser = (u: User) => {
     setNewEvent((e) => {
@@ -310,25 +306,48 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
         tags={tags ? tags : []}
         selectedTags={newEvent.tags ? newEvent.tags : []}
       />
-      <div className={createEventModalStyle.modal_top}>
-        <div className={createEventModalStyle.errors_wrapper}></div>
-        <div className={createEventModalStyle.top_button_wrapper}>
+      <Box
+        display="flex"
+        flexDirection={isSmallerThan768 ? 'row' : 'column'}
+        justifyContent="space-between"
+        borderBottomColor="blue.500"
+        borderBottomWidth={1}
+        pb="8px"
+        alignItems="center"
+        mb="16px"
+        w="100%"
+        position={isSmallerThan768 ? 'sticky' : undefined}
+        zIndex={50}
+        bg={'#ececec'}
+        top={isSmallerThan768 ? '-15px' : undefined}
+        pt={isSmallerThan768 ? '15px' : undefined}>
+        <Box
+          display="flex"
+          flexDir="row"
+          justifyContent={isSmallerThan768 ? 'space-between' : 'flex-end'}
+          w="100%">
           <Button
-            className={createEventModalStyle.save_event_button}
+            mr="40px"
             onClick={() => {
               checkErrors();
             }}
             colorScheme="blue">
-            イベントを保存
+            {isLoading ? <Spinner /> : <Text>イベントを保存</Text>}
           </Button>
           <MdCancel
             onClick={onCancelPressed}
             className={createEventModalStyle.cancel_button}
           />
-        </div>
-      </div>
-      <div className={createEventModalStyle.form_wrapper}>
-        <div className={createEventModalStyle.left}>
+        </Box>
+      </Box>
+      <Box display="flex" flexDir={isSmallerThan768 ? 'column' : 'row'}>
+        <Box
+          display="flex"
+          flexDir="column"
+          w={isSmallerThan768 ? '100%' : '48%'}
+          overflowY="auto"
+          mr={isSmallerThan768 ? 0 : '16px'}
+          css={hideScrollbarCss}>
           <Input
             type="text"
             name="title"
@@ -338,15 +357,23 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
             onChange={(e) =>
               setNewEvent((ev) => ({ ...ev, title: e.target.value }))
             }
-            className={clsx(
-              createEventModalStyle.title,
-              createEventModalStyle.big_text,
-              createEventModalStyle.input,
-            )}
+            bg="white"
+            textAlign="left"
+            p="8px"
+            fontSize="22px"
+            fontWeight="bold"
+            color={darkFontColor}
           />
-          <div className={createEventModalStyle.date_form_wrapper}>
-            <div className={createEventModalStyle.date_picker_wrapper}>
-              <div className={createEventModalStyle.date_picker}>
+          <Box textAlign="center" mb="16px">
+            <Box
+              display="flex"
+              flexDir={isSmallerThan768 ? 'column' : 'row'}
+              justifyContent={isSmallerThan768 ? 'flex-start' : 'space-evenly'}
+              alignItems="center"
+              mb={isSmallerThan768 ? 0 : '16px'}>
+              <Box
+                w={isSmallerThan768 ? '100%' : '40%'}
+                mb={isSmallerThan768 ? '16px' : 0}>
                 {newEvent.type !== EventType.SUBMISSION_ETC ? (
                   <DateTimePicker
                     value={newEvent.startAt}
@@ -356,12 +383,14 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
                     formatStyle={'medium'}
                   />
                 ) : (
-                  <span className={createEventModalStyle.caution_message}>
+                  <Text color={'blue.600'}>
                     提出物イベントは終了日時の2時間前の日時に開始としてカレンダーに表示されます
-                  </span>
+                  </Text>
                 )}
-              </div>
-              <div className={createEventModalStyle.date_picker}>
+              </Box>
+              <Box
+                w={isSmallerThan768 ? '100%' : '40%'}
+                mb={isSmallerThan768 ? '16px' : 0}>
                 <DateTimePicker
                   value={newEvent.endAt}
                   onChange={(d) =>
@@ -382,13 +411,17 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
                   hour24
                   formatStyle={'medium'}
                 />
-              </div>
-            </div>
-          </div>
+              </Box>
+            </Box>
+          </Box>
           <Textarea
             name="description"
             placeholder="概要を入力してください"
-            className={createEventModalStyle.description}
+            p="10px"
+            h={isSmallerThan768 ? '1vh' : '280px'}
+            w="100%"
+            wordBreak="break-all"
+            mb="16px"
             value={newEvent.description}
             height="max( 240px, 30vh )"
             onChange={(e) =>
@@ -399,7 +432,8 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
             wrap="hard"
           />
           <Button
-            className={createEventModalStyle.add_tag}
+            alignSelf="flex-end"
+            mb="8px"
             onClick={() => setUserModal(true)}
             size="sm"
             colorScheme="pink">
@@ -412,11 +446,14 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
             onComplete={() => setUserModal(false)}
             toggleUser={toggleHostUser}
           />
-          <div className={createEventModalStyle.tags}>
+          <Box
+            display="flex"
+            flexDir="row"
+            justifyContent="flex-start"
+            flexWrap="wrap"
+            maxH="200px">
             {newEvent.hostUsers?.map((u) => (
-              <div
-                className={createEventModalStyle.selected_tags_wrapper}
-                key={u.id}>
+              <Box mb="5px" mr="4px" key={u.id}>
                 <ButtonGroup isAttached size="xs" colorScheme="purple">
                   <Button mr="-px">{u.lastName + u.firstName}</Button>
                   <IconButton
@@ -425,21 +462,25 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
                     icon={<MdCancel size={18} />}
                   />
                 </ButtonGroup>
-              </div>
+              </Box>
             ))}
-          </div>
+          </Box>
           <Button
-            className={createEventModalStyle.add_tag}
+            alignSelf="flex-end"
+            mb="8px"
             onClick={() => openTagModal()}
             size="sm"
             colorScheme="green">
             タグを編集
           </Button>
-          <div className={createEventModalStyle.tags}>
+          <Box
+            display="flex"
+            flexDir="row"
+            justifyContent="flex-start"
+            flexWrap="wrap"
+            maxH="200px">
             {newEvent.tags?.map((t) => (
-              <div
-                className={createEventModalStyle.selected_tags_wrapper}
-                key={t.id}>
+              <Box mb="5px" mr="4px" key={t.id}>
                 <ButtonGroup
                   isAttached
                   size="xs"
@@ -451,14 +492,19 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
                     icon={<MdCancel size={18} />}
                   />
                 </ButtonGroup>
-              </div>
+              </Box>
             ))}
-          </div>
-        </div>
-        <div className={createEventModalStyle.right}>
+          </Box>
+        </Box>
+        <Box
+          display="flex"
+          flexDir="column"
+          w={isSmallerThan768 ? '100%' : '48%'}
+          overflowY="auto"
+          css={hideScrollbarCss}>
           {/* chat group is able to be created only on creation */}
           {!newEvent.id && newEvent.type !== EventType.SUBMISSION_ETC ? (
-            <div className={createEventModalStyle.type_select_wrapper}>
+            <Box mb="16px">
               <FormControl>
                 <FormLabel>
                   チャットルームの作成(作成後に変更することはできません)
@@ -486,9 +532,9 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
                   </Stack>
                 </RadioGroup>
               </FormControl>
-            </div>
+            </Box>
           ) : null}
-          <div className={createEventModalStyle.type_select_wrapper}>
+          <Box mb="16px">
             <FormControl>
               <FormLabel>タイプ</FormLabel>
               <Select
@@ -528,15 +574,16 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
                 )}
               </Select>
             </FormControl>
-          </div>
-          <p className={createEventModalStyle.related_files}>サムネイル</p>
-          <div className={createEventModalStyle.image_form_wrapper}>
+          </Box>
+          <Text mb="8px">サムネイル</Text>
+          <Box
+            display="flex"
+            flexDir="column"
+            justifyContent="center"
+            alignItems="center"
+            mb="16px">
             {newEvent.imageURL && !selectThumbnailUrl ? (
-              <img
-                className={createEventModalStyle.image}
-                src={newEvent.imageURL}
-                alt="サムネイル"
-              />
+              <Image mb="16px" src={newEvent.imageURL} alt="サムネイル" />
             ) : null}
             {selectThumbnailUrl ? (
               <ReactCrop
@@ -555,48 +602,57 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
                 onImageLoaded={onLoad}
               />
             ) : (
-              <div
+              <Box
                 {...getEventThumbnailRootProps({
                   className: createEventModalStyle.image_dropzone,
                 })}>
                 <input {...getEventThumbnailInputProps()} />
-                <p>
+                <Text>
                   クリックかドラッグアンドドロップで
                   {newEvent.imageURL ? '別のサムネイルに更新' : '投稿'}
-                </p>
-              </div>
+                </Text>
+              </Box>
             )}
-          </div>
-          <p className={createEventModalStyle.related_files}>参考資料</p>
-          <div className={createEventModalStyle.input_icon_wrapper}>
+          </Box>
+          <Text mb="16px">参考資料</Text>
+          <Box display="flex" flexDir="row" alignItems="center" mb="16px">
             <div
               {...getRelatedFileRootProps({
-                className: createEventModalStyle.related_file_dropzone,
+                className: createEventModalStyle.image_dropzone,
               })}>
               <input {...getRelatedFileInputProps()} />
-              <p>クリックかドラッグアンドドロップで投稿</p>
+              <Text>クリックかドラッグアンドドロップで投稿</Text>
             </div>
-          </div>
-          {newFiles.length || newEvent.files?.length ? (
-            <div className={createEventModalStyle.related_files_wrapper}>
-              {newFiles.map((f) => (
-                <div className={createEventModalStyle.url_wrapper} key={f.name}>
-                  <p className={createEventModalStyle.url}>{f.name}</p>
-                  <MdCancel
-                    className={createEventModalStyle.url_delete_button}
-                    onClick={() =>
-                      setNewFiles(
-                        newFiles.filter((file) => f.name !== file.name),
-                      )
-                    }
-                  />
-                </div>
-              ))}
+          </Box>
+          {newEvent.files?.length ? (
+            <Box mb="16px">
               {newEvent.files.map((f) => (
-                <div className={createEventModalStyle.url_wrapper} key={f.url}>
-                  <span className={createEventModalStyle.url}>
+                <Box
+                  key={f.url}
+                  borderColor={'blue.500'}
+                  rounded="md"
+                  borderWidth={1}
+                  display="flex"
+                  flexDir="row"
+                  justifyContent="space-between"
+                  alignItems="center"
+                  h="40px"
+                  mb="8px"
+                  px="8px">
+                  <Text
+                    color="blue.600"
+                    alignSelf="center"
+                    h="40px"
+                    verticalAlign="middle"
+                    textAlign="left"
+                    display="flex"
+                    alignItems="center"
+                    whiteSpace="nowrap"
+                    overflowX="auto"
+                    w="95%"
+                    css={hideScrollbarCss}>
                     {fileNameTransformer(f.url || '')}
-                  </span>
+                  </Text>
                   <MdCancel
                     className={createEventModalStyle.url_delete_button}
                     onClick={() =>
@@ -608,21 +664,23 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
                       })
                     }
                   />
-                </div>
+                </Box>
               ))}
-            </div>
+            </Box>
           ) : null}
-          <p className={createEventModalStyle.youtube_url}>関連動画</p>
-          <div className={createEventModalStyle.input_icon_wrapper}>
+          <Text mb="16px">関連動画</Text>
+          <Box display="flex" flexDir="row" alignItems="center" mb="16px">
             <Input
               background="white"
               placeholder="Youtubeの動画URLを設定してください"
               type="text"
-              className={clsx(
-                createEventModalStyle.input,
-                createEventModalStyle.youtube_url__input,
-              )}
-              paddingRight={'40px'}
+              w="100%"
+              h="40px"
+              color={darkFontColor}
+              bg="white"
+              rounded="md"
+              textAlign="left"
+              pr={'40px'}
               value={newYoutube}
               onChange={(e) => setNewYoutube(e.currentTarget.value)}
             />
@@ -630,11 +688,35 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
               className={createEventModalStyle.icon}
               onClick={pushYoutube}
             />
-          </div>
-          <div className={createEventModalStyle.related_files_wrapper}>
+          </Box>
+          <Box display="flex" flexDir="column" mb="16px">
             {newEvent?.videos?.map((y) => (
-              <div className={createEventModalStyle.url_wrapper} key={y.url}>
-                <p className={createEventModalStyle.url}>{y.url}</p>
+              <Box
+                key={y.url}
+                borderColor={'blue.500'}
+                borderWidth={1}
+                rounded="md"
+                display="flex"
+                flexDir="row"
+                justifyContent="space-between"
+                alignItems="center"
+                h="40px"
+                mb="8px"
+                px="8px">
+                <Text
+                  color="blue.600"
+                  alignSelf="center"
+                  h="40px"
+                  verticalAlign="middle"
+                  textAlign="left"
+                  display="flex"
+                  alignItems="center"
+                  whiteSpace="nowrap"
+                  overflowX="auto"
+                  w="95%"
+                  css={hideScrollbarCss}>
+                  {y.url}
+                </Text>
                 <MdCancel
                   className={createEventModalStyle.url_delete_button}
                   onClick={() =>
@@ -646,11 +728,11 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
                     })
                   }
                 />
-              </div>
+              </Box>
             ))}
-          </div>
-        </div>
-      </div>
+          </Box>
+        </Box>
+      </Box>
     </Modal>
   );
 };
