@@ -155,7 +155,7 @@ const EventParticipants: React.FC<EventParticipantsProps> = ({
         <ModalOverlay />
         <ModalContent h="90vh" bg={'#f9fafb'}>
           <ModalCloseButton />
-          <ModalHeader>参加者一覧</ModalHeader>
+          <ModalHeader color="green.600">参加者一覧</ModalHeader>
           <ModalBody>
             {userList(
               participantsExceptCanceled?.filter((u) => u.user.existence),
