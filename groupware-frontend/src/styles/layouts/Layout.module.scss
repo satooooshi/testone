@@ -3,7 +3,8 @@
 .whole_layout {
   display: flex;
   flex-direction: row;
-  width: 100vw;
+  width: 98vw;
+  max-width: 98vw;
   min-height: 100vh;
 }
 
