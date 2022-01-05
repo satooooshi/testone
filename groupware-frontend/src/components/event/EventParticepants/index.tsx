@@ -1,18 +1,26 @@
 import React, { useState } from 'react';
-import eventParticipantsStyles from '@/styles/components/EventParticipants.module.scss';
 import { UserJoiningEvent, UserRole } from 'src/types';
 import {
-  Avatar,
+  Box,
   Button,
+  Link,
   Menu,
   MenuButton,
   MenuItemOption,
   MenuList,
   MenuOptionGroup,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalHeader,
+  ModalOverlay,
+  Text,
 } from '@chakra-ui/react';
-import Link from 'next/link';
-import boldMascot from '@/public/bold-mascot.png';
 import { useAuthenticate } from 'src/contexts/useAuthenticate';
+import { darkFontColor } from 'src/utils/colors';
+import UserAvatar from '@/components/common/UserAvatar';
+import { userNameFactory } from 'src/utils/factory/userNameFactory';
 
 type EventParticipantsProps = {
   userJoiningEvent: UserJoiningEvent[];
@@ -44,43 +52,64 @@ const EventParticipants: React.FC<EventParticipantsProps> = ({
     }
     return `${message}遅刻`;
   };
-  return (
-    <div className={eventParticipantsStyles.participants_area}>
-      <div className={eventParticipantsStyles.participant_top}>
-        <p className={eventParticipantsStyles.participant_list_title}>
-          参加者一覧
-        </p>
-        {!allVisible && participantsExceptCanceled.length > 15 ? (
-          <button
-            className={eventParticipantsStyles.see_all_text}
-            onClick={() => setAllVisible(true)}>
-            See all
-          </button>
+
+  const userList = (users: UserJoiningEvent[], isModal?: boolean) => {
+    return (
+      <Box shadow="md" rounded="md" borderWidth={1} borderColor={'gray.200'}>
+        {!isModal ? (
+          <Box
+            display="flex"
+            flexDir="row"
+            alignItems="center"
+            mx="16px"
+            minH="50px"
+            justifyContent="space-between"
+            borderBottomColor="gray.200"
+            borderBottomWidth={1}>
+            <Text color="green.600" fontWeight="bold" fontSize="20px">
+              参加者一覧
+            </Text>
+            <Link onClick={() => setAllVisible((v) => !v)}>
+              <Text fontWeight="bold" fontSize="20px" color="blue.600">
+                {'全て見る'}
+              </Text>
+            </Link>
+          </Box>
         ) : null}
-      </div>
-      {!participantsExceptCanceled?.length && (
-        <div className={eventParticipantsStyles.participant_name_wrapper}>
-          <a className={eventParticipantsStyles.user_info_wrapper}>
-            <p className={eventParticipantsStyles.participant_name}>
+        {!participantsExceptCanceled?.length && (
+          <Box
+            borderWidth={1}
+            borderColor={'gray.200'}
+            py="8px"
+            px="16px"
+            display="flex"
+            flexDir="row"
+            alignItems="center"
+            justifyContent="space-between">
+            <Text color={darkFontColor} fontWeight="bold" fontSize="18px">
               まだ参加申し込みされていません
-            </p>
-          </a>
-        </div>
-      )}
-      {participantsExceptCanceled?.map((u, index) =>
-        index <= 15 || allVisible ? (
-          u.user.existence ? (
-            <div className={eventParticipantsStyles.participant_name_wrapper}>
-              <Link key={u.user.id} href={`/account/${u.user.id}`}>
-                <a className={eventParticipantsStyles.participant_info_wrapper}>
-                  <Avatar
-                    src={u.user.avatarUrl}
-                    className={eventParticipantsStyles.participant_avatar}
-                  />
-                  <p className={eventParticipantsStyles.participant_name}>
-                    {u.user.lastName + ' ' + u.user.firstName}
-                  </p>
-                </a>
+            </Text>
+          </Box>
+        )}
+        {users.map((u, index) =>
+          index <= 15 || allVisible ? (
+            <Box
+              borderWidth={1}
+              borderColor={'gray.200'}
+              py="8px"
+              px="16px"
+              display="flex"
+              flexDir="row"
+              alignItems="center"
+              key={u.user.id}
+              justifyContent="space-between">
+              <Link href={`/account/${u.user.id}`}>
+                <Box display="flex" flexDir="row" alignItems="center">
+                  <UserAvatar user={u.user} h="40px" w="40px" mr="8px" />
+                  <Text color={darkFontColor} fontWeight="bold" fontSize="18px">
+                    {userNameFactory(u.user)}
+                  </Text>
+                </Box>
               </Link>
               {user?.role === UserRole.ADMIN && (
                 <Menu>
@@ -108,23 +137,40 @@ const EventParticipants: React.FC<EventParticipantsProps> = ({
                   </MenuList>
                 </Menu>
               )}
-            </div>
+            </Box>
           ) : (
-            <div className={eventParticipantsStyles.participant_name_wrapper}>
-              <Avatar
-                src={boldMascot.src}
-                className={eventParticipantsStyles.participant_avatar}
-              />
-              <p className={eventParticipantsStyles.participant_name}>
-                ボールドくん
-              </p>
-            </div>
-          )
-        ) : (
-          <></>
+            <></>
+          ),
+        )}
+      </Box>
+    );
+  };
+
+  return (
+    <>
+      <Modal
+        onClose={() => setAllVisible(false)}
+        isOpen={allVisible}
+        scrollBehavior="inside">
+        <ModalOverlay />
+        <ModalContent h="90vh" bg={'#f9fafb'}>
+          <ModalCloseButton />
+          <ModalHeader color="green.600">参加者一覧</ModalHeader>
+          <ModalBody>
+            {userList(
+              participantsExceptCanceled?.filter((u) => u.user.existence),
+              true,
+            )}
+          </ModalBody>
+        </ModalContent>
+      </Modal>
+      {userList(
+        participantsExceptCanceled?.filter(
+          (u, index) => u.user.existence && index <= 10,
+          false,
         ),
       )}
-    </div>
+    </>
   );
 };
 
