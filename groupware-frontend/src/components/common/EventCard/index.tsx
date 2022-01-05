@@ -67,6 +67,8 @@ const EventCard: React.FC<EventCardProps> = ({
       justifyContent="space-between"
       w={isSmallerThan768 ? '90vw' : isSmallerThan1024 ? '75vw' : '36vw'}
       backgroundColor="gray.100"
+      borderWidth={1}
+      borderColor="gray.200"
       shadow="md"
       href={`/event/${eventSchedule.id}`}
       _hover={{ textDecoration: 'none' }}>
@@ -76,8 +78,7 @@ const EventCard: React.FC<EventCardProps> = ({
         alignItems="flex-start"
         justifyContent="flex-start"
         px="8px"
-        pt="8px"
-        mb="8px">
+        pt="8px">
         <Box
           mr="16px"
           minW="40%"
@@ -93,7 +94,6 @@ const EventCard: React.FC<EventCardProps> = ({
         <Box
           display="flex"
           flexDir="column"
-          justifyContent="space-between"
           w={isSmallerThan576 ? '50%' : '55%'}
           h="100%">
           <Box mb="8px">

@@ -68,7 +68,7 @@ const FileIcon: React.FC<FileIconProps> = ({ href, submitted }) => {
       h="136px"
       bg={!submitted ? 'white' : 'lightblue'}>
       <AiOutlineFileProtect className={eventDetailStyles.file_icon} />
-      <Text noOfLines={2} isTruncated={true} w="100%" textAlign="center">
+      <Text isTruncated={true} w="100%" textAlign="center">
         {fileNameTransformer(href)}
       </Text>
     </Link>
