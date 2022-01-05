@@ -14,6 +14,7 @@ import {
   ModalOverlay,
   Box,
   Avatar,
+  Spinner,
 } from '@chakra-ui/react';
 import { useAPIUploadStorage } from '@/hooks/api/storage/useAPIUploadStorage';
 import { useDropzone } from 'react-dropzone';
@@ -46,7 +47,7 @@ const EditChatGroupModal: React.FC<EditChatGroupModalProps> = ({
   });
 
   const [selectImageUrl, setSelectImageUrl] = useState<string>('');
-  const { mutate: uploadImage } = useAPIUploadStorage({
+  const { mutate: uploadImage, isLoading } = useAPIUploadStorage({
     onSuccess: async (fileURLs) => {
       saveGroup({ ...newGroupInfo, imageURL: fileURLs[0] } as ChatGroup);
       setSelectImageUrl('');
@@ -122,7 +123,7 @@ const EditChatGroupModal: React.FC<EditChatGroupModalProps> = ({
             mb="8px"
             colorScheme="green"
             alignItems="center">
-            <Text display="inline">更新</Text>
+            {isLoading ? <Spinner /> : <Text display="inline">更新</Text>}
           </Button>
         </ModalHeader>
         <ModalCloseButton />

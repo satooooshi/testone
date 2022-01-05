@@ -11,8 +11,10 @@ import {
   FormControl,
   FormLabel,
   Input,
+  Spinner,
   Textarea,
   useToast,
+  Text,
 } from '@chakra-ui/react';
 import { useAuthenticate } from 'src/contexts/useAuthenticate';
 import { imageExtensions } from 'src/utils/imageExtensions';
@@ -103,16 +105,18 @@ const Profile = () => {
     },
   );
 
-  const { mutate: uploadImage } = useAPIUploadStorage({
-    onSuccess: async (fileURLs) => {
-      const updateEventImageOnState = async () => {
-        Promise.resolve();
-        setUserInfo((e) => ({ ...e, avatarUrl: fileURLs[0] }));
-      };
-      await updateEventImageOnState();
-      updateUser({ ...userInfo, avatarUrl: fileURLs[0] });
+  const { mutate: uploadImage, isLoading: loadingUplaod } = useAPIUploadStorage(
+    {
+      onSuccess: async (fileURLs) => {
+        const updateEventImageOnState = async () => {
+          Promise.resolve();
+          setUserInfo((e) => ({ ...e, avatarUrl: fileURLs[0] }));
+        };
+        await updateEventImageOnState();
+        updateUser({ ...userInfo, avatarUrl: fileURLs[0] });
+      },
     },
-  });
+  );
   const [
     {
       crop,
@@ -171,7 +175,7 @@ const Profile = () => {
     },
   });
 
-  const { mutate: updateUser } = useAPIUpdateUser({
+  const { mutate: updateUser, isLoading: loadigUpdateUser } = useAPIUpdateUser({
     onSuccess: (responseData) => {
       if (responseData) {
         toast({
@@ -209,6 +213,8 @@ const Profile = () => {
       tags: toggledTag,
     }));
   };
+
+  const isLoading = loadigUpdateUser || loadingUplaod;
 
   return (
     <LayoutWithTab
@@ -421,7 +427,7 @@ const Profile = () => {
         onClick={() => {
           checkErrors();
         }}>
-        更新
+        {isLoading ? <Spinner /> : <Text>更新</Text>}
       </Button>
     </LayoutWithTab>
   );

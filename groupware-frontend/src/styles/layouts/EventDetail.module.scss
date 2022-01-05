@@ -186,28 +186,6 @@
   margin-bottom: 16px;
 }
 
-.files_wrapper {
-  display: flex;
-  flex-direction: row;
-  overflow: scroll;
-  -ms-overflow-style: none;
-  &::-webkit-scrollbar {
-    display: none;
-  }
-  margin-bottom: 16px;
-}
-
-.submission_files_wrapper {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  -ms-overflow-style: none;
-  &::-webkit-scrollbar {
-    display: none;
-  }
-  margin-bottom: 16px;
-}
-
 .submission_file_icon_item_wrapper {
   margin-bottom: 8px;
 }
