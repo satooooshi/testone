@@ -10,7 +10,15 @@ import { AiOutlineFileProtect } from 'react-icons/ai';
 import CreateEventModal from '@/components/event/CreateEventModal';
 import EventParticipants from '@/components/event/EventParticepants';
 import Linkify from 'react-linkify';
-import { Box, Button, Link, Text, Textarea, useToast } from '@chakra-ui/react';
+import {
+  Box,
+  Button,
+  Link,
+  Spinner,
+  Text,
+  Textarea,
+  useToast,
+} from '@chakra-ui/react';
 import Head from 'next/head';
 import { useAuthenticate } from 'src/contexts/useAuthenticate';
 import React from 'react';
@@ -84,7 +92,11 @@ const EventDetail = () => {
   const [commentVisible, setCommentVisible] = useState(false);
   const [newComment, setNewComment] = useState<string>('');
   const { user } = useAuthenticate();
-  const { data, refetch, isLoading } = useAPIGetEventDetail(id);
+  const {
+    data,
+    refetch,
+    isLoading: loadingEventDetail,
+  } = useAPIGetEventDetail(id);
   const submissionRef = useRef<HTMLInputElement | null>(null);
   const toast = useToast();
   const [submitFiles, setSubmitFiles] = useState<
@@ -131,21 +143,22 @@ const EventDetail = () => {
       refetch();
     },
   });
-  const { mutate: uploadStorage } = useAPIUploadStorage({
-    onSuccess: (urls) => {
-      const filesNotSubmitted: Partial<SubmissionFile>[] = [];
-      for (const url of urls) {
-        const submitFileObj = {
-          url: url,
-          eventSchedule: data,
-          userSubmitted: user,
-          submitUnFinished: true,
-        };
-        filesNotSubmitted.push(submitFileObj);
-      }
-      setSubmitFiles((files) => [...files, ...filesNotSubmitted]);
-    },
-  });
+  const { mutate: uploadStorage, isLoading: loadingUplaod } =
+    useAPIUploadStorage({
+      onSuccess: (urls) => {
+        const filesNotSubmitted: Partial<SubmissionFile>[] = [];
+        for (const url of urls) {
+          const submitFileObj = {
+            url: url,
+            eventSchedule: data,
+            userSubmitted: user,
+            submitUnFinished: true,
+          };
+          filesNotSubmitted.push(submitFileObj);
+        }
+        setSubmitFiles((files) => [...files, ...filesNotSubmitted]);
+      },
+    });
 
   const { mutate: joinEvent } = useAPIJoinEvent({
     onSuccess: () => refetch(),
@@ -269,7 +282,7 @@ const EventDetail = () => {
     return false;
   }, [data, user?.id, user?.role]);
 
-  const doesntExist = !isLoading && (!data || !data?.id);
+  const doesntExist = !loadingEventDetail && (!data || !data?.id);
 
   const tabs: Tab[] = useHeaderTab(
     user?.role === UserRole.ADMIN && !doesntExist
@@ -575,7 +588,7 @@ const EventDetail = () => {
                       onClick={() => {
                         submissionRef.current?.click();
                       }}>
-                      提出物を追加
+                      {loadingUplaod ? <Spinner /> : <Text>提出物を追加</Text>}
                     </Button>
                     <Button
                       size="sm"
