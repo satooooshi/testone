@@ -180,11 +180,7 @@ const Chat: React.FC = () => {
     useAPISendChatMessage({
       onSuccess: sentMsg => {
         socket.emit('message', {...sentMsg, isSender: false});
-        setTimeout(() => {
-          if (sentMsg.id !== messages?.[0].id) {
-            setMessages([sentMsg, ...messages]);
-          }
-        }, 3000);
+        setMessages([sentMsg, ...messages]);
         setValues(v => ({
           ...v,
           content: '',
@@ -419,7 +415,10 @@ const Chat: React.FC = () => {
           );
         }
         setMessages(m => {
-          return [sentMsgByOtherUsers, ...m];
+          if (m[0].id !== sentMsgByOtherUsers.id) {
+            return [sentMsgByOtherUsers, ...m];
+          }
+          return m;
         });
       }
     });
@@ -624,11 +623,8 @@ const Chat: React.FC = () => {
   );
 
   useEffect(() => {
-    saveLastReadChatTime(room.id, {
-      onError: () => {
-        Alert.alert('エラーが発生しました。\n時間をおいて再実行してください。');
-      },
-    });
+    saveLastReadChatTime(room.id);
+    return () => saveLastReadChatTime(room.id);
   }, [room.id, saveLastReadChatTime]);
 
   const readUserBox = (user: User) => (

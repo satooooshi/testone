@@ -306,6 +306,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
 
   useEffect(() => {
     saveLastReadChatTime(room.id);
+    return () => saveLastReadChatTime(room.id);
   }, [room.id, saveLastReadChatTime]);
 
   useEffect(() => {
