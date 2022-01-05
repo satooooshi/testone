@@ -66,7 +66,11 @@ const DetailScreen: React.FC<DetailScreenProps> = ({profile, isLoading}) => {
               {userRoleNameFactory(profile.role)}
             </Text>
           </Div>
-          <Div flexDir="row" mb={'lg'} alignItems="center">
+          <Div
+            w={windowWidth * 0.7}
+            flexDir="row"
+            mb={'lg'}
+            alignItems="center">
             <Text mr="lg" fontSize={16}>
               自己紹介
             </Text>
