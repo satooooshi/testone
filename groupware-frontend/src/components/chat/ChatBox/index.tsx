@@ -356,6 +356,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
 
   return (
     <Box
+      {...getRootProps()}
       {...noClickRootDropzone}
       w={isSmallerThan768 ? '100%' : '60vw'}
       h="100%"
@@ -577,7 +578,6 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
         />
       </Box>
       <Link
-        {...getRootProps()}
         color={darkFontColor}
         position="absolute"
         zIndex={1}

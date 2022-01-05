@@ -144,10 +144,12 @@ const Chat: React.FC = () => {
     if (!room.members) {
       return [];
     }
-    return room.members.map(m => ({
-      id: m.id.toString(),
-      name: userNameFactory(m) + 'さん',
-    }));
+    return room.members
+      ?.filter(member => member.id !== myself?.id)
+      .map(m => ({
+        id: m.id.toString(),
+        name: userNameFactory(m) + 'さん',
+      }));
   };
   const {refetch: refetchLatest} = useAPIGetMessages(
     {

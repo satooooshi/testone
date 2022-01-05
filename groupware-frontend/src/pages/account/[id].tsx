@@ -24,10 +24,12 @@ import {
   Button,
   ThemeTypings,
   useMediaQuery,
+  SimpleGrid,
 } from '@chakra-ui/react';
 import { BoardCategory, TagType, UserTag, WikiType } from 'src/types';
 import { userRoleNameFactory } from 'src/utils/factory/userRoleNameFactory';
 import { darkFontColor } from 'src/utils/colors';
+import { userNameFactory } from 'src/utils/factory/userNameFactory';
 
 type UserTagListProps = {
   tags?: UserTag[];
@@ -125,6 +127,7 @@ const MyAccountInfo = () => {
     },
   });
   const [isSmallerThan1024] = useMediaQuery('(max-width: 1024px)');
+  const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
 
   const tabs: Tab[] = useHeaderTab({ headerTabType: 'account', user });
 
@@ -179,8 +182,13 @@ const MyAccountInfo = () => {
       </Head>
       <div className={accountInfoStyles.main}>
         {profile && (
-          <div className={accountInfoStyles.profile_wrapper}>
-            <div className={accountInfoStyles.avatar_wrapper}>
+          <Box
+            display="flex"
+            flexDir="column"
+            alignSelf="center"
+            alignItems="center"
+            w={isSmallerThan768 ? '90vw' : undefined}>
+            <Box mb="16px">
               {profile.avatarUrl ? (
                 <img
                   src={profile.avatarUrl}
@@ -194,13 +202,22 @@ const MyAccountInfo = () => {
                   className={accountInfoStyles.avatar}
                 />
               )}
-            </div>
+            </Box>
 
-            <div className={accountInfoStyles.name_wrapper}>
-              <h1 className={accountInfoStyles.name}>
-                {profile.lastName + ' ' + profile.firstName}
-              </h1>
-            </div>
+            {/* <div className={accountInfoStyles.name_wrapper}> */}
+            {/*   <h1 className={accountInfoStyles.name}> */}
+            {/*     {userNameFactory(user)} */}
+            {/*   </h1> */}
+            {/* </div> */}
+            <Box display="flex" flexDir="row" justifyContent="center" mb="16px">
+              <Text
+                fontSize={20}
+                fontWeight="bold"
+                color={darkFontColor}
+                display="block">
+                {userNameFactory(user)}
+              </Text>
+            </Box>
 
             <Box mb="24px">
               <TopTabBar topTabBehaviorList={topTabBehaviorList} />
@@ -209,6 +226,23 @@ const MyAccountInfo = () => {
             {activeTab === TabName.DETAIL && (
               <>
                 <Box w="80vw">
+                  <Box
+                    display="flex"
+                    mb={5}
+                    flexDir="row"
+                    alignItems="center"
+                    w="100%">
+                    <Text fontSize={14} w={'10%'}>
+                      社員番号:
+                    </Text>
+                    <Text
+                      fontWeight="bold"
+                      w="85%"
+                      fontSize={18}
+                      color={darkFontColor}>
+                      {profile.employeeId || '未登録'}
+                    </Text>
+                  </Box>
                   <Box
                     display="flex"
                     mb={5}
@@ -279,48 +313,37 @@ const MyAccountInfo = () => {
             )}
 
             {activeTab === TabName.EVENT && events && events.events.length ? (
-              <div className={accountInfoStyles.event_card_row}>
+              <SimpleGrid columns={{ sm: 1, md: 1, lg: 2 }} spacing="16px">
                 {events.events.map((e) => (
-                  <div
+                  <EventCard
                     key={e.id}
-                    className={accountInfoStyles.event_card_wrapper}>
-                    <EventCard
-                      hrefTagClick={(t) => `/event/list?tag=${t.id}`}
-                      eventSchedule={e}
-                    />
-                  </div>
+                    hrefTagClick={(t) => `/event/list?tag=${t.id}`}
+                    eventSchedule={e}
+                  />
                 ))}
-              </div>
+              </SimpleGrid>
             ) : null}
 
             {activeTab === TabName.QUESTION &&
             questionList &&
             questionList.wiki.length ? (
-              <div className={accountInfoStyles.question_wrapper}>
+              <Box>
                 {questionList.wiki.map((w) => (
-                  <div
-                    key={w.id}
-                    className={accountInfoStyles.question_card_wrapper}>
-                    <WikiCard wiki={w} />
-                  </div>
+                  <WikiCard wiki={w} key={w.id} />
                 ))}
-              </div>
+              </Box>
             ) : null}
 
             {activeTab === TabName.KNOWLEDGE &&
             knowledgeList &&
             knowledgeList.wiki.length ? (
-              <div className={accountInfoStyles.question_wrapper}>
+              <Box>
                 {knowledgeList.wiki.map((w) => (
-                  <div
-                    key={w.id}
-                    className={accountInfoStyles.question_card_wrapper}>
-                    <WikiCard wiki={w} />
-                  </div>
+                  <WikiCard wiki={w} key={w.id} />
                 ))}
-              </div>
+              </Box>
             ) : null}
-          </div>
+          </Box>
         )}
       </div>
     </LayoutWithTab>

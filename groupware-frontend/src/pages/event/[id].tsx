@@ -37,7 +37,6 @@ import boldayImage1 from '@/public/bolday_1.jpg';
 import impressiveUnivertyImage from '@/public/impressive_university_1.png';
 import studyMeeting1Image from '@/public/study_meeting_1.jpg';
 import portalLinkBoxStyles from '@/styles/components/PortalLinkBox.module.scss';
-import eventCardStyles from '@/styles/components/EventCard.module.scss';
 import { useAPISaveUserJoiningEvent } from '@/hooks/api/event/useAPISaveUserJoiningEvent';
 import { userNameFactory } from 'src/utils/factory/userNameFactory';
 import { tagColorFactory } from 'src/utils/factory/tagColorFactory';
@@ -100,10 +99,8 @@ const EventDetail = () => {
       case EventType.CLUB:
         return (
           <FcSportsMode
-            className={clsx(
-              eventCardStyles.icon,
-              portalLinkBoxStyles.club_icon,
-            )}
+            style={{ height: '100%', width: '100%' }}
+            className={clsx(portalLinkBoxStyles.club_icon)}
           />
         );
       case EventType.IMPRESSIVE_UNIVERSITY:
@@ -113,10 +110,8 @@ const EventDetail = () => {
       case EventType.SUBMISSION_ETC:
         return (
           <MdAssignment
-            className={clsx(
-              eventCardStyles.icon,
-              portalLinkBoxStyles.submission_etc_icon,
-            )}
+            style={{ height: '100%', width: '100%' }}
+            className={clsx(portalLinkBoxStyles.submission_etc_icon)}
           />
         );
 

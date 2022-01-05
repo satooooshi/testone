@@ -4,6 +4,7 @@ import {
 } from '@draft-js-plugins/mention';
 import { useReducer } from 'react';
 import { User } from 'src/types';
+import { useAuthenticate } from 'src/contexts/useAuthenticate';
 
 type MentionState = {
   suggestions: MentionData[];
@@ -30,10 +31,11 @@ type MentionAction =
       value: MentionData;
     };
 
-const mentionReducer = (
+const MentionReducer = (
   state: MentionState,
   action: MentionAction,
 ): MentionState => {
+  const { user } = useAuthenticate();
   switch (action.type) {
     case 'popup': {
       return {
@@ -54,11 +56,13 @@ const mentionReducer = (
       return action.value?.length
         ? {
             ...state,
-            allMentionUserData: action.value.map((u) => ({
-              id: u.id,
-              name: u.lastName + ' ' + u.firstName + 'さん',
-              avatar: u.avatarUrl,
-            })),
+            allMentionUserData: action.value
+              ?.filter((u) => u.id !== user?.id)
+              .map((u) => ({
+                id: u.id,
+                name: u.lastName + ' ' + u.firstName + 'さん',
+                avatar: u.avatarUrl,
+              })),
           }
         : {
             ...state,
@@ -79,7 +83,7 @@ const mentionReducer = (
   }
 };
 export const useMention = () => {
-  return useReducer(mentionReducer, {
+  return useReducer(MentionReducer, {
     popup: false,
     suggestions: [],
     allMentionUserData: [],
