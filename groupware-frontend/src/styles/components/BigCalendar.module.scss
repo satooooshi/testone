@@ -4,7 +4,7 @@
   @media (max-width: 768px) {
     height: 75vh;
     width: 750px;
-    overflow: scroll;
+    overflow: auto;
     -ms-overflow-style: none;
     &::-webkit-scrollbar {
       display: none;

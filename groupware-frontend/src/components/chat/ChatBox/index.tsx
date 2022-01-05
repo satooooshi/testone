@@ -43,6 +43,8 @@ import { useAuthenticate } from 'src/contexts/useAuthenticate';
 import AlbumModal from '../AlbumModal';
 import NoteModal from '../NoteModal';
 import { useRoomRefetch } from 'src/contexts/chat/useRoomRefetch';
+import { fileNameTransformer } from 'src/utils/factory/fileNameTransformer';
+import { saveAs } from 'file-saver';
 
 const socket = io(baseURL, {
   transports: ['websocket'],
@@ -354,6 +356,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
 
   return (
     <Box
+      {...getRootProps()}
       {...noClickRootDropzone}
       w={isSmallerThan768 ? '100%' : '60vw'}
       h="100%"
@@ -388,7 +391,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
                   className={`react-viewer-icon react-viewer-icon-download`}></i>
               ),
               onClick: ({ src }) => {
-                saveAs(src);
+                saveAs(src, fileNameTransformer(src));
               },
             },
           ]);
@@ -575,7 +578,6 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
         />
       </Box>
       <Link
-        {...getRootProps()}
         color={darkFontColor}
         position="absolute"
         zIndex={1}

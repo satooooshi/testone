@@ -38,6 +38,7 @@ import { darkFontColor } from 'src/utils/colors';
 import { dateTimeFormatterFromJSDDate } from 'src/utils/dateTimeFormatter';
 import NextLink from 'next/link';
 import dynamic from 'next/dynamic';
+import { topNewsSchema } from 'src/utils/validation/schema';
 const ReactPaginate = dynamic(() => import('react-paginate'), { ssr: false });
 
 const NewsAdmin: React.VFC = () => {
@@ -63,8 +64,11 @@ const NewsAdmin: React.VFC = () => {
     handleChange,
     handleSubmit,
     resetForm: reset,
+    errors,
+    touched,
   } = useFormik<Partial<TopNews>>({
     initialValues,
+    validationSchema: topNewsSchema,
     validate: (inputValues) => {
       const errors: FormikErrors<Partial<TopNews>> = {};
       if (inputValues.urlPath) {
@@ -75,9 +79,6 @@ const NewsAdmin: React.VFC = () => {
           errors.urlPath =
             'URLはイベント詳細/Wiki詳細/アカウント詳細のいずれかのURLを入力してください';
         }
-      }
-      if (inputValues?.title?.length && inputValues.title.length > 100) {
-        errors.title = 'タイトルは100文字以内で入力してください';
       }
       return errors;
     },
@@ -130,6 +131,9 @@ const NewsAdmin: React.VFC = () => {
       alignItems={'flex-end'}>
       <FormControl mb="8px">
         <FormLabel>URL</FormLabel>
+        {errors.urlPath && touched.urlPath ? (
+          <FormLabel color="tomato">{errors.urlPath}</FormLabel>
+        ) : null}
         <Input
           bg="white"
           value={values.urlPath}
@@ -140,6 +144,9 @@ const NewsAdmin: React.VFC = () => {
       </FormControl>
       <FormControl mb="8px">
         <FormLabel>タイトル(100文字以内)</FormLabel>
+        {errors.title && touched.title ? (
+          <FormLabel color="tomato">{errors.title}</FormLabel>
+        ) : null}
         <Input
           bg="white"
           value={values.title}
@@ -200,7 +207,7 @@ const NewsAdmin: React.VFC = () => {
         flexDir="column"
         justifyContent={!isSmallerThan768 ? 'center' : 'flex-start'}
         alignItems="center"
-        w={!isSmallerThan768 ? '100%' : '100vw'}
+        w={!isSmallerThan768 ? '100%' : '99vw'}
         mb="72px">
         <Text color="blue.500" fontSize="16px" mb="8px">
           特集管理ではアプリのTOP画面に表示されるリンクの管理ができます
@@ -233,11 +240,13 @@ const NewsAdmin: React.VFC = () => {
               </Box>
             )}
             <Box
-              w={isSmallerThan768 ? '100vw' : '100%'}
+              w={'100%'}
               justifyContent={isSmallerThan768 ? 'flex-start' : 'center'}
+              alignItems="center"
               display="flex"
               overflowX="auto"
               maxW="1980px"
+              mx="auto"
               alignSelf="center">
               <Table
                 variant="simple"

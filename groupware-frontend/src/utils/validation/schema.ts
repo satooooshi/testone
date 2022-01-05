@@ -111,3 +111,10 @@ export const chatGroupSchema = Yup.object().shape({
   name: Yup.string().max(50, `ルーム名は${nWordLimitMessage(50)}`),
   members: Yup.array().min(1, minUsersMessage),
 });
+
+export const topNewsSchema = Yup.object().shape({
+  urlPath: Yup.string().required(requireMessage),
+  title: Yup.string()
+    .required(requireMessage)
+    .max(100, `タイトルは${nWordLimitMessage(100)}`),
+});

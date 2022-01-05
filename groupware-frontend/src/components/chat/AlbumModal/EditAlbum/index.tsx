@@ -28,6 +28,8 @@ import { albumSchema } from 'src/utils/validation/schema';
 import dynamic from 'next/dynamic';
 import { ImageDecorator } from 'react-viewer/lib/ViewerProps';
 const Viewer = dynamic(() => import('react-viewer'), { ssr: false });
+import { saveAs } from 'file-saver';
+import { fileNameTransformer } from 'src/utils/factory/fileNameTransformer';
 
 type EditAlbumProps = {
   selectedAlbum: ChatAlbum;
@@ -145,7 +147,7 @@ const EditAlbum: React.FC<EditAlbumProps> = ({
                   className={`react-viewer-icon react-viewer-icon-download`}></i>
               ),
               onClick: ({ src }) => {
-                saveAs(src);
+                saveAs(src, fileNameTransformer(src));
               },
             },
           ]);

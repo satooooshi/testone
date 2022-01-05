@@ -10,10 +10,9 @@ import { AiOutlineFileProtect } from 'react-icons/ai';
 import CreateEventModal from '@/components/event/CreateEventModal';
 import EventParticipants from '@/components/event/EventParticepants';
 import Linkify from 'react-linkify';
-import { Box, Button, Text, Textarea, useToast } from '@chakra-ui/react';
+import { Box, Button, Link, Text, Textarea, useToast } from '@chakra-ui/react';
 import Head from 'next/head';
 import { useAuthenticate } from 'src/contexts/useAuthenticate';
-import Link from 'next/link';
 import React from 'react';
 import { useAPICreateComment } from '@/hooks/api/event/useAPICreateComment';
 import EventCommentCard from '@/components/event/EventComment';
@@ -38,7 +37,6 @@ import boldayImage1 from '@/public/bolday_1.jpg';
 import impressiveUnivertyImage from '@/public/impressive_university_1.png';
 import studyMeeting1Image from '@/public/study_meeting_1.jpg';
 import portalLinkBoxStyles from '@/styles/components/PortalLinkBox.module.scss';
-import eventCardStyles from '@/styles/components/EventCard.module.scss';
 import { useAPISaveUserJoiningEvent } from '@/hooks/api/event/useAPISaveUserJoiningEvent';
 import { userNameFactory } from 'src/utils/factory/userNameFactory';
 import { tagColorFactory } from 'src/utils/factory/tagColorFactory';
@@ -48,30 +46,32 @@ import { eventTypeColorFactory } from 'src/utils/factory/eventTypeColorFactory';
 import eventTypeNameFactory from 'src/utils/factory/eventTypeNameFactory';
 import { responseErrorMsgFactory } from 'src/utils/factory/responseErrorMsgFactory';
 import { darkFontColor } from 'src/utils/colors';
+import { fileNameTransformer } from 'src/utils/factory/fileNameTransformer';
 
 type FileIconProps = {
-  href?: string;
+  href: string;
   submitted?: boolean;
 };
 
 const FileIcon: React.FC<FileIconProps> = ({ href, submitted }) => {
   return (
-    <a
-      href={href}
-      target="_blank"
-      rel="noreferrer noopener"
-      download
-      className={clsx(
-        eventDetailStyles.file,
-        submitted
-          ? eventDetailStyles.unsubmitted_file_color
-          : eventDetailStyles.submitted_file_color,
-      )}>
+    <Link
+      onClick={() => saveAs(href, fileNameTransformer(href))}
+      display="flex"
+      flexDir="column"
+      alignItems="center"
+      justifyContent="center"
+      border="1px solid #e0e0e0"
+      rounded="md"
+      p="8px"
+      w="136px"
+      h="136px"
+      bg={!submitted ? 'white' : 'lightblue'}>
       <AiOutlineFileProtect className={eventDetailStyles.file_icon} />
-      <span>
-        {decodeURI((href?.match('.+/(.+?)([?#;].*)?$') || ['', href])[1] || '')}
-      </span>
-    </a>
+      <Text isTruncated={true} w="100%" textAlign="center">
+        {fileNameTransformer(href)}
+      </Text>
+    </Link>
   );
 };
 
@@ -99,10 +99,8 @@ const EventDetail = () => {
       case EventType.CLUB:
         return (
           <FcSportsMode
-            className={clsx(
-              eventCardStyles.icon,
-              portalLinkBoxStyles.club_icon,
-            )}
+            style={{ height: '100%', width: '100%' }}
+            className={clsx(portalLinkBoxStyles.club_icon)}
           />
         );
       case EventType.IMPRESSIVE_UNIVERSITY:
@@ -112,10 +110,8 @@ const EventDetail = () => {
       case EventType.SUBMISSION_ETC:
         return (
           <MdAssignment
-            className={clsx(
-              eventCardStyles.icon,
-              portalLinkBoxStyles.submission_etc_icon,
-            )}
+            style={{ height: '100%', width: '100%' }}
+            className={clsx(portalLinkBoxStyles.submission_etc_icon)}
           />
         );
 
@@ -477,7 +473,9 @@ const EventDetail = () => {
             {data.files && data.files.length ? (
               <div className={eventDetailStyles.files_wrapper}>
                 {data.files.map((f) => (
-                  <FileIcon href={f.url} key={f.id} />
+                  <Box mr="4px" mb="4px" key={f.id}>
+                    <FileIcon href={f.url} />
+                  </Box>
                 ))}
               </div>
             ) : (
@@ -628,8 +626,11 @@ const EventDetail = () => {
                 {submitFiles && submitFiles.length ? (
                   <Box display="flex" flexDir="row" flexWrap="wrap" mb="16px">
                     {submitFiles.map((f) => (
-                      <Box key={f.url} mb="4px">
-                        <FileIcon href={f.url} submitted={f.submitUnFinished} />
+                      <Box key={f.url} mb="4px" mr="4px">
+                        <FileIcon
+                          href={f.url || ''}
+                          submitted={f.submitUnFinished}
+                        />
                       </Box>
                     ))}
                   </Box>

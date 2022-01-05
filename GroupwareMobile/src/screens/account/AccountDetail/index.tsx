@@ -50,7 +50,15 @@ const DetailScreen: React.FC<DetailScreenProps> = ({profile, isLoading}) => {
     <Div w={windowWidth * 0.9} alignSelf="center" mt="lg">
       {!isLoading ? (
         <>
-          <Div mb={'lg'} flexDir="row">
+          <Div mb={'lg'} flexDir="row" alignItems="center">
+            <Text mr="lg" fontSize={16}>
+              社員番号
+            </Text>
+            <Text color={darkFontColor} fontWeight="bold" fontSize={20}>
+              {profile.employeeId || '未登録'}
+            </Text>
+          </Div>
+          <Div mb={'lg'} flexDir="row" alignItems="center">
             <Text mr="lg" fontSize={16}>
               社員区分
             </Text>
@@ -58,7 +66,11 @@ const DetailScreen: React.FC<DetailScreenProps> = ({profile, isLoading}) => {
               {userRoleNameFactory(profile.role)}
             </Text>
           </Div>
-          <Div w={windowWidth * 0.7} flexDir="row" mb={'lg'}>
+          <Div
+            w={windowWidth * 0.7}
+            flexDir="row"
+            mb={'lg'}
+            alignItems="center">
             <Text mr="lg" fontSize={16}>
               自己紹介
             </Text>

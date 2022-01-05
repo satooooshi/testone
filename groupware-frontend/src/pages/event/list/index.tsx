@@ -502,15 +502,23 @@ const EventList = () => {
         createEvent={createEvent}
         event={newEvent}
       />
-      <div className={eventListStyles.above_pagination}>
+      <Box
+        display="flex"
+        flexDir="column"
+        justifyContent="flex-start"
+        mb="72px">
         <Box mb="24px">
           <TopTabBar topTabBehaviorList={topTabBehaviorList} />
         </Box>
 
         {isCalendar && (
-          <div
+          <Box
             ref={calendarRef}
-            className={eventListStyles.big_calendar_wrapper}>
+            display="flex"
+            justifyContent="center"
+            alignItems="center"
+            maxW="90%"
+            alignSelf="center">
             <BigCalendar
               selectable
               resizable
@@ -537,7 +545,7 @@ const EventList = () => {
               }}
               eventPropGetter={eventPropGetter}
             />
-          </div>
+          </Box>
         )}
 
         {!isCalendar && (
@@ -577,7 +585,7 @@ const EventList = () => {
             </div>
           </>
         )}
-      </div>
+      </Box>
       <div className={eventListStyles.pagination_wrapper}>
         {typeof window !== 'undefined' &&
         !isCalendar &&

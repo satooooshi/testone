@@ -4,6 +4,7 @@ import {Icon, Text} from 'react-native-magnus';
 import {fileIconStyles} from '../../../styles/component/common/fileIcon.style';
 import FileViewer from 'react-native-file-viewer';
 import RNFetchBlob from 'rn-fetch-blob';
+import {fileNameTransformer} from '../../../utils/factory/fileNameTransformer';
 const {fs, config} = RNFetchBlob;
 
 type FileIconProps = {
@@ -51,9 +52,7 @@ const FileIcon: React.FC<FileIconProps> = ({url, color = 'white'}) => {
       <>
         <Icon name="filetext1" fontFamily="AntDesign" fontSize={64} mb={'lg'} />
         <Text color="blue700" numberOfLines={1}>
-          {decodeURIComponent(
-            (url?.match('.+/(.+?)([?#;].*)?$') || ['', url])[1] || '',
-          )}
+          {fileNameTransformer(url)}
         </Text>
       </>
     </TouchableHighlight>

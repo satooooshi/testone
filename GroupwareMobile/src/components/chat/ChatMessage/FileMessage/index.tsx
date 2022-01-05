@@ -5,6 +5,7 @@ import {fileMessageStyles} from '../../../../styles/component/chat/fileMessage.s
 import {ChatMessage} from '../../../../types';
 import FileViewer from 'react-native-file-viewer';
 import RNFetchBlob from 'rn-fetch-blob';
+import {fileNameTransformer} from '../../../../utils/factory/fileNameTransformer';
 const {fs, config} = RNFetchBlob;
 
 type FileMessageProps = {
@@ -57,12 +58,7 @@ const FileMessage: React.FC<FileMessageProps> = ({message, onLongPress}) => {
       style={fileMessageStyles.messageWrapper}>
       <Icon name="filetext1" fontFamily="AntDesign" fontSize={64} mb={'lg'} />
       <Text color="blue700" numberOfLines={1}>
-        {
-          (message.content?.match('.+/(.+?)([?#;].*)?$') || [
-            '',
-            message.content,
-          ])[1]
-        }
+        {fileNameTransformer(message.content)}
       </Text>
     </TouchableOpacity>
   );

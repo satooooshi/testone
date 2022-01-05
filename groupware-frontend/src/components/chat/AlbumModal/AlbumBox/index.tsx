@@ -48,6 +48,7 @@ const AlbumBox: React.FC<AlbumBoxProps> = ({
       </Box>
       {album.images?.length ? (
         <Image
+          loading="lazy"
           src={album.images[0].imageURL}
           alt="アルバム画像"
           maxW={'100%'}
