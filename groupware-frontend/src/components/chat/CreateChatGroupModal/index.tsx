@@ -16,6 +16,7 @@ import {
   ButtonGroup,
   IconButton,
   Avatar,
+  Spinner,
 } from '@chakra-ui/react';
 import { useDropzone } from 'react-dropzone';
 import { chatGroupSchema } from 'src/utils/validation/schema';
@@ -76,14 +77,15 @@ const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
     setImgUploaded(false);
   }, []);
 
-  const { mutate: createGroup } = useAPISaveChatGroup({
-    onSuccess: (createdData) => {
-      onClose();
-      router.push(`/chat/${createdData.id.toString()}`, undefined, {
-        shallow: true,
-      });
-    },
-  });
+  const { mutate: createGroup, isLoading: loadingCreateGroup } =
+    useAPISaveChatGroup({
+      onSuccess: (createdData) => {
+        onClose();
+        router.push(`/chat/${createdData.id.toString()}`, undefined, {
+          shallow: true,
+        });
+      },
+    });
 
   const {
     values: newGroup,
@@ -108,11 +110,14 @@ const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
       createGroup(newGroup);
     },
   });
-  const { mutate: uploadImage } = useAPIUploadStorage({
-    onSuccess: async (fileURLs) => {
-      createGroup({ ...newGroup, imageURL: fileURLs[0] });
+  const { mutate: uploadImage, isLoading: loadingUpload } = useAPIUploadStorage(
+    {
+      onSuccess: async (fileURLs) => {
+        createGroup({ ...newGroup, imageURL: fileURLs[0] });
+      },
     },
-  });
+  );
+  const isLoading = loadingCreateGroup || loadingUpload;
 
   const checkErrors = async () => {
     const errors = await validateForm();
@@ -162,7 +167,7 @@ const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
             mb="8px"
             colorScheme="green"
             alignItems="center">
-            <Text display="inline">作成</Text>
+            {isLoading ? <Spinner /> : <Text display="inline">作成</Text>}
           </Button>
         </ModalHeader>
         <ModalCloseButton />
