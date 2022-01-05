@@ -134,7 +134,7 @@ const RoomList: React.FC<RoomListProps> = ({
       ) : loadingGetChatGroupList ? (
         <Spinner />
       ) : (
-        <Box position="absolute" top="auto" bottom="auto">
+        <Box wordBreak="break-all">
           <Text>ルームを作成するか、招待をお待ちください</Text>
         </Box>
       )}
