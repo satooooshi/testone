@@ -121,12 +121,8 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
 
   const { mutate: sendChatMessage } = useAPISendChatMessage({
     onSuccess: (data) => {
+      setMessages([data, ...messages]);
       socket.emit('message', { ...data, isSender: false });
-      setTimeout(() => {
-        if (data.id !== messages?.[0].id) {
-          setMessages([data, ...messages]);
-        }
-      }, 3000);
       setNewChatMessage((m) => ({
         ...m,
         content: '',
@@ -208,7 +204,6 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
     onDrop: (f) => uploadFiles(f),
   });
   const { getRootProps: getRootProps, getInputProps } = useDropzone({
-    noClick: false,
     onDrop: (f) => uploadFiles(f),
   });
 
@@ -314,7 +309,10 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
           sentMsgByOtherUsers.isSender = true;
         }
         setMessages((m) => {
-          return [sentMsgByOtherUsers, ...m];
+          if (m[0].id !== sentMsgByOtherUsers.id) {
+            return [sentMsgByOtherUsers, ...m];
+          }
+          return m;
         });
         needRefetch();
       }
@@ -356,8 +354,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
 
   return (
     <Box
-      {...getRootProps()}
-      {...noClickRootDropzone}
+      {...noClickRootDropzone()}
       w={isSmallerThan768 ? '100%' : '60vw'}
       h="100%"
       bg="white"
@@ -578,13 +575,14 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
         />
       </Box>
       <Link
+        {...getRootProps()}
         color={darkFontColor}
         position="absolute"
         zIndex={1}
         bottom={'8px'}
         cursor="pointer"
         right="50px">
-        <input {...getInputProps()} />
+        <input {...getInputProps()} onClick={getInputProps().onDrag} />
         <AiOutlinePaperClip size={20} color={darkFontColor} />
       </Link>
 

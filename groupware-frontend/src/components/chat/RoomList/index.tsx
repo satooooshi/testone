@@ -100,7 +100,6 @@ const RoomList: React.FC<RoomListProps> = ({
       }
     }
   }, [currentId, currentRoom, roomsForInfiniteScroll, setCurrentRoom]);
-  console.log(refetchNeeded);
 
   useEffect(() => {
     if (refetchNeeded) {

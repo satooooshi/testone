@@ -16,7 +16,6 @@ export const uploadStorage = async (files: File[]): Promise<string[]> => {
         return signedURLMapping[f.name];
       }),
     );
-    console.log(fileURLs);
     const urlResponse = await axiosInstance.post<string[]>(
       readStorageURL,
       fileURLs,
