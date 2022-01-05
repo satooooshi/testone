@@ -38,6 +38,7 @@ import { darkFontColor } from 'src/utils/colors';
 import { dateTimeFormatterFromJSDDate } from 'src/utils/dateTimeFormatter';
 import NextLink from 'next/link';
 import dynamic from 'next/dynamic';
+import { topNewsSchema } from 'src/utils/validation/schema';
 const ReactPaginate = dynamic(() => import('react-paginate'), { ssr: false });
 
 const NewsAdmin: React.VFC = () => {
@@ -63,8 +64,11 @@ const NewsAdmin: React.VFC = () => {
     handleChange,
     handleSubmit,
     resetForm: reset,
+    errors,
+    touched,
   } = useFormik<Partial<TopNews>>({
     initialValues,
+    validationSchema: topNewsSchema,
     validate: (inputValues) => {
       const errors: FormikErrors<Partial<TopNews>> = {};
       if (inputValues.urlPath) {
@@ -75,9 +79,6 @@ const NewsAdmin: React.VFC = () => {
           errors.urlPath =
             'URLはイベント詳細/Wiki詳細/アカウント詳細のいずれかのURLを入力してください';
         }
-      }
-      if (inputValues?.title?.length && inputValues.title.length > 100) {
-        errors.title = 'タイトルは100文字以内で入力してください';
       }
       return errors;
     },
@@ -130,6 +131,9 @@ const NewsAdmin: React.VFC = () => {
       alignItems={'flex-end'}>
       <FormControl mb="8px">
         <FormLabel>URL</FormLabel>
+        {errors.urlPath && touched.urlPath ? (
+          <FormLabel color="tomato">{errors.urlPath}</FormLabel>
+        ) : null}
         <Input
           bg="white"
           value={values.urlPath}
@@ -140,6 +144,9 @@ const NewsAdmin: React.VFC = () => {
       </FormControl>
       <FormControl mb="8px">
         <FormLabel>タイトル(100文字以内)</FormLabel>
+        {errors.title && touched.title ? (
+          <FormLabel color="tomato">{errors.title}</FormLabel>
+        ) : null}
         <Input
           bg="white"
           value={values.title}
