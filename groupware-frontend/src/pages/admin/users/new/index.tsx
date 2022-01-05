@@ -23,6 +23,8 @@ import {
   Select,
   Textarea,
   useToast,
+  Text,
+  Spinner,
 } from '@chakra-ui/react';
 import { imageExtensions } from 'src/utils/imageExtensions';
 import noImage from '@/public/no-image.jpg';
@@ -85,15 +87,13 @@ const CreateNewUser = () => {
     resetForm,
   } = useFormik({
     initialValues: initialUserValues,
-    onSubmit: async (submitted, { resetForm }) => {
+    onSubmit: async (submitted) => {
       if (croppedImageURL && imageName && completedCrop) {
         const result = await dataURLToFile(croppedImageURL, imageName);
         uploadImage([result]);
-        resetForm();
         return;
       }
       registerUser(submitted);
-      resetForm();
     },
     validationSchema: registerSchema,
   });
@@ -153,20 +153,22 @@ const CreateNewUser = () => {
   ] = useImageCrop();
 
   // const [userInfo, setUserInfo] = useState<Partial<User>>(initialUserValues);
-  const { mutate: uploadImage } = useAPIUploadStorage({
-    onSuccess: async (fileURLs) => {
-      const updateEventImageOnState = async () => {
-        Promise.resolve();
-        setUserInfo((e) => ({ ...e, avatarUrl: fileURLs[0] }));
-      };
-      await updateEventImageOnState();
-      registerUser({ ...values, avatarUrl: fileURLs[0] });
-      dispatchCrop({
-        type: 'setImageFile',
-        value: undefined,
-      });
+  const { mutate: uploadImage, isLoading: loadingUplaod } = useAPIUploadStorage(
+    {
+      onSuccess: async (fileURLs) => {
+        const updateEventImageOnState = async () => {
+          Promise.resolve();
+          setUserInfo((e) => ({ ...e, avatarUrl: fileURLs[0] }));
+        };
+        await updateEventImageOnState();
+        registerUser({ ...values, avatarUrl: fileURLs[0] });
+        dispatchCrop({
+          type: 'setImageFile',
+          value: undefined,
+        });
+      },
     },
-  });
+  );
 
   const onEventImageDrop = useCallback(
     (f: File[]) => {
@@ -186,7 +188,7 @@ const CreateNewUser = () => {
     accept: imageExtensions,
   });
 
-  const { mutate: registerUser } = useAPIRegister({
+  const { mutate: registerUser, isLoading: loadingRegister } = useAPIRegister({
     onSuccess: (responseData) => {
       if (responseData) {
         const tempPassword: string = values.password || '';
@@ -212,6 +214,8 @@ const CreateNewUser = () => {
       tags: toggledTag,
     }));
   };
+
+  const isLoading = loadingRegister || loadingUplaod;
 
   useEffect(() => {
     if (user?.role !== UserRole.ADMIN) {
@@ -517,7 +521,7 @@ const CreateNewUser = () => {
           width="40"
           colorScheme="blue"
           onClick={() => handleSubmit()}>
-          作成
+          {isLoading ? <Spinner /> : <Text>作成</Text>}
         </Button>
       </div>
     </LayoutWithTab>
