@@ -30,6 +30,8 @@ import { dateTimeFormatterFromJSDDate } from 'src/utils/dateTimeFormatter';
 import { albumSchema } from 'src/utils/validation/schema';
 import dynamic from 'next/dynamic';
 import { ImageDecorator } from 'react-viewer/lib/ViewerProps';
+import { saveAs } from 'file-saver';
+import { fileNameTransformer } from 'src/utils/factory/fileNameTransformer';
 const Viewer = dynamic(() => import('react-viewer'), { ssr: false });
 
 type PostAlbumProps = {
@@ -140,7 +142,7 @@ const PostAlbum: React.FC<PostAlbumProps> = ({
                   className={`react-viewer-icon react-viewer-icon-download`}></i>
               ),
               onClick: ({ src }) => {
-                saveAs(src);
+                saveAs(src, fileNameTransformer(src));
               },
             },
           ]);

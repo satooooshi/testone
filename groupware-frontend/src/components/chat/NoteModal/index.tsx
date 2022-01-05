@@ -29,6 +29,8 @@ import { useAPIDeleteChatNote } from '@/hooks/api/chat/note/useAPIDeleteChatNote
 import { useAPIUpdateNote } from '@/hooks/api/chat/note/useAPIUpdateChatNote';
 import NoteBox from './NoteBox';
 import { noteSchema } from 'src/utils/validation/schema';
+import { saveAs } from 'file-saver';
+import { fileNameTransformer } from 'src/utils/factory/fileNameTransformer';
 
 const Viewer = dynamic(() => import('react-viewer'), { ssr: false });
 
@@ -474,7 +476,7 @@ const NoteModal: React.FC<NoteModalProps> = ({ isOpen, onClose, room }) => {
                   className={`react-viewer-icon react-viewer-icon-download`}></i>
               ),
               onClick: ({ src }) => {
-                saveAs(src);
+                saveAs(src, fileNameTransformer(src));
               },
             },
           ]);

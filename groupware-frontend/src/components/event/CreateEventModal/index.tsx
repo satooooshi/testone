@@ -44,6 +44,7 @@ import { DateTime } from 'luxon';
 import { tagColorFactory } from 'src/utils/factory/tagColorFactory';
 import { useAuthenticate } from 'src/contexts/useAuthenticate';
 import { formikErrorMsgFactory } from 'src/utils/factory/formikErrorMsgFactory';
+import { fileNameTransformer } from 'src/utils/factory/fileNameTransformer';
 
 type ExcludeFilesAndVideos = Pick<
   EventSchedule,
@@ -594,10 +595,7 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
               {newEvent.files.map((f) => (
                 <div className={createEventModalStyle.url_wrapper} key={f.url}>
                   <span className={createEventModalStyle.url}>
-                    {decodeURIComponent(
-                      (f.url?.match('.+/(.+?)([?#;].*)?$') || ['', f.url])[1] ||
-                        '',
-                    )}
+                    {fileNameTransformer(f.url || '')}
                   </span>
                   <MdCancel
                     className={createEventModalStyle.url_delete_button}

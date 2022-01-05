@@ -19,6 +19,8 @@ import { useAPIGetChatAlbumImages } from '@/hooks/api/chat/album/useAPIGetChatAl
 import { ImageDecorator } from 'react-viewer/lib/ViewerProps';
 import { ChatAlbumImage, ChatAlbum } from 'src/types';
 const Viewer = dynamic(() => import('react-viewer'), { ssr: false });
+import { saveAs } from 'file-saver';
+import { fileNameTransformer } from 'src/utils/factory/fileNameTransformer';
 
 type AlbumDetailProps = {
   onClickEdit: () => void;
@@ -77,7 +79,7 @@ const AlbumDetail: React.FC<AlbumDetailProps> = ({
                   className={`react-viewer-icon react-viewer-icon-download`}></i>
               ),
               onClick: ({ src }) => {
-                saveAs(src);
+                saveAs(src, fileNameTransformer(src));
               },
             },
           ]);
@@ -132,7 +134,12 @@ const AlbumDetail: React.FC<AlbumDetailProps> = ({
                   {albumImages?.map((i) => (
                     <Box position="relative" key={i.id}>
                       <Link key={i.id} onClick={() => setSelectedImage(i)}>
-                        <Image src={i.imageURL} alt="アルバム画像" w="100%" />
+                        <Image
+                          loading="lazy"
+                          src={i.imageURL}
+                          alt="アルバム画像"
+                          w="100%"
+                        />
                       </Link>
                     </Box>
                   ))}

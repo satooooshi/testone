@@ -7,7 +7,6 @@ import {
   MenuList,
   SimpleGrid,
   Link,
-  Avatar,
   MenuItem,
   Text,
   Image,
@@ -19,6 +18,8 @@ import { ImageDecorator } from 'react-viewer/lib/ViewerProps';
 import { ChatNote, ChatNoteImage } from 'src/types';
 import { dateTimeFormatterFromJSDDate } from 'src/utils/dateTimeFormatter';
 import { userNameFactory } from 'src/utils/factory/userNameFactory';
+import { saveAs } from 'file-saver';
+import { fileNameTransformer } from 'src/utils/factory/fileNameTransformer';
 const Viewer = dynamic(() => import('react-viewer'), { ssr: false });
 
 type NoteBoxProps = {
@@ -53,7 +54,7 @@ const NoteBox: React.FC<NoteBoxProps> = ({
                   className={`react-viewer-icon react-viewer-icon-download`}></i>
               ),
               onClick: ({ src }) => {
-                saveAs(src);
+                saveAs(src, fileNameTransformer(src));
               },
             },
           ]);
@@ -114,7 +115,7 @@ const NoteBox: React.FC<NoteBoxProps> = ({
         <SimpleGrid spacing="4px" columns={3} w="100%">
           {n.images?.map((i) => (
             <Link onClick={() => setSelectedImage(i)} key={i.id}>
-              <Image src={i.imageURL} alt="関連画像" />
+              <Image loading="lazy" src={i.imageURL} alt="関連画像" />
             </Link>
           ))}
         </SimpleGrid>
