@@ -9,6 +9,12 @@ import {
   MenuItemOption,
   MenuList,
   MenuOptionGroup,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalHeader,
+  ModalOverlay,
   Text,
 } from '@chakra-ui/react';
 import { useAuthenticate } from 'src/contexts/useAuthenticate';
@@ -46,46 +52,46 @@ const EventParticipants: React.FC<EventParticipantsProps> = ({
     }
     return `${message}遅刻`;
   };
-  return (
-    <Box shadow="md" rounded="md" borderWidth={1} borderColor={'gray.200'}>
-      <Box
-        display="flex"
-        flexDir="row"
-        alignItems="center"
-        mx="16px"
-        minH="50px"
-        justifyContent="space-between"
-        borderBottomColor="gray.200"
-        borderBottomWidth={1}>
-        <Text color="green.600" fontWeight="bold" fontSize="20px">
-          参加者一覧
-        </Text>
-        {!allVisible && participantsExceptCanceled.length > 15 ? (
-          <Link onClick={() => setAllVisible(true)}>
-            <Text fontWeight="bold" fontSize="20px" color="blue.600">
-              See All
+
+  const userList = (users: UserJoiningEvent[], isModal?: boolean) => {
+    return (
+      <Box shadow="md" rounded="md" borderWidth={1} borderColor={'gray.200'}>
+        {!isModal ? (
+          <Box
+            display="flex"
+            flexDir="row"
+            alignItems="center"
+            mx="16px"
+            minH="50px"
+            justifyContent="space-between"
+            borderBottomColor="gray.200"
+            borderBottomWidth={1}>
+            <Text color="green.600" fontWeight="bold" fontSize="20px">
+              参加者一覧
             </Text>
-          </Link>
+            <Link onClick={() => setAllVisible((v) => !v)}>
+              <Text fontWeight="bold" fontSize="20px" color="blue.600">
+                {'全て見る'}
+              </Text>
+            </Link>
+          </Box>
         ) : null}
-      </Box>
-      {!participantsExceptCanceled?.length && (
-        <Box
-          borderWidth={1}
-          borderColor={'gray.200'}
-          py="8px"
-          px="16px"
-          display="flex"
-          flexDir="row"
-          alignItems="center"
-          justifyContent="space-between">
-          <Text color={darkFontColor} fontWeight="bold" fontSize="18px">
-            まだ参加申し込みされていません
-          </Text>
-        </Box>
-      )}
-      {participantsExceptCanceled
-        ?.filter((u) => u.user.existence)
-        ?.map((u, index) =>
+        {!participantsExceptCanceled?.length && (
+          <Box
+            borderWidth={1}
+            borderColor={'gray.200'}
+            py="8px"
+            px="16px"
+            display="flex"
+            flexDir="row"
+            alignItems="center"
+            justifyContent="space-between">
+            <Text color={darkFontColor} fontWeight="bold" fontSize="18px">
+              まだ参加申し込みされていません
+            </Text>
+          </Box>
+        )}
+        {users.map((u, index) =>
           index <= 15 || allVisible ? (
             <Box
               borderWidth={1}
@@ -136,7 +142,35 @@ const EventParticipants: React.FC<EventParticipantsProps> = ({
             <></>
           ),
         )}
-    </Box>
+      </Box>
+    );
+  };
+
+  return (
+    <>
+      <Modal
+        onClose={() => setAllVisible(false)}
+        isOpen={allVisible}
+        scrollBehavior="inside">
+        <ModalOverlay />
+        <ModalContent h="90vh" bg={'#f9fafb'}>
+          <ModalCloseButton />
+          <ModalHeader>参加者一覧</ModalHeader>
+          <ModalBody>
+            {userList(
+              participantsExceptCanceled?.filter((u) => u.user.existence),
+              true,
+            )}
+          </ModalBody>
+        </ModalContent>
+      </Modal>
+      {userList(
+        participantsExceptCanceled?.filter(
+          (u, index) => u.user.existence && index <= 10,
+          false,
+        ),
+      )}
+    </>
   );
 };
 
