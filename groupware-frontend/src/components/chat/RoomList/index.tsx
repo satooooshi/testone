@@ -27,6 +27,7 @@ const RoomList: React.FC<RoomListProps> = ({
     useAPIGetRoomsByPage(
       {
         page,
+        limit: '20',
       },
       {
         onSuccess: (data) => {
@@ -38,15 +39,10 @@ const RoomList: React.FC<RoomListProps> = ({
     );
   const onScroll = (e: any) => {
     if (
-      e.target.clientHeight - e.target.scrollTop >=
-      (e.target.scrollHeight * 2) / 3
+      e.target.scrollTop > e.target.scrollHeight / 2 &&
+      chatRooms?.rooms?.length
     ) {
-      if (
-        typeof Number(chatRooms?.pageCount) === 'number' &&
-        Number(page + 1) <= Number(chatRooms?.pageCount)
-      ) {
-        setPage((p) => (Number(p) + 1).toString());
-      }
+      setPage((p) => (Number(p) + 1).toString());
     }
   };
 

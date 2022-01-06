@@ -34,6 +34,7 @@ const RoomList: React.FC = () => {
 
   const {data: chatRooms, isLoading: loadingGetChatGroupList} = useAPIGetRooms({
     page,
+    limit: '20',
   });
   const {mutate: saveGroup} = useAPIUpdateChatGroup({
     onSuccess: () => {
@@ -51,10 +52,7 @@ const RoomList: React.FC = () => {
   };
 
   const onEndReached = () => {
-    if (
-      typeof Number(chatRooms?.pageCount) === 'number' &&
-      Number(page + 1) <= Number(chatRooms?.pageCount)
-    ) {
+    if (chatRooms?.rooms?.length) {
       setPage(p => (Number(p) + 1).toString());
     }
   };
@@ -98,11 +96,13 @@ const RoomList: React.FC = () => {
         rightButtonName={'新規作成'}
         {...{onPressRightButton}}
       />
-      {loadingGetChatGroupList ? <ActivityIndicator /> : null}
-      {!loadingGetChatGroupList && roomsForInfiniteScroll.length ? (
+      {roomsForInfiniteScroll.length ? (
         <FlatList
           {...{onEndReached}}
-          contentContainerStyle={tailwind('self-center mt-4')}
+          ListFooterComponent={
+            loadingGetChatGroupList ? <ActivityIndicator /> : null
+          }
+          contentContainerStyle={tailwind('self-center mt-4 pb-4')}
           keyExtractor={item => item.id.toString()}
           data={roomsForInfiniteScroll}
           renderItem={({item: room}) => (
@@ -122,11 +122,13 @@ const RoomList: React.FC = () => {
             </Div>
           )}
         />
-      ) : !loadingGetChatGroupList ? (
+      ) : loadingGetChatGroupList ? (
+        <ActivityIndicator />
+      ) : (
         <Text fontSize={16} textAlign="center">
           ルームを作成するか、招待をお待ちください
         </Text>
-      ) : null}
+      )}
     </WholeContainer>
   );
 };

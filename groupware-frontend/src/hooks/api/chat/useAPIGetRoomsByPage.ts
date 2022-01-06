@@ -15,9 +15,9 @@ export interface GetRoomsResult {
 }
 
 const getRooms = async (query: GetRoomsQuery) => {
-  const { page = 1 } = query;
+  const { page = 1, limit } = query;
   const res = await axiosInstance.get<GetRoomsResult>(
-    `${getRoomsByPageURL}?page=${page}`,
+    `${getRoomsByPageURL}?page=${page}&limit=${limit || ''}`,
   );
   return res.data;
 };
