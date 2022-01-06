@@ -26,6 +26,7 @@ import { useSelectedUsers } from '@/hooks/user/useSelectedUsers';
 import { MdCancel } from 'react-icons/md';
 import { userNameFactory } from 'src/utils/factory/userNameFactory';
 import { darkFontColor } from 'src/utils/colors';
+import { hideScrollbarCss } from 'src/utils/chakra/hideScrollBar.css';
 
 type EditChatGroupMambersModalProps = {
   room?: ChatGroup;
@@ -97,6 +98,7 @@ const EditChatGroupMembersModal: React.FC<EditChatGroupMambersModalProps> = ({
 
   return (
     <Modal
+      size="lg"
       onClose={() => {
         onCancel();
         clear();
@@ -123,7 +125,7 @@ const EditChatGroupMembersModal: React.FC<EditChatGroupMambersModalProps> = ({
         </ModalHeader>
         <ModalCloseButton />
         <ModalBody>
-          <Box display="flex" flexDir="row">
+          <Box display="flex" flexDir="row" h="100%">
             <Box mr="8px">
               <FormControl mb="16px">
                 <FormLabel>タイプ</FormLabel>
@@ -145,7 +147,7 @@ const EditChatGroupMembersModal: React.FC<EditChatGroupMambersModalProps> = ({
                   <option value={UserRole.COMMON}>一般社員</option>
                 </Select>
               </FormControl>
-              <Box h="80%" overflowY="auto">
+              <Box h="90%" overflowY="auto">
                 {isLoading ? (
                   <Spinner />
                 ) : (
@@ -162,7 +164,7 @@ const EditChatGroupMembersModal: React.FC<EditChatGroupMambersModalProps> = ({
                 )}
               </Box>
             </Box>
-            <Box>
+            <Box overflowY="auto" css={hideScrollbarCss}>
               <Text mb="8px">選択済みのメンバー</Text>
               {selectedUsersInModal
                 ?.filter((m) => m.id !== myProfile?.id)
