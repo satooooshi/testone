@@ -11,6 +11,7 @@ import {
   Spinner,
   useToast,
   Text,
+  Button,
 } from '@chakra-ui/react';
 import React, { useEffect, useState } from 'react';
 import { ChatAlbum, ChatGroup } from 'src/types';
@@ -21,6 +22,7 @@ type AlbmListProps = {
   onClickAlbum: (album: ChatAlbum) => void;
   isOpen: boolean;
   onClose: () => void;
+  onClickPost: () => void;
 };
 
 const AlbumList: React.FC<AlbmListProps> = ({
@@ -28,6 +30,7 @@ const AlbumList: React.FC<AlbmListProps> = ({
   onClickAlbum,
   isOpen,
   onClose,
+  onClickPost,
 }) => {
   const toast = useToast();
   const [albumsForScroll, setAlbumsForScroll] = useState<ChatAlbum[]>([]);
@@ -82,6 +85,14 @@ const AlbumList: React.FC<AlbmListProps> = ({
           display="flex"
           mr="24px">
           <Text>アルバム</Text>
+          <Button
+            size="sm"
+            onClick={() => onClickPost()}
+            mb="8px"
+            colorScheme="green"
+            alignItems="center">
+            <Text display="inline">アルバムを作成</Text>
+          </Button>
         </ModalHeader>
         <ModalCloseButton />
         <ModalBody onScroll={onScroll}>
