@@ -138,6 +138,9 @@ const RoomList: React.FC<RoomListProps> = ({
           <Text>ルームを作成するか、招待をお待ちください</Text>
         </Box>
       )}
+      {roomsForInfiniteScroll.length && loadingGetChatGroupList ? (
+        <Spinner />
+      ) : null}
     </Box>
   );
 };
