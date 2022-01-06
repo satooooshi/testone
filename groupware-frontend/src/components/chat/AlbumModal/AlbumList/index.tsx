@@ -11,6 +11,7 @@ import {
   Spinner,
   useToast,
   Text,
+  Button,
 } from '@chakra-ui/react';
 import React, { useEffect, useState } from 'react';
 import { ChatAlbum, ChatGroup } from 'src/types';
@@ -21,6 +22,7 @@ type AlbmListProps = {
   onClickAlbum: (album: ChatAlbum) => void;
   isOpen: boolean;
   onClose: () => void;
+  onClickPost: () => void;
 };
 
 const AlbumList: React.FC<AlbmListProps> = ({
@@ -28,6 +30,7 @@ const AlbumList: React.FC<AlbmListProps> = ({
   onClickAlbum,
   isOpen,
   onClose,
+  onClickPost,
 }) => {
   const toast = useToast();
   const [albumsForScroll, setAlbumsForScroll] = useState<ChatAlbum[]>([]);
@@ -70,8 +73,11 @@ const AlbumList: React.FC<AlbmListProps> = ({
   };
 
   useEffect(() => {
+    setAlbumsForScroll([]);
     setAlbumListPage(1);
-  }, [room]);
+    refetchAlbums();
+  }, [refetchAlbums, room]);
+
   return (
     <Modal onClose={onClose} isOpen={isOpen} scrollBehavior="inside">
       <ModalOverlay />
@@ -82,44 +88,58 @@ const AlbumList: React.FC<AlbmListProps> = ({
           display="flex"
           mr="24px">
           <Text>アルバム</Text>
+          <Button
+            size="sm"
+            onClick={() => onClickPost()}
+            mb="8px"
+            colorScheme="green"
+            alignItems="center">
+            <Text display="inline">アルバムを作成</Text>
+          </Button>
         </ModalHeader>
         <ModalCloseButton />
         <ModalBody onScroll={onScroll}>
           <Box>
-            {albumsForScroll.map((a) => (
-              <Box mb="16px" key={a.id}>
-                <AlbumBox
-                  album={a}
-                  onClick={() => {
-                    onClickAlbum(a);
-                  }}
-                  onClickDeleteButton={() => {
-                    if (confirm('アルバムを削除してよろしいですか？')) {
-                      deleteAlbum(
-                        {
-                          roomId: room.id.toString(),
-                          albumId: a.id.toString(),
-                        },
-                        {
-                          onSuccess: () => {
-                            setAlbumsForScroll([]);
-                            setAlbumListPage(1);
-                            toast({
-                              description: 'アルバムを削除しました。',
-                              status: 'success',
-                              duration: 3000,
-                              isClosable: true,
-                            });
-                            refetchAlbums();
+            {albumsForScroll.length ? (
+              albumsForScroll.map((a) => (
+                <Box mb="16px" key={a.id}>
+                  <AlbumBox
+                    album={a}
+                    onClick={() => {
+                      onClickAlbum(a);
+                    }}
+                    onClickDeleteButton={() => {
+                      if (confirm('アルバムを削除してよろしいですか？')) {
+                        deleteAlbum(
+                          {
+                            roomId: room.id.toString(),
+                            albumId: a.id.toString(),
                           },
-                        },
-                      );
-                    }
-                  }}
-                />
-              </Box>
-            ))}
-            {isLoading && <Spinner />}
+                          {
+                            onSuccess: () => {
+                              setAlbumsForScroll([]);
+                              setAlbumListPage(1);
+                              toast({
+                                description: 'アルバムを削除しました。',
+                                status: 'success',
+                                duration: 3000,
+                                isClosable: true,
+                              });
+                              refetchAlbums();
+                            },
+                          },
+                        );
+                      }
+                    }}
+                  />
+                </Box>
+              ))
+            ) : isLoading ? (
+              <Spinner />
+            ) : (
+              <Text textAlign="center">まだアルバムが投稿されていません</Text>
+            )}
+            {albumsForScroll.length && isLoading ? <Spinner /> : null}
           </Box>
         </ModalBody>
       </ModalContent>

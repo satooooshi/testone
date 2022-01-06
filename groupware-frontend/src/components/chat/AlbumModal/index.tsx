@@ -27,6 +27,7 @@ const AlbumModal: React.FC<AlbumModalProps> = ({ isOpen, onClose, room }) => {
             setMode('detail');
             setSelectedAlbum(a);
           }}
+          onClickPost={() => setMode('post')}
         />
       ) : selectedAlbum && mode === 'detail' ? (
         <AlbumDetail
