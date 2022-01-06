@@ -60,27 +60,13 @@ export class EventScheduleService {
   }
 
   public async getSubmissionZip(id: number) {
-    const zip = new JSZip();
-    const targetEvent = await this.eventRepository.findOne(id);
-    const folder = zip.folder(targetEvent.title);
     const submissionFiles = await this.submissionFileRepository
       .createQueryBuilder('submissionFiles')
-      .leftJoin('submissionFiles.eventSchedule', 'eventSchedule')
+      .leftJoinAndSelect('submissionFiles.eventSchedule', 'eventSchedule')
+      .leftJoinAndSelect('submissionFiles.userSubmitted', 'userSubmitted')
       .where('eventSchedule.id = :id', { id })
       .getMany();
-    const fileURLs = submissionFiles.map((f) => f.url);
-    const fileNames = submissionFiles.map(
-      (f) => (decodeURI(f.url).match('.+/(.+?)([?#;].*)?$') || ['', f.url])[1],
-    );
-
-    const downloadedFiles = await this.storageService.downloadFile(fileURLs);
-    for (let i = 0; i < downloadedFiles.length; i++) {
-      folder?.file(fileNames[i], downloadedFiles[i].createReadStream(), {
-        binary: true,
-      });
-    }
-    const content = await zip.generateAsync({ type: 'base64' });
-    return content;
+    return submissionFiles;
   }
 
   public async getCsv(query: { from: string; to: string }) {

@@ -8,7 +8,7 @@ import {
   QueryToGetUserCsv,
   useAPIDownloadUserCsv,
 } from '@/hooks/api/user/useAPIDownloadUserCsv';
-import { Button, Progress } from '@chakra-ui/react';
+import { Button, Progress, Spinner, Text } from '@chakra-ui/react';
 import Head from 'next/head';
 import React, { useEffect, useState } from 'react';
 import { DatePicker } from 'react-rainbow-components';
@@ -27,8 +27,10 @@ const ExportCsv = () => {
     useState<Partial<QueryToGetEventCsv>>();
   const [userDuration, setUserDuration] =
     useState<Partial<QueryToGetUserCsv>>();
-  const { mutate: downloadEvent } = useAPIDownloadEventCsv();
-  const { mutate: downloadUser } = useAPIDownloadUserCsv();
+  const { mutate: downloadEvent, isLoading: loadingEventCsv } =
+    useAPIDownloadEventCsv();
+  const { mutate: downloadUser, isLoading: loadingUserCsv } =
+    useAPIDownloadUserCsv();
   const tabs: Tab[] = useHeaderTab({ headerTabType: 'admin' });
   const [loadingUserRole, setLoadingUserRole] = useState(true);
 
@@ -105,7 +107,7 @@ const ExportCsv = () => {
             <Button
               onClick={() => downloadUser(userDuration || {})}
               colorScheme="green">
-              ダウンロード
+              {loadingUserCsv ? <Spinner /> : <Text>ダウンロード</Text>}
             </Button>
           </div>
         </div>
@@ -161,7 +163,7 @@ const ExportCsv = () => {
             <Button
               onClick={() => downloadEvent(eventDuration || {})}
               colorScheme="green">
-              ダウンロード
+              {loadingEventCsv ? <Spinner /> : <Text>ダウンロード</Text>}
             </Button>
           </div>
         </div>
