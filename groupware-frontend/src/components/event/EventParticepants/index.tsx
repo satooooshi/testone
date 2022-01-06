@@ -69,11 +69,13 @@ const EventParticipants: React.FC<EventParticipantsProps> = ({
             <Text color="green.600" fontWeight="bold" fontSize="20px">
               参加者一覧
             </Text>
-            <Link onClick={() => setAllVisible((v) => !v)}>
-              <Text fontWeight="bold" fontSize="20px" color="blue.600">
-                {'全て見る'}
-              </Text>
-            </Link>
+            {users?.length >= 10 ? (
+              <Link onClick={() => setAllVisible((v) => !v)}>
+                <Text fontWeight="bold" fontSize="20px" color="blue.600">
+                  {'全て見る'}
+                </Text>
+              </Link>
+            ) : null}
           </Box>
         ) : null}
         {!participantsExceptCanceled?.length && (
@@ -92,7 +94,7 @@ const EventParticipants: React.FC<EventParticipantsProps> = ({
           </Box>
         )}
         {users.map((u, index) =>
-          index <= 15 || allVisible ? (
+          index <= 10 || allVisible ? (
             <Box
               borderWidth={1}
               borderColor={'gray.200'}
