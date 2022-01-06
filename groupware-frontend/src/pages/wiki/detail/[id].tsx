@@ -8,7 +8,13 @@ import 'react-markdown-editor-lite/lib/index.css';
 import { useAPICreateAnswer } from '@/hooks/api/wiki/useAPICreateAnswer';
 import LayoutWithTab from '@/components/layout/LayoutWithTab';
 import AnswerReply from '@/components/wiki/AnswerReply';
-import { BoardCategory, QAAnswer, QAAnswerReply, WikiType } from 'src/types';
+import {
+  BoardCategory,
+  QAAnswer,
+  QAAnswerReply,
+  WikiType,
+  UserRole,
+} from 'src/types';
 import {
   Text,
   Button,
@@ -297,9 +303,14 @@ const QuestionDetail = () => {
                 body={wiki.body}
                 date={wiki.createdAt}
                 writer={wiki.writer}
-                isWriter={myself?.id === wiki.writer?.id}
+                isWriter={
+                  myself?.id === wiki.writer?.id ||
+                  myself?.role === UserRole.ADMIN
+                }
                 onClickEditButton={() =>
-                  myself?.id === wiki.writer?.id && navigateToEditWiki(wiki.id)
+                  (myself?.id === wiki.writer?.id ||
+                    myself?.role === UserRole.ADMIN) &&
+                  navigateToEditWiki(wiki.id)
                 }
               />
             </div>
