@@ -35,9 +35,11 @@ import {generateClientURL} from '../../../utils/url';
 import UserAvatar from '../../../components/common/UserAvatar';
 import {tagColorFactory} from '../../../utils/factory/tagColorFactory';
 import tailwind from 'tailwind-rn';
+import {useAuthenticate} from '../../../contexts/useAuthenticate';
 
 const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
   const isFocused = useIsFocused();
+  const {user} = useAuthenticate();
   const {id} = route.params;
   const {drawerRef, openDrawer, closeDrawer} = useMinimumDrawer();
   const {width: windowWidth} = useWindowDimensions();
@@ -83,7 +85,8 @@ const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
   }, [isFocused, refetchWikiInfo]);
 
   const headerTitle = wikiTypeName + '詳細';
-  const headerRightButtonName = wikiTypeName + 'を編集';
+  const headerRightButtonName =
+    user?.id === wikiInfo?.writer?.id ? wikiTypeName + 'を編集' : undefined;
 
   const onPressHeaderRightButton = () => {
     if (wikiInfo) {
