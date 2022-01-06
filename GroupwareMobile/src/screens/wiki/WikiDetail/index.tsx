@@ -39,7 +39,7 @@ import {useAuthenticate} from '../../../contexts/useAuthenticate';
 
 const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
   const isFocused = useIsFocused();
-  const {user} = useAuthenticate();
+  const {user: authUser} = useAuthenticate();
   const {id} = route.params;
   const {drawerRef, openDrawer, closeDrawer} = useMinimumDrawer();
   const {width: windowWidth} = useWindowDimensions();
@@ -86,7 +86,7 @@ const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
 
   const headerTitle = wikiTypeName + '詳細';
   const headerRightButtonName =
-    user?.id === wikiInfo?.writer?.id || user?.role === UserRole.ADMIN
+    authUser?.id === wikiInfo?.writer?.id || authUser?.role === UserRole.ADMIN
       ? wikiTypeName + 'を編集'
       : undefined;
 
@@ -110,10 +110,10 @@ const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
     // else error handling
   };
 
-  const onPressAvatar = (profile: User) => {
+  const onPressAvatar = (user: User) => {
     navigation.navigate('AccountStack', {
       screen: 'AccountDetail',
-      params: {id: profile.id},
+      params: {id: user.id},
     });
   };
 
