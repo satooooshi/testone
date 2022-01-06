@@ -86,8 +86,10 @@ const FileIcon: React.FC<FileIconProps> = ({ href, submitted }) => {
 const EventDetail = () => {
   const router = useRouter();
   const { id } = router.query as { id: string };
-  const { mutate: downloadEvent } = useAPIDownloadEventCsv();
-  const { mutate: downloadZip } = useAPIDonwloadSubmissionZip();
+  const { mutate: downloadEvent, isLoading: loadingEventCsv } =
+    useAPIDownloadEventCsv();
+  const { mutate: downloadZip, isLoading: loadingSubmissionZip } =
+    useAPIDonwloadSubmissionZip();
   const [editModal, setEditModal] = useState(false);
   const [commentVisible, setCommentVisible] = useState(false);
   const [newComment, setNewComment] = useState<string>('');
@@ -459,7 +461,14 @@ const EventDetail = () => {
                           name: data.title,
                         })
                       }>
-                      提出物を一括ダウンロード
+                      {loadingSubmissionZip ? (
+                        <Text>
+                          一括ダウンロードには時間がかかります
+                          <Spinner />
+                        </Text>
+                      ) : (
+                        <Text>提出物を一括ダウンロード</Text>
+                      )}
                     </Button>
                   </div>
                 ) : null}
@@ -468,7 +477,11 @@ const EventDetail = () => {
                     <Button
                       colorScheme={'green'}
                       onClick={() => downloadEvent({ id, name: data.title })}>
-                      イベントデータをCSV出力
+                      {loadingEventCsv ? (
+                        <Spinner />
+                      ) : (
+                        <Text>イベントデータをCSV出力</Text>
+                      )}
                     </Button>
                   </div>
                 ) : null}
@@ -622,7 +635,7 @@ const EventDetail = () => {
                       for (let i = 0; i < files.length; i++) {
                         const renamedFile = new File(
                           [files[i]],
-                          userNameFactory(user) + ' ' + files[i].name,
+                          files[i].name,
                           {
                             type: files[i].type,
                             lastModified: files[i].lastModified,

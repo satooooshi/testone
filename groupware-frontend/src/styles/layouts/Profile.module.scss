@@ -24,9 +24,9 @@
 .image_wrapper {
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
   margin-right: 40px;
+  margin-top: 80px;
   width: 30vw;
   // height: 31vw;
   @media (max-width: 576px) {
@@ -45,9 +45,11 @@
   background-color: #fafafa;
   color: #bdbdbd;
   margin-bottom: 16px;
-  width: 30vw;
-  height: 31vw;
+  width: 20vw;
+  height: 21vw;
   border-radius: 100%;
+  max-width: 410px;
+  max-height: 410px;
   @media (max-width: 576px) {
     width: 50vw;
     height: 51vw;
@@ -58,8 +60,10 @@
 }
 
 .avatar {
-  width: 30vw;
-  height: 30vw;
+  max-width: 400px;
+  max-height: 400px;
+  width: 20vw;
+  height: 20vw;
   @media (max-width: 576px) {
     width: 50vw;
     height: 51vw;
@@ -72,7 +76,7 @@
   flex-direction: column;
   align-items: center;
   margin-bottom: 40px;
-  width: 40vw;
+  width: 50vw;
   @media (max-width: 576px) {
     width: 70vw;
     margin-bottom: 0;

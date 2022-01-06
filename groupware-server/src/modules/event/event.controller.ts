@@ -86,15 +86,10 @@ export class EventScheduleController {
 
   @Get('submission-zip')
   @UseGuards(JwtAuthenticationGuard)
-  async getSubmissionZip(
-    @Query() query: QueryToGetZipSubmission,
-    @Res() res: Response,
-  ) {
+  async getSubmissionZip(@Query() query: QueryToGetZipSubmission) {
     const { id } = query;
 
-    const zip = await this.eventService.getSubmissionZip(Number(id));
-    res.setHeader('Content-Type', 'application/zip');
-    res.send(zip);
+    return await this.eventService.getSubmissionZip(Number(id));
   }
 
   @Get('csv')
