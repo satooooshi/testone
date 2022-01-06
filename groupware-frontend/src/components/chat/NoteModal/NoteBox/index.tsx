@@ -11,59 +11,27 @@ import {
   Text,
   Image,
 } from '@chakra-ui/react';
-import dynamic from 'next/dynamic';
-import React, { useMemo, useState } from 'react';
+import React from 'react';
 import { FiMenu } from 'react-icons/fi';
-import { ImageDecorator } from 'react-viewer/lib/ViewerProps';
 import { ChatNote, ChatNoteImage } from 'src/types';
 import { dateTimeFormatterFromJSDDate } from 'src/utils/dateTimeFormatter';
 import { userNameFactory } from 'src/utils/factory/userNameFactory';
-import { saveAs } from 'file-saver';
-import { fileNameTransformer } from 'src/utils/factory/fileNameTransformer';
-const Viewer = dynamic(() => import('react-viewer'), { ssr: false });
 
 type NoteBoxProps = {
   note: ChatNote;
   onClickEdit: (note: ChatNote) => void;
   onClickDelete: (note: ChatNote) => void;
+  onClickImage: (note: ChatNote, selectedImage: Partial<ChatNoteImage>) => void;
 };
 
 const NoteBox: React.FC<NoteBoxProps> = ({
   note: n,
   onClickEdit,
   onClickDelete,
+  onClickImage,
 }) => {
-  const [selectedImage, setSelectedImage] = useState<Partial<ChatNoteImage>>();
-  const imagesForViewer = useMemo<ImageDecorator>(() => {
-    return {
-      src: selectedImage?.imageURL || '',
-      alt: 'ノート画像',
-      downloadUrl: selectedImage?.imageURL || '',
-    };
-  }, [selectedImage?.imageURL]);
-
   return (
     <>
-      <Viewer
-        customToolbar={(config) => {
-          return config.concat([
-            {
-              key: 'donwload',
-              render: (
-                <i
-                  className={`react-viewer-icon react-viewer-icon-download`}></i>
-              ),
-              onClick: ({ src }) => {
-                saveAs(src, fileNameTransformer(src));
-              },
-            },
-          ]);
-        }}
-        images={[imagesForViewer]}
-        visible={!!selectedImage}
-        onClose={() => setSelectedImage(undefined)}
-        activeIndex={0}
-      />
       <Box
         p={'4px'}
         bg="white"
@@ -114,7 +82,7 @@ const NoteBox: React.FC<NoteBoxProps> = ({
         </Box>
         <SimpleGrid spacing="4px" columns={3} w="100%">
           {n.images?.map((i) => (
-            <Link onClick={() => setSelectedImage(i)} key={i.id}>
+            <Link onClick={() => onClickImage(n, i)} key={i.id}>
               <Image loading="lazy" src={i.imageURL} alt="関連画像" />
             </Link>
           ))}
