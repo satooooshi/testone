@@ -108,10 +108,10 @@ const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
     // else error handling
   };
 
-  const onPressAvatar = (user: User) => {
+  const onPressAvatar = (profile: User) => {
     navigation.navigate('AccountStack', {
       screen: 'AccountDetail',
-      params: {id: user.id},
+      params: {id: profile.id},
     });
   };
 
