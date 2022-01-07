@@ -15,13 +15,7 @@ import { convertToRaw, EditorState } from 'draft-js';
 import { AiOutlinePaperClip, AiOutlinePicture } from 'react-icons/ai';
 import { ChatGroup, ChatMessage, ChatMessageType, User } from 'src/types';
 import { MenuValue } from '@/hooks/chat/useModalReducer';
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import ChatMessageItem from '../ChatMessageItem';
 import { IoCloseSharp, IoSend } from 'react-icons/io5';
 import { FiFileText } from 'react-icons/fi';
@@ -29,7 +23,6 @@ import createMentionPlugin from '@draft-js-plugins/mention';
 import { useDropzone } from 'react-dropzone';
 import { userNameFactory } from 'src/utils/factory/userNameFactory';
 import { draftToMarkdown } from 'markdown-draft-js';
-import { useMention } from '@/hooks/chat/useMention';
 import { useAPIGetLastReadChatTime } from '@/hooks/api/chat/useAPIGetLastReadChatTime';
 import { useAPIGetMessages } from '@/hooks/api/chat/useAPIGetMessages';
 import { useAPISendChatMessage } from '@/hooks/api/chat/useAPISendChatMessage';
@@ -52,6 +45,54 @@ import NoteModal from '../NoteModal';
 import { useRoomRefetch } from 'src/contexts/chat/useRoomRefetch';
 import { fileNameTransformer } from 'src/utils/factory/fileNameTransformer';
 import { saveAs } from 'file-saver';
+import { EntryComponentProps } from '@draft-js-plugins/mention/lib/MentionSuggestions/Entry/Entry';
+import suggestionStyles from '@/styles/components/Suggestion.module.scss';
+
+export const Entry: React.FC<EntryComponentProps> = ({
+  mention,
+  isFocused,
+  id,
+  onMouseUp,
+  onMouseDown,
+  onMouseEnter,
+}) => {
+  const entryRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (isFocused) {
+      if ('scrollIntoViewIfNeeded' in document.body) {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        //@ts-ignore
+        entryRef.current?.scrollIntoViewIfNeeded(false);
+      } else {
+        entryRef.current?.scrollIntoView(false);
+      }
+    }
+  }, [isFocused]);
+
+  return (
+    <div
+      ref={entryRef}
+      style={
+        isFocused
+          ? {
+              padding: '5px',
+              backgroundColor: 'cornsilk',
+            }
+          : {
+              padding: '5px',
+            }
+      }
+      role="option"
+      aria-selected={isFocused ? 'true' : 'false'}
+      id={id}
+      onMouseUp={onMouseUp}
+      onMouseEnter={onMouseEnter}
+      onMouseDown={onMouseDown}>
+      {mention.name}
+    </div>
+  );
+};
 
 const socket = io(baseURL, {
   transports: ['websocket'],
@@ -64,6 +105,7 @@ type ChatBoxProps = {
 
 const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
   const { needRefetch } = useRoomRefetch();
+  const { user } = useAuthenticate();
   const [visibleAlbumModal, setVisibleAlbumModal] = useState(false);
   const [visibleNoteModal, setVisibleNoteModal] = useState(false);
   const { user: myself } = useAuthenticate();
@@ -96,8 +138,22 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
   const { data: lastReadChatTime } = useAPIGetLastReadChatTime(room.id, {
     refetchInterval: 1000,
   });
-  const [{ popup, suggestions, mentionedUserData }, dispatchMention] =
-    useMention();
+  const userDataForMention: MentionData[] = useMemo(() => {
+    return (
+      room?.members
+        ?.filter((u) => u.id !== user?.id)
+        .map((u) => ({
+          id: u.id,
+          name: userNameFactory(u) + 'さん',
+          avatar: u.avatarUrl,
+        })) || []
+    );
+  }, [room?.members, user?.id]);
+
+  const [suggestions, setSuggestions] =
+    useState<MentionData[]>(userDataForMention);
+  const [mentionOpened, setMentionOpened] = useState(false);
+  const [mentionedUserData, setMentionedUserData] = useState<MentionData[]>([]);
   const { data: fetchedPastMessages } = useAPIGetMessages({
     group: room.id,
     page: page.toString(),
@@ -175,33 +231,25 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
     }
   };
 
-  const onSuggestionOpenChange = useCallback(
-    (_open: boolean) => {
-      dispatchMention({ type: 'popup', value: _open });
-    },
-    [dispatchMention],
-  );
+  const onSuggestionOpenChange = (_open: boolean) => {
+    setMentionOpened(_open);
+  };
 
-  const onSuggestionSearchChange = useCallback(
-    ({ value }: { value: string }) => {
-      dispatchMention({
-        type: 'suggestions',
-        value,
-      });
-    },
-    [dispatchMention],
-  );
+  const onSuggestionSearchChange = ({ value }: { value: string }) => {
+    setSuggestions(
+      userDataForMention.filter((m) => {
+        return m.name.toLowerCase().includes(value.toLowerCase());
+      }),
+    );
+  };
 
-  const onAddMention = useCallback(
-    (m: MentionData) => {
-      // get the mention object selected
-      dispatchMention({
-        type: 'mentionedUserData',
-        value: m,
-      });
-    },
-    [dispatchMention],
-  );
+  useEffect(() => {
+    setSuggestions(userDataForMention);
+  }, [userDataForMention]);
+
+  const onAddMention = (newMention: MentionData) => {
+    setMentionedUserData((m) => [...m, newMention]);
+  };
   const [editorState, setEditorState] = useState(EditorState.createEmpty());
   const messageWrapperDivRef = useRef<HTMLDivElement | null>(null);
   const editorRef = useRef<Editor>(null);
@@ -257,13 +305,6 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
       }
     }
   };
-
-  useEffect(() => {
-    dispatchMention({
-      type: 'allMentionUserData',
-      value: room?.members,
-    });
-  }, [dispatchMention, room]);
 
   useEffect(() => {
     setMessages([]);
@@ -578,13 +619,16 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
           plugins={plugins}
           ref={editorRef}
         />
-        <MentionSuggestions
-          open={popup}
-          onOpenChange={onSuggestionOpenChange}
-          suggestions={suggestions}
-          onSearchChange={onSuggestionSearchChange}
-          onAddMention={onAddMention}
-        />
+        <div className={suggestionStyles.suggestion_wrapper}>
+          <MentionSuggestions
+            open={mentionOpened}
+            onOpenChange={onSuggestionOpenChange}
+            suggestions={suggestions}
+            onSearchChange={onSuggestionSearchChange}
+            onAddMention={onAddMention}
+            entryComponent={Entry}
+          />
+        </div>
       </Box>
       <Link
         {...getRootProps()}
