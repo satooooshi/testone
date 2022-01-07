@@ -639,9 +639,9 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
             mode="datetime"
             date={
               dateTimeModal.visible === 'startAt'
-                ? newEvent?.startAt
+                ? new Date(newEvent?.startAt || new Date())
                 : dateTimeModal.visible === 'endAt'
-                ? newEvent?.endAt
+                ? new Date(newEvent?.endAt || new Date())
                 : new Date()
             }
             onConfirm={date => {
