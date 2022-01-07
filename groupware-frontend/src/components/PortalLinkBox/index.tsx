@@ -250,7 +250,7 @@ const descriptionText = (href: PortalLinkType): string => {
     case PortalLinkType.ACCOUNT:
       return '自分のアカウント情報を編集します。';
     case PortalLinkType.BOARD:
-      return '社内で情報共有をする掲示板です・';
+      return 'ナレッジやQ&Aなど、社内で情報共有をする掲示板です。';
     default:
       return '';
   }
