@@ -114,10 +114,18 @@ export class ChatMessage {
   @AfterInsert()
   async sendPushNotification() {
     if (this.chatGroup?.id && this.sender?.id) {
+      let content = this.content;
+      if (this.type === ChatMessageType.IMAGE) {
+        content = '画像';
+      } else if (this.type === ChatMessageType.VIDEO) {
+        content = '動画';
+      } else if (this.type === ChatMessageType.OTHER_FILE) {
+        content = 'ファイル';
+      }
       const mentionRegex = /@\[.*?\]\(([0-9]+)\)/g;
       const mentionedIds: number[] = [];
       let mentionArr = [];
-      while ((mentionArr = mentionRegex.exec(this.content)) !== null) {
+      while ((mentionArr = mentionRegex.exec(content)) !== null) {
         if (mentionArr[1] && typeof Number(mentionArr[1]) === 'number') {
           mentionedIds.push(Number(mentionArr[1]));
         }
@@ -138,7 +146,7 @@ export class ChatMessage {
         .getMany();
       const notificationDataWithNoMention: CustomPushNotificationData = {
         title: `新着メッセージが届きました`,
-        body: `${mentionTransform(this.content)}`,
+        body: `${mentionTransform(content)}`,
         custom: {
           screen: 'chat',
           id: this.chatGroup.id.toString(),
@@ -161,7 +169,7 @@ export class ChatMessage {
           .getMany();
         const notificationDataWithMention: CustomPushNotificationData = {
           title: `あなたをメンションした新着メッセージが届きました`,
-          body: `${mentionTransform(this.content)}`,
+          body: `${mentionTransform(content)}`,
           custom: {
             screen: 'chat',
             id: this.chatGroup.id.toString(),
