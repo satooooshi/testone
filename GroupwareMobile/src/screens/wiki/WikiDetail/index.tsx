@@ -17,7 +17,7 @@ import {
 } from '../../../utils/colors';
 import {userNameFactory} from '../../../utils/factory/userNameFactory';
 import {wikiDetailStyles} from '../../../styles/screen/wiki/wikiDetail.style';
-import {BoardCategory, User, WikiType} from '../../../types';
+import {BoardCategory, User, UserRole, WikiType} from '../../../types';
 import {WikiDetailProps} from '../../../types/navigator/drawerScreenProps';
 import {useIsFocused} from '@react-navigation/core';
 import AnswerList from '../AnswerList';
@@ -35,9 +35,11 @@ import {generateClientURL} from '../../../utils/url';
 import UserAvatar from '../../../components/common/UserAvatar';
 import {tagColorFactory} from '../../../utils/factory/tagColorFactory';
 import tailwind from 'tailwind-rn';
+import {useAuthenticate} from '../../../contexts/useAuthenticate';
 
 const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
   const isFocused = useIsFocused();
+  const {user: authUser} = useAuthenticate();
   const {id} = route.params;
   const {drawerRef, openDrawer, closeDrawer} = useMinimumDrawer();
   const {width: windowWidth} = useWindowDimensions();
@@ -83,7 +85,10 @@ const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
   }, [isFocused, refetchWikiInfo]);
 
   const headerTitle = wikiTypeName + '詳細';
-  const headerRightButtonName = wikiTypeName + 'を編集';
+  const headerRightButtonName =
+    authUser?.id === wikiInfo?.writer?.id || authUser?.role === UserRole.ADMIN
+      ? wikiTypeName + 'を編集'
+      : undefined;
 
   const onPressHeaderRightButton = () => {
     if (wikiInfo) {
