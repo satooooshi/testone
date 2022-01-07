@@ -68,7 +68,9 @@ const EventCard: React.FC<EventCardProps> = ({event}) => {
         w={cardWidth}
         h={cardWidth * 0.45}
         bg={grayColor}
-        shadow="md"
+        shadow="sm"
+        borderWidth={1}
+        borderColor="gray400"
         py={4}
         justifyContent="space-between"
         flexDir="column">

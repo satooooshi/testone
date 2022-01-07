@@ -1,5 +1,5 @@
 import React from 'react';
-import {Platform, TouchableOpacity, useWindowDimensions} from 'react-native';
+import {Platform, TouchableHighlight, useWindowDimensions} from 'react-native';
 import FastImage from 'react-native-fast-image';
 import {Swipeable} from 'react-native-gesture-handler';
 import {Button, Div, Icon, Text} from 'react-native-magnus';
@@ -57,7 +57,7 @@ const RoomCard: React.FC<RoomCardProps> = ({
     : false;
 
   return (
-    <TouchableOpacity onPress={onPress}>
+    <TouchableHighlight underlayColor="none" onPress={onPress}>
       <Swipeable
         containerStyle={tailwind('rounded-sm')}
         renderRightActions={rightSwipeActions}>
@@ -127,7 +127,7 @@ const RoomCard: React.FC<RoomCardProps> = ({
           </Div>
         </Div>
       </Swipeable>
-    </TouchableOpacity>
+    </TouchableHighlight>
   );
 };
 
