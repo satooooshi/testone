@@ -2,7 +2,7 @@ import {StyleSheet} from 'react-native';
 
 export const fileIconStyles = StyleSheet.create({
   default: {
-    maxWidth: 120,
+    width: 104,
     backgroundColor: 'white',
     padding: 8,
     borderRadius: 8,
