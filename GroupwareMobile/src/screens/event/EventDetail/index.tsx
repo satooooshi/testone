@@ -536,6 +536,7 @@ const EventDetail: React.FC = () => {
                           alignItems="flex-end">
                           <Div>
                             <Button
+                              py={0}
                               bg="blue600"
                               color="white"
                               h={40}
@@ -545,6 +546,7 @@ const EventDetail: React.FC = () => {
                             </Button>
                           </Div>
                           <Button
+                            py={0}
                             bg="pink600"
                             color="white"
                             h={40}
