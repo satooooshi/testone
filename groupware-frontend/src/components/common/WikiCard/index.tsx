@@ -73,6 +73,7 @@ const WikiCard: React.FC<WikiCardProps> = ({ wiki }) => {
       </Box>
       <Box
         mb="8px"
+        px="8px"
         flexDir="row"
         display="flex"
         alignItems="center"
