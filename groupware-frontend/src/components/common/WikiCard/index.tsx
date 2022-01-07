@@ -30,21 +30,20 @@ const WikiCard: React.FC<WikiCardProps> = ({ wiki }) => {
     <Link
       href={`/wiki/detail/${wiki.id}`}
       w={isSmallerThan768 ? '100vw' : 'min(1600px, 70vw)'}
-      minH="120px"
+      minH="104px"
       shadow="md"
       borderWidth={1}
-      borderColor={'gray.200'}
+      borderColor={'gray.300'}
       bg="#ececec"
-      py="9px"
-      px="16px"
+      py="4px"
       _hover={{ textDecoration: 'none', cursor: 'pointer' }}>
       <Box
+        px="16px"
         display="flex"
         flexDir="row"
         alignItems="center"
-        mb="16px"
-        justifyContent="space-bewtween"
-        minH="50%">
+        mb="8px"
+        justifyContent="space-bewtween">
         <Box w="90%" display="flex" alignItems="center">
           {wiki.type !== WikiType.RULES && writer ? (
             <Link
@@ -71,38 +70,49 @@ const WikiCard: React.FC<WikiCardProps> = ({ wiki }) => {
             {title}
           </Text>
         </Box>
+      </Box>
+      <Box
+        mb="8px"
+        flexDir="row"
+        display="flex"
+        alignItems="center"
+        justifyContent="flex-end">
         {wiki.type === WikiType.BOARD &&
         wiki.boardCategory === BoardCategory.QA ? (
           <Box
+            mr="8px"
             display="flex"
-            w="10%"
-            flexDir={isSmallerThan768 ? 'column' : 'row'}
+            flexDir={'row'}
             alignItems="center"
             justifyContent="center">
-            <Text
-              color={darkFontColor}
-              fontSize={isSmallerThan768 ? '16px' : '14px'}
-              mr={isSmallerThan768 ? '14px' : '16px'}>
+            <Text color={darkFontColor} mr={'4px'}>
               回答
             </Text>
-            <Text color="green.500" fontSize="24px" fontWeight="bold">
+            <Text color="green.500" fontSize="22px" fontWeight="bold">
               {answers?.length.toString()}
             </Text>
           </Box>
         ) : null}
+        {wiki.type !== WikiType.RULES && (
+          <Text
+            fontSize={isSmallerThan768 ? '14px' : '18px'}
+            color={darkFontColor}
+            display="flex">
+            {dateTimeFormatterFromJSDDate({ dateTime: new Date(createdAt) })}
+          </Text>
+        )}
       </Box>
       <Box
         display="flex"
         flexDir={isSmallerThan768 ? 'column' : 'row'}
         justifyContent={isSmallerThan768 ? 'flex-start' : 'space-between'}>
         <Box
+          pl="16px"
           display="flex"
           flexDir="row"
-          maxW={isSmallerThan768 ? '100%' : '80%'}
           overflowX="auto"
-          mb={isSmallerThan768 ? '8px' : undefined}
           css={hideScrollbarCss}>
-          <Link mr="4px" mb="4px" _hover={{ textDecoration: 'none' }}>
+          <Link mr="4px" _hover={{ textDecoration: 'none' }}>
             <Button colorScheme={tagButtonColor} color="white" size="xs">
               {wikiTypeNameFactory(
                 wiki.type,
@@ -126,16 +136,6 @@ const WikiCard: React.FC<WikiCardProps> = ({ wiki }) => {
               ))
             : null}
         </Box>
-        {wiki.type !== WikiType.RULES && (
-          <Text
-            fontSize={isSmallerThan768 ? '14px' : '18px'}
-            color={darkFontColor}
-            display="flex"
-            alignSelf="flex-end"
-            mb={isSmallerThan768 ? '24px' : undefined}>
-            {dateTimeFormatterFromJSDDate({ dateTime: new Date(createdAt) })}
-          </Text>
-        )}
       </Box>
     </Link>
   );
