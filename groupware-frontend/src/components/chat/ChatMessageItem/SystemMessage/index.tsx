@@ -19,8 +19,11 @@ const SystemMessage: React.FC<SystemMessageProps> = ({ message }) => {
       minW="60%"
       minH={'24px'}
       mb={'8px'}
+      p="4px"
       maxW="50vw">
-      <Text fontSize={'14px'}>{message.content}</Text>
+      <Text fontSize={'14px'} textAlign="center">
+        {message.content}
+      </Text>
     </Box>
   );
 };
