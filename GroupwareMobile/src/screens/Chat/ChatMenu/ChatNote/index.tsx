@@ -89,7 +89,7 @@ const ChatNotes: React.FC = () => {
       <ImageView
         animationType="slide"
         images={images}
-        imageIndex={nowImageIndex}
+        imageIndex={nowImageIndex === -1 ? 0 : nowImageIndex}
         visible={imageModal}
         onRequestClose={() => setImageModal(false)}
         swipeToCloseEnabled={false}
