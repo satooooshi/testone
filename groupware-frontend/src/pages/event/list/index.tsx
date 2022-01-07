@@ -43,8 +43,9 @@ import {
 import { useAPIGetTag } from '@/hooks/api/tag/useAPIGetTag';
 import { useHeaderTab } from '@/hooks/headerTab/useHeaderTab';
 import { useAPIUpdateEvent } from '@/hooks/api/event/useAPIUpdateEvent';
-import { Box, useToast } from '@chakra-ui/react';
+import { Box, useMediaQuery, useToast } from '@chakra-ui/react';
 import { responseErrorMsgFactory } from 'src/utils/factory/responseErrorMsgFactory';
+import { hideScrollbarCss } from 'src/utils/chakra/hideScrollBar.css';
 
 const localizer = momentLocalizer(moment);
 //@ts-ignore
@@ -119,6 +120,7 @@ type EventListGetParams = SearchQueryToGetEvents & {
 const EventList = () => {
   const router = useRouter();
   const toast = useToast();
+  const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
 
   const {
     page = '1',
@@ -514,10 +516,11 @@ const EventList = () => {
         {isCalendar && (
           <Box
             ref={calendarRef}
-            display="flex"
             justifyContent="center"
             alignItems="center"
-            maxW="90%"
+            maxW={isSmallerThan768 ? '99vw' : undefined}
+            overflowX="auto"
+            css={hideScrollbarCss}
             alignSelf="center">
             <BigCalendar
               selectable
