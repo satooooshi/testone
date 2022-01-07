@@ -165,22 +165,30 @@ const NoteList: React.FC<NoteListProps> = ({
             <ModalCloseButton />
             <ModalBody onScroll={onScroll}>
               <Box mb={!isLoading ? '24px' : undefined}>
-                {notesForInfiniteScroll.map((n) => (
-                  <Box mb="16px" key={n.id}>
-                    <NoteBox
-                      note={n}
-                      onClickEdit={() => {
-                        onClickEdit(n);
-                      }}
-                      onClickDelete={() => handleNoteDelete(n)}
-                      onClickImage={(note, image) => {
-                        setSelectedNoteForImageViewer(note);
-                        setSelectedImage(image);
-                      }}
-                    />
-                  </Box>
-                ))}
-                {isLoading && <Spinner />}
+                {setNotesForInfiniteScroll.length ? (
+                  notesForInfiniteScroll.map((n) => (
+                    <Box mb="16px" key={n.id}>
+                      <NoteBox
+                        note={n}
+                        onClickEdit={() => {
+                          onClickEdit(n);
+                        }}
+                        onClickDelete={() => handleNoteDelete(n)}
+                        onClickImage={(note, image) => {
+                          setSelectedNoteForImageViewer(note);
+                          setSelectedImage(image);
+                        }}
+                      />
+                    </Box>
+                  ))
+                ) : isLoading ? (
+                  <Spinner />
+                ) : (
+                  <Text>まだノートが投稿されていません</Text>
+                )}
+                {!setNotesForInfiniteScroll.length && isLoading ? (
+                  <Spinner />
+                ) : null}
               </Box>
             </ModalBody>
           </ModalContent>
