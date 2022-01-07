@@ -165,7 +165,7 @@ const NoteList: React.FC<NoteListProps> = ({
             <ModalCloseButton />
             <ModalBody onScroll={onScroll}>
               <Box mb={!isLoading ? '24px' : undefined}>
-                {setNotesForInfiniteScroll.length ? (
+                {notesForInfiniteScroll.length ? (
                   notesForInfiniteScroll.map((n) => (
                     <Box mb="16px" key={n.id}>
                       <NoteBox
@@ -184,7 +184,7 @@ const NoteList: React.FC<NoteListProps> = ({
                 ) : isLoading ? (
                   <Spinner />
                 ) : (
-                  <Text>まだノートが投稿されていません</Text>
+                  <Text textAlign="center">まだノートが投稿されていません</Text>
                 )}
                 {!setNotesForInfiniteScroll.length && isLoading ? (
                   <Spinner />
