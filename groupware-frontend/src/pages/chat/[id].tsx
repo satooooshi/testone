@@ -3,7 +3,7 @@ import { MenuValue, useModalReducer } from '@/hooks/chat/useModalReducer';
 import React, { useState } from 'react';
 import { ChatGroup } from 'src/types';
 import CreateChatGroupModal from '@/components/chat/CreateChatGroupModal';
-import { useMediaQuery, Box, useToast } from '@chakra-ui/react';
+import { useMediaQuery, Box, useToast, Text } from '@chakra-ui/react';
 import LayoutWithTab from '@/components/layout/LayoutWithTab';
 import { Tab } from 'src/types/header/tab/types';
 import Head from 'next/head';
@@ -162,7 +162,6 @@ const ChatDetail = () => {
               <Box w="30vw">
                 <RoomList
                   currentId={id}
-                  currentRoom={currentRoom}
                   setCurrentRoom={setCurrentRoom}
                   onClickRoom={(g) =>
                     router.push(`/chat/${g.id.toString()}`, undefined, {
@@ -172,9 +171,24 @@ const ChatDetail = () => {
                 />
               </Box>
             )}
-            {currentRoom && (
+            {currentRoom ? (
               <ChatBox room={currentRoom} onMenuClicked={handleMenuSelected} />
-            )}
+            ) : !isSmallerThan768 ? (
+              <Box
+                w="60vw"
+                h="100%"
+                display="flex"
+                flexDir="row"
+                justifyContent="center"
+                alignItems="center"
+                boxShadow="md"
+                bg="white"
+                borderRadius="md">
+                <Text position="absolute" top="auto" bottom="auto">
+                  ルームを選択してください
+                </Text>
+              </Box>
+            ) : null}
           </>
         </Box>
       </LayoutWithTab>

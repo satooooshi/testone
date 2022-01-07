@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -206,8 +207,16 @@ export class ChatController {
 
   @Get('/v2/room/:roomId')
   @UseGuards(JwtAuthenticationGuard)
-  async getRoomDetail(@Param('roomId') roomId: string): Promise<ChatGroup> {
-    return await this.chatService.getRoomDetail(Number(roomId));
+  async getRoomDetail(
+    @Param('roomId') roomId: string,
+    @Req() req: RequestWithUser,
+  ): Promise<ChatGroup> {
+    const { user } = req;
+    const roomDetail = await this.chatService.getRoomDetail(Number(roomId));
+    if (!roomDetail.members.filter((m) => m.id === user.id).length) {
+      throw new BadRequestException('チャットルームを取得する権限がありません');
+    }
+    return roomDetail;
   }
 
   @Get('/v2/room/:roomId/note')
