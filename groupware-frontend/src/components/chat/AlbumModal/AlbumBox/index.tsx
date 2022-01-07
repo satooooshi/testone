@@ -28,15 +28,24 @@ const AlbumBox: React.FC<AlbumBoxProps> = ({
       flexDir="column"
       cursor="pointer"
       onClick={onClick}
+      py="8px"
       alignItems="center">
-      <Box
-        p="8px"
-        display="flex"
-        flexDir="row"
-        w={'100%'}
-        justifyContent="space-between">
-        <Text maxW="80%" noOfLines={1} mr="4px" display="inline">
+      <Box px="8px" display="flex" flexDir="row" w={'100%'}>
+        <Text maxW="80%" noOfLines={1} mr="4px" display="inline" isTruncated>
           {album.title}
+        </Text>
+      </Box>
+      <Box
+        mb="4px"
+        mr="4px"
+        flexDir="row"
+        display="flex"
+        alignItems="center"
+        fontSize="14px"
+        alignSelf="flex-end"
+        justifyContent="flex-end">
+        <Text mr="4px" color="gray.500">
+          {album.images?.length || 0}枚の画像
         </Text>
         <Link
           onClick={(e) => {
