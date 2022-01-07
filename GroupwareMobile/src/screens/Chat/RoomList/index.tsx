@@ -8,7 +8,7 @@ import RoomCard from '../../../components/chat/RoomCard';
 import HeaderWithTextButton from '../../../components/Header';
 import WholeContainer from '../../../components/WholeContainer';
 import {useAPIGetRooms} from '../../../hooks/api/chat/useAPIGetRoomsByPage';
-import {useAPIUpdateChatGroup} from '../../../hooks/api/chat/useAPIUpdateChatGroup';
+import {useAPISavePin} from '../../../hooks/api/chat/useAPISavePin';
 import {ChatGroup} from '../../../types';
 import {RoomListNavigationProps} from '../../../types/navigator/drawerScreenProps';
 
@@ -36,13 +36,13 @@ const RoomList: React.FC = () => {
     page,
     limit: '20',
   });
-  const {mutate: saveGroup} = useAPIUpdateChatGroup({
+  const {mutate: savePin} = useAPISavePin({
     onSuccess: () => {
       refetchAllRooms();
     },
     onError: () => {
       Alert.alert(
-        'チャットルーム更新中にエラーが発生しました。\n時間をおいて再実行してください。',
+        'ピン留めを更新中にエラーが発生しました。\n時間をおいて再実行してください。',
       );
     },
   });
@@ -116,7 +116,7 @@ const RoomList: React.FC = () => {
                   })
                 }
                 onPressPinButton={() => {
-                  saveGroup({...room, isPinned: !room.isPinned});
+                  savePin({...room, isPinned: !room.isPinned});
                 }}
               />
             </Div>

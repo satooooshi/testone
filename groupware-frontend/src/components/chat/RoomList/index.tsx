@@ -62,29 +62,7 @@ const RoomList: React.FC<RoomListProps> = ({
   };
 
   const stateRefreshNeeded = (newData: ChatGroup[]) => {
-    let updateNeeded = false;
-    if (roomsForInfiniteScroll.length !== newData?.length) {
-      updateNeeded = true;
-    }
-    if (roomsForInfiniteScroll.length || newData?.length) {
-      for (let i = 0; i < roomsForInfiniteScroll.length; i++) {
-        if (updateNeeded) {
-          break;
-        }
-        if (
-          new Date(roomsForInfiniteScroll[i]?.updatedAt).getTime() !==
-            new Date(newData?.[i]?.updatedAt).getTime() ||
-          roomsForInfiniteScroll[i].hasBeenRead !== newData?.[i]?.hasBeenRead ||
-          roomsForInfiniteScroll[i]?.members?.length !==
-            newData?.[i]?.members?.length
-        ) {
-          updateNeeded = true;
-        }
-      }
-    }
-    if (updateNeeded) {
-      setRoomsForInfiniteScroll(newData);
-    }
+    setRoomsForInfiniteScroll(newData);
   };
 
   const { refetch: refreshRooms } = useAPIGetRoomsByPage(
@@ -94,9 +72,9 @@ const RoomList: React.FC<RoomListProps> = ({
     },
     {
       refetchInterval: 30000,
+      onSettled: clearRefetch,
       onSuccess: (data) => {
         stateRefreshNeeded(data.rooms);
-        clearRefetch();
       },
     },
   );
@@ -104,9 +82,8 @@ const RoomList: React.FC<RoomListProps> = ({
   useEffect(() => {
     if (refetchNeeded) {
       refreshRooms();
-      clearRefetch();
     }
-  }, [clearRefetch, refetchNeeded, refreshRooms]);
+  }, [refetchNeeded, refreshRooms]);
 
   return (
     <Box

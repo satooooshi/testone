@@ -104,7 +104,17 @@ export class ChatController {
       ...(chatGroup?.members?.filter((u) => u.id !== user.id) || []),
       user,
     ];
-    return await this.chatService.saveChatGroup(chatGroup, user.id);
+    return await this.chatService.saveChatGroup(chatGroup);
+  }
+
+  @Post('v2/room/pin')
+  @UseGuards(JwtAuthenticationGuard)
+  async savePin(
+    @Req() req: RequestWithUser,
+    @Body() chatGroup: Partial<ChatGroup>,
+  ) {
+    const { user } = req;
+    return await this.chatService.savePin(chatGroup, user.id);
   }
 
   @Patch('/v2/room')

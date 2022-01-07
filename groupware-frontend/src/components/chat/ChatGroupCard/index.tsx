@@ -4,8 +4,8 @@ import { dateTimeFormatterFromJSDDate } from 'src/utils/dateTimeFormatter';
 import { Avatar, Box, useMediaQuery, Text, Link } from '@chakra-ui/react';
 import { darkFontColor } from 'src/utils/colors';
 import { RiPushpin2Fill, RiPushpin2Line } from 'react-icons/ri';
-import { useAPIUpdateChatGroup } from '@/hooks/api/chat/useAPIUpdateChatGroup';
 import { useRoomRefetch } from 'src/contexts/chat/useRoomRefetch';
+import { useAPISavePin } from '@/hooks/api/chat/useAPISavePin';
 
 type ChatGroupCardProps = {
   chatGroup: ChatGroup;
@@ -18,10 +18,16 @@ const ChatGroupCard: React.FC<ChatGroupCardProps> = ({
 }) => {
   const { needRefetch } = useRoomRefetch();
   const [isPinned, setIsPinned] = useState<boolean>(!!chatGroup.isPinned);
-  const { mutate: saveGroup } = useAPIUpdateChatGroup({
+
+  const { mutate: savePin } = useAPISavePin({
     onSuccess: () => {
       setIsPinned(!isPinned);
       needRefetch();
+    },
+    onError: () => {
+      alert(
+        'ピン留めを更新中にエラーが発生しました。\n時間をおいて再実行してください。',
+      );
     },
   });
   const [isSmallerThan768] = useMediaQuery('max-width: 768px');
@@ -82,7 +88,7 @@ const ChatGroupCard: React.FC<ChatGroupCardProps> = ({
             <Link
               onClick={(e) => {
                 e.stopPropagation();
-                saveGroup({ ...chatGroup, isPinned: !chatGroup.isPinned });
+                savePin({ ...chatGroup, isPinned: !chatGroup.isPinned });
               }}>
               <RiPushpin2Fill size={24} color="green" />
             </Link>
@@ -90,7 +96,7 @@ const ChatGroupCard: React.FC<ChatGroupCardProps> = ({
             <Link
               onClick={(e) => {
                 e.stopPropagation();
-                saveGroup({ ...chatGroup, isPinned: !chatGroup.isPinned });
+                savePin({ ...chatGroup, isPinned: !chatGroup.isPinned });
               }}>
               <RiPushpin2Line size={24} color="green" />
             </Link>
