@@ -17,6 +17,7 @@ import 'emoji-mart/css/emoji-mart.css';
 import RoomList from '@/components/chat/RoomList';
 import { useAPIUpdateChatGroup } from '@/hooks/api/chat/useAPIUpdateChatGroup';
 import { RoomRefetchProvider } from 'src/contexts/chat/useRoomRefetch';
+import { useAPIGetRoomDetail } from '@/hooks/api/chat/useAPIGetRoomDetail';
 
 const ChatDetail = () => {
   const router = useRouter();
@@ -28,7 +29,21 @@ const ChatDetail = () => {
   ] = useModalReducer();
   const { mutate: updateGroup } = useAPIUpdateChatGroup();
   const toast = useToast();
-
+  useAPIGetRoomDetail(Number(id), {
+    onSuccess: (data) => {
+      if (setCurrentRoom) {
+        setCurrentRoom(data);
+      }
+    },
+    onError: (err) => {
+      if (setCurrentRoom) {
+        setCurrentRoom(undefined);
+      }
+      if (err?.response?.data?.message) {
+        alert(err?.response?.data?.message);
+      }
+    },
+  });
   const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
 
   const { mutate: leaveChatGroup } = useAPILeaveChatRoom({
@@ -162,7 +177,6 @@ const ChatDetail = () => {
               <Box w="30vw">
                 <RoomList
                   currentId={id}
-                  setCurrentRoom={setCurrentRoom}
                   onClickRoom={(g) =>
                     router.push(`/chat/${g.id.toString()}`, undefined, {
                       shallow: true,

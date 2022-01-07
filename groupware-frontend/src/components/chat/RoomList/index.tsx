@@ -1,42 +1,21 @@
-import { useAPIGetRoomDetail } from '@/hooks/api/chat/useAPIGetRoomDetail';
 import { useAPIGetRoomsByPage } from '@/hooks/api/chat/useAPIGetRoomsByPage';
 import { Box, Spinner, Text } from '@chakra-ui/react';
-import React, { SetStateAction, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRoomRefetch } from 'src/contexts/chat/useRoomRefetch';
 import { ChatGroup } from 'src/types';
 import ChatGroupCard from '../ChatGroupCard';
 
 type RoomListProps = {
   currentId?: string;
-  setCurrentRoom?: React.Dispatch<SetStateAction<ChatGroup | undefined>>;
   onClickRoom: (room: ChatGroup) => void;
 };
 
-const RoomList: React.FC<RoomListProps> = ({
-  currentId,
-  setCurrentRoom,
-  onClickRoom,
-}) => {
+const RoomList: React.FC<RoomListProps> = ({ currentId, onClickRoom }) => {
   const { clearRefetch, refetchNeeded } = useRoomRefetch();
   const [page, setPage] = useState('1');
   const [roomsForInfiniteScroll, setRoomsForInfiniteScroll] = useState<
     ChatGroup[]
   >([]);
-  useAPIGetRoomDetail(Number(currentId), {
-    onSuccess: (data) => {
-      if (setCurrentRoom) {
-        setCurrentRoom(data);
-      }
-    },
-    onError: (err) => {
-      if (setCurrentRoom) {
-        setCurrentRoom(undefined);
-      }
-      if (err?.response?.data?.message) {
-        alert(err?.response?.data?.message);
-      }
-    },
-  });
 
   const { data: chatRooms, isLoading: loadingGetChatGroupList } =
     useAPIGetRoomsByPage(
