@@ -33,8 +33,7 @@ const WikiCard: React.FC<WikiCardProps> = ({wiki}) => {
         flexDir="column"
         w={windowWidth}
         borderBottomWidth={1}
-        pt={4}
-        h={108}
+        py={4}
         bg="#eceeec"
         borderColor="#b0b0b0">
         <Div w={'100%'} px={8} flexDir="row" alignItems="center">
