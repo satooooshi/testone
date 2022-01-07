@@ -40,6 +40,7 @@ import { useAPIDeleteReaction } from '@/hooks/api/chat/useAPIDeleteReaction';
 import { AiOutlineUnorderedList } from 'react-icons/ai';
 import ReactionListModal from './ReactionListModal';
 import ReadUsersListModal from './ReadUsersListModal';
+import { darkFontColor } from 'src/utils/colors';
 
 type ChatMessageItemProps = {
   message: ChatMessage;
@@ -225,7 +226,7 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
                     ref={reactionOpenerRef}
                   />
                 </PopoverTrigger>
-                <HiOutlineDotsCircleHorizontal size={24} />
+                <HiOutlineDotsCircleHorizontal size={24} color={'#b0b0b0'} />
               </MenuButton>
             }
             transition>
