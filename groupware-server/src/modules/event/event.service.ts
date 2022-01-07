@@ -366,6 +366,9 @@ export class EventScheduleService {
       .leftJoinAndSelect('comments.writer', 'writer')
       .where('events.id = :id', { id })
       .getOne();
+    existEvent.userJoiningEvent = existEvent.userJoiningEvent.filter(
+      (u) => u?.user.existence,
+    );
     return existEvent;
   }
 

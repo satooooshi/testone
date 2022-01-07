@@ -171,12 +171,12 @@ export class EventScheduleController {
     const eventSchedule = await this.eventService.getEventDetail(id, user.id);
     const isJoining =
       eventSchedule?.userJoiningEvent?.filter(
-        (userJoiningEvent) => user.id === userJoiningEvent.user.id,
+        (userJoiningEvent) => user?.id === userJoiningEvent.user?.id,
       ).length || false;
     const isCanceled =
       eventSchedule?.userJoiningEvent?.filter(
         (userJoiningEvent) =>
-          user.id === userJoiningEvent.user.id && userJoiningEvent.canceledAt,
+          user.id === userJoiningEvent.user?.id && userJoiningEvent?.canceledAt,
       ).length || false;
 
     const returnData: GetEventDetailResopnse = {
