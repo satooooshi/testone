@@ -5,7 +5,6 @@ import React, {
   useRef,
   ChangeEvent,
 } from 'react';
-import qaCreateStyles from '@/styles/layouts/QACreate.module.scss';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
 import { SidebarScreenName } from '@/components/layout/Sidebar';
@@ -30,6 +29,7 @@ import {
   FormControl,
   FormLabel,
   Text,
+  Box,
 } from '@chakra-ui/react';
 import { useAuthenticate } from 'src/contexts/useAuthenticate';
 import { Editor, EditorState } from 'draft-js';
@@ -59,6 +59,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
   setWikiType,
   onClickSaveButton,
 }) => {
+  const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
   const mdParser = new MarkdownIt({
     breaks: true,
   });
@@ -117,7 +118,6 @@ const WikiForm: React.FC<WikiFormProps> = ({
     },
   });
 
-  const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
   const formTopRef = useRef<HTMLDivElement | null>(null);
   const editorRef = useRef<MarkdownEditor | null>(null);
 
@@ -262,8 +262,15 @@ const WikiForm: React.FC<WikiFormProps> = ({
             setTagModal(false);
           }}
         />
-        <div ref={formTopRef} className={qaCreateStyles.type_select_wrapper}>
-          <FormControl className={qaCreateStyles.title_input}>
+        <Box
+          ref={formTopRef}
+          w="80vw"
+          mb={isSmallerThan768 ? 'auto' : '24px'}
+          display="flex"
+          flexDir={isSmallerThan768 ? 'column' : 'row'}>
+          <FormControl
+            mr={isSmallerThan768 ? 0 : '16px'}
+            mb={isSmallerThan768 ? '16px' : 0}>
             <FormLabel>タイトル</FormLabel>
             {errors.title && touched.title ? (
               <Text color="tomato">{errors.title}</Text>
@@ -283,7 +290,10 @@ const WikiForm: React.FC<WikiFormProps> = ({
           {!wiki && (
             <FormControl
               width={isSmallerThan768 ? '100%' : '30%'}
-              className={qaCreateStyles.type_select}>
+              mr="16px"
+              display={isSmallerThan768 ? 'flex' : undefined}
+              flexDir={isSmallerThan768 ? 'column' : undefined}
+              mb={isSmallerThan768 ? '16px' : undefined}>
               <FormLabel fontWeight="bold">タイプを選択してください</FormLabel>
               <Select
                 colorScheme="teal"
@@ -405,12 +415,19 @@ const WikiForm: React.FC<WikiFormProps> = ({
               </Select>
             </FormControl>
           )}
-        </div>
+        </Box>
 
-        <div className={qaCreateStyles.top_form_wrapper}>
+        <Box
+          display="flex"
+          flexDir={isSmallerThan768 ? 'column' : 'row'}
+          justifyContent="space-between"
+          w="80vw"
+          alignItems="center"
+          maxW="1980px"
+          mb="24px">
           {!wiki && (
-            <div className={qaCreateStyles.format_selector_wrapper}>
-              <FormControl className={qaCreateStyles.type_select}>
+            <Box mb={isSmallerThan768 ? '24px' : undefined} w="100%">
+              <FormControl mr="16px" mb={isSmallerThan768 ? '16px' : undefined}>
                 <FormLabel fontWeight="bold">
                   入力形式(投稿後に変更することはできません)
                 </FormLabel>
@@ -436,10 +453,18 @@ const WikiForm: React.FC<WikiFormProps> = ({
                   <option value={'markdown'}>マークダウン</option>
                 </Select>
               </FormControl>
-            </div>
+            </Box>
           )}
-          <div className={qaCreateStyles.title_wrapper}>
-            <div className={qaCreateStyles.button_wrapper}>
+          <Box
+            display="flex"
+            flexDir={isSmallerThan768 ? 'column' : 'row'}
+            alignItems="center"
+            w="100%"
+            justifyContent="flex-end">
+            <Box
+              display="flex"
+              flexDir="row"
+              justifyContent={isSmallerThan768 ? 'center' : 'flex-end'}>
               <Button
                 colorScheme="blue"
                 onClick={() => setTagModal(true)}
@@ -449,19 +474,28 @@ const WikiForm: React.FC<WikiFormProps> = ({
               <Button colorScheme="pink" onClick={() => handleSubmit()}>
                 {wiki ? `${saveButtonName}を更新` : `${saveButtonName}を投稿`}
               </Button>
-            </div>
-          </div>
-        </div>
+            </Box>
+          </Box>
+        </Box>
         {newQuestion.tags?.length ? (
-          <div className={qaCreateStyles.tags}>
+          <Box
+            display="flex"
+            flexDir="row"
+            mb="24px"
+            flexWrap="wrap"
+            w="80vw"
+            maxW="1980px">
             {newQuestion.tags.map((t) => (
-              <div key={t.id} className={qaCreateStyles.tag__item}>
-                <Button colorScheme={tagColorFactory(t.type)} size="xs">
-                  {t.name}
-                </Button>
-              </div>
+              <Button
+                key={t.id}
+                colorScheme={tagColorFactory(t.type)}
+                size="xs"
+                mr="4px"
+                mb="4px">
+                {t.name}
+              </Button>
             ))}
-          </div>
+          </Box>
         ) : null}
         {touched.body &&
         newQuestion.textFormat === 'html' &&
