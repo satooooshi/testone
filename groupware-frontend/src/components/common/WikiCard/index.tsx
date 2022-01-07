@@ -81,7 +81,7 @@ const WikiCard: React.FC<WikiCardProps> = ({ wiki }) => {
         {wiki.type === WikiType.BOARD &&
         wiki.boardCategory === BoardCategory.QA ? (
           <Box
-            mr="8px"
+            mr="16px"
             display="flex"
             flexDir={'row'}
             alignItems="center"
@@ -94,14 +94,12 @@ const WikiCard: React.FC<WikiCardProps> = ({ wiki }) => {
             </Text>
           </Box>
         ) : null}
-        {wiki.type !== WikiType.RULES && (
-          <Text
-            fontSize={isSmallerThan768 ? '14px' : '18px'}
-            color={darkFontColor}
-            display="flex">
-            {dateTimeFormatterFromJSDDate({ dateTime: new Date(createdAt) })}
-          </Text>
-        )}
+        <Text
+          fontSize={isSmallerThan768 ? '14px' : '16px'}
+          color={darkFontColor}
+          display="flex">
+          {dateTimeFormatterFromJSDDate({ dateTime: new Date(createdAt) })}
+        </Text>
       </Box>
       <Box
         display="flex"
