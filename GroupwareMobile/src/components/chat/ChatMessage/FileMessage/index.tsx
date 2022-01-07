@@ -1,11 +1,12 @@
-import React from 'react';
-import {TouchableOpacity, Platform, Alert, Linking} from 'react-native';
+import React, {useState} from 'react';
+import {TouchableOpacity, Platform, Alert} from 'react-native';
 import {Icon, Text} from 'react-native-magnus';
 import {fileMessageStyles} from '../../../../styles/component/chat/fileMessage.style';
 import {ChatMessage} from '../../../../types';
 import FileViewer from 'react-native-file-viewer';
 import RNFetchBlob from 'rn-fetch-blob';
 import {fileNameTransformer} from '../../../../utils/factory/fileNameTransformer';
+import {ActivityIndicator} from 'react-native-paper';
 const {fs, config} = RNFetchBlob;
 
 type FileMessageProps = {
@@ -14,7 +15,9 @@ type FileMessageProps = {
 };
 
 const FileMessage: React.FC<FileMessageProps> = ({message, onLongPress}) => {
+  const [loading, setLoading] = useState(false);
   const downloadFile = async () => {
+    setLoading(true);
     let DownloadDir =
       Platform.OS === 'android' ? fs.dirs.DownloadDir : fs.dirs.DocumentDir;
     const ext = message.content.split(/[#?]/)[0]?.split('.')?.pop()?.trim();
@@ -44,19 +47,31 @@ const FileMessage: React.FC<FileMessageProps> = ({message, onLongPress}) => {
           ])[1] || '',
         ), // this is the path where your downloaded file will live in
     };
-    const {path} = await config(options).fetch('GET', message.content);
-    FileViewer.open(path()).catch(err => {
-      if (err?.message === 'No app associated with this mime type') {
-        Alert.alert('このファイル形式に対応しているアプリがありません');
+    try {
+      const {path} = await config(options).fetch('GET', message.content);
+      setLoading(false);
+      if (path) {
+        FileViewer.open(path()).catch(err => {
+          if (err?.message === 'No app associated with this mime type') {
+            Alert.alert('このファイル形式に対応しているアプリがありません');
+          }
+        });
       }
-    });
+    } catch {
+      Alert.alert('ファイルダウンロード時にエラーが発生しました');
+      setLoading(false);
+    }
   };
   return (
     <TouchableOpacity
       onPress={downloadFile}
       onLongPress={onLongPress}
       style={fileMessageStyles.messageWrapper}>
-      <Icon name="filetext1" fontFamily="AntDesign" fontSize={64} mb={'lg'} />
+      {loading ? (
+        <ActivityIndicator />
+      ) : (
+        <Icon name="filetext1" fontFamily="AntDesign" fontSize={64} mb={'lg'} />
+      )}
       <Text color="blue700" numberOfLines={1}>
         {fileNameTransformer(message.content)}
       </Text>
