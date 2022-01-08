@@ -8,7 +8,6 @@ export const textEditorStyles = StyleSheet.create({
     borderColor: '#e3e3e3',
   },
   quillEditor: {
-    flex: 1,
     minHeight: 200,
   },
 });

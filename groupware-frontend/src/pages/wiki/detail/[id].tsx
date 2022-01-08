@@ -35,6 +35,7 @@ import { stateToHTML } from 'draft-js-export-html';
 import { useHeaderTab } from '@/hooks/headerTab/useHeaderTab';
 import { tagColorFactory } from 'src/utils/factory/tagColorFactory';
 import { useAuthenticate } from 'src/contexts/useAuthenticate';
+import { isEditableWiki } from 'src/utils/factory/isCreatableWiki';
 
 type TOCHead = string[];
 
@@ -303,10 +304,7 @@ const QuestionDetail = () => {
                 body={wiki.body}
                 date={wiki.createdAt}
                 writer={wiki.writer}
-                isWriter={
-                  myself?.id === wiki.writer?.id ||
-                  myself?.role === UserRole.ADMIN
-                }
+                isWriter={isEditableWiki(wiki, user)}
                 onClickEditButton={() =>
                   (myself?.id === wiki.writer?.id ||
                     myself?.role === UserRole.ADMIN) &&

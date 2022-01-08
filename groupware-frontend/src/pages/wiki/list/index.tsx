@@ -6,25 +6,18 @@ import dynamic from 'next/dynamic';
 const ReactPaginate = dynamic(() => import('react-paginate'), { ssr: false });
 import paginationStyles from '@/styles/components/Pagination.module.scss';
 import qaListStyles from '@/styles/layouts/QAList.module.scss';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import LayoutWithTab from '@/components/layout/LayoutWithTab';
 import SearchForm from '@/components/common/SearchForm';
 import { useAPIGetTag } from '@/hooks/api/tag/useAPIGetTag';
 import { toggleTag } from 'src/utils/toggleTag';
-import {
-  BoardCategory,
-  RuleCategory,
-  Tag,
-  UserRole,
-  WikiType,
-} from 'src/types';
+import { BoardCategory, RuleCategory, Tag, WikiType } from 'src/types';
 import { wikiQueryRefresh } from 'src/utils/wikiQueryRefresh';
 import Head from 'next/head';
 import {
   SearchQueryToGetWiki,
   useAPIGetWikiList,
 } from '@/hooks/api/wiki/useAPIGetWikiList';
-import { useAuthenticate } from 'src/contexts/useAuthenticate';
 import { useHeaderTab } from '@/hooks/headerTab/useHeaderTab';
 import TopTabBar, { TopTabBehavior } from '@/components/layout/TopTabBar';
 import { Box, Radio, RadioGroup, Stack, Text } from '@chakra-ui/react';
@@ -41,7 +34,6 @@ const QAQuestionList = () => {
     rule_category,
     board_category,
   } = router.query as SearchQueryToGetWiki;
-  const { user } = useAuthenticate();
   const { data: questions, isLoading } = useAPIGetWikiList({
     page,
     tag,
@@ -278,28 +270,6 @@ const QAQuestionList = () => {
 
   const tabs: Tab[] = useHeaderTab({ headerTabType: 'wikiList', queryRefresh });
 
-  const onClickCreateButton =
-    type === WikiType.RULES || type === WikiType.ALL_POSTAL
-      ? user?.role === UserRole.ADMIN
-        ? () => {
-            router.push('/wiki/new?type=' + type || '');
-          }
-        : undefined
-      : () => {
-          router.push('/wiki/new?type=' + type || '');
-        };
-
-  const headerRightButtonName = useMemo(() => {
-    return type
-      ? `${wikiTypeNameFactory(
-          type,
-          rule_category,
-          true,
-          board_category,
-        )}を新規作成`
-      : 'Wikiを新規作成';
-  }, [board_category, rule_category, type]);
-
   const initialHeaderValue = {
     title: '社内Wiki',
     activeTabName:
@@ -311,8 +281,8 @@ const QAQuestionList = () => {
         ? 'オール便'
         : 'All',
     tabs,
-    rightButtonName: headerRightButtonName,
-    onClickRightButton: onClickCreateButton,
+    rightButtonName: 'Wikiを作成',
+    onClickRightButton: () => router.push('/wiki/new'),
   };
 
   useEffect(() => {
