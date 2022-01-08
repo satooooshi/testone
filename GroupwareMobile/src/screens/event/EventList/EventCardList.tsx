@@ -54,11 +54,20 @@ const EventCardList: React.FC<EventCardListProps> = ({
     status,
     type,
   });
-  const {data: events, isLoading} = useAPIGetEventList(searchQuery);
+  const {isLoading} = useAPIGetEventList(searchQuery, {
+    onSuccess: data => {
+      setEventsForInfiniteScroll(e => {
+        if (e.length) {
+          return [...e, ...data.events];
+        }
+        return data.events;
+      });
+    },
+  });
   const [visibleSearchFormModal, setVisibleSearchFormModal] = useState(false);
   const [eventsForInfinitScroll, setEventsForInfiniteScroll] = useState<
     EventSchedule[]
-  >(events?.events || []);
+  >([]);
 
   const onEndReached = () => {
     setSearchQuery(q => ({
@@ -76,17 +85,6 @@ const EventCardList: React.FC<EventCardListProps> = ({
       setPartOfSearchQuery({refetchNeeded: false});
     }
   }, [partOfSearchQuery.refetchNeeded, setPartOfSearchQuery]);
-
-  useEffect(() => {
-    if (events?.events) {
-      setEventsForInfiniteScroll(e => {
-        if (e.length) {
-          return [...e, ...events.events];
-        }
-        return events.events;
-      });
-    }
-  }, [events?.events]);
 
   const queryRefresh = (
     query: Partial<SearchQueryToGetEvents>,
