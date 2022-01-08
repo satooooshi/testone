@@ -1,4 +1,4 @@
-import {useFocusEffect, useNavigation} from '@react-navigation/native';
+import {useFocusEffect} from '@react-navigation/native';
 import React, {useCallback, useEffect, useState} from 'react';
 import {FlatList} from 'react-native';
 import {Text, Div} from 'react-native-magnus';
@@ -7,18 +7,16 @@ import UserRow from '../../../components/admin/UesrRow';
 import SearchForm from '../../../components/common/SearchForm';
 import SearchFormOpenerButton from '../../../components/common/SearchForm/SearchFormOpenerButton';
 import HeaderWithTextButton from '../../../components/Header';
-import {Tab} from '../../../components/Header/HeaderTemplate';
 import WholeContainer from '../../../components/WholeContainer';
+import {useAdminHeaderTab} from '../../../contexts/admin/useAdminHeaderTab';
 import {useAPIGetUserTag} from '../../../hooks/api/tag/useAPIGetUserTag';
 import {
   SearchQueryToGetUsers,
   useAPISearchUsers,
 } from '../../../hooks/api/user/useAPISearchUsers';
 import {User, UserTag} from '../../../types';
-import {UserAdminNavigationProps} from '../../../types/navigator/drawerScreenProps';
 
 const UserAdmin: React.FC = () => {
-  const navigation = useNavigation<UserAdminNavigationProps>();
   const [searchQuery, setSearchQuery] = useState<SearchQueryToGetUsers>({
     page: '1',
   });
@@ -46,26 +44,7 @@ const UserAdmin: React.FC = () => {
     [],
   );
 
-  const tabs: Tab[] = [
-    {
-      name: 'ユーザー管理',
-      onPress: () => navigation.navigate('AdminStack', {screen: 'UserAdmin'}),
-    },
-    {
-      name: 'ユーザー作成',
-      onPress: () =>
-        navigation.navigate('AdminStack', {screen: 'UserRegisteringAdmin'}),
-    },
-    {
-      name: 'タグ管理',
-      onPress: () => navigation.navigate('AdminStack', {screen: 'TagAdmin'}),
-    },
-    {
-      name: 'タグ管理(ユーザー)',
-      onPress: () =>
-        navigation.navigate('AdminStack', {screen: 'UserTagAdmin'}),
-    },
-  ];
+  const tabs = useAdminHeaderTab();
 
   const onEndReached = () => {
     setSearchQuery(q => ({...q, page: (Number(q.page) + 1).toString()}));

@@ -1,22 +1,20 @@
-import {useNavigation} from '@react-navigation/native';
 import React from 'react';
 import {Alert, useWindowDimensions} from 'react-native';
 import {Overlay, ScrollDiv} from 'react-native-magnus';
 import {ActivityIndicator} from 'react-native-paper';
 import TagCollapse from '../../../components/admin/TagCollapse';
 import HeaderWithTextButton from '../../../components/Header';
-import {Tab} from '../../../components/Header/HeaderTemplate';
 import WholeContainer from '../../../components/WholeContainer';
+import {useAdminHeaderTab} from '../../../contexts/admin/useAdminHeaderTab';
+import {useAuthenticate} from '../../../contexts/useAuthenticate';
 import {useAPICreateTag} from '../../../hooks/api/tag/useAPICreateTag';
 import {useAPIDeleteTag} from '../../../hooks/api/tag/useAPIDeleteTag';
 import {useAPIGetTag} from '../../../hooks/api/tag/useAPIGetTag';
 import {useTagType} from '../../../hooks/tag/useTagType';
 import {tagAdminStyles} from '../../../styles/screen/admin/tagAdmin.style';
-import {Tag, TagType} from '../../../types';
-import {TagAdminNavigationProps} from '../../../types/navigator/drawerScreenProps';
+import {Tag, TagType, UserRole} from '../../../types';
 
 const TagAdmin: React.FC = () => {
-  const navigation = useNavigation<TagAdminNavigationProps>();
   const {data: tags, refetch, isLoading: loadingTags} = useAPIGetTag();
   const {mutate: createTag, isLoading: loadingCreateTag} = useAPICreateTag({
     onSuccess: () => {
@@ -65,26 +63,9 @@ const TagAdmin: React.FC = () => {
   const modifiedTags: Tag[] =
     tags?.map(t => ({...t, name: modifyStrToFlat(t.name)})) || [];
 
-  const tabs: Tab[] = [
-    {
-      name: 'ユーザー管理',
-      onPress: () => navigation.navigate('AdminStack', {screen: 'UserAdmin'}),
-    },
-    {
-      name: 'ユーザー作成',
-      onPress: () =>
-        navigation.navigate('AdminStack', {screen: 'UserRegisteringAdmin'}),
-    },
-    {
-      name: 'タグ管理',
-      onPress: () => navigation.navigate('AdminStack', {screen: 'TagAdmin'}),
-    },
-    {
-      name: 'タグ管理(ユーザー)',
-      onPress: () =>
-        navigation.navigate('AdminStack', {screen: 'UserTagAdmin'}),
-    },
-  ];
+  const tabs = useAdminHeaderTab();
+  const {user} = useAuthenticate();
+  const isAdmin = user?.role === UserRole.ADMIN;
 
   const handleDelete = (t: Tag) => {
     if (t.name) {
@@ -141,20 +122,24 @@ const TagAdmin: React.FC = () => {
           onLongPressTag={handleDelete}
           mb={'lg'}
         />
-        <TagCollapse
-          tags={qualificationTags || []}
-          tagType={TagType.QUALIFICATION}
-          onPressSaveButton={handleCreate}
-          onLongPressTag={handleDelete}
-          mb={'lg'}
-        />
-        <TagCollapse
-          tags={clubTags || []}
-          tagType={TagType.CLUB}
-          onPressSaveButton={handleCreate}
-          onLongPressTag={handleDelete}
-          mb={'lg'}
-        />
+        {isAdmin ? (
+          <>
+            <TagCollapse
+              tags={qualificationTags || []}
+              tagType={TagType.QUALIFICATION}
+              onPressSaveButton={handleCreate}
+              onLongPressTag={handleDelete}
+              mb={'lg'}
+            />
+            <TagCollapse
+              tags={clubTags || []}
+              tagType={TagType.CLUB}
+              onPressSaveButton={handleCreate}
+              onLongPressTag={handleDelete}
+              mb={'lg'}
+            />
+          </>
+        ) : null}
         <TagCollapse
           tags={hobbyTags || []}
           tagType={TagType.HOBBY}
@@ -162,13 +147,15 @@ const TagAdmin: React.FC = () => {
           onLongPressTag={handleDelete}
           mb={'lg'}
         />
-        <TagCollapse
-          tags={otherTags || []}
-          tagType={TagType.OTHER}
-          onPressSaveButton={handleCreate}
-          onLongPressTag={handleDelete}
-          mb={'lg'}
-        />
+        {isAdmin ? (
+          <TagCollapse
+            tags={otherTags || []}
+            tagType={TagType.OTHER}
+            onPressSaveButton={handleCreate}
+            onLongPressTag={handleDelete}
+            mb={'lg'}
+          />
+        ) : null}
       </ScrollDiv>
     </WholeContainer>
   );

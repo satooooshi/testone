@@ -140,7 +140,7 @@ const RenderWikiCardList: React.FC<RenderWikiCardListProps> = ({
         ) : null}
         {wikiForInfiniteScroll.length ? (
           <FlatList
-            contentContainerStyle={tailwind('mb-8')}
+            contentContainerStyle={tailwind('pb-8')}
             onEndReached={onEndReached}
             onEndReachedThreshold={0.5}
             data={wikiForInfiniteScroll || []}

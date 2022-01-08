@@ -5,10 +5,8 @@ import HeaderWithTextButton from '../../../components/Header';
 import {Tab} from '../../../components/Header/HeaderTemplate';
 import WholeContainer from '../../../components/WholeContainer';
 import {useEventCardListSearchQuery} from '../../../contexts/event/useEventSearchQuery';
-import {useAuthenticate} from '../../../contexts/useAuthenticate';
 import {EventType} from '../../../types';
 import {EventListRouteProps} from '../../../types/navigator/drawerScreenProps';
-import {isEventCreatableUser} from '../../../utils/factory/event/isCreatableEvent';
 import {eventTypeColorFactory} from '../../../utils/factory/eventTypeColorFactory';
 import eventTypeNameFactory from '../../../utils/factory/eventTypeNameFactory';
 import EventCalendar from './EventCalendar';
@@ -17,7 +15,6 @@ import EventCardList from './EventCardList';
 const TopTab = createMaterialTopTabNavigator();
 
 const EventSearcher: React.FC = () => {
-  const {user} = useAuthenticate();
   const typePassedByRoute = useRoute<EventListRouteProps>()?.params?.type;
   const tagPassedByRoute = useRoute<EventListRouteProps>()?.params?.tag;
   const personalPassedByRoute =
@@ -87,14 +84,8 @@ const EventSearcher: React.FC = () => {
             ? eventTypeNameFactory(partOfSearchQuery.type)
             : 'All'
         }
-        rightButtonName={
-          isEventCreatableUser(user?.role) ? '新規イベント' : undefined
-        }
-        onPressRightButton={
-          isEventCreatableUser(user?.role)
-            ? () => setEventFormModal(true)
-            : undefined
-        }
+        rightButtonName={'新規イベント'}
+        onPressRightButton={() => setEventFormModal(true)}
       />
       <TopTab.Navigator
         initialRouteName={

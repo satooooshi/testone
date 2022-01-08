@@ -29,6 +29,8 @@ import {wikiTypeNameFactory} from '../../utils/factory/wiki/wikiTypeNameFactory'
 import {wikiSchema} from '../../utils/validation/schema';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import {NodeHtmlMarkdown} from 'node-html-markdown';
+import {useAuthenticate} from '../../contexts/useAuthenticate';
+import {isCreatableWiki} from '../../utils/factory/wiki/isCreatableWiki';
 
 type WikiFormProps = {
   wiki?: Wiki;
@@ -128,6 +130,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
     );
   };
   const isEdit = !!wiki?.id;
+  const {user} = useAuthenticate();
 
   const formatDropdown = (
     <Dropdown
@@ -163,223 +166,319 @@ const WikiForm: React.FC<WikiFormProps> = ({
       {...defaultDropdownProps}
       title="タイプを選択"
       ref={typeDropdownRef}>
-      <Dropdown.Option
-        {...defaultDropdownOptionProps}
-        onPress={() =>
-          setNewWiki(w => ({
-            ...w,
-            type: WikiType.RULES,
-            ruleCategory: RuleCategory.RULES,
-          }))
-        }
-        value={RuleCategory.RULES}>
-        {wikiTypeNameFactory(WikiType.RULES, RuleCategory.RULES, true)}
-      </Dropdown.Option>
-      <Dropdown.Option
-        {...defaultDropdownOptionProps}
-        onPress={() =>
-          setNewWiki(w => ({
-            ...w,
-            type: WikiType.RULES,
-            ruleCategory: RuleCategory.PHILOSOPHY,
-          }))
-        }
-        value={RuleCategory.PHILOSOPHY}>
-        {wikiTypeNameFactory(WikiType.RULES, RuleCategory.PHILOSOPHY, true)}
-      </Dropdown.Option>
-      <Dropdown.Option
-        {...defaultDropdownOptionProps}
-        onPress={() =>
-          setNewWiki(w => ({
-            ...w,
-            type: WikiType.RULES,
-            ruleCategory: RuleCategory.ABC,
-          }))
-        }
-        value={RuleCategory.ABC}>
-        {wikiTypeNameFactory(WikiType.RULES, RuleCategory.ABC, true)}
-      </Dropdown.Option>
-      <Dropdown.Option
-        {...defaultDropdownOptionProps}
-        onPress={() =>
-          setNewWiki(w => ({
-            ...w,
-            type: WikiType.RULES,
-            ruleCategory: RuleCategory.BENEFITS,
-          }))
-        }
-        value={RuleCategory.BENEFITS}>
-        {wikiTypeNameFactory(WikiType.RULES, RuleCategory.BENEFITS, true)}
-      </Dropdown.Option>
-      <Dropdown.Option
-        {...defaultDropdownOptionProps}
-        onPress={() =>
-          setNewWiki(w => ({
-            ...w,
-            type: WikiType.RULES,
-            ruleCategory: RuleCategory.DOCUMENT,
-          }))
-        }
-        value={RuleCategory.DOCUMENT}>
-        {wikiTypeNameFactory(WikiType.RULES, RuleCategory.DOCUMENT, true)}
-      </Dropdown.Option>
-      <Dropdown.Option
-        {...defaultDropdownOptionProps}
-        onPress={() =>
-          setNewWiki(w => ({
-            ...w,
-            type: WikiType.ALL_POSTAL,
-            ruleCategory: RuleCategory.NON_RULE,
-          }))
-        }
-        value={WikiType.ALL_POSTAL}>
-        {wikiTypeNameFactory(WikiType.ALL_POSTAL)}
-      </Dropdown.Option>
-      <Dropdown.Option
-        {...defaultDropdownOptionProps}
-        onPress={() =>
-          setNewWiki(w => ({
-            ...w,
-            type: WikiType.BOARD,
-            ruleCategory: RuleCategory.NON_RULE,
-            boardCategory: BoardCategory.KNOWLEDGE,
-          }))
-        }
-        value={BoardCategory.KNOWLEDGE}>
-        {wikiTypeNameFactory(
-          WikiType.BOARD,
-          undefined,
-          true,
-          BoardCategory.KNOWLEDGE,
-        )}
-      </Dropdown.Option>
-      <Dropdown.Option
-        {...defaultDropdownOptionProps}
-        onPress={() =>
-          setNewWiki(w => ({
-            ...w,
-            type: WikiType.BOARD,
-            ruleCategory: RuleCategory.NON_RULE,
-            boardCategory: BoardCategory.QA,
-          }))
-        }
-        value={BoardCategory.QA}>
-        {wikiTypeNameFactory(WikiType.BOARD, undefined, true, BoardCategory.QA)}
-      </Dropdown.Option>
-      <Dropdown.Option
-        {...defaultDropdownOptionProps}
-        onPress={() =>
-          setNewWiki(w => ({
-            ...w,
-            type: WikiType.BOARD,
-            ruleCategory: RuleCategory.NON_RULE,
-            boardCategory: BoardCategory.NEWS,
-          }))
-        }
-        value={BoardCategory.NEWS}>
-        {wikiTypeNameFactory(
-          WikiType.BOARD,
-          undefined,
-          true,
-          BoardCategory.NEWS,
-        )}
-      </Dropdown.Option>
-      <Dropdown.Option
-        {...defaultDropdownOptionProps}
-        onPress={() =>
-          setNewWiki(w => ({
-            ...w,
-            type: WikiType.BOARD,
-            ruleCategory: RuleCategory.NON_RULE,
-            boardCategory: BoardCategory.IMPRESSIVE_UNIVERSITY,
-          }))
-        }
-        value={BoardCategory.IMPRESSIVE_UNIVERSITY}>
-        {wikiTypeNameFactory(
-          WikiType.BOARD,
-          undefined,
-          true,
-          BoardCategory.IMPRESSIVE_UNIVERSITY,
-        )}
-      </Dropdown.Option>
-      <Dropdown.Option
-        {...defaultDropdownOptionProps}
-        onPress={() =>
-          setNewWiki(w => ({
-            ...w,
-            type: WikiType.BOARD,
-            ruleCategory: RuleCategory.NON_RULE,
-            boardCategory: BoardCategory.CLUB,
-          }))
-        }
-        value={BoardCategory.CLUB}>
-        {wikiTypeNameFactory(
-          WikiType.BOARD,
-          undefined,
-          true,
-          BoardCategory.CLUB,
-        )}
-      </Dropdown.Option>
-      <Dropdown.Option
-        {...defaultDropdownOptionProps}
-        onPress={() =>
-          setNewWiki(w => ({
-            ...w,
-            type: WikiType.BOARD,
-            ruleCategory: RuleCategory.NON_RULE,
-            boardCategory: BoardCategory.STUDY_MEETING,
-          }))
-        }
-        value={BoardCategory.STUDY_MEETING}>
-        {wikiTypeNameFactory(
-          WikiType.BOARD,
-          undefined,
-          true,
-          BoardCategory.STUDY_MEETING,
-        )}
-      </Dropdown.Option>
-      <Dropdown.Option
-        {...defaultDropdownOptionProps}
-        onPress={() =>
-          setNewWiki(w => ({
-            ...w,
-            type: WikiType.BOARD,
-            ruleCategory: RuleCategory.NON_RULE,
-            boardCategory: BoardCategory.CELEBRATION,
-          }))
-        }
-        value={BoardCategory.CELEBRATION}>
-        {wikiTypeNameFactory(
-          WikiType.BOARD,
-          undefined,
-          true,
-          BoardCategory.CELEBRATION,
-        )}
-      </Dropdown.Option>
-      <Dropdown.Option
-        {...defaultDropdownOptionProps}
-        onPress={() =>
-          setNewWiki(w => ({
-            ...w,
-            type: WikiType.BOARD,
-            ruleCategory: RuleCategory.NON_RULE,
-            boardCategory: BoardCategory.OTHER,
-          }))
-        }
-        value={BoardCategory.OTHER}>
-        {wikiTypeNameFactory(
-          WikiType.BOARD,
-          undefined,
-          true,
-          BoardCategory.OTHER,
-        )}
-      </Dropdown.Option>
+      {isCreatableWiki({type: WikiType.RULES, userRole: user?.role}) ? (
+        <Dropdown.Option
+          {...defaultDropdownOptionProps}
+          onPress={() =>
+            setNewWiki(w => ({
+              ...w,
+              type: WikiType.RULES,
+              ruleCategory: RuleCategory.RULES,
+            }))
+          }
+          value={RuleCategory.RULES}>
+          {wikiTypeNameFactory(WikiType.RULES, RuleCategory.RULES, true)}
+        </Dropdown.Option>
+      ) : (
+        <></>
+      )}
+      {isCreatableWiki({type: WikiType.RULES, userRole: user?.role}) ? (
+        <Dropdown.Option
+          {...defaultDropdownOptionProps}
+          onPress={() =>
+            setNewWiki(w => ({
+              ...w,
+              type: WikiType.RULES,
+              ruleCategory: RuleCategory.PHILOSOPHY,
+            }))
+          }
+          value={RuleCategory.PHILOSOPHY}>
+          {wikiTypeNameFactory(WikiType.RULES, RuleCategory.PHILOSOPHY, true)}
+        </Dropdown.Option>
+      ) : (
+        <></>
+      )}
+      {isCreatableWiki({type: WikiType.RULES, userRole: user?.role}) ? (
+        <Dropdown.Option
+          {...defaultDropdownOptionProps}
+          onPress={() =>
+            setNewWiki(w => ({
+              ...w,
+              type: WikiType.RULES,
+              ruleCategory: RuleCategory.ABC,
+            }))
+          }
+          value={RuleCategory.ABC}>
+          {wikiTypeNameFactory(WikiType.RULES, RuleCategory.ABC, true)}
+        </Dropdown.Option>
+      ) : (
+        <></>
+      )}
+      {isCreatableWiki({type: WikiType.RULES, userRole: user?.role}) ? (
+        <Dropdown.Option
+          {...defaultDropdownOptionProps}
+          onPress={() =>
+            setNewWiki(w => ({
+              ...w,
+              type: WikiType.RULES,
+              ruleCategory: RuleCategory.BENEFITS,
+            }))
+          }
+          value={RuleCategory.BENEFITS}>
+          {wikiTypeNameFactory(WikiType.RULES, RuleCategory.BENEFITS, true)}
+        </Dropdown.Option>
+      ) : (
+        <></>
+      )}
+      {isCreatableWiki({type: WikiType.RULES, userRole: user?.role}) ? (
+        <Dropdown.Option
+          {...defaultDropdownOptionProps}
+          onPress={() =>
+            setNewWiki(w => ({
+              ...w,
+              type: WikiType.RULES,
+              ruleCategory: RuleCategory.DOCUMENT,
+            }))
+          }
+          value={RuleCategory.DOCUMENT}>
+          {wikiTypeNameFactory(WikiType.RULES, RuleCategory.DOCUMENT, true)}
+        </Dropdown.Option>
+      ) : (
+        <></>
+      )}
+      {isCreatableWiki({type: WikiType.ALL_POSTAL, userRole: user?.role}) ? (
+        <Dropdown.Option
+          {...defaultDropdownOptionProps}
+          onPress={() =>
+            setNewWiki(w => ({
+              ...w,
+              type: WikiType.ALL_POSTAL,
+              ruleCategory: RuleCategory.NON_RULE,
+            }))
+          }
+          value={WikiType.ALL_POSTAL}>
+          {wikiTypeNameFactory(WikiType.ALL_POSTAL)}
+        </Dropdown.Option>
+      ) : (
+        <></>
+      )}
+      {isCreatableWiki({
+        type: WikiType.BOARD,
+        boardCategory: BoardCategory.KNOWLEDGE,
+        userRole: user?.role,
+      }) ? (
+        <Dropdown.Option
+          {...defaultDropdownOptionProps}
+          onPress={() =>
+            setNewWiki(w => ({
+              ...w,
+              type: WikiType.BOARD,
+              ruleCategory: RuleCategory.NON_RULE,
+              boardCategory: BoardCategory.KNOWLEDGE,
+            }))
+          }
+          value={BoardCategory.KNOWLEDGE}>
+          {wikiTypeNameFactory(
+            WikiType.BOARD,
+            undefined,
+            true,
+            BoardCategory.KNOWLEDGE,
+          )}
+        </Dropdown.Option>
+      ) : (
+        <></>
+      )}
+      {isCreatableWiki({
+        type: WikiType.BOARD,
+        boardCategory: BoardCategory.QA,
+        userRole: user?.role,
+      }) ? (
+        <Dropdown.Option
+          {...defaultDropdownOptionProps}
+          onPress={() =>
+            setNewWiki(w => ({
+              ...w,
+              type: WikiType.BOARD,
+              ruleCategory: RuleCategory.NON_RULE,
+              boardCategory: BoardCategory.QA,
+            }))
+          }
+          value={BoardCategory.QA}>
+          {wikiTypeNameFactory(
+            WikiType.BOARD,
+            undefined,
+            true,
+            BoardCategory.QA,
+          )}
+        </Dropdown.Option>
+      ) : (
+        <></>
+      )}
+      {isCreatableWiki({
+        type: WikiType.BOARD,
+        boardCategory: BoardCategory.NEWS,
+        userRole: user?.role,
+      }) ? (
+        <Dropdown.Option
+          {...defaultDropdownOptionProps}
+          onPress={() =>
+            setNewWiki(w => ({
+              ...w,
+              type: WikiType.BOARD,
+              ruleCategory: RuleCategory.NON_RULE,
+              boardCategory: BoardCategory.NEWS,
+            }))
+          }
+          value={BoardCategory.NEWS}>
+          {wikiTypeNameFactory(
+            WikiType.BOARD,
+            undefined,
+            true,
+            BoardCategory.NEWS,
+          )}
+        </Dropdown.Option>
+      ) : (
+        <></>
+      )}
+      {isCreatableWiki({
+        type: WikiType.BOARD,
+        boardCategory: BoardCategory.IMPRESSIVE_UNIVERSITY,
+        userRole: user?.role,
+      }) ? (
+        <Dropdown.Option
+          {...defaultDropdownOptionProps}
+          onPress={() =>
+            setNewWiki(w => ({
+              ...w,
+              type: WikiType.BOARD,
+              ruleCategory: RuleCategory.NON_RULE,
+              boardCategory: BoardCategory.IMPRESSIVE_UNIVERSITY,
+            }))
+          }
+          value={BoardCategory.IMPRESSIVE_UNIVERSITY}>
+          {wikiTypeNameFactory(
+            WikiType.BOARD,
+            undefined,
+            true,
+            BoardCategory.IMPRESSIVE_UNIVERSITY,
+          )}
+        </Dropdown.Option>
+      ) : (
+        <></>
+      )}
+      {isCreatableWiki({
+        type: WikiType.BOARD,
+        boardCategory: BoardCategory.CLUB,
+        userRole: user?.role,
+      }) ? (
+        <Dropdown.Option
+          {...defaultDropdownOptionProps}
+          onPress={() =>
+            setNewWiki(w => ({
+              ...w,
+              type: WikiType.BOARD,
+              ruleCategory: RuleCategory.NON_RULE,
+              boardCategory: BoardCategory.CLUB,
+            }))
+          }
+          value={BoardCategory.CLUB}>
+          {wikiTypeNameFactory(
+            WikiType.BOARD,
+            undefined,
+            true,
+            BoardCategory.CLUB,
+          )}
+        </Dropdown.Option>
+      ) : (
+        <></>
+      )}
+      {isCreatableWiki({
+        type: WikiType.BOARD,
+        boardCategory: BoardCategory.STUDY_MEETING,
+        userRole: user?.role,
+      }) ? (
+        <Dropdown.Option
+          {...defaultDropdownOptionProps}
+          onPress={() =>
+            setNewWiki(w => ({
+              ...w,
+              type: WikiType.BOARD,
+              ruleCategory: RuleCategory.NON_RULE,
+              boardCategory: BoardCategory.STUDY_MEETING,
+            }))
+          }
+          value={BoardCategory.STUDY_MEETING}>
+          {wikiTypeNameFactory(
+            WikiType.BOARD,
+            undefined,
+            true,
+            BoardCategory.STUDY_MEETING,
+          )}
+        </Dropdown.Option>
+      ) : (
+        <></>
+      )}
+      {isCreatableWiki({
+        type: WikiType.BOARD,
+        boardCategory: BoardCategory.CELEBRATION,
+        userRole: user?.role,
+      }) ? (
+        <Dropdown.Option
+          {...defaultDropdownOptionProps}
+          onPress={() =>
+            setNewWiki(w => ({
+              ...w,
+              type: WikiType.BOARD,
+              ruleCategory: RuleCategory.NON_RULE,
+              boardCategory: BoardCategory.CELEBRATION,
+            }))
+          }
+          value={BoardCategory.CELEBRATION}>
+          {wikiTypeNameFactory(
+            WikiType.BOARD,
+            undefined,
+            true,
+            BoardCategory.CELEBRATION,
+          )}
+        </Dropdown.Option>
+      ) : (
+        <></>
+      )}
+      {isCreatableWiki({
+        type: WikiType.BOARD,
+        boardCategory: BoardCategory.OTHER,
+        userRole: user?.role,
+      }) ? (
+        <Dropdown.Option
+          {...defaultDropdownOptionProps}
+          onPress={() =>
+            setNewWiki(w => ({
+              ...w,
+              type: WikiType.BOARD,
+              ruleCategory: RuleCategory.NON_RULE,
+              boardCategory: BoardCategory.OTHER,
+            }))
+          }
+          value={BoardCategory.OTHER}>
+          {wikiTypeNameFactory(
+            WikiType.BOARD,
+            undefined,
+            true,
+            BoardCategory.OTHER,
+          )}
+        </Dropdown.Option>
+      ) : (
+        <></>
+      )}
     </Dropdown>
   );
 
   return (
     <WholeContainer>
-      <HeaderWithTextButton title="Wiki作成" enableBackButton={true} />
+      <HeaderWithTextButton
+        title={wiki?.id ? 'Wiki編集' : 'Wiki作成'}
+        enableBackButton={true}
+      />
       <TagModal
         onCompleteModal={selectedTagsInModal =>
           setNewWiki(w => ({...w, tags: selectedTagsInModal}))

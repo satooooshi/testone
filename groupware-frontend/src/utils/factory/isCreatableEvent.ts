@@ -1,4 +1,4 @@
-import {EventSchedule, EventType, User, UserRole} from '../../../types';
+import { EventType, UserRole, EventSchedule, User } from 'src/types';
 
 export const isCreatableEvent = (
   type: EventType,
