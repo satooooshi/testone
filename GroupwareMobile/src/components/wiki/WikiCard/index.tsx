@@ -44,7 +44,7 @@ const WikiCard: React.FC<WikiCardProps> = ({wiki}) => {
             {wiki.title}
           </Text>
         </Div>
-        <Div flexDir="row" justifyContent="flex-end" mb={4}>
+        <Div flexDir="row" justifyContent="flex-end" mb={4} mr={4}>
           {isQA ? (
             <Div mr="lg" flexDir="row">
               <Text textAlignVertical="bottom" mr={2}>
