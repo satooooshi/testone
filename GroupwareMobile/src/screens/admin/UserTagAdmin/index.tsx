@@ -1,22 +1,20 @@
-import {useNavigation} from '@react-navigation/native';
 import React from 'react';
 import {Alert, useWindowDimensions} from 'react-native';
 import {Overlay, ScrollDiv} from 'react-native-magnus';
 import {ActivityIndicator} from 'react-native-paper';
 import TagCollapse from '../../../components/admin/TagCollapse';
 import HeaderWithTextButton from '../../../components/Header';
-import {Tab} from '../../../components/Header/HeaderTemplate';
 import WholeContainer from '../../../components/WholeContainer';
+import {useAdminHeaderTab} from '../../../contexts/admin/useAdminHeaderTab';
+import {useAuthenticate} from '../../../contexts/useAuthenticate';
 import {useAPICreateUserTag} from '../../../hooks/api/tag/useAPICreateUesrTag';
 import {useAPIDeleteUserTag} from '../../../hooks/api/tag/useAPIDelteUserTag';
 import {useAPIGetUserTag} from '../../../hooks/api/tag/useAPIGetUserTag';
 import {useTagType} from '../../../hooks/tag/useTagType';
 import {tagAdminStyles} from '../../../styles/screen/admin/tagAdmin.style';
-import {TagType, UserTag} from '../../../types';
-import {UserTagAdminNavigationProps} from '../../../types/navigator/drawerScreenProps';
+import {TagType, UserRole, UserTag} from '../../../types';
 
 const UserTagAdmin: React.FC = () => {
-  const navigation = useNavigation<UserTagAdminNavigationProps>();
   const {data: tags, refetch, isLoading: loadingTags} = useAPIGetUserTag();
   const {mutate: createTag, isLoading: loadingCreateTag} = useAPICreateUserTag({
     onSuccess: () => {
@@ -65,26 +63,9 @@ const UserTagAdmin: React.FC = () => {
   const modifiedTags: UserTag[] =
     tags?.map(t => ({...t, name: modifyStrToFlat(t.name)})) || [];
 
-  const tabs: Tab[] = [
-    {
-      name: 'ユーザー管理',
-      onPress: () => navigation.navigate('AdminStack', {screen: 'UserAdmin'}),
-    },
-    {
-      name: 'ユーザー作成',
-      onPress: () =>
-        navigation.navigate('AdminStack', {screen: 'UserRegisteringAdmin'}),
-    },
-    {
-      name: 'タグ管理',
-      onPress: () => navigation.navigate('AdminStack', {screen: 'TagAdmin'}),
-    },
-    {
-      name: 'タグ管理(ユーザー)',
-      onPress: () =>
-        navigation.navigate('AdminStack', {screen: 'UserTagAdmin'}),
-    },
-  ];
+  const tabs = useAdminHeaderTab();
+  const {user} = useAuthenticate();
+  const isAdmin = user?.role === UserRole.ADMIN;
 
   const handleDelete = (t: UserTag) => {
     if (t.name) {
@@ -134,20 +115,24 @@ const UserTagAdmin: React.FC = () => {
           ...tagAdminStyles.scrollView,
           width: windowWidth * 0.9,
         }}>
-        <TagCollapse
-          tags={techTags || []}
-          tagType={TagType.TECH}
-          onPressSaveButton={handleCreate}
-          onLongPressTag={handleDelete}
-          mb={'lg'}
-        />
-        <TagCollapse
-          tags={qualificationTags || []}
-          tagType={TagType.QUALIFICATION}
-          onPressSaveButton={handleCreate}
-          onLongPressTag={handleDelete}
-          mb={'lg'}
-        />
+        {isAdmin ? (
+          <>
+            <TagCollapse
+              tags={techTags || []}
+              tagType={TagType.TECH}
+              onPressSaveButton={handleCreate}
+              onLongPressTag={handleDelete}
+              mb={'lg'}
+            />
+            <TagCollapse
+              tags={qualificationTags || []}
+              tagType={TagType.QUALIFICATION}
+              onPressSaveButton={handleCreate}
+              onLongPressTag={handleDelete}
+              mb={'lg'}
+            />
+          </>
+        ) : null}
         <TagCollapse
           tags={clubTags || []}
           tagType={TagType.CLUB}
@@ -162,13 +147,15 @@ const UserTagAdmin: React.FC = () => {
           onLongPressTag={handleDelete}
           mb={'lg'}
         />
-        <TagCollapse
-          tags={otherTags || []}
-          tagType={TagType.OTHER}
-          onPressSaveButton={handleCreate}
-          onLongPressTag={handleDelete}
-          mb={'lg'}
-        />
+        {isAdmin ? (
+          <TagCollapse
+            tags={otherTags || []}
+            tagType={TagType.OTHER}
+            onPressSaveButton={handleCreate}
+            onLongPressTag={handleDelete}
+            mb={'lg'}
+          />
+        ) : null}
       </ScrollDiv>
     </WholeContainer>
   );
