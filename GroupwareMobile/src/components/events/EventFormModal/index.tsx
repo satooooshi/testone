@@ -46,6 +46,7 @@ import {useAPIGetUsers} from '../../../hooks/api/user/useAPIGetUsers';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import {isCreatableEvent} from '../../../utils/factory/event/isCreatableEvent';
 import {useAuthenticate} from '../../../contexts/useAuthenticate';
+import tailwind from 'tailwind-rn';
 
 type CustomModalProps = Omit<ModalProps, 'children'>;
 
@@ -274,7 +275,7 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
         <KeyboardAwareScrollView
           contentContainerStyle={{
             width: windowWidth * 0.9,
-            alignSelf: 'center',
+            ...tailwind('self-center'),
           }}>
           <Button
             bg="gray400"

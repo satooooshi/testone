@@ -32,7 +32,6 @@ import {ActivityIndicator} from 'react-native-paper';
 import {useAPICreateEvent} from '../../../hooks/api/event/useAPICreateEvent';
 import EventFormModal from '../../../components/events/EventFormModal';
 import {useEventCardListSearchQuery} from '../../../contexts/event/useEventSearchQuery';
-import {isEventCreatableUser} from '../../../utils/factory/event/isCreatableEvent';
 
 type EventCalendarProps = {
   personal?: boolean;
@@ -247,14 +246,12 @@ const EventCalendar: React.FC<EventCalendarProps> = ({
 
   return (
     <>
-      {isEventCreatableUser(user?.role) ? (
-        <EventFormModal
-          type={partOfSearchQuery.type || undefined}
-          isVisible={visibleEventFormModal}
-          onCloseModal={hideEventFormModal}
-          onSubmit={event => saveEvent(event)}
-        />
-      ) : null}
+      <EventFormModal
+        type={partOfSearchQuery.type || undefined}
+        isVisible={visibleEventFormModal}
+        onCloseModal={hideEventFormModal}
+        onSubmit={event => saveEvent(event)}
+      />
       <Div
         flexDir="row"
         justifyContent="space-between"
