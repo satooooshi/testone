@@ -133,7 +133,7 @@ const EventCardList: React.FC<EventCardListProps> = ({
       <Div flexDir="column" alignItems="center">
         {eventsForInfinitScroll?.length ? (
           <FlatList
-            style={tailwind('h-full')}
+            style={tailwind('h-full pt-4')}
             onEndReached={onEndReached}
             data={eventsForInfinitScroll}
             keyExtractor={item => item.id.toString()}

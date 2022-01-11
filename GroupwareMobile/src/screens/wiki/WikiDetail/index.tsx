@@ -135,7 +135,7 @@ const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
         }}>
         {wikiInfo && wikiInfo.writer ? (
           <Div flexDir="column" w={'100%'}>
-            <Div mb={16} flexDir="row" justifyContent="space-between">
+            <Div mb={16} flexDir="row" justifyContent="space-between" mt="sm">
               <Text
                 fontWeight="bold"
                 fontSize={24}
