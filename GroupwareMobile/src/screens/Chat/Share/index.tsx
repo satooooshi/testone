@@ -1,5 +1,5 @@
 import {useNavigation, useRoute} from '@react-navigation/native';
-import React, {useCallback, useState} from 'react';
+import React, {useState} from 'react';
 import {ActivityIndicator, Alert, FlatList} from 'react-native';
 import {Button, Div, Icon} from 'react-native-magnus';
 import tailwind from 'tailwind-rn';
@@ -7,8 +7,8 @@ import RoomCard from '../../../components/chat/RoomCard';
 import HeaderWithTextButton from '../../../components/Header';
 import WholeContainer from '../../../components/WholeContainer';
 import {useAPIGetRooms} from '../../../hooks/api/chat/useAPIGetRoomsByPage';
+import {useAPISavePin} from '../../../hooks/api/chat/useAPISavePin';
 import {useAPISendChatMessage} from '../../../hooks/api/chat/useAPISendChatMessage';
-import {useAPIUpdateChatGroup} from '../../../hooks/api/chat/useAPIUpdateChatGroup';
 import {ChatGroup, ChatMessageType} from '../../../types';
 
 const Share: React.FC = () => {
@@ -19,54 +19,37 @@ const Share: React.FC = () => {
   const [roomsForInfiniteScroll, setRoomsForInfiniteScroll] = useState<
     ChatGroup[]
   >([]);
-  useAPIGetRooms(
+  const {data: chatRooms, isLoading: loadingGetChatGroupList} = useAPIGetRooms({
+    page,
+    limit: '20',
+  });
+  const {refetch: refetchAllRooms} = useAPIGetRooms(
     {
       page: '1',
       limit: (20 * Number(page)).toString(),
     },
     {
-      refetchInterval: 3000,
+      refetchInterval: 30000,
       onSuccess: data => {
         stateRefreshNeeded(data.rooms);
       },
-      onError: () => {
-        Alert.alert(
-          'ルーム取得中にエラーが発生しました。\n時間をおいて再実行してください。',
-        );
-      },
     },
   );
-  const [selectedRoom, setSelectedRoom] = useState<ChatGroup[]>([]);
-  const {mutate: sendChatMessage} = useAPISendChatMessage();
-
-  const {
-    data: chatRooms,
-    isLoading: loadingGetChatGroupList,
-    refetch,
-  } = useAPIGetRooms({
-    page,
-  });
-  const {mutate: saveGroup} = useAPIUpdateChatGroup({
+  const {mutate: savePin} = useAPISavePin({
     onSuccess: () => {
-      handleRefetch();
+      refetchAllRooms();
     },
     onError: () => {
       Alert.alert(
-        'チャット更新中にエラーが発生しました。\n時間をおいて再実行してください。',
+        'ピン留めを更新中にエラーが発生しました。\n時間をおいて再実行してください。',
       );
     },
   });
-
-  const handleRefetch = useCallback(() => {
-    setRoomsForInfiniteScroll([]);
-    refetch();
-  }, [refetch]);
+  const [selectedRoom, setSelectedRoom] = useState<ChatGroup[]>([]);
+  const {mutate: sendChatMessage} = useAPISendChatMessage();
 
   const onEndReached = () => {
-    if (
-      typeof Number(chatRooms?.pageCount) === 'number' &&
-      Number(page + 1) <= Number(chatRooms?.pageCount)
-    ) {
+    if (chatRooms?.rooms?.length) {
       setPage(p => (Number(p) + 1).toString());
     }
   };
@@ -103,7 +86,9 @@ const Share: React.FC = () => {
         if (
           new Date(roomsForInfiniteScroll[i]?.updatedAt).getTime() !==
             new Date(newData?.[i]?.updatedAt).getTime() ||
-          roomsForInfiniteScroll[i].hasBeenRead !== newData?.[i]?.hasBeenRead
+          roomsForInfiniteScroll[i].hasBeenRead !== newData?.[i]?.hasBeenRead ||
+          roomsForInfiniteScroll[i]?.members?.length !==
+            newData?.[i]?.members?.length
         ) {
           updateNeeded = true;
         }
@@ -145,7 +130,7 @@ const Share: React.FC = () => {
 
   return (
     <WholeContainer>
-      <HeaderWithTextButton title="ルーム一覧" />
+      <HeaderWithTextButton title="ルームを選択" enableBackButton={true} />
       <Button
         onPress={handleSubmit}
         bg="purple600"
@@ -170,7 +155,7 @@ const Share: React.FC = () => {
               onPress={() => toggleRoom(room)}
               dangerousBgColor={isSelected(room) ? 'gray300' : 'white'}
               onPressPinButton={() =>
-                saveGroup({...room, isPinned: !room.isPinned})
+                savePin({...room, isPinned: !room.isPinned})
               }
             />
           </Div>
