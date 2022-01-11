@@ -400,31 +400,41 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
               </TagButton>
             ))}
           </Div>
-          <Div row justifyContent="space-between" w="100%" mb="lg">
-            <Text fontSize={16}>チャットルームの作成</Text>
-            <Div row>
-              <Div row alignItems="center" mr="sm">
-                <Text>オン</Text>
-                {/* @ts-ignore */}
-                <Radio
-                  value={1}
-                  activeColor="green500"
-                  onChange={() => setNewEvent(e => ({...e, chatNeeded: true}))}
-                  checked={newEvent.chatNeeded}
-                />
-              </Div>
-              <Div row alignItems="center">
-                <Text>オフ</Text>
-                {/* @ts-ignore */}
-                <Radio
-                  value={2}
-                  activeColor="green500"
-                  onChange={() => setNewEvent(e => ({...e, chatNeeded: false}))}
-                  checked={!newEvent.chatNeeded}
-                />
+          {!newEvent?.id ? (
+            <Div row justifyContent="space-between" w="100%" mb="lg">
+              <Text fontSize={16}>
+                {'チャットルームの作成\n'}
+                <Text color="tomato">イベント作成後は変更できません</Text>
+              </Text>
+              <Div row>
+                <Div row alignItems="center" mr="sm">
+                  <Text>オン</Text>
+                  {/* @ts-ignore */}
+                  <Radio
+                    value={1}
+                    activeColor="green500"
+                    onChange={() =>
+                      setNewEvent(e => ({...e, chatNeeded: true}))
+                    }
+                    checked={newEvent.chatNeeded}
+                  />
+                </Div>
+                <Div row alignItems="center">
+                  <Text>オフ</Text>
+                  {/* @ts-ignore */}
+                  <Radio
+                    value={2}
+                    activeColor="green500"
+                    onChange={() =>
+                      setNewEvent(e => ({...e, chatNeeded: false}))
+                    }
+                    checked={!newEvent.chatNeeded}
+                  />
+                </Div>
               </Div>
             </Div>
-          </Div>
+          ) : null}
+
           <Div
             flexDir="column"
             alignItems="flex-start"
