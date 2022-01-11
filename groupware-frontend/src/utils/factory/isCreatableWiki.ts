@@ -35,7 +35,7 @@ export const isCreatableWiki = (context: Context): boolean => {
           case BoardCategory.CELEBRATION:
             return userRole === UserRole.ADMIN;
           case BoardCategory.OTHER:
-            return userRole === UserRole.ADMIN;
+            return true;
         }
       }
       return false;
