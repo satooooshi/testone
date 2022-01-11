@@ -14,7 +14,7 @@ import CreateEventModal, {
   CreateEventRequest,
 } from '@/components/event/CreateEventModal';
 import SearchForm from '@/components/common/SearchForm';
-import { EventSchedule, EventType, Tag, UserRole } from 'src/types';
+import { EventSchedule, EventType, Tag } from 'src/types';
 import { EventTab } from 'src/types/header/tab/types';
 import { toggleTag } from 'src/utils/toggleTag';
 import { generateEventSearchQueryString } from 'src/utils/eventQueryRefresh';
@@ -46,6 +46,7 @@ import { useAPIUpdateEvent } from '@/hooks/api/event/useAPIUpdateEvent';
 import { Box, useMediaQuery, useToast } from '@chakra-ui/react';
 import { responseErrorMsgFactory } from 'src/utils/factory/responseErrorMsgFactory';
 import { hideScrollbarCss } from 'src/utils/chakra/hideScrollBar.css';
+import { isEditableEvent } from 'src/utils/factory/isCreatableEvent';
 
 const localizer = momentLocalizer(moment);
 //@ts-ignore
@@ -269,7 +270,7 @@ const EventList = () => {
   };
 
   const resizeEvent = async ({ event, start, end }: any) => {
-    if (!isEditableEvent(event.type) && !isAuthor(event)) {
+    if (!isEditableEvent(event.type, user) && !isAuthor(event)) {
       alert('イベントを編集する権限がありません');
       return;
     }
@@ -282,32 +283,9 @@ const EventList = () => {
       updateEvent(newEventInfo);
     }
   };
-  const isEditableEvent = (type: EventType): boolean => {
-    switch (type) {
-      case EventType.IMPRESSIVE_UNIVERSITY:
-        return user?.role === UserRole.ADMIN;
-      case EventType.STUDY_MEETING:
-        return (
-          user?.role === UserRole.ADMIN ||
-          user?.role === UserRole.INTERNAL_INSTRUCTOR
-        );
-      case EventType.BOLDAY:
-        return user?.role === UserRole.ADMIN;
-      case EventType.COACH:
-        return user?.role === UserRole.ADMIN || user?.role === UserRole.COACH;
-      case EventType.CLUB:
-        return (
-          user?.role === UserRole.ADMIN ||
-          user?.role === UserRole.INTERNAL_INSTRUCTOR ||
-          user?.role === UserRole.COMMON
-        );
-      case EventType.SUBMISSION_ETC:
-        return user?.role === UserRole.ADMIN;
-    }
-  };
 
   const moveEvent = async ({ event, start, end }: any) => {
-    if (!isEditableEvent(event.type) && !isAuthor(event)) {
+    if (!isEditableEvent(event.type, user) && !isAuthor(event)) {
       alert('イベントを編集する権限がありません');
       return;
     }

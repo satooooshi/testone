@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import createEventModalStyle from '@/styles/components/CreateEventModal.module.scss';
 import Modal from 'react-modal';
 import { MdCancel } from 'react-icons/md';
@@ -9,7 +9,6 @@ import {
   EventVideo,
   Tag,
   User,
-  UserRole,
 } from 'src/types';
 import { IoMdAddCircle } from 'react-icons/io';
 import { useAPIGetTag } from '@/hooks/api/tag/useAPIGetTag';
@@ -51,6 +50,7 @@ import { formikErrorMsgFactory } from 'src/utils/factory/formikErrorMsgFactory';
 import { fileNameTransformer } from 'src/utils/factory/fileNameTransformer';
 import { hideScrollbarCss } from 'src/utils/chakra/hideScrollBar.css';
 import { darkFontColor } from 'src/utils/colors';
+import { isCreatableEvent } from 'src/utils/factory/isCreatableEvent';
 
 type ExcludeFilesAndVideos = Pick<
   EventSchedule,
@@ -243,36 +243,26 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
     }));
   };
 
-  const isCreatableImpressiveUniversity = useMemo(() => {
-    return user?.role === UserRole.ADMIN;
-  }, [user?.role]);
+  const isCreatableImpressiveUniversity = isCreatableEvent(
+    EventType.IMPRESSIVE_UNIVERSITY,
+    user?.role,
+  );
 
-  const isCreatableStudyMeeting = useMemo(() => {
-    return (
-      user?.role === UserRole.ADMIN ||
-      user?.role === UserRole.INTERNAL_INSTRUCTOR
-    );
-  }, [user?.role]);
+  const isCreatableStudyMeeting = isCreatableEvent(
+    EventType.STUDY_MEETING,
+    user?.role,
+  );
 
-  const isCreatableBolday = useMemo(() => {
-    return user?.role === UserRole.ADMIN;
-  }, [user?.role]);
+  const isCreatableBolday = isCreatableEvent(EventType.BOLDAY, user?.role);
 
-  const isCreatableCoach = useMemo(() => {
-    return user?.role === UserRole.ADMIN || user?.role === UserRole.COACH;
-  }, [user?.role]);
+  const isCreatableCoach = isCreatableEvent(EventType.COACH, user?.role);
 
-  const isCreatableClub = useMemo(() => {
-    return (
-      user?.role === UserRole.ADMIN ||
-      user?.role === UserRole.INTERNAL_INSTRUCTOR ||
-      user?.role === UserRole.COMMON
-    );
-  }, [user?.role]);
+  const isCreatableClub = isCreatableEvent(EventType.CLUB, user?.role);
 
-  const isCreatableSubmissionEtc = useMemo(() => {
-    return user?.role === UserRole.ADMIN;
-  }, [user?.role]);
+  const isCreatableSubmissionEtc = isCreatableEvent(
+    EventType.SUBMISSION_ETC,
+    user?.role,
+  );
 
   const pushYoutube = () => {
     const youtubeRegex =

@@ -1,4 +1,4 @@
-import React, {useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {textEditorStyles} from '../../../styles/component/wiki/textEditor.style';
 import {TextFormat} from '../../../types';
 import MarkdownIt from 'markdown-it';
@@ -31,6 +31,11 @@ const TextEditor: React.FC<TextEditorProps> = ({
       });
     }
   };
+
+  //if this code are deleted, editor height breaks for long text in Android
+  useEffect(() => {
+    quillRef?.current?.focus();
+  }, []);
 
   return (
     <>

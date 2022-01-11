@@ -15,8 +15,6 @@ import SearchFormOpenerButton from '../../../components/common/SearchForm/Search
 import SearchForm from '../../../components/common/SearchForm';
 import EventFormModal from '../../../components/events/EventFormModal';
 import {useAPICreateEvent} from '../../../hooks/api/event/useAPICreateEvent';
-import {isEventCreatableUser} from '../../../utils/factory/event/isCreatableEvent';
-import {useAuthenticate} from '../../../contexts/useAuthenticate';
 
 type EventCardListProps = {
   status: EventStatus;
@@ -29,7 +27,6 @@ const EventCardList: React.FC<EventCardListProps> = ({
   visibleEventFormModal,
   hideEventFormModal,
 }) => {
-  const {user} = useAuthenticate();
   const {partOfSearchQuery, setPartOfSearchQuery} =
     useEventCardListSearchQuery();
   const {mutate: saveEvent} = useAPICreateEvent({
@@ -54,11 +51,20 @@ const EventCardList: React.FC<EventCardListProps> = ({
     status,
     type,
   });
-  const {data: events, isLoading} = useAPIGetEventList(searchQuery);
+  const {isLoading} = useAPIGetEventList(searchQuery, {
+    onSuccess: data => {
+      setEventsForInfiniteScroll(e => {
+        if (e.length) {
+          return [...e, ...data.events];
+        }
+        return data.events;
+      });
+    },
+  });
   const [visibleSearchFormModal, setVisibleSearchFormModal] = useState(false);
   const [eventsForInfinitScroll, setEventsForInfiniteScroll] = useState<
     EventSchedule[]
-  >(events?.events || []);
+  >([]);
 
   const onEndReached = () => {
     setSearchQuery(q => ({
@@ -77,17 +83,6 @@ const EventCardList: React.FC<EventCardListProps> = ({
     }
   }, [partOfSearchQuery.refetchNeeded, setPartOfSearchQuery]);
 
-  useEffect(() => {
-    if (events?.events) {
-      setEventsForInfiniteScroll(e => {
-        if (e.length) {
-          return [...e, ...events.events];
-        }
-        return events.events;
-      });
-    }
-  }, [events?.events]);
-
   const queryRefresh = (
     query: Partial<SearchQueryToGetEvents>,
     selectedTags?: AllTag[],
@@ -105,14 +100,12 @@ const EventCardList: React.FC<EventCardListProps> = ({
 
   return (
     <>
-      {isEventCreatableUser(user?.role) ? (
-        <EventFormModal
-          type={partOfSearchQuery.type || undefined}
-          isVisible={visibleEventFormModal}
-          onCloseModal={hideEventFormModal}
-          onSubmit={event => saveEvent(event)}
-        />
-      ) : null}
+      <EventFormModal
+        type={partOfSearchQuery.type || undefined}
+        isVisible={visibleEventFormModal}
+        onCloseModal={hideEventFormModal}
+        onSubmit={event => saveEvent(event)}
+      />
       <SearchForm
         searchTarget="other"
         isVisible={visibleSearchFormModal}

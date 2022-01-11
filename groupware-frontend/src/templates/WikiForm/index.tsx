@@ -15,7 +15,6 @@ import {
   Wiki,
   Tag,
   TextFormat,
-  UserRole,
   WikiType,
   RuleCategory,
   BoardCategory,
@@ -45,6 +44,7 @@ import { wikiSchema } from 'src/utils/validation/schema';
 import { stateFromHTML } from 'draft-js-import-html';
 import { imageExtensionsForMarkDownEditor } from 'src/utils/imageExtensions';
 import { wikiTypeNameFactory } from 'src/utils/wiki/wikiTypeNameFactory';
+import { isCreatableWiki } from 'src/utils/factory/isCreatableWiki';
 
 type WikiFormProps = {
   wiki?: Wiki;
@@ -306,7 +306,10 @@ const WikiForm: React.FC<WikiFormProps> = ({
                     ? type
                     : BoardCategory.QA
                 }>
-                {user?.role === UserRole.ADMIN && (
+                {isCreatableWiki({
+                  type: WikiType.RULES,
+                  userRole: user?.role,
+                }) ? (
                   <>
                     <option value={RuleCategory.PHILOSOPHY}>
                       {wikiTypeNameFactory(
@@ -343,11 +346,17 @@ const WikiForm: React.FC<WikiFormProps> = ({
                         true,
                       )}
                     </option>
-                    <option value={WikiType.ALL_POSTAL}>
-                      {wikiTypeNameFactory(WikiType.ALL_POSTAL)}
-                    </option>
                   </>
-                )}
+                ) : null}
+                {isCreatableWiki({
+                  type: WikiType.ALL_POSTAL,
+                  userRole: user?.role,
+                }) ? (
+                  <option value={WikiType.ALL_POSTAL}>
+                    {wikiTypeNameFactory(WikiType.ALL_POSTAL)}
+                  </option>
+                ) : null}
+
                 <option value={BoardCategory.KNOWLEDGE}>
                   {wikiTypeNameFactory(
                     WikiType.BOARD,
@@ -364,54 +373,90 @@ const WikiForm: React.FC<WikiFormProps> = ({
                     BoardCategory.QA,
                   )}
                 </option>
-                <option value={BoardCategory.NEWS}>
-                  {wikiTypeNameFactory(
-                    WikiType.BOARD,
-                    undefined,
-                    true,
-                    BoardCategory.NEWS,
-                  )}
-                </option>
-                <option value={BoardCategory.IMPRESSIVE_UNIVERSITY}>
-                  {wikiTypeNameFactory(
-                    WikiType.BOARD,
-                    undefined,
-                    true,
-                    BoardCategory.IMPRESSIVE_UNIVERSITY,
-                  )}
-                </option>
-                <option value={BoardCategory.CLUB}>
-                  {wikiTypeNameFactory(
-                    WikiType.BOARD,
-                    undefined,
-                    true,
-                    BoardCategory.CLUB,
-                  )}
-                </option>
-                <option value={BoardCategory.STUDY_MEETING}>
-                  {wikiTypeNameFactory(
-                    WikiType.BOARD,
-                    undefined,
-                    true,
-                    BoardCategory.STUDY_MEETING,
-                  )}
-                </option>
-                <option value={BoardCategory.CELEBRATION}>
-                  {wikiTypeNameFactory(
-                    WikiType.BOARD,
-                    undefined,
-                    true,
-                    BoardCategory.CELEBRATION,
-                  )}
-                </option>
-                <option value={BoardCategory.OTHER}>
-                  {wikiTypeNameFactory(
-                    WikiType.BOARD,
-                    undefined,
-                    true,
-                    BoardCategory.OTHER,
-                  )}
-                </option>
+                {isCreatableWiki({
+                  type: WikiType.BOARD,
+                  boardCategory: BoardCategory.NEWS,
+                  userRole: user?.role,
+                }) ? (
+                  <option value={BoardCategory.NEWS}>
+                    {wikiTypeNameFactory(
+                      WikiType.BOARD,
+                      undefined,
+                      true,
+                      BoardCategory.NEWS,
+                    )}
+                  </option>
+                ) : null}
+                {isCreatableWiki({
+                  type: WikiType.BOARD,
+                  boardCategory: BoardCategory.IMPRESSIVE_UNIVERSITY,
+                  userRole: user?.role,
+                }) ? (
+                  <option value={BoardCategory.IMPRESSIVE_UNIVERSITY}>
+                    {wikiTypeNameFactory(
+                      WikiType.BOARD,
+                      undefined,
+                      true,
+                      BoardCategory.IMPRESSIVE_UNIVERSITY,
+                    )}
+                  </option>
+                ) : null}
+                {isCreatableWiki({
+                  type: WikiType.BOARD,
+                  boardCategory: BoardCategory.CLUB,
+                  userRole: user?.role,
+                }) ? (
+                  <option value={BoardCategory.CLUB}>
+                    {wikiTypeNameFactory(
+                      WikiType.BOARD,
+                      undefined,
+                      true,
+                      BoardCategory.CLUB,
+                    )}
+                  </option>
+                ) : null}
+                {isCreatableWiki({
+                  type: WikiType.BOARD,
+                  boardCategory: BoardCategory.STUDY_MEETING,
+                  userRole: user?.role,
+                }) ? (
+                  <option value={BoardCategory.STUDY_MEETING}>
+                    {wikiTypeNameFactory(
+                      WikiType.BOARD,
+                      undefined,
+                      true,
+                      BoardCategory.STUDY_MEETING,
+                    )}
+                  </option>
+                ) : null}
+                {isCreatableWiki({
+                  type: WikiType.BOARD,
+                  boardCategory: BoardCategory.CELEBRATION,
+                  userRole: user?.role,
+                }) ? (
+                  <option value={BoardCategory.CELEBRATION}>
+                    {wikiTypeNameFactory(
+                      WikiType.BOARD,
+                      undefined,
+                      true,
+                      BoardCategory.CELEBRATION,
+                    )}
+                  </option>
+                ) : null}
+                {isCreatableWiki({
+                  type: WikiType.BOARD,
+                  boardCategory: BoardCategory.OTHER,
+                  userRole: user?.role,
+                }) ? (
+                  <option value={BoardCategory.OTHER}>
+                    {wikiTypeNameFactory(
+                      WikiType.BOARD,
+                      undefined,
+                      true,
+                      BoardCategory.OTHER,
+                    )}
+                  </option>
+                ) : null}
               </Select>
             </FormControl>
           )}

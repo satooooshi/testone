@@ -1,4 +1,3 @@
-import {useNavigation} from '@react-navigation/native';
 import {useFormik} from 'formik';
 import React, {useRef, useState} from 'react';
 import {
@@ -21,7 +20,6 @@ import {
 import DropdownOpenerButton from '../../../components/common/DropdownOpenerButton';
 import TagModal from '../../../components/common/TagModal';
 import HeaderWithTextButton from '../../../components/Header';
-import {Tab} from '../../../components/Header/HeaderTemplate';
 import TagEditLine from '../../../components/TagEditLine';
 import WholeContainer from '../../../components/WholeContainer';
 import {useAPIRegister} from '../../../hooks/api/auth/useAPIRegister';
@@ -30,7 +28,6 @@ import {useAPIGetUserTag} from '../../../hooks/api/tag/useAPIGetUserTag';
 import {useTagType} from '../../../hooks/tag/useTagType';
 import {userRegisteringAdminStyles} from '../../../styles/screen/admin/userRegisteringAdmin.style';
 import {User, TagType, UserRole} from '../../../types';
-import {UserRegisteringAdminNavigationProps} from '../../../types/navigator/drawerScreenProps';
 import {uploadImageFromGallery} from '../../../utils/cropImage/uploadImageFromGallery';
 import {
   defaultDropdownOptionProps,
@@ -41,6 +38,7 @@ import {userRoleNameFactory} from '../../../utils/factory/userRoleNameFactory';
 import {formikErrorMsgFactory} from '../../../utils/factory/formikEroorMsgFactory';
 import {createUserSchema} from '../../../utils/validation/schema';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+import {useAdminHeaderTab} from '../../../contexts/admin/useAdminHeaderTab';
 
 const initialValues: Partial<User> = {
   email: '',
@@ -59,7 +57,6 @@ const initialValues: Partial<User> = {
 };
 
 const UserRegisteringAdmin: React.FC = () => {
-  const navigation = useNavigation<UserRegisteringAdminNavigationProps>();
   const dropdownRef = useRef<any | null>(null);
   const {mutate: register, isLoading} = useAPIRegister({
     onSuccess: responseData => {
@@ -128,26 +125,7 @@ const UserRegisteringAdmin: React.FC = () => {
       );
     },
   });
-  const tabs: Tab[] = [
-    {
-      name: 'ユーザー管理',
-      onPress: () => navigation.navigate('AdminStack', {screen: 'UserAdmin'}),
-    },
-    {
-      name: 'ユーザー作成',
-      onPress: () =>
-        navigation.navigate('AdminStack', {screen: 'UserRegisteringAdmin'}),
-    },
-    {
-      name: 'タグ管理',
-      onPress: () => navigation.navigate('AdminStack', {screen: 'TagAdmin'}),
-    },
-    {
-      name: 'タグ管理(ユーザー)',
-      onPress: () =>
-        navigation.navigate('AdminStack', {screen: 'UserTagAdmin'}),
-    },
-  ];
+  const tabs = useAdminHeaderTab();
 
   const handleUploadImage = async () => {
     const {formData} = await uploadImageFromGallery({
