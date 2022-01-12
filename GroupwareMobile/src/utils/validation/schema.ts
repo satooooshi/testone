@@ -13,7 +13,12 @@ const afterNowMessage = '現在の日時以降に設定してください';
 const minRoomUserMessage = 'トークルームには一人以上の社員を招待してください';
 
 export const loginSchema = Yup.object().shape({
-  email: Yup.string().email(emailFormatMessage).required(requireMessage),
+  email: Yup.string()
+    .matches(
+      /^[a-zA-Z0-9_+-]+(\.[a-zA-Z0-9_+-]+)*@([a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]*\.)+[a-zA-Z]{2,}$/,
+      emailFormatMessage,
+    )
+    .required(requireMessage),
   password: Yup.string()
     .matches(/^(?=.*?[a-z])(?=.*?\d)[a-z\d]{8,16}$/, passwordFormatMessage)
     .required(requireMessage),
@@ -49,7 +54,12 @@ export const updatePasswordSchema = Yup.object().shape({
 export const registerSchema = Yup.object().shape({
   firstName: Yup.string().required(requireMessage),
   lastName: Yup.string().required(requireMessage),
-  email: Yup.string().email(emailFormatMessage).required(requireMessage),
+  email: Yup.string()
+    .matches(
+      /^[a-zA-Z0-9_+-]+(\.[a-zA-Z0-9_+-]+)*@([a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]*\.)+[a-zA-Z]{2,}$/,
+      emailFormatMessage,
+    )
+    .required(requireMessage),
   password: Yup.string()
     .matches(/^(?=.*?[a-z])(?=.*?\d)[a-z\d]{8,16}$/, passwordFormatMessage)
     .required(requireMessage),
@@ -88,7 +98,10 @@ export const savingRoomSchema = Yup.object().shape({
 
 const profileValidation = {
   email: Yup.string()
-    .email(emailFormatMessage)
+    .matches(
+      /^[a-zA-Z0-9_+-]+(\.[a-zA-Z0-9_+-]+)*@([a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]*\.)+[a-zA-Z]{2,}$/,
+      emailFormatMessage,
+    )
     .required(`メールアドレスは${requireMessage}`),
   lastName: Yup.string()
     .required(`姓は${requireMessage}`)

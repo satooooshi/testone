@@ -14,7 +14,10 @@ const afterNowMessage = '現在の日時以降に設定してください';
 
 export const loginSchema = Yup.object().shape({
   email: Yup.string()
-    .email(emailFormatMessage)
+    .matches(
+      /^[a-zA-Z0-9_+-]+(\.[a-zA-Z0-9_+-]+)*@([a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]*\.)+[a-zA-Z]{2,}$/,
+      emailFormatMessage,
+    )
     .required(`メールアドレスは${requireMessage}`),
   password: Yup.string()
     .matches(
@@ -42,7 +45,12 @@ export const updatePasswordSchema = Yup.object().shape({
 export const registerSchema = Yup.object().shape({
   firstName: Yup.string().required(requireMessage),
   lastName: Yup.string().required(requireMessage),
-  email: Yup.string().email(emailFormatMessage).required(requireMessage),
+  email: Yup.string()
+    .matches(
+      /^[a-zA-Z0-9_+-]+(\.[a-zA-Z0-9_+-]+)*@([a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]*\.)+[a-zA-Z]{2,}$/,
+      emailFormatMessage,
+    )
+    .required(requireMessage),
   password: Yup.string()
     .matches(/^(?=.*?[a-z])(?=.*?\d)[a-z\d]{8,16}$/, passwordFormatMessage)
     .required(requireMessage),
@@ -62,7 +70,12 @@ export const createEventSchema = Yup.object().shape({
 });
 
 export const profileSchema = Yup.object().shape({
-  email: Yup.string().email(emailFormatMessage).required(requireMessage),
+  email: Yup.string()
+    .matches(
+      /^[a-zA-Z0-9_+-]+(\.[a-zA-Z0-9_+-]+)*@([a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]*\.)+[a-zA-Z]{2,}$/,
+      emailFormatMessage,
+    )
+    .required(requireMessage),
   lastName: Yup.string()
     .required(`姓は${requireMessage}`)
     .max(50, `姓は${nWordLimitMessage(50)}`),
