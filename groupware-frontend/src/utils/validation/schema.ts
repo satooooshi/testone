@@ -2,8 +2,8 @@ import * as Yup from 'yup';
 
 const requireMessage = '入力必須です';
 const emailFormatMessage = 'メールアドレスの形式で入力してください';
-const blankMixedMessage = '空白文字は使用できません';
-const minEightTextMessage = '8文字以上で入力してください';
+const passwordFormatMessage =
+  '半角英数字をそれぞれ1種類以上含む8文字以上16文字以下で入力してください';
 const minDateMessage = '開始日時は終了日時より前に設定してください';
 const minTagsMessage = 'タグは一つ以上設定してください';
 const minUsersMessage = 'チャットメンバーは一人以上設定してください';
@@ -17,8 +17,10 @@ export const loginSchema = Yup.object().shape({
     .email(emailFormatMessage)
     .required(`メールアドレスは${requireMessage}`),
   password: Yup.string()
-    .matches(/^([^ ]*)$/, blankMixedMessage)
-    .min(8, minEightTextMessage)
+    .matches(
+      /^(?=.*?[a-z])(?=.*?\d)[a-z\d]{8,16}$/,
+      `パスワードは${passwordFormatMessage}`,
+    )
     .required(`パスワードは${requireMessage}`),
 });
 
@@ -30,8 +32,7 @@ export const wikiSchema = Yup.object().shape({
 export const updatePasswordSchema = Yup.object().shape({
   currentPassword: Yup.string().required(requireMessage),
   newPassword: Yup.string()
-    .matches(/^([^ ]*)$/, blankMixedMessage)
-    .min(8, minEightTextMessage)
+    .matches(/^(?=.*?[a-z])(?=.*?\d)[a-z\d]{8,16}$/, passwordFormatMessage)
     .required(requireMessage),
   newPasswordConfirmation: Yup.string()
     .required(requireMessage)
@@ -43,8 +44,7 @@ export const registerSchema = Yup.object().shape({
   lastName: Yup.string().required(requireMessage),
   email: Yup.string().email(emailFormatMessage).required(requireMessage),
   password: Yup.string()
-    .matches(/^([^ ]*)$/, blankMixedMessage)
-    .min(8, minEightTextMessage)
+    .matches(/^(?=.*?[a-z])(?=.*?\d)[a-z\d]{8,16}$/, passwordFormatMessage)
     .required(requireMessage),
 });
 
