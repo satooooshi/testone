@@ -229,7 +229,8 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
   };
 
   const onClickDeleteImage = () => {
-    alert('onClickDeleteImage');
+    newEvent.imageURL && createEvent({ ...newEvent, imageURL: '' });
+    dispatchCrop({ type: 'resetImage', value: 'resetImage' });
   };
 
   const toggleTag = (clickedTag: Tag) => {
@@ -570,14 +571,16 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
             </FormControl>
           </Box>
           <Text mb="15px">サムネイル</Text>
-          <Button
-            mb="15px"
-            onClick={() => {
-              onClickDeleteImage();
-            }}
-            colorScheme="blue">
-            イベントを保存
-          </Button>
+          {((newEvent.imageURL && !selectThumbnailUrl) || completedCrop) && (
+            <Button
+              mb="15px"
+              onClick={() => {
+                onClickDeleteImage();
+              }}
+              colorScheme="blue">
+              既存画像を削除
+            </Button>
+          )}
           <Box
             display="flex"
             flexDir="column"
