@@ -301,7 +301,7 @@ const UserRegisteringAdmin: React.FC = () => {
             secureTextEntry={true}
             value={values.password}
             onChangeText={t => setValues({...values, password: t})}
-            placeholder="8文字以上で入力してください"
+            placeholder="半角英数字を各1種類以上含む8文字以上16文字以下"
             autoCapitalize="none"
           />
         </Div>
