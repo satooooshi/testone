@@ -7,10 +7,11 @@ type AuthButtonProps = HTMLProps<HTMLButtonElement> & {
   isActive: boolean;
 };
 
-const AuthButton: React.FC<AuthButtonProps> = ({ name, isActive }) => {
+const AuthButton: React.FC<AuthButtonProps> = ({ name, isActive, onClick }) => {
   return (
     <button
       type="submit"
+      onClick={onClick}
       className={clsx(
         styles.button_oblong,
         isActive
