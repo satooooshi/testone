@@ -410,7 +410,7 @@ const CreateNewUser = () => {
             </FormLabel>
             <Input
               type="password"
-              placeholder="半角英数字をそれぞれ1種類以上含む8文字以上16文字以下"
+              placeholder="password"
               value={values.password}
               background="white"
               name="password"
