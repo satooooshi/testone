@@ -12,7 +12,7 @@ export const genSignedURL = async (text: string): Promise<string> => {
   let parseText = text;
   const bucketName = process.env.CLOUD_STORAGE_BUCKET;
   const url = 'https://storage.googleapis.com/' + bucketName + '/';
-  const regex = new RegExp(`${url}\\S+\\.[^'")\\s]+`, 'g');
+  const regex = new RegExp(`${url}\.+\\.[^'")\\s]+`, 'g');
   const storageURLs = text.match(regex);
   if (!storageURLs || !storageURLs.length) {
     return text;
