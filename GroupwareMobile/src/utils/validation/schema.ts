@@ -2,8 +2,8 @@ import * as Yup from 'yup';
 
 const requireMessage = '入力必須です';
 const emailFormatMessage = 'メールアドレスの形式で入力してください';
-const passwordFormatMessage =
-  '半角英数字をそれぞれ1種類以上含む8文字以上16文字以下で入力してください';
+const blankMixedMessage = '空白文字は使用できません';
+const minEightTextMessage = '8文字以上で入力してください';
 const minDateMessage = '開始日時は終了日時より前に設定してください';
 const minTagsMessage = 'タグは一つ以上設定してください';
 const unmatchPasswordConfirmation = '再入力と新しいパスワードが一致しません';
@@ -15,7 +15,8 @@ const minRoomUserMessage = 'トークルームには一人以上の社員を招�
 export const loginSchema = Yup.object().shape({
   email: Yup.string().email(emailFormatMessage).required(requireMessage),
   password: Yup.string()
-    .matches(/^(?=.*?[a-z])(?=.*?\d)[a-z\d]{8,16}$/, passwordFormatMessage)
+    .matches(/^([^ ]*)$/, blankMixedMessage)
+    .min(8, minEightTextMessage)
     .required(requireMessage),
 });
 
@@ -38,7 +39,8 @@ export const replySchema = Yup.object().shape({
 export const updatePasswordSchema = Yup.object().shape({
   currentPassword: Yup.string().required(requireMessage),
   newPassword: Yup.string()
-    .matches(/^(?=.*?[a-z])(?=.*?\d)[a-z\d]{8,16}$/, passwordFormatMessage)
+    .matches(/^([^ ]*)$/, blankMixedMessage)
+    .min(8, minEightTextMessage)
     .required(requireMessage),
   newPasswordConfirmation: Yup.string().oneOf(
     [Yup.ref('newPassword'), null],
@@ -51,7 +53,8 @@ export const registerSchema = Yup.object().shape({
   lastName: Yup.string().required(requireMessage),
   email: Yup.string().email(emailFormatMessage).required(requireMessage),
   password: Yup.string()
-    .matches(/^(?=.*?[a-z])(?=.*?\d)[a-z\d]{8,16}$/, passwordFormatMessage)
+    .matches(/^([^ ]*)$/, blankMixedMessage)
+    .min(8, minEightTextMessage)
     .required(requireMessage),
 });
 
@@ -126,9 +129,7 @@ export const createUserSchema = Yup.object().shape({
   ...profileValidation,
   employeeId: Yup.string().required('社員コードは' + requireMessage),
   password: Yup.string()
-    .matches(
-      /^(?=.*?[a-z])(?=.*?\d)[a-z\d]{8,16}$/,
-      'パスワードは' + passwordFormatMessage,
-    )
+    .matches(/^([^ ]*)$/, 'パスワードは' + blankMixedMessage)
+    .min(8, 'パスワードは' + minEightTextMessage)
     .required('パスワードは' + requireMessage),
 });
