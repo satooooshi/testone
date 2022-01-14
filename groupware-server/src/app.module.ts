@@ -13,7 +13,6 @@ import { MailerModule } from '@nestjs-modules/mailer';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 import { TopNewsModule } from './modules/top-news/top-news.module';
 import { ChatGateway } from './gateway/chat.gateway';
-import { JwtModule } from '@nestjs/jwt';
 
 @Module({
   imports: [
@@ -33,7 +32,10 @@ import { JwtModule } from '@nestjs/jwt';
           from: configService.get('EMAIL_FROM'),
         },
         template: {
-          dir: './templates/',
+          dir:
+            process.env.NODE_ENV !== 'production'
+              ? process.cwd() + '/templates/'
+              : __dirname + '/templates/',
           adapter: new HandlebarsAdapter(), // or new PugAdapter()
           options: {
             strict: true,
