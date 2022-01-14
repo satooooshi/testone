@@ -98,7 +98,7 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
     validationSchema: savingEventSchema,
     onSubmit: async values => {
       onSubmit(values);
-      resetForm();
+      !event && resetForm();
     },
   });
 
