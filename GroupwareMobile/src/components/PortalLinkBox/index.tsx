@@ -43,6 +43,8 @@ type PortalType =
   | 'my_schedule'
   | 'safety_confirmation'
   | 'salary'
+  | 'users'
+  | 'attendance'
   | 'account';
 
 type PortalLinkIconProps = {
@@ -162,6 +164,24 @@ const PortalLinkIcon: React.FC<PortalLinkIconProps> = ({type}) => {
           fontFamily="MaterialCommunityIcons"
         />
       );
+    case 'users':
+      return (
+        <Icon
+          name="users"
+          fontFamily="FontAwesome5"
+          color="blue900"
+          fontSize={iconSize}
+        />
+      );
+    case 'attendance':
+      return (
+        <Icon
+          name="external-link"
+          fontSize={iconSize}
+          color="red900"
+          fontFamily="Feather"
+        />
+      );
   }
 };
 
@@ -211,6 +231,10 @@ const PortalLinkBox: React.FC<PortarlLinkBoxProps> = ({type, onPress}) => {
         return '給与明細';
       case 'board':
         return '掲示板';
+      case 'users':
+        return '社員名鑑';
+      case 'attendance':
+        return '勤怠管理';
       default:
         return '';
     }

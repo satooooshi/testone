@@ -3,8 +3,12 @@ import WholeContainer from '../../components/WholeContainer';
 import HeaderWithTextButton from '../../components/Header';
 import PortalLinkBox from '../../components/PortalLinkBox';
 import {Div, ScrollDiv, Text} from 'react-native-magnus';
-import {Alert, TouchableHighlight, useWindowDimensions} from 'react-native';
-import {storage} from '../../utils/url';
+import {
+  Alert,
+  Linking,
+  TouchableHighlight,
+  useWindowDimensions,
+} from 'react-native';
 import {useAuthenticate} from '../../contexts/useAuthenticate';
 import {useAPIGetTopNews} from '../../hooks/api/topNews/useAPIGetTopNews';
 import {EventType, TopNews} from '../../types';
@@ -262,6 +266,27 @@ const Home: React.FC = () => {
               }}
             />
           </Div>
+          <Div mb={8} mr={4}>
+            <PortalLinkBox
+              type="users"
+              onPress={() => {
+                navigation.navigate('UsersStack', {
+                  screen: 'UserList',
+                  params: {},
+                });
+              }}
+            />
+          </Div>
+          <Div mb={8}>
+            <PortalLinkBox
+              type="attendance"
+              onPress={() => {
+                Linking.openURL('https://bold-kintai.net/bold/root/attendance');
+              }}
+            />
+          </Div>
+        </Div>
+        <Div flexDir="row" justifyContent="center" alignItems="center">
           <Div mb={8} mr={4}>
             <PortalLinkBox
               type="safety_confirmation"
