@@ -3,6 +3,7 @@ WORKDIR /groupware-server
 COPY ./package*.json /groupware-server/
 COPY ./yarn.lock /groupware-server/
 RUN yarn
+COPY ./nest-cli.json /groupware-server/
 COPY . /groupware-server/
 RUN yarn build
 
