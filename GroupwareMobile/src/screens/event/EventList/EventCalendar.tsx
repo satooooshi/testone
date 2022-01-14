@@ -94,7 +94,9 @@ const EventCalendar: React.FC<EventCalendarProps> = ({
         const modifiedEvents: any[] = ev.map(e => ({
           ...e,
           start: new Date(e.startAt),
-          end: new Date(e.endAt),
+          end: DateTime.fromJSDate(new Date(e.endAt))
+            .minus({minutes: 1})
+            .toJSDate(),
         }));
         return modifiedEvents;
       }
