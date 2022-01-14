@@ -33,7 +33,7 @@ import { JwtModule } from '@nestjs/jwt';
           from: configService.get('EMAIL_FROM'),
         },
         template: {
-          dir: process.cwd() + '/templates/',
+          dir: './templates/',
           adapter: new HandlebarsAdapter(), // or new PugAdapter()
           options: {
             strict: true,
