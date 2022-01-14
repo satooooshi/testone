@@ -102,7 +102,6 @@ const EventCalendar: React.FC<EventCalendarProps> = ({
                   .toJSDate()
               : new Date(e.endAt),
         }));
-        console.log(modifiedEvents);
         return modifiedEvents;
       }
       return [];
