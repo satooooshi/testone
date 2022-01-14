@@ -145,7 +145,14 @@ const AccountDetail: React.FC = () => {
 
   const bottomContentsHeight = () => {
     if (activeScreen === defaultScreenName && profile?.tags) {
-      return 700 + profile?.tags.length * 15;
+      const strings: string =
+        profile?.introduceOther +
+        profile?.introduceTech +
+        profile?.introduceQualification +
+        profile?.introduceClub +
+        profile?.introduceClub;
+      const lines = (strings.match(/\n/g) || '').length + 1;
+      return 700 + profile?.tags.length * 15 + strings.length * 3 + lines * 10;
     }
     if (activeScreen === eventScreenName && events?.events) {
       return 100 + events?.events.length * windowWidth * 0.9;
