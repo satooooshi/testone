@@ -61,7 +61,7 @@ export class NotificationService {
       .sendMail({
         to,
         subject,
-        template: './index', // The `.pug` or `.hbs` extension is appended automatically.
+        template: __dirname + '/../../templates/index', // The `.pug` or `.hbs` extension is appended automatically.
         context: {
           // Data to be sent to template engine.
           title,
