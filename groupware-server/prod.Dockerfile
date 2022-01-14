@@ -11,8 +11,5 @@ WORKDIR /groupware-server
 COPY ./ormconfig.js ./
 COPY --from=builder /groupware-server/dist ./
 COPY --from=builder /groupware-server/package.json ./
-RUN mkdir -p templates
-COPY --from=builder /groupware-server/templates/index.hbs ./templates/index.hbs
-RUN ls
 RUN yarn add typeorm
 CMD ["yarn", "start:prod"]
