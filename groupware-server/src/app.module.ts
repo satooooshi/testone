@@ -32,10 +32,7 @@ import { ChatGateway } from './gateway/chat.gateway';
           from: configService.get('EMAIL_FROM'),
         },
         template: {
-          dir:
-            process.env.NODE_ENV !== 'production'
-              ? process.cwd() + '/templates/'
-              : __dirname + '/templates/',
+          dir: __dirname + '/templates/',
           adapter: new HandlebarsAdapter(), // or new PugAdapter()
           options: {
             strict: true,
