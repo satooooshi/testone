@@ -229,7 +229,7 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
   };
 
   const onClickDeleteImage = () => {
-    newEvent.imageURL && createEvent({ ...newEvent, imageURL: '' });
+    newEvent.imageURL && setNewEvent({ ...newEvent, imageURL: '' });
     dispatchCrop({ type: 'resetImage', value: 'resetImage' });
   };
 
