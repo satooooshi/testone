@@ -1,4 +1,4 @@
-import {useNavigation} from '@react-navigation/native';
+import {useNavigation, useRoute} from '@react-navigation/native';
 import React from 'react';
 import {FlatList, TouchableHighlight, useWindowDimensions} from 'react-native';
 import {Text, Div, Tag} from 'react-native-magnus';
@@ -19,6 +19,7 @@ type UserCardProps = {
 
 const UserCard: React.FC<UserCardProps> = ({user, filteredDuration}) => {
   const navigation = useNavigation<any>();
+  const route = useRoute<any>();
   const {user: mySelf} = useAuthenticate();
   const {width: windowWidth} = useWindowDimensions();
   const {filteredTags: techTags} = useTagType(TagType.TECH, user?.tags || []);
@@ -41,17 +42,18 @@ const UserCard: React.FC<UserCardProps> = ({user, filteredDuration}) => {
   };
 
   const navigateToAccountScreen = () => {
-    if (user?.id === mySelf?.id) {
-      navigation.navigate('AccountStack', {
-        screen: 'MyProfile',
-        params: {id: user?.id},
-      });
-    } else {
-      navigation.navigate('UsersStack', {
-        screen: 'AccountDetail',
-        params: {id: user?.id},
-      });
-    }
+    console.log(navigation.getState());
+    // if (user?.id === mySelf?.id) {
+    // navigation.navigate('AccountStack', {
+    //   screen: 'MyProfile',
+    //   params: {id: user?.id},
+    // });
+    // } else {
+    //   navigation.navigate('UsersStack', {
+    //     screen: 'AccountDetail',
+    //     params: {id: user?.id},
+    //   });
+    // }
   };
 
   const onPressTag = (tag: UserTag) => {

@@ -23,15 +23,22 @@ const UserAvatar: React.FC<UserAvatarProps> = ({user, h, w, onPress}) => {
           onPress();
           return;
         }
+        const routes = navigation.getState()?.routes;
         if (user?.id === mySelf?.id) {
           navigation.navigate('AccountStack', {
             screen: 'MyProfile',
-            params: {id: user?.id},
+            params: {
+              id: user?.id,
+              previousScreenName: routes[routes?.length - 1],
+            },
           });
         } else {
           navigation.navigate('UsersStack', {
             screen: 'AccountDetail',
-            params: {id: user?.id},
+            params: {
+              id: user?.id,
+              previousScreenName: routes[routes?.length - 1],
+            },
           });
         }
       }}>

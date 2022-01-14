@@ -214,6 +214,11 @@ const AccountDetail: React.FC = () => {
         enableBackButton={userID !== user?.id}
         rightButtonName={mySelfOfNot ? 'ログアウト' : undefined}
         onPressRightButton={mySelfOfNot ? handleLogout : undefined}
+        screenForBack={
+          route.params?.previousScreenName
+            ? route.params.previousScreenName
+            : undefined
+        }
       />
       <ScrollDiv contentContainerStyle={accountDetailStyles.scrollView}>
         {profile && (

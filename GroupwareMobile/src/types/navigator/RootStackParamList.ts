@@ -46,6 +46,7 @@ export type RootStackParamList = {
   AccountDetail:
     | {
         id?: number;
+        previousScreenName?: keyof RootStackParamList;
       }
     | undefined;
   Profile: undefined;
