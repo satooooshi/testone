@@ -95,7 +95,7 @@ const EventCalendar: React.FC<EventCalendarProps> = ({
           ...e,
           start: new Date(e.startAt),
           end:
-            (DateTime.fromJSDate(new Date(e.endAt)).hour &&
+            (DateTime.fromJSDate(new Date(e.endAt)).hour === 0 &&
               DateTime.fromJSDate(new Date(e.endAt)).minute) === 0
               ? DateTime.fromJSDate(new Date(e.endAt))
                   .minus({minutes: 1})
