@@ -228,6 +228,11 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
     setTagModal(true);
   };
 
+  const onClickDeleteImage = () => {
+    newEvent.imageURL && setNewEvent({ ...newEvent, imageURL: '' });
+    dispatchCrop({ type: 'resetImage', value: 'resetImage' });
+  };
+
   const toggleTag = (clickedTag: Tag) => {
     const isExist = newEvent.tags?.filter((t) => t.id === clickedTag.id).length;
     if (isExist) {
@@ -565,7 +570,17 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
               </Select>
             </FormControl>
           </Box>
-          <Text mb="8px">サムネイル</Text>
+          <Text mb="15px">サムネイル</Text>
+          {((newEvent.imageURL && !selectThumbnailUrl) || completedCrop) && (
+            <Button
+              mb="15px"
+              onClick={() => {
+                onClickDeleteImage();
+              }}
+              colorScheme="blue">
+              既存画像を削除
+            </Button>
+          )}
           <Box
             display="flex"
             flexDir="column"
