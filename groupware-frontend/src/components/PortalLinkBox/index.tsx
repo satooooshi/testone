@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import React from 'react';
+import React, { CSSProperties } from 'react';
 import portalLinkBoxStyles from '@/styles/components/PortalLinkBox.module.scss';
 import { FaSchool } from 'react-icons/fa';
 import { GiBookCover, GiTeacher, GiPartyPopper } from 'react-icons/gi';
@@ -7,7 +7,7 @@ import { BsChatDotsFill } from 'react-icons/bs';
 import { FaUserCog } from 'react-icons/fa';
 import { FcSportsMode } from 'react-icons/fc';
 import { RiAccountCircleFill, RiQuestionnaireFill } from 'react-icons/ri';
-import { MdAssignment, MdDeveloperBoard } from 'react-icons/md';
+import { MdAssignment, MdDeveloperBoard, MdWork } from 'react-icons/md';
 import { CgLoadbarDoc } from 'react-icons/cg';
 import { GrMail } from 'react-icons/gr';
 import { AiOutlineGlobal, AiFillBulb } from 'react-icons/ai';
@@ -30,6 +30,7 @@ export enum PortalLinkType {
   CHAT = '/chat',
   ADMIN = '/admin/users',
   ACCOUNT = '/account',
+  ATTENDANCE = '/attendance',
 }
 
 type PortarlLinkBoxProps = {
@@ -41,6 +42,11 @@ type PortalProps = {
 };
 
 const PortalIcon: React.FC<PortalProps> = ({ href }) => {
+  const iconStyle: CSSProperties = {
+    width: '144px',
+    height: '144px',
+    marginBottom: '16px',
+  };
   switch (href) {
     case PortalLinkType.IMPRESSIVE_UNIVERSITY:
       return (
@@ -177,8 +183,8 @@ const PortalIcon: React.FC<PortalProps> = ({ href }) => {
           )}
         />
       );
-    default:
-      return <GiBookCover className={portalLinkBoxStyles.icon} />;
+    case PortalLinkType.ATTENDANCE:
+      return <MdWork style={{ ...iconStyle, color: '#086f83' }} />;
   }
 };
 export const eventTitleText = (href: PortalLinkType): string => {
@@ -213,8 +219,8 @@ export const eventTitleText = (href: PortalLinkType): string => {
       return 'アカウント';
     case PortalLinkType.BOARD:
       return '掲示板';
-    default:
-      return '';
+    case PortalLinkType.ATTENDANCE:
+      return '勤怠管理';
   }
 };
 
@@ -251,8 +257,8 @@ const descriptionText = (href: PortalLinkType): string => {
       return '自分のアカウント情報を編集します。';
     case PortalLinkType.BOARD:
       return 'ナレッジやQ&Aなど、社内で情報共有をする掲示板です。';
-    default:
-      return '';
+    case PortalLinkType.ATTENDANCE:
+      return '勤怠についての申請や管理ができます。';
   }
 };
 
