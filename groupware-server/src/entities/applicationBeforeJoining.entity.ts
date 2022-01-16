@@ -9,6 +9,13 @@ import {
 } from 'typeorm';
 import { User } from './user.entity';
 
+export enum ApplicationCategory {
+  //お客様都合
+  CLIENT = 'client',
+  //自社都合
+  INHOUSE = 'inhouse',
+}
+
 export enum OneWayOrRound {
   ONE_WAY = 'one_way',
   ROUND = 'round',
@@ -19,6 +26,14 @@ export enum OneWayOrRound {
 export class ApplicationBeforeJoining {
   @PrimaryGeneratedColumn()
   id: number;
+
+  @Column({
+    type: 'enum',
+    name: 'category',
+    enum: ApplicationCategory,
+    default: ApplicationCategory.INHOUSE,
+  })
+  category: ApplicationCategory;
 
   //日付
   @Column({ type: 'datetime', name: 'attendance_time', default: () => 'now()' })

@@ -14,10 +14,26 @@ export enum TravelCostOneWayOrRound {
   ROUND = 'round',
 }
 
+export enum TravelCostCategory {
+  //お客様都合
+  CLIENT = 'client',
+  //自社都合
+  INHOUSE = 'inhouse',
+}
+
 @Entity('travel_cost')
 export class TravelCost {
   @PrimaryGeneratedColumn()
   id: number;
+
+  //交通費区分
+  @Column({
+    type: 'enum',
+    name: 'category',
+    enum: TravelCostCategory,
+    default: TravelCostCategory.INHOUSE,
+  })
+  category: TravelCostCategory;
 
   //行き先
   @Column({ type: 'varchar', name: 'destination', length: 100, default: '' })

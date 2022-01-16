@@ -447,6 +447,8 @@ export enum TravelCostOneWayOrRound {
 }
 export interface TravelCost {
   id: number;
+  //交通費区分
+  category: TravelCostCategory;
   //行き先
   destination: string;
   //目的
@@ -471,6 +473,14 @@ export enum OneWayOrRound {
   ONE_WAY = 'one_way',
   ROUND = 'round',
 }
+
+export enum TravelCostCategory {
+  //お客様都合
+  CLIENT = 'client',
+  //自社都合
+  INHOUSE = 'inhouse',
+}
+
 //入社前申請
 export interface ApplicationBeforeJoining {
   id: number;

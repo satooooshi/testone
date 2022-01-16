@@ -28,6 +28,7 @@ import { useAPICreateAttendance } from '@/hooks/api/attendance/useAPICreateAtten
 import { useAPIUpdateAttendance } from '@/hooks/api/attendance/useAPIUpdateAttendance';
 import { useAuthenticate } from 'src/contexts/useAuthenticate';
 import { attendanceCategoryName } from 'src/utils/factory/attendanceCategoryName';
+import TravelCostFormModal from '@/components/attendance/TravelCostFormModal';
 
 const AttendanceRow = ({
   date,
@@ -37,6 +38,8 @@ const AttendanceRow = ({
   attendanceData?: Attendance[];
 }) => {
   const { user } = useAuthenticate();
+  const [selectedDateForApplication, setSelectedDateForApplication] =
+    useState<DateTime>();
   const toast = useToast();
   const targetData = attendanceData?.filter(
     (a) =>
@@ -48,6 +51,7 @@ const AttendanceRow = ({
     targetDate: date.toJSDate(),
     breakMinutes: 0,
     user: user as User,
+    travelCost: [],
   };
   const { mutate: createAttendance } = useAPICreateAttendance({
     onSuccess: (created) => {
@@ -70,6 +74,10 @@ const AttendanceRow = ({
     initialValues: targetData || initialValues,
     enableReinitialize: true,
     onSubmit: (submitted) => {
+      submitted.travelCost = submitted?.travelCost?.filter(
+        (t) => !!t.travelCost,
+      );
+      // console.log(submitted?.travelCost);
       if (submitted?.id) {
         updateAttendance(submitted as Attendance);
         return;
@@ -109,6 +117,15 @@ const AttendanceRow = ({
   }, [setValues, targetData]);
   return (
     <>
+      <TravelCostFormModal
+        isOpen={!!selectedDateForApplication}
+        onClose={() => setSelectedDateForApplication(undefined)}
+        attendance={values}
+        setAttendance={setValues}
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        //@ts-ignore
+        date={selectedDateForApplication}
+      />
       <Td>
         <Text>{date.toFormat('d日')}</Text>
       </Td>
@@ -220,7 +237,11 @@ const AttendanceRow = ({
       </Td>
       <Td></Td>
       <Td>
-        <Button colorScheme="blue">申請</Button>
+        <Button
+          onClick={() => setSelectedDateForApplication(date)}
+          colorScheme="blue">
+          申請
+        </Button>
       </Td>
       <Td>
         <Button colorScheme="blue">備考</Button>

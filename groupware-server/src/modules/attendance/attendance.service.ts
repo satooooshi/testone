@@ -47,11 +47,27 @@ export class AttendanceService {
 
   public async createAttendance(attendance: Attendance) {
     const createdAttendance = await this.attendanceRepo.save(attendance);
+    if (attendance?.travelCost?.length) {
+      const costArr = attendance.travelCost.map((cost) => ({
+        ...cost,
+        createdAttendance,
+      }));
+      const travelCost = await this.travelCostRepo.save(costArr);
+      return { ...createdAttendance, travelCost };
+    }
     return createdAttendance;
   }
 
   public async updateAttendance(attendance: Attendance) {
     const updatedAttendance = await this.attendanceRepo.save(attendance);
+    if (attendance?.travelCost?.length) {
+      const costArr = attendance.travelCost.map((cost) => ({
+        ...cost,
+        updatedAttendance,
+      }));
+      const travelCost = await this.travelCostRepo.save(costArr);
+      return { ...updatedAttendance, travelCost };
+    }
     return updatedAttendance;
   }
 
