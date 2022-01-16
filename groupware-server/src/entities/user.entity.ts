@@ -31,6 +31,8 @@ import { ChatMessageReaction } from './chatMessageReaction.entity';
 import { NotificationDevice } from './device.entity';
 import { genSignedURL } from 'src/utils/storage/genSignedURL';
 import { genStorageURL } from 'src/utils/storage/genStorageURL';
+import { Attendance } from './attendance.entity';
+import { ApplicationBeforeJoining } from './applicationBeforeJoining.entity';
 
 export enum UserRole {
   ADMIN = 'admin',
@@ -266,6 +268,12 @@ export class User {
 
   @OneToMany(() => ChatMessageReaction, (reaction) => reaction.user)
   chatMessageReactions?: ChatMessageReaction[];
+
+  @OneToMany(() => Attendance, (attendance) => attendance.user)
+  attendance?: Attendance[];
+
+  @OneToMany(() => ApplicationBeforeJoining, (application) => application.user)
+  applications?: ApplicationBeforeJoining[];
 
   //this is jwt token send when login or authenticate
   token?: string;

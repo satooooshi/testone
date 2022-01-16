@@ -13,6 +13,7 @@ import { MailerModule } from '@nestjs-modules/mailer';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 import { TopNewsModule } from './modules/top-news/top-news.module';
 import { ChatGateway } from './gateway/chat.gateway';
+import { AttendanceModule } from './modules/attendance/attendance.module';
 
 @Module({
   imports: [
@@ -71,6 +72,7 @@ import { ChatGateway } from './gateway/chat.gateway';
     ChatModule,
     NotificationModule,
     TopNewsModule,
+    AttendanceModule,
   ],
   controllers: [],
   providers: [ChatGateway],
