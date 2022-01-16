@@ -1,4 +1,4 @@
-import React, {useRef} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {TouchableOpacity, useWindowDimensions} from 'react-native';
 import {
   Button,
@@ -6,6 +6,7 @@ import {
   Dropdown,
   DropdownProps,
   Icon,
+  Input,
   Modal,
   ModalProps,
   ScrollDiv,
@@ -35,12 +36,34 @@ const TagModal: React.FC<TagModalProps> = props => {
     selectedTagType: alreadySelectedTags,
     defaultSelectedTags,
   } = props;
+  const [searchWords, setSearchWords] = useState<RegExpMatchArray | null>();
+  const [modalTags, setModalTags] = useState(tags);
+
+  const onChangeHandle = (t: string) => {
+    const words = t
+      .trim()
+      .toLowerCase()
+      .match(/[^\s]+/g);
+    setSearchWords(words);
+    return;
+  };
+  useEffect(() => {
+    if (!searchWords) {
+      setModalTags(tags);
+      return;
+    }
+    const searchedTags = tags.filter(t =>
+      searchWords.every(w => t.name.toLowerCase().indexOf(w) !== -1),
+    );
+    setModalTags(searchedTags);
+  }, [searchWords, tags]);
+
   const {selectedTags, toggleTag, isSelected, clear} = useSelectedTags(
     defaultSelectedTags || [],
   );
   const {selectedTagType, selectTagType, filteredTags} = useTagType(
     alreadySelectedTags,
-    tags,
+    modalTags,
   );
   const dropdownRef = useRef<any | null>(null);
   const defaultDropdownProps: Partial<DropdownProps> = {
@@ -95,8 +118,19 @@ const TagModal: React.FC<TagModalProps> = props => {
         alignItems="flex-start"
         alignSelf="center"
         mb={'lg'}>
-        <Text fontSize={16}>タグのタイプを選択</Text>
+        <Text mx={8}>タグを検索</Text>
+        <Input
+          autoCapitalize={'none'}
+          mb={8}
+          mx={8}
+          onChangeText={v => onChangeHandle(v)}
+        />
+
+        <Text fontSize={16} mx={8}>
+          タグのタイプを選択
+        </Text>
         <Button
+          mx={8}
           alignSelf="center"
           block
           w={windowWidth * 0.9}
