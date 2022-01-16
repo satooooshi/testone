@@ -1,4 +1,4 @@
-import React, {useRef} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {TouchableOpacity, useWindowDimensions} from 'react-native';
 import {
   Button,
@@ -6,6 +6,7 @@ import {
   Dropdown,
   DropdownProps,
   Icon,
+  Input,
   Modal,
   ModalProps,
   ScrollDiv,
@@ -42,10 +43,38 @@ const UserModal: React.FC<UserModalProps> = props => {
     selectedUsers: selectedUsersInModal,
     clear,
   } = useSelectedUsers(defaultSelectedUsers || []);
+  const [searchWords, setSearchWords] = useState<RegExpMatchArray | null>();
+  const [modalUsers, setModalUsers] = useState<User[]>();
   const {selectedUserRole, selectUserRole, filteredUsers} = useUserRole(
     alreadySelectedUserRole,
-    users,
+    modalUsers,
   );
+
+  const onChangeHandle = (t: string) => {
+    const words = t
+      .trim()
+      .toLowerCase()
+      .match(/[^\s]+/g);
+    setSearchWords(words);
+    return;
+  };
+
+  const onCloseUserModal = () => {
+    onCloseModal();
+    setModalUsers(users);
+  };
+  useEffect(() => {
+    if (!searchWords) {
+      setModalUsers(users);
+      return;
+    }
+    const searchedTags = users.filter(u => {
+      const userName = u.firstName + u.lastName;
+      return searchWords.every(w => userName.indexOf(w) !== -1);
+    });
+    setModalUsers(searchedTags);
+  }, [searchWords, users]);
+
   const dropdownRef = useRef<any | null>(null);
   const defaultDropdownProps: Partial<DropdownProps> = {
     m: 'md',
@@ -77,7 +106,7 @@ const UserModal: React.FC<UserModalProps> = props => {
         w={60}
         onPress={() => {
           onCompleteModal(selectedUsersInModal as User[]);
-          onCloseModal();
+          onCloseUserModal();
         }}>
         <Icon color="white" fontSize="6xl" name="check" />
       </Button>
@@ -90,10 +119,17 @@ const UserModal: React.FC<UserModalProps> = props => {
         rounded="circle"
         onPress={() => {
           clear();
-          onCloseModal();
+          onCloseUserModal();
         }}>
         <Icon color="black" name="close" />
       </Button>
+      <Text mx={8}>タグを検索</Text>
+      <Input
+        mx={8}
+        autoCapitalize="none"
+        mb={8}
+        onChangeText={v => onChangeHandle(v)}
+      />
       <Div
         flexDir="column"
         alignItems="flex-start"
