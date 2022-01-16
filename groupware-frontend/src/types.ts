@@ -356,3 +356,143 @@ export interface TopNews {
   createdAt: Date;
   updatedAt: Date;
 }
+
+export enum AttendanceCategory {
+  // 通常
+  COMMON = 'common',
+  // 欠勤有給
+  PAILD_ABSENCE = 'paid_absence',
+  // 遅刻
+  LATE = 'late',
+  // 電車遅延
+  TRAINDELAY = 'train_delay',
+  // 早退
+  EARLY_LEAVING = 'early_leaving',
+  // 遅刻かつ早退
+  LATE_AND_EARY_LEAVING = 'late_and_eary_leaving',
+  // 有給などの休日
+  HOLIDAY = 'holiday',
+  // 休日出勤
+  HOLIDAY_WORK = 'holiday_work',
+  // 振替休日
+  TRANSFER_HOLIDAY = 'transfer_holiday',
+  // 外出(業務中に自己都合で外出)
+  GOOUT = 'go_out',
+  // シフト(顧客都合により出社時間を変更する場合)
+  SHIFTWORK = 'shift_work',
+  // 欠勤
+  ABSENCE = 'absence',
+  // 半休
+  HALF_HOLIDAY = 'half_holiday',
+}
+
+export enum AttendanceReason {
+  //通常
+  COMMON = 'common',
+  //私用
+  PRIVATE = 'private',
+  //体調不良
+  SICK = 'sick',
+  //家事都合
+  HOUSEWORK = 'housework',
+  //有給休暇
+  HOLIDAY = 'holiday',
+  //慶弔
+  CONDOLENCE = 'condolence',
+  //現場都合
+  SITE = 'site',
+  //災害
+  DISASTER = 'disaster',
+  //面談
+  MEETING = 'meeting',
+  //バースデー
+  BIRTHDAY = 'birthday',
+  //午前半休
+  MORNING_OFF = 'morning_off',
+  //午後半休
+  AFTERNOON_OFF = 'afternoon_off',
+  //遅刻半休
+  LATE_OFF = 'late_off',
+  //早退半休
+  EARLY_LEAVING_OFF = 'early_leaving_off',
+}
+
+export interface Attendance {
+  id: number;
+  category: AttendanceCategory;
+  reason: AttendanceReason;
+  //対象日
+  targetDate: Date;
+  //出勤時刻
+  attendanceTime: Date;
+  //退勤時刻
+  absenceTime: Date;
+  //退勤時刻
+  detail: string;
+  //休憩時間
+  breakMinutes: number;
+  //本社報告日
+  reportDate: Date | null;
+  // //交通費(円)
+  travelCost: TravelCost[];
+  //承認時刻
+  verifiedAt: Date | null;
+  user?: User;
+  createdAt: Date;
+  updatedAt: Date;
+}
+export enum TravelCostOneWayOrRound {
+  ONE_WAY = 'one_way',
+  ROUND = 'round',
+}
+export interface TravelCost {
+  id: number;
+  //行き先
+  destination: string;
+  //目的
+  purpose: string;
+  //出発駅
+  departureStation: string;
+  //経由
+  viaStation: string;
+  //到着駅
+  destinationStation: string;
+  //交通費(円)
+  travelCost: number;
+  //片道か往復か
+  oneWayOrRound: TravelCostOneWayOrRound;
+  //承認時刻
+  verifiedAt: Date | null;
+  attendance?: Attendance;
+  createdAt: Date;
+  updatedAt: Date;
+}
+export enum OneWayOrRound {
+  ONE_WAY = 'one_way',
+  ROUND = 'round',
+}
+//入社前申請
+export interface ApplicationBeforeJoining {
+  id: number;
+  //日付
+  attendanceTime: Date;
+  //行き先
+  destination: string;
+  //目的
+  purpose: string;
+  //出発駅
+  departureStation: string;
+  //経由
+  viaStation: string;
+  //到着駅
+  destinationStation: string;
+  //交通費(円)
+  travelCost: number;
+  //片道か往復か
+  oneWayOrRound: OneWayOrRound;
+  //承認時刻
+  verifiedAt: Date | null;
+  user?: User;
+  createdAt: Date;
+  updatedAt: Date;
+}
