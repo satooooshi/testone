@@ -16,8 +16,8 @@ import RequestWithUser from '../auth/requestWithUser.interface';
 import { AttendanceService } from './attendance.service';
 
 export interface GetAttendanceQuery {
-  fromDate: string;
-  toDate: string;
+  from_date: string;
+  to_date: string;
 }
 
 @Controller('attendance')
@@ -38,7 +38,10 @@ export class AttendanceController {
     @Query() query: GetAttendanceQuery,
     @Req() req: RequestWithUser,
   ) {
-    if (!this.isValidDate(query.fromDate) || !this.isValidDate(query.toDate)) {
+    if (
+      !this.isValidDate(query.from_date) ||
+      !this.isValidDate(query.to_date)
+    ) {
       throw new BadRequestException();
     }
     const { user } = req;
@@ -53,7 +56,10 @@ export class AttendanceController {
   @Get('/all')
   @UseGuards(JwtAuthenticationGuard)
   async getAttendanceAllUser(@Query() query: GetAttendanceQuery) {
-    if (!this.isValidDate(query.fromDate) || !this.isValidDate(query.toDate)) {
+    if (
+      !this.isValidDate(query.from_date) ||
+      !this.isValidDate(query.to_date)
+    ) {
       throw new BadRequestException();
     }
 

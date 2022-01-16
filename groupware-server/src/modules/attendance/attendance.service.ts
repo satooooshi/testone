@@ -18,13 +18,13 @@ export class AttendanceService {
   ) {}
 
   public async getAttendanceAllUser(query: GetAttendanceQuery) {
-    const { fromDate, toDate } = query;
+    const { from_date: fromDate, to_date: toDate } = query;
     const attendance = await this.attendanceRepo
       .createQueryBuilder('attendance')
       .leftJoinAndSelect('attendance.travelCost', 'travelCost')
       .leftJoinAndSelect('attendance.user', 'user')
-      .where('targetDate >= :fromDate', { fromDate })
-      .where('targetDate <= :toDate', { toDate })
+      .where('attendance.targetDate >= :fromDate', { fromDate })
+      .where('attendance.targetDate <= :toDate', { toDate })
       .getMany();
     return attendance;
   }
@@ -33,14 +33,14 @@ export class AttendanceService {
     userId: number,
     query: GetAttendanceQuery,
   ) {
-    const { fromDate, toDate } = query;
+    const { from_date: fromDate, to_date: toDate } = query;
     const attendance = await this.attendanceRepo
       .createQueryBuilder('attendance')
       .leftJoinAndSelect('attendance.travelCost', 'travelCost')
       .leftJoinAndSelect('attendance.user', 'user')
       .where('user.id = :userId', { userId })
-      .where('targetDate >= :fromDate', { fromDate })
-      .where('targetDate <= :toDate', { toDate })
+      .where('attendance.targetDate >= :fromDate', { fromDate })
+      .where('attendance.targetDate <= :toDate', { toDate })
       .getMany();
     return attendance;
   }
