@@ -12,6 +12,7 @@ import Link from 'next/link';
 import { AiFillTags, AiOutlineGlobal } from 'react-icons/ai';
 import { GiCancel } from 'react-icons/gi';
 import { useMediaQuery } from '@chakra-ui/media-query';
+import { MdWork } from 'react-icons/md';
 
 export enum SidebarScreenName {
   ACCOUNT = 'アカウント',
@@ -23,6 +24,7 @@ export enum SidebarScreenName {
   CHAT = 'チャット',
   ADMIN = '管理',
   TAGADMIN = 'タグ編集',
+  ATTENDANCE = '勤怠管理',
 }
 
 export type SidebarProps = {
@@ -156,6 +158,17 @@ const Sidebar: React.FC<SidebarProps> = ({
               />
             }
             iconName={SidebarScreenName.ACCOUNT}
+          />
+          <LinkWithIcon
+            screenName={`/attendance`}
+            icon={
+              <MdWork
+                className={iconClass(
+                  activeScreenName === SidebarScreenName.ATTENDANCE,
+                )}
+              />
+            }
+            iconName={SidebarScreenName.ATTENDANCE}
           />
         </div>
         {user?.role === UserRole.ADMIN ? (

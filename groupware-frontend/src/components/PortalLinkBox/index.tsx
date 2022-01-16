@@ -31,6 +31,7 @@ export enum PortalLinkType {
   ADMIN = '/admin/users',
   ACCOUNT = '/account',
   ATTENDANCE = '/attendance',
+  ATTENDANCE_VIEW = '/attendance/view',
 }
 
 type PortarlLinkBoxProps = {
@@ -185,6 +186,8 @@ const PortalIcon: React.FC<PortalProps> = ({ href }) => {
       );
     case PortalLinkType.ATTENDANCE:
       return <MdWork style={{ ...iconStyle, color: '#086f83' }} />;
+    case PortalLinkType.ATTENDANCE_VIEW:
+      return <MdWork style={{ ...iconStyle, color: '#086f83' }} />;
   }
 };
 export const eventTitleText = (href: PortalLinkType): string => {
@@ -221,6 +224,8 @@ export const eventTitleText = (href: PortalLinkType): string => {
       return '掲示板';
     case PortalLinkType.ATTENDANCE:
       return '勤怠管理';
+    case PortalLinkType.ATTENDANCE_VIEW:
+      return '勤怠打刻・管理';
   }
 };
 
@@ -258,6 +263,8 @@ const descriptionText = (href: PortalLinkType): string => {
     case PortalLinkType.BOARD:
       return 'ナレッジやQ&Aなど、社内で情報共有をする掲示板です。';
     case PortalLinkType.ATTENDANCE:
+      return '勤怠についての申請や管理ができます。';
+    case PortalLinkType.ATTENDANCE_VIEW:
       return '勤怠についての申請や管理ができます。';
   }
 };
