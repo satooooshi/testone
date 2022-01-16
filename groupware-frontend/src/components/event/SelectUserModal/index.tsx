@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import ReactModal from 'react-modal';
 import { User, UserRole } from 'src/types';
 import selectUserModalStyles from '@/styles/components/SelectUserModal.module.scss';
@@ -8,6 +8,7 @@ import {
   Button,
   FormControl,
   FormLabel,
+  Input,
   Link,
   Select,
   Text,
@@ -66,6 +67,26 @@ const SelectUserModal: React.FC<SelectUserModalProps> = ({
   const [selectedRole, setSelectedRole] = useState<UserRole | 'all'>(
     UserRole.INTERNAL_INSTRUCTOR,
   );
+  const [modalUsers, setModalUsers] = useState(users);
+  const [searchWords, setSearchWords] = useState<RegExpMatchArray | null>();
+  const onChangeHandle = (t: string) => {
+    const searchWords = t.trim().match(/[^\s]+/g);
+    setSearchWords(searchWords);
+    return;
+  };
+
+  useEffect(() => {
+    if (!searchWords) {
+      setModalUsers(users);
+      return;
+    }
+    const searchedTags = users.filter((u) => {
+      const userName = u.firstName + u.lastName;
+      return searchWords.every((w) => userName.indexOf(w) !== -1);
+    });
+    setModalUsers(searchedTags);
+  }, [searchWords, users]);
+
   return (
     <ReactModal
       ariaHideApp={false}
@@ -73,6 +94,12 @@ const SelectUserModal: React.FC<SelectUserModalProps> = ({
       isOpen={isOpen}
       className={selectUserModalStyles.modal}>
       <FormControl className={selectUserModalStyles.user_role_select_wrapper}>
+        <FormLabel htmlFor="search">タグを検索</FormLabel>
+        <Input
+          marginBottom={8}
+          onChange={(v) => onChangeHandle(v.target.value)}
+          id="search"
+        />
         <FormLabel>タイプ</FormLabel>
         <Select
           bg="white"
@@ -92,7 +119,7 @@ const SelectUserModal: React.FC<SelectUserModalProps> = ({
       </FormControl>
       <Box display="flex" flexDir="column" mb="16px" h="80%" overflowY="auto">
         {selectedRole !== 'all'
-          ? users
+          ? modalUsers
               .filter((u) => u.role === selectedRole)
               .map((u) => (
                 <SelectableUser
@@ -102,7 +129,7 @@ const SelectUserModal: React.FC<SelectUserModalProps> = ({
                   toggleUser={toggleUser}
                 />
               ))
-          : users.map((u) => (
+          : modalUsers.map((u) => (
               <SelectableUser
                 key={u.id}
                 user={u}
