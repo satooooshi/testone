@@ -3,7 +3,13 @@ import { Tag, TagType, UserTag } from 'src/types';
 import Modal from 'react-modal';
 import tagModalStyles from '@/styles/components/TagModal.module.scss';
 import clsx from 'clsx';
-import { Button, FormControl, FormLabel, Select } from '@chakra-ui/react';
+import {
+  Button,
+  FormControl,
+  FormLabel,
+  Input,
+  Select,
+} from '@chakra-ui/react';
 
 type TagModalProps = {
   isOpen: boolean;
@@ -54,16 +60,28 @@ const TagModal: React.FC<TagModalProps> = ({
   onComplete,
 }) => {
   const [tags, setTags] = useState(savedTags);
+  const [searchWords, setSearchWords] = useState<RegExpMatchArray | null>();
   const [selectedTagType, setSelectedTagType] = useState<TagType | 'all'>(
     'all',
   );
-
+  const onChangeHandle = (t: string) => {
+    const searchWords = t
+      .trim()
+      .toLowerCase()
+      .match(/[^\s]+/g);
+    setSearchWords(searchWords);
+    return;
+  };
   useEffect(() => {
-    if (savedTags) {
+    if (!searchWords) {
       setTags(savedTags);
+      return;
     }
-  }, [savedTags]);
-
+    const searchedTags = savedTags.filter((t) =>
+      searchWords.every((w) => t.name.toLowerCase().indexOf(w) !== -1),
+    );
+    setTags(searchedTags);
+  }, [searchWords, savedTags]);
   useEffect(() => {
     if (filteredTagType) {
       setSelectedTagType(filteredTagType);
@@ -80,6 +98,12 @@ const TagModal: React.FC<TagModalProps> = ({
       className={tagModalStyles.modal_wrapper}>
       {!filteredTagType && (
         <FormControl className={tagModalStyles.tag_select_wrapper}>
+          <FormLabel htmlFor="search">タグを検索</FormLabel>
+          <Input
+            marginBottom={8}
+            onChange={(v) => onChangeHandle(v.target.value)}
+            id="search"
+          />
           <FormLabel>タイプ</FormLabel>
           <Select
             bg="white"
