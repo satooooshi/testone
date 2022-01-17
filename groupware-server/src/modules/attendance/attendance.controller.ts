@@ -9,6 +9,7 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
+import { ApplicationBeforeJoining } from 'src/entities/applicationBeforeJoining.entity';
 import { Attendance } from 'src/entities/attendance.entity';
 import { DefaultAttendance } from 'src/entities/defaultAttendance.entity';
 import { TravelCost } from 'src/entities/travelCost.entity';
@@ -151,5 +152,43 @@ export class AttendanceController {
       user,
     });
     return attendance;
+  }
+
+  @Get('application')
+  @UseGuards(JwtAuthenticationGuard)
+  async getApplications(@Req() req: RequestWithUser) {
+    const { user } = req;
+    const applications =
+      await this.attendanceService.getApplicationBySpecificUser(user);
+    return applications;
+  }
+
+  @Post('application')
+  @UseGuards(JwtAuthenticationGuard)
+  async createApplication(
+    @Req() req: RequestWithUser,
+    @Body() application: ApplicationBeforeJoining,
+  ) {
+    const { user } = req;
+    console.log('called');
+    const created = await this.attendanceService.createApplication({
+      ...application,
+      user,
+    });
+    return created;
+  }
+
+  @Patch('application')
+  @UseGuards(JwtAuthenticationGuard)
+  async updateApplication(
+    @Req() req: RequestWithUser,
+    @Body() application: ApplicationBeforeJoining,
+  ) {
+    const { user } = req;
+    const updated = await this.attendanceService.createApplication({
+      ...application,
+      user,
+    });
+    return updated;
   }
 }

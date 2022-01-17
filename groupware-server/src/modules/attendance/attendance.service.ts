@@ -110,4 +110,19 @@ export class AttendanceService {
     const updatedAttendance = await this.travelCostRepo.save(travelCost);
     return updatedAttendance;
   }
+
+  public async getApplicationBySpecificUser(user: User) {
+    const applications = await this.applicationRepo.find({ where: { user } });
+    return applications;
+  }
+
+  public async createApplication(application: ApplicationBeforeJoining) {
+    const created = await this.applicationRepo.save(application);
+    return created;
+  }
+
+  public async updateApplication(application: ApplicationBeforeJoining) {
+    const updated = await this.applicationRepo.save(application);
+    return updated;
+  }
 }

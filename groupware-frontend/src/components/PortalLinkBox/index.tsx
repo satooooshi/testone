@@ -6,7 +6,11 @@ import { GiBookCover, GiTeacher, GiPartyPopper } from 'react-icons/gi';
 import { BsChatDotsFill } from 'react-icons/bs';
 import { FaUserCog } from 'react-icons/fa';
 import { FcSportsMode } from 'react-icons/fc';
-import { RiAccountCircleFill, RiQuestionnaireFill } from 'react-icons/ri';
+import {
+  RiAccountCircleFill,
+  RiExchangeCnyFill,
+  RiQuestionnaireFill,
+} from 'react-icons/ri';
 import { MdAssignment, MdDeveloperBoard, MdWork } from 'react-icons/md';
 import { CgLoadbarDoc } from 'react-icons/cg';
 import { GrMail } from 'react-icons/gr';
@@ -32,6 +36,7 @@ export enum PortalLinkType {
   ACCOUNT = '/account',
   ATTENDANCE = '/attendance',
   ATTENDANCE_VIEW = '/attendance/view',
+  APPLICATION = '/attendance/application',
 }
 
 type PortarlLinkBoxProps = {
@@ -188,6 +193,10 @@ const PortalIcon: React.FC<PortalProps> = ({ href }) => {
       return <MdWork style={{ ...iconStyle, color: '#086f83' }} />;
     case PortalLinkType.ATTENDANCE_VIEW:
       return <MdWork style={{ ...iconStyle, color: '#086f83' }} />;
+    case PortalLinkType.APPLICATION:
+      return (
+        <RiExchangeCnyFill style={{ ...iconStyle, color: 'darkorange' }} />
+      );
   }
 };
 export const eventTitleText = (href: PortalLinkType): string => {
@@ -226,6 +235,8 @@ export const eventTitleText = (href: PortalLinkType): string => {
       return '勤怠管理';
     case PortalLinkType.ATTENDANCE_VIEW:
       return '勤怠打刻・管理';
+    case PortalLinkType.APPLICATION:
+      return '入社前申請';
   }
 };
 
@@ -266,6 +277,8 @@ const descriptionText = (href: PortalLinkType): string => {
       return '勤怠についての申請や管理ができます。';
     case PortalLinkType.ATTENDANCE_VIEW:
       return '勤怠についての申請や管理ができます。';
+    case PortalLinkType.APPLICATION:
+      return '入社前にかかった交通費などの申請ができます。';
   }
 };
 
