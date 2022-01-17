@@ -427,7 +427,7 @@ export interface Attendance {
   attendanceTime: Date;
   //退勤時刻
   absenceTime: Date;
-  //退勤時刻
+  //備考
   detail: string;
   //休憩時間
   breakMinutes: number;

@@ -29,6 +29,8 @@ import { useAPIUpdateAttendance } from '@/hooks/api/attendance/useAPIUpdateAtten
 import { useAuthenticate } from 'src/contexts/useAuthenticate';
 import { attendanceCategoryName } from 'src/utils/factory/attendanceCategoryName';
 import TravelCostFormModal from '@/components/attendance/TravelCostFormModal';
+import { attendanceSchema } from 'src/utils/validation/schema';
+import { formikErrorMsgFactory } from 'src/utils/factory/formikErrorMsgFactory';
 
 const AttendanceRow = ({
   date,
@@ -70,9 +72,23 @@ const AttendanceRow = ({
       });
     },
   });
-  const { values, handleSubmit, setValues } = useFormik({
+
+  const validate = () => {
+    const errorMsg = formikErrorMsgFactory(errors);
+    if (errorMsg) {
+      toast({
+        description: errorMsg,
+        status: 'error',
+        isClosable: true,
+      });
+    }
+  };
+  const { values, handleSubmit, setValues, errors } = useFormik({
     initialValues: targetData || initialValues,
     enableReinitialize: true,
+    validationSchema: attendanceSchema,
+    validateOnChange: true,
+    validateOnMount: true,
     onSubmit: (submitted) => {
       submitted.travelCost = submitted?.travelCost?.filter(
         (t) => !!t.travelCost,
@@ -250,7 +266,12 @@ const AttendanceRow = ({
         <Button colorScheme="yellow">定時</Button>
       </Td>
       <Td>
-        <Button colorScheme="green" onClick={() => handleSubmit()}>
+        <Button
+          colorScheme="green"
+          onClick={() => {
+            handleSubmit();
+            validate();
+          }}>
           保存
         </Button>
       </Td>
@@ -261,7 +282,7 @@ const AttendanceRow = ({
 const AttendanceView = () => {
   const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
   const tabs: Tab[] = [
-    { type: 'link', name: '勤怠管理 Home', href: '/attendance' },
+    { type: 'link', name: '勤怠打刻', href: '/attendance/view' },
   ];
   const [month, setMonth] = useState(DateTime.now());
   const { data } = useAPIGetAttendace({
@@ -282,17 +303,17 @@ const AttendanceView = () => {
 
   return (
     <LayoutWithTab
-      sidebar={{ activeScreenName: SidebarScreenName.QA }}
+      sidebar={{ activeScreenName: SidebarScreenName.ATTENDANCE }}
       header={{
-        title: '勤怠管理',
+        title: '勤怠打刻',
         tabs,
-        activeTabName: '勤怠管理 Home',
+        activeTabName: '勤怠打刻',
       }}>
       <Head>
         <title>ボールド | 勤怠打刻</title>
       </Head>
 
-      <Box>
+      <Box display="flex" flexDir="row" justifyContent="flex-start" mb="16px">
         <FormControl>
           <FormLabel>対象月</FormLabel>
           <Input

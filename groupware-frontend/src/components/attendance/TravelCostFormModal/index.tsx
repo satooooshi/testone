@@ -23,6 +23,7 @@ import {
   TravelCostOneWayOrRound,
 } from 'src/types';
 import { travelCostCategoryName } from 'src/utils/factory/travelCostCategoryName';
+import { travelCostFormModalSchema } from 'src/utils/validation/schema';
 
 type TravelCostFormModalProps = {
   date: DateTime;
@@ -54,8 +55,9 @@ const TravelForm = ({
     oneWayOrRound: TravelCostOneWayOrRound.ROUND,
     attendance: attendance as Attendance,
   };
-  const { values, setValues, handleSubmit } = useFormik({
+  const { values, setValues, handleSubmit, errors, touched } = useFormik({
     initialValues: travelCost || initialValues,
+    validationSchema: travelCostFormModalSchema,
     onSubmit: (submittedValues) => {
       setAttendance((a) => {
         if (a?.travelCost?.length) {
@@ -109,6 +111,9 @@ const TravelForm = ({
           </option>
         </Select>
       </FormControl>
+      {errors?.destination && touched.destination ? (
+        <FormLabel color="tomato">{errors?.destination}</FormLabel>
+      ) : null}
       <FormControl
         mb="8px"
         display="flex"
@@ -128,6 +133,9 @@ const TravelForm = ({
           }
         />
       </FormControl>
+      {errors?.purpose && touched.purpose ? (
+        <FormLabel color="tomato">{errors?.purpose}</FormLabel>
+      ) : null}
       <FormControl
         mb="8px"
         display="flex"
@@ -147,6 +155,9 @@ const TravelForm = ({
           }
         />
       </FormControl>
+      {errors?.destination && touched.destination ? (
+        <FormLabel color="tomato">{errors?.destination}</FormLabel>
+      ) : null}
       <FormControl
         mb="8px"
         display="flex"
@@ -185,6 +196,9 @@ const TravelForm = ({
           }
         />
       </FormControl>
+      {errors?.destinationStation && touched.destinationStation ? (
+        <FormLabel color="tomato">{errors?.destinationStation}</FormLabel>
+      ) : null}
       <FormControl
         mb="8px"
         display="flex"
@@ -209,6 +223,9 @@ const TravelForm = ({
           経路を確認
         </Button>
       </Box>
+      {errors?.travelCost && touched.travelCost ? (
+        <FormLabel color="tomato">{errors?.travelCost}</FormLabel>
+      ) : null}
       <FormControl
         mb="8px"
         display="flex"
@@ -220,12 +237,15 @@ const TravelForm = ({
           value={values.travelCost}
           placeholder="小計"
           bg="white"
-          onChange={(e) =>
+          onChange={(e) => {
+            if (isNaN(Number(e.target.value))) {
+              return;
+            }
             setValues((a) => ({
               ...a,
               travelCost: Number(e.target.value),
-            }))
-          }
+            }));
+          }}
         />
       </FormControl>
       <FormControl
@@ -243,8 +263,8 @@ const TravelForm = ({
               oneWayOrRound: e.target.value as TravelCostOneWayOrRound,
             }))
           }>
-          <option value={TravelCostCategory.CLIENT}>片道</option>
-          <option value={TravelCostCategory.INHOUSE}>往復</option>
+          <option value={TravelCostOneWayOrRound.ONE_WAY}>片道</option>
+          <option value={TravelCostOneWayOrRound.ROUND}>往復</option>
         </Select>
       </FormControl>
       {index === undefined ||
