@@ -110,12 +110,12 @@ export class Attendance {
 
   //休憩時間
   @Column({
-    type: 'int',
+    type: 'time',
     name: 'break_minutes',
     nullable: false,
-    default: 0,
+    default: '00:00:00',
   })
-  breakMinutes: number;
+  breakMinutes: string;
 
   //本社報告日
   @Column({

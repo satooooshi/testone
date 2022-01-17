@@ -10,6 +10,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { Attendance } from 'src/entities/attendance.entity';
+import { DefaultAttendance } from 'src/entities/defaultAttendance.entity';
 import { TravelCost } from 'src/entities/travelCost.entity';
 import JwtAuthenticationGuard from '../auth/jwtAuthentication.guard';
 import RequestWithUser from '../auth/requestWithUser.interface';
@@ -113,5 +114,42 @@ export class AttendanceController {
       travelCost,
     );
     return updatedTravelCost;
+  }
+
+  @Get('/default')
+  @UseGuards(JwtAuthenticationGuard)
+  async getDefaultAttendance(@Req() req: RequestWithUser) {
+    const { user } = req;
+
+    const attendance = await this.attendanceService.getDefaultAttendance(user);
+    return attendance;
+  }
+
+  @Post('/default')
+  @UseGuards(JwtAuthenticationGuard)
+  async createDefaultAttendance(
+    @Body() defaultAttendance: DefaultAttendance,
+    @Req() req: RequestWithUser,
+  ) {
+    const { user } = req;
+    const attendance = await this.attendanceService.createDefaultAttendance({
+      ...defaultAttendance,
+      user,
+    });
+    return attendance;
+  }
+
+  @Patch('/default')
+  @UseGuards(JwtAuthenticationGuard)
+  async updateDefaultAttendance(
+    @Body() defaultAttendance: DefaultAttendance,
+    @Req() req: RequestWithUser,
+  ) {
+    const { user } = req;
+    const attendance = await this.attendanceService.updateDefaultAttendance({
+      ...defaultAttendance,
+      user,
+    });
+    return attendance;
   }
 }

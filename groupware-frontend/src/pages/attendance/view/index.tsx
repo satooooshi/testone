@@ -19,9 +19,21 @@ import {
   Select,
   Button,
   useToast,
+  Modal,
+  ModalOverlay,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalHeader,
+  Textarea,
 } from '@chakra-ui/react';
 import { DateTime } from 'luxon';
-import { Attendance, AttendanceCategory, User } from 'src/types';
+import {
+  Attendance,
+  AttendanceCategory,
+  DefaultAttendance,
+  User,
+} from 'src/types';
 import { useFormik } from 'formik';
 import { useAPIGetAttendace } from '@/hooks/api/attendance/useAPIGetAttendance';
 import { useAPICreateAttendance } from '@/hooks/api/attendance/useAPICreateAttendance';
@@ -31,14 +43,18 @@ import { attendanceCategoryName } from 'src/utils/factory/attendanceCategoryName
 import TravelCostFormModal from '@/components/attendance/TravelCostFormModal';
 import { attendanceSchema } from 'src/utils/validation/schema';
 import { formikErrorMsgFactory } from 'src/utils/factory/formikErrorMsgFactory';
+import { useAPIGetDefaultAttendance } from '@/hooks/api/attendance/useAPIGetDefaultAttendance';
 
 const AttendanceRow = ({
   date,
   attendanceData,
+  defaultData,
 }: {
   date: DateTime;
   attendanceData?: Attendance[];
+  defaultData?: DefaultAttendance;
 }) => {
+  const [detailModal, setDetailModal] = useState(false);
   const { user } = useAuthenticate();
   const [selectedDateForApplication, setSelectedDateForApplication] =
     useState<DateTime>();
@@ -51,7 +67,7 @@ const AttendanceRow = ({
   const initialValues: Partial<Attendance> = {
     category: AttendanceCategory.COMMON,
     targetDate: date.toJSDate(),
-    breakMinutes: 0,
+    breakMinutes: '00:00',
     user: user as User,
     travelCost: [],
   };
@@ -90,10 +106,19 @@ const AttendanceRow = ({
     validateOnChange: true,
     validateOnMount: true,
     onSubmit: (submitted) => {
+      if (
+        submitted?.targetDate &&
+        new Date(submitted?.targetDate)?.getMonth() !== new Date().getMonth()
+      ) {
+        toast({
+          title: '今月のデータのみ編集可能です',
+          status: 'error',
+        });
+        return;
+      }
       submitted.travelCost = submitted?.travelCost?.filter(
         (t) => !!t.travelCost,
       );
-      // console.log(submitted?.travelCost);
       if (submitted?.id) {
         updateAttendance(submitted as Attendance);
         return;
@@ -113,19 +138,6 @@ const AttendanceRow = ({
     return undefined;
   };
 
-  const breakMinutes = (time: number) => {
-    const hour = Math.floor(time / 60);
-    const minutes = time % 60;
-    const hourAndMinutes = DateTime.fromJSDate(
-      targetData?.targetDate
-        ? new Date(targetData?.targetDate)
-        : date.toJSDate(),
-    )
-      .set({ hour, minute: minutes })
-      .toFormat('HH:mm');
-    return hourAndMinutes;
-  };
-
   useEffect(() => {
     if (targetData) {
       setValues(targetData);
@@ -133,6 +145,36 @@ const AttendanceRow = ({
   }, [setValues, targetData]);
   return (
     <>
+      <Modal
+        scrollBehavior="inside"
+        isOpen={detailModal}
+        onClose={() => setDetailModal(false)}>
+        <ModalOverlay />
+        <ModalContent h="90vh" bg={'#f9fafb'}>
+          <ModalHeader
+            flexDir="row"
+            justifyContent="space-between"
+            display="flex"
+            mr="24px">
+            <Text>{date?.toFormat('LL月dd日 備考')}</Text>
+          </ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <FormControl>
+              <FormLabel>備考欄を記入してください</FormLabel>
+            </FormControl>
+            <Textarea
+              type="text"
+              value={values.detail}
+              h="300px"
+              placeholder="備考を入力してください"
+              onChange={(e) =>
+                setValues((v) => ({ ...v, detail: e.target.value }))
+              }
+            />
+          </ModalBody>
+        </ModalContent>
+      </Modal>
       <TravelCostFormModal
         isOpen={!!selectedDateForApplication}
         onClose={() => setSelectedDateForApplication(undefined)}
@@ -237,17 +279,9 @@ const AttendanceRow = ({
       <Td>
         <input
           type="time"
-          value={
-            values?.breakMinutes ? breakMinutes(values.breakMinutes) : undefined
-          }
+          value={values?.breakMinutes}
           onChange={(e) => {
-            const hourAndMinutes = e.target.value.split(':');
-            const dateTimeObj = date.set({
-              hour: Number(hourAndMinutes[0]),
-              minute: Number(hourAndMinutes[1]),
-            });
-            const minutes = dateTimeObj.hour * 60 + dateTimeObj.minute;
-            setValues((v) => ({ ...v, breakMinutes: minutes }));
+            setValues((v) => ({ ...v, breakMinutes: e.target.value }));
           }}
         />
       </Td>
@@ -260,17 +294,45 @@ const AttendanceRow = ({
         </Button>
       </Td>
       <Td>
-        <Button colorScheme="blue">備考</Button>
+        <Button colorScheme="blue" onClick={() => setDetailModal(true)}>
+          備考
+        </Button>
       </Td>
       <Td>
-        <Button colorScheme="yellow">定時</Button>
+        <Button
+          colorScheme="yellow"
+          onClick={() => {
+            if (defaultData) {
+              const attendanceHourAndMinutes =
+                defaultData.attendanceTime.split(':');
+              const absenceHourAndMinutes = defaultData.absenceTime.split(':');
+              setValues((v) => ({
+                ...v,
+                attendanceTime: date
+                  .set({
+                    hour: Number(attendanceHourAndMinutes[0]),
+                    minute: Number(attendanceHourAndMinutes[1]),
+                  })
+                  .toJSDate(),
+                absenceTime: date
+                  .set({
+                    hour: Number(absenceHourAndMinutes[0]),
+                    minute: Number(absenceHourAndMinutes[1]),
+                  })
+                  .toJSDate(),
+                breakMinutes: defaultData.breakMinutes,
+              }));
+            }
+          }}>
+          定時
+        </Button>
       </Td>
       <Td>
         <Button
           colorScheme="green"
           onClick={() => {
-            handleSubmit();
             validate();
+            handleSubmit();
           }}>
           保存
         </Button>
@@ -281,8 +343,10 @@ const AttendanceRow = ({
 
 const AttendanceView = () => {
   const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
+  const { data: defaultData } = useAPIGetDefaultAttendance();
   const tabs: Tab[] = [
     { type: 'link', name: '勤怠打刻', href: '/attendance/view' },
+    { type: 'link', name: '定時設定', href: '/attendance/default' },
   ];
   const [month, setMonth] = useState(DateTime.now());
   const { data } = useAPIGetAttendace({
@@ -359,7 +423,11 @@ const AttendanceView = () => {
           <Tbody position="relative" borderColor="gray.300" borderWidth={1}>
             {dates.map((d) => (
               <Tr key={d.toISO()}>
-                <AttendanceRow date={d} attendanceData={data} />
+                <AttendanceRow
+                  date={d}
+                  attendanceData={data}
+                  defaultData={defaultData}
+                />
               </Tr>
             ))}
           </Tbody>

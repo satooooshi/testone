@@ -2,7 +2,9 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ApplicationBeforeJoining } from 'src/entities/applicationBeforeJoining.entity';
 import { Attendance } from 'src/entities/attendance.entity';
+import { DefaultAttendance } from 'src/entities/defaultAttendance.entity';
 import { TravelCost } from 'src/entities/travelCost.entity';
+import { User } from 'src/entities/user.entity';
 import { Repository } from 'typeorm';
 import { GetAttendanceQuery } from './attendance.controller';
 
@@ -15,7 +17,29 @@ export class AttendanceService {
     private readonly applicationRepo: Repository<ApplicationBeforeJoining>,
     @InjectRepository(TravelCost)
     private readonly travelCostRepo: Repository<TravelCost>,
+    @InjectRepository(DefaultAttendance)
+    private readonly defaultAttendanceRepo: Repository<DefaultAttendance>,
   ) {}
+
+  public async getDefaultAttendance(user: User) {
+    const defaultAttendance = await this.defaultAttendanceRepo.findOne(
+      {
+        user,
+      },
+      { relations: ['user'] },
+    );
+    return defaultAttendance;
+  }
+
+  public async createDefaultAttendance(defaultAttendance: DefaultAttendance) {
+    const created = await this.defaultAttendanceRepo.save(defaultAttendance);
+    return created;
+  }
+
+  public async updateDefaultAttendance(defaultAttendance: DefaultAttendance) {
+    const updated = await this.defaultAttendanceRepo.save(defaultAttendance);
+    return updated;
+  }
 
   public async getAttendanceAllUser(query: GetAttendanceQuery) {
     const { from_date: fromDate, to_date: toDate } = query;
@@ -46,7 +70,10 @@ export class AttendanceService {
   }
 
   public async createAttendance(attendance: Attendance) {
-    const createdAttendance = await this.attendanceRepo.save(attendance);
+    const createdAttendance = await this.attendanceRepo.save({
+      ...attendance,
+      verifiedAt: null,
+    });
     if (attendance?.travelCost?.length) {
       const costArr = attendance.travelCost.map((cost) => ({
         ...cost,
@@ -59,7 +86,10 @@ export class AttendanceService {
   }
 
   public async updateAttendance(attendance: Attendance) {
-    const updatedAttendance = await this.attendanceRepo.save(attendance);
+    const updatedAttendance = await this.attendanceRepo.save({
+      ...attendance,
+      verifiedAt: null,
+    });
     if (attendance?.travelCost?.length) {
       const costArr = attendance.travelCost.map((cost) => ({
         ...cost,

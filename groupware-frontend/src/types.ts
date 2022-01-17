@@ -104,6 +104,7 @@ export interface User {
   wiki?: Wiki[];
   qaAnswers?: QAAnswer[];
   qaAnswerReplies?: QAAnswerReply[];
+  defaultAttendance: DefaultAttendance;
   //this params is sent when login
   token?: string;
 
@@ -430,7 +431,7 @@ export interface Attendance {
   //備考
   detail: string;
   //休憩時間
-  breakMinutes: number;
+  breakMinutes: string;
   //本社報告日
   reportDate: Date | null;
   // //交通費(円)
@@ -503,6 +504,19 @@ export interface ApplicationBeforeJoining {
   //承認時刻
   verifiedAt: Date | null;
   user?: User;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface DefaultAttendance {
+  id: number;
+  //出勤時刻
+  attendanceTime: string;
+  //退勤時刻
+  absenceTime: string;
+  //休憩時間
+  breakMinutes: string;
+  user: User;
   createdAt: Date;
   updatedAt: Date;
 }
