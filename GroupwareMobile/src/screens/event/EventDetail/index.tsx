@@ -8,7 +8,7 @@ import {
   Alert,
 } from 'react-native';
 import HeaderWithTextButton from '../../../components/Header';
-import {Div, Text, Button, Overlay, ScrollDiv} from 'react-native-magnus';
+import {Div, Text, Button, Overlay, ScrollDiv, Icon} from 'react-native-magnus';
 import FastImage from 'react-native-fast-image';
 import {eventDetailStyles} from '../../../styles/screen/event/eventDetail.style';
 import {useAPIGetEventDetail} from '../../../hooks/api/event/useAPIGetEventDetail';
@@ -220,6 +220,30 @@ const EventDetail: React.FC = () => {
       : undefined;
 
   const isFinished = isFinishedEvent(eventInfo);
+  const normalizeURL = (url: string) => {
+    const filePrefix = 'file://';
+    if (url.startsWith(filePrefix)) {
+      url = url.substring(filePrefix.length);
+      url = decodeURI(url);
+      return url;
+    }
+  };
+  const defaultImage = () => {
+    switch (eventInfo?.type) {
+      case EventType.STUDY_MEETING:
+        return require('../../../../assets/study_meeting_1.jpg');
+      case EventType.IMPRESSIVE_UNIVERSITY:
+        return require('../../../../assets/impressive_university_1.png');
+      case EventType.BOLDAY:
+        return require('../../../../assets/bolday_1.jpg');
+      case EventType.COACH:
+        return require('../../../../assets/coach_1.jpeg');
+      case EventType.CLUB:
+        return require('../../../../assets/club_3.png');
+      default:
+        return undefined;
+    }
+  };
 
   const handleUploadSubmission = async () => {
     const res = await DocumentPicker.pickSingle({
@@ -228,7 +252,7 @@ const EventDetail: React.FC = () => {
     const formData = new FormData();
     formData.append('files', {
       name: res.name,
-      uri: res.uri,
+      uri: normalizeURL(res.uri),
       type: res.type,
     });
     uploadFile(formData);
@@ -293,19 +317,35 @@ const EventDetail: React.FC = () => {
           <ScrollDiv>
             <Div flexDir="column">
               <Div>
-                <FastImage
-                  style={{
-                    ...eventDetailStyles.image,
-                    width: windowWidth,
-                    minHeight: windowWidth * 0.8,
-                  }}
-                  resizeMode="cover"
-                  source={
-                    eventInfo.imageURL
-                      ? {uri: eventInfo.imageURL}
-                      : require('../../../../assets/study_meeting_1.jpg')
-                  }
-                />
+                {eventInfo.type !== EventType.SUBMISSION_ETC ? (
+                  <Div w="48%" mr={4}>
+                    <FastImage
+                      style={{
+                        ...eventDetailStyles.image,
+                        width: windowWidth,
+                        minHeight: windowWidth * 0.8,
+                      }}
+                      resizeMode="cover"
+                      source={
+                        eventInfo.imageURL
+                          ? {uri: eventInfo.imageURL}
+                          : defaultImage()
+                      }
+                    />
+                  </Div>
+                ) : (
+                  <Div justifyContent="center" alignItems="center">
+                    <Icon
+                      name="filetext1"
+                      fontSize={80}
+                      style={{
+                        ...eventDetailStyles.image,
+                        width: windowWidth,
+                        minHeight: windowWidth * 0.8,
+                      }}
+                    />
+                  </Div>
+                )}
                 <Button
                   mb={16}
                   bg={eventTypeColorFactory(eventInfo.type)}
