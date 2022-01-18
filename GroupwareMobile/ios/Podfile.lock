@@ -352,6 +352,8 @@ PODS:
   - react-native-mmkv (1.5.1):
     - MMKV
     - React-Core
+  - react-native-month-year-picker (1.8.0):
+    - React
   - react-native-pager-view (5.4.7):
     - React-Core
   - react-native-safe-area-context (3.3.2):
@@ -555,6 +557,7 @@ DEPENDENCIES:
   - react-native-create-thumbnail (from `../node_modules/react-native-create-thumbnail`)
   - react-native-document-picker (from `../node_modules/react-native-document-picker`)
   - react-native-mmkv (from `../node_modules/react-native-mmkv`)
+  - react-native-month-year-picker (from `../node_modules/react-native-month-year-picker`)
   - react-native-pager-view (from `../node_modules/react-native-pager-view`)
   - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
   - react-native-version-check (from `../node_modules/react-native-version-check`)
@@ -665,6 +668,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-document-picker"
   react-native-mmkv:
     :path: "../node_modules/react-native-mmkv"
+  react-native-month-year-picker:
+    :path: "../node_modules/react-native-month-year-picker"
   react-native-pager-view:
     :path: "../node_modules/react-native-pager-view"
   react-native-safe-area-context:
@@ -778,6 +783,7 @@ SPEC CHECKSUMS:
   react-native-create-thumbnail: d31c84dd69fb4d60aec0ff2f49bc0de41ede7b2c
   react-native-document-picker: f4cc4df2eff8c9015d862a59bdaef11a153f1292
   react-native-mmkv: ff527e2eca43ee577fd8d8876cea60d5430c0cf9
+  react-native-month-year-picker: 2f00a9c261a86a39e14cafd02f4c319ac0fe7fe6
   react-native-pager-view: 741e7606ee2f6e399fc7da777f5519454a4b38c5
   react-native-safe-area-context: 584dc04881deb49474363f3be89e4ca0e854c057
   react-native-version-check: d8b8900e6ce03ae1568cb22ef9451f2508188883

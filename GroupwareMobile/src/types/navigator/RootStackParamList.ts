@@ -101,4 +101,8 @@ export type RootStackParamList = {
   };
   WikiLinks: undefined;
   MyProfile: undefined;
+  AttendanceHome: undefined;
+  Attendance: undefined;
+  DefaultAttendance: undefined;
+  ApplicationBeforeJoining: undefined;
 };
