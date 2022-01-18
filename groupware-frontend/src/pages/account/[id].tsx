@@ -215,7 +215,7 @@ const MyAccountInfo = () => {
                 fontWeight="bold"
                 color={darkFontColor}
                 display="block">
-                {userNameFactory(user)}
+                {userNameFactory(profile)}
               </Text>
             </Box>
 
