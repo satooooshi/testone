@@ -1,6 +1,6 @@
 import {AxiosError} from 'axios';
 import {useQuery, UseQueryOptions} from 'react-query';
-import {ApplicationBeforeJoining} from 'src/types';
+import {ApplicationBeforeJoining} from '../../../../types';
 import {axiosInstance} from '../../../../utils/url';
 import {applicationURL} from '../../../../utils/url/attendance.url';
 

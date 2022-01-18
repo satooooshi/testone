@@ -268,7 +268,7 @@ const AttendanceStack = () => {
         options={{headerShown: false}}
       />
       <Stack.Screen
-        name="Application"
+        name="ApplicationBeforeJoining"
         component={Application}
         options={{headerShown: false}}
       />

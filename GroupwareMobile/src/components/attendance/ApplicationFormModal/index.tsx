@@ -1,81 +1,72 @@
 import {useFormik} from 'formik';
 import {DateTime} from 'luxon';
-import React, {Dispatch, SetStateAction, useEffect, useState} from 'react';
-import {Linking, useWindowDimensions} from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {Alert, Linking, useWindowDimensions} from 'react-native';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import {
-  ScrollDiv,
-  Modal,
-  Div,
-  Text,
   Box,
-  Input,
   Button,
-  Icon,
+  Div,
   Dropdown,
+  Icon,
+  Input,
+  Modal,
+  Text,
 } from 'react-native-magnus';
+import DateTimePicker from 'react-native-modal-datetime-picker';
 import tailwind from 'tailwind-rn';
+import {useAPICreateApplication} from '../../../hooks/api/attendance/application/useAPICreateApplication';
+import {useAPIUpdateApplication} from '../../../hooks/api/attendance/application/useAPIUpdateApplication';
+import {ApplicationBeforeJoining, OneWayOrRound} from '../../../types';
 import {
-  Attendance,
-  TravelCost,
-  TravelCostCategory,
-  TravelCostOneWayOrRound,
-} from '../../../../types';
-import {
-  defaultDropdownOptionProps,
   defaultDropdownProps,
-} from '../../../../utils/dropdown/helper';
-import {travelCostCategoryName} from '../../../../utils/factory/attendance/travelCostCategoryName';
-import {travelCostFormModalSchema} from '../../../../utils/validation/schema';
-import DropdownOpenerButton from '../../../common/DropdownOpenerButton';
+  defaultDropdownOptionProps,
+} from '../../../utils/dropdown/helper';
+import {applicationFormModalSchema} from '../../../utils/validation/schema';
+import DropdownOpenerButton from '../../common/DropdownOpenerButton';
 
-type TravelCostFormModalProps = {
-  date: DateTime;
-  attendance: Partial<Attendance>;
-  setAttendance: SetStateAction<Dispatch<Partial<Attendance>>>;
+type ApplicationFormModalProps = {
+  application?: ApplicationBeforeJoining;
   onClose: () => void;
   isOpen: boolean;
 };
-const TravelForm = ({
-  index,
-  travelCost,
-  attendance,
-  setAttendance,
-}: {
-  index?: number;
-  travelCost?: TravelCost;
-  attendance: Partial<Attendance>;
-  setAttendance: SetStateAction<Dispatch<Partial<Attendance>>>;
+
+const ApplicationForm: React.FC<ApplicationFormModalProps> = ({
+  application,
+  onClose,
 }) => {
-  const initialValues: Partial<TravelCost> = {
-    category: TravelCostCategory.CLIENT,
+  const [dateTimeModal, setDateTimeModal] = useState(false);
+  const [oneWayOrRoundDropdown, setOneWayOrRoundDropdown] = useState(false);
+  const initialValues: Partial<ApplicationBeforeJoining> = {
     destination: '',
     purpose: '',
     departureStation: '',
     viaStation: '',
     destinationStation: '',
     travelCost: 0,
-    oneWayOrRound: TravelCostOneWayOrRound.ROUND,
-    attendance: attendance as Attendance,
+    oneWayOrRound: OneWayOrRound.ROUND,
   };
-  const [categoryDropdown, setCategoryDropdown] = useState(false);
-  const [oneWayOrRoundDropdown, setOneWayOrRoundDropdown] = useState(false);
+  const {mutate: createApplication} = useAPICreateApplication({
+    onSuccess: () => {
+      Alert.alert('申請が完了しました');
+      onClose();
+    },
+  });
+  const {mutate: updateApplication} = useAPIUpdateApplication({
+    onSuccess: () => {
+      Alert.alert('更新が完了しました');
+      onClose();
+    },
+  });
   const {values, setValues, handleSubmit, errors, touched} = useFormik({
-    initialValues: travelCost || initialValues,
-    validationSchema: travelCostFormModalSchema,
+    initialValues: application || initialValues,
+    validationSchema: applicationFormModalSchema,
     onSubmit: submittedValues => {
-      setAttendance(a => {
-        if (a?.travelCost?.length) {
-          const travelCosts = a?.travelCost?.map((t, arrIndex) => {
-            if (index === arrIndex) {
-              return submittedValues;
-            }
-            return t;
-          });
-          return {...a, travelCosts};
-        }
-        return {...a, travelCost: [submittedValues]};
-      });
+      if (submittedValues.id) {
+        updateApplication(submittedValues as ApplicationBeforeJoining);
+        return;
+      }
+      createApplication(submittedValues);
     },
   });
 
@@ -85,29 +76,21 @@ const TravelForm = ({
   };
 
   useEffect(() => {
-    handleSubmit();
-  }, [handleSubmit, values]);
-
-  useEffect(() => {
-    setCategoryDropdown(false);
-  }, [values.category]);
-
-  useEffect(() => {
     setOneWayOrRoundDropdown(false);
   }, [values.oneWayOrRound]);
-
   return (
     <Div borderTopWidth={5} borderTopColor={'blue600'}>
-      <Text fontSize={22} fontWeight="bold">{`申請#${
-        index ? index + 1 : 1
-      }`}</Text>
       <Box mb={4}>
-        <Text>交通費区分</Text>
+        <Text>日付</Text>
         <DropdownOpenerButton
           name={
-            values.category ? travelCostCategoryName(values.category) : '未設定'
+            values.attendanceTime
+              ? DateTime.fromJSDate(new Date(values.attendanceTime)).toFormat(
+                  'yyyy/LL/dd HH:mm',
+                )
+              : '未設定'
           }
-          onPress={() => setCategoryDropdown(true)}
+          onPress={() => setDateTimeModal(true)}
         />
       </Box>
       <Box mb={4}>
@@ -220,57 +203,25 @@ const TravelForm = ({
         />
       </Box>
       <Box mb={4}>
-        <Text>交通費区分</Text>
+        <Text>片道往復区分</Text>
         <DropdownOpenerButton
           name={
-            values.oneWayOrRound === TravelCostOneWayOrRound.ROUND
+            values.oneWayOrRound === OneWayOrRound.ROUND
               ? '往復'
-              : values.oneWayOrRound === TravelCostOneWayOrRound.ONE_WAY
+              : values.oneWayOrRound === OneWayOrRound.ONE_WAY
               ? '片道'
               : '未設定'
           }
           onPress={() => setOneWayOrRoundDropdown(true)}
         />
       </Box>
-      {index === undefined ||
-      (index !== undefined && !attendance?.travelCost?.[index + 1]) ? (
-        <Button
-          bg="blue600"
-          color="white"
-          alignSelf="flex-end"
-          onPress={() =>
-            setAttendance(a => ({
-              ...a,
-              travelCost: a?.travelCost?.length
-                ? [...a.travelCost, initialValues]
-                : [values, initialValues],
-            }))
-          }>
-          申請を追加
-        </Button>
-      ) : null}
-
-      <Dropdown
-        {...defaultDropdownProps}
-        isVisible={categoryDropdown}
-        title="交通費区分を選択">
-        <Dropdown.Option
-          {...defaultDropdownOptionProps}
-          onPress={() => {
-            setValues(v => ({...v, category: TravelCostCategory.CLIENT}));
-          }}
-          value={TravelCostCategory.CLIENT}>
-          {travelCostCategoryName(TravelCostCategory.CLIENT)}
-        </Dropdown.Option>
-        <Dropdown.Option
-          {...defaultDropdownOptionProps}
-          onPress={() => {
-            setValues(v => ({...v, category: TravelCostCategory.INHOUSE}));
-          }}
-          value={TravelCostCategory.INHOUSE}>
-          {travelCostCategoryName(TravelCostCategory.INHOUSE)}
-        </Dropdown.Option>
-      </Dropdown>
+      <Button
+        bg="blue600"
+        color="white"
+        alignSelf="flex-end"
+        onPress={() => handleSubmit()}>
+        {values.id ? '更新する' : '申請する'}
+      </Button>
       <Dropdown
         {...defaultDropdownProps}
         isVisible={oneWayOrRoundDropdown}
@@ -280,10 +231,10 @@ const TravelForm = ({
           onPress={() => {
             setValues(v => ({
               ...v,
-              oneWayOrRound: TravelCostOneWayOrRound.ONE_WAY,
+              oneWayOrRound: OneWayOrRound.ONE_WAY,
             }));
           }}
-          value={TravelCostOneWayOrRound.ROUND}>
+          value={OneWayOrRound.ROUND}>
           片道
         </Dropdown.Option>
         <Dropdown.Option
@@ -291,24 +242,30 @@ const TravelForm = ({
           onPress={() => {
             setValues(v => ({
               ...v,
-              oneWayOrRound: TravelCostOneWayOrRound.ROUND,
+              oneWayOrRound: OneWayOrRound.ROUND,
             }));
           }}
-          value={TravelCostOneWayOrRound.ROUND}>
+          value={OneWayOrRound.ROUND}>
           往復
         </Dropdown.Option>
       </Dropdown>
+      <DateTimePicker
+        isVisible={dateTimeModal}
+        date={
+          values.attendanceTime ? new Date(values.attendanceTime) : new Date()
+        }
+        onCancel={() => setDateTimeModal(false)}
+        onConfirm={date => {
+          setValues(v => ({...v, attendanceTime: date}));
+          setDateTimeModal(false);
+        }}
+      />
     </Div>
   );
 };
 
-const TravelCostFormModal: React.FC<TravelCostFormModalProps> = ({
-  date,
-  attendance,
-  setAttendance,
-  onClose,
-  isOpen,
-}) => {
+const ApplicationFormModal: React.FC<ApplicationFormModalProps> = props => {
+  const {isOpen, onClose} = props;
   const windowWidth = useWindowDimensions().width;
   return (
     <Modal isVisible={isOpen}>
@@ -325,24 +282,11 @@ const TravelCostFormModal: React.FC<TravelCostFormModalProps> = ({
       <KeyboardAwareScrollView
         contentContainerStyle={{width: windowWidth * 0.9}}
         style={tailwind('self-center')}>
-        <Text fontSize={16}>{date?.toFormat('LL月dd日')}</Text>
-        {attendance?.travelCost?.length ? (
-          attendance?.travelCost?.map((t, index) => (
-            <Box mb={16} key={t.id}>
-              <TravelForm
-                index={index}
-                attendance={attendance}
-                setAttendance={setAttendance}
-                travelCost={t}
-              />
-            </Box>
-          ))
-        ) : (
-          <TravelForm attendance={attendance} setAttendance={setAttendance} />
-        )}
+        <Text fontSize={16}>入社前経費申請</Text>
+        <ApplicationForm {...props} />
       </KeyboardAwareScrollView>
     </Modal>
   );
 };
 
-export default TravelCostFormModal;
+export default ApplicationFormModal;
