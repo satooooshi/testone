@@ -5,7 +5,15 @@
 この案件のクライアントは株式会社ボールド様(SES 企業)です。このグループウェアはボールド様の社内で使用する情報共有、チャットツールとして使用されます。クライアントとの会話では「ポータルサイト」、「ポータルアプリ」などと呼ばれています。
 
 ## アプリのリリース  
-リリース方法はWiki参照。**リリースは必ずmobile-mainブランチでやる**
+基本的なリリース方法はWiki参照。
+### アプリリリースの手順
+- **リリースは必ずmobile-mainブランチに移動**
+- driveで本番用のGoogle-Service.Info.plistファイルとgoogle-services.jsonをファイルを共有している
+- XCodeのサイドバーでディレクトリ構造を見るモードにする。一番上のGroupwareMobileの下にすでにGoogleService-Info.plistがあればそれを削除する。(右クリックでDelete->Remove Reference)。ディレクトリ構造一番上のGroupwareMobileを右クリックし、"Add Files to GroupwareMobile"を選択。GoogleService-Info.plistを選択し、Copy item if neededとCreate groupsとGroupwaremobileにチェックがついていることを確認してAddボタンを押す。
+- mobile/android/app内にgoogle-service.jsonを追加(すでにある場合は上書き)
+- mobile/android/app/build.gradle 152行目に書いてあるversionCodeを一つ上の番号に書きかえる
+- XCodeのディレクトリ構造で一番上のGroupwareMobileを押し、真ん中のウインドウでGeneralタブが開いている状態で、VersionとBuildの番号をそれぞれ一つ上の番号に書きかえる
+- 以降はWiki通りにビルドすればOK。
 
 ## メイン機能
 
