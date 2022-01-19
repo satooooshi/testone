@@ -1905,6 +1905,13 @@
   resolved "https://registry.yarnpkg.com/@types/react-native-push-notification/-/react-native-push-notification-7.3.3.tgz#76d8cd73e37d5348ba714e8632e98615677961d2"
   integrity sha512-6LmfaZ0cRuk4oEdBZEJVRZ8DoPHz95fqD7wW3jBbcJFy3U23eSE+MeSQall4BCZFBZDGT1KCEGFCwflTxFEZMw==
 
+"@types/react-native-uuid@^2.0.0":
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/@types/react-native-uuid/-/react-native-uuid-2.0.0.tgz#b0c4ec48973fd6618c104c15034a94edae00b1bf"
+  integrity sha512-EzREcBGsE6AeXWmXbWq0RFtzBh1RLjHWHU4uwirroQD9FVpFmKdqKW4r8mmTK40FGQiYAhhyWTnWV98ID3Ajow==
+  dependencies:
+    react-native-uuid "*"
+
 "@types/react-native-vector-icons@*":
   version "6.4.10"
   resolved "https://registry.yarnpkg.com/@types/react-native-vector-icons/-/react-native-vector-icons-6.4.10.tgz#9bfd6e64dd37b8119425496b5e53ff91d034efa9"
@@ -2157,6 +2164,16 @@ agent-base@6:
   integrity sha512-RZNwNclF7+MS/8bDg70amg32dyeZGZxiDuQmZxKLAlQjr3jGyLx+4Kkk58UO7D2QdgFIQCovuSuZESne6RG6XQ==
   dependencies:
     debug "4"
+
+agora-react-native-rtm@^1.4.8:
+  version "1.4.8"
+  resolved "https://registry.yarnpkg.com/agora-react-native-rtm/-/agora-react-native-rtm-1.4.8.tgz#b738818c7e57cba0754521cfe869d4ffe46a9271"
+  integrity sha512-UaWAvQ8EQMIodY4+RuqQB9DPsKJoB/SwSDcqTa0DHShatrsvUv3JMPg7TzO1ZHrpnkWHira6EL5C/VgVXu3YYw==
+
+agora-rn-uikit@^3.3.0:
+  version "3.3.0"
+  resolved "https://registry.yarnpkg.com/agora-rn-uikit/-/agora-rn-uikit-3.3.0.tgz#a7820ec49a36a7e88da4cf59e016ad03b4d7afd8"
+  integrity sha512-KuhTBOwRpHDYYDwSLliGnQqrCTSkAIlTLqRn0/KveLgjiTaGpi6zGUAa7yjOasorHYa/oFUt+euvk2MAoom/+Q==
 
 ajv@^6.10.0, ajv@^6.12.4:
   version "6.12.6"
@@ -7041,6 +7058,11 @@ react-is@^16.13.0, react-is@^16.7.0, react-is@^16.8.1:
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-16.13.1.tgz#789729a4dc36de2999dc156dd6c1d9c18cea56a4"
   integrity sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ==
 
+react-native-agora@^3.5.2:
+  version "3.5.2"
+  resolved "https://registry.yarnpkg.com/react-native-agora/-/react-native-agora-3.5.2.tgz#36c0f4bb610b894181e81e4982c50a22963532b0"
+  integrity sha512-cgZ9FjQq2cpn92HU1NLXdxQU3xCyaP+tlF6joCxmFNr3XW6/qe5MjgHyGeTifrmq97d/TEQO2YzM/bIfvSAHYA==
+
 react-native-animatable@1.3.3, react-native-animatable@^1.3.3:
   version "1.3.3"
   resolved "https://registry.yarnpkg.com/react-native-animatable/-/react-native-animatable-1.3.3.tgz#a13a4af8258e3bb14d0a9d839917e9bb9274ec8a"
@@ -7072,6 +7094,11 @@ react-native-bootsplash@^4.0.2:
     chalk "^4.1.2"
     fs-extra "^10.0.0"
     jimp "^0.16.1"
+
+react-native-callkeep@^4.3.1:
+  version "4.3.1"
+  resolved "https://registry.yarnpkg.com/react-native-callkeep/-/react-native-callkeep-4.3.1.tgz#62c5713318714a2432e5a0e269bf5f8fd0fc9722"
+  integrity sha512-ezFd0ch0m81V6INUnJeyyy6WNpoUreb3heFq64F4elzGOdoVhY2m2Z/wJNin7b/zBZwKk8sEXlBXoNhW+GjDVg==
 
 react-native-cn-quill@^0.7.15:
   version "0.7.15"
@@ -7256,6 +7283,11 @@ react-native-tab-view@^3.1.1:
   version "3.1.1"
   resolved "https://registry.yarnpkg.com/react-native-tab-view/-/react-native-tab-view-3.1.1.tgz#1f8d7a835ab4f5b1b1407ec8dddc1053b53fa3c6"
   integrity sha512-M5pRN6utQfytKWoKlKVzg5NbkYu308qNoW1khGTtEOTs1k14p2dHJ/BWOJoJYHKbPVUyZldbG9MFT7gUl4YHnw==
+
+react-native-uuid@*, react-native-uuid@^2.0.1:
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/react-native-uuid/-/react-native-uuid-2.0.1.tgz#ed4e2dfb1683eddb66967eb5dca140dfe1abddb9"
+  integrity sha512-cptnoIbL53GTCrWlb/+jrDC6tvb7ypIyzbXNJcpR3Vab0mkeaaVd5qnB3f0whXYzS+SMoSQLcUUB0gEWqkPC0g==
 
 react-native-vector-icons@^8.1.0:
   version "8.1.0"
