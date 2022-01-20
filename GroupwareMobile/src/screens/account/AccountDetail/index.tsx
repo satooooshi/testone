@@ -2,7 +2,7 @@ import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs
 import {useIsFocused, useNavigation, useRoute} from '@react-navigation/native';
 import React, {useEffect, useState} from 'react';
 import {useWindowDimensions} from 'react-native';
-import {Text, Div, ScrollDiv} from 'react-native-magnus';
+import {Text, Div, ScrollDiv, Icon, Button} from 'react-native-magnus';
 import {ActivityIndicator} from 'react-native-paper';
 import TagListBox from '../../../components/account/TagListBox';
 import UserAvatar from '../../../components/common/UserAvatar';
@@ -25,6 +25,11 @@ import {
 import {darkFontColor} from '../../../utils/colors';
 import {userNameFactory} from '../../../utils/factory/userNameFactory';
 import {userRoleNameFactory} from '../../../utils/factory/userRoleNameFactory';
+import {axiosInstance} from '../../../utils/url';
+import uuid from 'react-native-uuid';
+import {engine} from '../../../navigator';
+import Config from 'react-native-config';
+const getNewUuid = () => uuid.v4();
 
 const TopTab = createMaterialTopTabNavigator();
 
@@ -199,6 +204,21 @@ const AccountDetail: React.FC = () => {
     setUser({});
   };
 
+  const inviteCall = async () => {
+    if (profile) {
+      await engine.createInstance(Config.AGORA_APP_ID);
+      const parsedUUid = getNewUuid();
+      const localInvitation = await engine.createLocalInvitation(
+        profile.id.toString(),
+        parsedUUid as string,
+        parsedUUid as string,
+      );
+      const res = await axiosInstance.get<string>('/chat/get-rtm-token');
+      await engine.loginV2(user?.id?.toString() as string, res.data);
+      await engine.sendLocalInvitationV2(localInvitation);
+    }
+  };
+
   useEffect(() => {
     if (isFocused) {
       refetch();
@@ -231,13 +251,26 @@ const AccountDetail: React.FC = () => {
                   w={windowWidth * 0.6}
                 />
               </Div>
-              <Text
-                fontWeight="bold"
-                mb={'lg'}
-                color={darkFontColor}
-                fontSize={24}>
-                {userNameFactory(profile)}
-              </Text>
+              <Div flexDir="row" mb="sm">
+                <Text
+                  fontWeight="bold"
+                  mb={'lg'}
+                  color={darkFontColor}
+                  mr="lg"
+                  fontSize={24}>
+                  {userNameFactory(profile)}
+                </Text>
+                {profile.id !== user?.id ? (
+                  <Button bg="white" rounded="circle" onPress={inviteCall}>
+                    <Icon
+                      name="phone"
+                      fontFamily="Entypo"
+                      fontSize={24}
+                      color="blue700"
+                    />
+                  </Button>
+                ) : null}
+              </Div>
             </Div>
             <Div h={bottomContentsHeight()}>
               <TopTab.Navigator

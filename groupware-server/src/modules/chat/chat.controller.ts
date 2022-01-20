@@ -12,6 +12,13 @@ import {
   Res,
   UseGuards,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import {
+  RtmTokenBuilder,
+  RtmRole,
+  RtcTokenBuilder,
+  RtcRole,
+} from 'agora-access-token';
 import { Response } from 'express';
 import { ChatAlbum } from 'src/entities/chatAlbum.entity';
 import { ChatGroup } from 'src/entities/chatGroup.entity';
@@ -48,7 +55,58 @@ export class ChatController {
     private readonly chatService: ChatService,
     private readonly chatAlbumService: ChatAlbumService,
     private readonly chatNoteService: ChatNoteService,
+    private readonly configService: ConfigService,
   ) {}
+
+  @Get('get-rtm-token')
+  @UseGuards(JwtAuthenticationGuard)
+  async getAgoraRtmToken(@Req() req: RequestWithUser) {
+    const appID = this.configService.get('AGORA_APP_ID');
+    const cert = this.configService.get('AGORA_CERT_ID');
+    const uid = req.user?.id.toString();
+    const expirationTimeInSeconds = 3600;
+
+    const currentTimestamp = Math.floor(Date.now() / 1000);
+
+    const privilegeExpiredTs = currentTimestamp + expirationTimeInSeconds;
+
+    // console.log(uid);
+    const token = RtmTokenBuilder.buildToken(
+      appID,
+      cert,
+      uid,
+      RtmRole.Rtm_User,
+      privilegeExpiredTs,
+    );
+    return token;
+  }
+
+  @Get('get-voice-token/:roomId')
+  @UseGuards(JwtAuthenticationGuard)
+  async getAgoraToken(
+    @Req() req: RequestWithUser,
+    @Param('roomId') roomId: string,
+  ) {
+    const appID = this.configService.get('AGORA_APP_ID');
+    const cert = this.configService.get('AGORA_CERT_ID');
+    const channelName = roomId;
+    const uid = req.user?.id;
+    const expirationTimeInSeconds = 3600;
+
+    const currentTimestamp = Math.floor(Date.now() / 1000);
+
+    const privilegeExpiredTs = currentTimestamp + expirationTimeInSeconds;
+
+    const token = RtcTokenBuilder.buildTokenWithUid(
+      appID,
+      cert,
+      channelName,
+      uid,
+      RtcRole.PUBLISHER,
+      privilegeExpiredTs,
+    );
+    return token;
+  }
 
   @Get('group-list')
   @UseGuards(JwtAuthenticationGuard)

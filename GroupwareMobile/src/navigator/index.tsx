@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {createStackNavigator} from '@react-navigation/stack';
 import {
   NavigationContainer,
@@ -17,16 +17,19 @@ import ForgotPassword from '../screens/auth/ForgotPassword';
 import WebEngine from '../components/WebEngine';
 import RtmClient, {RemoteInvitation} from 'agora-react-native-rtm';
 import RNCallKeep, {IOptions} from 'react-native-callkeep';
-import AgoraUIKit from 'agora-rn-uikit';
-import RtcEngine from 'react-native-agora';
+import AgoraUIKit, {
+  CallbacksInterface,
+  RtcPropsInterface,
+} from 'agora-rn-uikit';
+import RtcEngine, {RtcEngineContext} from 'react-native-agora';
 import {userNameFactory} from '../utils/factory/userNameFactory';
 import {apiAuthenticate} from '../hooks/api/auth/useAPIAuthenticate';
-import {Platform} from 'react-native';
+import {Alert, Platform} from 'react-native';
+import Config from 'react-native-config';
 
 const Stack = createStackNavigator<RootStackParamList>();
 export const engine = new RtmClient();
 let rtcEngine: RtcEngine;
-let remoteInvitation: RemoteInvitation;
 
 const Navigator = () => {
   const {user} = useAuthenticate();
@@ -35,43 +38,53 @@ const Navigator = () => {
   const [videoCall, setVideoCall] = useState(false);
   const [agoraToken, setAgoraToken] = useState('');
   const [channelName, setChannelName] = useState('');
-  const AGORA_APP_ID = '209d796222b64c678d4fdc96206af1e7';
-  const rtcProps = {
+  const AGORA_APP_ID = Config.AGORA_APP_ID;
+  const rtcProps: RtcPropsInterface = {
     appId: AGORA_APP_ID,
     channel: channelName,
     token: agoraToken,
   };
-
-  const callbacks = {
-    EndCall: () => {
-      remoteInvitation = undefined;
-      // setRemoteInvitation(undefined);
-      rtcEngine.leaveChannel();
-      RNCallKeep.endAllCalls();
-      setVideoCall(false);
-    },
+  const remoteInvitation = useRef<RemoteInvitation | undefined>();
+  const endCall = async () => {
+    remoteInvitation.current = undefined;
+    await rtcEngine?.leaveChannel();
+    RNCallKeep.endAllCalls();
+    setVideoCall(false);
+    setChannelName('');
   };
 
-  const rtcInit = async () => {
-    rtcEngine = await RtcEngine.create('46b5e94ed6c245399f8b23ad18ad31ee');
-    await rtcEngine.enableAudio();
-    await rtcEngine.disableVideo();
+  const callbacks: Partial<CallbacksInterface> = {
+    EndCall: endCall,
+  };
 
-    rtcEngine.addListener('UserJoined', (uid, elapsed) => {
+  // console.log(rtcEngine);
+  const rtcInit = async () => {
+    rtcEngine = await RtcEngine.createWithContext(
+      new RtcEngineContext(AGORA_APP_ID),
+    );
+    await rtcEngine?.enableAudio();
+    await rtcEngine?.disableVideo();
+
+    rtcEngine?.addListener('UserJoined', (uid, elapsed) => {
       console.log('UserJoined', uid, elapsed);
     });
-    rtcEngine.addListener('UserOffline', (uid, reason) => {
+    rtcEngine?.addListener('UserOffline', (uid, reason) => {
       console.log('UserOffline', uid, reason);
+      Alert.alert('通話が終了しました');
+      endCall();
     });
-    rtcEngine.addListener('JoinChannelSuccess', (channel, uid, elapsed) => {
+    rtcEngine?.addListener('LeaveChannel', ({userCount}) => {
+      console.log('LeaveChannel. user count: ', userCount);
+    });
+    rtcEngine?.addListener('JoinChannelSuccess', (channel, uid, elapsed) => {
       console.log('JoinChannelSuccess', channel, uid, elapsed);
     });
-    rtcEngine.addListener('Error', errCode => {
+    rtcEngine?.addListener('Error', errCode => {
       console.log('errCode', errCode);
     });
   };
 
-  const setup = () => {
+  const callKeepSetup = async () => {
     const options: IOptions = {
       ios: {
         appName: 'Eface',
@@ -94,8 +107,11 @@ const Navigator = () => {
     };
 
     try {
-      RNCallKeep.setup(options);
+      await RNCallKeep.setup(options);
       RNCallKeep.setAvailable(true);
+      RNCallKeep.addEventListener('didLoadWithEvents', events => {
+        console.log(events);
+      });
     } catch (err) {
       //@ts-ignore
       console.error('Initialize CallKeep Error:', err?.message);
@@ -114,14 +130,18 @@ const Navigator = () => {
   };
 
   const answerCall = async () => {
+    console.log('called');
     RNCallKeep.endAllCalls();
-    if (remoteInvitation && remoteInvitation?.channelId) {
-      const realChannelName = remoteInvitation?.content as string;
+    if (remoteInvitation.current?.channelId) {
+      const realChannelName = remoteInvitation.current?.content as string;
       if (Platform.OS === 'ios') {
         //https://github.com/AgoraIO/agora-react-native-rtm/issues/52
-        await engine.acceptRemoteInvitationV2({...remoteInvitation, hash: 0});
+        await engine.acceptRemoteInvitationV2({
+          ...remoteInvitation.current,
+          hash: 0,
+        });
       } else {
-        await engine.acceptRemoteInvitationV2(remoteInvitation);
+        await engine.acceptRemoteInvitationV2(remoteInvitation.current);
       }
       const res = await axiosInstance.get<string>(
         `/chat/get-voice-token/${realChannelName}`,
@@ -129,8 +149,9 @@ const Navigator = () => {
       const tokenForCall = res.data;
       const userData = await apiAuthenticate();
       const userId = userData?.id;
-      if (userId && remoteInvitation?.content) {
-        await rtcEngine.joinChannel(
+      if (userId && remoteInvitation.current?.content) {
+        await rtcInit();
+        await rtcEngine?.joinChannel(
           tokenForCall,
           realChannelName,
           null,
@@ -144,7 +165,7 @@ const Navigator = () => {
 
   useEffect(() => {
     rtcInit();
-    setup();
+    callKeepSetup();
     engine.addListener('LocalInvitationAccepted', async invitation => {
       const realChannelName = invitation?.content as string;
       const res = await axiosInstance.get<string>(
@@ -153,9 +174,9 @@ const Navigator = () => {
       const tokenForCall = res.data;
       const userData = await apiAuthenticate();
       const userId = userData?.id;
-      console.log(userId);
       if (userId) {
-        await rtcEngine.joinChannel(
+        await rtcInit();
+        await rtcEngine?.joinChannel(
           tokenForCall,
           realChannelName,
           null,
@@ -168,7 +189,7 @@ const Navigator = () => {
     engine.addListener(
       'RemoteInvitationReceived',
       (invitation: RemoteInvitation) => {
-        remoteInvitation = invitation;
+        remoteInvitation.current = invitation;
         displayIncomingCallNow(invitation);
       },
     );
@@ -186,7 +207,7 @@ const Navigator = () => {
       storage.set('rtmToken', res.data);
       setAgoraToken(res.data);
       if (user?.id && res.data) {
-        await engine.createInstance('46b5e94ed6c245399f8b23ad18ad31ee');
+        await engine.createInstance(AGORA_APP_ID);
         await engine.loginV2(user?.id.toString(), res.data);
         console.log('login as ', user?.id.toString());
       }
