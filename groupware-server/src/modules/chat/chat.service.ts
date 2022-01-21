@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { orderBy } from 'lodash';
+import PushNotifications from 'node-pushnotifications';
 import { ChatGroup } from 'src/entities/chatGroup.entity';
 import { ChatMessage, ChatMessageType } from 'src/entities/chatMessage.entity';
 import { ChatMessageReaction } from 'src/entities/chatMessageReaction.entity';
@@ -31,6 +32,11 @@ export class ChatService {
     private readonly chatMessageReactionRepository: Repository<ChatMessageReaction>,
     private readonly storageService: StorageService,
   ) {}
+
+  public async calleeForPhoneCall(calleeId: string) {
+    const user = await this.userRepository.findOne(calleeId);
+    return user;
+  }
 
   public async getChatGroup(userID: number): Promise<ChatGroup[]> {
     const groups = await this.chatGroupRepository

@@ -28,6 +28,10 @@ import { ChatNote } from 'src/entities/chatNote.entity';
 import { LastReadChatTime } from 'src/entities/lastReadChatTime.entity';
 import { User } from 'src/entities/user.entity';
 import { userNameFactory } from 'src/utils/factory/userNameFactory';
+import {
+  CustomPushNotificationData,
+  sendPushNotifToSpecificUsers,
+} from 'src/utils/notification/sendPushNotification';
 import JwtAuthenticationGuard from '../auth/jwtAuthentication.guard';
 import RequestWithUser from '../auth/requestWithUser.interface';
 import { ChatService } from './chat.service';
@@ -57,6 +61,20 @@ export class ChatController {
     private readonly chatNoteService: ChatNoteService,
     private readonly configService: ConfigService,
   ) {}
+
+  @Get('notif-call/:calleeId')
+  @UseGuards(JwtAuthenticationGuard)
+  async notifiCall(@Param('calleeId') calleeId: string) {
+    const callee = await this.chatService.calleeForPhoneCall(calleeId);
+    const notificationData: CustomPushNotificationData = {
+      title: '',
+      body: '',
+      custom: {
+        type: 'call',
+      },
+    };
+    await sendPushNotifToSpecificUsers([callee], notificationData);
+  }
 
   @Get('get-rtm-token')
   @UseGuards(JwtAuthenticationGuard)

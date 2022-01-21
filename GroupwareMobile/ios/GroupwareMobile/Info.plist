@@ -69,7 +69,9 @@
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>fetch</string>
+		<string>processing</string>
 		<string>remote-notification</string>
+		<string>voip</string>
 	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>BootSplash</string>
@@ -77,10 +79,6 @@
 	<array>
 		<string>armv7</string>
 	</array>
-  <key>UIBackgroundModes</key>
-  <array>
-    <string>voip</string>
-  </array>
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>

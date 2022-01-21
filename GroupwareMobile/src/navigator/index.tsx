@@ -28,7 +28,7 @@ import {Alert, Platform} from 'react-native';
 import Config from 'react-native-config';
 
 const Stack = createStackNavigator<RootStackParamList>();
-export const engine = new RtmClient();
+export const rtmEngine = new RtmClient();
 let rtcEngine: RtcEngine;
 
 const Navigator = () => {
@@ -83,6 +83,14 @@ const Navigator = () => {
       console.log('errCode', errCode);
     });
   };
+  messaging().setBackgroundMessageHandler(async remoteMessage => {
+    if (Platform.OS === 'ios') {
+      if (remoteMessage?.data?.type === 'call') {
+        RNCallKeep.backToForeground();
+      }
+    }
+    console.log('Message handled in the background!', remoteMessage);
+  });
 
   const callKeepSetup = async () => {
     const options: IOptions = {
@@ -121,27 +129,26 @@ const Navigator = () => {
   const displayIncomingCallNow = (callingData: RemoteInvitation) => {
     console.log('Event: Display Incoming Call: ', callingData);
     RNCallKeep.displayIncomingCall(
-      callingData?.content as string,
+      callingData?.channelId as string,
       userNameFactory(user),
-      '不明',
+      callingData?.content,
       'generic',
       false,
     );
   };
 
   const answerCall = async () => {
-    console.log('called');
     RNCallKeep.endAllCalls();
     if (remoteInvitation.current?.channelId) {
-      const realChannelName = remoteInvitation.current?.content as string;
+      const realChannelName = remoteInvitation.current?.channelId as string;
       if (Platform.OS === 'ios') {
         //https://github.com/AgoraIO/agora-react-native-rtm/issues/52
-        await engine.acceptRemoteInvitationV2({
+        await rtmEngine.acceptRemoteInvitationV2({
           ...remoteInvitation.current,
           hash: 0,
         });
       } else {
-        await engine.acceptRemoteInvitationV2(remoteInvitation.current);
+        await rtmEngine.acceptRemoteInvitationV2(remoteInvitation.current);
       }
       const res = await axiosInstance.get<string>(
         `/chat/get-voice-token/${realChannelName}`,
@@ -149,7 +156,7 @@ const Navigator = () => {
       const tokenForCall = res.data;
       const userData = await apiAuthenticate();
       const userId = userData?.id;
-      if (userId && remoteInvitation.current?.content) {
+      if (userId && remoteInvitation.current?.channelId) {
         await rtcInit();
         await rtcEngine?.joinChannel(
           tokenForCall,
@@ -166,8 +173,8 @@ const Navigator = () => {
   useEffect(() => {
     rtcInit();
     callKeepSetup();
-    engine.addListener('LocalInvitationAccepted', async invitation => {
-      const realChannelName = invitation?.content as string;
+    rtmEngine.addListener('LocalInvitationAccepted', async invitation => {
+      const realChannelName = invitation?.channelId as string;
       const res = await axiosInstance.get<string>(
         `/chat/get-voice-token/${realChannelName}`,
       );
@@ -186,9 +193,10 @@ const Navigator = () => {
         setVideoCall(true);
       }
     });
-    engine.addListener(
+    rtmEngine.addListener(
       'RemoteInvitationReceived',
       (invitation: RemoteInvitation) => {
+        RNCallKeep.backToForeground();
         remoteInvitation.current = invitation;
         displayIncomingCallNow(invitation);
       },
@@ -207,8 +215,8 @@ const Navigator = () => {
       storage.set('rtmToken', res.data);
       setAgoraToken(res.data);
       if (user?.id && res.data) {
-        await engine.createInstance(AGORA_APP_ID);
-        await engine.loginV2(user?.id.toString(), res.data);
+        await rtmEngine.createInstance(AGORA_APP_ID);
+        await rtmEngine.loginV2(user?.id.toString(), res.data);
         console.log('login as ', user?.id.toString());
       }
     };

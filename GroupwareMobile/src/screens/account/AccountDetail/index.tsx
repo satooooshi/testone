@@ -27,7 +27,7 @@ import {userNameFactory} from '../../../utils/factory/userNameFactory';
 import {userRoleNameFactory} from '../../../utils/factory/userRoleNameFactory';
 import {axiosInstance} from '../../../utils/url';
 import uuid from 'react-native-uuid';
-import {engine} from '../../../navigator';
+import {rtmEngine} from '../../../navigator';
 import Config from 'react-native-config';
 const getNewUuid = () => uuid.v4();
 
@@ -206,16 +206,17 @@ const AccountDetail: React.FC = () => {
 
   const inviteCall = async () => {
     if (profile) {
-      await engine.createInstance(Config.AGORA_APP_ID);
+      await rtmEngine.createInstance(Config.AGORA_APP_ID);
       const parsedUUid = getNewUuid();
-      const localInvitation = await engine.createLocalInvitation(
+      const localInvitation = await rtmEngine.createLocalInvitation(
         profile.id.toString(),
-        parsedUUid as string,
+        userNameFactory(user),
         parsedUUid as string,
       );
       const res = await axiosInstance.get<string>('/chat/get-rtm-token');
-      await engine.loginV2(user?.id?.toString() as string, res.data);
-      await engine.sendLocalInvitationV2(localInvitation);
+      await rtmEngine.loginV2(user?.id?.toString() as string, res.data);
+      await rtmEngine.sendLocalInvitationV2(localInvitation);
+      await axiosInstance.get(`/chat/notif-call/${profile.id}`);
     }
   };
 
