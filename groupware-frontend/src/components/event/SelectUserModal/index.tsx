@@ -96,7 +96,7 @@ const SelectUserModal: React.FC<SelectUserModalProps> = ({
       <FormControl className={selectUserModalStyles.user_role_select_wrapper}>
         <FormLabel htmlFor="search">ユーザーを検索</FormLabel>
         <Input
-          marginBottom={8}
+          marginBottom={'8px'}
           onChange={(v) => onChangeHandle(v.target.value)}
           id="search"
         />

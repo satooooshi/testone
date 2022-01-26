@@ -147,9 +147,9 @@ const EditChatGroupMembersModal: React.FC<EditChatGroupMambersModalProps> = ({
         <ModalBody>
           <Box display="flex" flexDir="row" h="100%">
             <Box mr="8px">
-              <FormLabel htmlFor="search">タグを検索</FormLabel>
+              <FormLabel htmlFor="search">メンバーを検索</FormLabel>
               <Input
-                marginBottom={8}
+                marginBottom={'8px'}
                 onChange={(v) => onChangeHandle(v.target.value)}
                 id="search"
               />
