@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ChatGroup, User, UserRole, UserRoleInApp } from 'src/types';
 import {
   Avatar,
@@ -8,6 +8,7 @@ import {
   FormControl,
   FormLabel,
   IconButton,
+  Input,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -85,10 +86,28 @@ const EditChatGroupMembersModal: React.FC<EditChatGroupMambersModalProps> = ({
     setSelectedUsers,
     clear,
   } = useSelectedUsers(room?.members || []);
+  const [modalUsers, setModalUsers] = useState(users);
+  const [searchWords, setSearchWords] = useState<RegExpMatchArray | null>();
+  const onChangeHandle = (t: string) => {
+    const searchWords = t.trim().match(/[^\s]+/g);
+    setSearchWords(searchWords);
+    return;
+  };
   const { selectedUserRole, selectUserRole, filteredUsers } = useUserRole(
     'All',
-    users,
+    modalUsers,
   );
+  useEffect(() => {
+    if (!searchWords) {
+      setModalUsers(users);
+      return;
+    }
+    const searchedTags = users?.filter((u) => {
+      const userName = u.firstName + u.lastName;
+      return searchWords.every((w) => userName.indexOf(w) !== -1);
+    });
+    setModalUsers(searchedTags);
+  }, [searchWords, users]);
 
   useEffect(() => {
     if (room?.members) {
@@ -101,6 +120,7 @@ const EditChatGroupMembersModal: React.FC<EditChatGroupMambersModalProps> = ({
       size="lg"
       onClose={() => {
         onCancel();
+        setSearchWords(null);
         clear();
       }}
       scrollBehavior="inside"
@@ -127,6 +147,12 @@ const EditChatGroupMembersModal: React.FC<EditChatGroupMambersModalProps> = ({
         <ModalBody>
           <Box display="flex" flexDir="row" h="100%">
             <Box mr="8px">
+              <FormLabel htmlFor="search">タグを検索</FormLabel>
+              <Input
+                marginBottom={8}
+                onChange={(v) => onChangeHandle(v.target.value)}
+                id="search"
+              />
               <FormControl mb="16px">
                 <FormLabel>タイプ</FormLabel>
                 <Select
