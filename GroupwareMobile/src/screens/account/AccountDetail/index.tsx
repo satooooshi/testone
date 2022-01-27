@@ -1,8 +1,8 @@
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
 import {useIsFocused, useNavigation, useRoute} from '@react-navigation/native';
 import React, {useEffect, useState} from 'react';
-import {useWindowDimensions} from 'react-native';
-import {Text, Div, ScrollDiv} from 'react-native-magnus';
+import {Alert, useWindowDimensions} from 'react-native';
+import {Text, Div, ScrollDiv, Button, Icon} from 'react-native-magnus';
 import {ActivityIndicator} from 'react-native-paper';
 import TagListBox from '../../../components/account/TagListBox';
 import UserAvatar from '../../../components/common/UserAvatar';
@@ -12,6 +12,7 @@ import {Tab} from '../../../components/Header/HeaderTemplate';
 import WholeContainer from '../../../components/WholeContainer';
 import WikiCard from '../../../components/wiki/WikiCard';
 import {useAuthenticate} from '../../../contexts/useAuthenticate';
+import {useAPISaveChatGroup} from '../../../hooks/api/chat/useAPISaveChatGroup';
 import {useAPIGetEventList} from '../../../hooks/api/event/useAPIGetEventList';
 import {useAPIGetUserInfoById} from '../../../hooks/api/user/useAPIGetUserInfoById';
 import {useAPIGetWikiList} from '../../../hooks/api/wiki/useAPIGetWikiList';
@@ -139,6 +140,18 @@ const AccountDetail: React.FC = () => {
     writer: userID?.toString() || '0',
     type: WikiType.BOARD,
     board_category: BoardCategory.KNOWLEDGE,
+  });
+  const {mutate: createGroup} = useAPISaveChatGroup({
+    onSuccess: createdData => {
+      navigation.navigate('ChatStack', {
+        screen: 'Chat',
+        params: {room: createdData},
+        initial: false,
+      });
+    },
+    onError: () => {
+      Alert.alert('チャットルームの作成に失敗しました');
+    },
   });
   const isFocused = useIsFocused();
   const [activeScreen, setActiveScreen] = useState(defaultScreenName);
@@ -319,6 +332,26 @@ const AccountDetail: React.FC = () => {
           </>
         )}
       </ScrollDiv>
+      {profile && profile.id !== user?.id && (
+        <Button
+          bg="purple600"
+          position="absolute"
+          right={10}
+          bottom={10}
+          h={60}
+          zIndex={20}
+          rounded="circle"
+          w={60}
+          px={0}
+          onPress={() => createGroup({name: '', members: [profile]})}>
+          <Icon
+            fontSize={'6xl'}
+            color="white"
+            name="chatbubble-ellipses-outline"
+            fontFamily="Ionicons"
+          />
+        </Button>
+      )}
     </WholeContainer>
   );
 };
