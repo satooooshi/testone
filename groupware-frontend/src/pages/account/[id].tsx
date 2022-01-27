@@ -323,12 +323,14 @@ const MyAccountInfo = () => {
                       />
                     </Box>
                   </Box>
-                  <HiOutlineChat
-                    onClick={() =>
-                      createGroup({ name: '', members: [profile] })
-                    }
-                    className={accountInfoStyles.chat_button}
-                  />
+                  {profile?.id !== user?.id && (
+                    <HiOutlineChat
+                      onClick={() =>
+                        createGroup({ name: '', members: [profile] })
+                      }
+                      className={accountInfoStyles.chat_button}
+                    />
+                  )}
                 </Box>
               </>
             )}
