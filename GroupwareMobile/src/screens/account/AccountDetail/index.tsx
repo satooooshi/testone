@@ -347,10 +347,9 @@ const AccountDetail: React.FC = () => {
           right={10}
           bottom={10}
           h={60}
+          w={60}
           zIndex={20}
           rounded="circle"
-          w={60}
-          px={0}
           onPress={() => createGroup({name: '', members: [profile]})}>
           <Icon
             fontSize={'6xl'}
