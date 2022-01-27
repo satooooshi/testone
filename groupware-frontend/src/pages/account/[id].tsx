@@ -28,7 +28,7 @@ import {
 } from '@chakra-ui/react';
 import { BoardCategory, TagType, UserTag, WikiType } from 'src/types';
 import { userRoleNameFactory } from 'src/utils/factory/userRoleNameFactory';
-import { darkFontColor } from 'src/utils/colors';
+import { blueColor, darkFontColor } from 'src/utils/colors';
 import { userNameFactory } from 'src/utils/factory/userNameFactory';
 import { useAPISaveChatGroup } from '@/hooks/api/chat/useAPISaveChatGroup';
 import { HiOutlineChat } from 'react-icons/hi';
@@ -324,12 +324,26 @@ const MyAccountInfo = () => {
                     </Box>
                   </Box>
                   {profile?.id !== user?.id && (
-                    <HiOutlineChat
-                      onClick={() =>
-                        createGroup({ name: '', members: [profile] })
-                      }
-                      className={accountInfoStyles.chat_button}
-                    />
+                    <Button
+                      h={'64px'}
+                      w={'64px'}
+                      bg={blueColor}
+                      position={'fixed'}
+                      top={'auto'}
+                      bottom={'24px'}
+                      right={'24px'}
+                      rounded={'full'}
+                      zIndex={1}
+                      px={0}
+                      _hover={{ textDecoration: 'none' }}>
+                      <HiOutlineChat
+                        style={{ width: 40, height: 40 }}
+                        onClick={() =>
+                          createGroup({ name: '', members: [profile] })
+                        }
+                        color="white"
+                      />
+                    </Button>
                   )}
                 </Box>
               </>

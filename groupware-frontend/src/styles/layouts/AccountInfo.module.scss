@@ -134,16 +134,3 @@
 .introduce {
   white-space: pre-wrap;
 }
-
-.chat_button {
-  position: fixed;
-  width: 8vh;
-  height: 8vh;
-  top: auto;
-  bottom: 24px;
-  right: 24px;
-  color: $white_color;
-  background: $blue_color;
-  border-radius: 100%;
-  z-index: 1;
-}
