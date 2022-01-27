@@ -30,6 +30,7 @@ import { BoardCategory, TagType, UserTag, WikiType } from 'src/types';
 import { userRoleNameFactory } from 'src/utils/factory/userRoleNameFactory';
 import { darkFontColor } from 'src/utils/colors';
 import { userNameFactory } from 'src/utils/factory/userNameFactory';
+import { useAPISaveChatGroup } from '@/hooks/api/chat/useAPISaveChatGroup';
 
 type UserTagListProps = {
   tags?: UserTag[];
@@ -161,6 +162,14 @@ const MyAccountInfo = () => {
       isActiveTab: activeTab === TabName.KNOWLEDGE,
     },
   ];
+
+  const { mutate: createGroup } = useAPISaveChatGroup({
+    onSuccess: (createdData) => {
+      router.push(`/chat/${createdData.id.toString()}`, undefined, {
+        shallow: true,
+      });
+    },
+  });
 
   return (
     <LayoutWithTab
@@ -307,6 +316,15 @@ const MyAccountInfo = () => {
                         introduce={profile.introduceHobby}
                       />
                     </Box>
+
+                    <Button
+                      onClick={() =>
+                        createGroup({ name: '', members: [profile] })
+                      }
+                      width={'100%'}
+                      colorScheme="green">
+                      チャットへ
+                    </Button>
                   </Box>
                 </Box>
               </>
