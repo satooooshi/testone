@@ -1,5 +1,10 @@
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
-import {useIsFocused, useNavigation, useRoute} from '@react-navigation/native';
+import {
+  StackActions,
+  useIsFocused,
+  useNavigation,
+  useRoute,
+} from '@react-navigation/native';
 import React, {useEffect, useState} from 'react';
 import {Alert, useWindowDimensions} from 'react-native';
 import {Text, Div, ScrollDiv, Button, Icon} from 'react-native-magnus';
@@ -143,6 +148,9 @@ const AccountDetail: React.FC = () => {
   });
   const {mutate: createGroup} = useAPISaveChatGroup({
     onSuccess: createdData => {
+      const resetAction = StackActions.popToTop();
+      navigation.dispatch(resetAction);
+
       navigation.navigate('ChatStack', {
         screen: 'Chat',
         params: {room: createdData},
