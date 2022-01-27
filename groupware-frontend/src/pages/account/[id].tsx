@@ -31,6 +31,7 @@ import { userRoleNameFactory } from 'src/utils/factory/userRoleNameFactory';
 import { darkFontColor } from 'src/utils/colors';
 import { userNameFactory } from 'src/utils/factory/userNameFactory';
 import { useAPISaveChatGroup } from '@/hooks/api/chat/useAPISaveChatGroup';
+import { HiOutlineChat } from 'react-icons/hi';
 
 type UserTagListProps = {
   tags?: UserTag[];
@@ -287,7 +288,12 @@ const MyAccountInfo = () => {
                       {profile.introduceOther || '未入力'}
                     </Text>
                   </Box>
-                  <Box w={'100%'} display="flex" flexDir="row" flexWrap="wrap">
+                  <Box
+                    w={'100%'}
+                    mb={35}
+                    display="flex"
+                    flexDir="row"
+                    flexWrap="wrap">
                     <Box mb={8} mr={4} w={isSmallerThan1024 ? '100%' : '49%'}>
                       <UserTagList
                         tags={profile.tags}
@@ -316,16 +322,13 @@ const MyAccountInfo = () => {
                         introduce={profile.introduceHobby}
                       />
                     </Box>
-
-                    <Button
-                      onClick={() =>
-                        createGroup({ name: '', members: [profile] })
-                      }
-                      width={'100%'}
-                      colorScheme="green">
-                      チャットへ
-                    </Button>
                   </Box>
+                  <HiOutlineChat
+                    onClick={() =>
+                      createGroup({ name: '', members: [profile] })
+                    }
+                    className={accountInfoStyles.chat_button}
+                  />
                 </Box>
               </>
             )}
