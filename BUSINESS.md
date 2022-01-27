@@ -1,5 +1,9 @@
 # 事務関連
 
+## 月次レポート
+- [ポータルサイト月次レポート](https://docs.google.com/spreadsheets/d/1lFYV3G_RyBL6FnkppCNM1jblwyjBPkVp/edit?usp=sharing&ouid=115646302913888293254&rtpof=true&sd=true)を使用してボールド様と作業内容を共有する
+- スレッドシート上部の注意事項参照
+
 ## 請求書
 - 月初第3営業日にすべて締めているとのこと。**必ず月初に請求書を送付する**
 例
