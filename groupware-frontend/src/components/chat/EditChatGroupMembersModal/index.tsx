@@ -120,7 +120,7 @@ const EditChatGroupMembersModal: React.FC<EditChatGroupMambersModalProps> = ({
             mb="8px"
             colorScheme="green"
             alignItems="center">
-            <Text display="inline">{room ? '更新' : '選択'}</Text>
+            <Text display="inline">{room ? '更新' : '次へ'}</Text>
           </Button>
         </ModalHeader>
         <ModalCloseButton />
