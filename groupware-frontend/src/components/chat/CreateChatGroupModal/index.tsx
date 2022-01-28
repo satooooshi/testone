@@ -38,16 +38,20 @@ import { useRoomRefetch } from 'src/contexts/chat/useRoomRefetch';
 type CreateChatGroupModalProps = {
   isOpen: boolean;
   closeModal: () => void;
+  onComplete: () => void;
+  selectedMembers: User[];
 };
 
 const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
   isOpen,
   closeModal,
+  onComplete,
+  selectedMembers,
 }) => {
   const toast = useToast();
   const initialChatValues = {
     name: '',
-    members: [],
+    members: selectedMembers,
   };
   const { needRefetch } = useRoomRefetch();
   const [membersModal, setMembersModal] = useState(false);
@@ -110,6 +114,7 @@ const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
         const result = await dataURLToFile(img, selectImageName);
         return uploadImage([result]);
       }
+      onComplete();
       createGroup(newGroup);
     },
   });
@@ -248,7 +253,7 @@ const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
                 colorScheme="pink"
                 fontWeight="bold"
                 w="100%"
-                onClick={() => setMembersModal(true)}>
+                onClick={() => closeModal()}>
                 メンバーを編集
               </Button>
             </Box>

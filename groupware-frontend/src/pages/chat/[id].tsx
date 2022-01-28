@@ -18,13 +18,18 @@ import RoomList from '@/components/chat/RoomList';
 import { useAPIUpdateChatGroup } from '@/hooks/api/chat/useAPIUpdateChatGroup';
 import { RoomRefetchProvider } from 'src/contexts/chat/useRoomRefetch';
 import { useAPIGetRoomDetail } from '@/hooks/api/chat/useAPIGetRoomDetail';
+import ModalSelectRoomType from '@/components/chat/ModalSelectRoomType';
 
 const ChatDetail = () => {
   const router = useRouter();
   const { id } = router.query as { id: string };
   const [currentRoom, setCurrentRoom] = useState<ChatGroup>();
   const [
-    { editChatGroupModalVisible, createGroupWindow, editMembersModalVisible },
+    {
+      editChatGroupModalVisible,
+      editMembersModalVisible,
+      modalSelectRoomTypeVisible,
+    },
     dispatchModal,
   ] = useModalReducer();
   const { mutate: updateGroup } = useAPIUpdateChatGroup();
@@ -95,17 +100,20 @@ const ChatDetail = () => {
           tabs: tabs,
           rightButtonName: 'ルームを作成',
           onClickRightButton: () =>
-            dispatchModal({ type: 'createGroupWindow', value: true }),
+            dispatchModal({ type: 'modalSelectRoomTypeVisible', value: true }),
         }}>
         <Head>
           <title>ボールド | Chat</title>
         </Head>
 
-        <CreateChatGroupModal
-          isOpen={createGroupWindow}
-          closeModal={() => {
-            dispatchModal({ type: 'createGroupWindow', value: false });
-          }}
+        <ModalSelectRoomType
+          isOpen={modalSelectRoomTypeVisible}
+          closeModal={() =>
+            dispatchModal({
+              type: 'modalSelectRoomTypeVisible',
+              value: false,
+            })
+          }
         />
         {currentRoom ? (
           <>

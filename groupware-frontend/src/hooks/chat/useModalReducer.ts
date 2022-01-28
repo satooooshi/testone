@@ -7,6 +7,7 @@ type ModalState = {
   createGroupWindow: boolean;
   selectChatGroupWindow: boolean;
   editMembersModalVisible: boolean;
+  modalSelectRoomTypeVisible: boolean;
 };
 
 type ModalAction =
@@ -26,6 +27,7 @@ type ModalAction =
       type: 'editMembersModalVisible';
       value: boolean;
     }
+  | { type: 'modalSelectRoomTypeVisible'; value: boolean }
   | {
       type: 'handleMenuSelected';
       value: MenuValue;
@@ -36,6 +38,7 @@ const modalInitialValue: ModalState = {
   createGroupWindow: false,
   selectChatGroupWindow: false,
   editMembersModalVisible: false,
+  modalSelectRoomTypeVisible: false,
 };
 
 const modalReducer = (state: ModalState, action: ModalAction): ModalState => {
@@ -47,6 +50,7 @@ const modalReducer = (state: ModalState, action: ModalAction): ModalState => {
       };
     }
     case 'createGroupWindow': {
+      console.log('create');
       return {
         ...state,
         createGroupWindow: action.value,
@@ -76,6 +80,12 @@ const modalReducer = (state: ModalState, action: ModalAction): ModalState => {
             editMembersModalVisible: true,
           }
         : { ...state };
+    }
+    case 'modalSelectRoomTypeVisible': {
+      return {
+        ...state,
+        modalSelectRoomTypeVisible: action.value,
+      };
     }
   }
 };
