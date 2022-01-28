@@ -9,12 +9,13 @@ import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { darkFontColor } from 'src/utils/colors';
 import RoomList from '@/components/chat/RoomList';
+import ModalSelectRoomType from '@/components/chat/ModalSelectRoomType';
 
 const Chat = () => {
   const router = useRouter();
   const [isLargerTahn1024] = useMediaQuery('(min-width: 1024px)');
   const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
-  const [createGroupWindow, setCreateGroupWindow] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
 
   return (
     <LayoutWithTab
@@ -22,16 +23,14 @@ const Chat = () => {
       header={{
         title: 'Chat',
         rightButtonName: 'ルームを作成',
-        onClickRightButton: () => setCreateGroupWindow(true),
+        onClickRightButton: () => setIsOpen(true),
       }}>
       <Head>
         <title>ボールド | Chat</title>
       </Head>
-      <CreateChatGroupModal
-        isOpen={createGroupWindow}
-        closeModal={() => {
-          setCreateGroupWindow(false);
-        }}
+      <ModalSelectRoomType
+        isOpen={isOpen}
+        closeModal={() => setIsOpen(false)}
       />
       {isSmallerThan768 ? (
         <>
