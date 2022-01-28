@@ -5,6 +5,7 @@ import {
   ChatNote,
   EventType,
   RuleCategory,
+  User,
   WikiType,
 } from '../../types';
 
@@ -62,7 +63,7 @@ export type RootStackParamList = {
     room: ChatGroup;
   };
   RoomList: undefined;
-  NewRoom: undefined;
+  NewRoom: undefined | {selectedMembers: User[]};
   EditRoom: {room: ChatGroup};
   ChatMenu: {
     room: ChatGroup;
