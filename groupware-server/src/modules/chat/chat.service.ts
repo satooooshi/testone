@@ -411,9 +411,11 @@ export class ChatService {
 
     const existGroup = maybeExistGroup
       .filter((g) => g.members.length === userIds.length)
-      .filter((g) =>
-        g.members.map((m) => m.id).filter((id) => userIds.includes(id)),
-      );
+      .map((g) => {
+        g.members = g.members.filter((m) => userIds.includes(m.id));
+        return g;
+      })
+      .filter((g) => g.members?.length === 2);
 
     if (existGroup.length) {
       return existGroup[0];
