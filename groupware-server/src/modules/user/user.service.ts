@@ -509,20 +509,31 @@ export class UserService {
       const existUser = await this.userRepository.findOne({
         employeeId: u.employeeId,
       });
-      const hashedPassword = await hash(u.password, 10);
-      if (existUser) {
+      if (!u.email && !u.password && !existUser) {
+        throw new BadRequestException('メールアドレスとパスワードは必須です');
+      }
+      if (!u.password && existUser) {
         usersArr.push({
           ...existUser,
           ...u,
-          password: hashedPassword,
           verifiedAt: new Date(),
         });
       } else {
-        usersArr.push({
-          ...u,
-          password: hashedPassword,
-          verifiedAt: new Date(),
-        });
+        const hashedPassword = await hash(u.password, 10);
+        if (existUser) {
+          usersArr.push({
+            ...existUser,
+            ...u,
+            password: hashedPassword,
+            verifiedAt: new Date(),
+          });
+        } else {
+          usersArr.push({
+            ...u,
+            password: hashedPassword,
+            verifiedAt: new Date(),
+          });
+        }
       }
     }
     const newUsers = await this.userRepository.save(usersArr);
