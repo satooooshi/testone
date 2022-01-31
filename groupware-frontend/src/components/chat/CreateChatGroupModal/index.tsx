@@ -39,7 +39,7 @@ type CreateChatGroupModalProps = {
   isOpen: boolean;
   closeModal: () => void;
   onComplete: () => void;
-  selectedMembers: User[];
+  selectedMembers: Partial<User>[];
 };
 
 const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
