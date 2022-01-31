@@ -1,22 +1,33 @@
 import React from 'react';
 import headerStyles from '@/styles/components/Header.module.scss';
 import clsx from 'clsx';
-import { Button, Text } from '@chakra-ui/react';
+import {
+  Button,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuList,
+  Text,
+} from '@chakra-ui/react';
 import boldLogo from '@/public/bold-logo.png';
 import Image from 'next/image';
 import { GiHamburgerMenu } from 'react-icons/gi';
 import Link from 'next/link';
 import { EventTab, Tab } from 'src/types/header/tab/types';
+import { IoChevronDownCircleOutline } from 'react-icons/io5';
 
 export type HeaderProps = {
   title: string;
   activeTabName?: string;
   tabs?: Tab[];
   rightButtonName?: string;
+  rightMenuName?: string;
   onClickRightButton?: () => void;
   classNames?: string[];
   isDrawerOpen: boolean;
   setIsDrawerOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  setIsTalkRoom?: React.Dispatch<React.SetStateAction<boolean>>;
+  setMembersModal?: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 const tabClassNameGetter = (tab: Tab): string => {
@@ -44,9 +55,12 @@ const HeaderWithTab: React.FC<HeaderProps> = ({
   activeTabName,
   tabs,
   rightButtonName,
+  rightMenuName,
   onClickRightButton,
   isDrawerOpen,
   setIsDrawerOpen,
+  setIsTalkRoom,
+  setMembersModal,
 }) => {
   return (
     <div className={headerStyles.header_and_tab_wrapper}>
@@ -62,6 +76,35 @@ const HeaderWithTab: React.FC<HeaderProps> = ({
           </div>
           <div className={headerStyles.header_right}>
             <div className={headerStyles.right_button_wrapper}>
+              {rightMenuName && setMembersModal && setIsTalkRoom ? (
+                <Menu>
+                  {({ isOpen }) => (
+                    <>
+                      <MenuButton
+                        isActive={isOpen}
+                        colorScheme="blue"
+                        as={Button}
+                        rightIcon={<IoChevronDownCircleOutline />}>
+                        {rightMenuName}
+                      </MenuButton>
+                      <MenuList>
+                        <MenuItem
+                          onClick={() => {
+                            setMembersModal(true), setIsTalkRoom(true);
+                          }}>
+                          トーク
+                        </MenuItem>
+                        <MenuItem
+                          onClick={() => {
+                            setMembersModal(true), setIsTalkRoom(false);
+                          }}>
+                          グループ
+                        </MenuItem>
+                      </MenuList>
+                    </>
+                  )}
+                </Menu>
+              ) : null}
               {rightButtonName && onClickRightButton ? (
                 <Button
                   size="sm"

@@ -506,8 +506,24 @@ export class UserService {
   async registerUsers(userData: User[]) {
     const usersArr: User[] = [];
     for (const u of userData) {
+      const existUser = await this.userRepository.findOne({
+        employeeId: u.employeeId,
+      });
       const hashedPassword = await hash(u.password, 10);
-      usersArr.push({ ...u, password: hashedPassword, verifiedAt: new Date() });
+      if (existUser) {
+        usersArr.push({
+          ...existUser,
+          ...u,
+          password: hashedPassword,
+          verifiedAt: new Date(),
+        });
+      } else {
+        usersArr.push({
+          ...u,
+          password: hashedPassword,
+          verifiedAt: new Date(),
+        });
+      }
     }
     const newUsers = await this.userRepository.save(usersArr);
     return newUsers;

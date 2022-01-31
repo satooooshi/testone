@@ -314,13 +314,22 @@ const Chat: React.FC = () => {
   };
 
   const handleUploadFile = async () => {
+    const normalizeURL = (url: string) => {
+      const filePrefix = 'file://';
+      if (url.startsWith(filePrefix)) {
+        url = url.substring(filePrefix.length);
+        url = decodeURI(url);
+        return url;
+      }
+    };
     const res = await DocumentPicker.pickSingle({
       type: [DocumentPicker.types.allFiles],
     });
+    console.log(res);
     const formData = new FormData();
     formData.append('files', {
       name: res.name,
-      uri: res.uri,
+      uri: normalizeURL(res.uri),
       type: res.type,
     });
     uploadFile(formData);

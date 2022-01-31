@@ -1,5 +1,5 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {TouchableOpacity, useWindowDimensions} from 'react-native';
+import {FlatList, TouchableOpacity, useWindowDimensions} from 'react-native';
 import {
   Button,
   Div,
@@ -13,17 +13,19 @@ import {
   Text,
 } from 'react-native-magnus';
 import {DropdownOptionProps} from 'react-native-magnus/lib/typescript/src/ui/dropdown/dropdown.option.type';
+import tailwind from 'tailwind-rn';
 import {useSelectedUsers} from '../../../hooks/user/useSelectedUsers';
 import {useUserRole} from '../../../hooks/user/useUserRole';
 import {User, UserRole, UserRoleInApp} from '../../../types';
 import {userNameFactory} from '../../../utils/factory/userNameFactory';
 import {userRoleNameFactory} from '../../../utils/factory/userRoleNameFactory';
+import UserAvatar from '../UserAvatar';
 
 type ModalContainerProps = Omit<ModalProps, 'children'>;
 
 type UserModalProps = ModalContainerProps & {
   onCloseModal: () => void;
-  onCompleteModal: (users: User[]) => void;
+  onCompleteModal: (users: User[], reset: () => void) => void;
   users: User[];
   selectedUserRole: UserRoleInApp;
   defaultSelectedUsers?: Partial<User>[];
@@ -105,8 +107,8 @@ const UserModal: React.FC<UserModalProps> = props => {
         rounded="circle"
         w={60}
         onPress={() => {
-          onCompleteModal(selectedUsersInModal as User[]);
-          onCloseUserModal();
+          onCompleteModal(selectedUsersInModal as User[], clear);
+          onCloseModal();
         }}>
         <Icon color="white" fontSize="6xl" name="check" />
       </Button>
@@ -153,6 +155,31 @@ const UserModal: React.FC<UserModalProps> = props => {
           {userRoleNameFactory(selectedUserRole)}
         </Button>
       </Div>
+      <Div w={windowWidth * 0.9} alignSelf="center" mb="xs">
+        <Text
+          fontWeight="bold"
+          fontSize={16}>{`${selectedUsersInModal?.length}人選択中`}</Text>
+      </Div>
+      <FlatList
+        horizontal
+        data={selectedUsersInModal}
+        renderItem={({item}) => (
+          <Div mr={'md'}>
+            <TouchableOpacity
+              // eslint-disable-next-line react-native/no-inline-styles
+              style={{...tailwind('absolute top-0 right-0'), zIndex: 50}}
+              onPress={() => {
+                toggleUser(item as User);
+              }}>
+              <Icon color="black" name="close" />
+            </TouchableOpacity>
+            <Div h={120}>
+              <UserAvatar user={item} h={64} w={64} />
+              <Text>{userNameFactory(item)}</Text>
+            </Div>
+          </Div>
+        )}
+      />
       <Dropdown
         {...defaultDropdownProps}
         title="入力形式を選択"
