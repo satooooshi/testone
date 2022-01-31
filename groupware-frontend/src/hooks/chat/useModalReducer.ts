@@ -50,7 +50,6 @@ const modalReducer = (state: ModalState, action: ModalAction): ModalState => {
       };
     }
     case 'createGroupWindow': {
-      console.log('create');
       return {
         ...state,
         createGroupWindow: action.value,
