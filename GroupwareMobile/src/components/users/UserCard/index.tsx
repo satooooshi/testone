@@ -72,7 +72,12 @@ const UserCard: React.FC<UserCardProps> = ({user, filteredDuration}) => {
         borderWidth={1}
         borderColor={'gray500'}>
         <Div px="xs" justifyContent="space-between" flexDir="row">
-          <UserAvatar user={user} w={120} h={120} />
+          <UserAvatar
+            user={user}
+            w={120}
+            h={120}
+            onPress={navigateToAccountScreen}
+          />
           <Div w={'60%'}>
             <Text fontSize={18} fontWeight="bold" color={darkFontColor}>
               {userNameFactory(user)}
