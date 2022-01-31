@@ -131,6 +131,7 @@ const RoomList: React.FC = () => {
           flexDir="row"
           alignSelf="center"
           w={'100%'}
+          pt={24}
           py={'lg'}
           justifyContent="space-around"
           px={'sm'}>
@@ -139,7 +140,7 @@ const RoomList: React.FC = () => {
             onPress={() => {
               setRoomTypeSelector(false);
             }}>
-            <Icon color="black" name="close" />
+            <Icon color="black" name="close" fontSize={20} />
           </TouchableOpacity>
 
           <TouchableHighlight
@@ -152,7 +153,7 @@ const RoomList: React.FC = () => {
             <>
               <Icon
                 fontFamily="Ionicons"
-                name="chatbubble-ellipses"
+                name="chatbubble-ellipses-outline"
                 color={'black'}
                 fontSize={36}
               />
@@ -168,8 +169,8 @@ const RoomList: React.FC = () => {
             }}>
             <>
               <Icon
-                fontFamily="MaterialIcons"
-                name="group"
+                fontFamily="Ionicons"
+                name="ios-chatbubbles-outline"
                 color={'black'}
                 fontSize={36}
               />
@@ -185,8 +186,10 @@ const RoomList: React.FC = () => {
             onCompleteModal={(selectedUsers, reset) => {
               if (selectedUsers.length === 1 && creationType === 'talk') {
                 createGroup({members: selectedUsers});
+                setRoomTypeSelector(false);
                 return;
               }
+              setRoomTypeSelector(false);
               navigation.navigate('ChatStack', {
                 screen: 'NewRoom',
                 params: {selectedMembers: selectedUsers},
