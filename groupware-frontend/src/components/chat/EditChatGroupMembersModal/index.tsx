@@ -165,6 +165,7 @@ const EditChatGroupMembersModal: React.FC<EditChatGroupMambersModalProps> = ({
             <Box mr="8px">
               <FormLabel htmlFor="search">メンバーを検索</FormLabel>
               <Input
+                bg="white"
                 marginBottom={'8px'}
                 onChange={(v) => onChangeHandle(v.target.value)}
                 id="search"
