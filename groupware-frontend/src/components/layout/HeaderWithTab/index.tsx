@@ -82,6 +82,7 @@ const HeaderWithTab: React.FC<HeaderProps> = ({
                     <>
                       <MenuButton
                         isActive={isOpen}
+                        colorScheme="blue"
                         as={Button}
                         rightIcon={<IoChevronDownCircleOutline />}>
                         {rightMenuName}
@@ -93,7 +94,10 @@ const HeaderWithTab: React.FC<HeaderProps> = ({
                           }}>
                           トーク
                         </MenuItem>
-                        <MenuItem onClick={() => setMembersModal(true)}>
+                        <MenuItem
+                          onClick={() => {
+                            setMembersModal(true), setIsTalkRoom(false);
+                          }}>
                           グループ
                         </MenuItem>
                       </MenuList>
