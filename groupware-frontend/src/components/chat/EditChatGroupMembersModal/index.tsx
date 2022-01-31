@@ -121,21 +121,23 @@ const EditChatGroupMembersModal: React.FC<EditChatGroupMambersModalProps> = ({
           display="flex"
           mr="24px">
           <Text>メンバーを編集</Text>
-          <Button
-            size="sm"
-            flexDir="row"
-            onClick={() => onComplete(selectedUsersInModal as User[])}
-            mb="8px"
-            colorScheme="green"
-            alignItems="center">
-            <Text display="inline">
-              {room
-                ? '更新'
-                : isTalkRoom && selectedUsersInModal.length === 1
-                ? '作成'
-                : '次へ'}
-            </Text>
-          </Button>
+          {selectedUsersInModal.length !== 0 && (
+            <Button
+              size="sm"
+              flexDir="row"
+              onClick={() => onComplete(selectedUsersInModal as User[])}
+              mb="8px"
+              colorScheme="green"
+              alignItems="center">
+              <Text display="inline">
+                {room
+                  ? '更新'
+                  : isTalkRoom && selectedUsersInModal.length === 1
+                  ? '作成'
+                  : '次へ'}
+              </Text>
+            </Button>
+          )}
         </ModalHeader>
         <ModalCloseButton />
         <ModalBody>

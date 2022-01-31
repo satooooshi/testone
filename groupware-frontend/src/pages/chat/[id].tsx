@@ -131,6 +131,7 @@ const ChatDetail = () => {
               dispatchModal({ type: 'createGroupWindow', value: true });
             }
           }}
+          isTalkRoom={isTalkRoom}
         />
 
         <CreateChatGroupModal
