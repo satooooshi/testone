@@ -404,8 +404,9 @@ export class ChatService {
     const maybeExistGroup = await this.chatGroupRepository
       .createQueryBuilder('g')
       .leftJoinAndSelect('g.members', 'u')
-      .where('u.id IN (:...userIds)', { userIds })
-      .andWhere('g.name = :name', { name: newData.name })
+      .andWhere(newData.name ? 'g.name = :name' : 'g.name = ""', {
+        name: newData.name,
+      })
       .getMany();
 
     const existGroup = maybeExistGroup

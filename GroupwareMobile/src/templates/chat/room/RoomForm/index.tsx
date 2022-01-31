@@ -25,6 +25,7 @@ type RoomFormProps = {
   users: User[];
   headerTitle: string;
   initialRoom?: ChatGroup;
+  selectedMembers?: User[];
   onSubmit: (chatGroup: Partial<ChatGroup> | ChatGroup) => void;
   onUploadImage: (
     formData: FormData,
@@ -36,6 +37,7 @@ const RoomForm: React.FC<RoomFormProps> = ({
   users,
   headerTitle,
   initialRoom,
+  selectedMembers,
   onSubmit,
   onUploadImage,
 }) => {
@@ -44,11 +46,12 @@ const RoomForm: React.FC<RoomFormProps> = ({
   const initialValues: Partial<ChatGroup> = {
     name: '',
     imageURL: '',
-    members: [],
+    members: selectedMembers || [],
   };
   const {values, setValues, handleChange, handleSubmit, errors, touched} =
     useFormik({
       initialValues: initialRoom || initialValues,
+      enableReinitialize: true,
       onSubmit: submittedValues => {
         onSubmit(submittedValues);
       },
