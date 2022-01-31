@@ -160,26 +160,35 @@ const UserModal: React.FC<UserModalProps> = props => {
           fontWeight="bold"
           fontSize={16}>{`${selectedUsersInModal?.length}人選択中`}</Text>
       </Div>
-      <FlatList
-        horizontal
-        data={selectedUsersInModal}
-        renderItem={({item}) => (
-          <Div mr={'md'}>
-            <TouchableOpacity
-              // eslint-disable-next-line react-native/no-inline-styles
-              style={{...tailwind('absolute top-0 right-0'), zIndex: 50}}
-              onPress={() => {
-                toggleUser(item as User);
-              }}>
-              <Icon color="black" name="close" />
-            </TouchableOpacity>
-            <Div h={120}>
-              <UserAvatar user={item} h={64} w={64} />
-              <Text>{userNameFactory(item)}</Text>
+
+      <Div>
+        <FlatList
+          horizontal
+          data={selectedUsersInModal}
+          renderItem={({item}) => (
+            <Div mr={'md'}>
+              <TouchableOpacity
+                // eslint-disable-next-line react-native/no-inline-styles
+                style={{...tailwind('absolute top-0 right-0'), zIndex: 50}}
+                onPress={() => {
+                  toggleUser(item as User);
+                }}>
+                <Icon
+                  color="black"
+                  name="close"
+                  bg="gray300"
+                  rounded="circle"
+                />
+              </TouchableOpacity>
+              <Div alignItems="center">
+                <UserAvatar user={item} h={64} w={64} />
+                <Text>{userNameFactory(item)}</Text>
+              </Div>
             </Div>
-          </Div>
-        )}
-      />
+          )}
+        />
+      </Div>
+
       <Dropdown
         {...defaultDropdownProps}
         title="入力形式を選択"
@@ -221,7 +230,7 @@ const UserModal: React.FC<UserModalProps> = props => {
           {userRoleNameFactory(UserRole.EXTERNAL_INSTRUCTOR)}
         </Dropdown.Option>
       </Dropdown>
-      <ScrollDiv>
+      <ScrollDiv contentContainerStyle={{width: '100%'}}>
         {filteredUsers?.map(u => (
           <TouchableOpacity key={u.id} onPress={() => toggleUser(u)}>
             <Div
