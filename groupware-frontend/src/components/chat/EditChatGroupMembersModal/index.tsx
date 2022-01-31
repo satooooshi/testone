@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ChatGroup, User, UserRole, UserRoleInApp } from 'src/types';
 import {
   Avatar,
@@ -33,6 +33,7 @@ type EditChatGroupMambersModalProps = {
   isOpen: boolean;
   onClose: () => void;
   onComplete: (selectedUsers: User[]) => void;
+  isTalkRoom?: boolean;
 };
 
 const UserRenderer = ({
@@ -75,6 +76,7 @@ const EditChatGroupMembersModal: React.FC<EditChatGroupMambersModalProps> = ({
   isOpen,
   onClose: onCancel,
   onComplete,
+  isTalkRoom = false,
 }) => {
   const { data: users, isLoading } = useAPIGetUsers();
   const { user: myProfile } = useAuthenticate();
@@ -96,6 +98,12 @@ const EditChatGroupMembersModal: React.FC<EditChatGroupMambersModalProps> = ({
     }
   }, [room?.members, setSelectedUsers]);
 
+  useEffect(() => {
+    if (!isOpen) {
+      clear();
+    }
+  }, [isOpen, clear]);
+
   return (
     <Modal
       size="lg"
@@ -113,15 +121,23 @@ const EditChatGroupMembersModal: React.FC<EditChatGroupMambersModalProps> = ({
           display="flex"
           mr="24px">
           <Text>メンバーを編集</Text>
-          <Button
-            size="sm"
-            flexDir="row"
-            onClick={() => onComplete(selectedUsersInModal as User[])}
-            mb="8px"
-            colorScheme="green"
-            alignItems="center">
-            <Text display="inline">{room ? '更新' : '選択'}</Text>
-          </Button>
+          {selectedUsersInModal.length !== 0 && (
+            <Button
+              size="sm"
+              flexDir="row"
+              onClick={() => onComplete(selectedUsersInModal as User[])}
+              mb="8px"
+              colorScheme="green"
+              alignItems="center">
+              <Text display="inline">
+                {room
+                  ? '更新'
+                  : isTalkRoom && selectedUsersInModal.length === 1
+                  ? '作成'
+                  : '次へ'}
+              </Text>
+            </Button>
+          )}
         </ModalHeader>
         <ModalCloseButton />
         <ModalBody>
