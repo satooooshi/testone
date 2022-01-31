@@ -94,7 +94,7 @@ const SelectUserModal: React.FC<SelectUserModalProps> = ({
       isOpen={isOpen}
       className={selectUserModalStyles.modal}>
       <FormControl className={selectUserModalStyles.user_role_select_wrapper}>
-        <FormLabel htmlFor="search">ユーザーを検索</FormLabel>
+        <FormLabel htmlFor="search">名前で検索</FormLabel>
         <Input
           marginBottom={'8px'}
           onChange={(v) => onChangeHandle(v.target.value)}
