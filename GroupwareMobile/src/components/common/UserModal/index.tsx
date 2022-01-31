@@ -125,7 +125,7 @@ const UserModal: React.FC<UserModalProps> = props => {
         }}>
         <Icon color="black" name="close" />
       </Button>
-      <Text mx={8}>タグを検索</Text>
+      <Text mx={8}>名前で検索</Text>
       <Input
         mx={8}
         autoCapitalize="none"
