@@ -68,7 +68,6 @@ const Chat = () => {
         }}
         onComplete={() => {
           setMembersModal(false);
-          setMembersModal(false);
         }}
         selectedMembers={selectedMembers || []}
       />
