@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ChatGroup, User, UserRole, UserRoleInApp } from 'src/types';
 import {
   Avatar,
@@ -8,6 +8,7 @@ import {
   FormControl,
   FormLabel,
   IconButton,
+  Input,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -33,6 +34,7 @@ type EditChatGroupMambersModalProps = {
   isOpen: boolean;
   onClose: () => void;
   onComplete: (selectedUsers: User[]) => void;
+  isTalkRoom?: boolean;
 };
 
 const UserRenderer = ({
@@ -75,6 +77,7 @@ const EditChatGroupMembersModal: React.FC<EditChatGroupMambersModalProps> = ({
   isOpen,
   onClose: onCancel,
   onComplete,
+  isTalkRoom = false,
 }) => {
   const { data: users, isLoading } = useAPIGetUsers();
   const { user: myProfile } = useAuthenticate();
@@ -85,10 +88,28 @@ const EditChatGroupMembersModal: React.FC<EditChatGroupMambersModalProps> = ({
     setSelectedUsers,
     clear,
   } = useSelectedUsers(room?.members || []);
+  const [modalUsers, setModalUsers] = useState(users);
+  const [searchWords, setSearchWords] = useState<RegExpMatchArray | null>();
+  const onChangeHandle = (t: string) => {
+    const searchWords = t.trim().match(/[^\s]+/g);
+    setSearchWords(searchWords);
+    return;
+  };
   const { selectedUserRole, selectUserRole, filteredUsers } = useUserRole(
     'All',
-    users,
+    modalUsers,
   );
+  useEffect(() => {
+    if (!searchWords) {
+      setModalUsers(users);
+      return;
+    }
+    const searchedTags = users?.filter((u) => {
+      const userName = u.firstName + u.lastName;
+      return searchWords.every((w) => userName.indexOf(w) !== -1);
+    });
+    setModalUsers(searchedTags);
+  }, [searchWords, users]);
 
   useEffect(() => {
     if (room?.members) {
@@ -96,11 +117,18 @@ const EditChatGroupMembersModal: React.FC<EditChatGroupMambersModalProps> = ({
     }
   }, [room?.members, setSelectedUsers]);
 
+  useEffect(() => {
+    if (!isOpen) {
+      clear();
+    }
+  }, [isOpen, clear]);
+
   return (
     <Modal
       size="lg"
       onClose={() => {
         onCancel();
+        setSearchWords(null);
         clear();
       }}
       scrollBehavior="inside"
@@ -113,20 +141,35 @@ const EditChatGroupMembersModal: React.FC<EditChatGroupMambersModalProps> = ({
           display="flex"
           mr="24px">
           <Text>メンバーを編集</Text>
-          <Button
-            size="sm"
-            flexDir="row"
-            onClick={() => onComplete(selectedUsersInModal as User[])}
-            mb="8px"
-            colorScheme="green"
-            alignItems="center">
-            <Text display="inline">{room ? '更新' : '選択'}</Text>
-          </Button>
+          {selectedUsersInModal.length !== 0 && (
+            <Button
+              size="sm"
+              flexDir="row"
+              onClick={() => onComplete(selectedUsersInModal as User[])}
+              mb="8px"
+              colorScheme="green"
+              alignItems="center">
+              <Text display="inline">
+                {room
+                  ? '更新'
+                  : isTalkRoom && selectedUsersInModal.length === 1
+                  ? '作成'
+                  : '次へ'}
+              </Text>
+            </Button>
+          )}
         </ModalHeader>
         <ModalCloseButton />
         <ModalBody>
           <Box display="flex" flexDir="row" h="100%">
             <Box mr="8px">
+              <FormLabel htmlFor="search">メンバーを検索</FormLabel>
+              <Input
+                bg="white"
+                marginBottom={'8px'}
+                onChange={(v) => onChangeHandle(v.target.value)}
+                id="search"
+              />
               <FormControl mb="16px">
                 <FormLabel>タイプ</FormLabel>
                 <Select

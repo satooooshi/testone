@@ -19,7 +19,6 @@ type UserCardProps = {
 
 const UserCard: React.FC<UserCardProps> = ({user, filteredDuration}) => {
   const navigation = useNavigation<any>();
-  const route = useRoute<any>();
   const {user: mySelf} = useAuthenticate();
   const {width: windowWidth} = useWindowDimensions();
   const {filteredTags: techTags} = useTagType(TagType.TECH, user?.tags || []);
@@ -42,18 +41,17 @@ const UserCard: React.FC<UserCardProps> = ({user, filteredDuration}) => {
   };
 
   const navigateToAccountScreen = () => {
-    console.log(navigation.getState());
-    // if (user?.id === mySelf?.id) {
-    // navigation.navigate('AccountStack', {
-    //   screen: 'MyProfile',
-    //   params: {id: user?.id},
-    // });
-    // } else {
-    //   navigation.navigate('UsersStack', {
-    //     screen: 'AccountDetail',
-    //     params: {id: user?.id},
-    //   });
-    // }
+    if (user?.id === mySelf?.id) {
+      navigation.navigate('AccountStack', {
+        screen: 'MyProfile',
+        params: {id: user?.id},
+      });
+    } else {
+      navigation.navigate('UsersStack', {
+        screen: 'AccountDetail',
+        params: {id: user?.id},
+      });
+    }
   };
 
   const onPressTag = (tag: UserTag) => {
@@ -74,7 +72,12 @@ const UserCard: React.FC<UserCardProps> = ({user, filteredDuration}) => {
         borderWidth={1}
         borderColor={'gray500'}>
         <Div px="xs" justifyContent="space-between" flexDir="row">
-          <UserAvatar user={user} w={120} h={120} />
+          <UserAvatar
+            user={user}
+            w={120}
+            h={120}
+            onPress={navigateToAccountScreen}
+          />
           <Div w={'60%'}>
             <Text fontSize={18} fontWeight="bold" color={darkFontColor}>
               {userNameFactory(user)}
