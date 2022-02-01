@@ -43,6 +43,7 @@ const Navigator = () => {
     appId: AGORA_APP_ID,
     channel: channelName,
     token: agoraToken,
+    enableVideo: false,
   };
   const remoteInvitation = useRef<RemoteInvitation | undefined>();
   const endCall = async () => {
@@ -55,6 +56,15 @@ const Navigator = () => {
 
   const callbacks: Partial<CallbacksInterface> = {
     EndCall: endCall,
+    LocalMuteVideo: async bool => {
+      if (bool) {
+        await rtcEngine?.adjustPlaybackSignalVolume(100);
+        await rtcEngine?.adjustRecordingSignalVolume(100);
+      } else {
+        await rtcEngine?.adjustPlaybackSignalVolume(400);
+        await rtcEngine?.adjustRecordingSignalVolume(400);
+      }
+    },
   };
 
   // console.log(rtcEngine);
@@ -62,7 +72,6 @@ const Navigator = () => {
     rtcEngine = await RtcEngine.createWithContext(
       new RtcEngineContext(AGORA_APP_ID),
     );
-    await rtcEngine?.enableAudio();
     await rtcEngine?.disableVideo();
 
     rtcEngine?.addListener('UserJoined', (uid, elapsed) => {
@@ -137,6 +146,22 @@ const Navigator = () => {
     );
   };
 
+  const joinChannel = async (realChannelName: string) => {
+    const res = await axiosInstance.get<string>(
+      `/chat/get-voice-token/${realChannelName}`,
+    );
+    const tokenForCall = res.data;
+    const userData = await apiAuthenticate();
+    const userId = userData?.id;
+    if (userId) {
+      await rtcInit();
+      await rtcEngine?.joinChannel(tokenForCall, realChannelName, null, userId);
+      await rtcEngine?.disableVideo();
+      setChannelName(realChannelName);
+      setVideoCall(true);
+    }
+  };
+
   const answerCall = async () => {
     RNCallKeep.endAllCalls();
     if (remoteInvitation.current?.channelId) {
@@ -150,23 +175,7 @@ const Navigator = () => {
       } else {
         await rtmEngine.acceptRemoteInvitationV2(remoteInvitation.current);
       }
-      const res = await axiosInstance.get<string>(
-        `/chat/get-voice-token/${realChannelName}`,
-      );
-      const tokenForCall = res.data;
-      const userData = await apiAuthenticate();
-      const userId = userData?.id;
-      if (userId && remoteInvitation.current?.channelId) {
-        await rtcInit();
-        await rtcEngine?.joinChannel(
-          tokenForCall,
-          realChannelName,
-          null,
-          userId,
-        );
-        setChannelName(realChannelName);
-        setVideoCall(true);
-      }
+      await joinChannel(realChannelName);
     }
   };
 
@@ -175,23 +184,7 @@ const Navigator = () => {
     callKeepSetup();
     rtmEngine.addListener('LocalInvitationAccepted', async invitation => {
       const realChannelName = invitation?.channelId as string;
-      const res = await axiosInstance.get<string>(
-        `/chat/get-voice-token/${realChannelName}`,
-      );
-      const tokenForCall = res.data;
-      const userData = await apiAuthenticate();
-      const userId = userData?.id;
-      if (userId) {
-        await rtcInit();
-        await rtcEngine?.joinChannel(
-          tokenForCall,
-          realChannelName,
-          null,
-          userId,
-        );
-        setChannelName(realChannelName);
-        setVideoCall(true);
-      }
+      await joinChannel(realChannelName);
     });
     rtmEngine.addListener(
       'RemoteInvitationReceived',
