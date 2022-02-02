@@ -5,6 +5,7 @@ import {
   Text,
   Link,
   Spinner,
+  Input,
 } from '@chakra-ui/react';
 import { MentionData } from '@draft-js-plugins/mention';
 import { darkFontColor } from 'src/utils/colors';
@@ -12,7 +13,11 @@ import { Menu, MenuItem, MenuButton } from '@szhsin/react-menu';
 import { HiOutlineDotsCircleHorizontal } from 'react-icons/hi';
 import Editor from '@draft-js-plugins/editor';
 import { convertToRaw, EditorState } from 'draft-js';
-import { AiOutlinePaperClip, AiOutlinePicture } from 'react-icons/ai';
+import {
+  AiOutlinePaperClip,
+  AiOutlinePicture,
+  AiOutlineSearch,
+} from 'react-icons/ai';
 import { ChatGroup, ChatMessage, ChatMessageType, User } from 'src/types';
 import { MenuValue } from '@/hooks/chat/useModalReducer';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
@@ -47,6 +52,7 @@ import { fileNameTransformer } from 'src/utils/factory/fileNameTransformer';
 import { saveAs } from 'file-saver';
 import { EntryComponentProps } from '@draft-js-plugins/mention/lib/MentionSuggestions/Entry/Entry';
 import suggestionStyles from '@/styles/components/Suggestion.module.scss';
+import { useAPISearchMessages } from '@/hooks/api/chat/useAPISearchMessages';
 
 export const Entry: React.FC<EntryComponentProps> = ({
   mention,
@@ -108,6 +114,9 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
   const { user } = useAuthenticate();
   const [visibleAlbumModal, setVisibleAlbumModal] = useState(false);
   const [visibleNoteModal, setVisibleNoteModal] = useState(false);
+  const [visibleSearchForm, setVisibleSearchForm] = useState(false);
+  const [searchedWord, setSearchedWord] = useState('');
+
   const { user: myself } = useAuthenticate();
   const [page, setPage] = useState(1);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -178,6 +187,19 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
             needRefetch();
           }
         }
+      },
+    },
+  );
+
+  const { refetch: searchMessages } = useAPISearchMessages(
+    {
+      group: room.id,
+      word: searchedWord,
+    },
+    {
+      enabled: false,
+      onSuccess: (searchedWords) => {
+        console.log(searchedWords);
       },
     },
   );
@@ -487,6 +509,9 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
           </Box>
         </Box>
         <Box display="flex" flexDir="row" alignItems="center">
+          <Link onClick={() => setVisibleSearchForm((v) => !v)}>
+            <AiOutlineSearch size={24} />
+          </Link>
           <Link mr="4px" onClick={() => setVisibleNoteModal(true)}>
             <FiFileText size={24} />
           </Link>
@@ -508,6 +533,18 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
           </Menu>
         </Box>
       </Box>
+      {visibleSearchForm && (
+        <Input
+          placeholder="メッセージを検索"
+          type="search"
+          onChange={(e) => setSearchedWord(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              searchMessages();
+            }
+          }}
+        />
+      )}
       {/*
        * Messages
        */}

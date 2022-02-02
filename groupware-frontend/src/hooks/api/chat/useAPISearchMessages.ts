@@ -19,9 +19,9 @@ const searchMessages = async (query: SearchMessageQuery) => {
 
 export const useAPISearchMessages = (
   query: SearchMessageQuery,
-  options?: UseQueryOptions<Partial<ChatMessage[]>, AxiosError>,
+  options?: UseQueryOptions<Partial<ChatMessage>[], AxiosError>,
 ) => {
-  return useQuery<Partial<ChatMessage[]>, AxiosError>(
+  return useQuery<Partial<ChatMessage>[], AxiosError>(
     ['getMessages', query],
     () => searchMessages(query),
     options,

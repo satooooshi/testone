@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { User } from 'src/types';
 
 export const useSelectedUsers = (alreadySelectedUsers?: Partial<User>[]) => {
@@ -22,9 +22,9 @@ export const useSelectedUsers = (alreadySelectedUsers?: Partial<User>[]) => {
     });
   };
 
-  const clear = () => {
+  const clear = useCallback(() => {
     setSelectedUsers(alreadySelectedUsers || []);
-  };
+  }, []);
 
   return {
     selectedUsers,
