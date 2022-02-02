@@ -14,7 +14,11 @@ import { User } from 'src/entities/user.entity';
 import { userNameFactory } from 'src/utils/factory/userNameFactory';
 import { In, Repository } from 'typeorm';
 import { StorageService } from '../storage/storage.service';
-import { GetMessagesQuery, GetRoomsResult } from './chat.controller';
+import {
+  GetMessagesQuery,
+  GetRoomsResult,
+  SearchMessageQuery,
+} from './chat.controller';
 
 @Injectable()
 export class ChatService {
@@ -159,6 +163,30 @@ export class ChatService {
       return m;
     });
     return messages;
+  }
+
+  public async searchMessage(
+    query: SearchMessageQuery,
+  ): Promise<Partial<ChatMessage[]>> {
+    const words = query.word.split(' ');
+
+    const sql = this.chatMessageRepository
+      .createQueryBuilder('chat_messages')
+      .select('chat_messages.id');
+
+    words.map((w, index) => {
+      if (index === 0) {
+        sql.where('chat_messages.content LIKE :word0', { word0: w });
+      } else {
+        sql.andWhere(`chat_messages.content LIKE :word${index}`, {
+          [`word${index}`]: w,
+        });
+      }
+    });
+    const message = await sql
+      .orderBy('chat_messages.createdAt', 'DESC')
+      .getMany();
+    return message;
   }
 
   public async getMenthionedChatMessage(user: User): Promise<ChatMessage[]> {
