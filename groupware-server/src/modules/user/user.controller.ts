@@ -37,10 +37,10 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   //@TODO this endpoint is for inputting data
-  // @Post('register-users')
-  // async registerUsers(@Body() users: User[]) {
-  //   return await this.userService.registerUsers(users);
-  // }
+  @Post('register-users')
+  async registerUsers(@Body() users: User[]) {
+    return await this.userService.registerUsers(users);
+  }
 
   @Get('csv')
   @UseGuards(JwtAuthenticationGuard)

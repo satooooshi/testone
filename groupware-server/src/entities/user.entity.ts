@@ -76,6 +76,24 @@ export class User {
 
   @Column({
     type: 'varchar',
+    name: 'last_name_kana',
+    length: 50,
+    nullable: false,
+    default: '',
+  })
+  lastNameKana: string;
+
+  @Column({
+    type: 'varchar',
+    name: 'first_name_kana',
+    length: 50,
+    nullable: false,
+    default: '',
+  })
+  firstNameKana: string;
+
+  @Column({
+    type: 'varchar',
     length: 1000,
     name: 'introduce_tech',
     default: '',
