@@ -167,15 +167,7 @@ const EventCard: React.FC<EventCardProps> = ({
                 </Button>
               </Link>
             ))
-          ) : (
-            <Button
-              size="xs"
-              colorScheme="orange"
-              mr="4px"
-              _first={{ marginLeft: '4px' }}>
-              {'タグなし'}
-            </Button>
-          )}
+          ) : null}
         </Box>
       </Box>
     </Link>
