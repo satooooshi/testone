@@ -8,6 +8,7 @@ import Login from '../screens/auth/Login';
 import {useAuthenticate} from '../contexts/useAuthenticate';
 import {RootStackParamList} from '../types/navigator/RootStackParamList';
 import DrawerTab from './Drawer';
+import BottomTab from './BottomTab';
 import {tokenString} from '../utils/url';
 import messaging from '@react-native-firebase/messaging';
 import PushNotification, {Importance} from 'react-native-push-notification';
@@ -121,9 +122,14 @@ const Navigator = () => {
           initialRouteName={user?.id || tokenString() ? 'Main' : 'Login'}>
           {user?.id || tokenString() ? (
             <>
-              <Stack.Screen
+              {/* <Stack.Screen
                 name="Main"
                 component={DrawerTab}
+                options={{headerShown: false}}
+              /> */}
+              <Stack.Screen
+                name="TabBar"
+                component={BottomTab}
                 options={{headerShown: false}}
               />
             </>
