@@ -151,23 +151,23 @@ const EventCard: React.FC<EventCardProps> = ({
           flexDir="row"
           overflowX="auto"
           css={hideScrollbarCss}>
-          {eventSchedule.tags && eventSchedule.tags.length ? (
-            eventSchedule.tags.map((t) => (
-              <Link
-                _hover={{ textDecoration: 'none' }}
-                mr="4px"
-                _first={{ marginLeft: '4px' }}
-                passHref
-                href={
-                  hrefTagClick ? hrefTagClick(t) : `/event/list?tag=${t.id}`
-                }
-                key={t.id}>
-                <Button size="xs" colorScheme={tagColorFactory(t.type)}>
-                  {t.name}
-                </Button>
-              </Link>
-            ))
-          ) : null}
+          {eventSchedule.tags && eventSchedule.tags.length
+            ? eventSchedule.tags.map((t) => (
+                <Link
+                  _hover={{ textDecoration: 'none' }}
+                  mr="4px"
+                  _first={{ marginLeft: '4px' }}
+                  passHref
+                  href={
+                    hrefTagClick ? hrefTagClick(t) : `/event/list?tag=${t.id}`
+                  }
+                  key={t.id}>
+                  <Button size="xs" colorScheme={tagColorFactory(t.type)}>
+                    {t.name}
+                  </Button>
+                </Link>
+              ))
+            : null}
         </Box>
       </Box>
     </Link>
