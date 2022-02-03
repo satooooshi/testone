@@ -29,6 +29,14 @@ import { ChatNoteService, GetChatNotesResult } from './chatNote.service';
 
 export interface GetMessagesQuery {
   group: number;
+  limit?: string;
+  after?: string;
+  before?: string;
+  include?: boolean;
+}
+
+export interface GetChaRoomsByPageQuery {
+  group: number;
   page?: string;
   limit?: string;
 }

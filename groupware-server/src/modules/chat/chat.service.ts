@@ -15,6 +15,7 @@ import { userNameFactory } from 'src/utils/factory/userNameFactory';
 import { In, Repository } from 'typeorm';
 import { StorageService } from '../storage/storage.service';
 import {
+  GetChaRoomsByPageQuery,
   GetMessagesQuery,
   GetRoomsResult,
   SearchMessageQuery,
@@ -71,7 +72,7 @@ export class ChatService {
 
   public async getRoomsByPage(
     userID: number,
-    query: GetMessagesQuery,
+    query: GetChaRoomsByPageQuery,
   ): Promise<GetRoomsResult> {
     const { page, limit = '20' } = query;
     const offset = Number(limit) * (Number(page) - 1);
@@ -127,9 +128,9 @@ export class ChatService {
     userID: number,
     query: GetMessagesQuery,
   ): Promise<ChatMessage[]> {
-    const { page = '1' } = query;
+    const { after, before, include = false } = query;
     const limit = 20;
-    const offset = (Number(page) - 1) * limit;
+    console.log('after', typeof after, 'before', before);
     const existMessages = await this.chatMessageRepository
       .createQueryBuilder('chat_messages')
       .withDeleted()
@@ -143,8 +144,23 @@ export class ChatService {
       )
       .leftJoinAndSelect('replyParentMessage.sender', 'reply_sender')
       .where('chat_group.id = :chatGroupID', { chatGroupID: query.group })
+      .andWhere(
+        after && include
+          ? 'chat_messages.id >= :after'
+          : after && !include
+          ? 'chat_messages.id > :after'
+          : '1=1',
+        { after },
+      )
+      .andWhere(
+        before && include
+          ? 'chat_messages.id <= :before'
+          : before && !include
+          ? 'chat_messages.id < :before'
+          : '1=1',
+        { before },
+      )
       .take(limit)
-      .skip(offset)
       .orderBy('chat_messages.createdAt', 'DESC')
       .withDeleted()
       .getMany();
@@ -169,10 +185,11 @@ export class ChatService {
     query: SearchMessageQuery,
   ): Promise<Partial<ChatMessage[]>> {
     const words = query.word.split(' ');
+    console.log(query.group);
 
     const sql = this.chatMessageRepository
       .createQueryBuilder('chat_messages')
-      .leftJoin('chat_messages.chatGorup', 'g')
+      .leftJoin('chat_messages.chatGroup', 'g')
       .select('chat_messages.id');
 
     words.map((w, index) => {

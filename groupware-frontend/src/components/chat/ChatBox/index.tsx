@@ -116,9 +116,9 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
   const [visibleNoteModal, setVisibleNoteModal] = useState(false);
   const [visibleSearchForm, setVisibleSearchForm] = useState(false);
   const [searchedWord, setSearchedWord] = useState('');
-
+  const [after, setAfter] = useState<number>();
+  const [before, setBefore] = useState<number>();
   const { user: myself } = useAuthenticate();
-  const [page, setPage] = useState(1);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const {
     values: newChatMessage,
@@ -165,12 +165,13 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
   const [mentionedUserData, setMentionedUserData] = useState<MentionData[]>([]);
   const { data: fetchedPastMessages } = useAPIGetMessages({
     group: room.id,
-    page: page.toString(),
+    after,
+    before,
   });
+
   const { refetch: refetchLatest } = useAPIGetMessages(
     {
       group: room.id,
-      page: '1',
     },
     {
       enabled: false,
@@ -323,14 +324,15 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
       (e.target.scrollHeight * 2) / 3
     ) {
       if (fetchedPastMessages?.length) {
-        setPage((p) => p + 1);
+        setBefore(messages[messages.length - 1].id);
       }
     }
   };
 
   useEffect(() => {
     setMessages([]);
-    setPage(1);
+    setBefore(undefined);
+    setAfter(undefined);
     refetchLatest();
   }, [refetchLatest, room]);
 
