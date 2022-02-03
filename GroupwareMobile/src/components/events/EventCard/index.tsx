@@ -112,17 +112,6 @@ const EventCard: React.FC<EventCardProps> = ({event}) => {
         <Div h={'20%'}>
           <FlatList
             horizontal
-            ListEmptyComponent={
-              <TagButton
-                fontSize={'lg'}
-                h={28}
-                py={0}
-                bg={'orange'}
-                color="white"
-                mr={4}>
-                タグなし
-              </TagButton>
-            }
             style={eventCardStyles.tagList}
             data={event.tags || []}
             renderItem={({item: t}) => (
