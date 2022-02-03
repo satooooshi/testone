@@ -52,7 +52,7 @@ const EventDetail: React.FC = () => {
   const route = useRoute<EventDetailRouteProps>();
   const {user} = useAuthenticate();
   const navigation = useNavigation();
-  const {id} = route.params;
+  const id = route.params?.id;
   const {
     data: eventInfo,
     refetch: refetchEvents,
@@ -295,7 +295,12 @@ const EventDetail: React.FC = () => {
             ? 'イベント編集'
             : undefined
         }
-        screenForBack="EventList"
+        screenForBack={
+          route.params?.previousScreenName
+            ? route.params.previousScreenName
+            : 'EventList'
+        }
+        // screenForBack="EventList"
         onPressRightButton={
           eventInfo && isEditableEvent(eventInfo, user)
             ? () => setEventFormModal(true)
