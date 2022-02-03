@@ -242,7 +242,9 @@ export class EventScheduleService {
         { queryWord: `%${word}%` },
       )
       .andWhere(
-        status === 'future'
+        query.participant_id
+          ? '1=1'
+          : status === 'future'
           ? 'events.start_at > now()'
           : status === 'past'
           ? 'events.start_at < now() AND events.end_at < now()'
