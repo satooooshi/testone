@@ -93,6 +93,8 @@ export interface User {
   email: string;
   lastName: string;
   firstName: string;
+  lastNameKana: string;
+  firstNameKana: string;
   introduceTech: string;
   introduceQualification: string;
   introduceHobby: string;

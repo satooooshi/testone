@@ -275,7 +275,7 @@ const AccountDetail: React.FC = () => {
                       profile={profile}
                     />
                   )}
-                  options={{title: '詳細'}}
+                  options={{title: 'プロフィール'}}
                 />
                 <TopTab.Screen
                   listeners={{focus: () => setActiveScreen(eventScreenName)}}

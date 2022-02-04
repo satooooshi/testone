@@ -135,7 +135,7 @@ const MyAccountInfo = () => {
 
   const topTabBehaviorList: TopTabBehavior[] = [
     {
-      tabName: '詳細',
+      tabName: 'プロフィール',
       onClick: () => {
         setActiveTab(TabName.DETAIL);
       },

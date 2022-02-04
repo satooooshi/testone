@@ -208,7 +208,7 @@ export class UserService {
         ? 'answerCount'
         : sort === 'knowledge'
         ? 'knowledgeCount'
-        : 'user.createdAt';
+        : 'user.lastNameKana';
     let offset: number;
     let fromDate: Date;
     if (duration === 'month') {
@@ -318,7 +318,7 @@ export class UserService {
       }, 'knowledgeCount')
       .skip(offset)
       .take(limit)
-      .orderBy(sortKey, 'DESC')
+      .orderBy(sortKey, sortKey === 'user.lastNameKana' ? 'ASC' : 'DESC')
       .getManyAndCount();
     const userIDs = users.map((u) => u.id);
     const userArrWithTags = await this.userRepository.findByIds(userIDs, {
@@ -421,7 +421,9 @@ export class UserService {
   }
 
   async getUsers(): Promise<User[]> {
-    const users = await this.userRepository.find();
+    const users = await this.userRepository.find({
+      order: { lastNameKana: 'ASC' },
+    });
     return users;
   }
 
@@ -507,14 +509,16 @@ export class UserService {
     const usersArr: User[] = [];
     for (const u of userData) {
       const existUser = await this.userRepository.findOne({
-        employeeId: u.employeeId,
+        email: u.email,
       });
+      if (!u.email && !u.password && !existUser) {
+        throw new BadRequestException('メールアドレスとパスワードは必須です');
+      }
       const hashedPassword = await hash(u.password, 10);
       if (existUser) {
         usersArr.push({
           ...existUser,
           ...u,
-          password: hashedPassword,
           verifiedAt: new Date(),
         });
       } else {
