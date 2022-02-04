@@ -57,6 +57,31 @@ export class User {
   email: string;
 
   @Column({
+    type: 'boolean',
+    name: 'isEmailPublic',
+    nullable: false,
+    default: false,
+  })
+  isEmailPublic: boolean;
+  
+  @Column({
+    type: 'varchar',
+    name: 'phone',
+    length: 100,
+    nullable: true,
+    default: '',
+  })
+  phone: string;
+  
+  @Column({
+    type: 'boolean',
+    name: 'isPhonePublic',
+    nullable: false,
+    default: false,
+  })
+  isPhonePublic: boolean;
+
+  @Column({
     type: 'varchar',
     name: 'last_name',
     length: 50,

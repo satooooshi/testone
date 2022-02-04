@@ -47,6 +47,9 @@ export class UserService {
     const csvFields = [
       { label: 'id', value: 'id' },
       { label: 'メールアドレス', value: 'email' },
+      { label: 'メールアドレス公開', value: 'isEmailPublic' },
+      { label: '電話番号', value: 'phone' },
+      { label: '電話番号公開', value: 'isEmailPublic' },
       { label: '姓', value: 'lastName' },
       { label: '名', value: 'firstName' },
       { label: '自己紹介', value: 'introduce' },
