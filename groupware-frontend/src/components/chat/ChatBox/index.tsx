@@ -6,6 +6,8 @@ import {
   Link,
   Spinner,
   Input,
+  InputGroup,
+  InputRightElement,
 } from '@chakra-ui/react';
 import { MentionData } from '@draft-js-plugins/mention';
 import { darkFontColor } from 'src/utils/colors';
@@ -14,9 +16,11 @@ import { HiOutlineDotsCircleHorizontal } from 'react-icons/hi';
 import Editor from '@draft-js-plugins/editor';
 import { convertToRaw, EditorState } from 'draft-js';
 import {
+  AiOutlineDown,
   AiOutlinePaperClip,
   AiOutlinePicture,
   AiOutlineSearch,
+  AiOutlineUp,
 } from 'react-icons/ai';
 import { ChatGroup, ChatMessage, ChatMessageType, User } from 'src/types';
 import { MenuValue } from '@/hooks/chat/useModalReducer';
@@ -115,11 +119,14 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
   const [visibleAlbumModal, setVisibleAlbumModal] = useState(false);
   const [visibleNoteModal, setVisibleNoteModal] = useState(false);
   const [visibleSearchForm, setVisibleSearchForm] = useState(false);
-  const [searchedWord, setSearchedWord] = useState('');
+  const [inputtedSearchWord, setInputtedSearchWord] = useState('');
+  const [confirmedSearchWord, setConfirmedSearchWord] = useState('');
   const [after, setAfter] = useState<number>();
   const [before, setBefore] = useState<number>();
   const { user: myself } = useAuthenticate();
+  const [focusedMessageID, setFocusedMessageID] = useState<number>();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [include, setInclude] = useState(false);
   const {
     values: newChatMessage,
     setValues: setNewChatMessage,
@@ -167,6 +174,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
     group: room.id,
     after,
     before,
+    include,
   });
 
   const { refetch: refetchLatest } = useAPIGetMessages(
@@ -192,18 +200,22 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
     },
   );
 
-  const { refetch: searchMessages } = useAPISearchMessages(
-    {
-      group: room.id,
-      word: searchedWord,
-    },
-    {
-      enabled: false,
-      onSuccess: (searchedWords) => {
-        console.log(searchedWords);
+  const { data: searchedResults, refetch: searchMessages } =
+    useAPISearchMessages(
+      {
+        group: room.id,
+        word: inputtedSearchWord,
       },
-    },
-  );
+      {
+        enabled: false,
+        onSuccess: (result) => {
+          if (result.length && result[0].id) {
+            setFocusedMessageID(result[0].id);
+            refetchDoesntExistMessages(result[0].id);
+          }
+        },
+      },
+    );
 
   const { mutate: sendChatMessage, isLoading: loadingSend } =
     useAPISendChatMessage({
@@ -338,24 +350,12 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
 
   useEffect(() => {
     if (fetchedPastMessages?.length) {
-      if (
-        messages?.length &&
-        isRecent(
-          messages[messages.length - 1],
-          fetchedPastMessages[fetchedPastMessages.length - 1],
-        )
-      ) {
-        const msgToAppend: ChatMessage[] = [];
-        for (const sentMsg of fetchedPastMessages) {
-          if (isRecent(messages[messages.length - 1], sentMsg)) {
-            msgToAppend.push(sentMsg);
-          }
-        }
-        setMessages((m) => {
-          return [...m, ...msgToAppend];
-        });
-      } else if (!messages?.length) {
-        setMessages(fetchedPastMessages);
+      const refreshedMessage = refreshMessage(fetchedPastMessages);
+      setMessages(refreshedMessage);
+      if (!refetchDoesntExistMessages(fetchedPastMessages[0].id)) {
+        setAfter(undefined);
+        setInclude(false);
+        setBefore(undefined);
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -427,6 +427,48 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
       case ChatMessageType.OTHER_FILE:
         return 'ファイル';
     }
+  };
+  const refetchDoesntExistMessages = (focused: number) => {
+    const isExist = messages.filter((m) => m.id === focused)?.length;
+
+    if (!isExist) {
+      setAfter(focused);
+      setInclude(true);
+      return true;
+    } else {
+      setInclude(false);
+      return false;
+    }
+  };
+
+  const nextFocusIndex = (sequence: 'prev' | 'next') => {
+    if (searchedResults) {
+      if (focusedMessageID !== undefined) {
+        const index = searchedResults?.findIndex(
+          (e) => e.id === focusedMessageID,
+        );
+        refetchDoesntExistMessages(focusedMessageID);
+        if (sequence === 'next') {
+          return searchedResults?.[index - 1]
+            ? searchedResults[index - 1]?.id
+            : searchedResults[searchedResults.length - 1]?.id;
+        } else {
+          return searchedResults?.[index + 1]
+            ? searchedResults[index + 1]?.id
+            : 0;
+        }
+      }
+      return searchedResults[0]?.id;
+    }
+  };
+
+  const refreshMessage = (targetMessages: ChatMessage[]): ChatMessage[] => {
+    const arrayIncludesDuplicate = [...messages, ...targetMessages];
+    return arrayIncludesDuplicate
+      .filter((value, index, self) => {
+        return index === self.findIndex((m) => m.id === value.id);
+      })
+      .sort((a, b) => b.id - a.id);
   };
 
   return (
@@ -536,16 +578,30 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
         </Box>
       </Box>
       {visibleSearchForm && (
-        <Input
-          placeholder="メッセージを検索"
-          type="search"
-          onChange={(e) => setSearchedWord(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter') {
-              searchMessages();
-            }
-          }}
-        />
+        <InputGroup size="md">
+          <Input
+            placeholder="メッセージを検索"
+            type="search"
+            onChange={(e) => setInputtedSearchWord(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                if (inputtedSearchWord !== confirmedSearchWord) {
+                  searchMessages();
+                  setConfirmedSearchWord(inputtedSearchWord);
+                }
+                setFocusedMessageID(nextFocusIndex('next'));
+              }
+            }}
+          />
+          <InputRightElement width="4.5rem">
+            <Link onClick={() => setFocusedMessageID(nextFocusIndex('prev'))}>
+              <AiOutlineUp size={10} />
+            </Link>
+            <Link onClick={() => setFocusedMessageID(nextFocusIndex('next'))}>
+              <AiOutlineDown size={10} />
+            </Link>
+          </InputRightElement>
+        </InputGroup>
       )}
       {/*
        * Messages
@@ -565,6 +621,12 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
           <>
             {messages.map((m) => (
               <ChatMessageItem
+                isScrollTarget={focusedMessageID === m.id}
+                scrollToTarget={(topOffset) => {
+                  messageWrapperDivRef.current?.scrollTo({
+                    top: topOffset,
+                  });
+                }}
                 usersInRoom={room.members || []}
                 key={m.id + m.content}
                 message={m}

@@ -130,7 +130,6 @@ export class ChatService {
   ): Promise<ChatMessage[]> {
     const { after, before, include = false } = query;
     const limit = 20;
-    console.log('after', typeof after, 'before', before);
     const existMessages = await this.chatMessageRepository
       .createQueryBuilder('chat_messages')
       .withDeleted()
@@ -161,7 +160,7 @@ export class ChatService {
         { before },
       )
       .take(limit)
-      .orderBy('chat_messages.createdAt', 'DESC')
+      .orderBy('chat_messages.createdAt', after ? 'ASC' : 'DESC')
       .withDeleted()
       .getMany();
     const messages = existMessages.map((m) => {
