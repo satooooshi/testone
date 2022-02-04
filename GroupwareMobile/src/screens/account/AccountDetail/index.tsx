@@ -72,6 +72,22 @@ const DetailScreen: React.FC<DetailScreenProps> = ({profile, isLoading}) => {
               {userRoleNameFactory(profile.role)}
             </Text>
           </Div>
+          <Div mb={'lg'} flexDir="row" alignItems="center">
+            <Text mr="lg" fontSize={16}>
+              {'メール　'}
+            </Text>
+            <Text color={darkFontColor} fontWeight="bold" fontSize={20}>
+              {profile.isEmailPublic ? profile.email : '非公開'}
+            </Text>
+          </Div>
+          <Div mb={'lg'} flexDir="row" alignItems="center">
+            <Text mr="lg" fontSize={16}>
+              電話番号
+            </Text>
+            <Text color={darkFontColor} fontWeight="bold" fontSize={20}>
+              {profile.isPhonePublic ? profile.phone : '非公開'}
+            </Text>
+          </Div>
           <Div
             w={windowWidth * 0.7}
             flexDir="row"

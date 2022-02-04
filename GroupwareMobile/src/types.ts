@@ -91,6 +91,9 @@ export type TextFormat = 'markdown' | 'html';
 export interface User {
   id: number;
   email: string;
+  isEmailPublic: boolean;
+  phone: string;
+  isPhonePublic: boolean;
   lastName: string;
   firstName: string;
   lastNameKana: string;
