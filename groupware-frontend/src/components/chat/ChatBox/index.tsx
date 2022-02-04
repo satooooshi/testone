@@ -606,6 +606,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
       {visibleSearchForm && (
         <InputGroup size="md">
           <Input
+            autoFocus={visibleSearchForm}
             value={inputtedSearchWord}
             placeholder="メッセージを検索"
             onChange={(e) => setInputtedSearchWord(e.target.value)}
