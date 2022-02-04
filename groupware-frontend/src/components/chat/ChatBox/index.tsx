@@ -25,7 +25,13 @@ import {
 } from 'react-icons/ai';
 import { ChatGroup, ChatMessage, ChatMessageType, User } from 'src/types';
 import { MenuValue } from '@/hooks/chat/useModalReducer';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  useCallback,
+} from 'react';
 import ChatMessageItem from '../ChatMessageItem';
 import { IoCloseSharp, IoSend } from 'react-icons/io5';
 import { FiFileText } from 'react-icons/fi';
@@ -485,6 +491,12 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
       .sort((a, b) => b.id - a.id);
   };
 
+  const scrollToTarget = useCallback((topOffset: number) => {
+    messageWrapperDivRef.current?.scrollTo({
+      top: topOffset,
+    });
+  }, []);
+
   return (
     <Box
       {...noClickRootDropzone()}
@@ -649,11 +661,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
             {messages.map((m) => (
               <ChatMessageItem
                 isScrollTarget={focusedMessageID === m.id}
-                scrollToTarget={(topOffset) => {
-                  messageWrapperDivRef.current?.scrollTo({
-                    top: topOffset,
-                  });
-                }}
+                scrollToTarget={scrollToTarget}
                 usersInRoom={room.members || []}
                 key={m.id + m.content}
                 message={m}
