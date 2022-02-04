@@ -16,6 +16,7 @@ import { HiOutlineDotsCircleHorizontal } from 'react-icons/hi';
 import Editor from '@draft-js-plugins/editor';
 import { convertToRaw, EditorState } from 'draft-js';
 import {
+  AiFillCloseCircle,
   AiOutlineDown,
   AiOutlinePaperClip,
   AiOutlinePicture,
@@ -126,7 +127,11 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
   const { user: myself } = useAuthenticate();
   const [focusedMessageID, setFocusedMessageID] = useState<number>();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [searchedResults, setSearchedResults] = useState<
+    Partial<ChatMessage>[]
+  >([]);
   const [include, setInclude] = useState(false);
+
   const {
     values: newChatMessage,
     setValues: setNewChatMessage,
@@ -200,22 +205,22 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
     },
   );
 
-  const { data: searchedResults, refetch: searchMessages } =
-    useAPISearchMessages(
-      {
-        group: room.id,
-        word: inputtedSearchWord,
+  const { refetch: searchMessages } = useAPISearchMessages(
+    {
+      group: room.id,
+      word: inputtedSearchWord,
+    },
+    {
+      enabled: false,
+      onSuccess: (result) => {
+        setSearchedResults(result);
+        if (result.length && result[0].id) {
+          setFocusedMessageID(result[0].id);
+          refetchDoesntExistMessages(result[0].id);
+        }
       },
-      {
-        enabled: false,
-        onSuccess: (result) => {
-          if (result.length && result[0].id) {
-            setFocusedMessageID(result[0].id);
-            refetchDoesntExistMessages(result[0].id);
-          }
-        },
-      },
-    );
+    },
+  );
 
   const { mutate: sendChatMessage, isLoading: loadingSend } =
     useAPISendChatMessage({
@@ -289,6 +294,15 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
   const messageWrapperDivRef = useRef<HTMLDivElement | null>(null);
   const editorRef = useRef<Editor>(null);
   const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
+  const countOfSearchWord = useMemo(() => {
+    if (searchedResults && focusedMessageID) {
+      const index = searchedResults?.findIndex((result) => {
+        return result?.id === focusedMessageID;
+      });
+      return Math.abs(searchedResults.length - index);
+    }
+    return 0;
+  }, [focusedMessageID, searchedResults]);
   const {
     getRootProps: noClickRootDropzone,
     getInputProps: noClickInputDropzone,
@@ -455,7 +469,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
         } else {
           return searchedResults?.[index + 1]
             ? searchedResults[index + 1]?.id
-            : 0;
+            : searchedResults[0]?.id;
         }
       }
       return searchedResults[0]?.id;
@@ -580,8 +594,8 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
       {visibleSearchForm && (
         <InputGroup size="md">
           <Input
+            value={inputtedSearchWord}
             placeholder="メッセージを検索"
-            type="search"
             onChange={(e) => setInputtedSearchWord(e.target.value)}
             onKeyDown={(e) => {
               if (e.key === 'Enter') {
@@ -593,12 +607,25 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
               }
             }}
           />
-          <InputRightElement width="4.5rem">
-            <Link onClick={() => setFocusedMessageID(nextFocusIndex('prev'))}>
-              <AiOutlineUp size={10} />
-            </Link>
-            <Link onClick={() => setFocusedMessageID(nextFocusIndex('next'))}>
-              <AiOutlineDown size={10} />
+          <InputRightElement width="rem">
+            {searchedResults.length !== 0 && (
+              <Box display="flex">
+                <Text>{`${countOfSearchWord} / ${searchedResults.length}`}</Text>
+                <Link
+                  onClick={() => setFocusedMessageID(nextFocusIndex('prev'))}
+                  style={{ marginRight: 5 }}>
+                  <AiOutlineUp size={20} />
+                </Link>
+                <Link
+                  onClick={() => setFocusedMessageID(nextFocusIndex('next'))}
+                  style={{ marginRight: 5 }}>
+                  <AiOutlineDown size={20} />
+                </Link>
+              </Box>
+            )}
+
+            <Link onClick={() => setInputtedSearchWord('')}>
+              <AiFillCloseCircle style={{ marginRight: 5 }} size={20} />
             </Link>
           </InputRightElement>
         </InputGroup>
