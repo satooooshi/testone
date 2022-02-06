@@ -2,6 +2,7 @@ import * as Yup from 'yup';
 
 const requireMessage = '入力必須です';
 const emailFormatMessage = 'メールアドレスの形式で入力してください';
+const phoneFormatMessage = '電話番号の形式で入力してください';
 const blankMixedMessage = '空白文字は使用できません';
 const minEightTextMessage = '8文字以上で入力してください';
 const minDateMessage = '開始日時は終了日時より前に設定してください';
@@ -68,6 +69,7 @@ export const profileSchema = Yup.object().shape({
       emailFormatMessage,
     )
     .required(requireMessage),
+  phone: Yup.string().matches(/^0\d{2,3}-\d{1,4}-\d{1,4}$/, phoneFormatMessage),
   lastName: Yup.string()
     .required(`姓は${requireMessage}`)
     .max(50, `姓は${nWordLimitMessage(50)}`),
