@@ -338,7 +338,6 @@ const Profile = () => {
               placeholder="000-0000-0000"
               background="white"
               value={userInfo.phone}
-              background="white"
               onChange={handleChange}
             />
             <Stack spacing={5} direction="row">
