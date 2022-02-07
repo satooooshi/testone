@@ -307,29 +307,29 @@ const Profile = () => {
               background="white"
               onChange={handleChange}
             />
+            <Stack spacing={5} direction="row">
+              <Radio
+                bg="white"
+                colorScheme="green"
+                isChecked={userInfo.isEmailPublic}
+                value={'public'}
+                onChange={() =>
+                  setUserInfo((v) => ({ ...v, isEmailPublic: true }))
+                }>
+                公開
+              </Radio>
+              <Radio
+                bg="white"
+                colorScheme="green"
+                isChecked={!userInfo.isEmailPublic}
+                value={'inPublic'}
+                onChange={() =>
+                  setUserInfo((v) => ({ ...v, isEmailPublic: true }))
+                }>
+                非公開
+              </Radio>
+            </Stack>
           </FormControl>
-          <Stack spacing={5} direction="row">
-            <Radio
-              bg="white"
-              colorScheme="green"
-              isChecked={userInfo.isEmailPublic}
-              value={'public'}
-              onChange={() =>
-                setUserInfo((v) => ({ ...v, isEmailPublic: true }))
-              }>
-              公開
-            </Radio>
-            <Radio
-              bg="white"
-              colorScheme="green"
-              isChecked={!userInfo.isEmailPublic}
-              value={'inPublic'}
-              onChange={() =>
-                setUserInfo((v) => ({ ...v, isEmailPublic: true }))
-              }>
-              非公開
-            </Radio>
-          </Stack>
           <FormControl className={profileStyles.input_wrapper}>
             <FormLabel fontWeight={'bold'}>電話番号</FormLabel>
             <Input
@@ -341,29 +341,29 @@ const Profile = () => {
               background="white"
               onChange={handleChange}
             />
+            <Stack spacing={5} direction="row">
+              <Radio
+                bg="white"
+                colorScheme="green"
+                isChecked={userInfo.isPhonePublic}
+                value={'public'}
+                onChange={() =>
+                  setUserInfo((v) => ({ ...v, isPhonePublic: true }))
+                }>
+                公開
+              </Radio>
+              <Radio
+                bg="white"
+                colorScheme="green"
+                isChecked={!userInfo.isPhonePublic}
+                value={'unPublic'}
+                onChange={() =>
+                  setUserInfo((v) => ({ ...v, isPhonePublic: false }))
+                }>
+                非公開
+              </Radio>
+            </Stack>
           </FormControl>
-          <Stack spacing={5} direction="row">
-            <Radio
-              bg="white"
-              colorScheme="green"
-              isChecked={userInfo.isPhonePublic}
-              value={'public'}
-              onChange={() =>
-                setUserInfo((v) => ({ ...v, isPhonePublic: true }))
-              }>
-              公開
-            </Radio>
-            <Radio
-              bg="white"
-              colorScheme="green"
-              isChecked={!userInfo.isPhonePublic}
-              value={'unPublic'}
-              onChange={() =>
-                setUserInfo((v) => ({ ...v, isPhonePublic: false }))
-              }>
-              非公開
-            </Radio>
-          </Stack>
           <FormControl className={profileStyles.input_wrapper}>
             <FormLabel fontWeight={'bold'}>姓</FormLabel>
             <Input
