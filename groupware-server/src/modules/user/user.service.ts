@@ -47,9 +47,7 @@ export class UserService {
     const csvFields = [
       { label: 'id', value: 'id' },
       { label: 'メールアドレス', value: 'email' },
-      { label: 'メールアドレス公開', value: 'isEmailPublic' },
       { label: '電話番号', value: 'phone' },
-      { label: '電話番号公開', value: 'isEmailPublic' },
       { label: '姓', value: 'lastName' },
       { label: '名', value: 'firstName' },
       { label: '自己紹介', value: 'introduce' },
@@ -65,7 +63,7 @@ export class UserService {
       { label: '回答数', value: 'answerCount' },
       { label: 'ナレッジ投稿数', value: 'knowledgeCount' },
     ];
-    const csvParser = new Parser({ fields: csvFields });
+      const csvParser = new Parser({ fields: csvFields });
     const searchQuery = this.userRepository
       .createQueryBuilder('user')
       .select()
@@ -158,6 +156,7 @@ export class UserService {
       entityUsers.push({
         id: u.user_id,
         email: u.user_email,
+        phone: u.user_phone,
         lastName: u.user_last_name,
         firstName: u.user_first_name,
         introduce: u.user_introduce,

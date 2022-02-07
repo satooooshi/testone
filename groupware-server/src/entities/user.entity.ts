@@ -68,7 +68,7 @@ export class User {
     type: 'varchar',
     name: 'phone',
     length: 100,
-    nullable: true,
+    nullable: false,
     default: '',
   })
   phone: string;
