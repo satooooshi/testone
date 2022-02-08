@@ -35,3 +35,4 @@ lerna-debug.log*
 
 *.env
 cloud_storage.json
+.vscode

@@ -272,6 +272,40 @@ const MyAccountInfo = () => {
                   </Box>
                   <Box
                     display="flex"
+                    mb={5}
+                    flexDir="row"
+                    alignItems="center"
+                    w="100%">
+                    <Text fontSize={14} w={'10%'}>
+                      {'メール　'}:
+                    </Text>
+                    <Text
+                      fontWeight="bold"
+                      w="85%"
+                      fontSize={18}
+                      color={darkFontColor}>
+                      {profile.isEmailPublic ? profile.email : '非公開'}
+                    </Text>
+                  </Box>
+                  <Box
+                    display="flex"
+                    mb={5}
+                    flexDir="row"
+                    alignItems="center"
+                    w="100%">
+                    <Text fontSize={14} w={'10%'}>
+                      電話番号:
+                    </Text>
+                    <Text
+                      fontWeight="bold"
+                      w="85%"
+                      fontSize={18}
+                      color={darkFontColor}>
+                      {profile.isPhonePublic ? profile.phone : '非公開'}
+                    </Text>
+                  </Box>
+                  <Box
+                    display="flex"
                     flexDir="row"
                     alignItems="center"
                     mb={8}
