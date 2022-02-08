@@ -63,7 +63,7 @@ export class UserService {
       { label: '回答数', value: 'answerCount' },
       { label: 'ナレッジ投稿数', value: 'knowledgeCount' },
     ];
-      const csvParser = new Parser({ fields: csvFields });
+    const csvParser = new Parser({ fields: csvFields });
     const searchQuery = this.userRepository
       .createQueryBuilder('user')
       .select()
