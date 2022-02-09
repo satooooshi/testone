@@ -16,6 +16,7 @@ import {
   Modal as MagnusModal,
   Button,
   Dropdown,
+  Input,
 } from 'react-native-magnus';
 import WholeContainer from '../../components/WholeContainer';
 import {useAPIGetMessages} from '../../hooks/api/chat/useAPIGetMessages';
@@ -47,7 +48,6 @@ import {
 } from '../../types/navigator/drawerScreenProps';
 import {useFormik} from 'formik';
 import ReplyTarget from '../../components/chat/ChatFooter/ReplyTarget';
-import HeaderWithIconButton from '../../components/Header/HeaderWithIconButton';
 import {darkFontColor} from '../../utils/colors';
 import tailwind from 'tailwind-rn';
 import {useAPIGetLastReadChatTime} from '../../hooks/api/chat/useAPIGetLastReadChatTime';
@@ -66,6 +66,7 @@ import {useAPISaveLastReadChatTime} from '../../hooks/api/chat/useAPISaveLastRea
 import DownloadIcon from '../../components/common/DownLoadIcon';
 import UserAvatar from '../../components/common/UserAvatar';
 import {nameOfRoom} from '../../utils/factory/chat/nameOfRoom';
+import HeaderTemplate from '../../components/Header/HeaderTemplate';
 import {useAPIGetRoomDetail} from '../../hooks/api/chat/useAPIGetRoomDetail';
 import {chatMessageSchema} from '../../utils/validation/schema';
 import {reactionEmojis} from '../../utils/factory/reactionEmojis';
@@ -93,6 +94,7 @@ const Chat: React.FC = () => {
   const [page, setPage] = useState(1);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [imageModal, setImageModal] = useState(false);
+  const [visibleSearchInput, setVisibleSearchInput] = useState(false);
   const imagesForViewing: ImageSource[] = useMemo(() => {
     return messages
       .filter(m => m.type === ChatMessageType.IMAGE)
@@ -203,20 +205,6 @@ const Chat: React.FC = () => {
     setNowImageIndex(imagesForViewing.findIndex(isNowUri));
     setImageModal(true);
   };
-  const headerRightIcon = (
-    <TouchableOpacity
-      style={tailwind('flex flex-row items-center')}
-      onPress={() =>
-        navigation.navigate('ChatStack', {screen: 'ChatMenu', params: {room}})
-      }>
-      <Icon
-        name="dots-horizontal-circle-outline"
-        fontFamily="MaterialCommunityIcons"
-        fontSize={26}
-        color={darkFontColor}
-      />
-    </TouchableOpacity>
-  );
 
   const handleDeleteReaction = (
     reaction: ChatMessageReaction,
@@ -770,12 +758,51 @@ const Chat: React.FC = () => {
           </Div>
         )}
       />
-      <HeaderWithIconButton
+      <HeaderTemplate
         title={roomDetail ? nameOfRoom(roomDetail) : nameOfRoom(room)}
         enableBackButton={true}
-        screenForBack={'RoomList'}
-        icon={headerRightIcon}
-      />
+        screenForBack={'RoomList'}>
+        <Div style={tailwind('flex flex-row')}>
+          <TouchableOpacity
+            style={tailwind('flex flex-row')}
+            onPress={() => setVisibleSearchInput(true)}>
+            <Icon name="search" fontFamily="Feather" fontSize={26} />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={tailwind('flex flex-row')}
+            onPress={() =>
+              navigation.navigate('ChatStack', {
+                screen: 'ChatMenu',
+                params: {room},
+              })
+            }>
+            <Icon
+              name="dots-horizontal-circle-outline"
+              fontFamily="MaterialCommunityIcons"
+              fontSize={26}
+              color={darkFontColor}
+            />
+          </TouchableOpacity>
+        </Div>
+      </HeaderTemplate>
+      {visibleSearchInput && (
+        <Div style={tailwind('flex flex-row')}>
+          <Input placeholder="メッセージを検索" w={'70%'} />
+          <Div style={tailwind('flex flex-row justify-between m-1')} w={'25%'}>
+            <TouchableOpacity style={tailwind('flex flex-row')}>
+              <Icon name="arrow-up" fontFamily="FontAwesome" fontSize={25} />
+            </TouchableOpacity>
+            <TouchableOpacity style={tailwind('flex flex-row')}>
+              <Icon name="arrow-down" fontFamily="FontAwesome" fontSize={25} />
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={tailwind('flex flex-row')}
+              onPress={() => setVisibleSearchInput(false)}>
+              <Icon name="close" fontFamily="FontAwesome" fontSize={25} />
+            </TouchableOpacity>
+          </Div>
+        </Div>
+      )}
       {messageListAvoidngKeyboardDisturb}
     </WholeContainer>
   );
