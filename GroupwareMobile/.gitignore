@@ -67,3 +67,4 @@ GoogleService-Info.plist
 *.aab
 *.apk
 output-metadata.json
+.vscode
