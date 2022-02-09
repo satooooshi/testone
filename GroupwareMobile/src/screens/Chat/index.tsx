@@ -86,7 +86,10 @@ const TopTab = createMaterialTopTabNavigator();
 const Chat: React.FC = () => {
   const {user: myself} = useAuthenticate();
   const typeDropdownRef = useRef<any | null>(null);
-  const messageRef = useRef<FlatList | null>(null);
+  const messageIosRef = useRef<FlatList | null>(null);
+  const messageAndroidRef = useRef<{flatListRef: Element | null}>({
+    flatListRef: null,
+  });
   const navigation = useNavigation<ChatNavigationProps>();
   const route = useRoute<ChatRouteProps>();
   const {room} = route.params;
@@ -392,7 +395,13 @@ const Chat: React.FC = () => {
 
   const scrollToTarget = (messageIndex: number) => {
     if (searchedResults?.length) {
-      messageRef.current?.scrollToIndex({index: messageIndex});
+      if (Platform.OS === 'ios') {
+        messageIosRef.current?.scrollToIndex({index: messageIndex});
+      } else {
+        (messageAndroidRef.current?.flatListRef as any)?.scrollToIndex({
+          index: messageIndex,
+        });
+      }
     }
   };
 
@@ -564,7 +573,7 @@ const Chat: React.FC = () => {
           behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
           {loadingMessages && fetchingMessages ? <ActivityIndicator /> : null}
           <FlatList
-            ref={messageRef}
+            ref={messageIosRef}
             style={chatStyles.flatlist}
             inverted
             data={messages}
@@ -607,6 +616,7 @@ const Chat: React.FC = () => {
       ) : (
         <>
           <KeyboardAwareFlatList
+            innerRef={ref => (messageAndroidRef.current.flatListRef = ref)}
             refreshing={true}
             style={chatStyles.flatlist}
             ListHeaderComponent={
