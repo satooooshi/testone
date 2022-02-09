@@ -86,6 +86,7 @@ const TopTab = createMaterialTopTabNavigator();
 const Chat: React.FC = () => {
   const {user: myself} = useAuthenticate();
   const typeDropdownRef = useRef<any | null>(null);
+  const messageRef = useRef<FlatList | null>(null);
   const navigation = useNavigation<ChatNavigationProps>();
   const route = useRoute<ChatRouteProps>();
   const {room} = route.params;
@@ -94,6 +95,7 @@ const Chat: React.FC = () => {
   );
   const [page, setPage] = useState(1);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [focusedMessageID, setFocusedMessageID] = useState<number>();
   const [inputtedSearchWord, setInputtedSearchWord] = useState('');
   const [imageModal, setImageModal] = useState(false);
   const [visibleSearchInput, setVisibleSearchInput] = useState(false);
@@ -371,6 +373,29 @@ const Chat: React.FC = () => {
     );
   };
 
+  const nextFocusIndex = (sequence: 'prev' | 'next') => {
+    if (searchedResults) {
+      const index = searchedResults.findIndex(e => e.id === focusedMessageID);
+
+      if (sequence === 'next') {
+        return searchedResults?.[index].id === searchedResults?.[0].id
+          ? searchedResults?.[searchedResults.length - 1].id
+          : searchedResults[index - 1].id;
+      } else if (sequence === 'prev') {
+        return searchedResults?.[index].id ===
+          searchedResults?.[searchedResults.length - 1].id
+          ? searchedResults[0].id
+          : searchedResults[index + 1].id;
+      }
+    }
+  };
+
+  const scrollToTarget = (messageIndex: number) => {
+    if (searchedResults?.length) {
+      messageRef.current?.scrollToIndex({index: messageIndex});
+    }
+  };
+
   const typeDropdown = (
     <Dropdown
       {...defaultDropdownProps}
@@ -401,8 +426,7 @@ const Chat: React.FC = () => {
   useEffect(() => {
     // 検索する文字がアルファベットの場合、なぜかuseAPISearchMessagesのonSuccessが動作しない為、こちらで代わりとなる処理を記述しています。
     if (searchedResults?.length) {
-      console.log('検索結果', searchedResults);
-      // setFocusedMessageID(searchedResults[0].id);
+      setFocusedMessageID(searchedResults[0].id);
     }
   }, [searchedResults]);
 
@@ -481,11 +505,14 @@ const Chat: React.FC = () => {
       : [];
   };
 
-  const renderMessage = (message: ChatMessage) => (
+  const renderMessage = (message: ChatMessage, messageIndex: number) => (
     <Div mb={'sm'} mx="md">
       <ChatMessageItem
         message={message}
         readUsers={readUsers(message)}
+        messageIndex={messageIndex}
+        scrollToTarget={scrollToTarget}
+        isScrollTarget={focusedMessageID === message.id}
         onCheckLastRead={() => setSelectedMessageForCheckLastRead(message)}
         numbersOfRead={numbersOfRead(message)}
         onLongPress={() => setLongPressedMgg(message)}
@@ -537,11 +564,14 @@ const Chat: React.FC = () => {
           behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
           {loadingMessages && fetchingMessages ? <ActivityIndicator /> : null}
           <FlatList
+            ref={messageRef}
             style={chatStyles.flatlist}
             inverted
             data={messages}
             {...{onEndReached}}
-            renderItem={({item: message}) => renderMessage(message)}
+            renderItem={({item: message, index}) =>
+              renderMessage(message, index)
+            }
           />
           {reactionTarget ? (
             reactionSelector
@@ -591,7 +621,9 @@ const Chat: React.FC = () => {
             data={messages}
             {...{onEndReached}}
             keyExtractor={item => item.id.toString()}
-            renderItem={({item: message}) => renderMessage(message)}
+            renderItem={({item: message, index}) =>
+              renderMessage(message, index)
+            }
           />
           {reactionTarget ? (
             reactionSelector
@@ -813,10 +845,14 @@ const Chat: React.FC = () => {
             }}
           />
           <Div style={tailwind('flex flex-row justify-between m-1')} w={'25%'}>
-            <TouchableOpacity style={tailwind('flex flex-row')}>
+            <TouchableOpacity
+              style={tailwind('flex flex-row')}
+              onPress={() => setFocusedMessageID(nextFocusIndex('prev'))}>
               <Icon name="arrow-up" fontFamily="FontAwesome" fontSize={25} />
             </TouchableOpacity>
-            <TouchableOpacity style={tailwind('flex flex-row')}>
+            <TouchableOpacity
+              style={tailwind('flex flex-row')}
+              onPress={() => setFocusedMessageID(nextFocusIndex('next'))}>
               <Icon name="arrow-down" fontFamily="FontAwesome" fontSize={25} />
             </TouchableOpacity>
             <TouchableOpacity

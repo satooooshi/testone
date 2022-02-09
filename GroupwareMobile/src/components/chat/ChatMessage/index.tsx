@@ -1,5 +1,6 @@
-import {useNavigation} from '@react-navigation/native';
 import React from 'react';
+import {useEffect} from 'react';
+import {useNavigation} from '@react-navigation/native';
 import {
   TouchableHighlight,
   TouchableOpacity,
@@ -25,6 +26,9 @@ import VideoMessage from './VideoMessage';
 type ChatMessageItemProps = {
   message: ChatMessage;
   readUsers: User[];
+  messageIndex: number;
+  isScrollTarget: boolean;
+  scrollToTarget: (messageIndex: number) => void;
   onCheckLastRead: () => void;
   numbersOfRead: number;
   onLongPress: () => void;
@@ -37,6 +41,9 @@ type ChatMessageItemProps = {
 const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
   message,
   readUsers,
+  messageIndex,
+  isScrollTarget = false,
+  scrollToTarget,
   onCheckLastRead,
   numbersOfRead,
   onLongPress,
@@ -61,6 +68,12 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
     }
     return reactionsNoDuplicates;
   };
+
+  useEffect(() => {
+    if (isScrollTarget) {
+      scrollToTarget(messageIndex);
+    }
+  }, [isScrollTarget, scrollToTarget, messageIndex]);
 
   const timesAndReadCounts = (
     <Div justifyContent="flex-end" alignItems="center">
