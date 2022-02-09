@@ -203,14 +203,18 @@ const Navigator = () => {
 
   useEffect(() => {
     const getRtmToken = async () => {
-      const res = await axiosInstance.get<string>('/chat/get-rtm-token');
-      console.log('rtmToken', res.data);
-      storage.set('rtmToken', res.data);
-      setAgoraToken(res.data);
-      if (user?.id && res.data) {
-        await rtmEngine.createInstance(AGORA_APP_ID);
-        await rtmEngine.loginV2(user?.id.toString(), res.data);
-        console.log('login as ', user?.id.toString());
+      if (user?.id) {
+        const res = await axiosInstance.get<string>('/chat/get-rtm-token');
+        console.log('rtmToken', res.data);
+        storage.set('rtmToken', res.data);
+        setAgoraToken(res.data);
+        if (res.data) {
+          await rtmEngine.createInstance(AGORA_APP_ID);
+          await rtmEngine.loginV2(user?.id.toString(), res.data);
+          console.log('login as ', user?.id.toString());
+        }
+      } else {
+        await rtmEngine.logout();
       }
     };
     getRtmToken();
@@ -309,7 +313,7 @@ const Navigator = () => {
   useEffect(() => {
     if (videoCall && channelName) {
       navigationRef.current?.navigate('Call');
-    } else {
+    } else if (user?.id) {
       navigationRef.current?.navigate('Main');
     }
   }, [videoCall, channelName]);
