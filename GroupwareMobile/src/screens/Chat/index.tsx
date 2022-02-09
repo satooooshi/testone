@@ -20,6 +20,7 @@ import {
 } from 'react-native-magnus';
 import WholeContainer from '../../components/WholeContainer';
 import {useAPIGetMessages} from '../../hooks/api/chat/useAPIGetMessages';
+import {useAPISearchMessages} from '../../hooks/api/chat/useAPISearchMessages';
 import {useAPISendChatMessage} from '../../hooks/api/chat/useAPISendChatMessage';
 import {useAPIUploadStorage} from '../../hooks/api/storage/useAPIUploadStorage';
 import {chatStyles} from '../../styles/screen/chat/chat.style';
@@ -93,6 +94,7 @@ const Chat: React.FC = () => {
   );
   const [page, setPage] = useState(1);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [inputtedSearchWord, setInputtedSearchWord] = useState('');
   const [imageModal, setImageModal] = useState(false);
   const [visibleSearchInput, setVisibleSearchInput] = useState(false);
   const imagesForViewing: ImageSource[] = useMemo(() => {
@@ -142,6 +144,12 @@ const Chat: React.FC = () => {
     group: room.id,
     page: page.toString(),
   });
+  const {data: searchedResults, refetch: searchMessages} = useAPISearchMessages(
+    {
+      group: room.id,
+      word: inputtedSearchWord,
+    },
+  );
   const suggestions = (): Suggestion[] => {
     if (!room.members) {
       return [];
@@ -389,6 +397,14 @@ const Chat: React.FC = () => {
       </Dropdown.Option>
     </Dropdown>
   );
+
+  useEffect(() => {
+    // 検索する文字がアルファベットの場合、なぜかuseAPISearchMessagesのonSuccessが動作しない為、こちらで代わりとなる処理を記述しています。
+    if (searchedResults?.length) {
+      console.log('検索結果', searchedResults);
+      // setFocusedMessageID(searchedResults[0].id);
+    }
+  }, [searchedResults]);
 
   useEffect(() => {
     if (longPressedMsg) {
@@ -787,7 +803,15 @@ const Chat: React.FC = () => {
       </HeaderTemplate>
       {visibleSearchInput && (
         <Div style={tailwind('flex flex-row')}>
-          <Input placeholder="メッセージを検索" w={'70%'} />
+          <Input
+            placeholder="メッセージを検索"
+            w={'70%'}
+            value={inputtedSearchWord}
+            onChangeText={text => {
+              setInputtedSearchWord(text);
+              searchMessages();
+            }}
+          />
           <Div style={tailwind('flex flex-row justify-between m-1')} w={'25%'}>
             <TouchableOpacity style={tailwind('flex flex-row')}>
               <Icon name="arrow-up" fontFamily="FontAwesome" fontSize={25} />
