@@ -13,6 +13,7 @@ export type RootStackParamList = {
   Home: undefined;
   Login: undefined;
   Main: undefined;
+  Call: undefined;
   EventList: {
     type?: EventType;
     tag?: string;

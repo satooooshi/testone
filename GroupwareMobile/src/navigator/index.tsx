@@ -306,9 +306,15 @@ const Navigator = () => {
     handleMessaging();
   }, [registerDevice, user]);
 
-  return videoCall && channelName ? (
-    <AgoraUIKit rtcProps={rtcProps} callbacks={callbacks} />
-  ) : (
+  useEffect(() => {
+    if (videoCall && channelName) {
+      navigationRef.current?.navigate('Call');
+    } else {
+      navigationRef.current?.navigate('Main');
+    }
+  }, [videoCall, channelName]);
+
+  return (
     <NavigationContainer ref={navigationRef}>
       <WebEngine>
         <Stack.Navigator
@@ -319,6 +325,12 @@ const Navigator = () => {
                 name="Main"
                 component={DrawerTab}
                 options={{headerShown: false}}
+              />
+              <Stack.Screen
+                name="Call"
+                children={() => (
+                  <AgoraUIKit rtcProps={rtcProps} callbacks={callbacks} />
+                )}
               />
             </>
           ) : (
