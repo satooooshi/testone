@@ -25,7 +25,7 @@ import {
   monthQueryFactoryFromTargetDate,
   weekQueryFactoryFromTargetDate,
 } from '../../../utils/eventQueryRefresh';
-import {useNavigation} from '@react-navigation/native';
+import {useNavigation, useFocusEffect} from '@react-navigation/native';
 import {EventListNavigationProps} from '../../../types/navigator/drawerScreenProps';
 import {dateTimeFormatterFromJSDDate} from '../../../utils/dateTimeFormatterFromJSDate';
 import {ActivityIndicator} from 'react-native-paper';
@@ -78,6 +78,12 @@ const EventCalendar: React.FC<EventCalendarProps> = ({
     isLoading,
   } = useAPIGetEventList(searchQuery);
   const {height: windowHeight, width: windowWidth} = useWindowDimensions();
+
+  useFocusEffect(
+    useCallback(() => {
+      refetchEvents();
+    }, [refetchEvents]),
+  );
 
   const memorizedEvent = useMemo<any[]>(() => {
     const changeToBigCalendarEvent = (ev?: EventSchedule[]): any[] => {
