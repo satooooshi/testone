@@ -47,6 +47,7 @@ export class UserService {
     const csvFields = [
       { label: 'id', value: 'id' },
       { label: 'メールアドレス', value: 'email' },
+      { label: '電話番号', value: 'phone' },
       { label: '姓', value: 'lastName' },
       { label: '名', value: 'firstName' },
       { label: '自己紹介', value: 'introduce' },
@@ -155,6 +156,7 @@ export class UserService {
       entityUsers.push({
         id: u.user_id,
         email: u.user_email,
+        phone: u.user_phone,
         lastName: u.user_last_name,
         firstName: u.user_first_name,
         introduce: u.user_introduce,

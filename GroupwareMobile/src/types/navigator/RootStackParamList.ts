@@ -20,6 +20,7 @@ export type RootStackParamList = {
   };
   EventDetail: {
     id: number;
+    previousScreenName?: keyof RootStackParamList;
   };
   Wiki: undefined;
   WikiList: {

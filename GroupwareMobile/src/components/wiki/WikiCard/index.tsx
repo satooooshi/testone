@@ -111,15 +111,6 @@ const WikiCard: React.FC<WikiCardProps> = ({wiki}) => {
                 ml={4}>
                 {wikiTypeNameFactory(wiki.type, wiki.ruleCategory)}
               </Tag>
-              <Tag
-                fontSize={'lg'}
-                h={28}
-                py={0}
-                bg={'orange'}
-                color="white"
-                ml={4}>
-                タグなし
-              </Tag>
             </>
           )}
         </Div>

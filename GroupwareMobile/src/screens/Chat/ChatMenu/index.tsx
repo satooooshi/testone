@@ -19,7 +19,6 @@ const ChatMenu: React.FC = () => {
     onSuccess: () => {
       navigation.navigate('ChatStack', {
         screen: 'RoomList',
-        params: {needRefetch: true},
       });
     },
     onError: () => {

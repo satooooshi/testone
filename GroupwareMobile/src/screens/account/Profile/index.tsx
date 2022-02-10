@@ -15,6 +15,7 @@ import {
   Button,
   Icon,
   Overlay,
+  Radio,
 } from 'react-native-magnus';
 import TagModal from '../../../components/common/TagModal';
 import HeaderWithTextButton from '../../../components/Header';
@@ -36,6 +37,7 @@ import UserAvatar from '../../../components/common/UserAvatar';
 
 const initialValues: Partial<User> = {
   email: '',
+  phone: '',
   lastName: '',
   firstName: '',
   avatarUrl: '',
@@ -207,6 +209,65 @@ const Profile: React.FC = () => {
               placeholder="bold@example.com"
               autoCapitalize="none"
             />
+            <Div row>
+              <Div row alignItems="center" mr="sm">
+                <Text>公開</Text>
+                {/* @ts-ignore */}
+                <Radio
+                  value={1}
+                  activeColor="green500"
+                  onChange={() => setValues(e => ({...e, isEmailPublic: true}))}
+                  checked={values.isEmailPublic}
+                />
+              </Div>
+              <Div row alignItems="center">
+                <Text>非公開</Text>
+                {/* @ts-ignore */}
+                <Radio
+                  value={2}
+                  activeColor="green500"
+                  onChange={() =>
+                    setValues(e => ({...e, isEmailPublic: false}))
+                  }
+                  checked={!values.isEmailPublic}
+                />
+              </Div>
+            </Div>
+          </Div>
+          <Div mb="lg">
+            <Text fontSize={16} fontWeight="bold">
+              電話番号
+            </Text>
+            <Input
+              value={values.phone}
+              onChangeText={handleChange('phone')}
+              placeholder="000-0000-0000"
+              autoCapitalize="none"
+            />
+            <Div row>
+              <Div row alignItems="center" mr="sm">
+                <Text>公開</Text>
+                {/* @ts-ignore */}
+                <Radio
+                  value={1}
+                  activeColor="green500"
+                  onChange={() => setValues(e => ({...e, isPhonePublic: true}))}
+                  checked={values.isPhonePublic}
+                />
+              </Div>
+              <Div row alignItems="center">
+                <Text>非公開</Text>
+                {/* @ts-ignore */}
+                <Radio
+                  value={2}
+                  activeColor="green500"
+                  onChange={() =>
+                    setValues(e => ({...e, isPhonePublic: false}))
+                  }
+                  checked={!values.isPhonePublic}
+                />
+              </Div>
+            </Div>
           </Div>
           <Div mb="lg">
             <Text fontSize={16} fontWeight="bold">
