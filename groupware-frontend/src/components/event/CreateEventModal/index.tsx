@@ -124,7 +124,6 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
     validationSchema: createEventSchema,
     onSubmit: async (submittedValues) => {
       if (!croppedImageURL || !selectThumbnailName || !completedCrop) {
-        console.log('event type ==== ', submittedValues.type);
         createEvent(submittedValues);
         return;
       }
