@@ -11,6 +11,17 @@ import {
   MinVoiceView,
   RtcConfigure,
   Controls,
+  Endcall,
+  LocalAudioMute,
+  LocalVideoMute,
+  SwitchCamera,
+  RemoteAudioMute,
+  RemoteSwap,
+  RemoteVideoMute,
+  RemoteControls,
+  BtnTemplate,
+  PinnedVideo,
+  GridVideo,
 } from 'agora-rn-uikit/Components';
 // import PropsProvider from 'agora-rn-uikit';
 import {PropsProvider} from 'agora-rn-uikit/src/PropsContext';
@@ -21,12 +32,10 @@ import {PropsProvider} from 'agora-rn-uikit/src/PropsContext';
 //   PropsInterface,
 // } from 'agora-rn-uikit';
 // import LocalControls from 'agora-rn-uikit/src/Controls/LocalControls';
-import {MaxUidConsumer} from 'agora-rn-uikit/src/MaxUidContext';
-import {MinUidConsumer} from 'agora-rn-uikit/src/MinUidContext';
 import styles from 'agora-rn-uikit/src/Style';
 import {useAPIGetUserInfoById} from '../../../../src/hooks/api/user/useAPIGetUserInfoById';
-import {Text, Div, ScrollDiv, Button, Icon} from 'react-native-magnus';
-import {Alert, useWindowDimensions} from 'react-native';
+import {Text, Div, ScrollDiv, Button} from 'react-native-magnus';
+import {useWindowDimensions} from 'react-native';
 import UserAvatar from '../../../components/common/UserAvatar';
 import {userNameFactory} from '../../../utils/factory/userNameFactory';
 
@@ -65,7 +74,7 @@ const VoiceCall: React.FC<VoiceCallProps> = ({
               {userNameFactory(profile)}
             </Text>
           </Div>
-          <Controls showButton={true} />
+          <Controls showButton={false} />
           {/* <LocalControls showButton={props.rtcProps.layout !== layout.grid} /> */}
         </RtcConfigure>
       </View>

@@ -1,3 +1,24 @@
+diff --git a/node_modules/agora-rn-uikit/src/AgoraUIKit.tsx b/node_modules/agora-rn-uikit/src/AgoraUIKit.tsx
+index eed9461..7c29c39 100644
+--- a/node_modules/agora-rn-uikit/src/AgoraUIKit.tsx
++++ b/node_modules/agora-rn-uikit/src/AgoraUIKit.tsx
+@@ -8,12 +8,16 @@ import {PropsProvider, PropsInterface, layout} from './PropsContext';
+ import LocalControls from './Controls/LocalControls';
+ import GridVideo from './GridVideo';
+ import PinnedVideo from './PinnedVideo';
++import { useAPIGetUserInfoById } from '../../../src/hooks/api/user/useAPIGetUserInfoById';
++import UserAvatar from '../../../src/components/common/UserAvatar';
+ 
+ /**
+  * High level component to render the UI Kit
+  * @param props {@link PropsInterface}
+  */
+ const AgoraUIKit: React.FC<PropsInterface> = (props) => {
++  // const profile = useAPIGetUserInfoById(props.rtcProps.uid.toString());
++  // console.log('profile ======',profile)
+   return (
+     <PropsProvider value={props}>
+       <View style={props.styleProps?.UIKitContainer}>
 diff --git a/node_modules/agora-rn-uikit/src/Controls/Icons.ts b/node_modules/agora-rn-uikit/src/Controls/Icons.ts
 index 74f9789..1565c0f 100644
 --- a/node_modules/agora-rn-uikit/src/Controls/Icons.ts
@@ -33,6 +54,19 @@ index e597912..cd50a22 100644
        style={{...styles.localBtn, ...(muteLocalVideo as object)}}
        onPress={() => {
          (dispatch as DispatchType<'LocalMuteVideo'>)({
+diff --git a/node_modules/agora-rn-uikit/src/Controls/LocalControls.tsx b/node_modules/agora-rn-uikit/src/Controls/LocalControls.tsx
+index eb792e0..8b76ab6 100644
+--- a/node_modules/agora-rn-uikit/src/Controls/LocalControls.tsx
++++ b/node_modules/agora-rn-uikit/src/Controls/LocalControls.tsx
+@@ -23,7 +23,7 @@ function Controls(props: {showButton: Boolean}) {
+           <>
+             <LocalAudioMute />
+             <LocalVideoMute />
+-            <SwitchCamera />
++            {/* <SwitchCamera /> */}
+             <EndCall />
+           </>
+         )}
 diff --git a/node_modules/agora-rn-uikit/src/PropsContext.tsx b/node_modules/agora-rn-uikit/src/PropsContext.tsx
 index dd880c1..f0b017a 100644
 --- a/node_modules/agora-rn-uikit/src/PropsContext.tsx
@@ -132,3 +166,21 @@ index ab641cf..dcdbd83 100644
  > {
    type: T;
    value: Parameters<K[T]>;
+diff --git a/node_modules/agora-rn-uikit/src/Style.ts b/node_modules/agora-rn-uikit/src/Style.ts
+index c06d8ff..0b4e2b5 100644
+--- a/node_modules/agora-rn-uikit/src/Style.ts
++++ b/node_modules/agora-rn-uikit/src/Style.ts
+@@ -37,9 +37,10 @@ export default StyleSheet.create({
+     height: 135,
+   },
+   Controls: {
+-    position: 'absolute',
+-    bottom: 25,
+-    left: 0,
++    // position: 'absolute',
++    // bottom: 25,
++    // left: 0,
++    marginTop: '10%',
+     width: '100%',
+     height: 70,
+     zIndex: 10,

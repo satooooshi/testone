@@ -47,6 +47,7 @@ const Navigator = () => {
     channel: channelName,
     token: agoraToken,
     enableVideo: false,
+    activeSpeaker: true,
   };
   const remoteInvitation = useRef<RemoteInvitation | undefined>();
   const endCall = async () => {
