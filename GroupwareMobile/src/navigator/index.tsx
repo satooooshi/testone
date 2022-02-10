@@ -27,6 +27,7 @@ import {apiAuthenticate} from '../hooks/api/auth/useAPIAuthenticate';
 import {Alert, Platform} from 'react-native';
 import Config from 'react-native-config';
 import VideoCall from '../components/call/VideoCall';
+import VoiceCall from '../components/call/VoiceCall';
 
 const Stack = createStackNavigator<RootStackParamList>();
 export const rtmEngine = new RtmClient();
@@ -335,9 +336,10 @@ const Navigator = () => {
                 options={{headerShown: false}}
               />
               <Stack.Screen
+                options={{headerShown: false}}
                 name="Call"
                 children={() => (
-                  <VideoCall
+                  <VoiceCall
                     rtcProps={rtcProps}
                     callbacks={callbacks}
                     onCallUid={onCallUid}
