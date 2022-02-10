@@ -244,8 +244,6 @@ const AccountDetail: React.FC = () => {
               </Text>
             </Div>
             <Div h={bottomContentsHeight() ? bottomContentsHeight() : 700}>
-              {/* <Div h={height !== 3600 ? height : bottomContentsHeight()}> */}
-              {/* <ScrollView style={ flexGrow: 1}> */}
               <TopTab.Navigator
                 initialRouteName={defaultScreenName}
                 screenOptions={{
@@ -266,7 +264,7 @@ const AccountDetail: React.FC = () => {
                             ...s,
                             [defaultScreenName]: {
                               ...s?.[defaultScreenName],
-                              height: nativeEvent.layout.y + 60,
+                              height: nativeEvent.layout.y + 130,
                             },
                           }));
                         }}
@@ -299,7 +297,7 @@ const AccountDetail: React.FC = () => {
                             ...s,
                             [eventScreenName]: {
                               ...s?.[eventScreenName],
-                              height: nativeEvent.layout.y + 60,
+                              height: nativeEvent.layout.y + 130,
                             },
                           }));
                         }}
@@ -330,7 +328,7 @@ const AccountDetail: React.FC = () => {
                             ...s,
                             [questionScreenName]: {
                               ...s?.[questionScreenName],
-                              height: nativeEvent.layout.y + 60,
+                              height: nativeEvent.layout.y + 130,
                             },
                           }));
                         }}
@@ -363,7 +361,7 @@ const AccountDetail: React.FC = () => {
                             ...s,
                             [knowledgeScreenName]: {
                               ...s?.[knowledgeScreenName],
-                              height: nativeEvent.layout.y + 60,
+                              height: nativeEvent.layout.y + 130,
                             },
                           }));
                         }}
@@ -373,7 +371,6 @@ const AccountDetail: React.FC = () => {
                   options={{title: 'ナレッジ'}}
                 />
               </TopTab.Navigator>
-              {/* </ScrollView> */}
             </Div>
           </>
         )}
