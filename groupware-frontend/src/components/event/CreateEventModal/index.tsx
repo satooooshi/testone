@@ -597,6 +597,7 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
                 onChange={(newCrop) =>
                   dispatchCrop({ type: 'setCrop', value: newCrop })
                 }
+                keepSelection={true}
                 onComplete={(c) =>
                   dispatchCrop({
                     type: 'setCompletedCrop',

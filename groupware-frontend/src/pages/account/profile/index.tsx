@@ -273,6 +273,7 @@ const Profile = () => {
           ) : null}
           {selectImageUrl ? (
             <ReactCrop
+              keepSelection={true}
               src={selectImageUrl}
               crop={crop}
               onChange={(newCrop) => {
