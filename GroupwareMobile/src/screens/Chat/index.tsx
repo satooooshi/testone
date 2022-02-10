@@ -377,7 +377,7 @@ const Chat: React.FC = () => {
   };
 
   const nextFocusIndex = (sequence: 'prev' | 'next') => {
-    if (searchedResults) {
+    if (searchedResults?.length) {
       const index = searchedResults.findIndex(e => e.id === focusedMessageID);
 
       if (sequence === 'next') {
