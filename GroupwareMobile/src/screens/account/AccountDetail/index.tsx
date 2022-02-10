@@ -96,7 +96,13 @@ const DetailScreen: React.FC<DetailScreenProps> = ({profile, isLoading}) => {
             <Text mr="lg" fontSize={16}>
               自己紹介
             </Text>
-            <Text color={darkFontColor} fontWeight="bold" fontSize={20}>
+          </Div>
+          <Div
+            w={windowWidth * 0.9}
+            flexDir="row"
+            mb={'lg'}
+            alignItems="center">
+            <Text color={darkFontColor} fontWeight="bold" fontSize={15}>
               {profile.introduceOther || '未設定'}
             </Text>
           </Div>
