@@ -394,7 +394,7 @@ const Chat: React.FC = () => {
   };
 
   const scrollToTarget = (messageIndex: number) => {
-    if (searchedResults?.length) {
+    if (searchedResults?.length && inputtedSearchWord) {
       if (Platform.OS === 'ios') {
         messageIosRef.current?.scrollToIndex({index: messageIndex});
       } else {
