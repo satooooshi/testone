@@ -26,6 +26,7 @@ import {userNameFactory} from '../utils/factory/userNameFactory';
 import {apiAuthenticate} from '../hooks/api/auth/useAPIAuthenticate';
 import {Alert, Platform} from 'react-native';
 import Config from 'react-native-config';
+import VideoCall from '../components/call/VideoCall';
 
 const Stack = createStackNavigator<RootStackParamList>();
 export const rtmEngine = new RtmClient();
@@ -38,12 +39,14 @@ const Navigator = () => {
   const [videoCall, setVideoCall] = useState(false);
   const [agoraToken, setAgoraToken] = useState('');
   const [channelName, setChannelName] = useState('');
+  const [onCallUid, setOnCallUid] = useState('2');
   const AGORA_APP_ID = Config.AGORA_APP_ID;
   const rtcProps: RtcPropsInterface = {
     appId: AGORA_APP_ID,
     channel: channelName,
     token: agoraToken,
     enableVideo: false,
+    uid: onCallUid,
   };
   const remoteInvitation = useRef<RemoteInvitation | undefined>();
   const endCall = async () => {
@@ -183,12 +186,14 @@ const Navigator = () => {
     rtcInit();
     callKeepSetup();
     rtmEngine.addListener('LocalInvitationAccepted', async invitation => {
+      setOnCallUid(invitation?.calleeId as string);
       const realChannelName = invitation?.channelId as string;
       await joinChannel(realChannelName);
     });
     rtmEngine.addListener(
       'RemoteInvitationReceived',
       (invitation: RemoteInvitation) => {
+        setOnCallUid(invitation?.callerId as string);
         RNCallKeep.backToForeground();
         remoteInvitation.current = invitation;
         displayIncomingCallNow(invitation);
@@ -333,7 +338,7 @@ const Navigator = () => {
               <Stack.Screen
                 name="Call"
                 children={() => (
-                  <AgoraUIKit rtcProps={rtcProps} callbacks={callbacks} />
+                  <VideoCall rtcProps={rtcProps} callbacks={callbacks} />
                 )}
               />
             </>
