@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import createEventModalStyle from '@/styles/components/CreateEventModal.module.scss';
 import Modal from 'react-modal';
 import { MdCancel } from 'react-icons/md';
@@ -90,7 +90,7 @@ const initialEventValue = {
   description: '',
   startAt: setDateTime(1, 19, 0),
   endAt: setDateTime(1, 21, 0),
-  type: EventType.STUDY_MEETING,
+  type: EventType.IMPRESSIVE_UNIVERSITY,
   imageURL: '',
   chatNeeded: false,
   hostUsers: [],
@@ -124,6 +124,7 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
     validationSchema: createEventSchema,
     onSubmit: async (submittedValues) => {
       if (!croppedImageURL || !selectThumbnailName || !completedCrop) {
+        console.log('event type ==== ', submittedValues.type);
         createEvent(submittedValues);
         return;
       }
@@ -268,6 +269,36 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
     EventType.SUBMISSION_ETC,
     user?.role,
   );
+
+  const getInitialEventType = () => {
+    if (isCreatableImpressiveUniversity) {
+      return EventType.IMPRESSIVE_UNIVERSITY;
+    }
+    if (isCreatableBolday) {
+      return EventType.BOLDAY;
+    }
+    if (isCreatableStudyMeeting) {
+      return EventType.STUDY_MEETING;
+    }
+    if (isCreatableCoach) {
+      return EventType.COACH;
+    }
+    if (isCreatableClub) {
+      return EventType.CLUB;
+    }
+    if (isCreatableSubmissionEtc) {
+      return EventType.SUBMISSION_ETC;
+    }
+    return EventType.IMPRESSIVE_UNIVERSITY;
+  };
+
+  useEffect(() => {
+    const initialEventType = getInitialEventType();
+    setNewEvent((e) => ({
+      ...e,
+      type: initialEventType,
+    }));
+  }, []);
 
   const pushYoutube = () => {
     const youtubeRegex =
