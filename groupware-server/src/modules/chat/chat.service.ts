@@ -184,8 +184,6 @@ export class ChatService {
     query: SearchMessageQuery,
   ): Promise<Partial<ChatMessage[]>> {
     const words = query.word.split(' ');
-    console.log(query.group);
-
     const sql = this.chatMessageRepository
       .createQueryBuilder('chat_messages')
       .leftJoin('chat_messages.chatGroup', 'g')
