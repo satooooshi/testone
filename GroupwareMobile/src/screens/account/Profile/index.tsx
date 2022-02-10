@@ -10,7 +10,6 @@ import {
 import {
   Text,
   Div,
-  ScrollDiv,
   Input,
   Button,
   Icon,
@@ -34,6 +33,7 @@ import {formikErrorMsgFactory} from '../../../utils/factory/formikEroorMsgFactor
 import {profileSchema} from '../../../utils/validation/schema';
 import {Tab} from '../../../components/Header/HeaderTemplate';
 import UserAvatar from '../../../components/common/UserAvatar';
+import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 
 const initialValues: Partial<User> = {
   email: '',
@@ -186,7 +186,8 @@ const Profile: React.FC = () => {
         <Icon color="white" name="check" fontSize={32} />
       </Button>
       {values && (
-        <ScrollDiv
+        <KeyboardAwareScrollView
+          extraScrollHeight={50}
           contentContainerStyle={{
             ...profileStyles.scrollView,
             width: windowWidth * 0.9,
@@ -384,7 +385,7 @@ const Profile: React.FC = () => {
               style={profileStyles.textArea}
             />
           </Div>
-        </ScrollDiv>
+        </KeyboardAwareScrollView>
       )}
     </WholeContainer>
   );
