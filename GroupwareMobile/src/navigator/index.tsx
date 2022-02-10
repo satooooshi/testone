@@ -128,7 +128,7 @@ const Navigator = () => {
                 options={{headerShown: false}}
               /> */}
               <Stack.Screen
-                name="TabBar"
+                name="Main"
                 component={BottomTab}
                 options={{headerShown: false}}
               />
