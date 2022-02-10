@@ -46,7 +46,6 @@ const Navigator = () => {
     channel: channelName,
     token: agoraToken,
     enableVideo: false,
-    uid: onCallUid,
   };
   const remoteInvitation = useRef<RemoteInvitation | undefined>();
   const endCall = async () => {
@@ -338,7 +337,11 @@ const Navigator = () => {
               <Stack.Screen
                 name="Call"
                 children={() => (
-                  <VideoCall rtcProps={rtcProps} callbacks={callbacks} />
+                  <VideoCall
+                    rtcProps={rtcProps}
+                    callbacks={callbacks}
+                    onCallUid={onCallUid}
+                  />
                 )}
               />
             </>

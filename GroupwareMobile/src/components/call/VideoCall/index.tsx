@@ -4,12 +4,15 @@ import {
   PropsInterface,
   CallbacksInterface,
   RtcPropsInterface,
+  layout,
 } from 'agora-rn-uikit';
 import {
   MaxVideoView,
   MinVideoView,
   RtcConfigure,
+  LocalControls,
 } from 'agora-rn-uikit/Components';
+import PropsProvider from 'agora-rn-uikit/Components';
 import {MaxUidConsumer} from 'agora-rn-uikit/src/MaxUidContext';
 import {MinUidConsumer} from 'agora-rn-uikit/src/MinUidContext';
 import styles from 'agora-rn-uikit/src/Style';
@@ -22,21 +25,26 @@ import {userNameFactory} from '../../../utils/factory/userNameFactory';
 type VideoCallProps = {
   rtcProps: RtcPropsInterface;
   callbacks: Partial<CallbacksInterface>;
+  onCallUid: string;
 };
 
-const VideoCall: React.FC<VideoCallProps> = ({rtcProps, callbacks}) => {
+const VideoCall: React.FC<VideoCallProps> = ({
+  rtcProps,
+  callbacks,
+  onCallUid,
+}) => {
   const [videoCall, setVideoCall] = useState(true);
   const props: PropsInterface = {
     rtcProps: rtcProps,
     callbacks: callbacks,
   };
   const {width: windowWidth, height: windowHeight} = useWindowDimensions();
-  const {data: profile, isLoading: loadingProfile} = useAPIGetUserInfoById(
-    props.rtcProps.uid.toString(),
-  );
+  const {data: profile, isLoading: loadingProfile} =
+    useAPIGetUserInfoById(onCallUid);
   console.log('profile ======', profile);
 
   return videoCall ? (
+    // <PropsProvider value={props}>
     <View style={props.styleProps?.UIKitContainer}>
       <RtcConfigure>
         {/* <MaxUidConsumer>
@@ -50,7 +58,7 @@ const VideoCall: React.FC<VideoCallProps> = ({rtcProps, callbacks}) => {
           showsHorizontalScrollIndicator={false}
           horizontal={true}
           style={{
-            ...styles.minContainer,
+            // ...styles.minContainer,
             width: '100%',
           }}>
           {/* <MinUidConsumer>
@@ -62,19 +70,21 @@ const VideoCall: React.FC<VideoCallProps> = ({rtcProps, callbacks}) => {
           </MinUidConsumer> */}
           <Div alignItems="center">
             <Div my={'lg'}>
-              {/* <UserAvatar
+              <UserAvatar
                 user={profile}
                 h={windowWidth * 0.6}
                 w={windowWidth * 0.6}
-              /> */}
+              />
               <Text fontWeight="bold" mb={'lg'} mr="lg" fontSize={24}>
                 {userNameFactory(profile)}
               </Text>
             </Div>
           </Div>
         </ScrollView>
+        {/* <LocalControls showButton={props.rtcProps.layout !== layout.grid} /> */}
       </RtcConfigure>
     </View>
-  ) : null;
+  ) : // </PropsProvider>
+  null;
 };
 export default VideoCall;
