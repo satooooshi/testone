@@ -83,9 +83,16 @@ export class UserController {
 
   @UseGuards(JwtAuthenticationGuard)
   @Get('others-list')
-  async getUsers(@Req() req: RequestWithUser): Promise<User[]> {
+  async getUsers(
+    @Req() req: RequestWithUser,
+    @Query() All: any,
+  ): Promise<User[]> {
     const requestUser = req.user;
     const allUsers = await this.userService.getUsers();
+    console.log('============', All);
+    if (All.status === 'ALL') {
+      return allUsers;
+    }
     const usersExceptRequestUser = allUsers.filter(
       (u) => u.id !== requestUser.id,
     );
