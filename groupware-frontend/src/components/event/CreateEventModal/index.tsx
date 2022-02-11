@@ -90,7 +90,7 @@ const initialEventValue = {
   description: '',
   startAt: setDateTime(1, 19, 0),
   endAt: setDateTime(1, 21, 0),
-  type: EventType.IMPRESSIVE_UNIVERSITY,
+  type: EventType.CLUB,
   imageURL: '',
   chatNeeded: false,
   hostUsers: [],
@@ -269,29 +269,28 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
     user?.role,
   );
 
-  const getInitialEventType = () => {
-    if (isCreatableImpressiveUniversity) {
-      return EventType.IMPRESSIVE_UNIVERSITY;
-    }
-    if (isCreatableBolday) {
-      return EventType.BOLDAY;
-    }
-    if (isCreatableStudyMeeting) {
-      return EventType.STUDY_MEETING;
-    }
-    if (isCreatableCoach) {
-      return EventType.COACH;
-    }
-    if (isCreatableClub) {
-      return EventType.CLUB;
-    }
-    if (isCreatableSubmissionEtc) {
-      return EventType.SUBMISSION_ETC;
-    }
-    return EventType.IMPRESSIVE_UNIVERSITY;
-  };
-
   useEffect(() => {
+    const getInitialEventType = () => {
+      if (isCreatableImpressiveUniversity) {
+        return EventType.IMPRESSIVE_UNIVERSITY;
+      }
+      if (isCreatableBolday) {
+        return EventType.BOLDAY;
+      }
+      if (isCreatableStudyMeeting) {
+        return EventType.STUDY_MEETING;
+      }
+      if (isCreatableCoach) {
+        return EventType.COACH;
+      }
+      if (isCreatableClub) {
+        return EventType.CLUB;
+      }
+      if (isCreatableSubmissionEtc) {
+        return EventType.SUBMISSION_ETC;
+      }
+      return EventType.IMPRESSIVE_UNIVERSITY;
+    };
     const initialEventType = getInitialEventType();
     setNewEvent((e) => ({
       ...e,
