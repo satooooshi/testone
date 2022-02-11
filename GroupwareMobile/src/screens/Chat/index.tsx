@@ -76,6 +76,7 @@ import io from 'socket.io-client';
 import {baseURL} from '../../utils/url';
 import {getThumbnailOfVideo} from '../../utils/getThumbnailOfVideo';
 import {useAuthenticate} from '../../contexts/useAuthenticate';
+// import {yellow100} from 'react-native-paper/lib/typescript/styles/colors';
 
 const socket = io(baseURL, {
   transports: ['websocket'],
@@ -392,6 +393,15 @@ const Chat: React.FC = () => {
       }
     }
   };
+  const countOfSearchWord = useMemo(() => {
+    if (searchedResults?.length && focusedMessageID) {
+      const index = searchedResults?.findIndex(result => {
+        return result?.id === focusedMessageID;
+      });
+      return Math.abs(searchedResults.length - index);
+    }
+    return 0;
+  }, [searchedResults, focusedMessageID]);
 
   const scrollToTarget = (messageIndex: number) => {
     if (searchedResults?.length && inputtedSearchWord) {
@@ -844,33 +854,48 @@ const Chat: React.FC = () => {
         </Div>
       </HeaderTemplate>
       {visibleSearchInput && (
-        <Div style={tailwind('flex flex-row')}>
-          <Input
-            placeholder="メッセージを検索"
-            w={'70%'}
-            value={inputtedSearchWord}
-            onChangeText={text => {
-              setInputtedSearchWord(text);
-              searchMessages();
-            }}
-          />
-          <Div style={tailwind('flex flex-row justify-between m-1')} w={'25%'}>
-            <TouchableOpacity
-              style={tailwind('flex flex-row')}
-              onPress={() => setFocusedMessageID(nextFocusIndex('prev'))}>
-              <Icon name="arrow-up" fontFamily="FontAwesome" fontSize={25} />
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={tailwind('flex flex-row')}
-              onPress={() => setFocusedMessageID(nextFocusIndex('next'))}>
-              <Icon name="arrow-down" fontFamily="FontAwesome" fontSize={25} />
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={tailwind('flex flex-row')}
-              onPress={() => setVisibleSearchInput(false)}>
-              <Icon name="close" fontFamily="FontAwesome" fontSize={25} />
-            </TouchableOpacity>
+        <Div>
+          <Div style={tailwind('flex flex-row')}>
+            <Input
+              placeholder="メッセージを検索"
+              w={'70%'}
+              value={inputtedSearchWord}
+              onChangeText={text => {
+                setInputtedSearchWord(text);
+                searchMessages();
+              }}
+            />
+            <Div
+              style={tailwind('flex flex-row justify-between m-1')}
+              w={'25%'}>
+              <TouchableOpacity
+                style={tailwind('flex flex-row')}
+                onPress={() => setFocusedMessageID(nextFocusIndex('prev'))}>
+                <Icon name="arrow-up" fontFamily="FontAwesome" fontSize={25} />
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={tailwind('flex flex-row')}
+                onPress={() => setFocusedMessageID(nextFocusIndex('next'))}>
+                <Icon
+                  name="arrow-down"
+                  fontFamily="FontAwesome"
+                  fontSize={25}
+                />
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={tailwind('flex flex-row')}
+                onPress={() => setVisibleSearchInput(false)}>
+                <Icon name="close" fontFamily="FontAwesome" fontSize={25} />
+              </TouchableOpacity>
+            </Div>
           </Div>
+          {inputtedSearchWord !== '' && (
+            <Div h={40} alignItems={'center'} justifyContent={'center'}>
+              <Text color="black">{`${countOfSearchWord} / ${
+                searchedResults?.length || 0
+              }`}</Text>
+            </Div>
+          )}
         </Div>
       )}
       {messageListAvoidngKeyboardDisturb}
