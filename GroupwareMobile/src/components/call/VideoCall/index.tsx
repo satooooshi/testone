@@ -9,10 +9,17 @@ import {
 import {
   MaxVideoView,
   MinVideoView,
+  // MaxVoiceView,
+  // MinVoiceView,
   RtcConfigure,
-  LocalControls,
+  Controls,
+  Endcall,
+  SwitchCamera,
+  BtnTemplate,
+  PinnedVideo,
+  GridVideo,
 } from 'agora-rn-uikit/Components';
-import PropsProvider from 'agora-rn-uikit/Components';
+import {PropsProvider} from 'agora-rn-uikit/src/PropsContext';
 import {MaxUidConsumer} from 'agora-rn-uikit/src/MaxUidContext';
 import {MinUidConsumer} from 'agora-rn-uikit/src/MinUidContext';
 import styles from 'agora-rn-uikit/src/Style';
@@ -34,57 +41,42 @@ const VideoCall: React.FC<VideoCallProps> = ({
   onCallUid,
 }) => {
   const [videoCall, setVideoCall] = useState(true);
-  const props: PropsInterface = {
+  const props: React.PropsWithChildren<PropsInterface> = {
     rtcProps: rtcProps,
     callbacks: callbacks,
   };
   const {width: windowWidth, height: windowHeight} = useWindowDimensions();
-  const {data: profile, isLoading: loadingProfile} =
-    useAPIGetUserInfoById(onCallUid);
-  console.log('profile ======', profile);
 
   return videoCall ? (
-    // <PropsProvider value={props}>
-    <View style={props.styleProps?.UIKitContainer}>
-      <RtcConfigure>
-        {/* <MaxUidConsumer>
-          {maxUsers =>
-            maxUsers[0] ? (
-              <MaxVideoView user={maxUsers[0]} key={maxUsers[0].uid} />
-            ) : null
-          }
-        </MaxUidConsumer> */}
-        <ScrollView
-          showsHorizontalScrollIndicator={false}
-          horizontal={true}
-          style={{
-            // ...styles.minContainer,
-            width: '100%',
-          }}>
-          {/* <MinUidConsumer>
-            {minUsers =>
-              minUsers.map(user => (
-                <MinVideoView user={user} key={user.uid} showOverlay={true} />
-              ))
+    <PropsProvider value={props}>
+      <View style={props.styleProps?.UIKitContainer}>
+        <RtcConfigure>
+          <MaxUidConsumer>
+            {maxUsers =>
+              maxUsers[0] ? (
+                <MaxVideoView user={maxUsers[0]} key={maxUsers[0].uid} />
+              ) : null
             }
-          </MinUidConsumer> */}
-          <Div alignItems="center">
-            <Div my={'lg'}>
-              <UserAvatar
-                user={profile}
-                h={windowWidth * 0.6}
-                w={windowWidth * 0.6}
-              />
-              <Text fontWeight="bold" mb={'lg'} mr="lg" fontSize={24}>
-                {userNameFactory(profile)}
-              </Text>
-            </Div>
-          </Div>
-        </ScrollView>
-        {/* <LocalControls showButton={props.rtcProps.layout !== layout.grid} /> */}
-      </RtcConfigure>
-    </View>
-  ) : // </PropsProvider>
-  null;
+          </MaxUidConsumer>
+          <ScrollView
+            showsHorizontalScrollIndicator={false}
+            horizontal={true}
+            style={{
+              ...styles.minContainer,
+              width: '100%',
+            }}>
+            <MinUidConsumer>
+              {minUsers =>
+                minUsers.map(user => (
+                  <MinVideoView user={user} key={user.uid} showOverlay={true} />
+                ))
+              }
+            </MinUidConsumer>
+          </ScrollView>
+          <Controls showButton={false} />
+        </RtcConfigure>
+      </View>
+    </PropsProvider>
+  ) : null;
 };
 export default VideoCall;
