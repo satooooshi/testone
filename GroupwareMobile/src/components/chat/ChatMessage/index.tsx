@@ -26,6 +26,7 @@ import VideoMessage from './VideoMessage';
 type ChatMessageItemProps = {
   message: ChatMessage;
   readUsers: User[];
+  inputtedSearchWord?: string;
   messageIndex: number;
   isScrollTarget: boolean;
   scrollToTarget: (messageIndex: number) => void;
@@ -41,6 +42,7 @@ type ChatMessageItemProps = {
 const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
   message,
   readUsers,
+  inputtedSearchWord,
   messageIndex,
   isScrollTarget = false,
   scrollToTarget,
@@ -133,7 +135,11 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
           <Div flexDir="row" alignItems="flex-end">
             {message.isSender && timesAndReadCounts}
             {message.type === ChatMessageType.TEXT ? (
-              <TextMessage message={message} onLongPress={onLongPress} />
+              <TextMessage
+                message={message}
+                inputtedSearchWord={inputtedSearchWord}
+                onLongPress={onLongPress}
+              />
             ) : message.type === ChatMessageType.IMAGE ? (
               <ImageMessage
                 onPress={onPressImage}

@@ -6,20 +6,27 @@ import {Linking, StyleProp, TextStyle} from 'react-native';
 
 type AutoLinkedTextProps = {
   text: string;
+  inputtedSearchWord?: string;
   style?: StyleProp<TextStyle>;
   linkStyle?: StyleProp<TextStyle>;
 };
 
 const AutoLinkedText: React.FC<AutoLinkedTextProps> = ({
   text,
+  inputtedSearchWord,
   style,
   linkStyle,
 }) => {
   const navigation = useNavigation<any>();
+  const matcher: any = {
+    pattern: inputtedSearchWord,
+    style: {backgroundColor: 'yellow', color: 'black'},
+  };
   return (
     <Autolink
       // Required: the text to parse for links
       text={text}
+      matchers={[matcher]}
       url
       linkStyle={linkStyle}
       style={style}

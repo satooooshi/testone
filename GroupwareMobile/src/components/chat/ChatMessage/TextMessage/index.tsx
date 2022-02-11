@@ -9,10 +9,15 @@ import {mentionTransform} from '../../../../utils/messageTransform';
 
 export type TextMessageProps = {
   message: ChatMessage;
+  inputtedSearchWord?: string;
   onLongPress: () => void;
 };
 
-const TextMessage: React.FC<TextMessageProps> = ({message, onLongPress}) => {
+const TextMessage: React.FC<TextMessageProps> = ({
+  message,
+  inputtedSearchWord,
+  onLongPress,
+}) => {
   const {width: windowWidth} = useWindowDimensions();
   return (
     <TouchableHighlight onLongPress={onLongPress} underlayColor="none">
@@ -28,6 +33,7 @@ const TextMessage: React.FC<TextMessageProps> = ({message, onLongPress}) => {
         )}
         <AutoLinkedText
           text={mentionTransform(message.content)}
+          inputtedSearchWord={inputtedSearchWord}
           linkStyle={tailwind(
             message.isSender
               ? 'font-bold text-pink-300 text-base'

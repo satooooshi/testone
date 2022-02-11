@@ -529,6 +529,7 @@ const Chat: React.FC = () => {
       <ChatMessageItem
         message={message}
         readUsers={readUsers(message)}
+        inputtedSearchWord={inputtedSearchWord}
         messageIndex={messageIndex}
         scrollToTarget={scrollToTarget}
         isScrollTarget={focusedMessageID === message.id}
