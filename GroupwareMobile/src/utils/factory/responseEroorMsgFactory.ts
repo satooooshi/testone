@@ -8,7 +8,11 @@ export type ValidateErrorResponseByServer = {
 
 export const responseErrorMsgFactory = (
   errors: AxiosError<ValidateErrorResponseByServer>,
+  errorText?: string,
 ) => {
+  if (errorText) {
+    return errorText;
+  }
   if (errors?.response?.status !== 400) {
     return 'サーバー内部でエラーが発生しました。しばらくしてからお試しください';
   }
