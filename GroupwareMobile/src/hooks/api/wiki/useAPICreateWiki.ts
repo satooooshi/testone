@@ -1,6 +1,7 @@
 import {AxiosError} from 'axios';
 import {useMutation, UseMutationOptions} from 'react-query';
 import {Wiki} from '../../../types';
+import {ValidateErrorResponseByServer} from '../../../utils/factory/responseEroorMsgFactory';
 import {axiosInstance, jsonHeader} from '../../../utils/url';
 import {createWikiURL} from '../../../utils/url/wiki.url';
 
@@ -14,13 +15,14 @@ const createWiki = async (question: Partial<Wiki>) => {
 export const useAPICreateWiki = (
   mutationOptions?: UseMutationOptions<
     Wiki,
-    AxiosError,
+    AxiosError<ValidateErrorResponseByServer>,
     Partial<Wiki>,
     unknown
   >,
 ) => {
-  return useMutation<Wiki, AxiosError, Partial<Wiki>>(
-    q => createWiki(q),
-    mutationOptions,
-  );
+  return useMutation<
+    Wiki,
+    AxiosError<ValidateErrorResponseByServer>,
+    Partial<Wiki>
+  >(q => createWiki(q), mutationOptions);
 };
