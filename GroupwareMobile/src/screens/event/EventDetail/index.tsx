@@ -64,7 +64,11 @@ const EventDetail: React.FC = () => {
   const [screenLoading, setScreenLoading] = useState(false);
   const [visibleEventFormModal, setEventFormModal] = useState(false);
   const [commentVisible, setCommentVisible] = useState(false);
-  const {mutate: saveEvent, isLoading: isLoadingSaveEvent} = useAPIUpdateEvent({
+  const {
+    mutate: saveEvent,
+    isSuccess,
+    isLoading: isLoadingSaveEvent,
+  } = useAPIUpdateEvent({
     onSuccess: () => {
       setEventFormModal(false);
       refetchEvents();
@@ -315,6 +319,7 @@ const EventDetail: React.FC = () => {
         isVisible={visibleEventFormModal}
         onCloseModal={() => setEventFormModal(false)}
         onSubmit={event => saveEvent({...event, id: eventInfo?.id})}
+        isSuccess={isSuccess}
       />
 
       {eventInfo && (
