@@ -74,10 +74,8 @@ const EventDetail: React.FC = () => {
       setEventFormModal(false);
       refetchEvents();
     },
-    onError: () => {
-      Alert.alert(
-        'イベント更新中にエラーが発生しました。\n時間をおいて再実行してください。',
-      );
+    onError: e => {
+      Alert.alert(responseErrorMsgFactory(e));
     },
   });
   const [unsavedSubmissions, setUnsavedSubmissions] = useState<

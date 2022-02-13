@@ -68,8 +68,7 @@ const EventCalendar: React.FC<EventCalendarProps> = ({
       refetchEvents();
     },
     onError: e => {
-      const messages = responseErrorMsgFactory(e);
-      Alert.alert(messages);
+      Alert.alert(responseErrorMsgFactory(e));
     },
   });
 

@@ -40,8 +40,7 @@ const EventCardList: React.FC<EventCardListProps> = ({
       setPartOfSearchQuery({refetchNeeded: true});
     },
     onError: e => {
-      const messages = responseErrorMsgFactory(e);
-      Alert.alert(messages);
+      Alert.alert(responseErrorMsgFactory(e));
     },
   });
   const {word, tag, type} = partOfSearchQuery;
