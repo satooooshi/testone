@@ -23,6 +23,7 @@ import {
   useExternalPlaybackAvailability,
 } from 'react-airplay';
 import AudioOutput from 'react-native-switch-audio-output-android';
+import Timer from '../../common/Timer';
 
 type VoiceCallProps = {
   rtcProps: RtcPropsInterface;
@@ -80,7 +81,6 @@ const VoiceCall: React.FC<VoiceCallProps> = ({
 
   return (
     <PropsProvider value={props}>
-      {/* <View style={props.styleProps?.UIKitContainer}> */}
       <Div h={windowHeight}>
         <RtcConfigure>
           <Div alignItems="center" mt={'40%'}>
@@ -94,6 +94,7 @@ const VoiceCall: React.FC<VoiceCallProps> = ({
             <Text fontWeight="bold" mt={'lg'} mb={'lg'} fontSize={24}>
               {userNameFactory(profile)}
             </Text>
+            <Timer />
           </Div>
           <Controls showButton={false} />
           {showSpeakerChanger && (
@@ -112,7 +113,6 @@ const VoiceCall: React.FC<VoiceCallProps> = ({
           )}
         </RtcConfigure>
       </Div>
-      {/* </View> */}
     </PropsProvider>
   );
 };
