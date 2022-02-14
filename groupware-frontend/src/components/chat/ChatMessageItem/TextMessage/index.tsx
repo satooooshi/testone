@@ -6,6 +6,7 @@ import { darkFontColor } from 'src/utils/colors';
 import { userNameFactory } from 'src/utils/factory/userNameFactory';
 import { mentionTransform } from 'src/utils/mentionTransform';
 import Linkify from 'react-linkify';
+import { removeHalfWidthSpace } from 'src/utils/removeHarfWidthSpace';
 
 type TextMessageProps = {
   message: ChatMessage;
@@ -28,10 +29,6 @@ const TextMessage: React.FC<TextMessageProps> = ({
       case ChatMessageType.OTHER_FILE:
         return 'ファイル';
     }
-  };
-
-  const removeHalfWidthSpace = (text: string): string => {
-    return text.replace(/ /g, '');
   };
 
   const highlightSearchedWord = (text: string): ReactNode => {

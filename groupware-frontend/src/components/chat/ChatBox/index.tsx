@@ -64,6 +64,7 @@ import { saveAs } from 'file-saver';
 import { EntryComponentProps } from '@draft-js-plugins/mention/lib/MentionSuggestions/Entry/Entry';
 import suggestionStyles from '@/styles/components/Suggestion.module.scss';
 import { useAPISearchMessages } from '@/hooks/api/chat/useAPISearchMessages';
+import { removeHalfWidthSpace } from 'src/utils/removeHarfWidthSpace';
 
 export const Entry: React.FC<EntryComponentProps> = ({
   mention,
@@ -612,7 +613,10 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
             onChange={(e) => setInputtedSearchWord(e.target.value)}
             onKeyDown={(e) => {
               if (e.key === 'Enter') {
-                if (inputtedSearchWord !== confirmedSearchWord) {
+                if (
+                  removeHalfWidthSpace(inputtedSearchWord) !== '' &&
+                  inputtedSearchWord !== confirmedSearchWord
+                ) {
                   searchMessages();
                   setConfirmedSearchWord(inputtedSearchWord);
                 }
