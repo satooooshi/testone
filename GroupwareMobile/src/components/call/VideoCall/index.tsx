@@ -9,8 +9,6 @@ import {
 import {
   MaxVideoView,
   MinVideoView,
-  // MaxVoiceView,
-  // MinVoiceView,
   RtcConfigure,
   Controls,
 } from 'agora-rn-uikit/Components';

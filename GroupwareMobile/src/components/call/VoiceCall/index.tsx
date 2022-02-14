@@ -27,12 +27,13 @@ const VoiceCall: React.FC<VoiceCallProps> = ({
     rtcProps: rtcProps,
     callbacks: callbacks,
   };
-  const {width: windowWidth} = useWindowDimensions();
+  const {width: windowWidth, height: windowHeight} = useWindowDimensions();
   const {data: profile} = useAPIGetUserInfoById(onCallUid);
 
   return (
     <PropsProvider value={props}>
-      <View style={props.styleProps?.UIKitContainer}>
+      {/* <View style={props.styleProps?.UIKitContainer}> */}
+      <Div h={windowHeight}>
         <RtcConfigure>
           <Div alignItems="center" mt={'40%'}>
             <Div my={'lg'}>
@@ -49,7 +50,8 @@ const VoiceCall: React.FC<VoiceCallProps> = ({
           <Controls showButton={false} />
           {/* <LocalControls showButton={props.rtcProps.layout !== layout.grid} /> */}
         </RtcConfigure>
-      </View>
+      </Div>
+      {/* </View> */}
     </PropsProvider>
   );
 };

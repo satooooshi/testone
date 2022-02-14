@@ -62,9 +62,17 @@ const Navigator = () => {
     EndCall: endCall,
     LocalMuteVideo: async bool => {
       if (bool) {
+        if ((await rtcEngine?.isSpeakerphoneEnabled()) === true) {
+          await rtcEngine?.setEnableSpeakerphone(true);
+        }
         await rtcEngine?.adjustPlaybackSignalVolume(100);
         await rtcEngine?.adjustRecordingSignalVolume(100);
       } else {
+        console.log('-------------------------------');
+        if ((await rtcEngine?.isSpeakerphoneEnabled()) === false) {
+          console.log('==============================');
+          await rtcEngine?.setEnableSpeakerphone(true);
+        }
         await rtcEngine?.adjustPlaybackSignalVolume(400);
         await rtcEngine?.adjustRecordingSignalVolume(400);
       }
