@@ -7035,6 +7035,11 @@ range-parser@~1.2.1:
   resolved "https://registry.yarnpkg.com/range-parser/-/range-parser-1.2.1.tgz#3cf37023d199e1c24d1a55b84800c2f3e6468031"
   integrity sha512-Hrgsx+orqoygnmhFbKaHE6c296J+HTAQXoxEF6gNupROmmGJRoyzfG3ccAveqCBrwr/2yxQ5BVd/GTl5agOwSg==
 
+react-airplay@^1.1.2:
+  version "1.1.2"
+  resolved "https://registry.yarnpkg.com/react-airplay/-/react-airplay-1.1.2.tgz#90c0c98304bc9746dcfea6c99d5cac169a74f86d"
+  integrity sha512-elsnY0VLF5N0JqY+jdqFd28BmTnzhda0ljV4vTexFcdhrB6uht70J5QUN2E25U4Y0DWlcgprlxAYfWDbUOjTCQ==
+
 react-devtools-core@^4.13.0:
   version "4.20.0"
   resolved "https://registry.yarnpkg.com/react-devtools-core/-/react-devtools-core-4.20.0.tgz#49640f374bcf541cd86410d86c2cb07392005b33"
