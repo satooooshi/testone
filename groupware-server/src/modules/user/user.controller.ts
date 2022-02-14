@@ -85,7 +85,7 @@ export class UserController {
   @Get('others-list')
   async getUsers(
     @Req() req: RequestWithUser,
-    @Query() query: { status: string },
+    @Query() query: { status: 'ALL' | '' },
   ): Promise<User[]> {
     const requestUser = req.user;
     const allUsers = await this.userService.getUsers();
