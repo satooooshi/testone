@@ -50,6 +50,7 @@ type ChatMessageItemProps = {
   usersInRoom: User[];
   isScrollTarget?: boolean;
   scrollToTarget?: (position: number) => void;
+  confirmedSearchWord: string;
 };
 
 const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
@@ -60,6 +61,7 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
   onClickImage,
   isScrollTarget = false,
   scrollToTarget,
+  confirmedSearchWord,
 }) => {
   const [messageState, setMessageState] = useState(message);
   const [visibleReadModal, setVisibleLastReadModal] = useState(false);
@@ -329,7 +331,10 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
                 </Text>
               )}
               {messageState.type === ChatMessageType.TEXT ? (
-                <TextMessage message={messageState} />
+                <TextMessage
+                  message={messageState}
+                  confirmedSearchWord={confirmedSearchWord}
+                />
               ) : (
                 <Box
                   borderRadius="8px"
