@@ -176,6 +176,8 @@ PODS:
     - React-RCTSettings (= 0.66.0)
     - React-RCTText (= 0.66.0)
     - React-RCTVibration (= 0.66.0)
+  - react-airplay (1.1.2):
+    - React-Core
   - React-callinvoker (0.66.0)
   - React-Core (0.66.0):
     - glog
@@ -551,6 +553,7 @@ DEPENDENCIES:
   - RCTRequired (from `../node_modules/react-native/Libraries/RCTRequired`)
   - RCTTypeSafety (from `../node_modules/react-native/Libraries/TypeSafety`)
   - React (from `../node_modules/react-native/`)
+  - react-airplay (from `../node_modules/react-airplay`)
   - React-callinvoker (from `../node_modules/react-native/ReactCommon/callinvoker`)
   - React-Core (from `../node_modules/react-native/`)
   - React-Core/DevSupport (from `../node_modules/react-native/`)
@@ -656,6 +659,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/Libraries/TypeSafety"
   React:
     :path: "../node_modules/react-native/"
+  react-airplay:
+    :path: "../node_modules/react-airplay"
   React-callinvoker:
     :path: "../node_modules/react-native/ReactCommon/callinvoker"
   React-Core:
@@ -789,6 +794,7 @@ SPEC CHECKSUMS:
   RCTRequired: e4a18a90004e0ed97bba9081099104fd0f658dc9
   RCTTypeSafety: 8a3c31d38de58e1a6a7df6e4e643644a60b00e22
   React: 2b1d0dc3c23e01b754588a74a5b265282d9eb61e
+  react-airplay: 19bc646b4cc698c00772f4cb0e45ca8e280d4c6e
   React-callinvoker: 57c195e780695285fa56e61efdbc0ca0e9204484
   React-Core: 45e4b3c57b0b5fdbb24bc6a63a964870c0405955
   React-CoreModules: d7bb1ae3436eddd85a7eb6d5e928f8c1655d87db
