@@ -14,7 +14,7 @@ const NewRoom: React.FC = () => {
   const navigation = useNavigation<NewRoomNavigationProps>();
   const route = useRoute<NewRoomRouteProps>();
   const {mutate: uploadImage} = useAPIUploadStorage();
-  const {data: users} = useAPIGetUsers();
+  const {data: users} = useAPIGetUsers('');
   const headerTitle = 'ルーム新規作成';
   const {mutate: createGroup} = useAPISaveChatGroup({
     onSuccess: createdData => {
