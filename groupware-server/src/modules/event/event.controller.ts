@@ -287,22 +287,9 @@ export class EventScheduleController {
 
   @Cron(CronExpression.EVERY_MINUTE)
   async sendNotification() {
-    const notifTitle = 'イベントの開始の1時間前になりました。';
     const eventsStartAtAnHourLater =
       await this.eventService.getEventsStartAtAnHourLater();
     for (const e of eventsStartAtAnHourLater) {
-      await this.notifService.sendEmailNotification({
-        to: [
-          e.author.email,
-          ...e.hostUsers.map((u) => u.email),
-          ...e.userJoiningEvent.map((e) => e.user.email),
-        ],
-        subject: notifTitle,
-        title: notifTitle,
-        content: notifTitle,
-        buttonLink: `${this.configService.get('CLIENT_DOMAIN')}`,
-        buttonName: '確認する',
-      });
       const notificationData: CustomPushNotificationData = {
         title: 'イベントの開始の1時間前になりました。',
         body: e.title,
