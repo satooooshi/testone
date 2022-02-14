@@ -187,11 +187,12 @@ export class ChatService {
     const sql = this.chatMessageRepository
       .createQueryBuilder('chat_messages')
       .leftJoin('chat_messages.chatGroup', 'g')
+      .where('chat_messages.type <> :type', { type: 'system_text' })
       .select('chat_messages.id');
 
     words.map((w, index) => {
       if (index === 0) {
-        sql.where('chat_messages.content LIKE :word0', { word0: `%${w}%` });
+        sql.andWhere('chat_messages.content LIKE :word0', { word0: `%${w}%` });
       } else {
         sql.andWhere(`chat_messages.content LIKE :word${index}`, {
           [`word${index}`]: `%${w}%`,
