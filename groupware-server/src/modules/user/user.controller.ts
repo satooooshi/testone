@@ -85,12 +85,11 @@ export class UserController {
   @Get('others-list')
   async getUsers(
     @Req() req: RequestWithUser,
-    @Query() All: any,
+    @Query() query: { status: string },
   ): Promise<User[]> {
     const requestUser = req.user;
     const allUsers = await this.userService.getUsers();
-    console.log('============', All);
-    if (All.status === 'ALL') {
+    if (query.status === 'ALL') {
       return allUsers;
     }
     const usersExceptRequestUser = allUsers.filter(
