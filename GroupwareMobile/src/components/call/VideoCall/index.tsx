@@ -13,11 +13,6 @@ import {
   // MinVoiceView,
   RtcConfigure,
   Controls,
-  Endcall,
-  SwitchCamera,
-  BtnTemplate,
-  PinnedVideo,
-  GridVideo,
 } from 'agora-rn-uikit/Components';
 import {PropsProvider} from 'agora-rn-uikit/src/PropsContext';
 import {MaxUidConsumer} from 'agora-rn-uikit/src/MaxUidContext';

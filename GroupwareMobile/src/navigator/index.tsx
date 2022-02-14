@@ -340,7 +340,7 @@ const Navigator = () => {
                 options={{headerShown: false}}
                 name="Call"
                 children={() => (
-                  <VideoCall
+                  <VoiceCall
                     rtcProps={rtcProps}
                     callbacks={callbacks}
                     onCallUid={onCallUid}
