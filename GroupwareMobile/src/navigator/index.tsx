@@ -228,7 +228,7 @@ const Navigator = () => {
           console.log('login as ', user?.id.toString());
         }
       } else {
-        await rtmEngine.logout();
+        // await rtmEngine.logout();
       }
     };
     getRtmToken();

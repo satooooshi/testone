@@ -7284,6 +7284,11 @@ react-native-screens@^3.8.0:
   dependencies:
     warn-once "^0.1.0"
 
+react-native-switch-audio-output-android@^1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/react-native-switch-audio-output-android/-/react-native-switch-audio-output-android-1.0.2.tgz#e36fc4647f9bf29385136c42db7129285c6f2740"
+  integrity sha512-joGTiJ1TYFHcl4O9Sh429iW1X/PjDnGPwD4ITL0NhL9jU1MyrJTdz/kHy0BtldliePxcU9oqI+U7aKMB/amemw==
+
 react-native-tab-view@^3.1.1:
   version "3.1.1"
   resolved "https://registry.yarnpkg.com/react-native-tab-view/-/react-native-tab-view-3.1.1.tgz#1f8d7a835ab4f5b1b1407ec8dddc1053b53fa3c6"
