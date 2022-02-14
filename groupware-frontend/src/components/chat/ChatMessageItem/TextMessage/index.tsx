@@ -30,17 +30,23 @@ const TextMessage: React.FC<TextMessageProps> = ({
     }
   };
 
+  const removeHalfWidthSpace = (text: string): string => {
+    return text.replace(/ /g, '');
+  };
+
   const highlightSearchedWord = (text: string): ReactNode => {
     if (confirmedSearchWord) {
-      const Exp = new RegExp(`(${confirmedSearchWord})`);
+      const Exp = new RegExp(`(${removeHalfWidthSpace(confirmedSearchWord)})`);
       return text.split(Exp).map((t) => {
-        if (t === confirmedSearchWord) {
+        if (t.match(Exp)) {
           return <Text as="mark">{t}</Text>;
         }
         return t;
       });
     }
+    return text;
   };
+
   return (
     <Box
       maxW={isSmallerThan768 ? '300px' : '40vw'}
