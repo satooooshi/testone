@@ -58,6 +58,7 @@ export type RootStackParamList = {
   };
   UserAdmin: undefined;
   UserRegisteringAdmin: undefined;
+  EditedProfile: {id?: number};
   TagAdmin: undefined;
   UserTagAdmin: undefined;
   Chat: {
