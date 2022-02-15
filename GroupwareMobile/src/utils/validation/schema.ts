@@ -106,6 +106,12 @@ const profileValidation = {
   firstName: Yup.string()
     .required(`名は${requireMessage}`)
     .max(50, `名は${nWordLimitMessage(50)}`),
+  lastNameKana: Yup.string()
+    .required(`姓(ふりがな)は${requireMessage}`)
+    .max(50, `姓(ふりがな)は${nWordLimitMessage(50)}`),
+  firstNameKana: Yup.string()
+    .required(`名(ふりがな)は${requireMessage}`)
+    .max(50, `名(ふりがな)は${nWordLimitMessage(50)}`),
   introduceOther: Yup.string().max(
     1000,
     `自己紹介は${nWordLimitMessage(1000)}`,
