@@ -10,6 +10,7 @@ import {grayColor, darkFontColor} from '../../../utils/colors';
 import {tagTypeNameFactory} from '../../../utils/factory/tag/tagTypeNameFactory';
 import {tagColorFactory} from '../../../utils/factory/tagColorFactory';
 import {userNameFactory} from '../../../utils/factory/userNameFactory';
+import {userNameKanaFactory} from '../../../utils/factory/userNameKanaFactory';
 import UserAvatar from '../../common/UserAvatar';
 
 type UserCardProps = {
@@ -81,6 +82,9 @@ const UserCard: React.FC<UserCardProps> = ({user, filteredDuration}) => {
           <Div w={'60%'}>
             <Text fontSize={18} fontWeight="bold" color={darkFontColor}>
               {userNameFactory(user)}
+            </Text>
+            <Text fontSize={14} fontWeight="bold" color={darkFontColor}>
+              {userNameKanaFactory(user)}
             </Text>
             <Text fontSize={16} color={darkFontColor} numberOfLines={2}>
               {user.introduceOther || '未設定'}
