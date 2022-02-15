@@ -296,7 +296,7 @@ const Profile: React.FC = () => {
           </Div>
           <Div mb="lg">
             <Text fontSize={16} fontWeight="bold">
-              姓(ひらがな)
+              姓(ふりがな)
             </Text>
             <Input
               value={values.lastNameKana}
@@ -307,7 +307,7 @@ const Profile: React.FC = () => {
           </Div>
           <Div mb="lg">
             <Text fontSize={16} fontWeight="bold">
-              名(ひらがな)
+              名(ふりがな)
             </Text>
             <Input
               value={values.firstNameKana}

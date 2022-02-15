@@ -30,6 +30,7 @@ import {
 } from '../../../types/navigator/drawerScreenProps';
 import {darkFontColor} from '../../../utils/colors';
 import {userNameFactory} from '../../../utils/factory/userNameFactory';
+import {userNameKanaFactory} from '../../../utils/factory/userNameKanaFactory';
 import {userRoleNameFactory} from '../../../utils/factory/userRoleNameFactory';
 
 const TopTab = createMaterialTopTabNavigator();
@@ -274,12 +275,15 @@ const AccountDetail: React.FC = () => {
                   w={windowWidth * 0.6}
                 />
               </Div>
+              <Text fontWeight="bold" color={darkFontColor} fontSize={24}>
+                {userNameFactory(profile)}
+              </Text>
               <Text
                 fontWeight="bold"
                 mb={'lg'}
                 color={darkFontColor}
-                fontSize={24}>
-                {userNameFactory(profile)}
+                fontSize={16}>
+                {userNameKanaFactory(profile)}
               </Text>
             </Div>
             <Div h={bottomContentsHeight()}>
