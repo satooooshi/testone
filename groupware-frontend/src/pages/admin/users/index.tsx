@@ -25,6 +25,7 @@ import { useAPIGetUserTag } from '@/hooks/api/tag/useAPIGetUserTag';
 import { useHeaderTab } from '@/hooks/headerTab/useHeaderTab';
 import Link from 'next/link';
 import { userRoleNameFactory } from 'src/utils/factory/userRoleNameFactory';
+import { BiPencil } from 'react-icons/bi';
 
 const UserAdmin: React.FC = () => {
   const router = useRouter();
@@ -136,6 +137,7 @@ const UserAdmin: React.FC = () => {
               <th className={userAdminStyles.table_head}>メールアドレス</th>
               <th className={userAdminStyles.table_head}>社員区分</th>
               <th className={userAdminStyles.table_head}>認証</th>
+              <th className={userAdminStyles.table_head}>編集</th>
               <th className={userAdminStyles.table_head} />
             </tr>
             {users?.users?.map((u) => (
@@ -195,6 +197,14 @@ const UserAdmin: React.FC = () => {
                     </Button>
                   )}
                 </td>
+                <td className={userAdminStyles.delete_icon_wrapper}>
+                  <Link href={`/admin/users/editProfile/${u.id}`} passHref>
+                    <a>
+                      <BiPencil className={userAdminStyles.delete_icon} />
+                    </a>
+                  </Link>
+                </td>
+
                 <td className={userAdminStyles.delete_icon_wrapper}>
                   <MdDelete
                     onClick={() => onDeleteClicked(u)}
