@@ -44,6 +44,8 @@ const initialValues: Partial<User> = {
   email: '',
   lastName: '',
   firstName: '',
+  lastNameKana: '',
+  firstNameKana: '',
   avatarUrl: '',
   role: UserRole.COMMON,
   employeeId: '',
@@ -81,9 +83,14 @@ const UserRegisteringAdmin: React.FC = () => {
       );
     },
   });
-  const {values, setValues, handleSubmit, validateForm, resetForm} = useFormik<
-    Partial<User>
-  >({
+  const {
+    values,
+    setValues,
+    handleChange,
+    handleSubmit,
+    validateForm,
+    resetForm,
+  } = useFormik<Partial<User>>({
     initialValues: initialValues,
     validationSchema: createUserSchema,
     enableReinitialize: true,
@@ -258,6 +265,28 @@ const UserRegisteringAdmin: React.FC = () => {
             value={values.firstName}
             onChangeText={t => setValues({...values, firstName: t})}
             placeholder="太郎"
+            autoCapitalize="none"
+          />
+        </Div>
+        <Div mb="lg">
+          <Text fontSize={16} fontWeight="bold">
+            姓(ふりがな)
+          </Text>
+          <Input
+            value={values.lastNameKana}
+            onChangeText={handleChange('lastNameKana')}
+            placeholder="やまだ"
+            autoCapitalize="none"
+          />
+        </Div>
+        <Div mb="lg">
+          <Text fontSize={16} fontWeight="bold">
+            名(ふりがな)
+          </Text>
+          <Input
+            value={values.firstNameKana}
+            onChangeText={handleChange('firstNameKana')}
+            placeholder="たろう"
             autoCapitalize="none"
           />
         </Div>
