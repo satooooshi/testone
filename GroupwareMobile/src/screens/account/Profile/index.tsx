@@ -296,23 +296,23 @@ const Profile: React.FC = () => {
           </Div>
           <Div mb="lg">
             <Text fontSize={16} fontWeight="bold">
-              姓(ふりがな)
+              姓(フリガナ)
             </Text>
             <Input
               value={values.lastNameKana}
               onChangeText={handleChange('lastNameKana')}
-              placeholder="やまだ"
+              placeholder="ヤマダ"
               autoCapitalize="none"
             />
           </Div>
           <Div mb="lg">
             <Text fontSize={16} fontWeight="bold">
-              名(ふりがな)
+              名(フリガナ)
             </Text>
             <Input
               value={values.firstNameKana}
               onChangeText={handleChange('firstNameKana')}
-              placeholder="たろう"
+              placeholder="タロウ"
               autoCapitalize="none"
             />
           </Div>
