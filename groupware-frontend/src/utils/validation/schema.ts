@@ -11,6 +11,7 @@ const minUsersMessage = 'チャットメンバーは一人以上設定してく�
 const unmatchPasswordConfirmation = '再入力と新しいパスワードが一致しません';
 const nWordLimitMessage = (len: number) => `${len}文字以内で入力してください`;
 const afterNowMessage = '現在の日時以降に設定してください';
+const kanaFormatMessage = 'カタカナのみで入力してください。';
 // const minHostUsersMessage = '開催者/講師は一人以上設定してください';
 
 export const loginSchema = Yup.object().shape({
@@ -76,6 +77,14 @@ export const profileSchema = Yup.object().shape({
   firstName: Yup.string()
     .required(`名は${requireMessage}`)
     .max(50, `名は${nWordLimitMessage(50)}`),
+  lastNameKana: Yup.string()
+    .required(`姓(フリガナ)は${requireMessage}`)
+    .matches(/^[ァ-ヶー]+$/, `姓(フリガナ)は${kanaFormatMessage}`)
+    .max(50, `姓(フリガナ)は${nWordLimitMessage(50)}`),
+  firstNameKana: Yup.string()
+    .required(`名(フリガナ)は${requireMessage}`)
+    .matches(/^[ァ-ヶー]+$/, `名(フリガナ)は${kanaFormatMessage}`)
+    .max(50, `名(フリガナ)は${nWordLimitMessage(50)}`),
   introduceOther: Yup.string().max(
     1000,
     `自己紹介は${nWordLimitMessage(1000)}`,

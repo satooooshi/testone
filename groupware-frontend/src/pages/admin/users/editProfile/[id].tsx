@@ -384,6 +384,28 @@ const Profile = () => {
               onChange={handleChange}
             />
           </FormControl>
+          <FormControl className={profileStyles.input_wrapper}>
+            <FormLabel fontWeight={'bold'}>姓(フリガナ)</FormLabel>
+            <Input
+              type="text"
+              name="lastNameKana"
+              placeholder="ヤマダ"
+              value={userInfo.lastNameKana}
+              background="white"
+              onChange={handleChange}
+            />
+          </FormControl>
+          <FormControl className={profileStyles.input_wrapper}>
+            <FormLabel fontWeight={'bold'}>名(フリガナ)</FormLabel>
+            <Input
+              type="text"
+              name="firstNameKana"
+              placeholder="タロウ"
+              value={userInfo.firstNameKana}
+              background="white"
+              onChange={handleChange}
+            />
+          </FormControl>
           <FormControl mb={4}>
             <FormLabel fontWeight={'bold'}>自己紹介</FormLabel>
             <Textarea
