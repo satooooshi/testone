@@ -36,8 +36,12 @@ export const updatePasswordSchema = Yup.object().shape({
 });
 
 export const registerSchema = Yup.object().shape({
-  firstName: Yup.string().required(requireMessage),
-  lastName: Yup.string().required(requireMessage),
+  lastName: Yup.string()
+    .required(`姓は${requireMessage}`)
+    .max(50, `姓は${nWordLimitMessage(50)}`),
+  firstName: Yup.string()
+    .required(`名は${requireMessage}`)
+    .max(50, `名は${nWordLimitMessage(50)}`),
   lastNameKana: Yup.string()
     .required(`姓(フリガナ)は${requireMessage}`)
     .matches(/^[ァ-ヶー]+$/, `姓(フリガナ)は${kanaFormatMessage}`)
@@ -51,11 +55,31 @@ export const registerSchema = Yup.object().shape({
       /^([\w!#$%&'*+\-\/=?^`{|}~]+(\.[\w!#$%&'*+\-\/=?^`{|}~]+)*|"([\w!#$%&'*+\-\/=?^`{|}~. ()<>\[\]:;@,]|\\[\\"])+")@(([a-zA-Z\d\-]+\.)+[a-zA-Z]+|\[(\d{1,3}(\.\d{1,3}){3}|IPv6:[\da-fA-F]{0,4}(:[\da-fA-F]{0,4}){1,5}(:\d{1,3}(\.\d{1,3}){3}|(:[\da-fA-F]{0,4}){0,2}))\])$/,
       emailFormatMessage,
     )
-    .required(requireMessage),
+    .required(`メールアドレス${requireMessage}`),
   password: Yup.string()
     .matches(/^([^ ]*)$/, blankMixedMessage)
     .min(8, minEightTextMessage)
-    .required(requireMessage),
+    .required(`パスワードは${requireMessage}`),
+  introduceOther: Yup.string().max(
+    1000,
+    `自己紹介は${nWordLimitMessage(1000)}`,
+  ),
+  introduceTech: Yup.string().max(
+    1000,
+    `技術の紹介は${nWordLimitMessage(1000)}`,
+  ),
+  introduceQualification: Yup.string().max(
+    1000,
+    `資格の紹介は${nWordLimitMessage(1000)}`,
+  ),
+  introduceClub: Yup.string().max(
+    1000,
+    `部活動の紹介は${nWordLimitMessage(1000)}`,
+  ),
+  introduceHobby: Yup.string().max(
+    1000,
+    `趣味の紹介は${nWordLimitMessage(1000)}`,
+  ),
 });
 
 export const createEventSchema = Yup.object().shape({
