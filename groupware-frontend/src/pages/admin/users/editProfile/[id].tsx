@@ -59,6 +59,8 @@ const Profile = () => {
     isPhonePublic: false,
     lastName: '',
     firstName: '',
+    lastNameKana: '',
+    firstNameKana: '',
     avatarUrl: '',
     introduceOther: '',
     introduceTech: '',
