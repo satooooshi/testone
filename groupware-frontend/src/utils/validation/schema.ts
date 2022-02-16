@@ -38,6 +38,14 @@ export const updatePasswordSchema = Yup.object().shape({
 export const registerSchema = Yup.object().shape({
   firstName: Yup.string().required(requireMessage),
   lastName: Yup.string().required(requireMessage),
+  lastNameKana: Yup.string()
+    .required(`姓(フリガナ)は${requireMessage}`)
+    .matches(/^[ァ-ヶー]+$/, `姓(フリガナ)は${kanaFormatMessage}`)
+    .max(50, `姓(フリガナ)は${nWordLimitMessage(50)}`),
+  firstNameKana: Yup.string()
+    .required(`名(フリガナ)は${requireMessage}`)
+    .matches(/^[ァ-ヶー]+$/, `名(フリガナ)は${kanaFormatMessage}`)
+    .max(50, `名(フリガナ)は${nWordLimitMessage(50)}`),
   email: Yup.string()
     .matches(
       /^([\w!#$%&'*+\-\/=?^`{|}~]+(\.[\w!#$%&'*+\-\/=?^`{|}~]+)*|"([\w!#$%&'*+\-\/=?^`{|}~. ()<>\[\]:;@,]|\\[\\"])+")@(([a-zA-Z\d\-]+\.)+[a-zA-Z]+|\[(\d{1,3}(\.\d{1,3}){3}|IPv6:[\da-fA-F]{0,4}(:[\da-fA-F]{0,4}){1,5}(:\d{1,3}(\.\d{1,3}){3}|(:[\da-fA-F]{0,4}){0,2}))\])$/,

@@ -64,6 +64,8 @@ const CreateNewUser = () => {
     email: '',
     lastName: '',
     firstName: '',
+    lastNameKana: '',
+    firstNameKana: '',
     password: '',
     role: UserRole.COMMON,
     avatarUrl: '',
@@ -331,6 +333,28 @@ const CreateNewUser = () => {
               }
               name="firstName"
               onBlur={handleBlur}
+            />
+          </FormControl>
+          <FormControl className={createNewUserStyles.input_wrapper}>
+            <FormLabel fontWeight={'bold'}>姓(フリガナ)</FormLabel>
+            <Input
+              type="text"
+              name="lastNameKana"
+              placeholder="ヤマダ"
+              value={validationErrorStyles.lastNameKana}
+              background="white"
+              onChange={handleChange}
+            />
+          </FormControl>
+          <FormControl className={createNewUserStyles.input_wrapper}>
+            <FormLabel fontWeight={'bold'}>名(フリガナ)</FormLabel>
+            <Input
+              type="text"
+              name="firstNameKana"
+              placeholder="タロウ"
+              value={validationErrorStyles.firstNameKana}
+              background="white"
+              onChange={handleChange}
             />
           </FormControl>
           <FormControl className={createNewUserStyles.input_wrapper}>
