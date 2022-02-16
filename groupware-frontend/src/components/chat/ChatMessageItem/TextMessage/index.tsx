@@ -6,7 +6,6 @@ import { darkFontColor } from 'src/utils/colors';
 import { userNameFactory } from 'src/utils/factory/userNameFactory';
 import { mentionTransform } from 'src/utils/mentionTransform';
 import Linkify from 'react-linkify';
-import { removeHalfWidthSpace } from 'src/utils/removeHarfWidthSpace';
 
 type TextMessageProps = {
   message: ChatMessage;
@@ -33,7 +32,7 @@ const TextMessage: React.FC<TextMessageProps> = ({
 
   const highlightSearchedWord = (text: string): ReactNode => {
     if (confirmedSearchWord) {
-      const Exp = new RegExp(`(${removeHalfWidthSpace(confirmedSearchWord)})`);
+      const Exp = new RegExp(`(${confirmedSearchWord.replace(' ', '|')})`);
       return text.split(Exp).map((t) => {
         if (t.match(Exp)) {
           return <Text as="mark">{t}</Text>;
