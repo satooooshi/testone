@@ -278,13 +278,13 @@ const AccountDetail: React.FC = () => {
               <Text fontWeight="bold" color={darkFontColor} fontSize={24}>
                 {userNameFactory(profile)}
               </Text>
-              <Text
+              {/* <Text
                 fontWeight="bold"
                 mb={'lg'}
                 color={darkFontColor}
                 fontSize={16}>
                 {userNameKanaFactory(profile)}
-              </Text>
+              </Text> */}
             </Div>
             <Div h={bottomContentsHeight()}>
               <TopTab.Navigator
