@@ -138,6 +138,7 @@ const UserRow: React.FC<UserRowProps> = ({user}) => {
                   dropdownRef.current?.open();
                 }}
                 name={userRoleNameFactory(currentUser.role)}
+                fontSize={13}
               />
             </Div>
             <Div mr={10}>
