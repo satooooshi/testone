@@ -191,6 +191,7 @@ const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
           <Box overflowY="auto" css={hideScrollbarCss}>
             {selectImageUrl ? (
               <ReactCrop
+                keepSelection={true}
                 imageStyle={{ maxHeight: '80%' }}
                 src={selectImageUrl}
                 crop={crop}

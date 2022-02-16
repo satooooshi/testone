@@ -67,7 +67,7 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
   const {user} = useAuthenticate();
   const dropdownRef = useRef<any | null>(null);
   const {data: tags} = useAPIGetTag();
-  const {data: users} = useAPIGetUsers();
+  const {data: users} = useAPIGetUsers('ALL');
   const [visibleTagModal, setVisibleTagModal] = useState(false);
   const [visibleUserModal, setVisibleUserModal] = useState(false);
   const initialEventValue = {

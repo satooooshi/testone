@@ -260,6 +260,7 @@ const CreateNewUser = () => {
         <div className={createNewUserStyles.image_wrapper}>
           {imageURL ? (
             <ReactCrop
+              keepSelection={true}
               src={imageURL}
               crop={crop}
               onChange={(newCrop) =>

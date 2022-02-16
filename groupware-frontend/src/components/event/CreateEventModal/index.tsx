@@ -106,7 +106,7 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
   createEvent,
 }) => {
   const { data: tags } = useAPIGetTag();
-  const { data: users } = useAPIGetUsers();
+  const { data: users } = useAPIGetUsers('ALL');
   const { user } = useAuthenticate();
   const toast = useToast();
   const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
@@ -597,6 +597,7 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
                 onChange={(newCrop) =>
                   dispatchCrop({ type: 'setCrop', value: newCrop })
                 }
+                keepSelection={true}
                 onComplete={(c) =>
                   dispatchCrop({
                     type: 'setCompletedCrop',
