@@ -40,6 +40,8 @@ const initialValues: Partial<User> = {
   phone: '',
   lastName: '',
   firstName: '',
+  lastNameKana: '',
+  firstNameKana: '',
   avatarUrl: '',
   introduceOther: '',
   introduceTech: '',
@@ -289,6 +291,28 @@ const Profile: React.FC = () => {
               value={values.firstName}
               onChangeText={handleChange('firstName')}
               placeholder="太郎"
+              autoCapitalize="none"
+            />
+          </Div>
+          <Div mb="lg">
+            <Text fontSize={16} fontWeight="bold">
+              姓(フリガナ)
+            </Text>
+            <Input
+              value={values.lastNameKana}
+              onChangeText={handleChange('lastNameKana')}
+              placeholder="ヤマダ"
+              autoCapitalize="none"
+            />
+          </Div>
+          <Div mb="lg">
+            <Text fontSize={16} fontWeight="bold">
+              名(フリガナ)
+            </Text>
+            <Input
+              value={values.firstNameKana}
+              onChangeText={handleChange('firstNameKana')}
+              placeholder="タロウ"
               autoCapitalize="none"
             />
           </Div>
