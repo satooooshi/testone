@@ -15,6 +15,7 @@ import {
   PostWikiNavigationProps,
   PostWikiRouteProps,
 } from '../../../types/navigator/drawerScreenProps';
+import {responseErrorMsgFactory} from '../../../utils/factory/responseEroorMsgFactory';
 
 const PostWiki: React.FC = () => {
   const navigation = useNavigation<PostWikiNavigationProps>();
@@ -24,12 +25,11 @@ const PostWiki: React.FC = () => {
   const boardCategory = route.params?.boardCategory;
   const {mutate: saveWiki, isLoading: loadingSaveWiki} = useAPICreateWiki({
     onSuccess: () => {
+      Alert.alert('Wikiを投稿しました。');
       navigation.goBack();
     },
-    onError: () => {
-      Alert.alert(
-        'Wiki作成中にエラーが発生しました。\n時間をおいて再実行してください。',
-      );
+    onError: e => {
+      Alert.alert(responseErrorMsgFactory(e));
     },
   });
   const {data: tags} = useAPIGetTag();

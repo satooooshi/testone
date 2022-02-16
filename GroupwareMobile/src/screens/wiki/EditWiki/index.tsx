@@ -1,5 +1,4 @@
 import React, {useEffect} from 'react';
-import {useAPICreateWiki} from '../../../hooks/api/wiki/useAPICreateWiki';
 import {BoardCategory, RuleCategory, Tag, Wiki, WikiType} from '../../../types';
 import {useFormik} from 'formik';
 import {wikiSchema} from '../../../utils/validation/schema';
@@ -16,20 +15,21 @@ import {
   EditWikiNavigationProps,
   EditWikiRouteProps,
 } from '../../../types/navigator/drawerScreenProps';
+import {useAPIUpdateWiki} from '../../../hooks/api/wiki/useAPIUpdateQuestion';
+import {responseErrorMsgFactory} from '../../../utils/factory/responseEroorMsgFactory';
 
 const EditWiki: React.FC = () => {
   const navigation = useNavigation<EditWikiNavigationProps>();
   const route = useRoute<EditWikiRouteProps>();
   const {id} = route.params;
   const {data: wiki} = useAPIGetWikiDetail(id);
-  const {mutate: saveWiki, isLoading: loadingSaveWiki} = useAPICreateWiki({
+  const {mutate: saveWiki, isLoading: loadingSaveWiki} = useAPIUpdateWiki({
     onSuccess: () => {
+      Alert.alert('Wikiを編集しました。');
       navigation.goBack();
     },
-    onError: () => {
-      Alert.alert(
-        'Wiki更新中にエラーが発生しました。\n時間をおいて再実行してください。',
-      );
+    onError: e => {
+      Alert.alert(responseErrorMsgFactory(e));
     },
   });
   const {data: tags} = useAPIGetTag();

@@ -3,6 +3,7 @@ import {useMutation, UseMutationOptions} from 'react-query';
 import {EventComment} from '../../../types';
 import {axiosInstance, jsonHeader} from '../../../utils/url';
 import {createCommentURL} from '../../../utils/url/event.url';
+import {ValidateErrorResponseByServer} from '../../../utils/factory/responseEroorMsgFactory';
 
 const createComment = async (
   answer: Partial<EventComment>,
@@ -20,13 +21,14 @@ const createComment = async (
 export const useAPICreateComment = (
   mutationOptions?: UseMutationOptions<
     EventComment,
-    AxiosError,
+    AxiosError<ValidateErrorResponseByServer>,
     Partial<EventComment>,
     unknown
   >,
 ) => {
-  return useMutation<EventComment, AxiosError, Partial<EventComment>>(
-    createComment,
-    mutationOptions,
-  );
+  return useMutation<
+    EventComment,
+    AxiosError<ValidateErrorResponseByServer>,
+    Partial<EventComment>
+  >(createComment, mutationOptions);
 };
