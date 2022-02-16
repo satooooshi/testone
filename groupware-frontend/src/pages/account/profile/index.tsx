@@ -60,6 +60,8 @@ const Profile = () => {
     isPhonePublic: false,
     lastName: '',
     firstName: '',
+    lastNameKana: '',
+    firstNameKana: '',
     avatarUrl: '',
     introduceOther: '',
     introduceTech: '',
@@ -382,6 +384,28 @@ const Profile = () => {
               name="firstName"
               placeholder="太郎"
               value={userInfo.firstName}
+              background="white"
+              onChange={handleChange}
+            />
+          </FormControl>
+          <FormControl className={profileStyles.input_wrapper}>
+            <FormLabel fontWeight={'bold'}>姓(フリガナ)</FormLabel>
+            <Input
+              type="text"
+              name="lastNameKana"
+              placeholder="ヤマダ"
+              value={userInfo.lastNameKana}
+              background="white"
+              onChange={handleChange}
+            />
+          </FormControl>
+          <FormControl className={profileStyles.input_wrapper}>
+            <FormLabel fontWeight={'bold'}>名(フリガナ)</FormLabel>
+            <Input
+              type="text"
+              name="firstNameKana"
+              placeholder="タロウ"
+              value={userInfo.firstNameKana}
               background="white"
               onChange={handleChange}
             />
