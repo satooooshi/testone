@@ -31,6 +31,7 @@ const UserAvatar: React.FC<UserAvatarProps> = ({user, h, w, onPress}) => {
               id: user?.id,
               previousScreenName: routes[routes?.length - 1],
             },
+            initial: false,
           });
         } else {
           navigation.navigate('UsersStack', {
@@ -39,6 +40,7 @@ const UserAvatar: React.FC<UserAvatarProps> = ({user, h, w, onPress}) => {
               id: user?.id,
               previousScreenName: routes[routes?.length - 1],
             },
+            initial: false,
           });
         }
       }}>
