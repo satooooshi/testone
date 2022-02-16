@@ -30,7 +30,6 @@ import {
 } from '../../../types/navigator/drawerScreenProps';
 import {darkFontColor} from '../../../utils/colors';
 import {userNameFactory} from '../../../utils/factory/userNameFactory';
-import {userNameKanaFactory} from '../../../utils/factory/userNameKanaFactory';
 import {userRoleNameFactory} from '../../../utils/factory/userRoleNameFactory';
 
 const TopTab = createMaterialTopTabNavigator();
