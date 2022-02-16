@@ -289,14 +289,25 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
       if (isCreatableSubmissionEtc) {
         return EventType.SUBMISSION_ETC;
       }
-      return EventType.IMPRESSIVE_UNIVERSITY;
+      return undefined;
     };
     const initialEventType = getInitialEventType();
-    setNewEvent((e) => ({
-      ...e,
-      type: initialEventType,
-    }));
-  }, []);
+    if (!event && initialEventType) {
+      setNewEvent((e) => ({
+        ...e,
+        type: initialEventType,
+      }));
+    }
+  }, [
+    event,
+    isCreatableBolday,
+    isCreatableClub,
+    isCreatableCoach,
+    isCreatableImpressiveUniversity,
+    isCreatableStudyMeeting,
+    isCreatableSubmissionEtc,
+    setNewEvent,
+  ]);
 
   const pushYoutube = () => {
     const youtubeRegex =
