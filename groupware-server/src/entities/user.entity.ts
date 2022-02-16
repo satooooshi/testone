@@ -63,7 +63,7 @@ export class User {
     default: false,
   })
   isEmailPublic: boolean;
-  
+
   @Column({
     type: 'varchar',
     name: 'phone',
@@ -72,7 +72,7 @@ export class User {
     default: '',
   })
   phone: string;
-  
+
   @Column({
     type: 'boolean',
     name: 'isPhonePublic',
