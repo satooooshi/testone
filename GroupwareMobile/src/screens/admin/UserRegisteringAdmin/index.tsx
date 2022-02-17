@@ -303,6 +303,17 @@ const UserRegisteringAdmin: React.FC = () => {
         </Div>
         <Div mb="lg">
           <Text fontSize={16} fontWeight="bold">
+            電話番号
+          </Text>
+          <Input
+            value={values.phone}
+            onChangeText={t => setValues({...values, phone: t})}
+            placeholder="000-0000-0000"
+            autoCapitalize="none"
+          />
+        </Div>
+        <Div mb="lg">
+          <Text fontSize={16} fontWeight="bold">
             社員区分
           </Text>
           <DropdownOpenerButton
