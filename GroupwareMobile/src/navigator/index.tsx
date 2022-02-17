@@ -48,7 +48,7 @@ const Navigator = () => {
   };
   Sound.setCategory('Playback');
   var sound = new Sound(
-    '../../../assets/endCall.mp3',
+    '../../assets/endCall.mp3',
     Sound.MAIN_BUNDLE,
     error => {
       if (error) {
