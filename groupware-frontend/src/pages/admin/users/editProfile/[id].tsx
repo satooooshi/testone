@@ -15,11 +15,9 @@ import {
   Textarea,
   useToast,
   Text,
-  RadioGroup,
   Radio,
   Stack,
 } from '@chakra-ui/react';
-import { useAuthenticate } from 'src/contexts/useAuthenticate';
 import { imageExtensions } from 'src/utils/imageExtensions';
 import { useDropzone } from 'react-dropzone';
 import { useFormik } from 'formik';
@@ -29,7 +27,6 @@ import { useAPIUploadStorage } from '@/hooks/api/storage/useAPIUploadStorage';
 import Head from 'next/head';
 import ReactCrop from 'react-image-crop';
 import { dataURLToFile } from 'src/utils/dataURLToFile';
-import { useAPIGetProfile } from '@/hooks/api/user/useAPIGetProfile';
 import { useImageCrop } from '@/hooks/crop/useImageCrop';
 import { useHeaderTab } from '@/hooks/headerTab/useHeaderTab';
 import TagModal from '@/components/common/TagModal';
@@ -38,7 +35,8 @@ import { profileSchema } from 'src/utils/validation/schema';
 import { formikErrorMsgFactory } from 'src/utils/factory/formikErrorMsgFactory';
 import { useAPIGetUserTag } from '@/hooks/api/tag/useAPIGetUserTag';
 import FormToLinkTag from '@/components/FormToLinkTag';
-import router from 'next/router';
+import { useRouter } from 'next/router';
+import { useAPIGetUserInfoById } from '@/hooks/api/user/useAPIGetUserInfoById';
 
 type ModalState = {
   isOpen: boolean;
@@ -50,8 +48,9 @@ type ModalAction = {
 };
 
 const Profile = () => {
-  const { data: profile } = useAPIGetProfile();
-  const { user } = useAuthenticate();
+  const router = useRouter();
+  const { id } = router.query as { id: string };
+  const { data: profile } = useAPIGetUserInfoById(id);
   const { data: tags } = useAPIGetUserTag();
   const initialUserValues = {
     email: '',
@@ -193,12 +192,12 @@ const Profile = () => {
           isClosable: true,
         });
         dispatchCrop({ type: 'setImageFile', value: undefined });
-        router.push(`/account/${responseData.id.toString()}`);
+        router.back();
       }
     },
   });
 
-  const tabs: Tab[] = useHeaderTab({ headerTabType: 'account', user });
+  const tabs: Tab[] = useHeaderTab({ headerTabType: 'admin' });
 
   const handleUpdateUser = async () => {
     if (!croppedImageURL || !completedCrop || !selectImageName) {
@@ -226,10 +225,9 @@ const Profile = () => {
 
   return (
     <LayoutWithTab
-      sidebar={{ activeScreenName: SidebarScreenName.ACCOUNT }}
+      sidebar={{ activeScreenName: SidebarScreenName.ADMIN }}
       header={{
-        title: 'Account',
-        activeTabName: 'プロフィール編集',
+        title: 'Admin',
         tabs,
       }}>
       <Head>

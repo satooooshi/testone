@@ -37,6 +37,7 @@ import EventIntroduction from '../../screens/event/EventIntroduction';
 import {useAuthenticate} from '../../contexts/useAuthenticate';
 import {UserRole} from '../../types';
 import WikiLinks from '../../screens/wiki/WikiLinks';
+import EditedProfile from '../../screens/admin/EditedProfile';
 
 const Drawer = createDrawerNavigator();
 const Stack = createStackNavigator();
@@ -166,6 +167,11 @@ const AdminStack = () => {
           <Stack.Screen
             name="UserRegisteringAdmin"
             component={UserRegisteringAdmin}
+            options={{headerShown: false}}
+          />
+          <Stack.Screen
+            name="EditedProfile"
+            component={EditedProfile}
             options={{headerShown: false}}
           />
         </>

@@ -51,6 +51,7 @@ const HeaderTemplate: React.FC<HeaderTemplateProps> = ({
             <TouchableOpacity
               onPress={() => {
                 if (screenForBack) {
+                  navigation.goBack();
                   navigation.navigate(screenForBack as any);
                 } else {
                   navigation.goBack();

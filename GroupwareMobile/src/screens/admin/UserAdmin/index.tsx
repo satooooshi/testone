@@ -110,9 +110,14 @@ const UserAdmin: React.FC = () => {
             {'名前\nメールアドレス'}
           </Text>
         </Div>
-        <Div minW={'40%'} justifyContent="center">
+        <Div minW={'30%'} justifyContent="center">
           <Text fontWeight="bold" fontSize={16}>
             社員区分
+          </Text>
+        </Div>
+        <Div minW={'20%'} justifyContent="center">
+          <Text fontWeight="bold" fontSize={16}>
+            編集
           </Text>
         </Div>
         <Div minW={'10%'} />
