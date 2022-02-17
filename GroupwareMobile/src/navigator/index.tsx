@@ -17,16 +17,12 @@ import ForgotPassword from '../screens/auth/ForgotPassword';
 import WebEngine from '../components/WebEngine';
 import RtmClient, {RemoteInvitation} from 'agora-react-native-rtm';
 import RNCallKeep, {IOptions} from 'react-native-callkeep';
-import AgoraUIKit, {
-  CallbacksInterface,
-  RtcPropsInterface,
-} from 'agora-rn-uikit';
+import {CallbacksInterface, RtcPropsInterface} from 'agora-rn-uikit';
 import RtcEngine, {RtcEngineContext} from 'react-native-agora';
 import {userNameFactory} from '../utils/factory/userNameFactory';
 import {apiAuthenticate} from '../hooks/api/auth/useAPIAuthenticate';
 import {Alert, Platform} from 'react-native';
 import Config from 'react-native-config';
-import VideoCall from '../components/call/VideoCall';
 import VoiceCall from '../components/call/VoiceCall';
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -125,7 +121,7 @@ const Navigator = () => {
           '通話機能を利用するためには通話アカウントにこのアプリを登録してください',
         cancelButton: 'Cancel',
         okButton: 'ok',
-        // additionalPermissions: [PermissionsAndroid.PERMISSIONS.example],
+        additionalPermissions: [],
         foregroundService: {
           channelId: 'com.groupwaremobile',
           channelName: 'Foreground service for my app',
@@ -232,7 +228,7 @@ const Navigator = () => {
       }
     };
     getRtmToken();
-  }, [user?.id]);
+  }, [AGORA_APP_ID, user?.id]);
 
   useEffect(() => {
     const naviateByNotif = (notification: any) => {
@@ -330,7 +326,7 @@ const Navigator = () => {
     } else if (user?.id) {
       navigationRef.current?.navigate('Main');
     }
-  }, [videoCall, channelName]);
+  }, [videoCall, channelName, user?.id, navigationRef]);
 
   return (
     <NavigationContainer ref={navigationRef}>
