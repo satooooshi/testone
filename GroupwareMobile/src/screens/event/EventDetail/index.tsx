@@ -47,6 +47,7 @@ import {isFinishedEvent} from '../../../utils/factory/event/isFinishedEvent';
 import {isEditableEvent} from '../../../utils/factory/event/isCreatableEvent';
 import EventParticipants from '../../../components/events/EventParticipants';
 import EventCommentCard from '../EventCommentCard';
+import {responseErrorMsgFactory} from '../../../utils/factory/responseEroorMsgFactory';
 
 const EventDetail: React.FC = () => {
   const route = useRoute<EventDetailRouteProps>();
@@ -64,15 +65,17 @@ const EventDetail: React.FC = () => {
   const [screenLoading, setScreenLoading] = useState(false);
   const [visibleEventFormModal, setEventFormModal] = useState(false);
   const [commentVisible, setCommentVisible] = useState(false);
-  const {mutate: saveEvent, isLoading: isLoadingSaveEvent} = useAPIUpdateEvent({
+  const {
+    mutate: saveEvent,
+    isSuccess,
+    isLoading: isLoadingSaveEvent,
+  } = useAPIUpdateEvent({
     onSuccess: () => {
       setEventFormModal(false);
       refetchEvents();
     },
-    onError: () => {
-      Alert.alert(
-        'イベント更新中にエラーが発生しました。\n時間をおいて再実行してください。',
-      );
+    onError: e => {
+      Alert.alert(responseErrorMsgFactory(e));
     },
   });
   const [unsavedSubmissions, setUnsavedSubmissions] = useState<
@@ -142,10 +145,8 @@ const EventDetail: React.FC = () => {
         refetchEvents();
       }
     },
-    onError: () => {
-      Alert.alert(
-        'コメント作成中にエラーが発生しました。\n時間をおいて再実行してください。',
-      );
+    onError: e => {
+      Alert.alert(responseErrorMsgFactory(e));
     },
   });
   const {mutate: uploadFile} = useAPIUploadStorage();
@@ -315,6 +316,7 @@ const EventDetail: React.FC = () => {
         isVisible={visibleEventFormModal}
         onCloseModal={() => setEventFormModal(false)}
         onSubmit={event => saveEvent({...event, id: eventInfo?.id})}
+        isSuccess={isSuccess}
       />
 
       {eventInfo && (

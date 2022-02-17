@@ -15,7 +15,6 @@ import { EventVideo } from 'src/entities/eventVideo.entity';
 import { Tag } from 'src/entities/tag.entity';
 import { User } from 'src/entities/user.entity';
 import { isNotEmptyExceptTags } from 'src/utils/dto/isNotEmptyExceptTags';
-import { isYoutubeLink } from 'src/utils/dto/isYoutubeLink';
 
 export class SaveEventDto {
   @isNotEmptyExceptTags({

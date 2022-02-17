@@ -184,15 +184,26 @@ export class ChatService {
     query: SearchMessageQuery,
   ): Promise<Partial<ChatMessage[]>> {
     const words = query.word.split(' ');
+<<<<<<< HEAD
 
     const sql = this.chatMessageRepository
       .createQueryBuilder('chat_messages')
       .leftJoin('chat_messages.chatGroup', 'g')
+=======
+    const sql = this.chatMessageRepository
+      .createQueryBuilder('chat_messages')
+      .leftJoin('chat_messages.chatGroup', 'g')
+      .where('chat_messages.type <> :type', { type: 'system_text' })
+>>>>>>> 87c25fa2f447b07a893ae4c31947a773144ae01c
       .select('chat_messages.id');
 
     words.map((w, index) => {
       if (index === 0) {
+<<<<<<< HEAD
         sql.where('chat_messages.content LIKE :word0', { word0: `%${w}%` });
+=======
+        sql.andWhere('chat_messages.content LIKE :word0', { word0: `%${w}%` });
+>>>>>>> 87c25fa2f447b07a893ae4c31947a773144ae01c
       } else {
         sql.andWhere(`chat_messages.content LIKE :word${index}`, {
           [`word${index}`]: `%${w}%`,

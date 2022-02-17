@@ -4,6 +4,7 @@ export const getRoomDetailURL = `/${chatURL}/v2/room`;
 
 export const getChatGroupListURL = `/${chatURL}/group-list`;
 export const getChatMessagesURL = `/${chatURL}/get-messages`;
+export const searchMessagesURL = `${chatURL}/search-messages`;
 export const getLatestMentionedMessageURL = `/${chatURL}/latest-mentioned`;
 export const getLastReadChatTimeURL = `/${chatURL}/get-last-read-chat-time`;
 export const editMembersURL = (roomId: number) =>

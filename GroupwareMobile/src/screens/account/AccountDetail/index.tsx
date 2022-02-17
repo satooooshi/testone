@@ -96,7 +96,13 @@ const DetailScreen: React.FC<DetailScreenProps> = ({profile, isLoading}) => {
             <Text mr="lg" fontSize={16}>
               自己紹介
             </Text>
-            <Text color={darkFontColor} fontWeight="bold" fontSize={20}>
+          </Div>
+          <Div
+            w={windowWidth * 0.9}
+            flexDir="row"
+            mb={'lg'}
+            alignItems="center">
+            <Text color={darkFontColor} fontWeight="bold" fontSize={15}>
               {profile.introduceOther || '未設定'}
             </Text>
           </Div>
@@ -119,7 +125,6 @@ const DetailScreen: React.FC<DetailScreenProps> = ({profile, isLoading}) => {
             introduce={profile.introduceClub}
           />
           <TagListBox
-            mb={'lg'}
             tags={hobbyTags || []}
             tagType={TagType.HOBBY}
             introduce={profile.introduceHobby}
@@ -144,6 +149,9 @@ const AccountDetail: React.FC = () => {
   const questionScreenName = `${screenName}-question`;
   const knowledgeScreenName = `${screenName}-knowledge`;
   const {width: windowWidth, height: windowHeight} = useWindowDimensions();
+  const [screenHeight, setScreenHeight] = useState<{
+    [key: string]: {height: number};
+  }>({[defaultScreenName]: {height: 3600}});
   const {
     data: profile,
     refetch,
@@ -181,26 +189,7 @@ const AccountDetail: React.FC = () => {
   const [activeScreen, setActiveScreen] = useState(defaultScreenName);
 
   const bottomContentsHeight = () => {
-    if (activeScreen === defaultScreenName && profile?.tags) {
-      const strings: string =
-        profile?.introduceOther +
-        profile?.introduceTech +
-        profile?.introduceQualification +
-        profile?.introduceClub +
-        profile?.introduceClub;
-      const lines = (strings.match(/\n/g) || '').length + 1;
-      return 700 + profile?.tags.length * 15 + strings.length * 3 + lines * 10;
-    }
-    if (activeScreen === eventScreenName && events?.events) {
-      return 100 + events?.events.length * windowWidth * 0.9;
-    }
-    if (activeScreen === questionScreenName && questionList?.wiki) {
-      return 100 + questionList?.wiki.length * 120;
-    }
-    if (activeScreen === knowledgeScreenName && knowledgeList?.wiki) {
-      return 100 + knowledgeList?.wiki.length * 120;
-    }
-    return windowHeight;
+    return screenHeight[activeScreen]?.height;
   };
 
   const mySelfOfNot = id === user?.id || !id;
@@ -268,15 +257,18 @@ const AccountDetail: React.FC = () => {
                   w={windowWidth * 0.6}
                 />
               </Div>
-              <Text
+              <Text fontWeight="bold" color={darkFontColor} fontSize={24}>
+                {userNameFactory(profile)}
+              </Text>
+              {/* <Text
                 fontWeight="bold"
                 mb={'lg'}
                 color={darkFontColor}
-                fontSize={24}>
-                {userNameFactory(profile)}
-              </Text>
+                fontSize={16}>
+                {userNameKanaFactory(profile)}
+              </Text> */}
             </Div>
-            <Div h={bottomContentsHeight()}>
+            <Div h={bottomContentsHeight() ? bottomContentsHeight() : 700}>
               <TopTab.Navigator
                 initialRouteName={defaultScreenName}
                 screenOptions={{
@@ -286,10 +278,23 @@ const AccountDetail: React.FC = () => {
                   listeners={{focus: () => setActiveScreen(defaultScreenName)}}
                   name={defaultScreenName}
                   children={() => (
-                    <DetailScreen
-                      isLoading={loadingProfile}
-                      profile={profile}
-                    />
+                    <>
+                      <DetailScreen
+                        isLoading={loadingProfile}
+                        profile={profile}
+                      />
+                      <Div
+                        onLayout={({nativeEvent}) => {
+                          setScreenHeight(s => ({
+                            ...s,
+                            [defaultScreenName]: {
+                              ...s?.[defaultScreenName],
+                              height: nativeEvent.layout.y + 130,
+                            },
+                          }));
+                        }}
+                      />
+                    </>
                   )}
                   options={{title: 'プロフィール'}}
                 />
@@ -297,19 +302,32 @@ const AccountDetail: React.FC = () => {
                   listeners={{focus: () => setActiveScreen(eventScreenName)}}
                   name={eventScreenName}
                   children={() => (
-                    <Div alignItems="center" mt="lg">
-                      {events?.events?.length ? (
-                        events?.events?.map(e => (
-                          <Div mb={'lg'} key={e.id}>
-                            <EventCard event={e} />
-                          </Div>
-                        ))
-                      ) : (
-                        <Text fontSize={16}>
-                          参加したイベントが見つかりませんでした
-                        </Text>
-                      )}
-                    </Div>
+                    <>
+                      <Div alignItems="center" mt="lg">
+                        {events?.events?.length ? (
+                          events?.events?.map(e => (
+                            <Div mb={'lg'} key={e.id}>
+                              <EventCard event={e} />
+                            </Div>
+                          ))
+                        ) : (
+                          <Text fontSize={16}>
+                            参加したイベントが見つかりませんでした
+                          </Text>
+                        )}
+                      </Div>
+                      <Div
+                        onLayout={({nativeEvent}) => {
+                          setScreenHeight(s => ({
+                            ...s,
+                            [eventScreenName]: {
+                              ...s?.[eventScreenName],
+                              height: nativeEvent.layout.y + 130,
+                            },
+                          }));
+                        }}
+                      />
+                    </>
                   )}
                   options={{title: '参加したイベント'}}
                 />
@@ -317,17 +335,30 @@ const AccountDetail: React.FC = () => {
                   listeners={{focus: () => setActiveScreen(questionScreenName)}}
                   name={questionScreenName}
                   children={() => (
-                    <Div alignItems="center" mt="lg">
-                      {questionList?.wiki?.length ? (
-                        questionList?.wiki?.map(w => (
-                          <WikiCard key={w.id} wiki={w} />
-                        ))
-                      ) : (
-                        <Text fontSize={16}>
-                          投稿した質問が見つかりませんでした
-                        </Text>
-                      )}
-                    </Div>
+                    <>
+                      <Div alignItems="center" mt="lg">
+                        {questionList?.wiki?.length ? (
+                          questionList?.wiki?.map(w => (
+                            <WikiCard key={w.id} wiki={w} />
+                          ))
+                        ) : (
+                          <Text fontSize={16}>
+                            投稿した質問が見つかりませんでした
+                          </Text>
+                        )}
+                      </Div>
+                      <Div
+                        onLayout={({nativeEvent}) => {
+                          setScreenHeight(s => ({
+                            ...s,
+                            [questionScreenName]: {
+                              ...s?.[questionScreenName],
+                              height: nativeEvent.layout.y + 130,
+                            },
+                          }));
+                        }}
+                      />
+                    </>
                   )}
                   options={{title: '質問'}}
                 />
@@ -337,17 +368,30 @@ const AccountDetail: React.FC = () => {
                   }}
                   name={knowledgeScreenName}
                   children={() => (
-                    <Div alignItems="center" mt="lg">
-                      {knowledgeList?.wiki?.length ? (
-                        knowledgeList?.wiki?.map(w => (
-                          <WikiCard key={w.id} wiki={w} />
-                        ))
-                      ) : (
-                        <Text fontSize={16}>
-                          投稿したナレッジが見つかりませんでした
-                        </Text>
-                      )}
-                    </Div>
+                    <>
+                      <Div alignItems="center" mt="lg">
+                        {knowledgeList?.wiki?.length ? (
+                          knowledgeList?.wiki?.map(w => (
+                            <WikiCard key={w.id} wiki={w} />
+                          ))
+                        ) : (
+                          <Text fontSize={16}>
+                            投稿したナレッジが見つかりませんでした
+                          </Text>
+                        )}
+                      </Div>
+                      <Div
+                        onLayout={({nativeEvent}) => {
+                          setScreenHeight(s => ({
+                            ...s,
+                            [knowledgeScreenName]: {
+                              ...s?.[knowledgeScreenName],
+                              height: nativeEvent.layout.y + 130,
+                            },
+                          }));
+                        }}
+                      />
+                    </>
                   )}
                   options={{title: 'ナレッジ'}}
                 />

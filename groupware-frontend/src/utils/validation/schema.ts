@@ -11,6 +11,7 @@ const minUsersMessage = 'チャットメンバーは一人以上設定してく�
 const unmatchPasswordConfirmation = '再入力と新しいパスワードが一致しません';
 const nWordLimitMessage = (len: number) => `${len}文字以内で入力してください`;
 const afterNowMessage = '現在の日時以降に設定してください';
+const kanaFormatMessage = 'カタカナのみで入力してください。';
 // const minHostUsersMessage = '開催者/講師は一人以上設定してください';
 
 export const loginSchema = Yup.object().shape({
@@ -35,18 +36,50 @@ export const updatePasswordSchema = Yup.object().shape({
 });
 
 export const registerSchema = Yup.object().shape({
-  firstName: Yup.string().required(requireMessage),
-  lastName: Yup.string().required(requireMessage),
+  lastName: Yup.string()
+    .required(`姓は${requireMessage}`)
+    .max(50, `姓は${nWordLimitMessage(50)}`),
+  firstName: Yup.string()
+    .required(`名は${requireMessage}`)
+    .max(50, `名は${nWordLimitMessage(50)}`),
+  lastNameKana: Yup.string()
+    .required(`姓(フリガナ)は${requireMessage}`)
+    .matches(/^[ァ-ヶー]+$/, `姓(フリガナ)は${kanaFormatMessage}`)
+    .max(50, `姓(フリガナ)は${nWordLimitMessage(50)}`),
+  firstNameKana: Yup.string()
+    .required(`名(フリガナ)は${requireMessage}`)
+    .matches(/^[ァ-ヶー]+$/, `名(フリガナ)は${kanaFormatMessage}`)
+    .max(50, `名(フリガナ)は${nWordLimitMessage(50)}`),
   email: Yup.string()
     .matches(
       /^([\w!#$%&'*+\-\/=?^`{|}~]+(\.[\w!#$%&'*+\-\/=?^`{|}~]+)*|"([\w!#$%&'*+\-\/=?^`{|}~. ()<>\[\]:;@,]|\\[\\"])+")@(([a-zA-Z\d\-]+\.)+[a-zA-Z]+|\[(\d{1,3}(\.\d{1,3}){3}|IPv6:[\da-fA-F]{0,4}(:[\da-fA-F]{0,4}){1,5}(:\d{1,3}(\.\d{1,3}){3}|(:[\da-fA-F]{0,4}){0,2}))\])$/,
       emailFormatMessage,
     )
-    .required(requireMessage),
+    .required(`メールアドレス${requireMessage}`),
   password: Yup.string()
     .matches(/^([^ ]*)$/, blankMixedMessage)
     .min(8, minEightTextMessage)
-    .required(requireMessage),
+    .required(`パスワードは${requireMessage}`),
+  introduceOther: Yup.string().max(
+    1000,
+    `自己紹介は${nWordLimitMessage(1000)}`,
+  ),
+  introduceTech: Yup.string().max(
+    1000,
+    `技術の紹介は${nWordLimitMessage(1000)}`,
+  ),
+  introduceQualification: Yup.string().max(
+    1000,
+    `資格の紹介は${nWordLimitMessage(1000)}`,
+  ),
+  introduceClub: Yup.string().max(
+    1000,
+    `部活動の紹介は${nWordLimitMessage(1000)}`,
+  ),
+  introduceHobby: Yup.string().max(
+    1000,
+    `趣味の紹介は${nWordLimitMessage(1000)}`,
+  ),
 });
 
 export const createEventSchema = Yup.object().shape({
@@ -76,6 +109,14 @@ export const profileSchema = Yup.object().shape({
   firstName: Yup.string()
     .required(`名は${requireMessage}`)
     .max(50, `名は${nWordLimitMessage(50)}`),
+  lastNameKana: Yup.string()
+    .required(`姓(フリガナ)は${requireMessage}`)
+    .matches(/^[ァ-ヶー]+$/, `姓(フリガナ)は${kanaFormatMessage}`)
+    .max(50, `姓(フリガナ)は${nWordLimitMessage(50)}`),
+  firstNameKana: Yup.string()
+    .required(`名(フリガナ)は${requireMessage}`)
+    .matches(/^[ァ-ヶー]+$/, `名(フリガナ)は${kanaFormatMessage}`)
+    .max(50, `名(フリガナ)は${nWordLimitMessage(50)}`),
   introduceOther: Yup.string().max(
     1000,
     `自己紹介は${nWordLimitMessage(1000)}`,

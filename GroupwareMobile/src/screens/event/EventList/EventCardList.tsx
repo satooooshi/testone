@@ -15,6 +15,7 @@ import SearchFormOpenerButton from '../../../components/common/SearchForm/Search
 import SearchForm from '../../../components/common/SearchForm';
 import EventFormModal from '../../../components/events/EventFormModal';
 import {useAPICreateEvent} from '../../../hooks/api/event/useAPICreateEvent';
+import {responseErrorMsgFactory} from '../../../utils/factory/responseEroorMsgFactory';
 
 type EventCardListProps = {
   status: EventStatus;
@@ -29,18 +30,17 @@ const EventCardList: React.FC<EventCardListProps> = ({
 }) => {
   const {partOfSearchQuery, setPartOfSearchQuery} =
     useEventCardListSearchQuery();
-  const {mutate: saveEvent} = useAPICreateEvent({
+  const {mutate: saveEvent, isSuccess} = useAPICreateEvent({
     onSuccess: newEvent => {
+      Alert.alert('イベントを作成しました。');
       hideEventFormModal();
       if (newEvent.type === partOfSearchQuery.type) {
         setSearchQuery(q => ({...q, page: '1'}));
       }
       setPartOfSearchQuery({refetchNeeded: true});
     },
-    onError: () => {
-      Alert.alert(
-        'イベント更新中にエラーが発生しました。\n時間をおいて再実行してください。',
-      );
+    onError: e => {
+      Alert.alert(responseErrorMsgFactory(e));
     },
   });
   const {word, tag, type} = partOfSearchQuery;
@@ -105,6 +105,7 @@ const EventCardList: React.FC<EventCardListProps> = ({
         isVisible={visibleEventFormModal}
         onCloseModal={hideEventFormModal}
         onSubmit={event => saveEvent(event)}
+        isSuccess={isSuccess}
       />
       <SearchForm
         searchTarget="other"

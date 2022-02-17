@@ -1,4 +1,4 @@
-import {useIsFocused, useNavigation} from '@react-navigation/native';
+import {useIsFocused, useNavigation, useRoute} from '@react-navigation/native';
 import {useFormik} from 'formik';
 import React, {useEffect, useState} from 'react';
 import {
@@ -22,26 +22,28 @@ import TagEditLine from '../../../components/TagEditLine';
 import WholeContainer from '../../../components/WholeContainer';
 import {useAPIUploadStorage} from '../../../hooks/api/storage/useAPIUploadStorage';
 import {useAPIGetUserTag} from '../../../hooks/api/tag/useAPIGetUserTag';
-import {useAPIGetProfile} from '../../../hooks/api/user/useAPIGetProfile';
 import {useAPIUpdateUser} from '../../../hooks/api/user/useAPIUpdateUser';
 import {useTagType} from '../../../hooks/tag/useTagType';
 import {profileStyles} from '../../../styles/screen/account/profile.style';
 import {TagType, User} from '../../../types';
-import {ProfileNavigationProps} from '../../../types/navigator/drawerScreenProps/account';
 import {uploadImageFromGallery} from '../../../utils/cropImage/uploadImageFromGallery';
 import {formikErrorMsgFactory} from '../../../utils/factory/formikEroorMsgFactory';
 import {profileSchema} from '../../../utils/validation/schema';
 import {Tab} from '../../../components/Header/HeaderTemplate';
 import UserAvatar from '../../../components/common/UserAvatar';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+import {
+  EditedProfileAdminNavigationProps,
+  EditedProfileRouteProps,
+} from '../../../types/navigator/drawerScreenProps';
+import {useAdminHeaderTab} from '../../../contexts/admin/useAdminHeaderTab';
+import {useAPIGetUserInfoById} from '../../../hooks/api/user/useAPIGetUserInfoById';
 
 const initialValues: Partial<User> = {
   email: '',
   phone: '',
   lastName: '',
   firstName: '',
-  lastNameKana: '',
-  firstNameKana: '',
   avatarUrl: '',
   introduceOther: '',
   introduceTech: '',
@@ -51,18 +53,25 @@ const initialValues: Partial<User> = {
   tags: [],
 };
 
-const Profile: React.FC = () => {
-  const navigation = useNavigation<ProfileNavigationProps>();
+const EditedProfile: React.FC = () => {
+  const navigation = useNavigation<EditedProfileAdminNavigationProps>();
+  const route = useRoute<EditedProfileRouteProps>();
+  const userID = route.params?.id || 0;
   const {
     data: profile,
     refetch,
     isLoading: loadingProfile,
-  } = useAPIGetProfile();
+  } = useAPIGetUserInfoById(userID.toString());
   const isFocused = useIsFocused();
   const {mutate: updateUser, isLoading: loadingUpdate} = useAPIUpdateUser({
     onSuccess: responseData => {
       if (responseData) {
-        Alert.alert('プロフィールを更新しました');
+        Alert.alert('プロフィールを更新しました', '', [
+          {
+            text: 'OK',
+            onPress: () => navigation.goBack(),
+          },
+        ]);
       }
     },
     onError: () => {
@@ -114,21 +123,7 @@ const Profile: React.FC = () => {
       );
     },
   });
-  const tabs: Tab[] = [
-    {
-      name: 'アカウント情報',
-      onPress: () => navigation.navigate('AccountStack', {screen: 'MyProfile'}),
-    },
-    {
-      name: 'プロフィール編集',
-      onPress: () => {},
-    },
-    {
-      name: 'パスワード更新',
-      onPress: () =>
-        navigation.navigate('AccountStack', {screen: 'UpdatePassword'}),
-    },
-  ];
+  const tabs: Tab[] = useAdminHeaderTab();
 
   const handleUploadImage = async () => {
     const {formData} = await uploadImageFromGallery({
@@ -159,11 +154,7 @@ const Profile: React.FC = () => {
       <Overlay visible={loadingProfile || loadingUpdate} p="xl">
         <ActivityIndicator />
       </Overlay>
-      <HeaderWithTextButton
-        title={'Account'}
-        tabs={tabs}
-        activeTabName={'プロフィール編集'}
-      />
+      <HeaderWithTextButton title={'Admin'} tabs={tabs} />
       <TagModal
         onCompleteModal={selectedTagsInModal =>
           setValues(v => ({...v, tags: selectedTagsInModal}))
@@ -415,4 +406,4 @@ const Profile: React.FC = () => {
   );
 };
 
-export default Profile;
+export default EditedProfile;
