@@ -167,6 +167,23 @@ export class Wiki {
   })
   tags?: Tag[];
 
+  @ManyToMany(() => User, (user) => user.userGoodForBoard, {
+    onUpdate: 'CASCADE',
+    onDelete: 'CASCADE',
+  })
+  @JoinTable({
+    name: 'user_good_for_board',
+    joinColumn: {
+      name: 'wiki_id',
+      referencedColumnName: 'id',
+    },
+    inverseJoinColumn: {
+      name: 'user_id',
+      referencedColumnName: 'id',
+    },
+  })
+  userGoodForBoard?: User[];
+
   @BeforeInsert()
   @BeforeUpdate()
   changeToStorageURL?() {
