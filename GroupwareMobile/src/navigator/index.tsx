@@ -17,10 +17,7 @@ import ForgotPassword from '../screens/auth/ForgotPassword';
 import WebEngine from '../components/WebEngine';
 import RtmClient, {RemoteInvitation} from 'agora-react-native-rtm';
 import RNCallKeep, {IOptions} from 'react-native-callkeep';
-import AgoraUIKit, {
-  CallbacksInterface,
-  RtcPropsInterface,
-} from 'agora-rn-uikit';
+import {CallbacksInterface, RtcPropsInterface} from 'agora-rn-uikit';
 import RtcEngine, {RtcEngineContext} from 'react-native-agora';
 import {userNameFactory} from '../utils/factory/userNameFactory';
 import {apiAuthenticate} from '../hooks/api/auth/useAPIAuthenticate';
@@ -50,10 +47,6 @@ const Navigator = () => {
     enableVideo: false,
     activeSpeaker: true,
   };
-  const mainBundle =
-    Platform.OS === 'ios'
-      ? encodeURIComponent(Sound.MAIN_BUNDLE)
-      : Sound.MAIN_BUNDLE;
   Sound.setCategory('Playback');
   const file = require('../../assets/endCall.mp3');
   var sound = new Sound(file, '', error => {
