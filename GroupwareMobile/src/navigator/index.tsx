@@ -28,6 +28,7 @@ import {Alert, Platform} from 'react-native';
 import Config from 'react-native-config';
 import VideoCall from '../components/call/VideoCall';
 import VoiceCall from '../components/call/VoiceCall';
+import Sound from 'react-native-sound';
 
 const Stack = createStackNavigator<RootStackParamList>();
 export const rtmEngine = new RtmClient();
@@ -49,8 +50,24 @@ const Navigator = () => {
     enableVideo: false,
     activeSpeaker: true,
   };
+  Sound.setCategory('Playback');
+  var sound = new Sound(
+    '../../../assets/endCall.mp3',
+    Sound.MAIN_BUNDLE,
+    error => {
+      if (error) {
+        console.log('failed to load the sound', error);
+      }
+    },
+  );
+  sound.setVolume(1);
+  sound.setPan(1);
   const remoteInvitation = useRef<RemoteInvitation | undefined>();
   const endCall = async () => {
+    sound.stop(() => {
+      sound.play();
+    });
+    // sound.release();
     remoteInvitation.current = undefined;
     await rtcEngine?.leaveChannel();
     RNCallKeep.endAllCalls();
@@ -68,9 +85,7 @@ const Navigator = () => {
         await rtcEngine?.adjustPlaybackSignalVolume(100);
         await rtcEngine?.adjustRecordingSignalVolume(100);
       } else {
-        console.log('-------------------------------');
         if ((await rtcEngine?.isSpeakerphoneEnabled()) === false) {
-          console.log('==============================');
           await rtcEngine?.setEnableSpeakerphone(true);
         }
         await rtcEngine?.adjustPlaybackSignalVolume(400);

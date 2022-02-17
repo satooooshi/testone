@@ -8,21 +8,9 @@ import {RtcConfigure} from 'agora-rn-uikit/Components';
 import {PropsProvider} from 'agora-rn-uikit/src/PropsContext';
 import {useAPIGetUserInfoById} from '../../../../src/hooks/api/user/useAPIGetUserInfoById';
 import {Text, Div} from 'react-native-magnus';
-import {
-  useWindowDimensions,
-  Button,
-  Platform,
-  Alert,
-  AlertButton,
-} from 'react-native';
+import {useWindowDimensions} from 'react-native';
 import UserAvatar from '../../../components/common/UserAvatar';
 import {userNameFactory} from '../../../utils/factory/userNameFactory';
-import {
-  AirplayButton,
-  showRoutePicker,
-  useExternalPlaybackAvailability,
-} from 'react-airplay';
-import AudioOutput from 'react-native-switch-audio-output-android';
 import Timer from '../../common/Timer';
 import Controls from '../Control';
 
