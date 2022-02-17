@@ -56,6 +56,10 @@ export const registerSchema = Yup.object().shape({
       emailFormatMessage,
     )
     .required(`メールアドレス${requireMessage}`),
+  phone: Yup.string().matches(
+    /^0\d{2,3}-\d{1,4}-\d{1,4}$/,
+    `電話番号は${phoneFormatMessage}`,
+  ),
   password: Yup.string()
     .matches(/^([^ ]*)$/, blankMixedMessage)
     .min(8, minEightTextMessage)
@@ -102,7 +106,10 @@ export const profileSchema = Yup.object().shape({
       emailFormatMessage,
     )
     .required(requireMessage),
-  phone: Yup.string().matches(/^0\d{2,3}-\d{1,4}-\d{1,4}$/, phoneFormatMessage),
+  phone: Yup.string().matches(
+    /^0\d{2,3}-\d{1,4}-\d{1,4}$/,
+    `電話番号は${phoneFormatMessage}`,
+  ),
   lastName: Yup.string()
     .required(`姓は${requireMessage}`)
     .max(50, `姓は${nWordLimitMessage(50)}`),
