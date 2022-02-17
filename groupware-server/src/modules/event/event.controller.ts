@@ -286,7 +286,7 @@ export class EventScheduleController {
   }
 
   @Cron(CronExpression.EVERY_MINUTE)
-  async sendNotification() {
+  async sendNotifEventsStartsInHour() {
     const eventsStartAtAnHourLater =
       await this.eventService.getEventsStartAtAnHourLater();
     for (const e of eventsStartAtAnHourLater) {
