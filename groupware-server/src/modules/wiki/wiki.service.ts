@@ -212,4 +212,33 @@ export class WikiService {
       .getOne();
     return existAnswer;
   }
+
+  public async toggleGoodForBoard(userID: number, id: number) {
+    const existGoodReaction = await this.wikiRepository
+      .createQueryBuilder('wiki')
+      .innerJoin('wiki.useGoodForBoard', 'userGoodForBoard')
+      .where('userGoodForBoard.id = :wikiID', {
+        wikiID: id,
+      })
+      .andWhere('userGoodForBoard.id = :userID', {
+        userID: userID,
+      })
+      .getOne();
+
+    if (existGoodReaction) {
+      await this.wikiRepository
+        .createQueryBuilder()
+        .relation(Wiki, 'userGoodForBoard')
+        .of({ id: userID })
+        .remove({ id });
+      return { isSender: false, wikiID: id };
+    } else {
+      await this.wikiRepository
+        .createQueryBuilder()
+        .relation(Wiki, 'userGoodForBoard')
+        .of({ id: userID })
+        .add({ id });
+      return { isSender: true, wikiID: id };
+    }
+  }
 }
