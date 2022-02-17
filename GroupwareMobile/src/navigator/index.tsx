@@ -24,6 +24,7 @@ import {apiAuthenticate} from '../hooks/api/auth/useAPIAuthenticate';
 import {Alert, Platform} from 'react-native';
 import Config from 'react-native-config';
 import VoiceCall from '../components/call/VoiceCall';
+import SoundPlayer from 'react-native-sound-player';
 
 const Stack = createStackNavigator<RootStackParamList>();
 export const rtmEngine = new RtmClient();
@@ -46,8 +47,18 @@ const Navigator = () => {
     activeSpeaker: true,
   };
   const remoteInvitation = useRef<RemoteInvitation | undefined>();
+
+  const soundOnEnd = async () => {
+    try {
+      SoundPlayer.playSoundFile('end_call', 'mp3');
+    } catch (e) {
+      console.log('sound on end call failed:', e);
+    }
+  };
   const endCall = async () => {
     remoteInvitation.current = undefined;
+    await soundOnEnd();
+    console.log('sound on end ');
     await rtcEngine?.leaveChannel();
     RNCallKeep.endAllCalls();
     setVideoCall(false);
