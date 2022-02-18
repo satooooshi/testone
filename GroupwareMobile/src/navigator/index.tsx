@@ -38,6 +38,7 @@ const Navigator = () => {
   const [agoraToken, setAgoraToken] = useState('');
   const [channelName, setChannelName] = useState('');
   const [onCallUid, setOnCallUid] = useState('2');
+  const [alertCountOnEndCall, setAlertCountOnEndCall] = useState(0);
   const AGORA_APP_ID = Config.AGORA_APP_ID;
   const rtcProps: RtcPropsInterface = {
     appId: AGORA_APP_ID,
@@ -57,12 +58,14 @@ const Navigator = () => {
   };
   const endCall = async () => {
     remoteInvitation.current = undefined;
+    setAlertCountOnEndCall(c => c + 1);
     await soundOnEnd();
     console.log('sound on end ');
     await rtcEngine?.leaveChannel();
     RNCallKeep.endAllCalls();
     setVideoCall(false);
     setChannelName('');
+    navigationRef.current?.navigate('Main');
   };
 
   const callbacks: Partial<CallbacksInterface> = {
@@ -98,7 +101,6 @@ const Navigator = () => {
     });
     rtcEngine?.addListener('UserOffline', (uid, reason) => {
       console.log('UserOffline', uid, reason);
-      Alert.alert('通話が終了しました');
       endCall();
     });
     rtcEngine?.addListener('LeaveChannel', ({userCount}) => {
@@ -156,6 +158,9 @@ const Navigator = () => {
 
   const displayIncomingCallNow = (callingData: RemoteInvitation) => {
     console.log('Event: Display Incoming Call: ', callingData);
+    remoteInvitation.current = callingData;
+    setOnCallUid(callingData?.callerId as string);
+    RNCallKeep.backToForeground();
     RNCallKeep.displayIncomingCall(
       callingData?.channelId as string,
       userNameFactory(user),
@@ -178,6 +183,7 @@ const Navigator = () => {
       await rtcEngine?.disableVideo();
       setChannelName(realChannelName);
       setVideoCall(true);
+      navigateToCallWindow();
     }
   };
 
@@ -198,6 +204,24 @@ const Navigator = () => {
     }
   };
 
+  const navigateToCallWindow = () => {
+    navigationRef.current?.navigate('Call');
+  };
+
+  //useEffectで処理しないと複数回アラートが出る可能性がある
+  useEffect(() => {
+    if (alertCountOnEndCall === 1) {
+      Alert.alert('通話が終了しました', '', [
+        {
+          text: 'OK',
+          onPress: () => {
+            setAlertCountOnEndCall(0);
+          },
+        },
+      ]);
+    }
+  }, [alertCountOnEndCall]);
+
   useEffect(() => {
     rtcInit();
     callKeepSetup();
@@ -209,15 +233,13 @@ const Navigator = () => {
     rtmEngine.addListener(
       'RemoteInvitationReceived',
       (invitation: RemoteInvitation) => {
-        setOnCallUid(invitation?.callerId as string);
-        RNCallKeep.backToForeground();
-        remoteInvitation.current = invitation;
         displayIncomingCallNow(invitation);
       },
     );
     RNCallKeep.addEventListener('answerCall', answerCall);
     return () => {
       RNCallKeep.removeEventListener('answerCall');
+      rtcEngine.removeAllListeners();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
