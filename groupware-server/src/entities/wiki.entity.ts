@@ -196,4 +196,6 @@ export class Wiki {
   async changeToSignedURL?() {
     this.body = await genSignedURL(this.body);
   }
+
+  isSender?: boolean;
 }

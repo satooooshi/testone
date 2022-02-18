@@ -122,4 +122,13 @@ export class WikiController {
       resolvedAt: new Date(),
     });
   }
+
+  @UseGuards(JwtAuthenticationGuard)
+  @Post('toggle-good-for-board')
+  async toggleGoodForBoard(
+    @Req() req: RequestWithUser,
+    @Body() WikiID: number,
+  ): Promise<Partial<Wiki>> {
+    return this.qaService.toggleGoodForBoard(req.user.id, WikiID);
+  }
 }

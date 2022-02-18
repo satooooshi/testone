@@ -213,12 +213,15 @@ export class WikiService {
     return existAnswer;
   }
 
-  public async toggleGoodForBoard(userID: number, id: number) {
+  public async toggleGoodForBoard(
+    userID: number,
+    wikiID: number,
+  ): Promise<Partial<Wiki>> {
     const existGoodReaction = await this.wikiRepository
       .createQueryBuilder('wiki')
       .innerJoin('wiki.useGoodForBoard', 'userGoodForBoard')
       .where('userGoodForBoard.id = :wikiID', {
-        wikiID: id,
+        wikiID: wikiID,
       })
       .andWhere('userGoodForBoard.id = :userID', {
         userID: userID,
@@ -230,15 +233,15 @@ export class WikiService {
         .createQueryBuilder()
         .relation(Wiki, 'userGoodForBoard')
         .of({ id: userID })
-        .remove({ id });
-      return { isSender: false, wikiID: id };
+        .remove({ wikiID });
+      return { isSender: false, id: wikiID };
     } else {
       await this.wikiRepository
         .createQueryBuilder()
         .relation(Wiki, 'userGoodForBoard')
         .of({ id: userID })
-        .add({ id });
-      return { isSender: true, wikiID: id };
+        .add({ wikiID });
+      return { isSender: true, id: wikiID };
     }
   }
 }

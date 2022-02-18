@@ -152,6 +152,7 @@ export interface Wiki {
   bestAnswer?: QAAnswer;
   createdAt: Date;
   updatedAt: Date;
+  isSender: boolean;
 }
 
 export interface QAAnswerReply {
