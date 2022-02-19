@@ -146,17 +146,6 @@ const SearchInput: React.FC<SearchFormProps> = ({
             onClick={handleModalSearchButton}>
             検索
           </Button>
-          <TagModal
-            isOpen={tagModal}
-            tags={tags || []}
-            selectedTags={selectedTags}
-            toggleTag={toggleTag}
-            onClear={() => {
-              onClearTag();
-            }}
-            onComplete={() => setTagModal(false)}
-            isSearch={true}
-          />
         </div>
         <div className={clsx(searchFormStyles.clear_search_button)}>
           <Button
@@ -165,17 +154,6 @@ const SearchInput: React.FC<SearchFormProps> = ({
             onClick={handleModalResetButton}>
             クリア
           </Button>
-          <TagModal
-            isOpen={tagModal}
-            tags={tags || []}
-            selectedTags={selectedTags}
-            toggleTag={toggleTag}
-            onClear={() => {
-              onClearTag();
-            }}
-            onComplete={() => setTagModal(false)}
-            isSearch={true}
-          />
         </div>
       </div>
       {selectedTags.length ? (
