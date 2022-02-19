@@ -110,6 +110,10 @@ const EventCardList: React.FC<EventCardListProps> = ({
       <SearchForm
         searchTarget="other"
         isVisible={visibleSearchFormModal}
+        onClear={() => {
+          queryRefresh({word: ''}, []);
+          setVisibleSearchFormModal(false);
+        }}
         onCloseModal={() => setVisibleSearchFormModal(false)}
         onSubmit={values => {
           queryRefresh({word: values.word}, values.selectedTags);
