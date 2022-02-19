@@ -1,7 +1,7 @@
 import { useMutation, UseMutationOptions } from 'react-query';
 import { Wiki } from 'src/types';
-import { toggleGoodForBoardURL } from 'src/utils/url/chat.url';
 import { jsonHeader } from 'src/utils/url/header';
+import { toggleGoodForBoardURL } from 'src/utils/url/wiki.url';
 import { axiosInstance } from '../../../utils/url';
 
 const toggleGoodForBoard = async (wikiID: number) => {

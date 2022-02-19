@@ -22,7 +22,6 @@ export const albumURL = (roomId: string) =>
   `${chatURL}/v2/room/${roomId}/album`;
 export const albumImageURL = `${chatURL}/v2/room/album/images`;
 export const noteImageURL = `${chatURL}/v2/room/note/images`;
-export const toggleGoodForBoardURL = `/${chatURL}/toggle-good-for-board`;
 
 //GET
 export const getChatNotesURL = (roomId: string, page: string) =>
