@@ -47,9 +47,11 @@ export class WikiController {
   @Get('list')
   @UseGuards(JwtAuthenticationGuard)
   async getWikiList(
+    @Req() req: RequestWithUser,
     @Query() query: SearchQueryToGetWiki,
   ): Promise<SearchResultToGetWiki> {
-    return await this.qaService.getWikiList(query);
+    const userID = req.user.id;
+    return await this.qaService.getWikiList(userID, query);
   }
 
   @Get('detail/:id')
@@ -127,8 +129,8 @@ export class WikiController {
   @Post('toggle-good-for-board')
   async toggleGoodForBoard(
     @Req() req: RequestWithUser,
-    @Body() WikiID: number,
+    @Body() WikiID: { id: number },
   ): Promise<Partial<Wiki>> {
-    return this.qaService.toggleGoodForBoard(req.user.id, WikiID);
+    return this.qaService.toggleGoodForBoard(req.user.id, WikiID.id);
   }
 }

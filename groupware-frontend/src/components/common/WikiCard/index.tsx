@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { dateTimeFormatterFromJSDDate } from 'src/utils/dateTimeFormatter';
 import { BoardCategory, Wiki, WikiType } from 'src/types';
 import { Box, Button, Link, Text, useMediaQuery } from '@chakra-ui/react';
@@ -7,6 +7,8 @@ import { wikiTypeNameFactory } from 'src/utils/wiki/wikiTypeNameFactory';
 import UserAvatar from '../UserAvatar';
 import { darkFontColor } from 'src/utils/colors';
 import { hideScrollbarCss } from 'src/utils/chakra/hideScrollBar.css';
+import { AiOutlineHeart } from 'react-icons/ai';
+import { useToggleGoodForBoard } from '@/hooks/api/wiki/useAPIToggleGoodForBoard';
 
 type WikiCardProps = {
   wiki: Wiki;
@@ -14,7 +16,8 @@ type WikiCardProps = {
 
 const WikiCard: React.FC<WikiCardProps> = ({ wiki }) => {
   const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
-  const { title, writer, tags, createdAt, answers } = wiki;
+  const { title, writer, tags, createdAt, answers, isGoodSender } = wiki;
+  const [isPressHeart, setIsPressHeart] = useState<boolean>(isGoodSender);
   const tagButtonColor = useMemo(() => {
     switch (wiki.type) {
       case WikiType.BOARD:
@@ -26,9 +29,16 @@ const WikiCard: React.FC<WikiCardProps> = ({ wiki }) => {
     }
   }, [wiki.type]);
 
+  const { mutate } = useToggleGoodForBoard({
+    onSuccess: (result) => {
+      if (wiki.id === result.id && result.isGoodSender !== undefined) {
+        setIsPressHeart(result.isGoodSender);
+      }
+    },
+  });
+
   return (
-    <Link
-      href={`/wiki/detail/${wiki.id}`}
+    <Box
       w={isSmallerThan768 ? '100vw' : 'min(1600px, 70vw)'}
       minH="104px"
       shadow="md"
@@ -36,7 +46,16 @@ const WikiCard: React.FC<WikiCardProps> = ({ wiki }) => {
       borderColor={'gray.300'}
       bg="#ececec"
       py="4px"
-      _hover={{ textDecoration: 'none', cursor: 'pointer' }}>
+      position="relative">
+      <Link
+        position="absolute"
+        top={0}
+        left={0}
+        right={0}
+        bottom={0}
+        href={`/wiki/detail/${wiki.id}`}
+        zIndex={-500}
+      />
       <Box
         px="16px"
         display="flex"
@@ -101,6 +120,22 @@ const WikiCard: React.FC<WikiCardProps> = ({ wiki }) => {
           {dateTimeFormatterFromJSDDate({ dateTime: new Date(createdAt) })}
         </Text>
       </Box>
+      {wiki.type === WikiType.BOARD && (
+        <Box w={40} zIndex={5}>
+          <Link
+            zIndex={5}
+            onClick={() => {
+              mutate(wiki.id);
+            }}>
+            <a>
+              <AiOutlineHeart
+                size={40}
+                color={isPressHeart ? 'red' : 'white'}
+              />
+            </a>
+          </Link>
+        </Box>
+      )}
       <Box
         display="flex"
         flexDir={isSmallerThan768 ? 'column' : 'row'}
@@ -111,7 +146,7 @@ const WikiCard: React.FC<WikiCardProps> = ({ wiki }) => {
           flexDir="row"
           overflowX="auto"
           css={hideScrollbarCss}>
-          <Link mr="4px" _hover={{ textDecoration: 'none' }}>
+          <Link mr="4px" zIndex={5} _hover={{ textDecoration: 'none' }}>
             <Button colorScheme={tagButtonColor} color="white" size="xs">
               {wikiTypeNameFactory(
                 wiki.type,
@@ -124,6 +159,7 @@ const WikiCard: React.FC<WikiCardProps> = ({ wiki }) => {
           {tags && tags.length
             ? tags.map((t) => (
                 <Link
+                  zIndex={5}
                   href={`/wiki/list?tag=${t.id}`}
                   key={t.id}
                   mr="4px"
@@ -136,7 +172,7 @@ const WikiCard: React.FC<WikiCardProps> = ({ wiki }) => {
             : null}
         </Box>
       </Box>
-    </Link>
+    </Box>
   );
 };
 
