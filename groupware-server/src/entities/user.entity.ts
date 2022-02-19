@@ -298,7 +298,7 @@ export class User {
   })
   chatGroups?: ChatGroup[];
 
-  @ManyToMany(() => Wiki, (board) => board.userGoodForBoard, {
+  @ManyToMany(() => Wiki, (wiki) => wiki.userGoodForBoard, {
     onUpdate: 'CASCADE',
     onDelete: 'CASCADE',
   })
