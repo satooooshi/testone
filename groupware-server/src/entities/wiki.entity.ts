@@ -197,5 +197,5 @@ export class Wiki {
     this.body = await genSignedURL(this.body);
   }
 
-  isSender?: boolean;
+  isGoodSender?: boolean;
 }
