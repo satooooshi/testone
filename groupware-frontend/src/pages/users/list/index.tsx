@@ -103,6 +103,12 @@ const UserList = () => {
     }
   }, [query.tag, tags]);
 
+  const resetSearch = () => {
+    setSelectedTags([]);
+    setSearchWord('');
+    queryRefresh({ page: '1', word: '' });
+  };
+
   return (
     <LayoutWithTab
       sidebar={{ activeScreenName: SidebarScreenName.USERS }}
@@ -118,13 +124,14 @@ const UserList = () => {
         </Box>
         <div className={userListStyles.search_form_wrapper}>
           <SearchForm
-            onClear={() => setSelectedTags([])}
+            onClearTag={() => setSelectedTags([])}
             value={searchWord || ''}
             onChange={(e) => setSearchWord(e.currentTarget.value)}
             onClickButton={() => queryRefresh({ page: '1', word: searchWord })}
             tags={tags || []}
             selectedTags={selectedTags}
             toggleTag={onToggleTag}
+            onClear={() => resetSearch()}
           />
         </div>
         {!isLoading && !users?.users.length && (

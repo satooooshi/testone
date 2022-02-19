@@ -79,6 +79,12 @@ const UserAdmin: React.FC = () => {
     router.push(`/admin/users${queryParam}`, undefined, { shallow: true });
   };
 
+  const resetSearch = () => {
+    setSelectedTags([]);
+    setSearchWord('');
+    queryRefresh({ page: '1', word: '' });
+  };
+
   useEffect(() => {
     if (user?.role !== UserRole.ADMIN) {
       router.back();
@@ -114,13 +120,14 @@ const UserAdmin: React.FC = () => {
       </Head>
       <div className={userAdminStyles.search_form_wrapper}>
         <SearchForm
-          onClear={() => setSelectedTags([])}
+          onClearTag={() => setSelectedTags([])}
           value={searchWord || ''}
           onChange={(e) => setSearchWord(e.currentTarget.value)}
           onClickButton={() => queryRefresh({ page: '1', word: searchWord })}
           tags={tags || []}
           selectedTags={selectedTags}
           toggleTag={onToggleTag}
+          onClear={() => resetSearch()}
         />
         {!isLoading && !users?.users.length && (
           <Text alignItems="center" textAlign="center" mb={4}>

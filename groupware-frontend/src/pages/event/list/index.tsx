@@ -467,6 +467,12 @@ const EventList = () => {
     },
   ];
 
+  const resetSearch = () => {
+    setSelectedTags([]);
+    setSearchWord('');
+    queryRefresh({ page: '1', word: '' });
+  };
+
   return (
     <LayoutWithTab
       header={initialHeaderValue}
@@ -533,7 +539,7 @@ const EventList = () => {
           <>
             <div className={eventListStyles.search_form_wrapper}>
               <SearchForm
-                onClear={() => setSelectedTags([])}
+                onClearTag={() => setSelectedTags([])}
                 value={searchWord || ''}
                 onChange={(e) => setSearchWord(e.currentTarget.value)}
                 onClickButton={() =>
@@ -542,6 +548,7 @@ const EventList = () => {
                 tags={tags || []}
                 selectedTags={selectedTags}
                 toggleTag={onToggleTag}
+                onClear={() => resetSearch()}
               />
             </div>
             <div className={eventListStyles.event_list_wrapper}>

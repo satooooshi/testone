@@ -297,6 +297,12 @@ const QAQuestionList = () => {
 
   const isQA = type === WikiType.BOARD && board_category === BoardCategory.QA;
 
+  const resetSearch = () => {
+    setSelectedTags([]);
+    setSearchWord('');
+    queryRefresh({ page: '1', word: '' });
+  };
+
   return (
     <LayoutWithTab
       sidebar={{ activeScreenName: SidebarScreenName.QA }}
@@ -317,7 +323,7 @@ const QAQuestionList = () => {
       <div className={qaListStyles.top_contents_wrapper}>
         <div className={qaListStyles.search_form_wrapper}>
           <SearchForm
-            onClear={() => setSelectedTags([])}
+            onClearTag={() => setSelectedTags([])}
             value={searchWord}
             onChange={(e) => setSearchWord(e.currentTarget.value)}
             onClickButton={() =>
@@ -332,6 +338,7 @@ const QAQuestionList = () => {
             tags={tags || []}
             selectedTags={selectedTags}
             toggleTag={onToggleTag}
+            onClear={() => resetSearch()}
           />
         </div>
         {!isLoading && !questions?.wiki.length && (

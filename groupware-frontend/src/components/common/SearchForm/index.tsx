@@ -63,6 +63,7 @@ type SearchFormProps = {
   tags?: Tag[];
   selectedTags?: Tag[];
   toggleTag: (t: Tag) => void;
+  onClearTag: () => void;
   onClear: () => void;
 };
 
@@ -73,6 +74,7 @@ const SearchInput: React.FC<SearchFormProps> = ({
   tags = [],
   selectedTags = [],
   toggleTag,
+  onClearTag,
   onClear,
 }) => {
   const [tagModal, setTagModal] = useState(false);
@@ -82,6 +84,12 @@ const SearchInput: React.FC<SearchFormProps> = ({
   const handleModalSearchButton = () => {
     onClickButton();
     setSearchedWord(value);
+    isSmallerThan768 && hideSearchModal();
+  };
+
+  const handleModalResetButton = () => {
+    setSearchedWord('');
+    onClear();
     isSmallerThan768 && hideSearchModal();
   };
 
@@ -126,7 +134,7 @@ const SearchInput: React.FC<SearchFormProps> = ({
           selectedTags={selectedTags}
           toggleTag={toggleTag}
           onClear={() => {
-            onClear();
+            onClearTag();
           }}
           onComplete={() => setTagModal(false)}
           isSearch={true}
@@ -144,7 +152,26 @@ const SearchInput: React.FC<SearchFormProps> = ({
             selectedTags={selectedTags}
             toggleTag={toggleTag}
             onClear={() => {
-              onClear();
+              onClearTag();
+            }}
+            onComplete={() => setTagModal(false)}
+            isSearch={true}
+          />
+        </div>
+        <div className={clsx(searchFormStyles.clear_search_button)}>
+          <Button
+            width={isSmallerThan768 ? '100%' : '15vw'}
+            colorScheme="gray"
+            onClick={handleModalResetButton}>
+            クリア
+          </Button>
+          <TagModal
+            isOpen={tagModal}
+            tags={tags || []}
+            selectedTags={selectedTags}
+            toggleTag={toggleTag}
+            onClear={() => {
+              onClearTag();
             }}
             onComplete={() => setTagModal(false)}
             isSearch={true}
