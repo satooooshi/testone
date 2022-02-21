@@ -76,7 +76,6 @@ import io from 'socket.io-client';
 import {baseURL} from '../../utils/url';
 import {getThumbnailOfVideo} from '../../utils/getThumbnailOfVideo';
 import {useAuthenticate} from '../../contexts/useAuthenticate';
-// import {yellow100} from 'react-native-paper/lib/typescript/styles/colors';
 
 const socket = io(baseURL, {
   transports: ['websocket'],
@@ -97,9 +96,11 @@ const Chat: React.FC = () => {
   const {data: roomDetail, refetch: refetchRoomDetail} = useAPIGetRoomDetail(
     room.id,
   );
-  const [page, setPage] = useState(1);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [focusedMessageID, setFocusedMessageID] = useState<number>();
+  const [after, setAfter] = useState<number>();
+  const [before, setBefore] = useState<number>();
+  const [include, setInclude] = useState<boolean>();
   const [inputtedSearchWord, setInputtedSearchWord] = useState('');
   const [imageModal, setImageModal] = useState(false);
   const [visibleSearchInput, setVisibleSearchInput] = useState(false);
@@ -147,8 +148,12 @@ const Chat: React.FC = () => {
     isLoading: loadingMessages,
     isFetching: fetchingMessages,
   } = useAPIGetMessages({
+    // group: room.id,
+    // page: page.toString(),
     group: room.id,
-    page: page.toString(),
+    after,
+    before,
+    include,
   });
   const {data: searchedResults, refetch: searchMessages} = useAPISearchMessages(
     {
@@ -170,7 +175,7 @@ const Chat: React.FC = () => {
   const {refetch: refetchLatest} = useAPIGetMessages(
     {
       group: room.id,
-      page: '1',
+      // page: '1',
     },
     {
       enabled: false,
@@ -357,11 +362,11 @@ const Chat: React.FC = () => {
     setVideo(url);
   };
 
-  const onEndReached = () => {
-    if (fetchedPastMessages?.length) {
-      setPage(p => p + 1);
-    }
-  };
+  // const onEndReached = () => {
+  //   if (fetchedPastMessages?.length) {
+  //     setPage(p => p + 1);
+  //   }
+  // };
 
   const isRecent = (created: ChatMessage, target: ChatMessage): boolean => {
     if (new Date(created.createdAt) > new Date(target.createdAt)) {
@@ -412,6 +417,34 @@ const Chat: React.FC = () => {
           index: messageIndex,
         });
       }
+    }
+  };
+  const refreshMessage = (targetMessages: ChatMessage[]): ChatMessage[] => {
+    const arrayIncludesDuplicate = [...messages, ...targetMessages];
+    return arrayIncludesDuplicate
+      .filter((value, index, self) => {
+        return index === self.findIndex(m => m.id === value.id);
+      })
+      .sort((a, b) => b.id - a.id);
+  };
+  useEffect(() => {
+    setMessages([]);
+    setBefore(undefined);
+    setAfter(undefined);
+    refetchLatest();
+  }, [refetchLatest, room]);
+
+  useEffect(() => {
+    if (fetchedPastMessages?.length) {
+      const refreshedMessage = refreshMessage(fetchedPastMessages);
+      setMessages(refreshedMessage);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fetchedPastMessages]);
+
+  const onScrollTopOnChat = () => {
+    if (fetchedPastMessages?.length) {
+      setBefore(messages[messages.length - 1].id);
     }
   };
 
@@ -588,7 +621,7 @@ const Chat: React.FC = () => {
             style={chatStyles.flatlist}
             inverted
             data={messages}
-            {...{onEndReached}}
+            // {...{onEndReached}}
             renderItem={({item: message, index}) =>
               renderMessage(message, index)
             }
@@ -627,6 +660,7 @@ const Chat: React.FC = () => {
       ) : (
         <>
           <KeyboardAwareFlatList
+            onEndReached={() => onScrollTopOnChat()}
             innerRef={ref => (messageAndroidRef.current.flatListRef = ref)}
             refreshing={true}
             style={chatStyles.flatlist}
@@ -640,7 +674,7 @@ const Chat: React.FC = () => {
             contentContainerStyle={chatStyles.flatlistContent}
             inverted
             data={messages}
-            {...{onEndReached}}
+            // {...{onEndReached}}
             keyExtractor={item => item.id.toString()}
             renderItem={({item: message, index}) =>
               renderMessage(message, index)

@@ -7,13 +7,15 @@ import {AxiosError} from 'axios';
 
 export interface GetMessagesQuery {
   group: number;
-  page?: string;
+  after?: number;
+  before?: number;
+  include?: boolean;
 }
 
 const getMessages = async (query: GetMessagesQuery) => {
-  const {group, page = 1} = query;
+  const {group, after = '', before = '', include} = query;
   const res = await axiosInstance.get<ChatMessage[]>(
-    `${getChatMessagesURL}?group=${group}&page=${page}`,
+    `${getChatMessagesURL}?group=${group}&after=${after}&before=${before}&include=${include}`,
   );
   await Promise.all(
     res.data.map(async m => {
