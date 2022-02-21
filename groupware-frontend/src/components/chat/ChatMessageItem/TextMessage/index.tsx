@@ -1,6 +1,6 @@
 import UserAvatar from '@/components/common/UserAvatar';
 import { Box, Text, useMediaQuery } from '@chakra-ui/react';
-import React, { ReactNode } from 'react';
+import React from 'react';
 import { ChatMessage, ChatMessageType } from 'src/types';
 import { darkFontColor } from 'src/utils/colors';
 import { userNameFactory } from 'src/utils/factory/userNameFactory';
@@ -9,13 +9,9 @@ import Linkify from 'react-linkify';
 
 type TextMessageProps = {
   message: ChatMessage;
-  confirmedSearchWord: string;
 };
 
-const TextMessage: React.FC<TextMessageProps> = ({
-  message,
-  confirmedSearchWord,
-}) => {
+const TextMessage: React.FC<TextMessageProps> = ({ message }) => {
   const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
   const replyContent = (parentMsg: ChatMessage) => {
     switch (parentMsg.type) {
@@ -28,19 +24,6 @@ const TextMessage: React.FC<TextMessageProps> = ({
       case ChatMessageType.OTHER_FILE:
         return 'ファイル';
     }
-  };
-
-  const highlightSearchedWord = (text: string): ReactNode => {
-    if (confirmedSearchWord) {
-      const Exp = new RegExp(`(${confirmedSearchWord.replace(' ', '|')})`);
-      return text.split(Exp).map((t) => {
-        if (t.match(Exp)) {
-          return <Text as="mark">{t}</Text>;
-        }
-        return t;
-      });
-    }
-    return text;
   };
 
   return (
@@ -81,7 +64,7 @@ const TextMessage: React.FC<TextMessageProps> = ({
           wordBreak={'break-word'}
           color={message.isSender ? 'white' : darkFontColor}
           bg={message.isSender ? 'blue.500' : '#ececec'}>
-          {highlightSearchedWord(mentionTransform(message.content))}
+          {mentionTransform(message.content)}
         </Text>
       </Linkify>
     </Box>
