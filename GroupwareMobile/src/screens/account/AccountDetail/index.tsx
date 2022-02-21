@@ -36,6 +36,7 @@ import uuid from 'react-native-uuid';
 import {rtmEngine} from '../../../navigator';
 import Config from 'react-native-config';
 import {useInviteCall} from '../../../contexts/call/useInviteCall';
+
 const getNewUuid = () => uuid.v4();
 
 const TopTab = createMaterialTopTabNavigator();
@@ -230,7 +231,7 @@ const AccountDetail: React.FC = () => {
   const inviteCall = async () => {
     if (profile) {
       await rtmEngine.createInstance(Config.AGORA_APP_ID);
-      const parsedUUid = getNewUuid();
+      const parsedUUid = uuid.v4();
       const localInvitation = await rtmEngine.createLocalInvitation(
         profile.id.toString(),
         userNameFactory(user),

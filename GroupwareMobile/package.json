@@ -74,7 +74,7 @@
     "react-native-render-html": "^6.2.0",
     "react-native-safe-area-context": "^3.3.2",
     "react-native-screens": "^3.8.0",
-    "react-native-sound": "^0.11.2",
+    "react-native-sound-player": "^0.11.3",
     "react-native-switch-audio-output-android": "^1.0.2",
     "react-native-tab-view": "^3.1.1",
     "react-native-uuid": "^2.0.1",

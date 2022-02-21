@@ -25,8 +25,9 @@ import {Alert, Platform} from 'react-native';
 import Config from 'react-native-config';
 import VideoCall from '../components/call/VideoCall';
 import VoiceCall from '../components/call/VoiceCall';
-import Sound from 'react-native-sound';
 import {useInviteCall} from '../contexts/call/useInviteCall';
+import SoundPlayer from 'react-native-sound-player';
+
 const Stack = createStackNavigator<RootStackParamList>();
 export const rtmEngine = new RtmClient();
 let rtcEngine: RtcEngine;
@@ -40,6 +41,7 @@ const Navigator = () => {
   const [agoraToken, setAgoraToken] = useState('');
   const [channelName, setChannelName] = useState('');
   const [onCallUid, setOnCallUid] = useState('2');
+  const [alertCountOnEndCall, setAlertCountOnEndCall] = useState(0);
   const AGORA_APP_ID = Config.AGORA_APP_ID;
   const rtcProps: RtcPropsInterface = {
     appId: AGORA_APP_ID,
@@ -58,17 +60,29 @@ const Navigator = () => {
   sound.setVolume(1);
   sound.setPan(1);
   const remoteInvitation = useRef<RemoteInvitation | undefined>();
+
+  const soundOnEnd = async () => {
+    try {
+      SoundPlayer.playSoundFile('end_call', 'mp3');
+    } catch (e) {
+      console.log('sound on end call failed:', e);
+    }
+  };
   const endCall = async () => {
     sound.stop(() => {
       sound.play();
     });
     // sound.release();
     remoteInvitation.current = undefined;
+    setAlertCountOnEndCall(c => c + 1);
+    await soundOnEnd();
+    console.log('sound on end ');
     await rtcEngine?.leaveChannel();
     RNCallKeep.endAllCalls();
     disableInvitationFlag();
     setCall(false);
     setChannelName('');
+    navigationRef.current?.navigate('Main');
   };
 
   const callbacks: Partial<CallbacksInterface> = {
@@ -102,7 +116,6 @@ const Navigator = () => {
     });
     rtcEngine?.addListener('UserOffline', (uid, reason) => {
       console.log('UserOffline', uid, reason);
-      Alert.alert('通話が終了しました');
       endCall();
     });
     rtcEngine?.addListener('LeaveChannel', ({userCount}) => {
@@ -160,6 +173,9 @@ const Navigator = () => {
 
   const displayIncomingCallNow = (callingData: RemoteInvitation) => {
     console.log('Event: Display Incoming Call: ', callingData);
+    remoteInvitation.current = callingData;
+    setOnCallUid(callingData?.callerId as string);
+    RNCallKeep.backToForeground();
     RNCallKeep.displayIncomingCall(
       callingData?.channelId as string,
       userNameFactory(user),
@@ -181,7 +197,12 @@ const Navigator = () => {
       await rtcEngine?.joinChannel(tokenForCall, realChannelName, null, userId);
       await rtcEngine?.disableVideo();
       setChannelName(realChannelName);
+<<<<<<< HEAD
       setCall(true);
+=======
+      setVideoCall(true);
+      navigateToCallWindow();
+>>>>>>> 281f7a83ac8ede2d2be477ca12c4d12dfa0277e2
     }
   };
 
@@ -202,6 +223,24 @@ const Navigator = () => {
     }
   };
 
+  const navigateToCallWindow = () => {
+    navigationRef.current?.navigate('Call');
+  };
+
+  //useEffectで処理しないと複数回アラートが出る可能性がある
+  useEffect(() => {
+    if (alertCountOnEndCall === 1) {
+      Alert.alert('通話が終了しました', '', [
+        {
+          text: 'OK',
+          onPress: () => {
+            setAlertCountOnEndCall(0);
+          },
+        },
+      ]);
+    }
+  }, [alertCountOnEndCall]);
+
   useEffect(() => {
     rtcInit();
     callKeepSetup();
@@ -213,15 +252,13 @@ const Navigator = () => {
     rtmEngine.addListener(
       'RemoteInvitationReceived',
       (invitation: RemoteInvitation) => {
-        setOnCallUid(invitation?.callerId as string);
-        RNCallKeep.backToForeground();
-        remoteInvitation.current = invitation;
         displayIncomingCallNow(invitation);
       },
     );
     RNCallKeep.addEventListener('answerCall', answerCall);
     return () => {
       RNCallKeep.removeEventListener('answerCall');
+      rtcEngine.removeAllListeners();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

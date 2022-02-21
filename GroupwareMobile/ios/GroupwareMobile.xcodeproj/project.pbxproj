@@ -16,6 +16,7 @@
 		75236F632797F7BE004360E1 /* CallKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 75236F622797F7BE004360E1 /* CallKit.framework */; };
 		753A358027587EAB00FD41E5 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 753A357F27587EAB00FD41E5 /* GoogleService-Info.plist */; };
 		753A35892759FD9900FD41E5 /* BootSplash.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 753A35882759FD9900FD41E5 /* BootSplash.storyboard */; };
+		7542A1F327BE7F45009FAA2E /* end_call.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 7542A1F227BE7F45009FAA2E /* end_call.mp3 */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
 		91AB0A1E1051C62486C94D78 /* libPods-GroupwareMobile-GroupwareMobileTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2BB485AD61E420A6B352227A /* libPods-GroupwareMobile-GroupwareMobileTests.a */; };
 		9FD60BC1D719494D0ACCE86C /* libPods-GroupwareMobile.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1FF66F4F0BC4328C9F6808C7 /* libPods-GroupwareMobile.a */; };
@@ -53,6 +54,7 @@
 		753A357F27587EAB00FD41E5 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		753A35832758C3F800FD41E5 /* GroupwareMobile.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = GroupwareMobile.entitlements; path = GroupwareMobile/GroupwareMobile.entitlements; sourceTree = "<group>"; };
 		753A35882759FD9900FD41E5 /* BootSplash.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = BootSplash.storyboard; path = GroupwareMobile/BootSplash.storyboard; sourceTree = "<group>"; };
+		7542A1F227BE7F45009FAA2E /* end_call.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = end_call.mp3; path = ../assets/end_call.mp3; sourceTree = "<group>"; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = GroupwareMobile/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		ACB31023C8DDA645769A26CE /* Pods-GroupwareMobile.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-GroupwareMobile.debug.xcconfig"; path = "Target Support Files/Pods-GroupwareMobile/Pods-GroupwareMobile.debug.xcconfig"; sourceTree = "<group>"; };
 		C5A2518973110DA0843777F3 /* Pods-GroupwareMobile-GroupwareMobileTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-GroupwareMobile-GroupwareMobileTests.debug.xcconfig"; path = "Target Support Files/Pods-GroupwareMobile-GroupwareMobileTests/Pods-GroupwareMobile-GroupwareMobileTests.debug.xcconfig"; sourceTree = "<group>"; };
@@ -137,6 +139,7 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
+				7542A1F227BE7F45009FAA2E /* end_call.mp3 */,
 				753A357F27587EAB00FD41E5 /* GoogleService-Info.plist */,
 				7520C28C271C173000C800B4 /* BridgingFile.swift */,
 				13B07FAE1A68108700A75B9A /* GroupwareMobile */,
@@ -271,6 +274,7 @@
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
 				C919375A27BE0A620066E26A /* endCall.mp3 in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
+				7542A1F327BE7F45009FAA2E /* end_call.mp3 in Resources */,
 				753A358027587EAB00FD41E5 /* GoogleService-Info.plist in Resources */,
 				753A35892759FD9900FD41E5 /* BootSplash.storyboard in Resources */,
 			);

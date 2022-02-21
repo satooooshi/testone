@@ -508,11 +508,16 @@ PODS:
   - RNScreens (3.8.0):
     - React-Core
     - React-RCTImage
+<<<<<<< HEAD
   - RNSound (0.11.2):
     - React-Core
     - RNSound/Core (= 0.11.2)
   - RNSound/Core (0.11.2):
     - React-Core
+=======
+  - RNSoundPlayer (0.11.3):
+    - React
+>>>>>>> 281f7a83ac8ede2d2be477ca12c4d12dfa0277e2
   - RNVectorIcons (8.1.0):
     - React-Core
   - SDWebImage (5.11.1):
@@ -606,7 +611,7 @@ DEPENDENCIES:
   - RNImageCropPicker (from `../node_modules/react-native-image-crop-picker`)
   - RNReanimated (from `../node_modules/react-native-reanimated`)
   - RNScreens (from `../node_modules/react-native-screens`)
-  - RNSound (from `../node_modules/react-native-sound`)
+  - RNSoundPlayer (from `../node_modules/react-native-sound-player`)
   - RNVectorIcons (from `../node_modules/react-native-vector-icons`)
   - Yoga (from `../node_modules/react-native/ReactCommon/yoga`)
 
@@ -757,8 +762,13 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-reanimated"
   RNScreens:
     :path: "../node_modules/react-native-screens"
+<<<<<<< HEAD
   RNSound:
     :path: "../node_modules/react-native-sound"
+=======
+  RNSoundPlayer:
+    :path: "../node_modules/react-native-sound-player"
+>>>>>>> 281f7a83ac8ede2d2be477ca12c4d12dfa0277e2
   RNVectorIcons:
     :path: "../node_modules/react-native-vector-icons"
   Yoga:
@@ -848,7 +858,11 @@ SPEC CHECKSUMS:
   RNImageCropPicker: 73891a709e6fd8a47d32104d942757971f220aee
   RNReanimated: b04ef2a4f0cb61b062bbcf033f84a9e470f4f60b
   RNScreens: 6e1ea5787989f92b0671049b808aef64fa1ef98c
+<<<<<<< HEAD
   RNSound: 6c156f925295bdc83e8e422e7d8b38d33bc71852
+=======
+  RNSoundPlayer: 6b5532fb8e9afe17af48e62813c80ad568aea5d3
+>>>>>>> 281f7a83ac8ede2d2be477ca12c4d12dfa0277e2
   RNVectorIcons: 31cebfcf94e8cf8686eb5303ae0357da64d7a5a4
   SDWebImage: a7f831e1a65eb5e285e3fb046a23fcfbf08e696d
   SDWebImageWebPCoder: f93010f3f6c031e2f8fb3081ca4ee6966c539815
