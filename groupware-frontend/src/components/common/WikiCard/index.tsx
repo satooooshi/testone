@@ -54,13 +54,6 @@ const WikiCard: React.FC<WikiCardProps> = ({ wiki }) => {
     },
   });
 
-  const memoWriter = useMemo<User | undefined>(() => {
-    if (writer) {
-      return writer;
-    }
-    return;
-  }, [writer]);
-
   const tagButtonColor = useMemo(() => {
     switch (wiki.type) {
       case WikiType.BOARD:
@@ -89,7 +82,6 @@ const WikiCard: React.FC<WikiCardProps> = ({ wiki }) => {
         right={0}
         bottom={0}
         href={`/wiki/detail/${wiki.id}`}
-        zIndex={-500}
       />
       <Box
         px="16px"
@@ -156,21 +148,19 @@ const WikiCard: React.FC<WikiCardProps> = ({ wiki }) => {
         </Text>
       </Box>
       {wiki.type === WikiType.BOARD && (
-        <Box w={40} zIndex={5}>
+        <Box w={40}>
           <Link
-            zIndex={5}
+            position={'relative'}
             onClick={() => {
               mutate(wiki.id);
             }}>
-            <AiOutlineHeart size={40} color={isPressHeart ? 'red' : 'white'} />
-            <Text>{userGoodForBoard?.length}</Text>
+            <AiOutlineHeart size={30} color={isPressHeart ? 'red' : 'black'} />
           </Link>
           <Link
-            zIndex={5}
             onClick={() => {
               setGoodSendersModal(true);
             }}>
-            <Button>いいねしたユーザー</Button>
+            <Button>{`${userGoodForBoard?.length}件のいいね`}</Button>
           </Link>
         </Box>
       )}
@@ -189,7 +179,7 @@ const WikiCard: React.FC<WikiCardProps> = ({ wiki }) => {
           flexDir="row"
           overflowX="auto"
           css={hideScrollbarCss}>
-          <Link mr="4px" zIndex={5} _hover={{ textDecoration: 'none' }}>
+          <Link mr="4px" _hover={{ textDecoration: 'none' }}>
             <Button colorScheme={tagButtonColor} color="white" size="xs">
               {wikiTypeNameFactory(
                 wiki.type,
@@ -202,7 +192,6 @@ const WikiCard: React.FC<WikiCardProps> = ({ wiki }) => {
           {tags && tags.length
             ? tags.map((t) => (
                 <Link
-                  zIndex={5}
                   href={`/wiki/list?tag=${t.id}`}
                   key={t.id}
                   mr="4px"
