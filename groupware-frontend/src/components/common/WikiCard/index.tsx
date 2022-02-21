@@ -8,6 +8,7 @@ import UserAvatar from '../UserAvatar';
 import { darkFontColor } from 'src/utils/colors';
 import { hideScrollbarCss } from 'src/utils/chakra/hideScrollBar.css';
 import { AiOutlineHeart } from 'react-icons/ai';
+import GoodSendersModal from '@/components/wiki/GoodSendersModal';
 
 type WikiCardProps = {
   wiki: Wiki;
@@ -16,6 +17,7 @@ type WikiCardProps = {
 
 const WikiCard: React.FC<WikiCardProps> = ({ wiki, onPressHeartIcon }) => {
   const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
+  const [goodSendersModal, setGoodSendersModal] = useState(false);
   const {
     title,
     writer,
@@ -127,16 +129,23 @@ const WikiCard: React.FC<WikiCardProps> = ({ wiki, onPressHeartIcon }) => {
             onClick={() => {
               onPressHeartIcon();
             }}>
-            <a>
-              <AiOutlineHeart
-                size={40}
-                color={isGoodSender ? 'red' : 'white'}
-              />
-            </a>
+            <AiOutlineHeart size={40} color={isGoodSender ? 'red' : 'white'} />
             <Text>{userGoodForBoard?.length}</Text>
+          </Link>
+          <Link
+            zIndex={5}
+            onClick={() => {
+              setGoodSendersModal(true);
+            }}>
+            <Button>いいねしたユーザー</Button>
           </Link>
         </Box>
       )}
+      <GoodSendersModal
+        isOpen={goodSendersModal}
+        onClose={() => setGoodSendersModal(false)}
+        goodSenders={wiki.userGoodForBoard || []}
+      />
       <Box
         display="flex"
         flexDir={isSmallerThan768 ? 'column' : 'row'}
