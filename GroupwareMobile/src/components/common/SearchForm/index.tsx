@@ -60,7 +60,6 @@ const SearchForm: React.FC<SearchFormProps> = ({
   }, [defaultValue, setSelectedTags]);
 
   const handleOnClear = () => {
-    console.log('==============');
     setWord('');
     setSelectedTags([]);
     onClear();
