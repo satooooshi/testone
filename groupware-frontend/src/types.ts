@@ -152,7 +152,8 @@ export interface Wiki {
   bestAnswer?: QAAnswer;
   createdAt: Date;
   updatedAt: Date;
-  isGoodSender: boolean;
+  userGoodForBoard?: User[];
+  isGoodSender?: boolean;
 }
 
 export interface QAAnswerReply {

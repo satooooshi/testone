@@ -22,6 +22,7 @@ import { useHeaderTab } from '@/hooks/headerTab/useHeaderTab';
 import TopTabBar, { TopTabBehavior } from '@/components/layout/TopTabBar';
 import { Box, Radio, RadioGroup, Stack, Text } from '@chakra-ui/react';
 import { wikiTypeNameFactory } from 'src/utils/wiki/wikiTypeNameFactory';
+import { useToggleGoodForBoard } from '@/hooks/api/wiki/useAPIToggleGoodForBoard';
 
 const QAQuestionList = () => {
   const router = useRouter();
@@ -34,7 +35,11 @@ const QAQuestionList = () => {
     rule_category,
     board_category,
   } = router.query as SearchQueryToGetWiki;
-  const { data: questions, isLoading } = useAPIGetWikiList({
+  const {
+    refetch,
+    data: questions,
+    isLoading,
+  } = useAPIGetWikiList({
     page,
     tag,
     word,
@@ -46,6 +51,7 @@ const QAQuestionList = () => {
   const [searchWord, setSearchWord] = useState(word);
   const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
   const { data: tags } = useAPIGetTag();
+
   const boardTopTab: TopTabBehavior[] = [
     {
       tabName: '全て',
@@ -297,6 +303,19 @@ const QAQuestionList = () => {
 
   const isQA = type === WikiType.BOARD && board_category === BoardCategory.QA;
 
+  const { mutate } = useToggleGoodForBoard({
+    onSuccess: (result) => {
+      if (questions) {
+        for (const wiki of questions.wiki) {
+          if (wiki.id === result.id && result.isGoodSender !== undefined) {
+            wiki.isGoodSender = result.isGoodSender;
+          }
+        }
+      }
+      refetch();
+    },
+  });
+
   return (
     <LayoutWithTab
       sidebar={{ activeScreenName: SidebarScreenName.QA }}
@@ -365,7 +384,11 @@ const QAQuestionList = () => {
             </RadioGroup>
           ) : null}
           {questions?.wiki.map((q) => (
-            <WikiCard key={q.id} wiki={q} />
+            <WikiCard
+              onPressHeartIcon={() => mutate(q.id)}
+              key={q.id}
+              wiki={q}
+            />
           ))}
         </div>
       </div>

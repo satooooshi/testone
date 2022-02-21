@@ -8,16 +8,24 @@ import UserAvatar from '../UserAvatar';
 import { darkFontColor } from 'src/utils/colors';
 import { hideScrollbarCss } from 'src/utils/chakra/hideScrollBar.css';
 import { AiOutlineHeart } from 'react-icons/ai';
-import { useToggleGoodForBoard } from '@/hooks/api/wiki/useAPIToggleGoodForBoard';
 
 type WikiCardProps = {
   wiki: Wiki;
+  onPressHeartIcon: () => void;
 };
 
-const WikiCard: React.FC<WikiCardProps> = ({ wiki }) => {
+const WikiCard: React.FC<WikiCardProps> = ({ wiki, onPressHeartIcon }) => {
   const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
-  const { title, writer, tags, createdAt, answers, isGoodSender } = wiki;
-  const [isPressHeart, setIsPressHeart] = useState<boolean>(isGoodSender);
+  const {
+    title,
+    writer,
+    tags,
+    createdAt,
+    answers,
+    isGoodSender,
+    userGoodForBoard,
+  } = wiki;
+
   const tagButtonColor = useMemo(() => {
     switch (wiki.type) {
       case WikiType.BOARD:
@@ -28,14 +36,6 @@ const WikiCard: React.FC<WikiCardProps> = ({ wiki }) => {
         return 'green';
     }
   }, [wiki.type]);
-
-  const { mutate } = useToggleGoodForBoard({
-    onSuccess: (result) => {
-      if (wiki.id === result.id && result.isGoodSender !== undefined) {
-        setIsPressHeart(result.isGoodSender);
-      }
-    },
-  });
 
   return (
     <Box
@@ -125,14 +125,15 @@ const WikiCard: React.FC<WikiCardProps> = ({ wiki }) => {
           <Link
             zIndex={5}
             onClick={() => {
-              mutate(wiki.id);
+              onPressHeartIcon();
             }}>
             <a>
               <AiOutlineHeart
                 size={40}
-                color={isPressHeart ? 'red' : 'white'}
+                color={isGoodSender ? 'red' : 'white'}
               />
             </a>
+            <Text>{userGoodForBoard?.length}</Text>
           </Link>
         </Box>
       )}
