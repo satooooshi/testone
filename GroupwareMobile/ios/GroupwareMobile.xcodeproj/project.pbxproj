@@ -20,7 +20,7 @@
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
 		91AB0A1E1051C62486C94D78 /* libPods-GroupwareMobile-GroupwareMobileTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2BB485AD61E420A6B352227A /* libPods-GroupwareMobile-GroupwareMobileTests.a */; };
 		9FD60BC1D719494D0ACCE86C /* libPods-GroupwareMobile.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1FF66F4F0BC4328C9F6808C7 /* libPods-GroupwareMobile.a */; };
-		C919375A27BE0A620066E26A /* endCall.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = C919375927BE0A620066E26A /* endCall.mp3 */; };
+		C9BAB5AF27C3978F00497DFD /* call_ring.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = C9BAB5AE27C3978F00497DFD /* call_ring.mp3 */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -58,7 +58,7 @@
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = GroupwareMobile/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		ACB31023C8DDA645769A26CE /* Pods-GroupwareMobile.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-GroupwareMobile.debug.xcconfig"; path = "Target Support Files/Pods-GroupwareMobile/Pods-GroupwareMobile.debug.xcconfig"; sourceTree = "<group>"; };
 		C5A2518973110DA0843777F3 /* Pods-GroupwareMobile-GroupwareMobileTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-GroupwareMobile-GroupwareMobileTests.debug.xcconfig"; path = "Target Support Files/Pods-GroupwareMobile-GroupwareMobileTests/Pods-GroupwareMobile-GroupwareMobileTests.debug.xcconfig"; sourceTree = "<group>"; };
-		C919375927BE0A620066E26A /* endCall.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = endCall.mp3; path = ../assets/endCall.mp3; sourceTree = "<group>"; };
+		C9BAB5AE27C3978F00497DFD /* call_ring.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = call_ring.mp3; path = ../assets/call_ring.mp3; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
@@ -104,7 +104,6 @@
 		13B07FAE1A68108700A75B9A /* GroupwareMobile */ = {
 			isa = PBXGroup;
 			children = (
-				C919375927BE0A620066E26A /* endCall.mp3 */,
 				753A35882759FD9900FD41E5 /* BootSplash.storyboard */,
 				753A35832758C3F800FD41E5 /* GroupwareMobile.entitlements */,
 				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
@@ -139,6 +138,7 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
+				C9BAB5AE27C3978F00497DFD /* call_ring.mp3 */,
 				7542A1F227BE7F45009FAA2E /* end_call.mp3 */,
 				753A357F27587EAB00FD41E5 /* GoogleService-Info.plist */,
 				7520C28C271C173000C800B4 /* BridgingFile.swift */,
@@ -272,7 +272,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
-				C919375A27BE0A620066E26A /* endCall.mp3 in Resources */,
+				C9BAB5AF27C3978F00497DFD /* call_ring.mp3 in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				7542A1F327BE7F45009FAA2E /* end_call.mp3 in Resources */,
 				753A358027587EAB00FD41E5 /* GoogleService-Info.plist in Resources */,
