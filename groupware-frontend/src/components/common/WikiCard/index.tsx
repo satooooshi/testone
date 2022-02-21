@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { dateTimeFormatterFromJSDDate } from 'src/utils/dateTimeFormatter';
-import { BoardCategory, Wiki, WikiType } from 'src/types';
+import { BoardCategory, User, Wiki, WikiType } from 'src/types';
 import { Box, Button, Link, Text, useMediaQuery } from '@chakra-ui/react';
 import { tagColorFactory } from 'src/utils/factory/tagColorFactory';
 import { wikiTypeNameFactory } from 'src/utils/wiki/wikiTypeNameFactory';
@@ -9,15 +9,17 @@ import { darkFontColor } from 'src/utils/colors';
 import { hideScrollbarCss } from 'src/utils/chakra/hideScrollBar.css';
 import { AiOutlineHeart } from 'react-icons/ai';
 import GoodSendersModal from '@/components/wiki/GoodSendersModal';
+import { useAPIToggleGoodForBoard } from '@/hooks/api/wiki/useAPIToggleGoodForBoard';
+import { useAuthenticate } from 'src/contexts/useAuthenticate';
 
 type WikiCardProps = {
   wiki: Wiki;
-  onPressHeartIcon: () => void;
 };
 
-const WikiCard: React.FC<WikiCardProps> = ({ wiki, onPressHeartIcon }) => {
+const WikiCard: React.FC<WikiCardProps> = ({ wiki }) => {
   const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
   const [goodSendersModal, setGoodSendersModal] = useState(false);
+  const { user } = useAuthenticate();
   const {
     title,
     writer,
@@ -27,6 +29,37 @@ const WikiCard: React.FC<WikiCardProps> = ({ wiki, onPressHeartIcon }) => {
     isGoodSender,
     userGoodForBoard,
   } = wiki;
+
+  const [isPressHeart, setIsPressHeart] = useState<boolean>(
+    isGoodSender || false,
+  );
+  const { mutate } = useAPIToggleGoodForBoard({
+    onSuccess: (result) => {
+      // toggle heart icon
+      if (wiki.id === result.id && result.isGoodSender !== undefined) {
+        setIsPressHeart(result.isGoodSender);
+      }
+
+      // include or exclude yourself in userGoodForBoard.
+      if (isPressHeart) {
+        wiki.userGoodForBoard = wiki.userGoodForBoard?.filter(
+          (u) => u.id !== user?.id,
+        );
+      } else {
+        wiki.userGoodForBoard = [
+          user as User,
+          ...(wiki.userGoodForBoard || []),
+        ];
+      }
+    },
+  });
+
+  const memoWriter = useMemo<User | undefined>(() => {
+    if (writer) {
+      return writer;
+    }
+    return;
+  }, [writer]);
 
   const tagButtonColor = useMemo(() => {
     switch (wiki.type) {
@@ -127,9 +160,9 @@ const WikiCard: React.FC<WikiCardProps> = ({ wiki, onPressHeartIcon }) => {
           <Link
             zIndex={5}
             onClick={() => {
-              onPressHeartIcon();
+              mutate(wiki.id);
             }}>
-            <AiOutlineHeart size={40} color={isGoodSender ? 'red' : 'white'} />
+            <AiOutlineHeart size={40} color={isPressHeart ? 'red' : 'white'} />
             <Text>{userGoodForBoard?.length}</Text>
           </Link>
           <Link

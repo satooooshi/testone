@@ -15,7 +15,7 @@ const toggleGoodForBoard = async (wikiID: number) => {
   return response.data;
 };
 
-export const useToggleGoodForBoard = (
+export const useAPIToggleGoodForBoard = (
   mutationOptions?: UseMutationOptions<Partial<Wiki>, Error, number, unknown>,
 ) => {
   return useMutation<Partial<Wiki>, Error, number>(
