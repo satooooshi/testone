@@ -104,9 +104,9 @@ const UserList = () => {
   }, [query.tag, tags]);
 
   const resetSearch = () => {
-    setSelectedTags([]);
     setSearchWord('');
-    queryRefresh({ page: '1', word: '' });
+    setSelectedTags([]);
+    queryRefresh({ page: '1', word: '', tag: '' });
   };
 
   return (

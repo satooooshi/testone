@@ -211,10 +211,6 @@ const EventList = () => {
     });
   };
 
-  useEffect(() => {
-    queryRefresh({ page: '1', word: word });
-  }, [selectedTags]);
-
   const tabs: Tab[] = useHeaderTab({
     headerTabType: 'event',
     queryRefresh,
@@ -474,7 +470,17 @@ const EventList = () => {
   const resetSearch = () => {
     setSearchWord('');
     setSelectedTags([]);
-    // queryRefresh({ page: '1', word: '' });
+    router.push(
+      generateEventSearchQueryString({
+        ...router.query,
+        word: '',
+        tag: '',
+      }),
+      undefined,
+      {
+        shallow: true,
+      },
+    );
   };
 
   return (

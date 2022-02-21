@@ -88,9 +88,14 @@ const SearchInput: React.FC<SearchFormProps> = ({
   };
 
   const handleModalResetButton = () => {
-    setSearchedWord('');
     onClear();
+    setSearchedWord('');
     isSmallerThan768 && hideSearchModal();
+  };
+
+  const handleOnComplete = () => {
+    setTagModal(false);
+    onClickButton();
   };
 
   return (
@@ -136,7 +141,7 @@ const SearchInput: React.FC<SearchFormProps> = ({
           onClear={() => {
             onClearTag();
           }}
-          onComplete={() => setTagModal(false)}
+          onComplete={handleOnComplete}
           isSearch={true}
         />
         <div className={clsx(searchFormStyles.search_and_close_button_wrapper)}>
