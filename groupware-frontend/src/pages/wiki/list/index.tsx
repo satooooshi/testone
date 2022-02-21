@@ -22,6 +22,7 @@ import { useHeaderTab } from '@/hooks/headerTab/useHeaderTab';
 import TopTabBar, { TopTabBehavior } from '@/components/layout/TopTabBar';
 import { Box, Radio, RadioGroup, Stack, Text } from '@chakra-ui/react';
 import { wikiTypeNameFactory } from 'src/utils/wiki/wikiTypeNameFactory';
+import { generateEventSearchQueryString } from 'src/utils/eventQueryRefresh';
 
 const QAQuestionList = () => {
   const router = useRouter();
@@ -300,7 +301,17 @@ const QAQuestionList = () => {
   const resetSearch = () => {
     setSelectedTags([]);
     setSearchWord('');
-    queryRefresh({ page: '1', word: '' });
+    router.push(
+      generateEventSearchQueryString({
+        ...router.query,
+        word: '',
+        tag: '',
+      }),
+      undefined,
+      {
+        shallow: true,
+      },
+    );
   };
 
   return (
