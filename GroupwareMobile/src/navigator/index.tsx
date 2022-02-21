@@ -26,7 +26,7 @@ import Config from 'react-native-config';
 import VideoCall from '../components/call/VideoCall';
 import VoiceCall from '../components/call/VoiceCall';
 import Sound from 'react-native-sound';
-
+import {useInviteCall} from '../contexts/call/useInviteCall';
 const Stack = createStackNavigator<RootStackParamList>();
 export const rtmEngine = new RtmClient();
 let rtcEngine: RtcEngine;
@@ -35,6 +35,7 @@ const Navigator = () => {
   const {user} = useAuthenticate();
   const navigationRef = useNavigationContainerRef<any>();
   const {mutate: registerDevice} = useAPIRegisterDevice();
+  const {isInvitationSending, disableInvitationFlag} = useInviteCall();
   const [Call, setCall] = useState(false);
   const [agoraToken, setAgoraToken] = useState('');
   const [channelName, setChannelName] = useState('');
@@ -65,6 +66,7 @@ const Navigator = () => {
     remoteInvitation.current = undefined;
     await rtcEngine?.leaveChannel();
     RNCallKeep.endAllCalls();
+    disableInvitationFlag();
     setCall(false);
     setChannelName('');
   };
@@ -203,7 +205,6 @@ const Navigator = () => {
   useEffect(() => {
     rtcInit();
     callKeepSetup();
-    // setCall(true);
     rtmEngine.addListener('LocalInvitationAccepted', async invitation => {
       setOnCallUid(invitation?.calleeId as string);
       const realChannelName = invitation?.channelId as string;
@@ -341,6 +342,18 @@ const Navigator = () => {
       navigationRef.current?.navigate('Main');
     }
   }, [Call]);
+
+  useEffect(() => {
+    if (isInvitationSending) {
+      setCall(isInvitationSending);
+      setTimeout(() => {
+        if (isInvitationSending && !channelName) {
+          endCall();
+        }
+        console.log('===============================');
+      }, 3000);
+    }
+  }, [isInvitationSending]);
 
   return (
     <NavigationContainer ref={navigationRef}>

@@ -7,6 +7,7 @@ import RNBootSplash from 'react-native-bootsplash';
 import PushNotificationIOS from '@react-native-community/push-notification-ios';
 import {Alert, Linking, Platform} from 'react-native';
 import VersionCheck from 'react-native-version-check';
+import {InviteCallProvider} from './contexts/call/useInviteCall';
 
 const App = () => {
   const queryClient = new QueryClient();
@@ -55,7 +56,9 @@ const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthenticateProvider>
-        <Navigator />
+        <InviteCallProvider>
+          <Navigator />
+        </InviteCallProvider>
       </AuthenticateProvider>
     </QueryClientProvider>
   );

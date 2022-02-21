@@ -48,7 +48,13 @@ const VoiceCall: React.FC<VoiceCallProps> = ({
             <Text fontWeight="bold" mt={'lg'} mb={'lg'} fontSize={24}>
               {userNameFactory(profile)}
             </Text>
-            {channelName ? <Timer /> : null}
+            {channelName ? (
+              <Timer />
+            ) : (
+              <Text mt={'lg'} mb={'lg'} fontSize={20}>
+                呼び出し中
+              </Text>
+            )}
           </Div>
           <Controls />
         </RtcConfigure>

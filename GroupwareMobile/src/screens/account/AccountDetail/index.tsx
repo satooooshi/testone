@@ -35,6 +35,7 @@ import {axiosInstance} from '../../../utils/url';
 import uuid from 'react-native-uuid';
 import {rtmEngine} from '../../../navigator';
 import Config from 'react-native-config';
+import {useInviteCall} from '../../../contexts/call/useInviteCall';
 const getNewUuid = () => uuid.v4();
 
 const TopTab = createMaterialTopTabNavigator();
@@ -125,6 +126,7 @@ const AccountDetail: React.FC = () => {
   const navigation = useNavigation<AccountDetailNavigationProps>();
   const route = useRoute<AccountDetailRouteProps>();
   const {user, setUser, logout} = useAuthenticate();
+  const {enableInvitationFlag} = useInviteCall();
   const id = route.params?.id;
   const userID = id || user?.id;
   const screenName = 'AccountDetail';
@@ -238,6 +240,7 @@ const AccountDetail: React.FC = () => {
       await rtmEngine.loginV2(user?.id?.toString() as string, res.data);
       await rtmEngine.sendLocalInvitationV2(localInvitation);
       await axiosInstance.get(`/chat/notif-call/${profile.id}`);
+      enableInvitationFlag();
     }
   };
 
