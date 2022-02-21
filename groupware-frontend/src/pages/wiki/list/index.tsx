@@ -259,13 +259,19 @@ const QAQuestionList = () => {
   };
 
   const queryRefresh = (query: Partial<SearchQueryToGetWiki>) => {
-    const selectedTagIDs = selectedTags.map((t) => t.id.toString());
-    const tagQuery = selectedTagIDs.join('+');
+    let tagQuery;
+    if (query.tag === '') {
+      tagQuery = '';
+    } else {
+      const selectedTagIDs = selectedTags.map((t) => t.id.toString());
+      tagQuery = selectedTagIDs.join('+');
+    }
     const refreshedQueryStrings = wikiQueryRefresh({
       ...router.query,
       ...query,
       tag: tagQuery,
     });
+
     router.push(`/wiki/list?${refreshedQueryStrings}`);
   };
 
@@ -301,17 +307,7 @@ const QAQuestionList = () => {
   const resetSearch = () => {
     setSelectedTags([]);
     setSearchWord('');
-    router.push(
-      generateEventSearchQueryString({
-        ...router.query,
-        word: '',
-        tag: '',
-      }),
-      undefined,
-      {
-        shallow: true,
-      },
-    );
+    queryRefresh({ page: '1', word: '', tag: '' });
   };
 
   return (
@@ -340,7 +336,6 @@ const QAQuestionList = () => {
             onClickButton={() =>
               queryRefresh({
                 page: '1',
-                tag,
                 status,
                 word: searchWord,
                 type,
