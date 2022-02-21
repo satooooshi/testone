@@ -35,7 +35,7 @@ const Navigator = () => {
   const {user} = useAuthenticate();
   const navigationRef = useNavigationContainerRef<any>();
   const {mutate: registerDevice} = useAPIRegisterDevice();
-  const [videoCall, setVideoCall] = useState(false);
+  const [Call, setCall] = useState(false);
   const [agoraToken, setAgoraToken] = useState('');
   const [channelName, setChannelName] = useState('');
   const [onCallUid, setOnCallUid] = useState('2');
@@ -65,7 +65,7 @@ const Navigator = () => {
     remoteInvitation.current = undefined;
     await rtcEngine?.leaveChannel();
     RNCallKeep.endAllCalls();
-    setVideoCall(false);
+    setCall(false);
     setChannelName('');
   };
 
@@ -179,7 +179,7 @@ const Navigator = () => {
       await rtcEngine?.joinChannel(tokenForCall, realChannelName, null, userId);
       await rtcEngine?.disableVideo();
       setChannelName(realChannelName);
-      setVideoCall(true);
+      setCall(true);
     }
   };
 
@@ -203,6 +203,7 @@ const Navigator = () => {
   useEffect(() => {
     rtcInit();
     callKeepSetup();
+    // setCall(true);
     rtmEngine.addListener('LocalInvitationAccepted', async invitation => {
       setOnCallUid(invitation?.calleeId as string);
       const realChannelName = invitation?.channelId as string;
@@ -334,12 +335,12 @@ const Navigator = () => {
   }, [registerDevice, user]);
 
   useEffect(() => {
-    if (videoCall && channelName) {
+    if (Call) {
       navigationRef.current?.navigate('Call');
     } else if (user?.id) {
       navigationRef.current?.navigate('Main');
     }
-  }, [videoCall, channelName]);
+  }, [Call]);
 
   return (
     <NavigationContainer ref={navigationRef}>
@@ -361,6 +362,7 @@ const Navigator = () => {
                     rtcProps={rtcProps}
                     callbacks={callbacks}
                     onCallUid={onCallUid}
+                    channelName={channelName}
                   />
                 )}
               />

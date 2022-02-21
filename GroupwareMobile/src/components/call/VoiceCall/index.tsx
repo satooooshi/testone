@@ -18,11 +18,13 @@ type VoiceCallProps = {
   rtcProps: RtcPropsInterface;
   callbacks: Partial<CallbacksInterface>;
   onCallUid: string;
+  channelName: string;
 };
 const VoiceCall: React.FC<VoiceCallProps> = ({
   rtcProps,
   callbacks,
   onCallUid,
+  channelName,
 }) => {
   const props: React.PropsWithChildren<PropsInterface> = {
     rtcProps: rtcProps,
@@ -46,7 +48,7 @@ const VoiceCall: React.FC<VoiceCallProps> = ({
             <Text fontWeight="bold" mt={'lg'} mb={'lg'} fontSize={24}>
               {userNameFactory(profile)}
             </Text>
-            <Timer />
+            {channelName ? <Timer /> : null}
           </Div>
           <Controls />
         </RtcConfigure>
