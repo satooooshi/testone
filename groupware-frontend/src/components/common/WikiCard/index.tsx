@@ -7,7 +7,7 @@ import { wikiTypeNameFactory } from 'src/utils/wiki/wikiTypeNameFactory';
 import UserAvatar from '../UserAvatar';
 import { darkFontColor } from 'src/utils/colors';
 import { hideScrollbarCss } from 'src/utils/chakra/hideScrollBar.css';
-import { AiOutlineHeart } from 'react-icons/ai';
+import { AiFillHeart, AiOutlineHeart } from 'react-icons/ai';
 import GoodSendersModal from '@/components/wiki/GoodSendersModal';
 import { useAPIToggleGoodForBoard } from '@/hooks/api/wiki/useAPIToggleGoodForBoard';
 import { useAuthenticate } from 'src/contexts/useAuthenticate';
@@ -140,30 +140,36 @@ const WikiCard: React.FC<WikiCardProps> = ({ wiki }) => {
             </Text>
           </Box>
         ) : null}
-        <Text
-          fontSize={isSmallerThan768 ? '14px' : '16px'}
-          color={darkFontColor}
-          display="flex">
-          {dateTimeFormatterFromJSDDate({ dateTime: new Date(createdAt) })}
-        </Text>
-      </Box>
-      {wiki.type === WikiType.BOARD && (
-        <Box w={40}>
-          <Link
-            position={'relative'}
-            onClick={() => {
-              mutate(wiki.id);
-            }}>
-            <AiOutlineHeart size={30} color={isPressHeart ? 'red' : 'black'} />
-          </Link>
-          <Link
-            onClick={() => {
-              setGoodSendersModal(true);
-            }}>
-            <Button>{`${userGoodForBoard?.length}件のいいね`}</Button>
-          </Link>
+        <Box display="flex" flexDir="column" height={5}>
+          <Text fontSize={'16px'} color={darkFontColor} display="flex">
+            {dateTimeFormatterFromJSDDate({ dateTime: new Date(createdAt) })}
+          </Text>
+
+          {wiki.type === WikiType.BOARD && (
+            <Box display="flex">
+              <Link
+                position={'relative'}
+                onClick={() => {
+                  mutate(wiki.id);
+                }}>
+                {isPressHeart ? (
+                  <AiFillHeart size={30} color="red" />
+                ) : (
+                  <AiOutlineHeart size={30} color="black" />
+                )}
+              </Link>
+              <Link
+                onClick={() => {
+                  setGoodSendersModal(true);
+                }}>
+                <Button
+                  size={'sm'}>{`${userGoodForBoard?.length}件のいいね`}</Button>
+              </Link>
+            </Box>
+          )}
         </Box>
-      )}
+      </Box>
+
       <GoodSendersModal
         isOpen={goodSendersModal}
         onClose={() => setGoodSendersModal(false)}
@@ -174,6 +180,7 @@ const WikiCard: React.FC<WikiCardProps> = ({ wiki }) => {
         flexDir={isSmallerThan768 ? 'column' : 'row'}
         justifyContent={isSmallerThan768 ? 'flex-start' : 'space-between'}>
         <Box
+          w="65vw"
           pl="16px"
           display="flex"
           flexDir="row"
