@@ -776,16 +776,18 @@ const Chat: React.FC = () => {
         enableBackButton={true}
         screenForBack={'RoomList'}>
         <Div style={tailwind('flex flex-row')}>
-          <Div style={tailwind('flex flex-row')}>
-            <Button bg="transparent" pb={-3}>
-              <Icon
-                name="phone"
-                fontFamily="Entypo"
-                fontSize={20}
-                color="blue700"
-              />
-            </Button>
-          </Div>
+          {roomDetail?.members && roomDetail.members.length < 3 ? (
+            <Div style={tailwind('flex flex-row')}>
+              <Button bg="transparent" pb={-3}>
+                <Icon
+                  name="phone"
+                  fontFamily="Entypo"
+                  fontSize={20}
+                  color="blue700"
+                />
+              </Button>
+            </Div>
+          ) : null}
           <TouchableOpacity
             style={tailwind('flex flex-row')}
             onPress={() =>
