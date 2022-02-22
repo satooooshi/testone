@@ -38,9 +38,12 @@ const Navigator = () => {
   const {mutate: registerDevice} = useAPIRegisterDevice();
   const {
     isInvitationSending,
+    isCallAccepted,
     disableInvitationFlag,
     enableCallAcceptedFlag,
     disableCallAcceptedFlag,
+    ringCall,
+    localInvitation,
   } = useInviteCall();
   const [Call, setCall] = useState(false);
   const [agoraToken, setAgoraToken] = useState('');
@@ -56,6 +59,7 @@ const Navigator = () => {
     activeSpeaker: true,
   };
   const remoteInvitation = useRef<RemoteInvitation | undefined>();
+  // SoundPlayer.loadSoundFile('ring_call', 'mp3');
 
   const soundOnEnd = async () => {
     try {
@@ -66,13 +70,19 @@ const Navigator = () => {
   };
 
   const endCall = async () => {
-    remoteInvitation.current = undefined;
+    if (remoteInvitation.current) {
+      await rtmEngine?.refuseRemoteInvitationV2(remoteInvitation.current);
+      remoteInvitation.current = undefined;
+    }
+    if (!isCallAccepted && localInvitation) {
+      await rtmEngine?.cancelLocalInvitationV2(localInvitation);
+    }
     setAlertCountOnEndCall(c => c + 1);
     await soundOnEnd();
     console.log('sound on end ');
     await rtcEngine?.leaveChannel();
     RNCallKeep.endAllCalls();
-    disableInvitationFlag();
+    // disableInvitationFlag();
     disableCallAcceptedFlag();
     setCall(false);
     setChannelName('');
@@ -112,14 +122,10 @@ const Navigator = () => {
       console.log('UserOffline', uid, reason);
       endCall();
     });
-    rtmEngine.addListener('LocalInvitationRefused', () => {
-      console.log('LocalInvitationRefused');
-      endCall();
-    });
-    rtmEngine.addListener('RemoteInvitationRefused', () => {
-      console.log('RemoteInvitationRefused');
-      endCall();
-    });
+    // rtmEngine.addListener('RemoteInvitationRefused', () => {
+    //   console.log('RemoteInvitationRefused');
+    //   endCall();
+    // });
     rtcEngine?.addListener('LeaveChannel', ({userCount}) => {
       console.log('LeaveChannel. user count: ', userCount);
     });
@@ -248,17 +254,17 @@ const Navigator = () => {
       const realChannelName = invitation?.channelId as string;
       await joinChannel(realChannelName);
     });
-    rtmEngine.addListener('LocalInvitationRefused', async invitation => {
-      console.log('===========');
-      endCall();
-    });
     rtmEngine.addListener(
       'RemoteInvitationReceived',
       (invitation: RemoteInvitation) => {
         displayIncomingCallNow(invitation);
       },
     );
+    rtmEngine.addListener('LocalInvitationCanceled', () => {
+      endCall();
+    });
     RNCallKeep.addEventListener('answerCall', answerCall);
+    RNCallKeep.addEventListener('endCall', endCall);
     return () => {
       RNCallKeep.removeEventListener('answerCall');
       rtcEngine.removeAllListeners();
@@ -388,17 +394,15 @@ const Navigator = () => {
   // };
 
   useEffect(() => {
-    // if (isInvitationSending) {
-    //   SoundPlayer.resume();
+    console.log(
+      'isInvitationSending ====================',
+      isInvitationSending,
+    );
+    if (isInvitationSending) {
+      // SoundPlayer.resume();
+      ringCall();
+    }
     setCall(isInvitationSending);
-    //   setTimeout(() => {
-    //     if (isInvitationSending && !channelName) {
-    //       SoundPlayer.stop();
-    //       endCall();
-    //     }
-    //     console.log('===============================');
-    //   }, 20000);
-    // }
   }, [isInvitationSending]);
 
   return (
