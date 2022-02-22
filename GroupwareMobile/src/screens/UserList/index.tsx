@@ -45,6 +45,11 @@ const UserList: React.FC = () => {
           setTag(values.selectedTags?.map(t => t.id.toString()).join('+'));
           setVisibleSearchFormModal(false);
         }}
+        onClear={() => {
+          setWord('');
+          setTag('');
+          setVisibleSearchFormModal(false);
+        }}
       />
       <SearchFormOpenerButton
         bottom={10}

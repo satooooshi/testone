@@ -190,6 +190,12 @@ const WikiCardList: React.FC<WikiCardListProps> = ({
           const tagQuery = selectedTagIDs.join('+');
           setTag(tagQuery);
         }}
+        onClear={() => {
+          setVisibleSearchFormModal(false);
+          setType(undefined);
+          setWord('');
+          setTag('');
+        }}
         defaultSelectedTagIds={tag.split('+')?.map(t => Number(t))}
       />
       <SearchFormOpenerButton onPress={() => setVisibleSearchFormModal(true)} />
