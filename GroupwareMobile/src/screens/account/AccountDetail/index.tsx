@@ -31,14 +31,7 @@ import {
 import {darkFontColor} from '../../../utils/colors';
 import {userNameFactory} from '../../../utils/factory/userNameFactory';
 import {userRoleNameFactory} from '../../../utils/factory/userRoleNameFactory';
-import {axiosInstance} from '../../../utils/url';
-import uuid from 'react-native-uuid';
-import {rtmEngine} from '../../../navigator';
-import Config from 'react-native-config';
 import {useInviteCall} from '../../../contexts/call/useInviteCall';
-import SoundPlayer from 'react-native-sound-player';
-
-const getNewUuid = () => uuid.v4();
 
 const TopTab = createMaterialTopTabNavigator();
 
@@ -128,15 +121,7 @@ const AccountDetail: React.FC = () => {
   const navigation = useNavigation<AccountDetailNavigationProps>();
   const route = useRoute<AccountDetailRouteProps>();
   const {user, setUser, logout} = useAuthenticate();
-  const {
-    enableInvitationFlag,
-    disableInvitationFlag,
-    isCallAccepted,
-    isInvitationSending,
-    ringCall,
-    stopRing,
-    setLocalInvitationState,
-  } = useInviteCall();
+  const {sendCallInvitation} = useInviteCall();
   const id = route.params?.id;
   const userID = id || user?.id;
   const screenName = 'AccountDetail';
@@ -145,14 +130,6 @@ const AccountDetail: React.FC = () => {
   const questionScreenName = `${screenName}-question`;
   const knowledgeScreenName = `${screenName}-knowledge`;
   const {width: windowWidth, height: windowHeight} = useWindowDimensions();
-  // SoundPlayer.loadSoundFile('ring_call', 'mp3');
-  // const soundOnEnd = async () => {
-  //   try {
-  //     SoundPlayer.playSoundFile('ring_call', 'mp3');
-  //   } catch (e) {
-  //     console.log('sound on end call failed:', e);
-  //   }
-  // };
   const {
     data: profile,
     refetch,
@@ -246,43 +223,10 @@ const AccountDetail: React.FC = () => {
   };
 
   const inviteCall = async () => {
-    if (profile) {
-      await rtmEngine.createInstance(Config.AGORA_APP_ID);
-      const parsedUUid = uuid.v4();
-      const localInvitation = await rtmEngine.createLocalInvitation(
-        profile.id.toString(),
-        userNameFactory(user),
-        parsedUUid as string,
-      );
-      setLocalInvitationState(localInvitation);
-      const res = await axiosInstance.get<string>('/chat/get-rtm-token');
-      await rtmEngine.loginV2(user?.id?.toString() as string, res.data);
-      await rtmEngine.sendLocalInvitationV2(localInvitation);
-      await axiosInstance.get(`/chat/notif-call/${profile.id}`);
-      enableInvitationFlag();
-      await new Promise(resolve => setTimeout(resolve, 10000));
-      console.log('=============================== timeout');
-      console.log(
-        'isInvitationSending',
-        isInvitationSending,
-        'isCallAccepted',
-        isCallAccepted,
-      );
-      stopRing();
-      if (isInvitationSending && !isCallAccepted) {
-        console.log('cancelLocalInvitationV2 called');
-        await rtmEngine.cancelLocalInvitationV2(localInvitation);
-        disableInvitationFlag();
-      }
+    if (profile && user) {
+      await sendCallInvitation(user, profile);
     }
   };
-
-  useEffect(() => {
-    if (isCallAccepted) {
-      // SoundPlayer.stop();
-      stopRing();
-    }
-  }, [isCallAccepted]);
 
   useEffect(() => {
     if (isFocused) {
@@ -317,7 +261,7 @@ const AccountDetail: React.FC = () => {
                   w={windowWidth * 0.6}
                 />
               </Div>
-              <Div flexDir="row" mb="sm">
+              <Div flexDir="row" mb="sm" alignItems="center">
                 <Text
                   fontWeight="bold"
                   mb={'lg'}
