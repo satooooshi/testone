@@ -659,6 +659,19 @@ const Chat: React.FC = () => {
     </View>
   );
 
+  const inviteCall = () => {
+    roomDetail?.members?.map(member => {
+      if (member !== myself) {
+        const caller = member;
+        if (myself && caller) {
+          //第一引数に通話を書ける人のユーザーオブジェクト、第二引数に通話をかけられるひとのユーザーオブジェクト
+          // await sendCallInvitation(myself, caller);
+          console.log('inviteCal called');
+        }
+      }
+    });
+  };
+
   return (
     <WholeContainer>
       {typeDropdown}
@@ -778,7 +791,7 @@ const Chat: React.FC = () => {
         <Div style={tailwind('flex flex-row')}>
           {roomDetail?.members && roomDetail.members.length < 3 ? (
             <Div style={tailwind('flex flex-row')}>
-              <Button bg="transparent" pb={-3}>
+              <Button bg="transparent" pb={-3} onPress={inviteCall}>
                 <Icon
                   name="phone"
                   fontFamily="Entypo"
