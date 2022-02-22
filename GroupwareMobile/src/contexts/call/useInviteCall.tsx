@@ -1,39 +1,48 @@
-import React, {createContext, useContext, useState} from 'react';
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from 'react';
 import SoundPlayer from 'react-native-sound-player';
 import {LocalInvitation} from 'agora-react-native-rtm';
+import {User} from '../../types';
+import {
+  cancelCallInvitation,
+  sendInvitation,
+} from '../../utils/calling/inviteCall';
 
-const InvitationStatusContext = createContext({
-  isInvitationSending: false,
+interface IInvitationStatusContext {
+  isCallAccepted: boolean;
+  localInvitation: LocalInvitation | undefined;
+  sendCallInvitation: (caller: Partial<User>, callee: User) => Promise<void>;
+  enableCallAcceptedFlag: () => void;
+  disableCallAcceptedFlag: () => void;
+  cancelInvitation: () => Promise<void>;
+}
+
+const InvitationStatusContext = createContext<IInvitationStatusContext>({
   isCallAccepted: false,
-  localInvitation: {} as LocalInvitation | undefined,
-  setLocalInvitationState: (() => {}) as (invitation: LocalInvitation) => void,
-  enableInvitationFlag: () => {},
-  disableInvitationFlag: () => {},
+  localInvitation: undefined as LocalInvitation | undefined,
+  sendCallInvitation: async () => {},
   enableCallAcceptedFlag: () => {},
   disableCallAcceptedFlag: () => {},
-  ringCall: () => {},
-  stopRing: () => {},
+  cancelInvitation: async () => {},
 });
 
 export const InviteCallProvider: React.FC = ({children}) => {
-  const [isInvitationSending, setIsInvitationSending] = useState(false);
   const [isCallAccepted, setIsCallAccepted] = useState(false);
   const [localInvitation, setLocalInvitation] = useState<LocalInvitation>();
-  SoundPlayer.loadSoundFile('ring_call', 'mp3');
+  const [resetInvitation, setResetInvitation] = useState(false);
 
-  const enableInvitationFlag = () => {
-    setIsInvitationSending(true);
-  };
-  const disableInvitationFlag = () => {
-    setIsInvitationSending(false);
-  };
   const enableCallAcceptedFlag = () => {
     setIsCallAccepted(true);
   };
   const disableCallAcceptedFlag = () => {
     setIsCallAccepted(false);
   };
-  const ringCall = () => {
+  const startRing = () => {
     SoundPlayer.setNumberOfLoops(5);
     SoundPlayer.play();
   };
@@ -41,23 +50,55 @@ export const InviteCallProvider: React.FC = ({children}) => {
     SoundPlayer.stop();
   };
 
-  const setLocalInvitationState = (invitation: LocalInvitation) => {
+  const sendCallInvitation = async (caller: Partial<User>, callee: User) => {
+    const invitation = await sendInvitation(caller, callee);
+    console.log('send call invitation');
     setLocalInvitation(invitation);
+    startRing();
   };
+
+  const cancelInvitation = useCallback(async () => {
+    if (localInvitation) {
+      stopRing();
+      setResetInvitation(true);
+      setLocalInvitation(undefined);
+    } else {
+      console.error('invitationが送信されていません');
+    }
+  }, [localInvitation]);
+
+  useEffect(() => {
+    console.log(localInvitation, isCallAccepted);
+    const timeoutInvitation = async () => {
+      await new Promise(resolve => setTimeout(resolve, 10000));
+      setResetInvitation(true);
+    };
+    timeoutInvitation();
+  }, [localInvitation, isCallAccepted, cancelInvitation]);
+
+  useEffect(() => {
+    SoundPlayer.loadSoundFile('ring_call', 'mp3');
+  }, []);
+
+  useEffect(() => {
+    const cancel = async () => {
+      if (resetInvitation && localInvitation && !isCallAccepted) {
+        await cancelInvitation();
+      }
+    };
+    cancel();
+    setResetInvitation(false);
+  }, []);
 
   return (
     <InvitationStatusContext.Provider
       value={{
-        isInvitationSending,
         isCallAccepted,
-        enableInvitationFlag,
-        disableInvitationFlag,
+        localInvitation,
         enableCallAcceptedFlag,
         disableCallAcceptedFlag,
-        ringCall,
-        stopRing,
-        localInvitation,
-        setLocalInvitationState,
+        sendCallInvitation,
+        cancelInvitation,
       }}>
       {children}
     </InvitationStatusContext.Provider>
