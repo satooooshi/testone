@@ -1,7 +1,7 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {useWindowDimensions, FlatList, TouchableHighlight} from 'react-native';
-import {BoardCategory, Wiki, WikiType} from '../../../types';
-import {Div, Text, Tag} from 'react-native-magnus';
+import {BoardCategory, User, Wiki, WikiType} from '../../../types';
+import {Div, Text, Tag, Icon, Button} from 'react-native-magnus';
 import {tagColorFactory} from '../../../utils/factory/tagColorFactory';
 import {wikiCardStyles} from '../../../styles/component/wiki/wikiCard.style';
 import {wikiTypeColorFactory} from '../../../utils/factory/wiki/wikiTypeColorFactory';
@@ -9,6 +9,10 @@ import {wikiTypeNameFactory} from '../../../utils/factory/wiki/wikiTypeNameFacto
 import {useNavigation} from '@react-navigation/native';
 import UserAvatar from '../../common/UserAvatar';
 import {dateTimeFormatterFromJSDDate} from '../../../utils/dateTimeFormatterFromJSDate';
+import {useAPIToggleGoodForBoard} from '../../../hooks/api/wiki/useAPIToggleGoodForBoard';
+import {useAuthenticate} from '../../../contexts/useAuthenticate';
+import {darkFontColor} from '../../../utils/colors';
+import GoodSendersModal from '../../chat/GoodSendersModal';
 
 type WikiCardProps = {
   wiki: Wiki;
@@ -17,8 +21,30 @@ type WikiCardProps = {
 const WikiCard: React.FC<WikiCardProps> = ({wiki}) => {
   const windowWidth = useWindowDimensions().width;
   const navigation = useNavigation<any>();
+  const [isVisible, setIsVisible] = useState<boolean>(false);
   const isQA =
     wiki.type === WikiType.BOARD && wiki.boardCategory === BoardCategory.QA;
+  const [isPressHeart, setIsPressHeart] = useState<boolean>(
+    wiki.isGoodSender || false,
+  );
+  const {user} = useAuthenticate();
+
+  const {mutate} = useAPIToggleGoodForBoard({
+    onSuccess: () => {
+      setIsPressHeart(!isPressHeart);
+
+      if (isPressHeart) {
+        wiki.userGoodForBoard = wiki.userGoodForBoard?.filter(
+          u => u.id !== user?.id,
+        );
+      } else {
+        wiki.userGoodForBoard = [
+          user as User,
+          ...(wiki.userGoodForBoard || []),
+        ];
+      }
+    },
+  });
   return (
     <TouchableHighlight
       underlayColor="none"
@@ -46,25 +72,30 @@ const WikiCard: React.FC<WikiCardProps> = ({wiki}) => {
             {wiki.title}
           </Text>
         </Div>
-        <Div flexDir="row" justifyContent="flex-end" mb={4} mr={4}>
-          {isQA ? (
-            <Div mr="lg" flexDir="row">
-              <Text textAlignVertical="bottom" mr={2}>
-                回答
-              </Text>
-              <Text
-                color="green600"
-                textAlignVertical="bottom"
-                fontSize={18}
-                mt={-3}>
-                {wiki.answers?.length.toString() || 0}
-              </Text>
-            </Div>
-          ) : null}
-          <Text textAlignVertical="bottom" textAlign="center">
-            {dateTimeFormatterFromJSDDate({dateTime: new Date(wiki.createdAt)})}
-          </Text>
+        <Div flexDir="column" w="100%">
+          <Div flexDir="row" justifyContent="flex-end" mb={4} mr={4}>
+            {isQA ? (
+              <Div mr="lg" flexDir="row">
+                <Text textAlignVertical="bottom" mr={2}>
+                  回答
+                </Text>
+                <Text
+                  color="green600"
+                  textAlignVertical="bottom"
+                  fontSize={18}
+                  mt={-3}>
+                  {wiki.answers?.length.toString() || 0}
+                </Text>
+              </Div>
+            ) : null}
+            <Text textAlignVertical="bottom" textAlign="center">
+              {dateTimeFormatterFromJSDDate({
+                dateTime: new Date(wiki.createdAt),
+              })}
+            </Text>
+          </Div>
         </Div>
+
         <Div flexDir="row">
           {wiki?.tags?.length ? (
             <FlatList
@@ -113,6 +144,38 @@ const WikiCard: React.FC<WikiCardProps> = ({wiki}) => {
               </Tag>
             </>
           )}
+          {wiki.type === WikiType.BOARD && (
+            <Div flexDir="row" ml="auto" mr={5}>
+              <TouchableHighlight onPress={() => mutate(wiki.id)}>
+                {isPressHeart ? (
+                  <Icon
+                    name="heart"
+                    fontFamily="AntDesign"
+                    fontSize={35}
+                    color={'red'}
+                    mr={3}
+                  />
+                ) : (
+                  <Icon
+                    name="hearto"
+                    fontFamily="AntDesign"
+                    fontSize={35}
+                    color={darkFontColor}
+                    mr={3}
+                  />
+                )}
+              </TouchableHighlight>
+              <Button
+                onPress={() =>
+                  setIsVisible(true)
+                }>{`${wiki.userGoodForBoard?.length}件のいいね`}</Button>
+            </Div>
+          )}
+          <GoodSendersModal
+            goodSenders={wiki.userGoodForBoard || []}
+            isVisible={isVisible}
+            onClose={() => setIsVisible(false)}
+          />
         </Div>
       </Div>
     </TouchableHighlight>
