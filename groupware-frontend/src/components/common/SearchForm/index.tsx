@@ -125,7 +125,7 @@ const SearchInput: React.FC<SearchFormProps> = ({
           onChange={onChange}
         />
         <Button
-          width={isSmallerThan768 ? '100%' : '15vw'}
+          width={isSmallerThan768 ? '100%' : '20vw'}
           className={searchFormStyles.add_tag_button}
           colorScheme="green"
           onClick={() => setTagModal(true)}>
@@ -146,7 +146,7 @@ const SearchInput: React.FC<SearchFormProps> = ({
         />
         <div className={clsx(searchFormStyles.search_and_close_button_wrapper)}>
           <Button
-            width={isSmallerThan768 ? '100%' : '15vw'}
+            width={isSmallerThan768 ? '100%' : '12vw'}
             colorScheme="pink"
             onClick={handleModalSearchButton}>
             検索
@@ -154,8 +154,8 @@ const SearchInput: React.FC<SearchFormProps> = ({
         </div>
         <div className={clsx(searchFormStyles.clear_search_button)}>
           <Button
-            width={isSmallerThan768 ? '100%' : '15vw'}
-            colorScheme="gray"
+            width={isSmallerThan768 ? '100%' : '12vw'}
+            colorScheme="blackAlpha"
             onClick={handleModalResetButton}>
             クリア
           </Button>
