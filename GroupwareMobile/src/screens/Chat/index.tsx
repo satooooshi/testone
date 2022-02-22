@@ -660,16 +660,16 @@ const Chat: React.FC = () => {
   );
 
   const inviteCall = () => {
-    roomDetail?.members?.map(member => {
-      if (member !== myself) {
-        const caller = member;
-        if (myself && caller) {
-          //第一引数に通話を書ける人のユーザーオブジェクト、第二引数に通話をかけられるひとのユーザーオブジェクト
-          // await sendCallInvitation(myself, caller);
-          console.log('inviteCal called');
-        }
+    const caller = roomDetail?.members?.map(member => {
+      if (member?.id !== myself?.id) {
+        return member;
       }
     });
+    if (myself && caller) {
+      //第一引数に通話を書ける人のユーザーオブジェクト、第二引数に通話をかけられるひとのユーザーオブジェクト
+      // await sendCallInvitation(myself, caller);
+      console.log('inviteCal called', caller);
+    }
   };
 
   return (
