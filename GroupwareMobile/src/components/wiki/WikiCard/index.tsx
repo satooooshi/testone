@@ -30,18 +30,18 @@ const WikiCard: React.FC<WikiCardProps> = ({wiki}) => {
   const {user} = useAuthenticate();
 
   const {mutate} = useAPIToggleGoodForBoard({
-    onSuccess: () => {
-      setIsPressHeart(!isPressHeart);
+    onSuccess: result => {
+      setIsPressHeart(p => !p);
 
-      if (isPressHeart) {
-        wiki.userGoodForBoard = wiki.userGoodForBoard?.filter(
-          u => u.id !== user?.id,
-        );
-      } else {
+      if (result.isGoodSender) {
         wiki.userGoodForBoard = [
           user as User,
           ...(wiki.userGoodForBoard || []),
         ];
+      } else {
+        wiki.userGoodForBoard = wiki.userGoodForBoard?.filter(
+          u => u.id !== user?.id,
+        );
       }
     },
   });
@@ -146,7 +146,9 @@ const WikiCard: React.FC<WikiCardProps> = ({wiki}) => {
           )}
           {wiki.type === WikiType.BOARD && (
             <Div flexDir="row" ml="auto" mr={5}>
-              <TouchableHighlight onPress={() => mutate(wiki.id)}>
+              <TouchableHighlight
+                underlayColor={'none'}
+                onPress={() => mutate(wiki.id)}>
                 {isPressHeart ? (
                   <Icon
                     name="heart"

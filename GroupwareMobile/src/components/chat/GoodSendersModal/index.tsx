@@ -42,7 +42,12 @@ const GoodSendersModal: React.FC<GoodSendersModalProps> = ({
             <View style={tailwind('flex-row bg-white items-center px-4 mb-2')}>
               <>
                 <Div mr={'sm'}>
-                  <UserAvatar user={item} h={64} w={64} />
+                  <UserAvatar
+                    user={item}
+                    h={64}
+                    w={64}
+                    onCloseModal={() => onClose()}
+                  />
                 </Div>
 
                 <Text fontSize={18}>{userNameFactory(item)}</Text>
