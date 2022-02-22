@@ -35,21 +35,17 @@ const WikiCard: React.FC<WikiCardProps> = ({ wiki }) => {
   );
   const { mutate } = useAPIToggleGoodForBoard({
     onSuccess: (result) => {
-      // toggle heart icon
-      if (wiki.id === result.id && result.isGoodSender !== undefined) {
-        setIsPressHeart(result.isGoodSender);
-      }
+      setIsPressHeart((p) => !p);
 
-      // include or exclude yourself in userGoodForBoard.
-      if (isPressHeart) {
-        wiki.userGoodForBoard = wiki.userGoodForBoard?.filter(
-          (u) => u.id !== user?.id,
-        );
-      } else {
+      if (result.isGoodSender) {
         wiki.userGoodForBoard = [
           user as User,
           ...(wiki.userGoodForBoard || []),
         ];
+      } else {
+        wiki.userGoodForBoard = wiki.userGoodForBoard?.filter(
+          (u) => u.id !== user?.id,
+        );
       }
     },
   });
@@ -124,27 +120,7 @@ const WikiCard: React.FC<WikiCardProps> = ({ wiki }) => {
         display="flex"
         alignItems="center"
         justifyContent="flex-end">
-        {wiki.type === WikiType.BOARD &&
-        wiki.boardCategory === BoardCategory.QA ? (
-          <Box
-            mr="16px"
-            display="flex"
-            flexDir={'row'}
-            alignItems="center"
-            justifyContent="center">
-            <Text color={darkFontColor} mr={'4px'}>
-              回答
-            </Text>
-            <Text color="green.500" fontSize="22px" fontWeight="bold">
-              {answers?.length.toString()}
-            </Text>
-          </Box>
-        ) : null}
-        <Box display="flex" flexDir="column" height={5}>
-          <Text fontSize={'16px'} color={darkFontColor} display="flex">
-            {dateTimeFormatterFromJSDDate({ dateTime: new Date(createdAt) })}
-          </Text>
-
+        <Box display="flex" flexDir="row" height={5} alignItems="center">
           {wiki.type === WikiType.BOARD && (
             <Box display="flex">
               <Link
@@ -167,6 +143,25 @@ const WikiCard: React.FC<WikiCardProps> = ({ wiki }) => {
               </Link>
             </Box>
           )}
+          {wiki.type === WikiType.BOARD &&
+          wiki.boardCategory === BoardCategory.QA ? (
+            <Box
+              mr="16px"
+              display="flex"
+              flexDir={'row'}
+              alignItems="center"
+              justifyContent="center">
+              <Text color={darkFontColor} mr={'4px'}>
+                回答
+              </Text>
+              <Text color="green.500" fontSize="22px" fontWeight="bold">
+                {answers?.length.toString()}
+              </Text>
+            </Box>
+          ) : null}
+          <Text fontSize={'16px'} color={darkFontColor} display="flex">
+            {dateTimeFormatterFromJSDDate({ dateTime: new Date(createdAt) })}
+          </Text>
         </Box>
       </Box>
 
@@ -180,7 +175,7 @@ const WikiCard: React.FC<WikiCardProps> = ({ wiki }) => {
         flexDir={isSmallerThan768 ? 'column' : 'row'}
         justifyContent={isSmallerThan768 ? 'flex-start' : 'space-between'}>
         <Box
-          w="65vw"
+          w="vw"
           pl="16px"
           display="flex"
           flexDir="row"

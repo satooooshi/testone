@@ -10,9 +10,16 @@ type UserAvatarProps = {
   h: number | string;
   w: number | string;
   onPress?: () => void;
+  onCloseModal?: () => void;
 };
 
-const UserAvatar: React.FC<UserAvatarProps> = ({user, h, w, onPress}) => {
+const UserAvatar: React.FC<UserAvatarProps> = ({
+  user,
+  h,
+  w,
+  onPress,
+  onCloseModal,
+}) => {
   const navigation = useNavigation<any>();
   const {user: mySelf} = useAuthenticate();
   return (
@@ -22,6 +29,9 @@ const UserAvatar: React.FC<UserAvatarProps> = ({user, h, w, onPress}) => {
         if (onPress) {
           onPress();
           return;
+        }
+        if (onCloseModal) {
+          onCloseModal();
         }
         const routes = navigation.getState()?.routes;
         if (user?.id === mySelf?.id) {
