@@ -74,6 +74,7 @@ import io from 'socket.io-client';
 import {baseURL} from '../../utils/url';
 import {getThumbnailOfVideo} from '../../utils/getThumbnailOfVideo';
 import {useAuthenticate} from '../../contexts/useAuthenticate';
+import HeaderTemplate from '../../components/Header/HeaderTemplate';
 
 const socket = io(baseURL, {
   transports: ['websocket'],
@@ -770,12 +771,39 @@ const Chat: React.FC = () => {
           </Div>
         )}
       />
-      <HeaderWithIconButton
+      <HeaderTemplate
         title={roomDetail ? nameOfRoom(roomDetail) : nameOfRoom(room)}
         enableBackButton={true}
-        screenForBack={'RoomList'}
-        icon={headerRightIcon}
-      />
+        screenForBack={'RoomList'}>
+        <Div style={tailwind('flex flex-row')}>
+          <Div style={tailwind('flex flex-row')}>
+            <Button bg="transparent" pb={-3}>
+              <Icon
+                name="phone"
+                fontFamily="Entypo"
+                fontSize={20}
+                color="blue700"
+              />
+            </Button>
+          </Div>
+          <TouchableOpacity
+            style={tailwind('flex flex-row')}
+            onPress={() =>
+              navigation.navigate('ChatStack', {
+                screen: 'ChatMenu',
+                params: {room},
+              })
+            }>
+            <Icon
+              name="dots-horizontal-circle-outline"
+              fontFamily="MaterialCommunityIcons"
+              fontSize={26}
+              color={darkFontColor}
+            />
+          </TouchableOpacity>
+        </Div>
+      </HeaderTemplate>
+
       {messageListAvoidngKeyboardDisturb}
     </WholeContainer>
   );
