@@ -35,7 +35,7 @@ const WikiCard: React.FC<WikiCardProps> = ({ wiki }) => {
   );
   const { mutate } = useAPIToggleGoodForBoard({
     onSuccess: (result) => {
-      setIsPressHeart((p) => !p);
+      setIsPressHeart(!isPressHeart);
 
       if (result.isGoodSender) {
         wiki.userGoodForBoard = [
