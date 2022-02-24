@@ -41,6 +41,7 @@ const Navigator = () => {
     enableCallAcceptedFlag,
     disableCallAcceptedFlag,
     ringCall,
+    setLocalInvitationState,
     localInvitation,
   } = useInviteCall();
   const [isCalling, setIsCalling] = useState(false);
@@ -139,6 +140,7 @@ const Navigator = () => {
   const rtmInit = () => {
     rtmEngine.addListener('LocalInvitationAccepted', async invitation => {
       enableCallAcceptedFlag();
+      setLocalInvitationState(undefined);
       setOnCallUid(invitation?.calleeId as string);
       const realChannelName = invitation?.channelId as string;
       await joinChannel(realChannelName);
@@ -218,6 +220,7 @@ const Navigator = () => {
       setChannelName(realChannelName);
       setIsCalling(true);
       navigateToCallWindow();
+      remoteInvitation.current = undefined;
     }
   };
 

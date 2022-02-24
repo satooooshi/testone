@@ -12,7 +12,9 @@ const InvitationStatusContext = createContext({
   isInvitationSending: false,
   isCallAccepted: false,
   localInvitation: {} as LocalInvitation | undefined,
-  setLocalInvitationState: (() => {}) as (invitation: LocalInvitation) => void,
+  setLocalInvitationState: (() => {}) as (
+    invitation: LocalInvitation | undefined,
+  ) => void,
   enableInvitationFlag: () => {},
   disableInvitationFlag: () => {},
   enableCallAcceptedFlag: () => {},
@@ -24,7 +26,9 @@ const InvitationStatusContext = createContext({
 export const InviteCallProvider: React.FC = ({children}) => {
   const [isInvitationSending, setIsInvitationSending] = useState(false);
   const [isCallAccepted, setIsCallAccepted] = useState(false);
-  const [localInvitation, setLocalInvitation] = useState<LocalInvitation>();
+  const [localInvitation, setLocalInvitation] = useState<
+    LocalInvitation | undefined
+  >();
   SoundPlayer.loadSoundFile('ring_call', 'mp3');
 
   const enableInvitationFlag = () => {
@@ -46,7 +50,7 @@ export const InviteCallProvider: React.FC = ({children}) => {
     SoundPlayer.stop();
   }, []);
 
-  const setLocalInvitationState = (invitation: LocalInvitation) => {
+  const setLocalInvitationState = (invitation: LocalInvitation | undefined) => {
     setLocalInvitation(invitation);
   };
 
