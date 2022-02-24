@@ -50,7 +50,7 @@ const VoiceCall: React.FC<VoiceCallProps> = ({
             <Text fontWeight="bold" mt={'lg'} mb={'lg'} fontSize={24}>
               {profile ? userNameFactory(profile) : '通話情報を取得中...'}
             </Text>
-            {channelName ? (
+            {channelName && onCallUid ? (
               <Timer />
             ) : (
               <Text mt={'lg'} mb={'lg'} fontSize={20}>
