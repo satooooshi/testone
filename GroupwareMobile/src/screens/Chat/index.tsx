@@ -662,12 +662,11 @@ const Chat: React.FC = () => {
   );
 
   const inviteCall = async () => {
-    const caller = roomDetail?.members?.map(member => {
-      if (member?.id !== myself?.id) {
-        return member;
-      }
-    });
-    if (myself && caller) {
+    if (roomDetail?.members?.length === 2 && myself) {
+      const caller =
+        roomDetail.members[0].id === myself.id
+          ? roomDetail.members[1]
+          : roomDetail.members[0];
       //第一引数に通話を書ける人のユーザーオブジェクト、第二引数に通話をかけられるひとのユーザーオブジェクト
       await sendCallInvitation(myself, caller);
       console.log('inviteCal called', caller);
