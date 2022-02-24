@@ -75,6 +75,7 @@ import {baseURL} from '../../utils/url';
 import {getThumbnailOfVideo} from '../../utils/getThumbnailOfVideo';
 import {useAuthenticate} from '../../contexts/useAuthenticate';
 import HeaderTemplate from '../../components/Header/HeaderTemplate';
+import {useInviteCall} from '../../contexts/call/useInviteCall';
 
 const socket = io(baseURL, {
   transports: ['websocket'],
@@ -88,6 +89,7 @@ const Chat: React.FC = () => {
   const navigation = useNavigation<ChatNavigationProps>();
   const route = useRoute<ChatRouteProps>();
   const {room} = route.params;
+  const {sendCallInvitation} = useInviteCall();
   const {data: roomDetail, refetch: refetchRoomDetail} = useAPIGetRoomDetail(
     room.id,
   );
@@ -659,7 +661,7 @@ const Chat: React.FC = () => {
     </View>
   );
 
-  const inviteCall = () => {
+  const inviteCall = async () => {
     const caller = roomDetail?.members?.map(member => {
       if (member?.id !== myself?.id) {
         return member;
@@ -667,7 +669,7 @@ const Chat: React.FC = () => {
     });
     if (myself && caller) {
       //第一引数に通話を書ける人のユーザーオブジェクト、第二引数に通話をかけられるひとのユーザーオブジェクト
-      // await sendCallInvitation(myself, caller);
+      await sendCallInvitation(myself, caller);
       console.log('inviteCal called', caller);
     }
   };
