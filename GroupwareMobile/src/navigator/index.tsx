@@ -74,7 +74,7 @@ const Navigator = () => {
     }
   };
 
-  const endCall = async () => {
+  const endCall = useCallback(async () => {
     reject();
     if (remoteInvitation.current) {
       console.log('end call');
@@ -96,7 +96,13 @@ const Navigator = () => {
       console.log('cancel finished');
     }
     navigationRef.current?.navigate('Main');
-  };
+  }, [
+    disableCallAcceptedFlag,
+    isCallAccepted,
+    localInvitation,
+    navigationRef,
+    setLocalInvitationState,
+  ]);
 
   const callbacks: Partial<CallbacksInterface> = {
     EndCall: endCall,
@@ -434,10 +440,16 @@ const Navigator = () => {
         const realChannelName = localInvitation?.channelId as string;
         await joinChannel(realChannelName);
         navigationRef.current?.navigate('Call');
+        //タイムアウト
+        await new Promise(r => setTimeout(r, 12000));
+        if (!isCallAccepted) {
+          await endCall();
+          navigationRef.current?.navigate('Main');
+        }
       };
       joining();
     }
-  }, [joinChannel, localInvitation, navigationRef]);
+  }, [endCall, isCallAccepted, joinChannel, localInvitation, navigationRef]);
 
   return (
     <NavigationContainer ref={navigationRef}>
