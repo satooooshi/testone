@@ -1,6 +1,6 @@
 import React, {useCallback, useEffect, useState} from 'react';
 import WholeContainer from '../../../components/WholeContainer';
-import {Div, Text, Button, Tag} from 'react-native-magnus';
+import {Div, Text, Button, Tag, Icon} from 'react-native-magnus';
 import {useAPIGetWikiDetail} from '../../../hooks/api/wiki/useAPIGetWikiDetail';
 import {
   StyleSheet,
@@ -22,7 +22,11 @@ import {WikiDetailProps} from '../../../types/navigator/drawerScreenProps';
 import {useIsFocused} from '@react-navigation/core';
 import AnswerList from '../AnswerList';
 import {ScrollerProvider} from '../../../utils/htmlScroll/scroller';
-import {DrawerLayout, ScrollView} from 'react-native-gesture-handler';
+import {
+  DrawerLayout,
+  ScrollView,
+  TouchableHighlight,
+} from 'react-native-gesture-handler';
 import WikiBodyRenderer from '../../../components/wiki/WikiBodyRenderer';
 import TOC from '../../../components/wiki/TOC';
 import {FAB} from 'react-native-paper';
@@ -36,6 +40,8 @@ import UserAvatar from '../../../components/common/UserAvatar';
 import {tagColorFactory} from '../../../utils/factory/tagColorFactory';
 import tailwind from 'tailwind-rn';
 import {useAuthenticate} from '../../../contexts/useAuthenticate';
+import GoodSendersModal from '../../../components/chat/GoodSendersModal';
+import {useAPIToggleGoodForBoard} from '../../../hooks/api/wiki/useAPIToggleGoodForBoard';
 
 const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
   const isFocused = useIsFocused();
@@ -44,7 +50,13 @@ const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
   const {drawerRef, openDrawer, closeDrawer} = useMinimumDrawer();
   const {width: windowWidth} = useWindowDimensions();
   const {data: wikiInfo, refetch: refetchWikiInfo} = useAPIGetWikiDetail(id);
+  const {user} = useAuthenticate();
   const [wikiTypeName, setWikiTypeName] = useState('Wiki');
+  const [isVisible, setIsVisible] = useState<boolean>(false);
+  const [isPressHeart, setIsPressHeart] = useState<boolean>(
+    wikiInfo?.isGoodSender || false,
+  );
+
   const mdParser = new MarkdownIt({breaks: true});
   const wikiBody =
     wikiInfo?.textFormat === 'html'
@@ -123,6 +135,24 @@ const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
       wikiInfo?.boardCategory === BoardCategory.QA
     ) && headings.length;
 
+  const {mutate} = useAPIToggleGoodForBoard({
+    onSuccess: result => {
+      setIsPressHeart(!isPressHeart);
+      if (wikiInfo) {
+        if (result.isGoodSender) {
+          wikiInfo.userGoodForBoard = [
+            user as User,
+            ...(wikiInfo?.userGoodForBoard || []),
+          ];
+        } else {
+          wikiInfo.userGoodForBoard = wikiInfo.userGoodForBoard?.filter(
+            u => u.id !== user?.id,
+          );
+        }
+      }
+    },
+  });
+
   const article = (
     <ScrollerProvider scroller={scroller}>
       <ScrollView
@@ -186,6 +216,40 @@ const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
             </Div>
           </Div>
         ) : null}
+        {wikiInfo?.type === WikiType.BOARD && (
+          <Div flexDir="row" ml="auto" mb={10}>
+            <TouchableHighlight
+              underlayColor={'none'}
+              onPress={() => mutate(wikiInfo.id)}>
+              {isPressHeart ? (
+                <Icon
+                  name="heart"
+                  fontFamily="AntDesign"
+                  fontSize={37}
+                  color={'red'}
+                  mr={3}
+                />
+              ) : (
+                <Icon
+                  name="hearto"
+                  fontFamily="AntDesign"
+                  fontSize={35}
+                  color={darkFontColor}
+                  mr={3}
+                />
+              )}
+            </TouchableHighlight>
+            <Button
+              onPress={() =>
+                setIsVisible(true)
+              }>{`${wikiInfo.userGoodForBoard?.length}件のいいね`}</Button>
+          </Div>
+        )}
+        <GoodSendersModal
+          goodSenders={wikiInfo?.userGoodForBoard || []}
+          isVisible={isVisible}
+          onClose={() => setIsVisible(false)}
+        />
         {wikiInfo?.type === WikiType.BOARD &&
         wikiInfo.boardCategory === BoardCategory.QA ? (
           <Div w={windowWidth * 0.9} alignSelf="center">
@@ -215,6 +279,7 @@ const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
                   : '回答を投稿する'}
               </Button>
             </Div>
+
             <AnswerList wiki={wikiInfo} onPressAvatar={onPressAvatar} />
           </Div>
         ) : null}
