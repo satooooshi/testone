@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {createStackNavigator} from '@react-navigation/stack';
 import {
   NavigationContainer,
@@ -30,6 +30,7 @@ import SoundPlayer from 'react-native-sound-player';
 const Stack = createStackNavigator<RootStackParamList>();
 export const rtmEngine = new RtmClient();
 let rtcEngine: RtcEngine;
+let callKeepUUID = '';
 
 const Navigator = () => {
   const {user} = useAuthenticate();
@@ -56,6 +57,7 @@ const Navigator = () => {
     enableVideo: false,
     activeSpeaker: true,
   };
+  // const [callKeepUUID, setCallKeepUUUID] = useState('');
   const remoteInvitation = useRef<RemoteInvitation | undefined>();
 
   const soundOnEnd = async () => {
@@ -65,23 +67,35 @@ const Navigator = () => {
       console.log('sound on end call failed:', e);
     }
   };
+  const reject = () => {
+    if (callKeepUUID) {
+      RNCallKeep.rejectCall(callKeepUUID);
+      callKeepUUID = '';
+    }
+  };
 
   const endCall = async () => {
+    reject();
     if (remoteInvitation.current) {
+      console.log('end call');
+      console.log('end call finished');
       await rtmEngine?.refuseRemoteInvitationV2(remoteInvitation.current);
       remoteInvitation.current = undefined;
     }
-    if (!isCallAccepted && localInvitation) {
-      await rtmEngine?.cancelLocalInvitationV2(localInvitation);
-    }
     setAlertCountOnEndCall(c => c + 1);
     await soundOnEnd();
-    await rtcEngine?.leaveChannel();
-    RNCallKeep.endAllCalls();
     disableCallAcceptedFlag();
     setIsCalling(false);
     setChannelName('');
-    // navigationRef.current?.navigate('Main');
+    setOnCallUid('');
+    await rtcEngine?.leaveChannel();
+    if (!isCallAccepted && localInvitation) {
+      console.log('attempt to cancel');
+      await rtmEngine?.cancelLocalInvitationV2(localInvitation);
+      setLocalInvitationState(undefined);
+      console.log('cancel finished');
+    }
+    navigationRef.current?.navigate('Main');
   };
 
   const callbacks: Partial<CallbacksInterface> = {
@@ -103,22 +117,22 @@ const Navigator = () => {
     },
   };
 
-  const createRTCInstance = async () => {
+  const createRTCInstance = useCallback(async () => {
     rtcEngine = await RtcEngine.createWithContext(
       new RtcEngineContext(AGORA_APP_ID),
     );
-  };
+  }, [AGORA_APP_ID]);
 
   const rtcInit = async () => {
-    createRTCInstance();
+    await createRTCInstance();
     await rtcEngine?.disableVideo();
 
     rtcEngine?.addListener('UserJoined', (uid, elapsed) => {
       console.log('UserJoined', uid, elapsed);
     });
-    rtcEngine?.addListener('UserOffline', (uid, reason) => {
+    rtcEngine?.addListener('UserOffline', async (uid, reason) => {
       console.log('UserOffline', uid, reason);
-      endCall();
+      await endCall();
     });
     rtcEngine?.addListener('LeaveChannel', ({userCount}) => {
       console.log('LeaveChannel. user count: ', userCount);
@@ -141,12 +155,14 @@ const Navigator = () => {
 
   const rtmInit = () => {
     rtmEngine.addListener('RemoteInvitationCanceled', async () => {
-      endCall();
+      console.log('canceled');
+      await endCall();
     });
     rtmEngine.addListener('LocalInvitationRefused', async () => {
       disableCallAcceptedFlag();
       setLocalInvitationState(undefined);
       stopRing();
+      navigationRef.current?.navigate('Main');
     });
     rtmEngine.addListener('LocalInvitationAccepted', async invitation => {
       enableCallAcceptedFlag();
@@ -204,6 +220,10 @@ const Navigator = () => {
 
   const displayIncomingCallNow = (callingData: RemoteInvitation) => {
     console.log('Event: Display Incoming Call: ', callingData);
+    console.log('callingData.channelId', callingData.channelId);
+    if (callingData?.channelId) {
+      callKeepUUID = callingData.channelId;
+    }
     remoteInvitation.current = callingData;
     setOnCallUid(callingData?.callerId as string);
     RNCallKeep.backToForeground();
@@ -215,26 +235,38 @@ const Navigator = () => {
       false,
     );
   };
+  const navigateToCallWindow = useCallback(() => {
+    navigationRef.current?.navigate('Call');
+  }, [navigationRef]);
 
-  const joinChannel = async (realChannelName: string) => {
-    const res = await axiosInstance.get<string>(
-      `/chat/get-voice-token/${realChannelName}`,
-    );
-    const tokenForCall = res.data;
-    const userData = await apiAuthenticate();
-    const userId = userData?.id;
-    if (userId) {
-      createRTCInstance();
-      await rtcEngine?.joinChannel(tokenForCall, realChannelName, null, userId);
-      await rtcEngine?.disableVideo();
-      setChannelName(realChannelName);
-      navigateToCallWindow();
-      remoteInvitation.current = undefined;
-      setIsCalling(true);
-    }
-  };
+  const joinChannel = useCallback(
+    async (realChannelName: string) => {
+      const res = await axiosInstance.get<string>(
+        `/chat/get-voice-token/${realChannelName}`,
+      );
+      const tokenForCall = res.data;
+      const userData = await apiAuthenticate();
+      const userId = userData?.id;
+      if (userId) {
+        await createRTCInstance();
+        await rtcEngine?.joinChannel(
+          tokenForCall,
+          realChannelName,
+          null,
+          userId,
+        );
+        await rtcEngine?.disableVideo();
+        setChannelName(realChannelName);
+        navigateToCallWindow();
+        remoteInvitation.current = undefined;
+        setIsCalling(true);
+      }
+    },
+    [createRTCInstance, navigateToCallWindow],
+  );
 
   const answerCall = async () => {
+    RNCallKeep.backToForeground();
     RNCallKeep.endAllCalls();
     if (remoteInvitation.current?.channelId) {
       const realChannelName = remoteInvitation.current?.channelId as string;
@@ -249,10 +281,6 @@ const Navigator = () => {
       }
       await joinChannel(realChannelName);
     }
-  };
-
-  const navigateToCallWindow = () => {
-    navigationRef.current?.navigate('Call');
   };
 
   //useEffectで処理しないと複数回アラートが出る可能性がある
@@ -399,6 +427,17 @@ const Navigator = () => {
       navigationRef.current?.navigate('Main');
     }
   }, [isCalling, navigationRef, user?.id]);
+
+  useEffect(() => {
+    if (localInvitation) {
+      const joining = async () => {
+        const realChannelName = localInvitation?.channelId as string;
+        await joinChannel(realChannelName);
+        navigationRef.current?.navigate('Call');
+      };
+      joining();
+    }
+  }, [joinChannel, localInvitation, navigationRef]);
 
   return (
     <NavigationContainer ref={navigationRef}>
