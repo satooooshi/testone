@@ -267,6 +267,7 @@ const Navigator = () => {
       RNCallKeep.removeEventListener('answerCall');
       RNCallKeep.removeEventListener('endCall');
       rtcEngine.removeAllListeners();
+      rtmEngine.removeAllListeners();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
