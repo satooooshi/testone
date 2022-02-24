@@ -304,14 +304,14 @@ export class WikiService {
         .relation(Wiki, 'userGoodForBoard')
         .of({ id: userID })
         .remove({ id: wikiID });
-      return { isGoodSender: false, id: wikiID };
+      return { isGoodSender: false };
     } else {
       await this.wikiRepository
         .createQueryBuilder()
         .relation(Wiki, 'userGoodForBoard')
         .of({ id: userID })
         .add({ id: wikiID });
-      return { isGoodSender: true, id: wikiID };
+      return { isGoodSender: true };
     }
   }
 }
