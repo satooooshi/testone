@@ -39,14 +39,16 @@ const VoiceCall: React.FC<VoiceCallProps> = ({
         <RtcConfigure>
           <Div alignItems="center" mt={'40%'}>
             <Div my={'lg'}>
-              <UserAvatar
-                user={profile}
-                h={windowWidth * 0.5}
-                w={windowWidth * 0.5}
-              />
+              {profile ? (
+                <UserAvatar
+                  user={profile}
+                  h={windowWidth * 0.5}
+                  w={windowWidth * 0.5}
+                />
+              ) : null}
             </Div>
             <Text fontWeight="bold" mt={'lg'} mb={'lg'} fontSize={24}>
-              {userNameFactory(profile)}
+              {profile ? userNameFactory(profile) : '通話情報を取得中...'}
             </Text>
             {channelName ? (
               <Timer />
