@@ -48,7 +48,6 @@ const GoodSendersModal: React.FC<GoodSendersModalProps> = ({
               href={`/account/${u.id}`}
               passHref>
               <Box display="flex" flexDir="row" alignItems="center">
-                {console.log(u)}
                 <UserAvatar user={u} />
                 <Text fontSize={darkFontColor}>{userNameFactory(u)}</Text>
               </Box>
