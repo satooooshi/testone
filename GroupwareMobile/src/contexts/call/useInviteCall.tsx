@@ -1,4 +1,10 @@
-import React, {createContext, useContext, useState} from 'react';
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from 'react';
 import SoundPlayer from 'react-native-sound-player';
 import {LocalInvitation} from 'agora-react-native-rtm';
 
@@ -34,16 +40,21 @@ export const InviteCallProvider: React.FC = ({children}) => {
     setIsCallAccepted(false);
   };
   const ringCall = () => {
-    SoundPlayer.setNumberOfLoops(5);
     SoundPlayer.play();
   };
-  const stopRing = () => {
+  const stopRing = useCallback(() => {
     SoundPlayer.stop();
-  };
+  }, []);
 
   const setLocalInvitationState = (invitation: LocalInvitation) => {
     setLocalInvitation(invitation);
   };
+
+  useEffect(() => {
+    if (isCallAccepted) {
+      stopRing();
+    }
+  }, [isCallAccepted, stopRing]);
 
   return (
     <InvitationStatusContext.Provider

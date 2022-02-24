@@ -23,7 +23,6 @@ import {userNameFactory} from '../utils/factory/userNameFactory';
 import {apiAuthenticate} from '../hooks/api/auth/useAPIAuthenticate';
 import {Alert, Platform} from 'react-native';
 import Config from 'react-native-config';
-import VideoCall from '../components/call/VideoCall';
 import VoiceCall from '../components/call/VoiceCall';
 import {useInviteCall} from '../contexts/call/useInviteCall';
 import SoundPlayer from 'react-native-sound-player';
@@ -39,7 +38,6 @@ const Navigator = () => {
   const {
     isInvitationSending,
     isCallAccepted,
-    disableInvitationFlag,
     enableCallAcceptedFlag,
     disableCallAcceptedFlag,
     ringCall,
@@ -59,7 +57,6 @@ const Navigator = () => {
     activeSpeaker: true,
   };
   const remoteInvitation = useRef<RemoteInvitation | undefined>();
-  // SoundPlayer.loadSoundFile('ring_call', 'mp3');
 
   const soundOnEnd = async () => {
     try {
@@ -79,10 +76,8 @@ const Navigator = () => {
     }
     setAlertCountOnEndCall(c => c + 1);
     await soundOnEnd();
-    console.log('sound on end ');
     await rtcEngine?.leaveChannel();
     RNCallKeep.endAllCalls();
-    // disableInvitationFlag();
     disableCallAcceptedFlag();
     setCall(false);
     setChannelName('');
@@ -157,7 +152,7 @@ const Navigator = () => {
           '通話機能を利用するためには通話アカウントにこのアプリを登録してください',
         cancelButton: 'Cancel',
         okButton: 'ok',
-        // additionalPermissions: [PermissionsAndroid.PERMISSIONS.example],
+        additionalPermissions: [],
         foregroundService: {
           channelId: 'com.groupwaremobile',
           channelName: 'Foreground service for my app',
@@ -289,7 +284,7 @@ const Navigator = () => {
       }
     };
     getRtmToken();
-  }, [user?.id]);
+  }, [AGORA_APP_ID, user?.id]);
 
   useEffect(() => {
     const naviateByNotif = (notification: any) => {
@@ -387,7 +382,7 @@ const Navigator = () => {
     } else if (user?.id) {
       navigationRef.current?.navigate('Main');
     }
-  }, [Call]);
+  }, [Call, navigationRef, user?.id]);
 
   // const ringSound = async () => {
   //   await soundOnRing();
@@ -403,7 +398,7 @@ const Navigator = () => {
       ringCall();
     }
     setCall(isInvitationSending);
-  }, [isInvitationSending]);
+  }, [isInvitationSending, ringCall]);
 
   return (
     <NavigationContainer ref={navigationRef}>
