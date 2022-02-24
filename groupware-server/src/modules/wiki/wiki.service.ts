@@ -99,7 +99,7 @@ export class WikiService {
     }
   }
 
-  public async getWikiDetail(id: number): Promise<Wiki> {
+  public async getWikiDetail(userID: number, id: number): Promise<Wiki> {
     const existWiki = await this.wikiRepository
       .createQueryBuilder('wiki')
       .withDeleted()
@@ -110,9 +110,21 @@ export class WikiService {
       .leftJoinAndSelect('answer.replies', 'reply')
       .leftJoinAndSelect('reply.writer', 'reply_writer')
       .leftJoinAndSelect('wiki.tags', 'tags')
+      .leftJoinAndSelect('wiki.userGoodForBoard', 'userGoodForBoard')
       .where('wiki.id = :id', { id })
       .orderBy({ 'answer.created_at': 'ASC', 'reply.created_at': 'ASC' })
       .getOne();
+
+    if (existWiki.type === WikiType.BOARD) {
+      for (const user of existWiki.userGoodForBoard) {
+        if (user.id === userID) {
+          existWiki.isGoodSender = true;
+          break;
+        }
+        existWiki.isGoodSender = false;
+      }
+    }
+
     return existWiki;
   }
 
@@ -274,6 +286,7 @@ export class WikiService {
             wiki.isGoodSender = true;
             break;
           }
+          wiki.isGoodSender = false;
         }
       }
     }

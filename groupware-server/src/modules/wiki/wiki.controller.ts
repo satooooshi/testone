@@ -55,8 +55,12 @@ export class WikiController {
   }
 
   @Get('detail/:id')
-  async getWikiDetail(@Param('id') id: number): Promise<Wiki> {
-    return await this.qaService.getWikiDetail(id);
+  @UseGuards(JwtAuthenticationGuard)
+  async getWikiDetail(
+    @Req() request: RequestWithUser,
+    @Param('id') id: number,
+  ): Promise<Wiki> {
+    return await this.qaService.getWikiDetail(request.user.id, id);
   }
 
   @Get('latest')
