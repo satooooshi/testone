@@ -125,7 +125,7 @@ const AccountDetail: React.FC = () => {
   const navigation = useNavigation<AccountDetailNavigationProps>();
   const route = useRoute<AccountDetailRouteProps>();
   const {user, setUser, logout} = useAuthenticate();
-  const {isCallAccepted, stopRing, setLocalInvitationState} = useInviteCall();
+  const {stopRing, setLocalInvitationState} = useInviteCall();
   const id = route.params?.id;
   const userID = id || user?.id;
   const screenName = 'AccountDetail';
