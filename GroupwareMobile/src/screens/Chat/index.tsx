@@ -101,6 +101,7 @@ const Chat: React.FC = () => {
   const [after, setAfter] = useState<number>();
   const [before, setBefore] = useState<number>();
   const [include, setInclude] = useState<boolean>();
+  const [renderMessageId, setRenderMessageId] = useState<number | undefined>();
   const [inputtedSearchWord, setInputtedSearchWord] = useState('');
   const [imageModal, setImageModal] = useState(false);
   const [visibleSearchInput, setVisibleSearchInput] = useState(false);
@@ -191,7 +192,7 @@ const Chat: React.FC = () => {
               }
             }
           }
-          setMessages(m => [...msgToAppend, ...m]);
+          setMessages(m => refreshMessage([...msgToAppend, ...m]));
           // setImagesForViewing(i => [...i, ...imagesToApped]);
         }
       },
@@ -201,7 +202,7 @@ const Chat: React.FC = () => {
     useAPISendChatMessage({
       onSuccess: sentMsg => {
         socket.emit('message', {...sentMsg, isSender: false});
-        setMessages([sentMsg, ...messages]);
+        setMessages(refreshMessage([sentMsg, ...messages]));
         setValues(v => ({
           ...v,
           content: '',
@@ -232,17 +233,19 @@ const Chat: React.FC = () => {
     deleteReaction(reaction, {
       onSuccess: reactionId => {
         setMessages(m => {
-          return m.map(eachMessage => {
-            if (eachMessage.id === target.id) {
-              return {
-                ...eachMessage,
-                reactions: eachMessage.reactions?.filter(
-                  r => r.id !== reactionId,
-                ),
-              };
-            }
-            return eachMessage;
-          });
+          return refreshMessage(
+            m.map(eachMessage => {
+              if (eachMessage.id === target.id) {
+                return {
+                  ...eachMessage,
+                  reactions: eachMessage.reactions?.filter(
+                    r => r.id !== reactionId,
+                  ),
+                };
+              }
+              return eachMessage;
+            }),
+          );
         });
       },
       onError: () => {
@@ -263,17 +266,19 @@ const Chat: React.FC = () => {
       onSuccess: savedReaction => {
         const reactionAdded = {...savedReaction, isSender: true};
         setMessages(m => {
-          return m.map(eachMessage => {
-            if (eachMessage.id === savedReaction.chatMessage?.id) {
-              return {
-                ...eachMessage,
-                reactions: eachMessage.reactions?.length
-                  ? [...eachMessage.reactions, reactionAdded]
-                  : [reactionAdded],
-              };
-            }
-            return eachMessage;
-          });
+          return refreshMessage(
+            m.map(eachMessage => {
+              if (eachMessage.id === savedReaction.chatMessage?.id) {
+                return {
+                  ...eachMessage,
+                  reactions: eachMessage.reactions?.length
+                    ? [...eachMessage.reactions, reactionAdded]
+                    : [reactionAdded],
+                };
+              }
+              return eachMessage;
+            }),
+          );
         });
       },
       onError: () => {
@@ -408,17 +413,48 @@ const Chat: React.FC = () => {
     return 0;
   }, [searchedResults, focusedMessageID]);
 
-  const scrollToTarget = (messageIndex: number) => {
-    if (searchedResults?.length && inputtedSearchWord) {
-      if (Platform.OS === 'ios') {
-        messageIosRef.current?.scrollToIndex({index: messageIndex});
-      } else {
-        (messageAndroidRef.current?.flatListRef as any)?.scrollToIndex({
-          index: messageIndex,
-        });
-      }
+  const refetchDoesntExistMessages = (focused?: number) => {
+    const isExist = messages.filter(m => m.id === focused)?.length;
+
+    if (!isExist) {
+      setAfter(focused);
+      setInclude(true);
+      return true;
+    } else {
+      setInclude(false);
+      return false;
     }
   };
+
+  const scrollToRenderedMessage = () => {
+    const wait = new Promise(resolve => setTimeout(resolve, 100));
+    wait.then(() => {
+      if (renderMessageId) {
+        scrollToTarget(renderMessageId);
+        console.log('setRenderMessageId動作');
+        setRenderMessageId(undefined);
+      } else {
+        Alert.alert(
+          'メッセージの読み込みがうまくいきませんでした。再度検索してください。',
+        );
+      }
+    });
+  };
+
+  const scrollToTarget = useCallback(
+    (messageIndex: number) => {
+      if (searchedResults?.length && inputtedSearchWord) {
+        if (Platform.OS === 'ios') {
+          messageIosRef.current?.scrollToIndex({index: messageIndex});
+        } else {
+          (messageAndroidRef.current?.flatListRef as any)?.scrollToIndex({
+            index: messageIndex,
+          });
+        }
+      }
+    },
+    [inputtedSearchWord, searchedResults?.length],
+  );
   const refreshMessage = (targetMessages: ChatMessage[]): ChatMessage[] => {
     const arrayIncludesDuplicate = [...messages, ...targetMessages];
     return arrayIncludesDuplicate
@@ -435,9 +471,21 @@ const Chat: React.FC = () => {
   }, [refetchLatest, room]);
 
   useEffect(() => {
+    if (focusedMessageID) {
+      refetchDoesntExistMessages(focusedMessageID);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [focusedMessageID]);
+
+  useEffect(() => {
     if (fetchedPastMessages?.length) {
       const refreshedMessage = refreshMessage(fetchedPastMessages);
       setMessages(refreshedMessage);
+      if (!refetchDoesntExistMessages(fetchedPastMessages[0].id)) {
+        setAfter(undefined);
+        setInclude(false);
+        setBefore(undefined);
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fetchedPastMessages]);
@@ -479,7 +527,9 @@ const Chat: React.FC = () => {
     // 検索する文字がアルファベットの場合、なぜかuseAPISearchMessagesのonSuccessが動作しない為、こちらで代わりとなる処理を記述しています。
     if (searchedResults?.length) {
       setFocusedMessageID(searchedResults[0].id);
+      refetchDoesntExistMessages(searchedResults[0].id);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchedResults]);
 
   useEffect(() => {
@@ -505,9 +555,9 @@ const Chat: React.FC = () => {
         }
         setMessages(m => {
           if (m[0].id !== sentMsgByOtherUsers.id) {
-            return [sentMsgByOtherUsers, ...m];
+            return refreshMessage([sentMsgByOtherUsers, ...m]);
           }
-          return m;
+          return refreshMessage(m);
         });
       }
     });
@@ -541,10 +591,10 @@ const Chat: React.FC = () => {
           }
         }
         setMessages(m => {
-          return [...m, ...msgToAppend];
+          return refreshMessage([...m, ...msgToAppend]);
         });
       } else if (!messages?.length) {
-        setMessages(fetchedPastMessages);
+        setMessages(refreshMessage(fetchedPastMessages));
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -558,7 +608,15 @@ const Chat: React.FC = () => {
   };
 
   const renderMessage = (message: ChatMessage, messageIndex: number) => (
-    <Div mb={'sm'} mx="md">
+    <Div
+      mb={'sm'}
+      mx="md"
+      onLayout={() =>
+        message.id === messages[messages.length - 1].id &&
+        include &&
+        after &&
+        scrollToRenderedMessage()
+      }>
       <ChatMessageItem
         message={message}
         readUsers={readUsers(message)}
@@ -621,6 +679,9 @@ const Chat: React.FC = () => {
             style={chatStyles.flatlist}
             inverted
             data={messages}
+            onScrollToIndexFailed={info => {
+              setRenderMessageId(info.index);
+            }}
             // {...{onEndReached}}
             renderItem={({item: message, index}) =>
               renderMessage(message, index)
@@ -674,6 +735,9 @@ const Chat: React.FC = () => {
             contentContainerStyle={chatStyles.flatlistContent}
             inverted
             data={messages}
+            onScrollToIndexFailed={info => {
+              setRenderMessageId(info.index);
+            }}
             // {...{onEndReached}}
             keyExtractor={item => item.id.toString()}
             renderItem={({item: message, index}) =>
@@ -905,12 +969,16 @@ const Chat: React.FC = () => {
               w={'25%'}>
               <TouchableOpacity
                 style={tailwind('flex flex-row')}
-                onPress={() => setFocusedMessageID(nextFocusIndex('prev'))}>
+                onPress={() => {
+                  setFocusedMessageID(nextFocusIndex('prev'));
+                }}>
                 <Icon name="arrow-up" fontFamily="FontAwesome" fontSize={25} />
               </TouchableOpacity>
               <TouchableOpacity
                 style={tailwind('flex flex-row')}
-                onPress={() => setFocusedMessageID(nextFocusIndex('next'))}>
+                onPress={() => {
+                  setFocusedMessageID(nextFocusIndex('next'));
+                }}>
                 <Icon
                   name="arrow-down"
                   fontFamily="FontAwesome"
@@ -926,9 +994,13 @@ const Chat: React.FC = () => {
           </Div>
           {inputtedSearchWord !== '' && (
             <Div h={40} alignItems={'center'} justifyContent={'center'}>
-              <Text color="black">{`${countOfSearchWord} / ${
-                searchedResults?.length || 0
-              }`}</Text>
+              {renderMessageId ? (
+                <ActivityIndicator />
+              ) : (
+                <Text color="black">{`${countOfSearchWord} / ${
+                  searchedResults?.length || 0
+                }`}</Text>
+              )}
             </Div>
           )}
         </Div>
