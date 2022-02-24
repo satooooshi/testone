@@ -47,7 +47,7 @@ const Navigator = () => {
   const [isCalling, setIsCalling] = useState(false);
   const [agoraToken, setAgoraToken] = useState('');
   const [channelName, setChannelName] = useState('');
-  const [onCallUid, setOnCallUid] = useState('2');
+  const [onCallUid, setOnCallUid] = useState('');
   const [alertCountOnEndCall, setAlertCountOnEndCall] = useState(0);
   const AGORA_APP_ID = Config.AGORA_APP_ID;
   const rtcProps: RtcPropsInterface = {
