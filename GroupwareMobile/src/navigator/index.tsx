@@ -43,7 +43,7 @@ const Navigator = () => {
     ringCall,
     localInvitation,
   } = useInviteCall();
-  const [Call, setCall] = useState(false);
+  const [isCalling, setIsCalling] = useState(false);
   const [agoraToken, setAgoraToken] = useState('');
   const [channelName, setChannelName] = useState('');
   const [onCallUid, setOnCallUid] = useState('2');
@@ -79,7 +79,7 @@ const Navigator = () => {
     await rtcEngine?.leaveChannel();
     RNCallKeep.endAllCalls();
     disableCallAcceptedFlag();
-    setCall(false);
+    setIsCalling(false);
     setChannelName('');
     navigationRef.current?.navigate('Main');
   };
@@ -117,10 +117,6 @@ const Navigator = () => {
       console.log('UserOffline', uid, reason);
       endCall();
     });
-    // rtmEngine.addListener('RemoteInvitationRefused', () => {
-    //   console.log('RemoteInvitationRefused');
-    //   endCall();
-    // });
     rtcEngine?.addListener('LeaveChannel', ({userCount}) => {
       console.log('LeaveChannel. user count: ', userCount);
     });
@@ -140,7 +136,25 @@ const Navigator = () => {
     console.log('Message handled in the background!', remoteMessage);
   });
 
-  const callKeepSetup = async () => {
+  const rtmInit = () => {
+    rtmEngine.addListener('LocalInvitationAccepted', async invitation => {
+      enableCallAcceptedFlag();
+      setOnCallUid(invitation?.calleeId as string);
+      const realChannelName = invitation?.channelId as string;
+      await joinChannel(realChannelName);
+    });
+    rtmEngine.addListener(
+      'RemoteInvitationReceived',
+      (invitation: RemoteInvitation) => {
+        displayIncomingCallNow(invitation);
+      },
+    );
+    rtmEngine.addListener('LocalInvitationCanceled', () => {
+      endCall();
+    });
+  };
+
+  const callKeepInit = async () => {
     const options: IOptions = {
       ios: {
         appName: 'Eface',
@@ -168,6 +182,8 @@ const Navigator = () => {
       RNCallKeep.addEventListener('didLoadWithEvents', events => {
         console.log(events);
       });
+      RNCallKeep.addEventListener('answerCall', answerCall);
+      RNCallKeep.addEventListener('endCall', endCall);
     } catch (err) {
       //@ts-ignore
       console.error('Initialize CallKeep Error:', err?.message);
@@ -200,7 +216,7 @@ const Navigator = () => {
       await rtcEngine?.joinChannel(tokenForCall, realChannelName, null, userId);
       await rtcEngine?.disableVideo();
       setChannelName(realChannelName);
-      setCall(true);
+      setIsCalling(true);
       navigateToCallWindow();
     }
   };
@@ -242,26 +258,11 @@ const Navigator = () => {
 
   useEffect(() => {
     rtcInit();
-    callKeepSetup();
-    rtmEngine.addListener('LocalInvitationAccepted', async invitation => {
-      enableCallAcceptedFlag();
-      setOnCallUid(invitation?.calleeId as string);
-      const realChannelName = invitation?.channelId as string;
-      await joinChannel(realChannelName);
-    });
-    rtmEngine.addListener(
-      'RemoteInvitationReceived',
-      (invitation: RemoteInvitation) => {
-        displayIncomingCallNow(invitation);
-      },
-    );
-    rtmEngine.addListener('LocalInvitationCanceled', () => {
-      endCall();
-    });
-    RNCallKeep.addEventListener('answerCall', answerCall);
-    RNCallKeep.addEventListener('endCall', endCall);
+    callKeepInit();
+    rtmInit();
     return () => {
       RNCallKeep.removeEventListener('answerCall');
+      RNCallKeep.removeEventListener('endCall');
       rtcEngine.removeAllListeners();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -377,16 +378,12 @@ const Navigator = () => {
   }, [registerDevice, user]);
 
   useEffect(() => {
-    if (Call) {
+    if (isCalling) {
       navigationRef.current?.navigate('Call');
     } else if (user?.id) {
       navigationRef.current?.navigate('Main');
     }
-  }, [Call, navigationRef, user?.id]);
-
-  // const ringSound = async () => {
-  //   await soundOnRing();
-  // };
+  }, [isCalling, navigationRef, user?.id]);
 
   useEffect(() => {
     console.log(
@@ -397,7 +394,7 @@ const Navigator = () => {
       // SoundPlayer.resume();
       ringCall();
     }
-    setCall(isInvitationSending);
+    setIsCalling(isInvitationSending);
   }, [isInvitationSending, ringCall]);
 
   return (
