@@ -41,6 +41,7 @@ const Navigator = () => {
     disableCallAcceptedFlag,
     setLocalInvitationState,
     localInvitation,
+    stopRing,
   } = useInviteCall();
   const [isCalling, setIsCalling] = useState(false);
   const [agoraToken, setAgoraToken] = useState('');
@@ -80,7 +81,7 @@ const Navigator = () => {
     disableCallAcceptedFlag();
     setIsCalling(false);
     setChannelName('');
-    navigationRef.current?.navigate('Main');
+    // navigationRef.current?.navigate('Main');
   };
 
   const callbacks: Partial<CallbacksInterface> = {
@@ -102,11 +103,14 @@ const Navigator = () => {
     },
   };
 
-  // console.log(rtcEngine);
-  const rtcInit = async () => {
+  const createRTCInstance = async () => {
     rtcEngine = await RtcEngine.createWithContext(
       new RtcEngineContext(AGORA_APP_ID),
     );
+  };
+
+  const rtcInit = async () => {
+    createRTCInstance();
     await rtcEngine?.disableVideo();
 
     rtcEngine?.addListener('UserJoined', (uid, elapsed) => {
@@ -136,6 +140,14 @@ const Navigator = () => {
   });
 
   const rtmInit = () => {
+    rtmEngine.addListener('RemoteInvitationCanceled', async () => {
+      endCall();
+    });
+    rtmEngine.addListener('LocalInvitationRefused', async () => {
+      disableCallAcceptedFlag();
+      setLocalInvitationState(undefined);
+      stopRing();
+    });
     rtmEngine.addListener('LocalInvitationAccepted', async invitation => {
       enableCallAcceptedFlag();
       setLocalInvitationState(undefined);
@@ -212,7 +224,7 @@ const Navigator = () => {
     const userData = await apiAuthenticate();
     const userId = userData?.id;
     if (userId) {
-      await rtcInit();
+      createRTCInstance();
       await rtcEngine?.joinChannel(tokenForCall, realChannelName, null, userId);
       await rtcEngine?.disableVideo();
       setChannelName(realChannelName);
@@ -283,7 +295,8 @@ const Navigator = () => {
           console.log('login as ', user?.id.toString());
         }
       } else {
-        // await rtmEngine.logout();
+        await rtmEngine.createInstance(AGORA_APP_ID);
+        await rtmEngine.logout();
       }
     };
     getRtmToken();
