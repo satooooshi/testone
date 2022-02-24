@@ -52,7 +52,7 @@ const ReadUsersListModal: React.FC<ReadUsersListModalProps> = ({
     </Link>
   );
   return (
-    <Modal isOpen={isOpen} onClose={onClose}>
+    <Modal isOpen={isOpen} onClose={onClose} scrollBehavior="inside">
       <ModalOverlay />
       <ModalContent h="90vh" bg={'#f9fafb'}>
         <ModalHeader>
