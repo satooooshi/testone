@@ -74,6 +74,7 @@ export class ChatController {
       },
     };
     await sendPushNotifToSpecificUsers([callee], notificationData);
+    return;
   }
 
   @Get('get-rtm-token')
