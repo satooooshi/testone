@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {createStackNavigator} from '@react-navigation/stack';
 import {
   NavigationContainer,
@@ -21,9 +21,8 @@ import {CallbacksInterface, RtcPropsInterface} from 'agora-rn-uikit';
 import RtcEngine, {RtcEngineContext} from 'react-native-agora';
 import {userNameFactory} from '../utils/factory/userNameFactory';
 import {apiAuthenticate} from '../hooks/api/auth/useAPIAuthenticate';
-import {Alert, Platform} from 'react-native';
+import {Platform} from 'react-native';
 import Config from 'react-native-config';
-import VideoCall from '../components/call/VideoCall';
 import VoiceCall from '../components/call/VoiceCall';
 import {useInviteCall} from '../contexts/call/useInviteCall';
 import SoundPlayer from 'react-native-sound-player';
@@ -37,19 +36,15 @@ const Navigator = () => {
   const navigationRef = useNavigationContainerRef<any>();
   const {mutate: registerDevice} = useAPIRegisterDevice();
   const {
-    isInvitationSending,
-    isCallAccepted,
-    disableInvitationFlag,
     enableCallAcceptedFlag,
     disableCallAcceptedFlag,
-    ringCall,
     localInvitation,
+    cancelInvitation,
   } = useInviteCall();
-  const [Call, setCall] = useState(false);
+  const [calling, setCalling] = useState(false);
   const [agoraToken, setAgoraToken] = useState('');
   const [channelName, setChannelName] = useState('');
   const [onCallUid, setOnCallUid] = useState('2');
-  const [alertCountOnEndCall, setAlertCountOnEndCall] = useState(0);
   const AGORA_APP_ID = Config.AGORA_APP_ID;
   const rtcProps: RtcPropsInterface = {
     appId: AGORA_APP_ID,
@@ -59,7 +54,6 @@ const Navigator = () => {
     activeSpeaker: true,
   };
   const remoteInvitation = useRef<RemoteInvitation | undefined>();
-  // SoundPlayer.loadSoundFile('ring_call', 'mp3');
 
   const soundOnEnd = async () => {
     try {
@@ -71,20 +65,16 @@ const Navigator = () => {
 
   const endCall = async () => {
     if (remoteInvitation.current) {
-      await rtmEngine?.refuseRemoteInvitationV2(remoteInvitation.current);
-      remoteInvitation.current = undefined;
+      console.log('exists');
+      rtmEngine?.refuseRemoteInvitationV2(remoteInvitation.current);
     }
-    if (!isCallAccepted && localInvitation) {
-      await rtmEngine?.cancelLocalInvitationV2(localInvitation);
-    }
-    setAlertCountOnEndCall(c => c + 1);
+    remoteInvitation.current = undefined;
+    cancelInvitation();
     await soundOnEnd();
-    console.log('sound on end ');
     await rtcEngine?.leaveChannel();
     RNCallKeep.endAllCalls();
-    // disableInvitationFlag();
     disableCallAcceptedFlag();
-    setCall(false);
+    setCalling(false);
     setChannelName('');
     navigationRef.current?.navigate('Main');
   };
@@ -122,10 +112,10 @@ const Navigator = () => {
       console.log('UserOffline', uid, reason);
       endCall();
     });
-    // rtmEngine.addListener('RemoteInvitationRefused', () => {
-    //   console.log('RemoteInvitationRefused');
-    //   endCall();
-    // });
+    rtmEngine.addListener('RemoteInvitationCanceled', () => {
+      console.log('RemoteInvitationCanceled');
+      RNCallKeep.endAllCalls();
+    });
     rtcEngine?.addListener('LeaveChannel', ({userCount}) => {
       console.log('LeaveChannel. user count: ', userCount);
     });
@@ -157,7 +147,7 @@ const Navigator = () => {
           '通話機能を利用するためには通話アカウントにこのアプリを登録してください',
         cancelButton: 'Cancel',
         okButton: 'ok',
-        // additionalPermissions: [PermissionsAndroid.PERMISSIONS.example],
+        additionalPermissions: [],
         foregroundService: {
           channelId: 'com.groupwaremobile',
           channelName: 'Foreground service for my app',
@@ -205,7 +195,7 @@ const Navigator = () => {
       await rtcEngine?.joinChannel(tokenForCall, realChannelName, null, userId);
       await rtcEngine?.disableVideo();
       setChannelName(realChannelName);
-      setCall(true);
+      setCalling(true);
       navigateToCallWindow();
     }
   };
@@ -227,23 +217,9 @@ const Navigator = () => {
     }
   };
 
-  const navigateToCallWindow = () => {
+  const navigateToCallWindow = useCallback(() => {
     navigationRef.current?.navigate('Call');
-  };
-
-  //useEffectで処理しないと複数回アラートが出る可能性がある
-  useEffect(() => {
-    if (alertCountOnEndCall === 1) {
-      Alert.alert('通話が終了しました', '', [
-        {
-          text: 'OK',
-          onPress: () => {
-            setAlertCountOnEndCall(0);
-          },
-        },
-      ]);
-    }
-  }, [alertCountOnEndCall]);
+  }, [navigationRef]);
 
   useEffect(() => {
     rtcInit();
@@ -268,6 +244,9 @@ const Navigator = () => {
     return () => {
       RNCallKeep.removeEventListener('answerCall');
       rtcEngine.removeAllListeners();
+      RNCallKeep.removeEventListener('answerCall');
+      RNCallKeep.removeEventListener('endCall');
+      rtmEngine.removeAllListeners();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -289,7 +268,7 @@ const Navigator = () => {
       }
     };
     getRtmToken();
-  }, [user?.id]);
+  }, [AGORA_APP_ID, user?.id]);
 
   useEffect(() => {
     const naviateByNotif = (notification: any) => {
@@ -382,28 +361,25 @@ const Navigator = () => {
   }, [registerDevice, user]);
 
   useEffect(() => {
-    if (Call) {
-      navigationRef.current?.navigate('Call');
+    if (localInvitation) {
+      setCalling(true);
+    } else {
+      setCalling(false);
+    }
+  }, [localInvitation, navigationRef]);
+
+  useEffect(() => {
+    if (Platform.OS === 'android') {
+      console.log('Androider', calling, localInvitation);
+    } else {
+      console.log('ios', calling, localInvitation);
+    }
+    if (calling || localInvitation) {
+      navigateToCallWindow();
     } else if (user?.id) {
       navigationRef.current?.navigate('Main');
     }
-  }, [Call]);
-
-  // const ringSound = async () => {
-  //   await soundOnRing();
-  // };
-
-  useEffect(() => {
-    console.log(
-      'isInvitationSending ====================',
-      isInvitationSending,
-    );
-    if (isInvitationSending) {
-      // SoundPlayer.resume();
-      ringCall();
-    }
-    setCall(isInvitationSending);
-  }, [isInvitationSending]);
+  }, [calling, localInvitation, navigateToCallWindow, navigationRef, user?.id]);
 
   return (
     <NavigationContainer ref={navigationRef}>
