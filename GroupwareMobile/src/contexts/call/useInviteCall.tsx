@@ -9,14 +9,11 @@ import SoundPlayer from 'react-native-sound-player';
 import {LocalInvitation} from 'agora-react-native-rtm';
 
 const InvitationStatusContext = createContext({
-  isInvitationSending: false,
   isCallAccepted: false,
   localInvitation: {} as LocalInvitation | undefined,
   setLocalInvitationState: (() => {}) as (
     invitation: LocalInvitation | undefined,
   ) => void,
-  enableInvitationFlag: () => {},
-  disableInvitationFlag: () => {},
   enableCallAcceptedFlag: () => {},
   disableCallAcceptedFlag: () => {},
   ringCall: () => {},
@@ -24,19 +21,10 @@ const InvitationStatusContext = createContext({
 });
 
 export const InviteCallProvider: React.FC = ({children}) => {
-  const [isInvitationSending, setIsInvitationSending] = useState(false);
   const [isCallAccepted, setIsCallAccepted] = useState(false);
   const [localInvitation, setLocalInvitation] = useState<
     LocalInvitation | undefined
   >();
-  SoundPlayer.loadSoundFile('ring_call', 'mp3');
-
-  const enableInvitationFlag = () => {
-    setIsInvitationSending(true);
-  };
-  const disableInvitationFlag = () => {
-    setIsInvitationSending(false);
-  };
   const enableCallAcceptedFlag = () => {
     setIsCallAccepted(true);
   };
@@ -44,7 +32,7 @@ export const InviteCallProvider: React.FC = ({children}) => {
     setIsCallAccepted(false);
   };
   const ringCall = () => {
-    SoundPlayer.play();
+    SoundPlayer.playSoundFile('ring_call', 'mp3');
   };
   const stopRing = useCallback(() => {
     SoundPlayer.stop();
@@ -55,6 +43,14 @@ export const InviteCallProvider: React.FC = ({children}) => {
   };
 
   useEffect(() => {
+    if (localInvitation) {
+      ringCall();
+    } else {
+      stopRing();
+    }
+  }, [localInvitation, stopRing]);
+
+  useEffect(() => {
     if (isCallAccepted) {
       stopRing();
     }
@@ -63,10 +59,7 @@ export const InviteCallProvider: React.FC = ({children}) => {
   return (
     <InvitationStatusContext.Provider
       value={{
-        isInvitationSending,
         isCallAccepted,
-        enableInvitationFlag,
-        disableInvitationFlag,
         enableCallAcceptedFlag,
         disableCallAcceptedFlag,
         ringCall,

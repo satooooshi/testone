@@ -36,11 +36,9 @@ const Navigator = () => {
   const navigationRef = useNavigationContainerRef<any>();
   const {mutate: registerDevice} = useAPIRegisterDevice();
   const {
-    isInvitationSending,
     isCallAccepted,
     enableCallAcceptedFlag,
     disableCallAcceptedFlag,
-    ringCall,
     setLocalInvitationState,
     localInvitation,
   } = useInviteCall();
@@ -218,9 +216,9 @@ const Navigator = () => {
       await rtcEngine?.joinChannel(tokenForCall, realChannelName, null, userId);
       await rtcEngine?.disableVideo();
       setChannelName(realChannelName);
-      setIsCalling(true);
       navigateToCallWindow();
       remoteInvitation.current = undefined;
+      setIsCalling(true);
     }
   };
 
@@ -388,18 +386,6 @@ const Navigator = () => {
       navigationRef.current?.navigate('Main');
     }
   }, [isCalling, navigationRef, user?.id]);
-
-  useEffect(() => {
-    console.log(
-      'isInvitationSending ====================',
-      isInvitationSending,
-    );
-    if (isInvitationSending) {
-      // SoundPlayer.resume();
-      ringCall();
-    }
-    setIsCalling(isInvitationSending);
-  }, [isInvitationSending, ringCall]);
 
   return (
     <NavigationContainer ref={navigationRef}>
