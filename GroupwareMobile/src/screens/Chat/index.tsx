@@ -962,14 +962,16 @@ const Chat: React.FC = () => {
               <TouchableOpacity
                 style={tailwind('flex flex-row')}
                 onPress={() => {
-                  setFocusedMessageID(nextFocusIndex('prev'));
+                  !renderMessageIndex &&
+                    setFocusedMessageID(nextFocusIndex('prev'));
                 }}>
                 <Icon name="arrow-up" fontFamily="FontAwesome" fontSize={25} />
               </TouchableOpacity>
               <TouchableOpacity
                 style={tailwind('flex flex-row')}
                 onPress={() => {
-                  setFocusedMessageID(nextFocusIndex('next'));
+                  !renderMessageIndex &&
+                    setFocusedMessageID(nextFocusIndex('next'));
                 }}>
                 <Icon
                   name="arrow-down"
