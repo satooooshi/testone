@@ -149,8 +149,6 @@ const Chat: React.FC = () => {
     isLoading: loadingMessages,
     isFetching: fetchingMessages,
   } = useAPIGetMessages({
-    // group: room.id,
-    // page: page.toString(),
     group: room.id,
     after,
     before,
@@ -176,7 +174,6 @@ const Chat: React.FC = () => {
   const {refetch: refetchLatest} = useAPIGetMessages(
     {
       group: room.id,
-      // page: '1',
     },
     {
       enabled: false,
@@ -367,12 +364,6 @@ const Chat: React.FC = () => {
     setVideo(url);
   };
 
-  // const onEndReached = () => {
-  //   if (fetchedPastMessages?.length) {
-  //     setPage(p => p + 1);
-  //   }
-  // };
-
   const isRecent = (created: ChatMessage, target: ChatMessage): boolean => {
     if (new Date(created.createdAt) > new Date(target.createdAt)) {
       return true;
@@ -431,11 +422,10 @@ const Chat: React.FC = () => {
     wait.then(() => {
       if (renderMessageId) {
         scrollToTarget(renderMessageId);
-        console.log('setRenderMessageId動作');
         setRenderMessageId(undefined);
       } else {
         Alert.alert(
-          'メッセージの読み込みがうまくいきませんでした。再度検索してください。',
+          'メッセージの読み込みがうまくいきませんでした。\n再度検索してください。',
         );
       }
     });
@@ -682,7 +672,7 @@ const Chat: React.FC = () => {
             onScrollToIndexFailed={info => {
               setRenderMessageId(info.index);
             }}
-            // {...{onEndReached}}
+            onEndReached={() => onScrollTopOnChat()}
             renderItem={({item: message, index}) =>
               renderMessage(message, index)
             }
@@ -721,7 +711,6 @@ const Chat: React.FC = () => {
       ) : (
         <>
           <KeyboardAwareFlatList
-            onEndReached={() => onScrollTopOnChat()}
             innerRef={ref => (messageAndroidRef.current.flatListRef = ref)}
             refreshing={true}
             style={chatStyles.flatlist}
@@ -738,7 +727,7 @@ const Chat: React.FC = () => {
             onScrollToIndexFailed={info => {
               setRenderMessageId(info.index);
             }}
-            // {...{onEndReached}}
+            onEndReached={() => onScrollTopOnChat()}
             keyExtractor={item => item.id.toString()}
             renderItem={({item: message, index}) =>
               renderMessage(message, index)
