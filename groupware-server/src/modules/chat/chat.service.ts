@@ -161,6 +161,32 @@ export class ChatService {
     return messages;
   }
 
+  public async searchMessage(
+    query: SearchMessageQuery,
+  ): Promise<Partial<ChatMessage[]>> {
+    const words = query.word.split(' ');
+    const sql = this.chatMessageRepository
+      .createQueryBuilder('chat_messages')
+      .leftJoin('chat_messages.chatGroup', 'g')
+      .where('chat_messages.type <> :type', { type: 'system_text' })
+      .select('chat_messages.id');
+
+    words.map((w, index) => {
+      if (index === 0) {
+        sql.andWhere('chat_messages.content LIKE :word0', { word0: `%${w}%` });
+      } else {
+        sql.andWhere(`chat_messages.content LIKE :word${index}`, {
+          [`word${index}`]: `%${w}%`,
+        });
+      }
+    });
+    const message = await sql
+      .andWhere('g.id = :group', { group: query.group })
+      .orderBy('chat_messages.createdAt', 'DESC')
+      .getMany();
+    return message;
+  }
+
   public async getMenthionedChatMessage(user: User): Promise<ChatMessage[]> {
     const now = new Date();
     // const oneDayAgo = new Date(now.setDate(now.getDate() - 1));
