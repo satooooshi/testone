@@ -13,6 +13,7 @@ type CallMessageProps = {
 };
 
 const CallMessage: React.FC<CallMessageProps> = ({ message }) => {
+  const test = '01:00:10';
   return (
     <Box
       w={150}
@@ -33,13 +34,21 @@ const CallMessage: React.FC<CallMessageProps> = ({ message }) => {
         justifyContent="center">
         <IoCall />
       </Box>
-      <Box ml={2}>
+      <Box ml={2} flexDir="column" display="flex" alignItems="center">
         <Text
-          borderRadius="8px"
+          fontSize={15}
           color={message.isSender ? 'white' : darkFontColor}
           bg={message.isSender ? 'blue.500' : '#ececec'}>
           {mentionTransform(message.content)}
         </Text>
+        {test ? (
+          <Text
+            mt={1}
+            fontSize={11}
+            color={message.isSender ? 'white' : darkFontColor}>
+            {test}
+          </Text>
+        ) : null}
       </Box>
     </Box>
   );

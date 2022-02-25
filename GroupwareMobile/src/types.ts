@@ -280,6 +280,7 @@ export interface ChatMessage {
   updatedAt: Date;
   isSender?: boolean;
   thumbnail?: string;
+  callTime?: string;
   replyParentMessage?: ChatMessage | null;
 }
 

@@ -277,6 +277,7 @@ export interface ChatMessage {
   createdAt: Date;
   updatedAt: Date;
   isSender?: boolean;
+  callTime?: string;
   replyParentMessage?: ChatMessage;
 }
 

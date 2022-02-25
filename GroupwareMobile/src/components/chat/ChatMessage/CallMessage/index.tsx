@@ -12,6 +12,7 @@ export type CallMessageProps = {
 
 const CallMessage: React.FC<CallMessageProps> = ({message, onLongPress}) => {
   const {width: windowWidth, height: windowHeight} = useWindowDimensions();
+  const test = '01:00:10';
   return (
     <TouchableHighlight onLongPress={onLongPress} underlayColor="none">
       <Div
@@ -32,10 +33,15 @@ const CallMessage: React.FC<CallMessageProps> = ({message, onLongPress}) => {
           ml={3}>
           <Icon name="phone" fontFamily="Entypo" fontSize={25} color="white" />
         </Div>
-        <Div>
-          <Text ml={10} fontSize={15} color="white">
+        <Div ml={10} flexDir="column" alignItems="center">
+          <Text fontSize={15} color="white">
             {message.content}
           </Text>
+          {test ? (
+            <Text mt={2} fontSize={12} color="white">
+              {test}
+            </Text>
+          ) : null}
         </Div>
       </Div>
     </TouchableHighlight>
