@@ -19,12 +19,14 @@ type VoiceCallProps = {
   callbacks: Partial<CallbacksInterface>;
   onCallUid: string;
   channelName: string;
+  isCalling: boolean;
 };
 const VoiceCall: React.FC<VoiceCallProps> = ({
   rtcProps,
   callbacks,
   onCallUid,
   channelName,
+  isCalling,
 }) => {
   const props: React.PropsWithChildren<PropsInterface> = {
     rtcProps: rtcProps,
@@ -50,7 +52,7 @@ const VoiceCall: React.FC<VoiceCallProps> = ({
             <Text fontWeight="bold" mt={'lg'} mb={'lg'} fontSize={24}>
               {profile ? userNameFactory(profile) : '通話情報を取得中...'}
             </Text>
-            {channelName && onCallUid ? (
+            {channelName && onCallUid && isCalling ? (
               <Timer />
             ) : (
               <Text mt={'lg'} mb={'lg'} fontSize={20}>

@@ -82,13 +82,16 @@ const Navigator = () => {
       await rtmEngine?.refuseRemoteInvitationV2(remoteInvitation.current);
       remoteInvitation.current = undefined;
     }
+    await rtcInit();
+    await rtcEngine?.leaveChannel();
+    const userInfo = await rtcEngine?.getUserInfoByUid(1327);
+    console.log(userInfo);
     setAlertCountOnEndCall(c => c + 1);
     await soundOnEnd();
     disableCallAcceptedFlag();
     setIsCalling(false);
     setChannelName('');
     setOnCallUid('');
-    await rtcEngine?.leaveChannel();
     if (!isCallAccepted && localInvitation) {
       console.log('attempt to cancel');
       await rtmEngine?.cancelLocalInvitationV2(localInvitation);
@@ -96,6 +99,8 @@ const Navigator = () => {
       console.log('cancel finished');
     }
     navigationRef.current?.navigate('Main');
+    // await rtcEngine?.destroy();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     disableCallAcceptedFlag,
     isCallAccepted,
@@ -103,6 +108,39 @@ const Navigator = () => {
     navigationRef,
     setLocalInvitationState,
   ]);
+
+  const createRTCInstance = useCallback(async () => {
+    rtcEngine = await RtcEngine.createWithContext(
+      new RtcEngineContext(AGORA_APP_ID),
+    );
+  }, [AGORA_APP_ID]);
+
+  const rtcInit = useCallback(async () => {
+    await createRTCInstance();
+    await rtcEngine?.disableVideo();
+    rtcEngine?.removeAllListeners();
+
+    rtcEngine?.addListener('UserJoined', (uid, elapsed) => {
+      console.log('UserJoined', uid, elapsed);
+    });
+    rtcEngine?.addListener('UserOffline', async (uid, reason) => {
+      console.log('UserOffline', uid, reason);
+      await endCall();
+    });
+    rtcEngine?.addListener('ConnectionStateChanged', async (state, reason) => {
+      console.log('ConnectionStateChanged ', Platform.OS, state, reason);
+    });
+    rtcEngine?.addListener('LeaveChannel', async ({userCount}) => {
+      console.log('LeaveChannel. user count: ', Platform.OS, userCount);
+      await endCall();
+    });
+    rtcEngine?.addListener('JoinChannelSuccess', (channel, uid, elapsed) => {
+      console.log('JoinChannelSuccess', channel, uid, elapsed);
+    });
+    rtcEngine?.addListener('Error', errCode => {
+      console.log('errCode', errCode);
+    });
+  }, [createRTCInstance, endCall]);
 
   const callbacks: Partial<CallbacksInterface> = {
     EndCall: endCall,
@@ -122,38 +160,10 @@ const Navigator = () => {
       }
     },
   };
-
-  const createRTCInstance = useCallback(async () => {
-    rtcEngine = await RtcEngine.createWithContext(
-      new RtcEngineContext(AGORA_APP_ID),
-    );
-  }, [AGORA_APP_ID]);
-
-  const rtcInit = async () => {
-    await createRTCInstance();
-    await rtcEngine?.disableVideo();
-
-    rtcEngine?.addListener('UserJoined', (uid, elapsed) => {
-      console.log('UserJoined', uid, elapsed);
-    });
-    rtcEngine?.addListener('UserOffline', async (uid, reason) => {
-      console.log('UserOffline', uid, reason);
-      await endCall();
-    });
-    rtcEngine?.addListener('LeaveChannel', ({userCount}) => {
-      console.log('LeaveChannel. user count: ', userCount);
-    });
-    rtcEngine?.addListener('JoinChannelSuccess', (channel, uid, elapsed) => {
-      console.log('JoinChannelSuccess', channel, uid, elapsed);
-    });
-    rtcEngine?.addListener('Error', errCode => {
-      console.log('errCode', errCode);
-    });
-  };
   messaging().setBackgroundMessageHandler(async remoteMessage => {
     if (Platform.OS === 'ios') {
       if (remoteMessage?.data?.type === 'call') {
-        RNCallKeep.backToForeground();
+        displayIncomingCallNow(remoteMessage?.data as any);
       }
     }
     console.log('Message handled in the background!', remoteMessage);
@@ -232,7 +242,7 @@ const Navigator = () => {
     }
     remoteInvitation.current = callingData;
     setOnCallUid(callingData?.callerId as string);
-    RNCallKeep.backToForeground();
+    // RNCallKeep.backToForeground();
     RNCallKeep.displayIncomingCall(
       callingData?.channelId as string,
       userNameFactory(user),
@@ -254,7 +264,7 @@ const Navigator = () => {
       const userData = await apiAuthenticate();
       const userId = userData?.id;
       if (userId) {
-        await createRTCInstance();
+        await rtcInit();
         await rtcEngine?.joinChannel(
           tokenForCall,
           realChannelName,
@@ -268,7 +278,7 @@ const Navigator = () => {
         setIsCalling(true);
       }
     },
-    [createRTCInstance, navigateToCallWindow],
+    [rtcInit, navigateToCallWindow],
   );
 
   const answerCall = async () => {
@@ -441,11 +451,11 @@ const Navigator = () => {
         await joinChannel(realChannelName);
         navigationRef.current?.navigate('Call');
         //タイムアウト
-        await new Promise(r => setTimeout(r, 12000));
-        if (!isCallAccepted) {
-          await endCall();
-          navigationRef.current?.navigate('Main');
-        }
+        // await new Promise(r => setTimeout(r, 12000));
+        // if (!isCallAccepted) {
+        //   await endCall();
+        //   navigationRef.current?.navigate('Main');
+        // }
       };
       joining();
     }
@@ -472,6 +482,7 @@ const Navigator = () => {
                     callbacks={callbacks}
                     onCallUid={onCallUid}
                     channelName={channelName}
+                    isCalling={isCalling}
                   />
                 )}
               />

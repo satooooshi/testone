@@ -62,16 +62,17 @@ export class ChatController {
     private readonly configService: ConfigService,
   ) {}
 
-  @Get('notif-call/:calleeId')
+  @Post('notif-call/:calleeId')
   @UseGuards(JwtAuthenticationGuard)
-  async notifiCall(@Param('calleeId') calleeId: string) {
+  async notifiCall(
+    @Param('calleeId') calleeId: string,
+    @Body() invitation: any,
+  ) {
     const callee = await this.chatService.calleeForPhoneCall(calleeId);
     const notificationData: CustomPushNotificationData = {
       title: '',
       body: '',
-      custom: {
-        type: 'call',
-      },
+      custom: invitation,
     };
     await sendPushNotifToSpecificUsers([callee], notificationData);
   }

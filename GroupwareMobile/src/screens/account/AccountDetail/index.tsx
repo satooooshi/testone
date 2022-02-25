@@ -239,7 +239,10 @@ const AccountDetail: React.FC = () => {
       const res = await axiosInstance.get<string>('/chat/get-rtm-token');
       await rtmEngine.loginV2(user?.id?.toString() as string, res.data);
       await rtmEngine.sendLocalInvitationV2(localInvitation);
-      await axiosInstance.get(`/chat/notif-call/${profile.id}`);
+      await axiosInstance.post(
+        `/chat/notif-call/${profile.id}`,
+        localInvitation,
+      );
       await new Promise(resolve => setTimeout(resolve, 10000));
       stopRing();
     }
