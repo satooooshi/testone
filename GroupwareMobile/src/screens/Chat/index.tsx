@@ -380,42 +380,9 @@ const Chat: React.FC = () => {
     );
   };
 
-  const nextFocusIndex = (sequence: 'prev' | 'next') => {
-    if (searchedResults?.length) {
-      const index = searchedResults.findIndex(e => e.id === focusedMessageID);
-
-      if (sequence === 'next') {
-        return searchedResults?.[index].id === searchedResults?.[0].id
-          ? searchedResults?.[searchedResults.length - 1].id
-          : searchedResults[index - 1].id;
-      } else if (sequence === 'prev') {
-        return searchedResults?.[index].id ===
-          searchedResults?.[searchedResults.length - 1].id
-          ? searchedResults[0].id
-          : searchedResults[index + 1].id;
-      }
-    }
-  };
-  const countOfSearchWord = useMemo(() => {
-    if (searchedResults?.length && focusedMessageID) {
-      const index = searchedResults?.findIndex(result => {
-        return result?.id === focusedMessageID;
-      });
-      return Math.abs(searchedResults.length - index);
-    }
-    return 0;
-  }, [searchedResults, focusedMessageID]);
-
-  const refetchDoesntExistMessages = (focused?: number) => {
-    const isExist = messages.filter(m => m.id === focused)?.length;
-
-    if (!isExist) {
-      setAfter(focused);
-      setInclude(true);
-      return true;
-    } else {
-      setInclude(false);
-      return false;
+  const onScrollTopOnChat = () => {
+    if (fetchedPastMessages?.length) {
+      setBefore(messages[messages.length - 1].id);
     }
   };
 
@@ -447,6 +414,47 @@ const Chat: React.FC = () => {
     },
     [inputtedSearchWord, searchedResults?.length],
   );
+
+  const countOfSearchWord = useMemo(() => {
+    if (searchedResults?.length && focusedMessageID) {
+      const index = searchedResults?.findIndex(result => {
+        return result?.id === focusedMessageID;
+      });
+      return Math.abs(searchedResults.length - index);
+    }
+    return 0;
+  }, [searchedResults, focusedMessageID]);
+
+  const nextFocusIndex = (sequence: 'prev' | 'next') => {
+    if (searchedResults?.length) {
+      const index = searchedResults.findIndex(e => e.id === focusedMessageID);
+
+      if (sequence === 'next') {
+        return searchedResults?.[index].id === searchedResults?.[0].id
+          ? searchedResults?.[searchedResults.length - 1].id
+          : searchedResults[index - 1].id;
+      } else if (sequence === 'prev') {
+        return searchedResults?.[index].id ===
+          searchedResults?.[searchedResults.length - 1].id
+          ? searchedResults[0].id
+          : searchedResults[index + 1].id;
+      }
+    }
+  };
+
+  const refetchDoesntExistMessages = (focused?: number) => {
+    const isExist = messages.filter(m => m.id === focused)?.length;
+
+    if (!isExist) {
+      setAfter(focused);
+      setInclude(true);
+      return true;
+    } else {
+      setInclude(false);
+      return false;
+    }
+  };
+
   const refreshMessage = (targetMessages: ChatMessage[]): ChatMessage[] => {
     const arrayIncludesDuplicate = [...messages, ...targetMessages];
     return arrayIncludesDuplicate
@@ -461,6 +469,15 @@ const Chat: React.FC = () => {
     setAfter(undefined);
     refetchLatest();
   }, [refetchLatest, room]);
+
+  useEffect(() => {
+    // 検索する文字がアルファベットの場合、なぜかuseAPISearchMessagesのonSuccessが動作しない為、こちらで代わりとなる処理を記述しています。
+    if (searchedResults?.length) {
+      setFocusedMessageID(searchedResults[0].id);
+      refetchDoesntExistMessages(searchedResults[0].id);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchedResults]);
 
   useEffect(() => {
     if (focusedMessageID) {
@@ -483,12 +500,6 @@ const Chat: React.FC = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fetchedPastMessages]);
-
-  const onScrollTopOnChat = () => {
-    if (fetchedPastMessages?.length) {
-      setBefore(messages[messages.length - 1].id);
-    }
-  };
 
   const typeDropdown = (
     <Dropdown
@@ -516,15 +527,6 @@ const Chat: React.FC = () => {
       </Dropdown.Option>
     </Dropdown>
   );
-
-  useEffect(() => {
-    // 検索する文字がアルファベットの場合、なぜかuseAPISearchMessagesのonSuccessが動作しない為、こちらで代わりとなる処理を記述しています。
-    if (searchedResults?.length) {
-      setFocusedMessageID(searchedResults[0].id);
-      refetchDoesntExistMessages(searchedResults[0].id);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchedResults]);
 
   useEffect(() => {
     if (longPressedMsg) {
