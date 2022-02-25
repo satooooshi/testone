@@ -441,11 +441,11 @@ const Navigator = () => {
         await joinChannel(realChannelName);
         navigationRef.current?.navigate('Call');
         //タイムアウト
-        await new Promise(r => setTimeout(r, 12000));
-        if (!isCallAccepted) {
-          await endCall();
-          navigationRef.current?.navigate('Main');
-        }
+        // await new Promise(r => setTimeout(r, 12000));
+        // if (!isCallAccepted) {
+        //   await endCall();
+        //   navigationRef.current?.navigate('Main');
+        // }
       };
       joining();
     }
