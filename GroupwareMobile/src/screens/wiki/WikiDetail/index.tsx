@@ -87,6 +87,7 @@ const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
     if (wikiInfo) {
       const nameStr = wikiTypeNameFactory(wikiInfo.type, wikiInfo.ruleCategory);
       setWikiTypeName(nameStr);
+      setIsPressHeart(wikiInfo.isGoodSender || false);
     }
   }, [wikiInfo]);
 
@@ -240,6 +241,7 @@ const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
               )}
             </TouchableHighlight>
             <Button
+              bg="gray"
               onPress={() =>
                 setIsVisible(true)
               }>{`${wikiInfo.userGoodForBoard?.length}件のいいね`}</Button>
