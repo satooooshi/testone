@@ -20,6 +20,7 @@ import FileMessage from './FileMessage';
 import ImageMessage from './ImageMessage';
 import ReactionToMessage from './ReactionToMessage';
 import TextMessage from './TextMessage';
+import CallMessage from './CallMessage';
 import VideoMessage from './VideoMessage';
 
 type ChatMessageItemProps = {
@@ -121,6 +122,8 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
             {message.isSender && timesAndReadCounts}
             {message.type === ChatMessageType.TEXT ? (
               <TextMessage message={message} onLongPress={onLongPress} />
+            ) : message.type === ChatMessageType.CALL ? (
+              <CallMessage message={message} onLongPress={onLongPress} />
             ) : message.type === ChatMessageType.IMAGE ? (
               <ImageMessage
                 onPress={onPressImage}

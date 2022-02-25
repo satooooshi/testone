@@ -7,11 +7,15 @@ import React, {
 } from 'react';
 import SoundPlayer from 'react-native-sound-player';
 import {LocalInvitation} from 'agora-react-native-rtm';
-import {User} from '../../types';
+import {ChatMessageType, User} from '../../types';
 import {
   cancelCallInvitation,
   sendInvitation,
 } from '../../utils/calling/inviteCall';
+import {useAPISaveChatGroup} from '../../hooks/api/chat/useAPISaveChatGroup';
+import {useAPISendChatMessage} from '../../hooks/api/chat/useAPISendChatMessage';
+import io from 'socket.io-client';
+import {baseURL} from '../../utils/url';
 
 interface IInvitationStatusContext {
   isCallAccepted: boolean;
@@ -36,6 +40,16 @@ export const InviteCallProvider: React.FC = ({children}) => {
   const [localInvitation, setLocalInvitation] = useState<LocalInvitation>();
   const [resetInvitation, setResetInvitation] = useState(false);
 
+  const {mutate: createGroup, data: groupData} = useAPISaveChatGroup();
+  const socket = io(baseURL, {
+    transports: ['websocket'],
+  });
+  const {mutate: sendChatMessage} = useAPISendChatMessage({
+    onSuccess: sentMsg => {
+      socket.emit('message', {...sentMsg, isSender: false});
+    },
+  });
+
   const enableCallAcceptedFlag = () => {
     setIsCallAccepted(true);
   };
@@ -54,7 +68,17 @@ export const InviteCallProvider: React.FC = ({children}) => {
     const invitation = await sendInvitation(caller, callee);
     console.log('send call invitation');
     setLocalInvitation(invitation);
+    createGroup({name: '', members: [callee]});
     startRing();
+    console.log(
+      'sendCallInvitation =================================================',
+      groupData,
+    );
+    sendChatMessage({
+      content: 'キャンセル',
+      type: ChatMessageType.CALL,
+      chatGroup: groupData,
+    });
   };
 
   const cancelInvitation = useCallback(async () => {
@@ -62,6 +86,12 @@ export const InviteCallProvider: React.FC = ({children}) => {
       stopRing();
       setResetInvitation(true);
       setLocalInvitation(undefined);
+
+      // sendChatMessage({
+      //   content: 'キャンセル',
+      //   type: ChatMessageType.IMAGE,
+      //   chatGroup: groupData,
+      // });
     } else {
       console.error('invitationが送信されていません');
     }
