@@ -139,9 +139,8 @@ const WikiComment: React.FC<WikiCommentProps> = ({
         ) : null}
       </div>
       {wiki?.type === WikiType.BOARD && (
-        <Box display="flex" justifyContent={'flex-end'}>
+        <Box display="flex" justifyContent={'flex-end'} mt={5}>
           <Link
-            position="relative"
             onClick={() => {
               mutate(wiki?.id || 0);
             }}>
