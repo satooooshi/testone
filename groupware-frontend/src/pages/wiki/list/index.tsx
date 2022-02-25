@@ -34,11 +34,7 @@ const QAQuestionList = () => {
     rule_category,
     board_category,
   } = router.query as SearchQueryToGetWiki;
-  const {
-    refetch,
-    data: questions,
-    isLoading,
-  } = useAPIGetWikiList({
+  const { data: questions, isLoading } = useAPIGetWikiList({
     page,
     tag,
     word,
