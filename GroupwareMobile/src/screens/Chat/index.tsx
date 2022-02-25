@@ -101,7 +101,7 @@ const Chat: React.FC = () => {
   const [after, setAfter] = useState<number>();
   const [before, setBefore] = useState<number>();
   const [include, setInclude] = useState<boolean>();
-  const [renderMessageId, setRenderMessageId] = useState<number | undefined>();
+  const [renderMessageIndex, setRenderMessageIndex] = useState<number | undefined>();
   const [inputtedSearchWord, setInputtedSearchWord] = useState('');
   const [imageModal, setImageModal] = useState(false);
   const [visibleSearchInput, setVisibleSearchInput] = useState(false);
@@ -420,9 +420,9 @@ const Chat: React.FC = () => {
   const scrollToRenderedMessage = () => {
     const wait = new Promise(resolve => setTimeout(resolve, 100));
     wait.then(() => {
-      if (renderMessageId) {
-        scrollToTarget(renderMessageId);
-        setRenderMessageId(undefined);
+      if (renderMessageIndex) {
+        scrollToTarget(renderMessageIndex);
+        setRenderMessageIndex(undefined);
       } else {
         Alert.alert(
           'メッセージの読み込みがうまくいきませんでした。\n再度検索してください。',
@@ -670,7 +670,7 @@ const Chat: React.FC = () => {
             inverted
             data={messages}
             onScrollToIndexFailed={info => {
-              setRenderMessageId(info.index);
+              setRenderMessageIndex(info.index);
             }}
             onEndReached={() => onScrollTopOnChat()}
             renderItem={({item: message, index}) =>
@@ -725,7 +725,7 @@ const Chat: React.FC = () => {
             inverted
             data={messages}
             onScrollToIndexFailed={info => {
-              setRenderMessageId(info.index);
+              setRenderMessageIndex(info.index);
             }}
             onEndReached={() => onScrollTopOnChat()}
             keyExtractor={item => item.id.toString()}
@@ -983,7 +983,7 @@ const Chat: React.FC = () => {
           </Div>
           {inputtedSearchWord !== '' && (
             <Div h={40} alignItems={'center'} justifyContent={'center'}>
-              {renderMessageId ? (
+              {renderMessageIndex ? (
                 <ActivityIndicator />
               ) : (
                 <Text color="black">{`${countOfSearchWord} / ${
