@@ -101,7 +101,9 @@ const Chat: React.FC = () => {
   const [after, setAfter] = useState<number>();
   const [before, setBefore] = useState<number>();
   const [include, setInclude] = useState<boolean>();
-  const [renderMessageIndex, setRenderMessageIndex] = useState<number | undefined>();
+  const [renderMessageIndex, setRenderMessageIndex] = useState<
+    number | undefined
+  >();
   const [inputtedSearchWord, setInputtedSearchWord] = useState('');
   const [imageModal, setImageModal] = useState(false);
   const [visibleSearchInput, setVisibleSearchInput] = useState(false);
@@ -604,9 +606,8 @@ const Chat: React.FC = () => {
       mb={'sm'}
       mx="md"
       onLayout={() =>
-        message.id === messages[messages.length - 1].id &&
-        include &&
-        after &&
+        message.id === focusedMessageID &&
+        renderMessageIndex &&
         scrollToRenderedMessage()
       }>
       <ChatMessageItem
