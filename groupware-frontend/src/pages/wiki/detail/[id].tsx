@@ -310,6 +310,7 @@ const QuestionDetail = () => {
                     myself?.role === UserRole.ADMIN) &&
                   navigateToEditWiki(wiki.id)
                 }
+                wiki={wiki}
               />
             </div>
           </div>
