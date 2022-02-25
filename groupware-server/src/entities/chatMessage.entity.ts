@@ -49,6 +49,9 @@ export class ChatMessage {
   })
   type: ChatMessageType;
 
+  @Column({ type: 'varchar', name: 'call_time' })
+  callTime?: string;
+
   @ManyToOne(() => ChatGroup, (chatGroup) => chatGroup.chatMessages, {
     onUpdate: 'CASCADE',
     onDelete: 'CASCADE',

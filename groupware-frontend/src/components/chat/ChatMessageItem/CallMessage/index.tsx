@@ -15,23 +15,32 @@ type CallMessageProps = {
 const CallMessage: React.FC<CallMessageProps> = ({ message }) => {
   return (
     <Box
-      w={'100'}
-      h={'100'}
+      w={150}
+      h={50}
       bg={message.isSender ? 'blue.500' : '#ececec'}
       p="8px"
-      rounded="md">
-      <Linkify>
+      rounded="md"
+      display="flex"
+      flexDirection="row"
+      alignItems="center">
+      <Box
+        w={8}
+        h={8}
+        rounded="full"
+        display="flex"
+        bg={message.isSender ? 'blue.400' : 'gray.300'}
+        alignItems="center"
+        justifyContent="center">
         <IoCall />
+      </Box>
+      <Box ml={2}>
         <Text
           borderRadius="8px"
-          maxW={'40vw'}
-          minW={'10vw'}
-          wordBreak={'break-word'}
           color={message.isSender ? 'white' : darkFontColor}
           bg={message.isSender ? 'blue.500' : '#ececec'}>
           {mentionTransform(message.content)}
         </Text>
-      </Linkify>
+      </Box>
     </Box>
   );
 };
