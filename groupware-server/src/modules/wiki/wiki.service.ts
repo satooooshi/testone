@@ -165,7 +165,7 @@ export class WikiService {
       offset = (Number(page) - 1) * limit;
     }
     const tagIDs = tag.split(' ');
-    const sql = this.wikiRepository
+    const [wikiWithRelation, count] = await this.wikiRepository
       .createQueryBuilder('wiki')
       .select()
       .leftJoinAndSelect('wiki.tags', 'tag')
@@ -173,62 +173,6 @@ export class WikiService {
       .leftJoinAndSelect('wiki.answers', 'answer')
       .leftJoinAndSelect('answer.writer', 'answer_writer')
       .leftJoinAndSelect('wiki.userGoodForBoard', 'userGoodForBoard')
-      .andWhere(type ? 'wiki.type = :type' : '1=1', { type })
-      .andWhere(word ? 'CONCAT(title, wiki.body) LIKE :queryWord' : '1=1', {
-        queryWord: `%${word}%`,
-      })
-      .andWhere(
-        status === 'new' &&
-          !writer &&
-          type === WikiType.BOARD &&
-          board_category === BoardCategory.QA
-          ? 'wiki.resolved_at is null'
-          : status === 'resolved' &&
-            !writer &&
-            type === WikiType.BOARD &&
-            board_category === BoardCategory.QA
-          ? 'wiki.resolved_at is not null'
-          : '1=1',
-      )
-      .andWhere(writer ? 'writer.id = :writer' : '1=1', {
-        writer: writer,
-      })
-      .andWhere(
-        query.answer_writer ? 'answer_writer.id = :answerWriter' : '1=1',
-        {
-          answerWriter: query.answer_writer,
-        },
-      )
-      .andWhere(
-        rule_category && type === WikiType.RULES
-          ? 'wiki.ruleCategory = :ruleCategory'
-          : '1=1',
-        {
-          ruleCategory: rule_category,
-        },
-      )
-      .andWhere(
-        board_category && type === WikiType.BOARD
-          ? 'wiki.boardCategory = :boardCategory'
-          : '1=1',
-        {
-          boardCategory: board_category,
-        },
-      )
-      .andWhere(tag ? 'tag.id IN (:...tagIDs)' : '1=1', {
-        tagIDs,
-      })
-      .skip(offset)
-      .take(limit)
-      .orderBy('wiki.createdAt', 'DESC');
-    const wikiWithRelation = await sql.getMany();
-    const [_, count] = await this.wikiRepository
-      .createQueryBuilder('wiki')
-      .select()
-      .leftJoinAndSelect('wiki.tags', 'tag')
-      .leftJoinAndSelect('wiki.writer', 'writer')
-      .leftJoinAndSelect('wiki.answers', 'answer')
-      .leftJoinAndSelect('answer.writer', 'answer_writer')
       .andWhere(type ? 'wiki.type = :type' : '1=1', { type })
       .andWhere(word ? 'CONCAT(title, wiki.body) LIKE :queryWord' : '1=1', {
         queryWord: `%${word}%`,
