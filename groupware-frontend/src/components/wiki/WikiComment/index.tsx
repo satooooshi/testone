@@ -152,6 +152,8 @@ const WikiComment: React.FC<WikiCommentProps> = ({
           </Link>
           <Link onClick={() => setGoodSendersModal(true)}>
             <Button
+              colorScheme={'blue'}
+              color="white"
               size={
                 'sm'
               }>{`${wiki?.userGoodForBoard?.length}件のいいね`}</Button>

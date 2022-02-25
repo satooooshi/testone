@@ -122,7 +122,7 @@ const WikiCard: React.FC<WikiCardProps> = ({ wiki }) => {
         justifyContent="flex-end">
         <Box display="flex" flexDir="row" height={5} alignItems="center">
           {wiki.type === WikiType.BOARD && (
-            <Box display="flex">
+            <Box display="flex" mr={3}>
               <Link
                 position={'relative'}
                 onClick={() => {
@@ -139,6 +139,8 @@ const WikiCard: React.FC<WikiCardProps> = ({ wiki }) => {
                   setGoodSendersModal(true);
                 }}>
                 <Button
+                  colorScheme={'blue'}
+                  color="white"
                   size={'sm'}>{`${userGoodForBoard?.length}件のいいね`}</Button>
               </Link>
             </Box>

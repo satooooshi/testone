@@ -241,7 +241,6 @@ const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
               )}
             </TouchableHighlight>
             <Button
-              bg="gray"
               onPress={() =>
                 setIsVisible(true)
               }>{`${wikiInfo.userGoodForBoard?.length}件のいいね`}</Button>
