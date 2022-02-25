@@ -43,6 +43,16 @@
   margin-bottom: 4px;
 }
 
+.name_kana {
+  color: $dark_font_color;
+  font-size: 13px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  width: 100%;
+  margin-bottom: 4px;
+}
+
 .sub_info_text {
   font-size: 14px;
   display: flex;

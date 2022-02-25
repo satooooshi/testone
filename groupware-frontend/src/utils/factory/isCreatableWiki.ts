@@ -54,12 +54,5 @@ export const isWikiAuthor = (event: Wiki, targetUser?: Partial<User>) => {
 };
 
 export const isEditableWiki = (wiki: Wiki, targetUser?: Partial<User>) => {
-  return (
-    isWikiAuthor(wiki, targetUser) ||
-    isCreatableWiki({
-      type: wiki.type,
-      boardCategory: wiki.boardCategory,
-      userRole: targetUser?.role,
-    })
-  );
+  return isWikiAuthor(wiki, targetUser);
 };

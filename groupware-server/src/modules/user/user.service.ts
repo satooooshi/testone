@@ -516,7 +516,6 @@ export class UserService {
       if (!u.email && !u.password && !existUser) {
         throw new BadRequestException('メールアドレスとパスワードは必須です');
       }
-      const hashedPassword = await hash(u.password, 10);
       if (existUser) {
         usersArr.push({
           ...existUser,
@@ -524,6 +523,7 @@ export class UserService {
           verifiedAt: new Date(),
         });
       } else {
+        const hashedPassword = await hash(u.password, 10);
         usersArr.push({
           ...u,
           password: hashedPassword,

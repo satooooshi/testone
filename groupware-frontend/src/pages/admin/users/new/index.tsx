@@ -377,6 +377,21 @@ const CreateNewUser = () => {
           </FormControl>
           <FormControl className={createNewUserStyles.input_wrapper}>
             <FormLabel fontWeight={'bold'}>
+              <p>電話番号</p>
+            </FormLabel>
+            <Input
+              type="phone"
+              placeholder="000-0000-0000"
+              value={values.phone}
+              background="white"
+              onChange={(e) =>
+                setUserInfo((i) => ({ ...i, phone: e.target.value }))
+              }
+              name="phone"
+            />
+          </FormControl>
+          <FormControl className={createNewUserStyles.input_wrapper}>
+            <FormLabel fontWeight={'bold'}>
               <p>社員区分</p>
             </FormLabel>
             <Select

@@ -6,16 +6,13 @@ import { getChatMessagesURL } from 'src/utils/url/chat.url';
 
 export interface GetMessagesQuery {
   group: number;
-  limit?: string;
-  after?: number;
-  before?: number;
-  include?: boolean;
+  page?: string;
 }
 
 const getMessages = async (query: GetMessagesQuery) => {
-  const { group, after = '', before = '', include } = query;
+  const { group, page = 1 } = query;
   const res = await axiosInstance.get(
-    `${getChatMessagesURL}?group=${group}&after=${after}&before=${before}&include=${include}`,
+    `${getChatMessagesURL}?group=${group}&page=${page}`,
   );
   return res.data;
 };
