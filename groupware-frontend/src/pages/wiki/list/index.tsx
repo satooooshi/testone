@@ -46,6 +46,7 @@ const QAQuestionList = () => {
   const [searchWord, setSearchWord] = useState(word);
   const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
   const { data: tags } = useAPIGetTag();
+
   const boardTopTab: TopTabBehavior[] = [
     {
       tabName: '全て',

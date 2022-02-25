@@ -360,11 +360,17 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
         if (sentMsgByOtherUsers.sender?.id === myself?.id) {
           sentMsgByOtherUsers.isSender = true;
         }
-        setMessages((m) => {
-          if (m[0].id !== sentMsgByOtherUsers.id) {
-            return [sentMsgByOtherUsers, ...m];
+        setMessages((msgs) => {
+          if (
+            msgs.length &&
+            msgs[0].id !== sentMsgByOtherUsers.id &&
+            sentMsgByOtherUsers.chatGroup?.id === room.id
+          ) {
+            return [sentMsgByOtherUsers, ...msgs];
+          } else if (sentMsgByOtherUsers.chatGroup?.id !== room.id) {
+            return msgs.filter((m) => m.id !== sentMsgByOtherUsers.id);
           }
-          return m;
+          return msgs;
         });
         needRefetch();
       }

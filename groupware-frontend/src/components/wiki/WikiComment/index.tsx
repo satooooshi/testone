@@ -1,15 +1,19 @@
-import React from 'react';
-import { TextFormat, User } from 'src/types';
+import React, { useEffect, useState } from 'react';
+import { TextFormat, User, Wiki, WikiType } from 'src/types';
 import qaCommentStyles from '@/styles/components/QAComment.module.scss';
 import { dateTimeFormatterFromJSDDate } from 'src/utils/dateTimeFormatter';
-import { Avatar, Button } from '@chakra-ui/react';
+import { Avatar, Box, Button } from '@chakra-ui/react';
 import MarkdownIt from 'markdown-it';
 import Editor from 'react-markdown-editor-lite';
 import 'react-markdown-editor-lite/lib/index.css';
 import DraftMarkup from '../DraftMarkup';
-import Link from 'next/link';
 import boldMascot from '@/public/bold-mascot.png';
 import Linkify from 'react-linkify';
+import { useAPIToggleGoodForBoard } from '@/hooks/api/wiki/useAPIToggleGoodForBoard';
+import { useAuthenticate } from 'src/contexts/useAuthenticate';
+import { AiFillHeart, AiOutlineHeart } from 'react-icons/ai';
+import GoodSendersModal from '../GoodSendersModal';
+import { Link } from '@chakra-ui/react';
 
 type WikiCommentProps = {
   textFormat?: TextFormat;
@@ -23,6 +27,7 @@ type WikiCommentProps = {
   onClickReplyButton?: () => void;
   bestAnswerButtonName?: string;
   onClickBestAnswerButton?: () => void;
+  wiki?: Wiki;
 };
 
 const WikiComment: React.FC<WikiCommentProps> = ({
@@ -37,8 +42,43 @@ const WikiComment: React.FC<WikiCommentProps> = ({
   onClickReplyButton,
   bestAnswerButtonName,
   onClickBestAnswerButton,
+  wiki,
 }) => {
   const mdParser = new MarkdownIt({ breaks: true });
+  const [wikiState, setWikiState] = useState(wiki);
+  const [isPressHeart, setIsPressHeart] = useState<boolean>(
+    wiki?.isGoodSender || false,
+  );
+  const [goodSendersModal, setGoodSendersModal] = useState(false);
+  const { user } = useAuthenticate();
+
+  const { mutate } = useAPIToggleGoodForBoard({
+    onSuccess: () => {
+      setIsPressHeart((prevHeartStatus) => {
+        setWikiState((w) => {
+          if (w) {
+            if (prevHeartStatus) {
+              w.userGoodForBoard = w.userGoodForBoard?.filter(
+                (u) => u.id !== user?.id,
+              );
+            } else {
+              w.userGoodForBoard = [
+                user as User,
+                ...(w.userGoodForBoard || []),
+              ];
+            }
+            return w;
+          }
+        });
+
+        return !prevHeartStatus;
+      });
+    },
+  });
+
+  useEffect(() => {
+    setWikiState(wiki);
+  }, [wiki]);
 
   return (
     <>
@@ -110,6 +150,33 @@ const WikiComment: React.FC<WikiCommentProps> = ({
           </div>
         ) : null}
       </div>
+      {wikiState?.type === WikiType.BOARD && (
+        <Box display="flex" justifyContent={'flex-end'} mt={5}>
+          <Link
+            onClick={() => {
+              mutate(wikiState?.id || 0);
+            }}>
+            {isPressHeart ? (
+              <AiFillHeart size={30} color="red" />
+            ) : (
+              <AiOutlineHeart size={30} color="black" />
+            )}
+          </Link>
+          <Link onClick={() => setGoodSendersModal(true)}>
+            <Button
+              colorScheme={'blue'}
+              color="white"
+              size={
+                'sm'
+              }>{`${wikiState?.userGoodForBoard?.length}件のいいね`}</Button>
+          </Link>
+        </Box>
+      )}
+      <GoodSendersModal
+        isOpen={goodSendersModal}
+        onClose={() => setGoodSendersModal(false)}
+        goodSenders={wikiState?.userGoodForBoard || []}
+      />
     </>
   );
 };

@@ -549,11 +549,19 @@ const Chat: React.FC = () => {
             sentMsgByOtherUsers.content,
           );
         }
-        setMessages(m => {
-          if (m[0].id !== sentMsgByOtherUsers.id) {
-            return refreshMessage([sentMsgByOtherUsers, ...m]);
+        setMessages(msgs => {
+          if (
+            msgs.length &&
+            msgs[0].id !== sentMsgByOtherUsers.id &&
+            sentMsgByOtherUsers.chatGroup?.id === room.id
+          ) {
+            return refreshMessage([sentMsgByOtherUsers, ...msgs]);
+          } else if (sentMsgByOtherUsers.chatGroup?.id !== room.id) {
+            return refreshMessage(
+              msgs.filter(m => m.id !== sentMsgByOtherUsers.id),
+            );
           }
-          return refreshMessage(m);
+          return refreshMessage(msgs);
         });
       }
     });
