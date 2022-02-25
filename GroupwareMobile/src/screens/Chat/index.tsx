@@ -471,7 +471,9 @@ const Chat: React.FC = () => {
     if (fetchedPastMessages?.length) {
       const refreshedMessage = refreshMessage(fetchedPastMessages);
       setMessages(refreshedMessage);
-      if (!refetchDoesntExistMessages(fetchedPastMessages[0].id)) {
+      if (refetchDoesntExistMessages(fetchedPastMessages[0].id)) {
+        refetchDoesntExistMessages(fetchedPastMessages[0].id + 20);
+      } else {
         setAfter(undefined);
         setInclude(false);
         setBefore(undefined);
