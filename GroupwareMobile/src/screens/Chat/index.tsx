@@ -925,7 +925,12 @@ const Chat: React.FC = () => {
           <TouchableOpacity
             style={tailwind('flex flex-row')}
             onPress={() => setVisibleSearchInput(true)}>
-            <Icon name="search" fontFamily="Feather" fontSize={26} />
+            <Icon
+              name="search"
+              fontFamily="Feather"
+              fontSize={26}
+              color={darkFontColor}
+            />
           </TouchableOpacity>
           <TouchableOpacity
             style={tailwind('flex flex-row')}
