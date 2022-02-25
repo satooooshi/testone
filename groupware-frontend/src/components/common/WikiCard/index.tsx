@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { dateTimeFormatterFromJSDDate } from 'src/utils/dateTimeFormatter';
 import { BoardCategory, User, Wiki, WikiType } from 'src/types';
 import { Box, Button, Link, Text, useMediaQuery } from '@chakra-ui/react';
@@ -20,33 +20,28 @@ const WikiCard: React.FC<WikiCardProps> = ({ wiki }) => {
   const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
   const [goodSendersModal, setGoodSendersModal] = useState(false);
   const { user } = useAuthenticate();
-  const {
-    title,
-    writer,
-    tags,
-    createdAt,
-    answers,
-    isGoodSender,
-    userGoodForBoard,
-  } = wiki;
+  const [wikiState, setWikiState] = useState(wiki);
 
   const [isPressHeart, setIsPressHeart] = useState<boolean>(
-    isGoodSender || false,
+    wikiState.isGoodSender || false,
   );
-  const { mutate } = useAPIToggleGoodForBoard({
-    onSuccess: (result) => {
-      setIsPressHeart(!isPressHeart);
 
-      if (result.isGoodSender) {
-        wiki.userGoodForBoard = [
-          user as User,
-          ...(wiki.userGoodForBoard || []),
-        ];
-      } else {
-        wiki.userGoodForBoard = wiki.userGoodForBoard?.filter(
-          (u) => u.id !== user?.id,
-        );
-      }
+  const { mutate } = useAPIToggleGoodForBoard({
+    onSuccess: () => {
+      setIsPressHeart((prevHeartStatus) => {
+        setWikiState((w) => {
+          if (prevHeartStatus) {
+            w.userGoodForBoard = w.userGoodForBoard?.filter(
+              (u) => u.id !== user?.id,
+            );
+          } else {
+            w.userGoodForBoard = [user as User, ...(w.userGoodForBoard || [])];
+          }
+          return w;
+        });
+
+        return !prevHeartStatus;
+      });
     },
   });
 
@@ -60,6 +55,10 @@ const WikiCard: React.FC<WikiCardProps> = ({ wiki }) => {
         return 'green';
     }
   }, [wiki.type]);
+
+  useEffect(() => {
+    setWikiState(wiki);
+  }, [wiki]);
 
   return (
     <Box
@@ -87,13 +86,13 @@ const WikiCard: React.FC<WikiCardProps> = ({ wiki }) => {
         mb="8px"
         justifyContent="space-bewtween">
         <Box w="90%" display="flex" alignItems="center">
-          {wiki.type !== WikiType.RULES && writer ? (
+          {wiki.type !== WikiType.RULES && wikiState.writer ? (
             <Link
-              href={`/account/${writer.id}`}
+              href={`/account/${wikiState.writer.id}`}
               passHref
               _hover={{ textDecoration: 'none' }}>
               <UserAvatar
-                user={writer}
+                user={wikiState.writer}
                 w="40px"
                 h="40px"
                 rounded="full"
@@ -109,7 +108,7 @@ const WikiCard: React.FC<WikiCardProps> = ({ wiki }) => {
             w="100%"
             isTruncated
             overflow="hidden">
-            {title}
+            {wikiState.title}
           </Text>
         </Box>
       </Box>
@@ -121,12 +120,12 @@ const WikiCard: React.FC<WikiCardProps> = ({ wiki }) => {
         alignItems="center"
         justifyContent="flex-end">
         <Box display="flex" flexDir="row" height={5} alignItems="center">
-          {wiki.type === WikiType.BOARD && (
+          {wikiState.type === WikiType.BOARD && (
             <Box display="flex" mr={3}>
               <Link
                 position={'relative'}
                 onClick={() => {
-                  mutate(wiki.id);
+                  mutate(wikiState.id);
                 }}>
                 {isPressHeart ? (
                   <AiFillHeart size={30} color="red" />
@@ -141,7 +140,9 @@ const WikiCard: React.FC<WikiCardProps> = ({ wiki }) => {
                 <Button
                   colorScheme={'blue'}
                   color="white"
-                  size={'sm'}>{`${userGoodForBoard?.length}件のいいね`}</Button>
+                  size={
+                    'sm'
+                  }>{`${wikiState.userGoodForBoard?.length}件のいいね`}</Button>
               </Link>
             </Box>
           )}
@@ -157,12 +158,14 @@ const WikiCard: React.FC<WikiCardProps> = ({ wiki }) => {
                 回答
               </Text>
               <Text color="green.500" fontSize="22px" fontWeight="bold">
-                {answers?.length.toString()}
+                {wikiState.answers?.length.toString()}
               </Text>
             </Box>
           ) : null}
           <Text fontSize={'16px'} color={darkFontColor} display="flex">
-            {dateTimeFormatterFromJSDDate({ dateTime: new Date(createdAt) })}
+            {dateTimeFormatterFromJSDDate({
+              dateTime: new Date(wikiState.createdAt),
+            })}
           </Text>
         </Box>
       </Box>
@@ -193,8 +196,8 @@ const WikiCard: React.FC<WikiCardProps> = ({ wiki }) => {
               )}
             </Button>
           </Link>
-          {tags && tags.length
-            ? tags.map((t) => (
+          {wikiState.tags && wikiState.tags.length
+            ? wikiState.tags.map((t) => (
                 <Link
                   href={`/wiki/list?tag=${t.id}`}
                   key={t.id}

@@ -56,16 +56,17 @@ const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
   const [isPressHeart, setIsPressHeart] = useState<boolean>(
     wikiInfo?.isGoodSender || false,
   );
+  const [wikiState, setWikiState] = useState(wikiInfo);
 
   const mdParser = new MarkdownIt({breaks: true});
   const wikiBody =
-    wikiInfo?.textFormat === 'html'
-      ? wikiInfo?.body
-      : wikiInfo?.textFormat === 'markdown'
-      ? mdParser.render(wikiInfo?.body || '')
+    wikiState?.textFormat === 'html'
+      ? wikiState?.body
+      : wikiState?.textFormat === 'markdown'
+      ? mdParser.render(wikiState?.body || '')
       : '';
   const {dom, headings} = useDom(wikiBody);
-  const {scrollViewRef, scroller} = useHTMLScrollFeature(wikiInfo?.body);
+  const {scrollViewRef, scroller} = useHTMLScrollFeature(wikiState?.body);
   const onPressEntry = useCallback(
     (entry: string) => {
       closeDrawer();
@@ -88,6 +89,7 @@ const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
       const nameStr = wikiTypeNameFactory(wikiInfo.type, wikiInfo.ruleCategory);
       setWikiTypeName(nameStr);
       setIsPressHeart(wikiInfo.isGoodSender || false);
+      setWikiState(wikiInfo);
     }
   }, [wikiInfo]);
 
@@ -99,25 +101,25 @@ const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
 
   const headerTitle = wikiTypeName + '詳細';
   const headerRightButtonName =
-    authUser?.id === wikiInfo?.writer?.id || authUser?.role === UserRole.ADMIN
+    authUser?.id === wikiState?.writer?.id || authUser?.role === UserRole.ADMIN
       ? wikiTypeName + 'を編集'
       : undefined;
 
   const onPressHeaderRightButton = () => {
-    if (wikiInfo) {
+    if (wikiState) {
       navigation.navigate('WikiStack', {
         screen: 'EditWiki',
-        params: {id: wikiInfo.id},
+        params: {id: wikiState.id},
       });
     }
     // else error handling
   };
 
   const onPressPostAnswerButton = () => {
-    if (wikiInfo) {
+    if (wikiState) {
       navigation.navigate('WikiStack', {
         screen: 'PostAnswer',
-        params: {id: wikiInfo.id},
+        params: {id: wikiState.id},
       });
     }
     // else error handling
@@ -132,25 +134,31 @@ const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
 
   const renderingTOCNeeded =
     !(
-      wikiInfo?.type === WikiType.BOARD &&
-      wikiInfo?.boardCategory === BoardCategory.QA
+      wikiState?.type === WikiType.BOARD &&
+      wikiState?.boardCategory === BoardCategory.QA
     ) && headings.length;
 
   const {mutate} = useAPIToggleGoodForBoard({
-    onSuccess: result => {
-      setIsPressHeart(!isPressHeart);
-      if (wikiInfo) {
-        if (result.isGoodSender) {
-          wikiInfo.userGoodForBoard = [
-            user as User,
-            ...(wikiInfo?.userGoodForBoard || []),
-          ];
-        } else {
-          wikiInfo.userGoodForBoard = wikiInfo.userGoodForBoard?.filter(
-            u => u.id !== user?.id,
-          );
-        }
-      }
+    onSuccess: () => {
+      setIsPressHeart(prevHeartStatus => {
+        setWikiState(w => {
+          if (w) {
+            if (prevHeartStatus) {
+              w.userGoodForBoard = w.userGoodForBoard?.filter(
+                u => u.id !== user?.id,
+              );
+            } else {
+              w.userGoodForBoard = [
+                user as User,
+                ...(w.userGoodForBoard || []),
+              ];
+            }
+            return w;
+          }
+        });
+
+        return !prevHeartStatus;
+      });
     },
   });
 
@@ -164,7 +172,7 @@ const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
           ...wikiDetailStyles.wrapper,
           width: windowWidth * 0.9,
         }}>
-        {wikiInfo && wikiInfo.writer ? (
+        {wikiState && wikiState.writer ? (
           <Div flexDir="column" w={'100%'}>
             <Div mb={16} flexDir="row" justifyContent="space-between" mt="sm">
               <Text
@@ -173,17 +181,17 @@ const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
                 color={darkFontColor}
                 mt={16}
                 w={'70%'}>
-                {wikiInfo.title}
+                {wikiState.title}
               </Text>
               <ShareButton
-                urlPath={generateClientURL(`/wiki/detail/${wikiInfo.id}`)}
-                text={wikiInfo.title}
+                urlPath={generateClientURL(`/wiki/detail/${wikiState.id}`)}
+                text={wikiState.title}
               />
             </Div>
             <FlatList
               style={tailwind('mb-4')}
               horizontal
-              data={wikiInfo?.tags || []}
+              data={wikiState?.tags || []}
               renderItem={({item: t}) => (
                 <Tag
                   fontSize={'md'}
@@ -200,16 +208,16 @@ const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
             <Div flexDir="row" alignItems="center" mb={16}>
               <TouchableOpacity
                 onPress={() => {
-                  if (wikiInfo.writer && wikiInfo.writer.existence) {
-                    onPressAvatar(wikiInfo.writer);
+                  if (wikiState.writer && wikiState.writer.existence) {
+                    onPressAvatar(wikiState.writer);
                   }
                 }}>
                 <Div mr={8}>
-                  <UserAvatar h={48} w={48} user={wikiInfo.writer} />
+                  <UserAvatar h={48} w={48} user={wikiState.writer} />
                 </Div>
               </TouchableOpacity>
               <Text fontSize={18} color={darkFontColor}>
-                {userNameFactory(wikiInfo.writer)}
+                {userNameFactory(wikiState.writer)}
               </Text>
             </Div>
             <Div bg="white" rounded="md" p={8} mb={16}>
@@ -217,11 +225,11 @@ const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
             </Div>
           </Div>
         ) : null}
-        {wikiInfo?.type === WikiType.BOARD && (
+        {wikiState?.type === WikiType.BOARD && (
           <Div flexDir="row" ml="auto" mb={10}>
             <TouchableHighlight
               underlayColor={'none'}
-              onPress={() => mutate(wikiInfo.id)}>
+              onPress={() => mutate(wikiState.id)}>
               {isPressHeart ? (
                 <Icon
                   name="heart"
@@ -243,16 +251,16 @@ const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
             <Button
               onPress={() =>
                 setIsVisible(true)
-              }>{`${wikiInfo.userGoodForBoard?.length}件のいいね`}</Button>
+              }>{`${wikiState.userGoodForBoard?.length}件のいいね`}</Button>
           </Div>
         )}
         <GoodSendersModal
-          goodSenders={wikiInfo?.userGoodForBoard || []}
+          goodSenders={wikiState?.userGoodForBoard || []}
           isVisible={isVisible}
           onClose={() => setIsVisible(false)}
         />
-        {wikiInfo?.type === WikiType.BOARD &&
-        wikiInfo.boardCategory === BoardCategory.QA ? (
+        {wikiState?.type === WikiType.BOARD &&
+        wikiState.boardCategory === BoardCategory.QA ? (
           <Div w={windowWidth * 0.9} alignSelf="center">
             <Div
               justifyContent="space-between"
@@ -264,7 +272,7 @@ const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
               borderBottomColor={wikiBorderColor}>
               <Text fontWeight="bold" fontSize={24} color={darkFontColor}>
                 回答
-                {wikiInfo?.answers?.length ? wikiInfo.answers.length : 0}件
+                {wikiState?.answers?.length ? wikiState.answers.length : 0}件
               </Text>
               <Button
                 alignSelf="center"
@@ -275,13 +283,13 @@ const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
                 onPress={onPressPostAnswerButton}
                 bg={wikiAnswerButtonColor}
                 color="white">
-                {wikiInfo?.answers?.length
+                {wikiState?.answers?.length
                   ? '回答を追加する'
                   : '回答を投稿する'}
               </Button>
             </Div>
 
-            <AnswerList wiki={wikiInfo} onPressAvatar={onPressAvatar} />
+            <AnswerList wiki={wikiState} onPressAvatar={onPressAvatar} />
           </Div>
         ) : null}
       </ScrollView>

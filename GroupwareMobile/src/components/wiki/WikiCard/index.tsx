@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {useWindowDimensions, FlatList, TouchableHighlight} from 'react-native';
 import {BoardCategory, User, Wiki, WikiType} from '../../../types';
 import {Div, Text, Tag, Icon, Button} from 'react-native-magnus';
@@ -28,23 +28,31 @@ const WikiCard: React.FC<WikiCardProps> = ({wiki}) => {
     wiki.isGoodSender || false,
   );
   const {user} = useAuthenticate();
+  const [wikiState, setWikiState] = useState(wiki);
 
   const {mutate} = useAPIToggleGoodForBoard({
-    onSuccess: result => {
-      setIsPressHeart(!isPressHeart);
+    onSuccess: () => {
+      setIsPressHeart(prevHeartStatus => {
+        setWikiState(w => {
+          if (prevHeartStatus) {
+            w.userGoodForBoard = w.userGoodForBoard?.filter(
+              u => u.id !== user?.id,
+            );
+          } else {
+            w.userGoodForBoard = [user as User, ...(w.userGoodForBoard || [])];
+          }
+          return w;
+        });
 
-      if (result.isGoodSender) {
-        wiki.userGoodForBoard = [
-          user as User,
-          ...(wiki.userGoodForBoard || []),
-        ];
-      } else {
-        wiki.userGoodForBoard = wiki.userGoodForBoard?.filter(
-          u => u.id !== user?.id,
-        );
-      }
+        return !prevHeartStatus;
+      });
     },
   });
+
+  useEffect(() => {
+    setWikiState(wiki);
+  }, [wiki]);
+
   return (
     <TouchableHighlight
       underlayColor="none"
@@ -170,11 +178,11 @@ const WikiCard: React.FC<WikiCardProps> = ({wiki}) => {
               <Button
                 onPress={() =>
                   setIsVisible(true)
-                }>{`${wiki.userGoodForBoard?.length}件のいいね`}</Button>
+                }>{`${wikiState.userGoodForBoard?.length}件のいいね`}</Button>
             </Div>
           )}
           <GoodSendersModal
-            goodSenders={wiki.userGoodForBoard || []}
+            goodSenders={wikiState.userGoodForBoard || []}
             isVisible={isVisible}
             onClose={() => setIsVisible(false)}
           />
