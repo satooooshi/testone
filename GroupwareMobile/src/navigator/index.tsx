@@ -132,7 +132,7 @@ const Navigator = () => {
     });
     rtcEngine?.addListener('LeaveChannel', async ({userCount}) => {
       console.log('LeaveChannel. user count: ', Platform.OS, userCount);
-      await endCall();
+      // await endCall();
     });
     rtcEngine?.addListener('JoinChannelSuccess', (channel, uid, elapsed) => {
       console.log('JoinChannelSuccess', channel, uid, elapsed);
