@@ -31,11 +31,8 @@ import {
 import {darkFontColor} from '../../../utils/colors';
 import {userNameFactory} from '../../../utils/factory/userNameFactory';
 import {userRoleNameFactory} from '../../../utils/factory/userRoleNameFactory';
-import {axiosInstance} from '../../../utils/url';
-import uuid from 'react-native-uuid';
-import {rtmEngine} from '../../../navigator';
-import Config from 'react-native-config';
 import {useInviteCall} from '../../../contexts/call/useInviteCall';
+import {sendCallInvitation} from '../../../utils/calling/calling';
 
 const TopTab = createMaterialTopTabNavigator();
 
@@ -125,7 +122,7 @@ const AccountDetail: React.FC = () => {
   const navigation = useNavigation<AccountDetailNavigationProps>();
   const route = useRoute<AccountDetailRouteProps>();
   const {user, setUser, logout} = useAuthenticate();
-  const {stopRing, setLocalInvitationState} = useInviteCall();
+  const {setLocalInvitationState} = useInviteCall();
   const id = route.params?.id;
   const userID = id || user?.id;
   const screenName = 'AccountDetail';
@@ -227,24 +224,9 @@ const AccountDetail: React.FC = () => {
   };
 
   const inviteCall = async () => {
-    if (profile) {
-      await rtmEngine.createInstance(Config.AGORA_APP_ID);
-      const parsedUUid = uuid.v4();
-      const localInvitation = await rtmEngine.createLocalInvitation(
-        profile.id.toString(),
-        userNameFactory(user),
-        parsedUUid as string,
-      );
+    if (user && profile) {
+      const localInvitation = await sendCallInvitation(user, profile);
       setLocalInvitationState(localInvitation);
-      const res = await axiosInstance.get<string>('/chat/get-rtm-token');
-      await rtmEngine.loginV2(user?.id?.toString() as string, res.data);
-      await rtmEngine.sendLocalInvitationV2(localInvitation);
-      await axiosInstance.post(
-        `/chat/notif-call/${profile.id}`,
-        localInvitation,
-      );
-      await new Promise(resolve => setTimeout(resolve, 10000));
-      stopRing();
     }
   };
 
