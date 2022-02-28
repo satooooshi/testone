@@ -158,6 +158,10 @@
 ## 通話機能
 - iOSでアプリがバックグランド状態の時に通知が届かなくなることがあるが、アプリをアンインストールしてからいれると直る
 - 各種Agora関係のエンジンクラスは同じ変数に入れていても毎回createInstance的なメソッドで初期化しないと動かないという不具合がある？
+- **Agoraの仕様を知るために以下は読んでおいたほうがいい**
+- [Start a Voice Call - Voice Call - Agora Documentation](https://docs.agora.io/en/Voice/start_call_audio_react_native?platform=React%20Native)
+- [Call Invitation - Real-time Messaging - Agora Documentation](https://docs.agora.io/en/Real-time-Messaging/rtm_invite_android?platform=Android)
+- ブイキューブと契約しているはずなので、分からなければAgoraのエンジニアにきく
 
 # システム構成
 

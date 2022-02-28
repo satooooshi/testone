@@ -29,6 +29,7 @@ import SoundPlayer from 'react-native-sound-player';
 
 const Stack = createStackNavigator<RootStackParamList>();
 export const rtmEngine = new RtmClient();
+//rtcはメソッド使用直前にcreateInstanceしないとエラーがでることがある
 let rtcEngine: RtcEngine;
 let callKeepUUID = '';
 
@@ -79,18 +80,21 @@ const Navigator = () => {
   const endCall = useCallback(
     async (alertNeeded: boolean = true) => {
       if (alertNeeded) {
+        // callkeepをプログラム側でendした場合とユーザーが通話拒否ボタンを押したときとで切りわける
+        // ユーザーが通話拒否ボタンを押したときはアラート等を出さないようにする
         setAlertCountOnEndCall(c => c + 1);
         setOnCallUid('');
         setChannelName('');
+        setIsCalling(false);
+        setIsJoining(false);
       }
 
       disableCallAcceptedFlag();
-      setIsJoining(false);
       setLocalInvitationState(undefined);
-      setIsCalling(false);
       navigationRef.current?.navigate('Main');
       reject();
       if (remoteInvitation.current) {
+        // remote invitation(送られてきた通話招待)があればrefuseする
         await rtmEngine?.refuseRemoteInvitationV2({
           ...remoteInvitation.current,
           hash: 0,
@@ -98,13 +102,12 @@ const Navigator = () => {
         console.log('refused');
         remoteInvitation.current = undefined;
       }
+      // initしないとエラーがでることがある
       await rtcInit();
       await soundOnEnd();
       await rtcEngine?.leaveChannel();
       if (!isCallAccepted && localInvitation) {
-        console.log(
-          '==============================================-------------=',
-        );
+        // local invitation(送信した通話招待)があればcancelする
         console.log('attempt to cancel');
         await rtmEngine?.cancelLocalInvitationV2(localInvitation);
         if (alertNeeded) {
@@ -137,6 +140,8 @@ const Navigator = () => {
     rtcEngine?.addListener('UserJoined', (uid, elapsed) => {
       console.log('UserJoined', uid, elapsed);
     });
+    // UserOfflineはチャンネルから人が退出したときのイベント
+    // 詳しくはnode_modules/react-native-agora/lib/typescript/src/common/RtcEvents.d.tsに書いてある
     rtcEngine?.addListener('UserOffline', async (uid, reason) => {
       console.log('UserOffline', uid, reason);
       await endCall();
@@ -177,6 +182,7 @@ const Navigator = () => {
   messaging().setBackgroundMessageHandler(async remoteMessage => {
     if (Platform.OS === 'ios') {
       if (remoteMessage?.data?.type === 'call') {
+        // iOSのみ、アプリがバックグラウンド状態のときはプッシュ通知で通話をハンドリングする必要がある
         displayIncomingCallNow(remoteMessage?.data as any);
       }
     }
@@ -185,12 +191,10 @@ const Navigator = () => {
 
   const rtmInit = async () => {
     await rtmEngine.createInstance(AGORA_APP_ID);
+    // listenerを複数登録しないようにする
     rtmEngine.removeAllListeners();
     rtmEngine.addListener('RemoteInvitationCanceled', async () => {
       await endCall();
-    });
-    rtmEngine.addListener('RemoteInvitationAccepted', async () => {
-      setIsCalling(true);
     });
     rtmEngine.addListener('LocalInvitationRefused', async () => {
       console.log('refused');
@@ -247,6 +251,7 @@ const Navigator = () => {
         console.log(events);
       });
       RNCallKeep.addEventListener('answerCall', answerCall);
+      // ユーザーが通話拒否ボタンを押したときはアラート等を出さないようにする
       RNCallKeep.addEventListener('endCall', () => endCall(false));
     } catch (err) {
       //@ts-ignore
@@ -261,6 +266,8 @@ const Navigator = () => {
       callKeepUUID = callingData.channelId;
     }
     if (Platform.OS === 'ios') {
+      // iOSの場合はhashを0にしないとinvitationを使う諸々の処理でエラーが起こる
+      // https://github.com/AgoraIO/agora-react-native-rtm/issues/52#issuecomment-1015078875
       remoteInvitation.current = {...callingData, hash: 0};
     } else {
       remoteInvitation.current = callingData;
@@ -309,10 +316,13 @@ const Navigator = () => {
   // console.log(Platform.OS, 'callerId', onCallUid);
 
   const answerCall = async () => {
+    // アプリをバックグラウンドからフォアグラウンドに
     RNCallKeep.backToForeground();
     RNCallKeep.endAllCalls();
     if (remoteInvitation.current?.channelId) {
       const realChannelName = remoteInvitation.current?.channelId as string;
+      // 招待を承認
+      setIsCalling(true);
       await rtmEngine.acceptRemoteInvitationV2(remoteInvitation.current);
       await joinChannel(realChannelName);
     }
@@ -343,6 +353,7 @@ const Navigator = () => {
     callKeepInit();
     rtmInit();
     return () => {
+      // アンマウント時に全てのリスナーを消す
       RNCallKeep.removeEventListener('answerCall');
       RNCallKeep.removeEventListener('endCall');
       rtcEngine.removeAllListeners();
@@ -359,6 +370,7 @@ const Navigator = () => {
         storage.set('rtmToken', res.data);
         setAgoraToken(res.data);
         if (res.data) {
+          //rtmにログインしないとinvitationが受け取れないので、アプリ起動時かユーザーがログインしたときにrtmにもログインする(ログインIDは自由に決められるのでアプリのユーザーIDをrtmのログインIDにする)
           await rtmEngine.createInstance(AGORA_APP_ID);
           await rtmEngine.loginV2(user?.id.toString(), res.data);
           console.log('login as ', user?.id.toString());

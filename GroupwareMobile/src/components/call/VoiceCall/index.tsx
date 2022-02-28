@@ -8,7 +8,7 @@ import {RtcConfigure} from 'agora-rn-uikit/Components';
 import {PropsProvider} from 'agora-rn-uikit/src/PropsContext';
 import {useAPIGetUserInfoById} from '../../../../src/hooks/api/user/useAPIGetUserInfoById';
 import {Text, Div} from 'react-native-magnus';
-import {useWindowDimensions} from 'react-native';
+import {Platform, useWindowDimensions} from 'react-native';
 import UserAvatar from '../../../components/common/UserAvatar';
 import {userNameFactory} from '../../../utils/factory/userNameFactory';
 import Timer from '../../common/Timer';
@@ -52,7 +52,7 @@ const VoiceCall: React.FC<VoiceCallProps> = ({
             <Text fontWeight="bold" mt={'lg'} mb={'lg'} fontSize={24}>
               {profile ? userNameFactory(profile) : '通話情報を取得中...'}
             </Text>
-            {isJoining && isCalling ? (
+            {isCalling ? (
               <Timer />
             ) : (
               <Text mt={'lg'} mb={'lg'} fontSize={20}>
