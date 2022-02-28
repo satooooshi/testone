@@ -76,26 +76,24 @@ export const InviteCallProvider: React.FC = ({children}) => {
     createGroup({name: '', members: [callee]});
   };
 
-  const sendCallHistory = (message: string) => {
-    sendChatMessage({
-      content: message,
-      callTime: callTime,
-      type: ChatMessageType.CALL,
-      chatGroup: groupData,
-    });
-  };
-
-  useEffect(() => {
-    if (!isCallAccepted && callTime) {
+  const sendCallHistory = useCallback(
+    (message: string) => {
       sendChatMessage({
-        content: '音声通話',
+        content: message,
         callTime: callTime,
         type: ChatMessageType.CALL,
         chatGroup: groupData,
       });
+    },
+    [callTime, groupData, sendChatMessage],
+  );
+
+  useEffect(() => {
+    if (!isCallAccepted && callTime) {
+      sendCallHistory('音声通話');
       setCallTime('');
     }
-  }, [isCallAccepted]);
+  }, [isCallAccepted, callTime, setCallTime, sendCallHistory]);
 
   useEffect(() => {
     if (localInvitation) {

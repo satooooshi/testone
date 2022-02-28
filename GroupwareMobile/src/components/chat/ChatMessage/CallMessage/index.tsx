@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useMemo} from 'react';
 import {TouchableHighlight, useWindowDimensions} from 'react-native';
 import {Div, Icon, Text} from 'react-native-magnus';
 import {ChatMessage} from '../../../../types';
@@ -11,13 +11,13 @@ export type CallMessageProps = {
 };
 
 const CallMessage: React.FC<CallMessageProps> = ({message, onLongPress}) => {
-  // const {width: windowWidth, height: windowHeight} = useWindowDimensions();
-
-  useEffect(() => {
+  const messageContent = useMemo(() => {
     if (message.content !== '音声通話' && !message.isSender) {
-      message.content = '不在着信';
+      return (message.content = '不在着信');
     }
-  });
+    return message.content;
+  }, [message]);
+
   return (
     <TouchableHighlight onLongPress={onLongPress} underlayColor="none">
       <Div
@@ -40,7 +40,7 @@ const CallMessage: React.FC<CallMessageProps> = ({message, onLongPress}) => {
         </Div>
         <Div ml={10} flexDir="column" alignItems="center">
           <Text fontSize={15} color="white">
-            {message.content}
+            {messageContent}
           </Text>
           {message.callTime ? (
             <Text mt={2} fontSize={12} color="white">
