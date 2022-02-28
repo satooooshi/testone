@@ -15,11 +15,13 @@ export const sendCallInvitation = async (
   const localInvitation = await rtmEngine.createLocalInvitation(
     callee.id.toString(),
     userNameFactory(caller),
+    // channel id はcallkeepとの関係でUUIDでなければならない
     parsedUUid as string,
   );
   const res = await axiosInstance.get<string>('/chat/get-rtm-token');
   await rtmEngine.loginV2(caller?.id?.toString() as string, res.data);
   await rtmEngine.sendLocalInvitationV2(localInvitation);
+  // iOSのためにプッシュ通知も送る
   await axiosInstance.post(`/chat/notif-call/${caller.id}`, localInvitation);
   return localInvitation;
 };
