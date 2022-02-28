@@ -12,7 +12,6 @@ export type CallMessageProps = {
 
 const CallMessage: React.FC<CallMessageProps> = ({message, onLongPress}) => {
   const {width: windowWidth, height: windowHeight} = useWindowDimensions();
-  const test = '01:00:10';
   return (
     <TouchableHighlight onLongPress={onLongPress} underlayColor="none">
       <Div
@@ -37,9 +36,9 @@ const CallMessage: React.FC<CallMessageProps> = ({message, onLongPress}) => {
           <Text fontSize={15} color="white">
             {message.content}
           </Text>
-          {test ? (
+          {message.callTime ? (
             <Text mt={2} fontSize={12} color="white">
-              {test}
+              {message.callTime}
             </Text>
           ) : null}
         </Div>

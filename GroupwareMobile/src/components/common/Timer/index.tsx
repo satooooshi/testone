@@ -1,8 +1,10 @@
 import React from 'react';
 import {useState, useEffect} from 'react';
 import {Text} from 'react-native-magnus';
+import {useInviteCall} from '../../../contexts/call/useInviteCall';
 
 const Timer = () => {
+  const {callTime, setCallTimeState} = useInviteCall();
   const [hours, setHours] = useState(0);
   const [minutes, setMinutes] = useState(0);
   const [seconds, setSeconds] = useState(0);
@@ -23,11 +25,19 @@ const Timer = () => {
     };
   });
 
+  useEffect(() => {
+    const h = hours ? (hours < 10 ? `0${hours}:` : `${hours}:`) : '';
+    const m = minutes < 10 ? `0${minutes}:` : `${minutes}:`;
+    const s = seconds < 10 ? `0${seconds}` : seconds;
+    setCallTimeState(h + m + s);
+  }, [seconds, minutes, hours, setCallTimeState]);
+
   return (
     <Text mt={'lg'} mb={'lg'} fontSize={20}>
-      {hours ? (hours < 10 ? `0${hours}:` : `${hours}:`) : ''}
+      {/* {hours ? (hours < 10 ? `0${hours}:` : `${hours}:`) : ''}
       {minutes < 10 ? `0${minutes}` : minutes}:
-      {seconds < 10 ? `0${seconds}` : seconds}
+      {seconds < 10 ? `0${seconds}` : seconds} */}
+      {callTime}
     </Text>
   );
 };

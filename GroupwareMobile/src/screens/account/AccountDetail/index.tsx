@@ -122,7 +122,7 @@ const AccountDetail: React.FC = () => {
   const navigation = useNavigation<AccountDetailNavigationProps>();
   const route = useRoute<AccountDetailRouteProps>();
   const {user, setUser, logout} = useAuthenticate();
-  const {setLocalInvitationState} = useInviteCall();
+  const {setLocalInvitationState, sendCallInvitation2} = useInviteCall();
   const id = route.params?.id;
   const userID = id || user?.id;
   const screenName = 'AccountDetail';
@@ -225,10 +225,15 @@ const AccountDetail: React.FC = () => {
 
   const inviteCall = async () => {
     if (user && profile) {
-      const localInvitation = await sendCallInvitation(user, profile);
-      setLocalInvitationState(localInvitation);
+      await sendCallInvitation2(user, profile);
     }
   };
+  // const inviteCall = async () => {
+  //   if (user && profile) {
+  //     const localInvitation = await sendCallInvitation(user, profile);
+  //     setLocalInvitationState(localInvitation);
+  //   }
+  // };
 
   useEffect(() => {
     if (isFocused) {

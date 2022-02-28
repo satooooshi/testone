@@ -5,26 +5,48 @@ import React, {
   useEffect,
   useState,
 } from 'react';
+import {ChatMessageType, User} from '../../types';
 import SoundPlayer from 'react-native-sound-player';
 import {LocalInvitation} from 'agora-react-native-rtm';
+import {useAPISaveChatGroup} from '../../hooks/api/chat/useAPISaveChatGroup';
+import {useAPISendChatMessage} from '../../hooks/api/chat/useAPISendChatMessage';
+import {sendCallInvitation} from '../../utils/calling/calling';
+import io from 'socket.io-client';
+import {baseURL} from '../../utils/url';
 
 const InvitationStatusContext = createContext({
   isCallAccepted: false,
   localInvitation: {} as LocalInvitation | undefined,
+  callTime: '',
   setLocalInvitationState: (() => {}) as (
     invitation: LocalInvitation | undefined,
   ) => void,
+  sendCallInvitation2: (async () => {}) as (
+    caller: Partial<User>,
+    callee: User,
+  ) => Promise<void>,
   enableCallAcceptedFlag: () => {},
   disableCallAcceptedFlag: () => {},
   ringCall: () => {},
   stopRing: () => {},
+  setCallTimeState: (() => {}) as (callTime: string) => void,
 });
 
 export const InviteCallProvider: React.FC = ({children}) => {
+  const {mutate: createGroup, data: groupData} = useAPISaveChatGroup();
+  const socket = io(baseURL, {
+    transports: ['websocket'],
+  });
+  const {mutate: sendChatMessage} = useAPISendChatMessage({
+    onSuccess: sentMsg => {
+      socket.emit('message', {...sentMsg, isSender: false});
+    },
+  });
   const [isCallAccepted, setIsCallAccepted] = useState(false);
   const [localInvitation, setLocalInvitation] = useState<
     LocalInvitation | undefined
   >();
+  const [callTime, setCallTime] = useState('');
   const enableCallAcceptedFlag = () => {
     setIsCallAccepted(true);
   };
@@ -41,6 +63,38 @@ export const InviteCallProvider: React.FC = ({children}) => {
   const setLocalInvitationState = (invitation: LocalInvitation | undefined) => {
     setLocalInvitation(invitation);
   };
+
+  const setCallTimeState = (CallTime: string) => {
+    setCallTime(CallTime);
+  };
+
+  const sendCallInvitation2 = async (caller: Partial<User>, callee: User) => {
+    const invitation = await sendCallInvitation(caller, callee);
+    console.log('send call invitation');
+    setLocalInvitation(invitation);
+    createGroup({name: '', members: [callee]});
+    // console.log(
+    //   'sendCallInvitation =================================================',
+    //   groupData,
+    // );
+    // sendChatMessage({
+    //   content: 'キャンセル',
+    //   type: ChatMessageType.CALL,
+    //   chatGroup: groupData,
+    // });
+  };
+
+  useEffect(() => {
+    if (!isCallAccepted && callTime) {
+      sendChatMessage({
+        content: '音声通話',
+        callTime: callTime,
+        type: ChatMessageType.CALL,
+        chatGroup: groupData,
+      });
+      setCallTime('');
+    }
+  }, [isCallAccepted]);
 
   useEffect(() => {
     if (localInvitation) {
@@ -60,12 +114,15 @@ export const InviteCallProvider: React.FC = ({children}) => {
     <InvitationStatusContext.Provider
       value={{
         isCallAccepted,
+        callTime,
         enableCallAcceptedFlag,
         disableCallAcceptedFlag,
         ringCall,
         stopRing,
         localInvitation,
         setLocalInvitationState,
+        sendCallInvitation2,
+        setCallTimeState,
       }}>
       {children}
     </InvitationStatusContext.Provider>
