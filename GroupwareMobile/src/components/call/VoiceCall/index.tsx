@@ -18,14 +18,14 @@ type VoiceCallProps = {
   rtcProps: RtcPropsInterface;
   callbacks: Partial<CallbacksInterface>;
   onCallUid: string;
-  channelName: string;
+  isJoining: boolean;
   isCalling: boolean;
 };
 const VoiceCall: React.FC<VoiceCallProps> = ({
   rtcProps,
   callbacks,
   onCallUid,
-  channelName,
+  isJoining,
   isCalling,
 }) => {
   const props: React.PropsWithChildren<PropsInterface> = {
@@ -33,7 +33,7 @@ const VoiceCall: React.FC<VoiceCallProps> = ({
     callbacks: callbacks,
   };
   const {width: windowWidth, height: windowHeight} = useWindowDimensions();
-  const {data: profile} = useAPIGetUserInfoById(onCallUid);
+  const {data: profile} = useAPIGetUserInfoById(onCallUid ? onCallUid : '0');
 
   return (
     <PropsProvider value={props}>
@@ -52,7 +52,7 @@ const VoiceCall: React.FC<VoiceCallProps> = ({
             <Text fontWeight="bold" mt={'lg'} mb={'lg'} fontSize={24}>
               {profile ? userNameFactory(profile) : '通話情報を取得中...'}
             </Text>
-            {channelName && onCallUid && isCalling ? (
+            {isJoining && isCalling ? (
               <Timer />
             ) : (
               <Text mt={'lg'} mb={'lg'} fontSize={20}>
