@@ -49,7 +49,7 @@ export class ChatMessage {
   })
   type: ChatMessageType;
 
-  @Column({ type: 'varchar', name: 'call_time' })
+  @Column({ type: 'varchar', name: 'call_time', default: '' })
   callTime?: string;
 
   @ManyToOne(() => ChatGroup, (chatGroup) => chatGroup.chatMessages, {
