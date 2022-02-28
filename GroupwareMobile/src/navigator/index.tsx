@@ -83,6 +83,7 @@ const Navigator = () => {
         setOnCallUid('');
         setChannelName('');
       }
+
       disableCallAcceptedFlag();
       setIsJoining(false);
       setLocalInvitationState(undefined);
@@ -95,16 +96,20 @@ const Navigator = () => {
           hash: 0,
         });
         console.log('refused');
-        sendCallHistory('応答なし');
         remoteInvitation.current = undefined;
       }
       await rtcInit();
       await soundOnEnd();
       await rtcEngine?.leaveChannel();
       if (!isCallAccepted && localInvitation) {
+        console.log(
+          '==============================================-------------=',
+        );
         console.log('attempt to cancel');
-        sendCallHistory('キャンセル');
         await rtmEngine?.cancelLocalInvitationV2(localInvitation);
+        if (alertNeeded) {
+          sendCallHistory('キャンセル');
+        }
         console.log('cancel finished');
       }
     },
@@ -189,6 +194,7 @@ const Navigator = () => {
     });
     rtmEngine.addListener('LocalInvitationRefused', async () => {
       console.log('refused');
+      sendCallHistory('応答なし');
       disableCallAcceptedFlag();
       setLocalInvitationState(undefined);
       stopRing();

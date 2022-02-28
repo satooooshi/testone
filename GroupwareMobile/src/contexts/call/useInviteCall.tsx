@@ -13,6 +13,7 @@ import {useAPISendChatMessage} from '../../hooks/api/chat/useAPISendChatMessage'
 import {sendCallInvitation} from '../../utils/calling/calling';
 import io from 'socket.io-client';
 import {baseURL} from '../../utils/url';
+import {ChatGroup} from '../../../types';
 
 const InvitationStatusContext = createContext({
   isCallAccepted: false,
@@ -33,13 +34,14 @@ const InvitationStatusContext = createContext({
 });
 
 export const InviteCallProvider: React.FC = ({children}) => {
-  const {mutate: createGroup, data: groupData} = useAPISaveChatGroup();
+  const {mutate: createGroup} = useAPISaveChatGroup();
+  const [currentGroupData, setCurrentGroupData] = useState<ChatGroup>();
   const socket = io(baseURL, {
     transports: ['websocket'],
   });
   const {mutate: sendChatMessage} = useAPISendChatMessage({
     onSuccess: sentMsg => {
-      socket.emit('message', {...sentMsg, isSender: false});
+      socket.emit('message', sentMsg);
     },
   });
   const [isCallAccepted, setIsCallAccepted] = useState(false);
@@ -72,7 +74,14 @@ export const InviteCallProvider: React.FC = ({children}) => {
     const invitation = await sendCallInvitation(caller, callee);
     console.log('send call invitation');
     setLocalInvitation(invitation);
-    createGroup({name: '', members: [callee]});
+    createGroup(
+      {name: '', members: [callee]},
+      {
+        onSuccess: createdGroup => {
+          setCurrentGroupData(createdGroup);
+        },
+      },
+    );
   };
 
   const sendCallHistory = useCallback(
@@ -81,10 +90,10 @@ export const InviteCallProvider: React.FC = ({children}) => {
         content: message,
         callTime: callTime,
         type: ChatMessageType.CALL,
-        chatGroup: groupData,
+        chatGroup: currentGroupData,
       });
     },
-    [callTime, groupData, sendChatMessage],
+    [callTime, sendChatMessage, currentGroupData],
   );
 
   useEffect(() => {
