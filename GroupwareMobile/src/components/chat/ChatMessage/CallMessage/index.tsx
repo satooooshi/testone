@@ -11,13 +11,13 @@ export type CallMessageProps = {
 };
 
 const CallMessage: React.FC<CallMessageProps> = ({message, onLongPress}) => {
-  const {width: windowWidth, height: windowHeight} = useWindowDimensions();
+  // const {width: windowWidth, height: windowHeight} = useWindowDimensions();
   return (
     <TouchableHighlight onLongPress={onLongPress} underlayColor="none">
       <Div
         rounded="xl"
-        h={windowHeight * 0.1}
-        w={windowWidth * 0.4}
+        h={60}
+        w={150}
         bg={message.isSender ? 'blue600' : 'gray500'}
         p={8}
         flexDir="row"

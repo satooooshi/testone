@@ -73,15 +73,6 @@ export const InviteCallProvider: React.FC = ({children}) => {
     console.log('send call invitation');
     setLocalInvitation(invitation);
     createGroup({name: '', members: [callee]});
-    // console.log(
-    //   'sendCallInvitation =================================================',
-    //   groupData,
-    // );
-    // sendChatMessage({
-    //   content: 'キャンセル',
-    //   type: ChatMessageType.CALL,
-    //   chatGroup: groupData,
-    // });
   };
 
   useEffect(() => {
