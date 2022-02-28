@@ -30,6 +30,7 @@ const InvitationStatusContext = createContext({
   ringCall: () => {},
   stopRing: () => {},
   setCallTimeState: (() => {}) as (callTime: string) => void,
+  sendCallHistory: (() => {}) as (message: string) => void,
 });
 
 export const InviteCallProvider: React.FC = ({children}) => {
@@ -75,6 +76,15 @@ export const InviteCallProvider: React.FC = ({children}) => {
     createGroup({name: '', members: [callee]});
   };
 
+  const sendCallHistory = (message: string) => {
+    sendChatMessage({
+      content: message,
+      callTime: callTime,
+      type: ChatMessageType.CALL,
+      chatGroup: groupData,
+    });
+  };
+
   useEffect(() => {
     if (!isCallAccepted && callTime) {
       sendChatMessage({
@@ -114,6 +124,7 @@ export const InviteCallProvider: React.FC = ({children}) => {
         setLocalInvitationState,
         sendCallInvitation2,
         setCallTimeState,
+        sendCallHistory,
       }}>
       {children}
     </InvitationStatusContext.Provider>

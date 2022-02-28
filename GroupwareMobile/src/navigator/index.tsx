@@ -43,6 +43,7 @@ const Navigator = () => {
     setLocalInvitationState,
     localInvitation,
     stopRing,
+    sendCallHistory,
   } = useInviteCall();
   const [isCalling, setIsCalling] = useState(false);
   const [agoraToken, setAgoraToken] = useState('');
@@ -96,6 +97,7 @@ const Navigator = () => {
       console.log('attempt to cancel');
       await rtmEngine?.cancelLocalInvitationV2(localInvitation);
       setLocalInvitationState(undefined);
+      sendCallHistory('キャンセル');
       console.log('cancel finished');
     }
     navigationRef.current?.navigate('Main');
