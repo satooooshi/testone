@@ -1,9 +1,7 @@
-import React, {useEffect, useMemo} from 'react';
-import {TouchableHighlight, useWindowDimensions} from 'react-native';
+import React, {useMemo} from 'react';
+import {TouchableHighlight} from 'react-native';
 import {Div, Icon, Text} from 'react-native-magnus';
 import {ChatMessage} from '../../../../types';
-import ReplyParent from '../ReplyParent';
-import tailwind from 'tailwind-rn';
 
 export type CallMessageProps = {
   message: ChatMessage;
