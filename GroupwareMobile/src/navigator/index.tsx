@@ -45,6 +45,7 @@ const Navigator = () => {
     stopRing,
     sendCallHistory,
   } = useInviteCall();
+  const [isJoining, setIsJoining] = useState(false);
   const [isCalling, setIsCalling] = useState(false);
   const [agoraToken, setAgoraToken] = useState('');
   const [channelName, setChannelName] = useState('');
@@ -75,41 +76,47 @@ const Navigator = () => {
     }
   };
 
-  const endCall = useCallback(async () => {
-    reject();
-    if (remoteInvitation.current) {
-      console.log('end call');
-      console.log('end call finished');
-      await rtmEngine?.refuseRemoteInvitationV2(remoteInvitation.current);
-      remoteInvitation.current = undefined;
-    }
-    await rtcInit();
-    await rtcEngine?.leaveChannel();
-    const userInfo = await rtcEngine?.getUserInfoByUid(1327);
-    console.log(userInfo);
-    setAlertCountOnEndCall(c => c + 1);
-    await soundOnEnd();
-    disableCallAcceptedFlag();
-    setIsCalling(false);
-    setChannelName('');
-    setOnCallUid('');
-    if (!isCallAccepted && localInvitation) {
-      console.log('attempt to cancel');
-      await rtmEngine?.cancelLocalInvitationV2(localInvitation);
+  const endCall = useCallback(
+    async (alertNeeded: boolean = true) => {
+      if (alertNeeded) {
+        setAlertCountOnEndCall(c => c + 1);
+        setOnCallUid('');
+        setChannelName('');
+      }
+      disableCallAcceptedFlag();
+      setIsJoining(false);
       setLocalInvitationState(undefined);
-      sendCallHistory('キャンセル');
-      console.log('cancel finished');
-    }
-    navigationRef.current?.navigate('Main');
-    // await rtcEngine?.destroy();
+      setIsCalling(false);
+      navigationRef.current?.navigate('Main');
+      reject();
+      if (remoteInvitation.current) {
+        await rtmEngine?.refuseRemoteInvitationV2({
+          ...remoteInvitation.current,
+          hash: 0,
+        });
+        console.log('refused');
+        sendCallHistory('応答なし');
+        remoteInvitation.current = undefined;
+      }
+      await rtcInit();
+      await soundOnEnd();
+      await rtcEngine?.leaveChannel();
+      if (!isCallAccepted && localInvitation) {
+        console.log('attempt to cancel');
+        sendCallHistory('キャンセル');
+        await rtmEngine?.cancelLocalInvitationV2(localInvitation);
+        console.log('cancel finished');
+      }
+    },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    disableCallAcceptedFlag,
-    isCallAccepted,
-    localInvitation,
-    navigationRef,
-    setLocalInvitationState,
-  ]);
+    [
+      disableCallAcceptedFlag,
+      isCallAccepted,
+      localInvitation,
+      navigationRef,
+      setLocalInvitationState,
+    ],
+  );
 
   const createRTCInstance = useCallback(async () => {
     rtcEngine = await RtcEngine.createWithContext(
@@ -171,12 +178,17 @@ const Navigator = () => {
     console.log('Message handled in the background!', remoteMessage);
   });
 
-  const rtmInit = () => {
+  const rtmInit = async () => {
+    await rtmEngine.createInstance(AGORA_APP_ID);
+    rtmEngine.removeAllListeners();
     rtmEngine.addListener('RemoteInvitationCanceled', async () => {
-      console.log('canceled');
       await endCall();
     });
+    rtmEngine.addListener('RemoteInvitationAccepted', async () => {
+      setIsCalling(true);
+    });
     rtmEngine.addListener('LocalInvitationRefused', async () => {
+      console.log('refused');
       disableCallAcceptedFlag();
       setLocalInvitationState(undefined);
       stopRing();
@@ -184,8 +196,8 @@ const Navigator = () => {
     });
     rtmEngine.addListener('LocalInvitationAccepted', async invitation => {
       enableCallAcceptedFlag();
+      setIsCalling(true);
       setLocalInvitationState(undefined);
-      setOnCallUid(invitation?.calleeId as string);
       const realChannelName = invitation?.channelId as string;
       await joinChannel(realChannelName);
     });
@@ -229,7 +241,7 @@ const Navigator = () => {
         console.log(events);
       });
       RNCallKeep.addEventListener('answerCall', answerCall);
-      RNCallKeep.addEventListener('endCall', endCall);
+      RNCallKeep.addEventListener('endCall', () => endCall(false));
     } catch (err) {
       //@ts-ignore
       console.error('Initialize CallKeep Error:', err?.message);
@@ -242,8 +254,13 @@ const Navigator = () => {
     if (callingData?.channelId) {
       callKeepUUID = callingData.channelId;
     }
-    remoteInvitation.current = callingData;
-    setOnCallUid(callingData?.callerId as string);
+    if (Platform.OS === 'ios') {
+      remoteInvitation.current = {...callingData, hash: 0};
+    } else {
+      remoteInvitation.current = callingData;
+    }
+    const callerId = callingData.callerId;
+    setOnCallUid(callerId);
     // RNCallKeep.backToForeground();
     RNCallKeep.displayIncomingCall(
       callingData?.channelId as string,
@@ -266,6 +283,7 @@ const Navigator = () => {
       const userData = await apiAuthenticate();
       const userId = userData?.id;
       if (userId) {
+        callKeepUUID = '';
         await rtcInit();
         await rtcEngine?.joinChannel(
           tokenForCall,
@@ -277,29 +295,28 @@ const Navigator = () => {
         setChannelName(realChannelName);
         navigateToCallWindow();
         remoteInvitation.current = undefined;
-        setIsCalling(true);
+        setIsJoining(true);
       }
     },
     [rtcInit, navigateToCallWindow],
   );
+  // console.log(Platform.OS, 'callerId', onCallUid);
 
   const answerCall = async () => {
     RNCallKeep.backToForeground();
     RNCallKeep.endAllCalls();
     if (remoteInvitation.current?.channelId) {
       const realChannelName = remoteInvitation.current?.channelId as string;
-      if (Platform.OS === 'ios') {
-        //https://github.com/AgoraIO/agora-react-native-rtm/issues/52
-        await rtmEngine.acceptRemoteInvitationV2({
-          ...remoteInvitation.current,
-          hash: 0,
-        });
-      } else {
-        await rtmEngine.acceptRemoteInvitationV2(remoteInvitation.current);
-      }
+      await rtmEngine.acceptRemoteInvitationV2(remoteInvitation.current);
       await joinChannel(realChannelName);
     }
   };
+
+  useEffect(() => {
+    if (localInvitation) {
+      setOnCallUid(localInvitation?.calleeId as string);
+    }
+  }, [localInvitation]);
 
   //useEffectで処理しないと複数回アラートが出る可能性がある
   useEffect(() => {
@@ -439,12 +456,12 @@ const Navigator = () => {
   }, [registerDevice, user]);
 
   useEffect(() => {
-    if (isCalling) {
+    if (isJoining) {
       navigationRef.current?.navigate('Call');
     } else if (user?.id) {
       navigationRef.current?.navigate('Main');
     }
-  }, [isCalling, navigationRef, user?.id]);
+  }, [isJoining, navigationRef, user?.id]);
 
   useEffect(() => {
     if (localInvitation) {
@@ -480,11 +497,11 @@ const Navigator = () => {
                 name="Call"
                 children={() => (
                   <VoiceCall
+                    isCalling={isCalling}
                     rtcProps={rtcProps}
                     callbacks={callbacks}
                     onCallUid={onCallUid}
-                    channelName={channelName}
-                    isCalling={isCalling}
+                    isJoining={isJoining}
                   />
                 )}
               />
