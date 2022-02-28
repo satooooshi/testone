@@ -337,19 +337,6 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fetchedPastMessages]);
 
-  const readUsers = (targetMsg: ChatMessage) => {
-    return lastReadChatTime
-      ? lastReadChatTime
-          .filter((t) => t.readTime >= targetMsg.createdAt)
-          .map((t) => t.user)
-      : [];
-  };
-
-  useEffect(() => {
-    saveLastReadChatTime(room.id);
-    return () => saveLastReadChatTime(room.id);
-  }, [room.id, saveLastReadChatTime]);
-
   useEffect(() => {
     socket.emit('joinRoom', room.id.toString());
     socket.on('msgToClient', async (sentMsgByOtherUsers: ChatMessage) => {
@@ -388,6 +375,24 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [room.id]);
+
+  useEffect(() => {
+    messages[0]?.chatGroup?.id === room.id && saveLastReadChatTime(room.id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [messages, room.id]);
+
+  useEffect(() => {
+    saveLastReadChatTime(room.id);
+    return () => saveLastReadChatTime(room.id);
+  }, [room.id, saveLastReadChatTime]);
+
+  const readUsers = (targetMsg: ChatMessage) => {
+    return lastReadChatTime
+      ? lastReadChatTime
+          .filter((t) => t.readTime >= targetMsg.createdAt)
+          .map((t) => t.user)
+      : [];
+  };
 
   const isLoading = loadingSend || loadingUplaod;
   const activeIndex = useMemo(() => {
