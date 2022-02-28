@@ -22,6 +22,7 @@ export enum ChatMessageType {
   VIDEO = 'video',
   IMAGE = 'image',
   TEXT = 'text',
+  CALL = 'call',
   SYSTEM_TEXT = 'system_text',
   OTHER_FILE = 'other_file',
 }
@@ -279,6 +280,7 @@ export interface ChatMessage {
   updatedAt: Date;
   isSender?: boolean;
   thumbnail?: string;
+  callTime?: string;
   replyParentMessage?: ChatMessage | null;
 }
 

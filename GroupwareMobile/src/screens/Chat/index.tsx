@@ -74,6 +74,8 @@ import io from 'socket.io-client';
 import {baseURL} from '../../utils/url';
 import {getThumbnailOfVideo} from '../../utils/getThumbnailOfVideo';
 import {useAuthenticate} from '../../contexts/useAuthenticate';
+import HeaderTemplate from '../../components/Header/HeaderTemplate';
+import {useInviteCall} from '../../contexts/call/useInviteCall';
 
 const socket = io(baseURL, {
   transports: ['websocket'],
@@ -87,6 +89,7 @@ const Chat: React.FC = () => {
   const navigation = useNavigation<ChatNavigationProps>();
   const route = useRoute<ChatRouteProps>();
   const {room} = route.params;
+  const {sendCallInvitation} = useInviteCall();
   const {data: roomDetail, refetch: refetchRoomDetail} = useAPIGetRoomDetail(
     room.id,
   );
@@ -658,6 +661,18 @@ const Chat: React.FC = () => {
     </View>
   );
 
+  const inviteCall = async () => {
+    if (roomDetail?.members?.length === 2 && myself) {
+      const caller =
+        roomDetail.members[0].id === myself.id
+          ? roomDetail.members[1]
+          : roomDetail.members[0];
+      //第一引数に通話を書ける人のユーザーオブジェクト、第二引数に通話をかけられるひとのユーザーオブジェクト
+      await sendCallInvitation(myself, caller);
+      console.log('inviteCal called', caller);
+    }
+  };
+
   return (
     <WholeContainer>
       {typeDropdown}
@@ -770,12 +785,41 @@ const Chat: React.FC = () => {
           </Div>
         )}
       />
-      <HeaderWithIconButton
+      <HeaderTemplate
         title={roomDetail ? nameOfRoom(roomDetail) : nameOfRoom(room)}
         enableBackButton={true}
-        screenForBack={'RoomList'}
-        icon={headerRightIcon}
-      />
+        screenForBack={'RoomList'}>
+        <Div style={tailwind('flex flex-row')}>
+          {roomDetail?.members && roomDetail.members.length < 3 ? (
+            <Div style={tailwind('flex flex-row')}>
+              <Button bg="transparent" pb={-3} onPress={inviteCall}>
+                <Icon
+                  name="phone"
+                  fontFamily="Entypo"
+                  fontSize={20}
+                  color="blue700"
+                />
+              </Button>
+            </Div>
+          ) : null}
+          <TouchableOpacity
+            style={tailwind('flex flex-row')}
+            onPress={() =>
+              navigation.navigate('ChatStack', {
+                screen: 'ChatMenu',
+                params: {room},
+              })
+            }>
+            <Icon
+              name="dots-horizontal-circle-outline"
+              fontFamily="MaterialCommunityIcons"
+              fontSize={26}
+              color={darkFontColor}
+            />
+          </TouchableOpacity>
+        </Div>
+      </HeaderTemplate>
+
       {messageListAvoidngKeyboardDisturb}
     </WholeContainer>
   );

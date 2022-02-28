@@ -75,6 +75,7 @@ export class ChatController {
       custom: invitation,
     };
     await sendPushNotifToSpecificUsers([callee], notificationData);
+    return;
   }
 
   @Get('get-rtm-token')
@@ -165,6 +166,11 @@ export class ChatController {
     @Req() req: RequestWithUser,
     @Body() message: Partial<ChatMessage>,
   ): Promise<ChatMessage> {
+    console.log(
+      '==========================, send message',
+      message,
+      message.chatGroup.members,
+    );
     const user = req.user;
     message.sender = user;
     return await this.chatService.sendMessage(message);
@@ -201,6 +207,8 @@ export class ChatController {
     @Body() chatGroup: Partial<ChatGroup>,
   ): Promise<ChatGroup> {
     const user = req.user;
+    console.log('========================== update');
+
     chatGroup.members = [
       ...(chatGroup?.members?.filter((u) => u.id !== user.id) || []),
       user,

@@ -29,6 +29,7 @@ export enum ChatMessageType {
   VIDEO = 'video',
   IMAGE = 'image',
   TEXT = 'text',
+  CALL = 'call',
   SYSTEM_TEXT = 'system_text',
   OTHER_FILE = 'other_file',
 }
@@ -47,6 +48,9 @@ export class ChatMessage {
     default: ChatMessageType.TEXT,
   })
   type: ChatMessageType;
+
+  @Column({ type: 'varchar', name: 'call_time' })
+  callTime?: string;
 
   @ManyToOne(() => ChatGroup, (chatGroup) => chatGroup.chatMessages, {
     onUpdate: 'CASCADE',

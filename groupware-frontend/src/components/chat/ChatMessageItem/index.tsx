@@ -36,6 +36,7 @@ import VideoMessage from './VideoMessage';
 import ImageMessage from './ImageMessage';
 import FileMessage from './FileMessage';
 import TextMessage from './TextMessage';
+import CallMessage from './CallMessage';
 import { useAPIDeleteReaction } from '@/hooks/api/chat/useAPIDeleteReaction';
 import { AiOutlineUnorderedList } from 'react-icons/ai';
 import ReactionListModal from './ReactionListModal';
@@ -319,6 +320,8 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
               )}
               {messageState.type === ChatMessageType.TEXT ? (
                 <TextMessage message={messageState} />
+              ) : messageState.type === ChatMessageType.CALL ? (
+                <CallMessage message={messageState} />
               ) : (
                 <Box
                   borderRadius="8px"
