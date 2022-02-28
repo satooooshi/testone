@@ -84,11 +84,11 @@ const Navigator = () => {
         setAlertCountOnEndCall(c => c + 1);
         setOnCallUid('');
         setChannelName('');
+        setIsCalling(false);
+        setIsJoining(false);
       }
       disableCallAcceptedFlag();
-      setIsJoining(false);
       setLocalInvitationState(undefined);
-      setIsCalling(false);
       navigationRef.current?.navigate('Main');
       reject();
       if (remoteInvitation.current) {
@@ -190,9 +190,6 @@ const Navigator = () => {
     rtmEngine.removeAllListeners();
     rtmEngine.addListener('RemoteInvitationCanceled', async () => {
       await endCall();
-    });
-    rtmEngine.addListener('RemoteInvitationAccepted', async () => {
-      setIsCalling(true);
     });
     rtmEngine.addListener('LocalInvitationRefused', async () => {
       disableCallAcceptedFlag();
@@ -318,6 +315,7 @@ const Navigator = () => {
     if (remoteInvitation.current?.channelId) {
       const realChannelName = remoteInvitation.current?.channelId as string;
       // 招待を承認
+      setIsCalling(true);
       await rtmEngine.acceptRemoteInvitationV2(remoteInvitation.current);
       await joinChannel(realChannelName);
     }
