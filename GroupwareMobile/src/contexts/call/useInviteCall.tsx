@@ -17,7 +17,6 @@ import {baseURL} from '../../utils/url';
 const InvitationStatusContext = createContext({
   isCallAccepted: false,
   localInvitation: {} as LocalInvitation | undefined,
-  callTime: '',
   setLocalInvitationState: (() => {}) as (
     invitation: LocalInvitation | undefined,
   ) => void,
@@ -113,7 +112,6 @@ export const InviteCallProvider: React.FC = ({children}) => {
     <InvitationStatusContext.Provider
       value={{
         isCallAccepted,
-        callTime,
         enableCallAcceptedFlag,
         disableCallAcceptedFlag,
         ringCall,

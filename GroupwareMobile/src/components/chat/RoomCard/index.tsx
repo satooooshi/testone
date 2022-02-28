@@ -39,6 +39,19 @@ const RoomCard: React.FC<RoomCardProps> = ({
       </Button>
     );
   };
+
+  const latestCall = (message: ChatMessage) => {
+    switch (message.content) {
+      case '音声通話':
+        return `通話時間 ${message.callTime}`;
+      case 'キャンセル':
+        return message.isSender ? '通話をキャンセルしました' : '不在着信';
+      case '応答なし':
+        return message.isSender ? '通話に応答がありませんでした' : '不在着信';
+      default:
+        return 'error';
+    }
+  };
   const latestMessage = (chatMessage: ChatMessage) => {
     switch (chatMessage.type) {
       case ChatMessageType.IMAGE:
@@ -47,6 +60,8 @@ const RoomCard: React.FC<RoomCardProps> = ({
         return '動画が送信されました';
       case ChatMessageType.OTHER_FILE:
         return 'ファイルが送信されました';
+      case ChatMessageType.CALL:
+        return latestCall(chatMessage);
       default:
         return mentionTransform(chatMessage.content);
     }
