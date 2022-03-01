@@ -96,11 +96,18 @@ const WikiCard: React.FC<WikiCardProps> = ({wiki}) => {
                 </Text>
               </Div>
             ) : null}
-            <Text textAlignVertical="bottom" textAlign="center">
-              {dateTimeFormatterFromJSDDate({
-                dateTime: new Date(wiki.createdAt),
-              })}
-            </Text>
+            <Div flexDir="column" alignItems="flex-end">
+              <Text textAlignVertical="bottom" textAlign="center">
+                {`投稿日: ${dateTimeFormatterFromJSDDate({
+                  dateTime: new Date(wiki.createdAt),
+                })}`}
+              </Text>
+              <Text textAlignVertical="bottom" textAlign="center">
+                {`最終更新日: ${dateTimeFormatterFromJSDDate({
+                  dateTime: new Date(wiki.updatedAt),
+                })}`}
+              </Text>
+            </Div>
           </Div>
         </Div>
 
