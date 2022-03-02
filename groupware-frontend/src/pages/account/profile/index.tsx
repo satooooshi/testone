@@ -62,6 +62,7 @@ const Profile = () => {
     firstName: '',
     lastNameKana: '',
     firstNameKana: '',
+    branch: BranchType.NON_SET,
     avatarUrl: '',
     introduceOther: '',
     introduceTech: '',
@@ -413,9 +414,10 @@ const Profile = () => {
           <FormControl mb={4}>
             <FormLabel fontWeight={'bold'}>所属支社</FormLabel>
             <Select
+              name="branch"
+              defaultValue={BranchType.NON_SET}
               bg="white"
               height="10"
-              defaultValue={BranchType.NON_SET}
               onChange={handleChange}>
               <option value={BranchType.NON_SET}>未設定</option>
               <option value={BranchType.TOKYO}>東京</option>
