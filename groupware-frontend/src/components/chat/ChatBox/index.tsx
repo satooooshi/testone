@@ -382,6 +382,13 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fetchedPastMessages]);
 
+  useEffect(() => {
+    if (focusedMessageID) {
+      refetchDoesntExistMessages(focusedMessageID);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [focusedMessageID]);
+
   const readUsers = (targetMsg: ChatMessage) => {
     return lastReadChatTime
       ? lastReadChatTime
@@ -468,7 +475,6 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
         const index = searchedResults?.findIndex(
           (e) => e.id === focusedMessageID,
         );
-        refetchDoesntExistMessages(focusedMessageID);
         if (sequence === 'next') {
           return searchedResults?.[index - 1]
             ? searchedResults[index - 1]?.id
