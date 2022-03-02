@@ -28,6 +28,7 @@ import {
 } from '@chakra-ui/react';
 import { BoardCategory, TagType, UserTag, WikiType } from 'src/types';
 import { userRoleNameFactory } from 'src/utils/factory/userRoleNameFactory';
+import { branchTypeNameFactory } from 'src/utils/factory/branchTypeNameFactory';
 import { blueColor, darkFontColor } from 'src/utils/colors';
 import { userNameFactory } from 'src/utils/factory/userNameFactory';
 import { useAPISaveChatGroup } from '@/hooks/api/chat/useAPISaveChatGroup';
@@ -268,6 +269,23 @@ const MyAccountInfo = () => {
                       fontSize={18}
                       color={darkFontColor}>
                       {userRoleNameFactory(profile.role)}
+                    </Text>
+                  </Box>
+                  <Box
+                    display="flex"
+                    mb={5}
+                    flexDir="row"
+                    alignItems="center"
+                    w="100%">
+                    <Text fontSize={14} w={'10%'}>
+                      所属支社:
+                    </Text>
+                    <Text
+                      fontWeight="bold"
+                      w="85%"
+                      fontSize={18}
+                      color={darkFontColor}>
+                      {branchTypeNameFactory(profile.branch)}
                     </Text>
                   </Box>
                   <Box
