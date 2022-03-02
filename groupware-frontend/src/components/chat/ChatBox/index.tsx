@@ -612,7 +612,6 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
         cursor="text"
         p="16px"
         bg="#fefefe"
-        overflowY="auto"
         h="20%"
         onClick={() => {
           editorRef.current?.focus();
