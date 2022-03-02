@@ -97,7 +97,6 @@ const CreateNewUser = () => {
   const {
     handleSubmit: onFinish,
     handleChange,
-    handleBlur,
     validateForm,
     setValues: setUserInfo,
     values,
