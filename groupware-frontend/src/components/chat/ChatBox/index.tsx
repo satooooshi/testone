@@ -373,10 +373,12 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
     if (fetchedPastMessages?.length) {
       const refreshedMessage = refreshMessage(fetchedPastMessages);
       setMessages(refreshedMessage);
-      if (refetchDoesntExistMessages(fetchedPastMessages[0].id)) {
+
+      if (after && refetchDoesntExistMessages(fetchedPastMessages[0].id)) {
         refetchDoesntExistMessages(fetchedPastMessages[0].id + 20);
-      } else {
-        setAfter(undefined);
+      }
+      if (before && !refetchDoesntExistMessages(fetchedPastMessages[0].id)) {
+        // setAfter(undefined);
         setInclude(false);
         setBefore(undefined);
       }
