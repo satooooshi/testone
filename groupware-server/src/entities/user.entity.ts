@@ -42,7 +42,7 @@ export enum UserRole {
 
 export enum BranchType {
   TOKYO = 'tokyo',
-  Osaka = 'osaka',
+  OSAKA = 'osaka',
   NON_SET = 'non_set',
 }
 

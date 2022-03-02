@@ -4,7 +4,7 @@ import { Tab } from 'src/types/header/tab/types';
 import LayoutWithTab from '@/components/layout/LayoutWithTab';
 import profileStyles from '@/styles/layouts/Profile.module.scss';
 import { useAPIUpdateUser } from '@/hooks/api/user/useAPIUpdateUser';
-import { TagType, User, UserTag } from 'src/types';
+import { TagType, User, UserTag, BranchType } from 'src/types';
 import {
   Box,
   Button,
@@ -13,9 +13,9 @@ import {
   Input,
   Spinner,
   Textarea,
+  Select,
   useToast,
   Text,
-  RadioGroup,
   Radio,
   Stack,
 } from '@chakra-ui/react';
@@ -409,6 +409,18 @@ const Profile = () => {
               background="white"
               onChange={handleChange}
             />
+          </FormControl>
+          <FormControl mb={4}>
+            <FormLabel fontWeight={'bold'}>所属支社</FormLabel>
+            <Select
+              bg="white"
+              height="10"
+              defaultValue={BranchType.NON_SET}
+              onChange={handleChange}>
+              <option value={BranchType.NON_SET}>未設定</option>
+              <option value={BranchType.TOKYO}>東京</option>
+              <option value={BranchType.OSAKA}>大阪</option>
+            </Select>
           </FormControl>
           <FormControl mb={4}>
             <FormLabel fontWeight={'bold'}>自己紹介</FormLabel>
