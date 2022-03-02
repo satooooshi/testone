@@ -415,7 +415,7 @@ const Profile = () => {
             <FormLabel fontWeight={'bold'}>所属支社</FormLabel>
             <Select
               name="branch"
-              defaultValue={BranchType.NON_SET}
+              value={userInfo.branch}
               bg="white"
               height="10"
               onChange={handleChange}>
