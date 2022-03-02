@@ -275,46 +275,56 @@ const QuestionDetail = () => {
               ))}
             </div>
           ) : null}
-          {headLinkContents &&
-          headLinkContents.length &&
-          !(
-            wiki.type === WikiType.BOARD &&
-            wiki.boardCategory === BoardCategory.QA
-          ) ? (
-            <Flex mb={'8px'} rounded="md" bg="white" flexDir="column" p="40px">
-              <Text fontWeight="bold" mb="16px" alignSelf="center">
-                目次
-              </Text>
-              {headLinkContents.map((content, index) => (
-                <ChakraLink
-                  mb={'8px'}
-                  pb={'2px'}
-                  pl={isH2Str((index + 1).toString()) ? '24px' : 0}
-                  _hover={{ borderBottom: '1px solid #b0b0b0' }}
-                  key={content}
-                  href={`#${index + 1}`}>
-                  {content}
-                </ChakraLink>
-              ))}
-            </Flex>
-          ) : null}
-          <Text fontSize="16px" mb="8px" display="block" alignSelf="flex-start">
-            参考資料
-          </Text>
-          {wiki.files && wiki.files.length ? (
-            <Box display="flex" flexDir="row" flexWrap="wrap" mb="16px">
-              {wiki.files.map((f) => (
-                <Box mr="4px" mb="4px" key={f.id}>
-                  <FileIcon href={f.url} />
+          <Box display="flex" alignSelf="flex-start">
+            {headLinkContents &&
+            headLinkContents.length &&
+            !(
+              wiki.type === WikiType.BOARD &&
+              wiki.boardCategory === BoardCategory.QA
+            ) ? (
+              <Flex
+                mb={'8px'}
+                rounded="md"
+                bg="white"
+                flexDir="column"
+                p="40px">
+                <Text fontWeight="bold" mb="16px" alignSelf="center">
+                  目次
+                </Text>
+                {headLinkContents.map((content, index) => (
+                  <ChakraLink
+                    mb={'8px'}
+                    pb={'2px'}
+                    pl={isH2Str((index + 1).toString()) ? '24px' : 0}
+                    _hover={{ borderBottom: '1px solid #b0b0b0' }}
+                    key={content}
+                    href={`#${index + 1}`}>
+                    {content}
+                  </ChakraLink>
+                ))}
+              </Flex>
+            ) : null}
+            {wiki.files && wiki.files.length ? (
+              <Flex
+                mb={'8px'}
+                ml="40px"
+                rounded="md"
+                bg="white"
+                flexDir="column"
+                p="40px">
+                <Text fontWeight="bold" mb="16px" alignSelf="center">
+                  添付ファイル
+                </Text>
+                <Box display="flex" flexDir="row" flexWrap="wrap" mb="16px">
+                  {wiki.files.map((f) => (
+                    <Box mr="4px" mb="4px" key={f.id}>
+                      <FileIcon href={f.url} />
+                    </Box>
+                  ))}
                 </Box>
-              ))}
-            </Box>
-          ) : (
-            <Text mb="16px" display="block" alignSelf="flex-start">
-              参考資料はありません
-            </Text>
-          )}
-
+              </Flex>
+            ) : null}
+          </Box>
           <div className={qaDetailStyles.question_wrapper}>
             <div id="wiki-body" className={qaDetailStyles.qa_wrapper}>
               <WikiComment
