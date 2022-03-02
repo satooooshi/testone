@@ -22,6 +22,7 @@ import {
   Link as ChakraLink,
   Flex,
   useToast,
+  Box,
 } from '@chakra-ui/react';
 import WrappedDraftEditor from '@/components/wiki/WrappedDraftEditor';
 import { ContentState, Editor, EditorState } from 'draft-js';
@@ -36,6 +37,7 @@ import { useHeaderTab } from '@/hooks/headerTab/useHeaderTab';
 import { tagColorFactory } from 'src/utils/factory/tagColorFactory';
 import { useAuthenticate } from 'src/contexts/useAuthenticate';
 import { isEditableWiki } from 'src/utils/factory/isCreatableWiki';
+import FileIcon from '@/components/common/FileIcon';
 
 type TOCHead = string[];
 
@@ -296,6 +298,22 @@ const QuestionDetail = () => {
               ))}
             </Flex>
           ) : null}
+          <Text fontSize="16px" mb="8px" display="block" alignSelf="flex-start">
+            参考資料
+          </Text>
+          {wiki.files && wiki.files.length ? (
+            <Box display="flex" flexDir="row" flexWrap="wrap" mb="16px">
+              {wiki.files.map((f) => (
+                <Box mr="4px" mb="4px" key={f.id}>
+                  <FileIcon href={f.url} />
+                </Box>
+              ))}
+            </Box>
+          ) : (
+            <Text mb="16px" display="block" alignSelf="flex-start">
+              参考資料はありません
+            </Text>
+          )}
 
           <div className={qaDetailStyles.question_wrapper}>
             <div id="wiki-body" className={qaDetailStyles.qa_wrapper}>

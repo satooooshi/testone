@@ -56,33 +56,7 @@ import { responseErrorMsgFactory } from 'src/utils/factory/responseErrorMsgFacto
 import { darkFontColor } from 'src/utils/colors';
 import { fileNameTransformer } from 'src/utils/factory/fileNameTransformer';
 import { isEditableEvent } from 'src/utils/factory/isCreatableEvent';
-
-type FileIconProps = {
-  href: string;
-  submitted?: boolean;
-};
-
-const FileIcon: React.FC<FileIconProps> = ({ href, submitted }) => {
-  return (
-    <Link
-      onClick={() => saveAs(href, fileNameTransformer(href))}
-      display="flex"
-      flexDir="column"
-      alignItems="center"
-      justifyContent="center"
-      border="1px solid #e0e0e0"
-      rounded="md"
-      p="8px"
-      w="136px"
-      h="136px"
-      bg={!submitted ? 'white' : 'lightblue'}>
-      <AiOutlineFileProtect className={eventDetailStyles.file_icon} />
-      <Text isTruncated={true} w="100%" textAlign="center">
-        {fileNameTransformer(href)}
-      </Text>
-    </Link>
-  );
-};
+import FileIcon from '@/components/common/FileIcon';
 
 const EventDetail = () => {
   const router = useRouter();

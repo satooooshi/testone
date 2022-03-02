@@ -16,6 +16,7 @@ import {
   Tag,
   TextFormat,
   WikiType,
+  WikiFile,
   RuleCategory,
   BoardCategory,
 } from 'src/types';
@@ -37,7 +38,10 @@ import WrappedEditor from '@/components/wiki/WrappedEditor';
 import MarkdownEditor from 'react-markdown-editor-lite';
 import { liteEditorPlugins } from 'src/utils/liteEditorPlugins';
 import MarkdownIt from 'markdown-it';
-import { uploadStorage } from '@/hooks/api/storage/useAPIUploadStorage';
+import {
+  uploadStorage,
+  useAPIUploadStorage,
+} from '@/hooks/api/storage/useAPIUploadStorage';
 import { tagColorFactory } from 'src/utils/factory/tagColorFactory';
 import { useFormik } from 'formik';
 import { wikiSchema } from 'src/utils/validation/schema';
@@ -45,6 +49,11 @@ import { stateFromHTML } from 'draft-js-import-html';
 import { imageExtensionsForMarkDownEditor } from 'src/utils/imageExtensions';
 import { wikiTypeNameFactory } from 'src/utils/wiki/wikiTypeNameFactory';
 import { isCreatableWiki } from 'src/utils/factory/isCreatableWiki';
+import { MdCancel } from 'react-icons/md';
+import { useDropzone } from 'react-dropzone';
+import { fileNameTransformer } from 'src/utils/factory/fileNameTransformer';
+import createEventModalStyle from '@/styles/components/CreateEventModal.module.scss';
+import { hideScrollbarCss } from 'src/utils/chakra/hideScrollBar.css';
 
 type WikiFormProps = {
   wiki?: Wiki;
@@ -174,6 +183,24 @@ const WikiForm: React.FC<WikiFormProps> = ({
       return 'ファイルアップロード失敗しました';
     }
   };
+
+  const {
+    getRootProps: getRelatedFileRootProps,
+    getInputProps: getRelatedFileInputProps,
+  } = useDropzone({
+    onDrop: (files: File[]) => {
+      uploadFiles(files, {
+        onSuccess: (urls: string[]) => {
+          const newFiles: Partial<WikiFile>[] = urls.map((u) => ({ url: u }));
+          setNewQuestion((e) => ({
+            ...e,
+            files: [...(e.files || []), ...newFiles],
+          }));
+        },
+      });
+    },
+  });
+  const { mutate: uploadFiles, isLoading } = useAPIUploadStorage();
 
   const onTypeSelectionChange = (e: ChangeEvent<HTMLSelectElement>) => {
     if (
@@ -523,6 +550,60 @@ const WikiForm: React.FC<WikiFormProps> = ({
             </Box>
           </Box>
         </Box>
+        <Text mb="16px">参考資料</Text>
+        <Box display="flex" flexDir="row" alignItems="center" mb="16px">
+          <div
+            {...getRelatedFileRootProps({
+              className: createEventModalStyle.image_dropzone,
+            })}>
+            <input {...getRelatedFileInputProps()} />
+            <Text>クリックかドラッグアンドドロップで投稿</Text>
+          </div>
+        </Box>
+        {newQuestion.files?.length ? (
+          <Box mb="16px">
+            {newQuestion.files.map((f) => (
+              <Box
+                key={f.url}
+                borderColor={'blue.500'}
+                rounded="md"
+                borderWidth={1}
+                display="flex"
+                flexDir="row"
+                justifyContent="space-between"
+                alignItems="center"
+                h="40px"
+                mb="8px"
+                px="8px">
+                <Text
+                  color="blue.600"
+                  alignSelf="center"
+                  h="40px"
+                  verticalAlign="middle"
+                  textAlign="left"
+                  display="flex"
+                  alignItems="center"
+                  whiteSpace="nowrap"
+                  overflowX="auto"
+                  w="95%"
+                  css={hideScrollbarCss}>
+                  {fileNameTransformer(f.url || '')}
+                </Text>
+                <MdCancel
+                  className={createEventModalStyle.url_delete_button}
+                  onClick={() =>
+                    setNewQuestion({
+                      ...newQuestion,
+                      files: newQuestion.files?.filter(
+                        (file) => file.id !== f.id,
+                      ),
+                    })
+                  }
+                />
+              </Box>
+            ))}
+          </Box>
+        ) : null}
         {newQuestion.tags?.length ? (
           <Box
             display="flex"

@@ -149,11 +149,20 @@ export interface Wiki {
   writer?: User;
   answers?: QAAnswer[];
   tags?: Tag[];
+  files?: Partial<WikiFile>[];
   bestAnswer?: QAAnswer;
   createdAt: Date;
   updatedAt: Date;
   userGoodForBoard?: User[];
   isGoodSender?: boolean;
+}
+
+export interface WikiFile {
+  id: number;
+  url: string;
+  Wiki?: Wiki;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface QAAnswerReply {
