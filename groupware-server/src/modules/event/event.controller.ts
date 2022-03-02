@@ -25,6 +25,10 @@ import CreateCommentDto from './dto/createCommentDto';
 import SaveEventDto from './dto/saveEventDto';
 import { EventScheduleService } from './event.service';
 import { GetEventDetailResopnse } from './eventDetail.type';
+import { Cron, CronExpression } from '@nestjs/schedule';
+import { NotificationService } from '../notification/notification.service';
+import { ConfigService } from '@nestjs/config';
+import { CustomPushNotificationData, sendPushNotifToSpecificUsers } from 'src/utils/notification/sendPushNotification';
 
 export interface QueryToGetZipSubmission {
   id: string;
@@ -76,6 +80,8 @@ export class EventScheduleController {
   constructor(
     private readonly eventService: EventScheduleService,
     private readonly chatService: ChatService,
+    private readonly notifService: NotificationService,
+    private readonly configService: ConfigService,
   ) {}
 
   //@TODO this endpoint is for inputting data
@@ -277,5 +283,29 @@ export class EventScheduleController {
   ): Promise<EventComment> {
     comment.writer = request.user;
     return await this.eventService.createComment(comment);
+  }
+
+  @Cron(CronExpression.EVERY_MINUTE)
+  async sendNotifEventsStartsInHour() {
+    const eventsStartAtAnHourLater =
+      await this.eventService.getEventsStartAtAnHourLater();
+    for (const e of eventsStartAtAnHourLater) {
+      const notificationData: CustomPushNotificationData = {
+        title: 'イベントの開始の1時間前になりました。',
+        body: e.title,
+        custom: {
+          screen: 'event',
+          id: e.id.toString(),
+        },
+      };
+      await sendPushNotifToSpecificUsers(
+        [
+          e.author,
+          ...e.hostUsers.map((u) => u),
+          ...e.userJoiningEvent.map((e) => e.user),
+        ],
+        notificationData,
+      );
+    }
   }
 }
