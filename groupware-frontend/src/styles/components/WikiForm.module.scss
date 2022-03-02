@@ -1,0 +1,25 @@
+@import '../variables.scss';
+
+.url_delete_button {
+  color: $dark_font_color;
+  height: 30px;
+  width: 30px;
+  &:hover {
+    cursor: pointer;
+  }
+}
+
+.image_dropzone {
+  text-align: center;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 3px dashed #eeeeee;
+  background-color: #fafafa;
+  color: #bdbdbd;
+  width: 100%;
+  &:hover {
+    cursor: pointer;
+  }
+}

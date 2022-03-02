@@ -52,7 +52,7 @@ import { isCreatableWiki } from 'src/utils/factory/isCreatableWiki';
 import { MdCancel } from 'react-icons/md';
 import { useDropzone } from 'react-dropzone';
 import { fileNameTransformer } from 'src/utils/factory/fileNameTransformer';
-import createEventModalStyle from '@/styles/components/CreateEventModal.module.scss';
+import WikiFormStyle from '@/styles/components/WikiForm.module.scss';
 import { hideScrollbarCss } from 'src/utils/chakra/hideScrollBar.css';
 
 type WikiFormProps = {
@@ -550,11 +550,11 @@ const WikiForm: React.FC<WikiFormProps> = ({
             </Box>
           </Box>
         </Box>
-        <Text mb="16px">参考資料</Text>
+        <Text mb="16px">添付ファイル</Text>
         <Box display="flex" flexDir="row" alignItems="center" mb="16px">
           <div
             {...getRelatedFileRootProps({
-              className: createEventModalStyle.image_dropzone,
+              className: WikiFormStyle.image_dropzone,
             })}>
             <input {...getRelatedFileInputProps()} />
             <Text>クリックかドラッグアンドドロップで投稿</Text>
@@ -590,7 +590,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
                   {fileNameTransformer(f.url || '')}
                 </Text>
                 <MdCancel
-                  className={createEventModalStyle.url_delete_button}
+                  className={WikiFormStyle.url_delete_button}
                   onClick={() =>
                     setNewQuestion({
                       ...newQuestion,
