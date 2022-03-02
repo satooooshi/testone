@@ -27,7 +27,7 @@ async function bootstrap() {
   app.enableCors({
     credentials: true,
     origin: [
-      'http://localhost:3005',
+      'http://localhost:3000',
       'http://localhost:8080',
       'https://editor-example-kabasawa-sgzkfl3uyq-an.a.run.app',
       'https://groupware-frontend.vercel.app',

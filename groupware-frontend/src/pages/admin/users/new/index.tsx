@@ -10,7 +10,7 @@ import React, {
 import { Tab } from 'src/types/header/tab/types';
 import Head from 'next/head';
 import Image from 'next/image';
-import { TagType, User, UserRole, UserTag } from 'src/types';
+import { TagType, User, UserRole, UserTag, BranchType } from 'src/types';
 import { useAPIUploadStorage } from '@/hooks/api/storage/useAPIUploadStorage';
 import { useDropzone } from 'react-dropzone';
 import {
@@ -412,6 +412,20 @@ const CreateNewUser = () => {
               <option value={UserRole.COMMON}>一般社員</option>
             </Select>
           </FormControl>
+          <FormControl mb={4}>
+            <FormLabel fontWeight={'bold'}>所属支社</FormLabel>
+            <Select
+              name="branch"
+              value={values.branch}
+              defaultValue={BranchType.NON_SET}
+              bg="white"
+              height="10"
+              onChange={handleChange}>
+              <option value={BranchType.NON_SET}>未設定</option>
+              <option value={BranchType.TOKYO}>東京</option>
+              <option value={BranchType.OSAKA}>大阪</option>
+            </Select>
+          </FormControl>
           <FormControl className={createNewUserStyles.input_wrapper}>
             <FormLabel fontWeight={'bold'}>
               <p>社員コード</p>
@@ -425,6 +439,7 @@ const CreateNewUser = () => {
               onChange={handleChange}
             />
           </FormControl>
+          <FormControl mb={4}></FormControl>
           <FormControl className={createNewUserStyles.input_wrapper}>
             <FormLabel fontWeight={'bold'}>
               <p>パスワード</p>
