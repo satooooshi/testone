@@ -302,7 +302,8 @@ const QuestionDetail = () => {
               <WikiComment
                 textFormat={wiki.textFormat}
                 body={wiki.body}
-                date={wiki.createdAt}
+                createdAt={wiki.createdAt}
+                updatedAt={wiki.updatedAt}
                 writer={wiki.writer}
                 isWriter={isEditableWiki(wiki, user)}
                 onClickEditButton={() =>
@@ -366,7 +367,8 @@ const QuestionDetail = () => {
                               createBestAnswer({ ...wiki, bestAnswer: answer })
                             }
                             body={answer.body}
-                            date={answer.createdAt}
+                            createdAt={answer.createdAt}
+                            updatedAt={answer.updatedAt}
                             writer={answer.writer}
                             isWriter={myself?.id === wiki.writer?.id}
                             replyButtonName={

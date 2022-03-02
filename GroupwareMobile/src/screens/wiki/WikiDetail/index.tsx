@@ -42,6 +42,7 @@ import tailwind from 'tailwind-rn';
 import {useAuthenticate} from '../../../contexts/useAuthenticate';
 import GoodSendersModal from '../../../components/chat/GoodSendersModal';
 import {useAPIToggleGoodForBoard} from '../../../hooks/api/wiki/useAPIToggleGoodForBoard';
+import {dateTimeFormatterFromJSDDate} from '../../../utils/dateTimeFormatterFromJSDate';
 
 const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
   const isFocused = useIsFocused();
@@ -205,20 +206,37 @@ const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
                 </Tag>
               )}
             />
-            <Div flexDir="row" alignItems="center" mb={16}>
-              <TouchableOpacity
-                onPress={() => {
-                  if (wikiState.writer && wikiState.writer.existence) {
-                    onPressAvatar(wikiState.writer);
-                  }
-                }}>
-                <Div mr={8}>
-                  <UserAvatar h={48} w={48} user={wikiState.writer} />
-                </Div>
-              </TouchableOpacity>
-              <Text fontSize={18} color={darkFontColor}>
-                {userNameFactory(wikiState.writer)}
-              </Text>
+            <Div flexDir="column" mb={16}>
+              <Div
+                flexDir="row"
+                justifyContent="flex-start"
+                alignItems="center">
+                <TouchableOpacity
+                  onPress={() => {
+                    if (wikiState.writer && wikiState.writer.existence) {
+                      onPressAvatar(wikiState.writer);
+                    }
+                  }}>
+                  <Div mr={8}>
+                    <UserAvatar h={48} w={48} user={wikiState.writer} />
+                  </Div>
+                </TouchableOpacity>
+                <Text fontSize={18} color={darkFontColor}>
+                  {userNameFactory(wikiState.writer)}
+                </Text>
+              </Div>
+              <Div flexDir="column" alignItems="flex-end">
+                <Text textAlignVertical="bottom" textAlign="center">
+                  {`投稿日: ${dateTimeFormatterFromJSDDate({
+                    dateTime: new Date(wikiState.createdAt),
+                  })}`}
+                </Text>
+                <Text textAlignVertical="bottom" textAlign="center">
+                  {`最終更新日: ${dateTimeFormatterFromJSDDate({
+                    dateTime: new Date(wikiState.updatedAt),
+                  })}`}
+                </Text>
+              </Div>
             </Div>
             <Div bg="white" rounded="md" p={8} mb={16}>
               {dom && <WikiBodyRenderer dom={dom} />}
