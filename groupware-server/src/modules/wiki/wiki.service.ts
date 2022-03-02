@@ -6,12 +6,16 @@ import { BoardCategory, Wiki, WikiType } from 'src/entities/wiki.entity';
 import { In, Repository } from 'typeorm';
 import { SearchQueryToGetWiki, SearchResultToGetWiki } from './wiki.controller';
 import { StorageService } from '../storage/storage.service';
+import { WikiFile } from 'src/entities/wikiFile.entity';
 
 @Injectable()
 export class WikiService {
   constructor(
     @InjectRepository(Wiki)
     private readonly wikiRepository: Repository<Wiki>,
+
+    @InjectRepository(WikiFile)
+    private readonly wikiFileRepository: Repository<WikiFile>,
 
     @InjectRepository(QAAnswer)
     private readonly qaAnswerRepository: Repository<QAAnswer>,
@@ -24,8 +28,16 @@ export class WikiService {
 
   public async saveWiki(wiki: Partial<Wiki>): Promise<Wiki> {
     try {
+      if (wiki.files && wiki.files.length) {
+        wiki.files = wiki.files.map((f) => ({
+          ...f,
+          url: this.storageService.parseSignedURLToStorageURL(f.url),
+        }));
+        wiki.files = await this.wikiFileRepository.save(wiki.files);
+      }
       wiki.body = this.storageService.parseSignedURLToStorageURL(wiki.body);
       const newWiki = await this.wikiRepository.save(wiki);
+
       return newWiki;
     } catch (err) {
       console.log(err);
@@ -111,6 +123,7 @@ export class WikiService {
       .leftJoinAndSelect('reply.writer', 'reply_writer')
       .leftJoinAndSelect('wiki.tags', 'tags')
       .leftJoinAndSelect('wiki.userGoodForBoard', 'userGoodForBoard')
+      .leftJoinAndSelect('wiki.files', 'files')
       .where('wiki.id = :id', { id })
       .orderBy({ 'answer.created_at': 'ASC', 'reply.created_at': 'ASC' })
       .getOne();
@@ -124,6 +137,7 @@ export class WikiService {
         existWiki.isGoodSender = false;
       }
     }
+    console.log('exist wiki file', existWiki?.files);
 
     return existWiki;
   }

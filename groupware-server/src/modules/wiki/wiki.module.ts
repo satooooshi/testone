@@ -9,10 +9,11 @@ import { NotificationModule } from '../notification/notification.module';
 import { WikiController } from './wiki.controller';
 import { WikiService } from './wiki.service';
 import { StorageModule } from '../storage/storage.module';
+import { WikiFile } from 'src/entities/wikiFile.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Wiki, QAAnswer, QAAnswerReply, User]),
+    TypeOrmModule.forFeature([Wiki, QAAnswer, QAAnswerReply, User, WikiFile]),
     StorageModule,
     NotificationModule,
     ConfigModule,

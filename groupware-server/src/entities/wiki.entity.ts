@@ -22,6 +22,7 @@ import {
 import { QAAnswer } from './qaAnswer.entity';
 import { Tag } from './tag.entity';
 import { User } from './user.entity';
+import { WikiFile } from './wikiFile.entity';
 
 export enum WikiType {
   RULES = 'rule',
@@ -114,6 +115,9 @@ export class Wiki {
     default: 'markdown',
   })
   textFormat: TextFormat;
+
+  @OneToMany(() => WikiFile, (file) => file.wiki)
+  files: WikiFile[];
 
   @Column({
     type: 'datetime',

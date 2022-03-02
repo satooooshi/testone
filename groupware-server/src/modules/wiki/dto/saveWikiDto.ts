@@ -8,10 +8,12 @@ import {
 } from 'class-validator';
 import { WikiType } from 'src/entities/wiki.entity';
 import { User } from 'src/entities/user.entity';
+import { WikiFile } from 'src/entities/wikiFile.entity';
 
 export class SaveWikiDto {
   id: number;
   writer?: User;
+  files?: WikiFile[];
   @isNotEmptyExceptTags({
     message: 'タイトルは必須項目です。空白のみは設定できません。',
   })

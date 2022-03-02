@@ -76,6 +76,7 @@ export class WikiController {
     @Body() wiki: SaveWikiDto,
   ): Promise<Wiki> {
     wiki.writer = request.user;
+    console.log('createWiki', wiki.files);
     return await this.qaService.saveWiki(wiki);
   }
 
