@@ -42,6 +42,7 @@ import tailwind from 'tailwind-rn';
 import {useAuthenticate} from '../../../contexts/useAuthenticate';
 import GoodSendersModal from '../../../components/chat/GoodSendersModal';
 import {useAPIToggleGoodForBoard} from '../../../hooks/api/wiki/useAPIToggleGoodForBoard';
+import FileIcon from '../../../components/common/FileIcon';
 
 const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
   const isFocused = useIsFocused();
@@ -225,6 +226,17 @@ const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
             </Div>
           </Div>
         ) : null}
+        <Text>{wikiInfo?.files?.length ? '添付ファイル' : null}</Text>
+        <Div flexDir="row" flexWrap="wrap">
+          {wikiInfo?.files?.map(
+            f =>
+              f.url && (
+                <Div mr={4} mb={4}>
+                  <FileIcon url={f.url} />
+                </Div>
+              ),
+          )}
+        </Div>
         {wikiState?.type === WikiType.BOARD && (
           <Div flexDir="row" ml="auto" mb={10}>
             <TouchableHighlight

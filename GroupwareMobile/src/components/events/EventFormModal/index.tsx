@@ -27,7 +27,6 @@ import {dateTimeFormatterFromJSDDate} from '../../../utils/dateTimeFormatterFrom
 import DropdownOpenerButton from '../../common/DropdownOpenerButton';
 import {useFormik} from 'formik';
 import {savingEventSchema} from '../../../utils/validation/schema';
-import DocumentPicker from 'react-native-document-picker';
 import eventTypeNameFactory from '../../../utils/factory/eventTypeNameFactory';
 import {uploadImageFromGallery} from '../../../utils/cropImage/uploadImageFromGallery';
 import {useAPIUploadStorage} from '../../../hooks/api/storage/useAPIUploadStorage';
@@ -47,6 +46,7 @@ import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import {isCreatableEvent} from '../../../utils/factory/event/isCreatableEvent';
 import {useAuthenticate} from '../../../contexts/useAuthenticate';
 import tailwind from 'tailwind-rn';
+import {handlePickDocument} from '../../../utils/handlePickDocument';
 
 type CustomModalProps = Omit<ModalProps, 'children'>;
 
@@ -154,34 +154,6 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
       Alert.alert(messages);
     } else {
       onComplete();
-    }
-  };
-  const normalizeURL = (url: string) => {
-    const filePrefix = 'file://';
-    if (url.startsWith(filePrefix)) {
-      url = url.substring(filePrefix.length);
-      url = decodeURI(url);
-      return url;
-    }
-  };
-
-  const handlePickDocument = async () => {
-    try {
-      const res = await DocumentPicker.pickSingle({
-        type: [DocumentPicker.types.allFiles],
-      });
-      const formData = new FormData();
-      formData.append('files', {
-        name: res.name,
-        uri: normalizeURL(res.uri),
-        type: res.type,
-      });
-      uploadFile(formData);
-    } catch (err) {
-      if (DocumentPicker.isCancel(err)) {
-      } else {
-        throw err;
-      }
     }
   };
 
@@ -577,7 +549,7 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
             <Text fontSize={16}>参考資料を選択</Text>
             <DropdownOpenerButton
               name={'タップでファイルを選択'}
-              onPress={() => handlePickDocument()}
+              onPress={() => handlePickDocument(uploadFile)}
             />
           </Div>
           {newEvent.files?.map(f => (

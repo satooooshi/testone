@@ -6,6 +6,7 @@ import {
   Div,
   Dropdown,
   DropdownProps,
+  Icon,
   Input,
   Tag as TagButton,
   Text,
@@ -31,6 +32,12 @@ import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import {NodeHtmlMarkdown} from 'node-html-markdown';
 import {useAuthenticate} from '../../contexts/useAuthenticate';
 import {isCreatableWiki} from '../../utils/factory/wiki/isCreatableWiki';
+import {TouchableOpacity} from 'react-native-gesture-handler';
+import DropdownOpenerButton from '../../components/common/DropdownOpenerButton';
+import {blueColor} from '../../utils/colors';
+import {handlePickDocument} from '../../utils/handlePickDocument';
+import {useAPIUploadStorage} from '../../hooks/api/storage/useAPIUploadStorage';
+// import {blueColor} from '../../../utils/colors';
 
 type WikiFormProps = {
   wiki?: Wiki;
@@ -81,6 +88,28 @@ const WikiForm: React.FC<WikiFormProps> = ({
         return;
       }
       saveWiki(w);
+    },
+  });
+  const {mutate: uploadFile} = useAPIUploadStorage({
+    onSuccess: uploadedURL => {
+      setNewWiki(e => {
+        const newWikiFile = {url: uploadedURL[0]};
+        if (e.files && e.files.length) {
+          return {
+            ...e,
+            files: [...e.files, newWikiFile],
+          };
+        }
+        return {
+          ...e,
+          files: [newWikiFile],
+        };
+      });
+    },
+    onError: () => {
+      Alert.alert(
+        'アップロード中にエラーが発生しました。\n時間をおいて再実行してください。',
+      );
     },
   });
   const {width: windowWidth} = useWindowDimensions();
@@ -591,6 +620,42 @@ const WikiForm: React.FC<WikiFormProps> = ({
             {errors.body}
           </Text>
         ) : null}
+        <Div
+          flexDir="column"
+          alignItems="flex-start"
+          alignSelf="center"
+          mb={'lg'}>
+          <Text fontSize={16}>参考資料を選択</Text>
+          <DropdownOpenerButton
+            name={'タップでファイルを選択'}
+            onPress={() => handlePickDocument(uploadFile)}
+          />
+        </Div>
+        {newWiki.files?.map(f => (
+          <Div
+            key={f.id}
+            mb={'lg'}
+            w={'100%'}
+            borderColor={blueColor}
+            borderWidth={1}
+            px={8}
+            py={8}
+            flexDir="row"
+            justifyContent="space-between"
+            rounded="md">
+            <Text fontSize={16} color={blueColor} w="80%">
+              {
+                (decodeURI(f.url || '')?.match('.+/(.+?)([?#;].*)?$') || [
+                  '',
+                  f.url,
+                ])[1]
+              }
+            </Text>
+            <TouchableOpacity>
+              <Icon name="closecircle" color="gray900" fontSize={24} />
+            </TouchableOpacity>
+          </Div>
+        ))}
         <Div mb={60}>
           <TextEditor
             textFormat={newWiki.textFormat}

@@ -167,11 +167,20 @@ export interface Wiki {
   writer?: User;
   answers?: QAAnswer[];
   tags?: Tag[];
+  files?: Partial<EventFile>[];
   bestAnswer?: QAAnswer;
   createdAt: Date;
   updatedAt: Date;
   userGoodForBoard?: User[];
   isGoodSender?: boolean;
+}
+
+export interface EventFile {
+  id: number;
+  url: string;
+  wiki?: Wiki;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface QAAnswerReply {
