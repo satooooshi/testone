@@ -393,7 +393,11 @@ const MyAccountInfo = () => {
                   />
                 ))}
               </SimpleGrid>
-            ) : null}
+            ) : (
+              <Text fontSize={16}>
+                  参加したイベントが見つかりませんでした
+              </Text>
+            )}
 
             {activeTab === TabName.QUESTION &&
             questionList &&
