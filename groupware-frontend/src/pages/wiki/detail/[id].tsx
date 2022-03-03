@@ -327,7 +327,13 @@ const QuestionDetail = () => {
                 onClick={() => {
                   checkErrors('answer');
                 }}>
-                {answerVisible ? '回答を投稿する' : '回答を追加'}
+                {wiki.boardCategory === BoardCategory.QA
+                  ? answerVisible
+                    ? '回答を投稿する'
+                    : '回答を追加'
+                  : answerVisible
+                  ? 'コメントを投稿する'
+                  : 'コメントを追加'}
               </Button>
             </div>
           ) : null}
@@ -337,7 +343,11 @@ const QuestionDetail = () => {
                 marginBottom: 40,
                 width: isSmallerThan768 ? '100vw' : '80vw',
               }}
-              placeholder="回答を記入してください"
+              placeholder={
+                wiki.boardCategory === BoardCategory.QA
+                  ? '回答を記入してください'
+                  : 'コメントを記入してください'
+              }
               editorRef={draftEditor}
               editorState={answerEditorState}
               setEditorState={setAnswerEditorState}
@@ -354,11 +364,13 @@ const QuestionDetail = () => {
                         <div className={qaDetailStyles.qa_wrapper}>
                           <WikiComment
                             bestAnswerButtonName={
-                              wiki.bestAnswer?.id === answer.id
-                                ? 'ベストアンサーに選ばれた回答'
-                                : !wiki.resolvedAt &&
-                                  myself?.id === wiki.writer?.id
-                                ? 'ベストアンサーに選ぶ'
+                              wiki.boardCategory === BoardCategory.QA
+                                ? wiki.bestAnswer?.id === answer.id
+                                  ? 'ベストアンサーに選ばれた回答'
+                                  : !wiki.resolvedAt &&
+                                    myself?.id === wiki.writer?.id
+                                  ? 'ベストアンサーに選ぶ'
+                                  : undefined
                                 : undefined
                             }
                             isExistsBestAnswer={wiki.bestAnswer ? true : false}
@@ -391,7 +403,11 @@ const QuestionDetail = () => {
                             width: isSmallerThan768 ? '100vw' : '70vw',
                           }}
                           editorRef={draftEditor}
-                          placeholder="回答への返信を記入してください"
+                          placeholder={
+                            wiki.boardCategory === BoardCategory.QA
+                              ? '回答への返信を記入してください'
+                              : 'コメントへの返信を記入してください'
+                          }
                           editorState={answerReplyEditorState}
                           setEditorState={setAnswerReplyEditorState}
                         />
