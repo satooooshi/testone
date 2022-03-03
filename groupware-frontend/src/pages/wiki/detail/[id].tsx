@@ -315,8 +315,7 @@ const QuestionDetail = () => {
               />
             </div>
           </div>
-          {wiki.type === WikiType.BOARD &&
-          wiki.boardCategory === BoardCategory.QA ? (
+          {wiki.type === WikiType.BOARD ? (
             <div className={qaDetailStyles.answer_count__wrapper}>
               <p className={qaDetailStyles.answer_count}>
                 回答{wiki.answers?.length ? wiki.answers.length : 0}件
