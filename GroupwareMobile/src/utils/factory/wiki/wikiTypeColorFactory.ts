@@ -1,5 +1,12 @@
 import {WikiType, RuleCategory, BoardCategory} from '../../../types';
-import {allPostalColor, knowledgeColor, qaColor, ruleColor} from '../../colors';
+import {
+  allPostalColor,
+  knowledgeColor,
+  qaColor,
+  ruleColor,
+  wikiBorderColor,
+  clubColor,
+} from '../../colors';
 
 export const wikiTypeColorFactory = (
   wikiType: WikiType,
@@ -21,10 +28,12 @@ export const wikiTypeColorFactory = (
           return ruleColor;
         case BoardCategory.CELEBRATION:
           return ruleColor;
+        case BoardCategory.CLUB:
+          return clubColor;
         case BoardCategory.OTHER:
           return ruleColor;
         default:
-          return ruleColor;
+          return wikiBorderColor;
       }
     case WikiType.ALL_POSTAL:
       return allPostalColor;
