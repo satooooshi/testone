@@ -277,8 +277,7 @@ const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
           isVisible={isVisible}
           onClose={() => setIsVisible(false)}
         />
-        {wikiState?.type === WikiType.BOARD &&
-        wikiState.boardCategory === BoardCategory.QA ? (
+        {wikiState?.type === WikiType.BOARD ? (
           <Div w={windowWidth * 0.9} alignSelf="center">
             <Div
               justifyContent="space-between"
@@ -289,7 +288,9 @@ const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
               borderBottomWidth={1}
               borderBottomColor={wikiBorderColor}>
               <Text fontWeight="bold" fontSize={24} color={darkFontColor}>
-                回答
+                {wikiState.boardCategory === BoardCategory.QA
+                  ? '回答'
+                  : 'コメント'}
                 {wikiState?.answers?.length ? wikiState.answers.length : 0}件
               </Text>
               <Button
@@ -301,9 +302,13 @@ const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
                 onPress={onPressPostAnswerButton}
                 bg={wikiAnswerButtonColor}
                 color="white">
-                {wikiState?.answers?.length
-                  ? '回答を追加する'
-                  : '回答を投稿する'}
+                {wikiState.boardCategory === BoardCategory.QA
+                  ? wikiState?.answers?.length
+                    ? '回答を追加する'
+                    : '回答を投稿する'
+                  : wikiState?.answers?.length
+                  ? 'コメントを追加する'
+                  : 'コメントを投稿する'}
               </Button>
             </Div>
 
