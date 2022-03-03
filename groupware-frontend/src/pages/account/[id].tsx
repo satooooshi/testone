@@ -166,6 +166,13 @@ const MyAccountInfo = () => {
       },
       isActiveTab: activeTab === TabName.KNOWLEDGE,
     },
+    {
+      tabName: 'いいね (直近20件)',
+      onClick: () => {
+        setActiveTab(TabName.GOOD);
+      },
+      isActiveTab: activeTab === TabName.GOOD,
+    },
   ];
 
   const { mutate: createGroup } = useAPISaveChatGroup({
@@ -414,6 +421,15 @@ const MyAccountInfo = () => {
             knowledgeList.wiki.length ? (
               <Box>
                 {knowledgeList.wiki.map((w) => (
+                  <WikiCard wiki={w} key={w.id} />
+                ))}
+              </Box>
+            ) : null}
+            {activeTab === TabName.GOOD &&
+            profile.userGoodForBoard &&
+            profile.userGoodForBoard.length ? (
+              <Box>
+                {profile.userGoodForBoard.map((w) => (
                   <WikiCard wiki={w} key={w.id} />
                 ))}
               </Box>
