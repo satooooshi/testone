@@ -625,7 +625,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
           alignItems="flex-start"
           alignSelf="center"
           mb={'lg'}>
-          <Text fontSize={16}>参考資料を選択</Text>
+          <Text fontSize={16}>添付ファイルを選択</Text>
           <DropdownOpenerButton
             name={'タップでファイルを選択'}
             onPress={() => handlePickDocument(uploadFile)}
