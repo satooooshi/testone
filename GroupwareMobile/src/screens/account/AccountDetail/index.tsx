@@ -157,7 +157,7 @@ const AccountDetail: React.FC = () => {
   const eventScreenName = `${screenName}-event`;
   const questionScreenName = `${screenName}-question`;
   const knowledgeScreenName = `${screenName}-knowledge`;
-  const {width: windowWidth, height: windowHeight} = useWindowDimensions();
+  const {width: windowWidth} = useWindowDimensions();
   const [screenHeight, setScreenHeight] = useState<{
     [key: string]: {height: number};
   }>({[defaultScreenName]: {height: 3600}});
