@@ -448,7 +448,13 @@ export class UserService {
   async getAllInfoById(id: number): Promise<User> {
     const user = await this.userRepository.findOne({
       where: { id },
-      relations: ['tags'],
+      relations: [
+        'tags',
+        'userGoodForBoard',
+        'userGoodForBoard.userGoodForBoard',
+        'userGoodForBoard.tags',
+        'userGoodForBoard.writer',
+      ],
     });
     if (!user) {
       throw new NotFoundException('User with this id does not exist');
@@ -456,6 +462,10 @@ export class UserService {
     if (!user?.verifiedAt) {
       throw new BadRequestException('The user is not verified');
     }
+    for (const wiki of user.userGoodForBoard) {
+      wiki.isGoodSender = true;
+    }
+
     return user;
   }
 
