@@ -18,7 +18,8 @@ import { Link } from '@chakra-ui/react';
 type WikiCommentProps = {
   textFormat?: TextFormat;
   body: string;
-  date?: Date;
+  createdAt?: Date;
+  updatedAt?: Date;
   writer?: User;
   isWriter?: boolean;
   isExistsBestAnswer?: boolean;
@@ -33,7 +34,8 @@ type WikiCommentProps = {
 const WikiComment: React.FC<WikiCommentProps> = ({
   textFormat,
   body,
-  date,
+  createdAt,
+  updatedAt,
   writer,
   isWriter,
   isExistsBestAnswer,
@@ -82,7 +84,7 @@ const WikiComment: React.FC<WikiCommentProps> = ({
 
   return (
     <>
-      {date && writer && (
+      {createdAt && updatedAt && writer && (
         <div className={qaCommentStyles.question_uploader__info}>
           <div className={qaCommentStyles.user_info_wrapper}>
             {writer.existence ? (
@@ -110,11 +112,20 @@ const WikiComment: React.FC<WikiCommentProps> = ({
             )}
           </div>
           <div className={qaCommentStyles.info_left}>
-            <p className={qaCommentStyles.wrote_date}>
-              {dateTimeFormatterFromJSDDate({
-                dateTime: new Date(date),
-              })}
-            </p>
+            <Box display="flex" flexDir={'column'} alignItems="end">
+              <p className={qaCommentStyles.wrote_date}>
+                {`投稿日: ${dateTimeFormatterFromJSDDate({
+                  dateTime: new Date(createdAt),
+                })}`}
+              </p>
+              {onClickEditButton && (
+                <p className={qaCommentStyles.wrote_date}>
+                  {`最終更新日: ${dateTimeFormatterFromJSDDate({
+                    dateTime: new Date(updatedAt),
+                  })}`}
+                </p>
+              )}
+            </Box>
             {isWriter && onClickEditButton ? (
               <Button colorScheme="blue" width="24" onClick={onClickEditButton}>
                 編集

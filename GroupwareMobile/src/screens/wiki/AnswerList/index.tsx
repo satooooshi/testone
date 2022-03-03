@@ -16,6 +16,7 @@ import {useAPICreateBestAnswer} from '../../../hooks/api/wiki/useAPICreateBestAn
 import {useAuthenticate} from '../../../contexts/useAuthenticate';
 import {useAPIGetWikiDetail} from '../../../hooks/api/wiki/useAPIGetWikiDetail';
 import UserAvatar from '../../../components/common/UserAvatar';
+import { dateTimeFormatterFromJSDDate } from '../../../utils/dateTimeFormatterFromJSDate';
 
 type AnswerListProps = {
   wiki: Wiki;
@@ -47,19 +48,29 @@ const AnswerList: React.FC<AnswerListProps> = ({wiki, onPressAvatar}) => {
           answer =>
             answer.writer && (
               <Div mb={26}>
-                <Div flexDir="row" alignItems="center" mb={8}>
-                  <TouchableOpacity
-                    onPress={() => {
-                      if (answer.writer && answer.writer.existence) {
-                        onPressAvatar(answer.writer);
-                      }
-                    }}>
-                    <Div mr={8}>
-                      <UserAvatar user={answer.writer} h={64} w={64} />
-                    </Div>
-                  </TouchableOpacity>
-                  <Text fontSize={18} color={darkFontColor}>
-                    {userNameFactory(answer.writer)}
+                <Div flexDir="column" mb={8}>
+                  <Div
+                    flexDir="row"
+                    justifyContent="flex-start"
+                    alignItems="center">
+                    <TouchableOpacity
+                      onPress={() => {
+                        if (answer.writer && answer.writer.existence) {
+                          onPressAvatar(answer.writer);
+                        }
+                      }}>
+                      <Div mr={8}>
+                        <UserAvatar user={answer.writer} h={64} w={64} />
+                      </Div>
+                    </TouchableOpacity>
+                    <Text fontSize={18} color={darkFontColor}>
+                      {userNameFactory(answer.writer)}
+                    </Text>
+                  </Div>
+                  <Text textAlignVertical="bottom" textAlign="right">
+                    {`投稿日: ${dateTimeFormatterFromJSDDate({
+                      dateTime: new Date(answer.createdAt),
+                    })}`}
                   </Text>
                 </Div>
                 <Div bg="white" rounded="md" p={8} mb={8}>

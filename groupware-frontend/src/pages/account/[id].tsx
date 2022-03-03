@@ -92,7 +92,11 @@ const UserTagList: React.FC<UserTagListProps> = ({ tags, type, introduce }) => {
       </Box>
       <Box>
         <Text mb={2} fontSize={14}>{`${labelName}の紹介`}</Text>
-        <Text fontSize={16} color={darkFontColor} fontWeight="bold">
+        <Text
+          fontSize={16}
+          color={darkFontColor}
+          fontWeight="bold"
+          className={accountInfoStyles.introduce}>
           {introduce || '未入力'}
         </Text>
       </Box>

@@ -44,10 +44,10 @@ const AnswerReply: React.FC<AnswerReplyProps> = ({ reply }) => {
           )}
         </div>
         <p className={answerReplyStyles.wrote_date}>
-          {dateTimeFormatterFromJSDDate({
+          {`投稿日: ${dateTimeFormatterFromJSDDate({
             dateTime: new Date(reply.createdAt),
-            format: 'yyyy/LL/dd HH:mm:ss',
-          })}
+            format: 'yyyy/LL/dd HH:mm',
+          })}`}
         </p>
       </div>
       <div className={answerReplyStyles.qa_reply_wrapper}>

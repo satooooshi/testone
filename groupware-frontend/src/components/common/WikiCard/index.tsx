@@ -162,11 +162,18 @@ const WikiCard: React.FC<WikiCardProps> = ({ wiki }) => {
               </Text>
             </Box>
           ) : null}
-          <Text fontSize={'16px'} color={darkFontColor} display="flex">
-            {dateTimeFormatterFromJSDDate({
-              dateTime: new Date(wikiState.createdAt),
-            })}
-          </Text>
+          <Box display="flex" flexDir={'column'} alignItems="end">
+            <Text fontSize={'16px'} color={darkFontColor} display="flex">
+              {`投稿日: ${dateTimeFormatterFromJSDDate({
+                dateTime: new Date(wikiState.createdAt),
+              })}`}
+            </Text>
+            <Text fontSize={'16px'} color={darkFontColor} display="flex">
+              {`最終更新日: ${dateTimeFormatterFromJSDDate({
+                dateTime: new Date(wikiState.updatedAt),
+              })}`}
+            </Text>
+          </Box>
         </Box>
       </Box>
 
