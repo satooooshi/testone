@@ -70,6 +70,7 @@ const PostAnswer: React.FC = () => {
       {wikiInfo ? (
         <>
           <HeaderWithTextButton
+            enableBackButton={true}
             title={
               wikiInfo.answers?.length ? '回答を追加する' : '回答を投稿する'
             }

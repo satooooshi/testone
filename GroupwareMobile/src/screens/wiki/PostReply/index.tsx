@@ -69,7 +69,7 @@ const PostReply: React.FC = () => {
     <WholeContainer>
       {answerInfo ? (
         <>
-          <HeaderWithTextButton title="返信する" />
+          <HeaderWithTextButton title="返信する" enableBackButton={true} />
           <Overlay visible={isLoading} p="xl">
             <ActivityIndicator />
           </Overlay>
