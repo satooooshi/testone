@@ -157,19 +157,20 @@ const AccountDetail: React.FC = () => {
     refetch,
     isLoading: loadingProfile,
   } = useAPIGetUserInfoById(userID?.toString() || '0');
-  const {data: events} = useAPIGetEventList({
+  const {data: events, refetch: refetchEventList} = useAPIGetEventList({
     participant_id: userID?.toString(),
   });
-  const {data: questionList} = useAPIGetWikiList({
+  const {data: questionList, refetch: refetchQuestionList} = useAPIGetWikiList({
     writer: userID?.toString() || '0',
     type: WikiType.BOARD,
     board_category: BoardCategory.QA,
   });
-  const {data: knowledgeList} = useAPIGetWikiList({
-    writer: userID?.toString() || '0',
-    type: WikiType.BOARD,
-    board_category: BoardCategory.KNOWLEDGE,
-  });
+  const {data: knowledgeList, refetch: refetchKnowledgeList} =
+    useAPIGetWikiList({
+      writer: userID?.toString() || '0',
+      type: WikiType.BOARD,
+      board_category: BoardCategory.KNOWLEDGE,
+    });
   const {mutate: createGroup} = useAPISaveChatGroup({
     onSuccess: createdData => {
       const resetAction = StackActions.popToTop();
@@ -228,8 +229,17 @@ const AccountDetail: React.FC = () => {
   useEffect(() => {
     if (isFocused) {
       refetch();
+      refetchEventList();
+      refetchQuestionList();
+      refetchKnowledgeList();
     }
-  }, [isFocused, refetch]);
+  }, [
+    isFocused,
+    refetch,
+    refetchEventList,
+    refetchQuestionList,
+    refetchKnowledgeList,
+  ]);
 
   return (
     <WholeContainer>
