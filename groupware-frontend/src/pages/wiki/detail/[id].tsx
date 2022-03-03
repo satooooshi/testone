@@ -318,7 +318,8 @@ const QuestionDetail = () => {
           {wiki.type === WikiType.BOARD ? (
             <div className={qaDetailStyles.answer_count__wrapper}>
               <p className={qaDetailStyles.answer_count}>
-                回答{wiki.answers?.length ? wiki.answers.length : 0}件
+                {wiki.boardCategory === BoardCategory.QA ? '回答' : 'コメント'}
+                {wiki.answers?.length ? wiki.answers.length : 0}件
               </p>
               <Button
                 size="sm"
