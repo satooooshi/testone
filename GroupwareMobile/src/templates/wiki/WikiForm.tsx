@@ -1,6 +1,6 @@
 import {useFormik} from 'formik';
 import React, {useRef, useState} from 'react';
-import {Alert, useWindowDimensions} from 'react-native';
+import {useWindowDimensions} from 'react-native';
 import {
   Button,
   Div,
@@ -16,14 +16,7 @@ import HeaderWithTextButton from '../../components/Header';
 import WholeContainer from '../../components/WholeContainer';
 import TextEditor from '../../components/wiki/TextEditor';
 import {useTagType} from '../../hooks/tag/useTagType';
-import {
-  BoardCategory,
-  RuleCategory,
-  Tag,
-  TextFormat,
-  Wiki,
-  WikiType,
-} from '../../types';
+import {BoardCategory, RuleCategory, Tag, Wiki, WikiType} from '../../types';
 import {tagColorFactory} from '../../utils/factory/tagColorFactory';
 import {wikiTypeNameFactory} from '../../utils/factory/wiki/wikiTypeNameFactory';
 import {wikiSchema} from '../../utils/validation/schema';
@@ -103,13 +96,13 @@ const WikiForm: React.FC<WikiFormProps> = ({
   const {selectedTagType, filteredTags} = useTagType('All', tags);
   const [visibleTagModal, setVisibleTagModal] = useState(false);
   const typeDropdownRef = useRef<any | null>(null);
-  const textFormatDropdownRef = useRef<any | null>(null);
 
-  const isEdit = !!wiki?.id;
   const {user} = useAuthenticate();
 
-  //
+  //   Fixed the input format so that it cannot be selected at once.
 
+  // const textFormatDropdownRef = useRef<any | null>(null);
+  // const isEdit = !!wiki?.id;
   // const handleChangeTextFormat = (format: TextFormat) => {
   //   if (newWiki.textFormat === format) {
   //     return;
