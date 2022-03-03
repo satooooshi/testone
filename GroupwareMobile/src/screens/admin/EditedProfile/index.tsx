@@ -1,6 +1,6 @@
 import {useIsFocused, useNavigation, useRoute} from '@react-navigation/native';
 import {useFormik} from 'formik';
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useRef} from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -15,7 +15,9 @@ import {
   Icon,
   Overlay,
   Radio,
+  Dropdown,
 } from 'react-native-magnus';
+import DropdownOpenerButton from '../../../components/common/DropdownOpenerButton';
 import TagModal from '../../../components/common/TagModal';
 import HeaderWithTextButton from '../../../components/Header';
 import TagEditLine from '../../../components/TagEditLine';
@@ -25,9 +27,14 @@ import {useAPIGetUserTag} from '../../../hooks/api/tag/useAPIGetUserTag';
 import {useAPIUpdateUser} from '../../../hooks/api/user/useAPIUpdateUser';
 import {useTagType} from '../../../hooks/tag/useTagType';
 import {profileStyles} from '../../../styles/screen/account/profile.style';
-import {TagType, User} from '../../../types';
+import {TagType, User, BranchType} from '../../../types';
 import {uploadImageFromGallery} from '../../../utils/cropImage/uploadImageFromGallery';
 import {formikErrorMsgFactory} from '../../../utils/factory/formikEroorMsgFactory';
+import {branchTypeNameFactory} from '../../../utils/factory/branchTypeNameFactory';
+import {
+  defaultDropdownProps,
+  defaultDropdownOptionProps,
+} from '../../../utils/dropdown/helper';
 import {profileSchema} from '../../../utils/validation/schema';
 import {Tab} from '../../../components/Header/HeaderTemplate';
 import UserAvatar from '../../../components/common/UserAvatar';
@@ -99,6 +106,7 @@ const EditedProfile: React.FC = () => {
   const {width: windowWidth} = useWindowDimensions();
   const {data: tags} = useAPIGetUserTag();
   const [visibleTagModal, setVisibleTagModal] = useState(false);
+  const dropdownRef = useRef<any | null>(null);
   const {selectedTagType, selectTagType, filteredTags} = useTagType(
     'All',
     tags,
@@ -307,6 +315,41 @@ const EditedProfile: React.FC = () => {
               autoCapitalize="none"
             />
           </Div>
+          <Div mb="lg">
+            <Text fontSize={16} fontWeight="bold">
+              所属支社
+            </Text>
+            <DropdownOpenerButton
+              name={branchTypeNameFactory(values.branch || BranchType.NON_SET)}
+              onPress={() => dropdownRef.current?.open()}
+            />
+          </Div>
+          <Dropdown ref={dropdownRef} {...defaultDropdownProps}>
+            <Dropdown.Option
+              {...defaultDropdownOptionProps}
+              value={BranchType.NON_SET}
+              onPress={() =>
+                setValues(v => ({...v, branch: BranchType.NON_SET}))
+              }>
+              {branchTypeNameFactory(BranchType.NON_SET)}
+            </Dropdown.Option>
+            <Dropdown.Option
+              {...defaultDropdownOptionProps}
+              value={BranchType.TOKYO}
+              onPress={() =>
+                setValues(v => ({...v, branch: BranchType.TOKYO}))
+              }>
+              {branchTypeNameFactory(BranchType.TOKYO)}
+            </Dropdown.Option>
+            <Dropdown.Option
+              {...defaultDropdownOptionProps}
+              value={BranchType.OSAKA}
+              onPress={() =>
+                setValues(v => ({...v, branch: BranchType.OSAKA}))
+              }>
+              {branchTypeNameFactory(BranchType.OSAKA)}
+            </Dropdown.Option>
+          </Dropdown>
           <Div mb="lg">
             <Text fontSize={16} fontWeight="bold">
               自己紹介
