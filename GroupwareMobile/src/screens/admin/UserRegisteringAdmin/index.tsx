@@ -27,7 +27,7 @@ import {useAPIUploadStorage} from '../../../hooks/api/storage/useAPIUploadStorag
 import {useAPIGetUserTag} from '../../../hooks/api/tag/useAPIGetUserTag';
 import {useTagType} from '../../../hooks/tag/useTagType';
 import {userRegisteringAdminStyles} from '../../../styles/screen/admin/userRegisteringAdmin.style';
-import {User, TagType, UserRole} from '../../../types';
+import {User, TagType, UserRole, BranchType} from '../../../types';
 import {uploadImageFromGallery} from '../../../utils/cropImage/uploadImageFromGallery';
 import {
   defaultDropdownOptionProps,
@@ -36,6 +36,7 @@ import {
 import {userNameFactory} from '../../../utils/factory/userNameFactory';
 import {userRoleNameFactory} from '../../../utils/factory/userRoleNameFactory';
 import {formikErrorMsgFactory} from '../../../utils/factory/formikEroorMsgFactory';
+import {branchTypeNameFactory} from '../../../utils/factory/branchTypeNameFactory';
 import {createUserSchema} from '../../../utils/validation/schema';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import {useAdminHeaderTab} from '../../../contexts/admin/useAdminHeaderTab';
@@ -59,7 +60,8 @@ const initialValues: Partial<User> = {
 };
 
 const UserRegisteringAdmin: React.FC = () => {
-  const dropdownRef = useRef<any | null>(null);
+  const userRoleDropdownRef = useRef<any | null>(null);
+  const branchTypeDropdownRef = useRef<any | null>(null);
   const {mutate: register, isLoading} = useAPIRegister({
     onSuccess: responseData => {
       if (responseData) {
@@ -185,7 +187,7 @@ const UserRegisteringAdmin: React.FC = () => {
         onPress={() => checkValidateErrors()}>
         <Icon color="white" name="check" fontSize={32} />
       </Button>
-      <Dropdown {...defaultDropdownProps} ref={dropdownRef}>
+      <Dropdown {...defaultDropdownProps} ref={userRoleDropdownRef}>
         <Dropdown.Option
           {...defaultDropdownOptionProps}
           value={UserRole.ADMIN}
@@ -225,6 +227,27 @@ const UserRegisteringAdmin: React.FC = () => {
             setValues(v => ({...v, role: UserRole.EXTERNAL_INSTRUCTOR}));
           }}>
           {userRoleNameFactory(UserRole.EXTERNAL_INSTRUCTOR)}
+        </Dropdown.Option>
+      </Dropdown>
+
+      <Dropdown ref={branchTypeDropdownRef} {...defaultDropdownProps}>
+        <Dropdown.Option
+          {...defaultDropdownOptionProps}
+          value={BranchType.NON_SET}
+          onPress={() => setValues(v => ({...v, branch: BranchType.NON_SET}))}>
+          {branchTypeNameFactory(BranchType.NON_SET)}
+        </Dropdown.Option>
+        <Dropdown.Option
+          {...defaultDropdownOptionProps}
+          value={BranchType.TOKYO}
+          onPress={() => setValues(v => ({...v, branch: BranchType.TOKYO}))}>
+          {branchTypeNameFactory(BranchType.TOKYO)}
+        </Dropdown.Option>
+        <Dropdown.Option
+          {...defaultDropdownOptionProps}
+          value={BranchType.OSAKA}
+          onPress={() => setValues(v => ({...v, branch: BranchType.OSAKA}))}>
+          {branchTypeNameFactory(BranchType.OSAKA)}
         </Dropdown.Option>
       </Dropdown>
       <KeyboardAwareScrollView
@@ -318,9 +341,18 @@ const UserRegisteringAdmin: React.FC = () => {
           </Text>
           <DropdownOpenerButton
             onPress={() => {
-              dropdownRef.current?.open();
+              userRoleDropdownRef.current?.open();
             }}
             name={values.role ? userRoleNameFactory(values.role) : '未選択'}
+          />
+        </Div>
+        <Div mb="lg">
+          <Text fontSize={16} fontWeight="bold">
+            所属支社
+          </Text>
+          <DropdownOpenerButton
+            name={branchTypeNameFactory(values.branch || BranchType.NON_SET)}
+            onPress={() => branchTypeDropdownRef.current?.open()}
           />
         </Div>
         <Div mb="lg">
