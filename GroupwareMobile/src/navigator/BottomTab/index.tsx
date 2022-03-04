@@ -13,7 +13,7 @@ import WikiDetail from '../../screens/wiki/WikiDetail';
 import WikiList from '../../screens/wiki/WikiList';
 import {createStackNavigator} from '@react-navigation/stack';
 import PostWiki from '../../screens/wiki/PostWiki';
-import {Icon} from 'react-native-magnus';
+import {Icon, Text} from 'react-native-magnus';
 import AccountDetail from '../../screens/account/AccountDetail';
 import Profile from '../../screens/account/Profile';
 import UpdatePassword from '../../screens/account/UpdatePassword';
@@ -350,12 +350,14 @@ const BottomTab = () => {
         options={{
           tabBarLabel: 'アカウント',
           tabBarIcon: ({color}) => (
-            <Icon
-              name="user-alt"
-              fontFamily="FontAwesome5"
-              color={color}
-              fontSize={23}
-            />
+            <>
+              <Icon
+                name="user-alt"
+                fontFamily="FontAwesome5"
+                color={color}
+                fontSize={23}
+              />
+            </>
           ),
         }}
       />
