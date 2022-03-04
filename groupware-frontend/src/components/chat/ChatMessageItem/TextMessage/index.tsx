@@ -5,7 +5,7 @@ import { ChatMessage, ChatMessageType } from 'src/types';
 import { darkFontColor } from 'src/utils/colors';
 import { userNameFactory } from 'src/utils/factory/userNameFactory';
 import { mentionTransform } from 'src/utils/mentionTransform';
-// import { removeHalfWidthSpace } from 'src/utils/removeHarfWidthSpace';
+import { replaceFullWidthSpace } from 'src/utils/replaceWidthSpace';
 import Linkify from 'react-linkify';
 
 type TextMessageProps = {
@@ -33,8 +33,7 @@ const TextMessage: React.FC<TextMessageProps> = ({
 
   const highlightSearchedWord = (text: string): ReactNode => {
     if (confirmedSearchWord) {
-      const replaceFullWidthSpace = confirmedSearchWord.replace('　', ' ');
-      const words = replaceFullWidthSpace.split(' ');
+      const words = replaceFullWidthSpace(confirmedSearchWord).split(' ');
       const regexpWord = '(?=.*word)';
       const regexpWordAry: string[] = [];
       words.map((w: string) => {

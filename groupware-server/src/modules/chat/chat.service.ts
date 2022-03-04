@@ -204,7 +204,6 @@ export class ChatService {
       .andWhere('g.id = :group', { group: query.group })
       .orderBy('chat_messages.createdAt', 'DESC')
       .getMany();
-    console.log(message);
     return message;
   }
 

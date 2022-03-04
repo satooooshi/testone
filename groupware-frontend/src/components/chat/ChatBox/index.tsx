@@ -64,7 +64,7 @@ import { saveAs } from 'file-saver';
 import { EntryComponentProps } from '@draft-js-plugins/mention/lib/MentionSuggestions/Entry/Entry';
 import suggestionStyles from '@/styles/components/Suggestion.module.scss';
 import { useAPISearchMessages } from '@/hooks/api/chat/useAPISearchMessages';
-import { removeHalfWidthSpace } from 'src/utils/removeHarfWidthSpace';
+import { removeHalfWidthSpace } from 'src/utils/replaceWidthSpace';
 
 export const Entry: React.FC<EntryComponentProps> = ({
   mention,
