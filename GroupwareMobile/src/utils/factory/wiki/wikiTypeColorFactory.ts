@@ -6,6 +6,7 @@ import {
   ruleColor,
   wikiBorderColor,
   clubColor,
+  boardColor,
 } from '../../colors';
 
 export const wikiTypeColorFactory = (
@@ -16,24 +17,24 @@ export const wikiTypeColorFactory = (
   switch (wikiType) {
     case WikiType.BOARD:
       switch (boardCategory) {
-        case BoardCategory.KNOWLEDGE:
-          return knowledgeColor;
-        case BoardCategory.QA:
-          return qaColor;
-        case BoardCategory.NEWS:
-          return ruleColor;
-        case BoardCategory.IMPRESSIVE_UNIVERSITY:
-          return ruleColor;
-        case BoardCategory.STUDY_MEETING:
-          return ruleColor;
-        case BoardCategory.CELEBRATION:
-          return ruleColor;
-        case BoardCategory.CLUB:
-          return clubColor;
-        case BoardCategory.OTHER:
-          return ruleColor;
+        // case BoardCategory.KNOWLEDGE:
+        //   return knowledgeColor;
+        // case BoardCategory.QA:
+        //   return qaColor;
+        // case BoardCategory.NEWS:
+        //   return ruleColor;
+        // case BoardCategory.IMPRESSIVE_UNIVERSITY:
+        //   return ruleColor;
+        // case BoardCategory.STUDY_MEETING:
+        //   return ruleColor;
+        // case BoardCategory.CELEBRATION:
+        //   return ruleColor;
+        // case BoardCategory.CLUB:
+        //   return clubColor;
+        // case BoardCategory.OTHER:
+        //   return ruleColor;
         default:
-          return wikiBorderColor;
+          return boardColor;
       }
     case WikiType.ALL_POSTAL:
       return allPostalColor;

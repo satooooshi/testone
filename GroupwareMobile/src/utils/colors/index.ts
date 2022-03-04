@@ -12,6 +12,7 @@ export const wikiColor = '#00b5d8';
 export const wikiBorderColor = '#5dc6a9';
 export const wikiAnswerButtonColor = '#319795';
 export const ruleColor = '#38a169';
+export const boardColor = '#ecc94b';
 export const knowledgeColor = '#ecc94b';
 export const qaColor = '#00b5d8';
 export const allPostalColor = '#DD6B20';
