@@ -505,7 +505,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
             onChangeText={text => setNewWiki(w => ({...w, title: text}))}
             mb="sm"
           />
-          <Div mb={8} flexDir="row" justifyContent="center">
+          <Div mb={10} flexDir="row">
             <Div alignItems="center">
               <Text fontSize={16} mb={4}>
                 タイプを選択
