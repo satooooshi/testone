@@ -154,12 +154,10 @@ const Profile: React.FC = () => {
     if (isFocused) {
       refetch();
       setIsTabBarVisible(false);
-      console.log('================');
     } else {
       setIsTabBarVisible(true);
-      console.log('+++++++++++++++++');
     }
-  }, [isFocused, refetch]);
+  }, [isFocused, refetch, setIsTabBarVisible]);
 
   return (
     <WholeContainer>

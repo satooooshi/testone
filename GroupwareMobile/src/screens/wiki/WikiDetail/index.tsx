@@ -43,6 +43,7 @@ import {useAuthenticate} from '../../../contexts/useAuthenticate';
 import GoodSendersModal from '../../../components/chat/GoodSendersModal';
 import {useAPIToggleGoodForBoard} from '../../../hooks/api/wiki/useAPIToggleGoodForBoard';
 import {dateTimeFormatterFromJSDDate} from '../../../utils/dateTimeFormatterFromJSDate';
+import {useIsTabBarVisible} from '../../../contexts/bottomTab/useIsTabBarVisible';
 
 const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
   const isFocused = useIsFocused();
@@ -54,6 +55,7 @@ const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
   const {user} = useAuthenticate();
   const [wikiTypeName, setWikiTypeName] = useState('Wiki');
   const [isVisible, setIsVisible] = useState<boolean>(false);
+  const {setIsTabBarVisible} = useIsTabBarVisible();
   const [isPressHeart, setIsPressHeart] = useState<boolean>(
     wikiInfo?.isGoodSender || false,
   );
@@ -97,8 +99,11 @@ const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
   useEffect(() => {
     if (isFocused) {
       refetchWikiInfo();
+      setIsTabBarVisible(false);
+    } else {
+      setIsTabBarVisible(true);
     }
-  }, [isFocused, refetchWikiInfo]);
+  }, [isFocused, refetchWikiInfo, setIsTabBarVisible]);
 
   const headerTitle = wikiTypeName + '詳細';
   const headerRightButtonName =

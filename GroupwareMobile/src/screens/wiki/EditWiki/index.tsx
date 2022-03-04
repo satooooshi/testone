@@ -10,18 +10,21 @@ import {uploadImageFromGallery} from '../../../utils/cropImage/uploadImageFromGa
 import {ActivityIndicator, Alert} from 'react-native';
 import {Overlay} from 'react-native-magnus';
 import {useAPIGetWikiDetail} from '../../../hooks/api/wiki/useAPIGetWikiDetail';
-import {useNavigation, useRoute} from '@react-navigation/native';
+import {useIsFocused, useNavigation, useRoute} from '@react-navigation/native';
 import {
   EditWikiNavigationProps,
   EditWikiRouteProps,
 } from '../../../types/navigator/drawerScreenProps';
 import {useAPIUpdateWiki} from '../../../hooks/api/wiki/useAPIUpdateQuestion';
 import {responseErrorMsgFactory} from '../../../utils/factory/responseEroorMsgFactory';
+import {useIsTabBarVisible} from '../../../contexts/bottomTab/useIsTabBarVisible';
 
 const EditWiki: React.FC = () => {
   const navigation = useNavigation<EditWikiNavigationProps>();
   const route = useRoute<EditWikiRouteProps>();
   const {id} = route.params;
+  const isFocused = useIsFocused();
+  const {setIsTabBarVisible} = useIsTabBarVisible();
   const {data: wiki} = useAPIGetWikiDetail(id);
   const {mutate: saveWiki, isLoading: loadingSaveWiki} = useAPIUpdateWiki({
     onSuccess: () => {
@@ -61,6 +64,14 @@ const EditWiki: React.FC = () => {
       uploadImage(formData, {onSuccess});
     }
   };
+
+  useEffect(() => {
+    if (isFocused) {
+      setIsTabBarVisible(false);
+    } else {
+      setIsTabBarVisible(true);
+    }
+  }, [isFocused, setIsTabBarVisible]);
 
   useEffect(() => {
     setNewWiki(w => ({...w, tags: selectedTags as Tag[]}));

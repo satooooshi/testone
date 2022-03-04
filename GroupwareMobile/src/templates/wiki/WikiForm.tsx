@@ -1,5 +1,5 @@
 import {useFormik} from 'formik';
-import React, {useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {Alert, useWindowDimensions} from 'react-native';
 import {
   Button,
@@ -31,6 +31,8 @@ import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import {NodeHtmlMarkdown} from 'node-html-markdown';
 import {useAuthenticate} from '../../contexts/useAuthenticate';
 import {isCreatableWiki} from '../../utils/factory/wiki/isCreatableWiki';
+import {useIsFocused} from '@react-navigation/native';
+import {useIsTabBarVisible} from '../../contexts/bottomTab/useIsTabBarVisible';
 
 type WikiFormProps = {
   wiki?: Wiki;
@@ -52,6 +54,8 @@ const WikiForm: React.FC<WikiFormProps> = ({
   onUploadImage,
 }) => {
   const scrollRef = useRef<KeyboardAwareScrollView | null>(null);
+  const isFocused = useIsFocused();
+  const {setIsTabBarVisible} = useIsTabBarVisible();
   const initialValues: Partial<Wiki> = {
     title: '',
     body: '',
@@ -104,6 +108,14 @@ const WikiForm: React.FC<WikiFormProps> = ({
   const [visibleTagModal, setVisibleTagModal] = useState(false);
   const typeDropdownRef = useRef<any | null>(null);
   const textFormatDropdownRef = useRef<any | null>(null);
+
+  useEffect(() => {
+    if (isFocused) {
+      setIsTabBarVisible(false);
+    } else {
+      setIsTabBarVisible(true);
+    }
+  }, [isFocused, setIsTabBarVisible]);
 
   const handleChangeTextFormat = (format: TextFormat) => {
     if (newWiki.textFormat === format) {
