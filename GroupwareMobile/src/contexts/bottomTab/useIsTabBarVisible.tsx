@@ -12,10 +12,6 @@ export const IsTabBarVisibleProvider: React.FC = ({children}) => {
     setIsVIsible(isTabBarVisible);
   };
 
-  useEffect(() => {
-    console.log('visible===========', isVisible);
-  }, [isVisible]);
-
   return (
     <IsTabBarVisibleContext.Provider
       value={{

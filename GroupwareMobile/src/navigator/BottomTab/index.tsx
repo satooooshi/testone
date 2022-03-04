@@ -261,15 +261,10 @@ const BottomTab = () => {
   const isAdmin = user?.role === UserRole.ADMIN;
   const {isTabBarVisible} = useIsTabBarVisible();
 
-  useEffect(() => {
-    console.log('visible', isTabBarVisible);
-  }, [isTabBarVisible]);
-
   return (
     <Tab.Navigator
       initialRouteName="Home"
       screenOptions={{
-        tabBarHideOnKeyboard: true,
         headerShown: false,
         tabBarLabelStyle: {color: 'white'},
         tabBarActiveTintColor: 'green400',
