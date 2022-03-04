@@ -276,10 +276,10 @@ const BottomTab = () => {
           tabBarLabel: 'ホーム',
           tabBarIcon: ({color}) => (
             <Icon
-              name="event"
-              fontFamily="MaterialIcons"
+              name="home"
+              fontFamily="MaterialCommunityIcons"
               color={color}
-              fontSize={23}
+              fontSize={26}
             />
           ),
         }}

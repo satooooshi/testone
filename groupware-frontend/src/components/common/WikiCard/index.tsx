@@ -146,8 +146,7 @@ const WikiCard: React.FC<WikiCardProps> = ({ wiki }) => {
               </Link>
             </Box>
           )}
-          {wiki.type === WikiType.BOARD &&
-          wiki.boardCategory === BoardCategory.QA ? (
+          {wiki.type === WikiType.BOARD ? (
             <Box
               mr="16px"
               display="flex"
@@ -155,7 +154,7 @@ const WikiCard: React.FC<WikiCardProps> = ({ wiki }) => {
               alignItems="center"
               justifyContent="center">
               <Text color={darkFontColor} mr={'4px'}>
-                回答
+                {wiki.boardCategory === BoardCategory.QA ? '回答' : 'コメント'}
               </Text>
               <Text color="green.500" fontSize="22px" fontWeight="bold">
                 {wikiState.answers?.length.toString()}
