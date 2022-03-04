@@ -183,7 +183,8 @@ export class ChatService {
   public async searchMessage(
     query: SearchMessageQuery,
   ): Promise<Partial<ChatMessage[]>> {
-    const words = query.word.split(' ');
+    const replaceFullWidthSpace = query.word.replace('　', ' ');
+    const words = replaceFullWidthSpace.split(' ');
     const sql = this.chatMessageRepository
       .createQueryBuilder('chat_messages')
       .leftJoin('chat_messages.chatGroup', 'g')
@@ -203,6 +204,7 @@ export class ChatService {
       .andWhere('g.id = :group', { group: query.group })
       .orderBy('chat_messages.createdAt', 'DESC')
       .getMany();
+    console.log(message);
     return message;
   }
 
