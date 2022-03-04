@@ -122,7 +122,12 @@ const WikiCard: React.FC<WikiCardProps> = ({wiki}) => {
                   bg={wikiTypeColorFactory(wiki.type, wiki.ruleCategory)}
                   color="white"
                   ml={4}>
-                  {wikiTypeNameFactory(wiki.type, wiki.ruleCategory)}
+                  {wikiTypeNameFactory(
+                    wiki.type,
+                    wiki.ruleCategory,
+                    true,
+                    wiki?.boardCategory,
+                  )}
                 </Tag>
               }
               style={wikiCardStyles.tagList}
@@ -155,7 +160,12 @@ const WikiCard: React.FC<WikiCardProps> = ({wiki}) => {
                 bg={wikiTypeColorFactory(wiki.type, wiki.ruleCategory)}
                 color="white"
                 ml={4}>
-                {wikiTypeNameFactory(wiki.type, wiki.ruleCategory)}
+                {wikiTypeNameFactory(
+                  wiki.type,
+                  wiki.ruleCategory,
+                  true,
+                  wiki?.boardCategory,
+                )}
               </Tag>
             </>
           )}
