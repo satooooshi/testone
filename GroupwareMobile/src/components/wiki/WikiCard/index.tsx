@@ -22,8 +22,8 @@ const WikiCard: React.FC<WikiCardProps> = ({wiki}) => {
   const windowWidth = useWindowDimensions().width;
   const navigation = useNavigation<any>();
   const [isVisible, setIsVisible] = useState<boolean>(false);
-  const isQA =
-    wiki.type === WikiType.BOARD && wiki.boardCategory === BoardCategory.QA;
+  const isBoard = wiki.type === WikiType.BOARD;
+  const isQA = wiki.boardCategory === BoardCategory.QA;
   const [isPressHeart, setIsPressHeart] = useState<boolean>(
     wiki.isGoodSender || false,
   );
@@ -82,10 +82,10 @@ const WikiCard: React.FC<WikiCardProps> = ({wiki}) => {
         </Div>
         <Div flexDir="column" w="100%">
           <Div flexDir="row" justifyContent="flex-end" mb={4} mr={4}>
-            {isQA ? (
+            {isBoard ? (
               <Div mr="lg" flexDir="row">
                 <Text textAlignVertical="bottom" mr={2}>
-                  回答
+                  {isQA ? '回答' : 'コメント'}
                 </Text>
                 <Text
                   color="green600"
