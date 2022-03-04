@@ -1,7 +1,7 @@
-import {useNavigation, useRoute} from '@react-navigation/native';
+import {useIsFocused, useNavigation, useRoute} from '@react-navigation/native';
 import {useFormik} from 'formik';
 import MarkdownIt from 'markdown-it';
-import React, {useRef} from 'react';
+import React, {useEffect, useRef} from 'react';
 import {ActivityIndicator, Alert, useWindowDimensions} from 'react-native';
 import {Button, Overlay, ScrollDiv, Text, Div} from 'react-native-magnus';
 import HeaderWithTextButton from '../../../components/Header';
@@ -19,12 +19,14 @@ import {replySchema} from '../../../utils/validation/schema';
 import RenderHtml from 'react-native-render-html';
 import TextEditor from '../../../components/wiki/TextEditor';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+import {useIsTabBarVisible} from '../../../contexts/bottomTab/useIsTabBarVisible';
 
 const PostReply: React.FC = () => {
   const navigation = useNavigation<PostWikiNavigationProps>();
   const route = useRoute<PostAnswerRouteProps>();
   const scrollRef = useRef<KeyboardAwareScrollView | null>(null);
-
+  const isFocused = useIsFocused();
+  const {setIsTabBarVisible} = useIsTabBarVisible();
   const answerId = route.params.id;
   const {data: answerInfo} = useAPIGetAnswerDetail(answerId);
   const mdParser = new MarkdownIt({breaks: true});
@@ -61,6 +63,12 @@ const PostReply: React.FC = () => {
       saveReply(r);
     },
   });
+
+  useEffect(() => {
+    if (isFocused) {
+      setIsTabBarVisible(false);
+    }
+  }, [isFocused, setIsTabBarVisible]);
 
   const handleUploadImage = async (onSuccess: (imageURL: string[]) => void) => {
     const {formData} = await uploadImageFromGallery();

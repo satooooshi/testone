@@ -68,8 +68,6 @@ const EditWiki: React.FC = () => {
   useEffect(() => {
     if (isFocused) {
       setIsTabBarVisible(false);
-    } else {
-      setIsTabBarVisible(true);
     }
   }, [isFocused, setIsTabBarVisible]);
 
