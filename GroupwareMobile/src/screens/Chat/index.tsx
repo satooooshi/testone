@@ -103,7 +103,9 @@ const Chat: React.FC = () => {
   }, [messages]);
   const [nowImageIndex, setNowImageIndex] = useState<number>(0);
   const [video, setVideo] = useState('');
-  const {data: lastReadChatTime} = useAPIGetLastReadChatTime(room.id);
+  const {data: lastReadChatTime} = useAPIGetLastReadChatTime(room.id, {
+    refetchInterval: 1000,
+  });
   const [longPressedMsg, setLongPressedMgg] = useState<ChatMessage>();
   const [reactionTarget, setReactionTarget] = useState<ChatMessage>();
   const {mutate: saveReaction} = useAPISaveReaction();
@@ -423,11 +425,17 @@ const Chat: React.FC = () => {
             sentMsgByOtherUsers.content,
           );
         }
-        setMessages(m => {
-          if (m[0].id !== sentMsgByOtherUsers.id) {
-            return [sentMsgByOtherUsers, ...m];
+        setMessages(msgs => {
+          if (
+            msgs.length &&
+            msgs[0].id !== sentMsgByOtherUsers.id &&
+            sentMsgByOtherUsers.chatGroup?.id === room.id
+          ) {
+            return [sentMsgByOtherUsers, ...msgs];
+          } else if (sentMsgByOtherUsers.chatGroup?.id !== room.id) {
+            return msgs.filter(m => m.id !== sentMsgByOtherUsers.id);
           }
-          return m;
+          return msgs;
         });
       }
     });
@@ -469,6 +477,12 @@ const Chat: React.FC = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fetchedPastMessages]);
+
+  useEffect(() => {
+    messages[0]?.chatGroup?.id === room.id && saveLastReadChatTime(room.id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [messages, room.id]);
+
   const readUsers = (targetMsg: ChatMessage) => {
     return lastReadChatTime
       ? lastReadChatTime

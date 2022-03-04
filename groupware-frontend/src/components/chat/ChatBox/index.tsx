@@ -392,19 +392,6 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [focusedMessageID]);
 
-  const readUsers = (targetMsg: ChatMessage) => {
-    return lastReadChatTime
-      ? lastReadChatTime
-          .filter((t) => t.readTime >= targetMsg.createdAt)
-          .map((t) => t.user)
-      : [];
-  };
-
-  useEffect(() => {
-    saveLastReadChatTime(room.id);
-    return () => saveLastReadChatTime(room.id);
-  }, [room.id, saveLastReadChatTime]);
-
   useEffect(() => {
     socket.emit('joinRoom', room.id.toString());
     socket.on('msgToClient', async (sentMsgByOtherUsers: ChatMessage) => {
@@ -415,11 +402,17 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
         if (sentMsgByOtherUsers.sender?.id === myself?.id) {
           sentMsgByOtherUsers.isSender = true;
         }
-        setMessages((m) => {
-          if (m[0].id !== sentMsgByOtherUsers.id) {
-            return [sentMsgByOtherUsers, ...m];
+        setMessages((msgs) => {
+          if (
+            msgs.length &&
+            msgs[0].id !== sentMsgByOtherUsers.id &&
+            sentMsgByOtherUsers.chatGroup?.id === room.id
+          ) {
+            return [sentMsgByOtherUsers, ...msgs];
+          } else if (sentMsgByOtherUsers.chatGroup?.id !== room.id) {
+            return msgs.filter((m) => m.id !== sentMsgByOtherUsers.id);
           }
-          return m;
+          return msgs;
         });
         needRefetch();
       }
@@ -437,6 +430,24 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [room.id]);
+
+  useEffect(() => {
+    messages[0]?.chatGroup?.id === room.id && saveLastReadChatTime(room.id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [messages, room.id]);
+
+  useEffect(() => {
+    saveLastReadChatTime(room.id);
+    return () => saveLastReadChatTime(room.id);
+  }, [room.id, saveLastReadChatTime]);
+
+  const readUsers = (targetMsg: ChatMessage) => {
+    return lastReadChatTime
+      ? lastReadChatTime
+          .filter((t) => t.readTime >= targetMsg.createdAt)
+          .map((t) => t.user)
+      : [];
+  };
 
   const isLoading = loadingSend || loadingUplaod;
   const activeIndex = useMemo(() => {
@@ -757,7 +768,6 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
         cursor="text"
         p="16px"
         bg="#fefefe"
-        overflowY="auto"
         h="20%"
         onClick={() => {
           editorRef.current?.focus();

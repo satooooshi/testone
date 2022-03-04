@@ -298,6 +298,23 @@ export class User {
   })
   chatGroups?: ChatGroup[];
 
+  @ManyToMany(() => Wiki, (wiki) => wiki.userGoodForBoard, {
+    onUpdate: 'CASCADE',
+    onDelete: 'CASCADE',
+  })
+  @JoinTable({
+    name: 'user_good_for_board',
+    joinColumn: {
+      name: 'user_id',
+      referencedColumnName: 'id',
+    },
+    inverseJoinColumn: {
+      name: 'wiki_id',
+      referencedColumnName: 'id',
+    },
+  })
+  userGoodForBoard?: Wiki[];
+
   @OneToMany(() => Wiki, (wiki) => wiki.writer)
   wiki?: Wiki[];
 

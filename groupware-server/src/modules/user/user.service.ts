@@ -448,7 +448,13 @@ export class UserService {
   async getAllInfoById(id: number): Promise<User> {
     const user = await this.userRepository.findOne({
       where: { id },
-      relations: ['tags'],
+      relations: [
+        'tags',
+        'userGoodForBoard',
+        'userGoodForBoard.userGoodForBoard',
+        'userGoodForBoard.tags',
+        'userGoodForBoard.writer',
+      ],
     });
     if (!user) {
       throw new NotFoundException('User with this id does not exist');
@@ -456,6 +462,10 @@ export class UserService {
     if (!user?.verifiedAt) {
       throw new BadRequestException('The user is not verified');
     }
+    for (const wiki of user.userGoodForBoard) {
+      wiki.isGoodSender = true;
+    }
+
     return user;
   }
 
@@ -516,7 +526,6 @@ export class UserService {
       if (!u.email && !u.password && !existUser) {
         throw new BadRequestException('メールアドレスとパスワードは必須です');
       }
-      const hashedPassword = await hash(u.password, 10);
       if (existUser) {
         usersArr.push({
           ...existUser,
@@ -524,6 +533,7 @@ export class UserService {
           verifiedAt: new Date(),
         });
       } else {
+        const hashedPassword = await hash(u.password, 10);
         usersArr.push({
           ...u,
           password: hashedPassword,

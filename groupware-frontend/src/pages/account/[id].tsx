@@ -92,7 +92,11 @@ const UserTagList: React.FC<UserTagListProps> = ({ tags, type, introduce }) => {
       </Box>
       <Box>
         <Text mb={2} fontSize={14}>{`${labelName}の紹介`}</Text>
-        <Text fontSize={16} color={darkFontColor} fontWeight="bold">
+        <Text
+          fontSize={16}
+          color={darkFontColor}
+          fontWeight="bold"
+          className={accountInfoStyles.introduce}>
           {introduce || '未入力'}
         </Text>
       </Box>
@@ -161,6 +165,13 @@ const MyAccountInfo = () => {
         setActiveTab(TabName.KNOWLEDGE);
       },
       isActiveTab: activeTab === TabName.KNOWLEDGE,
+    },
+    {
+      tabName: 'いいね (直近20件)',
+      onClick: () => {
+        setActiveTab(TabName.GOOD);
+      },
+      isActiveTab: activeTab === TabName.GOOD,
     },
   ];
 
@@ -410,6 +421,15 @@ const MyAccountInfo = () => {
             knowledgeList.wiki.length ? (
               <Box>
                 {knowledgeList.wiki.map((w) => (
+                  <WikiCard wiki={w} key={w.id} />
+                ))}
+              </Box>
+            ) : null}
+            {activeTab === TabName.GOOD &&
+            profile.userGoodForBoard &&
+            profile.userGoodForBoard.length ? (
+              <Box>
+                {profile.userGoodForBoard.map((w) => (
                   <WikiCard wiki={w} key={w.id} />
                 ))}
               </Box>

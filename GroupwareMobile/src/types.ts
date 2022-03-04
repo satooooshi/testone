@@ -124,7 +124,7 @@ export interface User {
   qaAnswerReplies?: QAAnswerReply[];
   //this params is sent when login
   token?: string;
-
+  userGoodForBoard?: Wiki[];
   eventCount?: number;
   questionCount?: number;
   answerCount?: number;
@@ -170,6 +170,8 @@ export interface Wiki {
   bestAnswer?: QAAnswer;
   createdAt: Date;
   updatedAt: Date;
+  userGoodForBoard?: User[];
+  isGoodSender?: boolean;
 }
 
 export interface QAAnswerReply {

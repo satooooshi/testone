@@ -148,6 +148,7 @@ const AccountDetail: React.FC = () => {
   const eventScreenName = `${screenName}-event`;
   const questionScreenName = `${screenName}-question`;
   const knowledgeScreenName = `${screenName}-knowledge`;
+  const goodScreenName = `${screenName}-good`;
   const {width: windowWidth, height: windowHeight} = useWindowDimensions();
   const [screenHeight, setScreenHeight] = useState<{
     [key: string]: {height: number};
@@ -157,19 +158,20 @@ const AccountDetail: React.FC = () => {
     refetch,
     isLoading: loadingProfile,
   } = useAPIGetUserInfoById(userID?.toString() || '0');
-  const {data: events} = useAPIGetEventList({
+  const {data: events, refetch: refetchEventList} = useAPIGetEventList({
     participant_id: userID?.toString(),
   });
-  const {data: questionList} = useAPIGetWikiList({
+  const {data: questionList, refetch: refetchQuestionList} = useAPIGetWikiList({
     writer: userID?.toString() || '0',
     type: WikiType.BOARD,
     board_category: BoardCategory.QA,
   });
-  const {data: knowledgeList} = useAPIGetWikiList({
-    writer: userID?.toString() || '0',
-    type: WikiType.BOARD,
-    board_category: BoardCategory.KNOWLEDGE,
-  });
+  const {data: knowledgeList, refetch: refetchKnowledgeList} =
+    useAPIGetWikiList({
+      writer: userID?.toString() || '0',
+      type: WikiType.BOARD,
+      board_category: BoardCategory.KNOWLEDGE,
+    });
   const {mutate: createGroup} = useAPISaveChatGroup({
     onSuccess: createdData => {
       const resetAction = StackActions.popToTop();
@@ -228,8 +230,17 @@ const AccountDetail: React.FC = () => {
   useEffect(() => {
     if (isFocused) {
       refetch();
+      refetchEventList();
+      refetchQuestionList();
+      refetchKnowledgeList();
     }
-  }, [isFocused, refetch]);
+  }, [
+    isFocused,
+    refetch,
+    refetchEventList,
+    refetchQuestionList,
+    refetchKnowledgeList,
+  ]);
 
   return (
     <WholeContainer>
@@ -394,6 +405,39 @@ const AccountDetail: React.FC = () => {
                     </>
                   )}
                   options={{title: 'ナレッジ'}}
+                />
+                <TopTab.Screen
+                  listeners={{
+                    focus: () => setActiveScreen(goodScreenName),
+                  }}
+                  name={goodScreenName}
+                  children={() => (
+                    <>
+                      <Div alignItems="center" mt="lg">
+                        {profile?.userGoodForBoard?.length ? (
+                          profile?.userGoodForBoard?.map(w => (
+                            <WikiCard key={w.id} wiki={w} />
+                          ))
+                        ) : (
+                          <Text fontSize={16}>
+                            いいねした掲示板が見つかりませんでした
+                          </Text>
+                        )}
+                      </Div>
+                      <Div
+                        onLayout={({nativeEvent}) => {
+                          setScreenHeight(s => ({
+                            ...s,
+                            [goodScreenName]: {
+                              ...s?.[goodScreenName],
+                              height: nativeEvent.layout.y + 130,
+                            },
+                          }));
+                        }}
+                      />
+                    </>
+                  )}
+                  options={{title: 'いいね'}}
                 />
               </TopTab.Navigator>
             </Div>

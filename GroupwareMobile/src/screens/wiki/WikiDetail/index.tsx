@@ -1,6 +1,6 @@
 import React, {useCallback, useEffect, useState} from 'react';
 import WholeContainer from '../../../components/WholeContainer';
-import {Div, Text, Button, Tag} from 'react-native-magnus';
+import {Div, Text, Button, Tag, Icon} from 'react-native-magnus';
 import {useAPIGetWikiDetail} from '../../../hooks/api/wiki/useAPIGetWikiDetail';
 import {
   StyleSheet,
@@ -22,7 +22,11 @@ import {WikiDetailProps} from '../../../types/navigator/drawerScreenProps';
 import {useIsFocused} from '@react-navigation/core';
 import AnswerList from '../AnswerList';
 import {ScrollerProvider} from '../../../utils/htmlScroll/scroller';
-import {DrawerLayout, ScrollView} from 'react-native-gesture-handler';
+import {
+  DrawerLayout,
+  ScrollView,
+  TouchableHighlight,
+} from 'react-native-gesture-handler';
 import WikiBodyRenderer from '../../../components/wiki/WikiBodyRenderer';
 import TOC from '../../../components/wiki/TOC';
 import {FAB} from 'react-native-paper';
@@ -36,6 +40,9 @@ import UserAvatar from '../../../components/common/UserAvatar';
 import {tagColorFactory} from '../../../utils/factory/tagColorFactory';
 import tailwind from 'tailwind-rn';
 import {useAuthenticate} from '../../../contexts/useAuthenticate';
+import GoodSendersModal from '../../../components/chat/GoodSendersModal';
+import {useAPIToggleGoodForBoard} from '../../../hooks/api/wiki/useAPIToggleGoodForBoard';
+import {dateTimeFormatterFromJSDDate} from '../../../utils/dateTimeFormatterFromJSDate';
 
 const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
   const isFocused = useIsFocused();
@@ -44,16 +51,23 @@ const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
   const {drawerRef, openDrawer, closeDrawer} = useMinimumDrawer();
   const {width: windowWidth} = useWindowDimensions();
   const {data: wikiInfo, refetch: refetchWikiInfo} = useAPIGetWikiDetail(id);
+  const {user} = useAuthenticate();
   const [wikiTypeName, setWikiTypeName] = useState('Wiki');
+  const [isVisible, setIsVisible] = useState<boolean>(false);
+  const [isPressHeart, setIsPressHeart] = useState<boolean>(
+    wikiInfo?.isGoodSender || false,
+  );
+  const [wikiState, setWikiState] = useState(wikiInfo);
+
   const mdParser = new MarkdownIt({breaks: true});
   const wikiBody =
-    wikiInfo?.textFormat === 'html'
-      ? wikiInfo?.body
-      : wikiInfo?.textFormat === 'markdown'
-      ? mdParser.render(wikiInfo?.body || '')
+    wikiState?.textFormat === 'html'
+      ? wikiState?.body
+      : wikiState?.textFormat === 'markdown'
+      ? mdParser.render(wikiState?.body || '')
       : '';
   const {dom, headings} = useDom(wikiBody);
-  const {scrollViewRef, scroller} = useHTMLScrollFeature(wikiInfo?.body);
+  const {scrollViewRef, scroller} = useHTMLScrollFeature(wikiState?.body);
   const onPressEntry = useCallback(
     (entry: string) => {
       closeDrawer();
@@ -75,6 +89,8 @@ const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
     if (wikiInfo) {
       const nameStr = wikiTypeNameFactory(wikiInfo.type, wikiInfo.ruleCategory);
       setWikiTypeName(nameStr);
+      setIsPressHeart(wikiInfo.isGoodSender || false);
+      setWikiState(wikiInfo);
     }
   }, [wikiInfo]);
 
@@ -86,25 +102,25 @@ const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
 
   const headerTitle = wikiTypeName + '詳細';
   const headerRightButtonName =
-    authUser?.id === wikiInfo?.writer?.id || authUser?.role === UserRole.ADMIN
+    authUser?.id === wikiState?.writer?.id || authUser?.role === UserRole.ADMIN
       ? wikiTypeName + 'を編集'
       : undefined;
 
   const onPressHeaderRightButton = () => {
-    if (wikiInfo) {
+    if (wikiState) {
       navigation.navigate('WikiStack', {
         screen: 'EditWiki',
-        params: {id: wikiInfo.id},
+        params: {id: wikiState.id},
       });
     }
     // else error handling
   };
 
   const onPressPostAnswerButton = () => {
-    if (wikiInfo) {
+    if (wikiState) {
       navigation.navigate('WikiStack', {
         screen: 'PostAnswer',
-        params: {id: wikiInfo.id},
+        params: {id: wikiState.id},
       });
     }
     // else error handling
@@ -119,9 +135,33 @@ const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
 
   const renderingTOCNeeded =
     !(
-      wikiInfo?.type === WikiType.BOARD &&
-      wikiInfo?.boardCategory === BoardCategory.QA
+      wikiState?.type === WikiType.BOARD &&
+      wikiState?.boardCategory === BoardCategory.QA
     ) && headings.length;
+
+  const {mutate} = useAPIToggleGoodForBoard({
+    onSuccess: () => {
+      setIsPressHeart(prevHeartStatus => {
+        setWikiState(w => {
+          if (w) {
+            if (prevHeartStatus) {
+              w.userGoodForBoard = w.userGoodForBoard?.filter(
+                u => u.id !== user?.id,
+              );
+            } else {
+              w.userGoodForBoard = [
+                user as User,
+                ...(w.userGoodForBoard || []),
+              ];
+            }
+            return w;
+          }
+        });
+
+        return !prevHeartStatus;
+      });
+    },
+  });
 
   const article = (
     <ScrollerProvider scroller={scroller}>
@@ -133,7 +173,7 @@ const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
           ...wikiDetailStyles.wrapper,
           width: windowWidth * 0.9,
         }}>
-        {wikiInfo && wikiInfo.writer ? (
+        {wikiState && wikiState.writer ? (
           <Div flexDir="column" w={'100%'}>
             <Div mb={16} flexDir="row" justifyContent="space-between" mt="sm">
               <Text
@@ -142,17 +182,17 @@ const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
                 color={darkFontColor}
                 mt={16}
                 w={'70%'}>
-                {wikiInfo.title}
+                {wikiState.title}
               </Text>
               <ShareButton
-                urlPath={generateClientURL(`/wiki/detail/${wikiInfo.id}`)}
-                text={wikiInfo.title}
+                urlPath={generateClientURL(`/wiki/detail/${wikiState.id}`)}
+                text={wikiState.title}
               />
             </Div>
             <FlatList
               style={tailwind('mb-4')}
               horizontal
-              data={wikiInfo?.tags || []}
+              data={wikiState?.tags || []}
               renderItem={({item: t}) => (
                 <Tag
                   fontSize={'md'}
@@ -166,28 +206,78 @@ const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
                 </Tag>
               )}
             />
-            <Div flexDir="row" alignItems="center" mb={16}>
-              <TouchableOpacity
-                onPress={() => {
-                  if (wikiInfo.writer && wikiInfo.writer.existence) {
-                    onPressAvatar(wikiInfo.writer);
-                  }
-                }}>
-                <Div mr={8}>
-                  <UserAvatar h={48} w={48} user={wikiInfo.writer} />
-                </Div>
-              </TouchableOpacity>
-              <Text fontSize={18} color={darkFontColor}>
-                {userNameFactory(wikiInfo.writer)}
-              </Text>
+            <Div flexDir="column" mb={16}>
+              <Div
+                flexDir="row"
+                justifyContent="flex-start"
+                alignItems="center">
+                <TouchableOpacity
+                  onPress={() => {
+                    if (wikiState.writer && wikiState.writer.existence) {
+                      onPressAvatar(wikiState.writer);
+                    }
+                  }}>
+                  <Div mr={8}>
+                    <UserAvatar h={48} w={48} user={wikiState.writer} />
+                  </Div>
+                </TouchableOpacity>
+                <Text fontSize={18} color={darkFontColor}>
+                  {userNameFactory(wikiState.writer)}
+                </Text>
+              </Div>
+              <Div flexDir="column" alignItems="flex-end">
+                <Text textAlignVertical="bottom" textAlign="center">
+                  {`投稿日: ${dateTimeFormatterFromJSDDate({
+                    dateTime: new Date(wikiState.createdAt),
+                  })}`}
+                </Text>
+                <Text textAlignVertical="bottom" textAlign="center">
+                  {`最終更新日: ${dateTimeFormatterFromJSDDate({
+                    dateTime: new Date(wikiState.updatedAt),
+                  })}`}
+                </Text>
+              </Div>
             </Div>
             <Div bg="white" rounded="md" p={8} mb={16}>
               {dom && <WikiBodyRenderer dom={dom} />}
             </Div>
           </Div>
         ) : null}
-        {wikiInfo?.type === WikiType.BOARD &&
-        wikiInfo.boardCategory === BoardCategory.QA ? (
+        {wikiState?.type === WikiType.BOARD && (
+          <Div flexDir="row" ml="auto" mb={10}>
+            <TouchableHighlight
+              underlayColor={'none'}
+              onPress={() => mutate(wikiState.id)}>
+              {isPressHeart ? (
+                <Icon
+                  name="heart"
+                  fontFamily="AntDesign"
+                  fontSize={37}
+                  color={'red'}
+                  mr={3}
+                />
+              ) : (
+                <Icon
+                  name="hearto"
+                  fontFamily="AntDesign"
+                  fontSize={35}
+                  color={darkFontColor}
+                  mr={3}
+                />
+              )}
+            </TouchableHighlight>
+            <Button
+              onPress={() =>
+                setIsVisible(true)
+              }>{`${wikiState.userGoodForBoard?.length}件のいいね`}</Button>
+          </Div>
+        )}
+        <GoodSendersModal
+          goodSenders={wikiState?.userGoodForBoard || []}
+          isVisible={isVisible}
+          onClose={() => setIsVisible(false)}
+        />
+        {wikiState?.type === WikiType.BOARD ? (
           <Div w={windowWidth * 0.9} alignSelf="center">
             <Div
               justifyContent="space-between"
@@ -198,8 +288,10 @@ const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
               borderBottomWidth={1}
               borderBottomColor={wikiBorderColor}>
               <Text fontWeight="bold" fontSize={24} color={darkFontColor}>
-                回答
-                {wikiInfo?.answers?.length ? wikiInfo.answers.length : 0}件
+                {wikiState.boardCategory === BoardCategory.QA
+                  ? '回答'
+                  : 'コメント'}
+                {wikiState?.answers?.length ? wikiState.answers.length : 0}件
               </Text>
               <Button
                 alignSelf="center"
@@ -210,12 +302,17 @@ const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
                 onPress={onPressPostAnswerButton}
                 bg={wikiAnswerButtonColor}
                 color="white">
-                {wikiInfo?.answers?.length
-                  ? '回答を追加する'
-                  : '回答を投稿する'}
+                {wikiState.boardCategory === BoardCategory.QA
+                  ? wikiState?.answers?.length
+                    ? '回答を追加する'
+                    : '回答を投稿する'
+                  : wikiState?.answers?.length
+                  ? 'コメントを追加する'
+                  : 'コメントを投稿する'}
               </Button>
             </Div>
-            <AnswerList wiki={wikiInfo} onPressAvatar={onPressAvatar} />
+
+            <AnswerList wiki={wikiState} onPressAvatar={onPressAvatar} />
           </Div>
         ) : null}
       </ScrollView>
