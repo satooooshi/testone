@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 // import {createMaterialBottomTabNavigator} from '@react-navigation/material-bottom-tabs';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 
@@ -42,10 +42,7 @@ import EventIntroduction from '../../screens/event/EventIntroduction';
 import {useAuthenticate} from '../../contexts/useAuthenticate';
 import {UserRole} from '../../types';
 import WikiLinks from '../../screens/wiki/WikiLinks';
-import {
-  IsTabBarVisibleProvider,
-  useIsTabBarVisible,
-} from '../../contexts/bottomTab/useIsTabBarVisible';
+import {useIsTabBarVisible} from '../../contexts/bottomTab/useIsTabBarVisible';
 
 const Tab = createBottomTabNavigator();
 // const Tab = createMaterialBottomTabNavigator();
@@ -264,131 +261,133 @@ const BottomTab = () => {
   const isAdmin = user?.role === UserRole.ADMIN;
   const {isTabBarVisible} = useIsTabBarVisible();
 
+  useEffect(() => {
+    console.log('visible', isTabBarVisible);
+  }, [isTabBarVisible]);
+
   return (
-    <IsTabBarVisibleProvider>
-      <Tab.Navigator
-        initialRouteName="Home"
-        screenOptions={{
-          tabBarHideOnKeyboard: true,
-          headerShown: false,
-          tabBarLabelStyle: {color: 'white'},
-          tabBarActiveTintColor: 'green400',
-          tabBarStyle: {
-            display: isTabBarVisible,
-            backgroundColor: darkFontColor,
-          },
-        }}>
-        <Tab.Screen
-          name="Home"
-          component={Home}
-          options={{
-            tabBarLabel: 'ホーム',
-            tabBarIcon: ({color}) => (
+    <Tab.Navigator
+      initialRouteName="Home"
+      screenOptions={{
+        tabBarHideOnKeyboard: true,
+        headerShown: false,
+        tabBarLabelStyle: {color: 'white'},
+        tabBarActiveTintColor: 'green400',
+        tabBarStyle: {
+          display: `${isTabBarVisible ? 'flex' : 'none'}`,
+          backgroundColor: darkFontColor,
+        },
+      }}>
+      <Tab.Screen
+        name="Home"
+        component={Home}
+        options={{
+          tabBarLabel: 'ホーム',
+          tabBarIcon: ({color}) => (
+            <Icon
+              name="home"
+              fontFamily="MaterialCommunityIcons"
+              color={color}
+              fontSize={26}
+            />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="EventStack"
+        component={EventStack}
+        options={{
+          tabBarLabel: 'イベント',
+          tabBarIcon: ({color}) => (
+            <Icon
+              name="event"
+              fontFamily="MaterialIcons"
+              color={color}
+              fontSize={23}
+            />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="WikiStack"
+        component={WikiStack}
+        options={{
+          tabBarLabel: '社内Wiki',
+          tabBarIcon: ({color}) => (
+            <Icon
+              name="globe-outline"
+              fontFamily="Ionicons"
+              color={color}
+              fontSize={23}
+            />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="UsersStack"
+        component={UserListStack}
+        options={{
+          tabBarLabel: '社員名鑑',
+          tabBarIcon: ({color}) => (
+            <Icon
+              name="users"
+              fontFamily="FontAwesome5"
+              color={color}
+              fontSize={21}
+            />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="ChatStack"
+        component={ChatStack}
+        options={{
+          tabBarLabel: 'チャット',
+          tabBarIcon: ({color}) => (
+            <Icon
+              name="ios-chatbubble-ellipses"
+              fontFamily="Ionicons"
+              color={color}
+              fontSize={23}
+            />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="AccountStack"
+        component={AccountStack}
+        options={{
+          tabBarLabel: 'アカウント',
+          tabBarIcon: ({color}) => (
+            <Icon
+              name="user-alt"
+              fontFamily="FontAwesome5"
+              color={color}
+              fontSize={23}
+            />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="AdminStack"
+        component={AdminStack}
+        options={{
+          tabBarLabel: '管理',
+          tabBarIcon: ({color}) =>
+            isAdmin ? (
               <Icon
-                name="home"
-                fontFamily="MaterialCommunityIcons"
-                color={color}
-                fontSize={26}
-              />
-            ),
-          }}
-        />
-        <Tab.Screen
-          name="EventStack"
-          component={EventStack}
-          options={{
-            tabBarLabel: 'イベント',
-            tabBarIcon: ({color}) => (
-              <Icon
-                name="event"
-                fontFamily="MaterialIcons"
-                color={color}
-                fontSize={23}
-              />
-            ),
-          }}
-        />
-        <Tab.Screen
-          name="WikiStack"
-          component={WikiStack}
-          options={{
-            tabBarLabel: '社内Wiki',
-            tabBarIcon: ({color}) => (
-              <Icon
-                name="globe-outline"
-                fontFamily="Ionicons"
-                color={color}
-                fontSize={23}
-              />
-            ),
-          }}
-        />
-        <Tab.Screen
-          name="UsersStack"
-          component={UserListStack}
-          options={{
-            tabBarLabel: '社員名鑑',
-            tabBarIcon: ({color}) => (
-              <Icon
-                name="users"
+                name="user-cog"
                 fontFamily="FontAwesome5"
                 color={color}
-                fontSize={21}
-              />
-            ),
-          }}
-        />
-        <Tab.Screen
-          name="ChatStack"
-          component={ChatStack}
-          options={{
-            tabBarLabel: 'チャット',
-            tabBarIcon: ({color}) => (
-              <Icon
-                name="ios-chatbubble-ellipses"
-                fontFamily="Ionicons"
-                color={color}
                 fontSize={23}
+                mr={-5}
               />
+            ) : (
+              <Icon name="tags" color={color} fontSize={26} />
             ),
-          }}
-        />
-        <Tab.Screen
-          name="AccountStack"
-          component={AccountStack}
-          options={{
-            tabBarLabel: 'アカウント',
-            tabBarIcon: ({color}) => (
-              <Icon
-                name="user-alt"
-                fontFamily="FontAwesome5"
-                color={color}
-                fontSize={23}
-              />
-            ),
-          }}
-        />
-        <Tab.Screen
-          name="AdminStack"
-          component={AdminStack}
-          options={{
-            tabBarLabel: '管理',
-            tabBarIcon: ({color}) =>
-              isAdmin ? (
-                <Icon
-                  name="user-cog"
-                  fontFamily="FontAwesome5"
-                  color={color}
-                  fontSize={23}
-                  mr={-5}
-                />
-              ) : (
-                <Icon name="tags" color={color} fontSize={26} />
-              ),
-          }}
-        />
-      </Tab.Navigator>
-    </IsTabBarVisibleProvider>
+        }}
+      />
+    </Tab.Navigator>
   );
 };
 

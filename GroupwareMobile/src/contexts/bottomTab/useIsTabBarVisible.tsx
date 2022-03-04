@@ -1,27 +1,26 @@
-import React, {createContext, useContext, useState} from 'react';
+import React, {createContext, useContext, useEffect, useState} from 'react';
 
 const IsTabBarVisibleContext = createContext({
-  isTabBarVisible: 'inline',
-  setTabBarVisible: () => {},
-  setTabBarUnVisible: () => {},
+  isTabBarVisible: true,
+  setIsTabBarVisible: (() => {}) as (isTabBarVisible: boolean) => void,
 });
 
 export const IsTabBarVisibleProvider: React.FC = ({children}) => {
-  const [isVisible, setIsVIsible] = useState<string>('inline');
+  const [isVisible, setIsVIsible] = useState(true);
 
-  const setTabBarVisible = () => {
-    setIsVIsible('inline');
+  const setIsTabBarVisible = (isTabBarVisible: boolean) => {
+    setIsVIsible(isTabBarVisible);
   };
-  const setTabBarUnVisible = () => {
-    setIsVIsible('none');
-  };
+
+  useEffect(() => {
+    console.log('visible===========', isVisible);
+  }, [isVisible]);
 
   return (
     <IsTabBarVisibleContext.Provider
       value={{
         isTabBarVisible: isVisible,
-        setTabBarVisible,
-        setTabBarUnVisible,
+        setIsTabBarVisible,
       }}>
       {children}
     </IsTabBarVisibleContext.Provider>

@@ -34,6 +34,7 @@ import {profileSchema} from '../../../utils/validation/schema';
 import {Tab} from '../../../components/Header/HeaderTemplate';
 import UserAvatar from '../../../components/common/UserAvatar';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+import {useIsTabBarVisible} from '../../../contexts/bottomTab/useIsTabBarVisible';
 
 const initialValues: Partial<User> = {
   email: '',
@@ -59,6 +60,7 @@ const Profile: React.FC = () => {
     isLoading: loadingProfile,
   } = useAPIGetProfile();
   const isFocused = useIsFocused();
+  const {setIsTabBarVisible} = useIsTabBarVisible();
   const {mutate: updateUser, isLoading: loadingUpdate} = useAPIUpdateUser({
     onSuccess: responseData => {
       if (responseData) {
@@ -151,6 +153,11 @@ const Profile: React.FC = () => {
   useEffect(() => {
     if (isFocused) {
       refetch();
+      setIsTabBarVisible(false);
+      console.log('================');
+    } else {
+      setIsTabBarVisible(true);
+      console.log('+++++++++++++++++');
     }
   }, [isFocused, refetch]);
 
