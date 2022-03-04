@@ -37,10 +37,10 @@ const TextMessage: React.FC<TextMessageProps> = ({
       const words = replaceFullWidthSpace.split(' ');
       const regexpWord = '(?=.*word)';
       const regexpWordAry: string[] = [];
-      const regexpWords = regexpWordAry.join('');
       words.map((w: string) => {
         regexpWordAry.push(regexpWord.replace('word', w));
       });
+      const regexpWords = regexpWordAry.join('');
 
       const Exp = new RegExp(`(^${regexpWords}.*$)`);
       return text.split(Exp).map((t) => {
