@@ -1,13 +1,5 @@
-import {WikiType, RuleCategory, BoardCategory} from '../../../types';
-import {
-  allPostalColor,
-  knowledgeColor,
-  qaColor,
-  ruleColor,
-  wikiBorderColor,
-  clubColor,
-  boardColor,
-} from '../../colors';
+import {WikiType, RuleCategory} from '../../../types';
+import {allPostalColor, ruleColor, boardColor} from '../../colors';
 
 export const wikiTypeColorFactory = (
   wikiType: WikiType,
