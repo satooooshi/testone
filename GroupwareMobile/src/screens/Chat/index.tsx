@@ -624,6 +624,7 @@ const Chat: React.FC = () => {
         message={message}
         readUsers={readUsers(message)}
         inputtedSearchWord={inputtedSearchWord}
+        searchedResultIds={searchedResults?.map(s => s.id)}
         messageIndex={messageIndex}
         scrollToTarget={scrollToTarget}
         isScrollTarget={focusedMessageID === message.id}

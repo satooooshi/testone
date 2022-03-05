@@ -27,6 +27,7 @@ type ChatMessageItemProps = {
   message: ChatMessage;
   readUsers: User[];
   inputtedSearchWord?: string;
+  searchedResultIds?: (number | undefined)[];
   messageIndex: number;
   isScrollTarget: boolean;
   scrollToTarget: (messageIndex: number) => void;
@@ -43,6 +44,7 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
   message,
   readUsers,
   inputtedSearchWord,
+  searchedResultIds,
   messageIndex,
   isScrollTarget = false,
   scrollToTarget,
@@ -138,6 +140,7 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
               <TextMessage
                 message={message}
                 inputtedSearchWord={inputtedSearchWord}
+                searchedResultIds={searchedResultIds}
                 onLongPress={onLongPress}
               />
             ) : message.type === ChatMessageType.IMAGE ? (
