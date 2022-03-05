@@ -16,6 +16,7 @@ import HeaderWithTextButton from '../../../components/Header';
 import {Tab} from '../../../components/Header/HeaderTemplate';
 import WholeContainer from '../../../components/WholeContainer';
 import WikiCard from '../../../components/wiki/WikiCard';
+import {useIsTabBarVisible} from '../../../contexts/bottomTab/useIsTabBarVisible';
 import {useAuthenticate} from '../../../contexts/useAuthenticate';
 import {useAPISaveChatGroup} from '../../../hooks/api/chat/useAPISaveChatGroup';
 import {useAPIGetEventList} from '../../../hooks/api/event/useAPIGetEventList';
@@ -141,6 +142,7 @@ const AccountDetail: React.FC = () => {
   const navigation = useNavigation<AccountDetailNavigationProps>();
   const route = useRoute<AccountDetailRouteProps>();
   const {user, setUser, logout} = useAuthenticate();
+  const {setIsTabBarVisible} = useIsTabBarVisible();
   const id = route.params?.id;
   const userID = id || user?.id;
   const screenName = 'AccountDetail';
@@ -233,6 +235,7 @@ const AccountDetail: React.FC = () => {
       refetchEventList();
       refetchQuestionList();
       refetchKnowledgeList();
+      setIsTabBarVisible(true);
     }
   }, [
     isFocused,
@@ -240,6 +243,7 @@ const AccountDetail: React.FC = () => {
     refetchEventList,
     refetchQuestionList,
     refetchKnowledgeList,
+    setIsTabBarVisible,
   ]);
 
   return (

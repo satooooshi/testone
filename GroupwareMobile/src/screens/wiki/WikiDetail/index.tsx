@@ -331,6 +331,11 @@ const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
         rightButtonName={headerRightButtonName}
         onPressRightButton={onPressHeaderRightButton}
         enableBackButton={true}
+        screenForBack={
+          route.params?.previousScreenName
+            ? route.params.previousScreenName
+            : undefined
+        }
       />
       {renderingTOCNeeded ? (
         <DrawerLayout
