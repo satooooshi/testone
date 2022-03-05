@@ -43,6 +43,7 @@ import {useAuthenticate} from '../../contexts/useAuthenticate';
 import {UserRole} from '../../types';
 import WikiLinks from '../../screens/wiki/WikiLinks';
 import {useIsTabBarVisible} from '../../contexts/bottomTab/useIsTabBarVisible';
+import EditedProfile from '../../screens/admin/EditedProfile';
 
 const Tab = createBottomTabNavigator();
 // const Tab = createMaterialBottomTabNavigator();
@@ -185,6 +186,11 @@ const AdminStack = () => {
       <Stack.Screen
         name="TagAdmin"
         component={TagAdmin}
+        options={{headerShown: false}}
+      />
+      <Stack.Screen
+        name="EditedProfile"
+        component={EditedProfile}
         options={{headerShown: false}}
       />
     </Stack.Navigator>
