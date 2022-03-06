@@ -146,7 +146,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
   const typeDropdown = (
     <Dropdown
       {...defaultDropdownProps}
-      title="タイプを択"
+      title="タイプを選択"
       ref={typeDropdownRef}>
       {isCreatableWiki({type: WikiType.RULES, userRole: user?.role}) ? (
         <Dropdown.Option
