@@ -51,6 +51,7 @@ type ChatMessageItemProps = {
   isScrollTarget?: boolean;
   scrollToTarget?: (position: number) => void;
   confirmedSearchWord: string;
+  searchedResultIds?: (number | undefined)[];
 };
 
 const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
@@ -62,6 +63,7 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
   isScrollTarget = false,
   scrollToTarget,
   confirmedSearchWord,
+  searchedResultIds,
 }) => {
   const [messageState, setMessageState] = useState(message);
   const [visibleReadModal, setVisibleLastReadModal] = useState(false);
@@ -334,6 +336,7 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
                 <TextMessage
                   message={messageState}
                   confirmedSearchWord={confirmedSearchWord}
+                  searchedResultIds={searchedResultIds}
                 />
               ) : (
                 <Box

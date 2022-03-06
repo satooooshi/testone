@@ -691,6 +691,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
                 key={m.id + m.content}
                 message={m}
                 confirmedSearchWord={confirmedSearchWord}
+                searchedResultIds={searchedResults?.map((s) => s.id)}
                 readUsers={readUsers(m)}
                 onClickReply={() =>
                   setNewChatMessage((pre) => ({

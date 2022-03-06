@@ -11,11 +11,13 @@ import Linkify from 'react-linkify';
 type TextMessageProps = {
   message: ChatMessage;
   confirmedSearchWord: string;
+  searchedResultIds?: (number | undefined)[];
 };
 
 const TextMessage: React.FC<TextMessageProps> = ({
   message,
   confirmedSearchWord,
+  searchedResultIds,
 }) => {
   const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
   const replyContent = (parentMsg: ChatMessage) => {
@@ -31,19 +33,14 @@ const TextMessage: React.FC<TextMessageProps> = ({
     }
   };
 
-  const highlightSearchedWord = (text: string): ReactNode => {
+  const highlightSearchedWord = (message: ChatMessage): ReactNode => {
+    const text = mentionTransform(message.content);
     if (confirmedSearchWord) {
-      const words = replaceFullWidthSpace(confirmedSearchWord).split(' ');
-      const regexpWord = '(?=.*word)';
-      const regexpWordAry: string[] = [];
-      words.map((w: string) => {
-        regexpWordAry.push(regexpWord.replace('word', w));
-      });
-      const regexpWords = regexpWordAry.join('');
-
-      const Exp = new RegExp(`(^${regexpWords}.*$)`);
+      const Exp = new RegExp(
+        `(${replaceFullWidthSpace(confirmedSearchWord).replace(' ', '|')})`,
+      );
       return text.split(Exp).map((t) => {
-        if (t.match(Exp)) {
+        if (t.match(Exp) && searchedResultIds?.includes(message.id)) {
           return <Text as="mark">{t}</Text>;
         }
         return t;
@@ -90,7 +87,7 @@ const TextMessage: React.FC<TextMessageProps> = ({
           wordBreak={'break-word'}
           color={message.isSender ? 'white' : darkFontColor}
           bg={message.isSender ? 'blue.500' : '#ececec'}>
-          {highlightSearchedWord(mentionTransform(message.content))}
+          {highlightSearchedWord(message)}
         </Text>
       </Linkify>
     </Box>
