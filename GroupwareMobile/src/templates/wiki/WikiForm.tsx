@@ -1,16 +1,14 @@
 import {useFormik} from 'formik';
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useRef, useState} from 'react';
 import {useWindowDimensions} from 'react-native';
 import {
   Button,
   Div,
   Dropdown,
-  DropdownProps,
   Input,
   Tag as TagButton,
   Text,
 } from 'react-native-magnus';
-import {DropdownOptionProps} from 'react-native-magnus/lib/typescript/src/ui/dropdown/dropdown.option.type';
 import TagModal from '../../components/common/TagModal';
 import HeaderWithTextButton from '../../components/Header';
 import WholeContainer from '../../components/WholeContainer';
@@ -20,6 +18,10 @@ import {BoardCategory, RuleCategory, Tag, Wiki, WikiType} from '../../types';
 import {tagColorFactory} from '../../utils/factory/tagColorFactory';
 import {wikiTypeNameFactory} from '../../utils/factory/wiki/wikiTypeNameFactory';
 import {wikiSchema} from '../../utils/validation/schema';
+import {
+  defaultDropdownProps,
+  defaultDropdownOptionProps,
+} from '../../utils/dropdown/helper';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import {NodeHtmlMarkdown} from 'node-html-markdown';
 import {useAuthenticate} from '../../contexts/useAuthenticate';
@@ -77,22 +79,6 @@ const WikiForm: React.FC<WikiFormProps> = ({
     },
   });
   const {width: windowWidth} = useWindowDimensions();
-  const defaultDropdownProps: Partial<DropdownProps> = {
-    m: 'md',
-    pb: 'md',
-    showSwipeIndicator: false,
-    roundedTop: 'xl',
-  };
-  const defaultDropdownOptionProps: Partial<DropdownOptionProps> = {
-    bg: 'gray100',
-    color: 'blue600',
-    py: 'lg',
-    px: 'xl',
-    borderBottomWidth: 1,
-    borderBottomColor: 'gray200',
-    justifyContent: 'center',
-    roundedTop: 'lg',
-  };
   const {selectedTagType, filteredTags} = useTagType('All', tags);
   const [visibleTagModal, setVisibleTagModal] = useState(false);
   const typeDropdownRef = useRef<any | null>(null);
@@ -160,7 +146,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
   const typeDropdown = (
     <Dropdown
       {...defaultDropdownProps}
-      title="タイプを選択"
+      title="タイプを択"
       ref={typeDropdownRef}>
       {isCreatableWiki({type: WikiType.RULES, userRole: user?.role}) ? (
         <Dropdown.Option
