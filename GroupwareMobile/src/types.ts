@@ -129,6 +129,7 @@ export interface User {
   questionCount?: number;
   answerCount?: number;
   knowledgeCount?: number;
+  chatGroups?: ChatGroup[];
 }
 
 export interface Tag {

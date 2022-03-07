@@ -74,6 +74,7 @@ import io from 'socket.io-client';
 import {baseURL} from '../../utils/url';
 import {getThumbnailOfVideo} from '../../utils/getThumbnailOfVideo';
 import {useAuthenticate} from '../../contexts/useAuthenticate';
+import {useHandleBadge} from '../../contexts/badge/useHandleBadge';
 
 const socket = io(baseURL, {
   transports: ['websocket'],
@@ -114,6 +115,7 @@ const Chat: React.FC = () => {
   const [selectedReactions, setSelectedReactions] = useState<
     ChatMessageReaction[] | undefined
   >();
+  const {setUnreadChatCount} = useHandleBadge();
   const [selectedEmoji, setSelectedEmoji] = useState<string>();
   const {mutate: saveLastReadChatTime} = useAPISaveLastReadChatTime();
   const [selectedMessageForCheckLastRead, setSelectedMessageForCheckLastRead] =

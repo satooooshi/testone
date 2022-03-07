@@ -22,7 +22,6 @@ const Navigator = () => {
   const {user} = useAuthenticate();
   const navigationRef = useNavigationContainerRef<any>();
   const {mutate: registerDevice} = useAPIRegisterDevice();
-  console.log('------------------', user);
 
   useEffect(() => {
     const naviateByNotif = (notification: any) => {

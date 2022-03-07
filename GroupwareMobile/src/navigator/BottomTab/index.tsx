@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 // import {createMaterialBottomTabNavigator} from '@react-navigation/material-bottom-tabs';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 
@@ -13,7 +13,7 @@ import WikiDetail from '../../screens/wiki/WikiDetail';
 import WikiList from '../../screens/wiki/WikiList';
 import {createStackNavigator} from '@react-navigation/stack';
 import PostWiki from '../../screens/wiki/PostWiki';
-import {Icon, Text} from 'react-native-magnus';
+import {Badge, Icon, Text} from 'react-native-magnus';
 import AccountDetail from '../../screens/account/AccountDetail';
 import Profile from '../../screens/account/Profile';
 import UpdatePassword from '../../screens/account/UpdatePassword';
@@ -42,6 +42,7 @@ import EventIntroduction from '../../screens/event/EventIntroduction';
 import {useAuthenticate} from '../../contexts/useAuthenticate';
 import {UserRole} from '../../types';
 import WikiLinks from '../../screens/wiki/WikiLinks';
+import {useHandleBadge} from '../../contexts/badge/useHandleBadge';
 
 const Tab = createBottomTabNavigator();
 // const Tab = createMaterialBottomTabNavigator();
@@ -257,7 +258,24 @@ const ChatStack = () => (
 );
 const BottomTab = () => {
   const {user} = useAuthenticate();
+  const {unreadChatCount} = useHandleBadge();
   const isAdmin = user?.role === UserRole.ADMIN;
+  // const [isUnRead, setIsUnRead] = useState(false);
+
+  // useEffect(() => {
+  //   console.log('==================');
+  //   if (user?.chatGroups) {
+  //     let flag = false;
+  //     for (const chatGroup of user.chatGroups) {
+  //       if (chatGroup.hasBeenRead === false) {
+  //         flag = true;
+  //       }
+  //     }
+  //     setIsUnRead(flag);
+  //     console.log('==================', flag);
+  //   }
+  // }, [user?.chatGroups]);
+
   return (
     <Tab.Navigator
       initialRouteName="Home"
@@ -335,12 +353,33 @@ const BottomTab = () => {
         options={{
           tabBarLabel: 'チャット',
           tabBarIcon: ({color}) => (
-            <Icon
-              name="ios-chatbubble-ellipses"
-              fontFamily="Ionicons"
-              color={color}
-              fontSize={23}
-            />
+            <>
+              {unreadChatCount ? (
+                <Badge bg="red500" right={-5} top={-5} h={10} w={10}>
+                  <Icon
+                    name="ios-chatbubble-ellipses"
+                    fontFamily="Ionicons"
+                    color={color}
+                    fontSize={23}
+                  />
+                </Badge>
+              ) : (
+                <Icon
+                  name="ios-chatbubble-ellipses"
+                  fontFamily="Ionicons"
+                  color={color}
+                  fontSize={23}
+                />
+              )}
+              {/* <Badge bg="red500" right={-5} top={-5} h={10} w={10}>
+                <Icon
+                  name="ios-chatbubble-ellipses"
+                  fontFamily="Ionicons"
+                  color={color}
+                  fontSize={23}
+                />
+              </Badge> */}
+            </>
           ),
         }}
       />

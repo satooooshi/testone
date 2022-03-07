@@ -30,6 +30,7 @@ export class ChatGateway
   handleConnection(client: Socket) {
     // this.logger.log(`Client connected: ${client.id}`);
     this.server.emit('msgToClient', 'connected');
+    this.server.emit('badgeClient', 'connected');
   }
 
   @SubscribeMessage('message')
@@ -37,6 +38,7 @@ export class ChatGateway
     this.server
       .to(payload.chatGroup?.id.toString())
       .emit('msgToClient', { ...payload, isSender: false });
+    this.server.emit('badgeClient', 'message is sent');
   }
 
   @SubscribeMessage('joinRoom')
