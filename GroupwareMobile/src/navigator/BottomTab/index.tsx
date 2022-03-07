@@ -339,7 +339,7 @@ const BottomTab = () => {
           tabBarLabel: 'チャット',
           tabBarIcon: ({color}) => (
             <>
-              {unreadChatCount ? (
+              {unreadChatCount > 0 ? (
                 <Badge bg="red500" right={-5} top={-5} h={10} w={10}>
                   <Icon
                     name="ios-chatbubble-ellipses"
