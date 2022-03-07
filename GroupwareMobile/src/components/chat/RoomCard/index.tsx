@@ -58,10 +58,6 @@ const RoomCard: React.FC<RoomCardProps> = ({
     ? new Date(room?.lastReadChatTime?.[0]?.readTime) > new Date(room.updatedAt)
     : false;
 
-  useEffect(() => {
-    setUnreadChatCount(1);
-  }, [readOrNot]);
-
   return (
     <TouchableHighlight underlayColor="none" onPress={onPress}>
       <Swipeable

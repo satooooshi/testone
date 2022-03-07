@@ -1,11 +1,12 @@
 import React, {useContext, createContext, useState, useEffect} from 'react';
 import {io} from 'socket.io-client';
-import {ChatMessage} from '../../types';
+import {useAPIGetRooms} from '../../hooks/api/chat/useAPIGetRoomsByPage';
 import {baseURL} from '../../utils/url';
 
 const BadgeContext = createContext({
   unreadChatCount: 0,
   setUnreadChatCount: (() => {}) as (count: number) => void,
+  refetchRoom: () => {},
 });
 
 export const BadgeProvider: React.FC = ({children}) => {
@@ -13,17 +14,46 @@ export const BadgeProvider: React.FC = ({children}) => {
   const socket = io(baseURL, {
     transports: ['websocket'],
   });
+  const {refetch: refetchAllRooms} = useAPIGetRooms(
+    {
+      page: '1',
+    },
+    {
+      onSuccess: data => {
+        let count = 0;
+        for (const room of data.rooms) {
+          if (!room.hasBeenRead) {
+            count++;
+          }
+        }
+        console.log('count^^^^^^^^^^^^^^^^^^', count);
+        setChatUnreadCount(count);
+      },
+    },
+  );
   useEffect(() => {
-    socket.on('badgeClient', async (sentMsgByOtherUsers: ChatMessage) => {
-      console.log(sentMsgByOtherUsers);
+    socket.on('badgeClient', async (status: string) => {
+      console.log(status);
+      if (status !== 'connected') {
+        refetchAllRooms();
+      }
     });
-  }, [socket]);
+  }, []);
+
+  const refetchRoom = () => {
+    refetchAllRooms();
+  };
+
   const setUnreadChatCount = (count: number) => {
     setChatUnreadCount(unreadCount => unreadCount + count);
   };
   return (
     <BadgeContext.Provider
-      value={{unreadChatCount: chatUnreadCount, setUnreadChatCount}}>
+      value={{
+        unreadChatCount: chatUnreadCount,
+        setUnreadChatCount,
+        refetchRoom,
+      }}>
       {children}
     </BadgeContext.Provider>
   );

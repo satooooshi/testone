@@ -115,7 +115,7 @@ const Chat: React.FC = () => {
   const [selectedReactions, setSelectedReactions] = useState<
     ChatMessageReaction[] | undefined
   >();
-  const {setUnreadChatCount} = useHandleBadge();
+  const {refetchRoom, setUnreadChatCount} = useHandleBadge();
   const [selectedEmoji, setSelectedEmoji] = useState<string>();
   const {mutate: saveLastReadChatTime} = useAPISaveLastReadChatTime();
   const [selectedMessageForCheckLastRead, setSelectedMessageForCheckLastRead] =
@@ -479,6 +479,12 @@ const Chat: React.FC = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fetchedPastMessages]);
+
+  useEffect(() => {
+    if (!room.hasBeenRead) {
+      setUnreadChatCount(-1);
+    }
+  }, [room, setUnreadChatCount]);
 
   useEffect(() => {
     messages[0]?.chatGroup?.id === room.id && saveLastReadChatTime(room.id);

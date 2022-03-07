@@ -260,21 +260,6 @@ const BottomTab = () => {
   const {user} = useAuthenticate();
   const {unreadChatCount} = useHandleBadge();
   const isAdmin = user?.role === UserRole.ADMIN;
-  // const [isUnRead, setIsUnRead] = useState(false);
-
-  // useEffect(() => {
-  //   console.log('==================');
-  //   if (user?.chatGroups) {
-  //     let flag = false;
-  //     for (const chatGroup of user.chatGroups) {
-  //       if (chatGroup.hasBeenRead === false) {
-  //         flag = true;
-  //       }
-  //     }
-  //     setIsUnRead(flag);
-  //     console.log('==================', flag);
-  //   }
-  // }, [user?.chatGroups]);
 
   return (
     <Tab.Navigator

@@ -51,10 +51,14 @@ export class ChatService {
     });
     groupsAndUsers = groupsAndUsers.map((g) => {
       const isPinned = !!g.pinnedUsers.filter((u) => u.id === userID).length;
+      const hasBeenRead = g?.lastReadChatTime?.[0]?.readTime
+        ? g?.lastReadChatTime?.[0]?.readTime > g.updatedAt
+        : false;
       return {
         ...g,
         pinnedUsers: undefined,
         isPinned,
+        hasBeenRead,
       };
     });
     groupsAndUsers = orderBy(groupsAndUsers, [
