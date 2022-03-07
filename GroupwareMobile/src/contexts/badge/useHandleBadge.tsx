@@ -1,15 +1,18 @@
 import React, {useContext, createContext, useState, useEffect} from 'react';
 import {io} from 'socket.io-client';
 import {useAPIGetRooms} from '../../hooks/api/chat/useAPIGetRoomsByPage';
+import {ChatGroup} from '../../types';
 import {baseURL} from '../../utils/url';
 
 const BadgeContext = createContext({
+  roomList: {} as ChatGroup[],
   unreadChatCount: 0,
   setUnreadChatCount: (() => {}) as (count: number) => void,
   refetchRoom: () => {},
 });
 
 export const BadgeProvider: React.FC = ({children}) => {
+  const [roomList, setRoomList] = useState<ChatGroup[]>([]);
   const [chatUnreadCount, setChatUnreadCount] = useState(0);
   const socket = io(baseURL, {
     transports: ['websocket'],
@@ -20,6 +23,7 @@ export const BadgeProvider: React.FC = ({children}) => {
     },
     {
       onSuccess: data => {
+        setRoomList(data.rooms);
         let count = 0;
         for (const room of data.rooms) {
           if (!room.hasBeenRead) {
@@ -31,6 +35,7 @@ export const BadgeProvider: React.FC = ({children}) => {
       },
     },
   );
+
   useEffect(() => {
     socket.on('badgeClient', async (status: string) => {
       console.log(status);
@@ -50,6 +55,7 @@ export const BadgeProvider: React.FC = ({children}) => {
   return (
     <BadgeContext.Provider
       value={{
+        roomList: roomList,
         unreadChatCount: chatUnreadCount,
         setUnreadChatCount,
         refetchRoom,
