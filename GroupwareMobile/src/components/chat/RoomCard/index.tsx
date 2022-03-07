@@ -1,10 +1,9 @@
-import React, {useEffect} from 'react';
+import React from 'react';
 import {Platform, TouchableHighlight, useWindowDimensions} from 'react-native';
 import FastImage from 'react-native-fast-image';
 import {Swipeable} from 'react-native-gesture-handler';
 import {Button, Div, Icon, Text} from 'react-native-magnus';
 import tailwind from 'tailwind-rn';
-import {useHandleBadge} from '../../../contexts/badge/useHandleBadge';
 import {roomCardStyles} from '../../../styles/component/chat/roomCard.style';
 import {ChatGroup, ChatMessage, ChatMessageType} from '../../../types';
 import {darkFontColor} from '../../../utils/colors';
@@ -26,7 +25,6 @@ const RoomCard: React.FC<RoomCardProps> = ({
   onPressPinButton,
   dangerousBgColor,
 }) => {
-  const {setUnreadChatCount} = useHandleBadge();
   const {width: windowWidth} = useWindowDimensions();
   const rightSwipeActions = () => {
     return (
