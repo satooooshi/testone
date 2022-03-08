@@ -21,6 +21,7 @@ type WikiCardProps = {
 const WikiCard: React.FC<WikiCardProps> = ({wiki}) => {
   const windowWidth = useWindowDimensions().width;
   const navigation = useNavigation<any>();
+  const routes = navigation.getState()?.routes;
   const [isVisible, setIsVisible] = useState<boolean>(false);
   const isBoard = wiki.type === WikiType.BOARD;
   const isQA = wiki.boardCategory === BoardCategory.QA;
@@ -59,7 +60,7 @@ const WikiCard: React.FC<WikiCardProps> = ({wiki}) => {
       onPress={() =>
         navigation.navigate('WikiStack', {
           screen: 'WikiDetail',
-          params: {id: wiki.id},
+          params: {id: wiki.id, previousScreenName: routes[routes?.length - 1]},
           initial: false,
         })
       }>
@@ -122,7 +123,12 @@ const WikiCard: React.FC<WikiCardProps> = ({wiki}) => {
                   bg={wikiTypeColorFactory(wiki.type, wiki.ruleCategory)}
                   color="white"
                   ml={4}>
-                  {wikiTypeNameFactory(wiki.type, wiki.ruleCategory)}
+                  {wikiTypeNameFactory(
+                    wiki.type,
+                    wiki.ruleCategory,
+                    true,
+                    wiki?.boardCategory,
+                  )}
                 </Tag>
               }
               style={wikiCardStyles.tagList}
@@ -155,7 +161,12 @@ const WikiCard: React.FC<WikiCardProps> = ({wiki}) => {
                 bg={wikiTypeColorFactory(wiki.type, wiki.ruleCategory)}
                 color="white"
                 ml={4}>
-                {wikiTypeNameFactory(wiki.type, wiki.ruleCategory)}
+                {wikiTypeNameFactory(
+                  wiki.type,
+                  wiki.ruleCategory,
+                  true,
+                  wiki?.boardCategory,
+                )}
               </Tag>
             </>
           )}

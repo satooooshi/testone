@@ -20,7 +20,7 @@ import {userNameFactory} from '../../../utils/factory/userNameFactory';
 import {tagColorFactory} from '../../../utils/factory/tagColorFactory';
 import YoutubePlayer from 'react-native-youtube-iframe';
 import generateYoutubeId from '../../../utils/generateYoutubeId';
-import {useRoute} from '@react-navigation/native';
+import {useIsFocused, useRoute} from '@react-navigation/native';
 import {EventDetailRouteProps} from '../../../types/navigator/drawerScreenProps';
 import EventFormModal from '../../../components/events/EventFormModal';
 import {useAPIUpdateEvent} from '../../../hooks/api/event/useAPIUpdateEvent';
@@ -48,12 +48,15 @@ import {isEditableEvent} from '../../../utils/factory/event/isCreatableEvent';
 import EventParticipants from '../../../components/events/EventParticipants';
 import EventCommentCard from '../EventCommentCard';
 import {responseErrorMsgFactory} from '../../../utils/factory/responseEroorMsgFactory';
+import {useIsTabBarVisible} from '../../../contexts/bottomTab/useIsTabBarVisible';
 
 const EventDetail: React.FC = () => {
   const route = useRoute<EventDetailRouteProps>();
   const {user} = useAuthenticate();
   const navigation = useNavigation();
   const id = route.params?.id;
+  const isFocused = useIsFocused();
+  const {setIsTabBarVisible} = useIsTabBarVisible();
   const {
     data: eventInfo,
     refetch: refetchEvents,
@@ -109,6 +112,14 @@ const EventDetail: React.FC = () => {
       );
     },
   });
+
+  useEffect(() => {
+    if (isFocused) {
+      setIsTabBarVisible(false);
+    } else {
+      setIsTabBarVisible(true);
+    }
+  }, [isFocused, setIsTabBarVisible]);
 
   const userJoiningEvents = useMemo(() => {
     if (!eventInfo?.userJoiningEvent) {

@@ -394,36 +394,48 @@ const MyAccountInfo = () => {
               </>
             )}
 
-            {activeTab === TabName.EVENT && events && events.events.length ? (
-              <SimpleGrid columns={{ sm: 1, md: 1, lg: 2 }} spacing="16px">
-                {events.events.map((e) => (
-                  <EventCard
-                    key={e.id}
-                    hrefTagClick={(t) => `/event/list?tag=${t.id}`}
-                    eventSchedule={e}
-                  />
-                ))}
-              </SimpleGrid>
+            {activeTab === TabName.EVENT ? (
+              events && events.events.length ? (
+                <SimpleGrid columns={{ sm: 1, md: 1, lg: 2 }} spacing="16px">
+                  {events.events.map((e) => (
+                    <EventCard
+                      key={e.id}
+                      hrefTagClick={(t) => `/event/list?tag=${t.id}`}
+                      eventSchedule={e}
+                    />
+                  ))}
+                </SimpleGrid>
+              ) : (
+                <Text fontSize={16}>
+                  参加したイベントが見つかりませんでした
+                </Text>
+              )
             ) : null}
 
-            {activeTab === TabName.QUESTION &&
-            questionList &&
-            questionList.wiki.length ? (
-              <Box>
-                {questionList.wiki.map((w) => (
-                  <WikiCard wiki={w} key={w.id} />
-                ))}
-              </Box>
+            {activeTab === TabName.QUESTION ? (
+              questionList && questionList.wiki.length ? (
+                <Box>
+                  {questionList.wiki.map((w) => (
+                    <WikiCard wiki={w} key={w.id} />
+                  ))}
+                </Box>
+              ) : (
+                <Text fontSize={16}>投稿した質問が見つかりませんでした</Text>
+              )
             ) : null}
 
-            {activeTab === TabName.KNOWLEDGE &&
-            knowledgeList &&
-            knowledgeList.wiki.length ? (
-              <Box>
-                {knowledgeList.wiki.map((w) => (
-                  <WikiCard wiki={w} key={w.id} />
-                ))}
-              </Box>
+            {activeTab === TabName.KNOWLEDGE ? (
+              knowledgeList && knowledgeList.wiki.length ? (
+                <Box>
+                  {knowledgeList.wiki.map((w) => (
+                    <WikiCard wiki={w} key={w.id} />
+                  ))}
+                </Box>
+              ) : (
+                <Text fontSize={16}>
+                  投稿したナレッジが見つかりませんでした
+                </Text>
+              )
             ) : null}
             {activeTab === TabName.GOOD &&
             profile.userGoodForBoard &&

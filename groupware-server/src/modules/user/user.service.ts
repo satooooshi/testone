@@ -454,6 +454,7 @@ export class UserService {
         'userGoodForBoard.userGoodForBoard',
         'userGoodForBoard.tags',
         'userGoodForBoard.writer',
+        'userGoodForBoard.answers',
       ],
     });
     if (!user) {

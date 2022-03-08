@@ -43,6 +43,8 @@ import {useAuthenticate} from '../../contexts/useAuthenticate';
 import {UserRole} from '../../types';
 import WikiLinks from '../../screens/wiki/WikiLinks';
 import {useHandleBadge} from '../../contexts/badge/useHandleBadge';
+import {useIsTabBarVisible} from '../../contexts/bottomTab/useIsTabBarVisible';
+import EditedProfile from '../../screens/admin/EditedProfile';
 
 const Tab = createBottomTabNavigator();
 // const Tab = createMaterialBottomTabNavigator();
@@ -187,6 +189,11 @@ const AdminStack = () => {
         component={TagAdmin}
         options={{headerShown: false}}
       />
+      <Stack.Screen
+        name="EditedProfile"
+        component={EditedProfile}
+        options={{headerShown: false}}
+      />
     </Stack.Navigator>
   );
 };
@@ -260,6 +267,7 @@ const BottomTab = () => {
   const {user} = useAuthenticate();
   const {unreadChatCount} = useHandleBadge();
   const isAdmin = user?.role === UserRole.ADMIN;
+  const {isTabBarVisible} = useIsTabBarVisible();
 
   return (
     <Tab.Navigator
@@ -269,6 +277,7 @@ const BottomTab = () => {
         tabBarLabelStyle: {color: 'white'},
         tabBarActiveTintColor: 'green400',
         tabBarStyle: {
+          display: `${isTabBarVisible ? 'flex' : 'none'}`,
           backgroundColor: darkFontColor,
         },
       }}>

@@ -31,6 +31,7 @@ export type RootStackParamList = {
   };
   WikiDetail: {
     id: number;
+    previousScreenName?: keyof RootStackParamList;
   };
   PostWiki: {
     type?: WikiType;

@@ -38,6 +38,7 @@ import {Suggestion} from 'react-native-controlled-mentions';
 import {KeyboardAwareFlatList} from 'react-native-keyboard-aware-scroll-view';
 import {
   useFocusEffect,
+  useIsFocused,
   useNavigation,
   useRoute,
 } from '@react-navigation/native';
@@ -75,6 +76,7 @@ import {baseURL} from '../../utils/url';
 import {getThumbnailOfVideo} from '../../utils/getThumbnailOfVideo';
 import {useAuthenticate} from '../../contexts/useAuthenticate';
 import {useHandleBadge} from '../../contexts/badge/useHandleBadge';
+import {useIsTabBarVisible} from '../../contexts/bottomTab/useIsTabBarVisible';
 
 const socket = io(baseURL, {
   transports: ['websocket'],
@@ -88,6 +90,8 @@ const Chat: React.FC = () => {
   const navigation = useNavigation<ChatNavigationProps>();
   const route = useRoute<ChatRouteProps>();
   const {room} = route.params;
+  const isFocused = useIsFocused();
+  const {setIsTabBarVisible} = useIsTabBarVisible();
   const {data: roomDetail, refetch: refetchRoomDetail} = useAPIGetRoomDetail(
     room.id,
   );
@@ -411,6 +415,14 @@ const Chat: React.FC = () => {
       typeDropdownRef.current?.open();
     }
   }, [longPressedMsg]);
+
+  useEffect(() => {
+    if (isFocused) {
+      setIsTabBarVisible(false);
+    } else {
+      setIsTabBarVisible(true);
+    }
+  }, [isFocused, setIsTabBarVisible]);
 
   useEffect(() => {
     socket.emit('joinRoom', room.id.toString());
