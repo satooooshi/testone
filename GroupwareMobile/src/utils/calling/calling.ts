@@ -19,7 +19,15 @@ export const sendCallInvitation = async (
     parsedUUid as string,
   );
   const res = await axiosInstance.get<string>('/chat/get-rtm-token');
+  console.log(
+    '----------------------------------++',
+    caller.id,
+    'data =====',
+    res.data,
+  );
   await rtmEngine.loginV2(caller?.id?.toString() as string, res.data);
+  console.log('loginv2 completed');
+
   await rtmEngine.sendLocalInvitationV2(localInvitation);
   // iOSのためにプッシュ通知も送る
   await axiosInstance.post(`/chat/notif-call/${caller.id}`, localInvitation);

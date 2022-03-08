@@ -13,7 +13,7 @@ import {useAPISendChatMessage} from '../../hooks/api/chat/useAPISendChatMessage'
 import {sendCallInvitation} from '../../utils/calling/calling';
 import io from 'socket.io-client';
 import {baseURL} from '../../utils/url';
-import {ChatGroup} from '../../../types';
+import {ChatGroup} from '../../types';
 
 const InvitationStatusContext = createContext({
   isCallAccepted: false,
@@ -71,6 +71,8 @@ export const InviteCallProvider: React.FC = ({children}) => {
   };
 
   const sendCallInvitation2 = async (caller: Partial<User>, callee: User) => {
+    console.log('will send call invitation', callee);
+    console.log('will send call invitation', caller);
     const invitation = await sendCallInvitation(caller, callee);
     console.log('send call invitation');
     setLocalInvitation(invitation);
