@@ -5,29 +5,24 @@ import {
   Button,
   Div,
   Dropdown,
-  DropdownProps,
   Icon,
   Input,
   Tag as TagButton,
   Text,
 } from 'react-native-magnus';
-import {DropdownOptionProps} from 'react-native-magnus/lib/typescript/src/ui/dropdown/dropdown.option.type';
 import TagModal from '../../components/common/TagModal';
 import HeaderWithTextButton from '../../components/Header';
 import WholeContainer from '../../components/WholeContainer';
 import TextEditor from '../../components/wiki/TextEditor';
 import {useTagType} from '../../hooks/tag/useTagType';
-import {
-  BoardCategory,
-  RuleCategory,
-  Tag,
-  TextFormat,
-  Wiki,
-  WikiType,
-} from '../../types';
+import {BoardCategory, RuleCategory, Tag, Wiki, WikiType} from '../../types';
 import {tagColorFactory} from '../../utils/factory/tagColorFactory';
 import {wikiTypeNameFactory} from '../../utils/factory/wiki/wikiTypeNameFactory';
 import {wikiSchema} from '../../utils/validation/schema';
+import {
+  defaultDropdownProps,
+  defaultDropdownOptionProps,
+} from '../../utils/dropdown/helper';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import {NodeHtmlMarkdown} from 'node-html-markdown';
 import {useAuthenticate} from '../../contexts/useAuthenticate';
@@ -113,82 +108,69 @@ const WikiForm: React.FC<WikiFormProps> = ({
     },
   });
   const {width: windowWidth} = useWindowDimensions();
-  const defaultDropdownProps: Partial<DropdownProps> = {
-    m: 'md',
-    pb: 'md',
-    showSwipeIndicator: false,
-    roundedTop: 'xl',
-  };
-  const defaultDropdownOptionProps: Partial<DropdownOptionProps> = {
-    bg: 'gray100',
-    color: 'blue600',
-    py: 'lg',
-    px: 'xl',
-    borderBottomWidth: 1,
-    borderBottomColor: 'gray200',
-    justifyContent: 'center',
-    roundedTop: 'lg',
-  };
   const {selectedTagType, filteredTags} = useTagType('All', tags);
   const [visibleTagModal, setVisibleTagModal] = useState(false);
   const typeDropdownRef = useRef<any | null>(null);
-  const textFormatDropdownRef = useRef<any | null>(null);
 
-  const handleChangeTextFormat = (format: TextFormat) => {
-    if (newWiki.textFormat === format) {
-      return;
-    }
-    Alert.alert(
-      '入力形式を変更します',
-      '現在の入力状態が失われます\nよろしいですか？',
-      [
-        {
-          text: '変更',
-          onPress: () => {
-            setNewWiki(w => ({
-              ...w,
-              body: '',
-              textFormat: format,
-            }));
-          },
-        },
-        {
-          text: 'キャンセル',
-        },
-      ],
-    );
-  };
-  const isEdit = !!wiki?.id;
   const {user} = useAuthenticate();
 
-  const formatDropdown = (
-    <Dropdown
-      {...defaultDropdownProps}
-      title="入力形式を選択"
-      ref={textFormatDropdownRef}>
-      <Dropdown.Option
-        {...defaultDropdownOptionProps}
-        onPress={() => handleChangeTextFormat('html')}
-        value={'html'}>
-        <Text fontSize={16} color="blue700">
-          デフォルト
-        </Text>
-      </Dropdown.Option>
-      <Dropdown.Option
-        {...defaultDropdownOptionProps}
-        value={'markdown'}
-        onPress={() => handleChangeTextFormat('markdown')}>
-        <Div justifyContent="center" alignItems="center">
-          <Text fontSize={16} color="blue700">
-            マークダウン
-          </Text>
-          <Text color="tomato">
-            ※WEB上で編集する際にマークダウン記法で編集できます
-          </Text>
-        </Div>
-      </Dropdown.Option>
-    </Dropdown>
-  );
+  //   Fixed the input format so that it cannot be selected at once.
+
+  // const textFormatDropdownRef = useRef<any | null>(null);
+  // const isEdit = !!wiki?.id;
+  // const handleChangeTextFormat = (format: TextFormat) => {
+  //   if (newWiki.textFormat === format) {
+  //     return;
+  //   }
+  //   Alert.alert(
+  //     '入力形式を変更します',
+  //     '現在の入力状態が失われます\nよろしいですか？',
+  //     [
+  //       {
+  //         text: '変更',
+  //         onPress: () => {
+  //           setNewWiki(w => ({
+  //             ...w,
+  //             body: '',
+  //             textFormat: format,
+  //           }));
+  //         },
+  //       },
+  //       {
+  //         text: 'キャンセル',
+  //       },
+  //     ],
+  //   );
+  // };
+
+  // const formatDropdown = (
+  //   <Dropdown
+  //     {...defaultDropdownProps}
+  //     title="入力形式を選択"
+  //     ref={textFormatDropdownRef}>
+  //     <Dropdown.Option
+  //       {...defaultDropdownOptionProps}
+  //       onPress={() => handleChangeTextFormat('html')}
+  //       value={'html'}>
+  //       <Text fontSize={16} color="blue700">
+  //         デフォルト
+  //       </Text>
+  //     </Dropdown.Option>
+  //     <Dropdown.Option
+  //       {...defaultDropdownOptionProps}
+  //       value={'markdown'}
+  //       onPress={() => handleChangeTextFormat('markdown')}>
+  //       <Div justifyContent="center" alignItems="center">
+  //         <Text fontSize={16} color="blue700">
+  //           マークダウン
+  //         </Text>
+  //         <Text color="tomato">
+  //           ※WEB上で編集する際にマークダウン記法で編集できます
+  //         </Text>
+  //       </Div>
+  //     </Dropdown.Option>
+  //   </Dropdown>
+  // );
 
   const typeDropdown = (
     <Dropdown
@@ -518,7 +500,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
         selectedTagType={selectedTagType}
         defaultSelectedTags={newWiki.tags}
       />
-      {formatDropdown}
+      {/* {formatDropdown} */}
       {typeDropdown}
       <KeyboardAwareScrollView
         ref={scrollRef}
@@ -538,8 +520,8 @@ const WikiForm: React.FC<WikiFormProps> = ({
             onChangeText={text => setNewWiki(w => ({...w, title: text}))}
             mb="sm"
           />
-          <Div mb={8} flexDir="row" justifyContent="space-evenly">
-            <Div>
+          <Div mb={10} flexDir="row">
+            <Div alignItems="center">
               <Text fontSize={16} mb={4}>
                 タイプを選択
               </Text>
@@ -549,7 +531,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
                 borderColor={'#ececec'}
                 p="md"
                 color="black"
-                w={!isEdit ? windowWidth * 0.4 : windowWidth * 0.9}
+                w={windowWidth * 0.9}
                 onPress={() => typeDropdownRef.current.open()}>
                 {newWiki.type
                   ? wikiTypeNameFactory(
@@ -561,7 +543,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
                   : 'タイプを選択してください'}
               </Button>
             </Div>
-            {!isEdit && (
+            {/* {!isEdit && (
               <Div>
                 <Text fontSize={16} fontWeight="bold" mb={4}>
                   入力形式を選択
@@ -579,7 +561,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
                     : 'マークダウン'}
                 </Button>
               </Div>
-            )}
+            )} */}
           </Div>
           <Button
             bg="green600"

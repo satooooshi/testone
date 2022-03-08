@@ -38,6 +38,7 @@ import {
 } from '../../../types/navigator/drawerScreenProps';
 import {useAdminHeaderTab} from '../../../contexts/admin/useAdminHeaderTab';
 import {useAPIGetUserInfoById} from '../../../hooks/api/user/useAPIGetUserInfoById';
+import {useIsTabBarVisible} from '../../../contexts/bottomTab/useIsTabBarVisible';
 
 const initialValues: Partial<User> = {
   email: '',
@@ -63,6 +64,7 @@ const EditedProfile: React.FC = () => {
     isLoading: loadingProfile,
   } = useAPIGetUserInfoById(userID.toString());
   const isFocused = useIsFocused();
+  const {setIsTabBarVisible} = useIsTabBarVisible();
   const {mutate: updateUser, isLoading: loadingUpdate} = useAPIUpdateUser({
     onSuccess: responseData => {
       if (responseData) {
@@ -146,8 +148,11 @@ const EditedProfile: React.FC = () => {
   useEffect(() => {
     if (isFocused) {
       refetch();
+      setIsTabBarVisible(false);
+    } else {
+      setIsTabBarVisible(true);
     }
-  }, [isFocused, refetch]);
+  }, [isFocused, refetch, setIsTabBarVisible]);
 
   return (
     <WholeContainer>

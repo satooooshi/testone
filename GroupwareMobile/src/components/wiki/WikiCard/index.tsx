@@ -21,9 +21,10 @@ type WikiCardProps = {
 const WikiCard: React.FC<WikiCardProps> = ({wiki}) => {
   const windowWidth = useWindowDimensions().width;
   const navigation = useNavigation<any>();
+  const routes = navigation.getState()?.routes;
   const [isVisible, setIsVisible] = useState<boolean>(false);
-  const isQA =
-    wiki.type === WikiType.BOARD && wiki.boardCategory === BoardCategory.QA;
+  const isBoard = wiki.type === WikiType.BOARD;
+  const isQA = wiki.boardCategory === BoardCategory.QA;
   const [isPressHeart, setIsPressHeart] = useState<boolean>(
     wiki.isGoodSender || false,
   );
@@ -59,7 +60,7 @@ const WikiCard: React.FC<WikiCardProps> = ({wiki}) => {
       onPress={() =>
         navigation.navigate('WikiStack', {
           screen: 'WikiDetail',
-          params: {id: wiki.id},
+          params: {id: wiki.id, previousScreenName: routes[routes?.length - 1]},
           initial: false,
         })
       }>
@@ -82,10 +83,10 @@ const WikiCard: React.FC<WikiCardProps> = ({wiki}) => {
         </Div>
         <Div flexDir="column" w="100%">
           <Div flexDir="row" justifyContent="flex-end" mb={4} mr={4}>
-            {isQA ? (
+            {isBoard ? (
               <Div mr="lg" flexDir="row">
                 <Text textAlignVertical="bottom" mr={2}>
-                  回答
+                  {isQA ? '回答' : 'コメント'}
                 </Text>
                 <Text
                   color="green600"
@@ -122,7 +123,12 @@ const WikiCard: React.FC<WikiCardProps> = ({wiki}) => {
                   bg={wikiTypeColorFactory(wiki.type, wiki.ruleCategory)}
                   color="white"
                   ml={4}>
-                  {wikiTypeNameFactory(wiki.type, wiki.ruleCategory)}
+                  {wikiTypeNameFactory(
+                    wiki.type,
+                    wiki.ruleCategory,
+                    true,
+                    wiki?.boardCategory,
+                  )}
                 </Tag>
               }
               style={wikiCardStyles.tagList}
@@ -155,7 +161,12 @@ const WikiCard: React.FC<WikiCardProps> = ({wiki}) => {
                 bg={wikiTypeColorFactory(wiki.type, wiki.ruleCategory)}
                 color="white"
                 ml={4}>
-                {wikiTypeNameFactory(wiki.type, wiki.ruleCategory)}
+                {wikiTypeNameFactory(
+                  wiki.type,
+                  wiki.ruleCategory,
+                  true,
+                  wiki?.boardCategory,
+                )}
               </Tag>
             </>
           )}

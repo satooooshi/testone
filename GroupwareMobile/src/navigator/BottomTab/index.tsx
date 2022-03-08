@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 // import {createMaterialBottomTabNavigator} from '@react-navigation/material-bottom-tabs';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 
@@ -42,6 +42,8 @@ import EventIntroduction from '../../screens/event/EventIntroduction';
 import {useAuthenticate} from '../../contexts/useAuthenticate';
 import {UserRole} from '../../types';
 import WikiLinks from '../../screens/wiki/WikiLinks';
+import {useIsTabBarVisible} from '../../contexts/bottomTab/useIsTabBarVisible';
+import EditedProfile from '../../screens/admin/EditedProfile';
 
 const Tab = createBottomTabNavigator();
 // const Tab = createMaterialBottomTabNavigator();
@@ -186,6 +188,11 @@ const AdminStack = () => {
         component={TagAdmin}
         options={{headerShown: false}}
       />
+      <Stack.Screen
+        name="EditedProfile"
+        component={EditedProfile}
+        options={{headerShown: false}}
+      />
     </Stack.Navigator>
   );
 };
@@ -258,6 +265,8 @@ const ChatStack = () => (
 const BottomTab = () => {
   const {user} = useAuthenticate();
   const isAdmin = user?.role === UserRole.ADMIN;
+  const {isTabBarVisible} = useIsTabBarVisible();
+
   return (
     <Tab.Navigator
       initialRouteName="Home"
@@ -266,6 +275,7 @@ const BottomTab = () => {
         tabBarLabelStyle: {color: 'white'},
         tabBarActiveTintColor: 'green400',
         tabBarStyle: {
+          display: `${isTabBarVisible ? 'flex' : 'none'}`,
           backgroundColor: darkFontColor,
         },
       }}>
@@ -276,10 +286,10 @@ const BottomTab = () => {
           tabBarLabel: 'ホーム',
           tabBarIcon: ({color}) => (
             <Icon
-              name="event"
-              fontFamily="MaterialIcons"
+              name="home"
+              fontFamily="MaterialCommunityIcons"
               color={color}
-              fontSize={23}
+              fontSize={26}
             />
           ),
         }}

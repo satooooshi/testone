@@ -44,6 +44,7 @@ import GoodSendersModal from '../../../components/chat/GoodSendersModal';
 import {useAPIToggleGoodForBoard} from '../../../hooks/api/wiki/useAPIToggleGoodForBoard';
 import FileIcon from '../../../components/common/FileIcon';
 import {dateTimeFormatterFromJSDDate} from '../../../utils/dateTimeFormatterFromJSDate';
+import {useIsTabBarVisible} from '../../../contexts/bottomTab/useIsTabBarVisible';
 
 const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
   const isFocused = useIsFocused();
@@ -55,6 +56,7 @@ const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
   const {user} = useAuthenticate();
   const [wikiTypeName, setWikiTypeName] = useState('Wiki');
   const [isVisible, setIsVisible] = useState<boolean>(false);
+  const {setIsTabBarVisible} = useIsTabBarVisible();
   const [isPressHeart, setIsPressHeart] = useState<boolean>(
     wikiInfo?.isGoodSender || false,
   );
@@ -98,8 +100,11 @@ const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
   useEffect(() => {
     if (isFocused) {
       refetchWikiInfo();
+      setIsTabBarVisible(false);
+    } else {
+      setIsTabBarVisible(true);
     }
-  }, [isFocused, refetchWikiInfo]);
+  }, [isFocused, refetchWikiInfo, setIsTabBarVisible]);
 
   const headerTitle = wikiTypeName + '詳細';
   const headerRightButtonName =
@@ -289,8 +294,7 @@ const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
           isVisible={isVisible}
           onClose={() => setIsVisible(false)}
         />
-        {wikiState?.type === WikiType.BOARD &&
-        wikiState.boardCategory === BoardCategory.QA ? (
+        {wikiState?.type === WikiType.BOARD ? (
           <Div w={windowWidth * 0.9} alignSelf="center">
             <Div
               justifyContent="space-between"
@@ -301,7 +305,9 @@ const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
               borderBottomWidth={1}
               borderBottomColor={wikiBorderColor}>
               <Text fontWeight="bold" fontSize={24} color={darkFontColor}>
-                回答
+                {wikiState.boardCategory === BoardCategory.QA
+                  ? '回答'
+                  : 'コメント'}
                 {wikiState?.answers?.length ? wikiState.answers.length : 0}件
               </Text>
               <Button
@@ -313,9 +319,13 @@ const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
                 onPress={onPressPostAnswerButton}
                 bg={wikiAnswerButtonColor}
                 color="white">
-                {wikiState?.answers?.length
-                  ? '回答を追加する'
-                  : '回答を投稿する'}
+                {wikiState.boardCategory === BoardCategory.QA
+                  ? wikiState?.answers?.length
+                    ? '回答を追加する'
+                    : '回答を投稿する'
+                  : wikiState?.answers?.length
+                  ? 'コメントを追加する'
+                  : 'コメントを投稿する'}
               </Button>
             </Div>
 
@@ -333,6 +343,11 @@ const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
         rightButtonName={headerRightButtonName}
         onPressRightButton={onPressHeaderRightButton}
         enableBackButton={true}
+        screenForBack={
+          route.params?.previousScreenName
+            ? route.params.previousScreenName
+            : undefined
+        }
       />
       {renderingTOCNeeded ? (
         <DrawerLayout
