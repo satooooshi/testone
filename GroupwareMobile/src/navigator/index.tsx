@@ -51,6 +51,7 @@ const Navigator = () => {
   const [agoraToken, setAgoraToken] = useState('');
   const [channelName, setChannelName] = useState('');
   const [onCallUid, setOnCallUid] = useState('');
+
   const [alertCountOnEndCall, setAlertCountOnEndCall] = useState(0);
   const AGORA_APP_ID = Config.AGORA_APP_ID;
   const rtcProps: RtcPropsInterface = {
@@ -84,7 +85,7 @@ const Navigator = () => {
         // ユーザーが通話拒否ボタンを押したときはアラート等を出さないようにする
         setAlertCountOnEndCall(c => c + 1);
       }
-      setOnCallUid('');
+      // setOnCallUid('');
       setChannelName('');
       setIsCalling(false);
       setIsJoining(false);
@@ -327,7 +328,7 @@ const Navigator = () => {
   };
 
   useEffect(() => {
-    if (localInvitation) {
+    if (localInvitation?.calleeId) {
       setOnCallUid(localInvitation?.calleeId as string);
     }
   }, [localInvitation]);
