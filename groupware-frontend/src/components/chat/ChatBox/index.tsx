@@ -36,6 +36,7 @@ import ChatMessageItem from '../ChatMessageItem';
 import { IoCloseSharp, IoSend } from 'react-icons/io5';
 import { FiFileText } from 'react-icons/fi';
 import createMentionPlugin from '@draft-js-plugins/mention';
+import createStickerPlugin from '@draft-js-plugins/sticker';
 import { useDropzone } from 'react-dropzone';
 import { userNameFactory } from 'src/utils/factory/userNameFactory';
 import { draftToMarkdown } from 'markdown-draft-js';
@@ -52,6 +53,7 @@ import dynamic from 'next/dynamic';
 const Viewer = dynamic(() => import('react-viewer'), { ssr: false });
 import '@draft-js-plugins/mention/lib/plugin.css';
 import '@draft-js-plugins/image/lib/plugin.css';
+import '@draft-js-plugins/sticker/lib/plugin.css';
 import UserAvatar from '@/components/common/UserAvatar';
 import io from 'socket.io-client';
 import { baseURL } from 'src/utils/url';
@@ -65,6 +67,7 @@ import { EntryComponentProps } from '@draft-js-plugins/mention/lib/MentionSugges
 import suggestionStyles from '@/styles/components/Suggestion.module.scss';
 import { useAPISearchMessages } from '@/hooks/api/chat/useAPISearchMessages';
 import { removeHalfWidthSpace } from 'src/utils/replaceWidthSpace';
+import { reactionStickers } from 'src/utils/reactionStickers';
 
 export const Entry: React.FC<EntryComponentProps> = ({
   mention,
@@ -344,11 +347,19 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
     return false;
   };
 
-  const { MentionSuggestions, plugins } = useMemo(() => {
+  const { MentionSuggestions, StickerSelect, plugins } = useMemo(() => {
     const mentionPlugin = createMentionPlugin();
     const { MentionSuggestions } = mentionPlugin;
-    const plugins = [mentionPlugin];
-    return { plugins, MentionSuggestions };
+    const stickerPlugin = createStickerPlugin({
+      stickers: reactionStickers,
+    });
+    const StickerSelect = stickerPlugin.StickerSelect;
+    const plugins = [mentionPlugin, stickerPlugin];
+    return {
+      MentionSuggestions,
+      StickerSelect,
+      plugins,
+    };
   }, []);
 
   const onScrollTopOnChat = (e: any) => {
@@ -798,6 +809,22 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
           />
         </div>
       </Box>
+      <Link
+        color={darkFontColor}
+        position="absolute"
+        zIndex={1}
+        bottom={'8px'}
+        cursor="pointer"
+        right="92px">
+        <StickerSelect
+          editor={{
+            onChange: onEditorChange,
+            state: {
+              editorState,
+            },
+          }}
+        />
+      </Link>
       <Link
         {...getRootProps()}
         color={darkFontColor}
