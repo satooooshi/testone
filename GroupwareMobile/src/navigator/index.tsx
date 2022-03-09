@@ -83,15 +83,14 @@ const Navigator = () => {
         // callkeepをプログラム側でendした場合とユーザーが通話拒否ボタンを押したときとで切りわける
         // ユーザーが通話拒否ボタンを押したときはアラート等を出さないようにする
         setAlertCountOnEndCall(c => c + 1);
-        setOnCallUid('');
-        setChannelName('');
-        setIsCalling(false);
-        setIsJoining(false);
       }
+      setOnCallUid('');
+      setChannelName('');
+      setIsCalling(false);
+      setIsJoining(false);
 
       disableCallAcceptedFlag();
       setLocalInvitationState(undefined);
-      navigationRef.current?.navigate('Main');
       reject();
       if (remoteInvitation.current) {
         // remote invitation(送られてきた通話招待)があればrefuseする
@@ -121,7 +120,6 @@ const Navigator = () => {
       disableCallAcceptedFlag,
       isCallAccepted,
       localInvitation,
-      navigationRef,
       setLocalInvitationState,
     ],
   );
