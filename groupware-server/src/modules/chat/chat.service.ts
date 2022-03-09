@@ -98,6 +98,7 @@ export class ChatService {
         'm',
         'm.id = ( SELECT id FROM chat_messages WHERE chat_group_id = chat_groups.id AND type <> "system_text" ORDER BY updated_at DESC LIMIT 1 )',
       )
+      .leftJoinAndSelect('m.sender', 'sender')
       .leftJoinAndSelect('lastReadChatTime.user', 'lastReadChatTime.user')
       .where('member.id = :memberId', { memberId: userID })
       .skip(offset)
@@ -116,6 +117,7 @@ export class ChatService {
         hasBeenRead,
       };
     });
+    console.log(rooms.map((r, index) => console.log(index, r.chatMessages)));
     rooms = orderBy(rooms, [
       'isPinned',
       'updatedAt',
