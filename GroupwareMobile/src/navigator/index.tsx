@@ -51,7 +51,6 @@ const Navigator = () => {
   const [agoraToken, setAgoraToken] = useState('');
   const [channelName, setChannelName] = useState('');
   const [onCallUid, setOnCallUid] = useState('');
-
   const [alertCountOnEndCall, setAlertCountOnEndCall] = useState(0);
   const AGORA_APP_ID = Config.AGORA_APP_ID;
   const rtcProps: RtcPropsInterface = {
@@ -83,15 +82,20 @@ const Navigator = () => {
       if (alertNeeded) {
         // callkeepをプログラム側でendした場合とユーザーが通話拒否ボタンを押したときとで切りわける
         // ユーザーが通話拒否ボタンを押したときはアラート等を出さないようにする
+        // setOnCallUid('');
         setAlertCountOnEndCall(c => c + 1);
       }
-      // setOnCallUid('');
-      setChannelName('');
+
       setIsCalling(false);
       setIsJoining(false);
-
+      setChannelName('');
       disableCallAcceptedFlag();
       setLocalInvitationState(undefined);
+      console.log(
+        '===========================================================================',
+        user?.id,
+      );
+
       reject();
       if (remoteInvitation.current) {
         // remote invitation(送られてきた通話招待)があればrefuseする
@@ -143,7 +147,7 @@ const Navigator = () => {
     // 詳しくはnode_modules/react-native-agora/lib/typescript/src/common/RtcEvents.d.tsに書いてある
     rtcEngine?.addListener('UserOffline', async (uid, reason) => {
       console.log('UserOffline', uid, reason);
-      await endCall();
+      await endCall(false);
     });
     rtcEngine?.addListener('ConnectionStateChanged', async (state, reason) => {
       console.log('ConnectionStateChanged ', Platform.OS, state, reason);
@@ -193,7 +197,7 @@ const Navigator = () => {
     // listenerを複数登録しないようにする
     rtmEngine.removeAllListeners();
     rtmEngine.addListener('RemoteInvitationCanceled', async () => {
-      await endCall();
+      await endCall(false);
     });
     rtmEngine.addListener('LocalInvitationRefused', async () => {
       console.log('refused');
@@ -217,7 +221,7 @@ const Navigator = () => {
       },
     );
     rtmEngine.addListener('LocalInvitationCanceled', () => {
-      endCall();
+      endCall(false);
     });
   };
 
@@ -401,7 +405,7 @@ const Navigator = () => {
         }
         if (notification.data?.screen === 'room') {
           navigationRef.current?.navigate('ChatStack', {
-            screen: 'RooomList',
+            screen: 'RoomList',
           });
         }
         if (notification.data?.screen === 'chat' && notification.data?.id) {
