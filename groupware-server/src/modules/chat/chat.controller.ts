@@ -29,7 +29,21 @@ import { ChatNoteService, GetChatNotesResult } from './chatNote.service';
 
 export interface GetMessagesQuery {
   group: number;
+  limit?: string;
+  after?: string;
+  before?: string;
+  include?: boolean;
+}
+
+export interface GetChaRoomsByPageQuery {
+  group: number;
   page?: string;
+  limit?: string;
+}
+
+export interface SearchMessageQuery {
+  group: number;
+  word: string;
   limit?: string;
 }
 
@@ -72,6 +86,14 @@ export class ChatController {
     @Query() query: GetMessagesQuery,
   ): Promise<ChatMessage[]> {
     return await this.chatService.getChatMessage(req.user.id, query);
+  }
+
+  @Get('search-messages')
+  @UseGuards(JwtAuthenticationGuard)
+  async searchMessages(
+    @Query() query: SearchMessageQuery,
+  ): Promise<Partial<ChatMessage[]>> {
+    return await this.chatService.searchMessage(query);
   }
 
   @Get('latest-mentioned')
