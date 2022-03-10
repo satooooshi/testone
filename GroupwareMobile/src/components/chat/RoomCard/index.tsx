@@ -5,6 +5,7 @@ import {Swipeable} from 'react-native-gesture-handler';
 import {Button, Div, Icon, Text} from 'react-native-magnus';
 import tailwind from 'tailwind-rn';
 import {roomCardStyles} from '../../../styles/component/chat/roomCard.style';
+import {userAdminStyles} from '../../../styles/screen/admin/userAdmin.style';
 import {ChatGroup, ChatMessage, ChatMessageType} from '../../../types';
 import {darkFontColor} from '../../../utils/colors';
 import {dateTimeFormatterFromJSDDate} from '../../../utils/dateTimeFormatterFromJSDate';
@@ -45,9 +46,9 @@ const RoomCard: React.FC<RoomCardProps> = ({
       case '音声通話':
         return `通話時間 ${message.callTime}`;
       case 'キャンセル':
-        return message.isSender ? '通話をキャンセルしました' : '不在着信';
+        return message.sender?.id ? '通話をキャンセルしました' : '不在着信';
       case '応答なし':
-        return message.isSender ? '通話に応答がありませんでした' : '不在着信';
+        return message.sender?.id ? '通話に応答がありませんでした' : '不在着信';
       default:
         return 'error';
     }
