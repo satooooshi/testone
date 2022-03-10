@@ -44,6 +44,10 @@ import {UserRole} from '../../types';
 import WikiLinks from '../../screens/wiki/WikiLinks';
 import {useIsTabBarVisible} from '../../contexts/bottomTab/useIsTabBarVisible';
 import EditedProfile from '../../screens/admin/EditedProfile';
+import AttendanceHome from '../../screens/attendance/AttendanceHome';
+import Attendance from '../../screens/attendance/Attendance';
+import Application from '../../screens/attendance/Application';
+import DefaultAttendanceForm from '../../screens/attendance/DefaultAttendance';
 
 const Tab = createBottomTabNavigator();
 // const Tab = createMaterialBottomTabNavigator();
@@ -262,6 +266,32 @@ const ChatStack = () => (
     />
   </Stack.Navigator>
 );
+const AttendanceStack = () => {
+  return (
+    <Stack.Navigator initialRouteName={'AttendanceHome'}>
+      <Stack.Screen
+        name="AttendanceHome"
+        component={AttendanceHome}
+        options={{headerShown: false}}
+      />
+      <Stack.Screen
+        name="Attendance"
+        component={Attendance}
+        options={{headerShown: false}}
+      />
+      <Stack.Screen
+        name="ApplicationBeforeJoining"
+        component={Application}
+        options={{headerShown: false}}
+      />
+      <Stack.Screen
+        name="DefaultAttendance"
+        component={DefaultAttendanceForm}
+        options={{headerShown: false}}
+      />
+    </Stack.Navigator>
+  );
+};
 const BottomTab = () => {
   const {user} = useAuthenticate();
   const isAdmin = user?.role === UserRole.ADMIN;
@@ -363,6 +393,21 @@ const BottomTab = () => {
             <Icon
               name="user-alt"
               fontFamily="FontAwesome5"
+              color={color}
+              fontSize={23}
+            />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="AttendanceStack"
+        component={AttendanceStack}
+        options={{
+          tabBarLabel: '勤怠管理',
+          tabBarIcon: ({color}) => (
+            <Icon
+              name="work"
+              fontFamily="MaterialIcons"
               color={color}
               fontSize={23}
             />

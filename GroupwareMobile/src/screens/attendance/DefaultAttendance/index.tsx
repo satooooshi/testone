@@ -87,6 +87,7 @@ const DefaultAttendanceForm: React.FC = () => {
               ...v,
               [timePicker]: DateTime.fromJSDate(date).toFormat('HH:mm'),
             }));
+            setTimePicker(undefined);
           }
         }}
         date={

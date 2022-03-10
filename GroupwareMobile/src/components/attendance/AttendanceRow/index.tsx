@@ -1,6 +1,6 @@
 import {useFormik} from 'formik';
 import {DateTime} from 'luxon';
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {Alert, TextInput, useWindowDimensions} from 'react-native';
 import {
   Button,
@@ -45,6 +45,7 @@ const AttendanceRow = ({
     useState<DateTime>();
   const {user} = useAuthenticate();
   const windowWidth = useWindowDimensions().width;
+  const dropdownRef = useRef<any | null>(null);
   const targetData = attendanceData?.filter(
     a =>
       DateTime.fromJSDate(new Date(a?.targetDate)).toFormat('yyyy-LL-dd') ===
@@ -68,7 +69,6 @@ const AttendanceRow = ({
       Alert.alert('更新が完了しました');
     },
   });
-  const [visibleDropdown, setVisibleDropdown] = useState(false);
   const [visibleAttendanceModal, setVisibleAttendanceModal] = useState(false);
   const [visibleTimePicker, setVisibleTimePicker] = useState<
     'attendanceTime' | 'absenceTime' | 'breakMinutes'
@@ -113,10 +113,6 @@ const AttendanceRow = ({
     const minute = Number(breakHourAndMinutes[0]);
     return now.set({hour, minute}).toJSDate();
   };
-
-  useEffect(() => {
-    setVisibleDropdown(false);
-  }, [values.category]);
 
   return (
     <>
@@ -171,7 +167,7 @@ const AttendanceRow = ({
                 ? attendanceCategoryName(values.category)
                 : '未選択'
             }
-            onPress={() => setVisibleDropdown(true)}
+            onPress={() => dropdownRef.current?.open()}
           />
 
           <Text fontSize={16}>出勤時間</Text>
@@ -215,7 +211,7 @@ const AttendanceRow = ({
           />
           <Dropdown
             {...defaultDropdownProps}
-            isVisible={visibleDropdown}
+            ref={dropdownRef}
             title="区分を選択">
             <Dropdown.Option
               {...defaultDropdownOptionProps}
