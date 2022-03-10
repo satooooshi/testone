@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import Autolink from 'react-native-autolink';
+import Autolink, {CustomMatcher} from 'react-native-autolink';
 import {linkOpen} from '../../../utils/linkHelper';
 import {useNavigation} from '@react-navigation/native';
 import {Linking, StyleProp, TextStyle} from 'react-native';
@@ -23,11 +23,12 @@ const AutoLinkedText: React.FC<AutoLinkedTextProps> = ({
 }) => {
   const navigation = useNavigation<any>();
   const [searchedWords, setSearchedWords] = useState<string[]>(['']);
-  const matcher: any = [];
+  const matcher: CustomMatcher[] = [];
   searchedResultIds?.includes(message.id) &&
     searchedWords.map(w => {
       matcher.push({
-        ...{style: {backgroundColor: 'yellow', color: 'black'}, pattern: w},
+        style: {backgroundColor: 'yellow', color: 'black'},
+        pattern: new RegExp(w),
       });
     });
 
