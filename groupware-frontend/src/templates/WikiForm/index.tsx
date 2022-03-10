@@ -67,7 +67,6 @@ const WikiForm: React.FC<WikiFormProps> = ({
   const router = useRouter();
   const { type } = router.query as { type: WikiType };
   const { user } = useAuthenticate();
-
   const [tagModal, setTagModal] = useState(false);
   const [editorState, setEditorState] = useState(() =>
     EditorState.createEmpty(),
@@ -80,7 +79,9 @@ const WikiForm: React.FC<WikiFormProps> = ({
     type: type || WikiType.BOARD,
     ruleCategory: type === WikiType.RULES ? RuleCategory.RULES : undefined,
     boardCategory:
-      type === WikiType.BOARD ? BoardCategory.QA : BoardCategory.NON_BOARD,
+      type === WikiType.BOARD || !type
+        ? BoardCategory.QA
+        : BoardCategory.NON_BOARD,
     textFormat: 'html',
   };
   const draftJsEmptyError = '入力必須です';

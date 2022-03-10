@@ -1,5 +1,5 @@
 import {useFormik} from 'formik';
-import React, {useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -39,11 +39,15 @@ import {formikErrorMsgFactory} from '../../../utils/factory/formikEroorMsgFactor
 import {createUserSchema} from '../../../utils/validation/schema';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import {useAdminHeaderTab} from '../../../contexts/admin/useAdminHeaderTab';
+import {useIsFocused} from '@react-navigation/native';
+import {useIsTabBarVisible} from '../../../contexts/bottomTab/useIsTabBarVisible';
 
 const initialValues: Partial<User> = {
   email: '',
   lastName: '',
   firstName: '',
+  lastNameKana: '',
+  firstNameKana: '',
   avatarUrl: '',
   role: UserRole.COMMON,
   employeeId: '',
@@ -58,6 +62,8 @@ const initialValues: Partial<User> = {
 
 const UserRegisteringAdmin: React.FC = () => {
   const dropdownRef = useRef<any | null>(null);
+  const isFocused = useIsFocused();
+  const {setIsTabBarVisible} = useIsTabBarVisible();
   const {mutate: register, isLoading} = useAPIRegister({
     onSuccess: responseData => {
       if (responseData) {
@@ -81,9 +87,14 @@ const UserRegisteringAdmin: React.FC = () => {
       );
     },
   });
-  const {values, setValues, handleSubmit, validateForm, resetForm} = useFormik<
-    Partial<User>
-  >({
+  const {
+    values,
+    setValues,
+    handleChange,
+    handleSubmit,
+    validateForm,
+    resetForm,
+  } = useFormik<Partial<User>>({
     initialValues: initialValues,
     validationSchema: createUserSchema,
     enableReinitialize: true,
@@ -126,6 +137,14 @@ const UserRegisteringAdmin: React.FC = () => {
     },
   });
   const tabs = useAdminHeaderTab();
+
+  useEffect(() => {
+    if (isFocused) {
+      setIsTabBarVisible(false);
+    } else {
+      setIsTabBarVisible(true);
+    }
+  }, [isFocused, setIsTabBarVisible]);
 
   const handleUploadImage = async () => {
     const {formData} = await uploadImageFromGallery({
@@ -263,12 +282,45 @@ const UserRegisteringAdmin: React.FC = () => {
         </Div>
         <Div mb="lg">
           <Text fontSize={16} fontWeight="bold">
+            姓(フリガナ)
+          </Text>
+          <Input
+            value={values.lastNameKana}
+            onChangeText={handleChange('lastNameKana')}
+            placeholder="ヤマダ"
+            autoCapitalize="none"
+          />
+        </Div>
+        <Div mb="lg">
+          <Text fontSize={16} fontWeight="bold">
+            名(フリガナ)
+          </Text>
+          <Input
+            value={values.firstNameKana}
+            onChangeText={handleChange('firstNameKana')}
+            placeholder="タロウ"
+            autoCapitalize="none"
+          />
+        </Div>
+        <Div mb="lg">
+          <Text fontSize={16} fontWeight="bold">
             メールアドレス
           </Text>
           <Input
             value={values.email}
             onChangeText={t => setValues({...values, email: t})}
             placeholder="bold@example.com"
+            autoCapitalize="none"
+          />
+        </Div>
+        <Div mb="lg">
+          <Text fontSize={16} fontWeight="bold">
+            電話番号
+          </Text>
+          <Input
+            value={values.phone}
+            onChangeText={t => setValues({...values, phone: t})}
+            placeholder="000-0000-0000"
             autoCapitalize="none"
           />
         </Div>

@@ -44,6 +44,7 @@ import { userRoleNameFactory } from 'src/utils/factory/userRoleNameFactory';
 import FormToLinkTag from '@/components/FormToLinkTag';
 import { useRouter } from 'next/router';
 import { useAuthenticate } from 'src/contexts/useAuthenticate';
+import { formikErrorMsgFactory } from 'src/utils/factory/formikErrorMsgFactory';
 
 type ModalState = {
   isOpen: boolean;
@@ -64,6 +65,8 @@ const CreateNewUser = () => {
     email: '',
     lastName: '',
     firstName: '',
+    lastNameKana: '',
+    firstNameKana: '',
     password: '',
     role: UserRole.COMMON,
     avatarUrl: '',
@@ -76,12 +79,26 @@ const CreateNewUser = () => {
     verifiedAt: new Date(),
     tags: [],
   };
+  const checkErrors = async () => {
+    const errors = await validateForm();
+    const messages = formikErrorMsgFactory(errors);
+    if (messages) {
+      toast({
+        title: messages,
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      });
+    } else {
+      onFinish();
+    }
+  };
+
   const {
-    errors,
-    touched,
-    handleSubmit,
+    handleSubmit: onFinish,
     handleChange,
     handleBlur,
+    validateForm,
     setValues: setUserInfo,
     values,
     resetForm,
@@ -260,6 +277,7 @@ const CreateNewUser = () => {
         <div className={createNewUserStyles.image_wrapper}>
           {imageURL ? (
             <ReactCrop
+              keepSelection={true}
               src={imageURL}
               crop={crop}
               onChange={(newCrop) =>
@@ -295,11 +313,6 @@ const CreateNewUser = () => {
           <FormControl className={createNewUserStyles.input_wrapper}>
             <FormLabel fontWeight={'bold'}>
               <p>姓</p>
-              {errors.lastName && touched.lastName ? (
-                <p className={validationErrorStyles.error_text}>
-                  {errors.lastName}
-                </p>
-              ) : null}
             </FormLabel>
             <Input
               type="text"
@@ -308,17 +321,11 @@ const CreateNewUser = () => {
               background="white"
               name="lastName"
               onChange={handleChange}
-              onBlur={handleBlur}
             />
           </FormControl>
           <FormControl className={createNewUserStyles.input_wrapper}>
             <FormLabel fontWeight={'bold'}>
               <p>名</p>
-              {errors.firstName && touched.firstName ? (
-                <p className={validationErrorStyles.error_text}>
-                  {errors.firstName}
-                </p>
-              ) : null}
             </FormLabel>
             <Input
               type="text"
@@ -329,17 +336,33 @@ const CreateNewUser = () => {
                 setUserInfo((i) => ({ ...i, firstName: e.target.value }))
               }
               name="firstName"
-              onBlur={handleBlur}
+            />
+          </FormControl>
+          <FormControl className={createNewUserStyles.input_wrapper}>
+            <FormLabel fontWeight={'bold'}>姓(フリガナ)</FormLabel>
+            <Input
+              type="text"
+              name="lastNameKana"
+              placeholder="ヤマダ"
+              value={validationErrorStyles.lastNameKana}
+              background="white"
+              onChange={handleChange}
+            />
+          </FormControl>
+          <FormControl className={createNewUserStyles.input_wrapper}>
+            <FormLabel fontWeight={'bold'}>名(フリガナ)</FormLabel>
+            <Input
+              type="text"
+              name="firstNameKana"
+              placeholder="タロウ"
+              value={validationErrorStyles.firstNameKana}
+              background="white"
+              onChange={handleChange}
             />
           </FormControl>
           <FormControl className={createNewUserStyles.input_wrapper}>
             <FormLabel fontWeight={'bold'}>
               <p>メールアドレス</p>
-              {errors.email && touched.email ? (
-                <p className={validationErrorStyles.error_text}>
-                  {errors.email}
-                </p>
-              ) : null}
             </FormLabel>
             <Input
               type="email"
@@ -350,17 +373,26 @@ const CreateNewUser = () => {
                 setUserInfo((i) => ({ ...i, email: e.target.value }))
               }
               name="email"
-              onBlur={handleBlur}
+            />
+          </FormControl>
+          <FormControl className={createNewUserStyles.input_wrapper}>
+            <FormLabel fontWeight={'bold'}>
+              <p>電話番号</p>
+            </FormLabel>
+            <Input
+              type="phone"
+              placeholder="000-0000-0000"
+              value={values.phone}
+              background="white"
+              onChange={(e) =>
+                setUserInfo((i) => ({ ...i, phone: e.target.value }))
+              }
+              name="phone"
             />
           </FormControl>
           <FormControl className={createNewUserStyles.input_wrapper}>
             <FormLabel fontWeight={'bold'}>
               <p>社員区分</p>
-              {errors.role && touched.role ? (
-                <p className={validationErrorStyles.error_text}>
-                  {errors.role}
-                </p>
-              ) : null}
             </FormLabel>
             <Select
               name="role"
@@ -383,11 +415,6 @@ const CreateNewUser = () => {
           <FormControl className={createNewUserStyles.input_wrapper}>
             <FormLabel fontWeight={'bold'}>
               <p>社員コード</p>
-              {errors.employeeId && touched.employeeId ? (
-                <p className={validationErrorStyles.error_text}>
-                  {errors.employeeId}
-                </p>
-              ) : null}
             </FormLabel>
             <Input
               type="text"
@@ -396,17 +423,11 @@ const CreateNewUser = () => {
               background="white"
               name="employeeId"
               onChange={handleChange}
-              onBlur={handleBlur}
             />
           </FormControl>
           <FormControl className={createNewUserStyles.input_wrapper}>
             <FormLabel fontWeight={'bold'}>
               <p>パスワード</p>
-              {errors.password && touched.password ? (
-                <p className={validationErrorStyles.error_text}>
-                  {errors.password}
-                </p>
-              ) : null}
             </FormLabel>
             <Input
               type="password"
@@ -415,7 +436,6 @@ const CreateNewUser = () => {
               background="white"
               name="password"
               onChange={handleChange}
-              onBlur={handleBlur}
             />
           </FormControl>
           <FormControl mb={4}>
@@ -520,7 +540,7 @@ const CreateNewUser = () => {
           className={createNewUserStyles.update_button_wrapper}
           width="40"
           colorScheme="blue"
-          onClick={() => handleSubmit()}>
+          onClick={() => checkErrors()}>
           {isLoading ? <Spinner /> : <Text>作成</Text>}
         </Button>
       </div>

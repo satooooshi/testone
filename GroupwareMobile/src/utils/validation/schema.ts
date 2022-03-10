@@ -2,6 +2,8 @@ import * as Yup from 'yup';
 
 const requireMessage = '入力必須です';
 const emailFormatMessage = 'メールアドレスの形式で入力してください';
+const kanaFormatMessage = 'カタカナのみで入力してください。';
+const phoneFormatMessage = '電話番号の形式で入力してください';
 const blankMixedMessage = '空白文字は使用できません';
 const minEightTextMessage = '8文字以上で入力してください';
 const minDateMessage = '開始日時は終了日時より前に設定してください';
@@ -98,12 +100,24 @@ const profileValidation = {
       emailFormatMessage,
     )
     .required(`メールアドレスは${requireMessage}`),
+  phone: Yup.string().matches(
+    /^0\d{2,3}-\d{1,4}-\d{1,4}$/,
+    `電話番号は${phoneFormatMessage}`,
+  ),
   lastName: Yup.string()
     .required(`姓は${requireMessage}`)
     .max(50, `姓は${nWordLimitMessage(50)}`),
   firstName: Yup.string()
     .required(`名は${requireMessage}`)
     .max(50, `名は${nWordLimitMessage(50)}`),
+  lastNameKana: Yup.string()
+    .required(`姓(フリガナ)は${requireMessage}`)
+    .matches(/^[ァ-ヶー]+$/, `姓(フリガナ)は${kanaFormatMessage}`)
+    .max(50, `姓(フリガナ)は${nWordLimitMessage(50)}`),
+  firstNameKana: Yup.string()
+    .required(`名(フリガナ)は${requireMessage}`)
+    .matches(/^[ァ-ヶー]+$/, `名(フリガナ)は${kanaFormatMessage}`)
+    .max(50, `名(フリガナ)は${nWordLimitMessage(50)}`),
   introduceOther: Yup.string().max(
     1000,
     `自己紹介は${nWordLimitMessage(1000)}`,

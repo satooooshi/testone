@@ -156,12 +156,20 @@
 - 入力されたメールアドレスに対して自動生成されたパスワードを記載したメールが送られる。この後ログインする際に使用されたパスワードが新しいパスワードとして採用される。(使われなかったパスワードは無効になる)
 
 ## 通話機能
-- iOSでアプリがバックグランド状態の時に通知が届かなくなることがあるが、アプリをアンインストールしてからいれると直る
-- 各種Agora関係のエンジンクラスは同じ変数に入れていても毎回createInstance的なメソッドで初期化しないと動かないという不具合がある？
-- **Agoraの仕様を知るために以下は読んでおいたほうがいい**
+
+- iOS でアプリがバックグランド状態の時に通知が届かなくなることがあるが、アプリをアンインストールしてからいれると直る
+- 各種 Agora 関係のエンジンクラスは同じ変数に入れていても毎回 createInstance 的なメソッドで初期化しないと動かないという不具合がある？
+- **Agora の仕様を知るために以下は読んでおいたほうがいい**
 - [Start a Voice Call - Voice Call - Agora Documentation](https://docs.agora.io/en/Voice/start_call_audio_react_native?platform=React%20Native)
 - [Call Invitation - Real-time Messaging - Agora Documentation](https://docs.agora.io/en/Real-time-Messaging/rtm_invite_android?platform=Android)
-- ブイキューブと契約しているはずなので、分からなければAgoraのエンジニアにきく
+- ブイキューブと契約しているはずなので、分からなければ Agora のエンジニアにきく
+
+## プッシュ通知のタイミング
+
+- sendPushNotifToSpecificUsers 関数の使用されている箇所などを調べると実装箇所がわかる
+- チャットにメッセージが送信されたときにそのルームに所属しているユーザーで送信者ではない人に通知
+- 質問に新しい回答が投稿されたときに質問者に通知
+- 質問の回答に返信が送られたときに質問者に通知
 
 # システム構成
 

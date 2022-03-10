@@ -7,8 +7,8 @@ import {
 import Login from '../screens/auth/Login';
 import {useAuthenticate} from '../contexts/useAuthenticate';
 import {RootStackParamList} from '../types/navigator/RootStackParamList';
-import DrawerTab from './Drawer';
 import {axiosInstance, storage, tokenString} from '../utils/url';
+import BottomTab from './BottomTab';
 import messaging from '@react-native-firebase/messaging';
 import PushNotification from 'react-native-push-notification';
 import {requestIOSMsgPermission} from '../utils/permission/requestIOSMsgPermisson';
@@ -195,7 +195,7 @@ const Navigator = () => {
       await endCall(false);
     });
     rtmEngine.addListener('LocalInvitationRefused', async () => {
-      console.log('refused');
+      console.log('LocalInvitationRefused refused');
       sendCallHistory('応答なし');
       disableCallAcceptedFlag();
       setLocalInvitationState(undefined);
@@ -506,7 +506,7 @@ const Navigator = () => {
             <>
               <Stack.Screen
                 name="Main"
-                component={DrawerTab}
+                component={BottomTab}
                 options={{headerShown: false}}
               />
               <Stack.Screen

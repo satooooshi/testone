@@ -8,6 +8,7 @@ import PushNotificationIOS from '@react-native-community/push-notification-ios';
 import {Alert, Linking, Platform} from 'react-native';
 import VersionCheck from 'react-native-version-check';
 import {InviteCallProvider} from './contexts/call/useInviteCall';
+import {IsTabBarVisibleProvider} from './contexts/bottomTab/useIsTabBarVisible';
 
 const App = () => {
   const queryClient = new QueryClient();
@@ -56,9 +57,11 @@ const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthenticateProvider>
-        <InviteCallProvider>
-          <Navigator />
-        </InviteCallProvider>
+        <IsTabBarVisibleProvider>
+          <InviteCallProvider>
+            <Navigator />
+          </InviteCallProvider>
+        </IsTabBarVisibleProvider>
       </AuthenticateProvider>
     </QueryClientProvider>
   );

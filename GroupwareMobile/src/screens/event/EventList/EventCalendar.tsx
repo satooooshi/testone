@@ -25,13 +25,14 @@ import {
   monthQueryFactoryFromTargetDate,
   weekQueryFactoryFromTargetDate,
 } from '../../../utils/eventQueryRefresh';
-import {useNavigation} from '@react-navigation/native';
+import {useNavigation, useFocusEffect} from '@react-navigation/native';
 import {EventListNavigationProps} from '../../../types/navigator/drawerScreenProps';
 import {dateTimeFormatterFromJSDDate} from '../../../utils/dateTimeFormatterFromJSDate';
 import {ActivityIndicator} from 'react-native-paper';
 import {useAPICreateEvent} from '../../../hooks/api/event/useAPICreateEvent';
 import EventFormModal from '../../../components/events/EventFormModal';
 import {useEventCardListSearchQuery} from '../../../contexts/event/useEventSearchQuery';
+import {responseErrorMsgFactory} from '../../../utils/factory/responseEroorMsgFactory';
 
 type EventCalendarProps = {
   personal?: boolean;
@@ -60,15 +61,14 @@ const EventCalendar: React.FC<EventCalendarProps> = ({
   );
   const {partOfSearchQuery, setPartOfSearchQuery} =
     useEventCardListSearchQuery();
-  const {mutate: saveEvent} = useAPICreateEvent({
+  const {mutate: saveEvent, isSuccess} = useAPICreateEvent({
     onSuccess: () => {
+      Alert.alert('イベントを作成しました。');
       hideEventFormModal();
       refetchEvents();
     },
-    onError: () => {
-      Alert.alert(
-        'イベント作成中にエラーが発生しました。\n時間をおいて再実行してください。',
-      );
+    onError: e => {
+      Alert.alert(responseErrorMsgFactory(e));
     },
   });
 
@@ -78,6 +78,12 @@ const EventCalendar: React.FC<EventCalendarProps> = ({
     isLoading,
   } = useAPIGetEventList(searchQuery);
   const {height: windowHeight, width: windowWidth} = useWindowDimensions();
+
+  useFocusEffect(
+    useCallback(() => {
+      refetchEvents();
+    }, [refetchEvents]),
+  );
 
   const memorizedEvent = useMemo<any[]>(() => {
     const changeToBigCalendarEvent = (ev?: EventSchedule[]): any[] => {
@@ -257,6 +263,7 @@ const EventCalendar: React.FC<EventCalendarProps> = ({
         isVisible={visibleEventFormModal}
         onCloseModal={hideEventFormModal}
         onSubmit={event => saveEvent(event)}
+        isSuccess={isSuccess}
       />
       <Div
         flexDir="row"

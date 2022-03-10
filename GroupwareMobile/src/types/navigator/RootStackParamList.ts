@@ -14,6 +14,7 @@ export type RootStackParamList = {
   Login: undefined;
   Main: undefined;
   Call: undefined;
+  TabBar: undefined;
   EventList: {
     type?: EventType;
     tag?: string;
@@ -21,6 +22,7 @@ export type RootStackParamList = {
   };
   EventDetail: {
     id: number;
+    previousScreenName?: keyof RootStackParamList;
   };
   Wiki: undefined;
   WikiList: {
@@ -30,6 +32,7 @@ export type RootStackParamList = {
   };
   WikiDetail: {
     id: number;
+    previousScreenName?: keyof RootStackParamList;
   };
   PostWiki: {
     type?: WikiType;
@@ -58,6 +61,7 @@ export type RootStackParamList = {
   };
   UserAdmin: undefined;
   UserRegisteringAdmin: undefined;
+  EditedProfile: {id?: number};
   TagAdmin: undefined;
   UserTagAdmin: undefined;
   Chat: {

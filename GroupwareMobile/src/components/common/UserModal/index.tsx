@@ -4,7 +4,6 @@ import {
   Button,
   Div,
   Dropdown,
-  DropdownProps,
   Icon,
   Input,
   Modal,
@@ -12,7 +11,10 @@ import {
   ScrollDiv,
   Text,
 } from 'react-native-magnus';
-import {DropdownOptionProps} from 'react-native-magnus/lib/typescript/src/ui/dropdown/dropdown.option.type';
+import {
+  defaultDropdownProps,
+  defaultDropdownOptionProps,
+} from '../../../utils/dropdown/helper';
 import tailwind from 'tailwind-rn';
 import {useSelectedUsers} from '../../../hooks/user/useSelectedUsers';
 import {useUserRole} from '../../../hooks/user/useUserRole';
@@ -78,22 +80,6 @@ const UserModal: React.FC<UserModalProps> = props => {
   }, [searchWords, users]);
 
   const dropdownRef = useRef<any | null>(null);
-  const defaultDropdownProps: Partial<DropdownProps> = {
-    m: 'md',
-    pb: 'md',
-    showSwipeIndicator: false,
-    roundedTop: 'xl',
-  };
-  const defaultDropdownOptionProps: Partial<DropdownOptionProps> = {
-    bg: 'gray100',
-    color: 'blue600',
-    py: 'lg',
-    px: 'xl',
-    borderBottomWidth: 1,
-    borderBottomColor: 'gray200',
-    justifyContent: 'center',
-    roundedTop: 'lg',
-  };
   const {width: windowWidth} = useWindowDimensions();
   return (
     <Modal {...props}>

@@ -1,15 +1,13 @@
 import React from 'react';
-import {Button, Icon} from 'react-native-magnus';
+import {Button, ButtonProps, Icon} from 'react-native-magnus';
 
-type DropdownOpenerButtonProps = {
+type DropdownOpenerButtonProps = ButtonProps & {
   name: string;
   onPress: () => void;
 };
 
-const DropdownOpenerButton: React.FC<DropdownOpenerButtonProps> = ({
-  name,
-  onPress,
-}) => {
+const DropdownOpenerButton: React.FC<DropdownOpenerButtonProps> = props => {
+  const {name, onPress, fontSize} = props;
   return (
     <Button
       block
@@ -17,6 +15,7 @@ const DropdownOpenerButton: React.FC<DropdownOpenerButtonProps> = ({
       bg="white"
       borderWidth={1}
       borderColor={'#e0e0e0'}
+      fontSize={fontSize}
       p={12}
       color="black"
       onPress={onPress}

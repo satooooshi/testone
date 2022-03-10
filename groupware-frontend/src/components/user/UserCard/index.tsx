@@ -65,6 +65,10 @@ const UserCard: React.FC<UserCardProps> = ({ user, onClickTag, duration }) => {
               className={
                 userCardStyles.name
               }>{`${user.lastName} ${user.firstName}`}</p>
+            <p
+              className={
+                userCardStyles.name_kana
+              }>{`${user.lastNameKana} ${user.firstNameKana}`}</p>
             <div className={userCardStyles.introduce_text_wrapper}>
               <p className={userCardStyles.introduce_text}>{`${
                 user.introduceOther || '自己紹介未入力'

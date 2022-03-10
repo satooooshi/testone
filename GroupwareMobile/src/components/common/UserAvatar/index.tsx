@@ -10,9 +10,16 @@ type UserAvatarProps = {
   h: number | string;
   w: number | string;
   onPress?: () => void;
+  onCloseModal?: () => void;
 };
 
-const UserAvatar: React.FC<UserAvatarProps> = ({user, h, w, onPress}) => {
+const UserAvatar: React.FC<UserAvatarProps> = ({
+  user,
+  h,
+  w,
+  onPress,
+  onCloseModal,
+}) => {
   const navigation = useNavigation<any>();
   const {user: mySelf} = useAuthenticate();
   return (
@@ -23,6 +30,9 @@ const UserAvatar: React.FC<UserAvatarProps> = ({user, h, w, onPress}) => {
           onPress();
           return;
         }
+        if (onCloseModal) {
+          onCloseModal();
+        }
         const routes = navigation.getState()?.routes;
         if (user?.id === mySelf?.id) {
           navigation.navigate('AccountStack', {
@@ -31,6 +41,7 @@ const UserAvatar: React.FC<UserAvatarProps> = ({user, h, w, onPress}) => {
               id: user?.id,
               previousScreenName: routes[routes?.length - 1],
             },
+            initial: false,
           });
         } else {
           navigation.navigate('UsersStack', {
@@ -39,6 +50,7 @@ const UserAvatar: React.FC<UserAvatarProps> = ({user, h, w, onPress}) => {
               id: user?.id,
               previousScreenName: routes[routes?.length - 1],
             },
+            initial: false,
           });
         }
       }}>

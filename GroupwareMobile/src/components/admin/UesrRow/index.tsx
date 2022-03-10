@@ -7,6 +7,7 @@ import {useAPIDeleteUser} from '../../../hooks/api/user/useAPIDeleteUser';
 import {useAPIUpdateUser} from '../../../hooks/api/user/useAPIUpdateUser';
 import {userAdminStyles} from '../../../styles/screen/admin/userAdmin.style';
 import {User, UserRole} from '../../../types';
+import {blueColor} from '../../../utils/colors';
 import {
   defaultDropdownProps,
   defaultDropdownOptionProps,
@@ -131,17 +132,34 @@ const UserRow: React.FC<UserRowProps> = ({user}) => {
             <Text w={'29%'} mr={'1%'}>{`${userNameFactory(user)}\n${
               currentUser.email
             }`}</Text>
-            <Div w={'39%'} mr={'1%'}>
+            <Div w={'28%'} mr={'1%'}>
               <DropdownOpenerButton
                 onPress={() => {
                   dropdownRef.current?.open();
                 }}
                 name={userRoleNameFactory(currentUser.role)}
+                fontSize={13}
               />
+            </Div>
+            <Div mr={10}>
+              <TouchableOpacity
+                onPress={() =>
+                  navigation.navigate('AdminStack', {
+                    screen: 'EditedProfile',
+                    params: {id: currentUser.id},
+                  })
+                }>
+                <Icon
+                  name="pen"
+                  fontFamily={'FontAwesome5'}
+                  fontSize={26}
+                  color={blueColor}
+                />
+              </TouchableOpacity>
             </Div>
             {!loadingDelete ? (
               <TouchableOpacity onPress={() => handleDeleteUser(user)}>
-                <Icon name="delete" fontSize={26} />
+                <Icon name="delete" fontSize={26} color="tomato" />
               </TouchableOpacity>
             ) : (
               <ActivityIndicator />

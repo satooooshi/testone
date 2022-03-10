@@ -29,7 +29,7 @@ const RoomList: React.FC = () => {
   >([]);
   const [roomTypeSelector, setRoomTypeSelector] = useState(false);
   const [userModal, setVisibleUserModal] = useState(false);
-  const {data: users} = useAPIGetUsers();
+  const {data: users} = useAPIGetUsers('');
   const {selectedUserRole, filteredUsers} = useUserRole('All', users);
   const [creationType, setCreationType] = useState<
     'talk' | 'group' | undefined

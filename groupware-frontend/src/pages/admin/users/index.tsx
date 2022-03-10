@@ -2,7 +2,6 @@ import { Tab } from 'src/types/header/tab/types';
 import LayoutWithTab from '@/components/layout/LayoutWithTab';
 import { SidebarScreenName } from '@/components/layout/Sidebar';
 import React, { useEffect, useState } from 'react';
-import { MdDelete } from 'react-icons/md';
 import userAdminStyles from '@/styles/layouts/UserAdmin.module.scss';
 import { Tag, User, UserRole } from 'src/types';
 import { useAPIUpdateUser } from '@/hooks/api/user/useAPIUpdateUser';
@@ -25,6 +24,9 @@ import { useAPIGetUserTag } from '@/hooks/api/tag/useAPIGetUserTag';
 import { useHeaderTab } from '@/hooks/headerTab/useHeaderTab';
 import Link from 'next/link';
 import { userRoleNameFactory } from 'src/utils/factory/userRoleNameFactory';
+import { blueColor } from 'src/utils/colors';
+import { FaPen } from 'react-icons/fa';
+import { RiDeleteBin6Line } from 'react-icons/ri';
 
 const UserAdmin: React.FC = () => {
   const router = useRouter();
@@ -136,6 +138,7 @@ const UserAdmin: React.FC = () => {
               <th className={userAdminStyles.table_head}>メールアドレス</th>
               <th className={userAdminStyles.table_head}>社員区分</th>
               <th className={userAdminStyles.table_head}>認証</th>
+              <th className={userAdminStyles.table_head}>編集</th>
               <th className={userAdminStyles.table_head} />
             </tr>
             {users?.users?.map((u) => (
@@ -196,9 +199,21 @@ const UserAdmin: React.FC = () => {
                   )}
                 </td>
                 <td className={userAdminStyles.delete_icon_wrapper}>
-                  <MdDelete
+                  <Link href={`/admin/users/editProfile/${u.id}`} passHref>
+                    <a>
+                      <FaPen
+                        className={userAdminStyles.delete_icon}
+                        color={blueColor}
+                      />
+                    </a>
+                  </Link>
+                </td>
+
+                <td className={userAdminStyles.delete_icon_wrapper}>
+                  <RiDeleteBin6Line
                     onClick={() => onDeleteClicked(u)}
                     className={userAdminStyles.delete_icon}
+                    color="tomato"
                   />
                 </td>
               </tr>

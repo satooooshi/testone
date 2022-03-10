@@ -16,6 +16,7 @@ type EventCardProps = {
 const EventCard: React.FC<EventCardProps> = ({event}) => {
   const windowWidth = useWindowDimensions().width;
   const navigation = useNavigation<any>();
+  const routes = navigation.getState()?.routes;
   const cardWidth = useMemo(() => {
     return windowWidth * 0.9;
   }, [windowWidth]);
@@ -60,7 +61,10 @@ const EventCard: React.FC<EventCardProps> = ({event}) => {
       onPress={() =>
         navigation.navigate('EventStack', {
           screen: 'EventDetail',
-          params: {id: event.id},
+          params: {
+            id: event.id,
+            previousScreenName: routes[routes?.length - 1],
+          },
           initial: false,
         })
       }>
@@ -112,17 +116,6 @@ const EventCard: React.FC<EventCardProps> = ({event}) => {
         <Div h={'20%'}>
           <FlatList
             horizontal
-            ListEmptyComponent={
-              <TagButton
-                fontSize={'lg'}
-                h={28}
-                py={0}
-                bg={'orange'}
-                color="white"
-                mr={4}>
-                タグなし
-              </TagButton>
-            }
             style={eventCardStyles.tagList}
             data={event.tags || []}
             renderItem={({item: t}) => (

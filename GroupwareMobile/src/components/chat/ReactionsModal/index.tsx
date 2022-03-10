@@ -118,7 +118,12 @@ const ReactionsModal: React.FC<ReactionsModalProps> = ({
                 style={tailwind('flex-row bg-white items-center px-4 mb-2')}>
                 <>
                   <Div mr={'sm'}>
-                    <UserAvatar user={item.user} h={64} w={64} />
+                    <UserAvatar
+                      user={item.user}
+                      h={64}
+                      w={64}
+                      onCloseModal={() => onPressCloseButton()}
+                    />
                   </Div>
 
                   <Text fontSize={18}>{userNameFactory(item.user)}</Text>

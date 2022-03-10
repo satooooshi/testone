@@ -20,7 +20,7 @@ import {userNameFactory} from '../../../utils/factory/userNameFactory';
 import {tagColorFactory} from '../../../utils/factory/tagColorFactory';
 import YoutubePlayer from 'react-native-youtube-iframe';
 import generateYoutubeId from '../../../utils/generateYoutubeId';
-import {useRoute} from '@react-navigation/native';
+import {useIsFocused, useRoute} from '@react-navigation/native';
 import {EventDetailRouteProps} from '../../../types/navigator/drawerScreenProps';
 import EventFormModal from '../../../components/events/EventFormModal';
 import {useAPIUpdateEvent} from '../../../hooks/api/event/useAPIUpdateEvent';
@@ -47,12 +47,16 @@ import {isFinishedEvent} from '../../../utils/factory/event/isFinishedEvent';
 import {isEditableEvent} from '../../../utils/factory/event/isCreatableEvent';
 import EventParticipants from '../../../components/events/EventParticipants';
 import EventCommentCard from '../EventCommentCard';
+import {responseErrorMsgFactory} from '../../../utils/factory/responseEroorMsgFactory';
+import {useIsTabBarVisible} from '../../../contexts/bottomTab/useIsTabBarVisible';
 
 const EventDetail: React.FC = () => {
   const route = useRoute<EventDetailRouteProps>();
   const {user} = useAuthenticate();
   const navigation = useNavigation();
-  const {id} = route.params;
+  const id = route.params?.id;
+  const isFocused = useIsFocused();
+  const {setIsTabBarVisible} = useIsTabBarVisible();
   const {
     data: eventInfo,
     refetch: refetchEvents,
@@ -64,15 +68,17 @@ const EventDetail: React.FC = () => {
   const [screenLoading, setScreenLoading] = useState(false);
   const [visibleEventFormModal, setEventFormModal] = useState(false);
   const [commentVisible, setCommentVisible] = useState(false);
-  const {mutate: saveEvent, isLoading: isLoadingSaveEvent} = useAPIUpdateEvent({
+  const {
+    mutate: saveEvent,
+    isSuccess,
+    isLoading: isLoadingSaveEvent,
+  } = useAPIUpdateEvent({
     onSuccess: () => {
       setEventFormModal(false);
       refetchEvents();
     },
-    onError: () => {
-      Alert.alert(
-        'イベント更新中にエラーが発生しました。\n時間をおいて再実行してください。',
-      );
+    onError: e => {
+      Alert.alert(responseErrorMsgFactory(e));
     },
   });
   const [unsavedSubmissions, setUnsavedSubmissions] = useState<
@@ -106,6 +112,14 @@ const EventDetail: React.FC = () => {
       );
     },
   });
+
+  useEffect(() => {
+    if (isFocused) {
+      setIsTabBarVisible(false);
+    } else {
+      setIsTabBarVisible(true);
+    }
+  }, [isFocused, setIsTabBarVisible]);
 
   const userJoiningEvents = useMemo(() => {
     if (!eventInfo?.userJoiningEvent) {
@@ -142,10 +156,8 @@ const EventDetail: React.FC = () => {
         refetchEvents();
       }
     },
-    onError: () => {
-      Alert.alert(
-        'コメント作成中にエラーが発生しました。\n時間をおいて再実行してください。',
-      );
+    onError: e => {
+      Alert.alert(responseErrorMsgFactory(e));
     },
   });
   const {mutate: uploadFile} = useAPIUploadStorage();
@@ -295,7 +307,12 @@ const EventDetail: React.FC = () => {
             ? 'イベント編集'
             : undefined
         }
-        screenForBack="EventList"
+        screenForBack={
+          route.params?.previousScreenName
+            ? route.params.previousScreenName
+            : 'EventList'
+        }
+        // screenForBack="EventList"
         onPressRightButton={
           eventInfo && isEditableEvent(eventInfo, user)
             ? () => setEventFormModal(true)
@@ -310,6 +327,7 @@ const EventDetail: React.FC = () => {
         isVisible={visibleEventFormModal}
         onCloseModal={() => setEventFormModal(false)}
         onSubmit={event => saveEvent({...event, id: eventInfo?.id})}
+        isSuccess={isSuccess}
       />
 
       {eventInfo && (

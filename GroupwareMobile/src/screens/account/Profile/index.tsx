@@ -10,11 +10,11 @@ import {
 import {
   Text,
   Div,
-  ScrollDiv,
   Input,
   Button,
   Icon,
   Overlay,
+  Radio,
 } from 'react-native-magnus';
 import TagModal from '../../../components/common/TagModal';
 import HeaderWithTextButton from '../../../components/Header';
@@ -33,11 +33,16 @@ import {formikErrorMsgFactory} from '../../../utils/factory/formikEroorMsgFactor
 import {profileSchema} from '../../../utils/validation/schema';
 import {Tab} from '../../../components/Header/HeaderTemplate';
 import UserAvatar from '../../../components/common/UserAvatar';
+import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+import {useIsTabBarVisible} from '../../../contexts/bottomTab/useIsTabBarVisible';
 
 const initialValues: Partial<User> = {
   email: '',
+  phone: '',
   lastName: '',
   firstName: '',
+  lastNameKana: '',
+  firstNameKana: '',
   avatarUrl: '',
   introduceOther: '',
   introduceTech: '',
@@ -55,6 +60,7 @@ const Profile: React.FC = () => {
     isLoading: loadingProfile,
   } = useAPIGetProfile();
   const isFocused = useIsFocused();
+  const {setIsTabBarVisible} = useIsTabBarVisible();
   const {mutate: updateUser, isLoading: loadingUpdate} = useAPIUpdateUser({
     onSuccess: responseData => {
       if (responseData) {
@@ -147,8 +153,11 @@ const Profile: React.FC = () => {
   useEffect(() => {
     if (isFocused) {
       refetch();
+      setIsTabBarVisible(false);
+    } else {
+      setIsTabBarVisible(true);
     }
-  }, [isFocused, refetch]);
+  }, [isFocused, refetch, setIsTabBarVisible]);
 
   return (
     <WholeContainer>
@@ -184,7 +193,8 @@ const Profile: React.FC = () => {
         <Icon color="white" name="check" fontSize={32} />
       </Button>
       {values && (
-        <ScrollDiv
+        <KeyboardAwareScrollView
+          extraScrollHeight={50}
           contentContainerStyle={{
             ...profileStyles.scrollView,
             width: windowWidth * 0.9,
@@ -207,6 +217,65 @@ const Profile: React.FC = () => {
               placeholder="bold@example.com"
               autoCapitalize="none"
             />
+            <Div row>
+              <Div row alignItems="center" mr="sm">
+                <Text>公開</Text>
+                {/* @ts-ignore */}
+                <Radio
+                  value={1}
+                  activeColor="green500"
+                  onChange={() => setValues(e => ({...e, isEmailPublic: true}))}
+                  checked={values.isEmailPublic}
+                />
+              </Div>
+              <Div row alignItems="center">
+                <Text>非公開</Text>
+                {/* @ts-ignore */}
+                <Radio
+                  value={2}
+                  activeColor="green500"
+                  onChange={() =>
+                    setValues(e => ({...e, isEmailPublic: false}))
+                  }
+                  checked={!values.isEmailPublic}
+                />
+              </Div>
+            </Div>
+          </Div>
+          <Div mb="lg">
+            <Text fontSize={16} fontWeight="bold">
+              電話番号
+            </Text>
+            <Input
+              value={values.phone}
+              onChangeText={handleChange('phone')}
+              placeholder="000-0000-0000"
+              autoCapitalize="none"
+            />
+            <Div row>
+              <Div row alignItems="center" mr="sm">
+                <Text>公開</Text>
+                {/* @ts-ignore */}
+                <Radio
+                  value={1}
+                  activeColor="green500"
+                  onChange={() => setValues(e => ({...e, isPhonePublic: true}))}
+                  checked={values.isPhonePublic}
+                />
+              </Div>
+              <Div row alignItems="center">
+                <Text>非公開</Text>
+                {/* @ts-ignore */}
+                <Radio
+                  value={2}
+                  activeColor="green500"
+                  onChange={() =>
+                    setValues(e => ({...e, isPhonePublic: false}))
+                  }
+                  checked={!values.isPhonePublic}
+                />
+              </Div>
+            </Div>
           </Div>
           <Div mb="lg">
             <Text fontSize={16} fontWeight="bold">
@@ -227,6 +296,28 @@ const Profile: React.FC = () => {
               value={values.firstName}
               onChangeText={handleChange('firstName')}
               placeholder="太郎"
+              autoCapitalize="none"
+            />
+          </Div>
+          <Div mb="lg">
+            <Text fontSize={16} fontWeight="bold">
+              姓(フリガナ)
+            </Text>
+            <Input
+              value={values.lastNameKana}
+              onChangeText={handleChange('lastNameKana')}
+              placeholder="ヤマダ"
+              autoCapitalize="none"
+            />
+          </Div>
+          <Div mb="lg">
+            <Text fontSize={16} fontWeight="bold">
+              名(フリガナ)
+            </Text>
+            <Input
+              value={values.firstNameKana}
+              onChangeText={handleChange('firstNameKana')}
+              placeholder="タロウ"
               autoCapitalize="none"
             />
           </Div>
@@ -323,7 +414,7 @@ const Profile: React.FC = () => {
               style={profileStyles.textArea}
             />
           </Div>
-        </ScrollDiv>
+        </KeyboardAwareScrollView>
       )}
     </WholeContainer>
   );

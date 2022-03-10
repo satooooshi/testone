@@ -1,4 +1,4 @@
-import {useNavigation, useRoute} from '@react-navigation/native';
+import {useIsFocused, useNavigation, useRoute} from '@react-navigation/native';
 import React, {useEffect} from 'react';
 import {useAPICreateWiki} from '../../../hooks/api/wiki/useAPICreateWiki';
 import {BoardCategory, RuleCategory, Tag, Wiki, WikiType} from '../../../types';
@@ -15,21 +15,24 @@ import {
   PostWikiNavigationProps,
   PostWikiRouteProps,
 } from '../../../types/navigator/drawerScreenProps';
+import {responseErrorMsgFactory} from '../../../utils/factory/responseEroorMsgFactory';
+import {useIsTabBarVisible} from '../../../contexts/bottomTab/useIsTabBarVisible';
 
 const PostWiki: React.FC = () => {
   const navigation = useNavigation<PostWikiNavigationProps>();
   const route = useRoute<PostWikiRouteProps>();
   const type = route.params?.type;
+  const isFocused = useIsFocused();
+  const {setIsTabBarVisible} = useIsTabBarVisible();
   const ruleCategory = route.params?.ruleCategory;
   const boardCategory = route.params?.boardCategory;
   const {mutate: saveWiki, isLoading: loadingSaveWiki} = useAPICreateWiki({
     onSuccess: () => {
+      Alert.alert('Wikiを投稿しました。');
       navigation.goBack();
     },
-    onError: () => {
-      Alert.alert(
-        'Wiki作成中にエラーが発生しました。\n時間をおいて再実行してください。',
-      );
+    onError: e => {
+      Alert.alert(responseErrorMsgFactory(e));
     },
   });
   const {data: tags} = useAPIGetTag();
@@ -65,6 +68,14 @@ const PostWiki: React.FC = () => {
   useEffect(() => {
     setNewWiki(w => ({...w, tags: selectedTags as Tag[]}));
   }, [selectedTags, setNewWiki]);
+
+  useEffect(() => {
+    if (isFocused) {
+      setIsTabBarVisible(false);
+    } else {
+      setIsTabBarVisible(true);
+    }
+  }, [isFocused, setIsTabBarVisible]);
 
   return (
     <>
