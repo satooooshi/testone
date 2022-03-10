@@ -32,7 +32,6 @@ import DropdownOpenerButton from '../../components/common/DropdownOpenerButton';
 import {blueColor} from '../../utils/colors';
 import {handlePickDocument} from '../../utils/handlePickDocument';
 import {useAPIUploadStorage} from '../../hooks/api/storage/useAPIUploadStorage';
-// import {blueColor} from '../../../utils/colors';
 
 type WikiFormProps = {
   wiki?: Wiki;

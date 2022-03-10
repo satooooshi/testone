@@ -137,7 +137,6 @@ export class WikiService {
         existWiki.isGoodSender = false;
       }
     }
-    console.log('exist wiki file', existWiki?.files);
 
     return existWiki;
   }
