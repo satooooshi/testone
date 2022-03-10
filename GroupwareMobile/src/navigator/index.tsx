@@ -86,16 +86,11 @@ const Navigator = () => {
         setAlertCountOnEndCall(c => c + 1);
       }
 
-      setIsCalling(false);
-      setIsJoining(false);
       setChannelName('');
+      setIsJoining(false);
+      setIsCalling(false);
       disableCallAcceptedFlag();
       setLocalInvitationState(undefined);
-      console.log(
-        '===========================================================================',
-        user?.id,
-      );
-
       reject();
       if (remoteInvitation.current) {
         // remote invitation(送られてきた通話招待)があればrefuseする
@@ -147,7 +142,7 @@ const Navigator = () => {
     // 詳しくはnode_modules/react-native-agora/lib/typescript/src/common/RtcEvents.d.tsに書いてある
     rtcEngine?.addListener('UserOffline', async (uid, reason) => {
       console.log('UserOffline', uid, reason);
-      await endCall(false);
+      await endCall();
     });
     rtcEngine?.addListener('ConnectionStateChanged', async (state, reason) => {
       console.log('ConnectionStateChanged ', Platform.OS, state, reason);
@@ -205,7 +200,8 @@ const Navigator = () => {
       disableCallAcceptedFlag();
       setLocalInvitationState(undefined);
       stopRing();
-      navigationRef.current?.navigate('Main');
+      setIsJoining(false);
+      // navigationRef.current?.navigate('Main');
     });
     rtmEngine.addListener('LocalInvitationAccepted', async invitation => {
       enableCallAcceptedFlag();
@@ -325,9 +321,9 @@ const Navigator = () => {
     if (remoteInvitation.current?.channelId) {
       const realChannelName = remoteInvitation.current?.channelId as string;
       // 招待を承認
-      setIsCalling(true);
       await rtmEngine.acceptRemoteInvitationV2(remoteInvitation.current);
       await joinChannel(realChannelName);
+      setIsCalling(true);
     }
   };
 
@@ -489,7 +485,7 @@ const Navigator = () => {
       const joining = async () => {
         const realChannelName = localInvitation?.channelId as string;
         await joinChannel(realChannelName);
-        navigationRef.current?.navigate('Call');
+        // navigationRef.current?.navigate('Call');
         //タイムアウト
         // await new Promise(r => setTimeout(r, 12000));
         // if (!isCallAccepted) {

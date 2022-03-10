@@ -25,12 +25,15 @@ const Timer = () => {
     };
   });
 
-  useEffect(() => {
-    const h = hours ? `${hours}:` : '';
-    const m = minutes || hours ? `${minutes}:` : '0:';
-    const s = seconds < 10 ? `0${seconds}` : seconds;
-    setCallTimeState(h + m + s);
-  }, [seconds, minutes, hours, setCallTimeState]);
+  useEffect(
+    () => {
+      const h = hours ? `${hours}:` : '';
+      const m = minutes || hours ? `${minutes}:` : '0:';
+      const s = seconds < 10 ? `0${seconds}` : seconds;
+      setCallTimeState(h + m + s);
+    }, //eslint-disable-next-line react-hooks/exhaustive-deps
+    [seconds, minutes, hours],
+  );
 
   return (
     <Text mt={'lg'} mb={'lg'} fontSize={20}>

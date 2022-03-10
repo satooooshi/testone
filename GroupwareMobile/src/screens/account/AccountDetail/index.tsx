@@ -32,7 +32,6 @@ import {darkFontColor} from '../../../utils/colors';
 import {userNameFactory} from '../../../utils/factory/userNameFactory';
 import {userRoleNameFactory} from '../../../utils/factory/userRoleNameFactory';
 import {useInviteCall} from '../../../contexts/call/useInviteCall';
-import {sendCallInvitation} from '../../../utils/calling/calling';
 
 const TopTab = createMaterialTopTabNavigator();
 
