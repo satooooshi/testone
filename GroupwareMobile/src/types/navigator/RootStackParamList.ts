@@ -13,6 +13,7 @@ export type RootStackParamList = {
   Home: undefined;
   Login: undefined;
   Main: undefined;
+  TabBar: undefined;
   EventList: {
     type?: EventType;
     tag?: string;
@@ -30,6 +31,7 @@ export type RootStackParamList = {
   };
   WikiDetail: {
     id: number;
+    previousScreenName?: keyof RootStackParamList;
   };
   PostWiki: {
     type?: WikiType;

@@ -123,6 +123,10 @@ a:hover {
   height: 100% !important;
 }
 
+.public-DraftEditor-content {
+  overflow-y: auto;
+}
+
 .chakra-alert__desc {
   white-space: pre-wrap;
 }

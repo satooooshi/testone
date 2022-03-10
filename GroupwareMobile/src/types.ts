@@ -18,6 +18,12 @@ export enum UserRole {
   COMMON = 'common',
 }
 
+export enum BranchType {
+  TOKYO = 'tokyo',
+  OSAKA = 'osaka',
+  NON_SET = 'non_set',
+}
+
 export enum ChatMessageType {
   VIDEO = 'video',
   IMAGE = 'image',
@@ -98,6 +104,7 @@ export interface User {
   firstName: string;
   lastNameKana: string;
   firstNameKana: string;
+  branch: BranchType;
   introduceTech: string;
   introduceQualification: string;
   introduceHobby: string;
@@ -124,7 +131,7 @@ export interface User {
   qaAnswerReplies?: QAAnswerReply[];
   //this params is sent when login
   token?: string;
-
+  userGoodForBoard?: Wiki[];
   eventCount?: number;
   questionCount?: number;
   answerCount?: number;

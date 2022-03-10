@@ -40,6 +40,7 @@ import {Suggestion} from 'react-native-controlled-mentions';
 import {KeyboardAwareFlatList} from 'react-native-keyboard-aware-scroll-view';
 import {
   useFocusEffect,
+  useIsFocused,
   useNavigation,
   useRoute,
 } from '@react-navigation/native';
@@ -76,6 +77,7 @@ import io from 'socket.io-client';
 import {baseURL} from '../../utils/url';
 import {getThumbnailOfVideo} from '../../utils/getThumbnailOfVideo';
 import {useAuthenticate} from '../../contexts/useAuthenticate';
+import {useIsTabBarVisible} from '../../contexts/bottomTab/useIsTabBarVisible';
 
 const socket = io(baseURL, {
   transports: ['websocket'],
@@ -93,6 +95,8 @@ const Chat: React.FC = () => {
   const navigation = useNavigation<ChatNavigationProps>();
   const route = useRoute<ChatRouteProps>();
   const {room} = route.params;
+  const isFocused = useIsFocused();
+  const {setIsTabBarVisible} = useIsTabBarVisible();
   const {data: roomDetail, refetch: refetchRoomDetail} = useAPIGetRoomDetail(
     room.id,
   );
@@ -117,7 +121,9 @@ const Chat: React.FC = () => {
   }, [messages]);
   const [nowImageIndex, setNowImageIndex] = useState<number>(0);
   const [video, setVideo] = useState('');
-  const {data: lastReadChatTime} = useAPIGetLastReadChatTime(room.id);
+  const {data: lastReadChatTime} = useAPIGetLastReadChatTime(room.id, {
+    refetchInterval: 1000,
+  });
   const [longPressedMsg, setLongPressedMgg] = useState<ChatMessage>();
   const [reactionTarget, setReactionTarget] = useState<ChatMessage>();
   const {mutate: saveReaction} = useAPISaveReaction();
@@ -535,6 +541,14 @@ const Chat: React.FC = () => {
   }, [longPressedMsg]);
 
   useEffect(() => {
+    if (isFocused) {
+      setIsTabBarVisible(false);
+    } else {
+      setIsTabBarVisible(true);
+    }
+  }, [isFocused, setIsTabBarVisible]);
+
+  useEffect(() => {
     socket.emit('joinRoom', room.id.toString());
     socket.on('msgToClient', async (sentMsgByOtherUsers: ChatMessage) => {
       if (sentMsgByOtherUsers.content) {
@@ -603,6 +617,12 @@ const Chat: React.FC = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fetchedPastMessages]);
+
+  useEffect(() => {
+    messages[0]?.chatGroup?.id === room.id && saveLastReadChatTime(room.id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [messages, room.id]);
+
   const readUsers = (targetMsg: ChatMessage) => {
     return lastReadChatTime
       ? lastReadChatTime

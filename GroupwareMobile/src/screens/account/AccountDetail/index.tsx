@@ -16,6 +16,7 @@ import HeaderWithTextButton from '../../../components/Header';
 import {Tab} from '../../../components/Header/HeaderTemplate';
 import WholeContainer from '../../../components/WholeContainer';
 import WikiCard from '../../../components/wiki/WikiCard';
+import {useIsTabBarVisible} from '../../../contexts/bottomTab/useIsTabBarVisible';
 import {useAuthenticate} from '../../../contexts/useAuthenticate';
 import {useAPISaveChatGroup} from '../../../hooks/api/chat/useAPISaveChatGroup';
 import {useAPIGetEventList} from '../../../hooks/api/event/useAPIGetEventList';
@@ -31,6 +32,7 @@ import {
 import {darkFontColor} from '../../../utils/colors';
 import {userNameFactory} from '../../../utils/factory/userNameFactory';
 import {userRoleNameFactory} from '../../../utils/factory/userRoleNameFactory';
+import {branchTypeNameFactory} from '../../../utils/factory/branchTypeNameFactory';
 
 const TopTab = createMaterialTopTabNavigator();
 
@@ -74,7 +76,15 @@ const DetailScreen: React.FC<DetailScreenProps> = ({profile, isLoading}) => {
           </Div>
           <Div mb={'lg'} flexDir="row" alignItems="center">
             <Text mr="lg" fontSize={16}>
-              {'メール　'}
+              所属支社
+            </Text>
+            <Text color={darkFontColor} fontWeight="bold" fontSize={20}>
+              {branchTypeNameFactory(profile.branch)}
+            </Text>
+          </Div>
+          <Div mb={'lg'} flexDir="row" alignItems="center">
+            <Text mr="lg" fontSize={16}>
+              メール
             </Text>
             <Text color={darkFontColor} fontWeight="bold" fontSize={20}>
               {profile.isEmailPublic ? profile.email : '非公開'}
@@ -141,6 +151,7 @@ const AccountDetail: React.FC = () => {
   const navigation = useNavigation<AccountDetailNavigationProps>();
   const route = useRoute<AccountDetailRouteProps>();
   const {user, setUser, logout} = useAuthenticate();
+  const {setIsTabBarVisible} = useIsTabBarVisible();
   const id = route.params?.id;
   const userID = id || user?.id;
   const screenName = 'AccountDetail';
@@ -148,7 +159,8 @@ const AccountDetail: React.FC = () => {
   const eventScreenName = `${screenName}-event`;
   const questionScreenName = `${screenName}-question`;
   const knowledgeScreenName = `${screenName}-knowledge`;
-  const {width: windowWidth, height: windowHeight} = useWindowDimensions();
+  const goodScreenName = `${screenName}-good`;
+  const {width: windowWidth} = useWindowDimensions();
   const [screenHeight, setScreenHeight] = useState<{
     [key: string]: {height: number};
   }>({[defaultScreenName]: {height: 3600}});
@@ -157,19 +169,20 @@ const AccountDetail: React.FC = () => {
     refetch,
     isLoading: loadingProfile,
   } = useAPIGetUserInfoById(userID?.toString() || '0');
-  const {data: events} = useAPIGetEventList({
+  const {data: events, refetch: refetchEventList} = useAPIGetEventList({
     participant_id: userID?.toString(),
   });
-  const {data: questionList} = useAPIGetWikiList({
+  const {data: questionList, refetch: refetchQuestionList} = useAPIGetWikiList({
     writer: userID?.toString() || '0',
     type: WikiType.BOARD,
     board_category: BoardCategory.QA,
   });
-  const {data: knowledgeList} = useAPIGetWikiList({
-    writer: userID?.toString() || '0',
-    type: WikiType.BOARD,
-    board_category: BoardCategory.KNOWLEDGE,
-  });
+  const {data: knowledgeList, refetch: refetchKnowledgeList} =
+    useAPIGetWikiList({
+      writer: userID?.toString() || '0',
+      type: WikiType.BOARD,
+      board_category: BoardCategory.KNOWLEDGE,
+    });
   const {mutate: createGroup} = useAPISaveChatGroup({
     onSuccess: createdData => {
       const resetAction = StackActions.popToTop();
@@ -228,8 +241,19 @@ const AccountDetail: React.FC = () => {
   useEffect(() => {
     if (isFocused) {
       refetch();
+      refetchEventList();
+      refetchQuestionList();
+      refetchKnowledgeList();
+      setIsTabBarVisible(true);
     }
-  }, [isFocused, refetch]);
+  }, [
+    isFocused,
+    refetch,
+    refetchEventList,
+    refetchQuestionList,
+    refetchKnowledgeList,
+    setIsTabBarVisible,
+  ]);
 
   return (
     <WholeContainer>
@@ -394,6 +418,39 @@ const AccountDetail: React.FC = () => {
                     </>
                   )}
                   options={{title: 'ナレッジ'}}
+                />
+                <TopTab.Screen
+                  listeners={{
+                    focus: () => setActiveScreen(goodScreenName),
+                  }}
+                  name={goodScreenName}
+                  children={() => (
+                    <>
+                      <Div alignItems="center" mt="lg">
+                        {profile?.userGoodForBoard?.length ? (
+                          profile?.userGoodForBoard?.map(w => (
+                            <WikiCard key={w.id} wiki={w} />
+                          ))
+                        ) : (
+                          <Text fontSize={16}>
+                            いいねした掲示板が見つかりませんでした
+                          </Text>
+                        )}
+                      </Div>
+                      <Div
+                        onLayout={({nativeEvent}) => {
+                          setScreenHeight(s => ({
+                            ...s,
+                            [goodScreenName]: {
+                              ...s?.[goodScreenName],
+                              height: nativeEvent.layout.y + 130,
+                            },
+                          }));
+                        }}
+                      />
+                    </>
+                  )}
+                  options={{title: 'いいね'}}
                 />
               </TopTab.Navigator>
             </Div>

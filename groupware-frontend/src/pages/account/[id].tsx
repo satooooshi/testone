@@ -28,6 +28,7 @@ import {
 } from '@chakra-ui/react';
 import { BoardCategory, TagType, UserTag, WikiType } from 'src/types';
 import { userRoleNameFactory } from 'src/utils/factory/userRoleNameFactory';
+import { branchTypeNameFactory } from 'src/utils/factory/branchTypeNameFactory';
 import { blueColor, darkFontColor } from 'src/utils/colors';
 import { userNameFactory } from 'src/utils/factory/userNameFactory';
 import { useAPISaveChatGroup } from '@/hooks/api/chat/useAPISaveChatGroup';
@@ -92,7 +93,11 @@ const UserTagList: React.FC<UserTagListProps> = ({ tags, type, introduce }) => {
       </Box>
       <Box>
         <Text mb={2} fontSize={14}>{`${labelName}の紹介`}</Text>
-        <Text fontSize={16} color={darkFontColor} fontWeight="bold">
+        <Text
+          fontSize={16}
+          color={darkFontColor}
+          fontWeight="bold"
+          className={accountInfoStyles.introduce}>
           {introduce || '未入力'}
         </Text>
       </Box>
@@ -161,6 +166,13 @@ const MyAccountInfo = () => {
         setActiveTab(TabName.KNOWLEDGE);
       },
       isActiveTab: activeTab === TabName.KNOWLEDGE,
+    },
+    {
+      tabName: 'いいね (直近20件)',
+      onClick: () => {
+        setActiveTab(TabName.GOOD);
+      },
+      isActiveTab: activeTab === TabName.GOOD,
     },
   ];
 
@@ -277,6 +289,23 @@ const MyAccountInfo = () => {
                     alignItems="center"
                     w="100%">
                     <Text fontSize={14} w={'10%'}>
+                      所属支社:
+                    </Text>
+                    <Text
+                      fontWeight="bold"
+                      w="85%"
+                      fontSize={18}
+                      color={darkFontColor}>
+                      {branchTypeNameFactory(profile.branch)}
+                    </Text>
+                  </Box>
+                  <Box
+                    display="flex"
+                    mb={5}
+                    flexDir="row"
+                    alignItems="center"
+                    w="100%">
+                    <Text fontSize={14} w={'10%'}>
                       {'メール　'}:
                     </Text>
                     <Text
@@ -383,33 +412,54 @@ const MyAccountInfo = () => {
               </>
             )}
 
-            {activeTab === TabName.EVENT && events && events.events.length ? (
-              <SimpleGrid columns={{ sm: 1, md: 1, lg: 2 }} spacing="16px">
-                {events.events.map((e) => (
-                  <EventCard
-                    key={e.id}
-                    hrefTagClick={(t) => `/event/list?tag=${t.id}`}
-                    eventSchedule={e}
-                  />
-                ))}
-              </SimpleGrid>
+            {activeTab === TabName.EVENT ? (
+              events && events.events.length ? (
+                <SimpleGrid columns={{ sm: 1, md: 1, lg: 2 }} spacing="16px">
+                  {events.events.map((e) => (
+                    <EventCard
+                      key={e.id}
+                      hrefTagClick={(t) => `/event/list?tag=${t.id}`}
+                      eventSchedule={e}
+                    />
+                  ))}
+                </SimpleGrid>
+              ) : (
+                <Text fontSize={16}>
+                  参加したイベントが見つかりませんでした
+                </Text>
+              )
             ) : null}
 
-            {activeTab === TabName.QUESTION &&
-            questionList &&
-            questionList.wiki.length ? (
-              <Box>
-                {questionList.wiki.map((w) => (
-                  <WikiCard wiki={w} key={w.id} />
-                ))}
-              </Box>
+            {activeTab === TabName.QUESTION ? (
+              questionList && questionList.wiki.length ? (
+                <Box>
+                  {questionList.wiki.map((w) => (
+                    <WikiCard wiki={w} key={w.id} />
+                  ))}
+                </Box>
+              ) : (
+                <Text fontSize={16}>投稿した質問が見つかりませんでした</Text>
+              )
             ) : null}
 
-            {activeTab === TabName.KNOWLEDGE &&
-            knowledgeList &&
-            knowledgeList.wiki.length ? (
+            {activeTab === TabName.KNOWLEDGE ? (
+              knowledgeList && knowledgeList.wiki.length ? (
+                <Box>
+                  {knowledgeList.wiki.map((w) => (
+                    <WikiCard wiki={w} key={w.id} />
+                  ))}
+                </Box>
+              ) : (
+                <Text fontSize={16}>
+                  投稿したナレッジが見つかりませんでした
+                </Text>
+              )
+            ) : null}
+            {activeTab === TabName.GOOD &&
+            profile.userGoodForBoard &&
+            profile.userGoodForBoard.length ? (
               <Box>
-                {knowledgeList.wiki.map((w) => (
+                {profile.userGoodForBoard.map((w) => (
                   <WikiCard wiki={w} key={w.id} />
                 ))}
               </Box>

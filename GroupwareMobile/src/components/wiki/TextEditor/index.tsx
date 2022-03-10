@@ -2,7 +2,6 @@ import React, {useEffect, useRef, useState} from 'react';
 import {textEditorStyles} from '../../../styles/component/wiki/textEditor.style';
 import {TextFormat} from '../../../types';
 import MarkdownIt from 'markdown-it';
-import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import QuillEditor, {QuillToolbar} from 'react-native-cn-quill';
 import {blueColor} from '../../../utils/colors';
 
