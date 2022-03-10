@@ -32,6 +32,7 @@ import {
 import {darkFontColor} from '../../../utils/colors';
 import {userNameFactory} from '../../../utils/factory/userNameFactory';
 import {userRoleNameFactory} from '../../../utils/factory/userRoleNameFactory';
+import {branchTypeNameFactory} from '../../../utils/factory/branchTypeNameFactory';
 
 const TopTab = createMaterialTopTabNavigator();
 
@@ -75,7 +76,15 @@ const DetailScreen: React.FC<DetailScreenProps> = ({profile, isLoading}) => {
           </Div>
           <Div mb={'lg'} flexDir="row" alignItems="center">
             <Text mr="lg" fontSize={16}>
-              {'メール　'}
+              所属支社
+            </Text>
+            <Text color={darkFontColor} fontWeight="bold" fontSize={20}>
+              {branchTypeNameFactory(profile.branch)}
+            </Text>
+          </Div>
+          <Div mb={'lg'} flexDir="row" alignItems="center">
+            <Text mr="lg" fontSize={16}>
+              メール
             </Text>
             <Text color={darkFontColor} fontWeight="bold" fontSize={20}>
               {profile.isEmailPublic ? profile.email : '非公開'}
@@ -151,7 +160,7 @@ const AccountDetail: React.FC = () => {
   const questionScreenName = `${screenName}-question`;
   const knowledgeScreenName = `${screenName}-knowledge`;
   const goodScreenName = `${screenName}-good`;
-  const {width: windowWidth, height: windowHeight} = useWindowDimensions();
+  const {width: windowWidth} = useWindowDimensions();
   const [screenHeight, setScreenHeight] = useState<{
     [key: string]: {height: number};
   }>({[defaultScreenName]: {height: 3600}});
