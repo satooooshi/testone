@@ -24,6 +24,7 @@ const Application: React.FC = () => {
   return (
     <WholeContainer>
       <HeaderWithTextButton
+        enableBackButton={true}
         title="入社前申請"
         tabs={tabs}
         activeTabName={'入社前申請'}

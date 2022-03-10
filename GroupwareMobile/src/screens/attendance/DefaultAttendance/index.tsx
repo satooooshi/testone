@@ -73,6 +73,7 @@ const DefaultAttendanceForm: React.FC = () => {
   return (
     <WholeContainer>
       <HeaderWithTextButton
+        enableBackButton={true}
         title={'定時設定'}
         tabs={tabs}
         activeTabName={'定時設定'}

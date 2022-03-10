@@ -50,6 +50,7 @@ const Attendance: React.FC = () => {
   return (
     <WholeContainer>
       <HeaderWithTextButton
+        enableBackButton={true}
         title="勤怠打刻"
         tabs={tabs}
         activeTabName={'勤怠打刻'}
