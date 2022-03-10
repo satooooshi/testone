@@ -4,6 +4,7 @@ import FastImage from 'react-native-fast-image';
 import {Swipeable} from 'react-native-gesture-handler';
 import {Button, Div, Icon, Text} from 'react-native-magnus';
 import tailwind from 'tailwind-rn';
+import {useAuthenticate} from '../../../contexts/useAuthenticate';
 import {roomCardStyles} from '../../../styles/component/chat/roomCard.style';
 import {userAdminStyles} from '../../../styles/screen/admin/userAdmin.style';
 import {ChatGroup, ChatMessage, ChatMessageType} from '../../../types';
@@ -27,6 +28,7 @@ const RoomCard: React.FC<RoomCardProps> = ({
   dangerousBgColor,
 }) => {
   const {width: windowWidth} = useWindowDimensions();
+  const {user} = useAuthenticate();
   const rightSwipeActions = () => {
     return (
       <Button bg="green500" h={'100%'} w={80} onPress={onPressPinButton}>
@@ -46,9 +48,13 @@ const RoomCard: React.FC<RoomCardProps> = ({
       case '音声通話':
         return `通話時間 ${message.callTime}`;
       case 'キャンセル':
-        return message.sender?.id ? '通話をキャンセルしました' : '不在着信';
+        return message.sender?.id === user?.id
+          ? '通話をキャンセルしました'
+          : '不在着信';
       case '応答なし':
-        return message.sender?.id ? '通話に応答がありませんでした' : '不在着信';
+        return message.sender?.id === user?.id
+          ? '通話に応答がありませんでした'
+          : '不在着信';
       default:
         return 'error';
     }
