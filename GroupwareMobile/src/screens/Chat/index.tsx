@@ -16,9 +16,11 @@ import {
   Modal as MagnusModal,
   Button,
   Dropdown,
+  Input,
 } from 'react-native-magnus';
 import WholeContainer from '../../components/WholeContainer';
 import {useAPIGetMessages} from '../../hooks/api/chat/useAPIGetMessages';
+import {useAPISearchMessages} from '../../hooks/api/chat/useAPISearchMessages';
 import {useAPISendChatMessage} from '../../hooks/api/chat/useAPISendChatMessage';
 import {useAPIUploadStorage} from '../../hooks/api/storage/useAPIUploadStorage';
 import {chatStyles} from '../../styles/screen/chat/chat.style';
@@ -48,7 +50,6 @@ import {
 } from '../../types/navigator/drawerScreenProps';
 import {useFormik} from 'formik';
 import ReplyTarget from '../../components/chat/ChatFooter/ReplyTarget';
-import HeaderWithIconButton from '../../components/Header/HeaderWithIconButton';
 import {darkFontColor} from '../../utils/colors';
 import tailwind from 'tailwind-rn';
 import {useAPIGetLastReadChatTime} from '../../hooks/api/chat/useAPIGetLastReadChatTime';
@@ -67,6 +68,7 @@ import {useAPISaveLastReadChatTime} from '../../hooks/api/chat/useAPISaveLastRea
 import DownloadIcon from '../../components/common/DownLoadIcon';
 import UserAvatar from '../../components/common/UserAvatar';
 import {nameOfRoom} from '../../utils/factory/chat/nameOfRoom';
+import HeaderTemplate from '../../components/Header/HeaderTemplate';
 import {useAPIGetRoomDetail} from '../../hooks/api/chat/useAPIGetRoomDetail';
 import {chatMessageSchema} from '../../utils/validation/schema';
 import {reactionEmojis} from '../../utils/factory/reactionEmojis';
@@ -86,6 +88,10 @@ const TopTab = createMaterialTopTabNavigator();
 const Chat: React.FC = () => {
   const {user: myself} = useAuthenticate();
   const typeDropdownRef = useRef<any | null>(null);
+  const messageIosRef = useRef<FlatList | null>(null);
+  const messageAndroidRef = useRef<{flatListRef: Element | null}>({
+    flatListRef: null,
+  });
   const navigation = useNavigation<ChatNavigationProps>();
   const route = useRoute<ChatRouteProps>();
   const {room} = route.params;
@@ -94,9 +100,17 @@ const Chat: React.FC = () => {
   const {data: roomDetail, refetch: refetchRoomDetail} = useAPIGetRoomDetail(
     room.id,
   );
-  const [page, setPage] = useState(1);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [focusedMessageID, setFocusedMessageID] = useState<number>();
+  const [after, setAfter] = useState<number>();
+  const [before, setBefore] = useState<number>();
+  const [include, setInclude] = useState<boolean>();
+  const [renderMessageIndex, setRenderMessageIndex] = useState<
+    number | undefined
+  >();
+  const [inputtedSearchWord, setInputtedSearchWord] = useState('');
   const [imageModal, setImageModal] = useState(false);
+  const [visibleSearchInput, setVisibleSearchInput] = useState(false);
   const imagesForViewing: ImageSource[] = useMemo(() => {
     return messages
       .filter(m => m.type === ChatMessageType.IMAGE)
@@ -144,8 +158,16 @@ const Chat: React.FC = () => {
     isFetching: fetchingMessages,
   } = useAPIGetMessages({
     group: room.id,
-    page: page.toString(),
+    after,
+    before,
+    include,
   });
+  const {data: searchedResults, refetch: searchMessages} = useAPISearchMessages(
+    {
+      group: room.id,
+      word: inputtedSearchWord,
+    },
+  );
   const suggestions = (): Suggestion[] => {
     if (!room.members) {
       return [];
@@ -160,7 +182,6 @@ const Chat: React.FC = () => {
   const {refetch: refetchLatest} = useAPIGetMessages(
     {
       group: room.id,
-      page: '1',
     },
     {
       enabled: false,
@@ -176,7 +197,7 @@ const Chat: React.FC = () => {
               }
             }
           }
-          setMessages(m => [...msgToAppend, ...m]);
+          setMessages(m => refreshMessage([...msgToAppend, ...m]));
           // setImagesForViewing(i => [...i, ...imagesToApped]);
         }
       },
@@ -186,7 +207,7 @@ const Chat: React.FC = () => {
     useAPISendChatMessage({
       onSuccess: sentMsg => {
         socket.emit('message', {...sentMsg, isSender: false});
-        setMessages([sentMsg, ...messages]);
+        setMessages(refreshMessage([sentMsg, ...messages]));
         setValues(v => ({
           ...v,
           content: '',
@@ -209,20 +230,6 @@ const Chat: React.FC = () => {
     setNowImageIndex(imagesForViewing.findIndex(isNowUri));
     setImageModal(true);
   };
-  const headerRightIcon = (
-    <TouchableOpacity
-      style={tailwind('flex flex-row items-center')}
-      onPress={() =>
-        navigation.navigate('ChatStack', {screen: 'ChatMenu', params: {room}})
-      }>
-      <Icon
-        name="dots-horizontal-circle-outline"
-        fontFamily="MaterialCommunityIcons"
-        fontSize={26}
-        color={darkFontColor}
-      />
-    </TouchableOpacity>
-  );
 
   const handleDeleteReaction = (
     reaction: ChatMessageReaction,
@@ -231,17 +238,19 @@ const Chat: React.FC = () => {
     deleteReaction(reaction, {
       onSuccess: reactionId => {
         setMessages(m => {
-          return m.map(eachMessage => {
-            if (eachMessage.id === target.id) {
-              return {
-                ...eachMessage,
-                reactions: eachMessage.reactions?.filter(
-                  r => r.id !== reactionId,
-                ),
-              };
-            }
-            return eachMessage;
-          });
+          return refreshMessage(
+            m.map(eachMessage => {
+              if (eachMessage.id === target.id) {
+                return {
+                  ...eachMessage,
+                  reactions: eachMessage.reactions?.filter(
+                    r => r.id !== reactionId,
+                  ),
+                };
+              }
+              return eachMessage;
+            }),
+          );
         });
       },
       onError: () => {
@@ -262,17 +271,19 @@ const Chat: React.FC = () => {
       onSuccess: savedReaction => {
         const reactionAdded = {...savedReaction, isSender: true};
         setMessages(m => {
-          return m.map(eachMessage => {
-            if (eachMessage.id === savedReaction.chatMessage?.id) {
-              return {
-                ...eachMessage,
-                reactions: eachMessage.reactions?.length
-                  ? [...eachMessage.reactions, reactionAdded]
-                  : [reactionAdded],
-              };
-            }
-            return eachMessage;
-          });
+          return refreshMessage(
+            m.map(eachMessage => {
+              if (eachMessage.id === savedReaction.chatMessage?.id) {
+                return {
+                  ...eachMessage,
+                  reactions: eachMessage.reactions?.length
+                    ? [...eachMessage.reactions, reactionAdded]
+                    : [reactionAdded],
+                };
+              }
+              return eachMessage;
+            }),
+          );
         });
       },
       onError: () => {
@@ -361,12 +372,6 @@ const Chat: React.FC = () => {
     setVideo(url);
   };
 
-  const onEndReached = () => {
-    if (fetchedPastMessages?.length) {
-      setPage(p => p + 1);
-    }
-  };
-
   const isRecent = (created: ChatMessage, target: ChatMessage): boolean => {
     if (new Date(created.createdAt) > new Date(target.createdAt)) {
       return true;
@@ -380,6 +385,127 @@ const Chat: React.FC = () => {
         .length || 0
     );
   };
+
+  const onScrollTopOnChat = () => {
+    if (fetchedPastMessages?.length) {
+      setBefore(messages[messages.length - 1].id);
+    }
+  };
+
+  const scrollToRenderedMessage = () => {
+    const wait = new Promise(resolve => setTimeout(resolve, 100));
+    wait.then(() => {
+      if (renderMessageIndex) {
+        scrollToTarget(renderMessageIndex);
+        setRenderMessageIndex(undefined);
+      } else {
+        Alert.alert(
+          'メッセージの読み込みがうまくいきませんでした。\n再度検索してください。',
+        );
+      }
+    });
+  };
+
+  const scrollToTarget = useCallback(
+    (messageIndex: number) => {
+      if (searchedResults?.length && inputtedSearchWord) {
+        if (Platform.OS === 'ios') {
+          messageIosRef.current?.scrollToIndex({index: messageIndex});
+        } else {
+          (messageAndroidRef.current?.flatListRef as any)?.scrollToIndex({
+            index: messageIndex,
+          });
+        }
+      }
+    },
+    [inputtedSearchWord, searchedResults?.length],
+  );
+
+  const countOfSearchWord = useMemo(() => {
+    if (searchedResults?.length && focusedMessageID) {
+      const index = searchedResults?.findIndex(result => {
+        return result?.id === focusedMessageID;
+      });
+      return Math.abs(searchedResults.length - index);
+    }
+    return 0;
+  }, [searchedResults, focusedMessageID]);
+
+  const nextFocusIndex = (sequence: 'prev' | 'next') => {
+    if (searchedResults?.length) {
+      const index = searchedResults.findIndex(e => e.id === focusedMessageID);
+
+      if (sequence === 'next') {
+        return searchedResults?.[index].id === searchedResults?.[0].id
+          ? searchedResults?.[searchedResults.length - 1].id
+          : searchedResults[index - 1].id;
+      } else if (sequence === 'prev') {
+        return searchedResults?.[index].id ===
+          searchedResults?.[searchedResults.length - 1].id
+          ? searchedResults[0].id
+          : searchedResults[index + 1].id;
+      }
+    }
+  };
+
+  const refetchDoesntExistMessages = (focused?: number) => {
+    const isExist = messages.filter(m => m.id === focused)?.length;
+
+    if (!isExist) {
+      setAfter(focused);
+      setInclude(true);
+      return true;
+    } else {
+      setInclude(false);
+      return false;
+    }
+  };
+
+  const refreshMessage = (targetMessages: ChatMessage[]): ChatMessage[] => {
+    const arrayIncludesDuplicate = [...messages, ...targetMessages];
+    return arrayIncludesDuplicate
+      .filter((value, index, self) => {
+        return index === self.findIndex(m => m.id === value.id);
+      })
+      .sort((a, b) => b.id - a.id);
+  };
+  useEffect(() => {
+    setMessages([]);
+    setBefore(undefined);
+    setAfter(undefined);
+    refetchLatest();
+  }, [refetchLatest, room]);
+
+  useEffect(() => {
+    // 検索する文字がアルファベットの場合、なぜかuseAPISearchMessagesのonSuccessが動作しない為、こちらで代わりとなる処理を記述しています。
+    if (searchedResults?.length) {
+      setFocusedMessageID(searchedResults[0].id);
+      refetchDoesntExistMessages(searchedResults[0].id);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchedResults]);
+
+  useEffect(() => {
+    if (focusedMessageID) {
+      refetchDoesntExistMessages(focusedMessageID);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [focusedMessageID]);
+
+  useEffect(() => {
+    if (fetchedPastMessages?.length) {
+      const refreshedMessage = refreshMessage(fetchedPastMessages);
+      setMessages(refreshedMessage);
+      if (refetchDoesntExistMessages(fetchedPastMessages[0].id)) {
+        refetchDoesntExistMessages(fetchedPastMessages[0].id + 20);
+      } else {
+        setAfter(undefined);
+        setInclude(false);
+        setBefore(undefined);
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fetchedPastMessages]);
 
   const typeDropdown = (
     <Dropdown
@@ -443,11 +569,13 @@ const Chat: React.FC = () => {
             msgs[0].id !== sentMsgByOtherUsers.id &&
             sentMsgByOtherUsers.chatGroup?.id === room.id
           ) {
-            return [sentMsgByOtherUsers, ...msgs];
+            return refreshMessage([sentMsgByOtherUsers, ...msgs]);
           } else if (sentMsgByOtherUsers.chatGroup?.id !== room.id) {
-            return msgs.filter(m => m.id !== sentMsgByOtherUsers.id);
+            return refreshMessage(
+              msgs.filter(m => m.id !== sentMsgByOtherUsers.id),
+            );
           }
-          return msgs;
+          return refreshMessage(msgs);
         });
       }
     });
@@ -481,10 +609,10 @@ const Chat: React.FC = () => {
           }
         }
         setMessages(m => {
-          return [...m, ...msgToAppend];
+          return refreshMessage([...m, ...msgToAppend]);
         });
       } else if (!messages?.length) {
-        setMessages(fetchedPastMessages);
+        setMessages(refreshMessage(fetchedPastMessages));
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -503,11 +631,23 @@ const Chat: React.FC = () => {
       : [];
   };
 
-  const renderMessage = (message: ChatMessage) => (
-    <Div mb={'sm'} mx="md">
+  const renderMessage = (message: ChatMessage, messageIndex: number) => (
+    <Div
+      mb={'sm'}
+      mx="md"
+      onLayout={() =>
+        message.id === focusedMessageID &&
+        renderMessageIndex &&
+        scrollToRenderedMessage()
+      }>
       <ChatMessageItem
         message={message}
         readUsers={readUsers(message)}
+        inputtedSearchWord={inputtedSearchWord}
+        searchedResultIds={searchedResults?.map(s => s.id)}
+        messageIndex={messageIndex}
+        scrollToTarget={scrollToTarget}
+        isScrollTarget={focusedMessageID === message.id}
         onCheckLastRead={() => setSelectedMessageForCheckLastRead(message)}
         numbersOfRead={numbersOfRead(message)}
         onLongPress={() => setLongPressedMgg(message)}
@@ -559,11 +699,17 @@ const Chat: React.FC = () => {
           behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
           {loadingMessages && fetchingMessages ? <ActivityIndicator /> : null}
           <FlatList
+            ref={messageIosRef}
             style={chatStyles.flatlist}
             inverted
             data={messages}
-            {...{onEndReached}}
-            renderItem={({item: message}) => renderMessage(message)}
+            onScrollToIndexFailed={info => {
+              setRenderMessageIndex(info.index);
+            }}
+            onEndReached={() => onScrollTopOnChat()}
+            renderItem={({item: message, index}) =>
+              renderMessage(message, index)
+            }
           />
           {reactionTarget ? (
             reactionSelector
@@ -599,6 +745,7 @@ const Chat: React.FC = () => {
       ) : (
         <>
           <KeyboardAwareFlatList
+            innerRef={ref => (messageAndroidRef.current.flatListRef = ref)}
             refreshing={true}
             style={chatStyles.flatlist}
             ListHeaderComponent={
@@ -611,9 +758,14 @@ const Chat: React.FC = () => {
             contentContainerStyle={chatStyles.flatlistContent}
             inverted
             data={messages}
-            {...{onEndReached}}
+            onScrollToIndexFailed={info => {
+              setRenderMessageIndex(info.index);
+            }}
+            onEndReached={() => onScrollTopOnChat()}
             keyExtractor={item => item.id.toString()}
-            renderItem={({item: message}) => renderMessage(message)}
+            renderItem={({item: message, index}) =>
+              renderMessage(message, index)
+            }
           />
           {reactionTarget ? (
             reactionSelector
@@ -796,12 +948,93 @@ const Chat: React.FC = () => {
           </Div>
         )}
       />
-      <HeaderWithIconButton
+      <HeaderTemplate
         title={roomDetail ? nameOfRoom(roomDetail) : nameOfRoom(room)}
         enableBackButton={true}
-        screenForBack={'RoomList'}
-        icon={headerRightIcon}
-      />
+        screenForBack={'RoomList'}>
+        <Div style={tailwind('flex flex-row')}>
+          <TouchableOpacity
+            style={tailwind('flex flex-row')}
+            onPress={() => setVisibleSearchInput(true)}>
+            <Icon
+              name="search"
+              fontFamily="Feather"
+              fontSize={26}
+              color={darkFontColor}
+            />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={tailwind('flex flex-row')}
+            onPress={() =>
+              navigation.navigate('ChatStack', {
+                screen: 'ChatMenu',
+                params: {room},
+              })
+            }>
+            <Icon
+              name="dots-horizontal-circle-outline"
+              fontFamily="MaterialCommunityIcons"
+              fontSize={26}
+              color={darkFontColor}
+            />
+          </TouchableOpacity>
+        </Div>
+      </HeaderTemplate>
+      {visibleSearchInput && (
+        <Div>
+          <Div style={tailwind('flex flex-row')}>
+            <Input
+              placeholder="メッセージを検索"
+              w={'70%'}
+              value={inputtedSearchWord}
+              onChangeText={text => {
+                setInputtedSearchWord(text);
+                searchMessages();
+              }}
+            />
+            <Div
+              style={tailwind('flex flex-row justify-between m-1')}
+              w={'25%'}>
+              <TouchableOpacity
+                style={tailwind('flex flex-row')}
+                onPress={() => {
+                  !renderMessageIndex &&
+                    setFocusedMessageID(nextFocusIndex('prev'));
+                }}>
+                <Icon name="arrow-up" fontFamily="FontAwesome" fontSize={25} />
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={tailwind('flex flex-row')}
+                onPress={() => {
+                  !renderMessageIndex &&
+                    setFocusedMessageID(nextFocusIndex('next'));
+                }}>
+                <Icon
+                  name="arrow-down"
+                  fontFamily="FontAwesome"
+                  fontSize={25}
+                />
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={tailwind('flex flex-row')}
+                onPress={() => setVisibleSearchInput(false)}>
+                <Icon name="close" fontFamily="FontAwesome" fontSize={25} />
+              </TouchableOpacity>
+            </Div>
+          </Div>
+          {inputtedSearchWord !== '' && (
+            <Div h={40} alignItems={'center'} justifyContent={'center'}>
+              {renderMessageIndex ? (
+                <ActivityIndicator />
+              ) : (
+                <Text color="black">{`${countOfSearchWord} / ${
+                  searchedResults?.length || 0
+                }`}</Text>
+              )}
+            </Div>
+          )}
+        </Div>
+      )}
       {messageListAvoidngKeyboardDisturb}
     </WholeContainer>
   );
