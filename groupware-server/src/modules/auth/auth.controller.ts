@@ -2,7 +2,6 @@ import {
   Body,
   Controller,
   Get,
-  HttpCode,
   Post,
   Req,
   Res,
@@ -53,7 +52,6 @@ ${registrationData.password}
     return registeredUser;
   }
 
-  @HttpCode(200)
   @UseGuards(LocalAuthenticationGuard)
   @Post('login')
   login(@Req() request: RequestWithUser): Partial<User> {
@@ -74,7 +72,6 @@ ${registrationData.password}
   }
 
   @Post('refresh-password')
-  @HttpCode(200)
   async forgotPassword(@Body() body: ForgotPasswordDto) {
     const { email } = body;
     await this.authService.sendEmailToRefreshPass(email);

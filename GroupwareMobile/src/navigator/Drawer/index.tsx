@@ -41,6 +41,7 @@ import AttendanceHome from '../../screens/attendance/AttendanceHome';
 import Attendance from '../../screens/attendance/Attendance';
 import Application from '../../screens/attendance/Application';
 import DefaultAttendance from '../../screens/attendance/DefaultAttendance';
+import EditedProfile from '../../screens/admin/EditedProfile';
 
 const Drawer = createDrawerNavigator();
 const Stack = createStackNavigator();
@@ -170,6 +171,11 @@ const AdminStack = () => {
           <Stack.Screen
             name="UserRegisteringAdmin"
             component={UserRegisteringAdmin}
+            options={{headerShown: false}}
+          />
+          <Stack.Screen
+            name="EditedProfile"
+            component={EditedProfile}
             options={{headerShown: false}}
           />
         </>

@@ -1,7 +1,7 @@
 import { SidebarScreenName } from '@/components/layout/Sidebar';
 import { MenuValue, useModalReducer } from '@/hooks/chat/useModalReducer';
 import React, { useState } from 'react';
-import { ChatGroup } from 'src/types';
+import { ChatGroup, User } from 'src/types';
 import CreateChatGroupModal from '@/components/chat/CreateChatGroupModal';
 import { useMediaQuery, Box, useToast, Text } from '@chakra-ui/react';
 import LayoutWithTab from '@/components/layout/LayoutWithTab';
@@ -16,15 +16,24 @@ import ChatBox from '@/components/chat/ChatBox';
 import 'emoji-mart/css/emoji-mart.css';
 import RoomList from '@/components/chat/RoomList';
 import { useAPIUpdateChatGroup } from '@/hooks/api/chat/useAPIUpdateChatGroup';
-import { RoomRefetchProvider } from 'src/contexts/chat/useRoomRefetch';
+import {
+  RoomRefetchProvider,
+  useRoomRefetch,
+} from 'src/contexts/chat/useRoomRefetch';
 import { useAPIGetRoomDetail } from '@/hooks/api/chat/useAPIGetRoomDetail';
+import { useAPISaveChatGroup } from '@/hooks/api/chat/useAPISaveChatGroup';
 
 const ChatDetail = () => {
   const router = useRouter();
   const { id } = router.query as { id: string };
   const [currentRoom, setCurrentRoom] = useState<ChatGroup>();
+  const [membersModal, setMembersModal] = useState(false);
+  const { needRefetch } = useRoomRefetch();
+  const [isTalkRoom, setIsTalkRoom] = useState<boolean>(false);
+  const [selectedMembers, setSelectedMembers] = useState<User[]>();
+
   const [
-    { editChatGroupModalVisible, createGroupWindow, editMembersModalVisible },
+    { editChatGroupModalVisible, editMembersModalVisible, createGroupWindow },
     dispatchModal,
   ] = useModalReducer();
   const { mutate: updateGroup } = useAPIUpdateChatGroup();
@@ -49,6 +58,15 @@ const ChatDetail = () => {
   const { mutate: leaveChatGroup } = useAPILeaveChatRoom({
     onSuccess: () => {
       router.push('/chat');
+    },
+  });
+
+  const { mutate: createGroup } = useAPISaveChatGroup({
+    onSuccess: (createdData) => {
+      needRefetch();
+      router.push(`/chat/${createdData.id.toString()}`, undefined, {
+        shallow: true,
+      });
     },
   });
 
@@ -93,20 +111,40 @@ const ChatDetail = () => {
         header={{
           title: 'Chat',
           tabs: tabs,
-          rightButtonName: 'ルームを作成',
-          onClickRightButton: () =>
-            dispatchModal({ type: 'createGroupWindow', value: true }),
+          rightMenuName: 'ルームを作成',
+          setIsTalkRoom: setIsTalkRoom,
+          setMembersModal: setMembersModal,
         }}>
         <Head>
           <title>ボールド | Chat</title>
         </Head>
+
+        <EditChatGroupMembersModal
+          isOpen={membersModal}
+          onClose={() => setMembersModal(false)}
+          onComplete={(selected) => {
+            if (isTalkRoom && selected.length === 1) {
+              createGroup({ name: '', members: selected });
+              setMembersModal(false);
+            } else {
+              setSelectedMembers(selected);
+              dispatchModal({ type: 'createGroupWindow', value: true });
+            }
+          }}
+          isTalkRoom={isTalkRoom}
+        />
 
         <CreateChatGroupModal
           isOpen={createGroupWindow}
           closeModal={() => {
             dispatchModal({ type: 'createGroupWindow', value: false });
           }}
+          onComplete={() => {
+            setMembersModal(false);
+          }}
+          selectedMembers={selectedMembers || []}
         />
+
         {currentRoom ? (
           <>
             <EditChatGroupModal

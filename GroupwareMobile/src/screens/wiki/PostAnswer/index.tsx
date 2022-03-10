@@ -1,12 +1,12 @@
-import {useNavigation, useRoute} from '@react-navigation/native';
-import React from 'react';
+import {useIsFocused, useNavigation, useRoute} from '@react-navigation/native';
+import React, {useEffect, useRef} from 'react';
 import {QAAnswer} from '../../../types';
 import {useFormik} from 'formik';
 import {answerSchema} from '../../../utils/validation/schema';
 import {useAPIUploadStorage} from '../../../hooks/api/storage/useAPIUploadStorage';
 import {uploadImageFromGallery} from '../../../utils/cropImage/uploadImageFromGallery';
 import {ActivityIndicator, Alert, useWindowDimensions} from 'react-native';
-import {Button, Overlay, ScrollDiv, Text} from 'react-native-magnus';
+import {Button, Div, Overlay, Text} from 'react-native-magnus';
 import {
   PostWikiNavigationProps,
   PostAnswerRouteProps,
@@ -18,13 +18,18 @@ import WholeContainer from '../../../components/WholeContainer';
 import HeaderWithTextButton from '../../../components/Header';
 import RenderHtml from 'react-native-render-html';
 import MarkdownIt from 'markdown-it';
+import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+import {useIsTabBarVisible} from '../../../contexts/bottomTab/useIsTabBarVisible';
 
 const PostAnswer: React.FC = () => {
   const navigation = useNavigation<PostWikiNavigationProps>();
   const route = useRoute<PostAnswerRouteProps>();
+  const scrollRef = useRef<KeyboardAwareScrollView | null>(null);
   const wikiId = route.params.id;
   const {data: wikiInfo} = useAPIGetWikiDetail(wikiId);
   const mdParser = new MarkdownIt({breaks: true});
+  const isFocused = useIsFocused();
+  const {setIsTabBarVisible} = useIsTabBarVisible();
   const {mutate: saveAnswer, isLoading: loadingSaveAnswer} = useAPICreateAnswer(
     {
       onSuccess: () => {
@@ -58,6 +63,12 @@ const PostAnswer: React.FC = () => {
     },
   });
 
+  useEffect(() => {
+    if (isFocused) {
+      setIsTabBarVisible(false);
+    }
+  }, [isFocused, setIsTabBarVisible]);
+
   const handleUploadImage = async (onSuccess: (imageURL: string[]) => void) => {
     const {formData} = await uploadImageFromGallery();
     if (formData) {
@@ -70,6 +81,7 @@ const PostAnswer: React.FC = () => {
       {wikiInfo ? (
         <>
           <HeaderWithTextButton
+            enableBackButton={true}
             title={
               wikiInfo.answers?.length ? '回答を追加する' : '回答を投稿する'
             }
@@ -77,51 +89,49 @@ const PostAnswer: React.FC = () => {
           <Overlay visible={isLoading} p="xl">
             <ActivityIndicator />
           </Overlay>
-          <ScrollDiv
+
+          <KeyboardAwareScrollView
+            ref={scrollRef}
             nestedScrollEnabled={true}
             scrollEventThrottle={20}
-            keyboardDismissMode={'none'}
-            w={windowWidth * 0.9}
-            h={windowHeight * 0.3}
-            alignSelf="center"
-            pt={10}
-            bg="white"
-            rounded="md"
-            mb={16}>
-            <RenderHtml
-              source={{
-                html:
-                  wikiInfo.textFormat === 'html'
-                    ? wikiInfo.body
-                    : mdParser.render(wikiInfo.body),
-              }}
-            />
-          </ScrollDiv>
-          <ScrollDiv
-            nestedScrollEnabled={true}
-            scrollEventThrottle={20}
-            keyboardDismissMode={'none'}
-            w={windowWidth * 0.9}
-            alignSelf="center"
-            pt={10}>
-            <Button
-              mb={16}
-              bg="pink600"
-              w={'100%'}
-              onPress={() => handleSubmit()}>
-              投稿
-            </Button>
-            {errors.body && touched.body ? (
-              <Text fontSize={16} color="tomato">
-                {errors.body}
-              </Text>
-            ) : null}
-            <TextEditor
-              textFormat={wikiInfo.textFormat}
-              onUploadImage={handleUploadImage}
-              onChange={text => setNewAnswer(a => ({...a, body: text}))}
-            />
-          </ScrollDiv>
+            keyboardDismissMode={'none'}>
+            <Div
+              w={windowWidth * 0.9}
+              h={windowHeight * 0.3}
+              alignSelf="center"
+              pt={10}
+              bg="white"
+              rounded="md"
+              mb={16}>
+              <RenderHtml
+                source={{
+                  html:
+                    wikiInfo.textFormat === 'html'
+                      ? wikiInfo.body
+                      : mdParser.render(wikiInfo.body),
+                }}
+              />
+            </Div>
+            <Div w={windowWidth * 0.9} alignSelf="center" pt={10}>
+              <Button
+                mb={16}
+                bg="pink600"
+                w={'100%'}
+                onPress={() => handleSubmit()}>
+                投稿
+              </Button>
+              {errors.body && touched.body ? (
+                <Text fontSize={16} color="tomato">
+                  {errors.body}
+                </Text>
+              ) : null}
+              <TextEditor
+                textFormat={wikiInfo.textFormat}
+                onUploadImage={handleUploadImage}
+                onChange={text => setNewAnswer(a => ({...a, body: text}))}
+              />
+            </Div>
+          </KeyboardAwareScrollView>
         </>
       ) : null}
     </WholeContainer>

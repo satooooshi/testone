@@ -15,6 +15,9 @@ import {
   Textarea,
   useToast,
   Text,
+  RadioGroup,
+  Radio,
+  Stack,
 } from '@chakra-ui/react';
 import { useAuthenticate } from 'src/contexts/useAuthenticate';
 import { imageExtensions } from 'src/utils/imageExtensions';
@@ -52,8 +55,13 @@ const Profile = () => {
   const { data: tags } = useAPIGetUserTag();
   const initialUserValues = {
     email: '',
+    isEmailPublic: false,
+    phone: '',
+    isPhonePublic: false,
     lastName: '',
     firstName: '',
+    lastNameKana: '',
+    firstNameKana: '',
     avatarUrl: '',
     introduceOther: '',
     introduceTech: '',
@@ -273,6 +281,7 @@ const Profile = () => {
           ) : null}
           {selectImageUrl ? (
             <ReactCrop
+              keepSelection={true}
               src={selectImageUrl}
               crop={crop}
               onChange={(newCrop) => {
@@ -301,6 +310,61 @@ const Profile = () => {
               background="white"
               onChange={handleChange}
             />
+            <Stack spacing={5} direction="row">
+              <Radio
+                bg="white"
+                colorScheme="green"
+                isChecked={userInfo.isEmailPublic}
+                value={'public'}
+                onChange={() =>
+                  setUserInfo((v) => ({ ...v, isEmailPublic: true }))
+                }>
+                公開
+              </Radio>
+              <Radio
+                bg="white"
+                colorScheme="green"
+                isChecked={!userInfo.isEmailPublic}
+                value={'inPublic'}
+                onChange={() =>
+                  setUserInfo((v) => ({ ...v, isEmailPublic: true }))
+                }>
+                非公開
+              </Radio>
+            </Stack>
+          </FormControl>
+          <FormControl className={profileStyles.input_wrapper}>
+            <FormLabel fontWeight={'bold'}>電話番号</FormLabel>
+            <Input
+              type="phone"
+              name="phone"
+              placeholder="000-0000-0000"
+              background="white"
+              value={userInfo.phone}
+              onChange={handleChange}
+            />
+            <Stack spacing={5} direction="row">
+              <Radio
+                bg="white"
+                colorScheme="green"
+                isChecked={userInfo.isPhonePublic}
+                value={'public'}
+                onChange={() =>
+                  setUserInfo((v) => ({ ...v, isPhonePublic: true }))
+                }>
+                公開
+              </Radio>
+              <Radio
+                bg="white"
+                colorScheme="green"
+                isChecked={!userInfo.isPhonePublic}
+                value={'unPublic'}
+                onChange={() =>
+                  setUserInfo((v) => ({ ...v, isPhonePublic: false }))
+                }>
+                非公開
+              </Radio>
+            </Stack>
           </FormControl>
           <FormControl className={profileStyles.input_wrapper}>
             <FormLabel fontWeight={'bold'}>姓</FormLabel>
@@ -320,6 +384,28 @@ const Profile = () => {
               name="firstName"
               placeholder="太郎"
               value={userInfo.firstName}
+              background="white"
+              onChange={handleChange}
+            />
+          </FormControl>
+          <FormControl className={profileStyles.input_wrapper}>
+            <FormLabel fontWeight={'bold'}>姓(フリガナ)</FormLabel>
+            <Input
+              type="text"
+              name="lastNameKana"
+              placeholder="ヤマダ"
+              value={userInfo.lastNameKana}
+              background="white"
+              onChange={handleChange}
+            />
+          </FormControl>
+          <FormControl className={profileStyles.input_wrapper}>
+            <FormLabel fontWeight={'bold'}>名(フリガナ)</FormLabel>
+            <Input
+              type="text"
+              name="firstNameKana"
+              placeholder="タロウ"
+              value={userInfo.firstNameKana}
               background="white"
               onChange={handleChange}
             />

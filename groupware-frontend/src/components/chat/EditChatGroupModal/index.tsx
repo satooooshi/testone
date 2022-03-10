@@ -138,6 +138,7 @@ const EditChatGroupModal: React.FC<EditChatGroupModalProps> = ({
                   onComplete={(c) => setCompletedCrop(c)}
                   onImageLoaded={onLoad}
                   circularCrop={true}
+                  keepSelection={true}
                 />
               ) : (
                 <Box

@@ -51,6 +51,7 @@ const HeaderTemplate: React.FC<HeaderTemplateProps> = ({
             <TouchableOpacity
               onPress={() => {
                 if (screenForBack) {
+                  navigation.goBack();
                   navigation.navigate(screenForBack as any);
                 } else {
                   navigation.goBack();
@@ -59,10 +60,11 @@ const HeaderTemplate: React.FC<HeaderTemplateProps> = ({
               <Icon name="left" fontSize={26} mr={4} />
             </TouchableOpacity>
           )}
-          <TouchableOpacity
+          {/* ハンバーガーメニュー */}
+          {/* <TouchableOpacity
             onPress={() => navigation.dispatch(DrawerActions.toggleDrawer())}>
             <Ionicons name="menu-outline" size={26} />
-          </TouchableOpacity>
+          </TouchableOpacity> */}
           <TouchableHighlight
             onPress={() => navigation.navigate('Home' as any)}
             underlayColor="none">

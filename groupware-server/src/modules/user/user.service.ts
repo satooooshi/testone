@@ -47,6 +47,7 @@ export class UserService {
     const csvFields = [
       { label: 'id', value: 'id' },
       { label: 'メールアドレス', value: 'email' },
+      { label: '電話番号', value: 'phone' },
       { label: '姓', value: 'lastName' },
       { label: '名', value: 'firstName' },
       { label: '自己紹介', value: 'introduce' },
@@ -155,6 +156,7 @@ export class UserService {
       entityUsers.push({
         id: u.user_id,
         email: u.user_email,
+        phone: u.user_phone,
         lastName: u.user_last_name,
         firstName: u.user_first_name,
         introduce: u.user_introduce,
@@ -208,7 +210,7 @@ export class UserService {
         ? 'answerCount'
         : sort === 'knowledge'
         ? 'knowledgeCount'
-        : 'user.createdAt';
+        : 'user.lastNameKana';
     let offset: number;
     let fromDate: Date;
     if (duration === 'month') {
@@ -318,7 +320,7 @@ export class UserService {
       }, 'knowledgeCount')
       .skip(offset)
       .take(limit)
-      .orderBy(sortKey, 'DESC')
+      .orderBy(sortKey, sortKey === 'user.lastNameKana' ? 'ASC' : 'DESC')
       .getManyAndCount();
     const userIDs = users.map((u) => u.id);
     const userArrWithTags = await this.userRepository.findByIds(userIDs, {
@@ -421,7 +423,9 @@ export class UserService {
   }
 
   async getUsers(): Promise<User[]> {
-    const users = await this.userRepository.find();
+    const users = await this.userRepository.find({
+      order: { lastNameKana: 'ASC' },
+    });
     return users;
   }
 
@@ -444,7 +448,14 @@ export class UserService {
   async getAllInfoById(id: number): Promise<User> {
     const user = await this.userRepository.findOne({
       where: { id },
-      relations: ['tags'],
+      relations: [
+        'tags',
+        'userGoodForBoard',
+        'userGoodForBoard.userGoodForBoard',
+        'userGoodForBoard.tags',
+        'userGoodForBoard.writer',
+        'userGoodForBoard.answers',
+      ],
     });
     if (!user) {
       throw new NotFoundException('User with this id does not exist');
@@ -452,6 +463,10 @@ export class UserService {
     if (!user?.verifiedAt) {
       throw new BadRequestException('The user is not verified');
     }
+    for (const wiki of user.userGoodForBoard) {
+      wiki.isGoodSender = true;
+    }
+
     return user;
   }
 
@@ -506,8 +521,26 @@ export class UserService {
   async registerUsers(userData: User[]) {
     const usersArr: User[] = [];
     for (const u of userData) {
-      const hashedPassword = await hash(u.password, 10);
-      usersArr.push({ ...u, password: hashedPassword, verifiedAt: new Date() });
+      const existUser = await this.userRepository.findOne({
+        email: u.email,
+      });
+      if (!u.email && !u.password && !existUser) {
+        throw new BadRequestException('メールアドレスとパスワードは必須です');
+      }
+      if (existUser) {
+        usersArr.push({
+          ...existUser,
+          ...u,
+          verifiedAt: new Date(),
+        });
+      } else {
+        const hashedPassword = await hash(u.password, 10);
+        usersArr.push({
+          ...u,
+          password: hashedPassword,
+          verifiedAt: new Date(),
+        });
+      }
     }
     const newUsers = await this.userRepository.save(usersArr);
     return newUsers;

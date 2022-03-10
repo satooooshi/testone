@@ -78,8 +78,13 @@ export type TextFormat = 'markdown' | 'html';
 export interface User {
   id: number;
   email: string;
+  isEmailPublic: boolean;
+  phone: string;
+  isPhonePublic: boolean;
   lastName: string;
   firstName: string;
+  lastNameKana: string;
+  firstNameKana: string;
   introduceTech: string;
   introduceQualification: string;
   introduceHobby: string;
@@ -107,7 +112,7 @@ export interface User {
   defaultAttendance: DefaultAttendance;
   //this params is sent when login
   token?: string;
-
+  userGoodForBoard?: Wiki[];
   eventCount?: number;
   questionCount?: number;
   answerCount?: number;
@@ -148,6 +153,8 @@ export interface Wiki {
   bestAnswer?: QAAnswer;
   createdAt: Date;
   updatedAt: Date;
+  userGoodForBoard?: User[];
+  isGoodSender?: boolean;
 }
 
 export interface QAAnswerReply {

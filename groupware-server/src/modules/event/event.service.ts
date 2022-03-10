@@ -242,7 +242,9 @@ export class EventScheduleService {
         { queryWord: `%${word}%` },
       )
       .andWhere(
-        status === 'future'
+        query.participant_id
+          ? '1=1'
+          : status === 'future'
           ? 'events.start_at > now()'
           : status === 'past'
           ? 'events.start_at < now() AND events.end_at < now()'
@@ -412,6 +414,38 @@ export class EventScheduleService {
       .take(limit)
       .getMany();
     return latestEvents;
+  }
+
+  public async getEventsStartAtAnHourLater(): Promise<EventSchedule[]> {
+    const minDateNow = new Date();
+    const maxDateNow = new Date();
+    const minDate = new Date(
+      minDateNow.setHours(
+        minDateNow.getHours() + 1,
+        minDateNow.getMinutes() - 1,
+        59,
+        999,
+      ),
+    );
+    const maxDate = new Date(
+      maxDateNow.setHours(
+        maxDateNow.getHours() + 1,
+        maxDateNow.getMinutes() + 1,
+        0,
+        0,
+      ),
+    );
+    const events = await this.eventRepository
+      .createQueryBuilder('events')
+      .leftJoinAndSelect('events.userJoiningEvent', 'userJoiningEvent')
+      .leftJoinAndSelect('userJoiningEvent.user', 'user')
+      .leftJoinAndSelect('events.author', 'author')
+      .leftJoinAndSelect('events.hostUsers', 'hostUsers')
+      .leftJoinAndSelect('events.tags', 'tags')
+      .where('events.startAt > :minDate', { minDate })
+      .andWhere('events.startAt < :maxDate', { maxDate })
+      .getMany();
+    return events;
   }
 
   public async saveEvent(

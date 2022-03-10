@@ -4,11 +4,13 @@ import {
   JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
+  Unique,
 } from 'typeorm';
 import { ChatGroup } from './chatGroup.entity';
 import { User } from './user.entity';
 
 @Entity({ name: 'last_read_chat_time' })
+@Unique(['user', 'chatGroup'])
 export class LastReadChatTime {
   @PrimaryGeneratedColumn()
   id: number;

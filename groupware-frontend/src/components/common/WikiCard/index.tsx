@@ -1,12 +1,16 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { dateTimeFormatterFromJSDDate } from 'src/utils/dateTimeFormatter';
-import { BoardCategory, Wiki, WikiType } from 'src/types';
+import { BoardCategory, User, Wiki, WikiType } from 'src/types';
 import { Box, Button, Link, Text, useMediaQuery } from '@chakra-ui/react';
 import { tagColorFactory } from 'src/utils/factory/tagColorFactory';
 import { wikiTypeNameFactory } from 'src/utils/wiki/wikiTypeNameFactory';
 import UserAvatar from '../UserAvatar';
 import { darkFontColor } from 'src/utils/colors';
 import { hideScrollbarCss } from 'src/utils/chakra/hideScrollBar.css';
+import { AiFillHeart, AiOutlineHeart } from 'react-icons/ai';
+import GoodSendersModal from '@/components/wiki/GoodSendersModal';
+import { useAPIToggleGoodForBoard } from '@/hooks/api/wiki/useAPIToggleGoodForBoard';
+import { useAuthenticate } from 'src/contexts/useAuthenticate';
 
 type WikiCardProps = {
   wiki: Wiki;
@@ -14,7 +18,33 @@ type WikiCardProps = {
 
 const WikiCard: React.FC<WikiCardProps> = ({ wiki }) => {
   const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
-  const { title, writer, tags, createdAt, answers } = wiki;
+  const [goodSendersModal, setGoodSendersModal] = useState(false);
+  const { user } = useAuthenticate();
+  const [wikiState, setWikiState] = useState(wiki);
+
+  const [isPressHeart, setIsPressHeart] = useState<boolean>(
+    wikiState.isGoodSender || false,
+  );
+
+  const { mutate } = useAPIToggleGoodForBoard({
+    onSuccess: () => {
+      setIsPressHeart((prevHeartStatus) => {
+        setWikiState((w) => {
+          if (prevHeartStatus) {
+            w.userGoodForBoard = w.userGoodForBoard?.filter(
+              (u) => u.id !== user?.id,
+            );
+          } else {
+            w.userGoodForBoard = [user as User, ...(w.userGoodForBoard || [])];
+          }
+          return w;
+        });
+
+        return !prevHeartStatus;
+      });
+    },
+  });
+
   const tagButtonColor = useMemo(() => {
     switch (wiki.type) {
       case WikiType.BOARD:
@@ -26,9 +56,12 @@ const WikiCard: React.FC<WikiCardProps> = ({ wiki }) => {
     }
   }, [wiki.type]);
 
+  useEffect(() => {
+    setWikiState(wiki);
+  }, [wiki]);
+
   return (
-    <Link
-      href={`/wiki/detail/${wiki.id}`}
+    <Box
       w={isSmallerThan768 ? '100vw' : 'min(1600px, 70vw)'}
       minH="104px"
       shadow="md"
@@ -36,7 +69,15 @@ const WikiCard: React.FC<WikiCardProps> = ({ wiki }) => {
       borderColor={'gray.300'}
       bg="#ececec"
       py="4px"
-      _hover={{ textDecoration: 'none', cursor: 'pointer' }}>
+      position="relative">
+      <Link
+        position="absolute"
+        top={0}
+        left={0}
+        right={0}
+        bottom={0}
+        href={`/wiki/detail/${wiki.id}`}
+      />
       <Box
         px="16px"
         display="flex"
@@ -45,13 +86,13 @@ const WikiCard: React.FC<WikiCardProps> = ({ wiki }) => {
         mb="8px"
         justifyContent="space-bewtween">
         <Box w="90%" display="flex" alignItems="center">
-          {wiki.type !== WikiType.RULES && writer ? (
+          {wiki.type !== WikiType.RULES && wikiState.writer ? (
             <Link
-              href={`/account/${writer.id}`}
+              href={`/account/${wikiState.writer.id}`}
               passHref
               _hover={{ textDecoration: 'none' }}>
               <UserAvatar
-                user={writer}
+                user={wikiState.writer}
                 w="40px"
                 h="40px"
                 rounded="full"
@@ -67,7 +108,7 @@ const WikiCard: React.FC<WikiCardProps> = ({ wiki }) => {
             w="100%"
             isTruncated
             overflow="hidden">
-            {title}
+            {wikiState.title}
           </Text>
         </Box>
       </Box>
@@ -78,34 +119,74 @@ const WikiCard: React.FC<WikiCardProps> = ({ wiki }) => {
         display="flex"
         alignItems="center"
         justifyContent="flex-end">
-        {wiki.type === WikiType.BOARD &&
-        wiki.boardCategory === BoardCategory.QA ? (
-          <Box
-            mr="16px"
-            display="flex"
-            flexDir={'row'}
-            alignItems="center"
-            justifyContent="center">
-            <Text color={darkFontColor} mr={'4px'}>
-              回答
+        <Box display="flex" flexDir="row" height={5} alignItems="center">
+          {wikiState.type === WikiType.BOARD && (
+            <Box display="flex" mr={3}>
+              <Link
+                position={'relative'}
+                onClick={() => {
+                  mutate(wikiState.id);
+                }}>
+                {isPressHeart ? (
+                  <AiFillHeart size={30} color="red" />
+                ) : (
+                  <AiOutlineHeart size={30} color="black" />
+                )}
+              </Link>
+              <Link
+                onClick={() => {
+                  setGoodSendersModal(true);
+                }}>
+                <Button
+                  colorScheme={'blue'}
+                  color="white"
+                  size={
+                    'sm'
+                  }>{`${wikiState.userGoodForBoard?.length}件のいいね`}</Button>
+              </Link>
+            </Box>
+          )}
+          {wiki.type === WikiType.BOARD ? (
+            <Box
+              mr="16px"
+              display="flex"
+              flexDir={'row'}
+              alignItems="center"
+              justifyContent="center">
+              <Text color={darkFontColor} mr={'4px'}>
+                {wiki.boardCategory === BoardCategory.QA ? '回答' : 'コメント'}
+              </Text>
+              <Text color="green.500" fontSize="22px" fontWeight="bold">
+                {wikiState.answers?.length.toString()}
+              </Text>
+            </Box>
+          ) : null}
+          <Box display="flex" flexDir={'column'} alignItems="end">
+            <Text fontSize={'16px'} color={darkFontColor} display="flex">
+              {`投稿日: ${dateTimeFormatterFromJSDDate({
+                dateTime: new Date(wikiState.createdAt),
+              })}`}
             </Text>
-            <Text color="green.500" fontSize="22px" fontWeight="bold">
-              {answers?.length.toString()}
+            <Text fontSize={'16px'} color={darkFontColor} display="flex">
+              {`最終更新日: ${dateTimeFormatterFromJSDDate({
+                dateTime: new Date(wikiState.updatedAt),
+              })}`}
             </Text>
           </Box>
-        ) : null}
-        <Text
-          fontSize={isSmallerThan768 ? '14px' : '16px'}
-          color={darkFontColor}
-          display="flex">
-          {dateTimeFormatterFromJSDDate({ dateTime: new Date(createdAt) })}
-        </Text>
+        </Box>
       </Box>
+
+      <GoodSendersModal
+        isOpen={goodSendersModal}
+        onClose={() => setGoodSendersModal(false)}
+        goodSenders={wiki.userGoodForBoard || []}
+      />
       <Box
         display="flex"
         flexDir={isSmallerThan768 ? 'column' : 'row'}
         justifyContent={isSmallerThan768 ? 'flex-start' : 'space-between'}>
         <Box
+          w="vw"
           pl="16px"
           display="flex"
           flexDir="row"
@@ -121,8 +202,8 @@ const WikiCard: React.FC<WikiCardProps> = ({ wiki }) => {
               )}
             </Button>
           </Link>
-          {tags && tags.length
-            ? tags.map((t) => (
+          {wikiState.tags && wikiState.tags.length
+            ? wikiState.tags.map((t) => (
                 <Link
                   href={`/wiki/list?tag=${t.id}`}
                   key={t.id}
@@ -136,7 +217,7 @@ const WikiCard: React.FC<WikiCardProps> = ({ wiki }) => {
             : null}
         </Box>
       </Box>
-    </Link>
+    </Box>
   );
 };
 

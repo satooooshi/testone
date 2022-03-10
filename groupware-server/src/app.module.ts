@@ -14,6 +14,7 @@ import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handleba
 import { TopNewsModule } from './modules/top-news/top-news.module';
 import { ChatGateway } from './gateway/chat.gateway';
 import { AttendanceModule } from './modules/attendance/attendance.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
@@ -63,6 +64,7 @@ import { AttendanceModule } from './modules/attendance/attendance.module';
       }),
       inject: [ConfigService],
     }),
+    ScheduleModule.forRoot(),
     UserModule,
     AuthModule,
     WikiModule,

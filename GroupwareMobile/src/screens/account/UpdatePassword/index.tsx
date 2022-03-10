@@ -1,17 +1,20 @@
-import {useNavigation} from '@react-navigation/native';
+import {useIsFocused, useNavigation} from '@react-navigation/native';
 import {useFormik} from 'formik';
-import React from 'react';
+import React, {useEffect} from 'react';
 import {ActivityIndicator, Alert, useWindowDimensions} from 'react-native';
 import {Button, Div, Icon, Input, Overlay, Text} from 'react-native-magnus';
 import HeaderWithTextButton from '../../../components/Header';
 import {Tab} from '../../../components/Header/HeaderTemplate';
 import WholeContainer from '../../../components/WholeContainer';
+import {useIsTabBarVisible} from '../../../contexts/bottomTab/useIsTabBarVisible';
 import {useAPIUpdatePassword} from '../../../hooks/api/user/useAPIUpdatePassword';
 import {UpdatePasswordNavigationProps} from '../../../types/navigator/drawerScreenProps';
 import {updatePasswordSchema} from '../../../utils/validation/schema';
 
 const UpdatePassword: React.FC = () => {
   const navigation = useNavigation<UpdatePasswordNavigationProps>();
+  const isFocused = useIsFocused();
+  const {setIsTabBarVisible} = useIsTabBarVisible();
   const {width: windowWidth} = useWindowDimensions();
   const {mutate: updatePassword, isLoading: loadingUpdate} =
     useAPIUpdatePassword({
@@ -51,6 +54,14 @@ const UpdatePassword: React.FC = () => {
         updatePassword(v);
       },
     });
+
+  useEffect(() => {
+    if (isFocused) {
+      setIsTabBarVisible(false);
+    } else {
+      setIsTabBarVisible(true);
+    }
+  }, [isFocused, setIsTabBarVisible]);
 
   return (
     <WholeContainer>

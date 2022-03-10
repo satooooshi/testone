@@ -47,14 +47,20 @@ export class WikiController {
   @Get('list')
   @UseGuards(JwtAuthenticationGuard)
   async getWikiList(
+    @Req() req: RequestWithUser,
     @Query() query: SearchQueryToGetWiki,
   ): Promise<SearchResultToGetWiki> {
-    return await this.qaService.getWikiList(query);
+    const userID = req.user.id;
+    return await this.qaService.getWikiList(userID, query);
   }
 
   @Get('detail/:id')
-  async getWikiDetail(@Param('id') id: number): Promise<Wiki> {
-    return await this.qaService.getWikiDetail(id);
+  @UseGuards(JwtAuthenticationGuard)
+  async getWikiDetail(
+    @Req() request: RequestWithUser,
+    @Param('id') id: number,
+  ): Promise<Wiki> {
+    return await this.qaService.getWikiDetail(request.user.id, id);
   }
 
   @Get('latest')
@@ -121,5 +127,14 @@ export class WikiController {
       ...wiki,
       resolvedAt: new Date(),
     });
+  }
+
+  @UseGuards(JwtAuthenticationGuard)
+  @Post('toggle-good-for-board')
+  async toggleGoodForBoard(
+    @Req() req: RequestWithUser,
+    @Body() WikiID: { id: number },
+  ): Promise<Partial<Wiki>> {
+    return this.qaService.toggleGoodForBoard(req.user.id, WikiID.id);
   }
 }

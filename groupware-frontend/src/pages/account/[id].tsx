@@ -28,8 +28,10 @@ import {
 } from '@chakra-ui/react';
 import { BoardCategory, TagType, UserTag, WikiType } from 'src/types';
 import { userRoleNameFactory } from 'src/utils/factory/userRoleNameFactory';
-import { darkFontColor } from 'src/utils/colors';
+import { blueColor, darkFontColor } from 'src/utils/colors';
 import { userNameFactory } from 'src/utils/factory/userNameFactory';
+import { useAPISaveChatGroup } from '@/hooks/api/chat/useAPISaveChatGroup';
+import { HiOutlineChat } from 'react-icons/hi';
 
 type UserTagListProps = {
   tags?: UserTag[];
@@ -90,7 +92,11 @@ const UserTagList: React.FC<UserTagListProps> = ({ tags, type, introduce }) => {
       </Box>
       <Box>
         <Text mb={2} fontSize={14}>{`${labelName}の紹介`}</Text>
-        <Text fontSize={16} color={darkFontColor} fontWeight="bold">
+        <Text
+          fontSize={16}
+          color={darkFontColor}
+          fontWeight="bold"
+          className={accountInfoStyles.introduce}>
           {introduce || '未入力'}
         </Text>
       </Box>
@@ -133,7 +139,7 @@ const MyAccountInfo = () => {
 
   const topTabBehaviorList: TopTabBehavior[] = [
     {
-      tabName: '詳細',
+      tabName: 'プロフィール',
       onClick: () => {
         setActiveTab(TabName.DETAIL);
       },
@@ -160,7 +166,22 @@ const MyAccountInfo = () => {
       },
       isActiveTab: activeTab === TabName.KNOWLEDGE,
     },
+    {
+      tabName: 'いいね (直近20件)',
+      onClick: () => {
+        setActiveTab(TabName.GOOD);
+      },
+      isActiveTab: activeTab === TabName.GOOD,
+    },
   ];
+
+  const { mutate: createGroup } = useAPISaveChatGroup({
+    onSuccess: (createdData) => {
+      router.push(`/chat/${createdData.id.toString()}`, undefined, {
+        shallow: true,
+      });
+    },
+  });
 
   return (
     <LayoutWithTab
@@ -215,7 +236,7 @@ const MyAccountInfo = () => {
                 fontWeight="bold"
                 color={darkFontColor}
                 display="block">
-                {userNameFactory(user)}
+                {userNameFactory(profile)}
               </Text>
             </Box>
 
@@ -262,6 +283,40 @@ const MyAccountInfo = () => {
                   </Box>
                   <Box
                     display="flex"
+                    mb={5}
+                    flexDir="row"
+                    alignItems="center"
+                    w="100%">
+                    <Text fontSize={14} w={'10%'}>
+                      {'メール　'}:
+                    </Text>
+                    <Text
+                      fontWeight="bold"
+                      w="85%"
+                      fontSize={18}
+                      color={darkFontColor}>
+                      {profile.isEmailPublic ? profile.email : '非公開'}
+                    </Text>
+                  </Box>
+                  <Box
+                    display="flex"
+                    mb={5}
+                    flexDir="row"
+                    alignItems="center"
+                    w="100%">
+                    <Text fontSize={14} w={'10%'}>
+                      電話番号:
+                    </Text>
+                    <Text
+                      fontWeight="bold"
+                      w="85%"
+                      fontSize={18}
+                      color={darkFontColor}>
+                      {profile.isPhonePublic ? profile.phone : '非公開'}
+                    </Text>
+                  </Box>
+                  <Box
+                    display="flex"
                     flexDir="row"
                     alignItems="center"
                     mb={8}
@@ -278,7 +333,12 @@ const MyAccountInfo = () => {
                       {profile.introduceOther || '未入力'}
                     </Text>
                   </Box>
-                  <Box w={'100%'} display="flex" flexDir="row" flexWrap="wrap">
+                  <Box
+                    w={'100%'}
+                    mb={35}
+                    display="flex"
+                    flexDir="row"
+                    flexWrap="wrap">
                     <Box mb={8} mr={4} w={isSmallerThan1024 ? '100%' : '49%'}>
                       <UserTagList
                         tags={profile.tags}
@@ -308,37 +368,80 @@ const MyAccountInfo = () => {
                       />
                     </Box>
                   </Box>
+                  {profile?.id !== user?.id && (
+                    <Button
+                      h={'64px'}
+                      w={'64px'}
+                      bg={blueColor}
+                      position={'fixed'}
+                      top={'auto'}
+                      bottom={'24px'}
+                      right={'24px'}
+                      rounded={'full'}
+                      zIndex={1}
+                      px={0}
+                      _hover={{ textDecoration: 'none' }}>
+                      <HiOutlineChat
+                        style={{ width: 40, height: 40 }}
+                        onClick={() =>
+                          createGroup({ name: '', members: [profile] })
+                        }
+                        color="white"
+                      />
+                    </Button>
+                  )}
                 </Box>
               </>
             )}
 
-            {activeTab === TabName.EVENT && events && events.events.length ? (
-              <SimpleGrid columns={{ sm: 1, md: 1, lg: 2 }} spacing="16px">
-                {events.events.map((e) => (
-                  <EventCard
-                    key={e.id}
-                    hrefTagClick={(t) => `/event/list?tag=${t.id}`}
-                    eventSchedule={e}
-                  />
-                ))}
-              </SimpleGrid>
+            {activeTab === TabName.EVENT ? (
+              events && events.events.length ? (
+                <SimpleGrid columns={{ sm: 1, md: 1, lg: 2 }} spacing="16px">
+                  {events.events.map((e) => (
+                    <EventCard
+                      key={e.id}
+                      hrefTagClick={(t) => `/event/list?tag=${t.id}`}
+                      eventSchedule={e}
+                    />
+                  ))}
+                </SimpleGrid>
+              ) : (
+                <Text fontSize={16}>
+                  参加したイベントが見つかりませんでした
+                </Text>
+              )
             ) : null}
 
-            {activeTab === TabName.QUESTION &&
-            questionList &&
-            questionList.wiki.length ? (
-              <Box>
-                {questionList.wiki.map((w) => (
-                  <WikiCard wiki={w} key={w.id} />
-                ))}
-              </Box>
+            {activeTab === TabName.QUESTION ? (
+              questionList && questionList.wiki.length ? (
+                <Box>
+                  {questionList.wiki.map((w) => (
+                    <WikiCard wiki={w} key={w.id} />
+                  ))}
+                </Box>
+              ) : (
+                <Text fontSize={16}>投稿した質問が見つかりませんでした</Text>
+              )
             ) : null}
 
-            {activeTab === TabName.KNOWLEDGE &&
-            knowledgeList &&
-            knowledgeList.wiki.length ? (
+            {activeTab === TabName.KNOWLEDGE ? (
+              knowledgeList && knowledgeList.wiki.length ? (
+                <Box>
+                  {knowledgeList.wiki.map((w) => (
+                    <WikiCard wiki={w} key={w.id} />
+                  ))}
+                </Box>
+              ) : (
+                <Text fontSize={16}>
+                  投稿したナレッジが見つかりませんでした
+                </Text>
+              )
+            ) : null}
+            {activeTab === TabName.GOOD &&
+            profile.userGoodForBoard &&
+            profile.userGoodForBoard.length ? (
               <Box>
-                {knowledgeList.wiki.map((w) => (
+                {profile.userGoodForBoard.map((w) => (
                   <WikiCard wiki={w} key={w.id} />
                 ))}
               </Box>

@@ -5,6 +5,7 @@ import {
   ChatNote,
   EventType,
   RuleCategory,
+  User,
   WikiType,
 } from '../../types';
 
@@ -12,6 +13,7 @@ export type RootStackParamList = {
   Home: undefined;
   Login: undefined;
   Main: undefined;
+  TabBar: undefined;
   EventList: {
     type?: EventType;
     tag?: string;
@@ -19,6 +21,7 @@ export type RootStackParamList = {
   };
   EventDetail: {
     id: number;
+    previousScreenName?: keyof RootStackParamList;
   };
   Wiki: undefined;
   WikiList: {
@@ -28,6 +31,7 @@ export type RootStackParamList = {
   };
   WikiDetail: {
     id: number;
+    previousScreenName?: keyof RootStackParamList;
   };
   PostWiki: {
     type?: WikiType;
@@ -56,13 +60,14 @@ export type RootStackParamList = {
   };
   UserAdmin: undefined;
   UserRegisteringAdmin: undefined;
+  EditedProfile: {id?: number};
   TagAdmin: undefined;
   UserTagAdmin: undefined;
   Chat: {
     room: ChatGroup;
   };
   RoomList: undefined;
-  NewRoom: undefined;
+  NewRoom: undefined | {selectedMembers: User[]};
   EditRoom: {room: ChatGroup};
   ChatMenu: {
     room: ChatGroup;

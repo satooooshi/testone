@@ -61,6 +61,31 @@ export class User {
   email: string;
 
   @Column({
+    type: 'boolean',
+    name: 'isEmailPublic',
+    nullable: false,
+    default: false,
+  })
+  isEmailPublic: boolean;
+
+  @Column({
+    type: 'varchar',
+    name: 'phone',
+    length: 100,
+    nullable: false,
+    default: '',
+  })
+  phone: string;
+
+  @Column({
+    type: 'boolean',
+    name: 'isPhonePublic',
+    nullable: false,
+    default: false,
+  })
+  isPhonePublic: boolean;
+
+  @Column({
     type: 'varchar',
     name: 'last_name',
     length: 50,
@@ -77,6 +102,24 @@ export class User {
     default: '',
   })
   firstName: string;
+
+  @Column({
+    type: 'varchar',
+    name: 'last_name_kana',
+    length: 50,
+    nullable: false,
+    default: '',
+  })
+  lastNameKana: string;
+
+  @Column({
+    type: 'varchar',
+    name: 'first_name_kana',
+    length: 50,
+    nullable: false,
+    default: '',
+  })
+  firstNameKana: string;
 
   @Column({
     type: 'varchar',
@@ -258,6 +301,23 @@ export class User {
     onDelete: 'CASCADE',
   })
   chatGroups?: ChatGroup[];
+
+  @ManyToMany(() => Wiki, (wiki) => wiki.userGoodForBoard, {
+    onUpdate: 'CASCADE',
+    onDelete: 'CASCADE',
+  })
+  @JoinTable({
+    name: 'user_good_for_board',
+    joinColumn: {
+      name: 'user_id',
+      referencedColumnName: 'id',
+    },
+    inverseJoinColumn: {
+      name: 'wiki_id',
+      referencedColumnName: 'id',
+    },
+  })
+  userGoodForBoard?: Wiki[];
 
   @OneToMany(() => Wiki, (wiki) => wiki.writer)
   wiki?: Wiki[];

@@ -33,7 +33,7 @@ export class StorageService {
       const bucketName = this.configService.get('CLOUD_STORAGE_BUCKET');
       const signedURL = await this.storage
         .bucket(bucketName)
-        .file(Date.now() + '/' + fn.replace(/ /g, '_'))
+        .file(Date.now() + '/')
         .getSignedUrl(options);
       signedURLs[fn] = signedURL[0];
     }
