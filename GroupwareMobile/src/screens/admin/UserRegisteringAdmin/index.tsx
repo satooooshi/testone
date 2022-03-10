@@ -1,5 +1,5 @@
 import {useFormik} from 'formik';
-import React, {useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -40,6 +40,8 @@ import {branchTypeNameFactory} from '../../../utils/factory/branchTypeNameFactor
 import {createUserSchema} from '../../../utils/validation/schema';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import {useAdminHeaderTab} from '../../../contexts/admin/useAdminHeaderTab';
+import {useIsFocused} from '@react-navigation/native';
+import {useIsTabBarVisible} from '../../../contexts/bottomTab/useIsTabBarVisible';
 
 const initialValues: Partial<User> = {
   email: '',
@@ -62,6 +64,8 @@ const initialValues: Partial<User> = {
 const UserRegisteringAdmin: React.FC = () => {
   const userRoleDropdownRef = useRef<any | null>(null);
   const branchTypeDropdownRef = useRef<any | null>(null);
+  const isFocused = useIsFocused();
+  const {setIsTabBarVisible} = useIsTabBarVisible();
   const {mutate: register, isLoading} = useAPIRegister({
     onSuccess: responseData => {
       if (responseData) {
@@ -135,6 +139,14 @@ const UserRegisteringAdmin: React.FC = () => {
     },
   });
   const tabs = useAdminHeaderTab();
+
+  useEffect(() => {
+    if (isFocused) {
+      setIsTabBarVisible(false);
+    } else {
+      setIsTabBarVisible(true);
+    }
+  }, [isFocused, setIsTabBarVisible]);
 
   const handleUploadImage = async () => {
     const {formData} = await uploadImageFromGallery({

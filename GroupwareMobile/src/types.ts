@@ -131,7 +131,7 @@ export interface User {
   qaAnswerReplies?: QAAnswerReply[];
   //this params is sent when login
   token?: string;
-
+  userGoodForBoard?: Wiki[];
   eventCount?: number;
   questionCount?: number;
   answerCount?: number;

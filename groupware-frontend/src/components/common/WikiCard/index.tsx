@@ -146,8 +146,7 @@ const WikiCard: React.FC<WikiCardProps> = ({ wiki }) => {
               </Link>
             </Box>
           )}
-          {wiki.type === WikiType.BOARD &&
-          wiki.boardCategory === BoardCategory.QA ? (
+          {wiki.type === WikiType.BOARD ? (
             <Box
               mr="16px"
               display="flex"
@@ -155,18 +154,25 @@ const WikiCard: React.FC<WikiCardProps> = ({ wiki }) => {
               alignItems="center"
               justifyContent="center">
               <Text color={darkFontColor} mr={'4px'}>
-                回答
+                {wiki.boardCategory === BoardCategory.QA ? '回答' : 'コメント'}
               </Text>
               <Text color="green.500" fontSize="22px" fontWeight="bold">
                 {wikiState.answers?.length.toString()}
               </Text>
             </Box>
           ) : null}
-          <Text fontSize={'16px'} color={darkFontColor} display="flex">
-            {dateTimeFormatterFromJSDDate({
-              dateTime: new Date(wikiState.createdAt),
-            })}
-          </Text>
+          <Box display="flex" flexDir={'column'} alignItems="end">
+            <Text fontSize={'16px'} color={darkFontColor} display="flex">
+              {`投稿日: ${dateTimeFormatterFromJSDDate({
+                dateTime: new Date(wikiState.createdAt),
+              })}`}
+            </Text>
+            <Text fontSize={'16px'} color={darkFontColor} display="flex">
+              {`最終更新日: ${dateTimeFormatterFromJSDDate({
+                dateTime: new Date(wikiState.updatedAt),
+              })}`}
+            </Text>
+          </Box>
         </Box>
       </Box>
 

@@ -302,7 +302,8 @@ const QuestionDetail = () => {
               <WikiComment
                 textFormat={wiki.textFormat}
                 body={wiki.body}
-                date={wiki.createdAt}
+                createdAt={wiki.createdAt}
+                updatedAt={wiki.updatedAt}
                 writer={wiki.writer}
                 isWriter={isEditableWiki(wiki, user)}
                 onClickEditButton={() =>
@@ -314,11 +315,11 @@ const QuestionDetail = () => {
               />
             </div>
           </div>
-          {wiki.type === WikiType.BOARD &&
-          wiki.boardCategory === BoardCategory.QA ? (
+          {wiki.type === WikiType.BOARD ? (
             <div className={qaDetailStyles.answer_count__wrapper}>
               <p className={qaDetailStyles.answer_count}>
-                回答{wiki.answers?.length ? wiki.answers.length : 0}件
+                {wiki.boardCategory === BoardCategory.QA ? '回答' : 'コメント'}
+                {wiki.answers?.length ? wiki.answers.length : 0}件
               </p>
               <Button
                 size="sm"
@@ -326,7 +327,13 @@ const QuestionDetail = () => {
                 onClick={() => {
                   checkErrors('answer');
                 }}>
-                {answerVisible ? '回答を投稿する' : '回答を追加'}
+                {wiki.boardCategory === BoardCategory.QA
+                  ? answerVisible
+                    ? '回答を投稿する'
+                    : '回答を追加'
+                  : answerVisible
+                  ? 'コメントを投稿する'
+                  : 'コメントを追加'}
               </Button>
             </div>
           ) : null}
@@ -336,7 +343,11 @@ const QuestionDetail = () => {
                 marginBottom: 40,
                 width: isSmallerThan768 ? '100vw' : '80vw',
               }}
-              placeholder="回答を記入してください"
+              placeholder={
+                wiki.boardCategory === BoardCategory.QA
+                  ? '回答を記入してください'
+                  : 'コメントを記入してください'
+              }
               editorRef={draftEditor}
               editorState={answerEditorState}
               setEditorState={setAnswerEditorState}
@@ -353,11 +364,13 @@ const QuestionDetail = () => {
                         <div className={qaDetailStyles.qa_wrapper}>
                           <WikiComment
                             bestAnswerButtonName={
-                              wiki.bestAnswer?.id === answer.id
-                                ? 'ベストアンサーに選ばれた回答'
-                                : !wiki.resolvedAt &&
-                                  myself?.id === wiki.writer?.id
-                                ? 'ベストアンサーに選ぶ'
+                              wiki.boardCategory === BoardCategory.QA
+                                ? wiki.bestAnswer?.id === answer.id
+                                  ? 'ベストアンサーに選ばれた回答'
+                                  : !wiki.resolvedAt &&
+                                    myself?.id === wiki.writer?.id
+                                  ? 'ベストアンサーに選ぶ'
+                                  : undefined
                                 : undefined
                             }
                             isExistsBestAnswer={wiki.bestAnswer ? true : false}
@@ -366,7 +379,8 @@ const QuestionDetail = () => {
                               createBestAnswer({ ...wiki, bestAnswer: answer })
                             }
                             body={answer.body}
-                            date={answer.createdAt}
+                            createdAt={answer.createdAt}
+                            updatedAt={answer.updatedAt}
                             writer={answer.writer}
                             isWriter={myself?.id === wiki.writer?.id}
                             replyButtonName={
@@ -389,7 +403,11 @@ const QuestionDetail = () => {
                             width: isSmallerThan768 ? '100vw' : '70vw',
                           }}
                           editorRef={draftEditor}
-                          placeholder="回答への返信を記入してください"
+                          placeholder={
+                            wiki.boardCategory === BoardCategory.QA
+                              ? '回答への返信を記入してください'
+                              : 'コメントへの返信を記入してください'
+                          }
                           editorState={answerReplyEditorState}
                           setEditorState={setAnswerReplyEditorState}
                         />
