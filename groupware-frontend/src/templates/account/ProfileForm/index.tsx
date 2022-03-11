@@ -1,4 +1,4 @@
-import React, { useReducer } from 'react';
+import React, { useReducer, useRef, useCallback } from 'react';
 import profileStyles from '@/styles/layouts/Profile.module.scss';
 import { User, TagType, BranchType, UserTag } from 'src/types';
 import {
@@ -12,9 +12,15 @@ import {
   Radio,
   Stack,
 } from '@chakra-ui/react';
+import Image from 'next/image';
+import noImage from '@/public/no-image.jpg';
+import ReactCrop from 'react-image-crop';
 import { useFormik } from 'formik';
+import { useDropzone } from 'react-dropzone';
 import FormToLinkTag from '@/components/FormToLinkTag';
 import TagModal from '@/components/common/TagModal';
+import { useImageCrop } from '@/hooks/crop/useImageCrop';
+import { imageExtensions } from 'src/utils/imageExtensions';
 import { toggleTag } from 'src/utils/toggleTag';
 
 type ProfileFormProps = {
@@ -94,6 +100,33 @@ const ProfileForm: React.FC<ProfileFormProps> = (profile, tags) => {
     },
   );
 
+  const [
+    {
+      crop,
+      completedCrop,
+      croppedImageURL,
+      imageName: selectImageName,
+      imageURL: selectImageUrl,
+    },
+    dispatchCrop,
+  ] = useImageCrop();
+  const imgRef = useRef<HTMLImageElement | null>(null);
+
+  const onEventImageDrop = useCallback(
+    (f: File[]) => {
+      dispatchCrop({ type: 'setImageFile', value: f[0] });
+    },
+    [dispatchCrop],
+  );
+
+  const {
+    getRootProps: getEventImageRootProps,
+    getInputProps: getEventImageInputProps,
+  } = useDropzone({
+    onDrop: onEventImageDrop,
+    accept: imageExtensions,
+  });
+
   const {
     values: userInfo,
     setValues: setUserInfo,
@@ -117,6 +150,10 @@ const ProfileForm: React.FC<ProfileFormProps> = (profile, tags) => {
     }));
   };
 
+  const onLoad = useCallback((img) => {
+    imgRef.current = img;
+  }, []);
+
   return (
     <>
       {tags.length && (
@@ -133,6 +170,55 @@ const ProfileForm: React.FC<ProfileFormProps> = (profile, tags) => {
           onComplete={() => dispatchModal({ type: 'close' })}
         />
       )}
+      <div className={profileStyles.image_wrapper}>
+        {userInfo.avatarUrl && !selectImageUrl ? (
+          <div
+            {...getEventImageRootProps({
+              className: profileStyles.image_dropzone,
+            })}>
+            <input {...getEventImageInputProps()} />
+            <img
+              className={profileStyles.avatar}
+              src={croppedImageURL ? croppedImageURL : userInfo.avatarUrl}
+              alt="アバター画像"
+            />
+          </div>
+        ) : null}
+        {!userInfo.avatarUrl && !selectImageUrl ? (
+          <div
+            {...getEventImageRootProps({
+              className: profileStyles.image_dropzone,
+            })}>
+            <input {...getEventImageInputProps()} />
+            <div className={profileStyles.next_image_wrapper}>
+              <Image
+                className={profileStyles.avatar}
+                src={noImage}
+                alt="アバター画像"
+              />
+            </div>
+          </div>
+        ) : null}
+        {selectImageUrl ? (
+          <ReactCrop
+            keepSelection={true}
+            src={selectImageUrl}
+            crop={crop}
+            onChange={(newCrop) => {
+              dispatchCrop({ type: 'setCrop', value: newCrop });
+            }}
+            onComplete={(c) => {
+              dispatchCrop({
+                type: 'setCompletedCrop',
+                value: c,
+                ref: imgRef.current,
+              });
+            }}
+            onImageLoaded={onLoad}
+            circularCrop={true}
+          />
+        ) : null}
+      </div>
       <div className={profileStyles.form_wrapper}>
         <FormControl className={profileStyles.input_wrapper}>
           <FormLabel fontWeight={'bold'}>メールアドレス</FormLabel>

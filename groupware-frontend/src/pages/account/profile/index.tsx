@@ -127,32 +127,32 @@ const Profile = () => {
       },
     },
   );
-  const [
-    {
-      crop,
-      completedCrop,
-      croppedImageURL,
-      imageName: selectImageName,
-      imageURL: selectImageUrl,
-    },
-    dispatchCrop,
-  ] = useImageCrop();
-  const imgRef = useRef<HTMLImageElement | null>(null);
+  // const [
+  //   {
+  //     crop,
+  //     completedCrop,
+  //     croppedImageURL,
+  //     imageName: selectImageName,
+  //     imageURL: selectImageUrl,
+  //   },
+  //   dispatchCrop,
+  // ] = useImageCrop();
+  // const imgRef = useRef<HTMLImageElement | null>(null);
 
-  const onEventImageDrop = useCallback(
-    (f: File[]) => {
-      dispatchCrop({ type: 'setImageFile', value: f[0] });
-    },
-    [dispatchCrop],
-  );
+  // const onEventImageDrop = useCallback(
+  //   (f: File[]) => {
+  //     dispatchCrop({ type: 'setImageFile', value: f[0] });
+  //   },
+  //   [dispatchCrop],
+  // );
 
-  const {
-    getRootProps: getEventImageRootProps,
-    getInputProps: getEventImageInputProps,
-  } = useDropzone({
-    onDrop: onEventImageDrop,
-    accept: imageExtensions,
-  });
+  // const {
+  //   getRootProps: getEventImageRootProps,
+  //   getInputProps: getEventImageInputProps,
+  // } = useDropzone({
+  //   onDrop: onEventImageDrop,
+  //   accept: imageExtensions,
+  // });
   const toast = useToast();
 
   const checkErrors = async () => {
@@ -181,7 +181,7 @@ const Profile = () => {
     enableReinitialize: true,
     validationSchema: profileSchema,
     onSubmit: () => {
-      handleUpdateUser();
+      // handleUpdateUser();
     },
   });
 
@@ -194,7 +194,7 @@ const Profile = () => {
           duration: 3000,
           isClosable: true,
         });
-        dispatchCrop({ type: 'setImageFile', value: undefined });
+        // dispatchCrop({ type: 'setImageFile', value: undefined });
         router.push(`/account/${responseData.id.toString()}`);
       }
     },
@@ -202,19 +202,19 @@ const Profile = () => {
 
   const tabs: Tab[] = useHeaderTab({ headerTabType: 'account', user });
 
-  const handleUpdateUser = async () => {
-    if (!croppedImageURL || !completedCrop || !selectImageName) {
-      updateUser(userInfo);
-      return;
-    }
-    const result = await dataURLToFile(croppedImageURL, selectImageName);
-    uploadImage([result]);
-    return;
-  };
+  // const handleUpdateUser = async () => {
+  //   if (!croppedImageURL || !completedCrop || !selectImageName) {
+  //     updateUser(userInfo);
+  //     return;
+  //   }
+  //   const result = await dataURLToFile(croppedImageURL, selectImageName);
+  //   uploadImage([result]);
+  //   return;
+  // };
 
-  const onLoad = useCallback((img) => {
-    imgRef.current = img;
-  }, []);
+  // const onLoad = useCallback((img) => {
+  //   imgRef.current = img;
+  // }, []);
 
   // const toggleSelectedTag = (t: UserTag) => {
   //   const toggledTag = toggleTag(userInfo?.tags, t);
@@ -252,7 +252,7 @@ const Profile = () => {
         />
       )} */}
       <div className={profileStyles.main}>
-        <div className={profileStyles.image_wrapper}>
+        {/* <div className={profileStyles.image_wrapper}>
           {userInfo.avatarUrl && !selectImageUrl ? (
             <div
               {...getEventImageRootProps({
@@ -300,7 +300,7 @@ const Profile = () => {
               circularCrop={true}
             />
           ) : null}
-        </div>
+        </div> */}
         <ProfileForm profile={profile} tags={tags} />
         {/* <div className={profileStyles.form_wrapper}> */}
         {/* <FormControl className={profileStyles.input_wrapper}>
