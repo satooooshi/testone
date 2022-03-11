@@ -301,9 +301,9 @@ const Profile = () => {
             />
           ) : null}
         </div>
-        <div className={profileStyles.form_wrapper}>
-          <ProfileForm profile={profile} tags={tags} />
-          {/* <FormControl className={profileStyles.input_wrapper}>
+        <ProfileForm profile={profile} tags={tags} />
+        {/* <div className={profileStyles.form_wrapper}> */}
+        {/* <FormControl className={profileStyles.input_wrapper}>
             <FormLabel fontWeight={'bold'}>メールアドレス</FormLabel>
             <Input
               type="email"
@@ -438,7 +438,7 @@ const Profile = () => {
               onChange={handleChange}
             />
           </FormControl> */}
-          {/* <Box mb={2} w={'100%'}>
+        {/* <Box mb={2} w={'100%'}>
             <FormToLinkTag
               tags={userInfo?.tags || []}
               tagType={TagType.TECH}
@@ -520,7 +520,7 @@ const Profile = () => {
               onChange={handleChange}
             />
           </FormControl> */}
-        </div>
+        {/* </div> */}
       </div>
       {/* <Button
         className={profileStyles.update_button_wrapper}
