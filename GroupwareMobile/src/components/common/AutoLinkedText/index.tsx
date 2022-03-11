@@ -7,7 +7,9 @@ import {ChatMessage} from '../../../types';
 import {mentionTransform} from '../../../utils/messageTransform';
 
 type AutoLinkedTextProps = {
-  message: ChatMessage;
+  // Use "message" for chat and "text" for others.
+  text?: string;
+  message?: ChatMessage;
   inputtedSearchWord?: string;
   searchedResultIds?: (number | undefined)[];
   style?: StyleProp<TextStyle>;
@@ -15,6 +17,7 @@ type AutoLinkedTextProps = {
 };
 
 const AutoLinkedText: React.FC<AutoLinkedTextProps> = ({
+  text,
   message,
   inputtedSearchWord,
   searchedResultIds,
@@ -24,7 +27,7 @@ const AutoLinkedText: React.FC<AutoLinkedTextProps> = ({
   const navigation = useNavigation<any>();
   const [searchedWords, setSearchedWords] = useState<string[]>(['']);
   const matcher: CustomMatcher[] = [];
-  searchedResultIds?.includes(message.id) &&
+  searchedResultIds?.includes(message?.id) &&
     searchedWords.map(w => {
       matcher.push({
         style: {backgroundColor: 'yellow', color: 'black'},
@@ -42,7 +45,7 @@ const AutoLinkedText: React.FC<AutoLinkedTextProps> = ({
   return (
     <Autolink
       // Required: the text to parse for links
-      text={mentionTransform(message.content)}
+      text={message ? mentionTransform(message.content) : text || ''}
       matchers={matcher}
       url
       linkStyle={linkStyle}
