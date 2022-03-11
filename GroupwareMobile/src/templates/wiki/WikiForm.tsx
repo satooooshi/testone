@@ -627,6 +627,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
             key={f.id}
             mb={'lg'}
             w={'100%'}
+            h={'10%'}
             borderColor={blueColor}
             borderWidth={1}
             px={8}
