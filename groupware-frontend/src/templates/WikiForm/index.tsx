@@ -87,6 +87,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
     tags: [],
     type: type || WikiType.BOARD,
     ruleCategory: type === WikiType.RULES ? RuleCategory.RULES : undefined,
+    files: [],
     boardCategory:
       type === WikiType.BOARD || !type
         ? BoardCategory.QA
@@ -595,7 +596,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
                     setNewQuestion({
                       ...newQuestion,
                       files: newQuestion.files?.filter(
-                        (file) => file.id !== f.id,
+                        (file) => file.url !== f.url,
                       ),
                     })
                   }

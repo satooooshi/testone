@@ -59,6 +59,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
     tags: [],
     type: type || WikiType.BOARD,
     ruleCategory: ruleCategory || RuleCategory.NON_RULE,
+    files: [],
     boardCategory: boardCategory
       ? boardCategory
       : !type || type === WikiType.BOARD
@@ -112,6 +113,15 @@ const WikiForm: React.FC<WikiFormProps> = ({
   const typeDropdownRef = useRef<any | null>(null);
 
   const {user} = useAuthenticate();
+
+  const removeFile = (fileUrl: string) => {
+    setNewWiki(e => {
+      if (e.files?.length) {
+        return {...e, files: e.files.filter(f => f.url !== fileUrl)};
+      }
+      return e;
+    });
+  };
 
   //   Fixed the input format so that it cannot be selected at once.
 
@@ -632,7 +642,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
                 ])[1]
               }
             </Text>
-            <TouchableOpacity>
+            <TouchableOpacity onPress={() => removeFile(f.url || '')}>
               <Icon name="closecircle" color="gray900" fontSize={24} />
             </TouchableOpacity>
           </Div>
