@@ -80,6 +80,7 @@ const AttendanceReport: React.FC = () => {
   // }, [month]);
 
   useEffect(() => {
+    console.log('data?.length', data);
     console.log('data?.length', data?.length);
 
     if (data?.length) {
@@ -91,7 +92,7 @@ const AttendanceReport: React.FC = () => {
       setUnAcceptedREport(UnAcceptedRepo);
       setAcceptedREport(acceptedRepo);
     }
-  }, [data]);
+  }, [data, data?.length]);
 
   return (
     <WholeContainer>
@@ -138,18 +139,35 @@ const AttendanceReport: React.FC = () => {
         borderBottomColor={'#b0b0b0'}
         flexDir="row"
         h={40}>
-        <Div minW={'20%'} justifyContent="center" alignItems="center">
+        <Div w={'20%'} justifyContent="center" alignItems="center">
           <Text fontSize={16}>日付</Text>
         </Div>
-        <Div minW={'30%'} justifyContent="center" alignItems="center">
+        <Div w={'30%'} justifyContent="center" alignItems="center">
           <Text fontSize={16}>区分</Text>
         </Div>
-        <Div minW={'30%'} justifyContent="center" alignItems="center">
+        <Div w={'20%'} justifyContent="center" alignItems="center">
           <Text fontSize={16}>送信日</Text>
         </Div>
-        <Div minW={'20%'} justifyContent="center" alignItems="center">
-          <Text fontSize={16}>受理日</Text>
-        </Div>
+        {activeTabName === 'reportAfterAccepted' && (
+          <>
+            <Div w={'20%'} justifyContent="center" alignItems="center">
+              <Text fontSize={16}>受理日</Text>
+            </Div>
+            <Div w={'10%'} justifyContent="center" alignItems="center">
+              <Text fontSize={16}>詳細</Text>
+            </Div>
+          </>
+        )}
+        {activeTabName === 'reportBeforeAccepted' && (
+          <>
+            <Div w={'20%'} justifyContent="center" alignItems="center">
+              <Text fontSize={16}>編集</Text>
+            </Div>
+            <Div w={'10%'} justifyContent="center" alignItems="center">
+              <Text fontSize={16}>詳細</Text>
+            </Div>
+          </>
+        )}
       </Div>
 
       {activeTabName === 'reportAfterAccepted' &&
