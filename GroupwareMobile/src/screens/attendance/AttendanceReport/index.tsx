@@ -97,39 +97,43 @@ const AttendanceReport: React.FC = () => {
         </Div>
       </Div>
 
-      {activeTabName === 'reportAfterAccepted' ? (
-        data ? (
+      {activeTabName === 'reportAfterAccepted' &&
+        (data ? (
           <ScrollDiv>
-            {data?.map(d => (
-              <Div flexDir="row" my="sm">
-                <AttendanceReportRow reportData={d} />
-              </Div>
-            ))}
+            {data?.map(
+              d =>
+                d.verifiedAt !== null && (
+                  <Div flexDir="row" my="sm">
+                    <AttendanceReportRow reportData={d} />
+                  </Div>
+                ),
+            )}
           </ScrollDiv>
         ) : (
           <Text mt={20} fontSize={20} textAlign="center">
             承認済みの報告はありません
           </Text>
-        )
-      ) : null}
+        ))}
 
-      {activeTabName === 'reportBeforeAccepted' ? (
-        data ? (
+      {activeTabName === 'reportBeforeAccepted' &&
+        (data ? (
           <ScrollDiv>
-            {data?.map(d => (
-              <Div flexDir="row" my="sm">
-                <Div flexDir="row" my="sm">
-                  <AttendanceReportRow reportData={d} />
-                </Div>
-              </Div>
-            ))}
+            {data?.map(
+              d =>
+                d.verifiedAt === null && (
+                  <Div flexDir="row" my="sm">
+                    <Div flexDir="row" my="sm">
+                      <AttendanceReportRow reportData={d} />
+                    </Div>
+                  </Div>
+                ),
+            )}
           </ScrollDiv>
         ) : (
           <Text mt={20} fontSize={20} textAlign="center">
             承認前の報告はありません
           </Text>
-        )
-      ) : null}
+        ))}
     </WholeContainer>
   );
 };
