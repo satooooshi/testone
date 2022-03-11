@@ -237,6 +237,7 @@ const Profile = () => {
       <Head>
         <title>ボールド | プロフィール編集</title>
       </Head>
+      <ProfileForm profile={profile} tags={tags} isLoading={isLoading} />
       {/* {tags && (
         <TagModal
           isOpen={isOpen}
@@ -251,7 +252,7 @@ const Profile = () => {
           onComplete={() => dispatchModal({ type: 'close' })}
         />
       )} */}
-      <div className={profileStyles.main}>
+      {/* <div className={profileStyles.main}> */}
         {/* <div className={profileStyles.image_wrapper}>
           {userInfo.avatarUrl && !selectImageUrl ? (
             <div
@@ -301,7 +302,7 @@ const Profile = () => {
             />
           ) : null}
         </div> */}
-        <ProfileForm profile={profile} tags={tags} isLoading={isLoading} />
+
         {/* <div className={profileStyles.form_wrapper}> */}
         {/* <FormControl className={profileStyles.input_wrapper}>
             <FormLabel fontWeight={'bold'}>メールアドレス</FormLabel>
@@ -521,7 +522,7 @@ const Profile = () => {
             />
           </FormControl> */}
         {/* </div> */}
-      </div>
+      {/* </div> */}
       {/* <Button
         className={profileStyles.update_button_wrapper}
         width="40"
