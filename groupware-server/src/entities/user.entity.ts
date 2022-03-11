@@ -35,6 +35,7 @@ import { genStorageURL } from 'src/utils/storage/genStorageURL';
 import { Attendance } from './attendance.entity';
 import { ApplicationBeforeJoining } from './applicationBeforeJoining.entity';
 import { DefaultAttendance } from './defaultAttendance.entity';
+import { AttendanceReport } from './attendanceReport.entity';
 
 export enum UserRole {
   ADMIN = 'admin',
@@ -333,6 +334,12 @@ export class User {
 
   @OneToMany(() => Attendance, (attendance) => attendance.user)
   attendance?: Attendance[];
+
+  @OneToMany(
+    () => AttendanceReport,
+    (attendanceReport) => attendanceReport.user,
+  )
+  AttendanceReport?: AttendanceReport[];
 
   @OneToMany(() => ApplicationBeforeJoining, (application) => application.user)
   applications?: ApplicationBeforeJoining[];
