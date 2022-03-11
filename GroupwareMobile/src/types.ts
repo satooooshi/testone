@@ -432,8 +432,6 @@ export enum AttendanceCategory {
 }
 
 export enum AttendanceReason {
-  //通常
-  COMMON = 'common',
   //私用
   PRIVATE = 'private',
   //体調不良
@@ -465,7 +463,6 @@ export enum AttendanceReason {
 export interface Attendance {
   id: number;
   category: AttendanceCategory;
-  reason: AttendanceReason;
   //対象日
   targetDate: Date;
   //出勤時刻
@@ -486,7 +483,7 @@ export interface Attendance {
   createdAt: Date;
   updatedAt: Date;
 }
-export interface AttendanceReport {
+export interface AttendanceRepo {
   id: number;
   category: AttendanceCategory;
   reason: AttendanceReason;
