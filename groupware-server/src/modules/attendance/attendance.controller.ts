@@ -11,6 +11,7 @@ import {
 } from '@nestjs/common';
 import { ApplicationBeforeJoining } from 'src/entities/applicationBeforeJoining.entity';
 import { Attendance } from 'src/entities/attendance.entity';
+import { AttendanceReport } from 'src/entities/attendanceReport.entity';
 import { DefaultAttendance } from 'src/entities/defaultAttendance.entity';
 import { TravelCost } from 'src/entities/travelCost.entity';
 import JwtAuthenticationGuard from '../auth/jwtAuthentication.guard';
@@ -190,5 +191,30 @@ export class AttendanceController {
       user,
     });
     return updated;
+  }
+
+  @Get('/report')
+  @UseGuards(JwtAuthenticationGuard)
+  async getAttendanceReport(@Req() req: RequestWithUser) {
+    const { user } = req;
+    const attendanceReports = await this.attendanceService.getAttendanceReports(
+      user,
+    );
+    return attendanceReports;
+  }
+
+  @Post('/report')
+  @UseGuards(JwtAuthenticationGuard)
+  async createAttendanceReport(
+    @Body() attendanceReport: AttendanceReport,
+    @Req() req: RequestWithUser,
+  ) {
+    const { user } = req;
+    const attendanceReports =
+      await this.attendanceService.createAttendanceReport({
+        ...attendanceReport,
+        user,
+      });
+    return attendanceReports;
   }
 }

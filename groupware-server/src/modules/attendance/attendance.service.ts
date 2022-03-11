@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ApplicationBeforeJoining } from 'src/entities/applicationBeforeJoining.entity';
 import { Attendance } from 'src/entities/attendance.entity';
+import { AttendanceReport } from 'src/entities/attendanceReport.entity';
 import { DefaultAttendance } from 'src/entities/defaultAttendance.entity';
 import { TravelCost } from 'src/entities/travelCost.entity';
 import { User } from 'src/entities/user.entity';
@@ -19,6 +20,8 @@ export class AttendanceService {
     private readonly travelCostRepo: Repository<TravelCost>,
     @InjectRepository(DefaultAttendance)
     private readonly defaultAttendanceRepo: Repository<DefaultAttendance>,
+    @InjectRepository(AttendanceReport)
+    private readonly attendanceReport: Repository<AttendanceReport>,
   ) {}
 
   public async getDefaultAttendance(user: User) {
@@ -124,5 +127,21 @@ export class AttendanceService {
   public async updateApplication(application: ApplicationBeforeJoining) {
     const updated = await this.applicationRepo.save(application);
     return updated;
+  }
+  public async getAttendanceReports(user: User) {
+    const attendanceReports = await this.attendanceReport.findOne(
+      {
+        user,
+      },
+      { relations: ['user'] },
+    );
+    return attendanceReports;
+  }
+  public async createAttendanceReport(attendanceReport: AttendanceReport) {
+    const createdAttendanceReport = await this.attendanceReport.save({
+      ...attendanceReport,
+      verifiedAt: null,
+    });
+    return createdAttendanceReport;
   }
 }
