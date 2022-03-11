@@ -17,42 +17,48 @@ const reactionStickers: Immutable.Map<
   Immutable.Map<string, Immutable.Map<string, string>>
 > = Map({
   data: Map({
-    0: Map({
+    'b3aa388f-b9f4-45b0-bba5-d92cf2caa48b': Map({
+      id: 'b3aa388f-b9f4-45b0-bba5-d92cf2caa48b',
       url: goodSticker.src,
     }),
-    1: Map({
+    'adec3f13-823c-47c3-b4d1-be4f68dd9d6d': Map({
+      id: 'adec3f13-823c-47c3-b4d1-be4f68dd9d6d',
       url: shockSticker.src,
     }),
-    2: Map({
+    'e14b5a20-1025-4952-b731-41cd4b118ba0': Map({
+      id: 'e14b5a20-1025-4952-b731-41cd4b118ba0',
       url: angrySticker.src,
     }),
-    3: Map({
+    '659a0dbf-5f85-4f32-999d-eb9ba6b0f417': Map({
+      id: '659a0dbf-5f85-4f32-999d-eb9ba6b0f417',
       url: funnySticker.src,
     }),
-    4: Map({
+    'fab0ae95-ae95-4775-b484-72c290437602': Map({
+      id: 'fab0ae95-ae95-4775-b484-72c290437602',
       url: callSticker.src,
     }),
-    5: Map({
+    '71853190-8acd-4d3b-b4fd-63f7b0648daa': Map({
+      id: '71853190-8acd-4d3b-b4fd-63f7b0648daa',
       url: lookSticker.src,
     }),
-    6: Map({
-      url: helpSticker.src,
-    }),
-    7: Map({
-      url: questionSticker.src,
-    }),
-    8: Map({
-      url: goodJobSticker.src,
-    }),
-    9: Map({
-      url: rogerSticker.src,
-    }),
-    10: Map({
-      url: sorrySticker.src,
-    }),
-    11: Map({
-      url: willDoSticker.src,
-    }),
+    // 6: Map({
+    //   url: helpSticker.src,
+    // }),
+    // 7: Map({
+    //   url: questionSticker.src,
+    // }),
+    // 8: Map({
+    //   url: goodJobSticker.src,
+    // }),
+    // 9: Map({
+    //   url: rogerSticker.src,
+    // }),
+    // 10: Map({
+    //   url: sorrySticker.src,
+    // }),
+    // 11: Map({
+    //   url: willDoSticker.src,
+    // }),
   }),
 });
 
