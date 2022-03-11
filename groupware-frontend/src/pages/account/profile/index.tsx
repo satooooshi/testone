@@ -38,6 +38,7 @@ import { profileSchema } from 'src/utils/validation/schema';
 import { formikErrorMsgFactory } from 'src/utils/factory/formikErrorMsgFactory';
 import { useAPIGetUserTag } from '@/hooks/api/tag/useAPIGetUserTag';
 import FormToLinkTag from '@/components/FormToLinkTag';
+import ProfileForm from 'src/templates/account/ProfileForm';
 import router from 'next/router';
 
 type ModalState = {
@@ -301,7 +302,8 @@ const Profile = () => {
           ) : null}
         </div>
         <div className={profileStyles.form_wrapper}>
-          <FormControl className={profileStyles.input_wrapper}>
+          <ProfileForm profile={profile} />
+          {/* <FormControl className={profileStyles.input_wrapper}>
             <FormLabel fontWeight={'bold'}>メールアドレス</FormLabel>
             <Input
               type="email"
@@ -435,8 +437,8 @@ const Profile = () => {
               background="white"
               onChange={handleChange}
             />
-          </FormControl>
-          <Box mb={2} w={'100%'}>
+          </FormControl> */}
+          {/* <Box mb={2} w={'100%'}>
             <FormToLinkTag
               tags={userInfo?.tags || []}
               tagType={TagType.TECH}
@@ -517,10 +519,10 @@ const Profile = () => {
               background="white"
               onChange={handleChange}
             />
-          </FormControl>
+          </FormControl> */}
         </div>
       </div>
-      <Button
+      {/* <Button
         className={profileStyles.update_button_wrapper}
         width="40"
         colorScheme="blue"
@@ -528,7 +530,7 @@ const Profile = () => {
           checkErrors();
         }}>
         {isLoading ? <Spinner /> : <Text>更新</Text>}
-      </Button>
+      </Button> */}
     </LayoutWithTab>
   );
 };
