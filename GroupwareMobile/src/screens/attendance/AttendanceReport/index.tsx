@@ -1,29 +1,49 @@
 import {useNavigation} from '@react-navigation/core';
 import {DateTime} from 'luxon';
-import React, {useMemo, useState} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 import DropdownOpenerButton from '../../../components/common/DropdownOpenerButton';
 import HeaderWithTextButton from '../../../components/Header';
 import {Tab} from '../../../components/Header/HeaderTemplate';
 import WholeContainer from '../../../components/WholeContainer';
-import {AttendanceNavigationProps} from '../../../types/navigator/drawerScreenProps/attendance';
+import {
+  AttendanceHomeNavigationProps,
+  AttendanceNavigationProps,
+} from '../../../types/navigator/drawerScreenProps/attendance';
 import MonthPicker from 'react-native-month-year-picker';
-import {useWindowDimensions} from 'react-native';
+import {Alert, useWindowDimensions} from 'react-native';
 import {Text, Div, ScrollDiv, Button} from 'react-native-magnus';
 import {useAPIGetDefaultAttendance} from '../../../hooks/api/attendance/useAPIGetDefaultAttendance';
 import {useAPIGetAttendace} from '../../../hooks/api/attendance/useAPIGetAttendance';
 import AttendanceRow from '../../../components/attendance/AttendanceRow';
-import {useAPIGetAttendaceReport} from '../../../hooks/api/attendance/attendanceReport/useAPIGetAttendanceReport';
+import {
+  useAPIGetAttendaceReport,
+  useAPIGetAttendanceReport,
+} from '../../../hooks/api/attendance/attendanceReport/useAPIGetAttendanceReport';
 import AttendanceReportRow from '../../../components/attendance/AttendanceReportRow';
+import AttendanceReportFormModal from '../../../components/attendance/AttendanceReportFrom';
+import {useAPICreateAttendanceReport} from '../../../hooks/api/attendance/attendanceReport/useAPICreateAttendanceReport';
+import {responseErrorMsgFactory} from '../../../utils/factory/responseEroorMsgFactory';
+import {AttendanceRepo} from '../../../types';
 
 const AttendanceReport: React.FC = () => {
+  const navigation = useNavigation<AttendanceHomeNavigationProps>();
   const [activeTabName, setActiveTabName] = useState('reportBeforeAccepted');
   const [month, setMonth] = useState(DateTime.now());
   const [dateTimeModal, setDateTimeModal] = useState(false);
+  const [visibleAttendanceFormModal, setAttendanceFormModal] = useState(false);
   const windowWidth = useWindowDimensions().width;
-  const {data} = useAPIGetAttendaceReport({
+  const {data: data, refetch: refetchReports} = useAPIGetAttendanceReport({
     from_date: month.startOf('month').toFormat('yyyy-LL-dd'),
     to_date: month.endOf('month').endOf('day').toFormat('yyyy-LL-dd'),
   });
+  console.log('data----------------', data);
+
+  const [unAcceptedReport, setUnAcceptedREport] = useState<
+    AttendanceRepo[] | undefined
+  >();
+  const [acceptedReport, setAcceptedREport] = useState<
+    AttendanceRepo[] | undefined
+  >();
   const tabs: Tab[] = [
     {
       name: '承認済みの報告',
@@ -34,17 +54,44 @@ const AttendanceReport: React.FC = () => {
       onPress: () => setActiveTabName('reportBeforeAccepted'),
     },
   ];
-  const dates = useMemo(() => {
-    const start = month.startOf('month');
-    const end = month.endOf('month');
-    const arr: DateTime[] = [];
-    let i = 0;
-    while (arr[arr.length - 1]?.day !== end.day) {
-      arr.push(start.plus({days: i}));
-      i++;
+  const {
+    mutate: saveReport,
+    isSuccess,
+    isLoading: isLoadingSaveEvent,
+  } = useAPICreateAttendanceReport({
+    onSuccess: () => {
+      setAttendanceFormModal(false);
+      refetchReports();
+    },
+    onError: e => {
+      Alert.alert(responseErrorMsgFactory(e));
+    },
+  });
+  // const dates = useMemo(() => {
+  //   const start = month.startOf('month');
+  //   const end = month.endOf('month');
+  //   const arr: DateTime[] = [];
+  //   let i = 0;
+  //   while (arr[arr.length - 1]?.day !== end.day) {
+  //     arr.push(start.plus({days: i}));
+  //     i++;
+  //   }
+  //   return arr;
+  // }, [month]);
+
+  useEffect(() => {
+    console.log('data?.length', data?.length);
+
+    if (data?.length) {
+      const UnAcceptedRepo = data?.filter(d => d.verifiedAt == null);
+      const acceptedRepo = data?.filter(d => d.verifiedAt != null);
+      console.log('UnAcceptedRepo', UnAcceptedRepo);
+      console.log('acceptedRepo', acceptedRepo);
+
+      setUnAcceptedREport(UnAcceptedRepo);
+      setAcceptedREport(acceptedRepo);
     }
-    return arr;
-  }, [month]);
+  }, [data]);
 
   return (
     <WholeContainer>
@@ -57,6 +104,14 @@ const AttendanceReport: React.FC = () => {
             ? '承認済みの報告'
             : '承認前の報告'
         }
+        rightButtonName={'勤怠報告入力'}
+        onPressRightButton={() => setAttendanceFormModal(true)}
+      />
+      <AttendanceReportFormModal
+        isVisible={visibleAttendanceFormModal}
+        onCloseModal={() => setAttendanceFormModal(false)}
+        onSubmit={report => saveReport(report)}
+        isSuccess={isSuccess}
       />
       <Div w={windowWidth * 0.8} alignSelf="center">
         <Text>対象月</Text>
@@ -98,9 +153,9 @@ const AttendanceReport: React.FC = () => {
       </Div>
 
       {activeTabName === 'reportAfterAccepted' &&
-        (data ? (
+        (acceptedReport?.length ? (
           <ScrollDiv>
-            {data?.map(
+            {acceptedReport.map(
               d =>
                 d.verifiedAt !== null && (
                   <Div flexDir="row" my="sm">
@@ -116,9 +171,9 @@ const AttendanceReport: React.FC = () => {
         ))}
 
       {activeTabName === 'reportBeforeAccepted' &&
-        (data ? (
+        (unAcceptedReport?.length ? (
           <ScrollDiv>
-            {data?.map(
+            {unAcceptedReport.map(
               d =>
                 d.verifiedAt === null && (
                   <Div flexDir="row" my="sm">

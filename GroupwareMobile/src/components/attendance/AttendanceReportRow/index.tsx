@@ -3,10 +3,10 @@ import {DateTime} from 'luxon';
 import React, {useEffect, useRef, useState} from 'react';
 import {Alert, u} from 'react-native';
 import {Button, Div, Text} from 'react-native-magnus';
-import {AttendanceReport} from '../../../types';
+import {AttendanceRepo} from '../../../types';
 
 type AttendanceReportRowProps = {
-  reportData?: AttendanceReport;
+  reportData?: AttendanceRepo;
 };
 
 const AttendanceReportRow: React.FC<AttendanceReportRowProps> = ({

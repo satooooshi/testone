@@ -77,7 +77,7 @@ export class AttendanceController {
     @Req() req: RequestWithUser,
   ) {
     const { user } = req;
-
+    console.log('attendance', attendance);
     const createdAttendance = await this.attendanceService.createAttendance({
       ...attendance,
       user,
@@ -210,6 +210,7 @@ export class AttendanceController {
     @Req() req: RequestWithUser,
   ) {
     const { user } = req;
+    console.log('attendanceReport', attendanceReport);
     const attendanceReports =
       await this.attendanceService.createAttendanceReport({
         ...attendanceReport,
