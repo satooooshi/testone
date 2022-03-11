@@ -195,10 +195,20 @@ export class AttendanceController {
 
   @Get('/report')
   @UseGuards(JwtAuthenticationGuard)
-  async getAttendanceReport(@Req() req: RequestWithUser) {
+  async getAttendanceReport(
+    @Query() query: GetAttendanceQuery,
+    @Req() req: RequestWithUser,
+  ) {
+    if (
+      !this.isValidDate(query.from_date) ||
+      !this.isValidDate(query.to_date)
+    ) {
+      throw new BadRequestException();
+    }
     const { user } = req;
     const attendanceReports = await this.attendanceService.getAttendanceReports(
-      user,
+      user.id,
+      query,
     );
     return attendanceReports;
   }

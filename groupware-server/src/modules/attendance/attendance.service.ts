@@ -128,13 +128,15 @@ export class AttendanceService {
     const updated = await this.applicationRepo.save(application);
     return updated;
   }
-  public async getAttendanceReports(user: User) {
-    const attendanceReports = await this.attendanceReport.findOne(
-      {
-        user,
-      },
-      { relations: ['user'] },
-    );
+  public async getAttendanceReports(userId: number, query: GetAttendanceQuery) {
+    const { from_date: fromDate, to_date: toDate } = query;
+    const attendanceReports = await this.attendanceReport
+      .createQueryBuilder('attendance_report')
+      .leftJoinAndSelect('attendance_report.user', 'user')
+      .where('user.id = :userId', { userId })
+      .where('attendance_report.targetDate >= :fromDate', { fromDate })
+      .where('attendance_report.targetDate <= :toDate', { toDate })
+      .getMany();
     return attendanceReports;
   }
 
