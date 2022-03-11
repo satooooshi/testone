@@ -108,6 +108,7 @@ export type RootStackParamList = {
   MyProfile: undefined;
   AttendanceHome: undefined;
   Attendance: undefined;
+  AttendanceReport: undefined;
   DefaultAttendance: undefined;
   ApplicationBeforeJoining: undefined;
 };

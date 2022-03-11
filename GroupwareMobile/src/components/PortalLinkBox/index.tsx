@@ -45,6 +45,7 @@ type PortalType =
   | 'salary'
   | 'users'
   | 'attendance'
+  | 'attendance_report'
   | 'application'
   | 'work'
   | 'account';
@@ -202,6 +203,15 @@ const PortalLinkIcon: React.FC<PortalLinkIconProps> = ({type}) => {
           fontFamily="MaterialIcons"
         />
       );
+    case 'attendance_report':
+      return (
+        <Icon
+          name="work"
+          fontSize={iconSize}
+          color="#086f83"
+          fontFamily="MaterialIcons"
+        />
+      );
     case 'application':
       return (
         <Icon
@@ -266,6 +276,8 @@ const PortalLinkBox: React.FC<PortarlLinkBoxProps> = ({type, onPress}) => {
         return '勤怠管理';
       case 'application':
         return '入社前申請';
+      case 'attendance_report':
+        return '勤怠報告';
       default:
         return '';
     }

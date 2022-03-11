@@ -48,6 +48,7 @@ import AttendanceHome from '../../screens/attendance/AttendanceHome';
 import Attendance from '../../screens/attendance/Attendance';
 import Application from '../../screens/attendance/Application';
 import DefaultAttendanceForm from '../../screens/attendance/DefaultAttendance';
+import AttendanceReport from '../../screens/attendance/AttendanceReport';
 
 const Tab = createBottomTabNavigator();
 // const Tab = createMaterialBottomTabNavigator();
@@ -287,6 +288,11 @@ const AttendanceStack = () => {
       <Stack.Screen
         name="DefaultAttendance"
         component={DefaultAttendanceForm}
+        options={{headerShown: false}}
+      />
+      <Stack.Screen
+        name="AttendanceReport"
+        component={AttendanceReport}
         options={{headerShown: false}}
       />
     </Stack.Navigator>
