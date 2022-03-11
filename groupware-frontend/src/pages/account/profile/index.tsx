@@ -41,14 +41,14 @@ import FormToLinkTag from '@/components/FormToLinkTag';
 import ProfileForm from 'src/templates/account/ProfileForm';
 import router from 'next/router';
 
-type ModalState = {
-  isOpen: boolean;
-  filteredTagType?: TagType;
-};
+// type ModalState = {
+//   isOpen: boolean;
+//   filteredTagType?: TagType;
+// };
 
-type ModalAction = {
-  type: 'openTech' | 'openQualification' | 'openClub' | 'openHobby' | 'close';
-};
+// type ModalAction = {
+//   type: 'openTech' | 'openQualification' | 'openClub' | 'openHobby' | 'close';
+// };
 
 const Profile = () => {
   const { data: profile } = useAPIGetProfile();
@@ -72,48 +72,48 @@ const Profile = () => {
     introduceHobby: '',
   };
 
-  const modalReducer = (
-    _state: ModalState,
-    action: ModalAction,
-  ): ModalState => {
-    switch (action.type) {
-      case 'openTech': {
-        return {
-          isOpen: true,
-          filteredTagType: TagType.TECH,
-        };
-      }
-      case 'openQualification': {
-        return {
-          isOpen: true,
-          filteredTagType: TagType.QUALIFICATION,
-        };
-      }
-      case 'openClub': {
-        return {
-          isOpen: true,
-          filteredTagType: TagType.CLUB,
-        };
-      }
-      case 'openHobby': {
-        return {
-          isOpen: true,
-          filteredTagType: TagType.HOBBY,
-        };
-      }
-      case 'close': {
-        return {
-          isOpen: false,
-        };
-      }
-    }
-  };
-  const [{ isOpen, filteredTagType }, dispatchModal] = useReducer(
-    modalReducer,
-    {
-      isOpen: false,
-    },
-  );
+  // const modalReducer = (
+  //   _state: ModalState,
+  //   action: ModalAction,
+  // ): ModalState => {
+  //   switch (action.type) {
+  //     case 'openTech': {
+  //       return {
+  //         isOpen: true,
+  //         filteredTagType: TagType.TECH,
+  //       };
+  //     }
+  //     case 'openQualification': {
+  //       return {
+  //         isOpen: true,
+  //         filteredTagType: TagType.QUALIFICATION,
+  //       };
+  //     }
+  //     case 'openClub': {
+  //       return {
+  //         isOpen: true,
+  //         filteredTagType: TagType.CLUB,
+  //       };
+  //     }
+  //     case 'openHobby': {
+  //       return {
+  //         isOpen: true,
+  //         filteredTagType: TagType.HOBBY,
+  //       };
+  //     }
+  //     case 'close': {
+  //       return {
+  //         isOpen: false,
+  //       };
+  //     }
+  //   }
+  // };
+  // const [{ isOpen, filteredTagType }, dispatchModal] = useReducer(
+  //   modalReducer,
+  //   {
+  //     isOpen: false,
+  //   },
+  // );
 
   const { mutate: uploadImage, isLoading: loadingUplaod } = useAPIUploadStorage(
     {
@@ -216,13 +216,13 @@ const Profile = () => {
     imgRef.current = img;
   }, []);
 
-  const toggleSelectedTag = (t: UserTag) => {
-    const toggledTag = toggleTag(userInfo?.tags, t);
-    setUserInfo((i) => ({
-      ...i,
-      tags: toggledTag,
-    }));
-  };
+  // const toggleSelectedTag = (t: UserTag) => {
+  //   const toggledTag = toggleTag(userInfo?.tags, t);
+  //   setUserInfo((i) => ({
+  //     ...i,
+  //     tags: toggledTag,
+  //   }));
+  // };
 
   const isLoading = loadigUpdateUser || loadingUplaod;
 
@@ -237,7 +237,7 @@ const Profile = () => {
       <Head>
         <title>ボールド | プロフィール編集</title>
       </Head>
-      {tags && (
+      {/* {tags && (
         <TagModal
           isOpen={isOpen}
           isSearch={false}
@@ -250,7 +250,7 @@ const Profile = () => {
           }}
           onComplete={() => dispatchModal({ type: 'close' })}
         />
-      )}
+      )} */}
       <div className={profileStyles.main}>
         <div className={profileStyles.image_wrapper}>
           {userInfo.avatarUrl && !selectImageUrl ? (
@@ -302,7 +302,7 @@ const Profile = () => {
           ) : null}
         </div>
         <div className={profileStyles.form_wrapper}>
-          <ProfileForm profile={profile} />
+          <ProfileForm profile={profile} tags={tags} />
           {/* <FormControl className={profileStyles.input_wrapper}>
             <FormLabel fontWeight={'bold'}>メールアドレス</FormLabel>
             <Input

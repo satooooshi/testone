@@ -1,5 +1,6 @@
+import React, { useReducer } from 'react';
 import profileStyles from '@/styles/layouts/Profile.module.scss';
-import { User, TagType, BranchType } from 'src/types';
+import { User, TagType, BranchType, UserTag } from 'src/types';
 import {
   Box,
   Button,
@@ -13,12 +14,24 @@ import {
 } from '@chakra-ui/react';
 import { useFormik } from 'formik';
 import FormToLinkTag from '@/components/FormToLinkTag';
+import TagModal from '@/components/common/TagModal';
+import { toggleTag } from 'src/utils/toggleTag';
 
 type ProfileFormProps = {
   profile?: User;
+  tags?: UserTag[];
 };
 
-const ProfileForm: React.FC<ProfileFormProps> = (profile) => {
+type ModalState = {
+  isOpen: boolean;
+  filteredTagType?: TagType;
+};
+
+type ModalAction = {
+  type: 'openTech' | 'openQualification' | 'openClub' | 'openHobby' | 'close';
+};
+
+const ProfileForm: React.FC<ProfileFormProps> = (profile, tags) => {
   const initialUserValues = {
     email: '',
     isEmailPublic: false,
@@ -37,6 +50,50 @@ const ProfileForm: React.FC<ProfileFormProps> = (profile) => {
     introduceHobby: '',
   };
 
+  const modalReducer = (
+    _state: ModalState,
+    action: ModalAction,
+  ): ModalState => {
+    switch (action.type) {
+      case 'openTech': {
+        return {
+          isOpen: true,
+          filteredTagType: TagType.TECH,
+        };
+      }
+      case 'openQualification': {
+        return {
+          isOpen: true,
+          filteredTagType: TagType.QUALIFICATION,
+        };
+      }
+      case 'openClub': {
+        return {
+          isOpen: true,
+          filteredTagType: TagType.CLUB,
+        };
+      }
+      case 'openHobby': {
+        return {
+          isOpen: true,
+          filteredTagType: TagType.HOBBY,
+        };
+      }
+      case 'close': {
+        return {
+          isOpen: false,
+        };
+      }
+    }
+  };
+
+  const [{ isOpen, filteredTagType }, dispatchModal] = useReducer(
+    modalReducer,
+    {
+      isOpen: false,
+    },
+  );
+
   const {
     values: userInfo,
     setValues: setUserInfo,
@@ -52,8 +109,31 @@ const ProfileForm: React.FC<ProfileFormProps> = (profile) => {
     // },
   });
 
+  const toggleSelectedTag = (t: UserTag) => {
+    const toggledTag = toggleTag(userInfo?.tags, t);
+    setUserInfo((i) => ({
+      ...i,
+      tags: toggledTag,
+    }));
+  };
+
   return (
     <>
+      {tags.length && (
+        <TagModal
+          isOpen={isOpen}
+          isSearch={false}
+          tags={tags}
+          selectedTags={userInfo?.tags || []}
+          filteredTagType={filteredTagType}
+          toggleTag={toggleSelectedTag}
+          onClear={() => {
+            dispatchModal({ type: 'close' });
+          }}
+          onComplete={() => dispatchModal({ type: 'close' })}
+        />
+      )}
+      <div className={profileStyles.form_wrapper}></div>
       <FormControl className={profileStyles.input_wrapper}>
         <FormLabel fontWeight={'bold'}>メールアドレス</FormLabel>
         <Input
@@ -190,7 +270,12 @@ const ProfileForm: React.FC<ProfileFormProps> = (profile) => {
         />
       </FormControl>
       <Box mb={2} w={'100%'}>
-        <FormToLinkTag tags={userInfo?.tags || []} tagType={TagType.TECH} />
+        <FormToLinkTag
+          tags={userInfo?.tags || []}
+          tagType={TagType.TECH}
+          toggleTag={toggleSelectedTag}
+          onEditButtonClick={() => dispatchModal({ type: 'openTech' })}
+        />
       </Box>
       <FormControl mb={6}>
         <FormLabel fontWeight={'bold'}>技術の紹介</FormLabel>
@@ -208,6 +293,8 @@ const ProfileForm: React.FC<ProfileFormProps> = (profile) => {
         <FormToLinkTag
           tags={userInfo?.tags || []}
           tagType={TagType.QUALIFICATION}
+          toggleTag={toggleSelectedTag}
+          onEditButtonClick={() => dispatchModal({ type: 'openQualification' })}
         />
       </Box>
       <FormControl mb={6}>
@@ -223,7 +310,12 @@ const ProfileForm: React.FC<ProfileFormProps> = (profile) => {
         />
       </FormControl>
       <Box mb={2} w={'100%'}>
-        <FormToLinkTag tags={userInfo?.tags || []} tagType={TagType.CLUB} />
+        <FormToLinkTag
+          tags={userInfo?.tags || []}
+          tagType={TagType.CLUB}
+          toggleTag={toggleSelectedTag}
+          onEditButtonClick={() => dispatchModal({ type: 'openClub' })}
+        />
       </Box>
       <FormControl mb={6}>
         <FormLabel fontWeight={'bold'}>部活動の紹介</FormLabel>
@@ -238,7 +330,12 @@ const ProfileForm: React.FC<ProfileFormProps> = (profile) => {
         />
       </FormControl>
       <Box mb={2} w={'100%'}>
-        <FormToLinkTag tags={userInfo?.tags || []} tagType={TagType.HOBBY} />
+        <FormToLinkTag
+          tags={userInfo?.tags || []}
+          tagType={TagType.HOBBY}
+          toggleTag={toggleSelectedTag}
+          onEditButtonClick={() => dispatchModal({ type: 'openHobby' })}
+        />
       </Box>
       <FormControl mb={8}>
         <FormLabel fontWeight={'bold'}>趣味の紹介</FormLabel>
@@ -256,7 +353,7 @@ const ProfileForm: React.FC<ProfileFormProps> = (profile) => {
         className={profileStyles.update_button_wrapper}
         width="40"
         colorScheme="blue">
-        更新する
+        {/* {isLoading ? <Spinner /> : <Text>更新</Text>} */}
       </Button>
     </>
   );
