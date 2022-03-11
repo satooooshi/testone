@@ -486,6 +486,23 @@ export interface Attendance {
   createdAt: Date;
   updatedAt: Date;
 }
+export interface AttendanceReport {
+  id: number;
+  category: AttendanceCategory;
+  reason: AttendanceReason;
+  //対象日
+  targetDate: Date;
+  //詳細
+  detail: string;
+  //本社報告日
+  reportDate: Date | null;
+  //承認時刻
+  verifiedAt: Date | null;
+  user?: User;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 export enum TravelCostOneWayOrRound {
   ONE_WAY = 'one_way',
   ROUND = 'round',
