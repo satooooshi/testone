@@ -7,8 +7,10 @@ import {
   FormControl,
   FormLabel,
   Input,
+  Spinner,
   Textarea,
   Select,
+  Text,
   Radio,
   Stack,
 } from '@chakra-ui/react';
@@ -26,6 +28,7 @@ import { toggleTag } from 'src/utils/toggleTag';
 type ProfileFormProps = {
   profile?: User;
   tags?: UserTag[];
+  isLoading: boolean;
 };
 
 type ModalState = {
@@ -37,7 +40,11 @@ type ModalAction = {
   type: 'openTech' | 'openQualification' | 'openClub' | 'openHobby' | 'close';
 };
 
-const ProfileForm: React.FC<ProfileFormProps> = (profile, tags) => {
+const ProfileForm: React.FC<ProfileFormProps> = ({
+  profile,
+  tags,
+  isLoading,
+}) => {
   const initialUserValues = {
     email: '',
     isEmailPublic: false,
@@ -442,7 +449,7 @@ const ProfileForm: React.FC<ProfileFormProps> = (profile, tags) => {
         className={profileStyles.update_button_wrapper}
         width="40"
         colorScheme="blue">
-        {/* {isLoading ? <Spinner /> : <Text>更新</Text>} */}
+        {isLoading ? <Spinner /> : <Text>更新</Text>}
       </Button>
     </>
   );

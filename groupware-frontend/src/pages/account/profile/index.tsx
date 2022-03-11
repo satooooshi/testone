@@ -301,7 +301,7 @@ const Profile = () => {
             />
           ) : null}
         </div> */}
-        <ProfileForm profile={profile} tags={tags} />
+        <ProfileForm profile={profile} tags={tags} isLoading={isLoading} />
         {/* <div className={profileStyles.form_wrapper}> */}
         {/* <FormControl className={profileStyles.input_wrapper}>
             <FormLabel fontWeight={'bold'}>メールアドレス</FormLabel>
