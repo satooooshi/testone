@@ -291,7 +291,7 @@ const Home: React.FC = () => {
             <PortalLinkBox
               type="safety_confirmation"
               onPress={() => {
-                Alert.alert('2022年4月実装予定です');
+                Alert.alert('近日公開予定です');
               }}
             />
           </Div>
