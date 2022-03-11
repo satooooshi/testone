@@ -43,7 +43,6 @@ const TextEditor: React.FC<TextEditorProps> = ({
         webview={{
           androidHardwareAccelerationDisabled: true,
           androidLayerType: 'software',
-          hideKeyboardAccessoryView: true,
         }}
         autoSize
         ref={quillRef}
