@@ -137,6 +137,7 @@ export class AttendanceService {
     );
     return attendanceReports;
   }
+
   public async createAttendanceReport(attendanceReport: AttendanceReport) {
     const createdAttendanceReport = await this.attendanceReport.save({
       ...attendanceReport,
