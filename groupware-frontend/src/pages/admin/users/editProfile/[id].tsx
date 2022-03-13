@@ -15,6 +15,7 @@ import ProfileForm from 'src/templates/account/ProfileForm';
 
 const Profile = () => {
   const router = useRouter();
+  const toast = useToast();
   const { id } = router.query as { id: string };
   const { data: profile } = useAPIGetUserInfoById(id);
   const { data: tags } = useAPIGetUserTag();
@@ -32,8 +33,6 @@ const Profile = () => {
       },
     },
   );
-
-  const toast = useToast();
 
   const { mutate: updateUser, isLoading: loadigUpdateUser } = useAPIUpdateUser({
     onSuccess: (responseData) => {
