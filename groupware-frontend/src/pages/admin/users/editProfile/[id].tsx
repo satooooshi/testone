@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useReducer } from 'react';
+import React, { useState, useCallback, useRef, useReducer } from 'react';
 import { SidebarScreenName } from '@/components/layout/Sidebar';
 import { Tab } from 'src/types/header/tab/types';
 import LayoutWithTab from '@/components/layout/LayoutWithTab';
@@ -54,65 +54,66 @@ const Profile = () => {
   const { id } = router.query as { id: string };
   const { data: profile } = useAPIGetUserInfoById(id);
   const { data: tags } = useAPIGetUserTag();
-  const initialUserValues = {
-    email: '',
-    isEmailPublic: false,
-    phone: '',
-    isPhonePublic: false,
-    lastName: '',
-    firstName: '',
-    lastNameKana: '',
-    firstNameKana: '',
-    avatarUrl: '',
-    introduceOther: '',
-    introduceTech: '',
-    introduceQualification: '',
-    introduceClub: '',
-    introduceHobby: '',
-  };
+  const [userInfo, setUserInfo] = useState<Partial<User> | undefined>();
+  // const initialUserValues = {
+  //   email: '',
+  //   isEmailPublic: false,
+  //   phone: '',
+  //   isPhonePublic: false,
+  //   lastName: '',
+  //   firstName: '',
+  //   lastNameKana: '',
+  //   firstNameKana: '',
+  //   avatarUrl: '',
+  //   introduceOther: '',
+  //   introduceTech: '',
+  //   introduceQualification: '',
+  //   introduceClub: '',
+  //   introduceHobby: '',
+  // };
 
-  const modalReducer = (
-    _state: ModalState,
-    action: ModalAction,
-  ): ModalState => {
-    switch (action.type) {
-      case 'openTech': {
-        return {
-          isOpen: true,
-          filteredTagType: TagType.TECH,
-        };
-      }
-      case 'openQualification': {
-        return {
-          isOpen: true,
-          filteredTagType: TagType.QUALIFICATION,
-        };
-      }
-      case 'openClub': {
-        return {
-          isOpen: true,
-          filteredTagType: TagType.CLUB,
-        };
-      }
-      case 'openHobby': {
-        return {
-          isOpen: true,
-          filteredTagType: TagType.HOBBY,
-        };
-      }
-      case 'close': {
-        return {
-          isOpen: false,
-        };
-      }
-    }
-  };
-  const [{ isOpen, filteredTagType }, dispatchModal] = useReducer(
-    modalReducer,
-    {
-      isOpen: false,
-    },
-  );
+  // const modalReducer = (
+  //   _state: ModalState,
+  //   action: ModalAction,
+  // ): ModalState => {
+  //   switch (action.type) {
+  //     case 'openTech': {
+  //       return {
+  //         isOpen: true,
+  //         filteredTagType: TagType.TECH,
+  //       };
+  //     }
+  //     case 'openQualification': {
+  //       return {
+  //         isOpen: true,
+  //         filteredTagType: TagType.QUALIFICATION,
+  //       };
+  //     }
+  //     case 'openClub': {
+  //       return {
+  //         isOpen: true,
+  //         filteredTagType: TagType.CLUB,
+  //       };
+  //     }
+  //     case 'openHobby': {
+  //       return {
+  //         isOpen: true,
+  //         filteredTagType: TagType.HOBBY,
+  //       };
+  //     }
+  //     case 'close': {
+  //       return {
+  //         isOpen: false,
+  //       };
+  //     }
+  //   }
+  // };
+  // const [{ isOpen, filteredTagType }, dispatchModal] = useReducer(
+  //   modalReducer,
+  //   {
+  //     isOpen: false,
+  //   },
+  // );
 
   const { mutate: uploadImage, isLoading: loadingUplaod } = useAPIUploadStorage(
     {
@@ -126,63 +127,63 @@ const Profile = () => {
       },
     },
   );
-  const [
-    {
-      crop,
-      completedCrop,
-      croppedImageURL,
-      imageName: selectImageName,
-      imageURL: selectImageUrl,
-    },
-    dispatchCrop,
-  ] = useImageCrop();
-  const imgRef = useRef<HTMLImageElement | null>(null);
+  // const [
+  //   {
+  //     crop,
+  //     completedCrop,
+  //     croppedImageURL,
+  //     imageName: selectImageName,
+  //     imageURL: selectImageUrl,
+  //   },
+  //   dispatchCrop,
+  // ] = useImageCrop();
+  // const imgRef = useRef<HTMLImageElement | null>(null);
 
-  const onEventImageDrop = useCallback(
-    (f: File[]) => {
-      dispatchCrop({ type: 'setImageFile', value: f[0] });
-    },
-    [dispatchCrop],
-  );
+  // const onEventImageDrop = useCallback(
+  //   (f: File[]) => {
+  //     dispatchCrop({ type: 'setImageFile', value: f[0] });
+  //   },
+  //   [dispatchCrop],
+  // );
 
-  const {
-    getRootProps: getEventImageRootProps,
-    getInputProps: getEventImageInputProps,
-  } = useDropzone({
-    onDrop: onEventImageDrop,
-    accept: imageExtensions,
-  });
+  // const {
+  //   getRootProps: getEventImageRootProps,
+  //   getInputProps: getEventImageInputProps,
+  // } = useDropzone({
+  //   onDrop: onEventImageDrop,
+  //   accept: imageExtensions,
+  // });
   const toast = useToast();
 
-  const checkErrors = async () => {
-    const errors = await validateForm();
-    const messages = formikErrorMsgFactory(errors);
-    if (messages) {
-      toast({
-        title: messages,
-        status: 'error',
-        duration: 3000,
-        isClosable: true,
-      });
-    } else {
-      onFinish();
-    }
-  };
+  // const checkErrors = async () => {
+  //   const errors = await validateForm();
+  //   const messages = formikErrorMsgFactory(errors);
+  //   if (messages) {
+  //     toast({
+  //       title: messages,
+  //       status: 'error',
+  //       duration: 3000,
+  //       isClosable: true,
+  //     });
+  //   } else {
+  //     onFinish();
+  //   }
+  // };
 
-  const {
-    values: userInfo,
-    setValues: setUserInfo,
-    handleSubmit: onFinish,
-    handleChange,
-    validateForm,
-  } = useFormik<Partial<User>>({
-    initialValues: profile ? profile : initialUserValues,
-    enableReinitialize: true,
-    validationSchema: profileSchema,
-    onSubmit: () => {
-      handleUpdateUser();
-    },
-  });
+  // const {
+  //   values: userInfo,
+  //   setValues: setUserInfo,
+  //   handleSubmit: onFinish,
+  //   handleChange,
+  //   validateForm,
+  // } = useFormik<Partial<User>>({
+  //   initialValues: profile ? profile : initialUserValues,
+  //   enableReinitialize: true,
+  //   validationSchema: profileSchema,
+  //   onSubmit: () => {
+  //     handleUpdateUser();
+  //   },
+  // });
 
   const { mutate: updateUser, isLoading: loadigUpdateUser } = useAPIUpdateUser({
     onSuccess: (responseData) => {
@@ -193,7 +194,7 @@ const Profile = () => {
           duration: 3000,
           isClosable: true,
         });
-        dispatchCrop({ type: 'setImageFile', value: undefined });
+        // dispatchCrop({ type: 'setImageFile', value: undefined });
         router.back();
       }
     },
@@ -201,27 +202,27 @@ const Profile = () => {
 
   const tabs: Tab[] = useHeaderTab({ headerTabType: 'admin' });
 
-  const handleUpdateUser = async () => {
-    if (!croppedImageURL || !completedCrop || !selectImageName) {
-      updateUser(userInfo);
-      return;
-    }
-    const result = await dataURLToFile(croppedImageURL, selectImageName);
-    uploadImage([result]);
-    return;
-  };
+  // const handleUpdateUser = async () => {
+  //   if (!croppedImageURL || !completedCrop || !selectImageName) {
+  //     updateUser(userInfo);
+  //     return;
+  //   }
+  //   const result = await dataURLToFile(croppedImageURL, selectImageName);
+  //   uploadImage([result]);
+  //   return;
+  // };
 
-  const onLoad = useCallback((img) => {
-    imgRef.current = img;
-  }, []);
+  // const onLoad = useCallback((img) => {
+  //   imgRef.current = img;
+  // }, []);
 
-  const toggleSelectedTag = (t: UserTag) => {
-    const toggledTag = toggleTag(userInfo?.tags, t);
-    setUserInfo((i) => ({
-      ...i,
-      tags: toggledTag,
-    }));
-  };
+  // const toggleSelectedTag = (t: UserTag) => {
+  //   const toggledTag = toggleTag(userInfo?.tags, t);
+  //   setUserInfo((i) => ({
+  //     ...i,
+  //     tags: toggledTag,
+  //   }));
+  // };
 
   const isLoading = loadigUpdateUser || loadingUplaod;
 
