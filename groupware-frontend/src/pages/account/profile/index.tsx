@@ -1,50 +1,24 @@
-import React, { useCallback, useRef, useReducer, useState } from 'react';
+import React, { useState } from 'react';
 import { SidebarScreenName } from '@/components/layout/Sidebar';
 import { Tab } from 'src/types/header/tab/types';
 import LayoutWithTab from '@/components/layout/LayoutWithTab';
-import profileStyles from '@/styles/layouts/Profile.module.scss';
 import { useAPIUpdateUser } from '@/hooks/api/user/useAPIUpdateUser';
-import { TagType, User, UserTag, BranchType } from 'src/types';
-import {
-  Box,
-  Button,
-  FormControl,
-  FormLabel,
-  Input,
-  Spinner,
-  Textarea,
-  Select,
-  useToast,
-  Text,
-  Radio,
-  Stack,
-} from '@chakra-ui/react';
-import { useAuthenticate } from 'src/contexts/useAuthenticate';
-import { imageExtensions } from 'src/utils/imageExtensions';
-import { useDropzone } from 'react-dropzone';
-import { useFormik } from 'formik';
-import Image from 'next/image';
-import noImage from '@/public/no-image.jpg';
+import { User } from 'src/types';
+import { useToast } from '@chakra-ui/react';
+import { useAuthenticate } from 'src/contexts/useAuthenticate';;
 import { useAPIUploadStorage } from '@/hooks/api/storage/useAPIUploadStorage';
 import Head from 'next/head';
-import ReactCrop from 'react-image-crop';
-import { dataURLToFile } from 'src/utils/dataURLToFile';
 import { useAPIGetProfile } from '@/hooks/api/user/useAPIGetProfile';
-import { useImageCrop } from '@/hooks/crop/useImageCrop';
 import { useHeaderTab } from '@/hooks/headerTab/useHeaderTab';
-import TagModal from '@/components/common/TagModal';
-import { toggleTag } from 'src/utils/toggleTag';
-import { profileSchema } from 'src/utils/validation/schema';
-import { formikErrorMsgFactory } from 'src/utils/factory/formikErrorMsgFactory';
 import { useAPIGetUserTag } from '@/hooks/api/tag/useAPIGetUserTag';
-import FormToLinkTag from '@/components/FormToLinkTag';
 import ProfileForm from 'src/templates/account/ProfileForm';
 import router from 'next/router';
 
 const Profile = () => {
+  const toast = useToast();
   const { data: profile } = useAPIGetProfile();
-  const { user } = useAuthenticate();
   const { data: tags } = useAPIGetUserTag();
+  const { user } = useAuthenticate();
   const [userInfo, setUserInfo] = useState<Partial<User> | undefined>();
 
   const { mutate: uploadImage, isLoading: loadingUplaod } = useAPIUploadStorage(
@@ -59,8 +33,6 @@ const Profile = () => {
       },
     },
   );
-
-  const toast = useToast();
 
   const { mutate: updateUser, isLoading: loadigUpdateUser } = useAPIUpdateUser({
     onSuccess: (responseData) => {
