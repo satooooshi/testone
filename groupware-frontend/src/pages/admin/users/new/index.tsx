@@ -45,6 +45,7 @@ import FormToLinkTag from '@/components/FormToLinkTag';
 import { useRouter } from 'next/router';
 import { useAuthenticate } from 'src/contexts/useAuthenticate';
 import { formikErrorMsgFactory } from 'src/utils/factory/formikErrorMsgFactory';
+import ProfileForm from 'src/templates/account/ProfileForm';
 
 type ModalState = {
   isOpen: boolean;
@@ -61,6 +62,7 @@ const CreateNewUser = () => {
   const router = useRouter();
   const { user } = useAuthenticate();
   const [loadingUserRole, setLoadingUserRole] = useState(true);
+  const [userInfo, setUserInfo] = useState<Partial<User> | undefined>();
   const initialUserValues: Partial<User> = {
     email: '',
     lastName: '',
@@ -258,7 +260,14 @@ const CreateNewUser = () => {
       <Head>
         <title>ボールド | ユーザー作成</title>
       </Head>
-      {tags && (
+      <ProfileForm
+        tags={tags}
+        isLoading={isLoading}
+        updateUser={registerUser}
+        uploadImage={uploadImage}
+        setUserInfoProps={setUserInfo}
+      />
+      {/* {tags && (
         <TagModal
           isOpen={isOpen}
           isSearch={false}
@@ -557,7 +566,7 @@ const CreateNewUser = () => {
           onClick={() => checkErrors()}>
           {isLoading ? <Spinner /> : <Text>作成</Text>}
         </Button>
-      </div>
+      </div> */}
     </LayoutWithTab>
   );
 };
