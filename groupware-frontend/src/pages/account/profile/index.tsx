@@ -5,7 +5,7 @@ import LayoutWithTab from '@/components/layout/LayoutWithTab';
 import { useAPIUpdateUser } from '@/hooks/api/user/useAPIUpdateUser';
 import { User } from 'src/types';
 import { useToast } from '@chakra-ui/react';
-import { useAuthenticate } from 'src/contexts/useAuthenticate';;
+import { useAuthenticate } from 'src/contexts/useAuthenticate';
 import { useAPIUploadStorage } from '@/hooks/api/storage/useAPIUploadStorage';
 import Head from 'next/head';
 import { useAPIGetProfile } from '@/hooks/api/user/useAPIGetProfile';
