@@ -68,7 +68,7 @@ const Profile = () => {
         profile={profile}
         tags={tags}
         isLoading={isLoading}
-        updateUser={updateUser}
+        saveUser={updateUser}
         uploadImage={uploadImage}
         setUserInfoProps={setUserInfo}
       />

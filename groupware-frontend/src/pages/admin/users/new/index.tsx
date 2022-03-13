@@ -81,40 +81,6 @@ const CreateNewUser = () => {
     verifiedAt: new Date(),
     tags: [],
   };
-  const checkErrors = async () => {
-    const errors = await validateForm();
-    const messages = formikErrorMsgFactory(errors);
-    if (messages) {
-      toast({
-        title: messages,
-        status: 'error',
-        duration: 3000,
-        isClosable: true,
-      });
-    } else {
-      onFinish();
-    }
-  };
-
-  const {
-    handleSubmit: onFinish,
-    handleChange,
-    validateForm,
-    setValues: setUserInfo,
-    values,
-    resetForm,
-  } = useFormik({
-    initialValues: initialUserValues,
-    onSubmit: async (submitted) => {
-      if (croppedImageURL && imageName && completedCrop) {
-        const result = await dataURLToFile(croppedImageURL, imageName);
-        uploadImage([result]);
-        return;
-      }
-      registerUser(submitted);
-    },
-    validationSchema: registerSchema,
-  });
   const imgRef = useRef<HTMLImageElement | null>(null);
 
   const onLoad = useCallback((img) => {
@@ -179,11 +145,7 @@ const CreateNewUser = () => {
           setUserInfo((e) => ({ ...e, avatarUrl: fileURLs[0] }));
         };
         await updateEventImageOnState();
-        registerUser({ ...values, avatarUrl: fileURLs[0] });
-        dispatchCrop({
-          type: 'setImageFile',
-          value: undefined,
-        });
+        registerUser({ ...userInfo, avatarUrl: fileURLs[0] });
       },
     },
   );
@@ -209,7 +171,7 @@ const CreateNewUser = () => {
   const { mutate: registerUser, isLoading: loadingRegister } = useAPIRegister({
     onSuccess: (responseData) => {
       if (responseData) {
-        const tempPassword: string = values.password || '';
+        const tempPassword: string = userInfo?.password || '';
         toast({
           title: `${responseData.lastName} ${responseData.firstName}さんのアカウントを作成しました`,
           description: `パスワード: ${tempPassword}`,
@@ -217,7 +179,7 @@ const CreateNewUser = () => {
           duration: 3000,
           isClosable: true,
         });
-        resetForm();
+        // resetForm();
         setUserInfo(initialUserValues);
       }
     },
@@ -263,7 +225,7 @@ const CreateNewUser = () => {
       <ProfileForm
         tags={tags}
         isLoading={isLoading}
-        updateUser={registerUser}
+        saveUser={registerUser}
         uploadImage={uploadImage}
         setUserInfoProps={setUserInfo}
       />
