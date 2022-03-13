@@ -3,7 +3,7 @@ import { SidebarScreenName } from '@/components/layout/Sidebar';
 import { Tab } from 'src/types/header/tab/types';
 import LayoutWithTab from '@/components/layout/LayoutWithTab';
 import { useAPIUpdateUser } from '@/hooks/api/user/useAPIUpdateUser';
-import { TagType, User } from 'src/types';
+import { User } from 'src/types';
 import { useToast } from '@chakra-ui/react';
 import { useAPIUploadStorage } from '@/hooks/api/storage/useAPIUploadStorage';
 import Head from 'next/head';
@@ -12,15 +12,6 @@ import { useAPIGetUserTag } from '@/hooks/api/tag/useAPIGetUserTag';
 import { useRouter } from 'next/router';
 import { useAPIGetUserInfoById } from '@/hooks/api/user/useAPIGetUserInfoById';
 import ProfileForm from 'src/templates/account/ProfileForm';
-
-type ModalState = {
-  isOpen: boolean;
-  filteredTagType?: TagType;
-};
-
-type ModalAction = {
-  type: 'openTech' | 'openQualification' | 'openClub' | 'openHobby' | 'close';
-};
 
 const Profile = () => {
   const router = useRouter();
