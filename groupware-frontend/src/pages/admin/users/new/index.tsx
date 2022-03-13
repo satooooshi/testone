@@ -47,15 +47,6 @@ import { useAuthenticate } from 'src/contexts/useAuthenticate';
 import { formikErrorMsgFactory } from 'src/utils/factory/formikErrorMsgFactory';
 import ProfileForm from 'src/templates/account/ProfileForm';
 
-type ModalState = {
-  isOpen: boolean;
-  filteredTagType?: TagType;
-};
-
-type ModalAction = {
-  type: 'openTech' | 'openQualification' | 'openClub' | 'openHobby' | 'close';
-};
-
 const CreateNewUser = () => {
   const toast = useToast();
   const { data: tags } = useAPIGetUserTag();
@@ -63,80 +54,25 @@ const CreateNewUser = () => {
   const { user } = useAuthenticate();
   const [loadingUserRole, setLoadingUserRole] = useState(true);
   const [userInfo, setUserInfo] = useState<Partial<User> | undefined>();
-  const initialUserValues: Partial<User> = {
-    email: '',
-    lastName: '',
-    firstName: '',
-    lastNameKana: '',
-    firstNameKana: '',
-    password: '',
-    role: UserRole.COMMON,
-    avatarUrl: '',
-    employeeId: '',
-    introduceOther: '',
-    introduceTech: '',
-    introduceClub: '',
-    introduceHobby: '',
-    introduceQualification: '',
-    verifiedAt: new Date(),
-    tags: [],
-  };
-  const imgRef = useRef<HTMLImageElement | null>(null);
+  // const initialUserValues: Partial<User> = {
+  //   email: '',
+  //   lastName: '',
+  //   firstName: '',
+  //   lastNameKana: '',
+  //   firstNameKana: '',
+  //   password: '',
+  //   role: UserRole.COMMON,
+  //   avatarUrl: '',
+  //   employeeId: '',
+  //   introduceOther: '',
+  //   introduceTech: '',
+  //   introduceClub: '',
+  //   introduceHobby: '',
+  //   introduceQualification: '',
+  //   verifiedAt: new Date(),
+  //   tags: [],
+  // };
 
-  const onLoad = useCallback((img) => {
-    imgRef.current = img;
-  }, []);
-
-  const modalReducer = (
-    _state: ModalState,
-    action: ModalAction,
-  ): ModalState => {
-    switch (action.type) {
-      case 'openTech': {
-        return {
-          isOpen: true,
-          filteredTagType: TagType.TECH,
-        };
-      }
-      case 'openQualification': {
-        return {
-          isOpen: true,
-          filteredTagType: TagType.QUALIFICATION,
-        };
-      }
-      case 'openClub': {
-        return {
-          isOpen: true,
-          filteredTagType: TagType.CLUB,
-        };
-      }
-      case 'openHobby': {
-        return {
-          isOpen: true,
-          filteredTagType: TagType.HOBBY,
-        };
-      }
-      case 'close': {
-        return {
-          isOpen: false,
-        };
-      }
-    }
-  };
-
-  const [{ isOpen, filteredTagType }, dispatchModal] = useReducer(
-    modalReducer,
-    {
-      isOpen: false,
-    },
-  );
-
-  const [
-    { crop, completedCrop, croppedImageURL, imageName, imageURL },
-    dispatchCrop,
-  ] = useImageCrop();
-
-  // const [userInfo, setUserInfo] = useState<Partial<User>>(initialUserValues);
   const { mutate: uploadImage, isLoading: loadingUplaod } = useAPIUploadStorage(
     {
       onSuccess: async (fileURLs) => {
@@ -150,24 +86,6 @@ const CreateNewUser = () => {
     },
   );
 
-  const onEventImageDrop = useCallback(
-    (f: File[]) => {
-      dispatchCrop({
-        type: 'setImageFile',
-        value: f[0],
-      });
-    },
-    [dispatchCrop],
-  );
-
-  const {
-    getRootProps: getEventImageRootProps,
-    getInputProps: getEventImageInputProps,
-  } = useDropzone({
-    onDrop: onEventImageDrop,
-    accept: imageExtensions,
-  });
-
   const { mutate: registerUser, isLoading: loadingRegister } = useAPIRegister({
     onSuccess: (responseData) => {
       if (responseData) {
@@ -180,20 +98,12 @@ const CreateNewUser = () => {
           isClosable: true,
         });
         // resetForm();
-        setUserInfo(initialUserValues);
+        setUserInfo(undefined);
       }
     },
   });
 
   const tabs: Tab[] = useHeaderTab({ headerTabType: 'admin' });
-
-  const toggleSelectedTag = (t: UserTag) => {
-    const toggledTag = toggleTag(values.tags, t);
-    setUserInfo((i) => ({
-      ...i,
-      tags: toggledTag,
-    }));
-  };
 
   const isLoading = loadingRegister || loadingUplaod;
 
