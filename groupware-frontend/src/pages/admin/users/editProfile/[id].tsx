@@ -38,6 +38,7 @@ import { useAPIGetUserTag } from '@/hooks/api/tag/useAPIGetUserTag';
 import FormToLinkTag from '@/components/FormToLinkTag';
 import { useRouter } from 'next/router';
 import { useAPIGetUserInfoById } from '@/hooks/api/user/useAPIGetUserInfoById';
+import ProfileForm from 'src/templates/account/ProfileForm';
 
 type ModalState = {
   isOpen: boolean;
@@ -234,7 +235,15 @@ const Profile = () => {
       <Head>
         <title>ボールド | プロフィール編集</title>
       </Head>
-      {tags && (
+      <ProfileForm
+        profile={profile}
+        tags={tags}
+        isLoading={isLoading}
+        updateUser={updateUser}
+        uploadImage={uploadImage}
+        setUserInfoProps={setUserInfo}
+      />
+      {/* {tags && (
         <TagModal
           isOpen={isOpen}
           isSearch={false}
@@ -527,7 +536,7 @@ const Profile = () => {
           checkErrors();
         }}>
         {isLoading ? <Spinner /> : <Text>更新</Text>}
-      </Button>
+      </Button> */}
     </LayoutWithTab>
   );
 };
