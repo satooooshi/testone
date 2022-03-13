@@ -1,4 +1,10 @@
-import React, { useReducer, useRef, useCallback } from 'react';
+import React, {
+  Dispatch,
+  SetStateAction,
+  useReducer,
+  useRef,
+  useCallback,
+} from 'react';
 import profileStyles from '@/styles/layouts/Profile.module.scss';
 import { User, TagType, BranchType, UserTag } from 'src/types';
 import {
@@ -10,6 +16,7 @@ import {
   Spinner,
   Textarea,
   Select,
+  useToast,
   Text,
   Radio,
   Stack,
@@ -22,13 +29,19 @@ import { useDropzone } from 'react-dropzone';
 import FormToLinkTag from '@/components/FormToLinkTag';
 import TagModal from '@/components/common/TagModal';
 import { useImageCrop } from '@/hooks/crop/useImageCrop';
+import { formikErrorMsgFactory } from 'src/utils/factory/formikErrorMsgFactory';
+import { profileSchema } from 'src/utils/validation/schema';
 import { imageExtensions } from 'src/utils/imageExtensions';
+import { dataURLToFile } from 'src/utils/dataURLToFile';
 import { toggleTag } from 'src/utils/toggleTag';
 
 type ProfileFormProps = {
   profile?: User;
   tags?: UserTag[];
   isLoading: boolean;
+  updateUser: (userInfo: Partial<User>) => void;
+  uploadImage: (result: File[]) => void;
+  setUserInfoProps: Dispatch<SetStateAction<Partial<User> | undefined>>;
 };
 
 type ModalState = {
@@ -44,7 +57,11 @@ const ProfileForm: React.FC<ProfileFormProps> = ({
   profile,
   tags,
   isLoading,
+  updateUser,
+  uploadImage,
+  setUserInfoProps,
 }) => {
+  const toast = useToast();
   const initialUserValues = {
     email: '',
     isEmailPublic: false,
@@ -143,10 +160,10 @@ const ProfileForm: React.FC<ProfileFormProps> = ({
   } = useFormik<Partial<User>>({
     initialValues: profile ? profile : initialUserValues,
     enableReinitialize: true,
-    // validationSchema: profileSchema,
-    // onSubmit: () => {
-    //   handleUpdateUser();
-    // },
+    validationSchema: profileSchema,
+    onSubmit: () => {
+      handleUpdateUser();
+    },
   });
 
   const toggleSelectedTag = (t: UserTag) => {
@@ -155,6 +172,32 @@ const ProfileForm: React.FC<ProfileFormProps> = ({
       ...i,
       tags: toggledTag,
     }));
+  };
+
+  const checkErrors = async () => {
+    const errors = await validateForm();
+    const messages = formikErrorMsgFactory(errors);
+    if (messages) {
+      toast({
+        title: messages,
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      });
+    } else {
+      onFinish();
+    }
+  };
+
+  const handleUpdateUser = async () => {
+    if (!croppedImageURL || !completedCrop || !selectImageName) {
+      updateUser(userInfo);
+      return;
+    }
+    const result = await dataURLToFile(croppedImageURL, selectImageName);
+    setUserInfoProps(userInfo);
+    uploadImage([result]);
+    return;
   };
 
   const onLoad = useCallback((img) => {
@@ -450,7 +493,8 @@ const ProfileForm: React.FC<ProfileFormProps> = ({
       <Button
         className={profileStyles.update_button_wrapper}
         width="40"
-        colorScheme="blue">
+        colorScheme="blue"
+        onClick={() => checkErrors()}>
         {isLoading ? <Spinner /> : <Text>更新</Text>}
       </Button>
     </>

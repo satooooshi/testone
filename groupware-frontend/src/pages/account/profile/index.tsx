@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useReducer } from 'react';
+import React, { useCallback, useRef, useReducer, useState } from 'react';
 import { SidebarScreenName } from '@/components/layout/Sidebar';
 import { Tab } from 'src/types/header/tab/types';
 import LayoutWithTab from '@/components/layout/LayoutWithTab';
@@ -45,23 +45,7 @@ const Profile = () => {
   const { data: profile } = useAPIGetProfile();
   const { user } = useAuthenticate();
   const { data: tags } = useAPIGetUserTag();
-  const initialUserValues = {
-    email: '',
-    isEmailPublic: false,
-    phone: '',
-    isPhonePublic: false,
-    lastName: '',
-    firstName: '',
-    lastNameKana: '',
-    firstNameKana: '',
-    branch: BranchType.NON_SET,
-    avatarUrl: '',
-    introduceOther: '',
-    introduceTech: '',
-    introduceQualification: '',
-    introduceClub: '',
-    introduceHobby: '',
-  };
+  const [userInfo, setUserInfo] = useState<Partial<User> | undefined>();
 
   const { mutate: uploadImage, isLoading: loadingUplaod } = useAPIUploadStorage(
     {
@@ -78,36 +62,6 @@ const Profile = () => {
 
   const toast = useToast();
 
-  const checkErrors = async () => {
-    const errors = await validateForm();
-    const messages = formikErrorMsgFactory(errors);
-    if (messages) {
-      toast({
-        title: messages,
-        status: 'error',
-        duration: 3000,
-        isClosable: true,
-      });
-    } else {
-      onFinish();
-    }
-  };
-
-  const {
-    values: userInfo,
-    setValues: setUserInfo,
-    handleSubmit: onFinish,
-    handleChange,
-    validateForm,
-  } = useFormik<Partial<User>>({
-    initialValues: profile ? profile : initialUserValues,
-    enableReinitialize: true,
-    validationSchema: profileSchema,
-    onSubmit: () => {
-      // handleUpdateUser();
-    },
-  });
-
   const { mutate: updateUser, isLoading: loadigUpdateUser } = useAPIUpdateUser({
     onSuccess: (responseData) => {
       if (responseData) {
@@ -117,7 +71,7 @@ const Profile = () => {
           duration: 3000,
           isClosable: true,
         });
-        // dispatchCrop({ type: 'setImageFile', value: undefined });
+        setUserInfo(undefined);
         router.push(`/account/${responseData.id.toString()}`);
       }
     },
@@ -138,7 +92,14 @@ const Profile = () => {
       <Head>
         <title>ボールド | プロフィール編集</title>
       </Head>
-      <ProfileForm profile={profile} tags={tags} isLoading={isLoading} />
+      <ProfileForm
+        profile={profile}
+        tags={tags}
+        isLoading={isLoading}
+        updateUser={updateUser}
+        uploadImage={uploadImage}
+        setUserInfoProps={setUserInfo}
+      />
     </LayoutWithTab>
   );
 };
