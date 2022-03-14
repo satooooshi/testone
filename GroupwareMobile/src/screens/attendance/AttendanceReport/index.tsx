@@ -172,7 +172,7 @@ const AttendanceReport: React.FC = () => {
             {acceptedReport.map(
               d =>
                 d.verifiedAt !== null && (
-                  <Div flexDir="row" my="sm">
+                  <Div key={d.id} flexDir="row" my="sm">
                     <AttendanceReportRow reportData={d} />
                   </Div>
                 ),
@@ -190,10 +190,8 @@ const AttendanceReport: React.FC = () => {
             {unAcceptedReport.map(
               d =>
                 d.verifiedAt === null && (
-                  <Div flexDir="row" my="sm">
-                    <Div flexDir="row" my="sm">
-                      <AttendanceReportRow reportData={d} />
-                    </Div>
+                  <Div key={d.id} flexDir="row" my="sm">
+                    <AttendanceReportRow reportData={d} />
                   </Div>
                 ),
             )}

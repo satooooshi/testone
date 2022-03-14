@@ -205,6 +205,7 @@ export class AttendanceController {
     ) {
       throw new BadRequestException();
     }
+
     const { user } = req;
     const attendanceReports = await this.attendanceService.getAttendanceReports(
       user.id,

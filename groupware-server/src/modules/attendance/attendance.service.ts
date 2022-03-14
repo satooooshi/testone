@@ -50,8 +50,8 @@ export class AttendanceService {
       .createQueryBuilder('attendance')
       .leftJoinAndSelect('attendance.travelCost', 'travelCost')
       .leftJoinAndSelect('attendance.user', 'user')
-      .where('attendance.targetDate >= :fromDate', { fromDate })
-      .where('attendance.targetDate <= :toDate', { toDate })
+      .andWhere('attendance.targetDate >= :fromDate', { fromDate })
+      .andWhere('attendance.targetDate <= :toDate', { toDate })
       .getMany();
     return attendance;
   }
@@ -65,8 +65,8 @@ export class AttendanceService {
       .createQueryBuilder('attendance')
       .leftJoinAndSelect('attendance.travelCost', 'travelCost')
       .leftJoinAndSelect('attendance.user', 'user')
-      .where('user.id = :userId', { userId })
-      .where('attendance_report.targetDate between :fromDate and :toDate', {
+      .andWhere('user.id = :userId', { userId })
+      .andWhere('attendance_report.targetDate between :fromDate and :toDate', {
         fromDate,
         toDate,
       })
@@ -135,13 +135,12 @@ export class AttendanceService {
     const attendanceReports = await this.attendanceReport
       .createQueryBuilder('attendance_report')
       .leftJoinAndSelect('attendance_report.user', 'user')
-      .where('user.id = :userId', { userId })
-      .where('attendance_report.targetDate between :fromDate and :toDate', {
+      .andWhere('user.id = :userId', { userId })
+      .andWhere('attendance_report.targetDate between :fromDate and :toDate', {
         fromDate,
         toDate,
       })
       .getMany();
-    console.log('aaaaaaaaaa', fromDate);
 
     return attendanceReports;
   }
