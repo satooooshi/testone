@@ -201,7 +201,7 @@ const AttendanceRow = ({
           <TextInput
             value={values.detail}
             //@ts-ignore
-            onChange={t => setValues(v => ({...v, detail: t}))}
+            onChangeText={t => setValues(v => ({...v, detail: t}))}
             placeholder="備考を入力してください"
             numberOfLines={10}
             multiline={true}

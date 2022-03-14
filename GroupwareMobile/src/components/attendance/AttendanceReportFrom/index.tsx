@@ -177,7 +177,7 @@ const AttendanceReportFormModal: React.FC<AttendanceReportFormModalProps> =
               <TextInput
                 value={newReport.detail}
                 //@ts-ignore
-                onChange={t => setNewReport(v => ({...v, detail: t}))}
+                onChangeText={t => setNewReport(v => ({...v, detail: t}))}
                 placeholder="詳細を入力してください"
                 numberOfLines={10}
                 multiline={true}
