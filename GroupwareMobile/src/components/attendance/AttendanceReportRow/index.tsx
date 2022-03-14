@@ -40,7 +40,12 @@ const AttendanceReportRow: React.FC<AttendanceReportRowProps> = ({
 
       <Div w={'20%'} justifyContent="center" alignItems="center">
         {reportData.verifiedAt ? (
-          <Text fontSize={13}>{reportData.verifiedAt}</Text>
+          <Text fontSize={13}>
+            {' '}
+            {DateTime.fromJSDate(new Date(reportData.verifiedAt)).toFormat(
+              'yyyy/LL/dd',
+            )}
+          </Text>
         ) : (
           <Text fontSize={13} color="blue">
             編集

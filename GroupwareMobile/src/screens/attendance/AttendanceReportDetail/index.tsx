@@ -1,30 +1,50 @@
 import {DateTime} from 'luxon';
 import React from 'react';
-import {useWindowDimensions} from 'react-native';
-import {ModalProps, Text, Box, ScrollDiv} from 'react-native-magnus';
-import {AttendanceRepo} from '../../../types';
+import {Alert, useWindowDimensions} from 'react-native';
+import {ModalProps, Text, Box, ScrollDiv, Button} from 'react-native-magnus';
+import {AttendanceRepo, UserRole} from '../../../types';
 import {attendanceCategoryName} from '../../../utils/factory/attendance/attendanceCategoryName';
 import {attendanceReasonName} from '../../../utils/factory/attendance/attendanceReasonName';
 import HeaderWithTextButton from '../../../components/Header';
 import WholeContainer from '../../../components/WholeContainer';
 import {AttendanceReportDetailProps} from '../../../types/navigator/drawerScreenProps/attendance';
+import {useAuthenticate} from '../../../contexts/useAuthenticate';
+import {useAPIVerifyAttendanceReport} from '../../../hooks/api/attendance/attendanceReport/useAPIVerifyAttendanceReport';
+import {useNavigation} from '@react-navigation/native';
+import {responseErrorMsgFactory} from '../../../utils/factory/responseEroorMsgFactory';
 
 type CustomModalProps = Omit<ModalProps, 'children'>;
-
-// type AttendanceReportDetailProps = {
-//   report: AttendanceRepo;
-//   // route: AttendanceReportDetailRouteProps;
-// };
 
 const AttendanceReportDetail: React.FC<AttendanceReportDetailProps> = ({
   route,
 }) => {
+  const {user} = useAuthenticate();
+  const navigation = useNavigation<any>();
+  const isAdmin = user?.role === UserRole.ADMIN;
   const {width: windowWidth} = useWindowDimensions();
   const {report} = route.params;
 
+  const {mutate: verifyReport} = useAPIVerifyAttendanceReport({
+    onSuccess: () => {
+      Alert.alert('承認が完了しました');
+      navigation.navigate('AdminStack', {screen: 'AttendanceReportAdmin'});
+    },
+    onError: e => {
+      Alert.alert(responseErrorMsgFactory(e));
+    },
+  });
+
   return (
     <WholeContainer>
-      <HeaderWithTextButton enableBackButton={true} title="勤怠報告詳細" />
+      <HeaderWithTextButton
+        enableBackButton={true}
+        screenForBack={
+          route.params?.previousScreenName
+            ? route.params.previousScreenName
+            : undefined
+        }
+        title="勤怠報告詳細"
+      />
       <ScrollDiv
         contentContainerStyle={{width: windowWidth * 0.9}}
         alignSelf="center">
@@ -77,6 +97,11 @@ const AttendanceReportDetail: React.FC<AttendanceReportDetailProps> = ({
               )
             : '承認されていません。'}
         </Text>
+        {isAdmin && (
+          <Button my="lg" onPress={() => verifyReport(report)}>
+            承認
+          </Button>
+        )}
       </ScrollDiv>
     </WholeContainer>
   );

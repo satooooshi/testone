@@ -3,11 +3,11 @@ import {useMutation, UseMutationOptions} from 'react-query';
 import {AttendanceRepo} from '../../../../types';
 import {ValidateErrorResponseByServer} from '../../../../utils/factory/responseEroorMsgFactory';
 import {axiosInstance} from '../../../../utils/url';
-import {allUnverifiedAttendanceReportURL} from '../../../../utils/url/attendance.url';
+import {attendanceReportURL} from '../../../../utils/url/attendance.url';
 
 const updateAttendanceReport = async (query: AttendanceRepo) => {
   const res = await axiosInstance.patch<AttendanceRepo>(
-    allUnverifiedAttendanceReportURL,
+    attendanceReportURL,
     query,
   );
   return res.data;

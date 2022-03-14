@@ -2,7 +2,7 @@ import {AxiosError} from 'axios';
 import {useQuery, UseQueryOptions} from 'react-query';
 import {AttendanceRepo} from '../../../../types';
 import {axiosInstance} from '../../../../utils/url';
-import {attendanceReportURL} from '../../../../utils/url/attendance.url';
+import {allUnverifiedAttendanceReportURL} from '../../../../utils/url/attendance.url';
 
 export interface GetAttendanceReportQuery {
   from_date: string;
@@ -14,7 +14,8 @@ const getAllUnverifiedAttendanceReport = async (
 ): Promise<AttendanceRepo[]> => {
   const {from_date: fromDate, to_date: toDate} = query;
   const response = await axiosInstance.get<AttendanceRepo[]>(
-    attendanceReportURL + `?from_date=${fromDate}&to_date=${toDate}`,
+    allUnverifiedAttendanceReportURL +
+      `?from_date=${fromDate}&to_date=${toDate}`,
   );
   return response.data;
 };

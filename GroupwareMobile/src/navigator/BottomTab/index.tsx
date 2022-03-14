@@ -50,6 +50,7 @@ import Application from '../../screens/attendance/Application';
 import DefaultAttendanceForm from '../../screens/attendance/DefaultAttendance';
 import AttendanceReport from '../../screens/attendance/AttendanceReport';
 import AttendanceReportDetail from '../../screens/attendance/AttendanceReportDetail';
+import AttendanceReportAdmin from '../../screens/admin/AttendanceReportAdmin';
 
 const Tab = createBottomTabNavigator();
 // const Tab = createMaterialBottomTabNavigator();
@@ -197,6 +198,11 @@ const AdminStack = () => {
       <Stack.Screen
         name="EditedProfile"
         component={EditedProfile}
+        options={{headerShown: false}}
+      />
+      <Stack.Screen
+        name="AttendanceReportAdmin"
+        component={AttendanceReportAdmin}
         options={{headerShown: false}}
       />
     </Stack.Navigator>

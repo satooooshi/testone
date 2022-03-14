@@ -110,7 +110,10 @@ export type RootStackParamList = {
   AttendanceHome: undefined;
   Attendance: undefined;
   AttendanceReport: undefined;
-  AttendanceReportDetail: {report: AttendanceRepo};
+  AttendanceReportDetail: {
+    report: AttendanceRepo;
+    previousScreenName?: keyof RootStackParamList;
+  };
   DefaultAttendance: undefined;
   ApplicationBeforeJoining: undefined;
 };

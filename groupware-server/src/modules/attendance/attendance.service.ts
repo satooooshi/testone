@@ -156,7 +156,7 @@ export class AttendanceService {
         fromDate,
         toDate,
       })
-      .andWhere('attendance_report.verified = null')
+      .andWhere('attendance_report.verifiedAt is null')
       .getMany();
     return attendanceReports;
   }
