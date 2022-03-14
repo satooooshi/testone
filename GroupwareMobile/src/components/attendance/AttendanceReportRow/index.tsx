@@ -1,9 +1,11 @@
+import {useNavigation} from '@react-navigation/native';
 import {useFormik} from 'formik';
 import {DateTime} from 'luxon';
 import React, {useEffect, useRef, useState} from 'react';
 import {Alert, u} from 'react-native';
 import {Button, Div, Text} from 'react-native-magnus';
 import {AttendanceRepo} from '../../../types';
+import {AttendanceHomeNavigationProps} from '../../../types/navigator/drawerScreenProps/attendance';
 import {attendanceCategoryName} from '../../../utils/factory/attendance/attendanceCategoryName';
 import AttendanceReportFormModal from '../AttendanceReportFrom';
 
@@ -14,6 +16,8 @@ type AttendanceReportRowProps = {
 const AttendanceReportRow: React.FC<AttendanceReportRowProps> = ({
   reportData,
 }) => {
+  const navigation = useNavigation<AttendanceHomeNavigationProps>();
+
   return (
     <>
       <Div w={'20%'} justifyContent="center" alignItems="center">
@@ -44,7 +48,15 @@ const AttendanceReportRow: React.FC<AttendanceReportRowProps> = ({
         )}
       </Div>
       <Div w={'10%'} justifyContent="center" alignItems="center">
-        <Text fontSize={13} color="blue">
+        <Text
+          fontSize={13}
+          color="blue"
+          onPress={() => {
+            navigation.navigate('AttendanceStack', {
+              screen: 'AttendanceReportDetail',
+              params: {report: reportData},
+            });
+          }}>
           詳細
         </Text>
       </Div>
