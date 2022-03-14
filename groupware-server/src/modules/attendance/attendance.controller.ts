@@ -242,4 +242,19 @@ export class AttendanceController {
       });
     return attendanceReports;
   }
+
+  @Patch('/verify')
+  @UseGuards(JwtAuthenticationGuard)
+  async verifyAttendanceReport(
+    @Body() attendanceReport: AttendanceReport,
+    @Req() req: RequestWithUser,
+  ) {
+    const { user } = req;
+    const attendanceReports =
+      await this.attendanceService.verifyAttendanceReport({
+        ...attendanceReport,
+        user,
+      });
+    return attendanceReports;
+  }
 }

@@ -159,4 +159,12 @@ export class AttendanceService {
     );
     return updatedAttendanceReport;
   }
+
+  public async verifyAttendanceReport(attendanceReport: AttendanceReport) {
+    const verifyAttendanceReport = await this.attendanceReport.save({
+      ...attendanceReport,
+      verifiedAt: new Date(),
+    });
+    return verifyAttendanceReport;
+  }
 }

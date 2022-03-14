@@ -3,17 +3,17 @@ import {useMutation, UseMutationOptions} from 'react-query';
 import {AttendanceRepo} from '../../../../types';
 import {ValidateErrorResponseByServer} from '../../../../utils/factory/responseEroorMsgFactory';
 import {axiosInstance} from '../../../../utils/url';
-import {attendanceReportURL} from '../../../../utils/url/attendance.url';
+import {verifyAttendanceReportURL} from '../../../../utils/url/attendance.url';
 
-const updateAttendanceReport = async (query: AttendanceRepo) => {
+const verifyAttendanceReport = async (query: AttendanceRepo) => {
   const res = await axiosInstance.patch<AttendanceRepo>(
-    attendanceReportURL,
+    verifyAttendanceReportURL,
     query,
   );
   return res.data;
 };
 
-export const useAPIUpdateAttendanceReport = (
+export const useAPIVerifyAttendanceReport = (
   options?: UseMutationOptions<
     AttendanceRepo,
     AxiosError<ValidateErrorResponseByServer>,
@@ -26,5 +26,5 @@ export const useAPIUpdateAttendanceReport = (
     AxiosError<ValidateErrorResponseByServer>,
     AttendanceRepo,
     unknown
-  >(updateAttendanceReport, options);
+  >(verifyAttendanceReport, options);
 };
