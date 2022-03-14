@@ -29,7 +29,7 @@ const AttendanceHome: React.FC = () => {
               }
             />
           </Div>
-          <Div mb={8}>
+          <Div mb={8} mr={4}>
             <PortalLinkBox
               type="application"
               onPress={() =>
@@ -39,7 +39,7 @@ const AttendanceHome: React.FC = () => {
               }
             />
           </Div>
-          <Div mb={8} mr={4}>
+          <Div mb={8}>
             <PortalLinkBox
               type="attendance_report"
               onPress={() =>
