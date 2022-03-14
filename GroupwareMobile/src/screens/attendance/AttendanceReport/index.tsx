@@ -67,17 +67,10 @@ const AttendanceReport: React.FC = () => {
       Alert.alert(responseErrorMsgFactory(e));
     },
   });
-  // const dates = useMemo(() => {
-  //   const start = month.startOf('month');
-  //   const end = month.endOf('month');
-  //   const arr: DateTime[] = [];
-  //   let i = 0;
-  //   while (arr[arr.length - 1]?.day !== end.day) {
-  //     arr.push(start.plus({days: i}));
-  //     i++;
-  //   }
-  //   return arr;
-  // }, [month]);
+
+  useEffect(() => {
+    refetchReports();
+  }, [month, refetchReports]);
 
   useEffect(() => {
     console.log('data?.length', data);
@@ -91,6 +84,9 @@ const AttendanceReport: React.FC = () => {
 
       setUnAcceptedREport(UnAcceptedRepo);
       setAcceptedREport(acceptedRepo);
+    } else {
+      setUnAcceptedREport(undefined);
+      setAcceptedREport(undefined);
     }
   }, [data, data?.length]);
 
