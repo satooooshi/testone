@@ -29,8 +29,10 @@ import { useDropzone } from 'react-dropzone';
 import FormToLinkTag from '@/components/FormToLinkTag';
 import TagModal from '@/components/common/TagModal';
 import { useImageCrop } from '@/hooks/crop/useImageCrop';
+import { UserRole } from 'src/types';
 import { formikErrorMsgFactory } from 'src/utils/factory/formikErrorMsgFactory';
 import { registerSchema, profileSchema } from 'src/utils/validation/schema';
+import { userRoleNameFactory } from 'src/utils/factory/userRoleNameFactory';
 import { imageExtensions } from 'src/utils/imageExtensions';
 import { dataURLToFile } from 'src/utils/dataURLToFile';
 import { toggleTag } from 'src/utils/toggleTag';
@@ -62,22 +64,26 @@ const ProfileForm: React.FC<ProfileFormProps> = ({
   setUserInfoProps,
 }) => {
   const toast = useToast();
-  const initialUserValues = {
+
+  const initialUserValues = profile || {
     email: '',
-    isEmailPublic: false,
     phone: '',
-    isPhonePublic: false,
     lastName: '',
     firstName: '',
     lastNameKana: '',
     firstNameKana: '',
+    password: '',
+    role: UserRole.COMMON,
     branch: BranchType.NON_SET,
     avatarUrl: '',
+    employeeId: '',
     introduceOther: '',
     introduceTech: '',
     introduceQualification: '',
     introduceClub: '',
     introduceHobby: '',
+    verifiedAt: new Date(),
+    tags: [],
   };
 
   const modalReducer = (
@@ -158,7 +164,7 @@ const ProfileForm: React.FC<ProfileFormProps> = ({
     handleChange,
     validateForm,
   } = useFormik<Partial<User>>({
-    initialValues: profile ? profile : initialUserValues,
+    initialValues: initialUserValues,
     enableReinitialize: true,
     validationSchema: profile ? profileSchema : registerSchema,
     onSubmit: () => {
@@ -280,28 +286,30 @@ const ProfileForm: React.FC<ProfileFormProps> = ({
               background="white"
               onChange={handleChange}
             />
-            <Stack spacing={5} direction="row">
-              <Radio
-                bg="white"
-                colorScheme="green"
-                isChecked={userInfo.isEmailPublic}
-                value={'public'}
-                onChange={() =>
-                  setUserInfo((v) => ({ ...v, isEmailPublic: true }))
-                }>
-                公開
-              </Radio>
-              <Radio
-                bg="white"
-                colorScheme="green"
-                isChecked={!userInfo.isEmailPublic}
-                value={'inPublic'}
-                onChange={() =>
-                  setUserInfo((v) => ({ ...v, isEmailPublic: true }))
-                }>
-                非公開
-              </Radio>
-            </Stack>
+            {profile && (
+              <Stack spacing={5} direction="row">
+                <Radio
+                  bg="white"
+                  colorScheme="green"
+                  isChecked={userInfo.isEmailPublic}
+                  value={'public'}
+                  onChange={() =>
+                    setUserInfo((v) => ({ ...v, isEmailPublic: true }))
+                  }>
+                  公開
+                </Radio>
+                <Radio
+                  bg="white"
+                  colorScheme="green"
+                  isChecked={!userInfo.isEmailPublic}
+                  value={'inPublic'}
+                  onChange={() =>
+                    setUserInfo((v) => ({ ...v, isEmailPublic: true }))
+                  }>
+                  非公開
+                </Radio>
+              </Stack>
+            )}
           </FormControl>
           <FormControl className={profileStyles.input_wrapper}>
             <FormLabel fontWeight={'bold'}>電話番号</FormLabel>
@@ -313,28 +321,30 @@ const ProfileForm: React.FC<ProfileFormProps> = ({
               value={userInfo.phone}
               onChange={handleChange}
             />
-            <Stack spacing={5} direction="row">
-              <Radio
-                bg="white"
-                colorScheme="green"
-                isChecked={userInfo.isPhonePublic}
-                value={'public'}
-                onChange={() =>
-                  setUserInfo((v) => ({ ...v, isPhonePublic: true }))
-                }>
-                公開
-              </Radio>
-              <Radio
-                bg="white"
-                colorScheme="green"
-                isChecked={!userInfo.isPhonePublic}
-                value={'unPublic'}
-                onChange={() =>
-                  setUserInfo((v) => ({ ...v, isPhonePublic: false }))
-                }>
-                非公開
-              </Radio>
-            </Stack>
+            {profile && (
+              <Stack spacing={5} direction="row">
+                <Radio
+                  bg="white"
+                  colorScheme="green"
+                  isChecked={userInfo.isPhonePublic}
+                  value={'public'}
+                  onChange={() =>
+                    setUserInfo((v) => ({ ...v, isPhonePublic: true }))
+                  }>
+                  公開
+                </Radio>
+                <Radio
+                  bg="white"
+                  colorScheme="green"
+                  isChecked={!userInfo.isPhonePublic}
+                  value={'unPublic'}
+                  onChange={() =>
+                    setUserInfo((v) => ({ ...v, isPhonePublic: false }))
+                  }>
+                  非公開
+                </Radio>
+              </Stack>
+            )}
           </FormControl>
           <FormControl className={profileStyles.input_wrapper}>
             <FormLabel fontWeight={'bold'}>姓</FormLabel>
@@ -380,6 +390,30 @@ const ProfileForm: React.FC<ProfileFormProps> = ({
               onChange={handleChange}
             />
           </FormControl>
+          {!profile && (
+            <FormControl className={profileStyles.input_wrapper}>
+              <FormLabel fontWeight={'bold'}>
+                <p>社員区分</p>
+              </FormLabel>
+              <Select
+                name="role"
+                value={userInfo.role}
+                colorScheme="teal"
+                bg="white"
+                onChange={handleChange}
+                defaultValue={UserRole.COMMON}>
+                <option value={UserRole.ADMIN}>管理者</option>
+                <option value={UserRole.EXTERNAL_INSTRUCTOR}>
+                  {userRoleNameFactory(UserRole.EXTERNAL_INSTRUCTOR)}
+                </option>
+                <option value={UserRole.INTERNAL_INSTRUCTOR}>
+                  {userRoleNameFactory(UserRole.INTERNAL_INSTRUCTOR)}
+                </option>
+                <option value={UserRole.COACH}>コーチ</option>
+                <option value={UserRole.COMMON}>一般社員</option>
+              </Select>
+            </FormControl>
+          )}
           <FormControl mb={4}>
             <FormLabel fontWeight={'bold'}>所属支社</FormLabel>
             <Select
@@ -393,6 +427,37 @@ const ProfileForm: React.FC<ProfileFormProps> = ({
               <option value={BranchType.OSAKA}>大阪</option>
             </Select>
           </FormControl>
+          {!profile && (
+            <>
+              <FormControl className={profileStyles.input_wrapper}>
+                <FormLabel fontWeight={'bold'}>
+                  <p>社員コード</p>
+                </FormLabel>
+                <Input
+                  type="text"
+                  placeholder="社員コード"
+                  value={userInfo.employeeId || ''}
+                  background="white"
+                  name="employeeId"
+                  onChange={handleChange}
+                />
+              </FormControl>
+              <FormControl mb={4}></FormControl>
+              <FormControl className={profileStyles.input_wrapper}>
+                <FormLabel fontWeight={'bold'}>
+                  <p>パスワード</p>
+                </FormLabel>
+                <Input
+                  type="password"
+                  placeholder="password"
+                  value={userInfo.password}
+                  background="white"
+                  name="password"
+                  onChange={handleChange}
+                />
+              </FormControl>
+            </>
+          )}
           <FormControl mb={4}>
             <FormLabel fontWeight={'bold'}>自己紹介</FormLabel>
             <Textarea
@@ -494,7 +559,7 @@ const ProfileForm: React.FC<ProfileFormProps> = ({
         width="40"
         colorScheme="blue"
         onClick={() => checkErrors()}>
-        {isLoading ? <Spinner /> : <Text>更新</Text>}
+        {isLoading ? <Spinner /> : <Text>{profile ? '更新' : '作成'}</Text>}
       </Button>
     </>
   );

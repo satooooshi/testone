@@ -54,24 +54,6 @@ const CreateNewUser = () => {
   const { user } = useAuthenticate();
   const [loadingUserRole, setLoadingUserRole] = useState(true);
   const [userInfo, setUserInfo] = useState<Partial<User> | undefined>();
-  // const initialUserValues: Partial<User> = {
-  //   email: '',
-  //   lastName: '',
-  //   firstName: '',
-  //   lastNameKana: '',
-  //   firstNameKana: '',
-  //   password: '',
-  //   role: UserRole.COMMON,
-  //   avatarUrl: '',
-  //   employeeId: '',
-  //   introduceOther: '',
-  //   introduceTech: '',
-  //   introduceClub: '',
-  //   introduceHobby: '',
-  //   introduceQualification: '',
-  //   verifiedAt: new Date(),
-  //   tags: [],
-  // };
 
   const { mutate: uploadImage, isLoading: loadingUplaod } = useAPIUploadStorage(
     {
