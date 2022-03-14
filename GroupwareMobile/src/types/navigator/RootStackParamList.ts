@@ -1,4 +1,5 @@
 import {
+  AttendanceRepo,
   BoardCategory,
   ChatAlbum,
   ChatGroup,
@@ -109,6 +110,7 @@ export type RootStackParamList = {
   AttendanceHome: undefined;
   Attendance: undefined;
   AttendanceReport: undefined;
+  AttendanceReportDetail: {report: AttendanceRepo};
   DefaultAttendance: undefined;
   ApplicationBeforeJoining: undefined;
 };
