@@ -152,4 +152,11 @@ export class AttendanceService {
     });
     return createdAttendanceReport;
   }
+
+  public async updateAttendanceReport(attendanceReport: AttendanceReport) {
+    const updatedAttendanceReport = await this.attendanceReport.save(
+      attendanceReport,
+    );
+    return updatedAttendanceReport;
+  }
 }

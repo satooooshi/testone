@@ -77,7 +77,6 @@ export class AttendanceController {
     @Req() req: RequestWithUser,
   ) {
     const { user } = req;
-    console.log('attendance', attendance);
     const createdAttendance = await this.attendanceService.createAttendance({
       ...attendance,
       user,
@@ -221,9 +220,23 @@ export class AttendanceController {
     @Req() req: RequestWithUser,
   ) {
     const { user } = req;
-    console.log('attendanceReport', attendanceReport);
     const attendanceReports =
       await this.attendanceService.createAttendanceReport({
+        ...attendanceReport,
+        user,
+      });
+    return attendanceReports;
+  }
+
+  @Patch('/report')
+  @UseGuards(JwtAuthenticationGuard)
+  async updateAttendanceReport(
+    @Body() attendanceReport: AttendanceReport,
+    @Req() req: RequestWithUser,
+  ) {
+    const { user } = req;
+    const attendanceReports =
+      await this.attendanceService.updateAttendanceReport({
         ...attendanceReport,
         user,
       });
