@@ -212,6 +212,22 @@ export class AttendanceController {
     );
     return attendanceReports;
   }
+  @Get('/report/all-unverified')
+  @UseGuards(JwtAuthenticationGuard)
+  async getUnverifiedAttendanceReportAllUser(
+    @Query() query: GetAttendanceQuery,
+  ) {
+    if (
+      !this.isValidDate(query.from_date) ||
+      !this.isValidDate(query.to_date)
+    ) {
+      throw new BadRequestException();
+    }
+
+    const attendanceReports =
+      await this.attendanceService.getUnverifiedAttendanceReportAllUser(query);
+    return attendanceReports;
+  }
 
   @Post('/report')
   @UseGuards(JwtAuthenticationGuard)

@@ -50,8 +50,10 @@ export class AttendanceService {
       .createQueryBuilder('attendance')
       .leftJoinAndSelect('attendance.travelCost', 'travelCost')
       .leftJoinAndSelect('attendance.user', 'user')
-      .andWhere('attendance.targetDate >= :fromDate', { fromDate })
-      .andWhere('attendance.targetDate <= :toDate', { toDate })
+      .andWhere('attendance_report.targetDate between :fromDate and :toDate', {
+        fromDate,
+        toDate,
+      })
       .getMany();
     return attendance;
   }
@@ -142,6 +144,20 @@ export class AttendanceService {
       })
       .getMany();
 
+    return attendanceReports;
+  }
+
+  public async getUnverifiedAttendanceReportAllUser(query: GetAttendanceQuery) {
+    const { from_date: fromDate, to_date: toDate } = query;
+    const attendanceReports = await this.attendanceReport
+      .createQueryBuilder('attendance_report')
+      .leftJoinAndSelect('attendance_report.user', 'user')
+      .andWhere('attendance_report.targetDate between :fromDate and :toDate', {
+        fromDate,
+        toDate,
+      })
+      .andWhere('attendance_report.verified = null')
+      .getMany();
     return attendanceReports;
   }
 
