@@ -5,7 +5,7 @@ import {ValidateErrorResponseByServer} from '../../../../utils/factory/responseE
 import {axiosInstance} from '../../../../utils/url';
 import {attendanceReportURL} from '../../../../utils/url/attendance.url';
 
-const updateAttendanceReport = async (query: AttendanceRepo) => {
+const updateAttendanceReport = async (query: Partial<AttendanceRepo>) => {
   const res = await axiosInstance.patch<AttendanceRepo>(
     attendanceReportURL,
     query,
@@ -17,14 +17,14 @@ export const useAPIUpdateAttendanceReport = (
   options?: UseMutationOptions<
     AttendanceRepo,
     AxiosError<ValidateErrorResponseByServer>,
-    AttendanceRepo,
+    Partial<AttendanceRepo>,
     unknown
   >,
 ) => {
   return useMutation<
     AttendanceRepo,
     AxiosError<ValidateErrorResponseByServer>,
-    AttendanceRepo,
+    Partial<AttendanceRepo>,
     unknown
   >(updateAttendanceReport, options);
 };

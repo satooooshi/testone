@@ -67,7 +67,7 @@ const AttendanceReportFormModal: React.FC<AttendanceReportFormModalProps> =
       validateForm,
       resetForm,
     } = useFormik<Partial<AttendanceRepo>>({
-      initialValues: report ? Object.assign(report) : initialReportValue,
+      initialValues: report ? report : initialReportValue,
       validationSchema: attendanceReportSchema,
       onSubmit: async values => {
         onSubmit(values);

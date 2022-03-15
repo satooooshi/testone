@@ -53,11 +53,7 @@ const AttendanceReport: React.FC = () => {
       onPress: () => setActiveTabName('reportBeforeAccepted'),
     },
   ];
-  const {
-    mutate: saveReport,
-    isSuccess,
-    isLoading: isLoadingSaveEvent,
-  } = useAPICreateAttendanceReport({
+  const {mutate: saveReport, isSuccess} = useAPICreateAttendanceReport({
     onSuccess: () => {
       setAttendanceFormModal(false);
       refetchReports();
@@ -187,7 +183,10 @@ const AttendanceReport: React.FC = () => {
               d =>
                 d.verifiedAt === null && (
                   <Div key={d.id} flexDir="row" my="sm">
-                    <AttendanceReportRow reportData={d} />
+                    <AttendanceReportRow
+                      reportData={d}
+                      refetchReports={() => refetchReports()}
+                    />
                   </Div>
                 ),
             )}

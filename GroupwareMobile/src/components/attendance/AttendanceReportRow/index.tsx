@@ -1,25 +1,48 @@
 import {useNavigation} from '@react-navigation/native';
-import {useFormik} from 'formik';
 import {DateTime} from 'luxon';
-import React, {useEffect, useRef, useState} from 'react';
-import {Alert, u} from 'react-native';
-import {Button, Div, Text} from 'react-native-magnus';
+import React, {useState} from 'react';
+import {Alert} from 'react-native';
+import {Div, Text} from 'react-native-magnus';
+import {useAPIUpdateAttendanceReport} from '../../../hooks/api/attendance/attendanceReport/useAPIUpdateAttendanceReport';
 import {AttendanceRepo} from '../../../types';
 import {AttendanceHomeNavigationProps} from '../../../types/navigator/drawerScreenProps/attendance';
 import {attendanceCategoryName} from '../../../utils/factory/attendance/attendanceCategoryName';
+import {responseErrorMsgFactory} from '../../../utils/factory/responseEroorMsgFactory';
 import AttendanceReportFormModal from '../AttendanceReportFrom';
 
 type AttendanceReportRowProps = {
   reportData: AttendanceRepo;
+  refetchReports?: () => void;
 };
 
 const AttendanceReportRow: React.FC<AttendanceReportRowProps> = ({
   reportData,
+  refetchReports,
 }) => {
   const navigation = useNavigation<AttendanceHomeNavigationProps>();
+  const [visibleAttendanceFormModal, setAttendanceFormModal] = useState(false);
+  const {mutate: saveReport, isSuccess} = useAPIUpdateAttendanceReport({
+    onSuccess: () => {
+      setAttendanceFormModal(false);
+      Alert.alert('勤怠報告を更新しました。');
+      if (refetchReports) {
+        refetchReports();
+      }
+    },
+    onError: e => {
+      Alert.alert(responseErrorMsgFactory(e));
+    },
+  });
 
   return (
     <>
+      <AttendanceReportFormModal
+        report={reportData}
+        isVisible={visibleAttendanceFormModal}
+        onCloseModal={() => setAttendanceFormModal(false)}
+        onSubmit={report => saveReport(report)}
+        isSuccess={isSuccess}
+      />
       <Div w={'20%'} justifyContent="center" alignItems="center">
         <Text fontSize={13}>
           {DateTime.fromJSDate(new Date(reportData.targetDate)).toFormat(
@@ -37,7 +60,6 @@ const AttendanceReportRow: React.FC<AttendanceReportRowProps> = ({
           )}
         </Text>
       </Div>
-
       <Div w={'20%'} justifyContent="center" alignItems="center">
         {reportData.verifiedAt ? (
           <Text fontSize={13}>
@@ -47,7 +69,10 @@ const AttendanceReportRow: React.FC<AttendanceReportRowProps> = ({
             )}
           </Text>
         ) : (
-          <Text fontSize={13} color="blue">
+          <Text
+            fontSize={13}
+            color="blue"
+            onPress={() => setAttendanceFormModal(true)}>
             編集
           </Text>
         )}
