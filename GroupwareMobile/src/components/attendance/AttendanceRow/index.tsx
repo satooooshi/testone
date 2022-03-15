@@ -27,6 +27,7 @@ import {
   defaultDropdownProps,
 } from '../../../utils/dropdown/helper';
 import {attendanceCategoryName} from '../../../utils/factory/attendance/attendanceCategoryName';
+import {isDisplayableWorkingTime} from '../../../utils/factory/attendance/isDisplayableWorkingTime';
 import {formikErrorMsgFactory} from '../../../utils/factory/formikEroorMsgFactory';
 import {attendanceSchema} from '../../../utils/validation/schema';
 import DropdownOpenerButton from '../../common/DropdownOpenerButton';
@@ -71,6 +72,7 @@ const AttendanceRow = ({
     },
   });
   const [visibleAttendanceModal, setVisibleAttendanceModal] = useState(false);
+  const [hasWorkingTime, setHasWorkingTime] = useState(true);
   const [visibleTimePicker, setVisibleTimePicker] = useState<
     'attendanceTime' | 'absenceTime' | 'breakMinutes'
   >();
@@ -78,7 +80,7 @@ const AttendanceRow = ({
   const {values, handleSubmit, setValues, errors} = useFormik({
     initialValues: targetData || initialValues,
     enableReinitialize: true,
-    validationSchema: attendanceSchema,
+    validationSchema: hasWorkingTime ? attendanceSchema : undefined,
     validateOnChange: true,
     validateOnMount: true,
     onSubmit: submitted => {
@@ -115,6 +117,12 @@ const AttendanceRow = ({
     const minute = Number(breakHourAndMinutes[0]);
     return now.set({hour, minute}).toJSDate();
   };
+
+  useEffect(() => {
+    if (values.category) {
+      setHasWorkingTime(isDisplayableWorkingTime(values.category));
+    }
+  }, [values.category]);
 
   return (
     <>
@@ -172,33 +180,37 @@ const AttendanceRow = ({
             onPress={() => dropdownRef.current?.open()}
           />
 
-          <Text fontSize={16}>出勤時間</Text>
-          <DropdownOpenerButton
-            name={
-              values?.attendanceTime
-                ? DateTime.fromJSDate(new Date(values.attendanceTime)).toFormat(
-                    'HH:mm',
-                  )
-                : '未選択'
-            }
-            onPress={() => setVisibleTimePicker('attendanceTime')}
-          />
-          <Text fontSize={16}>退勤時間</Text>
-          <DropdownOpenerButton
-            name={
-              values?.absenceTime
-                ? DateTime.fromJSDate(new Date(values.absenceTime)).toFormat(
-                    'HH:mm',
-                  )
-                : '未選択'
-            }
-            onPress={() => setVisibleTimePicker('absenceTime')}
-          />
-          <Text fontSize={16}>休憩時間</Text>
-          <DropdownOpenerButton
-            name={values?.breakMinutes ? values.breakMinutes : '未選択'}
-            onPress={() => setVisibleTimePicker('breakMinutes')}
-          />
+          {hasWorkingTime && (
+            <>
+              <Text fontSize={16}>出勤時間</Text>
+              <DropdownOpenerButton
+                name={
+                  values?.attendanceTime
+                    ? DateTime.fromJSDate(
+                        new Date(values.attendanceTime),
+                      ).toFormat('HH:mm')
+                    : '未選択'
+                }
+                onPress={() => setVisibleTimePicker('attendanceTime')}
+              />
+              <Text fontSize={16}>退勤時間</Text>
+              <DropdownOpenerButton
+                name={
+                  values?.absenceTime
+                    ? DateTime.fromJSDate(
+                        new Date(values.absenceTime),
+                      ).toFormat('HH:mm')
+                    : '未選択'
+                }
+                onPress={() => setVisibleTimePicker('absenceTime')}
+              />
+              <Text fontSize={16}>休憩時間</Text>
+              <DropdownOpenerButton
+                name={values?.breakMinutes ? values.breakMinutes : '未選択'}
+                onPress={() => setVisibleTimePicker('breakMinutes')}
+              />
+            </>
+          )}
           <Text fontSize={16}>備考</Text>
           <TextInput
             value={values.detail}
@@ -379,24 +391,48 @@ const AttendanceRow = ({
         //@ts-ignore
         date={selectedDateForApplication}
       />
-      <Div minW={'20%'} justifyContent="center" alignItems="center">
-        <Text fontSize={16}>{date.toFormat('d日')}</Text>
+      <Div w={'20%'} justifyContent="center" alignItems="center">
+        <Text
+          fontSize={16}
+          color={
+            values.category !== AttendanceCategory.COMMON
+              ? values.verifiedAt
+                ? 'green'
+                : 'blue'
+              : 'black'
+          }>
+          {date.toFormat('d日')}
+        </Text>
       </Div>
-      <Div minW={'30%'} justifyContent="center" alignItems="center">
+      <Div w={'30%'} justifyContent="center" alignItems="center">
         <Button
+          w={'100%'}
           onPress={() => setVisibleAttendanceModal(true)}
           alignSelf="center">
-          {values?.id ? '入力済み' : '詳細を入力'}
+          {values?.category &&
+          values.attendanceTime &&
+          values.absenceTime &&
+          values?.id
+            ? hasWorkingTime
+              ? DateTime.fromJSDate(new Date(values.attendanceTime)).toFormat(
+                  'HH:mm',
+                ) +
+                '~' +
+                DateTime.fromJSDate(new Date(values.absenceTime)).toFormat(
+                  'HH:mm',
+                )
+              : '公欠'
+            : '詳細を入力'}
         </Button>
       </Div>
-      <Div minW={'30%'} justifyContent="center" alignItems="center">
+      <Div w={'30%'} justifyContent="center" alignItems="center">
         <Button
           onPress={() => setSelectedDateForApplication(date)}
           alignSelf="center">
           申請
         </Button>
       </Div>
-      <Div minW={'20%'} alignItems="center">
+      <Div w={'20%'} alignItems="center">
         <Button
           alignSelf="center"
           bg="green600"
