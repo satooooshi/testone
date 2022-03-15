@@ -50,7 +50,7 @@ export class AttendanceService {
       .createQueryBuilder('attendance')
       .leftJoinAndSelect('attendance.travelCost', 'travelCost')
       .leftJoinAndSelect('attendance.user', 'user')
-      .andWhere('attendance_report.targetDate between :fromDate and :toDate', {
+      .andWhere('attendance.targetDate between :fromDate and :toDate', {
         fromDate,
         toDate,
       })
@@ -68,7 +68,7 @@ export class AttendanceService {
       .leftJoinAndSelect('attendance.travelCost', 'travelCost')
       .leftJoinAndSelect('attendance.user', 'user')
       .andWhere('user.id = :userId', { userId })
-      .andWhere('attendance_report.targetDate between :fromDate and :toDate', {
+      .andWhere('attendance.targetDate between :fromDate and :toDate', {
         fromDate,
         toDate,
       })
@@ -97,12 +97,15 @@ export class AttendanceService {
       ...attendance,
       verifiedAt: null,
     });
-    if (attendance?.travelCost?.length) {
+    console.log('travel cost ==', attendance?.travelCost);
+    if (attendance?.travelCost.length) {
       const costArr = attendance.travelCost.map((cost) => ({
         ...cost,
         updatedAttendance,
       }));
+
       const travelCost = await this.travelCostRepo.save(costArr);
+      console.log('travel cost ==', travelCost);
       return { ...updatedAttendance, travelCost };
     }
     return updatedAttendance;

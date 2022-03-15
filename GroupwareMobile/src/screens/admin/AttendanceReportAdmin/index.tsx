@@ -20,7 +20,6 @@ const AttendanceReportAdmin: React.FC = () => {
       from_date: month.startOf('month').toFormat('yyyy-LL-dd'),
       to_date: month.endOf('month').endOf('day').toFormat('yyyy-LL-dd'),
     });
-  console.log('------------repo', reports);
 
   return (
     <WholeContainer>

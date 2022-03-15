@@ -36,7 +36,6 @@ const AttendanceReport: React.FC = () => {
     from_date: month.startOf('month').toFormat('yyyy-LL-dd'),
     to_date: month.endOf('month').endOf('day').toFormat('yyyy-LL-dd'),
   });
-  console.log('data----------------', data);
 
   const [unAcceptedReport, setUnAcceptedREport] = useState<
     AttendanceRepo[] | undefined
@@ -73,9 +72,6 @@ const AttendanceReport: React.FC = () => {
   }, [month, refetchReports]);
 
   useEffect(() => {
-    console.log('data?.length', data);
-    console.log('data?.length', data?.length);
-
     if (data?.length) {
       const UnAcceptedRepo = data?.filter(d => d.verifiedAt == null);
       const acceptedRepo = data?.filter(d => d.verifiedAt != null);

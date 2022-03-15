@@ -91,6 +91,7 @@ export class AttendanceController {
     @Req() req: RequestWithUser,
   ) {
     const { user } = req;
+    console.log('0000000000', attendance.travelCost);
 
     const createdAttendance = await this.attendanceService.updateAttendance({
       ...attendance,

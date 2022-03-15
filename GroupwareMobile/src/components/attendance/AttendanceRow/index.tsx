@@ -65,7 +65,10 @@ const AttendanceRow = ({
     },
   });
   const {mutate: updateAttendance} = useAPIUpdateAttendance({
-    onSuccess: () => {
+    onSuccess: update => {
+      console.log('+++++++++', update.travelCost);
+
+      setValues(update);
       Alert.alert('更新が完了しました');
     },
   });
@@ -88,11 +91,13 @@ const AttendanceRow = ({
         Alert.alert('今月のデータのみ編集可能です');
         return;
       }
-      submitted.travelCost = submitted?.travelCost?.filter(t => !!t.travelCost);
+      // submitted.travelCost = submitted?.travelCost?.filter(t => !!t.travelCost);
+      console.log('-----------------', submitted);
       if (submitted?.id) {
-        updateAttendance(submitted as Attendance);
+        updateAttendance(submitted);
         return;
       }
+
       createAttendance(submitted);
     },
   });
