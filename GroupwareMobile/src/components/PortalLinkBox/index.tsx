@@ -176,15 +176,7 @@ const PortalLinkIcon: React.FC<PortalLinkIconProps> = ({type}) => {
           fontSize={iconSize}
         />
       );
-    case 'attendance':
-      return (
-        <Icon
-          name="external-link"
-          fontSize={iconSize}
-          color="red900"
-          fontFamily="Feather"
-        />
-      );
+
     case 'work':
       return (
         <Icon
@@ -197,28 +189,28 @@ const PortalLinkIcon: React.FC<PortalLinkIconProps> = ({type}) => {
     case 'attendance':
       return (
         <Icon
-          name="work"
+          name="time-outline"
           fontSize={iconSize}
-          color="#086f83"
-          fontFamily="MaterialIcons"
+          color="red900"
+          fontFamily="Ionicons"
         />
       );
     case 'attendance_report':
       return (
         <Icon
-          name="work"
+          name="message-square"
           fontSize={iconSize}
           color="#086f83"
-          fontFamily="MaterialIcons"
+          fontFamily="Feather"
         />
       );
     case 'application':
       return (
         <Icon
-          name="comment-dollar"
+          name="work-outline"
           fontSize={iconSize}
           color="orange600"
-          fontFamily="FontAwesome5"
+          fontFamily="MaterialIcons"
         />
       );
   }
