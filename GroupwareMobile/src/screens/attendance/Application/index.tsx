@@ -28,6 +28,8 @@ const Application: React.FC = () => {
         title="入社前申請"
         tabs={tabs}
         activeTabName={'入社前申請'}
+        rightButtonName={'新規申請'}
+        onPressRightButton={() => setModal(true)}
       />
       <ApplicationFormModal
         isOpen={modal}
@@ -43,42 +45,44 @@ const Application: React.FC = () => {
         borderBottomColor={'#b0b0b0'}
         flexDir="row"
         h={40}>
-        <Div minW={'20%'} justifyContent="center" alignItems="center">
+        <Div w={'25%'} justifyContent="center" alignItems="center">
           <Text fontSize={16}>{'日付'}</Text>
         </Div>
-        <Div minW={'20%'} justifyContent="center" alignItems="center">
+        <Div w={'20%'} justifyContent="center" alignItems="center">
           <Text fontSize={16}>{'行先'}</Text>
         </Div>
-        <Div minW={'20%'} justifyContent="center" alignItems="center">
+        <Div w={'20%'} justifyContent="center" alignItems="center">
           <Text fontSize={16}>目的</Text>
         </Div>
-        <Div minW={'20%'} justifyContent="center" alignItems="center">
+        <Div w={'20%'} justifyContent="center" alignItems="center">
           <Text fontSize={16}>合計金額</Text>
         </Div>
-        <Div minW={'20%'} justifyContent="center" alignItems="center">
+        <Div w={'15%'} justifyContent="center" alignItems="center">
           <Text fontSize={16}>操作</Text>
         </Div>
       </Div>
       <ScrollDiv>
         {data?.map(a => (
           <Div key={a.id} flexDir="row" my="sm">
-            <Div minW={'20%'} justifyContent="center" alignItems="center">
-              <Text fontSize={16}>
+            <Div w={'25%'} justifyContent="center" alignItems="center">
+              <Text fontSize={13}>
                 {DateTime.fromJSDate(new Date(a.attendanceTime)).toFormat(
                   'yyyy/LL/dd日',
                 )}
               </Text>
             </Div>
-            <Div minW={'20%'} justifyContent="center" alignItems="center">
+            <Div w={'20%'} justifyContent="center" alignItems="center">
               <Text fontSize={16}>{a.destination}</Text>
             </Div>
-            <Div minW={'20%'} justifyContent="center" alignItems="center">
+            <Div w={'20%'} justifyContent="center" alignItems="center">
               <Text fontSize={16}>{a.purpose}</Text>
             </Div>
-            <Div minW={'20%'} justifyContent="center" alignItems="center">
-              <Text fontSize={16}>{a.travelCost}</Text>
+            <Div w={'20%'} justifyContent="center" alignItems="center">
+              <Text fontSize={16}>
+                {a.travelCost * (a.oneWayOrRound === 'one_way' ? 1 : 2)}
+              </Text>
             </Div>
-            <Div minW={'20%'} justifyContent="center" alignItems="center">
+            <Div w={'15%'} justifyContent="center" alignItems="center">
               <Button
                 color="white"
                 bg="green600"
@@ -91,7 +95,7 @@ const Application: React.FC = () => {
             </Div>
           </Div>
         ))}
-        <Div flexDir="row" my="sm" bg="gray500">
+        {/* <Div flexDir="row" my="sm" bg="gray500">
           <Div minW={'20%'} justifyContent="center" alignItems="center" />
           <Div minW={'20%'} justifyContent="center" alignItems="center" />
           <Div minW={'20%'} justifyContent="center" alignItems="center" />
@@ -107,7 +111,7 @@ const Application: React.FC = () => {
               追加
             </Button>
           </Div>
-        </Div>
+        </Div> */}
       </ScrollDiv>
     </WholeContainer>
   );

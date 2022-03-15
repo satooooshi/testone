@@ -35,8 +35,8 @@ const ApplicationForm: React.FC<ApplicationFormModalProps> = ({
   application,
   onClose,
 }) => {
+  const fareCategoryRef = useRef<any | null>(null);
   const [dateTimeModal, setDateTimeModal] = useState(false);
-  const [oneWayOrRoundDropdown, setOneWayOrRoundDropdown] = useState(false);
   const initialValues: Partial<ApplicationBeforeJoining> = {
     destination: '',
     purpose: '',
@@ -75,9 +75,6 @@ const ApplicationForm: React.FC<ApplicationFormModalProps> = ({
     Linking.openURL(url);
   };
 
-  useEffect(() => {
-    setOneWayOrRoundDropdown(false);
-  }, [values.oneWayOrRound]);
   return (
     <Div borderTopWidth={5} borderTopColor={'blue600'}>
       <Box mb={4}>
@@ -86,7 +83,7 @@ const ApplicationForm: React.FC<ApplicationFormModalProps> = ({
           name={
             values.attendanceTime
               ? DateTime.fromJSDate(new Date(values.attendanceTime)).toFormat(
-                  'yyyy/LL/dd HH:mm',
+                  'yyyy/LL/dd',
                 )
               : '未設定'
           }
@@ -117,7 +114,7 @@ const ApplicationForm: React.FC<ApplicationFormModalProps> = ({
         ) : null}
         <Input
           value={values.purpose}
-          placeholder="行先"
+          placeholder="目的"
           bg="white"
           onChangeText={t =>
             setValues(a => ({
@@ -134,7 +131,7 @@ const ApplicationForm: React.FC<ApplicationFormModalProps> = ({
         ) : null}
         <Input
           value={values.departureStation}
-          placeholder="行先"
+          placeholder="出発駅"
           bg="white"
           onChangeText={t =>
             setValues(a => ({
@@ -151,7 +148,7 @@ const ApplicationForm: React.FC<ApplicationFormModalProps> = ({
         ) : null}
         <Input
           value={values.viaStation}
-          placeholder="行先"
+          placeholder="経由"
           bg="white"
           onChangeText={t =>
             setValues(a => ({
@@ -168,7 +165,7 @@ const ApplicationForm: React.FC<ApplicationFormModalProps> = ({
         ) : null}
         <Input
           value={values.destinationStation}
-          placeholder="行先"
+          placeholder="到着駅"
           bg="white"
           onChangeText={t =>
             setValues(a => ({
@@ -192,7 +189,7 @@ const ApplicationForm: React.FC<ApplicationFormModalProps> = ({
         ) : null}
         <Input
           value={values.travelCost ? values.travelCost.toString() : ''}
-          placeholder="行先"
+          placeholder="小計"
           bg="white"
           onChangeText={t =>
             setValues(a => ({
@@ -212,7 +209,7 @@ const ApplicationForm: React.FC<ApplicationFormModalProps> = ({
               ? '片道'
               : '未設定'
           }
-          onPress={() => setOneWayOrRoundDropdown(true)}
+          onPress={() => fareCategoryRef.current?.open()}
         />
       </Box>
       <Button
@@ -224,7 +221,7 @@ const ApplicationForm: React.FC<ApplicationFormModalProps> = ({
       </Button>
       <Dropdown
         {...defaultDropdownProps}
-        isVisible={oneWayOrRoundDropdown}
+        ref={fareCategoryRef}
         title="交通費区分を選択">
         <Dropdown.Option
           {...defaultDropdownOptionProps}
@@ -282,7 +279,9 @@ const ApplicationFormModal: React.FC<ApplicationFormModalProps> = props => {
       <KeyboardAwareScrollView
         contentContainerStyle={{width: windowWidth * 0.9}}
         style={tailwind('self-center')}>
-        <Text fontSize={16}>入社前経費申請</Text>
+        <Text my="lg" fontWeight="bold" fontSize={20}>
+          入社前経費申請
+        </Text>
         <ApplicationForm {...props} />
       </KeyboardAwareScrollView>
     </Modal>

@@ -162,7 +162,7 @@ export const travelCostFormModalSchema = Yup.object().shape({
 });
 
 export const applicationFormModalSchema = Yup.object().shape({
-  attendanceTime: Yup.date().required(requireMessage),
+  attendanceTime: Yup.date().required('日付は' + requireMessage),
   destination: Yup.string().required(requireMessage),
   purpose: Yup.string().required(requireMessage),
   departureStation: Yup.string().required(requireMessage),

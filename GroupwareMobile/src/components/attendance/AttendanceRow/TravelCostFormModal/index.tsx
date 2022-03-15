@@ -10,7 +10,6 @@ import React, {
 import {Linking, useWindowDimensions} from 'react-native';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import {
-  ScrollDiv,
   Modal,
   Div,
   Text,
@@ -65,10 +64,8 @@ const TravelForm = ({
     attendance: attendance as Attendance,
   };
 
-  const [categoryDropdown, setCategoryDropdown] = useState(false);
   const reportCategoryRef = useRef<any | null>(null);
   const fareCategoryRef = useRef<any | null>(null);
-  const [oneWayOrRoundDropdown, setOneWayOrRoundDropdown] = useState(false);
   const {values, setValues, handleSubmit, errors, touched} = useFormik({
     initialValues: travelCost || initialValues,
     validationSchema: travelCostFormModalSchema,
