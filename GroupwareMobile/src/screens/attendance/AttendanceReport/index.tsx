@@ -56,6 +56,7 @@ const AttendanceReport: React.FC = () => {
   const {mutate: saveReport, isSuccess} = useAPICreateAttendanceReport({
     onSuccess: () => {
       setAttendanceFormModal(false);
+      Alert.alert('新規勤怠報告を作成しました。');
       refetchReports();
     },
     onError: e => {

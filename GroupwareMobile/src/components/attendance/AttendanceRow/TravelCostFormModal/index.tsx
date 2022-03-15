@@ -1,6 +1,12 @@
 import {useFormik} from 'formik';
 import {DateTime} from 'luxon';
-import React, {Dispatch, SetStateAction, useEffect, useState} from 'react';
+import React, {
+  Dispatch,
+  SetStateAction,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import {Linking, useWindowDimensions} from 'react-native';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import {
@@ -60,6 +66,8 @@ const TravelForm = ({
   };
 
   const [categoryDropdown, setCategoryDropdown] = useState(false);
+  const reportCategoryRef = useRef<any | null>(null);
+  const fareCategoryRef = useRef<any | null>(null);
   const [oneWayOrRoundDropdown, setOneWayOrRoundDropdown] = useState(false);
   const {values, setValues, handleSubmit, errors, touched} = useFormik({
     initialValues: travelCost || initialValues,
@@ -89,14 +97,6 @@ const TravelForm = ({
     handleSubmit();
   }, [handleSubmit, values]);
 
-  useEffect(() => {
-    setCategoryDropdown(false);
-  }, [values.category]);
-
-  useEffect(() => {
-    setOneWayOrRoundDropdown(false);
-  }, [values.oneWayOrRound]);
-
   return (
     <Div borderTopWidth={5} borderTopColor={'blue600'}>
       <Text fontSize={22} fontWeight="bold">{`申請#${
@@ -108,7 +108,7 @@ const TravelForm = ({
           name={
             values.category ? travelCostCategoryName(values.category) : '未設定'
           }
-          onPress={() => setCategoryDropdown(true)}
+          onPress={() => reportCategoryRef.current?.open()}
         />
       </Box>
       <Box mb={4}>
@@ -230,7 +230,7 @@ const TravelForm = ({
               ? '片道'
               : '未設定'
           }
-          onPress={() => setOneWayOrRoundDropdown(true)}
+          onPress={() => fareCategoryRef.current?.open()}
         />
       </Box>
       {index === undefined ||
@@ -253,7 +253,7 @@ const TravelForm = ({
 
       <Dropdown
         {...defaultDropdownProps}
-        isVisible={categoryDropdown}
+        ref={reportCategoryRef}
         title="交通費区分を選択">
         <Dropdown.Option
           {...defaultDropdownOptionProps}
@@ -274,7 +274,7 @@ const TravelForm = ({
       </Dropdown>
       <Dropdown
         {...defaultDropdownProps}
-        isVisible={oneWayOrRoundDropdown}
+        ref={fareCategoryRef}
         title="交通費区分を選択">
         <Dropdown.Option
           {...defaultDropdownOptionProps}
