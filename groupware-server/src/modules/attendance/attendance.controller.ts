@@ -178,6 +178,12 @@ export class AttendanceController {
     return created;
   }
 
+  @Post('delete-application')
+  @UseGuards(JwtAuthenticationGuard)
+  async deleteApplication(@Body() body: { applicationId: number }) {
+    return await this.attendanceService.deleteApplication(body.applicationId);
+  }
+
   @Patch('application')
   @UseGuards(JwtAuthenticationGuard)
   async updateApplication(

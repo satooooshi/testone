@@ -16,6 +16,7 @@ import {
 import DateTimePicker from 'react-native-modal-datetime-picker';
 import tailwind from 'tailwind-rn';
 import {useAPICreateApplication} from '../../../hooks/api/attendance/application/useAPICreateApplication';
+import {useAPIDeleteApplication} from '../../../hooks/api/attendance/application/useAPIDeleteApplication';
 import {useAPIUpdateApplication} from '../../../hooks/api/attendance/application/useAPIUpdateApplication';
 import {ApplicationBeforeJoining, OneWayOrRound} from '../../../types';
 import {
@@ -58,6 +59,32 @@ const ApplicationForm: React.FC<ApplicationFormModalProps> = ({
       onClose();
     },
   });
+
+  const {mutate: deleteApplication} = useAPIDeleteApplication({
+    onSuccess: () => {
+      Alert.alert('削除が完了しました');
+      onClose();
+    },
+  });
+
+  const onDeleteButtonClicked = () => {
+    if (!application) {
+      return;
+    }
+    Alert.alert(
+      '申請を削除してよろしいですか？',
+      '',
+      [
+        {text: 'キャンセル', style: 'cancel'},
+        {
+          text: '削除する',
+          style: 'destructive',
+          onPress: () => deleteApplication({applicationId: application.id}),
+        },
+      ],
+      {cancelable: false},
+    );
+  };
   const {values, setValues, handleSubmit, errors, touched} = useFormik({
     initialValues: application || initialValues,
     validationSchema: applicationFormModalSchema,
@@ -212,13 +239,24 @@ const ApplicationForm: React.FC<ApplicationFormModalProps> = ({
           onPress={() => fareCategoryRef.current?.open()}
         />
       </Box>
-      <Button
-        bg="blue600"
-        color="white"
-        alignSelf="flex-end"
-        onPress={() => handleSubmit()}>
-        {values.id ? '更新する' : '申請する'}
-      </Button>
+      <Box flexDir="row" alignSelf="flex-end">
+        <Button
+          bg="blue600"
+          color="white"
+          alignSelf="flex-end"
+          onPress={() => handleSubmit()}>
+          {values.id ? '更新する' : '申請する'}
+        </Button>
+        {application?.id && (
+          <Button
+            bg="red600"
+            color="white"
+            alignSelf="flex-end"
+            onPress={() => onDeleteButtonClicked()}>
+            削除する
+          </Button>
+        )}
+      </Box>
       <Dropdown
         {...defaultDropdownProps}
         ref={fareCategoryRef}
@@ -287,5 +325,4 @@ const ApplicationFormModal: React.FC<ApplicationFormModalProps> = props => {
     </Modal>
   );
 };
-
 export default ApplicationFormModal;

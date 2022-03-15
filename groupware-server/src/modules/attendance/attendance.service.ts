@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ApplicationBeforeJoining } from 'src/entities/applicationBeforeJoining.entity';
 import { Attendance } from 'src/entities/attendance.entity';
@@ -133,6 +133,19 @@ export class AttendanceService {
     const updated = await this.applicationRepo.save(application);
     return updated;
   }
+
+  public async deleteApplication(applicationId: number) {
+    const Application = await this.applicationRepo.findOne({
+      id: applicationId,
+    });
+    if (!Application) {
+      throw new BadRequestException(
+        'The application has already been deleted.',
+      );
+    }
+    await this.applicationRepo.delete(applicationId);
+  }
+
   public async getAttendanceReports(userId: number, query: GetAttendanceQuery) {
     const { from_date: fromDate, to_date: toDate } = query;
     const attendanceReports = await this.attendanceReport
