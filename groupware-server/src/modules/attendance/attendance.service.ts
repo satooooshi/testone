@@ -97,7 +97,6 @@ export class AttendanceService {
       ...attendance,
       verifiedAt: null,
     });
-    console.log('travel cost ==', attendance?.travelCost);
     if (attendance?.travelCost.length) {
       const costArr = attendance.travelCost.map((cost) => ({
         ...cost,
@@ -105,7 +104,6 @@ export class AttendanceService {
       }));
 
       const travelCost = await this.travelCostRepo.save(costArr);
-      console.log('travel cost ==', travelCost);
       return { ...updatedAttendance, travelCost };
     }
     return updatedAttendance;

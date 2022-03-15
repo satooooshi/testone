@@ -66,8 +66,6 @@ const AttendanceRow = ({
   });
   const {mutate: updateAttendance} = useAPIUpdateAttendance({
     onSuccess: update => {
-      console.log('+++++++++', update.travelCost);
-
       setValues(update);
       Alert.alert('更新が完了しました');
     },
@@ -92,7 +90,6 @@ const AttendanceRow = ({
         return;
       }
       // submitted.travelCost = submitted?.travelCost?.filter(t => !!t.travelCost);
-      console.log('-----------------', submitted);
       if (submitted?.id) {
         updateAttendance(submitted);
         return;

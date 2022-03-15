@@ -58,7 +58,6 @@ const TravelForm = ({
     oneWayOrRound: TravelCostOneWayOrRound.ROUND,
     attendance: attendance as Attendance,
   };
-  console.log('=============', attendance.travelCost);
 
   const [categoryDropdown, setCategoryDropdown] = useState(false);
   const [oneWayOrRoundDropdown, setOneWayOrRoundDropdown] = useState(false);
@@ -67,8 +66,6 @@ const TravelForm = ({
     validationSchema: travelCostFormModalSchema,
     onSubmit: submittedValues => {
       setAttendance(a => {
-        console.log('submnit =====', submittedValues);
-
         if (a?.travelCost?.length) {
           const travelCosts = a?.travelCost?.map((t, arrIndex) => {
             if (index === arrIndex) {
