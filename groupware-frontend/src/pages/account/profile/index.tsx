@@ -43,7 +43,6 @@ const Profile = () => {
           duration: 3000,
           isClosable: true,
         });
-        setUserInfo(undefined);
         router.push(`/account/${responseData.id.toString()}`);
       }
     },
