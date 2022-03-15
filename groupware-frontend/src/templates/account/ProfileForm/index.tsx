@@ -55,6 +55,27 @@ type ModalAction = {
   type: 'openTech' | 'openQualification' | 'openClub' | 'openHobby' | 'close';
 };
 
+const initialUserValues: Partial<User> = {
+  email: '',
+  phone: '',
+  lastName: '',
+  firstName: '',
+  lastNameKana: '',
+  firstNameKana: '',
+  password: '',
+  role: UserRole.COMMON,
+  branch: BranchType.NON_SET,
+  avatarUrl: '',
+  employeeId: '',
+  introduceOther: '',
+  introduceTech: '',
+  introduceQualification: '',
+  introduceClub: '',
+  introduceHobby: '',
+  verifiedAt: new Date(),
+  tags: [],
+};
+
 const ProfileForm: React.FC<ProfileFormProps> = ({
   profile,
   tags,
@@ -64,27 +85,6 @@ const ProfileForm: React.FC<ProfileFormProps> = ({
   setUserInfoProps,
 }) => {
   const toast = useToast();
-
-  const initialUserValues = profile || {
-    email: '',
-    phone: '',
-    lastName: '',
-    firstName: '',
-    lastNameKana: '',
-    firstNameKana: '',
-    password: '',
-    role: UserRole.COMMON,
-    branch: BranchType.NON_SET,
-    avatarUrl: '',
-    employeeId: '',
-    introduceOther: '',
-    introduceTech: '',
-    introduceQualification: '',
-    introduceClub: '',
-    introduceHobby: '',
-    verifiedAt: new Date(),
-    tags: [],
-  };
 
   const modalReducer = (
     _state: ModalState,
@@ -164,7 +164,7 @@ const ProfileForm: React.FC<ProfileFormProps> = ({
     handleChange,
     validateForm,
   } = useFormik<Partial<User>>({
-    initialValues: initialUserValues,
+    initialValues: profile || initialUserValues,
     enableReinitialize: true,
     validationSchema: profile ? profileSchema : registerSchema,
     onSubmit: () => {
@@ -196,9 +196,9 @@ const ProfileForm: React.FC<ProfileFormProps> = ({
   };
 
   const handleUpdateUser = async () => {
+    setUserInfoProps(userInfo);
     if (croppedImageURL && completedCrop && selectImageName) {
       const result = await dataURLToFile(croppedImageURL, selectImageName);
-      setUserInfoProps(userInfo);
       uploadImage([result]);
       return;
     }

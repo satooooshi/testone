@@ -79,8 +79,11 @@ const CreateNewUser = () => {
           duration: 3000,
           isClosable: true,
         });
-        // resetForm();
-        setUserInfo(undefined);
+        location.reload();
+        const wait = new Promise((resolve) => {
+          setTimeout(resolve, 3000);
+        });
+        wait.then(() => location.reload());
       }
     },
   });
