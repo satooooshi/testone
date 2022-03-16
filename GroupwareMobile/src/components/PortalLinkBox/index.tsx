@@ -265,7 +265,7 @@ const PortalLinkBox: React.FC<PortarlLinkBoxProps> = ({type, onPress}) => {
       case 'users':
         return '社員名鑑';
       case 'attendance':
-        return '勤怠管理';
+        return '勤怠打刻';
       case 'application':
         return '入社前申請';
       case 'attendance_report':

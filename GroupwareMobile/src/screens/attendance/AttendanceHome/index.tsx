@@ -9,13 +9,11 @@ import {AttendanceHomeNavigationProps} from '../../../types/navigator/drawerScre
 
 const AttendanceHome: React.FC = () => {
   const navigation = useNavigation<AttendanceHomeNavigationProps>();
-  const tabs: Tab[] = [{name: '勤怠管理 Home', onPress: () => {}}];
   return (
     <WholeContainer>
       <HeaderWithTextButton
         title="勤怠管理 Home"
         activeTabName="勤怠管理 Home"
-        tabs={tabs}
       />
       <ScrollDiv mt="lg">
         <Div flexDir="row" justifyContent="center" alignItems="center">
