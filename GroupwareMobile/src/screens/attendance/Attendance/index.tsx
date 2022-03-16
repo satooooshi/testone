@@ -86,10 +86,13 @@ const Attendance: React.FC = () => {
         <Div minW={'30%'} justifyContent="center" alignItems="center">
           <Text fontSize={16}>{'打刻情報'}</Text>
         </Div>
-        <Div minW={'30%'} justifyContent="center" alignItems="center">
+        <Div minW={'20%'} justifyContent="center" alignItems="center">
+          <Text fontSize={16}>実働</Text>
+        </Div>
+        <Div minW={'15%'} justifyContent="center" alignItems="center">
           <Text fontSize={16}>申請</Text>
         </Div>
-        <Div minW={'20%'} justifyContent="center" alignItems="center">
+        <Div minW={'15%'} justifyContent="center" alignItems="center">
           <Text fontSize={16}>保存</Text>
         </Div>
       </Div>

@@ -73,6 +73,7 @@ const AttendanceRow = ({
   });
   const [visibleAttendanceModal, setVisibleAttendanceModal] = useState(false);
   const [hasWorkingTime, setHasWorkingTime] = useState(true);
+  const [WorkingTime, setWorkingTime] = useState<string | undefined>();
   const [visibleTimePicker, setVisibleTimePicker] = useState<
     'attendanceTime' | 'absenceTime' | 'breakMinutes'
   >();
@@ -112,11 +113,35 @@ const AttendanceRow = ({
     if (!values.breakMinutes) {
       return now.startOf('day').toJSDate();
     }
+
     const breakHourAndMinutes = values.breakMinutes.split(':');
     const hour = Number(breakHourAndMinutes[0]);
-    const minute = Number(breakHourAndMinutes[0]);
+    const minute = Number(breakHourAndMinutes[1]);
     return now.set({hour, minute}).toJSDate();
   };
+
+  useEffect(() => {
+    if (values.attendanceTime && values.absenceTime && values.breakMinutes) {
+      const breakHourAndMinutes = values.breakMinutes.split(':');
+      const diff =
+        (new Date(values.absenceTime).getTime() -
+          new Date(values.attendanceTime).getTime()) /
+        3600000;
+      const minutesNumber =
+        Math.round((diff - Math.floor(diff)) * 60) -
+        Number(breakHourAndMinutes[1]);
+
+      const minutes = String(
+        '00' + (minutesNumber < 0 ? 60 + minutesNumber : minutesNumber),
+      ).slice(-2);
+      const hoursNumber =
+        Math.floor(diff) -
+        Number(breakHourAndMinutes[0]) -
+        (minutesNumber < 0 ? 1 : 0);
+      const hours = String('00' + hoursNumber).slice(-2);
+      setWorkingTime(hours + ':' + minutes);
+    }
+  }, [values.attendanceTime, values.absenceTime, values.breakMinutes]);
 
   useEffect(() => {
     if (values.category) {
@@ -425,14 +450,17 @@ const AttendanceRow = ({
             : '詳細を入力'}
         </Button>
       </Div>
-      <Div w={'30%'} justifyContent="center" alignItems="center">
+      <Div w={'20%'} justifyContent="center" alignItems="center">
+        <Text>{hasWorkingTime && WorkingTime}</Text>
+      </Div>
+      <Div w={'15%'} justifyContent="center" alignItems="center">
         <Button
           onPress={() => setSelectedDateForApplication(date)}
           alignSelf="center">
           申請
         </Button>
       </Div>
-      <Div w={'20%'} alignItems="center">
+      <Div w={'15%'} alignItems="center">
         <Button
           alignSelf="center"
           bg="green600"
