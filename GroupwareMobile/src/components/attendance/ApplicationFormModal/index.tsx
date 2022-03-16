@@ -104,7 +104,7 @@ const ApplicationForm: React.FC<ApplicationFormModalProps> = ({
 
   return (
     <Div borderTopWidth={5} borderTopColor={'blue600'}>
-      <Box mb={4}>
+      <Box mt="lg" mb={4}>
         <Text>日付</Text>
         <DropdownOpenerButton
           name={
