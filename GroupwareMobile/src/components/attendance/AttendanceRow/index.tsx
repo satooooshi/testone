@@ -397,7 +397,7 @@ const AttendanceRow = ({
           color={
             values.category !== AttendanceCategory.COMMON
               ? values.verifiedAt
-                ? 'green'
+                ? 'red'
                 : 'blue'
               : 'black'
           }>
@@ -421,7 +421,7 @@ const AttendanceRow = ({
                 DateTime.fromJSDate(new Date(values.absenceTime)).toFormat(
                   'HH:mm',
                 )
-              : '公欠'
+              : '公休'
             : '詳細を入力'}
         </Button>
       </Div>
