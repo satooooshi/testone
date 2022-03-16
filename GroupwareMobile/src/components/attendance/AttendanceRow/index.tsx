@@ -401,7 +401,7 @@ const AttendanceRow = ({
                 : 'blue'
               : 'black'
           }>
-          {date.toFormat('d日')}
+          {date.setLocale('ja').toFormat('d日(EEE)')}
         </Text>
       </Div>
       <Div w={'30%'} justifyContent="center" alignItems="center">
