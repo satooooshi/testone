@@ -203,6 +203,23 @@ export class AttendanceService {
       .getMany();
     return attendanceReports;
   }
+  public async getAttendanceRepoSpecificUserByDate(
+    userId: number,
+    targetDate: Date,
+  ) {
+    const attendanceRepo = await this.attendanceRepo
+      .createQueryBuilder('attendance_report')
+      .leftJoinAndSelect('attendance_report.user', 'user')
+      .andWhere('user.id = :userId', { userId })
+      .andWhere(
+        `DATE_FORMAT(attendance_report.targetDate, '%Y-%m-%d') = DATE_FORMAT(:targetDate, '%Y-%m-%d')`,
+        {
+          targetDate,
+        },
+      )
+      .getOne();
+    return attendanceRepo;
+  }
 
   public async createAttendanceReport(attendanceReport: AttendanceReport) {
     const createdAttendanceReport = await this.attendanceReport.save({

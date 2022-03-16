@@ -242,6 +242,14 @@ export class AttendanceController {
     @Req() req: RequestWithUser,
   ) {
     const { user } = req;
+    const sameTargetDAteReport =
+      await this.attendanceService.getAttendanceRepoSpecificUserByDate(
+        user.id,
+        attendanceReport.targetDate,
+      );
+    if (sameTargetDAteReport) {
+      throw new BadRequestException('report is exist');
+    }
     const attendanceRepo = await this.attendanceService.createAttendanceReport({
       ...attendanceReport,
       user,

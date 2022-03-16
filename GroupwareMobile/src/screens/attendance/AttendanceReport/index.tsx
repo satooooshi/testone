@@ -64,6 +64,28 @@ const AttendanceReport: React.FC = () => {
     },
   });
 
+  const handleSaveReport = (report: Partial<AttendanceRepo>) => {
+    let isSameDateReportExist = false;
+    if (data) {
+      for (const d of data) {
+        if (
+          report?.targetDate &&
+          DateTime.fromJSDate(new Date(d.targetDate)).toFormat('yyyy/LL/dd') ===
+            DateTime.fromJSDate(new Date(report?.targetDate)).toFormat(
+              'yyyy/LL/dd',
+            )
+        ) {
+          isSameDateReportExist = true;
+        }
+      }
+    }
+    if (isSameDateReportExist) {
+      Alert.alert('同じ日付の報告が既に存在しています');
+    } else {
+      saveReport(report);
+    }
+  };
+
   useEffect(() => {
     refetchReports();
   }, [month, refetchReports]);
@@ -100,7 +122,7 @@ const AttendanceReport: React.FC = () => {
       <AttendanceReportFormModal
         isVisible={visibleAttendanceFormModal}
         onCloseModal={() => setAttendanceFormModal(false)}
-        onSubmit={report => saveReport(report)}
+        onSubmit={report => handleSaveReport(report)}
         isSuccess={isSuccess}
       />
       <Div w={windowWidth * 0.8} alignSelf="center">
