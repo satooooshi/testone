@@ -138,6 +138,13 @@ export class AttendanceService {
     return updatedAttendance;
   }
 
+  public async verityAttendance(attendance: Attendance, date: Date) {
+    await this.attendanceRepo.save({
+      ...attendance,
+      verifiedAt: date,
+    });
+  }
+
   public async createTravelCost(travelCost: TravelCost) {
     const createdAttendance = await this.travelCostRepo.save(travelCost);
     return createdAttendance;

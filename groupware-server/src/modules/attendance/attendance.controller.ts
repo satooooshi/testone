@@ -279,11 +279,20 @@ export class AttendanceController {
     @Req() req: RequestWithUser,
   ) {
     const { user } = req;
-    const attendanceReports =
-      await this.attendanceService.verifyAttendanceReport({
-        ...attendanceReport,
-        user,
-      });
-    return attendanceReports;
+    const attendanceRepo = await this.attendanceService.verifyAttendanceReport({
+      ...attendanceReport,
+      user,
+    });
+    const attendance =
+      await this.attendanceService.getAttendanceSpecificUserByDate(
+        user.id,
+        attendanceRepo.targetDate,
+      );
+    if (attendance)
+      await this.attendanceService.verityAttendance(
+        attendance,
+        attendanceRepo.verifiedAt,
+      );
+    return attendanceRepo;
   }
 }
