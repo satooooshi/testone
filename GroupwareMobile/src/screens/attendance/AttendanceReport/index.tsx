@@ -94,8 +94,6 @@ const AttendanceReport: React.FC = () => {
     if (data?.length) {
       const UnAcceptedRepo = data?.filter(d => d.verifiedAt == null);
       const acceptedRepo = data?.filter(d => d.verifiedAt != null);
-      console.log('UnAcceptedRepo', UnAcceptedRepo);
-      console.log('acceptedRepo', acceptedRepo);
 
       setUnAcceptedREport(UnAcceptedRepo);
       setAcceptedREport(acceptedRepo);
