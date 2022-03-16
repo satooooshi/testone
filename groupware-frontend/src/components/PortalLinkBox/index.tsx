@@ -10,6 +10,7 @@ import {
   RiAccountCircleFill,
   RiExchangeCnyFill,
   RiQuestionnaireFill,
+  RiTimeLine,
 } from 'react-icons/ri';
 import { MdAssignment, MdDeveloperBoard, MdWork } from 'react-icons/md';
 import { CgLoadbarDoc } from 'react-icons/cg';
@@ -17,6 +18,7 @@ import { GrMail } from 'react-icons/gr';
 import { AiOutlineGlobal, AiFillBulb } from 'react-icons/ai';
 import clsx from 'clsx';
 import { useAuthenticate } from 'src/contexts/useAuthenticate';
+import { FiMessageSquare } from 'react-icons/fi';
 
 export enum PortalLinkType {
   IMPRESSIVE_UNIVERSITY = '/event/impressive_university',
@@ -37,6 +39,7 @@ export enum PortalLinkType {
   ATTENDANCE = '/attendance',
   ATTENDANCE_VIEW = '/attendance/view',
   APPLICATION = '/attendance/application',
+  ATTENDANCE_REPORT = '/attendance/report',
 }
 
 type PortarlLinkBoxProps = {
@@ -192,11 +195,11 @@ const PortalIcon: React.FC<PortalProps> = ({ href }) => {
     case PortalLinkType.ATTENDANCE:
       return <MdWork style={{ ...iconStyle, color: '#086f83' }} />;
     case PortalLinkType.ATTENDANCE_VIEW:
-      return <MdWork style={{ ...iconStyle, color: '#086f83' }} />;
+      return <RiTimeLine style={{ ...iconStyle, color: 'darkred' }} />;
+    case PortalLinkType.ATTENDANCE_REPORT:
+      return <FiMessageSquare style={{ ...iconStyle, color: '#086f83' }} />;
     case PortalLinkType.APPLICATION:
-      return (
-        <RiExchangeCnyFill style={{ ...iconStyle, color: 'darkorange' }} />
-      );
+      return <MdWork style={{ ...iconStyle, color: 'darkorange' }} />;
   }
 };
 export const eventTitleText = (href: PortalLinkType): string => {
@@ -234,7 +237,9 @@ export const eventTitleText = (href: PortalLinkType): string => {
     case PortalLinkType.ATTENDANCE:
       return '勤怠管理';
     case PortalLinkType.ATTENDANCE_VIEW:
-      return '勤怠打刻・管理';
+      return '勤怠打刻';
+    case PortalLinkType.ATTENDANCE_REPORT:
+      return '勤怠報告';
     case PortalLinkType.APPLICATION:
       return '入社前申請';
   }
@@ -276,7 +281,9 @@ const descriptionText = (href: PortalLinkType): string => {
     case PortalLinkType.ATTENDANCE:
       return '勤怠についての申請や管理ができます。';
     case PortalLinkType.ATTENDANCE_VIEW:
-      return '勤怠についての申請や管理ができます。';
+      return '勤怠打刻についての申請や管理ができます。';
+    case PortalLinkType.ATTENDANCE_REPORT:
+      return '勤怠報告の申請や管理ができます。';
     case PortalLinkType.APPLICATION:
       return '入社前にかかった交通費などの申請ができます。';
   }
