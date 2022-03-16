@@ -76,6 +76,24 @@ export class AttendanceService {
     return attendance;
   }
 
+  public async getAttendanceSpecificUserByDate(
+    userId: number,
+    targetDate: Date,
+  ) {
+    const attendance = await this.attendanceRepo
+      .createQueryBuilder('attendance')
+      .leftJoinAndSelect('attendance.user', 'user')
+      .andWhere('user.id = :userId', { userId })
+      .andWhere(
+        `DATE_FORMAT(attendance.targetDate, '%Y-%m-%d') = DATE_FORMAT(:targetDate, '%Y-%m-%d')`,
+        {
+          targetDate,
+        },
+      )
+      .getOne();
+    return attendance;
+  }
+
   public async createAttendance(attendance: Attendance) {
     const createdAttendance = await this.attendanceRepo.save({
       ...attendance,
@@ -90,6 +108,17 @@ export class AttendanceService {
       return { ...createdAttendance, travelCost };
     }
     return createdAttendance;
+  }
+
+  public async createAttendanceBYReport(attendanceRepo: AttendanceReport) {
+    await this.attendanceRepo.save({
+      category: attendanceRepo.category,
+      reason: attendanceRepo.reason,
+      user: attendanceRepo.user,
+      targetDate: attendanceRepo.targetDate,
+      detail: '',
+      verifiedAt: null,
+    });
   }
 
   public async updateAttendance(attendance: Attendance) {

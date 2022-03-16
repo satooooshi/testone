@@ -242,12 +242,19 @@ export class AttendanceController {
     @Req() req: RequestWithUser,
   ) {
     const { user } = req;
-    const attendanceReports =
-      await this.attendanceService.createAttendanceReport({
-        ...attendanceReport,
-        user,
-      });
-    return attendanceReports;
+    const attendanceRepo = await this.attendanceService.createAttendanceReport({
+      ...attendanceReport,
+      user,
+    });
+    const attendance =
+      await this.attendanceService.getAttendanceSpecificUserByDate(
+        user.id,
+        attendanceReport.targetDate,
+      );
+    if (!attendance) {
+      await this.attendanceService.createAttendanceBYReport(attendanceRepo);
+    }
+    return attendanceRepo;
   }
 
   @Patch('/report')
