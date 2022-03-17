@@ -45,6 +45,7 @@ import { attendanceSchema } from 'src/utils/validation/schema';
 import { formikErrorMsgFactory } from 'src/utils/factory/formikErrorMsgFactory';
 import { useAPIGetDefaultAttendance } from '@/hooks/api/attendance/useAPIGetDefaultAttendance';
 import DefaultModal from '../../../components/attendance/DefaultModal';
+import { isDisplayableWorkingTime } from 'src/utils/factory/isDisplayableWorkingTime';
 
 const AttendanceRow = ({
   date,
@@ -57,6 +58,8 @@ const AttendanceRow = ({
 }) => {
   const [detailModal, setDetailModal] = useState(false);
   const { user } = useAuthenticate();
+  const [hasWorkingTime, setHasWorkingTime] = useState(true);
+  const [WorkingTime, setWorkingTime] = useState<string | undefined>();
   const [selectedDateForApplication, setSelectedDateForApplication] =
     useState<DateTime>();
   const toast = useToast();
@@ -103,7 +106,7 @@ const AttendanceRow = ({
   const { values, handleSubmit, setValues, errors } = useFormik({
     initialValues: targetData || initialValues,
     enableReinitialize: true,
-    validationSchema: attendanceSchema,
+    validationSchema: hasWorkingTime ? attendanceSchema : undefined,
     validateOnChange: true,
     validateOnMount: true,
     onSubmit: (submitted) => {
@@ -138,12 +141,40 @@ const AttendanceRow = ({
     }
     return undefined;
   };
+  useEffect(() => {
+    if (values.attendanceTime && values.absenceTime && values.breakMinutes) {
+      const breakHourAndMinutes = values.breakMinutes.split(':');
+      const diff =
+        (new Date(values.absenceTime).getTime() -
+          new Date(values.attendanceTime).getTime()) /
+        3600000;
+      const minutesNumber =
+        Math.round((diff - Math.floor(diff)) * 60) -
+        Number(breakHourAndMinutes[1]);
+
+      const minutes = String(
+        '00' + (minutesNumber < 0 ? 60 + minutesNumber : minutesNumber),
+      ).slice(-2);
+      const hoursNumber =
+        Math.floor(diff) -
+        Number(breakHourAndMinutes[0]) -
+        (minutesNumber < 0 ? 1 : 0);
+      const hours = String('00' + hoursNumber).slice(-2);
+      setWorkingTime(hours + ':' + minutes);
+    }
+  }, [values.attendanceTime, values.absenceTime, values.breakMinutes]);
 
   useEffect(() => {
     if (targetData) {
       setValues(targetData);
     }
   }, [setValues, targetData]);
+
+  useEffect(() => {
+    if (values.category) {
+      setHasWorkingTime(isDisplayableWorkingTime(values.category));
+    }
+  }, [values.category]);
   return (
     <>
       <Modal
@@ -242,51 +273,57 @@ const AttendanceRow = ({
         </Select>
       </Td>
       <Td>
-        <input
-          type="time"
-          value={dateToTime(values.attendanceTime)}
-          onChange={(e) => {
-            const hourAndMinutes = e.target.value.split(':');
-            setValues((v) => ({
-              ...v,
-              attendanceTime: date
-                .set({
-                  hour: Number(hourAndMinutes[0]),
-                  minute: Number(hourAndMinutes[1]),
-                })
-                .toJSDate(),
-            }));
-          }}
-        />
+        {hasWorkingTime && (
+          <input
+            type="time"
+            value={dateToTime(values.attendanceTime)}
+            onChange={(e) => {
+              const hourAndMinutes = e.target.value.split(':');
+              setValues((v) => ({
+                ...v,
+                attendanceTime: date
+                  .set({
+                    hour: Number(hourAndMinutes[0]),
+                    minute: Number(hourAndMinutes[1]),
+                  })
+                  .toJSDate(),
+              }));
+            }}
+          />
+        )}
       </Td>
       <Td>
-        <input
-          type="time"
-          value={dateToTime(values.absenceTime)}
-          onChange={(e) => {
-            const hourAndMinutes = e.target.value.split(':');
-            setValues((v) => ({
-              ...v,
-              absenceTime: date
-                .set({
-                  hour: Number(hourAndMinutes[0]),
-                  minute: Number(hourAndMinutes[1]),
-                })
-                .toJSDate(),
-            }));
-          }}
-        />
+        {hasWorkingTime && (
+          <input
+            type="time"
+            value={dateToTime(values.absenceTime)}
+            onChange={(e) => {
+              const hourAndMinutes = e.target.value.split(':');
+              setValues((v) => ({
+                ...v,
+                absenceTime: date
+                  .set({
+                    hour: Number(hourAndMinutes[0]),
+                    minute: Number(hourAndMinutes[1]),
+                  })
+                  .toJSDate(),
+              }));
+            }}
+          />
+        )}
       </Td>
       <Td>
-        <input
-          type="time"
-          value={values?.breakMinutes}
-          onChange={(e) => {
-            setValues((v) => ({ ...v, breakMinutes: e.target.value }));
-          }}
-        />
+        {hasWorkingTime && (
+          <input
+            type="time"
+            value={values?.breakMinutes}
+            onChange={(e) => {
+              setValues((v) => ({ ...v, breakMinutes: e.target.value }));
+            }}
+          />
+        )}
       </Td>
-      <Td></Td>
+      <Td>{hasWorkingTime && WorkingTime}</Td>
       <Td>
         <Button
           onClick={() => setSelectedDateForApplication(date)}
@@ -335,7 +372,7 @@ const AttendanceRow = ({
             validate();
             handleSubmit();
           }}>
-          保存
+          {values.id ? '更新' : '保存'}
         </Button>
       </Td>
     </>
