@@ -80,7 +80,9 @@ const Application: React.FC = () => {
                 </Td>
                 <Td>{a.destination}</Td>
                 <Td>{a.purpose}</Td>
-                <Td>{a.travelCost}</Td>
+                <Td>
+                  {a.travelCost * (a.oneWayOrRound === 'one_way' ? 1 : 2)}
+                </Td>
                 <Td>
                   <Button
                     colorScheme="green"

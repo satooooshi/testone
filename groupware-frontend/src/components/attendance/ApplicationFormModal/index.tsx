@@ -90,15 +90,11 @@ const ApplicationForm = ({
         justifyContent="space-between">
         <FormLabel w="40%">日付</FormLabel>
         <Input
-          type="datetime-local"
+          type="date"
           value={
             values.attendanceTime
               ? DateTime.fromJSDate(new Date(values.attendanceTime)).toFormat(
                   'yyyy-LL-dd',
-                ) +
-                'T' +
-                DateTime.fromJSDate(new Date(values.attendanceTime)).toFormat(
-                  'HH:mm',
                 )
               : undefined
           }
