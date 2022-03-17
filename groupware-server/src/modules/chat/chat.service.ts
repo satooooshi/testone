@@ -112,6 +112,7 @@ export class ChatService {
       if (g.roomType === RoomType.PERSONAL) {
         const chatPartner = g.members.filter((m) => m.id !== userID)[0];
         g.imageURL = chatPartner.avatarUrl;
+        g.name = `${chatPartner.lastName} ${chatPartner.firstName}`;
       }
 
       return {
