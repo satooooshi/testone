@@ -1,7 +1,7 @@
 import LayoutWithTab from '@/components/layout/LayoutWithTab';
 import { SidebarScreenName } from '@/components/layout/Sidebar';
 import Head from 'next/head';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Tab } from 'src/types/header/tab/types';
 import {
   Box,
@@ -16,36 +16,11 @@ import {
   Tr,
   Text,
   useMediaQuery,
-  Select,
   Button,
-  useToast,
-  Modal,
-  ModalOverlay,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalHeader,
-  Textarea,
-  Alert,
 } from '@chakra-ui/react';
 import { DateTime } from 'luxon';
-import {
-  Attendance,
-  AttendanceCategory,
-  AttendanceRepo,
-  DefaultAttendance,
-  User,
-} from 'src/types';
-import { useFormik } from 'formik';
-import { useAPIGetAttendace } from '@/hooks/api/attendance/useAPIGetAttendance';
-import { useAPICreateAttendance } from '@/hooks/api/attendance/useAPICreateAttendance';
-import { useAPIUpdateAttendance } from '@/hooks/api/attendance/useAPIUpdateAttendance';
-import { useAuthenticate } from 'src/contexts/useAuthenticate';
+import { AttendanceRepo } from 'src/types';
 import { attendanceCategoryName } from 'src/utils/factory/attendanceCategoryName';
-import TravelCostFormModal from '@/components/attendance/TravelCostFormModal';
-import { attendanceSchema } from 'src/utils/validation/schema';
-import { formikErrorMsgFactory } from 'src/utils/factory/formikErrorMsgFactory';
-import { useAPIGetDefaultAttendance } from '@/hooks/api/attendance/useAPIGetDefaultAttendance';
 import { useAPIGetAttendanceReport } from '@/hooks/api/attendance/attendanceReport/useAPIGetAttendanceReport';
 import ReportFormModal from '@/components/attendance/ReportFormModal';
 import { useAPICreateAttendanceReport } from '@/hooks/api/attendance/attendanceReport/useAPICreateAttendanceReport';
@@ -62,7 +37,6 @@ const AttendanceReportRow = ({
   refetchReports?: () => void;
 }) => {
   const [detailModal, setDetailModal] = useState(false);
-  const { user } = useAuthenticate();
   const [visibleFormModal, setFormModal] = useState(false);
   const { mutate: saveReport, isSuccess } = useAPIUpdateAttendanceReport({
     onSuccess: () => {

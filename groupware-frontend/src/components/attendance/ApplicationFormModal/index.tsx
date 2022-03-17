@@ -19,7 +19,6 @@ import {
 } from '@chakra-ui/react';
 import { useFormik } from 'formik';
 import { DateTime } from 'luxon';
-import app from 'next/app';
 import React from 'react';
 import { ApplicationBeforeJoining, OneWayOrRound } from 'src/types';
 import { applicationFormModalSchema } from 'src/utils/validation/schema';
