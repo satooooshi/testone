@@ -44,6 +44,8 @@ import TravelCostFormModal from '@/components/attendance/TravelCostFormModal';
 import { attendanceSchema } from 'src/utils/validation/schema';
 import { formikErrorMsgFactory } from 'src/utils/factory/formikErrorMsgFactory';
 import { useAPIGetDefaultAttendance } from '@/hooks/api/attendance/useAPIGetDefaultAttendance';
+import router from 'next/router';
+import DefaultModal from '../default';
 
 const AttendanceRow = ({
   date,
@@ -346,8 +348,8 @@ const AttendanceView = () => {
   const { data: defaultData } = useAPIGetDefaultAttendance();
   const tabs: Tab[] = [
     { type: 'link', name: '勤怠打刻', href: '/attendance/view' },
-    { type: 'link', name: '定時設定', href: '/attendance/default' },
   ];
+  const [visibleDefaultModal, setDefaultModal] = useState(false);
   const [month, setMonth] = useState(DateTime.now());
   const { data } = useAPIGetAttendace({
     from_date: month.startOf('month').toFormat('yyyy-LL-dd'),
@@ -376,6 +378,10 @@ const AttendanceView = () => {
       <Head>
         <title>ボールド | 勤怠打刻</title>
       </Head>
+      <DefaultModal
+        onCloseModal={() => setDefaultModal(false)}
+        isOpen={visibleDefaultModal}
+      />
 
       <Box display="flex" flexDir="row" justifyContent="flex-start" mb="16px">
         <FormControl>
@@ -395,6 +401,12 @@ const AttendanceView = () => {
             }}
           />
         </FormControl>
+        <Button
+          onClick={() => setDefaultModal(true)}
+          right="50px"
+          position="absolute">
+          定時設定
+        </Button>
       </Box>
       <Box
         w={'100%'}
