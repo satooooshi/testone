@@ -31,9 +31,7 @@ const RoomList: React.FC = () => {
   const [userModal, setVisibleUserModal] = useState(false);
   const {data: users} = useAPIGetUsers('');
   const {selectedUserRole, filteredUsers} = useUserRole('All', users);
-  const [creationType, setCreationType] = useState<
-    'talk' | 'group' | undefined
-  >();
+  const [creationType, setCreationType] = useState<RoomType>();
 
   const {refetch: refetchAllRooms} = useAPIGetRooms(
     {
@@ -52,6 +50,7 @@ const RoomList: React.FC = () => {
     page,
     limit: '20',
   });
+
   const {mutate: createGroup} = useAPISaveChatGroup({
     onSuccess: createdData => {
       navigation.navigate('ChatStack', {
@@ -114,6 +113,8 @@ const RoomList: React.FC = () => {
 
   useFocusEffect(
     useCallback(() => {
+      console.log('========================= refetch');
+
       refetchAllRooms();
     }, [refetchAllRooms]),
   );
@@ -147,7 +148,7 @@ const RoomList: React.FC = () => {
             underlayColor="none"
             onPress={() => {
               setVisibleUserModal(true);
-              setCreationType('talk');
+              setCreationType(RoomType.TALK_ROOM);
             }}
             style={tailwind('justify-center w-6/12 items-center')}>
             <>
@@ -165,7 +166,7 @@ const RoomList: React.FC = () => {
             style={tailwind('justify-center w-6/12 items-center')}
             onPress={() => {
               setVisibleUserModal(true);
-              setCreationType('group');
+              setCreationType(RoomType.GROUP);
             }}>
             <>
               <Icon
@@ -184,7 +185,10 @@ const RoomList: React.FC = () => {
             selectedUserRole={selectedUserRole}
             defaultSelectedUsers={[]}
             onCompleteModal={(selectedUsers, reset) => {
-              if (selectedUsers.length === 1 && creationType === 'talk') {
+              if (
+                selectedUsers.length === 1 &&
+                creationType === RoomType.TALK_ROOM
+              ) {
                 createGroup({
                   members: selectedUsers,
                   roomType: RoomType.PERSONAL,
