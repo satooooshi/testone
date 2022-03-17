@@ -51,46 +51,46 @@ const AttendanceReportDetail: React.FC<AttendanceReportDetailProps> = ({
         <Text fontSize={25} my="lg" fontWeight="bold">
           勤怠報告詳細
         </Text>
-        <Text ml={4} fontSize={16}>
+        <Text ml={4} fontSize={16} fontWeight="bold">
           日付:
         </Text>
-        <Text mt={5} ml={4} fontSize={20} fontWeight="bold">
+        <Text mt={5} ml={4} fontSize={20}>
           {DateTime.fromJSDate(new Date(report.targetDate)).toFormat(
             'yyyy/LL/dd',
           )}
         </Text>
-        <Text mt="lg" ml={4} fontSize={16}>
+        <Text mt="lg" ml={4} fontSize={16} fontWeight="bold">
           区分:
         </Text>
-        <Text mt={5} ml={4} fontSize={20} fontWeight="bold">
+        <Text mt={5} ml={4} fontSize={20}>
           {attendanceCategoryName(report.category)}
         </Text>
-        <Text mt="lg" ml={4} fontSize={16}>
+        <Text mt="lg" ml={4} fontSize={16} fontWeight="bold">
           理由:
         </Text>
-        <Text mt={5} ml={4} fontSize={20} fontWeight="bold">
+        <Text mt={5} ml={4} fontSize={20}>
           {attendanceReasonName(report.reason)}
         </Text>
-        <Text mt="lg" ml={4} fontSize={16}>
+        <Text mt="lg" ml={4} fontSize={16} fontWeight="bold">
           詳細:
         </Text>
-        <Text mt={5} ml={4} fontSize={20} fontWeight="bold">
+        <Text mt={5} ml={4} fontSize={16}>
           {report.detail ? report.detail : '詳細はありません。'}
         </Text>
-        <Text fontSize={16} ml={4} mt="lg">
+        <Text fontSize={16} ml={4} mt="lg" fontWeight="bold">
           本社報告日:
         </Text>
-        <Text mt={5} ml={4} fontSize={20} fontWeight="bold">
+        <Text mt={5} ml={4} fontSize={20}>
           {report.reportDate
             ? DateTime.fromJSDate(new Date(report.reportDate)).toFormat(
                 'yyyy/LL/dd',
               )
             : '記載されていません。'}
         </Text>
-        <Text fontSize={16} ml={4} mt="lg">
+        <Text fontSize={16} ml={4} mt="lg" fontWeight="bold">
           報告承認日:
         </Text>
-        <Text mt={5} ml={4} fontSize={20} fontWeight="bold">
+        <Text mt={5} ml={4} fontSize={20}>
           {report.verifiedAt
             ? DateTime.fromJSDate(new Date(report.verifiedAt)).toFormat(
                 'yyyy/LL/dd',

@@ -7,6 +7,7 @@ import {
   ModalHeader,
   ModalOverlay,
   Text,
+  Textarea,
 } from '@chakra-ui/react';
 import { DateTime } from 'luxon';
 import React from 'react';
@@ -59,9 +60,9 @@ const ReportDetailModal: React.FC<ReportDetailModalProps> = (props) => {
               </Box>
               <Box display="flex" flexDir="column" mt={5}>
                 <Text fontWeight="bold">詳細:</Text>
-                <Text mt={5}>
+                <Textarea mt={5} isReadOnly={true}>
                   {report.detail ? report.detail : '詳細はありません。'}
-                </Text>
+                </Textarea>
               </Box>
               <Box display="flex" flexDir="row" mt={5}>
                 <Text fontWeight="bold">本社報告日:</Text>
