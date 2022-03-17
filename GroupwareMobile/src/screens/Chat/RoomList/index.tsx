@@ -18,7 +18,7 @@ import {useAPISaveChatGroup} from '../../../hooks/api/chat/useAPISaveChatGroup';
 import {useAPISavePin} from '../../../hooks/api/chat/useAPISavePin';
 import {useAPIGetUsers} from '../../../hooks/api/user/useAPIGetUsers';
 import {useUserRole} from '../../../hooks/user/useUserRole';
-import {ChatGroup} from '../../../types';
+import {ChatGroup, RoomType} from '../../../types';
 import {RoomListNavigationProps} from '../../../types/navigator/drawerScreenProps';
 
 const RoomList: React.FC = () => {
@@ -185,7 +185,10 @@ const RoomList: React.FC = () => {
             defaultSelectedUsers={[]}
             onCompleteModal={(selectedUsers, reset) => {
               if (selectedUsers.length === 1 && creationType === 'talk') {
-                createGroup({members: selectedUsers});
+                createGroup({
+                  members: selectedUsers,
+                  roomType: RoomType.PERSONAL,
+                });
                 setRoomTypeSelector(false);
                 return;
               }
