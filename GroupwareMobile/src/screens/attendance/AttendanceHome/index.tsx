@@ -27,16 +27,6 @@ const AttendanceHome: React.FC = () => {
               }
             />
           </Div>
-          <Div mb={8} mr={4}>
-            <PortalLinkBox
-              type="application"
-              onPress={() =>
-                navigation.navigate('AttendanceStack', {
-                  screen: 'ApplicationBeforeJoining',
-                })
-              }
-            />
-          </Div>
           <Div mb={8}>
             <PortalLinkBox
               type="attendance_report"
@@ -46,6 +36,16 @@ const AttendanceHome: React.FC = () => {
                 })
               }
             />
+            <Div mb={8} mr={4}>
+              <PortalLinkBox
+                type="application"
+                onPress={() =>
+                  navigation.navigate('AttendanceStack', {
+                    screen: 'ApplicationBeforeJoining',
+                  })
+                }
+              />
+            </Div>
           </Div>
         </Div>
       </ScrollDiv>

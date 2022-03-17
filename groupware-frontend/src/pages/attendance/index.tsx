@@ -25,8 +25,8 @@ const Attendance = () => {
 
       <SimpleGrid columns={{ sm: 1, md: 2, lg: 3 }} spacing={'16px'}>
         <PortalLinkBox href={PortalLinkType.ATTENDANCE_VIEW} />
-        <PortalLinkBox href={PortalLinkType.APPLICATION} />
         <PortalLinkBox href={PortalLinkType.ATTENDANCE_REPORT} />
+        <PortalLinkBox href={PortalLinkType.APPLICATION} />
       </SimpleGrid>
     </LayoutWithTab>
   );
