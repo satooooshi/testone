@@ -1,4 +1,5 @@
 import { useAPICreateApplication } from '@/hooks/api/attendance/application/useAPICreateApplication';
+import { useAPIDeleteApplication } from '@/hooks/api/attendance/application/useAPIDeleteApplication';
 import { useAPIUpdateApplication } from '@/hooks/api/attendance/application/useAPIUpdateApplication';
 import {
   FormControl,
@@ -18,6 +19,7 @@ import {
 } from '@chakra-ui/react';
 import { useFormik } from 'formik';
 import { DateTime } from 'luxon';
+import app from 'next/app';
 import React from 'react';
 import { ApplicationBeforeJoining, OneWayOrRound } from 'src/types';
 import { applicationFormModalSchema } from 'src/utils/validation/schema';
@@ -60,6 +62,21 @@ const ApplicationForm = ({
       onClose();
     },
   });
+
+  const { mutate: deleteApplication } = useAPIDeleteApplication({
+    onSuccess: () => {
+      alert('削除が完了しました');
+      onClose();
+    },
+  });
+  const onDeleteButtonClicked = () => {
+    if (!application) {
+      return;
+    }
+    if (confirm('アルバムを削除してよろしいですか？')) {
+      deleteApplication({ applicationId: application.id });
+    }
+  };
   const { values, setValues, handleSubmit, errors, touched } = useFormik({
     initialValues: application || initialValues,
     validationSchema: applicationFormModalSchema,
@@ -267,6 +284,11 @@ const ApplicationForm = ({
         <Button colorScheme={'blue'} onClick={() => handleSubmit()}>
           {values.id ? '更新する' : '申請する'}
         </Button>
+        {application?.id && (
+          <Button colorScheme="red" onClick={() => onDeleteButtonClicked()}>
+            削除する
+          </Button>
+        )}
       </Box>
     </Box>
   );

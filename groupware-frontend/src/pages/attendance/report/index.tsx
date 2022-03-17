@@ -112,15 +112,21 @@ const AttendanceReportRow = ({
         </Td>
       ) : (
         <Td>
-          <Text fontSize={16} color="blue" onClick={() => setFormModal(true)}>
+          <Button
+            fontSize={16}
+            colorScheme="blue"
+            onClick={() => setFormModal(true)}>
             編集
-          </Text>
+          </Button>
         </Td>
       )}
       <Td>
-        <Text fontSize={16} color="blue" onClick={() => setDetailModal(true)}>
+        <Button
+          fontSize={16}
+          colorScheme="blue"
+          onClick={() => setDetailModal(true)}>
           詳細
-        </Text>
+        </Button>
       </Td>
     </>
   );
