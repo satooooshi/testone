@@ -25,6 +25,11 @@ import { EventSchedule } from './event.entity';
 import { LastReadChatTime } from './lastReadChatTime.entity';
 import { User } from './user.entity';
 
+export enum RoomType {
+  GROUP = 'group',
+  TALK_ROOM = 'talk_room',
+  PERSONAL = 'personal',
+}
 @Entity({ name: 'chat_groups' })
 export class ChatGroup {
   @PrimaryGeneratedColumn()
@@ -47,6 +52,14 @@ export class ChatGroup {
     default: '',
   })
   imageURL: string;
+
+  @Column({
+    type: 'enum',
+    name: 'room_type',
+    enum: RoomType,
+    default: RoomType.TALK_ROOM,
+  })
+  roomType: RoomType;
 
   @OneToOne(() => EventSchedule, (eventSchedule) => eventSchedule.chatGroup, {
     onUpdate: 'CASCADE',
