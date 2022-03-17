@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { orderBy } from 'lodash';
-import { ChatGroup } from 'src/entities/chatGroup.entity';
+import { ChatGroup, RoomType } from 'src/entities/chatGroup.entity';
 import { ChatMessage, ChatMessageType } from 'src/entities/chatMessage.entity';
 import { ChatMessageReaction } from 'src/entities/chatMessageReaction.entity';
 import { LastReadChatTime } from 'src/entities/lastReadChatTime.entity';
@@ -108,6 +108,12 @@ export class ChatService {
       const hasBeenRead = g?.lastReadChatTime?.[0]?.readTime
         ? g?.lastReadChatTime?.[0]?.readTime > g.updatedAt
         : false;
+
+      if (g.roomType === RoomType.PERSONAL) {
+        const chatPartner = g.members.filter((m) => m.id !== userID)[0];
+        g.imageURL = chatPartner.avatarUrl;
+      }
+
       return {
         ...g,
         pinnedUsers: undefined,
@@ -115,6 +121,7 @@ export class ChatService {
         hasBeenRead,
       };
     });
+
     rooms = orderBy(rooms, [
       'isPinned',
       'updatedAt',
