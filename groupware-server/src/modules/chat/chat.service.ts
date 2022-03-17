@@ -133,7 +133,7 @@ export class ChatService {
     const existMessages = await this.chatMessageRepository
       .createQueryBuilder('chat_messages')
       .withDeleted()
-      .leftJoin('chat_messages.chatGroup', 'chat_group')
+      .leftJoinAndSelect('chat_messages.chatGroup', 'chat_group')
       .leftJoinAndSelect('chat_messages.sender', 'sender')
       .leftJoinAndSelect('chat_messages.reactions', 'reactions')
       .leftJoinAndSelect('reactions.user', 'user')
