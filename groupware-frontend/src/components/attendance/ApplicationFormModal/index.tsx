@@ -281,11 +281,11 @@ const ApplicationForm = ({
       </FormControl>
       <Box mb="8px" flexDir="row" display="flex" justifyContent="flex-end">
         <Button colorScheme={'blue'} onClick={() => handleSubmit()}>
-          {values.id ? '更新する' : '申請する'}
+          {values.id ? '更新' : '申請'}
         </Button>
         {application?.id && (
           <Button colorScheme="red" onClick={() => onDeleteButtonClicked()}>
-            削除する
+            削除
           </Button>
         )}
       </Box>
