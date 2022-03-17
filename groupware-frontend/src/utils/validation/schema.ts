@@ -195,3 +195,7 @@ export const attendanceSchema = Yup.object().shape({
   attendanceTime: Yup.date().required('出勤時間は' + requireMessage),
   absenceTime: Yup.date().required('退勤時間は' + requireMessage),
 });
+
+export const attendanceReportSchema = Yup.object().shape({
+  targetDate: Yup.date().required('日付は' + requireMessage),
+});

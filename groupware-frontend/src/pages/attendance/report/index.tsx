@@ -26,11 +26,13 @@ import {
   ModalContent,
   ModalHeader,
   Textarea,
+  Alert,
 } from '@chakra-ui/react';
 import { DateTime } from 'luxon';
 import {
   Attendance,
   AttendanceCategory,
+  AttendanceRepo,
   DefaultAttendance,
   User,
 } from 'src/types';
@@ -44,338 +46,115 @@ import TravelCostFormModal from '@/components/attendance/TravelCostFormModal';
 import { attendanceSchema } from 'src/utils/validation/schema';
 import { formikErrorMsgFactory } from 'src/utils/factory/formikErrorMsgFactory';
 import { useAPIGetDefaultAttendance } from '@/hooks/api/attendance/useAPIGetDefaultAttendance';
+import { useAPIGetAttendanceReport } from '@/hooks/api/attendance/attendanceReport/useAPIGetAttendanceReport';
+import ReportFormModal from '@/components/attendance/ReportFormModal ';
+import { useAPICreateAttendanceReport } from '@/hooks/api/attendance/attendanceReport/useAPICreateAttendanceReport';
+import { responseErrorMsgFactory } from 'src/utils/factory/responseErrorMsgFactory';
 
-const AttendanceRow = ({
-  date,
-  attendanceData,
-  defaultData,
+const AttendanceReportRow = ({
+  reportData,
+  refetchReports,
 }: {
-  date: DateTime;
-  attendanceData?: Attendance[];
-  defaultData?: DefaultAttendance;
+  reportData: AttendanceRepo;
+  refetchReports?: () => void;
 }) => {
   const [detailModal, setDetailModal] = useState(false);
   const { user } = useAuthenticate();
-  const [selectedDateForApplication, setSelectedDateForApplication] =
-    useState<DateTime>();
-  const toast = useToast();
-  const targetData = attendanceData?.filter(
-    (a) =>
-      DateTime.fromJSDate(new Date(a?.targetDate)).toFormat('yyyy-LL-dd') ===
-      date.toFormat('yyyy-LL-dd'),
-  )?.[0];
-  const initialValues: Partial<Attendance> = {
-    category: AttendanceCategory.COMMON,
-    targetDate: date.toJSDate(),
-    breakMinutes: '00:00',
-    user: user as User,
-    travelCost: [],
-  };
-  const { mutate: createAttendance } = useAPICreateAttendance({
-    onSuccess: (created) => {
-      setValues(created);
-      toast({
-        title: '申請が完了しました',
-        status: 'success',
-      });
-    },
-  });
-  const { mutate: updateAttendance } = useAPIUpdateAttendance({
-    onSuccess: () => {
-      toast({
-        title: '更新が完了しました',
-        status: 'success',
-      });
-    },
-  });
 
-  const validate = () => {
-    const errorMsg = formikErrorMsgFactory(errors);
-    if (errorMsg) {
-      toast({
-        description: errorMsg,
-        status: 'error',
-        isClosable: true,
-      });
-    }
-  };
-  const { values, handleSubmit, setValues, errors } = useFormik({
-    initialValues: targetData || initialValues,
-    enableReinitialize: true,
-    validationSchema: attendanceSchema,
-    validateOnChange: true,
-    validateOnMount: true,
-    onSubmit: (submitted) => {
-      if (
-        submitted?.targetDate &&
-        new Date(submitted?.targetDate)?.getMonth() !== new Date().getMonth()
-      ) {
-        toast({
-          title: '今月のデータのみ編集可能です',
-          status: 'error',
-        });
-        return;
-      }
-      submitted.travelCost = submitted?.travelCost?.filter(
-        (t) => !!t.travelCost,
-      );
-      if (submitted?.id) {
-        updateAttendance(submitted as Attendance);
-        return;
-      }
-      createAttendance(submitted);
-    },
-  });
-
-  const dateToTime = (target: Date | string | undefined) => {
-    if (!target) {
-      return undefined;
-    }
-    const dateObj = new Date(target);
-    if (dateObj instanceof Date) {
-      return DateTime.fromJSDate(dateObj).toFormat('HH:mm');
-    }
-    return undefined;
-  };
-
-  useEffect(() => {
-    if (targetData) {
-      setValues(targetData);
-    }
-  }, [setValues, targetData]);
   return (
     <>
-      <Modal
-        scrollBehavior="inside"
-        isOpen={detailModal}
-        onClose={() => setDetailModal(false)}>
-        <ModalOverlay />
-        <ModalContent h="90vh" bg={'#f9fafb'}>
-          <ModalHeader
-            flexDir="row"
-            justifyContent="space-between"
-            display="flex"
-            mr="24px">
-            <Text>{date?.toFormat('LL月dd日 備考')}</Text>
-          </ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            <FormControl>
-              <FormLabel>備考欄を記入してください</FormLabel>
-            </FormControl>
-            <Textarea
-              type="text"
-              value={values.detail}
-              h="300px"
-              placeholder="備考を入力してください"
-              onChange={(e) =>
-                setValues((v) => ({ ...v, detail: e.target.value }))
-              }
-            />
-          </ModalBody>
-        </ModalContent>
-      </Modal>
-      <TravelCostFormModal
-        isOpen={!!selectedDateForApplication}
-        onClose={() => setSelectedDateForApplication(undefined)}
-        attendance={values}
-        setAttendance={setValues}
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        //@ts-ignore
-        date={selectedDateForApplication}
-      />
       <Td>
-        <Text>{date.toFormat('d日')}</Text>
+        <Text>
+          {DateTime.fromJSDate(new Date(reportData.targetDate)).toFormat(
+            'yyyy/LL/dd',
+          )}
+        </Text>
+      </Td>
+      <Td>{attendanceCategoryName(reportData.category)}</Td>
+      <Td>
+        {DateTime.fromJSDate(new Date(reportData.createdAt)).toFormat(
+          'yyyy/LL/dd',
+        )}
       </Td>
       <Td>
-        <Select
-          colorScheme="teal"
-          bg="white"
-          defaultValue={values.category}
-          onChange={(e) =>
-            setValues((v) => ({
-              ...v,
-              category: e.target.value as AttendanceCategory,
-            }))
-          }
-          value={values.category}>
-          <option value={AttendanceCategory.COMMON}>
-            {attendanceCategoryName(AttendanceCategory.COMMON)}
-          </option>
-          <option value={AttendanceCategory.PAILD_ABSENCE}>
-            {attendanceCategoryName(AttendanceCategory.PAILD_ABSENCE)}
-          </option>
-          <option value={AttendanceCategory.LATE}>
-            {attendanceCategoryName(AttendanceCategory.LATE)}
-          </option>
-          <option value={AttendanceCategory.TRAINDELAY}>
-            {attendanceCategoryName(AttendanceCategory.TRAINDELAY)}
-          </option>
-          <option value={AttendanceCategory.EARLY_LEAVING}>
-            {attendanceCategoryName(AttendanceCategory.EARLY_LEAVING)}
-          </option>
-          <option value={AttendanceCategory.LATE_AND_EARY_LEAVING}>
-            {attendanceCategoryName(AttendanceCategory.LATE_AND_EARY_LEAVING)}
-          </option>
-          <option value={AttendanceCategory.HOLIDAY}>
-            {attendanceCategoryName(AttendanceCategory.HOLIDAY)}
-          </option>
-          <option value={AttendanceCategory.HOLIDAY_WORK}>
-            {attendanceCategoryName(AttendanceCategory.HOLIDAY_WORK)}
-          </option>
-          <option value={AttendanceCategory.TRANSFER_HOLIDAY}>
-            {attendanceCategoryName(AttendanceCategory.TRANSFER_HOLIDAY)}
-          </option>
-          <option value={AttendanceCategory.GOOUT}>
-            {attendanceCategoryName(AttendanceCategory.GOOUT)}
-          </option>
-          <option value={AttendanceCategory.SHIFTWORK}>
-            {attendanceCategoryName(AttendanceCategory.SHIFTWORK)}
-          </option>
-          <option value={AttendanceCategory.ABSENCE}>
-            {attendanceCategoryName(AttendanceCategory.ABSENCE)}
-          </option>
-          <option value={AttendanceCategory.HALF_HOLIDAY}>
-            {attendanceCategoryName(AttendanceCategory.HALF_HOLIDAY)}
-          </option>
-        </Select>
+        {DateTime.fromJSDate(new Date(reportData.createdAt)).toFormat(
+          'yyyy/LL/dd',
+        )}
       </Td>
-      <Td>
-        <input
-          type="time"
-          value={dateToTime(values.attendanceTime)}
-          onChange={(e) => {
-            const hourAndMinutes = e.target.value.split(':');
-            setValues((v) => ({
-              ...v,
-              attendanceTime: date
-                .set({
-                  hour: Number(hourAndMinutes[0]),
-                  minute: Number(hourAndMinutes[1]),
-                })
-                .toJSDate(),
-            }));
-          }}
-        />
-      </Td>
-      <Td>
-        <input
-          type="time"
-          value={dateToTime(values.absenceTime)}
-          onChange={(e) => {
-            const hourAndMinutes = e.target.value.split(':');
-            setValues((v) => ({
-              ...v,
-              absenceTime: date
-                .set({
-                  hour: Number(hourAndMinutes[0]),
-                  minute: Number(hourAndMinutes[1]),
-                })
-                .toJSDate(),
-            }));
-          }}
-        />
-      </Td>
-      <Td>
-        <input
-          type="time"
-          value={values?.breakMinutes}
-          onChange={(e) => {
-            setValues((v) => ({ ...v, breakMinutes: e.target.value }));
-          }}
-        />
-      </Td>
-      <Td></Td>
-      <Td>
-        <Button
-          onClick={() => setSelectedDateForApplication(date)}
-          colorScheme="blue">
-          申請
-        </Button>
-      </Td>
-      <Td>
-        <Button colorScheme="blue" onClick={() => setDetailModal(true)}>
-          備考
-        </Button>
-      </Td>
-      <Td>
-        <Button
-          colorScheme="yellow"
-          onClick={() => {
-            if (defaultData) {
-              const attendanceHourAndMinutes =
-                defaultData.attendanceTime.split(':');
-              const absenceHourAndMinutes = defaultData.absenceTime.split(':');
-              setValues((v) => ({
-                ...v,
-                attendanceTime: date
-                  .set({
-                    hour: Number(attendanceHourAndMinutes[0]),
-                    minute: Number(attendanceHourAndMinutes[1]),
-                  })
-                  .toJSDate(),
-                absenceTime: date
-                  .set({
-                    hour: Number(absenceHourAndMinutes[0]),
-                    minute: Number(absenceHourAndMinutes[1]),
-                  })
-                  .toJSDate(),
-                breakMinutes: defaultData.breakMinutes,
-              }));
-            }
-          }}>
-          定時
-        </Button>
-      </Td>
-      <Td>
-        <Button
-          colorScheme="green"
-          onClick={() => {
-            validate();
-            handleSubmit();
-          }}>
-          保存
-        </Button>
-      </Td>
+      <Td>詳細</Td>
     </>
   );
 };
 
 const AttendanceReport = () => {
   const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
-  const { data: defaultData } = useAPIGetDefaultAttendance();
   const tabs: Tab[] = [
+    { type: 'link', name: '勤怠報告', href: '/attendance/report' },
     { type: 'link', name: '勤怠打刻', href: '/attendance/view' },
     { type: 'link', name: '定時設定', href: '/attendance/default' },
   ];
+  const [visibleFormModal, setFormModal] = useState(false);
   const [month, setMonth] = useState(DateTime.now());
-  const { data } = useAPIGetAttendace({
+  const { data: data, refetch: refetchReports } = useAPIGetAttendanceReport({
     from_date: month.startOf('month').toFormat('yyyy-LL-dd'),
     to_date: month.endOf('month').endOf('day').toFormat('yyyy-LL-dd'),
   });
-  const dates = useMemo(() => {
-    const start = month.startOf('month');
-    const end = month.endOf('month');
-    const arr: DateTime[] = [];
-    let i = 0;
-    while (arr[arr.length - 1]?.day !== end.day) {
-      arr.push(start.plus({ days: i }));
-      i++;
+  const { mutate: saveReport, isSuccess } = useAPICreateAttendanceReport({
+    onSuccess: () => {
+      setFormModal(false);
+      alert('新規勤怠報告を作成しました。');
+      refetchReports();
+    },
+    onError: (e) => {
+      alert(responseErrorMsgFactory(e));
+    },
+  });
+
+  const handleSaveReport = (report: Partial<AttendanceRepo>) => {
+    let isSameDateReportExist = false;
+    if (data) {
+      for (const d of data) {
+        if (
+          report?.targetDate &&
+          DateTime.fromJSDate(new Date(d.targetDate)).toFormat('yyyy/LL/dd') ===
+            DateTime.fromJSDate(new Date(report?.targetDate)).toFormat(
+              'yyyy/LL/dd',
+            )
+        ) {
+          isSameDateReportExist = true;
+        }
+      }
     }
-    return arr;
-  }, [month]);
+    if (isSameDateReportExist) {
+      alert('同じ日付の報告が既に存在しています');
+    } else {
+      saveReport(report);
+    }
+  };
+
+  useEffect(() => {
+    refetchReports();
+  }, [month, refetchReports]);
 
   return (
     <LayoutWithTab
       sidebar={{ activeScreenName: SidebarScreenName.ATTENDANCE }}
       header={{
-        title: '勤怠打刻',
+        title: '勤怠報告',
         tabs,
-        activeTabName: '勤怠打刻',
+        activeTabName: '勤怠報告',
+        rightButtonName: '新規勤怠報告',
+        onClickRightButton: () => setFormModal(true),
       }}>
       <Head>
         <title>ボールド | 勤怠打刻</title>
       </Head>
+      <ReportFormModal
+        isOpen={visibleFormModal}
+        onCloseModal={() => setFormModal(false)}
+        onSubmit={(report) => handleSaveReport(report)}
+        isSuccess={isSuccess}
+      />
 
       <Box display="flex" flexDir="row" justifyContent="flex-start" mb="16px">
         <FormControl>
@@ -410,29 +189,30 @@ const AttendanceReport = () => {
             <Tr>
               <Th minW={'100px'}>日付</Th>
               <Th>区分</Th>
-              <Th>出勤時間</Th>
-              <Th>退勤時間</Th>
-              <Th>休憩時間</Th>
-              <Th minW={'100px'}>実働</Th>
-              <Th>申請</Th>
-              <Th>備考</Th>
-              <Th>定時</Th>
-              <Th>保存</Th>
+              <Th>送信日</Th>
+              <Th>受理日</Th>
+              <Th>詳細</Th>
             </Tr>
           </Thead>
-          <Tbody position="relative" borderColor="gray.300" borderWidth={1}>
-            {dates.map((d) => (
-              <Tr key={d.toISO()}>
-                <AttendanceRow
-                  date={d}
-                  attendanceData={data}
-                  defaultData={defaultData}
-                />
-              </Tr>
-            ))}
-          </Tbody>
+          {data?.length ? (
+            <Tbody position="relative" borderColor="gray.300" borderWidth={1}>
+              {data.map((d) => (
+                <Tr key={d.id}>
+                  <AttendanceReportRow
+                    reportData={d}
+                    refetchReports={refetchReports}
+                  />
+                </Tr>
+              ))}
+            </Tbody>
+          ) : null}
         </Table>
       </Box>
+      {!data?.length && (
+        <Text mt={20} fontSize={25} textAlign="center">
+          承認済みの報告はありません
+        </Text>
+      )}
     </LayoutWithTab>
   );
 };
