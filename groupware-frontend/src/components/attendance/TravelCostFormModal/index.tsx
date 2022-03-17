@@ -267,8 +267,10 @@ const TravelForm = ({
           <option value={TravelCostOneWayOrRound.ROUND}>往復</option>
         </Select>
       </FormControl>
-      {index === undefined ||
-      (index !== undefined && !attendance?.travelCost?.[index + 1]) ? (
+      {(!attendance?.travelCost?.length ||
+        attendance?.travelCost?.length < 6) &&
+      (index === undefined ||
+        (index !== undefined && !attendance?.travelCost?.[index + 1])) ? (
         <Box mb="8px" flexDir="row" display="flex" justifyContent="flex-end">
           <Button
             colorScheme="blue"

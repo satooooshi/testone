@@ -230,8 +230,10 @@ const TravelForm = ({
           onPress={() => fareCategoryRef.current?.open()}
         />
       </Box>
-      {index === undefined ||
-      (index !== undefined && !attendance?.travelCost?.[index + 1]) ? (
+      {(!attendance?.travelCost?.length ||
+        attendance?.travelCost?.length < 6) &&
+      (index === undefined ||
+        (index !== undefined && !attendance?.travelCost?.[index + 1])) ? (
         <Button
           bg="blue600"
           color="white"
