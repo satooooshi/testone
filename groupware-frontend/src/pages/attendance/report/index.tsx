@@ -47,7 +47,7 @@ import { attendanceSchema } from 'src/utils/validation/schema';
 import { formikErrorMsgFactory } from 'src/utils/factory/formikErrorMsgFactory';
 import { useAPIGetDefaultAttendance } from '@/hooks/api/attendance/useAPIGetDefaultAttendance';
 import { useAPIGetAttendanceReport } from '@/hooks/api/attendance/attendanceReport/useAPIGetAttendanceReport';
-import ReportFormModal from '@/components/attendance/ReportFormModal ';
+import ReportFormModal from '@/components/attendance/ReportFormModal';
 import { useAPICreateAttendanceReport } from '@/hooks/api/attendance/attendanceReport/useAPICreateAttendanceReport';
 import { responseErrorMsgFactory } from 'src/utils/factory/responseErrorMsgFactory';
 
