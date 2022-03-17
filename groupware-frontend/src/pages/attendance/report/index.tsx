@@ -50,6 +50,9 @@ import { useAPIGetAttendanceReport } from '@/hooks/api/attendance/attendanceRepo
 import ReportFormModal from '@/components/attendance/ReportFormModal';
 import { useAPICreateAttendanceReport } from '@/hooks/api/attendance/attendanceReport/useAPICreateAttendanceReport';
 import { responseErrorMsgFactory } from 'src/utils/factory/responseErrorMsgFactory';
+import TopTabBar, { TopTabBehavior } from '@/components/layout/TopTabBar';
+import { useAPIUpdateAttendanceReport } from '@/hooks/api/attendance/attendanceReport/useAPIUpdateAttendanceReport';
+import ReportDetailModal from '@/components/attendance/ReportDetailModal';
 
 const AttendanceReportRow = ({
   reportData,
@@ -60,9 +63,34 @@ const AttendanceReportRow = ({
 }) => {
   const [detailModal, setDetailModal] = useState(false);
   const { user } = useAuthenticate();
+  const [visibleFormModal, setFormModal] = useState(false);
+  const { mutate: saveReport, isSuccess } = useAPIUpdateAttendanceReport({
+    onSuccess: () => {
+      setFormModal(false);
+      alert('勤怠報告を更新しました。');
+      if (refetchReports) {
+        refetchReports();
+      }
+    },
+    onError: (e) => {
+      alert(responseErrorMsgFactory(e));
+    },
+  });
 
   return (
     <>
+      <ReportFormModal
+        report={reportData}
+        isOpen={visibleFormModal}
+        onCloseModal={() => setFormModal(false)}
+        onSubmit={(report) => saveReport(report)}
+        isSuccess={isSuccess}
+      />
+      <ReportDetailModal
+        report={reportData}
+        isOpen={detailModal}
+        onCloseModal={() => setDetailModal(false)}
+      />
       <Td>
         <Text>
           {DateTime.fromJSDate(new Date(reportData.targetDate)).toFormat(
@@ -76,12 +104,24 @@ const AttendanceReportRow = ({
           'yyyy/LL/dd',
         )}
       </Td>
+      {reportData.verifiedAt ? (
+        <Td>
+          {DateTime.fromJSDate(new Date(reportData.createdAt)).toFormat(
+            'yyyy/LL/dd',
+          )}
+        </Td>
+      ) : (
+        <Td>
+          <Text fontSize={16} color="blue" onClick={() => setFormModal(true)}>
+            編集
+          </Text>
+        </Td>
+      )}
       <Td>
-        {DateTime.fromJSDate(new Date(reportData.createdAt)).toFormat(
-          'yyyy/LL/dd',
-        )}
+        <Text fontSize={16} color="blue" onClick={() => setDetailModal(true)}>
+          詳細
+        </Text>
       </Td>
-      <Td>詳細</Td>
     </>
   );
 };
@@ -94,6 +134,13 @@ const AttendanceReport = () => {
     { type: 'link', name: '定時設定', href: '/attendance/default' },
   ];
   const [visibleFormModal, setFormModal] = useState(false);
+  const [activeTabName, setActiveTabName] = useState('reportBeforeAccepted');
+  const [unAcceptedReport, setUnAcceptedREport] = useState<
+    AttendanceRepo[] | undefined
+  >();
+  const [acceptedReport, setAcceptedREport] = useState<
+    AttendanceRepo[] | undefined
+  >();
   const [month, setMonth] = useState(DateTime.now());
   const { data: data, refetch: refetchReports } = useAPIGetAttendanceReport({
     from_date: month.startOf('month').toFormat('yyyy-LL-dd'),
@@ -109,6 +156,22 @@ const AttendanceReport = () => {
       alert(responseErrorMsgFactory(e));
     },
   });
+  const topTabBehaviorList: TopTabBehavior[] = [
+    {
+      tabName: '承認済みの報告',
+      onClick: () => {
+        setActiveTabName('reportAfterAccepted');
+      },
+      isActiveTab: activeTabName === 'reportAfterAccepted',
+    },
+    {
+      tabName: '承認前の報告',
+      onClick: () => {
+        setActiveTabName('reportBeforeAccepted');
+      },
+      isActiveTab: activeTabName === 'reportBeforeAccepted',
+    },
+  ];
 
   const handleSaveReport = (report: Partial<AttendanceRepo>) => {
     let isSameDateReportExist = false;
@@ -136,6 +199,19 @@ const AttendanceReport = () => {
     refetchReports();
   }, [month, refetchReports]);
 
+  useEffect(() => {
+    if (data?.length) {
+      const UnAcceptedRepo = data?.filter((d) => d.verifiedAt == null);
+      const acceptedRepo = data?.filter((d) => d.verifiedAt != null);
+
+      setUnAcceptedREport(UnAcceptedRepo);
+      setAcceptedREport(acceptedRepo);
+    } else {
+      setUnAcceptedREport(undefined);
+      setAcceptedREport(undefined);
+    }
+  }, [data, data?.length]);
+
   return (
     <LayoutWithTab
       sidebar={{ activeScreenName: SidebarScreenName.ATTENDANCE }}
@@ -149,6 +225,9 @@ const AttendanceReport = () => {
       <Head>
         <title>ボールド | 勤怠打刻</title>
       </Head>
+      <Box mb="24px">
+        <TopTabBar topTabBehaviorList={topTabBehaviorList} />
+      </Box>
       <ReportFormModal
         isOpen={visibleFormModal}
         onCloseModal={() => setFormModal(false)}
@@ -190,13 +269,28 @@ const AttendanceReport = () => {
               <Th minW={'100px'}>日付</Th>
               <Th>区分</Th>
               <Th>送信日</Th>
-              <Th>受理日</Th>
+              <Th>
+                {activeTabName === 'reportAfterAccepted' ? '受理日' : '編集'}
+              </Th>
               <Th>詳細</Th>
             </Tr>
           </Thead>
-          {data?.length ? (
+          {activeTabName === 'reportAfterAccepted' && acceptedReport?.length ? (
             <Tbody position="relative" borderColor="gray.300" borderWidth={1}>
-              {data.map((d) => (
+              {acceptedReport.map((d) => (
+                <Tr key={d.id}>
+                  <AttendanceReportRow
+                    reportData={d}
+                    refetchReports={refetchReports}
+                  />
+                </Tr>
+              ))}
+            </Tbody>
+          ) : null}
+          {activeTabName === 'reportBeforeAccepted' &&
+          unAcceptedReport?.length ? (
+            <Tbody position="relative" borderColor="gray.300" borderWidth={1}>
+              {unAcceptedReport.map((d) => (
                 <Tr key={d.id}>
                   <AttendanceReportRow
                     reportData={d}
@@ -208,7 +302,12 @@ const AttendanceReport = () => {
           ) : null}
         </Table>
       </Box>
-      {!data?.length && (
+      {activeTabName === 'reportAfterAccepted' && !acceptedReport?.length && (
+        <Text mt={20} fontSize={25} textAlign="center">
+          承認済みの報告はありません
+        </Text>
+      )}
+      {activeTabName === 'reportBeforeAccepted' && !unAcceptedReport?.length && (
         <Text mt={20} fontSize={25} textAlign="center">
           承認済みの報告はありません
         </Text>
