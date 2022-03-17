@@ -505,11 +505,17 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
 
   const refreshMessage = (targetMessages: ChatMessage[]): ChatMessage[] => {
     const arrayIncludesDuplicate = [...messages, ...targetMessages];
-    return arrayIncludesDuplicate
+    return filterCurrentGroup(arrayIncludesDuplicate)
       .filter((value, index, self) => {
         return index === self.findIndex((m) => m.id === value.id);
       })
       .sort((a, b) => b.id - a.id);
+  };
+
+  const filterCurrentGroup = (messages: ChatMessage[]) => {
+    return messages.filter((m) => {
+      return room.id === m.chatGroup?.id;
+    });
   };
 
   const scrollToTarget = useCallback((topOffset: number) => {
