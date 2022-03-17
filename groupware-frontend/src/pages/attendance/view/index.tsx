@@ -44,8 +44,7 @@ import TravelCostFormModal from '@/components/attendance/TravelCostFormModal';
 import { attendanceSchema } from 'src/utils/validation/schema';
 import { formikErrorMsgFactory } from 'src/utils/factory/formikErrorMsgFactory';
 import { useAPIGetDefaultAttendance } from '@/hooks/api/attendance/useAPIGetDefaultAttendance';
-import router from 'next/router';
-import DefaultModal from '../default';
+import DefaultModal from '../../../components/attendance/DefaultModal';
 
 const AttendanceRow = ({
   date,
@@ -348,6 +347,8 @@ const AttendanceView = () => {
   const { data: defaultData } = useAPIGetDefaultAttendance();
   const tabs: Tab[] = [
     { type: 'link', name: '勤怠打刻', href: '/attendance/view' },
+    { type: 'link', name: '勤怠報告', href: '/attendance/report' },
+    { type: 'link', name: '入社前申請', href: '/attendance/application' },
   ];
   const [visibleDefaultModal, setDefaultModal] = useState(false);
   const [month, setMonth] = useState(DateTime.now());
