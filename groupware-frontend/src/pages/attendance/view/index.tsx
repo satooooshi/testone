@@ -217,7 +217,16 @@ const AttendanceRow = ({
         date={selectedDateForApplication}
       />
       <Td>
-        <Text>{date.toFormat('d日')}</Text>
+        <Text
+          color={
+            values.category !== AttendanceCategory.COMMON
+              ? values.verifiedAt
+                ? 'red'
+                : 'blue'
+              : 'black'
+          }>
+          {date.toFormat('d日')}
+        </Text>
       </Td>
       <Td>
         <Select
