@@ -228,7 +228,7 @@ const ReportForm: React.FC<ReportFormModalProps> = (props) => {
           }
         />
       </FormControl>
-      <Box mb="8px" flexDir="row" display="flex" justifyContent="flex-end">
+      <Box mt={5} flexDir="row" display="flex" justifyContent="flex-end">
         <Button colorScheme={'blue'} onClick={() => checkValidateErrors()}>
           {values.id ? '更新' : '送信'}
         </Button>
