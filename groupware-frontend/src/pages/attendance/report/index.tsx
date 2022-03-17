@@ -114,7 +114,7 @@ const AttendanceReport = () => {
     { type: 'link', name: '入社前申請', href: '/attendance/application' },
   ];
   const [visibleFormModal, setFormModal] = useState(false);
-  const [activeTabName, setActiveTabName] = useState('reportBeforeAccepted');
+  const [activeTabName, setActiveTabName] = useState('reportAfterAccepted');
   const [unAcceptedReport, setUnAcceptedREport] = useState<
     AttendanceRepo[] | undefined
   >();

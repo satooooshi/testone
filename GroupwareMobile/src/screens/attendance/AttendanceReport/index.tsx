@@ -1,24 +1,13 @@
-import {useNavigation} from '@react-navigation/core';
 import {DateTime} from 'luxon';
-import React, {useEffect, useMemo, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import DropdownOpenerButton from '../../../components/common/DropdownOpenerButton';
 import HeaderWithTextButton from '../../../components/Header';
 import {Tab} from '../../../components/Header/HeaderTemplate';
 import WholeContainer from '../../../components/WholeContainer';
-import {
-  AttendanceHomeNavigationProps,
-  AttendanceNavigationProps,
-} from '../../../types/navigator/drawerScreenProps/attendance';
 import MonthPicker from 'react-native-month-year-picker';
 import {Alert, useWindowDimensions} from 'react-native';
-import {Text, Div, ScrollDiv, Button} from 'react-native-magnus';
-import {useAPIGetDefaultAttendance} from '../../../hooks/api/attendance/useAPIGetDefaultAttendance';
-import {useAPIGetAttendace} from '../../../hooks/api/attendance/useAPIGetAttendance';
-import AttendanceRow from '../../../components/attendance/AttendanceRow';
-import {
-  useAPIGetAttendaceReport,
-  useAPIGetAttendanceReport,
-} from '../../../hooks/api/attendance/attendanceReport/useAPIGetAttendanceReport';
+import {Text, Div, ScrollDiv} from 'react-native-magnus';
+import {useAPIGetAttendanceReport} from '../../../hooks/api/attendance/attendanceReport/useAPIGetAttendanceReport';
 import AttendanceReportRow from '../../../components/attendance/AttendanceReportRow';
 import AttendanceReportFormModal from '../../../components/attendance/AttendanceReportFrom';
 import {useAPICreateAttendanceReport} from '../../../hooks/api/attendance/attendanceReport/useAPICreateAttendanceReport';
@@ -26,8 +15,7 @@ import {responseErrorMsgFactory} from '../../../utils/factory/responseEroorMsgFa
 import {AttendanceRepo} from '../../../types';
 
 const AttendanceReport: React.FC = () => {
-  const navigation = useNavigation<AttendanceHomeNavigationProps>();
-  const [activeTabName, setActiveTabName] = useState('reportBeforeAccepted');
+  const [activeTabName, setActiveTabName] = useState('reportAfterAccepted');
   const [month, setMonth] = useState(DateTime.now());
   const [dateTimeModal, setDateTimeModal] = useState(false);
   const [visibleAttendanceFormModal, setAttendanceFormModal] = useState(false);
