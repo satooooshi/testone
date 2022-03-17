@@ -70,7 +70,7 @@ const AttendanceReportRow: React.FC<AttendanceReportRowProps> = ({
           </Text>
         ) : (
           <Text
-            fontSize={13}
+            fontSize={15}
             color="blue"
             onPress={() => setAttendanceFormModal(true)}>
             編集
@@ -79,7 +79,7 @@ const AttendanceReportRow: React.FC<AttendanceReportRowProps> = ({
       </Div>
       <Div w={'10%'} justifyContent="center" alignItems="center">
         <Text
-          fontSize={13}
+          fontSize={15}
           color="blue"
           onPress={() => {
             navigation.navigate('AttendanceStack', {

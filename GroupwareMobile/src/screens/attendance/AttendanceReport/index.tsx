@@ -93,118 +93,120 @@ const AttendanceReport: React.FC = () => {
 
   return (
     <WholeContainer>
-      <HeaderWithTextButton
-        enableBackButton={true}
-        title="勤怠報告"
-        tabs={tabs}
-        activeTabName={
-          activeTabName === 'reportAfterAccepted'
-            ? '承認済みの報告'
-            : '承認前の報告'
-        }
-        rightButtonName={'勤怠報告入力'}
-        onPressRightButton={() => setAttendanceFormModal(true)}
-      />
-      <AttendanceReportFormModal
-        isVisible={visibleAttendanceFormModal}
-        onCloseModal={() => setAttendanceFormModal(false)}
-        onSubmit={report => handleSaveReport(report)}
-        isSuccess={isSuccess}
-      />
-      <Div w={windowWidth * 0.8} alignSelf="center">
-        <Text>対象月</Text>
-        <DropdownOpenerButton
-          name={month.toFormat('yyyy-LL')}
-          onPress={() => {
-            setDateTimeModal(true);
-          }}
+      <Div mr={7} ml={7}>
+        <HeaderWithTextButton
+          enableBackButton={true}
+          title="勤怠報告"
+          tabs={tabs}
+          activeTabName={
+            activeTabName === 'reportAfterAccepted'
+              ? '承認済みの報告'
+              : '承認前の報告'
+          }
+          rightButtonName={'勤怠報告入力'}
+          onPressRightButton={() => setAttendanceFormModal(true)}
         />
-      </Div>
-      {dateTimeModal && (
-        <MonthPicker
-          onChange={(_, date) => {
-            // console.log(date);
-            setMonth(DateTime.fromJSDate(new Date(date)));
-            setDateTimeModal(false);
-          }}
-          value={month.toJSDate()}
-          locale="ja"
+        <AttendanceReportFormModal
+          isVisible={visibleAttendanceFormModal}
+          onCloseModal={() => setAttendanceFormModal(false)}
+          onSubmit={report => handleSaveReport(report)}
+          isSuccess={isSuccess}
         />
-      )}
-      <Div
-        borderBottomWidth={1}
-        borderBottomColor={'#b0b0b0'}
-        flexDir="row"
-        h={40}>
-        <Div w={'20%'} justifyContent="center" alignItems="center">
-          <Text fontSize={16}>日付</Text>
+        <Div w={windowWidth * 0.8} alignSelf="center">
+          <Text>対象月</Text>
+          <DropdownOpenerButton
+            name={month.toFormat('yyyy-LL')}
+            onPress={() => {
+              setDateTimeModal(true);
+            }}
+          />
         </Div>
-        <Div w={'30%'} justifyContent="center" alignItems="center">
-          <Text fontSize={16}>区分</Text>
-        </Div>
-        <Div w={'20%'} justifyContent="center" alignItems="center">
-          <Text fontSize={16}>送信日</Text>
-        </Div>
-        {activeTabName === 'reportAfterAccepted' && (
-          <>
-            <Div w={'20%'} justifyContent="center" alignItems="center">
-              <Text fontSize={16}>受理日</Text>
-            </Div>
-            <Div w={'10%'} justifyContent="center" alignItems="center">
-              <Text fontSize={16}>詳細</Text>
-            </Div>
-          </>
+        {dateTimeModal && (
+          <MonthPicker
+            onChange={(_, date) => {
+              // console.log(date);
+              setMonth(DateTime.fromJSDate(new Date(date)));
+              setDateTimeModal(false);
+            }}
+            value={month.toJSDate()}
+            locale="ja"
+          />
         )}
-        {activeTabName === 'reportBeforeAccepted' && (
-          <>
-            <Div w={'20%'} justifyContent="center" alignItems="center">
-              <Text fontSize={16}>編集</Text>
-            </Div>
-            <Div w={'10%'} justifyContent="center" alignItems="center">
-              <Text fontSize={16}>詳細</Text>
-            </Div>
-          </>
-        )}
+        <Div
+          borderBottomWidth={1}
+          borderBottomColor={'#b0b0b0'}
+          flexDir="row"
+          h={40}>
+          <Div w={'20%'} justifyContent="center" alignItems="center">
+            <Text fontSize={16}>日付</Text>
+          </Div>
+          <Div w={'30%'} justifyContent="center" alignItems="center">
+            <Text fontSize={16}>区分</Text>
+          </Div>
+          <Div w={'20%'} justifyContent="center" alignItems="center">
+            <Text fontSize={16}>送信日</Text>
+          </Div>
+          {activeTabName === 'reportAfterAccepted' && (
+            <>
+              <Div w={'20%'} justifyContent="center" alignItems="center">
+                <Text fontSize={16}>受理日</Text>
+              </Div>
+              <Div w={'10%'} justifyContent="center" alignItems="center">
+                <Text fontSize={16}>詳細</Text>
+              </Div>
+            </>
+          )}
+          {activeTabName === 'reportBeforeAccepted' && (
+            <>
+              <Div w={'20%'} justifyContent="center" alignItems="center">
+                <Text fontSize={16}>編集</Text>
+              </Div>
+              <Div w={'10%'} justifyContent="center" alignItems="center">
+                <Text fontSize={16}>詳細</Text>
+              </Div>
+            </>
+          )}
+        </Div>
+
+        {activeTabName === 'reportAfterAccepted' &&
+          (acceptedReport?.length ? (
+            <ScrollDiv>
+              {acceptedReport.map(
+                d =>
+                  d.verifiedAt !== null && (
+                    <Div key={d.id} flexDir="row" my="sm">
+                      <AttendanceReportRow reportData={d} />
+                    </Div>
+                  ),
+              )}
+            </ScrollDiv>
+          ) : (
+            <Text mt={20} fontSize={20} textAlign="center">
+              承認済みの報告はありません
+            </Text>
+          ))}
+
+        {activeTabName === 'reportBeforeAccepted' &&
+          (unAcceptedReport?.length ? (
+            <ScrollDiv>
+              {unAcceptedReport.map(
+                d =>
+                  d.verifiedAt === null && (
+                    <Div key={d.id} flexDir="row" my="sm" mt={10}>
+                      <AttendanceReportRow
+                        reportData={d}
+                        refetchReports={() => refetchReports()}
+                      />
+                    </Div>
+                  ),
+              )}
+            </ScrollDiv>
+          ) : (
+            <Text mt={20} fontSize={20} textAlign="center">
+              承認前の報告はありません
+            </Text>
+          ))}
       </Div>
-
-      {activeTabName === 'reportAfterAccepted' &&
-        (acceptedReport?.length ? (
-          <ScrollDiv>
-            {acceptedReport.map(
-              d =>
-                d.verifiedAt !== null && (
-                  <Div key={d.id} flexDir="row" my="sm">
-                    <AttendanceReportRow reportData={d} />
-                  </Div>
-                ),
-            )}
-          </ScrollDiv>
-        ) : (
-          <Text mt={20} fontSize={20} textAlign="center">
-            承認済みの報告はありません
-          </Text>
-        ))}
-
-      {activeTabName === 'reportBeforeAccepted' &&
-        (unAcceptedReport?.length ? (
-          <ScrollDiv>
-            {unAcceptedReport.map(
-              d =>
-                d.verifiedAt === null && (
-                  <Div key={d.id} flexDir="row" my="sm">
-                    <AttendanceReportRow
-                      reportData={d}
-                      refetchReports={() => refetchReports()}
-                    />
-                  </Div>
-                ),
-            )}
-          </ScrollDiv>
-        ) : (
-          <Text mt={20} fontSize={20} textAlign="center">
-            承認前の報告はありません
-          </Text>
-        ))}
     </WholeContainer>
   );
 };
