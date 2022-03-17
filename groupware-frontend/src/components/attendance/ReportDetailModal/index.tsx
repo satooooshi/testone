@@ -42,7 +42,7 @@ const ReportDetailModal: React.FC<ReportDetailModalProps> = (props) => {
           <ModalBody>
             <Box borderTopWidth={5} borderTopColor={'blue.600'} fontSize={20}>
               <Box display="flex" flexDir="row" mt={5}>
-                <Text>日付:</Text>
+                <Text fontWeight="bold">日付:</Text>
                 <Text ml={5}>
                   {DateTime.fromJSDate(new Date(report.targetDate)).toFormat(
                     'yyyy/LL/dd',
@@ -50,21 +50,21 @@ const ReportDetailModal: React.FC<ReportDetailModalProps> = (props) => {
                 </Text>
               </Box>
               <Box display="flex" flexDir="row" mt={5}>
-                <Text>区分:</Text>
+                <Text fontWeight="bold">区分:</Text>
                 <Text ml={5}> {attendanceCategoryName(report.category)}</Text>
               </Box>
               <Box display="flex" flexDir="row" mt={5}>
-                <Text>理由:</Text>
+                <Text fontWeight="bold">理由:</Text>
                 <Text ml={5}>{attendanceReasonName(report.reason)}</Text>
               </Box>
               <Box display="flex" flexDir="column" mt={5}>
-                <Text>詳細:</Text>
+                <Text fontWeight="bold">詳細:</Text>
                 <Text mt={5}>
                   {report.detail ? report.detail : '詳細はありません。'}
                 </Text>
               </Box>
               <Box display="flex" flexDir="row" mt={5}>
-                <Text>本社報告日:</Text>
+                <Text fontWeight="bold">本社報告日:</Text>
                 <Text ml={5}>
                   {report.reportDate
                     ? DateTime.fromJSDate(new Date(report.reportDate)).toFormat(
@@ -74,7 +74,7 @@ const ReportDetailModal: React.FC<ReportDetailModalProps> = (props) => {
                 </Text>
               </Box>
               <Box display="flex" flexDir="row" mt={5}>
-                <Text>報告承認日:</Text>
+                <Text fontWeight="bold">報告承認日:</Text>
                 <Text ml={5}>
                   {report.verifiedAt
                     ? DateTime.fromJSDate(new Date(report.verifiedAt)).toFormat(

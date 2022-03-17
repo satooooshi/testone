@@ -12,7 +12,6 @@ import {
   ModalHeader,
   ModalOverlay,
   Text,
-  useToast,
   Textarea,
 } from '@chakra-ui/react';
 import { useFormik } from 'formik';
@@ -78,15 +77,11 @@ const ReportForm: React.FC<ReportFormModalProps> = (props) => {
         justifyContent="space-between">
         <FormLabel w="40%">日付:</FormLabel>
         <Input
-          type="datetime-local"
+          type="date"
           value={
             values.targetDate
               ? DateTime.fromJSDate(new Date(values.targetDate)).toFormat(
                   'yyyy-LL-dd',
-                ) +
-                'T' +
-                DateTime.fromJSDate(new Date(values.targetDate)).toFormat(
-                  'HH:mm',
                 )
               : undefined
           }
@@ -216,15 +211,11 @@ const ReportForm: React.FC<ReportFormModalProps> = (props) => {
         justifyContent="space-between">
         <FormLabel w="40%">本社報告日</FormLabel>
         <Input
-          type="datetime-local"
+          type="date"
           value={
             values.reportDate
               ? DateTime.fromJSDate(new Date(values.reportDate)).toFormat(
                   'yyyy-LL-dd',
-                ) +
-                'T' +
-                DateTime.fromJSDate(new Date(values.reportDate)).toFormat(
-                  'HH:mm',
                 )
               : undefined
           }
@@ -247,7 +238,7 @@ const ReportForm: React.FC<ReportFormModalProps> = (props) => {
 };
 
 const ReportFormModal: React.FC<ReportFormModalProps> = (props) => {
-  const { onCloseModal, report, onSubmit, isSuccess = false, isOpen } = props;
+  const { onCloseModal, isOpen } = props;
   return (
     <Modal
       onClose={onCloseModal}
