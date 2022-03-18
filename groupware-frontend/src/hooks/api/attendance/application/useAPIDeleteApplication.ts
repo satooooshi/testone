@@ -1,8 +1,8 @@
-import {AxiosError} from 'axios';
-import {useMutation, UseMutationOptions} from 'react-query';
-import {ApplicationBeforeJoining} from '../../../../types';
-import {axiosInstance} from '../../../../utils/url';
-import {deleteApplicationURL} from '../../../../utils/url/attendance.url';
+import { AxiosError } from 'axios';
+import { useMutation, UseMutationOptions } from 'react-query';
+import { ApplicationBeforeJoining } from '../../../../types';
+import { axiosInstance } from '../../../../utils/url';
+import { deleteApplicationURL } from '../../../../utils/url/attendance.url';
 
 interface deleteApplicationRequest {
   applicationId: number;

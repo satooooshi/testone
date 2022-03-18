@@ -1,3 +1,4 @@
+import { useAPIDeleteAttendanceReport } from '@/hooks/api/attendance/attendanceReport/useAPIDeleteAttendanceReport';
 import {
   FormControl,
   FormLabel,
@@ -33,12 +34,12 @@ type ReportFormModalProps = {
   report?: Partial<AttendanceRepo>;
   onCloseModal: () => void;
   onSubmit: (event: Partial<AttendanceRepo>) => void;
-  isSuccess?: boolean;
+  onDelete: (reportId: number) => void;
   isOpen: boolean;
 };
 
 const ReportForm: React.FC<ReportFormModalProps> = (props) => {
-  const { onCloseModal, report, onSubmit, isSuccess = false } = props;
+  const { report, onSubmit, onDelete } = props;
   const { user } = useAuthenticate();
   const initialReportValue = {
     category: AttendanceCategory.PAILD_ABSENCE,
@@ -46,6 +47,7 @@ const ReportForm: React.FC<ReportFormModalProps> = (props) => {
     detail: '',
     user: user as User,
   };
+
   const {
     values: values,
     handleSubmit: onComplete,
@@ -232,6 +234,18 @@ const ReportForm: React.FC<ReportFormModalProps> = (props) => {
         <Button colorScheme={'blue'} onClick={() => checkValidateErrors()}>
           {values.id ? '更新' : '送信'}
         </Button>
+        {values.id && onDelete && (
+          <Button
+            ml={1}
+            colorScheme={'red'}
+            onClick={() => {
+              if (values.id && confirm('アルバムを削除してよろしいですか？')) {
+                onDelete(values.id);
+              }
+            }}>
+            削除
+          </Button>
+        )}
       </Box>
     </Box>
   );

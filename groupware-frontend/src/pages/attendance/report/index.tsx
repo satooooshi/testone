@@ -28,6 +28,7 @@ import { responseErrorMsgFactory } from 'src/utils/factory/responseErrorMsgFacto
 import TopTabBar, { TopTabBehavior } from '@/components/layout/TopTabBar';
 import { useAPIUpdateAttendanceReport } from '@/hooks/api/attendance/attendanceReport/useAPIUpdateAttendanceReport';
 import ReportDetailModal from '@/components/attendance/ReportDetailModal';
+import { useAPIDeleteAttendanceReport } from '@/hooks/api/attendance/attendanceReport/useAPIDeleteAttendanceReport';
 
 const AttendanceReportRow = ({
   reportData,
@@ -38,10 +39,22 @@ const AttendanceReportRow = ({
 }) => {
   const [detailModal, setDetailModal] = useState(false);
   const [visibleFormModal, setFormModal] = useState(false);
-  const { mutate: saveReport, isSuccess } = useAPIUpdateAttendanceReport({
+  const { mutate: saveReport } = useAPIUpdateAttendanceReport({
     onSuccess: () => {
       setFormModal(false);
       alert('勤怠報告を更新しました。');
+      if (refetchReports) {
+        refetchReports();
+      }
+    },
+    onError: (e) => {
+      alert(responseErrorMsgFactory(e));
+    },
+  });
+  const { mutate: deleteReport } = useAPIDeleteAttendanceReport({
+    onSuccess: () => {
+      setFormModal(false);
+      alert('勤怠報告を削除しました。');
       if (refetchReports) {
         refetchReports();
       }
@@ -58,7 +71,7 @@ const AttendanceReportRow = ({
         isOpen={visibleFormModal}
         onCloseModal={() => setFormModal(false)}
         onSubmit={(report) => saveReport(report)}
-        isSuccess={isSuccess}
+        onDelete={(reportId) => deleteReport({ reportId: reportId })}
       />
       <ReportDetailModal
         report={reportData}
@@ -126,7 +139,7 @@ const AttendanceReport = () => {
     from_date: month.startOf('month').toFormat('yyyy-LL-dd'),
     to_date: month.endOf('month').endOf('day').toFormat('yyyy-LL-dd'),
   });
-  const { mutate: saveReport, isSuccess } = useAPICreateAttendanceReport({
+  const { mutate: saveReport } = useAPICreateAttendanceReport({
     onSuccess: () => {
       setFormModal(false);
       alert('新規勤怠報告を作成しました。');
@@ -212,7 +225,6 @@ const AttendanceReport = () => {
         isOpen={visibleFormModal}
         onCloseModal={() => setFormModal(false)}
         onSubmit={(report) => handleSaveReport(report)}
-        isSuccess={isSuccess}
       />
 
       <Box display="flex" flexDir="row" justifyContent="flex-start" mb="16px">

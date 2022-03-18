@@ -284,7 +284,10 @@ const ApplicationForm = ({
           {values.id ? '更新' : '申請'}
         </Button>
         {application?.id && (
-          <Button colorScheme="red" onClick={() => onDeleteButtonClicked()}>
+          <Button
+            ml={1}
+            colorScheme="red"
+            onClick={() => onDeleteButtonClicked()}>
             削除
           </Button>
         )}
