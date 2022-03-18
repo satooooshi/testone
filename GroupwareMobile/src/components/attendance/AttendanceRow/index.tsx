@@ -103,7 +103,7 @@ const AttendanceRow = ({
   });
   const validate = () => {
     const errorMsg = formikErrorMsgFactory(errors);
-    if (errorMsg) {
+    if (errorMsg && hasWorkingTime) {
       Alert.alert(errorMsg);
     }
   };

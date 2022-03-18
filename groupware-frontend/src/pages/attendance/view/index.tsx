@@ -41,7 +41,7 @@ import { useAPIUpdateAttendance } from '@/hooks/api/attendance/useAPIUpdateAtten
 import { useAuthenticate } from 'src/contexts/useAuthenticate';
 import { attendanceCategoryName } from 'src/utils/factory/attendanceCategoryName';
 import TravelCostFormModal from '@/components/attendance/TravelCostFormModal';
-import { attendanceSchema } from 'src/utils/validation/schema';
+import { attendanceSchema, emptySchema } from 'src/utils/validation/schema';
 import { formikErrorMsgFactory } from 'src/utils/factory/formikErrorMsgFactory';
 import { useAPIGetDefaultAttendance } from '@/hooks/api/attendance/useAPIGetDefaultAttendance';
 import DefaultModal from '../../../components/attendance/DefaultModal';
@@ -95,7 +95,7 @@ const AttendanceRow = ({
 
   const validate = () => {
     const errorMsg = formikErrorMsgFactory(errors);
-    if (errorMsg) {
+    if (errorMsg && hasWorkingTime) {
       toast({
         description: errorMsg,
         status: 'error',
