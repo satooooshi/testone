@@ -98,7 +98,7 @@ const AttendanceReportFormModal: React.FC<AttendanceReportFormModalProps> =
     return (
       <Modal {...props}>
         <WholeContainer>
-          <Button
+          {/* <Button
             bg="blue700"
             h={60}
             w={60}
@@ -110,7 +110,7 @@ const AttendanceReportFormModal: React.FC<AttendanceReportFormModalProps> =
             rounded="circle"
             onPress={() => checkValidateErrors()}>
             <Icon color="white" name="check" fontSize={32} />
-          </Button>
+          </Button> */}
           <KeyboardAwareScrollView
             contentContainerStyle={{
               width: windowWidth * 0.9,
@@ -201,16 +201,25 @@ const AttendanceReportFormModal: React.FC<AttendanceReportFormModalProps> =
                   onPress={() => setVisibleTimePicker('reportDate')}
                 />
               </Box>
-              {newReport.id && onDelete && (
+              <Box flexDir="row" alignSelf="flex-end" mt={5} mr={5}>
                 <Button
-                  ml="auto"
-                  mr={3}
-                  bg="red600"
+                  bg="blue600"
                   color="white"
-                  onPress={() => onDelete()}>
-                  削除
+                  alignSelf="flex-end"
+                  onPress={() => checkValidateErrors()}>
+                  {newReport.id ? '更新' : '申請'}
                 </Button>
-              )}
+                {newReport.id && onDelete && (
+                  <Button
+                    ml={3}
+                    bg="red600"
+                    color="white"
+                    alignSelf="flex-end"
+                    onPress={() => onDelete()}>
+                    削除
+                  </Button>
+                )}
+              </Box>
               <Dropdown
                 {...defaultDropdownProps}
                 ref={reportCategoryRef}

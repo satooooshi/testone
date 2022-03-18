@@ -239,7 +239,7 @@ const ApplicationForm: React.FC<ApplicationFormModalProps> = ({
           onPress={() => fareCategoryRef.current?.open()}
         />
       </Box>
-      <Box flexDir="row" alignSelf="flex-end">
+      <Box flexDir="row" alignSelf="flex-end" mt={5} mr={5}>
         <Button
           bg="blue600"
           color="white"
