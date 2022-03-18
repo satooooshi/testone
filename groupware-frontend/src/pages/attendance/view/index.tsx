@@ -430,8 +430,12 @@ const AttendanceView = () => {
         isOpen={visibleDefaultModal}
       />
 
-      <Box display="flex" flexDir="row" justifyContent="flex-start" mb="16px">
-        <FormControl>
+      <Box display="flex" flexDir="row" justifyContent="flex-start" mb="32px">
+        <FormControl
+          display="flex"
+          flexDir="column"
+          alignItems="center"
+          justifyContent="flex-start">
           <FormLabel>対象月</FormLabel>
           <Input
             type="month"
@@ -448,13 +452,13 @@ const AttendanceView = () => {
             }}
           />
         </FormControl>
-        <Button
-          onClick={() => setDefaultModal(true)}
-          right="50px"
-          position="absolute">
-          定時設定
-        </Button>
       </Box>
+      <Button
+        onClick={() => setDefaultModal(true)}
+        right="50px"
+        position="absolute">
+        定時設定
+      </Button>
       <Box
         w={'100%'}
         justifyContent={isSmallerThan768 ? 'flex-start' : 'center'}

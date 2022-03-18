@@ -227,8 +227,12 @@ const AttendanceReport = () => {
         onSubmit={(report) => handleSaveReport(report)}
       />
 
-      <Box display="flex" flexDir="row" justifyContent="flex-start" mb="16px">
-        <FormControl>
+      <Box display="flex" flexDir="row" justifyContent="flex-start" mb="32px">
+        <FormControl
+          display="flex"
+          flexDir="column"
+          alignItems="center"
+          justifyContent="flex-start">
           <FormLabel>対象月</FormLabel>
           <Input
             type="month"
