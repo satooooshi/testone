@@ -95,7 +95,7 @@ const ApplicationForm = ({
 
   return (
     <Box borderTopWidth={5} borderTopColor={'blue.600'}>
-      {errors?.attendanceTime && touched.attendanceTime ? (
+      {errors?.attendanceTime ? (
         <FormLabel color="tomato">{errors?.attendanceTime}</FormLabel>
       ) : null}
       <FormControl

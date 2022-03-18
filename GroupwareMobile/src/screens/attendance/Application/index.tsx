@@ -45,7 +45,7 @@ const Application: React.FC = () => {
         borderBottomColor={'#b0b0b0'}
         flexDir="row"
         h={40}>
-        <Div w={'25%'} justifyContent="center" alignItems="center">
+        <Div w={'30%'} justifyContent="center" alignItems="center">
           <Text fontSize={16}>{'日付'}</Text>
         </Div>
         <Div w={'20%'} justifyContent="center" alignItems="center">
@@ -54,7 +54,7 @@ const Application: React.FC = () => {
         <Div w={'20%'} justifyContent="center" alignItems="center">
           <Text fontSize={16}>目的</Text>
         </Div>
-        <Div w={'20%'} justifyContent="center" alignItems="center">
+        <Div w={'15%'} justifyContent="center" alignItems="center">
           <Text fontSize={16}>合計金額</Text>
         </Div>
         <Div w={'15%'} justifyContent="center" alignItems="center">
@@ -64,8 +64,8 @@ const Application: React.FC = () => {
       <ScrollDiv>
         {data?.map(a => (
           <Div key={a.id} flexDir="row" my="sm">
-            <Div w={'25%'} justifyContent="center" alignItems="center">
-              <Text fontSize={13}>
+            <Div w={'30%'} justifyContent="center" alignItems="center">
+              <Text fontSize={15}>
                 {DateTime.fromJSDate(new Date(a.attendanceTime)).toFormat(
                   'yyyy/LL/dd日',
                 )}
@@ -77,7 +77,7 @@ const Application: React.FC = () => {
             <Div w={'20%'} justifyContent="center" alignItems="center">
               <Text fontSize={16}>{a.purpose}</Text>
             </Div>
-            <Div w={'20%'} justifyContent="center" alignItems="center">
+            <Div w={'15%'} justifyContent="center" alignItems="center">
               <Text fontSize={16}>
                 {a.travelCost * (a.oneWayOrRound === 'one_way' ? 1 : 2)}
               </Text>

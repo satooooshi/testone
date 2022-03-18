@@ -106,6 +106,9 @@ const ApplicationForm: React.FC<ApplicationFormModalProps> = ({
     <Div borderTopWidth={5} borderTopColor={'blue600'}>
       <Box mt="lg" mb={4}>
         <Text>日付</Text>
+        {errors?.attendanceTime ? (
+          <Text color="tomato">{errors?.attendanceTime}</Text>
+        ) : null}
         <DropdownOpenerButton
           name={
             values.attendanceTime
