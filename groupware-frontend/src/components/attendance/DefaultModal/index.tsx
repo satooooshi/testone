@@ -68,11 +68,7 @@ const DefaultModal: React.FC<DefaultModalProps> = ({
   });
 
   return (
-    <Modal
-      onClose={onCloseModal}
-      scrollBehavior="inside"
-      isOpen={isOpen}
-      size="xl">
+    <Modal onClose={onCloseModal} scrollBehavior="inside" isOpen={isOpen}>
       <>
         <ModalOverlay />
         <ModalContent h="90vh" bg={'#f9fafb'}>
