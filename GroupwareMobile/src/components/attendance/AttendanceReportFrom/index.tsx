@@ -203,6 +203,7 @@ const AttendanceReportFormModal: React.FC<AttendanceReportFormModalProps> =
               </Box>
               <Box flexDir="row" alignSelf="flex-end" mt={5} mr={5}>
                 <Button
+                  fontSize={20}
                   bg="blue600"
                   color="white"
                   alignSelf="flex-end"
@@ -211,6 +212,7 @@ const AttendanceReportFormModal: React.FC<AttendanceReportFormModalProps> =
                 </Button>
                 {newReport.id && onDelete && (
                   <Button
+                    fontSize={20}
                     ml={3}
                     bg="red600"
                     color="white"
