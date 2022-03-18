@@ -69,6 +69,7 @@ export enum BoardCategory {
   //掲示板ではないもの
   NON_BOARD = '',
 }
+
 export type TextFormat = 'markdown' | 'html';
 
 @Entity({ name: 'wiki' })
