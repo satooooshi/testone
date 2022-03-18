@@ -93,7 +93,7 @@ const AttendanceReport: React.FC = () => {
 
   return (
     <WholeContainer>
-      <Div mr={7} ml={7}>
+      <Div mr={10} ml={10}>
         <HeaderWithTextButton
           enableBackButton={true}
           title="勤怠報告"
@@ -137,13 +137,13 @@ const AttendanceReport: React.FC = () => {
           borderBottomColor={'#b0b0b0'}
           flexDir="row"
           h={40}>
-          <Div w={'20%'} justifyContent="center" alignItems="center">
+          <Div w={'15%'} justifyContent="center" alignItems="center">
             <Text fontSize={16}>日付</Text>
           </Div>
           <Div w={'30%'} justifyContent="center" alignItems="center">
             <Text fontSize={16}>区分</Text>
           </Div>
-          <Div w={'20%'} justifyContent="center" alignItems="center">
+          <Div w={'15%'} justifyContent="center" alignItems="center">
             <Text fontSize={16}>送信日</Text>
           </Div>
           {activeTabName === 'reportAfterAccepted' && (
@@ -151,7 +151,7 @@ const AttendanceReport: React.FC = () => {
               <Div w={'20%'} justifyContent="center" alignItems="center">
                 <Text fontSize={16}>受理日</Text>
               </Div>
-              <Div w={'10%'} justifyContent="center" alignItems="center">
+              <Div w={'20%'} justifyContent="center" alignItems="center">
                 <Text fontSize={16}>詳細</Text>
               </Div>
             </>
@@ -161,7 +161,7 @@ const AttendanceReport: React.FC = () => {
               <Div w={'20%'} justifyContent="center" alignItems="center">
                 <Text fontSize={16}>編集</Text>
               </Div>
-              <Div w={'10%'} justifyContent="center" alignItems="center">
+              <Div w={'20%'} justifyContent="center" alignItems="center">
                 <Text fontSize={16}>詳細</Text>
               </Div>
             </>

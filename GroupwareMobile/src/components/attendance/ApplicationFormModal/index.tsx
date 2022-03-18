@@ -245,15 +245,16 @@ const ApplicationForm: React.FC<ApplicationFormModalProps> = ({
           color="white"
           alignSelf="flex-end"
           onPress={() => handleSubmit()}>
-          {values.id ? '更新する' : '申請する'}
+          {values.id ? '更新' : '申請'}
         </Button>
         {application?.id && (
           <Button
+            ml={3}
             bg="red600"
             color="white"
             alignSelf="flex-end"
             onPress={() => onDeleteButtonClicked()}>
-            削除する
+            削除
           </Button>
         )}
       </Box>

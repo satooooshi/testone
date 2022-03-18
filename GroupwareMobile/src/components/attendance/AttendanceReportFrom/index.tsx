@@ -41,12 +41,13 @@ type AttendanceReportFormModalProps = CustomModalProps & {
   report?: Partial<AttendanceRepo>;
   onCloseModal: () => void;
   onSubmit: (event: Partial<AttendanceRepo>) => void;
+  onDelete?: () => void;
   isSuccess?: boolean;
 };
 
 const AttendanceReportFormModal: React.FC<AttendanceReportFormModalProps> =
   props => {
-    const {onCloseModal, report, onSubmit, isSuccess = false} = props;
+    const {onCloseModal, report, onSubmit, onDelete, isSuccess = false} = props;
     const {user} = useAuthenticate();
     const reportCategoryRef = useRef<any | null>(null);
     const reportReasonRef = useRef<any | null>(null);
@@ -200,6 +201,16 @@ const AttendanceReportFormModal: React.FC<AttendanceReportFormModalProps> =
                   onPress={() => setVisibleTimePicker('reportDate')}
                 />
               </Box>
+              {newReport.id && onDelete && (
+                <Button
+                  ml="auto"
+                  mr={3}
+                  bg="red600"
+                  color="white"
+                  onPress={() => onDelete()}>
+                  削除
+                </Button>
+              )}
               <Dropdown
                 {...defaultDropdownProps}
                 ref={reportCategoryRef}

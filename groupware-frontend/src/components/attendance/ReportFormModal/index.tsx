@@ -34,7 +34,7 @@ type ReportFormModalProps = {
   report?: Partial<AttendanceRepo>;
   onCloseModal: () => void;
   onSubmit: (event: Partial<AttendanceRepo>) => void;
-  onDelete: (reportId: number) => void;
+  onDelete?: (reportId: number) => void;
   isOpen: boolean;
 };
 
