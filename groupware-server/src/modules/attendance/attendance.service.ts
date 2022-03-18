@@ -243,6 +243,18 @@ export class AttendanceService {
     return updatedAttendanceReport;
   }
 
+  public async deleteAttendanceReport(reportId: number) {
+    const report = await this.attendanceReport.findOne({
+      id: reportId,
+    });
+    if (!report) {
+      throw new BadRequestException(
+        'The attendance report has already been deleted.',
+      );
+    }
+    await this.attendanceReport.delete(reportId);
+  }
+
   public async verifyAttendanceReport(attendanceReport: AttendanceReport) {
     const verifyAttendanceReport = await this.attendanceReport.save({
       ...attendanceReport,

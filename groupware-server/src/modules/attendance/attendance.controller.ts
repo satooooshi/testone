@@ -257,6 +257,12 @@ export class AttendanceController {
     return attendanceRepo;
   }
 
+  @Post('delete-report')
+  @UseGuards(JwtAuthenticationGuard)
+  async deleteReport(@Body() body: { reportId: number }) {
+    return await this.attendanceService.deleteAttendanceReport(body.reportId);
+  }
+
   @Patch('/report')
   @UseGuards(JwtAuthenticationGuard)
   async updateAttendanceReport(
