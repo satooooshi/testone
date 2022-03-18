@@ -2,6 +2,7 @@ import {DateTime} from 'luxon';
 import React, {useEffect, useRef, useState} from 'react';
 import {
   Alert,
+  Platform,
   TextInput,
   TouchableOpacity,
   useWindowDimensions,
@@ -173,7 +174,7 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
       const formData = new FormData();
       formData.append('files', {
         name: res.name,
-        uri: normalizeURL(res.uri),
+        uri: Platform.OS === 'android' ? res.uri : normalizeURL(res.uri),
         type: res.type,
       });
       uploadFile(formData);
