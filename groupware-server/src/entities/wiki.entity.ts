@@ -69,7 +69,6 @@ export enum BoardCategory {
   //掲示板ではないもの
   NON_BOARD = '',
 }
-// ALTER TABLE wiki CHANGE board_category board_category enum
 export type TextFormat = 'markdown' | 'html';
 
 @Entity({ name: 'wiki' })
