@@ -58,6 +58,10 @@ export enum BoardCategory {
   CLUB = 'club',
   //勉強会
   STUDY_MEETING = 'study_meeting',
+  //自己研鑽
+  SELF_IMPROVEMENT = 'self_improvement',
+  //個人告知
+  PERSONAL_ANNOUNCEMENT = 'personal_announcement',
   //お祝い事
   CELEBRATION = 'celebration',
   //その他
@@ -65,7 +69,7 @@ export enum BoardCategory {
   //掲示板ではないもの
   NON_BOARD = '',
 }
-
+// ALTER TABLE wiki CHANGE board_category board_category enum
 export type TextFormat = 'markdown' | 'html';
 
 @Entity({ name: 'wiki' })
