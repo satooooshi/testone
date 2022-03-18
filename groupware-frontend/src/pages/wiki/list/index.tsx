@@ -161,6 +161,40 @@ const QAQuestionList = () => {
         WikiType.BOARD,
         undefined,
         true,
+        BoardCategory.SELF_IMPROVEMENT,
+      ),
+      onClick: () =>
+        queryRefresh({
+          type: WikiType.BOARD,
+          board_category: BoardCategory.SELF_IMPROVEMENT,
+          status: undefined,
+        }),
+      isActiveTab:
+        type === WikiType.BOARD &&
+        board_category === BoardCategory.SELF_IMPROVEMENT,
+    },
+    {
+      tabName: wikiTypeNameFactory(
+        WikiType.BOARD,
+        undefined,
+        true,
+        BoardCategory.PERSONAL_ANNOUNCEMENT,
+      ),
+      onClick: () =>
+        queryRefresh({
+          type: WikiType.BOARD,
+          board_category: BoardCategory.PERSONAL_ANNOUNCEMENT,
+          status: undefined,
+        }),
+      isActiveTab:
+        type === WikiType.BOARD &&
+        board_category === BoardCategory.PERSONAL_ANNOUNCEMENT,
+    },
+    {
+      tabName: wikiTypeNameFactory(
+        WikiType.BOARD,
+        undefined,
+        true,
         BoardCategory.CELEBRATION,
       ),
       onClick: () =>
