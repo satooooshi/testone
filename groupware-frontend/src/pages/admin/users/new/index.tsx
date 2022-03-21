@@ -252,7 +252,7 @@ const CreateNewUser = () => {
         activeScreenName: SidebarScreenName.ADMIN,
       }}
       header={{
-        title: '新規ユーザー作成',
+        title: '新規',
         tabs: tabs,
         activeTabName: 'ユーザー作成',
       }}>
