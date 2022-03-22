@@ -5,7 +5,7 @@ import {User} from '../../types';
 import {userNameFactory} from '../factory/userNameFactory';
 import {axiosInstance} from '../url';
 
-export const sendCallInvitation = async (
+export const setupCallInvitation = async (
   caller: Partial<User>,
   callee: User,
 ): Promise<LocalInvitation> => {

@@ -143,7 +143,7 @@ const AccountDetail: React.FC = () => {
   const navigation = useNavigation<AccountDetailNavigationProps>();
   const route = useRoute<AccountDetailRouteProps>();
   const {user, setUser, logout} = useAuthenticate();
-  const {sendCallInvitation2} = useInviteCall();
+  const {sendCallInvitation} = useInviteCall();
   const {setIsTabBarVisible} = useIsTabBarVisible();
   const id = route.params?.id;
   const userID = id || user?.id;
@@ -233,12 +233,12 @@ const AccountDetail: React.FC = () => {
 
   const inviteCall = async () => {
     if (user && profile) {
-      await sendCallInvitation2(user, profile);
+      await sendCallInvitation(user, profile);
     }
   };
   // const inviteCall = async () => {
   //   if (user && profile) {
-  //     const localInvitation = await sendCallInvitation(user, profile);
+  //     const localInvitation = await setupCallInvitation(user, profile);
   //     setLocalInvitationState(localInvitation);
   //   }
   // };

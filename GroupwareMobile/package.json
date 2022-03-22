@@ -23,7 +23,7 @@
     "@react-navigation/material-top-tabs": "^6.0.6",
     "@react-navigation/native": "^6.0.6",
     "@react-navigation/stack": "^6.0.11",
-    "agora-react-native-rtm": "^1.4.8",
+    "agora-react-native-rtm": "^1.5.0",
     "agora-rn-uikit": "^3.3.0",
     "axios": "^0.23.0",
     "buffer": "^6.0.3",

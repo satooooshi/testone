@@ -2165,10 +2165,10 @@ agent-base@6:
   dependencies:
     debug "4"
 
-agora-react-native-rtm@^1.4.8:
-  version "1.4.8"
-  resolved "https://registry.yarnpkg.com/agora-react-native-rtm/-/agora-react-native-rtm-1.4.8.tgz#b738818c7e57cba0754521cfe869d4ffe46a9271"
-  integrity sha512-UaWAvQ8EQMIodY4+RuqQB9DPsKJoB/SwSDcqTa0DHShatrsvUv3JMPg7TzO1ZHrpnkWHira6EL5C/VgVXu3YYw==
+agora-react-native-rtm@^1.5.0:
+  version "1.5.0"
+  resolved "https://registry.yarnpkg.com/agora-react-native-rtm/-/agora-react-native-rtm-1.5.0.tgz#fe650a9a61db0c94cb804180eb4c1020da092c10"
+  integrity sha512-8LApJVTK21a6/JkOPwzkatrFrcvD/t4WUJNdc55BybBadrlSSE1yzz/1Ts/8tHVdzsX9Pya9pjMZ+UQBGovong==
 
 agora-rn-uikit@^3.3.0:
   version "3.3.0"

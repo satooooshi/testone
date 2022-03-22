@@ -10,7 +10,7 @@ import SoundPlayer from 'react-native-sound-player';
 import {LocalInvitation} from 'agora-react-native-rtm';
 import {useAPISaveChatGroup} from '../../hooks/api/chat/useAPISaveChatGroup';
 import {useAPISendChatMessage} from '../../hooks/api/chat/useAPISendChatMessage';
-import {sendCallInvitation} from '../../utils/calling/calling';
+import {setupCallInvitation} from '../../utils/calling/calling';
 import io from 'socket.io-client';
 import {baseURL} from '../../utils/url';
 import {ChatGroup} from '../../types';
@@ -21,7 +21,7 @@ const InvitationStatusContext = createContext({
   setLocalInvitationState: (() => {}) as (
     invitation: LocalInvitation | undefined,
   ) => void,
-  sendCallInvitation2: (async () => {}) as (
+  sendCallInvitation: (async () => {}) as (
     caller: Partial<User>,
     callee: User,
   ) => Promise<void>,
@@ -70,10 +70,10 @@ export const InviteCallProvider: React.FC = ({children}) => {
     setCallTime(CallTime);
   };
 
-  const sendCallInvitation2 = async (caller: Partial<User>, callee: User) => {
+  const sendCallInvitation = async (caller: Partial<User>, callee: User) => {
     console.log('will send call invitation', callee);
     console.log('will send call invitation', caller);
-    const invitation = await sendCallInvitation(caller, callee);
+    const invitation = await setupCallInvitation(caller, callee);
     console.log('send call invitation');
     setLocalInvitation(invitation);
     createGroup(
@@ -107,6 +107,7 @@ export const InviteCallProvider: React.FC = ({children}) => {
 
   useEffect(() => {
     if (localInvitation) {
+      // setTimeout(ringCall, 1000);
       ringCall();
     } else {
       stopRing();
@@ -129,7 +130,7 @@ export const InviteCallProvider: React.FC = ({children}) => {
         stopRing,
         localInvitation,
         setLocalInvitationState,
-        sendCallInvitation2,
+        sendCallInvitation,
         setCallTimeState,
         sendCallHistory,
       }}>

@@ -91,7 +91,7 @@ const Chat: React.FC = () => {
   const navigation = useNavigation<ChatNavigationProps>();
   const route = useRoute<ChatRouteProps>();
   const {room} = route.params;
-  const {sendCallInvitation2} = useInviteCall();
+  const {sendCallInvitation} = useInviteCall();
   const isFocused = useIsFocused();
   const {setIsTabBarVisible} = useIsTabBarVisible();
   const {data: roomDetail, refetch: refetchRoomDetail} = useAPIGetRoomDetail(
@@ -694,7 +694,7 @@ const Chat: React.FC = () => {
           ? roomDetail.members[1]
           : roomDetail.members[0];
       //第一引数に通話を書ける人のユーザーオブジェクト、第二引数に通話をかけられるひとのユーザーオブジェクト
-      await sendCallInvitation2(myself, caller);
+      await sendCallInvitation(myself, caller);
     }
   };
 
