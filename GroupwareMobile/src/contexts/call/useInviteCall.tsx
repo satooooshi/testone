@@ -14,6 +14,7 @@ import {setupCallInvitation} from '../../utils/calling/calling';
 import io from 'socket.io-client';
 import {baseURL} from '../../utils/url';
 import {ChatGroup} from '../../types';
+import {useAuthenticate} from '../useAuthenticate';
 
 const InvitationStatusContext = createContext({
   isCallAccepted: false,
@@ -34,6 +35,7 @@ const InvitationStatusContext = createContext({
 });
 
 export const InviteCallProvider: React.FC = ({children}) => {
+  const {user} = useAuthenticate();
   const {mutate: createGroup} = useAPISaveChatGroup();
   const [currentGroupData, setCurrentGroupData] = useState<ChatGroup>();
   const socket = io(baseURL, {
@@ -98,17 +100,20 @@ export const InviteCallProvider: React.FC = ({children}) => {
     [callTime, sendChatMessage, currentGroupData],
   );
 
-  useEffect(() => {
-    if (!isCallAccepted && callTime) {
-      sendCallHistory('音声通話');
-      setCallTime('');
-    }
-  }, [isCallAccepted, callTime, setCallTime, sendCallHistory]);
+  useEffect(
+    () => {
+      if (currentGroupData && !isCallAccepted && callTime) {
+        sendCallHistory('音声通話');
+        setCallTime('');
+      }
+    }, // eslint-disable-next-line react-hooks/exhaustive-deps
+    [isCallAccepted, currentGroupData],
+  );
 
   useEffect(() => {
     if (localInvitation) {
-      // setTimeout(ringCall, 1000);
-      ringCall();
+      setTimeout(ringCall, 3000);
+      // ringCall();
     } else {
       stopRing();
     }
