@@ -301,6 +301,9 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
     setMentionedUserData((m) => [...m, newMention]);
   };
   const [editorState, setEditorState] = useState(EditorState.createEmpty());
+  const [stickerEditorState, setStickerEditorState] = useState(
+    EditorState.createEmpty(),
+  );
   const messageWrapperDivRef = useRef<HTMLDivElement | null>(null);
   const editorRef = useRef<Editor>(null);
   const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
@@ -330,6 +333,16 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
     const rawObject = convertToRaw(content);
     const markdownString = draftToMarkdown(rawObject);
     setNewChatMessage((v) => ({ ...v, content: markdownString }));
+  };
+
+  const onStickerEditorChange = (newState: EditorState) => {
+    const content = newState.getCurrentContent();
+    const rawObject = convertToRaw(content);
+    sendChatMessage({
+      content: rawObject.entityMap[0].data.id,
+      chatGroup: newChatMessage.chatGroup,
+      type: ChatMessageType.IMAGE,
+    });
   };
 
   const nameOfEmptyNameGroup = (members?: User[]): string => {
@@ -818,9 +831,9 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
         right="92px">
         <StickerSelect
           editor={{
-            onChange: onEditorChange,
+            onChange: onStickerEditorChange,
             state: {
-              editorState,
+              editorState: stickerEditorState,
             },
           }}
         />
