@@ -817,7 +817,21 @@ const Chat: React.FC = () => {
         <Div style={tailwind('flex flex-row')}>
           {roomDetail?.members && roomDetail.members.length < 3 ? (
             <Div style={tailwind('flex flex-row')}>
-              <Button bg="transparent" pb={-3} onPress={inviteCall}>
+              <Button
+                bg="transparent"
+                pb={-3}
+                onPress={() => {
+                  Alert.alert('通話しますか？', undefined, [
+                    {
+                      text: 'はい',
+                      onPress: () => inviteCall(),
+                    },
+                    {
+                      text: 'いいえ',
+                      onPress: () => {},
+                    },
+                  ]);
+                }}>
                 <Icon
                   name="phone"
                   fontFamily="Entypo"

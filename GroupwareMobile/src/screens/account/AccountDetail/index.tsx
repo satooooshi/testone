@@ -302,7 +302,18 @@ const AccountDetail: React.FC = () => {
                     mt={-10}
                     bg="white"
                     rounded="circle"
-                    onPress={inviteCall}>
+                    onPress={() => {
+                      Alert.alert('通話しますか？', undefined, [
+                        {
+                          text: 'はい',
+                          onPress: () => inviteCall(),
+                        },
+                        {
+                          text: 'いいえ',
+                          onPress: () => {},
+                        },
+                      ]);
+                    }}>
                     <Icon
                       name="phone"
                       fontFamily="Entypo"
