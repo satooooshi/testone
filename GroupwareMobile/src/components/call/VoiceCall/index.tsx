@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   CallbacksInterface,
   RtcPropsInterface,
@@ -13,6 +13,8 @@ import UserAvatar from '../../../components/common/UserAvatar';
 import {userNameFactory} from '../../../utils/factory/userNameFactory';
 import Timer from '../../common/Timer';
 import Controls from '../Control';
+import {useInviteCall} from '../../../contexts/call/useInviteCall';
+import SoundPlayer from 'react-native-sound-player';
 
 type VoiceCallProps = {
   rtcProps: RtcPropsInterface;
@@ -34,6 +36,26 @@ const VoiceCall: React.FC<VoiceCallProps> = ({
   };
   const {width: windowWidth, height: windowHeight} = useWindowDimensions();
   const {data: profile} = useAPIGetUserInfoById(onCallUid ? onCallUid : '0');
+  const [isRinging, setRinging] = useState(false);
+  const {ringCall, stopRing} = useInviteCall();
+
+  // const ringCall = () => {
+  //   SoundPlayer.playSoundFile('ring_call', 'mp3');
+  // };
+  // const stopRing = () => {
+  //   SoundPlayer.stop();
+  // };
+
+  useEffect(() => {
+    if (isJoining && !isCalling && !isRinging) {
+      console.log('================');
+
+      ringCall();
+      setRinging(true);
+    } else if (!isJoining || isCalling) {
+      stopRing();
+    }
+  }, [isJoining, isCalling]);
 
   return (
     <PropsProvider value={props}>

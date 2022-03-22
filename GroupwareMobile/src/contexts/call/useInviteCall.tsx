@@ -110,14 +110,14 @@ export const InviteCallProvider: React.FC = ({children}) => {
     [isCallAccepted, currentGroupData],
   );
 
-  useEffect(() => {
-    if (localInvitation) {
-      setTimeout(ringCall, 3000);
-      // ringCall();
-    } else {
-      stopRing();
-    }
-  }, [localInvitation, stopRing]);
+  // useEffect(() => {
+  //   if (localInvitation) {
+  //     setTimeout(ringCall, 3000);
+  //     // ringCall();
+  //   } else {
+  //     stopRing();
+  //   }
+  // }, [localInvitation, stopRing]);
 
   useEffect(() => {
     if (isCallAccepted) {
