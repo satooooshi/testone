@@ -247,10 +247,10 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
 
   const { mutate: uploadFiles, isLoading: loadingUplaod } = useAPIUploadStorage(
     {
-      onSuccess: (fileURLs, requestFileURLs) => {
-        const type = isImage(requestFileURLs[0].name)
+      onSuccess: (fileURLs) => {
+        const type = isImage(fileURLs[0])
           ? ChatMessageType.IMAGE
-          : isVideo(requestFileURLs[0].name)
+          : isVideo(fileURLs[0])
           ? ChatMessageType.VIDEO
           : ChatMessageType.OTHER_FILE;
         sendChatMessage({
