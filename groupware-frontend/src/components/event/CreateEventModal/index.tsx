@@ -36,6 +36,8 @@ import {
   Box,
   Image,
   useMediaQuery,
+  InputGroup,
+  InputRightElement,
 } from '@chakra-ui/react';
 import SelectUserModal from '../SelectUserModal';
 import { useAPIGetUsers } from '@/hooks/api/user/useAPIGetUsers';
@@ -716,24 +718,29 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
           ) : null}
           <Text mb="16px">関連動画</Text>
           <Box display="flex" flexDir="row" alignItems="center" mb="16px">
-            <Input
-              background="white"
-              placeholder="Youtubeの動画URLを設定してください"
-              type="text"
-              w="100%"
-              h="40px"
-              color={darkFontColor}
-              bg="white"
-              rounded="md"
-              textAlign="left"
-              pr={'40px'}
-              value={newYoutube}
-              onChange={(e) => setNewYoutube(e.currentTarget.value)}
-            />
-            <IoMdAddCircle
-              className={createEventModalStyle.icon}
-              onClick={pushYoutube}
-            />
+            <InputGroup>
+              <Input
+                background="white"
+                placeholder="Youtubeの動画URLを設定してください"
+                type="text"
+                w="100%"
+                h="40px"
+                color={darkFontColor}
+                bg="white"
+                rounded="md"
+                textAlign="left"
+                pr={'40px'}
+                value={newYoutube}
+                onChange={(e) => setNewYoutube(e.currentTarget.value)}
+              />
+
+              <InputRightElement right={-10}>
+                <IoMdAddCircle
+                  className={createEventModalStyle.icon}
+                  onClick={pushYoutube}
+                />
+              </InputRightElement>
+            </InputGroup>
           </Box>
           <Box display="flex" flexDir="column" mb="16px">
             {newEvent?.videos?.map((y) => (
