@@ -705,7 +705,7 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
                       setNewEvent({
                         ...newEvent,
                         files: newEvent.files.filter(
-                          (file) => file.id !== f.id,
+                          (file) => file.url !== f.url,
                         ),
                       })
                     }
