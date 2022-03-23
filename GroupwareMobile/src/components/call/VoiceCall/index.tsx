@@ -48,7 +48,6 @@ const VoiceCall: React.FC<VoiceCallProps> = ({
 
   useEffect(() => {
     if (isJoining && !isCalling && !isRinging) {
-      console.log('================');
       setRinging(true);
       ringCall();
     } else if (!isJoining || isCalling) {

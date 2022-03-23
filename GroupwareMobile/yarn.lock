@@ -7289,6 +7289,11 @@ react-native-sound-player@^0.11.3:
   resolved "https://registry.yarnpkg.com/react-native-sound-player/-/react-native-sound-player-0.11.3.tgz#407aa76521a2203d29f40e081c4f89cb44ebdfd4"
   integrity sha512-UROQGIPkb4vk5hk3cycup1YEgVmQtnT1VA+j3RMJmohBuFXIXauVob1sGsW9+rUOfRnMVXxv2FpDJU1Yet4IlA==
 
+react-native-splash-screen@^3.3.0:
+  version "3.3.0"
+  resolved "https://registry.yarnpkg.com/react-native-splash-screen/-/react-native-splash-screen-3.3.0.tgz#3af71ed17afe50fee69590a45aec399d071ead02"
+  integrity sha512-rGjt6HkoSXxMqH4SQUJ1gnPQlPJV8+J47+4yhgTIan4bVvAwJhEeJH7wWt9hXSdH4+VfwTS0GTaflj1Tw83IhA==
+
 react-native-switch-audio-output-android@^1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/react-native-switch-audio-output-android/-/react-native-switch-audio-output-android-1.0.2.tgz#e36fc4647f9bf29385136c42db7129285c6f2740"

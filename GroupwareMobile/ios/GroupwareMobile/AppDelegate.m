@@ -2,6 +2,7 @@
 #import <RNCPushNotificationIOS.h>
 #import <Firebase.h>
 #import "AppDelegate.h"
+#import "RNFBMessagingModule.h"
 
 #import "RNBootSplash.h"
 
@@ -48,9 +49,10 @@ static void InitializeFlipper(UIApplication *application) {
 #endif
 
   RCTBridge *bridge = [[RCTBridge alloc] initWithDelegate:self launchOptions:launchOptions];
+  NSDictionary *appProperties = [RNFBMessagingModule addCustomPropsToUserProps:nil withLaunchOptions:launchOptions];
   RCTRootView *rootView = [[RCTRootView alloc] initWithBridge:bridge
                                                    moduleName:@"GroupwareMobile"
-                                            initialProperties:nil];
+                                            initialProperties:appProperties];
 
   if (@available(iOS 13.0, *)) {
       rootView.backgroundColor = [UIColor systemBackgroundColor];

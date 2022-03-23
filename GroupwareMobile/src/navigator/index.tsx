@@ -192,10 +192,10 @@ const Navigator = () => {
   messaging().setBackgroundMessageHandler(async remoteMessage => {
     console.log('----------------aaaaaaaaa');
     if (Platform.OS === 'ios') {
-      console.log('----------------aaaaaaaaa');
+      console.log('----------------bbbbbbbbbbb', remoteMessage?.data);
       if (remoteMessage?.data?.type === 'call') {
         // iOSのみ、アプリがバックグラウンド状態のときはプッシュ通知で通話をハンドリングする必要がある
-        console.log('----------------');
+        console.log('----------------cccccccccccc');
 
         displayIncomingCallNow(remoteMessage?.data as any);
         console.log('Message handled in the background!', remoteMessage);
@@ -229,6 +229,8 @@ const Navigator = () => {
     rtmEngine.addListener(
       'RemoteInvitationReceived',
       (invitation: RemoteInvitation) => {
+        console.log('remote invitation received ----------');
+
         displayIncomingCallNow(invitation);
       },
     );
