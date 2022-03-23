@@ -1,10 +1,10 @@
 import React, {useState} from 'react';
-import {ScrollView, StyleSheet, View} from 'react-native';
 import {textContent} from 'domutils';
 import {Element} from 'domhandler';
 import TOCEntry from './TOCEntry';
 import {useEffect} from 'react';
 import {useScroller} from '../../../utils/htmlScroll/scroller';
+import {Div} from 'react-native-magnus';
 
 function useOnEntryChangeEffect(onEntryChange: (entryName: string) => void) {
   const scroller = useScroller();
@@ -31,10 +31,7 @@ export default function TOC({
   );
   useOnEntryChangeEffect(setActiveEntry);
   return (
-    <ScrollView
-      contentContainerStyle={styles.scrollContent}
-      style={styles.scrollView}>
-      <View style={styles.scrollBackground} />
+    <Div>
       {headings.map(header => {
         const headerName = textContent(header);
         const onPress = () => {
@@ -51,27 +48,6 @@ export default function TOC({
           />
         );
       })}
-    </ScrollView>
+    </Div>
   );
 }
-
-const styles = StyleSheet.create({
-  scrollView: {
-    flex: 1,
-    backgroundColor: 'white',
-    opacity: 0.92,
-    paddingRight: 10,
-  },
-  scrollContent: {
-    flex: 1,
-    paddingVertical: 20,
-    position: 'relative',
-  },
-  scrollBackground: {
-    ...StyleSheet.absoluteFillObject,
-    flex: 1,
-    borderRightWidth: 1,
-    marginRight: 10,
-    borderColor: 'rgba(125,125,125,0.3)',
-  },
-});
