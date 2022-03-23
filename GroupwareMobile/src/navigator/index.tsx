@@ -58,6 +58,7 @@ const Navigator = () => {
   } = useInviteCall();
   const [isJoining, setIsJoining] = useState(false);
   const [isCalling, setIsCalling] = useState(false);
+  const [callTimeout, setCallTimeout] = useState(false);
   const [agoraToken, setAgoraToken] = useState('');
   const [channelName, setChannelName] = useState('');
   const [onCallUid, setOnCallUid] = useState('');
@@ -506,20 +507,22 @@ const Navigator = () => {
         await joinChannel(realChannelName);
         // 応答なしだと自動で終了する(テスト)
         await new Promise(r => setTimeout(r, 20000));
-        console.log(
-          '------------------------------',
-          localInvitation,
-          isCallAccepted,
-        );
-
-        if (localInvitation && !isCallAccepted) {
-          console.log('===================');
-          await endCall(false);
-        }
+        setCallTimeout(true);
       };
       joining();
     }
   }, [endCall, isCallAccepted, joinChannel, localInvitation, navigationRef]);
+
+  useEffect(() => {
+    const cancelCallByTimeout = async () => {
+      await endCall(false);
+    };
+    if (localInvitation && !isCallAccepted) {
+      console.log('===================');
+      cancelCallByTimeout();
+    }
+    setCallTimeout(false);
+  }, [callTimeout]);
 
   return (
     <NavigationContainer ref={navigationRef}>
