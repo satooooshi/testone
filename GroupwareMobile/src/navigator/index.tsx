@@ -36,7 +36,17 @@ let callKeepUUID = '';
 const Navigator = () => {
   const {user} = useAuthenticate();
   const navigationRef = useNavigationContainerRef<any>();
-  const {mutate: registerDevice} = useAPIRegisterDevice();
+  const {mutate: registerDevice} = useAPIRegisterDevice({
+    onSuccess: updatedInfo => {
+      console.log(
+        '---------------------------------------------------------------------success',
+        updatedInfo,
+      );
+    },
+    onError: () => {
+      Alert.alert('fail to register device');
+    },
+  });
   const {
     isCallAccepted,
     enableCallAcceptedFlag,
@@ -177,14 +187,19 @@ const Navigator = () => {
       }
     },
   };
+
   messaging().setBackgroundMessageHandler(async remoteMessage => {
+    console.log('----------------aaaaaaaaa');
     if (Platform.OS === 'ios') {
+      console.log('----------------aaaaaaaaa');
       if (remoteMessage?.data?.type === 'call') {
         // iOSのみ、アプリがバックグラウンド状態のときはプッシュ通知で通話をハンドリングする必要がある
+        console.log('----------------');
+
         displayIncomingCallNow(remoteMessage?.data as any);
+        console.log('Message handled in the background!', remoteMessage);
       }
     }
-    console.log('Message handled in the background!', remoteMessage);
   });
 
   const rtmInit = async () => {
@@ -454,7 +469,11 @@ const Navigator = () => {
         //     ? await messaging().getToken()
         //     : await messaging().getAPNSToken();
         const token = await messaging().getToken();
-        console.log('token', token);
+        console.log(
+          'token-------------------------------',
+          user.firstName,
+          token,
+        );
         if (token) {
           registerDevice({token});
         }
@@ -485,13 +504,18 @@ const Navigator = () => {
       const joining = async () => {
         const realChannelName = localInvitation?.channelId as string;
         await joinChannel(realChannelName);
-        // navigationRef.current?.navigate('Call');
-        //タイムアウト
-        // await new Promise(r => setTimeout(r, 12000));
-        // if (!isCallAccepted) {
-        //   await endCall();
-        //   navigationRef.current?.navigate('Main');
-        // }
+        // 応答なしだと自動で終了する(テスト)
+        await new Promise(r => setTimeout(r, 20000));
+        console.log(
+          '------------------------------',
+          localInvitation,
+          isCallAccepted,
+        );
+
+        if (localInvitation && !isCallAccepted) {
+          console.log('===================');
+          await endCall(false);
+        }
       };
       joining();
     }
