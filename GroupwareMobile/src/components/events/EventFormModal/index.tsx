@@ -232,6 +232,15 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
     });
   };
 
+  const removeFile = (fileUrl: string) => {
+    setNewEvent(e => {
+      if (e.files?.length) {
+        return {...e, files: e.files.filter(f => f.url !== fileUrl)};
+      }
+      return e;
+    });
+  };
+
   useEffect(() => {
     if (event) {
       setNewEvent(event);
@@ -586,6 +595,7 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
               key={f.id}
               mb={'lg'}
               w={'100%'}
+              h={'5%'}
               borderColor={blueColor}
               borderWidth={1}
               px={8}
@@ -601,7 +611,7 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
                   ])[1]
                 }
               </Text>
-              <TouchableOpacity>
+              <TouchableOpacity onPress={() => removeFile(f.url || '')}>
                 <Icon name="closecircle" color="gray900" fontSize={24} />
               </TouchableOpacity>
             </Div>
