@@ -63,6 +63,7 @@ const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
   );
   const [wikiState, setWikiState] = useState(wikiInfo);
   const [isVisibleTOCModal, setIsVisibleTOCModal] = useState<boolean>(false);
+  const [activeEntry, setActiveEntry] = useState<string>('');
 
   const mdParser = new MarkdownIt({breaks: true});
   const wikiBody =
@@ -77,6 +78,7 @@ const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
     (entry: string) => {
       setIsVisibleTOCModal(false);
       scroller.scrollToEntry(entry);
+      setActiveEntry(entry);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [scroller],
@@ -84,10 +86,17 @@ const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
 
   const renderToc = useCallback(
     function renderToc() {
-      return <TOC headings={headings} onPressEntry={onPressEntry} />;
+      return (
+        <TOC
+          headings={headings}
+          onPressEntry={onPressEntry}
+          activeEntry={activeEntry}
+          setActiveEntry={setActiveEntry}
+        />
+      );
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [headings],
+    [headings, activeEntry],
   );
 
   useEffect(() => {

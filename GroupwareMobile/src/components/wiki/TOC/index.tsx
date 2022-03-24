@@ -22,14 +22,16 @@ function useOnEntryChangeEffect(onEntryChange: (entryName: string) => void) {
 export default function TOC({
   headings,
   onPressEntry,
+  activeEntry = textContent(headings[0]),
+  setActiveEntry,
 }: {
   headings: Element[];
   onPressEntry?: (name: string) => void;
+  activeEntry: string;
+  setActiveEntry: React.Dispatch<React.SetStateAction<string>>;
 }) {
-  const [activeEntry, setActiveEntry] = useState(
-    headings.length ? textContent(headings[0]) : '',
-  );
   useOnEntryChangeEffect(setActiveEntry);
+  const checkIsNotEmptyChar = (char: string) => char !== '';
   return (
     <Div>
       {headings.map(header => {
@@ -40,7 +42,11 @@ export default function TOC({
         };
         return (
           <TOCEntry
-            active={headerName === activeEntry}
+            active={
+              checkIsNotEmptyChar(activeEntry)
+                ? headerName === activeEntry
+                : headerName === textContent(headings[0])
+            }
             key={headerName}
             onPress={onPress}
             tagName={header.tagName}
