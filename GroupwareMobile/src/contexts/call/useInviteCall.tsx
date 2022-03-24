@@ -83,6 +83,7 @@ export const InviteCallProvider: React.FC = ({children}) => {
       {
         onSuccess: createdGroup => {
           setCurrentGroupData(createdGroup);
+          console.log('success set chatGroup!!');
         },
       },
     );
@@ -90,6 +91,8 @@ export const InviteCallProvider: React.FC = ({children}) => {
 
   const sendCallHistory = useCallback(
     (message: string) => {
+      console.log('currentGroupData====================', currentGroupData);
+
       sendChatMessage({
         content: message,
         callTime: callTime,

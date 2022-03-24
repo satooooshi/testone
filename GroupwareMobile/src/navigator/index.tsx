@@ -96,6 +96,15 @@ const Navigator = () => {
         // setOnCallUid('');
         setAlertCountOnEndCall(c => c + 1);
       }
+      if (!isCallAccepted && localInvitation) {
+        // local invitation(送信した通話招待)があればcancelする
+        console.log('attempt to cancel');
+        await rtmEngine?.cancelLocalInvitationV2(localInvitation);
+        if (alertNeeded) {
+          sendCallHistory('キャンセル');
+        }
+        console.log('cancel finished');
+      }
 
       setChannelName('');
       setIsJoining(false);
@@ -116,15 +125,6 @@ const Navigator = () => {
       await rtcInit();
       await soundOnEnd();
       await rtcEngine?.leaveChannel();
-      if (!isCallAccepted && localInvitation) {
-        // local invitation(送信した通話招待)があればcancelする
-        console.log('attempt to cancel');
-        await rtmEngine?.cancelLocalInvitationV2(localInvitation);
-        if (alertNeeded) {
-          sendCallHistory('キャンセル');
-        }
-        console.log('cancel finished');
-      }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [
@@ -228,7 +228,8 @@ const Navigator = () => {
     });
     rtmEngine.addListener(
       'RemoteInvitationReceived',
-      (invitation: RemoteInvitation) => {
+      async (invitation: RemoteInvitation) => {
+        await new Promise(r => setTimeout(r, 500));
         console.log('remote invitation received ----------');
 
         displayIncomingCallNow(invitation);
