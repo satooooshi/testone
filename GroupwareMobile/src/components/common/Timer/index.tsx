@@ -12,38 +12,20 @@ const Timer = () => {
   const [seconds, setSeconds] = useState(0);
 
   useEffect(() => {
-    if (Platform.OS === 'ios') {
-      let interval = BackgroundTimer.setInterval(() => {
-        setSeconds(seconds + 1);
-        if (seconds === 59) {
-          setMinutes(minutes + 1);
-          setSeconds(0);
-        }
-        if (minutes === 59) {
-          setHours(hours + 1);
-          setMinutes(0);
-        }
-      }, 1000);
-      return () => {
-        BackgroundTimer.clearInterval(interval);
-      };
-    }
-    if (Platform.OS === 'android') {
-      const interval = BackgroundTimer.setInterval(() => {
-        setSeconds(seconds + 1);
-        if (seconds === 59) {
-          setMinutes(minutes + 1);
-          setSeconds(0);
-        }
-        if (minutes === 59) {
-          setHours(hours + 1);
-          setMinutes(0);
-        }
-      }, 1000);
-      return () => {
-        BackgroundTimer.clearInterval(interval);
-      };
-    }
+    let interval = BackgroundTimer.setInterval(() => {
+      setSeconds(seconds + 1);
+      if (seconds === 59) {
+        setMinutes(minutes + 1);
+        setSeconds(0);
+      }
+      if (minutes === 59) {
+        setHours(hours + 1);
+        setMinutes(0);
+      }
+    }, 1000);
+    return () => {
+      BackgroundTimer.clearInterval(interval);
+    };
   });
 
   useEffect(
