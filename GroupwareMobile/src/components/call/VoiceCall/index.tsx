@@ -8,13 +8,12 @@ import {RtcConfigure} from 'agora-rn-uikit/Components';
 import {PropsProvider} from 'agora-rn-uikit/src/PropsContext';
 import {useAPIGetUserInfoById} from '../../../../src/hooks/api/user/useAPIGetUserInfoById';
 import {Text, Div} from 'react-native-magnus';
-import {Platform, useWindowDimensions} from 'react-native';
+import {useWindowDimensions} from 'react-native';
 import UserAvatar from '../../../components/common/UserAvatar';
 import {userNameFactory} from '../../../utils/factory/userNameFactory';
 import Timer from '../../common/Timer';
 import Controls from '../Control';
 import {useInviteCall} from '../../../contexts/call/useInviteCall';
-import SoundPlayer from 'react-native-sound-player';
 
 type VoiceCallProps = {
   rtcProps: RtcPropsInterface;
@@ -38,13 +37,6 @@ const VoiceCall: React.FC<VoiceCallProps> = ({
   const {data: profile} = useAPIGetUserInfoById(onCallUid ? onCallUid : '0');
   const [isRinging, setRinging] = useState(false);
   const {ringCall, stopRing} = useInviteCall();
-
-  // const ringCall = () => {
-  //   SoundPlayer.playSoundFile('ring_call', 'mp3');
-  // };
-  // const stopRing = () => {
-  //   SoundPlayer.stop();
-  // };
 
   useEffect(() => {
     if (isJoining && !isCalling && !isRinging) {

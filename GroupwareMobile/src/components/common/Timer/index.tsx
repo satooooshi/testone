@@ -2,27 +2,48 @@ import React from 'react';
 import {useState, useEffect} from 'react';
 import {Text} from 'react-native-magnus';
 import {useInviteCall} from '../../../contexts/call/useInviteCall';
+import BackgroundTimer from 'react-native-background-timer';
+import {Platform} from 'react-native';
 
 const Timer = () => {
   const {setCallTimeState} = useInviteCall();
   const [hours, setHours] = useState(0);
   const [minutes, setMinutes] = useState(0);
   const [seconds, setSeconds] = useState(0);
+
   useEffect(() => {
-    let myInterval = setInterval(() => {
-      setSeconds(seconds + 1);
-      if (seconds === 60) {
-        setMinutes(minutes + 1);
-        setSeconds(0);
-      }
-      if (minutes === 60) {
-        setHours(hours + 1);
-        setMinutes(0);
-      }
-    }, 1000);
-    return () => {
-      clearInterval(myInterval);
-    };
+    if (Platform.OS === 'ios') {
+      let interval = BackgroundTimer.setInterval(() => {
+        setSeconds(seconds + 1);
+        if (seconds === 59) {
+          setMinutes(minutes + 1);
+          setSeconds(0);
+        }
+        if (minutes === 59) {
+          setHours(hours + 1);
+          setMinutes(0);
+        }
+      }, 1000);
+      return () => {
+        BackgroundTimer.clearInterval(interval);
+      };
+    }
+    if (Platform.OS === 'android') {
+      const interval = BackgroundTimer.setInterval(() => {
+        setSeconds(seconds + 1);
+        if (seconds === 59) {
+          setMinutes(minutes + 1);
+          setSeconds(0);
+        }
+        if (minutes === 59) {
+          setHours(hours + 1);
+          setMinutes(0);
+        }
+      }, 1000);
+      return () => {
+        BackgroundTimer.clearInterval(interval);
+      };
+    }
   });
 
   useEffect(
@@ -32,7 +53,7 @@ const Timer = () => {
       const s = seconds < 10 ? `0${seconds}` : seconds;
       setCallTimeState(h + m + s);
     }, //eslint-disable-next-line react-hooks/exhaustive-deps
-    [seconds, minutes, hours],
+    [seconds],
   );
 
   return (
