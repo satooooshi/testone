@@ -10,6 +10,6 @@ export const requestIOSMsgPermission = async () => {
     authStatus === messaging.AuthorizationStatus.PROVISIONAL;
 
   if (enabled) {
-    console.log('Authorization status===============:', authStatus);
+    console.log('Authorization status:', authStatus);
   }
 };

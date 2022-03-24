@@ -26,6 +26,7 @@ import Config from 'react-native-config';
 import VoiceCall from '../components/call/VoiceCall';
 import {useInviteCall} from '../contexts/call/useInviteCall';
 import SoundPlayer from 'react-native-sound-player';
+import PushNotificationIOS from '@react-native-community/push-notification-ios';
 
 const Stack = createStackNavigator<RootStackParamList>();
 export const rtmEngine = new RtmClient();
@@ -425,17 +426,21 @@ const Navigator = () => {
     };
     getRtmToken();
   }, [AGORA_APP_ID, user?.id]);
-  PushNotification.createChannel(
-    {
-      channelId: 'default-channel-id', // (required)
-      channelName: 'Default channel', // (required)
-      channelDescription: 'A default channel', // (optional) default: undefined.
-      soundName: 'default', // (optional) See `soundName` parameter of `localNotification` function
-      vibrate: true, // (optional) default: true. Creates the default vibration pattern if true.
-    },
-    created =>
-      console.log(`createChannel 'default-channel-id' returned '${created}'`), // (optional) callback returns whether the channel was created, false means it already existed.
-  );
+
+  // PushNotification.createChannel(
+  //   {
+  //     channelId: 'chat-channel-id', // (required)
+  //     channelName: 'chat channel', // (required)
+  //     channelDescription: 'A default channel', // (optional) default: undefined.
+  //     soundName: 'default', // (optional) See `soundName` parameter of `localNotification` function
+  //     vibrate: true, // (optional) default: true. Creates the default vibration pattern if true.
+  //   },
+  //   created =>
+  //     console.log(`createChannel 'default-channel-id' returned '${created}'`), // (optional) callback returns whether the channel was created, false means it already existed.
+  // );
+  PushNotification.getChannels(function (channel_ids) {
+    console.log('list of channelId ------', channel_ids); // ['channel_id_1']
+  });
 
   useEffect(() => {
     const naviateByNotif = (notification: any) => {
@@ -477,6 +482,7 @@ const Navigator = () => {
         if (notification.userInteraction) {
           naviateByNotif(notification);
         }
+        notification.finish(PushNotificationIOS.FetchResult.NoData);
       },
       permissions: {
         alert: true,
@@ -486,39 +492,23 @@ const Navigator = () => {
       requestPermissions: true,
     });
     const unsubscribe = messaging().onMessage(async remoteMessage => {
-      if (Platform.OS === 'ios') {
-        console.log('onMessage  ios --------', remoteMessage);
-        PushNotification.localNotification({
-          id: remoteMessage.messageId,
-          message: remoteMessage.notification?.body || '',
-          title: remoteMessage.notification?.title,
-          bigPictureUrl: remoteMessage.notification?.android?.imageUrl,
-          userInfo: {
-            screen: remoteMessage?.data?.screen,
-            id: remoteMessage?.data?.id,
-          },
-        });
-      } else if (Platform.OS === 'android') {
-        console.log('onMessage android--------', remoteMessage);
-        PushNotification.localNotification({
-          channelId: 'default-channel-id',
-          ignoreInForeground: false,
-          id: remoteMessage.messageId,
-          vibrate: true, // (optional) default: true
-          vibration: 300,
-          priority: 'high', // (optional) set notification priority, default: high
-
-          visibility: 'public', // (optional) set notification visibility, default: private
-
-          message: remoteMessage.notification?.body || '',
-          title: remoteMessage.notification?.title,
-          bigPictureUrl: remoteMessage.notification?.android?.imageUrl,
-          userInfo: {
-            screen: remoteMessage?.data?.screen,
-            id: remoteMessage?.data?.id,
-          },
-        });
-      }
+      console.log('onMessage  --------', remoteMessage);
+      PushNotification.localNotification({
+        channelId: 'default-channel-id',
+        ignoreInForeground: false,
+        id: remoteMessage.messageId,
+        vibrate: true, // (optional) default: true
+        vibration: 300,
+        priority: 'high', // (optional) set notification priority, default: high
+        visibility: 'public', // (optional) set notification visibility, default: private
+        message: remoteMessage.notification?.body || '',
+        title: remoteMessage.notification?.title,
+        bigPictureUrl: remoteMessage.notification?.android?.imageUrl,
+        userInfo: {
+          screen: remoteMessage?.data?.screen,
+          id: remoteMessage?.data?.id,
+        },
+      });
     });
 
     return unsubscribe;
@@ -545,16 +535,19 @@ const Navigator = () => {
     }
   }, [endCall, isCallAccepted, joinChannel, localInvitation, navigationRef]);
 
-  useEffect(() => {
-    const cancelCallByTimeout = async () => {
-      await endCall(false);
-    };
-    if (localInvitation && !isCallAccepted) {
-      console.log('===================');
-      cancelCallByTimeout();
-    }
-    setCallTimeout(false);
-  }, [callTimeout]);
+  useEffect(
+    () => {
+      const cancelCallByTimeout = async () => {
+        await endCall(false);
+      };
+      if (localInvitation && !isCallAccepted) {
+        console.log('===================');
+        cancelCallByTimeout();
+      }
+      setCallTimeout(false);
+    }, // eslint-disable-next-line react-hooks/exhaustive-deps
+    [callTimeout],
+  );
 
   return (
     <NavigationContainer ref={navigationRef}>
