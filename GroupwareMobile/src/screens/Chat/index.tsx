@@ -426,6 +426,7 @@ const Chat: React.FC = () => {
   }, [isFocused, setIsTabBarVisible]);
 
   useEffect(() => {
+    let isMounted = true;
     socket.emit('joinRoom', room.id.toString());
     socket.on('msgToClient', async (sentMsgByOtherUsers: ChatMessage) => {
       if (sentMsgByOtherUsers.content) {
@@ -440,18 +441,20 @@ const Chat: React.FC = () => {
             sentMsgByOtherUsers.content,
           );
         }
-        setMessages(msgs => {
-          if (
-            msgs.length &&
-            msgs[0].id !== sentMsgByOtherUsers.id &&
-            sentMsgByOtherUsers.chatGroup?.id === room.id
-          ) {
-            return [sentMsgByOtherUsers, ...msgs];
-          } else if (sentMsgByOtherUsers.chatGroup?.id !== room.id) {
-            return msgs.filter(m => m.id !== sentMsgByOtherUsers.id);
-          }
-          return msgs;
-        });
+        if (isMounted) {
+          setMessages(msgs => {
+            if (
+              msgs.length &&
+              msgs[0].id !== sentMsgByOtherUsers.id &&
+              sentMsgByOtherUsers.chatGroup?.id === room.id
+            ) {
+              return [sentMsgByOtherUsers, ...msgs];
+            } else if (sentMsgByOtherUsers.chatGroup?.id !== room.id) {
+              return msgs.filter(m => m.id !== sentMsgByOtherUsers.id);
+            }
+            return msgs;
+          });
+        }
       }
     });
 
@@ -464,6 +467,7 @@ const Chat: React.FC = () => {
     });
     return () => {
       socket.emit('leaveRoom', room.id);
+      isMounted = false;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [room.id]);
