@@ -38,10 +38,7 @@ const Navigator = () => {
   const navigationRef = useNavigationContainerRef<any>();
   const {mutate: registerDevice} = useAPIRegisterDevice({
     onSuccess: updatedInfo => {
-      console.log(
-        '---------------------------------------------------------------------success',
-        updatedInfo,
-      );
+      console.log('RegisterDevice success--------', updatedInfo);
     },
     onError: () => {
       Alert.alert('fail to register device');
@@ -87,6 +84,37 @@ const Navigator = () => {
       callKeepUUID = '';
     }
   };
+
+  useEffect(() => {
+    const handleMessaging = async () => {
+      if (user) {
+        await requestIOSMsgPermission();
+        // const token =
+        //   Platform.OS === 'android'
+        //     ? await messaging().getToken()
+        //     : await messaging().getAPNSToken();
+        const token = await messaging().getToken();
+        console.log(
+          'token-------------------------------',
+          user.firstName,
+          token,
+        );
+        if (token) {
+          registerDevice({token});
+        }
+
+        // Listen to whether the token changes
+        return messaging().onTokenRefresh(tokenChanged => {
+          if (token) {
+            registerDevice({token: tokenChanged});
+          }
+          // saveTokenToDatabase(token);
+          console.log('token changed: ', tokenChanged);
+        });
+      }
+    };
+    handleMessaging();
+  }, [registerDevice, user]);
 
   const endCall = useCallback(
     async (alertNeeded: boolean = true) => {
@@ -190,13 +218,10 @@ const Navigator = () => {
   };
 
   messaging().setBackgroundMessageHandler(async remoteMessage => {
-    console.log('----------------aaaaaaaaa');
+    console.log('BackgroundMessage received!!');
     if (Platform.OS === 'ios') {
-      console.log('----------------bbbbbbbbbbb', remoteMessage?.data);
       if (remoteMessage?.data?.type === 'call') {
         // iOSのみ、アプリがバックグラウンド状態のときはプッシュ通知で通話をハンドリングする必要がある
-        console.log('----------------cccccccccccc');
-
         displayIncomingCallNow(remoteMessage?.data as any);
         console.log('Message handled in the background!', remoteMessage);
       }
@@ -441,6 +466,8 @@ const Navigator = () => {
       requestPermissions: true,
     });
     const unsubscribe = messaging().onMessage(async remoteMessage => {
+      console.log('onMessage --------', remoteMessage);
+
       PushNotification.localNotification({
         channelId: 'default-channel-id',
         ignoreInForeground: false,
@@ -463,37 +490,6 @@ const Navigator = () => {
 
     return unsubscribe;
   }, [navigationRef]);
-
-  useEffect(() => {
-    const handleMessaging = async () => {
-      if (user) {
-        await requestIOSMsgPermission();
-        // const token =
-        //   Platform.OS === 'android'
-        //     ? await messaging().getToken()
-        //     : await messaging().getAPNSToken();
-        const token = await messaging().getToken();
-        console.log(
-          'token-------------------------------',
-          user.firstName,
-          token,
-        );
-        if (token) {
-          registerDevice({token});
-        }
-
-        // Listen to whether the token changes
-        return messaging().onTokenRefresh(tokenChanged => {
-          if (token) {
-            registerDevice({token: tokenChanged});
-          }
-          // saveTokenToDatabase(token);
-          console.log('token changed: ', tokenChanged);
-        });
-      }
-    };
-    handleMessaging();
-  }, [registerDevice, user]);
 
   useEffect(() => {
     if (isJoining) {
