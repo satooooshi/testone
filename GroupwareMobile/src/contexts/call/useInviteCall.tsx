@@ -74,7 +74,6 @@ export const InviteCallProvider: React.FC = ({children}) => {
 
   const sendCallInvitation = async (caller: Partial<User>, callee: User) => {
     console.log('will send call invitation', callee);
-    console.log('will send call invitation', caller);
     const invitation = await setupCallInvitation(caller, callee);
     console.log('send call invitation');
     setLocalInvitation(invitation);

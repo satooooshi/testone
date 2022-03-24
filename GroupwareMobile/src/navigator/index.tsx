@@ -127,9 +127,9 @@ const Navigator = () => {
       }
       if (!isCallAccepted && localInvitation) {
         // local invitation(送信した通話招待)があればcancelする
-        console.log('attempt to cancel');
-        await rtmEngine?.cancelLocalInvitationV2(localInvitation);
         if (alertNeeded) {
+          console.log('attempt to cancel', localInvitation);
+          await rtmEngine?.cancelLocalInvitationV2(localInvitation);
           sendCallHistory('キャンセル');
         }
         console.log('cancel finished');
@@ -494,7 +494,7 @@ const Navigator = () => {
     const unsubscribe = messaging().onMessage(async remoteMessage => {
       console.log('onMessage  --------', remoteMessage);
       PushNotification.localNotification({
-        channelId: 'default-channel-id',
+        channelId: 'fcm_fallback_notification_channel',
         ignoreInForeground: false,
         id: remoteMessage.messageId,
         vibrate: true, // (optional) default: true
@@ -538,10 +538,14 @@ const Navigator = () => {
   useEffect(
     () => {
       const cancelCallByTimeout = async () => {
-        await endCall(false);
+        if (localInvitation && !isCallAccepted) {
+          console.log('cancel call by time out ===================');
+          // await rtmEngine?.cancelLocalInvitationV2(localInvitation);
+          // sendCallHistory('応答なし');
+          await endCall(true);
+        }
       };
-      if (localInvitation && !isCallAccepted) {
-        console.log('===================');
+      if (callTimeout) {
         cancelCallByTimeout();
       }
       setCallTimeout(false);
