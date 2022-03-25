@@ -193,18 +193,14 @@ const EditChatGroupMembersModal: React.FC<EditChatGroupMambersModalProps> = ({
                 ) : (
                   filteredUsers
                     ?.filter((u) => u.id !== myProfile?.id)
-                    .map((u) =>
-                      u.role === UserRole.EXTERNAL_INSTRUCTOR ? (
-                        <></>
-                      ) : (
-                        <UserRenderer
-                          user={u}
-                          key={u.id}
-                          onClick={toggleUser}
-                          isSelected={isSelected(u)}
-                        />
-                      ),
-                    )
+                    .map((u) => (
+                      <UserRenderer
+                        user={u}
+                        key={u.id}
+                        onClick={toggleUser}
+                        isSelected={isSelected(u)}
+                      />
+                    ))
                 )}
               </Box>
             </Box>
