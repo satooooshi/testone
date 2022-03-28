@@ -289,96 +289,103 @@ const NewsAdmin: React.VFC = () => {
               justifyContent={isSmallerThan768 ? 'flex-start' : 'center'}
               alignItems="center"
               display="flex"
+              flexDir="column"
               overflowX="auto"
               maxW="1980px"
+              minW="900px"
               mx="auto"
               alignSelf="center">
-              <Table
-                variant="simple"
-                alignSelf="center"
+              <Box
+                display="flex"
+                flexDir="row"
                 w="100%"
-                overflowX="auto">
-                <Thead bg="white">
-                  <Tr>
-                    <Th>URL</Th>
-                    <Th>タイトル</Th>
-                    <Th>作成日</Th>
-                    <Th />
-                    <Th />
-                  </Tr>
-                </Thead>
-                {(!isLoading || !updateLoading) && (
-                  <Tbody
-                    position="relative"
-                    borderColor="gray.300"
-                    borderWidth={1}>
-                    <DragDropContext onDragEnd={handleDragEnd}>
-                      <Droppable droppableId="items">
-                        {(provided: DroppableProvided) => (
-                          <ul
-                            {...provided.droppableProps}
-                            ref={provided.innerRef}
-                            style={{ listStyleType: 'none' }} // スタイル調整用
-                          >
-                            {news?.map((n, i) => (
-                              <Draggable
-                                draggableId={n.id.toString()}
-                                key={n.id}
-                                index={i}>
-                                {(provided: DraggableProvided) => (
-                                  <li
-                                    ref={provided.innerRef}
-                                    {...provided.draggableProps}
-                                    {...provided.dragHandleProps}>
-                                    <Tr key={n.id}>
-                                      <Td w={'fit-content'} color="blue">
-                                        <NextLink
-                                          href={location.href + n.urlPath}>
-                                          <a target="_blank">
-                                            {location.origin + n.urlPath}
-                                          </a>
-                                        </NextLink>
-                                      </Td>
-                                      <Td>{n.title}</Td>
-                                      <Td>
-                                        {dateTimeFormatterFromJSDDate({
-                                          dateTime: new Date(n.createdAt),
-                                          format: 'yyyy/LL/dd HH:mm',
-                                        })}
-                                      </Td>
-                                      <Td>
-                                        <Link
-                                          onClick={() => {
-                                            setValues(n);
-                                            setFormOpened(true);
-                                          }}>
-                                          <BsPencilSquare
-                                            size={24}
-                                            color={darkFontColor}
-                                          />
-                                        </Link>
-                                      </Td>
-                                      <Td>
-                                        <Link onClick={() => onDeleteNews(n)}>
-                                          <MdDelete
-                                            size={24}
-                                            color={darkFontColor}
-                                          />
-                                        </Link>
-                                      </Td>
-                                    </Tr>
-                                  </li>
-                                )}
-                              </Draggable>
-                            ))}
-                            {provided.placeholder}
-                          </ul>
-                        )}
-                      </Droppable>
-                    </DragDropContext>
-                  </Tbody>
-                )}
-              </Table>
+                h="40px"
+                border="1px"
+                alignItems="center">
+                <Text w="40%" fontWeight="bold" ml="5px">
+                  URL
+                </Text>
+                <Text w="20%" fontWeight="bold">
+                  タイトル
+                </Text>
+                <Text w="20%" fontWeight="bold">
+                  作成日
+                </Text>
+              </Box>
+              {(!isLoading || !updateLoading) && (
+                <DragDropContext onDragEnd={handleDragEnd}>
+                  <Droppable droppableId="items">
+                    {(provided: DroppableProvided) => (
+                      <ul
+                        {...provided.droppableProps}
+                        ref={provided.innerRef}
+                        style={{
+                          listStyleType: 'none',
+                          width: '100%',
+                        }} // スタイル調整用
+                      >
+                        {news?.map((n, i) => (
+                          <Draggable
+                            draggableId={n.id.toString()}
+                            key={n.id}
+                            index={i}>
+                            {(provided: DraggableProvided) => (
+                              <li
+                                ref={provided.innerRef}
+                                {...provided.draggableProps}
+                                {...provided.dragHandleProps}>
+                                <Box
+                                  display="flex"
+                                  flexDir="row"
+                                  w="100%"
+                                  border="1px"
+                                  h="40px"
+                                  alignItems="center">
+                                  <Box w="40%" color="blue" ml="5px">
+                                    <NextLink href={location.href + n.urlPath}>
+                                      <a target="_blank">
+                                        {location.origin + n.urlPath}
+                                      </a>
+                                    </NextLink>
+                                  </Box>
+                                  <Box w="20%">{n.title}</Box>
+                                  <Box w="20%">
+                                    {dateTimeFormatterFromJSDDate({
+                                      dateTime: new Date(n.createdAt),
+                                      format: 'yyyy/LL/dd HH:mm',
+                                    })}
+                                  </Box>
+                                  <Box w="10%">
+                                    <Link
+                                      onClick={() => {
+                                        setValues(n);
+                                        setFormOpened(true);
+                                      }}>
+                                      <BsPencilSquare
+                                        size={24}
+                                        color={darkFontColor}
+                                      />
+                                    </Link>
+                                  </Box>
+                                  <Box w="10%">
+                                    <Link onClick={() => onDeleteNews(n)}>
+                                      <MdDelete
+                                        size={24}
+                                        color={darkFontColor}
+                                      />
+                                    </Link>
+                                  </Box>
+                                </Box>
+                              </li>
+                            )}
+                          </Draggable>
+                        ))}
+                        {provided.placeholder}
+                      </ul>
+                    )}
+                  </Droppable>
+                </DragDropContext>
+              )}
             </Box>
             {(isLoading || updateLoading) && <Spinner />}
           </>
