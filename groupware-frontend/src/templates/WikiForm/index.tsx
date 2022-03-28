@@ -574,6 +574,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
                 justifyContent="space-between"
                 alignItems="center"
                 h="40px"
+                w="350px"
                 mb="8px"
                 px="8px">
                 <Text
