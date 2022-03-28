@@ -30,7 +30,7 @@ import {
 import { FormikErrors, useFormik } from 'formik';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { BsPencilSquare } from 'react-icons/bs';
 import { MdDelete } from 'react-icons/md';
 import { TopNews } from 'src/types';
@@ -39,6 +39,12 @@ import { dateTimeFormatterFromJSDDate } from 'src/utils/dateTimeFormatter';
 import NextLink from 'next/link';
 import dynamic from 'next/dynamic';
 import { topNewsSchema } from 'src/utils/validation/schema';
+import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
+import type {
+  DropResult,
+  DroppableProvided,
+  DraggableProvided,
+} from 'react-beautiful-dnd';
 const ReactPaginate = dynamic(() => import('react-paginate'), { ssr: false });
 
 const NewsAdmin: React.VFC = () => {
@@ -52,8 +58,10 @@ const NewsAdmin: React.VFC = () => {
   const activeTabName = '特集管理';
   const { data, isLoading, refetch } = useAPIGetTopNews({ page });
   const { mutate: createNews } = useAPICreateNews();
-  const { mutate: updateNews } = useAPIUpdateNews();
+  const { mutate: updateNews, isLoading: updateLoading } = useAPIUpdateNews();
   const { mutate: deleteNews } = useAPIDeleteNews();
+  const [news, setNews] = useState(data?.news);
+
   const initialValues: Partial<TopNews> = {
     title: '',
     urlPath: '',
@@ -191,6 +199,43 @@ const NewsAdmin: React.VFC = () => {
     }
   }, [formOpened]);
 
+  const handleDragEnd = useCallback(
+    (result: DropResult) => {
+      if (!result.destination) {
+        return;
+      }
+      if (news) {
+        const newTopics = [...news];
+        if (result.source.index < result.destination.index) {
+          for (let i = result.source.index; i < result.destination.index; i++) {
+            updateNews({ ...news[i + 1], id: news[i].id });
+          }
+        } else {
+          for (let i = result.source.index; i > result.destination.index; i--) {
+            updateNews({ ...news[i - 1], id: news[i].id });
+          }
+        }
+        const [removed] = newTopics.splice(result.source.index, 1);
+        updateNews(
+          { ...removed, id: news[result.destination.index].id },
+          {
+            onSuccess: () => {
+              refetch();
+            },
+          },
+        );
+        newTopics.splice(result.destination.index, 0, removed);
+        setNews(newTopics);
+      }
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [news],
+  );
+
+  useEffect(() => {
+    setNews(data?.news);
+  }, [data]);
+
   return (
     <LayoutWithTab
       sidebar={{ activeScreenName: SidebarScreenName.ADMIN }}
@@ -262,46 +307,80 @@ const NewsAdmin: React.VFC = () => {
                     <Th />
                   </Tr>
                 </Thead>
-                {!isLoading && (
+                {(!isLoading || !updateLoading) && (
                   <Tbody
                     position="relative"
                     borderColor="gray.300"
                     borderWidth={1}>
-                    {data?.news?.map((n) => (
-                      <Tr key={n.id}>
-                        <Td w={'fit-content'} color="blue">
-                          <NextLink href={location.href + n.urlPath}>
-                            <a target="_blank">{location.origin + n.urlPath}</a>
-                          </NextLink>
-                        </Td>
-                        <Td>{n.title}</Td>
-                        <Td>
-                          {dateTimeFormatterFromJSDDate({
-                            dateTime: new Date(n.createdAt),
-                            format: 'yyyy/LL/dd HH:mm',
-                          })}
-                        </Td>
-                        <Td>
-                          <Link
-                            onClick={() => {
-                              setValues(n);
-                              setFormOpened(true);
-                            }}>
-                            <BsPencilSquare size={24} color={darkFontColor} />
-                          </Link>
-                        </Td>
-                        <Td>
-                          <Link onClick={() => onDeleteNews(n)}>
-                            <MdDelete size={24} color={darkFontColor} />
-                          </Link>
-                        </Td>
-                      </Tr>
-                    ))}
+                    <DragDropContext onDragEnd={handleDragEnd}>
+                      <Droppable droppableId="items">
+                        {(provided: DroppableProvided) => (
+                          <ul
+                            {...provided.droppableProps}
+                            ref={provided.innerRef}
+                            style={{ listStyleType: 'none' }} // スタイル調整用
+                          >
+                            {news?.map((n, i) => (
+                              <Draggable
+                                draggableId={n.id.toString()}
+                                key={n.id}
+                                index={i}>
+                                {(provided: DraggableProvided) => (
+                                  <li
+                                    ref={provided.innerRef}
+                                    {...provided.draggableProps}
+                                    {...provided.dragHandleProps}>
+                                    <Tr key={n.id}>
+                                      <Td w={'fit-content'} color="blue">
+                                        <NextLink
+                                          href={location.href + n.urlPath}>
+                                          <a target="_blank">
+                                            {location.origin + n.urlPath}
+                                          </a>
+                                        </NextLink>
+                                      </Td>
+                                      <Td>{n.title}</Td>
+                                      <Td>
+                                        {dateTimeFormatterFromJSDDate({
+                                          dateTime: new Date(n.createdAt),
+                                          format: 'yyyy/LL/dd HH:mm',
+                                        })}
+                                      </Td>
+                                      <Td>
+                                        <Link
+                                          onClick={() => {
+                                            setValues(n);
+                                            setFormOpened(true);
+                                          }}>
+                                          <BsPencilSquare
+                                            size={24}
+                                            color={darkFontColor}
+                                          />
+                                        </Link>
+                                      </Td>
+                                      <Td>
+                                        <Link onClick={() => onDeleteNews(n)}>
+                                          <MdDelete
+                                            size={24}
+                                            color={darkFontColor}
+                                          />
+                                        </Link>
+                                      </Td>
+                                    </Tr>
+                                  </li>
+                                )}
+                              </Draggable>
+                            ))}
+                            {provided.placeholder}
+                          </ul>
+                        )}
+                      </Droppable>
+                    </DragDropContext>
                   </Tbody>
                 )}
               </Table>
             </Box>
-            {isLoading && <Spinner />}
+            {(isLoading || updateLoading) && <Spinner />}
           </>
         )}
       </Box>
