@@ -301,7 +301,8 @@ const NewsAdmin: React.VFC = () => {
                 w="100%"
                 h="40px"
                 border="1px"
-                alignItems="center">
+                alignItems="center"
+                mb="-1px">
                 <Text w="40%" fontWeight="bold" ml="5px">
                   URL
                 </Text>
@@ -340,7 +341,8 @@ const NewsAdmin: React.VFC = () => {
                                   w="100%"
                                   border="1px"
                                   h="40px"
-                                  alignItems="center">
+                                  alignItems="center"
+                                  mb={i + 1 < news.length ? '-1px' : '0px'}>
                                   <Box w="40%" color="blue" ml="5px">
                                     <NextLink href={location.href + n.urlPath}>
                                       <a target="_blank">
