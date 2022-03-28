@@ -205,7 +205,7 @@ const NewsAdmin: React.VFC = () => {
         return;
       }
       if (news) {
-        const newTopics = [...news];
+        const newNews = [...news];
         if (result.source.index < result.destination.index) {
           for (let i = result.source.index; i < result.destination.index; i++) {
             updateNews({ ...news[i + 1], id: news[i].id });
@@ -215,7 +215,7 @@ const NewsAdmin: React.VFC = () => {
             updateNews({ ...news[i - 1], id: news[i].id });
           }
         }
-        const [removed] = newTopics.splice(result.source.index, 1);
+        const [removed] = newNews.splice(result.source.index, 1);
         updateNews(
           { ...removed, id: news[result.destination.index].id },
           {
@@ -224,8 +224,8 @@ const NewsAdmin: React.VFC = () => {
             },
           },
         );
-        newTopics.splice(result.destination.index, 0, removed);
-        setNews(newTopics);
+        newNews.splice(result.destination.index, 0, removed);
+        setNews(newNews);
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
