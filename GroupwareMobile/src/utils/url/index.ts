@@ -27,7 +27,7 @@ export const baseURL =
     ? Config.API_URL
     : !__DEV__
     ? 'https://groupware-development-sgzkfl3uyq-an.a.run.app'
-    : 'http://localhost:9000';
+    : 'https://groupware-development-sgzkfl3uyq-an.a.run.app';
 
 export const markdownEditorURL =
   Config.MARKDOWN_EDITOR_URL || 'http://localhost:8080';
@@ -38,8 +38,8 @@ axiosInstance.defaults.headers.common = jwtJsonHeader;
 
 export const generateClientURL = (path: string) => {
   if (__DEV__) {
-    return 'http://localhost:3000' + path;
+    return 'https://groupware-frontend-sgzkfl3uyq-an.a.run.app' + path;
   } else {
-    return 'https://groupware-frontend-theta.vercel.app' + path;
+    return 'https://groupware-frontend-sgzkfl3uyq-an.a.run.app' + path;
   }
 };
