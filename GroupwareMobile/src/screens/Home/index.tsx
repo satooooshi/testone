@@ -46,7 +46,7 @@ const Home: React.FC = () => {
         Alert.alert('情報の取得に失敗しました');
       }
     } else if (news.urlPath.includes('wiki')) {
-      const id: string = news.urlPath.replace('/wiki/', '');
+      const id: string = news.urlPath.replace('/wiki/detail/', '');
       if (typeof Number(id) === 'number') {
         navigation.navigate('WikiStack', {
           screen: 'WikiDetail',
