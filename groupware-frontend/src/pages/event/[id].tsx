@@ -33,7 +33,7 @@ import { useAPIUpdateEvent } from '@/hooks/api/event/useAPIUpdateEvent';
 import Image from 'next/image';
 import noImage from '@/public/no-image.jpg';
 import { useHeaderTab } from '@/hooks/headerTab/useHeaderTab';
-import { EventType, SubmissionFile, UserRole } from 'src/types';
+import { EventFile, EventType, SubmissionFile, UserRole } from 'src/types';
 import { useAPIDownloadEventCsv } from '@/hooks/api/event/useAPIDownloadEventCsv';
 import { useAPIUploadStorage } from '@/hooks/api/storage/useAPIUploadStorage';
 import { useAPISaveSubmission } from '@/hooks/api/event/useAPISaveSubmission';
@@ -58,14 +58,14 @@ import { fileNameTransformer } from 'src/utils/factory/fileNameTransformer';
 import { isEditableEvent } from 'src/utils/factory/isCreatableEvent';
 
 type FileIconProps = {
-  href: string;
+  file: EventFile;
   submitted?: boolean;
 };
 
-const FileIcon: React.FC<FileIconProps> = ({ href, submitted }) => {
+const FileIcon: React.FC<FileIconProps> = ({ file, submitted }) => {
   return (
     <Link
-      onClick={() => saveAs(href, fileNameTransformer(href))}
+      onClick={() => saveAs(file.url, file.name)}
       display="flex"
       flexDir="column"
       alignItems="center"
@@ -78,7 +78,7 @@ const FileIcon: React.FC<FileIconProps> = ({ href, submitted }) => {
       bg={!submitted ? 'white' : 'lightblue'}>
       <AiOutlineFileProtect className={eventDetailStyles.file_icon} />
       <Text isTruncated={true} w="100%" textAlign="center">
-        {fileNameTransformer(href)}
+        {file.name}
       </Text>
     </Link>
   );
@@ -465,7 +465,7 @@ const EventDetail = () => {
               <Box display="flex" flexDir="row" flexWrap="wrap" mb="16px">
                 {data.files.map((f) => (
                   <Box mr="4px" mb="4px" key={f.id}>
-                    <FileIcon href={f.url} />
+                    <FileIcon file={f} />
                   </Box>
                 ))}
               </Box>

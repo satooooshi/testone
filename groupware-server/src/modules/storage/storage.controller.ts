@@ -55,6 +55,7 @@ export class StorageController {
   @UseInterceptors(FilesInterceptor('files'))
   async upload(@UploadedFiles() files: Express.Multer.File[]) {
     const fileURLs = await this.storageService.upload(files);
+    console.log('fileURLs', fileURLs);
     const signedURLs: string[] = [];
     for (const u of fileURLs) {
       const parsedURL = await this.storageService.parseStorageURLToSignedURL(u);

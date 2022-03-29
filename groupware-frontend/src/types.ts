@@ -267,6 +267,7 @@ export interface SubmissionFile {
 export interface EventFile {
   id: number;
   url: string;
+  name: string;
   eventSchedule?: EventSchedule;
   createdAt: Date;
   updatedAt: Date;

@@ -196,7 +196,12 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
     onDrop: (files: File[]) => {
       uploadFiles(files, {
         onSuccess: (urls: string[]) => {
-          const newFiles: Partial<EventFile>[] = urls.map((u) => ({ url: u }));
+          console.log('files', urls);
+
+          const newFiles: Partial<EventFile>[] = urls.map((u, i) => ({
+            url: u,
+            name: files[i].name,
+          }));
           setNewEvent((e) => ({
             ...e,
             files: [...(e.files || []), ...newFiles],
@@ -699,7 +704,8 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
                     overflowX="auto"
                     w="95%"
                     css={hideScrollbarCss}>
-                    {fileNameTransformer(f.url || '')}
+                    {f.name}
+                    {/* {fileNameTransformer(f.url || '')} */}
                   </Text>
                   <MdCancel
                     className={createEventModalStyle.url_delete_button}
