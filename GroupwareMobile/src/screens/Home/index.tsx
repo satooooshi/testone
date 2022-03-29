@@ -27,6 +27,7 @@ const Home: React.FC = () => {
     data,
     refetch,
     isLoading: loadingNews,
+    isRefetching,
   } = useAPIGetTopNews({
     page: page.toString(),
   });
@@ -77,17 +78,25 @@ const Home: React.FC = () => {
   };
 
   useEffect(() => {
+    setNewsIndex(1);
+    setPage(1);
+    setNewsForScroll([]);
     if (isFocused) {
       refetch();
     }
   }, [refetch, isFocused]);
 
   useEffect(() => {
-    if (data?.news) {
-      setNewsForScroll(data.news);
+    if (!isRefetching && data?.news) {
+      setNewsForScroll(n => {
+        if (data.news.length) {
+          return [...n, ...data.news];
+        }
+        return data.news;
+      });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data?.news]);
+  }, [data?.news, isRefetching]);
 
   return (
     <WholeContainer>
