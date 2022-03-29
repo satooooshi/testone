@@ -12,7 +12,7 @@ import {
 import {useAuthenticate} from '../../contexts/useAuthenticate';
 import {useAPIGetTopNews} from '../../hooks/api/topNews/useAPIGetTopNews';
 import {EventType, TopNews} from '../../types';
-import {useNavigation} from '@react-navigation/native';
+import {useIsFocused, useNavigation} from '@react-navigation/native';
 import {HomeNavigationProps} from '../../types/navigator/drawerScreenProps/home';
 import tailwind from 'tailwind-rn';
 import {ActivityIndicator} from 'react-native-paper';
@@ -23,10 +23,16 @@ const Home: React.FC = () => {
   const {width: windowWidth} = useWindowDimensions();
   const [page, setPage] = useState(1);
   const [newsIndex, setNewsIndex] = useState(1);
-  const {data, isLoading: loadingNews} = useAPIGetTopNews({
+  const {
+    data,
+    refetch,
+    isLoading: loadingNews,
+  } = useAPIGetTopNews({
     page: page.toString(),
   });
   const [newsForScroll, setNewsForScroll] = useState<TopNews[]>([]);
+
+  const isFocused = useIsFocused();
 
   const handleLogout = () => {
     logout();
@@ -71,12 +77,14 @@ const Home: React.FC = () => {
   };
 
   useEffect(() => {
-    if (data?.news?.length) {
-      if (newsForScroll.length) {
-        setNewsForScroll([...newsForScroll, ...data.news]);
-        return;
-      }
-      setNewsForScroll([...data.news]);
+    if (isFocused) {
+      refetch();
+    }
+  }, [refetch, isFocused]);
+
+  useEffect(() => {
+    if (data?.news) {
+      setNewsForScroll(data.news);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data?.news]);
