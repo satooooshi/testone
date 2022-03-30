@@ -54,7 +54,6 @@ import { eventTypeColorFactory } from 'src/utils/factory/eventTypeColorFactory';
 import eventTypeNameFactory from 'src/utils/factory/eventTypeNameFactory';
 import { responseErrorMsgFactory } from 'src/utils/factory/responseErrorMsgFactory';
 import { darkFontColor } from 'src/utils/colors';
-import { fileNameTransformer } from 'src/utils/factory/fileNameTransformer';
 import { isEditableEvent } from 'src/utils/factory/isCreatableEvent';
 
 type FileIconProps = {

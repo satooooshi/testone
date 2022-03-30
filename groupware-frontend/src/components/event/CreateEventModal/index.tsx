@@ -196,8 +196,6 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
     onDrop: (files: File[]) => {
       uploadFiles(files, {
         onSuccess: (urls: string[]) => {
-          console.log('files', urls);
-
           const newFiles: Partial<EventFile>[] = urls.map((u, i) => ({
             url: u,
             name: files[i].name,
