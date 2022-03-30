@@ -7,7 +7,6 @@ import {baseURL} from '../../utils/url';
 const BadgeContext = createContext({
   roomList: {} as ChatGroup[],
   unreadChatCount: 0,
-  setUnreadChatCount: (() => {}) as (count: number) => void,
   refetchRoom: () => {},
 });
 
@@ -28,34 +27,31 @@ export const BadgeProvider: React.FC = ({children}) => {
         for (const room of data.rooms) {
           count += room.unreadCount;
         }
-        console.log('count^^^^^^^^^^^^^^^^^^', count);
         setChatUnreadCount(count);
       },
     },
   );
 
-  useEffect(() => {
-    socket.on('badgeClient', async (status: string) => {
-      console.log(status);
-      if (status !== 'connected') {
-        refetchAllRooms();
-      }
-    });
-  }, []);
+  useEffect(
+    () => {
+      socket.on('badgeClient', async (status: string) => {
+        if (status !== 'connected') {
+          refetchAllRooms();
+        }
+      });
+    }, // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
+  );
 
   const refetchRoom = () => {
     refetchAllRooms();
   };
 
-  const setUnreadChatCount = (count: number) => {
-    setChatUnreadCount(unreadCount => unreadCount + count);
-  };
   return (
     <BadgeContext.Provider
       value={{
         roomList: roomList,
         unreadChatCount: chatUnreadCount,
-        setUnreadChatCount,
         refetchRoom,
       }}>
       {children}
