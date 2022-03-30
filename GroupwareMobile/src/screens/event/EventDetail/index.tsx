@@ -495,9 +495,10 @@ const EventDetail: React.FC = () => {
                 <Div flexDir="row" flexWrap="wrap">
                   {eventInfo?.files?.map(
                     f =>
-                      f.url && (
+                      f.url &&
+                      f.name && (
                         <Div mr={4} mb={4}>
-                          <FileIcon url={f.url} />
+                          <FileIcon name={f.name} url={f.url} />
                         </Div>
                       ),
                   )}
