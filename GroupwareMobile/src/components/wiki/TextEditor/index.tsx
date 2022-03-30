@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useRef, useState} from 'react';
 import {textEditorStyles} from '../../../styles/component/wiki/textEditor.style';
 import {TextFormat} from '../../../types';
 import MarkdownIt from 'markdown-it';
@@ -31,10 +31,11 @@ const TextEditor: React.FC<TextEditorProps> = ({
     }
   };
 
-  //if this code are deleted, editor height breaks for long text in Android
-  useEffect(() => {
-    quillRef?.current?.focus();
-  }, []);
+  // This code would solve the editor's height collapse, but it causes a crash on Android 10.
+  // https://stackoverflow.com/questions/58519749/android-d0-probable-deadlock-detected-due-to-webview-api-being-called-on-incor
+  // useEffect(() => {
+  //   quillRef?.current?.focus();
+  // }, []);
 
   return (
     <>
