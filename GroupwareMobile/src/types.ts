@@ -301,7 +301,7 @@ export interface ChatGroup {
   members?: User[];
   lastReadChatTime?: LastReadChatTime[];
   hasBeenRead?: boolean;
-  unreadCount: number;
+  unreadCount?: number;
   createdAt: Date;
   updatedAt: Date;
 }
