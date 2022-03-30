@@ -32,6 +32,10 @@ export interface GetMessagesQuery {
   page?: string;
   limit?: string;
 }
+export interface GetUnreadMessagesQuery {
+  group: number;
+  lastReadTime: Date;
+}
 
 export interface GetRoomsQuery {
   page?: string;

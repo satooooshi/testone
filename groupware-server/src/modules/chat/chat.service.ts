@@ -14,7 +14,11 @@ import { User } from 'src/entities/user.entity';
 import { userNameFactory } from 'src/utils/factory/userNameFactory';
 import { In, Repository } from 'typeorm';
 import { StorageService } from '../storage/storage.service';
-import { GetMessagesQuery, GetRoomsResult } from './chat.controller';
+import {
+  GetMessagesQuery,
+  GetRoomsResult,
+  GetUnreadMessagesQuery,
+} from './chat.controller';
 
 @Injectable()
 export class ChatService {
@@ -102,18 +106,30 @@ export class ChatService {
       .take(Number(limit))
       .orderBy('chat_groups.updatedAt', 'DESC')
       .getManyAndCount();
-    let rooms = urlUnparsedRooms.map((g) => {
-      const isPinned = !!g.pinnedUsers.length;
-      const hasBeenRead = g?.lastReadChatTime?.[0]?.readTime
-        ? g?.lastReadChatTime?.[0]?.readTime > g.updatedAt
-        : false;
-      return {
-        ...g,
-        pinnedUsers: undefined,
-        isPinned,
-        hasBeenRead,
-      };
-    });
+    let rooms = await Promise.all(
+      urlUnparsedRooms.map(async (g) => {
+        let unreadCount = 0;
+        const isPinned = !!g.pinnedUsers.length;
+        const hasBeenRead = g?.lastReadChatTime?.[0]?.readTime
+          ? g?.lastReadChatTime?.[0]?.readTime > g.updatedAt
+          : false;
+        if (!hasBeenRead && g?.lastReadChatTime?.[0]?.readTime) {
+          const query = {
+            group: g.id,
+            lastReadTime: g.lastReadChatTime?.[0].readTime,
+          };
+          unreadCount = await this.getUnreadChatMessage(userID, query);
+        }
+
+        return {
+          ...g,
+          pinnedUsers: undefined,
+          isPinned,
+          hasBeenRead,
+          unreadCount,
+        };
+      }),
+    );
     rooms = orderBy(rooms, [
       'isPinned',
       'updatedAt',
@@ -163,6 +179,29 @@ export class ChatService {
       return m;
     });
     return messages;
+  }
+
+  public async getUnreadChatMessage(
+    userID: number,
+    query: GetUnreadMessagesQuery,
+  ): Promise<number> {
+    const unreadCount = await this.chatMessageRepository
+      .createQueryBuilder('chat_messages')
+      .withDeleted()
+      .leftJoin('chat_messages.chatGroup', 'chat_group')
+      .leftJoinAndSelect(
+        'chat_messages.replyParentMessage',
+        'replyParentMessage',
+      )
+      .leftJoinAndSelect('replyParentMessage.sender', 'reply_sender')
+      .where('chat_group.id = :chatGroupID', { chatGroupID: query.group })
+      .andWhere('chat_messages.createdAt > :lastReadTime', {
+        lastReadTime: query.lastReadTime,
+      })
+      .orderBy('chat_messages.createdAt', 'DESC')
+      .withDeleted()
+      .getCount();
+    return unreadCount;
   }
 
   public async getMenthionedChatMessage(user: User): Promise<ChatMessage[]> {
