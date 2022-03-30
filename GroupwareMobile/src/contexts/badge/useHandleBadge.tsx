@@ -26,9 +26,7 @@ export const BadgeProvider: React.FC = ({children}) => {
         setRoomList(data.rooms);
         let count = 0;
         for (const room of data.rooms) {
-          if (!room.hasBeenRead) {
-            count++;
-          }
+          count += room.unreadCount;
         }
         console.log('count^^^^^^^^^^^^^^^^^^', count);
         setChatUnreadCount(count);

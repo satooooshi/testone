@@ -45,6 +45,7 @@ import WikiLinks from '../../screens/wiki/WikiLinks';
 import {useHandleBadge} from '../../contexts/badge/useHandleBadge';
 import {useIsTabBarVisible} from '../../contexts/bottomTab/useIsTabBarVisible';
 import EditedProfile from '../../screens/admin/EditedProfile';
+import IconBadge from 'react-native-icon-badge';
 
 const Tab = createBottomTabNavigator();
 // const Tab = createMaterialBottomTabNavigator();
@@ -349,14 +350,29 @@ const BottomTab = () => {
           tabBarIcon: ({color}) => (
             <>
               {unreadChatCount > 0 ? (
-                <Badge bg="red500" right={-5} top={-5} h={10} w={10}>
-                  <Icon
-                    name="ios-chatbubble-ellipses"
-                    fontFamily="Ionicons"
-                    color={color}
-                    fontSize={23}
-                  />
-                </Badge>
+                <IconBadge
+                  MainElement={
+                    <Icon
+                      name="ios-chatbubble-ellipses"
+                      fontFamily="Ionicons"
+                      color={color}
+                      fontSize={23}
+                    />
+                  }
+                  BadgeElement={
+                    <Text color="white" fontSize={10}>
+                      {unreadChatCount}
+                    </Text>
+                  }
+                  IconBadgeStyle={{
+                    marginTop: -10,
+                    marginRight: -10,
+                    minWidth: 18,
+                    width: 18,
+                    height: 18,
+                    backgroundColor: 'red',
+                  }}
+                />
               ) : (
                 <Icon
                   name="ios-chatbubble-ellipses"
@@ -365,14 +381,6 @@ const BottomTab = () => {
                   fontSize={23}
                 />
               )}
-              {/* <Badge bg="red500" right={-5} top={-5} h={10} w={10}>
-                <Icon
-                  name="ios-chatbubble-ellipses"
-                  fontFamily="Ionicons"
-                  color={color}
-                  fontSize={23}
-                />
-              </Badge> */}
             </>
           ),
         }}
