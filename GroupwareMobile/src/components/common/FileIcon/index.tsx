@@ -9,7 +9,6 @@ import {Icon, Text} from 'react-native-magnus';
 import {fileIconStyles} from '../../../styles/component/common/fileIcon.style';
 import FileViewer from 'react-native-file-viewer';
 import RNFetchBlob from 'rn-fetch-blob';
-import {fileNameTransformer} from '../../../utils/factory/fileNameTransformer';
 const {fs, config} = RNFetchBlob;
 
 type FileIconProps = {
