@@ -47,6 +47,7 @@ import { fileNameTransformer } from 'src/utils/factory/fileNameTransformer';
 import { saveAs } from 'file-saver';
 import { EntryComponentProps } from '@draft-js-plugins/mention/lib/MentionSuggestions/Entry/Entry';
 import suggestionStyles from '@/styles/components/Suggestion.module.scss';
+import { useHandleBadge } from 'src/contexts/badge/useHandleBadge';
 
 export const Entry: React.FC<EntryComponentProps> = ({
   mention,
@@ -133,7 +134,11 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
       }))
       .reverse();
   }, [messages]);
-  const { mutate: saveLastReadChatTime } = useAPISaveLastReadChatTime();
+  const { mutate: saveLastReadChatTime } = useAPISaveLastReadChatTime({
+    onSuccess: () => {
+      refetchRoom();
+    },
+  });
   const [selectedImageURL, setSelectedImageURL] = useState<string>();
   const { data: lastReadChatTime } = useAPIGetLastReadChatTime(room.id, {
     refetchInterval: 1000,
@@ -253,6 +258,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
   const [editorState, setEditorState] = useState(EditorState.createEmpty());
   const messageWrapperDivRef = useRef<HTMLDivElement | null>(null);
   const editorRef = useRef<Editor>(null);
+  const { refetchRoom } = useHandleBadge();
   const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
   const {
     getRootProps: noClickRootDropzone,
