@@ -51,6 +51,12 @@ export interface SearchMessageQuery {
   limit?: string;
 }
 
+export interface SearchMessageQuery {
+  group: number;
+  word: string;
+  limit?: string;
+}
+
 export interface GetRoomsQuery {
   page?: string;
 }
