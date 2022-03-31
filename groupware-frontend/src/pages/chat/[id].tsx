@@ -22,6 +22,7 @@ import {
 } from 'src/contexts/chat/useRoomRefetch';
 import { useAPIGetRoomDetail } from '@/hooks/api/chat/useAPIGetRoomDetail';
 import { useAPISaveChatGroup } from '@/hooks/api/chat/useAPISaveChatGroup';
+import { useAPIDeleteChatRoom } from '@/hooks/api/chat/useAPIDeleteChatRoom';
 
 const ChatDetail = () => {
   const router = useRouter();
@@ -65,6 +66,8 @@ const ChatDetail = () => {
       router.push('/chat');
     },
   });
+
+  const { mutate: deleteChatGroup } = useAPIDeleteChatRoom();
 
   const { mutate: createGroup } = useAPISaveChatGroup({
     onSuccess: (createdData) => {
@@ -116,7 +119,7 @@ const ChatDetail = () => {
     }
     if (menuValue === 'deleteRoom') {
       if (confirm('このルームを解散してよろしいですか？')) {
-        leaveChatGroup(
+        deleteChatGroup(
           { id: Number(id) },
           {
             onSuccess: () => router.push('/chat', undefined, { shallow: true }),
