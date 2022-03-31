@@ -2,11 +2,11 @@ import { AxiosError } from 'axios';
 import { useMutation, UseMutationOptions } from 'react-query';
 import { ChatGroup } from 'src/types';
 import { axiosInstance } from 'src/utils/url';
-import { leaveChatRoomURL } from 'src/utils/url/chat.url';
+import { deleteChatRoomURL } from 'src/utils/url/chat.url';
 import { jsonHeader } from 'src/utils/url/header';
 
 const deleteChatGroup = async (chatGroup: Partial<ChatGroup>) => {
-  const response = await axiosInstance.post(leaveChatRoomURL, chatGroup, {
+  const response = await axiosInstance.post(deleteChatRoomURL, chatGroup, {
     headers: jsonHeader,
   });
   return response.data;
