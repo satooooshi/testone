@@ -168,6 +168,7 @@ export class ChatController {
       ...(chatGroup?.members?.filter((u) => u.id !== user.id) || []),
       user,
     ];
+    chatGroup.owner = chatGroup?.members?.filter((u) => u.id === user.id) || [];
     const savedGroup = await this.chatService.v2SaveChatGroup(chatGroup);
     return savedGroup;
   }

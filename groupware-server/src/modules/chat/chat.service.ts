@@ -446,7 +446,9 @@ export class ChatService {
       throw new InternalServerErrorException('Something went wrong');
     }
     const userIds = newData.members.map((u) => u.id);
+    const ownerIds = newData.owner.map((u) => u.id);
     const users = await this.userRepository.findByIds(userIds);
+    const owners = await this.userRepository.findByIds(ownerIds);
     const maybeExistGroup = await this.chatGroupRepository
       .createQueryBuilder('g')
       .leftJoinAndSelect('g.members', 'u')
@@ -467,6 +469,7 @@ export class ChatService {
       return existGroup[0];
     }
     newData.members = users;
+    newData.owner = owners;
 
     const newGroup = await this.chatGroupRepository.save(
       this.chatGroupRepository.create(newData),
@@ -506,7 +509,7 @@ export class ChatService {
 
   public async getRoomDetail(roomId: number) {
     const existRoom = await this.chatGroupRepository.findOne(roomId, {
-      relations: ['members'],
+      relations: ['members', 'owner'],
     });
     return existRoom;
   }
