@@ -109,8 +109,6 @@ const EditChatGroupMembersModal: React.FC<EditChatGroupMambersModalProps> = ({
 
   useEffect(() => {
     const userList = category === 'メンバー' ? users : room?.members;
-    console.log('member', category, userList);
-
     if (!searchWords) {
       setModalUsers(userList);
       return;
