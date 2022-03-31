@@ -59,6 +59,7 @@ const Chat = () => {
           }
         }}
         isTalkRoom={isTalkRoom}
+        category="メンバー"
       />
 
       <CreateChatGroupModal

@@ -122,8 +122,6 @@ type ChatBoxProps = {
 };
 
 const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
-  console.log('------------------------------', room.owner);
-
   const { needRefetch } = useRoomRefetch();
   const { user } = useAuthenticate();
   const [visibleAlbumModal, setVisibleAlbumModal] = useState(false);
@@ -525,8 +523,6 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
       top: topOffset,
     });
   }, []);
-
-  console.log('^^^^^^^^^^^', room.owner.length);
 
   return (
     <Box

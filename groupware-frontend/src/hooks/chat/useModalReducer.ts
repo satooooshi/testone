@@ -1,12 +1,13 @@
 import { useReducer } from 'react';
 
-export type MenuValue = 'editGroup' | 'editMembers';
+export type MenuValue = 'editGroup' | 'editMembers' | 'editOwners';
 
 type ModalState = {
   editChatGroupModalVisible: boolean;
   createGroupWindow: boolean;
   selectChatGroupWindow: boolean;
   editMembersModalVisible: boolean;
+  editOwnersModalVisible: boolean;
   modalSelectRoomTypeVisible: boolean;
 };
 
@@ -27,6 +28,10 @@ type ModalAction =
       type: 'editMembersModalVisible';
       value: boolean;
     }
+  | {
+      type: 'editOwnersModalVisible';
+      value: boolean;
+    }
   | { type: 'modalSelectRoomTypeVisible'; value: boolean }
   | {
       type: 'handleMenuSelected';
@@ -38,6 +43,7 @@ const modalInitialValue: ModalState = {
   createGroupWindow: false,
   selectChatGroupWindow: false,
   editMembersModalVisible: false,
+  editOwnersModalVisible: false,
   modalSelectRoomTypeVisible: false,
 };
 
@@ -65,6 +71,12 @@ const modalReducer = (state: ModalState, action: ModalAction): ModalState => {
       return {
         ...state,
         editMembersModalVisible: action.value,
+      };
+    }
+    case 'editOwnersModalVisible': {
+      return {
+        ...state,
+        editOwnersModalVisible: action.value,
       };
     }
     case 'handleMenuSelected': {

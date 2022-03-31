@@ -187,6 +187,7 @@ const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
               setNewGroup((g) => ({ ...g, members: selected }));
               setMembersModal(false);
             }}
+            category="メンバー"
           />
           <Box overflowY="auto" css={hideScrollbarCss}>
             {selectImageUrl ? (
