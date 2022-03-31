@@ -80,6 +80,7 @@ export class ChatService {
       .createQueryBuilder('chat_groups')
       .leftJoinAndSelect('chat_groups.members', 'members')
       .leftJoin('chat_groups.members', 'member')
+      .leftJoinAndSelect('chat_groups.owner', 'owner')
       .leftJoinAndSelect(
         'chat_groups.pinnedUsers',
         'pinnedUsers',

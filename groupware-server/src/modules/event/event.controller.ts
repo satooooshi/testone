@@ -28,7 +28,10 @@ import { GetEventDetailResopnse } from './eventDetail.type';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { NotificationService } from '../notification/notification.service';
 import { ConfigService } from '@nestjs/config';
-import { CustomPushNotificationData, sendPushNotifToSpecificUsers } from 'src/utils/notification/sendPushNotification';
+import {
+  CustomPushNotificationData,
+  sendPushNotifToSpecificUsers,
+} from 'src/utils/notification/sendPushNotification';
 
 export interface QueryToGetZipSubmission {
   id: string;
