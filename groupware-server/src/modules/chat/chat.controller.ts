@@ -215,6 +215,13 @@ export class ChatController {
     await this.chatService.leaveChatRoom(id, chatGroupId);
   }
 
+  @Post('delete-room')
+  @UseGuards(JwtAuthenticationGuard)
+  async deleteGroup(@Body() chatGroup: Partial<ChatGroup>) {
+    const { id: chatGroupId } = chatGroup;
+    await this.chatService.deleteChatRoom(chatGroupId);
+  }
+
   @Delete('/v2/reaction/:reactionId')
   @UseGuards(JwtAuthenticationGuard)
   async deleteReaction(

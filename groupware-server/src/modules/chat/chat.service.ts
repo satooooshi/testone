@@ -292,6 +292,14 @@ export class ChatService {
       .add(userID);
   }
 
+  async deleteChatRoom(chatGroupID: number) {
+    const targetGroup = await this.chatGroupRepository.findOne(chatGroupID);
+    if (!targetGroup) {
+      throw new BadRequestException('The chat room has already been deleted.');
+    }
+    await this.chatGroupRepository.delete(chatGroupID);
+  }
+
   public async leaveChatRoom(userID: number, chatGroupID: number) {
     const containMembers: ChatGroup = await this.chatGroupRepository.findOne({
       where: { id: chatGroupID },
