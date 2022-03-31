@@ -434,6 +434,52 @@ const WikiCardList: React.FC<WikiCardListProps> = ({
               }}
             />
             <TopTab.Screen
+              name={'WikiList-' + BoardCategory.SELF_IMPROVEMENT}
+              children={() => (
+                <RenderWikiCardList
+                  focused={isFocused}
+                  setRuleCategory={setRuleCategory}
+                  setBoardCategory={setBoardCategory}
+                  ruleCategory={undefined}
+                  boardCategory={BoardCategory.SELF_IMPROVEMENT}
+                  word={word}
+                  tag={tag}
+                  type={type}
+                />
+              )}
+              options={{
+                title: wikiTypeNameFactory(
+                  WikiType.BOARD,
+                  undefined,
+                  true,
+                  BoardCategory.SELF_IMPROVEMENT,
+                ),
+              }}
+            />
+            <TopTab.Screen
+              name={'WikiList-' + BoardCategory.PERSONAL_ANNOUNCEMENT}
+              children={() => (
+                <RenderWikiCardList
+                  focused={isFocused}
+                  setRuleCategory={setRuleCategory}
+                  setBoardCategory={setBoardCategory}
+                  ruleCategory={undefined}
+                  boardCategory={BoardCategory.PERSONAL_ANNOUNCEMENT}
+                  word={word}
+                  tag={tag}
+                  type={type}
+                />
+              )}
+              options={{
+                title: wikiTypeNameFactory(
+                  WikiType.BOARD,
+                  undefined,
+                  true,
+                  BoardCategory.PERSONAL_ANNOUNCEMENT,
+                ),
+              }}
+            />
+            <TopTab.Screen
               name={'WikiList-' + BoardCategory.CELEBRATION}
               children={() => (
                 <RenderWikiCardList

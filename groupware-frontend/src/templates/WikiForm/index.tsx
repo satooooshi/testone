@@ -196,6 +196,8 @@ const WikiForm: React.FC<WikiFormProps> = ({
       e.target.value === BoardCategory.IMPRESSIVE_UNIVERSITY ||
       e.target.value === BoardCategory.CLUB ||
       e.target.value === BoardCategory.STUDY_MEETING ||
+      e.target.value === BoardCategory.SELF_IMPROVEMENT ||
+      e.target.value === BoardCategory.PERSONAL_ANNOUNCEMENT ||
       e.target.value === BoardCategory.CELEBRATION ||
       e.target.value === BoardCategory.OTHER
     ) {
@@ -427,6 +429,34 @@ const WikiForm: React.FC<WikiFormProps> = ({
                       undefined,
                       true,
                       BoardCategory.STUDY_MEETING,
+                    )}
+                  </option>
+                ) : null}
+                {isCreatableWiki({
+                  type: WikiType.BOARD,
+                  boardCategory: BoardCategory.SELF_IMPROVEMENT,
+                  userRole: user?.role,
+                }) ? (
+                  <option value={BoardCategory.SELF_IMPROVEMENT}>
+                    {wikiTypeNameFactory(
+                      WikiType.BOARD,
+                      undefined,
+                      true,
+                      BoardCategory.SELF_IMPROVEMENT,
+                    )}
+                  </option>
+                ) : null}
+                {isCreatableWiki({
+                  type: WikiType.BOARD,
+                  boardCategory: BoardCategory.PERSONAL_ANNOUNCEMENT,
+                  userRole: user?.role,
+                }) ? (
+                  <option value={BoardCategory.PERSONAL_ANNOUNCEMENT}>
+                    {wikiTypeNameFactory(
+                      WikiType.BOARD,
+                      undefined,
+                      true,
+                      BoardCategory.PERSONAL_ANNOUNCEMENT,
                     )}
                   </option>
                 ) : null}

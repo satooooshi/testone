@@ -84,6 +84,10 @@ export enum BoardCategory {
   CLUB = 'club',
   //勉強会
   STUDY_MEETING = 'study_meeting',
+  //自己研鑽
+  SELF_IMPROVEMENT = 'self_improvement',
+  //個人告知
+  PERSONAL_ANNOUNCEMENT = 'personal_announcement',
   //お祝い事
   CELEBRATION = 'celebration',
   //その他
