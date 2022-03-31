@@ -33,7 +33,12 @@ const ChatDetail = () => {
   const [selectedMembers, setSelectedMembers] = useState<User[]>();
 
   const [
-    { editChatGroupModalVisible, editMembersModalVisible, createGroupWindow },
+    {
+      editChatGroupModalVisible,
+      editMembersModalVisible,
+      editOwnersModalVisible,
+      createGroupWindow,
+    },
     dispatchModal,
   ] = useModalReducer();
   const { mutate: updateGroup } = useAPIUpdateChatGroup();
@@ -84,6 +89,13 @@ const ChatDetail = () => {
       });
       return;
     }
+    if (menuValue === 'editOwners') {
+      dispatchModal({
+        type: 'editOwnersModalVisible',
+        value: true,
+      });
+      return;
+    }
     if (menuValue === 'editGroup') {
       dispatchModal({
         type: 'editChatGroupModalVisible',
@@ -93,6 +105,17 @@ const ChatDetail = () => {
     }
     if (menuValue === 'leaveRoom') {
       if (confirm('このルームを退室してよろしいですか？')) {
+        leaveChatGroup(
+          { id: Number(id) },
+          {
+            onSuccess: () => router.push('/chat', undefined, { shallow: true }),
+          },
+        );
+      }
+      return;
+    }
+    if (menuValue === 'deleteRoom') {
+      if (confirm('このルームを解散してよろしいですか？')) {
         leaveChatGroup(
           { id: Number(id) },
           {
@@ -132,6 +155,7 @@ const ChatDetail = () => {
             }
           }}
           isTalkRoom={isTalkRoom}
+          category="メンバー"
         />
 
         <CreateChatGroupModal
@@ -201,6 +225,52 @@ const ChatDetail = () => {
                   value: false,
                 })
               }
+              category="メンバー"
+            />
+            <EditChatGroupMembersModal
+              isOpen={editOwnersModalVisible}
+              room={currentRoom}
+              onComplete={(selectedUsersInModal) => {
+                updateGroup(
+                  {
+                    ...currentRoom,
+                    owner: selectedUsersInModal,
+                  },
+                  {
+                    onSuccess: (newGroupInfo) => {
+                      dispatchModal({
+                        type: 'editOwnersModalVisible',
+                        value: false,
+                      });
+                      toast({
+                        title: `オーナーを更新しました`,
+                        status: 'success',
+                        duration: 3000,
+                        isClosable: true,
+                      });
+                      setCurrentRoom({
+                        ...newGroupInfo,
+                        owner: selectedUsersInModal,
+                      });
+                    },
+                    onError: () => {
+                      toast({
+                        title: `エラーが発生しました`,
+                        status: 'error',
+                        duration: 3000,
+                        isClosable: true,
+                      });
+                    },
+                  },
+                );
+              }}
+              onClose={() =>
+                dispatchModal({
+                  type: 'editOwnersModalVisible',
+                  value: false,
+                })
+              }
+              category="オーナー"
             />
           </>
         ) : null}
