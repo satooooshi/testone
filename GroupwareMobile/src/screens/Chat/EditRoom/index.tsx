@@ -25,7 +25,7 @@ const EditRoom: React.FC = () => {
     },
   });
   const {mutate: uploadImage} = useAPIUploadStorage();
-  const {data: users} = useAPIGetUsers('');
+  const {data: users} = useAPIGetUsers('ALL');
   const headerTitle = 'ルーム編集';
   const {mutate: updateGroup} = useAPIUpdateChatGroup({
     onSuccess: () => {

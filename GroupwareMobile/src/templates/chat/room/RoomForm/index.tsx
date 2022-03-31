@@ -14,6 +14,7 @@ import {
 import UserModal from '../../../../components/common/UserModal';
 import HeaderWithTextButton from '../../../../components/Header';
 import WholeContainer from '../../../../components/WholeContainer';
+import {useAuthenticate} from '../../../../contexts/useAuthenticate';
 import {useUserRole} from '../../../../hooks/user/useUserRole';
 import {newRoomStyles} from '../../../../styles/screen/chat/newRoom.style';
 import {ChatGroup, User} from '../../../../types';
@@ -41,8 +42,10 @@ const RoomForm: React.FC<RoomFormProps> = ({
   onSubmit,
   onUploadImage,
 }) => {
+  const {user: myProfile} = useAuthenticate();
   const {width: windowWidth} = useWindowDimensions();
   const [visibleUserModal, setVisibleUserModal] = useState(false);
+  const [visibleOwnerModal, setVisibleOwnerModal] = useState(false);
   const initialValues: Partial<ChatGroup> = {
     name: '',
     imageURL: '',
@@ -78,12 +81,31 @@ const RoomForm: React.FC<RoomFormProps> = ({
     <WholeContainer>
       <UserModal
         isVisible={visibleUserModal}
-        users={filteredUsers || []}
+        users={filteredUsers?.filter(u => u.id !== myProfile?.id) || []}
         onCloseModal={() => setVisibleUserModal(false)}
         selectedUserRole={selectedUserRole}
         defaultSelectedUsers={values.members}
         onCompleteModal={selectedUsers =>
           setValues(v => ({...v, members: selectedUsers}))
+        }
+      />
+      <UserModal
+        isVisible={visibleOwnerModal}
+        users={
+          filteredUsers?.filter(u => {
+            const member = values.members?.filter(m => {
+              return m.id === u.id;
+            });
+            if (member?.length) {
+              return member;
+            }
+          }) || []
+        }
+        onCloseModal={() => setVisibleOwnerModal(false)}
+        selectedUserRole={selectedUserRole}
+        defaultSelectedUsers={values.owner}
+        onCompleteModal={selectedUsers =>
+          setValues(v => ({...v, owner: selectedUsers}))
         }
       />
       <HeaderWithTextButton enableBackButton={true} title={headerTitle} />
@@ -158,6 +180,36 @@ const RoomForm: React.FC<RoomFormProps> = ({
             </TagButton>
           ))}
         </Div>
+        {values?.owner?.length === 0 ||
+        (myProfile?.id &&
+          values?.owner?.filter(u => {
+            return u.id === myProfile?.id;
+          }).length) ? (
+          <>
+            <Div mb="lg">
+              <Button
+                w={'100%'}
+                mb="lg"
+                onPress={() => setVisibleOwnerModal(true)}
+                bg="pink600"
+                fontWeight="bold">
+                オーナーを編集
+              </Button>
+            </Div>
+            <Div flexDir="row" flexWrap="wrap" mb={'lg'}>
+              {values.owner?.map(u => (
+                <TagButton
+                  key={u.id}
+                  mr={4}
+                  mb={8}
+                  color="white"
+                  bg={'purple800'}>
+                  {userNameFactory(u)}
+                </TagButton>
+              ))}
+            </Div>
+          </>
+        ) : null}
       </ScrollDiv>
     </WholeContainer>
   );
