@@ -122,6 +122,8 @@ type ChatBoxProps = {
 };
 
 const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
+  console.log('------------------------------', room.owner);
+
   const { needRefetch } = useRoomRefetch();
   const { user } = useAuthenticate();
   const [visibleAlbumModal, setVisibleAlbumModal] = useState(false);
@@ -524,6 +526,8 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
     });
   }, []);
 
+  console.log('^^^^^^^^^^^', room.owner.length);
+
   return (
     <Box
       {...noClickRootDropzone()}
@@ -626,7 +630,20 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
             transition>
             <MenuItem value={'editGroup'}>ルームの情報を編集</MenuItem>
             <MenuItem value={'editMembers'}>メンバーを編集</MenuItem>
+            {room.owner.length === 0 ||
+            (user?.id &&
+              room.owner.filter((u) => {
+                return u.id === user?.id;
+              }).length) ? (
+              <MenuItem value={'editOwners'}>オーナーを編集</MenuItem>
+            ) : null}
             <MenuItem value={'leaveRoom'}>ルームを退室</MenuItem>
+            {user?.id &&
+            room.owner.filter((u) => {
+              return u.id === user?.id;
+            }).length ? (
+              <MenuItem value={'deleteRoom'}>ルームを解散</MenuItem>
+            ) : null}
           </Menu>
         </Box>
       </Box>
