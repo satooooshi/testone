@@ -5,6 +5,8 @@ import {Icon} from 'react-native-magnus';
 import ChatMenuRow from '../../../components/chat/ChatMenuRow';
 import HeaderWithTextButton from '../../../components/Header';
 import WholeContainer from '../../../components/WholeContainer';
+import {useAuthenticate} from '../../../contexts/useAuthenticate';
+import {useAPIDeleteChatRoom} from '../../../hooks/api/chat/useAPIDeleteChatRoom';
 import {useAPILeaveChatRoom} from '../../../hooks/api/chat/useAPILeaveChatRoomURL';
 import {
   ChatMenuNavigationProps,
@@ -12,6 +14,7 @@ import {
 } from '../../../types/navigator/drawerScreenProps';
 
 const ChatMenu: React.FC = () => {
+  const {user: myProfile} = useAuthenticate();
   const route = useRoute<ChatMenuRouteProps>();
   const navigation = useNavigation<ChatMenuNavigationProps>();
   const {room} = route.params;
@@ -24,6 +27,18 @@ const ChatMenu: React.FC = () => {
     onError: () => {
       Alert.alert(
         '退室中にエラーが発生しました。\n時間をおいて再実行してください。',
+      );
+    },
+  });
+  const {mutate: deleteChatGroup} = useAPIDeleteChatRoom({
+    onSuccess: () => {
+      navigation.navigate('ChatStack', {
+        screen: 'RoomList',
+      });
+    },
+    onError: () => {
+      Alert.alert(
+        '削除中にエラーが発生しました。\n時間をおいて再実行してください。',
       );
     },
   });
@@ -96,6 +111,30 @@ const ChatMenu: React.FC = () => {
           ])
         }
       />
+      {myProfile?.id &&
+      room?.owner?.filter(u => {
+        return u.id === myProfile?.id;
+      }).length ? (
+        <ChatMenuRow
+          name="解散"
+          icon={<Icon name="delete" fontSize={20} mr={'lg'} color="black" />}
+          onPress={() =>
+            Alert.alert('ルームを解散してよろしいですか？', undefined, [
+              {
+                text: 'キャンセル',
+                style: 'cancel',
+              },
+              {
+                text: '解散する',
+                style: 'destructive',
+                onPress: () => {
+                  deleteChatGroup(room);
+                },
+              },
+            ])
+          }
+        />
+      ) : null}
     </WholeContainer>
   );
 };

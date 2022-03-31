@@ -35,7 +35,7 @@ const EditRoom: React.FC = () => {
           onPress: () => {
             navigation.navigate('ChatStack', {
               screen: 'ChatMenu',
-              params: {room},
+              params: {room: room},
             });
           },
         },
