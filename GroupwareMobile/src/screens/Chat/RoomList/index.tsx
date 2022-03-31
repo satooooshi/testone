@@ -113,8 +113,6 @@ const RoomList: React.FC = () => {
 
   useFocusEffect(
     useCallback(() => {
-      console.log('========================= refetch');
-
       refetchAllRooms();
     }, [refetchAllRooms]),
   );
