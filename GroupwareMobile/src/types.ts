@@ -300,10 +300,17 @@ export interface ChatMessage {
   replyParentMessage?: ChatMessage | null;
 }
 
+export enum RoomType {
+  GROUP = 'group',
+  TALK_ROOM = 'talk_room',
+  PERSONAL = 'personal',
+}
+
 export interface ChatGroup {
   id: number;
   name: string;
   imageURL: string;
+  roomType: RoomType;
   pinnedUsers?: User[];
   isPinned?: boolean;
   chatNotes?: ChatNote[];
