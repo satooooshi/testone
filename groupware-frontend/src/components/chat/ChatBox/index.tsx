@@ -271,7 +271,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
       let parsedMessage = newChatMessage.content;
       for (const m of mentionedUserData) {
         const regexp = new RegExp(`\\s${m.name}|^${m.name}`, 'g');
-        parsedMessage = parsedMessage.replace(regexp, `@[${m.name}](${m.id})`);
+        parsedMessage = parsedMessage.replace(regexp, `@${m.name}`);
       }
       sendChatMessage({
         ...newChatMessage,
@@ -790,7 +790,6 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
           ref={editorRef}
         />
         <div className={suggestionStyles.suggestion_wrapper}>
-          <Text>@all</Text>
           <MentionSuggestions
             open={mentionOpened}
             onOpenChange={onSuggestionOpenChange}
