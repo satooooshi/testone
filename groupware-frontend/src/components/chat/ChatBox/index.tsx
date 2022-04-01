@@ -10,7 +10,7 @@ import {
   InputRightElement,
 } from '@chakra-ui/react';
 import { MentionData } from '@draft-js-plugins/mention';
-import { darkFontColor } from 'src/utils/colors';
+import { blueColor, darkFontColor } from 'src/utils/colors';
 import { Menu, MenuItem, MenuButton } from '@szhsin/react-menu';
 import { HiOutlineDotsCircleHorizontal } from 'react-icons/hi';
 import Editor from '@draft-js-plugins/editor';
@@ -826,7 +826,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
           <IoSend
             size={20}
             onClick={() => handleSubmit()}
-            color={newChatMessage.content ? 'blue.500' : darkFontColor}
+            color={newChatMessage.content ? blueColor : darkFontColor}
           />
         )}
       </Link>
