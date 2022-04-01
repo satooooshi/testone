@@ -147,21 +147,7 @@ const EventDetail = () => {
     },
   });
   const { mutate: uploadStorage, isLoading: loadingUplaod } =
-    useAPIUploadStorage({
-      onSuccess: (urls) => {
-        const filesNotSubmitted: Partial<SubmissionFile>[] = [];
-        for (const url of urls) {
-          const submitFileObj = {
-            url: url,
-            eventSchedule: data,
-            userSubmitted: user,
-            submitUnFinished: true,
-          };
-          filesNotSubmitted.push(submitFileObj);
-        }
-        setSubmitFiles((files) => [...files, ...filesNotSubmitted]);
-      },
-    });
+    useAPIUploadStorage();
 
   const { mutate: joinEvent } = useAPIJoinEvent({
     onSuccess: () => refetch(),
@@ -610,7 +596,22 @@ const EventDetail = () => {
                         );
                         fileArr.push(renamedFile);
                       }
-                      uploadStorage(fileArr);
+                      uploadStorage(fileArr, {
+                        onSuccess: (urls) => {
+                          const filesNotSubmitted: Partial<SubmissionFile>[] =
+                            urls.map((u, i) => ({
+                              url: u,
+                              name: fileArr[i].name,
+                              eventSchedule: data,
+                              userSubmitted: user,
+                              submitUnFinished: true,
+                            }));
+                          setSubmitFiles((files) => [
+                            ...files,
+                            ...filesNotSubmitted,
+                          ]);
+                        },
+                      });
                     }}
                   />
                 </Box>
@@ -618,13 +619,15 @@ const EventDetail = () => {
                   <Box display="flex" flexDir="row" flexWrap="wrap" mb="16px">
                     {submitFiles.map((f) =>
                       f.url && f.name ? (
-                        <Box key={f.url} mb="4px" mr="4px">
-                          <FileIcon
-                            url={f.url}
-                            name={f.name}
-                            submitted={f.submitUnFinished}
-                          />
-                        </Box>
+                        <>
+                          <Box key={f.url} mb="4px" mr="4px">
+                            <FileIcon
+                              url={f.url}
+                              name={f.name}
+                              submitted={f.submitUnFinished}
+                            />
+                          </Box>
+                        </>
                       ) : null,
                     )}
                   </Box>
