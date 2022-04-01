@@ -57,14 +57,15 @@ import { darkFontColor } from 'src/utils/colors';
 import { isEditableEvent } from 'src/utils/factory/isCreatableEvent';
 
 type FileIconProps = {
-  file: EventFile;
+  url: string;
+  name: string;
   submitted?: boolean;
 };
 
-const FileIcon: React.FC<FileIconProps> = ({ file, submitted }) => {
+const FileIcon: React.FC<FileIconProps> = ({ url, name, submitted }) => {
   return (
     <Link
-      onClick={() => saveAs(file.url, file.name)}
+      onClick={() => saveAs(url, name)}
       display="flex"
       flexDir="column"
       alignItems="center"
@@ -77,7 +78,7 @@ const FileIcon: React.FC<FileIconProps> = ({ file, submitted }) => {
       bg={!submitted ? 'white' : 'lightblue'}>
       <AiOutlineFileProtect className={eventDetailStyles.file_icon} />
       <Text isTruncated={true} w="100%" textAlign="center">
-        {file.name}
+        {name}
       </Text>
     </Link>
   );
@@ -464,7 +465,7 @@ const EventDetail = () => {
               <Box display="flex" flexDir="row" flexWrap="wrap" mb="16px">
                 {data.files.map((f) => (
                   <Box mr="4px" mb="4px" key={f.id}>
-                    <FileIcon file={f} />
+                    <FileIcon url={f.url} name={f.name} />
                   </Box>
                 ))}
               </Box>
@@ -615,14 +616,17 @@ const EventDetail = () => {
                 </Box>
                 {submitFiles && submitFiles.length ? (
                   <Box display="flex" flexDir="row" flexWrap="wrap" mb="16px">
-                    {submitFiles.map((f) => (
-                      <Box key={f.url} mb="4px" mr="4px">
-                        <FileIcon
-                          href={f.url || ''}
-                          submitted={f.submitUnFinished}
-                        />
-                      </Box>
-                    ))}
+                    {submitFiles.map((f) =>
+                      f.url && f.name ? (
+                        <Box key={f.url} mb="4px" mr="4px">
+                          <FileIcon
+                            url={f.url}
+                            name={f.name}
+                            submitted={f.submitUnFinished}
+                          />
+                        </Box>
+                      ) : null,
+                    )}
                   </Box>
                 ) : (
                   <></>
