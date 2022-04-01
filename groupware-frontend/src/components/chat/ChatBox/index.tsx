@@ -167,15 +167,17 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
     refetchInterval: 1000,
   });
   const userDataForMention: MentionData[] = useMemo(() => {
-    return (
+    const users =
       room?.members
         ?.filter((u) => u.id !== user?.id)
         .map((u) => ({
           id: u.id,
           name: userNameFactory(u) + 'さん',
           avatar: u.avatarUrl,
-        })) || []
-    );
+        })) || [];
+    const allTag = { id: 0, name: 'all', avatar: '' };
+    users.unshift(allTag);
+    return users;
   }, [room?.members, user?.id]);
 
   const [suggestions, setSuggestions] =
@@ -788,6 +790,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
           ref={editorRef}
         />
         <div className={suggestionStyles.suggestion_wrapper}>
+          <Text>@all</Text>
           <MentionSuggestions
             open={mentionOpened}
             onOpenChange={onSuggestionOpenChange}
