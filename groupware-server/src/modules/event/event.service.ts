@@ -387,6 +387,7 @@ export class EventScheduleService {
         url: this.storageService.parseSignedURLToStorageURL(f.url),
       }));
     }
+
     const submittedFiles = await this.submissionFileRepository.save(
       submissionFiles,
     );
