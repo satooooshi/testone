@@ -45,11 +45,11 @@ import { ScheduleModule } from '@nestjs/schedule';
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
         type: 'mysql',
-        host: '34.85.62.171',
-        username: 'groupware-dev-root',
-        password: '6sUs6LZHpdhjDY3wYVHxj7AXVPdaP7M',
-        database: 'growpware-mobile-test',
-        port: 3306,
+        host: configService.get('DB_HOST'),
+        username: configService.get('DB_USERNAME'),
+        password: configService.get('DB_PASSWORD'),
+        database: configService.get('DB_DATABASE'),
+        port: configService.get('DB_PORT'),
         entities: [__dirname + '/entities/*.entity{.ts,.js}'],
         synchronize: false,
         migrations:
