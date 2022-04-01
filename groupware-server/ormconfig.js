@@ -1,17 +1,9 @@
 module.exports = {
   type: 'mysql',
-  host:
-    process.env.NODE_ENV !== 'production' ? '127.0.0.1' : process.env.DB_HOST,
-  username:
-    process.env.NODE_ENV !== 'production' ? 'develop' : process.env.DB_USERNAME,
-  password:
-    process.env.NODE_ENV !== 'production'
-      ? 'password'
-      : process.env.DB_PASSWORD,
-  database:
-    process.env.NODE_ENV !== 'production'
-      ? 'groupware-mysql8'
-      : process.env.DB_DATABASE,
+  host: '34.85.62.171',
+  username: 'groupware-dev-root',
+  password: '6sUs6LZHpdhjDY3wYVHxj7AXVPdaP7M',
+  database: 'growpware-mobile-test',
   port: process.env.NODE_ENV !== 'production' ? 3306 : process.env.DB_PORT,
   entities: [
     process.env.NODE_ENV !== 'production'
