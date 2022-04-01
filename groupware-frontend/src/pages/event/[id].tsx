@@ -55,6 +55,8 @@ import eventTypeNameFactory from 'src/utils/factory/eventTypeNameFactory';
 import { responseErrorMsgFactory } from 'src/utils/factory/responseErrorMsgFactory';
 import { darkFontColor } from 'src/utils/colors';
 import { isEditableEvent } from 'src/utils/factory/isCreatableEvent';
+import { MdCancel } from 'react-icons/md';
+import { useAPIDeleteSubmission } from '@/hooks/api/event/useAPIDeleteSubmission';
 
 type FileIconProps = {
   url: string;
@@ -139,6 +141,18 @@ const EventDetail = () => {
     onSuccess: () => {
       toast({
         title: `ファイルを提出しました`,
+        status: 'success',
+        duration: 3000,
+        isClosable: true,
+      });
+      refetch();
+    },
+  });
+
+  const { mutate: deleteSubmission } = useAPIDeleteSubmission({
+    onSuccess: () => {
+      toast({
+        title: `ファイルを削除しました`,
         status: 'success',
         duration: 3000,
         isClosable: true,
@@ -620,12 +634,33 @@ const EventDetail = () => {
                     {submitFiles.map((f) =>
                       f.url && f.name ? (
                         <>
-                          <Box key={f.url} mb="4px" mr="4px">
+                          <Box key={f.url} mb="4px" mr="10px" display="flex">
                             <FileIcon
                               url={f.url}
                               name={f.name}
                               submitted={f.submitUnFinished}
                             />
+                            <Box ml="-13px" mt="-2">
+                              <MdCancel
+                                size="25px"
+                                onClick={() => {
+                                  if (f.id) {
+                                    if (
+                                      confirm(
+                                        'ファイルを削除してよろしいですか？',
+                                      )
+                                    ) {
+                                      deleteSubmission({ submissionId: f.id });
+                                    }
+                                  } else {
+                                    const files = submitFiles.filter(
+                                      (file) => file.url !== f.url,
+                                    );
+                                    setSubmitFiles(files);
+                                  }
+                                }}
+                              />
+                            </Box>
                           </Box>
                         </>
                       ) : null,
