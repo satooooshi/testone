@@ -323,7 +323,7 @@ const Chat: React.FC = () => {
         onSuccess: imageURL => {
           sendChatMessage({
             content: imageURL[0],
-            fileName: imageURL[0] + '.mov',
+            fileName: imageURL[0] + '.mp4',
             type: ChatMessageType.VIDEO,
             chatGroup: room,
           });
@@ -372,6 +372,7 @@ const Chat: React.FC = () => {
   };
 
   const playVideoOnModal = (url: string) => {
+    console.log('url ===========', url);
     setVideo(url);
   };
 

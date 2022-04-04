@@ -26,26 +26,11 @@ const FileMessage: React.FC<FileMessageProps> = ({message, onLongPress}) => {
         useDownloadManager: true, // setting it to true will use the device's native download manager and will be shown in the notification bar.
         notification: true,
         description: 'ファイルをダウンロードします',
-        path:
-          DownloadDir +
-          '/me_' +
-          decodeURIComponent(
-            (message.content?.match('.+/(.+?)([?#;].*)?$') || [
-              '',
-              message.content,
-            ])[1] || '',
-          ), // this is the path where your downloaded file will live in
+        path: DownloadDir + '/' + message.fileName,
+        // this is the path where your downloaded file will live in
         appendExt: ext,
       },
-      path:
-        DownloadDir +
-        '/me_' +
-        decodeURIComponent(
-          (message.content?.match('.+/(.+?)([?#;].*)?$') || [
-            '',
-            message.content,
-          ])[1] || '',
-        ), // this is the path where your downloaded file will live in
+      path: DownloadDir + '/' + message.fileName, // this is the path where your downloaded file will live in
     };
     try {
       const {path} = await config(options).fetch('GET', message.content);
@@ -73,7 +58,7 @@ const FileMessage: React.FC<FileMessageProps> = ({message, onLongPress}) => {
         <Icon name="filetext1" fontFamily="AntDesign" fontSize={64} mb={'lg'} />
       )}
       <Text color="blue700" numberOfLines={1}>
-        {fileNameTransformer(message.content)}
+        {message.fileName}
       </Text>
     </TouchableOpacity>
   );
