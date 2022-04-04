@@ -6,7 +6,6 @@ import {ChatMessage} from '../../../../types';
 import FileViewer from 'react-native-file-viewer';
 import RNFetchBlob, {RNFetchBlobConfig} from 'rn-fetch-blob';
 import {ActivityIndicator} from 'react-native-paper';
-import RNFS from 'react-native-fs';
 
 const {fs, config} = RNFetchBlob;
 
@@ -42,16 +41,16 @@ const FileMessage: React.FC<FileMessageProps> = ({message, onLongPress}) => {
         'GET',
         message.content,
       );
-      console.log('path =', path);
 
       setLoading(false);
       if (path) {
         FileViewer.open(path()).catch(err => {
-          if (
-            Platform.OS === 'ios' &&
-            err?.message === 'No app associated with this mime type'
-          ) {
-            Alert.alert('このファイル形式に対応しているアプリがありません');
+          if (err?.message === 'No app associated with this mime type') {
+            if (Platform.OS === 'ios') {
+              Alert.alert('このファイル形式に対応しているアプリがありません');
+            } else {
+              Alert.alert('ダウンロードが完了しました。');
+            }
           }
         });
       }
