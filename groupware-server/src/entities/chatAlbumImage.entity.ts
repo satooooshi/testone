@@ -24,6 +24,15 @@ export class ChatAlbumImage {
   @Column({ type: 'varchar', name: 'image_url', length: 2083 })
   imageURL: string;
 
+  @Column({
+    name: 'name',
+    type: 'varchar',
+    length: 2083,
+    default: '',
+    nullable: false,
+  })
+  name: string;
+
   @ManyToOne(() => ChatAlbum, (chatAlbum) => chatAlbum.images, {
     onUpdate: 'CASCADE',
     onDelete: 'CASCADE',
