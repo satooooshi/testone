@@ -715,8 +715,8 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
                   }))
                 }
                 onClickImage={() => {
+                  console.log('qq', m.fileName);
                   if (m.type === ChatMessageType.IMAGE) {
-                    console.log('qq', m.fileName);
                     setSelectedImage({ url: m.content, name: m.fileName });
                   }
                 }}
