@@ -659,59 +659,54 @@ const EventDetail: React.FC = () => {
                       </Text>
                     </Div>
                     <Div flexDir="row" flexWrap="wrap" mx={16}>
-                      {eventInfo?.submissionFiles?.map(
-                        f =>
-                          f.url &&
-                          f.name && (
-                            <Div flexDir="row" mr={4}>
-                              <Div mb={4}>
-                                <FileIcon name={f.name} url={f.url} />
-                              </Div>
-                              <Div ml={-12} mt={-5}>
-                                <TouchableOpacity
-                                  onPress={() => handleDelete(f)}>
-                                  <Icon
-                                    name="closecircle"
-                                    color="gray900"
-                                    fontSize={24}
-                                  />
-                                </TouchableOpacity>
-                              </Div>
+                      {eventInfo?.submissionFiles?.map(f =>
+                        f.url && f.name ? (
+                          <Div flexDir="row" mr={4}>
+                            <Div mb={4}>
+                              <FileIcon name={f.name} url={f.url} />
                             </Div>
-                          ),
+                            <Div ml={-12} mt={-5}>
+                              <TouchableOpacity onPress={() => handleDelete(f)}>
+                                <Icon
+                                  name="closecircle"
+                                  color="gray900"
+                                  fontSize={24}
+                                />
+                              </TouchableOpacity>
+                            </Div>
+                          </Div>
+                        ) : null,
                       )}
-                      {unsavedSubmissions?.map(
-                        f =>
-                          f.url &&
-                          f.name && (
-                            <Div flexDir="row" mr={4}>
-                              <Div mb={4}>
-                                <Div mr={4} mb={4}>
-                                  <FileIcon
-                                    name={f.name}
-                                    url={f.url}
-                                    color="blue"
-                                  />
-                                </Div>
-                              </Div>
-                              <Div ml={-12} mt={-5}>
-                                <TouchableOpacity
-                                  onPress={() =>
-                                    setUnsavedSubmissions(
-                                      unsavedSubmissions.filter(
-                                        file => file.url !== f.url,
-                                      ),
-                                    )
-                                  }>
-                                  <Icon
-                                    name="closecircle"
-                                    color="gray900"
-                                    fontSize={24}
-                                  />
-                                </TouchableOpacity>
+                      {unsavedSubmissions?.map(f =>
+                        f.url && f.name ? (
+                          <Div flexDir="row" mr={4}>
+                            <Div mb={4}>
+                              <Div mr={4} mb={4}>
+                                <FileIcon
+                                  name={f.name}
+                                  url={f.url}
+                                  color="blue"
+                                />
                               </Div>
                             </Div>
-                          ),
+                            <Div ml={-12} mt={-5}>
+                              <TouchableOpacity
+                                onPress={() =>
+                                  setUnsavedSubmissions(
+                                    unsavedSubmissions.filter(
+                                      file => file.url !== f.url,
+                                    ),
+                                  )
+                                }>
+                                <Icon
+                                  name="closecircle"
+                                  color="gray900"
+                                  fontSize={24}
+                                />
+                              </TouchableOpacity>
+                            </Div>
+                          </Div>
+                        ) : null,
                       )}
                     </Div>
                   </>
