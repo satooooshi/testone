@@ -58,7 +58,7 @@ export const InviteCallProvider: React.FC = ({children}) => {
     setIsCallAccepted(false);
   };
   const ringCall = () => {
-    SoundPlayer.playSoundFile('ring_call', 'mp3');
+    SoundPlayer.playSoundFile('ring_sound', 'mp3');
   };
   const stopRing = useCallback(() => {
     SoundPlayer.stop();
@@ -124,6 +124,8 @@ export const InviteCallProvider: React.FC = ({children}) => {
   useEffect(() => {
     if (isCallAccepted) {
       stopRing();
+    } else if (!isCallAccepted && localInvitation) {
+      ringCall();
     }
   }, [isCallAccepted, stopRing]);
 

@@ -132,7 +132,7 @@ const Navigator = () => {
           await rtmEngine?.cancelLocalInvitationV2(localInvitation);
           sendCallHistory('キャンセル');
         }
-        console.log('cancel finished');
+        console.log('cancel finishedーーーーーーーーーーーーー');
       }
 
       setChannelName('');
