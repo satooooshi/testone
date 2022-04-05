@@ -372,7 +372,6 @@ const Chat: React.FC = () => {
   };
 
   const playVideoOnModal = (url: string) => {
-    console.log('url ===========', url);
     setVideo(url);
   };
 

@@ -249,7 +249,6 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
   const { mutate: uploadFiles, isLoading: loadingUplaod } = useAPIUploadStorage(
     {
       onSuccess: (fileURLs, requestFileURLs) => {
-        console.log('name ====', requestFileURLs[0].name);
         const type = isImage(requestFileURLs[0].name)
           ? ChatMessageType.IMAGE
           : isVideo(requestFileURLs[0].name)
@@ -563,12 +562,6 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
                   className={`react-viewer-icon react-viewer-icon-download`}></i>
               ),
               onClick: ({ src }) => {
-                console.log(
-                  '--------',
-                  selectedImage?.name,
-                  selectedImage?.url,
-                );
-
                 if (selectedImage?.name) saveAs(src, selectedImage.name);
               },
             },
@@ -715,7 +708,6 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
                   }))
                 }
                 onClickImage={() => {
-                  console.log('qq', m.fileName);
                   if (m.type === ChatMessageType.IMAGE) {
                     setSelectedImage({ url: m.content, name: m.fileName });
                   }
