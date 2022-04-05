@@ -7,6 +7,12 @@ export enum UserRole {
   COMMON = 'common',
 }
 
+export enum BranchType {
+  TOKYO = 'tokyo',
+  OSAKA = 'osaka',
+  NON_SET = 'non_set',
+}
+
 export enum ChatMessageType {
   VIDEO = 'video',
   IMAGE = 'image',
@@ -66,6 +72,10 @@ export enum BoardCategory {
   CLUB = 'club',
   //勉強会
   STUDY_MEETING = 'study_meeting',
+  //自己研鑽
+  SELF_IMPROVEMENT = 'self_improvement',
+  //個人告知
+  PERSONAL_ANNOUNCEMENT = 'personal_announcement',
   //お祝い事
   CELEBRATION = 'celebration',
   //その他
@@ -86,6 +96,7 @@ export interface User {
   firstName: string;
   lastNameKana: string;
   firstNameKana: string;
+  branch: BranchType;
   introduceTech: string;
   introduceQualification: string;
   introduceHobby: string;
@@ -288,10 +299,16 @@ export interface ChatMessage {
   replyParentMessage?: ChatMessage;
 }
 
+export enum RoomType {
+  GROUP = 'group',
+  TALK_ROOM = 'talk_room',
+  PERSONAL = 'personal',
+}
 export interface ChatGroup {
   id: number;
   name: string;
   imageURL: string;
+  roomType: RoomType;
   pinnedUsers?: User[];
   isPinned?: boolean;
   chatNotes?: ChatNote[];

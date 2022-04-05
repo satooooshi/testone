@@ -1,6 +1,14 @@
 import React, {useCallback, useEffect, useState} from 'react';
 import WholeContainer from '../../../components/WholeContainer';
-import {Div, Text, Button, Tag, Icon} from 'react-native-magnus';
+import {
+  Div,
+  Text,
+  Button,
+  Tag,
+  Icon,
+  ScrollDiv,
+  Modal,
+} from 'react-native-magnus';
 import {useAPIGetWikiDetail} from '../../../hooks/api/wiki/useAPIGetWikiDetail';
 import {
   StyleSheet,
@@ -22,18 +30,13 @@ import {WikiDetailProps} from '../../../types/navigator/drawerScreenProps';
 import {useIsFocused} from '@react-navigation/core';
 import AnswerList from '../AnswerList';
 import {ScrollerProvider} from '../../../utils/htmlScroll/scroller';
-import {
-  DrawerLayout,
-  ScrollView,
-  TouchableHighlight,
-} from 'react-native-gesture-handler';
+import {ScrollView, TouchableHighlight} from 'react-native-gesture-handler';
 import WikiBodyRenderer from '../../../components/wiki/WikiBodyRenderer';
 import TOC from '../../../components/wiki/TOC';
 import {FAB} from 'react-native-paper';
 import MarkdownIt from 'markdown-it';
 import {useHTMLScrollFeature} from '../../../hooks/scroll/useHTMLScrollFeature';
 import {useDom} from '../../../hooks/dom/useDom';
-import {useMinimumDrawer} from '../../../hooks/minimumDrawer/useMinimumDrawer';
 import ShareButton from '../../../components/common/ShareButton';
 import {generateClientURL} from '../../../utils/url';
 import UserAvatar from '../../../components/common/UserAvatar';
@@ -49,7 +52,6 @@ const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
   const isFocused = useIsFocused();
   const {user: authUser} = useAuthenticate();
   const {id} = route.params;
-  const {drawerRef, openDrawer, closeDrawer} = useMinimumDrawer();
   const {width: windowWidth} = useWindowDimensions();
   const {data: wikiInfo, refetch: refetchWikiInfo} = useAPIGetWikiDetail(id);
   const {user} = useAuthenticate();
@@ -60,6 +62,8 @@ const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
     wikiInfo?.isGoodSender || false,
   );
   const [wikiState, setWikiState] = useState(wikiInfo);
+  const [isVisibleTOCModal, setIsVisibleTOCModal] = useState<boolean>(false);
+  const [activeEntry, setActiveEntry] = useState<string>('');
 
   const mdParser = new MarkdownIt({breaks: true});
   const wikiBody =
@@ -72,8 +76,9 @@ const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
   const {scrollViewRef, scroller} = useHTMLScrollFeature(wikiState?.body);
   const onPressEntry = useCallback(
     (entry: string) => {
-      closeDrawer();
+      setIsVisibleTOCModal(false);
       scroller.scrollToEntry(entry);
+      setActiveEntry(entry);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [scroller],
@@ -81,10 +86,17 @@ const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
 
   const renderToc = useCallback(
     function renderToc() {
-      return <TOC headings={headings} onPressEntry={onPressEntry} />;
+      return (
+        <TOC
+          headings={headings}
+          onPressEntry={onPressEntry}
+          activeEntry={activeEntry}
+          setActiveEntry={setActiveEntry}
+        />
+      );
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [headings],
+    [headings, activeEntry],
   );
 
   useEffect(() => {
@@ -338,19 +350,30 @@ const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
         }
       />
       {renderingTOCNeeded ? (
-        <DrawerLayout
-          drawerPosition="right"
-          drawerWidth={300}
-          renderNavigationView={renderToc}
-          ref={drawerRef}>
+        <>
           {article}
           <FAB
             style={styles.fab}
             color="#61dafb"
             icon="format-list-bulleted-square"
-            onPress={openDrawer}
+            onPress={() => setIsVisibleTOCModal(true)}
           />
-        </DrawerLayout>
+          <Modal h={400} isVisible={isVisibleTOCModal}>
+            <ScrollDiv>
+              <Button
+                bg="gray400"
+                h={35}
+                w={35}
+                right={0}
+                alignSelf="flex-end"
+                rounded="circle"
+                onPress={() => setIsVisibleTOCModal(false)}>
+                <Icon color="black" name="close" />
+              </Button>
+              {renderToc()}
+            </ScrollDiv>
+          </Modal>
+        </>
       ) : (
         article
       )}

@@ -2,6 +2,7 @@ import {DateTime} from 'luxon';
 import React, {useEffect, useRef, useState} from 'react';
 import {
   Alert,
+  Platform,
   TextInput,
   TouchableOpacity,
   useWindowDimensions,
@@ -173,7 +174,7 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
       const formData = new FormData();
       formData.append('files', {
         name: res.name,
-        uri: normalizeURL(res.uri),
+        uri: Platform.OS === 'android' ? res.uri : normalizeURL(res.uri),
         type: res.type,
       });
       uploadFile(formData);
@@ -226,6 +227,15 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
     setNewEvent(e => {
       if (e.videos?.length) {
         return {...e, videos: e.videos.filter(v => v.url !== videoUrl)};
+      }
+      return e;
+    });
+  };
+
+  const removeFile = (fileUrl: string) => {
+    setNewEvent(e => {
+      if (e.files?.length) {
+        return {...e, files: e.files.filter(f => f.url !== fileUrl)};
       }
       return e;
     });
@@ -585,6 +595,7 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
               key={f.id}
               mb={'lg'}
               w={'100%'}
+              h={'5%'}
               borderColor={blueColor}
               borderWidth={1}
               px={8}
@@ -600,7 +611,7 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
                   ])[1]
                 }
               </Text>
-              <TouchableOpacity>
+              <TouchableOpacity onPress={() => removeFile(f.url || '')}>
                 <Icon name="closecircle" color="gray900" fontSize={24} />
               </TouchableOpacity>
             </Div>

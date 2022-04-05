@@ -12,7 +12,7 @@ import {
 import {useAuthenticate} from '../../contexts/useAuthenticate';
 import {useAPIGetTopNews} from '../../hooks/api/topNews/useAPIGetTopNews';
 import {EventType, TopNews} from '../../types';
-import {useNavigation} from '@react-navigation/native';
+import {useIsFocused, useNavigation} from '@react-navigation/native';
 import {HomeNavigationProps} from '../../types/navigator/drawerScreenProps/home';
 import tailwind from 'tailwind-rn';
 import {ActivityIndicator} from 'react-native-paper';
@@ -23,10 +23,17 @@ const Home: React.FC = () => {
   const {width: windowWidth} = useWindowDimensions();
   const [page, setPage] = useState(1);
   const [newsIndex, setNewsIndex] = useState(1);
-  const {data, isLoading: loadingNews} = useAPIGetTopNews({
+  const {
+    data,
+    refetch,
+    isLoading: loadingNews,
+    isRefetching,
+  } = useAPIGetTopNews({
     page: page.toString(),
   });
   const [newsForScroll, setNewsForScroll] = useState<TopNews[]>([]);
+
+  const isFocused = useIsFocused();
 
   const handleLogout = () => {
     logout();
@@ -46,7 +53,7 @@ const Home: React.FC = () => {
         Alert.alert('情報の取得に失敗しました');
       }
     } else if (news.urlPath.includes('wiki')) {
-      const id: string = news.urlPath.replace('/wiki/', '');
+      const id: string = news.urlPath.replace('/wiki/detail/', '');
       if (typeof Number(id) === 'number') {
         navigation.navigate('WikiStack', {
           screen: 'WikiDetail',
@@ -71,15 +78,25 @@ const Home: React.FC = () => {
   };
 
   useEffect(() => {
-    if (data?.news?.length) {
-      if (newsForScroll.length) {
-        setNewsForScroll([...newsForScroll, ...data.news]);
-        return;
-      }
-      setNewsForScroll([...data.news]);
+    setNewsIndex(1);
+    setPage(1);
+    setNewsForScroll([]);
+    if (isFocused) {
+      refetch();
+    }
+  }, [refetch, isFocused]);
+
+  useEffect(() => {
+    if (!isRefetching && data?.news) {
+      setNewsForScroll(n => {
+        if (data.news.length) {
+          return [...n, ...data.news];
+        }
+        return data.news;
+      });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data?.news]);
+  }, [data?.news, isRefetching]);
 
   return (
     <WholeContainer>
@@ -291,7 +308,7 @@ const Home: React.FC = () => {
             <PortalLinkBox
               type="safety_confirmation"
               onPress={() => {
-                Alert.alert('2022年4月実装予定です');
+                Alert.alert('近日公開予定です');
               }}
             />
           </Div>

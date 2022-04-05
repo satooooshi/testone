@@ -7,7 +7,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { orderBy } from 'lodash';
 import PushNotifications from 'node-pushnotifications';
-import { ChatGroup } from 'src/entities/chatGroup.entity';
+import { ChatGroup, RoomType } from 'src/entities/chatGroup.entity';
 import { ChatMessage, ChatMessageType } from 'src/entities/chatMessage.entity';
 import { ChatMessageReaction } from 'src/entities/chatMessageReaction.entity';
 import { LastReadChatTime } from 'src/entities/lastReadChatTime.entity';
@@ -15,7 +15,12 @@ import { User } from 'src/entities/user.entity';
 import { userNameFactory } from 'src/utils/factory/userNameFactory';
 import { In, Repository } from 'typeorm';
 import { StorageService } from '../storage/storage.service';
-import { GetMessagesQuery, GetRoomsResult } from './chat.controller';
+import {
+  GetChaRoomsByPageQuery,
+  GetMessagesQuery,
+  GetRoomsResult,
+  SearchMessageQuery,
+} from './chat.controller';
 
 @Injectable()
 export class ChatService {
@@ -73,7 +78,7 @@ export class ChatService {
 
   public async getRoomsByPage(
     userID: number,
-    query: GetMessagesQuery,
+    query: GetChaRoomsByPageQuery,
   ): Promise<GetRoomsResult> {
     const { page, limit = '20' } = query;
     const offset = Number(limit) * (Number(page) - 1);
@@ -110,6 +115,13 @@ export class ChatService {
       const hasBeenRead = g?.lastReadChatTime?.[0]?.readTime
         ? g?.lastReadChatTime?.[0]?.readTime > g.updatedAt
         : false;
+
+      if (g.roomType === RoomType.PERSONAL) {
+        const chatPartner = g.members.filter((m) => m.id !== userID)[0];
+        g.imageURL = chatPartner.avatarUrl;
+        g.name = `${chatPartner.lastName} ${chatPartner.firstName}`;
+      }
+
       return {
         ...g,
         pinnedUsers: undefined,
@@ -131,13 +143,12 @@ export class ChatService {
     userID: number,
     query: GetMessagesQuery,
   ): Promise<ChatMessage[]> {
-    const { page = '1' } = query;
+    const { after, before, include = false } = query;
     const limit = 20;
-    const offset = (Number(page) - 1) * limit;
     const existMessages = await this.chatMessageRepository
       .createQueryBuilder('chat_messages')
       .withDeleted()
-      .leftJoin('chat_messages.chatGroup', 'chat_group')
+      .leftJoinAndSelect('chat_messages.chatGroup', 'chat_group')
       .leftJoinAndSelect('chat_messages.sender', 'sender')
       .leftJoinAndSelect('chat_messages.reactions', 'reactions')
       .leftJoinAndSelect('reactions.user', 'user')
@@ -147,9 +158,24 @@ export class ChatService {
       )
       .leftJoinAndSelect('replyParentMessage.sender', 'reply_sender')
       .where('chat_group.id = :chatGroupID', { chatGroupID: query.group })
+      .andWhere(
+        after && include
+          ? 'chat_messages.id >= :after'
+          : after && !include
+          ? 'chat_messages.id > :after'
+          : '1=1',
+        { after },
+      )
+      .andWhere(
+        before && include
+          ? 'chat_messages.id <= :before'
+          : before && !include
+          ? 'chat_messages.id < :before'
+          : '1=1',
+        { before },
+      )
       .take(limit)
-      .skip(offset)
-      .orderBy('chat_messages.createdAt', 'DESC')
+      .orderBy('chat_messages.createdAt', after ? 'ASC' : 'DESC')
       .withDeleted()
       .getMany();
     const messages = existMessages.map((m) => {
@@ -167,6 +193,33 @@ export class ChatService {
       return m;
     });
     return messages;
+  }
+
+  public async searchMessage(
+    query: SearchMessageQuery,
+  ): Promise<Partial<ChatMessage[]>> {
+    const replaceFullWidthSpace = query.word.replace('　', ' ');
+    const words = replaceFullWidthSpace.split(' ');
+    const sql = this.chatMessageRepository
+      .createQueryBuilder('chat_messages')
+      .leftJoin('chat_messages.chatGroup', 'g')
+      .where('chat_messages.type <> :type', { type: 'system_text' })
+      .select('chat_messages.id');
+
+    words.map((w, index) => {
+      if (index === 0) {
+        sql.andWhere('chat_messages.content LIKE :word0', { word0: `%${w}%` });
+      } else {
+        sql.andWhere(`chat_messages.content LIKE :word${index}`, {
+          [`word${index}`]: `%${w}%`,
+        });
+      }
+    });
+    const message = await sql
+      .andWhere('g.id = :group', { group: query.group })
+      .orderBy('chat_messages.createdAt', 'DESC')
+      .getMany();
+    return message;
   }
 
   public async getMenthionedChatMessage(user: User): Promise<ChatMessage[]> {

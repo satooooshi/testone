@@ -20,6 +20,10 @@ export const wikiTypeColorFactory = (
     //   return ruleColor;
     // case BoardCategory.STUDY_MEETING:
     //   return ruleColor;
+    // case BoardCategory.SELF_IMPROVEMENT:
+    //   return ruleColor;
+    // case BoardCategory.PERSONAL_ANNOUNCEMENT:
+    //   return ruleColor;
     // case BoardCategory.CELEBRATION:
     //   return ruleColor;
     // case BoardCategory.CLUB:

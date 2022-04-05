@@ -1,17 +1,24 @@
 import UserAvatar from '@/components/common/UserAvatar';
 import { Box, Text, useMediaQuery } from '@chakra-ui/react';
-import React from 'react';
+import React, { ReactNode } from 'react';
 import { ChatMessage, ChatMessageType } from 'src/types';
 import { darkFontColor } from 'src/utils/colors';
 import { userNameFactory } from 'src/utils/factory/userNameFactory';
 import { mentionTransform } from 'src/utils/mentionTransform';
+import { replaceFullWidthSpace } from 'src/utils/replaceWidthSpace';
 import Linkify from 'react-linkify';
 
 type TextMessageProps = {
   message: ChatMessage;
+  confirmedSearchWord: string;
+  searchedResultIds?: (number | undefined)[];
 };
 
-const TextMessage: React.FC<TextMessageProps> = ({ message }) => {
+const TextMessage: React.FC<TextMessageProps> = ({
+  message,
+  confirmedSearchWord,
+  searchedResultIds,
+}) => {
   const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
   const replyContent = (parentMsg: ChatMessage) => {
     switch (parentMsg.type) {
@@ -24,6 +31,22 @@ const TextMessage: React.FC<TextMessageProps> = ({ message }) => {
       case ChatMessageType.OTHER_FILE:
         return 'ファイル';
     }
+  };
+
+  const highlightSearchedWord = (message: ChatMessage): ReactNode => {
+    const text = mentionTransform(message.content);
+    if (confirmedSearchWord) {
+      const Exp = new RegExp(
+        `(${replaceFullWidthSpace(confirmedSearchWord).replace(' ', '|')})`,
+      );
+      return text.split(Exp).map((t) => {
+        if (t.match(Exp) && searchedResultIds?.includes(message.id)) {
+          return <Text as="mark">{t}</Text>;
+        }
+        return t;
+      });
+    }
+    return text;
   };
 
   return (
@@ -64,7 +87,7 @@ const TextMessage: React.FC<TextMessageProps> = ({ message }) => {
           wordBreak={'break-word'}
           color={message.isSender ? 'white' : darkFontColor}
           bg={message.isSender ? 'blue.500' : '#ececec'}>
-          {mentionTransform(message.content)}
+          {highlightSearchedWord(message)}
         </Text>
       </Linkify>
     </Box>

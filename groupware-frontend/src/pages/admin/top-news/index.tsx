@@ -73,7 +73,7 @@ const NewsAdmin: React.VFC = () => {
       const errors: FormikErrors<Partial<TopNews>> = {};
       if (inputValues.urlPath) {
         const idExists = new RegExp(
-          `${location.origin}/(event|wiki|account)\/[0-9]+$`,
+          `${location.origin}/(event|wiki/detail|account)\/[0-9]+$`,
         ).test(inputValues.urlPath);
         if (!idExists) {
           errors.urlPath =

@@ -1,5 +1,6 @@
-import {useNavigation} from '@react-navigation/native';
 import React from 'react';
+import {useEffect} from 'react';
+import {useNavigation} from '@react-navigation/native';
 import {
   TouchableHighlight,
   TouchableOpacity,
@@ -26,6 +27,11 @@ import VideoMessage from './VideoMessage';
 type ChatMessageItemProps = {
   message: ChatMessage;
   readUsers: User[];
+  inputtedSearchWord?: string;
+  searchedResultIds?: (number | undefined)[];
+  messageIndex: number;
+  isScrollTarget: boolean;
+  scrollToTarget: (messageIndex: number) => void;
   onCheckLastRead: () => void;
   numbersOfRead: number;
   onLongPress: () => void;
@@ -38,6 +44,11 @@ type ChatMessageItemProps = {
 const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
   message,
   readUsers,
+  inputtedSearchWord,
+  searchedResultIds,
+  messageIndex,
+  isScrollTarget = false,
+  scrollToTarget,
   onCheckLastRead,
   numbersOfRead,
   onLongPress,
@@ -62,6 +73,12 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
     }
     return reactionsNoDuplicates;
   };
+
+  useEffect(() => {
+    if (isScrollTarget) {
+      scrollToTarget(messageIndex);
+    }
+  }, [isScrollTarget, scrollToTarget, messageIndex]);
 
   const timesAndReadCounts = (
     <Div justifyContent="flex-end" alignItems="center">
@@ -121,7 +138,12 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
           <Div flexDir="row" alignItems="flex-end">
             {message.isSender && timesAndReadCounts}
             {message.type === ChatMessageType.TEXT ? (
-              <TextMessage message={message} onLongPress={onLongPress} />
+              <TextMessage
+                message={message}
+                inputtedSearchWord={inputtedSearchWord}
+                searchedResultIds={searchedResultIds}
+                onLongPress={onLongPress}
+              />
             ) : message.type === ChatMessageType.CALL ? (
               <CallMessage message={message} onLongPress={onLongPress} />
             ) : message.type === ChatMessageType.IMAGE ? (
