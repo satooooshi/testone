@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   TextInput,
   Alert,
+  Platform,
 } from 'react-native';
 import HeaderWithTextButton from '../../../components/Header';
 import {Div, Text, Button, Overlay, ScrollDiv, Icon} from 'react-native-magnus';
@@ -278,10 +279,10 @@ const EventDetail: React.FC = () => {
     const formData = new FormData();
     formData.append('files', {
       name: res.name,
-      uri: normalizeURL(res.uri),
+      uri: Platform.OS === 'android' ? res.uri : normalizeURL(res.uri),
       type: res.type,
     });
-    uploadFile(formData);
+
     if (formData) {
       uploadFile(formData, {
         onSuccess: fileURL => {

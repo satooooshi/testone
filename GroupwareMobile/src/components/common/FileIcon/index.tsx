@@ -22,7 +22,6 @@ const FileIcon: React.FC<FileIconProps> = ({name, url, color = 'white'}) => {
   const downloadFile = async () => {
     setLoading(true);
 
-    console.log('====000000000000');
     let DownloadDir =
       Platform.OS === 'android' ? fs.dirs.DownloadDir : fs.dirs.DocumentDir;
     const ext = name.split(/[#?]/)[0]?.split('.')?.pop()?.trim();
@@ -40,9 +39,7 @@ const FileIcon: React.FC<FileIconProps> = ({name, url, color = 'white'}) => {
       },
     };
     try {
-      console.log('================');
       const {path} = await config(options).fetch('GET', url);
-      console.log('================');
 
       setLoading(false);
       if (path) {
