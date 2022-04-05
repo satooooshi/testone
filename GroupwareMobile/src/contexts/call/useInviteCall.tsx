@@ -14,7 +14,7 @@ import {setupCallInvitation} from '../../utils/calling/calling';
 import io from 'socket.io-client';
 import {baseURL} from '../../utils/url';
 import {ChatGroup} from '../../types';
-import {useAuthenticate} from '../useAuthenticate';
+import _, {debounce} from 'lodash';
 
 const InvitationStatusContext = createContext({
   isCallAccepted: false,
@@ -35,7 +35,6 @@ const InvitationStatusContext = createContext({
 });
 
 export const InviteCallProvider: React.FC = ({children}) => {
-  const {user} = useAuthenticate();
   const {mutate: createGroup} = useAPISaveChatGroup();
   const [currentGroupData, setCurrentGroupData] = useState<ChatGroup>();
   const socket = io(baseURL, {
@@ -102,6 +101,21 @@ export const InviteCallProvider: React.FC = ({children}) => {
     [callTime, sendChatMessage, currentGroupData],
   );
 
+  // const sendCallHistory = useCallback(
+  //   (message: string) =>
+  //     _.debounce(() => {
+  //       console.log('currentGroupData====================', currentGroupData);
+
+  //       sendChatMessage({
+  //         content: message,
+  //         callTime: callTime,
+  //         type: ChatMessageType.CALL,
+  //         chatGroup: currentGroupData,
+  //       });
+  //     }, 100),
+  //   [callTime, sendChatMessage, currentGroupData],
+  // );
+
   useEffect(
     () => {
       if (currentGroupData && !isCallAccepted && callTime) {
@@ -121,13 +135,16 @@ export const InviteCallProvider: React.FC = ({children}) => {
   //   }
   // }, [localInvitation, stopRing]);
 
-  useEffect(() => {
-    if (isCallAccepted) {
-      stopRing();
-    } else if (!isCallAccepted && localInvitation) {
-      ringCall();
-    }
-  }, [isCallAccepted, stopRing]);
+  useEffect(
+    () => {
+      if (isCallAccepted) {
+        stopRing();
+      } else if (!isCallAccepted && localInvitation) {
+        ringCall();
+      }
+    }, // eslint-disable-next-line react-hooks/exhaustive-deps
+    [isCallAccepted, stopRing],
+  );
 
   return (
     <InvitationStatusContext.Provider

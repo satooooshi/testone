@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {createStackNavigator} from '@react-navigation/stack';
 import {
   NavigationContainer,
@@ -27,6 +27,7 @@ import VoiceCall from '../components/call/VoiceCall';
 import {useInviteCall} from '../contexts/call/useInviteCall';
 import SoundPlayer from 'react-native-sound-player';
 import PushNotificationIOS from '@react-native-community/push-notification-ios';
+import {debounce} from 'lodash';
 
 const Stack = createStackNavigator<RootStackParamList>();
 export const rtmEngine = new RtmClient();
@@ -131,6 +132,7 @@ const Navigator = () => {
           console.log('attempt to cancel', localInvitation);
           await rtmEngine?.cancelLocalInvitationV2(localInvitation);
           sendCallHistory('キャンセル');
+          // sendCallHistory('キャンセル');
         }
         console.log('cancel finishedーーーーーーーーーーーーー');
       }
@@ -199,8 +201,10 @@ const Navigator = () => {
     });
   }, [createRTCInstance, endCall]);
 
+  const debouncedEndCall = debounce(endCall, 300);
+
   const callbacks: Partial<CallbacksInterface> = {
-    EndCall: endCall,
+    EndCall: debouncedEndCall,
     LocalMuteVideo: async bool => {
       if (bool) {
         if ((await rtcEngine?.isSpeakerphoneEnabled()) === true) {
