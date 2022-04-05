@@ -27,6 +27,7 @@ import VoiceCall from '../components/call/VoiceCall';
 import {useInviteCall} from '../contexts/call/useInviteCall';
 import SoundPlayer from 'react-native-sound-player';
 import PushNotificationIOS from '@react-native-community/push-notification-ios';
+import _, {debounce} from 'lodash';
 
 const Stack = createStackNavigator<RootStackParamList>();
 export const rtmEngine = new RtmClient();
@@ -129,8 +130,11 @@ const Navigator = () => {
         // local invitation(送信した通話招待)があればcancelする
         if (alertNeeded) {
           console.log('attempt to cancel', localInvitation);
-          await rtmEngine?.cancelLocalInvitationV2(localInvitation);
-          sendCallHistory('キャンセル');
+          debounce(async () => {
+            await rtmEngine?.cancelLocalInvitationV2(localInvitation);
+            sendCallHistory('キャンセル');
+          }, 200);
+          // sendCallHistory('キャンセル');
         }
         console.log('cancel finishedーーーーーーーーーーーーー');
       }
