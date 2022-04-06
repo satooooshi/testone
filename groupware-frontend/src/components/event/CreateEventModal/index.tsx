@@ -703,7 +703,6 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
                     w="95%"
                     css={hideScrollbarCss}>
                     {f.name}
-                    {/* {fileNameTransformer(f.url || '')} */}
                   </Text>
                   <MdCancel
                     className={createEventModalStyle.url_delete_button}
