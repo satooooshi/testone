@@ -28,7 +28,11 @@ import {useInviteCall} from '../contexts/call/useInviteCall';
 import SoundPlayer from 'react-native-sound-player';
 import PushNotificationIOS from '@react-native-community/push-notification-ios';
 import {debounce} from 'lodash';
-import {Notifications} from 'react-native-notifications';
+import {
+  Notification,
+  NotificationCompletion,
+  Notifications,
+} from 'react-native-notifications';
 
 const Stack = createStackNavigator<RootStackParamList>();
 export const rtmEngine = new RtmClient();
@@ -225,6 +229,15 @@ const Navigator = () => {
 
   messaging().setBackgroundMessageHandler(async remoteMessage => {
     console.log('BackgroundMessage received!!');
+    const payload = {
+      body: 'Local notification!',
+      title: 'Local Notification Title',
+      sound: 'chime.aiff',
+      silent: false,
+      category: 'SOME_CATEGORY',
+      userInfo: {},
+    };
+    Notifications.postLocalNotification(payload);
     if (Platform.OS === 'ios') {
       if (remoteMessage?.data?.type === 'call') {
         // iOSのみ、アプリがバックグラウンド状態のときはプッシュ通知で通話をハンドリングする必要がある
@@ -451,29 +464,38 @@ const Navigator = () => {
   useEffect(() => {
     const naviateByNotif = (notification: any) => {
       if (navigationRef.current?.getCurrentRoute?.name !== 'Login') {
-        if (notification.data?.screen === 'event' && notification.data?.id) {
+        if (
+          notification.userInfo?.screen === 'event' &&
+          notification.userInfo?.id
+        ) {
           navigationRef.current?.navigate('EventStack', {
             screen: 'EventDetail',
-            params: {id: notification.data?.id},
+            params: {id: notification.userInfo?.id},
             initial: false,
           });
         }
-        if (notification.data?.screen === 'wiki' && notification.data?.id) {
+        if (
+          notification.userInfo?.screen === 'wiki' &&
+          notification.userInfo?.id
+        ) {
           navigationRef.current?.navigate('WikiStack', {
             screen: 'WikiDetail',
-            params: {id: notification.data?.id},
+            params: {id: notification.userInfo?.id},
             initial: false,
           });
         }
-        if (notification.data?.screen === 'room') {
+        if (notification.userInfo?.screen === 'room') {
           navigationRef.current?.navigate('ChatStack', {
             screen: 'RoomList',
           });
         }
-        if (notification.data?.screen === 'chat' && notification.data?.id) {
+        if (
+          notification.userInfo?.screen === 'chat' &&
+          notification.userInfo?.id
+        ) {
           navigationRef.current?.navigate('ChatStack', {
             screen: 'Chat',
-            params: {room: {id: notification.data?.id}},
+            params: {room: {id: notification.userInfo?.id}},
             initial: false,
           });
         }
@@ -488,52 +510,69 @@ const Navigator = () => {
       })
       .catch(err => console.error('getInitialNotifiation() failed', err));
 
-    PushNotification.configure({
-      onRegister: function (token) {
-        console.log('PushNotification TOKEN:', token);
-      },
-      onNotification: notification => {
-        console.log('PushNotification onNotification========', notification);
-        if (notification.userInteraction) {
-          naviateByNotif(notification);
-        }
-        notification.finish(PushNotificationIOS.FetchResult.NoData);
-      },
-      permissions: {
-        alert: true,
-        badge: true,
-        sound: true,
-      },
-      requestPermissions: true,
-    });
+    // PushNotification.configure({
+    //   onRegister: function (token) {
+    //     console.log('PushNotification TOKEN:', token);
+    //   },
+    //   onNotification: notification => {
+    //     console.log('PushNotification onNotification========', notification);
+    //     if (notification.userInteraction) {
+    //       naviateByNotif(notification);
+    //     }
+    //     notification.finish(PushNotificationIOS.FetchResult.NoData);
+    //   },
+    //   permissions: {
+    //     alert: true,
+    //     badge: true,
+    //     sound: true,
+    //   },
+    //   requestPermissions: true,
+    // });
+    // Notifications.events().registerNotificationReceivedForeground(
+    //   (
+    //     notification: Notification,
+    //     completion: (response: NotificationCompletion) => void,
+    //   ) => {
+    //     console.log('Notification Received - Foreground', notification.payload);
+    //     if (notification.payload.userInfo) {
+    //       naviateByNotif(notification.payload);
+    //     }
+
+    //     // Calling completion on iOS with `alert: true` will present the native iOS inApp notification.
+    //     completion({alert: true, sound: true, badge: false});
+    //   },
+    // );
     const unsubscribe = messaging().onMessage(async remoteMessage => {
       console.log('onMessage  --------', remoteMessage);
-      PushNotification.localNotification({
-        channelId: 'fcm_fallback_notification_channel',
-        ignoreInForeground: false,
-        id: remoteMessage.messageId,
-        vibrate: true, // (optional) default: true
-        vibration: 300,
-        priority: 'high', // (optional) set notification priority, default: high
-        visibility: 'public', // (optional) set notification visibility, default: private
-        message: remoteMessage.notification?.body || '',
+      // PushNotification.localNotification({
+      //   channelId: 'fcm_fallback_notification_channel',
+      //   ignoreInForeground: false,
+      //   id: remoteMessage.messageId,
+      //   vibrate: true, // (optional) default: true
+      //   vibration: 300,
+      //   priority: 'high', // (optional) set notification priority, default: high
+      //   visibility: 'public', // (optional) set notification visibility, default: private
+      //   message: remoteMessage.notification?.body || '',
+      //   title: remoteMessage.notification?.title,
+      //   bigPictureUrl: remoteMessage.notification?.android?.imageUrl,
+      //   userInfo: {
+      //     screen: remoteMessage?.data?.screen,
+      //     id: remoteMessage?.data?.id,
+      //   },
+      // });
+      const payload = {
+        body: remoteMessage.notification?.body || '',
         title: remoteMessage.notification?.title,
-        bigPictureUrl: remoteMessage.notification?.android?.imageUrl,
+        sound: 'chime.aiff',
+        silent: false,
+        category: 'SOME_CATEGORY',
         userInfo: {
           screen: remoteMessage?.data?.screen,
           id: remoteMessage?.data?.id,
         },
-      });
-      const payload = {
-        body: 'Local notification!',
-        title: 'Local Notification Title',
-        sound: 'chime.aiff',
-        silent: false,
-        category: 'SOME_CATEGORY',
-        userInfo: {},
-        fireDate: new Date(),
       };
       Notifications.postLocalNotification(payload);
+      console.log('00000000000000000000000');
     });
 
     return unsubscribe;
