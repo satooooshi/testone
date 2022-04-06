@@ -201,7 +201,7 @@ const Navigator = () => {
     });
   }, [createRTCInstance, endCall]);
 
-  const debouncedEndCall = debounce(endCall, 300);
+  const debouncedEndCall = debounce(endCall, 100);
 
   const callbacks: Partial<CallbacksInterface> = {
     EndCall: debouncedEndCall,
@@ -402,6 +402,7 @@ const Navigator = () => {
     rtmInit();
     return () => {
       // アンマウント時に全てのリスナーを消す
+      console.log('unmount!');
       RNCallKeep.removeEventListener('answerCall');
       RNCallKeep.removeEventListener('endCall');
       rtcEngine.removeAllListeners();
