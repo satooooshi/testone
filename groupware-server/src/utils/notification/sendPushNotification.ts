@@ -40,6 +40,7 @@ const sendPushNotifToSpecificDevices = async (
   devices: NotificationDevice[],
   data: CustomPushNotificationData,
 ) => {
+  console.log('sendPushNotifToSpecificDevices called', data.custom);
   const pushNotifSettings: PushNotifications.Settings = {
     gcm: {
       id: process.env.FCM_API_KEY,
@@ -49,13 +50,13 @@ const sendPushNotifToSpecificDevices = async (
   const pushNotifService = new PushNotifications(pushNotifSettings);
   const tokens = devices.map((d) => d.token);
   const dataToSend: PushNotifications.Data = {
-    title: '', // REQUIRED for Android
+    title: data.title ? data.title : '', // REQUIRED for Android
     topic: process.env.IOS_BUNDLE_ID ? '' : '', // REQUIRED for iOS (apn and gcm)
     /* The topic of the notification. When using token-based authentication, specify the bundle ID of the app.
      * When using certificate-based authentication, the topic is usually your app's bundle ID.
      * More details can be found under https://developer.apple.com/documentation/usernotifications/setting_up_a_remote_notification_server/sending_notification_requests_to_apns
      */
-    body: '',
+    body: data.body ? data.body : '',
     custom: data.custom,
     priority: 'high', // gcm, apn. Supported values are 'high' or 'normal' (gcm). Will be translated to 10 and 5 for apn. Defaults to 'high'
     collapseKey: '', // gcm for android, used as collapseId in apn

@@ -13,7 +13,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import com.facebook.react.bridge.JSIModulePackage;
 import com.lugg.ReactNativeConfig.ReactNativeConfigPackage;
-import com.wix.reactnativenotifications.RNNotificationsPackage;
 
 
 

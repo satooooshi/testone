@@ -229,15 +229,27 @@ const Navigator = () => {
 
   messaging().setBackgroundMessageHandler(async remoteMessage => {
     console.log('BackgroundMessage received!!');
-    const payload = {
-      body: 'Local notification!',
-      title: 'Local Notification Title',
-      sound: 'chime.aiff',
-      silent: false,
-      category: 'SOME_CATEGORY',
-      userInfo: {},
-    };
-    Notifications.postLocalNotification(payload);
+    messaging().onMessage(async remoteMessage => {
+      console.log('onMessage  --------', remoteMessage.data);
+      if (remoteMessage?.data?.screen) {
+        PushNotification.localNotification({
+          channelId: 'fcm_fallback_notification_channel',
+          ignoreInForeground: false,
+          id: remoteMessage.messageId,
+          vibrate: true, // (optional) default: true
+          vibration: 300,
+          priority: 'high', // (optional) set notification priority, default: high
+          visibility: 'public', // (optional) set notification visibility, default: private
+          message: remoteMessage.notification?.body || 'notification',
+          title: remoteMessage.notification?.title || 'notification',
+          bigPictureUrl: remoteMessage.notification?.android?.imageUrl,
+          userInfo: {
+            screen: remoteMessage?.data?.screen,
+            id: remoteMessage?.data?.id,
+          },
+        });
+      }
+    });
     if (Platform.OS === 'ios') {
       if (remoteMessage?.data?.type === 'call') {
         // iOSのみ、アプリがバックグラウンド状態のときはプッシュ通知で通話をハンドリングする必要がある
@@ -446,133 +458,78 @@ const Navigator = () => {
     getRtmToken();
   }, [AGORA_APP_ID, user?.id]);
 
-  // PushNotification.createChannel(
-  //   {
-  //     channelId: 'chat-channel-id', // (required)
-  //     channelName: 'chat channel', // (required)
-  //     channelDescription: 'A default channel', // (optional) default: undefined.
-  //     soundName: 'default', // (optional) See `soundName` parameter of `localNotification` function
-  //     vibrate: true, // (optional) default: true. Creates the default vibration pattern if true.
-  //   },
-  //   created =>
-  //     console.log(`createChannel 'default-channel-id' returned '${created}'`), // (optional) callback returns whether the channel was created, false means it already existed.
-  // );
-  PushNotification.getChannels(function (channel_ids) {
-    console.log('list of channelId ------', channel_ids); // ['channel_id_1']
-  });
-
   useEffect(() => {
     const naviateByNotif = (notification: any) => {
+      console.log('navigateByNotif called');
+
       if (navigationRef.current?.getCurrentRoute?.name !== 'Login') {
-        if (
-          notification.userInfo?.screen === 'event' &&
-          notification.userInfo?.id
-        ) {
+        if (notification.data?.screen === 'event' && notification.data?.id) {
           navigationRef.current?.navigate('EventStack', {
             screen: 'EventDetail',
-            params: {id: notification.userInfo?.id},
+            params: {id: notification.data?.id},
             initial: false,
           });
         }
-        if (
-          notification.userInfo?.screen === 'wiki' &&
-          notification.userInfo?.id
-        ) {
+        if (notification.data?.screen === 'wiki' && notification.data?.id) {
           navigationRef.current?.navigate('WikiStack', {
             screen: 'WikiDetail',
-            params: {id: notification.userInfo?.id},
+            params: {id: notification.data?.id},
             initial: false,
           });
         }
-        if (notification.userInfo?.screen === 'room') {
+        if (notification.data?.screen === 'room') {
           navigationRef.current?.navigate('ChatStack', {
             screen: 'RoomList',
           });
         }
-        if (
-          notification.userInfo?.screen === 'chat' &&
-          notification.userInfo?.id
-        ) {
+        if (notification.data?.screen === 'chat' && notification.data?.id) {
           navigationRef.current?.navigate('ChatStack', {
             screen: 'Chat',
-            params: {room: {id: notification.userInfo?.id}},
+            params: {room: {id: notification.data?.id}},
             initial: false,
           });
         }
       }
     };
-    Notifications.getInitialNotification()
-      .then(notification => {
-        console.log(
-          'Initial notification was:',
-          notification ? notification.payload : 'N/A',
-        );
-      })
-      .catch(err => console.error('getInitialNotifiation() failed', err));
 
-    // PushNotification.configure({
-    //   onRegister: function (token) {
-    //     console.log('PushNotification TOKEN:', token);
-    //   },
-    //   onNotification: notification => {
-    //     console.log('PushNotification onNotification========', notification);
-    //     if (notification.userInteraction) {
-    //       naviateByNotif(notification);
-    //     }
-    //     notification.finish(PushNotificationIOS.FetchResult.NoData);
-    //   },
-    //   permissions: {
-    //     alert: true,
-    //     badge: true,
-    //     sound: true,
-    //   },
-    //   requestPermissions: true,
-    // });
-    // Notifications.events().registerNotificationReceivedForeground(
-    //   (
-    //     notification: Notification,
-    //     completion: (response: NotificationCompletion) => void,
-    //   ) => {
-    //     console.log('Notification Received - Foreground', notification.payload);
-    //     if (notification.payload.userInfo) {
-    //       naviateByNotif(notification.payload);
-    //     }
+    PushNotification.configure({
+      onRegister: function (token) {
+        console.log('PushNotification TOKEN:', token);
+      },
+      onNotification: notification => {
+        console.log('PushNotification onNotification========', notification);
+        if (notification.userInteraction) {
+          console.log('++++++++++++========');
+          naviateByNotif(notification);
+        }
+        notification.finish(PushNotificationIOS.FetchResult.NoData);
+      },
+      permissions: {
+        alert: true,
+        badge: true,
+        sound: true,
+      },
+      requestPermissions: true,
+    });
 
-    //     // Calling completion on iOS with `alert: true` will present the native iOS inApp notification.
-    //     completion({alert: true, sound: true, badge: false});
-    //   },
-    // );
     const unsubscribe = messaging().onMessage(async remoteMessage => {
-      console.log('onMessage  --------', remoteMessage);
-      // PushNotification.localNotification({
-      //   channelId: 'fcm_fallback_notification_channel',
-      //   ignoreInForeground: false,
-      //   id: remoteMessage.messageId,
-      //   vibrate: true, // (optional) default: true
-      //   vibration: 300,
-      //   priority: 'high', // (optional) set notification priority, default: high
-      //   visibility: 'public', // (optional) set notification visibility, default: private
-      //   message: remoteMessage.notification?.body || '',
-      //   title: remoteMessage.notification?.title,
-      //   bigPictureUrl: remoteMessage.notification?.android?.imageUrl,
-      //   userInfo: {
-      //     screen: remoteMessage?.data?.screen,
-      //     id: remoteMessage?.data?.id,
-      //   },
-      // });
-      const payload = {
-        body: remoteMessage.notification?.body || '',
-        title: remoteMessage.notification?.title,
-        sound: 'chime.aiff',
-        silent: false,
-        category: 'SOME_CATEGORY',
+      console.log('onMessage  --------', remoteMessage.data);
+      PushNotification.localNotification({
+        channelId: 'fcm_fallback_notification_channel',
+        ignoreInForeground: false,
+        id: remoteMessage.messageId,
+        vibrate: true, // (optional) default: true
+        vibration: 300,
+        priority: 'high', // (optional) set notification priority, default: high
+        visibility: 'public', // (optional) set notification visibility, default: private
+        message: remoteMessage.notification?.body || 'notification',
+        title: remoteMessage.notification?.title || 'notification',
+        bigPictureUrl: remoteMessage.notification?.android?.imageUrl,
         userInfo: {
           screen: remoteMessage?.data?.screen,
           id: remoteMessage?.data?.id,
         },
-      };
-      Notifications.postLocalNotification(payload);
-      console.log('00000000000000000000000');
+      });
     });
 
     return unsubscribe;
