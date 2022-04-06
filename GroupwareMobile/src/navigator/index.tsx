@@ -3,6 +3,8 @@ import {createStackNavigator} from '@react-navigation/stack';
 import {
   NavigationContainer,
   useNavigationContainerRef,
+  useNavigationState,
+  useRoute,
 } from '@react-navigation/native';
 import Login from '../screens/auth/Login';
 import {useAuthenticate} from '../contexts/useAuthenticate';
@@ -41,7 +43,7 @@ let rtcEngine: RtcEngine;
 let callKeepUUID = '';
 
 const Navigator = () => {
-  const {user} = useAuthenticate();
+  const {user, currentChatRoomId} = useAuthenticate();
   const navigationRef = useNavigationContainerRef<any>();
   const {mutate: registerDevice} = useAPIRegisterDevice({
     onSuccess: updatedInfo => {
@@ -499,7 +501,6 @@ const Navigator = () => {
       onNotification: notification => {
         console.log('PushNotification onNotification========', notification);
         if (notification.userInteraction) {
-          console.log('++++++++++++========');
           naviateByNotif(notification);
         }
         notification.finish(PushNotificationIOS.FetchResult.NoData);
@@ -514,6 +515,15 @@ const Navigator = () => {
 
     const unsubscribe = messaging().onMessage(async remoteMessage => {
       console.log('onMessage  --------', remoteMessage.data);
+      console.log('------------', currentChatRoomId);
+      if (
+        remoteMessage?.data?.screen &&
+        remoteMessage.data?.id === `${currentChatRoomId}`
+      ) {
+        console.log('He is in the same chat room!!');
+        return;
+      }
+
       PushNotification.localNotification({
         channelId: 'fcm_fallback_notification_channel',
         ignoreInForeground: false,
@@ -533,7 +543,7 @@ const Navigator = () => {
     });
 
     return unsubscribe;
-  }, [navigationRef]);
+  }, [navigationRef, currentChatRoomId]);
 
   useEffect(() => {
     if (isJoining) {
