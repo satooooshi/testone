@@ -3,6 +3,7 @@
 #import <Firebase.h>
 #import "AppDelegate.h"
 #import "RNFBMessagingModule.h"
+#import "RNNotifications.h"
 
 #import "RNBootSplash.h"
 
@@ -40,6 +41,12 @@ static void InitializeFlipper(UIApplication *application) {
             continueUserActivity:userActivity
               restorationHandler:restorationHandler];
  }
+
+//  - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+//     [RNNotifications startMonitorNotifications]; // -> Add this line
+
+//     return YES;
+// }
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
@@ -108,6 +115,7 @@ didReceiveNotificationResponse:(UNNotificationResponse *)response
 {
   completionHandler(UNNotificationPresentationOptionSound | UNNotificationPresentationOptionAlert | UNNotificationPresentationOptionBadge);
 }
+
 
 
 @end

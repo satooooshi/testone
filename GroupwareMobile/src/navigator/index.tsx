@@ -28,6 +28,7 @@ import {useInviteCall} from '../contexts/call/useInviteCall';
 import SoundPlayer from 'react-native-sound-player';
 import PushNotificationIOS from '@react-native-community/push-notification-ios';
 import {debounce} from 'lodash';
+import {Notifications} from 'react-native-notifications';
 
 const Stack = createStackNavigator<RootStackParamList>();
 export const rtmEngine = new RtmClient();
@@ -478,6 +479,15 @@ const Navigator = () => {
         }
       }
     };
+    Notifications.getInitialNotification()
+      .then(notification => {
+        console.log(
+          'Initial notification was:',
+          notification ? notification.payload : 'N/A',
+        );
+      })
+      .catch(err => console.error('getInitialNotifiation() failed', err));
+
     PushNotification.configure({
       onRegister: function (token) {
         console.log('PushNotification TOKEN:', token);
@@ -514,6 +524,16 @@ const Navigator = () => {
           id: remoteMessage?.data?.id,
         },
       });
+      const payload = {
+        body: 'Local notification!',
+        title: 'Local Notification Title',
+        sound: 'chime.aiff',
+        silent: false,
+        category: 'SOME_CATEGORY',
+        userInfo: {},
+        fireDate: new Date(),
+      };
+      Notifications.postLocalNotification(payload);
     });
 
     return unsubscribe;
