@@ -15,6 +15,7 @@ import com.facebook.react.bridge.JSIModulePackage;
 import com.lugg.ReactNativeConfig.ReactNativeConfigPackage;
 
 
+
 public class MainApplication extends Application implements ReactApplication {
 
   private final ReactNativeHost mReactNativeHost =

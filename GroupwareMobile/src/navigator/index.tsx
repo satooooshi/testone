@@ -28,6 +28,11 @@ import {useInviteCall} from '../contexts/call/useInviteCall';
 import SoundPlayer from 'react-native-sound-player';
 import PushNotificationIOS from '@react-native-community/push-notification-ios';
 import {debounce} from 'lodash';
+import {
+  Notification,
+  NotificationCompletion,
+  Notifications,
+} from 'react-native-notifications';
 
 const Stack = createStackNavigator<RootStackParamList>();
 export const rtmEngine = new RtmClient();
@@ -201,7 +206,7 @@ const Navigator = () => {
     });
   }, [createRTCInstance, endCall]);
 
-  const debouncedEndCall = debounce(endCall, 300);
+  const debouncedEndCall = debounce(endCall, 100);
 
   const callbacks: Partial<CallbacksInterface> = {
     EndCall: debouncedEndCall,
@@ -224,6 +229,27 @@ const Navigator = () => {
 
   messaging().setBackgroundMessageHandler(async remoteMessage => {
     console.log('BackgroundMessage received!!');
+    messaging().onMessage(async remoteMessage => {
+      console.log('onMessage  --------', remoteMessage.data);
+      if (remoteMessage?.data?.screen) {
+        PushNotification.localNotification({
+          channelId: 'fcm_fallback_notification_channel',
+          ignoreInForeground: false,
+          id: remoteMessage.messageId,
+          vibrate: true, // (optional) default: true
+          vibration: 300,
+          priority: 'high', // (optional) set notification priority, default: high
+          visibility: 'public', // (optional) set notification visibility, default: private
+          message: remoteMessage.notification?.body || 'notification',
+          title: remoteMessage.notification?.title || 'notification',
+          bigPictureUrl: remoteMessage.notification?.android?.imageUrl,
+          userInfo: {
+            screen: remoteMessage?.data?.screen,
+            id: remoteMessage?.data?.id,
+          },
+        });
+      }
+    });
     if (Platform.OS === 'ios') {
       if (remoteMessage?.data?.type === 'call') {
         // iOSのみ、アプリがバックグラウンド状態のときはプッシュ通知で通話をハンドリングする必要がある
@@ -402,6 +428,7 @@ const Navigator = () => {
     rtmInit();
     return () => {
       // アンマウント時に全てのリスナーを消す
+      console.log('unmount!');
       RNCallKeep.removeEventListener('answerCall');
       RNCallKeep.removeEventListener('endCall');
       rtcEngine.removeAllListeners();
@@ -431,23 +458,10 @@ const Navigator = () => {
     getRtmToken();
   }, [AGORA_APP_ID, user?.id]);
 
-  // PushNotification.createChannel(
-  //   {
-  //     channelId: 'chat-channel-id', // (required)
-  //     channelName: 'chat channel', // (required)
-  //     channelDescription: 'A default channel', // (optional) default: undefined.
-  //     soundName: 'default', // (optional) See `soundName` parameter of `localNotification` function
-  //     vibrate: true, // (optional) default: true. Creates the default vibration pattern if true.
-  //   },
-  //   created =>
-  //     console.log(`createChannel 'default-channel-id' returned '${created}'`), // (optional) callback returns whether the channel was created, false means it already existed.
-  // );
-  PushNotification.getChannels(function (channel_ids) {
-    console.log('list of channelId ------', channel_ids); // ['channel_id_1']
-  });
-
   useEffect(() => {
     const naviateByNotif = (notification: any) => {
+      console.log('navigateByNotif called');
+
       if (navigationRef.current?.getCurrentRoute?.name !== 'Login') {
         if (notification.data?.screen === 'event' && notification.data?.id) {
           navigationRef.current?.navigate('EventStack', {
@@ -477,6 +491,7 @@ const Navigator = () => {
         }
       }
     };
+
     PushNotification.configure({
       onRegister: function (token) {
         console.log('PushNotification TOKEN:', token);
@@ -484,6 +499,7 @@ const Navigator = () => {
       onNotification: notification => {
         console.log('PushNotification onNotification========', notification);
         if (notification.userInteraction) {
+          console.log('++++++++++++========');
           naviateByNotif(notification);
         }
         notification.finish(PushNotificationIOS.FetchResult.NoData);
@@ -495,8 +511,9 @@ const Navigator = () => {
       },
       requestPermissions: true,
     });
+
     const unsubscribe = messaging().onMessage(async remoteMessage => {
-      console.log('onMessage  --------', remoteMessage);
+      console.log('onMessage  --------', remoteMessage.data);
       PushNotification.localNotification({
         channelId: 'fcm_fallback_notification_channel',
         ignoreInForeground: false,
@@ -505,8 +522,8 @@ const Navigator = () => {
         vibration: 300,
         priority: 'high', // (optional) set notification priority, default: high
         visibility: 'public', // (optional) set notification visibility, default: private
-        message: remoteMessage.notification?.body || '',
-        title: remoteMessage.notification?.title,
+        message: remoteMessage.notification?.body || 'notification',
+        title: remoteMessage.notification?.title || 'notification',
         bigPictureUrl: remoteMessage.notification?.android?.imageUrl,
         userInfo: {
           screen: remoteMessage?.data?.screen,
