@@ -28,19 +28,36 @@ export const reactionStickers = [
     name: 'funnySticker',
     src: funnySticker.src,
   },
+  {
+    name: 'callSticker',
+    src: callSticker.src,
+  },
+  {
+    name: 'lookSticker',
+    src: lookSticker.src,
+  },
+  {
+    name: 'helpSticker',
+    src: helpSticker.src,
+  },
+  {
+    name: 'questionSticker',
+    src: questionSticker.src,
+  },
+  {
+    name: 'goodJobSticker',
+    src: goodJobSticker.src,
+  },
+  {
+    name: 'rogerSticker',
+    src: rogerSticker.src,
+  },
+  {
+    name: 'sorrySticker',
+    src: sorrySticker.src,
+  },
+  {
+    name: 'willDoSticker',
+    src: willDoSticker.src,
+  },
 ];
-
-// export const reactionStickers = [
-//   goodSticker.src,
-//   shockSticker.src,
-//   angrySticker.src,
-//   funnySticker.src,
-//   callSticker.src,
-//   lookSticker.src,
-//   helpSticker.src,
-//   questionSticker.src,
-//   goodJobSticker.src,
-//   rogerSticker.src,
-//   sorrySticker.src,
-//   willDoSticker.src,
-// ];
