@@ -341,11 +341,11 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
     setNewChatMessage((v) => ({ ...v, content: markdownString }));
   };
 
-  const handleStickerSelected = (sticker: string) => {
+  const handleStickerSelected = (sticker?: string) => {
     sendChatMessage({
       content: sticker,
       chatGroup: newChatMessage.chatGroup,
-      type: ChatMessageType.IMAGE,
+      type: ChatMessageType.STICKER,
     });
   };
 
@@ -844,15 +844,15 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
                 <PopoverBody>
                   <SimpleGrid columns={3}>
                     {reactionStickers.map((e) => (
-                      <Fragment key={e}>
+                      <Fragment key={e.name}>
                         <a
                           onClick={() => {
-                            handleStickerSelected(e);
+                            handleStickerSelected(e.name);
                             onClose();
                           }}>
                           <Box display="flex" maxW="300px" maxH={'300px'}>
                             <Image
-                              src={e}
+                              src={e.src}
                               w={100}
                               h={100}
                               padding={2}

@@ -12,16 +12,35 @@ import sorrySticker from '@/public/sorry_sticker.png';
 import willDoSticker from '@/public/willdo_sticker.png';
 
 export const reactionStickers = [
-  goodSticker.src,
-  shockSticker.src,
-  angrySticker.src,
-  funnySticker.src,
-  callSticker.src,
-  lookSticker.src,
-  helpSticker.src,
-  questionSticker.src,
-  goodJobSticker.src,
-  rogerSticker.src,
-  sorrySticker.src,
-  willDoSticker.src,
+  {
+    name: 'goodSticker',
+    src: goodSticker.src,
+  },
+  {
+    name: 'shockSticker',
+    src: shockSticker.src,
+  },
+  {
+    name: 'angrySticker',
+    src: angrySticker.src,
+  },
+  {
+    name: 'funnySticker',
+    src: funnySticker.src,
+  },
 ];
+
+// export const reactionStickers = [
+//   goodSticker.src,
+//   shockSticker.src,
+//   angrySticker.src,
+//   funnySticker.src,
+//   callSticker.src,
+//   lookSticker.src,
+//   helpSticker.src,
+//   questionSticker.src,
+//   goodJobSticker.src,
+//   rogerSticker.src,
+//   sorrySticker.src,
+//   willDoSticker.src,
+// ];
