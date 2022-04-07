@@ -68,6 +68,7 @@ const Navigator = () => {
   const [agoraToken, setAgoraToken] = useState('');
   const [channelName, setChannelName] = useState('');
   const [onCallUid, setOnCallUid] = useState('');
+  const [refusedInvitation, setRefusedInvitation] = useState(false);
   const [alertCountOnEndCall, setAlertCountOnEndCall] = useState(0);
   const AGORA_APP_ID = Config.AGORA_APP_ID;
   const rtcProps: RtcPropsInterface = {
@@ -263,15 +264,18 @@ const Navigator = () => {
     // }
   });
 
-  const handleInvitationRefused = useCallback(
+  useEffect(
     () => {
-      sendCallHistory('応答なし');
-      disableCallAcceptedFlag();
-      setLocalInvitationState(undefined);
-      stopRing();
-      setIsJoining(false);
+      if (refusedInvitation) {
+        sendCallHistory('応答なし');
+        disableCallAcceptedFlag();
+        setLocalInvitationState(undefined);
+        stopRing();
+        setIsJoining(false);
+        setRefusedInvitation(false);
+      }
     }, // eslint-disable-next-line react-hooks/exhaustive-deps
-    [localInvitation],
+    [refusedInvitation],
   );
 
   const rtmInit = async () => {
@@ -283,7 +287,7 @@ const Navigator = () => {
     });
     rtmEngine.addListener('LocalInvitationRefused', async () => {
       console.log('LocalInvitationRefused refused');
-      handleInvitationRefused();
+      setRefusedInvitation(true);
       // navigationRef.current?.navigate('Main');
     });
     rtmEngine.addListener('LocalInvitationAccepted', async invitation => {
