@@ -30,6 +30,6 @@ export const setupCallInvitation = async (
 
   await rtmEngine.sendLocalInvitationV2(localInvitation);
   // iOSのためにプッシュ通知も送る
-  await axiosInstance.post(`/chat/notif-call/${caller.id}`, localInvitation);
+  // await axiosInstance.post(`/chat/notif-call/${caller.id}`, localInvitation);
   return localInvitation;
 };
