@@ -242,8 +242,8 @@ const Navigator = () => {
           vibration: 300,
           priority: 'high', // (optional) set notification priority, default: high
           visibility: 'public', // (optional) set notification visibility, default: private
-          message: remoteMessage.notification?.body || 'notification',
-          title: remoteMessage.notification?.title || 'notification',
+          message: remoteMessage.notification?.body || '',
+          title: remoteMessage.notification?.title || '',
           bigPictureUrl: remoteMessage.notification?.android?.imageUrl,
           userInfo: {
             screen: remoteMessage?.data?.screen,
