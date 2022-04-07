@@ -10,7 +10,7 @@ import {
   InputRightElement,
 } from '@chakra-ui/react';
 import { MentionData } from '@draft-js-plugins/mention';
-import { darkFontColor } from 'src/utils/colors';
+import { blueColor, darkFontColor } from 'src/utils/colors';
 import { Menu, MenuItem, MenuButton } from '@szhsin/react-menu';
 import { HiOutlineDotsCircleHorizontal } from 'react-icons/hi';
 import Editor from '@draft-js-plugins/editor';
@@ -65,6 +65,7 @@ import { EntryComponentProps } from '@draft-js-plugins/mention/lib/MentionSugges
 import suggestionStyles from '@/styles/components/Suggestion.module.scss';
 import { useAPISearchMessages } from '@/hooks/api/chat/useAPISearchMessages';
 import { removeHalfWidthSpace } from 'src/utils/replaceWidthSpace';
+import { valueScaleCorrection } from 'framer-motion/types/render/dom/projection/scale-correction';
 
 export const Entry: React.FC<EntryComponentProps> = ({
   mention,
@@ -168,15 +169,17 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
     refetchInterval: 1000,
   });
   const userDataForMention: MentionData[] = useMemo(() => {
-    return (
+    const users =
       room?.members
         ?.filter((u) => u.id !== user?.id)
         .map((u) => ({
           id: u.id,
           name: userNameFactory(u) + 'さん',
           avatar: u.avatarUrl,
-        })) || []
-    );
+        })) || [];
+    const allTag = { id: 0, name: 'all', avatar: '' };
+    users.unshift(allTag);
+    return users;
   }, [room?.members, user?.id]);
 
   const [suggestions, setSuggestions] =
@@ -271,7 +274,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
       let parsedMessage = newChatMessage.content;
       for (const m of mentionedUserData) {
         const regexp = new RegExp(`\\s${m.name}|^${m.name}`, 'g');
-        parsedMessage = parsedMessage.replace(regexp, `@[${m.name}](${m.id})`);
+        parsedMessage = parsedMessage.replace(regexp, `@${m.name}`);
       }
       sendChatMessage({
         ...newChatMessage,
@@ -825,7 +828,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
           <IoSend
             size={20}
             onClick={() => handleSubmit()}
-            color={darkFontColor}
+            color={newChatMessage.content ? blueColor : darkFontColor}
           />
         )}
       </Link>
