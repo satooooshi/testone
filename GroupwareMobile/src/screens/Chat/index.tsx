@@ -308,6 +308,7 @@ const Chat: React.FC = () => {
         onSuccess: imageURL => {
           sendChatMessage({
             content: imageURL[0],
+            fileName: imageURL[0] + '.png',
             type: ChatMessageType.IMAGE,
             chatGroup: room,
           });
@@ -326,6 +327,7 @@ const Chat: React.FC = () => {
         onSuccess: imageURL => {
           sendChatMessage({
             content: imageURL[0],
+            fileName: imageURL[0] + '.mp4',
             type: ChatMessageType.VIDEO,
             chatGroup: room,
           });
@@ -359,6 +361,7 @@ const Chat: React.FC = () => {
         onSuccess: imageURL => {
           sendChatMessage({
             content: imageURL[0],
+            fileName: res.name,
             type: ChatMessageType.OTHER_FILE,
             chatGroup: room,
           });

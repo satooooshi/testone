@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React from 'react';
 import {textContent} from 'domutils';
 import {Element} from 'domhandler';
 import TOCEntry from './TOCEntry';

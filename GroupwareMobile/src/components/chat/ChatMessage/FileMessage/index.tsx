@@ -4,9 +4,9 @@ import {Icon, Text} from 'react-native-magnus';
 import {fileMessageStyles} from '../../../../styles/component/chat/fileMessage.style';
 import {ChatMessage} from '../../../../types';
 import FileViewer from 'react-native-file-viewer';
-import RNFetchBlob from 'rn-fetch-blob';
-import {fileNameTransformer} from '../../../../utils/factory/fileNameTransformer';
+import RNFetchBlob, {RNFetchBlobConfig} from 'rn-fetch-blob';
 import {ActivityIndicator} from 'react-native-paper';
+
 const {fs, config} = RNFetchBlob;
 
 type FileMessageProps = {
@@ -18,42 +18,39 @@ const FileMessage: React.FC<FileMessageProps> = ({message, onLongPress}) => {
   const [loading, setLoading] = useState(false);
   const downloadFile = async () => {
     setLoading(true);
+
     let DownloadDir =
       Platform.OS === 'android' ? fs.dirs.DownloadDir : fs.dirs.DocumentDir;
-    const ext = message.content.split(/[#?]/)[0]?.split('.')?.pop()?.trim();
+    const ext = message.fileName.split(/[#?]/)[0]?.split('.')?.pop()?.trim();
+
     let options = {
+      path: DownloadDir + '/' + message.fileName, // this is the path where your downloaded file will live in
       addAndroidDownloads: {
-        useDownloadManager: true, // setting it to true will use the device's native download manager and will be shown in the notification bar.
+        title: DownloadDir + '/' + message.fileName,
+        useDownloadManager: false, // setting it to true will use the device's native download manager and will be shown in the notification bar.
+        // useDownloadManager: true,にするとエラー
         notification: true,
         description: 'ファイルをダウンロードします',
-        path:
-          DownloadDir +
-          '/me_' +
-          decodeURIComponent(
-            (message.content?.match('.+/(.+?)([?#;].*)?$') || [
-              '',
-              message.content,
-            ])[1] || '',
-          ), // this is the path where your downloaded file will live in
+        // path: DownloadDir + '/' + message.fileName,
+        // this is the path where your downloaded file will live in
         appendExt: ext,
       },
-      path:
-        DownloadDir +
-        '/me_' +
-        decodeURIComponent(
-          (message.content?.match('.+/(.+?)([?#;].*)?$') || [
-            '',
-            message.content,
-          ])[1] || '',
-        ), // this is the path where your downloaded file will live in
     };
     try {
-      const {path} = await config(options).fetch('GET', message.content);
+      const {path} = await config(options as RNFetchBlobConfig).fetch(
+        'GET',
+        message.content,
+      );
+
       setLoading(false);
       if (path) {
         FileViewer.open(path()).catch(err => {
           if (err?.message === 'No app associated with this mime type') {
-            Alert.alert('このファイル形式に対応しているアプリがありません');
+            if (Platform.OS === 'ios') {
+              Alert.alert('このファイル形式に対応しているアプリがありません');
+            } else {
+              Alert.alert('ダウンロードが完了しました。');
+            }
           }
         });
       }
@@ -73,7 +70,7 @@ const FileMessage: React.FC<FileMessageProps> = ({message, onLongPress}) => {
         <Icon name="filetext1" fontFamily="AntDesign" fontSize={64} mb={'lg'} />
       )}
       <Text color="blue700" numberOfLines={1}>
-        {fileNameTransformer(message.content)}
+        {message.fileName}
       </Text>
     </TouchableOpacity>
   );

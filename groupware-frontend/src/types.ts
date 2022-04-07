@@ -72,6 +72,10 @@ export enum BoardCategory {
   CLUB = 'club',
   //勉強会
   STUDY_MEETING = 'study_meeting',
+  //自己研鑽
+  SELF_IMPROVEMENT = 'self_improvement',
+  //個人告知
+  PERSONAL_ANNOUNCEMENT = 'personal_announcement',
   //お祝い事
   CELEBRATION = 'celebration',
   //その他
@@ -259,6 +263,7 @@ export interface EventVideo {
 export interface SubmissionFile {
   id: number;
   url: string;
+  name: string;
   eventSchedule?: Partial<EventSchedule>;
   userSubmitted?: Partial<User>;
   createdAt: Date;
@@ -268,6 +273,7 @@ export interface SubmissionFile {
 export interface EventFile {
   id: number;
   url: string;
+  name: string;
   eventSchedule?: EventSchedule;
   createdAt: Date;
   updatedAt: Date;
@@ -283,6 +289,7 @@ export interface Department {
 export interface ChatMessage {
   id: number;
   content: string;
+  fileName: string;
   type: ChatMessageType;
   chatGroup?: ChatGroup;
   chatMessages?: ChatMessage[];
@@ -294,10 +301,16 @@ export interface ChatMessage {
   replyParentMessage?: ChatMessage;
 }
 
+export enum RoomType {
+  GROUP = 'group',
+  TALK_ROOM = 'talk_room',
+  PERSONAL = 'personal',
+}
 export interface ChatGroup {
   id: number;
   name: string;
   imageURL: string;
+  roomType: RoomType;
   pinnedUsers?: User[];
   isPinned?: boolean;
   chatNotes?: ChatNote[];
@@ -330,6 +343,7 @@ export interface ChatNote {
 export interface ChatNoteImage {
   id: number;
   imageURL: string;
+  name: string;
   chatNote?: ChatNote;
   createdAt: Date;
   updatedAt: Date;
@@ -348,6 +362,7 @@ export interface ChatAlbum {
 
 export interface ChatAlbumImage {
   id: number;
+  name: string;
   imageURL: string;
   chatAlbum?: ChatAlbum;
   createdAt: Date;

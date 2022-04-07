@@ -44,9 +44,6 @@ const App = () => {
               Linking.openURL(needOrNot.storeUrl);
             },
           },
-          {
-            text: 'キャンセル',
-          },
         ]);
       }
     };
