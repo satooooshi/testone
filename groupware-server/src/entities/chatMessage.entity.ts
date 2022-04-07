@@ -118,6 +118,7 @@ export class ChatMessage {
   @AfterInsert()
   async sendPushNotification() {
     if (this.chatGroup?.id && this.sender?.id) {
+      if (this.content === '音声通話') return;
       let content = this.content;
       if (this.type === ChatMessageType.IMAGE) {
         content = '画像';

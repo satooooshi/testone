@@ -3,6 +3,8 @@ import {createStackNavigator} from '@react-navigation/stack';
 import {
   NavigationContainer,
   useNavigationContainerRef,
+  useNavigationState,
+  useRoute,
 } from '@react-navigation/native';
 import Login from '../screens/auth/Login';
 import {useAuthenticate} from '../contexts/useAuthenticate';
@@ -41,7 +43,7 @@ let rtcEngine: RtcEngine;
 let callKeepUUID = '';
 
 const Navigator = () => {
-  const {user} = useAuthenticate();
+  const {user, currentChatRoomId} = useAuthenticate();
   const navigationRef = useNavigationContainerRef<any>();
   const {mutate: registerDevice} = useAPIRegisterDevice({
     onSuccess: updatedInfo => {
@@ -228,35 +230,32 @@ const Navigator = () => {
   };
 
   messaging().setBackgroundMessageHandler(async remoteMessage => {
-    console.log('BackgroundMessage received!!');
-    messaging().onMessage(async remoteMessage => {
-      console.log('onMessage  --------', remoteMessage.data);
-      if (remoteMessage?.data?.screen) {
-        PushNotification.localNotification({
-          channelId: 'fcm_fallback_notification_channel',
-          ignoreInForeground: false,
-          id: remoteMessage.messageId,
-          vibrate: true, // (optional) default: true
-          vibration: 300,
-          priority: 'high', // (optional) set notification priority, default: high
-          visibility: 'public', // (optional) set notification visibility, default: private
-          message: remoteMessage.notification?.body || 'notification',
-          title: remoteMessage.notification?.title || 'notification',
-          bigPictureUrl: remoteMessage.notification?.android?.imageUrl,
-          userInfo: {
-            screen: remoteMessage?.data?.screen,
-            id: remoteMessage?.data?.id,
-          },
-        });
-      }
-    });
-    if (Platform.OS === 'ios') {
-      if (remoteMessage?.data?.type === 'call') {
-        // iOSのみ、アプリがバックグラウンド状態のときはプッシュ通知で通話をハンドリングする必要がある
-        displayIncomingCallNow(remoteMessage?.data as any);
-        console.log('Message handled in the background!', remoteMessage);
-      }
-    }
+    console.log('BackgroundMessage received!!', remoteMessage);
+    // if (Platform.OS === 'ios' && remoteMessage?.data?.screen) {
+    //   PushNotification.localNotification({
+    //     channelId: 'fcm_fallback_notification_channel',
+    //     ignoreInForeground: false,
+    //     id: remoteMessage.messageId,
+    //     vibrate: true, // (optional) default: true
+    //     vibration: 300,
+    //     priority: 'high', // (optional) set notification priority, default: high
+    //     visibility: 'public', // (optional) set notification visibility, default: private
+    //     message: remoteMessage.notification?.body || '',
+    //     title: remoteMessage.notification?.title || '',
+    //     bigPictureUrl: remoteMessage.notification?.android?.imageUrl,
+    //     userInfo: {
+    //       screen: remoteMessage?.data?.screen,
+    //       id: remoteMessage?.data?.id,
+    //     },
+    //   });
+    // }
+    // if (Platform.OS === 'ios') {
+    //   if (remoteMessage?.data?.type === 'call') {
+    //     // iOSのみ、アプリがバックグラウンド状態のときはプッシュ通知で通話をハンドリングする必要がある
+    //     displayIncomingCallNow(remoteMessage?.data as any);
+    //     console.log('Message handled in the background!', remoteMessage);
+    //   }
+    // }
   });
 
   const rtmInit = async () => {
@@ -393,6 +392,7 @@ const Navigator = () => {
     // アプリをバックグラウンドからフォアグラウンドに
     RNCallKeep.backToForeground();
     RNCallKeep.endAllCalls();
+    navigationRef.current?.navigate('Call');
     if (remoteInvitation.current?.channelId) {
       const realChannelName = remoteInvitation.current?.channelId as string;
       // 招待を承認
@@ -493,13 +493,9 @@ const Navigator = () => {
     };
 
     PushNotification.configure({
-      onRegister: function (token) {
-        console.log('PushNotification TOKEN:', token);
-      },
       onNotification: notification => {
         console.log('PushNotification onNotification========', notification);
         if (notification.userInteraction) {
-          console.log('++++++++++++========');
           naviateByNotif(notification);
         }
         notification.finish(PushNotificationIOS.FetchResult.NoData);
@@ -514,16 +510,24 @@ const Navigator = () => {
 
     const unsubscribe = messaging().onMessage(async remoteMessage => {
       console.log('onMessage  --------', remoteMessage.data);
+      console.log('------------', currentChatRoomId);
+      if (
+        remoteMessage?.data?.screen &&
+        remoteMessage.data?.id === `${currentChatRoomId}`
+      ) {
+        console.log('He is in the same chat room!!');
+        return;
+      }
       PushNotification.localNotification({
-        channelId: 'fcm_fallback_notification_channel',
+        channelId: 'default-channel-id',
         ignoreInForeground: false,
         id: remoteMessage.messageId,
         vibrate: true, // (optional) default: true
         vibration: 300,
         priority: 'high', // (optional) set notification priority, default: high
         visibility: 'public', // (optional) set notification visibility, default: private
-        message: remoteMessage.notification?.body || 'notification',
-        title: remoteMessage.notification?.title || 'notification',
+        message: remoteMessage.notification?.body || '',
+        title: remoteMessage.notification?.title || '',
         bigPictureUrl: remoteMessage.notification?.android?.imageUrl,
         userInfo: {
           screen: remoteMessage?.data?.screen,
@@ -533,7 +537,7 @@ const Navigator = () => {
     });
 
     return unsubscribe;
-  }, [navigationRef]);
+  }, [navigationRef, currentChatRoomId]);
 
   useEffect(() => {
     if (isJoining) {

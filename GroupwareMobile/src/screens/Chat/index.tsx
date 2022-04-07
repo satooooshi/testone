@@ -87,7 +87,7 @@ const socket = io(baseURL, {
 const TopTab = createMaterialTopTabNavigator();
 
 const Chat: React.FC = () => {
-  const {user: myself} = useAuthenticate();
+  const {user: myself, setCurrentChatRoomId} = useAuthenticate();
   const typeDropdownRef = useRef<any | null>(null);
   const messageIosRef = useRef<FlatList | null>(null);
   const messageAndroidRef = useRef<{flatListRef: Element | null}>({
@@ -584,6 +584,7 @@ const Chat: React.FC = () => {
         }
       }
     });
+    setCurrentChatRoomId(room.id);
 
     socket.on('joinedRoom', (r: any) => {
       console.log('joinedRoom', r);
@@ -595,6 +596,7 @@ const Chat: React.FC = () => {
     return () => {
       socket.emit('leaveRoom', room.id);
       isMounted = false;
+      setCurrentChatRoomId(undefined);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [room.id]);
