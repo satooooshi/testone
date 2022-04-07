@@ -2,6 +2,7 @@ import { NotificationDevice } from 'src/entities/device.entity';
 import { User } from 'src/entities/user.entity';
 import { getRepository } from 'typeorm';
 import * as PushNotifications from 'node-pushnotifications';
+import { callHistoryMessageFactory } from '../factory/callHistoryMessageFactory';
 
 export type CustomPushNotificationData = {
   title: string;
@@ -56,7 +57,7 @@ const sendPushNotifToSpecificDevices = async (
      * When using certificate-based authentication, the topic is usually your app's bundle ID.
      * More details can be found under https://developer.apple.com/documentation/usernotifications/setting_up_a_remote_notification_server/sending_notification_requests_to_apns
      */
-    body: data.body ? data.body : '',
+    body: callHistoryMessageFactory(data.body),
     custom: data.custom,
     priority: 'high', // gcm, apn. Supported values are 'high' or 'normal' (gcm). Will be translated to 10 and 5 for apn. Defaults to 'high'
     collapseKey: '', // gcm for android, used as collapseId in apn
