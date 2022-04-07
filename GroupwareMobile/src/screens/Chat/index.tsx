@@ -372,10 +372,10 @@ const Chat: React.FC = () => {
     }
   };
 
-  const handleStickerSelected = (stickerFileName: string) => {
+  const handleStickerSelected = (sticker: string) => {
     sendChatMessage({
-      content: stickerFileName,
-      type: ChatMessageType.IMAGE,
+      content: sticker,
+      type: ChatMessageType.STICKER,
       chatGroup: room,
     });
   };
@@ -718,8 +718,10 @@ const Chat: React.FC = () => {
       </TouchableOpacity>
       <ScrollView horizontal={true}>
         {reactionStickers.map(e => (
-          <TouchableOpacity key={e} onPress={() => handleStickerSelected(e)}>
-            <Image source={e} style={{height: 80, width: 80, margin: 10}} />
+          <TouchableOpacity
+            key={e.name}
+            onPress={() => handleStickerSelected(e.name)}>
+            <Image source={e.src} style={{height: 80, width: 80, margin: 10}} />
           </TouchableOpacity>
         ))}
       </ScrollView>
