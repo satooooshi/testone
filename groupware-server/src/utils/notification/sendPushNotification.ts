@@ -106,7 +106,12 @@ const sendPushNotifToSpecificDevices = async (
     mutableContent: 0, // apn
     threadId: '', // apn
     pushType: 'alert', // apn. valid values are 'alert' and 'background' (https://github.com/parse-community/node-apn/blob/master/doc/notification.markdown#notificationpushtype)
+    expiry: Math.floor(Date.now() / 1000) + 28 * 86400, // unit is seconds. if both expiry and timeToLive are given, expiry will take precedence
     timeToLive: 28 * 86400,
+    headers: [], // wns
+    launch: '', // wns
+    duration: '', // wns
+    consolidationKey: 'my notification', // ADM
   };
   pushNotifService.send(tokens, dataToSend, (err, result) => {
     if (err) {
