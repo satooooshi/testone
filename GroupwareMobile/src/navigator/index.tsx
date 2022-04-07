@@ -138,8 +138,11 @@ const Navigator = () => {
         if (alertNeeded) {
           console.log('attempt to cancel', localInvitation);
           await rtmEngine?.cancelLocalInvitationV2(localInvitation);
-          sendCallHistory('キャンセル');
-          // sendCallHistory('キャンセル');
+          if (callTimeout) {
+            sendCallHistory('応答なし');
+          } else {
+            sendCallHistory('キャンセル');
+          }
         }
         console.log('cancel finishedーーーーーーーーーーーーー');
       }
@@ -147,6 +150,7 @@ const Navigator = () => {
       setChannelName('');
       setIsJoining(false);
       setIsCalling(false);
+      setCallTimeout(false);
       disableCallAcceptedFlag();
       setLocalInvitationState(undefined);
       reject();
@@ -170,6 +174,7 @@ const Navigator = () => {
       isCallAccepted,
       localInvitation,
       setLocalInvitationState,
+      callTimeout,
     ],
   );
 
@@ -258,6 +263,17 @@ const Navigator = () => {
     // }
   });
 
+  const handleInvitationRefused = useCallback(
+    () => {
+      sendCallHistory('応答なし');
+      disableCallAcceptedFlag();
+      setLocalInvitationState(undefined);
+      stopRing();
+      setIsJoining(false);
+    }, // eslint-disable-next-line react-hooks/exhaustive-deps
+    [localInvitation],
+  );
+
   const rtmInit = async () => {
     await rtmEngine.createInstance(AGORA_APP_ID);
     // listenerを複数登録しないようにする
@@ -267,11 +283,7 @@ const Navigator = () => {
     });
     rtmEngine.addListener('LocalInvitationRefused', async () => {
       console.log('LocalInvitationRefused refused');
-      sendCallHistory('応答なし');
-      disableCallAcceptedFlag();
-      setLocalInvitationState(undefined);
-      stopRing();
-      setIsJoining(false);
+      handleInvitationRefused();
       // navigationRef.current?.navigate('Main');
     });
     rtmEngine.addListener('LocalInvitationAccepted', async invitation => {
@@ -566,14 +578,12 @@ const Navigator = () => {
         if (localInvitation && !isCallAccepted) {
           console.log('cancel call by time out ===================');
           // await rtmEngine?.cancelLocalInvitationV2(localInvitation);
-          // sendCallHistory('応答なし');
           await endCall(true);
         }
       };
       if (callTimeout) {
         cancelCallByTimeout();
       }
-      setCallTimeout(false);
     }, // eslint-disable-next-line react-hooks/exhaustive-deps
     [callTimeout],
   );

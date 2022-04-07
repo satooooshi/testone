@@ -41,7 +41,6 @@ const sendPushNotifToSpecificDevices = async (
   devices: NotificationDevice[],
   data: CustomPushNotificationData,
 ) => {
-  console.log('sendPushNotifToSpecificDevices called', data.custom);
   const pushNotifSettings: PushNotifications.Settings = {
     gcm: {
       id: process.env.FCM_API_KEY,
@@ -116,11 +115,12 @@ const sendPushNotifToSpecificDevices = async (
   pushNotifService.send(tokens, dataToSend, (err, result) => {
     if (err) {
       console.log(err);
-    } else {
-      console.log(result);
-      for (const e of result) {
-        console.log(e.message);
-      }
     }
+    //  else {
+    //   console.log(result);
+    //   for (const e of result) {
+    //     console.log(e.message);
+    //   }
+    // }
   });
 };
