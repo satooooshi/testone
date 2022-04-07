@@ -15,6 +15,7 @@ const StickerMessage: React.FC<StickerMessageProps> = ({message}) => {
       <FastImage
         source={reactionStickers.find(s => s.name === message.content)?.src}
         style={{height: 144, width: windowWidth * 0.6, borderRadius: 8}}
+        resizeMode="contain"
       />
     </TouchableOpacity>
   );
