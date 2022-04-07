@@ -28,7 +28,10 @@ import { GetEventDetailResopnse } from './eventDetail.type';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { NotificationService } from '../notification/notification.service';
 import { ConfigService } from '@nestjs/config';
-import { CustomPushNotificationData, sendPushNotifToSpecificUsers } from 'src/utils/notification/sendPushNotification';
+import {
+  CustomPushNotificationData,
+  sendPushNotifToSpecificUsers,
+} from 'src/utils/notification/sendPushNotification';
 
 export interface QueryToGetZipSubmission {
   id: string;
@@ -155,6 +158,12 @@ export class EventScheduleController {
     @Body() submissionFiles: Partial<SubmissionFile>[],
   ): Promise<SubmissionFile[]> {
     return await this.eventService.saveSubmission(submissionFiles);
+  }
+
+  @Post('delete-submission')
+  @UseGuards(JwtAuthenticationGuard)
+  async deleteSubmission(@Body() body: { submissionId: number }) {
+    await this.eventService.deleteSubmission(body.submissionId);
   }
 
   //get 10 latest event randomly

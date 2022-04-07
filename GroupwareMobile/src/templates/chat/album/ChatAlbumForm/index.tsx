@@ -83,6 +83,7 @@ const ChatAlbumForm: React.FC<ChatAlbumFormProps> = ({
         onSuccess: imageURLs => {
           const newImages: Partial<ChatAlbumImage>[] = imageURLs.map(u => ({
             imageURL: u,
+            name: u + '.png',
           }));
           setValues(v => ({
             ...v,

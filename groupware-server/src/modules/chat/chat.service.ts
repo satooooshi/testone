@@ -270,6 +270,7 @@ export class ChatService {
     const savedMessage = await this.chatMessageRepository.save(
       this.chatMessageRepository.create(message),
     );
+
     existGroup.updatedAt = new Date();
     await this.chatGroupRepository.save({
       ...existGroup,

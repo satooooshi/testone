@@ -265,6 +265,7 @@ export interface EventVideo {
 export interface SubmissionFile {
   id: number;
   url: string;
+  name: string;
   eventSchedule?: Partial<EventSchedule>;
   userSubmitted?: Partial<User>;
   createdAt: Date;
@@ -274,6 +275,7 @@ export interface SubmissionFile {
 export interface EventFile {
   id: number;
   url: string;
+  name: string;
   eventSchedule?: EventSchedule;
   createdAt: Date;
   updatedAt: Date;
@@ -289,6 +291,7 @@ export interface Department {
 export interface ChatMessage {
   id: number;
   content: string;
+  fileName: string;
   type: ChatMessageType;
   chatGroup?: ChatGroup;
   sender?: User;
@@ -342,6 +345,7 @@ export interface ChatNote {
 
 export interface ChatNoteImage {
   id: number;
+  name: string;
   imageURL: string;
   chatNote?: ChatNote;
   createdAt: Date;
@@ -366,6 +370,7 @@ export interface ChatAlbum {
 
 export interface ChatAlbumImage {
   id: number;
+  name: string;
   imageURL: string;
   chatAlbum?: ChatAlbum;
   createdAt: Date;

@@ -48,6 +48,15 @@ export class ChatMessage {
   })
   type: ChatMessageType;
 
+  @Column({
+    name: 'name',
+    type: 'varchar',
+    length: 2083,
+    default: '',
+    nullable: false,
+  })
+  fileName: string;
+
   @ManyToOne(() => ChatGroup, (chatGroup) => chatGroup.chatMessages, {
     onUpdate: 'CASCADE',
     onDelete: 'CASCADE',

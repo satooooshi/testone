@@ -393,6 +393,18 @@ export class EventScheduleService {
     return submittedFiles;
   }
 
+  async deleteSubmission(submissionId: number) {
+    const submission = await this.submissionFileRepository.findOne({
+      id: submissionId,
+    });
+    if (!submission) {
+      throw new BadRequestException(
+        'The submission file has already been deleted.',
+      );
+    }
+    await this.submissionFileRepository.delete(submissionId);
+  }
+
   public async getLatestEvent(
     query: Pick<SearchQueryToGetEvents, 'type'>,
   ): Promise<EventSchedule[]> {
