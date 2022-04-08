@@ -19,12 +19,6 @@ export const setupCallInvitation = async (
     parsedUUid as string,
   );
   const res = await axiosInstance.get<string>('/chat/get-rtm-token');
-  console.log(
-    '----------------------------------++',
-    caller.id,
-    'data =====',
-    res.data,
-  );
   await rtmEngine.loginV2(caller?.id?.toString() as string, res.data);
   console.log('loginv2 completed');
 

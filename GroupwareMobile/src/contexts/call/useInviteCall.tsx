@@ -75,7 +75,6 @@ export const InviteCallProvider: React.FC = ({children}) => {
     console.log('will send call invitation', callee);
     const invitation = await setupCallInvitation(caller, callee);
     console.log('send call invitation');
-    setLocalInvitation(invitation);
     createGroup(
       {name: '', members: [callee]},
       {
@@ -85,18 +84,25 @@ export const InviteCallProvider: React.FC = ({children}) => {
         },
       },
     );
+    setLocalInvitation(invitation);
   };
 
   const sendCallHistory = useCallback(
     (message: string) => {
-      console.log('currentGroupData====================', currentGroupData);
-
-      sendChatMessage({
-        content: message,
-        callTime: callTime,
-        type: ChatMessageType.CALL,
-        chatGroup: currentGroupData,
-      });
+      console.log(
+        'currentGroupData====================',
+        message,
+        currentGroupData,
+      );
+      if (currentGroupData) {
+        sendChatMessage({
+          content: message,
+          callTime: callTime,
+          type: ChatMessageType.CALL,
+          chatGroup: currentGroupData,
+        });
+      }
+      setCurrentGroupData(undefined);
     },
     [callTime, sendChatMessage, currentGroupData],
   );
