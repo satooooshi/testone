@@ -30,11 +30,6 @@ import {useInviteCall} from '../contexts/call/useInviteCall';
 import SoundPlayer from 'react-native-sound-player';
 import PushNotificationIOS from '@react-native-community/push-notification-ios';
 import {debounce} from 'lodash';
-import {
-  Notification,
-  NotificationCompletion,
-  Notifications,
-} from 'react-native-notifications';
 
 const Stack = createStackNavigator<RootStackParamList>();
 export const rtmEngine = new RtmClient();
