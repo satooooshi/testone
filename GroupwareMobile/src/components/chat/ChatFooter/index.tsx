@@ -231,7 +231,12 @@ const ChatFooter: React.FC<ChatFooterProps> = ({
           <ActivityIndicator />
         ) : (
           <TouchableOpacity onPress={onSend}>
-            <Icon name="send" fontFamily="Ionicons" fontSize={21} />
+            <Icon
+              name="send"
+              fontFamily="Ionicons"
+              fontSize={21}
+              color={value ? 'blue600' : 'gray'}
+            />
           </TouchableOpacity>
         )}
       </Div>

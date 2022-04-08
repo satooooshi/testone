@@ -50,7 +50,7 @@ export class ChatMessage {
   type: ChatMessageType;
 
   @Column({
-    name: 'name',
+    name: 'file_name',
     type: 'varchar',
     length: 2083,
     default: '',
