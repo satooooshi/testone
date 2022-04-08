@@ -459,6 +459,10 @@ const Navigator = () => {
       body: remoteMessage.data?.body || '',
       android: {
         channelId: channelId,
+        pressAction: {
+          id: 'action_id',
+          launchActivity: 'default',
+        },
       },
       data: {
         screen: remoteMessage?.data?.screen ? remoteMessage?.data?.screen : '',
