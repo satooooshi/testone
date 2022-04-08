@@ -76,12 +76,9 @@ import { EntryComponentProps } from '@draft-js-plugins/mention/lib/MentionSugges
 import suggestionStyles from '@/styles/components/Suggestion.module.scss';
 import { useAPISearchMessages } from '@/hooks/api/chat/useAPISearchMessages';
 import { removeHalfWidthSpace } from 'src/utils/replaceWidthSpace';
-<<<<<<< HEAD
 import { reactionStickers } from 'src/utils/reactionStickers';
 import { BiSmile } from 'react-icons/bi';
-=======
 import { valueScaleCorrection } from 'framer-motion/types/render/dom/projection/scale-correction';
->>>>>>> develop
 
 export const Entry: React.FC<EntryComponentProps> = ({
   mention,
