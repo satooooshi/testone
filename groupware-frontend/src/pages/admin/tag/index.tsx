@@ -89,7 +89,7 @@ const TagAdmin: React.FC = () => {
         tabs,
       }}>
       <Head>
-        <title>ボールド | タグ管理</title>
+        <title>りゅう鍼灸整骨院 | タグ管理</title>
       </Head>
       <div className={tagAdminStyles.main}>
         <TagListBox

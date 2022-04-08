@@ -116,7 +116,7 @@ const ChatDetail = () => {
           setMembersModal: setMembersModal,
         }}>
         <Head>
-          <title>ボールド | Chat</title>
+          <title>りゅう鍼灸整骨院 | Chat</title>
         </Head>
 
         <EditChatGroupMembersModal

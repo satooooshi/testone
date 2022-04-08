@@ -31,7 +31,7 @@ const EventCommentCard: React.FC<EventCommentCardProps> = ({
           <Text fontSize={12} color="gray800">
             {writer.existence
               ? writer.lastName + ' ' + writer.firstName
-              : 'ボールドくん'}
+              : 'サンプル'}
           </Text>
         </Div>
         <Div p={20} bg="white" rounded="sm" flex={3}>

@@ -110,7 +110,7 @@ const UserList = () => {
         title: '社員名鑑',
       }}>
       <Head>
-        <title>ボールド | 社員名鑑</title>
+        <title>りゅう鍼灸整骨院 | 社員名鑑</title>
       </Head>
       <div className={userListStyles.above_pagination}>
         <Box mb="24px">

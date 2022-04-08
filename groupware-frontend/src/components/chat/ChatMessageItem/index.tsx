@@ -329,7 +329,7 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
                 <Text>
                   {messageState.sender && messageState.sender?.existence
                     ? userNameFactory(messageState.sender)
-                    : 'ボールドくん'}
+                    : ''}
                 </Text>
               )}
               {messageState.type === ChatMessageType.TEXT ? (

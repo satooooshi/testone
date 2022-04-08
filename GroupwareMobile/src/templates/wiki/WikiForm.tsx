@@ -324,32 +324,6 @@ const WikiForm: React.FC<WikiFormProps> = ({
       )}
       {isCreatableWiki({
         type: WikiType.BOARD,
-        boardCategory: BoardCategory.IMPRESSIVE_UNIVERSITY,
-        userRole: user?.role,
-      }) ? (
-        <Dropdown.Option
-          {...defaultDropdownOptionProps}
-          onPress={() =>
-            setNewWiki(w => ({
-              ...w,
-              type: WikiType.BOARD,
-              ruleCategory: RuleCategory.NON_RULE,
-              boardCategory: BoardCategory.IMPRESSIVE_UNIVERSITY,
-            }))
-          }
-          value={BoardCategory.IMPRESSIVE_UNIVERSITY}>
-          {wikiTypeNameFactory(
-            WikiType.BOARD,
-            undefined,
-            true,
-            BoardCategory.IMPRESSIVE_UNIVERSITY,
-          )}
-        </Dropdown.Option>
-      ) : (
-        <></>
-      )}
-      {isCreatableWiki({
-        type: WikiType.BOARD,
         boardCategory: BoardCategory.CLUB,
         userRole: user?.role,
       }) ? (

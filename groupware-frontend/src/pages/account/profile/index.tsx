@@ -234,7 +234,7 @@ const Profile = () => {
         tabs,
       }}>
       <Head>
-        <title>ボールド | プロフィール編集</title>
+        <title>りゅう鍼灸整骨院 | プロフィール編集</title>
       </Head>
       {tags && (
         <TagModal

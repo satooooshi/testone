@@ -111,8 +111,6 @@ const EventDetail = () => {
     switch (data?.type) {
       case EventType.STUDY_MEETING:
         return <Image src={studyMeeting1Image} alt="イベント画像" />;
-      case EventType.BOLDAY:
-        return <Image src={boldayImage1} alt="イベント画像" />;
       case EventType.CLUB:
         return (
           <FcSportsMode
@@ -120,8 +118,6 @@ const EventDetail = () => {
             className={clsx(portalLinkBoxStyles.club_icon)}
           />
         );
-      case EventType.IMPRESSIVE_UNIVERSITY:
-        return <Image src={impressiveUnivertyImage} alt="イベント画像" />;
       case EventType.COACH:
         return <Image src={coachImage} alt="イベント画像" />;
       case EventType.SUBMISSION_ETC:
@@ -300,7 +296,7 @@ const EventDetail = () => {
       {data && data.id ? (
         <div className={eventDetailStyles.main}>
           <Head>
-            <title>ボールド | {data.title}</title>
+            <title>りゅう鍼灸整骨院 | {data.title}</title>
           </Head>
           <div className={eventDetailStyles.all_wrapper}>
             <div className={eventDetailStyles.event_info_wrapper}>

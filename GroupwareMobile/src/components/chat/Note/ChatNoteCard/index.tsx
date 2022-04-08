@@ -40,7 +40,7 @@ const ChatNoteCard: React.FC<ChatNoteCardProps> = ({
           <Text fontWeight="bold" fontSize={16}>
             {note.editors?.length
               ? userNameFactory(note.editors[0])
-              : 'ボールドくん'}
+              : 'サンプル'}
           </Text>
         </Div>
         {note.isEditor && (

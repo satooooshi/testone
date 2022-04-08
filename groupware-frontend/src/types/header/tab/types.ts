@@ -1,8 +1,6 @@
 export enum EventTab {
   ALL = 'All',
-  IMPRESSIVE_UNIVERSITY = '感動大学',
   STUDY_MEETING = '技術勉強会',
-  BOLDAY = 'BOLDay',
   COACH = 'コーチ制度',
   CLUB = '部活動',
   SUBMISSION_ETC = '提出物等',

@@ -337,7 +337,7 @@ const QAQuestionList = () => {
       sidebar={{ activeScreenName: SidebarScreenName.QA }}
       header={initialHeaderValue}>
       <Head>
-        <title>ボールド | Wiki</title>
+        <title>りゅう鍼灸整骨院 | Wiki</title>
       </Head>
       {type === WikiType.RULES && (
         <Box mb="24px">

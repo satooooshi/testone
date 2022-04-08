@@ -36,10 +36,6 @@ const EventCard: React.FC<EventCardProps> = ({event}) => {
     switch (event.type) {
       case EventType.STUDY_MEETING:
         return require('../../../../assets/study_meeting_1.jpg');
-      case EventType.IMPRESSIVE_UNIVERSITY:
-        return require('../../../../assets/impressive_university_1.png');
-      case EventType.BOLDAY:
-        return require('../../../../assets/bolday_1.jpg');
       case EventType.COACH:
         return require('../../../../assets/coach_1.jpeg');
       case EventType.CLUB:
