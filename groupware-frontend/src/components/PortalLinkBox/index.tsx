@@ -20,9 +20,7 @@ import clsx from 'clsx';
 import { useAuthenticate } from 'src/contexts/useAuthenticate';
 
 export enum PortalLinkType {
-  IMPRESSIVE_UNIVERSITY = '/event/impressive_university',
   STUDY_MEETING = '/event/study_meeting',
-  BOLDAY = '/event/bolday',
   COACH = '/event/coach',
   CLUB = '/event/club',
   SUBMISSION_ETC = '/event/list?type=submission_etc&from=&to=',
@@ -198,8 +196,6 @@ const PortalIcon: React.FC<PortalProps> = ({ href }) => {
 };
 export const eventTitleText = (href: PortalLinkType): string => {
   switch (href) {
-    case PortalLinkType.IMPRESSIVE_UNIVERSITY:
-      return '感動大学';
     case PortalLinkType.STUDY_MEETING:
       return '勉強会';
     case PortalLinkType.BOLDAY:

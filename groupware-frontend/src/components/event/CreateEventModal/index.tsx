@@ -258,8 +258,6 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
     user?.role,
   );
 
-  const isCreatableBolday = isCreatableEvent(EventType.BOLDAY, user?.role);
-
   const isCreatableCoach = isCreatableEvent(EventType.COACH, user?.role);
 
   const isCreatableClub = isCreatableEvent(EventType.CLUB, user?.role);
@@ -271,9 +269,6 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
 
   useEffect(() => {
     const getInitialEventType = () => {
-      if (isCreatableBolday) {
-        return EventType.BOLDAY;
-      }
       if (isCreatableStudyMeeting) {
         return EventType.STUDY_MEETING;
       }
@@ -297,7 +292,6 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
     }
   }, [
     event,
-    isCreatableBolday,
     isCreatableClub,
     isCreatableCoach,
     isCreatableStudyMeeting,
@@ -585,9 +579,6 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
                 defaultValue={newEvent.type}>
                 {isCreatableStudyMeeting && (
                   <option value={EventType.STUDY_MEETING}>勉強会</option>
-                )}
-                {isCreatableBolday && (
-                  <option value={EventType.BOLDAY}>BOLDay</option>
                 )}
                 {isCreatableCoach && (
                   <option value={EventType.COACH}>コーチ制度</option>

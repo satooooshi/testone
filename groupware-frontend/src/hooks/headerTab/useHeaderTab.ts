@@ -79,19 +79,6 @@ const headerTab = (headerTabBehavior: HeaderTabBehavior): Tab[] => {
           },
         },
         {
-          name: EventTab.BOLDAY,
-          onClick: () => {
-            if (queryRefresh)
-              queryRefresh({
-                page: '1',
-                type: EventType.BOLDAY,
-                personal,
-                from,
-                to,
-              });
-          },
-        },
-        {
           name: EventTab.COACH,
           onClick: () => {
             if (queryRefresh)
