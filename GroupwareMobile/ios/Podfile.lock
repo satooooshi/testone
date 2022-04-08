@@ -364,8 +364,6 @@ PODS:
   - react-native-mmkv (1.5.1):
     - MMKV
     - React-Core
-  - react-native-notifications (4.2.4):
-    - React-Core
   - react-native-pager-view (5.4.7):
     - React-Core
   - react-native-safe-area-context (3.3.2):
@@ -482,6 +480,11 @@ PODS:
     - React-Core
     - React-RCTImage
     - TOCropViewController
+  - RNNotifee (5.1.0):
+    - React-Core
+    - RNNotifee/NotifeeCore (= 5.1.0)
+  - RNNotifee/NotifeeCore (5.1.0):
+    - React-Core
   - RNReanimated (2.2.3):
     - DoubleConversion
     - FBLazyVector
@@ -579,7 +582,6 @@ DEPENDENCIES:
   - react-native-create-thumbnail (from `../node_modules/react-native-create-thumbnail`)
   - react-native-document-picker (from `../node_modules/react-native-document-picker`)
   - react-native-mmkv (from `../node_modules/react-native-mmkv`)
-  - react-native-notifications (from `../node_modules/react-native-notifications`)
   - react-native-pager-view (from `../node_modules/react-native-pager-view`)
   - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
   - react-native-splash-screen (from `../node_modules/react-native-splash-screen`)
@@ -610,6 +612,7 @@ DEPENDENCIES:
   - RNFileViewer (from `../node_modules/react-native-file-viewer`)
   - RNGestureHandler (from `../node_modules/react-native-gesture-handler`)
   - RNImageCropPicker (from `../node_modules/react-native-image-crop-picker`)
+  - "RNNotifee (from `../node_modules/@notifee/react-native`)"
   - RNReanimated (from `../node_modules/react-native-reanimated`)
   - RNScreens (from `../node_modules/react-native-screens`)
   - RNSoundPlayer (from `../node_modules/react-native-sound-player`)
@@ -703,8 +706,6 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-document-picker"
   react-native-mmkv:
     :path: "../node_modules/react-native-mmkv"
-  react-native-notifications:
-    :path: "../node_modules/react-native-notifications"
   react-native-pager-view:
     :path: "../node_modules/react-native-pager-view"
   react-native-safe-area-context:
@@ -765,6 +766,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-gesture-handler"
   RNImageCropPicker:
     :path: "../node_modules/react-native-image-crop-picker"
+  RNNotifee:
+    :path: "../node_modules/@notifee/react-native"
   RNReanimated:
     :path: "../node_modules/react-native-reanimated"
   RNScreens:
@@ -830,7 +833,6 @@ SPEC CHECKSUMS:
   react-native-create-thumbnail: d31c84dd69fb4d60aec0ff2f49bc0de41ede7b2c
   react-native-document-picker: f4cc4df2eff8c9015d862a59bdaef11a153f1292
   react-native-mmkv: ff527e2eca43ee577fd8d8876cea60d5430c0cf9
-  react-native-notifications: 3de8ef9cd800e5db0225d9aa46b228d2b94ce51e
   react-native-pager-view: 741e7606ee2f6e399fc7da777f5519454a4b38c5
   react-native-safe-area-context: 584dc04881deb49474363f3be89e4ca0e854c057
   react-native-splash-screen: 4312f786b13a81b5169ef346d76d33bc0c6dc457
@@ -861,6 +863,7 @@ SPEC CHECKSUMS:
   RNFileViewer: 83cc066ad795b1f986791d03b56fe0ee14b6a69f
   RNGestureHandler: a479ebd5ed4221a810967000735517df0d2db211
   RNImageCropPicker: 73891a709e6fd8a47d32104d942757971f220aee
+  RNNotifee: 6692f7bff575e9f25b5370a37530f5d5b3cb3a7b
   RNReanimated: b04ef2a4f0cb61b062bbcf033f84a9e470f4f60b
   RNScreens: 6e1ea5787989f92b0671049b808aef64fa1ef98c
   RNSoundPlayer: 6b5532fb8e9afe17af48e62813c80ad568aea5d3

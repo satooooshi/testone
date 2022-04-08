@@ -30,6 +30,7 @@ import {useInviteCall} from '../contexts/call/useInviteCall';
 import SoundPlayer from 'react-native-sound-player';
 import PushNotificationIOS from '@react-native-community/push-notification-ios';
 import {debounce} from 'lodash';
+import notifee, {EventType} from '@notifee/react-native';
 
 const Stack = createStackNavigator<RootStackParamList>();
 export const rtmEngine = new RtmClient();
@@ -470,6 +471,19 @@ const Navigator = () => {
   }, [AGORA_APP_ID, user?.id]);
 
   useEffect(() => {
+    return notifee.onForegroundEvent(({type, detail}) => {
+      switch (type) {
+        case EventType.DISMISSED:
+          console.log('User dismissed notification', detail.notification);
+          break;
+        case EventType.PRESS:
+          console.log('User pressed notification', detail.notification);
+          break;
+      }
+    });
+  }, []);
+
+  useEffect(() => {
     const naviateByNotif = (notification: any) => {
       console.log('navigateByNotif called');
 
@@ -518,6 +532,7 @@ const Navigator = () => {
       },
       requestPermissions: true,
     });
+    notifee.requestPermission();
 
     const unsubscribe = messaging().onMessage(async remoteMessage => {
       console.log('onMessage  --------', remoteMessage.data);
@@ -529,22 +544,45 @@ const Navigator = () => {
         console.log('He is in the same chat room!!');
         return;
       }
-      PushNotification.localNotification({
-        channelId: 'default-channel-id',
-        ignoreInForeground: false,
-        id: remoteMessage.messageId,
-        vibrate: true, // (optional) default: true
-        vibration: 300,
-        priority: 'high', // (optional) set notification priority, default: high
-        visibility: 'public', // (optional) set notification visibility, default: private
-        message: remoteMessage.notification?.body || '',
+
+      const channelId = await notifee.createChannel({
+        id: 'default',
+        name: 'Default Channel',
+      });
+
+      await notifee.displayNotification({
         title: remoteMessage.notification?.title || '',
-        bigPictureUrl: remoteMessage.notification?.android?.imageUrl,
-        userInfo: {
-          screen: remoteMessage?.data?.screen,
-          id: remoteMessage?.data?.id,
+        body: remoteMessage.notification?.body || '',
+        android: {
+          channelId: channelId,
+        },
+        data: {
+          screen: remoteMessage?.data?.screen
+            ? remoteMessage?.data?.screen
+            : '',
+          id: remoteMessage?.data?.id ? remoteMessage?.data?.id : '',
+        },
+        ios: {
+          // iOS resource (.wav, aiff, .caf)
+          sound: 'local.wav',
         },
       });
+      // PushNotification.localNotification({
+      //   channelId: 'default-channel-id',
+      //   ignoreInForeground: false,
+      //   id: remoteMessage.messageId,
+      //   vibrate: true, // (optional) default: true
+      //   vibration: 300,
+      //   priority: 'high', // (optional) set notification priority, default: high
+      //   visibility: 'public', // (optional) set notification visibility, default: private
+      //   message: remoteMessage.notification?.body || '',
+      //   title: remoteMessage.notification?.title || '',
+      //   bigPictureUrl: remoteMessage.notification?.android?.imageUrl,
+      //   userInfo: {
+      //     screen: remoteMessage?.data?.screen,
+      //     id: remoteMessage?.data?.id,
+      //   },
+      // });
     });
 
     return unsubscribe;

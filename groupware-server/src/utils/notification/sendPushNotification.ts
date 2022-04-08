@@ -49,7 +49,7 @@ const sendPushNotifToSpecificDevices = async (
   };
   const pushNotifService = new PushNotifications(pushNotifSettings);
   const tokens = devices.map((d) => d.token);
-  const dataToSend: PushNotifications.Data = {
+  const dataToSend = {
     title: data.title ? data.title : '', // REQUIRED for Android
     topic: process.env.IOS_BUNDLE_ID ? '' : '', // REQUIRED for iOS (apn and gcm)
     /* The topic of the notification. When using token-based authentication, specify the bundle ID of the app.
