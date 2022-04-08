@@ -385,6 +385,7 @@ const Chat: React.FC = () => {
       type: ChatMessageType.STICKER,
       chatGroup: room,
     });
+    setVisibleStickerSelector(false);
   };
 
   const playVideoOnModal = (url: string) => {
