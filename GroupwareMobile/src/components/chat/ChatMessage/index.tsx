@@ -151,7 +151,7 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
                 onLongPress={onLongPress}
               />
             ) : message.type === ChatMessageType.STICKER ? (
-              <StickerMessage message={message} />
+              <StickerMessage message={message} onLongPress={onLongPress} />
             ) : message.type === ChatMessageType.VIDEO ? (
               <VideoMessage
                 message={message}

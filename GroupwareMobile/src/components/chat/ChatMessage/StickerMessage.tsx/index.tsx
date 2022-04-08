@@ -6,12 +6,16 @@ import {reactionStickers} from '../../../../utils/factory/reactionStickers';
 
 type StickerMessageProps = {
   message: ChatMessage;
+  onLongPress: () => void;
 };
 
-const StickerMessage: React.FC<StickerMessageProps> = ({message}) => {
+const StickerMessage: React.FC<StickerMessageProps> = ({
+  message,
+  onLongPress,
+}) => {
   const {width: windowWidth} = useWindowDimensions();
   return (
-    <TouchableOpacity>
+    <TouchableOpacity onLongPress={onLongPress}>
       <FastImage
         source={reactionStickers.find(s => s.name === message.content)?.src}
         style={{height: 144, width: windowWidth * 0.6, borderRadius: 8}}
