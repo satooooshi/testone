@@ -215,16 +215,16 @@ const NewsAdmin: React.VFC = () => {
             updateNews({ ...news[i - 1], id: news[i].id });
           }
         }
-        const [removed] = newNews.splice(result.source.index, 1);
+        const [pickedNews] = newNews.splice(result.source.index, 1);
         updateNews(
-          { ...removed, id: news[result.destination.index].id },
+          { ...pickedNews, id: news[result.destination.index].id },
           {
             onSuccess: () => {
               refetch();
             },
           },
         );
-        newNews.splice(result.destination.index, 0, removed);
+        newNews.splice(result.destination.index, 0, pickedNews);
         setNews(newNews);
       }
     },
