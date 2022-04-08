@@ -11,8 +11,9 @@ import {useAuthenticate} from '../contexts/useAuthenticate';
 import {RootStackParamList} from '../types/navigator/RootStackParamList';
 import {axiosInstance, storage, tokenString} from '../utils/url';
 import BottomTab from './BottomTab';
-import messaging from '@react-native-firebase/messaging';
-import PushNotification from 'react-native-push-notification';
+import messaging, {
+  FirebaseMessagingTypes,
+} from '@react-native-firebase/messaging';
 import {requestIOSMsgPermission} from '../utils/permission/requestIOSMsgPermisson';
 import {useAPIRegisterDevice} from '../hooks/api/notification/useAPIRegisterDevice';
 import ForgotPassword from '../screens/auth/ForgotPassword';
@@ -28,7 +29,6 @@ import Config from 'react-native-config';
 import VoiceCall from '../components/call/VoiceCall';
 import {useInviteCall} from '../contexts/call/useInviteCall';
 import SoundPlayer from 'react-native-sound-player';
-import PushNotificationIOS from '@react-native-community/push-notification-ios';
 import {debounce} from 'lodash';
 import notifee, {EventType} from '@notifee/react-native';
 
@@ -233,31 +233,7 @@ const Navigator = () => {
 
   messaging().setBackgroundMessageHandler(async remoteMessage => {
     console.log('BackgroundMessage received!!', remoteMessage);
-    // if (Platform.OS === 'ios' && remoteMessage?.data?.screen) {
-    //   PushNotification.localNotification({
-    //     channelId: 'fcm_fallback_notification_channel',
-    //     ignoreInForeground: false,
-    //     id: remoteMessage.messageId,
-    //     vibrate: true, // (optional) default: true
-    //     vibration: 300,
-    //     priority: 'high', // (optional) set notification priority, default: high
-    //     visibility: 'public', // (optional) set notification visibility, default: private
-    //     message: remoteMessage.notification?.body || '',
-    //     title: remoteMessage.notification?.title || '',
-    //     bigPictureUrl: remoteMessage.notification?.android?.imageUrl,
-    //     userInfo: {
-    //       screen: remoteMessage?.data?.screen,
-    //       id: remoteMessage?.data?.id,
-    //     },
-    //   });
-    // }
-    // if (Platform.OS === 'ios') {
-    //   if (remoteMessage?.data?.type === 'call') {
-    //     // iOSのみ、アプリがバックグラウンド状態のときはプッシュ通知で通話をハンドリングする必要がある
-    //     displayIncomingCallNow(remoteMessage?.data as any);
-    //     console.log('Message handled in the background!', remoteMessage);
-    //   }
-    // }
+    sendLocalNotification(remoteMessage);
   });
 
   useEffect(
@@ -470,18 +446,30 @@ const Navigator = () => {
     getRtmToken();
   }, [AGORA_APP_ID, user?.id]);
 
-  useEffect(() => {
-    return notifee.onForegroundEvent(({type, detail}) => {
-      switch (type) {
-        case EventType.DISMISSED:
-          console.log('User dismissed notification', detail.notification);
-          break;
-        case EventType.PRESS:
-          console.log('User pressed notification', detail.notification);
-          break;
-      }
+  const sendLocalNotification = async (
+    remoteMessage: FirebaseMessagingTypes.RemoteMessage,
+  ) => {
+    const channelId = await notifee.createChannel({
+      id: 'default',
+      name: 'Default Channel',
     });
-  }, []);
+
+    await notifee.displayNotification({
+      title: remoteMessage.data?.title || '',
+      body: remoteMessage.data?.body || '',
+      android: {
+        channelId: channelId,
+      },
+      data: {
+        screen: remoteMessage?.data?.screen ? remoteMessage?.data?.screen : '',
+        id: remoteMessage?.data?.id ? remoteMessage?.data?.id : '',
+      },
+      ios: {
+        // iOS resource (.wav, aiff, .caf)
+        sound: 'local.wav',
+      },
+    });
+  };
 
   useEffect(() => {
     const naviateByNotif = (notification: any) => {
@@ -517,72 +505,46 @@ const Navigator = () => {
       }
     };
 
-    PushNotification.configure({
-      onNotification: notification => {
-        console.log('PushNotification onNotification========', notification);
-        if (notification.userInteraction) {
-          naviateByNotif(notification);
-        }
-        notification.finish(PushNotificationIOS.FetchResult.NoData);
-      },
-      permissions: {
-        alert: true,
-        badge: true,
-        sound: true,
-      },
-      requestPermissions: true,
+    notifee.onForegroundEvent(({type, detail}) => {
+      switch (type) {
+        case EventType.DISMISSED:
+          console.log('User dismissed notification', detail.notification);
+          break;
+        case EventType.PRESS:
+          console.log('User pressed notification', detail.notification);
+          naviateByNotif(detail.notification);
+          break;
+      }
+    });
+    notifee.onBackgroundEvent(async ({type, detail}) => {
+      switch (type) {
+        case EventType.DISMISSED:
+          console.log(
+            'User dismissed notification from background',
+            detail.notification,
+          );
+          break;
+        case EventType.PRESS:
+          console.log(
+            'User pressed notification from background',
+            detail.notification,
+          );
+          naviateByNotif(detail.notification);
+          break;
+      }
     });
     notifee.requestPermission();
 
     const unsubscribe = messaging().onMessage(async remoteMessage => {
-      console.log('onMessage  --------', remoteMessage.data);
-      console.log('------------', currentChatRoomId);
+      console.log('onMessage  --------', remoteMessage);
       if (
         remoteMessage?.data?.screen &&
         remoteMessage.data?.id === `${currentChatRoomId}`
       ) {
-        console.log('He is in the same chat room!!');
+        console.log('They are in the same chat room!!');
         return;
       }
-
-      const channelId = await notifee.createChannel({
-        id: 'default',
-        name: 'Default Channel',
-      });
-
-      await notifee.displayNotification({
-        title: remoteMessage.notification?.title || '',
-        body: remoteMessage.notification?.body || '',
-        android: {
-          channelId: channelId,
-        },
-        data: {
-          screen: remoteMessage?.data?.screen
-            ? remoteMessage?.data?.screen
-            : '',
-          id: remoteMessage?.data?.id ? remoteMessage?.data?.id : '',
-        },
-        ios: {
-          // iOS resource (.wav, aiff, .caf)
-          sound: 'local.wav',
-        },
-      });
-      // PushNotification.localNotification({
-      //   channelId: 'default-channel-id',
-      //   ignoreInForeground: false,
-      //   id: remoteMessage.messageId,
-      //   vibrate: true, // (optional) default: true
-      //   vibration: 300,
-      //   priority: 'high', // (optional) set notification priority, default: high
-      //   visibility: 'public', // (optional) set notification visibility, default: private
-      //   message: remoteMessage.notification?.body || '',
-      //   title: remoteMessage.notification?.title || '',
-      //   bigPictureUrl: remoteMessage.notification?.android?.imageUrl,
-      //   userInfo: {
-      //     screen: remoteMessage?.data?.screen,
-      //     id: remoteMessage?.data?.id,
-      //   },
-      // });
+      sendLocalNotification(remoteMessage);
     });
 
     return unsubscribe;
