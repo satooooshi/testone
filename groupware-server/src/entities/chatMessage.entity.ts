@@ -52,7 +52,7 @@ export class ChatMessage {
   @Column({ type: 'varchar', name: 'call_time', default: '' })
   callTime?: string;
   @Column({
-    name: 'name',
+    name: 'file_name',
     type: 'varchar',
     length: 2083,
     default: '',
