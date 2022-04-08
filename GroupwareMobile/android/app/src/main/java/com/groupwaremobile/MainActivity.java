@@ -1,4 +1,4 @@
-package com.groupwaremobiletest;
+package com.groupwaremobileTest;
 
 //react-navigation
 import android.os.Bundle;
