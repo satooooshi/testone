@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-  package="com.groupwaremobileTest">
+  package="com.groupwaremobiletest">
 
   <uses-permission android:name="android.permission.BIND_TELECOM_CONNECTION_SERVICE"/>
   <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
