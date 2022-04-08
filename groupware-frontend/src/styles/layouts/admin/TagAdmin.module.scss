@@ -1,0 +1,109 @@
+@import '../../variables.scss';
+
+.main {
+  display: flex;
+  flex-flow: row;
+  flex-wrap: wrap;
+  justify-content: center;
+
+  &::after {
+    content: '';
+    display: block;
+    width: 40vw;
+  }
+}
+
+.tag_list_area {
+  background: $white_color;
+  height: fit-content;
+  width: 40vw;
+  padding: 8px 16px;
+  border-radius: 10px;
+  @media (min-width: 768px) {
+    margin-bottom: 24px;
+    &:nth-child(odd) {
+      margin-right: 16px;
+    }
+  }
+  @media (max-width: 768px) {
+    width: 90vw;
+  }
+}
+
+.tag_form_wrapper {
+  margin-bottom: 16px;
+  display: flex;
+  flex-flow: row;
+  flex-wrap: wrap;
+  align-items: center;
+  @media (max-width: 768px) {
+    flex-flow: column;
+  }
+}
+
+.selected_tag_wrapper {
+  display: flex;
+  flex-flow: row;
+  align-items: center;
+  justify-content: flex-start;
+  align-self: flex-start;
+  margin-bottom: 8px;
+}
+
+.tag_label_text {
+  font-size: 18px;
+  color: $dark_font_color;
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+.input_and_button_wrapper {
+  display: flex;
+  flex-flow: row;
+  flex-wrap: wrap;
+  align-items: center;
+  width: 100%;
+  @media (max-width: 768px) {
+    flex-flow: column;
+  }
+}
+
+.buttons_wrapper {
+  display: flex;
+  flex-flow: row;
+}
+
+.save_button_wrapper {
+  margin-right: 8px;
+}
+
+.tag_input_wrapper {
+  margin-right: 8px;
+  width: 55%;
+  @media (max-width: 768px) {
+    width: 100%;
+    margin-bottom: 8px;
+  }
+}
+
+.right_arrow {
+  font-weight: bold;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+.tag_label_wrapper {
+  display: flex;
+  flex-flow: row;
+}
+
+.tags_wrapper {
+  display: flex;
+  flex-flow: row;
+  flex-wrap: wrap;
+}
+
+.tag_item_wrapper {
+  margin-bottom: 4px;
+  margin-right: 4px;
+}

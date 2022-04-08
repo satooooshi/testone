@@ -1,0 +1,77 @@
+@import '../variables.scss';
+
+.modal {
+  margin: auto auto;
+  height: min(95vh, 1240px);
+  width: min(90vw, 2000px);
+  border-radius: 10px;
+  border: 1px solid $blue_color;
+  display: flex;
+  flex-direction: column;
+  padding: 15px 40px;
+  background: $header_background_color;
+  position: absolute;
+  overflow: scroll;
+  -ms-overflow-style: none;
+  left: 0px;
+  right: 0px;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+  @media (max-width: 768px) {
+    top: 5vh;
+  }
+  @media (min-width: 768px) {
+    top: 0px;
+    bottom: 0px;
+  }
+}
+.cancel_button {
+  color: $dark_font_color;
+  height: 40px;
+  width: 40px;
+  &:hover {
+    cursor: pointer;
+  }
+}
+
+.url_delete_button {
+  color: $dark_font_color;
+  height: 30px;
+  width: 30px;
+  &:hover {
+    cursor: pointer;
+  }
+}
+
+.selected_tags_wrapper {
+  margin-bottom: 4px;
+  margin-right: 4px;
+}
+
+.icon {
+  height: 30px;
+  width: 30px;
+  color: $dark_font_color;
+  position: absolute;
+  right: 48px;
+  z-index: 60;
+  &:hover {
+    cursor: pointer;
+  }
+}
+
+.image_dropzone {
+  text-align: center;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 3px dashed #eeeeee;
+  background-color: #fafafa;
+  color: #bdbdbd;
+  width: 100%;
+  &:hover {
+    cursor: pointer;
+  }
+}

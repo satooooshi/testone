@@ -1,0 +1,77 @@
+@import '../variables.scss';
+
+.modal_wrapper {
+  margin: auto auto;
+  height: 80vh;
+  max-height: 1240px;
+  width: 50vw;
+  border-radius: 10px;
+  border: 1px solid $blue_color;
+  display: flex;
+  flex-direction: column;
+  padding: 15px 40px;
+  background: #fff;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  position: absolute;
+  @media (max-width: 1280px) {
+    width: 90vw;
+  }
+}
+
+.tags {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 16px;
+  height: 86%;
+  overflow: scroll;
+  -ms-overflow-style: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.tag__item {
+  display: flex;
+  flex-direction: row;
+  border-bottom: 1px $header_background_color solid;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.tag__item__selected {
+  background-color: #f4f3f3;
+}
+
+.tag__item_left {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.tag__name {
+  color: $dark_font_color;
+}
+
+.modal_bottom_buttons {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+.modal_cancel_button {
+  margin-right: 3%;
+}
+
+.error_text {
+  text-align: center;
+  color: red;
+  font-size: 14px;
+}
+
+.tag_select_wrapper {
+  margin-bottom: 16px;
+}

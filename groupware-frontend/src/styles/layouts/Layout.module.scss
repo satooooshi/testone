@@ -1,0 +1,47 @@
+@import '../variables.scss';
+
+.whole_layout {
+  display: flex;
+  flex-direction: row;
+  width: 98vw;
+  max-width: 98vw;
+  min-height: 100vh;
+}
+
+.right_contents {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  @media (min-width: 768px) {
+    margin-left: max(94px, 4vw);
+  }
+}
+
+.main {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  @media (max-width: 768px) {
+    //for header fixed position
+    padding-top: 110px;
+    padding-left: 0;
+    padding-right: 0;
+    // padding-left: 10vw;
+    // padding-right: 10vw;
+  }
+}
+
+.main_padding_with_tab {
+  width: 100%;
+  padding-top: 24px;
+  @media (max-width: 768px) {
+    padding-top: 17vh;
+  }
+}
+.main_padding_no_tab {
+  padding-top: 24px;
+  @media (max-width: 768px) {
+    padding-top: 8vh;
+  }
+}

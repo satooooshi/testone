@@ -1,0 +1,100 @@
+@import '../variables.scss';
+
+.above_pagination {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  margin-bottom: 72px;
+}
+
+.event_list_wrapper {
+  flex-direction: column;
+  @media (max-width: 1024px) {
+    margin-right: 0;
+    display: flex;
+    align-items: center;
+  }
+}
+
+.no_result_text {
+  align-self: center;
+  text-align: center;
+}
+
+.event_card__row {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+
+  &::after {
+    content: '';
+    display: block;
+    width: 36vw;
+    @media (max-width: 1024px) {
+      width: 80vw;
+    }
+  }
+
+  @media (max-width: 1024px) {
+    flex-direction: column;
+    justify-content: flex-start;
+  }
+}
+
+.event_card_margin {
+  margin-bottom: 24px;
+  margin-right: 16px;
+  &:nth-child(even) {
+    margin-right: 0;
+  }
+  @media (max-width: 1024px) {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-right: 0;
+  }
+}
+
+.pagination_wrapper {
+  display: flex;
+  justify-content: center;
+  position: absolute;
+  bottom: 24px;
+  right: auto;
+  left: auto;
+}
+
+.search_form_wrapper {
+  display: flex;
+  align-self: center;
+  @media (min-width: 768px) {
+    margin-bottom: 16px;
+  }
+}
+
+.status_select_wrapper {
+  width: 70vw;
+  display: flex;
+  align-self: center;
+  justify-content: center;
+  margin-bottom: 40px;
+  @media (max-width: 768px) {
+    width: 80vw;
+  }
+}
+
+.status_select {
+}
+
+.big_calendar_wrapper {
+  width: 80vw;
+  overflow: scroll;
+  @media (max-width: 768px) {
+    width: 100vw;
+  }
+}
+
+.no_result_to_search {
+  align-self: center;
+}

@@ -1,0 +1,117 @@
+@import '../variables.scss';
+
+.search_form_wrapper {
+  margin-bottom: 24px;
+}
+
+.table_wrapper {
+  display: flex;
+  justify-content: center;
+  align-self: center;
+  width: 100%;
+  overflow: scroll;
+  -ms-overflow-style: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+  @media (max-width: 768px) {
+    justify-content: flex-start;
+    width: 100vw;
+  }
+}
+
+.table {
+  align-self: center;
+  width: 85vw;
+  max-width: 1980px;
+  border-collapse: collapse;
+  margin-bottom: 72px;
+  overflow: scroll;
+  -ms-overflow-style: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  & td,
+  th {
+    border-bottom: 1px solid #c4c4c4;
+  }
+
+  @media (max-width: 768px) {
+  }
+}
+
+.table_head {
+  text-align: left;
+  padding: 10px 0;
+  background: #eff1f5;
+}
+
+.user_row_wrapper {
+  // border-bottom: 1px solid #c4c4c4;
+}
+
+.user_info_text {
+  color: $dark_font_color;
+  font-size: 14px;
+  text-align: left;
+  vertical-align: middle;
+  @media (max-width: 768px) {
+    min-width: 184px;
+  }
+}
+
+.avatar_wrapper {
+  padding: 5px 0;
+  text-align: center;
+  @media (max-width: 768px) {
+    min-width: 120px;
+  }
+}
+
+.avatar {
+  height: 40px;
+  width: 40px;
+  border-radius: 100%;
+  @media (max-width: 576px) {
+    display: none;
+  }
+}
+
+.roles {
+  cursor: pointer;
+}
+
+.verified_button_wrapper {
+  color: $dark_font_color;
+  font-size: 14px;
+  text-align: left;
+  vertical-align: middle;
+  @media (max-width: 768px) {
+    min-width: 96px;
+  }
+}
+
+.verified_button {
+  background-color: $green_color;
+}
+
+.delete_icon_wrapper {
+  text-align: right;
+  vertical-align: middle;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  padding-right: 10px;
+  @media (max-width: 768px) {
+    text-align: center;
+  }
+}
+.delete_icon {
+  height: 25px;
+  width: 25px;
+  color: $dark_font_color;
+
+  &:hover {
+    cursor: pointer;
+  }
+}

@@ -1,0 +1,50 @@
+@import '../variables.scss';
+
+.card_wrapper {
+}
+
+.comment_uploader_info {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+.user_info_wrapper {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+.comment_name_wrapper {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+}
+.user_avatar {
+  height: 40px;
+  aspect-ratio: 1/1;
+  border-radius: 100px;
+  margin-right: 20px;
+}
+.user_name {
+  color: $dark_font_color;
+}
+
+.wrote_date {
+  color: $dark_font_color;
+}
+
+.comment_body {
+  background: $white_color;
+  border-radius: 10px;
+  min-height: 60px;
+  padding: 15px;
+  margin-bottom: 40px;
+}
+
+.comment_text {
+  color: $dark_font_color;
+  word-wrap: break-word;
+  white-space: pre-wrap;
+}

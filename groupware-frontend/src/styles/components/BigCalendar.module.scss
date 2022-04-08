@@ -1,0 +1,13 @@
+.big_calendar {
+  height: 90vh;
+  width: 80vw;
+  @media (max-width: 768px) {
+    height: 75vh;
+    width: 750px;
+    overflow: auto;
+    -ms-overflow-style: none;
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+}
