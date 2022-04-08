@@ -62,7 +62,6 @@ const headerBlocks = [
 ];
 
 const inlineStyles = [
-  { style: 'BOLD', icon: <FaBold /> },
   { style: 'ITALIC', icon: <FaItalic /> },
   { style: 'STRIKETHROUGH', icon: <FaStrikethrough /> },
   { style: 'CODE', icon: <GoCode /> },

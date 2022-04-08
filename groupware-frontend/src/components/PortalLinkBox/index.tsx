@@ -46,30 +46,12 @@ type PortalProps = {
 
 const PortalIcon: React.FC<PortalProps> = ({ href }) => {
   switch (href) {
-    case PortalLinkType.IMPRESSIVE_UNIVERSITY:
-      return (
-        <FaSchool
-          className={clsx(
-            portalLinkBoxStyles.icon,
-            portalLinkBoxStyles.impressive_university_icon,
-          )}
-        />
-      );
     case PortalLinkType.STUDY_MEETING:
       return (
         <GiBookCover
           className={clsx(
             portalLinkBoxStyles.icon,
             portalLinkBoxStyles.study_meeting_icon,
-          )}
-        />
-      );
-    case PortalLinkType.BOLDAY:
-      return (
-        <GiPartyPopper
-          className={clsx(
-            portalLinkBoxStyles.icon,
-            portalLinkBoxStyles.bolday_icon,
           )}
         />
       );
@@ -198,8 +180,6 @@ export const eventTitleText = (href: PortalLinkType): string => {
   switch (href) {
     case PortalLinkType.STUDY_MEETING:
       return '勉強会';
-    case PortalLinkType.BOLDAY:
-      return 'BOLDay';
     case PortalLinkType.COACH:
       return 'コーチ制度';
     case PortalLinkType.CLUB:
@@ -233,12 +213,8 @@ export const eventTitleText = (href: PortalLinkType): string => {
 
 const descriptionText = (href: PortalLinkType): string => {
   switch (href) {
-    case PortalLinkType.IMPRESSIVE_UNIVERSITY:
-      return '技術力と人間力を 毎日プロから学ぶことが出来る研修制度です。';
     case PortalLinkType.STUDY_MEETING:
       return '社員同士が教え合いながら、知識を深めていく勉強会です。';
-    case PortalLinkType.BOLDAY:
-      return '社員同士が高めあう風土が生まれる帰社日';
     case PortalLinkType.COACH:
       return '現場経験の豊富なエキスパート陣が、様々な視点から社員へアドバイスや指導を行います。';
     case PortalLinkType.CLUB:
