@@ -16,8 +16,6 @@ export const wikiTypeNameFactory = (
             return 'Q&A';
           case BoardCategory.NEWS:
             return '本社からのお知らせ';
-          case BoardCategory.IMPRESSIVE_UNIVERSITY:
-            return '感動大学';
           case BoardCategory.CLUB:
             return '部活動・サークル';
           case BoardCategory.STUDY_MEETING:

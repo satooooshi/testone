@@ -253,11 +253,6 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
     }));
   };
 
-  const isCreatableImpressiveUniversity = isCreatableEvent(
-    EventType.IMPRESSIVE_UNIVERSITY,
-    user?.role,
-  );
-
   const isCreatableStudyMeeting = isCreatableEvent(
     EventType.STUDY_MEETING,
     user?.role,
@@ -276,9 +271,6 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
 
   useEffect(() => {
     const getInitialEventType = () => {
-      if (isCreatableImpressiveUniversity) {
-        return EventType.IMPRESSIVE_UNIVERSITY;
-      }
       if (isCreatableBolday) {
         return EventType.BOLDAY;
       }
@@ -308,7 +300,6 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
     isCreatableBolday,
     isCreatableClub,
     isCreatableCoach,
-    isCreatableImpressiveUniversity,
     isCreatableStudyMeeting,
     isCreatableSubmissionEtc,
     setNewEvent,
@@ -592,11 +583,6 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
                   }));
                 }}
                 defaultValue={newEvent.type}>
-                {isCreatableImpressiveUniversity && (
-                  <option value={EventType.IMPRESSIVE_UNIVERSITY}>
-                    感動大学
-                  </option>
-                )}
                 {isCreatableStudyMeeting && (
                   <option value={EventType.STUDY_MEETING}>勉強会</option>
                 )}

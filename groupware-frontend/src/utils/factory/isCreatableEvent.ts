@@ -5,8 +5,6 @@ export const isCreatableEvent = (
   userRole?: UserRole,
 ): boolean => {
   switch (type) {
-    case EventType.IMPRESSIVE_UNIVERSITY:
-      return userRole === UserRole.ADMIN;
     case EventType.STUDY_MEETING:
       return (
         userRole === UserRole.ADMIN || userRole === UserRole.INTERNAL_INSTRUCTOR

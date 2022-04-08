@@ -66,19 +66,6 @@ const headerTab = (headerTabBehavior: HeaderTabBehavior): Tab[] => {
           },
         },
         {
-          name: EventTab.IMPRESSIVE_UNIVERSITY,
-          onClick: () => {
-            if (queryRefresh)
-              queryRefresh({
-                page: '1',
-                type: EventType.IMPRESSIVE_UNIVERSITY,
-                personal,
-                from,
-                to,
-              });
-          },
-        },
-        {
           name: EventTab.STUDY_MEETING,
           onClick: () => {
             if (queryRefresh)

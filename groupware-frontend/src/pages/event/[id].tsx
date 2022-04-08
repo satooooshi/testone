@@ -300,7 +300,7 @@ const EventDetail = () => {
       {data && data.id ? (
         <div className={eventDetailStyles.main}>
           <Head>
-            <title>ボールド | {data.title}</title>
+            <title>りゅう鍼灸整骨院 | {data.title}</title>
           </Head>
           <div className={eventDetailStyles.all_wrapper}>
             <div className={eventDetailStyles.event_info_wrapper}>

@@ -39,9 +39,6 @@ export default function Home() {
       </Head>
       <div className={homeStyles.box_row_wrapper}>
         <div className={homeStyles.box_wrapper}>
-          <PortalLinkBox href={PortalLinkType.IMPRESSIVE_UNIVERSITY} />
-        </div>
-        <div className={homeStyles.box_wrapper}>
           <PortalLinkBox href={PortalLinkType.STUDY_MEETING} />
         </div>
         <div className={homeStyles.box_wrapper}>
