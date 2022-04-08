@@ -226,9 +226,6 @@ const EventList = () => {
   };
 
   const activeTabName = () => {
-    if (type === EventType.BOLDAY) {
-      return EventTab.BOLDAY;
-    }
     if (type === EventType.STUDY_MEETING) {
       return EventTab.STUDY_MEETING;
     }
@@ -464,7 +461,7 @@ const EventList = () => {
       sidebar={{ activeScreenName: SidebarScreenName.EVENT }}>
       <Head>
         <title>
-          ボールド | {type ? eventTitleText[type] : '全てのイベント'}
+          りゅう鍼灸整骨院 | {type ? eventTitleText[type] : '全てのイベント'}
         </title>
       </Head>
       <CreateEventModal

@@ -35,14 +35,11 @@ export default function Home() {
         onClickRightButton: () => logout(),
       }}>
       <Head>
-        <title>ボールド | Home</title>
+        <title>りゅう鍼灸整骨院 | Home</title>
       </Head>
       <div className={homeStyles.box_row_wrapper}>
         <div className={homeStyles.box_wrapper}>
           <PortalLinkBox href={PortalLinkType.STUDY_MEETING} />
-        </div>
-        <div className={homeStyles.box_wrapper}>
-          <PortalLinkBox href={PortalLinkType.BOLDAY} />
         </div>
         <div className={homeStyles.box_wrapper}>
           <PortalLinkBox href={PortalLinkType.COACH} />

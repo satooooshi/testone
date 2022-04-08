@@ -110,7 +110,7 @@ const EventIntroductionTemplate: React.FC<EventIntroductionProps> = ({
       sidebar={{ activeScreenName: SidebarScreenName.EVENT }}
       header={{ ...headerProps, tabs }}>
       <Head>
-        <title>ボールド | {eventTypeNameFactory(type)}</title>
+        <title>りゅう鍼灸整骨院 | {eventTypeNameFactory(type)}</title>
       </Head>
       <div className={eventPRStyles.main}>
         {editMode && eventIntroduction ? (

@@ -33,9 +33,7 @@ export enum ChatMessageType {
 }
 
 export enum EventType {
-  IMPRESSIVE_UNIVERSITY = 'impressive_university',
   STUDY_MEETING = 'study_meeting',
-  BOLDAY = 'bolday',
   COACH = 'coach',
   CLUB = 'club',
   SUBMISSION_ETC = 'submission_etc',
@@ -78,8 +76,6 @@ export enum BoardCategory {
   QA = 'question',
   //本社からのお知らせ
   NEWS = 'news',
-  //感動大学
-  IMPRESSIVE_UNIVERSITY = 'impressive_university',
   //部活動・サークル
   CLUB = 'club',
   //勉強会

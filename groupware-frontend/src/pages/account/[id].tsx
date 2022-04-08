@@ -199,7 +199,8 @@ const MyAccountInfo = () => {
       }}>
       <Head>
         <title>
-          ボールド | {profile ? `${profile.lastName} ${profile.firstName}` : ''}
+          りゅう鍼灸整骨院 |{' '}
+          {profile ? `${profile.lastName} ${profile.firstName}` : ''}
         </title>
       </Head>
       <div className={accountInfoStyles.main}>

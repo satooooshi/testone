@@ -365,29 +365,6 @@ const WikiCardList: React.FC<WikiCardListProps> = ({
               }}
             />
             <TopTab.Screen
-              name={'WikiList-' + BoardCategory.IMPRESSIVE_UNIVERSITY}
-              children={() => (
-                <RenderWikiCardList
-                  focused={isFocused}
-                  setRuleCategory={setRuleCategory}
-                  setBoardCategory={setBoardCategory}
-                  ruleCategory={undefined}
-                  boardCategory={BoardCategory.IMPRESSIVE_UNIVERSITY}
-                  word={word}
-                  tag={tag}
-                  type={type}
-                />
-              )}
-              options={{
-                title: wikiTypeNameFactory(
-                  WikiType.BOARD,
-                  undefined,
-                  true,
-                  BoardCategory.IMPRESSIVE_UNIVERSITY,
-                ),
-              }}
-            />
-            <TopTab.Screen
               name={'WikiList-' + BoardCategory.CLUB}
               children={() => (
                 <RenderWikiCardList

@@ -19,7 +19,7 @@ const Wiki = () => {
         activeTabName: '社内Wiki Home',
       }}>
       <Head>
-        <title>ボールド | 社内Wiki</title>
+        <title>りゅう鍼灸整骨院 | 社内Wiki</title>
       </Head>
 
       <SimpleGrid columns={{ sm: 1, md: 2, lg: 3 }} spacing={'16px'}>
