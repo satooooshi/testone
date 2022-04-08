@@ -380,7 +380,6 @@ const Navigator = () => {
     // アプリをバックグラウンドからフォアグラウンドに
     RNCallKeep.backToForeground();
     RNCallKeep.endAllCalls();
-    navigationRef.current?.navigate('Call');
     if (remoteInvitation.current?.channelId) {
       const realChannelName = remoteInvitation.current?.channelId as string;
       // 招待を承認
