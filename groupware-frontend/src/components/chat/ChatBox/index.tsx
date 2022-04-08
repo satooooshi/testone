@@ -10,7 +10,7 @@ import {
   InputRightElement,
 } from '@chakra-ui/react';
 import { MentionData } from '@draft-js-plugins/mention';
-import { darkFontColor } from 'src/utils/colors';
+import { blueColor, darkFontColor } from 'src/utils/colors';
 import { Menu, MenuItem, MenuButton } from '@szhsin/react-menu';
 import { HiOutlineDotsCircleHorizontal } from 'react-icons/hi';
 import Editor from '@draft-js-plugins/editor';
@@ -65,6 +65,7 @@ import { EntryComponentProps } from '@draft-js-plugins/mention/lib/MentionSugges
 import suggestionStyles from '@/styles/components/Suggestion.module.scss';
 import { useAPISearchMessages } from '@/hooks/api/chat/useAPISearchMessages';
 import { removeHalfWidthSpace } from 'src/utils/replaceWidthSpace';
+import { valueScaleCorrection } from 'framer-motion/types/render/dom/projection/scale-correction';
 
 export const Entry: React.FC<EntryComponentProps> = ({
   mention,
@@ -162,20 +163,23 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
       .reverse();
   }, [messages]);
   const { mutate: saveLastReadChatTime } = useAPISaveLastReadChatTime();
-  const [selectedImageURL, setSelectedImageURL] = useState<string>();
+  const [selectedImage, setSelectedImage] =
+    useState<{ url: string; name: string }>();
   const { data: lastReadChatTime } = useAPIGetLastReadChatTime(room.id, {
     refetchInterval: 1000,
   });
   const userDataForMention: MentionData[] = useMemo(() => {
-    return (
+    const users =
       room?.members
         ?.filter((u) => u.id !== user?.id)
         .map((u) => ({
           id: u.id,
           name: userNameFactory(u) + 'さん',
           avatar: u.avatarUrl,
-        })) || []
-    );
+        })) || [];
+    const allTag = { id: 0, name: 'all', avatar: '' };
+    users.unshift(allTag);
+    return users;
   }, [room?.members, user?.id]);
 
   const [suggestions, setSuggestions] =
@@ -255,6 +259,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
           : ChatMessageType.OTHER_FILE;
         sendChatMessage({
           content: fileURLs[0],
+          fileName: requestFileURLs[0].name,
           chatGroup: newChatMessage.chatGroup,
           type,
         });
@@ -269,7 +274,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
       let parsedMessage = newChatMessage.content;
       for (const m of mentionedUserData) {
         const regexp = new RegExp(`\\s${m.name}|^${m.name}`, 'g');
-        parsedMessage = parsedMessage.replace(regexp, `@[${m.name}](${m.id})`);
+        parsedMessage = parsedMessage.replace(regexp, `@${m.name}`);
       }
       sendChatMessage({
         ...newChatMessage,
@@ -451,12 +456,12 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
 
   const isLoading = loadingSend || loadingUplaod;
   const activeIndex = useMemo(() => {
-    if (selectedImageURL) {
+    if (selectedImage?.url) {
       const isNowUri = (element: ImageDecorator) =>
-        element.src === selectedImageURL;
+        element.src === selectedImage.url;
       return imagesForViewing.findIndex(isNowUri);
     }
-  }, [imagesForViewing, selectedImageURL]);
+  }, [imagesForViewing, selectedImage?.url]);
 
   const replyTargetContent = (replyTarget: ChatMessage) => {
     switch (replyTarget.type) {
@@ -560,14 +565,14 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
                   className={`react-viewer-icon react-viewer-icon-download`}></i>
               ),
               onClick: ({ src }) => {
-                saveAs(src, fileNameTransformer(src));
+                if (selectedImage?.name) saveAs(src, selectedImage.name);
               },
             },
           ]);
         }}
         images={imagesForViewing}
-        visible={!!selectedImageURL}
-        onClose={() => setSelectedImageURL(undefined)}
+        visible={!!selectedImage}
+        onClose={() => setSelectedImage(undefined)}
         activeIndex={activeIndex !== -1 ? activeIndex : 0}
       />
       {/*
@@ -707,7 +712,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
                 }
                 onClickImage={() => {
                   if (m.type === ChatMessageType.IMAGE) {
-                    setSelectedImageURL(m.content);
+                    setSelectedImage({ url: m.content, name: m.fileName });
                   }
                 }}
               />
@@ -823,7 +828,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
           <IoSend
             size={20}
             onClick={() => handleSubmit()}
-            color={darkFontColor}
+            color={newChatMessage.content ? blueColor : darkFontColor}
           />
         )}
       </Link>

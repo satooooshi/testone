@@ -51,6 +51,14 @@ export class ChatMessage {
 
   @Column({ type: 'varchar', name: 'call_time', default: '' })
   callTime?: string;
+  @Column({
+    name: 'name',
+    type: 'varchar',
+    length: 2083,
+    default: '',
+    nullable: false,
+  })
+  fileName: string;
 
   @ManyToOne(() => ChatGroup, (chatGroup) => chatGroup.chatMessages, {
     onUpdate: 'CASCADE',
