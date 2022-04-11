@@ -20,12 +20,14 @@ type VoiceCallProps = {
   callbacks: Partial<CallbacksInterface>;
   onCallUid: string;
   isCalling: boolean;
+  CallTimeout: () => void;
 };
 const VoiceCall: React.FC<VoiceCallProps> = ({
   rtcProps,
   callbacks,
   onCallUid,
   isCalling,
+  CallTimeout,
 }) => {
   const props: React.PropsWithChildren<PropsInterface> = {
     rtcProps: rtcProps,
@@ -64,13 +66,7 @@ const VoiceCall: React.FC<VoiceCallProps> = ({
             <Text fontWeight="bold" mt={'lg'} mb={'lg'} fontSize={24}>
               {profile ? userNameFactory(profile) : '通話情報を取得中...'}
             </Text>
-            {isCalling ? (
-              <Timer />
-            ) : (
-              <Text mt={'lg'} mb={'lg'} fontSize={20}>
-                呼び出し中
-              </Text>
-            )}
+            <Timer CallTimeout={CallTimeout} isCalling={isCalling} />
           </Div>
           <Controls />
         </RtcConfigure>

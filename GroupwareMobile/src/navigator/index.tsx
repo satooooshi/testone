@@ -144,6 +144,7 @@ const Navigator = () => {
         console.log('cancel finishedーーーーーーーーーーーーー');
       }
 
+      await soundOnEnd();
       setChannelName('');
       setIsJoining(false);
       setIsCalling(false);
@@ -162,7 +163,6 @@ const Navigator = () => {
       }
       // initしないとエラーがでることがある
       await rtcInit();
-      await soundOnEnd();
       await rtcEngine?.leaveChannel();
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -573,8 +573,8 @@ const Navigator = () => {
           const realChannelName = localInvitation?.channelId as string;
           await joinChannel(realChannelName);
           // 応答なしだと自動で終了する(テスト)
-          await new Promise(r => setTimeout(r, 20000));
-          setCallTimeout(true);
+          // await new Promise(r => setTimeout(r, 20000));
+          // setCallTimeout(true);
         };
         joining();
       }
@@ -619,7 +619,7 @@ const Navigator = () => {
                     rtcProps={rtcProps}
                     callbacks={callbacks}
                     onCallUid={onCallUid}
-                    isJoining={isJoining}
+                    CallTimeout={() => setCallTimeout(true)}
                   />
                 )}
               />
