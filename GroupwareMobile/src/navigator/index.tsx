@@ -272,9 +272,7 @@ const Navigator = () => {
     rtmEngine.addListener(
       'RemoteInvitationReceived',
       async (invitation: RemoteInvitation) => {
-        await new Promise(r => setTimeout(r, 500));
         console.log('remote invitation received ----------');
-
         displayIncomingCallNow(invitation);
       },
     );
