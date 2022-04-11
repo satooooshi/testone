@@ -100,11 +100,6 @@ const Navigator = () => {
         //     ? await messaging().getToken()
         //     : await messaging().getAPNSToken();
         const token = await messaging().getToken();
-        console.log(
-          'token-------------------------------',
-          user.firstName,
-          token,
-        );
         if (token) {
           registerDevice({token});
         }
@@ -133,7 +128,6 @@ const Navigator = () => {
       if (!isCallAccepted && localInvitation) {
         // local invitation(送信した通話招待)があればcancelする
         if (alertNeeded) {
-          console.log('attempt to cancel', localInvitation);
           await rtmEngine?.cancelLocalInvitationV2(localInvitation);
           if (callTimeout) {
             sendCallHistory('応答なし');
@@ -141,7 +135,6 @@ const Navigator = () => {
             sendCallHistory('キャンセル');
           }
         }
-        console.log('cancel finishedーーーーーーーーーーーーー');
       }
 
       await soundOnEnd();
@@ -158,7 +151,6 @@ const Navigator = () => {
           ...remoteInvitation.current,
           hash: 0,
         });
-        console.log('refused');
         remoteInvitation.current = undefined;
       }
       // initしないとエラーがでることがある
@@ -258,7 +250,6 @@ const Navigator = () => {
       await endCall(false);
     });
     rtmEngine.addListener('LocalInvitationRefused', async () => {
-      console.log('LocalInvitationRefused refused');
       setRefusedInvitation(true);
       // navigationRef.current?.navigate('Main');
     });
@@ -272,7 +263,6 @@ const Navigator = () => {
     rtmEngine.addListener(
       'RemoteInvitationReceived',
       async (invitation: RemoteInvitation) => {
-        console.log('remote invitation received ----------');
         displayIncomingCallNow(invitation);
       },
     );
@@ -319,8 +309,6 @@ const Navigator = () => {
   };
 
   const displayIncomingCallNow = (callingData: RemoteInvitation) => {
-    console.log('Event: Display Incoming Call: ', callingData);
-    console.log('callingData.channelId', callingData.channelId);
     if (callingData?.channelId) {
       callKeepUUID = callingData.channelId;
     }
@@ -357,11 +345,6 @@ const Navigator = () => {
       if (userId) {
         callKeepUUID = '';
         await rtcInit();
-        console.log(
-          '====================================================================================================================================================================================',
-          userId,
-          userData.lastName,
-        );
         await rtcEngine?.joinChannel(
           tokenForCall,
           realChannelName,
@@ -418,7 +401,6 @@ const Navigator = () => {
     rtmInit();
     return () => {
       // アンマウント時に全てのリスナーを消す
-      console.log('unmount!');
       RNCallKeep.removeEventListener('answerCall');
       RNCallKeep.removeEventListener('endCall');
       rtcEngine.removeAllListeners();
@@ -431,7 +413,6 @@ const Navigator = () => {
     const getRtmToken = async () => {
       if (user?.id) {
         const res = await axiosInstance.get<string>('/chat/get-rtm-token');
-        console.log('rtmToken', res.data);
         storage.set('rtmToken', res.data);
         setAgoraToken(res.data);
         if (res.data) {
@@ -479,8 +460,6 @@ const Navigator = () => {
 
   useEffect(() => {
     const naviateByNotif = (notification: any) => {
-      console.log('navigateByNotif called');
-
       if (navigationRef.current?.getCurrentRoute?.name !== 'Login') {
         if (notification.data?.screen === 'event' && notification.data?.id) {
           navigationRef.current?.navigate('EventStack', {
@@ -514,10 +493,8 @@ const Navigator = () => {
     notifee.onForegroundEvent(({type, detail}) => {
       switch (type) {
         case EventType.DISMISSED:
-          console.log('User dismissed notification', detail.notification);
           break;
         case EventType.PRESS:
-          console.log('User pressed notification', detail.notification);
           naviateByNotif(detail.notification);
           break;
       }
@@ -525,18 +502,9 @@ const Navigator = () => {
     notifee.onBackgroundEvent(async ({type, detail}) => {
       switch (type) {
         case EventType.DISMISSED:
-          console.log(
-            'User dismissed notification from background',
-            detail.notification,
-          );
           break;
         case EventType.PRESS:
-          console.log(
-            'User pressed notification from background',
-            detail.notification,
-          );
           naviateByNotif(detail.notification);
-          break;
       }
     });
     notifee.requestPermission();
@@ -567,8 +535,6 @@ const Navigator = () => {
   useEffect(
     () => {
       if (localInvitation) {
-        console.log('------------------------------------------------------');
-
         const joining = async () => {
           const realChannelName = localInvitation?.channelId as string;
           await joinChannel(realChannelName);
