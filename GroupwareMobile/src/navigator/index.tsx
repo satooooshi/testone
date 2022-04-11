@@ -359,6 +359,11 @@ const Navigator = () => {
       if (userId) {
         callKeepUUID = '';
         await rtcInit();
+        console.log(
+          '====================================================================================================================================================================================',
+          userId,
+          userData.lastName,
+        );
         await rtcEngine?.joinChannel(
           tokenForCall,
           realChannelName,
@@ -564,6 +569,8 @@ const Navigator = () => {
 
   useEffect(() => {
     if (localInvitation) {
+      console.log('------------------------------------------------------');
+
       const joining = async () => {
         const realChannelName = localInvitation?.channelId as string;
         await joinChannel(realChannelName);
@@ -573,7 +580,7 @@ const Navigator = () => {
       };
       joining();
     }
-  }, [endCall, isCallAccepted, joinChannel, localInvitation, navigationRef]);
+  }, [localInvitation]);
 
   useEffect(
     () => {
