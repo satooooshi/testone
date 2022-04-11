@@ -272,9 +272,7 @@ const Navigator = () => {
     rtmEngine.addListener(
       'RemoteInvitationReceived',
       async (invitation: RemoteInvitation) => {
-        await new Promise(r => setTimeout(r, 500));
         console.log('remote invitation received ----------');
-
         displayIncomingCallNow(invitation);
       },
     );
@@ -385,7 +383,6 @@ const Navigator = () => {
     // アプリをバックグラウンドからフォアグラウンドに
     RNCallKeep.backToForeground();
     RNCallKeep.endAllCalls();
-    navigationRef.current?.navigate('Call');
     if (remoteInvitation.current?.channelId) {
       const realChannelName = remoteInvitation.current?.channelId as string;
       // 招待を承認
