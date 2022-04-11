@@ -58,9 +58,11 @@ export const InviteCallProvider: React.FC = ({children}) => {
   };
   const ringCall = () => {
     SoundPlayer.playSoundFile('ring_sound', 'mp3');
+    console.log('ring sound ringing!');
   };
   const stopRing = useCallback(() => {
     SoundPlayer.stop();
+    console.log('ring sound stoped!!');
   }, []);
 
   const setLocalInvitationState = (invitation: LocalInvitation | undefined) => {

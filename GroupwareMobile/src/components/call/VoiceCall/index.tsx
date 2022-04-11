@@ -19,15 +19,15 @@ type VoiceCallProps = {
   rtcProps: RtcPropsInterface;
   callbacks: Partial<CallbacksInterface>;
   onCallUid: string;
-  isJoining: boolean;
   isCalling: boolean;
+  CallTimeout: () => void;
 };
 const VoiceCall: React.FC<VoiceCallProps> = ({
   rtcProps,
   callbacks,
   onCallUid,
-  isJoining,
   isCalling,
+  CallTimeout,
 }) => {
   const props: React.PropsWithChildren<PropsInterface> = {
     rtcProps: rtcProps,
@@ -39,15 +39,15 @@ const VoiceCall: React.FC<VoiceCallProps> = ({
   const {ringCall, stopRing} = useInviteCall();
 
   useEffect(() => {
-    if (isJoining && !isCalling && !isRinging) {
+    if (!isCalling && !isRinging) {
       setRinging(true);
       ringCall();
-    } else if (!isJoining || isCalling) {
+    } else if (isCalling) {
       setRinging(false);
       stopRing();
     }
     //eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isJoining, isCalling]);
+  }, [isCalling]);
 
   return (
     <PropsProvider value={props}>
@@ -66,13 +66,7 @@ const VoiceCall: React.FC<VoiceCallProps> = ({
             <Text fontWeight="bold" mt={'lg'} mb={'lg'} fontSize={24}>
               {profile ? userNameFactory(profile) : '通話情報を取得中...'}
             </Text>
-            {isCalling ? (
-              <Timer />
-            ) : (
-              <Text mt={'lg'} mb={'lg'} fontSize={20}>
-                呼び出し中
-              </Text>
-            )}
+            <Timer CallTimeout={CallTimeout} isCalling={isCalling} />
           </Div>
           <Controls />
         </RtcConfigure>
