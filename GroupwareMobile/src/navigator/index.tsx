@@ -276,9 +276,9 @@ const Navigator = () => {
         displayIncomingCallNow(invitation);
       },
     );
-    rtmEngine.addListener('LocalInvitationCanceled', () => {
-      endCall(false);
-    });
+    // rtmEngine.addListener('LocalInvitationCanceled', () => {
+    //   endCall(false);
+    // });
   };
 
   const callKeepInit = async () => {
