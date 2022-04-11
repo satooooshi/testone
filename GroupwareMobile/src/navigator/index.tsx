@@ -564,20 +564,23 @@ const Navigator = () => {
     }
   }, [isJoining, navigationRef, user?.id]);
 
-  useEffect(() => {
-    if (localInvitation) {
-      console.log('------------------------------------------------------');
+  useEffect(
+    () => {
+      if (localInvitation) {
+        console.log('------------------------------------------------------');
 
-      const joining = async () => {
-        const realChannelName = localInvitation?.channelId as string;
-        await joinChannel(realChannelName);
-        // 応答なしだと自動で終了する(テスト)
-        await new Promise(r => setTimeout(r, 20000));
-        setCallTimeout(true);
-      };
-      joining();
-    }
-  }, [localInvitation]);
+        const joining = async () => {
+          const realChannelName = localInvitation?.channelId as string;
+          await joinChannel(realChannelName);
+          // 応答なしだと自動で終了する(テスト)
+          await new Promise(r => setTimeout(r, 20000));
+          setCallTimeout(true);
+        };
+        joining();
+      }
+    }, // eslint-disable-next-line react-hooks/exhaustive-deps
+    [localInvitation],
+  );
 
   useEffect(
     () => {

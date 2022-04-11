@@ -19,14 +19,12 @@ type VoiceCallProps = {
   rtcProps: RtcPropsInterface;
   callbacks: Partial<CallbacksInterface>;
   onCallUid: string;
-  isJoining: boolean;
   isCalling: boolean;
 };
 const VoiceCall: React.FC<VoiceCallProps> = ({
   rtcProps,
   callbacks,
   onCallUid,
-  isJoining,
   isCalling,
 }) => {
   const props: React.PropsWithChildren<PropsInterface> = {
@@ -39,15 +37,15 @@ const VoiceCall: React.FC<VoiceCallProps> = ({
   const {ringCall, stopRing} = useInviteCall();
 
   useEffect(() => {
-    if (isJoining && !isCalling && !isRinging) {
+    if (!isCalling && !isRinging) {
       setRinging(true);
       ringCall();
-    } else if (!isJoining || isCalling) {
+    } else if (isCalling) {
       setRinging(false);
       stopRing();
     }
     //eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isJoining, isCalling]);
+  }, [isCalling]);
 
   return (
     <PropsProvider value={props}>
