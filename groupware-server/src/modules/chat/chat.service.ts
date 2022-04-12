@@ -252,7 +252,7 @@ export class ChatService {
     if (!isMember) {
       throw new NotAcceptableException('Something went wrong');
     }
-    return chatGroup.lastReadChatTime.filter((l) => l.user.id !== user.id);
+    return chatGroup.lastReadChatTime;
   }
 
   public async sendMessage(
