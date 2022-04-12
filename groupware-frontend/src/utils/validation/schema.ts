@@ -164,7 +164,7 @@ export const editEventIntroductionSchema = Yup.object().shape({
 
 export const chatGroupSchema = Yup.object().shape({
   name: Yup.string().max(50, `ルーム名は${nWordLimitMessage(50)}`),
-  members: Yup.array().min(1, minUsersMessage),
+  members: Yup.array().min(0, minUsersMessage),
 });
 
 export const topNewsSchema = Yup.object().shape({
