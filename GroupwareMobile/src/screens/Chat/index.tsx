@@ -386,13 +386,6 @@ const Chat: React.FC = () => {
     return false;
   };
 
-  const numbersOfRead = (message: ChatMessage) => {
-    return (
-      lastReadChatTime?.filter(time => time.readTime >= message.createdAt)
-        .length || 0
-    );
-  };
-
   const onScrollTopOnChat = () => {
     if (fetchedPastMessages?.length) {
       setBefore(messages[messages.length - 1].id);
@@ -631,12 +624,14 @@ const Chat: React.FC = () => {
   }, [messages, room.id]);
 
   const readUsers = (targetMsg: ChatMessage) => {
-    return lastReadChatTime
+    const readUserlist = lastReadChatTime
       ? lastReadChatTime
           .filter(t => t.readTime >= targetMsg.createdAt)
           .map(t => t.user)
       : [];
+    return readUserlist.filter(u => u.id !== targetMsg?.sender?.id);
   };
+
   const unReadUsers = (targetMsg: ChatMessage) => {
     const unreadUsers = roomDetail?.members?.filter(
       existMembers =>
@@ -644,7 +639,7 @@ const Chat: React.FC = () => {
           .map(u => u.id)
           .includes(existMembers.id),
     );
-    return unreadUsers?.filter(u => u.id !== myself?.id);
+    return unreadUsers?.filter(u => u.id !== targetMsg?.sender?.id);
   };
 
   const renderMessage = (message: ChatMessage, messageIndex: number) => (
@@ -665,7 +660,7 @@ const Chat: React.FC = () => {
         scrollToTarget={scrollToTarget}
         isScrollTarget={focusedMessageID === message.id}
         onCheckLastRead={() => setSelectedMessageForCheckLastRead(message)}
-        numbersOfRead={numbersOfRead(message)}
+        numbersOfRead={readUsers(message).length}
         onLongPress={() => setLongPressedMgg(message)}
         onPressImage={() => showImageOnModal(message.content)}
         onPressVideo={() => playVideoOnModal(message.content)}

@@ -81,9 +81,7 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
 
   const timesAndReadCounts = (
     <Div justifyContent="flex-end" alignItems="center">
-      {message.isSender &&
-      readUsers.length &&
-      message.type !== ChatMessageType.SYSTEM_TEXT ? (
+      {readUsers.length && message.type !== ChatMessageType.SYSTEM_TEXT ? (
         <TouchableOpacity onPress={onCheckLastRead}>
           <Text
             mb="sm"
