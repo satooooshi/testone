@@ -263,6 +263,9 @@ const Navigator = () => {
     rtmEngine.addListener(
       'RemoteInvitationReceived',
       async (invitation: RemoteInvitation) => {
+        if (Platform.OS === 'ios') {
+          await new Promise(r => setTimeout(r, 500));
+        }
         displayIncomingCallNow(invitation);
       },
     );
