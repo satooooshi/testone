@@ -314,7 +314,8 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
                   {readUsers.length ? (
                     <Link
                       onClick={() => setVisibleLastReadModal(true)}
-                      mx="4px"
+                      mx="8px"
+                      mb="4px"
                       color="gray"
                       fontSize="12px">
                       既読
@@ -361,26 +362,21 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
             </Box>
             {!messageState.isSender && (
               <>
-                <Box>
-                  {readUsers.filter((u) =>
-                    u.id !== messageState?.sender?.id ? (
-                      <Link
-                        onClick={() => setVisibleLastReadModal(true)}
-                        mx="4px"
-                        color="gray"
-                        fontSize="12px">
-                        既読
-                        {
-                          readUsers.filter(
-                            (u) => u.id !== messageState?.sender?.id,
-                          ).length
-                        }
-                      </Link>
-                    ) : null,
-                  )}
+                <Box display="flex" flexDir="column">
+                  {readUsers.length ? (
+                    <Link
+                      onClick={() => setVisibleLastReadModal(true)}
+                      mx="8px"
+                      mb="4px"
+                      color="gray"
+                      fontSize="12px">
+                      既読
+                      {readUsers.length}
+                    </Link>
+                  ) : null}
                   {createdAtText}
-                  {menuOpener}
                 </Box>
+                {menuOpener}
               </>
             )}
           </Box>
