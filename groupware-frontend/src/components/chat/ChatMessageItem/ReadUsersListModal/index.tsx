@@ -32,13 +32,12 @@ const ReadUsersListModal: React.FC<ReadUsersListModalProps> = ({
   onClose,
 }) => {
   const [readOrUnread, setReadOrUnRead] = useState(true);
-  const { user } = useAuthenticate();
   const unReadUsers = () => {
     const unreadUsers =
       usersInRoom?.filter(
         (inRoom) => !readUsers.map((r) => r.id).includes(inRoom.id),
       ) || [];
-    return unreadUsers?.filter((u) => u.id !== sender?.id && u.id !== user?.id);
+    return unreadUsers?.filter((u) => u.id !== sender?.id);
   };
 
   const userRow = (user: User) => (

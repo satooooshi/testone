@@ -273,7 +273,7 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
         isOpen={visibleReadModal}
         sender={messageState.sender}
         onClose={() => setVisibleLastReadModal(false)}
-        readUsers={readUsers.filter((u) => u.id !== messageState?.sender?.id)}
+        readUsers={readUsers}
       />
 
       <ReactionListModal
