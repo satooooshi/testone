@@ -271,8 +271,9 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
       <ReadUsersListModal
         usersInRoom={usersInRoom}
         isOpen={visibleReadModal}
+        sender={messageState.sender}
         onClose={() => setVisibleLastReadModal(false)}
-        readUsers={readUsers}
+        readUsers={readUsers.filter((u) => u.id !== messageState?.sender?.id)}
       />
 
       <ReactionListModal
@@ -360,8 +361,26 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
             </Box>
             {!messageState.isSender && (
               <>
-                {createdAtText}
-                {menuOpener}
+                <Box>
+                  {readUsers.filter((u) =>
+                    u.id !== messageState?.sender?.id ? (
+                      <Link
+                        onClick={() => setVisibleLastReadModal(true)}
+                        mx="4px"
+                        color="gray"
+                        fontSize="12px">
+                        既読
+                        {
+                          readUsers.filter(
+                            (u) => u.id !== messageState?.sender?.id,
+                          ).length
+                        }
+                      </Link>
+                    ) : null,
+                  )}
+                  {createdAtText}
+                  {menuOpener}
+                </Box>
               </>
             )}
           </Box>
