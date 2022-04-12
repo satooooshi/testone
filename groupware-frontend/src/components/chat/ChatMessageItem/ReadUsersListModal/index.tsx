@@ -11,6 +11,7 @@ import {
   Text,
 } from '@chakra-ui/react';
 import React, { useState } from 'react';
+import { useAuthenticate } from 'src/contexts/useAuthenticate';
 import { User } from 'src/types';
 import { darkFontColor } from 'src/utils/colors';
 import { userNameFactory } from 'src/utils/factory/userNameFactory';
@@ -29,10 +30,14 @@ const ReadUsersListModal: React.FC<ReadUsersListModalProps> = ({
   onClose,
 }) => {
   const [readOrUnread, setReadOrUnRead] = useState(true);
-  const unReadUsers =
-    usersInRoom?.filter(
-      (inRoom) => !readUsers.map((r) => r.id).includes(inRoom.id),
-    ) || [];
+  const { user } = useAuthenticate();
+  const unReadUsers = () => {
+    const unreadUsers =
+      usersInRoom?.filter(
+        (inRoom) => !readUsers.map((r) => r.id).includes(inRoom.id),
+      ) || [];
+    return unreadUsers?.filter((u) => u.id !== user?.id);
+  };
 
   const userRow = (user: User) => (
     <Link
@@ -89,7 +94,7 @@ const ReadUsersListModal: React.FC<ReadUsersListModalProps> = ({
         <ModalBody>
           {readOrUnread
             ? readUsers.map((u) => userRow(u))
-            : unReadUsers.map((u) => userRow(u))}
+            : unReadUsers().map((u) => userRow(u))}
         </ModalBody>
       </ModalContent>
     </Modal>
