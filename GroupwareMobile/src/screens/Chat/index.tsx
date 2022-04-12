@@ -637,6 +637,15 @@ const Chat: React.FC = () => {
           .map(t => t.user)
       : [];
   };
+  const unReadUsers = (targetMsg: ChatMessage) => {
+    const unreadUsers = roomDetail?.members?.filter(
+      existMembers =>
+        !readUsers(targetMsg)
+          .map(u => u.id)
+          .includes(existMembers.id),
+    );
+    return unreadUsers?.filter(u => u.id !== myself?.id);
+  };
 
   const renderMessage = (message: ChatMessage, messageIndex: number) => (
     <Div
@@ -919,12 +928,7 @@ const Chat: React.FC = () => {
             children={() =>
               selectedMessageForCheckLastRead ? (
                 <FlatList
-                  data={roomDetail?.members?.filter(
-                    existMembers =>
-                      !readUsers(selectedMessageForCheckLastRead)
-                        .map(u => u.id)
-                        .includes(existMembers.id),
-                  )}
+                  data={unReadUsers(selectedMessageForCheckLastRead)}
                   keyExtractor={item => item.id.toString()}
                   renderItem={({item}) => readUserBox(item)}
                 />
