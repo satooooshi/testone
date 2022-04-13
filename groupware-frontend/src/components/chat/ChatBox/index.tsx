@@ -23,7 +23,7 @@ import { blueColor, darkFontColor } from 'src/utils/colors';
 import { Menu, MenuItem, MenuButton } from '@szhsin/react-menu';
 import { HiOutlineDotsCircleHorizontal } from 'react-icons/hi';
 import Editor from '@draft-js-plugins/editor';
-import { convertToRaw, EditorState } from 'draft-js';
+import { convertToRaw, EditorState, getDefaultKeyBinding } from 'draft-js';
 import {
   AiFillCloseCircle,
   AiOutlineDown,
@@ -352,6 +352,14 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
       chatGroup: newChatMessage.chatGroup,
       type: ChatMessageType.STICKER,
     });
+  };
+
+  const editorKeyBindingFn = (e: React.KeyboardEvent) => {
+    if (e.ctrlKey !== e.metaKey && e.key === 'Enter') {
+      onSend();
+      return null;
+    }
+    return getDefaultKeyBinding(e);
   };
 
   const nameOfEmptyNameGroup = (members?: User[]): string => {
@@ -814,6 +822,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
           placeholder="メッセージを入力"
           editorState={editorState}
           onChange={onEditorChange}
+          keyBindingFn={editorKeyBindingFn}
           plugins={plugins}
           ref={editorRef}
         />

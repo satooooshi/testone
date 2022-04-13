@@ -26,7 +26,7 @@ import {
   useMediaQuery,
   SimpleGrid,
 } from '@chakra-ui/react';
-import { BoardCategory, TagType, UserTag, WikiType } from 'src/types';
+import { BoardCategory, RoomType, TagType, UserTag, WikiType } from 'src/types';
 import { userRoleNameFactory } from 'src/utils/factory/userRoleNameFactory';
 import { branchTypeNameFactory } from 'src/utils/factory/branchTypeNameFactory';
 import { blueColor, darkFontColor } from 'src/utils/colors';
@@ -402,7 +402,11 @@ const MyAccountInfo = () => {
                       <HiOutlineChat
                         style={{ width: 40, height: 40 }}
                         onClick={() =>
-                          createGroup({ name: '', members: [profile] })
+                          createGroup({
+                            name: '',
+                            members: [profile],
+                            roomType: RoomType.PERSONAL,
+                          })
                         }
                         color="white"
                       />
