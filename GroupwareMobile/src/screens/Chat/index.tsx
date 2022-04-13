@@ -122,9 +122,8 @@ const Chat: React.FC = () => {
   }, [messages]);
   const [nowImageIndex, setNowImageIndex] = useState<number>(0);
   const [video, setVideo] = useState('');
-  const {data: lastReadChatTime} = useAPIGetLastReadChatTime(room.id, {
-    refetchInterval: 1000,
-  });
+  const {data: lastReadChatTime, refetch: refetchLastReadChatTime} =
+    useAPIGetLastReadChatTime(room.id);
   const [longPressedMsg, setLongPressedMgg] = useState<ChatMessage>();
   const [reactionTarget, setReactionTarget] = useState<ChatMessage>();
   const {mutate: saveReaction} = useAPISaveReaction();
@@ -551,9 +550,29 @@ const Chat: React.FC = () => {
   }, [isFocused, setIsTabBarVisible]);
 
   useEffect(() => {
+    socket.connect();
     socket.emit('joinRoom', room.id.toString());
+    socket.on('readMessageClient', async (senderId: string) => {
+      if (myself?.id && senderId && senderId !== `${myself?.id}`) {
+        console.log('readMessageClient called', senderId, myself.id, room.id);
+        refetchLastReadChatTime();
+      }
+    });
     socket.on('msgToClient', async (sentMsgByOtherUsers: ChatMessage) => {
       if (sentMsgByOtherUsers.content) {
+        if (sentMsgByOtherUsers?.sender?.id !== myself?.id) {
+          saveLastReadChatTime(room.id, {
+            onSuccess: () => {
+              socket.emit('readReport', {
+                room: room.id.toString(),
+                senderId: myself?.id,
+              });
+              console.log('>>>>>>>>>>>>>>');
+              refetchRoom();
+            },
+          });
+          refetchLastReadChatTime();
+        }
         sentMsgByOtherUsers.createdAt = new Date(sentMsgByOtherUsers.createdAt);
         sentMsgByOtherUsers.updatedAt = new Date(sentMsgByOtherUsers.updatedAt);
         if (sentMsgByOtherUsers.sender?.id === myself?.id) {
@@ -592,47 +611,26 @@ const Chat: React.FC = () => {
     return () => {
       socket.emit('leaveRoom', room.id);
       refetchRoom();
+      socket.disconnect();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [room.id]);
 
-  useEffect(() => {
-    if (fetchedPastMessages?.length) {
-      if (
-        messages?.length &&
-        isRecent(
-          messages[messages.length - 1],
-          fetchedPastMessages[fetchedPastMessages.length - 1],
-        )
-      ) {
-        const msgToAppend: ChatMessage[] = [];
-        for (const sentMsg of fetchedPastMessages) {
-          if (isRecent(messages[messages.length - 1], sentMsg)) {
-            msgToAppend.push(sentMsg);
-          }
-        }
-        setMessages(m => {
-          return refreshMessage([...m, ...msgToAppend]);
-        });
-      } else if (!messages?.length) {
-        setMessages(refreshMessage(fetchedPastMessages));
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [fetchedPastMessages]);
+  // useEffect(() => {
+  //   messages[0]?.chatGroup?.id === room.id && saveLastReadChatTime(room.id);
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [messages, room.id]);
 
-  useEffect(() => {
-    messages[0]?.chatGroup?.id === room.id && saveLastReadChatTime(room.id);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [messages, room.id]);
-
-  const readUsers = (targetMsg: ChatMessage) => {
-    return lastReadChatTime
-      ? lastReadChatTime
-          .filter(t => t.readTime >= targetMsg.createdAt)
-          .map(t => t.user)
-      : [];
-  };
+  const readUsers = useCallback(
+    (targetMsg: ChatMessage) => {
+      return lastReadChatTime
+        ? lastReadChatTime
+            .filter(t => t.readTime >= targetMsg.createdAt)
+            .map(t => t.user)
+        : [];
+    },
+    [lastReadChatTime],
+  );
 
   const renderMessage = (message: ChatMessage, messageIndex: number) => (
     <Div
@@ -813,8 +811,18 @@ const Chat: React.FC = () => {
   );
 
   useEffect(() => {
-    saveLastReadChatTime(room.id);
+    saveLastReadChatTime(room.id, {
+      onSuccess: () => {
+        console.log('2222222');
+
+        socket.emit('readReport', {
+          room: room.id.toString(),
+          senderId: myself?.id,
+        });
+      },
+    });
     return () => saveLastReadChatTime(room.id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [room.id, saveLastReadChatTime]);
 
   const readUserBox = (user: User) => (
