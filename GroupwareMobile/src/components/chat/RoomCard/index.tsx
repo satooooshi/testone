@@ -74,7 +74,7 @@ const RoomCard: React.FC<RoomCardProps> = ({
           w={windowWidth * 0.9}
           shadow="sm"
           p={4}
-          h={100}
+          h={70}
           alignItems="center"
           flexDir="row">
           <Div>
