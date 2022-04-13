@@ -12,10 +12,10 @@
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		6071535227FC7D65006E718E /* ring_sound.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 6071535127FC7D65006E718E /* ring_sound.mp3 */; };
+		60A84E782806C6FF00D7208A /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 60A84E772806C6FF00D7208A /* GoogleService-Info.plist */; };
 		7520C28D271C173000C800B4 /* BridgingFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7520C28C271C173000C800B4 /* BridgingFile.swift */; };
 		75236F612797F7B4004360E1 /* Intents.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 75236F602797F7B4004360E1 /* Intents.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		75236F632797F7BE004360E1 /* CallKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 75236F622797F7BE004360E1 /* CallKit.framework */; };
-		753A358027587EAB00FD41E5 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 753A357F27587EAB00FD41E5 /* GoogleService-Info.plist */; };
 		753A35892759FD9900FD41E5 /* BootSplash.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 753A35882759FD9900FD41E5 /* BootSplash.storyboard */; };
 		7542A1F327BE7F45009FAA2E /* end_call.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 7542A1F227BE7F45009FAA2E /* end_call.mp3 */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
@@ -48,11 +48,11 @@
 		2BB485AD61E420A6B352227A /* libPods-GroupwareMobile-GroupwareMobileTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-GroupwareMobile-GroupwareMobileTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		390372DAB52248BC4435856A /* Pods-GroupwareMobile.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-GroupwareMobile.release.xcconfig"; path = "Target Support Files/Pods-GroupwareMobile/Pods-GroupwareMobile.release.xcconfig"; sourceTree = "<group>"; };
 		6071535127FC7D65006E718E /* ring_sound.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = ring_sound.mp3; path = ../assets/ring_sound.mp3; sourceTree = "<group>"; };
+		60A84E772806C6FF00D7208A /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "../../../../Downloads/GoogleService-Info.plist"; sourceTree = "<group>"; };
 		7520C28B271C173000C800B4 /* GroupwareMobile-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "GroupwareMobile-Bridging-Header.h"; sourceTree = "<group>"; };
 		7520C28C271C173000C800B4 /* BridgingFile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BridgingFile.swift; sourceTree = "<group>"; };
 		75236F602797F7B4004360E1 /* Intents.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Intents.framework; path = System/Library/Frameworks/Intents.framework; sourceTree = SDKROOT; };
 		75236F622797F7BE004360E1 /* CallKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CallKit.framework; path = System/Library/Frameworks/CallKit.framework; sourceTree = SDKROOT; };
-		753A357F27587EAB00FD41E5 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		753A35832758C3F800FD41E5 /* GroupwareMobile.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = GroupwareMobile.entitlements; path = GroupwareMobile/GroupwareMobile.entitlements; sourceTree = "<group>"; };
 		753A35882759FD9900FD41E5 /* BootSplash.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = BootSplash.storyboard; path = GroupwareMobile/BootSplash.storyboard; sourceTree = "<group>"; };
 		7542A1F227BE7F45009FAA2E /* end_call.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = end_call.mp3; path = ../assets/end_call.mp3; sourceTree = "<group>"; };
@@ -138,9 +138,9 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
+				60A84E772806C6FF00D7208A /* GoogleService-Info.plist */,
 				6071535127FC7D65006E718E /* ring_sound.mp3 */,
 				7542A1F227BE7F45009FAA2E /* end_call.mp3 */,
-				753A357F27587EAB00FD41E5 /* GoogleService-Info.plist */,
 				7520C28C271C173000C800B4 /* BridgingFile.swift */,
 				13B07FAE1A68108700A75B9A /* GroupwareMobile */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
@@ -275,8 +275,8 @@
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				6071535227FC7D65006E718E /* ring_sound.mp3 in Resources */,
 				7542A1F327BE7F45009FAA2E /* end_call.mp3 in Resources */,
-				753A358027587EAB00FD41E5 /* GoogleService-Info.plist in Resources */,
 				753A35892759FD9900FD41E5 /* BootSplash.storyboard in Resources */,
+				60A84E782806C6FF00D7208A /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
