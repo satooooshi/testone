@@ -102,7 +102,7 @@ export class ChatService {
         'm',
         'm.id = ( SELECT id FROM chat_messages WHERE chat_group_id = chat_groups.id AND type <> "system_text" ORDER BY updated_at DESC LIMIT 1 )',
       )
-      .leftJoinAndSelect('lastReadChatTime.user', 'lastReadChatTime.user')
+      // .leftJoinAndSelect('lastReadChatTime.user', 'lastReadChatTime.user')
       .where('member.id = :memberId', { memberId: userID })
       .skip(offset)
       .take(Number(limit))
@@ -139,6 +139,43 @@ export class ChatService {
     ]).reverse();
     const pageCount = Math.floor(count / Number(limit)) + 1;
     return { rooms, pageCount };
+  }
+
+  public async getRoomsUnreadChatCount(userID: number): Promise<ChatGroup[]> {
+    const [urlUnparsedRooms] = await this.chatGroupRepository
+      .createQueryBuilder('chat_groups')
+      .leftJoin('chat_groups.members', 'member')
+      .leftJoinAndSelect(
+        'chat_groups.lastReadChatTime',
+        'lastReadChatTime',
+        'lastReadChatTime.user_id = :userID',
+        { userID },
+      )
+      // .leftJoinAndSelect('lastReadChatTime.user', 'lastReadChatTime.user')
+      .where('member.id = :memberId', { memberId: userID })
+      .orderBy('chat_groups.updatedAt', 'DESC')
+      .getManyAndCount();
+    const rooms = await Promise.all(
+      urlUnparsedRooms.map(async (g) => {
+        let unreadCount = 0;
+        const hasBeenRead = g?.lastReadChatTime?.[0]?.readTime
+          ? g?.lastReadChatTime?.[0]?.readTime > g.updatedAt
+          : false;
+        if (!hasBeenRead && g?.lastReadChatTime?.[0]?.readTime) {
+          const query = {
+            group: g.id,
+            lastReadTime: g.lastReadChatTime?.[0].readTime,
+          };
+          unreadCount = await this.getUnreadChatMessage(userID, query);
+        }
+
+        return {
+          ...g,
+          unreadCount,
+        };
+      }),
+    );
+    return rooms;
   }
 
   public async getChatMessage(

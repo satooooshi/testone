@@ -80,6 +80,14 @@ export class ChatController {
     return await this.chatService.getChatGroup(req.user.id);
   }
 
+  @Get('group-unread-chat-count')
+  @UseGuards(JwtAuthenticationGuard)
+  async getRoomsUnreadChatCount(
+    @Req() req: RequestWithUser,
+  ): Promise<ChatGroup[]> {
+    return await this.chatService.getRoomsUnreadChatCount(req.user.id);
+  }
+
   @Get('/v2/rooms')
   @UseGuards(JwtAuthenticationGuard)
   async getChatGroupByPage(
