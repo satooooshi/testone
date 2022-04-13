@@ -2,7 +2,7 @@ import React from 'react';
 import {Platform, TouchableHighlight, useWindowDimensions} from 'react-native';
 import FastImage from 'react-native-fast-image';
 import {Swipeable} from 'react-native-gesture-handler';
-import {Button, Div, Icon, Text} from 'react-native-magnus';
+import {Badge, Button, Div, Icon, Text} from 'react-native-magnus';
 import tailwind from 'tailwind-rn';
 import {roomCardStyles} from '../../../styles/component/chat/roomCard.style';
 import {ChatGroup, ChatMessage, ChatMessageType} from '../../../types';
@@ -107,6 +107,11 @@ const RoomCard: React.FC<RoomCardProps> = ({
             <Text numberOfLines={1} mb={'xs'} fontWeight="bold" fontSize={16}>
               {nameOfRoom(room)}
             </Text>
+            {room.unreadCount && room.unreadCount > 0 ? (
+              <Badge position="absolute" left={windowWidth * 0.6}>
+                {`${room.unreadCount}`}
+              </Badge>
+            ) : null}
             <Text
               mb={'xs'}
               fontSize={14}
