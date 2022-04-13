@@ -162,15 +162,15 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
       }))
       .reverse();
   }, [messages]);
-  const { mutate: saveLastReadChatTime } = useAPISaveLastReadChatTime({
-    onSuccess: () => {
-      refetchRoom();
-    },
-  });
+  const { mutate: saveLastReadChatTime } = useAPISaveLastReadChatTime();
   const [selectedImageURL, setSelectedImageURL] = useState<string>();
-  const { data: lastReadChatTime } = useAPIGetLastReadChatTime(room.id, {
-    refetchInterval: 1000,
-  });
+  const { data: lastReadChatTime, refetch: refetchLastReadChatTime } =
+    useAPIGetLastReadChatTime(room.id, {
+      onSuccess: () => {
+        // refetchRoom();
+        needRefetch();
+      },
+    });
   const userDataForMention: MentionData[] = useMemo(() => {
     return (
       room?.members
@@ -399,10 +399,30 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
   }, [focusedMessageID]);
 
   useEffect(() => {
+    socket.connect();
     socket.emit('joinRoom', room.id.toString());
+    socket.on('readMessageClient', async (senderId: string) => {
+      if (user?.id && senderId && senderId != `${user?.id}`) {
+        console.log('readMessageClient called', senderId, user.id, room.id);
+        refetchLastReadChatTime();
+      }
+    });
     socket.on('msgToClient', async (sentMsgByOtherUsers: ChatMessage) => {
-      // console.log('sent by other users', sentMsgByOtherUsers.content);
+      console.log('sent by other users', sentMsgByOtherUsers.content);
       if (sentMsgByOtherUsers.content) {
+        if (sentMsgByOtherUsers?.sender?.id !== myself?.id) {
+          saveLastReadChatTime(room.id, {
+            onSuccess: () => {
+              socket.emit('readReport', {
+                room: room.id.toString(),
+                senderId: user?.id,
+              });
+              console.log('>>>>>>>>>>>>>>');
+              refetchRoom();
+            },
+          });
+          refetchLastReadChatTime();
+        }
         sentMsgByOtherUsers.createdAt = new Date(sentMsgByOtherUsers.createdAt);
         sentMsgByOtherUsers.updatedAt = new Date(sentMsgByOtherUsers.updatedAt);
         if (sentMsgByOtherUsers.sender?.id === myself?.id) {
@@ -420,40 +440,45 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
           }
           return msgs;
         });
-        needRefetch();
       }
     });
 
-    // socket.on('joinedRoom', (r: any) => {
-    //   console.log('joinedRoom', r);
-    // });
-    //
-    // socket.on('leftRoom', (r: any) => {
-    //   console.log('leftRoom', r);
-    // });
     return () => {
       socket.emit('leaveRoom', room.id);
+      socket.disconnect();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [room.id]);
 
-  useEffect(() => {
-    messages[0]?.chatGroup?.id === room.id && saveLastReadChatTime(room.id);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [messages, room.id]);
+  // useEffect(() => {
+  //   messages[0]?.chatGroup?.id === room.id && saveLastReadChatTime(room.id);
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [messages, room.id]);
 
   useEffect(() => {
-    saveLastReadChatTime(room.id);
+    saveLastReadChatTime(room.id, {
+      onSuccess: () => {
+        socket.emit('readReport', {
+          room: room.id.toString(),
+          senderId: user?.id,
+        });
+        refetchRoom();
+      },
+    });
     return () => saveLastReadChatTime(room.id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [room.id, saveLastReadChatTime]);
 
-  const readUsers = (targetMsg: ChatMessage) => {
-    return lastReadChatTime
-      ? lastReadChatTime
-          .filter((t) => t.readTime >= targetMsg.createdAt)
-          .map((t) => t.user)
-      : [];
-  };
+  const readUsers = useCallback(
+    (targetMsg: ChatMessage) => {
+      return lastReadChatTime
+        ? lastReadChatTime
+            .filter((t) => t.readTime >= targetMsg.createdAt)
+            .map((t) => t.user)
+        : [];
+    },
+    [lastReadChatTime],
+  );
 
   const isLoading = loadingSend || loadingUplaod;
   const activeIndex = useMemo(() => {
@@ -544,7 +569,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
         isOpen={visibleAlbumModal}
         onClose={() => {
           setVisibleAlbumModal(false);
-          refetchLatest();
+          // refetchLatest();
         }}
       />
       <NoteModal
@@ -552,7 +577,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
         isOpen={visibleNoteModal}
         onClose={() => {
           setVisibleNoteModal(false);
-          refetchLatest();
+          // refetchLatest();
         }}
       />
       <input {...noClickInputDropzone()} />

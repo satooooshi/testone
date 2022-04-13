@@ -1,15 +1,17 @@
 import { useAPIGetRoomsUnreadChatCount } from '@/hooks/api/chat/useAPIGetRoomsUnreadChatCount';
 import React, { useContext, createContext, useState, useEffect } from 'react';
 import { io } from 'socket.io-client';
-import { ChatGroup } from '../../types';
 import { baseURL } from '../../utils/url';
+import { useAuthenticate } from '../useAuthenticate';
 
 const BadgeContext = createContext({
   unreadChatCount: 0,
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
   refetchRoom: () => {},
 });
 
 export const BadgeProvider: React.FC = ({ children }) => {
+  const { user } = useAuthenticate();
   const [chatUnreadCount, setChatUnreadCount] = useState(0);
   const socket = io(baseURL, {
     transports: ['websocket'],
@@ -20,14 +22,17 @@ export const BadgeProvider: React.FC = ({ children }) => {
       for (const room of data) {
         count += room.unreadCount ? room.unreadCount : 0;
       }
+      console.log('count------------------', count);
+
       setChatUnreadCount(count);
     },
   });
 
   useEffect(
     () => {
-      socket.on('badgeClient', async (status: string) => {
-        if (status !== 'connected') {
+      socket.on('badgeClient', async (userId: number) => {
+        if (user?.id && userId !== user.id) {
+          console.log('message was sent---------', userId);
           getRooms();
         }
       });
