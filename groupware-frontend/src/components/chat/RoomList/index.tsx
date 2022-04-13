@@ -1,6 +1,7 @@
 import { useAPIGetRoomsByPage } from '@/hooks/api/chat/useAPIGetRoomsByPage';
 import { Box, Spinner, Text } from '@chakra-ui/react';
 import React, { useEffect, useState } from 'react';
+import { useHandleBadge } from 'src/contexts/badge/useHandleBadge';
 import { useRoomRefetch } from 'src/contexts/chat/useRoomRefetch';
 import { ChatGroup } from 'src/types';
 import ChatGroupCard from '../ChatGroupCard';
@@ -13,28 +14,15 @@ type RoomListProps = {
 const RoomList: React.FC<RoomListProps> = ({ currentId, onClickRoom }) => {
   const { clearRefetch, refetchNeeded } = useRoomRefetch();
   const [page, setPage] = useState('1');
+  const { unreadChatCount } = useHandleBadge();
   const [roomsForInfiniteScroll, setRoomsForInfiniteScroll] = useState<
     ChatGroup[]
   >([]);
 
-  const { data: chatRooms, isLoading: loadingGetChatGroupList } =
-    useAPIGetRoomsByPage(
-      {
-        page,
-        limit: '20',
-      },
-      {
-        onSuccess: (data) => {
-          if (data.rooms.length) {
-            setRoomsForInfiniteScroll((r) => [...r, ...data.rooms]);
-          }
-        },
-      },
-    );
   const onScroll = (e: any) => {
     if (
       e.target.scrollTop > e.target.scrollHeight / 2 &&
-      chatRooms?.rooms?.length
+      roomsForInfiniteScroll?.length >= Number(page) * 20
     ) {
       setPage((p) => (Number(p) + 1).toString());
     }
@@ -44,25 +32,29 @@ const RoomList: React.FC<RoomListProps> = ({ currentId, onClickRoom }) => {
     setRoomsForInfiniteScroll(newData);
   };
 
-  const { refetch: refreshRooms } = useAPIGetRoomsByPage(
-    {
-      page: '1',
-      limit: (20 * Number(page)).toString(),
-    },
-    {
-      refetchInterval: 30000,
-      onSettled: clearRefetch,
-      onSuccess: (data) => {
-        stateRefreshNeeded(data.rooms);
+  const { refetch: refreshRooms, isLoading: loadingGetChatGroupList } =
+    useAPIGetRoomsByPage(
+      {
+        page: '1',
+        limit: (20 * Number(page)).toString(),
       },
-    },
-  );
+      {
+        onSettled: clearRefetch,
+        onSuccess: (data) => {
+          stateRefreshNeeded(data.rooms);
+        },
+      },
+    );
 
   useEffect(() => {
     if (refetchNeeded) {
       refreshRooms();
     }
   }, [refetchNeeded, refreshRooms]);
+
+  useEffect(() => {
+    refreshRooms();
+  }, [unreadChatCount, refreshRooms]);
 
   return (
     <Box

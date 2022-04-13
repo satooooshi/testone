@@ -1,7 +1,14 @@
 import React, { useState } from 'react';
 import { ChatGroup, ChatMessage, ChatMessageType, User } from 'src/types';
 import { dateTimeFormatterFromJSDDate } from 'src/utils/dateTimeFormatter';
-import { Avatar, Box, useMediaQuery, Text, Link } from '@chakra-ui/react';
+import {
+  Avatar,
+  Box,
+  useMediaQuery,
+  Text,
+  Link,
+  Badge,
+} from '@chakra-ui/react';
 import { darkFontColor } from 'src/utils/colors';
 import { RiPushpin2Fill, RiPushpin2Line } from 'react-icons/ri';
 import { useRoomRefetch } from 'src/contexts/chat/useRoomRefetch';
@@ -70,7 +77,7 @@ const ChatGroupCard: React.FC<ChatGroupCardProps> = ({
         flexDir="column"
         overflow="hidden"
         w={isSmallerThan768 ? '100%' : '80%'}
-        h="60px"
+        h="70px"
         justifyContent="space-around">
         <Box
           display="flex"
@@ -84,23 +91,41 @@ const ChatGroupCard: React.FC<ChatGroupCardProps> = ({
               ? chatGroup.name
               : nameOfEmptyNameGroup(chatGroup.members)}
           </Text>
-          {isPinned ? (
-            <Link
-              onClick={(e) => {
-                e.stopPropagation();
-                savePin({ ...chatGroup, isPinned: !chatGroup.isPinned });
-              }}>
-              <RiPushpin2Fill size={24} color="green" />
-            </Link>
-          ) : (
-            <Link
-              onClick={(e) => {
-                e.stopPropagation();
-                savePin({ ...chatGroup, isPinned: !chatGroup.isPinned });
-              }}>
-              <RiPushpin2Line size={24} color="green" />
-            </Link>
-          )}
+
+          <Box display="flex" flexDir="row">
+            {isSelected == false &&
+            chatGroup?.unreadCount &&
+            chatGroup?.unreadCount > 0 ? (
+              <Badge
+                bg="red"
+                color="white"
+                w="30px"
+                h="30px"
+                mr="20px"
+                borderRadius="50%"
+                textAlign="center"
+                lineHeight="30px">
+                {chatGroup?.unreadCount}
+              </Badge>
+            ) : null}
+            {isPinned ? (
+              <Link
+                onClick={(e) => {
+                  e.stopPropagation();
+                  savePin({ ...chatGroup, isPinned: !chatGroup.isPinned });
+                }}>
+                <RiPushpin2Fill size={24} color="green" />
+              </Link>
+            ) : (
+              <Link
+                onClick={(e) => {
+                  e.stopPropagation();
+                  savePin({ ...chatGroup, isPinned: !chatGroup.isPinned });
+                }}>
+                <RiPushpin2Line size={24} color="green" />
+              </Link>
+            )}
+          </Box>
         </Box>
         <Box display="flex" flexDir="row" alignItems="center" mb="4px">
           <Text fontSize="12px" color={darkFontColor} noOfLines={1}>
