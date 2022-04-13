@@ -1,5 +1,5 @@
 import {useFocusEffect, useNavigation} from '@react-navigation/native';
-import React, {useCallback, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {
   Alert,
   FlatList,
@@ -13,6 +13,7 @@ import RoomCard from '../../../components/chat/RoomCard';
 import UserModal from '../../../components/common/UserModal';
 import HeaderWithTextButton from '../../../components/Header';
 import WholeContainer from '../../../components/WholeContainer';
+import {useHandleBadge} from '../../../contexts/badge/useHandleBadge';
 import {useAPIGetRooms} from '../../../hooks/api/chat/useAPIGetRoomsByPage';
 import {useAPISaveChatGroup} from '../../../hooks/api/chat/useAPISaveChatGroup';
 import {useAPISavePin} from '../../../hooks/api/chat/useAPISavePin';
@@ -30,28 +31,29 @@ const RoomList: React.FC = () => {
   const [roomTypeSelector, setRoomTypeSelector] = useState(false);
   const [userModal, setVisibleUserModal] = useState(false);
   const {data: users} = useAPIGetUsers('');
+  const {unreadChatCount} = useHandleBadge();
   const {selectedUserRole, filteredUsers} = useUserRole('All', users);
   const [creationType, setCreationType] = useState<
     'talk' | 'group' | undefined
   >();
 
-  const {refetch: refetchAllRooms} = useAPIGetRooms(
-    {
-      page: '1',
-      limit: (20 * Number(page)).toString(),
-    },
-    {
-      refetchInterval: 30000,
-      onSuccess: data => {
-        stateRefreshNeeded(data.rooms);
+  const {refetch: refetchAllRooms, isLoading: loadingGetChatGroupList} =
+    useAPIGetRooms(
+      {
+        page: '1',
+        limit: (20 * Number(page)).toString(),
       },
-    },
-  );
+      {
+        onSuccess: data => {
+          stateRefreshNeeded(data.rooms);
+        },
+      },
+    );
 
-  const {data: chatRooms, isLoading: loadingGetChatGroupList} = useAPIGetRooms({
-    page,
-    limit: '20',
-  });
+  // const {data: chatRooms, isLoading: loadingGetChatGroupList} = useAPIGetRooms({
+  //   page,
+  //   limit: '20',
+  // });
   const {mutate: createGroup} = useAPISaveChatGroup({
     onSuccess: createdData => {
       navigation.navigate('ChatStack', {
@@ -81,7 +83,7 @@ const RoomList: React.FC = () => {
   };
 
   const onEndReached = () => {
-    if (chatRooms?.rooms?.length) {
+    if (roomsForInfiniteScroll?.length >= Number(page) * 20) {
       setPage(p => (Number(p) + 1).toString());
     }
   };
@@ -112,11 +114,15 @@ const RoomList: React.FC = () => {
     }
   };
 
-  useFocusEffect(
-    useCallback(() => {
-      refetchAllRooms();
-    }, [refetchAllRooms]),
-  );
+  // useFocusEffect(
+  //   useCallback(() => {
+  //     refetchAllRooms();
+  //   }, [refetchAllRooms]),
+  // );
+
+  useEffect(() => {
+    refetchAllRooms();
+  }, [unreadChatCount, refetchAllRooms]);
 
   return (
     <WholeContainer>

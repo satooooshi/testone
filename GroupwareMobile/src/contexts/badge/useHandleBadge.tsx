@@ -1,6 +1,6 @@
 import React, {useContext, createContext, useState, useEffect} from 'react';
 import {io} from 'socket.io-client';
-import {useAPIGetRooms} from '../../hooks/api/chat/useAPIGetRoomsByPage';
+import {useAPIGetRoomsUnreadChatCount} from '../../hooks/api/chat/useAPIGetRoomsUnreadChatCount';
 import {baseURL} from '../../utils/url';
 
 const BadgeContext = createContext({
@@ -13,26 +13,22 @@ export const BadgeProvider: React.FC = ({children}) => {
   const socket = io(baseURL, {
     transports: ['websocket'],
   });
-  const {refetch: refetchAllRooms} = useAPIGetRooms(
-    {
-      page: '1',
+  const {mutate: getRooms} = useAPIGetRoomsUnreadChatCount({
+    onSuccess: data => {
+      let count = 0;
+      for (const room of data) {
+        count += room.unreadCount ? room.unreadCount : 0;
+      }
+      setChatUnreadCount(count);
     },
-    {
-      onSuccess: data => {
-        let count = 0;
-        for (const room of data.rooms) {
-          count += room.unreadCount ? room.unreadCount : 0;
-        }
-        setChatUnreadCount(count);
-      },
-    },
-  );
+  });
 
   useEffect(
     () => {
+      getRooms();
       socket.on('badgeClient', async (status: string) => {
         if (status !== 'connected') {
-          refetchAllRooms();
+          getRooms();
         }
       });
     }, // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -40,7 +36,7 @@ export const BadgeProvider: React.FC = ({children}) => {
   );
 
   const refetchRoom = () => {
-    refetchAllRooms();
+    getRooms();
   };
 
   return (
