@@ -102,7 +102,6 @@ export class ChatService {
         'm',
         'm.id = ( SELECT id FROM chat_messages WHERE chat_group_id = chat_groups.id AND type <> "system_text" ORDER BY updated_at DESC LIMIT 1 )',
       )
-      // .leftJoinAndSelect('lastReadChatTime.user', 'lastReadChatTime.user')
       .where('member.id = :memberId', { memberId: userID })
       .skip(offset)
       .take(Number(limit))
@@ -151,7 +150,6 @@ export class ChatService {
         'lastReadChatTime.user_id = :userID',
         { userID },
       )
-      // .leftJoinAndSelect('lastReadChatTime.user', 'lastReadChatTime.user')
       .where('member.id = :memberId', { memberId: userID })
       .orderBy('chat_groups.updatedAt', 'DESC')
       .getManyAndCount();

@@ -111,12 +111,6 @@ const RoomList: React.FC = () => {
     }
   };
 
-  // useFocusEffect(
-  //   useCallback(() => {
-  //     refetchAllRooms();
-  //   }, [refetchAllRooms]),
-  // );
-
   useEffect(() => {
     refetchAllRooms();
   }, [unreadChatCount, refetchAllRooms]);
