@@ -13,7 +13,6 @@ type CallMessageProps = {
 };
 
 const CallMessage: React.FC<CallMessageProps> = ({ message }) => {
-  const test = '01:00:10';
   return (
     <Box
       w={150}
@@ -41,14 +40,13 @@ const CallMessage: React.FC<CallMessageProps> = ({ message }) => {
           bg={message.isSender ? 'blue.500' : '#ececec'}>
           {mentionTransform(message.content)}
         </Text>
-        {test ? (
-          <Text
-            mt={1}
-            fontSize={11}
-            color={message.isSender ? 'white' : darkFontColor}>
-            {test}
-          </Text>
-        ) : null}
+
+        <Text
+          mt={1}
+          fontSize={11}
+          color={message.isSender ? 'white' : darkFontColor}>
+          {message.callTime}
+        </Text>
       </Box>
     </Box>
   );

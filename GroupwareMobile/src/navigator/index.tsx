@@ -3,8 +3,6 @@ import {createStackNavigator} from '@react-navigation/stack';
 import {
   NavigationContainer,
   useNavigationContainerRef,
-  useNavigationState,
-  useRoute,
 } from '@react-navigation/native';
 import Login from '../screens/auth/Login';
 import {useAuthenticate} from '../contexts/useAuthenticate';
@@ -364,6 +362,9 @@ const Navigator = () => {
 
   const answerCall = async () => {
     // アプリをバックグラウンドからフォアグラウンドに
+    if (Platform.OS === 'ios') {
+      await new Promise(r => setTimeout(r, 500));
+    }
     RNCallKeep.backToForeground();
     RNCallKeep.endAllCalls();
     if (remoteInvitation.current?.channelId) {
