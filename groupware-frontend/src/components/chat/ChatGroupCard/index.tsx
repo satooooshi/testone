@@ -46,6 +46,8 @@ const ChatGroupCard: React.FC<ChatGroupCardProps> = ({
         return '動画が送信されました';
       case ChatMessageType.OTHER_FILE:
         return 'ファイルが送信されました';
+      case ChatMessageType.CALL:
+        return `通話時間 ${chatMessage.callTime}`;
       default:
         return chatMessage.content;
     }
