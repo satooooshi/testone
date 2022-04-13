@@ -9,6 +9,7 @@ import {
 } from '@nestjs/websockets';
 import { Server } from 'socket.io';
 import { Socket } from 'socket.io';
+import { ChatGroup } from 'src/entities/chatGroup.entity';
 import { ChatMessage } from 'src/entities/chatMessage.entity';
 
 @WebSocketGateway()
@@ -29,8 +30,6 @@ export class ChatGateway
 
   handleConnection(client: Socket) {
     // this.logger.log(`Client connected: ${client.id}`);
-    this.server.emit('msgToClient', 'connected');
-    this.server.emit('badgeClient', 'connected');
   }
 
   @SubscribeMessage('message')
@@ -38,7 +37,15 @@ export class ChatGateway
     this.server
       .to(payload.chatGroup?.id.toString())
       .emit('msgToClient', { ...payload, isSender: false });
-    this.server.emit('badgeClient', 'message is sent');
+    this.server.emit('badgeClient', payload.sender.id);
+  }
+
+  @SubscribeMessage('readReport')
+  public async readMessage(
+    _: Socket,
+    data: { room: string; senderId: string },
+  ) {
+    this.server.to(data.room).emit('readMessageClient', data.senderId);
   }
 
   @SubscribeMessage('joinRoom')
