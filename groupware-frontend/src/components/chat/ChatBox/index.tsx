@@ -132,7 +132,6 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
   const [confirmedSearchWord, setConfirmedSearchWord] = useState('');
   const [after, setAfter] = useState<number>();
   const [before, setBefore] = useState<number>();
-  const { user: myself } = useAuthenticate();
   const [focusedMessageID, setFocusedMessageID] = useState<number>();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [searchedResults, setSearchedResults] = useState<
@@ -410,7 +409,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
     socket.on('msgToClient', async (sentMsgByOtherUsers: ChatMessage) => {
       console.log('sent by other users', sentMsgByOtherUsers.content);
       if (sentMsgByOtherUsers.content) {
-        if (sentMsgByOtherUsers?.sender?.id !== myself?.id) {
+        if (sentMsgByOtherUsers?.sender?.id !== user?.id) {
           saveLastReadChatTime(room.id, {
             onSuccess: () => {
               socket.emit('readReport', {
@@ -425,7 +424,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
         }
         sentMsgByOtherUsers.createdAt = new Date(sentMsgByOtherUsers.createdAt);
         sentMsgByOtherUsers.updatedAt = new Date(sentMsgByOtherUsers.updatedAt);
-        if (sentMsgByOtherUsers.sender?.id === myself?.id) {
+        if (sentMsgByOtherUsers.sender?.id === user?.id) {
           sentMsgByOtherUsers.isSender = true;
         }
         setMessages((msgs) => {
