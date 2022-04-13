@@ -50,12 +50,9 @@ const RoomList: React.FC = () => {
       },
     );
 
-  // const {data: chatRooms, isLoading: loadingGetChatGroupList} = useAPIGetRooms({
-  //   page,
-  //   limit: '20',
-  // });
   const {mutate: createGroup} = useAPISaveChatGroup({
     onSuccess: createdData => {
+      refetchAllRooms();
       navigation.navigate('ChatStack', {
         screen: 'Chat',
         params: {room: createdData},
