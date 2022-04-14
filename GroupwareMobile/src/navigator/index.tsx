@@ -434,30 +434,34 @@ const Navigator = () => {
   const sendLocalNotification = async (
     remoteMessage: FirebaseMessagingTypes.RemoteMessage,
   ) => {
-    const channelId = await notifee.createChannel({
-      id: 'default',
-      name: 'Default Channel',
-    });
+    if (!remoteMessage?.data?.calleeId) {
+      const channelId = await notifee.createChannel({
+        id: 'default',
+        name: 'Default Channel',
+      });
 
-    await notifee.displayNotification({
-      title: remoteMessage.data?.title || '',
-      body: remoteMessage.data?.body || '',
-      android: {
-        channelId: channelId,
-        pressAction: {
-          id: 'action_id',
-          launchActivity: 'default',
+      await notifee.displayNotification({
+        title: remoteMessage.data?.title || '',
+        body: remoteMessage.data?.body || '',
+        android: {
+          channelId: channelId,
+          pressAction: {
+            id: 'action_id',
+            launchActivity: 'default',
+          },
         },
-      },
-      data: {
-        screen: remoteMessage?.data?.screen ? remoteMessage?.data?.screen : '',
-        id: remoteMessage?.data?.id ? remoteMessage?.data?.id : '',
-      },
-      ios: {
-        // iOS resource (.wav, aiff, .caf)
-        sound: 'local.wav',
-      },
-    });
+        data: {
+          screen: remoteMessage?.data?.screen
+            ? remoteMessage?.data?.screen
+            : '',
+          id: remoteMessage?.data?.id ? remoteMessage?.data?.id : '',
+        },
+        ios: {
+          // iOS resource (.wav, aiff, .caf)
+          sound: 'local.wav',
+        },
+      });
+    }
   };
 
   useEffect(() => {
