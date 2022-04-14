@@ -329,9 +329,9 @@ const Navigator = () => {
       false,
     );
   };
-  const navigateToCallWindow = useCallback(() => {
-    navigationRef.current?.navigate('Call');
-  }, [navigationRef]);
+  // const navigateToCallWindow = useCallback(() => {
+  //   navigationRef.current?.navigate('Call');
+  // }, [navigationRef]);
 
   const joinChannel = useCallback(
     async (realChannelName: string) => {
@@ -352,20 +352,20 @@ const Navigator = () => {
         );
         await rtcEngine?.disableVideo();
         setChannelName(realChannelName);
-        navigateToCallWindow();
+        // navigateToCallWindow();
         remoteInvitation.current = undefined;
         setIsJoining(true);
       }
     },
-    [rtcInit, navigateToCallWindow],
+    [rtcInit],
   );
   // console.log(Platform.OS, 'callerId', onCallUid);
 
   const answerCall = async () => {
     // アプリをバックグラウンドからフォアグラウンドに
-    if (Platform.OS === 'ios' && AppState.currentState === 'background') {
-      await new Promise(r => setTimeout(r, 1000));
-    }
+    // if (Platform.OS === 'ios' && AppState.currentState === 'background') {
+    //   await new Promise(r => setTimeout(r, 1000));
+    // }
     RNCallKeep.backToForeground();
     RNCallKeep.endAllCalls();
     if (remoteInvitation.current?.channelId) {
