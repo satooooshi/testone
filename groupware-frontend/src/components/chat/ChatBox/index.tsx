@@ -62,7 +62,6 @@ import dynamic from 'next/dynamic';
 const Viewer = dynamic(() => import('react-viewer'), { ssr: false });
 import '@draft-js-plugins/mention/lib/plugin.css';
 import '@draft-js-plugins/image/lib/plugin.css';
-import '@draft-js-plugins/sticker/lib/plugin.css';
 import UserAvatar from '@/components/common/UserAvatar';
 import io from 'socket.io-client';
 import { baseURL } from 'src/utils/url';

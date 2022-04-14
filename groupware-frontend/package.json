@@ -17,7 +17,6 @@
     "@draft-js-plugins/editor": "^4.1.0",
     "@draft-js-plugins/image": "^4.1.2",
     "@draft-js-plugins/mention": "^4.6.1",
-    "@draft-js-plugins/sticker": "^4.1.1",
     "@draft-js-plugins/video": "^4.1.1",
     "@emotion/react": "^11",
     "@emotion/styled": "^11",

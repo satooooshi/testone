@@ -1197,13 +1197,6 @@
     prop-types "^15.5.8"
     react-popper "^2.2.5"
 
-"@draft-js-plugins/sticker@^4.1.1":
-  version "4.1.1"
-  resolved "https://registry.yarnpkg.com/@draft-js-plugins/sticker/-/sticker-4.1.1.tgz#efa60f8385d7fb92db6de7f2fe6bce31a999d27c"
-  integrity sha512-NtoMqLAA16aL1STJg3yC7BshhOPHLMK6NpO3E+sObXpp13q/yLj4yZOs7x0b7NUO302Eq0airkz1elHcWxJs0g==
-  dependencies:
-    immutable "~3.7.4"
-
 "@draft-js-plugins/video@^4.1.1":
   version "4.1.1"
   resolved "https://registry.yarnpkg.com/@draft-js-plugins/video/-/video-4.1.1.tgz#c4cd8180acffe4553f392ca9f64c7bdcb28323ff"
