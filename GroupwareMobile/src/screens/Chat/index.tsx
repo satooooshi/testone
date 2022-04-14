@@ -17,6 +17,7 @@ import {
   Button,
   Dropdown,
   Input,
+  Image,
 } from 'react-native-magnus';
 import WholeContainer from '../../components/WholeContainer';
 import {useAPIGetMessages} from '../../hooks/api/chat/useAPIGetMessages';
@@ -78,6 +79,8 @@ import {baseURL} from '../../utils/url';
 import {getThumbnailOfVideo} from '../../utils/getThumbnailOfVideo';
 import {useAuthenticate} from '../../contexts/useAuthenticate';
 import {useIsTabBarVisible} from '../../contexts/bottomTab/useIsTabBarVisible';
+import {reactionStickers} from '../../utils/factory/reactionStickers';
+import {ScrollView} from 'react-native-gesture-handler';
 
 const socket = io(baseURL, {
   transports: ['websocket'],
@@ -126,6 +129,7 @@ const Chat: React.FC = () => {
   });
   const [longPressedMsg, setLongPressedMgg] = useState<ChatMessage>();
   const [reactionTarget, setReactionTarget] = useState<ChatMessage>();
+  const [visibleStickerSelctor, setVisibleStickerSelector] = useState(false);
   const {mutate: saveReaction} = useAPISaveReaction();
   const {width: windowWidth, height: windowHeight} = useWindowDimensions();
   const {mutate: deleteReaction} = useAPIDeleteReaction();
@@ -373,6 +377,15 @@ const Chat: React.FC = () => {
         },
       });
     }
+  };
+
+  const handleStickerSelected = (sticker: string) => {
+    sendChatMessage({
+      content: sticker,
+      type: ChatMessageType.STICKER,
+      chatGroup: room,
+    });
+    setVisibleStickerSelector(false);
   };
 
   const playVideoOnModal = (url: string) => {
@@ -696,6 +709,32 @@ const Chat: React.FC = () => {
       ))}
     </Div>
   );
+  const stickerSelector = (
+    <Div
+      bg="white"
+      flexDir="row"
+      flexWrap="wrap"
+      alignSelf="center"
+      w={'100%'}
+      py={32}
+      justifyContent="space-around"
+      px={'sm'}>
+      <TouchableOpacity
+        style={tailwind('absolute right-0 top-0')}
+        onPress={() => setVisibleStickerSelector(false)}>
+        <Icon name="close" fontSize={24} />
+      </TouchableOpacity>
+      <ScrollView horizontal={true}>
+        {reactionStickers.map(e => (
+          <TouchableOpacity
+            key={e.name}
+            onPress={() => handleStickerSelected(e.name)}>
+            <Image source={e.src} style={{height: 80, width: 80, margin: 10}} />
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
+    </Div>
+  );
 
   const messageListAvoidngKeyboardDisturb = (
     <>
@@ -720,6 +759,8 @@ const Chat: React.FC = () => {
           />
           {reactionTarget ? (
             reactionSelector
+          ) : visibleStickerSelctor ? (
+            stickerSelector
           ) : (
             <>
               {values.replyParentMessage && (
@@ -734,6 +775,7 @@ const Chat: React.FC = () => {
                 onUploadFile={handleUploadFile}
                 onUploadVideo={handleUploadVideo}
                 onUploadImage={handleUploadImage}
+                setVisibleStickerSelector={setVisibleStickerSelector}
                 text={values.content || ''}
                 onChangeText={t =>
                   setValues(v => ({
@@ -776,6 +818,8 @@ const Chat: React.FC = () => {
           />
           {reactionTarget ? (
             reactionSelector
+          ) : visibleStickerSelctor ? (
+            stickerSelector
           ) : (
             <>
               {values.replyParentMessage && (
@@ -790,6 +834,7 @@ const Chat: React.FC = () => {
                 onUploadFile={handleUploadFile}
                 onUploadVideo={handleUploadVideo}
                 onUploadImage={handleUploadImage}
+                setVisibleStickerSelector={setVisibleStickerSelector}
                 text={values.content || ''}
                 onChangeText={t =>
                   setValues(v => ({
