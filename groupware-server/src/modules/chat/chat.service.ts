@@ -603,10 +603,13 @@ export class ChatService {
       .leftJoin('time.user', 'u')
       .where('g.id = :chatGroupId', { chatGroupId })
       .andWhere('u.id = :userId', { userId: user.id })
-      .getMany();
+      .getOne();
 
-    if (existTime.length) {
-      await this.lastReadChatTimeRepository.remove(existTime);
+    if (existTime) {
+      return await this.lastReadChatTimeRepository.save({
+        ...existTime,
+        readTime: new Date(),
+      });
     }
 
     const newTarget = this.lastReadChatTimeRepository.create({
