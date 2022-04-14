@@ -24,7 +24,7 @@ import {useAPIGetUserInfoById} from '../../../hooks/api/user/useAPIGetUserInfoBy
 import {useAPIGetWikiList} from '../../../hooks/api/wiki/useAPIGetWikiList';
 import {useTagType} from '../../../hooks/tag/useTagType';
 import {accountDetailStyles} from '../../../styles/screen/account/accountDetail.style';
-import {BoardCategory, TagType, User, WikiType} from '../../../types';
+import {BoardCategory, RoomType, TagType, User, WikiType} from '../../../types';
 import {
   AccountDetailNavigationProps,
   AccountDetailRouteProps,
@@ -467,7 +467,13 @@ const AccountDetail: React.FC = () => {
           w={60}
           zIndex={20}
           rounded="circle"
-          onPress={() => createGroup({name: '', members: [profile]})}>
+          onPress={() =>
+            createGroup({
+              name: '',
+              members: [profile],
+              roomType: RoomType.PERSONAL,
+            })
+          }>
           <Icon
             fontSize={'6xl'}
             color="white"
