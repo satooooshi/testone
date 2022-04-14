@@ -97,7 +97,7 @@ const ChatGroupCard: React.FC<ChatGroupCardProps> = ({
             chatGroup?.unreadCount &&
             chatGroup?.unreadCount > 0 ? (
               <Badge
-                bg="red"
+                bg="green"
                 color="white"
                 w="30px"
                 h="30px"
