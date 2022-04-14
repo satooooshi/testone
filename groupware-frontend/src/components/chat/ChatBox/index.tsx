@@ -468,16 +468,28 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [room.id, saveLastReadChatTime]);
 
-  const readUsers = useCallback(
-    (targetMsg: ChatMessage) => {
-      return lastReadChatTime
-        ? lastReadChatTime
-            .filter((t) => t.readTime >= targetMsg.createdAt)
-            .map((t) => t.user)
-        : [];
-    },
-    [lastReadChatTime],
-  );
+  const [readUsers, setReadUsers] = useState<User[][]>([]);
+
+  // const readUsers = (targetMsg: ChatMessage) => {
+  //   return lastReadChatTime
+  //     ? lastReadChatTime
+  //         .filter((t) => t.readTime >= targetMsg.createdAt)
+  //         .map((t) => t.user)
+  //     : [];
+  // };
+
+  useEffect(() => {
+    if (lastReadChatTime) {
+      const readUsersArray = messages.map((m) => {
+        return lastReadChatTime
+          ? lastReadChatTime
+              .filter((t) => t.readTime >= m.createdAt)
+              .map((t) => t.user)
+          : [];
+      });
+      setReadUsers(readUsersArray);
+    }
+  }, [lastReadChatTime, messages]);
 
   const isLoading = loadingSend || loadingUplaod;
   const activeIndex = useMemo(() => {
@@ -719,7 +731,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
         onScroll={onScrollTopOnChat}>
         {messages ? (
           <>
-            {messages.map((m) => (
+            {messages.map((m, i) => (
               <ChatMessageItem
                 isScrollTarget={focusedMessageID === m.id}
                 scrollToTarget={scrollToTarget}
@@ -728,7 +740,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
                 message={m}
                 confirmedSearchWord={confirmedSearchWord}
                 searchedResultIds={searchedResults?.map((s) => s.id)}
-                readUsers={readUsers(m)}
+                readUsers={readUsers[i] ? readUsers[i] : []}
                 onClickReply={() =>
                   setNewChatMessage((pre) => ({
                     ...pre,
