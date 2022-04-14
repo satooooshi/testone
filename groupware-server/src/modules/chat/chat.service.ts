@@ -246,6 +246,9 @@ export class ChatService {
       )
       .leftJoinAndSelect('replyParentMessage.sender', 'reply_sender')
       .where('chat_group.id = :chatGroupID', { chatGroupID: query.group })
+      .andWhere('chat_messages.sender.id != :userID', {
+        userID,
+      })
       .andWhere('chat_messages.createdAt > :lastReadTime', {
         lastReadTime: query.lastReadTime,
       })
