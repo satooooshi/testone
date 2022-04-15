@@ -816,14 +816,11 @@ const Chat: React.FC = () => {
   );
 
   const handleLastReadByAppState = () => {
-    console.log('99999', AppState.currentState);
     if (AppState.currentState === 'active') {
-      console.log('8888');
       refetchLatest();
       saveLastReadChatTime(room.id, {
         onSuccess: () => {
           console.log('2222222');
-
           socket.emit('readReport', {
             room: room.id.toString(),
             senderId: myself?.id,
@@ -834,9 +831,10 @@ const Chat: React.FC = () => {
     }
   };
 
-  const debounceHandleLastReadByAppState = debounce(
-    handleLastReadByAppState,
-    1000,
+  const debounceHandleLastReadByAppState = useMemo(
+    () => debounce(handleLastReadByAppState, 500),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
   );
 
   useEffect(() => {
