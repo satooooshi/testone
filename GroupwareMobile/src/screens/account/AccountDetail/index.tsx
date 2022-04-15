@@ -296,16 +296,11 @@ const AccountDetail: React.FC = () => {
                   w={windowWidth * 0.6}
                 />
               </Div>
-              <Div flexDir="row" mb="sm">
-                <Text
-                  fontWeight="bold"
-                  mb={'lg'}
-                  color={darkFontColor}
-                  mr="lg"
-                  fontSize={24}>
-                  {userNameFactory(profile)}
-                </Text>
-                {/* {profile.id !== user?.id ? (
+              {/* <Div flexDir="row" mb="sm"> */}
+              <Text fontWeight="bold" color={darkFontColor} fontSize={24}>
+                {userNameFactory(profile)}
+              </Text>
+              {/* {profile.id !== user?.id ? (
                   <Button
                     mr={-50}
                     mt={-10}
@@ -331,7 +326,7 @@ const AccountDetail: React.FC = () => {
                     />
                   </Button>
                 ) : null} */}
-              </Div>
+              {/* </Div> */}
             </Div>
             <Div h={bottomContentsHeight() ? bottomContentsHeight() : 700}>
               <TopTab.Navigator
