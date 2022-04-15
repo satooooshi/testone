@@ -360,6 +360,7 @@ const Navigator = () => {
     [rtcInit],
   );
   // console.log(Platform.OS, 'callerId', onCallUid);
+  const [startCall, setStartCall] = useState(false);
 
   const answerCall = async () => {
     // アプリをバックグラウンドからフォアグラウンドに
@@ -368,14 +369,35 @@ const Navigator = () => {
     // }
     RNCallKeep.backToForeground();
     RNCallKeep.endAllCalls();
-    if (remoteInvitation.current?.channelId) {
-      const realChannelName = remoteInvitation.current?.channelId as string;
-      // 招待を承認
-      await rtmEngine.acceptRemoteInvitationV2(remoteInvitation.current);
-      await joinChannel(realChannelName);
-      setIsCalling(true);
+    if (Platform.OS === 'android') {
+      if (remoteInvitation.current?.channelId) {
+        const realChannelName = remoteInvitation.current?.channelId as string;
+        // 招待を承認
+        await rtmEngine.acceptRemoteInvitationV2(remoteInvitation.current);
+        await joinChannel(realChannelName);
+        setIsCalling(true);
+      }
+    } else {
+      setStartCall(true);
     }
   };
+
+  useEffect(() => {
+    const execAnswerCall = async () => {
+      if (remoteInvitation.current?.channelId) {
+        const realChannelName = remoteInvitation.current?.channelId as string;
+        // 招待を承認
+        await rtmEngine.acceptRemoteInvitationV2(remoteInvitation.current);
+        await joinChannel(realChannelName);
+        setIsCalling(true);
+        setStartCall(false);
+      }
+    };
+    if (AppState.currentState !== 'active' && startCall) {
+      execAnswerCall();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [AppState.currentState, startCall]);
 
   useEffect(() => {
     if (localInvitation?.calleeId) {
