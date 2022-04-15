@@ -1,4 +1,4 @@
-package com.groupwaremobileTest;
+package com.groupwaremobile;
 
 import com.facebook.react.bridge.JSIModuleSpec;
 import com.facebook.react.bridge.JavaScriptContextHolder;
