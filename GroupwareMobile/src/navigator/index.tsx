@@ -162,6 +162,7 @@ const Navigator = () => {
       localInvitation,
       setLocalInvitationState,
       callTimeout,
+      remoteInvitation.current,
     ],
   );
 
