@@ -152,7 +152,7 @@ const AccountDetail: React.FC = () => {
   const navigation = useNavigation<AccountDetailNavigationProps>();
   const route = useRoute<AccountDetailRouteProps>();
   const {user, setUser, logout} = useAuthenticate();
-  const {sendCallInvitation} = useInviteCall();
+  // const {sendCallInvitation} = useInviteCall();
   const {setIsTabBarVisible} = useIsTabBarVisible();
   const id = route.params?.id;
   const userID = id || user?.id;
@@ -240,11 +240,11 @@ const AccountDetail: React.FC = () => {
     setUser({});
   };
 
-  const inviteCall = async () => {
-    if (user && profile) {
-      await sendCallInvitation(user, profile);
-    }
-  };
+  // const inviteCall = async () => {
+  //   if (user && profile) {
+  //     await sendCallInvitation(user, profile);
+  //   }
+  // };
   // const inviteCall = async () => {
   //   if (user && profile) {
   //     const localInvitation = await setupCallInvitation(user, profile);
@@ -305,7 +305,7 @@ const AccountDetail: React.FC = () => {
                   fontSize={24}>
                   {userNameFactory(profile)}
                 </Text>
-                {profile.id !== user?.id ? (
+                {/* {profile.id !== user?.id ? (
                   <Button
                     mr={-50}
                     mt={-10}
@@ -330,7 +330,7 @@ const AccountDetail: React.FC = () => {
                       color="blue700"
                     />
                   </Button>
-                ) : null}
+                ) : null} */}
               </Div>
             </Div>
             <Div h={bottomContentsHeight() ? bottomContentsHeight() : 700}>

@@ -78,7 +78,7 @@ import io from 'socket.io-client';
 import {baseURL} from '../../utils/url';
 import {getThumbnailOfVideo} from '../../utils/getThumbnailOfVideo';
 import {useAuthenticate} from '../../contexts/useAuthenticate';
-import {useInviteCall} from '../../contexts/call/useInviteCall';
+// import {useInviteCall} from '../../contexts/call/useInviteCall';
 import {useIsTabBarVisible} from '../../contexts/bottomTab/useIsTabBarVisible';
 import {reactionStickers} from '../../utils/factory/reactionStickers';
 import {ScrollView} from 'react-native-gesture-handler';
@@ -99,7 +99,7 @@ const Chat: React.FC = () => {
   const navigation = useNavigation<ChatNavigationProps>();
   const route = useRoute<ChatRouteProps>();
   const {room} = route.params;
-  const {sendCallInvitation} = useInviteCall();
+  // const {sendCallInvitation} = useInviteCall();
   const isFocused = useIsFocused();
   const {setIsTabBarVisible} = useIsTabBarVisible();
   const {data: roomDetail, refetch: refetchRoomDetail} = useAPIGetRoomDetail(
@@ -896,16 +896,16 @@ const Chat: React.FC = () => {
     </View>
   );
 
-  const inviteCall = async () => {
-    if (roomDetail?.members?.length === 2 && myself) {
-      const callee =
-        roomDetail.members[0].id === myself.id
-          ? roomDetail.members[1]
-          : roomDetail.members[0];
-      //第一引数に通話を書ける人のユーザーオブジェクト、第二引数に通話をかけられるひとのユーザーオブジェクト
-      await sendCallInvitation(myself, callee);
-    }
-  };
+  // const inviteCall = async () => {
+  //   if (roomDetail?.members?.length === 2 && myself) {
+  //     const callee =
+  //       roomDetail.members[0].id === myself.id
+  //         ? roomDetail.members[1]
+  //         : roomDetail.members[0];
+  //     //第一引数に通話を書ける人のユーザーオブジェクト、第二引数に通話をかけられるひとのユーザーオブジェクト
+  //     await sendCallInvitation(myself, callee);
+  //   }
+  // };
 
   return (
     <WholeContainer>
@@ -1024,7 +1024,7 @@ const Chat: React.FC = () => {
         enableBackButton={true}
         screenForBack={'RoomList'}>
         <Div style={tailwind('flex flex-row')}>
-          {roomDetail?.members && roomDetail.members.length < 3 ? (
+          {/* {roomDetail?.members && roomDetail.members.length < 3 ? (
             <Div style={tailwind('flex flex-row')}>
               <Button
                 bg="transparent"
@@ -1049,7 +1049,7 @@ const Chat: React.FC = () => {
                 />
               </Button>
             </Div>
-          ) : null}
+          ) : null} */}
           <TouchableOpacity
             style={tailwind('flex flex-row')}
             onPress={() => setVisibleSearchInput(true)}>
