@@ -30,6 +30,7 @@ export enum ChatMessageType {
   IMAGE = 'image',
   TEXT = 'text',
   CALL = 'call',
+  STICKER = 'sticker',
   SYSTEM_TEXT = 'system_text',
   OTHER_FILE = 'other_file',
 }

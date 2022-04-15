@@ -42,6 +42,7 @@ import { AiOutlineUnorderedList } from 'react-icons/ai';
 import ReactionListModal from './ReactionListModal';
 import ReadUsersListModal from './ReadUsersListModal';
 import { useEffect } from 'react';
+import StickerMessage from './StickerMessage';
 
 type ChatMessageItemProps = {
   message: ChatMessage;
@@ -355,6 +356,8 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
                     />
                   ) : messageState.type === ChatMessageType.VIDEO ? (
                     <VideoMessage message={messageState} />
+                  ) : messageState.type === ChatMessageType.STICKER ? (
+                    <StickerMessage message={messageState} />
                   ) : (
                     <FileMessage message={messageState} />
                   )}

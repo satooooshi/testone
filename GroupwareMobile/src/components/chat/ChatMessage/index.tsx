@@ -23,6 +23,7 @@ import ReactionToMessage from './ReactionToMessage';
 import TextMessage from './TextMessage';
 import CallMessage from './CallMessage';
 import VideoMessage from './VideoMessage';
+import StickerMessage from './StickerMessage.tsx';
 
 type ChatMessageItemProps = {
   message: ChatMessage;
@@ -152,6 +153,8 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
                 message={message}
                 onLongPress={onLongPress}
               />
+            ) : message.type === ChatMessageType.STICKER ? (
+              <StickerMessage message={message} onLongPress={onLongPress} />
             ) : message.type === ChatMessageType.VIDEO ? (
               <VideoMessage
                 message={message}
