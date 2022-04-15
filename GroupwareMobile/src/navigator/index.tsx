@@ -143,7 +143,7 @@ const Navigator = () => {
       setCallTimeout(false);
       disableCallAcceptedFlag();
       setLocalInvitationState(undefined);
-      reject();
+      // reject();
       if (remoteInvitation.current) {
         // remote invitation(送られてきた通話招待)があればrefuseする
         await rtmEngine?.refuseRemoteInvitationV2({
@@ -425,8 +425,8 @@ const Navigator = () => {
     rtmInit();
     return () => {
       // アンマウント時に全てのリスナーを消す
-      RNCallKeep.removeEventListener('answerCall');
-      RNCallKeep.removeEventListener('endCall');
+      // RNCallKeep.removeEventListener('answerCall');
+      // RNCallKeep.removeEventListener('endCall');
       rtcEngine.removeAllListeners();
       rtmEngine.removeAllListeners();
     };
