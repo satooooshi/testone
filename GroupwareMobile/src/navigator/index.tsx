@@ -245,7 +245,7 @@ const Navigator = () => {
     // listenerを複数登録しないようにする
     rtmEngine.removeAllListeners();
     rtmEngine.addListener('RemoteInvitationCanceled', async () => {
-      await endCall(false);
+      await endCall(true);
     });
     rtmEngine.addListener('LocalInvitationRefused', async () => {
       setRefusedInvitation(true);
