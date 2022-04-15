@@ -2,7 +2,7 @@ import RtmClient, {LocalInvitation} from 'agora-react-native-rtm';
 import Config from 'react-native-config';
 import uuid from 'react-native-uuid';
 import {User} from '../../types';
-import {userNameFactory} from '../factory/userNameFactory';
+import {userNameFactoryForPartial} from '../factory/userNameFactory';
 import {axiosInstance} from '../url';
 
 export const setupCallInvitation = async (
@@ -14,7 +14,7 @@ export const setupCallInvitation = async (
   const parsedUUid = uuid.v4();
   const localInvitation = await rtmEngine.createLocalInvitation(
     callee.id.toString(),
-    userNameFactory(caller),
+    userNameFactoryForPartial(caller),
     // channel id はcallkeepとの関係でUUIDでなければならない
     parsedUUid as string,
   );
