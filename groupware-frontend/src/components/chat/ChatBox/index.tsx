@@ -32,7 +32,13 @@ import {
   AiOutlineSearch,
   AiOutlineUp,
 } from 'react-icons/ai';
-import { ChatGroup, ChatMessage, ChatMessageType, User } from 'src/types';
+import {
+  ChatGroup,
+  ChatMessage,
+  ChatMessageType,
+  RoomType,
+  User,
+} from 'src/types';
 import { MenuValue } from '@/hooks/chat/useModalReducer';
 import React, {
   Fragment,
@@ -364,6 +370,14 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
   const nameOfEmptyNameGroup = (members?: User[]): string => {
     if (!members?.length) {
       return 'メンバーがいません';
+    }
+
+    if (room.roomType === RoomType.PERSONAL) {
+      const chatPartner = members.filter((m) => m.id !== myself?.id);
+      const partnerName = chatPartner
+        .map((p) => p.lastName + ' ' + p.firstName)
+        .join();
+      return partnerName;
     }
     const strMembers = members?.map((m) => m.lastName + m.firstName).join();
     return strMembers.toString();

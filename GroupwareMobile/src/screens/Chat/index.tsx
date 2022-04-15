@@ -1001,7 +1001,7 @@ const Chat: React.FC = () => {
         )}
       />
       <HeaderTemplate
-        title={roomDetail ? nameOfRoom(roomDetail) : nameOfRoom(room)}
+        title={roomDetail ? nameOfRoom(roomDetail, myself) : nameOfRoom(room)}
         enableBackButton={true}
         screenForBack={'RoomList'}>
         <Div style={tailwind('flex flex-row')}>
