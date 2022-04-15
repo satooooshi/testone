@@ -108,7 +108,14 @@ const RoomCard: React.FC<RoomCardProps> = ({
               {nameOfRoom(room)}
             </Text>
             {room.unreadCount && room.unreadCount > 0 ? (
-              <Badge position="absolute" left={windowWidth * 0.6}>
+              <Badge
+                position="absolute"
+                left={windowWidth * 0.6}
+                pt={5}
+                pb={5}
+                w={30}
+                h={30}
+                fontSize={10}>
                 {`${room.unreadCount}`}
               </Badge>
             ) : null}
