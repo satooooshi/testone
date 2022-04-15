@@ -367,7 +367,6 @@ const Navigator = () => {
     // }
     const invitation = remoteInvitation.current;
     const realChannelName = remoteInvitation.current?.channelId as string;
-    remoteInvitation.current = undefined;
     console.log(
       '-------------------------------------------------',
       invitation,
@@ -382,6 +381,7 @@ const Navigator = () => {
       await joinChannel(realChannelName);
       setIsCalling(true);
     }
+    remoteInvitation.current = undefined;
     RNCallKeep.endAllCalls();
     //   if (Platform.OS === 'android') {
     //     if (invitation && realChannelName) {
