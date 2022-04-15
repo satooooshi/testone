@@ -383,6 +383,13 @@ const Navigator = () => {
   };
 
   useEffect(() => {
+    console.log(
+      '-------------------',
+      AppState.currentState,
+      startCall,
+      user?.id,
+    );
+
     const execAnswerCall = async () => {
       if (remoteInvitation.current?.channelId) {
         const realChannelName = remoteInvitation.current?.channelId as string;
