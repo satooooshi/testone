@@ -22,7 +22,7 @@ import {CallbacksInterface, RtcPropsInterface} from 'agora-rn-uikit';
 import RtcEngine, {RtcEngineContext} from 'react-native-agora';
 import {userNameFactory} from '../utils/factory/userNameFactory';
 import {apiAuthenticate} from '../hooks/api/auth/useAPIAuthenticate';
-import {Alert, Platform} from 'react-native';
+import {Alert, AppState, Platform} from 'react-native';
 import Config from 'react-native-config';
 import VoiceCall from '../components/call/VoiceCall';
 import {useInviteCall} from '../contexts/call/useInviteCall';
@@ -91,13 +91,14 @@ const Navigator = () => {
 
   useEffect(() => {
     const handleMessaging = async () => {
-      if (user) {
+      if (user?.id) {
         await requestIOSMsgPermission();
         // const token =
         //   Platform.OS === 'android'
         //     ? await messaging().getToken()
         //     : await messaging().getAPNSToken();
         const token = await messaging().getToken();
+
         if (token) {
           registerDevice({token});
         }
@@ -328,9 +329,9 @@ const Navigator = () => {
       false,
     );
   };
-  const navigateToCallWindow = useCallback(() => {
-    navigationRef.current?.navigate('Call');
-  }, [navigationRef]);
+  // const navigateToCallWindow = useCallback(() => {
+  //   navigationRef.current?.navigate('Call');
+  // }, [navigationRef]);
 
   const joinChannel = useCallback(
     async (realChannelName: string) => {
@@ -351,20 +352,20 @@ const Navigator = () => {
         );
         await rtcEngine?.disableVideo();
         setChannelName(realChannelName);
-        navigateToCallWindow();
+        // navigateToCallWindow();
         remoteInvitation.current = undefined;
         setIsJoining(true);
       }
     },
-    [rtcInit, navigateToCallWindow],
+    [rtcInit],
   );
   // console.log(Platform.OS, 'callerId', onCallUid);
 
   const answerCall = async () => {
     // アプリをバックグラウンドからフォアグラウンドに
-    if (Platform.OS === 'ios') {
-      await new Promise(r => setTimeout(r, 500));
-    }
+    // if (Platform.OS === 'ios' && AppState.currentState === 'background') {
+    //   await new Promise(r => setTimeout(r, 1000));
+    // }
     RNCallKeep.backToForeground();
     RNCallKeep.endAllCalls();
     if (remoteInvitation.current?.channelId) {
@@ -433,30 +434,34 @@ const Navigator = () => {
   const sendLocalNotification = async (
     remoteMessage: FirebaseMessagingTypes.RemoteMessage,
   ) => {
-    const channelId = await notifee.createChannel({
-      id: 'default',
-      name: 'Default Channel',
-    });
+    if (!remoteMessage?.data?.calleeId) {
+      const channelId = await notifee.createChannel({
+        id: 'default',
+        name: 'Default Channel',
+      });
 
-    await notifee.displayNotification({
-      title: remoteMessage.data?.title || '',
-      body: remoteMessage.data?.body || '',
-      android: {
-        channelId: channelId,
-        pressAction: {
-          id: 'action_id',
-          launchActivity: 'default',
+      await notifee.displayNotification({
+        title: remoteMessage.data?.title || '',
+        body: remoteMessage.data?.body || '',
+        android: {
+          channelId: channelId,
+          pressAction: {
+            id: 'action_id',
+            launchActivity: 'default',
+          },
         },
-      },
-      data: {
-        screen: remoteMessage?.data?.screen ? remoteMessage?.data?.screen : '',
-        id: remoteMessage?.data?.id ? remoteMessage?.data?.id : '',
-      },
-      ios: {
-        // iOS resource (.wav, aiff, .caf)
-        sound: 'local.wav',
-      },
-    });
+        data: {
+          screen: remoteMessage?.data?.screen
+            ? remoteMessage?.data?.screen
+            : '',
+          id: remoteMessage?.data?.id ? remoteMessage?.data?.id : '',
+        },
+        ios: {
+          // iOS resource (.wav, aiff, .caf)
+          sound: 'local.wav',
+        },
+      });
+    }
   };
 
   useEffect(() => {
@@ -501,6 +506,7 @@ const Navigator = () => {
       }
     });
     notifee.onBackgroundEvent(async ({type, detail}) => {
+      console.log('navigator ================');
       switch (type) {
         case EventType.DISMISSED:
           break;
