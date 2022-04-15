@@ -695,12 +695,12 @@ const Chat: React.FC = () => {
 
   const inviteCall = async () => {
     if (roomDetail?.members?.length === 2 && myself) {
-      const caller =
+      const callee =
         roomDetail.members[0].id === myself.id
           ? roomDetail.members[1]
           : roomDetail.members[0];
       //第一引数に通話を書ける人のユーザーオブジェクト、第二引数に通話をかけられるひとのユーザーオブジェクト
-      await sendCallInvitation(myself, caller);
+      await sendCallInvitation(myself, callee);
     }
   };
 
