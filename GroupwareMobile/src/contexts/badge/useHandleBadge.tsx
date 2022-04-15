@@ -21,15 +21,17 @@ export const BadgeProvider: React.FC = ({children}) => {
       for (const room of data) {
         count += room.unreadCount ? room.unreadCount : 0;
       }
+      console.log('count-----', count);
       setChatUnreadCount(count);
     },
   });
 
   useEffect(
     () => {
+      getRooms();
       socket.on('badgeClient', async (userId: number) => {
+        console.log('message was sent---------', userId, user?.id);
         if (user?.id && userId !== user.id) {
-          console.log('message was sent---------', userId);
           getRooms();
         }
       });

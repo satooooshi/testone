@@ -1,6 +1,7 @@
 import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {
   Alert,
+  AppState,
   FlatList,
   Keyboard,
   KeyboardAvoidingView,
@@ -79,6 +80,7 @@ import {getThumbnailOfVideo} from '../../utils/getThumbnailOfVideo';
 import {useAuthenticate} from '../../contexts/useAuthenticate';
 import {useHandleBadge} from '../../contexts/badge/useHandleBadge';
 import {useIsTabBarVisible} from '../../contexts/bottomTab/useIsTabBarVisible';
+import {debounce} from 'lodash';
 
 const socket = io(baseURL, {
   transports: ['websocket'],
@@ -560,7 +562,10 @@ const Chat: React.FC = () => {
     });
     socket.on('msgToClient', async (sentMsgByOtherUsers: ChatMessage) => {
       if (sentMsgByOtherUsers.content) {
-        if (sentMsgByOtherUsers?.sender?.id !== myself?.id) {
+        if (
+          sentMsgByOtherUsers?.sender?.id !== myself?.id &&
+          AppState.currentState === 'active'
+        ) {
           saveLastReadChatTime(room.id, {
             onSuccess: () => {
               socket.emit('readReport', {
@@ -610,8 +615,8 @@ const Chat: React.FC = () => {
     });
     return () => {
       socket.emit('leaveRoom', room.id);
-      refetchRoom();
       socket.disconnect();
+      // refetchRoom();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [room.id]);
@@ -810,6 +815,34 @@ const Chat: React.FC = () => {
     }, [refetchLatest, refetchRoomDetail]),
   );
 
+  const handleLastReadByAppState = () => {
+    console.log('99999', AppState.currentState);
+    if (AppState.currentState === 'active') {
+      console.log('8888');
+      refetchLatest();
+      saveLastReadChatTime(room.id, {
+        onSuccess: () => {
+          console.log('2222222');
+
+          socket.emit('readReport', {
+            room: room.id.toString(),
+            senderId: myself?.id,
+          });
+          refetchRoom();
+        },
+      });
+    }
+  };
+
+  const debounceHandleLastReadByAppState = debounce(
+    handleLastReadByAppState,
+    1000,
+  );
+
+  useEffect(() => {
+    AppState.addEventListener('change', debounceHandleLastReadByAppState);
+  });
+
   useEffect(() => {
     saveLastReadChatTime(room.id, {
       onSuccess: () => {
@@ -819,6 +852,7 @@ const Chat: React.FC = () => {
           room: room.id.toString(),
           senderId: myself?.id,
         });
+        refetchRoom();
       },
     });
     return () => saveLastReadChatTime(room.id);
