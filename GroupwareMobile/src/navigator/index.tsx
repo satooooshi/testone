@@ -421,7 +421,7 @@ const Navigator = () => {
 
   useEffect(() => {
     rtcInit();
-    callKeepInit();
+    // callKeepInit();
     rtmInit();
     return () => {
       // アンマウント時に全てのリスナーを消す
