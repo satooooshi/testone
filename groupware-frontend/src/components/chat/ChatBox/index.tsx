@@ -575,6 +575,8 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
     });
   }, []);
 
+  const isPersonal = room.roomType === RoomType.PERSONAL;
+
   return (
     <Box
       {...noClickRootDropzone()}
@@ -666,19 +668,21 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
           <Link mr="4px" onClick={() => setVisibleAlbumModal(true)}>
             <AiOutlinePicture size={24} />
           </Link>
-          <Menu
-            direction="left"
-            onItemClick={(e) => onMenuClicked(e.value as MenuValue)}
-            menuButton={
-              <MenuButton>
-                <HiOutlineDotsCircleHorizontal size={24} />
-              </MenuButton>
-            }
-            transition>
-            <MenuItem value={'editGroup'}>ルームの情報を編集</MenuItem>
-            <MenuItem value={'editMembers'}>メンバーを編集</MenuItem>
-            <MenuItem value={'leaveRoom'}>ルームを退室</MenuItem>
-          </Menu>
+          {!isPersonal && (
+            <Menu
+              direction="left"
+              onItemClick={(e) => onMenuClicked(e.value as MenuValue)}
+              menuButton={
+                <MenuButton>
+                  <HiOutlineDotsCircleHorizontal size={24} />
+                </MenuButton>
+              }
+              transition>
+              <MenuItem value={'editGroup'}>ルームの情報を編集</MenuItem>
+              <MenuItem value={'editMembers'}>メンバーを編集</MenuItem>
+              <MenuItem value={'leaveRoom'}>ルームを退室</MenuItem>
+            </Menu>
+          )}
         </Box>
       </Box>
       {visibleSearchForm && (
