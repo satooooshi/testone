@@ -111,8 +111,7 @@ const RoomCard: React.FC<RoomCardProps> = ({
               <Badge
                 position="absolute"
                 left={windowWidth * 0.6}
-                pt={5}
-                pb={5}
+                py={5}
                 w={30}
                 h={30}
                 fontSize={10}>

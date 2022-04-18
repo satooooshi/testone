@@ -26,6 +26,7 @@ export class ChatGateway
 
   handleDisconnect(client: Socket) {
     // this.logger.log(`Client disconnected: ${client.id}`);
+    // this.server.emit('badgeClient', 'connected');
   }
 
   handleConnection(client: Socket) {
@@ -35,9 +36,11 @@ export class ChatGateway
   @SubscribeMessage('message')
   public async handleMessage(_: Socket, payload: ChatMessage) {
     this.server
+      // .to(payload.chatGroup?.id.toString())
+      .emit('badgeClient', payload.sender.id);
+    this.server
       .to(payload.chatGroup?.id.toString())
       .emit('msgToClient', { ...payload, isSender: false });
-    this.server.emit('badgeClient', payload.sender.id);
   }
 
   @SubscribeMessage('readReport')
