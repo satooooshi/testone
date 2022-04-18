@@ -30,9 +30,10 @@ export const BadgeProvider: React.FC = ({ children }) => {
 
   useEffect(
     () => {
+      getRooms();
       socket.on('badgeClient', async (userId: number) => {
+        console.log('message was sent---------', userId);
         if (user?.id && userId !== user.id) {
-          console.log('message was sent---------', userId);
           getRooms();
         }
       });

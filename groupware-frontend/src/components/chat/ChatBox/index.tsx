@@ -468,28 +468,42 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [room.id, saveLastReadChatTime]);
 
-  const [readUsers, setReadUsers] = useState<User[][]>([]);
+  // const [readUsers, setReadUsers] = useState<User[][]>([]);
 
-  // const readUsers = (targetMsg: ChatMessage) => {
-  //   return lastReadChatTime
-  //     ? lastReadChatTime
-  //         .filter((t) => t.readTime >= targetMsg.createdAt)
-  //         .map((t) => t.user)
-  //     : [];
-  // };
+  const readUsers = (targetMsg: ChatMessage) => {
+    return lastReadChatTime
+      ? lastReadChatTime
+          .filter((t) => t.readTime >= targetMsg.createdAt)
+          .map((t) => t.user)
+      : [];
+  };
 
   useEffect(() => {
-    if (lastReadChatTime) {
-      const readUsersArray = messages.map((m) => {
-        return lastReadChatTime
+    if (lastReadChatTime && messages.length) {
+      console.log(
+        '000000000000',
+        lastReadChatTime && messages.length
           ? lastReadChatTime
-              .filter((t) => t.readTime >= m.createdAt)
+              .filter(
+                (t) => t.readTime >= messages[messages.length - 1].createdAt,
+              )
               .map((t) => t.user)
-          : [];
-      });
-      setReadUsers(readUsersArray);
+          : [],
+      );
+      // const readUsersArray = messages.map((m) => {
+      //   return lastReadChatTime
+      //     ? lastReadChatTime
+      //         .filter((t) => t.readTime >= m.createdAt)
+      //         .map((t) => t.user)
+      //     : [];
+      // });
+      // setReadUsers(readUsersArray);
+      // const readMessage = messages[messages.length - 1];
+      // const messagess = messages.splice(0, messages.length);
+      // messagess.pop();
+      // setMessages([readMessage, ...messagess]);
     }
-  }, [lastReadChatTime, messages]);
+  }, [lastReadChatTime]);
 
   const isLoading = loadingSend || loadingUplaod;
   const activeIndex = useMemo(() => {
@@ -731,7 +745,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
         onScroll={onScrollTopOnChat}>
         {messages ? (
           <>
-            {messages.map((m, i) => (
+            {messages.map((m) => (
               <ChatMessageItem
                 isScrollTarget={focusedMessageID === m.id}
                 scrollToTarget={scrollToTarget}
@@ -740,7 +754,8 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
                 message={m}
                 confirmedSearchWord={confirmedSearchWord}
                 searchedResultIds={searchedResults?.map((s) => s.id)}
-                readUsers={readUsers[i] ? readUsers[i] : []}
+                readUsers={readUsers(m)}
+                // readUsers={readUsers[i] ? readUsers[i] : []}
                 onClickReply={() =>
                   setNewChatMessage((pre) => ({
                     ...pre,
