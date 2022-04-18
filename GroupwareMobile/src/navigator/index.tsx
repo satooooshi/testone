@@ -134,7 +134,7 @@ const Navigator = () => {
       } else if (!isCallKeep) {
         setAlertCountOnEndCall(c => c + 1);
       }
-
+      RNCallKeep.endAllCalls();
       await soundOnEnd();
       setChannelName('');
       setIsJoining(false);
@@ -382,7 +382,7 @@ const Navigator = () => {
       await rtmEngine.acceptRemoteInvitationV2(invitation);
       await joinChannel(realChannelName);
       setIsCalling(true);
-      RNCallKeep.endAllCalls();
+      // RNCallKeep.endAllCalls();
     }
     //   if (Platform.OS === 'android') {
     //     if (invitation && realChannelName) {
