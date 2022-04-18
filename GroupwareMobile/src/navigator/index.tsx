@@ -117,23 +117,22 @@ const Navigator = () => {
   }, [registerDevice, user]);
 
   const endCall = useCallback(
-    async (alertNeeded: boolean = true) => {
-      if (alertNeeded) {
-        // callkeepをプログラム側でendした場合とユーザーが通話拒否ボタンを押したときとで切りわける
-        // ユーザーが通話拒否ボタンを押したときはアラート等を出さないようにする
-        // setOnCallUid('');
-        setAlertCountOnEndCall(c => c + 1);
+    async (isCallKeep: boolean = false) => {
+      if (isCallKeep && !remoteInvitation.current) {
+        console.log('end call called by endAllCalls');
+        return;
       }
+
       if (!isCallAccepted && localInvitation) {
         // local invitation(送信した通話招待)があればcancelする
-        if (alertNeeded) {
-          await rtmEngine?.cancelLocalInvitationV2(localInvitation);
-          if (callTimeout) {
-            sendCallHistory('応答なし');
-          } else {
-            sendCallHistory('キャンセル');
-          }
+        await rtmEngine?.cancelLocalInvitationV2(localInvitation);
+        if (callTimeout) {
+          sendCallHistory('応答なし');
+        } else {
+          sendCallHistory('キャンセル');
         }
+      } else if (!isCallKeep) {
+        setAlertCountOnEndCall(c => c + 1);
       }
 
       await soundOnEnd();
@@ -163,6 +162,7 @@ const Navigator = () => {
       localInvitation,
       setLocalInvitationState,
       callTimeout,
+      remoteInvitation.current,
     ],
   );
 
@@ -246,7 +246,7 @@ const Navigator = () => {
     // listenerを複数登録しないようにする
     rtmEngine.removeAllListeners();
     rtmEngine.addListener('RemoteInvitationCanceled', async () => {
-      await endCall(false);
+      await endCall(true);
     });
     rtmEngine.addListener('LocalInvitationRefused', async () => {
       setRefusedInvitation(true);
@@ -300,7 +300,7 @@ const Navigator = () => {
       });
       RNCallKeep.addEventListener('answerCall', answerCall);
       // ユーザーが通話拒否ボタンを押したときはアラート等を出さないようにする
-      RNCallKeep.addEventListener('endCall', () => endCall(false));
+      RNCallKeep.addEventListener('endCall', () => endCall(true));
     } catch (err) {
       //@ts-ignore
       console.error('Initialize CallKeep Error:', err?.message);
@@ -352,52 +352,74 @@ const Navigator = () => {
         );
         await rtcEngine?.disableVideo();
         setChannelName(realChannelName);
-        // navigateToCallWindow();
         remoteInvitation.current = undefined;
+        // navigateToCallWindow();
         setIsJoining(true);
       }
     },
     [rtcInit],
   );
   // console.log(Platform.OS, 'callerId', onCallUid);
-  const [startCall, setStartCall] = useState(false);
+  // const [startCall, setStartCall] = useState(false);
 
   const answerCall = async () => {
     // アプリをバックグラウンドからフォアグラウンドに
     // if (Platform.OS === 'ios' && AppState.currentState === 'background') {
     //   await new Promise(r => setTimeout(r, 1000));
     // }
+    const invitation = remoteInvitation.current;
+    const realChannelName = remoteInvitation.current?.channelId as string;
+    console.log(
+      '-------------------------------------------------',
+      invitation,
+      remoteInvitation,
+    );
+
     RNCallKeep.backToForeground();
-    RNCallKeep.endAllCalls();
-    if (Platform.OS === 'android') {
-      if (remoteInvitation.current?.channelId) {
-        const realChannelName = remoteInvitation.current?.channelId as string;
-        // 招待を承認
-        await rtmEngine.acceptRemoteInvitationV2(remoteInvitation.current);
-        await joinChannel(realChannelName);
-        setIsCalling(true);
-      }
-    } else {
-      setStartCall(true);
+    if (invitation && realChannelName) {
+      // 招待を承認
+      console.log('answer call called');
+      await rtmEngine.acceptRemoteInvitationV2(invitation);
+      await joinChannel(realChannelName);
+      setIsCalling(true);
+      RNCallKeep.endAllCalls();
     }
+    //   if (Platform.OS === 'android') {
+    //     if (invitation && realChannelName) {
+    //       // 招待を承認
+    //       console.log('answer call called');
+    //       await rtmEngine.acceptRemoteInvitationV2(invitation);
+    //       await joinChannel(realChannelName);
+    //       setIsCalling(true);
+    //     }
+    //   } else {
+    //     setStartCall(true);
+    //   }
   };
 
-  useEffect(() => {
-    const execAnswerCall = async () => {
-      if (remoteInvitation.current?.channelId) {
-        const realChannelName = remoteInvitation.current?.channelId as string;
-        // 招待を承認
-        await rtmEngine.acceptRemoteInvitationV2(remoteInvitation.current);
-        await joinChannel(realChannelName);
-        setIsCalling(true);
-        setStartCall(false);
-      }
-    };
-    if (AppState.currentState !== 'active' && startCall) {
-      execAnswerCall();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [AppState.currentState, startCall]);
+  // useEffect(() => {
+  //   console.log(
+  //     '-------------------',
+  //     AppState.currentState,
+  //     startCall,
+  //     user?.id,
+  //   );
+
+  //   const execAnswerCall = async () => {
+  //     if (remoteInvitation.current?.channelId) {
+  //       const realChannelName = remoteInvitation.current?.channelId as string;
+  //       // 招待を承認
+  //       await rtmEngine.acceptRemoteInvitationV2(remoteInvitation.current);
+  //       await joinChannel(realChannelName);
+  //       setIsCalling(true);
+  //       setStartCall(false);
+  //     }
+  //   };
+  //   if (AppState.currentState !== 'active' && startCall) {
+  //     execAnswerCall();
+  //   }
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [AppState.currentState, startCall]);
 
   useEffect(() => {
     if (localInvitation?.calleeId) {
