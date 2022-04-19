@@ -374,11 +374,6 @@ const Navigator = () => {
     // }
     const invitation = remoteInvitation.current;
     const realChannelName = remoteInvitation.current?.channelId as string;
-    console.log(
-      '-------------------------------------------------',
-      invitation,
-      remoteInvitation,
-    );
 
     RNCallKeep.backToForeground();
     // RNCallKeep.setMutedCall(realChannelName, true);
@@ -386,7 +381,6 @@ const Navigator = () => {
 
     if (invitation && realChannelName) {
       // 招待を承認
-      console.log('answer call called');
       await rtmEngine.acceptRemoteInvitationV2(invitation);
       await joinChannel(realChannelName);
       setIsCalling(true);
@@ -560,7 +554,6 @@ const Navigator = () => {
       }
     });
     notifee.onBackgroundEvent(async ({type, detail}) => {
-      console.log('navigator ================');
       switch (type) {
         case EventType.DISMISSED:
           break;
@@ -571,12 +564,10 @@ const Navigator = () => {
     notifee.requestPermission();
 
     const unsubscribe = messaging().onMessage(async remoteMessage => {
-      console.log('onMessage  --------', remoteMessage);
       if (
         remoteMessage?.data?.screen &&
         remoteMessage.data?.id === `${currentChatRoomId}`
       ) {
-        console.log('They are in the same chat room!!');
         return;
       }
       sendLocalNotification(remoteMessage);
@@ -613,7 +604,6 @@ const Navigator = () => {
     () => {
       const cancelCallByTimeout = async () => {
         if (localInvitation && !isCallAccepted) {
-          console.log('cancel call by time out ===================');
           // await rtmEngine?.cancelLocalInvitationV2(localInvitation);
           await endCall(true);
         }
