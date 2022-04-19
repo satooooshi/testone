@@ -24,7 +24,14 @@ import {useAPIGetUserInfoById} from '../../../hooks/api/user/useAPIGetUserInfoBy
 import {useAPIGetWikiList} from '../../../hooks/api/wiki/useAPIGetWikiList';
 import {useTagType} from '../../../hooks/tag/useTagType';
 import {accountDetailStyles} from '../../../styles/screen/account/accountDetail.style';
-import {BoardCategory, RoomType, TagType, User, WikiType} from '../../../types';
+import {
+  BoardCategory,
+  RoomType,
+  TagType,
+  User,
+  UserRole,
+  WikiType,
+} from '../../../types';
 import {
   AccountDetailNavigationProps,
   AccountDetailRouteProps,
@@ -493,31 +500,33 @@ const AccountDetail: React.FC = () => {
           </>
         )}
       </ScrollDiv>
-      {profile && profile.id !== user?.id && (
-        <Button
-          bg="purple600"
-          position="absolute"
-          right={10}
-          bottom={10}
-          h={60}
-          w={60}
-          zIndex={20}
-          rounded="circle"
-          onPress={() =>
-            createGroup({
-              name: '',
-              members: [profile],
-              roomType: RoomType.PERSONAL,
-            })
-          }>
-          <Icon
-            fontSize={'6xl'}
-            color="white"
-            name="chatbubble-ellipses-outline"
-            fontFamily="Ionicons"
-          />
-        </Button>
-      )}
+      {profile &&
+        profile.id !== user?.id &&
+        profile.role !== UserRole.EXTERNAL_INSTRUCTOR && (
+          <Button
+            bg="purple600"
+            position="absolute"
+            right={10}
+            bottom={10}
+            h={60}
+            w={60}
+            zIndex={20}
+            rounded="circle"
+            onPress={() =>
+              createGroup({
+                name: '',
+                members: [profile],
+                roomType: RoomType.PERSONAL,
+              })
+            }>
+            <Icon
+              fontSize={'6xl'}
+              color="white"
+              name="chatbubble-ellipses-outline"
+              fontFamily="Ionicons"
+            />
+          </Button>
+        )}
     </WholeContainer>
   );
 };
