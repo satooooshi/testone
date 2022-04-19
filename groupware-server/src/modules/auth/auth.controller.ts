@@ -29,7 +29,7 @@ export class AuthController {
   async register(@Body() registrationData: User): Promise<User> {
     const registeredUser = await this.authService.register(registrationData);
 
-    const notifTitle = 'ボールドのポータルに登録されました';
+    const notifTitle = 'valleyinのポータルに登録されました';
     const notifContent = `
 下記情報で登録されました。\n
 姓: ${registrationData.lastName}\n

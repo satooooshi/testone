@@ -43,7 +43,7 @@ const Chat = () => {
         setMembersModal: setMembersModal,
       }}>
       <Head>
-        <title>りゅう鍼灸整骨院 | Chat</title>
+        <title>sample | Chat</title>
       </Head>
 
       <EditChatGroupMembersModal

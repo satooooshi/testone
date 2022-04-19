@@ -199,7 +199,7 @@ const MyAccountInfo = () => {
       }}>
       <Head>
         <title>
-          りゅう鍼灸整骨院 |{' '}
+          sample |{' '}
           {profile ? `${profile.lastName} ${profile.firstName}` : ''}
         </title>
       </Head>

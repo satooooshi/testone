@@ -255,7 +255,7 @@ const QuestionDetail = () => {
       {wiki && wiki.writer ? (
         <div className={qaDetailStyles.main}>
           <Head>
-            <title>りゅう鍼灸整骨院 | {wiki ? wiki.title : headerTitle}</title>
+            <title>sample | {wiki ? wiki.title : headerTitle}</title>
           </Head>
           <div className={qaDetailStyles.title_wrapper}>
             <p className={qaDetailStyles.title_text}>{wiki.title}</p>

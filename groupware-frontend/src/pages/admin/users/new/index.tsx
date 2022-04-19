@@ -256,7 +256,7 @@ const CreateNewUser = () => {
         activeTabName: 'ユーザー作成',
       }}>
       <Head>
-        <title>りゅう鍼灸整骨院 | ユーザー作成</title>
+        <title>sample | ユーザー作成</title>
       </Head>
       {tags && (
         <TagModal

@@ -22,7 +22,7 @@ const MentionList = () => {
         tabs: tabs,
       }}>
       <Head>
-        <title>りゅう鍼灸整骨院 | メンション一覧</title>
+        <title>sample | メンション一覧</title>
       </Head>
       <div className={mentionStyles.mention_list}>
         {messages && messages.length ? (

@@ -461,7 +461,7 @@ const EventList = () => {
       sidebar={{ activeScreenName: SidebarScreenName.EVENT }}>
       <Head>
         <title>
-          りゅう鍼灸整骨院 | {type ? eventTitleText[type] : '全てのイベント'}
+          sample | {type ? eventTitleText[type] : '全てのイベント'}
         </title>
       </Head>
       <CreateEventModal
