@@ -81,6 +81,7 @@ import {useAuthenticate} from '../../contexts/useAuthenticate';
 import {useHandleBadge} from '../../contexts/badge/useHandleBadge';
 import {useIsTabBarVisible} from '../../contexts/bottomTab/useIsTabBarVisible';
 import {debounce} from 'lodash';
+import Clipboard from '@react-native-community/clipboard';
 
 const socket = io(baseURL, {
   transports: ['websocket'],
@@ -534,6 +535,22 @@ const Chat: React.FC = () => {
         }}>
         リアクション
       </Dropdown.Option>
+
+      {longPressedMsg?.type === 'text' ? (
+        <Dropdown.Option
+          {...defaultDropdownOptionProps}
+          value="copy"
+          onPress={() => {
+            Clipboard.setString(
+              longPressedMsg?.content ? longPressedMsg?.content : '',
+            );
+            setLongPressedMgg(undefined);
+          }}>
+          コピー
+        </Dropdown.Option>
+      ) : (
+        <></>
+      )}
     </Dropdown>
   );
 
