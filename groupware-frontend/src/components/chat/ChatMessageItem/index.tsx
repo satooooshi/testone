@@ -24,7 +24,7 @@ import {
 } from 'src/types';
 import { dateTimeFormatterFromJSDDate } from 'src/utils/dateTimeFormatter';
 import { userNameFactory } from 'src/utils/factory/userNameFactory';
-import boldMascot from '@/public/bold-mascot.png';
+import noImage from '@/public/no-image.jpg';
 import { Menu, MenuItem, MenuButton } from '@szhsin/react-menu';
 import { HiOutlineDotsCircleHorizontal } from 'react-icons/hi';
 import { useState } from 'react';
@@ -299,7 +299,7 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
                 cursor="pointer"
                 src={
                   !messageState.sender?.existence
-                    ? boldMascot.src
+                    ? noImage.src
                     : messageState.sender?.avatarUrl
                 }
               />

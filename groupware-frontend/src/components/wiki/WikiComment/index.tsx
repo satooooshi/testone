@@ -7,7 +7,7 @@ import MarkdownIt from 'markdown-it';
 import Editor from 'react-markdown-editor-lite';
 import 'react-markdown-editor-lite/lib/index.css';
 import DraftMarkup from '../DraftMarkup';
-import boldMascot from '@/public/bold-mascot.png';
+import noImage from '@/public/no-image.jpg';
 import Linkify from 'react-linkify';
 import { useAPIToggleGoodForBoard } from '@/hooks/api/wiki/useAPIToggleGoodForBoard';
 import { useAuthenticate } from 'src/contexts/useAuthenticate';
@@ -105,7 +105,7 @@ const WikiComment: React.FC<WikiCommentProps> = ({
               <>
                 <Avatar
                   className={qaCommentStyles.user_avatar}
-                  src={boldMascot.src}
+                  src={noImage.src}
                 />
                 <p className={qaCommentStyles.user_name}>サンプル</p>
               </>

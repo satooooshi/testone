@@ -9,7 +9,7 @@ import {
   MenuList,
   Text,
 } from '@chakra-ui/react';
-import boldLogo from '@/public/bold-logo.png';
+import valleyinLogo from '@/public/valleyin-logo.png';
 import Image from 'next/image';
 import { GiHamburgerMenu } from 'react-icons/gi';
 import Link from 'next/link';
@@ -65,7 +65,7 @@ const HeaderWithTab: React.FC<HeaderProps> = ({
           <div className={headerStyles.header_left}>
             <Link href="/">
               <a className={headerStyles.logo_image}>
-                <Image src={boldLogo} alt="bold logo" />
+                <Image src={valleyinLogo} alt="bold logo" />
               </a>
             </Link>
             <h1 className={headerStyles.header_title}>{title}</h1>

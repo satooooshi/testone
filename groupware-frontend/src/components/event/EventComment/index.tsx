@@ -2,7 +2,7 @@ import { User } from 'src/types';
 import eventCommentStyles from '@/styles/components/EventComment.module.scss';
 import { dateTimeFormatterFromJSDDate } from 'src/utils/dateTimeFormatter';
 import Link from 'next/link';
-import boldMascot from '@/public/bold-mascot.png';
+import noImage from '@/public/no-image.jpg';
 import { Avatar } from '@chakra-ui/react';
 
 type EventCommentCardProps = {
@@ -35,7 +35,7 @@ const EventCommentCard: React.FC<EventCommentCardProps> = ({
             <div className={eventCommentStyles.comment_name_wrapper}>
               <Avatar
                 className={eventCommentStyles.user_avatar}
-                src={boldMascot.src}
+                src={noImage.src}
               />
               <p className={eventCommentStyles.user_name}>サンプル</p>
             </div>

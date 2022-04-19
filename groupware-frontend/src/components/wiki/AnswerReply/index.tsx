@@ -5,7 +5,7 @@ import { dateTimeFormatterFromJSDDate } from 'src/utils/dateTimeFormatter';
 import { Avatar } from '@chakra-ui/react';
 import WikiComment from '../WikiComment';
 import Link from 'next/link';
-import boldMascot from '@/public/bold-mascot.png';
+import noImage from '@/public/no-image.jpg';
 
 type AnswerReplyProps = {
   reply: QAAnswerReply;
@@ -37,7 +37,7 @@ const AnswerReply: React.FC<AnswerReplyProps> = ({ reply }) => {
             <>
               <Avatar
                 className={answerReplyStyles.user_avatar}
-                src={boldMascot.src}
+                src={noImage.src}
               />
               <p className={answerReplyStyles.user_name}>サンプル</p>
             </>
