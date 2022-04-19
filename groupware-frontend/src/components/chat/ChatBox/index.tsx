@@ -402,12 +402,10 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
     socket.emit('joinRoom', room.id.toString());
     socket.on('readMessageClient', async (senderId: string) => {
       if (user?.id && senderId && senderId != `${user?.id}`) {
-        console.log('readMessageClient called', senderId, user.id, room.id);
         refetchLastReadChatTime();
       }
     });
     socket.on('msgToClient', async (sentMsgByOtherUsers: ChatMessage) => {
-      console.log('sent by other users', sentMsgByOtherUsers.content);
       if (sentMsgByOtherUsers.content) {
         if (sentMsgByOtherUsers?.sender?.id !== user?.id) {
           saveLastReadChatTime(room.id, {
@@ -416,7 +414,6 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
                 room: room.id.toString(),
                 senderId: user?.id,
               });
-              console.log('>>>>>>>>>>>>>>');
               refetchRoom();
             },
           });
@@ -467,43 +464,6 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
     return () => saveLastReadChatTime(room.id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [room.id, saveLastReadChatTime]);
-
-  // const [readUsers, setReadUsers] = useState<User[][]>([]);
-
-  const readUsers = (targetMsg: ChatMessage) => {
-    return lastReadChatTime
-      ? lastReadChatTime
-          .filter((t) => t.readTime >= targetMsg.createdAt)
-          .map((t) => t.user)
-      : [];
-  };
-
-  useEffect(() => {
-    if (lastReadChatTime && messages.length) {
-      console.log(
-        '000000000000',
-        lastReadChatTime && messages.length
-          ? lastReadChatTime
-              .filter(
-                (t) => t.readTime >= messages[messages.length - 1].createdAt,
-              )
-              .map((t) => t.user)
-          : [],
-      );
-      // const readUsersArray = messages.map((m) => {
-      //   return lastReadChatTime
-      //     ? lastReadChatTime
-      //         .filter((t) => t.readTime >= m.createdAt)
-      //         .map((t) => t.user)
-      //     : [];
-      // });
-      // setReadUsers(readUsersArray);
-      // const readMessage = messages[messages.length - 1];
-      // const messagess = messages.splice(0, messages.length);
-      // messagess.pop();
-      // setMessages([readMessage, ...messagess]);
-    }
-  }, [lastReadChatTime]);
 
   const isLoading = loadingSend || loadingUplaod;
   const activeIndex = useMemo(() => {
@@ -754,7 +714,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
                 message={m}
                 confirmedSearchWord={confirmedSearchWord}
                 searchedResultIds={searchedResults?.map((s) => s.id)}
-                readUsers={readUsers(m)}
+                lastReadChatTime={lastReadChatTime}
                 // readUsers={readUsers[i] ? readUsers[i] : []}
                 onClickReply={() =>
                   setNewChatMessage((pre) => ({
