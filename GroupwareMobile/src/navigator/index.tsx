@@ -131,25 +131,29 @@ const Navigator = () => {
         } else {
           sendCallHistory('キャンセル');
         }
-      } else if (!isCallKeep) {
-        setAlertCountOnEndCall(c => c + 1);
+      } else if (!callKeepUUID) {
+        if (AppState.currentState === 'active') {
+          setAlertCountOnEndCall(c => c + 1);
+        }
+        await soundOnEnd();
       }
-      RNCallKeep.endAllCalls();
-      await soundOnEnd();
       setChannelName('');
       setIsJoining(false);
       setIsCalling(false);
       setCallTimeout(false);
       disableCallAcceptedFlag();
       setLocalInvitationState(undefined);
-      reject();
-      if (remoteInvitation.current) {
+      if (remoteInvitation.current && callKeepUUID) {
         // remote invitation(送られてきた通話招待)があればrefuseする
         await rtmEngine?.refuseRemoteInvitationV2({
           ...remoteInvitation.current,
           hash: 0,
         });
-        remoteInvitation.current = undefined;
+      }
+      remoteInvitation.current = undefined;
+      reject();
+      if (Platform.OS === 'ios') {
+        RNCallKeep.endAllCalls();
       }
       // initしないとエラーがでることがある
       await rtcInit();
@@ -163,6 +167,7 @@ const Navigator = () => {
       setLocalInvitationState,
       callTimeout,
       remoteInvitation.current,
+      AppState.currentState,
     ],
   );
 
@@ -352,7 +357,7 @@ const Navigator = () => {
         );
         await rtcEngine?.disableVideo();
         setChannelName(realChannelName);
-        remoteInvitation.current = undefined;
+        // remoteInvitation.current = undefined;
         // navigateToCallWindow();
         setIsJoining(true);
       }
@@ -376,13 +381,18 @@ const Navigator = () => {
     );
 
     RNCallKeep.backToForeground();
+    // RNCallKeep.setMutedCall(realChannelName, true);
+    // await RNCallKeep.setAudioRoute(realChannelName, routeName);
+
     if (invitation && realChannelName) {
       // 招待を承認
       console.log('answer call called');
       await rtmEngine.acceptRemoteInvitationV2(invitation);
       await joinChannel(realChannelName);
       setIsCalling(true);
-      // RNCallKeep.endAllCalls();
+      if (Platform.OS === 'android') {
+        RNCallKeep.endAllCalls();
+      }
     }
     //   if (Platform.OS === 'android') {
     //     if (invitation && realChannelName) {
