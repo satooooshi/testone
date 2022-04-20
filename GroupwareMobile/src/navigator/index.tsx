@@ -279,7 +279,10 @@ const Navigator = () => {
     const options: IOptions = {
       ios: {
         appName: 'Eface',
-        supportsVideo: true,
+        supportsVideo: false,
+        imageName: 'bold-logo.png',
+        maximumCallGroups: '1',
+        maximumCallsPerCallGroup: '2',
       },
       android: {
         alertTitle: '通話機能を利用するためには許可が必要です',
