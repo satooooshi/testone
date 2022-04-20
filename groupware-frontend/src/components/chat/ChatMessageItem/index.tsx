@@ -91,7 +91,6 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
   }, [isScrollTarget, scrollToTarget]);
 
   const readUsers = useMemo(() => {
-    console.log(1);
     return lastReadChatTime
       ? lastReadChatTime
           .filter((t) => new Date(t.readTime) >= new Date(message.createdAt))

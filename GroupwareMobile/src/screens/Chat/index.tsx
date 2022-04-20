@@ -647,7 +647,7 @@ const Chat: React.FC = () => {
     (targetMsg: ChatMessage) => {
       return lastReadChatTime
         ? lastReadChatTime
-            .filter(t => t.readTime >= targetMsg.createdAt)
+            .filter(t => new Date(t.readTime) >= new Date(targetMsg.createdAt))
             .map(t => t.user)
         : [];
     },
@@ -837,7 +837,6 @@ const Chat: React.FC = () => {
       refetchLatest();
       saveLastReadChatTime(room.id, {
         onSuccess: () => {
-          console.log('2222222');
           socket.emit('readReport', {
             room: room.id.toString(),
             senderId: myself?.id,
