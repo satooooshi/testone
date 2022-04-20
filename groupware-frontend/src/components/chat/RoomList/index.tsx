@@ -67,7 +67,7 @@ const RoomList: React.FC<RoomListProps> = ({ currentId, onClickRoom }) => {
       {roomsForInfiniteScroll.length ? (
         roomsForInfiniteScroll.map((g) => (
           <a
-            onClick={() => onClickRoom(g)}
+            onClick={() => g.id === Number(currentId) || onClickRoom(g)}
             key={g.id}
             style={{ width: '100%' }}>
             <Box w="100%" mb={'8px'}>

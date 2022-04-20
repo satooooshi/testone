@@ -132,6 +132,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
   const [confirmedSearchWord, setConfirmedSearchWord] = useState('');
   const [after, setAfter] = useState<number>();
   const [before, setBefore] = useState<number>();
+  const [minBefore, setMinBefore] = useState<number>();
   const [focusedMessageID, setFocusedMessageID] = useState<number>();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [searchedResults, setSearchedResults] = useState<
@@ -362,7 +363,10 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
       (e.target.scrollHeight * 2) / 3
     ) {
       if (fetchedPastMessages?.length) {
-        setBefore(messages[messages.length - 1].id);
+        const target = messages[messages.length - 1].id;
+        if (minBefore && minBefore <= target) return;
+        setMinBefore(target);
+        setBefore(target);
       }
     }
   };
@@ -710,7 +714,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
                 isScrollTarget={focusedMessageID === m.id}
                 scrollToTarget={scrollToTarget}
                 usersInRoom={room.members || []}
-                key={m.id + m.content}
+                key={m.id}
                 message={m}
                 confirmedSearchWord={confirmedSearchWord}
                 searchedResultIds={searchedResults?.map((s) => s.id)}
