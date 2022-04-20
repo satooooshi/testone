@@ -377,7 +377,7 @@ const Navigator = () => {
     // }
     const invitation = remoteInvitation.current;
     const realChannelName = remoteInvitation.current?.channelId as string;
-    RNCallKeep.answerIncomingCall(realChannelName);
+    // RNCallKeep.answerIncomingCall(realChannelName);
     RNCallKeep.backToForeground();
     // RNCallKeep.setMutedCall(realChannelName, true);
     // await RNCallKeep.setAudioRoute(realChannelName, routeName);
