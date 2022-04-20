@@ -388,6 +388,7 @@ const Navigator = () => {
       await joinChannel(realChannelName);
       setIsCalling(true);
       if (Platform.OS === 'android') {
+        remoteInvitation.current = undefined;
         RNCallKeep.endAllCalls();
       }
     }
