@@ -304,11 +304,15 @@ const Chat: React.FC = () => {
     });
   };
 
-  const handleUploadImage = async () => {
-    const {formData} = await uploadImageFromGallery({
-      mediaType: 'photo',
-      cropping: false,
-    });
+  const handleUploadImage = async (useCamera: boolean) => {
+    const {formData} = await uploadImageFromGallery(
+      {
+        mediaType: 'photo',
+        cropping: false,
+      },
+      useCamera,
+    );
+    console.log('-----', formData);
     if (formData) {
       uploadFile(formData, {
         onSuccess: imageURL => {

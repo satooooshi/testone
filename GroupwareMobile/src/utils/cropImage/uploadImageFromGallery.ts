@@ -11,12 +11,24 @@ export const uploadImageFromGallery = async (
     mediaType: 'photo',
     multiple: false,
   },
+  useCamera = false,
 ): Promise<{formData: FormData | undefined; mime: string | undefined}> => {
   try {
-    const optionsExec: Options =
-      options.mediaType === 'photo' ? {...options, forceJpg: true} : options;
-    const photo = await ImagePicker.openPicker(optionsExec);
-    const mime = photo.mime;
+    let photo;
+    let mime;
+    if (useCamera) {
+      photo = await ImagePicker.openCamera({
+        width: 300,
+        height: 400,
+        // cropping: true,
+      });
+      mime = photo.mime;
+    } else {
+      const optionsExec: Options =
+        options.mediaType === 'photo' ? {...options, forceJpg: true} : options;
+      photo = await ImagePicker.openPicker(optionsExec);
+      mime = photo.mime;
+    }
     const formData = imagePickerResponseToFormData(photo);
     return {formData, mime};
   } catch (err) {

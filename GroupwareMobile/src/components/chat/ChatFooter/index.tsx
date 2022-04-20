@@ -30,7 +30,7 @@ type ChatFooterProps = {
   onChangeText: (text: string) => void;
   onUploadFile: () => void;
   onUploadVideo: () => void;
-  onUploadImage: () => void;
+  onUploadImage: (useCamera: boolean) => void;
   onSend: () => void;
   setVisibleStickerSelector: React.Dispatch<React.SetStateAction<boolean>>;
   mentionSuggestions: Suggestion[];
@@ -183,8 +183,11 @@ const ChatFooter: React.FC<ChatFooterProps> = ({
         <TouchableOpacity onPress={onUploadVideo}>
           <Icon name="video-camera" fontFamily="FontAwesome" fontSize={21} />
         </TouchableOpacity>
-        <TouchableOpacity onPress={onUploadImage}>
+        <TouchableOpacity onPress={() => onUploadImage(false)}>
           <Icon name="picture" fontSize={21} />
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => onUploadImage(true)}>
+          <Icon name="camera" fontSize={21} />
         </TouchableOpacity>
         <TouchableOpacity onPress={() => setVisibleStickerSelector(true)}>
           <Icon name="smile-o" fontFamily="FontAwesome" fontSize={21} />
