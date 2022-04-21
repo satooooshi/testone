@@ -1,4 +1,4 @@
-package com.groupwaremobile;
+package com.valleyinapp;
 
 //react-navigation
 import android.os.Bundle;

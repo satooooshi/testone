@@ -58,9 +58,7 @@ const UserAvatar: React.FC<UserAvatarProps> = ({
         {...{h, w}}
         rounded="circle"
         source={
-          !user?.existence
-            ? require('../../../../assets/bold-mascot.png')
-            : user?.avatarUrl
+          user?.existence && user?.avatarUrl
             ? {uri: user.avatarUrl}
             : require('../../../../assets/no-image-avatar.png')
         }

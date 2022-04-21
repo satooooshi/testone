@@ -145,11 +145,11 @@ android {
     }
 
     defaultConfig {
-        resValue "string", "build_config_package", "com.groupwaremobile"
-        applicationId "com.groupwaremobile"
+        resValue "string", "build_config_package", "com.valleyinapp"
+        applicationId "com.valleyinapp"
         minSdkVersion 26
         targetSdkVersion 31
-        versionCode 14
+        versionCode 15
         versionName "1.0"
         //react-native-image-crop-picker
         vectorDrawables.useSupportLibrary = true

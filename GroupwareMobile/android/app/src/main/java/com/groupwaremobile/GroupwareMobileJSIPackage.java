@@ -1,4 +1,4 @@
-package com.groupwaremobile;
+package com.valleyinapp;
 
 import com.facebook.react.bridge.JSIModuleSpec;
 import com.facebook.react.bridge.JavaScriptContextHolder;
