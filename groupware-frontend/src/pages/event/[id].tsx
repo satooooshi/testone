@@ -42,7 +42,6 @@ import { useAPIDonwloadSubmissionZip } from '@/hooks/api/event/useAPIDonwloadSub
 import { FcSportsMode } from 'react-icons/fc';
 import { MdAssignment } from 'react-icons/md';
 import boldayImage1 from '@/public/bolday_1.jpg';
-import impressiveUnivertyImage from '@/public/impressive_university_1.png';
 import studyMeeting1Image from '@/public/study_meeting_1.jpg';
 import portalLinkBoxStyles from '@/styles/components/PortalLinkBox.module.scss';
 import { useAPISaveUserJoiningEvent } from '@/hooks/api/event/useAPISaveUserJoiningEvent';

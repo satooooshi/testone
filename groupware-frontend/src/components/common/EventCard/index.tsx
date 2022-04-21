@@ -5,7 +5,6 @@ import { dateTimeFormatterFromJSDDate } from 'src/utils/dateTimeFormatter';
 import { Box, Button, Link, useMediaQuery, Text } from '@chakra-ui/react';
 import noImage from '@/public/no-image.jpg';
 import boldayImage1 from '@/public/bolday_1.jpg';
-import impressiveUnivertyImage from '@/public/impressive_university_1.png';
 import coachImage from '@/public/coach_1.jpeg';
 import studyMeeting1Image from '@/public/study_meeting_1.jpg';
 import Image from 'next/image';

@@ -193,7 +193,6 @@ const WikiForm: React.FC<WikiFormProps> = ({
       e.target.value === BoardCategory.KNOWLEDGE ||
       e.target.value === BoardCategory.QA ||
       e.target.value === BoardCategory.NEWS ||
-      e.target.value === BoardCategory.IMPRESSIVE_UNIVERSITY ||
       e.target.value === BoardCategory.CLUB ||
       e.target.value === BoardCategory.STUDY_MEETING ||
       e.target.value === BoardCategory.SELF_IMPROVEMENT ||
@@ -387,20 +386,6 @@ const WikiForm: React.FC<WikiFormProps> = ({
                       undefined,
                       true,
                       BoardCategory.NEWS,
-                    )}
-                  </option>
-                ) : null}
-                {isCreatableWiki({
-                  type: WikiType.BOARD,
-                  boardCategory: BoardCategory.IMPRESSIVE_UNIVERSITY,
-                  userRole: user?.role,
-                }) ? (
-                  <option value={BoardCategory.IMPRESSIVE_UNIVERSITY}>
-                    {wikiTypeNameFactory(
-                      WikiType.BOARD,
-                      undefined,
-                      true,
-                      BoardCategory.IMPRESSIVE_UNIVERSITY,
                     )}
                   </option>
                 ) : null}
