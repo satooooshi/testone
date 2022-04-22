@@ -12,7 +12,11 @@ export const uploadImageFromGallery = async (
     multiple: false,
   },
   useCamera = false,
-): Promise<{formData: FormData | undefined; mime: string | undefined}> => {
+): Promise<{
+  formData: FormData | undefined;
+  mime: string | undefined;
+  // photo: string;
+}> => {
   try {
     let photo;
     let mime;
@@ -29,6 +33,7 @@ export const uploadImageFromGallery = async (
       photo = await ImagePicker.openPicker(optionsExec);
       mime = photo.mime;
     }
+    console.log('-----', photo);
     const formData = imagePickerResponseToFormData(photo);
     return {formData, mime};
   } catch (err) {

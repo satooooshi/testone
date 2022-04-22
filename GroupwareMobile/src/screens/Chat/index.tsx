@@ -134,6 +134,7 @@ const Chat: React.FC = () => {
   const [visibleStickerSelctor, setVisibleStickerSelector] = useState(false);
   const {mutate: saveReaction} = useAPISaveReaction();
   const {width: windowWidth, height: windowHeight} = useWindowDimensions();
+  const [footerHeight, setFooterHeight] = useState(0);
   const {mutate: deleteReaction} = useAPIDeleteReaction();
   const [selectedReactions, setSelectedReactions] = useState<
     ChatMessageReaction[] | undefined
@@ -312,7 +313,6 @@ const Chat: React.FC = () => {
       },
       useCamera,
     );
-    console.log('-----', formData);
     if (formData) {
       uploadFile(formData, {
         onSuccess: imageURL => {
@@ -783,12 +783,18 @@ const Chat: React.FC = () => {
                   replyParentMessage={values.replyParentMessage}
                 />
               )}
+              <Div
+                onLayout={({nativeEvent}) => {
+                  setFooterHeight(nativeEvent.layout.y);
+                }}
+              />
               <ChatFooter
                 onUploadFile={handleUploadFile}
                 onUploadVideo={handleUploadVideo}
                 onUploadImage={handleUploadImage}
                 setVisibleStickerSelector={setVisibleStickerSelector}
                 text={values.content || ''}
+                footerHeight={footerHeight}
                 onChangeText={t =>
                   setValues(v => ({
                     ...v,
@@ -842,12 +848,19 @@ const Chat: React.FC = () => {
                   replyParentMessage={values.replyParentMessage}
                 />
               )}
+              <Div
+                onLayout={({nativeEvent}) => {
+                  console.log('999', nativeEvent);
+                  setFooterHeight(nativeEvent.layout.y);
+                }}
+              />
               <ChatFooter
                 onUploadFile={handleUploadFile}
                 onUploadVideo={handleUploadVideo}
                 onUploadImage={handleUploadImage}
                 setVisibleStickerSelector={setVisibleStickerSelector}
                 text={values.content || ''}
+                footerHeight={footerHeight}
                 onChangeText={t =>
                   setValues(v => ({
                     ...v,
