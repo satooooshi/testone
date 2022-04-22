@@ -29,6 +29,7 @@ async function bootstrap() {
     origin: [
       'http://localhost:3000',
       'http://localhost:8080',
+      "https://valleyin-app-frontend-sgzkfl3uyq-an.a.run.app",
       'https://editor-example-kabasawa-sgzkfl3uyq-an.a.run.app',
       'https://groupware-frontend.vercel.app',
       'groupware-frontend.vercel.app',
