@@ -11,7 +11,7 @@
 		13B07FBC1A68108700A75B9A /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.m */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
-		6051B6C0280FDFD400759F43 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 6051B6BF280FDFD400759F43 /* GoogleService-Info.plist */; };
+		605CA6D12812AD870043910B /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 605CA6D02812AD870043910B /* GoogleService-Info.plist */; };
 		6071535227FC7D65006E718E /* ring_sound.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 6071535127FC7D65006E718E /* ring_sound.mp3 */; };
 		7520C28D271C173000C800B4 /* BridgingFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7520C28C271C173000C800B4 /* BridgingFile.swift */; };
 		75236F612797F7B4004360E1 /* Intents.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 75236F602797F7B4004360E1 /* Intents.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
@@ -48,7 +48,7 @@
 		1FF66F4F0BC4328C9F6808C7 /* libPods-GroupwareMobile.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-GroupwareMobile.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		2BB485AD61E420A6B352227A /* libPods-GroupwareMobile-GroupwareMobileTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-GroupwareMobile-GroupwareMobileTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		390372DAB52248BC4435856A /* Pods-GroupwareMobile.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-GroupwareMobile.release.xcconfig"; path = "Target Support Files/Pods-GroupwareMobile/Pods-GroupwareMobile.release.xcconfig"; sourceTree = "<group>"; };
-		6051B6BF280FDFD400759F43 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "../../../../Downloads/GoogleService-Info.plist"; sourceTree = "<group>"; };
+		605CA6D02812AD870043910B /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "../../../../Downloads/GoogleService-Info.plist"; sourceTree = "<group>"; };
 		6071535127FC7D65006E718E /* ring_sound.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = ring_sound.mp3; path = ../assets/ring_sound.mp3; sourceTree = "<group>"; };
 		7520C28B271C173000C800B4 /* GroupwareMobile-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "GroupwareMobile-Bridging-Header.h"; sourceTree = "<group>"; };
 		7520C28C271C173000C800B4 /* BridgingFile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BridgingFile.swift; sourceTree = "<group>"; };
@@ -140,7 +140,7 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
-				6051B6BF280FDFD400759F43 /* GoogleService-Info.plist */,
+				605CA6D02812AD870043910B /* GoogleService-Info.plist */,
 				C959FEBF280F9A3400354BF1 /* bold-logo.png */,
 				6071535127FC7D65006E718E /* ring_sound.mp3 */,
 				7542A1F227BE7F45009FAA2E /* end_call.mp3 */,
@@ -280,7 +280,7 @@
 				6071535227FC7D65006E718E /* ring_sound.mp3 in Resources */,
 				7542A1F327BE7F45009FAA2E /* end_call.mp3 in Resources */,
 				753A35892759FD9900FD41E5 /* BootSplash.storyboard in Resources */,
-				6051B6C0280FDFD400759F43 /* GoogleService-Info.plist in Resources */,
+				605CA6D12812AD870043910B /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -537,7 +537,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = GroupwareMobile/GroupwareMobile.entitlements;
-				CURRENT_PROJECT_VERSION = 30;
+				CURRENT_PROJECT_VERSION = 31;
 				DEVELOPMENT_TEAM = 6L7YYU79HT;
 				ENABLE_BITCODE = NO;
 				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = arm64;
@@ -659,7 +659,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = GroupwareMobile/GroupwareMobile.entitlements;
-				CURRENT_PROJECT_VERSION = 30;
+				CURRENT_PROJECT_VERSION = 31;
 				DEVELOPMENT_TEAM = 6L7YYU79HT;
 				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = arm64;
 				HEADER_SEARCH_PATHS = (
