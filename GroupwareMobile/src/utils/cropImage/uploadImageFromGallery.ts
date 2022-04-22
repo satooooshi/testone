@@ -33,7 +33,6 @@ export const uploadImageFromGallery = async (
     }
     const mime = photo.mime;
     const fileName = photo.filename;
-    console.log('-----', photo.filename);
     const formData = imagePickerResponseToFormData(photo);
     return {formData, mime, fileName};
   } catch (err) {
