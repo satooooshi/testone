@@ -199,7 +199,6 @@ const MyAccountInfo = () => {
       }}>
       <Head>
         <title>
-          sample |{' '}
           {profile ? `${profile.lastName} ${profile.firstName}` : ''}
         </title>
       </Head>

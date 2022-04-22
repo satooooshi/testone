@@ -460,9 +460,7 @@ const EventList = () => {
       header={initialHeaderValue}
       sidebar={{ activeScreenName: SidebarScreenName.EVENT }}>
       <Head>
-        <title>
-          sample | {type ? eventTitleText[type] : '全てのイベント'}
-        </title>
+        <title>sample | {type ? eventTitleText[type] : '全てのイベント'}</title>
       </Head>
       <CreateEventModal
         enabled={modalVisible}
