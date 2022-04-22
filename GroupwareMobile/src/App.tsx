@@ -9,6 +9,7 @@ import {Alert, Linking, Platform} from 'react-native';
 import VersionCheck from 'react-native-version-check';
 import {InviteCallProvider} from './contexts/call/useInviteCall';
 import {IsTabBarVisibleProvider} from './contexts/bottomTab/useIsTabBarVisible';
+import {Provider} from 'react-native-paper';
 
 const App = () => {
   const queryClient = new QueryClient();
@@ -53,13 +54,15 @@ const App = () => {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthenticateProvider>
-        <IsTabBarVisibleProvider>
-          <InviteCallProvider>
-            <Navigator />
-          </InviteCallProvider>
-        </IsTabBarVisibleProvider>
-      </AuthenticateProvider>
+      <Provider>
+        <AuthenticateProvider>
+          <IsTabBarVisibleProvider>
+            <InviteCallProvider>
+              <Navigator />
+            </InviteCallProvider>
+          </IsTabBarVisibleProvider>
+        </AuthenticateProvider>
+      </Provider>
     </QueryClientProvider>
   );
 };
