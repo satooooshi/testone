@@ -115,7 +115,7 @@ const Navigator = () => {
 
   const endCall = useCallback(
     async (isCallKeep: boolean = false) => {
-      if (isCallKeep && !remoteInvitation.current) {
+      if (isCallKeep && !remoteInvitation.current && !localInvitation) {
         console.log('end call called by endAllCalls');
         return;
       }
