@@ -102,23 +102,20 @@ const Navigator = () => {
         if (token) {
           registerDevice({token});
         }
-
-        // Listen to whether the token changes
-        return messaging().onTokenRefresh(tokenChanged => {
-          if (token) {
-            registerDevice({token: tokenChanged});
-          }
-          // saveTokenToDatabase(token);
-          console.log('token changed: ', tokenChanged);
-        });
       }
     };
     handleMessaging();
   }, [registerDevice, user]);
 
+  messaging().onTokenRefresh(tokenChanged => {
+    registerDevice({token: tokenChanged});
+    // saveTokenToDatabase(token);
+    console.log('token changed: ', tokenChanged);
+  });
+
   const endCall = useCallback(
     async (isCallKeep: boolean = false) => {
-      if (isCallKeep && !remoteInvitation.current) {
+      if (isCallKeep && !remoteInvitation.current && !localInvitation) {
         console.log('end call called by endAllCalls');
         return;
       }
