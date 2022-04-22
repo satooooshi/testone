@@ -199,7 +199,7 @@ const ChatFooter: React.FC<ChatFooterProps> = ({
           }>
           <Menu.Item
             icon="camera-image"
-            onPress={() => onUploadImage(true)}
+            onPress={() => onUploadImage(false)}
             title="写真を選択"
           />
           <Menu.Item
