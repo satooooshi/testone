@@ -68,7 +68,7 @@ const ChatAlbumForm: React.FC<ChatAlbumFormProps> = ({
   };
 
   const handlePressImageButton = async () => {
-    const {formData} = await uploadImageFromGallery({
+    const {formData, fileName} = await uploadImageFromGallery({
       cropping: true,
       mediaType: 'photo',
       multiple: true,
@@ -83,7 +83,7 @@ const ChatAlbumForm: React.FC<ChatAlbumFormProps> = ({
         onSuccess: imageURLs => {
           const newImages: Partial<ChatAlbumImage>[] = imageURLs.map(u => ({
             imageURL: u,
-            name: u + '.png',
+            name: fileName ? fileName : u + '.png',
           }));
           setValues(v => ({
             ...v,

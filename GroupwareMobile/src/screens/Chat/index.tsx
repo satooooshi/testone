@@ -306,7 +306,7 @@ const Chat: React.FC = () => {
   };
 
   const handleUploadImage = async (useCamera: boolean) => {
-    const {formData} = await uploadImageFromGallery(
+    const {formData, fileName} = await uploadImageFromGallery(
       {
         mediaType: 'photo',
         cropping: false,
@@ -318,7 +318,7 @@ const Chat: React.FC = () => {
         onSuccess: imageURL => {
           sendChatMessage({
             content: imageURL[0],
-            fileName: imageURL[0] + '.png',
+            fileName: fileName ? fileName : imageURL[0] + '.png',
             type: ChatMessageType.IMAGE,
             chatGroup: room,
           });
@@ -328,7 +328,7 @@ const Chat: React.FC = () => {
   };
 
   const handleUploadVideo = async () => {
-    const {formData} = await uploadImageFromGallery({
+    const {formData, fileName} = await uploadImageFromGallery({
       mediaType: 'video',
       multiple: false,
     });
@@ -337,7 +337,7 @@ const Chat: React.FC = () => {
         onSuccess: imageURL => {
           sendChatMessage({
             content: imageURL[0],
-            fileName: imageURL[0] + '.mp4',
+            fileName: fileName ? fileName : imageURL[0] + '.mp4',
             type: ChatMessageType.VIDEO,
             chatGroup: room,
           });

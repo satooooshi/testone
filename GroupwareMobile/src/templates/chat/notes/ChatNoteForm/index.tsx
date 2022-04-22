@@ -72,13 +72,13 @@ const ChatNoteForm: React.FC<ChatNoteFormProps> = ({
   };
 
   const handlePressImageButton = async () => {
-    const {formData} = await uploadImageFromGallery();
+    const {formData, fileName} = await uploadImageFromGallery();
     if (formData) {
       onUploadImage(formData, {
         onSuccess: imageURLs => {
           const newImage: Partial<ChatNoteImage> = {
             imageURL: imageURLs[0],
-            name: imageURLs[0] + '.png',
+            name: fileName ? fileName : imageURLs[0] + '.png',
           };
           setValues(v => ({
             ...v,

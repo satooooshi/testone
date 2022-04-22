@@ -1,6 +1,7 @@
 import {Alert, Platform} from 'react-native';
 import ImagePicker, {
   Image,
+  ImageOrVideo,
   Options,
   PickerErrorCode,
 } from 'react-native-image-crop-picker';
@@ -15,27 +16,26 @@ export const uploadImageFromGallery = async (
 ): Promise<{
   formData: FormData | undefined;
   mime: string | undefined;
-  // photo: string;
+  fileName: string | undefined;
 }> => {
   try {
-    let photo;
-    let mime;
+    let photo: ImageOrVideo;
     if (useCamera) {
       photo = await ImagePicker.openCamera({
         width: 300,
         height: 400,
         // cropping: true,
       });
-      mime = photo.mime;
     } else {
       const optionsExec: Options =
         options.mediaType === 'photo' ? {...options, forceJpg: true} : options;
       photo = await ImagePicker.openPicker(optionsExec);
-      mime = photo.mime;
     }
-    console.log('-----', photo);
+    const mime = photo.mime;
+    const fileName = photo.filename;
+    console.log('-----', photo.filename);
     const formData = imagePickerResponseToFormData(photo);
-    return {formData, mime};
+    return {formData, mime, fileName};
   } catch (err) {
     const code = (err as {code: PickerErrorCode})?.code;
     switch (code) {
