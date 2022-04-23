@@ -122,7 +122,6 @@ const Navigator = () => {
         console.log('end call called by endAllCalls');
         return;
       }
-
       if (!isCallAccepted && localInvitation) {
         // local invitation(送信した通話招待)があればcancelする
         await rtmEngine?.cancelLocalInvitationV2(localInvitation);
@@ -131,7 +130,7 @@ const Navigator = () => {
         } else {
           sendCallHistory('キャンセル');
         }
-      } else if (!callKeepUUID) {
+      } else if (!callKeepUUID && !isCallKeep) {
         if (AppState.currentState === 'active') {
           setAlertCountOnEndCall(c => c + 1);
         }
@@ -144,6 +143,7 @@ const Navigator = () => {
       disableCallAcceptedFlag();
       setLocalInvitationState(undefined);
       if (remoteInvitation.current && callKeepUUID) {
+        reject();
         // remote invitation(送られてきた通話招待)があればrefuseする
         await rtmEngine?.refuseRemoteInvitationV2({
           ...remoteInvitation.current,
@@ -151,7 +151,6 @@ const Navigator = () => {
         });
       }
       remoteInvitation.current = undefined;
-      reject();
       if (Platform.OS === 'ios') {
         RNCallKeep.endAllCalls();
       }
@@ -303,9 +302,6 @@ const Navigator = () => {
     try {
       await RNCallKeep.setup(options);
       RNCallKeep.setAvailable(true);
-      RNCallKeep.addEventListener('didLoadWithEvents', events => {
-        console.log(events);
-      });
       RNCallKeep.addEventListener('answerCall', answerCall);
       // ユーザーが通話拒否ボタンを押したときはアラート等を出さないようにする
       RNCallKeep.addEventListener('endCall', () => endCall(true));
