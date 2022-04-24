@@ -223,10 +223,10 @@ const Navigator = () => {
     },
   };
 
-  messaging().setBackgroundMessageHandler(async remoteMessage => {
-    console.log('BackgroundMessage received!!', remoteMessage);
-    sendLocalNotification(remoteMessage);
-  });
+  // messaging().setBackgroundMessageHandler(async remoteMessage => {
+  //   console.log('BackgroundMessage received!!', remoteMessage);
+  //   sendLocalNotification(remoteMessage);
+  // });
 
   useEffect(
     () => {
