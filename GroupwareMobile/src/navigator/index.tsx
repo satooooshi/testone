@@ -29,6 +29,9 @@ import {useInviteCall} from '../contexts/call/useInviteCall';
 import SoundPlayer from 'react-native-sound-player';
 import {debounce} from 'lodash';
 import notifee, {EventType} from '@notifee/react-native';
+import PushNotification, {
+  ReceivedNotification,
+} from 'react-native-push-notification';
 
 const Stack = createStackNavigator<RootStackParamList>();
 export const rtmEngine = new RtmClient();
@@ -119,7 +122,6 @@ const Navigator = () => {
         console.log('end call called by endAllCalls');
         return;
       }
-
       if (!isCallAccepted && localInvitation) {
         // local invitation(送信した通話招待)があればcancelする
         await rtmEngine?.cancelLocalInvitationV2(localInvitation);
@@ -128,7 +130,7 @@ const Navigator = () => {
         } else {
           sendCallHistory('キャンセル');
         }
-      } else if (!callKeepUUID) {
+      } else if (!callKeepUUID && !isCallKeep) {
         if (AppState.currentState === 'active') {
           setAlertCountOnEndCall(c => c + 1);
         }
@@ -141,6 +143,7 @@ const Navigator = () => {
       disableCallAcceptedFlag();
       setLocalInvitationState(undefined);
       if (remoteInvitation.current && callKeepUUID) {
+        reject();
         // remote invitation(送られてきた通話招待)があればrefuseする
         await rtmEngine?.refuseRemoteInvitationV2({
           ...remoteInvitation.current,
@@ -148,7 +151,6 @@ const Navigator = () => {
         });
       }
       remoteInvitation.current = undefined;
-      reject();
       if (Platform.OS === 'ios') {
         RNCallKeep.endAllCalls();
       }
@@ -224,24 +226,24 @@ const Navigator = () => {
     },
   };
 
-  messaging().setBackgroundMessageHandler(async remoteMessage => {
-    console.log('BackgroundMessage received!!', remoteMessage);
-    sendLocalNotification(remoteMessage);
-  });
+  // messaging().setBackgroundMessageHandler(async remoteMessage => {
+  //   console.log('BackgroundMessage received!!', remoteMessage);
+  //   sendLocalNotification(remoteMessage);
+  // });
 
-  useEffect(
-    () => {
-      if (refusedInvitation) {
-        sendCallHistory('応答なし');
-        disableCallAcceptedFlag();
-        setLocalInvitationState(undefined);
-        stopRing();
-        setIsJoining(false);
-        setRefusedInvitation(false);
-      }
-    }, // eslint-disable-next-line react-hooks/exhaustive-deps
-    [refusedInvitation],
-  );
+  // useEffect(
+  //   () => {
+  //     if (refusedInvitation) {
+  //       sendCallHistory('応答なし');
+  //       disableCallAcceptedFlag();
+  //       setLocalInvitationState(undefined);
+  //       stopRing();
+  //       setIsJoining(false);
+  //       setRefusedInvitation(false);
+  //     }
+  //   }, // eslint-disable-next-line react-hooks/exhaustive-deps
+  //   [refusedInvitation],
+  // );
 
   const rtmInit = async () => {
     await rtmEngine.createInstance(AGORA_APP_ID);
@@ -300,9 +302,6 @@ const Navigator = () => {
     try {
       await RNCallKeep.setup(options);
       RNCallKeep.setAvailable(true);
-      RNCallKeep.addEventListener('didLoadWithEvents', events => {
-        console.log(events);
-      });
       RNCallKeep.addEventListener('answerCall', answerCall);
       // ユーザーが通話拒否ボタンを押したときはアラート等を出さないようにする
       RNCallKeep.addEventListener('endCall', () => endCall(true));
@@ -481,7 +480,7 @@ const Navigator = () => {
   }, [AGORA_APP_ID, user?.id]);
 
   const sendLocalNotification = async (
-    remoteMessage: FirebaseMessagingTypes.RemoteMessage,
+    remoteMessage: Omit<ReceivedNotification, 'userInfo'>,
   ) => {
     if (!remoteMessage?.data?.calleeId) {
       const channelId = await notifee.createChannel({
@@ -491,7 +490,7 @@ const Navigator = () => {
 
       await notifee.displayNotification({
         title: remoteMessage.data?.title || '',
-        body: remoteMessage.data?.body || '',
+        body: remoteMessage.data?.message || '',
         android: {
           channelId: channelId,
           pressAction: {
@@ -512,6 +511,39 @@ const Navigator = () => {
       });
     }
   };
+
+  // const sendLocalNotification = async (
+  //   remoteMessage: FirebaseMessagingTypes.RemoteMessage,
+  // ) => {
+  //   if (!remoteMessage?.data?.calleeId) {
+  //     const channelId = await notifee.createChannel({
+  //       id: 'default',
+  //       name: 'Default Channel',
+  //     });
+
+  //     await notifee.displayNotification({
+  //       title: remoteMessage.data?.title || '',
+  //       body: remoteMessage.data?.body || '',
+  //       android: {
+  //         channelId: channelId,
+  //         pressAction: {
+  //           id: 'action_id',
+  //           launchActivity: 'default',
+  //         },
+  //       },
+  //       data: {
+  //         screen: remoteMessage?.data?.screen
+  //           ? remoteMessage?.data?.screen
+  //           : '',
+  //         id: remoteMessage?.data?.id ? remoteMessage?.data?.id : '',
+  //       },
+  //       ios: {
+  //         // iOS resource (.wav, aiff, .caf)
+  //         sound: 'local.wav',
+  //       },
+  //     });
+  //   }
+  // };
 
   useEffect(() => {
     const naviateByNotif = (notification: any) => {
@@ -564,17 +596,33 @@ const Navigator = () => {
     });
     notifee.requestPermission();
 
-    const unsubscribe = messaging().onMessage(async remoteMessage => {
-      if (
-        remoteMessage?.data?.screen &&
-        remoteMessage.data?.id === `${currentChatRoomId}`
-      ) {
-        return;
-      }
-      sendLocalNotification(remoteMessage);
+    PushNotification.configure({
+      onRegister: function (token) {
+        console.log('PushNotification TOKEN:', token);
+      },
+      onNotification: notification => {
+        console.log('PushNotification onNotification========', notification);
+        sendLocalNotification(notification);
+      },
+      permissions: {
+        alert: true,
+        badge: true,
+        sound: true,
+      },
+      requestPermissions: true,
     });
 
-    return unsubscribe;
+    // const unsubscribe = messaging().onMessage(async remoteMessage => {
+    //   if (
+    //     remoteMessage?.data?.screen &&
+    //     remoteMessage.data?.id === `${currentChatRoomId}`
+    //   ) {
+    //     return;
+    //   }
+    //   sendLocalNotification(remoteMessage);
+    // });
+
+    // return unsubscribe;
   }, [navigationRef, currentChatRoomId]);
 
   useEffect(() => {
