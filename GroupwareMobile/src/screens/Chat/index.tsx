@@ -82,6 +82,7 @@ import {useAuthenticate} from '../../contexts/useAuthenticate';
 import {useIsTabBarVisible} from '../../contexts/bottomTab/useIsTabBarVisible';
 import {reactionStickers} from '../../utils/factory/reactionStickers';
 import {ScrollView} from 'react-native-gesture-handler';
+import Video from 'react-native-video';
 
 const socket = io(baseURL, {
   transports: ['websocket'],
@@ -741,7 +742,10 @@ const Chat: React.FC = () => {
           <TouchableOpacity
             key={e.name}
             onPress={() => handleStickerSelected(e.name)}>
-            <Image source={e.src} style={{height: 80, width: 80, margin: 10}} />
+            <Image
+              source={e.src ? e.src : null}
+              style={{height: 80, width: 80, margin: 10}}
+            />
           </TouchableOpacity>
         ))}
       </ScrollView>
@@ -924,6 +928,10 @@ const Chat: React.FC = () => {
   //   }
   // };
 
+  useEffect(() => {
+    console.log('-----', video);
+  }, [video]);
+
   return (
     <WholeContainer>
       {typeDropdown}
@@ -950,12 +958,14 @@ const Chat: React.FC = () => {
             color="#fff"
           />
         </TouchableOpacity>
+        {/* <Video source={{uri: video}}> */}
         <VideoPlayer
           video={{
             uri: video,
           }}
           autoplay
           videoWidth={windowWidth}
+          videoHeight={windowHeight * 0.9}
         />
         <TouchableOpacity
           style={tailwind('absolute bottom-5 right-5')}

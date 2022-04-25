@@ -14,6 +14,7 @@ target 'GroupwareMobile' do
 
 
   pod 'react-native-background-timer', :path => '../node_modules/react-native-background-timer'
+  # pod 'react-native-video', :path => '../node_modules/react-native-video/react-native-video.podspec'
 
   target 'GroupwareMobileTests' do
     inherit! :complete

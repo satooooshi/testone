@@ -92,7 +92,7 @@ export const uploadImageFromGallery = async (
         break;
     }
 
-    return {formData: undefined, mime: undefined};
+    return {formData: undefined, mime: undefined, fileName: undefined};
   }
 };
 
