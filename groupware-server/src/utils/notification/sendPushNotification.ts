@@ -55,9 +55,10 @@ const sendPushNotifToSpecificDevices = async (
   const dataToSend = {
     title: data.title ? data.title : '', // REQUIRED for Android
     topic: process.env.IOS_BUNDLE_ID ? '' : '', // REQUIRED for iOS (apn and gcm)
-    // silent: true,
     contentAvailable: true,
     priority: 'high',
+    silent: false,
+    sound: 'local.wav',
     /* The topic of the notification. When using token-based authentication, specify the bundle ID of the app.
      * When using certificate-based authentication, the topic is usually your app's bundle ID.
      * More details can be found under https://developer.apple.com/documentation/usernotifications/setting_up_a_remote_notification_server/sending_notification_requests_to_apns
