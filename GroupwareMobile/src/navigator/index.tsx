@@ -602,7 +602,11 @@ const Navigator = () => {
       },
       onNotification: notification => {
         console.log('PushNotification onNotification========', notification);
-        sendLocalNotification(notification);
+        if (Platform.OS === 'android') {
+          sendLocalNotification(notification);
+        } else {
+          naviateByNotif(notification);
+        }
       },
       permissions: {
         alert: true,
