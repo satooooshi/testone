@@ -57,7 +57,7 @@ const sendPushNotifToSpecificDevices = async (
     topic: process.env.IOS_BUNDLE_ID ? '' : '', // REQUIRED for iOS (apn and gcm)
     contentAvailable: true,
     priority: 'high',
-    silent: false,
+    silent: data.title === 'call' ? true : false,
     sound: 'local.wav',
     /* The topic of the notification. When using token-based authentication, specify the bundle ID of the app.
      * When using certificate-based authentication, the topic is usually your app's bundle ID.

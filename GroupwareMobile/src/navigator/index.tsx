@@ -571,7 +571,7 @@ const Navigator = () => {
         console.log('PushNotification onNotification========', notification);
         if (Platform.OS === 'android') {
           sendLocalNotification(notification);
-        } else {
+        } else if (notification.userInteraction) {
           naviateByNotif(notification);
         }
       },

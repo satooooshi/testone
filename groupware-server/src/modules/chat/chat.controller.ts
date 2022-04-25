@@ -84,8 +84,8 @@ export class ChatController {
   ) {
     const callee = await this.chatService.calleeForPhoneCall(calleeId);
     const notificationData: CustomPushNotificationData = {
-      title: '',
-      body: '',
+      title: 'call',
+      body: 'call',
       custom: invitation,
     };
     await sendPushNotifToSpecificUsers([callee], notificationData);
