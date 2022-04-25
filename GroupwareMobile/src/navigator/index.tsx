@@ -231,19 +231,19 @@ const Navigator = () => {
   //   sendLocalNotification(remoteMessage);
   // });
 
-  // useEffect(
-  //   () => {
-  //     if (refusedInvitation) {
-  //       sendCallHistory('応答なし');
-  //       disableCallAcceptedFlag();
-  //       setLocalInvitationState(undefined);
-  //       stopRing();
-  //       setIsJoining(false);
-  //       setRefusedInvitation(false);
-  //     }
-  //   }, // eslint-disable-next-line react-hooks/exhaustive-deps
-  //   [refusedInvitation],
-  // );
+  useEffect(
+    () => {
+      if (refusedInvitation) {
+        sendCallHistory('応答なし');
+        disableCallAcceptedFlag();
+        setLocalInvitationState(undefined);
+        stopRing();
+        setIsJoining(false);
+        setRefusedInvitation(false);
+      }
+    }, // eslint-disable-next-line react-hooks/exhaustive-deps
+    [refusedInvitation],
+  );
 
   const rtmInit = async () => {
     await rtmEngine.createInstance(AGORA_APP_ID);
@@ -604,7 +604,7 @@ const Navigator = () => {
         console.log('PushNotification onNotification========', notification);
         if (Platform.OS === 'android') {
           sendLocalNotification(notification);
-        } else {
+        } else if (notification.userInteraction) {
           naviateByNotif(notification);
         }
       },
