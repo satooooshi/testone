@@ -479,9 +479,7 @@ const Navigator = () => {
     getRtmToken();
   }, [AGORA_APP_ID, user?.id]);
 
-  const sendLocalNotification = async (
-    remoteMessage: Omit<ReceivedNotification, 'userInfo'>,
-  ) => {
+  const sendLocalNotification = async (remoteMessage: any) => {
     if (!remoteMessage?.data?.calleeId) {
       const channelId = await notifee.createChannel({
         id: 'default',
@@ -490,7 +488,7 @@ const Navigator = () => {
 
       await notifee.displayNotification({
         title: remoteMessage.data?.title || '',
-        body: remoteMessage.data?.message || '',
+        body: remoteMessage.data?.message || remoteMessage.data?.body || '',
         android: {
           channelId: channelId,
           pressAction: {
@@ -616,17 +614,17 @@ const Navigator = () => {
       requestPermissions: true,
     });
 
-    // const unsubscribe = messaging().onMessage(async remoteMessage => {
-    //   if (
-    //     remoteMessage?.data?.screen &&
-    //     remoteMessage.data?.id === `${currentChatRoomId}`
-    //   ) {
-    //     return;
-    //   }
-    //   sendLocalNotification(remoteMessage);
-    // });
+    const unsubscribe = messaging().onMessage(async remoteMessage => {
+      if (
+        remoteMessage?.data?.screen &&
+        remoteMessage.data?.id === `${currentChatRoomId}`
+      ) {
+        return;
+      }
+      sendLocalNotification(remoteMessage);
+    });
 
-    // return unsubscribe;
+    return unsubscribe;
   }, [navigationRef, currentChatRoomId]);
 
   useEffect(() => {
