@@ -159,7 +159,7 @@ const AccountDetail: React.FC = () => {
   const navigation = useNavigation<AccountDetailNavigationProps>();
   const route = useRoute<AccountDetailRouteProps>();
   const {user, setUser, logout} = useAuthenticate();
-  // const {sendCallInvitation} = useInviteCall();
+  const {sendCallInvitation} = useInviteCall();
   const {setIsTabBarVisible} = useIsTabBarVisible();
   const id = route.params?.id;
   const userID = id || user?.id;
@@ -247,11 +247,11 @@ const AccountDetail: React.FC = () => {
     setUser({});
   };
 
-  // const inviteCall = async () => {
-  //   if (user && profile) {
-  //     await sendCallInvitation(user, profile);
-  //   }
-  // };
+  const inviteCall = async () => {
+    if (user && profile) {
+      await sendCallInvitation(user, profile);
+    }
+  };
   // const inviteCall = async () => {
   //   if (user && profile) {
   //     const localInvitation = await setupCallInvitation(user, profile);
@@ -303,11 +303,16 @@ const AccountDetail: React.FC = () => {
                   w={windowWidth * 0.6}
                 />
               </Div>
-              {/* <Div flexDir="row" mb="sm"> */}
-              <Text fontWeight="bold" color={darkFontColor} fontSize={24}>
-                {userNameFactory(profile)}
-              </Text>
-              {/* {profile.id !== user?.id ? (
+              <Div flexDir="row" mb="sm">
+                <Text
+                  fontWeight="bold"
+                  mb={'lg'}
+                  color={darkFontColor}
+                  mr="lg"
+                  fontSize={24}>
+                  {userNameFactory(profile)}
+                </Text>
+                {profile.id !== user?.id ? (
                   <Button
                     mr={-50}
                     mt={-10}
@@ -332,8 +337,8 @@ const AccountDetail: React.FC = () => {
                       color="blue700"
                     />
                   </Button>
-                ) : null} */}
-              {/* </Div> */}
+                ) : null}
+              </Div>
             </Div>
             <Div h={bottomContentsHeight() ? bottomContentsHeight() : 700}>
               <TopTab.Navigator
