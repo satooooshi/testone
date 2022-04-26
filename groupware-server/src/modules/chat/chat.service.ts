@@ -129,7 +129,6 @@ export class ChatService {
         hasBeenRead,
       };
     });
-    console.log(rooms.map((r, index) => console.log(index, r.chatMessages)));
     rooms = orderBy(rooms, [
       'isPinned',
       'updatedAt',
