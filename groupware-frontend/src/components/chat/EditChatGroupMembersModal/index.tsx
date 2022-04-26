@@ -166,7 +166,9 @@ const EditChatGroupMembersModal: React.FC<EditChatGroupMambersModalProps> = ({
           mr="24px">
           <Text>
             {category +
-              (room?.owner[0].id === myProfile?.id ? 'を編集' : 'を追加')}
+              (room?.owner && room?.owner[0]?.id === myProfile?.id
+                ? 'を編集'
+                : 'を追加')}
           </Text>
           {selectedUsersInModal.length !== 0 && (
             <Button
@@ -241,7 +243,7 @@ const EditChatGroupMembersModal: React.FC<EditChatGroupMambersModalProps> = ({
                 <Box mr={'4px'} mb={'4px'} key={u.id}>
                   <ButtonGroup isAttached size="xs" colorScheme="purple">
                     <Button mr="-px">{userNameFactory(u)}</Button>
-                    {(room?.owner[0].id === myProfile?.id ||
+                    {(room?.owner[0]?.id === myProfile?.id ||
                       room?.members?.filter((m) => m.id === u.id).length ===
                         0) && (
                       <IconButton
