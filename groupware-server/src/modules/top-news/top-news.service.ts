@@ -20,7 +20,7 @@ export class TopNewsService {
       .select()
       .skip(offset)
       .take(limit)
-      .orderBy('news.createdAt', 'DESC')
+      .orderBy('news.id', 'DESC')
       .getManyAndCount();
     const pageCount =
       count % limit === 0 ? count / limit : Math.floor(count / limit) + 1;

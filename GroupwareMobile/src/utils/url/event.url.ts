@@ -12,5 +12,6 @@ export const cancelEventURL = `/${eventURL}/cancel-event`;
 export const deleteEventURL = `/${eventURL}/delete-event`;
 export const createCommentURL = `/${eventURL}/create-comment`;
 export const saveSubmissionURL = `/${eventURL}/save-submission`;
+export const deleteSubmissionURL = `/${eventURL}/delete-submission`;
 export const downloadSubmissionZipURL = `/${eventURL}/submission-zip`;
 export const getEventIntroductionURL = `/${eventURL}/introduction`;

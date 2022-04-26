@@ -132,7 +132,7 @@ const NoteList: React.FC<NoteListProps> = ({
                   className={`react-viewer-icon react-viewer-icon-download`}></i>
               ),
               onClick: ({ src }) => {
-                saveAs(src, fileNameTransformer(src));
+                if (selectedImage?.name) saveAs(src, selectedImage.name);
               },
             },
           ]);

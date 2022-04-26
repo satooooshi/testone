@@ -10,7 +10,7 @@ import {
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 import { useRoomRefetch } from 'src/contexts/chat/useRoomRefetch';
-import { User } from 'src/types';
+import { RoomType, User } from 'src/types';
 import CreateChatGroupModal from '../CreateChatGroupModal';
 import EditChatGroupMembersModal from '../EditChatGroupMembersModal';
 
@@ -62,7 +62,11 @@ const ModalSelectRoomType: React.FC<ModalSelectRoomTypeProps> = ({
             onClose={() => setMembersModal(false)}
             onComplete={(selected) => {
               if (isTalkRoom && selected.length === 1) {
-                createGroup({ name: '', members: selected });
+                createGroup({
+                  name: '',
+                  members: selected,
+                  roomType: RoomType.PERSONAL,
+                });
                 setMembersModal(false);
               } else {
                 setSelectedMembers(selected);

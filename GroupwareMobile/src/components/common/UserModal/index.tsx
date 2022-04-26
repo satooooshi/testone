@@ -209,12 +209,6 @@ const UserModal: React.FC<UserModalProps> = props => {
           value={UserRole.INTERNAL_INSTRUCTOR}>
           {userRoleNameFactory(UserRole.INTERNAL_INSTRUCTOR)}
         </Dropdown.Option>
-        <Dropdown.Option
-          {...defaultDropdownOptionProps}
-          onPress={() => selectUserRole(UserRole.EXTERNAL_INSTRUCTOR)}
-          value={UserRole.EXTERNAL_INSTRUCTOR}>
-          {userRoleNameFactory(UserRole.EXTERNAL_INSTRUCTOR)}
-        </Dropdown.Option>
       </Dropdown>
       <ScrollDiv contentContainerStyle={{width: '100%'}}>
         {filteredUsers?.map(u => (

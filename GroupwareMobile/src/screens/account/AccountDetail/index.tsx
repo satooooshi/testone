@@ -24,7 +24,14 @@ import {useAPIGetUserInfoById} from '../../../hooks/api/user/useAPIGetUserInfoBy
 import {useAPIGetWikiList} from '../../../hooks/api/wiki/useAPIGetWikiList';
 import {useTagType} from '../../../hooks/tag/useTagType';
 import {accountDetailStyles} from '../../../styles/screen/account/accountDetail.style';
-import {BoardCategory, TagType, User, WikiType} from '../../../types';
+import {
+  BoardCategory,
+  RoomType,
+  TagType,
+  User,
+  UserRole,
+  WikiType,
+} from '../../../types';
 import {
   AccountDetailNavigationProps,
   AccountDetailRouteProps,
@@ -32,6 +39,7 @@ import {
 import {darkFontColor} from '../../../utils/colors';
 import {userNameFactory} from '../../../utils/factory/userNameFactory';
 import {userRoleNameFactory} from '../../../utils/factory/userRoleNameFactory';
+import {useInviteCall} from '../../../contexts/call/useInviteCall';
 import {branchTypeNameFactory} from '../../../utils/factory/branchTypeNameFactory';
 
 const TopTab = createMaterialTopTabNavigator();
@@ -151,6 +159,7 @@ const AccountDetail: React.FC = () => {
   const navigation = useNavigation<AccountDetailNavigationProps>();
   const route = useRoute<AccountDetailRouteProps>();
   const {user, setUser, logout} = useAuthenticate();
+  // const {sendCallInvitation} = useInviteCall();
   const {setIsTabBarVisible} = useIsTabBarVisible();
   const id = route.params?.id;
   const userID = id || user?.id;
@@ -238,6 +247,18 @@ const AccountDetail: React.FC = () => {
     setUser({});
   };
 
+  // const inviteCall = async () => {
+  //   if (user && profile) {
+  //     await sendCallInvitation(user, profile);
+  //   }
+  // };
+  // const inviteCall = async () => {
+  //   if (user && profile) {
+  //     const localInvitation = await setupCallInvitation(user, profile);
+  //     setLocalInvitationState(localInvitation);
+  //   }
+  // };
+
   useEffect(() => {
     if (isFocused) {
       refetch();
@@ -270,6 +291,7 @@ const AccountDetail: React.FC = () => {
             : undefined
         }
       />
+      {/* <Button onPress={() => SoundPlayer.resume()}>test </Button> */}
       <ScrollDiv contentContainerStyle={accountDetailStyles.scrollView}>
         {profile && (
           <>
@@ -281,16 +303,37 @@ const AccountDetail: React.FC = () => {
                   w={windowWidth * 0.6}
                 />
               </Div>
+              {/* <Div flexDir="row" mb="sm"> */}
               <Text fontWeight="bold" color={darkFontColor} fontSize={24}>
                 {userNameFactory(profile)}
               </Text>
-              {/* <Text
-                fontWeight="bold"
-                mb={'lg'}
-                color={darkFontColor}
-                fontSize={16}>
-                {userNameKanaFactory(profile)}
-              </Text> */}
+              {/* {profile.id !== user?.id ? (
+                  <Button
+                    mr={-50}
+                    mt={-10}
+                    bg="white"
+                    rounded="circle"
+                    onPress={() => {
+                      Alert.alert('通話しますか？', undefined, [
+                        {
+                          text: 'はい',
+                          onPress: () => inviteCall(),
+                        },
+                        {
+                          text: 'いいえ',
+                          onPress: () => {},
+                        },
+                      ]);
+                    }}>
+                    <Icon
+                      name="phone"
+                      fontFamily="Entypo"
+                      fontSize={24}
+                      color="blue700"
+                    />
+                  </Button>
+                ) : null} */}
+              {/* </Div> */}
             </Div>
             <Div h={bottomContentsHeight() ? bottomContentsHeight() : 700}>
               <TopTab.Navigator
@@ -457,25 +500,33 @@ const AccountDetail: React.FC = () => {
           </>
         )}
       </ScrollDiv>
-      {profile && profile.id !== user?.id && (
-        <Button
-          bg="purple600"
-          position="absolute"
-          right={10}
-          bottom={10}
-          h={60}
-          w={60}
-          zIndex={20}
-          rounded="circle"
-          onPress={() => createGroup({name: '', members: [profile]})}>
-          <Icon
-            fontSize={'6xl'}
-            color="white"
-            name="chatbubble-ellipses-outline"
-            fontFamily="Ionicons"
-          />
-        </Button>
-      )}
+      {profile &&
+        profile.id !== user?.id &&
+        profile.role !== UserRole.EXTERNAL_INSTRUCTOR && (
+          <Button
+            bg="purple600"
+            position="absolute"
+            right={10}
+            bottom={10}
+            h={60}
+            w={60}
+            zIndex={20}
+            rounded="circle"
+            onPress={() =>
+              createGroup({
+                name: '',
+                members: [profile],
+                roomType: RoomType.PERSONAL,
+              })
+            }>
+            <Icon
+              fontSize={'6xl'}
+              color="white"
+              name="chatbubble-ellipses-outline"
+              fontFamily="Ionicons"
+            />
+          </Button>
+        )}
     </WholeContainer>
   );
 };

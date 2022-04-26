@@ -1,6 +1,7 @@
 import React from 'react';
 import {Div, Image, Text} from 'react-native-magnus';
 import {ChatMessage, ChatMessageType} from '../../../../types';
+import {reactionStickers} from '../../../../utils/factory/reactionStickers';
 import {userNameFactory} from '../../../../utils/factory/userNameFactory';
 import {mentionTransform} from '../../../../utils/messageTransform';
 import UserAvatar from '../../../common/UserAvatar';
@@ -18,6 +19,8 @@ const ReplyParent: React.FC<ReplyParentProps> = ({parentMessage}) => {
         return '写真';
       case ChatMessageType.VIDEO:
         return '動画';
+      case ChatMessageType.STICKER:
+        return 'スタンプ';
       case ChatMessageType.OTHER_FILE:
         return 'ファイル';
     }
@@ -59,6 +62,15 @@ const ReplyParent: React.FC<ReplyParentProps> = ({parentMessage}) => {
             parentMessage.thumbnail
               ? {uri: parentMessage.thumbnail}
               : require('../../../../../assets/no-image.jpg')
+          }
+        />
+      ) : parentMessage.type === ChatMessageType.STICKER ? (
+        <Image
+          w={40}
+          h={40}
+          resizeMode="contain"
+          source={
+            reactionStickers.find(s => s.name === parentMessage.content)?.src
           }
         />
       ) : null}

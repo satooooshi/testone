@@ -7,6 +7,7 @@ import RNBootSplash from 'react-native-bootsplash';
 import PushNotificationIOS from '@react-native-community/push-notification-ios';
 import {Alert, Linking, Platform} from 'react-native';
 import VersionCheck from 'react-native-version-check';
+import {InviteCallProvider} from './contexts/call/useInviteCall';
 import {IsTabBarVisibleProvider} from './contexts/bottomTab/useIsTabBarVisible';
 
 const App = () => {
@@ -54,7 +55,9 @@ const App = () => {
     <QueryClientProvider client={queryClient}>
       <AuthenticateProvider>
         <IsTabBarVisibleProvider>
-          <Navigator />
+          <InviteCallProvider>
+            <Navigator />
+          </InviteCallProvider>
         </IsTabBarVisibleProvider>
       </AuthenticateProvider>
     </QueryClientProvider>

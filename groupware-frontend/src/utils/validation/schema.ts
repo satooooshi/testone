@@ -63,7 +63,7 @@ export const registerSchema = Yup.object().shape({
   password: Yup.string()
     .matches(/^([^ ]*)$/, blankMixedMessage)
     .min(8, minEightTextMessage)
-    .required(`パスワードは${requireMessage}`),
+    .required(`パスワードは${minEightTextMessage}`),
   introduceOther: Yup.string().max(
     1000,
     `自己紹介は${nWordLimitMessage(1000)}`,

@@ -160,6 +160,12 @@ export class EventScheduleController {
     return await this.eventService.saveSubmission(submissionFiles);
   }
 
+  @Post('delete-submission')
+  @UseGuards(JwtAuthenticationGuard)
+  async deleteSubmission(@Body() body: { submissionId: number }) {
+    await this.eventService.deleteSubmission(body.submissionId);
+  }
+
   //get 10 latest event randomly
   @Get('latest')
   @UseGuards(JwtAuthenticationGuard)

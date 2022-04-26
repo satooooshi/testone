@@ -30,6 +30,15 @@ export class EventFile {
   })
   url: string;
 
+  @Column({
+    name: 'name',
+    type: 'varchar',
+    length: 2083,
+    default: '',
+    nullable: false,
+  })
+  name: string;
+
   @ManyToOne(() => EventSchedule, (eventSchedule) => eventSchedule.files, {
     onUpdate: 'CASCADE',
     onDelete: 'CASCADE',

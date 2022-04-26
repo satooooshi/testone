@@ -192,9 +192,6 @@ const EditChatGroupMembersModal: React.FC<EditChatGroupMambersModalProps> = ({
                   defaultValue={selectedUserRole}>
                   <option value={'All'}>全て</option>
                   <option value={UserRole.ADMIN}>管理者</option>
-                  <option value={UserRole.EXTERNAL_INSTRUCTOR}>
-                    {userRoleNameFactory(UserRole.EXTERNAL_INSTRUCTOR)}
-                  </option>
                   <option value={UserRole.INTERNAL_INSTRUCTOR}>
                     {userRoleNameFactory(UserRole.INTERNAL_INSTRUCTOR)}
                   </option>

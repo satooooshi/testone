@@ -153,7 +153,7 @@ const EditNote: React.FC<EditNoteProps> = ({
                   className={`react-viewer-icon react-viewer-icon-download`}></i>
               ),
               onClick: ({ src }) => {
-                saveAs(src, fileNameTransformer(src));
+                if (selectedImage?.name) saveAs(src, selectedImage.name);
               },
             },
           ]);
@@ -239,7 +239,10 @@ const EditNote: React.FC<EditNoteProps> = ({
                         uploadImage(fileArr, {
                           onSuccess: (imageURLs) => {
                             const images: Partial<ChatNoteImage>[] =
-                              imageURLs.map((i) => ({ imageURL: i }));
+                              imageURLs.map((image, i) => ({
+                                imageURL: image,
+                                name: fileArr[i].name,
+                              }));
                             setValues((v) => ({
                               ...v,
                               images: v.images?.length

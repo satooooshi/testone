@@ -17,6 +17,7 @@ import {
   Button,
   Dropdown,
   Input,
+  Image,
 } from 'react-native-magnus';
 import WholeContainer from '../../components/WholeContainer';
 import {useAPIGetMessages} from '../../hooks/api/chat/useAPIGetMessages';
@@ -77,7 +78,10 @@ import io from 'socket.io-client';
 import {baseURL} from '../../utils/url';
 import {getThumbnailOfVideo} from '../../utils/getThumbnailOfVideo';
 import {useAuthenticate} from '../../contexts/useAuthenticate';
+// import {useInviteCall} from '../../contexts/call/useInviteCall';
 import {useIsTabBarVisible} from '../../contexts/bottomTab/useIsTabBarVisible';
+import {reactionStickers} from '../../utils/factory/reactionStickers';
+import {ScrollView} from 'react-native-gesture-handler';
 
 const socket = io(baseURL, {
   transports: ['websocket'],
@@ -86,7 +90,7 @@ const socket = io(baseURL, {
 const TopTab = createMaterialTopTabNavigator();
 
 const Chat: React.FC = () => {
-  const {user: myself} = useAuthenticate();
+  const {user: myself, setCurrentChatRoomId} = useAuthenticate();
   const typeDropdownRef = useRef<any | null>(null);
   const messageIosRef = useRef<FlatList | null>(null);
   const messageAndroidRef = useRef<{flatListRef: Element | null}>({
@@ -95,6 +99,7 @@ const Chat: React.FC = () => {
   const navigation = useNavigation<ChatNavigationProps>();
   const route = useRoute<ChatRouteProps>();
   const {room} = route.params;
+  // const {sendCallInvitation} = useInviteCall();
   const isFocused = useIsFocused();
   const {setIsTabBarVisible} = useIsTabBarVisible();
   const {data: roomDetail, refetch: refetchRoomDetail} = useAPIGetRoomDetail(
@@ -126,6 +131,7 @@ const Chat: React.FC = () => {
   });
   const [longPressedMsg, setLongPressedMgg] = useState<ChatMessage>();
   const [reactionTarget, setReactionTarget] = useState<ChatMessage>();
+  const [visibleStickerSelctor, setVisibleStickerSelector] = useState(false);
   const {mutate: saveReaction} = useAPISaveReaction();
   const {width: windowWidth, height: windowHeight} = useWindowDimensions();
   const {mutate: deleteReaction} = useAPIDeleteReaction();
@@ -172,12 +178,16 @@ const Chat: React.FC = () => {
     if (!room.members) {
       return [];
     }
-    return room.members
-      ?.filter(member => member.id !== myself?.id)
-      .map(m => ({
-        id: m.id.toString(),
-        name: userNameFactory(m) + 'さん',
-      }));
+    const users =
+      room?.members
+        ?.filter(u => u.id !== myself?.id)
+        .map(u => ({
+          id: `${u.id}`,
+          name: userNameFactory(u) + 'さん',
+        })) || [];
+    const allTag = {id: '0', name: 'all'};
+    users.unshift(allTag);
+    return users;
   };
   const {refetch: refetchLatest} = useAPIGetMessages(
     {
@@ -304,6 +314,7 @@ const Chat: React.FC = () => {
         onSuccess: imageURL => {
           sendChatMessage({
             content: imageURL[0],
+            fileName: imageURL[0] + '.png',
             type: ChatMessageType.IMAGE,
             chatGroup: room,
           });
@@ -322,6 +333,7 @@ const Chat: React.FC = () => {
         onSuccess: imageURL => {
           sendChatMessage({
             content: imageURL[0],
+            fileName: imageURL[0] + '.mp4',
             type: ChatMessageType.VIDEO,
             chatGroup: room,
           });
@@ -355,6 +367,7 @@ const Chat: React.FC = () => {
         onSuccess: imageURL => {
           sendChatMessage({
             content: imageURL[0],
+            fileName: res.name,
             type: ChatMessageType.OTHER_FILE,
             chatGroup: room,
           });
@@ -366,6 +379,15 @@ const Chat: React.FC = () => {
         },
       });
     }
+  };
+
+  const handleStickerSelected = (sticker: string) => {
+    sendChatMessage({
+      content: sticker,
+      type: ChatMessageType.STICKER,
+      chatGroup: room,
+    });
+    setVisibleStickerSelector(false);
   };
 
   const playVideoOnModal = (url: string) => {
@@ -549,6 +571,7 @@ const Chat: React.FC = () => {
   }, [isFocused, setIsTabBarVisible]);
 
   useEffect(() => {
+    let isMounted = true;
     socket.emit('joinRoom', room.id.toString());
     socket.on('msgToClient', async (sentMsgByOtherUsers: ChatMessage) => {
       if (sentMsgByOtherUsers.content) {
@@ -563,22 +586,25 @@ const Chat: React.FC = () => {
             sentMsgByOtherUsers.content,
           );
         }
-        setMessages(msgs => {
-          if (
-            msgs.length &&
-            msgs[0].id !== sentMsgByOtherUsers.id &&
-            sentMsgByOtherUsers.chatGroup?.id === room.id
-          ) {
-            return refreshMessage([sentMsgByOtherUsers, ...msgs]);
-          } else if (sentMsgByOtherUsers.chatGroup?.id !== room.id) {
-            return refreshMessage(
-              msgs.filter(m => m.id !== sentMsgByOtherUsers.id),
-            );
-          }
-          return refreshMessage(msgs);
-        });
+        if (isMounted) {
+          setMessages(msgs => {
+            if (
+              msgs.length &&
+              msgs[0].id !== sentMsgByOtherUsers.id &&
+              sentMsgByOtherUsers.chatGroup?.id === room.id
+            ) {
+              return refreshMessage([sentMsgByOtherUsers, ...msgs]);
+            } else if (sentMsgByOtherUsers.chatGroup?.id !== room.id) {
+              return refreshMessage(
+                msgs.filter(m => m.id !== sentMsgByOtherUsers.id),
+              );
+            }
+            return refreshMessage(msgs);
+          });
+        }
       }
     });
+    setCurrentChatRoomId(room.id);
 
     socket.on('joinedRoom', (r: any) => {
       console.log('joinedRoom', r);
@@ -589,6 +615,8 @@ const Chat: React.FC = () => {
     });
     return () => {
       socket.emit('leaveRoom', room.id);
+      isMounted = false;
+      setCurrentChatRoomId(undefined);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [room.id]);
@@ -689,6 +717,32 @@ const Chat: React.FC = () => {
       ))}
     </Div>
   );
+  const stickerSelector = (
+    <Div
+      bg="white"
+      flexDir="row"
+      flexWrap="wrap"
+      alignSelf="center"
+      w={'100%'}
+      py={32}
+      justifyContent="space-around"
+      px={'sm'}>
+      <TouchableOpacity
+        style={tailwind('absolute right-0 top-0')}
+        onPress={() => setVisibleStickerSelector(false)}>
+        <Icon name="close" fontSize={24} />
+      </TouchableOpacity>
+      <ScrollView horizontal={true}>
+        {reactionStickers.map(e => (
+          <TouchableOpacity
+            key={e.name}
+            onPress={() => handleStickerSelected(e.name)}>
+            <Image source={e.src} style={{height: 80, width: 80, margin: 10}} />
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
+    </Div>
+  );
 
   const messageListAvoidngKeyboardDisturb = (
     <>
@@ -713,6 +767,8 @@ const Chat: React.FC = () => {
           />
           {reactionTarget ? (
             reactionSelector
+          ) : visibleStickerSelctor ? (
+            stickerSelector
           ) : (
             <>
               {values.replyParentMessage && (
@@ -727,6 +783,7 @@ const Chat: React.FC = () => {
                 onUploadFile={handleUploadFile}
                 onUploadVideo={handleUploadVideo}
                 onUploadImage={handleUploadImage}
+                setVisibleStickerSelector={setVisibleStickerSelector}
                 text={values.content || ''}
                 onChangeText={t =>
                   setValues(v => ({
@@ -769,6 +826,8 @@ const Chat: React.FC = () => {
           />
           {reactionTarget ? (
             reactionSelector
+          ) : visibleStickerSelctor ? (
+            stickerSelector
           ) : (
             <>
               {values.replyParentMessage && (
@@ -783,6 +842,7 @@ const Chat: React.FC = () => {
                 onUploadFile={handleUploadFile}
                 onUploadVideo={handleUploadVideo}
                 onUploadImage={handleUploadImage}
+                setVisibleStickerSelector={setVisibleStickerSelector}
                 text={values.content || ''}
                 onChangeText={t =>
                   setValues(v => ({
@@ -835,6 +895,17 @@ const Chat: React.FC = () => {
       </>
     </View>
   );
+
+  // const inviteCall = async () => {
+  //   if (roomDetail?.members?.length === 2 && myself) {
+  //     const callee =
+  //       roomDetail.members[0].id === myself.id
+  //         ? roomDetail.members[1]
+  //         : roomDetail.members[0];
+  //     //第一引数に通話を書ける人のユーザーオブジェクト、第二引数に通話をかけられるひとのユーザーオブジェクト
+  //     await sendCallInvitation(myself, callee);
+  //   }
+  // };
 
   return (
     <WholeContainer>
@@ -949,10 +1020,36 @@ const Chat: React.FC = () => {
         )}
       />
       <HeaderTemplate
-        title={roomDetail ? nameOfRoom(roomDetail) : nameOfRoom(room)}
+        title={roomDetail ? nameOfRoom(roomDetail, myself) : nameOfRoom(room)}
         enableBackButton={true}
         screenForBack={'RoomList'}>
         <Div style={tailwind('flex flex-row')}>
+          {/* {roomDetail?.members && roomDetail.members.length < 3 ? (
+            <Div style={tailwind('flex flex-row')}>
+              <Button
+                bg="transparent"
+                pb={-3}
+                onPress={() => {
+                  Alert.alert('通話しますか？', undefined, [
+                    {
+                      text: 'はい',
+                      onPress: () => inviteCall(),
+                    },
+                    {
+                      text: 'いいえ',
+                      onPress: () => {},
+                    },
+                  ]);
+                }}>
+                <Icon
+                  name="phone"
+                  fontFamily="Entypo"
+                  fontSize={20}
+                  color="blue700"
+                />
+              </Button>
+            </Div>
+          ) : null} */}
           <TouchableOpacity
             style={tailwind('flex flex-row')}
             onPress={() => setVisibleSearchInput(true)}>
@@ -963,6 +1060,7 @@ const Chat: React.FC = () => {
               color={darkFontColor}
             />
           </TouchableOpacity>
+
           <TouchableOpacity
             style={tailwind('flex flex-row')}
             onPress={() =>
@@ -980,6 +1078,7 @@ const Chat: React.FC = () => {
           </TouchableOpacity>
         </Div>
       </HeaderTemplate>
+
       {visibleSearchInput && (
         <Div>
           <Div style={tailwind('flex flex-row')}>

@@ -6,7 +6,8 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { orderBy } from 'lodash';
-import { ChatGroup } from 'src/entities/chatGroup.entity';
+import PushNotifications from 'node-pushnotifications';
+import { ChatGroup, RoomType } from 'src/entities/chatGroup.entity';
 import { ChatMessage, ChatMessageType } from 'src/entities/chatMessage.entity';
 import { ChatMessageReaction } from 'src/entities/chatMessageReaction.entity';
 import { LastReadChatTime } from 'src/entities/lastReadChatTime.entity';
@@ -36,6 +37,11 @@ export class ChatService {
     private readonly chatMessageReactionRepository: Repository<ChatMessageReaction>,
     private readonly storageService: StorageService,
   ) {}
+
+  public async calleeForPhoneCall(calleeId: string) {
+    const user = await this.userRepository.findOne(calleeId);
+    return user;
+  }
 
   public async getChatGroup(userID: number): Promise<ChatGroup[]> {
     const groups = await this.chatGroupRepository
@@ -98,6 +104,7 @@ export class ChatService {
         'm',
         'm.id = ( SELECT id FROM chat_messages WHERE chat_group_id = chat_groups.id AND type <> "system_text" ORDER BY updated_at DESC LIMIT 1 )',
       )
+      .leftJoinAndSelect('m.sender', 'sender')
       .leftJoinAndSelect('lastReadChatTime.user', 'lastReadChatTime.user')
       .where('member.id = :memberId', { memberId: userID })
       .skip(offset)
@@ -109,6 +116,13 @@ export class ChatService {
       const hasBeenRead = g?.lastReadChatTime?.[0]?.readTime
         ? g?.lastReadChatTime?.[0]?.readTime > g.updatedAt
         : false;
+
+      if (g.roomType === RoomType.PERSONAL) {
+        const chatPartner = g.members.filter((m) => m.id !== userID)[0];
+        g.imageURL = chatPartner.avatarUrl;
+        g.name = `${chatPartner.lastName} ${chatPartner.firstName}`;
+      }
+
       return {
         ...g,
         pinnedUsers: undefined,
@@ -263,6 +277,7 @@ export class ChatService {
     const savedMessage = await this.chatMessageRepository.save(
       this.chatMessageRepository.create(message),
     );
+
     existGroup.updatedAt = new Date();
     await this.chatGroupRepository.save({
       ...existGroup,

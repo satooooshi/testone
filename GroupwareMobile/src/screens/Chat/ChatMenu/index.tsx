@@ -8,6 +8,7 @@ import WholeContainer from '../../../components/WholeContainer';
 import {useAuthenticate} from '../../../contexts/useAuthenticate';
 import {useAPIDeleteChatRoom} from '../../../hooks/api/chat/useAPIDeleteChatRoom';
 import {useAPILeaveChatRoom} from '../../../hooks/api/chat/useAPILeaveChatRoomURL';
+import {RoomType} from '../../../types';
 import {
   ChatMenuNavigationProps,
   ChatMenuRouteProps,
@@ -43,19 +44,23 @@ const ChatMenu: React.FC = () => {
     },
   });
 
+  const isPersonal = room.roomType === RoomType.PERSONAL;
+
   return (
     <WholeContainer>
       <HeaderWithTextButton enableBackButton={true} title="メニュー" />
-      <ChatMenuRow
-        name="ルームを編集"
-        icon={<Icon name="setting" fontSize={20} mr={'lg'} color="black" />}
-        onPress={() =>
-          navigation.navigate('ChatStack', {
-            screen: 'EditRoom',
-            params: {room},
-          })
-        }
-      />
+      {!isPersonal && (
+        <ChatMenuRow
+          name="ルームを編集"
+          icon={<Icon name="setting" fontSize={20} mr={'lg'} color="black" />}
+          onPress={() =>
+            navigation.navigate('ChatStack', {
+              screen: 'EditRoom',
+              params: {room},
+            })
+          }
+        />
+      )}
       <ChatMenuRow
         name="ノート"
         icon={<Icon name="filetext1" fontSize={20} mr={'lg'} color="black" />}
@@ -84,33 +89,35 @@ const ChatMenu: React.FC = () => {
           })
         }
       />
-      <ChatMenuRow
-        name="退室"
-        icon={
-          <Icon
-            name="ios-arrow-undo-outline"
-            fontSize={20}
-            fontFamily="Ionicons"
-            mr={'lg'}
-            color="black"
-          />
-        }
-        onPress={() =>
-          Alert.alert('退室してよろしいですか？', undefined, [
-            {
-              text: 'キャンセル',
-              style: 'cancel',
-            },
-            {
-              text: '退室する',
-              style: 'destructive',
-              onPress: () => {
-                leaveChatGroup(room);
+      {!isPersonal && (
+        <ChatMenuRow
+          name="退室"
+          icon={
+            <Icon
+              name="ios-arrow-undo-outline"
+              fontSize={20}
+              fontFamily="Ionicons"
+              mr={'lg'}
+              color="black"
+            />
+          }
+          onPress={() =>
+            Alert.alert('退室してよろしいですか？', undefined, [
+              {
+                text: 'キャンセル',
+                style: 'cancel',
               },
-            },
-          ])
-        }
-      />
+              {
+                text: '退室する',
+                style: 'destructive',
+                onPress: () => {
+                  leaveChatGroup(room);
+                },
+              },
+            ])
+          }
+        />
+      )}
       {myProfile?.id &&
       room?.owner?.filter(u => {
         return u.id === myProfile?.id;
