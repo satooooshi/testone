@@ -679,7 +679,10 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
               }
               transition>
               <MenuItem value={'editGroup'}>ルームの情報を編集</MenuItem>
-              <MenuItem value={'editMembers'}>メンバーを編集</MenuItem>
+              <MenuItem value={'editMembers'}>
+                メンバーを
+                {room?.owner[0].id === user?.id ? '編集' : '追加'}
+              </MenuItem>
               {room.owner.length === 0 ||
               (user?.id &&
                 room.owner.filter((u) => {

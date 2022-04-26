@@ -86,6 +86,7 @@ const EditChatGroupMembersModal: React.FC<EditChatGroupMambersModalProps> = ({
   const {
     toggleUser,
     isSelected,
+    selectOwner,
     selectedUsers: selectedUsersInModal,
     setSelectedUsers,
     clear,
@@ -106,6 +107,17 @@ const EditChatGroupMembersModal: React.FC<EditChatGroupMambersModalProps> = ({
     'All',
     modalUsers,
   );
+
+  const handleToggleUser = (selectedUser: User) => {
+    if (category === 'オーナー') {
+      return selectOwner(selectedUser);
+    }
+    const isMember = room?.members?.filter((u) => u.id === selectedUser.id);
+    if (room?.owner[0].id !== myProfile?.id && isMember?.length) {
+      return;
+    }
+    return toggleUser(selectedUser);
+  };
 
   useEffect(() => {
     const userList = category === 'メンバー' ? users : room?.members;
@@ -152,7 +164,10 @@ const EditChatGroupMembersModal: React.FC<EditChatGroupMambersModalProps> = ({
           justifyContent="space-between"
           display="flex"
           mr="24px">
-          <Text>{`${category}を編集`}</Text>
+          <Text>
+            {category +
+              (room?.owner[0].id === myProfile?.id ? 'を編集' : 'を追加')}
+          </Text>
           {selectedUsersInModal.length !== 0 && (
             <Button
               size="sm"
@@ -210,7 +225,7 @@ const EditChatGroupMembersModal: React.FC<EditChatGroupMambersModalProps> = ({
                     <UserRenderer
                       user={u}
                       key={u.id}
-                      onClick={toggleUser}
+                      onClick={handleToggleUser}
                       isSelected={isSelected(u)}
                     />
                   ))
@@ -226,11 +241,15 @@ const EditChatGroupMembersModal: React.FC<EditChatGroupMambersModalProps> = ({
                 <Box mr={'4px'} mb={'4px'} key={u.id}>
                   <ButtonGroup isAttached size="xs" colorScheme="purple">
                     <Button mr="-px">{userNameFactory(u)}</Button>
-                    <IconButton
-                      onClick={() => toggleUser(u as User)}
-                      aria-label="削除"
-                      icon={<MdCancel size={18} />}
-                    />
+                    {(room?.owner[0].id === myProfile?.id ||
+                      room?.members?.filter((m) => m.id === u.id).length ===
+                        0) && (
+                      <IconButton
+                        onClick={() => toggleUser(u as User)}
+                        aria-label="削除"
+                        icon={<MdCancel size={18} />}
+                      />
+                    )}
                   </ButtonGroup>
                 </Box>
               ))}

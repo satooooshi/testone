@@ -25,6 +25,12 @@ export const useSelectedUsers = (alreadySelectedUsers?: Partial<User>[]) => {
     });
   }, []);
 
+  const selectOwner = (newSelectedUser: User) => {
+    const owner: Partial<User>[] = [];
+    owner.push(newSelectedUser);
+    setSelectedUsers(owner);
+  };
+
   const clear = useCallback(() => {
     setSelectedUsers(alreadySelectedUsers || []);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -34,6 +40,7 @@ export const useSelectedUsers = (alreadySelectedUsers?: Partial<User>[]) => {
     selectedUsers,
     setSelectedUsers,
     toggleUser,
+    selectOwner,
     isSelected,
     clear,
   };
