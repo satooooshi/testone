@@ -1024,8 +1024,19 @@ const Chat: React.FC = () => {
         enableBackButton={true}
         screenForBack={'RoomList'}>
         <Div style={tailwind('flex flex-row')}>
+          <TouchableOpacity
+            style={tailwind('flex flex-row mr-1')}
+            onPress={() => setVisibleSearchInput(true)}>
+            <Icon
+              name="search"
+              fontFamily="Feather"
+              fontSize={26}
+              color={darkFontColor}
+            />
+          </TouchableOpacity>
+
           {roomDetail?.members && roomDetail.members.length < 3 ? (
-            <Div style={tailwind('flex flex-row')}>
+            <Div mt={-4} mr={-4} style={tailwind('flex flex-row ')}>
               <Button
                 bg="transparent"
                 pb={-3}
@@ -1042,24 +1053,14 @@ const Chat: React.FC = () => {
                   ]);
                 }}>
                 <Icon
-                  name="phone"
-                  fontFamily="Entypo"
-                  fontSize={20}
-                  color="blue700"
+                  name="call-outline"
+                  fontFamily="Ionicons"
+                  fontSize={25}
+                  color="gray700"
                 />
               </Button>
             </Div>
           ) : null}
-          <TouchableOpacity
-            style={tailwind('flex flex-row')}
-            onPress={() => setVisibleSearchInput(true)}>
-            <Icon
-              name="search"
-              fontFamily="Feather"
-              fontSize={26}
-              color={darkFontColor}
-            />
-          </TouchableOpacity>
 
           <TouchableOpacity
             style={tailwind('flex flex-row')}

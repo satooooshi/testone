@@ -31,7 +31,7 @@ const CallMessage: React.FC<CallMessageProps> = ({ message }) => {
         bg={message.isSender ? 'blue.400' : 'gray.300'}
         alignItems="center"
         justifyContent="center">
-        <IoCall />
+        <IoCall color="white" />
       </Box>
       <Box ml={2} flexDir="column" display="flex" alignItems="center">
         <Text

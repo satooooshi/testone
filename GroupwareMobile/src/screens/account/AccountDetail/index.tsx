@@ -331,8 +331,8 @@ const AccountDetail: React.FC = () => {
                       ]);
                     }}>
                     <Icon
-                      name="phone"
-                      fontFamily="Entypo"
+                      name="call"
+                      fontFamily="Ionicons"
                       fontSize={24}
                       color="blue700"
                     />
