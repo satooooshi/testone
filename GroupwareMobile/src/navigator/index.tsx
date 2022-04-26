@@ -143,14 +143,13 @@ const Navigator = () => {
       setCallTimeout(false);
       disableCallAcceptedFlag();
       setLocalInvitationState(undefined);
-      // reject();
-      if (remoteInvitation.current) {
+      if (remoteInvitation.current && callKeepUUID) {
+        reject();
         // remote invitation(送られてきた通話招待)があればrefuseする
         await rtmEngine?.refuseRemoteInvitationV2({
           ...remoteInvitation.current,
           hash: 0,
         });
-        remoteInvitation.current = undefined;
       }
       // initしないとエラーがでることがある
       await rtcInit();
