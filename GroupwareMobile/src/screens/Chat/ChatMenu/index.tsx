@@ -1,13 +1,15 @@
 import {useNavigation, useRoute} from '@react-navigation/native';
-import React from 'react';
+import React, {useState} from 'react';
 import {Alert} from 'react-native';
 import {Icon} from 'react-native-magnus';
 import ChatMenuRow from '../../../components/chat/ChatMenuRow';
+import UserModal from '../../../components/common/UserModal';
 import HeaderWithTextButton from '../../../components/Header';
 import WholeContainer from '../../../components/WholeContainer';
 import {useAuthenticate} from '../../../contexts/useAuthenticate';
 import {useAPIDeleteChatRoom} from '../../../hooks/api/chat/useAPIDeleteChatRoom';
 import {useAPILeaveChatRoom} from '../../../hooks/api/chat/useAPILeaveChatRoomURL';
+import AddUsersForm from '../../../templates/chat/room/AddUsersForm';
 import {RoomType} from '../../../types';
 import {
   ChatMenuNavigationProps,
@@ -19,6 +21,7 @@ const ChatMenu: React.FC = () => {
   const route = useRoute<ChatMenuRouteProps>();
   const navigation = useNavigation<ChatMenuNavigationProps>();
   const {room} = route.params;
+  const [visibleUserModal, setVisibleUserModal] = useState(false);
   const {mutate: leaveChatGroup} = useAPILeaveChatRoom({
     onSuccess: () => {
       navigation.navigate('ChatStack', {
@@ -48,19 +51,31 @@ const ChatMenu: React.FC = () => {
 
   return (
     <WholeContainer>
+      <AddUsersForm
+        visibleUserModal={visibleUserModal}
+        closeUserModal={() => setVisibleUserModal(false)}
+        room={room}
+      />
       <HeaderWithTextButton enableBackButton={true} title="メニュー" />
-      {!isPersonal && (
-        <ChatMenuRow
-          name="ルームを編集"
-          icon={<Icon name="setting" fontSize={20} mr={'lg'} color="black" />}
-          onPress={() =>
-            navigation.navigate('ChatStack', {
-              screen: 'EditRoom',
-              params: {room},
-            })
-          }
-        />
-      )}
+      {!isPersonal &&
+        (myProfile?.id && room?.owner[0]?.id === myProfile?.id ? (
+          <ChatMenuRow
+            name="ルームを編集"
+            icon={<Icon name="setting" fontSize={20} mr={'lg'} color="black" />}
+            onPress={() =>
+              navigation.navigate('ChatStack', {
+                screen: 'EditRoom',
+                params: {room},
+              })
+            }
+          />
+        ) : (
+          <ChatMenuRow
+            name="メンバーを追加"
+            icon={<Icon name="setting" fontSize={20} mr={'lg'} color="black" />}
+            onPress={() => setVisibleUserModal(true)}
+          />
+        ))}
       <ChatMenuRow
         name="ノート"
         icon={<Icon name="filetext1" fontSize={20} mr={'lg'} color="black" />}
@@ -118,10 +133,7 @@ const ChatMenu: React.FC = () => {
           }
         />
       )}
-      {myProfile?.id &&
-      room?.owner?.filter(u => {
-        return u.id === myProfile?.id;
-      }).length ? (
+      {!isPersonal && myProfile?.id && room?.owner[0]?.id === myProfile?.id ? (
         <ChatMenuRow
           name="解散"
           icon={<Icon name="delete" fontSize={20} mr={'lg'} color="black" />}

@@ -21,6 +21,11 @@ export const useSelectedUsers = (alreadySelectedUsers?: Partial<User>[]) => {
       return [...users, newSelectedUser];
     });
   };
+  const selectOwner = (newSelectedUser: User) => {
+    const owner: Partial<User>[] = [];
+    owner.push(newSelectedUser);
+    setSelectedUsers(owner);
+  };
 
   const clear = () => {
     setSelectedUsers(alreadySelectedUsers || []);
@@ -30,6 +35,7 @@ export const useSelectedUsers = (alreadySelectedUsers?: Partial<User>[]) => {
     selectedUsers,
     setSelectedUsers,
     toggleUser,
+    selectOwner,
     isSelected,
     clear,
   };

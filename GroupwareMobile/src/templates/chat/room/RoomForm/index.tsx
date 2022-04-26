@@ -11,6 +11,7 @@ import {
   Text,
   Tag as TagButton,
 } from 'react-native-magnus';
+import RoomMemberModal from '../../../../components/chat/RoomMemberModal';
 import UserModal from '../../../../components/common/UserModal';
 import HeaderWithTextButton from '../../../../components/Header';
 import WholeContainer from '../../../../components/WholeContainer';
@@ -79,7 +80,8 @@ const RoomForm: React.FC<RoomFormProps> = ({
 
   return (
     <WholeContainer>
-      <UserModal
+      <RoomMemberModal
+        isChatGroupOwner={true}
         isVisible={visibleUserModal}
         users={filteredUsers?.filter(u => u.id !== myProfile?.id) || []}
         onCloseModal={() => setVisibleUserModal(false)}
@@ -89,7 +91,9 @@ const RoomForm: React.FC<RoomFormProps> = ({
           setValues(v => ({...v, members: selectedUsers}))
         }
       />
-      <UserModal
+      <RoomMemberModal
+        isChatGroupOwner={true}
+        isOwnerEdit={true}
         isVisible={visibleOwnerModal}
         users={
           filteredUsers?.filter(u => {
@@ -180,36 +184,23 @@ const RoomForm: React.FC<RoomFormProps> = ({
             </TagButton>
           ))}
         </Div>
-        {values?.owner?.length === 0 ||
-        (myProfile?.id &&
-          values?.owner?.filter(u => {
-            return u.id === myProfile?.id;
-          }).length) ? (
-          <>
-            <Div mb="lg">
-              <Button
-                w={'100%'}
-                mb="lg"
-                onPress={() => setVisibleOwnerModal(true)}
-                bg="pink600"
-                fontWeight="bold">
-                オーナーを編集
-              </Button>
-            </Div>
-            <Div flexDir="row" flexWrap="wrap" mb={'lg'}>
-              {values.owner?.map(u => (
-                <TagButton
-                  key={u.id}
-                  mr={4}
-                  mb={8}
-                  color="white"
-                  bg={'purple800'}>
-                  {userNameFactory(u)}
-                </TagButton>
-              ))}
-            </Div>
-          </>
-        ) : null}
+        <Div mb="lg">
+          <Button
+            w={'100%'}
+            mb="lg"
+            onPress={() => setVisibleOwnerModal(true)}
+            bg="pink600"
+            fontWeight="bold">
+            オーナーを編集
+          </Button>
+        </Div>
+        <Div flexDir="row" flexWrap="wrap" mb={'lg'}>
+          {values.owner?.map(u => (
+            <TagButton key={u.id} mr={4} mb={8} color="white" bg={'purple800'}>
+              {userNameFactory(u)}
+            </TagButton>
+          ))}
+        </Div>
       </ScrollDiv>
     </WholeContainer>
   );

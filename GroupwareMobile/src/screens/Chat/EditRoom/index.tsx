@@ -28,14 +28,14 @@ const EditRoom: React.FC = () => {
   const {data: users} = useAPIGetUsers('ALL');
   const headerTitle = 'ルーム編集';
   const {mutate: updateGroup} = useAPIUpdateChatGroup({
-    onSuccess: () => {
+    onSuccess: updatedRoom => {
       Alert.alert('ルームの更新が完了しました。', undefined, [
         {
           text: 'OK',
           onPress: () => {
             navigation.navigate('ChatStack', {
               screen: 'ChatMenu',
-              params: {room: room},
+              params: {room: updatedRoom},
             });
           },
         },
