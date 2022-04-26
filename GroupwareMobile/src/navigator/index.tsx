@@ -452,12 +452,12 @@ const Navigator = () => {
 
   useEffect(() => {
     rtcInit();
-    // callKeepInit();
+    callKeepInit();
     rtmInit();
     return () => {
       // アンマウント時に全てのリスナーを消す
-      // RNCallKeep.removeEventListener('answerCall');
-      // RNCallKeep.removeEventListener('endCall');
+      RNCallKeep.removeEventListener('answerCall');
+      RNCallKeep.removeEventListener('endCall');
       rtcEngine.removeAllListeners();
       rtmEngine.removeAllListeners();
     };
