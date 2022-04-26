@@ -231,9 +231,6 @@ const Navigator = () => {
 
   messaging().setBackgroundMessageHandler(async remoteMessage => {
     console.log('BackgroundMessage received!!', remoteMessage);
-    if (Platform.OS === 'android') {
-      sendLocalNotification(remoteMessage);
-    }
   });
 
   useEffect(
