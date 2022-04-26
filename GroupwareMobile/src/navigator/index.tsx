@@ -226,10 +226,12 @@ const Navigator = () => {
     },
   };
 
-  // messaging().setBackgroundMessageHandler(async remoteMessage => {
-  //   console.log('BackgroundMessage received!!', remoteMessage);
-  //   sendLocalNotification(remoteMessage);
-  // });
+  messaging().setBackgroundMessageHandler(async remoteMessage => {
+    console.log('BackgroundMessage received!!', remoteMessage);
+    if (Platform.OS === 'android') {
+      sendLocalNotification(remoteMessage);
+    }
+  });
 
   useEffect(
     () => {
@@ -601,6 +603,12 @@ const Navigator = () => {
       onNotification: notification => {
         console.log('PushNotification onNotification========', notification);
         if (Platform.OS === 'android') {
+          if (
+            notification?.data?.screen &&
+            notification.data?.id === `${currentChatRoomId}`
+          ) {
+            return;
+          }
           sendLocalNotification(notification);
         } else if (notification.userInteraction) {
           naviateByNotif(notification);
