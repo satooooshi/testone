@@ -9,7 +9,7 @@
 ### アプリリリースの手順
 - **リリースは必ずmobile-mainブランチに移動**
 - **以下の手順は必ずやること**
-- GroupWareMobileの.envのAGORA_APP_IDを.env.exampleに記述されているものに必ず変更する。そうしないと通話が繋がらなくなるという現象が起きてしまいます。
+- GroupWareMobileの.envのAGORA_APP_IDを.env.exampleに記述されているものに必ず変更する。これをやらないと通話が繋がらなくなるという現象が起きてしまいます。
 - driveで本番用のGoogle-Service.Info.plistファイルとgoogle-services.jsonをファイルを共有している
 - XCodeのサイドバーでディレクトリ構造を見るモードにする。一番上のGroupwareMobileの下にすでにGoogleService-Info.plistがあればそれを削除する。(右クリックでDelete->Remove Reference)。ディレクトリ構造一番上のGroupwareMobileを右クリックし、"Add Files to GroupwareMobile"を選択。GoogleService-Info.plistを選択し、Copy item if neededとCreate groupsとGroupwaremobileにチェックがついていることを確認してAddボタンを押す。
 - mobile/android/app内にgoogle-service.jsonを追加(すでにある場合は上書き)
