@@ -335,6 +335,15 @@ export class ChatController {
     if (!roomDetail.members.filter((m) => m.id === user.id).length) {
       throw new BadRequestException('チャットルームを取得する権限がありません');
     }
+    // if (!roomDetail.owner.length) {
+    //   roomDetail.owner.push(roomDetail.members[0]);
+    //   const savedGroup = await this.chatService.v2UpdateChatGroup(
+    //     roomDetail,
+    //     user.id,
+    //   );
+    //   console.log('owner', savedGroup.owner);
+    //   return savedGroup;
+    // }
     return roomDetail;
   }
 

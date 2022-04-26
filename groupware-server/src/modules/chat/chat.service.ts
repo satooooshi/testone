@@ -123,6 +123,9 @@ export class ChatService {
         g.name = `${chatPartner.lastName} ${chatPartner.firstName}`;
       }
 
+      // if (!g.owner.length) {
+      //   g.owner.push(g.members[0]);
+      // }
       return {
         ...g,
         pinnedUsers: undefined,
@@ -319,7 +322,7 @@ export class ChatService {
   public async leaveChatRoom(userID: number, chatGroupID: number) {
     const containMembers: ChatGroup = await this.chatGroupRepository.findOne({
       where: { id: chatGroupID },
-      relations: ['members'],
+      relations: ['members', 'owner'],
     });
     const targetGroup = await this.chatGroupRepository.findOne(chatGroupID);
     const user = await this.userRepository.findOne(userID);
@@ -335,6 +338,23 @@ export class ChatService {
       .relation(ChatGroup, 'members')
       .of(chatGroupID)
       .remove(userID);
+    if (containMembers.owner.length) {
+      await this.chatGroupRepository
+        .createQueryBuilder()
+        .relation(ChatGroup, 'owner')
+        .of(chatGroupID)
+        .remove(userID);
+      const otherMembers = containMembers.members.filter(
+        (m) => m.id !== userID,
+      );
+      if (otherMembers.length) {
+        await this.chatGroupRepository
+          .createQueryBuilder()
+          .relation(ChatGroup, 'owner')
+          .of(chatGroupID)
+          .add(otherMembers[0].id);
+      }
+    }
     const systemMessage = new ChatMessage();
     const userName = userNameFactory(user);
     systemMessage.content = `${userName}さんが退出しました`;
