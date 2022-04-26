@@ -123,9 +123,6 @@ export class ChatService {
         g.name = `${chatPartner.lastName} ${chatPartner.firstName}`;
       }
 
-      // if (!g.owner.length) {
-      //   g.owner.push(g.members[0]);
-      // }
       return {
         ...g,
         pinnedUsers: undefined,
