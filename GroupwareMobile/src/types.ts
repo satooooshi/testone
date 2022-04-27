@@ -356,8 +356,9 @@ export interface ChatNoteImage {
 }
 
 //this is for react-native-image-viewing
-export type ImageSource = {
+export type FIleSource = {
   uri: string;
+  fileName: string;
 };
 
 export interface ChatAlbum {

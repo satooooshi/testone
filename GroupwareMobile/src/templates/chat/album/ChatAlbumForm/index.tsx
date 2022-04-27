@@ -5,7 +5,7 @@ import {
   ChatAlbum,
   ChatAlbumImage,
   ChatGroup,
-  ImageSource,
+  FIleSource,
 } from '../../../../types';
 import ImageView from 'react-native-image-viewing';
 import {UseMutateFunction} from 'react-query';
@@ -58,11 +58,11 @@ const ChatAlbumForm: React.FC<ChatAlbumFormProps> = ({
     validationSchema: albumSchema,
     onSubmit: submittedValues => onSubmit(submittedValues),
   });
-  const images: ImageSource[] =
+  const images: FIleSource[] =
     values.images?.map(i => ({uri: i.imageURL || ''})) || [];
 
   const handlePressImage = (url: string) => {
-    const isNowUri = (element: ImageSource) => element.uri === url;
+    const isNowUri = (element: FIleSource) => element.uri === url;
     setNowImageIndex(images.findIndex(isNowUri));
     setImageModal(true);
   };

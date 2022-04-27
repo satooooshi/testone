@@ -12,7 +12,7 @@ import {
   ChatGroup,
   ChatNote,
   ChatNoteImage,
-  ImageSource,
+  FIleSource,
 } from '../../../../types';
 import {uploadImageFromGallery} from '../../../../utils/cropImage/uploadImageFromGallery';
 import ImageView from 'react-native-image-viewing';
@@ -52,7 +52,7 @@ const ChatNoteForm: React.FC<ChatNoteFormProps> = ({
     validationSchema: noteSchema,
     onSubmit: submittedValues => onSubmit(submittedValues),
   });
-  const images: ImageSource[] =
+  const images: FIleSource[] =
     values.images?.map(i => ({uri: i.imageURL || ''})) || [];
 
   const removeImage = (image: Partial<ChatNoteImage>) => {
@@ -66,7 +66,7 @@ const ChatNoteForm: React.FC<ChatNoteFormProps> = ({
   };
 
   const handlePressImage = (url: string) => {
-    const isNowUri = (element: ImageSource) => element.uri === url;
+    const isNowUri = (element: FIleSource) => element.uri === url;
     setNowImageIndex(images.findIndex(isNowUri));
     setImageModal(true);
   };

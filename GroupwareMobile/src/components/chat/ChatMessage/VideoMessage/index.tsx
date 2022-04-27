@@ -19,7 +19,7 @@ const VideoMessage: React.FC<VideMessageProps> = ({
   return (
     <TouchableOpacity onPress={onPress} onLongPress={onLongPress}>
       <Image
-        source={{uri: message.thumbnail}}
+        source={{uri: message.thumbnail ? message.thumbnail : undefined}}
         w={windowWidth * 0.6}
         h={144}
         rounded={'md'}

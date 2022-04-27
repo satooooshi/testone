@@ -10,7 +10,7 @@ import tailwind from 'tailwind-rn';
 import ChatNoteCard from '../../../../components/chat/Note/ChatNoteCard';
 import HeaderWithTextButton from '../../../../components/Header';
 import WholeContainer from '../../../../components/WholeContainer';
-import {ChatNote, ChatNoteImage, ImageSource} from '../../../../types';
+import {ChatNote, ChatNoteImage, FIleSource} from '../../../../types';
 import {
   ChatNotesNavigationProps,
   ChatRouteProps,
@@ -33,7 +33,7 @@ const ChatNotes: React.FC = () => {
   >([]);
   const {mutate: deleteNote} = useAPIDeleteChatNote();
   const [imageModal, setImageModal] = useState(false);
-  const [images, setImages] = useState<ImageSource[]>([]);
+  const [images, setImages] = useState<FIleSource[]>([]);
   const [nowImageIndex, setNowImageIndex] = useState<number>(0);
 
   const onEndReached = () => {
@@ -47,7 +47,7 @@ const ChatNotes: React.FC = () => {
     ) => {
       const isNowUri = (element: Partial<ChatNoteImage>) =>
         element.imageURL === targetImage.imageURL;
-      const imageSources: ImageSource[] = noteImages.map(i => ({
+      const imageSources: FIleSource[] = noteImages.map(i => ({
         uri: i.imageURL || '',
       }));
       setImages(imageSources);

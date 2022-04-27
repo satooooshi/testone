@@ -19,7 +19,7 @@ import tailwind from 'tailwind-rn';
 import HeaderWithTextButton from '../../../../../components/Header';
 import WholeContainer from '../../../../../components/WholeContainer';
 import {useAPIGetChatAlbumImages} from '../../../../../hooks/api/chat/album/useAPIGetChatAlbumImages';
-import {ChatAlbumImage, ImageSource} from '../../../../../types';
+import {ChatAlbumImage, FIleSource} from '../../../../../types';
 import {
   ChatAlbumDetailNavigationProps,
   ChatAlbumDetailRouteProps,
@@ -67,13 +67,13 @@ const AlbumDetail: React.FC = () => {
       updateAlbum({...v, images: undefined});
     },
   });
-  const images: ImageSource[] = useMemo(() => {
+  const images: FIleSource[] = useMemo(() => {
     return imagesForInfiniteScroll?.map(i => ({uri: i.imageURL || ''})) || [];
   }, [imagesForInfiniteScroll]);
 
   const handlePressImage = useCallback(
     (url: string) => {
-      const isNowUri = (element: ImageSource) => element.uri === url;
+      const isNowUri = (element: FIleSource) => element.uri === url;
       setNowImageIndex(images.findIndex(isNowUri));
       setImageModal(true);
     },
