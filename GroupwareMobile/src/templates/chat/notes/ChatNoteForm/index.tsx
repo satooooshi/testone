@@ -78,7 +78,7 @@ const ChatNoteForm: React.FC<ChatNoteFormProps> = ({
         onSuccess: imageURLs => {
           const newImage: Partial<ChatNoteImage> = {
             imageURL: imageURLs[0],
-            name: imageURLs[0] + '.png',
+            fileName: imageURLs[0] + '.png',
           };
           setValues(v => ({
             ...v,

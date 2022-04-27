@@ -143,7 +143,8 @@ const PostAlbum: React.FC<PostAlbumProps> = ({
                   className={`react-viewer-icon react-viewer-icon-download`}></i>
               ),
               onClick: ({ src }) => {
-                if (selectedImage?.name) saveAs(src, selectedImage.name);
+                if (selectedImage?.fileName)
+                  saveAs(src, selectedImage.fileName);
               },
             },
           ]);
