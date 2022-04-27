@@ -18,6 +18,7 @@ import {uploadImageFromGallery} from '../../../../utils/cropImage/uploadImageFro
 import ImageView from 'react-native-image-viewing';
 import DownloadIcon from '../../../../components/common/DownLoadIcon';
 import {noteSchema} from '../../../../utils/validation/schema';
+import ChatShareIcon from '../../../../components/common/ChatShareIcon';
 
 type ChatNoteFormProps = {
   rightButtonNameOnHeader: string;
@@ -53,7 +54,10 @@ const ChatNoteForm: React.FC<ChatNoteFormProps> = ({
     onSubmit: submittedValues => onSubmit(submittedValues),
   });
   const images: FIleSource[] =
-    values.images?.map(i => ({uri: i.imageURL || ''})) || [];
+    values.images?.map(i => ({
+      uri: i.imageURL || '',
+      fileName: i.fileName || '',
+    })) || [];
 
   const removeImage = (image: Partial<ChatNoteImage>) => {
     if (!image.imageURL) {
@@ -78,7 +82,7 @@ const ChatNoteForm: React.FC<ChatNoteFormProps> = ({
         onSuccess: imageURLs => {
           const newImage: Partial<ChatNoteImage> = {
             imageURL: imageURLs[0],
-            name: imageURLs[0] + '.png',
+            fileName: 'image' + '.png',
           };
           setValues(v => ({
             ...v,
@@ -113,6 +117,7 @@ const ChatNoteForm: React.FC<ChatNoteFormProps> = ({
         FooterComponent={({imageIndex}) => (
           <Div position="absolute" bottom={5} right={5}>
             <DownloadIcon url={images[imageIndex].uri} />
+            <ChatShareIcon image={images[imageIndex]} />
           </Div>
         )}
       />

@@ -19,6 +19,7 @@ import ImageView from 'react-native-image-viewing';
 import {useAPIGetChatNotes} from '../../../../hooks/api/chat/note/useAPIGetNotes';
 import {useAPIDeleteChatNote} from '../../../../hooks/api/chat/note/useAPIDeleteChatNote';
 import DownloadIcon from '../../../../components/common/DownLoadIcon';
+import ChatShareIcon from '../../../../components/common/ChatShareIcon';
 
 const ChatNotes: React.FC = () => {
   const navigation = useNavigation<ChatNotesNavigationProps>();
@@ -49,6 +50,7 @@ const ChatNotes: React.FC = () => {
         element.imageURL === targetImage.imageURL;
       const imageSources: FIleSource[] = noteImages.map(i => ({
         uri: i.imageURL || '',
+        fileName: i.fileName || '',
       }));
       setImages(imageSources);
       setNowImageIndex(noteImages.findIndex(isNowUri));
@@ -95,8 +97,9 @@ const ChatNotes: React.FC = () => {
         swipeToCloseEnabled={false}
         doubleTapToZoomEnabled={true}
         FooterComponent={({imageIndex}) => (
-          <Div position="absolute" bottom={5} right={5}>
+          <Div>
             <DownloadIcon url={images[imageIndex].uri} />
+            <ChatShareIcon image={images[imageIndex]} />
           </Div>
         )}
       />

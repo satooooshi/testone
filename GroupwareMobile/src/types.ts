@@ -348,7 +348,7 @@ export interface ChatNote {
 
 export interface ChatNoteImage {
   id: number;
-  name: string;
+  fileName: string;
   imageURL: string;
   chatNote?: ChatNote;
   createdAt: Date;
@@ -374,7 +374,7 @@ export interface ChatAlbum {
 
 export interface ChatAlbumImage {
   id: number;
-  name: string;
+  fileName: string;
   imageURL: string;
   chatAlbum?: ChatAlbum;
   createdAt: Date;

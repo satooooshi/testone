@@ -21,6 +21,7 @@ const ChatShareIcon: React.FC<DownloadIconProps> = ({image, isUrlCreated}) => {
       };
     } else {
       const url = await getFileUrl(image.fileName, image.uri);
+
       if (url) {
         option = {
           url: url,
@@ -34,7 +35,8 @@ const ChatShareIcon: React.FC<DownloadIconProps> = ({image, isUrlCreated}) => {
         console.log(res);
       })
       .catch(err => {
-        Alert.alert('ファイル情報取得時にエラーが発生しました', err);
+        console.log(err);
+        // Alert.alert('ファイル情報取得時にエラーが発生しました', err);
       });
   };
 

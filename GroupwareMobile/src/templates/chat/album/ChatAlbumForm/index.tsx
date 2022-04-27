@@ -28,6 +28,7 @@ import {dateTimeFormatterFromJSDDate} from '../../../../utils/dateTimeFormatterF
 import DownloadIcon from '../../../../components/common/DownLoadIcon';
 import {ActivityIndicator} from 'react-native-paper';
 import {albumSchema} from '../../../../utils/validation/schema';
+import ChatShareIcon from '../../../../components/common/ChatShareIcon';
 
 type ChatAlbumFormProps = {
   album?: ChatAlbum;
@@ -59,7 +60,10 @@ const ChatAlbumForm: React.FC<ChatAlbumFormProps> = ({
     onSubmit: submittedValues => onSubmit(submittedValues),
   });
   const images: FIleSource[] =
-    values.images?.map(i => ({uri: i.imageURL || ''})) || [];
+    values.images?.map(i => ({
+      uri: i.imageURL || '',
+      fileName: i.fileName || '',
+    })) || [];
 
   const handlePressImage = (url: string) => {
     const isNowUri = (element: FIleSource) => element.uri === url;
@@ -83,7 +87,7 @@ const ChatAlbumForm: React.FC<ChatAlbumFormProps> = ({
         onSuccess: imageURLs => {
           const newImages: Partial<ChatAlbumImage>[] = imageURLs.map(u => ({
             imageURL: u,
-            name: u + '.png',
+            fileName: 'image' + '.png',
           }));
           setValues(v => ({
             ...v,
@@ -131,6 +135,7 @@ const ChatAlbumForm: React.FC<ChatAlbumFormProps> = ({
         FooterComponent={({imageIndex}) => (
           <Div position="absolute" bottom={5} right={5}>
             <DownloadIcon url={images[imageIndex].uri} />
+            <ChatShareIcon image={images[imageIndex]} />
           </Div>
         )}
       />

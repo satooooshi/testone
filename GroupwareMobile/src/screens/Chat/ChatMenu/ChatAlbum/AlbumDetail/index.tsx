@@ -30,6 +30,7 @@ import {useFormik} from 'formik';
 import {useAPIUpdateAlbum} from '../../../../../hooks/api/chat/album/useAPIUpdateChatAlbum';
 import DownloadIcon from '../../../../../components/common/DownLoadIcon';
 import {albumSchema} from '../../../../../utils/validation/schema';
+import ChatShareIcon from '../../../../../components/common/ChatShareIcon';
 
 const AlbumDetail: React.FC = () => {
   const {width: windowWidth} = useWindowDimensions();
@@ -68,7 +69,12 @@ const AlbumDetail: React.FC = () => {
     },
   });
   const images: FIleSource[] = useMemo(() => {
-    return imagesForInfiniteScroll?.map(i => ({uri: i.imageURL || ''})) || [];
+    return (
+      imagesForInfiniteScroll?.map(i => ({
+        uri: i.imageURL || '',
+        fileName: i.fileName,
+      })) || []
+    );
   }, [imagesForInfiniteScroll]);
 
   const handlePressImage = useCallback(
@@ -136,8 +142,9 @@ const AlbumDetail: React.FC = () => {
         swipeToCloseEnabled={false}
         doubleTapToZoomEnabled={true}
         FooterComponent={({imageIndex}) => (
-          <Div position="absolute" bottom={5} right={5}>
+          <Div>
             <DownloadIcon url={images[imageIndex].uri} />
+            <ChatShareIcon image={images[imageIndex]} />
           </Div>
         )}
       />

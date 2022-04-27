@@ -206,7 +206,10 @@ const Chat: React.FC = () => {
             if (!messages?.length || isRecent(latest, messages?.[0])) {
               msgToAppend.push(latest);
               if (latest.type === ChatMessageType.IMAGE) {
-                imagesToApped.unshift({uri: latest.content});
+                imagesToApped.unshift({
+                  uri: latest.content,
+                  fileName: latest.fileName,
+                });
               }
             }
           }
