@@ -1,8 +1,9 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {TouchableOpacity, useWindowDimensions} from 'react-native';
 import {Icon, Image} from 'react-native-magnus';
 import {ChatMessage} from '../../../../types';
 import {blueColor} from '../../../../utils/colors';
+import {getThumbnailOfVideo} from '../../../../utils/getThumbnailOfVideo';
 
 type VideMessageProps = {
   message: ChatMessage;
@@ -16,6 +17,19 @@ const VideoMessage: React.FC<VideMessageProps> = ({
   onLongPress,
 }) => {
   const {width: windowWidth} = useWindowDimensions();
+
+  useEffect(() => {
+    const getThumbnail = async () => {
+      message.thumbnail = await getThumbnailOfVideo(
+        message.content,
+        message.fileName,
+      );
+    };
+    if (message.thumbnail === undefined) {
+      getThumbnail();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [message.thumbnail]);
 
   return (
     <TouchableOpacity onPress={onPress} onLongPress={onLongPress}>

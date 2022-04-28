@@ -398,11 +398,9 @@ const Chat: React.FC = () => {
 
   const playVideoOnModal = async (data: FIleSource) => {
     const url = await getFileUrl(data.fileName, data.uri);
-    console.log('data===', data.uri, 'url', url);
     if (url) {
       data.uri = url;
     }
-    console.log('uri===', data.uri, 'fileName', data.fileName);
 
     setVideo(data);
   };
@@ -594,13 +592,6 @@ const Chat: React.FC = () => {
           sentMsgByOtherUsers.isSender = true;
         }
         // setImagesForViewing(i => [...i, {uri: sentMsgByOtherUsers.content}]);
-        if (sentMsgByOtherUsers.type === ChatMessageType.VIDEO) {
-          sentMsgByOtherUsers.thumbnail = await getThumbnailOfVideo(
-            sentMsgByOtherUsers.content,
-            sentMsgByOtherUsers.fileName,
-          );
-          console.log('----', sentMsgByOtherUsers.thumbnail);
-        }
         if (isMounted) {
           setMessages(msgs => {
             if (
