@@ -339,7 +339,7 @@ const Chat: React.FC = () => {
         onSuccess: imageURL => {
           sendChatMessage({
             content: imageURL[0],
-            fileName: imageURL[0] + '.mp4',
+            fileName: 'video' + '.mp4',
             type: ChatMessageType.VIDEO,
             chatGroup: room,
           });
@@ -398,9 +398,12 @@ const Chat: React.FC = () => {
 
   const playVideoOnModal = async (data: FIleSource) => {
     const url = await getFileUrl(data.fileName, data.uri);
+    console.log('data===', data.uri, 'url', url);
     if (url) {
       data.uri = url;
     }
+    console.log('uri===', data.uri, 'fileName', data.fileName);
+
     setVideo(data);
   };
 
@@ -594,7 +597,9 @@ const Chat: React.FC = () => {
         if (sentMsgByOtherUsers.type === ChatMessageType.VIDEO) {
           sentMsgByOtherUsers.thumbnail = await getThumbnailOfVideo(
             sentMsgByOtherUsers.content,
+            sentMsgByOtherUsers.fileName,
           );
+          console.log('----', sentMsgByOtherUsers.thumbnail);
         }
         if (isMounted) {
           setMessages(msgs => {
@@ -952,6 +957,7 @@ const Chat: React.FC = () => {
             }}
             autoplay
             videoWidth={windowWidth}
+            videoHeight={windowHeight * 0.9}
           />
           <TouchableOpacity
             style={tailwind('absolute bottom-5 right-5')}

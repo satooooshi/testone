@@ -16,6 +16,7 @@ const VideoMessage: React.FC<VideMessageProps> = ({
   onLongPress,
 }) => {
   const {width: windowWidth} = useWindowDimensions();
+
   return (
     <TouchableOpacity onPress={onPress} onLongPress={onLongPress}>
       <Image

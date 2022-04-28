@@ -3,6 +3,9 @@ import RNFetchBlob from 'rn-fetch-blob';
 const {fs, config} = RNFetchBlob;
 
 export const getFileUrl = async (name: string, url: string) => {
+  if (name.length > 100) {
+    name = name.slice(-10);
+  }
   let DownloadDir =
     Platform.OS === 'android' ? fs.dirs.DownloadDir : fs.dirs.DocumentDir;
   const ext = name.split(/[#?]/)[0]?.split('.')?.pop()?.trim();
