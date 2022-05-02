@@ -1,43 +1,44 @@
 import React from 'react';
-import {Alert, TouchableOpacity} from 'react-native';
+import {Platform, TouchableOpacity} from 'react-native';
 import {Icon} from 'react-native-magnus';
 import tailwind from 'tailwind-rn';
 import {FIleSource} from '../../../types';
 import Share, {ShareOptions} from 'react-native-share';
 import {getFileUrl} from '../../../utils/storage/getFileUrl';
+import RNFetchBlob from 'rn-fetch-blob';
+const {fs, config} = RNFetchBlob;
 
 type DownloadIconProps = {
   image: FIleSource;
-  isUrlCreated?: boolean;
 };
 
-const ChatShareIcon: React.FC<DownloadIconProps> = ({image, isUrlCreated}) => {
+const ChatShareIcon: React.FC<DownloadIconProps> = ({image}) => {
   const openShare = async () => {
-    let option: ShareOptions = {};
-    if (isUrlCreated) {
-      option = {
-        url: image.uri,
-        filename: image.fileName,
-      };
-    } else {
-      const url = await getFileUrl(image.fileName, image.uri);
-
-      if (url) {
-        option = {
-          url: url,
-          filename: image.fileName,
-        };
-      }
-    }
-
-    Share.open(option)
-      .then(res => {
-        console.log(res);
+    if (Platform.OS === 'android') {
+      let imagePath: string;
+      config({
+        fileCache: true,
       })
-      .catch(err => {
-        console.log(err);
-        // Alert.alert('ファイル情報取得時にエラーが発生しました', err);
-      });
+        .fetch('GET', image.uri)
+        .then(resp => {
+          imagePath = resp.path();
+          return resp.readFile('base64');
+        })
+        .then(async data => {
+          let base64Data = 'data:image/png;base64,' + data;
+          await Share.open({url: base64Data});
+          return fs.unlink(imagePath);
+        });
+    } else {
+      if (!image.createdUrl) {
+        image.createdUrl = await getFileUrl(image.fileName, image.uri);
+      }
+      const option: ShareOptions = {
+        url: image.createdUrl ? image.createdUrl : image.uri,
+        failOnCancel: false,
+      };
+      Share.open(option);
+    }
   };
 
   return (

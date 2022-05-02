@@ -12,7 +12,7 @@ export const getFileUrl = async (name: string, url: string) => {
   let options = {
     path: DownloadDir + '/' + name, // this is the path where your downloaded file will live in
     addAndroidDownloads: {
-      title: DownloadDir + '/' + name,
+      title: name,
       useDownloadManager: false, // setting it to true will use the device's native download manager and will be shown in the notification bar.
       // useDownloadManager: true,にするとエラー
       notification: true,

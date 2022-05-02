@@ -359,6 +359,7 @@ export interface ChatNoteImage {
 export type FIleSource = {
   uri: string;
   fileName: string;
+  createdUrl?: string;
 };
 
 export interface ChatAlbum {

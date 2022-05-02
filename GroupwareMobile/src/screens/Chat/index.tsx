@@ -76,7 +76,6 @@ import {reactionEmojis} from '../../utils/factory/reactionEmojis';
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
 import io from 'socket.io-client';
 import {baseURL} from '../../utils/url';
-import {getThumbnailOfVideo} from '../../utils/getThumbnailOfVideo';
 import {useAuthenticate} from '../../contexts/useAuthenticate';
 import {useInviteCall} from '../../contexts/call/useInviteCall';
 import {useIsTabBarVisible} from '../../contexts/bottomTab/useIsTabBarVisible';
@@ -397,11 +396,12 @@ const Chat: React.FC = () => {
   };
 
   const playVideoOnModal = async (data: FIleSource) => {
-    const url = await getFileUrl(data.fileName, data.uri);
-    if (url) {
-      data.uri = url;
+    if (!data.createdUrl) {
+      const url = await getFileUrl(data.fileName, data.uri);
+      if (url) {
+        data.createdUrl = url;
+      }
     }
-
     setVideo(data);
   };
 
@@ -944,7 +944,7 @@ const Chat: React.FC = () => {
           </TouchableOpacity>
           <VideoPlayer
             video={{
-              uri: video?.uri,
+              uri: video?.createdUrl,
             }}
             autoplay
             videoWidth={windowWidth}
@@ -957,7 +957,7 @@ const Chat: React.FC = () => {
             }>
             <Icon color="white" name="download" fontSize={24} />
           </TouchableOpacity>
-          <ChatShareIcon image={video} isUrlCreated={true} />
+          <ChatShareIcon image={video} />
         </MagnusModal>
       ) : null}
 
@@ -1019,7 +1019,9 @@ const Chat: React.FC = () => {
 
       <ImageView
         animationType="slide"
-        images={imagesForViewing}
+        images={imagesForViewing.map(i => {
+          return {uri: i.uri};
+        })}
         imageIndex={nowImageIndex === -1 ? 0 : nowImageIndex}
         visible={imageModal}
         onRequestClose={() => setImageModal(false)}
