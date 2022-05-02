@@ -10,9 +10,10 @@ const {fs, config} = RNFetchBlob;
 
 type DownloadIconProps = {
   image: FIleSource;
+  isVideo?: boolean;
 };
 
-const ChatShareIcon: React.FC<DownloadIconProps> = ({image}) => {
+const ChatShareIcon: React.FC<DownloadIconProps> = ({image, isVideo}) => {
   const openShare = async () => {
     if (Platform.OS === 'android') {
       let imagePath: string;
@@ -25,7 +26,10 @@ const ChatShareIcon: React.FC<DownloadIconProps> = ({image}) => {
           return resp.readFile('base64');
         })
         .then(async data => {
-          let base64Data = 'data:image/png;base64,' + data;
+          let format = isVideo
+            ? 'data:video/mp4;base64,'
+            : 'data:image/png;base64,';
+          let base64Data = format + data;
           await Share.open({url: base64Data});
           return fs.unlink(imagePath);
         });

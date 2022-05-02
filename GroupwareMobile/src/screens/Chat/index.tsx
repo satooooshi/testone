@@ -957,7 +957,7 @@ const Chat: React.FC = () => {
             }>
             <Icon color="white" name="download" fontSize={24} />
           </TouchableOpacity>
-          <ChatShareIcon image={video} />
+          <ChatShareIcon image={video} isVideo />
         </MagnusModal>
       ) : null}
 
