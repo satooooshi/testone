@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@notifee/react-native": "^5.1.0",
+    "@react-native-async-storage/async-storage": "^1.17.3",
     "@react-native-community/cameraroll": "^4.1.2",
     "@react-native-community/datetimepicker": "^3.5.2",
     "@react-native-community/push-notification-ios": "^1.10.1",
@@ -79,6 +80,7 @@
     "react-native-screens": "^3.8.0",
     "react-native-sound-player": "^0.11.3",
     "react-native-splash-screen": "^3.3.0",
+    "react-native-storage": "^1.0.1",
     "react-native-switch-audio-output-android": "^1.0.2",
     "react-native-tab-view": "^3.1.1",
     "react-native-uuid": "^2.0.1",
