@@ -204,6 +204,12 @@ export class ChatController {
     return await this.chatService.updateMessage(message);
   }
 
+  @Post('delete-message')
+  @UseGuards(JwtAuthenticationGuard)
+  async deleteMessage(@Body() message: Partial<ChatMessage>) {
+    await this.chatService.deleteMessage(message);
+  }
+
   @Post('save-chat-group')
   @UseGuards(JwtAuthenticationGuard)
   async createChatGroup(
