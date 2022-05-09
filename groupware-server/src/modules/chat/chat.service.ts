@@ -287,6 +287,30 @@ export class ChatService {
     return savedMessage;
   }
 
+  public async updateMessage(
+    message: Partial<ChatMessage>,
+  ): Promise<ChatMessage> {
+    if (!message.chatGroup || !message.chatGroup.id) {
+      throw new BadRequestException('No group is selected');
+    }
+    const existGroup = await this.chatGroupRepository.findOne(
+      message.chatGroup.id,
+    );
+    if (!existGroup) {
+      throw new BadRequestException('That group id is incorrect');
+    }
+    const savedMessage = await this.chatMessageRepository.save(message);
+
+    existGroup.updatedAt = new Date();
+    await this.chatGroupRepository.save({
+      ...existGroup,
+      updatedAt: new Date(),
+    });
+
+    savedMessage.isSender = true;
+    return savedMessage;
+  }
+
   public async joinChatGroup(userID: number, chatGroupID: number) {
     const containMembers: ChatGroup = await this.chatGroupRepository.findOne({
       where: { id: chatGroupID },

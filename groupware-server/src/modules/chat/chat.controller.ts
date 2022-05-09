@@ -193,6 +193,17 @@ export class ChatController {
     return await this.chatService.sendMessage(message);
   }
 
+  @Patch('send-message')
+  @UseGuards(JwtAuthenticationGuard)
+  async updateMessage(
+    @Req() req: RequestWithUser,
+    @Body() message: Partial<ChatMessage>,
+  ): Promise<ChatMessage> {
+    const user = req.user;
+    message.sender = user;
+    return await this.chatService.updateMessage(message);
+  }
+
   @Post('save-chat-group')
   @UseGuards(JwtAuthenticationGuard)
   async createChatGroup(
