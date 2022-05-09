@@ -110,9 +110,9 @@ const Chat: React.FC = () => {
   );
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [focusedMessageID, setFocusedMessageID] = useState<number>();
-  const [after, setAfter] = useState<number>();
-  const [before, setBefore] = useState<number>();
-  const [include, setInclude] = useState<boolean>();
+  const [after, setAfter] = useState<number>(0);
+  const [before, setBefore] = useState<number>(0);
+  const [include, setInclude] = useState<boolean>(false);
   const [renderMessageIndex, setRenderMessageIndex] = useState<
     number | undefined
   >();
@@ -507,10 +507,13 @@ const Chat: React.FC = () => {
   };
 
   const refetchDoesntExistMessages = (focused?: number) => {
+    if (!messages?.length) {
+      return;
+    }
     const isExist = messages.filter(m => m.id === focused)?.length;
 
     if (!isExist) {
-      setAfter(focused);
+      setAfter(focused ? focused : 0);
       setInclude(true);
       return true;
     } else {
@@ -528,9 +531,9 @@ const Chat: React.FC = () => {
       .sort((a, b) => b.id - a.id);
   };
   useEffect(() => {
-    setMessages([]);
-    setBefore(undefined);
-    setAfter(undefined);
+    // setMessages([]);
+    setBefore(0);
+    setAfter(0);
     refetchLatest();
   }, [refetchLatest, room]);
 
@@ -557,9 +560,9 @@ const Chat: React.FC = () => {
       if (refetchDoesntExistMessages(fetchedPastMessages[0].id)) {
         refetchDoesntExistMessages(fetchedPastMessages[0].id + 20);
       } else {
-        setAfter(undefined);
+        setAfter(0);
         setInclude(false);
-        setBefore(undefined);
+        setBefore(0);
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
