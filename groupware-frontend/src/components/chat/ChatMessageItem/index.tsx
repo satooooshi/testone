@@ -96,7 +96,7 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
           .filter((t) => new Date(t.readTime) >= new Date(message.createdAt))
           .map((t) => t.user)
       : [];
-  }, [lastReadChatTime?.map((i) => i.readTime), message]);
+  }, [lastReadChatTime, message]);
 
   const reactionList = (
     <Box flexDir="row" flexWrap="wrap" display="flex" maxW={'50vw'}>
