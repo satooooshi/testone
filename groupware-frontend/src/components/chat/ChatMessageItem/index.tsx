@@ -44,6 +44,7 @@ import ReadUsersListModal from './ReadUsersListModal';
 import { useEffect } from 'react';
 import StickerMessage from './StickerMessage';
 import { useAuthenticate } from 'src/contexts/useAuthenticate';
+import { useAPIDeleteChatMessage } from '@/hooks/api/chat/useAPIDeleteChatMessage';
 
 type ChatMessageItemProps = {
   message: ChatMessage;
@@ -68,9 +69,15 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
   confirmedSearchWord,
   searchedResultIds,
 }) => {
+  const { mutate: deleteMessage } = useAPIDeleteChatMessage({
+    onSuccess: () => {
+      setIsDeleted(true);
+    },
+  });
   const [messageState, setMessageState] = useState(message);
   const [visibleReadModal, setVisibleLastReadModal] = useState(false);
   const [reactionModal, setReactionModal] = useState(false);
+  const [isDeleted, setIsDeleted] = useState(false);
   const { user } = useAuthenticate();
   const [editMessage, setEditMessage] = useState(false);
   const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
@@ -264,7 +271,13 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
               </MenuItem>
             ) : null}
             {messageState?.sender?.id === user?.id ? (
-              <MenuItem value={'edit'} onClick={() => setEditMessage(true)}>
+              <MenuItem
+                value={'delete'}
+                onClick={() => {
+                  if (confirm('メッセージを削除してよろしいですか？')) {
+                    deleteMessage(messageState);
+                  }
+                }}>
                 <Text color="red">メッセージを削除</Text>
               </MenuItem>
             ) : null}
@@ -279,118 +292,122 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
   }
 
   return (
-    <Box
-      ref={ref}
-      display="flex"
-      flexDir="column"
-      alignItems={messageState.isSender ? 'flex-end' : 'flex-start'}>
-      <ReadUsersListModal
-        usersInRoom={usersInRoom}
-        isOpen={visibleReadModal}
-        onClose={() => setVisibleLastReadModal(false)}
-        readUsers={readUsers}
-      />
-
-      <ReactionListModal
-        isOpen={reactionModal}
-        onClose={() => setReactionModal(false)}
-        reactions={messageState.reactions || []}
-      />
-      {messageState.type === ChatMessageType.SYSTEM_TEXT ? (
-        <SystemMessage message={messageState} />
-      ) : null}
-      {messageState.type !== ChatMessageType.SYSTEM_TEXT && (
+    <>
+      {!isDeleted ? (
         <Box
+          ref={ref}
           display="flex"
-          mb="4px"
-          maxW="50vw"
-          key={messageState.id}
-          alignSelf={messageState.isSender ? 'flex-end' : 'flex-start'}
-          flexDir={messageState.isSender ? 'row-reverse' : undefined}>
-          {!messageState.isSender ? (
-            <Link href={`/account/${messageState.sender?.id}`} passHref>
-              <Avatar
-                h="40px"
-                w="40px"
-                cursor="pointer"
-                src={
-                  !messageState.sender?.existence
-                    ? boldMascot.src
-                    : messageState.sender?.avatarUrl
-                }
-              />
-            </Link>
+          flexDir="column"
+          alignItems={messageState.isSender ? 'flex-end' : 'flex-start'}>
+          <ReadUsersListModal
+            usersInRoom={usersInRoom}
+            isOpen={visibleReadModal}
+            onClose={() => setVisibleLastReadModal(false)}
+            readUsers={readUsers}
+          />
+
+          <ReactionListModal
+            isOpen={reactionModal}
+            onClose={() => setReactionModal(false)}
+            reactions={messageState.reactions || []}
+          />
+          {messageState.type === ChatMessageType.SYSTEM_TEXT ? (
+            <SystemMessage message={messageState} />
           ) : null}
-          <Box display="flex" alignItems="flex-end">
-            {messageState.isSender && (
-              <>
-                {menuOpener}
-                <Box>
-                  {readUsers.length ? (
-                    <Link
-                      onClick={() => setVisibleLastReadModal(true)}
-                      mx="4px"
-                      color="gray"
-                      fontSize="12px">
-                      既読
-                      {readUsers.length}
-                    </Link>
-                  ) : null}
-                  {createdAtText}
-                </Box>
-              </>
-            )}
-            <Box display="flex" flexDir="column" alignItems="flex-start">
-              {!messageState.isSender && (
-                <Text>
-                  {messageState.sender && messageState.sender?.existence
-                    ? userNameFactory(messageState.sender)
-                    : 'ボールドくん'}
-                </Text>
-              )}
-              {messageState.type === ChatMessageType.TEXT ? (
-                <TextMessage
-                  message={messageState}
-                  confirmedSearchWord={confirmedSearchWord}
-                  searchedResultIds={searchedResultIds}
-                  editMessage={editMessage}
-                  finishEdit={() => setEditMessage(false)}
-                />
-              ) : messageState.type === ChatMessageType.CALL ? (
-                <CallMessage message={messageState} />
-              ) : (
-                <Box
-                  borderRadius="8px"
-                  p="8px"
-                  maxW={isSmallerThan768 ? undefined : '40vw'}
-                  minW={'300px'}
-                  wordBreak="break-word">
-                  {messageState.type === ChatMessageType.IMAGE ? (
-                    <ImageMessage
+          {messageState.type !== ChatMessageType.SYSTEM_TEXT && (
+            <Box
+              display="flex"
+              mb="4px"
+              maxW="50vw"
+              key={messageState.id}
+              alignSelf={messageState.isSender ? 'flex-end' : 'flex-start'}
+              flexDir={messageState.isSender ? 'row-reverse' : undefined}>
+              {!messageState.isSender ? (
+                <Link href={`/account/${messageState.sender?.id}`} passHref>
+                  <Avatar
+                    h="40px"
+                    w="40px"
+                    cursor="pointer"
+                    src={
+                      !messageState.sender?.existence
+                        ? boldMascot.src
+                        : messageState.sender?.avatarUrl
+                    }
+                  />
+                </Link>
+              ) : null}
+              <Box display="flex" alignItems="flex-end">
+                {messageState.isSender && (
+                  <>
+                    {menuOpener}
+                    <Box>
+                      {readUsers.length ? (
+                        <Link
+                          onClick={() => setVisibleLastReadModal(true)}
+                          mx="4px"
+                          color="gray"
+                          fontSize="12px">
+                          既読
+                          {readUsers.length}
+                        </Link>
+                      ) : null}
+                      {createdAtText}
+                    </Box>
+                  </>
+                )}
+                <Box display="flex" flexDir="column" alignItems="flex-start">
+                  {!messageState.isSender && (
+                    <Text>
+                      {messageState.sender && messageState.sender?.existence
+                        ? userNameFactory(messageState.sender)
+                        : 'ボールドくん'}
+                    </Text>
+                  )}
+                  {messageState.type === ChatMessageType.TEXT ? (
+                    <TextMessage
                       message={messageState}
-                      onClick={onClickImage}
+                      confirmedSearchWord={confirmedSearchWord}
+                      searchedResultIds={searchedResultIds}
+                      editMessage={editMessage}
+                      finishEdit={() => setEditMessage(false)}
                     />
-                  ) : messageState.type === ChatMessageType.VIDEO ? (
-                    <VideoMessage message={messageState} />
-                  ) : messageState.type === ChatMessageType.STICKER ? (
-                    <StickerMessage message={messageState} />
+                  ) : messageState.type === ChatMessageType.CALL ? (
+                    <CallMessage message={messageState} />
                   ) : (
-                    <FileMessage message={messageState} />
+                    <Box
+                      borderRadius="8px"
+                      p="8px"
+                      maxW={isSmallerThan768 ? undefined : '40vw'}
+                      minW={'300px'}
+                      wordBreak="break-word">
+                      {messageState.type === ChatMessageType.IMAGE ? (
+                        <ImageMessage
+                          message={messageState}
+                          onClick={onClickImage}
+                        />
+                      ) : messageState.type === ChatMessageType.VIDEO ? (
+                        <VideoMessage message={messageState} />
+                      ) : messageState.type === ChatMessageType.STICKER ? (
+                        <StickerMessage message={messageState} />
+                      ) : (
+                        <FileMessage message={messageState} />
+                      )}
+                    </Box>
                   )}
                 </Box>
-              )}
+                {!messageState.isSender && (
+                  <>
+                    {createdAtText}
+                    {menuOpener}
+                  </>
+                )}
+              </Box>
             </Box>
-            {!messageState.isSender && (
-              <>
-                {createdAtText}
-                {menuOpener}
-              </>
-            )}
-          </Box>
+          )}
+          {reactionList}
         </Box>
-      )}
-      {reactionList}
-    </Box>
+      ) : null}
+    </>
   );
 };
 

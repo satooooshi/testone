@@ -10,6 +10,7 @@ export const getLastReadChatTimeURL = `/${chatURL}/get-last-read-chat-time`;
 export const editMembersURL = (roomId: number) =>
   `/${chatURL}/v2/room/${roomId.toString()}/members`;
 export const sendChantMessageURL = `/${chatURL}/send-message`;
+export const deleteChantMessageURL = `/${chatURL}/delete-message`;
 export const saveChatGroupURL = `/${chatURL}/v2/room`;
 export const savePinURL = `${saveChatGroupURL}/pin`;
 export const saveLastReadChatTimeURL = `/${chatURL}/save-last-read-chat-time`;
