@@ -24,9 +24,13 @@ const TextMessage: React.FC<TextMessageProps> = ({
   editMessage,
   finishEdit,
 }) => {
+  const [isEdited, setIsEdited] = useState(false);
   const { mutate: updateMessage } = useAPIUpdateChatMessage({
     onSuccess: (data) => {
       message.content = data.content;
+      message.updatedAt = new Date();
+
+      setIsEdited(true);
       finishEdit();
     },
   });
@@ -76,6 +80,12 @@ const TextMessage: React.FC<TextMessageProps> = ({
     };
   }, [finishEdit]);
 
+  useEffect(() => {
+    if (new Date(message.updatedAt) > new Date(message.createdAt)) {
+      setIsEdited(true);
+    }
+  }, [message.createdAt, message.updatedAt]);
+
   return (
     <Box
       maxW={isSmallerThan768 ? '300px' : '40vw'}
@@ -108,15 +118,20 @@ const TextMessage: React.FC<TextMessageProps> = ({
           </Box>
         )}
         {!editMessage ? (
-          <Text
-            borderRadius="8px"
-            maxW={'40vw'}
-            minW={'10vw'}
-            wordBreak={'break-word'}
-            color={message.isSender ? 'white' : darkFontColor}
-            bg={message.isSender ? 'blue.500' : '#ececec'}>
-            {highlightSearchedWord(message)}
-          </Text>
+          <>
+            <Text
+              borderRadius="8px"
+              maxW={'40vw'}
+              minW={'10vw'}
+              wordBreak={'break-word'}
+              color={message.isSender ? 'white' : darkFontColor}
+              bg={message.isSender ? 'blue.500' : '#ececec'}>
+              {highlightSearchedWord(message)}
+            </Text>
+            <Text fontSize={3} mt={2}>
+              {isEdited ? ' (編集済み)' : null}
+            </Text>
+          </>
         ) : (
           <>
             <Textarea
