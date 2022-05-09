@@ -43,6 +43,7 @@ import ReactionListModal from './ReactionListModal';
 import ReadUsersListModal from './ReadUsersListModal';
 import { useEffect } from 'react';
 import StickerMessage from './StickerMessage';
+import { useAuthenticate } from 'src/contexts/useAuthenticate';
 
 type ChatMessageItemProps = {
   message: ChatMessage;
@@ -70,6 +71,8 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
   const [messageState, setMessageState] = useState(message);
   const [visibleReadModal, setVisibleLastReadModal] = useState(false);
   const [reactionModal, setReactionModal] = useState(false);
+  const { user } = useAuthenticate();
+  const [editMessage, setEditMessage] = useState(false);
   const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
   const { mutate: saveReaction } = useAPISaveReaction();
   const { mutate: deleteReaction } = useAPIDeleteReaction();
@@ -254,6 +257,17 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
               onClick={() => reactionOpenerRef.current?.click()}>
               リアクション
             </MenuItem>
+            {messageState?.sender?.id === user?.id &&
+            messageState.type === ChatMessageType.TEXT ? (
+              <MenuItem value={'edit'} onClick={() => setEditMessage(true)}>
+                メッセージを編集
+              </MenuItem>
+            ) : null}
+            {messageState?.sender?.id === user?.id ? (
+              <MenuItem value={'edit'} onClick={() => setEditMessage(true)}>
+                <Text color="red">メッセージを削除</Text>
+              </MenuItem>
+            ) : null}
           </Menu>
         </>
       )}
@@ -339,6 +353,8 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
                   message={messageState}
                   confirmedSearchWord={confirmedSearchWord}
                   searchedResultIds={searchedResultIds}
+                  editMessage={editMessage}
+                  finishEdit={() => setEditMessage(false)}
                 />
               ) : messageState.type === ChatMessageType.CALL ? (
                 <CallMessage message={messageState} />
