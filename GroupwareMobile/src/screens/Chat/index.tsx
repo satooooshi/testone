@@ -18,6 +18,7 @@ import {
   Dropdown,
   Input,
   Image,
+  Box,
 } from 'react-native-magnus';
 import WholeContainer from '../../components/WholeContainer';
 import {useAPIGetMessages} from '../../hooks/api/chat/useAPIGetMessages';
@@ -82,6 +83,8 @@ import {useInviteCall} from '../../contexts/call/useInviteCall';
 import {useIsTabBarVisible} from '../../contexts/bottomTab/useIsTabBarVisible';
 import {reactionStickers} from '../../utils/factory/reactionStickers';
 import {ScrollView} from 'react-native-gesture-handler';
+import {useAPIUpdateChatMessage} from '../../hooks/api/chat/useAPIUpdateChatMessage';
+import {useAPIDeleteChatMessage} from '../../hooks/api/chat/useAPIDeleteChatMessage';
 
 const socket = io(baseURL, {
   transports: ['websocket'],
@@ -132,6 +135,7 @@ const Chat: React.FC = () => {
   const [longPressedMsg, setLongPressedMgg] = useState<ChatMessage>();
   const [reactionTarget, setReactionTarget] = useState<ChatMessage>();
   const [visibleStickerSelctor, setVisibleStickerSelector] = useState(false);
+  const [editMessage, setEditMessage] = useState(false);
   const {mutate: saveReaction} = useAPISaveReaction();
   const {width: windowWidth, height: windowHeight} = useWindowDimensions();
   const {mutate: deleteReaction} = useAPIDeleteReaction();
@@ -142,7 +146,9 @@ const Chat: React.FC = () => {
   const {mutate: saveLastReadChatTime} = useAPISaveLastReadChatTime();
   const [selectedMessageForCheckLastRead, setSelectedMessageForCheckLastRead] =
     useState<ChatMessage>();
-  const {values, handleSubmit, setValues} = useFormik<Partial<ChatMessage>>({
+  const {values, handleSubmit, setValues, resetForm} = useFormik<
+    Partial<ChatMessage>
+  >({
     initialValues: {
       content: '',
       type: ChatMessageType.TEXT,
@@ -154,7 +160,13 @@ const Chat: React.FC = () => {
     onSubmit: submittedValues => {
       Keyboard.dismiss();
       if (submittedValues.content) {
-        sendChatMessage(submittedValues);
+        if (editMessage) {
+          updateChatMessage(submittedValues);
+          setEditMessage(false);
+          resetForm();
+        } else {
+          sendChatMessage(submittedValues);
+        }
       }
     },
   });
@@ -231,6 +243,30 @@ const Chat: React.FC = () => {
         );
       },
     });
+  const {mutate: updateChatMessage} = useAPIUpdateChatMessage({
+    onSuccess: sentMsg => {
+      // socket.emit('message', {...sentMsg, isSender: false});
+      let clonedMessages = messages.map(m =>
+        m.id === sentMsg.id ? sentMsg : m,
+      );
+      setMessages(clonedMessages);
+      setValues(v => ({
+        ...v,
+        content: '',
+        type: ChatMessageType.TEXT,
+        replyParentMessage: undefined,
+      }));
+      setLongPressedMgg(undefined);
+    },
+    onError: () => {
+      Alert.alert(
+        'チャットの更新中にエラーが発生しました。\n時間をおいて再度実行してください。',
+      );
+    },
+  });
+
+  const {mutate: deleteMessage} = useAPIDeleteChatMessage();
+
   const {mutate: uploadFile, isLoading: loadingUploadFile} =
     useAPIUploadStorage();
   const isLoadingSending = loadingSendMessage || loadingUploadFile;
@@ -529,6 +565,30 @@ const Chat: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fetchedPastMessages]);
 
+  const handleDeleteMessage = () => {
+    if (longPressedMsg) {
+      Alert.alert(
+        'メッセージを削除してよろしいですか？',
+        '',
+        [
+          {text: 'キャンセル', style: 'cancel'},
+          {
+            text: '削除する',
+            style: 'destructive',
+            onPress: () =>
+              deleteMessage(longPressedMsg, {
+                onSuccess: () => {
+                  setMessages(messages.filter(m => m.id !== longPressedMsg.id));
+                  setLongPressedMgg(undefined);
+                },
+              }),
+          },
+        ],
+        {cancelable: false},
+      );
+    }
+  };
+
   const typeDropdown = (
     <Dropdown
       {...defaultDropdownProps}
@@ -553,6 +613,33 @@ const Chat: React.FC = () => {
         }}>
         リアクション
       </Dropdown.Option>
+      {longPressedMsg?.sender?.id === myself?.id &&
+      longPressedMsg?.type === ChatMessageType.TEXT ? (
+        <Dropdown.Option
+          {...defaultDropdownOptionProps}
+          value="edit"
+          onPress={() => {
+            setEditMessage(true);
+            if (longPressedMsg) {
+              setValues(longPressedMsg);
+            }
+          }}>
+          メッセージを編集
+        </Dropdown.Option>
+      ) : (
+        <></>
+      )}
+      {longPressedMsg?.sender?.id === myself?.id ? (
+        <Dropdown.Option
+          {...defaultDropdownOptionProps}
+          value="edit"
+          color="red"
+          onPress={() => handleDeleteMessage()}>
+          メッセージを削除
+        </Dropdown.Option>
+      ) : (
+        <></>
+      )}
     </Dropdown>
   );
 
@@ -779,6 +866,19 @@ const Chat: React.FC = () => {
                   replyParentMessage={values.replyParentMessage}
                 />
               )}
+              {editMessage ? (
+                <Box flexDir="row" alignItems="center" bg="gray">
+                  <Button
+                    bg="transparent"
+                    onPress={() => {
+                      setEditMessage(false);
+                      resetForm();
+                    }}>
+                    <Icon color="black" name="close" />
+                  </Button>
+                  <Text>メッセージ編集中</Text>
+                </Box>
+              ) : null}
               <ChatFooter
                 onUploadFile={handleUploadFile}
                 onUploadVideo={handleUploadVideo}
@@ -838,6 +938,7 @@ const Chat: React.FC = () => {
                   replyParentMessage={values.replyParentMessage}
                 />
               )}
+              <Text>"メッセージ編集中"</Text>
               <ChatFooter
                 onUploadFile={handleUploadFile}
                 onUploadVideo={handleUploadVideo}
