@@ -9,6 +9,7 @@ import {Alert, Linking, Platform} from 'react-native';
 import VersionCheck from 'react-native-version-check';
 import {BadgeProvider} from './contexts/badge/useHandleBadge';
 import {IsTabBarVisibleProvider} from './contexts/bottomTab/useIsTabBarVisible';
+import {Provider} from 'react-native-paper';
 
 const App = () => {
   const queryClient = new QueryClient();
@@ -53,13 +54,15 @@ const App = () => {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthenticateProvider>
-        <IsTabBarVisibleProvider>
-          <BadgeProvider>
-            <Navigator />
-          </BadgeProvider>
-        </IsTabBarVisibleProvider>
-      </AuthenticateProvider>
+      <Provider>
+        <AuthenticateProvider>
+          <IsTabBarVisibleProvider>
+            <BadgeProvider>
+              <Navigator />
+            </BadgeProvider>
+          </IsTabBarVisibleProvider>
+        </AuthenticateProvider>
+      </Provider>
     </QueryClientProvider>
   );
 };

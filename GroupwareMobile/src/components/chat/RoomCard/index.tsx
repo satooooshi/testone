@@ -2,7 +2,7 @@ import React from 'react';
 import {Platform, TouchableHighlight, useWindowDimensions} from 'react-native';
 import FastImage from 'react-native-fast-image';
 import {Swipeable} from 'react-native-gesture-handler';
-import {Badge, Button, Div, Icon, Text} from 'react-native-magnus';
+import {Button, Div, Icon, Text} from 'react-native-magnus';
 import tailwind from 'tailwind-rn';
 import {roomCardStyles} from '../../../styles/component/chat/roomCard.style';
 import {ChatGroup, ChatMessage, ChatMessageType} from '../../../types';
@@ -10,6 +10,7 @@ import {darkFontColor} from '../../../utils/colors';
 import {dateTimeFormatterFromJSDDate} from '../../../utils/dateTimeFormatterFromJSDate';
 import {nameOfRoom} from '../../../utils/factory/chat/nameOfRoom';
 import {mentionTransform} from '../../../utils/messageTransform';
+import {Badge} from 'react-native-paper';
 
 type RoomCardProps = {
   room: ChatGroup;
@@ -109,12 +110,13 @@ const RoomCard: React.FC<RoomCardProps> = ({
             </Text>
             {room.unreadCount && room.unreadCount > 0 ? (
               <Badge
-                position="absolute"
-                left={windowWidth * 0.6}
-                py={5}
-                w={30}
-                h={30}
-                fontSize={10}>
+                style={{
+                  position: 'absolute',
+                  left: windowWidth * 0.6,
+                  marginTop: 10,
+                  backgroundColor: 'green',
+                }}
+                size={25}>
                 {`${room.unreadCount}`}
               </Badge>
             ) : null}
