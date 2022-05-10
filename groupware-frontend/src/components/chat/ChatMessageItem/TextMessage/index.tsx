@@ -128,7 +128,7 @@ const TextMessage: React.FC<TextMessageProps> = ({
               bg={message.isSender ? 'blue.500' : '#ececec'}>
               {highlightSearchedWord(message)}
             </Text>
-            <Text fontSize={3} mt={2}>
+            <Text fontSize={3} mt={2} color={darkFontColor}>
               {isEdited ? ' (編集済み)' : null}
             </Text>
           </>

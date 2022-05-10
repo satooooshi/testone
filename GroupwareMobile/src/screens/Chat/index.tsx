@@ -225,6 +225,7 @@ const Chat: React.FC = () => {
       },
     },
   );
+
   const {mutate: sendChatMessage, isLoading: loadingSendMessage} =
     useAPISendChatMessage({
       onSuccess: sentMsg => {
