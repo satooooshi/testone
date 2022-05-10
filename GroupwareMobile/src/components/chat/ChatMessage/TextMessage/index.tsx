@@ -45,7 +45,7 @@ const TextMessage: React.FC<TextMessageProps> = ({
           style={tailwind('text-white')}
         />
         {message.updatedAt > message.createdAt ? (
-          <Text fontSize={10} mt={3} color={darkFontColor}>
+          <Text fontSize={10} mt={3} color={darkFontColor} textAlign="right">
             編集済み
           </Text>
         ) : null}
