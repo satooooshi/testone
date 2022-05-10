@@ -82,6 +82,7 @@ import {useInviteCall} from '../../contexts/call/useInviteCall';
 import {useIsTabBarVisible} from '../../contexts/bottomTab/useIsTabBarVisible';
 import {reactionStickers} from '../../utils/factory/reactionStickers';
 import {ScrollView} from 'react-native-gesture-handler';
+import storage from '../../utils/storage';
 
 const socket = io(baseURL, {
   transports: ['websocket'],
@@ -868,6 +869,18 @@ const Chat: React.FC = () => {
       refetchRoomDetail();
     }, [refetchLatest, refetchRoomDetail]),
   );
+
+  useEffect(() => {
+    if (messages.length) {
+      storage.save({
+        key: 'chatRoom',
+        id: room.id.toString(),
+        data: messages,
+        expires: null,
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [messages]);
 
   useEffect(() => {
     saveLastReadChatTime(room.id);
