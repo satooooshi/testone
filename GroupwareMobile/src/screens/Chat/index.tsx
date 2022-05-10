@@ -235,12 +235,7 @@ const Chat: React.FC = () => {
           chatMessage: {...sentMsg, isSender: false},
         });
         setMessages(refreshMessage([sentMsg, ...messages]));
-        setValues(v => ({
-          ...v,
-          content: '',
-          type: ChatMessageType.TEXT,
-          replyParentMessage: undefined,
-        }));
+        resetForm();
       },
       onError: () => {
         Alert.alert(
@@ -254,12 +249,7 @@ const Chat: React.FC = () => {
         type: 'edit',
         chatMessage: {...sentMsg, isSender: false},
       });
-      setValues(v => ({
-        ...v,
-        content: '',
-        type: ChatMessageType.TEXT,
-        replyParentMessage: undefined,
-      }));
+      resetForm();
       setLongPressedMgg(undefined);
     },
     onError: () => {
@@ -671,7 +661,10 @@ const Chat: React.FC = () => {
     let isMounted = true;
     socket.emit('joinRoom', room.id.toString());
     socket.on('msgToClient', async (socketMessage: SocketMessage) => {
-      if (socketMessage.chatMessage.sender?.id === myself?.id) {
+      if (!socketMessage.chatMessage) {
+        return;
+      }
+      if (socketMessage.chatMessage?.sender?.id === myself?.id) {
         socketMessage.chatMessage.isSender = true;
       }
       switch (socketMessage.type) {

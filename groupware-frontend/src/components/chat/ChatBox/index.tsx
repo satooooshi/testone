@@ -448,7 +448,10 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
   useEffect(() => {
     socket.emit('joinRoom', room.id.toString());
     socket.on('msgToClient', async (socketMessage: SocketMessage) => {
-      if (socketMessage.chatMessage.sender?.id === myself?.id) {
+      if (!socketMessage.chatMessage) {
+        return;
+      }
+      if (socketMessage.chatMessage?.sender?.id === myself?.id) {
         socketMessage.chatMessage.isSender = true;
       }
       switch (socketMessage.type) {
