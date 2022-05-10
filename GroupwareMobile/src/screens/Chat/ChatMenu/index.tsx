@@ -15,7 +15,7 @@ import {
 const ChatMenu: React.FC = () => {
   const route = useRoute<ChatMenuRouteProps>();
   const navigation = useNavigation<ChatMenuNavigationProps>();
-  const {room} = route.params;
+  const {room, removeCache} = route.params;
   const {mutate: leaveChatGroup} = useAPILeaveChatRoom({
     onSuccess: () => {
       navigation.navigate('ChatStack', {
@@ -74,6 +74,24 @@ const ChatMenu: React.FC = () => {
           })
         }
       />
+      <ChatMenuRow
+        name="メッセージのキャッシュ削除"
+        icon={<Icon name="delete" fontSize={20} mr={'lg'} color="black" />}
+        onPress={() =>
+          Alert.alert('メッセージのキャッシュを削除してよろしいですか？', '', [
+            {
+              text: 'いいえ',
+              style: 'cancel',
+            },
+            {
+              text: 'はい',
+              onPress: () => removeCache(),
+              style: 'destructive',
+            },
+          ])
+        }
+      />
+
       {!isPersonal && (
         <ChatMenuRow
           name="退室"

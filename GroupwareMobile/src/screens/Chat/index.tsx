@@ -940,6 +940,14 @@ const Chat: React.FC = () => {
     }
   };
 
+  const removeCache = () => {
+    storage.remove({
+      key: 'chatRoom',
+      id: room.id.toString(),
+    });
+    setMessages([]);
+  };
+
   return (
     <WholeContainer>
       {typeDropdown}
@@ -1100,7 +1108,7 @@ const Chat: React.FC = () => {
             onPress={() =>
               navigation.navigate('ChatStack', {
                 screen: 'ChatMenu',
-                params: {room},
+                params: {room, removeCache},
               })
             }>
             <Icon
