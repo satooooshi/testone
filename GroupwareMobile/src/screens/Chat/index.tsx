@@ -163,12 +163,22 @@ const Chat: React.FC = () => {
     data: fetchedPastMessages,
     isLoading: loadingMessages,
     isFetching: fetchingMessages,
-  } = useAPIGetMessages({
-    group: room.id,
-    after,
-    before,
-    include,
-  });
+    refetch: refetchFetchedPastMessages,
+  } = useAPIGetMessages(
+    {
+      group: room.id,
+      after,
+      before,
+      include,
+    },
+    {
+      enabled: false,
+      onSuccess: res => {
+        console.log('success ============================', res.length);
+      },
+    },
+  );
+
   const {data: searchedResults, refetch: searchMessages} = useAPISearchMessages(
     {
       group: room.id,
@@ -410,9 +420,7 @@ const Chat: React.FC = () => {
   };
 
   const onScrollTopOnChat = () => {
-    if (fetchedPastMessages?.length) {
-      setBefore(messages[messages.length - 1].id);
-    }
+    setBefore(messages[messages.length - 1].id);
   };
 
   const scrollToRenderedMessage = () => {
@@ -493,11 +501,14 @@ const Chat: React.FC = () => {
       .sort((a, b) => b.id - a.id);
   };
   useEffect(() => {
-    setMessages([]);
     setBefore(undefined);
     setAfter(undefined);
     refetchLatest();
   }, [refetchLatest, room]);
+
+  useEffect(() => {
+    refetchFetchedPastMessages();
+  }, [before, after, include, refetchFetchedPastMessages]);
 
   useEffect(() => {
     // 検索する文字がアルファベットの場合、なぜかuseAPISearchMessagesのonSuccessが動作しない為、こちらで代わりとなる処理を記述しています。
