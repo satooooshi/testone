@@ -865,8 +865,17 @@ const Chat: React.FC = () => {
 
   useFocusEffect(
     useCallback(() => {
+      storage
+        .load({
+          key: 'chatRoom',
+          id: room.id.toString(),
+        })
+        .then(cacheData => {
+          setMessages(cacheData);
+        });
       refetchLatest();
       refetchRoomDetail();
+      // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [refetchLatest, refetchRoomDetail]),
   );
 
