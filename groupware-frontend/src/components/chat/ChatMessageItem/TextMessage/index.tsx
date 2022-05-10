@@ -33,13 +33,10 @@ const TextMessage: React.FC<TextMessageProps> = ({
   const [isEdited, setIsEdited] = useState(false);
   const { mutate: updateMessage } = useAPIUpdateChatMessage({
     onSuccess: (data) => {
-      // message.content = data.content;
-      // message.updatedAt = new Date();
       socket.emit('message', {
         type: 'edit',
         chatMessage: { ...data, isSender: false },
       });
-      setIsEdited(true);
       finishEdit();
     },
   });
