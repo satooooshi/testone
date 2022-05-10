@@ -11,6 +11,11 @@ import { Server } from 'socket.io';
 import { Socket } from 'socket.io';
 import { ChatMessage } from 'src/entities/chatMessage.entity';
 
+type socketMessage = {
+  chatMessage: ChatMessage;
+  type: 'send' | 'edit' | 'delete';
+};
+
 @WebSocketGateway()
 export class ChatGateway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
@@ -33,10 +38,11 @@ export class ChatGateway
   }
 
   @SubscribeMessage('message')
-  public async handleMessage(_: Socket, payload: ChatMessage) {
+  public async handleMessage(_: Socket, payload: socketMessage) {
+    payload.chatMessage.isSender = false;
     this.server
-      .to(payload.chatGroup?.id.toString())
-      .emit('msgToClient', { ...payload, isSender: false });
+      .to(payload.chatMessage.chatGroup?.id.toString())
+      .emit('msgToClient', payload);
   }
 
   @SubscribeMessage('joinRoom')
