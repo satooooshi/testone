@@ -31,6 +31,7 @@ import {
   ChatMessageReaction,
   ChatMessageType,
   ImageSource,
+  SocketMessage,
   User,
 } from '../../types';
 import {uploadImageFromGallery} from '../../utils/cropImage/uploadImageFromGallery';
@@ -229,7 +230,10 @@ const Chat: React.FC = () => {
   const {mutate: sendChatMessage, isLoading: loadingSendMessage} =
     useAPISendChatMessage({
       onSuccess: sentMsg => {
-        socket.emit('message', {...sentMsg, isSender: false});
+        socket.emit('message', {
+          type: 'send',
+          chatMessage: {...sentMsg, isSender: false},
+        });
         setMessages(refreshMessage([sentMsg, ...messages]));
         setValues(v => ({
           ...v,
@@ -246,11 +250,10 @@ const Chat: React.FC = () => {
     });
   const {mutate: updateChatMessage} = useAPIUpdateChatMessage({
     onSuccess: sentMsg => {
-      // socket.emit('message', {...sentMsg, isSender: false});
-      let clonedMessages = messages.map(m =>
-        m.id === sentMsg.id ? sentMsg : m,
-      );
-      setMessages(clonedMessages);
+      socket.emit('message', {
+        type: 'edit',
+        chatMessage: {...sentMsg, isSender: false},
+      });
       setValues(v => ({
         ...v,
         content: '',
@@ -582,7 +585,10 @@ const Chat: React.FC = () => {
             onPress: () =>
               deleteMessage(longPressedMsg, {
                 onSuccess: () => {
-                  setMessages(messages.filter(m => m.id !== longPressedMsg.id));
+                  socket.emit('message', {
+                    type: 'delete',
+                    chatMessage: {...longPressedMsg, isSender: false},
+                  });
                   setLongPressedMgg(undefined);
                 },
               }),
@@ -664,34 +670,62 @@ const Chat: React.FC = () => {
   useEffect(() => {
     let isMounted = true;
     socket.emit('joinRoom', room.id.toString());
-    socket.on('msgToClient', async (sentMsgByOtherUsers: ChatMessage) => {
-      if (sentMsgByOtherUsers.content) {
-        sentMsgByOtherUsers.createdAt = new Date(sentMsgByOtherUsers.createdAt);
-        sentMsgByOtherUsers.updatedAt = new Date(sentMsgByOtherUsers.updatedAt);
-        if (sentMsgByOtherUsers.sender?.id === myself?.id) {
-          sentMsgByOtherUsers.isSender = true;
-        }
-        // setImagesForViewing(i => [...i, {uri: sentMsgByOtherUsers.content}]);
-        if (sentMsgByOtherUsers.type === ChatMessageType.VIDEO) {
-          sentMsgByOtherUsers.thumbnail = await getThumbnailOfVideo(
-            sentMsgByOtherUsers.content,
-          );
-        }
-        if (isMounted) {
-          setMessages(msgs => {
-            if (
-              msgs.length &&
-              msgs[0].id !== sentMsgByOtherUsers.id &&
-              sentMsgByOtherUsers.chatGroup?.id === room.id
-            ) {
-              return refreshMessage([sentMsgByOtherUsers, ...msgs]);
-            } else if (sentMsgByOtherUsers.chatGroup?.id !== room.id) {
-              return refreshMessage(
-                msgs.filter(m => m.id !== sentMsgByOtherUsers.id),
+    socket.on('msgToClient', async (socketMessage: SocketMessage) => {
+      if (socketMessage.chatMessage.sender?.id === myself?.id) {
+        socketMessage.chatMessage.isSender = true;
+      }
+      switch (socketMessage.type) {
+        case 'send': {
+          if (socketMessage.chatMessage.content) {
+            socketMessage.chatMessage.createdAt = new Date(
+              socketMessage.chatMessage.createdAt,
+            );
+            socketMessage.chatMessage.updatedAt = new Date(
+              socketMessage.chatMessage.updatedAt,
+            );
+
+            // setImagesForViewing(i => [...i, {uri: socketMessage.chatMessage.content}]);
+            if (socketMessage.chatMessage.type === ChatMessageType.VIDEO) {
+              socketMessage.chatMessage.thumbnail = await getThumbnailOfVideo(
+                socketMessage.chatMessage.content,
               );
             }
-            return refreshMessage(msgs);
+            if (isMounted) {
+              setMessages(msgs => {
+                if (
+                  msgs.length &&
+                  msgs[0].id !== socketMessage.chatMessage.id &&
+                  socketMessage.chatMessage.chatGroup?.id === room.id
+                ) {
+                  return refreshMessage([socketMessage.chatMessage, ...msgs]);
+                } else if (
+                  socketMessage.chatMessage.chatGroup?.id !== room.id
+                ) {
+                  return refreshMessage(
+                    msgs.filter(m => m.id !== socketMessage.chatMessage.id),
+                  );
+                }
+                return refreshMessage(msgs);
+              });
+            }
+          }
+          break;
+        }
+        case 'edit': {
+          setMessages(msgs => {
+            return msgs.map(m =>
+              m.id === socketMessage.chatMessage.id
+                ? socketMessage.chatMessage
+                : m,
+            );
           });
+          break;
+        }
+        case 'delete': {
+          setMessages(msgs => {
+            return msgs.filter(m => m.id !== socketMessage.chatMessage.id);
+          });
+          break;
         }
       }
     });
