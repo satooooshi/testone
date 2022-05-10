@@ -303,6 +303,11 @@ export interface ChatMessage {
   replyParentMessage?: ChatMessage;
 }
 
+export interface SocketMessage {
+  chatMessage: ChatMessage;
+  type: 'send' | 'edit' | 'delete';
+}
+
 export enum RoomType {
   GROUP = 'group',
   TALK_ROOM = 'talk_room',

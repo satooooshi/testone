@@ -45,6 +45,8 @@ import { useEffect } from 'react';
 import StickerMessage from './StickerMessage';
 import { useAuthenticate } from 'src/contexts/useAuthenticate';
 import { useAPIDeleteChatMessage } from '@/hooks/api/chat/useAPIDeleteChatMessage';
+import { io } from 'socket.io-client';
+import { baseURL } from 'src/utils/url';
 
 type ChatMessageItemProps = {
   message: ChatMessage;
@@ -58,6 +60,10 @@ type ChatMessageItemProps = {
   searchedResultIds?: (number | undefined)[];
 };
 
+const socket = io(baseURL, {
+  transports: ['websocket'],
+});
+
 const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
   usersInRoom,
   message,
@@ -70,8 +76,12 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
   searchedResultIds,
 }) => {
   const { mutate: deleteMessage } = useAPIDeleteChatMessage({
-    onSuccess: () => {
-      setIsDeleted(true);
+    onSuccess: (data) => {
+      socket.emit('message', {
+        type: 'delete',
+        chatMessage: { ...data, isSender: false },
+      });
+      // setIsDeleted(true);
     },
   });
   const [messageState, setMessageState] = useState(message);

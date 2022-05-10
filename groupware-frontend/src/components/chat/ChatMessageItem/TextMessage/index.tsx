@@ -8,6 +8,8 @@ import { mentionTransform } from 'src/utils/mentionTransform';
 import { replaceFullWidthSpace } from 'src/utils/replaceWidthSpace';
 import Linkify from 'react-linkify';
 import { useAPIUpdateChatMessage } from '@/hooks/api/chat/useAPIUpdateChatMessage';
+import { io } from 'socket.io-client';
+import { baseURL } from 'src/utils/url';
 
 type TextMessageProps = {
   message: ChatMessage;
@@ -16,6 +18,10 @@ type TextMessageProps = {
   editMessage: boolean;
   finishEdit: () => void;
 };
+
+const socket = io(baseURL, {
+  transports: ['websocket'],
+});
 
 const TextMessage: React.FC<TextMessageProps> = ({
   message,
@@ -27,9 +33,12 @@ const TextMessage: React.FC<TextMessageProps> = ({
   const [isEdited, setIsEdited] = useState(false);
   const { mutate: updateMessage } = useAPIUpdateChatMessage({
     onSuccess: (data) => {
-      message.content = data.content;
-      message.updatedAt = new Date();
-
+      // message.content = data.content;
+      // message.updatedAt = new Date();
+      socket.emit('message', {
+        type: 'edit',
+        chatMessage: { ...data, isSender: false },
+      });
       setIsEdited(true);
       finishEdit();
     },

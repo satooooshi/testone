@@ -37,6 +37,7 @@ import {
   ChatMessage,
   ChatMessageType,
   RoomType,
+  SocketMessage,
   User,
 } from 'src/types';
 import { MenuValue } from '@/hooks/chat/useModalReducer';
@@ -254,7 +255,10 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
     useAPISendChatMessage({
       onSuccess: (data) => {
         setMessages([data, ...messages]);
-        socket.emit('message', { ...data, isSender: false });
+        socket.emit('message', {
+          type: 'send',
+          chatMessage: { ...data, isSender: false },
+        });
         setNewChatMessage((m) => ({
           ...m,
           content: '',
@@ -443,27 +447,54 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
 
   useEffect(() => {
     socket.emit('joinRoom', room.id.toString());
-    socket.on('msgToClient', async (sentMsgByOtherUsers: ChatMessage) => {
-      // console.log('sent by other users', sentMsgByOtherUsers.content);
-      if (sentMsgByOtherUsers.content) {
-        sentMsgByOtherUsers.createdAt = new Date(sentMsgByOtherUsers.createdAt);
-        sentMsgByOtherUsers.updatedAt = new Date(sentMsgByOtherUsers.updatedAt);
-        if (sentMsgByOtherUsers.sender?.id === myself?.id) {
-          sentMsgByOtherUsers.isSender = true;
-        }
-        setMessages((msgs) => {
-          if (
-            msgs.length &&
-            msgs[0].id !== sentMsgByOtherUsers.id &&
-            sentMsgByOtherUsers.chatGroup?.id === room.id
-          ) {
-            return [sentMsgByOtherUsers, ...msgs];
-          } else if (sentMsgByOtherUsers.chatGroup?.id !== room.id) {
-            return msgs.filter((m) => m.id !== sentMsgByOtherUsers.id);
+    socket.on('msgToClient', async (socketMessage: SocketMessage) => {
+      if (socketMessage.chatMessage.sender?.id === myself?.id) {
+        socketMessage.chatMessage.isSender = true;
+      }
+      switch (socketMessage.type) {
+        case 'send': {
+          // console.log('sent by other users', socketMessage.chatMessage.content);
+          if (socketMessage.chatMessage.content) {
+            socketMessage.chatMessage.createdAt = new Date(
+              socketMessage.chatMessage.createdAt,
+            );
+            socketMessage.chatMessage.updatedAt = new Date(
+              socketMessage.chatMessage.updatedAt,
+            );
+            setMessages((msgs) => {
+              if (
+                msgs.length &&
+                msgs[0].id !== socketMessage.chatMessage.id &&
+                socketMessage.chatMessage.chatGroup?.id === room.id
+              ) {
+                return [socketMessage.chatMessage, ...msgs];
+              } else if (socketMessage.chatMessage.chatGroup?.id !== room.id) {
+                return msgs.filter(
+                  (m) => m.id !== socketMessage.chatMessage.id,
+                );
+              }
+              return msgs;
+            });
+            needRefetch();
           }
-          return msgs;
-        });
-        needRefetch();
+          break;
+        }
+        case 'edit': {
+          setMessages((msgs) => {
+            return msgs.map((m) =>
+              m.id === socketMessage.chatMessage.id
+                ? socketMessage.chatMessage
+                : m,
+            );
+          });
+          break;
+        }
+        case 'delete': {
+          setMessages((msgs) => {
+            return msgs.filter((m) => m.id !== socketMessage.chatMessage.id);
+          });
+          break;
+        }
       }
     });
 
