@@ -2,7 +2,29 @@ PODS:
   - agora-react-native-rtm (1.5.0):
     - AgoraRtm_iOS (= 1.4.10)
     - React
-  - AgoraRtcEngine_iOS (3.5.2)
+  - AgoraRtcEngine_Special_iOS (3.6.2.70):
+    - AgoraRtcEngine_Special_iOS/AINS (= 3.6.2.70)
+    - AgoraRtcEngine_Special_iOS/AV1Dec (= 3.6.2.70)
+    - AgoraRtcEngine_Special_iOS/ContentInspect (= 3.6.2.70)
+    - AgoraRtcEngine_Special_iOS/FullAudioFormat (= 3.6.2.70)
+    - AgoraRtcEngine_Special_iOS/JND (= 3.6.2.70)
+    - AgoraRtcEngine_Special_iOS/ReplayKit (= 3.6.2.70)
+    - AgoraRtcEngine_Special_iOS/ROIEnc (= 3.6.2.70)
+    - AgoraRtcEngine_Special_iOS/RtcBasic (= 3.6.2.70)
+    - AgoraRtcEngine_Special_iOS/SuperResolution (= 3.6.2.70)
+    - AgoraRtcEngine_Special_iOS/VideoPreprocess (= 3.6.2.70)
+    - AgoraRtcEngine_Special_iOS/VirtualBackground (= 3.6.2.70)
+  - AgoraRtcEngine_Special_iOS/AINS (3.6.2.70)
+  - AgoraRtcEngine_Special_iOS/AV1Dec (3.6.2.70)
+  - AgoraRtcEngine_Special_iOS/ContentInspect (3.6.2.70)
+  - AgoraRtcEngine_Special_iOS/FullAudioFormat (3.6.2.70)
+  - AgoraRtcEngine_Special_iOS/JND (3.6.2.70)
+  - AgoraRtcEngine_Special_iOS/ReplayKit (3.6.2.70)
+  - AgoraRtcEngine_Special_iOS/ROIEnc (3.6.2.70)
+  - AgoraRtcEngine_Special_iOS/RtcBasic (3.6.2.70)
+  - AgoraRtcEngine_Special_iOS/SuperResolution (3.6.2.70)
+  - AgoraRtcEngine_Special_iOS/VideoPreprocess (3.6.2.70)
+  - AgoraRtcEngine_Special_iOS/VirtualBackground (3.6.2.70)
   - AgoraRtm_iOS (1.4.10)
   - boost (1.76.0)
   - CocoaAsyncSocket (7.6.5)
@@ -346,9 +368,9 @@ PODS:
   - React-jsinspector (0.66.0)
   - React-logger (0.66.0):
     - glog
-  - react-native-agora (3.5.2):
-    - AgoraRtcEngine_iOS (= 3.5.2)
-    - React
+  - react-native-agora (3.6.2):
+    - AgoraRtcEngine_Special_iOS (= 3.6.2.70)
+    - React-Core
   - react-native-background-timer (2.4.1):
     - React-Core
   - react-native-cameraroll (4.1.2):
@@ -621,7 +643,7 @@ DEPENDENCIES:
 
 SPEC REPOS:
   trunk:
-    - AgoraRtcEngine_iOS
+    - AgoraRtcEngine_Special_iOS
     - AgoraRtm_iOS
     - CocoaAsyncSocket
     - Firebase
@@ -781,7 +803,7 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   agora-react-native-rtm: c62d06126cb86ecae39f75a929ba1e46e615c9e9
-  AgoraRtcEngine_iOS: 3d13806d67e401298558c9a6fb09340a4299afa2
+  AgoraRtcEngine_Special_iOS: 929a1cacc8e396fb7f4e7d329c7c38f56465b8c4
   AgoraRtm_iOS: 95e7070466f42a6494435a7f39fd2b13fc143cbf
   boost: a7c83b31436843459a1961bfd74b96033dc77234
   CocoaAsyncSocket: 065fd1e645c7abab64f7a6a2007a48038fdc6a99
@@ -826,7 +848,7 @@ SPEC CHECKSUMS:
   React-jsiexecutor: 6a05173dc0142abc582bd4edd2d23146b8cc218a
   React-jsinspector: be95ad424ba9f7b817aff22732eb9b1b810a000a
   React-logger: 9a9cd87d4ea681ae929b32ef580638ff1b50fb24
-  react-native-agora: 1f40c29ef13de4ccf00ddbfda1316f87c0c2b135
+  react-native-agora: c6db7769dbdc62fed8412435808e25ce6230f355
   react-native-background-timer: 17ea5e06803401a379ebf1f20505b793ac44d0fe
   react-native-cameraroll: 2957f2bce63ae896a848fbe0d5352c1bd4d20866
   react-native-config: 72d948053a442779b3178fddd571e37f118ef606
