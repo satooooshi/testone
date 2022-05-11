@@ -3,6 +3,7 @@ export const getRoomsByPageURL = `/${chatURL}/v2/rooms`;
 export const getRoomDetailURL = `/${chatURL}/v2/room`;
 
 export const getChatGroupListURL = `/${chatURL}/group-list`;
+export const getRoomsUnreadChatCountURL = `/${chatURL}/group-unread-chat-count`;
 export const getChatMessagesURL = `/${chatURL}/get-messages`;
 export const searchMessagesURL = `${chatURL}/search-messages`;
 export const getLatestMentionedMessageURL = `/${chatURL}/latest-mentioned`;

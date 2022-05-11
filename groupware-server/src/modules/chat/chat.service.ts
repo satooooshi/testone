@@ -20,6 +20,7 @@ import {
   GetMessagesQuery,
   GetRoomsResult,
   SearchMessageQuery,
+  GetUnreadMessagesQuery,
 } from './chat.controller';
 
 @Injectable()
@@ -62,10 +63,14 @@ export class ChatService {
     });
     groupsAndUsers = groupsAndUsers.map((g) => {
       const isPinned = !!g.pinnedUsers.filter((u) => u.id === userID).length;
+      const hasBeenRead = g?.lastReadChatTime?.[0]?.readTime
+        ? g?.lastReadChatTime?.[0]?.readTime > g.updatedAt
+        : false;
       return {
         ...g,
         pinnedUsers: undefined,
         isPinned,
+        hasBeenRead,
       };
     });
     groupsAndUsers = orderBy(groupsAndUsers, [
@@ -110,25 +115,30 @@ export class ChatService {
       .take(Number(limit))
       .orderBy('chat_groups.updatedAt', 'DESC')
       .getManyAndCount();
-    let rooms = urlUnparsedRooms.map((g) => {
-      const isPinned = !!g.pinnedUsers.length;
-      const hasBeenRead = g?.lastReadChatTime?.[0]?.readTime
-        ? g?.lastReadChatTime?.[0]?.readTime > g.updatedAt
-        : false;
+    let rooms = await Promise.all(
+      urlUnparsedRooms.map(async (g) => {
+        let unreadCount = 0;
+        const isPinned = !!g.pinnedUsers.length;
+        const hasBeenRead = g?.lastReadChatTime?.[0]?.readTime
+          ? g?.lastReadChatTime?.[0]?.readTime > g.updatedAt
+          : false;
+        if (!hasBeenRead && g?.lastReadChatTime?.[0]?.readTime) {
+          const query = {
+            group: g.id,
+            lastReadTime: g.lastReadChatTime?.[0].readTime,
+          };
+          unreadCount = await this.getUnreadChatMessage(userID, query);
+        }
 
-      if (g.roomType === RoomType.PERSONAL) {
-        const chatPartner = g.members.filter((m) => m.id !== userID)[0];
-        g.imageURL = chatPartner.avatarUrl;
-        g.name = `${chatPartner.lastName} ${chatPartner.firstName}`;
-      }
-
-      return {
-        ...g,
-        pinnedUsers: undefined,
-        isPinned,
-        hasBeenRead,
-      };
-    });
+        return {
+          ...g,
+          pinnedUsers: undefined,
+          isPinned,
+          hasBeenRead,
+          unreadCount,
+        };
+      }),
+    );
     rooms = orderBy(rooms, [
       'isPinned',
       'updatedAt',
@@ -136,6 +146,42 @@ export class ChatService {
     ]).reverse();
     const pageCount = Math.floor(count / Number(limit)) + 1;
     return { rooms, pageCount };
+  }
+
+  public async getRoomsUnreadChatCount(userID: number): Promise<ChatGroup[]> {
+    const [urlUnparsedRooms] = await this.chatGroupRepository
+      .createQueryBuilder('chat_groups')
+      .leftJoin('chat_groups.members', 'member')
+      .leftJoinAndSelect(
+        'chat_groups.lastReadChatTime',
+        'lastReadChatTime',
+        'lastReadChatTime.user_id = :userID',
+        { userID },
+      )
+      .where('member.id = :memberId', { memberId: userID })
+      .orderBy('chat_groups.updatedAt', 'DESC')
+      .getManyAndCount();
+    const rooms = await Promise.all(
+      urlUnparsedRooms.map(async (g) => {
+        let unreadCount = 0;
+        const hasBeenRead = g?.lastReadChatTime?.[0]?.readTime
+          ? g?.lastReadChatTime?.[0]?.readTime > g.updatedAt
+          : false;
+        if (!hasBeenRead && g?.lastReadChatTime?.[0]?.readTime) {
+          const query = {
+            group: g.id,
+            lastReadTime: g.lastReadChatTime?.[0].readTime,
+          };
+          unreadCount = await this.getUnreadChatMessage(userID, query);
+        }
+
+        return {
+          ...g,
+          unreadCount,
+        };
+      }),
+    );
+    return rooms;
   }
 
   public async getChatMessage(
@@ -192,6 +238,32 @@ export class ChatService {
       return m;
     });
     return messages;
+  }
+
+  public async getUnreadChatMessage(
+    userID: number,
+    query: GetUnreadMessagesQuery,
+  ): Promise<number> {
+    const unreadCount = await this.chatMessageRepository
+      .createQueryBuilder('chat_messages')
+      .withDeleted()
+      .leftJoin('chat_messages.chatGroup', 'chat_group')
+      .leftJoinAndSelect(
+        'chat_messages.replyParentMessage',
+        'replyParentMessage',
+      )
+      .leftJoinAndSelect('replyParentMessage.sender', 'reply_sender')
+      .where('chat_group.id = :chatGroupID', { chatGroupID: query.group })
+      .andWhere('chat_messages.sender.id != :userID', {
+        userID,
+      })
+      .andWhere('chat_messages.createdAt > :lastReadTime', {
+        lastReadTime: query.lastReadTime,
+      })
+      .orderBy('chat_messages.createdAt', 'DESC')
+      .withDeleted()
+      .getCount();
+    return unreadCount;
   }
 
   public async searchMessage(
@@ -543,10 +615,13 @@ export class ChatService {
       .leftJoin('time.user', 'u')
       .where('g.id = :chatGroupId', { chatGroupId })
       .andWhere('u.id = :userId', { userId: user.id })
-      .getMany();
+      .getOne();
 
-    if (existTime.length) {
-      await this.lastReadChatTimeRepository.remove(existTime);
+    if (existTime) {
+      return await this.lastReadChatTimeRepository.save({
+        ...existTime,
+        readTime: new Date(),
+      });
     }
 
     const newTarget = this.lastReadChatTimeRepository.create({

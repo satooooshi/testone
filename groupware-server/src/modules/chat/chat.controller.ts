@@ -51,6 +51,16 @@ export interface GetChaRoomsByPageQuery {
   page?: string;
   limit?: string;
 }
+export interface GetUnreadMessagesQuery {
+  group: number;
+  lastReadTime: Date;
+}
+
+export interface SearchMessageQuery {
+  group: number;
+  word: string;
+  limit?: string;
+}
 
 export interface SearchMessageQuery {
   group: number;
@@ -146,6 +156,14 @@ export class ChatController {
   @UseGuards(JwtAuthenticationGuard)
   async getChatGroup(@Req() req: RequestWithUser): Promise<ChatGroup[]> {
     return await this.chatService.getChatGroup(req.user.id);
+  }
+
+  @Get('group-unread-chat-count')
+  @UseGuards(JwtAuthenticationGuard)
+  async getRoomsUnreadChatCount(
+    @Req() req: RequestWithUser,
+  ): Promise<ChatGroup[]> {
+    return await this.chatService.getRoomsUnreadChatCount(req.user.id);
   }
 
   @Get('/v2/rooms')

@@ -12,6 +12,7 @@ import {darkFontColor} from '../../../utils/colors';
 import {dateTimeFormatterFromJSDDate} from '../../../utils/dateTimeFormatterFromJSDate';
 import {nameOfRoom} from '../../../utils/factory/chat/nameOfRoom';
 import {mentionTransform} from '../../../utils/messageTransform';
+import {Badge} from 'react-native-paper';
 
 type RoomCardProps = {
   room: ChatGroup;
@@ -98,7 +99,7 @@ const RoomCard: React.FC<RoomCardProps> = ({
           w={windowWidth * 0.9}
           shadow="sm"
           p={4}
-          h={100}
+          h={70}
           alignItems="center"
           flexDir="row">
           <Div>
@@ -131,6 +132,18 @@ const RoomCard: React.FC<RoomCardProps> = ({
             <Text numberOfLines={1} mb={'xs'} fontWeight="bold" fontSize={16}>
               {nameOfRoom(room)}
             </Text>
+            {room.unreadCount && room.unreadCount > 0 ? (
+              <Badge
+                style={{
+                  position: 'absolute',
+                  left: windowWidth * 0.6,
+                  marginTop: 10,
+                  backgroundColor: 'green',
+                }}
+                size={25}>
+                {`${room.unreadCount}`}
+              </Badge>
+            ) : null}
             <Text
               mb={'xs'}
               fontSize={14}

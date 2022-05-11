@@ -451,6 +451,7 @@ PODS:
   - RNCallKeep (4.3.1):
     - React
   - RNCAsyncStorage (1.17.3):
+  - RNCClipboard (1.5.1):
     - React-Core
   - RNCMaskedView (0.2.6):
     - React-Core
@@ -606,6 +607,7 @@ DEPENDENCIES:
   - RNBootSplash (from `../node_modules/react-native-bootsplash`)
   - RNCallKeep (from `../node_modules/react-native-callkeep`)
   - "RNCAsyncStorage (from `../node_modules/@react-native-async-storage/async-storage`)"
+  - "RNCClipboard (from `../node_modules/@react-native-community/clipboard`)"
   - "RNCMaskedView (from `../node_modules/@react-native-masked-view/masked-view`)"
   - "RNCPushNotificationIOS (from `../node_modules/@react-native-community/push-notification-ios`)"
   - "RNDateTimePicker (from `../node_modules/@react-native-community/datetimepicker`)"
@@ -753,6 +755,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-callkeep"
   RNCAsyncStorage:
     :path: "../node_modules/@react-native-async-storage/async-storage"
+  RNCClipboard:
+    :path: "../node_modules/@react-native-community/clipboard"
   RNCMaskedView:
     :path: "../node_modules/@react-native-masked-view/masked-view"
   RNCPushNotificationIOS:
@@ -860,6 +864,7 @@ SPEC CHECKSUMS:
   RNBootSplash: 5e82ba24a59a07315cbb2bb4855bb8d76fc7e802
   RNCallKeep: 3ac23a8074aa4b25901a437ee4c6fcbbd7509bfd
   RNCAsyncStorage: 005c0e2f09575360f142d0d1f1f15e4ec575b1af
+  RNCClipboard: 41d8d918092ae8e676f18adada19104fa3e68495
   RNCMaskedView: c298b644a10c0c142055b3ae24d83879ecb13ccd
   RNCPushNotificationIOS: 87b8d16d3ede4532745e05b03c42cff33a36cc45
   RNDateTimePicker: 7658208086d86d09e1627b5c34ba0cf237c60140
@@ -882,4 +887,4 @@ SPEC CHECKSUMS:
 
 PODFILE CHECKSUM: 3910fa18edb9db7c3c45e1d7820c5b04aac1bbf4
 
-COCOAPODS: 1.11.2
+COCOAPODS: 1.11.3
