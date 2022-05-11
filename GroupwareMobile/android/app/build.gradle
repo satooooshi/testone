@@ -214,7 +214,7 @@ dependencies {
     implementation project(':react-native-config')
 
     compile project(':react-native-file-viewer')
-
+    compile project(':react-native-background-timer')
 
     implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.0.0"
 
