@@ -185,7 +185,6 @@ const Navigator = () => {
     await createRTCInstance();
     await rtcEngine?.disableVideo();
     rtcEngine?.removeAllListeners();
-    rtcEngine?.setEnableSpeakerphone(false);
     await rtcEngine?.adjustPlaybackSignalVolume(100);
     await rtcEngine?.adjustRecordingSignalVolume(100);
 
@@ -220,7 +219,7 @@ const Navigator = () => {
     LocalMuteVideo: async bool => {
       if (bool) {
         if ((await rtcEngine?.isSpeakerphoneEnabled()) === true) {
-          await rtcEngine?.setEnableSpeakerphone(false);
+          await rtcEngine?.setEnableSpeakerphone(true);
         }
         await rtcEngine?.adjustPlaybackSignalVolume(100);
         await rtcEngine?.adjustRecordingSignalVolume(100);
@@ -298,7 +297,7 @@ const Navigator = () => {
         okButton: 'ok',
         additionalPermissions: [],
         foregroundService: {
-          channelId: 'com.groupwaremobile',
+          channelId: 'com.groupwaremobileTest',
           channelName: 'Foreground service for my app',
           notificationTitle: 'バックグラウンドで実行中です',
         },
