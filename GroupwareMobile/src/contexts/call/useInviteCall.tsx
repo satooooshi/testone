@@ -56,7 +56,7 @@ export const InviteCallProvider: React.FC = ({children}) => {
   const disableCallAcceptedFlag = () => {
     setIsCallAccepted(false);
   };
-  
+
   const ringCall = async () => {
     SoundPlayer.setSpeaker(false);
     SoundPlayer.playSoundFile('ring_sound', 'mp3');
