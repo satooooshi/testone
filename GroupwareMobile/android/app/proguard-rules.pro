@@ -9,5 +9,5 @@
 
 # Add any project specific keep options here:
 
--keep class com.groupwaremobile.BuildConfig { *; }
+-keep class com.groupwaremobileTest .BuildConfig { *; }
 

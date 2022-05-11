@@ -145,8 +145,8 @@ android {
     }
 
     defaultConfig {
-        resValue "string", "build_config_package", "com.groupwaremobile"
-        applicationId "com.groupwaremobile"
+        resValue "string", "build_config_package", "com.groupwaremobileTest "
+        applicationId "com.groupwaremobileTest "
         minSdkVersion 26
         targetSdkVersion 31
         versionCode 37
