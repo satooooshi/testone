@@ -80,6 +80,7 @@ const Navigator = () => {
 
   const soundOnEnd = async () => {
     try {
+      SoundPlayer.setSpeaker(false);
       SoundPlayer.playSoundFile('end_call', 'mp3');
     } catch (e) {
       console.log('sound on end call failed:', e);
@@ -127,6 +128,7 @@ const Navigator = () => {
       }
       if (!isCallAccepted && localInvitation) {
         // local invitation(送信した通話招待)があればcancelする
+        stopRing();
         await rtmEngine?.cancelLocalInvitationV2(localInvitation);
         if (callTimeout) {
           sendCallHistory('応答なし');
@@ -183,6 +185,9 @@ const Navigator = () => {
     await createRTCInstance();
     await rtcEngine?.disableVideo();
     rtcEngine?.removeAllListeners();
+    rtcEngine?.setEnableSpeakerphone(false);
+    await rtcEngine?.adjustPlaybackSignalVolume(100);
+    await rtcEngine?.adjustRecordingSignalVolume(100);
 
     rtcEngine?.addListener('UserJoined', (uid, elapsed) => {
       console.log('UserJoined', uid, elapsed);
@@ -215,7 +220,7 @@ const Navigator = () => {
     LocalMuteVideo: async bool => {
       if (bool) {
         if ((await rtcEngine?.isSpeakerphoneEnabled()) === true) {
-          await rtcEngine?.setEnableSpeakerphone(true);
+          await rtcEngine?.setEnableSpeakerphone(false);
         }
         await rtcEngine?.adjustPlaybackSignalVolume(100);
         await rtcEngine?.adjustRecordingSignalVolume(100);
