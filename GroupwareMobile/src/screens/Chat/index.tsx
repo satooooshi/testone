@@ -171,6 +171,7 @@ const Chat: React.FC = () => {
   } = useAPIGetMessages(
     {
       group: room.id,
+      limit: 20,
       after,
       before,
       include,
@@ -430,6 +431,7 @@ const Chat: React.FC = () => {
   };
 
   const onScrollTopOnChat = () => {
+    console.log('before call ===========================');
     setBefore(messages[messages.length - 1].id);
   };
 
@@ -517,8 +519,9 @@ const Chat: React.FC = () => {
   }, [refetchLatest, room]);
 
   useEffect(() => {
+    console.log('call =============================');
     refetchFetchedPastMessages();
-  }, [before, after, include, refetchFetchedPastMessages]);
+  }, [before, after, refetchFetchedPastMessages]);
 
   useEffect(() => {
     // 検索する文字がアルファベットの場合、なぜかuseAPISearchMessagesのonSuccessが動作しない為、こちらで代わりとなる処理を記述しています。

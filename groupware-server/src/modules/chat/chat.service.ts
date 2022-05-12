@@ -189,6 +189,7 @@ export class ChatService {
     query: GetMessagesQuery,
   ): Promise<ChatMessage[]> {
     const { after, before, include = false, limit = '20' } = query;
+
     if (Number(limit) === 0) {
       return;
     }
