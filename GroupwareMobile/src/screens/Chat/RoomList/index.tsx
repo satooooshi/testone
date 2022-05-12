@@ -21,6 +21,7 @@ import {useAPIGetUsers} from '../../../hooks/api/user/useAPIGetUsers';
 import {useUserRole} from '../../../hooks/user/useUserRole';
 import {ChatGroup, RoomType} from '../../../types';
 import {RoomListNavigationProps} from '../../../types/navigator/drawerScreenProps';
+import storage from '../../../utils/storage';
 
 const RoomList: React.FC = () => {
   const navigation = useNavigation<RoomListNavigationProps>();
@@ -112,6 +113,27 @@ const RoomList: React.FC = () => {
   useEffect(() => {
     refetchAllRooms();
   }, [unreadChatCount, refetchAllRooms]);
+
+  useFocusEffect(
+    useCallback(() => {
+      storage
+        .load({
+          key: 'roomList',
+        })
+        .then(loadedData => {
+          setRoomsForInfiniteScroll(loadedData);
+        });
+    }, []),
+  );
+
+  useEffect(() => {
+    if (roomsForInfiniteScroll.length) {
+      storage.save({
+        key: 'roomList',
+        data: roomsForInfiniteScroll,
+      });
+    }
+  }, [roomsForInfiniteScroll]);
 
   return (
     <WholeContainer>
