@@ -615,7 +615,7 @@ const Navigator = () => {
     ) {
       navigationRef.current?.navigate('Main');
     }
-  }, [isJoining, navigationRef, user?.id, channelName]);
+  }, [isJoining, navigationRef, user?.id, channelName, isCalling]);
 
   useEffect(
     () => {
