@@ -38,6 +38,7 @@ export const rtmEngine = new RtmClient();
 //rtcはメソッド使用直前にcreateInstanceしないとエラーがでることがある
 let rtcEngine: RtcEngine;
 let callKeepUUID = '';
+let isCallScreen = false;
 
 const Navigator = () => {
   const {user, currentChatRoomId} = useAuthenticate();
@@ -518,7 +519,10 @@ const Navigator = () => {
 
   useEffect(() => {
     const naviateByNotif = (notification: any) => {
-      if (navigationRef.current?.getCurrentRoute?.name !== 'Login') {
+      if (
+        navigationRef.current?.getCurrentRoute()?.name !== 'Login' &&
+        user?.id
+      ) {
         if (notification.data?.screen === 'event' && notification.data?.id) {
           navigationRef.current?.navigate('EventStack', {
             screen: 'EventDetail',
@@ -607,13 +611,12 @@ const Navigator = () => {
   }, [navigationRef, currentChatRoomId]);
 
   useEffect(() => {
-    if (isJoining && navigationRef.current?.getCurrentRoute?.name === 'Main') {
+    if (isJoining && !isCallScreen) {
       navigationRef.current?.navigate('Call');
-    } else if (
-      user?.id &&
-      navigationRef.current?.getCurrentRoute?.name !== 'Main'
-    ) {
+      isCallScreen = true;
+    } else if (user?.id && isCallScreen) {
       navigationRef.current?.navigate('Main');
+      isCallScreen = false;
     }
   }, [isJoining, navigationRef, user?.id, channelName, isCalling]);
 
