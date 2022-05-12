@@ -188,8 +188,11 @@ export class ChatService {
     userID: number,
     query: GetMessagesQuery,
   ): Promise<ChatMessage[]> {
-    const { after, before, include = false } = query;
-    const limit = 20;
+    const { after, before, include = false, limit = '20' } = query;
+    if (Number(limit) === 0) {
+      return;
+    }
+
     const existMessages = await this.chatMessageRepository
       .createQueryBuilder('chat_messages')
       .withDeleted()
@@ -219,10 +222,11 @@ export class ChatService {
           : '1=1',
         { before },
       )
-      .take(limit)
+      .take(Number(limit))
       .orderBy('chat_messages.createdAt', after ? 'ASC' : 'DESC')
       .withDeleted()
       .getMany();
+
     const messages = existMessages.map((m) => {
       m.reactions = m.reactions.map((r) => {
         if (r.user?.id === userID) {

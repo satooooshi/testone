@@ -207,10 +207,16 @@ const Chat: React.FC = () => {
   const {refetch: refetchLatest} = useAPIGetMessages(
     {
       group: room.id,
+      limit: room.unreadCount,
     },
     {
       enabled: false,
       onSuccess: latestData => {
+        console.log(
+          'latest success ===========================================',
+          latestData.length,
+          room.unreadCount,
+        );
         if (latestData?.length) {
           const msgToAppend: ChatMessage[] = [];
           const imagesToApped: ImageSource[] = [];
@@ -905,6 +911,7 @@ const Chat: React.FC = () => {
           id: room.id.toString(),
         })
         .then(cacheData => {
+          console.log('cacheData =================', cacheData.length);
           setMessages(cacheData);
         });
       refetchLatest();
