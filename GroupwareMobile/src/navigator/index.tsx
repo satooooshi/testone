@@ -607,12 +607,15 @@ const Navigator = () => {
   }, [navigationRef, currentChatRoomId]);
 
   useEffect(() => {
-    if (isJoining) {
+    if (isJoining && navigationRef.current?.getCurrentRoute?.name === 'Main') {
       navigationRef.current?.navigate('Call');
-    } else if (user?.id) {
+    } else if (
+      user?.id &&
+      navigationRef.current?.getCurrentRoute?.name !== 'Main'
+    ) {
       navigationRef.current?.navigate('Main');
     }
-  }, [isJoining, navigationRef, user?.id]);
+  }, [isJoining, navigationRef, user?.id, channelName]);
 
   useEffect(
     () => {
