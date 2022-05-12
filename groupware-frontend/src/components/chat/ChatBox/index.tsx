@@ -378,7 +378,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
     }
 
     if (room.roomType === RoomType.PERSONAL) {
-      const chatPartner = members.filter((m) => m.id !== myself?.id);
+      const chatPartner = members.filter((m) => m.id !== user?.id);
       const partnerName = chatPartner
         .map((p) => p.lastName + ' ' + p.firstName)
         .join();
@@ -519,12 +519,12 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
 
   const isLoading = loadingSend || loadingUplaod;
   const activeIndex = useMemo(() => {
-    if (selectedImage?.url) {
+    if (selectedImageURL) {
       const isNowUri = (element: ImageDecorator) =>
-        element.src === selectedImage.url;
+        element.src === selectedImageURL;
       return imagesForViewing.findIndex(isNowUri);
     }
-  }, [imagesForViewing, selectedImage?.url]);
+  }, [imagesForViewing, selectedImageURL]);
 
   const replyTargetContent = (replyTarget: ChatMessage) => {
     switch (replyTarget.type) {
@@ -632,14 +632,14 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
                   className={`react-viewer-icon react-viewer-icon-download`}></i>
               ),
               onClick: ({ src }) => {
-                if (selectedImage?.name) saveAs(src, selectedImage.name);
+                saveAs(src, fileNameTransformer(src));
               },
             },
           ]);
         }}
         images={imagesForViewing}
-        visible={!!selectedImage}
-        onClose={() => setSelectedImage(undefined)}
+        visible={!!selectedImageURL}
+        onClose={() => setSelectedImageURL(undefined)}
         activeIndex={activeIndex !== -1 ? activeIndex : 0}
       />
       {/*
@@ -782,7 +782,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
                 }
                 onClickImage={() => {
                   if (m.type === ChatMessageType.IMAGE) {
-                    setSelectedImage({ url: m.content, name: m.fileName });
+                    setSelectedImageURL(m.content);
                   }
                 }}
               />
