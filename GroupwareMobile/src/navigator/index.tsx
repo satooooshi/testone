@@ -67,7 +67,7 @@ const Navigator = () => {
   const [onCallUid, setOnCallUid] = useState('');
   const [refusedInvitation, setRefusedInvitation] = useState(false);
   const [alertCountOnEndCall, setAlertCountOnEndCall] = useState(0);
-  const AGORA_APP_ID = Config.AGORA_APP_ID;
+  const AGORA_APP_ID = Config.AGORA_APP_ID_TEST;
   const rtcProps: RtcPropsInterface = {
     appId: AGORA_APP_ID,
     channel: channelName,
