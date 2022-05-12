@@ -58,8 +58,11 @@ export const InviteCallProvider: React.FC = ({children}) => {
   };
 
   const ringCall = async () => {
+    SoundPlayer.loadSoundFile('ring_sound', 'mp3');
     SoundPlayer.setSpeaker(false);
-    SoundPlayer.playSoundFile('ring_sound', 'mp3');
+    SoundPlayer.setVolume(0.1);
+    SoundPlayer.play();
+    // SoundPlayer.playSoundFile('ring_sound', 'mp3');
   };
   const stopRing = useCallback(() => {
     SoundPlayer.stop();
