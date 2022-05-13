@@ -6,7 +6,15 @@ import {
   TouchableHighlight,
   TouchableOpacity,
 } from 'react-native';
-import {Div, Icon, Text} from 'react-native-magnus';
+import {
+  Button,
+  Div,
+  Icon,
+  Input,
+  Modal,
+  ScrollDiv,
+  Text,
+} from 'react-native-magnus';
 import {ActivityIndicator} from 'react-native-paper';
 import tailwind from 'tailwind-rn';
 import RoomCard from '../../../components/chat/RoomCard';
@@ -21,6 +29,7 @@ import {useAPIGetUsers} from '../../../hooks/api/user/useAPIGetUsers';
 import {useUserRole} from '../../../hooks/user/useUserRole';
 import {ChatGroup, RoomType} from '../../../types';
 import {RoomListNavigationProps} from '../../../types/navigator/drawerScreenProps';
+import {nameOfRoom} from '../../../utils/factory/chat/nameOfRoom';
 import storage from '../../../utils/storage';
 
 const RoomList: React.FC = () => {
@@ -35,6 +44,9 @@ const RoomList: React.FC = () => {
   const {unreadChatCount} = useHandleBadge();
   const {selectedUserRole, filteredUsers} = useUserRole('All', users);
   const [creationType, setCreationType] = useState<RoomType>();
+  const [isVisibleSearchedRooms, setIsVisibleSearchedRooms] =
+    useState<boolean>(false);
+  const [searchedRooms, setSearchedRooms] = useState<ChatGroup[]>();
 
   const {refetch: refetchAllRooms, isLoading: loadingGetChatGroupList} =
     useAPIGetRooms(
@@ -142,6 +154,33 @@ const RoomList: React.FC = () => {
         rightButtonName={'新規作成'}
         {...{onPressRightButton}}
       />
+      <Input
+        placeholder="検索"
+        onChangeText={e =>
+          setSearchedRooms(
+            roomsForInfiniteScroll.filter(r => {
+              const regex = new RegExp(e);
+              return r.name ? regex.test(r.name) : regex.test(nameOfRoom(r));
+            }),
+          )
+        }
+      />
+
+      <Modal h={400} isVisible={isVisibleSearchedRooms}>
+        <ScrollDiv>
+          <Button
+            bg="gray400"
+            h={35}
+            w={35}
+            right={0}
+            alignSelf="flex-end"
+            rounded="circle"
+            onPress={() => setIsVisibleSearchedRooms(false)}>
+            <Icon color="black" name="close" />
+          </Button>
+          {searchedRooms}
+        </ScrollDiv>
+      </Modal>
       {roomTypeSelector ? (
         <Div
           bg="white"
@@ -231,7 +270,7 @@ const RoomList: React.FC = () => {
           }
           contentContainerStyle={tailwind('self-center mt-4 pb-4')}
           keyExtractor={item => item.id.toString()}
-          data={roomsForInfiniteScroll}
+          data={searchedRooms ? searchedRooms : roomsForInfiniteScroll}
           renderItem={({item: room}) => (
             <Div mb="sm">
               <RoomCard
