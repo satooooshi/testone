@@ -66,6 +66,7 @@ const RoomList: React.FC = () => {
       page: latestPage.toString(),
       limit: '20',
       isLatest: true,
+      updatedAtLatestRoom: roomsForInfiniteScroll[0]?.updatedAt,
     },
     {
       enabled: false,
@@ -80,7 +81,11 @@ const RoomList: React.FC = () => {
         } else {
           setIsNeedRefetchLatest(false);
           setLatestPage(1);
-          setRoomsForInfiniteScroll(latestRooms);
+          const ids = latestRooms.map(r => r.id);
+          setRoomsForInfiniteScroll(room => {
+            const roomsExceptUpdated = room.filter(r => !ids.includes(r.id));
+            return [...latestRooms, ...roomsExceptUpdated];
+          });
         }
       },
     },

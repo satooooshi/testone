@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { orderBy } from 'lodash';
+import { DateTime } from 'luxon';
 import PushNotifications from 'node-pushnotifications';
 import { ChatGroup, RoomType } from 'src/entities/chatGroup.entity';
 import { ChatMessage, ChatMessageType } from 'src/entities/chatMessage.entity';
@@ -85,11 +86,16 @@ export class ChatService {
     userID: number,
     query: GetChaRoomsByPageQuery,
   ): Promise<GetRoomsResult> {
-    const { page, limit = '20' } = query;
+    const { page, limit = '20', updatedAtLatestRoom } = query;
     let offset;
     if (page) {
       offset = (Number(page) - 1) * Number(limit);
     }
+    const db = DateTime.fromJSDate(new Date(updatedAtLatestRoom));
+    const formatedDate = db.toFormat(
+      `yyyy-MM-dd hh:mm:ss.${db.get('millisecond')}`,
+    );
+
     const [urlUnparsedRooms, count] = await this.chatGroupRepository
       .createQueryBuilder('chat_groups')
       .leftJoinAndSelect('chat_groups.members', 'members')
@@ -114,10 +120,17 @@ export class ChatService {
       .leftJoinAndSelect('m.sender', 'sender')
       .leftJoinAndSelect('lastReadChatTime.user', 'lastReadChatTime.user')
       .where('member.id = :memberId', { memberId: userID })
+      .andWhere(
+        formatedDate ? `chat_groups.updatedAt > :formatedDate` : '1=1',
+        {
+          formatedDate,
+        },
+      )
       .skip(offset)
       .take(Number(limit))
       .orderBy('chat_groups.updatedAt', 'DESC')
       .getManyAndCount();
+
     let rooms = await Promise.all(
       urlUnparsedRooms.map(async (g) => {
         let unreadCount = 0;
