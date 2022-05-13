@@ -52,10 +52,11 @@ const RoomList: React.FC = () => {
     useAPIGetRooms(
       {
         page: '1',
-        limit: (20 * Number(page)).toString(),
+        limit: String(0),
       },
       {
         onSuccess: data => {
+          console.log('call -----------------------', data.rooms.length);
           stateRefreshNeeded(data.rooms);
         },
       },
@@ -88,12 +89,6 @@ const RoomList: React.FC = () => {
   const onPressRightButton = () => {
     // navigation.navigate('ChatStack', {screen: 'NewRoom'});
     setRoomTypeSelector(true);
-  };
-
-  const onEndReached = () => {
-    if (roomsForInfiniteScroll?.length >= Number(page) * 20) {
-      setPage(p => (Number(p) + 1).toString());
-    }
   };
 
   const stateRefreshNeeded = (newData: ChatGroup[]) => {
@@ -153,17 +148,6 @@ const RoomList: React.FC = () => {
         title="ルーム一覧"
         rightButtonName={'新規作成'}
         {...{onPressRightButton}}
-      />
-      <Input
-        placeholder="検索"
-        onChangeText={e =>
-          setSearchedRooms(
-            roomsForInfiniteScroll.filter(r => {
-              const regex = new RegExp(e);
-              return r.name ? regex.test(r.name) : regex.test(nameOfRoom(r));
-            }),
-          )
-        }
       />
 
       <Modal h={400} isVisible={isVisibleSearchedRooms}>
@@ -266,6 +250,7 @@ const RoomList: React.FC = () => {
       <Div alignItems="center">
         <Input
           w={'90%'}
+          mb={20}
           placeholder="検索"
           onChangeText={e => {
             const filteredRooms = roomsForInfiniteScroll.filter(r => {
@@ -284,31 +269,45 @@ const RoomList: React.FC = () => {
           }
         />
         {roomsForInfiniteScroll.length ? (
-          <FlatList
-            {...{onEndReached}}
-            ListFooterComponent={
-              loadingGetChatGroupList ? <ActivityIndicator /> : null
-            }
-            contentContainerStyle={tailwind('self-center mt-4 pb-4')}
-            keyExtractor={item => item.id.toString()}
-            data={searchedRooms ? searchedRooms : roomsForInfiniteScroll}
-            renderItem={({item: room}) => (
-              <Div mb="sm">
-                <RoomCard
-                  room={room}
-                  onPress={() =>
-                    navigation.navigate('ChatStack', {
-                      screen: 'Chat',
-                      params: {room},
-                    })
-                  }
-                  onPressPinButton={() => {
-                    savePin({...room, isPinned: !room.isPinned});
-                  }}
-                />
-              </Div>
-            )}
-          />
+          <ScrollDiv h={'80%'}>
+            {searchedRooms
+              ? searchedRooms.map(room => {
+                  return (
+                    <Div mb="sm">
+                      <RoomCard
+                        room={room}
+                        onPress={() =>
+                          navigation.navigate('ChatStack', {
+                            screen: 'Chat',
+                            params: {room},
+                          })
+                        }
+                        onPressPinButton={() => {
+                          savePin({...room, isPinned: !room.isPinned});
+                        }}
+                      />
+                    </Div>
+                  );
+                })
+              : roomsForInfiniteScroll.map(room => {
+                  return (
+                    <Div mb="sm">
+                      <RoomCard
+                        room={room}
+                        onPress={() =>
+                          navigation.navigate('ChatStack', {
+                            screen: 'Chat',
+                            params: {room},
+                          })
+                        }
+                        onPressPinButton={() => {
+                          savePin({...room, isPinned: !room.isPinned});
+                        }}
+                      />
+                    </Div>
+                  );
+                })}
+          </ScrollDiv>
         ) : loadingGetChatGroupList ? (
           <ActivityIndicator />
         ) : (
