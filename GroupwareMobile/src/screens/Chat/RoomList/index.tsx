@@ -262,39 +262,61 @@ const RoomList: React.FC = () => {
           />
         </Div>
       ) : null}
-      {roomsForInfiniteScroll.length ? (
-        <FlatList
-          {...{onEndReached}}
-          ListFooterComponent={
-            loadingGetChatGroupList ? <ActivityIndicator /> : null
+
+      <Div alignItems="center">
+        <Input
+          w={'90%'}
+          placeholder="検索"
+          onChangeText={e => {
+            const filteredRooms = roomsForInfiniteScroll.filter(r => {
+              const regex = new RegExp(e);
+              return r.name ? regex.test(r.name) : regex.test(nameOfRoom(r));
+            });
+            setSearchedRooms(filteredRooms);
+          }}
+          prefix={
+            <Icon
+              name="search"
+              color="gray900"
+              fontFamily="Feather"
+              fontSize={12}
+            />
           }
-          contentContainerStyle={tailwind('self-center mt-4 pb-4')}
-          keyExtractor={item => item.id.toString()}
-          data={searchedRooms ? searchedRooms : roomsForInfiniteScroll}
-          renderItem={({item: room}) => (
-            <Div mb="sm">
-              <RoomCard
-                room={room}
-                onPress={() =>
-                  navigation.navigate('ChatStack', {
-                    screen: 'Chat',
-                    params: {room},
-                  })
-                }
-                onPressPinButton={() => {
-                  savePin({...room, isPinned: !room.isPinned});
-                }}
-              />
-            </Div>
-          )}
         />
-      ) : loadingGetChatGroupList ? (
-        <ActivityIndicator />
-      ) : (
-        <Text fontSize={16} textAlign="center">
-          ルームを作成するか、招待をお待ちください
-        </Text>
-      )}
+        {roomsForInfiniteScroll.length ? (
+          <FlatList
+            {...{onEndReached}}
+            ListFooterComponent={
+              loadingGetChatGroupList ? <ActivityIndicator /> : null
+            }
+            contentContainerStyle={tailwind('self-center mt-4 pb-4')}
+            keyExtractor={item => item.id.toString()}
+            data={searchedRooms ? searchedRooms : roomsForInfiniteScroll}
+            renderItem={({item: room}) => (
+              <Div mb="sm">
+                <RoomCard
+                  room={room}
+                  onPress={() =>
+                    navigation.navigate('ChatStack', {
+                      screen: 'Chat',
+                      params: {room},
+                    })
+                  }
+                  onPressPinButton={() => {
+                    savePin({...room, isPinned: !room.isPinned});
+                  }}
+                />
+              </Div>
+            )}
+          />
+        ) : loadingGetChatGroupList ? (
+          <ActivityIndicator />
+        ) : (
+          <Text fontSize={16} textAlign="center">
+            ルームを作成するか、招待をお待ちください
+          </Text>
+        )}
+      </Div>
     </WholeContainer>
   );
 };
