@@ -7,6 +7,7 @@ import {getRoomsByPageURL} from '../../../utils/url/chat.url';
 export interface GetRoomsQuery {
   page?: string;
   limit?: string;
+  isLatest?: boolean;
 }
 
 export interface GetRoomsResult {
@@ -27,7 +28,7 @@ export const useAPIGetRooms = (
   options?: UseQueryOptions<GetRoomsResult, AxiosError>,
 ) => {
   return useQuery<GetRoomsResult, AxiosError>(
-    ['getMessages', query],
+    [query.isLatest ? 'getRoomsLatest' : 'getRooms', query],
     () => getRooms(query),
     options,
   );
