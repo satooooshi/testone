@@ -175,6 +175,21 @@ export class ChatController {
     return await this.chatService.getRoomsByPage(req.user.id, query);
   }
 
+  @Get('get-room/:roomId')
+  @UseGuards(JwtAuthenticationGuard)
+  async getOneRoom(
+    @Param('roomId') roomId: string,
+    @Req() req: RequestWithUser,
+  ): Promise<ChatGroup> {
+    const { user } = req;
+
+    const room = await this.chatService.getOneRoom(req.user.id, Number(roomId));
+    if (!room.members.filter((m) => m.id === user.id).length) {
+      throw new BadRequestException('チャットルームを取得する権限がありません');
+    }
+    return room;
+  }
+
   @Get('get-messages')
   @UseGuards(JwtAuthenticationGuard)
   async getMessages(

@@ -148,6 +148,46 @@ export class ChatService {
     return { rooms, pageCount };
   }
 
+  public async getOneRoom(userID: number, roomId: number): Promise<ChatGroup> {
+    const room = await this.chatGroupRepository
+      .createQueryBuilder('chat_groups')
+      .leftJoinAndSelect('chat_groups.members', 'members')
+      .leftJoin('chat_groups.members', 'member')
+      .leftJoinAndSelect(
+        'chat_groups.pinnedUsers',
+        'pinnedUsers',
+        'pinnedUsers.id = :pinnedUserID',
+        { pinnedUserID: userID },
+      )
+      .leftJoinAndSelect(
+        'chat_groups.lastReadChatTime',
+        'lastReadChatTime',
+        'lastReadChatTime.user_id = :userID',
+        { userID },
+      )
+      .leftJoinAndSelect(
+        'chat_groups.chatMessages',
+        'm',
+        'm.id = ( SELECT id FROM chat_messages WHERE chat_group_id = chat_groups.id AND type <> "system_text" ORDER BY updated_at DESC LIMIT 1 )',
+      )
+      .leftJoinAndSelect('m.sender', 'sender')
+      .leftJoinAndSelect('lastReadChatTime.user', 'lastReadChatTime.user')
+      .where('chat_groups.id = :roomId', { roomId: roomId })
+      .getOne();
+    room.isPinned = !!room.pinnedUsers.length;
+    room.hasBeenRead = room?.lastReadChatTime?.[0]?.readTime
+      ? room?.lastReadChatTime?.[0]?.readTime > room.updatedAt
+      : false;
+    if (!room.hasBeenRead && room?.lastReadChatTime?.[0]?.readTime) {
+      const query = {
+        group: room.id,
+        lastReadTime: room.lastReadChatTime?.[0].readTime,
+      };
+      room.unreadCount = await this.getUnreadChatMessage(userID, query);
+    }
+    return room;
+  }
+
   public async getRoomsUnreadChatCount(userID: number): Promise<ChatGroup[]> {
     const [urlUnparsedRooms] = await this.chatGroupRepository
       .createQueryBuilder('chat_groups')

@@ -37,7 +37,10 @@ export class ChatGateway
   public async handleMessage(_: Socket, payload: ChatMessage) {
     this.server
       // .to(payload.chatGroup?.id.toString())
-      .emit('badgeClient', payload.sender.id);
+      .emit('badgeClient', {
+        useId: payload.sender.id,
+        groupId: payload.chatGroup.id,
+      });
     this.server
       .to(payload.chatGroup?.id.toString())
       .emit('msgToClient', { ...payload, isSender: false });
@@ -48,10 +51,7 @@ export class ChatGateway
     _: Socket,
     data: { room: string; senderId: string },
   ) {
-    this.server.to(data.room).emit('readMessageClient', {
-      useId: data.senderId,
-      groupId: data.room,
-    });
+    this.server.to(data.room).emit('readMessageClient', data.senderId);
   }
 
   @SubscribeMessage('joinRoom')
