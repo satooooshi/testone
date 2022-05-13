@@ -12,6 +12,13 @@ import {
   Res,
   UseGuards,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import {
+  RtmTokenBuilder,
+  RtmRole,
+  RtcTokenBuilder,
+  RtcRole,
+} from 'agora-access-token';
 import { Response } from 'express';
 import { ChatAlbum } from 'src/entities/chatAlbum.entity';
 import { ChatGroup } from 'src/entities/chatGroup.entity';
@@ -21,6 +28,10 @@ import { ChatNote } from 'src/entities/chatNote.entity';
 import { LastReadChatTime } from 'src/entities/lastReadChatTime.entity';
 import { User } from 'src/entities/user.entity';
 import { userNameFactory } from 'src/utils/factory/userNameFactory';
+import {
+  CustomPushNotificationData,
+  sendPushNotifToSpecificUsers,
+} from 'src/utils/notification/sendPushNotification';
 import JwtAuthenticationGuard from '../auth/jwtAuthentication.guard';
 import RequestWithUser from '../auth/requestWithUser.interface';
 import { ChatService } from './chat.service';
@@ -72,7 +83,74 @@ export class ChatController {
     private readonly chatService: ChatService,
     private readonly chatAlbumService: ChatAlbumService,
     private readonly chatNoteService: ChatNoteService,
+    private readonly configService: ConfigService,
   ) {}
+
+  @Post('notif-call/:calleeId')
+  @UseGuards(JwtAuthenticationGuard)
+  async notifiCall(
+    @Param('calleeId') calleeId: string,
+    @Body() invitation: any,
+  ) {
+    const callee = await this.chatService.calleeForPhoneCall(calleeId);
+    const notificationData: CustomPushNotificationData = {
+      title: 'call',
+      body: 'call',
+      custom: invitation,
+    };
+    await sendPushNotifToSpecificUsers([callee], notificationData);
+    return;
+  }
+
+  @Get('get-rtm-token')
+  @UseGuards(JwtAuthenticationGuard)
+  async getAgoraRtmToken(@Req() req: RequestWithUser) {
+    const appID = this.configService.get('AGORA_APP_ID');
+    const cert = this.configService.get('AGORA_CERT_ID');
+    const uid = req.user?.id.toString();
+    const expirationTimeInSeconds = 3600;
+
+    const currentTimestamp = Math.floor(Date.now() / 1000);
+
+    const privilegeExpiredTs = currentTimestamp + expirationTimeInSeconds;
+
+    // console.log(uid);
+    const token = RtmTokenBuilder.buildToken(
+      appID,
+      cert,
+      uid,
+      RtmRole.Rtm_User,
+      privilegeExpiredTs,
+    );
+    return token;
+  }
+
+  @Get('get-voice-token/:roomId')
+  @UseGuards(JwtAuthenticationGuard)
+  async getAgoraToken(
+    @Req() req: RequestWithUser,
+    @Param('roomId') roomId: string,
+  ) {
+    const appID = this.configService.get('AGORA_APP_ID');
+    const cert = this.configService.get('AGORA_CERT_ID');
+    const channelName = roomId;
+    const uid = req.user?.id;
+    const expirationTimeInSeconds = 3600;
+
+    const currentTimestamp = Math.floor(Date.now() / 1000);
+
+    const privilegeExpiredTs = currentTimestamp + expirationTimeInSeconds;
+
+    const token = RtcTokenBuilder.buildTokenWithUid(
+      appID,
+      cert,
+      channelName,
+      uid,
+      RtcRole.PUBLISHER,
+      privilegeExpiredTs,
+    );
+    return token;
+  }
 
   @Get('group-list')
   @UseGuards(JwtAuthenticationGuard)
@@ -164,6 +242,7 @@ export class ChatController {
     @Body() chatGroup: Partial<ChatGroup>,
   ): Promise<ChatGroup> {
     const user = req.user;
+
     chatGroup.members = [
       ...(chatGroup?.members?.filter((u) => u.id !== user.id) || []),
       user,

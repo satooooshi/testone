@@ -89,7 +89,7 @@ const Home: React.FC = () => {
   useEffect(() => {
     if (!isRefetching && data?.news) {
       setNewsForScroll(n => {
-        if (data.news.length) {
+        if (n.length) {
           return [...n, ...data.news];
         }
         return data.news;

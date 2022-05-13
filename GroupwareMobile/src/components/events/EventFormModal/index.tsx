@@ -112,28 +112,7 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
     date: new Date(),
   });
   const {width: windowWidth} = useWindowDimensions();
-  const {mutate: uploadFile} = useAPIUploadStorage({
-    onSuccess: uploadedURL => {
-      setNewEvent(e => {
-        const newEventFile = {url: uploadedURL[0]};
-        if (e.files && e.files.length) {
-          return {
-            ...e,
-            files: [...e.files, newEventFile],
-          };
-        }
-        return {
-          ...e,
-          files: [newEventFile],
-        };
-      });
-    },
-    onError: () => {
-      Alert.alert(
-        'アップロード中にエラーが発生しました。\n時間をおいて再実行してください。',
-      );
-    },
-  });
+  const {mutate: uploadFile} = useAPIUploadStorage();
   const {mutate: uploadImage} = useAPIUploadStorage({
     onSuccess: uploadedURL => {
       setNewEvent(e => ({...e, imageURL: uploadedURL[0]}));
@@ -177,7 +156,28 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
         uri: Platform.OS === 'android' ? res.uri : normalizeURL(res.uri),
         type: res.type,
       });
-      uploadFile(formData);
+      uploadFile(formData, {
+        onSuccess: uploadedURL => {
+          setNewEvent(e => {
+            const newEventFile = {url: uploadedURL[0], name: res.name};
+            if (e.files && e.files.length) {
+              return {
+                ...e,
+                files: [...e.files, newEventFile],
+              };
+            }
+            return {
+              ...e,
+              files: [newEventFile],
+            };
+          });
+        },
+        onError: () => {
+          Alert.alert(
+            'アップロード中にエラーが発生しました。\n時間をおいて再実行してください。',
+          );
+        },
+      });
     } catch (err) {
       if (DocumentPicker.isCancel(err)) {
       } else {
@@ -604,12 +604,7 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
               justifyContent="space-between"
               rounded="md">
               <Text fontSize={16} color={blueColor} w="80%">
-                {
-                  (decodeURI(f.url || '')?.match('.+/(.+?)([?#;].*)?$') || [
-                    '',
-                    f.url,
-                  ])[1]
-                }
+                {f.name}
               </Text>
               <TouchableOpacity onPress={() => removeFile(f.url || '')}>
                 <Icon name="closecircle" color="gray900" fontSize={24} />

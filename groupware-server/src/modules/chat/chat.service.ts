@@ -6,7 +6,8 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { orderBy } from 'lodash';
-import { ChatGroup } from 'src/entities/chatGroup.entity';
+import PushNotifications from 'node-pushnotifications';
+import { ChatGroup, RoomType } from 'src/entities/chatGroup.entity';
 import { ChatMessage, ChatMessageType } from 'src/entities/chatMessage.entity';
 import { ChatMessageReaction } from 'src/entities/chatMessageReaction.entity';
 import { LastReadChatTime } from 'src/entities/lastReadChatTime.entity';
@@ -37,6 +38,11 @@ export class ChatService {
     private readonly chatMessageReactionRepository: Repository<ChatMessageReaction>,
     private readonly storageService: StorageService,
   ) {}
+
+  public async calleeForPhoneCall(calleeId: string) {
+    const user = await this.userRepository.findOne(calleeId);
+    return user;
+  }
 
   public async getChatGroup(userID: number): Promise<ChatGroup[]> {
     const groups = await this.chatGroupRepository
@@ -102,6 +108,8 @@ export class ChatService {
         'm',
         'm.id = ( SELECT id FROM chat_messages WHERE chat_group_id = chat_groups.id AND type <> "system_text" ORDER BY updated_at DESC LIMIT 1 )',
       )
+      .leftJoinAndSelect('m.sender', 'sender')
+      .leftJoinAndSelect('lastReadChatTime.user', 'lastReadChatTime.user')
       .where('member.id = :memberId', { memberId: userID })
       .skip(offset)
       .take(Number(limit))
@@ -180,8 +188,12 @@ export class ChatService {
     userID: number,
     query: GetMessagesQuery,
   ): Promise<ChatMessage[]> {
-    const { after, before, include = false } = query;
-    const limit = 20;
+    const { after, before, include = false, limit = '20' } = query;
+
+    if (Number(limit) === 0) {
+      return;
+    }
+
     const existMessages = await this.chatMessageRepository
       .createQueryBuilder('chat_messages')
       .withDeleted()
@@ -211,10 +223,11 @@ export class ChatService {
           : '1=1',
         { before },
       )
-      .take(limit)
+      .take(Number(limit))
       .orderBy('chat_messages.createdAt', after ? 'ASC' : 'DESC')
       .withDeleted()
       .getMany();
+
     const messages = existMessages.map((m) => {
       m.reactions = m.reactions.map((r) => {
         if (r.user?.id === userID) {
@@ -340,6 +353,7 @@ export class ChatService {
     const savedMessage = await this.chatMessageRepository.save(
       this.chatMessageRepository.create(message),
     );
+
     existGroup.updatedAt = new Date();
     await this.chatGroupRepository.save({
       ...existGroup,

@@ -4,17 +4,26 @@ import {
   useMediaQuery,
   Text,
   Link,
+  Image,
   Spinner,
   Input,
   InputGroup,
   InputRightElement,
+  Portal,
+  PopoverBody,
+  PopoverCloseButton,
+  PopoverContent,
+  PopoverHeader,
+  SimpleGrid,
+  Popover,
+  PopoverTrigger,
 } from '@chakra-ui/react';
 import { MentionData } from '@draft-js-plugins/mention';
-import { darkFontColor } from 'src/utils/colors';
+import { blueColor, darkFontColor } from 'src/utils/colors';
 import { Menu, MenuItem, MenuButton } from '@szhsin/react-menu';
 import { HiOutlineDotsCircleHorizontal } from 'react-icons/hi';
 import Editor from '@draft-js-plugins/editor';
-import { convertToRaw, EditorState } from 'draft-js';
+import { convertToRaw, EditorState, getDefaultKeyBinding } from 'draft-js';
 import {
   AiFillCloseCircle,
   AiOutlineDown,
@@ -23,9 +32,16 @@ import {
   AiOutlineSearch,
   AiOutlineUp,
 } from 'react-icons/ai';
-import { ChatGroup, ChatMessage, ChatMessageType, User } from 'src/types';
+import {
+  ChatGroup,
+  ChatMessage,
+  ChatMessageType,
+  RoomType,
+  User,
+} from 'src/types';
 import { MenuValue } from '@/hooks/chat/useModalReducer';
 import React, {
+  Fragment,
   useEffect,
   useMemo,
   useRef,
@@ -66,6 +82,9 @@ import suggestionStyles from '@/styles/components/Suggestion.module.scss';
 import { useHandleBadge } from 'src/contexts/badge/useHandleBadge';
 import { useAPISearchMessages } from '@/hooks/api/chat/useAPISearchMessages';
 import { removeHalfWidthSpace } from 'src/utils/replaceWidthSpace';
+import { reactionStickers } from 'src/utils/reactionStickers';
+import { BiSmile } from 'react-icons/bi';
+import { valueScaleCorrection } from 'framer-motion/types/render/dom/projection/scale-correction';
 
 export const Entry: React.FC<EntryComponentProps> = ({
   mention,
@@ -172,17 +191,18 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
       },
     });
   const userDataForMention: MentionData[] = useMemo(() => {
-    return (
+    const users =
       room?.members
         ?.filter((u) => u.id !== user?.id)
         .map((u) => ({
           id: u.id,
           name: userNameFactory(u) + 'さん',
           avatar: u.avatarUrl,
-        })) || []
-    );
+        })) || [];
+    const allTag = { id: 0, name: 'all', avatar: '' };
+    users.unshift(allTag);
+    return users;
   }, [room?.members, user?.id]);
-
   const [suggestions, setSuggestions] =
     useState<MentionData[]>(userDataForMention);
   const [mentionOpened, setMentionOpened] = useState(false);
@@ -260,6 +280,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
           : ChatMessageType.OTHER_FILE;
         sendChatMessage({
           content: fileURLs[0],
+          fileName: requestFileURLs[0].name,
           chatGroup: newChatMessage.chatGroup,
           type,
         });
@@ -274,7 +295,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
       let parsedMessage = newChatMessage.content;
       for (const m of mentionedUserData) {
         const regexp = new RegExp(`\\s${m.name}|^${m.name}`, 'g');
-        parsedMessage = parsedMessage.replace(regexp, `@[${m.name}](${m.id})`);
+        parsedMessage = parsedMessage.replace(regexp, `@${m.name}`);
       }
       sendChatMessage({
         ...newChatMessage,
@@ -335,9 +356,33 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
     setNewChatMessage((v) => ({ ...v, content: markdownString }));
   };
 
+  const handleStickerSelected = (sticker?: string) => {
+    sendChatMessage({
+      content: sticker,
+      chatGroup: newChatMessage.chatGroup,
+      type: ChatMessageType.STICKER,
+    });
+  };
+
+  const editorKeyBindingFn = (e: React.KeyboardEvent) => {
+    if (e.ctrlKey !== e.metaKey && e.key === 'Enter') {
+      onSend();
+      return null;
+    }
+    return getDefaultKeyBinding(e);
+  };
+
   const nameOfEmptyNameGroup = (members?: User[]): string => {
     if (!members?.length) {
       return 'メンバーがいません';
+    }
+
+    if (room.roomType === RoomType.PERSONAL) {
+      const chatPartner = members.filter((m) => m.id !== user?.id);
+      const partnerName = chatPartner
+        .map((p) => p.lastName + ' ' + p.firstName)
+        .join();
+      return partnerName;
     }
     const strMembers = members?.map((m) => m.lastName + m.firstName).join();
     return strMembers.toString();
@@ -354,7 +399,10 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
     const mentionPlugin = createMentionPlugin();
     const { MentionSuggestions } = mentionPlugin;
     const plugins = [mentionPlugin];
-    return { plugins, MentionSuggestions };
+    return {
+      MentionSuggestions,
+      plugins,
+    };
   }, []);
 
   const onScrollTopOnChat = (e: any) => {
@@ -486,6 +534,8 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
         return '写真';
       case ChatMessageType.VIDEO:
         return '動画';
+      case ChatMessageType.STICKER:
+        return 'スタンプ';
       case ChatMessageType.OTHER_FILE:
         return 'ファイル';
     }
@@ -543,6 +593,8 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
       top: topOffset,
     });
   }, []);
+
+  const isPersonal = room.roomType === RoomType.PERSONAL;
 
   return (
     <Box
@@ -635,19 +687,21 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
           <Link mr="4px" onClick={() => setVisibleAlbumModal(true)}>
             <AiOutlinePicture size={24} />
           </Link>
-          <Menu
-            direction="left"
-            onItemClick={(e) => onMenuClicked(e.value as MenuValue)}
-            menuButton={
-              <MenuButton>
-                <HiOutlineDotsCircleHorizontal size={24} />
-              </MenuButton>
-            }
-            transition>
-            <MenuItem value={'editGroup'}>ルームの情報を編集</MenuItem>
-            <MenuItem value={'editMembers'}>メンバーを編集</MenuItem>
-            <MenuItem value={'leaveRoom'}>ルームを退室</MenuItem>
-          </Menu>
+          {!isPersonal && (
+            <Menu
+              direction="left"
+              onItemClick={(e) => onMenuClicked(e.value as MenuValue)}
+              menuButton={
+                <MenuButton>
+                  <HiOutlineDotsCircleHorizontal size={24} />
+                </MenuButton>
+              }
+              transition>
+              <MenuItem value={'editGroup'}>ルームの情報を編集</MenuItem>
+              <MenuItem value={'editMembers'}>メンバーを編集</MenuItem>
+              <MenuItem value={'leaveRoom'}>ルームを退室</MenuItem>
+            </Menu>
+          )}
         </Box>
       </Box>
       {visibleSearchForm && (
@@ -805,6 +859,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
           placeholder="メッセージを入力"
           editorState={editorState}
           onChange={onEditorChange}
+          keyBindingFn={editorKeyBindingFn}
           plugins={plugins}
           ref={editorRef}
         />
@@ -819,6 +874,54 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
           />
         </div>
       </Box>
+      <Popover closeOnBlur={false} placement="top-start">
+        {({ onClose }) => (
+          <>
+            <PopoverTrigger>
+              <Link
+                color={darkFontColor}
+                position="absolute"
+                zIndex={1}
+                bottom={'8px'}
+                cursor="pointer"
+                right="90px">
+                <BiSmile size={20} color={darkFontColor} />
+              </Link>
+            </PopoverTrigger>
+            <Portal>
+              <PopoverContent>
+                <PopoverHeader border="0">
+                  <PopoverCloseButton />
+                </PopoverHeader>
+
+                <PopoverBody>
+                  <SimpleGrid columns={3}>
+                    {reactionStickers.map((e) => (
+                      <Fragment key={e.name}>
+                        <a
+                          onClick={() => {
+                            handleStickerSelected(e.name);
+                            onClose();
+                          }}>
+                          <Box display="flex" maxW="300px" maxH={'300px'}>
+                            <Image
+                              src={e.src}
+                              w={100}
+                              h={100}
+                              padding={2}
+                              alt="送信された画像"
+                            />
+                          </Box>
+                        </a>
+                      </Fragment>
+                    ))}
+                  </SimpleGrid>
+                </PopoverBody>
+              </PopoverContent>
+            </Portal>
+          </>
+        )}
+      </Popover>
       <Link
         {...getRootProps()}
         color={darkFontColor}
@@ -844,7 +947,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
           <IoSend
             size={20}
             onClick={() => handleSubmit()}
-            color={darkFontColor}
+            color={newChatMessage.content ? blueColor : darkFontColor}
           />
         )}
       </Link>

@@ -37,11 +37,13 @@ import VideoMessage from './VideoMessage';
 import ImageMessage from './ImageMessage';
 import FileMessage from './FileMessage';
 import TextMessage from './TextMessage';
+import CallMessage from './CallMessage';
 import { useAPIDeleteReaction } from '@/hooks/api/chat/useAPIDeleteReaction';
 import { AiOutlineUnorderedList } from 'react-icons/ai';
 import ReactionListModal from './ReactionListModal';
 import ReadUsersListModal from './ReadUsersListModal';
 import { useEffect } from 'react';
+import StickerMessage from './StickerMessage';
 
 type ChatMessageItemProps = {
   message: ChatMessage;
@@ -347,6 +349,8 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
                   confirmedSearchWord={confirmedSearchWord}
                   searchedResultIds={searchedResultIds}
                 />
+              ) : messageState.type === ChatMessageType.CALL ? (
+                <CallMessage message={messageState} />
               ) : (
                 <Box
                   borderRadius="8px"
@@ -361,6 +365,8 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
                     />
                   ) : messageState.type === ChatMessageType.VIDEO ? (
                     <VideoMessage message={messageState} />
+                  ) : messageState.type === ChatMessageType.STICKER ? (
+                    <StickerMessage message={messageState} />
                   ) : (
                     <FileMessage message={messageState} />
                   )}

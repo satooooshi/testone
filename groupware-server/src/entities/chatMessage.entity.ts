@@ -29,6 +29,8 @@ export enum ChatMessageType {
   VIDEO = 'video',
   IMAGE = 'image',
   TEXT = 'text',
+  CALL = 'call',
+  STICKER = 'sticker',
   SYSTEM_TEXT = 'system_text',
   OTHER_FILE = 'other_file',
 }
@@ -47,6 +49,17 @@ export class ChatMessage {
     default: ChatMessageType.TEXT,
   })
   type: ChatMessageType;
+
+  @Column({ type: 'varchar', name: 'call_time', default: '' })
+  callTime?: string;
+  @Column({
+    name: 'file_name',
+    type: 'varchar',
+    length: 2083,
+    default: '',
+    nullable: false,
+  })
+  fileName: string;
 
   @ManyToOne(() => ChatGroup, (chatGroup) => chatGroup.chatMessages, {
     onUpdate: 'CASCADE',
@@ -114,6 +127,7 @@ export class ChatMessage {
   @AfterInsert()
   async sendPushNotification() {
     if (this.chatGroup?.id && this.sender?.id) {
+      if (this.content === '音声通話') return;
       let content = this.content;
       if (this.type === ChatMessageType.IMAGE) {
         content = '画像';

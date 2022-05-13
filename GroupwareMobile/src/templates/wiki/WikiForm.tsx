@@ -402,6 +402,58 @@ const WikiForm: React.FC<WikiFormProps> = ({
       )}
       {isCreatableWiki({
         type: WikiType.BOARD,
+        boardCategory: BoardCategory.SELF_IMPROVEMENT,
+        userRole: user?.role,
+      }) ? (
+        <Dropdown.Option
+          {...defaultDropdownOptionProps}
+          onPress={() =>
+            setNewWiki(w => ({
+              ...w,
+              type: WikiType.BOARD,
+              ruleCategory: RuleCategory.NON_RULE,
+              boardCategory: BoardCategory.SELF_IMPROVEMENT,
+            }))
+          }
+          value={BoardCategory.SELF_IMPROVEMENT}>
+          {wikiTypeNameFactory(
+            WikiType.BOARD,
+            undefined,
+            true,
+            BoardCategory.SELF_IMPROVEMENT,
+          )}
+        </Dropdown.Option>
+      ) : (
+        <></>
+      )}
+      {isCreatableWiki({
+        type: WikiType.BOARD,
+        boardCategory: BoardCategory.PERSONAL_ANNOUNCEMENT,
+        userRole: user?.role,
+      }) ? (
+        <Dropdown.Option
+          {...defaultDropdownOptionProps}
+          onPress={() =>
+            setNewWiki(w => ({
+              ...w,
+              type: WikiType.BOARD,
+              ruleCategory: RuleCategory.NON_RULE,
+              boardCategory: BoardCategory.PERSONAL_ANNOUNCEMENT,
+            }))
+          }
+          value={BoardCategory.PERSONAL_ANNOUNCEMENT}>
+          {wikiTypeNameFactory(
+            WikiType.BOARD,
+            undefined,
+            true,
+            BoardCategory.PERSONAL_ANNOUNCEMENT,
+          )}
+        </Dropdown.Option>
+      ) : (
+        <></>
+      )}
+      {isCreatableWiki({
+        type: WikiType.BOARD,
         boardCategory: BoardCategory.CELEBRATION,
         userRole: user?.role,
       }) ? (

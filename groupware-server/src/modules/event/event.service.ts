@@ -387,10 +387,23 @@ export class EventScheduleService {
         url: this.storageService.parseSignedURLToStorageURL(f.url),
       }));
     }
+
     const submittedFiles = await this.submissionFileRepository.save(
       submissionFiles,
     );
     return submittedFiles;
+  }
+
+  async deleteSubmission(submissionId: number) {
+    const submission = await this.submissionFileRepository.findOne({
+      id: submissionId,
+    });
+    if (!submission) {
+      throw new BadRequestException(
+        'The submission file has already been deleted.',
+      );
+    }
+    await this.submissionFileRepository.delete(submissionId);
   }
 
   public async getLatestEvent(
