@@ -1,20 +1,7 @@
 import {useFocusEffect, useNavigation} from '@react-navigation/native';
 import React, {useCallback, useEffect, useState} from 'react';
-import {
-  Alert,
-  FlatList,
-  TouchableHighlight,
-  TouchableOpacity,
-} from 'react-native';
-import {
-  Button,
-  Div,
-  Icon,
-  Input,
-  Modal,
-  ScrollDiv,
-  Text,
-} from 'react-native-magnus';
+import {Alert, TouchableHighlight, TouchableOpacity} from 'react-native';
+import {Button, Div, Icon, Input, ScrollDiv, Text} from 'react-native-magnus';
 import {ActivityIndicator} from 'react-native-paper';
 import tailwind from 'tailwind-rn';
 import RoomCard from '../../../components/chat/RoomCard';
@@ -34,7 +21,7 @@ import storage from '../../../utils/storage';
 
 const RoomList: React.FC = () => {
   const navigation = useNavigation<RoomListNavigationProps>();
-  const [page, setPage] = useState('1');
+  const [page, setPage] = useState(1);
   const [roomsForInfiniteScroll, setRoomsForInfiniteScroll] = useState<
     ChatGroup[]
   >([]);
@@ -44,20 +31,29 @@ const RoomList: React.FC = () => {
   const {unreadChatCount} = useHandleBadge();
   const {selectedUserRole, filteredUsers} = useUserRole('All', users);
   const [creationType, setCreationType] = useState<RoomType>();
-  const [isVisibleSearchedRooms, setIsVisibleSearchedRooms] =
-    useState<boolean>(false);
-  const [searchedRooms, setSearchedRooms] = useState<ChatGroup[]>();
 
+  const [searchedRooms, setSearchedRooms] = useState<ChatGroup[]>();
+  const [isNeedRefetch, setIsNeedRefetch] = useState<boolean>(false);
   const {refetch: refetchAllRooms, isLoading: loadingGetChatGroupList} =
     useAPIGetRooms(
       {
-        page: '1',
-        limit: String(0),
+        page: page.toString(),
+        limit: '20',
       },
       {
+        enabled: false,
         onSuccess: data => {
           console.log('call -----------------------', data.rooms.length);
-          stateRefreshNeeded(data.rooms);
+          setPage(p => p + 1);
+          if (data.rooms.length) {
+            setIsNeedRefetch(true);
+            setRoomsForInfiniteScroll(r =>
+              r.length ? [...r, ...data.rooms] : [...data.rooms],
+            );
+          } else {
+            setIsNeedRefetch(false);
+            setPage(1);
+          }
         },
       },
     );
@@ -75,6 +71,7 @@ const RoomList: React.FC = () => {
       Alert.alert('チャットルームの作成に失敗しました');
     },
   });
+
   const {mutate: savePin} = useAPISavePin({
     onSuccess: () => {
       refetchAllRooms();
@@ -91,32 +88,6 @@ const RoomList: React.FC = () => {
     setRoomTypeSelector(true);
   };
 
-  const stateRefreshNeeded = (newData: ChatGroup[]) => {
-    let updateNeeded = false;
-    if (roomsForInfiniteScroll.length !== newData?.length) {
-      updateNeeded = true;
-    }
-    if (roomsForInfiniteScroll.length || newData?.length) {
-      for (let i = 0; i < roomsForInfiniteScroll.length; i++) {
-        if (updateNeeded) {
-          break;
-        }
-        if (
-          new Date(roomsForInfiniteScroll[i]?.updatedAt).getTime() !==
-            new Date(newData?.[i]?.updatedAt).getTime() ||
-          roomsForInfiniteScroll[i].hasBeenRead !== newData?.[i]?.hasBeenRead ||
-          roomsForInfiniteScroll[i]?.members?.length !==
-            newData?.[i]?.members?.length
-        ) {
-          updateNeeded = true;
-        }
-      }
-    }
-    if (updateNeeded) {
-      setRoomsForInfiniteScroll(newData);
-    }
-  };
-
   useEffect(() => {
     refetchAllRooms();
   }, [unreadChatCount, refetchAllRooms]);
@@ -128,7 +99,11 @@ const RoomList: React.FC = () => {
           key: 'roomList',
         })
         .then(loadedData => {
-          setRoomsForInfiniteScroll(loadedData);
+          if (loadedData.length) {
+            setRoomsForInfiniteScroll(loadedData);
+          } else {
+            refetchAllRooms();
+          }
         });
     }, []),
   );
@@ -140,7 +115,10 @@ const RoomList: React.FC = () => {
         data: roomsForInfiniteScroll,
       });
     }
-  }, [roomsForInfiniteScroll]);
+    if (isNeedRefetch) {
+      refetchAllRooms();
+    }
+  }, [roomsForInfiniteScroll, isNeedRefetch, refetchAllRooms]);
 
   return (
     <WholeContainer>
@@ -150,21 +128,6 @@ const RoomList: React.FC = () => {
         {...{onPressRightButton}}
       />
 
-      <Modal h={400} isVisible={isVisibleSearchedRooms}>
-        <ScrollDiv>
-          <Button
-            bg="gray400"
-            h={35}
-            w={35}
-            right={0}
-            alignSelf="flex-end"
-            rounded="circle"
-            onPress={() => setIsVisibleSearchedRooms(false)}>
-            <Icon color="black" name="close" />
-          </Button>
-          {searchedRooms}
-        </ScrollDiv>
-      </Modal>
       {roomTypeSelector ? (
         <Div
           bg="white"
@@ -268,7 +231,16 @@ const RoomList: React.FC = () => {
             />
           }
         />
-        {roomsForInfiniteScroll.length ? (
+        <Button
+          fontSize={10}
+          onPress={() => {
+            storage.remove({key: 'roomList'});
+            setRoomsForInfiniteScroll([]);
+            setPage(1);
+          }}
+        />
+
+        {roomsForInfiniteScroll.length && !isNeedRefetch ? (
           <ScrollDiv h={'80%'}>
             {searchedRooms
               ? searchedRooms.map(room => {
@@ -308,8 +280,14 @@ const RoomList: React.FC = () => {
                   );
                 })}
           </ScrollDiv>
-        ) : loadingGetChatGroupList ? (
-          <ActivityIndicator />
+        ) : isNeedRefetch ? (
+          <Div alignItems="center" w={'90%'}>
+            <Text>
+              ただいま全てのルームを取得しています。{'\n'}
+              しばらくの間お待ちください。
+            </Text>
+            <ActivityIndicator />
+          </Div>
         ) : (
           <Text fontSize={16} textAlign="center">
             ルームを作成するか、招待をお待ちください

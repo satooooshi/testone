@@ -86,7 +86,10 @@ export class ChatService {
     query: GetChaRoomsByPageQuery,
   ): Promise<GetRoomsResult> {
     const { page, limit = '20' } = query;
-    const offset = Number(limit) * (Number(page) - 1);
+    let offset;
+    if (page) {
+      offset = (Number(page) - 1) * Number(limit);
+    }
     const [urlUnparsedRooms, count] = await this.chatGroupRepository
       .createQueryBuilder('chat_groups')
       .leftJoinAndSelect('chat_groups.members', 'members')
