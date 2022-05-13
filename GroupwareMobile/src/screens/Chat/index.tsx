@@ -142,7 +142,7 @@ const Chat: React.FC = () => {
   const [selectedReactions, setSelectedReactions] = useState<
     ChatMessageReaction[] | undefined
   >();
-  const {refetchRoom} = useHandleBadge();
+  const {handleEnterRoom} = useHandleBadge();
   const [selectedEmoji, setSelectedEmoji] = useState<string>();
   const {mutate: saveLastReadChatTime} = useAPISaveLastReadChatTime();
   const [selectedMessageForCheckLastRead, setSelectedMessageForCheckLastRead] =
@@ -634,7 +634,7 @@ const Chat: React.FC = () => {
                 senderId: myself?.id,
               });
               console.log('>>>>>>>>>>>>>>');
-              refetchRoom();
+              handleEnterRoom(room.id);
             },
           });
           refetchLastReadChatTime();
@@ -682,7 +682,6 @@ const Chat: React.FC = () => {
       isMounted = false;
       setCurrentChatRoomId(undefined);
       socket.disconnect();
-      // refetchRoom();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [room.id]);
@@ -932,7 +931,7 @@ const Chat: React.FC = () => {
             room: room.id.toString(),
             senderId: myself?.id,
           });
-          refetchRoom();
+          handleEnterRoom(room.id);
         },
       });
     }
@@ -963,13 +962,11 @@ const Chat: React.FC = () => {
   useEffect(() => {
     saveLastReadChatTime(room.id, {
       onSuccess: () => {
-        console.log('2222222');
-
         socket.emit('readReport', {
           room: room.id.toString(),
           senderId: myself?.id,
         });
-        refetchRoom();
+        handleEnterRoom(room.id);
       },
     });
     return () => saveLastReadChatTime(room.id);
