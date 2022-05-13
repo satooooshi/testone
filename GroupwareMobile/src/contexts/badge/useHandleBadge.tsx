@@ -7,6 +7,7 @@ import React, {
 } from 'react';
 import {io} from 'socket.io-client';
 import {useAPIGetRoomsUnreadChatCount} from '../../hooks/api/chat/useAPIGetRoomsUnreadChatCount';
+import {ChatGroup} from '../../types';
 import {baseURL} from '../../utils/url';
 import {useAuthenticate} from '../useAuthenticate';
 
@@ -17,6 +18,7 @@ const BadgeContext = createContext({
 
 export const BadgeProvider: React.FC = ({children}) => {
   const [chatUnreadCount, setChatUnreadCount] = useState(0);
+  const [chatGroups, setChatGroups] = useState<ChatGroup[]>([]);
   const {user} = useAuthenticate();
   const socket = io(baseURL, {
     transports: ['websocket'],
@@ -24,6 +26,7 @@ export const BadgeProvider: React.FC = ({children}) => {
   const {mutate: getRooms} = useAPIGetRoomsUnreadChatCount({
     onSuccess: data => {
       let count = 0;
+      setChatGroups(data);
       for (const room of data) {
         count += room.unreadCount ? room.unreadCount : 0;
       }
@@ -35,13 +38,17 @@ export const BadgeProvider: React.FC = ({children}) => {
   useEffect(
     () => {
       getRooms();
-      socket.on('badgeClient', async (userId: number) => {
-        console.log('message was sent---------', userId, user);
-        if (user?.id && userId !== user.id) {
-          getRooms();
-        }
-        // handleGetRoom(userId);
-      });
+      socket.on(
+        'badgeClient',
+        async (data: {userId: number; groupId: string}) => {
+          console.log('message was sent---------', data.userId, user);
+          if (user?.id && data.userId !== user.id) {
+            setChatUnreadCount(count => count + 1);
+            // getRooms();
+          }
+          // handleGetRoom(userId);
+        },
+      );
     }, // eslint-disable-next-line react-hooks/exhaustive-deps
     [user],
   );

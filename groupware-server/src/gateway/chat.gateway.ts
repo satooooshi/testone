@@ -48,7 +48,10 @@ export class ChatGateway
     _: Socket,
     data: { room: string; senderId: string },
   ) {
-    this.server.to(data.room).emit('readMessageClient', data.senderId);
+    this.server.to(data.room).emit('readMessageClient', {
+      useId: data.senderId,
+      groupId: data.room,
+    });
   }
 
   @SubscribeMessage('joinRoom')
