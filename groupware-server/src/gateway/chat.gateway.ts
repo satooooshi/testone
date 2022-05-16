@@ -38,7 +38,7 @@ export class ChatGateway
     this.server
       // .to(payload.chatGroup?.id.toString())
       .emit('badgeClient', {
-        useId: payload.sender.id,
+        userId: payload.sender.id,
         groupId: payload.chatGroup.id,
       });
     this.server
