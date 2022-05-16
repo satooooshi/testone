@@ -574,7 +574,7 @@ const Navigator = () => {
     if (isJoining && !isCallScreen) {
       navigationRef.current?.navigate('Call');
       isCallScreen = true;
-    } else if (user?.id && isCallScreen) {
+    } else if (user?.id && isCallScreen && !isJoining) {
       navigationRef.current?.navigate('Main');
       isCallScreen = false;
     }
