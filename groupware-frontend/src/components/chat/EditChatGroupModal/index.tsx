@@ -25,6 +25,7 @@ import { dataURLToFile } from 'src/utils/dataURLToFile';
 import { getCroppedImageURL } from 'src/utils/getCroppedImageURL';
 import { imageExtensions } from 'src/utils/imageExtensions';
 import { useAPIUpdateChatGroup } from '@/hooks/api/chat/useAPIUpdateChatGroup';
+import { useRoomRefetch } from 'src/contexts/chat/useRoomRefetch';
 
 type EditChatGroupModalProps = {
   isOpen: boolean;
@@ -42,10 +43,12 @@ const EditChatGroupModal: React.FC<EditChatGroupModalProps> = ({
   const { mutate: saveGroup } = useAPIUpdateChatGroup({
     onSuccess: (newInfo) => {
       closeModal();
+      setNewChatGroup(newInfo);
       onComplete(newInfo);
     },
   });
 
+  const { setNewChatGroup } = useRoomRefetch();
   const [selectImageUrl, setSelectImageUrl] = useState<string>('');
   const { mutate: uploadImage, isLoading } = useAPIUploadStorage({
     onSuccess: async (fileURLs) => {

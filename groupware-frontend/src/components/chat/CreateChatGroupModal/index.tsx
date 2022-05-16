@@ -53,7 +53,7 @@ const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
     name: '',
     members: selectedMembers,
   };
-  const { needRefetch } = useRoomRefetch();
+  const { setNewChatGroup } = useRoomRefetch();
   const [membersModal, setMembersModal] = useState(false);
   const [selectImageUrl, setSelectImageUrl] = useState<string>('');
   const [selectImageName, setSelectImageName] = useState<string>('');
@@ -87,7 +87,7 @@ const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
     useAPISaveChatGroup({
       onSuccess: (createdData) => {
         onClose();
-        needRefetch();
+        setNewChatGroup(createdData);
         router.push(`/chat/${createdData.id.toString()}`, undefined, {
           shallow: true,
         });

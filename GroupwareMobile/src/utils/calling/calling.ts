@@ -20,7 +20,6 @@ export const setupCallInvitation = async (
   );
   const res = await axiosInstance.get<string>('/chat/get-rtm-token');
   await rtmEngine.loginV2(caller?.id?.toString() as string, res.data);
-  console.log('loginv2 completed');
 
   await rtmEngine.sendLocalInvitationV2(localInvitation);
   // iOSのためにプッシュ通知も送る

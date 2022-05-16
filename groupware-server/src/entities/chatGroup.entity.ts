@@ -123,6 +123,7 @@ export class ChatGroup {
 
   isPinned?: boolean;
   hasBeenRead?: boolean;
+  unreadCount?: number;
 
   @AfterInsert()
   async saveNewSystemMessage?() {

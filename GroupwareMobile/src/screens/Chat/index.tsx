@@ -1,6 +1,7 @@
 import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {
   Alert,
+  AppState,
   FlatList,
   Keyboard,
   KeyboardAvoidingView,
@@ -79,9 +80,13 @@ import {baseURL} from '../../utils/url';
 import {getThumbnailOfVideo} from '../../utils/getThumbnailOfVideo';
 import {useAuthenticate} from '../../contexts/useAuthenticate';
 import {useInviteCall} from '../../contexts/call/useInviteCall';
-import {useIsTabBarVisible} from '../../contexts/bottomTab/useIsTabBarVisible';
 import {reactionStickers} from '../../utils/factory/reactionStickers';
 import {ScrollView} from 'react-native-gesture-handler';
+import storage from '../../utils/storage';
+import {useHandleBadge} from '../../contexts/badge/useHandleBadge';
+import {useIsTabBarVisible} from '../../contexts/bottomTab/useIsTabBarVisible';
+import {debounce} from 'lodash';
+import Clipboard from '@react-native-community/clipboard';
 
 const socket = io(baseURL, {
   transports: ['websocket'],
@@ -126,9 +131,8 @@ const Chat: React.FC = () => {
   }, [messages]);
   const [nowImageIndex, setNowImageIndex] = useState<number>(0);
   const [video, setVideo] = useState('');
-  const {data: lastReadChatTime} = useAPIGetLastReadChatTime(room.id, {
-    refetchInterval: 1000,
-  });
+  const {data: lastReadChatTime, refetch: refetchLastReadChatTime} =
+    useAPIGetLastReadChatTime(room.id);
   const [longPressedMsg, setLongPressedMgg] = useState<ChatMessage>();
   const [reactionTarget, setReactionTarget] = useState<ChatMessage>();
   const [visibleStickerSelctor, setVisibleStickerSelector] = useState(false);
@@ -138,6 +142,7 @@ const Chat: React.FC = () => {
   const [selectedReactions, setSelectedReactions] = useState<
     ChatMessageReaction[] | undefined
   >();
+  const {handleEnterRoom} = useHandleBadge();
   const [selectedEmoji, setSelectedEmoji] = useState<string>();
   const {mutate: saveLastReadChatTime} = useAPISaveLastReadChatTime();
   const [selectedMessageForCheckLastRead, setSelectedMessageForCheckLastRead] =
@@ -162,12 +167,20 @@ const Chat: React.FC = () => {
     data: fetchedPastMessages,
     isLoading: loadingMessages,
     isFetching: fetchingMessages,
-  } = useAPIGetMessages({
-    group: room.id,
-    after,
-    before,
-    include,
-  });
+    refetch: refetchFetchedPastMessages,
+  } = useAPIGetMessages(
+    {
+      group: room.id,
+      limit: 20,
+      after,
+      before,
+      include,
+    },
+    {
+      enabled: false,
+    },
+  );
+
   const {data: searchedResults, refetch: searchMessages} = useAPISearchMessages(
     {
       group: room.id,
@@ -192,6 +205,7 @@ const Chat: React.FC = () => {
   const {refetch: refetchLatest} = useAPIGetMessages(
     {
       group: room.id,
+      limit: room.unreadCount,
     },
     {
       enabled: false,
@@ -354,7 +368,6 @@ const Chat: React.FC = () => {
     const res = await DocumentPicker.pickSingle({
       type: [DocumentPicker.types.allFiles],
     });
-    console.log(res);
     const formData = new FormData();
     formData.append('files', {
       name: res.name,
@@ -409,9 +422,7 @@ const Chat: React.FC = () => {
   };
 
   const onScrollTopOnChat = () => {
-    if (fetchedPastMessages?.length) {
-      setBefore(messages[messages.length - 1].id);
-    }
+    setBefore(messages[messages.length - 1].id);
   };
 
   const scrollToRenderedMessage = () => {
@@ -492,11 +503,14 @@ const Chat: React.FC = () => {
       .sort((a, b) => b.id - a.id);
   };
   useEffect(() => {
-    setMessages([]);
     setBefore(undefined);
     setAfter(undefined);
     refetchLatest();
   }, [refetchLatest, room]);
+
+  useEffect(() => {
+    refetchFetchedPastMessages();
+  }, [before, after, refetchFetchedPastMessages]);
 
   useEffect(() => {
     // 検索する文字がアルファベットの場合、なぜかuseAPISearchMessagesのonSuccessが動作しない為、こちらで代わりとなる処理を記述しています。
@@ -553,6 +567,22 @@ const Chat: React.FC = () => {
         }}>
         リアクション
       </Dropdown.Option>
+
+      {longPressedMsg?.type === 'text' ? (
+        <Dropdown.Option
+          {...defaultDropdownOptionProps}
+          value="copy"
+          onPress={() => {
+            Clipboard.setString(
+              longPressedMsg?.content ? longPressedMsg?.content : '',
+            );
+            setLongPressedMgg(undefined);
+          }}>
+          コピー
+        </Dropdown.Option>
+      ) : (
+        <></>
+      )}
     </Dropdown>
   );
 
@@ -572,9 +602,31 @@ const Chat: React.FC = () => {
 
   useEffect(() => {
     let isMounted = true;
+    socket.connect();
     socket.emit('joinRoom', room.id.toString());
+    socket.on('readMessageClient', async (senderId: string) => {
+      if (myself?.id && senderId && senderId !== `${myself?.id}`) {
+        console.log('readMessageClient called', senderId, myself.id, room.id);
+        refetchLastReadChatTime();
+      }
+    });
     socket.on('msgToClient', async (sentMsgByOtherUsers: ChatMessage) => {
       if (sentMsgByOtherUsers.content) {
+        if (
+          sentMsgByOtherUsers?.sender?.id !== myself?.id &&
+          AppState.currentState === 'active'
+        ) {
+          saveLastReadChatTime(room.id, {
+            onSuccess: () => {
+              socket.emit('readReport', {
+                room: room.id.toString(),
+                senderId: myself?.id,
+              });
+              handleEnterRoom(room.id);
+            },
+          });
+          refetchLastReadChatTime();
+        }
         sentMsgByOtherUsers.createdAt = new Date(sentMsgByOtherUsers.createdAt);
         sentMsgByOtherUsers.updatedAt = new Date(sentMsgByOtherUsers.updatedAt);
         if (sentMsgByOtherUsers.sender?.id === myself?.id) {
@@ -617,47 +669,26 @@ const Chat: React.FC = () => {
       socket.emit('leaveRoom', room.id);
       isMounted = false;
       setCurrentChatRoomId(undefined);
+      socket.disconnect();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [room.id]);
 
-  useEffect(() => {
-    if (fetchedPastMessages?.length) {
-      if (
-        messages?.length &&
-        isRecent(
-          messages[messages.length - 1],
-          fetchedPastMessages[fetchedPastMessages.length - 1],
-        )
-      ) {
-        const msgToAppend: ChatMessage[] = [];
-        for (const sentMsg of fetchedPastMessages) {
-          if (isRecent(messages[messages.length - 1], sentMsg)) {
-            msgToAppend.push(sentMsg);
-          }
-        }
-        setMessages(m => {
-          return refreshMessage([...m, ...msgToAppend]);
-        });
-      } else if (!messages?.length) {
-        setMessages(refreshMessage(fetchedPastMessages));
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [fetchedPastMessages]);
+  // useEffect(() => {
+  //   messages[0]?.chatGroup?.id === room.id && saveLastReadChatTime(room.id);
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [messages, room.id]);
 
-  useEffect(() => {
-    messages[0]?.chatGroup?.id === room.id && saveLastReadChatTime(room.id);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [messages, room.id]);
-
-  const readUsers = (targetMsg: ChatMessage) => {
-    return lastReadChatTime
-      ? lastReadChatTime
-          .filter(t => t.readTime >= targetMsg.createdAt)
-          .map(t => t.user)
-      : [];
-  };
+  const readUsers = useCallback(
+    (targetMsg: ChatMessage) => {
+      return lastReadChatTime
+        ? lastReadChatTime
+            .filter(t => new Date(t.readTime) >= new Date(targetMsg.createdAt))
+            .map(t => t.user)
+        : [];
+    },
+    [lastReadChatTime],
+  );
 
   const renderMessage = (message: ChatMessage, messageIndex: number) => (
     <Div
@@ -864,14 +895,70 @@ const Chat: React.FC = () => {
 
   useFocusEffect(
     useCallback(() => {
+      storage
+        .load({
+          key: 'chatRoom',
+          id: room.id.toString(),
+        })
+        .then(cacheData => {
+          console.log('cacheData =================', cacheData.length);
+          setMessages(cacheData);
+        });
       refetchLatest();
       refetchRoomDetail();
+      // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [refetchLatest, refetchRoomDetail]),
   );
 
+  const handleLastReadByAppState = () => {
+    if (AppState.currentState === 'active') {
+      refetchLatest();
+      saveLastReadChatTime(room.id, {
+        onSuccess: () => {
+          socket.emit('readReport', {
+            room: room.id.toString(),
+            senderId: myself?.id,
+          });
+          handleEnterRoom(room.id);
+        },
+      });
+    }
+  };
+
+  const debounceHandleLastReadByAppState = useMemo(
+    () => debounce(handleLastReadByAppState, 500),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
+  );
+
   useEffect(() => {
-    saveLastReadChatTime(room.id);
+    AppState.addEventListener('change', debounceHandleLastReadByAppState);
+  });
+
+  useEffect(() => {
+    if (messages.length) {
+      storage.save({
+        key: 'chatRoom',
+        id: room.id.toString(),
+        data: messages,
+        expires: null,
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [messages]);
+
+  useEffect(() => {
+    saveLastReadChatTime(room.id, {
+      onSuccess: () => {
+        socket.emit('readReport', {
+          room: room.id.toString(),
+          senderId: myself?.id,
+        });
+        handleEnterRoom(room.id);
+      },
+    });
     return () => saveLastReadChatTime(room.id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [room.id, saveLastReadChatTime]);
 
   const readUserBox = (user: User) => (
@@ -905,6 +992,14 @@ const Chat: React.FC = () => {
       //第一引数に通話を書ける人のユーザーオブジェクト、第二引数に通話をかけられるひとのユーザーオブジェクト
       await sendCallInvitation(myself, callee);
     }
+  };
+
+  const removeCache = () => {
+    storage.remove({
+      key: 'chatRoom',
+      id: room.id.toString(),
+    });
+    setMessages([]);
   };
 
   return (
@@ -1067,7 +1162,7 @@ const Chat: React.FC = () => {
             onPress={() =>
               navigation.navigate('ChatStack', {
                 screen: 'ChatMenu',
-                params: {room},
+                params: {room, removeCache},
               })
             }>
             <Icon

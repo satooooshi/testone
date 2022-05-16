@@ -32,6 +32,7 @@ import notifee, {EventType} from '@notifee/react-native';
 import PushNotification, {
   ReceivedNotification,
 } from 'react-native-push-notification';
+import {useHandleBadge} from '../contexts/badge/useHandleBadge';
 
 const Stack = createStackNavigator<RootStackParamList>();
 export const rtmEngine = new RtmClient();
@@ -60,6 +61,7 @@ const Navigator = () => {
     stopRing,
     sendCallHistory,
   } = useInviteCall();
+  const {unreadChatCount} = useHandleBadge();
   const [isJoining, setIsJoining] = useState(false);
   const [isCalling, setIsCalling] = useState(false);
   const [callTimeout, setCallTimeout] = useState(false);
@@ -93,6 +95,13 @@ const Navigator = () => {
       callKeepUUID = '';
     }
   };
+
+  useEffect(() => {
+    const setBadgeIcon = async () => {
+      await notifee.setBadgeCount(unreadChatCount);
+    };
+    setBadgeIcon();
+  }, [unreadChatCount]);
 
   useEffect(() => {
     const handleMessaging = async () => {
@@ -235,6 +244,7 @@ const Navigator = () => {
   };
 
   messaging().setBackgroundMessageHandler(async remoteMessage => {
+    // await notifee.incrementBadgeCount();
     console.log('BackgroundMessage received!!', remoteMessage);
   });
 
