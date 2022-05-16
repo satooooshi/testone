@@ -326,7 +326,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
   const [editorState, setEditorState] = useState(EditorState.createEmpty());
   const messageWrapperDivRef = useRef<HTMLDivElement | null>(null);
   const editorRef = useRef<Editor>(null);
-  const { refetchRoom } = useHandleBadge();
+  const { handleEnterRoom } = useHandleBadge();
   const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
   const countOfSearchWord = useMemo(() => {
     if (searchedResults && focusedMessageID) {
@@ -466,7 +466,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
                 room: room.id.toString(),
                 senderId: user?.id,
               });
-              refetchRoom();
+              handleEnterRoom(room.id);
             },
           });
           refetchLastReadChatTime();
@@ -510,7 +510,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
           room: room.id.toString(),
           senderId: user?.id,
         });
-        refetchRoom();
+        handleEnterRoom(room.id);
       },
     });
     return () => saveLastReadChatTime(room.id);

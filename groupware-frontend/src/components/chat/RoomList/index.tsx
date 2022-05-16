@@ -1,3 +1,4 @@
+import { useAPIGetOneRoom } from '@/hooks/api/chat/useAPIGetOneRoom';
 import { useAPIGetRoomsByPage } from '@/hooks/api/chat/useAPIGetRoomsByPage';
 import { Box, Spinner, Text } from '@chakra-ui/react';
 import React, { useEffect, useState } from 'react';
@@ -14,10 +15,33 @@ type RoomListProps = {
 const RoomList: React.FC<RoomListProps> = ({ currentId, onClickRoom }) => {
   const { clearRefetch, refetchNeeded } = useRoomRefetch();
   const [page, setPage] = useState('1');
-  const { unreadChatCount } = useHandleBadge();
+  const { completeRefetch, refetchGroupId } = useHandleBadge();
   const [roomsForInfiniteScroll, setRoomsForInfiniteScroll] = useState<
     ChatGroup[]
   >([]);
+
+  const { refetch: refetchRoom } = useAPIGetOneRoom(refetchGroupId, {
+    enabled: false,
+    onError: (err) => {
+      if (err?.response?.data?.message) {
+        alert(err?.response?.data?.message);
+      }
+    },
+    onSuccess: (data) => {
+      console.log('data', data.unreadCount);
+      const rooms = roomsForInfiniteScroll.filter((r) => r.id !== data.id);
+      if (data.isPinned) {
+        setRoomsForInfiniteScroll([...[data], ...rooms]);
+      } else {
+        const pinnedRoomsCount = rooms.filter((r) => r.isPinned).length;
+        if (pinnedRoomsCount) {
+          rooms.splice(pinnedRoomsCount, 0, data);
+          setRoomsForInfiniteScroll(rooms);
+        }
+      }
+      completeRefetch();
+    },
+  });
 
   const onScroll = (e: any) => {
     if (
@@ -46,15 +70,17 @@ const RoomList: React.FC<RoomListProps> = ({ currentId, onClickRoom }) => {
       },
     );
 
-  useEffect(() => {
-    if (refetchNeeded) {
-      refreshRooms();
-    }
-  }, [refetchNeeded, refreshRooms]);
+  // useEffect(() => {
+  //   if (refetchNeeded) {
+  //     refreshRooms();
+  //   }
+  // }, [refetchNeeded, refreshRooms]);
 
   useEffect(() => {
-    refreshRooms();
-  }, [unreadChatCount, refreshRooms]);
+    if (refetchGroupId) {
+      refetchRoom();
+    }
+  }, [refetchGroupId, refetchRoom]);
 
   return (
     <Box
