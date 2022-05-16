@@ -60,7 +60,7 @@ export const BadgeProvider: React.FC = ({children}) => {
           if (
             user?.id &&
             data.userId !== user.id &&
-            currentChatRoomId != data.groupId
+            currentChatRoomId !== data.groupId
           ) {
             setChatUnreadCount(count => count + 1);
             setChatGroups(group =>
