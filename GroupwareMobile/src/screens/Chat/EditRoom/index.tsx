@@ -5,6 +5,7 @@ import {
 } from '@react-navigation/native';
 import React, {useCallback} from 'react';
 import {Alert} from 'react-native';
+import {useRoomRefetch} from '../../../contexts/chat/useRoomRefetch';
 import {useAPIGetRoomDetail} from '../../../hooks/api/chat/useAPIGetRoomDetail';
 import {useAPIUpdateChatGroup} from '../../../hooks/api/chat/useAPIUpdateChatGroup';
 import {useAPIUploadStorage} from '../../../hooks/api/storage/useAPIUploadStorage';
@@ -18,6 +19,7 @@ import {
 
 const EditRoom: React.FC = () => {
   const navigation = useNavigation<EditRoomNavigationProps>();
+  const {setNewChatGroup} = useRoomRefetch();
   const {room} = useRoute<EditRoomRouteProps>().params;
   const {data: roomDetail, refetch} = useAPIGetRoomDetail(room.id, {
     onError: () => {
@@ -28,14 +30,15 @@ const EditRoom: React.FC = () => {
   const {data: users} = useAPIGetUsers('');
   const headerTitle = 'ルーム編集';
   const {mutate: updateGroup} = useAPIUpdateChatGroup({
-    onSuccess: () => {
+    onSuccess: updatedGroup => {
+      setNewChatGroup(updatedGroup);
       Alert.alert('ルームの更新が完了しました。', undefined, [
         {
           text: 'OK',
           onPress: () => {
             navigation.navigate('ChatStack', {
               screen: 'ChatMenu',
-              params: {room},
+              params: {room: updatedGroup},
             });
           },
         },
