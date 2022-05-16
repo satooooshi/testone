@@ -1,4 +1,5 @@
 import {useFocusEffect, useNavigation} from '@react-navigation/native';
+import {AxiosError} from 'axios';
 import React, {useCallback, useEffect, useState} from 'react';
 import {Alert, TouchableHighlight, TouchableOpacity} from 'react-native';
 import {Button, Div, Icon, Input, ScrollDiv, Text} from 'react-native-magnus';
@@ -88,10 +89,14 @@ const RoomList: React.FC = () => {
       page: latestPage.toString(),
       limit: '20',
       isLatest: true,
-      updatedAtLatestRoom: roomsForInfiniteScroll[0]?.updatedAt,
+      updatedAtLatestRoom: roomsForInfiniteScroll.filter(r => !r.isPinned)[0]
+        ?.updatedAt,
     },
     {
       enabled: false,
+      onSettled: () => {
+        console.log('call ---------------------------------------');
+      },
       onSuccess: data => {
         console.log('latest call -----------------------', data.rooms.length);
         setLatestPage(p => p + 1);
@@ -105,8 +110,26 @@ const RoomList: React.FC = () => {
           setLatestPage(1);
           const ids = latestRooms.map(r => r.id);
           setRoomsForInfiniteScroll(room => {
+            let latestPinnedRooms: ChatGroup[] = [];
             const roomsExceptUpdated = room.filter(r => !ids.includes(r.id));
-            return [...latestRooms, ...roomsExceptUpdated];
+            const roomsExceptPinned = roomsExceptUpdated.filter(
+              r => !r.isPinned,
+            );
+            let pinnedRooms = roomsExceptUpdated.filter(r => r.isPinned);
+            const latestRoomsExceptPinned = latestRooms.filter(r => {
+              if (r.isPinned) {
+                latestPinnedRooms.unshift(r);
+              } else {
+                return r;
+              }
+            });
+
+            return [
+              ...latestPinnedRooms,
+              ...pinnedRooms,
+              ...latestRoomsExceptPinned,
+              ...roomsExceptPinned,
+            ];
           });
         }
       },
@@ -194,10 +217,10 @@ const RoomList: React.FC = () => {
 
       const jsonRoomsInStorage = storage.getString('roomList');
       if (jsonRoomsInStorage) {
-        console.log('saved not delete ============================');
         const roomsInStorage: ChatGroup[] = JSON.parse(jsonRoomsInStorage);
         setRoomsForInfiniteScroll(roomsInStorage);
         refetchLatestRooms();
+        console.log('saved not delete ============================');
       } else {
         console.log('refetch all');
         refetchAllRooms();
@@ -350,9 +373,9 @@ const RoomList: React.FC = () => {
         {roomsForInfiniteScroll.length && !isNeedRefetch ? (
           <ScrollDiv h={'80%'}>
             {searchedRooms
-              ? searchedRooms.map((room, index) => {
+              ? searchedRooms.map(room => {
                   return (
-                    <Div key={index} mb="sm">
+                    <Div key={room.id} mb="sm">
                       <RoomCard
                         room={room}
                         onPress={() =>
