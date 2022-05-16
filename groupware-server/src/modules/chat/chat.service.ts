@@ -97,7 +97,7 @@ export class ChatService {
 
     const formatedUpdatedAt = updatedAtLatestRoom
       ? toDateTime(updatedAtLatestRoom).toFormat(
-          `yyyy-MM-dd hh:mm:ss.${toDateTime(updatedAtLatestRoom).get(
+          `yyyy-MM-dd HH:mm:ss.${toDateTime(updatedAtLatestRoom).get(
             'millisecond',
           )}`,
         )
@@ -128,7 +128,9 @@ export class ChatService {
       .leftJoinAndSelect('lastReadChatTime.user', 'lastReadChatTime.user')
       .where('member.id = :memberId', { memberId: userID })
       .andWhere(
-        formatedUpdatedAt ? `chat_groups.updatedAt > :formatedDate` : '1=1',
+        updatedAtLatestRoom
+          ? `chat_groups.updatedAt > :formatedUpdatedAt`
+          : '1=1',
         {
           formatedUpdatedAt,
         },
@@ -213,6 +215,7 @@ export class ChatService {
   ): Promise<ChatMessage[]> {
     const { after, before, include = false, limit = '20' } = query;
 
+    console.log('call ==================================');
     if (Number(limit) === 0) {
       return;
     }
