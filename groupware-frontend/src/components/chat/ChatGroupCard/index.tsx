@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ChatGroup, ChatMessage, ChatMessageType, User } from 'src/types';
 import { dateTimeFormatterFromJSDDate } from 'src/utils/dateTimeFormatter';
 import {
@@ -11,32 +11,34 @@ import {
 } from '@chakra-ui/react';
 import { darkFontColor } from 'src/utils/colors';
 import { RiPushpin2Fill, RiPushpin2Line } from 'react-icons/ri';
-import { useRoomRefetch } from 'src/contexts/chat/useRoomRefetch';
-import { useAPISavePin } from '@/hooks/api/chat/useAPISavePin';
+import { useHandleBadge } from 'src/contexts/badge/useHandleBadge';
 
 type ChatGroupCardProps = {
   chatGroup: ChatGroup;
   isSelected?: boolean;
+  onPressPinButton: () => void;
 };
 
 const ChatGroupCard: React.FC<ChatGroupCardProps> = ({
   chatGroup,
   isSelected = false,
+  onPressPinButton,
 }) => {
-  const { needRefetch } = useRoomRefetch();
-  const [isPinned, setIsPinned] = useState<boolean>(!!chatGroup.isPinned);
+  const { currentRoom } = useHandleBadge();
+  const [unreadCount, setUnreadCount] = useState(
+    chatGroup.unreadCount ? chatGroup.unreadCount : 0,
+  );
 
-  const { mutate: savePin } = useAPISavePin({
-    onSuccess: () => {
-      setIsPinned(!isPinned);
-      needRefetch();
-    },
-    onError: () => {
-      alert(
-        'ピン留めを更新中にエラーが発生しました。\n時間をおいて再実行してください。',
-      );
-    },
-  });
+  useEffect(() => {
+    if (chatGroup.unreadCount) setUnreadCount(chatGroup.unreadCount);
+  }, [chatGroup.unreadCount]);
+
+  useEffect(() => {
+    if (currentRoom?.id === chatGroup.id) {
+      setUnreadCount(currentRoom?.unreadCount ? currentRoom.unreadCount : 0);
+    }
+  }, [currentRoom, setUnreadCount, chatGroup.id]);
+
   const [isSmallerThan768] = useMediaQuery('max-width: 768px');
   const nameOfEmptyNameGroup = (members?: User[]): string => {
     if (!members) {
@@ -72,9 +74,7 @@ const ChatGroupCard: React.FC<ChatGroupCardProps> = ({
       boxShadow="md"
       w={'100%'}
       h="fit-content"
-      bg={
-        isSelected ? 'gray.200' : chatGroup.hasBeenRead ? '#f2f1f2' : 'white'
-      }>
+      bg={isSelected ? 'gray.200' : unreadCount ? 'white' : '#f2f1f2'}>
       <Avatar src={chatGroup.imageURL} size="md" mr="8px" />
       <Box
         display="flex"
@@ -97,9 +97,7 @@ const ChatGroupCard: React.FC<ChatGroupCardProps> = ({
           </Text>
 
           <Box display="flex" flexDir="row">
-            {isSelected == false &&
-            chatGroup?.unreadCount &&
-            chatGroup?.unreadCount > 0 ? (
+            {isSelected == false && unreadCount > 0 ? (
               <Badge
                 bg="green"
                 color="white"
@@ -109,14 +107,14 @@ const ChatGroupCard: React.FC<ChatGroupCardProps> = ({
                 borderRadius="50%"
                 textAlign="center"
                 lineHeight="30px">
-                {chatGroup?.unreadCount}
+                {unreadCount}
               </Badge>
             ) : null}
-            {isPinned ? (
+            {!!chatGroup.isPinned ? (
               <Link
                 onClick={(e) => {
                   e.stopPropagation();
-                  savePin({ ...chatGroup, isPinned: !chatGroup.isPinned });
+                  onPressPinButton();
                 }}>
                 <RiPushpin2Fill size={24} color="green" />
               </Link>
@@ -124,7 +122,7 @@ const ChatGroupCard: React.FC<ChatGroupCardProps> = ({
               <Link
                 onClick={(e) => {
                   e.stopPropagation();
-                  savePin({ ...chatGroup, isPinned: !chatGroup.isPinned });
+                  onPressPinButton();
                 }}>
                 <RiPushpin2Line size={24} color="green" />
               </Link>

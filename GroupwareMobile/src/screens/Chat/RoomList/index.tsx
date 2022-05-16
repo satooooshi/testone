@@ -9,6 +9,7 @@ import UserModal from '../../../components/common/UserModal';
 import HeaderWithTextButton from '../../../components/Header';
 import WholeContainer from '../../../components/WholeContainer';
 import {useHandleBadge} from '../../../contexts/badge/useHandleBadge';
+import {useAPIGetOneRoom} from '../../../hooks/api/chat/useAPIGetOneRoom';
 import {useAPIGetRooms} from '../../../hooks/api/chat/useAPIGetRoomsByPage';
 import {useAPISaveChatGroup} from '../../../hooks/api/chat/useAPISaveChatGroup';
 import {useAPISavePin} from '../../../hooks/api/chat/useAPISavePin';
@@ -29,7 +30,7 @@ const RoomList: React.FC = () => {
   const [roomTypeSelector, setRoomTypeSelector] = useState(false);
   const [userModal, setVisibleUserModal] = useState(false);
   const {data: users} = useAPIGetUsers('');
-  const {unreadChatCount} = useHandleBadge();
+  const {completeRefetch, refetchGroupId} = useHandleBadge();
   const {selectedUserRole, filteredUsers} = useUserRole('All', users);
   const [creationType, setCreationType] = useState<RoomType>();
   const [searchedRooms, setSearchedRooms] = useState<ChatGroup[]>();
@@ -60,6 +61,25 @@ const RoomList: React.FC = () => {
         },
       },
     );
+  const {refetch: refetchRoom} = useAPIGetOneRoom(refetchGroupId, {
+    enabled: false,
+    onError: () => {
+      Alert.alert('ルーム情報の取得に失敗しました');
+    },
+    onSuccess: data => {
+      let rooms = roomsForInfiniteScroll.filter(r => r.id !== data.id);
+      if (data.isPinned) {
+        setRoomsForInfiniteScroll([...[data], ...rooms]);
+      } else {
+        const pinnedRoomsCount = rooms.filter(r => r.isPinned).length;
+        if (pinnedRoomsCount) {
+          rooms.splice(pinnedRoomsCount, 0, data);
+          setRoomsForInfiniteScroll(rooms);
+        }
+      }
+      completeRefetch();
+    },
+  });
 
   const {refetch: refetchLatestRooms} = useAPIGetRooms(
     {
@@ -93,7 +113,7 @@ const RoomList: React.FC = () => {
 
   const {mutate: createGroup} = useAPISaveChatGroup({
     onSuccess: createdData => {
-      refetchAllRooms();
+      setRoomsForInfiniteScroll(r => [...[createdData], ...r]);
       navigation.navigate('ChatStack', {
         screen: 'Chat',
         params: {room: createdData},
@@ -106,8 +126,26 @@ const RoomList: React.FC = () => {
   });
 
   const {mutate: savePin} = useAPISavePin({
-    onSuccess: () => {
-      refetchAllRooms();
+    onSuccess: data => {
+      let rooms = roomsForInfiniteScroll.filter(r => r.id !== data.id);
+      if (data.isPinned) {
+        const pinnedRoomsCount = rooms.filter(
+          r => r.isPinned && r.updatedAt > data.updatedAt,
+        ).length;
+        if (pinnedRoomsCount) {
+          rooms.splice(pinnedRoomsCount, 0, data);
+          setRoomsForInfiniteScroll(rooms);
+        }
+      } else {
+        const pinnedRoomsCount = rooms.filter(
+          r => r.isPinned || r.updatedAt > data.updatedAt,
+        ).length;
+        if (pinnedRoomsCount) {
+          rooms.splice(pinnedRoomsCount, 0, data);
+          setRoomsForInfiniteScroll(rooms);
+        }
+      }
+      // refetchAllRooms();
     },
     onError: () => {
       Alert.alert(
@@ -122,9 +160,10 @@ const RoomList: React.FC = () => {
   };
 
   useEffect(() => {
-    console.log('unread count refetch all ====================');
-    refetchAllRooms();
-  }, [unreadChatCount, refetchAllRooms]);
+    if (refetchGroupId) {
+      refetchRoom();
+    }
+  }, [refetchGroupId, refetchRoom]);
 
   useFocusEffect(
     useCallback(() => {
@@ -191,7 +230,6 @@ const RoomList: React.FC = () => {
             }}>
             <Icon color="black" name="close" fontSize={20} />
           </TouchableOpacity>
-
           <TouchableHighlight
             underlayColor="none"
             onPress={() => {
