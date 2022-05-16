@@ -214,9 +214,8 @@ export class ChatService {
   ): Promise<ChatMessage[]> {
     const { after, before, include = false, limit = '20' } = query;
 
-    console.log('call ==================================');
     if (Number(limit) === 0) {
-      return;
+      return [];
     }
 
     const existMessages = await this.chatMessageRepository
