@@ -88,10 +88,13 @@ const RoomList: React.FC = () => {
       limit: '20',
       isLatest: true,
       updatedAtLatestRoom: roomsForInfiniteScroll.filter(r => !r.isPinned)[0]
-        .updatedAt,
+        ?.updatedAt,
     },
     {
       enabled: false,
+      onSettled: () => {
+        console.log('call ---------------------------------------');
+      },
       onSuccess: data => {
         console.log('latest call -----------------------', data.rooms.length);
         setLatestPage(p => p + 1);
@@ -105,12 +108,26 @@ const RoomList: React.FC = () => {
           setLatestPage(1);
           const ids = latestRooms.map(r => r.id);
           setRoomsForInfiniteScroll(room => {
+            let latestPinnedRooms: ChatGroup[] = [];
             const roomsExceptUpdated = room.filter(r => !ids.includes(r.id));
             const roomsExceptPinned = roomsExceptUpdated.filter(
               r => !r.isPinned,
             );
-            const pinnedRooms = roomsExceptUpdated.filter(r => r.isPinned);
-            return [...pinnedRooms, ...latestRooms, ...roomsExceptPinned];
+            let pinnedRooms = roomsExceptUpdated.filter(r => r.isPinned);
+            const latestRoomsExceptPinned = latestRooms.filter(r => {
+              if (r.isPinned) {
+                latestPinnedRooms.unshift(r);
+              } else {
+                return r;
+              }
+            });
+
+            return [
+              ...latestPinnedRooms,
+              ...pinnedRooms,
+              ...latestRoomsExceptPinned,
+              ...roomsExceptPinned,
+            ];
           });
         }
       },
@@ -335,9 +352,9 @@ const RoomList: React.FC = () => {
         {roomsForInfiniteScroll.length && !isNeedRefetch ? (
           <ScrollDiv h={'80%'}>
             {searchedRooms
-              ? searchedRooms.map((room, index) => {
+              ? searchedRooms.map(room => {
                   return (
-                    <Div key={index} mb="sm">
+                    <Div key={room.id} mb="sm">
                       <RoomCard
                         room={room}
                         onPress={() =>
