@@ -95,8 +95,26 @@ const RoomList: React.FC = () => {
     },
   });
   const {mutate: savePin} = useAPISavePin({
-    onSuccess: () => {
-      refetchAllRooms();
+    onSuccess: data => {
+      let rooms = roomsForInfiniteScroll.filter(r => r.id !== data.id);
+      if (data.isPinned) {
+        const pinnedRoomsCount = rooms.filter(
+          r => r.isPinned && r.updatedAt > data.updatedAt,
+        ).length;
+        if (pinnedRoomsCount) {
+          rooms.splice(pinnedRoomsCount, 0, data);
+          setRoomsForInfiniteScroll(rooms);
+        }
+      } else {
+        const pinnedRoomsCount = rooms.filter(
+          r => r.isPinned || r.updatedAt > data.updatedAt,
+        ).length;
+        if (pinnedRoomsCount) {
+          rooms.splice(pinnedRoomsCount, 0, data);
+          setRoomsForInfiniteScroll(rooms);
+        }
+      }
+      // refetchAllRooms();
     },
     onError: () => {
       Alert.alert(
@@ -203,7 +221,6 @@ const RoomList: React.FC = () => {
             }}>
             <Icon color="black" name="close" fontSize={20} />
           </TouchableOpacity>
-
           <TouchableHighlight
             underlayColor="none"
             onPress={() => {
