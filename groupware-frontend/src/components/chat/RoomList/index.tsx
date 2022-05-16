@@ -70,7 +70,6 @@ const RoomList: React.FC<RoomListProps> = ({ currentId, onClickRoom }) => {
   });
 
   useEffect(() => {
-    console.log('-----------');
     if (newRoom) {
       if (newRoom.updatedAt > newRoom.createdAt) {
         setRoomsForInfiniteScroll((room) =>
