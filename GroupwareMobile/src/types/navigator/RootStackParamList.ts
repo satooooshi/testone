@@ -72,7 +72,7 @@ export type RootStackParamList = {
   EditRoom: {room: ChatGroup};
   ChatMenu: {
     room: ChatGroup;
-    removeCache: () => void;
+    removeCache?: () => void;
   };
   ChatNotes: {
     room: ChatGroup;
