@@ -132,11 +132,11 @@ const RoomList: React.FC = () => {
       setLatestRooms([]);
       console.log('focus call ==========================');
 
-      const jsonLoadedData = storage.getString('roomList');
-      if (jsonLoadedData) {
+      const jsonRoomsInStorage = storage.getString('roomList');
+      if (jsonRoomsInStorage) {
         console.log('saved not delete ============================');
-        const loadedData: ChatGroup[] = JSON.parse(jsonLoadedData);
-        setRoomsForInfiniteScroll(loadedData);
+        const roomsInStorage: ChatGroup[] = JSON.parse(jsonRoomsInStorage);
+        setRoomsForInfiniteScroll(roomsInStorage);
         refetchLatestRooms();
       } else {
         console.log('refetch all');

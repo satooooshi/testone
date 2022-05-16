@@ -518,6 +518,7 @@ const Chat: React.FC = () => {
   }, [refetchLatest, room]);
 
   useEffect(() => {
+    console.log('call ==================== refetch past messages');
     refetchFetchedPastMessages();
   }, [before, after, include, refetchFetchedPastMessages]);
 
@@ -908,19 +909,16 @@ const Chat: React.FC = () => {
 
   useFocusEffect(
     useCallback(() => {
-      // storage
-      //   .load({
-      //     key: 'chatRoom',
-      //     id: room.id.toString(),
-      //   })
-      //   .then(cacheData => {
-      //     console.log('cacheData =================', cacheData.length);
-      //     setMessages(cacheData);
-      //   });
-      const jsonLoadedData = storage.getString(`chatRoom${room.id}`);
-      if (jsonLoadedData) {
-        const loadedData = JSON.parse(jsonLoadedData);
-        setMessages(loadedData);
+      const jsonMessagesInStorage = storage.getString(
+        `messagesIntRoom${room.id}`,
+      );
+      if (jsonMessagesInStorage) {
+        const messagesInStorage = JSON.parse(jsonMessagesInStorage);
+        console.log(
+          'loaded message =================',
+          messagesInStorage.length,
+        );
+        setMessages(messagesInStorage);
       }
       refetchLatest();
       refetchRoomDetail();
@@ -949,14 +947,18 @@ const Chat: React.FC = () => {
     [],
   );
 
+  const saveMessages = (msg: ChatMessage[]) => {
+    const jsonMessages = JSON.stringify(msg);
+    storage.set(`messagesIntRoom${room.id}`, jsonMessages);
+  };
+
   useEffect(() => {
     AppState.addEventListener('change', debounceHandleLastReadByAppState);
   });
 
   useEffect(() => {
     if (messages.length) {
-      const jsonMessages = JSON.stringify(messages);
-      storage.set(`chatRoom${room.id}`, jsonMessages);
+      saveMessages(messages);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [messages]);
@@ -1011,7 +1013,7 @@ const Chat: React.FC = () => {
   };
 
   const removeCache = () => {
-    storage.delete(`chatRoom${room.id}`);
+    storage.delete(`messagesIntRoom${room.id}`);
     setMessages([]);
   };
 
