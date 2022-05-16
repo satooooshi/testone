@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { orderBy } from 'lodash';
+import { DateTime } from 'luxon';
 import PushNotifications from 'node-pushnotifications';
 import { ChatGroup, RoomType } from 'src/entities/chatGroup.entity';
 import { ChatMessage, ChatMessageType } from 'src/entities/chatMessage.entity';
@@ -85,8 +86,22 @@ export class ChatService {
     userID: number,
     query: GetChaRoomsByPageQuery,
   ): Promise<GetRoomsResult> {
-    const { page, limit = '20' } = query;
-    const offset = Number(limit) * (Number(page) - 1);
+    const { page, limit = '20', updatedAtLatestRoom } = query;
+    let offset = 0;
+    if (page) {
+      offset = (Number(page) - 1) * Number(limit);
+    }
+
+    const updatedAtToDateTime = DateTime.fromJSDate(
+      new Date(updatedAtLatestRoom),
+    );
+
+    const formatedUpdatedAt = updatedAtLatestRoom
+      ? updatedAtToDateTime.toFormat(
+          `yyyy-MM-dd HH:mm:ss.${updatedAtToDateTime.get('millisecond')}`,
+        )
+      : undefined;
+
     const [urlUnparsedRooms, count] = await this.chatGroupRepository
       .createQueryBuilder('chat_groups')
       .leftJoinAndSelect('chat_groups.members', 'members')
@@ -111,10 +126,19 @@ export class ChatService {
       .leftJoinAndSelect('m.sender', 'sender')
       .leftJoinAndSelect('lastReadChatTime.user', 'lastReadChatTime.user')
       .where('member.id = :memberId', { memberId: userID })
+      .andWhere(
+        updatedAtLatestRoom
+          ? `chat_groups.updatedAt > :formatedUpdatedAt`
+          : '1=1',
+        {
+          formatedUpdatedAt,
+        },
+      )
       .skip(offset)
       .take(Number(limit))
       .orderBy('chat_groups.updatedAt', 'DESC')
       .getManyAndCount();
+
     let rooms = await Promise.all(
       urlUnparsedRooms.map(async (g) => {
         let unreadCount = 0;
@@ -231,7 +255,7 @@ export class ChatService {
     const { after, before, include = false, limit = '20' } = query;
 
     if (Number(limit) === 0) {
-      return;
+      return [];
     }
 
     const existMessages = await this.chatMessageRepository

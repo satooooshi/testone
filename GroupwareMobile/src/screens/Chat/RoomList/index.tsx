@@ -1,20 +1,7 @@
 import {useFocusEffect, useNavigation} from '@react-navigation/native';
 import React, {useCallback, useEffect, useState} from 'react';
-import {
-  Alert,
-  FlatList,
-  TouchableHighlight,
-  TouchableOpacity,
-} from 'react-native';
-import {
-  Button,
-  Div,
-  Icon,
-  Input,
-  Modal,
-  ScrollDiv,
-  Text,
-} from 'react-native-magnus';
+import {Alert, TouchableHighlight, TouchableOpacity} from 'react-native';
+import {Button, Div, Icon, Input, ScrollDiv, Text} from 'react-native-magnus';
 import {ActivityIndicator} from 'react-native-paper';
 import tailwind from 'tailwind-rn';
 import RoomCard from '../../../components/chat/RoomCard';
@@ -32,11 +19,12 @@ import {useUserRole} from '../../../hooks/user/useUserRole';
 import {ChatGroup, RoomType} from '../../../types';
 import {RoomListNavigationProps} from '../../../types/navigator/drawerScreenProps';
 import {nameOfRoom} from '../../../utils/factory/chat/nameOfRoom';
-import storage from '../../../utils/storage';
+import {storage} from '../../../utils/url';
 
 const RoomList: React.FC = () => {
   const navigation = useNavigation<RoomListNavigationProps>();
-  const [page, setPage] = useState('1');
+  const [page, setPage] = useState(1);
+  const [latestPage, setLatestPage] = useState(1);
   const [roomsForInfiniteScroll, setRoomsForInfiniteScroll] = useState<
     ChatGroup[]
   >([]);
@@ -47,19 +35,31 @@ const RoomList: React.FC = () => {
   const {completeRefetch, refetchGroupId} = useHandleBadge();
   const {selectedUserRole, filteredUsers} = useUserRole('All', users);
   const [creationType, setCreationType] = useState<RoomType>();
-  const [isVisibleSearchedRooms, setIsVisibleSearchedRooms] =
-    useState<boolean>(false);
   const [searchedRooms, setSearchedRooms] = useState<ChatGroup[]>();
-
+  const [isNeedRefetch, setIsNeedRefetch] = useState<boolean>(false);
+  const [isNeedRefetchLatest, setIsNeedRefetchLatest] =
+    useState<boolean>(false);
+  const [latestRooms, setLatestRooms] = useState<ChatGroup[]>([]);
   const {refetch: refetchAllRooms, isLoading: loadingGetChatGroupList} =
     useAPIGetRooms(
       {
-        page: '1',
-        limit: String(0),
+        page: page.toString(),
+        limit: '20',
       },
       {
+        enabled: false,
         onSuccess: data => {
-          stateRefreshNeeded(data.rooms);
+          console.log('call -----------------------', data.rooms.length);
+          setPage(p => p + 1);
+          if (data.rooms.length) {
+            setIsNeedRefetch(true);
+            setRoomsForInfiniteScroll(r =>
+              r.length ? [...r, ...data.rooms] : [...data.rooms],
+            );
+          } else {
+            setIsNeedRefetch(false);
+            setPage(1);
+          }
         },
       },
     );
@@ -83,6 +83,36 @@ const RoomList: React.FC = () => {
     },
   });
 
+  const {refetch: refetchLatestRooms} = useAPIGetRooms(
+    {
+      page: latestPage.toString(),
+      limit: '20',
+      isLatest: true,
+      updatedAtLatestRoom: roomsForInfiniteScroll[0]?.updatedAt,
+    },
+    {
+      enabled: false,
+      onSuccess: data => {
+        console.log('latest call -----------------------', data.rooms.length);
+        setLatestPage(p => p + 1);
+        if (data.rooms.length) {
+          setIsNeedRefetchLatest(true);
+          setLatestRooms(r =>
+            r.length ? [...r, ...data.rooms] : [...data.rooms],
+          );
+        } else {
+          setIsNeedRefetchLatest(false);
+          setLatestPage(1);
+          const ids = latestRooms.map(r => r.id);
+          setRoomsForInfiniteScroll(room => {
+            const roomsExceptUpdated = room.filter(r => !ids.includes(r.id));
+            return [...latestRooms, ...roomsExceptUpdated];
+          });
+        }
+      },
+    },
+  );
+
   const {mutate: createGroup} = useAPISaveChatGroup({
     onSuccess: createdData => {
       if (createdData.updatedAt > createdData.createdAt) {
@@ -99,6 +129,7 @@ const RoomList: React.FC = () => {
       Alert.alert('チャットルームの作成に失敗しました');
     },
   });
+
   const {mutate: savePin} = useAPISavePin({
     onSuccess: data => {
       let rooms = roomsForInfiniteScroll.filter(r => r.id !== data.id);
@@ -151,32 +182,6 @@ const RoomList: React.FC = () => {
     setRoomTypeSelector(true);
   };
 
-  const stateRefreshNeeded = (newData: ChatGroup[]) => {
-    let updateNeeded = false;
-    if (roomsForInfiniteScroll.length !== newData?.length) {
-      updateNeeded = true;
-    }
-    if (roomsForInfiniteScroll.length || newData?.length) {
-      for (let i = 0; i < roomsForInfiniteScroll.length; i++) {
-        if (updateNeeded) {
-          break;
-        }
-        if (
-          new Date(roomsForInfiniteScroll[i]?.updatedAt).getTime() !==
-            new Date(newData?.[i]?.updatedAt).getTime() ||
-          roomsForInfiniteScroll[i].hasBeenRead !== newData?.[i]?.hasBeenRead ||
-          roomsForInfiniteScroll[i]?.members?.length !==
-            newData?.[i]?.members?.length
-        ) {
-          updateNeeded = true;
-        }
-      }
-    }
-    if (updateNeeded) {
-      setRoomsForInfiniteScroll(newData);
-    }
-  };
-
   useEffect(() => {
     if (refetchGroupId) {
       refetchRoom();
@@ -185,24 +190,43 @@ const RoomList: React.FC = () => {
 
   useFocusEffect(
     useCallback(() => {
-      storage
-        .load({
-          key: 'roomList',
-        })
-        .then(loadedData => {
-          setRoomsForInfiniteScroll(loadedData);
-        });
-    }, []),
+      setRoomsForInfiniteScroll([]);
+      setLatestRooms([]);
+      console.log('focus call ==========================');
+
+      const jsonRoomsInStorage = storage.getString('roomList');
+      if (jsonRoomsInStorage) {
+        console.log('saved not delete ============================');
+        const roomsInStorage: ChatGroup[] = JSON.parse(jsonRoomsInStorage);
+        setRoomsForInfiniteScroll(roomsInStorage);
+        refetchLatestRooms();
+      } else {
+        console.log('refetch all');
+        refetchAllRooms();
+      }
+    }, [refetchAllRooms, refetchLatestRooms]),
   );
 
   useEffect(() => {
-    if (roomsForInfiniteScroll.length) {
-      storage.save({
-        key: 'roomList',
-        data: roomsForInfiniteScroll,
-      });
+    if (!isNeedRefetch && roomsForInfiniteScroll.length) {
+      console.log(
+        'save =================================',
+        roomsForInfiniteScroll.length,
+      );
+      const jsonRooms = JSON.stringify(roomsForInfiniteScroll);
+      storage.set('roomList', jsonRooms);
     }
-  }, [roomsForInfiniteScroll]);
+    if (isNeedRefetch) {
+      console.log('isNeeded refetch all ================');
+      refetchAllRooms();
+    }
+  }, [roomsForInfiniteScroll, refetchAllRooms, isNeedRefetch]);
+
+  useEffect(() => {
+    if (isNeedRefetchLatest) {
+      refetchLatestRooms();
+    }
+  }, [latestRooms, isNeedRefetchLatest, refetchLatestRooms]);
 
   return (
     <WholeContainer>
@@ -212,21 +236,6 @@ const RoomList: React.FC = () => {
         {...{onPressRightButton}}
       />
 
-      <Modal h={400} isVisible={isVisibleSearchedRooms}>
-        <ScrollDiv>
-          <Button
-            bg="gray400"
-            h={35}
-            w={35}
-            right={0}
-            alignSelf="flex-end"
-            rounded="circle"
-            onPress={() => setIsVisibleSearchedRooms(false)}>
-            <Icon color="black" name="close" />
-          </Button>
-          {searchedRooms}
-        </ScrollDiv>
-      </Modal>
       {roomTypeSelector ? (
         <Div
           bg="white"
@@ -329,12 +338,23 @@ const RoomList: React.FC = () => {
             />
           }
         />
-        {roomsForInfiniteScroll.length ? (
+        <Button
+          w={30}
+          h={30}
+          fontSize={10}
+          onPress={() => {
+            storage.delete('roomList');
+            setRoomsForInfiniteScroll([]);
+            setPage(1);
+          }}
+        />
+
+        {roomsForInfiniteScroll.length && !isNeedRefetch ? (
           <ScrollDiv h={'80%'}>
             {searchedRooms
-              ? searchedRooms.map(room => {
+              ? searchedRooms.map((room, index) => {
                   return (
-                    <Div mb="sm">
+                    <Div key={index} mb="sm">
                       <RoomCard
                         room={room}
                         onPress={() =>
@@ -350,9 +370,9 @@ const RoomList: React.FC = () => {
                     </Div>
                   );
                 })
-              : roomsForInfiniteScroll.map(room => {
+              : roomsForInfiniteScroll.map((room, index) => {
                   return (
-                    <Div mb="sm">
+                    <Div key={index} mb="sm">
                       <RoomCard
                         room={room}
                         onPress={() =>
@@ -369,8 +389,14 @@ const RoomList: React.FC = () => {
                   );
                 })}
           </ScrollDiv>
-        ) : loadingGetChatGroupList ? (
-          <ActivityIndicator />
+        ) : isNeedRefetch ? (
+          <Div alignItems="center" w={'90%'}>
+            <Text>
+              ただいま全てのルームを取得しています。{'\n'}
+              しばらくの間お待ちください。
+            </Text>
+            <ActivityIndicator />
+          </Div>
         ) : (
           <Text fontSize={16} textAlign="center">
             ルームを作成するか、招待をお待ちください
