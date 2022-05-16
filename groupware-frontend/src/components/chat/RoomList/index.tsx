@@ -6,6 +6,7 @@ import { useHandleBadge } from 'src/contexts/badge/useHandleBadge';
 import { useRoomRefetch } from 'src/contexts/chat/useRoomRefetch';
 import { ChatGroup } from 'src/types';
 import ChatGroupCard from '../ChatGroupCard';
+import { useAPISavePin } from '@/hooks/api/chat/useAPISavePin';
 
 type RoomListProps = {
   currentId?: string;
@@ -39,6 +40,34 @@ const RoomList: React.FC<RoomListProps> = ({ currentId, onClickRoom }) => {
         }
       }
       completeRefetch();
+    },
+  });
+
+  const { mutate: savePin } = useAPISavePin({
+    onSuccess: (data) => {
+      const rooms = roomsForInfiniteScroll.filter((r) => r.id !== data.id);
+      if (data.isPinned) {
+        const pinnedRoomsCount = rooms.filter(
+          (r) => r.isPinned && r.updatedAt > data.updatedAt,
+        ).length;
+        if (pinnedRoomsCount) {
+          rooms.splice(pinnedRoomsCount, 0, data);
+          setRoomsForInfiniteScroll(rooms);
+        }
+      } else {
+        const pinnedRoomsCount = rooms.filter(
+          (r) => r.isPinned || r.updatedAt > data.updatedAt,
+        ).length;
+        if (pinnedRoomsCount) {
+          rooms.splice(pinnedRoomsCount, 0, data);
+          setRoomsForInfiniteScroll(rooms);
+        }
+      }
+    },
+    onError: () => {
+      alert(
+        'ピン留めを更新中にエラーが発生しました。\n時間をおいて再実行してください。',
+      );
     },
   });
 
@@ -98,6 +127,9 @@ const RoomList: React.FC<RoomListProps> = ({ currentId, onClickRoom }) => {
             <Box w="100%" mb={'8px'}>
               <ChatGroupCard
                 isSelected={Number(currentId) === g.id}
+                onPressPinButton={() => {
+                  savePin({ ...g, isPinned: !g.isPinned });
+                }}
                 chatGroup={g}
                 key={g.id}
               />

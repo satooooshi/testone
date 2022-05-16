@@ -12,17 +12,18 @@ import {
 import { darkFontColor } from 'src/utils/colors';
 import { RiPushpin2Fill, RiPushpin2Line } from 'react-icons/ri';
 import { useRoomRefetch } from 'src/contexts/chat/useRoomRefetch';
-import { useAPISavePin } from '@/hooks/api/chat/useAPISavePin';
 import { useHandleBadge } from 'src/contexts/badge/useHandleBadge';
 
 type ChatGroupCardProps = {
   chatGroup: ChatGroup;
   isSelected?: boolean;
+  onPressPinButton: () => void;
 };
 
 const ChatGroupCard: React.FC<ChatGroupCardProps> = ({
   chatGroup,
   isSelected = false,
+  onPressPinButton,
 }) => {
   const { needRefetch } = useRoomRefetch();
   const [isPinned, setIsPinned] = useState<boolean>(!!chatGroup.isPinned);
@@ -41,17 +42,6 @@ const ChatGroupCard: React.FC<ChatGroupCardProps> = ({
     }
   }, [currentRoom, setUnreadCount, chatGroup.id]);
 
-  const { mutate: savePin } = useAPISavePin({
-    onSuccess: () => {
-      setIsPinned(!isPinned);
-      needRefetch();
-    },
-    onError: () => {
-      alert(
-        'ピン留めを更新中にエラーが発生しました。\n時間をおいて再実行してください。',
-      );
-    },
-  });
   const [isSmallerThan768] = useMediaQuery('max-width: 768px');
   const nameOfEmptyNameGroup = (members?: User[]): string => {
     if (!members) {
@@ -123,11 +113,11 @@ const ChatGroupCard: React.FC<ChatGroupCardProps> = ({
                 {unreadCount}
               </Badge>
             ) : null}
-            {isPinned ? (
+            {!!chatGroup.isPinned ? (
               <Link
                 onClick={(e) => {
                   e.stopPropagation();
-                  savePin({ ...chatGroup, isPinned: !chatGroup.isPinned });
+                  onPressPinButton();
                 }}>
                 <RiPushpin2Fill size={24} color="green" />
               </Link>
@@ -135,7 +125,7 @@ const ChatGroupCard: React.FC<ChatGroupCardProps> = ({
               <Link
                 onClick={(e) => {
                   e.stopPropagation();
-                  savePin({ ...chatGroup, isPinned: !chatGroup.isPinned });
+                  onPressPinButton();
                 }}>
                 <RiPushpin2Line size={24} color="green" />
               </Link>
