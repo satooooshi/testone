@@ -178,9 +178,6 @@ const Chat: React.FC = () => {
     },
     {
       enabled: false,
-      onSuccess: res => {
-        console.log('success ============================', res.length);
-      },
     },
   );
 
@@ -213,11 +210,6 @@ const Chat: React.FC = () => {
     {
       enabled: false,
       onSuccess: latestData => {
-        console.log(
-          'latest success ===========================================',
-          latestData.length,
-          room.unreadCount,
-        );
         if (latestData?.length) {
           const msgToAppend: ChatMessage[] = [];
           const imagesToApped: ImageSource[] = [];
@@ -376,7 +368,6 @@ const Chat: React.FC = () => {
     const res = await DocumentPicker.pickSingle({
       type: [DocumentPicker.types.allFiles],
     });
-    console.log(res);
     const formData = new FormData();
     formData.append('files', {
       name: res.name,
@@ -431,7 +422,6 @@ const Chat: React.FC = () => {
   };
 
   const onScrollTopOnChat = () => {
-    console.log('before call ===========================');
     setBefore(messages[messages.length - 1].id);
   };
 
@@ -519,7 +509,6 @@ const Chat: React.FC = () => {
   }, [refetchLatest, room]);
 
   useEffect(() => {
-    console.log('call =============================');
     refetchFetchedPastMessages();
   }, [before, after, refetchFetchedPastMessages]);
 
@@ -633,7 +622,6 @@ const Chat: React.FC = () => {
                 room: room.id.toString(),
                 senderId: myself?.id,
               });
-              console.log('>>>>>>>>>>>>>>');
               handleEnterRoom(room.id);
             },
           });

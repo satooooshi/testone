@@ -27,16 +27,11 @@ export const BadgeProvider: React.FC = ({ children }) => {
   });
   const { mutate: getRooms } = useAPIGetRoomsUnreadChatCount({
     onSuccess: (data) => {
-      console.log(
-        'count-----',
-        data.map((d) => d.unreadCount),
-      );
       let count = 0;
       setChatGroups(data);
       for (const room of data) {
         count += room.unreadCount ? room.unreadCount : 0;
       }
-      console.log('count-----', count);
       setChatUnreadCount(count);
     },
   });

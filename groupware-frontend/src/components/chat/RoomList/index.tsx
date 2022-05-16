@@ -28,7 +28,6 @@ const RoomList: React.FC<RoomListProps> = ({ currentId, onClickRoom }) => {
       }
     },
     onSuccess: (data) => {
-      console.log('data', data.unreadCount);
       const rooms = roomsForInfiniteScroll.filter((r) => r.id !== data.id);
       if (data.isPinned) {
         setRoomsForInfiniteScroll([...[data], ...rooms]);
