@@ -87,14 +87,21 @@ export class ChatService {
     query: GetChaRoomsByPageQuery,
   ): Promise<GetRoomsResult> {
     const { page, limit = '20', updatedAtLatestRoom } = query;
-    let offset;
+    let offset = 0;
     if (page) {
       offset = (Number(page) - 1) * Number(limit);
     }
-    const db = DateTime.fromJSDate(new Date(updatedAtLatestRoom));
-    const formatedDate = db.toFormat(
-      `yyyy-MM-dd hh:mm:ss.${db.get('millisecond')}`,
-    );
+
+    const toDateTime = (date: Date): DateTime =>
+      DateTime.fromJSDate(new Date(date));
+
+    const formatedUpdatedAt = updatedAtLatestRoom
+      ? toDateTime(updatedAtLatestRoom).toFormat(
+          `yyyy-MM-dd hh:mm:ss.${toDateTime(updatedAtLatestRoom).get(
+            'millisecond',
+          )}`,
+        )
+      : undefined;
 
     const [urlUnparsedRooms, count] = await this.chatGroupRepository
       .createQueryBuilder('chat_groups')
@@ -121,9 +128,9 @@ export class ChatService {
       .leftJoinAndSelect('lastReadChatTime.user', 'lastReadChatTime.user')
       .where('member.id = :memberId', { memberId: userID })
       .andWhere(
-        formatedDate ? `chat_groups.updatedAt > :formatedDate` : '1=1',
+        formatedUpdatedAt ? `chat_groups.updatedAt > :formatedDate` : '1=1',
         {
-          formatedDate,
+          formatedUpdatedAt,
         },
       )
       .skip(offset)
