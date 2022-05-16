@@ -107,7 +107,7 @@ export const BadgeProvider: React.FC = ({ children }) => {
     if (unreadCount) {
       setChatUnreadCount((c) => (c - unreadCount >= 0 ? c - unreadCount : 0));
       setChatGroups((group) =>
-        group.map((g) => (g.id === roomId ? g : { ...g, unreadCount: 0 })),
+        group.map((g) => (g.id === roomId ? { ...g, unreadCount: 0 } : g)),
       );
     }
   };
