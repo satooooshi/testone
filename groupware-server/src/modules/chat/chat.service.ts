@@ -92,14 +92,13 @@ export class ChatService {
       offset = (Number(page) - 1) * Number(limit);
     }
 
-    const toDateTime = (date: Date): DateTime =>
-      DateTime.fromJSDate(new Date(date));
+    const updatedAtToDateTime = DateTime.fromJSDate(
+      new Date(updatedAtLatestRoom),
+    );
 
     const formatedUpdatedAt = updatedAtLatestRoom
-      ? toDateTime(updatedAtLatestRoom).toFormat(
-          `yyyy-MM-dd HH:mm:ss.${toDateTime(updatedAtLatestRoom).get(
-            'millisecond',
-          )}`,
+      ? updatedAtToDateTime.toFormat(
+          `yyyy-MM-dd HH:mm:ss.${updatedAtToDateTime.get('millisecond')}`,
         )
       : undefined;
 
