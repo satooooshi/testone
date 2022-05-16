@@ -11,7 +11,6 @@ import {
 } from '@chakra-ui/react';
 import { darkFontColor } from 'src/utils/colors';
 import { RiPushpin2Fill, RiPushpin2Line } from 'react-icons/ri';
-import { useRoomRefetch } from 'src/contexts/chat/useRoomRefetch';
 import { useHandleBadge } from 'src/contexts/badge/useHandleBadge';
 
 type ChatGroupCardProps = {
@@ -25,8 +24,6 @@ const ChatGroupCard: React.FC<ChatGroupCardProps> = ({
   isSelected = false,
   onPressPinButton,
 }) => {
-  const { needRefetch } = useRoomRefetch();
-  const [isPinned, setIsPinned] = useState<boolean>(!!chatGroup.isPinned);
   const { currentRoom } = useHandleBadge();
   const [unreadCount, setUnreadCount] = useState(
     chatGroup.unreadCount ? chatGroup.unreadCount : 0,
@@ -38,7 +35,7 @@ const ChatGroupCard: React.FC<ChatGroupCardProps> = ({
 
   useEffect(() => {
     if (currentRoom?.id === chatGroup.id) {
-      setUnreadCount(currentRoom.unreadCount ? currentRoom.unreadCount : 0);
+      setUnreadCount(currentRoom?.unreadCount ? currentRoom.unreadCount : 0);
     }
   }, [currentRoom, setUnreadCount, chatGroup.id]);
 

@@ -14,7 +14,7 @@ type RoomListProps = {
 };
 
 const RoomList: React.FC<RoomListProps> = ({ currentId, onClickRoom }) => {
-  const { clearRefetch, refetchNeeded } = useRoomRefetch();
+  const { clearRefetch, setNewChatGroup, newRoom } = useRoomRefetch();
   const [page, setPage] = useState('1');
   const { completeRefetch, refetchGroupId } = useHandleBadge();
   const [roomsForInfiniteScroll, setRoomsForInfiniteScroll] = useState<
@@ -34,10 +34,8 @@ const RoomList: React.FC<RoomListProps> = ({ currentId, onClickRoom }) => {
         setRoomsForInfiniteScroll([...[data], ...rooms]);
       } else {
         const pinnedRoomsCount = rooms.filter((r) => r.isPinned).length;
-        if (pinnedRoomsCount) {
-          rooms.splice(pinnedRoomsCount, 0, data);
-          setRoomsForInfiniteScroll(rooms);
-        }
+        rooms.splice(pinnedRoomsCount, 0, data);
+        setRoomsForInfiniteScroll(rooms);
       }
       completeRefetch();
     },
@@ -70,6 +68,24 @@ const RoomList: React.FC<RoomListProps> = ({ currentId, onClickRoom }) => {
       );
     },
   });
+
+  useEffect(() => {
+    console.log('-----------');
+    if (newRoom) {
+      if (newRoom.updatedAt > newRoom.createdAt) {
+        setRoomsForInfiniteScroll((room) =>
+          room.map((r) => (r.id === newRoom.id ? newRoom : r)),
+        );
+      } else {
+        const rooms = roomsForInfiniteScroll;
+        const pinnedRoomsCount = rooms.filter((r) => r.isPinned).length;
+        rooms.splice(pinnedRoomsCount, 0, newRoom);
+        setRoomsForInfiniteScroll(rooms);
+        setNewChatGroup(undefined);
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [newRoom]);
 
   const onScroll = (e: any) => {
     if (

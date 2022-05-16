@@ -11,6 +11,7 @@ import { io } from 'socket.io-client';
 import { ChatGroup } from 'src/types';
 import { baseURL } from '../../utils/url';
 import { useAuthenticate } from '../useAuthenticate';
+import { RoomRefetchProvider } from 'src/contexts/chat/useRoomRefetch';
 
 const BadgeContext = createContext({
   unreadChatCount: 0,
@@ -127,7 +128,7 @@ export const BadgeProvider: React.FC = ({ children }) => {
         handleEnterRoom,
         completeRefetch,
       }}>
-      {children}
+      <RoomRefetchProvider>{children}</RoomRefetchProvider>
     </BadgeContext.Provider>
   );
 };
