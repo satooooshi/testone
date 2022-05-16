@@ -239,7 +239,7 @@ const Navigator = () => {
   };
 
   messaging().setBackgroundMessageHandler(async remoteMessage => {
-    await notifee.incrementBadgeCount();
+    // await notifee.incrementBadgeCount();
     console.log('BackgroundMessage received!!', remoteMessage);
   });
 
