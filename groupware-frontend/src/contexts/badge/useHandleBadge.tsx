@@ -1,6 +1,12 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 import { useAPIGetRoomsUnreadChatCount } from '@/hooks/api/chat/useAPIGetRoomsUnreadChatCount';
-import React, { useContext, createContext, useState, useEffect } from 'react';
+import React, {
+  useContext,
+  createContext,
+  useState,
+  useEffect,
+  useCallback,
+} from 'react';
 import { io } from 'socket.io-client';
 import { ChatGroup } from 'src/types';
 import { baseURL } from '../../utils/url';
@@ -8,7 +14,7 @@ import { useAuthenticate } from '../useAuthenticate';
 
 const BadgeContext = createContext({
   unreadChatCount: 0,
-  currentRoom: {} as ChatGroup | undefined,
+  currentRoom: {} as { id: number; unreadCount: number } | undefined,
   chatGroups: [] as ChatGroup[],
   refetchRoom: () => {},
   refetchGroupId: 0,
@@ -18,10 +24,11 @@ const BadgeContext = createContext({
 
 export const BadgeProvider: React.FC = ({ children }) => {
   const [chatUnreadCount, setChatUnreadCount] = useState(0);
-  const [currentRoom, setCurrentRoom] = useState<ChatGroup>();
+  const [currentRoom, setCurrentRoom] =
+    useState<{ id: number; unreadCount: number }>();
   const [chatGroups, setChatGroups] = useState<ChatGroup[]>([]);
   const [refetchGroupId, setRefetchGroupId] = useState(0);
-  const { user } = useAuthenticate();
+  const { user, currentChatRoomId } = useAuthenticate();
   const socket = io(baseURL, {
     transports: ['websocket'],
   });
@@ -36,33 +43,57 @@ export const BadgeProvider: React.FC = ({ children }) => {
     },
   });
 
+  useEffect(() => {
+    getRooms();
+  }, [user, getRooms]);
+
   useEffect(
     () => {
-      getRooms();
+      socket.connect();
       socket.on(
         'badgeClient',
         async (data: { userId: number; groupId: number }) => {
-          console.log('message was sent---------', data, user?.id);
+          // receivedMessage(data);
+          // debouncedReceiveMessage(data);
+          console.log(
+            'message was sent---------==',
+            data,
+            user?.id,
+            currentChatRoomId,
+          );
           if (data?.groupId) {
             setRefetchGroupId(data.groupId);
           }
-          if (user?.id && data.userId !== user.id) {
+          if (
+            user?.id &&
+            data.userId !== user.id &&
+            currentChatRoomId != data.groupId
+          ) {
             setChatUnreadCount((count) => count + 1);
             setChatGroups((group) =>
-              group.map((g) =>
-                g.id === data.groupId
-                  ? {
-                      ...g,
-                      unreadCount: g?.unreadCount ? g.unreadCount + 1 : 1,
-                    }
-                  : g,
-              ),
+              group.map((g) => {
+                if (g.id === data.groupId) {
+                  setCurrentRoom({
+                    id: data.groupId,
+                    unreadCount: g?.unreadCount ? g.unreadCount + 1 : 1,
+                  });
+                  return {
+                    ...g,
+                    unreadCount: g?.unreadCount ? g.unreadCount + 1 : 1,
+                  };
+                } else {
+                  return g;
+                }
+              }),
             );
           }
         },
       );
+      return () => {
+        socket.disconnect();
+      };
     }, // eslint-disable-next-line react-hooks/exhaustive-deps
-    [user],
+    [user, currentChatRoomId],
   );
 
   const completeRefetch = () => {
@@ -71,7 +102,7 @@ export const BadgeProvider: React.FC = ({ children }) => {
 
   const handleEnterRoom = (roomId: number) => {
     const targetRoom = chatGroups.filter((g) => g.id === roomId);
-    setCurrentRoom({ ...targetRoom[0], unreadCount: 0 });
+    setCurrentRoom({ id: targetRoom[0].id, unreadCount: 0 });
     const unreadCount = targetRoom[0]?.unreadCount;
     if (unreadCount) {
       setChatUnreadCount((c) => (c - unreadCount >= 0 ? c - unreadCount : 0));

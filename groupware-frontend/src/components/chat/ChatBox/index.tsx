@@ -143,7 +143,7 @@ type ChatBoxProps = {
 
 const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
   const { needRefetch } = useRoomRefetch();
-  const { user } = useAuthenticate();
+  const { user, setCurrentChatRoomId } = useAuthenticate();
   const [visibleAlbumModal, setVisibleAlbumModal] = useState(false);
   const [visibleNoteModal, setVisibleNoteModal] = useState(false);
   const [visibleSearchForm, setVisibleSearchForm] = useState(false);
@@ -451,6 +451,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
 
   useEffect(() => {
     socket.connect();
+    setCurrentChatRoomId(room.id);
     socket.emit('joinRoom', room.id.toString());
     socket.on('readMessageClient', async (senderId: string) => {
       if (user?.id && senderId && senderId != `${user?.id}`) {
@@ -494,6 +495,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
     return () => {
       socket.emit('leaveRoom', room.id);
       socket.disconnect();
+      setCurrentChatRoomId(undefined);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [room.id]);
