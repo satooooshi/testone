@@ -204,10 +204,11 @@ const Chat: React.FC = () => {
     users.unshift(allTag);
     return users;
   };
+
   const {refetch: refetchLatest} = useAPIGetMessages(
     {
       group: room.id,
-      limit: room.unreadCount,
+      limit: 0,
     },
     {
       enabled: false,
@@ -231,9 +232,22 @@ const Chat: React.FC = () => {
           setMessages(m => refreshMessage([...msgToAppend, ...m]));
           // setImagesForViewing(i => [...i, ...imagesToApped]);
         }
+        refetchUpdatedMessages();
       },
     },
   );
+
+  const {refetch: refetchUpdatedMessages} = useAPIGetMessages(
+    {group: room.id, limit: messages.length},
+    {
+      enabled: false,
+      onSuccess: data => {
+        console.log('updated messages ====================', data.length);
+        setMessages(data);
+      },
+    },
+  );
+
   const {mutate: sendChatMessage, isLoading: loadingSendMessage} =
     useAPISendChatMessage({
       onSuccess: sentMsg => {
@@ -252,6 +266,7 @@ const Chat: React.FC = () => {
         );
       },
     });
+
   const {mutate: uploadFile, isLoading: loadingUploadFile} =
     useAPIUploadStorage();
   const isLoadingSending = loadingSendMessage || loadingUploadFile;
@@ -920,6 +935,7 @@ const Chat: React.FC = () => {
         );
         setMessages(messagesInStorage);
       }
+      console.log('call useFocusEffect ==============================');
       refetchLatest();
       refetchRoomDetail();
       // eslint-disable-next-line react-hooks/exhaustive-deps
