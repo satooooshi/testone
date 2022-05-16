@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {Platform, TouchableHighlight, useWindowDimensions} from 'react-native';
 import FastImage from 'react-native-fast-image';
 import {Swipeable} from 'react-native-gesture-handler';
@@ -6,13 +6,13 @@ import {Button, Div, Icon, Text} from 'react-native-magnus';
 import tailwind from 'tailwind-rn';
 import {useAuthenticate} from '../../../contexts/useAuthenticate';
 import {roomCardStyles} from '../../../styles/component/chat/roomCard.style';
-import {userAdminStyles} from '../../../styles/screen/admin/userAdmin.style';
 import {ChatGroup, ChatMessage, ChatMessageType} from '../../../types';
 import {darkFontColor} from '../../../utils/colors';
 import {dateTimeFormatterFromJSDDate} from '../../../utils/dateTimeFormatterFromJSDate';
 import {nameOfRoom} from '../../../utils/factory/chat/nameOfRoom';
 import {mentionTransform} from '../../../utils/messageTransform';
 import {Badge} from 'react-native-paper';
+import {useHandleBadge} from '../../../contexts/badge/useHandleBadge';
 
 type RoomCardProps = {
   room: ChatGroup;
@@ -30,6 +30,23 @@ const RoomCard: React.FC<RoomCardProps> = ({
 }) => {
   const {width: windowWidth} = useWindowDimensions();
   const {user} = useAuthenticate();
+  const {currentRoom} = useHandleBadge();
+  const [unreadCount, setUnreadCount] = useState(
+    room.unreadCount ? room.unreadCount : 0,
+  );
+
+  useEffect(() => {
+    if (room.unreadCount) {
+      setUnreadCount(room.unreadCount);
+    }
+  }, [room.unreadCount]);
+
+  useEffect(() => {
+    if (currentRoom?.id === room.id) {
+      setUnreadCount(currentRoom.unreadCount ? currentRoom.unreadCount : 0);
+    }
+  }, [currentRoom, setUnreadCount, room.id]);
+
   const rightSwipeActions = () => {
     return (
       <Button bg="green500" h={'100%'} w={80} onPress={onPressPinButton}>
@@ -77,12 +94,12 @@ const RoomCard: React.FC<RoomCardProps> = ({
     }
   };
 
-  const readOrNot = room?.lastReadChatTime?.[0]?.readTime
-    ? new Date(room?.lastReadChatTime?.[0]?.readTime) > new Date(room.updatedAt)
-    : false;
-
   return (
-    <TouchableHighlight underlayColor="none" onPress={onPress}>
+    <TouchableHighlight
+      underlayColor="none"
+      onPress={() => {
+        onPress();
+      }}>
       <Swipeable
         containerStyle={tailwind('rounded-sm')}
         renderRightActions={rightSwipeActions}>
@@ -90,7 +107,7 @@ const RoomCard: React.FC<RoomCardProps> = ({
           bg={
             dangerousBgColor
               ? dangerousBgColor
-              : !readOrNot
+              : unreadCount
               ? 'white'
               : 'gray300'
           }
@@ -132,7 +149,7 @@ const RoomCard: React.FC<RoomCardProps> = ({
             <Text numberOfLines={1} mb={'xs'} fontWeight="bold" fontSize={16}>
               {nameOfRoom(room)}
             </Text>
-            {room.unreadCount && room.unreadCount > 0 ? (
+            {unreadCount > 0 ? (
               <Badge
                 style={{
                   position: 'absolute',
@@ -141,7 +158,7 @@ const RoomCard: React.FC<RoomCardProps> = ({
                   backgroundColor: 'green',
                 }}
                 size={25}>
-                {`${room.unreadCount}`}
+                {`${unreadCount}`}
               </Badge>
             ) : null}
             <Text

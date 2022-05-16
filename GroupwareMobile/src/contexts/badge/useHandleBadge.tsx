@@ -7,6 +7,8 @@ import {useAuthenticate} from '../useAuthenticate';
 
 const BadgeContext = createContext({
   unreadChatCount: 0,
+  currentRoom: {} as ChatGroup | undefined,
+  chatGroups: [] as ChatGroup[],
   refetchRoom: () => {},
   refetchGroupId: 0,
   handleEnterRoom: (() => {}) as (roomId: number) => void,
@@ -15,6 +17,7 @@ const BadgeContext = createContext({
 
 export const BadgeProvider: React.FC = ({children}) => {
   const [chatUnreadCount, setChatUnreadCount] = useState(0);
+  const [currentRoom, setCurrentRoom] = useState<ChatGroup>();
   const [chatGroups, setChatGroups] = useState<ChatGroup[]>([]);
   const [refetchGroupId, setRefetchGroupId] = useState(0);
   const {user} = useAuthenticate();
@@ -28,7 +31,6 @@ export const BadgeProvider: React.FC = ({children}) => {
       for (const room of data) {
         count += room.unreadCount ? room.unreadCount : 0;
       }
-      console.log('count-----', count);
       setChatUnreadCount(count);
     },
   });
@@ -39,7 +41,7 @@ export const BadgeProvider: React.FC = ({children}) => {
       socket.on(
         'badgeClient',
         async (data: {userId: number; groupId: number}) => {
-          console.log('message was sent---------', data, user);
+          console.log('message was sent---------', data, user?.id);
           if (data?.groupId) {
             setRefetchGroupId(data.groupId);
           }
@@ -48,13 +50,14 @@ export const BadgeProvider: React.FC = ({children}) => {
             setChatGroups(group =>
               group.map(g =>
                 g.id === data.groupId
-                  ? g
-                  : {...g, unreadCount: g?.unreadCount ? g.unreadCount + 1 : 1},
+                  ? {
+                      ...g,
+                      unreadCount: g?.unreadCount ? g.unreadCount + 1 : 1,
+                    }
+                  : g,
               ),
             );
-            // getRooms();
           }
-          // handleGetRoom(userId);
         },
       );
     }, // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -67,6 +70,7 @@ export const BadgeProvider: React.FC = ({children}) => {
 
   const handleEnterRoom = (roomId: number) => {
     const targetRoom = chatGroups.filter(g => g.id === roomId);
+    setCurrentRoom({...targetRoom[0], unreadCount: 0});
     const unreadCount = targetRoom[0]?.unreadCount;
     if (unreadCount) {
       setChatUnreadCount(c => c - unreadCount);
@@ -75,16 +79,6 @@ export const BadgeProvider: React.FC = ({children}) => {
       );
     }
   };
-  // const handleGetRoom = useCallback(
-  //   (userId: number) => {
-  //     console.log('6666');
-
-  //     if (user?.id && userId !== user.id) {
-  //       getRooms();
-  //     }
-  //   },
-  //   [user, getRooms],
-  // );
 
   const refetchRoom = () => {
     getRooms();
@@ -94,6 +88,8 @@ export const BadgeProvider: React.FC = ({children}) => {
     <BadgeContext.Provider
       value={{
         unreadChatCount: chatUnreadCount,
+        chatGroups,
+        currentRoom,
         refetchRoom,
         refetchGroupId,
         handleEnterRoom,

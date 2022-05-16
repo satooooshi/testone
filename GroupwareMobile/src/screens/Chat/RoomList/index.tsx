@@ -67,7 +67,6 @@ const RoomList: React.FC = () => {
       Alert.alert('ルーム情報の取得に失敗しました');
     },
     onSuccess: data => {
-      console.log('data', data.id);
       let rooms = roomsForInfiniteScroll.filter(r => r.id !== data.id);
       if (data.isPinned) {
         setRoomsForInfiniteScroll([...[data], ...rooms]);
@@ -84,7 +83,6 @@ const RoomList: React.FC = () => {
 
   const {mutate: createGroup} = useAPISaveChatGroup({
     onSuccess: createdData => {
-      console.log('=============');
       setRoomsForInfiniteScroll(r => [...[createdData], ...r]);
       navigation.navigate('ChatStack', {
         screen: 'Chat',
