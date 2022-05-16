@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {Platform, TouchableHighlight, useWindowDimensions} from 'react-native';
 import FastImage from 'react-native-fast-image';
 import {Swipeable} from 'react-native-gesture-handler';
@@ -28,6 +28,7 @@ const RoomCard: React.FC<RoomCardProps> = ({
   onPressPinButton,
   dangerousBgColor,
 }) => {
+  const ref = useRef<Swipeable>(null);
   const {width: windowWidth} = useWindowDimensions();
   const {user} = useAuthenticate();
   const {currentRoom} = useHandleBadge();
@@ -49,7 +50,14 @@ const RoomCard: React.FC<RoomCardProps> = ({
 
   const rightSwipeActions = () => {
     return (
-      <Button bg="green500" h={'100%'} w={80} onPress={onPressPinButton}>
+      <Button
+        bg="green500"
+        h={'100%'}
+        w={80}
+        onPress={() => {
+          onPressPinButton();
+          ref?.current?.close();
+        }}>
         <Icon
           name={!room.isPinned ? 'pin' : 'pin-off'}
           fontSize={24}
@@ -101,6 +109,7 @@ const RoomCard: React.FC<RoomCardProps> = ({
         onPress();
       }}>
       <Swipeable
+        ref={ref}
         containerStyle={tailwind('rounded-sm')}
         renderRightActions={rightSwipeActions}>
         <Div
