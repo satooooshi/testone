@@ -1,4 +1,5 @@
 import {useFocusEffect, useNavigation} from '@react-navigation/native';
+import {AxiosError} from 'axios';
 import React, {useCallback, useEffect, useState} from 'react';
 import {Alert, TouchableHighlight, TouchableOpacity} from 'react-native';
 import {Button, Div, Icon, Input, ScrollDiv, Text} from 'react-native-magnus';
@@ -86,7 +87,8 @@ const RoomList: React.FC = () => {
       page: latestPage.toString(),
       limit: '20',
       isLatest: true,
-      updatedAtLatestRoom: roomsForInfiniteScroll[0]?.updatedAt,
+      updatedAtLatestRoom: roomsForInfiniteScroll.filter(r => !r.isPinned)[0]
+        .updatedAt,
     },
     {
       enabled: false,
@@ -104,7 +106,11 @@ const RoomList: React.FC = () => {
           const ids = latestRooms.map(r => r.id);
           setRoomsForInfiniteScroll(room => {
             const roomsExceptUpdated = room.filter(r => !ids.includes(r.id));
-            return [...latestRooms, ...roomsExceptUpdated];
+            const roomsExceptPinned = roomsExceptUpdated.filter(
+              r => !r.isPinned,
+            );
+            const pinnedRooms = roomsExceptUpdated.filter(r => r.isPinned);
+            return [...pinnedRooms, ...latestRooms, ...roomsExceptPinned];
           });
         }
       },
@@ -173,10 +179,10 @@ const RoomList: React.FC = () => {
 
       const jsonRoomsInStorage = storage.getString('roomList');
       if (jsonRoomsInStorage) {
-        console.log('saved not delete ============================');
         const roomsInStorage: ChatGroup[] = JSON.parse(jsonRoomsInStorage);
         setRoomsForInfiniteScroll(roomsInStorage);
         refetchLatestRooms();
+        console.log('saved not delete ============================');
       } else {
         console.log('refetch all');
         refetchAllRooms();
