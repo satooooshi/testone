@@ -1,21 +1,25 @@
 import React, {useContext, createContext, useState, useEffect} from 'react';
+import {Alert} from 'react-native';
 import {io} from 'socket.io-client';
+import {useAPIGetOneRoom} from '../../hooks/api/chat/useAPIGetOneRoom';
 import {useAPIGetRoomsUnreadChatCount} from '../../hooks/api/chat/useAPIGetRoomsUnreadChatCount';
 import {ChatGroup} from '../../types';
 import {baseURL} from '../../utils/url';
-import {RoomRefetchProvider} from '../chat/useRoomRefetch';
+import {RoomRefetchProvider} from '../badge/useHandleBadge';
 import {useAuthenticate} from '../useAuthenticate';
 
 const BadgeContext = createContext({
   unreadChatCount: 0,
   currentRoom: {} as {id: number; unreadCount: number} | undefined,
   chatGroups: [] as ChatGroup[],
-  refetchRoom: () => {},
+  // refetchRoom: () => {},
   refetchGroupId: 0,
   handleEnterRoom: (() => {}) as (roomId: number) => void,
   refetchRoomCard: (() => {}) as (roomId: number) => void,
   handleNewMessage: (() => {}) as (groupId: number) => void,
   completeRefetch: () => {},
+  newRoom: {} as ChatGroup | undefined,
+  setNewChatGroup: (() => {}) as (room: ChatGroup | undefined) => void,
 });
 
 export const BadgeProvider: React.FC = ({children}) => {
@@ -24,6 +28,7 @@ export const BadgeProvider: React.FC = ({children}) => {
     useState<{id: number; unreadCount: number}>();
   const [chatGroups, setChatGroups] = useState<ChatGroup[]>([]);
   const [refetchGroupId, setRefetchGroupId] = useState(0);
+  const [newMessageGroupId, setNewMessageGroupId] = useState(0);
   const {user, currentChatRoomId} = useAuthenticate();
   const socket = io(baseURL, {
     transports: ['websocket'],
@@ -39,6 +44,32 @@ export const BadgeProvider: React.FC = ({children}) => {
     },
   });
 
+  const {refetch: refetchRoom} = useAPIGetOneRoom(refetchGroupId, {
+    enabled: false,
+    onError: () => {
+      Alert.alert('ルーム情報の取得に失敗しました');
+    },
+    onSuccess: data => {
+      let rooms = chatGroups.filter(r => r.id !== data.id);
+      if (data.isPinned) {
+        setChatGroups([...[data], ...rooms]);
+      } else {
+        const pinnedRoomsCount = rooms.filter(r => r.isPinned).length;
+        if (pinnedRoomsCount) {
+          rooms.splice(pinnedRoomsCount, 0, data);
+          setChatGroups(rooms);
+        }
+      }
+      completeRefetch();
+    },
+  });
+
+  useEffect(() => {
+    if (refetchGroupId) {
+      refetchRoom();
+    }
+  }, [refetchGroupId, refetchRoom]);
+
   useEffect(() => {
     getRooms();
   }, [user, getRooms]);
@@ -48,7 +79,8 @@ export const BadgeProvider: React.FC = ({children}) => {
   };
 
   const handleNewMessage = (groupId: number) => {
-    setRefetchGroupId(groupId);
+    // setRefetchGroupId(groupId);
+    setNewMessageGroupId(groupId);
     if (currentChatRoomId !== groupId) {
       setChatUnreadCount(count => count + 1);
       setChatGroups(group =>
@@ -135,25 +167,52 @@ export const BadgeProvider: React.FC = ({children}) => {
     }
   };
 
-  const refetchRoom = () => {
-    getRooms();
+  const [newRoom, setNewRoom] = useState<ChatGroup>();
+
+  const setNewChatGroup = (room: ChatGroup | undefined) => {
+    setNewRoom(room);
   };
 
+  useEffect(() => {
+    if (newRoom) {
+      if (newRoom.updatedAt > newRoom.createdAt) {
+        setChatGroups(room =>
+          room.map(r => (r.id === newRoom.id ? newRoom : r)),
+        );
+      } else {
+        const rooms = chatGroups;
+        const pinnedRoomsCount = rooms.filter(r => r.isPinned).length;
+        rooms.splice(pinnedRoomsCount, 0, newRoom);
+        setChatGroups(rooms);
+        setNewChatGroup(undefined);
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [newRoom]);
+
+  // const refetchRoom = () => {
+  //   getRooms();
+  // };
+
   return (
-    <BadgeContext.Provider
-      value={{
-        unreadChatCount: chatUnreadCount,
-        chatGroups,
-        currentRoom,
-        refetchRoom,
-        refetchGroupId,
-        handleEnterRoom,
-        refetchRoomCard,
-        handleNewMessage,
-        completeRefetch,
-      }}>
-      <RoomRefetchProvider>{children}</RoomRefetchProvider>
-    </BadgeContext.Provider>
+    <RoomRefetchProvider>
+      <BadgeContext.Provider
+        value={{
+          unreadChatCount: chatUnreadCount,
+          chatGroups,
+          currentRoom,
+          // refetchRoom,
+          refetchGroupId,
+          handleEnterRoom,
+          refetchRoomCard,
+          handleNewMessage,
+          completeRefetch,
+          newRoom,
+          setNewChatGroup,
+        }}>
+        {children}
+      </BadgeContext.Provider>
+    </RoomRefetchProvider>
   );
 };
 

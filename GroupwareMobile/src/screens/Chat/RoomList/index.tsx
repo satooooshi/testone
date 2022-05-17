@@ -10,7 +10,6 @@ import UserModal from '../../../components/common/UserModal';
 import HeaderWithTextButton from '../../../components/Header';
 import WholeContainer from '../../../components/WholeContainer';
 import {useHandleBadge} from '../../../contexts/badge/useHandleBadge';
-import {useRoomRefetch} from '../../../contexts/chat/useRoomRefetch';
 import {useAPIGetOneRoom} from '../../../hooks/api/chat/useAPIGetOneRoom';
 import {useAPIGetRooms} from '../../../hooks/api/chat/useAPIGetRoomsByPage';
 import {useAPISaveChatGroup} from '../../../hooks/api/chat/useAPISaveChatGroup';
@@ -29,7 +28,7 @@ const RoomList: React.FC = () => {
   const [roomsForInfiniteScroll, setRoomsForInfiniteScroll] = useState<
     ChatGroup[]
   >([]);
-  const {setNewChatGroup, newRoom} = useRoomRefetch();
+  const {setNewChatGroup, newRoom} = useHandleBadge();
   const [roomTypeSelector, setRoomTypeSelector] = useState(false);
   const [userModal, setVisibleUserModal] = useState(false);
   const {data: users} = useAPIGetUsers('');
@@ -64,25 +63,25 @@ const RoomList: React.FC = () => {
         },
       },
     );
-  const {refetch: refetchRoom} = useAPIGetOneRoom(refetchGroupId, {
-    enabled: false,
-    onError: () => {
-      Alert.alert('ルーム情報の取得に失敗しました');
-    },
-    onSuccess: data => {
-      let rooms = roomsForInfiniteScroll.filter(r => r.id !== data.id);
-      if (data.isPinned) {
-        setRoomsForInfiniteScroll([...[data], ...rooms]);
-      } else {
-        const pinnedRoomsCount = rooms.filter(r => r.isPinned).length;
-        if (pinnedRoomsCount) {
-          rooms.splice(pinnedRoomsCount, 0, data);
-          setRoomsForInfiniteScroll(rooms);
-        }
-      }
-      completeRefetch();
-    },
-  });
+  // const {refetch: refetchRoom} = useAPIGetOneRoom(refetchGroupId, {
+  //   enabled: false,
+  //   onError: () => {
+  //     Alert.alert('ルーム情報の取得に失敗しました');
+  //   },
+  //   onSuccess: data => {
+  //     let rooms = roomsForInfiniteScroll.filter(r => r.id !== data.id);
+  //     if (data.isPinned) {
+  //       setRoomsForInfiniteScroll([...[data], ...rooms]);
+  //     } else {
+  //       const pinnedRoomsCount = rooms.filter(r => r.isPinned).length;
+  //       if (pinnedRoomsCount) {
+  //         rooms.splice(pinnedRoomsCount, 0, data);
+  //         setRoomsForInfiniteScroll(rooms);
+  //       }
+  //     }
+  //     completeRefetch();
+  //   },
+  // });
 
   const {refetch: refetchLatestRooms} = useAPIGetRooms(
     {
@@ -180,34 +179,34 @@ const RoomList: React.FC = () => {
     },
   });
 
-  useEffect(() => {
-    console.log('--------', newRoom?.name);
-    if (newRoom) {
-      if (newRoom.updatedAt > newRoom.createdAt) {
-        setRoomsForInfiniteScroll(room =>
-          room.map(r => (r.id === newRoom.id ? newRoom : r)),
-        );
-      } else {
-        const rooms = roomsForInfiniteScroll;
-        const pinnedRoomsCount = rooms.filter(r => r.isPinned).length;
-        rooms.splice(pinnedRoomsCount, 0, newRoom);
-        setRoomsForInfiniteScroll(rooms);
-        setNewChatGroup(undefined);
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [newRoom]);
+  // useEffect(() => {
+  //   console.log('--------', newRoom?.name);
+  //   if (newRoom) {
+  //     if (newRoom.updatedAt > newRoom.createdAt) {
+  //       setRoomsForInfiniteScroll(room =>
+  //         room.map(r => (r.id === newRoom.id ? newRoom : r)),
+  //       );
+  //     } else {
+  //       const rooms = roomsForInfiniteScroll;
+  //       const pinnedRoomsCount = rooms.filter(r => r.isPinned).length;
+  //       rooms.splice(pinnedRoomsCount, 0, newRoom);
+  //       setRoomsForInfiniteScroll(rooms);
+  //       setNewChatGroup(undefined);
+  //     }
+  //   }
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [newRoom]);
 
   const onPressRightButton = () => {
     // navigation.navigate('ChatStack', {screen: 'NewRoom'});
     setRoomTypeSelector(true);
   };
 
-  useEffect(() => {
-    if (refetchGroupId) {
-      refetchRoom();
-    }
-  }, [refetchGroupId, refetchRoom]);
+  // useEffect(() => {
+  //   if (refetchGroupId) {
+  //     refetchRoom();
+  //   }
+  // }, [refetchGroupId, refetchRoom]);
 
   useFocusEffect(
     useCallback(() => {
