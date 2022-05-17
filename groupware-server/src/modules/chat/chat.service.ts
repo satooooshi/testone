@@ -207,7 +207,9 @@ export class ChatService {
         group: room.id,
         lastReadTime: room.lastReadChatTime?.[0].readTime,
       };
+
       room.unreadCount = await this.getUnreadChatMessage(userID, query);
+      console.log('----', userID, query, room.unreadCount);
     }
     return room;
   }

@@ -43,21 +43,20 @@ export const BadgeProvider: React.FC = ({children}) => {
       limit: '20',
     },
     {
+      enabled: false,
       onSuccess: data => {
-        console.log('call -----------------------', data.rooms.length);
         let count = chatUnreadCount;
         for (const room of data.rooms) {
           count += room.unreadCount ? room.unreadCount : 0;
         }
         setChatUnreadCount(count);
-        setPage(p => p + 1);
+        setChatGroups(r =>
+          r.length ? [...r, ...data.rooms] : [...data.rooms],
+        );
         if (data.rooms.length >= 20) {
+          setPage(p => p + 1);
           setIsNeedRefetch(true);
-          setChatGroups(r =>
-            r.length ? [...r, ...data.rooms] : [...data.rooms],
-          );
         } else {
-          setChatGroups(data.rooms);
           setIsNeedRefetch(false);
           setPage(1);
         }
@@ -68,6 +67,11 @@ export const BadgeProvider: React.FC = ({children}) => {
   const setChatGroupsState = (rooms: ChatGroup[]) => {
     setChatGroups(rooms);
   };
+
+  useEffect(() => {
+    refetchAllRooms();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     if (isNeedRefetch) {
@@ -92,6 +96,8 @@ export const BadgeProvider: React.FC = ({children}) => {
       Alert.alert('ルーム情報の取得に失敗しました');
     },
     onSuccess: data => {
+      console.log('0000', user?.lastName, user?.id);
+
       let rooms = chatGroups.filter(r => r.id !== data.id);
       if (data.isPinned) {
         setChatGroups([...[data], ...rooms]);
@@ -101,6 +107,9 @@ export const BadgeProvider: React.FC = ({children}) => {
           rooms.splice(pinnedRoomsCount, 0, data);
           setChatGroups(rooms);
         }
+      }
+      if (data.id !== currentChatRoomId) {
+        setChatUnreadCount(count => count + 1);
       }
       completeRefetch();
     },
@@ -121,27 +130,27 @@ export const BadgeProvider: React.FC = ({children}) => {
   };
 
   const handleNewMessage = (groupId: number) => {
-    // setRefetchGroupId(groupId);
-    setNewMessageGroupId(groupId);
-    if (currentChatRoomId !== groupId) {
-      setChatUnreadCount(count => count + 1);
-      setChatGroups(group =>
-        group.map(g => {
-          if (g.id === groupId) {
-            setCurrentRoom({
-              id: groupId,
-              unreadCount: g?.unreadCount ? g.unreadCount + 1 : 1,
-            });
-            return {
-              ...g,
-              unreadCount: g?.unreadCount ? g.unreadCount + 1 : 1,
-            };
-          } else {
-            return g;
-          }
-        }),
-      );
-    }
+    setRefetchGroupId(groupId);
+    // setNewMessageGroupId(groupId);
+    // if (currentChatRoomId !== groupId) {
+    //   setChatUnreadCount(count => count + 1);
+    //   setChatGroups(group =>
+    //     group.map(g => {
+    //       if (g.id === groupId) {
+    //         setCurrentRoom({
+    //           id: groupId,
+    //           unreadCount: g?.unreadCount ? g.unreadCount + 1 : 1,
+    //         });
+    //         return {
+    //           ...g,
+    //           unreadCount: g?.unreadCount ? g.unreadCount + 1 : 1,
+    //         };
+    //       } else {
+    //         return g;
+    //       }
+    //     }),
+    //   );
+    // }
   };
 
   // useEffect(

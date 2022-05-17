@@ -34,6 +34,7 @@ const RoomList: React.FC = () => {
   const {selectedUserRole, filteredUsers} = useUserRole('All', users);
   const [creationType, setCreationType] = useState<RoomType>();
   const [searchedRooms, setSearchedRooms] = useState<ChatGroup[]>();
+  const [chatRooms, setChatRooms] = useState<ChatGroup[]>(chatGroups);
   const [isNeedRefetch, setIsNeedRefetch] = useState<boolean>(false);
   const [isNeedRefetchLatest, setIsNeedRefetchLatest] =
     useState<boolean>(false);
@@ -83,8 +84,8 @@ const RoomList: React.FC = () => {
   });
 
   useEffect(() => {
-    console.log('0000', chatGroups);
-  }, [chatGroups]);
+    setChatRooms(chatGroups);
+  }, [chatGroups.map(r => r.chatMessages)]);
 
   const onPressRightButton = () => {
     // navigation.navigate('ChatStack', {screen: 'NewRoom'});
@@ -186,7 +187,7 @@ const RoomList: React.FC = () => {
           mb={20}
           placeholder="検索"
           onChangeText={e => {
-            const filteredRooms = chatGroups.filter(r => {
+            const filteredRooms = chatRooms.filter(r => {
               const regex = new RegExp(e);
               return r.name ? regex.test(r.name) : regex.test(nameOfRoom(r));
             });
@@ -211,7 +212,7 @@ const RoomList: React.FC = () => {
           }}
         />
 
-        {chatGroups.length && !isNeedRefetch ? (
+        {chatRooms.length && !isNeedRefetch ? (
           <ScrollDiv h={'80%'}>
             {searchedRooms
               ? searchedRooms.map(room => {
@@ -232,7 +233,7 @@ const RoomList: React.FC = () => {
                     </Div>
                   );
                 })
-              : chatGroups.map((room, index) => {
+              : chatRooms.map((room, index) => {
                   return (
                     <Div key={index} mb="sm">
                       <RoomCard
