@@ -2,16 +2,17 @@ import React, {useContext, createContext, useState, useEffect} from 'react';
 import {Alert} from 'react-native';
 import {io} from 'socket.io-client';
 import {useAPIGetOneRoom} from '../../hooks/api/chat/useAPIGetOneRoom';
+import {useAPIGetRooms} from '../../hooks/api/chat/useAPIGetRoomsByPage';
 import {useAPIGetRoomsUnreadChatCount} from '../../hooks/api/chat/useAPIGetRoomsUnreadChatCount';
 import {ChatGroup} from '../../types';
 import {baseURL} from '../../utils/url';
-import {RoomRefetchProvider} from '../badge/useHandleBadge';
 import {useAuthenticate} from '../useAuthenticate';
 
 const BadgeContext = createContext({
   unreadChatCount: 0,
   currentRoom: {} as {id: number; unreadCount: number} | undefined,
   chatGroups: [] as ChatGroup[],
+  setChatGroupsState: (() => {}) as (rooms: ChatGroup[]) => void,
   // refetchRoom: () => {},
   refetchGroupId: 0,
   handleEnterRoom: (() => {}) as (roomId: number) => void,
@@ -33,16 +34,57 @@ export const BadgeProvider: React.FC = ({children}) => {
   const socket = io(baseURL, {
     transports: ['websocket'],
   });
-  const {mutate: getRooms} = useAPIGetRoomsUnreadChatCount({
-    onSuccess: data => {
-      let count = 0;
-      setChatGroups(data);
-      for (const room of data) {
-        count += room.unreadCount ? room.unreadCount : 0;
-      }
-      setChatUnreadCount(count);
+  const [page, setPage] = useState(1);
+  const [isNeedRefetch, setIsNeedRefetch] = useState<boolean>(false);
+
+  const {refetch: refetchAllRooms} = useAPIGetRooms(
+    {
+      page: page.toString(),
+      limit: '20',
     },
-  });
+    {
+      onSuccess: data => {
+        console.log('call -----------------------', data.rooms.length);
+        let count = chatUnreadCount;
+        for (const room of data.rooms) {
+          count += room.unreadCount ? room.unreadCount : 0;
+        }
+        setChatUnreadCount(count);
+        setPage(p => p + 1);
+        if (data.rooms.length >= 20) {
+          setIsNeedRefetch(true);
+          setChatGroups(r =>
+            r.length ? [...r, ...data.rooms] : [...data.rooms],
+          );
+        } else {
+          setChatGroups(data.rooms);
+          setIsNeedRefetch(false);
+          setPage(1);
+        }
+      },
+    },
+  );
+
+  const setChatGroupsState = (rooms: ChatGroup[]) => {
+    setChatGroups(rooms);
+  };
+
+  useEffect(() => {
+    if (isNeedRefetch) {
+      refetchAllRooms();
+    }
+  }, [isNeedRefetch, refetchAllRooms]);
+
+  // const {mutate: getRooms} = useAPIGetRoomsUnreadChatCount({
+  //   onSuccess: data => {
+  //     let count = 0;
+  //     setChatGroups(data);
+  //     for (const room of data) {
+  //       count += room.unreadCount ? room.unreadCount : 0;
+  //     }
+  //     setChatUnreadCount(count);
+  //   },
+  // });
 
   const {refetch: refetchRoom} = useAPIGetOneRoom(refetchGroupId, {
     enabled: false,
@@ -70,9 +112,9 @@ export const BadgeProvider: React.FC = ({children}) => {
     }
   }, [refetchGroupId, refetchRoom]);
 
-  useEffect(() => {
-    getRooms();
-  }, [user, getRooms]);
+  // useEffect(() => {
+  //   getRooms();
+  // }, [user, getRooms]);
 
   const refetchRoomCard = (roomId: number) => {
     setRefetchGroupId(roomId);
@@ -195,24 +237,23 @@ export const BadgeProvider: React.FC = ({children}) => {
   // };
 
   return (
-    <RoomRefetchProvider>
-      <BadgeContext.Provider
-        value={{
-          unreadChatCount: chatUnreadCount,
-          chatGroups,
-          currentRoom,
-          // refetchRoom,
-          refetchGroupId,
-          handleEnterRoom,
-          refetchRoomCard,
-          handleNewMessage,
-          completeRefetch,
-          newRoom,
-          setNewChatGroup,
-        }}>
-        {children}
-      </BadgeContext.Provider>
-    </RoomRefetchProvider>
+    <BadgeContext.Provider
+      value={{
+        unreadChatCount: chatUnreadCount,
+        chatGroups,
+        setChatGroupsState,
+        currentRoom,
+        // refetchRoom,
+        refetchGroupId,
+        handleEnterRoom,
+        refetchRoomCard,
+        handleNewMessage,
+        completeRefetch,
+        newRoom,
+        setNewChatGroup,
+      }}>
+      {children}
+    </BadgeContext.Provider>
   );
 };
 
