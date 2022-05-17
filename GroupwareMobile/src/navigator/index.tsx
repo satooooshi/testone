@@ -613,6 +613,7 @@ const Navigator = () => {
     });
 
     return unsubscribe;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [navigationRef, currentChatRoomId]);
 
   useEffect(() => {
