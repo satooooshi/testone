@@ -5,7 +5,7 @@ import {
 } from '@react-navigation/native';
 import React, {useCallback} from 'react';
 import {Alert} from 'react-native';
-import {useRoomRefetch} from '../../../contexts/chat/useRoomRefetch';
+import {useHandleBadge} from '../../../contexts/badge/useHandleBadge';
 import {useAPIGetRoomDetail} from '../../../hooks/api/chat/useAPIGetRoomDetail';
 import {useAPIUpdateChatGroup} from '../../../hooks/api/chat/useAPIUpdateChatGroup';
 import {useAPIUploadStorage} from '../../../hooks/api/storage/useAPIUploadStorage';
@@ -19,7 +19,7 @@ import {
 
 const EditRoom: React.FC = () => {
   const navigation = useNavigation<EditRoomNavigationProps>();
-  const {setNewChatGroup} = useRoomRefetch();
+  const {setNewChatGroup} = useHandleBadge();
   const {room} = useRoute<EditRoomRouteProps>().params;
   const {data: roomDetail, refetch} = useAPIGetRoomDetail(room.id, {
     onError: () => {

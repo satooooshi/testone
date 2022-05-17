@@ -1,7 +1,7 @@
 import {useNavigation, useRoute} from '@react-navigation/native';
 import React from 'react';
 import {Alert} from 'react-native';
-import {useRoomRefetch} from '../../../contexts/chat/useRoomRefetch';
+import {useHandleBadge} from '../../../contexts/badge/useHandleBadge';
 import {useAPISaveChatGroup} from '../../../hooks/api/chat/useAPISaveChatGroup';
 import {useAPIUploadStorage} from '../../../hooks/api/storage/useAPIUploadStorage';
 import {useAPIGetUsers} from '../../../hooks/api/user/useAPIGetUsers';
@@ -14,7 +14,7 @@ import {
 const NewRoom: React.FC = () => {
   const navigation = useNavigation<NewRoomNavigationProps>();
   const route = useRoute<NewRoomRouteProps>();
-  const {setNewChatGroup} = useRoomRefetch();
+  const {setNewChatGroup} = useHandleBadge();
   const {mutate: uploadImage} = useAPIUploadStorage();
   const {data: users} = useAPIGetUsers('');
   const headerTitle = 'ルーム新規作成';

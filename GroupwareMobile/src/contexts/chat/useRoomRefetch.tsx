@@ -25,4 +25,4 @@ export const RoomRefetchProvider: React.FC = ({children}) => {
   );
 };
 
-export const useRoomRefetch = () => useContext(RoomRefetchContext);
+export const useHandleBadge = () => useContext(RoomRefetchContext);
