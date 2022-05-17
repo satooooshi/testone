@@ -13,6 +13,8 @@ const BadgeContext = createContext({
   refetchRoom: () => {},
   refetchGroupId: 0,
   handleEnterRoom: (() => {}) as (roomId: number) => void,
+  refetchRoomCard: (() => {}) as (roomId: number) => void,
+  handleNewMessage: (() => {}) as (groupId: number) => void,
   completeRefetch: () => {},
 });
 
@@ -41,54 +43,81 @@ export const BadgeProvider: React.FC = ({children}) => {
     getRooms();
   }, [user, getRooms]);
 
-  useEffect(
-    () => {
-      socket.connect();
-      socket.on(
-        'badgeClient',
-        async (data: {userId: number; groupId: number}) => {
-          // receivedMessage(data);
-          // debouncedReceiveMessage(data);
-          console.log(
-            'message was sent---------==',
-            data,
-            user?.id,
-            currentChatRoomId,
-          );
-          if (data?.groupId) {
-            setRefetchGroupId(data.groupId);
+  const refetchRoomCard = (roomId: number) => {
+    setRefetchGroupId(roomId);
+  };
+
+  const handleNewMessage = (groupId: number) => {
+    setRefetchGroupId(groupId);
+    if (currentChatRoomId !== groupId) {
+      setChatUnreadCount(count => count + 1);
+      setChatGroups(group =>
+        group.map(g => {
+          if (g.id === groupId) {
+            setCurrentRoom({
+              id: groupId,
+              unreadCount: g?.unreadCount ? g.unreadCount + 1 : 1,
+            });
+            return {
+              ...g,
+              unreadCount: g?.unreadCount ? g.unreadCount + 1 : 1,
+            };
+          } else {
+            return g;
           }
-          if (
-            user?.id &&
-            data.userId !== user.id &&
-            currentChatRoomId !== data.groupId
-          ) {
-            setChatUnreadCount(count => count + 1);
-            setChatGroups(group =>
-              group.map(g => {
-                if (g.id === data.groupId) {
-                  setCurrentRoom({
-                    id: data.groupId,
-                    unreadCount: g?.unreadCount ? g.unreadCount + 1 : 1,
-                  });
-                  return {
-                    ...g,
-                    unreadCount: g?.unreadCount ? g.unreadCount + 1 : 1,
-                  };
-                } else {
-                  return g;
-                }
-              }),
-            );
-          }
-        },
+        }),
       );
-      return () => {
-        socket.disconnect();
-      };
-    }, // eslint-disable-next-line react-hooks/exhaustive-deps
-    [user, currentChatRoomId],
-  );
+    }
+  };
+
+  // useEffect(
+  //   () => {
+  //     socket.connect();
+  //     socket.on(
+  //       'badgeClient',
+  //       async (data: {userId: number; groupId: number}) => {
+  //         // receivedMessage(data);
+  //         // debouncedReceiveMessage(data);
+  //         console.log(
+  //           'message was sent---------==',
+  //           data,
+  //           user?.id,
+  //           currentChatRoomId,
+  //         );
+  //         if (data?.groupId) {
+  //           setRefetchGroupId(data.groupId);
+  //         }
+  //         if (
+  //           user?.id &&
+  //           data.userId !== user.id &&
+  //           currentChatRoomId !== data.groupId
+  //         ) {
+  //           setChatUnreadCount(count => count + 1);
+  //           setChatGroups(group =>
+  //             group.map(g => {
+  //               if (g.id === data.groupId) {
+  //                 setCurrentRoom({
+  //                   id: data.groupId,
+  //                   unreadCount: g?.unreadCount ? g.unreadCount + 1 : 1,
+  //                 });
+  //                 return {
+  //                   ...g,
+  //                   unreadCount: g?.unreadCount ? g.unreadCount + 1 : 1,
+  //                 };
+  //               } else {
+  //                 return g;
+  //               }
+  //             }),
+  //           );
+  //         }
+  //       },
+  //     );
+  //     return () => {
+  //       socket.disconnect();
+  //     };
+  //   }, // eslint-disable-next-line react-hooks/exhaustive-deps
+  //   [user, currentChatRoomId],
+  // );
 
   const completeRefetch = () => {
     setRefetchGroupId(0);
@@ -119,6 +148,8 @@ export const BadgeProvider: React.FC = ({children}) => {
         refetchRoom,
         refetchGroupId,
         handleEnterRoom,
+        refetchRoomCard,
+        handleNewMessage,
         completeRefetch,
       }}>
       <RoomRefetchProvider>{children}</RoomRefetchProvider>
