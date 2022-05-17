@@ -76,13 +76,12 @@ import {chatMessageSchema} from '../../utils/validation/schema';
 import {reactionEmojis} from '../../utils/factory/reactionEmojis';
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
 import io from 'socket.io-client';
-import {baseURL} from '../../utils/url';
+import {baseURL, storage} from '../../utils/url';
 import {getThumbnailOfVideo} from '../../utils/getThumbnailOfVideo';
 import {useAuthenticate} from '../../contexts/useAuthenticate';
 import {useInviteCall} from '../../contexts/call/useInviteCall';
 import {reactionStickers} from '../../utils/factory/reactionStickers';
 import {ScrollView} from 'react-native-gesture-handler';
-import storage from '../../utils/storage';
 import {useHandleBadge} from '../../contexts/badge/useHandleBadge';
 import {useIsTabBarVisible} from '../../contexts/bottomTab/useIsTabBarVisible';
 import {debounce} from 'lodash';
@@ -202,10 +201,11 @@ const Chat: React.FC = () => {
     users.unshift(allTag);
     return users;
   };
+
   const {refetch: refetchLatest} = useAPIGetMessages(
     {
       group: room.id,
-      limit: room.unreadCount,
+      limit: 0,
     },
     {
       enabled: false,
@@ -224,9 +224,22 @@ const Chat: React.FC = () => {
           setMessages(m => refreshMessage([...msgToAppend, ...m]));
           // setImagesForViewing(i => [...i, ...imagesToApped]);
         }
+        refetchUpdatedMessages();
       },
     },
   );
+
+  const {refetch: refetchUpdatedMessages} = useAPIGetMessages(
+    {group: room.id, limit: messages.length},
+    {
+      enabled: false,
+      onSuccess: data => {
+        console.log('updated messages ====================', data.length);
+        setMessages(data);
+      },
+    },
+  );
+
   const {mutate: sendChatMessage, isLoading: loadingSendMessage} =
     useAPISendChatMessage({
       onSuccess: sentMsg => {
@@ -245,6 +258,7 @@ const Chat: React.FC = () => {
         );
       },
     });
+
   const {mutate: uploadFile, isLoading: loadingUploadFile} =
     useAPIUploadStorage();
   const isLoadingSending = loadingSendMessage || loadingUploadFile;
@@ -509,8 +523,9 @@ const Chat: React.FC = () => {
   }, [refetchLatest, room]);
 
   useEffect(() => {
+    console.log('call ==================== refetch past messages');
     refetchFetchedPastMessages();
-  }, [before, after, refetchFetchedPastMessages]);
+  }, [before, after, include, refetchFetchedPastMessages]);
 
   useEffect(() => {
     // 検索する文字がアルファベットの場合、なぜかuseAPISearchMessagesのonSuccessが動作しない為、こちらで代わりとなる処理を記述しています。
@@ -523,6 +538,7 @@ const Chat: React.FC = () => {
 
   useEffect(() => {
     if (focusedMessageID) {
+      console.log('focus change trigger ===================');
       refetchDoesntExistMessages(focusedMessageID);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -531,6 +547,7 @@ const Chat: React.FC = () => {
   useEffect(() => {
     if (fetchedPastMessages?.length) {
       const refreshedMessage = refreshMessage(fetchedPastMessages);
+      console.log('refreshMessage =============', refreshedMessage.length);
       setMessages(refreshedMessage);
       if (refetchDoesntExistMessages(fetchedPastMessages[0].id)) {
         refetchDoesntExistMessages(fetchedPastMessages[0].id + 20);
@@ -895,15 +912,18 @@ const Chat: React.FC = () => {
 
   useFocusEffect(
     useCallback(() => {
-      storage
-        .load({
-          key: 'chatRoom',
-          id: room.id.toString(),
-        })
-        .then(cacheData => {
-          console.log('cacheData =================', cacheData.length);
-          setMessages(cacheData);
-        });
+      const jsonMessagesInStorage = storage.getString(
+        `messagesIntRoom${room.id}`,
+      );
+      if (jsonMessagesInStorage) {
+        const messagesInStorage = JSON.parse(jsonMessagesInStorage);
+        console.log(
+          'loaded message =================',
+          messagesInStorage.length,
+        );
+        setMessages(messagesInStorage);
+      }
+      console.log('call useFocusEffect ==============================');
       refetchLatest();
       refetchRoomDetail();
       // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -931,18 +951,18 @@ const Chat: React.FC = () => {
     [],
   );
 
+  const saveMessages = (msg: ChatMessage[]) => {
+    const jsonMessages = JSON.stringify(msg);
+    storage.set(`messagesIntRoom${room.id}`, jsonMessages);
+  };
+
   useEffect(() => {
     AppState.addEventListener('change', debounceHandleLastReadByAppState);
   });
 
   useEffect(() => {
     if (messages.length) {
-      storage.save({
-        key: 'chatRoom',
-        id: room.id.toString(),
-        data: messages,
-        expires: null,
-      });
+      saveMessages(messages);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [messages]);
@@ -995,10 +1015,7 @@ const Chat: React.FC = () => {
   };
 
   const removeCache = () => {
-    storage.remove({
-      key: 'chatRoom',
-      id: room.id.toString(),
-    });
+    storage.delete(`messagesIntRoom${room.id}`);
     setMessages([]);
   };
 
