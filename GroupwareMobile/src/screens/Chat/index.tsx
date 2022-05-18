@@ -115,7 +115,7 @@ const Chat: React.FC = () => {
   const [focusedMessageID, setFocusedMessageID] = useState<number>();
   const [after, setAfter] = useState<number>();
   const [before, setBefore] = useState<number>();
-  const [include, setInclude] = useState<boolean>();
+  const [include, setInclude] = useState<boolean>(false);
   const [renderMessageIndex, setRenderMessageIndex] = useState<
     number | undefined
   >();
@@ -516,6 +516,9 @@ const Chat: React.FC = () => {
   };
 
   const refetchDoesntExistMessages = (focused?: number) => {
+    if (!messages.length) {
+      return false;
+    }
     const isExist = messages.filter(m => m.id === focused)?.length;
 
     if (!isExist) {
@@ -536,11 +539,12 @@ const Chat: React.FC = () => {
       })
       .sort((a, b) => b.id - a.id);
   };
-  useEffect(() => {
-    setBefore(undefined);
-    setAfter(undefined);
-    refetchLatest();
-  }, [refetchLatest, room]);
+  // useEffect(() => {
+  //   setMessages([]);
+  //   setBefore(undefined);
+  //   setAfter(undefined);
+  //   refetchLatest();
+  // }, [refetchLatest, room]);
 
   useEffect(() => {
     console.log('call ==================== refetch past messages');
