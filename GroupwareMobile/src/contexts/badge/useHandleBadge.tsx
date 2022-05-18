@@ -131,26 +131,6 @@ export const BadgeProvider: React.FC = ({children}) => {
 
   const handleNewMessage = (groupId: number) => {
     setRefetchGroupId(groupId);
-    // setNewMessageGroupId(groupId);
-    // if (currentChatRoomId !== groupId) {
-    //   setChatUnreadCount(count => count + 1);
-    //   setChatGroups(group =>
-    //     group.map(g => {
-    //       if (g.id === groupId) {
-    //         setCurrentRoom({
-    //           id: groupId,
-    //           unreadCount: g?.unreadCount ? g.unreadCount + 1 : 1,
-    //         });
-    //         return {
-    //           ...g,
-    //           unreadCount: g?.unreadCount ? g.unreadCount + 1 : 1,
-    //         };
-    //       } else {
-    //         return g;
-    //       }
-    //     }),
-    //   );
-    // }
   };
 
   // useEffect(
