@@ -643,6 +643,17 @@ export class ChatService {
   }
 
   public async deleteReaction(reactionId: number): Promise<number> {
+    const existReaction = await this.chatMessageReactionRepository.findOne(
+      reactionId,
+    );
+    const existMessages = await this.chatMessageRepository.findOne(
+      existReaction.chatMessage.id,
+    );
+
+    await this.chatMessageRepository.save({
+      ...existMessages,
+      updatedAt: new Date(),
+    });
     await this.chatMessageReactionRepository.delete(reactionId);
     return reactionId;
   }
