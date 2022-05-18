@@ -60,7 +60,7 @@ const Navigator = () => {
     stopRing,
     sendCallHistory,
   } = useInviteCall();
-  const {unreadChatCount} = useHandleBadge();
+  const {unreadChatCount, handleNewMessage} = useHandleBadge();
   const [isJoining, setIsJoining] = useState(false);
   const [isCalling, setIsCalling] = useState(false);
   const [callTimeout, setCallTimeout] = useState(false);
@@ -578,10 +578,13 @@ const Navigator = () => {
         console.log('PushNotification TOKEN:', token);
       },
       onNotification: notification => {
+        if (notification?.data?.screen === 'chat' && notification.data?.id) {
+          handleNewMessage(notification.data?.id);
+        }
         console.log('PushNotification onNotification========', notification);
         if (Platform.OS === 'android') {
           if (
-            notification?.data?.screen &&
+            notification?.data?.screen === 'chat' &&
             notification.data?.id === `${currentChatRoomId}`
           ) {
             return;
@@ -610,6 +613,7 @@ const Navigator = () => {
     });
 
     return unsubscribe;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [navigationRef, currentChatRoomId]);
 
   useEffect(() => {

@@ -10,7 +10,6 @@ import UserModal from '../../../components/common/UserModal';
 import HeaderWithTextButton from '../../../components/Header';
 import WholeContainer from '../../../components/WholeContainer';
 import {useHandleBadge} from '../../../contexts/badge/useHandleBadge';
-import {useRoomRefetch} from '../../../contexts/chat/useRoomRefetch';
 import {useAPIGetOneRoom} from '../../../hooks/api/chat/useAPIGetOneRoom';
 import {useAPIGetRooms} from '../../../hooks/api/chat/useAPIGetRoomsByPage';
 import {useAPISaveChatGroup} from '../../../hooks/api/chat/useAPISaveChatGroup';
@@ -26,122 +25,26 @@ const RoomList: React.FC = () => {
   const navigation = useNavigation<RoomListNavigationProps>();
   const [page, setPage] = useState(1);
   const [latestPage, setLatestPage] = useState(1);
-  const [roomsForInfiniteScroll, setRoomsForInfiniteScroll] = useState<
-    ChatGroup[]
-  >([]);
-  const {setNewChatGroup, newRoom} = useRoomRefetch();
+  const {setNewChatGroup} = useHandleBadge();
   const [roomTypeSelector, setRoomTypeSelector] = useState(false);
   const [userModal, setVisibleUserModal] = useState(false);
   const {data: users} = useAPIGetUsers('');
-  const {completeRefetch, refetchGroupId} = useHandleBadge();
+  const {completeRefetch, refetchGroupId, chatGroups, setChatGroupsState} =
+    useHandleBadge();
   const {selectedUserRole, filteredUsers} = useUserRole('All', users);
   const [creationType, setCreationType] = useState<RoomType>();
   const [searchedRooms, setSearchedRooms] = useState<ChatGroup[]>();
+  const [chatRooms, setChatRooms] = useState<ChatGroup[]>(chatGroups);
   const [isNeedRefetch, setIsNeedRefetch] = useState<boolean>(false);
   const [isNeedRefetchLatest, setIsNeedRefetchLatest] =
     useState<boolean>(false);
   const [latestRooms, setLatestRooms] = useState<ChatGroup[]>([]);
-  const {refetch: refetchAllRooms, isLoading: loadingGetChatGroupList} =
-    useAPIGetRooms(
-      {
-        page: page.toString(),
-        limit: '20',
-      },
-      {
-        enabled: false,
-        onSuccess: data => {
-          console.log('call -----------------------', data.rooms.length);
-          setPage(p => p + 1);
-          if (data.rooms.length) {
-            setIsNeedRefetch(true);
-            setRoomsForInfiniteScroll(r =>
-              r.length ? [...r, ...data.rooms] : [...data.rooms],
-            );
-          } else {
-            setIsNeedRefetch(false);
-            setPage(1);
-          }
-        },
-      },
-    );
-  const {refetch: refetchRoom} = useAPIGetOneRoom(refetchGroupId, {
-    enabled: false,
-    onError: () => {
-      Alert.alert('ルーム情報の取得に失敗しました');
-    },
-    onSuccess: data => {
-      let rooms = roomsForInfiniteScroll.filter(r => r.id !== data.id);
-      if (data.isPinned) {
-        setRoomsForInfiniteScroll([...[data], ...rooms]);
-      } else {
-        const pinnedRoomsCount = rooms.filter(r => r.isPinned).length;
-        if (pinnedRoomsCount) {
-          rooms.splice(pinnedRoomsCount, 0, data);
-          setRoomsForInfiniteScroll(rooms);
-        }
-      }
-      completeRefetch();
-    },
-  });
-
-  const {refetch: refetchLatestRooms} = useAPIGetRooms(
-    {
-      page: latestPage.toString(),
-      limit: '20',
-      isLatest: true,
-      updatedAtLatestRoom: roomsForInfiniteScroll.filter(r => !r.isPinned)[0]
-        ?.updatedAt,
-    },
-    {
-      enabled: false,
-      onSettled: () => {
-        console.log('call ---------------------------------------');
-      },
-      onSuccess: data => {
-        console.log('latest call -----------------------', data.rooms.length);
-        setLatestPage(p => p + 1);
-        if (data.rooms.length) {
-          setIsNeedRefetchLatest(true);
-          setLatestRooms(r =>
-            r.length ? [...r, ...data.rooms] : [...data.rooms],
-          );
-        } else {
-          setIsNeedRefetchLatest(false);
-          setLatestPage(1);
-          const ids = latestRooms.map(r => r.id);
-          setRoomsForInfiniteScroll(room => {
-            let latestPinnedRooms: ChatGroup[] = [];
-            const roomsExceptUpdated = room.filter(r => !ids.includes(r.id));
-            const roomsExceptPinned = roomsExceptUpdated.filter(
-              r => !r.isPinned,
-            );
-            let pinnedRooms = roomsExceptUpdated.filter(r => r.isPinned);
-            const latestRoomsExceptPinned = latestRooms.filter(r => {
-              if (r.isPinned) {
-                latestPinnedRooms.unshift(r);
-              } else {
-                return r;
-              }
-            });
-
-            return [
-              ...latestPinnedRooms,
-              ...pinnedRooms,
-              ...latestRoomsExceptPinned,
-              ...roomsExceptPinned,
-            ];
-          });
-        }
-      },
-    },
-  );
 
   const {mutate: createGroup} = useAPISaveChatGroup({
     onSuccess: createdData => {
       if (createdData.updatedAt > createdData.createdAt) {
         setNewChatGroup(createdData);
       }
-      setRoomsForInfiniteScroll(r => [...[createdData], ...r]);
       navigation.navigate('ChatStack', {
         screen: 'Chat',
         params: {room: createdData},
@@ -155,22 +58,20 @@ const RoomList: React.FC = () => {
 
   const {mutate: savePin} = useAPISavePin({
     onSuccess: data => {
-      let rooms = roomsForInfiniteScroll.filter(r => r.id !== data.id);
+      let rooms = chatGroups.filter(r => r.id !== data.id);
       if (data.isPinned) {
         const pinnedRoomsCount = rooms.filter(
           r => r.isPinned && r.updatedAt > data.updatedAt,
         ).length;
-        if (pinnedRoomsCount) {
-          rooms.splice(pinnedRoomsCount, 0, data);
-          setRoomsForInfiniteScroll(rooms);
-        }
+        rooms.splice(pinnedRoomsCount, 0, data);
+        setChatGroupsState(rooms);
       } else {
         const pinnedRoomsCount = rooms.filter(
           r => r.isPinned || r.updatedAt > data.updatedAt,
         ).length;
         if (pinnedRoomsCount) {
           rooms.splice(pinnedRoomsCount, 0, data);
-          setRoomsForInfiniteScroll(rooms);
+          setChatGroupsState(rooms);
         }
       }
       // refetchAllRooms();
@@ -182,74 +83,17 @@ const RoomList: React.FC = () => {
     },
   });
 
-  useEffect(() => {
-    console.log('--------', newRoom?.name);
-    if (newRoom) {
-      if (newRoom.updatedAt > newRoom.createdAt) {
-        setRoomsForInfiniteScroll(room =>
-          room.map(r => (r.id === newRoom.id ? newRoom : r)),
-        );
-      } else {
-        const rooms = roomsForInfiniteScroll;
-        const pinnedRoomsCount = rooms.filter(r => r.isPinned).length;
-        rooms.splice(pinnedRoomsCount, 0, newRoom);
-        setRoomsForInfiniteScroll(rooms);
-        setNewChatGroup(undefined);
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [newRoom]);
+  useFocusEffect(
+    useCallback(() => {
+      console.log('--------', chatGroups);
+      setChatRooms(chatGroups);
+    }, [chatGroups]),
+  );
 
   const onPressRightButton = () => {
     // navigation.navigate('ChatStack', {screen: 'NewRoom'});
     setRoomTypeSelector(true);
   };
-
-  useEffect(() => {
-    if (refetchGroupId) {
-      refetchRoom();
-    }
-  }, [refetchGroupId, refetchRoom]);
-
-  useFocusEffect(
-    useCallback(() => {
-      setRoomsForInfiniteScroll([]);
-      setLatestRooms([]);
-      console.log('focus call ==========================');
-
-      const jsonRoomsInStorage = storage.getString('roomList');
-      if (jsonRoomsInStorage) {
-        const roomsInStorage: ChatGroup[] = JSON.parse(jsonRoomsInStorage);
-        setRoomsForInfiniteScroll(roomsInStorage);
-        refetchLatestRooms();
-        console.log('saved not delete ============================');
-      } else {
-        console.log('refetch all');
-        refetchAllRooms();
-      }
-    }, [refetchAllRooms, refetchLatestRooms]),
-  );
-
-  useEffect(() => {
-    if (!isNeedRefetch && roomsForInfiniteScroll.length) {
-      console.log(
-        'save =================================',
-        roomsForInfiniteScroll.length,
-      );
-      const jsonRooms = JSON.stringify(roomsForInfiniteScroll);
-      storage.set('roomList', jsonRooms);
-    }
-    if (isNeedRefetch) {
-      console.log('isNeeded refetch all ================');
-      refetchAllRooms();
-    }
-  }, [roomsForInfiniteScroll, refetchAllRooms, isNeedRefetch]);
-
-  useEffect(() => {
-    if (isNeedRefetchLatest) {
-      refetchLatestRooms();
-    }
-  }, [latestRooms, isNeedRefetchLatest, refetchLatestRooms]);
 
   return (
     <WholeContainer>
@@ -346,7 +190,7 @@ const RoomList: React.FC = () => {
           mb={20}
           placeholder="検索"
           onChangeText={e => {
-            const filteredRooms = roomsForInfiniteScroll.filter(r => {
+            const filteredRooms = chatRooms.filter(r => {
               const regex = new RegExp(e);
               return r.name ? regex.test(r.name) : regex.test(nameOfRoom(r));
             });
@@ -367,12 +211,11 @@ const RoomList: React.FC = () => {
           fontSize={10}
           onPress={() => {
             storage.delete('roomList');
-            setRoomsForInfiniteScroll([]);
             setPage(1);
           }}
         />
 
-        {roomsForInfiniteScroll.length && !isNeedRefetch ? (
+        {chatRooms.length && !isNeedRefetch ? (
           <ScrollDiv h={'80%'}>
             {searchedRooms
               ? searchedRooms.map(room => {
@@ -393,7 +236,7 @@ const RoomList: React.FC = () => {
                     </Div>
                   );
                 })
-              : roomsForInfiniteScroll.map((room, index) => {
+              : chatRooms.map((room, index) => {
                   return (
                     <Div key={index} mb="sm">
                       <RoomCard

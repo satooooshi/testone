@@ -41,7 +41,7 @@ import {userNameFactory} from '../../../utils/factory/userNameFactory';
 import {userRoleNameFactory} from '../../../utils/factory/userRoleNameFactory';
 import {useInviteCall} from '../../../contexts/call/useInviteCall';
 import {branchTypeNameFactory} from '../../../utils/factory/branchTypeNameFactory';
-import {useRoomRefetch} from '../../../contexts/chat/useRoomRefetch';
+import {useHandleBadge} from '../../../contexts/badge/useHandleBadge';
 
 const TopTab = createMaterialTopTabNavigator();
 
@@ -161,7 +161,7 @@ const AccountDetail: React.FC = () => {
   const route = useRoute<AccountDetailRouteProps>();
   const {user, setUser, logout} = useAuthenticate();
   const {sendCallInvitation} = useInviteCall();
-  const {setNewChatGroup} = useRoomRefetch();
+  const {setNewChatGroup} = useHandleBadge();
   const {setIsTabBarVisible} = useIsTabBarVisible();
   const id = route.params?.id;
   const userID = id || user?.id;

@@ -36,17 +36,17 @@ const RoomCard: React.FC<RoomCardProps> = ({
     room.unreadCount ? room.unreadCount : 0,
   );
 
-  useEffect(() => {
-    if (room.unreadCount) {
-      setUnreadCount(room.unreadCount);
-    }
-  }, [room.unreadCount]);
+  // useEffect(() => {
+  //   if (room.unreadCount) {
+  //     setUnreadCount(room.unreadCount);
+  //   }
+  // }, [room.unreadCount]);
 
-  useEffect(() => {
-    if (currentRoom?.id === room.id) {
-      setUnreadCount(currentRoom.unreadCount ? currentRoom.unreadCount : 0);
-    }
-  }, [currentRoom, setUnreadCount, room.id]);
+  // useEffect(() => {
+  //   if (currentRoom?.id === room.id) {
+  //     setUnreadCount(currentRoom.unreadCount ? currentRoom.unreadCount : 0);
+  //   }
+  // }, [currentRoom, setUnreadCount, room.id]);
 
   const rightSwipeActions = () => {
     return (
@@ -116,7 +116,7 @@ const RoomCard: React.FC<RoomCardProps> = ({
           bg={
             dangerousBgColor
               ? dangerousBgColor
-              : unreadCount
+              : room?.unreadCount
               ? 'white'
               : 'gray300'
           }
@@ -158,7 +158,7 @@ const RoomCard: React.FC<RoomCardProps> = ({
             <Text numberOfLines={1} mb={'xs'} fontWeight="bold" fontSize={16}>
               {nameOfRoom(room)}
             </Text>
-            {unreadCount > 0 ? (
+            {room?.unreadCount && room?.unreadCount > 0 ? (
               <Badge
                 style={{
                   position: 'absolute',
@@ -167,7 +167,7 @@ const RoomCard: React.FC<RoomCardProps> = ({
                   backgroundColor: 'green',
                 }}
                 size={25}>
-                {`${unreadCount}`}
+                {`${room?.unreadCount}`}
               </Badge>
             ) : null}
             <Text

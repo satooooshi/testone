@@ -143,7 +143,7 @@ const Chat: React.FC = () => {
   const [selectedReactions, setSelectedReactions] = useState<
     ChatMessageReaction[] | undefined
   >();
-  const {handleEnterRoom} = useHandleBadge();
+  const {handleEnterRoom, refetchRoomCard} = useHandleBadge();
   const [selectedEmoji, setSelectedEmoji] = useState<string>();
   const {mutate: saveLastReadChatTime} = useAPISaveLastReadChatTime();
   const [selectedMessageForCheckLastRead, setSelectedMessageForCheckLastRead] =
@@ -261,6 +261,9 @@ const Chat: React.FC = () => {
       onSuccess: sentMsg => {
         socket.emit('message', {...sentMsg, isSender: false});
         setMessages(refreshMessage([sentMsg, ...messages]));
+        if (sentMsg?.chatGroup?.id) {
+          refetchRoomCard(sentMsg.chatGroup.id);
+        }
         setValues(v => ({
           ...v,
           content: '',
