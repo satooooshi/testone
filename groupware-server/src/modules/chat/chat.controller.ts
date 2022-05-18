@@ -44,6 +44,7 @@ export interface GetMessagesQuery {
   after?: string;
   before?: string;
   include?: boolean;
+  storedAt?: string;
 }
 
 export interface GetChaRoomsByPageQuery {

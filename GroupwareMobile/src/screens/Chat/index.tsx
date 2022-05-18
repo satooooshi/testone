@@ -86,6 +86,8 @@ import {useHandleBadge} from '../../contexts/badge/useHandleBadge';
 import {useIsTabBarVisible} from '../../contexts/bottomTab/useIsTabBarVisible';
 import {debounce} from 'lodash';
 import Clipboard from '@react-native-community/clipboard';
+import {dateTimeFormatterFromJSDDate} from '../../utils/dateTimeFormatterFromJSDate';
+import {useAPIGetUpdatedMessages} from '../../hooks/api/chat/useAPIGetUpdatedMessages';
 
 const socket = io(baseURL, {
   transports: ['websocket'],
@@ -146,6 +148,8 @@ const Chat: React.FC = () => {
   const {mutate: saveLastReadChatTime} = useAPISaveLastReadChatTime();
   const [selectedMessageForCheckLastRead, setSelectedMessageForCheckLastRead] =
     useState<ChatMessage>();
+  const [isAllowSave, setIsAllowSave] = useState<boolean>(false);
+
   const {values, handleSubmit, setValues} = useFormik<Partial<ChatMessage>>({
     initialValues: {
       content: '',
@@ -177,6 +181,12 @@ const Chat: React.FC = () => {
     },
     {
       enabled: false,
+      onError: e => {
+        console.log('error ===============================', e);
+      },
+      onSuccess: res => {
+        console.log('success =============================', res.length);
+      },
     },
   );
 
@@ -205,7 +215,7 @@ const Chat: React.FC = () => {
   const {refetch: refetchLatest} = useAPIGetMessages(
     {
       group: room.id,
-      limit: 0,
+      limit: room.unreadCount,
     },
     {
       enabled: false,
@@ -224,21 +234,27 @@ const Chat: React.FC = () => {
           setMessages(m => refreshMessage([...msgToAppend, ...m]));
           // setImagesForViewing(i => [...i, ...imagesToApped]);
         }
-        refetchUpdatedMessages();
       },
     },
   );
 
-  const {refetch: refetchUpdatedMessages} = useAPIGetMessages(
-    {group: room.id, limit: messages.length},
-    {
-      enabled: false,
-      onSuccess: data => {
-        console.log('updated messages ====================', data.length);
-        setMessages(data);
-      },
+  const {mutate: refetchUpdatedMessages} = useAPIGetUpdatedMessages({
+    onSuccess: updatedMessages => {
+      console.log(
+        'updated messages ====================',
+        updatedMessages.length,
+      );
+      for (const message of updatedMessages) {
+        setMessages(messages => {
+          const indexUpdatedMessages = messages.findIndex(
+            m => m.id === message.id,
+          );
+          messages.splice(indexUpdatedMessages, 1, message);
+          return messages;
+        });
+      }
     },
-  );
+  });
 
   const {mutate: sendChatMessage, isLoading: loadingSendMessage} =
     useAPISendChatMessage({
@@ -436,6 +452,7 @@ const Chat: React.FC = () => {
   };
 
   const onScrollTopOnChat = () => {
+    console.log('scrollTop call ---------------------------');
     setBefore(messages[messages.length - 1].id);
   };
 
@@ -917,13 +934,16 @@ const Chat: React.FC = () => {
       );
       if (jsonMessagesInStorage) {
         const messagesInStorage = JSON.parse(jsonMessagesInStorage);
-        console.log(
-          'loaded message =================',
-          messagesInStorage.length,
-        );
         setMessages(messagesInStorage);
+        const storedAt = storage.getString(`storedAtInRoom${room.id}`);
+        console.log('refetch updated messages ========================');
+        refetchUpdatedMessages({
+          group: room.id,
+          limit: messagesInStorage.length,
+          storedAt: storedAt,
+        });
       }
-      console.log('call useFocusEffect ==============================');
+      setIsAllowSave(true);
       refetchLatest();
       refetchRoomDetail();
       // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -954,6 +974,13 @@ const Chat: React.FC = () => {
   const saveMessages = (msg: ChatMessage[]) => {
     const jsonMessages = JSON.stringify(msg);
     storage.set(`messagesIntRoom${room.id}`, jsonMessages);
+
+    const now = dateTimeFormatterFromJSDDate({
+      dateTime: new Date(),
+      format: 'yyyy-LL-dd HH:mm:ss',
+    });
+
+    storage.set(`storedAtInRoom${room.id}`, now);
   };
 
   useEffect(() => {
@@ -961,7 +988,7 @@ const Chat: React.FC = () => {
   });
 
   useEffect(() => {
-    if (messages.length) {
+    if (messages.length && isAllowSave) {
       saveMessages(messages);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
