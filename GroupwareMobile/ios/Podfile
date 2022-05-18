@@ -13,7 +13,6 @@ target 'GroupwareMobile' do
   )
 
 
-  pod 'react-native-background-timer', :path => '../node_modules/react-native-background-timer'
 
   target 'GroupwareMobileTests' do
     inherit! :complete

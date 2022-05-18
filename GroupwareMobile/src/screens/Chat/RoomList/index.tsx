@@ -83,9 +83,12 @@ const RoomList: React.FC = () => {
     },
   });
 
-  useEffect(() => {
-    setChatRooms(chatGroups);
-  }, [chatGroups.map(r => r.chatMessages)]);
+  useFocusEffect(
+    useCallback(() => {
+      console.log('--------', chatGroups);
+      setChatRooms(chatGroups);
+    }, [chatGroups]),
+  );
 
   const onPressRightButton = () => {
     // navigation.navigate('ChatStack', {screen: 'NewRoom'});
