@@ -104,6 +104,13 @@ export const BadgeProvider: React.FC = ({children}) => {
       } else {
         const pinnedRoomsCount = rooms.filter(r => r.isPinned).length;
         if (pinnedRoomsCount) {
+          const messages = data?.chatMessages;
+          if (messages) {
+            Alert.alert(
+              '最新のメッセージ',
+              messages[0].content ? messages[0]?.content : 'undefined',
+            );
+          }
           rooms.splice(pinnedRoomsCount, 0, data);
           setChatGroups(rooms);
         }
