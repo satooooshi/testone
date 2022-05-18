@@ -645,6 +645,9 @@ export class ChatService {
   public async deleteReaction(reactionId: number): Promise<number> {
     const existReaction = await this.chatMessageReactionRepository.findOne(
       reactionId,
+      {
+        relations: ['chatMessage'],
+      },
     );
     const existMessages = await this.chatMessageRepository.findOne(
       existReaction.chatMessage.id,
