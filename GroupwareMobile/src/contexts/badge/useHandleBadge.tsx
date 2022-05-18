@@ -69,9 +69,10 @@ export const BadgeProvider: React.FC = ({children}) => {
   };
 
   useEffect(() => {
+    setChatUnreadCount(0);
     refetchAllRooms();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [user]);
 
   useEffect(() => {
     if (isNeedRefetch) {
@@ -103,17 +104,8 @@ export const BadgeProvider: React.FC = ({children}) => {
         setChatGroups([...[data], ...rooms]);
       } else {
         const pinnedRoomsCount = rooms.filter(r => r.isPinned).length;
-        if (pinnedRoomsCount) {
-          const messages = data?.chatMessages;
-          if (messages) {
-            Alert.alert(
-              '最新のメッセージ',
-              messages[0].content ? messages[0]?.content : 'undefined',
-            );
-          }
-          rooms.splice(pinnedRoomsCount, 0, data);
-          setChatGroups(rooms);
-        }
+        rooms.splice(pinnedRoomsCount, 0, data);
+        setChatGroups(rooms);
       }
       if (data.id !== currentChatRoomId) {
         setChatUnreadCount(count => count + 1);
