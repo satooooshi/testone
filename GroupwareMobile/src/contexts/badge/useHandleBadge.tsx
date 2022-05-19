@@ -7,6 +7,7 @@ import {useAPIGetRoomsUnreadChatCount} from '../../hooks/api/chat/useAPIGetRooms
 import {ChatGroup} from '../../types';
 import {baseURL} from '../../utils/url';
 import {useAuthenticate} from '../useAuthenticate';
+import NetInfo, {useNetInfo} from '@react-native-community/netinfo';
 
 const BadgeContext = createContext({
   unreadChatCount: 0,
@@ -35,7 +36,8 @@ export const BadgeProvider: React.FC = ({children}) => {
     transports: ['websocket'],
   });
   const [page, setPage] = useState(1);
-  const [isNeedRefetch, setIsNeedRefetch] = useState<boolean>(false);
+  const [isNeedRefetch, setIsNeedRefetch] = useState(false);
+  const [networkConnection, setNetworkConnection] = useState(true);
 
   const {refetch: refetchAllRooms} = useAPIGetRooms(
     {
@@ -45,7 +47,12 @@ export const BadgeProvider: React.FC = ({children}) => {
     {
       enabled: false,
       onSuccess: data => {
-        let count = chatUnreadCount;
+        let count = 0;
+        if (chatGroups.length) {
+          for (const room of chatGroups) {
+            count += room.unreadCount ? room.unreadCount : 0;
+          }
+        }
         for (const room of data.rooms) {
           count += room.unreadCount ? room.unreadCount : 0;
         }
@@ -68,28 +75,46 @@ export const BadgeProvider: React.FC = ({children}) => {
     setChatGroups(rooms);
   };
 
+  // useEffect(() => {
+  //   refetchAllRooms();
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [user]);
+
   useEffect(() => {
-    setChatUnreadCount(0);
-    refetchAllRooms();
+    Alert.alert(networkConnection ? 'connect' : 'not');
+    console.log(networkConnection ? 'connect' : 'not');
+    if (networkConnection && user?.id) {
+      console.log('refetchAllRooms called ----------------------------');
+      refetchAllRooms();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user]);
+  }, [networkConnection, user]);
+
+  useEffect(() => {
+    // Subscribe
+    const unsubscribe = NetInfo.addEventListener(state => {
+      console.log('Connection type', state.type);
+      if (state.isConnected) {
+        setNetworkConnection(state.isConnected);
+      }
+    });
+
+    // Unsubscribe
+    return unsubscribe();
+  });
+
+  // useEffect(() => {
+  //   if (isInternetReachable) {
+  //     setNetworkConnection(isInternetReachable);
+  //   }
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [isInternetReachable]);
 
   useEffect(() => {
     if (isNeedRefetch) {
       refetchAllRooms();
     }
   }, [isNeedRefetch, refetchAllRooms]);
-
-  // const {mutate: getRooms} = useAPIGetRoomsUnreadChatCount({
-  //   onSuccess: data => {
-  //     let count = 0;
-  //     setChatGroups(data);
-  //     for (const room of data) {
-  //       count += room.unreadCount ? room.unreadCount : 0;
-  //     }
-  //     setChatUnreadCount(count);
-  //   },
-  // });
 
   const {refetch: refetchRoom} = useAPIGetOneRoom(refetchGroupId, {
     enabled: false,
@@ -120,10 +145,6 @@ export const BadgeProvider: React.FC = ({children}) => {
     }
   }, [refetchGroupId, refetchRoom]);
 
-  // useEffect(() => {
-  //   getRooms();
-  // }, [user, getRooms]);
-
   const refetchRoomCard = (roomId: number) => {
     setRefetchGroupId(roomId);
   };
@@ -131,55 +152,6 @@ export const BadgeProvider: React.FC = ({children}) => {
   const handleNewMessage = (groupId: number) => {
     setRefetchGroupId(groupId);
   };
-
-  // useEffect(
-  //   () => {
-  //     socket.connect();
-  //     socket.on(
-  //       'badgeClient',
-  //       async (data: {userId: number; groupId: number}) => {
-  //         // receivedMessage(data);
-  //         // debouncedReceiveMessage(data);
-  //         console.log(
-  //           'message was sent---------==',
-  //           data,
-  //           user?.id,
-  //           currentChatRoomId,
-  //         );
-  //         if (data?.groupId) {
-  //           setRefetchGroupId(data.groupId);
-  //         }
-  //         if (
-  //           user?.id &&
-  //           data.userId !== user.id &&
-  //           currentChatRoomId !== data.groupId
-  //         ) {
-  //           setChatUnreadCount(count => count + 1);
-  //           setChatGroups(group =>
-  //             group.map(g => {
-  //               if (g.id === data.groupId) {
-  //                 setCurrentRoom({
-  //                   id: data.groupId,
-  //                   unreadCount: g?.unreadCount ? g.unreadCount + 1 : 1,
-  //                 });
-  //                 return {
-  //                   ...g,
-  //                   unreadCount: g?.unreadCount ? g.unreadCount + 1 : 1,
-  //                 };
-  //               } else {
-  //                 return g;
-  //               }
-  //             }),
-  //           );
-  //         }
-  //       },
-  //     );
-  //     return () => {
-  //       socket.disconnect();
-  //     };
-  //   }, // eslint-disable-next-line react-hooks/exhaustive-deps
-  //   [user, currentChatRoomId],
-  // );
 
   const completeRefetch = () => {
     setRefetchGroupId(0);
@@ -219,10 +191,6 @@ export const BadgeProvider: React.FC = ({children}) => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [newRoom]);
-
-  // const refetchRoom = () => {
-  //   getRooms();
-  // };
 
   return (
     <BadgeContext.Provider

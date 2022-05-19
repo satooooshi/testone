@@ -92,16 +92,6 @@ export class ChatService {
       offset = (Number(page) - 1) * Number(limit);
     }
 
-    const updatedAtToDateTime = DateTime.fromJSDate(
-      new Date(updatedAtLatestRoom),
-    );
-
-    const formatedUpdatedAt = updatedAtLatestRoom
-      ? updatedAtToDateTime.toFormat(
-          `yyyy-MM-dd HH:mm:ss.${updatedAtToDateTime.get('millisecond')}`,
-        )
-      : undefined;
-
     const [urlUnparsedRooms, count] = await this.chatGroupRepository
       .createQueryBuilder('chat_groups')
       .leftJoinAndSelect('chat_groups.members', 'members')
@@ -128,10 +118,10 @@ export class ChatService {
       .where('member.id = :memberId', { memberId: userID })
       .andWhere(
         updatedAtLatestRoom
-          ? `chat_groups.updatedAt > :formatedUpdatedAt`
+          ? `chat_groups.updatedAt > :updatedAtLatestRoom`
           : '1=1',
         {
-          formatedUpdatedAt,
+          updatedAtLatestRoom: new Date(updatedAtLatestRoom),
         },
       )
       .skip(offset)
