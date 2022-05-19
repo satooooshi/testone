@@ -139,9 +139,10 @@ export class ChatService {
         if (!hasBeenRead) {
           const query = {
             group: g.id,
-            lastReadTime: g.lastReadChatTime?.[0].readTime
-              ? g.lastReadChatTime?.[0].readTime
-              : g.createdAt,
+            lastReadTime:
+              g.lastReadChatTime?.[0] && g.lastReadChatTime?.[0].readTime
+                ? g.lastReadChatTime?.[0].readTime
+                : g.createdAt,
           };
           unreadCount = await this.getUnreadChatMessage(userID, query);
         }
