@@ -80,16 +80,17 @@ export const BadgeProvider: React.FC = ({children}) => {
   }, [networkConnection, user]);
 
   useEffect(() => {
-    // Subscribe
     const unsubscribe = NetInfo.addEventListener(state => {
       if (state.isConnected !== null) {
+        Alert.alert(state.isConnected ? 'connect' : 'not');
         setNetworkConnection(state.isConnected);
       }
     });
 
-    // Unsubscribe
-    return unsubscribe();
-  });
+    return () => {
+      unsubscribe();
+    };
+  }, [networkConnection]);
 
   useEffect(() => {
     if (isNeedRefetch) {

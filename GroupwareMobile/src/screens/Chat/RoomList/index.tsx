@@ -20,7 +20,6 @@ import {ChatGroup, RoomType} from '../../../types';
 import {RoomListNavigationProps} from '../../../types/navigator/drawerScreenProps';
 import {nameOfRoom} from '../../../utils/factory/chat/nameOfRoom';
 import {storage} from '../../../utils/url';
-import NetInfo, {useNetInfo} from '@react-native-community/netinfo';
 import {DateTime} from 'luxon';
 
 const RoomList: React.FC = () => {
