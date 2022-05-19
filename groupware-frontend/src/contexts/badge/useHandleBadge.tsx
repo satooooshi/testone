@@ -51,6 +51,9 @@ export const BadgeProvider: React.FC = ({ children }) => {
   useEffect(
     () => {
       socket.connect();
+      if (chatGroups.length) {
+        socket.emit('setChatGroups', chatGroups);
+      }
       socket.on(
         'badgeClient',
         async (data: { userId: number; groupId: number }) => {
@@ -94,7 +97,7 @@ export const BadgeProvider: React.FC = ({ children }) => {
         socket.disconnect();
       };
     }, // eslint-disable-next-line react-hooks/exhaustive-deps
-    [user, currentChatRoomId],
+    [user, currentChatRoomId, chatGroups],
   );
 
   const completeRefetch = () => {

@@ -35,12 +35,10 @@ export class ChatGateway
 
   @SubscribeMessage('message')
   public async handleMessage(_: Socket, payload: ChatMessage) {
-    this.server
-      // .to(payload.chatGroup?.id.toString())
-      .emit('badgeClient', {
-        userId: payload.sender.id,
-        groupId: payload.chatGroup.id,
-      });
+    this.server.to(payload.chatGroup?.id.toString()).emit('badgeClient', {
+      userId: payload.sender.id,
+      groupId: payload.chatGroup.id,
+    });
     this.server
       .to(payload.chatGroup?.id.toString())
       .emit('msgToClient', { ...payload, isSender: false });
