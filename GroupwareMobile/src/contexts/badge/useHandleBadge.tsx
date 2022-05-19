@@ -82,7 +82,6 @@ export const BadgeProvider: React.FC = ({children}) => {
   useEffect(() => {
     const unsubscribe = NetInfo.addEventListener(state => {
       if (state.isConnected !== null) {
-        Alert.alert(state.isConnected ? 'connect' : 'not');
         setNetworkConnection(state.isConnected);
       }
     });
