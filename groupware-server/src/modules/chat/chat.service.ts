@@ -543,6 +543,7 @@ export class ChatService {
       this.chatGroupRepository.create({
         ...existGroup,
         ...newData,
+        updatedAt: new Date(),
       }),
     );
     if (existGroup.name !== newGroup.name) {
