@@ -56,7 +56,7 @@ export class ChatGateway
 
   @SubscribeMessage('editRoom')
   public async editRoom(_: Socket, room: ChatGroup) {
-    this.server.to(room.id.toString()).emit('editRoomClient', room);
+    this.server.to(room?.id.toString()).emit('editRoomClient', room);
   }
 
   @SubscribeMessage('joinRoom')
@@ -64,6 +64,16 @@ export class ChatGateway
     //@TODO dbにグループがなかったらエラーを吐く
     client.join(room);
     client.emit('joinedRoom', room);
+  }
+
+  @SubscribeMessage('setChatGroups')
+  public setChatGroups(client: Socket, rooms: ChatGroup[]): void {
+    //@TODO dbにグループがなかったらエラーを吐く
+    for (const room of rooms) {
+      if (room?.id) {
+        client.join(room.id.toString());
+      }
+    }
   }
 
   @SubscribeMessage('leaveRoom')
