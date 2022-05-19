@@ -16,7 +16,7 @@ const BadgeContext = createContext({
   handleEnterRoom: (() => {}) as (roomId: number) => void,
   refetchRoomCard: (() => {}) as (roomId: number) => void,
   completeRefetch: () => {},
-  newRoom: {} as ChatGroup | undefined,
+  editRoom: {} as ChatGroup | undefined,
   setNewChatGroup: (() => {}) as (room: ChatGroup | undefined) => void,
 });
 
@@ -31,6 +31,7 @@ export const BadgeProvider: React.FC = ({children}) => {
   const [page, setPage] = useState(1);
   const [isNeedRefetch, setIsNeedRefetch] = useState(false);
   const [networkConnection, setNetworkConnection] = useState(true);
+  const [editRoom, setEditRoom] = useState<ChatGroup>();
 
   const {refetch: refetchAllRooms} = useAPIGetRooms(
     {
@@ -138,28 +139,50 @@ export const BadgeProvider: React.FC = ({children}) => {
     }
   };
 
-  const [newRoom, setNewRoom] = useState<ChatGroup>();
-
   const setNewChatGroup = (room: ChatGroup | undefined) => {
-    setNewRoom(room);
+    setEditRoom(room);
   };
 
+  useEffect(
+    () => {
+      socket.connect();
+      if (chatGroups.length) {
+        socket.emit('setChatGroups', chatGroups);
+      }
+      socket.on('editRoomClient', async (room: ChatGroup) => {
+        console.log('-----------');
+
+        if (room?.id) {
+          setEditRoom(room);
+        }
+      });
+      return () => {
+        socket.disconnect();
+      };
+    }, // eslint-disable-next-line react-hooks/exhaustive-deps
+    [user, chatGroups],
+  );
+
   useEffect(() => {
-    if (newRoom) {
-      if (newRoom.updatedAt > newRoom.createdAt) {
-        setChatGroups(room =>
-          room.map(r => (r.id === newRoom.id ? newRoom : r)),
-        );
+    if (editRoom) {
+      if (editRoom.updatedAt > editRoom.createdAt) {
+        if (editRoom.members?.filter(m => m.id === user?.id).length) {
+          setChatGroups(room =>
+            room.map(r => (r.id === editRoom.id ? editRoom : r)),
+          );
+        } else {
+          setChatGroups(rooms => rooms.filter(r => r.id !== editRoom.id));
+        }
       } else {
         const rooms = chatGroups;
         const pinnedRoomsCount = rooms.filter(r => r.isPinned).length;
-        rooms.splice(pinnedRoomsCount, 0, newRoom);
+        rooms.splice(pinnedRoomsCount, 0, editRoom);
         setChatGroups(rooms);
         setNewChatGroup(undefined);
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [newRoom]);
+  }, [editRoom]);
 
   return (
     <BadgeContext.Provider
@@ -171,7 +194,7 @@ export const BadgeProvider: React.FC = ({children}) => {
         handleEnterRoom,
         refetchRoomCard,
         completeRefetch,
-        newRoom,
+        editRoom,
         setNewChatGroup,
       }}>
       {children}
