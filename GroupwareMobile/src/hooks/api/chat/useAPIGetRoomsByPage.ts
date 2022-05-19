@@ -1,5 +1,4 @@
 import {AxiosError} from 'axios';
-import {DateTime} from 'luxon';
 import {useQuery, UseQueryOptions} from 'react-query';
 import {ChatGroup} from '../../../types';
 import {axiosInstance} from '../../../utils/url';
@@ -29,7 +28,7 @@ export const useAPIGetRooms = (
   options?: UseQueryOptions<GetRoomsResult, AxiosError>,
 ) => {
   return useQuery<GetRoomsResult, AxiosError>(
-    [query.updatedAtLatestRoom ? 'getRoomsLatest' : 'getRooms', query],
+    ['getRooms', query],
     () => getRooms(query),
     options,
   );

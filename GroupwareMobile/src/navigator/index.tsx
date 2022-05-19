@@ -60,7 +60,7 @@ const Navigator = () => {
     stopRing,
     sendCallHistory,
   } = useInviteCall();
-  const {unreadChatCount, handleNewMessage} = useHandleBadge();
+  const {unreadChatCount, refetchRoomCard} = useHandleBadge();
   const [isJoining, setIsJoining] = useState(false);
   const [isCalling, setIsCalling] = useState(false);
   const [callTimeout, setCallTimeout] = useState(false);
@@ -579,7 +579,7 @@ const Navigator = () => {
       },
       onNotification: notification => {
         if (notification?.data?.screen === 'chat' && notification.data?.id) {
-          handleNewMessage(notification.data?.id);
+          refetchRoomCard(notification.data?.id);
         }
         console.log('PushNotification onNotification========', notification);
         if (Platform.OS === 'android') {

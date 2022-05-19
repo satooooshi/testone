@@ -31,8 +31,7 @@ const RoomList: React.FC = () => {
   const [roomTypeSelector, setRoomTypeSelector] = useState(false);
   const [userModal, setVisibleUserModal] = useState(false);
   const {data: users} = useAPIGetUsers('');
-  const {completeRefetch, refetchGroupId, chatGroups, setChatGroupsState} =
-    useHandleBadge();
+  const {chatGroups, setChatGroupsState} = useHandleBadge();
   const {selectedUserRole, filteredUsers} = useUserRole('All', users);
   const [creationType, setCreationType] = useState<RoomType>();
   const [searchedRooms, setSearchedRooms] = useState<ChatGroup[]>();
@@ -41,51 +40,6 @@ const RoomList: React.FC = () => {
   const [isNeedRefetchLatest, setIsNeedRefetchLatest] =
     useState<boolean>(false);
   const [latestRooms, setLatestRooms] = useState<ChatGroup[]>([]);
-
-  // const {refetch: refetchAllRooms, isLoading: loadingGetChatGroupList} =
-  //   useAPIGetRooms(
-  //     {
-  //       page: page.toString(),
-  //       limit: '20',
-  //       updatedAtLatestRoom: DateTime.fromJSDate(new Date())
-  //         .minus({days: 5})
-  //         .toJSDate(),
-  //     },
-  //     {
-  //       enabled: false,
-  //       onSuccess: data => {
-  //         console.log('000');
-
-  //         console.log(
-  //           'call -----------------------',
-  //           data.rooms.map(r => r.name),
-  //         );
-  //       },
-  //     },
-  //   );
-
-  // useEffect(() => {
-  //   refetchAllRooms();
-  //   console.log('-----');
-  // }, [chatGroups]);
-
-  // useEffect(() => {
-  //   console.log('--------', isInternetReachable);
-  // }, [isInternetReachable]);
-
-  // useEffect(() => {
-  //   // Subscribe
-  //   const unsubscribe = NetInfo.addEventListener(state => {
-  //     console.log('Connection type', state.type);
-  //     // Alert.alert(
-  //     //   'Is connected?',
-  //     //   state.isConnected ? 'connected' : 'unconnected',
-  //     // );
-  //   });
-
-  //   // Unsubscribe
-  //   unsubscribe();
-  // });
 
   const {mutate: createGroup} = useAPISaveChatGroup({
     onSuccess: createdData => {
