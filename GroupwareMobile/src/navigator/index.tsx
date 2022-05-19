@@ -400,42 +400,7 @@ const Navigator = () => {
         RNCallKeep.endAllCalls();
       }
     }
-    //   if (Platform.OS === 'android') {
-    //     if (invitation && realChannelName) {
-    //       // 招待を承認
-    //       console.log('answer call called');
-    //       await rtmEngine.acceptRemoteInvitationV2(invitation);
-    //       await joinChannel(realChannelName);
-    //       setIsCalling(true);
-    //     }
-    //   } else {
-    //     setStartCall(true);
-    //   }
   };
-
-  // useEffect(() => {
-  //   console.log(
-  //     '-------------------',
-  //     AppState.currentState,
-  //     startCall,
-  //     user?.id,
-  //   );
-
-  //   const execAnswerCall = async () => {
-  //     if (remoteInvitation.current?.channelId) {
-  //       const realChannelName = remoteInvitation.current?.channelId as string;
-  //       // 招待を承認
-  //       await rtmEngine.acceptRemoteInvitationV2(remoteInvitation.current);
-  //       await joinChannel(realChannelName);
-  //       setIsCalling(true);
-  //       setStartCall(false);
-  //     }
-  //   };
-  //   if (AppState.currentState !== 'active' && startCall) {
-  //     execAnswerCall();
-  //   }
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [AppState.currentState, startCall]);
 
   useEffect(() => {
     if (localInvitation?.calleeId) {
