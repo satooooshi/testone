@@ -20,6 +20,8 @@ import {ChatGroup, RoomType} from '../../../types';
 import {RoomListNavigationProps} from '../../../types/navigator/drawerScreenProps';
 import {nameOfRoom} from '../../../utils/factory/chat/nameOfRoom';
 import {storage} from '../../../utils/url';
+import NetInfo, {useNetInfo} from '@react-native-community/netinfo';
+import {DateTime} from 'luxon';
 
 const RoomList: React.FC = () => {
   const navigation = useNavigation<RoomListNavigationProps>();
@@ -39,6 +41,51 @@ const RoomList: React.FC = () => {
   const [isNeedRefetchLatest, setIsNeedRefetchLatest] =
     useState<boolean>(false);
   const [latestRooms, setLatestRooms] = useState<ChatGroup[]>([]);
+
+  // const {refetch: refetchAllRooms, isLoading: loadingGetChatGroupList} =
+  //   useAPIGetRooms(
+  //     {
+  //       page: page.toString(),
+  //       limit: '20',
+  //       updatedAtLatestRoom: DateTime.fromJSDate(new Date())
+  //         .minus({days: 5})
+  //         .toJSDate(),
+  //     },
+  //     {
+  //       enabled: false,
+  //       onSuccess: data => {
+  //         console.log('000');
+
+  //         console.log(
+  //           'call -----------------------',
+  //           data.rooms.map(r => r.name),
+  //         );
+  //       },
+  //     },
+  //   );
+
+  // useEffect(() => {
+  //   refetchAllRooms();
+  //   console.log('-----');
+  // }, [chatGroups]);
+
+  // useEffect(() => {
+  //   console.log('--------', isInternetReachable);
+  // }, [isInternetReachable]);
+
+  // useEffect(() => {
+  //   // Subscribe
+  //   const unsubscribe = NetInfo.addEventListener(state => {
+  //     console.log('Connection type', state.type);
+  //     // Alert.alert(
+  //     //   'Is connected?',
+  //     //   state.isConnected ? 'connected' : 'unconnected',
+  //     // );
+  //   });
+
+  //   // Unsubscribe
+  //   unsubscribe();
+  // });
 
   const {mutate: createGroup} = useAPISaveChatGroup({
     onSuccess: createdData => {
@@ -85,7 +132,6 @@ const RoomList: React.FC = () => {
 
   useFocusEffect(
     useCallback(() => {
-      console.log('--------', chatGroups);
       setChatRooms(chatGroups);
     }, [chatGroups]),
   );
