@@ -85,7 +85,11 @@ const ChatMenu: React.FC = () => {
             },
             {
               text: 'はい',
-              onPress: () => removeCache(),
+              onPress: () => {
+                if (removeCache) {
+                  removeCache();
+                }
+              },
               style: 'destructive',
             },
           ])

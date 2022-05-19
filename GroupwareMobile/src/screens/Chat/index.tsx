@@ -1051,6 +1051,7 @@ const Chat: React.FC = () => {
   const removeCache = () => {
     storage.delete(`messagesIntRoom${room.id}`);
     setMessages([]);
+    refetchFetchedPastMessages();
   };
 
   return (
