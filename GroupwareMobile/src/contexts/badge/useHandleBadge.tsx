@@ -66,12 +66,6 @@ export const BadgeProvider: React.FC = ({children}) => {
   };
 
   useEffect(() => {
-    console.log('--------------', chatGroups.length);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [chatGroups]);
-
-  useEffect(() => {
-    Alert.alert(networkConnection ? 'connect' : 'not');
     if (networkConnection && user?.id) {
       console.log('refetchAllRooms called ----------------------------');
       refetchAllRooms();

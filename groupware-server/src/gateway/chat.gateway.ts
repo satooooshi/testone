@@ -54,6 +54,11 @@ export class ChatGateway
     this.server.to(data.room).emit('readMessageClient', data.senderId);
   }
 
+  @SubscribeMessage('editRoom')
+  public async editRoom(_: Socket, room: ChatGroup) {
+    this.server.to(room.id.toString()).emit('editRoomClient', room);
+  }
+
   @SubscribeMessage('joinRoom')
   public joinRoom(client: Socket, room: string): void {
     //@TODO dbにグループがなかったらエラーを吐く
