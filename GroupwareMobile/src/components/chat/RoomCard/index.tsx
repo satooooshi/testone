@@ -39,7 +39,9 @@ const RoomCard: React.FC<RoomCardProps> = ({
         h={'100%'}
         w={80}
         onPress={() => {
-          onPressPinButton();
+          if (onPressPinButton) {
+            onPressPinButton();
+          }
           ref?.current?.close();
         }}>
         <Icon
@@ -94,6 +96,7 @@ const RoomCard: React.FC<RoomCardProps> = ({
       }}>
       <Swipeable
         ref={ref}
+        enabled={onPressPinButton ? true : false}
         containerStyle={tailwind('rounded-sm')}
         renderRightActions={rightSwipeActions}>
         <Div
