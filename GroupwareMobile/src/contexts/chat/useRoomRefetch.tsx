@@ -3,21 +3,21 @@ import React, {createContext, useContext, useState} from 'react';
 import {ChatGroup} from '../../types';
 
 const RoomRefetchContext = createContext({
-  newRoom: {} as ChatGroup | undefined,
+  editRoom: {} as ChatGroup | undefined,
   setNewChatGroup: (() => {}) as (room: ChatGroup | undefined) => void,
 });
 
 export const RoomRefetchProvider: React.FC = ({children}) => {
-  const [newRoom, setNewRoom] = useState<ChatGroup>();
+  const [editRoom, setEditRoom] = useState<ChatGroup>();
 
   const setNewChatGroup = (room: ChatGroup | undefined) => {
-    setNewRoom(room);
+    setEditRoom(room);
   };
 
   return (
     <RoomRefetchContext.Provider
       value={{
-        newRoom,
+        editRoom,
         setNewChatGroup,
       }}>
       {children}

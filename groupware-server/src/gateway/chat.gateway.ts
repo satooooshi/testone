@@ -35,12 +35,10 @@ export class ChatGateway
 
   @SubscribeMessage('message')
   public async handleMessage(_: Socket, payload: ChatMessage) {
-    this.server
-      // .to(payload.chatGroup?.id.toString())
-      .emit('badgeClient', {
-        userId: payload.sender.id,
-        groupId: payload.chatGroup.id,
-      });
+    this.server.to(payload.chatGroup?.id.toString()).emit('badgeClient', {
+      userId: payload.sender.id,
+      groupId: payload.chatGroup.id,
+    });
     this.server
       .to(payload.chatGroup?.id.toString())
       .emit('msgToClient', { ...payload, isSender: false });
@@ -56,7 +54,7 @@ export class ChatGateway
 
   @SubscribeMessage('editRoom')
   public async editRoom(_: Socket, room: ChatGroup) {
-    this.server.to(room.id.toString()).emit('editRoomClient', room);
+    this.server.to(room?.id.toString()).emit('editRoomClient', room);
   }
 
   @SubscribeMessage('joinRoom')
@@ -64,6 +62,16 @@ export class ChatGateway
     //@TODO dbにグループがなかったらエラーを吐く
     client.join(room);
     client.emit('joinedRoom', room);
+  }
+
+  @SubscribeMessage('setChatGroups')
+  public setChatGroups(client: Socket, rooms: ChatGroup[]): void {
+    //@TODO dbにグループがなかったらエラーを吐く
+    for (const room of rooms) {
+      if (room?.id) {
+        client.join(room.id.toString());
+      }
+    }
   }
 
   @SubscribeMessage('leaveRoom')
