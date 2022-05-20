@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useRef} from 'react';
 import {Platform, TouchableHighlight, useWindowDimensions} from 'react-native';
 import FastImage from 'react-native-fast-image';
 import {Swipeable} from 'react-native-gesture-handler';
@@ -12,7 +12,6 @@ import {dateTimeFormatterFromJSDDate} from '../../../utils/dateTimeFormatterFrom
 import {nameOfRoom} from '../../../utils/factory/chat/nameOfRoom';
 import {mentionTransform} from '../../../utils/messageTransform';
 import {Badge} from 'react-native-paper';
-import {useHandleBadge} from '../../../contexts/badge/useHandleBadge';
 
 type RoomCardProps = {
   room: ChatGroup;
