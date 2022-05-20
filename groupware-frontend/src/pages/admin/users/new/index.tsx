@@ -445,7 +445,6 @@ const CreateNewUser = () => {
               <p>パスワード</p>
             </FormLabel>
             <Input
-              type="password"
               placeholder="password"
               value={values.password}
               background="white"
