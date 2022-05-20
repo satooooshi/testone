@@ -88,7 +88,6 @@ import {debounce} from 'lodash';
 import Clipboard from '@react-native-community/clipboard';
 import {dateTimeFormatterFromJSDDate} from '../../utils/dateTimeFormatterFromJSDate';
 import {useAPIGetUpdatedMessages} from '../../hooks/api/chat/useAPIGetUpdatedMessages';
-import NetInfo from '@react-native-community/netinfo';
 
 const socket = io(baseURL, {
   transports: ['websocket'],
@@ -149,8 +148,6 @@ const Chat: React.FC = () => {
   const {mutate: saveLastReadChatTime} = useAPISaveLastReadChatTime();
   const [selectedMessageForCheckLastRead, setSelectedMessageForCheckLastRead] =
     useState<ChatMessage>();
-  const [isAllowSave, setIsAllowSave] = useState<boolean>(false);
-  const [networkConnection, setNetworkConnection] = useState(true);
 
   const {values, handleSubmit, setValues} = useFormik<Partial<ChatMessage>>({
     initialValues: {
@@ -630,6 +627,7 @@ const Chat: React.FC = () => {
   );
 
   const saveMessages = (msg: ChatMessage[]) => {
+    console.log('call ------------------------------------------');
     const jsonMessages = JSON.stringify(msg);
     storage.set(`messagesIntRoom${room.id}`, jsonMessages);
 
@@ -651,13 +649,14 @@ const Chat: React.FC = () => {
     if (isFocused) {
       setIsTabBarVisible(false);
     } else {
-      if (messages.length && isAllowSave) {
+      console.log('call =========================================');
+      if (messages.length) {
         saveMessages(messages);
       }
       setIsTabBarVisible(true);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isFocused, setIsTabBarVisible, isAllowSave, messages]);
+  }, [isFocused, setIsTabBarVisible, messages]);
 
   useEffect(() => {
     let isMounted = true;
@@ -968,7 +967,6 @@ const Chat: React.FC = () => {
           storedAt: storedAt,
         });
       }
-      setIsAllowSave(true);
       refetchLatest();
       refetchRoomDetail();
       // eslint-disable-next-line react-hooks/exhaustive-deps
