@@ -140,7 +140,11 @@ export const BadgeProvider: React.FC = ({ children }) => {
       if (editRoom.updatedAt > editRoom.createdAt) {
         if (editRoom.members?.filter((m) => m.id === user?.id).length) {
           setChatGroups((room) =>
-            room.map((r) => (r.id === editRoom.id ? editRoom : r)),
+            room.map((r) =>
+              r.id === editRoom.id
+                ? { ...r, name: editRoom.name, members: editRoom.members }
+                : r,
+            ),
           );
         } else {
           setChatGroups((rooms) => rooms.filter((r) => r.id !== editRoom.id));
