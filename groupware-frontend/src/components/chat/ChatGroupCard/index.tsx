@@ -11,6 +11,7 @@ import {
 } from '@chakra-ui/react';
 import { darkFontColor } from 'src/utils/colors';
 import { RiPushpin2Fill, RiPushpin2Line } from 'react-icons/ri';
+import { nameOfEmptyNameGroup } from 'src/utils/chat/nameOfEmptyNameGroup';
 
 type ChatGroupCardProps = {
   chatGroup: ChatGroup;
@@ -24,13 +25,7 @@ const ChatGroupCard: React.FC<ChatGroupCardProps> = ({
   onPressPinButton,
 }) => {
   const [isSmallerThan768] = useMediaQuery('max-width: 768px');
-  const nameOfEmptyNameGroup = (members?: User[]): string => {
-    if (!members) {
-      return 'メンバーがいません';
-    }
-    const strMembers = members?.map((m) => m.lastName + m.firstName).join();
-    return strMembers;
-  };
+
   const latestMessage = (chatMessage: ChatMessage) => {
     switch (chatMessage.type) {
       case ChatMessageType.IMAGE:

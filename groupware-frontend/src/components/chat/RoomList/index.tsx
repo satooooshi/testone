@@ -1,12 +1,22 @@
 import { useAPIGetOneRoom } from '@/hooks/api/chat/useAPIGetOneRoom';
 import { useAPIGetRoomsByPage } from '@/hooks/api/chat/useAPIGetRoomsByPage';
-import { Box, Spinner, Text, useFocusEffect } from '@chakra-ui/react';
+import {
+  Box,
+  InputGroup,
+  InputLeftElement,
+  Spinner,
+  Text,
+  useFocusEffect,
+} from '@chakra-ui/react';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useHandleBadge } from 'src/contexts/badge/useHandleBadge';
 import { useRoomRefetch } from 'src/contexts/chat/useRoomRefetch';
 import { ChatGroup } from 'src/types';
 import ChatGroupCard from '../ChatGroupCard';
 import { useAPISavePin } from '@/hooks/api/chat/useAPISavePin';
+import { AiOutlineSearch } from 'react-icons/ai';
+import { Input } from 'react-rainbow-components';
+import { nameOfEmptyNameGroup } from 'src/utils/chat/nameOfEmptyNameGroup';
 
 type RoomListProps = {
   currentId?: string;
@@ -15,9 +25,9 @@ type RoomListProps = {
 
 const RoomList: React.FC<RoomListProps> = ({ currentId, onClickRoom }) => {
   const { clearRefetch } = useRoomRefetch();
-  const [page, setPage] = useState('1');
   const { setChatGroupsState, chatGroups } = useHandleBadge();
   const [chatRooms, setChatRooms] = useState<ChatGroup[]>([]);
+  const [searchedRooms, setSearchedRooms] = useState<ChatGroup[]>([]);
 
   const { mutate: savePin } = useAPISavePin({
     onSuccess: (data) => {
@@ -51,41 +61,69 @@ const RoomList: React.FC<RoomListProps> = ({ currentId, onClickRoom }) => {
     setChatRooms(chatGroups);
   }, [chatGroups]);
 
-  const onScroll = (e: any) => {
-    if (
-      e.target.scrollTop > e.target.scrollHeight / 2 &&
-      chatRooms?.length >= Number(page) * 20
-    ) {
-      setPage((p) => (Number(p) + 1).toString());
-    }
-  };
-
   return (
     <Box
       display={'flex'}
       flexDir="column"
       alignItems="center"
       h="100%"
-      overflowY="auto"
-      onScroll={onScroll}>
+      overflowY="auto">
+      <InputGroup>
+        <InputLeftElement pointerEvents="none">
+          <AiOutlineSearch />
+        </InputLeftElement>
+        <Input
+          type="search"
+          placeholder="名前で検索"
+          onChange={(e) => {
+            const filteredRooms = chatRooms.filter((r) => {
+              const regex = new RegExp(e.target.value);
+              return r.name
+                ? regex.test(r.name)
+                : regex.test(nameOfEmptyNameGroup(r.members));
+            });
+            setSearchedRooms(filteredRooms);
+          }}
+        />
+      </InputGroup>
       {chatRooms.length ? (
-        chatRooms.map((g) => (
-          <a
-            onClick={() => g.id === Number(currentId) || onClickRoom(g)}
-            key={g.id}
-            style={{ width: '100%' }}>
-            <Box w="100%" mb={'8px'}>
-              <ChatGroupCard
-                isSelected={Number(currentId) === g.id}
-                onPressPinButton={() => {
-                  savePin({ ...g, isPinned: !g.isPinned });
-                }}
-                chatGroup={g}
-                key={g.id}
-              />
-            </Box>
-          </a>
-        ))
+        searchedRooms ? (
+          searchedRooms.map((g) => (
+            <a
+              onClick={() => g.id === Number(currentId) || onClickRoom(g)}
+              key={g.id}
+              style={{ width: '100%' }}>
+              <Box w="100%" mb={'8px'}>
+                <ChatGroupCard
+                  isSelected={Number(currentId) === g.id}
+                  onPressPinButton={() => {
+                    savePin({ ...g, isPinned: !g.isPinned });
+                  }}
+                  chatGroup={g}
+                  key={g.id}
+                />
+              </Box>
+            </a>
+          ))
+        ) : (
+          chatRooms.map((g) => (
+            <a
+              onClick={() => g.id === Number(currentId) || onClickRoom(g)}
+              key={g.id}
+              style={{ width: '100%' }}>
+              <Box w="100%" mb={'8px'}>
+                <ChatGroupCard
+                  isSelected={Number(currentId) === g.id}
+                  onPressPinButton={() => {
+                    savePin({ ...g, isPinned: !g.isPinned });
+                  }}
+                  chatGroup={g}
+                  key={g.id}
+                />
+              </Box>
+            </a>
+          ))
+        )
       ) : (
         <Box wordBreak="break-all">
           <Text>ルームを作成するか、招待をお待ちください</Text>
