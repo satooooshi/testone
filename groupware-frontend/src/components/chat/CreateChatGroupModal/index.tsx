@@ -33,7 +33,7 @@ import { hideScrollbarCss } from 'src/utils/chakra/hideScrollBar.css';
 import EditChatGroupMembersModal from '../EditChatGroupMembersModal';
 import { MdCancel } from 'react-icons/md';
 import { userNameFactory } from 'src/utils/factory/userNameFactory';
-import { useRoomRefetch } from 'src/contexts/chat/useRoomRefetch';
+import { useHandleBadge } from 'src/contexts/badge/useHandleBadge';
 
 type CreateChatGroupModalProps = {
   isOpen: boolean;
@@ -53,7 +53,7 @@ const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
     name: '',
     members: selectedMembers,
   };
-  const { setNewChatGroup } = useRoomRefetch();
+  const { setNewChatGroup } = useHandleBadge();
   const [membersModal, setMembersModal] = useState(false);
   const [selectImageUrl, setSelectImageUrl] = useState<string>('');
   const [selectImageName, setSelectImageName] = useState<string>('');
