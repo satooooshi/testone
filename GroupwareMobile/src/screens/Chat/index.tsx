@@ -88,6 +88,7 @@ import {debounce} from 'lodash';
 import Clipboard from '@react-native-community/clipboard';
 import {dateTimeFormatterFromJSDDate} from '../../utils/dateTimeFormatterFromJSDate';
 import {useAPIGetUpdatedMessages} from '../../hooks/api/chat/useAPIGetUpdatedMessages';
+import NetInfo from '@react-native-community/netinfo';
 
 const socket = io(baseURL, {
   transports: ['websocket'],
@@ -149,6 +150,7 @@ const Chat: React.FC = () => {
   const [selectedMessageForCheckLastRead, setSelectedMessageForCheckLastRead] =
     useState<ChatMessage>();
   const [isAllowSave, setIsAllowSave] = useState<boolean>(false);
+  const [networkConnection, setNetworkConnection] = useState(true);
 
   const {values, handleSubmit, setValues} = useFormik<Partial<ChatMessage>>({
     initialValues: {
@@ -627,6 +629,18 @@ const Chat: React.FC = () => {
     </Dropdown>
   );
 
+  const saveMessages = (msg: ChatMessage[]) => {
+    const jsonMessages = JSON.stringify(msg);
+    storage.set(`messagesIntRoom${room.id}`, jsonMessages);
+
+    const now = dateTimeFormatterFromJSDDate({
+      dateTime: new Date(),
+      format: 'yyyy-LL-dd HH:mm:ss',
+    });
+
+    storage.set(`storedAtInRoom${room.id}`, now);
+  };
+
   useEffect(() => {
     if (longPressedMsg) {
       typeDropdownRef.current?.open();
@@ -637,9 +651,13 @@ const Chat: React.FC = () => {
     if (isFocused) {
       setIsTabBarVisible(false);
     } else {
+      if (messages.length && isAllowSave) {
+        saveMessages(messages);
+      }
       setIsTabBarVisible(true);
     }
-  }, [isFocused, setIsTabBarVisible]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isFocused, setIsTabBarVisible, isAllowSave, messages]);
 
   useEffect(() => {
     let isMounted = true;
@@ -978,28 +996,9 @@ const Chat: React.FC = () => {
     [],
   );
 
-  const saveMessages = (msg: ChatMessage[]) => {
-    const jsonMessages = JSON.stringify(msg);
-    storage.set(`messagesIntRoom${room.id}`, jsonMessages);
-
-    const now = dateTimeFormatterFromJSDDate({
-      dateTime: new Date(),
-      format: 'yyyy-LL-dd HH:mm:ss',
-    });
-
-    storage.set(`storedAtInRoom${room.id}`, now);
-  };
-
   useEffect(() => {
     AppState.addEventListener('change', debounceHandleLastReadByAppState);
   });
-
-  useEffect(() => {
-    if (messages.length && isAllowSave) {
-      saveMessages(messages);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [messages]);
 
   useEffect(() => {
     saveLastReadChatTime(room.id, {
