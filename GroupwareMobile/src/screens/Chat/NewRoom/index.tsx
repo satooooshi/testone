@@ -18,7 +18,7 @@ const NewRoom: React.FC = () => {
   const {mutate: uploadImage} = useAPIUploadStorage();
   const {data: users} = useAPIGetUsers('');
   const headerTitle = 'ルーム新規作成';
-  const {mutate: createGroup} = useAPISaveChatGroup({
+  const {mutate: createGroup, isLoading} = useAPISaveChatGroup({
     onSuccess: createdData => {
       if (createdData.updatedAt === createdData.createdAt) {
         setNewChatGroup(createdData);
@@ -42,6 +42,7 @@ const NewRoom: React.FC = () => {
       onUploadImage={(formData, onSuccessFunc) =>
         uploadImage(formData, {onSuccess: onSuccessFunc})
       }
+      isLoading={isLoading}
     />
   );
 };
