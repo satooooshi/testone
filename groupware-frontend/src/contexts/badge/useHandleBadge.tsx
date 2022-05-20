@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
+import { useAPIGetRoomsUnreadChatCount } from '@/hooks/api/chat/useAPIGetRoomsUnreadChatCount';
 import React, {
   useContext,
   createContext,
@@ -12,12 +13,13 @@ import { baseURL } from '../../utils/url';
 import { useAuthenticate } from '../useAuthenticate';
 import { RoomRefetchProvider } from 'src/contexts/chat/useRoomRefetch';
 import { useAPIGetRoomsByPage } from '@/hooks/api/chat/useAPIGetRoomsByPage';
+import { useAPIGetOneRoom } from '@/hooks/api/chat/useAPIGetOneRoom';
 
 const BadgeContext = createContext({
   unreadChatCount: 0,
   currentRoom: {} as { id: number; unreadCount: number } | undefined,
   chatGroups: [] as ChatGroup[],
-  refetchRoom: () => {},
+  setChatGroupsState: (() => {}) as (rooms: ChatGroup[]) => void,
   refetchGroupId: 0,
   handleEnterRoom: (() => {}) as (roomId: number) => void,
   completeRefetch: () => {},
@@ -67,9 +69,48 @@ export const BadgeProvider: React.FC = ({ children }) => {
     },
   );
 
+  const { refetch: refetchRoom } = useAPIGetOneRoom(refetchGroupId, {
+    enabled: false,
+    onError: () => {
+      alert('ルーム情報の取得に失敗しました');
+    },
+    onSuccess: (data) => {
+      const rooms = chatGroups.filter((r) => r.id !== data.id);
+      if (data.isPinned) {
+        setChatGroups([...[data], ...rooms]);
+      } else {
+        const pinnedRoomsCount = rooms.filter((r) => r.isPinned).length;
+        rooms.splice(pinnedRoomsCount, 0, data);
+        setChatGroups(rooms);
+      }
+      if (
+        data.id !== currentChatRoomId &&
+        data?.chatMessages?.[0].sender !== user?.id
+      ) {
+        setChatUnreadCount((count) => count + 1);
+      }
+      completeRefetch();
+    },
+  });
+
   useEffect(() => {
-    getRooms();
-  }, [user, getRooms]);
+    if (user?.id) {
+      refetchAllRooms();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]);
+
+  useEffect(() => {
+    if (isNeedRefetch) {
+      refetchAllRooms();
+    }
+  }, [isNeedRefetch, refetchAllRooms]);
+
+  useEffect(() => {
+    if (refetchGroupId) {
+      refetchRoom();
+    }
+  }, [refetchGroupId, refetchRoom]);
 
   useEffect(
     () => {
@@ -87,69 +128,36 @@ export const BadgeProvider: React.FC = ({ children }) => {
       socket.on(
         'badgeClient',
         async (data: { userId: number; groupId: number }) => {
-          // receivedMessage(data);
-          // debouncedReceiveMessage(data);
-          console.log(
-            'message was sent---------==',
-            data,
-            user?.id,
-            currentChatRoomId,
-          );
-          if (data?.groupId) {
-            setRefetchGroupId(data.groupId);
-          }
-          if (
-            user?.id &&
-            data.userId !== user.id &&
-            currentChatRoomId != data.groupId
-          ) {
-            setChatUnreadCount((count) => count + 1);
-            setChatGroups((group) =>
-              group.map((g) => {
-                if (g.id === data.groupId) {
-                  setCurrentRoom({
-                    id: data.groupId,
-                    unreadCount: g?.unreadCount ? g.unreadCount + 1 : 1,
-                  });
-                  return {
-                    ...g,
-                    unreadCount: g?.unreadCount ? g.unreadCount + 1 : 1,
-                  };
-                } else {
-                  return g;
-                }
-              }),
-            );
-          }
+          if (data.groupId) setRefetchGroupId(data.groupId);
         },
       );
       return () => {
         socket.disconnect();
       };
     }, // eslint-disable-next-line react-hooks/exhaustive-deps
-    [user, currentChatRoomId, chatGroups],
+    [user, chatGroups],
   );
 
-  // useEffect(() => {
-  //   if (editRoom) {
-  //     if (editRoom.updatedAt > editRoom.createdAt) {
-  //       if (editRoom.members?.filter((m) => m.id === user?.id).length) {
-  //         setChatGroups((room) =>
-  //           room.map((r) => (r.id === editRoom.id ? editRoom : r)),
-  //         );
-  //       } else {
-  //         setChatGroups((rooms) => rooms.filter((r) => r.id !== editRoom.id));
-  //       }
-  //     } else {
-  //       const rooms = chatGroups;
-  //       const pinnedRoomsCount = rooms.filter((r) => r.isPinned).length;
-  //       rooms.splice(pinnedRoomsCount, 0, editRoom);
-  //       setChatGroups(rooms);
-  //       setEditRoom(undefined);
-  //     }
-  //   }
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [editRoom]);
+  useEffect(() => {
+    if (editRoom) {
+      if (editRoom.updatedAt > editRoom.createdAt) {
+        if (editRoom.members?.filter((m) => m.id === user?.id).length) {
+          setChatGroups((room) =>
+            room.map((r) => (r.id === editRoom.id ? editRoom : r)),
+          );
+        } else {
+          setChatGroups((rooms) => rooms.filter((r) => r.id !== editRoom.id));
+        }
+      } else {
+        const rooms = chatGroups;
+        const pinnedRoomsCount = rooms.filter((r) => r.isPinned).length;
+        rooms.splice(pinnedRoomsCount, 0, editRoom);
+        setChatGroups(rooms);
+        setEditRoom(undefined);
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [editRoom]);
 
   const setNewChatGroup = (room: ChatGroup | undefined) => {
     setEditRoom(room);
@@ -157,6 +165,10 @@ export const BadgeProvider: React.FC = ({ children }) => {
 
   const completeRefetch = () => {
     setRefetchGroupId(0);
+  };
+
+  const setChatGroupsState = (rooms: ChatGroup[]) => {
+    setChatGroups(rooms);
   };
 
   const handleEnterRoom = (roomId: number) => {
@@ -171,17 +183,13 @@ export const BadgeProvider: React.FC = ({ children }) => {
     }
   };
 
-  const refetchRoom = () => {
-    getRooms();
-  };
-
   return (
     <BadgeContext.Provider
       value={{
         unreadChatCount: chatUnreadCount,
         chatGroups,
+        setChatGroupsState,
         currentRoom,
-        refetchRoom,
         refetchGroupId,
         handleEnterRoom,
         completeRefetch,
