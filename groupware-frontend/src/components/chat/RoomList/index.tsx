@@ -1,12 +1,21 @@
 import { useAPIGetOneRoom } from '@/hooks/api/chat/useAPIGetOneRoom';
 import { useAPIGetRoomsByPage } from '@/hooks/api/chat/useAPIGetRoomsByPage';
-import { Box, Spinner, Text } from '@chakra-ui/react';
+import {
+  Box,
+  Input,
+  InputGroup,
+  InputLeftElement,
+  Spinner,
+  Text,
+} from '@chakra-ui/react';
 import React, { useEffect, useState } from 'react';
 import { useHandleBadge } from 'src/contexts/badge/useHandleBadge';
 import { useRoomRefetch } from 'src/contexts/chat/useRoomRefetch';
 import { ChatGroup } from 'src/types';
 import ChatGroupCard from '../ChatGroupCard';
 import { useAPISavePin } from '@/hooks/api/chat/useAPISavePin';
+import { AiOutlineSearch } from 'react-icons/ai';
+import { nameOfEmptyNameGroup } from 'src/utils/chat/nameOfEmptyNameGroup';
 
 type RoomListProps = {
   currentId?: string;
@@ -15,11 +24,13 @@ type RoomListProps = {
 
 const RoomList: React.FC<RoomListProps> = ({ currentId, onClickRoom }) => {
   const { clearRefetch, setNewChatGroup, newRoom } = useRoomRefetch();
-  const [page, setPage] = useState('1');
+  const [page, setPage] = useState(1);
   const { completeRefetch, refetchGroupId } = useHandleBadge();
   const [roomsForInfiniteScroll, setRoomsForInfiniteScroll] = useState<
     ChatGroup[]
   >([]);
+  const [isNeedRefetch, setIsNeedRefetch] = useState(false);
+  const [searchedRooms, setSearchedRooms] = useState<ChatGroup[]>();
 
   const { refetch: refetchRoom } = useAPIGetOneRoom(refetchGroupId, {
     enabled: false,
@@ -86,38 +97,53 @@ const RoomList: React.FC<RoomListProps> = ({ currentId, onClickRoom }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [newRoom]);
 
-  const onScroll = (e: any) => {
-    if (
-      e.target.scrollTop > e.target.scrollHeight / 2 &&
-      roomsForInfiniteScroll?.length >= Number(page) * 20
-    ) {
-      setPage((p) => (Number(p) + 1).toString());
-    }
-  };
+  // const onScroll = (e: any) => {
+  //   if (
+  //     e.target.scrollTop > e.target.scrollHeight / 2 &&
+  //     roomsForInfiniteScroll?.length >= Number(page) * 20
+  //   ) {
+  //     setPage((p) => (Number(p) + 1).toString());
+  //   }
+  // };
 
-  const stateRefreshNeeded = (newData: ChatGroup[]) => {
-    setRoomsForInfiniteScroll(newData);
-  };
+  // const stateRefreshNeeded = (newData: ChatGroup[]) => {
+  //   setRoomsForInfiniteScroll(newData);
+  // };
 
   const { refetch: refreshRooms, isLoading: loadingGetChatGroupList } =
     useAPIGetRoomsByPage(
       {
-        page: '1',
-        limit: (20 * Number(page)).toString(),
+        page: page.toString(),
+        limit: '20',
       },
       {
+        enabled: false,
         onSettled: clearRefetch,
         onSuccess: (data) => {
-          stateRefreshNeeded(data.rooms);
+          setRoomsForInfiniteScroll((r) =>
+            page !== 1 && r.length ? [...r, ...data.rooms] : [...data.rooms],
+          );
+          if (data.rooms.length >= 20) {
+            setPage((p) => p + 1);
+            setIsNeedRefetch(true);
+          } else {
+            setIsNeedRefetch(false);
+            setPage(1);
+          }
         },
       },
     );
 
-  // useEffect(() => {
-  //   if (refetchNeeded) {
-  //     refreshRooms();
-  //   }
-  // }, [refetchNeeded, refreshRooms]);
+  useEffect(() => {
+    console.log('first rendering -----------------------');
+    refreshRooms();
+  }, []);
+
+  useEffect(() => {
+    if (isNeedRefetch) {
+      refreshRooms();
+    }
+  }, [isNeedRefetch, refreshRooms]);
 
   useEffect(() => {
     if (refetchGroupId) {
@@ -131,26 +157,63 @@ const RoomList: React.FC<RoomListProps> = ({ currentId, onClickRoom }) => {
       flexDir="column"
       alignItems="center"
       h="100%"
-      overflowY="auto"
-      onScroll={onScroll}>
+      overflowY="auto">
+      <InputGroup>
+        <InputLeftElement pointerEvents="none">
+          <AiOutlineSearch />
+        </InputLeftElement>
+        <Input
+          type="search"
+          placeholder="名前で検索"
+          onChange={(e) => {
+            const filteredRooms = roomsForInfiniteScroll.filter((r) => {
+              const regex = new RegExp(e.target.value);
+              return r.name
+                ? regex.test(r.name)
+                : regex.test(nameOfEmptyNameGroup(r.members));
+            });
+            setSearchedRooms(filteredRooms);
+          }}
+        />
+      </InputGroup>
       {roomsForInfiniteScroll.length ? (
-        roomsForInfiniteScroll.map((g) => (
-          <a
-            onClick={() => g.id === Number(currentId) || onClickRoom(g)}
-            key={g.id}
-            style={{ width: '100%' }}>
-            <Box w="100%" mb={'8px'}>
-              <ChatGroupCard
-                isSelected={Number(currentId) === g.id}
-                onPressPinButton={() => {
-                  savePin({ ...g, isPinned: !g.isPinned });
-                }}
-                chatGroup={g}
-                key={g.id}
-              />
-            </Box>
-          </a>
-        ))
+        searchedRooms ? (
+          searchedRooms.map((g) => (
+            <a
+              onClick={() => g.id === Number(currentId) || onClickRoom(g)}
+              key={g.id}
+              style={{ width: '100%' }}>
+              <Box w="100%" mb={'8px'}>
+                <ChatGroupCard
+                  isSelected={Number(currentId) === g.id}
+                  onPressPinButton={() => {
+                    savePin({ ...g, isPinned: !g.isPinned });
+                  }}
+                  chatGroup={g}
+                  key={g.id}
+                />
+              </Box>
+            </a>
+          ))
+        ) : (
+          roomsForInfiniteScroll.map((g) => (
+            <a
+              onClick={() => g.id === Number(currentId) || onClickRoom(g)}
+              key={g.id}
+              style={{ width: '100%' }}>
+              <Box w="100%" mb={'8px'}>
+                <ChatGroupCard
+                  isSelected={Number(currentId) === g.id}
+                  onPressPinButton={() => {
+                    savePin({ ...g, isPinned: !g.isPinned });
+                  }}
+                  chatGroup={g}
+                  key={g.id}
+                />
+              </Box>
+            </a>
+          ))
+        )
       ) : loadingGetChatGroupList ? (
         <Spinner />
       ) : (
@@ -159,7 +222,11 @@ const RoomList: React.FC<RoomListProps> = ({ currentId, onClickRoom }) => {
         </Box>
       )}
       {roomsForInfiniteScroll.length && loadingGetChatGroupList ? (
-        <Spinner />
+        <Box>
+          ただいま全てのルームを取得しています。{'\n'}
+          しばらくの間お待ちください
+          <Spinner />
+        </Box>
       ) : null}
     </Box>
   );
