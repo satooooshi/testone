@@ -86,7 +86,7 @@ const RoomList: React.FC<RoomListProps> = ({ currentId, onClickRoom }) => {
         />
       </InputGroup>
       {chatRooms.length ? (
-        searchedRooms ? (
+        searchedRooms.length ? (
           searchedRooms.map((g) => (
             <a
               onClick={() => g.id === Number(currentId) || onClickRoom(g)}
