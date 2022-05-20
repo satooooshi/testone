@@ -72,6 +72,7 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
   const {data: users} = useAPIGetUsers('ALL');
   const [visibleTagModal, setVisibleTagModal] = useState(false);
   const [visibleUserModal, setVisibleUserModal] = useState(false);
+  const [willSubmit, setWillSubmit] = useState(false);
   const initialEventValue = {
     title: '',
     description: '',
@@ -104,8 +105,16 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
   });
 
   useEffect(() => {
-    isSuccess && resetForm();
+    if (isSuccess) {
+      resetForm();
+    }
   }, [isSuccess, resetForm]);
+
+  useEffect(() => {
+    if (willSubmit) {
+      onComplete();
+    }
+  }, [willSubmit, onComplete]);
 
   const [dateTimeModal, setDateTimeModal] = useState<DateTimeModalStateValue>({
     visible: undefined,
@@ -133,7 +142,7 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
     if (messages) {
       Alert.alert(messages);
     } else {
-      onComplete();
+      setWillSubmit(true);
     }
   };
   const normalizeURL = (url: string) => {
