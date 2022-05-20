@@ -120,6 +120,10 @@ const RoomList: React.FC<RoomListProps> = ({ currentId, onClickRoom }) => {
         enabled: false,
         onSettled: clearRefetch,
         onSuccess: (data) => {
+          console.log(
+            'call refresh rooms ---------------------',
+            data.rooms.length,
+          );
           setRoomsForInfiniteScroll((r) =>
             page !== 1 && r.length ? [...r, ...data.rooms] : [...data.rooms],
           );
@@ -215,18 +219,20 @@ const RoomList: React.FC<RoomListProps> = ({ currentId, onClickRoom }) => {
           ))
         )
       ) : loadingGetChatGroupList ? (
-        <Spinner />
+        <Box display={'flex'} flexFlow="column" alignItems={'center'}>
+          <Box>
+            ただいま全てのルームを取得しています。{'\n'}
+            しばらくの間お待ちください
+          </Box>
+          <Spinner />
+        </Box>
       ) : (
         <Box wordBreak="break-all">
           <Text>ルームを作成するか、招待をお待ちください</Text>
         </Box>
       )}
       {roomsForInfiniteScroll.length && loadingGetChatGroupList ? (
-        <Box>
-          ただいま全てのルームを取得しています。{'\n'}
-          しばらくの間お待ちください
-          <Spinner />
-        </Box>
+        <Spinner />
       ) : null}
     </Box>
   );
