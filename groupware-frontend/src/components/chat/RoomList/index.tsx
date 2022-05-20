@@ -97,19 +97,6 @@ const RoomList: React.FC<RoomListProps> = ({ currentId, onClickRoom }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [newRoom]);
 
-  // const onScroll = (e: any) => {
-  //   if (
-  //     e.target.scrollTop > e.target.scrollHeight / 2 &&
-  //     roomsForInfiniteScroll?.length >= Number(page) * 20
-  //   ) {
-  //     setPage((p) => (Number(p) + 1).toString());
-  //   }
-  // };
-
-  // const stateRefreshNeeded = (newData: ChatGroup[]) => {
-  //   setRoomsForInfiniteScroll(newData);
-  // };
-
   const { refetch: refreshRooms, isLoading: loadingGetChatGroupList } =
     useAPIGetRoomsByPage(
       {
