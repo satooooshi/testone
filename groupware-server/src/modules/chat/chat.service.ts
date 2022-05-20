@@ -117,7 +117,7 @@ export class ChatService {
       .leftJoinAndSelect('lastReadChatTime.user', 'lastReadChatTime.user')
       .where('member.id = :memberId', { memberId: userID })
       .andWhere(
-        updatedAtLatestRoom
+        !!updatedAtLatestRoom
           ? `chat_groups.updatedAt > :updatedAtLatestRoom`
           : '1=1',
         {
@@ -162,6 +162,11 @@ export class ChatService {
       ['desc', 'desc'],
     ]).reverse();
     const pageCount = Math.floor(count / Number(limit)) + 1;
+    // console.log(
+    //   'call ==================================',
+    //   rooms.length,
+    //   pageCount,
+    // );
     return { rooms, pageCount };
   }
 
@@ -250,7 +255,7 @@ export class ChatService {
     userID: number,
     query: GetMessagesQuery,
   ): Promise<ChatMessage[]> {
-    const { after, before, include = false, limit = '20' } = query;
+    const { after, before, include = false, limit = '20', storedAt } = query;
 
     if (Number(limit) === 0) {
       return [];
@@ -284,6 +289,14 @@ export class ChatService {
           ? 'chat_messages.id < :before'
           : '1=1',
         { before },
+      )
+      .andWhere(
+        storedAt
+          ? 'CASE WHEN chat_messages.createdAt < chat_messages.updatedAt THEN chat_messages.updatedAt > :storedAt ELSE null END'
+          : '1=1',
+        {
+          storedAt: new Date(storedAt),
+        },
       )
       .take(Number(limit))
       .orderBy('chat_messages.createdAt', after ? 'ASC' : 'DESC')
@@ -635,6 +648,20 @@ export class ChatService {
   }
 
   public async deleteReaction(reactionId: number): Promise<number> {
+    const existReaction = await this.chatMessageReactionRepository.findOne(
+      reactionId,
+      {
+        relations: ['chatMessage'],
+      },
+    );
+    const existMessages = await this.chatMessageRepository.findOne(
+      existReaction.chatMessage.id,
+    );
+
+    await this.chatMessageRepository.save({
+      ...existMessages,
+      updatedAt: new Date(),
+    });
     await this.chatMessageReactionRepository.delete(reactionId);
     return reactionId;
   }
@@ -644,6 +671,9 @@ export class ChatService {
     userID: number,
   ): Promise<ChatMessageReaction> {
     const existUser = await this.userRepository.findOne(userID);
+    const existMessages = await this.chatMessageRepository.findOne(
+      reaction.chatMessage.id,
+    );
     const existReaction = await this.chatMessageReactionRepository.findOne({
       where: {
         emoji: reaction.emoji,
@@ -661,6 +691,10 @@ export class ChatService {
     const savedReaction = await this.chatMessageReactionRepository.save(
       reactionWithUser,
     );
+    await this.chatMessageRepository.save({
+      ...existMessages,
+      updatedAt: new Date(),
+    });
     return { ...savedReaction, isSender: true };
   }
 

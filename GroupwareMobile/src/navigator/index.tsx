@@ -48,7 +48,7 @@ const Navigator = () => {
       console.log('RegisterDevice success--------', updatedInfo);
     },
     onError: () => {
-      Alert.alert('fail to register device');
+      console.log('fail to register device');
     },
   });
   const {
