@@ -149,7 +149,7 @@ android {
         applicationId "com.groupwaremobileTest"
         minSdkVersion 26
         targetSdkVersion 31
-        versionCode 55
+        versionCode 56
         versionName "1.0"
         //react-native-image-crop-picker
         vectorDrawables.useSupportLibrary = true
