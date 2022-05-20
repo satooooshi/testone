@@ -48,6 +48,7 @@ const UserCardList: React.FC<UserCardListProps> = ({
   );
   const sortDropdownRef = useRef<any | null>(null);
   const durationDropdownRef = useRef<any | null>(null);
+  const flatListRef = useRef<FlatList | null>(null);
 
   const onEndReached = () => {
     setSearchQuery(q => ({...q, page: (Number(q?.page) + 1).toString()}));
@@ -94,6 +95,7 @@ const UserCardList: React.FC<UserCardListProps> = ({
 
   useEffect(() => {
     if (focused) {
+      flatListRef?.current?.scrollToOffset({animated: true, offset: 0});
       setSearchQuery(q => ({...q, page: '1'}));
       refetch();
     }
@@ -102,12 +104,13 @@ const UserCardList: React.FC<UserCardListProps> = ({
   useEffect(() => {
     if (!isRefetching && users?.users) {
       setUsersForInfiniteScroll(u => {
-        if (u.length) {
+        if (u.length && searchQuery?.page !== '1') {
           return [...u, ...users.users];
         }
         return users?.users;
       });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [users?.users, isRefetching]);
 
   return (
@@ -180,6 +183,7 @@ const UserCardList: React.FC<UserCardListProps> = ({
       </Div>
       {usersForInfiniteScroll?.length ? (
         <FlatList
+          ref={flatListRef}
           data={usersForInfiniteScroll}
           onEndReached={onEndReached}
           onEndReachedThreshold={0.5}
