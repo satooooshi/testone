@@ -162,11 +162,7 @@ export class ChatService {
       ['desc', 'desc'],
     ]).reverse();
     const pageCount = Math.floor(count / Number(limit)) + 1;
-    // console.log(
-    //   'call ==================================',
-    //   rooms.length,
-    //   pageCount,
-    // );
+
     return { rooms, pageCount };
   }
 

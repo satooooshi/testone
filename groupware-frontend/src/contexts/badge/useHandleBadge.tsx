@@ -21,7 +21,6 @@ const BadgeContext = createContext({
   setChatGroupsState: (() => {}) as (rooms: ChatGroup[]) => void,
   refetchGroupId: 0,
   handleEnterRoom: (() => {}) as (roomId: number) => void,
-  completeRefetch: () => {},
   editRoom: {} as ChatGroup | undefined,
   setNewChatGroup: (() => {}) as (room: ChatGroup | undefined) => void,
 });
@@ -34,6 +33,8 @@ export const BadgeProvider: React.FC = ({ children }) => {
   const [refetchGroupId, setRefetchGroupId] = useState(0);
   const { user, currentChatRoomId } = useAuthenticate();
   const [editRoom, setEditRoom] = useState<ChatGroup>();
+  const [completeRefetch, setCompleteRefetch] = useState(false);
+
   const socket = io(baseURL, {
     transports: ['websocket'],
   });
@@ -61,6 +62,7 @@ export const BadgeProvider: React.FC = ({ children }) => {
         } else {
           setIsNeedRefetch(false);
           setPage(1);
+          setCompleteRefetch(true);
         }
       },
     },
@@ -89,7 +91,7 @@ export const BadgeProvider: React.FC = ({ children }) => {
       ) {
         setChatUnreadCount((count) => count + 1);
       }
-      completeRefetch();
+      setRefetchGroupId(0);
     },
   });
 
@@ -102,6 +104,7 @@ export const BadgeProvider: React.FC = ({ children }) => {
 
   useEffect(() => {
     if (isNeedRefetch) {
+      setIsNeedRefetch(false);
       refetchAllRooms();
     }
   }, [isNeedRefetch, refetchAllRooms]);
@@ -143,15 +146,16 @@ export const BadgeProvider: React.FC = ({ children }) => {
 
   useEffect(
     () => {
-      if (!isNeedRefetch && chatGroups.length) {
+      if (completeRefetch && chatGroups.length) {
         socket.emit(
           'setChatGroups',
           chatGroups.map((g) => g.id),
         );
+        setCompleteRefetch(false);
         console.log('-----====---===---==', chatGroups.length);
       }
     }, // eslint-disable-next-line react-hooks/exhaustive-deps
-    [isNeedRefetch],
+    [completeRefetch, chatGroups],
   );
 
   useEffect(() => {
@@ -185,10 +189,6 @@ export const BadgeProvider: React.FC = ({ children }) => {
     setEditRoom(room);
   };
 
-  const completeRefetch = () => {
-    setRefetchGroupId(0);
-  };
-
   const setChatGroupsState = (rooms: ChatGroup[]) => {
     setChatGroups(rooms);
   };
@@ -212,7 +212,6 @@ export const BadgeProvider: React.FC = ({ children }) => {
         setChatGroupsState,
         refetchGroupId,
         handleEnterRoom,
-        completeRefetch,
         editRoom,
         setNewChatGroup,
       }}>
