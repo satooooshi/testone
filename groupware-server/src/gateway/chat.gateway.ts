@@ -75,28 +75,22 @@ export class ChatGateway
   }
 
   @SubscribeMessage('unsetChatGroups')
-  public unsetChatGroups(client: Socket, rooms: ChatGroup[]): void {
+  public unsetChatGroups(client: Socket, roomIds: number[]): void {
     //@TODO dbにグループがなかったらエラーを吐く
-    for (const room of rooms) {
-      if (room?.id) {
-        client.leave(room.id.toString());
+    for (const roomId of roomIds) {
+      if (roomId) {
+        client.leave(roomId.toString());
       }
     }
   }
   @SubscribeMessage('setChatGroup')
-  public setChatGroup(client: Socket, room: ChatGroup): void {
-    //@TODO dbにグループがなかったらエラーを吐く
-    if (room?.id) {
-      client.join(room.id.toString());
-    }
+  public setChatGroup(client: Socket, roomId: number): void {
+    client.join(roomId.toString());
   }
 
   @SubscribeMessage('unsetChatGroup')
-  public unsetChatGroup(client: Socket, room: ChatGroup): void {
-    //@TODO dbにグループがなかったらエラーを吐く
-    if (room?.id) {
-      client.leave(room.id.toString());
-    }
+  public unsetChatGroup(client: Socket, roomId: number): void {
+    client.leave(roomId.toString());
   }
 
   @SubscribeMessage('leaveRoom')

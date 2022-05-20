@@ -73,6 +73,9 @@ export const BadgeProvider: React.FC = ({ children }) => {
     },
     onSuccess: (data) => {
       const rooms = chatGroups.filter((r) => r.id !== data.id);
+      if (chatGroups.length === rooms.length) {
+        socket.emit('setChatGroup', data.id);
+      }
       if (data.isPinned) {
         setChatGroups([...[data], ...rooms]);
       } else {
@@ -112,9 +115,6 @@ export const BadgeProvider: React.FC = ({ children }) => {
   useEffect(
     () => {
       socket.connect();
-      if (chatGroups.length) {
-        socket.emit('setChatGroups', chatGroups);
-      }
       socket.on('editRoomClient', async (room: ChatGroup) => {
         console.log('-----------');
 
@@ -129,10 +129,29 @@ export const BadgeProvider: React.FC = ({ children }) => {
         },
       );
       return () => {
+        if (chatGroups.length) {
+          socket.emit(
+            'unsetChatGroups',
+            chatGroups.map((g) => g.id),
+          );
+        }
         socket.disconnect();
       };
     }, // eslint-disable-next-line react-hooks/exhaustive-deps
     [user, chatGroups],
+  );
+
+  useEffect(
+    () => {
+      if (!isNeedRefetch && chatGroups.length) {
+        socket.emit(
+          'setChatGroups',
+          chatGroups.map((g) => g.id),
+        );
+        console.log('-----====---===---==', chatGroups.length);
+      }
+    }, // eslint-disable-next-line react-hooks/exhaustive-deps
+    [isNeedRefetch],
   );
 
   useEffect(() => {
@@ -147,9 +166,11 @@ export const BadgeProvider: React.FC = ({ children }) => {
             ),
           );
         } else {
+          socket.emit('unsetChatGroup', editRoom.id);
           setChatGroups((rooms) => rooms.filter((r) => r.id !== editRoom.id));
         }
       } else {
+        socket.emit('setChatGroup', editRoom.id);
         const rooms = chatGroups;
         const pinnedRoomsCount = rooms.filter((r) => r.isPinned).length;
         rooms.splice(pinnedRoomsCount, 0, editRoom);
