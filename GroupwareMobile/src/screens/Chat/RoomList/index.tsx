@@ -1,8 +1,7 @@
 import {useFocusEffect, useNavigation} from '@react-navigation/native';
-import {AxiosError} from 'axios';
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useCallback, useState} from 'react';
 import {Alert, TouchableHighlight, TouchableOpacity} from 'react-native';
-import {Button, Div, Icon, Input, ScrollDiv, Text} from 'react-native-magnus';
+import {Div, Icon, Input, ScrollDiv, Text} from 'react-native-magnus';
 import {ActivityIndicator} from 'react-native-paper';
 import tailwind from 'tailwind-rn';
 import RoomCard from '../../../components/chat/RoomCard';
@@ -10,8 +9,6 @@ import UserModal from '../../../components/common/UserModal';
 import HeaderWithTextButton from '../../../components/Header';
 import WholeContainer from '../../../components/WholeContainer';
 import {useHandleBadge} from '../../../contexts/badge/useHandleBadge';
-import {useAPIGetOneRoom} from '../../../hooks/api/chat/useAPIGetOneRoom';
-import {useAPIGetRooms} from '../../../hooks/api/chat/useAPIGetRoomsByPage';
 import {useAPISaveChatGroup} from '../../../hooks/api/chat/useAPISaveChatGroup';
 import {useAPISavePin} from '../../../hooks/api/chat/useAPISavePin';
 import {useAPIGetUsers} from '../../../hooks/api/user/useAPIGetUsers';
@@ -19,26 +16,19 @@ import {useUserRole} from '../../../hooks/user/useUserRole';
 import {ChatGroup, RoomType} from '../../../types';
 import {RoomListNavigationProps} from '../../../types/navigator/drawerScreenProps';
 import {nameOfRoom} from '../../../utils/factory/chat/nameOfRoom';
-import {storage} from '../../../utils/url';
 
 const RoomList: React.FC = () => {
   const navigation = useNavigation<RoomListNavigationProps>();
-  const [page, setPage] = useState(1);
-  const [latestPage, setLatestPage] = useState(1);
   const {setNewChatGroup} = useHandleBadge();
   const [roomTypeSelector, setRoomTypeSelector] = useState(false);
   const [userModal, setVisibleUserModal] = useState(false);
   const {data: users} = useAPIGetUsers('');
-  const {completeRefetch, refetchGroupId, chatGroups, setChatGroupsState} =
-    useHandleBadge();
+  const {chatGroups, setChatGroupsState} = useHandleBadge();
   const {selectedUserRole, filteredUsers} = useUserRole('All', users);
   const [creationType, setCreationType] = useState<RoomType>();
   const [searchedRooms, setSearchedRooms] = useState<ChatGroup[]>();
   const [chatRooms, setChatRooms] = useState<ChatGroup[]>(chatGroups);
   const [isNeedRefetch, setIsNeedRefetch] = useState<boolean>(false);
-  const [isNeedRefetchLatest, setIsNeedRefetchLatest] =
-    useState<boolean>(false);
-  const [latestRooms, setLatestRooms] = useState<ChatGroup[]>([]);
 
   const {mutate: createGroup} = useAPISaveChatGroup({
     onSuccess: createdData => {
@@ -85,7 +75,6 @@ const RoomList: React.FC = () => {
 
   useFocusEffect(
     useCallback(() => {
-      console.log('--------', chatGroups);
       setChatRooms(chatGroups);
     }, [chatGroups]),
   );
@@ -205,17 +194,8 @@ const RoomList: React.FC = () => {
             />
           }
         />
-        <Button
-          w={30}
-          h={30}
-          fontSize={10}
-          onPress={() => {
-            storage.delete('roomList');
-            setPage(1);
-          }}
-        />
 
-        {chatRooms.length && !isNeedRefetch ? (
+        {chatRooms.length ? (
           <ScrollDiv h={'80%'}>
             {searchedRooms
               ? searchedRooms.map(room => {

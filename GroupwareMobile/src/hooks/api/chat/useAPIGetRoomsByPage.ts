@@ -8,7 +8,6 @@ export interface GetRoomsQuery {
   page?: string;
   limit?: string;
   updatedAtLatestRoom?: Date;
-  isLatest?: boolean;
 }
 
 export interface GetRoomsResult {
@@ -29,7 +28,7 @@ export const useAPIGetRooms = (
   options?: UseQueryOptions<GetRoomsResult, AxiosError>,
 ) => {
   return useQuery<GetRoomsResult, AxiosError>(
-    [query.isLatest ? 'getRoomsLatest' : 'getRooms', query],
+    ['getRooms', query],
     () => getRooms(query),
     options,
   );

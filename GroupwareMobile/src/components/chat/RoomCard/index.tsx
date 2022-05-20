@@ -31,22 +31,6 @@ const RoomCard: React.FC<RoomCardProps> = ({
   const ref = useRef<Swipeable>(null);
   const {width: windowWidth} = useWindowDimensions();
   const {user} = useAuthenticate();
-  const {currentRoom} = useHandleBadge();
-  const [unreadCount, setUnreadCount] = useState(
-    room.unreadCount ? room.unreadCount : 0,
-  );
-
-  // useEffect(() => {
-  //   if (room.unreadCount) {
-  //     setUnreadCount(room.unreadCount);
-  //   }
-  // }, [room.unreadCount]);
-
-  // useEffect(() => {
-  //   if (currentRoom?.id === room.id) {
-  //     setUnreadCount(currentRoom.unreadCount ? currentRoom.unreadCount : 0);
-  //   }
-  // }, [currentRoom, setUnreadCount, room.id]);
 
   const rightSwipeActions = () => {
     return (

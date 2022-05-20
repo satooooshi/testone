@@ -92,13 +92,6 @@ export class ChatService {
       offset = (Number(page) - 1) * Number(limit);
     }
 
-    // console.log(
-    //   'updated At latest ====================',
-    //   typeof updatedAtLatestRoom,
-    //   updatedAtLatestRoom,
-    //   DateTime.fromJSDate(new Date(updatedAtLatestRoom)).toSQL(),
-    // );
-
     const [urlUnparsedRooms, count] = await this.chatGroupRepository
       .createQueryBuilder('chat_groups')
       .leftJoinAndSelect('chat_groups.members', 'members')
@@ -124,7 +117,7 @@ export class ChatService {
       .leftJoinAndSelect('lastReadChatTime.user', 'lastReadChatTime.user')
       .where('member.id = :memberId', { memberId: userID })
       .andWhere(
-        !!updatedAtLatestRoom
+        updatedAtLatestRoom
           ? `chat_groups.updatedAt > :updatedAtLatestRoom`
           : '1=1',
         {
@@ -143,10 +136,13 @@ export class ChatService {
         const hasBeenRead = g?.lastReadChatTime?.[0]?.readTime
           ? g?.lastReadChatTime?.[0]?.readTime > g.updatedAt
           : false;
-        if (!hasBeenRead && g?.lastReadChatTime?.[0]?.readTime) {
+        if (!hasBeenRead) {
           const query = {
             group: g.id,
-            lastReadTime: g.lastReadChatTime?.[0].readTime,
+            lastReadTime:
+              g.lastReadChatTime?.[0] && g.lastReadChatTime?.[0].readTime
+                ? g.lastReadChatTime?.[0].readTime
+                : g.createdAt,
           };
           unreadCount = await this.getUnreadChatMessage(userID, query);
         }
@@ -204,10 +200,13 @@ export class ChatService {
     room.hasBeenRead = room?.lastReadChatTime?.[0]?.readTime
       ? room?.lastReadChatTime?.[0]?.readTime > room.updatedAt
       : false;
-    if (!room.hasBeenRead && room?.lastReadChatTime?.[0]?.readTime) {
+    if (!room.hasBeenRead) {
       const query = {
         group: room.id,
-        lastReadTime: room.lastReadChatTime?.[0].readTime,
+        lastReadTime:
+          room?.lastReadChatTime?.[0] && room?.lastReadChatTime?.[0]?.readTime
+            ? room.lastReadChatTime?.[0].readTime
+            : room?.createdAt,
       };
 
       room.unreadCount = await this.getUnreadChatMessage(userID, query);
@@ -426,6 +425,9 @@ export class ChatService {
     if (!existGroup) {
       throw new BadRequestException('That group id is incorrect');
     }
+    if (!existGroup.members.filter((m) => m.id === message.sender.id).length) {
+      throw new BadRequestException('sender is not a member of this group');
+    }
     const savedMessage = await this.chatMessageRepository.save(
       this.chatMessageRepository.create(message),
     );
@@ -560,6 +562,7 @@ export class ChatService {
       this.chatGroupRepository.create({
         ...existGroup,
         ...newData,
+        updatedAt: new Date(),
       }),
     );
     if (existGroup.name !== newGroup.name) {
