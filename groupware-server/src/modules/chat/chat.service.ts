@@ -406,13 +406,15 @@ export class ChatService {
     if (!message.chatGroup || !message.chatGroup.id) {
       throw new BadRequestException('No group is selected');
     }
-    const existGroup = await this.chatGroupRepository.findOne(
-      message.chatGroup.id,
-    );
+    const existGroup = await this.chatGroupRepository.findOne({
+      where: { id: message.chatGroup.id },
+      relations: ['members'],
+    });
     if (!existGroup) {
       throw new BadRequestException('That group id is incorrect');
-    }
-    if (!existGroup.members.filter((m) => m.id === message.sender.id).length) {
+    } else if (
+      !existGroup?.members.filter((m) => m?.id === message?.sender?.id).length
+    ) {
       throw new BadRequestException('sender is not a member of this group');
     }
     const savedMessage = await this.chatMessageRepository.save(
