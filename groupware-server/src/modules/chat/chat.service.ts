@@ -195,10 +195,13 @@ export class ChatService {
     room.hasBeenRead = room?.lastReadChatTime?.[0]?.readTime
       ? room?.lastReadChatTime?.[0]?.readTime > room.updatedAt
       : false;
-    if (!room.hasBeenRead && room?.lastReadChatTime?.[0]?.readTime) {
+    if (!room.hasBeenRead) {
       const query = {
         group: room.id,
-        lastReadTime: room.lastReadChatTime?.[0].readTime,
+        lastReadTime:
+          room?.lastReadChatTime?.[0] && room?.lastReadChatTime?.[0]?.readTime
+            ? room.lastReadChatTime?.[0].readTime
+            : room?.createdAt,
       };
 
       room.unreadCount = await this.getUnreadChatMessage(userID, query);
