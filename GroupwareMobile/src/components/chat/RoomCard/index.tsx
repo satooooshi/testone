@@ -17,7 +17,7 @@ import {useHandleBadge} from '../../../contexts/badge/useHandleBadge';
 type RoomCardProps = {
   room: ChatGroup;
   onPress: () => void;
-  onPressPinButton: () => void;
+  onPressPinButton?: () => void;
   //this param overrides every background color
   dangerousBgColor?: string;
 };
