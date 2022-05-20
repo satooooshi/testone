@@ -6,7 +6,7 @@ import {
   InputLeftElement,
   Spinner,
   Text,
-  useFocusEffect,
+  Input,
 } from '@chakra-ui/react';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useHandleBadge } from 'src/contexts/badge/useHandleBadge';
@@ -15,7 +15,6 @@ import { ChatGroup } from 'src/types';
 import ChatGroupCard from '../ChatGroupCard';
 import { useAPISavePin } from '@/hooks/api/chat/useAPISavePin';
 import { AiOutlineSearch } from 'react-icons/ai';
-import { Input } from 'react-rainbow-components';
 import { nameOfEmptyNameGroup } from 'src/utils/chat/nameOfEmptyNameGroup';
 
 type RoomListProps = {
@@ -87,7 +86,7 @@ const RoomList: React.FC<RoomListProps> = ({ currentId, onClickRoom }) => {
         />
       </InputGroup>
       {chatRooms.length ? (
-        searchedRooms ? (
+        searchedRooms.length ? (
           searchedRooms.map((g) => (
             <a
               onClick={() => g.id === Number(currentId) || onClickRoom(g)}
