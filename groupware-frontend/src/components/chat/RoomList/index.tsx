@@ -128,7 +128,6 @@ const RoomList: React.FC<RoomListProps> = ({ currentId, onClickRoom }) => {
           <Text>ルームを作成するか、招待をお待ちください</Text>
         </Box>
       )}
-      {chatRooms.length ? <Spinner /> : null}
     </Box>
   );
 };
