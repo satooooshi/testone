@@ -467,7 +467,6 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
                 room: room.id.toString(),
                 senderId: user?.id,
               });
-              handleEnterRoom(room.id);
             },
           });
           refetchLastReadChatTime();

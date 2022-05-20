@@ -11,7 +11,6 @@ import {
 } from '@chakra-ui/react';
 import { darkFontColor } from 'src/utils/colors';
 import { RiPushpin2Fill, RiPushpin2Line } from 'react-icons/ri';
-import { useHandleBadge } from 'src/contexts/badge/useHandleBadge';
 
 type ChatGroupCardProps = {
   chatGroup: ChatGroup;
@@ -24,21 +23,6 @@ const ChatGroupCard: React.FC<ChatGroupCardProps> = ({
   isSelected = false,
   onPressPinButton,
 }) => {
-  const { currentRoom } = useHandleBadge();
-  const [unreadCount, setUnreadCount] = useState(
-    chatGroup.unreadCount ? chatGroup.unreadCount : 0,
-  );
-
-  useEffect(() => {
-    if (chatGroup.unreadCount) setUnreadCount(chatGroup.unreadCount);
-  }, [chatGroup.unreadCount]);
-
-  useEffect(() => {
-    if (currentRoom?.id === chatGroup.id) {
-      setUnreadCount(currentRoom?.unreadCount ? currentRoom.unreadCount : 0);
-    }
-  }, [currentRoom, setUnreadCount, chatGroup.id]);
-
   const [isSmallerThan768] = useMediaQuery('max-width: 768px');
   const nameOfEmptyNameGroup = (members?: User[]): string => {
     if (!members) {
@@ -74,7 +58,9 @@ const ChatGroupCard: React.FC<ChatGroupCardProps> = ({
       boxShadow="md"
       w={'100%'}
       h="fit-content"
-      bg={isSelected ? 'gray.200' : unreadCount ? 'white' : '#f2f1f2'}>
+      bg={
+        isSelected ? 'gray.200' : chatGroup.unreadCount ? 'white' : '#f2f1f2'
+      }>
       <Avatar src={chatGroup.imageURL} size="md" mr="8px" />
       <Box
         display="flex"
@@ -97,7 +83,9 @@ const ChatGroupCard: React.FC<ChatGroupCardProps> = ({
           </Text>
 
           <Box display="flex" flexDir="row">
-            {isSelected == false && unreadCount > 0 ? (
+            {isSelected == false &&
+            chatGroup?.unreadCount &&
+            chatGroup.unreadCount > 0 ? (
               <Badge
                 bg="green"
                 color="white"
@@ -107,7 +95,7 @@ const ChatGroupCard: React.FC<ChatGroupCardProps> = ({
                 borderRadius="50%"
                 textAlign="center"
                 lineHeight="30px">
-                {unreadCount}
+                {chatGroup.unreadCount}
               </Badge>
             ) : null}
             {!!chatGroup.isPinned ? (

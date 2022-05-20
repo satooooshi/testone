@@ -17,7 +17,6 @@ import { useAPIGetOneRoom } from '@/hooks/api/chat/useAPIGetOneRoom';
 
 const BadgeContext = createContext({
   unreadChatCount: 0,
-  currentRoom: {} as { id: number; unreadCount: number } | undefined,
   chatGroups: [] as ChatGroup[],
   setChatGroupsState: (() => {}) as (rooms: ChatGroup[]) => void,
   refetchGroupId: 0,
@@ -29,8 +28,6 @@ const BadgeContext = createContext({
 
 export const BadgeProvider: React.FC = ({ children }) => {
   const [chatUnreadCount, setChatUnreadCount] = useState(0);
-  const [currentRoom, setCurrentRoom] =
-    useState<{ id: number; unreadCount: number }>();
   const [page, setPage] = useState(1);
   const [isNeedRefetch, setIsNeedRefetch] = useState(false);
   const [chatGroups, setChatGroups] = useState<ChatGroup[]>([]);
@@ -173,7 +170,6 @@ export const BadgeProvider: React.FC = ({ children }) => {
 
   const handleEnterRoom = (roomId: number) => {
     const targetRoom = chatGroups.filter((g) => g.id === roomId);
-    setCurrentRoom({ id: targetRoom[0].id, unreadCount: 0 });
     const unreadCount = targetRoom[0]?.unreadCount;
     if (unreadCount) {
       setChatUnreadCount((c) => (c - unreadCount >= 0 ? c - unreadCount : 0));
