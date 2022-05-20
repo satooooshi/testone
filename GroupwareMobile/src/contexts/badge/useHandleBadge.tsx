@@ -29,6 +29,7 @@ export const BadgeProvider: React.FC = ({children}) => {
   const [page, setPage] = useState(1);
   const [isNeedRefetch, setIsNeedRefetch] = useState(false);
   const [completeRefetch, setCompleteRefetch] = useState(false);
+  const [updateSocket, setUpdateSocket] = useState(false);
   const [networkConnection, setNetworkConnection] = useState(true);
   const [editRoom, setEditRoom] = useState<ChatGroup>();
 
@@ -74,11 +75,28 @@ export const BadgeProvider: React.FC = ({children}) => {
           'unsetChatGroups',
           chatGroups.map(g => g.id),
         );
+        setUpdateSocket(!updateSocket);
       }
       refetchAllRooms();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [networkConnection, user]);
+
+  // useEffect(
+  //   () => {
+  //     socket.connect();
+  //     return () => {
+  //       if (chatGroups.length) {
+  //         socket.emit(
+  //           'unsetChatGroups',
+  //           chatGroups.map(g => g.id),
+  //         );
+  //       }
+  //       socket.disconnect();
+  //     };
+  //   }, // eslint-disable-next-line react-hooks/exhaustive-deps
+  //   [user],
+  // );
 
   useEffect(() => {
     const unsubscribe = NetInfo.addEventListener(state => {
@@ -108,6 +126,9 @@ export const BadgeProvider: React.FC = ({children}) => {
       let rooms = chatGroups.filter(r => r.id !== data.id);
       if (chatGroups.length === rooms.length) {
         socket.emit('setChatGroup', data.id);
+        console.log('888888888');
+
+        setUpdateSocket(!updateSocket);
       }
       if (data.isPinned) {
         setChatGroups([...[data], ...rooms]);
@@ -151,39 +172,34 @@ export const BadgeProvider: React.FC = ({children}) => {
 
   useEffect(
     () => {
-      socket.connect();
-      return () => {
-        if (chatGroups.length) {
-          socket.emit(
-            'unsetChatGroups',
-            chatGroups.map(g => g.id),
-          );
-        }
-        socket.disconnect();
-      };
-    }, // eslint-disable-next-line react-hooks/exhaustive-deps
-    [user],
-  );
-
-  useEffect(
-    () => {
       if (completeRefetch && chatGroups.length) {
         socket.emit(
           'setChatGroups',
           chatGroups.map(g => g.id),
         );
-        socket.on('editRoomClient', async (room: ChatGroup) => {
-          console.log('-----------');
-
-          if (room?.id) {
-            setEditRoom(room);
-          }
-        });
+        setUpdateSocket(!updateSocket);
         setCompleteRefetch(false);
         console.log('-----====---===---==', chatGroups.length);
       }
     }, // eslint-disable-next-line react-hooks/exhaustive-deps
     [completeRefetch, chatGroups],
+  );
+
+  useEffect(
+    () => {
+      socket.connect();
+      console.log('-----------', user?.lastName);
+      socket.on('editRoomClient', async (room: ChatGroup) => {
+        if (room?.id) {
+          setEditRoom(room);
+          console.log('-----------editRoomClient-----');
+        }
+      });
+      return () => {
+        socket.disconnect();
+      };
+    }, // eslint-disable-next-line react-hooks/exhaustive-deps
+    [updateSocket],
   );
 
   useEffect(() => {
@@ -199,10 +215,12 @@ export const BadgeProvider: React.FC = ({children}) => {
           );
         } else {
           socket.emit('unsetChatGroup', editRoom.id);
+          setUpdateSocket(!updateSocket);
           setChatGroups(rooms => rooms.filter(r => r.id !== editRoom.id));
         }
       } else {
         socket.emit('setChatGroup', editRoom.id);
+        setUpdateSocket(!updateSocket);
         const rooms = chatGroups;
         const pinnedRoomsCount = rooms.filter(r => r.isPinned).length;
         rooms.splice(pinnedRoomsCount, 0, editRoom);
