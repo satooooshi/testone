@@ -65,7 +65,14 @@ type DateTimeModalStateValue = {
 };
 
 const EventFormModal: React.FC<EventFormModalProps> = props => {
-  const {onCloseModal, event, onSubmit, type, isSuccess = false} = props;
+  const {
+    onCloseModal,
+    event,
+    onSubmit,
+    type,
+    isSuccess = false,
+    isVisible,
+  } = props;
   const {user} = useAuthenticate();
   const dropdownRef = useRef<any | null>(null);
   const {data: tags} = useAPIGetTag();
@@ -109,6 +116,13 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
       resetForm();
     }
   }, [isSuccess, resetForm]);
+
+  useEffect(() => {
+    if (isVisible) {
+      setWillSubmit(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isVisible]);
 
   useEffect(() => {
     if (willSubmit) {

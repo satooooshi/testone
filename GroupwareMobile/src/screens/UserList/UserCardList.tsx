@@ -84,6 +84,7 @@ const UserCardList: React.FC<UserCardListProps> = ({
   }, [tag, word]);
 
   useEffect(() => {
+    setUsersForInfiniteScroll([]);
     setSearchQuery(q => ({...q, page: '1'}));
   }, [
     searchQuery.word,
@@ -94,6 +95,7 @@ const UserCardList: React.FC<UserCardListProps> = ({
 
   useEffect(() => {
     if (focused) {
+      setUsersForInfiniteScroll([]);
       setSearchQuery(q => ({...q, page: '1'}));
       refetch();
     }
