@@ -268,6 +268,10 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
         messageWrapperDivRef.current &&
           messageWrapperDivRef.current.scrollTo({ top: 0 });
       },
+      onError: (err) => {
+        alert('メッセージを送信できませんでした。');
+        console.log('0000', err);
+      },
     });
 
   const { mutate: uploadFiles, isLoading: loadingUplaod } = useAPIUploadStorage(
