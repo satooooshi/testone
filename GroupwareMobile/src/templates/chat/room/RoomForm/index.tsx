@@ -43,6 +43,7 @@ const RoomForm: React.FC<RoomFormProps> = ({
 }) => {
   const {width: windowWidth} = useWindowDimensions();
   const [visibleUserModal, setVisibleUserModal] = useState(false);
+  const [willSubmit, setWillSubmit] = useState(false);
   const initialValues: Partial<ChatGroup> = {
     name: '',
     imageURL: '',
@@ -74,6 +75,12 @@ const RoomForm: React.FC<RoomFormProps> = ({
     }
   }, [initialRoom, setValues]);
 
+  useEffect(() => {
+    if (willSubmit) {
+      handleSubmit();
+    }
+  }, [willSubmit, handleSubmit]);
+
   return (
     <WholeContainer>
       <UserModal
@@ -97,7 +104,7 @@ const RoomForm: React.FC<RoomFormProps> = ({
         bottom={10}
         alignSelf="flex-end"
         rounded="circle"
-        onPress={() => handleSubmit()}>
+        onPress={() => setWillSubmit(true)}>
         <Icon color="white" name="check" fontSize={32} />
       </Button>
       <ScrollDiv

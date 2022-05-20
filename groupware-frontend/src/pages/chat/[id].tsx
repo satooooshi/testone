@@ -19,15 +19,21 @@ import { useAPIUpdateChatGroup } from '@/hooks/api/chat/useAPIUpdateChatGroup';
 import { useRoomRefetch } from 'src/contexts/chat/useRoomRefetch';
 import { useAPIGetRoomDetail } from '@/hooks/api/chat/useAPIGetRoomDetail';
 import { useAPISaveChatGroup } from '@/hooks/api/chat/useAPISaveChatGroup';
+import { baseURL } from 'src/utils/url';
+import { io } from 'socket.io-client';
+import { useHandleBadge } from 'src/contexts/badge/useHandleBadge';
 
 const ChatDetail = () => {
   const router = useRouter();
   const { id } = router.query as { id: string };
   const [currentRoom, setCurrentRoom] = useState<ChatGroup>();
   const [membersModal, setMembersModal] = useState(false);
-  const { setNewChatGroup } = useRoomRefetch();
   const [isTalkRoom, setIsTalkRoom] = useState<boolean>(false);
   const [selectedMembers, setSelectedMembers] = useState<User[]>();
+  const socket = io(baseURL, {
+    transports: ['websocket'],
+  });
+  const { setNewChatGroup } = useHandleBadge();
 
   const [
     { editChatGroupModalVisible, editMembersModalVisible, createGroupWindow },
@@ -37,6 +43,7 @@ const ChatDetail = () => {
   const { mutate: updateGroup } = useAPIUpdateChatGroup({
     onSuccess: (data) => {
       setNewChatGroup(data);
+      socket.emit('editRoom', data);
     },
   });
   const toast = useToast();
@@ -151,7 +158,10 @@ const ChatDetail = () => {
           <EditChatGroupModal
             isOpen={editChatGroupModalVisible}
             chatGroup={currentRoom}
-            onComplete={(newInfo) => setCurrentRoom(newInfo)}
+            onComplete={(newInfo) => {
+              socket.emit('editRoom', newInfo);
+              setCurrentRoom(newInfo);
+            }}
             closeModal={() =>
               dispatchModal({
                 type: 'editChatGroupModalVisible',

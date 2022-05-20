@@ -117,7 +117,7 @@ export class ChatService {
       .leftJoinAndSelect('lastReadChatTime.user', 'lastReadChatTime.user')
       .where('member.id = :memberId', { memberId: userID })
       .andWhere(
-        updatedAtLatestRoom
+        !!updatedAtLatestRoom
           ? `chat_groups.updatedAt > :updatedAtLatestRoom`
           : '1=1',
         {
@@ -425,8 +425,9 @@ export class ChatService {
     });
     if (!existGroup) {
       throw new BadRequestException('That group id is incorrect');
-    }
-    if (!existGroup.members?.filter((m) => m.id === message.sender.id).length) {
+    } else if (
+      !existGroup?.members.filter((m) => m?.id === message?.sender?.id).length
+    ) {
       throw new BadRequestException('sender is not a member of this group');
     }
     const savedMessage = await this.chatMessageRepository.save(

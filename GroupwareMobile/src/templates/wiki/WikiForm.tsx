@@ -1,5 +1,5 @@
 import {useFormik} from 'formik';
-import React, {useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {useWindowDimensions} from 'react-native';
 import {
   Button,
@@ -47,6 +47,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
   onUploadImage,
 }) => {
   const scrollRef = useRef<KeyboardAwareScrollView | null>(null);
+  const [willSubmit, setWillSubmit] = useState(false);
   const initialValues: Partial<Wiki> = {
     title: '',
     body: '',
@@ -84,6 +85,12 @@ const WikiForm: React.FC<WikiFormProps> = ({
   const typeDropdownRef = useRef<any | null>(null);
 
   const {user} = useAuthenticate();
+
+  useEffect(() => {
+    if (willSubmit) {
+      handleSubmit();
+    }
+  }, [willSubmit, handleSubmit]);
 
   //   Fixed the input format so that it cannot be selected at once.
 
@@ -616,7 +623,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
             mb={16}
             bg="pink600"
             w={'100%'}
-            onPress={() => handleSubmit()}>
+            onPress={() => setWillSubmit(true)}>
             投稿
           </Button>
         </Div>
