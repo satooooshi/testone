@@ -31,7 +31,6 @@ type RoomFormProps = {
     formData: FormData,
     onSuccess: (imageUrls: string[]) => void,
   ) => void;
-  isLoading?: boolean;
 };
 
 const RoomForm: React.FC<RoomFormProps> = ({
@@ -41,7 +40,6 @@ const RoomForm: React.FC<RoomFormProps> = ({
   selectedMembers,
   onSubmit,
   onUploadImage,
-  isLoading,
 }) => {
   const {width: windowWidth} = useWindowDimensions();
   const [visibleUserModal, setVisibleUserModal] = useState(false);
@@ -106,11 +104,7 @@ const RoomForm: React.FC<RoomFormProps> = ({
         bottom={10}
         alignSelf="flex-end"
         rounded="circle"
-        onPress={() => {
-          if (!isLoading) {
-            handleSubmit();
-          }
-        }}>
+        onPress={() => setWillSubmit(true)}>
         <Icon color="white" name="check" fontSize={32} />
       </Button>
       <ScrollDiv
