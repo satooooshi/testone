@@ -76,6 +76,7 @@ const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
     onDrop: onEventImageDrop,
     accept: imageExtensions,
   });
+  const [willSubmit, setWillSubmit] = useState(false);
   const router = useRouter();
 
   const onLoad = useCallback((img) => {
@@ -93,6 +94,20 @@ const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
         });
       },
     });
+
+  useEffect(() => {
+    if (isOpen) {
+      setWillSubmit(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (willSubmit) {
+      checkErrors();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [willSubmit]);
 
   const {
     values: newGroup,
@@ -171,7 +186,7 @@ const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
           <Button
             size="sm"
             flexDir="row"
-            onClick={checkErrors}
+            onClick={() => setWillSubmit(true)}
             mb="8px"
             colorScheme="green"
             alignItems="center">
