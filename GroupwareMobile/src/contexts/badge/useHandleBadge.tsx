@@ -16,7 +16,6 @@ const BadgeContext = createContext({
   handleEnterRoom: (() => {}) as (roomId: number) => void,
   refetchRoomCard: (() => {}) as (roomId: number) => void,
   completeRefetch: () => {},
-  editRoom: {} as ChatGroup | undefined,
   setNewChatGroup: (() => {}) as (room: ChatGroup | undefined) => void,
 });
 
@@ -178,7 +177,7 @@ export const BadgeProvider: React.FC = ({children}) => {
         const pinnedRoomsCount = rooms.filter(r => r.isPinned).length;
         rooms.splice(pinnedRoomsCount, 0, editRoom);
         setChatGroups(rooms);
-        setNewChatGroup(undefined);
+        setEditRoom(undefined);
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -194,7 +193,6 @@ export const BadgeProvider: React.FC = ({children}) => {
         handleEnterRoom,
         refetchRoomCard,
         completeRefetch,
-        editRoom,
         setNewChatGroup,
       }}>
       {children}
