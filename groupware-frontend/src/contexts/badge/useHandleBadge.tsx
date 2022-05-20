@@ -185,7 +185,6 @@ export const BadgeProvider: React.FC = ({ children }) => {
         unreadChatCount: chatUnreadCount,
         chatGroups,
         setChatGroupsState,
-        currentRoom,
         refetchGroupId,
         handleEnterRoom,
         completeRefetch,
