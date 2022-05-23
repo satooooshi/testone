@@ -294,10 +294,10 @@ export class ChatService {
       )
       .andWhere(
         dateRefetchLatest
-          ? 'CASE WHEN chat_messages.createdAt < chat_messages.updatedAt THEN chat_messages.updatedAt > :storedAt ELSE null END'
+          ? 'CASE WHEN chat_messages.createdAt < chat_messages.updatedAt THEN chat_messages.updatedAt > :dateRefetchLatest ELSE null END'
           : '1=1',
         {
-          storedAt: new Date(dateRefetchLatest),
+          dateRefetchLatest: new Date(dateRefetchLatest),
         },
       )
       .take(Number(limit))
