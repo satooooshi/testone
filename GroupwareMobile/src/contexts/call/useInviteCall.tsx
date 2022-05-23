@@ -36,7 +36,7 @@ const InvitationStatusContext = createContext({
 });
 
 export const InviteCallProvider: React.FC = ({children}) => {
-  const {setNewChatGroup} = useHandleBadge();
+  const {emitEditRoom} = useHandleBadge();
   const {mutate: createGroup} = useAPISaveChatGroup();
   const [currentGroupData, setCurrentGroupData] = useState<ChatGroup>();
   const socket = io(baseURL, {
@@ -81,7 +81,7 @@ export const InviteCallProvider: React.FC = ({children}) => {
         onSuccess: createdGroup => {
           setCurrentGroupData(createdGroup);
           if (createdGroup.updatedAt === createdGroup.createdAt) {
-            setNewChatGroup(createdGroup);
+            emitEditRoom(createdGroup);
           }
         },
       },

@@ -35,7 +35,7 @@ const EditRoom: React.FC = () => {
   const headerTitle = 'ルーム編集';
   const {mutate: updateGroup} = useAPIUpdateChatGroup({
     onSuccess: updatedGroup => {
-      // setNewChatGroup(updatedGroup);
+      // emitEditRoom(updatedGroup);
       socket.emit('editRoom', updatedGroup);
       Alert.alert('ルームの更新が完了しました。', undefined, [
         {
