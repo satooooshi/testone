@@ -251,7 +251,13 @@ export class ChatService {
     userID: number,
     query: GetMessagesQuery,
   ): Promise<ChatMessage[]> {
-    const { after, before, include = false, limit = '20', storedAt } = query;
+    const {
+      after,
+      before,
+      include = false,
+      limit = '20',
+      dateRefetchLatest,
+    } = query;
 
     if (Number(limit) === 0) {
       return [];
@@ -287,11 +293,11 @@ export class ChatService {
         { before },
       )
       .andWhere(
-        storedAt
+        dateRefetchLatest
           ? 'CASE WHEN chat_messages.createdAt < chat_messages.updatedAt THEN chat_messages.updatedAt > :storedAt ELSE null END'
           : '1=1',
         {
-          storedAt: new Date(storedAt),
+          storedAt: new Date(dateRefetchLatest),
         },
       )
       .take(Number(limit))
