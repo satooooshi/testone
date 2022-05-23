@@ -68,17 +68,28 @@ export const BadgeProvider: React.FC = ({children}) => {
 
   useEffect(() => {
     if (networkConnection && user?.id) {
-      console.log('refetchAllRooms called ----------------------------');
       if (chatGroups.length) {
+        console.log('666666666666666666666666');
         socket.emit(
           'unsetChatGroups',
           chatGroups.map(g => g.id),
         );
+        socket.off('editRoomClient');
       }
       refetchAllRooms();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [networkConnection, user]);
+
+  const resetSocketOn = () => {
+    socket.off('editRoomClient');
+    socket.on('editRoomClient', async (room: ChatGroup) => {
+      if (room?.id) {
+        setEditRoom(room);
+        console.log('-----------editRoomClient-----');
+      }
+    });
+  };
 
   useEffect(() => {
     const unsubscribe = NetInfo.addEventListener(state => {
@@ -108,6 +119,8 @@ export const BadgeProvider: React.FC = ({children}) => {
       let rooms = chatGroups.filter(r => r.id !== data.id);
       if (chatGroups.length === rooms.length) {
         socket.emit('setChatGroup', data.id);
+        console.log('888888888');
+        resetSocketOn();
       }
       if (data.isPinned) {
         setChatGroups([...[data], ...rooms]);
@@ -151,39 +164,30 @@ export const BadgeProvider: React.FC = ({children}) => {
 
   useEffect(
     () => {
-      socket.connect();
-      return () => {
-        if (chatGroups.length) {
-          socket.emit(
-            'unsetChatGroups',
-            chatGroups.map(g => g.id),
-          );
-        }
-        socket.disconnect();
-      };
-    }, // eslint-disable-next-line react-hooks/exhaustive-deps
-    [user],
-  );
-
-  useEffect(
-    () => {
       if (completeRefetch && chatGroups.length) {
         socket.emit(
           'setChatGroups',
           chatGroups.map(g => g.id),
         );
         socket.on('editRoomClient', async (room: ChatGroup) => {
-          console.log('-----------');
-
           if (room?.id) {
             setEditRoom(room);
           }
         });
         setCompleteRefetch(false);
-        console.log('-----====---===---==', chatGroups.length);
       }
     }, // eslint-disable-next-line react-hooks/exhaustive-deps
     [completeRefetch, chatGroups],
+  );
+
+  useEffect(
+    () => {
+      socket.connect();
+      return () => {
+        socket.disconnect();
+      };
+    }, // eslint-disable-next-line react-hooks/exhaustive-deps
+    [user?.id],
   );
 
   useEffect(() => {
@@ -199,10 +203,12 @@ export const BadgeProvider: React.FC = ({children}) => {
           );
         } else {
           socket.emit('unsetChatGroup', editRoom.id);
+          resetSocketOn();
           setChatGroups(rooms => rooms.filter(r => r.id !== editRoom.id));
         }
       } else {
         socket.emit('setChatGroup', editRoom.id);
+        resetSocketOn();
         const rooms = chatGroups;
         const pinnedRoomsCount = rooms.filter(r => r.isPinned).length;
         rooms.splice(pinnedRoomsCount, 0, editRoom);
