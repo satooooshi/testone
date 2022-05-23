@@ -180,9 +180,6 @@ const Chat: React.FC = () => {
     },
     {
       enabled: false,
-      onError: e => {
-        console.log('error ===============================', e);
-      },
       onSuccess: res => {
         console.log('success =============================', res.length);
       },
@@ -214,7 +211,7 @@ const Chat: React.FC = () => {
   const {refetch: refetchLatest} = useAPIGetMessages(
     {
       group: room.id,
-      limit: room.unreadCount,
+      limit: room.unreadCount || 0,
     },
     {
       enabled: false,
@@ -233,6 +230,13 @@ const Chat: React.FC = () => {
           setMessages(m => refreshMessage([...msgToAppend, ...m]));
           // setImagesForViewing(i => [...i, ...imagesToApped]);
         }
+        console.log('latest success ====================', latestData.length);
+        const now = dateTimeFormatterFromJSDDate({
+          dateTime: new Date(),
+          format: 'yyyy-LL-dd HH:mm:ss',
+        });
+
+        storage.set(`dateRefetchLatestInRoom${room.id}`, now);
       },
     },
   );
@@ -243,14 +247,12 @@ const Chat: React.FC = () => {
         'updated messages ====================',
         updatedMessages.length,
       );
-      for (const message of updatedMessages) {
-        setMessages(messages => {
-          const indexUpdatedMessages = messages.findIndex(
-            m => m.id === message.id,
-          );
-          messages.splice(indexUpdatedMessages, 1, message);
-          return messages;
-        });
+      if (updatedMessages.length) {
+        for (const updateMsg of updatedMessages) {
+          setMessages(messages => {
+            return messages.map(m => (m.id === updateMsg.id ? updateMsg : m));
+          });
+        }
       }
     },
   });
@@ -454,7 +456,6 @@ const Chat: React.FC = () => {
   };
 
   const onScrollTopOnChat = () => {
-    console.log('scrollTop call ---------------------------');
     setBefore(messages[messages.length - 1].id);
   };
 
@@ -538,17 +539,28 @@ const Chat: React.FC = () => {
       })
       .sort((a, b) => b.id - a.id);
   };
-  // useEffect(() => {
-  //   setMessages([]);
-  //   setBefore(undefined);
-  //   setAfter(undefined);
-  //   refetchLatest();
-  // }, [refetchLatest, room]);
+
+  const saveMessages = (msg: ChatMessage[]) => {
+    const jsonMessages = JSON.stringify(msg);
+    storage.set(`messagesIntRoom${room.id}`, jsonMessages);
+  };
+
+  useEffect(() => {
+    setBefore(undefined);
+    setAfter(undefined);
+  }, [room]);
 
   useEffect(() => {
     console.log('call ==================== refetch past messages');
     refetchFetchedPastMessages();
   }, [before, after, include, refetchFetchedPastMessages]);
+
+  useEffect(() => {
+    if (messages.length) {
+      saveMessages(messages);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [messages]);
 
   useEffect(() => {
     // 検索する文字がアルファベットの場合、なぜかuseAPISearchMessagesのonSuccessが動作しない為、こちらで代わりとなる処理を記述しています。
@@ -626,19 +638,6 @@ const Chat: React.FC = () => {
     </Dropdown>
   );
 
-  const saveMessages = (msg: ChatMessage[]) => {
-    console.log('call ------------------------------------------');
-    const jsonMessages = JSON.stringify(msg);
-    storage.set(`messagesIntRoom${room.id}`, jsonMessages);
-
-    const now = dateTimeFormatterFromJSDDate({
-      dateTime: new Date(),
-      format: 'yyyy-LL-dd HH:mm:ss',
-    });
-
-    storage.set(`storedAtInRoom${room.id}`, now);
-  };
-
   useEffect(() => {
     if (longPressedMsg) {
       typeDropdownRef.current?.open();
@@ -649,14 +648,10 @@ const Chat: React.FC = () => {
     if (isFocused) {
       setIsTabBarVisible(false);
     } else {
-      console.log('call =========================================');
-      if (messages.length) {
-        saveMessages(messages);
-      }
       setIsTabBarVisible(true);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isFocused, setIsTabBarVisible, messages]);
+  }, [isFocused, setIsTabBarVisible]);
 
   useEffect(() => {
     let isMounted = true;
@@ -959,12 +954,17 @@ const Chat: React.FC = () => {
       if (jsonMessagesInStorage) {
         const messagesInStorage = JSON.parse(jsonMessagesInStorage);
         setMessages(messagesInStorage);
-        const storedAt = storage.getString(`storedAtInRoom${room.id}`);
-        console.log('refetch updated messages ========================');
+        const dateRefetchLatest = storage.getString(
+          `dateRefetchLatestInRoom${room.id}`,
+        );
+        console.log(
+          'refetch updated messages ========================',
+          dateRefetchLatest,
+        );
         refetchUpdatedMessages({
           group: room.id,
           limit: messagesInStorage.length,
-          storedAt: storedAt,
+          dateRefetchLatest: dateRefetchLatest,
         });
       }
       refetchLatest();
