@@ -967,6 +967,7 @@ const Chat: React.FC = () => {
           dateRefetchLatest: dateRefetchLatest,
         });
       }
+
       refetchLatest();
       refetchRoomDetail();
       // eslint-disable-next-line react-hooks/exhaustive-deps

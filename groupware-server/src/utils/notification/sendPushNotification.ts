@@ -72,9 +72,9 @@ const sendPushNotifToSpecificDevices = async (
       console.log(err);
     } else {
       console.log(result);
-      for (const e of result) {
-        console.log(e.message);
-      }
+      // for (const e of result) {
+      //   console.log(e.message);
+      // }
     }
   });
 };

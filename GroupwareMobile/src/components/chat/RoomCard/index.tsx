@@ -141,9 +141,20 @@ const RoomCard: React.FC<RoomCardProps> = ({
             )}
           </Div>
           <Div w={'75%'} pr={'sm'}>
-            <Text numberOfLines={1} mb={'xs'} fontWeight="bold" fontSize={16}>
-              {nameOfRoom(room)}
-            </Text>
+            <Div flexDir="row" mb={'xs'} w={'85%'}>
+              <Text numberOfLines={1} fontWeight="bold" fontSize={16}>
+                {nameOfRoom(room)}
+              </Text>
+              {room.muteUsers &&
+              room.muteUsers.filter(u => u.id === user?.id).length ? (
+                <Icon
+                  ml={3}
+                  name="volume-mute-outline"
+                  fontFamily="Ionicons"
+                  fontSize={16}
+                />
+              ) : null}
+            </Div>
             {room?.unreadCount && room?.unreadCount > 0 ? (
               <Badge
                 style={{
