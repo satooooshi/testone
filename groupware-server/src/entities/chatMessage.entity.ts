@@ -175,7 +175,11 @@ export class ChatMessage {
           id: this.chatGroup.id.toString(),
         },
       };
-      console.log('---====', notifiedUsers);
+      console.log(
+        '---====',
+        notifiedUsers,
+        notifiedUsers.map((u) => u.muteChatGroups),
+      );
 
       await sendPushNotifToSpecificUsers(
         notifiedUsers,
