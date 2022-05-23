@@ -321,6 +321,7 @@ export interface ChatGroup {
   pinnedUsers?: User[];
   isPinned?: boolean;
   chatNotes?: ChatNote[];
+  muteUsers?: User[];
   chatMessages?: ChatMessage[];
   members?: User[];
   lastReadChatTime?: LastReadChatTime[];

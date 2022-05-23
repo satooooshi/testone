@@ -54,7 +54,6 @@ export class ChatGateway
 
   @SubscribeMessage('editRoom')
   public async editRoom(_: Socket, room: ChatGroup) {
-    console.log('------');
     if (room.createdAt === room.updatedAt) {
       this.server.emit('editRoomClient', room);
     } else {

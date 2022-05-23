@@ -16,6 +16,7 @@ const BadgeContext = createContext({
   handleEnterRoom: (() => {}) as (roomId: number) => void,
   refetchRoomCard: (() => {}) as (roomId: number) => void,
   emitEditRoom: (() => {}) as (room: ChatGroup) => void,
+  editChatGroup: (() => {}) as (room: ChatGroup) => void,
 });
 
 export const BadgeProvider: React.FC = ({children}) => {
@@ -172,6 +173,10 @@ export const BadgeProvider: React.FC = ({children}) => {
     socket.emit('editRoom', room);
   };
 
+  const editChatGroup = (room: ChatGroup) => {
+    setEditRoom(room);
+  };
+
   useEffect(
     () => {
       if (completeRefetch && chatGroups.length) {
@@ -212,12 +217,19 @@ export const BadgeProvider: React.FC = ({children}) => {
 
   useEffect(() => {
     if (editRoom) {
+      console.log('editROom called-----', editRoom.muteUsers);
+
       if (editRoom.updatedAt > editRoom.createdAt) {
         if (editRoom.members?.filter(m => m.id === user?.id).length) {
           setChatGroups(room =>
             room.map(r =>
               r.id === editRoom.id
-                ? {...r, name: editRoom.name, members: editRoom.members}
+                ? {
+                    ...r,
+                    name: editRoom.name,
+                    members: editRoom.members,
+                    muteUsers: editRoom.muteUsers,
+                  }
                 : r,
             ),
           );
@@ -249,6 +261,7 @@ export const BadgeProvider: React.FC = ({children}) => {
         handleEnterRoom,
         refetchRoomCard,
         emitEditRoom,
+        editChatGroup,
       }}>
       {children}
     </BadgeContext.Provider>

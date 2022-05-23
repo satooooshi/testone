@@ -208,7 +208,6 @@ export class ChatService {
       };
 
       room.unreadCount = await this.getUnreadChatMessage(userID, query);
-      console.log('----', userID, query, room.unreadCount);
     }
     return room;
   }
