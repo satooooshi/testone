@@ -539,6 +539,12 @@ const Chat: React.FC = () => {
       })
       .sort((a, b) => b.id - a.id);
   };
+
+  const saveMessages = (msg: ChatMessage[]) => {
+    const jsonMessages = JSON.stringify(msg);
+    storage.set(`messagesIntRoom${room.id}`, jsonMessages);
+  };
+
   useEffect(() => {
     setBefore(undefined);
     setAfter(undefined);
@@ -632,11 +638,6 @@ const Chat: React.FC = () => {
     </Dropdown>
   );
 
-  const saveMessages = (msg: ChatMessage[]) => {
-    const jsonMessages = JSON.stringify(msg);
-    storage.set(`messagesIntRoom${room.id}`, jsonMessages);
-  };
-
   useEffect(() => {
     if (longPressedMsg) {
       typeDropdownRef.current?.open();
@@ -647,17 +648,10 @@ const Chat: React.FC = () => {
     if (isFocused) {
       setIsTabBarVisible(false);
     } else {
-      if (messages.length) {
-        console.log(
-          'save call =========================================',
-          messages.length,
-        );
-        saveMessages(messages);
-      }
       setIsTabBarVisible(true);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isFocused, setIsTabBarVisible, messages]);
+  }, [isFocused, setIsTabBarVisible]);
 
   useEffect(() => {
     let isMounted = true;
@@ -963,7 +957,10 @@ const Chat: React.FC = () => {
         const dateRefetchLatest = storage.getString(
           `dateRefetchLatestInRoom${room.id}`,
         );
-        console.log('refetch updated messages ========================');
+        console.log(
+          'refetch updated messages ========================',
+          dateRefetchLatest,
+        );
         refetchUpdatedMessages({
           group: room.id,
           limit: messagesInStorage.length,
