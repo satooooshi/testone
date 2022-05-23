@@ -22,7 +22,7 @@ const BadgeContext = createContext({
   refetchGroupId: 0,
   handleEnterRoom: (() => {}) as (roomId: number) => void,
   editRoom: {} as ChatGroup | undefined,
-  setNewChatGroup: (() => {}) as (room: ChatGroup | undefined) => void,
+  emitEditRoom: (() => {}) as (room: ChatGroup) => void,
 });
 
 export const BadgeProvider: React.FC = ({ children }) => {
@@ -188,7 +188,7 @@ export const BadgeProvider: React.FC = ({ children }) => {
           resetSocketOn();
           setChatGroups((rooms) => rooms.filter((r) => r.id !== editRoom.id));
         }
-      } else {
+      } else if (editRoom.members?.filter((m) => m.id === user?.id).length) {
         socket.emit('setChatGroup', editRoom.id);
         resetSocketOn();
         const rooms = chatGroups;
@@ -201,8 +201,8 @@ export const BadgeProvider: React.FC = ({ children }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editRoom]);
 
-  const setNewChatGroup = (room: ChatGroup | undefined) => {
-    setEditRoom(room);
+  const emitEditRoom = (room: ChatGroup) => {
+    socket.emit('editRoom', room);
   };
 
   const setChatGroupsState = (rooms: ChatGroup[]) => {
@@ -229,7 +229,7 @@ export const BadgeProvider: React.FC = ({ children }) => {
         refetchGroupId,
         handleEnterRoom,
         editRoom,
-        setNewChatGroup,
+        emitEditRoom,
       }}>
       <RoomRefetchProvider>{children}</RoomRefetchProvider>
     </BadgeContext.Provider>

@@ -43,12 +43,12 @@ const EditChatGroupModal: React.FC<EditChatGroupModalProps> = ({
   const { mutate: saveGroup } = useAPIUpdateChatGroup({
     onSuccess: (newInfo) => {
       closeModal();
-      setNewChatGroup(newInfo);
+      emitEditRoom(newInfo);
       onComplete(newInfo);
     },
   });
 
-  const { setNewChatGroup } = useHandleBadge();
+  const { emitEditRoom } = useHandleBadge();
   const [selectImageUrl, setSelectImageUrl] = useState<string>('');
   const { mutate: uploadImage, isLoading } = useAPIUploadStorage({
     onSuccess: async (fileURLs) => {
