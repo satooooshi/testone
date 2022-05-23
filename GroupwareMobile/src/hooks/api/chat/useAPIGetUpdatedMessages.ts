@@ -24,7 +24,7 @@ const getUpdatedMessages = async (query: GetMessagesQuery) => {
     dateRefetchLatest = '',
   } = query;
   const res = await axiosInstance.get<ChatMessage[]>(
-    `${getChatMessagesURL}?group=${group}&after=${after}&before=${before}&include=${include}&limit=${limit}&storedAt=${dateRefetchLatest}`,
+    `${getChatMessagesURL}?group=${group}&after=${after}&before=${before}&include=${include}&limit=${limit}&dateRefetchLatest=${dateRefetchLatest}`,
   );
   await Promise.all(
     res.data.map(async m => {
