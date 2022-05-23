@@ -11,13 +11,20 @@ export interface GetMessagesQuery {
   after?: number;
   before?: number;
   include?: boolean;
-  storedAt?: string;
+  dateRefetchLatest?: string;
 }
 
 const getUpdatedMessages = async (query: GetMessagesQuery) => {
-  const {group, after = '', before = '', include, limit, storedAt = ''} = query;
+  const {
+    group,
+    after = '',
+    before = '',
+    include,
+    limit,
+    dateRefetchLatest = '',
+  } = query;
   const res = await axiosInstance.get<ChatMessage[]>(
-    `${getChatMessagesURL}?group=${group}&after=${after}&before=${before}&include=${include}&limit=${limit}&storedAt=${storedAt}`,
+    `${getChatMessagesURL}?group=${group}&after=${after}&before=${before}&include=${include}&limit=${limit}&dateRefetchLatest=${dateRefetchLatest}`,
   );
   await Promise.all(
     res.data.map(async m => {
