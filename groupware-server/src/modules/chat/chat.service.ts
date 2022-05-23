@@ -96,6 +96,7 @@ export class ChatService {
       .createQueryBuilder('chat_groups')
       .leftJoinAndSelect('chat_groups.members', 'members')
       .leftJoin('chat_groups.members', 'member')
+      .leftJoinAndSelect('chat_groups.muteUsers', 'muteUsers')
       .leftJoinAndSelect(
         'chat_groups.pinnedUsers',
         'pinnedUsers',
@@ -171,6 +172,7 @@ export class ChatService {
       .createQueryBuilder('chat_groups')
       .leftJoinAndSelect('chat_groups.members', 'members')
       .leftJoin('chat_groups.members', 'member')
+      .leftJoinAndSelect('chat_groups.muteUsers', 'muteUsers')
       .leftJoinAndSelect(
         'chat_groups.pinnedUsers',
         'pinnedUsers',
@@ -258,6 +260,7 @@ export class ChatService {
       limit = '20',
       dateRefetchLatest,
     } = query;
+    console.log('--------', limit);
 
     if (Number(limit) === 0) {
       return [];

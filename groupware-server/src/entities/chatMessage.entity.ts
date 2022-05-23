@@ -138,6 +138,9 @@ export class ChatMessage {
       }
       const mentionRegex = /@\[.*?\]\(([0-9]+)\)/g;
       const mentionedIds: number[] = [];
+      const muteUsersIds = this.chatGroup?.muteUsers?.length
+        ? this.chatGroup?.muteUsers?.map((u) => u.id)
+        : [];
       let mentionArr = [];
       while ((mentionArr = mentionRegex.exec(content)) !== null) {
         if (mentionArr[1] && typeof Number(mentionArr[1]) === 'number') {
@@ -145,11 +148,16 @@ export class ChatMessage {
         }
       }
       // console.log(mentionedIds);
-      const allUsersInRoom = await getRepository(User)
+      const notifiedUsers = await getRepository(User)
         .createQueryBuilder('user')
         .select('user.id')
         .leftJoin('user.chatGroups', 'chatGroups')
-        .where('chatGroups.id = :chatGroupId', {
+        .leftJoinAndSelect('user.muteChatGroups', 'muteChatGroups')
+        .where('muteChatGroups.id <> :chatGroupId', {
+          chatGroupId: this.chatGroup.id,
+        })
+        .orWhere('muteChatGroups.id is null')
+        .andWhere('chatGroups.id = :chatGroupId', {
           chatGroupId: this.chatGroup.id,
         })
         .andWhere('user.id <> :senderId', { senderId: this.sender.id })
@@ -158,6 +166,7 @@ export class ChatMessage {
           { mentionedIds },
         )
         .getMany();
+
       const notificationDataWithNoMention: CustomPushNotificationData = {
         title: `新着メッセージが届きました`,
         body: `${mentionTransform(content)}`,
@@ -166,8 +175,10 @@ export class ChatMessage {
           id: this.chatGroup.id.toString(),
         },
       };
+      console.log('---====', notifiedUsers);
+
       await sendPushNotifToSpecificUsers(
-        allUsersInRoom,
+        notifiedUsers,
         notificationDataWithNoMention,
       );
       if (mentionedIds?.length) {
