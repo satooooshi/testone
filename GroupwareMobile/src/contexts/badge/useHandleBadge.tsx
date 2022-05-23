@@ -75,6 +75,7 @@ export const BadgeProvider: React.FC = ({children}) => {
           chatGroups.map(g => g.id),
         );
         socket.off('editRoomClient');
+        socket.off('badgeClient');
       }
       refetchAllRooms();
     }
@@ -89,6 +90,15 @@ export const BadgeProvider: React.FC = ({children}) => {
         console.log('-----------editRoomClient-----');
       }
     });
+    socket.off('badgeClient');
+    socket.on(
+      'badgeClient',
+      async (data: {userId: number; groupId: number}) => {
+        if (data.groupId) {
+          setRefetchGroupId(data.groupId);
+        }
+      },
+    );
   };
 
   useEffect(() => {
@@ -174,6 +184,14 @@ export const BadgeProvider: React.FC = ({children}) => {
             setEditRoom(room);
           }
         });
+        socket.on(
+          'badgeClient',
+          async (data: {userId: number; groupId: number}) => {
+            if (data.groupId) {
+              setRefetchGroupId(data.groupId);
+            }
+          },
+        );
         setCompleteRefetch(false);
       }
     }, // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -184,6 +202,8 @@ export const BadgeProvider: React.FC = ({children}) => {
     () => {
       socket.connect();
       return () => {
+        socket.off('editRoomClient');
+        socket.off('badgeClient');
         socket.disconnect();
       };
     }, // eslint-disable-next-line react-hooks/exhaustive-deps

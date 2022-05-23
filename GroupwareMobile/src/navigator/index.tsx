@@ -543,9 +543,9 @@ const Navigator = () => {
         console.log('PushNotification TOKEN:', token);
       },
       onNotification: notification => {
-        if (notification?.data?.screen === 'chat' && notification.data?.id) {
-          refetchRoomCard(notification.data?.id);
-        }
+        // if (notification?.data?.screen === 'chat' && notification.data?.id) {
+        //   refetchRoomCard(notification.data?.id);
+        // }
         console.log('PushNotification onNotification========', notification);
         if (Platform.OS === 'android') {
           if (
