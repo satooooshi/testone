@@ -161,7 +161,7 @@ const AccountDetail: React.FC = () => {
   const route = useRoute<AccountDetailRouteProps>();
   const {user, setUser, logout} = useAuthenticate();
   const {sendCallInvitation} = useInviteCall();
-  const {setNewChatGroup} = useHandleBadge();
+  const {emitEditRoom} = useHandleBadge();
   const {setIsTabBarVisible} = useIsTabBarVisible();
   const id = route.params?.id;
   const userID = id || user?.id;
@@ -197,7 +197,7 @@ const AccountDetail: React.FC = () => {
   const {mutate: createGroup} = useAPISaveChatGroup({
     onSuccess: createdData => {
       if (createdData.updatedAt === createdData.createdAt) {
-        setNewChatGroup(createdData);
+        emitEditRoom(createdData);
       }
       const resetAction = StackActions.popToTop();
       navigation.dispatch(resetAction);
