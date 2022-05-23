@@ -95,7 +95,7 @@ const UserCardList: React.FC<UserCardListProps> = ({
 
   useEffect(() => {
     if (focused) {
-      flatListRef?.current?.scrollToOffset({animated: true, offset: 0});
+      flatListRef?.current?.scrollToOffset({animated: false, offset: 0});
       setSearchQuery(q => ({...q, page: '1'}));
       refetch();
     }
