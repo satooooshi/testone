@@ -214,7 +214,7 @@ const Chat: React.FC = () => {
   const {refetch: refetchLatest} = useAPIGetMessages(
     {
       group: room.id,
-      limit: room.unreadCount,
+      limit: room.unreadCount || 0,
     },
     {
       enabled: false,
