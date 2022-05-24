@@ -1,3 +1,4 @@
+import { userNameFactory } from 'src/utils/factory/userNameFactory';
 import { mentionTransform } from 'src/utils/mentionTransform';
 import {
   CustomPushNotificationData,
@@ -148,6 +149,24 @@ export class ChatMessage {
         }
       }
       // console.log(mentionedIds);
+      const AllUsers = await getRepository(User)
+        .createQueryBuilder('user')
+        .select('user.id')
+        .leftJoin('user.chatGroups', 'chatGroups')
+        .leftJoinAndSelect('user.muteChatGroups', 'muteChatGroups')
+        .where('muteChatGroups.id <> :chatGroupId', {
+          chatGroupId: this.chatGroup.id,
+        })
+        .orWhere('muteChatGroups.id is null')
+        .andWhere('chatGroups.id = :chatGroupId', {
+          chatGroupId: this.chatGroup.id,
+        })
+        .andWhere('user.id <> :senderId', { senderId: this.sender.id })
+        .andWhere(
+          mentionedIds?.length ? 'user.id NOT IN (:...mentionedIds)' : '1=1',
+          { mentionedIds },
+        )
+        .getMany();
       const notifiedUsers = await getRepository(User)
         .createQueryBuilder('user')
         .select('user.id')
@@ -168,10 +187,18 @@ export class ChatMessage {
         .getMany();
 
       const notificationDataWithNoMention: CustomPushNotificationData = {
-        title: `新着メッセージが届きました`,
+        title: userNameFactory(this.sender),
         body: `${mentionTransform(content)}`,
         custom: {
           screen: 'chat',
+          id: this.chatGroup.id.toString(),
+        },
+      };
+      const silentNotification: CustomPushNotificationData = {
+        title: 'silent',
+        body: '',
+        custom: {
+          screen: '',
           id: this.chatGroup.id.toString(),
         },
       };
@@ -185,6 +212,7 @@ export class ChatMessage {
         notifiedUsers,
         notificationDataWithNoMention,
       );
+      await sendPushNotifToSpecificUsers(AllUsers, silentNotification);
       if (mentionedIds?.length) {
         const mentionedUsers = await getRepository(User)
           .createQueryBuilder('user')

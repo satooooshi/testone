@@ -14,6 +14,10 @@ import { ChatMessageReaction } from 'src/entities/chatMessageReaction.entity';
 import { LastReadChatTime } from 'src/entities/lastReadChatTime.entity';
 import { User } from 'src/entities/user.entity';
 import { userNameFactory } from 'src/utils/factory/userNameFactory';
+import {
+  CustomPushNotificationData,
+  sendPushNotifToSpecificUsers,
+} from 'src/utils/notification/sendPushNotification';
 import { In, Repository } from 'typeorm';
 import { StorageService } from '../storage/storage.service';
 import {
@@ -608,6 +612,16 @@ export class ChatService {
       removedMembersSystemMsg.chatGroup = { ...newGroup, members: undefined };
       await this.chatMessageRepository.save(removedMembersSystemMsg);
     }
+    const silentNotification: CustomPushNotificationData = {
+      title: 'silent',
+      body: '',
+      custom: {
+        screen: '',
+        id: newGroup.id.toString(),
+      },
+    };
+    const allMember = newGroup.members.concat(removedMembers);
+    await sendPushNotifToSpecificUsers(allMember, silentNotification);
 
     return newGroup;
   }

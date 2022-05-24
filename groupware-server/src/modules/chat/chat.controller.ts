@@ -97,7 +97,7 @@ export class ChatController {
   ) {
     const callee = await this.chatService.calleeForPhoneCall(calleeId);
     const notificationData: CustomPushNotificationData = {
-      title: 'call',
+      title: 'silent',
       body: 'call',
       custom: invitation,
     };
