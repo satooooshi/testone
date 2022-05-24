@@ -67,7 +67,25 @@ const ChatMenu: React.FC = () => {
       <HeaderWithTextButton enableBackButton={true} title="メニュー" />
       <ChatMenuRow
         name={isMute ? '通知をオン' : '通知をオフ'}
-        icon={<Icon name="setting" fontSize={20} mr={'lg'} color="black" />}
+        icon={
+          isMute ? (
+            <Icon
+              name="volume-high"
+              fontFamily="Ionicons"
+              fontSize={20}
+              mr={'lg'}
+              color="black"
+            />
+          ) : (
+            <Icon
+              name="volume-mute"
+              fontFamily="Ionicons"
+              fontSize={20}
+              mr={'lg'}
+              color="black"
+            />
+          )
+        }
         onPress={() => {
           if (isMute && room.muteUsers) {
             updateGroup({
