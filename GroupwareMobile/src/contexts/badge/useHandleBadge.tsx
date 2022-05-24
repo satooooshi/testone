@@ -200,7 +200,7 @@ export const BadgeProvider: React.FC = ({children}) => {
         setCompleteRefetch(false);
       }
     }, // eslint-disable-next-line react-hooks/exhaustive-deps
-    [completeRefetch, chatGroups],
+    [completeRefetch],
   );
 
   useEffect(
