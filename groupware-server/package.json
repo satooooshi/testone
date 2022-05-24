@@ -29,6 +29,7 @@
     "seed:eventIntroduction": "ts-node ./node_modules/typeorm-seeding/dist/cli.js seed -s CreateEventIntroduction",
     "seed:event": "ts-node ./node_modules/typeorm-seeding/dist/cli.js seed -s CreateEvents",
     "seed:tags": "ts-node ./node_modules/typeorm-seeding/dist/cli.js seed -s CreateTags",
+    "seed:userTags": "ts-node ./node_modules/typeorm-seeding/dist/cli.js seed -s createUserTag",
     "seed:question": "ts-node ./node_modules/typeorm-seeding/dist/cli.js seed -s CreateQAQuestions",
     "migration:generate": "ts-node -r tsconfig-paths/register node_modules/typeorm/cli.js migration:generate -n",
     "migration:run": "ts-node -r tsconfig-paths/register node_modules/typeorm/cli.js migration:run",
