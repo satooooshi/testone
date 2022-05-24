@@ -547,7 +547,10 @@ const Navigator = () => {
           refetchRoomCard(notification.data?.id);
         }
         console.log('PushNotification onNotification========', notification);
-        if (Platform.OS === 'android') {
+        if (
+          Platform.OS === 'android' &&
+          notification?.data?.title !== 'silent'
+        ) {
           if (
             notification?.data?.screen === 'chat' &&
             notification.data?.id === `${currentChatRoomId}`
