@@ -26,8 +26,6 @@ const ChatMenu: React.FC = () => {
 
   const {mutate: updateGroup} = useAPIUpdateChatGroup({
     onSuccess: updateRoom => {
-      console.log('=========', updateRoom.muteUsers);
-
       editChatGroup(updateRoom);
       setIsMute(!isMute);
     },
