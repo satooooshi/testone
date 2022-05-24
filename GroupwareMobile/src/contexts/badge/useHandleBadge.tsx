@@ -24,9 +24,9 @@ export const BadgeProvider: React.FC = ({children}) => {
   const [chatGroups, setChatGroups] = useState<ChatGroup[]>([]);
   const [refetchGroupId, setRefetchGroupId] = useState(0);
   const {user, currentChatRoomId} = useAuthenticate();
-  const socket = io(baseURL, {
-    transports: ['websocket'],
-  });
+  // const socket = io(baseURL, {
+  //   transports: ['websocket'],
+  // });
   const [page, setPage] = useState(1);
   const [isNeedRefetch, setIsNeedRefetch] = useState(false);
   const [completeRefetch, setCompleteRefetch] = useState(false);
@@ -69,38 +69,38 @@ export const BadgeProvider: React.FC = ({children}) => {
 
   useEffect(() => {
     if (networkConnection && user?.id) {
-      if (chatGroups.length) {
-        console.log('666666666666666666666666');
-        socket.emit(
-          'unsetChatGroups',
-          chatGroups.map(g => g.id),
-        );
-        socket.off('editRoomClient');
-        socket.off('badgeClient');
-      }
+      // if (chatGroups.length) {
+      //   console.log('666666666666666666666666');
+      //   socket.emit(
+      //     'unsetChatGroups',
+      //     chatGroups.map(g => g.id),
+      //   );
+      //   socket.off('editRoomClient');
+      //   socket.off('badgeClient');
+      // }
       refetchAllRooms();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [networkConnection, user]);
 
-  const resetSocketOn = () => {
-    socket.off('editRoomClient');
-    socket.on('editRoomClient', async (room: ChatGroup) => {
-      if (room?.id) {
-        setEditRoom(room);
-        console.log('-----------editRoomClient-----');
-      }
-    });
-    socket.off('badgeClient');
-    socket.on(
-      'badgeClient',
-      async (data: {userId: number; groupId: number}) => {
-        if (data.groupId) {
-          setRefetchGroupId(data.groupId);
-        }
-      },
-    );
-  };
+  // const resetSocketOn = () => {
+  //   socket.off('editRoomClient');
+  //   socket.on('editRoomClient', async (room: ChatGroup) => {
+  //     if (room?.id) {
+  //       setEditRoom(room);
+  //       console.log('-----------editRoomClient-----');
+  //     }
+  //   });
+  //   socket.off('badgeClient');
+  //   socket.on(
+  //     'badgeClient',
+  //     async (data: {userId: number; groupId: number}) => {
+  //       if (data.groupId) {
+  //         setRefetchGroupId(data.groupId);
+  //       }
+  //     },
+  //   );
+  // };
 
   useEffect(() => {
     const unsubscribe = NetInfo.addEventListener(state => {
@@ -128,11 +128,11 @@ export const BadgeProvider: React.FC = ({children}) => {
     },
     onSuccess: data => {
       let rooms = chatGroups.filter(r => r.id !== data.id);
-      if (chatGroups.length === rooms.length) {
-        socket.emit('setChatGroup', data.id);
-        console.log('888888888');
-        resetSocketOn();
-      }
+      // if (chatGroups.length === rooms.length) {
+      //   socket.emit('setChatGroup', data.id);
+      //   console.log('888888888');
+      //   resetSocketOn();
+      // }
       if (data.isPinned) {
         setChatGroups([...[data], ...rooms]);
       } else {
@@ -170,50 +170,50 @@ export const BadgeProvider: React.FC = ({children}) => {
   };
 
   const emitEditRoom = (room: ChatGroup) => {
-    socket.emit('editRoom', room);
+    // socket.emit('editRoom', room);
   };
 
   const editChatGroup = (room: ChatGroup) => {
     setEditRoom(room);
   };
 
-  useEffect(
-    () => {
-      if (completeRefetch && chatGroups.length) {
-        socket.emit(
-          'setChatGroups',
-          chatGroups.map(g => g.id),
-        );
-        socket.on('editRoomClient', async (room: ChatGroup) => {
-          if (room?.id) {
-            setEditRoom(room);
-          }
-        });
-        socket.on(
-          'badgeClient',
-          async (data: {userId: number; groupId: number}) => {
-            if (data.groupId) {
-              setRefetchGroupId(data.groupId);
-            }
-          },
-        );
-        setCompleteRefetch(false);
-      }
-    }, // eslint-disable-next-line react-hooks/exhaustive-deps
-    [completeRefetch],
-  );
+  // useEffect(
+  //   () => {
+  //     if (completeRefetch && chatGroups.length) {
+  //       socket.emit(
+  //         'setChatGroups',
+  //         chatGroups.map(g => g.id),
+  //       );
+  //       socket.on('editRoomClient', async (room: ChatGroup) => {
+  //         if (room?.id) {
+  //           setEditRoom(room);
+  //         }
+  //       });
+  //       socket.on(
+  //         'badgeClient',
+  //         async (data: {userId: number; groupId: number}) => {
+  //           if (data.groupId) {
+  //             setRefetchGroupId(data.groupId);
+  //           }
+  //         },
+  //       );
+  //       setCompleteRefetch(false);
+  //     }
+  //   }, // eslint-disable-next-line react-hooks/exhaustive-deps
+  //   [completeRefetch],
+  // );
 
-  useEffect(
-    () => {
-      socket.connect();
-      return () => {
-        socket.off('editRoomClient');
-        socket.off('badgeClient');
-        socket.disconnect();
-      };
-    }, // eslint-disable-next-line react-hooks/exhaustive-deps
-    [user?.id],
-  );
+  // useEffect(
+  //   () => {
+  //     socket.connect();
+  //     return () => {
+  //       socket.off('editRoomClient');
+  //       socket.off('badgeClient');
+  //       socket.disconnect();
+  //     };
+  //   }, // eslint-disable-next-line react-hooks/exhaustive-deps
+  //   [user?.id],
+  // );
 
   useEffect(() => {
     if (editRoom) {
@@ -234,13 +234,9 @@ export const BadgeProvider: React.FC = ({children}) => {
             ),
           );
         } else {
-          socket.emit('unsetChatGroup', editRoom.id);
-          resetSocketOn();
           setChatGroups(rooms => rooms.filter(r => r.id !== editRoom.id));
         }
       } else if (editRoom.members?.filter(m => m.id === user?.id).length) {
-        socket.emit('setChatGroup', editRoom.id);
-        resetSocketOn();
         const rooms = chatGroups;
         const pinnedRoomsCount = rooms.filter(r => r.isPinned).length;
         rooms.splice(pinnedRoomsCount, 0, editRoom);

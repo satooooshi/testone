@@ -25,6 +25,12 @@ export const sendPushNotifToSpecificUsers = async (
   user: User[],
   data: CustomPushNotificationData,
 ) => {
+  console.log(
+    '-----',
+    data,
+    user.map((u) => u.lastName),
+  );
+
   const deviceRepository = getRepository(NotificationDevice);
   const userIds = user.map((u) => u.id);
   if (userIds.length) {
@@ -57,7 +63,7 @@ const sendPushNotifToSpecificDevices = async (
     topic: process.env.IOS_BUNDLE_ID ? '' : '', // REQUIRED for iOS (apn and gcm)
     contentAvailable: true,
     priority: 'high',
-    silent: data.title === 'call' ? true : false,
+    silent: data.title === 'silent' ? true : false,
     sound: 'local.wav',
     /* The topic of the notification. When using token-based authentication, specify the bundle ID of the app.
      * When using certificate-based authentication, the topic is usually your app's bundle ID.
