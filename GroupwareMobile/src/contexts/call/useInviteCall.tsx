@@ -15,7 +15,6 @@ import io from 'socket.io-client';
 import {baseURL} from '../../utils/url';
 import {ChatGroup} from '../../types';
 import _, {debounce} from 'lodash';
-import {useHandleBadge} from '../badge/useHandleBadge';
 
 const InvitationStatusContext = createContext({
   isCallAccepted: false,
@@ -36,7 +35,6 @@ const InvitationStatusContext = createContext({
 });
 
 export const InviteCallProvider: React.FC = ({children}) => {
-  const {emitEditRoom} = useHandleBadge();
   const {mutate: createGroup} = useAPISaveChatGroup();
   const [currentGroupData, setCurrentGroupData] = useState<ChatGroup>();
   const socket = io(baseURL, {
@@ -80,9 +78,6 @@ export const InviteCallProvider: React.FC = ({children}) => {
       {
         onSuccess: createdGroup => {
           setCurrentGroupData(createdGroup);
-          if (createdGroup.updatedAt === createdGroup.createdAt) {
-            emitEditRoom(createdGroup);
-          }
         },
       },
     );
