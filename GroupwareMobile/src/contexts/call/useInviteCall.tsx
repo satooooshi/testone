@@ -15,6 +15,7 @@ import io from 'socket.io-client';
 import {baseURL} from '../../utils/url';
 import {ChatGroup} from '../../types';
 import _, {debounce} from 'lodash';
+import {useHandleBadge} from '../badge/useHandleBadge';
 
 const InvitationStatusContext = createContext({
   isCallAccepted: false,
@@ -36,6 +37,7 @@ const InvitationStatusContext = createContext({
 
 export const InviteCallProvider: React.FC = ({children}) => {
   const {mutate: createGroup} = useAPISaveChatGroup();
+  const {editChatGroup} = useHandleBadge();
   const [currentGroupData, setCurrentGroupData] = useState<ChatGroup>();
   const socket = io(baseURL, {
     transports: ['websocket'],
@@ -82,6 +84,9 @@ export const InviteCallProvider: React.FC = ({children}) => {
       {name: '', members: [callee]},
       {
         onSuccess: createdGroup => {
+          if (createdGroup.updatedAt === createdGroup.createdAt) {
+            editChatGroup(createdGroup);
+          }
           setCurrentGroupData(createdGroup);
         },
       },

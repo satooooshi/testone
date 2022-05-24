@@ -22,7 +22,7 @@ const RoomList: React.FC = () => {
   const [roomTypeSelector, setRoomTypeSelector] = useState(false);
   const [userModal, setVisibleUserModal] = useState(false);
   const {data: users} = useAPIGetUsers('');
-  const {chatGroups, setChatGroupsState} = useHandleBadge();
+  const {chatGroups, setChatGroupsState, editChatGroup} = useHandleBadge();
   const {selectedUserRole, filteredUsers} = useUserRole('All', users);
   const [creationType, setCreationType] = useState<RoomType>();
   const [searchedRooms, setSearchedRooms] = useState<ChatGroup[]>();
@@ -31,6 +31,9 @@ const RoomList: React.FC = () => {
 
   const {mutate: createGroup} = useAPISaveChatGroup({
     onSuccess: createdData => {
+      if (createdData.updatedAt === createdData.createdAt) {
+        editChatGroup(createdData);
+      }
       navigation.navigate('ChatStack', {
         screen: 'Chat',
         params: {room: createdData},

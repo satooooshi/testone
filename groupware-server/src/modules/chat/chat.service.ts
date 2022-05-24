@@ -614,7 +614,7 @@ export class ChatService {
     }
     const silentNotification: CustomPushNotificationData = {
       title: 'silent',
-      body: '',
+      body: 'edit',
       custom: {
         screen: '',
         id: newGroup.id.toString(),
@@ -662,6 +662,15 @@ export class ChatService {
     const newGroup = await this.chatGroupRepository.save(
       this.chatGroupRepository.create(newData),
     );
+    const silentNotification: CustomPushNotificationData = {
+      title: 'silent',
+      body: 'edit',
+      custom: {
+        screen: '',
+        id: newGroup.id.toString(),
+      },
+    };
+    await sendPushNotifToSpecificUsers(newGroup.members, silentNotification);
     return newGroup;
   }
 

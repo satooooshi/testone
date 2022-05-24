@@ -217,8 +217,7 @@ export const BadgeProvider: React.FC = ({children}) => {
 
   useEffect(() => {
     if (editRoom) {
-      console.log('editROom called-----', editRoom.muteUsers);
-
+      console.log('editROom called-----', editRoom.members);
       if (editRoom.updatedAt > editRoom.createdAt) {
         if (editRoom.members?.filter(m => m.id === user?.id).length) {
           setChatGroups(room =>

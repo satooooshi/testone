@@ -76,8 +76,8 @@ export const BadgeProvider: React.FC = ({ children }) => {
     onSuccess: (data) => {
       const rooms = chatGroups.filter((r) => r.id !== data.id);
       if (chatGroups.length === rooms.length) {
-        socket.emit('setChatGroup', data.id);
-        resetSocketOn();
+        // socket.emit('setChatGroup', data.id);
+        // resetSocketOn();
       }
       if (data.isPinned) {
         setChatGroups([...[data], ...rooms]);
@@ -133,44 +133,44 @@ export const BadgeProvider: React.FC = ({ children }) => {
     );
   };
 
-  useEffect(
-    () => {
-      socket.connect();
+  // useEffect(
+  //   () => {
+  //     socket.connect();
 
-      return () => {
-        socket.off('editRoomClient');
-        socket.off('badgeClient');
-        socket.disconnect();
-      };
-    }, // eslint-disable-next-line react-hooks/exhaustive-deps
-    [user, chatGroups],
-  );
+  //     return () => {
+  //       socket.off('editRoomClient');
+  //       socket.off('badgeClient');
+  //       socket.disconnect();
+  //     };
+  //   }, // eslint-disable-next-line react-hooks/exhaustive-deps
+  //   [user, chatGroups],
+  // );
 
-  useEffect(
-    () => {
-      if (completeRefetch && chatGroups.length) {
-        socket.emit(
-          'setChatGroups',
-          chatGroups.map((g) => g.id),
-        );
-        socket.on(
-          'badgeClient',
-          async (data: { userId: number; groupId: number }) => {
-            if (data.groupId) setRefetchGroupId(data.groupId);
-          },
-        );
-        socket.on('editRoomClient', async (room: ChatGroup) => {
-          if (room?.id) {
-            setEditRoom(room);
-            console.log('-----------editRoomClient-----');
-          }
-        });
-        setCompleteRefetch(false);
-        console.log('-----====---===---==', chatGroups.length);
-      }
-    }, // eslint-disable-next-line react-hooks/exhaustive-deps
-    [completeRefetch, chatGroups],
-  );
+  // useEffect(
+  //   () => {
+  //     if (completeRefetch && chatGroups.length) {
+  //       socket.emit(
+  //         'setChatGroups',
+  //         chatGroups.map((g) => g.id),
+  //       );
+  //       socket.on(
+  //         'badgeClient',
+  //         async (data: { userId: number; groupId: number }) => {
+  //           if (data.groupId) setRefetchGroupId(data.groupId);
+  //         },
+  //       );
+  //       socket.on('editRoomClient', async (room: ChatGroup) => {
+  //         if (room?.id) {
+  //           setEditRoom(room);
+  //           console.log('-----------editRoomClient-----');
+  //         }
+  //       });
+  //       setCompleteRefetch(false);
+  //       console.log('-----====---===---==', chatGroups.length);
+  //     }
+  //   }, // eslint-disable-next-line react-hooks/exhaustive-deps
+  //   [completeRefetch, chatGroups],
+  // );
 
   useEffect(() => {
     if (editRoom) {
@@ -184,13 +184,13 @@ export const BadgeProvider: React.FC = ({ children }) => {
             ),
           );
         } else {
-          socket.emit('unsetChatGroup', editRoom.id);
-          resetSocketOn();
+          // socket.emit('unsetChatGroup', editRoom.id);
+          // resetSocketOn();
           setChatGroups((rooms) => rooms.filter((r) => r.id !== editRoom.id));
         }
       } else if (editRoom.members?.filter((m) => m.id === user?.id).length) {
-        socket.emit('setChatGroup', editRoom.id);
-        resetSocketOn();
+        // socket.emit('setChatGroup', editRoom.id);
+        // resetSocketOn();
         const rooms = chatGroups;
         const pinnedRoomsCount = rooms.filter((r) => r.isPinned).length;
         rooms.splice(pinnedRoomsCount, 0, editRoom);
