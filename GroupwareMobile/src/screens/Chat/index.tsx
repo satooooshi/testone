@@ -655,8 +655,8 @@ const Chat: React.FC = () => {
 
   useEffect(() => {
     let isMounted = true;
-    socket.connect();
-    socket.emit('joinRoom', room.id.toString());
+    // socket.connect();
+    // socket.emit('joinRoom', room.id.toString());
     socket.on('readMessageClient', async (senderId: string) => {
       if (myself?.id && senderId && senderId !== `${myself?.id}`) {
         console.log('readMessageClient called', senderId, myself.id, room.id);
@@ -711,18 +711,18 @@ const Chat: React.FC = () => {
     });
     setCurrentChatRoomId(room.id);
 
-    socket.on('joinedRoom', (r: any) => {
-      console.log('joinedRoom', r);
-    });
+    // socket.on('joinedRoom', (r: any) => {
+    //   console.log('joinedRoom', r);
+    // });
 
-    socket.on('leftRoom', (r: any) => {
-      console.log('leftRoom', r);
-    });
+    // socket.on('leftRoom', (r: any) => {
+    //   console.log('leftRoom', r);
+    // });
     return () => {
-      socket.emit('leaveRoom', room.id);
+      // socket.emit('leaveRoom', room.id);
       isMounted = false;
       setCurrentChatRoomId(undefined);
-      socket.disconnect();
+      // socket.disconnect();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [room.id]);
