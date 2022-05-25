@@ -543,14 +543,11 @@ const Navigator = () => {
         console.log('PushNotification TOKEN:', token);
       },
       onNotification: notification => {
-        if (notification?.data?.title === 'silent' && notification.data?.id) {
+        if (notification?.data?.silent && notification.data?.id) {
           refetchRoomCard(notification.data?.id);
         }
         console.log('PushNotification onNotification========', notification);
-        if (
-          Platform.OS === 'android' &&
-          notification?.data?.title !== 'silent'
-        ) {
+        if (Platform.OS === 'android' && !notification?.data?.silent) {
           if (
             notification?.data?.screen === 'chat' &&
             notification.data?.id === `${currentChatRoomId}`

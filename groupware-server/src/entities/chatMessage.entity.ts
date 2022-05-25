@@ -195,9 +195,11 @@ export class ChatMessage {
         },
       };
       const silentNotification: CustomPushNotificationData = {
-        title: 'silent',
-        body: 'badge',
+        title: '',
+        body: '',
         custom: {
+          silent: 'silent',
+          type: 'badge',
           screen: '',
           id: this.chatGroup.id.toString(),
         },
