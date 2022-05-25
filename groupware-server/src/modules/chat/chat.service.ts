@@ -14,6 +14,10 @@ import { ChatMessageReaction } from 'src/entities/chatMessageReaction.entity';
 import { LastReadChatTime } from 'src/entities/lastReadChatTime.entity';
 import { User } from 'src/entities/user.entity';
 import { userNameFactory } from 'src/utils/factory/userNameFactory';
+import {
+  CustomPushNotificationData,
+  sendPushNotifToSpecificUsers,
+} from 'src/utils/notification/sendPushNotification';
 import { In, Repository } from 'typeorm';
 import { StorageService } from '../storage/storage.service';
 import {
@@ -96,6 +100,7 @@ export class ChatService {
       .createQueryBuilder('chat_groups')
       .leftJoinAndSelect('chat_groups.members', 'members')
       .leftJoin('chat_groups.members', 'member')
+      .leftJoinAndSelect('chat_groups.muteUsers', 'muteUsers')
       .leftJoinAndSelect(
         'chat_groups.pinnedUsers',
         'pinnedUsers',
@@ -177,6 +182,7 @@ export class ChatService {
       .createQueryBuilder('chat_groups')
       .leftJoinAndSelect('chat_groups.members', 'members')
       .leftJoin('chat_groups.members', 'member')
+      .leftJoinAndSelect('chat_groups.muteUsers', 'muteUsers')
       .leftJoinAndSelect(
         'chat_groups.pinnedUsers',
         'pinnedUsers',
@@ -212,7 +218,6 @@ export class ChatService {
       };
 
       room.unreadCount = await this.getUnreadChatMessage(userID, query);
-      console.log('----', userID, query, room.unreadCount);
     }
     return room;
   }
@@ -264,6 +269,7 @@ export class ChatService {
       limit = '20',
       dateRefetchLatest,
     } = query;
+    console.log('--------', limit);
 
     if (Number(limit) === 0) {
       return [];
@@ -550,7 +556,7 @@ export class ChatService {
 
   public async v2UpdateChatGroup(
     chatGroup: Partial<ChatGroup>,
-    userID: number,
+    requestUser: User,
   ): Promise<ChatGroup> {
     const newData: Partial<ChatGroup> = {
       ...chatGroup,
@@ -559,14 +565,14 @@ export class ChatService {
     if (!newData.members || !newData.members.length) {
       throw new InternalServerErrorException('Something went wrong');
     }
-    const userIds = newData.members.map((u) => u.id);
-    const users = await this.userRepository.findByIds(userIds);
-    const requestUser = await this.userRepository.findOne(userID);
 
     const existGroup = await this.chatGroupRepository.findOne(newData.id, {
       relations: ['members'],
     });
-    newData.members = users;
+
+    if (!existGroup.members.filter((u) => u.id === requestUser.id).length) {
+      throw new BadRequestException('The user is not a member');
+    }
 
     const newGroup = await this.chatGroupRepository.save(
       this.chatGroupRepository.create({
@@ -612,6 +618,21 @@ export class ChatService {
       removedMembersSystemMsg.chatGroup = { ...newGroup, members: undefined };
       await this.chatMessageRepository.save(removedMembersSystemMsg);
     }
+    const silentNotification: CustomPushNotificationData = {
+      title: '',
+      body: '',
+      custom: {
+        silent: 'silent',
+        type: 'edit',
+        screen: '',
+        id: newGroup.id.toString(),
+      },
+    };
+    const allMemberWithoutMyself = newGroup.members.concat(removedMembers);
+    await sendPushNotifToSpecificUsers(
+      allMemberWithoutMyself,
+      silentNotification,
+    );
 
     return newGroup;
   }
@@ -627,7 +648,6 @@ export class ChatService {
       throw new InternalServerErrorException('Something went wrong');
     }
     const userIds = newData.members.map((u) => u.id);
-    const users = await this.userRepository.findByIds(userIds);
     const maybeExistGroup = await this.chatGroupRepository
       .createQueryBuilder('g')
       .leftJoinAndSelect('g.members', 'u')
@@ -647,11 +667,11 @@ export class ChatService {
     if (existGroup.length) {
       return existGroup[0];
     }
-    newData.members = users;
 
     const newGroup = await this.chatGroupRepository.save(
       this.chatGroupRepository.create(newData),
     );
+
     return newGroup;
   }
 

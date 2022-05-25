@@ -109,6 +109,21 @@ export class ChatGroup {
   })
   members?: User[];
 
+  @ManyToMany(() => User, (user) => user.muteChatGroups, {
+    onUpdate: 'CASCADE',
+    onDelete: 'CASCADE',
+  })
+  @JoinTable({
+    name: 'user_chat_mute',
+    joinColumn: {
+      name: 'chat_group_id',
+    },
+    inverseJoinColumn: {
+      name: 'user_id',
+    },
+  })
+  muteUsers?: User[];
+
   @CreateDateColumn({
     type: 'datetime',
     name: 'created_at',

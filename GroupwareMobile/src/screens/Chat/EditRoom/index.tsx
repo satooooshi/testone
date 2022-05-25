@@ -16,15 +16,12 @@ import {
   EditRoomNavigationProps,
   EditRoomRouteProps,
 } from '../../../types/navigator/drawerScreenProps';
-import {io} from 'socket.io-client';
-import {baseURL} from '../../../utils/url';
 
 const EditRoom: React.FC = () => {
   const navigation = useNavigation<EditRoomNavigationProps>();
-  const socket = io(baseURL, {
-    transports: ['websocket'],
-  });
+  const {editChatGroup} = useHandleBadge();
   const {room} = useRoute<EditRoomRouteProps>().params;
+
   const {data: roomDetail, refetch} = useAPIGetRoomDetail(room.id, {
     onError: () => {
       Alert.alert('ルーム情報の取得に失敗しました');
@@ -35,8 +32,7 @@ const EditRoom: React.FC = () => {
   const headerTitle = 'ルーム編集';
   const {mutate: updateGroup} = useAPIUpdateChatGroup({
     onSuccess: updatedGroup => {
-      // setNewChatGroup(updatedGroup);
-      socket.emit('editRoom', updatedGroup);
+      editChatGroup(updatedGroup);
       Alert.alert('ルームの更新が完了しました。', undefined, [
         {
           text: 'OK',

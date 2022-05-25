@@ -35,10 +35,10 @@ export class ChatGateway
 
   @SubscribeMessage('message')
   public async handleMessage(_: Socket, payload: ChatMessage) {
-    this.server.to(payload.chatGroup?.id.toString()).emit('badgeClient', {
-      userId: payload.sender.id,
-      groupId: payload.chatGroup.id,
-    });
+    // this.server.to(payload.chatGroup?.id.toString()).emit('badgeClient', {
+    //   userId: payload.sender.id,
+    //   groupId: payload.chatGroup.id,
+    // });
     this.server
       .to(payload.chatGroup?.id.toString())
       .emit('msgToClient', { ...payload, isSender: false });
@@ -54,9 +54,11 @@ export class ChatGateway
 
   @SubscribeMessage('editRoom')
   public async editRoom(_: Socket, room: ChatGroup) {
-    console.log('------');
-
-    this.server.to(room?.id.toString()).emit('editRoomClient', room);
+    if (room.createdAt === room.updatedAt) {
+      this.server.emit('editRoomClient', room);
+    } else {
+      this.server.to(room?.id.toString()).emit('editRoomClient', room);
+    }
   }
 
   @SubscribeMessage('joinRoom')

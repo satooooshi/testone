@@ -25,6 +25,12 @@ export const sendPushNotifToSpecificUsers = async (
   user: User[],
   data: CustomPushNotificationData,
 ) => {
+  console.log(
+    '-----',
+    data,
+    user.map((u) => u.lastName),
+  );
+
   const deviceRepository = getRepository(NotificationDevice);
   const userIds = user.map((u) => u.id);
   if (userIds.length) {
@@ -41,7 +47,7 @@ const sendPushNotifToSpecificDevices = async (
   devices: NotificationDevice[],
   data: CustomPushNotificationData,
 ) => {
-  const pushNotifSettings: PushNotifications.Settings = {
+  const pushNotifSettings = {
     gcm: {
       id: process.env.FCM_API_KEY,
     },
@@ -57,8 +63,8 @@ const sendPushNotifToSpecificDevices = async (
     topic: process.env.IOS_BUNDLE_ID ? '' : '', // REQUIRED for iOS (apn and gcm)
     contentAvailable: true,
     priority: 'high',
-    silent: data.title === 'call' ? true : false,
-    sound: 'local.wav',
+    silent: data?.custom?.silent === 'silent' ? true : false,
+    sound: data.title ? 'local.wav' : undefined,
     /* The topic of the notification. When using token-based authentication, specify the bundle ID of the app.
      * When using certificate-based authentication, the topic is usually your app's bundle ID.
      * More details can be found under https://developer.apple.com/documentation/usernotifications/setting_up_a_remote_notification_server/sending_notification_requests_to_apns
@@ -72,9 +78,9 @@ const sendPushNotifToSpecificDevices = async (
       console.log(err);
     } else {
       console.log(result);
-      for (const e of result) {
-        console.log(e.message);
-      }
+      // for (const e of result) {
+      //   console.log(e.message);
+      // }
     }
   });
 };

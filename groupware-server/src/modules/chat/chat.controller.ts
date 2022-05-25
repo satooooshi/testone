@@ -97,9 +97,9 @@ export class ChatController {
   ) {
     const callee = await this.chatService.calleeForPhoneCall(calleeId);
     const notificationData: CustomPushNotificationData = {
-      title: 'call',
-      body: 'call',
-      custom: invitation,
+      title: '',
+      body: '',
+      custom: { invitation: invitation, silent: 'silent', type: 'edit' },
     };
     await sendPushNotifToSpecificUsers([callee], notificationData);
     return;
@@ -260,14 +260,9 @@ export class ChatController {
     @Body() chatGroup: Partial<ChatGroup>,
   ): Promise<ChatGroup> {
     const user = req.user;
-
-    chatGroup.members = [
-      ...(chatGroup?.members?.filter((u) => u.id !== user.id) || []),
-      user,
-    ];
     const savedGroup = await this.chatService.v2UpdateChatGroup(
       chatGroup,
-      user.id,
+      user,
     );
     return savedGroup;
   }
@@ -279,11 +274,23 @@ export class ChatController {
     @Body() chatGroup: Partial<ChatGroup>,
   ): Promise<ChatGroup> {
     const user = req.user;
+    const otherMembers = chatGroup.members;
     chatGroup.members = [
       ...(chatGroup?.members?.filter((u) => u.id !== user.id) || []),
       user,
     ];
     const savedGroup = await this.chatService.v2SaveChatGroup(chatGroup);
+    const silentNotification: CustomPushNotificationData = {
+      title: '',
+      body: '',
+      custom: {
+        silent: 'silent',
+        type: 'create',
+        screen: '',
+        id: savedGroup.id.toString(),
+      },
+    };
+    await sendPushNotifToSpecificUsers(otherMembers, silentNotification);
     return savedGroup;
   }
 

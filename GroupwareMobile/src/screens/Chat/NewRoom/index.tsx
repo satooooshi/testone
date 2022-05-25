@@ -14,15 +14,13 @@ import {
 const NewRoom: React.FC = () => {
   const navigation = useNavigation<NewRoomNavigationProps>();
   const route = useRoute<NewRoomRouteProps>();
-  const {setNewChatGroup} = useHandleBadge();
   const {mutate: uploadImage} = useAPIUploadStorage();
   const {data: users} = useAPIGetUsers('');
+  const {editChatGroup} = useHandleBadge();
   const headerTitle = 'ルーム新規作成';
   const {mutate: createGroup} = useAPISaveChatGroup({
     onSuccess: createdData => {
-      if (createdData.updatedAt === createdData.createdAt) {
-        setNewChatGroup(createdData);
-      }
+      editChatGroup(createdData);
       navigation.navigate('ChatStack', {
         screen: 'Chat',
         params: {room: createdData},

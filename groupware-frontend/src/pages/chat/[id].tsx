@@ -33,7 +33,7 @@ const ChatDetail = () => {
   const socket = io(baseURL, {
     transports: ['websocket'],
   });
-  const { setNewChatGroup } = useHandleBadge();
+  const { emitEditRoom } = useHandleBadge();
 
   const [
     { editChatGroupModalVisible, editMembersModalVisible, createGroupWindow },
@@ -42,8 +42,11 @@ const ChatDetail = () => {
 
   const { mutate: updateGroup } = useAPIUpdateChatGroup({
     onSuccess: (data) => {
-      setNewChatGroup(data);
+      emitEditRoom(data);
       socket.emit('editRoom', data);
+    },
+    onError: () => {
+      alert('グループの更新中にエラーが発生しました');
     },
   });
   const toast = useToast();
@@ -72,7 +75,7 @@ const ChatDetail = () => {
 
   const { mutate: createGroup } = useAPISaveChatGroup({
     onSuccess: (createdData) => {
-      setNewChatGroup(createdData);
+      emitEditRoom(createdData);
       router.push(`/chat/${createdData.id.toString()}`, undefined, {
         shallow: true,
       });
