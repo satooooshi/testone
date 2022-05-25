@@ -127,9 +127,14 @@ export const BadgeProvider: React.FC = ({ children }) => {
           setChatGroups((rooms) => {
             const latestPinnedRooms = [];
             for (const latestRoom of latestRooms) {
+              const olderRoom = chatGroups.filter(
+                (r) => r.id === latestRoom.id,
+              )[0];
+              const incrementCount =
+                (latestRoom?.unreadCount || 0) - (olderRoom?.unreadCount || 0);
+              setChatUnreadCount((c) => c + incrementCount);
               if (latestRoom.isPinned) {
                 latestPinnedRooms.unshift(latestRoom);
-                setChatUnreadCount((c) => c + (latestRoom.unreadCount || 0));
               }
             }
 
