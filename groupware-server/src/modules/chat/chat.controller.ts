@@ -270,9 +270,27 @@ export class ChatController {
   @Post('/v2/room')
   @UseGuards(JwtAuthenticationGuard)
   async v2SaveChatGroup(
+    @Req() req: RequestWithUser,
     @Body() chatGroup: Partial<ChatGroup>,
   ): Promise<ChatGroup> {
+    const user = req.user;
+    const otherMembers = chatGroup.members;
+    chatGroup.members = [
+      ...(chatGroup?.members?.filter((u) => u.id !== user.id) || []),
+      user,
+    ];
     const savedGroup = await this.chatService.v2SaveChatGroup(chatGroup);
+    const silentNotification: CustomPushNotificationData = {
+      title: '',
+      body: '',
+      custom: {
+        silent: 'silent',
+        type: 'create',
+        screen: '',
+        id: savedGroup.id.toString(),
+      },
+    };
+    await sendPushNotifToSpecificUsers(otherMembers, silentNotification);
     return savedGroup;
   }
 

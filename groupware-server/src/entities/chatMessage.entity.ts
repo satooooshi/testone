@@ -149,16 +149,12 @@ export class ChatMessage {
         }
       }
       // console.log(mentionedIds);
-      const AllUsers = await getRepository(User)
+      const allUsers = await getRepository(User)
         .createQueryBuilder('user')
         .select('user.id')
         .leftJoin('user.chatGroups', 'chatGroups')
         .leftJoinAndSelect('user.muteChatGroups', 'muteChatGroups')
-        .where('muteChatGroups.id <> :chatGroupId', {
-          chatGroupId: this.chatGroup.id,
-        })
-        .orWhere('muteChatGroups.id is null')
-        .andWhere('chatGroups.id = :chatGroupId', {
+        .where('chatGroups.id = :chatGroupId', {
           chatGroupId: this.chatGroup.id,
         })
         .andWhere('user.id <> :senderId', { senderId: this.sender.id })
@@ -206,7 +202,8 @@ export class ChatMessage {
       };
       console.log(
         '---====',
-        notifiedUsers,
+        notifiedUsers.map((u) => u.id),
+        allUsers.map((u) => u.id),
         notifiedUsers.map((u) => u.muteChatGroups),
       );
 
@@ -214,7 +211,7 @@ export class ChatMessage {
         notifiedUsers,
         notificationDataWithNoMention,
       );
-      await sendPushNotifToSpecificUsers(AllUsers, silentNotification);
+      await sendPushNotifToSpecificUsers(allUsers, silentNotification);
       if (mentionedIds?.length) {
         const mentionedUsers = await getRepository(User)
           .createQueryBuilder('user')
