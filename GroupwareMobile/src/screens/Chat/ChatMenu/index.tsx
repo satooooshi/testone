@@ -97,9 +97,7 @@ const ChatMenu: React.FC = () => {
                 ? room.muteUsers.splice(0, 0, myself[0])
                 : myself;
               updateGroup({...room, muteUsers: muteUsers});
-              console.log('-----------muteUsers', muteUsers);
             }
-            console.log('-----------', myself);
           }
         }}
       />
