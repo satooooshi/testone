@@ -540,13 +540,17 @@ const Navigator = () => {
           refetchRoomCard(notification.data?.id);
         }
         console.log('PushNotification onNotification========', notification);
-        if (Platform.OS === 'android' && !notification?.data?.silent) {
+        if (Platform.OS === 'android') {
           if (
-            notification?.data?.screen === 'chat' &&
-            notification.data?.id === `${currentChatRoomId}`
+            notification?.data?.silent ||
+            (notification?.data?.screen === 'chat' &&
+              notification.data?.id === `${currentChatRoomId}`)
           ) {
+            console.log('666666', notification.data);
             return;
           }
+          console.log('7777777');
+
           sendLocalNotification(notification);
         } else if (notification.userInteraction) {
           naviateByNotif(notification);
@@ -562,8 +566,9 @@ const Navigator = () => {
 
     const unsubscribe = messaging().onMessage(async remoteMessage => {
       if (
-        remoteMessage?.data?.screen &&
-        remoteMessage.data?.id === `${currentChatRoomId}`
+        Platform.OS === 'android' ||
+        (remoteMessage?.data?.screen &&
+          remoteMessage.data?.id === `${currentChatRoomId}`)
       ) {
         return;
       }
