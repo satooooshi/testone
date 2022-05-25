@@ -9,13 +9,13 @@ import {
   Input,
 } from '@chakra-ui/react';
 import React, { useCallback, useEffect, useState } from 'react';
-import { useHandleBadge } from 'src/contexts/badge/useHandleBadge';
 import { useRoomRefetch } from 'src/contexts/chat/useRoomRefetch';
 import { ChatGroup } from 'src/types';
 import ChatGroupCard from '../ChatGroupCard';
 import { useAPISavePin } from '@/hooks/api/chat/useAPISavePin';
 import { AiOutlineSearch } from 'react-icons/ai';
 import { nameOfEmptyNameGroup } from 'src/utils/chat/nameOfEmptyNameGroup';
+import { useHandleBadge } from 'src/contexts/badge/useHandleBadge';
 
 type RoomListProps = {
   currentId?: string;
@@ -27,6 +27,72 @@ const RoomList: React.FC<RoomListProps> = ({ currentId, onClickRoom }) => {
   const { setChatGroupsState, chatGroups } = useHandleBadge();
   const [chatRooms, setChatRooms] = useState<ChatGroup[]>([]);
   const [searchedRooms, setSearchedRooms] = useState<ChatGroup[]>([]);
+
+  const returnUpdatedAtLatest = (): Date => {
+    const updatedAtTopRoom = chatRooms[0].updatedAt;
+    if (chatRooms[0]?.isPinned) {
+      const updatedAtExceptPinnedTopRoom = chatRooms.filter(
+        (r) => !r.isPinned,
+      )[0]?.updatedAt;
+
+      return updatedAtTopRoom > updatedAtExceptPinnedTopRoom
+        ? updatedAtTopRoom
+        : updatedAtExceptPinnedTopRoom;
+    }
+    return updatedAtTopRoom;
+  };
+
+  const { refetch: refetchLatestRooms } = useAPIGetRoomsByPage(
+    {
+      limit: '20',
+      updatedAtLatestRoom: returnUpdatedAtLatest(),
+    },
+    {
+      refetchInterval: 10000,
+      onSuccess: (data) => {
+        const latestRooms = data.rooms;
+        console.log(
+          'success latest rooms refech ================================',
+          latestRooms.length,
+        );
+        if (latestRooms.length) {
+          setChatRooms((rooms) => {
+            const latestPinnedRooms = [];
+            for (const latestRoom of latestRooms) {
+              if (latestRoom.isPinned) {
+                latestPinnedRooms.unshift(latestRoom);
+              }
+            }
+
+            const ids = latestRooms.map((r) => r.id);
+            const existRooms = rooms.filter((r) => !ids.includes(r.id));
+            const existPinnedRooms = existRooms.filter((r) => r.isPinned);
+            const existExceptPinnedRooms = existRooms.filter(
+              (r) => !r.isPinned,
+            );
+
+            const latestRoomsExceptPinnedRooms = latestRooms.filter(
+              (r) => !r.isPinned,
+            );
+
+            setChatGroupsState([
+              ...latestPinnedRooms,
+              ...existPinnedRooms,
+              ...latestRoomsExceptPinnedRooms,
+              ...existExceptPinnedRooms,
+            ]);
+
+            return [
+              ...latestPinnedRooms,
+              ...existPinnedRooms,
+              ...latestRoomsExceptPinnedRooms,
+              ...existExceptPinnedRooms,
+            ];
+          });
+        }
+      },
+    },
+  );
 
   const { mutate: savePin } = useAPISavePin({
     onSuccess: (data) => {
