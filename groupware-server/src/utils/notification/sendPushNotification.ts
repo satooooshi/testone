@@ -47,7 +47,7 @@ const sendPushNotifToSpecificDevices = async (
   devices: NotificationDevice[],
   data: CustomPushNotificationData,
 ) => {
-  const pushNotifSettings: PushNotifications.Settings = {
+  const pushNotifSettings = {
     gcm: {
       id: process.env.FCM_API_KEY,
     },
@@ -59,7 +59,7 @@ const sendPushNotifToSpecificDevices = async (
   console.log('notification data', data.title, data.body);
 
   const dataToSend = {
-    title: data.title ? data.title : undefined, // REQUIRED for Android
+    title: data.title ? data.title : '', // REQUIRED for Android
     topic: process.env.IOS_BUNDLE_ID ? '' : '', // REQUIRED for iOS (apn and gcm)
     contentAvailable: true,
     priority: 'high',
@@ -69,10 +69,9 @@ const sendPushNotifToSpecificDevices = async (
      * When using certificate-based authentication, the topic is usually your app's bundle ID.
      * More details can be found under https://developer.apple.com/documentation/usernotifications/setting_up_a_remote_notification_server/sending_notification_requests_to_apns
      */
-    body: data.body ? callHistoryMessageFactory(data.body) : undefined,
+    body: callHistoryMessageFactory(data.body),
     custom: data.custom,
   };
-  console.log('----', data.title, dataToSend.silent);
 
   pushNotifService.send(tokens, dataToSend, (err, result) => {
     if (err) {
