@@ -613,9 +613,11 @@ export class ChatService {
       await this.chatMessageRepository.save(removedMembersSystemMsg);
     }
     const silentNotification: CustomPushNotificationData = {
-      title: 'silent',
-      body: 'edit',
+      title: '',
+      body: '',
       custom: {
+        silent: 'silent',
+        type: 'edit',
         screen: '',
         id: newGroup.id.toString(),
       },
@@ -663,9 +665,11 @@ export class ChatService {
       this.chatGroupRepository.create(newData),
     );
     const silentNotification: CustomPushNotificationData = {
-      title: 'silent',
-      body: 'edit',
+      title: '',
+      body: '',
       custom: {
+        silent: 'silent',
+        type: 'create',
         screen: '',
         id: newGroup.id.toString(),
       },
