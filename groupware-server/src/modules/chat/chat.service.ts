@@ -550,7 +550,7 @@ export class ChatService {
 
   public async v2UpdateChatGroup(
     chatGroup: Partial<ChatGroup>,
-    userID: number,
+    requestUser: User,
   ): Promise<ChatGroup> {
     const newData: Partial<ChatGroup> = {
       ...chatGroup,
@@ -559,14 +559,10 @@ export class ChatService {
     if (!newData.members || !newData.members.length) {
       throw new InternalServerErrorException('Something went wrong');
     }
-    const userIds = newData.members.map((u) => u.id);
-    const users = await this.userRepository.findByIds(userIds);
-    const requestUser = await this.userRepository.findOne(userID);
 
     const existGroup = await this.chatGroupRepository.findOne(newData.id, {
       relations: ['members'],
     });
-    newData.members = users;
 
     const newGroup = await this.chatGroupRepository.save(
       this.chatGroupRepository.create({
@@ -639,7 +635,6 @@ export class ChatService {
       throw new InternalServerErrorException('Something went wrong');
     }
     const userIds = newData.members.map((u) => u.id);
-    const users = await this.userRepository.findByIds(userIds);
     const maybeExistGroup = await this.chatGroupRepository
       .createQueryBuilder('g')
       .leftJoinAndSelect('g.members', 'u')
@@ -659,7 +654,6 @@ export class ChatService {
     if (existGroup.length) {
       return existGroup[0];
     }
-    newData.members = users;
 
     const newGroup = await this.chatGroupRepository.save(
       this.chatGroupRepository.create(newData),
