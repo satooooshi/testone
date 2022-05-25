@@ -564,6 +564,10 @@ export class ChatService {
       relations: ['members'],
     });
 
+    if (!existGroup.members.filter((u) => u.id === requestUser.id).length) {
+      throw new BadRequestException('The user is not a member');
+    }
+
     const newGroup = await this.chatGroupRepository.save(
       this.chatGroupRepository.create({
         ...existGroup,
@@ -618,8 +622,11 @@ export class ChatService {
         id: newGroup.id.toString(),
       },
     };
-    const allMember = newGroup.members.concat(removedMembers);
-    await sendPushNotifToSpecificUsers(allMember, silentNotification);
+    const allMemberWithoutMyself = newGroup.members.concat(removedMembers);
+    await sendPushNotifToSpecificUsers(
+      allMemberWithoutMyself,
+      silentNotification,
+    );
 
     return newGroup;
   }

@@ -45,6 +45,9 @@ const ChatDetail = () => {
       emitEditRoom(data);
       socket.emit('editRoom', data);
     },
+    onError: () => {
+      alert('グループの更新中にエラーが発生しました');
+    },
   });
   const toast = useToast();
   useAPIGetRoomDetail(Number(id), {
