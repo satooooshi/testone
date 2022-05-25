@@ -29,7 +29,7 @@ const RoomList: React.FC<RoomListProps> = ({ currentId, onClickRoom }) => {
   const [searchedRooms, setSearchedRooms] = useState<ChatGroup[]>([]);
 
   const returnUpdatedAtLatest = (): Date => {
-    const updatedAtTopRoom = chatRooms[0].updatedAt;
+    const updatedAtTopRoom = chatRooms[0]?.updatedAt;
     if (chatRooms[0]?.isPinned) {
       const updatedAtExceptPinnedTopRoom = chatRooms.filter(
         (r) => !r.isPinned,
