@@ -260,14 +260,9 @@ export class ChatController {
     @Body() chatGroup: Partial<ChatGroup>,
   ): Promise<ChatGroup> {
     const user = req.user;
-
-    chatGroup.members = [
-      ...(chatGroup?.members?.filter((u) => u.id !== user.id) || []),
-      user,
-    ];
     const savedGroup = await this.chatService.v2UpdateChatGroup(
       chatGroup,
-      user.id,
+      user,
     );
     return savedGroup;
   }
@@ -275,14 +270,8 @@ export class ChatController {
   @Post('/v2/room')
   @UseGuards(JwtAuthenticationGuard)
   async v2SaveChatGroup(
-    @Req() req: RequestWithUser,
     @Body() chatGroup: Partial<ChatGroup>,
   ): Promise<ChatGroup> {
-    const user = req.user;
-    chatGroup.members = [
-      ...(chatGroup?.members?.filter((u) => u.id !== user.id) || []),
-      user,
-    ];
     const savedGroup = await this.chatService.v2SaveChatGroup(chatGroup);
     return savedGroup;
   }
