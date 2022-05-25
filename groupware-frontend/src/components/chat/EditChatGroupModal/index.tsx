@@ -46,6 +46,9 @@ const EditChatGroupModal: React.FC<EditChatGroupModalProps> = ({
       emitEditRoom(newInfo);
       onComplete(newInfo);
     },
+    onError: () => {
+      alert('グループの更新中にエラーが発生しました');
+    },
   });
 
   const { emitEditRoom } = useHandleBadge();
