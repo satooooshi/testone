@@ -543,7 +543,11 @@ const Navigator = () => {
         console.log('PushNotification TOKEN:', token);
       },
       onNotification: notification => {
-        if (notification?.data?.silent && notification.data?.id) {
+        if (
+          (notification?.data?.silent ||
+            notification?.data?.type === 'badge') &&
+          notification.data?.id
+        ) {
           refetchRoomCard(notification.data?.id);
         }
         console.log('PushNotification onNotification========', notification);
