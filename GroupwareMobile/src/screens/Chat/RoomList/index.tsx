@@ -73,9 +73,15 @@ const RoomList: React.FC = () => {
     },
   });
 
+  // useFocusEffect(
+  //   useCallback(() => {
+  //     setChatRooms(chatGroups);
+  //   }, [chatGroups]),
+  // );
+
   useEffect(() => {
-    console.log('00000000', isRoomsRefetching);
-  }, [isRoomsRefetching]);
+    setChatRooms(chatGroups);
+  }, [chatGroups]);
 
   const onPressRightButton = () => {
     // navigation.navigate('ChatStack', {screen: 'NewRoom'});
