@@ -574,7 +574,7 @@ export class ChatService {
       if (u.id === requestUser.id) {
         isMySelf = true;
       } else {
-        return u.id;
+        return true;
       }
     });
 
@@ -638,7 +638,7 @@ export class ChatService {
     };
     const allMemberWithoutMyself = otherExistMembers.concat(newMembers);
     await sendPushNotifToSpecificUsers(
-      allMemberWithoutMyself,
+      allMemberWithoutMyself.map((u) => u.id),
       silentNotification,
     );
 

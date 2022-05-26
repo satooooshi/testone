@@ -82,7 +82,10 @@ export class QAAnswerReply {
         id: targetWiki.id.toString(),
       },
     };
-    await sendPushNotifToSpecificUsers([targetWiki.writer], notificationData);
+    await sendPushNotifToSpecificUsers(
+      [targetWiki.writer.id],
+      notificationData,
+    );
   }
 
   @BeforeInsert()

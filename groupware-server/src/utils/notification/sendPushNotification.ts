@@ -22,17 +22,10 @@ export const sendPushNotifToAllUsers = async (
 };
 
 export const sendPushNotifToSpecificUsers = async (
-  user: User[],
+  userIds: number[],
   data: CustomPushNotificationData,
 ) => {
-  console.log(
-    '-----',
-    data,
-    user.map((u) => u.lastName),
-  );
-
   const deviceRepository = getRepository(NotificationDevice);
-  const userIds = user.map((u) => u.id);
   if (userIds.length) {
     const devices = await deviceRepository
       .createQueryBuilder('devices')

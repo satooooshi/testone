@@ -274,7 +274,7 @@ export class ChatController {
     @Body() chatGroup: Partial<ChatGroup>,
   ): Promise<ChatGroup> {
     const user = req.user;
-    const otherMembers = chatGroup.members;
+    const otherMembersId = chatGroup.members.map((u) => u.id);
     chatGroup.members = [
       ...(chatGroup?.members?.filter((u) => u.id !== user.id) || []),
       user,
@@ -290,7 +290,7 @@ export class ChatController {
         id: savedGroup.id.toString(),
       },
     };
-    await sendPushNotifToSpecificUsers(otherMembers, silentNotification);
+    await sendPushNotifToSpecificUsers(otherMembersId, silentNotification);
     return savedGroup;
   }
 
