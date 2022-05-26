@@ -187,9 +187,9 @@ export class ChatController {
     const { user } = req;
 
     const room = await this.chatService.getOneRoom(req.user.id, Number(roomId));
-    if (!room.members.filter((m) => m.id === user.id).length) {
-      throw new BadRequestException('チャットルームを取得する権限がありません');
-    }
+    // if (!room.members.filter((m) => m.id === user.id).length) {
+    //   throw new BadRequestException('チャットルームを取得する権限がありません');
+    // }
     return room;
   }
 
