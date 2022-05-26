@@ -17,6 +17,7 @@ const BadgeContext = createContext({
   refetchRoomCard: (() => {}) as (roomId: number) => void,
   emitEditRoom: (() => {}) as (room: ChatGroup) => void,
   editChatGroup: (() => {}) as (room: ChatGroup) => void,
+  isRoomsRefetching: false,
 });
 
 export const BadgeProvider: React.FC = ({children}) => {
@@ -33,7 +34,7 @@ export const BadgeProvider: React.FC = ({children}) => {
   const [networkConnection, setNetworkConnection] = useState(true);
   const [editRoom, setEditRoom] = useState<ChatGroup>();
 
-  const {refetch: refetchAllRooms} = useAPIGetRooms(
+  const {refetch: refetchAllRooms, isLoading} = useAPIGetRooms(
     {
       page: page.toString(),
       limit: '20',
@@ -257,6 +258,7 @@ export const BadgeProvider: React.FC = ({children}) => {
         refetchRoomCard,
         emitEditRoom,
         editChatGroup,
+        isRoomsRefetching: isLoading,
       }}>
       {children}
     </BadgeContext.Provider>
