@@ -37,6 +37,10 @@ const ChatMenu: React.FC = () => {
   });
   const {mutate: leaveChatGroup} = useAPILeaveChatRoom({
     onSuccess: () => {
+      editChatGroup({
+        ...room,
+        members: room.members?.filter(u => u.id !== user?.id),
+      });
       navigation.navigate('ChatStack', {
         screen: 'RoomList',
       });
