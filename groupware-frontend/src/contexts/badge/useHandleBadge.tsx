@@ -12,6 +12,10 @@ import { useAuthenticate } from '../useAuthenticate';
 import { RoomRefetchProvider } from 'src/contexts/chat/useRoomRefetch';
 import { useAPIGetRoomsByPage } from '@/hooks/api/chat/useAPIGetRoomsByPage';
 import { useAPIGetOneRoom } from '@/hooks/api/chat/useAPIGetOneRoom';
+import {
+  onMessageListener,
+  requestForToken,
+} from 'src/utils/firebase/getFirebaseToken';
 
 const BadgeContext = createContext({
   unreadChatCount: 0,
@@ -163,6 +167,14 @@ export const BadgeProvider: React.FC = ({ children }) => {
       refetchRoom();
     }
   }, [refetchGroupId, refetchRoom]);
+
+  // useEffect(() => {
+  //   const handleMessaging = async () => {
+  //     await requestForToken();
+  //     // onMessageListener();
+  //   };
+  //   handleMessaging();
+  // }, [user]);
 
   useEffect(() => {
     if (editRoom) {
