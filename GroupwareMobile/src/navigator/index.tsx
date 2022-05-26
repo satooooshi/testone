@@ -457,6 +457,13 @@ const Navigator = () => {
   }, [AGORA_APP_ID, user?.id]);
 
   const sendLocalNotification = async (remoteMessage: any) => {
+    if (
+      remoteMessage?.data?.silent ||
+      (remoteMessage?.data?.screen === 'chat' &&
+        remoteMessage.data?.id === `${currentChatRoomId}`)
+    ) {
+      return;
+    }
     if (!remoteMessage?.data?.calleeId) {
       const channelId = await notifee.createChannel({
         id: 'default',
@@ -552,16 +559,6 @@ const Navigator = () => {
         }
         console.log('PushNotification onNotification========', notification);
         if (Platform.OS === 'android') {
-          if (
-            notification?.data?.silent ||
-            (notification?.data?.screen === 'chat' &&
-              notification.data?.id === `${currentChatRoomId}`)
-          ) {
-            console.log('666666', notification.data);
-            return;
-          }
-          console.log('7777777');
-
           sendLocalNotification(notification);
         } else if (notification.userInteraction) {
           naviateByNotif(notification);
@@ -576,14 +573,9 @@ const Navigator = () => {
     });
 
     const unsubscribe = messaging().onMessage(async remoteMessage => {
-      if (
-        Platform.OS === 'android' ||
-        (remoteMessage?.data?.screen &&
-          remoteMessage.data?.id === `${currentChatRoomId}`)
-      ) {
-        return;
+      if (Platform.OS === 'ios') {
+        sendLocalNotification(remoteMessage);
       }
-      sendLocalNotification(remoteMessage);
     });
 
     return unsubscribe;
