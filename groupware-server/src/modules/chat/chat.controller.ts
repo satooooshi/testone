@@ -334,6 +334,20 @@ export class ChatController {
     const { id } = req.user;
     const { id: chatGroupId } = chatGroup;
     await this.chatService.leaveChatRoom(id, chatGroupId);
+    const silentNotification: CustomPushNotificationData = {
+      title: '',
+      body: '',
+      custom: {
+        silent: 'silent',
+        type: 'leave',
+        screen: '',
+        id: chatGroupId.toString(),
+      },
+    };
+    await sendPushNotifToSpecificUsers(
+      chatGroup?.members.filter((u) => u.id !== id).map((u) => u.id),
+      silentNotification,
+    );
   }
 
   @Delete('/v2/reaction/:reactionId')
