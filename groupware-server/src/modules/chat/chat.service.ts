@@ -152,6 +152,12 @@ export class ChatService {
           unreadCount = await this.getUnreadChatMessage(userID, query);
         }
 
+        if (g.roomType === RoomType.PERSONAL) {
+          const chatPartner = g.members.filter((m) => m.id !== userID)[0];
+          g.imageURL = chatPartner.avatarUrl;
+          g.name = `${chatPartner.lastName} ${chatPartner.firstName}`;
+        }
+
         return {
           ...g,
           pinnedUsers: undefined,
@@ -563,8 +569,16 @@ export class ChatService {
     const existGroup = await this.chatGroupRepository.findOne(newData.id, {
       relations: ['members'],
     });
+    let isMySelf = false;
+    const otherExistMembers = existGroup.members.filter((u) => {
+      if (u.id === requestUser.id) {
+        isMySelf = true;
+      } else {
+        return true;
+      }
+    });
 
-    if (!existGroup.members.filter((u) => u.id === requestUser.id).length) {
+    if (!isMySelf) {
       throw new BadRequestException('The user is not a member');
     }
 
@@ -622,9 +636,9 @@ export class ChatService {
         id: newGroup.id.toString(),
       },
     };
-    const allMemberWithoutMyself = newGroup.members.concat(removedMembers);
+    const allMemberWithoutMyself = otherExistMembers.concat(newMembers);
     await sendPushNotifToSpecificUsers(
-      allMemberWithoutMyself,
+      allMemberWithoutMyself.map((u) => u.id),
       silentNotification,
     );
 

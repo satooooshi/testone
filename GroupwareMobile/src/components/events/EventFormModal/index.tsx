@@ -125,8 +125,13 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
   }, [isVisible]);
 
   useEffect(() => {
-    if (willSubmit) {
+    const safetySubmit = async () => {
       onComplete();
+      await new Promise(r => setTimeout(r, 1000));
+      setWillSubmit(false);
+    };
+    if (willSubmit) {
+      safetySubmit();
     }
   }, [willSubmit, onComplete]);
 

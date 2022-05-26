@@ -82,7 +82,7 @@ function MyApp({ Component, pageProps }: AppProps) {
         <QueryClientProvider client={queryClient}>
           <AuthProvder>
             <BadgeProvider>
-              <Component {...pageProps} />{' '}
+              <Component {...pageProps} />
             </BadgeProvider>
           </AuthProvder>
         </QueryClientProvider>

@@ -208,10 +208,13 @@ export class ChatMessage {
       );
 
       await sendPushNotifToSpecificUsers(
-        notifiedUsers,
+        notifiedUsers.map((u) => u.id),
         notificationDataWithNoMention,
       );
-      await sendPushNotifToSpecificUsers(allUsers, silentNotification);
+      await sendPushNotifToSpecificUsers(
+        allUsers.map((u) => u.id),
+        silentNotification,
+      );
       if (mentionedIds?.length) {
         const mentionedUsers = await getRepository(User)
           .createQueryBuilder('user')
@@ -232,7 +235,7 @@ export class ChatMessage {
           },
         };
         await sendPushNotifToSpecificUsers(
-          mentionedUsers,
+          mentionedUsers.map((u) => u.id),
           notificationDataWithMention,
         );
       }

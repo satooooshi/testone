@@ -53,7 +53,7 @@ const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
     name: '',
     members: selectedMembers,
   };
-  const { emitEditRoom } = useHandleBadge();
+  const { editChatGroup } = useHandleBadge();
   const [membersModal, setMembersModal] = useState(false);
   const [selectImageUrl, setSelectImageUrl] = useState<string>('');
   const [selectImageName, setSelectImageName] = useState<string>('');
@@ -88,7 +88,7 @@ const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
     useAPISaveChatGroup({
       onSuccess: (createdData) => {
         onClose();
-        emitEditRoom(createdData);
+        editChatGroup(createdData);
         router.push(`/chat/${createdData.id.toString()}`, undefined, {
           shallow: true,
         });
