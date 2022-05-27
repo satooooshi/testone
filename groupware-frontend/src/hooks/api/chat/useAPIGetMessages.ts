@@ -13,9 +13,9 @@ export interface GetMessagesQuery {
 }
 
 const getMessages = async (query: GetMessagesQuery) => {
-  const { group, after = '', before = '', include } = query;
+  const { group, after = '', before = '', include, limit } = query;
   const res = await axiosInstance.get(
-    `${getChatMessagesURL}?group=${group}&after=${after}&before=${before}&include=${include}`,
+    `${getChatMessagesURL}?group=${group}&after=${after}&before=${before}&include=${include}&limit=${limit}`,
   );
   return res.data;
 };

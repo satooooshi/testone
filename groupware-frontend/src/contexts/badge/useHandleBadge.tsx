@@ -12,10 +12,10 @@ import { useAuthenticate } from '../useAuthenticate';
 import { RoomRefetchProvider } from 'src/contexts/chat/useRoomRefetch';
 import { useAPIGetRoomsByPage } from '@/hooks/api/chat/useAPIGetRoomsByPage';
 import { useAPIGetOneRoom } from '@/hooks/api/chat/useAPIGetOneRoom';
-import {
-  onMessageListener,
-  requestForToken,
-} from 'src/utils/firebase/getFirebaseToken';
+// import {
+//   onMessageListener,
+//   requestForToken,
+// } from 'src/utils/firebase/getFirebaseToken';
 import router from 'next/router';
 
 const BadgeContext = createContext({
