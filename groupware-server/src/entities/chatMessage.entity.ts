@@ -201,7 +201,6 @@ export class ChatMessage {
         custom: {
           type: 'badge',
           silent: 'silent',
-          screen: '',
           id: this.chatGroup.id.toString(),
         },
       };

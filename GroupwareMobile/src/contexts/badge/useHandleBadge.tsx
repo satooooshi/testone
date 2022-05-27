@@ -70,38 +70,10 @@ export const BadgeProvider: React.FC = ({children}) => {
 
   useEffect(() => {
     if (networkConnection && user?.id) {
-      // if (chatGroups.length) {
-      //   console.log('666666666666666666666666');
-      //   socket.emit(
-      //     'unsetChatGroups',
-      //     chatGroups.map(g => g.id),
-      //   );
-      //   socket.off('editRoomClient');
-      //   socket.off('badgeClient');
-      // }
       refetchAllRooms();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [networkConnection, user]);
-
-  // const resetSocketOn = () => {
-  //   socket.off('editRoomClient');
-  //   socket.on('editRoomClient', async (room: ChatGroup) => {
-  //     if (room?.id) {
-  //       setEditRoom(room);
-  //       console.log('-----------editRoomClient-----');
-  //     }
-  //   });
-  //   socket.off('badgeClient');
-  //   socket.on(
-  //     'badgeClient',
-  //     async (data: {userId: number; groupId: number}) => {
-  //       if (data.groupId) {
-  //         setRefetchGroupId(data.groupId);
-  //       }
-  //     },
-  //   );
-  // };
 
   useEffect(() => {
     const unsubscribe = NetInfo.addEventListener(state => {
@@ -128,12 +100,9 @@ export const BadgeProvider: React.FC = ({children}) => {
       Alert.alert('ルーム情報の取得に失敗しました');
     },
     onSuccess: data => {
+      console.log('----getOneRoom --');
+
       let rooms = chatGroups.filter(r => r.id !== data.id);
-      // if (chatGroups.length === rooms.length) {
-      //   socket.emit('setChatGroup', data.id);
-      //   console.log('888888888');
-      //   resetSocketOn();
-      // }
       if (data.isPinned) {
         setChatGroups([...[data], ...rooms]);
       } else {

@@ -3,7 +3,7 @@ import {
   useNavigation,
   useRoute,
 } from '@react-navigation/native';
-import React, {useCallback, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {Alert} from 'react-native';
 import {Button, Div, Icon, Input, ScrollDiv} from 'react-native-magnus';
 import RoomCard from '../../../components/chat/RoomCard';
@@ -73,11 +73,10 @@ const Share: React.FC = () => {
     });
   };
 
-  useFocusEffect(
-    useCallback(() => {
-      setChatRooms(chatGroups);
-    }, [chatGroups]),
-  );
+  useEffect(() => {
+    setChatRooms(chatGroups);
+  }, [chatGroups]);
+
   return (
     <WholeContainer>
       <HeaderWithTextButton title="ルームを選択" enableBackButton={true} />

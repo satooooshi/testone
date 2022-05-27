@@ -2,6 +2,7 @@ import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {
   Alert,
   AppState,
+  AppStateStatus,
   FlatList,
   Keyboard,
   KeyboardAvoidingView,
@@ -166,7 +167,6 @@ const Chat: React.FC = () => {
     },
   });
   const {
-    data: fetchedPastMessages,
     isLoading: loadingMessages,
     isFetching: fetchingMessages,
     refetch: refetchFetchedPastMessages,
@@ -182,6 +182,18 @@ const Chat: React.FC = () => {
       enabled: false,
       onSuccess: res => {
         console.log('success =============================', res.length);
+        if (res?.length) {
+          const refreshedMessage = refreshMessage(res);
+          console.log('refreshMessage =============', refreshedMessage.length);
+          setMessages(refreshedMessage);
+          if (refetchDoesntExistMessages(res[0].id)) {
+            refetchDoesntExistMessages(res[0].id + 20);
+          } else {
+            setAfter(undefined);
+            setInclude(false);
+            setBefore(undefined);
+          }
+        }
       },
     },
   );
@@ -328,21 +340,19 @@ const Chat: React.FC = () => {
       onSettled: () => setReactionTarget(undefined),
       onSuccess: savedReaction => {
         const reactionAdded = {...savedReaction, isSender: true};
-        setMessages(m => {
-          return refreshMessage(
-            m.map(eachMessage => {
-              if (eachMessage.id === savedReaction.chatMessage?.id) {
-                return {
-                  ...eachMessage,
-                  reactions: eachMessage.reactions?.length
-                    ? [...eachMessage.reactions, reactionAdded]
-                    : [reactionAdded],
-                };
-              }
-              return eachMessage;
-            }),
-          );
-        });
+        setMessages(m =>
+          m.map(eachMessage => {
+            if (eachMessage.id === savedReaction.chatMessage?.id) {
+              return {
+                ...eachMessage,
+                reactions: eachMessage.reactions?.length
+                  ? [...eachMessage.reactions, reactionAdded]
+                  : [reactionAdded],
+              };
+            }
+            return eachMessage;
+          }),
+        );
       },
       onError: () => {
         Alert.alert(
@@ -578,22 +588,6 @@ const Chat: React.FC = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [focusedMessageID]);
-
-  useEffect(() => {
-    if (fetchedPastMessages?.length) {
-      const refreshedMessage = refreshMessage(fetchedPastMessages);
-      console.log('refreshMessage =============', refreshedMessage.length);
-      setMessages(refreshedMessage);
-      if (refetchDoesntExistMessages(fetchedPastMessages[0].id)) {
-        refetchDoesntExistMessages(fetchedPastMessages[0].id + 20);
-      } else {
-        setAfter(undefined);
-        setInclude(false);
-        setBefore(undefined);
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [fetchedPastMessages]);
 
   const typeDropdown = (
     <Dropdown
@@ -974,9 +968,20 @@ const Chat: React.FC = () => {
     }, [refetchLatest, refetchRoomDetail]),
   );
 
-  const handleLastReadByAppState = () => {
-    if (AppState.currentState === 'active') {
-      refetchLatest();
+  const [appState, setAppState] = useState<AppStateStatus>();
+  useEffect(() => {
+    const unsubscribeAppState = () => {
+      AppState.addEventListener('change', state => {
+        setAppState(state);
+      });
+    };
+    return () => {
+      unsubscribeAppState();
+    };
+  });
+
+  useEffect(() => {
+    if (appState === 'active' && isFocused) {
       saveLastReadChatTime(room.id, {
         onSuccess: () => {
           socket.emit('readReport', {
@@ -987,31 +992,9 @@ const Chat: React.FC = () => {
         },
       });
     }
-  };
-
-  const debounceHandleLastReadByAppState = useMemo(
-    () => debounce(handleLastReadByAppState, 500),
+    // return () => saveLastReadChatTime(room.id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [],
-  );
-
-  useEffect(() => {
-    AppState.addEventListener('change', debounceHandleLastReadByAppState);
-  });
-
-  useEffect(() => {
-    saveLastReadChatTime(room.id, {
-      onSuccess: () => {
-        socket.emit('readReport', {
-          room: room.id.toString(),
-          senderId: myself?.id,
-        });
-        handleEnterRoom(room.id);
-      },
-    });
-    return () => saveLastReadChatTime(room.id);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [room.id, saveLastReadChatTime]);
+  }, [appState, isFocused, room.id]);
 
   const readUserBox = (user: User) => (
     <View style={tailwind('flex-row bg-white items-center px-4 py-2')}>
