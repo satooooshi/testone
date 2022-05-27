@@ -37,7 +37,7 @@ const InvitationStatusContext = createContext({
 
 export const InviteCallProvider: React.FC = ({children}) => {
   const {mutate: createGroup} = useAPISaveChatGroup();
-  const {editChatGroup} = useHandleBadge();
+  const {editChatGroup, refetchRoomCard} = useHandleBadge();
   const [currentGroupData, setCurrentGroupData] = useState<ChatGroup>();
   const socket = io(baseURL, {
     transports: ['websocket'],
@@ -45,6 +45,9 @@ export const InviteCallProvider: React.FC = ({children}) => {
   const {mutate: sendChatMessage} = useAPISendChatMessage({
     onSuccess: sentMsg => {
       socket.emit('message', sentMsg);
+      if (sentMsg?.chatGroup?.id) {
+        refetchRoomCard({id: sentMsg.chatGroup.id, type: ''});
+      }
     },
   });
   const [isCallAccepted, setIsCallAccepted] = useState(false);
