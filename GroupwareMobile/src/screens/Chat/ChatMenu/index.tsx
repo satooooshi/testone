@@ -67,7 +67,7 @@ const ChatMenu: React.FC = () => {
   return (
     <WholeContainer>
       <HeaderWithTextButton enableBackButton={true} title="メニュー" />
-      <ChatMenuRow
+      {/* <ChatMenuRow
         name={isMute ? '通知をオン' : '通知をオフ'}
         icon={
           isMute ? (
@@ -104,7 +104,7 @@ const ChatMenu: React.FC = () => {
             }
           }
         }}
-      />
+      /> */}
       {!isPersonal && (
         <ChatMenuRow
           name="ルームを編集"
