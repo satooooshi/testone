@@ -31,6 +31,7 @@ export class ChatGateway
 
   handleConnection(client: Socket) {
     // this.logger.log(`Client connected: ${client.id}`);
+    this.server.emit('msgToClient', 'connected');
   }
 
   @SubscribeMessage('message')
