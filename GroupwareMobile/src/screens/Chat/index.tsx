@@ -951,6 +951,8 @@ const Chat: React.FC = () => {
 
   useFocusEffect(
     useCallback(() => {
+      console.log('----0000333-3-3-3-', room);
+
       const jsonMessagesInStorage = storage.getString(
         `messagesIntRoom${room.id}`,
       );
