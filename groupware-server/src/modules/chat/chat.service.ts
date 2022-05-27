@@ -121,7 +121,9 @@ export class ChatService {
       .leftJoinAndSelect('m.sender', 'sender')
       .where('member.id = :memberId', { memberId: userID })
       .andWhere(
-        !!updatedAtLatestRoom ? `m.createdAt > :updatedAtLatestRoom` : '1=1',
+        !!updatedAtLatestRoom
+          ? `chat_groups.updatedAt > :updatedAtLatestRoom`
+          : '1=1',
         {
           updatedAtLatestRoom: new Date(updatedAtLatestRoom),
         },
