@@ -2,6 +2,7 @@ import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {
   Alert,
   AppState,
+  AppStateStatus,
   FlatList,
   Keyboard,
   KeyboardAvoidingView,
@@ -974,9 +975,20 @@ const Chat: React.FC = () => {
     }, [refetchLatest, refetchRoomDetail]),
   );
 
-  const handleLastReadByAppState = () => {
-    if (AppState.currentState === 'active') {
-      refetchLatest();
+  const [appState, setAppState] = useState<AppStateStatus>();
+  useEffect(() => {
+    const unsubscribeAppState = () => {
+      AppState.addEventListener('change', state => {
+        setAppState(state);
+      });
+    };
+    return () => {
+      unsubscribeAppState();
+    };
+  });
+
+  useEffect(() => {
+    if (appState === 'active' && isFocused) {
       saveLastReadChatTime(room.id, {
         onSuccess: () => {
           socket.emit('readReport', {
@@ -987,31 +999,9 @@ const Chat: React.FC = () => {
         },
       });
     }
-  };
-
-  const debounceHandleLastReadByAppState = useMemo(
-    () => debounce(handleLastReadByAppState, 500),
+    // return () => saveLastReadChatTime(room.id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [],
-  );
-
-  useEffect(() => {
-    AppState.addEventListener('change', debounceHandleLastReadByAppState);
-  });
-
-  useEffect(() => {
-    saveLastReadChatTime(room.id, {
-      onSuccess: () => {
-        socket.emit('readReport', {
-          room: room.id.toString(),
-          senderId: myself?.id,
-        });
-        handleEnterRoom(room.id);
-      },
-    });
-    return () => saveLastReadChatTime(room.id);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [room.id, saveLastReadChatTime]);
+  }, [appState, isFocused, room.id]);
 
   const readUserBox = (user: User) => (
     <View style={tailwind('flex-row bg-white items-center px-4 py-2')}>
