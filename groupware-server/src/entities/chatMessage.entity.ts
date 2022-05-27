@@ -183,7 +183,8 @@ export class ChatMessage {
           !this.chatGroup.muteUsers.filter((m) => m.id === u.id).length &&
           !mentionedIds.filter((m) => m === u.id).length,
       );
-      const title = `${userNameFactory(this.sender)} (${this.chatGroup.name})`;
+      const groupName = this.chatGroup.name ? `(#${this.chatGroup.name})` : '';
+      const title = `${userNameFactory(this.sender)} ${groupName}`;
       const notificationDataWithNoMention: CustomPushNotificationData = {
         title: title,
         body: `${mentionTransform(content)}`,
