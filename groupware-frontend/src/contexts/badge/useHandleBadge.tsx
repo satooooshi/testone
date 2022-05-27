@@ -16,6 +16,7 @@ import {
   onMessageListener,
   requestForToken,
 } from 'src/utils/firebase/getFirebaseToken';
+import router from 'next/router';
 
 const BadgeContext = createContext({
   unreadChatCount: 0,
@@ -115,12 +116,14 @@ export const BadgeProvider: React.FC = ({ children }) => {
         if (latestRooms.length) {
           const reversedLatestRooms = latestRooms.reverse();
           for (const latestRoom of reversedLatestRooms) {
-            const olderRoom = chatGroups.filter(
-              (r) => r.id === latestRoom.id,
-            )[0];
-            const incrementCount =
-              (latestRoom?.unreadCount || 0) - (olderRoom?.unreadCount || 0);
-            setChatUnreadCount((c) => c + incrementCount);
+            if (router.pathname !== `/chat/${latestRoom.id}`) {
+              const olderRoom = chatGroups.filter(
+                (r) => r.id === latestRoom.id,
+              )[0];
+              const incrementCount =
+                (latestRoom?.unreadCount || 0) - (olderRoom?.unreadCount || 0);
+              setChatUnreadCount((c) => c + incrementCount);
+            }
 
             setChatGroups((rooms) => {
               const existRooms = rooms.filter((r) => !(r.id === latestRoom.id));
