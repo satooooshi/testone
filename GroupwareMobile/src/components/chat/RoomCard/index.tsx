@@ -180,7 +180,11 @@ const RoomCard: React.FC<RoomCardProps> = ({
               <Text>{`${room.members?.length || 0}人のメンバー`}</Text>
               <Text>
                 {dateTimeFormatterFromJSDDate({
-                  dateTime: new Date(room.updatedAt),
+                  dateTime: new Date(
+                    room?.chatMessages?.[0]?.createdAt
+                      ? room?.chatMessages?.[0]?.createdAt
+                      : room.updatedAt,
+                  ),
                 })}
               </Text>
             </Div>

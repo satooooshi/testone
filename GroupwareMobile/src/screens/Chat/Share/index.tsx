@@ -1,9 +1,5 @@
-import {
-  useFocusEffect,
-  useNavigation,
-  useRoute,
-} from '@react-navigation/native';
-import React, {useCallback, useEffect, useState} from 'react';
+import {useNavigation, useRoute} from '@react-navigation/native';
+import React, {useEffect, useState} from 'react';
 import {Alert} from 'react-native';
 import {Button, Div, Icon, Input, ScrollDiv} from 'react-native-magnus';
 import RoomCard from '../../../components/chat/RoomCard';

@@ -1,21 +1,19 @@
 import React, {useContext, createContext, useState, useEffect} from 'react';
 import {Alert} from 'react-native';
-import {io} from 'socket.io-client';
 import {useAPIGetOneRoom} from '../../hooks/api/chat/useAPIGetOneRoom';
 import {useAPIGetRooms} from '../../hooks/api/chat/useAPIGetRoomsByPage';
 import {ChatGroup} from '../../types';
-import {baseURL} from '../../utils/url';
 import {useAuthenticate} from '../useAuthenticate';
 import NetInfo from '@react-native-community/netinfo';
+import {storage} from '../../utils/url';
+import {dateTimeFormatterFromJSDDate} from '../../utils/dateTimeFormatterFromJSDate';
 
 const BadgeContext = createContext({
   unreadChatCount: 0,
   chatGroups: [] as ChatGroup[],
   setChatGroupsState: (() => {}) as (rooms: ChatGroup[]) => void,
-  refetchGroupId: 0,
   handleEnterRoom: (() => {}) as (roomId: number) => void,
-  refetchRoomCard: (() => {}) as (roomId: number) => void,
-  emitEditRoom: (() => {}) as (room: ChatGroup) => void,
+  refetchRoomCard: (() => {}) as (data: {id: number; type: string}) => void,
   editChatGroup: (() => {}) as (room: ChatGroup) => void,
   isRoomsRefetching: false,
 });
@@ -23,16 +21,19 @@ const BadgeContext = createContext({
 export const BadgeProvider: React.FC = ({children}) => {
   const [chatUnreadCount, setChatUnreadCount] = useState(0);
   const [chatGroups, setChatGroups] = useState<ChatGroup[]>([]);
-  const [refetchGroupId, setRefetchGroupId] = useState(0);
+  const [refetchGroup, setRefetchGroup] = useState({
+    id: 0,
+    type: '',
+  });
   const {user, currentChatRoomId} = useAuthenticate();
-  // const socket = io(baseURL, {
-  //   transports: ['websocket'],
-  // });
   const [page, setPage] = useState(1);
   const [isNeedRefetch, setIsNeedRefetch] = useState(false);
   const [completeRefetch, setCompleteRefetch] = useState(false);
   const [networkConnection, setNetworkConnection] = useState(true);
   const [editRoom, setEditRoom] = useState<ChatGroup>();
+  const [latestRefetchDate, setLatestRefetchDate] = useState<
+    string | undefined
+  >('');
 
   const {refetch: refetchAllRooms, isLoading} = useAPIGetRooms(
     {
@@ -70,10 +71,34 @@ export const BadgeProvider: React.FC = ({children}) => {
 
   useEffect(() => {
     if (networkConnection && user?.id) {
+      const jsonRoomListInStorage = storage.getString(
+        `chatRoomList${user?.id}`,
+      );
+      if (jsonRoomListInStorage) {
+        const messagesInStorage = JSON.parse(jsonRoomListInStorage);
+        setChatGroups(messagesInStorage);
+        let count = 0;
+        for (const room of messagesInStorage) {
+          count += room.unreadCount ? room.unreadCount : 0;
+        }
+        setChatUnreadCount(count);
+      }
       refetchAllRooms();
     }
+    return () => {
+      const jsonMessages = JSON.stringify(chatGroups);
+      storage.set(`chatRoomList${user?.id}`, jsonMessages);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [networkConnection, user]);
+
+  useEffect(() => {
+    if (user?.id && chatGroups.length) {
+      const jsonMessages = JSON.stringify(chatGroups);
+      storage.set(`chatRoomList${user?.id}`, jsonMessages);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id, chatGroups]);
 
   useEffect(() => {
     const unsubscribe = NetInfo.addEventListener(state => {
@@ -94,14 +119,15 @@ export const BadgeProvider: React.FC = ({children}) => {
     }
   }, [isNeedRefetch, refetchAllRooms]);
 
-  const {refetch: refetchRoom} = useAPIGetOneRoom(refetchGroupId, {
+  const {refetch: refetchRoom} = useAPIGetOneRoom(refetchGroup.id, {
     enabled: false,
     onError: () => {
       Alert.alert('ルーム情報の取得に失敗しました');
     },
     onSuccess: data => {
-      console.log('----getOneRoom --');
-
+      if (refetchGroup.type === 'edit') {
+        setEditRoom(data);
+      }
       let rooms = chatGroups.filter(r => r.id !== data.id);
       if (data.isPinned) {
         setChatGroups([...[data], ...rooms]);
@@ -110,21 +136,21 @@ export const BadgeProvider: React.FC = ({children}) => {
         rooms.splice(pinnedRoomsCount, 0, data);
         setChatGroups(rooms);
       }
-      if (data.id !== currentChatRoomId) {
+      if (refetchGroup.type === 'badge') {
         setChatUnreadCount(count => count + 1);
       }
-      setRefetchGroupId(0);
+      setRefetchGroup({id: 0, type: ''});
     },
   });
 
   useEffect(() => {
-    if (refetchGroupId) {
+    if (refetchGroup.id) {
       refetchRoom();
     }
-  }, [refetchGroupId, refetchRoom]);
+  }, [refetchGroup, refetchRoom]);
 
-  const refetchRoomCard = (roomId: number) => {
-    setRefetchGroupId(roomId);
+  const refetchRoomCard = (data: {id: number; type: string}) => {
+    setRefetchGroup(data);
   };
 
   const handleEnterRoom = (roomId: number) => {
@@ -139,51 +165,9 @@ export const BadgeProvider: React.FC = ({children}) => {
     }
   };
 
-  const emitEditRoom = (room: ChatGroup) => {
-    // socket.emit('editRoom', room);
-  };
-
   const editChatGroup = (room: ChatGroup) => {
     setEditRoom(room);
   };
-
-  // useEffect(
-  //   () => {
-  //     if (completeRefetch && chatGroups.length) {
-  //       socket.emit(
-  //         'setChatGroups',
-  //         chatGroups.map(g => g.id),
-  //       );
-  //       socket.on('editRoomClient', async (room: ChatGroup) => {
-  //         if (room?.id) {
-  //           setEditRoom(room);
-  //         }
-  //       });
-  //       socket.on(
-  //         'badgeClient',
-  //         async (data: {userId: number; groupId: number}) => {
-  //           if (data.groupId) {
-  //             setRefetchGroupId(data.groupId);
-  //           }
-  //         },
-  //       );
-  //       setCompleteRefetch(false);
-  //     }
-  //   }, // eslint-disable-next-line react-hooks/exhaustive-deps
-  //   [completeRefetch],
-  // );
-
-  // useEffect(
-  //   () => {
-  //     socket.connect();
-  //     return () => {
-  //       socket.off('editRoomClient');
-  //       socket.off('badgeClient');
-  //       socket.disconnect();
-  //     };
-  //   }, // eslint-disable-next-line react-hooks/exhaustive-deps
-  //   [user?.id],
-  // );
 
   useEffect(() => {
     if (editRoom) {
@@ -222,10 +206,8 @@ export const BadgeProvider: React.FC = ({children}) => {
         unreadChatCount: chatUnreadCount,
         chatGroups,
         setChatGroupsState,
-        refetchGroupId,
         handleEnterRoom,
         refetchRoomCard,
-        emitEditRoom,
         editChatGroup,
         isRoomsRefetching: isLoading,
       }}>
