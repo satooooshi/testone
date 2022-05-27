@@ -156,44 +156,6 @@ export const BadgeProvider: React.FC = ({children}) => {
     setEditRoom(room);
   };
 
-  // useEffect(
-  //   () => {
-  //     if (completeRefetch && chatGroups.length) {
-  //       socket.emit(
-  //         'setChatGroups',
-  //         chatGroups.map(g => g.id),
-  //       );
-  //       socket.on('editRoomClient', async (room: ChatGroup) => {
-  //         if (room?.id) {
-  //           setEditRoom(room);
-  //         }
-  //       });
-  //       socket.on(
-  //         'badgeClient',
-  //         async (data: {userId: number; groupId: number}) => {
-  //           if (data.groupId) {
-  //             setRefetchGroupId(data.groupId);
-  //           }
-  //         },
-  //       );
-  //       setCompleteRefetch(false);
-  //     }
-  //   }, // eslint-disable-next-line react-hooks/exhaustive-deps
-  //   [completeRefetch],
-  // );
-
-  // useEffect(
-  //   () => {
-  //     socket.connect();
-  //     return () => {
-  //       socket.off('editRoomClient');
-  //       socket.off('badgeClient');
-  //       socket.disconnect();
-  //     };
-  //   }, // eslint-disable-next-line react-hooks/exhaustive-deps
-  //   [user?.id],
-  // );
-
   useEffect(() => {
     if (editRoom) {
       console.log('editROom called-----', editRoom.members);
