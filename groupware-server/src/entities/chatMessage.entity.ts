@@ -180,7 +180,8 @@ export class ChatMessage {
       const notifiedUsers = this.chatGroup.members.filter(
         (u) =>
           u.id !== this.sender.id &&
-          !this.chatGroup.muteUsers.filter((m) => m.id === u.id).length,
+          !this.chatGroup.muteUsers.filter((m) => m.id === u.id).length &&
+          !mentionedIds.filter((m) => m === u.id).length,
       );
       const title = `${userNameFactory(this.sender)} (${this.chatGroup.name})`;
       const notificationDataWithNoMention: CustomPushNotificationData = {
@@ -235,6 +236,7 @@ export class ChatMessage {
           )} (${this.chatGroup.name})`,
           body: `${mentionTransform(content)}`,
           custom: {
+            type: 'badge',
             screen: 'chat',
             id: this.chatGroup.id.toString(),
           },
