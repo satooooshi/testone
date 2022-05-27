@@ -70,6 +70,11 @@ export const BadgeProvider: React.FC = ({children}) => {
       if (jsonRoomListInStorage) {
         const messagesInStorage = JSON.parse(jsonRoomListInStorage);
         setChatGroups(messagesInStorage);
+        let count = 0;
+        for (const room of messagesInStorage) {
+          count += room.unreadCount ? room.unreadCount : 0;
+        }
+        setChatUnreadCount(count);
       }
       refetchAllRooms();
     }
@@ -81,12 +86,12 @@ export const BadgeProvider: React.FC = ({children}) => {
   }, [networkConnection, user]);
 
   useEffect(() => {
-    if (completeRefetch) {
+    if (user?.id && chatGroups.length) {
       const jsonMessages = JSON.stringify(chatGroups);
       storage.set(`chatRoomList${user?.id}`, jsonMessages);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [completeRefetch]);
+  }, [user?.id, chatGroups]);
 
   useEffect(() => {
     const unsubscribe = NetInfo.addEventListener(state => {
