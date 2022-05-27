@@ -660,8 +660,7 @@ const Chat: React.FC = () => {
     socket.on('msgToClient', async (sentMsgByOtherUsers: ChatMessage) => {
       if (sentMsgByOtherUsers.content) {
         if (
-          (sentMsgByOtherUsers?.sender?.id !== myself?.id ||
-            sentMsgByOtherUsers.type === ChatMessageType.CALL) &&
+          sentMsgByOtherUsers?.sender?.id !== myself?.id &&
           AppState.currentState === 'active'
         ) {
           saveLastReadChatTime(room.id, {
