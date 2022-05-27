@@ -52,50 +52,20 @@ export class ChatGateway
     this.server.to(data.room).emit('readMessageClient', data.senderId);
   }
 
-  @SubscribeMessage('editRoom')
-  public async editRoom(_: Socket, room: ChatGroup) {
-    if (room.createdAt === room.updatedAt) {
-      this.server.emit('editRoomClient', room);
-    } else {
-      this.server.to(room?.id.toString()).emit('editRoomClient', room);
-    }
-  }
+  // @SubscribeMessage('editRoom')
+  // public async editRoom(_: Socket, room: ChatGroup) {
+  //   if (room.createdAt === room.updatedAt) {
+  //     this.server.emit('editRoomClient', room);
+  //   } else {
+  //     this.server.to(room?.id.toString()).emit('editRoomClient', room);
+  //   }
+  // }
 
   @SubscribeMessage('joinRoom')
   public joinRoom(client: Socket, room: string): void {
     //@TODO dbにグループがなかったらエラーを吐く
     client.join(room);
     client.emit('joinedRoom', room);
-  }
-
-  @SubscribeMessage('setChatGroups')
-  public setChatGroups(client: Socket, roomIds: number[]): void {
-    //@TODO dbにグループがなかったらエラーを吐く
-    console.log('-----join', roomIds);
-
-    for (const roomId of roomIds) {
-      client.join(roomId.toString());
-    }
-  }
-
-  @SubscribeMessage('unsetChatGroups')
-  public unsetChatGroups(client: Socket, roomIds: number[]): void {
-    console.log('-----leave', roomIds);
-    //@TODO dbにグループがなかったらエラーを吐く
-    for (const roomId of roomIds) {
-      if (roomId) {
-        client.leave(roomId.toString());
-      }
-    }
-  }
-  @SubscribeMessage('setChatGroup')
-  public setChatGroup(client: Socket, roomId: number): void {
-    client.join(roomId.toString());
-  }
-
-  @SubscribeMessage('unsetChatGroup')
-  public unsetChatGroup(client: Socket, roomId: number): void {
-    client.leave(roomId.toString());
   }
 
   @SubscribeMessage('leaveRoom')
