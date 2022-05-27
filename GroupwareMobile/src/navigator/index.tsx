@@ -134,6 +134,7 @@ const Navigator = () => {
         console.log('end call called by endAllCalls');
         return;
       }
+      setIsJoining(false);
       if (!isCallAccepted && localInvitation) {
         // local invitation(送信した通話招待)があればcancelする
         await rtmEngine?.cancelLocalInvitationV2(localInvitation);
@@ -149,7 +150,6 @@ const Navigator = () => {
         await soundOnEnd();
       }
       setChannelName('');
-      setIsJoining(false);
       setIsCalling(false);
       setCallTimeout(false);
       disableCallAcceptedFlag();
