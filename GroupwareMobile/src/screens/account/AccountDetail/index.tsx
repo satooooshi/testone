@@ -317,7 +317,8 @@ const AccountDetail: React.FC = () => {
                   fontSize={24}>
                   {userNameFactory(profile)}
                 </Text>
-                {profile.id !== user?.id ? (
+                {profile.id !== user?.id &&
+                profile.role !== UserRole.EXTERNAL_INSTRUCTOR ? (
                   <Button
                     mr={-50}
                     mt={-10}
