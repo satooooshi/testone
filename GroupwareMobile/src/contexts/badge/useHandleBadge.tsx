@@ -1,10 +1,8 @@
 import React, {useContext, createContext, useState, useEffect} from 'react';
 import {Alert} from 'react-native';
-import {io} from 'socket.io-client';
 import {useAPIGetOneRoom} from '../../hooks/api/chat/useAPIGetOneRoom';
 import {useAPIGetRooms} from '../../hooks/api/chat/useAPIGetRoomsByPage';
 import {ChatGroup} from '../../types';
-import {baseURL} from '../../utils/url';
 import {useAuthenticate} from '../useAuthenticate';
 import NetInfo from '@react-native-community/netinfo';
 
@@ -12,10 +10,8 @@ const BadgeContext = createContext({
   unreadChatCount: 0,
   chatGroups: [] as ChatGroup[],
   setChatGroupsState: (() => {}) as (rooms: ChatGroup[]) => void,
-  refetchGroupId: 0,
   handleEnterRoom: (() => {}) as (roomId: number) => void,
   refetchRoomCard: (() => {}) as (roomId: number) => void,
-  emitEditRoom: (() => {}) as (room: ChatGroup) => void,
   editChatGroup: (() => {}) as (room: ChatGroup) => void,
   isRoomsRefetching: false,
 });
@@ -25,9 +21,6 @@ export const BadgeProvider: React.FC = ({children}) => {
   const [chatGroups, setChatGroups] = useState<ChatGroup[]>([]);
   const [refetchGroupId, setRefetchGroupId] = useState(0);
   const {user, currentChatRoomId} = useAuthenticate();
-  // const socket = io(baseURL, {
-  //   transports: ['websocket'],
-  // });
   const [page, setPage] = useState(1);
   const [isNeedRefetch, setIsNeedRefetch] = useState(false);
   const [completeRefetch, setCompleteRefetch] = useState(false);
@@ -139,10 +132,6 @@ export const BadgeProvider: React.FC = ({children}) => {
     }
   };
 
-  const emitEditRoom = (room: ChatGroup) => {
-    // socket.emit('editRoom', room);
-  };
-
   const editChatGroup = (room: ChatGroup) => {
     setEditRoom(room);
   };
@@ -222,10 +211,8 @@ export const BadgeProvider: React.FC = ({children}) => {
         unreadChatCount: chatUnreadCount,
         chatGroups,
         setChatGroupsState,
-        refetchGroupId,
         handleEnterRoom,
         refetchRoomCard,
-        emitEditRoom,
         editChatGroup,
         isRoomsRefetching: isLoading,
       }}>
