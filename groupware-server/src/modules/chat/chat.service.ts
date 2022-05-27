@@ -136,7 +136,7 @@ export class ChatService {
     let rooms = await Promise.all(
       urlUnparsedRooms.map(async (g) => {
         let unreadCount = 0;
-        const isPinned = !!g.pinnedUsers.length;
+        const isPinned = !!g?.pinnedUsers?.length;
         const hasBeenRead = g?.lastReadChatTime?.[0]?.readTime
           ? g?.lastReadChatTime?.[0]?.readTime > g.updatedAt
           : false;
