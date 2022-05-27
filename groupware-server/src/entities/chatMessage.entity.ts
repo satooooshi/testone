@@ -234,7 +234,7 @@ export class ChatMessage {
         const notificationDataWithMention: CustomPushNotificationData = {
           title: `あなたをメンションした新着メッセージが届きました - ${userNameFactory(
             this.sender,
-          )} (${this.chatGroup.name})`,
+          )} ${groupName}`,
           body: `${mentionTransform(content)}`,
           custom: {
             type: 'badge',
