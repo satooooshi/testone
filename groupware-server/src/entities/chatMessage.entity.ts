@@ -139,9 +139,6 @@ export class ChatMessage {
       }
       const mentionRegex = /@\[.*?\]\(([0-9]+)\)/g;
       const mentionedIds: number[] = [];
-      const muteUsersIds = this.chatGroup?.muteUsers?.length
-        ? this.chatGroup?.muteUsers?.map((u) => u.id)
-        : [];
       let mentionArr = [];
       while ((mentionArr = mentionRegex.exec(content)) !== null) {
         if (mentionArr[1] && typeof Number(mentionArr[1]) === 'number') {
