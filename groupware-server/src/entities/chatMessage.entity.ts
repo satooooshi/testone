@@ -185,7 +185,7 @@ export class ChatMessage {
           u.id !== this.sender.id &&
           !this.chatGroup.muteUsers.filter((m) => m.id === u.id).length,
       );
-      const title = `${userNameFactory(this.sender)}  ${this.chatGroup.name}`;
+      const title = `${userNameFactory(this.sender)} (${this.chatGroup.name})`;
       const notificationDataWithNoMention: CustomPushNotificationData = {
         title: title,
         body: `${mentionTransform(content)}`,
@@ -233,7 +233,9 @@ export class ChatMessage {
           .andWhere('user.id IN (:...mentionedIds)', { mentionedIds })
           .getMany();
         const notificationDataWithMention: CustomPushNotificationData = {
-          title: `あなたをメンションした新着メッセージが届きました`,
+          title: `あなたをメンションした新着メッセージが届きました - ${userNameFactory(
+            this.sender,
+          )} (${this.chatGroup.name})`,
           body: `${mentionTransform(content)}`,
           custom: {
             screen: 'chat',
