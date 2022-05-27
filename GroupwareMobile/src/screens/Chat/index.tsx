@@ -275,7 +275,7 @@ const Chat: React.FC = () => {
         socket.emit('message', {...sentMsg, isSender: false});
         setMessages(refreshMessage([sentMsg, ...messages]));
         if (sentMsg?.chatGroup?.id) {
-          refetchRoomCard(sentMsg.chatGroup.id);
+          refetchRoomCard({id: sentMsg.chatGroup.id, type: ''});
         }
         setValues(v => ({
           ...v,

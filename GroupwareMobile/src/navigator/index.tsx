@@ -555,7 +555,10 @@ const Navigator = () => {
             notification?.data?.type === 'badge') &&
           notification.data?.id
         ) {
-          refetchRoomCard(notification.data?.id);
+          refetchRoomCard({
+            id: notification.data?.id,
+            type: notification.data.type,
+          });
         }
         console.log('PushNotification onNotification========', notification);
         if (Platform.OS === 'android') {
