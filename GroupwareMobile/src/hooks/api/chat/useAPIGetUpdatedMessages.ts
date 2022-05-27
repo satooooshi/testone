@@ -20,7 +20,7 @@ const getUpdatedMessages = async (query: GetMessagesQuery) => {
     after = '',
     before = '',
     include,
-    limit,
+    limit = '',
     dateRefetchLatest = '',
   } = query;
   const res = await axiosInstance.get<ChatMessage[]>(
