@@ -118,6 +118,7 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
     handleSubmit: onFinish,
     setValues: setNewEvent,
     validateForm,
+    resetForm,
   } = useFormik<CreateEventRequest | Required<EventSchedule>>({
     initialValues: event ? event : initialEventValue,
     enableReinitialize: true,
@@ -134,6 +135,7 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
       uploadFiles([result], {
         onSuccess: (fileURLs) => {
           createEvent({ ...submittedValues, imageURL: fileURLs[0] });
+          resetForm();
         },
       });
     },
@@ -150,13 +152,27 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
         isClosable: true,
       });
     } else {
-      onFinish();
+      setWillSubmit(true);
     }
   };
 
   const [newYoutube, setNewYoutube] = useState('');
   const [tagModal, setTagModal] = useState(false);
   const [userModal, setUserModal] = useState(false);
+  const [willSubmit, setWillSubmit] = useState(false);
+
+  useEffect(() => {
+    if (enabled) {
+      setWillSubmit(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [enabled]);
+
+  useEffect(() => {
+    if (willSubmit) {
+      onFinish();
+    }
+  }, [willSubmit, onFinish]);
 
   const [
     {

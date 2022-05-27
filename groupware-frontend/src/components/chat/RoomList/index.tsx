@@ -1,9 +1,21 @@
+import { useAPIGetOneRoom } from '@/hooks/api/chat/useAPIGetOneRoom';
 import { useAPIGetRoomsByPage } from '@/hooks/api/chat/useAPIGetRoomsByPage';
-import { Box, Spinner, Text } from '@chakra-ui/react';
-import React, { useEffect, useState } from 'react';
+import {
+  Box,
+  InputGroup,
+  InputLeftElement,
+  Spinner,
+  Text,
+  Input,
+} from '@chakra-ui/react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useRoomRefetch } from 'src/contexts/chat/useRoomRefetch';
 import { ChatGroup } from 'src/types';
 import ChatGroupCard from '../ChatGroupCard';
+import { useAPISavePin } from '@/hooks/api/chat/useAPISavePin';
+import { AiOutlineSearch } from 'react-icons/ai';
+import { nameOfEmptyNameGroup } from 'src/utils/chat/nameOfEmptyNameGroup';
+import { useHandleBadge } from 'src/contexts/badge/useHandleBadge';
 
 type RoomListProps = {
   currentId?: string;
@@ -11,58 +23,42 @@ type RoomListProps = {
 };
 
 const RoomList: React.FC<RoomListProps> = ({ currentId, onClickRoom }) => {
-  const { clearRefetch, refetchNeeded } = useRoomRefetch();
-  const [page, setPage] = useState('1');
-  const [roomsForInfiniteScroll, setRoomsForInfiniteScroll] = useState<
-    ChatGroup[]
-  >([]);
+  const { clearRefetch } = useRoomRefetch();
+  const { setChatGroupsState, chatGroups } = useHandleBadge();
+  const [chatRooms, setChatRooms] = useState<ChatGroup[]>([]);
+  const [searchedRooms, setSearchedRooms] = useState<ChatGroup[]>([]);
 
-  const { data: chatRooms, isLoading: loadingGetChatGroupList } =
-    useAPIGetRoomsByPage(
-      {
-        page,
-        limit: '20',
-      },
-      {
-        onSuccess: (data) => {
-          if (data.rooms.length) {
-            setRoomsForInfiniteScroll((r) => [...r, ...data.rooms]);
-          }
-        },
-      },
-    );
-  const onScroll = (e: any) => {
-    if (
-      e.target.scrollTop > e.target.scrollHeight / 2 &&
-      chatRooms?.rooms?.length
-    ) {
-      setPage((p) => (Number(p) + 1).toString());
-    }
-  };
-
-  const stateRefreshNeeded = (newData: ChatGroup[]) => {
-    setRoomsForInfiniteScroll(newData);
-  };
-
-  const { refetch: refreshRooms } = useAPIGetRoomsByPage(
-    {
-      page: '1',
-      limit: (20 * Number(page)).toString(),
+  const { mutate: savePin } = useAPISavePin({
+    onSuccess: (data) => {
+      const rooms = chatRooms.filter((r) => r.id !== data.id);
+      if (data.isPinned) {
+        const pinnedRoomsCount = rooms.filter(
+          (r) => r.isPinned && r.updatedAt > data.updatedAt,
+        ).length;
+        if (pinnedRoomsCount) {
+          rooms.splice(pinnedRoomsCount, 0, data);
+          setChatGroupsState(rooms);
+        }
+      } else {
+        const pinnedRoomsCount = rooms.filter(
+          (r) => r.isPinned || r.updatedAt > data.updatedAt,
+        ).length;
+        if (pinnedRoomsCount) {
+          rooms.splice(pinnedRoomsCount, 0, data);
+          setChatGroupsState(rooms);
+        }
+      }
     },
-    {
-      refetchInterval: 30000,
-      onSettled: clearRefetch,
-      onSuccess: (data) => {
-        stateRefreshNeeded(data.rooms);
-      },
+    onError: () => {
+      alert(
+        'ピン留めを更新中にエラーが発生しました。\n時間をおいて再実行してください。',
+      );
     },
-  );
+  });
 
   useEffect(() => {
-    if (refetchNeeded) {
-      refreshRooms();
-    }
-  }, [refetchNeeded, refreshRooms]);
+    setChatRooms(chatGroups);
+  }, [chatGroups]);
 
   return (
     <Box
@@ -70,33 +66,68 @@ const RoomList: React.FC<RoomListProps> = ({ currentId, onClickRoom }) => {
       flexDir="column"
       alignItems="center"
       h="100%"
-      overflowY="auto"
-      onScroll={onScroll}>
-      {roomsForInfiniteScroll.length ? (
-        roomsForInfiniteScroll.map((g) => (
-          <a
-            onClick={() => onClickRoom(g)}
-            key={g.id}
-            style={{ width: '100%' }}>
-            <Box w="100%" mb={'8px'}>
-              <ChatGroupCard
-                isSelected={Number(currentId) === g.id}
-                chatGroup={g}
-                key={g.id}
-              />
-            </Box>
-          </a>
-        ))
-      ) : loadingGetChatGroupList ? (
-        <Spinner />
+      overflowY="auto">
+      <InputGroup>
+        <InputLeftElement pointerEvents="none">
+          <AiOutlineSearch />
+        </InputLeftElement>
+        <Input
+          type="search"
+          placeholder="名前で検索"
+          onChange={(e) => {
+            const filteredRooms = chatRooms.filter((r) => {
+              const regex = new RegExp(e.target.value);
+              return r.name
+                ? regex.test(r.name)
+                : regex.test(nameOfEmptyNameGroup(r.members));
+            });
+            setSearchedRooms(filteredRooms);
+          }}
+        />
+      </InputGroup>
+      {chatRooms.length ? (
+        searchedRooms.length ? (
+          searchedRooms.map((g) => (
+            <a
+              onClick={() => g.id === Number(currentId) || onClickRoom(g)}
+              key={g.id}
+              style={{ width: '100%' }}>
+              <Box w="100%" mb={'8px'}>
+                <ChatGroupCard
+                  isSelected={Number(currentId) === g.id}
+                  onPressPinButton={() => {
+                    savePin({ ...g, isPinned: !g.isPinned });
+                  }}
+                  chatGroup={g}
+                  key={g.id}
+                />
+              </Box>
+            </a>
+          ))
+        ) : (
+          chatRooms.map((g) => (
+            <a
+              onClick={() => g.id === Number(currentId) || onClickRoom(g)}
+              key={g.id}
+              style={{ width: '100%' }}>
+              <Box w="100%" mb={'8px'}>
+                <ChatGroupCard
+                  isSelected={Number(currentId) === g.id}
+                  onPressPinButton={() => {
+                    savePin({ ...g, isPinned: !g.isPinned });
+                  }}
+                  chatGroup={g}
+                  key={g.id}
+                />
+              </Box>
+            </a>
+          ))
+        )
       ) : (
         <Box wordBreak="break-all">
           <Text>ルームを作成するか、招待をお待ちください</Text>
         </Box>
       )}
-      {roomsForInfiniteScroll.length && loadingGetChatGroupList ? (
-        <Spinner />
-      ) : null}
     </Box>
   );
 };

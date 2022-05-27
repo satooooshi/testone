@@ -10,7 +10,7 @@ export const setupCallInvitation = async (
   callee: User,
 ): Promise<LocalInvitation> => {
   const rtmEngine = new RtmClient();
-  await rtmEngine.createInstance(Config.AGORA_APP_ID);
+  await rtmEngine.createInstance(Config.AGORA_APP_ID_TEST);
   const parsedUUid = uuid.v4();
   const localInvitation = await rtmEngine.createLocalInvitation(
     callee.id.toString(),
@@ -20,7 +20,6 @@ export const setupCallInvitation = async (
   );
   const res = await axiosInstance.get<string>('/chat/get-rtm-token');
   await rtmEngine.loginV2(caller?.id?.toString() as string, res.data);
-  console.log('loginv2 completed');
 
   await rtmEngine.sendLocalInvitationV2(localInvitation);
   // iOSのためにプッシュ通知も送る

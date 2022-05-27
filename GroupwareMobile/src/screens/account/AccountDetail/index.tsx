@@ -41,6 +41,7 @@ import {userNameFactory} from '../../../utils/factory/userNameFactory';
 import {userRoleNameFactory} from '../../../utils/factory/userRoleNameFactory';
 import {useInviteCall} from '../../../contexts/call/useInviteCall';
 import {branchTypeNameFactory} from '../../../utils/factory/branchTypeNameFactory';
+import {useHandleBadge} from '../../../contexts/badge/useHandleBadge';
 
 const TopTab = createMaterialTopTabNavigator();
 
@@ -161,6 +162,7 @@ const AccountDetail: React.FC = () => {
   const {user, setUser, logout} = useAuthenticate();
   const {sendCallInvitation} = useInviteCall();
   const {setIsTabBarVisible} = useIsTabBarVisible();
+  const {editChatGroup} = useHandleBadge();
   const id = route.params?.id;
   const userID = id || user?.id;
   const screenName = 'AccountDetail';
@@ -194,6 +196,9 @@ const AccountDetail: React.FC = () => {
     });
   const {mutate: createGroup} = useAPISaveChatGroup({
     onSuccess: createdData => {
+      if (createdData.updatedAt === createdData.createdAt) {
+        editChatGroup(createdData);
+      }
       const resetAction = StackActions.popToTop();
       navigation.dispatch(resetAction);
 

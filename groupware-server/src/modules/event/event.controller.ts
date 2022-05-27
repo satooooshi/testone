@@ -309,9 +309,9 @@ export class EventScheduleController {
       };
       await sendPushNotifToSpecificUsers(
         [
-          e.author,
-          ...e.hostUsers.map((u) => u),
-          ...e.userJoiningEvent.map((e) => e.user),
+          e.author.id,
+          ...e.hostUsers.map((u) => u.id),
+          ...e.userJoiningEvent.map((e) => e.user.id),
         ],
         notificationData,
       );
