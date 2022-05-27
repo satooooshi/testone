@@ -31,9 +31,9 @@ export const BadgeProvider: React.FC = ({children}) => {
   const [completeRefetch, setCompleteRefetch] = useState(false);
   const [networkConnection, setNetworkConnection] = useState(true);
   const [editRoom, setEditRoom] = useState<ChatGroup>();
-  const [latestRefetchDate, setLatestRefetchDate] = useState<
-    string | undefined
-  >('');
+  // const [latestRefetchDate, setLatestRefetchDate] = useState<
+  //   string | undefined
+  // >('');
 
   const {refetch: refetchAllRooms, isLoading} = useAPIGetRooms(
     {
@@ -127,6 +127,8 @@ export const BadgeProvider: React.FC = ({children}) => {
     onSuccess: data => {
       if (refetchGroup.type === 'edit') {
         setEditRoom(data);
+        setRefetchGroup({id: 0, type: ''});
+        return;
       }
       let rooms = chatGroups.filter(r => r.id !== data.id);
       if (data.isPinned) {
