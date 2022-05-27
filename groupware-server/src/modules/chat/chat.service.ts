@@ -119,7 +119,6 @@ export class ChatService {
         'm.id = ( SELECT id FROM chat_messages WHERE chat_group_id = chat_groups.id AND type <> "system_text" ORDER BY updated_at DESC LIMIT 1 )',
       )
       .leftJoinAndSelect('m.sender', 'sender')
-      .leftJoinAndSelect('lastReadChatTime.user', 'lastReadChatTime.user')
       .where('member.id = :memberId', { memberId: userID })
       .andWhere(
         !!updatedAtLatestRoom
@@ -178,7 +177,7 @@ export class ChatService {
   }
 
   public async getOneRoom(userID: number, roomId: number): Promise<ChatGroup> {
-    const room = await this.chatGroupRepository
+    const chatGroup = await this.chatGroupRepository
       .createQueryBuilder('chat_groups')
       .leftJoinAndSelect('chat_groups.members', 'members')
       .leftJoin('chat_groups.members', 'member')
@@ -201,9 +200,10 @@ export class ChatService {
         'm.id = ( SELECT id FROM chat_messages WHERE chat_group_id = chat_groups.id AND type <> "system_text" ORDER BY updated_at DESC LIMIT 1 )',
       )
       .leftJoinAndSelect('m.sender', 'sender')
-      .leftJoinAndSelect('lastReadChatTime.user', 'lastReadChatTime.user')
       .where('chat_groups.id = :roomId', { roomId: roomId })
-      .getOne();
+      .getMany();
+
+    const room = chatGroup[0];
     room.isPinned = !!room.pinnedUsers.length;
     room.hasBeenRead = room?.lastReadChatTime?.[0]?.readTime
       ? room?.lastReadChatTime?.[0]?.readTime > room.updatedAt
@@ -219,6 +219,7 @@ export class ChatService {
 
       room.unreadCount = await this.getUnreadChatMessage(userID, query);
     }
+
     return room;
   }
 
@@ -435,7 +436,7 @@ export class ChatService {
     }
     const existGroup = await this.chatGroupRepository.findOne({
       where: { id: message.chatGroup.id },
-      relations: ['members'],
+      relations: ['members', 'muteUsers'],
     });
     if (!existGroup) {
       throw new BadRequestException('That group id is incorrect');
@@ -445,7 +446,7 @@ export class ChatService {
       throw new BadRequestException('sender is not a member of this group');
     }
     const savedMessage = await this.chatMessageRepository.save(
-      this.chatMessageRepository.create(message),
+      this.chatMessageRepository.create({ ...message, chatGroup: existGroup }),
     );
 
     existGroup.updatedAt = new Date();
@@ -569,8 +570,16 @@ export class ChatService {
     const existGroup = await this.chatGroupRepository.findOne(newData.id, {
       relations: ['members'],
     });
+    let isMySelf = false;
+    const otherExistMembers = existGroup.members.filter((u) => {
+      if (u.id === requestUser.id) {
+        isMySelf = true;
+      } else {
+        return true;
+      }
+    });
 
-    if (!existGroup.members.filter((u) => u.id === requestUser.id).length) {
+    if (!isMySelf) {
       throw new BadRequestException('The user is not a member');
     }
 
@@ -628,9 +637,9 @@ export class ChatService {
         id: newGroup.id.toString(),
       },
     };
-    const allMemberWithoutMyself = newGroup.members.concat(removedMembers);
+    const allMemberWithoutMyself = otherExistMembers.concat(newMembers);
     await sendPushNotifToSpecificUsers(
-      allMemberWithoutMyself,
+      allMemberWithoutMyself.map((u) => u.id),
       silentNotification,
     );
 

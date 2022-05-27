@@ -7,13 +7,15 @@ import React, {
   useEffect,
   useCallback,
 } from 'react';
-import { io } from 'socket.io-client';
 import { ChatGroup } from 'src/types';
-import { baseURL } from '../../utils/url';
 import { useAuthenticate } from '../useAuthenticate';
 import { RoomRefetchProvider } from 'src/contexts/chat/useRoomRefetch';
 import { useAPIGetRoomsByPage } from '@/hooks/api/chat/useAPIGetRoomsByPage';
 import { useAPIGetOneRoom } from '@/hooks/api/chat/useAPIGetOneRoom';
+import {
+  onMessageListener,
+  requestForToken,
+} from 'src/utils/firebase/getFirebaseToken';
 
 const BadgeContext = createContext({
   unreadChatCount: 0,
@@ -22,7 +24,8 @@ const BadgeContext = createContext({
   refetchGroupId: 0,
   handleEnterRoom: (() => {}) as (roomId: number) => void,
   editRoom: {} as ChatGroup | undefined,
-  emitEditRoom: (() => {}) as (room: ChatGroup) => void,
+  editChatGroup: (() => {}) as (room: ChatGroup) => void,
+  isRoomsRefetching: false,
 });
 
 export const BadgeProvider: React.FC = ({ children }) => {
@@ -33,12 +36,7 @@ export const BadgeProvider: React.FC = ({ children }) => {
   const [refetchGroupId, setRefetchGroupId] = useState(0);
   const { user, currentChatRoomId } = useAuthenticate();
   const [editRoom, setEditRoom] = useState<ChatGroup>();
-  const [completeRefetch, setCompleteRefetch] = useState(false);
-
-  const socket = io(baseURL, {
-    transports: ['websocket'],
-  });
-  const { refetch: refetchAllRooms } = useAPIGetRoomsByPage(
+  const { refetch: refetchAllRooms, isLoading } = useAPIGetRoomsByPage(
     {
       page: page.toString(),
       limit: '20',
@@ -62,7 +60,6 @@ export const BadgeProvider: React.FC = ({ children }) => {
         } else {
           setIsNeedRefetch(false);
           setPage(1);
-          setCompleteRefetch(true);
         }
       },
     },
@@ -75,10 +72,6 @@ export const BadgeProvider: React.FC = ({ children }) => {
     },
     onSuccess: (data) => {
       const rooms = chatGroups.filter((r) => r.id !== data.id);
-      if (chatGroups.length === rooms.length) {
-        // socket.emit('setChatGroup', data.id);
-        // resetSocketOn();
-      }
       if (data.isPinned) {
         setChatGroups([...[data], ...rooms]);
       } else {
@@ -181,61 +174,13 @@ export const BadgeProvider: React.FC = ({ children }) => {
     }
   }, [refetchGroupId, refetchRoom]);
 
-  const resetSocketOn = () => {
-    socket.off('editRoomClient');
-    socket.on('editRoomClient', async (room: ChatGroup) => {
-      if (room?.id) {
-        setEditRoom(room);
-        console.log('-----------editRoomClient-----');
-      }
-    });
-    socket.off('badgeClient');
-    socket.on(
-      'badgeClient',
-      async (data: { userId: number; groupId: number }) => {
-        if (data.groupId) setRefetchGroupId(data.groupId);
-      },
-    );
-  };
-
-  // useEffect(
-  //   () => {
-  //     socket.connect();
-
-  //     return () => {
-  //       socket.off('editRoomClient');
-  //       socket.off('badgeClient');
-  //       socket.disconnect();
-  //     };
-  //   }, // eslint-disable-next-line react-hooks/exhaustive-deps
-  //   [user, chatGroups],
-  // );
-
-  // useEffect(
-  //   () => {
-  //     if (completeRefetch && chatGroups.length) {
-  //       socket.emit(
-  //         'setChatGroups',
-  //         chatGroups.map((g) => g.id),
-  //       );
-  //       socket.on(
-  //         'badgeClient',
-  //         async (data: { userId: number; groupId: number }) => {
-  //           if (data.groupId) setRefetchGroupId(data.groupId);
-  //         },
-  //       );
-  //       socket.on('editRoomClient', async (room: ChatGroup) => {
-  //         if (room?.id) {
-  //           setEditRoom(room);
-  //           console.log('-----------editRoomClient-----');
-  //         }
-  //       });
-  //       setCompleteRefetch(false);
-  //       console.log('-----====---===---==', chatGroups.length);
-  //     }
-  //   }, // eslint-disable-next-line react-hooks/exhaustive-deps
-  //   [completeRefetch, chatGroups],
-  // );
+  // useEffect(() => {
+  //   const handleMessaging = async () => {
+  //     await requestForToken();
+  //     // onMessageListener();
+  //   };
+  //   handleMessaging();
+  // }, [user]);
 
   useEffect(() => {
     if (editRoom) {
@@ -249,13 +194,9 @@ export const BadgeProvider: React.FC = ({ children }) => {
             ),
           );
         } else {
-          // socket.emit('unsetChatGroup', editRoom.id);
-          // resetSocketOn();
           setChatGroups((rooms) => rooms.filter((r) => r.id !== editRoom.id));
         }
       } else if (editRoom.members?.filter((m) => m.id === user?.id).length) {
-        // socket.emit('setChatGroup', editRoom.id);
-        // resetSocketOn();
         const rooms = chatGroups;
         const pinnedRoomsCount = rooms.filter((r) => r.isPinned).length;
         rooms.splice(pinnedRoomsCount, 0, editRoom);
@@ -266,8 +207,8 @@ export const BadgeProvider: React.FC = ({ children }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editRoom]);
 
-  const emitEditRoom = (room: ChatGroup) => {
-    socket.emit('editRoom', room);
+  const editChatGroup = (room: ChatGroup) => {
+    setEditRoom(room);
   };
 
   const setChatGroupsState = (rooms: ChatGroup[]) => {
@@ -294,7 +235,8 @@ export const BadgeProvider: React.FC = ({ children }) => {
         refetchGroupId,
         handleEnterRoom,
         editRoom,
-        emitEditRoom,
+        editChatGroup,
+        isRoomsRefetching: isLoading,
       }}>
       <RoomRefetchProvider>{children}</RoomRefetchProvider>
     </BadgeContext.Provider>

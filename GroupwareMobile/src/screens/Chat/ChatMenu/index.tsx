@@ -37,6 +37,10 @@ const ChatMenu: React.FC = () => {
   });
   const {mutate: leaveChatGroup} = useAPILeaveChatRoom({
     onSuccess: () => {
+      editChatGroup({
+        ...room,
+        members: room.members?.filter(u => u.id !== user?.id),
+      });
       navigation.navigate('ChatStack', {
         screen: 'RoomList',
       });
@@ -97,9 +101,7 @@ const ChatMenu: React.FC = () => {
                 ? room.muteUsers.splice(0, 0, myself[0])
                 : myself;
               updateGroup({...room, muteUsers: muteUsers});
-              console.log('-----------muteUsers', muteUsers);
             }
-            console.log('-----------', myself);
           }
         }}
       />

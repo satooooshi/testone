@@ -86,7 +86,7 @@ export class QAAnswer {
         wikiId: this.wiki.id,
       })
       .getOne();
-    await sendPushNotifToSpecificUsers([targetUser], notificationData);
+    await sendPushNotifToSpecificUsers([targetUser.id], notificationData);
   }
 
   @BeforeInsert()

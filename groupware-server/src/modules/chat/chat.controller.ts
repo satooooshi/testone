@@ -101,7 +101,7 @@ export class ChatController {
       body: '',
       custom: { invitation: invitation, silent: 'silent', type: 'edit' },
     };
-    await sendPushNotifToSpecificUsers([callee], notificationData);
+    await sendPushNotifToSpecificUsers([callee.id], notificationData);
     return;
   }
 
@@ -274,7 +274,7 @@ export class ChatController {
     @Body() chatGroup: Partial<ChatGroup>,
   ): Promise<ChatGroup> {
     const user = req.user;
-    const otherMembers = chatGroup.members;
+    const otherMembersId = chatGroup.members.map((u) => u.id);
     chatGroup.members = [
       ...(chatGroup?.members?.filter((u) => u.id !== user.id) || []),
       user,
@@ -290,7 +290,7 @@ export class ChatController {
         id: savedGroup.id.toString(),
       },
     };
-    await sendPushNotifToSpecificUsers(otherMembers, silentNotification);
+    await sendPushNotifToSpecificUsers(otherMembersId, silentNotification);
     return savedGroup;
   }
 
@@ -334,6 +334,20 @@ export class ChatController {
     const { id } = req.user;
     const { id: chatGroupId } = chatGroup;
     await this.chatService.leaveChatRoom(id, chatGroupId);
+    const silentNotification: CustomPushNotificationData = {
+      title: '',
+      body: '',
+      custom: {
+        silent: 'silent',
+        type: 'leave',
+        screen: '',
+        id: chatGroupId.toString(),
+      },
+    };
+    await sendPushNotifToSpecificUsers(
+      chatGroup?.members.filter((u) => u.id !== id).map((u) => u.id),
+      silentNotification,
+    );
   }
 
   @Delete('/v2/reaction/:reactionId')

@@ -149,43 +149,48 @@ export class ChatMessage {
         }
       }
       // console.log(mentionedIds);
-      const allUsers = await getRepository(User)
-        .createQueryBuilder('user')
-        .select('user.id')
-        .leftJoin('user.chatGroups', 'chatGroups')
-        .leftJoinAndSelect('user.muteChatGroups', 'muteChatGroups')
-        .where('chatGroups.id = :chatGroupId', {
-          chatGroupId: this.chatGroup.id,
-        })
-        .andWhere('user.id <> :senderId', { senderId: this.sender.id })
-        .andWhere(
-          mentionedIds?.length ? 'user.id NOT IN (:...mentionedIds)' : '1=1',
-          { mentionedIds },
-        )
-        .getMany();
-      const notifiedUsers = await getRepository(User)
-        .createQueryBuilder('user')
-        .select('user.id')
-        .leftJoin('user.chatGroups', 'chatGroups')
-        .leftJoinAndSelect('user.muteChatGroups', 'muteChatGroups')
-        .where('muteChatGroups.id <> :chatGroupId', {
-          chatGroupId: this.chatGroup.id,
-        })
-        .orWhere('muteChatGroups.id is null')
-        .andWhere('chatGroups.id = :chatGroupId', {
-          chatGroupId: this.chatGroup.id,
-        })
-        .andWhere('user.id <> :senderId', { senderId: this.sender.id })
-        .andWhere(
-          mentionedIds?.length ? 'user.id NOT IN (:...mentionedIds)' : '1=1',
-          { mentionedIds },
-        )
-        .getMany();
-
+      // const allUsers = await getRepository(User)
+      //   .createQueryBuilder('user')
+      //   .select('user.id')
+      //   .leftJoin('user.chatGroups', 'chatGroups')
+      //   .leftJoinAndSelect('user.muteChatGroups', 'muteChatGroups')
+      //   .where('chatGroups.id = :chatGroupId', {
+      //     chatGroupId: this.chatGroup.id,
+      //   })
+      //   .andWhere('user.id <> :senderId', { senderId: this.sender.id })
+      //   .getMany();
+      // const notifiedUsers = await getRepository(User)
+      //   .createQueryBuilder('user')
+      //   .select('user.id')
+      //   .leftJoin('user.chatGroups', 'chatGroups')
+      //   .leftJoin('user.muteChatGroups', 'muteChatGroups')
+      //   .where(
+      //     'muteChatGroups.id <> :chatGroupId OR muteChatGroups.id is null',
+      //     {
+      //       chatGroupId: this.chatGroup.id,
+      //     },
+      //   )
+      //   // .orWhere('muteChatGroups.id is null')
+      //   .andWhere('chatGroups.id = :chatGroupId', {
+      //     chatGroupId: this.chatGroup.id,
+      //   })
+      //   .andWhere('user.id <> :senderId', { senderId: this.sender.id })
+      //   .andWhere(
+      //     mentionedIds?.length ? 'user.id NOT IN (:...mentionedIds)' : '1=1',
+      //     { mentionedIds },
+      //   )
+      //   .getMany();
+      const notifiedUsers = this.chatGroup.members.filter(
+        (u) =>
+          u.id !== this.sender.id &&
+          !this.chatGroup.muteUsers.filter((m) => m.id === u.id).length,
+      );
+      const title = `${userNameFactory(this.sender)}  ${this.chatGroup.name}`;
       const notificationDataWithNoMention: CustomPushNotificationData = {
-        title: userNameFactory(this.sender),
+        title: title,
         body: `${mentionTransform(content)}`,
         custom: {
+          type: 'badge',
           screen: 'chat',
           id: this.chatGroup.id.toString(),
         },
@@ -194,24 +199,28 @@ export class ChatMessage {
         title: '',
         body: '',
         custom: {
-          silent: 'silent',
           type: 'badge',
-          screen: '',
+          silent: 'silent',
           id: this.chatGroup.id.toString(),
         },
       };
       console.log(
         '---====',
         notifiedUsers.map((u) => u.id),
-        allUsers.map((u) => u.id),
-        notifiedUsers.map((u) => u.muteChatGroups),
+        this.chatGroup.members.map((u) => u.id),
+        this.sender.id,
+        title,
       );
 
       await sendPushNotifToSpecificUsers(
-        notifiedUsers,
+        notifiedUsers.map((u) => u.id),
         notificationDataWithNoMention,
       );
-      await sendPushNotifToSpecificUsers(allUsers, silentNotification);
+      if (this.chatGroup.muteUsers.length)
+        await sendPushNotifToSpecificUsers(
+          this.chatGroup.muteUsers.map((u) => u.id),
+          silentNotification,
+        );
       if (mentionedIds?.length) {
         const mentionedUsers = await getRepository(User)
           .createQueryBuilder('user')
@@ -232,7 +241,7 @@ export class ChatMessage {
           },
         };
         await sendPushNotifToSpecificUsers(
-          mentionedUsers,
+          mentionedUsers.map((u) => u.id),
           notificationDataWithMention,
         );
       }

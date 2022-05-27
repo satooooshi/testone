@@ -76,8 +76,13 @@ const RoomForm: React.FC<RoomFormProps> = ({
   }, [initialRoom, setValues]);
 
   useEffect(() => {
-    if (willSubmit) {
+    const safetySubmit = async () => {
       handleSubmit();
+      await new Promise(r => setTimeout(r, 1000));
+      setWillSubmit(false);
+    };
+    if (willSubmit) {
+      safetySubmit();
     }
   }, [willSubmit, handleSubmit]);
 

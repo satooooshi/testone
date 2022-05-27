@@ -1,5 +1,5 @@
 import {useFocusEffect, useNavigation} from '@react-navigation/native';
-import React, {useCallback, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {Alert, TouchableHighlight, TouchableOpacity} from 'react-native';
 import {Div, Icon, Input, ScrollDiv, Text} from 'react-native-magnus';
 import {ActivityIndicator} from 'react-native-paper';
@@ -22,7 +22,8 @@ const RoomList: React.FC = () => {
   const [roomTypeSelector, setRoomTypeSelector] = useState(false);
   const [userModal, setVisibleUserModal] = useState(false);
   const {data: users} = useAPIGetUsers('');
-  const {chatGroups, setChatGroupsState, editChatGroup} = useHandleBadge();
+  const {chatGroups, setChatGroupsState, editChatGroup, isRoomsRefetching} =
+    useHandleBadge();
   const {selectedUserRole, filteredUsers} = useUserRole('All', users);
   const [creationType, setCreationType] = useState<RoomType>();
   const [searchedRooms, setSearchedRooms] = useState<ChatGroup[]>();
@@ -72,11 +73,15 @@ const RoomList: React.FC = () => {
     },
   });
 
-  useFocusEffect(
-    useCallback(() => {
-      setChatRooms(chatGroups);
-    }, [chatGroups]),
-  );
+  // useFocusEffect(
+  //   useCallback(() => {
+  //     setChatRooms(chatGroups);
+  //   }, [chatGroups]),
+  // );
+
+  useEffect(() => {
+    setChatRooms(chatGroups);
+  }, [chatGroups]);
 
   const onPressRightButton = () => {
     // navigation.navigate('ChatStack', {screen: 'NewRoom'});
@@ -234,12 +239,8 @@ const RoomList: React.FC = () => {
                   );
                 })}
           </ScrollDiv>
-        ) : isNeedRefetch ? (
+        ) : isRoomsRefetching ? (
           <Div alignItems="center" w={'90%'}>
-            <Text>
-              ただいま全てのルームを取得しています。{'\n'}
-              しばらくの間お待ちください。
-            </Text>
             <ActivityIndicator />
           </Div>
         ) : (
