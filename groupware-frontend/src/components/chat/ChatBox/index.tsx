@@ -212,6 +212,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
     after,
     before,
     include,
+    limit: '20',
   });
 
   const { refetch: refetchLatest } = useAPIGetMessages(

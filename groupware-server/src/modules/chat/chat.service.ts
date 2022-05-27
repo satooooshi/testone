@@ -269,18 +269,7 @@ export class ChatService {
     userID: number,
     query: GetMessagesQuery,
   ): Promise<ChatMessage[]> {
-    const {
-      after,
-      before,
-      include = false,
-      limit = '20',
-      dateRefetchLatest,
-    } = query;
-    console.log('--------', limit);
-    const limitNumber = Number(limit) || 20;
-    // if (Number(limit) === 0) {
-    //   return [];
-    // }
+    const { after, before, include = false, limit, dateRefetchLatest } = query;
 
     const existMessages = await this.chatMessageRepository
       .createQueryBuilder('chat_messages')
@@ -313,13 +302,13 @@ export class ChatService {
       )
       .andWhere(
         dateRefetchLatest
-          ? 'CASE WHEN chat_messages.createdAt < chat_messages.updatedAt THEN chat_messages.updatedAt > :dateRefetchLatest ELSE null END'
+          ? 'chat_messages.updatedAt > :dateRefetchLatest'
           : '1=1',
         {
           dateRefetchLatest: new Date(dateRefetchLatest),
         },
       )
-      .take(limitNumber)
+      .take(Number(limit))
       .orderBy('chat_messages.createdAt', after ? 'ASC' : 'DESC')
       .withDeleted()
       .getMany();
