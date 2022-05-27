@@ -60,7 +60,12 @@ const AnswerList: React.FC<AnswerListProps> = ({wiki, onPressAvatar}) => {
                         }
                       }}>
                       <Div mr={8}>
-                        <UserAvatar user={answer.writer} h={64} w={64} />
+                        <UserAvatar
+                          user={answer.writer}
+                          h={64}
+                          w={64}
+                          GoProfile={true}
+                        />
                       </Div>
                     </TouchableOpacity>
                     <Text fontSize={18} color={darkFontColor}>

@@ -194,6 +194,7 @@ const AccountDetail: React.FC = () => {
       type: WikiType.BOARD,
       board_category: BoardCategory.KNOWLEDGE,
     });
+  const [safetyCreateGroup, setCreatGroup] = useState(false);
   const {mutate: createGroup} = useAPISaveChatGroup({
     onSuccess: createdData => {
       if (createdData.updatedAt === createdData.createdAt) {
@@ -212,6 +213,17 @@ const AccountDetail: React.FC = () => {
       Alert.alert('チャットルームの作成に失敗しました');
     },
   });
+
+  useEffect(() => {
+    if (safetyCreateGroup && profile) {
+      createGroup({
+        name: '',
+        members: [profile],
+        roomType: RoomType.PERSONAL,
+      });
+    }
+  }, [safetyCreateGroup, profile, createGroup]);
+
   const isFocused = useIsFocused();
   const [activeScreen, setActiveScreen] = useState(defaultScreenName);
 
@@ -522,13 +534,7 @@ const AccountDetail: React.FC = () => {
             w={60}
             zIndex={20}
             rounded="circle"
-            onPress={() =>
-              createGroup({
-                name: '',
-                members: [profile],
-                roomType: RoomType.PERSONAL,
-              })
-            }>
+            onPress={() => setCreatGroup(true)}>
             <Icon
               fontSize={'6xl'}
               color="white"

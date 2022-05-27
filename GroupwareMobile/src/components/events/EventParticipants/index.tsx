@@ -123,6 +123,7 @@ const EventParticipants: React.FC<EventParticipantsProps> = ({
                       user={uje.user}
                       h={windowWidth * 0.09}
                       w={windowWidth * 0.09}
+                      GoProfile={true}
                     />
                   </Div>
                   <Div>
@@ -216,6 +217,7 @@ const EventParticipants: React.FC<EventParticipantsProps> = ({
                       user={uje.user}
                       h={windowWidth * 0.09}
                       w={windowWidth * 0.09}
+                      GoProfile={true}
                     />
                   </Div>
                   <Div>
