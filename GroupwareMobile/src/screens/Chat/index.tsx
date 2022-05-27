@@ -992,9 +992,22 @@ const Chat: React.FC = () => {
         },
       });
     }
-    // return () => saveLastReadChatTime(room.id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [appState, isFocused, room.id]);
+  }, [appState, isFocused]);
+
+  useEffect(() => {
+    saveLastReadChatTime(room.id, {
+      onSuccess: () => {
+        socket.emit('readReport', {
+          room: room.id.toString(),
+          senderId: myself?.id,
+        });
+        handleEnterRoom(room.id);
+      },
+    });
+    return () => saveLastReadChatTime(room.id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [room.id, saveLastReadChatTime]);
 
   const readUserBox = (user: User) => (
     <View style={tailwind('flex-row bg-white items-center px-4 py-2')}>
