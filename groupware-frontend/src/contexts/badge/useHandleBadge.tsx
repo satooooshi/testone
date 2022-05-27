@@ -113,29 +113,46 @@ export const BadgeProvider: React.FC = ({ children }) => {
       refetchInterval: 10000,
       onSuccess: (data) => {
         const latestRooms = data.rooms;
+        console.log(
+          'success latest rooms refech ================================',
+          latestRooms.length,
+        );
         if (latestRooms.length) {
-          const reversedLatestRooms = latestRooms.reverse();
-          for (const latestRoom of reversedLatestRooms) {
-            if (router.pathname !== `/chat/${latestRoom.id}`) {
-              const olderRoom = chatGroups.filter(
-                (r) => r.id === latestRoom.id,
-              )[0];
-              const incrementCount =
-                (latestRoom?.unreadCount || 0) - (olderRoom?.unreadCount || 0);
-              setChatUnreadCount((c) => c + incrementCount);
+          setChatGroups((rooms) => {
+            const latestPinnedRooms = [];
+            for (const latestRoom of latestRooms) {
+              if (router.pathname !== `/chat/${latestRoom.id}`) {
+                const olderRoom = chatGroups.filter(
+                  (r) => r.id === latestRoom.id,
+                )[0];
+                const incrementCount =
+                  (latestRoom?.unreadCount || 0) -
+                  (olderRoom?.unreadCount || 0);
+                setChatUnreadCount((c) => c + incrementCount);
+              }
+              if (latestRoom.isPinned) {
+                latestPinnedRooms.unshift(latestRoom);
+              }
             }
 
-            setChatGroups((rooms) => {
-              const existRooms = rooms.filter((r) => !(r.id === latestRoom.id));
-              if (latestRoom.isPinned) {
-                return [latestRoom, ...existRooms];
-              } else {
-                const pinnedRoomsCount = rooms.filter((r) => r.isPinned).length;
-                rooms.splice(pinnedRoomsCount, 1, latestRoom);
-                return [...rooms];
-              }
-            });
-          }
+            const ids = latestRooms.map((r) => r.id);
+            const existRooms = rooms.filter((r) => !ids.includes(r.id));
+            const existPinnedRooms = existRooms.filter((r) => r.isPinned);
+            const existExceptPinnedRooms = existRooms.filter(
+              (r) => !r.isPinned,
+            );
+
+            const latestRoomsExceptPinnedRooms = latestRooms.filter(
+              (r) => !r.isPinned,
+            );
+
+            return [
+              ...latestPinnedRooms,
+              ...existPinnedRooms,
+              ...latestRoomsExceptPinnedRooms,
+              ...existExceptPinnedRooms,
+            ];
+          });
         }
       },
     },
