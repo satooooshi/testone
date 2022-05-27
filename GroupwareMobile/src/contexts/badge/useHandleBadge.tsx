@@ -125,9 +125,11 @@ export const BadgeProvider: React.FC = ({children}) => {
       Alert.alert('ルーム情報の取得に失敗しました');
     },
     onSuccess: data => {
-      if (refetchGroup.type === 'edit') {
-        setEditRoom(data);
-        setRefetchGroup({id: 0, type: ''});
+      if (!data.members?.filter(m => m.id === user?.id).length) {
+        if (refetchGroup.type === 'edit') {
+          setEditRoom(data);
+          setRefetchGroup({id: 0, type: ''});
+        }
         return;
       }
       let rooms = chatGroups.filter(r => r.id !== data.id);
