@@ -339,21 +339,19 @@ const Chat: React.FC = () => {
       onSettled: () => setReactionTarget(undefined),
       onSuccess: savedReaction => {
         const reactionAdded = {...savedReaction, isSender: true};
-        setMessages(m => {
-          return refreshMessage(
-            m.map(eachMessage => {
-              if (eachMessage.id === savedReaction.chatMessage?.id) {
-                return {
-                  ...eachMessage,
-                  reactions: eachMessage.reactions?.length
-                    ? [...eachMessage.reactions, reactionAdded]
-                    : [reactionAdded],
-                };
-              }
-              return eachMessage;
-            }),
-          );
-        });
+        setMessages(m =>
+          m.map(eachMessage => {
+            if (eachMessage.id === savedReaction.chatMessage?.id) {
+              return {
+                ...eachMessage,
+                reactions: eachMessage.reactions?.length
+                  ? [...eachMessage.reactions, reactionAdded]
+                  : [reactionAdded],
+              };
+            }
+            return eachMessage;
+          }),
+        );
       },
       onError: () => {
         Alert.alert(
