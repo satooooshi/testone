@@ -167,7 +167,6 @@ const Chat: React.FC = () => {
     },
   });
   const {
-    data: fetchedPastMessages,
     isLoading: loadingMessages,
     isFetching: fetchingMessages,
     refetch: refetchFetchedPastMessages,
@@ -183,6 +182,18 @@ const Chat: React.FC = () => {
       enabled: false,
       onSuccess: res => {
         console.log('success =============================', res.length);
+        if (res?.length) {
+          const refreshedMessage = refreshMessage(res);
+          console.log('refreshMessage =============', refreshedMessage.length);
+          setMessages(refreshedMessage);
+          if (refetchDoesntExistMessages(res[0].id)) {
+            refetchDoesntExistMessages(res[0].id + 20);
+          } else {
+            setAfter(undefined);
+            setInclude(false);
+            setBefore(undefined);
+          }
+        }
       },
     },
   );
@@ -329,21 +340,19 @@ const Chat: React.FC = () => {
       onSettled: () => setReactionTarget(undefined),
       onSuccess: savedReaction => {
         const reactionAdded = {...savedReaction, isSender: true};
-        setMessages(m => {
-          return refreshMessage(
-            m.map(eachMessage => {
-              if (eachMessage.id === savedReaction.chatMessage?.id) {
-                return {
-                  ...eachMessage,
-                  reactions: eachMessage.reactions?.length
-                    ? [...eachMessage.reactions, reactionAdded]
-                    : [reactionAdded],
-                };
-              }
-              return eachMessage;
-            }),
-          );
-        });
+        setMessages(m =>
+          m.map(eachMessage => {
+            if (eachMessage.id === savedReaction.chatMessage?.id) {
+              return {
+                ...eachMessage,
+                reactions: eachMessage.reactions?.length
+                  ? [...eachMessage.reactions, reactionAdded]
+                  : [reactionAdded],
+              };
+            }
+            return eachMessage;
+          }),
+        );
       },
       onError: () => {
         Alert.alert(
@@ -579,22 +588,6 @@ const Chat: React.FC = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [focusedMessageID]);
-
-  useEffect(() => {
-    if (fetchedPastMessages?.length) {
-      const refreshedMessage = refreshMessage(fetchedPastMessages);
-      console.log('refreshMessage =============', refreshedMessage.length);
-      setMessages(refreshedMessage);
-      if (refetchDoesntExistMessages(fetchedPastMessages[0].id)) {
-        refetchDoesntExistMessages(fetchedPastMessages[0].id + 20);
-      } else {
-        setAfter(undefined);
-        setInclude(false);
-        setBefore(undefined);
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [fetchedPastMessages]);
 
   const typeDropdown = (
     <Dropdown

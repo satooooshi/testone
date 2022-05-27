@@ -220,6 +220,12 @@ export class ChatService {
       room.unreadCount = await this.getUnreadChatMessage(userID, query);
     }
 
+    if (room.roomType === RoomType.PERSONAL) {
+      const chatPartner = room.members.filter((m) => m.id !== userID)[0];
+      room.imageURL = chatPartner.avatarUrl;
+      room.name = `${chatPartner.lastName} ${chatPartner.firstName}`;
+    }
+
     return room;
   }
 
