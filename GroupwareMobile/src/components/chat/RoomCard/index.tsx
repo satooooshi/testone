@@ -143,7 +143,7 @@ const RoomCard: React.FC<RoomCardProps> = ({
           <Div w={'75%'} pr={'sm'}>
             <Div flexDir="row" mb={'xs'} w={'85%'}>
               <Text numberOfLines={1} fontWeight="bold" fontSize={16}>
-                {nameOfRoom(room)}
+                {nameOfRoom(room, user)}
               </Text>
               {room.muteUsers &&
               room.muteUsers.filter(u => u.id === user?.id).length ? (
