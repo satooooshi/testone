@@ -5,6 +5,7 @@ import {useAPIGetRooms} from '../../hooks/api/chat/useAPIGetRoomsByPage';
 import {ChatGroup} from '../../types';
 import {useAuthenticate} from '../useAuthenticate';
 import NetInfo from '@react-native-community/netinfo';
+import {storage} from '../../utils/url';
 
 const BadgeContext = createContext({
   unreadChatCount: 0,
@@ -63,10 +64,29 @@ export const BadgeProvider: React.FC = ({children}) => {
 
   useEffect(() => {
     if (networkConnection && user?.id) {
+      const jsonRoomListInStorage = storage.getString(
+        `chatRoomList${user?.id}`,
+      );
+      if (jsonRoomListInStorage) {
+        const messagesInStorage = JSON.parse(jsonRoomListInStorage);
+        setChatGroups(messagesInStorage);
+      }
       refetchAllRooms();
     }
+    return () => {
+      const jsonMessages = JSON.stringify(chatGroups);
+      storage.set(`chatRoomList${user?.id}`, jsonMessages);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [networkConnection, user]);
+
+  useEffect(() => {
+    if (completeRefetch) {
+      const jsonMessages = JSON.stringify(chatGroups);
+      storage.set(`chatRoomList${user?.id}`, jsonMessages);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [completeRefetch]);
 
   useEffect(() => {
     const unsubscribe = NetInfo.addEventListener(state => {
