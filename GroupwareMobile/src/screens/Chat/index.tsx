@@ -649,6 +649,7 @@ const Chat: React.FC = () => {
 
   useEffect(() => {
     let isMounted = true;
+    socket.connect();
     socket.emit('joinRoom', room.id.toString());
     socket.on('readMessageClient', async (senderId: string) => {
       if (myself?.id && senderId && senderId !== `${myself?.id}`) {
@@ -715,6 +716,7 @@ const Chat: React.FC = () => {
       socket.emit('leaveRoom', room.id);
       isMounted = false;
       setCurrentChatRoomId(undefined);
+      socket.disconnect();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [room.id]);
