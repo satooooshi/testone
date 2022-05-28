@@ -132,7 +132,22 @@ export const BadgeProvider: React.FC = ({children}) => {
         }
         return;
       }
-      let rooms = chatGroups.filter(r => r.id !== data.id);
+      let rooms = chatGroups.filter(r => {
+        if (r.id === data.id) {
+          if (refetchGroup.type === 'badge' && currentChatRoomId !== data.id) {
+            const preUnreadCount = r.unreadCount ? r.unreadCount : 0;
+            const nowUnreadCount = data.unreadCount ? data.unreadCount : 0;
+            setChatUnreadCount(
+              count => count - preUnreadCount + nowUnreadCount,
+            );
+          }
+        } else {
+          return true;
+        }
+      });
+      if (rooms.length === chatGroups.length && refetchGroup.type === 'badge') {
+        setChatUnreadCount(count => count + 1);
+      }
       if (data.isPinned) {
         setChatGroups([...[data], ...rooms]);
       } else {
