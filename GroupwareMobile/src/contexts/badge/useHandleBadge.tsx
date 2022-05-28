@@ -140,7 +140,7 @@ export const BadgeProvider: React.FC = ({children}) => {
         rooms.splice(pinnedRoomsCount, 0, data);
         setChatGroups(rooms);
       }
-      if (refetchGroup.type === 'badge') {
+      if (refetchGroup.type === 'badge' && currentChatRoomId !== data.id) {
         setChatUnreadCount(count => count + 1);
       }
       setRefetchGroup({id: 0, type: ''});
