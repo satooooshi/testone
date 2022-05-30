@@ -308,7 +308,7 @@ const Navigator = () => {
         okButton: 'ok',
         additionalPermissions: [],
         foregroundService: {
-          channelId: 'com.groupwaremobileTest',
+          channelId: 'com.valleyinapp',
           channelName: 'Foreground service for my app',
           notificationTitle: 'バックグラウンドで実行中です',
         },
