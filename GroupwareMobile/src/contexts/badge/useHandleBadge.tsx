@@ -125,23 +125,35 @@ export const BadgeProvider: React.FC = ({children}) => {
       Alert.alert('ルーム情報の取得に失敗しました');
     },
     onSuccess: data => {
+      if (refetchGroup.type === 'edit') {
+        setEditRoom(data);
+        setRefetchGroup({id: 0, type: ''});
+      }
       if (!data.members?.filter(m => m.id === user?.id).length) {
-        if (refetchGroup.type === 'edit') {
-          setEditRoom(data);
-          setRefetchGroup({id: 0, type: ''});
-        }
         return;
       }
-      let rooms = chatGroups.filter(r => r.id !== data.id);
+      let rooms = chatGroups.filter(r => {
+        if (r.id === data.id) {
+          if (refetchGroup.type === 'badge' && currentChatRoomId !== data.id) {
+            const preUnreadCount = r.unreadCount ? r.unreadCount : 0;
+            const nowUnreadCount = data.unreadCount ? data.unreadCount : 0;
+            setChatUnreadCount(
+              count => count - preUnreadCount + nowUnreadCount,
+            );
+          }
+        } else {
+          return true;
+        }
+      });
+      if (rooms.length === chatGroups.length && refetchGroup.type === 'badge') {
+        setChatUnreadCount(count => count + 1);
+      }
       if (data.isPinned) {
         setChatGroups([...[data], ...rooms]);
       } else {
         const pinnedRoomsCount = rooms.filter(r => r.isPinned).length;
         rooms.splice(pinnedRoomsCount, 0, data);
         setChatGroups(rooms);
-      }
-      if (refetchGroup.type === 'badge') {
-        setChatUnreadCount(count => count + 1);
       }
       setRefetchGroup({id: 0, type: ''});
     },
@@ -176,7 +188,7 @@ export const BadgeProvider: React.FC = ({children}) => {
   useEffect(() => {
     if (editRoom) {
       console.log('editROom called-----', editRoom.members);
-      if (editRoom.updatedAt > editRoom.createdAt) {
+      if (chatGroups.map(g => g.id).includes(editRoom.id)) {
         if (editRoom.members?.filter(m => m.id === user?.id).length) {
           setChatGroups(room =>
             room.map(r =>

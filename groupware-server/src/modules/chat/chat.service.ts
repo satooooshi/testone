@@ -655,7 +655,7 @@ export class ChatService {
     const maybeExistGroup = await this.chatGroupRepository
       .createQueryBuilder('g')
       .leftJoinAndSelect('g.members', 'u')
-      .andWhere(newData.name ? 'g.name = :name' : 'g.name = ""', {
+      .where(newData.name ? 'g.name = :name' : 'g.name = ""', {
         name: newData.name,
       })
       .getMany();
@@ -666,7 +666,7 @@ export class ChatService {
         g.members = g.members.filter((m) => userIds.includes(m.id));
         return g;
       })
-      .filter((g) => g.members?.length === 2);
+      .filter((g) => g.members?.length === userIds.length);
 
     if (existGroup.length) {
       return existGroup[0];

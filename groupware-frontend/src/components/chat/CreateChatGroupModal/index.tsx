@@ -104,7 +104,7 @@ const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
 
   useEffect(() => {
     if (willSubmit) {
-      checkErrors();
+      onFinish();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [willSubmit]);
@@ -153,7 +153,7 @@ const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
         isClosable: true,
       });
     } else {
-      onFinish();
+      setWillSubmit(true);
     }
   };
 
@@ -186,7 +186,7 @@ const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
           <Button
             size="sm"
             flexDir="row"
-            onClick={() => setWillSubmit(true)}
+            onClick={checkErrors}
             mb="8px"
             colorScheme="green"
             alignItems="center">

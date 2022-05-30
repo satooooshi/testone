@@ -88,10 +88,16 @@ const PostAlbum: React.FC<PostAlbumProps> = ({
   }, [isOpen]);
 
   useEffect(() => {
-    if (willSubmit) {
+    const safetySubmit = async () => {
       handleSubmit();
+      await new Promise((r) => setTimeout(r, 1000));
+      setWillSubmit(false);
+    };
+    if (willSubmit) {
+      safetySubmit();
     }
   }, [willSubmit, handleSubmit]);
+
   const imagesInNewAlbumViewer = useMemo((): ImageDecorator[] => {
     return (
       values.images?.map((i) => ({
