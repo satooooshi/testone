@@ -206,7 +206,7 @@ const MyAccountInfo = () => {
       }}>
       <Head>
         <title>
-          ボールド | {profile ? `${profile.lastName} ${profile.firstName}` : ''}
+          sample | {profile ? `${profile.lastName} ${profile.firstName}` : ''}
         </title>
       </Head>
       <div className={accountInfoStyles.main}>

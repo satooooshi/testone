@@ -235,7 +235,7 @@ const Profile = () => {
         tabs,
       }}>
       <Head>
-        <title>ボールド | プロフィール編集</title>
+        <title>sample | プロフィール編集</title>
       </Head>
       {tags && (
         <TagModal

@@ -107,7 +107,7 @@ const WikiComment: React.FC<WikiCommentProps> = ({
                   className={qaCommentStyles.user_avatar}
                   src={boldMascot.src}
                 />
-                <p className={qaCommentStyles.user_name}>ボールドくん</p>
+                <p className={qaCommentStyles.user_name}>sampleくん</p>
               </>
             )}
           </div>

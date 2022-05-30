@@ -257,7 +257,7 @@ const CreateNewUser = () => {
         activeTabName: 'ユーザー作成',
       }}>
       <Head>
-        <title>ボールド | ユーザー作成</title>
+        <title>sample | ユーザー作成</title>
       </Head>
       {tags && (
         <TagModal

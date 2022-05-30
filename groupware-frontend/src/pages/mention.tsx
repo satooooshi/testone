@@ -22,7 +22,7 @@ const MentionList = () => {
         tabs: tabs,
       }}>
       <Head>
-        <title>ボールド | メンション一覧</title>
+        <title>sample | メンション一覧</title>
       </Head>
       <div className={mentionStyles.mention_list}>
         {messages && messages.length ? (
