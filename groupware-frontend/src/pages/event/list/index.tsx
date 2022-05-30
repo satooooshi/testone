@@ -106,7 +106,9 @@ const initialEventValue = {
 };
 
 const eventTitleText = {
+  [EventType.IMPRESSIVE_UNIVERSITY]: '感動大学',
   [EventType.STUDY_MEETING]: '勉強会',
+  [EventType.BOLDAY]: 'BOLDay',
   [EventType.COACH]: 'コーチ制度',
   [EventType.CLUB]: '部活動',
   [EventType.SUBMISSION_ETC]: '提出物等',
@@ -226,6 +228,12 @@ const EventList = () => {
   };
 
   const activeTabName = () => {
+    if (type === EventType.IMPRESSIVE_UNIVERSITY) {
+      return EventTab.IMPRESSIVE_UNIVERSITY;
+    }
+    if (type === EventType.BOLDAY) {
+      return EventTab.BOLDAY;
+    }
     if (type === EventType.STUDY_MEETING) {
       return EventTab.STUDY_MEETING;
     }
@@ -294,8 +302,12 @@ const EventList = () => {
   const eventPropGetter = (event: any): any => {
     const type = event.type;
     switch (type) {
+      case EventType.IMPRESSIVE_UNIVERSITY:
+        return { style: { backgroundColor: '#3182ce' } };
       case EventType.STUDY_MEETING:
         return { style: { backgroundColor: '#38a169' } };
+      case EventType.BOLDAY:
+        return { style: { backgroundColor: '#f6ad55' } };
       case EventType.COACH:
         return { style: { backgroundColor: '#90cdf4', color: '#65657d' } };
       case EventType.CLUB:
@@ -460,7 +472,9 @@ const EventList = () => {
       header={initialHeaderValue}
       sidebar={{ activeScreenName: SidebarScreenName.EVENT }}>
       <Head>
-        <title>sample | {type ? eventTitleText[type] : '全てのイベント'}</title>
+        <title>
+          ボールド | {type ? eventTitleText[type] : '全てのイベント'}
+        </title>
       </Head>
       <CreateEventModal
         enabled={modalVisible}

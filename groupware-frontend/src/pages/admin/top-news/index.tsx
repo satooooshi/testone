@@ -344,7 +344,7 @@ const NewsAdmin: React.VFC = () => {
                                   alignItems="center"
                                   mb={i + 1 < news.length ? '-1px' : '0px'}>
                                   <Box w="40%" color="blue" ml="5px">
-                                    <NextLink href={location.href + n.urlPath}>
+                                    <NextLink href={n.urlPath}>
                                       <a target="_blank">
                                         {location.origin + n.urlPath}
                                       </a>

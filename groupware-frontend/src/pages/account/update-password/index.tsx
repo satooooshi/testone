@@ -66,7 +66,7 @@ const UpdatePassword = () => {
         tabs,
       }}>
       <Head>
-        <title>sample | パスワード更新</title>
+        <title>ボールド | パスワード更新</title>
       </Head>
       <div className={profileStyles.main}>
         <div className={profileStyles.form_wrapper}>

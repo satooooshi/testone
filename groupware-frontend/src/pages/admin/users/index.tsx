@@ -110,7 +110,7 @@ const UserAdmin: React.FC = () => {
         tabs,
       }}>
       <Head>
-        <title>sample | ユーザー管理</title>
+        <title>ボールド | ユーザー管理</title>
       </Head>
       <div className={userAdminStyles.search_form_wrapper}>
         <SearchForm

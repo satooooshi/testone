@@ -111,6 +111,23 @@ const QAQuestionList = () => {
         WikiType.BOARD,
         undefined,
         true,
+        BoardCategory.IMPRESSIVE_UNIVERSITY,
+      ),
+      onClick: () =>
+        queryRefresh({
+          type: WikiType.BOARD,
+          board_category: BoardCategory.IMPRESSIVE_UNIVERSITY,
+          status: undefined,
+        }),
+      isActiveTab:
+        type === WikiType.BOARD &&
+        board_category === BoardCategory.IMPRESSIVE_UNIVERSITY,
+    },
+    {
+      tabName: wikiTypeNameFactory(
+        WikiType.BOARD,
+        undefined,
+        true,
         BoardCategory.CLUB,
       ),
       onClick: () =>
@@ -320,7 +337,7 @@ const QAQuestionList = () => {
       sidebar={{ activeScreenName: SidebarScreenName.QA }}
       header={initialHeaderValue}>
       <Head>
-        <title>sample | Wiki</title>
+        <title>ボールド | Wiki</title>
       </Head>
       {type === WikiType.RULES && (
         <Box mb="24px">

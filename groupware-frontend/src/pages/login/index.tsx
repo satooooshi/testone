@@ -1,6 +1,6 @@
 import React from 'react';
 import Image from 'next/image';
-import valleyinLogo from '@/public/valleyin-logo.png';
+import boldLogo from '@/public/bold-logo.png';
 import loginLayoutStyles from '@/styles/layouts/Login.module.scss';
 import { useFormik } from 'formik';
 import { useAPILogin } from '@/hooks/api/auth/useAPILogin';
@@ -109,7 +109,7 @@ const Login: React.FC = () => {
         <title>ログイン</title>
       </Head>
       <div className={loginLayoutStyles.logo_image}>
-        <Image src={valleyinLogo} alt="bold logo" />
+        <Image src={boldLogo} alt="bold logo" />
       </div>
       <form
         className={authFormStyles.login_form}

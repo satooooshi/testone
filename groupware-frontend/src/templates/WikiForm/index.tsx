@@ -129,6 +129,19 @@ const WikiForm: React.FC<WikiFormProps> = ({
     },
   ];
 
+  const [willSubmit, setWillSubmit] = useState(false);
+
+  useEffect(() => {
+    const safetySubmit = async () => {
+      handleSubmit();
+      await new Promise((r) => setTimeout(r, 1000));
+      setWillSubmit(false);
+    };
+    if (willSubmit) {
+      safetySubmit();
+    }
+  }, [willSubmit, handleSubmit]);
+
   const headerTabName = '内容を編集';
 
   const saveButtonName = useMemo(() => {
@@ -193,6 +206,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
       e.target.value === BoardCategory.KNOWLEDGE ||
       e.target.value === BoardCategory.QA ||
       e.target.value === BoardCategory.NEWS ||
+      e.target.value === BoardCategory.IMPRESSIVE_UNIVERSITY ||
       e.target.value === BoardCategory.CLUB ||
       e.target.value === BoardCategory.STUDY_MEETING ||
       e.target.value === BoardCategory.SELF_IMPROVEMENT ||
@@ -251,7 +265,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
           tabs,
         }}>
         <Head>
-          <title>sample | {wiki ? 'Wiki編集' : 'Wiki作成'}</title>
+          <title>ボールド | {wiki ? 'Wiki編集' : 'Wiki作成'}</title>
         </Head>
         <TagModal
           isOpen={tagModal}
@@ -386,6 +400,20 @@ const WikiForm: React.FC<WikiFormProps> = ({
                       undefined,
                       true,
                       BoardCategory.NEWS,
+                    )}
+                  </option>
+                ) : null}
+                {isCreatableWiki({
+                  type: WikiType.BOARD,
+                  boardCategory: BoardCategory.IMPRESSIVE_UNIVERSITY,
+                  userRole: user?.role,
+                }) ? (
+                  <option value={BoardCategory.IMPRESSIVE_UNIVERSITY}>
+                    {wikiTypeNameFactory(
+                      WikiType.BOARD,
+                      undefined,
+                      true,
+                      BoardCategory.IMPRESSIVE_UNIVERSITY,
                     )}
                   </option>
                 ) : null}
@@ -532,7 +560,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
                 marginRight="16px">
                 タグを編集
               </Button>
-              <Button colorScheme="pink" onClick={() => handleSubmit()}>
+              <Button colorScheme="pink" onClick={() => setWillSubmit(true)}>
                 {wiki ? `${saveButtonName}を更新` : `${saveButtonName}を投稿`}
               </Button>
             </Box>

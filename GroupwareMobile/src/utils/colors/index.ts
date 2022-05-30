@@ -2,7 +2,9 @@ export const layoutBackgroundGrayColor = '#F2F4FA';
 export const darkFontColor = '#65657d';
 export const blueColor = '#4a72d3';
 
+export const impressiveUniversityColor = '#3182ce';
 export const studyMeetingColor = '#38a169';
+export const boldayColor = '#f6ad55';
 export const coachColor = '#90cdf4';
 export const clubColor = '#f56565';
 export const submissionEtcColor = '#086f83';

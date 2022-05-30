@@ -172,12 +172,13 @@ const Home: React.FC = () => {
         <Div flexDir="row" justifyContent="center" alignItems="center">
           <Div mb={8} mr={4}>
             <PortalLinkBox
-              type="chat"
-              onPress={() => {
-                navigation.navigate('ChatStack', {
-                  screen: 'RoomList',
-                });
-              }}
+              type="impressive_university"
+              onPress={() =>
+                navigation.navigate('EventStack', {
+                  screen: 'EventIntroduction',
+                  params: {type: EventType.IMPRESSIVE_UNIVERSITY},
+                })
+              }
             />
           </Div>
           <Div mb={8} mr={4}>
@@ -193,12 +194,13 @@ const Home: React.FC = () => {
           </Div>
           <Div mb={8}>
             <PortalLinkBox
-              type="account"
-              onPress={() => {
-                navigation.navigate('AccountStack', {
-                  screen: 'AccountDetail',
-                });
-              }}
+              type="bolday"
+              onPress={() =>
+                navigation.navigate('EventStack', {
+                  screen: 'EventIntroduction',
+                  params: {type: EventType.BOLDAY},
+                })
+              }
             />
           </Div>
         </Div>
@@ -250,6 +252,28 @@ const Home: React.FC = () => {
           </Div>
           <Div mb={8} mr={4}>
             <PortalLinkBox
+              type="chat"
+              onPress={() => {
+                navigation.navigate('ChatStack', {
+                  screen: 'RoomList',
+                });
+              }}
+            />
+          </Div>
+          <Div mb={8}>
+            <PortalLinkBox
+              type="account"
+              onPress={() => {
+                navigation.navigate('AccountStack', {
+                  screen: 'AccountDetail',
+                });
+              }}
+            />
+          </Div>
+        </Div>
+        <Div flexDir="row" justifyContent="center" alignItems="center">
+          <Div mb={8} mr={4}>
+            <PortalLinkBox
               type="my_schedule"
               onPress={() => {
                 navigation.navigate('EventStack', {
@@ -259,8 +283,7 @@ const Home: React.FC = () => {
               }}
             />
           </Div>
-
-          <Div mb={8}>
+          <Div mb={8} mr={4}>
             <PortalLinkBox
               type="users"
               onPress={() => {
@@ -271,9 +294,7 @@ const Home: React.FC = () => {
               }}
             />
           </Div>
-        </Div>
-        <Div flexDir="row" justifyContent="center" alignItems="center">
-          <Div mb={8} mr={4}>
+          <Div mb={8}>
             <PortalLinkBox
               type="attendance"
               onPress={() => {
@@ -281,6 +302,8 @@ const Home: React.FC = () => {
               }}
             />
           </Div>
+        </Div>
+        <Div flexDir="row" justifyContent="center" alignItems="center">
           <Div mb={8} mr={4}>
             <PortalLinkBox
               type="safety_confirmation"

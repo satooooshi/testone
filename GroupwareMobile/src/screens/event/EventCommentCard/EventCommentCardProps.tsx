@@ -26,12 +26,13 @@ const EventCommentCard: React.FC<EventCommentCardProps> = ({
               h={windowWidth * 0.09}
               w={windowWidth * 0.09}
               user={writer}
+              GoProfile={true}
             />
           </Div>
           <Text fontSize={12} color="gray800">
             {writer.existence
               ? writer.lastName + ' ' + writer.firstName
-              : 'サンプル'}
+              : 'ボールドくん'}
           </Text>
         </Div>
         <Div p={20} bg="white" rounded="sm" flex={3}>

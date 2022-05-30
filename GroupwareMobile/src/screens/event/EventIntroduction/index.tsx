@@ -25,6 +25,10 @@ const EventIntroduction: React.FC = () => {
   const navigation = useNavigation<EventIntroductionNavigationProps>();
   const headlineImage: Source = useMemo(() => {
     switch (type) {
+      case EventType.IMPRESSIVE_UNIVERSITY:
+        return {
+          uri: 'https://www.bold.ne.jp/assets/assets_recruit/images/enviroment/img_balday_main.png',
+        };
       case EventType.STUDY_MEETING:
         return {
           uri: 'https://www.bold.ne.jp/assets/assets_recruit/images/enviroment/img_studygroup_main.png',
@@ -33,6 +37,10 @@ const EventIntroduction: React.FC = () => {
         return require('../../../../assets/coach_1.jpeg');
       case EventType.CLUB:
         return require('../../../../assets/club_5.jpg');
+      case EventType.BOLDAY:
+        return {
+          uri: 'https://www.bold.ne.jp/assets/assets_recruit/images/enviroment/img_balday_main.png',
+        };
       default:
         return {};
     }
@@ -40,6 +48,11 @@ const EventIntroduction: React.FC = () => {
 
   const bottomSources: Source[] = useMemo(() => {
     switch (type) {
+      case EventType.IMPRESSIVE_UNIVERSITY:
+        return [
+          require('../../../../assets/impressive_university_1.png'),
+          require('../../../../assets/impressive_university_2.jpg'),
+        ];
       case EventType.STUDY_MEETING:
         return [
           require('../../../../assets/study_meeting_1.jpg'),
@@ -51,6 +64,13 @@ const EventIntroduction: React.FC = () => {
           require('../../../../assets/club_4.jpg'),
           require('../../../../assets/club_6.jpg'),
           require('../../../../assets/club_2.jpg'),
+        ];
+      case EventType.BOLDAY:
+        return [
+          require('../../../../assets/bolday_1.jpg'),
+          require('../../../../assets/bolday_2.jpg'),
+          require('../../../../assets/bolday_4.jpg'),
+          require('../../../../assets/bolday_3.jpg'),
         ];
       default:
         return [];

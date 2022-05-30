@@ -118,6 +118,7 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
     handleSubmit: onFinish,
     setValues: setNewEvent,
     validateForm,
+    resetForm,
   } = useFormik<CreateEventRequest | Required<EventSchedule>>({
     initialValues: event ? event : initialEventValue,
     enableReinitialize: true,
@@ -134,6 +135,7 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
       uploadFiles([result], {
         onSuccess: (fileURLs) => {
           createEvent({ ...submittedValues, imageURL: fileURLs[0] });
+          resetForm();
         },
       });
     },
@@ -150,13 +152,27 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
         isClosable: true,
       });
     } else {
-      onFinish();
+      setWillSubmit(true);
     }
   };
 
   const [newYoutube, setNewYoutube] = useState('');
   const [tagModal, setTagModal] = useState(false);
   const [userModal, setUserModal] = useState(false);
+  const [willSubmit, setWillSubmit] = useState(false);
+
+  useEffect(() => {
+    if (enabled) {
+      setWillSubmit(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [enabled]);
+
+  useEffect(() => {
+    if (willSubmit) {
+      onFinish();
+    }
+  }, [willSubmit, onFinish]);
 
   const [
     {
@@ -253,10 +269,17 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
     }));
   };
 
+  const isCreatableImpressiveUniversity = isCreatableEvent(
+    EventType.IMPRESSIVE_UNIVERSITY,
+    user?.role,
+  );
+
   const isCreatableStudyMeeting = isCreatableEvent(
     EventType.STUDY_MEETING,
     user?.role,
   );
+
+  const isCreatableBolday = isCreatableEvent(EventType.BOLDAY, user?.role);
 
   const isCreatableCoach = isCreatableEvent(EventType.COACH, user?.role);
 
@@ -269,6 +292,12 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
 
   useEffect(() => {
     const getInitialEventType = () => {
+      if (isCreatableImpressiveUniversity) {
+        return EventType.IMPRESSIVE_UNIVERSITY;
+      }
+      if (isCreatableBolday) {
+        return EventType.BOLDAY;
+      }
       if (isCreatableStudyMeeting) {
         return EventType.STUDY_MEETING;
       }
@@ -292,8 +321,10 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
     }
   }, [
     event,
+    isCreatableBolday,
     isCreatableClub,
     isCreatableCoach,
+    isCreatableImpressiveUniversity,
     isCreatableStudyMeeting,
     isCreatableSubmissionEtc,
     setNewEvent,
@@ -577,8 +608,16 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
                   }));
                 }}
                 defaultValue={newEvent.type}>
+                {isCreatableImpressiveUniversity && (
+                  <option value={EventType.IMPRESSIVE_UNIVERSITY}>
+                    感動大学
+                  </option>
+                )}
                 {isCreatableStudyMeeting && (
                   <option value={EventType.STUDY_MEETING}>勉強会</option>
+                )}
+                {isCreatableBolday && (
+                  <option value={EventType.BOLDAY}>BOLDay</option>
                 )}
                 {isCreatableCoach && (
                   <option value={EventType.COACH}>コーチ制度</option>

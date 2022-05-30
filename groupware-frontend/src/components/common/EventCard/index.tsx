@@ -5,6 +5,7 @@ import { dateTimeFormatterFromJSDDate } from 'src/utils/dateTimeFormatter';
 import { Box, Button, Link, useMediaQuery, Text } from '@chakra-ui/react';
 import noImage from '@/public/no-image.jpg';
 import boldayImage1 from '@/public/bolday_1.jpg';
+import impressiveUnivertyImage from '@/public/impressive_university_1.png';
 import coachImage from '@/public/coach_1.jpeg';
 import studyMeeting1Image from '@/public/study_meeting_1.jpg';
 import Image from 'next/image';
@@ -32,6 +33,8 @@ const EventCard: React.FC<EventCardProps> = ({
     switch (eventSchedule.type) {
       case EventType.STUDY_MEETING:
         return <Image src={studyMeeting1Image} alt="イベント画像" />;
+      case EventType.BOLDAY:
+        return <Image src={boldayImage1} alt="イベント画像" />;
       case EventType.CLUB:
         return (
           <FcSportsMode
@@ -39,6 +42,8 @@ const EventCard: React.FC<EventCardProps> = ({
             className={clsx(portalLinkBoxStyles.club_icon)}
           />
         );
+      case EventType.IMPRESSIVE_UNIVERSITY:
+        return <Image src={impressiveUnivertyImage} alt="イベント画像" />;
       case EventType.COACH:
         return <Image src={coachImage} alt="イベント画像" />;
       case EventType.SUBMISSION_ETC:

@@ -133,7 +133,7 @@ android {
 
     compileSdkVersion rootProject.ext.compileSdkVersion
     // compileSdkVersion 27
-    //react-native-image-crop-picker
+    //react-native-image-crop-pickerr
     buildToolsVersion rootProject.ext.buildToolsVersion
 
     //mmkv
@@ -215,6 +215,7 @@ dependencies {
 
     compile project(':react-native-file-viewer')
 
+    compile project(':react-native-background-timer')
 
     implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.0.0"
 

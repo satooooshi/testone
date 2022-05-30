@@ -16,6 +16,7 @@ import {
   Select,
   useToast,
   Text,
+  RadioGroup,
   Radio,
   Stack,
 } from '@chakra-ui/react';
@@ -234,7 +235,7 @@ const Profile = () => {
         tabs,
       }}>
       <Head>
-        <title>sample | プロフィール編集</title>
+        <title>ボールド | プロフィール編集</title>
       </Head>
       {tags && (
         <TagModal

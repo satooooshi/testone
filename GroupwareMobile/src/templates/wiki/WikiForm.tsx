@@ -1,5 +1,5 @@
 import {useFormik} from 'formik';
-import React, {useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {useWindowDimensions} from 'react-native';
 import {
   Button,
@@ -47,6 +47,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
   onUploadImage,
 }) => {
   const scrollRef = useRef<KeyboardAwareScrollView | null>(null);
+  const [willSubmit, setWillSubmit] = useState(false);
   const initialValues: Partial<Wiki> = {
     title: '',
     body: '',
@@ -84,6 +85,17 @@ const WikiForm: React.FC<WikiFormProps> = ({
   const typeDropdownRef = useRef<any | null>(null);
 
   const {user} = useAuthenticate();
+
+  useEffect(() => {
+    const safetySubmit = async () => {
+      handleSubmit();
+      await new Promise(r => setTimeout(r, 1000));
+      setWillSubmit(false);
+    };
+    if (willSubmit) {
+      safetySubmit();
+    }
+  }, [willSubmit, handleSubmit]);
 
   //   Fixed the input format so that it cannot be selected at once.
 
@@ -317,6 +329,32 @@ const WikiForm: React.FC<WikiFormProps> = ({
             undefined,
             true,
             BoardCategory.NEWS,
+          )}
+        </Dropdown.Option>
+      ) : (
+        <></>
+      )}
+      {isCreatableWiki({
+        type: WikiType.BOARD,
+        boardCategory: BoardCategory.IMPRESSIVE_UNIVERSITY,
+        userRole: user?.role,
+      }) ? (
+        <Dropdown.Option
+          {...defaultDropdownOptionProps}
+          onPress={() =>
+            setNewWiki(w => ({
+              ...w,
+              type: WikiType.BOARD,
+              ruleCategory: RuleCategory.NON_RULE,
+              boardCategory: BoardCategory.IMPRESSIVE_UNIVERSITY,
+            }))
+          }
+          value={BoardCategory.IMPRESSIVE_UNIVERSITY}>
+          {wikiTypeNameFactory(
+            WikiType.BOARD,
+            undefined,
+            true,
+            BoardCategory.IMPRESSIVE_UNIVERSITY,
           )}
         </Dropdown.Option>
       ) : (
@@ -590,7 +628,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
             mb={16}
             bg="pink600"
             w={'100%'}
-            onPress={() => handleSubmit()}>
+            onPress={() => setWillSubmit(true)}>
             投稿
           </Button>
         </Div>

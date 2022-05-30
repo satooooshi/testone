@@ -28,12 +28,16 @@ export enum ChatMessageType {
   VIDEO = 'video',
   IMAGE = 'image',
   TEXT = 'text',
+  CALL = 'call',
+  STICKER = 'sticker',
   SYSTEM_TEXT = 'system_text',
   OTHER_FILE = 'other_file',
 }
 
 export enum EventType {
+  IMPRESSIVE_UNIVERSITY = 'impressive_university',
   STUDY_MEETING = 'study_meeting',
+  BOLDAY = 'bolday',
   COACH = 'coach',
   CLUB = 'club',
   SUBMISSION_ETC = 'submission_etc',
@@ -76,6 +80,8 @@ export enum BoardCategory {
   QA = 'question',
   //本社からのお知らせ
   NEWS = 'news',
+  //感動大学
+  IMPRESSIVE_UNIVERSITY = 'impressive_university',
   //部活動・サークル
   CLUB = 'club',
   //勉強会
@@ -136,6 +142,7 @@ export interface User {
   questionCount?: number;
   answerCount?: number;
   knowledgeCount?: number;
+  chatGroups?: ChatGroup[];
 }
 
 export interface Tag {
@@ -296,6 +303,7 @@ export interface ChatMessage {
   updatedAt: Date;
   isSender?: boolean;
   thumbnail?: string;
+  callTime?: string;
   replyParentMessage?: ChatMessage | null;
 }
 
@@ -313,10 +321,12 @@ export interface ChatGroup {
   pinnedUsers?: User[];
   isPinned?: boolean;
   chatNotes?: ChatNote[];
+  muteUsers?: User[];
   chatMessages?: ChatMessage[];
   members?: User[];
   lastReadChatTime?: LastReadChatTime[];
   hasBeenRead?: boolean;
+  unreadCount?: number;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -341,7 +351,7 @@ export interface ChatNote {
 
 export interface ChatNoteImage {
   id: number;
-  name: string;
+  fileName: string;
   imageURL: string;
   chatNote?: ChatNote;
   createdAt: Date;
@@ -366,7 +376,7 @@ export interface ChatAlbum {
 
 export interface ChatAlbumImage {
   id: number;
-  name: string;
+  fileName: string;
   imageURL: string;
   chatAlbum?: ChatAlbum;
   createdAt: Date;

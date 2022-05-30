@@ -11,6 +11,7 @@ type UserAvatarProps = {
   w: number | string;
   onPress?: () => void;
   onCloseModal?: () => void;
+  GoProfile?: boolean;
 };
 
 const UserAvatar: React.FC<UserAvatarProps> = ({
@@ -19,6 +20,7 @@ const UserAvatar: React.FC<UserAvatarProps> = ({
   w,
   onPress,
   onCloseModal,
+  GoProfile,
 }) => {
   const navigation = useNavigation<any>();
   const {user: mySelf} = useAuthenticate();
@@ -33,32 +35,36 @@ const UserAvatar: React.FC<UserAvatarProps> = ({
         if (onCloseModal) {
           onCloseModal();
         }
-        const routes = navigation.getState()?.routes;
-        if (user?.id === mySelf?.id) {
-          navigation.navigate('AccountStack', {
-            screen: 'MyProfile',
-            params: {
-              id: user?.id,
-              previousScreenName: routes[routes?.length - 1],
-            },
-            initial: false,
-          });
-        } else {
-          navigation.navigate('UsersStack', {
-            screen: 'AccountDetail',
-            params: {
-              id: user?.id,
-              previousScreenName: routes[routes?.length - 1],
-            },
-            initial: false,
-          });
+        if (GoProfile) {
+          const routes = navigation.getState()?.routes;
+          if (user?.id === mySelf?.id) {
+            navigation.navigate('AccountStack', {
+              screen: 'MyProfile',
+              params: {
+                id: user?.id,
+                previousScreenName: routes[routes?.length - 1],
+              },
+              initial: false,
+            });
+          } else {
+            navigation.navigate('UsersStack', {
+              screen: 'AccountDetail',
+              params: {
+                id: user?.id,
+                previousScreenName: routes[routes?.length - 1],
+              },
+              initial: false,
+            });
+          }
         }
       }}>
       <Image
         {...{h, w}}
         rounded="circle"
         source={
-          user?.existence && user?.avatarUrl
+          !user?.existence
+            ? require('../../../../assets/bold-mascot.png')
+            : user?.avatarUrl
             ? {uri: user.avatarUrl}
             : require('../../../../assets/no-image-avatar.png')
         }

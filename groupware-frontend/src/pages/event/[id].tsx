@@ -42,6 +42,7 @@ import { useAPIDonwloadSubmissionZip } from '@/hooks/api/event/useAPIDonwloadSub
 import { FcSportsMode } from 'react-icons/fc';
 import { MdAssignment } from 'react-icons/md';
 import boldayImage1 from '@/public/bolday_1.jpg';
+import impressiveUnivertyImage from '@/public/impressive_university_1.png';
 import studyMeeting1Image from '@/public/study_meeting_1.jpg';
 import portalLinkBoxStyles from '@/styles/components/PortalLinkBox.module.scss';
 import { useAPISaveUserJoiningEvent } from '@/hooks/api/event/useAPISaveUserJoiningEvent';
@@ -110,6 +111,8 @@ const EventDetail = () => {
     switch (data?.type) {
       case EventType.STUDY_MEETING:
         return <Image src={studyMeeting1Image} alt="イベント画像" />;
+      case EventType.BOLDAY:
+        return <Image src={boldayImage1} alt="イベント画像" />;
       case EventType.CLUB:
         return (
           <FcSportsMode
@@ -117,6 +120,8 @@ const EventDetail = () => {
             className={clsx(portalLinkBoxStyles.club_icon)}
           />
         );
+      case EventType.IMPRESSIVE_UNIVERSITY:
+        return <Image src={impressiveUnivertyImage} alt="イベント画像" />;
       case EventType.COACH:
         return <Image src={coachImage} alt="イベント画像" />;
       case EventType.SUBMISSION_ETC:
@@ -295,7 +300,7 @@ const EventDetail = () => {
       {data && data.id ? (
         <div className={eventDetailStyles.main}>
           <Head>
-            <title>sample | {data.title}</title>
+            <title>ボールド | {data.title}</title>
           </Head>
           <div className={eventDetailStyles.all_wrapper}>
             <div className={eventDetailStyles.event_info_wrapper}>

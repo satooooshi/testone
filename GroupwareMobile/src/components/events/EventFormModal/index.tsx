@@ -65,13 +65,21 @@ type DateTimeModalStateValue = {
 };
 
 const EventFormModal: React.FC<EventFormModalProps> = props => {
-  const {onCloseModal, event, onSubmit, type, isSuccess = false} = props;
+  const {
+    onCloseModal,
+    event,
+    onSubmit,
+    type,
+    isSuccess = false,
+    isVisible,
+  } = props;
   const {user} = useAuthenticate();
   const dropdownRef = useRef<any | null>(null);
   const {data: tags} = useAPIGetTag();
   const {data: users} = useAPIGetUsers('ALL');
   const [visibleTagModal, setVisibleTagModal] = useState(false);
   const [visibleUserModal, setVisibleUserModal] = useState(false);
+  const [willSubmit, setWillSubmit] = useState(false);
   const initialEventValue = {
     title: '',
     description: '',
@@ -104,8 +112,28 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
   });
 
   useEffect(() => {
-    isSuccess && resetForm();
+    if (isSuccess) {
+      resetForm();
+    }
   }, [isSuccess, resetForm]);
+
+  useEffect(() => {
+    if (isVisible) {
+      setWillSubmit(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isVisible]);
+
+  useEffect(() => {
+    const safetySubmit = async () => {
+      onComplete();
+      await new Promise(r => setTimeout(r, 1000));
+      setWillSubmit(false);
+    };
+    if (willSubmit) {
+      safetySubmit();
+    }
+  }, [willSubmit, onComplete]);
 
   const [dateTimeModal, setDateTimeModal] = useState<DateTimeModalStateValue>({
     visible: undefined,
@@ -133,7 +161,7 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
     if (messages) {
       Alert.alert(messages);
     } else {
-      onComplete();
+      setWillSubmit(true);
     }
   };
   const normalizeURL = (url: string) => {
@@ -474,6 +502,21 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
             />
           </Div>
           <Dropdown ref={dropdownRef} title="タイプの選択">
+            {isCreatableEvent(EventType.IMPRESSIVE_UNIVERSITY, user?.role) ? (
+              <Dropdown.Option
+                {...magnusDropdownOptions}
+                onPress={() =>
+                  setNewEvent(e => ({
+                    ...e,
+                    type: EventType.IMPRESSIVE_UNIVERSITY,
+                  }))
+                }
+                value={EventType.IMPRESSIVE_UNIVERSITY}>
+                {eventTypeNameFactory(EventType.IMPRESSIVE_UNIVERSITY)}
+              </Dropdown.Option>
+            ) : (
+              <></>
+            )}
             {isCreatableEvent(EventType.STUDY_MEETING, user?.role) ? (
               <Dropdown.Option
                 {...magnusDropdownOptions}
@@ -482,6 +525,18 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
                 }
                 value={EventType.STUDY_MEETING}>
                 {eventTypeNameFactory(EventType.STUDY_MEETING)}
+              </Dropdown.Option>
+            ) : (
+              <></>
+            )}
+            {isCreatableEvent(EventType.BOLDAY, user?.role) ? (
+              <Dropdown.Option
+                {...magnusDropdownOptions}
+                onPress={() =>
+                  setNewEvent(e => ({...e, type: EventType.BOLDAY}))
+                }
+                value={EventType.BOLDAY}>
+                {eventTypeNameFactory(EventType.BOLDAY)}
               </Dropdown.Option>
             ) : (
               <></>

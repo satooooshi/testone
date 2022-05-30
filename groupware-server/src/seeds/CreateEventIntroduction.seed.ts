@@ -18,6 +18,21 @@ export default class CreateEventIntroduction implements Seeder {
         .into(EventIntroduction)
         .values([
           {
+            type: EventType.IMPRESSIVE_UNIVERSITY,
+            title: '技術力と人間力を\n毎日プロから学ぶことが出来る研修制度',
+            description:
+              '外部講師を招へいし、社員向けに毎日研修を開講しております。技術力はもちろん、マネジメントやコミュニケーション等の人間力に関する研修もエンジニア向けの独自のカリキュラムを企画しております。社員の参加率は、常時75%となっており、多くの社員が自己研鑽の面で活用しています。講座数は、年間で200講座程となっており、お客様から頂く声を基にカリキュラムを作成しております。',
+            imageUrl:
+              'https://www.bold.ne.jp/assets/assets_recruit/images/enviroment/img_univ_main.png',
+            // imageUrlSub1:
+            //   'https://storage.googleapis.com/groupware-bucket-development/1637378765645/impressive_university_1.png',
+            // imageUrlSub2:
+            //   'https://storage.googleapis.com/groupware-bucket-development/1637378770502/impressive_university_2.png',
+            // imageUrlSub3: '',
+            // imageUrlSub4: '',
+            createdAt: new Date(),
+          },
+          {
             type: EventType.STUDY_MEETING,
             title: '社員同士が教え合いながら、\n知識を深めていく勉強会',
             description:
@@ -64,7 +79,7 @@ export default class CreateEventIntroduction implements Seeder {
             type: EventType.CLUB,
             title: '31の部活動、サークル',
             description:
-              'valleyinでは現在、ボルダリング、バスケ、バドミントンといった運動系の部活をはじめ、麻雀、アナログゲーム、写真といった文化系など、全部で17の部活と14のサークルがあり、月1程度で週末に集まって活動しています。（ちなみに時々新しいサークルが生まれ、だんだんと増え続けています。先日は囲碁・将棋サークルが発足しました）メンバーはもちろん、その部に所属していない人も自由に参加できるので、毎回違うメンバーで盛り上がっています！',
+              'ボールドでは現在、ボルダリング、バスケ、バドミントンといった運動系の部活をはじめ、麻雀、アナログゲーム、写真といった文化系など、全部で17の部活と14のサークルがあり、月1程度で週末に集まって活動しています。（ちなみに時々新しいサークルが生まれ、だんだんと増え続けています。先日は囲碁・将棋サークルが発足しました）メンバーはもちろん、その部に所属していない人も自由に参加できるので、毎回違うメンバーで盛り上がっています！',
             imageUrl:
               'https://storage.googleapis.com/groupware-bucket-development/1637377016631/club_5.jpg',
             // imageUrlSub1:

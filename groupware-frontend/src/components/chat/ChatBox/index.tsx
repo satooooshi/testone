@@ -4,17 +4,26 @@ import {
   useMediaQuery,
   Text,
   Link,
+  Image,
   Spinner,
   Input,
   InputGroup,
   InputRightElement,
+  Portal,
+  PopoverBody,
+  PopoverCloseButton,
+  PopoverContent,
+  PopoverHeader,
+  SimpleGrid,
+  Popover,
+  PopoverTrigger,
 } from '@chakra-ui/react';
 import { MentionData } from '@draft-js-plugins/mention';
 import { blueColor, darkFontColor } from 'src/utils/colors';
 import { Menu, MenuItem, MenuButton } from '@szhsin/react-menu';
 import { HiOutlineDotsCircleHorizontal } from 'react-icons/hi';
 import Editor from '@draft-js-plugins/editor';
-import { convertToRaw, EditorState } from 'draft-js';
+import { convertToRaw, EditorState, getDefaultKeyBinding } from 'draft-js';
 import {
   AiFillCloseCircle,
   AiOutlineDown,
@@ -23,9 +32,16 @@ import {
   AiOutlineSearch,
   AiOutlineUp,
 } from 'react-icons/ai';
-import { ChatGroup, ChatMessage, ChatMessageType, User } from 'src/types';
+import {
+  ChatGroup,
+  ChatMessage,
+  ChatMessageType,
+  RoomType,
+  User,
+} from 'src/types';
 import { MenuValue } from '@/hooks/chat/useModalReducer';
 import React, {
+  Fragment,
   useEffect,
   useMemo,
   useRef,
@@ -63,8 +79,11 @@ import { fileNameTransformer } from 'src/utils/factory/fileNameTransformer';
 import { saveAs } from 'file-saver';
 import { EntryComponentProps } from '@draft-js-plugins/mention/lib/MentionSuggestions/Entry/Entry';
 import suggestionStyles from '@/styles/components/Suggestion.module.scss';
+import { useHandleBadge } from 'src/contexts/badge/useHandleBadge';
 import { useAPISearchMessages } from '@/hooks/api/chat/useAPISearchMessages';
 import { removeHalfWidthSpace } from 'src/utils/replaceWidthSpace';
+import { reactionStickers } from 'src/utils/reactionStickers';
+import { BiSmile } from 'react-icons/bi';
 import { valueScaleCorrection } from 'framer-motion/types/render/dom/projection/scale-correction';
 
 export const Entry: React.FC<EntryComponentProps> = ({
@@ -124,7 +143,7 @@ type ChatBoxProps = {
 
 const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
   const { needRefetch } = useRoomRefetch();
-  const { user } = useAuthenticate();
+  const { user, setCurrentChatRoomId } = useAuthenticate();
   const [visibleAlbumModal, setVisibleAlbumModal] = useState(false);
   const [visibleNoteModal, setVisibleNoteModal] = useState(false);
   const [visibleSearchForm, setVisibleSearchForm] = useState(false);
@@ -132,7 +151,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
   const [confirmedSearchWord, setConfirmedSearchWord] = useState('');
   const [after, setAfter] = useState<number>();
   const [before, setBefore] = useState<number>();
-  const { user: myself } = useAuthenticate();
+  const [minBefore, setMinBefore] = useState<number>();
   const [focusedMessageID, setFocusedMessageID] = useState<number>();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [searchedResults, setSearchedResults] = useState<
@@ -163,11 +182,14 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
       .reverse();
   }, [messages]);
   const { mutate: saveLastReadChatTime } = useAPISaveLastReadChatTime();
-  const [selectedImage, setSelectedImage] =
-    useState<{ url: string; name: string }>();
-  const { data: lastReadChatTime } = useAPIGetLastReadChatTime(room.id, {
-    refetchInterval: 1000,
-  });
+  const [selectedImageURL, setSelectedImageURL] = useState<string>();
+  const { data: lastReadChatTime, refetch: refetchLastReadChatTime } =
+    useAPIGetLastReadChatTime(room.id, {
+      onSuccess: () => {
+        // refetchRoom();
+        needRefetch();
+      },
+    });
   const userDataForMention: MentionData[] = useMemo(() => {
     const users =
       room?.members
@@ -181,7 +203,6 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
     users.unshift(allTag);
     return users;
   }, [room?.members, user?.id]);
-
   const [suggestions, setSuggestions] =
     useState<MentionData[]>(userDataForMention);
   const [mentionOpened, setMentionOpened] = useState(false);
@@ -191,6 +212,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
     after,
     before,
     include,
+    limit: '20',
   });
 
   const { refetch: refetchLatest } = useAPIGetMessages(
@@ -246,6 +268,10 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
         setEditorState(EditorState.createEmpty());
         messageWrapperDivRef.current &&
           messageWrapperDivRef.current.scrollTo({ top: 0 });
+      },
+      onError: (err) => {
+        alert('メッセージを送信できませんでした。');
+        console.log('0000', err);
       },
     });
 
@@ -305,6 +331,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
   const [editorState, setEditorState] = useState(EditorState.createEmpty());
   const messageWrapperDivRef = useRef<HTMLDivElement | null>(null);
   const editorRef = useRef<Editor>(null);
+  const { handleEnterRoom } = useHandleBadge();
   const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
   const countOfSearchWord = useMemo(() => {
     if (searchedResults && focusedMessageID) {
@@ -334,9 +361,33 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
     setNewChatMessage((v) => ({ ...v, content: markdownString }));
   };
 
+  const handleStickerSelected = (sticker?: string) => {
+    sendChatMessage({
+      content: sticker,
+      chatGroup: newChatMessage.chatGroup,
+      type: ChatMessageType.STICKER,
+    });
+  };
+
+  const editorKeyBindingFn = (e: React.KeyboardEvent) => {
+    if (e.ctrlKey !== e.metaKey && e.key === 'Enter') {
+      onSend();
+      return null;
+    }
+    return getDefaultKeyBinding(e);
+  };
+
   const nameOfEmptyNameGroup = (members?: User[]): string => {
     if (!members?.length) {
       return 'メンバーがいません';
+    }
+
+    if (room.roomType === RoomType.PERSONAL) {
+      const chatPartner = members.filter((m) => m.id !== user?.id);
+      const partnerName = chatPartner
+        .map((p) => p.lastName + ' ' + p.firstName)
+        .join();
+      return partnerName;
     }
     const strMembers = members?.map((m) => m.lastName + m.firstName).join();
     return strMembers.toString();
@@ -353,7 +404,10 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
     const mentionPlugin = createMentionPlugin();
     const { MentionSuggestions } = mentionPlugin;
     const plugins = [mentionPlugin];
-    return { plugins, MentionSuggestions };
+    return {
+      MentionSuggestions,
+      plugins,
+    };
   }, []);
 
   const onScrollTopOnChat = (e: any) => {
@@ -362,7 +416,10 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
       (e.target.scrollHeight * 2) / 3
     ) {
       if (fetchedPastMessages?.length) {
-        setBefore(messages[messages.length - 1].id);
+        const target = messages[messages.length - 1].id;
+        if (minBefore && minBefore <= target) return;
+        setMinBefore(target);
+        setBefore(target);
       }
     }
   };
@@ -398,13 +455,30 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
   }, [focusedMessageID]);
 
   useEffect(() => {
+    socket.connect();
+    setCurrentChatRoomId(room.id);
     socket.emit('joinRoom', room.id.toString());
+    socket.on('readMessageClient', async (senderId: string) => {
+      if (user?.id && senderId && senderId != `${user?.id}`) {
+        refetchLastReadChatTime();
+      }
+    });
     socket.on('msgToClient', async (sentMsgByOtherUsers: ChatMessage) => {
-      // console.log('sent by other users', sentMsgByOtherUsers.content);
       if (sentMsgByOtherUsers.content) {
+        if (sentMsgByOtherUsers?.sender?.id !== user?.id) {
+          saveLastReadChatTime(room.id, {
+            onSuccess: () => {
+              socket.emit('readReport', {
+                room: room.id.toString(),
+                senderId: user?.id,
+              });
+            },
+          });
+          refetchLastReadChatTime();
+        }
         sentMsgByOtherUsers.createdAt = new Date(sentMsgByOtherUsers.createdAt);
         sentMsgByOtherUsers.updatedAt = new Date(sentMsgByOtherUsers.updatedAt);
-        if (sentMsgByOtherUsers.sender?.id === myself?.id) {
+        if (sentMsgByOtherUsers.sender?.id === user?.id) {
           sentMsgByOtherUsers.isSender = true;
         }
         setMessages((msgs) => {
@@ -419,49 +493,44 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
           }
           return msgs;
         });
-        needRefetch();
       }
     });
 
-    // socket.on('joinedRoom', (r: any) => {
-    //   console.log('joinedRoom', r);
-    // });
-    //
-    // socket.on('leftRoom', (r: any) => {
-    //   console.log('leftRoom', r);
-    // });
     return () => {
       socket.emit('leaveRoom', room.id);
+      socket.disconnect();
+      setCurrentChatRoomId(undefined);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [room.id]);
 
-  useEffect(() => {
-    messages[0]?.chatGroup?.id === room.id && saveLastReadChatTime(room.id);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [messages, room.id]);
+  // useEffect(() => {
+  //   messages[0]?.chatGroup?.id === room.id && saveLastReadChatTime(room.id);
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [messages, room.id]);
 
   useEffect(() => {
-    saveLastReadChatTime(room.id);
+    saveLastReadChatTime(room.id, {
+      onSuccess: () => {
+        socket.emit('readReport', {
+          room: room.id.toString(),
+          senderId: user?.id,
+        });
+        handleEnterRoom(room.id);
+      },
+    });
     return () => saveLastReadChatTime(room.id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [room.id, saveLastReadChatTime]);
-
-  const readUsers = (targetMsg: ChatMessage) => {
-    return lastReadChatTime
-      ? lastReadChatTime
-          .filter((t) => t.readTime >= targetMsg.createdAt)
-          .map((t) => t.user)
-      : [];
-  };
 
   const isLoading = loadingSend || loadingUplaod;
   const activeIndex = useMemo(() => {
-    if (selectedImage?.url) {
+    if (selectedImageURL) {
       const isNowUri = (element: ImageDecorator) =>
-        element.src === selectedImage.url;
+        element.src === selectedImageURL;
       return imagesForViewing.findIndex(isNowUri);
     }
-  }, [imagesForViewing, selectedImage?.url]);
+  }, [imagesForViewing, selectedImageURL]);
 
   const replyTargetContent = (replyTarget: ChatMessage) => {
     switch (replyTarget.type) {
@@ -471,6 +540,8 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
         return '写真';
       case ChatMessageType.VIDEO:
         return '動画';
+      case ChatMessageType.STICKER:
+        return 'スタンプ';
       case ChatMessageType.OTHER_FILE:
         return 'ファイル';
     }
@@ -529,6 +600,8 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
     });
   }, []);
 
+  const isPersonal = room.roomType === RoomType.PERSONAL;
+
   return (
     <Box
       {...noClickRootDropzone()}
@@ -543,7 +616,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
         isOpen={visibleAlbumModal}
         onClose={() => {
           setVisibleAlbumModal(false);
-          refetchLatest();
+          // refetchLatest();
         }}
       />
       <NoteModal
@@ -551,7 +624,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
         isOpen={visibleNoteModal}
         onClose={() => {
           setVisibleNoteModal(false);
-          refetchLatest();
+          // refetchLatest();
         }}
       />
       <input {...noClickInputDropzone()} />
@@ -565,14 +638,14 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
                   className={`react-viewer-icon react-viewer-icon-download`}></i>
               ),
               onClick: ({ src }) => {
-                if (selectedImage?.name) saveAs(src, selectedImage.name);
+                saveAs(src, fileNameTransformer(src));
               },
             },
           ]);
         }}
         images={imagesForViewing}
-        visible={!!selectedImage}
-        onClose={() => setSelectedImage(undefined)}
+        visible={!!selectedImageURL}
+        onClose={() => setSelectedImageURL(undefined)}
         activeIndex={activeIndex !== -1 ? activeIndex : 0}
       />
       {/*
@@ -620,19 +693,21 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
           <Link mr="4px" onClick={() => setVisibleAlbumModal(true)}>
             <AiOutlinePicture size={24} />
           </Link>
-          <Menu
-            direction="left"
-            onItemClick={(e) => onMenuClicked(e.value as MenuValue)}
-            menuButton={
-              <MenuButton>
-                <HiOutlineDotsCircleHorizontal size={24} />
-              </MenuButton>
-            }
-            transition>
-            <MenuItem value={'editGroup'}>ルームの情報を編集</MenuItem>
-            <MenuItem value={'editMembers'}>メンバーを編集</MenuItem>
-            <MenuItem value={'leaveRoom'}>ルームを退室</MenuItem>
-          </Menu>
+          {!isPersonal && (
+            <Menu
+              direction="left"
+              onItemClick={(e) => onMenuClicked(e.value as MenuValue)}
+              menuButton={
+                <MenuButton>
+                  <HiOutlineDotsCircleHorizontal size={24} />
+                </MenuButton>
+              }
+              transition>
+              <MenuItem value={'editGroup'}>ルームの情報を編集</MenuItem>
+              <MenuItem value={'editMembers'}>メンバーを編集</MenuItem>
+              <MenuItem value={'leaveRoom'}>ルームを退室</MenuItem>
+            </Menu>
+          )}
         </Box>
       </Box>
       {visibleSearchForm && (
@@ -699,11 +774,12 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
                 isScrollTarget={focusedMessageID === m.id}
                 scrollToTarget={scrollToTarget}
                 usersInRoom={room.members || []}
-                key={m.id + m.content}
+                key={m.id}
                 message={m}
                 confirmedSearchWord={confirmedSearchWord}
                 searchedResultIds={searchedResults?.map((s) => s.id)}
-                readUsers={readUsers(m)}
+                lastReadChatTime={lastReadChatTime}
+                // readUsers={readUsers[i] ? readUsers[i] : []}
                 onClickReply={() =>
                   setNewChatMessage((pre) => ({
                     ...pre,
@@ -712,7 +788,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
                 }
                 onClickImage={() => {
                   if (m.type === ChatMessageType.IMAGE) {
-                    setSelectedImage({ url: m.content, name: m.fileName });
+                    setSelectedImageURL(m.content);
                   }
                 }}
               />
@@ -789,6 +865,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
           placeholder="メッセージを入力"
           editorState={editorState}
           onChange={onEditorChange}
+          keyBindingFn={editorKeyBindingFn}
           plugins={plugins}
           ref={editorRef}
         />
@@ -803,6 +880,54 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
           />
         </div>
       </Box>
+      <Popover closeOnBlur={false} placement="top-start">
+        {({ onClose }) => (
+          <>
+            <PopoverTrigger>
+              <Link
+                color={darkFontColor}
+                position="absolute"
+                zIndex={1}
+                bottom={'8px'}
+                cursor="pointer"
+                right="90px">
+                <BiSmile size={20} color={darkFontColor} />
+              </Link>
+            </PopoverTrigger>
+            <Portal>
+              <PopoverContent>
+                <PopoverHeader border="0">
+                  <PopoverCloseButton />
+                </PopoverHeader>
+
+                <PopoverBody>
+                  <SimpleGrid columns={3}>
+                    {reactionStickers.map((e) => (
+                      <Fragment key={e.name}>
+                        <a
+                          onClick={() => {
+                            handleStickerSelected(e.name);
+                            onClose();
+                          }}>
+                          <Box display="flex" maxW="300px" maxH={'300px'}>
+                            <Image
+                              src={e.src}
+                              w={100}
+                              h={100}
+                              padding={2}
+                              alt="送信された画像"
+                            />
+                          </Box>
+                        </a>
+                      </Fragment>
+                    ))}
+                  </SimpleGrid>
+                </PopoverBody>
+              </PopoverContent>
+            </Portal>
+          </>
+        )}
+      </Popover>
       <Link
         {...getRootProps()}
         color={darkFontColor}

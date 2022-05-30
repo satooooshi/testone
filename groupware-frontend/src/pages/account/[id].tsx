@@ -26,7 +26,14 @@ import {
   useMediaQuery,
   SimpleGrid,
 } from '@chakra-ui/react';
-import { BoardCategory, TagType, UserTag, WikiType } from 'src/types';
+import {
+  BoardCategory,
+  RoomType,
+  TagType,
+  UserRole,
+  UserTag,
+  WikiType,
+} from 'src/types';
 import { userRoleNameFactory } from 'src/utils/factory/userRoleNameFactory';
 import { branchTypeNameFactory } from 'src/utils/factory/branchTypeNameFactory';
 import { blueColor, darkFontColor } from 'src/utils/colors';
@@ -199,7 +206,7 @@ const MyAccountInfo = () => {
       }}>
       <Head>
         <title>
-          {profile ? `${profile.lastName} ${profile.firstName}` : ''}
+          ボールド | {profile ? `${profile.lastName} ${profile.firstName}` : ''}
         </title>
       </Head>
       <div className={accountInfoStyles.main}>
@@ -386,28 +393,33 @@ const MyAccountInfo = () => {
                       />
                     </Box>
                   </Box>
-                  {profile?.id !== user?.id && (
-                    <Button
-                      h={'64px'}
-                      w={'64px'}
-                      bg={blueColor}
-                      position={'fixed'}
-                      top={'auto'}
-                      bottom={'24px'}
-                      right={'24px'}
-                      rounded={'full'}
-                      zIndex={1}
-                      px={0}
-                      _hover={{ textDecoration: 'none' }}>
-                      <HiOutlineChat
-                        style={{ width: 40, height: 40 }}
-                        onClick={() =>
-                          createGroup({ name: '', members: [profile] })
-                        }
-                        color="white"
-                      />
-                    </Button>
-                  )}
+                  {profile?.id !== user?.id &&
+                    profile.role !== UserRole.EXTERNAL_INSTRUCTOR && (
+                      <Button
+                        h={'64px'}
+                        w={'64px'}
+                        bg={blueColor}
+                        position={'fixed'}
+                        top={'auto'}
+                        bottom={'24px'}
+                        right={'24px'}
+                        rounded={'full'}
+                        zIndex={1}
+                        px={0}
+                        _hover={{ textDecoration: 'none' }}>
+                        <HiOutlineChat
+                          style={{ width: 40, height: 40 }}
+                          onClick={() =>
+                            createGroup({
+                              name: '',
+                              members: [profile],
+                              roomType: RoomType.PERSONAL,
+                            })
+                          }
+                          color="white"
+                        />
+                      </Button>
+                    )}
                 </Box>
               </>
             )}

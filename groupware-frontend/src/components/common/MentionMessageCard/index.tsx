@@ -35,6 +35,8 @@ const MentionMessageCard: React.FC<MentionMessageCardProps> = ({ message }) => {
         </p>
       ) : message.type === ChatMessageType.IMAGE ? (
         <p className={mentionMessageCardStyles.content}>画像</p>
+      ) : message.type === ChatMessageType.STICKER ? (
+        <p className={mentionMessageCardStyles.content}>スタンプ</p>
       ) : (
         <p className={mentionMessageCardStyles.content}>動画</p>
       )}

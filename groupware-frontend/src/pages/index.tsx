@@ -35,11 +35,17 @@ export default function Home() {
         onClickRightButton: () => logout(),
       }}>
       <Head>
-        <title>sample | Home</title>
+        <title>ボールド | Home</title>
       </Head>
       <div className={homeStyles.box_row_wrapper}>
         <div className={homeStyles.box_wrapper}>
+          <PortalLinkBox href={PortalLinkType.IMPRESSIVE_UNIVERSITY} />
+        </div>
+        <div className={homeStyles.box_wrapper}>
           <PortalLinkBox href={PortalLinkType.STUDY_MEETING} />
+        </div>
+        <div className={homeStyles.box_wrapper}>
+          <PortalLinkBox href={PortalLinkType.BOLDAY} />
         </div>
         <div className={homeStyles.box_wrapper}>
           <PortalLinkBox href={PortalLinkType.COACH} />

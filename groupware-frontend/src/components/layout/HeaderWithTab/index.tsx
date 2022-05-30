@@ -9,7 +9,7 @@ import {
   MenuList,
   Text,
 } from '@chakra-ui/react';
-import valleyinLogo from '@/public/valleyin-logo.png';
+import boldLogo from '@/public/bold-logo.png';
 import Image from 'next/image';
 import { GiHamburgerMenu } from 'react-icons/gi';
 import Link from 'next/link';
@@ -33,8 +33,12 @@ export type HeaderProps = {
 const tabClassNameGetter = (tab: Tab): string => {
   const name = tab.name;
   switch (name) {
+    case EventTab.IMPRESSIVE_UNIVERSITY:
+      return headerStyles.impressive_university_tab;
     case EventTab.STUDY_MEETING:
       return headerStyles.study_meeting_tab;
+    case EventTab.BOLDAY:
+      return headerStyles.bolday_tab;
     case EventTab.COACH:
       return headerStyles.coach_tab;
     case EventTab.CLUB:
@@ -65,7 +69,7 @@ const HeaderWithTab: React.FC<HeaderProps> = ({
           <div className={headerStyles.header_left}>
             <Link href="/">
               <a className={headerStyles.logo_image}>
-                <Image src={valleyinLogo} alt="bold logo" />
+                <Image src={boldLogo} alt="bold logo" />
               </a>
             </Link>
             <h1 className={headerStyles.header_title}>{title}</h1>

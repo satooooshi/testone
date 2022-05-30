@@ -97,6 +97,7 @@ const CreateNewUser = () => {
   const {
     handleSubmit: onFinish,
     handleChange,
+    handleBlur,
     validateForm,
     setValues: setUserInfo,
     values,
@@ -256,7 +257,7 @@ const CreateNewUser = () => {
         activeTabName: 'ユーザー作成',
       }}>
       <Head>
-        <title>sample | ユーザー作成</title>
+        <title>ボールド | ユーザー作成</title>
       </Head>
       {tags && (
         <TagModal
@@ -444,7 +445,6 @@ const CreateNewUser = () => {
               <p>パスワード</p>
             </FormLabel>
             <Input
-              type="password"
               placeholder="password"
               value={values.password}
               background="white"
