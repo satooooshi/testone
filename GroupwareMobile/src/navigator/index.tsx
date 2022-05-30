@@ -296,7 +296,7 @@ const Navigator = () => {
       ios: {
         appName: 'Eface',
         supportsVideo: false,
-        imageName: 'bold-logo.png',
+        imageName: 'valleyin-logo.png',
         maximumCallGroups: '1',
         maximumCallsPerCallGroup: '2',
       },

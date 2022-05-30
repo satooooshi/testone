@@ -1,6 +1,6 @@
 import React from 'react';
 import Image from 'next/image';
-import boldLogo from '@/public/bold-logo.png';
+import boldLogo from '@/public/valleyin-logo.png';
 import loginLayoutStyles from '@/styles/layouts/Login.module.scss';
 import { useFormik } from 'formik';
 import { useAPILogin } from '@/hooks/api/auth/useAPILogin';

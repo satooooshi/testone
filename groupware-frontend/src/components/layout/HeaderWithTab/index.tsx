@@ -9,7 +9,7 @@ import {
   MenuList,
   Text,
 } from '@chakra-ui/react';
-import boldLogo from '@/public/bold-logo.png';
+import boldLogo from '@/public/valleyin-logo.png';
 import Image from 'next/image';
 import { GiHamburgerMenu } from 'react-icons/gi';
 import Link from 'next/link';

@@ -69,7 +69,7 @@ const Login: React.FC<LoginProps> = ({navigation}) => {
               minHeight: windowWidth * 0.6,
             }}
             resizeMode="contain"
-            source={require('../../../../assets/bold-logo.png')}
+            source={require('../../../../assets/valleyin-logo.png')}
           />
           <>
             <Text

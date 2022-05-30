@@ -71,7 +71,7 @@ const HeaderTemplate: React.FC<HeaderTemplateProps> = ({
             <FastImage
               style={headerStyles.logoImage}
               resizeMode="contain"
-              source={require('../../../assets/bold-logo.png')}
+              source={require('../../../assets/valleyin-logo.png')}
             />
           </TouchableHighlight>
           <Text
