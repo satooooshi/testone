@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 // import {createMaterialBottomTabNavigator} from '@react-navigation/material-bottom-tabs';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 
@@ -13,7 +13,7 @@ import WikiDetail from '../../screens/wiki/WikiDetail';
 import WikiList from '../../screens/wiki/WikiList';
 import {createStackNavigator} from '@react-navigation/stack';
 import PostWiki from '../../screens/wiki/PostWiki';
-import {Icon} from 'react-native-magnus';
+import {Badge, Icon, Text} from 'react-native-magnus';
 import AccountDetail from '../../screens/account/AccountDetail';
 import Profile from '../../screens/account/Profile';
 import UpdatePassword from '../../screens/account/UpdatePassword';
@@ -42,6 +42,7 @@ import EventIntroduction from '../../screens/event/EventIntroduction';
 import {useAuthenticate} from '../../contexts/useAuthenticate';
 import {UserRole} from '../../types';
 import WikiLinks from '../../screens/wiki/WikiLinks';
+import {useHandleBadge} from '../../contexts/badge/useHandleBadge';
 import {useIsTabBarVisible} from '../../contexts/bottomTab/useIsTabBarVisible';
 import EditedProfile from '../../screens/admin/EditedProfile';
 import AttendanceHome from '../../screens/attendance/AttendanceHome';
@@ -51,6 +52,7 @@ import DefaultAttendanceForm from '../../screens/attendance/DefaultAttendance';
 import AttendanceReport from '../../screens/attendance/AttendanceReport';
 import AttendanceReportDetail from '../../screens/attendance/AttendanceReportDetail';
 import AttendanceReportAdmin from '../../screens/admin/AttendanceReportAdmin';
+import IconBadge from 'react-native-icon-badge';
 
 const Tab = createBottomTabNavigator();
 // const Tab = createMaterialBottomTabNavigator();
@@ -312,6 +314,7 @@ const AttendanceStack = () => {
 };
 const BottomTab = () => {
   const {user} = useAuthenticate();
+  const {unreadChatCount} = useHandleBadge();
   const isAdmin = user?.role === UserRole.ADMIN;
   const {isTabBarVisible} = useIsTabBarVisible();
 
@@ -393,12 +396,40 @@ const BottomTab = () => {
         options={{
           tabBarLabel: 'チャット',
           tabBarIcon: ({color}) => (
-            <Icon
-              name="ios-chatbubble-ellipses"
-              fontFamily="Ionicons"
-              color={color}
-              fontSize={23}
-            />
+            <>
+              {unreadChatCount > 0 ? (
+                <IconBadge
+                  MainElement={
+                    <Icon
+                      name="ios-chatbubble-ellipses"
+                      fontFamily="Ionicons"
+                      color={color}
+                      fontSize={23}
+                    />
+                  }
+                  BadgeElement={
+                    <Text color="white" fontSize={10}>
+                      {unreadChatCount}
+                    </Text>
+                  }
+                  IconBadgeStyle={{
+                    marginTop: -10,
+                    marginRight: -10,
+                    minWidth: 18,
+                    width: 18,
+                    height: 18,
+                    backgroundColor: 'red',
+                  }}
+                />
+              ) : (
+                <Icon
+                  name="ios-chatbubble-ellipses"
+                  fontFamily="Ionicons"
+                  color={color}
+                  fontSize={23}
+                />
+              )}
+            </>
           ),
         }}
       />
@@ -408,12 +439,14 @@ const BottomTab = () => {
         options={{
           tabBarLabel: 'アカウント',
           tabBarIcon: ({color}) => (
-            <Icon
-              name="user-alt"
-              fontFamily="FontAwesome5"
-              color={color}
-              fontSize={23}
-            />
+            <>
+              <Icon
+                name="user-alt"
+                fontFamily="FontAwesome5"
+                color={color}
+                fontSize={23}
+              />
+            </>
           ),
         }}
       />

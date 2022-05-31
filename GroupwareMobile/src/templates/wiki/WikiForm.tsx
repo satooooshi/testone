@@ -1,5 +1,5 @@
 import {useFormik} from 'formik';
-import React, {useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {useWindowDimensions} from 'react-native';
 import {
   Button,
@@ -47,6 +47,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
   onUploadImage,
 }) => {
   const scrollRef = useRef<KeyboardAwareScrollView | null>(null);
+  const [willSubmit, setWillSubmit] = useState(false);
   const initialValues: Partial<Wiki> = {
     title: '',
     body: '',
@@ -84,6 +85,17 @@ const WikiForm: React.FC<WikiFormProps> = ({
   const typeDropdownRef = useRef<any | null>(null);
 
   const {user} = useAuthenticate();
+
+  useEffect(() => {
+    const safetySubmit = async () => {
+      handleSubmit();
+      await new Promise(r => setTimeout(r, 1000));
+      setWillSubmit(false);
+    };
+    if (willSubmit) {
+      safetySubmit();
+    }
+  }, [willSubmit, handleSubmit]);
 
   //   Fixed the input format so that it cannot be selected at once.
 
@@ -402,6 +414,58 @@ const WikiForm: React.FC<WikiFormProps> = ({
       )}
       {isCreatableWiki({
         type: WikiType.BOARD,
+        boardCategory: BoardCategory.SELF_IMPROVEMENT,
+        userRole: user?.role,
+      }) ? (
+        <Dropdown.Option
+          {...defaultDropdownOptionProps}
+          onPress={() =>
+            setNewWiki(w => ({
+              ...w,
+              type: WikiType.BOARD,
+              ruleCategory: RuleCategory.NON_RULE,
+              boardCategory: BoardCategory.SELF_IMPROVEMENT,
+            }))
+          }
+          value={BoardCategory.SELF_IMPROVEMENT}>
+          {wikiTypeNameFactory(
+            WikiType.BOARD,
+            undefined,
+            true,
+            BoardCategory.SELF_IMPROVEMENT,
+          )}
+        </Dropdown.Option>
+      ) : (
+        <></>
+      )}
+      {isCreatableWiki({
+        type: WikiType.BOARD,
+        boardCategory: BoardCategory.PERSONAL_ANNOUNCEMENT,
+        userRole: user?.role,
+      }) ? (
+        <Dropdown.Option
+          {...defaultDropdownOptionProps}
+          onPress={() =>
+            setNewWiki(w => ({
+              ...w,
+              type: WikiType.BOARD,
+              ruleCategory: RuleCategory.NON_RULE,
+              boardCategory: BoardCategory.PERSONAL_ANNOUNCEMENT,
+            }))
+          }
+          value={BoardCategory.PERSONAL_ANNOUNCEMENT}>
+          {wikiTypeNameFactory(
+            WikiType.BOARD,
+            undefined,
+            true,
+            BoardCategory.PERSONAL_ANNOUNCEMENT,
+          )}
+        </Dropdown.Option>
+      ) : (
+        <></>
+      )}
+      {isCreatableWiki({
+        type: WikiType.BOARD,
         boardCategory: BoardCategory.CELEBRATION,
         userRole: user?.role,
       }) ? (
@@ -564,7 +628,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
             mb={16}
             bg="pink600"
             w={'100%'}
-            onPress={() => handleSubmit()}>
+            onPress={() => setWillSubmit(true)}>
             投稿
           </Button>
         </Div>

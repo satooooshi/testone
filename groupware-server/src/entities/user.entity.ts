@@ -45,6 +45,12 @@ export enum UserRole {
   COMMON = 'common',
 }
 
+export enum BranchType {
+  TOKYO = 'tokyo',
+  OSAKA = 'osaka',
+  NON_SET = 'non_set',
+}
+
 @Entity({ name: 'users' })
 @Index(['lastName', 'firstName'], { fulltext: true })
 @Unique(['email', 'existence'])
@@ -121,6 +127,13 @@ export class User {
     default: '',
   })
   firstNameKana: string;
+
+  @Column({
+    type: 'enum',
+    enum: BranchType,
+    default: BranchType.NON_SET,
+  })
+  branch: BranchType;
 
   @Column({
     type: 'varchar',
@@ -302,6 +315,12 @@ export class User {
     onDelete: 'CASCADE',
   })
   chatGroups?: ChatGroup[];
+
+  @ManyToMany(() => ChatGroup, (chatGroup) => chatGroup.muteUsers, {
+    onUpdate: 'CASCADE',
+    onDelete: 'CASCADE',
+  })
+  muteChatGroups?: ChatGroup[];
 
   @ManyToMany(() => Wiki, (wiki) => wiki.userGoodForBoard, {
     onUpdate: 'CASCADE',

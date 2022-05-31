@@ -16,6 +16,7 @@ import 'draft-js/dist/Draft.css';
 // import '@uiw/react-markdown-preview/dist/markdown.css';
 import '@szhsin/react-menu/dist/index.css';
 import '@szhsin/react-menu/dist/transitions/slide.css';
+import { BadgeProvider } from 'src/contexts/badge/useHandleBadge';
 
 const AuthProvder: React.FC = ({ children }) => {
   const router = useRouter();
@@ -80,7 +81,9 @@ function MyApp({ Component, pageProps }: AppProps) {
       <AuthenticateProvider>
         <QueryClientProvider client={queryClient}>
           <AuthProvder>
-            <Component {...pageProps} />{' '}
+            <BadgeProvider>
+              <Component {...pageProps} />
+            </BadgeProvider>
           </AuthProvder>
         </QueryClientProvider>
       </AuthenticateProvider>

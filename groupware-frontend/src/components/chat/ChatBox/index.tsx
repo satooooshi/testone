@@ -4,18 +4,50 @@ import {
   useMediaQuery,
   Text,
   Link,
+  Image,
   Spinner,
+  Input,
+  InputGroup,
+  InputRightElement,
+  Portal,
+  PopoverBody,
+  PopoverCloseButton,
+  PopoverContent,
+  PopoverHeader,
+  SimpleGrid,
+  Popover,
+  PopoverTrigger,
 } from '@chakra-ui/react';
 import { MentionData } from '@draft-js-plugins/mention';
-import { darkFontColor } from 'src/utils/colors';
+import { blueColor, darkFontColor } from 'src/utils/colors';
 import { Menu, MenuItem, MenuButton } from '@szhsin/react-menu';
 import { HiOutlineDotsCircleHorizontal } from 'react-icons/hi';
 import Editor from '@draft-js-plugins/editor';
-import { convertToRaw, EditorState } from 'draft-js';
-import { AiOutlinePaperClip, AiOutlinePicture } from 'react-icons/ai';
-import { ChatGroup, ChatMessage, ChatMessageType, User } from 'src/types';
+import { convertToRaw, EditorState, getDefaultKeyBinding } from 'draft-js';
+import {
+  AiFillCloseCircle,
+  AiOutlineDown,
+  AiOutlinePaperClip,
+  AiOutlinePicture,
+  AiOutlineSearch,
+  AiOutlineUp,
+} from 'react-icons/ai';
+import {
+  ChatGroup,
+  ChatMessage,
+  ChatMessageType,
+  RoomType,
+  User,
+} from 'src/types';
 import { MenuValue } from '@/hooks/chat/useModalReducer';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, {
+  Fragment,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  useCallback,
+} from 'react';
 import ChatMessageItem from '../ChatMessageItem';
 import { IoCloseSharp, IoSend } from 'react-icons/io5';
 import { FiFileText } from 'react-icons/fi';
@@ -47,6 +79,12 @@ import { fileNameTransformer } from 'src/utils/factory/fileNameTransformer';
 import { saveAs } from 'file-saver';
 import { EntryComponentProps } from '@draft-js-plugins/mention/lib/MentionSuggestions/Entry/Entry';
 import suggestionStyles from '@/styles/components/Suggestion.module.scss';
+import { useHandleBadge } from 'src/contexts/badge/useHandleBadge';
+import { useAPISearchMessages } from '@/hooks/api/chat/useAPISearchMessages';
+import { removeHalfWidthSpace } from 'src/utils/replaceWidthSpace';
+import { reactionStickers } from 'src/utils/reactionStickers';
+import { BiSmile } from 'react-icons/bi';
+import { valueScaleCorrection } from 'framer-motion/types/render/dom/projection/scale-correction';
 
 export const Entry: React.FC<EntryComponentProps> = ({
   mention,
@@ -105,12 +143,22 @@ type ChatBoxProps = {
 
 const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
   const { needRefetch } = useRoomRefetch();
-  const { user } = useAuthenticate();
+  const { user, setCurrentChatRoomId } = useAuthenticate();
   const [visibleAlbumModal, setVisibleAlbumModal] = useState(false);
   const [visibleNoteModal, setVisibleNoteModal] = useState(false);
-  const { user: myself } = useAuthenticate();
-  const [page, setPage] = useState(1);
+  const [visibleSearchForm, setVisibleSearchForm] = useState(false);
+  const [inputtedSearchWord, setInputtedSearchWord] = useState('');
+  const [confirmedSearchWord, setConfirmedSearchWord] = useState('');
+  const [after, setAfter] = useState<number>();
+  const [before, setBefore] = useState<number>();
+  const [minBefore, setMinBefore] = useState<number>();
+  const [focusedMessageID, setFocusedMessageID] = useState<number>();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [searchedResults, setSearchedResults] = useState<
+    Partial<ChatMessage>[]
+  >([]);
+  const [include, setInclude] = useState(false);
+
   const {
     values: newChatMessage,
     setValues: setNewChatMessage,
@@ -135,33 +183,41 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
   }, [messages]);
   const { mutate: saveLastReadChatTime } = useAPISaveLastReadChatTime();
   const [selectedImageURL, setSelectedImageURL] = useState<string>();
-  const { data: lastReadChatTime } = useAPIGetLastReadChatTime(room.id, {
-    refetchInterval: 1000,
-  });
+  const { data: lastReadChatTime, refetch: refetchLastReadChatTime } =
+    useAPIGetLastReadChatTime(room.id, {
+      onSuccess: () => {
+        // refetchRoom();
+        needRefetch();
+      },
+    });
   const userDataForMention: MentionData[] = useMemo(() => {
-    return (
+    const users =
       room?.members
         ?.filter((u) => u.id !== user?.id)
         .map((u) => ({
           id: u.id,
           name: userNameFactory(u) + 'さん',
           avatar: u.avatarUrl,
-        })) || []
-    );
+        })) || [];
+    const allTag = { id: 0, name: 'all', avatar: '' };
+    users.unshift(allTag);
+    return users;
   }, [room?.members, user?.id]);
-
   const [suggestions, setSuggestions] =
     useState<MentionData[]>(userDataForMention);
   const [mentionOpened, setMentionOpened] = useState(false);
   const [mentionedUserData, setMentionedUserData] = useState<MentionData[]>([]);
   const { data: fetchedPastMessages } = useAPIGetMessages({
     group: room.id,
-    page: page.toString(),
+    after,
+    before,
+    include,
+    limit: '20',
   });
+
   const { refetch: refetchLatest } = useAPIGetMessages(
     {
       group: room.id,
-      page: '1',
     },
     {
       enabled: false,
@@ -182,6 +238,23 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
     },
   );
 
+  const { refetch: searchMessages } = useAPISearchMessages(
+    {
+      group: room.id,
+      word: inputtedSearchWord,
+    },
+    {
+      enabled: false,
+      onSuccess: (result) => {
+        setSearchedResults(result);
+        if (result.length && result[0].id) {
+          setFocusedMessageID(result[0].id);
+          refetchDoesntExistMessages(result[0].id);
+        }
+      },
+    },
+  );
+
   const { mutate: sendChatMessage, isLoading: loadingSend } =
     useAPISendChatMessage({
       onSuccess: (data) => {
@@ -196,18 +269,23 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
         messageWrapperDivRef.current &&
           messageWrapperDivRef.current.scrollTo({ top: 0 });
       },
+      onError: (err) => {
+        alert('メッセージを送信できませんでした。');
+        console.log('0000', err);
+      },
     });
 
   const { mutate: uploadFiles, isLoading: loadingUplaod } = useAPIUploadStorage(
     {
-      onSuccess: (fileURLs) => {
-        const type = isImage(fileURLs[0])
+      onSuccess: (fileURLs, requestFileURLs) => {
+        const type = isImage(requestFileURLs[0].name)
           ? ChatMessageType.IMAGE
-          : isVideo(fileURLs[0])
+          : isVideo(requestFileURLs[0].name)
           ? ChatMessageType.VIDEO
           : ChatMessageType.OTHER_FILE;
         sendChatMessage({
           content: fileURLs[0],
+          fileName: requestFileURLs[0].name,
           chatGroup: newChatMessage.chatGroup,
           type,
         });
@@ -222,7 +300,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
       let parsedMessage = newChatMessage.content;
       for (const m of mentionedUserData) {
         const regexp = new RegExp(`\\s${m.name}|^${m.name}`, 'g');
-        parsedMessage = parsedMessage.replace(regexp, `@[${m.name}](${m.id})`);
+        parsedMessage = parsedMessage.replace(regexp, `@${m.name}`);
       }
       sendChatMessage({
         ...newChatMessage,
@@ -253,7 +331,17 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
   const [editorState, setEditorState] = useState(EditorState.createEmpty());
   const messageWrapperDivRef = useRef<HTMLDivElement | null>(null);
   const editorRef = useRef<Editor>(null);
+  const { handleEnterRoom } = useHandleBadge();
   const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
+  const countOfSearchWord = useMemo(() => {
+    if (searchedResults && focusedMessageID) {
+      const index = searchedResults?.findIndex((result) => {
+        return result?.id === focusedMessageID;
+      });
+      return Math.abs(searchedResults.length - index);
+    }
+    return 0;
+  }, [focusedMessageID, searchedResults]);
   const {
     getRootProps: noClickRootDropzone,
     getInputProps: noClickInputDropzone,
@@ -273,9 +361,33 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
     setNewChatMessage((v) => ({ ...v, content: markdownString }));
   };
 
+  const handleStickerSelected = (sticker?: string) => {
+    sendChatMessage({
+      content: sticker,
+      chatGroup: newChatMessage.chatGroup,
+      type: ChatMessageType.STICKER,
+    });
+  };
+
+  const editorKeyBindingFn = (e: React.KeyboardEvent) => {
+    if (e.ctrlKey !== e.metaKey && e.key === 'Enter') {
+      onSend();
+      return null;
+    }
+    return getDefaultKeyBinding(e);
+  };
+
   const nameOfEmptyNameGroup = (members?: User[]): string => {
     if (!members?.length) {
       return 'メンバーがいません';
+    }
+
+    if (room.roomType === RoomType.PERSONAL) {
+      const chatPartner = members.filter((m) => m.id !== user?.id);
+      const partnerName = chatPartner
+        .map((p) => p.lastName + ' ' + p.firstName)
+        .join();
+      return partnerName;
     }
     const strMembers = members?.map((m) => m.lastName + m.firstName).join();
     return strMembers.toString();
@@ -292,7 +404,10 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
     const mentionPlugin = createMentionPlugin();
     const { MentionSuggestions } = mentionPlugin;
     const plugins = [mentionPlugin];
-    return { plugins, MentionSuggestions };
+    return {
+      MentionSuggestions,
+      plugins,
+    };
   }, []);
 
   const onScrollTopOnChat = (e: any) => {
@@ -301,50 +416,69 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
       (e.target.scrollHeight * 2) / 3
     ) {
       if (fetchedPastMessages?.length) {
-        setPage((p) => p + 1);
+        const target = messages[messages.length - 1].id;
+        if (minBefore && minBefore <= target) return;
+        setMinBefore(target);
+        setBefore(target);
       }
     }
   };
 
   useEffect(() => {
     setMessages([]);
-    setPage(1);
+    setBefore(undefined);
+    setAfter(undefined);
     refetchLatest();
   }, [refetchLatest, room]);
 
   useEffect(() => {
     if (fetchedPastMessages?.length) {
-      if (
-        messages?.length &&
-        isRecent(
-          messages[messages.length - 1],
-          fetchedPastMessages[fetchedPastMessages.length - 1],
-        )
-      ) {
-        const msgToAppend: ChatMessage[] = [];
-        for (const sentMsg of fetchedPastMessages) {
-          if (isRecent(messages[messages.length - 1], sentMsg)) {
-            msgToAppend.push(sentMsg);
-          }
-        }
-        setMessages((m) => {
-          return [...m, ...msgToAppend];
-        });
-      } else if (!messages?.length) {
-        setMessages(fetchedPastMessages);
+      const refreshedMessage = refreshMessage(fetchedPastMessages);
+      setMessages(refreshedMessage);
+
+      if (after && refetchDoesntExistMessages(fetchedPastMessages[0].id)) {
+        refetchDoesntExistMessages(fetchedPastMessages[0].id + 20);
+      }
+      if (before && !refetchDoesntExistMessages(fetchedPastMessages[0].id)) {
+        setInclude(false);
+        setBefore(undefined);
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fetchedPastMessages]);
 
   useEffect(() => {
+    if (focusedMessageID) {
+      refetchDoesntExistMessages(focusedMessageID);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [focusedMessageID]);
+
+  useEffect(() => {
+    socket.connect();
+    setCurrentChatRoomId(room.id);
     socket.emit('joinRoom', room.id.toString());
+    socket.on('readMessageClient', async (senderId: string) => {
+      if (user?.id && senderId && senderId != `${user?.id}`) {
+        refetchLastReadChatTime();
+      }
+    });
     socket.on('msgToClient', async (sentMsgByOtherUsers: ChatMessage) => {
-      // console.log('sent by other users', sentMsgByOtherUsers.content);
       if (sentMsgByOtherUsers.content) {
+        if (sentMsgByOtherUsers?.sender?.id !== user?.id) {
+          saveLastReadChatTime(room.id, {
+            onSuccess: () => {
+              socket.emit('readReport', {
+                room: room.id.toString(),
+                senderId: user?.id,
+              });
+            },
+          });
+          refetchLastReadChatTime();
+        }
         sentMsgByOtherUsers.createdAt = new Date(sentMsgByOtherUsers.createdAt);
         sentMsgByOtherUsers.updatedAt = new Date(sentMsgByOtherUsers.updatedAt);
-        if (sentMsgByOtherUsers.sender?.id === myself?.id) {
+        if (sentMsgByOtherUsers.sender?.id === user?.id) {
           sentMsgByOtherUsers.isSender = true;
         }
         setMessages((msgs) => {
@@ -359,40 +493,35 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
           }
           return msgs;
         });
-        needRefetch();
       }
     });
 
-    // socket.on('joinedRoom', (r: any) => {
-    //   console.log('joinedRoom', r);
-    // });
-    //
-    // socket.on('leftRoom', (r: any) => {
-    //   console.log('leftRoom', r);
-    // });
     return () => {
       socket.emit('leaveRoom', room.id);
+      socket.disconnect();
+      setCurrentChatRoomId(undefined);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [room.id]);
 
-  useEffect(() => {
-    messages[0]?.chatGroup?.id === room.id && saveLastReadChatTime(room.id);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [messages, room.id]);
+  // useEffect(() => {
+  //   messages[0]?.chatGroup?.id === room.id && saveLastReadChatTime(room.id);
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [messages, room.id]);
 
   useEffect(() => {
-    saveLastReadChatTime(room.id);
+    saveLastReadChatTime(room.id, {
+      onSuccess: () => {
+        socket.emit('readReport', {
+          room: room.id.toString(),
+          senderId: user?.id,
+        });
+        handleEnterRoom(room.id);
+      },
+    });
     return () => saveLastReadChatTime(room.id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [room.id, saveLastReadChatTime]);
-
-  const readUsers = (targetMsg: ChatMessage) => {
-    return lastReadChatTime
-      ? lastReadChatTime
-          .filter((t) => t.readTime >= targetMsg.createdAt)
-          .map((t) => t.user)
-      : [];
-  };
 
   const isLoading = loadingSend || loadingUplaod;
   const activeIndex = useMemo(() => {
@@ -411,10 +540,67 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
         return '写真';
       case ChatMessageType.VIDEO:
         return '動画';
+      case ChatMessageType.STICKER:
+        return 'スタンプ';
       case ChatMessageType.OTHER_FILE:
         return 'ファイル';
     }
   };
+  const refetchDoesntExistMessages = (focused: number) => {
+    const isExist = messages.filter((m) => m.id === focused)?.length;
+
+    if (!isExist) {
+      setAfter(focused);
+      setInclude(true);
+      return true;
+    } else {
+      setInclude(false);
+      return false;
+    }
+  };
+
+  const nextFocusIndex = (sequence: 'prev' | 'next') => {
+    if (searchedResults) {
+      if (focusedMessageID !== undefined) {
+        const index = searchedResults?.findIndex(
+          (e) => e.id === focusedMessageID,
+        );
+        if (sequence === 'next') {
+          return searchedResults?.[index - 1]
+            ? searchedResults[index - 1]?.id
+            : searchedResults[searchedResults.length - 1]?.id;
+        } else {
+          return searchedResults?.[index + 1]
+            ? searchedResults[index + 1]?.id
+            : searchedResults[0]?.id;
+        }
+      }
+      return searchedResults[0]?.id;
+    }
+  };
+
+  const refreshMessage = (targetMessages: ChatMessage[]): ChatMessage[] => {
+    const arrayIncludesDuplicate = [...messages, ...targetMessages];
+    return filterCurrentGroup(arrayIncludesDuplicate)
+      .filter((value, index, self) => {
+        return index === self.findIndex((m) => m.id === value.id);
+      })
+      .sort((a, b) => b.id - a.id);
+  };
+
+  const filterCurrentGroup = (messages: ChatMessage[]) => {
+    return messages.filter((m) => {
+      return room.id === m.chatGroup?.id;
+    });
+  };
+
+  const scrollToTarget = useCallback((topOffset: number) => {
+    messageWrapperDivRef.current?.scrollTo({
+      top: topOffset,
+    });
+  }, []);
+
+  const isPersonal = room.roomType === RoomType.PERSONAL;
 
   return (
     <Box
@@ -430,7 +616,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
         isOpen={visibleAlbumModal}
         onClose={() => {
           setVisibleAlbumModal(false);
-          refetchLatest();
+          // refetchLatest();
         }}
       />
       <NoteModal
@@ -438,7 +624,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
         isOpen={visibleNoteModal}
         onClose={() => {
           setVisibleNoteModal(false);
-          refetchLatest();
+          // refetchLatest();
         }}
       />
       <input {...noClickInputDropzone()} />
@@ -498,27 +684,75 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
           </Box>
         </Box>
         <Box display="flex" flexDir="row" alignItems="center">
+          <Link onClick={() => setVisibleSearchForm((v) => !v)}>
+            <AiOutlineSearch size={24} />
+          </Link>
           <Link mr="4px" onClick={() => setVisibleNoteModal(true)}>
             <FiFileText size={24} />
           </Link>
           <Link mr="4px" onClick={() => setVisibleAlbumModal(true)}>
             <AiOutlinePicture size={24} />
           </Link>
-          <Menu
-            direction="left"
-            onItemClick={(e) => onMenuClicked(e.value as MenuValue)}
-            menuButton={
-              <MenuButton>
-                <HiOutlineDotsCircleHorizontal size={24} />
-              </MenuButton>
-            }
-            transition>
-            <MenuItem value={'editGroup'}>ルームの情報を編集</MenuItem>
-            <MenuItem value={'editMembers'}>メンバーを編集</MenuItem>
-            <MenuItem value={'leaveRoom'}>ルームを退室</MenuItem>
-          </Menu>
+          {!isPersonal && (
+            <Menu
+              direction="left"
+              onItemClick={(e) => onMenuClicked(e.value as MenuValue)}
+              menuButton={
+                <MenuButton>
+                  <HiOutlineDotsCircleHorizontal size={24} />
+                </MenuButton>
+              }
+              transition>
+              <MenuItem value={'editGroup'}>ルームの情報を編集</MenuItem>
+              <MenuItem value={'editMembers'}>メンバーを編集</MenuItem>
+              <MenuItem value={'leaveRoom'}>ルームを退室</MenuItem>
+            </Menu>
+          )}
         </Box>
       </Box>
+      {visibleSearchForm && (
+        <InputGroup size="md">
+          <Input
+            autoFocus={visibleSearchForm}
+            value={inputtedSearchWord}
+            placeholder="メッセージを検索"
+            onChange={(e) => setInputtedSearchWord(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                if (
+                  removeHalfWidthSpace(inputtedSearchWord) !== '' &&
+                  inputtedSearchWord !== confirmedSearchWord
+                ) {
+                  searchMessages();
+                  setConfirmedSearchWord(inputtedSearchWord);
+                }
+                setFocusedMessageID(nextFocusIndex('next'));
+              }
+            }}
+          />
+          <InputRightElement width="rem">
+            {searchedResults.length !== 0 && (
+              <Box display="flex">
+                <Text>{`${countOfSearchWord} / ${searchedResults.length}`}</Text>
+                <Link
+                  onClick={() => setFocusedMessageID(nextFocusIndex('prev'))}
+                  style={{ marginRight: 5 }}>
+                  <AiOutlineUp size={20} />
+                </Link>
+                <Link
+                  onClick={() => setFocusedMessageID(nextFocusIndex('next'))}
+                  style={{ marginRight: 5 }}>
+                  <AiOutlineDown size={20} />
+                </Link>
+              </Box>
+            )}
+
+            <Link onClick={() => setInputtedSearchWord('')}>
+              <AiFillCloseCircle style={{ marginRight: 5 }} size={20} />
+            </Link>
+          </InputRightElement>
+        </InputGroup>
+      )}
       {/*
        * Messages
        */}
@@ -537,10 +771,15 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
           <>
             {messages.map((m) => (
               <ChatMessageItem
+                isScrollTarget={focusedMessageID === m.id}
+                scrollToTarget={scrollToTarget}
                 usersInRoom={room.members || []}
-                key={m.id + m.content}
+                key={m.id}
                 message={m}
-                readUsers={readUsers(m)}
+                confirmedSearchWord={confirmedSearchWord}
+                searchedResultIds={searchedResults?.map((s) => s.id)}
+                lastReadChatTime={lastReadChatTime}
+                // readUsers={readUsers[i] ? readUsers[i] : []}
                 onClickReply={() =>
                   setNewChatMessage((pre) => ({
                     ...pre,
@@ -626,6 +865,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
           placeholder="メッセージを入力"
           editorState={editorState}
           onChange={onEditorChange}
+          keyBindingFn={editorKeyBindingFn}
           plugins={plugins}
           ref={editorRef}
         />
@@ -640,6 +880,54 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
           />
         </div>
       </Box>
+      <Popover closeOnBlur={false} placement="top-start">
+        {({ onClose }) => (
+          <>
+            <PopoverTrigger>
+              <Link
+                color={darkFontColor}
+                position="absolute"
+                zIndex={1}
+                bottom={'8px'}
+                cursor="pointer"
+                right="90px">
+                <BiSmile size={20} color={darkFontColor} />
+              </Link>
+            </PopoverTrigger>
+            <Portal>
+              <PopoverContent>
+                <PopoverHeader border="0">
+                  <PopoverCloseButton />
+                </PopoverHeader>
+
+                <PopoverBody>
+                  <SimpleGrid columns={3}>
+                    {reactionStickers.map((e) => (
+                      <Fragment key={e.name}>
+                        <a
+                          onClick={() => {
+                            handleStickerSelected(e.name);
+                            onClose();
+                          }}>
+                          <Box display="flex" maxW="300px" maxH={'300px'}>
+                            <Image
+                              src={e.src}
+                              w={100}
+                              h={100}
+                              padding={2}
+                              alt="送信された画像"
+                            />
+                          </Box>
+                        </a>
+                      </Fragment>
+                    ))}
+                  </SimpleGrid>
+                </PopoverBody>
+              </PopoverContent>
+            </Portal>
+          </>
+        )}
+      </Popover>
       <Link
         {...getRootProps()}
         color={darkFontColor}
@@ -665,7 +953,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
           <IoSend
             size={20}
             onClick={() => handleSubmit()}
-            color={darkFontColor}
+            color={newChatMessage.content ? blueColor : darkFontColor}
           />
         )}
       </Link>

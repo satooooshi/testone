@@ -14,12 +14,13 @@ import {
   useMediaQuery,
   useToast,
 } from '@chakra-ui/react';
-import React, { Fragment, useRef } from 'react';
+import React, { Fragment, useMemo, useRef } from 'react';
 import { Avatar } from '@chakra-ui/react';
 import {
   ChatMessage,
   ChatMessageReaction,
   ChatMessageType,
+  LastReadChatTime,
   User,
 } from 'src/types';
 import { dateTimeFormatterFromJSDDate } from 'src/utils/dateTimeFormatter';
@@ -36,26 +37,36 @@ import VideoMessage from './VideoMessage';
 import ImageMessage from './ImageMessage';
 import FileMessage from './FileMessage';
 import TextMessage from './TextMessage';
+import CallMessage from './CallMessage';
 import { useAPIDeleteReaction } from '@/hooks/api/chat/useAPIDeleteReaction';
 import { AiOutlineUnorderedList } from 'react-icons/ai';
 import ReactionListModal from './ReactionListModal';
 import ReadUsersListModal from './ReadUsersListModal';
-import { darkFontColor } from 'src/utils/colors';
+import { useEffect } from 'react';
+import StickerMessage from './StickerMessage';
 
 type ChatMessageItemProps = {
   message: ChatMessage;
   onClickReply: () => void;
-  readUsers: User[];
   onClickImage: () => void;
   usersInRoom: User[];
+  isScrollTarget?: boolean;
+  scrollToTarget?: (position: number) => void;
+  confirmedSearchWord: string;
+  searchedResultIds?: (number | undefined)[];
+  lastReadChatTime: LastReadChatTime[] | undefined;
 };
 
 const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
   usersInRoom,
   message,
   onClickReply,
-  readUsers,
   onClickImage,
+  isScrollTarget = false,
+  scrollToTarget,
+  confirmedSearchWord,
+  searchedResultIds,
+  lastReadChatTime,
 }) => {
   const [messageState, setMessageState] = useState(message);
   const [visibleReadModal, setVisibleLastReadModal] = useState(false);
@@ -74,6 +85,20 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
     }
     return reactionsNoDuplicates;
   };
+  const ref = useRef<HTMLDivElement | null>(null);
+  useEffect(() => {
+    if (scrollToTarget && isScrollTarget && ref.current?.offsetTop) {
+      scrollToTarget(ref.current?.offsetTop - 80);
+    }
+  }, [isScrollTarget, scrollToTarget]);
+
+  const readUsers = useMemo(() => {
+    return lastReadChatTime
+      ? lastReadChatTime
+          .filter((t) => new Date(t.readTime) >= new Date(message.createdAt))
+          .map((t) => t.user)
+      : [];
+  }, [lastReadChatTime, message]);
 
   const reactionList = (
     <Box flexDir="row" flexWrap="wrap" display="flex" maxW={'50vw'}>
@@ -250,6 +275,7 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
 
   return (
     <Box
+      ref={ref}
       display="flex"
       flexDir="column"
       alignItems={messageState.isSender ? 'flex-end' : 'flex-start'}>
@@ -318,7 +344,13 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
                 </Text>
               )}
               {messageState.type === ChatMessageType.TEXT ? (
-                <TextMessage message={messageState} />
+                <TextMessage
+                  message={messageState}
+                  confirmedSearchWord={confirmedSearchWord}
+                  searchedResultIds={searchedResultIds}
+                />
+              ) : messageState.type === ChatMessageType.CALL ? (
+                <CallMessage message={messageState} />
               ) : (
                 <Box
                   borderRadius="8px"
@@ -333,6 +365,8 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
                     />
                   ) : messageState.type === ChatMessageType.VIDEO ? (
                     <VideoMessage message={messageState} />
+                  ) : messageState.type === ChatMessageType.STICKER ? (
+                    <StickerMessage message={messageState} />
                   ) : (
                     <FileMessage message={messageState} />
                   )}

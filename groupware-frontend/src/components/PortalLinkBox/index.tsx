@@ -12,7 +12,13 @@ import {
   RiQuestionnaireFill,
   RiTimeLine,
 } from 'react-icons/ri';
-import { MdAssignment, MdDeveloperBoard, MdWork } from 'react-icons/md';
+import { RiCalendarEventLine } from 'react-icons/ri';
+import {
+  MdAssignment,
+  MdDeveloperBoard,
+  MdPermContactCalendar,
+  MdWork,
+} from 'react-icons/md';
 import { CgLoadbarDoc } from 'react-icons/cg';
 import { GrMail } from 'react-icons/gr';
 import { AiOutlineGlobal, AiFillBulb } from 'react-icons/ai';
@@ -40,6 +46,7 @@ export enum PortalLinkType {
   ATTENDANCE_VIEW = '/attendance/view',
   APPLICATION = '/attendance/application',
   ATTENDANCE_REPORT = '/attendance/report',
+  MYSCHEDULE = 'event/list?page=1&tag=&word=&status=past&from=2022-03-04&to=2022-04-11&personal=true',
 }
 
 type PortarlLinkBoxProps = {
@@ -200,6 +207,17 @@ const PortalIcon: React.FC<PortalProps> = ({ href }) => {
       return <FiMessageSquare style={{ ...iconStyle, color: '#086f83' }} />;
     case PortalLinkType.APPLICATION:
       return <MdWork style={{ ...iconStyle, color: 'darkorange' }} />;
+    case PortalLinkType.MYSCHEDULE:
+      return (
+        <RiCalendarEventLine
+          className={clsx(
+            portalLinkBoxStyles.icon,
+            portalLinkBoxStyles.myschedule_icon,
+          )}
+        />
+      );
+    default:
+      return <GiBookCover className={portalLinkBoxStyles.icon} />;
   }
 };
 export const eventTitleText = (href: PortalLinkType): string => {
@@ -215,7 +233,7 @@ export const eventTitleText = (href: PortalLinkType): string => {
     case PortalLinkType.CLUB:
       return '部活動';
     case PortalLinkType.SUBMISSION_ETC:
-      return '提出物等';
+      return '〆切一覧';
     case PortalLinkType.WIKI:
       return '社内Wiki';
     case PortalLinkType.RULES:
@@ -242,6 +260,10 @@ export const eventTitleText = (href: PortalLinkType): string => {
       return '勤怠報告';
     case PortalLinkType.APPLICATION:
       return '入社前申請';
+    case PortalLinkType.MYSCHEDULE:
+      return 'Myスケジュール';
+    default:
+      return '';
   }
 };
 
@@ -286,6 +308,10 @@ const descriptionText = (href: PortalLinkType): string => {
       return '勤怠報告の申請や管理ができます。';
     case PortalLinkType.APPLICATION:
       return '入社前にかかった交通費などの申請ができます。';
+    case PortalLinkType.MYSCHEDULE:
+      return '各スケジュールを確認します';
+    default:
+      return '';
   }
 };
 

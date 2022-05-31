@@ -129,6 +129,19 @@ const WikiForm: React.FC<WikiFormProps> = ({
     },
   ];
 
+  const [willSubmit, setWillSubmit] = useState(false);
+
+  useEffect(() => {
+    const safetySubmit = async () => {
+      handleSubmit();
+      await new Promise((r) => setTimeout(r, 1000));
+      setWillSubmit(false);
+    };
+    if (willSubmit) {
+      safetySubmit();
+    }
+  }, [willSubmit, handleSubmit]);
+
   const headerTabName = '内容を編集';
 
   const saveButtonName = useMemo(() => {
@@ -196,6 +209,8 @@ const WikiForm: React.FC<WikiFormProps> = ({
       e.target.value === BoardCategory.IMPRESSIVE_UNIVERSITY ||
       e.target.value === BoardCategory.CLUB ||
       e.target.value === BoardCategory.STUDY_MEETING ||
+      e.target.value === BoardCategory.SELF_IMPROVEMENT ||
+      e.target.value === BoardCategory.PERSONAL_ANNOUNCEMENT ||
       e.target.value === BoardCategory.CELEBRATION ||
       e.target.value === BoardCategory.OTHER
     ) {
@@ -432,6 +447,34 @@ const WikiForm: React.FC<WikiFormProps> = ({
                 ) : null}
                 {isCreatableWiki({
                   type: WikiType.BOARD,
+                  boardCategory: BoardCategory.SELF_IMPROVEMENT,
+                  userRole: user?.role,
+                }) ? (
+                  <option value={BoardCategory.SELF_IMPROVEMENT}>
+                    {wikiTypeNameFactory(
+                      WikiType.BOARD,
+                      undefined,
+                      true,
+                      BoardCategory.SELF_IMPROVEMENT,
+                    )}
+                  </option>
+                ) : null}
+                {isCreatableWiki({
+                  type: WikiType.BOARD,
+                  boardCategory: BoardCategory.PERSONAL_ANNOUNCEMENT,
+                  userRole: user?.role,
+                }) ? (
+                  <option value={BoardCategory.PERSONAL_ANNOUNCEMENT}>
+                    {wikiTypeNameFactory(
+                      WikiType.BOARD,
+                      undefined,
+                      true,
+                      BoardCategory.PERSONAL_ANNOUNCEMENT,
+                    )}
+                  </option>
+                ) : null}
+                {isCreatableWiki({
+                  type: WikiType.BOARD,
                   boardCategory: BoardCategory.CELEBRATION,
                   userRole: user?.role,
                 }) ? (
@@ -517,7 +560,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
                 marginRight="16px">
                 タグを編集
               </Button>
-              <Button colorScheme="pink" onClick={() => handleSubmit()}>
+              <Button colorScheme="pink" onClick={() => setWillSubmit(true)}>
                 {wiki ? `${saveButtonName}を更新` : `${saveButtonName}を投稿`}
               </Button>
             </Box>

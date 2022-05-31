@@ -12,7 +12,15 @@ import {
   Res,
   UseGuards,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import {
+  RtmTokenBuilder,
+  RtmRole,
+  RtcTokenBuilder,
+  RtcRole,
+} from 'agora-access-token';
 import { Response } from 'express';
+import { DateTime } from 'luxon';
 import { ChatAlbum } from 'src/entities/chatAlbum.entity';
 import { ChatGroup } from 'src/entities/chatGroup.entity';
 import { ChatMessage, ChatMessageType } from 'src/entities/chatMessage.entity';
@@ -21,6 +29,10 @@ import { ChatNote } from 'src/entities/chatNote.entity';
 import { LastReadChatTime } from 'src/entities/lastReadChatTime.entity';
 import { User } from 'src/entities/user.entity';
 import { userNameFactory } from 'src/utils/factory/userNameFactory';
+import {
+  CustomPushNotificationData,
+  sendPushNotifToSpecificUsers,
+} from 'src/utils/notification/sendPushNotification';
 import JwtAuthenticationGuard from '../auth/jwtAuthentication.guard';
 import RequestWithUser from '../auth/requestWithUser.interface';
 import { ChatService } from './chat.service';
@@ -29,7 +41,33 @@ import { ChatNoteService, GetChatNotesResult } from './chatNote.service';
 
 export interface GetMessagesQuery {
   group: number;
+  limit?: string;
+  after?: string;
+  before?: string;
+  include?: boolean;
+  dateRefetchLatest?: string;
+}
+
+export interface GetChaRoomsByPageQuery {
+  group: number;
   page?: string;
+  limit?: string;
+  updatedAtLatestRoom?: Date;
+}
+export interface GetUnreadMessagesQuery {
+  group: number;
+  lastReadTime: Date;
+}
+
+export interface SearchMessageQuery {
+  group: number;
+  word: string;
+  limit?: string;
+}
+
+export interface SearchMessageQuery {
+  group: number;
+  word: string;
   limit?: string;
 }
 
@@ -48,12 +86,87 @@ export class ChatController {
     private readonly chatService: ChatService,
     private readonly chatAlbumService: ChatAlbumService,
     private readonly chatNoteService: ChatNoteService,
+    private readonly configService: ConfigService,
   ) {}
+
+  @Post('notif-call/:calleeId')
+  @UseGuards(JwtAuthenticationGuard)
+  async notifiCall(
+    @Param('calleeId') calleeId: string,
+    @Body() invitation: any,
+  ) {
+    const callee = await this.chatService.calleeForPhoneCall(calleeId);
+    const notificationData: CustomPushNotificationData = {
+      title: '',
+      body: '',
+      custom: { invitation: invitation, silent: 'silent', type: 'edit' },
+    };
+    await sendPushNotifToSpecificUsers([callee.id], notificationData);
+    return;
+  }
+
+  @Get('get-rtm-token')
+  @UseGuards(JwtAuthenticationGuard)
+  async getAgoraRtmToken(@Req() req: RequestWithUser) {
+    const appID = this.configService.get('AGORA_APP_ID');
+    const cert = this.configService.get('AGORA_CERT_ID');
+    const uid = req.user?.id.toString();
+    const expirationTimeInSeconds = 3600;
+
+    const currentTimestamp = Math.floor(Date.now() / 1000);
+
+    const privilegeExpiredTs = currentTimestamp + expirationTimeInSeconds;
+
+    // console.log(uid);
+    const token = RtmTokenBuilder.buildToken(
+      appID,
+      cert,
+      uid,
+      RtmRole.Rtm_User,
+      privilegeExpiredTs,
+    );
+    return token;
+  }
+
+  @Get('get-voice-token/:roomId')
+  @UseGuards(JwtAuthenticationGuard)
+  async getAgoraToken(
+    @Req() req: RequestWithUser,
+    @Param('roomId') roomId: string,
+  ) {
+    const appID = this.configService.get('AGORA_APP_ID');
+    const cert = this.configService.get('AGORA_CERT_ID');
+    const channelName = roomId;
+    const uid = req.user?.id;
+    const expirationTimeInSeconds = 3600;
+
+    const currentTimestamp = Math.floor(Date.now() / 1000);
+
+    const privilegeExpiredTs = currentTimestamp + expirationTimeInSeconds;
+
+    const token = RtcTokenBuilder.buildTokenWithUid(
+      appID,
+      cert,
+      channelName,
+      uid,
+      RtcRole.PUBLISHER,
+      privilegeExpiredTs,
+    );
+    return token;
+  }
 
   @Get('group-list')
   @UseGuards(JwtAuthenticationGuard)
   async getChatGroup(@Req() req: RequestWithUser): Promise<ChatGroup[]> {
     return await this.chatService.getChatGroup(req.user.id);
+  }
+
+  @Get('group-unread-chat-count')
+  @UseGuards(JwtAuthenticationGuard)
+  async getRoomsUnreadChatCount(
+    @Req() req: RequestWithUser,
+  ): Promise<ChatGroup[]> {
+    return await this.chatService.getRoomsUnreadChatCount(req.user.id);
   }
 
   @Get('/v2/rooms')
@@ -65,6 +178,21 @@ export class ChatController {
     return await this.chatService.getRoomsByPage(req.user.id, query);
   }
 
+  @Get('get-room/:roomId')
+  @UseGuards(JwtAuthenticationGuard)
+  async getOneRoom(
+    @Param('roomId') roomId: string,
+    @Req() req: RequestWithUser,
+  ): Promise<ChatGroup> {
+    const { user } = req;
+
+    const room = await this.chatService.getOneRoom(req.user.id, Number(roomId));
+    // if (!room.members.filter((m) => m.id === user.id).length) {
+    //   throw new BadRequestException('チャットルームを取得する権限がありません');
+    // }
+    return room;
+  }
+
   @Get('get-messages')
   @UseGuards(JwtAuthenticationGuard)
   async getMessages(
@@ -72,6 +200,14 @@ export class ChatController {
     @Query() query: GetMessagesQuery,
   ): Promise<ChatMessage[]> {
     return await this.chatService.getChatMessage(req.user.id, query);
+  }
+
+  @Get('search-messages')
+  @UseGuards(JwtAuthenticationGuard)
+  async searchMessages(
+    @Query() query: SearchMessageQuery,
+  ): Promise<Partial<ChatMessage[]>> {
+    return await this.chatService.searchMessage(query);
   }
 
   @Get('latest-mentioned')
@@ -124,13 +260,9 @@ export class ChatController {
     @Body() chatGroup: Partial<ChatGroup>,
   ): Promise<ChatGroup> {
     const user = req.user;
-    chatGroup.members = [
-      ...(chatGroup?.members?.filter((u) => u.id !== user.id) || []),
-      user,
-    ];
     const savedGroup = await this.chatService.v2UpdateChatGroup(
       chatGroup,
-      user.id,
+      user,
     );
     return savedGroup;
   }
@@ -142,11 +274,23 @@ export class ChatController {
     @Body() chatGroup: Partial<ChatGroup>,
   ): Promise<ChatGroup> {
     const user = req.user;
+    const otherMembersId = chatGroup.members.map((u) => u.id);
     chatGroup.members = [
       ...(chatGroup?.members?.filter((u) => u.id !== user.id) || []),
       user,
     ];
     const savedGroup = await this.chatService.v2SaveChatGroup(chatGroup);
+    const silentNotification: CustomPushNotificationData = {
+      title: '',
+      body: '',
+      custom: {
+        silent: 'silent',
+        type: 'create',
+        screen: '',
+        id: savedGroup.id.toString(),
+      },
+    };
+    await sendPushNotifToSpecificUsers(otherMembersId, silentNotification);
     return savedGroup;
   }
 
@@ -190,6 +334,20 @@ export class ChatController {
     const { id } = req.user;
     const { id: chatGroupId } = chatGroup;
     await this.chatService.leaveChatRoom(id, chatGroupId);
+    const silentNotification: CustomPushNotificationData = {
+      title: '',
+      body: '',
+      custom: {
+        silent: 'silent',
+        type: 'leave',
+        screen: '',
+        id: chatGroupId.toString(),
+      },
+    };
+    await sendPushNotifToSpecificUsers(
+      chatGroup?.members.filter((u) => u.id !== id).map((u) => u.id),
+      silentNotification,
+    );
   }
 
   @Delete('/v2/reaction/:reactionId')

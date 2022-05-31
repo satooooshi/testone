@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import HeaderWithTextButton from '../../../../components/Header';
 import WholeContainer from '../../../../components/WholeContainer';
 import {
@@ -50,6 +50,7 @@ const ChatAlbumForm: React.FC<ChatAlbumFormProps> = ({
   const {width: windowWidth} = useWindowDimensions();
   const [imageModal, setImageModal] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [willSubmit, setWillSubmit] = useState(false);
   const [nowImageIndex, setNowImageIndex] = useState<number>(0);
   const {values, setValues, handleSubmit, errors, touched} = useFormik<
     ChatAlbum | Partial<ChatAlbum>
@@ -67,6 +68,17 @@ const ChatAlbumForm: React.FC<ChatAlbumFormProps> = ({
     setImageModal(true);
   };
 
+  useEffect(() => {
+    const safetySubmit = async () => {
+      handleSubmit();
+      await new Promise(r => setTimeout(r, 1000));
+      setWillSubmit(false);
+    };
+    if (willSubmit) {
+      safetySubmit();
+    }
+  }, [willSubmit, handleSubmit]);
+
   const handlePressImageButton = async () => {
     const {formData} = await uploadImageFromGallery({
       cropping: true,
@@ -83,6 +95,7 @@ const ChatAlbumForm: React.FC<ChatAlbumFormProps> = ({
         onSuccess: imageURLs => {
           const newImages: Partial<ChatAlbumImage>[] = imageURLs.map(u => ({
             imageURL: u,
+            name: u + '.png',
           }));
           setValues(v => ({
             ...v,
@@ -117,7 +130,7 @@ const ChatAlbumForm: React.FC<ChatAlbumFormProps> = ({
         title="アルバム"
         enableBackButton={true}
         rightButtonName={album ? '更新' : '投稿'}
-        onPressRightButton={() => handleSubmit()}
+        onPressRightButton={() => setWillSubmit(true)}
       />
       <ImageView
         animationType="slide"

@@ -36,6 +36,8 @@ import {
   Box,
   Image,
   useMediaQuery,
+  InputGroup,
+  InputRightElement,
 } from '@chakra-ui/react';
 import SelectUserModal from '../SelectUserModal';
 import { useAPIGetUsers } from '@/hooks/api/user/useAPIGetUsers';
@@ -116,6 +118,7 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
     handleSubmit: onFinish,
     setValues: setNewEvent,
     validateForm,
+    resetForm,
   } = useFormik<CreateEventRequest | Required<EventSchedule>>({
     initialValues: event ? event : initialEventValue,
     enableReinitialize: true,
@@ -132,6 +135,7 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
       uploadFiles([result], {
         onSuccess: (fileURLs) => {
           createEvent({ ...submittedValues, imageURL: fileURLs[0] });
+          resetForm();
         },
       });
     },
@@ -148,13 +152,27 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
         isClosable: true,
       });
     } else {
-      onFinish();
+      setWillSubmit(true);
     }
   };
 
   const [newYoutube, setNewYoutube] = useState('');
   const [tagModal, setTagModal] = useState(false);
   const [userModal, setUserModal] = useState(false);
+  const [willSubmit, setWillSubmit] = useState(false);
+
+  useEffect(() => {
+    if (enabled) {
+      setWillSubmit(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [enabled]);
+
+  useEffect(() => {
+    if (willSubmit) {
+      onFinish();
+    }
+  }, [willSubmit, onFinish]);
 
   const [
     {
@@ -194,7 +212,10 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
     onDrop: (files: File[]) => {
       uploadFiles(files, {
         onSuccess: (urls: string[]) => {
-          const newFiles: Partial<EventFile>[] = urls.map((u) => ({ url: u }));
+          const newFiles: Partial<EventFile>[] = urls.map((u, i) => ({
+            url: u,
+            name: files[i].name,
+          }));
           setNewEvent((e) => ({
             ...e,
             files: [...(e.files || []), ...newFiles],
@@ -697,7 +718,7 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
                     overflowX="auto"
                     w="95%"
                     css={hideScrollbarCss}>
-                    {fileNameTransformer(f.url || '')}
+                    {f.name}
                   </Text>
                   <MdCancel
                     className={createEventModalStyle.url_delete_button}
@@ -705,7 +726,7 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
                       setNewEvent({
                         ...newEvent,
                         files: newEvent.files.filter(
-                          (file) => file.id !== f.id,
+                          (file) => file.url !== f.url,
                         ),
                       })
                     }
@@ -716,24 +737,29 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
           ) : null}
           <Text mb="16px">関連動画</Text>
           <Box display="flex" flexDir="row" alignItems="center" mb="16px">
-            <Input
-              background="white"
-              placeholder="Youtubeの動画URLを設定してください"
-              type="text"
-              w="100%"
-              h="40px"
-              color={darkFontColor}
-              bg="white"
-              rounded="md"
-              textAlign="left"
-              pr={'40px'}
-              value={newYoutube}
-              onChange={(e) => setNewYoutube(e.currentTarget.value)}
-            />
-            <IoMdAddCircle
-              className={createEventModalStyle.icon}
-              onClick={pushYoutube}
-            />
+            <InputGroup>
+              <Input
+                background="white"
+                placeholder="Youtubeの動画URLを設定してください"
+                type="text"
+                w="100%"
+                h="40px"
+                color={darkFontColor}
+                bg="white"
+                rounded="md"
+                textAlign="left"
+                pr={'40px'}
+                value={newYoutube}
+                onChange={(e) => setNewYoutube(e.currentTarget.value)}
+              />
+
+              <InputRightElement right={-10}>
+                <IoMdAddCircle
+                  className={createEventModalStyle.icon}
+                  onClick={pushYoutube}
+                />
+              </InputRightElement>
+            </InputGroup>
           </Box>
           <Box display="flex" flexDir="column" mb="16px">
             {newEvent?.videos?.map((y) => (

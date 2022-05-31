@@ -5,14 +5,20 @@ import {ChatMessage} from '../../../../types';
 import ReplyParent from '../ReplyParent';
 import tailwind from 'tailwind-rn';
 import AutoLinkedText from '../../../common/AutoLinkedText';
-import {mentionTransform} from '../../../../utils/messageTransform';
 
 export type TextMessageProps = {
   message: ChatMessage;
+  inputtedSearchWord?: string;
+  searchedResultIds?: (number | undefined)[];
   onLongPress: () => void;
 };
 
-const TextMessage: React.FC<TextMessageProps> = ({message, onLongPress}) => {
+const TextMessage: React.FC<TextMessageProps> = ({
+  message,
+  inputtedSearchWord,
+  searchedResultIds,
+  onLongPress,
+}) => {
   const {width: windowWidth} = useWindowDimensions();
   return (
     <TouchableHighlight onLongPress={onLongPress} underlayColor="none">
@@ -27,7 +33,9 @@ const TextMessage: React.FC<TextMessageProps> = ({message, onLongPress}) => {
           <ReplyParent parentMessage={message.replyParentMessage} />
         )}
         <AutoLinkedText
-          text={mentionTransform(message.content)}
+          message={message}
+          inputtedSearchWord={inputtedSearchWord}
+          searchedResultIds={searchedResultIds}
           linkStyle={tailwind(
             message.isSender
               ? 'font-bold text-pink-300 text-base'

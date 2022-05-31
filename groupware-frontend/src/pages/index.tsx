@@ -67,6 +67,7 @@ export default function Home() {
         </div>
         <div className={homeStyles.box_wrapper}>
           <PortalLinkBox href={PortalLinkType.ATTENDANCE} />
+          <PortalLinkBox href={PortalLinkType.MYSCHEDULE} />
         </div>
       </div>
     </LayoutWithTab>

@@ -18,7 +18,7 @@ import {
   ModalOverlay,
 } from '@chakra-ui/react';
 import { useFormik } from 'formik';
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   AiOutlineLeft,
   AiFillCloseCircle,
@@ -77,6 +77,27 @@ const PostAlbum: React.FC<PostAlbumProps> = ({
         });
       },
     });
+
+  const [willSubmit, setWillSubmit] = useState(false);
+
+  useEffect(() => {
+    if (isOpen) {
+      setWillSubmit(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen]);
+
+  useEffect(() => {
+    const safetySubmit = async () => {
+      handleSubmit();
+      await new Promise((r) => setTimeout(r, 1000));
+      setWillSubmit(false);
+    };
+    if (willSubmit) {
+      safetySubmit();
+    }
+  }, [willSubmit, handleSubmit]);
+
   const imagesInNewAlbumViewer = useMemo((): ImageDecorator[] => {
     return (
       values.images?.map((i) => ({
@@ -112,8 +133,9 @@ const PostAlbum: React.FC<PostAlbumProps> = ({
     }
     uploadImage(fileArr, {
       onSuccess: (imageURLs) => {
-        const images: Partial<ChatAlbumImage>[] = imageURLs.map((i) => ({
-          imageURL: i,
+        const images: Partial<ChatAlbumImage>[] = imageURLs.map((image, i) => ({
+          imageURL: image,
+          name: fileArr[i].name,
         }));
         setValues((v) => ({
           ...v,
@@ -142,7 +164,8 @@ const PostAlbum: React.FC<PostAlbumProps> = ({
                   className={`react-viewer-icon react-viewer-icon-download`}></i>
               ),
               onClick: ({ src }) => {
-                saveAs(src, fileNameTransformer(src));
+                if (selectedImage?.fileName)
+                  saveAs(src, selectedImage.fileName);
               },
             },
           ]);
@@ -194,7 +217,7 @@ const PostAlbum: React.FC<PostAlbumProps> = ({
                     <Button
                       size="sm"
                       flexDir="row"
-                      onClick={() => handleSubmit()}
+                      onClick={() => setWillSubmit(true)}
                       mb="8px"
                       colorScheme="green"
                       alignItems="center">
