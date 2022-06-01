@@ -269,7 +269,13 @@ export class ChatService {
     userID: number,
     query: GetMessagesQuery,
   ): Promise<ChatMessage[]> {
-    const { after, before, include = false, limit, dateRefetchLatest } = query;
+    const {
+      after,
+      before,
+      include = false,
+      limit = '20',
+      dateRefetchLatest,
+    } = query;
 
     const existMessages = await this.chatMessageRepository
       .createQueryBuilder('chat_messages')
