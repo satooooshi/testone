@@ -154,13 +154,9 @@ const RoomList: React.FC = () => {
             selectedUserRole={selectedUserRole}
             defaultSelectedUsers={[]}
             onCompleteModal={(selectedUsers, reset) => {
-              if (
-                selectedUsers.length === 1 &&
-                creationType === RoomType.TALK_ROOM
-              ) {
+              if (creationType === RoomType.TALK_ROOM) {
                 createGroup({
                   members: selectedUsers,
-                  roomType: RoomType.PERSONAL,
                 });
                 setRoomTypeSelector(false);
                 return;

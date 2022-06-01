@@ -22,7 +22,7 @@ import {
 import { Response } from 'express';
 import { DateTime } from 'luxon';
 import { ChatAlbum } from 'src/entities/chatAlbum.entity';
-import { ChatGroup } from 'src/entities/chatGroup.entity';
+import { ChatGroup, RoomType } from 'src/entities/chatGroup.entity';
 import { ChatMessage, ChatMessageType } from 'src/entities/chatMessage.entity';
 import { ChatMessageReaction } from 'src/entities/chatMessageReaction.entity';
 import { ChatNote } from 'src/entities/chatNote.entity';
@@ -275,6 +275,12 @@ export class ChatController {
   ): Promise<ChatGroup> {
     const user = req.user;
     const otherMembersId = chatGroup.members.map((u) => u.id);
+    if (chatGroup.name) {
+      chatGroup.roomType = RoomType.GROUP;
+    } else {
+      chatGroup.roomType =
+        chatGroup.members.length === 1 ? RoomType.PERSONAL : RoomType.TALK_ROOM;
+    }
     chatGroup.members = [
       ...(chatGroup?.members?.filter((u) => u.id !== user.id) || []),
       user,
