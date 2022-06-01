@@ -241,7 +241,7 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
           <Menu
             direction="left"
             menuButton={
-              <MenuButton>
+              <div style={{ cursor: 'pointer' }}>
                 <PopoverTrigger>
                   <Button
                     h={0}
@@ -252,7 +252,7 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
                   />
                 </PopoverTrigger>
                 <HiOutlineDotsCircleHorizontal size={24} color={'#b0b0b0'} />
-              </MenuButton>
+              </div>
             }
             transition>
             <MenuItem value={'reply'} onClick={onClickReply}>

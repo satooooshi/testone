@@ -69,8 +69,6 @@ const Viewer = dynamic(() => import('react-viewer'), { ssr: false });
 import '@draft-js-plugins/mention/lib/plugin.css';
 import '@draft-js-plugins/image/lib/plugin.css';
 import UserAvatar from '@/components/common/UserAvatar';
-import io from 'socket.io-client';
-import { baseURL } from 'src/utils/url';
 import { useAuthenticate } from 'src/contexts/useAuthenticate';
 import AlbumModal from '../AlbumModal';
 import NoteModal from '../NoteModal';
@@ -85,6 +83,7 @@ import { removeHalfWidthSpace } from 'src/utils/replaceWidthSpace';
 import { reactionStickers } from 'src/utils/reactionStickers';
 import { BiSmile } from 'react-icons/bi';
 import { valueScaleCorrection } from 'framer-motion/types/render/dom/projection/scale-correction';
+import { useChatSocket } from './socket';
 
 export const Entry: React.FC<EntryComponentProps> = ({
   mention,
@@ -132,10 +131,6 @@ export const Entry: React.FC<EntryComponentProps> = ({
   );
 };
 
-const socket = io(baseURL, {
-  transports: ['websocket'],
-});
-
 type ChatBoxProps = {
   room: ChatGroup;
   onMenuClicked: (menuValue: MenuValue) => void;
@@ -143,7 +138,8 @@ type ChatBoxProps = {
 
 const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
   const { needRefetch } = useRoomRefetch();
-  const { user, setCurrentChatRoomId } = useAuthenticate();
+  const { user } = useAuthenticate();
+  const socket = useChatSocket(room);
   const [visibleAlbumModal, setVisibleAlbumModal] = useState(false);
   const [visibleNoteModal, setVisibleNoteModal] = useState(false);
   const [visibleSearchForm, setVisibleSearchForm] = useState(false);
@@ -153,7 +149,6 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
   const [before, setBefore] = useState<number>();
   const [minBefore, setMinBefore] = useState<number>();
   const [focusedMessageID, setFocusedMessageID] = useState<number>();
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [searchedResults, setSearchedResults] = useState<
     Partial<ChatMessage>[]
   >([]);
@@ -173,23 +168,16 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
     onSubmit: () => onSend(),
   });
   const imagesForViewing: ImageDecorator[] = useMemo(() => {
-    return messages
+    return socket.messages
       .filter((m) => m.type === ChatMessageType.IMAGE)
       .map((m) => ({
         src: m.content,
         downloadUrl: m.content,
       }))
       .reverse();
-  }, [messages]);
-  const { mutate: saveLastReadChatTime } = useAPISaveLastReadChatTime();
+  }, [socket.messages]);
+
   const [selectedImageURL, setSelectedImageURL] = useState<string>();
-  const { data: lastReadChatTime, refetch: refetchLastReadChatTime } =
-    useAPIGetLastReadChatTime(room.id, {
-      onSuccess: () => {
-        // refetchRoom();
-        needRefetch();
-      },
-    });
   const userDataForMention: MentionData[] = useMemo(() => {
     const users =
       room?.members
@@ -225,12 +213,15 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
         if (latestData?.length) {
           const msgToAppend: ChatMessage[] = [];
           for (const latest of latestData) {
-            if (!messages?.length || isRecent(latest, messages?.[0])) {
+            if (
+              !socket.messages?.length ||
+              isRecent(latest, socket.messages?.[0])
+            ) {
               msgToAppend.push(latest);
             }
           }
           if (msgToAppend.length) {
-            setMessages((m) => [...msgToAppend, ...m]);
+            socket.setMessages((m) => [...msgToAppend, ...m]);
             needRefetch();
           }
         }
@@ -258,8 +249,8 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
   const { mutate: sendChatMessage, isLoading: loadingSend } =
     useAPISendChatMessage({
       onSuccess: (data) => {
-        setMessages([data, ...messages]);
-        socket.emit('message', { ...data, isSender: false });
+        socket.setMessages([data, ...socket.messages]);
+        socket.send(data);
         setNewChatMessage((m) => ({
           ...m,
           content: '',
@@ -331,7 +322,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
   const [editorState, setEditorState] = useState(EditorState.createEmpty());
   const messageWrapperDivRef = useRef<HTMLDivElement | null>(null);
   const editorRef = useRef<Editor>(null);
-  const { handleEnterRoom } = useHandleBadge();
+
   const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
   const countOfSearchWord = useMemo(() => {
     if (searchedResults && focusedMessageID) {
@@ -416,7 +407,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
       (e.target.scrollHeight * 2) / 3
     ) {
       if (fetchedPastMessages?.length) {
-        const target = messages[messages.length - 1].id;
+        const target = socket.messages[socket.messages.length - 1].id;
         if (minBefore && minBefore <= target) return;
         setMinBefore(target);
         setBefore(target);
@@ -425,7 +416,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
   };
 
   useEffect(() => {
-    setMessages([]);
+    socket.setMessages([]);
     setBefore(undefined);
     setAfter(undefined);
     refetchLatest();
@@ -434,7 +425,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
   useEffect(() => {
     if (fetchedPastMessages?.length) {
       const refreshedMessage = refreshMessage(fetchedPastMessages);
-      setMessages(refreshedMessage);
+      socket.setMessages(refreshedMessage);
 
       if (after && refetchDoesntExistMessages(fetchedPastMessages[0].id)) {
         refetchDoesntExistMessages(fetchedPastMessages[0].id + 20);
@@ -455,73 +446,11 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
   }, [focusedMessageID]);
 
   useEffect(() => {
-    socket.connect();
-    setCurrentChatRoomId(room.id);
-    socket.emit('joinRoom', room.id.toString());
-    socket.on('readMessageClient', async (senderId: string) => {
-      if (user?.id && senderId && senderId != `${user?.id}`) {
-        refetchLastReadChatTime();
-      }
-    });
-    socket.on('msgToClient', async (sentMsgByOtherUsers: ChatMessage) => {
-      if (sentMsgByOtherUsers.content) {
-        if (sentMsgByOtherUsers?.sender?.id !== user?.id) {
-          saveLastReadChatTime(room.id, {
-            onSuccess: () => {
-              socket.emit('readReport', {
-                room: room.id.toString(),
-                senderId: user?.id,
-              });
-            },
-          });
-          refetchLastReadChatTime();
-        }
-        sentMsgByOtherUsers.createdAt = new Date(sentMsgByOtherUsers.createdAt);
-        sentMsgByOtherUsers.updatedAt = new Date(sentMsgByOtherUsers.updatedAt);
-        if (sentMsgByOtherUsers.sender?.id === user?.id) {
-          sentMsgByOtherUsers.isSender = true;
-        }
-        setMessages((msgs) => {
-          if (
-            msgs.length &&
-            msgs[0].id !== sentMsgByOtherUsers.id &&
-            sentMsgByOtherUsers.chatGroup?.id === room.id
-          ) {
-            return [sentMsgByOtherUsers, ...msgs];
-          } else if (sentMsgByOtherUsers.chatGroup?.id !== room.id) {
-            return msgs.filter((m) => m.id !== sentMsgByOtherUsers.id);
-          }
-          return msgs;
-        });
-      }
-    });
-
+    socket.joinRoom();
     return () => {
-      socket.emit('leaveRoom', room.id);
-      socket.disconnect();
-      setCurrentChatRoomId(undefined);
+      socket.leaveRoom();
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [room.id]);
-
-  // useEffect(() => {
-  //   messages[0]?.chatGroup?.id === room.id && saveLastReadChatTime(room.id);
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [messages, room.id]);
-
-  useEffect(() => {
-    saveLastReadChatTime(room.id, {
-      onSuccess: () => {
-        socket.emit('readReport', {
-          room: room.id.toString(),
-          senderId: user?.id,
-        });
-        handleEnterRoom(room.id);
-      },
-    });
-    return () => saveLastReadChatTime(room.id);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [room.id, saveLastReadChatTime]);
 
   const isLoading = loadingSend || loadingUplaod;
   const activeIndex = useMemo(() => {
@@ -547,7 +476,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
     }
   };
   const refetchDoesntExistMessages = (focused: number) => {
-    const isExist = messages.filter((m) => m.id === focused)?.length;
+    const isExist = socket.messages.filter((m) => m.id === focused)?.length;
 
     if (!isExist) {
       setAfter(focused);
@@ -580,7 +509,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
   };
 
   const refreshMessage = (targetMessages: ChatMessage[]): ChatMessage[] => {
-    const arrayIncludesDuplicate = [...messages, ...targetMessages];
+    const arrayIncludesDuplicate = [...socket.messages, ...targetMessages];
     return filterCurrentGroup(arrayIncludesDuplicate)
       .filter((value, index, self) => {
         return index === self.findIndex((m) => m.id === value.id);
@@ -767,9 +696,9 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
         p="8px"
         whiteSpace="pre-wrap"
         onScroll={onScrollTopOnChat}>
-        {messages ? (
+        {socket.messages ? (
           <>
-            {messages.map((m) => (
+            {socket.messages.map((m) => (
               <ChatMessageItem
                 isScrollTarget={focusedMessageID === m.id}
                 scrollToTarget={scrollToTarget}
@@ -778,7 +707,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
                 message={m}
                 confirmedSearchWord={confirmedSearchWord}
                 searchedResultIds={searchedResults?.map((s) => s.id)}
-                lastReadChatTime={lastReadChatTime}
+                lastReadChatTime={socket.lastReadChatTime}
                 // readUsers={readUsers[i] ? readUsers[i] : []}
                 onClickReply={() =>
                   setNewChatMessage((pre) => ({
