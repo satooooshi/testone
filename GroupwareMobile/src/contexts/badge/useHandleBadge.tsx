@@ -62,6 +62,11 @@ export const BadgeProvider: React.FC = ({children}) => {
           setCompleteRefetch(true);
         }
       },
+      onError: () => {
+        Alert.alert(
+          'チャットルームの取得に失敗しました。しばらく経ってもルームを取得できない場合は、アプリを再起動してみて下さい。',
+        );
+      },
     },
   );
 
