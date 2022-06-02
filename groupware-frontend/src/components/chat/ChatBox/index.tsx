@@ -218,11 +218,13 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
   const { refetch: refetchLatest } = useAPIGetMessages(
     {
       group: room.id,
+      limit: '2',
     },
     {
-      enabled: false,
-      refetchInterval: 3000,
+      refetchInterval: 5000,
       onSuccess: (latestData) => {
+        console.log('-------', latestData.length);
+
         refetchLastReadChatTime();
         if (latestData?.length) {
           const msgToAppend: ChatMessage[] = [];
@@ -436,12 +438,12 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
     }
   };
 
-  useEffect(() => {
-    setMessages([]);
-    setBefore(undefined);
-    setAfter(undefined);
-    refetchLatest();
-  }, [refetchLatest, room]);
+  // useEffect(() => {
+  //   setMessages([]);
+  //   setBefore(undefined);
+  //   setAfter(undefined);
+  //   refetchLatest();
+  // }, [refetchLatest, room]);
 
   useEffect(() => {
     if (fetchedPastMessages?.length) {
