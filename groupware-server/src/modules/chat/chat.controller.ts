@@ -264,6 +264,12 @@ export class ChatController {
       chatGroup,
       user,
     );
+    if (savedGroup.roomType === RoomType.PERSONAL && savedGroup.members.length === 2) {
+      const chatPartner = savedGroup.members.filter((m) => m.id !== user.id)[0];
+      savedGroup.imageURL = chatPartner.avatarUrl;
+      savedGroup.name = `${chatPartner.lastName} ${chatPartner.firstName}`;
+    }
+
     return savedGroup;
   }
 
@@ -297,6 +303,12 @@ export class ChatController {
       },
     };
     await sendPushNotifToSpecificUsers(otherMembersId, silentNotification);
+
+    if (savedGroup.roomType === RoomType.PERSONAL && savedGroup.members.length === 2) {
+      const chatPartner = savedGroup.members.filter((m) => m.id !== user.id)[0];
+      savedGroup.imageURL = chatPartner.avatarUrl;
+      savedGroup.name = `${chatPartner.lastName} ${chatPartner.firstName}`;
+    }
     return savedGroup;
   }
 
