@@ -99,7 +99,7 @@ export class ChatService {
     const limitNumber = Number(limit);
 
     if (userID === 599) {
-      console.log('limit number ========================================', limitNumber, 'limit number result ================',limitNumber >= 0 ? limitNumber : 20)
+      console.log('limitNumber ', limitNumber, 'limitNumberResult',limitNumber >= 0 ? limitNumber : 20)
     }
 
     const [urlUnparsedRooms, count] = await this.chatGroupRepository
@@ -140,7 +140,7 @@ export class ChatService {
       .getManyAndCount();
 
       if (userID === 599) {
-        console.log('call =================================================');
+        console.log('adminCall');
       }
 
     let rooms = await Promise.all(
