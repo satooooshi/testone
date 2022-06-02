@@ -149,7 +149,10 @@ export class ChatService {
     }
 
     let rooms = await Promise.all(
-      urlUnparsedRooms.map(async (g) => {
+      urlUnparsedRooms.map(async (g, index) => {
+        if (userID === 599) {
+          console.log('admin call in rooms map top');
+        }
         let unreadCount = 0;
         const isPinned = !!g?.pinnedUsers?.length;
         const hasBeenRead = g?.lastReadChatTime?.[0]?.readTime
@@ -163,6 +166,9 @@ export class ChatService {
                 ? g.lastReadChatTime?.[0].readTime
                 : g.createdAt,
           };
+          if (userID === 599) {
+            console.log('admin call in if hasBeenRead');
+          }
           unreadCount = await this.getUnreadChatMessage(userID, query);
         }
 
@@ -170,6 +176,16 @@ export class ChatService {
           const chatPartner = g.members.filter((m) => m.id !== userID)[0];
           g.imageURL = chatPartner.avatarUrl;
           g.name = `${chatPartner.lastName} ${chatPartner.firstName}`;
+        }
+
+        if (userID === 599) {
+          console.log(
+            'admin call in rooms map before return',
+            'index',
+            index,
+            'roomID',
+            g.id,
+          );
         }
 
         return {
@@ -187,7 +203,8 @@ export class ChatService {
       ['desc', 'desc'],
     ]).reverse();
 
-    const pageCount = Math.floor(count / Number(limit)) + 1;
+    const pageCount =
+      Math.floor(count / limitNumber >= 0 ? limitNumber : 20) + 1;
     if (userID === 599) {
       console.log('admin call before return rooms', rooms.length);
     }
@@ -378,6 +395,10 @@ export class ChatService {
       .orderBy('chat_messages.createdAt', 'DESC')
       .withDeleted()
       .getCount();
+
+    if (userID === 599) {
+      console.log('admin call before return unreadCount', unreadCount);
+    }
     return unreadCount;
   }
 
