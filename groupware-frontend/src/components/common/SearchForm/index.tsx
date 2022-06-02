@@ -8,15 +8,20 @@ import searchFormStyles from '@/styles/components/SearchForm.module.scss';
 import TagModal from '../TagModal';
 import { Tag } from 'src/types';
 import {
+  Badge,
+  Box,
   Button,
   ButtonGroup,
   IconButton,
   Input,
+  InputGroup,
+  InputLeftElement,
+  Text,
   useMediaQuery,
 } from '@chakra-ui/react';
 import { GiCancel } from 'react-icons/gi';
 import ReactModal from 'react-modal';
-import { AiOutlineSearch } from 'react-icons/ai';
+import { AiOutlinePlus, AiOutlineSearch } from 'react-icons/ai';
 import clsx from 'clsx';
 import { tagColorFactory } from 'src/utils/factory/tagColorFactory';
 import { MdCancel } from 'react-icons/md';
@@ -86,7 +91,7 @@ const SearchInput: React.FC<SearchFormProps> = ({
   };
 
   return (
-    <div className={searchFormStyles.main_wrapper}>
+    <Box display="flex" flexDir="column" justifyContent="center">
       <div
         className={clsx(
           searchFormStyles.search_form_wrapper,
@@ -101,25 +106,20 @@ const SearchInput: React.FC<SearchFormProps> = ({
             />
           </div>
         )}
-        <Input
-          className={searchFormStyles.input}
-          type="search"
-          name="word"
-          width={isSmallerThan768 ? '100%' : '60%'}
-          placeholder="検索ワードを入力"
-          background="white"
-          value={value}
-          onChange={onChange}
-        />
-        <Button
-          width={isSmallerThan768 ? '100%' : '15vw'}
-          className={searchFormStyles.add_tag_button}
-          colorScheme="green"
-          onClick={() => setTagModal(true)}>
-          {selectedTags.length
-            ? `${selectedTags.length}個のタグ`
-            : 'タグを選択'}
-        </Button>
+        <InputGroup width={isSmallerThan768 ? '100%' : '80%'}>
+          <InputLeftElement pointerEvents="none">
+            <AiOutlineSearch />
+          </InputLeftElement>
+          <Input
+            className={searchFormStyles.input}
+            type="search"
+            name="word"
+            placeholder="検索ワードを入力"
+            background="white"
+            value={value}
+            onChange={onChange}
+          />
+        </InputGroup>
         <TagModal
           isOpen={tagModal}
           tags={tags || []}
@@ -133,10 +133,14 @@ const SearchInput: React.FC<SearchFormProps> = ({
         />
         <div className={clsx(searchFormStyles.search_and_close_button_wrapper)}>
           <Button
-            width={isSmallerThan768 ? '100%' : '15vw'}
-            colorScheme="pink"
+            borderRadius={50}
+            width={isSmallerThan768 ? '100%' : '20vw'}
+            colorScheme="blue"
             onClick={handleModalSearchButton}>
-            検索
+            <Box display="flex">
+              <AiOutlineSearch size={20} />
+              <Text ml={1}>検索</Text>
+            </Box>
           </Button>
           <TagModal
             isOpen={tagModal}
@@ -151,36 +155,47 @@ const SearchInput: React.FC<SearchFormProps> = ({
           />
         </div>
       </div>
-      {selectedTags.length ? (
-        <div className={searchFormStyles.search_items_wrapper}>
-          <div className={searchFormStyles.searched_items_title_wrapper}>
-            <p className={searchFormStyles.searched_items_title}>
-              選択したタグ
-            </p>
-          </div>
-          <div className={searchFormStyles.selected_tags_wrapper}>
-            {selectedTags.map((tag) => (
-              <div
-                className={searchFormStyles.selected_tag_item_wrapper}
-                key={tag.id}>
-                <ButtonGroup
-                  isAttached
-                  size="sm"
-                  colorScheme={tagColorFactory(tag.type)}>
-                  <Button mr="-px">{tag.name}</Button>
-                  <IconButton
-                    onClick={() => toggleTag(tag)}
-                    aria-label="削除"
-                    icon={<MdCancel size={18} />}
-                  />
-                </ButtonGroup>
-              </div>
-            ))}
-          </div>
-        </div>
-      ) : null}
+      <Box display="flex" mt={2} alignItems="center">
+        <Button
+          borderRadius={50}
+          width={'8wh'}
+          height={8}
+          className={searchFormStyles.add_tag_button}
+          colorScheme="blue"
+          variant="outline"
+          onClick={() => setTagModal(true)}>
+          <Box display="flex">
+            <AiOutlinePlus size={15} />
+            <Text fontSize={12}>タグを追加</Text>
+          </Box>
+        </Button>
+        {selectedTags.length ? (
+          <>
+            <Text>選択したタグ</Text>
+            <Box ml={1} display="flex">
+              {selectedTags.map((tag) => (
+                <Badge
+                  ml={2}
+                  p={2}
+                  key={tag.id}
+                  display="flex"
+                  colorScheme={tagColorFactory(tag.type)}
+                  borderRadius={50}
+                  alignItems="center"
+                  variant="outline"
+                  borderWidth={1}>
+                  {tag.name}
+                  <Box ml={1}>
+                    <MdCancel size={14} onClick={() => toggleTag(tag)} />
+                  </Box>
+                </Badge>
+              ))}
+            </Box>
+          </>
+        ) : null}
+      </Box>
       {searchedWord ? <p>{`"${searchedWord}"での検索結果`}</p> : null}
-    </div>
+    </Box>
   );
 };
 
