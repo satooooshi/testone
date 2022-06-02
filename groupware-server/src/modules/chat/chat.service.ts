@@ -89,7 +89,7 @@ export class ChatService {
   public async getRoomsByPage(
     userID: number,
     query: GetChaRoomsByPageQuery,
-  ): Promise<GetRoomsResult> {
+  ): Promise<ChatGroup[]> {
     const { page, limit = '20', updatedAtLatestRoom } = query;
     let offset = 0;
     if (page) {
@@ -172,9 +172,9 @@ export class ChatService {
       'updatedAt',
       ['desc', 'desc'],
     ]).reverse();
-    const pageCount = Math.floor(count / Number(limit)) + 1;
+    // const pageCount = Math.floor(count / Number(limit)) + 1;
 
-    return { rooms, pageCount };
+    return rooms;
   }
 
   public async getOneRoom(userID: number, roomId: number): Promise<ChatGroup> {

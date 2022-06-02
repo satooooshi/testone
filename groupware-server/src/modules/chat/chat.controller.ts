@@ -174,7 +174,7 @@ export class ChatController {
   async getChatGroupByPage(
     @Req() req: RequestWithUser,
     @Query() query: GetMessagesQuery,
-  ): Promise<GetRoomsResult> {
+  ): Promise<ChatGroup[]> {
     return await this.chatService.getRoomsByPage(req.user.id, query);
   }
 
