@@ -24,7 +24,7 @@ export const jwtFormDataHeader = {
 
 export const baseURL =
   __DEV__ && Config.API_URL
-    ? 'https://groupware-mobile--dev-test-sgzkfl3uyq-an.a.run.app'
+    ? Config.API_URL
     : !__DEV__
     ? 'https://groupware-mobile--dev-test-sgzkfl3uyq-an.a.run.app'
     : 'https://groupware-mobile--dev-test-sgzkfl3uyq-an.a.run.app';

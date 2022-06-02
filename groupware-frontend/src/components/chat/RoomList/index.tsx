@@ -25,7 +25,7 @@ type RoomListProps = {
 
 const RoomList: React.FC<RoomListProps> = ({ currentId, onClickRoom }) => {
   const { clearRefetch } = useRoomRefetch();
-  const { setChatGroupsState, chatGroups, setChatUnreadCountState } =
+  const { setChatGroupsState, chatGroups, updateUnreadCount } =
     useHandleBadge();
   const [chatRooms, setChatRooms] = useState<ChatGroup[]>([]);
   const [searchedRooms, setSearchedRooms] = useState<ChatGroup[]>([]);
@@ -86,48 +86,35 @@ const RoomList: React.FC<RoomListProps> = ({ currentId, onClickRoom }) => {
           latestRooms.length,
         );
         if (latestRooms.length) {
-          setChatRooms((rooms) => {
-            const latestPinnedRooms = [];
-            for (const latestRoom of latestRooms) {
-              if (router.pathname !== `/chat/${latestRoom.id}`) {
-                const olderRoom = chatGroups.filter(
-                  (r) => r.id === latestRoom.id,
-                )[0];
-                const incrementCount =
-                  (latestRoom?.unreadCount || 0) -
-                  (olderRoom?.unreadCount || 0);
-                setChatUnreadCountState(incrementCount);
-              }
-              if (latestRoom.isPinned) {
-                latestPinnedRooms.unshift(latestRoom);
-              }
+          const latestPinnedRooms: ChatGroup[] = [];
+          for (const latestRoom of latestRooms) {
+            if (router.pathname !== `/chat/${latestRoom.id}`) {
+              const olderRoom = chatGroups.filter(
+                (r) => r.id === latestRoom.id,
+              )[0];
+              const incrementCount =
+                (latestRoom?.unreadCount || 0) - (olderRoom?.unreadCount || 0);
+              updateUnreadCount(incrementCount);
             }
+            if (latestRoom.isPinned) {
+              latestPinnedRooms.unshift(latestRoom);
+            }
+          }
+          const ids = latestRooms.map((r) => r.id);
+          const existRooms = chatGroups.filter((r) => !ids.includes(r.id));
+          const existPinnedRooms = existRooms.filter((r) => r.isPinned);
+          const existExceptPinnedRooms = existRooms.filter((r) => !r.isPinned);
 
-            const ids = latestRooms.map((r) => r.id);
-            const existRooms = rooms.filter((r) => !ids.includes(r.id));
-            const existPinnedRooms = existRooms.filter((r) => r.isPinned);
-            const existExceptPinnedRooms = existRooms.filter(
-              (r) => !r.isPinned,
-            );
+          const latestRoomsExceptPinnedRooms = latestRooms.filter(
+            (r) => !r.isPinned,
+          );
 
-            const latestRoomsExceptPinnedRooms = latestRooms.filter(
-              (r) => !r.isPinned,
-            );
-
-            setChatRooms([
-              ...latestPinnedRooms,
-              ...existPinnedRooms,
-              ...latestRoomsExceptPinnedRooms,
-              ...existExceptPinnedRooms,
-            ]);
-
-            return [
-              ...latestPinnedRooms,
-              ...existPinnedRooms,
-              ...latestRoomsExceptPinnedRooms,
-              ...existExceptPinnedRooms,
-            ];
-          });
+          setChatGroupsState([
+            ...latestPinnedRooms,
+            ...existPinnedRooms,
+            ...latestRoomsExceptPinnedRooms,
+            ...existExceptPinnedRooms,
+          ]);
         }
       },
     },

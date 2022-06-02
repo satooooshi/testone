@@ -22,7 +22,7 @@ const BadgeContext = createContext({
   handleEnterRoom: (() => {}) as (roomId: number) => void,
   editRoom: {} as ChatGroup | undefined,
   editChatGroup: (() => {}) as (room: ChatGroup) => void,
-  setChatUnreadCountState: (() => {}) as (num: number) => void,
+  updateUnreadCount: (() => {}) as (num: number) => void,
   isRoomsRefetching: false,
 });
 
@@ -148,7 +148,7 @@ export const BadgeProvider: React.FC = ({ children }) => {
     setChatGroups(rooms);
   };
 
-  const setChatUnreadCountState = (num: number) => {
+  const updateUnreadCount = (num: number) => {
     setChatUnreadCount((c) => c + num);
   };
 
@@ -174,7 +174,7 @@ export const BadgeProvider: React.FC = ({ children }) => {
         editRoom,
         editChatGroup,
         isRoomsRefetching: isLoading,
-        setChatUnreadCountState,
+        updateUnreadCount,
       }}>
       <RoomRefetchProvider>{children}</RoomRefetchProvider>
     </BadgeContext.Provider>
