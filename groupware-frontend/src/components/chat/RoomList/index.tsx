@@ -1,15 +1,11 @@
-import { useAPIGetOneRoom } from '@/hooks/api/chat/useAPIGetOneRoom';
-import { useAPIGetRoomsByPage } from '@/hooks/api/chat/useAPIGetRoomsByPage';
 import {
   Box,
   InputGroup,
   InputLeftElement,
-  Spinner,
   Text,
   Input,
 } from '@chakra-ui/react';
-import React, { useCallback, useEffect, useState } from 'react';
-import { useRoomRefetch } from 'src/contexts/chat/useRoomRefetch';
+import React, { useEffect, useState } from 'react';
 import { ChatGroup } from 'src/types';
 import ChatGroupCard from '../ChatGroupCard';
 import { useAPISavePin } from '@/hooks/api/chat/useAPISavePin';
@@ -23,10 +19,9 @@ type RoomListProps = {
 };
 
 const RoomList: React.FC<RoomListProps> = ({ currentId, onClickRoom }) => {
-  const { clearRefetch } = useRoomRefetch();
   const { setChatGroupsState, chatGroups } = useHandleBadge();
   const [chatRooms, setChatRooms] = useState<ChatGroup[]>([]);
-  const [searchedRooms, setSearchedRooms] = useState<ChatGroup[] | null>([]);
+  const [searchedRooms, setSearchedRooms] = useState<ChatGroup[] | null>(null);
 
   const { mutate: savePin } = useAPISavePin({
     onSuccess: (data) => {

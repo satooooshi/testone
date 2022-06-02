@@ -5,6 +5,7 @@ import { axiosInstance } from 'src/utils/url';
 import { getRoomDetailURL } from 'src/utils/url/chat.url';
 
 const getRoomDetail = async (roomId: number) => {
+  if (!roomId) throw 'No room ID';
   const res = await axiosInstance.get<ChatGroup>(
     `${getRoomDetailURL}/${roomId.toString()}`,
   );

@@ -139,7 +139,6 @@ type ChatBoxProps = {
 const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
   const { needRefetch } = useRoomRefetch();
   const { user } = useAuthenticate();
-  const socket = useChatSocket(room);
   const [visibleAlbumModal, setVisibleAlbumModal] = useState(false);
   const [visibleNoteModal, setVisibleNoteModal] = useState(false);
   const [visibleSearchForm, setVisibleSearchForm] = useState(false);
@@ -153,6 +152,8 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
     Partial<ChatMessage>[]
   >([]);
   const [include, setInclude] = useState(false);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const socket = useChatSocket(room, setMessages);
 
   const {
     values: newChatMessage,
@@ -168,14 +169,14 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
     onSubmit: () => onSend(),
   });
   const imagesForViewing: ImageDecorator[] = useMemo(() => {
-    return socket.messages
+    return messages
       .filter((m) => m.type === ChatMessageType.IMAGE)
       .map((m) => ({
         src: m.content,
         downloadUrl: m.content,
       }))
       .reverse();
-  }, [socket.messages]);
+  }, [messages]);
 
   const [selectedImageURL, setSelectedImageURL] = useState<string>();
   const userDataForMention: MentionData[] = useMemo(() => {
@@ -213,15 +214,12 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
         if (latestData?.length) {
           const msgToAppend: ChatMessage[] = [];
           for (const latest of latestData) {
-            if (
-              !socket.messages?.length ||
-              isRecent(latest, socket.messages?.[0])
-            ) {
+            if (!messages?.length || isRecent(latest, messages?.[0])) {
               msgToAppend.push(latest);
             }
           }
           if (msgToAppend.length) {
-            socket.setMessages((m) => [...msgToAppend, ...m]);
+            setMessages((m) => [...msgToAppend, ...m]);
             needRefetch();
           }
         }
@@ -249,7 +247,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
   const { mutate: sendChatMessage, isLoading: loadingSend } =
     useAPISendChatMessage({
       onSuccess: (data) => {
-        socket.setMessages([data, ...socket.messages]);
+        setMessages([data, ...messages]);
         socket.send(data);
         setNewChatMessage((m) => ({
           ...m,
@@ -407,7 +405,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
       (e.target.scrollHeight * 2) / 3
     ) {
       if (fetchedPastMessages?.length) {
-        const target = socket.messages[socket.messages.length - 1].id;
+        const target = messages[messages.length - 1].id;
         if (minBefore && minBefore <= target) return;
         setMinBefore(target);
         setBefore(target);
@@ -416,7 +414,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
   };
 
   useEffect(() => {
-    socket.setMessages([]);
+    setMessages([]);
     setBefore(undefined);
     setAfter(undefined);
     refetchLatest();
@@ -425,7 +423,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
   useEffect(() => {
     if (fetchedPastMessages?.length) {
       const refreshedMessage = refreshMessage(fetchedPastMessages);
-      socket.setMessages(refreshedMessage);
+      setMessages(refreshedMessage);
 
       if (after && refetchDoesntExistMessages(fetchedPastMessages[0].id)) {
         refetchDoesntExistMessages(fetchedPastMessages[0].id + 20);
@@ -476,7 +474,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
     }
   };
   const refetchDoesntExistMessages = (focused: number) => {
-    const isExist = socket.messages.filter((m) => m.id === focused)?.length;
+    const isExist = messages.filter((m) => m.id === focused)?.length;
 
     if (!isExist) {
       setAfter(focused);
@@ -509,7 +507,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
   };
 
   const refreshMessage = (targetMessages: ChatMessage[]): ChatMessage[] => {
-    const arrayIncludesDuplicate = [...socket.messages, ...targetMessages];
+    const arrayIncludesDuplicate = [...messages, ...targetMessages];
     return filterCurrentGroup(arrayIncludesDuplicate)
       .filter((value, index, self) => {
         return index === self.findIndex((m) => m.id === value.id);
@@ -696,9 +694,9 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
         p="8px"
         whiteSpace="pre-wrap"
         onScroll={onScrollTopOnChat}>
-        {socket.messages ? (
+        {messages ? (
           <>
-            {socket.messages.map((m) => (
+            {messages.map((m) => (
               <ChatMessageItem
                 isScrollTarget={focusedMessageID === m.id}
                 scrollToTarget={scrollToTarget}

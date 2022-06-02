@@ -8,7 +8,15 @@ import { useAuthenticate } from 'src/contexts/useAuthenticate';
 import { ChatGroup, ChatMessage } from 'src/types';
 import { baseURL } from 'src/utils/url';
 
-export const useChatSocket = (room: ChatGroup) => {
+// socket
+const socket = io(baseURL, {
+  transports: ['websocket'],
+});
+
+export const useChatSocket = (
+  room: ChatGroup,
+  setMessages: React.Dispatch<React.SetStateAction<ChatMessage[]>>,
+) => {
   const { handleEnterRoom } = useHandleBadge();
   const { user, setCurrentChatRoomId } = useAuthenticate();
   const { mutate: saveLastReadChatTime } = useAPISaveLastReadChatTime();
@@ -20,14 +28,6 @@ export const useChatSocket = (room: ChatGroup) => {
       },
     });
 
-  // states
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
-
-  // socket
-  const socket = io(baseURL, {
-    transports: ['websocket'],
-  });
-
   const report = () => {
     socket.emit('readReport', {
       room: room.id.toString(),
@@ -35,39 +35,9 @@ export const useChatSocket = (room: ChatGroup) => {
     });
   };
 
-  socket.connect();
-  socket.on('readMessageClient', async (senderId: string) => {
-    if (user?.id && senderId && senderId != `${user?.id}`) {
-      refetchLastReadChatTime();
-    }
-  });
-  socket.on('msgToClient', async (sentMsgByOtherUsers: ChatMessage) => {
-    if (sentMsgByOtherUsers.content) {
-      if (sentMsgByOtherUsers?.sender?.id !== user?.id) {
-        saveLastReadChatTime(room.id, {
-          onSuccess: () => report(),
-        });
-        refetchLastReadChatTime();
-      }
-      sentMsgByOtherUsers.createdAt = new Date(sentMsgByOtherUsers.createdAt);
-      sentMsgByOtherUsers.updatedAt = new Date(sentMsgByOtherUsers.updatedAt);
-      if (sentMsgByOtherUsers.sender?.id === user?.id) {
-        sentMsgByOtherUsers.isSender = true;
-      }
-      setMessages((msgs: ChatMessage[]) => {
-        if (
-          msgs.length &&
-          msgs[0].id !== sentMsgByOtherUsers.id &&
-          sentMsgByOtherUsers.chatGroup?.id === room.id
-        ) {
-          return [sentMsgByOtherUsers, ...msgs];
-        } else if (sentMsgByOtherUsers.chatGroup?.id !== room.id) {
-          return msgs.filter((m) => m.id !== sentMsgByOtherUsers.id);
-        }
-        return msgs;
-      });
-    }
-  });
+  if (socket.disconnected) {
+    socket.connect();
+  }
 
   useEffect(() => {
     saveLastReadChatTime(room.id, {
@@ -84,6 +54,44 @@ export const useChatSocket = (room: ChatGroup) => {
     joinRoom: () => {
       setCurrentChatRoomId(room.id);
       socket.emit('joinRoom', room.id.toString());
+
+      socket.on('readMessageClient', async (senderId: string) => {
+        if (user?.id && senderId && senderId != `${user?.id}`) {
+          refetchLastReadChatTime();
+        }
+      });
+
+      socket.on('msgToClient', async (sentMsgByOtherUsers: ChatMessage) => {
+        if (sentMsgByOtherUsers.content) {
+          if (sentMsgByOtherUsers?.sender?.id !== user?.id) {
+            saveLastReadChatTime(room.id, {
+              onSuccess: () => report(),
+            });
+            refetchLastReadChatTime();
+          }
+          sentMsgByOtherUsers.createdAt = new Date(
+            sentMsgByOtherUsers.createdAt,
+          );
+          sentMsgByOtherUsers.updatedAt = new Date(
+            sentMsgByOtherUsers.updatedAt,
+          );
+          if (sentMsgByOtherUsers.sender?.id === user?.id) {
+            sentMsgByOtherUsers.isSender = true;
+          }
+          setMessages((msgs) => {
+            if (
+              msgs.length &&
+              msgs[0].id !== sentMsgByOtherUsers.id &&
+              sentMsgByOtherUsers.chatGroup?.id === room.id
+            ) {
+              return [sentMsgByOtherUsers, ...msgs];
+            } else if (sentMsgByOtherUsers.chatGroup?.id !== room.id) {
+              return msgs.filter((m) => m.id !== sentMsgByOtherUsers.id);
+            }
+            return msgs;
+          });
+        }
+      });
     },
     leaveRoom: () => {
       socket.emit('leaveRoom', room.id);
@@ -92,8 +100,6 @@ export const useChatSocket = (room: ChatGroup) => {
     send: (m: ChatMessage) => {
       socket.emit('message', { ...m, isSender: false });
     },
-    messages,
-    setMessages,
     lastReadChatTime,
   };
 };
