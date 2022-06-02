@@ -181,7 +181,7 @@ export class ChatService {
           }
         }
 
-        if (g.roomType === RoomType.PERSONAL) {
+        if (g.roomType === RoomType.PERSONAL && g.members.length === 2) {
           const chatPartner = g.members.filter((m) => m.id !== userID)[0];
           g.imageURL = chatPartner.avatarUrl;
           g.name = `${chatPartner.lastName} ${chatPartner.firstName}`;
@@ -266,7 +266,7 @@ export class ChatService {
       room.unreadCount = await this.getUnreadChatMessage(userID, query);
     }
 
-    if (room.roomType === RoomType.PERSONAL) {
+    if (room.roomType === RoomType.PERSONAL && room.members.length === 2) {
       const chatPartner = room.members.filter((m) => m.id !== userID)[0];
       room.imageURL = chatPartner.avatarUrl;
       room.name = `${chatPartner.lastName} ${chatPartner.firstName}`;
