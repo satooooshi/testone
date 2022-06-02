@@ -77,7 +77,7 @@ export interface GetRoomsQuery {
 
 export interface GetRoomsResult {
   rooms: ChatGroup[];
-  pageCount: number;
+  // pageCount: number;
 }
 
 @Controller('chat')
@@ -174,7 +174,7 @@ export class ChatController {
   async getChatGroupByPage(
     @Req() req: RequestWithUser,
     @Query() query: GetMessagesQuery,
-  ): Promise<ChatGroup[]> {
+  ): Promise<GetRoomsResult> {
     return await this.chatService.getRoomsByPage(req.user.id, query);
   }
 
