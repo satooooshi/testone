@@ -207,22 +207,13 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
     useState<MentionData[]>(userDataForMention);
   const [mentionOpened, setMentionOpened] = useState(false);
   const [mentionedUserData, setMentionedUserData] = useState<MentionData[]>([]);
-  const { data: fetchedPastMessages } = useAPIGetMessages(
-    {
-      group: room.id,
-      after,
-      before,
-      include,
-      limit: '20',
-    },
-    {
-      refetchInterval: 3000,
-      onSuccess: () => {
-        console.log('asdjfoaisjdfoiadsfjoidjfas');
-        refetchLastReadChatTime();
-      },
-    },
-  );
+  const { data: fetchedPastMessages } = useAPIGetMessages({
+    group: room.id,
+    after,
+    before,
+    include,
+    limit: '20',
+  });
 
   const { refetch: refetchLatest } = useAPIGetMessages(
     {
@@ -230,7 +221,9 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
     },
     {
       enabled: false,
+      refetchInterval: 3000,
       onSuccess: (latestData) => {
+        refetchLastReadChatTime();
         if (latestData?.length) {
           const msgToAppend: ChatMessage[] = [];
           for (const latest of latestData) {
