@@ -91,11 +91,16 @@ export class ChatService {
     query: GetChaRoomsByPageQuery,
   ): Promise<GetRoomsResult> {
     const { page, limit = '20', updatedAtLatestRoom } = query;
+
     let offset = 0;
     if (page) {
       offset = (Number(page) - 1) * Number(limit);
     }
     const limitNumber = Number(limit);
+
+    if (userID === 599) {
+      console.log('limit number ========================================', limitNumber, 'limit number result ================',limitNumber >= 0 ? limitNumber : 20)
+    }
 
     const [urlUnparsedRooms, count] = await this.chatGroupRepository
       .createQueryBuilder('chat_groups')
@@ -133,6 +138,10 @@ export class ChatService {
       .take(limitNumber >= 0 ? limitNumber : 20)
       .orderBy('chat_groups.updatedAt', 'DESC')
       .getManyAndCount();
+
+      if (userID === 599) {
+        console.log('call =================================================');
+      }
 
     let rooms = await Promise.all(
       urlUnparsedRooms.map(async (g) => {
