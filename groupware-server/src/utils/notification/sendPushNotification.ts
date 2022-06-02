@@ -57,6 +57,7 @@ const sendPushNotifToSpecificDevices = async (
     contentAvailable: true,
     priority: 'high',
     silent: data?.custom?.silent === 'silent' ? true : false,
+    // badge: data.custom.type === 'badge' ? 1 : 0,
     sound: data.title ? 'local.wav' : undefined,
     /* The topic of the notification. When using token-based authentication, specify the bundle ID of the app.
      * When using certificate-based authentication, the topic is usually your app's bundle ID.

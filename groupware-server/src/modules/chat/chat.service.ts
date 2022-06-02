@@ -95,6 +95,7 @@ export class ChatService {
     if (page) {
       offset = (Number(page) - 1) * Number(limit);
     }
+    const limitNumber = Number(limit);
 
     const [urlUnparsedRooms, count] = await this.chatGroupRepository
       .createQueryBuilder('chat_groups')
@@ -129,7 +130,7 @@ export class ChatService {
         },
       )
       .skip(offset)
-      .take(Number(limit))
+      .take(limitNumber >= 0 ? limitNumber : 20)
       .orderBy('chat_groups.updatedAt', 'DESC')
       .getManyAndCount();
 
@@ -269,7 +270,14 @@ export class ChatService {
     userID: number,
     query: GetMessagesQuery,
   ): Promise<ChatMessage[]> {
-    const { after, before, include = false, limit, dateRefetchLatest } = query;
+    const {
+      after,
+      before,
+      include = false,
+      limit = '20',
+      dateRefetchLatest,
+    } = query;
+    const limitNumber = Number(limit);
 
     const existMessages = await this.chatMessageRepository
       .createQueryBuilder('chat_messages')
@@ -308,7 +316,7 @@ export class ChatService {
           dateRefetchLatest: new Date(dateRefetchLatest),
         },
       )
-      .take(Number(limit))
+      .take(limitNumber >= 0 ? limitNumber : 20)
       .orderBy('chat_messages.createdAt', after ? 'ASC' : 'DESC')
       .withDeleted()
       .getMany();
