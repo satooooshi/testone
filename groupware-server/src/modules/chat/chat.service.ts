@@ -277,6 +277,7 @@ export class ChatService {
       limit = '20',
       dateRefetchLatest,
     } = query;
+    const limitNumber = Number(limit);
 
     const existMessages = await this.chatMessageRepository
       .createQueryBuilder('chat_messages')
@@ -315,7 +316,7 @@ export class ChatService {
           dateRefetchLatest: new Date(dateRefetchLatest),
         },
       )
-      .take(Number(limit))
+      .take(limitNumber >= 0 ? limitNumber : 20)
       .orderBy('chat_messages.createdAt', after ? 'ASC' : 'DESC')
       .withDeleted()
       .getMany();
