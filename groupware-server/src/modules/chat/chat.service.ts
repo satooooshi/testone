@@ -99,7 +99,12 @@ export class ChatService {
     const limitNumber = Number(limit);
 
     if (userID === 599) {
-      console.log('limitNumber ', limitNumber, 'limitNumberResult',limitNumber >= 0 ? limitNumber : 20)
+      console.log(
+        'limit number ',
+        limitNumber,
+        'limit result',
+        limitNumber >= 0 ? limitNumber : 20,
+      );
     }
 
     const [urlUnparsedRooms, count] = await this.chatGroupRepository
@@ -139,9 +144,9 @@ export class ChatService {
       .orderBy('chat_groups.updatedAt', 'DESC')
       .getManyAndCount();
 
-      if (userID === 599) {
-        console.log('adminCall');
-      }
+    if (userID === 599) {
+      console.log('admin call after query builder', urlUnparsedRooms.length);
+    }
 
     let rooms = await Promise.all(
       urlUnparsedRooms.map(async (g) => {
@@ -181,8 +186,11 @@ export class ChatService {
       'updatedAt',
       ['desc', 'desc'],
     ]).reverse();
-    const pageCount = Math.floor(count / Number(limit)) + 1;
 
+    const pageCount = Math.floor(count / Number(limit)) + 1;
+    if (userID === 599) {
+      console.log('admin call before return rooms', rooms.length);
+    }
     return { rooms, pageCount };
   }
 
