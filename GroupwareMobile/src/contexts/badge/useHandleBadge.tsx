@@ -90,10 +90,6 @@ export const BadgeProvider: React.FC = ({children}) => {
       }
       refetchAllRooms();
     }
-    return () => {
-      const jsonMessages = JSON.stringify(chatGroups);
-      storage.set(`chatRoomList${user?.id}`, jsonMessages);
-    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [networkConnection, user]);
 
