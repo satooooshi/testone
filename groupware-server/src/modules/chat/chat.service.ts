@@ -98,15 +98,6 @@ export class ChatService {
     }
     const limitNumber = Number(limit);
 
-    if (userID === 599) {
-      console.log(
-        'limit number ',
-        limitNumber,
-        'limit result',
-        limitNumber >= 0 ? limitNumber : 20,
-      );
-    }
-
     const [urlUnparsedRooms, count] = await this.chatGroupRepository
       .createQueryBuilder('chat_groups')
       .leftJoinAndSelect('chat_groups.members', 'members')
@@ -144,21 +135,8 @@ export class ChatService {
       .orderBy('chat_groups.updatedAt', 'DESC')
       .getManyAndCount();
 
-    if (userID === 599) {
-      console.log('admin call after query builder', urlUnparsedRooms.length);
-    }
-
     let rooms = await Promise.all(
       urlUnparsedRooms.map(async (g, index) => {
-        if (userID === 599) {
-          console.log(
-            'admin call in room map top',
-            'index',
-            index,
-            'roomID',
-            g.id,
-          );
-        }
         let unreadCount = 0;
         const isPinned = !!g?.pinnedUsers?.length;
         const hasBeenRead = g?.lastReadChatTime?.[0]?.readTime
@@ -172,22 +150,12 @@ export class ChatService {
                 ? g.lastReadChatTime?.[0].readTime
                 : g.createdAt,
           };
-          if (userID === 599 && index === 10) {
-            console.log('admin call in if hasBeenRead', 'roomID', g.id);
-          }
           unreadCount = await this.getUnreadChatMessage(userID, query);
-          if (userID === 599 && index === 10) {
-            console.log('admin call after set unreadCount', 'roomID', g.id);
-          }
         }
-
         if (g.roomType === RoomType.PERSONAL && g.members.length === 2) {
           const chatPartner = g.members.filter((m) => m.id !== userID)[0];
           g.imageURL = chatPartner.avatarUrl;
           g.name = `${chatPartner.lastName} ${chatPartner.firstName}`;
-          if (userID === 599 && index === 10) {
-            console.log('admin call in if roomType Personal', 'roomID', g.id);
-          }
         }
 
         return {
@@ -200,25 +168,14 @@ export class ChatService {
       }),
     );
 
-    if (userID === 599) {
-      console.log('admin call before orderBy rooms length', rooms.length);
-    }
-
     rooms = orderBy(rooms, [
       'isPinned',
       'updatedAt',
       ['desc', 'desc'],
     ]).reverse();
 
-    if (userID === 599) {
-      console.log('admin call before page count rooms length', rooms.length);
-    }
-
     const pageCount =
       Math.floor(count / limitNumber >= 0 ? limitNumber : 20) + 1;
-    if (userID === 599) {
-      console.log('admin call before return rooms', rooms.length);
-    }
     return { rooms, pageCount };
   }
 
