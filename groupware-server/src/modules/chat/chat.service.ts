@@ -90,7 +90,7 @@ export class ChatService {
     userID: number,
     query: GetChaRoomsByPageQuery,
   ): Promise<GetRoomsResult> {
-    const { page, limit = 'a', updatedAtLatestRoom } = query;
+    const { page, limit = '20', updatedAtLatestRoom } = query;
     let offset = 0;
     if (page) {
       offset = (Number(page) - 1) * Number(limit);
