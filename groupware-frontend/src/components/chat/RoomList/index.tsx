@@ -17,6 +17,7 @@ import { AiOutlineSearch } from 'react-icons/ai';
 import { nameOfEmptyNameGroup } from 'src/utils/chat/nameOfEmptyNameGroup';
 import { useHandleBadge } from 'src/contexts/badge/useHandleBadge';
 import router from 'next/router';
+import { useAuthenticate } from 'src/contexts/useAuthenticate';
 
 type RoomListProps = {
   currentId?: string;
@@ -27,6 +28,7 @@ const RoomList: React.FC<RoomListProps> = ({ currentId, onClickRoom }) => {
   const { clearRefetch } = useRoomRefetch();
   const { setChatGroupsState, chatGroups, updateUnreadCount } =
     useHandleBadge();
+  const { currentChatRoomId } = useAuthenticate();
   const [chatRooms, setChatRooms] = useState<ChatGroup[]>([]);
   const [searchedRooms, setSearchedRooms] = useState<ChatGroup[]>([]);
 
@@ -88,7 +90,7 @@ const RoomList: React.FC<RoomListProps> = ({ currentId, onClickRoom }) => {
         if (latestRooms.length) {
           const latestPinnedRooms: ChatGroup[] = [];
           for (const latestRoom of latestRooms) {
-            if (router.pathname !== `/chat/${latestRoom.id}`) {
+            if (currentChatRoomId !== latestRoom.id) {
               const olderRoom = chatGroups.filter(
                 (r) => r.id === latestRoom.id,
               )[0];

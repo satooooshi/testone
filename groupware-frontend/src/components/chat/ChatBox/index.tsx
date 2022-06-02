@@ -218,7 +218,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
   const { refetch: refetchLatest } = useAPIGetMessages(
     {
       group: room.id,
-      limit: '2',
+      limit: '10',
     },
     {
       refetchInterval: 5000,
