@@ -197,11 +197,20 @@ export class ChatService {
         };
       }),
     );
+
+    if (userID === 599) {
+      console.log('admin call before orderBy rooms length', rooms.length);
+    }
+
     rooms = orderBy(rooms, [
       'isPinned',
       'updatedAt',
       ['desc', 'desc'],
     ]).reverse();
+
+    if (userID === 599) {
+      console.log('admin call before page count rooms length', rooms.length);
+    }
 
     const pageCount =
       Math.floor(count / limitNumber >= 0 ? limitNumber : 20) + 1;
