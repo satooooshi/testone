@@ -83,10 +83,18 @@ const EventCard: React.FC<EventCardProps> = ({
           mr="16px"
           minW="40%"
           maxW="40%"
+          minH="100%"
+          maxH="100%"
           alignSelf="flex-start"
           css={{ aspectRatio: '1' }}>
           {eventSchedule.imageURL ? (
-            <img src={eventSchedule.imageURL} alt="イベント画像" />
+            <img
+              src={eventSchedule.imageURL}
+              alt="イベント画像"
+              // width="50px"
+              // height="100%"
+              // style={{ height: '100px', width: '100%' }}
+            />
           ) : (
             imageSource
           )}
@@ -104,33 +112,23 @@ const EventCard: React.FC<EventCardProps> = ({
               verticalAlign="baseline"
               whiteSpace="nowrap"
               overflow="hidden"
-              color={darkFontColor}
               isTruncated={true}>
               {eventSchedule.title}
             </Text>
-            <Text
-              fontSize={14}
-              color={darkFontColor}
-              noOfLines={isSmallerThan350 ? 2 : 3}>
+            <Text fontSize={14} noOfLines={isSmallerThan350 ? 2 : 3}>
               {eventSchedule.description}
             </Text>
           </Box>
           <Box display="flex" flexDir="column" justifyContent="space-between">
             {eventSchedule.type !== EventType.SUBMISSION_ETC && (
-              <Text
-                fontSize={isSmallerThan768 ? 14 : 16}
-                fontWeight="bold"
-                color={darkFontColor}>
+              <Text fontSize={isSmallerThan768 ? 14 : 16}>
                 {dateTimeFormatterFromJSDDate({
                   dateTime: new Date(eventSchedule.startAt),
                   format: '開始: yyyy/LL/dd HH:mm ~',
                 })}
               </Text>
             )}
-            <Text
-              fontSize={isSmallerThan768 ? 14 : 16}
-              fontWeight="bold"
-              color={darkFontColor}>
+            <Text fontSize={isSmallerThan768 ? 14 : 16}>
               {`
                   ${
                     eventSchedule.type !== EventType.SUBMISSION_ETC
