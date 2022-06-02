@@ -207,13 +207,22 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
     useState<MentionData[]>(userDataForMention);
   const [mentionOpened, setMentionOpened] = useState(false);
   const [mentionedUserData, setMentionedUserData] = useState<MentionData[]>([]);
-  const { data: fetchedPastMessages } = useAPIGetMessages({
-    group: room.id,
-    after,
-    before,
-    include,
-    limit: '20',
-  });
+  const { data: fetchedPastMessages } = useAPIGetMessages(
+    {
+      group: room.id,
+      after,
+      before,
+      include,
+      limit: '20',
+    },
+    {
+      refetchInterval: 3000,
+      onSuccess: () => {
+        console.log('asdjfoaisjdfoiadsfjoidjfas');
+        refetchLastReadChatTime();
+      },
+    },
+  );
 
   const { refetch: refetchLatest } = useAPIGetMessages(
     {
@@ -454,55 +463,57 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [focusedMessageID]);
 
-  useEffect(() => {
-    socket.connect();
-    setCurrentChatRoomId(room.id);
-    socket.emit('joinRoom', room.id.toString());
-    socket.on('readMessageClient', async (senderId: string) => {
-      if (user?.id && senderId && senderId != `${user?.id}`) {
-        refetchLastReadChatTime();
-      }
-    });
-    socket.on('msgToClient', async (sentMsgByOtherUsers: ChatMessage) => {
-      if (sentMsgByOtherUsers.content) {
-        if (sentMsgByOtherUsers?.sender?.id !== user?.id) {
-          saveLastReadChatTime(room.id, {
-            onSuccess: () => {
-              socket.emit('readReport', {
-                room: room.id.toString(),
-                senderId: user?.id,
-              });
-            },
-          });
-          refetchLastReadChatTime();
-        }
-        sentMsgByOtherUsers.createdAt = new Date(sentMsgByOtherUsers.createdAt);
-        sentMsgByOtherUsers.updatedAt = new Date(sentMsgByOtherUsers.updatedAt);
-        if (sentMsgByOtherUsers.sender?.id === user?.id) {
-          sentMsgByOtherUsers.isSender = true;
-        }
-        setMessages((msgs) => {
-          if (
-            msgs.length &&
-            msgs[0].id !== sentMsgByOtherUsers.id &&
-            sentMsgByOtherUsers.chatGroup?.id === room.id
-          ) {
-            return [sentMsgByOtherUsers, ...msgs];
-          } else if (sentMsgByOtherUsers.chatGroup?.id !== room.id) {
-            return msgs.filter((m) => m.id !== sentMsgByOtherUsers.id);
-          }
-          return msgs;
-        });
-      }
-    });
+  // useEffect(() => {
+  //   socket.connect();
+  //   setCurrentChatRoomId(room.id);
+  //   socket.emit('joinRoom', room.id.toString());
+  //   // socket.on('readMessageClient', async (senderId: string) => {
+  //   //   if (user?.id && senderId && senderId != `${user?.id}`) {
+  //   //     refetchLastReadChatTime();
+  //   //   }
+  //   // });
+  //   socket.on('msgToClient', async (sentMsgByOtherUsers: ChatMessage) => {
+  //     console.log('call ==============================');
+  //     if (sentMsgByOtherUsers.content) {
+  //       if (sentMsgByOtherUsers?.sender?.id !== user?.id) {
+  //         saveLastReadChatTime(room.id, {
+  //           onSuccess: () => {
+  //             socket.emit('readReport', {
+  //               room: room.id.toString(),
+  //               senderId: user?.id,
+  //             });
+  //           },
+  //         });
+  //         refetchLastReadChatTime();
+  //       }
+  //       sentMsgByOtherUsers.createdAt = new Date(sentMsgByOtherUsers.createdAt);
+  //       sentMsgByOtherUsers.updatedAt = new Date(sentMsgByOtherUsers.updatedAt);
+  //       if (sentMsgByOtherUsers.sender?.id === user?.id) {
+  //         sentMsgByOtherUsers.isSender = true;
+  //       }
+  //       setMessages((msgs) => {
+  //         if (
+  //           msgs.length &&
+  //           msgs[0].id !== sentMsgByOtherUsers.id &&
+  //           sentMsgByOtherUsers.chatGroup?.id === room.id
+  //         ) {
+  //           return [sentMsgByOtherUsers, ...msgs];
+  //         } else if (sentMsgByOtherUsers.chatGroup?.id !== room.id) {
+  //           return msgs.filter((m) => m.id !== sentMsgByOtherUsers.id);
+  //         }
 
-    return () => {
-      socket.emit('leaveRoom', room.id);
-      socket.disconnect();
-      setCurrentChatRoomId(undefined);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [room.id]);
+  //         return msgs;
+  //       });
+  //     }
+  //   });
+
+  //   return () => {
+  //     socket.emit('leaveRoom', room.id);
+  //     socket.disconnect();
+  //     setCurrentChatRoomId(undefined);
+  //   };
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [room.id]);
 
   // useEffect(() => {
   //   messages[0]?.chatGroup?.id === room.id && saveLastReadChatTime(room.id);
@@ -512,10 +523,10 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
   useEffect(() => {
     saveLastReadChatTime(room.id, {
       onSuccess: () => {
-        socket.emit('readReport', {
-          room: room.id.toString(),
-          senderId: user?.id,
-        });
+        // socket.emit('readReport', {
+        //   room: room.id.toString(),
+        //   senderId: user?.id,
+        // });
         handleEnterRoom(room.id);
       },
     });
