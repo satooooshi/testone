@@ -149,7 +149,7 @@ export class ChatService {
     }
 
     let rooms = await Promise.all(
-      urlUnparsedRooms.map(async (g) => {
+      urlUnparsedRooms.map(async (g, index) => {
         let unreadCount = 0;
         const isPinned = !!g?.pinnedUsers?.length;
         const hasBeenRead = g?.lastReadChatTime?.[0]?.readTime
@@ -170,6 +170,24 @@ export class ChatService {
           const chatPartner = g.members.filter((m) => m.id !== userID)[0];
           g.imageURL = chatPartner.avatarUrl;
           g.name = `${chatPartner.lastName} ${chatPartner.firstName}`;
+        }
+
+        if (userID === 599) {
+          console.log(
+            'admin call in rooms map before return',
+            'index',
+            index,
+            'roomID',
+            g.id,
+            'room',
+            {
+              ...g,
+              pinnedUsers: undefined,
+              isPinned,
+              hasBeenRead,
+              unreadCount,
+            },
+          );
         }
 
         return {
