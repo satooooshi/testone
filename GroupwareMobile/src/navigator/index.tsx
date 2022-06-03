@@ -70,7 +70,7 @@ const Navigator = () => {
   const [onCallUid, setOnCallUid] = useState('');
   const [refusedInvitation, setRefusedInvitation] = useState(false);
   const [alertCountOnEndCall, setAlertCountOnEndCall] = useState(0);
-  const AGORA_APP_ID = Config.AGORA_APP_ID_TEST;
+  const AGORA_APP_ID = Config.AGORA_APP_ID;
   const rtcProps: RtcPropsInterface = {
     appId: AGORA_APP_ID,
     channel: channelName,
@@ -308,7 +308,7 @@ const Navigator = () => {
         okButton: 'ok',
         additionalPermissions: [],
         foregroundService: {
-          channelId: 'com.groupwaremobileTest',
+          channelId: 'com.groupwaremobile',
           channelName: 'Foreground service for my app',
           notificationTitle: 'バックグラウンドで実行中です',
         },
