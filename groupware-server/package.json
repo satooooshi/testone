@@ -46,7 +46,7 @@
     "@nestjs/platform-express": "^7.6.15",
     "@nestjs/platform-socket.io": "^8.2.4",
     "@nestjs/schedule": "^1.0.2",
-    "@nestjs/typeorm": "^8.0.1",
+    "@nestjs/typeorm": "8.0.1",
     "@nestjs/websockets": "^8.2.4",
     "@types/cron": "^1.7.3",
     "@types/passport-local": "^1.0.34",

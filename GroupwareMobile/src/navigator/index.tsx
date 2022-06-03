@@ -39,6 +39,7 @@ export const rtmEngine = new RtmClient();
 //rtcはメソッド使用直前にcreateInstanceしないとエラーがでることがある
 let rtcEngine: RtcEngine;
 let callKeepUUID = '';
+let isCallScreen = false;
 
 const Navigator = () => {
   const {user, currentChatRoomId} = useAuthenticate();
@@ -69,7 +70,7 @@ const Navigator = () => {
   const [onCallUid, setOnCallUid] = useState('');
   const [refusedInvitation, setRefusedInvitation] = useState(false);
   const [alertCountOnEndCall, setAlertCountOnEndCall] = useState(0);
-  const AGORA_APP_ID = Config.AGORA_APP_ID;
+  const AGORA_APP_ID = Config.AGORA_APP_ID_TEST;
   const rtcProps: RtcPropsInterface = {
     appId: AGORA_APP_ID,
     channel: channelName,
@@ -82,6 +83,7 @@ const Navigator = () => {
 
   const soundOnEnd = async () => {
     try {
+      SoundPlayer.setSpeaker(false);
       SoundPlayer.playSoundFile('end_call', 'mp3');
     } catch (e) {
       console.log('sound on end call failed:', e);
@@ -137,6 +139,7 @@ const Navigator = () => {
       setIsJoining(false);
       if (!isCallAccepted && localInvitation) {
         // local invitation(送信した通話招待)があればcancelする
+        stopRing();
         await rtmEngine?.cancelLocalInvitationV2(localInvitation);
         if (callTimeout) {
           sendCallHistory('応答なし');
@@ -192,6 +195,8 @@ const Navigator = () => {
     await createRTCInstance();
     await rtcEngine?.disableVideo();
     rtcEngine?.removeAllListeners();
+    await rtcEngine?.adjustPlaybackSignalVolume(100);
+    await rtcEngine?.adjustRecordingSignalVolume(100);
 
     rtcEngine?.addListener('UserJoined', (uid, elapsed) => {
       console.log('UserJoined', uid, elapsed);
@@ -303,7 +308,7 @@ const Navigator = () => {
         okButton: 'ok',
         additionalPermissions: [],
         foregroundService: {
-          channelId: 'com.groupwaremobile',
+          channelId: 'com.groupwaremobileTest',
           channelName: 'Foreground service for my app',
           notificationTitle: 'バックグラウンドで実行中です',
         },
@@ -336,7 +341,6 @@ const Navigator = () => {
     }
     const callerId = callingData.callerId;
     setOnCallUid(callerId);
-    // RNCallKeep.backToForeground();
     RNCallKeep.displayIncomingCall(
       callingData?.channelId as string,
       userNameFactory(user),
@@ -345,9 +349,6 @@ const Navigator = () => {
       false,
     );
   };
-  // const navigateToCallWindow = useCallback(() => {
-  //   navigationRef.current?.navigate('Call');
-  // }, [navigationRef]);
 
   const joinChannel = useCallback(
     async (realChannelName: string) => {
@@ -368,27 +369,16 @@ const Navigator = () => {
         );
         await rtcEngine?.disableVideo();
         setChannelName(realChannelName);
-        // remoteInvitation.current = undefined;
-        // navigateToCallWindow();
         setIsJoining(true);
       }
     },
     [rtcInit],
   );
-  // console.log(Platform.OS, 'callerId', onCallUid);
-  // const [startCall, setStartCall] = useState(false);
 
   const answerCall = async () => {
-    // アプリをバックグラウンドからフォアグラウンドに
-    // if (Platform.OS === 'ios' && AppState.currentState === 'background') {
-    //   await new Promise(r => setTimeout(r, 1000));
-    // }
     const invitation = remoteInvitation.current;
     const realChannelName = remoteInvitation.current?.channelId as string;
-    // RNCallKeep.answerIncomingCall(realChannelName);
     RNCallKeep.backToForeground();
-    // RNCallKeep.setMutedCall(realChannelName, true);
-    // await RNCallKeep.setAudioRoute(realChannelName, routeName);
 
     if (invitation && realChannelName) {
       // 招待を承認
@@ -496,7 +486,10 @@ const Navigator = () => {
 
   useEffect(() => {
     const naviateByNotif = (notification: any) => {
-      if (navigationRef.current?.getCurrentRoute?.name !== 'Login') {
+      if (
+        navigationRef.current?.getCurrentRoute()?.name !== 'Login' &&
+        user?.id
+      ) {
         if (notification.data?.screen === 'event' && notification.data?.id) {
           navigationRef.current?.navigate('EventStack', {
             screen: 'EventDetail',
@@ -586,12 +579,14 @@ const Navigator = () => {
   }, [navigationRef, currentChatRoomId]);
 
   useEffect(() => {
-    if (isJoining) {
+    if (isJoining && !isCallScreen) {
       navigationRef.current?.navigate('Call');
-    } else if (user?.id) {
+      isCallScreen = true;
+    } else if (user?.id && isCallScreen && !isJoining) {
       navigationRef.current?.navigate('Main');
+      isCallScreen = false;
     }
-  }, [isJoining, navigationRef, user?.id]);
+  }, [isJoining, navigationRef, user?.id, channelName, isCalling]);
 
   useEffect(
     () => {
@@ -599,9 +594,6 @@ const Navigator = () => {
         const joining = async () => {
           const realChannelName = localInvitation?.channelId as string;
           await joinChannel(realChannelName);
-          // 応答なしだと自動で終了する(テスト)
-          // await new Promise(r => setTimeout(r, 20000));
-          // setCallTimeout(true);
         };
         joining();
       }
@@ -613,7 +605,6 @@ const Navigator = () => {
     () => {
       const cancelCallByTimeout = async () => {
         if (localInvitation && !isCallAccepted) {
-          // await rtmEngine?.cancelLocalInvitationV2(localInvitation);
           await endCall(true);
         }
       };

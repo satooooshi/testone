@@ -218,10 +218,14 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
   const { refetch: refetchLatest } = useAPIGetMessages(
     {
       group: room.id,
+      limit: '10',
     },
     {
-      enabled: false,
+      refetchInterval: 5000,
       onSuccess: (latestData) => {
+        console.log('-------', latestData.length);
+
+        refetchLastReadChatTime();
         if (latestData?.length) {
           const msgToAppend: ChatMessage[] = [];
           for (const latest of latestData) {
@@ -230,6 +234,16 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
             }
           }
           if (msgToAppend.length) {
+            console.log('9999999');
+            saveLastReadChatTime(room.id, {
+              onSuccess: () => {
+                socket.emit('readReport', {
+                  room: room.id.toString(),
+                  senderId: user?.id,
+                });
+                handleEnterRoom(room.id);
+              },
+            });
             setMessages((m) => [...msgToAppend, ...m]);
             needRefetch();
           }
@@ -424,12 +438,12 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
     }
   };
 
-  useEffect(() => {
-    setMessages([]);
-    setBefore(undefined);
-    setAfter(undefined);
-    refetchLatest();
-  }, [refetchLatest, room]);
+  // useEffect(() => {
+  //   setMessages([]);
+  //   setBefore(undefined);
+  //   setAfter(undefined);
+  //   refetchLatest();
+  // }, [refetchLatest, room]);
 
   useEffect(() => {
     if (fetchedPastMessages?.length) {
@@ -455,50 +469,52 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
   }, [focusedMessageID]);
 
   useEffect(() => {
-    socket.connect();
     setCurrentChatRoomId(room.id);
-    socket.emit('joinRoom', room.id.toString());
-    socket.on('readMessageClient', async (senderId: string) => {
-      if (user?.id && senderId && senderId != `${user?.id}`) {
-        refetchLastReadChatTime();
-      }
-    });
-    socket.on('msgToClient', async (sentMsgByOtherUsers: ChatMessage) => {
-      if (sentMsgByOtherUsers.content) {
-        if (sentMsgByOtherUsers?.sender?.id !== user?.id) {
-          saveLastReadChatTime(room.id, {
-            onSuccess: () => {
-              socket.emit('readReport', {
-                room: room.id.toString(),
-                senderId: user?.id,
-              });
-            },
-          });
-          refetchLastReadChatTime();
-        }
-        sentMsgByOtherUsers.createdAt = new Date(sentMsgByOtherUsers.createdAt);
-        sentMsgByOtherUsers.updatedAt = new Date(sentMsgByOtherUsers.updatedAt);
-        if (sentMsgByOtherUsers.sender?.id === user?.id) {
-          sentMsgByOtherUsers.isSender = true;
-        }
-        setMessages((msgs) => {
-          if (
-            msgs.length &&
-            msgs[0].id !== sentMsgByOtherUsers.id &&
-            sentMsgByOtherUsers.chatGroup?.id === room.id
-          ) {
-            return [sentMsgByOtherUsers, ...msgs];
-          } else if (sentMsgByOtherUsers.chatGroup?.id !== room.id) {
-            return msgs.filter((m) => m.id !== sentMsgByOtherUsers.id);
-          }
-          return msgs;
-        });
-      }
-    });
+    // socket.connect();
+    // socket.emit('joinRoom', room.id.toString());
+    // // socket.on('readMessageClient', async (senderId: string) => {
+    // //   if (user?.id && senderId && senderId != `${user?.id}`) {
+    // //     refetchLastReadChatTime();
+    // //   }
+    // // });
+    // socket.on('msgToClient', async (sentMsgByOtherUsers: ChatMessage) => {
+    //   console.log('call ==============================');
+    //   if (sentMsgByOtherUsers.content) {
+    //     if (sentMsgByOtherUsers?.sender?.id !== user?.id) {
+    //       saveLastReadChatTime(room.id, {
+    //         onSuccess: () => {
+    //           socket.emit('readReport', {
+    //             room: room.id.toString(),
+    //             senderId: user?.id,
+    //           });
+    //         },
+    //       });
+    //       refetchLastReadChatTime();
+    //     }
+    //     sentMsgByOtherUsers.createdAt = new Date(sentMsgByOtherUsers.createdAt);
+    //     sentMsgByOtherUsers.updatedAt = new Date(sentMsgByOtherUsers.updatedAt);
+    //     if (sentMsgByOtherUsers.sender?.id === user?.id) {
+    //       sentMsgByOtherUsers.isSender = true;
+    //     }
+    //     setMessages((msgs) => {
+    //       if (
+    //         msgs.length &&
+    //         msgs[0].id !== sentMsgByOtherUsers.id &&
+    //         sentMsgByOtherUsers.chatGroup?.id === room.id
+    //       ) {
+    //         return [sentMsgByOtherUsers, ...msgs];
+    //       } else if (sentMsgByOtherUsers.chatGroup?.id !== room.id) {
+    //         return msgs.filter((m) => m.id !== sentMsgByOtherUsers.id);
+    //       }
+
+    //       return msgs;
+    //     });
+    //   }
+    // });
 
     return () => {
-      socket.emit('leaveRoom', room.id);
-      socket.disconnect();
+      // socket.emit('leaveRoom', room.id);
+      // socket.disconnect();
       setCurrentChatRoomId(undefined);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -509,19 +525,19 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
   //   // eslint-disable-next-line react-hooks/exhaustive-deps
   // }, [messages, room.id]);
 
-  useEffect(() => {
-    saveLastReadChatTime(room.id, {
-      onSuccess: () => {
-        socket.emit('readReport', {
-          room: room.id.toString(),
-          senderId: user?.id,
-        });
-        handleEnterRoom(room.id);
-      },
-    });
-    return () => saveLastReadChatTime(room.id);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [room.id, saveLastReadChatTime]);
+  // useEffect(() => {
+  //   saveLastReadChatTime(room.id, {
+  //     onSuccess: () => {
+  //       socket.emit('readReport', {
+  //         room: room.id.toString(),
+  //         senderId: user?.id,
+  //       });
+  //       handleEnterRoom(room.id);
+  //     },
+  //   });
+  //   return () => saveLastReadChatTime(room.id);
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [room.id, saveLastReadChatTime]);
 
   const isLoading = loadingSend || loadingUplaod;
   const activeIndex = useMemo(() => {
