@@ -91,6 +91,7 @@ export class ChatService {
     query: GetChaRoomsByPageQuery,
   ): Promise<GetRoomsResult> {
     const { page, limit = '20', updatedAtLatestRoom } = query;
+
     let offset = 0;
     if (page) {
       offset = (Number(page) - 1) * Number(limit);
@@ -135,7 +136,7 @@ export class ChatService {
       .getManyAndCount();
 
     let rooms = await Promise.all(
-      urlUnparsedRooms.map(async (g) => {
+      urlUnparsedRooms.map(async (g, index) => {
         let unreadCount = 0;
         const isPinned = !!g?.pinnedUsers?.length;
         const hasBeenRead = g?.lastReadChatTime?.[0]?.readTime
@@ -151,8 +152,7 @@ export class ChatService {
           };
           unreadCount = await this.getUnreadChatMessage(userID, query);
         }
-
-        if (g.roomType === RoomType.PERSONAL) {
+        if (g.roomType === RoomType.PERSONAL && g.members.length === 2) {
           const chatPartner = g.members.filter((m) => m.id !== userID)[0];
           g.imageURL = chatPartner.avatarUrl;
           g.name = `${chatPartner.lastName} ${chatPartner.firstName}`;
@@ -167,6 +167,7 @@ export class ChatService {
         };
       }),
     );
+
     rooms = orderBy(rooms, [
       'isPinned',
       'updatedAt',
@@ -174,7 +175,8 @@ export class ChatService {
     ]).reverse();
     // const pageCount = Math.floor(count / Number(limit)) + 1;
 
-    return { rooms };
+    const pageCount = 1;
+    return { rooms, pageCount };
   }
 
   public async getOneRoom(userID: number, roomId: number): Promise<ChatGroup> {
@@ -221,7 +223,7 @@ export class ChatService {
       room.unreadCount = await this.getUnreadChatMessage(userID, query);
     }
 
-    if (room.roomType === RoomType.PERSONAL) {
+    if (room.roomType === RoomType.PERSONAL && room.members.length === 2) {
       const chatPartner = room.members.filter((m) => m.id !== userID)[0];
       room.imageURL = chatPartner.avatarUrl;
       room.name = `${chatPartner.lastName} ${chatPartner.firstName}`;
@@ -361,6 +363,7 @@ export class ChatService {
       .orderBy('chat_messages.createdAt', 'DESC')
       .withDeleted()
       .getCount();
+
     return unreadCount;
   }
 

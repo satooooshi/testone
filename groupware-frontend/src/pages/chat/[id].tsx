@@ -30,9 +30,9 @@ const ChatDetail = () => {
   const [membersModal, setMembersModal] = useState(false);
   const [isTalkRoom, setIsTalkRoom] = useState<boolean>(false);
   const [selectedMembers, setSelectedMembers] = useState<User[]>();
-  const socket = io(baseURL, {
-    transports: ['websocket'],
-  });
+  // const socket = io(baseURL, {
+  //   transports: ['websocket'],
+  // });
   const { editChatGroup } = useHandleBadge();
 
   const [

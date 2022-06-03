@@ -77,7 +77,7 @@ export interface GetRoomsQuery {
 
 export interface GetRoomsResult {
   rooms: ChatGroup[];
-  // pageCount: number;
+  pageCount: number;
 }
 
 @Controller('chat')
@@ -187,9 +187,9 @@ export class ChatController {
     const { user } = req;
 
     const room = await this.chatService.getOneRoom(req.user.id, Number(roomId));
-    if (!room.members.filter((m) => m.id === user.id).length) {
-      throw new BadRequestException('チャットルームを取得する権限がありません');
-    }
+    // if (!room.members.filter((m) => m.id === user.id).length) {
+    //   throw new BadRequestException('チャットルームを取得する権限がありません');
+    // }
     return room;
   }
 
@@ -264,6 +264,15 @@ export class ChatController {
       chatGroup,
       user,
     );
+    if (
+      savedGroup.roomType === RoomType.PERSONAL &&
+      savedGroup.members.length === 2
+    ) {
+      const chatPartner = savedGroup.members.filter((m) => m.id !== user.id)[0];
+      savedGroup.imageURL = chatPartner.avatarUrl;
+      savedGroup.name = `${chatPartner.lastName} ${chatPartner.firstName}`;
+    }
+
     return savedGroup;
   }
 
@@ -297,6 +306,15 @@ export class ChatController {
       },
     };
     await sendPushNotifToSpecificUsers(otherMembersId, silentNotification);
+
+    if (
+      savedGroup.roomType === RoomType.PERSONAL &&
+      savedGroup.members.length === 2
+    ) {
+      const chatPartner = savedGroup.members.filter((m) => m.id !== user.id)[0];
+      savedGroup.imageURL = chatPartner.avatarUrl;
+      savedGroup.name = `${chatPartner.lastName} ${chatPartner.firstName}`;
+    }
     return savedGroup;
   }
 

@@ -95,7 +95,7 @@ const SelectChatGroupModal: React.FC<SelectChatGroupModal> = ({
               chatGroup={g}
               key={g.id}
               onPressPinButton={() => {
-                alert('使用していなかったため、処理なし');
+                alert('使っていなかったので対応していません');
               }}
             />
           </a>

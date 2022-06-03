@@ -16,6 +16,8 @@ import { useAPISavePin } from '@/hooks/api/chat/useAPISavePin';
 import { AiOutlineSearch } from 'react-icons/ai';
 import { nameOfEmptyNameGroup } from 'src/utils/chat/nameOfEmptyNameGroup';
 import { useHandleBadge } from 'src/contexts/badge/useHandleBadge';
+import router from 'next/router';
+import { useAuthenticate } from 'src/contexts/useAuthenticate';
 
 type RoomListProps = {
   currentId?: string;
@@ -24,7 +26,9 @@ type RoomListProps = {
 
 const RoomList: React.FC<RoomListProps> = ({ currentId, onClickRoom }) => {
   const { clearRefetch } = useRoomRefetch();
-  const { setChatGroupsState, chatGroups } = useHandleBadge();
+  const { setChatGroupsState, chatGroups, updateUnreadCount } =
+    useHandleBadge();
+  const { currentChatRoomId } = useAuthenticate();
   const [chatRooms, setChatRooms] = useState<ChatGroup[]>([]);
   const [searchedRooms, setSearchedRooms] = useState<ChatGroup[]>([]);
 
@@ -55,6 +59,68 @@ const RoomList: React.FC<RoomListProps> = ({ currentId, onClickRoom }) => {
       );
     },
   });
+
+  const returnUpdatedAtLatest = (): Date => {
+    const updatedAtTopRoom = chatRooms[0]?.updatedAt;
+    if (chatRooms[0]?.isPinned) {
+      const updatedAtExceptPinnedTopRoom = chatRooms.filter(
+        (r) => !r.isPinned,
+      )[0]?.updatedAt;
+
+      return updatedAtTopRoom > updatedAtExceptPinnedTopRoom
+        ? updatedAtTopRoom
+        : updatedAtExceptPinnedTopRoom;
+    }
+    return updatedAtTopRoom;
+  };
+
+  const { refetch: refetchLatestRooms } = useAPIGetRoomsByPage(
+    {
+      limit: '20',
+      updatedAtLatestRoom: returnUpdatedAtLatest(),
+    },
+    {
+      refetchInterval: 10000,
+      onSuccess: (data) => {
+        const latestRooms = data.rooms;
+        console.log(
+          'success latest rooms refech ================================',
+          latestRooms.length,
+        );
+        if (latestRooms.length) {
+          const latestPinnedRooms: ChatGroup[] = [];
+          for (const latestRoom of latestRooms) {
+            if (currentChatRoomId !== latestRoom.id) {
+              const olderRoom = chatGroups.filter(
+                (r) => r.id === latestRoom.id,
+              )[0];
+              const incrementCount =
+                (latestRoom?.unreadCount || 0) - (olderRoom?.unreadCount || 0);
+              updateUnreadCount(incrementCount);
+            }
+            if (latestRoom.isPinned) {
+              latestPinnedRooms.unshift(latestRoom);
+            }
+          }
+          const ids = latestRooms.map((r) => r.id);
+          const existRooms = chatGroups.filter((r) => !ids.includes(r.id));
+          const existPinnedRooms = existRooms.filter((r) => r.isPinned);
+          const existExceptPinnedRooms = existRooms.filter((r) => !r.isPinned);
+
+          const latestRoomsExceptPinnedRooms = latestRooms.filter(
+            (r) => !r.isPinned,
+          );
+
+          setChatGroupsState([
+            ...latestPinnedRooms,
+            ...existPinnedRooms,
+            ...latestRoomsExceptPinnedRooms,
+            ...existExceptPinnedRooms,
+          ]);
+        }
+      },
+    },
+  );
 
   useEffect(() => {
     setChatRooms(chatGroups);
