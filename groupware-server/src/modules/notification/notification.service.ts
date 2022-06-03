@@ -26,7 +26,10 @@ export class NotificationService {
       where: { token: token },
     });
     if (existDevice) {
-      await this.deviceRepository.delete(existDevice);
+      console.log('deleteDevice called');
+      const result = await this.deviceRepository.delete(existDevice);
+      console.log('deleteDevice called', result);
+      return result;
     }
   }
 
