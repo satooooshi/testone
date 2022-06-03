@@ -75,6 +75,6 @@ import { ScheduleModule } from '@nestjs/schedule';
     TopNewsModule,
   ],
   controllers: [],
-  providers: [ChatGateway],
+  providers: [],
 })
 export class AppModule {}
