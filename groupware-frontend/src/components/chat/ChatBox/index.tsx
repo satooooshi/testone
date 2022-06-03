@@ -142,7 +142,6 @@ type ChatBoxProps = {
 };
 
 const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
-  const { needRefetch } = useRoomRefetch();
   const { user, setCurrentChatRoomId } = useAuthenticate();
   const [visibleAlbumModal, setVisibleAlbumModal] = useState(false);
   const [visibleNoteModal, setVisibleNoteModal] = useState(false);
@@ -187,7 +186,6 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
     useAPIGetLastReadChatTime(room.id, {
       onSuccess: () => {
         // refetchRoom();
-        needRefetch();
       },
     });
   const userDataForMention: MentionData[] = useMemo(() => {
@@ -237,15 +235,13 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
             console.log('9999999');
             saveLastReadChatTime(room.id, {
               onSuccess: () => {
-                socket.emit('readReport', {
-                  room: room.id.toString(),
-                  senderId: user?.id,
-                });
-                handleEnterRoom(room.id);
+                // socket.emit('readReport', {
+                //   room: room.id.toString(),
+                //   senderId: user?.id,
+                // });
               },
             });
             setMessages((m) => [...msgToAppend, ...m]);
-            needRefetch();
           }
         }
       },
@@ -273,7 +269,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
     useAPISendChatMessage({
       onSuccess: (data) => {
         setMessages([data, ...messages]);
-        socket.emit('message', { ...data, isSender: false });
+        // socket.emit('message', { ...data, isSender: false });
         setNewChatMessage((m) => ({
           ...m,
           content: '',
@@ -470,6 +466,8 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
 
   useEffect(() => {
     setCurrentChatRoomId(room.id);
+    saveLastReadChatTime(room.id);
+    handleEnterRoom(room.id);
     // socket.connect();
     // socket.emit('joinRoom', room.id.toString());
     // // socket.on('readMessageClient', async (senderId: string) => {
