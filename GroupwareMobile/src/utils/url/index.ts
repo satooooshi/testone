@@ -24,10 +24,10 @@ export const jwtFormDataHeader = {
 
 export const baseURL =
   __DEV__ && Config.API_URL
-    ? 'https://groupware-mobile--dev-test-sgzkfl3uyq-an.a.run.app'
+    ? Config.API_URL
     : !__DEV__
-    ? 'https://groupware-mobile--dev-test-sgzkfl3uyq-an.a.run.app'
-    : 'https://groupware-mobile--dev-test-sgzkfl3uyq-an.a.run.app';
+    ? 'https://groupware-development-sgzkfl3uyq-an.a.run.app'
+    : 'http://localhost:9000';
 
 export const markdownEditorURL =
   Config.MARKDOWN_EDITOR_URL || 'http://localhost:8080';
