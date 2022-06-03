@@ -132,9 +132,9 @@ export const Entry: React.FC<EntryComponentProps> = ({
   );
 };
 
-const socket = io(baseURL, {
-  transports: ['websocket'],
-});
+// const socket = io(baseURL, {
+//   transports: ['websocket'],
+// });
 
 type ChatBoxProps = {
   room: ChatGroup;
