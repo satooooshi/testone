@@ -90,9 +90,9 @@ import Clipboard from '@react-native-community/clipboard';
 import {dateTimeFormatterFromJSDDate} from '../../utils/dateTimeFormatterFromJSDate';
 import {useAPIGetUpdatedMessages} from '../../hooks/api/chat/useAPIGetUpdatedMessages';
 
-const socket = io(baseURL, {
-  transports: ['websocket'],
-});
+// const socket = io(baseURL, {
+//   transports: ['websocket'],
+// });
 
 const TopTab = createMaterialTopTabNavigator();
 
@@ -255,18 +255,16 @@ const Chat: React.FC = () => {
 
   const {mutate: refetchUpdatedMessages} = useAPIGetUpdatedMessages({
     onSuccess: latestData => {
+      refetchLastReadChatTime();
       if (latestData?.length) {
-        // const msgToAppend: ChatMessage[] = [];
-        // const imagesToApped: ImageSource[] = [];
-        // for (const latest of latestData) {
-        //   if (!messages?.length || isRecent(latest, messages?.[0])) {
-        //     msgToAppend.push(latest);
-        //     if (latest.type === ChatMessageType.IMAGE) {
-        //       imagesToApped.unshift({uri: latest.content});
-        //     }
-        //   }
-        // }
-        setMessages(m => refreshMessage([...latestData, ...m]));
+        saveLastReadChatTime(room.id);
+        setMessages(m => {
+          const updatedMessages = refreshMessage([...latestData, ...m]);
+          // if (updatedMessages[0].id !== m[0].id) {
+          //   refetchLastReadChatTime();
+          // }
+          return updatedMessages;
+        });
         // setImagesForViewing(i => [...i, ...imagesToApped]);
       }
       console.log('latest success ====================', latestData.length);
@@ -275,13 +273,14 @@ const Chat: React.FC = () => {
         format: 'yyyy-LL-dd HH:mm:ss',
       });
       storage.set(`dateRefetchLatestInRoom${room.id}`, now);
+      setRefetchTimes(t => t + 1);
     },
   });
 
   const {mutate: sendChatMessage, isLoading: loadingSendMessage} =
     useAPISendChatMessage({
       onSuccess: sentMsg => {
-        socket.emit('message', {...sentMsg, isSender: false});
+        // socket.emit('message', {...sentMsg, isSender: false});
         setMessages(refreshMessage([sentMsg, ...messages]));
         if (sentMsg?.chatGroup?.id) {
           refetchRoomCard({id: sentMsg.chatGroup.id, type: ''});
@@ -658,74 +657,74 @@ const Chat: React.FC = () => {
 
   useEffect(() => {
     let isMounted = true;
-    socket.connect();
-    socket.emit('joinRoom', room.id.toString());
-    socket.on('readMessageClient', async (senderId: string) => {
-      if (myself?.id && senderId && senderId !== `${myself?.id}`) {
-        console.log('readMessageClient called', senderId, myself.id, room.id);
-        refetchLastReadChatTime();
-      }
-    });
-    socket.on('msgToClient', async (sentMsgByOtherUsers: ChatMessage) => {
-      if (sentMsgByOtherUsers.content) {
-        if (
-          sentMsgByOtherUsers?.sender?.id !== myself?.id &&
-          AppState.currentState === 'active'
-        ) {
-          saveLastReadChatTime(room.id, {
-            onSuccess: () => {
-              socket.emit('readReport', {
-                room: room.id.toString(),
-                senderId: myself?.id,
-              });
-              handleEnterRoom(room.id);
-            },
-          });
-          refetchLastReadChatTime();
-        }
-        sentMsgByOtherUsers.createdAt = new Date(sentMsgByOtherUsers.createdAt);
-        sentMsgByOtherUsers.updatedAt = new Date(sentMsgByOtherUsers.updatedAt);
-        if (sentMsgByOtherUsers.sender?.id === myself?.id) {
-          sentMsgByOtherUsers.isSender = true;
-        }
-        // setImagesForViewing(i => [...i, {uri: sentMsgByOtherUsers.content}]);
-        if (sentMsgByOtherUsers.type === ChatMessageType.VIDEO) {
-          sentMsgByOtherUsers.thumbnail = await getThumbnailOfVideo(
-            sentMsgByOtherUsers.content,
-          );
-        }
-        if (isMounted) {
-          setMessages(msgs => {
-            if (
-              msgs.length &&
-              msgs[0].id !== sentMsgByOtherUsers.id &&
-              sentMsgByOtherUsers.chatGroup?.id === room.id
-            ) {
-              return refreshMessage([sentMsgByOtherUsers, ...msgs]);
-            } else if (sentMsgByOtherUsers.chatGroup?.id !== room.id) {
-              return refreshMessage(
-                msgs.filter(m => m.id !== sentMsgByOtherUsers.id),
-              );
-            }
-            return refreshMessage(msgs);
-          });
-        }
-      }
-    });
+    // socket.connect();
+    // socket.emit('joinRoom', room.id.toString());
+    // socket.on('readMessageClient', async (senderId: string) => {
+    //   if (myself?.id && senderId && senderId !== `${myself?.id}`) {
+    //     console.log('readMessageClient called', senderId, myself.id, room.id);
+    //     refetchLastReadChatTime();
+    //   }
+    // });
+    // socket.on('msgToClient', async (sentMsgByOtherUsers: ChatMessage) => {
+    //   if (sentMsgByOtherUsers.content) {
+    //     if (
+    //       sentMsgByOtherUsers?.sender?.id !== myself?.id &&
+    //       AppState.currentState === 'active'
+    //     ) {
+    //       saveLastReadChatTime(room.id, {
+    //         onSuccess: () => {
+    //           socket.emit('readReport', {
+    //             room: room.id.toString(),
+    //             senderId: myself?.id,
+    //           });
+    //           handleEnterRoom(room.id);
+    //         },
+    //       });
+    //       refetchLastReadChatTime();
+    //     }
+    //     sentMsgByOtherUsers.createdAt = new Date(sentMsgByOtherUsers.createdAt);
+    //     sentMsgByOtherUsers.updatedAt = new Date(sentMsgByOtherUsers.updatedAt);
+    //     if (sentMsgByOtherUsers.sender?.id === myself?.id) {
+    //       sentMsgByOtherUsers.isSender = true;
+    //     }
+    //     // setImagesForViewing(i => [...i, {uri: sentMsgByOtherUsers.content}]);
+    //     if (sentMsgByOtherUsers.type === ChatMessageType.VIDEO) {
+    //       sentMsgByOtherUsers.thumbnail = await getThumbnailOfVideo(
+    //         sentMsgByOtherUsers.content,
+    //       );
+    //     }
+    //     if (isMounted) {
+    //       setMessages(msgs => {
+    //         if (
+    //           msgs.length &&
+    //           msgs[0].id !== sentMsgByOtherUsers.id &&
+    //           sentMsgByOtherUsers.chatGroup?.id === room.id
+    //         ) {
+    //           return refreshMessage([sentMsgByOtherUsers, ...msgs]);
+    //         } else if (sentMsgByOtherUsers.chatGroup?.id !== room.id) {
+    //           return refreshMessage(
+    //             msgs.filter(m => m.id !== sentMsgByOtherUsers.id),
+    //           );
+    //         }
+    //         return refreshMessage(msgs);
+    //       });
+    //     }
+    //   }
+    // });
     setCurrentChatRoomId(room.id);
 
-    socket.on('joinedRoom', (r: any) => {
-      console.log('joinedRoom', r);
-    });
+    // socket.on('joinedRoom', (r: any) => {
+    //   console.log('joinedRoom', r);
+    // });
 
-    socket.on('leftRoom', (r: any) => {
-      console.log('leftRoom', r);
-    });
+    // socket.on('leftRoom', (r: any) => {
+    //   console.log('leftRoom', r);
+    // });
     return () => {
-      socket.emit('leaveRoom', room.id);
+      // socket.emit('leaveRoom', room.id);
       isMounted = false;
       setCurrentChatRoomId(undefined);
-      socket.disconnect();
+      // socket.disconnect();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [room.id]);
@@ -974,6 +973,7 @@ const Chat: React.FC = () => {
         limit: messagesInStorageLength ? undefined : 20,
         dateRefetchLatest: dateRefetchLatest,
       });
+      handleEnterRoom(room.id);
 
       // refetchLatest();
       refetchRoomDetail();
@@ -981,7 +981,7 @@ const Chat: React.FC = () => {
     }, [refetchRoomDetail]),
   );
 
-  const [appState, setAppState] = useState<AppStateStatus>();
+  const [appState, setAppState] = useState<AppStateStatus>('active');
   useEffect(() => {
     const unsubscribeAppState = () => {
       AppState.addEventListener('change', state => {
@@ -993,34 +993,56 @@ const Chat: React.FC = () => {
     };
   });
 
+  const [refetchTimes, setRefetchTimes] = useState(0);
   useEffect(() => {
-    if (appState === 'active' && isFocused) {
-      saveLastReadChatTime(room.id, {
-        onSuccess: () => {
-          socket.emit('readReport', {
-            room: room.id.toString(),
-            senderId: myself?.id,
-          });
-          handleEnterRoom(room.id);
-        },
-      });
+    const messageRefetchInterval = async () => {
+      await new Promise(r => setTimeout(r, 5000));
+      if (appState === 'active' && isFocused) {
+        console.log('messageRefetchInterval---', myself?.lastName);
+        const dateRefetchLatest = storage.getString(
+          `dateRefetchLatestInRoom${room.id}`,
+        );
+        refetchUpdatedMessages({
+          group: room.id,
+          limit: undefined,
+          dateRefetchLatest: dateRefetchLatest,
+        });
+      }
+    };
+    if (appState === 'active' && refetchTimes > 0) {
+      messageRefetchInterval();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [appState, isFocused]);
+  }, [refetchTimes, appState]);
 
-  useEffect(() => {
-    saveLastReadChatTime(room.id, {
-      onSuccess: () => {
-        socket.emit('readReport', {
-          room: room.id.toString(),
-          senderId: myself?.id,
-        });
-        handleEnterRoom(room.id);
-      },
-    });
-    return () => saveLastReadChatTime(room.id);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [room.id, saveLastReadChatTime]);
+  // useEffect(() => {
+  //   if (appState === 'active' && isFocused) {
+  //     saveLastReadChatTime(room.id, {
+  //       onSuccess: () => {
+  //         socket.emit('readReport', {
+  //           room: room.id.toString(),
+  //           senderId: myself?.id,
+  //         });
+  //         handleEnterRoom(room.id);
+  //       },
+  //     });
+  //   }
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [appState, isFocused]);
+
+  // useEffect(() => {
+  //   saveLastReadChatTime(room.id, {
+  //     onSuccess: () => {
+  //       socket.emit('readReport', {
+  //         room: room.id.toString(),
+  //         senderId: myself?.id,
+  //       });
+  //       handleEnterRoom(room.id);
+  //     },
+  //   });
+  //   return () => saveLastReadChatTime(room.id);
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [room.id, saveLastReadChatTime]);
 
   const readUserBox = (user: User) => (
     <View style={tailwind('flex-row bg-white items-center px-4 py-2')}>

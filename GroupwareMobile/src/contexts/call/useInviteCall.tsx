@@ -39,12 +39,12 @@ export const InviteCallProvider: React.FC = ({children}) => {
   const {mutate: createGroup} = useAPISaveChatGroup();
   const {editChatGroup, refetchRoomCard} = useHandleBadge();
   const [currentGroupData, setCurrentGroupData] = useState<ChatGroup>();
-  const socket = io(baseURL, {
-    transports: ['websocket'],
-  });
+  // const socket = io(baseURL, {
+  //   transports: ['websocket'],
+  // });
   const {mutate: sendChatMessage} = useAPISendChatMessage({
     onSuccess: sentMsg => {
-      socket.emit('message', sentMsg);
+      // socket.emit('message', sentMsg);
       if (sentMsg?.chatGroup?.id) {
         refetchRoomCard({id: sentMsg.chatGroup.id, type: ''});
       }
