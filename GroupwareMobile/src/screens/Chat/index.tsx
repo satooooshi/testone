@@ -149,6 +149,7 @@ const Chat: React.FC = () => {
   const {mutate: saveLastReadChatTime} = useAPISaveLastReadChatTime();
   const [selectedMessageForCheckLastRead, setSelectedMessageForCheckLastRead] =
     useState<ChatMessage>();
+  const [appState, setAppState] = useState<AppStateStatus>('active');
 
   const {values, handleSubmit, setValues} = useFormik<Partial<ChatMessage>>({
     initialValues: {
@@ -256,24 +257,26 @@ const Chat: React.FC = () => {
   const {mutate: refetchUpdatedMessages} = useAPIGetUpdatedMessages({
     onSuccess: latestData => {
       refetchLastReadChatTime();
-      if (latestData?.length) {
-        saveLastReadChatTime(room.id);
-        setMessages(m => {
-          const updatedMessages = refreshMessage([...latestData, ...m]);
-          // if (updatedMessages[0].id !== m[0].id) {
-          //   refetchLastReadChatTime();
-          // }
-          return updatedMessages;
+      if (appState === 'active') {
+        if (latestData?.length) {
+          saveLastReadChatTime(room.id);
+          setMessages(m => {
+            const updatedMessages = refreshMessage([...latestData, ...m]);
+            // if (updatedMessages[0].id !== m[0].id) {
+            //   refetchLastReadChatTime();
+            // }
+            return updatedMessages;
+          });
+          // setImagesForViewing(i => [...i, ...imagesToApped]);
+        }
+        console.log('latest success ====================', latestData.length);
+        const now = dateTimeFormatterFromJSDDate({
+          dateTime: new Date(),
+          format: 'yyyy-LL-dd HH:mm:ss',
         });
-        // setImagesForViewing(i => [...i, ...imagesToApped]);
+        storage.set(`dateRefetchLatestInRoom${room.id}`, now);
+        setRefetchTimes(t => t + 1);
       }
-      console.log('latest success ====================', latestData.length);
-      const now = dateTimeFormatterFromJSDDate({
-        dateTime: new Date(),
-        format: 'yyyy-LL-dd HH:mm:ss',
-      });
-      storage.set(`dateRefetchLatestInRoom${room.id}`, now);
-      setRefetchTimes(t => t + 1);
     },
   });
 
@@ -981,7 +984,6 @@ const Chat: React.FC = () => {
     }, [refetchRoomDetail]),
   );
 
-  const [appState, setAppState] = useState<AppStateStatus>('active');
   useEffect(() => {
     const unsubscribeAppState = () => {
       AppState.addEventListener('change', state => {
