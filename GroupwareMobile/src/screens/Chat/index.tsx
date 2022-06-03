@@ -256,26 +256,24 @@ const Chat: React.FC = () => {
   const {mutate: refetchUpdatedMessages} = useAPIGetUpdatedMessages({
     onSuccess: latestData => {
       refetchLastReadChatTime();
-      if (appState === 'active') {
-        if (latestData?.length) {
-          saveLastReadChatTime(room.id);
-          setMessages(m => {
-            const updatedMessages = refreshMessage([...latestData, ...m]);
-            // if (updatedMessages[0].id !== m[0].id) {
-            //   refetchLastReadChatTime();
-            // }
-            return updatedMessages;
-          });
-          // setImagesForViewing(i => [...i, ...imagesToApped]);
-        }
-        console.log('latest success ====================', latestData.length);
-        const now = dateTimeFormatterFromJSDDate({
-          dateTime: new Date(),
-          format: 'yyyy-LL-dd HH:mm:ss',
+      if (latestData?.length) {
+        saveLastReadChatTime(room.id);
+        setMessages(m => {
+          const updatedMessages = refreshMessage([...latestData, ...m]);
+          // if (updatedMessages[0].id !== m[0].id) {
+          //   refetchLastReadChatTime();
+          // }
+          return updatedMessages;
         });
-        storage.set(`dateRefetchLatestInRoom${room.id}`, now);
-        setRefetchTimes(t => t + 1);
+        // setImagesForViewing(i => [...i, ...imagesToApped]);
       }
+      console.log('latest success ====================', latestData.length);
+      const now = dateTimeFormatterFromJSDDate({
+        dateTime: new Date(),
+        format: 'yyyy-LL-dd HH:mm:ss',
+      });
+      storage.set(`dateRefetchLatestInRoom${room.id}`, now);
+      setRefetchTimes(t => t + 1);
     },
   });
 
