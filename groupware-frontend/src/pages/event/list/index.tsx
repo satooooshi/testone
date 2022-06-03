@@ -43,7 +43,7 @@ import {
 import { useAPIGetTag } from '@/hooks/api/tag/useAPIGetTag';
 import { useHeaderTab } from '@/hooks/headerTab/useHeaderTab';
 import { useAPIUpdateEvent } from '@/hooks/api/event/useAPIUpdateEvent';
-import { Box, useMediaQuery, useToast } from '@chakra-ui/react';
+import { Box, SimpleGrid, useMediaQuery, useToast } from '@chakra-ui/react';
 import { responseErrorMsgFactory } from 'src/utils/factory/responseErrorMsgFactory';
 import { hideScrollbarCss } from 'src/utils/chakra/hideScrollBar.css';
 import { isEditableEvent } from 'src/utils/factory/isCreatableEvent';
@@ -122,6 +122,7 @@ const EventList = () => {
   const router = useRouter();
   const toast = useToast();
   const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
+  const [isSmallerThan1024] = useMediaQuery('(max-width: 1024px)');
 
   const {
     page = '1',
@@ -546,18 +547,18 @@ const EventList = () => {
             </div>
             <div className={eventListStyles.event_list_wrapper}>
               {events?.events.length ? (
-                <div className={eventListStyles.event_card__row}>
+                // <div className={eventListStyles.event_card__row}>
+                <SimpleGrid minChildWidth="360px" spacing="20px">
                   {events.events.map((e) => (
-                    <div
-                      key={e.id}
-                      className={eventListStyles.event_card_margin}>
+                    <Box key={e.id}>
                       <EventCard
                         hrefTagClick={hrefTagClick}
                         eventSchedule={e}
                       />
-                    </div>
+                    </Box>
                   ))}
-                </div>
+                  {/* </div> */}
+                </SimpleGrid>
               ) : !isLoadingEvents ? (
                 <p className={eventListStyles.no_result_text}>
                   検索結果が見つかりませんでした

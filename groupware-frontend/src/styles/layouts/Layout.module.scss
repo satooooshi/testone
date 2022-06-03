@@ -34,14 +34,18 @@
 
 .main_padding_with_tab {
   width: 100%;
+  background-color: #f3f6fb;
   padding-top: 24px;
   @media (max-width: 768px) {
+    background-color: #f3f6fb;
     padding-top: 17vh;
   }
 }
 .main_padding_no_tab {
   padding-top: 24px;
+  background-color: #f3f6fb;
   @media (max-width: 768px) {
+    background-color: #f3f6fb;
     padding-top: 8vh;
   }
 }

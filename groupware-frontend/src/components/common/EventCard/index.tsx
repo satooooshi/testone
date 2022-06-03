@@ -2,19 +2,32 @@ import React, { useMemo } from 'react';
 import { EventSchedule, EventType, Tag } from 'src/types';
 import clsx from 'clsx';
 import { dateTimeFormatterFromJSDDate } from 'src/utils/dateTimeFormatter';
-import { Box, Button, Link, useMediaQuery, Text } from '@chakra-ui/react';
+import {
+  Box,
+  Button,
+  Link,
+  useMediaQuery,
+  Text,
+  Image,
+  AspectRatio,
+  Badge,
+  Divider,
+} from '@chakra-ui/react';
 import noImage from '@/public/no-image.jpg';
 import boldayImage1 from '@/public/bolday_1.jpg';
 import impressiveUnivertyImage from '@/public/impressive_university_1.png';
 import coachImage from '@/public/coach_1.jpeg';
 import studyMeeting1Image from '@/public/study_meeting_1.jpg';
-import Image from 'next/image';
+// import Image from 'next/image';
 import portalLinkBoxStyles from '@/styles/components/PortalLinkBox.module.scss';
 import { MdAssignment } from 'react-icons/md';
 import { FcSportsMode } from 'react-icons/fc';
 import { tagColorFactory } from 'src/utils/factory/tagColorFactory';
 import { darkFontColor } from 'src/utils/colors';
 import { hideScrollbarCss } from 'src/utils/chakra/hideScrollBar.css';
+import boldLogo from '@/public/bold-logo.png';
+import { AiOutlineArrowRight } from 'react-icons/ai';
+import { useRouter } from 'next/router';
 
 type EventCardProps = {
   eventSchedule: EventSchedule;
@@ -29,12 +42,25 @@ const EventCard: React.FC<EventCardProps> = ({
   const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
   const [isSmallerThan576] = useMediaQuery('(max-width: 576px)');
   const [isSmallerThan350] = useMediaQuery('(max-width: 350px)');
+  const router = useRouter();
   const imageSource = useMemo(() => {
     switch (eventSchedule.type) {
       case EventType.STUDY_MEETING:
-        return <Image src={studyMeeting1Image} alt="イベント画像" />;
+        return (
+          <Image
+            src={studyMeeting1Image.src}
+            alt="イベント画像"
+            borderLeftRadius={10}
+          />
+        );
       case EventType.BOLDAY:
-        return <Image src={boldayImage1} alt="イベント画像" />;
+        return (
+          <Image
+            src={boldayImage1.src}
+            alt="イベント画像"
+            borderLeftRadius={10}
+          />
+        );
       case EventType.CLUB:
         return (
           <FcSportsMode
@@ -43,9 +69,21 @@ const EventCard: React.FC<EventCardProps> = ({
           />
         );
       case EventType.IMPRESSIVE_UNIVERSITY:
-        return <Image src={impressiveUnivertyImage} alt="イベント画像" />;
+        return (
+          <Image
+            src={impressiveUnivertyImage.src}
+            alt="イベント画像"
+            borderLeftRadius={10}
+          />
+        );
       case EventType.COACH:
-        return <Image src={coachImage} alt="イベント画像" />;
+        return (
+          <Image
+            src={coachImage.src}
+            alt="イベント画像"
+            borderLeftRadius={10}
+          />
+        );
       case EventType.SUBMISSION_ETC:
         return (
           <MdAssignment
@@ -55,56 +93,98 @@ const EventCard: React.FC<EventCardProps> = ({
         );
 
       default:
-        return <Image src={noImage} alt="イベント画像" />;
+        return <Image src={noImage.src} alt="イベント画像" />;
     }
   }, [eventSchedule.type]);
 
   return (
-    <Link
-      minH="160px"
+    <Box
+      // minH="160px"
+      borderRadius={10}
       display="flex"
       flexDir="column"
       justifyContent="space-between"
-      w={isSmallerThan768 ? '90vw' : isSmallerThan1024 ? '75vw' : '36vw'}
-      backgroundColor="gray.100"
+      // mb={3}
+      h="250px"
+      // minW="360px"
+      // maxW="400px"
+      w="420px"
+      backgroundColor="white"
       borderWidth={1}
       borderColor="gray.200"
       shadow="md"
-      href={`/event/${eventSchedule.id}`}
-      _hover={{ textDecoration: 'none' }}>
+      // href={`/event/${eventSchedule.id}`}
+      // _hover={{ textDecoration: 'none' }}
+    >
       <Box
         display="flex"
         flexDir="row"
         alignItems="flex-start"
-        justifyContent="flex-start"
-        px="8px"
-        pt="8px">
+        justifyContent="flex-start">
         <Box
-          mr="16px"
-          minW="40%"
-          maxW="40%"
-          minH="100%"
-          maxH="100%"
+          borderRightWidth={1}
+          // minW="40%"
+          // maxW="40%"
+          // minH="160px"
+
+          w="180px"
+          h="250px"
           alignSelf="flex-start"
           css={{ aspectRatio: '1' }}>
-          {eventSchedule.imageURL ? (
-            <img
-              src={eventSchedule.imageURL}
-              alt="イベント画像"
-              // width="50px"
-              // height="100%"
-              // style={{ height: '100px', width: '100%' }}
-            />
-          ) : (
-            imageSource
-          )}
+          <AspectRatio h="250px" w="180px" maxW="180px">
+            {eventSchedule.imageURL ? (
+              <Image
+                borderLeftRadius={10}
+                // h="100%"
+                src={boldLogo.src}
+                // src={eventSchedule.imageURL}
+                alt="イベント画像"
+              />
+            ) : (
+              imageSource
+            )}
+          </AspectRatio>
         </Box>
-        <Box
-          display="flex"
-          flexDir="column"
-          w={isSmallerThan576 ? '50%' : '55%'}
-          h="100%">
-          <Box mb="8px">
+        <Box display="flex" flexDir="column" w="240px" h="100%" px={2}>
+          <Box my="8px" w="100%">
+            <Box
+              display="flex"
+              flexDir="row"
+              overflowX="auto"
+              ml={-1}
+              mb={1}
+              css={hideScrollbarCss}>
+              {eventSchedule.tags && eventSchedule.tags.length
+                ? eventSchedule.tags.map((t) => (
+                    <Link
+                      _hover={{ textDecoration: 'none' }}
+                      passHref
+                      href={
+                        hrefTagClick
+                          ? hrefTagClick(t)
+                          : `/event/list?tag=${t.id}`
+                      }
+                      key={t.id}>
+                      <Badge
+                        ml={1}
+                        mb={1}
+                        p={2}
+                        as="sub"
+                        fontSize="x-small"
+                        display="flex"
+                        colorScheme={tagColorFactory(t.type)}
+                        borderRadius={50}
+                        alignItems="center"
+                        variant="outline"
+                        borderWidth={1}>
+                        {t.name}
+                      </Badge>
+                    </Link>
+                  ))
+                : null}
+            </Box>
+          </Box>
+          <Box mb="8px" h="80px" mr={4} mt={3}>
             <Text
               fontSize={isSmallerThan768 ? 18 : 16}
               fontWeight="bold"
@@ -115,20 +195,26 @@ const EventCard: React.FC<EventCardProps> = ({
               isTruncated={true}>
               {eventSchedule.title}
             </Text>
-            <Text fontSize={14} noOfLines={isSmallerThan350 ? 2 : 3}>
-              {eventSchedule.description}
-            </Text>
+            <Box>
+              <Text mt={3} fontSize={12} noOfLines={isSmallerThan350 ? 2 : 3}>
+                {eventSchedule.description}
+              </Text>
+            </Box>
           </Box>
+          <Divider orientation="horizontal" mb={3} />
           <Box display="flex" flexDir="column" justifyContent="space-between">
             {eventSchedule.type !== EventType.SUBMISSION_ETC && (
-              <Text fontSize={isSmallerThan768 ? 14 : 16}>
+              <Text fontSize={isSmallerThan768 ? 10 : 13} color={darkFontColor}>
                 {dateTimeFormatterFromJSDDate({
                   dateTime: new Date(eventSchedule.startAt),
-                  format: '開始: yyyy/LL/dd HH:mm ~',
+                  format: '開始: yyyy/LL/dd HH:mm ',
                 })}
               </Text>
             )}
-            <Text fontSize={isSmallerThan768 ? 14 : 16}>
+            <Text
+              fontSize={isSmallerThan768 ? 10 : 13}
+              mt="2px"
+              color={darkFontColor}>
               {`
                   ${
                     eventSchedule.type !== EventType.SUBMISSION_ETC
@@ -141,34 +227,43 @@ const EventCard: React.FC<EventCardProps> = ({
                 `}
             </Text>
           </Box>
+          <Box mt={3} mx="auto" pl={-1}>
+            <Button
+              borderRadius={50}
+              width="100px"
+              height={7}
+              colorScheme="blue"
+              // variant="outline"
+              // onClick={() => setTagModal(true)}
+            >
+              <Box display="flex">
+                <Text fontSize={10} mr="6px">
+                  回答する
+                </Text>
+                <AiOutlineArrowRight size={13} />
+              </Box>
+            </Button>
+            <Button
+              ml={2}
+              borderRadius={50}
+              width="100px"
+              height={7}
+              colorScheme="blue"
+              variant="outline"
+              onClick={() => {
+                router.push(`/event/${eventSchedule.id}`);
+              }}>
+              <Box display="flex">
+                <Text fontSize={10} mr="4px">
+                  詳細を見る
+                </Text>
+                <AiOutlineArrowRight size={13} />
+              </Box>
+            </Button>
+          </Box>
         </Box>
       </Box>
-      <Box pb="8px">
-        <Box
-          display="flex"
-          flexDir="row"
-          overflowX="auto"
-          css={hideScrollbarCss}>
-          {eventSchedule.tags && eventSchedule.tags.length
-            ? eventSchedule.tags.map((t) => (
-                <Link
-                  _hover={{ textDecoration: 'none' }}
-                  mr="4px"
-                  _first={{ marginLeft: '4px' }}
-                  passHref
-                  href={
-                    hrefTagClick ? hrefTagClick(t) : `/event/list?tag=${t.id}`
-                  }
-                  key={t.id}>
-                  <Button size="xs" colorScheme={tagColorFactory(t.type)}>
-                    {t.name}
-                  </Button>
-                </Link>
-              ))
-            : null}
-        </Box>
-      </Box>
-    </Link>
+    </Box>
   );
 };
 
