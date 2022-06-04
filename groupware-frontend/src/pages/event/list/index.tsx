@@ -43,10 +43,25 @@ import {
 import { useAPIGetTag } from '@/hooks/api/tag/useAPIGetTag';
 import { useHeaderTab } from '@/hooks/headerTab/useHeaderTab';
 import { useAPIUpdateEvent } from '@/hooks/api/event/useAPIUpdateEvent';
-import { Box, SimpleGrid, useMediaQuery, useToast } from '@chakra-ui/react';
+import {
+  Box,
+  Modal,
+  ModalOverlay,
+  SimpleGrid,
+  useMediaQuery,
+  useToast,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalHeader,
+  Text,
+  Select,
+  Button,
+} from '@chakra-ui/react';
 import { responseErrorMsgFactory } from 'src/utils/factory/responseErrorMsgFactory';
 import { hideScrollbarCss } from 'src/utils/chakra/hideScrollBar.css';
 import { isEditableEvent } from 'src/utils/factory/isCreatableEvent';
+import { useAPIJoinEvent } from '@/hooks/api/event/useAPIJoinEvent';
 
 const localizer = momentLocalizer(moment);
 //@ts-ignore
@@ -188,6 +203,20 @@ const EventList = () => {
     },
   });
   const [newEvent, setNewEvent] = useState<CreateEventRequest>();
+  const [openAnswerModal, setOpenAnswerModal] = useState(0);
+
+  const { mutate: joinEvent } = useAPIJoinEvent({
+    onError: (err) => {
+      if (err.response?.data?.message) {
+        toast({
+          description: err.response?.data?.message,
+          status: 'error',
+          duration: 3000,
+          isClosable: true,
+        });
+      }
+    },
+  });
 
   const onToggleTag = (t: Tag) => {
     setSelectedTags((s) => toggleTag(s, t));
@@ -491,6 +520,45 @@ const EventList = () => {
         <Box mb="24px">
           <TopTabBar topTabBehaviorList={topTabBehaviorList} />
         </Box>
+        {/* <Modal
+          onClose={() => setOpenAnswerModal(0)}
+          scrollBehavior="inside"
+          isOpen={openAnswerModal > 0}
+          size="xl">
+          <>
+            <ModalOverlay />
+            <ModalContent h="90vh" bg={'#f9fafb'}>
+              <ModalHeader
+                flexDir="row"
+                justifyContent="space-between"
+                display="flex"
+                mr="24px">
+                <Text>回答</Text>
+              </ModalHeader>
+              <ModalCloseButton />
+              <ModalBody>
+                <Box>
+                  <Select
+                    colorScheme="teal"
+                    bg="white"
+                    defaultValue={''}
+                    onChange={}
+                    value={}>
+                    <option value={}></option>
+                    <option value={}></option>
+                  </Select>
+                  <Box
+                    mt={5}
+                    flexDir="row"
+                    display="flex"
+                    justifyContent="flex-end">
+                    <Button colorScheme={'blue'} onClick={}></Button>
+                  </Box>
+                </Box>
+              </ModalBody>
+            </ModalContent>
+          </>
+        </Modal> */}
 
         {isCalendar && (
           <Box
@@ -548,10 +616,11 @@ const EventList = () => {
             <div className={eventListStyles.event_list_wrapper}>
               {events?.events.length ? (
                 // <div className={eventListStyles.event_card__row}>
-                <SimpleGrid minChildWidth="360px" spacing="20px">
+                <SimpleGrid minChildWidth="420px" spacing="20px">
                   {events.events.map((e) => (
                     <Box key={e.id}>
                       <EventCard
+                        onClickAnswer={(id) => setOpenAnswerModal(id)}
                         hrefTagClick={hrefTagClick}
                         eventSchedule={e}
                       />

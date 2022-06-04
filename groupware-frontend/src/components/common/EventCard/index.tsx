@@ -32,17 +32,20 @@ import { useRouter } from 'next/router';
 type EventCardProps = {
   eventSchedule: EventSchedule;
   hrefTagClick?: (t: Tag) => string;
+  onClickAnswer?: (id: number) => void;
 };
 
 const EventCard: React.FC<EventCardProps> = ({
   eventSchedule,
   hrefTagClick,
+  onClickAnswer,
 }) => {
   const [isSmallerThan1024] = useMediaQuery('(max-width: 1024px)');
   const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
   const [isSmallerThan576] = useMediaQuery('(max-width: 576px)');
   const [isSmallerThan350] = useMediaQuery('(max-width: 350px)');
   const router = useRouter();
+
   const imageSource = useMemo(() => {
     switch (eventSchedule.type) {
       case EventType.STUDY_MEETING:
@@ -233,9 +236,7 @@ const EventCard: React.FC<EventCardProps> = ({
               width="100px"
               height={7}
               colorScheme="blue"
-              // variant="outline"
-              // onClick={() => setTagModal(true)}
-            >
+              onClick={() => onClickAnswer(eventSchedule.id)}>
               <Box display="flex">
                 <Text fontSize={10} mr="6px">
                   回答する
