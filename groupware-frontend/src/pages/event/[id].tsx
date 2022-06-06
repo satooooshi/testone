@@ -17,7 +17,9 @@ import {
   Spinner,
   Text,
   Textarea,
+  Badge,
   useToast,
+  Heading,
 } from '@chakra-ui/react';
 import Head from 'next/head';
 import { useAuthenticate } from 'src/contexts/useAuthenticate';
@@ -57,6 +59,7 @@ import { darkFontColor } from 'src/utils/colors';
 import { isEditableEvent } from 'src/utils/factory/isCreatableEvent';
 import { MdCancel } from 'react-icons/md';
 import { useAPIDeleteSubmission } from '@/hooks/api/event/useAPIDeleteSubmission';
+import { hideScrollbarCss } from 'src/utils/chakra/hideScrollBar.css';
 
 type FileIconProps = {
   url: string;
@@ -298,10 +301,7 @@ const EventDetail = () => {
         createEvent={(newEvent) => saveEvent(newEvent)}
       />
       {data && data.id ? (
-        <div className={eventDetailStyles.main}>
-          <Head>
-            <title>ボールド | {data.title}</title>
-          </Head>
+        <Box display="flex" flexDir="column" justifyContent="space-between">
           <div className={eventDetailStyles.all_wrapper}>
             <div className={eventDetailStyles.event_info_wrapper}>
               <div className={eventDetailStyles.event_info_left}>
@@ -311,29 +311,91 @@ const EventDetail = () => {
                   imageSource
                 )}
               </div>
+
+              {/* <div className={eventDetailStyles.type_wrapper}>
+                <Button
+                  background={eventTypeColorFactory(data.type)}
+                  _hover={{}}
+                  size="sm"
+                  color="white">
+                  {eventTypeNameFactory(data.type)}
+                </Button>
+              </div> */}
               <div className={eventDetailStyles.event_info_right}>
-                <span className={eventDetailStyles.event_title}>
-                  {data.title}
-                </span>
-                <div className={eventDetailStyles.type_wrapper}>
-                  <Button
+                <Box mb="8px">
+                  <Badge
+                    py="4px"
+                    px="8px"
+                    color="white"
+                    fontSize="smaller"
                     background={eventTypeColorFactory(data.type)}
-                    _hover={{}}
-                    size="sm"
-                    color="white">
+                    borderRadius={50}
+                    alignItems="center"
+                    variant="outline">
                     {eventTypeNameFactory(data.type)}
-                  </Button>
-                </div>
-                <div className={eventDetailStyles.event_dates_wrapper}>
+                  </Badge>
+                </Box>
+                <Box mb="8px" h="160px" mr={4} mt={3}>
+                  <Heading fontWeight="bold"> {data.title}</Heading>
+                  <Box>
+                    <Text mt={3} fontSize={12} noOfLines={3}>
+                      {data.description}
+                    </Text>
+                  </Box>
+                </Box>
+                <Box w="100%">
+                  <Heading size="xs" mb={1}>
+                    タグ
+                  </Heading>
+                  <Box
+                    display="flex"
+                    flexDir="row"
+                    overflowX="auto"
+                    ml={-1}
+                    mb={1}
+                    css={hideScrollbarCss}>
+                    {data.tags && data.tags.length
+                      ? data.tags.map((t) => (
+                          <Link
+                            _hover={{ textDecoration: 'none' }}
+                            href={`/event/list?tag=${t.id}`}
+                            key={t.id}>
+                            <Badge
+                              ml={1}
+                              mb={1}
+                              p={2}
+                              as="sub"
+                              fontSize="x-small"
+                              display="flex"
+                              colorScheme={tagColorFactory(t.type)}
+                              borderRadius={50}
+                              alignItems="center"
+                              variant="outline"
+                              borderWidth={1}>
+                              {t.name}
+                            </Badge>
+                          </Link>
+                        ))
+                      : null}
+                  </Box>
+                </Box>
+                <Box
+                  mt={2}
+                  display="flex"
+                  flexDir="column"
+                  justifyContent="space-between">
+                  <Heading mb={2} size="xs">
+                    日時
+                  </Heading>
                   {data.type !== EventType.SUBMISSION_ETC && (
-                    <span className={eventDetailStyles.start_date}>
-                      {`開始: ${dateTimeFormatterFromJSDDate({
+                    <Text fontSize={14}>
+                      {dateTimeFormatterFromJSDDate({
                         dateTime: new Date(data.startAt),
-                        format: 'yyyy/LL/dd HH:mm',
-                      })} ~ `}
-                    </span>
+                        format: '開始: yyyy/LL/dd HH:mm ',
+                      })}
+                    </Text>
                   )}
-                  <span className={eventDetailStyles.end_date}>
+                  <Text fontSize={14} mt="5px">
                     {`
                   ${
                     data.type !== EventType.SUBMISSION_ETC ? '終了' : '締切'
@@ -342,21 +404,13 @@ const EventDetail = () => {
                       format: 'yyyy/LL/dd HH:mm',
                     })}
                 `}
-                  </span>
-                </div>
-                <span className={eventDetailStyles.sub_title}>概要</span>
-                <div className={eventDetailStyles.description_wrapper}>
-                  <Linkify>
-                    <span className={eventDetailStyles.description}>
-                      {data.description}
-                    </span>
-                  </Linkify>
-                </div>
+                  </Text>
+                </Box>
                 {data.type !== EventType.SUBMISSION_ETC && (
-                  <>
-                    <span className={eventDetailStyles.sub_title}>
+                  <Box mt={3}>
+                    <Heading size="xs" mb={2}>
                       開催者/講師
-                    </span>
+                    </Heading>
                     {data && data.hostUsers && data.hostUsers.length ? (
                       <div className={eventDetailStyles.tags_wrapper}>
                         {data.hostUsers.map((hostUser) => (
@@ -372,24 +426,9 @@ const EventDetail = () => {
                         ))}
                       </div>
                     ) : null}
-                  </>
+                  </Box>
                 )}
-                <span className={eventDetailStyles.sub_title}>タグ</span>
-                {data && data.tags && data.tags.length ? (
-                  <div className={eventDetailStyles.tags_wrapper}>
-                    {data.tags.map((tag) => (
-                      <Link href={`/event/list?tag=${tag.id}`} key={tag.id}>
-                        <a className={eventDetailStyles.tag}>
-                          <Button
-                            colorScheme={tagColorFactory(tag.type)}
-                            size="xs">
-                            {tag.name}
-                          </Button>
-                        </a>
-                      </Link>
-                    ))}
-                  </div>
-                ) : null}
+
                 <div className={eventDetailStyles.join_event_wrapper}>
                   {data.type !== 'submission_etc' && !isFinished ? (
                     <>
@@ -672,7 +711,7 @@ const EventDetail = () => {
               </>
             ) : null}
           </div>
-        </div>
+        </Box>
       ) : null}
     </LayoutWithTab>
   );

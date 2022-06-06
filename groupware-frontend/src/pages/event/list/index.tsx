@@ -520,46 +520,6 @@ const EventList = () => {
         <Box mb="24px">
           <TopTabBar topTabBehaviorList={topTabBehaviorList} />
         </Box>
-        {/* <Modal
-          onClose={() => setOpenAnswerModal(0)}
-          scrollBehavior="inside"
-          isOpen={openAnswerModal > 0}
-          size="xl">
-          <>
-            <ModalOverlay />
-            <ModalContent h="90vh" bg={'#f9fafb'}>
-              <ModalHeader
-                flexDir="row"
-                justifyContent="space-between"
-                display="flex"
-                mr="24px">
-                <Text>回答</Text>
-              </ModalHeader>
-              <ModalCloseButton />
-              <ModalBody>
-                <Box>
-                  <Select
-                    colorScheme="teal"
-                    bg="white"
-                    defaultValue={''}
-                    onChange={}
-                    value={}>
-                    <option value={}></option>
-                    <option value={}></option>
-                  </Select>
-                  <Box
-                    mt={5}
-                    flexDir="row"
-                    display="flex"
-                    justifyContent="flex-end">
-                    <Button colorScheme={'blue'} onClick={}></Button>
-                  </Box>
-                </Box>
-              </ModalBody>
-            </ModalContent>
-          </>
-        </Modal> */}
-
         {isCalendar && (
           <Box
             ref={calendarRef}
@@ -616,7 +576,10 @@ const EventList = () => {
             <div className={eventListStyles.event_list_wrapper}>
               {events?.events.length ? (
                 // <div className={eventListStyles.event_card__row}>
-                <SimpleGrid minChildWidth="420px" spacing="20px">
+                <SimpleGrid
+                  minChildWidth="360px"
+                  maxChildWidth="420px"
+                  spacing="20px">
                   {events.events.map((e) => (
                     <Box key={e.id}>
                       <EventCard

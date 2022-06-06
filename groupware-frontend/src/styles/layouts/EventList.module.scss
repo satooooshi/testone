@@ -8,7 +8,9 @@
 }
 
 .event_list_wrapper {
-  flex-direction: column;
+  // flex-direction: column;
+  padding-left: 6%;
+  padding-right: 6%;
   @media (max-width: 1024px) {
     margin-right: 0;
     display: flex;

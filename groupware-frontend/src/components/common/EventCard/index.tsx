@@ -105,13 +105,11 @@ const EventCard: React.FC<EventCardProps> = ({
       // minH="160px"
       borderRadius={10}
       display="flex"
-      flexDir="column"
-      justifyContent="space-between"
+      // flexDir="column"
+      // justifyContent="space-between"
       // mb={3}
       h="250px"
-      // minW="360px"
-      // maxW="400px"
-      w="420px"
+      w="100%"
       backgroundColor="white"
       borderWidth={1}
       borderColor="gray.200"
@@ -122,19 +120,18 @@ const EventCard: React.FC<EventCardProps> = ({
       <Box
         display="flex"
         flexDir="row"
-        alignItems="flex-start"
-        justifyContent="flex-start">
+        h="100%"
+        w="100%"
+        // alignItems="flex-start"
+        // justifyContent="flex-start"
+      >
         <Box
           borderRightWidth={1}
-          // minW="40%"
-          // maxW="40%"
-          // minH="160px"
-
-          w="180px"
-          h="250px"
-          alignSelf="flex-start"
-          css={{ aspectRatio: '1' }}>
-          <AspectRatio h="250px" w="180px" maxW="180px">
+          w="40%"
+          h="100%"
+          // alignSelf="flex-start"
+        >
+          <AspectRatio h="100%" w="100%">
             {eventSchedule.imageURL ? (
               <Image
                 borderLeftRadius={10}
@@ -148,7 +145,7 @@ const EventCard: React.FC<EventCardProps> = ({
             )}
           </AspectRatio>
         </Box>
-        <Box display="flex" flexDir="column" w="240px" h="100%" px={2}>
+        <Box display="flex" flexDir="column" w="60%" h="100%" px={2}>
           <Box my="8px" w="100%">
             <Box
               display="flex"
@@ -230,20 +227,20 @@ const EventCard: React.FC<EventCardProps> = ({
                 `}
             </Text>
           </Box>
-          <Box mt={3} mx="auto" pl={-1}>
-            <Button
-              borderRadius={50}
-              width="100px"
-              height={7}
-              colorScheme="blue"
-              onClick={() => onClickAnswer(eventSchedule.id)}>
-              <Box display="flex">
-                <Text fontSize={10} mr="6px">
-                  回答する
-                </Text>
-                <AiOutlineArrowRight size={13} />
-              </Box>
-            </Button>
+          <Box mt={3} pl={-1}>
+            {/* <Button
+            borderRadius={50}
+            width="100px"
+            height={7}
+            colorScheme="blue"
+            onClick={() => onClickAnswer(eventSchedule.id)}>
+            <Box display="flex">
+              <Text fontSize={10} mr="6px">
+                回答する
+              </Text>
+              <AiOutlineArrowRight size={13} />
+            </Box>
+          </Button> */}
             <Button
               ml={2}
               borderRadius={50}
