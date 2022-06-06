@@ -593,7 +593,7 @@ const EventDetail = () => {
                   userJoiningEvent={data.userJoiningEvent}
                 />
               </div>
-              <div className={eventDetailStyles.width}>
+              <Box w="100%" mt={2}>
                 <div className={eventDetailStyles.count_and_button_wrapper}>
                   <p className={eventDetailStyles.comment_count}>
                     コメント{data.comments?.length ? data.comments.length : 0}件
@@ -635,7 +635,7 @@ const EventDetail = () => {
                         ),
                     )
                   : null}
-              </div>
+              </Box>
             </>
           )}
           {data.type === EventType.SUBMISSION_ETC && !isFinished ? (
