@@ -516,6 +516,7 @@ const EventList = () => {
         display="flex"
         flexDir="column"
         justifyContent="flex-start"
+        w="100%"
         mb="72px">
         <Box mb="24px">
           <TopTabBar topTabBehaviorList={topTabBehaviorList} />
@@ -573,7 +574,7 @@ const EventList = () => {
                 toggleTag={onToggleTag}
               />
             </div>
-            <div className={eventListStyles.event_list_wrapper}>
+            <Box px="6%">
               {events?.events.length ? (
                 // <div className={eventListStyles.event_card__row}>
                 <SimpleGrid
@@ -596,7 +597,7 @@ const EventList = () => {
                   検索結果が見つかりませんでした
                 </p>
               ) : null}
-            </div>
+            </Box>
           </>
         )}
       </Box>
