@@ -66,9 +66,6 @@ const EventParticipants: React.FC<EventParticipantsProps> = ({
             justifyContent="space-between"
             borderBottomColor="gray.200"
             borderBottomWidth={1}>
-            <Text color="green.600" fontWeight="bold" fontSize="20px">
-              参加者一覧
-            </Text>
             {users?.length >= 10 ? (
               <Link onClick={() => setAllVisible((v) => !v)}>
                 <Text fontWeight="bold" fontSize="20px" color="blue.600">
