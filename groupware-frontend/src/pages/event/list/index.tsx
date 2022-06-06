@@ -613,8 +613,8 @@ const EventList = () => {
             initialPage={page ? Number(page) - 1 : 1}
             forcePage={page ? Number(page) - 1 : 1}
             disableInitialCallback={true}
-            previousLabel={'前へ'}
-            nextLabel={'次へ'}
+            previousLabel={'<'}
+            nextLabel={'>'}
             marginPagesDisplayed={2}
             pageRangeDisplayed={5}
             containerClassName={paginationStyles.pagination}

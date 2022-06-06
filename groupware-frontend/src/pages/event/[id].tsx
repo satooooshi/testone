@@ -586,14 +586,14 @@ const EventDetail = () => {
           )}
           {data.type !== EventType.SUBMISSION_ETC && (
             <>
-              <div className={eventDetailStyles.event_participants_wrapper}>
+              <Box w="100%" mt={2}>
                 <Heading fontSize="16px">参加者一覧</Heading>
                 <EventParticipants
                   onChangeJoiningData={(uje) => handleChangeJoiningData(uje)}
                   userJoiningEvent={data.userJoiningEvent}
                 />
-              </div>
-              <Box w="100%" mt={2}>
+              </Box>
+              <Box w="100%" mt={5}>
                 <div className={eventDetailStyles.count_and_button_wrapper}>
                   <p className={eventDetailStyles.comment_count}>
                     コメント{data.comments?.length ? data.comments.length : 0}件
