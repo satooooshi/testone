@@ -3,7 +3,7 @@ import eventCommentStyles from '@/styles/components/EventComment.module.scss';
 import { dateTimeFormatterFromJSDDate } from 'src/utils/dateTimeFormatter';
 import Link from 'next/link';
 import boldMascot from '@/public/bold-mascot.png';
-import { Avatar } from '@chakra-ui/react';
+import { Avatar, Box, Divider, Heading, Text } from '@chakra-ui/react';
 
 type EventCommentCardProps = {
   body: string;
@@ -16,9 +16,13 @@ const EventCommentCard: React.FC<EventCommentCardProps> = ({
   writer,
 }) => {
   return (
-    <div className={eventCommentStyles.card_wrapper}>
-      <div className={eventCommentStyles.comment_uploader_info}>
-        <div className={eventCommentStyles.user_info_wrapper}>
+    <Box p={3}>
+      <Box
+        display="flex"
+        flexDir="row"
+        alignItem="center"
+        justifyContent="space-between">
+        <Box display="flex" flexDir="row" alignItem="center">
           {writer.existence ? (
             <Link href={`/account/${writer?.id}`} passHref>
               <a className={eventCommentStyles.comment_name_wrapper}>
@@ -26,29 +30,38 @@ const EventCommentCard: React.FC<EventCommentCardProps> = ({
                   className={eventCommentStyles.user_avatar}
                   src={writer.avatarUrl}
                 />
-                <p className={eventCommentStyles.user_name}>
+                <Heading size="xs">
                   {writer.lastName + ' ' + writer.firstName}
-                </p>
+                </Heading>
               </a>
             </Link>
           ) : (
-            <div className={eventCommentStyles.comment_name_wrapper}>
+            <Box className={eventCommentStyles.comment_name_wrapper}>
               <Avatar
-                className={eventCommentStyles.user_avatar}
+                minH="20px"
+                minW="20px"
+                h="20px"
+                w="20px"
+                rounded="full"
+                mr="10px"
+                // className={eventCommentStyles.user_avatar}
                 src={boldMascot.src}
               />
               <p className={eventCommentStyles.user_name}>ボールドくん</p>
-            </div>
+            </Box>
           )}
-        </div>
-        <p className={eventCommentStyles.wrote_date}>
+        </Box>
+        <Text fontSize={12}>
           {dateTimeFormatterFromJSDDate({ dateTime: new Date(date) })}
-        </p>
-      </div>
-      <div className={eventCommentStyles.comment_body}>
-        <p className={eventCommentStyles.comment_text}>{body}</p>
-      </div>
-    </div>
+        </Text>
+      </Box>
+      <Box my={3}>
+        <Text wordBreak="break-word" whiteSpace="pre-wrap">
+          {body}
+        </Text>
+      </Box>
+      <Divider orientation="horizontal" my={1} w="95%" textAlign="center" />
+    </Box>
   );
 };
 

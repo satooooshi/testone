@@ -217,7 +217,7 @@ const CreateNewUser = () => {
           isClosable: true,
         });
         resetForm();
-        setUserInfo(initialUserValues);
+        // setUserInfo(initialUserValues);
       }
     },
   });
@@ -344,7 +344,7 @@ const CreateNewUser = () => {
               type="text"
               name="lastNameKana"
               placeholder="ヤマダ"
-              value={validationErrorStyles.lastNameKana}
+              value={values.lastNameKana}
               background="white"
               onChange={handleChange}
             />
@@ -355,7 +355,7 @@ const CreateNewUser = () => {
               type="text"
               name="firstNameKana"
               placeholder="タロウ"
-              value={validationErrorStyles.firstNameKana}
+              value={values.firstNameKana}
               background="white"
               onChange={handleChange}
             />

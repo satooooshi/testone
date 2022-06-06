@@ -23,6 +23,7 @@ import {
   useMediaQuery,
   Image,
   SimpleGrid,
+  Divider,
 } from '@chakra-ui/react';
 import Head from 'next/head';
 import { useAuthenticate } from 'src/contexts/useAuthenticate';
@@ -308,6 +309,7 @@ const EventDetail = () => {
         <Box
           w="100%"
           px="10%"
+          pb="20px"
           display="flex"
           flexDir="column"
           justifyContent="space-between">
@@ -595,18 +597,23 @@ const EventDetail = () => {
               </Box>
               <Box w="100%" mt={5}>
                 <div className={eventDetailStyles.count_and_button_wrapper}>
-                  <p className={eventDetailStyles.comment_count}>
-                    コメント{data.comments?.length ? data.comments.length : 0}件
-                  </p>
+                  <Box alignSelf="center">
+                    <Heading fontSize="16px">コメント</Heading>
+                    <Text>
+                      {data.comments?.length ? data.comments.length : 0}件
+                    </Text>
+                  </Box>
                   <Button
+                    borderRadius={50}
+                    colorScheme="blue"
                     size="sm"
-                    colorScheme="teal"
                     onClick={() => {
                       commentVisible && newComment
                         ? handleCreateComment()
                         : setCommentVisible(true);
                     }}>
-                    {commentVisible ? 'コメントを投稿する' : 'コメントを追加'}
+                    感想を投稿
+                    {/* {commentVisible ? 'コメントを投稿する' : 'コメントを追加'} */}
                   </Button>
                 </div>
                 {commentVisible && (
@@ -620,21 +627,21 @@ const EventDetail = () => {
                     autoFocus
                   />
                 )}
-                {data.comments && data.comments.length
-                  ? data.comments.map(
-                      (comment) =>
-                        comment.writer && (
-                          <>
+                <Box rounded="md" display="flex" flexDir="column" bg="white">
+                  {data.comments && data.comments.length
+                    ? data.comments.map(
+                        (comment) =>
+                          comment.writer && (
                             <EventCommentCard
                               key={comment.id}
                               body={comment.body}
                               date={comment.createdAt}
                               writer={comment.writer}
                             />
-                          </>
-                        ),
-                    )
-                  : null}
+                          ),
+                      )
+                    : null}
+                </Box>
               </Box>
             </>
           )}
