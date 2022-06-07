@@ -270,11 +270,6 @@ const Chat: React.FC = () => {
           // setImagesForViewing(i => [...i, ...imagesToApped]);
         }
         console.log('latest success ====================', latestData.length);
-        const now = dateTimeFormatterFromJSDDate({
-          dateTime: new Date(),
-          format: 'yyyy-LL-dd HH:mm:ss',
-        });
-        storage.set(`dateRefetchLatestInRoom${room.id}`, now);
         setRefetchTimes(t => t + 1);
       }
     },
@@ -690,6 +685,11 @@ const Chat: React.FC = () => {
           dateRefetchLatest,
         );
       }
+      const now = dateTimeFormatterFromJSDDate({
+        dateTime: new Date(),
+        format: 'yyyy-LL-dd HH:mm:ss',
+      });
+      storage.set(`dateRefetchLatestInRoom${room.id}`, now);
       refetchUpdatedMessages({
         group: room.id,
         limit: messagesInStorageLength ? undefined : 20,
