@@ -90,9 +90,9 @@ import Clipboard from '@react-native-community/clipboard';
 import {dateTimeFormatterFromJSDDate} from '../../utils/dateTimeFormatterFromJSDate';
 import {useAPIGetUpdatedMessages} from '../../hooks/api/chat/useAPIGetUpdatedMessages';
 
-// const socket = io(baseURL, {
-//   transports: ['websocket'],
-// });
+const socket = io('http://34.84.206.131:3001/', {
+  transports: ['websocket'],
+});
 
 const TopTab = createMaterialTopTabNavigator();
 
@@ -259,6 +259,11 @@ const Chat: React.FC = () => {
       refetchLastReadChatTime();
       if (appState === 'active') {
         if (latestData?.length) {
+          const now = dateTimeFormatterFromJSDDate({
+            dateTime: new Date(),
+            format: 'yyyy-LL-dd HH:mm:ss',
+          });
+          storage.set(`dateRefetchLatestInRoom${room.id}`, now);
           saveLastReadChatTime(room.id);
           setMessages(m => {
             const updatedMessages = refreshMessage([...latestData, ...m]);
@@ -270,7 +275,7 @@ const Chat: React.FC = () => {
           // setImagesForViewing(i => [...i, ...imagesToApped]);
         }
         console.log('latest success ====================', latestData.length);
-        setRefetchTimes(t => t + 1);
+        // setRefetchTimes(t => t + 1);
       }
     },
   });
@@ -655,11 +660,77 @@ const Chat: React.FC = () => {
 
   useEffect(() => {
     setCurrentChatRoomId(room.id);
+    let isMounted = true;
+    socket.connect();
+    socket.emit('joinRoom', room.id.toString());
+    socket.on('readMessageClient', async (senderId: string) => {
+      if (myself?.id && senderId && senderId !== `${myself?.id}`) {
+        console.log('readMessageClient called', senderId, myself.id, room.id);
+        refetchLastReadChatTime();
+      }
+    });
+    socket.on('msgToClient', async (sentMsgByOtherUsers: ChatMessage) => {
+      if (sentMsgByOtherUsers.content) {
+        if (
+          sentMsgByOtherUsers?.sender?.id !== myself?.id &&
+          AppState.currentState === 'active'
+        ) {
+          saveLastReadChatTime(room.id, {
+            onSuccess: () => {
+              socket.emit('readReport', {
+                room: room.id.toString(),
+                senderId: myself?.id,
+              });
+              handleEnterRoom(room.id);
+            },
+          });
+          refetchLastReadChatTime();
+        }
+        sentMsgByOtherUsers.createdAt = new Date(sentMsgByOtherUsers.createdAt);
+        sentMsgByOtherUsers.updatedAt = new Date(sentMsgByOtherUsers.updatedAt);
+        if (sentMsgByOtherUsers.sender?.id === myself?.id) {
+          sentMsgByOtherUsers.isSender = true;
+        }
+        // setImagesForViewing(i => [...i, {uri: sentMsgByOtherUsers.content}]);
+        if (sentMsgByOtherUsers.type === ChatMessageType.VIDEO) {
+          sentMsgByOtherUsers.thumbnail = await getThumbnailOfVideo(
+            sentMsgByOtherUsers.content,
+          );
+        }
+        if (isMounted) {
+          setMessages(msgs => {
+            if (
+              msgs.length &&
+              msgs[0].id !== sentMsgByOtherUsers.id &&
+              sentMsgByOtherUsers.chatGroup?.id === room.id
+            ) {
+              return refreshMessage([sentMsgByOtherUsers, ...msgs]);
+            } else if (sentMsgByOtherUsers.chatGroup?.id !== room.id) {
+              return refreshMessage(
+                msgs.filter(m => m.id !== sentMsgByOtherUsers.id),
+              );
+            }
+            return refreshMessage(msgs);
+          });
+        }
+      }
+    });
+    setCurrentChatRoomId(room.id);
+
+    socket.on('joinedRoom', (r: any) => {
+      console.log('joinedRoom', r);
+    });
+
+    socket.on('leftRoom', (r: any) => {
+      console.log('leftRoom', r);
+    });
 
     return () => {
       setMessages([]);
+      socket.emit('leaveRoom', room.id);
+      isMounted = false;
       console.log('===-----000---=====', room.id);
-
+      socket.disconnect();
       setCurrentChatRoomId(undefined);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -685,11 +756,6 @@ const Chat: React.FC = () => {
           dateRefetchLatest,
         );
       }
-      const now = dateTimeFormatterFromJSDDate({
-        dateTime: new Date(),
-        format: 'yyyy-LL-dd HH:mm:ss',
-      });
-      storage.set(`dateRefetchLatestInRoom${room.id}`, now);
       refetchUpdatedMessages({
         group: room.id,
         limit: messagesInStorageLength ? undefined : 20,
@@ -916,39 +982,6 @@ const Chat: React.FC = () => {
     </>
   );
 
-  // useFocusEffect(
-  //   useCallback(() => {
-  //     console.log('----0000333-3-3-3-', room);
-
-  //     const jsonMessagesInStorage = storage.getString(
-  //       `messagesIntRoom${room.id}`,
-  //     );
-  //     const dateRefetchLatest = storage.getString(
-  //       `dateRefetchLatestInRoom${room.id}`,
-  //     );
-  //     let messagesInStorageLength;
-  //     if (jsonMessagesInStorage) {
-  //       const messagesInStorage = JSON.parse(jsonMessagesInStorage);
-  //       setMessages(messagesInStorage);
-  //       messagesInStorageLength = messagesInStorage?.length;
-  //       console.log(
-  //         'refetch updated messages ========================',
-  //         dateRefetchLatest,
-  //       );
-  //     }
-  //     refetchUpdatedMessages({
-  //       group: room.id,
-  //       limit: messagesInStorageLength ? undefined : 20,
-  //       dateRefetchLatest: dateRefetchLatest,
-  //     });
-  //     handleEnterRoom(room.id);
-
-  //     // refetchLatest();
-  //     refetchRoomDetail();
-  //     // eslint-disable-next-line react-hooks/exhaustive-deps
-  //   }, [refetchRoomDetail]),
-  // );
-
   useEffect(() => {
     const unsubscribeAppState = () => {
       AppState.addEventListener('change', state => {
@@ -960,56 +993,61 @@ const Chat: React.FC = () => {
     };
   });
 
-  const [refetchTimes, setRefetchTimes] = useState(0);
-  useEffect(() => {
-    const messageRefetchInterval = async () => {
-      await new Promise(r => setTimeout(r, 5000));
-      if (appState === 'active' && isFocused) {
-        console.log('messageRefetchInterval---', myself?.lastName);
-        const dateRefetchLatest = storage.getString(
-          `dateRefetchLatestInRoom${room.id}`,
-        );
-        refetchUpdatedMessages({
-          group: room.id,
-          limit: undefined,
-          dateRefetchLatest: dateRefetchLatest,
-        });
-      }
-    };
-    if (appState === 'active' && refetchTimes > 0) {
-      messageRefetchInterval();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [refetchTimes, appState]);
-
+  // const [refetchTimes, setRefetchTimes] = useState(0);
   // useEffect(() => {
-  //   if (appState === 'active' && isFocused) {
-  //     saveLastReadChatTime(room.id, {
-  //       onSuccess: () => {
-  //         socket.emit('readReport', {
-  //           room: room.id.toString(),
-  //           senderId: myself?.id,
-  //         });
-  //         handleEnterRoom(room.id);
-  //       },
-  //     });
+  //   const messageRefetchInterval = async () => {
+  //     await new Promise(r => setTimeout(r, 5000));
+  //     if (appState === 'active' && isFocused) {
+  //       console.log('messageRefetchInterval---', myself?.lastName);
+  //       const dateRefetchLatest = storage.getString(
+  //         `dateRefetchLatestInRoom${room.id}`,
+  //       );
+  //       const now = dateTimeFormatterFromJSDDate({
+  //         dateTime: new Date(),
+  //         format: 'yyyy-LL-dd HH:mm:ss',
+  //       });
+  //       storage.set(`dateRefetchLatestInRoom${room.id}`, now);
+  //       refetchUpdatedMessages({
+  //         group: room.id,
+  //         limit: undefined,
+  //         dateRefetchLatest: dateRefetchLatest,
+  //       });
+  //     }
+  //   };
+  //   if (appState === 'active' && refetchTimes > 0) {
+  //     messageRefetchInterval();
   //   }
   //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [appState, isFocused]);
+  // }, [refetchTimes, appState]);
 
-  // useEffect(() => {
-  //   saveLastReadChatTime(room.id, {
-  //     onSuccess: () => {
-  //       socket.emit('readReport', {
-  //         room: room.id.toString(),
-  //         senderId: myself?.id,
-  //       });
-  //       handleEnterRoom(room.id);
-  //     },
-  //   });
-  //   return () => saveLastReadChatTime(room.id);
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [room.id, saveLastReadChatTime]);
+  useEffect(() => {
+    if (appState === 'active' && isFocused) {
+      saveLastReadChatTime(room.id, {
+        onSuccess: () => {
+          socket.emit('readReport', {
+            room: room.id.toString(),
+            senderId: myself?.id,
+          });
+          handleEnterRoom(room.id);
+        },
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [appState, isFocused]);
+
+  useEffect(() => {
+    saveLastReadChatTime(room.id, {
+      onSuccess: () => {
+        socket.emit('readReport', {
+          room: room.id.toString(),
+          senderId: myself?.id,
+        });
+        handleEnterRoom(room.id);
+      },
+    });
+    return () => saveLastReadChatTime(room.id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [room.id, saveLastReadChatTime]);
 
   const readUserBox = (user: User) => (
     <View style={tailwind('flex-row bg-white items-center px-4 py-2')}>
