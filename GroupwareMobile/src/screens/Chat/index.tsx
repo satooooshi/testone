@@ -276,6 +276,7 @@ const Chat: React.FC = () => {
         });
         storage.set(`dateRefetchLatestInRoom${room.id}`, now);
         setRefetchTimes(t => t + 1);
+      }
     },
   });
 
