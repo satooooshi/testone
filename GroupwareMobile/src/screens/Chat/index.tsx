@@ -182,7 +182,6 @@ const Chat: React.FC = () => {
     {
       enabled: false,
       onSuccess: res => {
-        console.log('success =============================', res.length);
         if (res?.length) {
           const refreshedMessage = refreshMessage(res);
           console.log('refreshMessage =============', refreshedMessage.length);
@@ -274,7 +273,6 @@ const Chat: React.FC = () => {
           });
           // setImagesForViewing(i => [...i, ...imagesToApped]);
         }
-        console.log('latest success ====================', latestData.length);
         // setRefetchTimes(t => t + 1);
       }
     },
@@ -572,7 +570,6 @@ const Chat: React.FC = () => {
   }, [room]);
 
   useEffect(() => {
-    console.log('call ==================== refetch past messages');
     refetchFetchedPastMessages();
   }, [before, after, include, refetchFetchedPastMessages]);
 
@@ -594,7 +591,6 @@ const Chat: React.FC = () => {
 
   useEffect(() => {
     if (focusedMessageID) {
-      console.log('focus change trigger ===================');
       refetchDoesntExistMessages(focusedMessageID);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -729,7 +725,6 @@ const Chat: React.FC = () => {
       setMessages([]);
       socket.emit('leaveRoom', room.id);
       isMounted = false;
-      console.log('===-----000---=====', room.id);
       socket.disconnect();
       setCurrentChatRoomId(undefined);
     };
@@ -738,8 +733,6 @@ const Chat: React.FC = () => {
 
   useEffect(() => {
     if (!messages.length) {
-      console.log('--------id', room.id, messages.length);
-
       const jsonMessagesInStorage = storage.getString(
         `messagesIntRoom${room.id}`,
       );
