@@ -91,7 +91,7 @@ const NoteBox: React.FC<NoteBoxProps> = ({
           ))}
         </SimpleGrid>
         <Linkify componentDecorator={componentDecorator}>
-          <Text alignSelf="flex-start" whiteSpace="pre-wrap">
+          <Text alignSelf="flex-start" whiteSpace="pre-wrap" w={'100%'}>
             {n.content}
           </Text>
         </Linkify>
