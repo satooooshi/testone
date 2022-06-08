@@ -34,7 +34,7 @@ const CallMessage: React.FC<CallMessageProps> = ({message, onLongPress}) => {
           alignItems="center"
           justifyContent="center"
           ml={3}>
-          <Icon name="phone" fontFamily="Entypo" fontSize={25} color="white" />
+          <Icon name="call" fontFamily="Ionicons" fontSize={25} color="white" />
         </Div>
         <Div ml={10} flexDir="column" alignItems="center">
           <Text fontSize={15} color="white">

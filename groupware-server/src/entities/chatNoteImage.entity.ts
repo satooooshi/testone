@@ -25,13 +25,13 @@ export class ChatNoteImage {
   imageURL: string;
 
   @Column({
-    name: 'name',
+    name: 'file_name',
     type: 'varchar',
     length: 2083,
     default: '',
     nullable: false,
   })
-  name: string;
+  fileName: string;
 
   @ManyToOne(() => ChatNote, (chatNote) => chatNote.images, {
     onUpdate: 'CASCADE',

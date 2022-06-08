@@ -33,7 +33,7 @@ import { hideScrollbarCss } from 'src/utils/chakra/hideScrollBar.css';
 import EditChatGroupMembersModal from '../EditChatGroupMembersModal';
 import { MdCancel } from 'react-icons/md';
 import { userNameFactory } from 'src/utils/factory/userNameFactory';
-import { useRoomRefetch } from 'src/contexts/chat/useRoomRefetch';
+import { useHandleBadge } from 'src/contexts/badge/useHandleBadge';
 
 type CreateChatGroupModalProps = {
   isOpen: boolean;
@@ -53,7 +53,7 @@ const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
     name: '',
     members: selectedMembers,
   };
-  const { needRefetch } = useRoomRefetch();
+  const { editChatGroup } = useHandleBadge();
   const [membersModal, setMembersModal] = useState(false);
   const [selectImageUrl, setSelectImageUrl] = useState<string>('');
   const [selectImageName, setSelectImageName] = useState<string>('');
@@ -76,6 +76,7 @@ const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
     onDrop: onEventImageDrop,
     accept: imageExtensions,
   });
+  const [willSubmit, setWillSubmit] = useState(false);
   const router = useRouter();
 
   const onLoad = useCallback((img) => {
@@ -87,12 +88,26 @@ const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
     useAPISaveChatGroup({
       onSuccess: (createdData) => {
         onClose();
-        needRefetch();
+        editChatGroup(createdData);
         router.push(`/chat/${createdData.id.toString()}`, undefined, {
           shallow: true,
         });
       },
     });
+
+  useEffect(() => {
+    if (isOpen) {
+      setWillSubmit(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (willSubmit) {
+      onFinish();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [willSubmit]);
 
   const {
     values: newGroup,
@@ -138,7 +153,7 @@ const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
         isClosable: true,
       });
     } else {
-      onFinish();
+      setWillSubmit(true);
     }
   };
 

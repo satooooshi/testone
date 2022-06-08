@@ -41,6 +41,7 @@ import {userNameFactory} from '../../../utils/factory/userNameFactory';
 import {userRoleNameFactory} from '../../../utils/factory/userRoleNameFactory';
 import {useInviteCall} from '../../../contexts/call/useInviteCall';
 import {branchTypeNameFactory} from '../../../utils/factory/branchTypeNameFactory';
+import {useHandleBadge} from '../../../contexts/badge/useHandleBadge';
 
 const TopTab = createMaterialTopTabNavigator();
 
@@ -159,8 +160,9 @@ const AccountDetail: React.FC = () => {
   const navigation = useNavigation<AccountDetailNavigationProps>();
   const route = useRoute<AccountDetailRouteProps>();
   const {user, setUser, logout} = useAuthenticate();
-  // const {sendCallInvitation} = useInviteCall();
+  const {sendCallInvitation} = useInviteCall();
   const {setIsTabBarVisible} = useIsTabBarVisible();
+  const {editChatGroup} = useHandleBadge();
   const id = route.params?.id;
   const userID = id || user?.id;
   const screenName = 'AccountDetail';
@@ -192,8 +194,12 @@ const AccountDetail: React.FC = () => {
       type: WikiType.BOARD,
       board_category: BoardCategory.KNOWLEDGE,
     });
+  const [safetyCreateGroup, setCreatGroup] = useState(false);
   const {mutate: createGroup} = useAPISaveChatGroup({
     onSuccess: createdData => {
+      if (createdData.updatedAt === createdData.createdAt) {
+        editChatGroup(createdData);
+      }
       const resetAction = StackActions.popToTop();
       navigation.dispatch(resetAction);
 
@@ -207,6 +213,17 @@ const AccountDetail: React.FC = () => {
       Alert.alert('チャットルームの作成に失敗しました');
     },
   });
+
+  useEffect(() => {
+    if (safetyCreateGroup && profile) {
+      createGroup({
+        name: '',
+        members: [profile],
+        roomType: RoomType.PERSONAL,
+      });
+    }
+  }, [safetyCreateGroup, profile, createGroup]);
+
   const isFocused = useIsFocused();
   const [activeScreen, setActiveScreen] = useState(defaultScreenName);
 
@@ -247,11 +264,11 @@ const AccountDetail: React.FC = () => {
     setUser({});
   };
 
-  // const inviteCall = async () => {
-  //   if (user && profile) {
-  //     await sendCallInvitation(user, profile);
-  //   }
-  // };
+  const inviteCall = async () => {
+    if (user && profile) {
+      await sendCallInvitation(user, profile);
+    }
+  };
   // const inviteCall = async () => {
   //   if (user && profile) {
   //     const localInvitation = await setupCallInvitation(user, profile);
@@ -303,11 +320,17 @@ const AccountDetail: React.FC = () => {
                   w={windowWidth * 0.6}
                 />
               </Div>
-              {/* <Div flexDir="row" mb="sm"> */}
-              <Text fontWeight="bold" color={darkFontColor} fontSize={24}>
-                {userNameFactory(profile)}
-              </Text>
-              {/* {profile.id !== user?.id ? (
+              <Div flexDir="row" mb="sm">
+                <Text
+                  fontWeight="bold"
+                  mb={'lg'}
+                  color={darkFontColor}
+                  mr="lg"
+                  fontSize={24}>
+                  {userNameFactory(profile)}
+                </Text>
+                {profile.id !== user?.id &&
+                profile.role !== UserRole.EXTERNAL_INSTRUCTOR ? (
                   <Button
                     mr={-50}
                     mt={-10}
@@ -326,14 +349,14 @@ const AccountDetail: React.FC = () => {
                       ]);
                     }}>
                     <Icon
-                      name="phone"
-                      fontFamily="Entypo"
+                      name="call"
+                      fontFamily="Ionicons"
                       fontSize={24}
                       color="blue700"
                     />
                   </Button>
-                ) : null} */}
-              {/* </Div> */}
+                ) : null}
+              </Div>
             </Div>
             <Div h={bottomContentsHeight() ? bottomContentsHeight() : 700}>
               <TopTab.Navigator
@@ -512,13 +535,7 @@ const AccountDetail: React.FC = () => {
             w={60}
             zIndex={20}
             rounded="circle"
-            onPress={() =>
-              createGroup({
-                name: '',
-                members: [profile],
-                roomType: RoomType.PERSONAL,
-              })
-            }>
+            onPress={() => setCreatGroup(true)}>
             <Icon
               fontSize={'6xl'}
               color="white"

@@ -63,14 +63,10 @@ export const AuthenticateProvider: React.FC = ({children}) => {
   };
 
   const setCurrentChatRoomId = (id: number | undefined) => {
-    console.log('setCurrentChatRoomId called ---', id);
-
     setCurrentChatRoom(id);
   };
 
   const getCurrentChatRoomId = useCallback(() => {
-    console.log('get current called');
-
     return currentChatRoomId;
   }, [currentChatRoomId]);
 

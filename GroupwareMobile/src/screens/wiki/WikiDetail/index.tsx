@@ -235,7 +235,12 @@ const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
                     }
                   }}>
                   <Div mr={8}>
-                    <UserAvatar h={48} w={48} user={wikiState.writer} />
+                    <UserAvatar
+                      h={48}
+                      w={48}
+                      user={wikiState.writer}
+                      GoProfile={true}
+                    />
                   </Div>
                 </TouchableOpacity>
                 <Text fontSize={18} color={darkFontColor}>
