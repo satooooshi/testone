@@ -31,7 +31,7 @@ import {
   ChatMessage,
   ChatMessageReaction,
   ChatMessageType,
-  ImageSource,
+  FIleSource,
   User,
 } from '../../types';
 import {uploadImageFromGallery} from '../../utils/cropImage/uploadImageFromGallery';
@@ -83,6 +83,9 @@ import {useAuthenticate} from '../../contexts/useAuthenticate';
 import {useInviteCall} from '../../contexts/call/useInviteCall';
 import {reactionStickers} from '../../utils/factory/reactionStickers';
 import Video from 'react-native-video';
+import {ScrollView} from 'react-native-gesture-handler';
+import ChatShareIcon from '../../components/common/ChatShareIcon';
+import {getFileUrl} from '../../utils/storage/getFileUrl';
 import {useHandleBadge} from '../../contexts/badge/useHandleBadge';
 import {useIsTabBarVisible} from '../../contexts/bottomTab/useIsTabBarVisible';
 import {debounce} from 'lodash';
@@ -123,16 +126,17 @@ const Chat: React.FC = () => {
   const [inputtedSearchWord, setInputtedSearchWord] = useState('');
   const [imageModal, setImageModal] = useState(false);
   const [visibleSearchInput, setVisibleSearchInput] = useState(false);
-  const imagesForViewing: ImageSource[] = useMemo(() => {
+  const imagesForViewing: FIleSource[] = useMemo(() => {
     return messages
       .filter(m => m.type === ChatMessageType.IMAGE)
       .map(m => ({
         uri: m.content,
+        fileName: m.fileName,
       }))
       .reverse();
   }, [messages]);
   const [nowImageIndex, setNowImageIndex] = useState<number>(0);
-  const [video, setVideo] = useState('');
+  const [video, setVideo] = useState<FIleSource>();
   const {data: lastReadChatTime, refetch: refetchLastReadChatTime} =
     useAPIGetLastReadChatTime(room.id);
   const [longPressedMsg, setLongPressedMgg] = useState<ChatMessage>();
@@ -259,6 +263,20 @@ const Chat: React.FC = () => {
       refetchLastReadChatTime();
       if (appState === 'active') {
         if (latestData?.length) {
+          // const msgToAppend: ChatMessage[] = [];
+          // const imagesToApped: FIleSource[] = [];
+          // for (const latest of latestData) {
+          //   if (!messages?.length || isRecent(latest, messages?.[0])) {
+          //     msgToAppend.push(latest);
+          //     if (latest.type === ChatMessageType.IMAGE) {
+          //       imagesToApped.unshift({
+          //         uri: latest.content,
+          //         fileName: latest.fileName,
+          //       });
+          //     }
+          //   }
+          // }
+          // setMessages(m => refreshMessage([...msgToAppend, ...m]));
           const now = dateTimeFormatterFromJSDDate({
             dateTime: new Date(),
             format: 'yyyy-LL-dd HH:mm:ss',
@@ -306,7 +324,7 @@ const Chat: React.FC = () => {
   const isLoadingSending = loadingSendMessage || loadingUploadFile;
 
   const showImageOnModal = (url: string) => {
-    const isNowUri = (element: ImageSource) => element.uri === url;
+    const isNowUri = (element: FIleSource) => element.uri === url;
     setNowImageIndex(imagesForViewing.findIndex(isNowUri));
     setImageModal(true);
   };
@@ -460,8 +478,14 @@ const Chat: React.FC = () => {
     setVisibleStickerSelector(false);
   };
 
-  const playVideoOnModal = (url: string) => {
-    setVideo(url);
+  const playVideoOnModal = async (data: FIleSource) => {
+    if (!data.createdUrl) {
+      const url = await getFileUrl(data.fileName, data.uri);
+      if (url) {
+        data.createdUrl = url;
+      }
+    }
+    setVideo(data);
   };
 
   const isRecent = (created: ChatMessage, target: ChatMessage): boolean => {
@@ -692,11 +716,6 @@ const Chat: React.FC = () => {
           sentMsgByOtherUsers.isSender = true;
         }
         // setImagesForViewing(i => [...i, {uri: sentMsgByOtherUsers.content}]);
-        if (sentMsgByOtherUsers.type === ChatMessageType.VIDEO) {
-          sentMsgByOtherUsers.thumbnail = await getThumbnailOfVideo(
-            sentMsgByOtherUsers.content,
-          );
-        }
         if (isMounted) {
           setMessages(msgs => {
             if (
@@ -797,7 +816,9 @@ const Chat: React.FC = () => {
         numbersOfRead={numbersOfRead(message)}
         onLongPress={() => setLongPressedMgg(message)}
         onPressImage={() => showImageOnModal(message.content)}
-        onPressVideo={() => playVideoOnModal(message.content)}
+        onPressVideo={() =>
+          playVideoOnModal({uri: message.content, fileName: message.fileName})
+        }
         onPressReaction={r =>
           r.isSender
             ? handleDeleteReaction(r, message)
@@ -1117,37 +1138,39 @@ const Chat: React.FC = () => {
         }}
         onPressEmoji={emoji => setSelectedEmoji(emoji)}
       />
-      <MagnusModal isVisible={!!video} bg="black">
-        <TouchableOpacity
-          style={chatStyles.cancelIcon}
-          onPress={() => {
-            setVideo('');
-          }}>
-          <Icon
-            position="absolute"
-            name={'cancel'}
-            fontFamily="MaterialIcons"
-            fontSize={30}
-            color="#fff"
+      {video?.fileName && video.uri ? (
+        <MagnusModal isVisible={!!video} bg="black">
+          <TouchableOpacity
+            style={chatStyles.cancelIcon}
+            onPress={() => {
+              setVideo(undefined);
+            }}>
+            <Icon
+              position="absolute"
+              name={'cancel'}
+              fontFamily="MaterialIcons"
+              fontSize={30}
+              color="#fff"
+            />
+          </TouchableOpacity>
+          <VideoPlayer
+            video={{
+              uri: video?.createdUrl,
+            }}
+            autoplay
+            videoWidth={windowWidth}
+            videoHeight={windowHeight * 0.9}
           />
-        </TouchableOpacity>
-        {/* <Video source={{uri: video}}> */}
-        <VideoPlayer
-          video={{
-            uri: video,
-          }}
-          autoplay
-          videoWidth={windowWidth}
-          videoHeight={windowHeight * 0.9}
-        />
-        <TouchableOpacity
-          style={tailwind('absolute bottom-5 right-5')}
-          onPress={async () =>
-            await saveToCameraRoll({url: video, type: 'video'})
-          }>
-          <Icon color="white" name="download" fontSize={24} />
-        </TouchableOpacity>
-      </MagnusModal>
+          <TouchableOpacity
+            style={tailwind('absolute bottom-5 right-5')}
+            onPress={async () =>
+              await saveToCameraRoll({url: video.uri, type: 'video'})
+            }>
+            <Icon color="white" name="download" fontSize={24} />
+          </TouchableOpacity>
+          <ChatShareIcon image={video} isVideo />
+        </MagnusModal>
+      ) : null}
 
       <MagnusModal isVisible={!!selectedMessageForCheckLastRead}>
         <Button
@@ -1207,15 +1230,18 @@ const Chat: React.FC = () => {
 
       <ImageView
         animationType="slide"
-        images={imagesForViewing}
+        images={imagesForViewing.map(i => {
+          return {uri: i.uri};
+        })}
         imageIndex={nowImageIndex === -1 ? 0 : nowImageIndex}
         visible={imageModal}
         onRequestClose={() => setImageModal(false)}
         swipeToCloseEnabled={false}
         doubleTapToZoomEnabled={true}
         FooterComponent={({imageIndex}) => (
-          <Div position="absolute" bottom={5} right={5}>
+          <Div>
             <DownloadIcon url={imagesForViewing[imageIndex].uri} />
+            <ChatShareIcon image={imagesForViewing[imageIndex]} />
           </Div>
         )}
       />

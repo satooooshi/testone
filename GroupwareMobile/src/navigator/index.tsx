@@ -9,9 +9,7 @@ import {useAuthenticate} from '../contexts/useAuthenticate';
 import {RootStackParamList} from '../types/navigator/RootStackParamList';
 import {axiosInstance, storage, tokenString} from '../utils/url';
 import BottomTab from './BottomTab';
-import messaging, {
-  FirebaseMessagingTypes,
-} from '@react-native-firebase/messaging';
+import messaging from '@react-native-firebase/messaging';
 import {requestIOSMsgPermission} from '../utils/permission/requestIOSMsgPermisson';
 import {useAPIRegisterDevice} from '../hooks/api/notification/useAPIRegisterDevice';
 import ForgotPassword from '../screens/auth/ForgotPassword';
@@ -29,9 +27,7 @@ import {useInviteCall} from '../contexts/call/useInviteCall';
 import SoundPlayer from 'react-native-sound-player';
 import {debounce} from 'lodash';
 import notifee, {EventType} from '@notifee/react-native';
-import PushNotification, {
-  ReceivedNotification,
-} from 'react-native-push-notification';
+import PushNotification from 'react-native-push-notification';
 import {useHandleBadge} from '../contexts/badge/useHandleBadge';
 
 const Stack = createStackNavigator<RootStackParamList>();

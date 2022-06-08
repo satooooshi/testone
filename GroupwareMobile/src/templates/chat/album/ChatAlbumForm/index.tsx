@@ -5,7 +5,7 @@ import {
   ChatAlbum,
   ChatAlbumImage,
   ChatGroup,
-  ImageSource,
+  FIleSource,
 } from '../../../../types';
 import ImageView from 'react-native-image-viewing';
 import {UseMutateFunction} from 'react-query';
@@ -28,6 +28,7 @@ import {dateTimeFormatterFromJSDDate} from '../../../../utils/dateTimeFormatterF
 import DownloadIcon from '../../../../components/common/DownLoadIcon';
 import {ActivityIndicator} from 'react-native-paper';
 import {albumSchema} from '../../../../utils/validation/schema';
+import ChatShareIcon from '../../../../components/common/ChatShareIcon';
 
 type ChatAlbumFormProps = {
   album?: ChatAlbum;
@@ -59,11 +60,14 @@ const ChatAlbumForm: React.FC<ChatAlbumFormProps> = ({
     validationSchema: albumSchema,
     onSubmit: submittedValues => onSubmit(submittedValues),
   });
-  const images: ImageSource[] =
-    values.images?.map(i => ({uri: i.imageURL || ''})) || [];
+  const images: FIleSource[] =
+    values.images?.map(i => ({
+      uri: i.imageURL || '',
+      fileName: i.fileName || '',
+    })) || [];
 
   const handlePressImage = (url: string) => {
-    const isNowUri = (element: ImageSource) => element.uri === url;
+    const isNowUri = (element: FIleSource) => element.uri === url;
     setNowImageIndex(images.findIndex(isNowUri));
     setImageModal(true);
   };
@@ -143,6 +147,7 @@ const ChatAlbumForm: React.FC<ChatAlbumFormProps> = ({
         FooterComponent={({imageIndex}) => (
           <Div position="absolute" bottom={5} right={5}>
             <DownloadIcon url={images[imageIndex].uri} />
+            <ChatShareIcon image={images[imageIndex]} />
           </Div>
         )}
       />
