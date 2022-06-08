@@ -79,6 +79,7 @@ import { fileNameTransformer } from 'src/utils/factory/fileNameTransformer';
 import { saveAs } from 'file-saver';
 import { EntryComponentProps } from '@draft-js-plugins/mention/lib/MentionSuggestions/Entry/Entry';
 import suggestionStyles from '@/styles/components/Suggestion.module.scss';
+import { useHandleBadge } from 'src/contexts/badge/useHandleBadge';
 import { useAPISearchMessages } from '@/hooks/api/chat/useAPISearchMessages';
 import { removeHalfWidthSpace } from 'src/utils/replaceWidthSpace';
 import { reactionStickers } from 'src/utils/reactionStickers';
@@ -131,9 +132,9 @@ export const Entry: React.FC<EntryComponentProps> = ({
   );
 };
 
-const socket = io(baseURL, {
-  transports: ['websocket'],
-});
+// const socket = io(baseURL, {
+//   transports: ['websocket'],
+// });
 
 type ChatBoxProps = {
   room: ChatGroup;
@@ -141,8 +142,7 @@ type ChatBoxProps = {
 };
 
 const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
-  const { needRefetch } = useRoomRefetch();
-  const { user } = useAuthenticate();
+  const { user, setCurrentChatRoomId } = useAuthenticate();
   const [visibleAlbumModal, setVisibleAlbumModal] = useState(false);
   const [visibleNoteModal, setVisibleNoteModal] = useState(false);
   const [visibleSearchForm, setVisibleSearchForm] = useState(false);
@@ -150,7 +150,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
   const [confirmedSearchWord, setConfirmedSearchWord] = useState('');
   const [after, setAfter] = useState<number>();
   const [before, setBefore] = useState<number>();
-  const { user: myself } = useAuthenticate();
+  const [minBefore, setMinBefore] = useState<number>();
   const [focusedMessageID, setFocusedMessageID] = useState<number>();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [searchedResults, setSearchedResults] = useState<
@@ -181,11 +181,13 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
       .reverse();
   }, [messages]);
   const { mutate: saveLastReadChatTime } = useAPISaveLastReadChatTime();
-  const [selectedImage, setSelectedImage] =
-    useState<{ url: string; name: string }>();
-  const { data: lastReadChatTime } = useAPIGetLastReadChatTime(room.id, {
-    refetchInterval: 1000,
-  });
+  const [selectedImageURL, setSelectedImageURL] = useState<string>();
+  const { data: lastReadChatTime, refetch: refetchLastReadChatTime } =
+    useAPIGetLastReadChatTime(room.id, {
+      onSuccess: () => {
+        // refetchRoom();
+      },
+    });
   const userDataForMention: MentionData[] = useMemo(() => {
     const users =
       room?.members
@@ -208,15 +210,20 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
     after,
     before,
     include,
+    limit: '20',
   });
 
   const { refetch: refetchLatest } = useAPIGetMessages(
     {
       group: room.id,
+      limit: '10',
     },
     {
-      enabled: false,
+      refetchInterval: 5000,
       onSuccess: (latestData) => {
+        console.log('-------', latestData.length);
+
+        refetchLastReadChatTime();
         if (latestData?.length) {
           const msgToAppend: ChatMessage[] = [];
           for (const latest of latestData) {
@@ -225,8 +232,16 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
             }
           }
           if (msgToAppend.length) {
+            console.log('9999999');
+            saveLastReadChatTime(room.id, {
+              onSuccess: () => {
+                // socket.emit('readReport', {
+                //   room: room.id.toString(),
+                //   senderId: user?.id,
+                // });
+              },
+            });
             setMessages((m) => [...msgToAppend, ...m]);
-            needRefetch();
           }
         }
       },
@@ -254,7 +269,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
     useAPISendChatMessage({
       onSuccess: (data) => {
         setMessages([data, ...messages]);
-        socket.emit('message', { ...data, isSender: false });
+        // socket.emit('message', { ...data, isSender: false });
         setNewChatMessage((m) => ({
           ...m,
           content: '',
@@ -263,6 +278,10 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
         setEditorState(EditorState.createEmpty());
         messageWrapperDivRef.current &&
           messageWrapperDivRef.current.scrollTo({ top: 0 });
+      },
+      onError: (err) => {
+        alert('メッセージを送信できませんでした。');
+        console.log('0000', err);
       },
     });
 
@@ -322,6 +341,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
   const [editorState, setEditorState] = useState(EditorState.createEmpty());
   const messageWrapperDivRef = useRef<HTMLDivElement | null>(null);
   const editorRef = useRef<Editor>(null);
+  const { handleEnterRoom } = useHandleBadge();
   const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
   const countOfSearchWord = useMemo(() => {
     if (searchedResults && focusedMessageID) {
@@ -373,7 +393,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
     }
 
     if (room.roomType === RoomType.PERSONAL) {
-      const chatPartner = members.filter((m) => m.id !== myself?.id);
+      const chatPartner = members.filter((m) => m.id !== user?.id);
       const partnerName = chatPartner
         .map((p) => p.lastName + ' ' + p.firstName)
         .join();
@@ -406,17 +426,20 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
       (e.target.scrollHeight * 2) / 3
     ) {
       if (fetchedPastMessages?.length) {
-        setBefore(messages[messages.length - 1].id);
+        const target = messages[messages.length - 1].id;
+        if (minBefore && minBefore <= target) return;
+        setMinBefore(target);
+        setBefore(target);
       }
     }
   };
 
-  useEffect(() => {
-    setMessages([]);
-    setBefore(undefined);
-    setAfter(undefined);
-    refetchLatest();
-  }, [refetchLatest, room]);
+  // useEffect(() => {
+  //   setMessages([]);
+  //   setBefore(undefined);
+  //   setAfter(undefined);
+  //   refetchLatest();
+  // }, [refetchLatest, room]);
 
   useEffect(() => {
     if (fetchedPastMessages?.length) {
@@ -442,70 +465,86 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
   }, [focusedMessageID]);
 
   useEffect(() => {
-    socket.emit('joinRoom', room.id.toString());
-    socket.on('msgToClient', async (sentMsgByOtherUsers: ChatMessage) => {
-      // console.log('sent by other users', sentMsgByOtherUsers.content);
-      if (sentMsgByOtherUsers.content) {
-        sentMsgByOtherUsers.createdAt = new Date(sentMsgByOtherUsers.createdAt);
-        sentMsgByOtherUsers.updatedAt = new Date(sentMsgByOtherUsers.updatedAt);
-        if (sentMsgByOtherUsers.sender?.id === myself?.id) {
-          sentMsgByOtherUsers.isSender = true;
-        }
-        setMessages((msgs) => {
-          if (
-            msgs.length &&
-            msgs[0].id !== sentMsgByOtherUsers.id &&
-            sentMsgByOtherUsers.chatGroup?.id === room.id
-          ) {
-            return [sentMsgByOtherUsers, ...msgs];
-          } else if (sentMsgByOtherUsers.chatGroup?.id !== room.id) {
-            return msgs.filter((m) => m.id !== sentMsgByOtherUsers.id);
-          }
-          return msgs;
-        });
-        needRefetch();
-      }
-    });
+    setCurrentChatRoomId(room.id);
+    saveLastReadChatTime(room.id);
+    handleEnterRoom(room.id);
+    // socket.connect();
+    // socket.emit('joinRoom', room.id.toString());
+    // // socket.on('readMessageClient', async (senderId: string) => {
+    // //   if (user?.id && senderId && senderId != `${user?.id}`) {
+    // //     refetchLastReadChatTime();
+    // //   }
+    // // });
+    // socket.on('msgToClient', async (sentMsgByOtherUsers: ChatMessage) => {
+    //   console.log('call ==============================');
+    //   if (sentMsgByOtherUsers.content) {
+    //     if (sentMsgByOtherUsers?.sender?.id !== user?.id) {
+    //       saveLastReadChatTime(room.id, {
+    //         onSuccess: () => {
+    //           socket.emit('readReport', {
+    //             room: room.id.toString(),
+    //             senderId: user?.id,
+    //           });
+    //         },
+    //       });
+    //       refetchLastReadChatTime();
+    //     }
+    //     sentMsgByOtherUsers.createdAt = new Date(sentMsgByOtherUsers.createdAt);
+    //     sentMsgByOtherUsers.updatedAt = new Date(sentMsgByOtherUsers.updatedAt);
+    //     if (sentMsgByOtherUsers.sender?.id === user?.id) {
+    //       sentMsgByOtherUsers.isSender = true;
+    //     }
+    //     setMessages((msgs) => {
+    //       if (
+    //         msgs.length &&
+    //         msgs[0].id !== sentMsgByOtherUsers.id &&
+    //         sentMsgByOtherUsers.chatGroup?.id === room.id
+    //       ) {
+    //         return [sentMsgByOtherUsers, ...msgs];
+    //       } else if (sentMsgByOtherUsers.chatGroup?.id !== room.id) {
+    //         return msgs.filter((m) => m.id !== sentMsgByOtherUsers.id);
+    //       }
 
-    // socket.on('joinedRoom', (r: any) => {
-    //   console.log('joinedRoom', r);
+    //       return msgs;
+    //     });
+    //   }
     // });
-    //
-    // socket.on('leftRoom', (r: any) => {
-    //   console.log('leftRoom', r);
-    // });
+
     return () => {
-      socket.emit('leaveRoom', room.id);
+      // socket.emit('leaveRoom', room.id);
+      // socket.disconnect();
+      setCurrentChatRoomId(undefined);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [room.id]);
 
-  useEffect(() => {
-    messages[0]?.chatGroup?.id === room.id && saveLastReadChatTime(room.id);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [messages, room.id]);
+  // useEffect(() => {
+  //   messages[0]?.chatGroup?.id === room.id && saveLastReadChatTime(room.id);
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [messages, room.id]);
 
-  useEffect(() => {
-    saveLastReadChatTime(room.id);
-    return () => saveLastReadChatTime(room.id);
-  }, [room.id, saveLastReadChatTime]);
-
-  const readUsers = (targetMsg: ChatMessage) => {
-    return lastReadChatTime
-      ? lastReadChatTime
-          .filter((t) => t.readTime >= targetMsg.createdAt)
-          .map((t) => t.user)
-      : [];
-  };
+  // useEffect(() => {
+  //   saveLastReadChatTime(room.id, {
+  //     onSuccess: () => {
+  //       socket.emit('readReport', {
+  //         room: room.id.toString(),
+  //         senderId: user?.id,
+  //       });
+  //       handleEnterRoom(room.id);
+  //     },
+  //   });
+  //   return () => saveLastReadChatTime(room.id);
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [room.id, saveLastReadChatTime]);
 
   const isLoading = loadingSend || loadingUplaod;
   const activeIndex = useMemo(() => {
-    if (selectedImage?.url) {
+    if (selectedImageURL) {
       const isNowUri = (element: ImageDecorator) =>
-        element.src === selectedImage.url;
+        element.src === selectedImageURL;
       return imagesForViewing.findIndex(isNowUri);
     }
-  }, [imagesForViewing, selectedImage?.url]);
+  }, [imagesForViewing, selectedImageURL]);
 
   const replyTargetContent = (replyTarget: ChatMessage) => {
     switch (replyTarget.type) {
@@ -591,7 +630,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
         isOpen={visibleAlbumModal}
         onClose={() => {
           setVisibleAlbumModal(false);
-          refetchLatest();
+          // refetchLatest();
         }}
       />
       <NoteModal
@@ -599,7 +638,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
         isOpen={visibleNoteModal}
         onClose={() => {
           setVisibleNoteModal(false);
-          refetchLatest();
+          // refetchLatest();
         }}
       />
       <input {...noClickInputDropzone()} />
@@ -613,14 +652,14 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
                   className={`react-viewer-icon react-viewer-icon-download`}></i>
               ),
               onClick: ({ src }) => {
-                if (selectedImage?.name) saveAs(src, selectedImage.name);
+                saveAs(src, fileNameTransformer(src));
               },
             },
           ]);
         }}
         images={imagesForViewing}
-        visible={!!selectedImage}
-        onClose={() => setSelectedImage(undefined)}
+        visible={!!selectedImageURL}
+        onClose={() => setSelectedImageURL(undefined)}
         activeIndex={activeIndex !== -1 ? activeIndex : 0}
       />
       {/*
@@ -749,11 +788,12 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
                 isScrollTarget={focusedMessageID === m.id}
                 scrollToTarget={scrollToTarget}
                 usersInRoom={room.members || []}
-                key={m.id + m.content}
+                key={m.id}
                 message={m}
                 confirmedSearchWord={confirmedSearchWord}
                 searchedResultIds={searchedResults?.map((s) => s.id)}
-                readUsers={readUsers(m)}
+                lastReadChatTime={lastReadChatTime}
+                // readUsers={readUsers[i] ? readUsers[i] : []}
                 onClickReply={() =>
                   setNewChatMessage((pre) => ({
                     ...pre,
@@ -762,7 +802,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
                 }
                 onClickImage={() => {
                   if (m.type === ChatMessageType.IMAGE) {
-                    setSelectedImage({ url: m.content, name: m.fileName });
+                    setSelectedImageURL(m.content);
                   }
                 }}
               />

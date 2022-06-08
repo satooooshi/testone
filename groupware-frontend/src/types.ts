@@ -320,6 +320,7 @@ export interface ChatGroup {
   members?: User[];
   lastReadChatTime?: LastReadChatTime[];
   hasBeenRead?: boolean;
+  unreadCount?: number;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -345,7 +346,7 @@ export interface ChatNote {
 export interface ChatNoteImage {
   id: number;
   imageURL: string;
-  name: string;
+  fileName: string;
   chatNote?: ChatNote;
   createdAt: Date;
   updatedAt: Date;
@@ -364,7 +365,7 @@ export interface ChatAlbum {
 
 export interface ChatAlbumImage {
   id: number;
-  name: string;
+  fileName: string;
   imageURL: string;
   chatAlbum?: ChatAlbum;
   createdAt: Date;

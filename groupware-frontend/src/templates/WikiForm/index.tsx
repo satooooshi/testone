@@ -129,6 +129,19 @@ const WikiForm: React.FC<WikiFormProps> = ({
     },
   ];
 
+  const [willSubmit, setWillSubmit] = useState(false);
+
+  useEffect(() => {
+    const safetySubmit = async () => {
+      handleSubmit();
+      await new Promise((r) => setTimeout(r, 1000));
+      setWillSubmit(false);
+    };
+    if (willSubmit) {
+      safetySubmit();
+    }
+  }, [willSubmit, handleSubmit]);
+
   const headerTabName = '内容を編集';
 
   const saveButtonName = useMemo(() => {
@@ -547,7 +560,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
                 marginRight="16px">
                 タグを編集
               </Button>
-              <Button colorScheme="pink" onClick={() => handleSubmit()}>
+              <Button colorScheme="pink" onClick={() => setWillSubmit(true)}>
                 {wiki ? `${saveButtonName}を更新` : `${saveButtonName}を投稿`}
               </Button>
             </Box>

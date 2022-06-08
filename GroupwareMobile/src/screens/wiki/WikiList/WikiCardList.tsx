@@ -4,6 +4,7 @@ import React, {
   Dispatch,
   SetStateAction,
   useCallback,
+  useRef,
 } from 'react';
 import {BoardCategory, RuleCategory, WikiType} from '../../../types';
 import {
@@ -73,6 +74,7 @@ const RenderWikiCardList: React.FC<RenderWikiCardListProps> = ({
   const [wikiForInfiniteScroll, setWikiForInfiniteScroll] = useState(
     fetchedWiki?.wiki || [],
   );
+  const flatListRef = useRef<FlatList | null>(null);
 
   const onEndReached = () => {
     setSearchQuery(q => ({
@@ -95,7 +97,7 @@ const RenderWikiCardList: React.FC<RenderWikiCardListProps> = ({
 
   useEffect(() => {
     if (focused) {
-      setWikiForInfiniteScroll([]);
+      flatListRef?.current?.scrollToOffset({animated: false, offset: 0});
       setSearchQuery(q => ({...q, page: '1', type, word, tag}));
       refetch();
     }
@@ -104,12 +106,17 @@ const RenderWikiCardList: React.FC<RenderWikiCardListProps> = ({
   useEffect(() => {
     if (!isFetching && fetchedWiki?.wiki && fetchedWiki?.wiki.length) {
       setWikiForInfiniteScroll(w => {
-        if (w.length && fetchedWiki.wiki[0].id !== w[0].id) {
+        if (
+          w.length &&
+          fetchedWiki.wiki[0].id !== w[0].id &&
+          searchQuery.page !== '1'
+        ) {
           return [...w, ...fetchedWiki.wiki];
         }
         return fetchedWiki.wiki;
       });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fetchedWiki?.wiki, isFetching]);
 
   const isQA = type === WikiType.BOARD && boardCategory === BoardCategory.QA;
@@ -140,6 +147,7 @@ const RenderWikiCardList: React.FC<RenderWikiCardListProps> = ({
         ) : null}
         {wikiForInfiniteScroll.length ? (
           <FlatList
+            ref={flatListRef}
             contentContainerStyle={tailwind('pb-8')}
             onEndReached={onEndReached}
             onEndReachedThreshold={0.5}

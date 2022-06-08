@@ -48,7 +48,7 @@
 		1FF66F4F0BC4328C9F6808C7 /* libPods-GroupwareMobile.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-GroupwareMobile.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		2BB485AD61E420A6B352227A /* libPods-GroupwareMobile-GroupwareMobileTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-GroupwareMobile-GroupwareMobileTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		390372DAB52248BC4435856A /* Pods-GroupwareMobile.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-GroupwareMobile.release.xcconfig"; path = "Target Support Files/Pods-GroupwareMobile/Pods-GroupwareMobile.release.xcconfig"; sourceTree = "<group>"; };
-		605CA6D02812AD870043910B /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "../../../../Downloads/GoogleService-Info.plist"; sourceTree = "<group>"; };
+		605CA6D02812AD870043910B /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		6071535127FC7D65006E718E /* ring_sound.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = ring_sound.mp3; path = ../assets/ring_sound.mp3; sourceTree = "<group>"; };
 		7520C28B271C173000C800B4 /* GroupwareMobile-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "GroupwareMobile-Bridging-Header.h"; sourceTree = "<group>"; };
 		7520C28C271C173000C800B4 /* BridgingFile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BridgingFile.swift; sourceTree = "<group>"; };
@@ -537,7 +537,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = GroupwareMobile/GroupwareMobile.entitlements;
-				CURRENT_PROJECT_VERSION = 36;
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 6L7YYU79HT;
 				ENABLE_BITCODE = NO;
 				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = arm64;
@@ -637,13 +637,13 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.1;
+				MARKETING_VERSION = 1.0;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
+				PRODUCT_BUNDLE_IDENTIFIER = org.reactjs.native.example.InitProjectbfdjska;
 				PRODUCT_NAME = GroupwareMobile;
 				SWIFT_OBJC_BRIDGING_HEADER = "GroupwareMobile-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -659,7 +659,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = GroupwareMobile/GroupwareMobile.entitlements;
-				CURRENT_PROJECT_VERSION = 36;
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 6L7YYU79HT;
 				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = arm64;
 				HEADER_SEARCH_PATHS = (
@@ -758,13 +758,13 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.1;
+				MARKETING_VERSION = 1.0;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
+				PRODUCT_BUNDLE_IDENTIFIER = org.reactjs.native.example.InitProjectbfdjska;
 				PRODUCT_NAME = GroupwareMobile;
 				SWIFT_OBJC_BRIDGING_HEADER = "GroupwareMobile-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;

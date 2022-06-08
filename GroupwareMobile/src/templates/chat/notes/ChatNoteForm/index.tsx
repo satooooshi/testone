@@ -1,6 +1,6 @@
 import {AxiosError} from 'axios';
 import {useFormik} from 'formik';
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Alert, TextInput, TouchableHighlight} from 'react-native';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import {Button, Div, Icon, Image, Text} from 'react-native-magnus';
@@ -37,6 +37,7 @@ const ChatNoteForm: React.FC<ChatNoteFormProps> = ({
 }) => {
   const [imageModal, setImageModal] = useState(false);
   const [nowImageIndex, setNowImageIndex] = useState<number>(0);
+  const [willSubmit, setWillSubmit] = useState(false);
   const initialValues: Partial<ChatNote> = {
     content: '',
     chatGroup: room,
@@ -69,6 +70,17 @@ const ChatNoteForm: React.FC<ChatNoteFormProps> = ({
     }));
   };
 
+  useEffect(() => {
+    const safetySubmit = async () => {
+      handleSubmit();
+      await new Promise(r => setTimeout(r, 1000));
+      setWillSubmit(false);
+    };
+    if (willSubmit) {
+      safetySubmit();
+    }
+  }, [willSubmit, handleSubmit]);
+
   const handlePressImage = (url: string) => {
     const isNowUri = (element: FIleSource) => element.uri === url;
     setNowImageIndex(images.findIndex(isNowUri));
@@ -82,7 +94,11 @@ const ChatNoteForm: React.FC<ChatNoteFormProps> = ({
         onSuccess: imageURLs => {
           const newImage: Partial<ChatNoteImage> = {
             imageURL: imageURLs[0],
+<<<<<<< HEAD
             fileName: 'image' + '.png',
+=======
+            fileName: imageURLs[0] + '.png',
+>>>>>>> develop
           };
           setValues(v => ({
             ...v,
@@ -104,7 +120,7 @@ const ChatNoteForm: React.FC<ChatNoteFormProps> = ({
         title="ノート"
         rightButtonName={rightButtonNameOnHeader}
         enableBackButton={true}
-        onPressRightButton={() => handleSubmit()}
+        onPressRightButton={() => setWillSubmit(true)}
       />
       <ImageView
         animationType="slide"

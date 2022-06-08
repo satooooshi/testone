@@ -177,7 +177,12 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
             }
             underlayColor="none">
             <Div mr="xs">
-              <UserAvatar h={40} w={40} user={message?.sender} />
+              <UserAvatar
+                h={40}
+                w={40}
+                user={message?.sender}
+                GoProfile={true}
+              />
             </Div>
           </TouchableHighlight>
         ) : null}

@@ -1,6 +1,7 @@
 const chatURL = 'chat';
 
 export const getChatGroupListURL = `/${chatURL}/group-list`;
+export const getRoomsUnreadChatCountURL = `/${chatURL}/group-unread-chat-count`;
 export const getRoomsByPageURL = `/${chatURL}/v2/rooms`;
 export const getRoomDetailURL = `/${chatURL}/v2/room`;
 export const getChatMessagesURL = `/${chatURL}/get-messages`;
@@ -10,6 +11,7 @@ export const editMembersURL = (roomId: number) =>
 export const getLatestMentionedMessageURL = `/${chatURL}/latest-mentioned`;
 export const getLastReadChatTimeURL = `/${chatURL}/get-last-read-chat-time`;
 export const sendChantMessageURL = `/${chatURL}/send-message`;
+export const getRoomURL = `/${chatURL}/get-room`;
 export const saveChatGroupURL = `/${chatURL}/v2/room`;
 export const savePinURL = `${saveChatGroupURL}/pin`;
 export const saveLastReadChatTimeURL = `/${chatURL}/save-last-read-chat-time`;

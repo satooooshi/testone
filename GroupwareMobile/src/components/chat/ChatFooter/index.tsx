@@ -208,6 +208,7 @@ const ChatFooter: React.FC<ChatFooterProps> = ({
                 ? chatStyles.inputAndroid
                 : chatStyles.inputIos,
               {
+                color: 'black',
                 minHeight: windowHeight * 0.03,
                 maxHeight: windowHeight * 0.22,
               },
