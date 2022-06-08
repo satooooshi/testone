@@ -987,7 +987,6 @@ const Chat: React.FC = () => {
               )}
               <Div
                 onLayout={({nativeEvent}) => {
-                  console.log('999', nativeEvent);
                   setFooterHeight(nativeEvent.layout.y);
                 }}
               />
@@ -1121,10 +1120,6 @@ const Chat: React.FC = () => {
     setMessages([]);
     refetchFetchedPastMessages();
   };
-
-  useEffect(() => {
-    console.log('-----', video);
-  }, [video]);
 
   return (
     <WholeContainer>

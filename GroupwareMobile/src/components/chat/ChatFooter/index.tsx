@@ -192,7 +192,6 @@ const ChatFooter: React.FC<ChatFooterProps> = ({
             <TouchableOpacity
               onPress={() => {
                 setVisibleMenu(true);
-                console.log('----');
               }}>
               <Icon name="picture" fontSize={21} />
             </TouchableOpacity>
