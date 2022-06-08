@@ -16,6 +16,9 @@ import { FiMenu } from 'react-icons/fi';
 import { ChatNote, ChatNoteImage } from 'src/types';
 import { dateTimeFormatterFromJSDDate } from 'src/utils/dateTimeFormatter';
 import { userNameFactory } from 'src/utils/factory/userNameFactory';
+import Linkify from 'react-linkify';
+import { blueColor } from 'src/utils/colors';
+import { componentDecorator } from 'src/utils/componentDecorator';
 
 type NoteBoxProps = {
   note: ChatNote;
@@ -87,9 +90,11 @@ const NoteBox: React.FC<NoteBoxProps> = ({
             </Link>
           ))}
         </SimpleGrid>
-        <Text alignSelf="flex-start" whiteSpace="pre-wrap">
-          {n.content}
-        </Text>
+        <Linkify componentDecorator={componentDecorator}>
+          <Text alignSelf="flex-start" whiteSpace="pre-wrap">
+            {n.content}
+          </Text>
+        </Linkify>
       </Box>
     </>
   );
