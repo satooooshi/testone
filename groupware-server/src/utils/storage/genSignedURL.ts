@@ -18,11 +18,14 @@ export const genSignedURL = async (text: string): Promise<string> => {
   if (!storageURLs || !storageURLs.length) {
     return text;
   }
+  //10 years
+  const date = Date.now() + 60000 * 60 * 24 * 6;
+
   const options: any = {
     version: 'v4',
     action: 'read',
-    //1 hour
-    expires: Date.now() + 30 * 60 * 1000,
+    //6 days
+    expires: date,
   };
 
   for await (const unsignedURL of storageURLs) {
