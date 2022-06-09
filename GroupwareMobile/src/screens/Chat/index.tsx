@@ -92,6 +92,7 @@ import {debounce} from 'lodash';
 import Clipboard from '@react-native-community/clipboard';
 import {dateTimeFormatterFromJSDDate} from '../../utils/dateTimeFormatterFromJSDate';
 import {useAPIGetUpdatedMessages} from '../../hooks/api/chat/useAPIGetUpdatedMessages';
+import {useAPIGetExpiredUrlMessages} from '../../hooks/api/chat/useAPIGetExpiredUrlMessages';
 
 const socket = io('http://34.84.206.131:3001/', {
   transports: ['websocket'],
@@ -199,6 +200,24 @@ const Chat: React.FC = () => {
             setBefore(undefined);
           }
         }
+      },
+    },
+  );
+
+  const {refetch: getExpiredUrlMessages} = useAPIGetExpiredUrlMessages(
+    room.id,
+    {
+      onSuccess: data => {
+        setMessages(mgs => {
+          return mgs.map(m => {
+            for (const d of data) {
+              if (d.id === m.id) {
+                return d;
+              }
+            }
+            return m;
+          });
+        });
       },
     },
   );
@@ -771,6 +790,7 @@ const Chat: React.FC = () => {
           'refetch updated messages ========================',
           dateRefetchLatest,
         );
+        getExpiredUrlMessages();
       }
       refetchUpdatedMessages({
         group: room.id,
