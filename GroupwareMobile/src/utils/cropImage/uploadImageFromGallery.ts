@@ -24,6 +24,10 @@ export const uploadImageFromGallery = async (
       photo = await ImagePicker.openCamera({
         width: 300,
         height: 400,
+        forceJpg: true,
+        // compressImageQuality: 0.2,
+        compressImageMaxWidth: 1000,
+        compressImageMaxHeight: 1000,
         // cropping: true,
       });
     } else {
