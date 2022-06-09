@@ -345,13 +345,10 @@ export class ChatService {
     console.log('---', date, query);
     date.setDate(date.getDate() - 1);
     console.log('---after', date);
-    const existMessages = await this.chatMessageRepository
+    const justBeforeExpiredUrlMessages = await this.chatMessageRepository
       .createQueryBuilder('chat_messages')
       .leftJoinAndSelect('chat_messages.chatGroup', 'chat_group')
       .where('chat_group.id = :chatGroupID', { chatGroupID: query })
-      .andWhere('chat_messages.updatedAt < :dateRefetchLatest', {
-        dateRefetchLatest: date,
-      })
       .andWhere(
         'chat_messages.type <> :text AND chat_messages.type <> :system AND chat_messages.type <> :sticker AND chat_messages.type <> :call',
         {
@@ -361,13 +358,19 @@ export class ChatService {
           call: ChatMessageType.CALL,
         },
       )
+      .andWhere('chat_messages.updatedAt < :fiveDaysAgo', {
+        fiveDaysAgo: date,
+      })
       .orderBy('chat_messages.createdAt', 'DESC')
       .getMany();
+    for (const m of justBeforeExpiredUrlMessages) {
+      await this.chatMessageRepository.save({ ...m, updatedAt: new Date() });
+    }
     console.log(
       '---==',
-      existMessages.map((m) => m.chatGroup.id),
+      justBeforeExpiredUrlMessages.map((m) => m.updatedAt),
     );
-    return existMessages;
+    return justBeforeExpiredUrlMessages;
   }
 
   public async getUnreadChatMessage(
