@@ -131,11 +131,11 @@ export class ChatMessage {
       if (this.content === '音声通話') return;
       let content = this.content;
       if (this.type === ChatMessageType.IMAGE) {
-        content = '画像';
+        content = '画像を送信しました。';
       } else if (this.type === ChatMessageType.VIDEO) {
-        content = '動画';
+        content = '動画を送信しました。';
       } else if (this.type === ChatMessageType.OTHER_FILE) {
-        content = 'ファイル';
+        content = 'ファイルを送信しました。';
       }
       const mentionRegex = /@\[.*?\]\(([0-9]+)\)/g;
       const mentionedIds: number[] = [];
