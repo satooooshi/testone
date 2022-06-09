@@ -119,9 +119,11 @@ export class ChatMessage {
       this.type === ChatMessageType.OTHER_FILE
     ) {
       this.content = await genSignedURL(this.content);
+      this.updatedAt = new Date();
     }
     if (this.type === ChatMessageType.OTHER_FILE) {
       this.content = mentionTransform(this.content);
+      this.updatedAt = new Date();
     }
   }
 
