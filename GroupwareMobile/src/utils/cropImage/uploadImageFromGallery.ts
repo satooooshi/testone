@@ -28,11 +28,20 @@ export const uploadImageFromGallery = async (
       });
     } else {
       const optionsExec: Options =
-        options.mediaType === 'photo' ? {...options, forceJpg: true} : options;
+        options.mediaType === 'photo'
+          ? {
+              ...options,
+              forceJpg: true,
+              // compressImageQuality: 0.2,
+              compressImageMaxWidth: 1000,
+              compressImageMaxHeight: 1000,
+            }
+          : options;
       photo = await ImagePicker.openPicker(optionsExec);
     }
     const mime = photo.mime;
     const fileName = photo.filename;
+
     const formData = imagePickerResponseToFormData(photo);
     return {formData, mime, fileName};
   } catch (err) {
