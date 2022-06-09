@@ -7,6 +7,7 @@ import { userNameFactory } from 'src/utils/factory/userNameFactory';
 import { mentionTransform } from 'src/utils/mentionTransform';
 import { replaceFullWidthSpace } from 'src/utils/replaceWidthSpace';
 import Linkify from 'react-linkify';
+import { componentDecorator } from 'src/utils/componentDecorator';
 
 type TextMessageProps = {
   message: ChatMessage;
@@ -58,7 +59,7 @@ const TextMessage: React.FC<TextMessageProps> = ({
       bg={message.isSender ? 'blue.500' : '#ececec'}
       p="8px"
       rounded="md">
-      <Linkify>
+      <Linkify componentDecorator={componentDecorator}>
         {message.replyParentMessage && (
           <Box
             flexDir="row"
