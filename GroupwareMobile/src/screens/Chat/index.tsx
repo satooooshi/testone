@@ -212,7 +212,7 @@ const Chat: React.FC = () => {
           return mgs.map(m => {
             for (const d of data) {
               if (d.id === m.id) {
-                return d;
+                m.content = d.content;
               }
             }
             return m;
