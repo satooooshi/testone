@@ -384,14 +384,6 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
     });
   };
 
-  const editorKeyBindingFn = (e: React.KeyboardEvent) => {
-    if (e.ctrlKey !== e.metaKey && e.key === 'Enter') {
-      onSend();
-      return null;
-    }
-    return getDefaultKeyBinding(e);
-  };
-
   const nameOfEmptyNameGroup = (members?: User[]): string => {
     if (!members?.length) {
       return 'メンバーがいません';
@@ -884,10 +876,13 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
           placeholder="メッセージを入力"
           editorState={editorState}
           onChange={onEditorChange}
-          keyBindingFn={editorKeyBindingFn}
           plugins={plugins}
           ref={editorRef}
           handleReturn={(e) => {
+            if (e.ctrlKey !== e.metaKey && e.key === 'Enter') {
+              onSend();
+              return 'handled';
+            }
             if (e.key === 'Enter') {
               setEditorState(RichUtils.insertSoftNewline(editorState));
               return 'handled';
