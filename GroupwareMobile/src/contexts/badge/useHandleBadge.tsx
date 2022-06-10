@@ -171,13 +171,13 @@ export const BadgeProvider: React.FC = ({children}) => {
   };
 
   const handleEnterRoom = (roomId: number) => {
-    const targetRoom = chatGroups.filter(g => g.id === roomId);
+    const targetRoom = chatGroups.filter(g => g.id === Number(roomId));
     // setCurrentRoom({id: targetRoom[0].id, unreadCount: 0});
     const unreadCount = targetRoom[0]?.unreadCount;
     if (unreadCount) {
       setChatUnreadCount(c => (c - unreadCount >= 0 ? c - unreadCount : 0));
       setChatGroups(group =>
-        group.map(g => (g.id === roomId ? {...g, unreadCount: 0} : g)),
+        group.map(g => (g.id === Number(roomId) ? {...g, unreadCount: 0} : g)),
       );
     }
   };
