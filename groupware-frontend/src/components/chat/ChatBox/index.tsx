@@ -418,13 +418,20 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
   }, []);
 
   const onScrollTopOnChat = (e: any) => {
+    console.log('onScrollTopOnChat');
+
     if (
       e.target.clientHeight - e.target.scrollTop >=
       (e.target.scrollHeight * 2) / 3
     ) {
+      console.log(
+        'onScrollTopOnChat fetchedPastMessages',
+        fetchedPastMessages?.length,
+      );
       if (fetchedPastMessages?.length) {
         const target = messages[messages.length - 1].id;
         if (minBefore && minBefore <= target) return;
+        console.log('onScrollTopOnChat set');
         setMinBefore(target);
         setBefore(target);
       }
@@ -465,6 +472,10 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
     setCurrentChatRoomId(room.id);
     saveLastReadChatTime(room.id);
     handleEnterRoom(room.id);
+    if (messageWrapperDivRef.current) {
+      messageWrapperDivRef.current.scrollTo({ top: 0 });
+      console.log('77777');
+    }
     // socket.connect();
     // socket.emit('joinRoom', room.id.toString());
     // // socket.on('readMessageClient', async (senderId: string) => {
@@ -509,6 +520,11 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
     return () => {
       // socket.emit('leaveRoom', room.id);
       // socket.disconnect();
+      setMessages([]);
+      setBefore(undefined);
+      setAfter(undefined);
+      setMinBefore(undefined);
+      setInclude(false);
       setCurrentChatRoomId(undefined);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
