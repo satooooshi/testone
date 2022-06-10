@@ -1,5 +1,6 @@
 import React, {Fragment, useMemo, useRef, useState} from 'react';
 import {
+  AppState,
   NativeSyntheticEvent,
   Platform,
   Text,
@@ -185,7 +186,10 @@ const ChatFooter: React.FC<ChatFooterProps> = ({
           <Icon name="paper-clip" fontFamily="SimpleLineIcons" fontSize={21} />
         </TouchableOpacity>
         <Menu
-          style={{position: 'absolute', top: footerHeight - 70}}
+          style={{
+            position: 'absolute',
+            top: footerHeight - (Platform.OS === 'ios' ? 70 : 160),
+          }}
           visible={visibleMenu}
           onDismiss={() => setVisibleMenu(false)}
           anchor={

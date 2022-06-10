@@ -272,7 +272,7 @@ const Chat: React.FC = () => {
   //         format: 'yyyy-LL-dd HH:mm:ss',
   //       });
 
-  //       storage.set(`dateRefetchLatestInRoom${room.id}`, now);
+  //       storage.set(`dateRefetchLatestInRoom${room.id}user${myself?.id}`, now);
   //     },
   //   },
   // );
@@ -300,6 +300,11 @@ const Chat: React.FC = () => {
             dateTime: new Date(),
             format: 'yyyy-LL-dd HH:mm:ss',
           });
+          storage.set(
+            `dateRefetchLatestInRoom${room.id}user${myself?.id}`,
+            now,
+          );
+          saveLastReadChatTime(room.id);
           storage.set(`dateRefetchLatestInRoom${room.id}`, now);
           setMessages(m => {
             const updatedMessages = refreshMessage([...latestData, ...m]);
@@ -607,7 +612,7 @@ const Chat: React.FC = () => {
 
   const saveMessages = (msg: ChatMessage[]) => {
     const jsonMessages = JSON.stringify(msg);
-    storage.set(`messagesIntRoom${room.id}`, jsonMessages);
+    storage.set(`messagesIntRoom${room.id}user${myself?.id}`, jsonMessages);
   };
 
   useEffect(() => {
@@ -777,10 +782,10 @@ const Chat: React.FC = () => {
     saveLastReadChatTime(room.id);
     if (!messages.length) {
       const jsonMessagesInStorage = storage.getString(
-        `messagesIntRoom${room.id}`,
+        `messagesIntRoom${room.id}user${myself?.id}`,
       );
       const dateRefetchLatest = storage.getString(
-        `dateRefetchLatestInRoom${room.id}`,
+        `dateRefetchLatestInRoom${room.id}user${myself?.id}`,
       );
       let messagesInStorageLength;
       if (jsonMessagesInStorage) {
@@ -1137,7 +1142,7 @@ const Chat: React.FC = () => {
   };
 
   const removeCache = () => {
-    storage.delete(`messagesIntRoom${room.id}`);
+    storage.delete(`messagesIntRoom${room.id}user${myself?.id}`);
     setMessages([]);
     refetchFetchedPastMessages();
   };

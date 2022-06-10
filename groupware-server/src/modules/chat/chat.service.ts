@@ -343,7 +343,7 @@ export class ChatService {
   public async getExpiredUrlMessages(query: number): Promise<ChatMessage[]> {
     const date = new Date();
     console.log('---', date, query);
-    date.setDate(date.getDate() - 1);
+    date.setDate(date.getDate() - 5);
     console.log('---after', date);
     const justBeforeExpiredUrlMessages = await this.chatMessageRepository
       .createQueryBuilder('chat_messages')
