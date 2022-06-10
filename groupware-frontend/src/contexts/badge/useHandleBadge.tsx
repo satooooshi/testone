@@ -42,8 +42,6 @@ export const BadgeProvider: React.FC = ({ children }) => {
     {
       enabled: false,
       onSuccess: (data) => {
-        console.log('refetchAllRooms called ----', data.rooms.length);
-
         let count = page !== 1 && chatGroups.length ? chatUnreadCount : 0;
         for (const room of data.rooms) {
           count += room.unreadCount ? room.unreadCount : 0;
