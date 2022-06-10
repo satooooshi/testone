@@ -18,18 +18,19 @@ const getMessages = async (query: GetMessagesQuery) => {
   const res = await axiosInstance.get<ChatMessage[]>(
     `${getChatMessagesURL}?group=${group}&after=${after}&before=${before}&include=${include}&limit=${limit}`,
   );
-  await Promise.all(
-    res.data.map(async m => {
-      if (m.type === ChatMessageType.VIDEO) {
-        try {
-          const thumbnail = await getThumbnailOfVideo(m.content, m.fileName);
-          m.thumbnail = thumbnail;
-        } catch {
-          m.thumbnail = '';
-        }
-      }
-    }),
-  );
+  // await Promise.all(
+  //   res.data.map(async m => {
+  //     if (m.type === ChatMessageType.VIDEO) {
+  //       try {
+  //         const thumbnail = await getThumbnailOfVideo(m.content, m.fileName);
+  //         m.thumbnail = thumbnail;
+  //       } catch {
+  //         m.thumbnail = '';
+  //       }
+  //       console.log('---------', m.thumbnail);
+  //     }
+  //   }),
+  // );
   return res.data;
 };
 

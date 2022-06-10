@@ -19,14 +19,17 @@ const VideoMessage: React.FC<VideMessageProps> = ({
   const {width: windowWidth} = useWindowDimensions();
 
   useEffect(() => {
+    console.log('------thumbnail--', message.thumbnail);
+
     const getThumbnail = async () => {
       message.thumbnail = await getThumbnailOfVideo(
         message.content,
         message.fileName,
       );
     };
-    if (message.thumbnail === undefined) {
+    if (!message.thumbnail) {
       getThumbnail();
+      console.log('------thumbnail--after', message.thumbnail);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [message.thumbnail]);
