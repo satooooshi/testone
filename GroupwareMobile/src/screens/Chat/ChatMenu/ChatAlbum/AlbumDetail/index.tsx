@@ -19,7 +19,7 @@ import tailwind from 'tailwind-rn';
 import HeaderWithTextButton from '../../../../../components/Header';
 import WholeContainer from '../../../../../components/WholeContainer';
 import {useAPIGetChatAlbumImages} from '../../../../../hooks/api/chat/album/useAPIGetChatAlbumImages';
-import {ChatAlbumImage, ImageSource} from '../../../../../types';
+import {ChatAlbumImage, FIleSource} from '../../../../../types';
 import {
   ChatAlbumDetailNavigationProps,
   ChatAlbumDetailRouteProps,
@@ -30,6 +30,7 @@ import {useFormik} from 'formik';
 import {useAPIUpdateAlbum} from '../../../../../hooks/api/chat/album/useAPIUpdateChatAlbum';
 import DownloadIcon from '../../../../../components/common/DownLoadIcon';
 import {albumSchema} from '../../../../../utils/validation/schema';
+import ChatShareIcon from '../../../../../components/common/ChatShareIcon';
 
 const AlbumDetail: React.FC = () => {
   const {width: windowWidth} = useWindowDimensions();
@@ -67,13 +68,18 @@ const AlbumDetail: React.FC = () => {
       updateAlbum({...v, images: undefined});
     },
   });
-  const images: ImageSource[] = useMemo(() => {
-    return imagesForInfiniteScroll?.map(i => ({uri: i.imageURL || ''})) || [];
+  const images: FIleSource[] = useMemo(() => {
+    return (
+      imagesForInfiniteScroll?.map(i => ({
+        uri: i.imageURL || '',
+        fileName: i.fileName,
+      })) || []
+    );
   }, [imagesForInfiniteScroll]);
 
   const handlePressImage = useCallback(
     (url: string) => {
-      const isNowUri = (element: ImageSource) => element.uri === url;
+      const isNowUri = (element: FIleSource) => element.uri === url;
       setNowImageIndex(images.findIndex(isNowUri));
       setImageModal(true);
     },
@@ -136,8 +142,9 @@ const AlbumDetail: React.FC = () => {
         swipeToCloseEnabled={false}
         doubleTapToZoomEnabled={true}
         FooterComponent={({imageIndex}) => (
-          <Div position="absolute" bottom={5} right={5}>
+          <Div>
             <DownloadIcon url={images[imageIndex].uri} />
+            <ChatShareIcon image={images[imageIndex]} />
           </Div>
         )}
       />

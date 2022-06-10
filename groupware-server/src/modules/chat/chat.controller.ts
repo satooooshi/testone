@@ -202,6 +202,14 @@ export class ChatController {
     return await this.chatService.getChatMessage(req.user.id, query);
   }
 
+  @Get('expired-url-messages/:id')
+  @UseGuards(JwtAuthenticationGuard)
+  async getExpiredUrlMessages(
+    @Param('id') roomId: number,
+  ): Promise<ChatMessage[]> {
+    return await this.chatService.getExpiredUrlMessages(roomId);
+  }
+
   @Get('search-messages')
   @UseGuards(JwtAuthenticationGuard)
   async searchMessages(

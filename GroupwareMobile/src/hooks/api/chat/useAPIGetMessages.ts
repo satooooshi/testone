@@ -22,20 +22,11 @@ const getMessages = async (query: GetMessagesQuery) => {
     res.data.map(async m => {
       if (m.type === ChatMessageType.VIDEO) {
         try {
-          const thumbnail = await getThumbnailOfVideo(m.content);
+          const thumbnail = await getThumbnailOfVideo(m.content, m.fileName);
           m.thumbnail = thumbnail;
         } catch {
           m.thumbnail = '';
         }
-      }
-
-      if (
-        m.replyParentMessage &&
-        m.replyParentMessage.type === ChatMessageType.VIDEO
-      ) {
-        m.replyParentMessage.thumbnail = await getThumbnailOfVideo(
-          m.replyParentMessage.content,
-        );
       }
     }),
   );

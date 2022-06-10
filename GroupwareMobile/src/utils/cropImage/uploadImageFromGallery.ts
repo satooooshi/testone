@@ -1,6 +1,7 @@
 import {Alert, Platform} from 'react-native';
 import ImagePicker, {
   Image,
+  ImageOrVideo,
   Options,
   PickerErrorCode,
 } from 'react-native-image-crop-picker';
@@ -11,14 +12,42 @@ export const uploadImageFromGallery = async (
     mediaType: 'photo',
     multiple: false,
   },
-): Promise<{formData: FormData | undefined; mime: string | undefined}> => {
+  useCamera = false,
+): Promise<{
+  formData: FormData | undefined;
+  mime: string | undefined;
+  fileName: string | undefined;
+}> => {
   try {
-    const optionsExec: Options =
-      options.mediaType === 'photo' ? {...options, forceJpg: true} : options;
-    const photo = await ImagePicker.openPicker(optionsExec);
+    let photo: ImageOrVideo;
+    if (useCamera) {
+      photo = await ImagePicker.openCamera({
+        width: 300,
+        height: 400,
+        forceJpg: true,
+        // compressImageQuality: 0.2,
+        compressImageMaxWidth: 1000,
+        compressImageMaxHeight: 1000,
+        // cropping: true,
+      });
+    } else {
+      const optionsExec: Options =
+        options.mediaType === 'photo'
+          ? {
+              ...options,
+              forceJpg: true,
+              // compressImageQuality: 0.2,
+              compressImageMaxWidth: 1000,
+              compressImageMaxHeight: 1000,
+            }
+          : options;
+      photo = await ImagePicker.openPicker(optionsExec);
+    }
     const mime = photo.mime;
+    const fileName = photo.filename;
+
     const formData = imagePickerResponseToFormData(photo);
-    return {formData, mime};
+    return {formData, mime, fileName};
   } catch (err) {
     const code = (err as {code: PickerErrorCode})?.code;
     switch (code) {
@@ -76,7 +105,7 @@ export const uploadImageFromGallery = async (
         break;
     }
 
-    return {formData: undefined, mime: undefined};
+    return {formData: undefined, mime: undefined, fileName: undefined};
   }
 };
 

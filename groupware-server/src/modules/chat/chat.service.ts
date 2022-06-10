@@ -340,6 +340,39 @@ export class ChatService {
     return messages;
   }
 
+  public async getExpiredUrlMessages(query: number): Promise<ChatMessage[]> {
+    const date = new Date();
+    console.log('---', date, query);
+    date.setDate(date.getDate() - 5);
+    console.log('---after', date);
+    const justBeforeExpiredUrlMessages = await this.chatMessageRepository
+      .createQueryBuilder('chat_messages')
+      .leftJoinAndSelect('chat_messages.chatGroup', 'chat_group')
+      .where('chat_group.id = :chatGroupID', { chatGroupID: query })
+      .andWhere(
+        'chat_messages.type <> :text AND chat_messages.type <> :system AND chat_messages.type <> :sticker AND chat_messages.type <> :call',
+        {
+          text: ChatMessageType.TEXT,
+          system: ChatMessageType.SYSTEM_TEXT,
+          sticker: ChatMessageType.STICKER,
+          call: ChatMessageType.CALL,
+        },
+      )
+      .andWhere('chat_messages.updatedAt < :fiveDaysAgo', {
+        fiveDaysAgo: date,
+      })
+      .orderBy('chat_messages.createdAt', 'DESC')
+      .getMany();
+    for (const m of justBeforeExpiredUrlMessages) {
+      await this.chatMessageRepository.save({ ...m, updatedAt: new Date() });
+    }
+    console.log(
+      '---==',
+      justBeforeExpiredUrlMessages.map((m) => m.updatedAt),
+    );
+    return justBeforeExpiredUrlMessages;
+  }
+
   public async getUnreadChatMessage(
     userID: number,
     query: GetUnreadMessagesQuery,

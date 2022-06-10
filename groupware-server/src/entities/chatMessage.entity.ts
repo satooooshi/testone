@@ -98,7 +98,6 @@ export class ChatMessage {
   replyParentMessage?: ChatMessage;
 
   @BeforeInsert()
-  @BeforeUpdate()
   async changeToStorageURL?() {
     if (
       this.type === ChatMessageType.IMAGE ||
@@ -109,9 +108,8 @@ export class ChatMessage {
     }
   }
 
-  @AfterInsert()
   @AfterLoad()
-  @AfterUpdate()
+  @AfterInsert()
   async changeToSignedURL?() {
     if (
       this.type === ChatMessageType.IMAGE ||
@@ -120,9 +118,9 @@ export class ChatMessage {
     ) {
       this.content = await genSignedURL(this.content);
     }
-    if (this.type === ChatMessageType.OTHER_FILE) {
-      this.content = mentionTransform(this.content);
-    }
+    // if (this.type === ChatMessageType.OTHER_FILE) {
+    //   this.content = mentionTransform(this.content);
+    // }
   }
 
   @AfterInsert()
