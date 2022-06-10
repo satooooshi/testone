@@ -301,7 +301,6 @@ const Chat: React.FC = () => {
             format: 'yyyy-LL-dd HH:mm:ss',
           });
           storage.set(`dateRefetchLatestInRoom${room.id}`, now);
-          saveLastReadChatTime(room.id);
           setMessages(m => {
             const updatedMessages = refreshMessage([...latestData, ...m]);
             // if (updatedMessages[0].id !== m[0].id) {
@@ -765,6 +764,7 @@ const Chat: React.FC = () => {
 
     return () => {
       setMessages([]);
+      handleEnterRoom(room.id);
       // socket.emit('leaveRoom', room.id);
       // isMounted = false;
       // socket.disconnect();
@@ -774,6 +774,7 @@ const Chat: React.FC = () => {
   }, [room.id]);
 
   useEffect(() => {
+    saveLastReadChatTime(room.id);
     if (!messages.length) {
       const jsonMessagesInStorage = storage.getString(
         `messagesIntRoom${room.id}`,
