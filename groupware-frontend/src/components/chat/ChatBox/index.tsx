@@ -473,6 +473,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
       messageWrapperDivRef.current.scrollTo({ top: 0 });
       console.log('77777');
     }
+
     // socket.connect();
     // socket.emit('joinRoom', room.id.toString());
     // // socket.on('readMessageClient', async (senderId: string) => {
