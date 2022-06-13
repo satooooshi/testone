@@ -36,22 +36,20 @@ const GoodSendersModal: React.FC<GoodSendersModalProps> = ({
         </ModalHeader>
         <ModalCloseButton />
         <ModalBody overflow={'scroll'}>
-          {[...Array(30)]?.map(() => (
+          {goodSenders?.map((u) => (
             <Link
-              key={goodSenders[0]?.id}
+              key={u.id}
               display="flex"
               flexDir="row"
               borderBottom={'1px'}
               py="8px"
               alignItems="center"
               justifyContent="space-between"
-              href={`/account/${goodSenders[0]?.id}`}
+              href={`/account/${u.id}`}
               passHref>
               <Box display="flex" flexDir="row" alignItems="center">
-                <UserAvatar user={goodSenders[0]} />
-                <Text fontSize={darkFontColor}>
-                  {userNameFactory(goodSenders[0])}
-                </Text>
+                <UserAvatar user={u} />
+                <Text fontSize={darkFontColor}>{userNameFactory(u)}</Text>
               </Box>
             </Link>
           ))}
