@@ -62,6 +62,11 @@ export const BadgeProvider: React.FC = ({children}) => {
           setCompleteRefetch(true);
         }
       },
+      onError: () => {
+        Alert.alert(
+          'チャットルームの取得に失敗しました。しばらく経ってもルームを取得できない場合は、アプリを再起動してみて下さい。',
+        );
+      },
     },
   );
 
@@ -85,10 +90,6 @@ export const BadgeProvider: React.FC = ({children}) => {
       }
       refetchAllRooms();
     }
-    return () => {
-      const jsonMessages = JSON.stringify(chatGroups);
-      storage.set(`chatRoomList${user?.id}`, jsonMessages);
-    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [networkConnection, user]);
 
@@ -170,13 +171,13 @@ export const BadgeProvider: React.FC = ({children}) => {
   };
 
   const handleEnterRoom = (roomId: number) => {
-    const targetRoom = chatGroups.filter(g => g.id === roomId);
+    const targetRoom = chatGroups.filter(g => g.id === Number(roomId));
     // setCurrentRoom({id: targetRoom[0].id, unreadCount: 0});
     const unreadCount = targetRoom[0]?.unreadCount;
     if (unreadCount) {
       setChatUnreadCount(c => (c - unreadCount >= 0 ? c - unreadCount : 0));
       setChatGroups(group =>
-        group.map(g => (g.id === roomId ? {...g, unreadCount: 0} : g)),
+        group.map(g => (g.id === Number(roomId) ? {...g, unreadCount: 0} : g)),
       );
     }
   };
@@ -187,7 +188,6 @@ export const BadgeProvider: React.FC = ({children}) => {
 
   useEffect(() => {
     if (editRoom) {
-      console.log('editROom called-----', editRoom.members);
       if (chatGroups.map(g => g.id).includes(editRoom.id)) {
         if (editRoom.members?.filter(m => m.id === user?.id).length) {
           setChatGroups(room =>

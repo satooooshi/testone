@@ -12,12 +12,13 @@ import {
   ChatGroup,
   ChatNote,
   ChatNoteImage,
-  ImageSource,
+  FIleSource,
 } from '../../../../types';
 import {uploadImageFromGallery} from '../../../../utils/cropImage/uploadImageFromGallery';
 import ImageView from 'react-native-image-viewing';
 import DownloadIcon from '../../../../components/common/DownLoadIcon';
 import {noteSchema} from '../../../../utils/validation/schema';
+import ChatShareIcon from '../../../../components/common/ChatShareIcon';
 
 type ChatNoteFormProps = {
   rightButtonNameOnHeader: string;
@@ -53,8 +54,11 @@ const ChatNoteForm: React.FC<ChatNoteFormProps> = ({
     validationSchema: noteSchema,
     onSubmit: submittedValues => onSubmit(submittedValues),
   });
-  const images: ImageSource[] =
-    values.images?.map(i => ({uri: i.imageURL || ''})) || [];
+  const images: FIleSource[] =
+    values.images?.map(i => ({
+      uri: i.imageURL || '',
+      fileName: i.fileName || '',
+    })) || [];
 
   const removeImage = (image: Partial<ChatNoteImage>) => {
     if (!image.imageURL) {
@@ -78,19 +82,19 @@ const ChatNoteForm: React.FC<ChatNoteFormProps> = ({
   }, [willSubmit, handleSubmit]);
 
   const handlePressImage = (url: string) => {
-    const isNowUri = (element: ImageSource) => element.uri === url;
+    const isNowUri = (element: FIleSource) => element.uri === url;
     setNowImageIndex(images.findIndex(isNowUri));
     setImageModal(true);
   };
 
   const handlePressImageButton = async () => {
-    const {formData} = await uploadImageFromGallery();
+    const {formData, fileName} = await uploadImageFromGallery();
     if (formData) {
       onUploadImage(formData, {
         onSuccess: imageURLs => {
           const newImage: Partial<ChatNoteImage> = {
             imageURL: imageURLs[0],
-            fileName: imageURLs[0] + '.png',
+            name: fileName ? fileName : imageURLs[0] + '.png',
           };
           setValues(v => ({
             ...v,
@@ -125,6 +129,7 @@ const ChatNoteForm: React.FC<ChatNoteFormProps> = ({
         FooterComponent={({imageIndex}) => (
           <Div position="absolute" bottom={5} right={5}>
             <DownloadIcon url={images[imageIndex].uri} />
+            <ChatShareIcon image={images[imageIndex]} />
           </Div>
         )}
       />

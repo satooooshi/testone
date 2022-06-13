@@ -91,10 +91,12 @@ export class ChatService {
     query: GetChaRoomsByPageQuery,
   ): Promise<GetRoomsResult> {
     const { page, limit = '20', updatedAtLatestRoom } = query;
+
     let offset = 0;
     if (page) {
       offset = (Number(page) - 1) * Number(limit);
     }
+    const limitNumber = Number(limit);
 
     const [urlUnparsedRooms, count] = await this.chatGroupRepository
       .createQueryBuilder('chat_groups')
@@ -129,12 +131,12 @@ export class ChatService {
         },
       )
       .skip(offset)
-      .take(Number(limit))
+      .take(limitNumber >= 0 ? limitNumber : 20)
       .orderBy('chat_groups.updatedAt', 'DESC')
       .getManyAndCount();
 
     let rooms = await Promise.all(
-      urlUnparsedRooms.map(async (g) => {
+      urlUnparsedRooms.map(async (g, index) => {
         let unreadCount = 0;
         const isPinned = !!g?.pinnedUsers?.length;
         const hasBeenRead = g?.lastReadChatTime?.[0]?.readTime
@@ -150,8 +152,7 @@ export class ChatService {
           };
           unreadCount = await this.getUnreadChatMessage(userID, query);
         }
-
-        if (g.roomType === RoomType.PERSONAL) {
+        if (g.roomType === RoomType.PERSONAL && g.members.length === 2) {
           const chatPartner = g.members.filter((m) => m.id !== userID)[0];
           g.imageURL = chatPartner.avatarUrl;
           g.name = `${chatPartner.lastName} ${chatPartner.firstName}`;
@@ -166,13 +167,15 @@ export class ChatService {
         };
       }),
     );
+
     rooms = orderBy(rooms, [
       'isPinned',
       'updatedAt',
       ['desc', 'desc'],
     ]).reverse();
-    const pageCount = Math.floor(count / Number(limit)) + 1;
+    // const pageCount = Math.floor(count / Number(limit)) + 1;
 
+    const pageCount = 1;
     return { rooms, pageCount };
   }
 
@@ -220,7 +223,7 @@ export class ChatService {
       room.unreadCount = await this.getUnreadChatMessage(userID, query);
     }
 
-    if (room.roomType === RoomType.PERSONAL) {
+    if (room.roomType === RoomType.PERSONAL && room.members.length === 2) {
       const chatPartner = room.members.filter((m) => m.id !== userID)[0];
       room.imageURL = chatPartner.avatarUrl;
       room.name = `${chatPartner.lastName} ${chatPartner.firstName}`;
@@ -269,7 +272,14 @@ export class ChatService {
     userID: number,
     query: GetMessagesQuery,
   ): Promise<ChatMessage[]> {
-    const { after, before, include = false, limit, dateRefetchLatest } = query;
+    const {
+      after,
+      before,
+      include = false,
+      limit = '20',
+      dateRefetchLatest,
+    } = query;
+    const limitNumber = Number(limit);
 
     const existMessages = await this.chatMessageRepository
       .createQueryBuilder('chat_messages')
@@ -308,7 +318,7 @@ export class ChatService {
           dateRefetchLatest: new Date(dateRefetchLatest),
         },
       )
-      .take(Number(limit))
+      .take(limitNumber >= 0 ? limitNumber : 20)
       .orderBy('chat_messages.createdAt', after ? 'ASC' : 'DESC')
       .withDeleted()
       .getMany();
@@ -328,6 +338,39 @@ export class ChatService {
       return m;
     });
     return messages;
+  }
+
+  public async getExpiredUrlMessages(query: number): Promise<ChatMessage[]> {
+    const date = new Date();
+    console.log('---', date, query);
+    date.setDate(date.getDate() - 5);
+    console.log('---after', date);
+    const justBeforeExpiredUrlMessages = await this.chatMessageRepository
+      .createQueryBuilder('chat_messages')
+      .leftJoinAndSelect('chat_messages.chatGroup', 'chat_group')
+      .where('chat_group.id = :chatGroupID', { chatGroupID: query })
+      .andWhere(
+        'chat_messages.type <> :text AND chat_messages.type <> :system AND chat_messages.type <> :sticker AND chat_messages.type <> :call',
+        {
+          text: ChatMessageType.TEXT,
+          system: ChatMessageType.SYSTEM_TEXT,
+          sticker: ChatMessageType.STICKER,
+          call: ChatMessageType.CALL,
+        },
+      )
+      .andWhere('chat_messages.updatedAt < :fiveDaysAgo', {
+        fiveDaysAgo: date,
+      })
+      .orderBy('chat_messages.createdAt', 'DESC')
+      .getMany();
+    for (const m of justBeforeExpiredUrlMessages) {
+      await this.chatMessageRepository.save({ ...m, updatedAt: new Date() });
+    }
+    console.log(
+      '---==',
+      justBeforeExpiredUrlMessages.map((m) => m.updatedAt),
+    );
+    return justBeforeExpiredUrlMessages;
   }
 
   public async getUnreadChatMessage(
@@ -353,6 +396,7 @@ export class ChatService {
       .orderBy('chat_messages.createdAt', 'DESC')
       .withDeleted()
       .getCount();
+
     return unreadCount;
   }
 

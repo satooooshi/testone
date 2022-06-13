@@ -22,7 +22,9 @@ const BadgeContext = createContext({
   handleEnterRoom: (() => {}) as (roomId: number) => void,
   editRoom: {} as ChatGroup | undefined,
   editChatGroup: (() => {}) as (room: ChatGroup) => void,
+  updateUnreadCount: (() => {}) as (num: number) => void,
   isRoomsRefetching: false,
+  getOneRoom: (() => {}) as (roomId: number) => ChatGroup | undefined,
 });
 
 export const BadgeProvider: React.FC = ({ children }) => {
@@ -41,8 +43,6 @@ export const BadgeProvider: React.FC = ({ children }) => {
     {
       enabled: false,
       onSuccess: (data) => {
-        console.log('refetchAllRooms called ----', data.rooms.length);
-
         let count = page !== 1 && chatGroups.length ? chatUnreadCount : 0;
         for (const room of data.rooms) {
           count += room.unreadCount ? room.unreadCount : 0;
@@ -85,74 +85,6 @@ export const BadgeProvider: React.FC = ({ children }) => {
       setRefetchGroupId(0);
     },
   });
-
-  const returnUpdatedAtLatest = (): Date => {
-    const updatedAtTopRoom = chatGroups[0]?.updatedAt;
-    if (chatGroups[0]?.isPinned) {
-      const updatedAtExceptPinnedTopRoom = chatGroups.filter(
-        (r) => !r.isPinned,
-      )[0]?.updatedAt;
-
-      return updatedAtTopRoom > updatedAtExceptPinnedTopRoom
-        ? updatedAtTopRoom
-        : updatedAtExceptPinnedTopRoom;
-    }
-    return updatedAtTopRoom;
-  };
-
-  const { refetch: refetchLatestRooms } = useAPIGetRoomsByPage(
-    {
-      limit: '20',
-      updatedAtLatestRoom: returnUpdatedAtLatest(),
-    },
-    {
-      refetchInterval: 10000,
-      onSuccess: (data) => {
-        const latestRooms = data.rooms;
-        console.log(
-          'success latest rooms refech ================================',
-          latestRooms.length,
-        );
-        if (latestRooms.length) {
-          setChatGroups((rooms) => {
-            const latestPinnedRooms = [];
-            for (const latestRoom of latestRooms) {
-              if (router.pathname !== `/chat/${latestRoom.id}`) {
-                const olderRoom = chatGroups.filter(
-                  (r) => r.id === latestRoom.id,
-                )[0];
-                const incrementCount =
-                  (latestRoom?.unreadCount || 0) -
-                  (olderRoom?.unreadCount || 0);
-                setChatUnreadCount((c) => c + incrementCount);
-              }
-              if (latestRoom.isPinned) {
-                latestPinnedRooms.unshift(latestRoom);
-              }
-            }
-
-            const ids = latestRooms.map((r) => r.id);
-            const existRooms = rooms.filter((r) => !ids.includes(r.id));
-            const existPinnedRooms = existRooms.filter((r) => r.isPinned);
-            const existExceptPinnedRooms = existRooms.filter(
-              (r) => !r.isPinned,
-            );
-
-            const latestRoomsExceptPinnedRooms = latestRooms.filter(
-              (r) => !r.isPinned,
-            );
-
-            return [
-              ...latestPinnedRooms,
-              ...existPinnedRooms,
-              ...latestRoomsExceptPinnedRooms,
-              ...existExceptPinnedRooms,
-            ];
-          });
-        }
-      },
-    },
-  );
 
   useEffect(() => {
     if (user?.id) {
@@ -215,6 +147,10 @@ export const BadgeProvider: React.FC = ({ children }) => {
     setChatGroups(rooms);
   };
 
+  const updateUnreadCount = (num: number) => {
+    setChatUnreadCount((c) => c + num);
+  };
+
   const handleEnterRoom = (roomId: number) => {
     const targetRoom = chatGroups.filter((g) => g.id === roomId);
     const unreadCount = targetRoom[0]?.unreadCount;
@@ -224,6 +160,10 @@ export const BadgeProvider: React.FC = ({ children }) => {
         group.map((g) => (g.id === roomId ? { ...g, unreadCount: 0 } : g)),
       );
     }
+  };
+
+  const getOneRoom = (roomId: number) => {
+    return chatGroups.find((g) => g.id === roomId);
   };
 
   return (
@@ -237,6 +177,8 @@ export const BadgeProvider: React.FC = ({ children }) => {
         editRoom,
         editChatGroup,
         isRoomsRefetching: isLoading,
+        updateUnreadCount,
+        getOneRoom,
       }}>
       <RoomRefetchProvider>{children}</RoomRefetchProvider>
     </BadgeContext.Provider>

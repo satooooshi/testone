@@ -23,7 +23,12 @@ import { blueColor, darkFontColor } from 'src/utils/colors';
 import { Menu, MenuItem, MenuButton } from '@szhsin/react-menu';
 import { HiOutlineDotsCircleHorizontal } from 'react-icons/hi';
 import Editor from '@draft-js-plugins/editor';
-import { convertToRaw, EditorState, getDefaultKeyBinding } from 'draft-js';
+import {
+  convertToRaw,
+  EditorState,
+  getDefaultKeyBinding,
+  RichUtils,
+} from 'draft-js';
 import {
   AiFillCloseCircle,
   AiOutlineDown,
@@ -132,9 +137,9 @@ export const Entry: React.FC<EntryComponentProps> = ({
   );
 };
 
-const socket = io(baseURL, {
-  transports: ['websocket'],
-});
+// const socket = io(baseURL, {
+//   transports: ['websocket'],
+// });
 
 type ChatBoxProps = {
   room: ChatGroup;
@@ -142,7 +147,6 @@ type ChatBoxProps = {
 };
 
 const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
-  const { needRefetch } = useRoomRefetch();
   const { user, setCurrentChatRoomId } = useAuthenticate();
   const [visibleAlbumModal, setVisibleAlbumModal] = useState(false);
   const [visibleNoteModal, setVisibleNoteModal] = useState(false);
@@ -187,7 +191,6 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
     useAPIGetLastReadChatTime(room.id, {
       onSuccess: () => {
         // refetchRoom();
-        needRefetch();
       },
     });
   const userDataForMention: MentionData[] = useMemo(() => {
@@ -218,10 +221,12 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
   const { refetch: refetchLatest } = useAPIGetMessages(
     {
       group: room.id,
+      limit: '10',
     },
     {
-      enabled: false,
+      refetchInterval: 5000,
       onSuccess: (latestData) => {
+        refetchLastReadChatTime();
         if (latestData?.length) {
           const msgToAppend: ChatMessage[] = [];
           for (const latest of latestData) {
@@ -230,8 +235,15 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
             }
           }
           if (msgToAppend.length) {
+            saveLastReadChatTime(room.id, {
+              onSuccess: () => {
+                // socket.emit('readReport', {
+                //   room: room.id.toString(),
+                //   senderId: user?.id,
+                // });
+              },
+            });
             setMessages((m) => [...msgToAppend, ...m]);
-            needRefetch();
           }
         }
       },
@@ -259,7 +271,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
     useAPISendChatMessage({
       onSuccess: (data) => {
         setMessages([data, ...messages]);
-        socket.emit('message', { ...data, isSender: false });
+        // socket.emit('message', { ...data, isSender: false });
         setNewChatMessage((m) => ({
           ...m,
           content: '',
@@ -271,7 +283,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
       },
       onError: (err) => {
         alert('メッセージを送信できませんでした。');
-        console.log('0000', err);
+        console.log(err);
       },
     });
 
@@ -369,14 +381,6 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
     });
   };
 
-  const editorKeyBindingFn = (e: React.KeyboardEvent) => {
-    if (e.ctrlKey !== e.metaKey && e.key === 'Enter') {
-      onSend();
-      return null;
-    }
-    return getDefaultKeyBinding(e);
-  };
-
   const nameOfEmptyNameGroup = (members?: User[]): string => {
     if (!members?.length) {
       return 'メンバーがいません';
@@ -411,25 +415,32 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
   }, []);
 
   const onScrollTopOnChat = (e: any) => {
+    console.log('onScrollTopOnChat');
+
     if (
       e.target.clientHeight - e.target.scrollTop >=
       (e.target.scrollHeight * 2) / 3
     ) {
+      console.log(
+        'onScrollTopOnChat fetchedPastMessages',
+        fetchedPastMessages?.length,
+      );
       if (fetchedPastMessages?.length) {
         const target = messages[messages.length - 1].id;
         if (minBefore && minBefore <= target) return;
+        console.log('onScrollTopOnChat set');
         setMinBefore(target);
         setBefore(target);
       }
     }
   };
 
-  useEffect(() => {
-    setMessages([]);
-    setBefore(undefined);
-    setAfter(undefined);
-    refetchLatest();
-  }, [refetchLatest, room]);
+  // useEffect(() => {
+  //   setMessages([]);
+  //   setBefore(undefined);
+  //   setAfter(undefined);
+  //   refetchLatest();
+  // }, [refetchLatest, room]);
 
   useEffect(() => {
     if (fetchedPastMessages?.length) {
@@ -455,50 +466,62 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
   }, [focusedMessageID]);
 
   useEffect(() => {
-    socket.connect();
     setCurrentChatRoomId(room.id);
-    socket.emit('joinRoom', room.id.toString());
-    socket.on('readMessageClient', async (senderId: string) => {
-      if (user?.id && senderId && senderId != `${user?.id}`) {
-        refetchLastReadChatTime();
-      }
-    });
-    socket.on('msgToClient', async (sentMsgByOtherUsers: ChatMessage) => {
-      if (sentMsgByOtherUsers.content) {
-        if (sentMsgByOtherUsers?.sender?.id !== user?.id) {
-          saveLastReadChatTime(room.id, {
-            onSuccess: () => {
-              socket.emit('readReport', {
-                room: room.id.toString(),
-                senderId: user?.id,
-              });
-            },
-          });
-          refetchLastReadChatTime();
-        }
-        sentMsgByOtherUsers.createdAt = new Date(sentMsgByOtherUsers.createdAt);
-        sentMsgByOtherUsers.updatedAt = new Date(sentMsgByOtherUsers.updatedAt);
-        if (sentMsgByOtherUsers.sender?.id === user?.id) {
-          sentMsgByOtherUsers.isSender = true;
-        }
-        setMessages((msgs) => {
-          if (
-            msgs.length &&
-            msgs[0].id !== sentMsgByOtherUsers.id &&
-            sentMsgByOtherUsers.chatGroup?.id === room.id
-          ) {
-            return [sentMsgByOtherUsers, ...msgs];
-          } else if (sentMsgByOtherUsers.chatGroup?.id !== room.id) {
-            return msgs.filter((m) => m.id !== sentMsgByOtherUsers.id);
-          }
-          return msgs;
-        });
-      }
-    });
+    saveLastReadChatTime(room.id);
+    handleEnterRoom(room.id);
+    if (messageWrapperDivRef.current) {
+      messageWrapperDivRef.current.scrollTo({ top: 0 });
+      console.log('77777');
+    }
+    // socket.connect();
+    // socket.emit('joinRoom', room.id.toString());
+    // // socket.on('readMessageClient', async (senderId: string) => {
+    // //   if (user?.id && senderId && senderId != `${user?.id}`) {
+    // //     refetchLastReadChatTime();
+    // //   }
+    // // });
+    // socket.on('msgToClient', async (sentMsgByOtherUsers: ChatMessage) => {
+    //   if (sentMsgByOtherUsers.content) {
+    //     if (sentMsgByOtherUsers?.sender?.id !== user?.id) {
+    //       saveLastReadChatTime(room.id, {
+    //         onSuccess: () => {
+    //           socket.emit('readReport', {
+    //             room: room.id.toString(),
+    //             senderId: user?.id,
+    //           });
+    //         },
+    //       });
+    //       refetchLastReadChatTime();
+    //     }
+    //     sentMsgByOtherUsers.createdAt = new Date(sentMsgByOtherUsers.createdAt);
+    //     sentMsgByOtherUsers.updatedAt = new Date(sentMsgByOtherUsers.updatedAt);
+    //     if (sentMsgByOtherUsers.sender?.id === user?.id) {
+    //       sentMsgByOtherUsers.isSender = true;
+    //     }
+    //     setMessages((msgs) => {
+    //       if (
+    //         msgs.length &&
+    //         msgs[0].id !== sentMsgByOtherUsers.id &&
+    //         sentMsgByOtherUsers.chatGroup?.id === room.id
+    //       ) {
+    //         return [sentMsgByOtherUsers, ...msgs];
+    //       } else if (sentMsgByOtherUsers.chatGroup?.id !== room.id) {
+    //         return msgs.filter((m) => m.id !== sentMsgByOtherUsers.id);
+    //       }
+
+    //       return msgs;
+    //     });
+    //   }
+    // });
 
     return () => {
-      socket.emit('leaveRoom', room.id);
-      socket.disconnect();
+      // socket.emit('leaveRoom', room.id);
+      // socket.disconnect();
+      setMessages([]);
+      setBefore(undefined);
+      setAfter(undefined);
+      setMinBefore(undefined);
+      setInclude(false);
       setCurrentChatRoomId(undefined);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -509,19 +532,19 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
   //   // eslint-disable-next-line react-hooks/exhaustive-deps
   // }, [messages, room.id]);
 
-  useEffect(() => {
-    saveLastReadChatTime(room.id, {
-      onSuccess: () => {
-        socket.emit('readReport', {
-          room: room.id.toString(),
-          senderId: user?.id,
-        });
-        handleEnterRoom(room.id);
-      },
-    });
-    return () => saveLastReadChatTime(room.id);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [room.id, saveLastReadChatTime]);
+  // useEffect(() => {
+  //   saveLastReadChatTime(room.id, {
+  //     onSuccess: () => {
+  //       socket.emit('readReport', {
+  //         room: room.id.toString(),
+  //         senderId: user?.id,
+  //       });
+  //       handleEnterRoom(room.id);
+  //     },
+  //   });
+  //   return () => saveLastReadChatTime(room.id);
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [room.id, saveLastReadChatTime]);
 
   const isLoading = loadingSend || loadingUplaod;
   const activeIndex = useMemo(() => {
@@ -865,9 +888,19 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
           placeholder="メッセージを入力"
           editorState={editorState}
           onChange={onEditorChange}
-          keyBindingFn={editorKeyBindingFn}
           plugins={plugins}
           ref={editorRef}
+          handleReturn={(e) => {
+            if (e.ctrlKey !== e.metaKey && e.key === 'Enter') {
+              onSend();
+              return 'handled';
+            }
+            if (e.key === 'Enter') {
+              setEditorState(RichUtils.insertSoftNewline(editorState));
+              return 'handled';
+            }
+            return 'not-handled';
+          }}
         />
         <div className={suggestionStyles.suggestion_wrapper}>
           <MentionSuggestions

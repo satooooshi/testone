@@ -45,10 +45,6 @@ export const AuthenticateProvider: React.FC = ({ children }) => {
     setIsAuthenticated(false);
   };
 
-  useEffect(() => {
-    console.log('-----', currentChatRoomId);
-  }, [currentChatRoomId]);
-
   return (
     <AuthenticateContext.Provider
       value={{

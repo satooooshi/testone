@@ -1,6 +1,6 @@
 import { SidebarScreenName } from '@/components/layout/Sidebar';
 import { MenuValue, useModalReducer } from '@/hooks/chat/useModalReducer';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ChatGroup, User } from 'src/types';
 import CreateChatGroupModal from '@/components/chat/CreateChatGroupModal';
 import { useMediaQuery, Box, useToast, Text } from '@chakra-ui/react';
@@ -30,10 +30,10 @@ const ChatDetail = () => {
   const [membersModal, setMembersModal] = useState(false);
   const [isTalkRoom, setIsTalkRoom] = useState<boolean>(false);
   const [selectedMembers, setSelectedMembers] = useState<User[]>();
-  const socket = io(baseURL, {
-    transports: ['websocket'],
-  });
-  const { editChatGroup } = useHandleBadge();
+  // const socket = io(baseURL, {
+  //   transports: ['websocket'],
+  // });
+  const { editChatGroup, getOneRoom } = useHandleBadge();
 
   const [
     { editChatGroupModalVisible, editMembersModalVisible, createGroupWindow },
@@ -49,21 +49,27 @@ const ChatDetail = () => {
     },
   });
   const toast = useToast();
-  useAPIGetRoomDetail(Number(id), {
-    onSuccess: (data) => {
-      if (setCurrentRoom) {
-        setCurrentRoom(data);
-      }
-    },
-    onError: (err) => {
-      if (setCurrentRoom) {
-        setCurrentRoom(undefined);
-      }
-      if (err?.response?.data?.message) {
-        alert(err?.response?.data?.message);
-      }
-    },
-  });
+  // useAPIGetRoomDetail(Number(id), {
+  //   onSuccess: (data) => {
+  //     if (setCurrentRoom) {
+  //       setCurrentRoom(data);
+  //     }
+  //   },
+  //   onError: (err) => {
+  //     if (setCurrentRoom) {
+  //       setCurrentRoom(undefined);
+  //     }
+  //     if (err?.response?.data?.message) {
+  //       alert(err?.response?.data?.message);
+  //     }
+  //   },
+  // });
+
+  useEffect(() => {
+    setCurrentRoom(getOneRoom(Number(id)));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id]);
+
   const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
 
   const { mutate: leaveChatGroup } = useAPILeaveChatRoom({
