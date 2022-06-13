@@ -24,6 +24,7 @@ const BadgeContext = createContext({
   editChatGroup: (() => {}) as (room: ChatGroup) => void,
   updateUnreadCount: (() => {}) as (num: number) => void,
   isRoomsRefetching: false,
+  getOneRoom: (() => {}) as (roomId: number) => ChatGroup | undefined,
 });
 
 export const BadgeProvider: React.FC = ({ children }) => {
@@ -161,6 +162,10 @@ export const BadgeProvider: React.FC = ({ children }) => {
     }
   };
 
+  const getOneRoom = (roomId: number) => {
+    return chatGroups.find((g) => g.id === roomId);
+  };
+
   return (
     <BadgeContext.Provider
       value={{
@@ -173,6 +178,7 @@ export const BadgeProvider: React.FC = ({ children }) => {
         editChatGroup,
         isRoomsRefetching: isLoading,
         updateUnreadCount,
+        getOneRoom,
       }}>
       <RoomRefetchProvider>{children}</RoomRefetchProvider>
     </BadgeContext.Provider>
