@@ -75,7 +75,7 @@ const TextMessage: React.FC<TextMessageProps> = ({
               cursor="pointer"
               user={message.replyParentMessage.sender}
             />
-            <Box>
+            <Box width={'90%'}>
               <Text fontWeight="bold">
                 {userNameFactory(message.replyParentMessage?.sender)}
               </Text>
