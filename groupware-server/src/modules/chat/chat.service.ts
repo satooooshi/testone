@@ -319,7 +319,6 @@ export class ChatService {
       )
       .take(limitNumber >= 0 ? limitNumber : 20)
       .orderBy('chat_messages.createdAt', after ? 'ASC' : 'DESC')
-      .withDeleted()
       .getMany();
 
     const messages = existMessages.map((m) => {
