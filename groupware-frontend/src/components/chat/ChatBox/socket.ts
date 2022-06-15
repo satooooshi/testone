@@ -6,10 +6,10 @@ import { useHandleBadge } from 'src/contexts/badge/useHandleBadge';
 import { useRoomRefetch } from 'src/contexts/chat/useRoomRefetch';
 import { useAuthenticate } from 'src/contexts/useAuthenticate';
 import { ChatGroup, ChatMessage } from 'src/types';
-import { baseURL } from 'src/utils/url';
+// import { baseURL } from 'src/utils/url';
 
 // socket
-const socket = io(baseURL, {
+const socket = io('http://34.84.206.131:3001/', {
   transports: ['websocket'],
 });
 
