@@ -60,7 +60,7 @@ const UserCard: React.FC<UserCardProps> = ({ user, onClickTag, duration }) => {
           fallbackSrc={noImage.src}
           objectFit="cover"
           mr="16px"
-          boxSize="150px"
+          boxSize="160px"
           borderRadius="full"
           alt="アバター画像"
         />
@@ -92,28 +92,28 @@ const UserCard: React.FC<UserCardProps> = ({ user, onClickTag, duration }) => {
             alignItems="start"
             p="4">
             <SimpleGrid spacingY="12px">
-          <UserPointCounter
-            label="event"
-            count={user.eventCount || 0}
-            duration={duration}
-          />
-          <UserPointCounter
-            label="question"
-            count={user.questionCount || 0}
-            duration={duration}
-          />
+              <UserPointCounter
+                label="event"
+                count={user.eventCount || 0}
+                duration={duration}
+              />
+              <UserPointCounter
+                label="question"
+                count={user.questionCount || 0}
+                duration={duration}
+              />
             </SimpleGrid>
             <SimpleGrid spacingY="12px">
-          <UserPointCounter
-            label="answer"
-            count={user.answerCount || 0}
-            duration={duration}
-          />
-          <UserPointCounter
-            label="knowledge"
-            count={user.knowledgeCount || 0}
-            duration={duration}
-          />
+              <UserPointCounter
+                label="answer"
+                count={user.answerCount || 0}
+                duration={duration}
+              />
+              <UserPointCounter
+                label="knowledge"
+                count={user.knowledgeCount || 0}
+                duration={duration}
+              />
             </SimpleGrid>
           </SimpleGrid>
         </Box>
