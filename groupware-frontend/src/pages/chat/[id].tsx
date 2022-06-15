@@ -21,23 +21,11 @@ const ChatDetail = () => {
   const [_, dispatchModal] = useModalReducer();
   const { id } = router.query as { id: string };
   const [currentRoom, setCurrentRoom] = useState<ChatGroup>();
-  const [membersModal, setMembersModal] = useState(false);
-  const [isTalkRoom, setIsTalkRoom] = useState<boolean>(false);
-  const [selectedMembers, setSelectedMembers] = useState<User[]>();
   // const socket = io(baseURL, {
   //   transports: ['websocket'],
   // });
-  const { editChatGroup, getOneRoom } = useHandleBadge();
+  const { getOneRoom } = useHandleBadge();
 
-  const { mutate: updateGroup } = useAPIUpdateChatGroup({
-    onSuccess: (data) => {
-      editChatGroup(data);
-    },
-    onError: () => {
-      alert('グループの更新中にエラーが発生しました');
-    },
-  });
-  const toast = useToast();
   // useAPIGetRoomDetail(Number(id), {
   //   onSuccess: (data) => {
   //     if (setCurrentRoom) {
