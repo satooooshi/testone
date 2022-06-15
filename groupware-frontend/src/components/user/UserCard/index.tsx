@@ -174,6 +174,14 @@ const UserCard: React.FC<UserCardProps> = ({ user, onClickTag, duration }) => {
               )}
             </div>
           </div>
+          <Button
+            size="lg"
+            rounded="full"
+            w="50%"
+            fontSize="16px"
+            color="blue.600">
+            プロフィールを見る
+          </Button>
         </div>
       </a>
     </Link>
