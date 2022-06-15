@@ -9,7 +9,7 @@ import { ChatGroup, ChatMessage } from 'src/types';
 // import { baseURL } from 'src/utils/url';
 
 // socket
-const socket = io('http://34.84.206.131:3001/', {
+const socket = io('https://34.84.206.131:3001/', {
   transports: ['websocket'],
 });
 
@@ -98,6 +98,7 @@ export const useChatSocket = (
     },
     leaveRoom: () => {
       socket.emit('leaveRoom', room.id);
+      socket.removeAllListeners();
       setCurrentChatRoomId(undefined);
     },
     send: (m: ChatMessage) => {
