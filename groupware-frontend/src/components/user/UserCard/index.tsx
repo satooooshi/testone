@@ -1,9 +1,10 @@
 import React, { useMemo } from 'react';
 import userCardStyles from '@/styles/components/UserCard.module.scss';
 import { Tag, TagType, User } from 'src/types';
-import { Avatar, Box, Button, Flex, Text } from '@chakra-ui/react';
+import { Box, Button, Flex, Text, Image } from '@chakra-ui/react';
 import Link from 'next/link';
 import UserPointCounter from './UserPointCounter';
+import noImage from '@/public/no-image.jpg';
 
 type TagLinkProps = {
   tag: Tag;
@@ -54,7 +55,15 @@ const UserCard: React.FC<UserCardProps> = ({ user, onClickTag, duration }) => {
   return (
     <Box bg="white" borderRadius="8px" p="16px">
       <Flex mb="8px">
-        <Avatar size="xl" src={user.avatarUrl} mr="8px" />
+        <Image
+          src={user.avatarUrl}
+          fallbackSrc={noImage.src}
+          objectFit="cover"
+          mr="16px"
+          boxSize="150px"
+          borderRadius="full"
+          alt="アバター画像"
+        />
         <Box w="100%" overflow="hidden" textOverflow="ellipsis">
           <Text
             fontWeight="bold"
