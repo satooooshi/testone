@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import userCardStyles from '@/styles/components/UserCard.module.scss';
 import { Tag, TagType, User } from 'src/types';
-import { Avatar, Box, Button } from '@chakra-ui/react';
+import { Avatar, Box, Button, Flex, Text } from '@chakra-ui/react';
 import Link from 'next/link';
 import UserPointCounter from './UserPointCounter';
 
@@ -52,27 +52,25 @@ const UserCard: React.FC<UserCardProps> = ({ user, onClickTag, duration }) => {
     return groupByTagType(user.tags || []);
   }, [user.tags]);
   return (
-    <Box className={userCardStyles.wrapper}>
-      <div className={userCardStyles.top}>
-        <Avatar
-          size="xl"
-          src={user.avatarUrl}
-          className={userCardStyles.avatar}
-        />
-        <div className={userCardStyles.user_info_text}>
-          <p
-            className={
-              userCardStyles.name
-            }>{`${user.lastName} ${user.firstName}`}</p>
-          <p
-            className={
-              userCardStyles.name_kana
-            }>{`${user.lastNameKana} ${user.firstNameKana}`}</p>
-          <div className={userCardStyles.introduce_text_wrapper}>
-            <p className={userCardStyles.introduce_text}>{`${
+    <Box bg="white" borderRadius="8px" p="16px">
+      <Flex mb="8px">
+        <Avatar size="xl" src={user.avatarUrl} mr="8px" />
+        <Box w="100%" overflow="hidden" textOverflow="ellipsis">
+          <Text
+            fontWeight="bold"
+            fontSize="18px"
+            mb="4px"
+            noOfLines={1}>{`${user.lastName} ${user.firstName}`}</Text>
+          <Text
+            fontSize="12px"
+            color="gray"
+            mb="12px"
+            noOfLines={1}>{`${user.lastNameKana} ${user.firstNameKana}`}</Text>
+          <Box h="40px">
+            <Text color="gray" fontSize="14px" noOfLines={2}>{`${
               user.introduceOther || '自己紹介未入力'
-            }`}</p>
-          </div>
+            }`}</Text>
+          </Box>
           <UserPointCounter
             label="event"
             count={user.eventCount || 0}
@@ -93,10 +91,10 @@ const UserCard: React.FC<UserCardProps> = ({ user, onClickTag, duration }) => {
             count={user.knowledgeCount || 0}
             duration={duration}
           />
-        </div>
-      </div>
+        </Box>
+      </Flex>
 
-      <div className={userCardStyles.bottom}>
+      <Box>
         <div className={userCardStyles.tags_with_label_wrapper}>
           <p className={userCardStyles.tags_label}>技術:</p>
           <div className={userCardStyles.tags_wrapper}>
@@ -183,7 +181,7 @@ const UserCard: React.FC<UserCardProps> = ({ user, onClickTag, duration }) => {
           color="blue.600">
           プロフィールを見る
         </Button>
-      </div>
+      </Box>
     </Box>
   );
 };

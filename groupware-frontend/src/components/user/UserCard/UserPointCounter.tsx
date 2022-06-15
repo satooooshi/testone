@@ -1,4 +1,5 @@
 import userCardStyles from '@/styles/components/UserCard.module.scss';
+import { Flex, Text } from '@chakra-ui/react';
 import { useMemo } from 'react';
 
 type UserPointCounterType = {
@@ -35,13 +36,19 @@ const UserPointCounter: React.FC<UserPointCounterType> = ({
     return '';
   };
   return (
-    <span className={userCardStyles.sub_info_text}>
-      <p className={userCardStyles.count_label_text}>
+    <Flex
+      alignItems="center"
+      justifyContent="space-between"
+      w="40%"
+      className={userCardStyles.sub_info_text}>
+      <Text fontSize="14px">
         {labelText}
         {durationText()}
-      </p>
-      <p className={userCardStyles.count}>{count.toString()}</p>
-    </span>
+      </Text>
+      <Text fontWeight="bold" fontSize="18px" color="green.400">
+        {count.toString()}
+      </Text>
+    </Flex>
   );
 };
 export default UserPointCounter;
