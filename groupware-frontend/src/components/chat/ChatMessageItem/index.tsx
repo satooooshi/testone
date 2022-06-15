@@ -356,7 +356,7 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
                   borderRadius="8px"
                   p="8px"
                   maxW={isSmallerThan768 ? undefined : '40vw'}
-                  minW={'300px'}
+                  minW={'150px'}
                   wordBreak="break-word">
                   {messageState.type === ChatMessageType.IMAGE ? (
                     <ImageMessage
