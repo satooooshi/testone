@@ -9,11 +9,7 @@ type StickerMessageProps = {
 
 const StickerMessage: React.FC<StickerMessageProps> = ({ message }) => {
   return (
-    <Box
-      display="flex"
-      justifyContent={message.isSender ? 'flex-end' : 'flex-start'}
-      maxW="150px"
-      maxH={'150px'}>
+    <Box display="flex" maxW="150px" maxH={'150px'}>
       <Image
         loading="lazy"
         src={reactionStickers.find((s) => s.name === message.content)?.src}
