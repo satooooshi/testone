@@ -14,6 +14,7 @@ import { nameOfEmptyNameGroup } from 'src/utils/chat/nameOfEmptyNameGroup';
 import { useHandleBadge } from 'src/contexts/badge/useHandleBadge';
 import router from 'next/router';
 import { useAuthenticate } from 'src/contexts/useAuthenticate';
+import { useAPIGetRoomsByPage } from '@/hooks/api/chat/useAPIGetRoomsByPage';
 
 type RoomListProps = {
   currentId?: string;
