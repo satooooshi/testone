@@ -1,4 +1,3 @@
-import userCardStyles from '@/styles/components/UserCard.module.scss';
 import { Flex, Text } from '@chakra-ui/react';
 import { useMemo } from 'react';
 
@@ -26,26 +25,22 @@ const UserPointCounter: React.FC<UserPointCounterType> = ({
     }
   }, [label]);
 
-  const durationText = () => {
-    if (duration === 'week') {
-      return '(週間)';
-    }
-    if (duration === 'month') {
-      return '(月間)';
-    }
-    return '';
-  };
+  // const durationText = () => {
+  //   if (duration === 'week') {
+  //     return '(週間)';
+  //   }
+  //   if (duration === 'month') {
+  //     return '(月間)';
+  //   }
+  //   return '';
+  // };
   return (
-    <Flex
-      alignItems="center"
-      justifyContent="space-between"
-      w="40%"
-      className={userCardStyles.sub_info_text}>
-      <Text fontSize="14px">
+    <Flex alignItems="center">
+      <Text fontSize="12px" color="gray" noOfLines={1} w="100px">
         {labelText}
-        {durationText()}
+        {/* {durationText()} */}
       </Text>
-      <Text fontWeight="bold" fontSize="18px" color="green.400">
+      <Text fontSize="12px" fontWeight="bold" color="green.300">
         {count.toString()}
       </Text>
     </Flex>

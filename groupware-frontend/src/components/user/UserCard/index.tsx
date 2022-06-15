@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import userCardStyles from '@/styles/components/UserCard.module.scss';
 import { Tag, TagType, User } from 'src/types';
-import { Box, Button, Flex, Text, Image } from '@chakra-ui/react';
+import { Box, Button, Flex, Text, Image, SimpleGrid } from '@chakra-ui/react';
 import Link from 'next/link';
 import UserPointCounter from './UserPointCounter';
 import noImage from '@/public/no-image.jpg';
@@ -80,6 +80,18 @@ const UserCard: React.FC<UserCardProps> = ({ user, onClickTag, duration }) => {
               user.introduceOther || '自己紹介未入力'
             }`}</Text>
           </Box>
+          <SimpleGrid
+            columns={2}
+            bg="gray.100"
+            maxWidth="320px"
+            spacingX="36px"
+            spacingY="12px"
+            w="100%"
+            borderRadius="lg"
+            justifyContent="space-between"
+            alignItems="start"
+            p="4">
+            <SimpleGrid spacingY="12px">
           <UserPointCounter
             label="event"
             count={user.eventCount || 0}
@@ -90,6 +102,8 @@ const UserCard: React.FC<UserCardProps> = ({ user, onClickTag, duration }) => {
             count={user.questionCount || 0}
             duration={duration}
           />
+            </SimpleGrid>
+            <SimpleGrid spacingY="12px">
           <UserPointCounter
             label="answer"
             count={user.answerCount || 0}
@@ -100,6 +114,8 @@ const UserCard: React.FC<UserCardProps> = ({ user, onClickTag, duration }) => {
             count={user.knowledgeCount || 0}
             duration={duration}
           />
+            </SimpleGrid>
+          </SimpleGrid>
         </Box>
       </Flex>
 
