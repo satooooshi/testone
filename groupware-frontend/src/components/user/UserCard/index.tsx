@@ -104,7 +104,7 @@ const UserCard: React.FC<UserCardProps> = ({ user, onClickTag, duration }) => {
       </Flex>
 
       <Box mb="20px">
-        <div className={userCardStyles.tags_with_label_wrapper}>
+        <Flex alignItems="center" mb="4px">
           <p className={userCardStyles.tags_label}>技術:</p>
           <div className={userCardStyles.tags_wrapper}>
             {groupedTags[TagType.TECH].length ? (
@@ -122,8 +122,8 @@ const UserCard: React.FC<UserCardProps> = ({ user, onClickTag, duration }) => {
               </Button>
             )}
           </div>
-        </div>
-        <div className={userCardStyles.tags_with_label_wrapper}>
+        </Flex>
+        <Flex alignItems="center" mb="4px">
           <p className={userCardStyles.tags_label}>資格:</p>
           <div className={userCardStyles.tags_wrapper}>
             {groupedTags[TagType.QUALIFICATION].length ? (
@@ -141,8 +141,8 @@ const UserCard: React.FC<UserCardProps> = ({ user, onClickTag, duration }) => {
               </Button>
             )}
           </div>
-        </div>
-        <div className={userCardStyles.tags_with_label_wrapper}>
+        </Flex>
+        <Flex alignItems="center" mb="4px">
           <p className={userCardStyles.tags_label}>部活動:</p>
           <div className={userCardStyles.tags_wrapper}>
             {groupedTags[TagType.CLUB].length ? (
@@ -160,8 +160,8 @@ const UserCard: React.FC<UserCardProps> = ({ user, onClickTag, duration }) => {
               </Button>
             )}
           </div>
-        </div>
-        <div className={userCardStyles.tags_with_label_wrapper}>
+        </Flex>
+        <Flex alignItems="center" mb="4px">
           <p className={userCardStyles.tags_label}>趣味:</p>
           <div className={userCardStyles.tags_wrapper}>
             {groupedTags[TagType.HOBBY].length ? (
@@ -179,7 +179,7 @@ const UserCard: React.FC<UserCardProps> = ({ user, onClickTag, duration }) => {
               </Button>
             )}
           </div>
-        </div>
+        </Flex>
       </Box>
       <Button
         as="a"
