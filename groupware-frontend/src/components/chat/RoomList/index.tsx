@@ -36,10 +36,8 @@ const RoomList: React.FC<RoomListProps> = ({ currentId, onClickRoom }) => {
           ? r.isPinned && r.updatedAt > data.updatedAt
           : r.isPinned || r.updatedAt > data.updatedAt,
       ).length;
-      if (pinnedRoomsCount) {
-        rooms.splice(pinnedRoomsCount, 0, data);
-        setChatGroupsState(rooms);
-      }
+      rooms.splice(pinnedRoomsCount, 0, data);
+      setChatGroupsState(rooms);
     },
     onError: () => {
       alert(
