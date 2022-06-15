@@ -94,7 +94,7 @@ const UserCard: React.FC<UserCardProps> = ({ user, onClickTag, duration }) => {
         </Box>
       </Flex>
 
-      <Box>
+      <Box mb="20px">
         <div className={userCardStyles.tags_with_label_wrapper}>
           <p className={userCardStyles.tags_label}>技術:</p>
           <div className={userCardStyles.tags_wrapper}>
@@ -171,17 +171,17 @@ const UserCard: React.FC<UserCardProps> = ({ user, onClickTag, duration }) => {
             )}
           </div>
         </div>
-        <Button
-          as="a"
-          href={`/account/${user.id}`}
-          size="lg"
-          rounded="full"
-          w="50%"
-          fontSize="16px"
-          color="blue.600">
-          プロフィールを見る
-        </Button>
       </Box>
+      <Button
+        as="a"
+        href={`/account/${user.id}`}
+        size="lg"
+        rounded="full"
+        w="50%"
+        fontSize="14px"
+        color="blue.600">
+        プロフィールを見る
+      </Button>
     </Box>
   );
 };
