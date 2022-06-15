@@ -174,27 +174,6 @@ const UserCard: React.FC<UserCardProps> = ({ user, onClickTag, duration }) => {
               )}
             </div>
           </div>
-
-          {/* <div className={userCardStyles.counts_wrapper}> */}
-          {/*   <div className={userCardStyles.count_item_wrapper}> */}
-          {/*     <p className={userCardStyles.count}>{user.eventCount}</p> */}
-          {/*     <p className={userCardStyles.count_label}> */}
-          {/*       イベント参加数{durationText()} */}
-          {/*     </p> */}
-          {/*   </div> */}
-          {/*   <div className={userCardStyles.count_item_wrapper}> */}
-          {/*     <p className={userCardStyles.count}>{user.questionCount}</p> */}
-          {/*     <p className={userCardStyles.count_label}> */}
-          {/*       質問数{durationText()} */}
-          {/*     </p> */}
-          {/*   </div> */}
-          {/*   <div className={userCardStyles.count_item_wrapper}> */}
-          {/*     <p className={userCardStyles.count}>{user.answerCount}</p> */}
-          {/*     <p className={userCardStyles.count_label}> */}
-          {/*       回答数{durationText()} */}
-          {/*     </p> */}
-          {/*   </div> */}
-          {/* </div> */}
         </div>
       </a>
     </Link>
