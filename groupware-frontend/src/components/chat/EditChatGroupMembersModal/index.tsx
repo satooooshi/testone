@@ -150,11 +150,7 @@ const EditChatGroupMembersModal: React.FC<EditChatGroupMambersModalProps> = ({
               colorScheme="green"
               alignItems="center">
               <Text display="inline">
-                {room
-                  ? '更新'
-                  : isTalkRoom && selectedUsersInModal.length === 1
-                  ? '作成'
-                  : '次へ'}
+                {room ? '更新' : isTalkRoom ? '作成' : '次へ'}
               </Text>
             </Button>
           )}
