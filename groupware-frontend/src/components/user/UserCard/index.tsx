@@ -108,7 +108,7 @@ const UserCard: React.FC<UserCardProps> = ({ user, onClickTag, duration }) => {
                 />
               ))
             ) : (
-              <Button size="xs" colorScheme="teal">
+              <Button size="xs" height="28px" colorScheme="teal">
                 未設定
               </Button>
             )}
