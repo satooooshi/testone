@@ -93,23 +93,17 @@ const ChatGroupCard: React.FC<ChatGroupCardProps> = ({
                 {chatGroup.unreadCount}
               </Badge>
             ) : null}
-            {!!chatGroup.isPinned ? (
-              <Link
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onPressPinButton();
-                }}>
+            <Link
+              onClick={(e) => {
+                e.stopPropagation();
+                onPressPinButton();
+              }}>
+              {!!chatGroup.isPinned ? (
                 <RiPushpin2Fill size={24} color="green" />
-              </Link>
-            ) : (
-              <Link
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onPressPinButton();
-                }}>
+              ) : (
                 <RiPushpin2Line size={24} color="green" />
-              </Link>
-            )}
+              )}
+            </Link>
           </Box>
         </Box>
         <Box display="flex" flexDir="row" alignItems="center" mb="4px">
