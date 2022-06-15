@@ -3,12 +3,9 @@
 .wrapper {
   display: flex;
   flex-direction: column;
-  width: 36vw;
-  background: $header_background_color;
-  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
-  @media (max-width: 1024px) {
-    width: 85vw;
-  }
+  background: #fff;
+  border-radius: 8px;
+  padding: 16px;
 }
 
 .top {
@@ -26,7 +23,6 @@
 
 .bottom {
   width: 100%;
-  padding-left: 8px;
 }
 
 .name {

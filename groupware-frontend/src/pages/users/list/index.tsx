@@ -12,7 +12,14 @@ import { toggleTag } from 'src/utils/toggleTag';
 import paginationStyles from '@/styles/components/Pagination.module.scss';
 import { userQueryRefresh } from 'src/utils/userQueryRefresh';
 import { SidebarScreenName } from '@/components/layout/Sidebar';
-import { Box, FormControl, FormLabel, Select, Text } from '@chakra-ui/react';
+import {
+  Box,
+  FormControl,
+  FormLabel,
+  Select,
+  SimpleGrid,
+  Text,
+} from '@chakra-ui/react';
 import TopTabBar, { TopTabBehavior } from '@/components/layout/TopTabBar';
 import { useAPIGetUserTag } from '@/hooks/api/tag/useAPIGetUserTag';
 import {
@@ -180,10 +187,13 @@ const UserList = () => {
                 </FormControl>
               </div>
             </div>
-
-            <div className={userListStyles.user_card_row}>
+            <SimpleGrid
+              columns={{ base: 1, lg: 2 }}
+              spacing="20px"
+              w="80vw"
+              mx="auto">
               {users.users.map((u) => (
-                <div key={u.id} className={userListStyles.user_card_wrapper}>
+                <div key={u.id}>
                   <UserCard
                     user={u}
                     onClickTag={(tag) => {
@@ -197,7 +207,7 @@ const UserList = () => {
                   />
                 </div>
               ))}
-            </div>
+            </SimpleGrid>
           </>
         ) : null}
       </div>
