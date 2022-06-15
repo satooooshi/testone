@@ -56,12 +56,15 @@ export const useChatSocket = (
       socket.emit('joinRoom', room.id.toString());
 
       socket.on('readMessageClient', async (senderId: string) => {
+        console.log('socket readMessageClient----', senderId);
         if (user?.id && senderId && senderId != `${user?.id}`) {
           refetchLastReadChatTime();
         }
       });
 
       socket.on('msgToClient', async (sentMsgByOtherUsers: ChatMessage) => {
+        console.log('socket msgToClient----', sentMsgByOtherUsers);
+
         if (sentMsgByOtherUsers.content) {
           if (sentMsgByOtherUsers?.sender?.id !== user?.id) {
             saveLastReadChatTime(room.id, {

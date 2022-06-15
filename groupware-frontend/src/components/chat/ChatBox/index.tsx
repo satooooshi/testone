@@ -404,20 +404,13 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
   }, []);
 
   const onScrollTopOnChat = (e: any) => {
-    console.log('onScrollTopOnChat');
-
     if (
       e.target.clientHeight - e.target.scrollTop >=
       (e.target.scrollHeight * 2) / 3
     ) {
-      console.log(
-        'onScrollTopOnChat fetchedPastMessages',
-        fetchedPastMessages?.length,
-      );
       if (fetchedPastMessages?.length) {
         const target = messages[messages.length - 1].id;
         if (minBefore && minBefore <= target) return;
-        console.log('onScrollTopOnChat set');
         setMinBefore(target);
         setBefore(target);
       }
