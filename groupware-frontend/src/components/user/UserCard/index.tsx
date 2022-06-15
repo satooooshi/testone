@@ -53,7 +53,7 @@ const UserCard: React.FC<UserCardProps> = ({ user, onClickTag, duration }) => {
     return groupByTagType(user.tags || []);
   }, [user.tags]);
   return (
-    <Box bg="white" borderRadius="8px" p="16px">
+    <Box bg="white" borderRadius="lg" p="16px">
       <Flex mb="8px">
         <Image
           src={user.avatarUrl}
