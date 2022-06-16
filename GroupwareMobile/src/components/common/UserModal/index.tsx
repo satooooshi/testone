@@ -66,6 +66,9 @@ const UserModal: React.FC<UserModalProps> = props => {
   const onCloseUserModal = () => {
     onCloseModal();
     setModalUsers(users);
+    setSearchWords(undefined);
+    selectUserRole('All');
+    clear();
   };
   useEffect(() => {
     if (!searchWords) {
