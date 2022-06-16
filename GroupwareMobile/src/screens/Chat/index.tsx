@@ -76,28 +76,22 @@ import {useAPIGetRoomDetail} from '../../hooks/api/chat/useAPIGetRoomDetail';
 import {chatMessageSchema} from '../../utils/validation/schema';
 import {reactionEmojis} from '../../utils/factory/reactionEmojis';
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
-import io from 'socket.io-client';
 import {baseURL, storage} from '../../utils/url';
-import {getThumbnailOfVideo} from '../../utils/getThumbnailOfVideo';
 import {useAuthenticate} from '../../contexts/useAuthenticate';
 import {useInviteCall} from '../../contexts/call/useInviteCall';
 import {reactionStickers} from '../../utils/factory/reactionStickers';
 import {ScrollView} from 'react-native-gesture-handler';
 import {useHandleBadge} from '../../contexts/badge/useHandleBadge';
 import {useIsTabBarVisible} from '../../contexts/bottomTab/useIsTabBarVisible';
-import {debounce} from 'lodash';
 import Clipboard from '@react-native-community/clipboard';
 import {dateTimeFormatterFromJSDDate} from '../../utils/dateTimeFormatterFromJSDate';
 import {useAPIGetUpdatedMessages} from '../../hooks/api/chat/useAPIGetUpdatedMessages';
-
-const socket = io('http://34.84.206.131:3001/', {
-  transports: ['websocket'],
-});
+import {useChatSocket} from './socket';
 
 const TopTab = createMaterialTopTabNavigator();
 
 const Chat: React.FC = () => {
-  const {user: myself, setCurrentChatRoomId} = useAuthenticate();
+  const {user: myself} = useAuthenticate();
   const typeDropdownRef = useRef<any | null>(null);
   const messageIosRef = useRef<FlatList | null>(null);
   const messageAndroidRef = useRef<{flatListRef: Element | null}>({
@@ -150,6 +144,16 @@ const Chat: React.FC = () => {
   const [selectedMessageForCheckLastRead, setSelectedMessageForCheckLastRead] =
     useState<ChatMessage>();
   const [appState, setAppState] = useState<AppStateStatus>('active');
+
+  const refreshMessage = (targetMessages: ChatMessage[]): ChatMessage[] => {
+    const arrayIncludesDuplicate = [...messages, ...targetMessages];
+    return arrayIncludesDuplicate
+      .filter((value, index, self) => {
+        return index === self.findIndex(m => m.id === value.id);
+      })
+      .sort((a, b) => b.id - a.id);
+  };
+  const socket = useChatSocket(room, refreshMessage, setMessages);
 
   const {values, handleSubmit, setValues} = useFormik<Partial<ChatMessage>>({
     initialValues: {
@@ -220,39 +224,6 @@ const Chat: React.FC = () => {
     return users;
   };
 
-  // const {refetch: refetchLatest} = useAPIGetMessages(
-  //   {
-  //     group: room.id,
-  //     limit: room.unreadCount || 0,
-  //   },
-  //   {
-  //     enabled: false,
-  //     onSuccess: latestData => {
-  //       if (latestData?.length) {
-  //         const msgToAppend: ChatMessage[] = [];
-  //         const imagesToApped: ImageSource[] = [];
-  //         for (const latest of latestData) {
-  //           if (!messages?.length || isRecent(latest, messages?.[0])) {
-  //             msgToAppend.push(latest);
-  //             if (latest.type === ChatMessageType.IMAGE) {
-  //               imagesToApped.unshift({uri: latest.content});
-  //             }
-  //           }
-  //         }
-  //         setMessages(m => refreshMessage([...msgToAppend, ...m]));
-  //         // setImagesForViewing(i => [...i, ...imagesToApped]);
-  //       }
-  //       console.log('latest success ====================', latestData.length);
-  //       const now = dateTimeFormatterFromJSDDate({
-  //         dateTime: new Date(),
-  //         format: 'yyyy-LL-dd HH:mm:ss',
-  //       });
-
-  //       storage.set(`dateRefetchLatestInRoom${room.id}`, now);
-  //     },
-  //   },
-  // );
-
   const {mutate: refetchUpdatedMessages} = useAPIGetUpdatedMessages({
     onSuccess: latestData => {
       refetchLastReadChatTime();
@@ -266,14 +237,9 @@ const Chat: React.FC = () => {
           saveLastReadChatTime(room.id);
           setMessages(m => {
             const updatedMessages = refreshMessage([...latestData, ...m]);
-            // if (updatedMessages[0].id !== m[0].id) {
-            //   refetchLastReadChatTime();
-            // }
             return updatedMessages;
           });
-          // setImagesForViewing(i => [...i, ...imagesToApped]);
         }
-        // setRefetchTimes(t => t + 1);
       }
     },
   });
@@ -281,7 +247,7 @@ const Chat: React.FC = () => {
   const {mutate: sendChatMessage, isLoading: loadingSendMessage} =
     useAPISendChatMessage({
       onSuccess: sentMsg => {
-        socket.emit('message', {...sentMsg, isSender: false});
+        socket.send(sentMsg);
         setMessages(refreshMessage([sentMsg, ...messages]));
         if (sentMsg?.chatGroup?.id) {
           refetchRoomCard({id: sentMsg.chatGroup.id, type: ''});
@@ -550,15 +516,6 @@ const Chat: React.FC = () => {
     }
   };
 
-  const refreshMessage = (targetMessages: ChatMessage[]): ChatMessage[] => {
-    const arrayIncludesDuplicate = [...messages, ...targetMessages];
-    return arrayIncludesDuplicate
-      .filter((value, index, self) => {
-        return index === self.findIndex(m => m.id === value.id);
-      })
-      .sort((a, b) => b.id - a.id);
-  };
-
   const saveMessages = (msg: ChatMessage[]) => {
     const jsonMessages = JSON.stringify(msg);
     storage.set(`messagesIntRoom${room.id}`, jsonMessages);
@@ -655,78 +612,9 @@ const Chat: React.FC = () => {
   }, [isFocused, setIsTabBarVisible]);
 
   useEffect(() => {
-    setCurrentChatRoomId(room.id);
-    let isMounted = true;
-    socket.connect();
-    socket.emit('joinRoom', room.id.toString());
-    socket.on('readMessageClient', async (senderId: string) => {
-      if (myself?.id && senderId && senderId !== `${myself?.id}`) {
-        console.log('readMessageClient called', senderId, myself.id, room.id);
-        refetchLastReadChatTime();
-      }
-    });
-    socket.on('msgToClient', async (sentMsgByOtherUsers: ChatMessage) => {
-      if (sentMsgByOtherUsers.content) {
-        if (
-          sentMsgByOtherUsers?.sender?.id !== myself?.id &&
-          AppState.currentState === 'active'
-        ) {
-          saveLastReadChatTime(room.id, {
-            onSuccess: () => {
-              socket.emit('readReport', {
-                room: room.id.toString(),
-                senderId: myself?.id,
-              });
-              handleEnterRoom(room.id);
-            },
-          });
-          refetchLastReadChatTime();
-        }
-        sentMsgByOtherUsers.createdAt = new Date(sentMsgByOtherUsers.createdAt);
-        sentMsgByOtherUsers.updatedAt = new Date(sentMsgByOtherUsers.updatedAt);
-        if (sentMsgByOtherUsers.sender?.id === myself?.id) {
-          sentMsgByOtherUsers.isSender = true;
-        }
-        // setImagesForViewing(i => [...i, {uri: sentMsgByOtherUsers.content}]);
-        if (sentMsgByOtherUsers.type === ChatMessageType.VIDEO) {
-          sentMsgByOtherUsers.thumbnail = await getThumbnailOfVideo(
-            sentMsgByOtherUsers.content,
-          );
-        }
-        if (isMounted) {
-          setMessages(msgs => {
-            if (
-              msgs.length &&
-              msgs[0].id !== sentMsgByOtherUsers.id &&
-              sentMsgByOtherUsers.chatGroup?.id === room.id
-            ) {
-              return refreshMessage([sentMsgByOtherUsers, ...msgs]);
-            } else if (sentMsgByOtherUsers.chatGroup?.id !== room.id) {
-              return refreshMessage(
-                msgs.filter(m => m.id !== sentMsgByOtherUsers.id),
-              );
-            }
-            return refreshMessage(msgs);
-          });
-        }
-      }
-    });
-    setCurrentChatRoomId(room.id);
-
-    socket.on('joinedRoom', (r: any) => {
-      console.log('joinedRoom', r);
-    });
-
-    socket.on('leftRoom', (r: any) => {
-      console.log('leftRoom', r);
-    });
-
+    socket.joinRoom();
     return () => {
-      setMessages([]);
-      socket.emit('leaveRoom', room.id);
-      isMounted = false;
-      socket.disconnect();
-      setCurrentChatRoomId(undefined);
+      socket.leaveRoom();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [room.id]);
@@ -986,41 +874,11 @@ const Chat: React.FC = () => {
     };
   });
 
-  // const [refetchTimes, setRefetchTimes] = useState(0);
-  // useEffect(() => {
-  //   const messageRefetchInterval = async () => {
-  //     await new Promise(r => setTimeout(r, 5000));
-  //     if (appState === 'active' && isFocused) {
-  //       console.log('messageRefetchInterval---', myself?.lastName);
-  //       const dateRefetchLatest = storage.getString(
-  //         `dateRefetchLatestInRoom${room.id}`,
-  //       );
-  //       const now = dateTimeFormatterFromJSDDate({
-  //         dateTime: new Date(),
-  //         format: 'yyyy-LL-dd HH:mm:ss',
-  //       });
-  //       storage.set(`dateRefetchLatestInRoom${room.id}`, now);
-  //       refetchUpdatedMessages({
-  //         group: room.id,
-  //         limit: undefined,
-  //         dateRefetchLatest: dateRefetchLatest,
-  //       });
-  //     }
-  //   };
-  //   if (appState === 'active' && refetchTimes > 0) {
-  //     messageRefetchInterval();
-  //   }
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [refetchTimes, appState]);
-
   useEffect(() => {
     if (appState === 'active' && isFocused) {
       saveLastReadChatTime(room.id, {
         onSuccess: () => {
-          socket.emit('readReport', {
-            room: room.id.toString(),
-            senderId: myself?.id,
-          });
+          socket.report();
           handleEnterRoom(room.id);
         },
       });
@@ -1031,10 +889,7 @@ const Chat: React.FC = () => {
   useEffect(() => {
     saveLastReadChatTime(room.id, {
       onSuccess: () => {
-        socket.emit('readReport', {
-          room: room.id.toString(),
-          senderId: myself?.id,
-        });
+        socket.report();
         handleEnterRoom(room.id);
       },
     });
