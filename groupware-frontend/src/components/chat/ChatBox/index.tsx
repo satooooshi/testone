@@ -178,7 +178,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
       .filter((m) => m.type === ChatMessageType.IMAGE)
       .map((m) => ({
         src: m.content,
-        downloadUrl: m.content,
+        downloadUrl: m.fileName,
       }))
       .reverse();
   }, [messages]);
@@ -576,8 +576,8 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
                 <i
                   className={`react-viewer-icon react-viewer-icon-download`}></i>
               ),
-              onClick: ({ src }) => {
-                saveAs(src, fileNameTransformer(src));
+              onClick: ({ src, downloadUrl }) => {
+                saveAs(src, downloadUrl ? downloadUrl : 'image.png');
               },
             },
           ]);

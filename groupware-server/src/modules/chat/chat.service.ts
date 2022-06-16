@@ -283,7 +283,6 @@ export class ChatService {
 
     const existMessages = await this.chatMessageRepository
       .createQueryBuilder('chat_messages')
-      .withDeleted()
       .leftJoinAndSelect('chat_messages.chatGroup', 'chat_group')
       .leftJoinAndSelect('chat_messages.sender', 'sender')
       .leftJoinAndSelect('chat_messages.reactions', 'reactions')
@@ -320,7 +319,6 @@ export class ChatService {
       )
       .take(limitNumber >= 0 ? limitNumber : 20)
       .orderBy('chat_messages.createdAt', after ? 'ASC' : 'DESC')
-      .withDeleted()
       .getMany();
 
     const messages = existMessages.map((m) => {
