@@ -88,7 +88,12 @@ const ChatNoteForm: React.FC<ChatNoteFormProps> = ({
   };
 
   const handlePressImageButton = async () => {
-    const {formData, fileName} = await uploadImageFromGallery();
+    const {formData, fileName} = await uploadImageFromGallery({
+      cropping: true,
+      mediaType: 'photo',
+      multiple: true,
+      maxFiles: 300,
+    });
     if (formData) {
       onUploadImage(formData, {
         onSuccess: imageURLs => {
