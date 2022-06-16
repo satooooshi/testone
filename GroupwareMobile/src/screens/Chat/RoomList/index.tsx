@@ -1,6 +1,11 @@
 import {useFocusEffect, useNavigation} from '@react-navigation/native';
 import React, {useCallback, useEffect, useState} from 'react';
-import {Alert, TouchableHighlight, TouchableOpacity} from 'react-native';
+import {
+  Alert,
+  RefreshControl,
+  TouchableHighlight,
+  TouchableOpacity,
+} from 'react-native';
 import {Div, Icon, Input, ScrollDiv, Text} from 'react-native-magnus';
 import {ActivityIndicator} from 'react-native-paper';
 import tailwind from 'tailwind-rn';
@@ -22,8 +27,13 @@ const RoomList: React.FC = () => {
   const [roomTypeSelector, setRoomTypeSelector] = useState(false);
   const [userModal, setVisibleUserModal] = useState(false);
   const {data: users} = useAPIGetUsers('');
-  const {chatGroups, setChatGroupsState, editChatGroup, isRoomsRefetching} =
-    useHandleBadge();
+  const {
+    chatGroups,
+    setChatGroupsState,
+    editChatGroup,
+    isRoomsRefetching,
+    refreshRooms,
+  } = useHandleBadge();
   const {selectedUserRole, filteredUsers} = useUserRole('All', users);
   const [creationType, setCreationType] = useState<RoomType>();
   const [searchedRooms, setSearchedRooms] = useState<ChatGroup[]>();
@@ -86,6 +96,10 @@ const RoomList: React.FC = () => {
   const onPressRightButton = () => {
     // navigation.navigate('ChatStack', {screen: 'NewRoom'});
     setRoomTypeSelector(true);
+  };
+
+  const refreshRoomList = () => {
+    refreshRooms();
   };
 
   return (
@@ -196,7 +210,11 @@ const RoomList: React.FC = () => {
         />
 
         {chatRooms.length ? (
-          <ScrollDiv h={'80%'}>
+          <ScrollDiv
+            h={'80%'}
+            refreshControl={
+              <RefreshControl refreshing={false} onRefresh={refreshRoomList} />
+            }>
             {searchedRooms
               ? searchedRooms.map(room => {
                   return (
