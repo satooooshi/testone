@@ -1,10 +1,9 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { User } from 'src/types';
 
-export const useSelectedUsers = (alreadySelectedUsers?: Partial<User>[]) => {
-  const [selectedUsers, setSelectedUsers] = useState<Partial<User>[]>(
-    alreadySelectedUsers || [],
-  );
+export const useSelectedUsers = (alreadySelectedUsers: Partial<User>[]) => {
+  const [selectedUsers, setSelectedUsers] =
+    useState<Partial<User>[]>(alreadySelectedUsers);
 
   const isSelected = useCallback(
     (targetUser: User): boolean => {
@@ -26,7 +25,7 @@ export const useSelectedUsers = (alreadySelectedUsers?: Partial<User>[]) => {
   }, []);
 
   const clear = useCallback(() => {
-    setSelectedUsers(alreadySelectedUsers || []);
+    // setSelectedUsers(alreadySelectedUsers || []);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
