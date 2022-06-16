@@ -12,9 +12,8 @@ import ChatLayout from '@/components/chat/Layout';
 
 const ChatDetail = () => {
   const router = useRouter();
-  const [_, dispatchModal] = useModalReducer();
+  const [modalStates, dispatchModal] = useModalReducer();
   const { id } = router.query as { id: string };
-
   const [currentRoom, setCurrentRoom] = useState<ChatGroup>();
 
   useAPIGetRoomDetail(Number(id), {
@@ -65,7 +64,11 @@ const ChatDetail = () => {
   };
 
   return (
-    <ChatLayout currentRoom={currentRoom} setCurrentRoom={setCurrentRoom}>
+    <ChatLayout
+      currentRoom={currentRoom}
+      setCurrentRoom={setCurrentRoom}
+      modalStates={modalStates}
+      dispatchModal={dispatchModal}>
       <Box
         w="100%"
         display="flex"
