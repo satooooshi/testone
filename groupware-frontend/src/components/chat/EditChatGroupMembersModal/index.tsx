@@ -121,7 +121,7 @@ const EditChatGroupMembersModal: React.FC<EditChatGroupMambersModalProps> = ({
     if (!isOpen) {
       clear();
     }
-  }, [isOpen, clear]);
+  }, [isOpen]);
 
   return (
     <Modal
