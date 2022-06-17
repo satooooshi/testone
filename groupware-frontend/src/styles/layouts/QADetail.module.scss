@@ -3,9 +3,9 @@
 .main {
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  // justify-content: center;
   width: 80vw;
-  align-self: center;
+  // align-self: center;
   align-items: center;
 }
 
@@ -36,7 +36,6 @@
   flex-direction: row;
   flex-wrap: wrap;
   justify-content: flex-start;
-  margin-bottom: 16px;
   align-self: flex-start;
 }
 

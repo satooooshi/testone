@@ -1,8 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { TextFormat, User, Wiki, WikiType } from 'src/types';
 import qaCommentStyles from '@/styles/components/QAComment.module.scss';
-import { dateTimeFormatterFromJSDDate } from 'src/utils/dateTimeFormatter';
-import { Avatar, Box, Button } from '@chakra-ui/react';
+import {
+  dateTimeFormatterFromJSDDate,
+  dateTimeFormatterFromJSDDateWithoutTime,
+} from 'src/utils/dateTimeFormatter';
+import { Avatar, Box, Button, Text } from '@chakra-ui/react';
 import MarkdownIt from 'markdown-it';
 import Editor from 'react-markdown-editor-lite';
 import 'react-markdown-editor-lite/lib/index.css';
@@ -111,26 +114,20 @@ const WikiComment: React.FC<WikiCommentProps> = ({
               </>
             )}
           </div>
+
           <div className={qaCommentStyles.info_left}>
-            <Box display="flex" flexDir={'column'} alignItems="end">
-              <p className={qaCommentStyles.wrote_date}>
-                {`投稿日: ${dateTimeFormatterFromJSDDate({
+            <Box display="flex" flexDir="column" alignItems="end">
+              <Text fontSize={'15px'} display="flex" whiteSpace="nowrap">
+                {`投稿: ${dateTimeFormatterFromJSDDateWithoutTime({
                   dateTime: new Date(createdAt),
                 })}`}
-              </p>
-              {onClickEditButton && (
-                <p className={qaCommentStyles.wrote_date}>
-                  {`最終更新日: ${dateTimeFormatterFromJSDDate({
-                    dateTime: new Date(updatedAt),
-                  })}`}
-                </p>
-              )}
+              </Text>
+              <Text ml={2} fontSize={'15px'} display="flex" whiteSpace="nowrap">
+                {`最終更新: ${dateTimeFormatterFromJSDDateWithoutTime({
+                  dateTime: new Date(updatedAt),
+                })}`}
+              </Text>
             </Box>
-            {isWriter && onClickEditButton ? (
-              <Button colorScheme="blue" width="24" onClick={onClickEditButton}>
-                編集
-              </Button>
-            ) : null}
             {onClickReplyButton && replyButtonName ? (
               <Button
                 colorScheme="orange"

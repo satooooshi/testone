@@ -22,6 +22,9 @@ import {
   Link as ChakraLink,
   Flex,
   useToast,
+  Box,
+  Badge,
+  Heading,
 } from '@chakra-ui/react';
 import WrappedDraftEditor from '@/components/wiki/WrappedDraftEditor';
 import { ContentState, Editor, EditorState } from 'draft-js';
@@ -178,6 +181,16 @@ const QuestionDetail = () => {
 
   const headerTitle = 'Wiki詳細';
 
+  const initialHeaderValue = {
+    title: 'Wiki詳細',
+    rightButtonName:
+      myself?.id === wiki?.writer?.id || myself?.role === UserRole.ADMIN
+        ? 'Wikiを編集'
+        : undefined,
+    onClickRightButton: wiki ? () => navigateToEditWiki(wiki.id) : undefined,
+    tabs: tabs,
+  };
+
   const isH2Str = (id: string) => {
     const target = document.getElementById(id);
     if (
@@ -251,28 +264,36 @@ const QuestionDetail = () => {
   return (
     <LayoutWithTab
       sidebar={{ activeScreenName: SidebarScreenName.QA }}
-      header={{ title: headerTitle, tabs: tabs }}>
+      header={initialHeaderValue}>
       {wiki && wiki.writer ? (
-        <div className={qaDetailStyles.main}>
+        <Box bg="white" borderRadius={10} p={5} w="80vw">
           <Head>
             <title>ボールド | {wiki ? wiki.title : headerTitle}</title>
           </Head>
-          <div className={qaDetailStyles.title_wrapper}>
-            <p className={qaDetailStyles.title_text}>{wiki.title}</p>
-          </div>
           {wiki && wiki.tags && wiki.tags.length ? (
             <div className={qaDetailStyles.tags_wrapper}>
               {wiki.tags.map((tag) => (
                 <Link href={`/wiki/list?tag=${tag.id}`} key={tag.id}>
-                  <a className={qaDetailStyles.tag}>
-                    <Button colorScheme={tagColorFactory(tag.type)} size="xs">
-                      {tag.name}
-                    </Button>
-                  </a>
+                  <Badge
+                    ml={1}
+                    p={2}
+                    as="sub"
+                    fontSize="x-small"
+                    display="flex"
+                    colorScheme={tagColorFactory(tag.type)}
+                    borderRadius={50}
+                    alignItems="center"
+                    variant="outline"
+                    borderWidth={1}>
+                    {tag.name}
+                  </Badge>
                 </Link>
               ))}
             </div>
           ) : null}
+          <Heading my={3} size="lg">
+            {wiki.title}
+          </Heading>
           {headLinkContents &&
           headLinkContents.length &&
           !(
@@ -297,24 +318,22 @@ const QuestionDetail = () => {
             </Flex>
           ) : null}
 
-          <div className={qaDetailStyles.question_wrapper}>
-            <div id="wiki-body" className={qaDetailStyles.qa_wrapper}>
-              <WikiComment
-                textFormat={wiki.textFormat}
-                body={wiki.body}
-                createdAt={wiki.createdAt}
-                updatedAt={wiki.updatedAt}
-                writer={wiki.writer}
-                isWriter={isEditableWiki(wiki, user)}
-                onClickEditButton={() =>
-                  (myself?.id === wiki.writer?.id ||
-                    myself?.role === UserRole.ADMIN) &&
-                  navigateToEditWiki(wiki.id)
-                }
-                wiki={wiki}
-              />
-            </div>
-          </div>
+          <Box
+            display="flex"
+            flexDir="column"
+            // alignItems="flex-end"
+            my={3}
+            w="100%">
+            <WikiComment
+              textFormat={wiki.textFormat}
+              body={wiki.body}
+              createdAt={wiki.createdAt}
+              updatedAt={wiki.updatedAt}
+              writer={wiki.writer}
+              isWriter={isEditableWiki(wiki, user)}
+              wiki={wiki}
+            />
+          </Box>
           {wiki.type === WikiType.BOARD ? (
             <div className={qaDetailStyles.answer_count__wrapper}>
               <p className={qaDetailStyles.answer_count}>
@@ -431,7 +450,7 @@ const QuestionDetail = () => {
                   ),
               )
             : null}
-        </div>
+        </Box>
       ) : null}
     </LayoutWithTab>
   );
