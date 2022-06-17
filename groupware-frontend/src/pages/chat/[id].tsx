@@ -36,30 +36,30 @@ const ChatDetail = () => {
   });
 
   const handleMenuSelected = (menuValue: MenuValue) => {
-    if (menuValue === 'editMembers') {
-      dispatchModal({
-        type: 'editMembersModalVisible',
-        value: true,
-      });
-      return;
-    }
-    if (menuValue === 'editGroup') {
-      dispatchModal({
-        type: 'editChatGroupModalVisible',
-        value: true,
-      });
-      return;
-    }
-    if (menuValue === 'leaveRoom') {
-      if (confirm('このルームを退室してよろしいですか？')) {
-        leaveChatGroup(
-          { id: Number(id) },
-          {
-            onSuccess: () => router.push('/chat', undefined, { shallow: true }),
-          },
-        );
-      }
-      return;
+    switch (menuValue) {
+      case 'editMembers':
+        dispatchModal({
+          type: 'editMembersModalVisible',
+          value: true,
+        });
+        break;
+      case 'editGroup':
+        dispatchModal({
+          type: 'editChatGroupModalVisible',
+          value: true,
+        });
+        break;
+      case 'leaveRoom':
+        if (confirm('このルームを退室してよろしいですか？')) {
+          leaveChatGroup(
+            { id: Number(id) },
+            {
+              onSuccess: () =>
+                router.push('/chat', undefined, { shallow: true }),
+            },
+          );
+        }
+        break;
     }
   };
 

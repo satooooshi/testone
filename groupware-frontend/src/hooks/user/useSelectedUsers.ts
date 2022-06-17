@@ -24,10 +24,10 @@ export const useSelectedUsers = (alreadySelectedUsers: Partial<User>[]) => {
     });
   }, []);
 
-  const clear = useCallback(() => {
-    // setSelectedUsers(alreadySelectedUsers || []);
+  const clear = () => {
+    setSelectedUsers(alreadySelectedUsers || []);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  };
 
   return {
     selectedUsers,
