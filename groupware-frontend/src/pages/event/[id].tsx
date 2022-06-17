@@ -600,11 +600,11 @@ const EventDetail = () => {
                 <div className={eventDetailStyles.count_and_button_wrapper}>
                   <Box alignSelf="center" display="flex" flexDir="row">
                     <Heading fontSize="16px">イベントの感想</Heading>
-                    {data.comments?.length && (
+                    {data.comments?.length ? (
                       <Text fontSize="11px" ml={2} alignSelf="center">
                         {data.comments.length}件
                       </Text>
-                    )}
+                    ) : null}
                   </Box>
                   <Box display="flex" flexDir="row">
                     <Button
