@@ -1,6 +1,8 @@
 import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {
   Alert,
+  AppState,
+  AppStateStatus,
   FlatList,
   Keyboard,
   KeyboardAvoidingView,
@@ -17,6 +19,7 @@ import {
   Button,
   Dropdown,
   Input,
+  Image,
 } from 'react-native-magnus';
 import WholeContainer from '../../components/WholeContainer';
 import {useAPIGetMessages} from '../../hooks/api/chat/useAPIGetMessages';
@@ -28,7 +31,7 @@ import {
   ChatMessage,
   ChatMessageReaction,
   ChatMessageType,
-  ImageSource,
+  FIleSource,
   User,
 } from '../../types';
 import {uploadImageFromGallery} from '../../utils/cropImage/uploadImageFromGallery';
@@ -74,19 +77,31 @@ import {chatMessageSchema} from '../../utils/validation/schema';
 import {reactionEmojis} from '../../utils/factory/reactionEmojis';
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
 import io from 'socket.io-client';
-import {baseURL} from '../../utils/url';
+import {baseURL, storage} from '../../utils/url';
 import {getThumbnailOfVideo} from '../../utils/getThumbnailOfVideo';
 import {useAuthenticate} from '../../contexts/useAuthenticate';
+import {useInviteCall} from '../../contexts/call/useInviteCall';
+import {reactionStickers} from '../../utils/factory/reactionStickers';
+import Video from 'react-native-video';
+import {ScrollView} from 'react-native-gesture-handler';
+import ChatShareIcon from '../../components/common/ChatShareIcon';
+import {getFileUrl} from '../../utils/storage/getFileUrl';
+import {useHandleBadge} from '../../contexts/badge/useHandleBadge';
 import {useIsTabBarVisible} from '../../contexts/bottomTab/useIsTabBarVisible';
+import {debounce} from 'lodash';
+import Clipboard from '@react-native-community/clipboard';
+import {dateTimeFormatterFromJSDDate} from '../../utils/dateTimeFormatterFromJSDate';
+import {useAPIGetUpdatedMessages} from '../../hooks/api/chat/useAPIGetUpdatedMessages';
+import {useAPIGetExpiredUrlMessages} from '../../hooks/api/chat/useAPIGetExpiredUrlMessages';
 
-const socket = io(baseURL, {
-  transports: ['websocket'],
-});
+// const socket = io('http://34.84.206.131:3001/', {
+//   transports: ['websocket'],
+// });
 
 const TopTab = createMaterialTopTabNavigator();
 
 const Chat: React.FC = () => {
-  const {user: myself} = useAuthenticate();
+  const {user: myself, setCurrentChatRoomId} = useAuthenticate();
   const typeDropdownRef = useRef<any | null>(null);
   const messageIosRef = useRef<FlatList | null>(null);
   const messageAndroidRef = useRef<{flatListRef: Element | null}>({
@@ -95,6 +110,7 @@ const Chat: React.FC = () => {
   const navigation = useNavigation<ChatNavigationProps>();
   const route = useRoute<ChatRouteProps>();
   const {room} = route.params;
+  const {sendCallInvitation} = useInviteCall();
   const isFocused = useIsFocused();
   const {setIsTabBarVisible} = useIsTabBarVisible();
   const {data: roomDetail, refetch: refetchRoomDetail} = useAPIGetRoomDetail(
@@ -104,38 +120,43 @@ const Chat: React.FC = () => {
   const [focusedMessageID, setFocusedMessageID] = useState<number>();
   const [after, setAfter] = useState<number>();
   const [before, setBefore] = useState<number>();
-  const [include, setInclude] = useState<boolean>();
+  const [include, setInclude] = useState<boolean>(false);
   const [renderMessageIndex, setRenderMessageIndex] = useState<
     number | undefined
   >();
   const [inputtedSearchWord, setInputtedSearchWord] = useState('');
   const [imageModal, setImageModal] = useState(false);
   const [visibleSearchInput, setVisibleSearchInput] = useState(false);
-  const imagesForViewing: ImageSource[] = useMemo(() => {
+  const imagesForViewing: FIleSource[] = useMemo(() => {
     return messages
       .filter(m => m.type === ChatMessageType.IMAGE)
       .map(m => ({
         uri: m.content,
+        fileName: m.fileName,
       }))
       .reverse();
   }, [messages]);
   const [nowImageIndex, setNowImageIndex] = useState<number>(0);
-  const [video, setVideo] = useState('');
-  const {data: lastReadChatTime} = useAPIGetLastReadChatTime(room.id, {
-    refetchInterval: 1000,
-  });
+  const [video, setVideo] = useState<FIleSource>();
+  const {data: lastReadChatTime, refetch: refetchLastReadChatTime} =
+    useAPIGetLastReadChatTime(room.id);
   const [longPressedMsg, setLongPressedMgg] = useState<ChatMessage>();
   const [reactionTarget, setReactionTarget] = useState<ChatMessage>();
+  const [visibleStickerSelctor, setVisibleStickerSelector] = useState(false);
   const {mutate: saveReaction} = useAPISaveReaction();
   const {width: windowWidth, height: windowHeight} = useWindowDimensions();
+  const [footerHeight, setFooterHeight] = useState(0);
   const {mutate: deleteReaction} = useAPIDeleteReaction();
   const [selectedReactions, setSelectedReactions] = useState<
     ChatMessageReaction[] | undefined
   >();
+  const {handleEnterRoom, refetchRoomCard} = useHandleBadge();
   const [selectedEmoji, setSelectedEmoji] = useState<string>();
   const {mutate: saveLastReadChatTime} = useAPISaveLastReadChatTime();
   const [selectedMessageForCheckLastRead, setSelectedMessageForCheckLastRead] =
     useState<ChatMessage>();
+  const [appState, setAppState] = useState<AppStateStatus>('active');
+
   const {values, handleSubmit, setValues} = useFormik<Partial<ChatMessage>>({
     initialValues: {
       content: '',
@@ -153,15 +174,54 @@ const Chat: React.FC = () => {
     },
   });
   const {
-    data: fetchedPastMessages,
     isLoading: loadingMessages,
     isFetching: fetchingMessages,
-  } = useAPIGetMessages({
-    group: room.id,
-    after,
-    before,
-    include,
-  });
+    refetch: refetchFetchedPastMessages,
+  } = useAPIGetMessages(
+    {
+      group: room.id,
+      limit: 20,
+      after,
+      before,
+      include,
+    },
+    {
+      enabled: false,
+      onSuccess: res => {
+        if (res?.length) {
+          const refreshedMessage = refreshMessage(res);
+          console.log('refreshMessage =============', refreshedMessage.length);
+          setMessages(refreshedMessage);
+          if (refetchDoesntExistMessages(res[0].id)) {
+            refetchDoesntExistMessages(res[0].id + 20);
+          } else {
+            setAfter(undefined);
+            setInclude(false);
+            setBefore(undefined);
+          }
+        }
+      },
+    },
+  );
+
+  const {refetch: getExpiredUrlMessages} = useAPIGetExpiredUrlMessages(
+    room.id,
+    {
+      onSuccess: data => {
+        setMessages(mgs => {
+          return mgs.map(m => {
+            for (const d of data) {
+              if (d.id === m.id) {
+                m.content = d.content;
+              }
+            }
+            return m;
+          });
+        });
+      },
+    },
+  );
+
   const {data: searchedResults, refetch: searchMessages} = useAPISearchMessages(
     {
       group: room.id,
@@ -183,35 +243,91 @@ const Chat: React.FC = () => {
     users.unshift(allTag);
     return users;
   };
-  const {refetch: refetchLatest} = useAPIGetMessages(
-    {
-      group: room.id,
-    },
-    {
-      enabled: false,
-      onSuccess: latestData => {
+
+  // const {refetch: refetchLatest} = useAPIGetMessages(
+  //   {
+  //     group: room.id,
+  //     limit: room.unreadCount || 0,
+  //   },
+  //   {
+  //     enabled: false,
+  //     onSuccess: latestData => {
+  //       if (latestData?.length) {
+  //         const msgToAppend: ChatMessage[] = [];
+  //         const imagesToApped: ImageSource[] = [];
+  //         for (const latest of latestData) {
+  //           if (!messages?.length || isRecent(latest, messages?.[0])) {
+  //             msgToAppend.push(latest);
+  //             if (latest.type === ChatMessageType.IMAGE) {
+  //               imagesToApped.unshift({uri: latest.content});
+  //             }
+  //           }
+  //         }
+  //         setMessages(m => refreshMessage([...msgToAppend, ...m]));
+  //         // setImagesForViewing(i => [...i, ...imagesToApped]);
+  //       }
+  //       console.log('latest success ====================', latestData.length);
+  //       const now = dateTimeFormatterFromJSDDate({
+  //         dateTime: new Date(),
+  //         format: 'yyyy-LL-dd HH:mm:ss',
+  //       });
+
+  //       storage.set(`dateRefetchLatestInRoom${room.id}user${myself?.id}`, now);
+  //     },
+  //   },
+  // );
+
+  const {mutate: refetchUpdatedMessages} = useAPIGetUpdatedMessages({
+    onSuccess: latestData => {
+      refetchLastReadChatTime();
+      if (appState === 'active') {
         if (latestData?.length) {
-          const msgToAppend: ChatMessage[] = [];
-          const imagesToApped: ImageSource[] = [];
-          for (const latest of latestData) {
-            if (!messages?.length || isRecent(latest, messages?.[0])) {
-              msgToAppend.push(latest);
-              if (latest.type === ChatMessageType.IMAGE) {
-                imagesToApped.unshift({uri: latest.content});
-              }
-            }
-          }
-          setMessages(m => refreshMessage([...msgToAppend, ...m]));
+          // const msgToAppend: ChatMessage[] = [];
+          // const imagesToApped: FIleSource[] = [];
+          // for (const latest of latestData) {
+          //   if (!messages?.length || isRecent(latest, messages?.[0])) {
+          //     msgToAppend.push(latest);
+          //     if (latest.type === ChatMessageType.IMAGE) {
+          //       imagesToApped.unshift({
+          //         uri: latest.content,
+          //         fileName: latest.fileName,
+          //       });
+          //     }
+          //   }
+          // }
+          // setMessages(m => refreshMessage([...msgToAppend, ...m]));
+          const now = dateTimeFormatterFromJSDDate({
+            dateTime: new Date(),
+            format: 'yyyy-LL-dd HH:mm:ss',
+          });
+          storage.set(
+            `dateRefetchLatestInRoom${room.id}user${myself?.id}`,
+            now,
+          );
+          saveLastReadChatTime(room.id);
+          storage.set(`dateRefetchLatestInRoom${room.id}`, now);
+          setMessages(m => {
+            const updatedMessages = refreshMessage([...latestData, ...m]);
+            // if (updatedMessages[0].id !== m[0].id) {
+            //   refetchLastReadChatTime();
+            // }
+            return updatedMessages;
+          });
           // setImagesForViewing(i => [...i, ...imagesToApped]);
         }
-      },
+        setRefetchTimes(t => t + 1);
+      }
     },
-  );
+  });
+
   const {mutate: sendChatMessage, isLoading: loadingSendMessage} =
     useAPISendChatMessage({
       onSuccess: sentMsg => {
-        socket.emit('message', {...sentMsg, isSender: false});
+        // socket.emit('message', {...sentMsg, isSender: false});
         setMessages(refreshMessage([sentMsg, ...messages]));
+        if (sentMsg?.chatGroup?.id) {
+          refetchRoomCard({id: sentMsg.chatGroup.id, type: ''});
+        }
         setValues(v => ({
           ...v,
           content: '',
@@ -225,12 +341,13 @@ const Chat: React.FC = () => {
         );
       },
     });
+
   const {mutate: uploadFile, isLoading: loadingUploadFile} =
     useAPIUploadStorage();
   const isLoadingSending = loadingSendMessage || loadingUploadFile;
 
   const showImageOnModal = (url: string) => {
-    const isNowUri = (element: ImageSource) => element.uri === url;
+    const isNowUri = (element: FIleSource) => element.uri === url;
     setNowImageIndex(imagesForViewing.findIndex(isNowUri));
     setImageModal(true);
   };
@@ -274,21 +391,19 @@ const Chat: React.FC = () => {
       onSettled: () => setReactionTarget(undefined),
       onSuccess: savedReaction => {
         const reactionAdded = {...savedReaction, isSender: true};
-        setMessages(m => {
-          return refreshMessage(
-            m.map(eachMessage => {
-              if (eachMessage.id === savedReaction.chatMessage?.id) {
-                return {
-                  ...eachMessage,
-                  reactions: eachMessage.reactions?.length
-                    ? [...eachMessage.reactions, reactionAdded]
-                    : [reactionAdded],
-                };
-              }
-              return eachMessage;
-            }),
-          );
-        });
+        setMessages(m =>
+          m.map(eachMessage => {
+            if (eachMessage.id === savedReaction.chatMessage?.id) {
+              return {
+                ...eachMessage,
+                reactions: eachMessage.reactions?.length
+                  ? [...eachMessage.reactions, reactionAdded]
+                  : [reactionAdded],
+              };
+            }
+            return eachMessage;
+          }),
+        );
       },
       onError: () => {
         Alert.alert(
@@ -298,17 +413,20 @@ const Chat: React.FC = () => {
     });
   };
 
-  const handleUploadImage = async () => {
-    const {formData} = await uploadImageFromGallery({
-      mediaType: 'photo',
-      cropping: false,
-    });
+  const handleUploadImage = async (useCamera: boolean) => {
+    const {formData, fileName} = await uploadImageFromGallery(
+      {
+        mediaType: 'photo',
+        cropping: false,
+      },
+      useCamera,
+    );
     if (formData) {
       uploadFile(formData, {
         onSuccess: imageURL => {
           sendChatMessage({
             content: imageURL[0],
-            fileName: imageURL[0] + '.png',
+            fileName: fileName ? fileName : imageURL[0] + '.png',
             type: ChatMessageType.IMAGE,
             chatGroup: room,
           });
@@ -318,7 +436,7 @@ const Chat: React.FC = () => {
   };
 
   const handleUploadVideo = async () => {
-    const {formData} = await uploadImageFromGallery({
+    const {formData, fileName} = await uploadImageFromGallery({
       mediaType: 'video',
       multiple: false,
     });
@@ -327,7 +445,7 @@ const Chat: React.FC = () => {
         onSuccess: imageURL => {
           sendChatMessage({
             content: imageURL[0],
-            fileName: imageURL[0] + '.mp4',
+            fileName: fileName ? fileName : imageURL[0] + '.mp4',
             type: ChatMessageType.VIDEO,
             chatGroup: room,
           });
@@ -348,7 +466,6 @@ const Chat: React.FC = () => {
     const res = await DocumentPicker.pickSingle({
       type: [DocumentPicker.types.allFiles],
     });
-    console.log(res);
     const formData = new FormData();
     formData.append('files', {
       name: res.name,
@@ -375,8 +492,23 @@ const Chat: React.FC = () => {
     }
   };
 
-  const playVideoOnModal = (url: string) => {
-    setVideo(url);
+  const handleStickerSelected = (sticker: string) => {
+    sendChatMessage({
+      content: sticker,
+      type: ChatMessageType.STICKER,
+      chatGroup: room,
+    });
+    setVisibleStickerSelector(false);
+  };
+
+  const playVideoOnModal = async (data: FIleSource) => {
+    if (!data.createdUrl) {
+      const url = await getFileUrl(data.fileName, data.uri);
+      if (url) {
+        data.createdUrl = url;
+      }
+    }
+    setVideo(data);
   };
 
   const isRecent = (created: ChatMessage, target: ChatMessage): boolean => {
@@ -394,9 +526,7 @@ const Chat: React.FC = () => {
   };
 
   const onScrollTopOnChat = () => {
-    if (fetchedPastMessages?.length) {
-      setBefore(messages[messages.length - 1].id);
-    }
+    setBefore(messages[messages.length - 1].id);
   };
 
   const scrollToRenderedMessage = () => {
@@ -456,6 +586,9 @@ const Chat: React.FC = () => {
   };
 
   const refetchDoesntExistMessages = (focused?: number) => {
+    if (!messages.length) {
+      return false;
+    }
     const isExist = messages.filter(m => m.id === focused)?.length;
 
     if (!isExist) {
@@ -476,12 +609,27 @@ const Chat: React.FC = () => {
       })
       .sort((a, b) => b.id - a.id);
   };
+
+  const saveMessages = (msg: ChatMessage[]) => {
+    const jsonMessages = JSON.stringify(msg);
+    storage.set(`messagesIntRoom${room.id}user${myself?.id}`, jsonMessages);
+  };
+
   useEffect(() => {
-    setMessages([]);
     setBefore(undefined);
     setAfter(undefined);
-    refetchLatest();
-  }, [refetchLatest, room]);
+  }, [room]);
+
+  useEffect(() => {
+    refetchFetchedPastMessages();
+  }, [before, after, include, refetchFetchedPastMessages]);
+
+  useEffect(() => {
+    if (messages.length) {
+      saveMessages(messages);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [messages]);
 
   useEffect(() => {
     // 検索する文字がアルファベットの場合、なぜかuseAPISearchMessagesのonSuccessが動作しない為、こちらで代わりとなる処理を記述しています。
@@ -498,21 +646,6 @@ const Chat: React.FC = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [focusedMessageID]);
-
-  useEffect(() => {
-    if (fetchedPastMessages?.length) {
-      const refreshedMessage = refreshMessage(fetchedPastMessages);
-      setMessages(refreshedMessage);
-      if (refetchDoesntExistMessages(fetchedPastMessages[0].id)) {
-        refetchDoesntExistMessages(fetchedPastMessages[0].id + 20);
-      } else {
-        setAfter(undefined);
-        setInclude(false);
-        setBefore(undefined);
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [fetchedPastMessages]);
 
   const typeDropdown = (
     <Dropdown
@@ -538,6 +671,22 @@ const Chat: React.FC = () => {
         }}>
         リアクション
       </Dropdown.Option>
+
+      {longPressedMsg?.type === 'text' ? (
+        <Dropdown.Option
+          {...defaultDropdownOptionProps}
+          value="copy"
+          onPress={() => {
+            Clipboard.setString(
+              longPressedMsg?.content ? longPressedMsg?.content : '',
+            );
+            setLongPressedMgg(undefined);
+          }}>
+          コピー
+        </Dropdown.Option>
+      ) : (
+        <></>
+      )}
     </Dropdown>
   );
 
@@ -553,90 +702,129 @@ const Chat: React.FC = () => {
     } else {
       setIsTabBarVisible(true);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isFocused, setIsTabBarVisible]);
 
   useEffect(() => {
-    socket.emit('joinRoom', room.id.toString());
-    socket.on('msgToClient', async (sentMsgByOtherUsers: ChatMessage) => {
-      if (sentMsgByOtherUsers.content) {
-        sentMsgByOtherUsers.createdAt = new Date(sentMsgByOtherUsers.createdAt);
-        sentMsgByOtherUsers.updatedAt = new Date(sentMsgByOtherUsers.updatedAt);
-        if (sentMsgByOtherUsers.sender?.id === myself?.id) {
-          sentMsgByOtherUsers.isSender = true;
-        }
-        // setImagesForViewing(i => [...i, {uri: sentMsgByOtherUsers.content}]);
-        if (sentMsgByOtherUsers.type === ChatMessageType.VIDEO) {
-          sentMsgByOtherUsers.thumbnail = await getThumbnailOfVideo(
-            sentMsgByOtherUsers.content,
-          );
-        }
-        setMessages(msgs => {
-          if (
-            msgs.length &&
-            msgs[0].id !== sentMsgByOtherUsers.id &&
-            sentMsgByOtherUsers.chatGroup?.id === room.id
-          ) {
-            return refreshMessage([sentMsgByOtherUsers, ...msgs]);
-          } else if (sentMsgByOtherUsers.chatGroup?.id !== room.id) {
-            return refreshMessage(
-              msgs.filter(m => m.id !== sentMsgByOtherUsers.id),
-            );
-          }
-          return refreshMessage(msgs);
-        });
-      }
-    });
+    setCurrentChatRoomId(room.id);
+    // let isMounted = true;
+    // socket.connect();
+    // socket.emit('joinRoom', room.id.toString());
+    // socket.on('readMessageClient', async (senderId: string) => {
+    //   if (myself?.id && senderId && senderId !== `${myself?.id}`) {
+    //     console.log('readMessageClient called', senderId, myself.id, room.id);
+    //     refetchLastReadChatTime();
+    //   }
+    // });
+    // socket.on('msgToClient', async (sentMsgByOtherUsers: ChatMessage) => {
+    //   if (sentMsgByOtherUsers.content) {
+    //     if (
+    //       sentMsgByOtherUsers?.sender?.id !== myself?.id &&
+    //       AppState.currentState === 'active'
+    //     ) {
+    //       saveLastReadChatTime(room.id, {
+    //         onSuccess: () => {
+    //           socket.emit('readReport', {
+    //             room: room.id.toString(),
+    //             senderId: myself?.id,
+    //           });
+    //           handleEnterRoom(room.id);
+    //         },
+    //       });
+    //       refetchLastReadChatTime();
+    //     }
+    //     sentMsgByOtherUsers.createdAt = new Date(sentMsgByOtherUsers.createdAt);
+    //     sentMsgByOtherUsers.updatedAt = new Date(sentMsgByOtherUsers.updatedAt);
+    //     if (sentMsgByOtherUsers.sender?.id === myself?.id) {
+    //       sentMsgByOtherUsers.isSender = true;
+    //     }
+    //     // setImagesForViewing(i => [...i, {uri: sentMsgByOtherUsers.content}]);
+    //     if (isMounted) {
+    //       setMessages(msgs => {
+    //         if (
+    //           msgs.length &&
+    //           msgs[0].id !== sentMsgByOtherUsers.id &&
+    //           sentMsgByOtherUsers.chatGroup?.id === room.id
+    //         ) {
+    //           return refreshMessage([sentMsgByOtherUsers, ...msgs]);
+    //         } else if (sentMsgByOtherUsers.chatGroup?.id !== room.id) {
+    //           return refreshMessage(
+    //             msgs.filter(m => m.id !== sentMsgByOtherUsers.id),
+    //           );
+    //         }
+    //         return refreshMessage(msgs);
+    //       });
+    //     }
+    //   }
+    // });
+    // setCurrentChatRoomId(room.id);
 
-    socket.on('joinedRoom', (r: any) => {
-      console.log('joinedRoom', r);
-    });
+    // socket.on('joinedRoom', (r: any) => {
+    //   console.log('joinedRoom', r);
+    // });
 
-    socket.on('leftRoom', (r: any) => {
-      console.log('leftRoom', r);
-    });
+    // socket.on('leftRoom', (r: any) => {
+    //   console.log('leftRoom', r);
+    // });
+
     return () => {
-      socket.emit('leaveRoom', room.id);
+      setMessages([]);
+      handleEnterRoom(room.id);
+      // socket.emit('leaveRoom', room.id);
+      // isMounted = false;
+      // socket.disconnect();
+      setCurrentChatRoomId(undefined);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [room.id]);
 
   useEffect(() => {
-    if (fetchedPastMessages?.length) {
-      if (
-        messages?.length &&
-        isRecent(
-          messages[messages.length - 1],
-          fetchedPastMessages[fetchedPastMessages.length - 1],
-        )
-      ) {
-        const msgToAppend: ChatMessage[] = [];
-        for (const sentMsg of fetchedPastMessages) {
-          if (isRecent(messages[messages.length - 1], sentMsg)) {
-            msgToAppend.push(sentMsg);
-          }
-        }
-        setMessages(m => {
-          return refreshMessage([...m, ...msgToAppend]);
-        });
-      } else if (!messages?.length) {
-        setMessages(refreshMessage(fetchedPastMessages));
+    saveLastReadChatTime(room.id);
+    if (!messages.length) {
+      const jsonMessagesInStorage = storage.getString(
+        `messagesIntRoom${room.id}user${myself?.id}`,
+      );
+      const dateRefetchLatest = storage.getString(
+        `dateRefetchLatestInRoom${room.id}user${myself?.id}`,
+      );
+      let messagesInStorageLength;
+      if (jsonMessagesInStorage) {
+        const messagesInStorage = JSON.parse(jsonMessagesInStorage);
+        setMessages(messagesInStorage);
+        messagesInStorageLength = messagesInStorage?.length;
+        console.log(
+          'refetch updated messages ========================',
+          dateRefetchLatest,
+        );
+        getExpiredUrlMessages();
       }
+      const now = dateTimeFormatterFromJSDDate({
+        dateTime: new Date(),
+        format: 'yyyy-LL-dd HH:mm:ss',
+      });
+      storage.set(`dateRefetchLatestInRoom${room.id}`, now);
+      refetchUpdatedMessages({
+        group: room.id,
+        limit: messagesInStorageLength ? undefined : 20,
+        dateRefetchLatest: dateRefetchLatest,
+      });
+      handleEnterRoom(room.id);
+      // refetchLatest();
+      refetchRoomDetail();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [fetchedPastMessages]);
+  }, [messages]);
 
-  useEffect(() => {
-    messages[0]?.chatGroup?.id === room.id && saveLastReadChatTime(room.id);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [messages, room.id]);
-
-  const readUsers = (targetMsg: ChatMessage) => {
-    return lastReadChatTime
-      ? lastReadChatTime
-          .filter(t => t.readTime >= targetMsg.createdAt)
-          .map(t => t.user)
-      : [];
-  };
+  const readUsers = useCallback(
+    (targetMsg: ChatMessage) => {
+      return lastReadChatTime
+        ? lastReadChatTime
+            .filter(t => new Date(t.readTime) >= new Date(targetMsg.createdAt))
+            .map(t => t.user)
+        : [];
+    },
+    [lastReadChatTime],
+  );
 
   const renderMessage = (message: ChatMessage, messageIndex: number) => (
     <Div
@@ -659,7 +847,9 @@ const Chat: React.FC = () => {
         numbersOfRead={numbersOfRead(message)}
         onLongPress={() => setLongPressedMgg(message)}
         onPressImage={() => showImageOnModal(message.content)}
-        onPressVideo={() => playVideoOnModal(message.content)}
+        onPressVideo={() =>
+          playVideoOnModal({uri: message.content, fileName: message.fileName})
+        }
         onPressReaction={r =>
           r.isSender
             ? handleDeleteReaction(r, message)
@@ -696,6 +886,35 @@ const Chat: React.FC = () => {
       ))}
     </Div>
   );
+  const stickerSelector = (
+    <Div
+      bg="white"
+      flexDir="row"
+      flexWrap="wrap"
+      alignSelf="center"
+      w={'100%'}
+      py={32}
+      justifyContent="space-around"
+      px={'sm'}>
+      <TouchableOpacity
+        style={tailwind('absolute right-0 top-0')}
+        onPress={() => setVisibleStickerSelector(false)}>
+        <Icon name="close" fontSize={24} />
+      </TouchableOpacity>
+      <ScrollView horizontal={true}>
+        {reactionStickers.map(e => (
+          <TouchableOpacity
+            key={e.name}
+            onPress={() => handleStickerSelected(e.name)}>
+            <Image
+              source={e.src ? e.src : null}
+              style={{height: 80, width: 80, margin: 10}}
+            />
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
+    </Div>
+  );
 
   const messageListAvoidngKeyboardDisturb = (
     <>
@@ -720,6 +939,8 @@ const Chat: React.FC = () => {
           />
           {reactionTarget ? (
             reactionSelector
+          ) : visibleStickerSelctor ? (
+            stickerSelector
           ) : (
             <>
               {values.replyParentMessage && (
@@ -730,11 +951,18 @@ const Chat: React.FC = () => {
                   replyParentMessage={values.replyParentMessage}
                 />
               )}
+              <Div
+                onLayout={({nativeEvent}) => {
+                  setFooterHeight(nativeEvent.layout.y);
+                }}
+              />
               <ChatFooter
                 onUploadFile={handleUploadFile}
                 onUploadVideo={handleUploadVideo}
                 onUploadImage={handleUploadImage}
+                setVisibleStickerSelector={setVisibleStickerSelector}
                 text={values.content || ''}
+                footerHeight={footerHeight}
                 onChangeText={t =>
                   setValues(v => ({
                     ...v,
@@ -776,6 +1004,8 @@ const Chat: React.FC = () => {
           />
           {reactionTarget ? (
             reactionSelector
+          ) : visibleStickerSelctor ? (
+            stickerSelector
           ) : (
             <>
               {values.replyParentMessage && (
@@ -786,11 +1016,18 @@ const Chat: React.FC = () => {
                   replyParentMessage={values.replyParentMessage}
                 />
               )}
+              <Div
+                onLayout={({nativeEvent}) => {
+                  setFooterHeight(nativeEvent.layout.y);
+                }}
+              />
               <ChatFooter
                 onUploadFile={handleUploadFile}
                 onUploadVideo={handleUploadVideo}
                 onUploadImage={handleUploadImage}
+                setVisibleStickerSelector={setVisibleStickerSelector}
                 text={values.content || ''}
+                footerHeight={footerHeight}
                 onChangeText={t =>
                   setValues(v => ({
                     ...v,
@@ -809,17 +1046,67 @@ const Chat: React.FC = () => {
     </>
   );
 
-  useFocusEffect(
-    useCallback(() => {
-      refetchLatest();
-      refetchRoomDetail();
-    }, [refetchLatest, refetchRoomDetail]),
-  );
-
   useEffect(() => {
-    saveLastReadChatTime(room.id);
-    return () => saveLastReadChatTime(room.id);
-  }, [room.id, saveLastReadChatTime]);
+    const unsubscribeAppState = () => {
+      AppState.addEventListener('change', state => {
+        setAppState(state);
+      });
+    };
+    return () => {
+      unsubscribeAppState();
+    };
+  });
+
+  const [refetchTimes, setRefetchTimes] = useState(0);
+  useEffect(() => {
+    const messageRefetchInterval = async () => {
+      await new Promise(r => setTimeout(r, 5000));
+      if (appState === 'active' && isFocused) {
+        console.log('messageRefetchInterval---', myself?.lastName);
+        const dateRefetchLatest = storage.getString(
+          `dateRefetchLatestInRoom${room.id}`,
+        );
+        refetchUpdatedMessages({
+          group: room.id,
+          limit: undefined,
+          dateRefetchLatest: dateRefetchLatest,
+        });
+      }
+    };
+    if (appState === 'active' && refetchTimes > 0) {
+      messageRefetchInterval();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [refetchTimes, appState]);
+
+  // useEffect(() => {
+  //   if (appState === 'active' && isFocused) {
+  //     saveLastReadChatTime(room.id, {
+  //       onSuccess: () => {
+  //         socket.emit('readReport', {
+  //           room: room.id.toString(),
+  //           senderId: myself?.id,
+  //         });
+  //         handleEnterRoom(room.id);
+  //       },
+  //     });
+  //   }
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [appState, isFocused]);
+
+  // useEffect(() => {
+  //   saveLastReadChatTime(room.id, {
+  //     onSuccess: () => {
+  //       socket.emit('readReport', {
+  //         room: room.id.toString(),
+  //         senderId: myself?.id,
+  //       });
+  //       handleEnterRoom(room.id);
+  //     },
+  //   });
+  //   return () => saveLastReadChatTime(room.id);
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [room.id, saveLastReadChatTime]);
 
   const readUserBox = (user: User) => (
     <View style={tailwind('flex-row bg-white items-center px-4 py-2')}>
@@ -843,6 +1130,23 @@ const Chat: React.FC = () => {
     </View>
   );
 
+  const inviteCall = async () => {
+    if (roomDetail?.members?.length === 2 && myself) {
+      const callee =
+        roomDetail.members[0].id === myself.id
+          ? roomDetail.members[1]
+          : roomDetail.members[0];
+      //第一引数に通話を書ける人のユーザーオブジェクト、第二引数に通話をかけられるひとのユーザーオブジェクト
+      await sendCallInvitation(myself, callee);
+    }
+  };
+
+  const removeCache = () => {
+    storage.delete(`messagesIntRoom${room.id}user${myself?.id}`);
+    setMessages([]);
+    refetchFetchedPastMessages();
+  };
+
   return (
     <WholeContainer>
       {typeDropdown}
@@ -855,35 +1159,39 @@ const Chat: React.FC = () => {
         }}
         onPressEmoji={emoji => setSelectedEmoji(emoji)}
       />
-      <MagnusModal isVisible={!!video} bg="black">
-        <TouchableOpacity
-          style={chatStyles.cancelIcon}
-          onPress={() => {
-            setVideo('');
-          }}>
-          <Icon
-            position="absolute"
-            name={'cancel'}
-            fontFamily="MaterialIcons"
-            fontSize={30}
-            color="#fff"
+      {video?.fileName && video.uri ? (
+        <MagnusModal isVisible={!!video} bg="black">
+          <TouchableOpacity
+            style={chatStyles.cancelIcon}
+            onPress={() => {
+              setVideo(undefined);
+            }}>
+            <Icon
+              position="absolute"
+              name={'cancel'}
+              fontFamily="MaterialIcons"
+              fontSize={30}
+              color="#fff"
+            />
+          </TouchableOpacity>
+          <VideoPlayer
+            video={{
+              uri: video?.createdUrl,
+            }}
+            autoplay
+            videoWidth={windowWidth}
+            videoHeight={windowHeight * 0.9}
           />
-        </TouchableOpacity>
-        <VideoPlayer
-          video={{
-            uri: video,
-          }}
-          autoplay
-          videoWidth={windowWidth}
-        />
-        <TouchableOpacity
-          style={tailwind('absolute bottom-5 right-5')}
-          onPress={async () =>
-            await saveToCameraRoll({url: video, type: 'video'})
-          }>
-          <Icon color="white" name="download" fontSize={24} />
-        </TouchableOpacity>
-      </MagnusModal>
+          <TouchableOpacity
+            style={tailwind('absolute bottom-5 right-5')}
+            onPress={async () =>
+              await saveToCameraRoll({url: video.uri, type: 'video'})
+            }>
+            <Icon color="white" name="download" fontSize={24} />
+          </TouchableOpacity>
+          <ChatShareIcon image={video} isVideo />
+        </MagnusModal>
+      ) : null}
 
       <MagnusModal isVisible={!!selectedMessageForCheckLastRead}>
         <Button
@@ -943,25 +1251,28 @@ const Chat: React.FC = () => {
 
       <ImageView
         animationType="slide"
-        images={imagesForViewing}
+        images={imagesForViewing.map(i => {
+          return {uri: i.uri};
+        })}
         imageIndex={nowImageIndex === -1 ? 0 : nowImageIndex}
         visible={imageModal}
         onRequestClose={() => setImageModal(false)}
         swipeToCloseEnabled={false}
         doubleTapToZoomEnabled={true}
         FooterComponent={({imageIndex}) => (
-          <Div position="absolute" bottom={5} right={5}>
+          <Div>
             <DownloadIcon url={imagesForViewing[imageIndex].uri} />
+            <ChatShareIcon image={imagesForViewing[imageIndex]} />
           </Div>
         )}
       />
       <HeaderTemplate
-        title={roomDetail ? nameOfRoom(roomDetail) : nameOfRoom(room)}
+        title={roomDetail ? nameOfRoom(roomDetail, myself) : nameOfRoom(room)}
         enableBackButton={true}
         screenForBack={'RoomList'}>
         <Div style={tailwind('flex flex-row')}>
           <TouchableOpacity
-            style={tailwind('flex flex-row')}
+            style={tailwind('flex flex-row mr-1')}
             onPress={() => setVisibleSearchInput(true)}>
             <Icon
               name="search"
@@ -970,12 +1281,40 @@ const Chat: React.FC = () => {
               color={darkFontColor}
             />
           </TouchableOpacity>
+
+          {roomDetail?.members && roomDetail.members.length < 3 ? (
+            <Div mt={-4} mr={-4} style={tailwind('flex flex-row ')}>
+              <Button
+                bg="transparent"
+                pb={-3}
+                onPress={() => {
+                  Alert.alert('通話しますか？', undefined, [
+                    {
+                      text: 'はい',
+                      onPress: () => inviteCall(),
+                    },
+                    {
+                      text: 'いいえ',
+                      onPress: () => {},
+                    },
+                  ]);
+                }}>
+                <Icon
+                  name="call-outline"
+                  fontFamily="Ionicons"
+                  fontSize={25}
+                  color="gray700"
+                />
+              </Button>
+            </Div>
+          ) : null}
+
           <TouchableOpacity
             style={tailwind('flex flex-row')}
             onPress={() =>
               navigation.navigate('ChatStack', {
                 screen: 'ChatMenu',
-                params: {room},
+                params: {room, removeCache},
               })
             }>
             <Icon
@@ -987,6 +1326,7 @@ const Chat: React.FC = () => {
           </TouchableOpacity>
         </Div>
       </HeaderTemplate>
+
       {visibleSearchInput && (
         <Div>
           <Div style={tailwind('flex flex-row')}>

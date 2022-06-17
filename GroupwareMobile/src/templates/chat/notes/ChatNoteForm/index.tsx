@@ -1,6 +1,6 @@
 import {AxiosError} from 'axios';
 import {useFormik} from 'formik';
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Alert, TextInput, TouchableHighlight} from 'react-native';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import {Button, Div, Icon, Image, Text} from 'react-native-magnus';
@@ -12,12 +12,13 @@ import {
   ChatGroup,
   ChatNote,
   ChatNoteImage,
-  ImageSource,
+  FIleSource,
 } from '../../../../types';
 import {uploadImageFromGallery} from '../../../../utils/cropImage/uploadImageFromGallery';
 import ImageView from 'react-native-image-viewing';
 import DownloadIcon from '../../../../components/common/DownLoadIcon';
 import {noteSchema} from '../../../../utils/validation/schema';
+import ChatShareIcon from '../../../../components/common/ChatShareIcon';
 
 type ChatNoteFormProps = {
   rightButtonNameOnHeader: string;
@@ -36,6 +37,7 @@ const ChatNoteForm: React.FC<ChatNoteFormProps> = ({
 }) => {
   const [imageModal, setImageModal] = useState(false);
   const [nowImageIndex, setNowImageIndex] = useState<number>(0);
+  const [willSubmit, setWillSubmit] = useState(false);
   const initialValues: Partial<ChatNote> = {
     content: '',
     chatGroup: room,
@@ -52,8 +54,11 @@ const ChatNoteForm: React.FC<ChatNoteFormProps> = ({
     validationSchema: noteSchema,
     onSubmit: submittedValues => onSubmit(submittedValues),
   });
-  const images: ImageSource[] =
-    values.images?.map(i => ({uri: i.imageURL || ''})) || [];
+  const images: FIleSource[] =
+    values.images?.map(i => ({
+      uri: i.imageURL || '',
+      fileName: i.fileName || '',
+    })) || [];
 
   const removeImage = (image: Partial<ChatNoteImage>) => {
     if (!image.imageURL) {
@@ -65,20 +70,31 @@ const ChatNoteForm: React.FC<ChatNoteFormProps> = ({
     }));
   };
 
+  useEffect(() => {
+    const safetySubmit = async () => {
+      handleSubmit();
+      await new Promise(r => setTimeout(r, 1000));
+      setWillSubmit(false);
+    };
+    if (willSubmit) {
+      safetySubmit();
+    }
+  }, [willSubmit, handleSubmit]);
+
   const handlePressImage = (url: string) => {
-    const isNowUri = (element: ImageSource) => element.uri === url;
+    const isNowUri = (element: FIleSource) => element.uri === url;
     setNowImageIndex(images.findIndex(isNowUri));
     setImageModal(true);
   };
 
   const handlePressImageButton = async () => {
-    const {formData} = await uploadImageFromGallery();
+    const {formData, fileName} = await uploadImageFromGallery();
     if (formData) {
       onUploadImage(formData, {
         onSuccess: imageURLs => {
           const newImage: Partial<ChatNoteImage> = {
             imageURL: imageURLs[0],
-            name: imageURLs[0] + '.png',
+            name: fileName ? fileName : imageURLs[0] + '.png',
           };
           setValues(v => ({
             ...v,
@@ -100,7 +116,7 @@ const ChatNoteForm: React.FC<ChatNoteFormProps> = ({
         title="ノート"
         rightButtonName={rightButtonNameOnHeader}
         enableBackButton={true}
-        onPressRightButton={() => handleSubmit()}
+        onPressRightButton={() => setWillSubmit(true)}
       />
       <ImageView
         animationType="slide"
@@ -113,6 +129,7 @@ const ChatNoteForm: React.FC<ChatNoteFormProps> = ({
         FooterComponent={({imageIndex}) => (
           <Div position="absolute" bottom={5} right={5}>
             <DownloadIcon url={images[imageIndex].uri} />
+            <ChatShareIcon image={images[imageIndex]} />
           </Div>
         )}
       />

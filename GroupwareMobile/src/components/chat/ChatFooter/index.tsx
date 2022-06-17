@@ -1,5 +1,6 @@
 import React, {Fragment, useMemo, useRef, useState} from 'react';
 import {
+  AppState,
   NativeSyntheticEvent,
   Platform,
   Text,
@@ -24,14 +25,17 @@ import {
 import {Div, Icon, ScrollDiv} from 'react-native-magnus';
 import {ActivityIndicator} from 'react-native-paper';
 import {chatStyles} from '../../../styles/screen/chat/chat.style';
+import {Menu} from 'react-native-paper';
 
 type ChatFooterProps = {
   text: string;
   onChangeText: (text: string) => void;
   onUploadFile: () => void;
   onUploadVideo: () => void;
-  onUploadImage: () => void;
+  onUploadImage: (useCamera: boolean) => void;
   onSend: () => void;
+  footerHeight: number;
+  setVisibleStickerSelector: React.Dispatch<React.SetStateAction<boolean>>;
   mentionSuggestions: Suggestion[];
   isLoading: boolean;
 };
@@ -43,12 +47,15 @@ const ChatFooter: React.FC<ChatFooterProps> = ({
   onUploadVideo,
   onUploadImage,
   onSend,
+  footerHeight,
+  setVisibleStickerSelector,
   mentionSuggestions,
   isLoading,
 }) => {
   const {width: windowWidth, height: windowHeight} = useWindowDimensions();
   const [selection, setSelection] = useState({start: 0, end: 0});
   const [mentionAdded, setMentionAdded] = useState(false);
+  const [visibleMenu, setVisibleMenu] = useState(false);
   const inputRef = useRef<TextInput>(null);
 
   const renderSuggestions: React.FC<MentionSuggestionsProps> = ({
@@ -178,11 +185,48 @@ const ChatFooter: React.FC<ChatFooterProps> = ({
         <TouchableOpacity onPress={onUploadFile}>
           <Icon name="paper-clip" fontFamily="SimpleLineIcons" fontSize={21} />
         </TouchableOpacity>
-        <TouchableOpacity onPress={onUploadVideo}>
-          <Icon name="video-camera" fontFamily="FontAwesome" fontSize={21} />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={onUploadImage}>
-          <Icon name="picture" fontSize={21} />
+        <Menu
+          style={{
+            position: 'absolute',
+            top: footerHeight - (Platform.OS === 'ios' ? 70 : 160),
+          }}
+          visible={visibleMenu}
+          onDismiss={() => setVisibleMenu(false)}
+          anchor={
+            <TouchableOpacity
+              onPress={() => {
+                setVisibleMenu(true);
+              }}>
+              <Icon name="picture" fontSize={21} />
+            </TouchableOpacity>
+          }>
+          <Menu.Item
+            icon="camera-image"
+            onPress={() => {
+              onUploadImage(false);
+              setVisibleMenu(false);
+            }}
+            title="写真を選択"
+          />
+          <Menu.Item
+            icon="camera"
+            onPress={() => {
+              onUploadImage(true);
+              setVisibleMenu(false);
+            }}
+            title="写真を撮る"
+          />
+          <Menu.Item
+            icon="video"
+            onPress={() => {
+              onUploadVideo();
+              setVisibleMenu(false);
+            }}
+            title="ビデオを選択"
+          />
+        </Menu>
+        <TouchableOpacity onPress={() => setVisibleStickerSelector(true)}>
+          <Icon name="smile-o" fontFamily="FontAwesome" fontSize={21} />
         </TouchableOpacity>
         <Div
           alignItems="center"
@@ -203,6 +247,7 @@ const ChatFooter: React.FC<ChatFooterProps> = ({
                 ? chatStyles.inputAndroid
                 : chatStyles.inputIos,
               {
+                color: 'black',
                 minHeight: windowHeight * 0.03,
                 maxHeight: windowHeight * 0.22,
               },

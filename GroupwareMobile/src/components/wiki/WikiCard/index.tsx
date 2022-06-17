@@ -74,7 +74,7 @@ const WikiCard: React.FC<WikiCardProps> = ({wiki}) => {
         <Div w={'100%'} px={8} flexDir="row" alignItems="center">
           {wiki.type !== WikiType.RULES && (
             <Div mr={8}>
-              <UserAvatar user={wiki.writer} h={48} w={48} />
+              <UserAvatar user={wiki.writer} h={48} w={48} GoProfile={true} />
             </Div>
           )}
           <Text w={'80%'} numberOfLines={2} fontWeight="bold" fontSize={22}>

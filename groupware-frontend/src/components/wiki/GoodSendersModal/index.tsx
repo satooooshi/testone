@@ -35,7 +35,7 @@ const GoodSendersModal: React.FC<GoodSendersModalProps> = ({
           </Box>
         </ModalHeader>
         <ModalCloseButton />
-        <ModalBody>
+        <ModalBody overflow={'scroll'}>
           {goodSenders?.map((u) => (
             <Link
               key={u.id}

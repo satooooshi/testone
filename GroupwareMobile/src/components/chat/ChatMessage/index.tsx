@@ -21,7 +21,9 @@ import FileMessage from './FileMessage';
 import ImageMessage from './ImageMessage';
 import ReactionToMessage from './ReactionToMessage';
 import TextMessage from './TextMessage';
+import CallMessage from './CallMessage';
 import VideoMessage from './VideoMessage';
+import StickerMessage from './StickerMessage.tsx';
 
 type ChatMessageItemProps = {
   message: ChatMessage;
@@ -143,12 +145,16 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
                 searchedResultIds={searchedResultIds}
                 onLongPress={onLongPress}
               />
+            ) : message.type === ChatMessageType.CALL ? (
+              <CallMessage message={message} onLongPress={onLongPress} />
             ) : message.type === ChatMessageType.IMAGE ? (
               <ImageMessage
                 onPress={onPressImage}
                 message={message}
                 onLongPress={onLongPress}
               />
+            ) : message.type === ChatMessageType.STICKER ? (
+              <StickerMessage message={message} onLongPress={onLongPress} />
             ) : message.type === ChatMessageType.VIDEO ? (
               <VideoMessage
                 message={message}
@@ -171,7 +177,12 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
             }
             underlayColor="none">
             <Div mr="xs">
-              <UserAvatar h={40} w={40} user={message?.sender} />
+              <UserAvatar
+                h={40}
+                w={40}
+                user={message?.sender}
+                GoProfile={true}
+              />
             </Div>
           </TouchableHighlight>
         ) : null}

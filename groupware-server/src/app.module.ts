@@ -12,7 +12,7 @@ import { NotificationModule } from './modules/notification/notification.module';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 import { TopNewsModule } from './modules/top-news/top-news.module';
-import { ChatGateway } from './gateway/chat.gateway';
+// import { ChatGateway } from './gateway/chat.gateway';
 import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
@@ -75,6 +75,6 @@ import { ScheduleModule } from '@nestjs/schedule';
     TopNewsModule,
   ],
   controllers: [],
-  providers: [ChatGateway],
+  providers: [],
 })
 export class AppModule {}

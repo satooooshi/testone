@@ -28,6 +28,8 @@ export enum ChatMessageType {
   VIDEO = 'video',
   IMAGE = 'image',
   TEXT = 'text',
+  CALL = 'call',
+  STICKER = 'sticker',
   SYSTEM_TEXT = 'system_text',
   OTHER_FILE = 'other_file',
 }
@@ -140,6 +142,7 @@ export interface User {
   questionCount?: number;
   answerCount?: number;
   knowledgeCount?: number;
+  chatGroups?: ChatGroup[];
 }
 
 export interface Tag {
@@ -300,6 +303,7 @@ export interface ChatMessage {
   updatedAt: Date;
   isSender?: boolean;
   thumbnail?: string;
+  callTime?: string;
   replyParentMessage?: ChatMessage | null;
 }
 
@@ -317,10 +321,12 @@ export interface ChatGroup {
   pinnedUsers?: User[];
   isPinned?: boolean;
   chatNotes?: ChatNote[];
+  muteUsers?: User[];
   chatMessages?: ChatMessage[];
   members?: User[];
   lastReadChatTime?: LastReadChatTime[];
   hasBeenRead?: boolean;
+  unreadCount?: number;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -345,7 +351,7 @@ export interface ChatNote {
 
 export interface ChatNoteImage {
   id: number;
-  name: string;
+  fileName: string;
   imageURL: string;
   chatNote?: ChatNote;
   createdAt: Date;
@@ -353,8 +359,10 @@ export interface ChatNoteImage {
 }
 
 //this is for react-native-image-viewing
-export type ImageSource = {
+export type FIleSource = {
   uri: string;
+  fileName: string;
+  createdUrl?: string;
 };
 
 export interface ChatAlbum {
@@ -370,7 +378,7 @@ export interface ChatAlbum {
 
 export interface ChatAlbumImage {
   id: number;
-  name: string;
+  fileName: string;
   imageURL: string;
   chatAlbum?: ChatAlbum;
   createdAt: Date;

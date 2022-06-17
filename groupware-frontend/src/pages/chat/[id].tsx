@@ -1,6 +1,6 @@
 import { SidebarScreenName } from '@/components/layout/Sidebar';
 import { MenuValue, useModalReducer } from '@/hooks/chat/useModalReducer';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ChatGroup, User } from 'src/types';
 import CreateChatGroupModal from '@/components/chat/CreateChatGroupModal';
 import { useMediaQuery, Box, useToast, Text } from '@chakra-ui/react';
@@ -16,43 +16,60 @@ import ChatBox from '@/components/chat/ChatBox';
 import 'emoji-mart/css/emoji-mart.css';
 import RoomList from '@/components/chat/RoomList';
 import { useAPIUpdateChatGroup } from '@/hooks/api/chat/useAPIUpdateChatGroup';
-import {
-  RoomRefetchProvider,
-  useRoomRefetch,
-} from 'src/contexts/chat/useRoomRefetch';
+import { useRoomRefetch } from 'src/contexts/chat/useRoomRefetch';
 import { useAPIGetRoomDetail } from '@/hooks/api/chat/useAPIGetRoomDetail';
 import { useAPISaveChatGroup } from '@/hooks/api/chat/useAPISaveChatGroup';
+import { baseURL } from 'src/utils/url';
+import { io } from 'socket.io-client';
+import { useHandleBadge } from 'src/contexts/badge/useHandleBadge';
 
 const ChatDetail = () => {
   const router = useRouter();
   const { id } = router.query as { id: string };
   const [currentRoom, setCurrentRoom] = useState<ChatGroup>();
   const [membersModal, setMembersModal] = useState(false);
-  const { needRefetch } = useRoomRefetch();
   const [isTalkRoom, setIsTalkRoom] = useState<boolean>(false);
   const [selectedMembers, setSelectedMembers] = useState<User[]>();
+  // const socket = io(baseURL, {
+  //   transports: ['websocket'],
+  // });
+  const { editChatGroup, getOneRoom } = useHandleBadge();
 
   const [
     { editChatGroupModalVisible, editMembersModalVisible, createGroupWindow },
     dispatchModal,
   ] = useModalReducer();
-  const { mutate: updateGroup } = useAPIUpdateChatGroup();
-  const toast = useToast();
-  useAPIGetRoomDetail(Number(id), {
+
+  const { mutate: updateGroup } = useAPIUpdateChatGroup({
     onSuccess: (data) => {
-      if (setCurrentRoom) {
-        setCurrentRoom(data);
-      }
+      editChatGroup(data);
     },
-    onError: (err) => {
-      if (setCurrentRoom) {
-        setCurrentRoom(undefined);
-      }
-      if (err?.response?.data?.message) {
-        alert(err?.response?.data?.message);
-      }
+    onError: () => {
+      alert('グループの更新中にエラーが発生しました');
     },
   });
+  const toast = useToast();
+  // useAPIGetRoomDetail(Number(id), {
+  //   onSuccess: (data) => {
+  //     if (setCurrentRoom) {
+  //       setCurrentRoom(data);
+  //     }
+  //   },
+  //   onError: (err) => {
+  //     if (setCurrentRoom) {
+  //       setCurrentRoom(undefined);
+  //     }
+  //     if (err?.response?.data?.message) {
+  //       alert(err?.response?.data?.message);
+  //     }
+  //   },
+  // });
+
+  useEffect(() => {
+    setCurrentRoom(getOneRoom(Number(id)));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id]);
+
   const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
 
   const { mutate: leaveChatGroup } = useAPILeaveChatRoom({
@@ -63,7 +80,7 @@ const ChatDetail = () => {
 
   const { mutate: createGroup } = useAPISaveChatGroup({
     onSuccess: (createdData) => {
-      needRefetch();
+      editChatGroup(createdData);
       router.push(`/chat/${createdData.id.toString()}`, undefined, {
         shallow: true,
       });
@@ -105,146 +122,147 @@ const ChatDetail = () => {
   };
 
   return (
-    <RoomRefetchProvider>
-      <LayoutWithTab
-        sidebar={{ activeScreenName: SidebarScreenName.CHAT }}
-        header={{
-          title: 'Chat',
-          tabs: tabs,
-          rightMenuName: 'ルームを作成',
-          setIsTalkRoom: setIsTalkRoom,
-          setMembersModal: setMembersModal,
-        }}>
-        <Head>
-          <title>ボールド | Chat</title>
-        </Head>
+    <LayoutWithTab
+      sidebar={{ activeScreenName: SidebarScreenName.CHAT }}
+      header={{
+        title: 'Chat',
+        tabs: tabs,
+        rightMenuName: 'ルームを作成',
+        setIsTalkRoom: setIsTalkRoom,
+        setMembersModal: setMembersModal,
+      }}>
+      <Head>
+        <title>ボールド | Chat</title>
+      </Head>
 
-        <EditChatGroupMembersModal
-          isOpen={membersModal}
-          onClose={() => setMembersModal(false)}
-          onComplete={(selected) => {
-            if (isTalkRoom && selected.length === 1) {
-              createGroup({ name: '', members: selected });
-              setMembersModal(false);
-            } else {
-              setSelectedMembers(selected);
-              dispatchModal({ type: 'createGroupWindow', value: true });
-            }
-          }}
-          isTalkRoom={isTalkRoom}
-        />
-
-        <CreateChatGroupModal
-          isOpen={createGroupWindow}
-          closeModal={() => {
-            dispatchModal({ type: 'createGroupWindow', value: false });
-          }}
-          onComplete={() => {
+      <EditChatGroupMembersModal
+        isOpen={membersModal}
+        onClose={() => setMembersModal(false)}
+        onComplete={(selected) => {
+          if (isTalkRoom && selected.length === 1) {
+            createGroup({ name: '', members: selected });
             setMembersModal(false);
-          }}
-          selectedMembers={selectedMembers || []}
-        />
+          } else {
+            setSelectedMembers(selected);
+            dispatchModal({ type: 'createGroupWindow', value: true });
+          }
+        }}
+        isTalkRoom={isTalkRoom}
+      />
 
-        {currentRoom ? (
-          <>
-            <EditChatGroupModal
-              isOpen={editChatGroupModalVisible}
-              chatGroup={currentRoom}
-              onComplete={(newInfo) => setCurrentRoom(newInfo)}
-              closeModal={() =>
-                dispatchModal({
-                  type: 'editChatGroupModalVisible',
-                  value: false,
-                })
-              }
-            />
-            <EditChatGroupMembersModal
-              isOpen={editMembersModalVisible}
-              room={currentRoom}
-              onComplete={(selectedUsersInModal) => {
-                updateGroup(
-                  {
-                    ...currentRoom,
-                    members: selectedUsersInModal,
+      <CreateChatGroupModal
+        isOpen={createGroupWindow}
+        closeModal={() => {
+          dispatchModal({ type: 'createGroupWindow', value: false });
+        }}
+        onComplete={() => {
+          setMembersModal(false);
+        }}
+        selectedMembers={selectedMembers || []}
+      />
+
+      {currentRoom ? (
+        <>
+          <EditChatGroupModal
+            isOpen={editChatGroupModalVisible}
+            chatGroup={currentRoom}
+            onComplete={(newInfo) => {
+              editChatGroup(newInfo);
+              setCurrentRoom(newInfo);
+            }}
+            closeModal={() =>
+              dispatchModal({
+                type: 'editChatGroupModalVisible',
+                value: false,
+              })
+            }
+          />
+          <EditChatGroupMembersModal
+            isOpen={editMembersModalVisible}
+            room={currentRoom}
+            onComplete={(selectedUsersInModal) => {
+              updateGroup(
+                {
+                  ...currentRoom,
+                  members: selectedUsersInModal,
+                },
+                {
+                  onSuccess: (newGroupInfo) => {
+                    dispatchModal({
+                      type: 'editMembersModalVisible',
+                      value: false,
+                    });
+                    toast({
+                      title: `メンバーを更新しました`,
+                      status: 'success',
+                      duration: 3000,
+                      isClosable: true,
+                    });
+                    setCurrentRoom({
+                      ...newGroupInfo,
+                      members: selectedUsersInModal,
+                    });
                   },
-                  {
-                    onSuccess: (newGroupInfo) => {
-                      dispatchModal({
-                        type: 'editMembersModalVisible',
-                        value: false,
-                      });
-                      toast({
-                        title: `メンバーを更新しました`,
-                        status: 'success',
-                        duration: 3000,
-                        isClosable: true,
-                      });
-                      setCurrentRoom({
-                        ...newGroupInfo,
-                        members: selectedUsersInModal,
-                      });
-                    },
-                    onError: () => {
-                      toast({
-                        title: `エラーが発生しました`,
-                        status: 'error',
-                        duration: 3000,
-                        isClosable: true,
-                      });
-                    },
+                  onError: () => {
+                    toast({
+                      title: `エラーが発生しました`,
+                      status: 'error',
+                      duration: 3000,
+                      isClosable: true,
+                    });
                   },
-                );
-              }}
-              onClose={() =>
-                dispatchModal({
-                  type: 'editMembersModalVisible',
-                  value: false,
-                })
-              }
-            />
-          </>
-        ) : null}
-        <Box
-          w="100%"
-          display="flex"
-          flexDir="row"
-          h="83vh"
-          justifyContent="center">
-          <>
-            {!isSmallerThan768 && (
-              <Box w="30vw">
-                <RoomList
-                  currentId={id}
-                  onClickRoom={(g) =>
-                    router.push(`/chat/${g.id.toString()}`, undefined, {
-                      shallow: true,
-                    })
-                  }
-                />
-              </Box>
-            )}
-            {currentRoom ? (
-              <ChatBox room={currentRoom} onMenuClicked={handleMenuSelected} />
-            ) : !isSmallerThan768 ? (
-              <Box
-                w="60vw"
-                h="100%"
-                display="flex"
-                flexDir="row"
-                justifyContent="center"
-                alignItems="center"
-                boxShadow="md"
-                bg="white"
-                borderRadius="md">
-                <Text position="absolute" top="auto" bottom="auto">
-                  ルームを選択してください
-                </Text>
-              </Box>
-            ) : null}
-          </>
-        </Box>
-      </LayoutWithTab>
-    </RoomRefetchProvider>
+                },
+              );
+            }}
+            onClose={() =>
+              dispatchModal({
+                type: 'editMembersModalVisible',
+                value: false,
+              })
+            }
+          />
+        </>
+      ) : null}
+      <Box
+        w="100%"
+        display="flex"
+        flexDir="row"
+        h="83vh"
+        justifyContent="center">
+        <>
+          {!isSmallerThan768 && (
+            <Box w="30vw">
+              <RoomList
+                currentId={id}
+                onClickRoom={(g) =>
+                  router.push(`/chat/${g.id.toString()}`, undefined, {
+                    shallow: true,
+                  })
+                }
+              />
+            </Box>
+          )}
+          {currentRoom ? (
+            <ChatBox room={currentRoom} onMenuClicked={handleMenuSelected} />
+          ) : !isSmallerThan768 ? (
+            <Box
+              w="60vw"
+              h="100%"
+              display="flex"
+              flexDir="row"
+              justifyContent="center"
+              alignItems="center"
+              boxShadow="md"
+              bg="white"
+              borderRadius="md">
+              <Text position="absolute" top="auto" bottom="auto">
+                ルームを選択してください
+              </Text>
+            </Box>
+          ) : null}
+        </>
+      </Box>
+    </LayoutWithTab>
   );
 };
 
