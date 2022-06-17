@@ -400,7 +400,7 @@ const QAQuestionList = () => {
             </RadioGroup>
           ) : null}
           {questions?.wiki.map((q) => (
-            <WikiCard key={q.id} wiki={q} />
+            <WikiCard key={q.id} wiki={q} type={type} />
           ))}
         </div>
       </div>
