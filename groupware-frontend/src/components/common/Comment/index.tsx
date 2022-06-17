@@ -5,16 +5,12 @@ import Link from 'next/link';
 import boldMascot from '@/public/bold-mascot.png';
 import { Avatar, Box, Divider, Heading, Text } from '@chakra-ui/react';
 
-type EventCommentCardProps = {
+type CommentCardProps = {
   body: string;
   date: Date;
   writer: User;
 };
-const EventCommentCard: React.FC<EventCommentCardProps> = ({
-  body,
-  date,
-  writer,
-}) => {
+const CommentCard: React.FC<CommentCardProps> = ({ body, date, writer }) => {
   return (
     <Box p={3}>
       <Box
@@ -65,4 +61,4 @@ const EventCommentCard: React.FC<EventCommentCardProps> = ({
   );
 };
 
-export default EventCommentCard;
+export default CommentCard;

@@ -87,7 +87,7 @@ const WikiComment: React.FC<WikiCommentProps> = ({
 
   return (
     <>
-      {createdAt && updatedAt && writer && (
+      {createdAt && writer && (
         <div className={qaCommentStyles.question_uploader__info}>
           <div className={qaCommentStyles.user_info_wrapper}>
             {writer.existence ? (
@@ -122,14 +122,21 @@ const WikiComment: React.FC<WikiCommentProps> = ({
                   dateTime: new Date(createdAt),
                 })}`}
               </Text>
-              <Text ml={2} fontSize={'15px'} display="flex" whiteSpace="nowrap">
-                {`最終更新: ${dateTimeFormatterFromJSDDateWithoutTime({
-                  dateTime: new Date(updatedAt),
-                })}`}
-              </Text>
+              {updatedAt && (
+                <Text
+                  ml={2}
+                  fontSize={'15px'}
+                  display="flex"
+                  whiteSpace="nowrap">
+                  {`最終更新: ${dateTimeFormatterFromJSDDateWithoutTime({
+                    dateTime: new Date(updatedAt),
+                  })}`}
+                </Text>
+              )}
             </Box>
             {onClickReplyButton && replyButtonName ? (
               <Button
+                ml={3}
                 colorScheme="orange"
                 width="24"
                 onClick={onClickReplyButton}>
@@ -159,24 +166,40 @@ const WikiComment: React.FC<WikiCommentProps> = ({
         ) : null}
       </div>
       {wikiState?.type === WikiType.BOARD && (
-        <Box display="flex" justifyContent={'flex-end'} mt={5}>
+        <Box
+          ml="auto"
+          mr={5}
+          mt={3}
+          display="flex"
+          flexDir="row"
+          alignItems="center"
+          justifyContent="flex-end">
+          <Box
+            display="flex"
+            flexDir="row"
+            alignItems="center"
+            justifyContent="center">
+            <Link
+              onClick={() => {
+                setGoodSendersModal(true);
+              }}>
+              <Text fontSize="20px">いいね</Text>
+            </Link>
+            <Text mx={2} color="#90CDF4" fontWeight="bold" fontSize="20px">
+              {wikiState.userGoodForBoard?.length}
+            </Text>
+          </Box>
           <Link
+            ml={3}
+            position={'relative'}
             onClick={() => {
-              mutate(wikiState?.id || 0);
+              mutate(wikiState.id || 0);
             }}>
             {isPressHeart ? (
               <AiFillHeart size={30} color="red" />
             ) : (
               <AiOutlineHeart size={30} color="black" />
             )}
-          </Link>
-          <Link onClick={() => setGoodSendersModal(true)}>
-            <Button
-              colorScheme={'blue'}
-              color="white"
-              size={
-                'sm'
-              }>{`${wikiState?.userGoodForBoard?.length}件のいいね`}</Button>
           </Link>
         </Box>
       )}

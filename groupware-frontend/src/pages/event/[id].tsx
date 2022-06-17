@@ -29,7 +29,7 @@ import Head from 'next/head';
 import { useAuthenticate } from 'src/contexts/useAuthenticate';
 import React from 'react';
 import { useAPICreateComment } from '@/hooks/api/event/useAPICreateComment';
-import EventCommentCard from '@/components/event/EventComment';
+import CommentCard from '@/components/event/EventComment';
 import { Tab } from 'src/types/header/tab/types';
 import { dateTimeFormatterFromJSDDate } from 'src/utils/dateTimeFormatter';
 import generateYoutubeId from 'src/utils/generateYoutubeId';
@@ -645,7 +645,7 @@ const EventDetail = () => {
                   {data.comments && data.comments.length
                     ? data.comments.map((comment, index) =>
                         index < showingCommentCount && comment.writer ? (
-                          <EventCommentCard
+                          <CommentCard
                             key={comment.id}
                             body={comment.body}
                             date={comment.createdAt}
