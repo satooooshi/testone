@@ -26,7 +26,7 @@ import { HiOutlineChevronRight } from 'react-icons/hi';
 
 type WikiCardProps = {
   wiki: Wiki;
-  type: WikiType | undefined;
+  type?: WikiType | undefined;
 };
 
 const WikiCard: React.FC<WikiCardProps> = ({ wiki, type }) => {

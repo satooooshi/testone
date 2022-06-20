@@ -29,7 +29,7 @@ import Head from 'next/head';
 import { useAuthenticate } from 'src/contexts/useAuthenticate';
 import React from 'react';
 import { useAPICreateComment } from '@/hooks/api/event/useAPICreateComment';
-import CommentCard from '@/components/event/EventComment';
+import CommentCard from '@/components/common/Comment';
 import { Tab } from 'src/types/header/tab/types';
 import { dateTimeFormatterFromJSDDate } from 'src/utils/dateTimeFormatter';
 import generateYoutubeId from 'src/utils/generateYoutubeId';
