@@ -19,8 +19,6 @@ import { useAPIUpdateChatGroup } from '@/hooks/api/chat/useAPIUpdateChatGroup';
 import { useRoomRefetch } from 'src/contexts/chat/useRoomRefetch';
 import { useAPIGetRoomDetail } from '@/hooks/api/chat/useAPIGetRoomDetail';
 import { useAPISaveChatGroup } from '@/hooks/api/chat/useAPISaveChatGroup';
-import { baseURL } from 'src/utils/url';
-import { io } from 'socket.io-client';
 import { useHandleBadge } from 'src/contexts/badge/useHandleBadge';
 
 const ChatDetail = () => {

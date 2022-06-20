@@ -426,13 +426,6 @@ const Chat: React.FC = () => {
     setVideo(url);
   };
 
-  const isRecent = (created: ChatMessage, target: ChatMessage): boolean => {
-    if (new Date(created.createdAt) > new Date(target.createdAt)) {
-      return true;
-    }
-    return false;
-  };
-
   const numbersOfRead = (message: ChatMessage) => {
     return (
       lastReadChatTime?.filter(time => time.readTime >= message.createdAt)
