@@ -267,8 +267,8 @@ const QuestionDetail = () => {
       sidebar={{ activeScreenName: SidebarScreenName.QA }}
       header={initialHeaderValue}>
       {wiki && wiki.writer ? (
-        <Box mb={10}>
-          <Box bg="white" borderRadius={10} p={5} w="80vw">
+        <Box mb={10} w="100%">
+          <Box bg="white" borderRadius={10} p={5} w="100%">
             <Head>
               <title>ボールド | {wiki ? wiki.title : headerTitle}</title>
             </Head>

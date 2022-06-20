@@ -574,10 +574,11 @@ const EventList = () => {
                 toggleTag={onToggleTag}
               />
             </div>
-            <Box px="6%">
+            <Box w="100%">
               {events?.events.length ? (
                 // <div className={eventListStyles.event_card__row}>
                 <SimpleGrid
+                  w="100%"
                   minChildWidth="360px"
                   maxChildWidth="420px"
                   spacing="20px">

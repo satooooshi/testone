@@ -10,13 +10,13 @@ export enum EventTab {
 
 export type Tab =
   | {
-      type?: 'action';
+      type?: 'edit' | 'delete';
       name: string;
-      onClick: () => void;
+      onClick?: () => void;
       color?: string;
     }
   | {
-      type: 'link';
+      type: 'link' | 'backButton';
       name: string;
       href: string;
       color?: string;

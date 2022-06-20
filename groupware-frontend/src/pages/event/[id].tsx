@@ -262,21 +262,20 @@ const EventDetail = () => {
 
   const doesntExist = !loadingEventDetail && (!data || !data?.id);
 
-  const tabs: Tab[] = useHeaderTab(
-    user?.role === UserRole.ADMIN && !doesntExist
-      ? {
-          headerTabType: 'adminEventDetail',
-          onDeleteClicked,
-        }
-      : {
-          headerTabType: 'eventDetail',
-        },
-  );
+  const tabs: Tab[] = useHeaderTab({
+    headerTabType: 'eventDetail',
+    onDeleteClicked:
+      (user?.role === UserRole.ADMIN || user?.id === data?.author.id) &&
+      !doesntExist
+        ? onDeleteClicked
+        : undefined,
+    onEditClicked: isEditable ? () => setEditModal(true) : undefined,
+  });
 
   const initialHeaderValue = {
     title: 'イベント詳細',
-    rightButtonName: isEditable ? 'イベントを編集' : undefined,
-    onClickRightButton: isEditable ? () => setEditModal(true) : undefined,
+    // rightButtonName: isEditable ? 'イベントを編集' : undefined,
+    // onClickRightButton: isEditable ? () => setEditModal(true) : undefined,
     tabs: tabs,
   };
 
@@ -309,7 +308,6 @@ const EventDetail = () => {
       {data && data.id ? (
         <Box
           w="100%"
-          px="10%"
           pb="20px"
           display="flex"
           flexDir="column"
