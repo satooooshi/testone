@@ -87,7 +87,7 @@ const WikiCard: React.FC<WikiCardProps> = ({ wiki, type }) => {
       p="15px"
       mb={2}
       position="relative">
-      <Box display="flex" flexDir="column" w="90%">
+      <Box display="flex" flexDir="column" minW="95%" maxW={'99%'}>
         <Box display="flex" flexDir={'row'} w="100%" alignItems="center">
           <Text
             fontSize={'15px'}
@@ -250,7 +250,8 @@ const WikiCard: React.FC<WikiCardProps> = ({ wiki, type }) => {
       <Link
         href={`/wiki/detail/${wiki.id}`}
         h="100%"
-        w="10%"
+        ml="auto"
+        w="30px"
         display="flex"
         justifyContent="center"
         alignItems="center">
