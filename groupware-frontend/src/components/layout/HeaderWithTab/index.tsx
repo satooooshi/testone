@@ -135,7 +135,8 @@ const HeaderWithTab: React.FC<HeaderProps> = ({
           display="flex"
           flexDir="row"
           alignItems="center"
-          bg="#f3f6fb"
+          h="40px"
+          bg={tabs[0].type === 'backButton' ? '#f3f6fb' : 'white'}
           justifyContent={
             tabs[0].type === 'backButton' ? 'flex-end' : 'flex-start'
           }>
