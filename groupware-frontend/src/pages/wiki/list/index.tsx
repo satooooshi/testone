@@ -50,7 +50,7 @@ const QAQuestionList = () => {
 
   const topTab: TopTabBehavior[] = [
     {
-      tabName: 'All',
+      tabName: '全て',
       onClick: () => {
         {
           if (queryRefresh)
@@ -90,7 +90,7 @@ const QAQuestionList = () => {
             });
         }
       },
-      isActiveTab: type === WikiType.BOARD,
+      isActiveTab: type === WikiType.ALL_POSTAL,
     },
     {
       tabName: '掲示板',
@@ -104,7 +104,7 @@ const QAQuestionList = () => {
             });
         }
       },
-      isActiveTab: type === WikiType.ALL_POSTAL,
+      isActiveTab: type === WikiType.BOARD,
     },
   ];
 
