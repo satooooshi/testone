@@ -62,6 +62,7 @@ import { responseErrorMsgFactory } from 'src/utils/factory/responseErrorMsgFacto
 import { hideScrollbarCss } from 'src/utils/chakra/hideScrollBar.css';
 import { isEditableEvent } from 'src/utils/factory/isCreatableEvent';
 import { useAPIJoinEvent } from '@/hooks/api/event/useAPIJoinEvent';
+import TabList from '@/components/common/TabList';
 
 const localizer = momentLocalizer(moment);
 //@ts-ignore
@@ -419,7 +420,7 @@ const EventList = () => {
   const initialHeaderValue = {
     title: 'Events',
     activeTabName: activeTabName(),
-    tabs: tabs,
+    // tabs: tabs,
     rightButtonName: 'イベントを追加',
     onClickRightButton: () => setModalVisible(true),
     resetEventForm: () => setNewEvent(initialEventValue),
@@ -521,6 +522,7 @@ const EventList = () => {
         <Box mb="24px">
           <TopTabBar topTabBehaviorList={topTabBehaviorList} />
         </Box>
+        <TabList tabs={tabs} activeTabName={activeTabName()} />
         {isCalendar && (
           <Box
             ref={calendarRef}

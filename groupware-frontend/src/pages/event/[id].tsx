@@ -265,7 +265,7 @@ const EventDetail = () => {
   const tabs: Tab[] = useHeaderTab({
     headerTabType: 'eventDetail',
     onDeleteClicked:
-      (user?.role === UserRole.ADMIN || user?.id === data?.author.id) &&
+      (user?.role === UserRole.ADMIN || user?.id === data?.author?.id) &&
       !doesntExist
         ? onDeleteClicked
         : undefined,
