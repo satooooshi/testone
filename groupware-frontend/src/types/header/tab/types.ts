@@ -14,6 +14,7 @@ export type Tab =
       name: string;
       onClick?: () => void;
       color?: string;
+      isActive?: boolean;
     }
   | {
       type: 'link' | 'backButton';
