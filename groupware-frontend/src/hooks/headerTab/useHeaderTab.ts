@@ -318,6 +318,11 @@ const headerTab = (headerTabBehavior: HeaderTabBehavior): Tab[] => {
           name: '戻る',
           href: '/wiki/list?page=1&tag=&word=&status=new&type=',
         },
+        {
+          type: 'edit',
+          name: '編集する',
+          onClick: onEditClicked,
+        },
       ];
     case 'wikiList':
       return [

@@ -109,7 +109,10 @@ const QuestionDetail = () => {
     router.push('/wiki/edit/' + id);
   };
 
-  const tabs: Tab[] = useHeaderTab({ headerTabType: 'wikiDetail' });
+  const tabs: Tab[] = useHeaderTab({
+    headerTabType: 'wikiDetail',
+    onEditClicked: wiki ? () => navigateToEditWiki(wiki.id) : undefined,
+  });
 
   const handleClickStartInputtingReplyButton = (answer: QAAnswer) => {
     if (answerReply.answer?.id !== answer.id) {
@@ -184,11 +187,11 @@ const QuestionDetail = () => {
 
   const initialHeaderValue = {
     title: 'Wiki詳細',
-    rightButtonName:
-      myself?.id === wiki?.writer?.id || myself?.role === UserRole.ADMIN
-        ? 'Wikiを編集'
-        : undefined,
-    onClickRightButton: wiki ? () => navigateToEditWiki(wiki.id) : undefined,
+    // rightButtonName:
+    //   myself?.id === wiki?.writer?.id || myself?.role === UserRole.ADMIN
+    //     ? 'Wikiを編集'
+    //     : undefined,
+    // onClickRightButton: wiki ? () => navigateToEditWiki(wiki.id) : undefined,
     tabs: tabs,
   };
 
