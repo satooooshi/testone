@@ -26,7 +26,6 @@ type WikiCommentProps = {
   writer?: User;
   isWriter?: boolean;
   isExistsBestAnswer?: boolean;
-  onClickEditButton?: () => void;
   replyButtonName?: string;
   onClickReplyButton?: () => void;
   bestAnswerButtonName?: string;
@@ -42,7 +41,6 @@ const WikiComment: React.FC<WikiCommentProps> = ({
   writer,
   isWriter,
   isExistsBestAnswer,
-  onClickEditButton,
   replyButtonName,
   onClickReplyButton,
   bestAnswerButtonName,
@@ -137,6 +135,7 @@ const WikiComment: React.FC<WikiCommentProps> = ({
             {onClickReplyButton && replyButtonName ? (
               <Button
                 ml={3}
+                // borderRadius={50}
                 colorScheme="orange"
                 width="24"
                 onClick={onClickReplyButton}>

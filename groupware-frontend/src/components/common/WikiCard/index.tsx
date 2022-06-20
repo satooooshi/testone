@@ -75,7 +75,7 @@ const WikiCard: React.FC<WikiCardProps> = ({ wiki, type }) => {
 
   return (
     <Box
-      w={isSmallerThan768 ? '100vw' : 'min(1600px, 70vw)'}
+      w={'80vw'}
       // minH="104px"
       shadow="md"
       borderWidth={1}
