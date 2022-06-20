@@ -14,7 +14,8 @@ const TabList: React.FC<TabListProps> = ({ activeTabName, tabs }) => {
       //   h="50px"
       display="flex"
       flexDir="row"
-      py={3}
+      p={3}
+      mb={3}
       overflowX="auto"
       css={hideScrollbarCss}>
       {tabs?.map((t) =>
