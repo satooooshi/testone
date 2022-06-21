@@ -811,7 +811,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
               onSend();
               return 'handled';
             }
-            if (e.key === 'Enter') {
+            if (e.keyCode === 13) {
               setEditorState(RichUtils.insertSoftNewline(editorState));
               return 'handled';
             }
