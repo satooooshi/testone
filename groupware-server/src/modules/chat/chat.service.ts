@@ -501,17 +501,33 @@ export class ChatService {
     user: User,
     chatGroupId: string,
   ): Promise<LastReadChatTime[]> {
-    const chatGroup = await this.chatGroupRepository.findOne(chatGroupId, {
-      relations: ['members', 'lastReadChatTime', 'lastReadChatTime.user'],
-      withDeleted: true,
-    });
+    const chatGroup = await this.chatGroupRepository
+      .createQueryBuilder('chat_groups')
+      .leftJoin('chat_groups.lastReadChatTime', 'lastReadChatTime')
+      .addSelect(['lastReadChatTime.readTime'])
+      .leftJoin('lastReadChatTime.user', 'user')
+      .addSelect([
+        'user.id',
+        'user.firstName',
+        'user.lastName',
+        'user.avatarUrl',
+        'user.existence',
+      ])
+      .where('chat_groups.id = :roomId', { roomId: chatGroupId })
+      .getOne();
+    // const chatGroup = await this.chatGroupRepository.findOne(chatGroupId, {
+    //   relations: ['lastReadChatTime', 'lastReadChatTime.user'],
+    //   select: ['id', 'lastReadChatTime'],
+    //   withDeleted: true,
+    // });
     if (!chatGroup) {
       return;
     }
-    const isMember = chatGroup.members.filter((m) => m.id === user.id).length;
-    if (!isMember) {
-      throw new NotAcceptableException('Something went wrong');
-    }
+
+    // const isMember = chatGroup.members.filter((m) => m.id === user.id).length;
+    // if (!isMember) {
+    //   throw new NotAcceptableException('Something went wrong');
+    // }
     return chatGroup.lastReadChatTime.filter((l) => l.user.id !== user.id);
   }
 
@@ -521,10 +537,19 @@ export class ChatService {
     if (!message.chatGroup || !message.chatGroup.id) {
       throw new BadRequestException('No group is selected');
     }
-    const existGroup = await this.chatGroupRepository.findOne({
-      where: { id: message.chatGroup.id },
-      relations: ['members', 'muteUsers'],
-    });
+    const existGroup = await this.chatGroupRepository
+      .createQueryBuilder('chat_groups')
+      .leftJoin('chat_groups.members', 'members')
+      .addSelect(['members.id'])
+      .leftJoin('chat_groups.muteUsers', 'muteUsers')
+      .addSelect(['muteUsers.id'])
+      .where('chat_groups.id = :roomId', { roomId: message.chatGroup.id })
+      .getOne();
+
+    // const existGroup = await this.chatGroupRepository.findOne({
+    //   where: { id: message.chatGroup.id },
+    //   relations: ['members', 'muteUsers'],
+    // });
     if (!existGroup) {
       throw new BadRequestException('That group id is incorrect');
     } else if (
@@ -847,7 +872,6 @@ export class ChatService {
       .where('g.id = :chatGroupId', { chatGroupId })
       .andWhere('u.id = :userId', { userId: user.id })
       .getOne();
-    console.log('log ', existTime);
 
     if (existTime) {
       return await this.lastReadChatTimeRepository.save({
