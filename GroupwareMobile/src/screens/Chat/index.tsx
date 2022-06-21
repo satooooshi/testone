@@ -94,7 +94,7 @@ import {dateTimeFormatterFromJSDDate} from '../../utils/dateTimeFormatterFromJSD
 import {useAPIGetUpdatedMessages} from '../../hooks/api/chat/useAPIGetUpdatedMessages';
 import {useAPIGetExpiredUrlMessages} from '../../hooks/api/chat/useAPIGetExpiredUrlMessages';
 
-const socket = io('http://34.84.206.131:3001/', {
+const socket = io('https://www.aaaaaa.ml:443', {
   transports: ['websocket'],
 });
 
