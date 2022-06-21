@@ -195,33 +195,47 @@ export class ChatService {
   }
 
   public async getOneRoom(userID: number, roomId: number): Promise<ChatGroup> {
-    const chatGroup = await this.chatGroupRepository
+    const room = await this.chatGroupRepository
       .createQueryBuilder('chat_groups')
-      .leftJoinAndSelect('chat_groups.members', 'members')
       .leftJoin('chat_groups.members', 'member')
-      .leftJoinAndSelect('chat_groups.muteUsers', 'muteUsers')
-      .leftJoinAndSelect(
+      .leftJoin('chat_groups.members', 'members')
+      .addSelect([
+        'members.id',
+        'members.firstName',
+        'members.lastName',
+        'members.avatarUrl',
+      ])
+      .leftJoin(
+        'chat_groups.muteUsers',
+        'muteUsers',
+        'muteUsers.id = :muteUsersID',
+        { muteUsersID: userID },
+      )
+      .addSelect(['muteUsers.id'])
+      .leftJoin(
         'chat_groups.pinnedUsers',
         'pinnedUsers',
         'pinnedUsers.id = :pinnedUserID',
         { pinnedUserID: userID },
       )
-      .leftJoinAndSelect(
+      .addSelect(['pinnedUsers.id'])
+      .leftJoin(
         'chat_groups.lastReadChatTime',
         'lastReadChatTime',
         'lastReadChatTime.user_id = :userID',
         { userID },
       )
+      .addSelect(['lastReadChatTime.readTime'])
       .leftJoinAndSelect(
         'chat_groups.chatMessages',
         'm',
         'm.id = ( SELECT id FROM chat_messages WHERE chat_group_id = chat_groups.id AND type <> "system_text" ORDER BY updated_at DESC LIMIT 1 )',
       )
-      .leftJoinAndSelect('m.sender', 'sender')
+      .leftJoin('m.sender', 'sender')
+      .addSelect(['sender.id'])
       .where('chat_groups.id = :roomId', { roomId: roomId })
-      .getMany();
+      .getOne();
 
-    const room = chatGroup[0];
     room.isPinned = !!room.pinnedUsers.length;
     room.hasBeenRead = room?.lastReadChatTime?.[0]?.readTime
       ? room?.lastReadChatTime?.[0]?.readTime > room.updatedAt
