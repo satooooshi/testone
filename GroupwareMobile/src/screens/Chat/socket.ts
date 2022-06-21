@@ -35,6 +35,7 @@ export const useChatSocket = (
 
   if (socket.disconnected) {
     socket.connect();
+    console.log('socket connected.', baseURL);
   }
 
   useEffect(() => {

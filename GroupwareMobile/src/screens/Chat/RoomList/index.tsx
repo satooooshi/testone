@@ -194,46 +194,26 @@ const RoomList: React.FC = () => {
             />
           }
         />
-
         {chatRooms.length ? (
           <ScrollDiv h={'80%'}>
-            {searchedRooms
-              ? searchedRooms.map(room => {
-                  return (
-                    <Div key={room.id} mb="sm">
-                      <RoomCard
-                        room={room}
-                        onPress={() =>
-                          navigation.navigate('ChatStack', {
-                            screen: 'Chat',
-                            params: {room},
-                          })
-                        }
-                        onPressPinButton={() => {
-                          savePin({...room, isPinned: !room.isPinned});
-                        }}
-                      />
-                    </Div>
-                  );
-                })
-              : chatRooms.map((room, index) => {
-                  return (
-                    <Div key={index} mb="sm">
-                      <RoomCard
-                        room={room}
-                        onPress={() =>
-                          navigation.navigate('ChatStack', {
-                            screen: 'Chat',
-                            params: {room},
-                          })
-                        }
-                        onPressPinButton={() => {
-                          savePin({...room, isPinned: !room.isPinned});
-                        }}
-                      />
-                    </Div>
-                  );
-                })}
+            {(searchedRooms ?? chatRooms).map(room => {
+              return (
+                <Div key={room.id} mb="sm">
+                  <RoomCard
+                    room={room}
+                    onPress={() =>
+                      navigation.navigate('ChatStack', {
+                        screen: 'Chat',
+                        params: {room},
+                      })
+                    }
+                    onPressPinButton={() => {
+                      savePin({...room, isPinned: !room.isPinned});
+                    }}
+                  />
+                </Div>
+              );
+            })}
           </ScrollDiv>
         ) : isRoomsRefetching ? (
           <Div alignItems="center" w={'90%'}>
