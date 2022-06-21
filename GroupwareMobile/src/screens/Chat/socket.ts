@@ -9,7 +9,7 @@ import {useAPISaveLastReadChatTime} from '../../hooks/api/chat/useAPISaveLastRea
 import {useAPIGetLastReadChatTime} from '../../hooks/api/chat/useAPIGetLastReadChatTime';
 import {useEffect, useState} from 'react';
 
-const socket = io(baseURL, {
+const socket = io('https://www.aaaaaa.ml:443', {
   transports: ['websocket'],
 });
 
