@@ -24,7 +24,7 @@ export const useChatSocket = (
   const {data: lastReadChatTime, refetch: refetchLastReadChatTime} =
     useAPIGetLastReadChatTime(room.id);
 
-  let isMounted: boolean | undefined = undefined;
+  let isMounted: boolean | undefined;
 
   const report = () => {
     socket.emit('readReport', {
@@ -113,6 +113,7 @@ export const useChatSocket = (
     leaveRoom: () => {
       setMessages([]);
       socket.emit('leaveRoom', room.id);
+      socket.removeAllListeners();
       isMounted = false;
       setCurrentChatRoomId(undefined);
     },
