@@ -98,7 +98,7 @@ export class ChatService {
     }
     const limitNumber = Number(limit);
 
-    const [urlUnparsedRooms, count] = await this.chatGroupRepository
+    const urlUnparsedRooms = await this.chatGroupRepository
       .createQueryBuilder('chat_groups')
       .leftJoin('chat_groups.members', 'member')
       .leftJoin('chat_groups.members', 'members')
@@ -149,7 +149,7 @@ export class ChatService {
       .skip(offset)
       .take(limitNumber >= 0 ? limitNumber : 20)
       .orderBy('chat_groups.updatedAt', 'DESC')
-      .getManyAndCount();
+      .getMany();
 
     let rooms = await Promise.all(
       urlUnparsedRooms.map(async (g, index) => {
@@ -189,7 +189,6 @@ export class ChatService {
       'updatedAt',
       ['desc', 'desc'],
     ]).reverse();
-    // const pageCount = Math.floor(count / Number(limit)) + 1;
 
     const pageCount = 1;
     return { rooms, pageCount };
@@ -198,7 +197,6 @@ export class ChatService {
   public async getOneRoom(userID: number, roomId: number): Promise<ChatGroup> {
     const room = await this.chatGroupRepository
       .createQueryBuilder('chat_groups')
-      .leftJoin('chat_groups.members', 'member')
       .leftJoin('chat_groups.members', 'members')
       .addSelect([
         'members.id',
