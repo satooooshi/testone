@@ -100,27 +100,42 @@ export class ChatService {
 
     const [urlUnparsedRooms, count] = await this.chatGroupRepository
       .createQueryBuilder('chat_groups')
-      .leftJoinAndSelect('chat_groups.members', 'members')
       .leftJoin('chat_groups.members', 'member')
-      .leftJoinAndSelect('chat_groups.muteUsers', 'muteUsers')
-      .leftJoinAndSelect(
+      .leftJoin('chat_groups.members', 'members')
+      .addSelect([
+        'members.id',
+        'members.firstName',
+        'members.lastName',
+        'members.avatarUrl',
+      ])
+      .leftJoin(
+        'chat_groups.muteUsers',
+        'muteUsers',
+        'muteUsers.id = :muteUsersID',
+        { muteUsersID: userID },
+      )
+      .addSelect(['muteUsers.id'])
+      .leftJoin(
         'chat_groups.pinnedUsers',
         'pinnedUsers',
         'pinnedUsers.id = :pinnedUserID',
         { pinnedUserID: userID },
       )
-      .leftJoinAndSelect(
+      .addSelect(['pinnedUsers.id'])
+      .leftJoin(
         'chat_groups.lastReadChatTime',
         'lastReadChatTime',
         'lastReadChatTime.user_id = :userID',
         { userID },
       )
+      .addSelect(['lastReadChatTime.readTime'])
       .leftJoinAndSelect(
         'chat_groups.chatMessages',
         'm',
         'm.id = ( SELECT id FROM chat_messages WHERE chat_group_id = chat_groups.id AND type <> "system_text" ORDER BY updated_at DESC LIMIT 1 )',
       )
-      .leftJoinAndSelect('m.sender', 'sender')
+      .leftJoin('m.sender', 'sender')
+      .addSelect(['sender.id'])
       .where('member.id = :memberId', { memberId: userID })
       .andWhere(
         !!updatedAtLatestRoom
@@ -377,22 +392,15 @@ export class ChatService {
   ): Promise<number> {
     const unreadCount = await this.chatMessageRepository
       .createQueryBuilder('chat_messages')
-      .withDeleted()
-      .leftJoin('chat_messages.chatGroup', 'chat_group')
-      .leftJoinAndSelect(
-        'chat_messages.replyParentMessage',
-        'replyParentMessage',
-      )
-      .leftJoinAndSelect('replyParentMessage.sender', 'reply_sender')
-      .where('chat_group.id = :chatGroupID', { chatGroupID: query.group })
+      .where('chat_messages.chatGroup.id = :chatGroupID', {
+        chatGroupID: query.group,
+      })
       .andWhere('chat_messages.sender.id != :userID', {
         userID,
       })
       .andWhere('chat_messages.createdAt > :lastReadTime', {
         lastReadTime: query.lastReadTime,
       })
-      .orderBy('chat_messages.createdAt', 'DESC')
-      .withDeleted()
       .getCount();
 
     return unreadCount;
@@ -797,6 +805,7 @@ export class ChatService {
       .where('g.id = :chatGroupId', { chatGroupId })
       .andWhere('u.id = :userId', { userId: user.id })
       .getOne();
+    console.log('log ', existTime);
 
     if (existTime) {
       return await this.lastReadChatTimeRepository.save({
