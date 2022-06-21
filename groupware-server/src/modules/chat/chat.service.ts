@@ -107,6 +107,7 @@ export class ChatService {
         'members.firstName',
         'members.lastName',
         'members.avatarUrl',
+        'members.existence',
       ])
       .leftJoin(
         'chat_groups.muteUsers',
@@ -204,6 +205,7 @@ export class ChatService {
         'members.firstName',
         'members.lastName',
         'members.avatarUrl',
+        'members.existence',
       ])
       .leftJoin(
         'chat_groups.muteUsers',
@@ -312,16 +314,41 @@ export class ChatService {
 
     const existMessages = await this.chatMessageRepository
       .createQueryBuilder('chat_messages')
-      .leftJoinAndSelect('chat_messages.chatGroup', 'chat_group')
-      .leftJoinAndSelect('chat_messages.sender', 'sender')
-      .leftJoinAndSelect('chat_messages.reactions', 'reactions')
-      .leftJoinAndSelect('reactions.user', 'user')
+      .leftJoin('chat_messages.chatGroup', 'chat_group')
+      .addSelect(['chat_group.id'])
+      .leftJoin('chat_messages.sender', 'sender')
+      .addSelect([
+        'sender.id',
+        'sender.firstName',
+        'sender.lastName',
+        'sender.avatarUrl',
+        'sender.existence',
+      ])
+      .leftJoin('chat_messages.reactions', 'reactions')
+      .leftJoin('reactions.user', 'user')
+      .addSelect(['reactions.id', 'reactions.emoji'])
+      .addSelect([
+        'user.id',
+        'user.firstName',
+        'user.lastName',
+        'user.avatarUrl',
+        'user.existence',
+      ])
       .leftJoinAndSelect(
         'chat_messages.replyParentMessage',
         'replyParentMessage',
       )
-      .leftJoinAndSelect('replyParentMessage.sender', 'reply_sender')
-      .where('chat_group.id = :chatGroupID', { chatGroupID: query.group })
+      .leftJoin('replyParentMessage.sender', 'reply_sender')
+      .addSelect([
+        'reply_sender.id',
+        'reply_sender.firstName',
+        'reply_sender.lastName',
+        'reply_sender.avatarUrl',
+        'reply_sender.existence',
+      ])
+      .where('chat_group.id = :chatGroupID', {
+        chatGroupID: query.group,
+      })
       .andWhere(
         after && include
           ? 'chat_messages.id >= :after'
@@ -364,6 +391,7 @@ export class ChatService {
       m.isSender = false;
       return m;
     });
+
     return messages;
   }
 
