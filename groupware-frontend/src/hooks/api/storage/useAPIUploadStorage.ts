@@ -34,7 +34,6 @@ export const uploadStorage = async (files: File[]): Promise<string[]> => {
     const signedURLMapping: { [fileName: string]: string } = res.data;
     const fileURLs = await Promise.all(
       files.map(async (f) => {
-        console.log(resizeImage(f));
         const formData = new FormData();
         const resizeImageBlob = await resizeImage(f);
         const fileChangedToBlob = new File([resizeImageBlob], `${f.name}`);
