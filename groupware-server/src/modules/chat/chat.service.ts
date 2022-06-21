@@ -281,6 +281,7 @@ export class ChatService {
     } = query;
     const limitNumber = Number(limit);
 
+    const startTime = Date.now();
     const existMessages = await this.chatMessageRepository
       .createQueryBuilder('chat_messages')
       .leftJoinAndSelect('chat_messages.chatGroup', 'chat_group')
@@ -320,6 +321,10 @@ export class ChatService {
       .take(limitNumber >= 0 ? limitNumber : 20)
       .orderBy('chat_messages.createdAt', after ? 'ASC' : 'DESC')
       .getMany();
+    const endTime = Date.now();
+    if (!dateRefetchLatest) {
+      console.log('get messages speed check', endTime - startTime);
+    }
 
     const messages = existMessages.map((m) => {
       m.reactions = m.reactions.map((r) => {
