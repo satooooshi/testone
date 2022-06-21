@@ -316,9 +316,10 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
         const regexp = new RegExp(`\\s${m.name}|^${m.name}`, 'g');
         parsedMessage = parsedMessage.replace(regexp, `@${m.name}`);
       }
+
       sendChatMessage({
         ...newChatMessage,
-        content: parsedMessage,
+        content: parsedMessage.trimEnd(),
       });
     }
   };
@@ -892,16 +893,16 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
           onChange={onEditorChange}
           plugins={plugins}
           ref={editorRef}
-          handleReturn={(e) => {
+          keyBindingFn={(e) => {
             if (e.ctrlKey !== e.metaKey && e.key === 'Enter') {
               onSend();
               return 'handled';
             }
-            if (e.keyCode === 13) {
+            if (e.key === 'Enter') {
               setEditorState(RichUtils.insertSoftNewline(editorState));
               return 'handled';
             }
-            return 'not-handled';
+            return getDefaultKeyBinding(e);
           }}
         />
         <div className={suggestionStyles.suggestion_wrapper}>
