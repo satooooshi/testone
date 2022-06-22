@@ -142,6 +142,7 @@ export interface User {
   questionCount?: number;
   answerCount?: number;
   knowledgeCount?: number;
+  chatGroups?: ChatGroup[];
 }
 
 export interface Tag {
@@ -320,10 +321,12 @@ export interface ChatGroup {
   pinnedUsers?: User[];
   isPinned?: boolean;
   chatNotes?: ChatNote[];
+  muteUsers?: User[];
   chatMessages?: ChatMessage[];
   members?: User[];
   lastReadChatTime?: LastReadChatTime[];
   hasBeenRead?: boolean;
+  unreadCount?: number;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -356,8 +359,10 @@ export interface ChatNoteImage {
 }
 
 //this is for react-native-image-viewing
-export type ImageSource = {
+export type FIleSource = {
   uri: string;
+  fileName: string;
+  createdUrl?: string;
 };
 
 export interface ChatAlbum {

@@ -34,7 +34,12 @@ const ReplyParent: React.FC<ReplyParentProps> = ({parentMessage}) => {
       borderBottomColor="white"
       pb="sm">
       <Div mr={'sm'}>
-        <UserAvatar w={32} h={32} user={parentMessage.sender} />
+        <UserAvatar
+          w={32}
+          h={32}
+          user={parentMessage.sender}
+          GoProfile={true}
+        />
       </Div>
       <Div w={'65%'}>
         <Text color="black" fontWeight="bold" fontSize={14}>

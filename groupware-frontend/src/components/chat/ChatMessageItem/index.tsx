@@ -14,12 +14,13 @@ import {
   useMediaQuery,
   useToast,
 } from '@chakra-ui/react';
-import React, { Fragment, useRef } from 'react';
+import React, { Fragment, useMemo, useRef } from 'react';
 import { Avatar } from '@chakra-ui/react';
 import {
   ChatMessage,
   ChatMessageReaction,
   ChatMessageType,
+  LastReadChatTime,
   User,
 } from 'src/types';
 import { dateTimeFormatterFromJSDDate } from 'src/utils/dateTimeFormatter';
@@ -47,25 +48,25 @@ import StickerMessage from './StickerMessage';
 type ChatMessageItemProps = {
   message: ChatMessage;
   onClickReply: () => void;
-  readUsers: User[];
   onClickImage: () => void;
   usersInRoom: User[];
   isScrollTarget?: boolean;
   scrollToTarget?: (position: number) => void;
   confirmedSearchWord: string;
   searchedResultIds?: (number | undefined)[];
+  lastReadChatTime: LastReadChatTime[] | undefined;
 };
 
 const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
   usersInRoom,
   message,
   onClickReply,
-  readUsers,
   onClickImage,
   isScrollTarget = false,
   scrollToTarget,
   confirmedSearchWord,
   searchedResultIds,
+  lastReadChatTime,
 }) => {
   const [messageState, setMessageState] = useState(message);
   const [visibleReadModal, setVisibleLastReadModal] = useState(false);
@@ -90,6 +91,14 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
       scrollToTarget(ref.current?.offsetTop - 80);
     }
   }, [isScrollTarget, scrollToTarget]);
+
+  const readUsers = useMemo(() => {
+    return lastReadChatTime
+      ? lastReadChatTime
+          .filter((t) => new Date(t.readTime) >= new Date(message.createdAt))
+          .map((t) => t.user)
+      : [];
+  }, [lastReadChatTime, message]);
 
   const reactionList = (
     <Box flexDir="row" flexWrap="wrap" display="flex" maxW={'50vw'}>
@@ -347,7 +356,7 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
                   borderRadius="8px"
                   p="8px"
                   maxW={isSmallerThan768 ? undefined : '40vw'}
-                  minW={'300px'}
+                  minW={'150px'}
                   wordBreak="break-word">
                   {messageState.type === ChatMessageType.IMAGE ? (
                     <ImageMessage

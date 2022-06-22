@@ -2,8 +2,48 @@ import axios, { AxiosError } from 'axios';
 import { useMutation, UseMutationOptions } from 'react-query';
 import { axiosInstance } from 'src/utils/url';
 import { readStorageURL, uploadStorageURL } from 'src/utils/url/storage.url';
+import Resizer from 'react-image-file-resizer';
+import { isImage } from 'src/utils/indecateChatMessageType';
 
 export const uploadStorage = async (files: File[]): Promise<string[]> => {
+  // console.log('----', files);
+  // const fileToDataUri = (file: File) =>
+  //   new Promise((resolve, reject) => {
+  //     const reader = new FileReader();
+  //     reader.onload = (event) => {
+  //       resolve(event?.target?.result);
+  //     };
+  //     reader.readAsDataURL(file);
+  //   });
+
+  // for (let i = 0; i < files.length; i++) {
+  //   if (isImage(files[i].name)) {
+  //     fileToDataUri(files[i]).then(async (dataUri) => {
+  //       const res: Response = await fetch(dataUri as string);
+  //       const blob: Blob = await res.blob();
+  //       new Promise((resolve) => {
+  //         Resizer.imageFileResizer(
+  //           blob,
+  //           1000,
+  //           1000,
+  //           'PNG',
+  //           100,
+  //           0,
+  //           (uri) => {
+  //             resolve(uri);
+  //           },
+  //           'base64',
+  //         );
+  //       });
+  //       console.log('before----imageFileResizer------', files[i]);
+  //       files[i] = new File([blob], 'test' + files[i].name, {
+  //         type: 'image/png',
+  //       });
+  //       console.log('----imageFileResizer------', files[i]);
+  //     });
+  //   }
+  // }
+  // console.log('----after', files);
   const fileNames = files.map((f) => f.name);
   try {
     const res = await axiosInstance.post(uploadStorageURL, fileNames);

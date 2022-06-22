@@ -311,6 +311,12 @@ export class User {
   })
   chatGroups?: ChatGroup[];
 
+  @ManyToMany(() => ChatGroup, (chatGroup) => chatGroup.muteUsers, {
+    onUpdate: 'CASCADE',
+    onDelete: 'CASCADE',
+  })
+  muteChatGroups?: ChatGroup[];
+
   @ManyToMany(() => Wiki, (wiki) => wiki.userGoodForBoard, {
     onUpdate: 'CASCADE',
     onDelete: 'CASCADE',

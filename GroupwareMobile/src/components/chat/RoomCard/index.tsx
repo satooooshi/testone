@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useRef} from 'react';
 import {Platform, TouchableHighlight, useWindowDimensions} from 'react-native';
 import FastImage from 'react-native-fast-image';
 import {Swipeable} from 'react-native-gesture-handler';
@@ -6,17 +6,17 @@ import {Button, Div, Icon, Text} from 'react-native-magnus';
 import tailwind from 'tailwind-rn';
 import {useAuthenticate} from '../../../contexts/useAuthenticate';
 import {roomCardStyles} from '../../../styles/component/chat/roomCard.style';
-import {userAdminStyles} from '../../../styles/screen/admin/userAdmin.style';
 import {ChatGroup, ChatMessage, ChatMessageType} from '../../../types';
 import {darkFontColor} from '../../../utils/colors';
 import {dateTimeFormatterFromJSDDate} from '../../../utils/dateTimeFormatterFromJSDate';
 import {nameOfRoom} from '../../../utils/factory/chat/nameOfRoom';
 import {mentionTransform} from '../../../utils/messageTransform';
+import {Badge} from 'react-native-paper';
 
 type RoomCardProps = {
   room: ChatGroup;
   onPress: () => void;
-  onPressPinButton: () => void;
+  onPressPinButton?: () => void;
   //this param overrides every background color
   dangerousBgColor?: string;
 };
@@ -27,11 +27,22 @@ const RoomCard: React.FC<RoomCardProps> = ({
   onPressPinButton,
   dangerousBgColor,
 }) => {
+  const ref = useRef<Swipeable>(null);
   const {width: windowWidth} = useWindowDimensions();
   const {user} = useAuthenticate();
+
   const rightSwipeActions = () => {
     return (
-      <Button bg="green500" h={'100%'} w={80} onPress={onPressPinButton}>
+      <Button
+        bg="green500"
+        h={'100%'}
+        w={80}
+        onPress={() => {
+          if (onPressPinButton) {
+            onPressPinButton();
+          }
+          ref?.current?.close();
+        }}>
         <Icon
           name={!room.isPinned ? 'pin' : 'pin-off'}
           fontSize={24}
@@ -76,20 +87,22 @@ const RoomCard: React.FC<RoomCardProps> = ({
     }
   };
 
-  const readOrNot = room?.lastReadChatTime?.[0]?.readTime
-    ? new Date(room?.lastReadChatTime?.[0]?.readTime) > new Date(room.updatedAt)
-    : false;
-
   return (
-    <TouchableHighlight underlayColor="none" onPress={onPress}>
+    <TouchableHighlight
+      underlayColor="none"
+      onPress={() => {
+        onPress();
+      }}>
       <Swipeable
+        ref={ref}
+        enabled={onPressPinButton ? true : false}
         containerStyle={tailwind('rounded-sm')}
         renderRightActions={rightSwipeActions}>
         <Div
           bg={
             dangerousBgColor
               ? dangerousBgColor
-              : !readOrNot
+              : room?.unreadCount
               ? 'white'
               : 'gray300'
           }
@@ -98,7 +111,7 @@ const RoomCard: React.FC<RoomCardProps> = ({
           w={windowWidth * 0.9}
           shadow="sm"
           p={4}
-          h={100}
+          h={70}
           alignItems="center"
           flexDir="row">
           <Div>
@@ -128,9 +141,32 @@ const RoomCard: React.FC<RoomCardProps> = ({
             )}
           </Div>
           <Div w={'75%'} pr={'sm'}>
-            <Text numberOfLines={1} mb={'xs'} fontWeight="bold" fontSize={16}>
-              {nameOfRoom(room)}
-            </Text>
+            <Div flexDir="row" mb={'xs'} w={'85%'}>
+              <Text numberOfLines={1} fontWeight="bold" fontSize={16}>
+                {nameOfRoom(room, user)}
+              </Text>
+              {room.muteUsers &&
+              room.muteUsers.filter(u => u.id === user?.id).length ? (
+                <Icon
+                  ml={3}
+                  name="volume-mute-outline"
+                  fontFamily="Ionicons"
+                  fontSize={16}
+                />
+              ) : null}
+            </Div>
+            {room?.unreadCount && room?.unreadCount > 0 ? (
+              <Badge
+                style={{
+                  position: 'absolute',
+                  left: windowWidth * 0.6,
+                  marginTop: 10,
+                  backgroundColor: 'green',
+                }}
+                size={25}>
+                {`${room?.unreadCount}`}
+              </Badge>
+            ) : null}
             <Text
               mb={'xs'}
               fontSize={14}
@@ -144,7 +180,11 @@ const RoomCard: React.FC<RoomCardProps> = ({
               <Text>{`${room.members?.length || 0}人のメンバー`}</Text>
               <Text>
                 {dateTimeFormatterFromJSDDate({
-                  dateTime: new Date(room.updatedAt),
+                  dateTime: new Date(
+                    room?.chatMessages?.[0]?.createdAt
+                      ? room?.chatMessages?.[0]?.createdAt
+                      : room.updatedAt,
+                  ),
                 })}
               </Text>
             </Div>

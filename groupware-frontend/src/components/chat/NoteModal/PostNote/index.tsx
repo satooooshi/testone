@@ -129,6 +129,26 @@ const EditNote: React.FC<EditNoteProps> = ({
     element.src === selectedImage?.imageURL;
   const activeIndex = imagesInSelectedNote.findIndex(isNowUri);
 
+  const [willSubmit, setWillSubmit] = useState(false);
+
+  useEffect(() => {
+    if (isOpen) {
+      setWillSubmit(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen]);
+
+  useEffect(() => {
+    const safetySubmit = async () => {
+      handleSubmit();
+      await new Promise((r) => setTimeout(r, 1000));
+      setWillSubmit(false);
+    };
+    if (willSubmit) {
+      safetySubmit();
+    }
+  }, [willSubmit, handleSubmit]);
+
   useEffect(() => {
     if (!note) {
       resetForm();
@@ -205,7 +225,7 @@ const EditNote: React.FC<EditNoteProps> = ({
                       <Button
                         size="sm"
                         colorScheme="blue"
-                        onClick={() => handleSubmit()}>
+                        onClick={() => setWillSubmit(true)}>
                         {loadingUploadFile ? (
                           <Spinner />
                         ) : (
