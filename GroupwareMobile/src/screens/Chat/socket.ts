@@ -89,6 +89,7 @@ export const useChatSocket = (
           if (sentMsgByOtherUsers.type === ChatMessageType.VIDEO) {
             sentMsgByOtherUsers.thumbnail = await getThumbnailOfVideo(
               sentMsgByOtherUsers.content,
+              sentMsgByOtherUsers.fileName,
             );
           }
           if (isMounted) {
