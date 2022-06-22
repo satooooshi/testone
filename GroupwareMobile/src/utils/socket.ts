@@ -1,13 +1,13 @@
 import {AppState, AppStateStatus} from 'react-native';
-import {useAuthenticate} from '../../contexts/useAuthenticate';
 import io from 'socket.io-client';
-import {baseURL, storage} from '../../utils/url';
-import {ChatGroup, ChatMessage, ChatMessageType} from '../../types';
-import {getThumbnailOfVideo} from '../../utils/getThumbnailOfVideo';
-import {useHandleBadge} from '../../contexts/badge/useHandleBadge';
-import {useAPISaveLastReadChatTime} from '../../hooks/api/chat/useAPISaveLastReadChatTime';
-import {useAPIGetLastReadChatTime} from '../../hooks/api/chat/useAPIGetLastReadChatTime';
 import {useEffect, useState} from 'react';
+import {baseURL} from './url';
+import {ChatGroup, ChatMessage, ChatMessageType} from '../types';
+import {useHandleBadge} from '../contexts/badge/useHandleBadge';
+import {useAuthenticate} from '../contexts/useAuthenticate';
+import {useAPISaveLastReadChatTime} from '../hooks/api/chat/useAPISaveLastReadChatTime';
+import {useAPIGetLastReadChatTime} from '../hooks/api/chat/useAPIGetLastReadChatTime';
+import {getThumbnailOfVideo} from './getThumbnailOfVideo';
 
 const socket = io(baseURL, {
   transports: ['websocket'],
@@ -33,10 +33,12 @@ export const useChatSocket = (
     });
   };
 
-  if (socket.disconnected) {
-    socket.connect();
-    console.log('socket connected.', baseURL);
-  }
+  const connect = () => {
+    if (socket.disconnected) {
+      socket.connect();
+      console.log('socket connected.', baseURL);
+    }
+  };
 
   useEffect(() => {
     saveLastReadChatTime(room.id, {
@@ -51,6 +53,7 @@ export const useChatSocket = (
 
   return {
     joinRoom: () => {
+      connect();
       setCurrentChatRoomId(room.id);
       isMounted = true;
       socket.emit('joinRoom', room.id.toString());

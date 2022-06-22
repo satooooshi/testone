@@ -86,7 +86,8 @@ import {useIsTabBarVisible} from '../../contexts/bottomTab/useIsTabBarVisible';
 import Clipboard from '@react-native-community/clipboard';
 import {dateTimeFormatterFromJSDDate} from '../../utils/dateTimeFormatterFromJSDate';
 import {useAPIGetUpdatedMessages} from '../../hooks/api/chat/useAPIGetUpdatedMessages';
-import {useChatSocket} from './socket';
+import {useChatSocket} from '../../utils/socket';
+import {useSocket} from '../../contexts/socket/useSocket';
 
 const TopTab = createMaterialTopTabNavigator();
 
