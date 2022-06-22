@@ -86,6 +86,15 @@ export class ChatService {
     return groupsAndUsers;
   }
 
+  public async getRoomsId(userID: number): Promise<ChatGroup[]> {
+    return await this.chatGroupRepository
+      .createQueryBuilder('chat_groups')
+      .select(['chat_groups.id'])
+      .leftJoin('chat_groups.members', 'member')
+      .where('member.id = :memberId', { memberId: userID })
+      .getMany();
+  }
+
   public async getRoomsByPage(
     userID: number,
     query: GetChaRoomsByPageQuery,

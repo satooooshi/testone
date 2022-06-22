@@ -127,21 +127,12 @@ export class UserController {
   @UseGuards(JwtAuthenticationGuard)
   @Post('delete-user')
   async deleteUser(@Body() user: User) {
-    await this.userService.deleteUser(user);
-    let i = 0;
-    let continueFlag = false;
-    while (!continueFlag) {
-      const rooms = await this.chatService.getRoomsByPage(user.id, {
-        page: `${i}`,
-        limit: '20',
-      });
-      for (const r of rooms.rooms) {
-        if (r.id) {
-          await this.chatService.leaveChatRoom(user.id, r.id);
-        }
+    const rooms = await this.chatService.getRoomsId(user.id);
+    for (const r of rooms) {
+      if (r.id) {
+        await this.chatService.leaveChatRoom(user.id, r.id);
       }
-      continueFlag = rooms.rooms.length === 20;
-      i++;
     }
+    await this.userService.deleteUser(user);
   }
 }
