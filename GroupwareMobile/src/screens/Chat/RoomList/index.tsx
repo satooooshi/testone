@@ -207,6 +207,7 @@ const RoomList: React.FC = () => {
               fontSize={12}
             />
           }
+          clearButtonMode="while-editing"
         />
 
         {chatRooms.length ? (
