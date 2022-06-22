@@ -16,6 +16,7 @@ import RequestWithUser from '../auth/requestWithUser.interface';
 import { UserService } from './user.service';
 import UpdatePasswordDto from './dto/updatePasswordDto';
 import { Response } from 'express';
+import { ChatService } from '../chat/chat.service';
 
 export interface SearchQueryToGetUsers {
   page?: string;
@@ -34,7 +35,10 @@ export interface QueryToGetUserCsv {
 
 @Controller('user')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly userService: UserService,
+    private readonly chatService: ChatService,
+  ) {}
 
   //@TODO this endpoint is for inputting data
   // @Post('register-users')
@@ -123,6 +127,21 @@ export class UserController {
   @UseGuards(JwtAuthenticationGuard)
   @Post('delete-user')
   async deleteUser(@Body() user: User) {
-    return await this.userService.deleteUser(user);
+    await this.userService.deleteUser(user);
+    let i = 0;
+    let continueFlag = false;
+    while (!continueFlag) {
+      const rooms = await this.chatService.getRoomsByPage(user.id, {
+        page: `${i}`,
+        limit: '20',
+      });
+      for (const r of rooms.rooms) {
+        if (r.id) {
+          await this.chatService.leaveChatRoom(user.id, r.id);
+        }
+      }
+      continueFlag = rooms.rooms.length === 20;
+      i++;
+    }
   }
 }

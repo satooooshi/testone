@@ -49,7 +49,6 @@ export interface GetMessagesQuery {
 }
 
 export interface GetChaRoomsByPageQuery {
-  group: number;
   page?: string;
   limit?: string;
   updatedAtLatestRoom?: Date;
