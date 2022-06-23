@@ -11,7 +11,7 @@
 .right_contents {
   width: 100%;
   display: flex;
-  overflow-x: scroll;
+  // overflow-x: scroll;
   flex-direction: column;
   @media (min-width: 768px) {
     margin-left: max(94px, 4vw);
