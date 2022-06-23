@@ -5,14 +5,16 @@ import { useRouter } from 'next/router';
 import { darkFontColor } from 'src/utils/colors';
 import RoomList from '@/components/chat/RoomList';
 import ChatLayout from '@/components/chat/Layout';
+import { useModalReducer } from '@/hooks/chat/useModalReducer';
 
 const Chat = () => {
   const router = useRouter();
   const [isLargerTahn1024] = useMediaQuery('(min-width: 1024px)');
   const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
+  const [modalStates, dispatchModal] = useModalReducer();
 
   return (
-    <ChatLayout>
+    <ChatLayout modalStates={modalStates} dispatchModal={dispatchModal}>
       {isSmallerThan768 ? (
         <>
           <Box alignSelf="center">
