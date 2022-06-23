@@ -264,7 +264,7 @@ const QuestionDetail = () => {
       }
     }, 50);
   }, [wiki?.body]);
-
+  console.log('---', tabs);
   return (
     <LayoutWithTab
       sidebar={{ activeScreenName: SidebarScreenName.QA }}
@@ -349,7 +349,8 @@ const QuestionDetail = () => {
             <Box
               display="flex"
               flexDir="row"
-              w="80vw"
+              w="100%"
+              px={1}
               alignItems="center"
               justifyContent="space-between"
               my={8}>
@@ -418,47 +419,46 @@ const QuestionDetail = () => {
                     <div
                       key={answer.id}
                       className={qaDetailStyles.answers_wrapper}>
-                      <div className={qaDetailStyles.qa_comment_wrapper}>
-                        <div className={qaDetailStyles.qa_wrapper}>
-                          <Box bg="white" p="10px" borderRadius={10}>
-                            <WikiComment
-                              bestAnswerButtonName={
-                                wiki.boardCategory === BoardCategory.QA
-                                  ? wiki.bestAnswer?.id === answer.id
-                                    ? 'ベストアンサーに選ばれた回答'
-                                    : !wiki.resolvedAt &&
-                                      myself?.id === wiki.writer?.id
-                                    ? 'ベストアンサーに選ぶ'
-                                    : undefined
-                                  : undefined
-                              }
-                              isExistsBestAnswer={
-                                wiki.bestAnswer ? true : false
-                              }
-                              onClickBestAnswerButton={() =>
-                                !wiki.bestAnswer &&
-                                createBestAnswer({
-                                  ...wiki,
-                                  bestAnswer: answer,
-                                })
-                              }
-                              body={answer.body}
-                              createdAt={answer.createdAt}
-                              writer={answer.writer}
-                              isWriter={myself?.id === wiki.writer?.id}
-                              replyButtonName={
-                                answerReply.answer?.id === answer.id ||
-                                !enableReplyToAnswer(answer)
-                                  ? undefined
-                                  : '返信/追記'
-                              }
-                              onClickReplyButton={() =>
-                                handleClickStartInputtingReplyButton(answer)
-                              }
-                            />
-                          </Box>
-                        </div>
-                      </div>
+                      <Box
+                        bg="white"
+                        p="10px"
+                        borderRadius={10}
+                        w="100%"
+                        mb={3}>
+                        <WikiComment
+                          bestAnswerButtonName={
+                            wiki.boardCategory === BoardCategory.QA
+                              ? wiki.bestAnswer?.id === answer.id
+                                ? 'ベストアンサーに選ばれた回答'
+                                : !wiki.resolvedAt &&
+                                  myself?.id === wiki.writer?.id
+                                ? 'ベストアンサーに選ぶ'
+                                : undefined
+                              : undefined
+                          }
+                          isExistsBestAnswer={wiki.bestAnswer ? true : false}
+                          onClickBestAnswerButton={() =>
+                            !wiki.bestAnswer &&
+                            createBestAnswer({
+                              ...wiki,
+                              bestAnswer: answer,
+                            })
+                          }
+                          body={answer.body}
+                          createdAt={answer.createdAt}
+                          writer={answer.writer}
+                          isWriter={myself?.id === wiki.writer?.id}
+                          replyButtonName={
+                            answerReply.answer?.id === answer.id ||
+                            !enableReplyToAnswer(answer)
+                              ? undefined
+                              : '返信/追記'
+                          }
+                          onClickReplyButton={() =>
+                            handleClickStartInputtingReplyButton(answer)
+                          }
+                        />
+                      </Box>
                       {answerReply.answer &&
                       answerReply.answer.id === answer.id ? (
                         <WrappedDraftEditor
