@@ -27,26 +27,30 @@ const ChatDetail = () => {
   // });
   const { getOneRoom } = useHandleBadge();
 
-  // useAPIGetRoomDetail(Number(id), {
-  //   onSuccess: (data) => {
-  //     if (setCurrentRoom) {
-  //       setCurrentRoom(data);
-  //     }
-  //   },
-  //   onError: (err) => {
-  //     if (setCurrentRoom) {
-  //       setCurrentRoom(undefined);
-  //     }
-  //     if (err?.response?.data?.message) {
-  //       alert(err?.response?.data?.message);
-  //     }
-  //   },
-  // });
+  const { refetch: getRoom } = useAPIGetRoomDetail(Number(id), {
+    enabled: false,
+    onSuccess: (data) => {
+      if (setCurrentRoom) {
+        setCurrentRoom(data);
+      }
+    },
+    onError: (err) => {
+      if (setCurrentRoom) {
+        setCurrentRoom(undefined);
+      }
+      if (err?.response?.data?.message) {
+        alert(err?.response?.data?.message);
+      }
+    },
+  });
 
   useEffect(() => {
-    setCurrentRoom(getOneRoom(Number(id)));
+    const room = id ? getOneRoom(Number(id)) : undefined;
+    room ? setCurrentRoom(room) : getRoom();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
+
+  console.log('----', id, currentRoom);
 
   const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
 

@@ -86,7 +86,7 @@ const ChatLayout: FC<Props> = ({
             isOpen={membersModal}
             onClose={() => setMembersModal(false)}
             onComplete={(selected) => {
-              if (isTalkRoom && selected.length === 1) {
+              if (isTalkRoom) {
                 createGroup({ name: '', members: selected });
                 setMembersModal(false);
               } else {
