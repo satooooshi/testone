@@ -90,7 +90,7 @@ import Clipboard from '@react-native-community/clipboard';
 import {dateTimeFormatterFromJSDDate} from '../../utils/dateTimeFormatterFromJSDate';
 import {useAPIGetUpdatedMessages} from '../../hooks/api/chat/useAPIGetUpdatedMessages';
 import {useAPIGetExpiredUrlMessages} from '../../hooks/api/chat/useAPIGetExpiredUrlMessages';
-import {useChatSocket} from './socket';
+import {useChatSocket} from '../../utils/socket';
 
 const TopTab = createMaterialTopTabNavigator();
 
