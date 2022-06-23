@@ -22,8 +22,13 @@ const RoomList: React.FC = () => {
   const [roomTypeSelector, setRoomTypeSelector] = useState(false);
   const [userModal, setVisibleUserModal] = useState(false);
   const {data: users} = useAPIGetUsers('');
-  const {chatGroups, setChatGroupsState, editChatGroup, isRoomsRefetching} =
-    useHandleBadge();
+  const {
+    chatGroups,
+    setChatGroupsState,
+    editChatGroup,
+    isRoomsRefetching,
+    isCompletedRefetchAllRooms,
+  } = useHandleBadge();
   const {selectedUserRole, filteredUsers} = useUserRole('All', users);
   const [creationType, setCreationType] = useState<RoomType>();
   const [searchedRooms, setSearchedRooms] = useState<ChatGroup[]>();
@@ -80,8 +85,11 @@ const RoomList: React.FC = () => {
   // );
 
   useEffect(() => {
-    setChatRooms(chatGroups);
-  }, [chatGroups]);
+    if (isCompletedRefetchAllRooms) {
+      console.log('----------=======isCompletedRefetchAllRooms');
+      setChatRooms(chatGroups);
+    }
+  }, [chatGroups, isCompletedRefetchAllRooms]);
 
   const onPressRightButton = () => {
     // navigation.navigate('ChatStack', {screen: 'NewRoom'});

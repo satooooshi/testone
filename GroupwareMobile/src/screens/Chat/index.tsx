@@ -208,6 +208,10 @@ const Chat: React.FC = () => {
     },
   );
 
+  useEffect(() => {
+    console.log('-----', after, before, include);
+  }, [after, before, include]);
+
   const {refetch: getExpiredUrlMessages} = useAPIGetExpiredUrlMessages(
     room.id,
     {
@@ -485,7 +489,9 @@ const Chat: React.FC = () => {
   };
 
   const onScrollTopOnChat = () => {
-    setBefore(messages[messages.length - 1].id);
+    if (messages.length >= 20) {
+      setBefore(messages[messages.length - 1].id);
+    }
   };
 
   const scrollToRenderedMessage = () => {
@@ -565,14 +571,16 @@ const Chat: React.FC = () => {
     storage.set(`messagesIntRoom${room.id}user${myself?.id}`, jsonMessages);
   };
 
-  useEffect(() => {
-    setBefore(undefined);
-    setAfter(undefined);
-  }, [room]);
+  // useEffect(() => {
+  //   setBefore(undefined);
+  //   setAfter(undefined);
+  // }, [room]);
 
   useEffect(() => {
-    refetchFetchedPastMessages();
-  }, [before, after, include, refetchFetchedPastMessages]);
+    if (before || after) {
+      refetchFetchedPastMessages();
+    }
+  }, [before, after, refetchFetchedPastMessages]);
 
   useEffect(() => {
     if (messages.length) {
@@ -657,8 +665,11 @@ const Chat: React.FC = () => {
 
   useEffect(() => {
     socket.joinRoom();
+    refetchFetchedPastMessages();
     return () => {
       socket.leaveRoom();
+      setBefore(undefined);
+      setAfter(undefined);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [room.id]);

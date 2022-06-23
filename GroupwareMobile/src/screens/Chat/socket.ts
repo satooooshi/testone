@@ -35,6 +35,11 @@ export const useChatSocket = (
     });
   };
 
+  if (socket.disconnected) {
+    socket.connect();
+    console.log('------');
+  }
+
   useEffect(() => {
     saveLastReadChatTime(room.id, {
       onSuccess: () => {
