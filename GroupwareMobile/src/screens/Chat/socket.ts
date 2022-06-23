@@ -11,6 +11,8 @@ import {useEffect, useState} from 'react';
 
 const socket = io('https://www.aaaaaa.ml', {
   transports: ['websocket'],
+  forceNew: true,
+  upgrade: false,
 });
 
 export const useChatSocket = (
