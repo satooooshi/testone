@@ -4,6 +4,7 @@ import HeaderWithTab, { HeaderProps } from '../HeaderWithTab';
 import layoutStyles from '@/styles/layouts/Layout.module.scss';
 import { useState } from 'react';
 import clsx from 'clsx';
+import { Box } from '@chakra-ui/react';
 
 type LayoutWithTabProps = {
   sidebar: SidebarProps;
@@ -41,7 +42,9 @@ const LayoutWithTab: React.FC<LayoutWithTabProps> = ({
                   ? layoutStyles.main_padding_with_tab
                   : layoutStyles.main_padding_no_tab,
               )}>
+              {/* <Box overflowX="scroll" w="100%" px={2}> */}
               {children}
+              {/* </Box> */}
             </div>
           </div>
         </>
