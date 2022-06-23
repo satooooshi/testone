@@ -91,7 +91,7 @@ const SearchInput: React.FC<SearchFormProps> = ({
   };
 
   return (
-    <Box display="flex" flexDir="column" justifyContent="center">
+    <Box display="flex" flexDir="column" justifyContent="center" width={'100%'}>
       <div
         className={clsx(
           searchFormStyles.search_form_wrapper,
@@ -106,7 +106,7 @@ const SearchInput: React.FC<SearchFormProps> = ({
             />
           </div>
         )}
-        <InputGroup width={isSmallerThan768 ? '100%' : '80%'}>
+        <InputGroup width={'100%'}>
           <InputLeftElement pointerEvents="none">
             <AiOutlineSearch />
           </InputLeftElement>

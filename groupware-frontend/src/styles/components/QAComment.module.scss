@@ -5,7 +5,6 @@
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 16px;
 }
 .user_info_wrapper {
   display: flex;
@@ -47,9 +46,7 @@
 .markdown {
   background: $white_color;
   border-radius: 10px;
-  min-height: 60px;
   color: $dark_font_color;
-  padding: 15px;
 }
 
 .best_answer_button_wrapper {

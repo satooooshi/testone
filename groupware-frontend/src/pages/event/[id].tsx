@@ -29,7 +29,7 @@ import Head from 'next/head';
 import { useAuthenticate } from 'src/contexts/useAuthenticate';
 import React from 'react';
 import { useAPICreateComment } from '@/hooks/api/event/useAPICreateComment';
-import EventCommentCard from '@/components/event/EventComment';
+import CommentCard from '@/components/common/Comment';
 import { Tab } from 'src/types/header/tab/types';
 import { dateTimeFormatterFromJSDDate } from 'src/utils/dateTimeFormatter';
 import generateYoutubeId from 'src/utils/generateYoutubeId';
@@ -103,6 +103,7 @@ const EventDetail = () => {
     useAPIDonwloadSubmissionZip();
   const [editModal, setEditModal] = useState(false);
   const [commentVisible, setCommentVisible] = useState(false);
+  const [showingCommentCount, setShowingCommentCount] = useState(3);
   const [newComment, setNewComment] = useState<string>('');
   const { user } = useAuthenticate();
   const {
@@ -261,21 +262,20 @@ const EventDetail = () => {
 
   const doesntExist = !loadingEventDetail && (!data || !data?.id);
 
-  const tabs: Tab[] = useHeaderTab(
-    user?.role === UserRole.ADMIN && !doesntExist
-      ? {
-          headerTabType: 'adminEventDetail',
-          onDeleteClicked,
-        }
-      : {
-          headerTabType: 'eventDetail',
-        },
-  );
+  const tabs: Tab[] = useHeaderTab({
+    headerTabType: 'eventDetail',
+    onDeleteClicked:
+      (user?.role === UserRole.ADMIN || user?.id === data?.author?.id) &&
+      !doesntExist
+        ? onDeleteClicked
+        : undefined,
+    onEditClicked: isEditable ? () => setEditModal(true) : undefined,
+  });
 
   const initialHeaderValue = {
     title: 'イベント詳細',
-    rightButtonName: isEditable ? 'イベントを編集' : undefined,
-    onClickRightButton: isEditable ? () => setEditModal(true) : undefined,
+    // rightButtonName: isEditable ? 'イベントを編集' : undefined,
+    // onClickRightButton: isEditable ? () => setEditModal(true) : undefined,
     tabs: tabs,
   };
 
@@ -308,7 +308,6 @@ const EventDetail = () => {
       {data && data.id ? (
         <Box
           w="100%"
-          px="10%"
           pb="20px"
           display="flex"
           flexDir="column"
@@ -597,24 +596,37 @@ const EventDetail = () => {
               </Box>
               <Box w="100%" mt={5}>
                 <div className={eventDetailStyles.count_and_button_wrapper}>
-                  <Box alignSelf="center">
-                    <Heading fontSize="16px">コメント</Heading>
-                    <Text>
-                      {data.comments?.length ? data.comments.length : 0}件
-                    </Text>
+                  <Box alignSelf="center" display="flex" flexDir="row">
+                    <Heading fontSize="16px">イベントの感想</Heading>
+                    {data.comments?.length ? (
+                      <Text fontSize="11px" ml={2} alignSelf="center">
+                        {data.comments.length}件
+                      </Text>
+                    ) : null}
                   </Box>
-                  <Button
-                    borderRadius={50}
-                    colorScheme="blue"
-                    size="sm"
-                    onClick={() => {
-                      commentVisible && newComment
-                        ? handleCreateComment()
-                        : setCommentVisible(true);
-                    }}>
-                    感想を投稿
-                    {/* {commentVisible ? 'コメントを投稿する' : 'コメントを追加'} */}
-                  </Button>
+                  <Box display="flex" flexDir="row">
+                    <Button
+                      borderRadius={50}
+                      colorScheme="blue"
+                      size="sm"
+                      onClick={() => {
+                        commentVisible && newComment
+                          ? handleCreateComment()
+                          : setCommentVisible(true);
+                      }}>
+                      感想を投稿
+                    </Button>
+                    {showingCommentCount < data.comments.length && (
+                      <Heading
+                        onClick={() => setShowingCommentCount((c) => c + 3)}
+                        fontSize="16px"
+                        cursor="pointer"
+                        alignSelf="center"
+                        ml={4}>
+                        もっと見る
+                      </Heading>
+                    )}
+                  </Box>
                 </div>
                 {commentVisible && (
                   <Textarea
@@ -629,16 +641,15 @@ const EventDetail = () => {
                 )}
                 <Box rounded="md" display="flex" flexDir="column" bg="white">
                   {data.comments && data.comments.length
-                    ? data.comments.map(
-                        (comment) =>
-                          comment.writer && (
-                            <EventCommentCard
-                              key={comment.id}
-                              body={comment.body}
-                              date={comment.createdAt}
-                              writer={comment.writer}
-                            />
-                          ),
+                    ? data.comments.map((comment, index) =>
+                        index < showingCommentCount && comment.writer ? (
+                          <CommentCard
+                            key={comment.id}
+                            body={comment.body}
+                            date={comment.createdAt}
+                            writer={comment.writer}
+                          />
+                        ) : null,
                       )
                     : null}
                 </Box>

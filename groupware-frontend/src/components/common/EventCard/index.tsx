@@ -227,7 +227,7 @@ const EventCard: React.FC<EventCardProps> = ({
                 `}
             </Text>
           </Box>
-          <Box mt={3} pl={-1}>
+          <Box my="auto" pl={-1}>
             {/* <Button
             borderRadius={50}
             width="100px"

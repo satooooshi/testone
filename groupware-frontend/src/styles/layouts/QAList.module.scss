@@ -6,6 +6,7 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  width: 100%;
   @media (max-width: 768px) {
     width: 100vw;
     margin-right: 0;
@@ -20,10 +21,12 @@
 .top_contents_wrapper {
   display: flex;
   flex-direction: column;
+  width: 100%;
   justify-content: flex-start;
 }
 
 .search_form_wrapper {
+  width: 100%;
   display: flex;
   margin-bottom: 24px;
   flex-direction: row;

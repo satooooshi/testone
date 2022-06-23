@@ -14,10 +14,10 @@ type HeaderTab =
   | 'chatDetail'
   | 'qaForm'
   | 'eventDetail'
-  | 'adminEventDetail'
+  // | 'adminEventDetail'
   | 'wikiDetail'
-  | 'tagEdit'
-  | 'wikiList';
+  | 'tagEdit';
+// | 'wikiList'
 
 type HeaderTabBehavior = {
   headerTabType: HeaderTab;
@@ -30,6 +30,7 @@ type HeaderTabBehavior = {
   isSmallerThan768?: boolean;
   setActiveTab?: (value: React.SetStateAction<TabName>) => void;
   onDeleteClicked?: () => void;
+  onEditClicked?: () => void;
   type?: WikiType;
 };
 
@@ -45,6 +46,7 @@ const headerTab = (headerTabBehavior: HeaderTabBehavior): Tab[] => {
     isSmallerThan768,
     setActiveTab,
     onDeleteClicked,
+    onEditClicked,
   } = headerTabBehavior;
 
   const headerTabName = '内容を編集';
@@ -279,90 +281,105 @@ const headerTab = (headerTabBehavior: HeaderTabBehavior): Tab[] => {
     case 'eventDetail':
       return [
         {
-          type: 'link',
-          name: '一覧に戻る',
-          href: '/event/list',
-        },
-      ];
-    case 'adminEventDetail':
-      return [
-        {
-          type: 'link',
-          name: '一覧に戻る',
+          type: 'backButton',
+          name: '戻る',
           href: '/event/list',
         },
         {
-          name: 'イベントを削除',
-          onClick: () => {
-            if (onDeleteClicked) onDeleteClicked();
-          },
-          color: 'red',
+          type: 'edit',
+          name: '編集する',
+          onClick: onEditClicked,
+        },
+        {
+          type: 'delete',
+          name: '削除する',
+          onClick: onDeleteClicked,
         },
       ];
+    // case 'adminEventDetail':
+    //   return [
+    //     {
+    //       type: 'backButton',
+    //       name: '戻る',
+    //       href: '/event/list',
+    //     },
+    //     {
+    //       type: 'delete',
+    //       name: '削除する',
+    //       onClick: () => {
+    //         if (onDeleteClicked) onDeleteClicked();
+    //       },
+    //     },
+    //   ];
     case 'wikiDetail':
       return [
         {
-          type: 'link',
-          name: 'Wiki一覧画面へ',
+          type: 'backButton',
+          name: '戻る',
           href: '/wiki/list?page=1&tag=&word=&status=new&type=',
         },
-      ];
-    case 'wikiList':
-      return [
         {
-          name: 'All',
-          onClick: () => {
-            {
-              if (queryRefresh)
-                queryRefresh({
-                  type: undefined,
-                  rule_category: undefined,
-                  board_category: undefined,
-                });
-            }
-          },
-        },
-        {
-          name: '社内規則',
-          onClick: () => {
-            {
-              if (queryRefresh)
-                queryRefresh({
-                  type: WikiType.RULES,
-                  rule_category: RuleCategory.PHILOSOPHY,
-                  board_category: undefined,
-                });
-            }
-          },
-        },
-        {
-          name: 'オール便',
-          onClick: () => {
-            {
-              if (queryRefresh)
-                queryRefresh({
-                  page: '1',
-                  type: WikiType.ALL_POSTAL,
-                  rule_category: undefined,
-                  board_category: undefined,
-                });
-            }
-          },
-        },
-        {
-          name: '掲示板',
-          onClick: () => {
-            {
-              if (queryRefresh)
-                queryRefresh({
-                  page: '1',
-                  type: WikiType.BOARD,
-                  rule_category: undefined,
-                });
-            }
-          },
+          type: 'edit',
+          name: '編集する',
+          onClick: onEditClicked,
         },
       ];
+    // case 'wikiList':
+    //   return [
+    //     {
+    //       name: 'All',
+    //       onClick: () => {
+    //         {
+    //           if (queryRefresh)
+    //             queryRefresh({
+    //               type: undefined,
+    //               rule_category: undefined,
+    //               board_category: undefined,
+    //             });
+    //         }
+    //       },
+    //     },
+    //     {
+    //       name: '社内規則',
+    //       onClick: () => {
+    //         {
+    //           if (queryRefresh)
+    //             queryRefresh({
+    //               type: WikiType.RULES,
+    //               rule_category: RuleCategory.PHILOSOPHY,
+    //               board_category: undefined,
+    //             });
+    //         }
+    //       },
+    //     },
+    //     {
+    //       name: 'オール便',
+    //       onClick: () => {
+    //         {
+    //           if (queryRefresh)
+    //             queryRefresh({
+    //               page: '1',
+    //               type: WikiType.ALL_POSTAL,
+    //               rule_category: undefined,
+    //               board_category: undefined,
+    //             });
+    //         }
+    //       },
+    //     },
+    //     {
+    //       name: '掲示板',
+    //       onClick: () => {
+    //         {
+    //           if (queryRefresh)
+    //             queryRefresh({
+    //               page: '1',
+    //               type: WikiType.BOARD,
+    //               rule_category: undefined,
+    //             });
+    //         }
+    //       },
+    //     },
+    //   ];
   }
 };
 

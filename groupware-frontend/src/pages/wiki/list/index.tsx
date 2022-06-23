@@ -22,6 +22,7 @@ import { useHeaderTab } from '@/hooks/headerTab/useHeaderTab';
 import TopTabBar, { TopTabBehavior } from '@/components/layout/TopTabBar';
 import { Box, Radio, RadioGroup, Stack, Text } from '@chakra-ui/react';
 import { wikiTypeNameFactory } from 'src/utils/wiki/wikiTypeNameFactory';
+import TabList from '@/components/common/TabList';
 
 const QAQuestionList = () => {
   const router = useRouter();
@@ -47,19 +48,79 @@ const QAQuestionList = () => {
   const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
   const { data: tags } = useAPIGetTag();
 
-  const boardTopTab: TopTabBehavior[] = [
+  const topTab: TopTabBehavior[] = [
     {
       tabName: '全て',
+      onClick: () => {
+        {
+          if (queryRefresh)
+            queryRefresh({
+              type: undefined,
+              rule_category: undefined,
+              board_category: undefined,
+            });
+        }
+      },
+      isActiveTab: type === undefined,
+    },
+    {
+      tabName: '社内規則',
+      onClick: () => {
+        {
+          if (queryRefresh)
+            queryRefresh({
+              type: WikiType.RULES,
+              rule_category: RuleCategory.PHILOSOPHY,
+              board_category: undefined,
+            });
+        }
+      },
+      isActiveTab: type === WikiType.RULES,
+    },
+    {
+      tabName: 'オール便',
+      onClick: () => {
+        {
+          if (queryRefresh)
+            queryRefresh({
+              page: '1',
+              type: WikiType.ALL_POSTAL,
+              rule_category: undefined,
+              board_category: undefined,
+            });
+        }
+      },
+      isActiveTab: type === WikiType.ALL_POSTAL,
+    },
+    {
+      tabName: '掲示板',
+      onClick: () => {
+        {
+          if (queryRefresh)
+            queryRefresh({
+              page: '1',
+              type: WikiType.BOARD,
+              rule_category: undefined,
+            });
+        }
+      },
+      isActiveTab: type === WikiType.BOARD,
+    },
+  ];
+
+  const boardTabs: Tab[] = [
+    {
+      name: 'All',
       onClick: () =>
         queryRefresh({
           type: WikiType.BOARD,
           board_category: undefined,
           status: undefined,
         }),
-      isActiveTab: type === WikiType.BOARD && !board_category,
+      isActive: type === WikiType.BOARD && !board_category,
     },
     {
-      tabName: wikiTypeNameFactory(
+      name: wikiTypeNameFactory(
         WikiType.BOARD,
         undefined,
         true,
@@ -71,11 +132,11 @@ const QAQuestionList = () => {
           board_category: BoardCategory.KNOWLEDGE,
           status: undefined,
         }),
-      isActiveTab:
+      isActive:
         type === WikiType.BOARD && board_category === BoardCategory.KNOWLEDGE,
     },
     {
-      tabName: wikiTypeNameFactory(
+      name: wikiTypeNameFactory(
         WikiType.BOARD,
         undefined,
         true,
@@ -87,11 +148,10 @@ const QAQuestionList = () => {
           board_category: BoardCategory.QA,
           status: 'new',
         }),
-      isActiveTab:
-        type === WikiType.BOARD && board_category === BoardCategory.QA,
+      isActive: type === WikiType.BOARD && board_category === BoardCategory.QA,
     },
     {
-      tabName: wikiTypeNameFactory(
+      name: wikiTypeNameFactory(
         WikiType.BOARD,
         undefined,
         true,
@@ -103,11 +163,11 @@ const QAQuestionList = () => {
           board_category: BoardCategory.NEWS,
           status: undefined,
         }),
-      isActiveTab:
+      isActive:
         type === WikiType.BOARD && board_category === BoardCategory.NEWS,
     },
     {
-      tabName: wikiTypeNameFactory(
+      name: wikiTypeNameFactory(
         WikiType.BOARD,
         undefined,
         true,
@@ -119,12 +179,12 @@ const QAQuestionList = () => {
           board_category: BoardCategory.IMPRESSIVE_UNIVERSITY,
           status: undefined,
         }),
-      isActiveTab:
+      isActive:
         type === WikiType.BOARD &&
         board_category === BoardCategory.IMPRESSIVE_UNIVERSITY,
     },
     {
-      tabName: wikiTypeNameFactory(
+      name: wikiTypeNameFactory(
         WikiType.BOARD,
         undefined,
         true,
@@ -136,11 +196,11 @@ const QAQuestionList = () => {
           board_category: BoardCategory.CLUB,
           status: undefined,
         }),
-      isActiveTab:
+      isActive:
         type === WikiType.BOARD && board_category === BoardCategory.CLUB,
     },
     {
-      tabName: wikiTypeNameFactory(
+      name: wikiTypeNameFactory(
         WikiType.BOARD,
         undefined,
         true,
@@ -152,12 +212,12 @@ const QAQuestionList = () => {
           board_category: BoardCategory.STUDY_MEETING,
           status: undefined,
         }),
-      isActiveTab:
+      isActive:
         type === WikiType.BOARD &&
         board_category === BoardCategory.STUDY_MEETING,
     },
     {
-      tabName: wikiTypeNameFactory(
+      name: wikiTypeNameFactory(
         WikiType.BOARD,
         undefined,
         true,
@@ -169,12 +229,12 @@ const QAQuestionList = () => {
           board_category: BoardCategory.SELF_IMPROVEMENT,
           status: undefined,
         }),
-      isActiveTab:
+      isActive:
         type === WikiType.BOARD &&
         board_category === BoardCategory.SELF_IMPROVEMENT,
     },
     {
-      tabName: wikiTypeNameFactory(
+      name: wikiTypeNameFactory(
         WikiType.BOARD,
         undefined,
         true,
@@ -186,12 +246,12 @@ const QAQuestionList = () => {
           board_category: BoardCategory.PERSONAL_ANNOUNCEMENT,
           status: undefined,
         }),
-      isActiveTab:
+      isActive:
         type === WikiType.BOARD &&
         board_category === BoardCategory.PERSONAL_ANNOUNCEMENT,
     },
     {
-      tabName: wikiTypeNameFactory(
+      name: wikiTypeNameFactory(
         WikiType.BOARD,
         undefined,
         true,
@@ -203,11 +263,11 @@ const QAQuestionList = () => {
           board_category: BoardCategory.CELEBRATION,
           status: undefined,
         }),
-      isActiveTab:
+      isActive:
         type === WikiType.BOARD && board_category === BoardCategory.CELEBRATION,
     },
     {
-      tabName: wikiTypeNameFactory(
+      name: wikiTypeNameFactory(
         WikiType.BOARD,
         undefined,
         true,
@@ -219,7 +279,7 @@ const QAQuestionList = () => {
           board_category: BoardCategory.OTHER,
           status: undefined,
         }),
-      isActiveTab:
+      isActive:
         type === WikiType.BOARD && board_category === BoardCategory.OTHER,
     },
   ];
@@ -243,48 +303,48 @@ const QAQuestionList = () => {
   //     isActiveTab: status === 'resolved',
   //   },
   // ];
-  const rulesTopTab: TopTabBehavior[] = [
+  const rulesTab: Tab[] = [
     {
-      tabName: '会社理念',
+      name: '会社理念',
       onClick: () =>
         queryRefresh({
           type: WikiType.RULES,
           rule_category: RuleCategory.PHILOSOPHY,
         }),
-      isActiveTab: !rule_category || rule_category === RuleCategory.PHILOSOPHY,
+      isActive: !rule_category || rule_category === RuleCategory.PHILOSOPHY,
     },
     {
-      tabName: '社内規則',
+      name: '社内規則',
       onClick: () =>
         queryRefresh({
           type: WikiType.RULES,
           rule_category: RuleCategory.RULES,
         }),
-      isActiveTab: rule_category === RuleCategory.RULES,
+      isActive: rule_category === RuleCategory.RULES,
     },
     {
-      tabName: 'ABC制度',
+      name: 'ABC制度',
       onClick: () =>
         queryRefresh({ type: WikiType.RULES, rule_category: RuleCategory.ABC }),
-      isActiveTab: rule_category === RuleCategory.ABC,
+      isActive: rule_category === RuleCategory.ABC,
     },
     {
-      tabName: '福利厚生等',
+      name: '福利厚生等',
       onClick: () =>
         queryRefresh({
           type: WikiType.RULES,
           rule_category: RuleCategory.BENEFITS,
         }),
-      isActiveTab: rule_category === RuleCategory.BENEFITS,
+      isActive: rule_category === RuleCategory.BENEFITS,
     },
     {
-      tabName: '各種申請書',
+      name: '各種申請書',
       onClick: () =>
         queryRefresh({
           type: WikiType.RULES,
           rule_category: RuleCategory.DOCUMENT,
         }),
-      isActiveTab: rule_category === RuleCategory.DOCUMENT,
+      isActive: rule_category === RuleCategory.DOCUMENT,
     },
   ];
 
@@ -303,19 +363,19 @@ const QAQuestionList = () => {
     router.push(`/wiki/list?${refreshedQueryStrings}`);
   };
 
-  const tabs: Tab[] = useHeaderTab({ headerTabType: 'wikiList', queryRefresh });
+  // const tabs: Tab[] = useHeaderTab({ headerTabType: 'wikiList', queryRefresh });
 
   const initialHeaderValue = {
     title: '社内Wiki',
-    activeTabName:
-      type === WikiType.RULES
-        ? '社内規則'
-        : type === WikiType.BOARD
-        ? '掲示板'
-        : type === WikiType.ALL_POSTAL
-        ? 'オール便'
-        : 'All',
-    tabs,
+    // activeTabName:
+    //   type === WikiType.RULES
+    //     ? '社内規則'
+    //     : type === WikiType.BOARD
+    //     ? '掲示板'
+    //     : type === WikiType.ALL_POSTAL
+    //     ? 'オール便'
+    //     : 'All',
+    // tabs,
     rightButtonName: 'Wikiを作成',
     onClickRightButton: () => router.push('/wiki/new'),
   };
@@ -339,16 +399,11 @@ const QAQuestionList = () => {
       <Head>
         <title>ボールド | Wiki</title>
       </Head>
-      {type === WikiType.RULES && (
-        <Box mb="24px">
-          <TopTabBar topTabBehaviorList={rulesTopTab} />
-        </Box>
-      )}
-      {type === WikiType.BOARD && (
-        <Box mb="24px">
-          <TopTabBar topTabBehaviorList={boardTopTab} />
-        </Box>
-      )}
+      <Box mb="24px">
+        <TopTabBar topTabBehaviorList={topTab} />
+      </Box>
+      {type === WikiType.RULES && <TabList tabs={rulesTab} />}
+      {type === WikiType.BOARD && <TabList tabs={boardTabs} />}
       <div className={qaListStyles.top_contents_wrapper}>
         <div className={qaListStyles.search_form_wrapper}>
           <SearchForm
@@ -400,7 +455,7 @@ const QAQuestionList = () => {
             </RadioGroup>
           ) : null}
           {questions?.wiki.map((q) => (
-            <WikiCard key={q.id} wiki={q} />
+            <WikiCard key={q.id} wiki={q} type={type} />
           ))}
         </div>
       </div>

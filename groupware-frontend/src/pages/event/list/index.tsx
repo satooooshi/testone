@@ -62,6 +62,7 @@ import { responseErrorMsgFactory } from 'src/utils/factory/responseErrorMsgFacto
 import { hideScrollbarCss } from 'src/utils/chakra/hideScrollBar.css';
 import { isEditableEvent } from 'src/utils/factory/isCreatableEvent';
 import { useAPIJoinEvent } from '@/hooks/api/event/useAPIJoinEvent';
+import TabList from '@/components/common/TabList';
 
 const localizer = momentLocalizer(moment);
 //@ts-ignore
@@ -419,7 +420,7 @@ const EventList = () => {
   const initialHeaderValue = {
     title: 'Events',
     activeTabName: activeTabName(),
-    tabs: tabs,
+    // tabs: tabs,
     rightButtonName: 'イベントを追加',
     onClickRightButton: () => setModalVisible(true),
     resetEventForm: () => setNewEvent(initialEventValue),
@@ -516,10 +517,12 @@ const EventList = () => {
         display="flex"
         flexDir="column"
         justifyContent="flex-start"
+        w="100%"
         mb="72px">
         <Box mb="24px">
           <TopTabBar topTabBehaviorList={topTabBehaviorList} />
         </Box>
+        <TabList tabs={tabs} activeTabName={activeTabName()} />
         {isCalendar && (
           <Box
             ref={calendarRef}
@@ -573,10 +576,11 @@ const EventList = () => {
                 toggleTag={onToggleTag}
               />
             </div>
-            <div className={eventListStyles.event_list_wrapper}>
+            <Box w="100%">
               {events?.events.length ? (
                 // <div className={eventListStyles.event_card__row}>
                 <SimpleGrid
+                  w="100%"
                   minChildWidth="360px"
                   maxChildWidth="420px"
                   spacing="20px">
@@ -596,7 +600,7 @@ const EventList = () => {
                   検索結果が見つかりませんでした
                 </p>
               ) : null}
-            </div>
+            </Box>
           </>
         )}
       </Box>

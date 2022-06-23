@@ -70,6 +70,7 @@
 .search_form_wrapper {
   display: flex;
   align-self: center;
+  width: 100%;
   @media (min-width: 768px) {
     margin-bottom: 16px;
   }
