@@ -9,7 +9,7 @@ import {useAPISaveLastReadChatTime} from '../../hooks/api/chat/useAPISaveLastRea
 import {useAPIGetLastReadChatTime} from '../../hooks/api/chat/useAPIGetLastReadChatTime';
 import {useEffect, useState} from 'react';
 
-const socket = io('https://www.aaaaaa.ml', {
+export const socket = io('https://www.aaaaaa.ml', {
   transports: ['websocket'],
   forceNew: true,
   upgrade: false,
@@ -35,11 +35,6 @@ export const useChatSocket = (
     });
   };
 
-  if (socket.disconnected) {
-    socket.connect();
-    console.log('socket connected.', baseURL);
-  }
-
   useEffect(() => {
     saveLastReadChatTime(room.id, {
       onSuccess: () => {
@@ -58,13 +53,14 @@ export const useChatSocket = (
       socket.emit('joinRoom', room.id.toString());
 
       socket.on('readMessageClient', async (senderId: string) => {
+        console.log('readMessageClient called', senderId, myself?.id, room.id);
         if (myself?.id && senderId && senderId !== `${myself?.id}`) {
-          console.log('readMessageClient called', senderId, myself.id, room.id);
           refetchLastReadChatTime();
         }
       });
 
       socket.on('msgToClient', async (sentMsgByOtherUsers: ChatMessage) => {
+        console.log('msgToClient', sentMsgByOtherUsers);
         if (sentMsgByOtherUsers.content) {
           if (
             sentMsgByOtherUsers?.sender?.id !== myself?.id &&
