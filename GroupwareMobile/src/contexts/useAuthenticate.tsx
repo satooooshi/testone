@@ -5,7 +5,6 @@ import {useAPIAuthenticate} from '../hooks/api/auth/useAPIAuthenticate';
 import {storage} from '../utils/url';
 import {Alert} from 'react-native';
 import {useAPIDeleteDevice} from '../hooks/api/notification/useAPIDeleteDevice';
-import {socket} from '../screens/Chat/socket';
 
 const AuthenticateContext = createContext({
   isAuthenticated: false,
@@ -40,12 +39,6 @@ export const AuthenticateProvider: React.FC = ({children}) => {
     },
   });
   const {mutate: deleteDevice} = useAPIDeleteDevice();
-
-  useEffect(() => {
-    if (socket.disconnected) {
-      socket.connect();
-    }
-  }, []);
 
   useEffect(() => {
     mutateAuthenticate();

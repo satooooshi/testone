@@ -16,7 +16,7 @@ import {baseURL} from '../../utils/url';
 import {ChatGroup} from '../../types';
 import _, {debounce} from 'lodash';
 import {useHandleBadge} from '../badge/useHandleBadge';
-import {socket} from '../../screens/Chat/socket';
+import {socket} from '../../utils/socket';
 
 const InvitationStatusContext = createContext({
   isCallAccepted: false,
