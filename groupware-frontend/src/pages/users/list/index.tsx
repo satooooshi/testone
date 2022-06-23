@@ -188,7 +188,7 @@ const UserList = () => {
               </div>
             </div>
             <SimpleGrid
-              columns={{ base: 1, lg: 2 }}
+              minChildWidth="520px"
               spacing="20px"
               w="80vw"
               mx="auto">
