@@ -907,7 +907,10 @@ const Chat: React.FC = () => {
             <TouchableOpacity
               key={e.name}
               onPress={() => handleStickerSelected(e.name)}>
-              <Image source={e.src} style={tailwind('w-20 h-20 m-2.5')} />
+              <Image
+                source={e.src}
+                style={tailwind('overflow-visible h-20 w-20 m-2.5')}
+              />
             </TouchableOpacity>
           ))}
         </View>
