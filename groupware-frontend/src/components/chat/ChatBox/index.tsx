@@ -801,6 +801,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
         }}>
         <Editor
           editorKey={'editor'}
+          stripPastedStyles={true}
           placeholder="メッセージを入力"
           editorState={editorState}
           onChange={onEditorChange}
