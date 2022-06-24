@@ -310,8 +310,8 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
   );
 
   const onSend = () => {
-    if (newChatMessage.content) {
-      let parsedMessage = newChatMessage.content;
+    let parsedMessage = newChatMessage?.content?.trimEnd();
+    if (parsedMessage) {
       for (const m of mentionedUserData) {
         const regexp = new RegExp(`\\s${m.name}|^${m.name}`, 'g');
         parsedMessage = parsedMessage.replace(regexp, `@${m.name}`);
@@ -319,7 +319,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
 
       sendChatMessage({
         ...newChatMessage,
-        content: parsedMessage.trimEnd(),
+        content: parsedMessage,
       });
     }
   };
@@ -989,7 +989,9 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
           <IoSend
             size={20}
             onClick={() => handleSubmit()}
-            color={newChatMessage.content ? blueColor : darkFontColor}
+            color={
+              newChatMessage.content?.trimEnd() ? blueColor : darkFontColor
+            }
           />
         )}
       </Link>
