@@ -44,6 +44,10 @@ import ReactionListModal from './ReactionListModal';
 import ReadUsersListModal from './ReadUsersListModal';
 import { useEffect } from 'react';
 import StickerMessage from './StickerMessage';
+import { useAuthenticate } from 'src/contexts/useAuthenticate';
+import { useAPIDeleteChatMessage } from '@/hooks/api/chat/useAPIDeleteChatMessage';
+import { io } from 'socket.io-client';
+import { baseURL } from 'src/utils/url';
 
 type ChatMessageItemProps = {
   message: ChatMessage;
@@ -57,6 +61,10 @@ type ChatMessageItemProps = {
   lastReadChatTime: LastReadChatTime[] | undefined;
 };
 
+const socket = io(baseURL, {
+  transports: ['websocket'],
+});
+
 const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
   usersInRoom,
   message,
@@ -68,9 +76,19 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
   searchedResultIds,
   lastReadChatTime,
 }) => {
+  const { mutate: deleteMessage } = useAPIDeleteChatMessage({
+    onSuccess: (data) => {
+      socket.emit('message', {
+        type: 'delete',
+        chatMessage: { ...data, isSender: false },
+      });
+    },
+  });
   const [messageState, setMessageState] = useState(message);
   const [visibleReadModal, setVisibleLastReadModal] = useState(false);
   const [reactionModal, setReactionModal] = useState(false);
+  const { user } = useAuthenticate();
+  const [editMessage, setEditMessage] = useState(false);
   const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
   const { mutate: saveReaction } = useAPISaveReaction();
   const { mutate: deleteReaction } = useAPIDeleteReaction();
@@ -263,6 +281,23 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
               onClick={() => reactionOpenerRef.current?.click()}>
               リアクション
             </MenuItem>
+            {messageState?.sender?.id === user?.id &&
+            messageState.type === ChatMessageType.TEXT ? (
+              <MenuItem value={'edit'} onClick={() => setEditMessage(true)}>
+                メッセージを編集
+              </MenuItem>
+            ) : null}
+            {messageState?.sender?.id === user?.id ? (
+              <MenuItem
+                value={'delete'}
+                onClick={() => {
+                  if (confirm('メッセージを削除してよろしいですか？')) {
+                    deleteMessage(messageState);
+                  }
+                }}>
+                <Text color="red">メッセージを削除</Text>
+              </MenuItem>
+            ) : null}
           </Menu>
         </>
       )}
@@ -348,6 +383,8 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
                   message={messageState}
                   confirmedSearchWord={confirmedSearchWord}
                   searchedResultIds={searchedResultIds}
+                  editMessage={editMessage}
+                  finishEdit={() => setEditMessage(false)}
                 />
               ) : messageState.type === ChatMessageType.CALL ? (
                 <CallMessage message={messageState} />

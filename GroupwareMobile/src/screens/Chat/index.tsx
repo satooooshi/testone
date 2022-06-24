@@ -20,6 +20,7 @@ import {
   Dropdown,
   Input,
   Image,
+  Box,
 } from 'react-native-magnus';
 import WholeContainer from '../../components/WholeContainer';
 import {useAPIGetMessages} from '../../hooks/api/chat/useAPIGetMessages';
@@ -32,6 +33,8 @@ import {
   ChatMessageReaction,
   ChatMessageType,
   FIleSource,
+  ImageSource,
+  SocketMessage,
   User,
 } from '../../types';
 import {uploadImageFromGallery} from '../../utils/cropImage/uploadImageFromGallery';
@@ -91,6 +94,8 @@ import {dateTimeFormatterFromJSDDate} from '../../utils/dateTimeFormatterFromJSD
 import {useAPIGetUpdatedMessages} from '../../hooks/api/chat/useAPIGetUpdatedMessages';
 import {useAPIGetExpiredUrlMessages} from '../../hooks/api/chat/useAPIGetExpiredUrlMessages';
 import {useChatSocket} from '../../utils/socket';
+import {useAPIUpdateChatMessage} from '../../hooks/api/chat/useAPIUpdateChatMessage';
+import {useAPIDeleteChatMessage} from '../../hooks/api/chat/useAPIDeleteChatMessage';
 
 const TopTab = createMaterialTopTabNavigator();
 
@@ -137,6 +142,7 @@ const Chat: React.FC = () => {
   const [longPressedMsg, setLongPressedMgg] = useState<ChatMessage>();
   const [reactionTarget, setReactionTarget] = useState<ChatMessage>();
   const [visibleStickerSelctor, setVisibleStickerSelector] = useState(false);
+  const [editMessage, setEditMessage] = useState(false);
   const {mutate: saveReaction} = useAPISaveReaction();
   const {width: windowWidth, height: windowHeight} = useWindowDimensions();
   const [footerHeight, setFooterHeight] = useState(0);
@@ -161,7 +167,9 @@ const Chat: React.FC = () => {
   };
   const socket = useChatSocket(room, refreshMessage, setMessages);
 
-  const {values, handleSubmit, setValues} = useFormik<Partial<ChatMessage>>({
+  const {values, handleSubmit, setValues, resetForm} = useFormik<
+    Partial<ChatMessage>
+  >({
     initialValues: {
       content: '',
       type: ChatMessageType.TEXT,
@@ -173,7 +181,13 @@ const Chat: React.FC = () => {
     onSubmit: submittedValues => {
       Keyboard.dismiss();
       if (submittedValues.content) {
-        sendChatMessage(submittedValues);
+        if (editMessage) {
+          updateChatMessage(submittedValues);
+          setEditMessage(false);
+          resetForm();
+        } else {
+          sendChatMessage(submittedValues);
+        }
       }
     },
   });
@@ -293,17 +307,12 @@ const Chat: React.FC = () => {
   const {mutate: sendChatMessage, isLoading: loadingSendMessage} =
     useAPISendChatMessage({
       onSuccess: sentMsg => {
-        socket.send(sentMsg);
+        socket.send({chatMessage: sentMsg, type: 'send'});
         setMessages(refreshMessage([sentMsg, ...messages]));
         if (sentMsg?.chatGroup?.id) {
           refetchRoomCard({id: sentMsg.chatGroup.id, type: ''});
         }
-        setValues(v => ({
-          ...v,
-          content: '',
-          type: ChatMessageType.TEXT,
-          replyParentMessage: undefined,
-        }));
+        resetForm();
       },
       onError: () => {
         Alert.alert(
@@ -311,6 +320,24 @@ const Chat: React.FC = () => {
         );
       },
     });
+
+  const {mutate: updateChatMessage} = useAPIUpdateChatMessage({
+    onSuccess: sentMsg => {
+      socket.send({
+        type: 'edit',
+        chatMessage: {...sentMsg, isSender: false},
+      });
+      resetForm();
+      setLongPressedMgg(undefined);
+    },
+    onError: () => {
+      Alert.alert(
+        'チャットの更新中にエラーが発生しました。\n時間をおいて再度実行してください。',
+      );
+    },
+  });
+
+  const {mutate: deleteMessage} = useAPIDeleteChatMessage();
 
   const {mutate: uploadFile, isLoading: loadingUploadFile} =
     useAPIUploadStorage();
@@ -551,13 +578,13 @@ const Chat: React.FC = () => {
   };
 
   const refetchDoesntExistMessages = (focused?: number) => {
-    if (!messages.length) {
-      return false;
+    if (!messages?.length) {
+      return;
     }
     const isExist = messages.filter(m => m.id === focused)?.length;
 
     if (!isExist) {
-      setAfter(focused);
+      setAfter(focused ? focused : 0);
       setInclude(true);
       return true;
     } else {
@@ -605,6 +632,33 @@ const Chat: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [focusedMessageID]);
 
+  const handleDeleteMessage = () => {
+    if (longPressedMsg) {
+      Alert.alert(
+        'メッセージを削除してよろしいですか？',
+        '',
+        [
+          {text: 'キャンセル', style: 'cancel'},
+          {
+            text: '削除する',
+            style: 'destructive',
+            onPress: () =>
+              deleteMessage(longPressedMsg, {
+                onSuccess: () => {
+                  socket.send({
+                    type: 'delete',
+                    chatMessage: longPressedMsg,
+                  });
+                  setLongPressedMgg(undefined);
+                },
+              }),
+          },
+        ],
+        {cancelable: false},
+      );
+    }
+  };
+
   const typeDropdown = (
     <Dropdown
       {...defaultDropdownProps}
@@ -641,6 +695,33 @@ const Chat: React.FC = () => {
             setLongPressedMgg(undefined);
           }}>
           コピー
+        </Dropdown.Option>
+      ) : (
+        <></>
+      )}
+      {longPressedMsg?.sender?.id === myself?.id &&
+      longPressedMsg?.type === ChatMessageType.TEXT ? (
+        <Dropdown.Option
+          {...defaultDropdownOptionProps}
+          value="edit"
+          onPress={() => {
+            setEditMessage(true);
+            if (longPressedMsg) {
+              setValues(longPressedMsg);
+            }
+          }}>
+          メッセージを編集
+        </Dropdown.Option>
+      ) : (
+        <></>
+      )}
+      {longPressedMsg?.sender?.id === myself?.id ? (
+        <Dropdown.Option
+          {...defaultDropdownOptionProps}
+          value="edit"
+          color="red"
+          onPress={() => handleDeleteMessage()}>
+          メッセージを削除
         </Dropdown.Option>
       ) : (
         <></>
@@ -852,6 +933,19 @@ const Chat: React.FC = () => {
                   setFooterHeight(nativeEvent.layout.y);
                 }}
               />
+              {editMessage ? (
+                <Box flexDir="row" alignItems="center" bg="gray">
+                  <Button
+                    bg="transparent"
+                    onPress={() => {
+                      setEditMessage(false);
+                      resetForm();
+                    }}>
+                    <Icon color="black" name="close" />
+                  </Button>
+                  <Text>メッセージ編集中</Text>
+                </Box>
+              ) : null}
               <ChatFooter
                 onUploadFile={handleUploadFile}
                 onUploadVideo={handleUploadVideo}
@@ -917,6 +1011,7 @@ const Chat: React.FC = () => {
                   setFooterHeight(nativeEvent.layout.y);
                 }}
               />
+              <Text>"メッセージ編集中"</Text>
               <ChatFooter
                 onUploadFile={handleUploadFile}
                 onUploadVideo={handleUploadVideo}

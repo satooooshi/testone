@@ -42,6 +42,7 @@ import {
   ChatMessage,
   ChatMessageType,
   RoomType,
+  SocketMessage,
   User,
 } from 'src/types';
 import { MenuValue } from '@/hooks/chat/useModalReducer';
@@ -460,6 +461,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
       setMinBefore(undefined);
       setInclude(false);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [room.id]);
 
   const isLoading = loadingSend || loadingUplaod;
