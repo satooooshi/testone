@@ -359,12 +359,14 @@ const Chat: React.FC = () => {
           return refreshMessage(
             m.map(eachMessage => {
               if (eachMessage.id === target.id) {
-                return {
+                const message = {
                   ...eachMessage,
                   reactions: eachMessage.reactions?.filter(
                     r => r.id !== reactionId,
                   ),
                 };
+                socket.send({type: 'edit', chatMessage: message});
+                return message;
               }
               return eachMessage;
             }),
@@ -391,12 +393,14 @@ const Chat: React.FC = () => {
         setMessages(m =>
           m.map(eachMessage => {
             if (eachMessage.id === savedReaction.chatMessage?.id) {
-              return {
+              const message = {
                 ...eachMessage,
                 reactions: eachMessage.reactions?.length
                   ? [...eachMessage.reactions, reactionAdded]
                   : [reactionAdded],
               };
+              socket.send({type: 'edit', chatMessage: message});
+              return message;
             }
             return eachMessage;
           }),

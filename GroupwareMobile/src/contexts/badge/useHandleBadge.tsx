@@ -50,10 +50,10 @@ export const BadgeProvider: React.FC = ({children}) => {
         for (const room of data.rooms) {
           count += room.unreadCount ? room.unreadCount : 0;
         }
-        // setChatUnreadCount(count);
-        // setChatGroups(r =>
-        //   page !== 1 && r.length ? [...r, ...data.rooms] : [...data.rooms],
-        // );
+        setChatUnreadCount(count);
+        setChatGroups(r =>
+          page !== 1 && r.length ? [...r, ...data.rooms] : [...data.rooms],
+        );
         if (data.rooms.length >= 20) {
           setPage(p => p + 1);
           setIsNeedRefetch(true);
