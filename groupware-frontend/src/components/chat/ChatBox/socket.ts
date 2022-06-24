@@ -62,6 +62,7 @@ export const useChatSocket = (
         }
       });
       socket.on('msgToClient', async (socketMessage: SocketMessage) => {
+        console.log('msgToClient called', socketMessage);
         if (!socketMessage.chatMessage) {
           return;
         }
@@ -70,7 +71,6 @@ export const useChatSocket = (
         }
         switch (socketMessage.type) {
           case 'send': {
-            // console.log('sent by other users', socketMessage.chatMessage.content);
             if (socketMessage.chatMessage.content) {
               if (!socketMessage.chatMessage?.isSender) {
                 saveLastReadChatTime(room.id, {
@@ -107,6 +107,7 @@ export const useChatSocket = (
             break;
           }
           case 'edit': {
+            console.log('edit called', socketMessage.chatMessage.content);
             setMessages((msgs) => {
               return msgs.map((m) =>
                 m.id === socketMessage.chatMessage.id
@@ -130,8 +131,8 @@ export const useChatSocket = (
       socket.removeAllListeners();
       setCurrentChatRoomId(undefined);
     },
-    send: (m: ChatMessage) => {
-      socket.emit('message', { ...m, isSender: false });
+    send: (m: SocketMessage) => {
+      socket.emit('message', m);
     },
     lastReadChatTime,
   };

@@ -50,8 +50,6 @@ const ChatDetail = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
-  console.log('----', id, currentRoom);
-
   const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
 
   const { mutate: leaveChatGroup } = useAPILeaveChatRoom({

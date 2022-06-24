@@ -231,7 +231,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
     useAPISendChatMessage({
       onSuccess: (data) => {
         setMessages([data, ...messages]);
-        socket.send(data);
+        socket.send({ chatMessage: data, type: 'send' });
         setNewChatMessage((m) => ({
           ...m,
           content: '',
