@@ -210,36 +210,6 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
     limit: '20',
   });
 
-  // const { refetch: refetchLatest } = useAPIGetMessages(
-  //   {
-  //     group: room.id,
-  //     limit: '10',
-  //   },
-  //   {
-  //     onSuccess: (latestData) => {
-  //       if (latestData?.length) {
-  //         const msgToAppend: ChatMessage[] = [];
-  //         for (const latest of latestData) {
-  //           if (!messages?.length || isRecent(latest, messages?.[0])) {
-  //             msgToAppend.push(latest);
-  //           }
-  //         }
-  //         if (msgToAppend.length) {
-  //           saveLastReadChatTime(room.id, {
-  //             onSuccess: () => {
-  //               // socket.emit('readReport', {
-  //               //   room: room.id.toString(),
-  //               //   senderId: user?.id,
-  //               // });
-  //             },
-  //           });
-  //           setMessages((m) => [...msgToAppend, ...m]);
-  //         }
-  //       }
-  //     },
-  //   },
-  // );
-
   const { refetch: searchMessages } = useAPISearchMessages(
     {
       group: room.id,

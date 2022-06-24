@@ -46,8 +46,7 @@ import { useEffect } from 'react';
 import StickerMessage from './StickerMessage';
 import { useAuthenticate } from 'src/contexts/useAuthenticate';
 import { useAPIDeleteChatMessage } from '@/hooks/api/chat/useAPIDeleteChatMessage';
-import { io } from 'socket.io-client';
-import { baseURL } from 'src/utils/url';
+import { socket } from '../ChatBox/socket';
 
 type ChatMessageItemProps = {
   message: ChatMessage;
@@ -60,10 +59,6 @@ type ChatMessageItemProps = {
   searchedResultIds?: (number | undefined)[];
   lastReadChatTime: LastReadChatTime[] | undefined;
 };
-
-const socket = io(baseURL, {
-  transports: ['websocket'],
-});
 
 const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
   usersInRoom,

@@ -9,8 +9,7 @@ import { replaceFullWidthSpace } from 'src/utils/replaceWidthSpace';
 import Linkify from 'react-linkify';
 import { componentDecorator } from 'src/utils/componentDecorator';
 import { useAPIUpdateChatMessage } from '@/hooks/api/chat/useAPIUpdateChatMessage';
-import { io } from 'socket.io-client';
-import { baseURL } from 'src/utils/url';
+import { socket } from '../../ChatBox/socket';
 
 type TextMessageProps = {
   message: ChatMessage;
@@ -19,10 +18,6 @@ type TextMessageProps = {
   editMessage: boolean;
   finishEdit: () => void;
 };
-
-const socket = io(baseURL, {
-  transports: ['websocket'],
-});
 
 const TextMessage: React.FC<TextMessageProps> = ({
   message,

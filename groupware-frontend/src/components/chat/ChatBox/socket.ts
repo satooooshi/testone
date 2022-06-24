@@ -9,7 +9,7 @@ import { ChatGroup, ChatMessage, SocketMessage } from 'src/types';
 // import { baseURL } from 'src/utils/url';
 
 // socket
-const socket = io('https://www.aaaaaa.ml:443', {
+export const socket = io('https://www.aaaaaa.ml:443', {
   transports: ['websocket'],
 });
 
