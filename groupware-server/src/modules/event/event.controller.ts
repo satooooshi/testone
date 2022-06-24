@@ -294,7 +294,7 @@ export class EventScheduleController {
     return await this.eventService.createComment(comment);
   }
 
-  @Cron(CronExpression.EVERY_MINUTE)
+  @Get('send-notif-events-starts-in-hour')
   async sendNotifEventsStartsInHour() {
     const eventsStartAtAnHourLater =
       await this.eventService.getEventsStartAtAnHourLater();
