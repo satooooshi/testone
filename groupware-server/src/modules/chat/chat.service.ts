@@ -18,6 +18,7 @@ import {
   CustomPushNotificationData,
   sendPushNotifToSpecificUsers,
 } from 'src/utils/notification/sendPushNotification';
+import { selectUserColumns } from 'src/utils/selectUserColumns';
 import { In, Repository } from 'typeorm';
 import { StorageService } from '../storage/storage.service';
 import {
@@ -111,13 +112,7 @@ export class ChatService {
       .createQueryBuilder('chat_groups')
       .leftJoin('chat_groups.members', 'member')
       .leftJoin('chat_groups.members', 'members')
-      .addSelect([
-        'members.id',
-        'members.firstName',
-        'members.lastName',
-        'members.avatarUrl',
-        'members.existence',
-      ])
+      .addSelect(selectUserColumns('members'))
       .leftJoin(
         'chat_groups.muteUsers',
         'muteUsers',
@@ -207,13 +202,7 @@ export class ChatService {
     const room = await this.chatGroupRepository
       .createQueryBuilder('chat_groups')
       .leftJoin('chat_groups.members', 'members')
-      .addSelect([
-        'members.id',
-        'members.firstName',
-        'members.lastName',
-        'members.avatarUrl',
-        'members.existence',
-      ])
+      .addSelect(selectUserColumns('members'))
       .leftJoin(
         'chat_groups.muteUsers',
         'muteUsers',
@@ -324,35 +313,17 @@ export class ChatService {
       .leftJoin('chat_messages.chatGroup', 'chat_group')
       .addSelect(['chat_group.id'])
       .leftJoin('chat_messages.sender', 'sender')
-      .addSelect([
-        'sender.id',
-        'sender.firstName',
-        'sender.lastName',
-        'sender.avatarUrl',
-        'sender.existence',
-      ])
+      .addSelect(selectUserColumns('sender'))
       .leftJoin('chat_messages.reactions', 'reactions')
       .leftJoin('reactions.user', 'user')
       .addSelect(['reactions.id', 'reactions.emoji'])
-      .addSelect([
-        'user.id',
-        'user.firstName',
-        'user.lastName',
-        'user.avatarUrl',
-        'user.existence',
-      ])
+      .addSelect(selectUserColumns('user'))
       .leftJoinAndSelect(
         'chat_messages.replyParentMessage',
         'replyParentMessage',
       )
       .leftJoin('replyParentMessage.sender', 'reply_sender')
-      .addSelect([
-        'reply_sender.id',
-        'reply_sender.firstName',
-        'reply_sender.lastName',
-        'reply_sender.avatarUrl',
-        'reply_sender.existence',
-      ])
+      .addSelect(selectUserColumns('reply_sender'))
       .where('chat_group.id = :chatGroupID', {
         chatGroupID: query.group,
       })
@@ -513,13 +484,7 @@ export class ChatService {
       .leftJoin('chat_groups.lastReadChatTime', 'lastReadChatTime')
       .addSelect(['lastReadChatTime.readTime'])
       .leftJoin('lastReadChatTime.user', 'user')
-      .addSelect([
-        'user.id',
-        'user.firstName',
-        'user.lastName',
-        'user.avatarUrl',
-        'user.existence',
-      ])
+      .addSelect(selectUserColumns('user'))
       .where('chat_groups.id = :roomId', { roomId: chatGroupId })
       .getOne();
     // const chatGroup = await this.chatGroupRepository.findOne(chatGroupId, {
