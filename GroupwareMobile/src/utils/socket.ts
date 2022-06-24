@@ -2,7 +2,7 @@ import {AppState, AppStateStatus} from 'react-native';
 import io from 'socket.io-client';
 import {useEffect, useState} from 'react';
 import {baseURL} from './url';
-import {ChatGroup, ChatMessage, ChatMessageType} from '../types';
+import {ChatGroup, ChatMessage, ChatMessageType, SocketMessage} from '../types';
 import {useHandleBadge} from '../contexts/badge/useHandleBadge';
 import {useAuthenticate} from '../contexts/useAuthenticate';
 import {useAPISaveLastReadChatTime} from '../hooks/api/chat/useAPISaveLastReadChatTime';
@@ -65,53 +65,80 @@ export const useChatSocket = (
           refetchLastReadChatTime();
         }
       });
-
-      socket.on('msgToClient', async (sentMsgByOtherUsers: ChatMessage) => {
-        console.log('msgToClient', sentMsgByOtherUsers);
-        if (sentMsgByOtherUsers.content) {
-          if (
-            sentMsgByOtherUsers?.sender?.id !== myself?.id &&
-            AppState.currentState === 'active'
-          ) {
-            saveLastReadChatTime(room.id, {
-              onSuccess: () => {
-                report();
-                handleEnterRoom(room.id);
-              },
-            });
-            refetchLastReadChatTime();
-          }
-          sentMsgByOtherUsers.createdAt = new Date(
-            sentMsgByOtherUsers.createdAt,
-          );
-          sentMsgByOtherUsers.updatedAt = new Date(
-            sentMsgByOtherUsers.updatedAt,
-          );
-          if (sentMsgByOtherUsers.sender?.id === myself?.id) {
-            sentMsgByOtherUsers.isSender = true;
-          }
-          // setImagesForViewing(i => [...i, {uri: sentMsgByOtherUsers.content}]);
-          if (sentMsgByOtherUsers.type === ChatMessageType.VIDEO) {
-            sentMsgByOtherUsers.thumbnail = await getThumbnailOfVideo(
-              sentMsgByOtherUsers.content,
-              sentMsgByOtherUsers.fileName,
-            );
-          }
-          if (isMounted) {
-            setMessages(msgs => {
+      socket.on('msgToClient', async (socketMessage: SocketMessage) => {
+        if (!socketMessage.chatMessage) {
+          return;
+        }
+        if (socketMessage.chatMessage?.sender?.id === myself?.id) {
+          socketMessage.chatMessage.isSender = true;
+        }
+        switch (socketMessage.type) {
+          case 'send': {
+            if (socketMessage.chatMessage.content) {
               if (
-                msgs.length &&
-                msgs[0].id !== sentMsgByOtherUsers.id &&
-                sentMsgByOtherUsers.chatGroup?.id === room.id
+                !socketMessage.chatMessage?.isSender &&
+                AppState.currentState === 'active'
               ) {
-                return refreshMessage([sentMsgByOtherUsers, ...msgs]);
-              } else if (sentMsgByOtherUsers.chatGroup?.id !== room.id) {
-                return refreshMessage(
-                  msgs.filter(m => m.id !== sentMsgByOtherUsers.id),
+                saveLastReadChatTime(room.id, {
+                  onSuccess: () => {
+                    report();
+                    handleEnterRoom(room.id);
+                  },
+                });
+                refetchLastReadChatTime();
+              }
+              socketMessage.chatMessage.createdAt = new Date(
+                socketMessage.chatMessage.createdAt,
+              );
+              socketMessage.chatMessage.updatedAt = new Date(
+                socketMessage.chatMessage.updatedAt,
+              );
+              if (socketMessage.chatMessage.sender?.id === myself?.id) {
+                socketMessage.chatMessage.isSender = true;
+              }
+              // setImagesForViewing(i => [...i, {uri: socketMessage.chatMessage.content}]);
+              if (socketMessage.chatMessage.type === ChatMessageType.VIDEO) {
+                socketMessage.chatMessage.thumbnail = await getThumbnailOfVideo(
+                  socketMessage.chatMessage.content,
+                  socketMessage.chatMessage.fileName,
                 );
               }
-              return refreshMessage(msgs);
+              if (isMounted) {
+                setMessages(msgs => {
+                  if (
+                    msgs.length &&
+                    msgs[0].id !== socketMessage.chatMessage.id &&
+                    socketMessage.chatMessage.chatGroup?.id === room.id
+                  ) {
+                    return refreshMessage([socketMessage.chatMessage, ...msgs]);
+                  } else if (
+                    socketMessage.chatMessage.chatGroup?.id !== room.id
+                  ) {
+                    return refreshMessage(
+                      msgs.filter(m => m.id !== socketMessage.chatMessage.id),
+                    );
+                  }
+                  return refreshMessage(msgs);
+                });
+              }
+            }
+            break;
+          }
+          case 'edit': {
+            setMessages(msgs => {
+              return msgs.map(m =>
+                m.id === socketMessage.chatMessage.id
+                  ? socketMessage.chatMessage
+                  : m,
+              );
             });
+            break;
+          }
+          case 'delete': {
+            setMessages(msgs => {
+              return msgs.filter(m => m.id !== socketMessage.chatMessage.id);
+            });
+            break;
           }
         }
       });
@@ -123,8 +150,8 @@ export const useChatSocket = (
       isMounted = false;
       setCurrentChatRoomId(undefined);
     },
-    send: (m: ChatMessage) => {
-      socket.emit('message', {...m, isSender: false});
+    send: (m: SocketMessage) => {
+      socket.emit('message', m);
     },
     report,
     lastReadChatTime,

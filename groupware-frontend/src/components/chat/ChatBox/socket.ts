@@ -5,7 +5,7 @@ import io from 'socket.io-client';
 import { useHandleBadge } from 'src/contexts/badge/useHandleBadge';
 import { useRoomRefetch } from 'src/contexts/chat/useRoomRefetch';
 import { useAuthenticate } from 'src/contexts/useAuthenticate';
-import { ChatGroup, ChatMessage } from 'src/types';
+import { ChatGroup, ChatMessage, SocketMessage } from 'src/types';
 // import { baseURL } from 'src/utils/url';
 
 // socket
@@ -61,38 +61,67 @@ export const useChatSocket = (
           refetchLastReadChatTime();
         }
       });
-
-      socket.on('msgToClient', async (sentMsgByOtherUsers: ChatMessage) => {
-        console.log('socket msgToClient----', sentMsgByOtherUsers);
-
-        if (sentMsgByOtherUsers.content) {
-          if (sentMsgByOtherUsers?.sender?.id !== user?.id) {
-            saveLastReadChatTime(room.id, {
-              onSuccess: () => report(),
-            });
-            refetchLastReadChatTime();
-          }
-          sentMsgByOtherUsers.createdAt = new Date(
-            sentMsgByOtherUsers.createdAt,
-          );
-          sentMsgByOtherUsers.updatedAt = new Date(
-            sentMsgByOtherUsers.updatedAt,
-          );
-          if (sentMsgByOtherUsers.sender?.id === user?.id) {
-            sentMsgByOtherUsers.isSender = true;
-          }
-          setMessages((msgs) => {
-            if (
-              msgs.length &&
-              msgs[0].id !== sentMsgByOtherUsers.id &&
-              sentMsgByOtherUsers.chatGroup?.id === room.id
-            ) {
-              return [sentMsgByOtherUsers, ...msgs];
-            } else if (sentMsgByOtherUsers.chatGroup?.id !== room.id) {
-              return msgs.filter((m) => m.id !== sentMsgByOtherUsers.id);
+      socket.on('msgToClient', async (socketMessage: SocketMessage) => {
+        if (!socketMessage.chatMessage) {
+          return;
+        }
+        if (socketMessage.chatMessage?.sender?.id === user?.id) {
+          socketMessage.chatMessage.isSender = true;
+        }
+        switch (socketMessage.type) {
+          case 'send': {
+            // console.log('sent by other users', socketMessage.chatMessage.content);
+            if (socketMessage.chatMessage.content) {
+              if (!socketMessage.chatMessage?.isSender) {
+                saveLastReadChatTime(room.id, {
+                  onSuccess: () => report(),
+                });
+                refetchLastReadChatTime();
+              }
+              socketMessage.chatMessage.createdAt = new Date(
+                socketMessage.chatMessage.createdAt,
+              );
+              socketMessage.chatMessage.updatedAt = new Date(
+                socketMessage.chatMessage.updatedAt,
+              );
+              if (socketMessage.chatMessage.sender?.id === user?.id) {
+                socketMessage.chatMessage.isSender = true;
+              }
+              setMessages((msgs) => {
+                if (
+                  msgs.length &&
+                  msgs[0].id !== socketMessage.chatMessage.id &&
+                  socketMessage.chatMessage.chatGroup?.id === room.id
+                ) {
+                  return [socketMessage.chatMessage, ...msgs];
+                } else if (
+                  socketMessage.chatMessage.chatGroup?.id !== room.id
+                ) {
+                  return msgs.filter(
+                    (m) => m.id !== socketMessage.chatMessage.id,
+                  );
+                }
+                return msgs;
+              });
             }
-            return msgs;
-          });
+            break;
+          }
+          case 'edit': {
+            setMessages((msgs) => {
+              return msgs.map((m) =>
+                m.id === socketMessage.chatMessage.id
+                  ? socketMessage.chatMessage
+                  : m,
+              );
+            });
+            break;
+          }
+          case 'delete': {
+            setMessages((msgs) => {
+              return msgs.filter((m) => m.id !== socketMessage.chatMessage.id);
+            });
+            break;
+          }
         }
       });
     },
