@@ -1011,7 +1011,19 @@ const Chat: React.FC = () => {
                   setFooterHeight(nativeEvent.layout.y);
                 }}
               />
-              <Text>"メッセージ編集中"</Text>
+              {editMessage ? (
+                <Box flexDir="row" alignItems="center" bg="gray">
+                  <Button
+                    bg="transparent"
+                    onPress={() => {
+                      setEditMessage(false);
+                      resetForm();
+                    }}>
+                    <Icon color="black" name="close" />
+                  </Button>
+                  <Text>メッセージ編集中</Text>
+                </Box>
+              ) : null}
               <ChatFooter
                 onUploadFile={handleUploadFile}
                 onUploadVideo={handleUploadVideo}
