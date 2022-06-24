@@ -7,7 +7,7 @@ import App from './src/App';
 import {name as appName} from './app.json';
 import 'intl';
 import 'intl/locale-data/jsonp/ja';
-import messaging from '@react-native-firebase/messaging';
+// import messaging from '@react-native-firebase/messaging';
 import AppFake from './src/AppFake';
 
 // messaging().setBackgroundMessageHandler(async remoteMessage => {
