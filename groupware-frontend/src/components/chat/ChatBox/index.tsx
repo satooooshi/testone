@@ -388,13 +388,6 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
     }
   };
 
-  // useEffect(() => {
-  //   setMessages([]);
-  //   setBefore(undefined);
-  //   setAfter(undefined);
-  //   refetchLatest();
-  // }, [refetchLatest, room]);
-
   useEffect(() => {
     if (fetchedPastMessages?.length) {
       const refreshedMessage = refreshMessage(fetchedPastMessages);

@@ -105,6 +105,10 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
     }
   }, [isScrollTarget, scrollToTarget]);
 
+  useEffect(() => {
+    setMessageState(message);
+  }, [message]);
+
   const readUsers = useMemo(() => {
     return lastReadChatTime
       ? lastReadChatTime
@@ -170,6 +174,13 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
     });
   };
 
+  const emitReaction = (message: ChatMessage) => {
+    socket.emit('message', {
+      type: 'edit',
+      chatMessage: { ...message, isSender: false },
+    });
+  };
+
   const handleDeleteReaction = (
     reaction: ChatMessageReaction,
     target: ChatMessage,
@@ -178,10 +189,11 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
       onSuccess: (reactionId) => {
         setMessageState((m) => {
           if (m.id === target.id) {
-            return {
+            const message = {
               ...m,
               reactions: m.reactions?.filter((r) => r.id !== reactionId),
             };
+            emitReaction(message);
           }
           return m;
         });
@@ -202,12 +214,14 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
         const reactionAdded = { ...savedReaction, isSender: true };
         setMessageState((m) => {
           if (m.id === savedReaction.chatMessage?.id) {
-            return {
+            const message = {
               ...m,
               reactions: m.reactions?.length
                 ? [...m.reactions, reactionAdded]
                 : [reactionAdded],
             };
+            emitReaction(message);
+            return message;
           }
           return m;
         });
