@@ -1,97 +1,5 @@
 @import '../variables.scss';
 
-.wrapper {
-  display: flex;
-  flex-direction: column;
-  width: 36vw;
-  background: $header_background_color;
-  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
-  @media (max-width: 1024px) {
-    width: 85vw;
-  }
-  &:hover {
-    cursor: pointer;
-  }
-}
-
-.top {
-  display: flex;
-  flex-direction: row;
-  align-items: flex-start;
-  width: 100%;
-  margin-bottom: 8px;
-  padding: 4px 8px 0 8px;
-}
-
-.avatar {
-  margin-right: 8px;
-}
-
-.bottom {
-  width: 100%;
-  padding-left: 8px;
-}
-
-.name {
-  font-weight: bold;
-  color: $dark_font_color;
-  font-size: 18px;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  overflow: hidden;
-  width: 100%;
-  margin-bottom: 4px;
-}
-
-.name_kana {
-  color: $dark_font_color;
-  font-size: 13px;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  overflow: hidden;
-  width: 100%;
-  margin-bottom: 4px;
-}
-
-.sub_info_text {
-  font-size: 14px;
-  display: flex;
-  flex-flow: row;
-  align-items: center;
-  justify-content: space-between;
-  width: 40%;
-  @media (max-width: 576px) {
-    font-size: 12px;
-    width: 100%;
-  }
-}
-
-.sub_info_wrapper {
-}
-
-.introduce_text_wrapper {
-  // height: 16px;
-}
-
-.introduce_text {
-  color: $dark_font_color;
-  font-size: 14px;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  overflow: hidden;
-  width: 100%;
-}
-
-.count_label_text {
-  // margin-right: 8px;
-}
-
-.count {
-  font-weight: bold;
-  color: $blue_color;
-  font-size: 18px;
-}
-
 .tag_item_wrapper {
   margin-right: 8px;
 }
@@ -112,13 +20,6 @@
   }
 }
 
-.tags_with_label_wrapper {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  margin-bottom: 4px;
-}
-
 .tags_label {
   margin-right: 8px;
   word-break: keep-all;
@@ -128,10 +29,4 @@
   @media (max-width: 768px) {
     width: 20%;
   }
-}
-
-.user_info_text {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  width: 100%;
 }
