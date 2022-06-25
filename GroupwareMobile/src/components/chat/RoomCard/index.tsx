@@ -126,7 +126,7 @@ const RoomCard: React.FC<RoomCardProps> = ({
             {room.isPinned && (
               <Icon
                 name="pin"
-                fontSize={26}
+                fontSize={20}
                 color="green500"
                 bg="white"
                 rounded="circle"
@@ -136,7 +136,7 @@ const RoomCard: React.FC<RoomCardProps> = ({
                 style={Platform.OS === 'android' && roomCardStyles.pinIcon}
                 position="absolute"
                 bottom={0}
-                right={10}
+                right={0}
               />
             )}
           </Div>
