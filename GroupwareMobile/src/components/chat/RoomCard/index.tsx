@@ -126,7 +126,7 @@ const RoomCard: React.FC<RoomCardProps> = ({
             {room.isPinned && (
               <Icon
                 name="pin"
-                fontSize={20}
+                fontSize={18}
                 color="green500"
                 bg="white"
                 rounded="circle"
