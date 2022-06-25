@@ -294,7 +294,6 @@ const Chat: React.FC = () => {
             now,
           );
           saveLastReadChatTime(room.id);
-          storage.set(`dateRefetchLatestInRoom${room.id}`, now);
           setMessages(m => {
             const updatedMessages = refreshMessage([...latestData, ...m]);
             return updatedMessages;
