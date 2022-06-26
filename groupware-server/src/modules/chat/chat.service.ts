@@ -573,17 +573,34 @@ export class ChatService {
     }
     const existGroup = await this.chatGroupRepository.findOne(
       message.chatGroup.id,
+      { relations: ['members'] },
     );
     if (!existGroup) {
       throw new BadRequestException('That group id is incorrect');
     }
     await this.chatMessageRepository.delete(message.id);
 
-    existGroup.updatedAt = new Date();
-    await this.chatGroupRepository.save({
-      ...existGroup,
-      updatedAt: new Date(),
-    });
+    const silentNotification: CustomPushNotificationData = {
+      title: '',
+      body: '',
+      custom: {
+        silent: 'silent',
+        type: 'deleteMessage',
+        screen: 'chat',
+        id: existGroup.id.toString(),
+        messageId: message.id.toString(),
+      },
+    };
+    await sendPushNotifToSpecificUsers(
+      existGroup.members.map((m) => m.id),
+      silentNotification,
+    );
+
+    // existGroup.updatedAt = new Date();
+    // await this.chatGroupRepository.save({
+    //   ...existGroup,
+    //   updatedAt: new Date(),
+    // });
   }
 
   public async joinChatGroup(userID: number, chatGroupID: number) {
