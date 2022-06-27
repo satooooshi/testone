@@ -575,8 +575,8 @@ const Navigator = () => {
                 console.log('messagesInStorage', messagesInStorage.length);
 
                 const jsonMessages = JSON.stringify(
-                  messagesInStorage.map(
-                    m => m.id !== notification.data.messageId,
+                  messagesInStorage.filter(
+                    m => m.id !== Number(notification.data.messageId),
                   ),
                 );
                 storage.set(
