@@ -29,7 +29,7 @@ export const BadgeProvider: React.FC = ({children}) => {
   const {user, currentChatRoomId} = useAuthenticate();
   const [page, setPage] = useState(1);
   const [isNeedRefetch, setIsNeedRefetch] = useState(false);
-  // const [completeRefetch, setCompleteRefetch] = useState(false);
+  const [completeRefetch, setCompleteRefetch] = useState(false);
   const [networkConnection, setNetworkConnection] = useState(true);
   const [editRoom, setEditRoom] = useState<ChatGroup>();
   // const [latestRefetchDate, setLatestRefetchDate] = useState<
@@ -60,7 +60,7 @@ export const BadgeProvider: React.FC = ({children}) => {
         } else {
           setIsNeedRefetch(false);
           setPage(1);
-          // setCompleteRefetch(true);
+          setCompleteRefetch(true);
         }
       },
       onError: () => {
