@@ -990,7 +990,11 @@ const Chat: React.FC = () => {
               setRenderMessageIndex(info.index);
             }}
             onEndReached={() => onScrollTopOnChat()}
-            keyExtractor={item => item.id.toString()}
+            keyExtractor={item => {
+              if (item.id) {
+                return item.id.toString();
+              }
+            }}
             renderItem={({item: message, index}) =>
               renderMessage(message, index)
             }
