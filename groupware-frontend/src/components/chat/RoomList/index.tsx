@@ -80,7 +80,7 @@ const RoomList: React.FC<RoomListProps> = ({ currentId, onClickRoom }) => {
       updatedAtLatestRoom: returnUpdatedAtLatest(),
     },
     {
-      refetchInterval: 10000,
+      refetchInterval: 5000,
       onSuccess: (data) => {
         const latestRooms = data.rooms;
         // console.log(
