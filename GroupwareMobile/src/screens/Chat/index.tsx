@@ -418,18 +418,21 @@ const Chat: React.FC = () => {
       {
         mediaType: 'photo',
         cropping: false,
+        multiple: true,
       },
       useCamera,
     );
     if (formData) {
       uploadFile(formData, {
-        onSuccess: imageURL => {
-          sendChatMessage({
-            content: imageURL[0],
-            fileName: fileName ? fileName : imageURL[0] + '.png',
-            type: ChatMessageType.IMAGE,
-            chatGroup: room,
-          });
+        onSuccess: imageURLs => {
+          for (let i = 0; i < imageURLs.length; i++) {
+            sendChatMessage({
+              content: imageURLs[i],
+              fileName: fileName?.[i] ? fileName[i] : imageURLs[i] + '.png',
+              type: ChatMessageType.IMAGE,
+              chatGroup: room,
+            });
+          }
         },
       });
     }
@@ -438,17 +441,19 @@ const Chat: React.FC = () => {
   const handleUploadVideo = async () => {
     const {formData, fileName} = await uploadImageFromGallery({
       mediaType: 'video',
-      multiple: false,
+      multiple: true,
     });
     if (formData) {
       uploadFile(formData, {
-        onSuccess: imageURL => {
-          sendChatMessage({
-            content: imageURL[0],
-            fileName: fileName ? fileName : imageURL[0] + '.mp4',
-            type: ChatMessageType.VIDEO,
-            chatGroup: room,
-          });
+        onSuccess: imageURLs => {
+          for (let i = 0; i < imageURLs.length; i++) {
+            sendChatMessage({
+              content: imageURLs[i],
+              fileName: fileName?.[i] ? fileName[i] : imageURLs[i] + '.mp4',
+              type: ChatMessageType.VIDEO,
+              chatGroup: room,
+            });
+          }
         },
       });
     }
