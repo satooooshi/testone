@@ -9,7 +9,7 @@ import {useAPISaveLastReadChatTime} from '../hooks/api/chat/useAPISaveLastReadCh
 import {useAPIGetLastReadChatTime} from '../hooks/api/chat/useAPIGetLastReadChatTime';
 import {getThumbnailOfVideo} from './getThumbnailOfVideo';
 
-export const socket = io('https://www.aaaaaa.ml', {
+export const socket = io('https://www.bbbbbb.ga', {
   transports: ['websocket'],
   forceNew: true,
   upgrade: false,
@@ -37,7 +37,7 @@ export const useChatSocket = (
   const connect = () => {
     if (socket.disconnected) {
       socket.connect();
-      console.log('socket connected.', baseURL);
+      console.log('socket connected.');
     }
   };
 
