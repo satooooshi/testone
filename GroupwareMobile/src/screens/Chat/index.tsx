@@ -138,7 +138,8 @@ const Chat: React.FC = () => {
   const [video, setVideo] = useState<FIleSource>();
   const {data: lastReadChatTime, refetch: refetchLastReadChatTime} =
     useAPIGetLastReadChatTime(room.id);
-  const [longPressedMsg, setLongPressedMgg] = useState<ChatMessage>();
+  const [longPressedMsg, setLongPressedMgg] =
+    useState<{message: ChatMessage; limitDate: Date}>();
   const [reactionTarget, setReactionTarget] = useState<ChatMessage>();
   const [visibleStickerSelctor, setVisibleStickerSelector] = useState(false);
   const [editMessage, setEditMessage] = useState(false);
@@ -651,11 +652,11 @@ const Chat: React.FC = () => {
             text: '削除する',
             style: 'destructive',
             onPress: () =>
-              deleteMessage(longPressedMsg, {
+              deleteMessage(longPressedMsg.message, {
                 onSuccess: () => {
                   socket.send({
                     type: 'delete',
-                    chatMessage: longPressedMsg,
+                    chatMessage: longPressedMsg.message,
                   });
                   setLongPressedMgg(undefined);
                 },
@@ -679,7 +680,7 @@ const Chat: React.FC = () => {
       <Dropdown.Option
         {...defaultDropdownOptionProps}
         onPress={() => {
-          setValues(v => ({...v, replyParentMessage: longPressedMsg}));
+          setValues(v => ({...v, replyParentMessage: longPressedMsg?.message}));
           setLongPressedMgg(undefined);
         }}
         value={'reply'}>
@@ -689,19 +690,21 @@ const Chat: React.FC = () => {
         {...defaultDropdownOptionProps}
         value="reaction"
         onPress={() => {
-          setReactionTarget(longPressedMsg);
+          setReactionTarget(longPressedMsg?.message);
           setLongPressedMgg(undefined);
         }}>
         リアクション
       </Dropdown.Option>
 
-      {longPressedMsg?.type === 'text' ? (
+      {longPressedMsg?.message?.type === 'text' ? (
         <Dropdown.Option
           {...defaultDropdownOptionProps}
           value="copy"
           onPress={() => {
             Clipboard.setString(
-              longPressedMsg?.content ? longPressedMsg?.content : '',
+              longPressedMsg?.message?.content
+                ? longPressedMsg?.message?.content
+                : '',
             );
             setLongPressedMgg(undefined);
           }}>
@@ -710,15 +713,17 @@ const Chat: React.FC = () => {
       ) : (
         <></>
       )}
-      {longPressedMsg?.sender?.id === myself?.id &&
-      longPressedMsg?.type === ChatMessageType.TEXT ? (
+      {longPressedMsg?.message &&
+      longPressedMsg?.message?.sender?.id === myself?.id &&
+      longPressedMsg?.message?.type === ChatMessageType.TEXT &&
+      longPressedMsg?.message.createdAt < longPressedMsg.limitDate ? (
         <Dropdown.Option
           {...defaultDropdownOptionProps}
           value="edit"
           onPress={() => {
             setEditMessage(true);
             if (longPressedMsg) {
-              setValues(longPressedMsg);
+              setValues(longPressedMsg?.message);
             }
           }}>
           メッセージを編集
@@ -726,7 +731,9 @@ const Chat: React.FC = () => {
       ) : (
         <></>
       )}
-      {longPressedMsg?.sender?.id === myself?.id ? (
+      {longPressedMsg?.message &&
+      longPressedMsg?.message?.sender?.id === myself?.id &&
+      longPressedMsg?.message.createdAt < longPressedMsg.limitDate ? (
         <Dropdown.Option
           {...defaultDropdownOptionProps}
           value="edit"
@@ -833,7 +840,11 @@ const Chat: React.FC = () => {
         isScrollTarget={focusedMessageID === message.id}
         onCheckLastRead={() => setSelectedMessageForCheckLastRead(message)}
         numbersOfRead={numbersOfRead(message)}
-        onLongPress={() => setLongPressedMgg(message)}
+        onLongPress={() => {
+          const date = new Date();
+          date.setDate(date.getHours() - 12);
+          setLongPressedMgg({message: message, limitDate: date});
+        }}
         onPressImage={() => showImageOnModal(message.content)}
         onPressVideo={() =>
           playVideoOnModal({uri: message.content, fileName: message.fileName})
