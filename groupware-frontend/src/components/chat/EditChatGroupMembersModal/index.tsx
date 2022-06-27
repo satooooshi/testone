@@ -141,7 +141,7 @@ const EditChatGroupMembersModal: React.FC<EditChatGroupMambersModalProps> = ({
           display="flex"
           mr="24px">
           <Text>メンバーを編集</Text>
-          {selectedUsersInModal.length !== 0 && (
+          {(selectedUsersInModal.length !== 0 || !isTalkRoom) && (
             <Button
               size="sm"
               flexDir="row"

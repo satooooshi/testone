@@ -1,6 +1,11 @@
-import {useFocusEffect, useNavigation} from '@react-navigation/native';
-import React, {useCallback, useEffect, useState} from 'react';
-import {Alert, TouchableHighlight, TouchableOpacity} from 'react-native';
+import {useNavigation} from '@react-navigation/native';
+import React, {useEffect, useState} from 'react';
+import {
+  Alert,
+  RefreshControl,
+  TouchableHighlight,
+  TouchableOpacity,
+} from 'react-native';
 import {Div, Icon, Input, ScrollDiv, Text} from 'react-native-magnus';
 import {ActivityIndicator} from 'react-native-paper';
 import tailwind from 'tailwind-rn';
@@ -33,7 +38,6 @@ const RoomList: React.FC = () => {
   const [creationType, setCreationType] = useState<RoomType>();
   const [searchedRooms, setSearchedRooms] = useState<ChatGroup[]>();
   const [chatRooms, setChatRooms] = useState<ChatGroup[]>(chatGroups);
-  const [isNeedRefetch, setIsNeedRefetch] = useState<boolean>(false);
 
   const {mutate: createGroup} = useAPISaveChatGroup({
     onSuccess: createdData => {

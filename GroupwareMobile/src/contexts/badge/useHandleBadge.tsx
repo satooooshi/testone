@@ -6,7 +6,6 @@ import {ChatGroup} from '../../types';
 import {useAuthenticate} from '../useAuthenticate';
 import NetInfo from '@react-native-community/netinfo';
 import {storage} from '../../utils/url';
-import {dateTimeFormatterFromJSDDate} from '../../utils/dateTimeFormatterFromJSDate';
 
 const BadgeContext = createContext({
   unreadChatCount: 0,
@@ -15,6 +14,7 @@ const BadgeContext = createContext({
   handleEnterRoom: (() => {}) as (roomId: number) => void,
   refetchRoomCard: (() => {}) as (data: {id: number; type: string}) => void,
   editChatGroup: (() => {}) as (room: ChatGroup) => void,
+  refreshRooms: () => {},
   isRoomsRefetching: false,
   isCompletedRefetchAllRooms: false,
 });
@@ -29,7 +29,7 @@ export const BadgeProvider: React.FC = ({children}) => {
   const {user, currentChatRoomId} = useAuthenticate();
   const [page, setPage] = useState(1);
   const [isNeedRefetch, setIsNeedRefetch] = useState(false);
-  const [completeRefetch, setCompleteRefetch] = useState(false);
+  // const [completeRefetch, setCompleteRefetch] = useState(false);
   const [networkConnection, setNetworkConnection] = useState(true);
   const [editRoom, setEditRoom] = useState<ChatGroup>();
   // const [latestRefetchDate, setLatestRefetchDate] = useState<
@@ -60,7 +60,7 @@ export const BadgeProvider: React.FC = ({children}) => {
         } else {
           setIsNeedRefetch(false);
           setPage(1);
-          setCompleteRefetch(true);
+          // setCompleteRefetch(true);
         }
       },
       onError: () => {
@@ -187,6 +187,10 @@ export const BadgeProvider: React.FC = ({children}) => {
     setEditRoom(room);
   };
 
+  const refreshRooms = () => {
+    setIsNeedRefetch(true);
+  };
+
   useEffect(() => {
     if (editRoom) {
       if (chatGroups.map(g => g.id).includes(editRoom.id)) {
@@ -228,6 +232,7 @@ export const BadgeProvider: React.FC = ({children}) => {
         editChatGroup,
         isRoomsRefetching: isLoading,
         isCompletedRefetchAllRooms: completeRefetch,
+        refreshRooms,
       }}>
       {children}
     </BadgeContext.Provider>

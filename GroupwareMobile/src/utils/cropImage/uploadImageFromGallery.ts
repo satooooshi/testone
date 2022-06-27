@@ -15,13 +15,12 @@ export const uploadImageFromGallery = async (
   useCamera = false,
 ): Promise<{
   formData: FormData | undefined;
-  mime: string | undefined;
-  fileName: string | undefined;
+  fileName: (string | undefined)[] | undefined;
 }> => {
   try {
-    let photo: ImageOrVideo;
+    let photo: ImageOrVideo[] = [];
     if (useCamera) {
-      photo = await ImagePicker.openCamera({
+      photo[0] = await ImagePicker.openCamera({
         width: 300,
         height: 400,
         forceJpg: true,
@@ -41,13 +40,16 @@ export const uploadImageFromGallery = async (
               compressImageMaxHeight: 1000,
             }
           : options;
-      photo = await ImagePicker.openPicker(optionsExec);
+      if (optionsExec.multiple) {
+        photo = await ImagePicker.openPicker(optionsExec && {multiple: true});
+      } else {
+        photo[0] = await ImagePicker.openPicker(optionsExec);
+      }
     }
-    const mime = photo.mime;
-    const fileName = photo.filename;
+    const fileName = photo.map(f => f.filename);
 
     const formData = imagePickerResponseToFormData(photo);
-    return {formData, mime, fileName};
+    return {formData, fileName};
   } catch (err) {
     const code = (err as {code: PickerErrorCode})?.code;
     switch (code) {
@@ -105,7 +107,7 @@ export const uploadImageFromGallery = async (
         break;
     }
 
-    return {formData: undefined, mime: undefined, fileName: undefined};
+    return {formData: undefined, fileName: undefined};
   }
 };
 

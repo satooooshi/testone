@@ -12,10 +12,13 @@
 // import { ChatGroup } from 'src/entities/chatGroup.entity';
 // import { ChatMessage } from 'src/entities/chatMessage.entity';
 
+<<<<<<< HEAD
 // type socketMessage = {
 //   chatMessage: ChatMessage;
 //   type: 'send' | 'edit' | 'delete';
 // };
+=======
+>>>>>>> develop
 // @WebSocketGateway()
 // export class ChatGateway
 //   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
@@ -37,6 +40,7 @@
 //     // this.logger.log(`Client connected: ${client.id}`);
 //     this.server.emit('msgToClient', 'connected');
 //   }
+<<<<<<< HEAD
 //   @SubscribeMessage('message')
 //   public async handleMessage(_: Socket, payload: socketMessage) {
 //     payload.chatMessage.isSender = false;
@@ -69,6 +73,44 @@
 //     client.emit('joinedRoom', room);
 //   }
 
+=======
+
+//   @SubscribeMessage('message')
+//   public async handleMessage(_: Socket, payload: ChatMessage) {
+//     // this.server.to(payload.chatGroup?.id.toString()).emit('badgeClient', {
+//     //   userId: payload.sender.id,
+//     //   groupId: payload.chatGroup.id,
+//     // });
+//     this.server
+//       .to(payload.chatGroup?.id.toString())
+//       .emit('msgToClient', { ...payload, isSender: false });
+//   }
+
+//   @SubscribeMessage('readReport')
+//   public async readMessage(
+//     _: Socket,
+//     data: { room: string; senderId: string },
+//   ) {
+//     this.server.to(data.room).emit('readMessageClient', data.senderId);
+//   }
+
+//   // @SubscribeMessage('editRoom')
+//   // public async editRoom(_: Socket, room: ChatGroup) {
+//   //   if (room.createdAt === room.updatedAt) {
+//   //     this.server.emit('editRoomClient', room);
+//   //   } else {
+//   //     this.server.to(room?.id.toString()).emit('editRoomClient', room);
+//   //   }
+//   // }
+
+//   @SubscribeMessage('joinRoom')
+//   public joinRoom(client: Socket, room: string): void {
+//     //@TODO dbにグループがなかったらエラーを吐く
+//     client.join(room);
+//     client.emit('joinedRoom', room);
+//   }
+
+>>>>>>> develop
 //   @SubscribeMessage('leaveRoom')
 //   public leaveRoom(client: Socket, room: string): void {
 //     client.leave(room);

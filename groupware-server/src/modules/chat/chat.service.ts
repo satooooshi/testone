@@ -308,8 +308,10 @@ export class ChatService {
     } = query;
     const limitNumber = Number(limit);
 
+    const startTime = Date.now();
     const existMessages = await this.chatMessageRepository
       .createQueryBuilder('chat_messages')
+<<<<<<< HEAD
       .leftJoin('chat_messages.chatGroup', 'chat_group')
       .addSelect(['chat_group.id'])
       .leftJoin('chat_messages.sender', 'sender')
@@ -318,6 +320,12 @@ export class ChatService {
       .leftJoin('reactions.user', 'user')
       .addSelect(['reactions.id', 'reactions.emoji'])
       .addSelect(selectUserColumns('user'))
+=======
+      .leftJoinAndSelect('chat_messages.chatGroup', 'chat_group')
+      .leftJoinAndSelect('chat_messages.sender', 'sender')
+      .leftJoinAndSelect('chat_messages.reactions', 'reactions')
+      .leftJoinAndSelect('reactions.user', 'user')
+>>>>>>> develop
       .leftJoinAndSelect(
         'chat_messages.replyParentMessage',
         'replyParentMessage',
@@ -354,6 +362,10 @@ export class ChatService {
       .take(limitNumber >= 0 ? limitNumber : 20)
       .orderBy('chat_messages.createdAt', after ? 'ASC' : 'DESC')
       .getMany();
+    const endTime = Date.now();
+    if (!dateRefetchLatest) {
+      console.log('get messages speed check', endTime - startTime);
+    }
 
     const messages = existMessages.map((m) => {
       m.reactions = m.reactions.map((r) => {

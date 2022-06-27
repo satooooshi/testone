@@ -97,10 +97,12 @@ const ChatAlbumForm: React.FC<ChatAlbumFormProps> = ({
           setUploading(false);
         },
         onSuccess: imageURLs => {
-          const newImages: Partial<ChatAlbumImage>[] = imageURLs.map(u => ({
-            imageURL: u,
-            name: fileName ? fileName : u + '.png',
-          }));
+          const newImages: Partial<ChatAlbumImage>[] = imageURLs.map(
+            (u, index) => ({
+              imageURL: u,
+              name: fileName?.[index] ? fileName[index] : u + '.png',
+            }),
+          );
           setValues(v => ({
             ...v,
             images: v.images?.length ? [...v.images, ...newImages] : newImages,

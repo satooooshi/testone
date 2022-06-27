@@ -210,6 +210,41 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
     limit: '20',
   });
 
+<<<<<<< HEAD
+=======
+  const { refetch: refetchLatest } = useAPIGetMessages(
+    {
+      group: room.id,
+      limit: '10',
+    },
+    {
+      refetchInterval: 1000,
+      onSuccess: (latestData) => {
+        refetchLastReadChatTime();
+        if (latestData?.length) {
+          const msgToAppend: ChatMessage[] = [];
+          for (const latest of latestData) {
+            if (!messages?.length || isRecent(latest, messages?.[0])) {
+              msgToAppend.push(latest);
+            }
+          }
+          if (msgToAppend.length) {
+            saveLastReadChatTime(room.id, {
+              onSuccess: () => {
+                // socket.emit('readReport', {
+                //   room: room.id.toString(),
+                //   senderId: user?.id,
+                // });
+              },
+            });
+            setMessages((m) => [...msgToAppend, ...m]);
+          }
+        }
+      },
+    },
+  );
+
+>>>>>>> develop
   const { refetch: searchMessages } = useAPISearchMessages(
     {
       group: room.id,
@@ -250,17 +285,19 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
   const { mutate: uploadFiles, isLoading: loadingUplaod } = useAPIUploadStorage(
     {
       onSuccess: (fileURLs, requestFileURLs) => {
-        const type = isImage(requestFileURLs[0].name)
-          ? ChatMessageType.IMAGE
-          : isVideo(requestFileURLs[0].name)
-          ? ChatMessageType.VIDEO
-          : ChatMessageType.OTHER_FILE;
-        sendChatMessage({
-          content: fileURLs[0],
-          fileName: requestFileURLs[0].name,
-          chatGroup: newChatMessage.chatGroup,
-          type,
-        });
+        for (let i = 0; i < fileURLs.length; i++) {
+          const type = isImage(requestFileURLs[i].name)
+            ? ChatMessageType.IMAGE
+            : isVideo(requestFileURLs[i].name)
+            ? ChatMessageType.VIDEO
+            : ChatMessageType.OTHER_FILE;
+          sendChatMessage({
+            content: fileURLs[i],
+            fileName: requestFileURLs[i].name,
+            chatGroup: newChatMessage.chatGroup,
+            type,
+          });
+        }
         messageWrapperDivRef.current &&
           messageWrapperDivRef.current.scrollTo({ top: 0 });
       },
@@ -268,12 +305,13 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
   );
 
   const onSend = () => {
-    if (newChatMessage.content) {
-      let parsedMessage = newChatMessage.content;
+    let parsedMessage = newChatMessage?.content?.trimEnd();
+    if (parsedMessage) {
       for (const m of mentionedUserData) {
         const regexp = new RegExp(`\\s${m.name}|^${m.name}`, 'g');
         parsedMessage = parsedMessage.replace(regexp, `@${m.name}`);
       }
+
       sendChatMessage({
         ...newChatMessage,
         content: parsedMessage,
@@ -772,7 +810,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
           onChange={onEditorChange}
           plugins={plugins}
           ref={editorRef}
-          handleReturn={(e) => {
+          keyBindingFn={(e) => {
             if (e.ctrlKey !== e.metaKey && e.key === 'Enter') {
               onSend();
               return 'handled';
@@ -781,7 +819,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
               setEditorState(RichUtils.insertSoftNewline(editorState));
               return 'handled';
             }
-            return 'not-handled';
+            return getDefaultKeyBinding(e);
           }}
         />
         <div className={suggestionStyles.suggestion_wrapper}>
@@ -868,7 +906,9 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
           <IoSend
             size={20}
             onClick={() => handleSubmit()}
-            color={newChatMessage.content ? blueColor : darkFontColor}
+            color={
+              newChatMessage.content?.trimEnd() ? blueColor : darkFontColor
+            }
           />
         )}
       </Link>
