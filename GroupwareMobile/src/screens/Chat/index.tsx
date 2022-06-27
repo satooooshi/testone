@@ -423,7 +423,7 @@ const Chat: React.FC = () => {
     );
     if (formData) {
       uploadFile(formData, {
-        onSuccess: imageURLs => {
+        onSuccess: async imageURLs => {
           for (let i = 0; i < imageURLs.length; i++) {
             sendChatMessage({
               content: imageURLs[i],
@@ -431,6 +431,7 @@ const Chat: React.FC = () => {
               type: ChatMessageType.IMAGE,
               chatGroup: room,
             });
+            await new Promise(r => setTimeout(r, 100));
           }
         },
       });
