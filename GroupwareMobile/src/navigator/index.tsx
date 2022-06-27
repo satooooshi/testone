@@ -549,25 +549,12 @@ const Navigator = () => {
               id: notification.data?.id,
               type: notification.data.type,
             });
-            console.log(
-              'notifi========',
-              notification.data?.id,
-              user?.id,
-              notification?.data?.type === 'deleteMessage',
-              notification.data.messageId,
-            );
             if (
               notification?.data?.type === 'deleteMessage' &&
               notification.data.messageId
             ) {
               const storageData = storage.getString(
                 `messagesIntRoom${notification.data?.id}user${user?.id}`,
-              );
-              console.log(
-                'storageData',
-                notification.data?.id,
-                user?.id,
-                storageData,
               );
               if (storageData) {
                 const messagesInStorage: ChatMessage[] =
