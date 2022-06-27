@@ -666,7 +666,10 @@ const Chat: React.FC = () => {
     <Dropdown
       {...defaultDropdownProps}
       title="アクションを選択"
-      onBackdropPress={() => typeDropdownRef.current?.close()}
+      onBackdropPress={() => {
+        typeDropdownRef.current?.close();
+        setLongPressedMgg(undefined);
+      }}
       ref={typeDropdownRef}>
       <Dropdown.Option
         {...defaultDropdownOptionProps}
