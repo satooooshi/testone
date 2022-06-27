@@ -224,7 +224,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
       limit: '10',
     },
     {
-      refetchInterval: 5000,
+      refetchInterval: 1000,
       onSuccess: (latestData) => {
         refetchLastReadChatTime();
         if (latestData?.length) {
