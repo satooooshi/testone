@@ -22,7 +22,8 @@ const TopTabBar: React.FC<TopTabBarProps> = ({ topTabBehaviorList }) => {
       display="flex"
       flexDir="row"
       alignItems="center"
-      w={isSmallerThan768 ? '100vw' : '80vw'}
+      w="100%"
+      // w={isSmallerThan768 ? '100vw' : '80vw'}
       px={isSmallerThan768 ? '5%' : undefined}
       h="40px"
       borderBottomWidth={1}

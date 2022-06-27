@@ -132,6 +132,8 @@ const HeaderWithTab: React.FC<HeaderProps> = ({
         <Box
           w="100%"
           px="2%"
+          maxWidth="1000px"
+          overflowX="auto"
           display="flex"
           flexDir="row"
           alignItems="center"
