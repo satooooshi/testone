@@ -33,7 +33,6 @@ import {
   ChatMessageReaction,
   ChatMessageType,
   FIleSource,
-  ImageSource,
   SocketMessage,
   User,
 } from '../../types';

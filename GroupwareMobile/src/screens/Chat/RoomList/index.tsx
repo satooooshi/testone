@@ -33,6 +33,7 @@ const RoomList: React.FC = () => {
     editChatGroup,
     isRoomsRefetching,
     isCompletedRefetchAllRooms,
+    refreshRooms,
   } = useHandleBadge();
   const {selectedUserRole, filteredUsers} = useUserRole('All', users);
   const [creationType, setCreationType] = useState<RoomType>();
@@ -98,6 +99,10 @@ const RoomList: React.FC = () => {
   const onPressRightButton = () => {
     // navigation.navigate('ChatStack', {screen: 'NewRoom'});
     setRoomTypeSelector(true);
+  };
+
+  const refreshRoomList = () => {
+    refreshRooms();
   };
 
   return (
@@ -207,7 +212,11 @@ const RoomList: React.FC = () => {
           }
         />
         {chatRooms.length ? (
-          <ScrollDiv h={'80%'}>
+          <ScrollDiv
+            h={'80%'}
+            refreshControl={
+              <RefreshControl refreshing={false} onRefresh={refreshRoomList} />
+            }>
             {(searchedRooms ?? chatRooms).map(room => {
               return (
                 <Div key={room.id} mb="sm">
