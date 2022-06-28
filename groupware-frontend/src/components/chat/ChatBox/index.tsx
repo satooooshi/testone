@@ -4,19 +4,10 @@ import {
   useMediaQuery,
   Text,
   Link,
-  Image,
   Spinner,
   Input,
   InputGroup,
   InputRightElement,
-  Portal,
-  PopoverBody,
-  PopoverCloseButton,
-  PopoverContent,
-  PopoverHeader,
-  SimpleGrid,
-  Popover,
-  PopoverTrigger,
 } from '@chakra-ui/react';
 import { MentionData } from '@draft-js-plugins/mention';
 import { blueColor, darkFontColor } from 'src/utils/colors';
@@ -55,6 +46,7 @@ import React, {
   useCallback,
 } from 'react';
 import ChatMessageItem from '../ChatMessageItem';
+import Sticker from '../Sticker';
 import { IoCloseSharp, IoSend } from 'react-icons/io5';
 import { FiFileText } from 'react-icons/fi';
 import createMentionPlugin from '@draft-js-plugins/mention';
@@ -86,7 +78,7 @@ import suggestionStyles from '@/styles/components/Suggestion.module.scss';
 import { useHandleBadge } from 'src/contexts/badge/useHandleBadge';
 import { useAPISearchMessages } from '@/hooks/api/chat/useAPISearchMessages';
 import { removeHalfWidthSpace } from 'src/utils/replaceWidthSpace';
-import { reactionStickers } from 'src/utils/reactionStickers';
+
 import { BiSmile } from 'react-icons/bi';
 import { valueScaleCorrection } from 'framer-motion/types/render/dom/projection/scale-correction';
 import { useChatSocket } from './socket';
@@ -337,13 +329,16 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
     setNewChatMessage((v) => ({ ...v, content: markdownString }));
   };
 
-  const handleStickerSelected = (sticker?: string) => {
-    sendChatMessage({
-      content: sticker,
-      chatGroup: newChatMessage.chatGroup,
-      type: ChatMessageType.STICKER,
-    });
-  };
+  const handleStickerSelected = useCallback(
+    (sticker?: string) => {
+      sendChatMessage({
+        content: sticker,
+        chatGroup: newChatMessage.chatGroup,
+        type: ChatMessageType.STICKER,
+      });
+    },
+    [sendChatMessage, newChatMessage.chatGroup],
+  );
 
   const nameOfEmptyNameGroup = (members?: User[]): string => {
     if (!members?.length) {
@@ -507,6 +502,22 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
       top: topOffset,
     });
   }, []);
+
+  const onClickReply = useCallback((m: ChatMessage) => {
+    setNewChatMessage((pre) => ({
+      ...pre,
+      replyParentMessage: m,
+    }));
+  }, []);
+  const onClickImage = useCallback((m: ChatMessage) => {
+    if (m.type === ChatMessageType.IMAGE) {
+      setSelectedImageURL(m.content);
+    }
+  }, []);
+
+  const searchedResultIds = useMemo(() => {
+    return searchedResults?.map((s) => s.id);
+  }, [searchedResults]);
 
   const isPersonal = room.roomType === RoomType.PERSONAL;
 
@@ -685,20 +696,11 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
                 key={m.id}
                 message={m}
                 confirmedSearchWord={confirmedSearchWord}
-                searchedResultIds={searchedResults?.map((s) => s.id)}
+                searchedResultIds={searchedResultIds}
                 lastReadChatTime={socket.lastReadChatTime}
                 // readUsers={readUsers[i] ? readUsers[i] : []}
-                onClickReply={() =>
-                  setNewChatMessage((pre) => ({
-                    ...pre,
-                    replyParentMessage: m,
-                  }))
-                }
-                onClickImage={() => {
-                  if (m.type === ChatMessageType.IMAGE) {
-                    setSelectedImageURL(m.content);
-                  }
-                }}
+                onClickReply={onClickReply}
+                onClickImage={onClickImage}
               />
             ))}
           </>
@@ -799,54 +801,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
           />
         </div>
       </Box>
-      <Popover closeOnBlur={false} placement="top-start">
-        {({ onClose }) => (
-          <>
-            <PopoverTrigger>
-              <Link
-                color={darkFontColor}
-                position="absolute"
-                zIndex={1}
-                bottom={'8px'}
-                cursor="pointer"
-                right="90px">
-                <BiSmile size={20} color={darkFontColor} />
-              </Link>
-            </PopoverTrigger>
-            <Portal>
-              <PopoverContent>
-                <PopoverHeader border="0">
-                  <PopoverCloseButton />
-                </PopoverHeader>
-
-                <PopoverBody>
-                  <SimpleGrid columns={3}>
-                    {reactionStickers.map((e) => (
-                      <Fragment key={e.name}>
-                        <a
-                          onClick={() => {
-                            handleStickerSelected(e.name);
-                            onClose();
-                          }}>
-                          <Box display="flex" maxW="300px" maxH={'300px'}>
-                            <Image
-                              src={e.src}
-                              w={100}
-                              h={100}
-                              padding={2}
-                              alt="送信された画像"
-                            />
-                          </Box>
-                        </a>
-                      </Fragment>
-                    ))}
-                  </SimpleGrid>
-                </PopoverBody>
-              </PopoverContent>
-            </Portal>
-          </>
-        )}
-      </Popover>
+      <Sticker handleStickerSelected={handleStickerSelected} />
       <Link
         {...getRootProps()}
         color={darkFontColor}
