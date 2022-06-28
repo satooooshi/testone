@@ -474,10 +474,9 @@ const Chat: React.FC = () => {
     const formData = new FormData();
     formData.append('files', {
       name: res.name,
-      uri: normalizeURL(res.uri),
+      uri: Platform.OS === 'ios' ? normalizeURL(res.uri) : res.uri,
       type: res.type,
     });
-    uploadFile(formData);
     if (formData) {
       uploadFile(formData, {
         onSuccess: imageURL => {
