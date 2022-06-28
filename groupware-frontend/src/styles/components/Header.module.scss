@@ -65,9 +65,9 @@
   background: #f3f6fb;
   // background: $white_color;
   height: max(56px, 2.4vw);
+  width: 100%;
 
   @media (max-width: 1024px) {
-    width: 88vw;
     height: 7vh;
     padding: 0 10%;
     overflow-x: scroll;
@@ -78,7 +78,6 @@
     }
   }
   @media (max-width: 768px) {
-    width: 100vw;
     height: 7vh;
     padding: 0 10%;
     overflow-x: scroll;
@@ -90,8 +89,8 @@
   }
 
   @media (min-width: 768px) {
-    padding-left: 48px;
-    padding-right: 48px;
+    padding-left: 2%;
+    padding-right: 2%;
   }
 }
 

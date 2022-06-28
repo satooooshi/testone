@@ -399,7 +399,7 @@ const QAQuestionList = () => {
       <Head>
         <title>ボールド | Wiki</title>
       </Head>
-      <Box mb="24px">
+      <Box w="100%" mb="24px">
         <TopTabBar topTabBehaviorList={topTab} />
       </Box>
       {type === WikiType.RULES && <TabList tabs={rulesTab} />}

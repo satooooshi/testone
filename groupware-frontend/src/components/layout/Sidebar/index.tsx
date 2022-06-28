@@ -119,7 +119,7 @@ const Sidebar: React.FC<SidebarProps> = ({
             iconName={SidebarScreenName.EVENT}
           />
           <LinkWithIcon
-            screenName="/wiki"
+            screenName="/wiki/list?page=1&tag=&word=&status=undefined&type="
             icon={
               <AiOutlineGlobal
                 className={iconClass(activeScreenName === SidebarScreenName.QA)}

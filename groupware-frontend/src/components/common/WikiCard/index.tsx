@@ -76,6 +76,8 @@ const WikiCard: React.FC<WikiCardProps> = ({ wiki, type }) => {
   return (
     <Box
       w="100%"
+      // mx={isSmallerThan768 ? '48px' : '0px'}
+      // minW="700px"
       // minH="104px"
       shadow="md"
       borderWidth={1}
@@ -248,6 +250,7 @@ const WikiCard: React.FC<WikiCardProps> = ({ wiki, type }) => {
           }></Box>
       </Box>
       <Link
+        boxSizing="border-box"
         href={`/wiki/detail/${wiki.id}`}
         h="100%"
         ml="auto"

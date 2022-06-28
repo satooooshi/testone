@@ -39,6 +39,7 @@ body {
   font-family: '游ゴシック体', YuGothic, '游ゴシック', 'Yu Gothic', sans-serif;
   line-height: 100%;
   background-color: $global_base_color;
+  overflow-x: hidden;
 }
 h1,
 p,
