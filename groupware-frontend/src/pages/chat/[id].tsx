@@ -98,7 +98,7 @@ const ChatDetail = () => {
         flexDir="row"
         h="83vh"
         justifyContent="center">
-        {!isSmallerThan768 && (
+        {!isSmallerThan768 ? (
           <>
             <Box w="30vw">
               <RoomList
@@ -129,7 +129,9 @@ const ChatDetail = () => {
               </Box>
             )}
           </>
-        )}
+        ) : currentRoom ? (
+          <ChatBox room={currentRoom} onMenuClicked={handleMenuSelected} />
+        ) : null}
       </Box>
     </ChatLayout>
   );
