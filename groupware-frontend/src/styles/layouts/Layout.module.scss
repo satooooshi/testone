@@ -11,13 +11,9 @@
 
 .right_contents {
   width: 100%;
-  max-width: 1000px;
-  margin-left: auto;
-  margin-right: auto;
   display: flex;
   flex-direction: column;
   overflow-x: scroll;
-  margin-left: auto;
   @media (min-width: 768px) {
     padding-left: max(94px, 4vw);
   }
@@ -26,14 +22,17 @@
 .main {
   width: 100%;
   height: 100%;
+  margin-right: auto;
+  margin-left: auto;
 
+  max-width: 1600px;
   // overflow-x: scroll;
   display: flex;
   flex-direction: column;
   align-items: center;
   // box-sizing: border-box;
-  padding-left: 3%;
-  padding-right: 3%;
+  padding-left: 4%;
+  padding-right: 4%;
   padding-bottom: 50px;
   // @media (min-width: 768px) {
   //   padding-left: 200px;
