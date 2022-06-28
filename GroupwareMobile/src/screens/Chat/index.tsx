@@ -468,16 +468,18 @@ const Chat: React.FC = () => {
         return url;
       }
     };
+    ('content://com.android.providers.media.documents/document/image%3A77');
     const res = await DocumentPicker.pickSingle({
       type: [DocumentPicker.types.allFiles],
     });
     const formData = new FormData();
+    console.log('---uri', res.uri, normalizeURL(res.uri));
+
     formData.append('files', {
       name: res.name,
-      uri: normalizeURL(res.uri),
+      uri: Platform.OS === 'ios' ? normalizeURL(res.uri) : res.uri,
       type: res.type,
     });
-    uploadFile(formData);
     if (formData) {
       uploadFile(formData, {
         onSuccess: imageURL => {
