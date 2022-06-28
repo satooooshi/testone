@@ -48,66 +48,6 @@ const QAQuestionList = () => {
   const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
   const { data: tags } = useAPIGetTag();
 
-  const topTab: TopTabBehavior[] = [
-    {
-      tabName: '全て',
-      onClick: () => {
-        {
-          if (queryRefresh)
-            queryRefresh({
-              type: undefined,
-              rule_category: undefined,
-              board_category: undefined,
-            });
-        }
-      },
-      isActiveTab: type === undefined,
-    },
-    {
-      tabName: '社内規則',
-      onClick: () => {
-        {
-          if (queryRefresh)
-            queryRefresh({
-              type: WikiType.RULES,
-              rule_category: RuleCategory.PHILOSOPHY,
-              board_category: undefined,
-            });
-        }
-      },
-      isActiveTab: type === WikiType.RULES,
-    },
-    {
-      tabName: 'オール便',
-      onClick: () => {
-        {
-          if (queryRefresh)
-            queryRefresh({
-              page: '1',
-              type: WikiType.ALL_POSTAL,
-              rule_category: undefined,
-              board_category: undefined,
-            });
-        }
-      },
-      isActiveTab: type === WikiType.ALL_POSTAL,
-    },
-    {
-      tabName: '掲示板',
-      onClick: () => {
-        {
-          if (queryRefresh)
-            queryRefresh({
-              page: '1',
-              type: WikiType.BOARD,
-              rule_category: undefined,
-            });
-        }
-      },
-      isActiveTab: type === WikiType.BOARD,
-    },
-  ];
-
   const boardTabs: Tab[] = [
     {
       name: 'All',
@@ -303,6 +243,7 @@ const QAQuestionList = () => {
   //     isActiveTab: status === 'resolved',
   //   },
   // ];
+
   const rulesTab: Tab[] = [
     {
       name: '会社理念',
@@ -363,21 +304,23 @@ const QAQuestionList = () => {
     router.push(`/wiki/list?${refreshedQueryStrings}`);
   };
 
-  // const tabs: Tab[] = useHeaderTab({ headerTabType: 'wikiList', queryRefresh });
+  const tabs: Tab[] = useHeaderTab({
+    headerTabType: 'wikiList',
+    queryRefresh,
+    onCreateClicked: () => router.push('/wiki/new'),
+  });
 
   const initialHeaderValue = {
     title: '社内Wiki',
-    // activeTabName:
-    //   type === WikiType.RULES
-    //     ? '社内規則'
-    //     : type === WikiType.BOARD
-    //     ? '掲示板'
-    //     : type === WikiType.ALL_POSTAL
-    //     ? 'オール便'
-    //     : 'All',
-    // tabs,
-    rightButtonName: 'Wikiを作成',
-    onClickRightButton: () => router.push('/wiki/new'),
+    activeTabName:
+      type === WikiType.RULES
+        ? '社内規則'
+        : type === WikiType.BOARD
+        ? '掲示板'
+        : type === WikiType.ALL_POSTAL
+        ? 'オール便'
+        : 'All',
+    tabs,
   };
 
   useEffect(() => {
@@ -399,9 +342,9 @@ const QAQuestionList = () => {
       <Head>
         <title>ボールド | Wiki</title>
       </Head>
-      <Box w="100%" mb="24px">
+      {/* <Box w="100%" mb="24px">
         <TopTabBar topTabBehaviorList={topTab} />
-      </Box>
+      </Box> */}
       {type === WikiType.RULES && <TabList tabs={rulesTab} />}
       {type === WikiType.BOARD && <TabList tabs={boardTabs} />}
       <div className={qaListStyles.top_contents_wrapper}>

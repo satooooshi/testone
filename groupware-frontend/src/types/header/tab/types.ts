@@ -10,7 +10,7 @@ export enum EventTab {
 
 export type Tab =
   | {
-      type?: 'edit' | 'delete';
+      type?: 'create' | 'edit' | 'delete';
       name: string;
       onClick?: () => void;
       color?: string;

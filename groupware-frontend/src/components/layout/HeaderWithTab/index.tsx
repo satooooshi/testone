@@ -14,7 +14,7 @@ import {
 import boldLogo from '@/public/bold-logo.png';
 import Image from 'next/image';
 import { GiHamburgerMenu } from 'react-icons/gi';
-import { AiOutlineLeft } from 'react-icons/ai';
+import { AiOutlineLeft, AiOutlinePlus } from 'react-icons/ai';
 import { FiEdit2 } from 'react-icons/fi';
 import { RiDeleteBin6Line } from 'react-icons/ri';
 import Link from 'next/link';
@@ -69,8 +69,8 @@ const HeaderWithTab: React.FC<HeaderProps> = ({
 }) => {
   return (
     <div className={headerStyles.header_and_tab_wrapper}>
-      <div className={headerStyles.header}>
-        <div className={headerStyles.header_top_wrapper}>
+      {/* <div className={headerStyles.header}> */}
+      {/* <div className={headerStyles.header_top_wrapper}>
           <div className={headerStyles.header_left}>
             <Link href="/">
               <a className={headerStyles.logo_image}>
@@ -118,26 +118,27 @@ const HeaderWithTab: React.FC<HeaderProps> = ({
                   {rightButtonName}
                 </Button>
               ) : null}
-            </div>
-            {!isDrawerOpen && (
+            </div> */}
+      {/* {!isDrawerOpen && (
               <GiHamburgerMenu
                 onClick={() => setIsDrawerOpen(true)}
                 className={headerStyles.ham_icon}
               />
             )}
           </div>
-        </div>
-      </div>
+        </div> */}
+      {/* </div> */}
       {tabs && tabs.length ? (
         <Box
           w="100%"
-          px="2%"
+          px="3%"
           maxWidth="1000px"
           overflowX="auto"
           display="flex"
           flexDir="row"
           alignItems="center"
-          h="40px"
+          // px="40px"
+          h="60px"
           bg={tabs[0].type === 'backButton' ? '#f3f6fb' : 'white'}
           justifyContent={
             tabs[0].type === 'backButton' ? 'flex-end' : 'flex-start'
@@ -166,6 +167,17 @@ const HeaderWithTab: React.FC<HeaderProps> = ({
                   <Text color={t.color}>{t.name}</Text>
                 </a>
               </Link>
+            ) : t.type === 'create' && t.onClick ? (
+              <Button
+                onClick={t.onClick}
+                rounded={50}
+                position="absolute"
+                colorScheme="blue"
+                right={0}
+                mr="3%"
+                rightIcon={<AiOutlinePlus />}>
+                {t.name}
+              </Button>
             ) : (t.type === 'edit' || t.type === 'delete') && t.onClick ? (
               <Button
                 onClick={t.onClick}
