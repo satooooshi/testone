@@ -232,6 +232,16 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
     });
   };
 
+  const isBeforeTwelveHours = (createdAt: Date | undefined) => {
+    if (!createdAt) {
+      return false;
+    }
+    const date = new Date();
+    date.setHours(date.getHours() - 12);
+
+    return new Date(createdAt) > date;
+  };
+
   const menuOpener = (
     <Popover
       closeOnBlur={false}
@@ -291,12 +301,14 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
               リアクション
             </MenuItem>
             {messageState?.sender?.id === user?.id &&
-            messageState.type === ChatMessageType.TEXT ? (
+            messageState.type === ChatMessageType.TEXT &&
+            isBeforeTwelveHours(messageState.createdAt) ? (
               <MenuItem value={'edit'} onClick={() => setEditMessage(true)}>
                 メッセージを編集
               </MenuItem>
             ) : null}
-            {messageState?.sender?.id === user?.id ? (
+            {messageState?.sender?.id === user?.id &&
+            isBeforeTwelveHours(messageState.createdAt) ? (
               <MenuItem
                 value={'delete'}
                 onClick={() => {

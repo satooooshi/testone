@@ -138,8 +138,7 @@ const Chat: React.FC = () => {
   const [video, setVideo] = useState<FIleSource>();
   const {data: lastReadChatTime, refetch: refetchLastReadChatTime} =
     useAPIGetLastReadChatTime(room.id);
-  const [longPressedMsg, setLongPressedMgg] =
-    useState<{message: ChatMessage; limitDate: Date}>();
+  const [longPressedMsg, setLongPressedMgg] = useState<ChatMessage>();
   const [reactionTarget, setReactionTarget] = useState<ChatMessage>();
   const [visibleStickerSelctor, setVisibleStickerSelector] = useState(false);
   const [editMessage, setEditMessage] = useState(false);
@@ -652,11 +651,11 @@ const Chat: React.FC = () => {
             text: '削除する',
             style: 'destructive',
             onPress: () =>
-              deleteMessage(longPressedMsg.message, {
+              deleteMessage(longPressedMsg, {
                 onSuccess: () => {
                   socket.send({
                     type: 'delete',
-                    chatMessage: longPressedMsg.message,
+                    chatMessage: longPressedMsg,
                   });
                   setLongPressedMgg(undefined);
                 },
@@ -666,6 +665,16 @@ const Chat: React.FC = () => {
         {cancelable: false},
       );
     }
+  };
+
+  const isBeforeTwelveHours = (createdAt: Date | undefined) => {
+    if (!createdAt) {
+      return false;
+    }
+    const date = new Date();
+    date.setHours(date.getHours() - 12);
+
+    return new Date(createdAt) > date;
   };
 
   const typeDropdown = (
@@ -680,7 +689,7 @@ const Chat: React.FC = () => {
       <Dropdown.Option
         {...defaultDropdownOptionProps}
         onPress={() => {
-          setValues(v => ({...v, replyParentMessage: longPressedMsg?.message}));
+          setValues(v => ({...v, replyParentMessage: longPressedMsg}));
           setLongPressedMgg(undefined);
         }}
         value={'reply'}>
@@ -690,21 +699,19 @@ const Chat: React.FC = () => {
         {...defaultDropdownOptionProps}
         value="reaction"
         onPress={() => {
-          setReactionTarget(longPressedMsg?.message);
+          setReactionTarget(longPressedMsg);
           setLongPressedMgg(undefined);
         }}>
         リアクション
       </Dropdown.Option>
 
-      {longPressedMsg?.message?.type === 'text' ? (
+      {longPressedMsg?.type === 'text' ? (
         <Dropdown.Option
           {...defaultDropdownOptionProps}
           value="copy"
           onPress={() => {
             Clipboard.setString(
-              longPressedMsg?.message?.content
-                ? longPressedMsg?.message?.content
-                : '',
+              longPressedMsg?.content ? longPressedMsg?.content : '',
             );
             setLongPressedMgg(undefined);
           }}>
@@ -713,17 +720,16 @@ const Chat: React.FC = () => {
       ) : (
         <></>
       )}
-      {longPressedMsg?.message &&
-      longPressedMsg?.message?.sender?.id === myself?.id &&
-      longPressedMsg?.message?.type === ChatMessageType.TEXT &&
-      longPressedMsg?.message.createdAt < longPressedMsg.limitDate ? (
+      {longPressedMsg?.sender?.id === myself?.id &&
+      longPressedMsg?.type === ChatMessageType.TEXT &&
+      isBeforeTwelveHours(longPressedMsg.createdAt) ? (
         <Dropdown.Option
           {...defaultDropdownOptionProps}
           value="edit"
           onPress={() => {
             setEditMessage(true);
             if (longPressedMsg) {
-              setValues(longPressedMsg?.message);
+              setValues(longPressedMsg);
             }
           }}>
           メッセージを編集
@@ -731,9 +737,8 @@ const Chat: React.FC = () => {
       ) : (
         <></>
       )}
-      {longPressedMsg?.message &&
-      longPressedMsg?.message?.sender?.id === myself?.id &&
-      longPressedMsg?.message.createdAt < longPressedMsg.limitDate ? (
+      {longPressedMsg?.sender?.id === myself?.id &&
+      isBeforeTwelveHours(longPressedMsg?.createdAt) ? (
         <Dropdown.Option
           {...defaultDropdownOptionProps}
           value="edit"
@@ -840,11 +845,7 @@ const Chat: React.FC = () => {
         isScrollTarget={focusedMessageID === message.id}
         onCheckLastRead={() => setSelectedMessageForCheckLastRead(message)}
         numbersOfRead={numbersOfRead(message)}
-        onLongPress={() => {
-          const date = new Date();
-          date.setDate(date.getHours() - 12);
-          setLongPressedMgg({message: message, limitDate: date});
-        }}
+        onLongPress={() => setLongPressedMgg(message)}
         onPressImage={() => showImageOnModal(message.content)}
         onPressVideo={() =>
           playVideoOnModal({uri: message.content, fileName: message.fileName})
