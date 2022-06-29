@@ -4,12 +4,23 @@ import { axiosInstance } from 'src/utils/url';
 import { readStorageURL, uploadStorageURL } from 'src/utils/url/storage.url';
 import { isImage } from 'src/utils/indecateChatMessageType';
 import Compress from 'node_modules/compress.js/src';
+import heic2any from 'heic2any';
 
 export const uploadStorage = async (files: File[]): Promise<string[]> => {
   const compress = new Compress();
   const resizeImage = async (file: File): Promise<Blob> => {
     if (isImage(file.name)) {
-      const resizedImage = await compress.compress([file], {
+      const isHeic = !!file.name.toUpperCase().match(/\.(heif|heic)/i);
+      let imageFile;
+      if (isHeic) {
+        imageFile = await heic2any({
+          blob: file,
+          toType: 'image/jpeg',
+          quality: 1,
+        });
+      }
+
+      const resizedImage = await compress.compress([imageFile], {
         size: 2, // the max size in MB, defaults to 2MB
         quality: 1, // the quality of the image, max is 1,
         maxWidth: 400, // the max width of the output image, defaults to 1920px

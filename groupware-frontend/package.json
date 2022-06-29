@@ -34,6 +34,7 @@
     "firebase": "^9.8.1",
     "formik": "^2.2.9",
     "framer-motion": "^4",
+    "heic2any": "^0.0.3",
     "jszip": "^3.7.1",
     "linkify-html": "^3.0.4",
     "linkifyjs": "^3.0.4",
