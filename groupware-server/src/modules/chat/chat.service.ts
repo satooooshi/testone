@@ -194,7 +194,7 @@ export class ChatService {
       ['desc', 'desc'],
     ]).reverse();
 
-    const pageCount = 1;
+    const pageCount = Number(page);
     return { rooms, pageCount };
   }
 

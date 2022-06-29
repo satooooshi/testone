@@ -56,9 +56,7 @@ export const BadgeProvider: React.FC = ({children}) => {
         );
         if (data.rooms.length >= 20) {
           setPage(p => p + 1);
-          setIsNeedRefetch(true);
         } else {
-          setIsNeedRefetch(false);
           setPage(1);
           setCompleteRefetch(true);
         }
@@ -96,6 +94,8 @@ export const BadgeProvider: React.FC = ({children}) => {
 
   useEffect(() => {
     if (user?.id && chatGroups.length) {
+      console.log('chatGroups.length', chatGroups.length);
+
       const jsonMessages = JSON.stringify(chatGroups);
       storage.set(`chatRoomList${user?.id}`, jsonMessages);
     }
@@ -115,11 +115,12 @@ export const BadgeProvider: React.FC = ({children}) => {
   }, [networkConnection]);
 
   useEffect(() => {
-    if (isNeedRefetch) {
-      setIsNeedRefetch(false);
+    if (page > 1) {
+      console.log('-----', page);
+
       refetchAllRooms();
     }
-  }, [isNeedRefetch, refetchAllRooms]);
+  }, [page, refetchAllRooms]);
 
   const {refetch: refetchRoom} = useAPIGetOneRoom(refetchGroup.id, {
     enabled: false,
@@ -188,7 +189,7 @@ export const BadgeProvider: React.FC = ({children}) => {
   };
 
   const refreshRooms = () => {
-    setIsNeedRefetch(true);
+    refetchAllRooms();
   };
 
   useEffect(() => {
