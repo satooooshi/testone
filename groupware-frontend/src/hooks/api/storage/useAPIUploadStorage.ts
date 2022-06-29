@@ -5,7 +5,7 @@ import { readStorageURL, uploadStorageURL } from 'src/utils/url/storage.url';
 import { isImage } from 'src/utils/indecateChatMessageType';
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 //@ts-ignore
-import Compress from 'node_modules/compress.js';
+import Compress from 'compress.js';
 import heic2any from 'heic2any';
 
 export const uploadStorage = async (files: File[]): Promise<string[]> => {
