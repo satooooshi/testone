@@ -166,6 +166,7 @@ const Chat: React.FC = () => {
       .sort((a, b) => b.id - a.id);
   };
   const socket = useChatSocket(room, refreshMessage, setMessages);
+  const messageContentRef = useRef('');
 
   const {values, handleSubmit, setValues, resetForm} = useFormik<
     Partial<ChatMessage>
@@ -176,18 +177,21 @@ const Chat: React.FC = () => {
       replyParentMessage: null,
       chatGroup: room,
     },
-    validationSchema: chatMessageSchema,
     enableReinitialize: true,
     onSubmit: submittedValues => {
-      Keyboard.dismiss();
-      if (submittedValues.content) {
+      if (messageContentRef.current) {
         if (editMessage) {
-          updateChatMessage(submittedValues);
-          setEditMessage(false);
-          resetForm();
+          updateChatMessage({
+            ...submittedValues,
+            content: messageContentRef.current,
+          });
         } else {
-          sendChatMessage(submittedValues);
+          sendChatMessage({
+            ...submittedValues,
+            content: messageContentRef.current,
+          });
         }
+        Keyboard.dismiss();
       }
     },
   });
@@ -308,6 +312,7 @@ const Chat: React.FC = () => {
         if (sentMsg?.chatGroup?.id) {
           refetchRoomCard({id: sentMsg.chatGroup.id, type: ''});
         }
+        messageContentRef.current = '';
         resetForm();
       },
       onError: () => {
@@ -324,7 +329,9 @@ const Chat: React.FC = () => {
         chatMessage: {...sentMsg, isSender: false},
       });
       resetForm();
+      messageContentRef.current = '';
       setLongPressedMgg(undefined);
+      setEditMessage(false);
     },
     onError: () => {
       Alert.alert(
@@ -973,15 +980,9 @@ const Chat: React.FC = () => {
                 onUploadVideo={handleUploadVideo}
                 onUploadImage={handleUploadImage}
                 setVisibleStickerSelector={setVisibleStickerSelector}
-                text={values.content || ''}
+                text={messageContentRef.current}
                 footerHeight={footerHeight}
-                onChangeText={t =>
-                  setValues(v => ({
-                    ...v,
-                    type: ChatMessageType.TEXT,
-                    content: t,
-                  }))
-                }
+                onChangeText={t => (messageContentRef.current = t)}
                 onSend={handleSubmit}
                 mentionSuggestions={suggestions()}
                 isLoading={isLoadingSending}
@@ -1055,15 +1056,9 @@ const Chat: React.FC = () => {
                 onUploadVideo={handleUploadVideo}
                 onUploadImage={handleUploadImage}
                 setVisibleStickerSelector={setVisibleStickerSelector}
-                text={values.content || ''}
+                text={messageContentRef.current}
                 footerHeight={footerHeight}
-                onChangeText={t =>
-                  setValues(v => ({
-                    ...v,
-                    type: ChatMessageType.TEXT,
-                    content: t,
-                  }))
-                }
+                onChangeText={t => (messageContentRef.current = t)}
                 onSend={handleSubmit}
                 mentionSuggestions={suggestions()}
                 isLoading={isLoadingSending}

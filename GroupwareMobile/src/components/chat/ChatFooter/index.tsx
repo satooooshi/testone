@@ -56,6 +56,7 @@ const ChatFooter: React.FC<ChatFooterProps> = ({
   const [selection, setSelection] = useState({start: 0, end: 0});
   const [mentionAdded, setMentionAdded] = useState(false);
   const [visibleMenu, setVisibleMenu] = useState(false);
+  const [isSendable, setIsSendable] = useState(false);
   const inputRef = useRef<TextInput>(null);
 
   const renderSuggestions: React.FC<MentionSuggestionsProps> = ({
@@ -239,7 +240,10 @@ const ChatFooter: React.FC<ChatFooterProps> = ({
             ref={inputRef}
             onSelectionChange={handleSelectionChange}
             multiline
-            onChangeText={onChangeInput}
+            onChangeText={t => {
+              setIsSendable(!!t);
+              onChangeInput(t);
+            }}
             autoCapitalize="none"
             placeholderTextColor="#868596"
             style={[
@@ -270,12 +274,12 @@ const ChatFooter: React.FC<ChatFooterProps> = ({
         {isLoading ? (
           <ActivityIndicator />
         ) : (
-          <TouchableOpacity onPress={onSend}>
+          <TouchableOpacity disabled={!setIsSendable} onPress={onSend}>
             <Icon
               name="send"
               fontFamily="Ionicons"
               fontSize={21}
-              color={value ? 'blue600' : 'gray'}
+              color={isSendable ? 'blue600' : 'gray'}
             />
           </TouchableOpacity>
         )}
