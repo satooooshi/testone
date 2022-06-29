@@ -3,7 +3,9 @@ import { useMutation, UseMutationOptions } from 'react-query';
 import { axiosInstance } from 'src/utils/url';
 import { readStorageURL, uploadStorageURL } from 'src/utils/url/storage.url';
 import { isImage } from 'src/utils/indecateChatMessageType';
-import Compress from 'node_modules/compress.js/src';
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+//@ts-ignore
+import Compress from 'node_modules/compress.js';
 import heic2any from 'heic2any';
 
 export const uploadStorage = async (files: File[]): Promise<string[]> => {
