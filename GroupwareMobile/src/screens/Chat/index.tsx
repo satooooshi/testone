@@ -136,8 +136,9 @@ const Chat: React.FC = () => {
   }, [messages]);
   const [nowImageIndex, setNowImageIndex] = useState<number>(0);
   const [video, setVideo] = useState<FIleSource>();
-  const {data: lastReadChatTime, refetch: refetchLastReadChatTime} =
-    useAPIGetLastReadChatTime(room.id);
+  const {data: lastReadChatTime} = useAPIGetLastReadChatTime(room.id, {
+    enabled: false,
+  });
   const [longPressedMsg, setLongPressedMgg] = useState<ChatMessage>();
   const [reactionTarget, setReactionTarget] = useState<ChatMessage>();
   const [visibleStickerSelctor, setVisibleStickerSelector] = useState(false);
@@ -221,10 +222,6 @@ const Chat: React.FC = () => {
     },
   );
 
-  useEffect(() => {
-    console.log('-----', after, before, include);
-  }, [after, before, include]);
-
   const {refetch: getExpiredUrlMessages} = useAPIGetExpiredUrlMessages(
     room.id,
     {
@@ -267,7 +264,6 @@ const Chat: React.FC = () => {
 
   const {mutate: refetchUpdatedMessages} = useAPIGetUpdatedMessages({
     onSuccess: latestData => {
-      refetchLastReadChatTime();
       if (appState === 'active') {
         if (latestData?.length) {
           // const msgToAppend: ChatMessage[] = [];
