@@ -22,10 +22,10 @@ export const uploadStorage = async (files: File[]): Promise<string[]> => {
       const resizedImage = await compress.compress(
         [isHeic ? await heicToBlob(file) : file],
         {
-          size: 2, // the max size in MB, defaults to 2MB
+          size: 1, // the max size in MB, defaults to 2MB
           quality: 1, // the quality of the image, max is 1,
-          maxWidth: 400, // the max width of the output image, defaults to 1920px
-          maxHeight: 400, // the max height of the output image, defaults to 1920px
+          maxWidth: 800, // the max width of the output image, defaults to 1920px
+          maxHeight: 800, // the max height of the output image, defaults to 1920px
           resize: true, // defaults to true, set false if you do not want to resize the image width and height
         },
       );
