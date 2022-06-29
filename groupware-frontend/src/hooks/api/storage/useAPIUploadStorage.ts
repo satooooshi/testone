@@ -2,48 +2,31 @@ import axios, { AxiosError } from 'axios';
 import { useMutation, UseMutationOptions } from 'react-query';
 import { axiosInstance } from 'src/utils/url';
 import { readStorageURL, uploadStorageURL } from 'src/utils/url/storage.url';
-import Resizer from 'react-image-file-resizer';
 import { isImage } from 'src/utils/indecateChatMessageType';
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+//@ts-ignore
+import Compress from 'compress.js';
 
 export const uploadStorage = async (files: File[]): Promise<string[]> => {
-  // console.log('----', files);
-  // const fileToDataUri = (file: File) =>
-  //   new Promise((resolve, reject) => {
-  //     const reader = new FileReader();
-  //     reader.onload = (event) => {
-  //       resolve(event?.target?.result);
-  //     };
-  //     reader.readAsDataURL(file);
-  //   });
+  const compress = new Compress();
+  const resizeImage = async (file: File): Promise<Blob> => {
+    if (isImage(file.name)) {
+      const resizedImage = await compress.compress([file], {
+        size: 2, // the max size in MB, defaults to 2MB
+        quality: 1, // the quality of the image, max is 1,
+        maxWidth: 400, // the max width of the output image, defaults to 1920px
+        maxHeight: 400, // the max height of the output image, defaults to 1920px
+        resize: true, // defaults to true, set false if you do not want to resize the image width and height
+      });
+      const img = resizedImage[0];
+      const base64str = img.data;
+      const imgExt = img.ext;
+      const resizedFiile = Compress.convertBase64ToFile(base64str, imgExt);
+      return resizedFiile;
+    }
+    return file;
+  };
 
-  // for (let i = 0; i < files.length; i++) {
-  //   if (isImage(files[i].name)) {
-  //     fileToDataUri(files[i]).then(async (dataUri) => {
-  //       const res: Response = await fetch(dataUri as string);
-  //       const blob: Blob = await res.blob();
-  //       new Promise((resolve) => {
-  //         Resizer.imageFileResizer(
-  //           blob,
-  //           1000,
-  //           1000,
-  //           'PNG',
-  //           100,
-  //           0,
-  //           (uri) => {
-  //             resolve(uri);
-  //           },
-  //           'base64',
-  //         );
-  //       });
-  //       console.log('before----imageFileResizer------', files[i]);
-  //       files[i] = new File([blob], 'test' + files[i].name, {
-  //         type: 'image/png',
-  //       });
-  //       console.log('----imageFileResizer------', files[i]);
-  //     });
-  //   }
-  // }
-  // console.log('----after', files);
   const fileNames = files.map((f) => f.name);
   try {
     const res = await axiosInstance.post(uploadStorageURL, fileNames);
@@ -51,8 +34,10 @@ export const uploadStorage = async (files: File[]): Promise<string[]> => {
     const fileURLs = await Promise.all(
       files.map(async (f) => {
         const formData = new FormData();
-        formData.append('file', f);
-        await axios.put(signedURLMapping[f.name], f);
+        const resizeImageBlob = await resizeImage(f);
+        const fileChangedToBlob = new File([resizeImageBlob], `${f.name}`);
+        formData.append('file', fileChangedToBlob);
+        await axios.put(signedURLMapping[f.name], fileChangedToBlob);
         return signedURLMapping[f.name];
       }),
     );
