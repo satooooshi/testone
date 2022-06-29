@@ -11,22 +11,24 @@ export const uploadStorage = async (files: File[]): Promise<string[]> => {
   const resizeImage = async (file: File): Promise<Blob> => {
     if (isImage(file.name)) {
       const isHeic = !!file.name.toUpperCase().match(/\.(heif|heic)/i);
-      let imageFile;
-      if (isHeic) {
-        imageFile = await heic2any({
+      const heicToBlob = async (file: File) => {
+        return await heic2any({
           blob: file,
           toType: 'image/jpeg',
           quality: 1,
         });
-      }
+      };
 
-      const resizedImage = await compress.compress([imageFile], {
-        size: 2, // the max size in MB, defaults to 2MB
-        quality: 1, // the quality of the image, max is 1,
-        maxWidth: 400, // the max width of the output image, defaults to 1920px
-        maxHeight: 400, // the max height of the output image, defaults to 1920px
-        resize: true, // defaults to true, set false if you do not want to resize the image width and height
-      });
+      const resizedImage = await compress.compress(
+        [isHeic ? await heicToBlob(file) : file],
+        {
+          size: 2, // the max size in MB, defaults to 2MB
+          quality: 1, // the quality of the image, max is 1,
+          maxWidth: 400, // the max width of the output image, defaults to 1920px
+          maxHeight: 400, // the max height of the output image, defaults to 1920px
+          resize: true, // defaults to true, set false if you do not want to resize the image width and height
+        },
+      );
       const img = resizedImage[0];
       const base64str = img.data;
       const imgExt = img.ext;
