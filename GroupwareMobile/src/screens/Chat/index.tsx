@@ -167,6 +167,7 @@ const Chat: React.FC = () => {
   };
   const socket = useChatSocket(room, refreshMessage, setMessages);
   const messageContentRef = useRef('');
+  console.log('--------');
 
   const {values, handleSubmit, setValues, resetForm} = useFormik<
     Partial<ChatMessage>
@@ -312,7 +313,9 @@ const Chat: React.FC = () => {
         if (sentMsg?.chatGroup?.id) {
           refetchRoomCard({id: sentMsg.chatGroup.id, type: ''});
         }
-        messageContentRef.current = '';
+        if (sentMsg.type === ChatMessageType.TEXT) {
+          messageContentRef.current = '';
+        }
         resetForm();
       },
       onError: () => {

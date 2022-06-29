@@ -56,7 +56,7 @@ const ChatFooter: React.FC<ChatFooterProps> = ({
   const [selection, setSelection] = useState({start: 0, end: 0});
   const [mentionAdded, setMentionAdded] = useState(false);
   const [visibleMenu, setVisibleMenu] = useState(false);
-  const [isSendable, setIsSendable] = useState(false);
+  const [isSendable, setIsSendable] = useState(!!value);
   const inputRef = useRef<TextInput>(null);
 
   const renderSuggestions: React.FC<MentionSuggestionsProps> = ({
@@ -274,7 +274,7 @@ const ChatFooter: React.FC<ChatFooterProps> = ({
         {isLoading ? (
           <ActivityIndicator />
         ) : (
-          <TouchableOpacity disabled={!setIsSendable} onPress={onSend}>
+          <TouchableOpacity onPress={onSend}>
             <Icon
               name="send"
               fontFamily="Ionicons"
