@@ -2269,6 +2269,11 @@
   dependencies:
     "@babel/types" "^7.3.0"
 
+"@types/compress.js@^1.1.1":
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/@types/compress.js/-/compress.js-1.1.1.tgz#cb8d599e84cad42b2b942bb704b8c32db5e1040e"
+  integrity sha512-6ShoR1Qu7jyD/Q2T5m6b+rt/iu/4WvMx+UD6QHFwUE3iVlmQgcoEU5Vc+oQvc41XLsCp2QQ4OWWkc0WeL46v/A==
+
 "@types/dompurify@^2.3.1":
   version "2.3.1"
   resolved "https://registry.yarnpkg.com/@types/dompurify/-/dompurify-2.3.1.tgz#2934adcd31c4e6b02676f9c22f9756e5091c04dd"

@@ -3,8 +3,6 @@ import { useMutation, UseMutationOptions } from 'react-query';
 import { axiosInstance } from 'src/utils/url';
 import { readStorageURL, uploadStorageURL } from 'src/utils/url/storage.url';
 import { isImage } from 'src/utils/indecateChatMessageType';
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-//@ts-ignore
 import Compress from 'compress.js';
 
 export const uploadStorage = async (files: File[]): Promise<string[]> => {
