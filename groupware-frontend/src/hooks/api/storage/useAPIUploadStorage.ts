@@ -6,7 +6,7 @@ import { isImage } from 'src/utils/indecateChatMessageType';
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 //@ts-ignore
 import Compress from 'compress.js';
-import heic2any from 'heic2any';
+// import heic2any from 'heic2any';
 
 export const uploadStorage = async (files: File[]): Promise<string[]> => {
   const compress = new Compress();
@@ -14,6 +14,9 @@ export const uploadStorage = async (files: File[]): Promise<string[]> => {
     if (isImage(file.name)) {
       const isHeic = !!file.name.toUpperCase().match(/\.(heif|heic)/i);
       const heicToBlob = async (file: File) => {
+        // this was only way to resolve err about heic2any at this time
+        // eslint-disable-next-line
+        const heic2any = require('heic2any');
         return await heic2any({
           blob: file,
           toType: 'image/jpeg',
