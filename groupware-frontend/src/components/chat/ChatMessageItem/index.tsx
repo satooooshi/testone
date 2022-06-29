@@ -81,15 +81,6 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = memo(
       },
     });
 
-    console.log('----b');
-    useEffect(() => {
-      console.log('----a');
-    }, [
-      // confirmedSearchWord,
-      searchedResultIds,
-      // lastReadChatTime,
-    ]);
-
     const [messageState, setMessageState] = useState(message);
     const [visibleReadModal, setVisibleLastReadModal] = useState(false);
     const [reactionModal, setReactionModal] = useState(false);
