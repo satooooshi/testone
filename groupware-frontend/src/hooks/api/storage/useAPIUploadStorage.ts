@@ -3,7 +3,7 @@ import { useMutation, UseMutationOptions } from 'react-query';
 import { axiosInstance } from 'src/utils/url';
 import { readStorageURL, uploadStorageURL } from 'src/utils/url/storage.url';
 import { isImage } from 'src/utils/indecateChatMessageType';
-import Compress from 'compress.js';
+import Compress from 'node_modules/compress.js/src';
 
 export const uploadStorage = async (files: File[]): Promise<string[]> => {
   const compress = new Compress();

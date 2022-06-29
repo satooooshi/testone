@@ -1,0 +1,155 @@
+diff --git a/node_modules/compress.js/src/LICENSE b/node_modules/compress.js/src/LICENSE
+new file mode 100755
+index 0000000..9e841e7
+--- /dev/null
++++ b/node_modules/compress.js/src/LICENSE
+@@ -0,0 +1,21 @@
++    MIT License
++
++    Copyright (c) Microsoft Corporation.
++
++    Permission is hereby granted, free of charge, to any person obtaining a copy
++    of this software and associated documentation files (the "Software"), to deal
++    in the Software without restriction, including without limitation the rights
++    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++    copies of the Software, and to permit persons to whom the Software is
++    furnished to do so, subject to the following conditions:
++
++    The above copyright notice and this permission notice shall be included in all
++    copies or substantial portions of the Software.
++
++    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
++    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
++    SOFTWARE
+diff --git a/node_modules/compress.js/src/README.md b/node_modules/compress.js/src/README.md
+new file mode 100755
+index 0000000..8009752
+--- /dev/null
++++ b/node_modules/compress.js/src/README.md
+@@ -0,0 +1,68 @@
++# Installation
++> `npm install --save @types/compress.js`
++
++# Summary
++This package contains type definitions for compress.js (- (link to the repo is missing)).
++
++# Details
++Files were exported from https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/compress.js.
++## [index.d.ts](https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/compress.js/index.d.ts)
++````ts
++// Type definitions for compress.js 1.1
++// Project: - (link to the repo is missing)
++// Definitions by: Yuri Drabik <https://github.com/yurist38>
++// Definitions: https://github.com/DefinitelyTyped/DefinitelyTyped
++
++export = Compress;
++
++declare class Compress {
++    attach(
++        el: string,
++        options: CompressOptions,
++    ): Promise<CompressResult[]>;
++
++    compress(
++        files: File[],
++        options: CompressOptions,
++    ): Promise<CompressResult[]>;
++
++    static convertBase64ToFile(
++        base64: string,
++        mime?: string,
++    ): File;
++}
++
++interface CompressOptions {
++    quality?: number | undefined;
++    size?: number | undefined;
++    maxWidth?: number | undefined;
++    maxHeight?: number | undefined;
++    resize?: boolean | undefined;
++}
++
++interface CompressResult {
++    data: string;
++    prefix: string;
++    elapsedTimeInSeconds: number;
++    alt: string;
++    initialSizeInMb: number;
++    endSizeInMb: number;
++    ext: string;
++    quality: number;
++    endWidthInPx: number;
++    endHeightInPx: number;
++    initialWidthInPx: number;
++    initialHeightInPx: number;
++    sizeReducedInPercent: number;
++    iterations: number;
++}
++
++````
++
++### Additional Details
++ * Last updated: Thu, 08 Jul 2021 09:08:05 GMT
++ * Dependencies: none
++ * Global values: none
++
++# Credits
++These definitions were written by [Yuri Drabik](https://github.com/yurist38).
+diff --git a/node_modules/compress.js/src/index.d.ts b/node_modules/compress.js/src/index.d.ts
+new file mode 100755
+index 0000000..32e0e72
+--- /dev/null
++++ b/node_modules/compress.js/src/index.d.ts
+@@ -0,0 +1,48 @@
++// Type definitions for compress.js 1.1
++// Project: - (link to the repo is missing)
++// Definitions by: Yuri Drabik <https://github.com/yurist38>
++// Definitions: https://github.com/DefinitelyTyped/DefinitelyTyped
++
++export = Compress;
++
++declare class Compress {
++    attach(
++        el: string,
++        options: CompressOptions,
++    ): Promise<CompressResult[]>;
++
++    compress(
++        files: File[],
++        options: CompressOptions,
++    ): Promise<CompressResult[]>;
++
++    static convertBase64ToFile(
++        base64: string,
++        mime?: string,
++    ): File;
++}
++
++interface CompressOptions {
++    quality?: number | undefined;
++    size?: number | undefined;
++    maxWidth?: number | undefined;
++    maxHeight?: number | undefined;
++    resize?: boolean | undefined;
++}
++
++interface CompressResult {
++    data: string;
++    prefix: string;
++    elapsedTimeInSeconds: number;
++    alt: string;
++    initialSizeInMb: number;
++    endSizeInMb: number;
++    ext: string;
++    quality: number;
++    endWidthInPx: number;
++    endHeightInPx: number;
++    initialWidthInPx: number;
++    initialHeightInPx: number;
++    sizeReducedInPercent: number;
++    iterations: number;
++}
