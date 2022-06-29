@@ -41,17 +41,6 @@ export const useChatSocket = (
     }
   };
 
-  useEffect(() => {
-    saveLastReadChatTime(room.id, {
-      onSuccess: () => {
-        report();
-        handleEnterRoom(room.id);
-      },
-    });
-    return () => saveLastReadChatTime(room.id);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [room.id, saveLastReadChatTime]);
-
   return {
     joinRoom: () => {
       connect();

@@ -293,6 +293,8 @@ const Chat: React.FC = () => {
             now,
           );
           saveLastReadChatTime(room.id);
+          console.log('saveLastReadChatTime refetch');
+
           setMessages(m => {
             const updatedMessages = refreshMessage([...latestData, ...m]);
             return updatedMessages;
@@ -781,7 +783,6 @@ const Chat: React.FC = () => {
   }, [room.id]);
 
   useEffect(() => {
-    saveLastReadChatTime(room.id);
     if (!messages.length) {
       const jsonMessagesInStorage = storage.getString(
         `messagesIntRoom${room.id}user${myself?.id}`,
@@ -1094,23 +1095,14 @@ const Chat: React.FC = () => {
       saveLastReadChatTime(room.id, {
         onSuccess: () => {
           socket.report();
+          console.log('saveLastReadChatTime appState');
+
           handleEnterRoom(room.id);
         },
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [appState, isFocused]);
-
-  useEffect(() => {
-    saveLastReadChatTime(room.id, {
-      onSuccess: () => {
-        socket.report();
-        handleEnterRoom(room.id);
-      },
-    });
-    return () => saveLastReadChatTime(room.id);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [room.id, saveLastReadChatTime]);
 
   const readUserBox = (user: User) => (
     <View style={tailwind('flex-row bg-white items-center px-4 py-2')}>
