@@ -196,19 +196,6 @@ const SearchInput: React.FC<SearchFormProps> = ({
         </Box>
       </div>
       <Box display="flex" mt={2} alignItems="center">
-        {/* <Button
-          borderRadius={50}
-          width={'8wh'}
-          height={8}
-          className={searchFormStyles.add_tag_button}
-          colorScheme="blue"
-          variant="outline"
-          onClick={() => setTagModal(true)}>
-          <Box display="flex">
-            <AiOutlinePlus size={15} />
-            <Text fontSize={12}>タグを追加</Text>
-          </Box>
-        </Button> */}
         {selectedTags?.length ? (
           <>
             <Box ml={1} display="flex">
