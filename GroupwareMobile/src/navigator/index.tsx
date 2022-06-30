@@ -456,6 +456,11 @@ const Navigator = () => {
         id: 'default',
         name: 'Default Channel',
       });
+      console.log(
+        '============',
+        remoteMessage.data?.id,
+        `${currentChatRoomId}`,
+      );
 
       await notifee.displayNotification({
         title: remoteMessage.data?.title || '',
