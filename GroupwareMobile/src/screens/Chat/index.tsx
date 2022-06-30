@@ -136,9 +136,6 @@ const Chat: React.FC = () => {
   }, [messages]);
   const [nowImageIndex, setNowImageIndex] = useState<number>(0);
   const [video, setVideo] = useState<FIleSource>();
-  const {data: lastReadChatTime} = useAPIGetLastReadChatTime(room.id, {
-    enabled: false,
-  });
   const [longPressedMsg, setLongPressedMgg] = useState<ChatMessage>();
   const [reactionTarget, setReactionTarget] = useState<ChatMessage>();
   const [visibleStickerSelctor, setVisibleStickerSelector] = useState(false);
@@ -528,8 +525,9 @@ const Chat: React.FC = () => {
 
   const numbersOfRead = (message: ChatMessage) => {
     return (
-      lastReadChatTime?.filter(time => time.readTime >= message.createdAt)
-        .length || 0
+      socket.lastReadChatTime?.filter(
+        time => time.readTime >= message.createdAt,
+      ).length || 0
     );
   };
 
@@ -826,13 +824,13 @@ const Chat: React.FC = () => {
 
   const readUsers = useCallback(
     (targetMsg: ChatMessage) => {
-      return lastReadChatTime
-        ? lastReadChatTime
+      return socket.lastReadChatTime
+        ? socket.lastReadChatTime
             .filter(t => new Date(t.readTime) >= new Date(targetMsg.createdAt))
             .map(t => t.user)
         : [];
     },
-    [lastReadChatTime],
+    [socket.lastReadChatTime],
   );
 
   const renderMessage = (message: ChatMessage, messageIndex: number) => (
