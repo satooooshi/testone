@@ -10,6 +10,23 @@ import goodJobSticker from '@/public/goodjob_sticker.png';
 import rogerSticker from '@/public/roger_sticker.png';
 import sorrySticker from '@/public/sorry_sticker.png';
 import willDoSticker from '@/public/willdo_sticker.png';
+import allRightSticker from '@/public/allright_sticker.png';
+import attachedSticker from '@/public/attached_sticker.png';
+import checkItSticker from '@/public/check_it_sticker.png';
+import closeDeadlineSticker from '@/public/close_deadline_sticker.png';
+import completedSticker from '@/public/completed_sticker.png';
+import confirmationSticker from '@/public/confirmation_sticker.png';
+import congratulationsSticker from '@/public/congratulations_sticker.png';
+import deadlineDaySticker from '@/public/deadline_day_sticker.png';
+import exclamationSticker from '@/public/exclamation_sticker.png';
+import ngSticker from '@/public/ng_sticker.png';
+import notDoneSticker from '@/public/not_done_sticker.png';
+import okSticker from '@/public/ok_sticker.png';
+import okayNowSticker from '@/public/okay_now_sticker.png';
+import osewaninaruSticker from '@/public/osewaninaru_sticker.png';
+import pleaseTakeCareSticker from '@/public/please_take_care_sticker.png';
+import scheduleDeterminedSticker from '@/public/schedule_determined_sticker.png';
+import thankYouSticker from '@/public/thank_you_sticker.png';
 
 export const reactionStickers = [
   {
@@ -59,5 +76,73 @@ export const reactionStickers = [
   {
     name: 'willDoSticker',
     src: willDoSticker.src,
+  },
+  {
+    name: 'allRightSticker',
+    src: allRightSticker.src,
+  },
+  {
+    name: 'attachedSticker',
+    src: attachedSticker.src,
+  },
+  {
+    name: 'checkItSticker',
+    src: checkItSticker.src,
+  },
+  {
+    name: 'closeDeadlineSticker',
+    src: closeDeadlineSticker.src,
+  },
+  {
+    name: 'completedSticker',
+    src: completedSticker.src,
+  },
+  {
+    name: 'confirmationSticker',
+    src: confirmationSticker.src,
+  },
+  {
+    name: 'congratulationsSticker',
+    src: congratulationsSticker.src,
+  },
+  {
+    name: 'deadlineDaySticker',
+    src: deadlineDaySticker.src,
+  },
+  {
+    name: 'exclamationSticker',
+    src: exclamationSticker.src,
+  },
+  {
+    name: 'ngSticker',
+    src: ngSticker.src,
+  },
+  {
+    name: 'notDoneSticker',
+    src: notDoneSticker.src,
+  },
+  {
+    name: 'okSticker',
+    src: okSticker.src,
+  },
+  {
+    name: 'okayNowSticker',
+    src: okayNowSticker.src,
+  },
+  {
+    name: 'osewaninaruSticker',
+    src: osewaninaruSticker.src,
+  },
+  {
+    name: 'pleaseTakeCareSticker',
+    src: pleaseTakeCareSticker.src,
+  },
+  {
+    name: 'thankYouSticker',
+    src: thankYouSticker.src,
+  },
+  {
+    name: 'scheduleDeterminedSticker',
+    src: scheduleDeterminedSticker.src,
   },
 ];
