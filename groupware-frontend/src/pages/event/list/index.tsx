@@ -64,6 +64,10 @@ import { hideScrollbarCss } from 'src/utils/chakra/hideScrollBar.css';
 import { isEditableEvent } from 'src/utils/factory/isCreatableEvent';
 import { useAPIJoinEvent } from '@/hooks/api/event/useAPIJoinEvent';
 import TabList from '@/components/common/TabList';
+import {
+  eventStatusNameToValue,
+  eventStatusValueToName,
+} from 'src/utils/event/eventStatusFormatter';
 
 const localizer = momentLocalizer(moment);
 //@ts-ignore
@@ -596,6 +600,20 @@ const EventList = () => {
           <>
             <div className={eventListStyles.search_form_wrapper}>
               <SearchForm
+                selectingItem={eventStatusValueToName(status)}
+                selectItems={[
+                  '今後のイベント',
+                  '過去のイベント',
+                  '進行中のイベント',
+                ]}
+                onSelect={(i) => {
+                  queryRefresh({
+                    page: '1',
+                    status: eventStatusNameToValue(i.target.value),
+                    from: undefined,
+                    to: undefined,
+                  });
+                }}
                 onClear={() => setSelectedTags([])}
                 value={searchWord || ''}
                 onChange={(e) => setSearchWord(e.currentTarget.value)}

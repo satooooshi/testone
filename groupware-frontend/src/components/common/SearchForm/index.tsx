@@ -13,9 +13,11 @@ import {
   Button,
   ButtonGroup,
   IconButton,
+  Select,
   Input,
   InputGroup,
   InputLeftElement,
+  InputRightElement,
   Text,
   useMediaQuery,
 } from '@chakra-ui/react';
@@ -64,6 +66,9 @@ const useSearchForm = () => useContext(SearchFormContext);
 type SearchFormProps = {
   value: string;
   onChange: ChangeEventHandler<HTMLInputElement>;
+  selectItems: string[];
+  selectingItem: string;
+  onSelect: ChangeEventHandler<HTMLSelectElement>;
   onClickButton: () => void;
   tags?: Tag[];
   selectedTags?: Tag[];
@@ -74,6 +79,9 @@ type SearchFormProps = {
 const SearchInput: React.FC<SearchFormProps> = ({
   value,
   onChange,
+  selectItems,
+  selectingItem,
+  onSelect,
   onClickButton,
   tags = [],
   selectedTags = [],
@@ -91,7 +99,12 @@ const SearchInput: React.FC<SearchFormProps> = ({
   };
 
   return (
-    <Box display="flex" flexDir="column" justifyContent="center" width={'100%'}>
+    <Box
+      display="flex"
+      flexDir="column"
+      justifyContent="center"
+      width={'100%'}
+      mt={5}>
       <div
         className={clsx(
           searchFormStyles.search_form_wrapper,
@@ -106,20 +119,6 @@ const SearchInput: React.FC<SearchFormProps> = ({
             />
           </div>
         )}
-        <InputGroup width={'100%'}>
-          <InputLeftElement pointerEvents="none">
-            <AiOutlineSearch />
-          </InputLeftElement>
-          <Input
-            className={searchFormStyles.input}
-            type="search"
-            name="word"
-            placeholder="検索ワードを入力"
-            background="white"
-            value={value}
-            onChange={onChange}
-          />
-        </InputGroup>
         <TagModal
           isOpen={tagModal}
           tags={tags || []}
@@ -131,32 +130,73 @@ const SearchInput: React.FC<SearchFormProps> = ({
           onComplete={() => setTagModal(false)}
           isSearch={true}
         />
-        <div className={clsx(searchFormStyles.search_and_close_button_wrapper)}>
+        <Box
+          display="flex"
+          flexDir="row"
+          w="100%"
+          justifyContent="space-between">
+          <InputGroup width="50%">
+            <InputLeftElement pointerEvents="none">
+              <AiOutlineSearch />
+            </InputLeftElement>
+            <Input
+              w="100%"
+              // className={searchFormStyles.input}
+              type="search"
+              name="word"
+              placeholder="検索する"
+              background="white"
+              value={value}
+              onChange={onChange}
+            />
+            <InputRightElement width="70px" mr={0}>
+              <Button
+                colorScheme="blue"
+                h="80%"
+                size="sm"
+                onClick={handleModalSearchButton}>
+                検索
+              </Button>
+            </InputRightElement>
+          </InputGroup>
           <Button
-            borderRadius={50}
-            width={isSmallerThan768 ? '100%' : '20vw'}
-            colorScheme="blue"
-            onClick={handleModalSearchButton}>
-            <Box display="flex">
-              <AiOutlineSearch size={20} />
-              <Text ml={1}>検索</Text>
-            </Box>
+            bg="white"
+            justifyContent="flex-start"
+            w="24%"
+            onClick={() => setTagModal(true)}>
+            <Text ml={1}>タグ</Text>
+            {selectedTags.length ? (
+              <Badge
+                ml="auto"
+                bg="blue.400"
+                color="white"
+                w="25px"
+                h="25px"
+                borderRadius="50%"
+                textAlign="center"
+                lineHeight="25px">
+                {selectedTags.length}
+              </Badge>
+            ) : null}
           </Button>
-          <TagModal
-            isOpen={tagModal}
-            tags={tags || []}
-            selectedTags={selectedTags}
-            toggleTag={toggleTag}
-            onClear={() => {
-              onClear();
-            }}
-            onComplete={() => setTagModal(false)}
-            isSearch={true}
-          />
-        </div>
+          <Select
+            name="branch"
+            value={selectingItem}
+            bg="white"
+            height="10"
+            w="24%"
+            onChange={onSelect}>
+            {selectItems?.length &&
+              selectItems.map((i) => (
+                <option key={i} value={i}>
+                  {i}
+                </option>
+              ))}
+          </Select>
+        </Box>
       </div>
       <Box display="flex" mt={2} alignItems="center">
-        <Button
+        {/* <Button
           borderRadius={50}
           width={'8wh'}
           height={8}
@@ -168,10 +208,9 @@ const SearchInput: React.FC<SearchFormProps> = ({
             <AiOutlinePlus size={15} />
             <Text fontSize={12}>タグを追加</Text>
           </Box>
-        </Button>
-        {selectedTags.length ? (
+        </Button> */}
+        {selectedTags?.length ? (
           <>
-            <Text>選択したタグ</Text>
             <Box ml={1} display="flex">
               {selectedTags.map((tag) => (
                 <Badge
