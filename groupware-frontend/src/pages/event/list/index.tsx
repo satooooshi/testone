@@ -57,6 +57,7 @@ import {
   Text,
   Select,
   Button,
+  Link,
 } from '@chakra-ui/react';
 import { responseErrorMsgFactory } from 'src/utils/factory/responseErrorMsgFactory';
 import { hideScrollbarCss } from 'src/utils/chakra/hideScrollBar.css';
@@ -244,6 +245,7 @@ const EventList = () => {
 
   const tabs: Tab[] = useHeaderTab({
     headerTabType: 'event',
+    onCreateClicked: () => setModalVisible(true),
     queryRefresh,
     personal,
     from,
@@ -420,7 +422,8 @@ const EventList = () => {
   const initialHeaderValue = {
     title: 'Events',
     activeTabName: activeTabName(),
-    // tabs: tabs,
+    tabs: tabs,
+    EventPage: isCalendar ? 'カレンダー' : 'リスト',
     rightButtonName: 'イベントを追加',
     onClickRightButton: () => setModalVisible(true),
     resetEventForm: () => setNewEvent(initialEventValue),
@@ -519,10 +522,10 @@ const EventList = () => {
         justifyContent="flex-start"
         w="100%"
         mb="72px">
-        <Box mb="24px">
+        {/* <Box mb="24px">
           <TopTabBar topTabBehaviorList={topTabBehaviorList} />
-        </Box>
-        <TabList tabs={tabs} activeTabName={activeTabName()} />
+        </Box> */}
+        {/* <TabList tabs={tabs} activeTabName={activeTabName()} /> */}
         {isCalendar && (
           <Box
             ref={calendarRef}
@@ -532,6 +535,34 @@ const EventList = () => {
             overflowX="auto"
             css={hideScrollbarCss}
             alignSelf="center">
+            <Box display="flex" flexDir="row" alignItems="center" mt={5} mb={8}>
+              <Button
+                bg={!personal ? 'white' : undefined}
+                colorScheme={personal === 'true' ? 'blue' : undefined}
+                onClick={() =>
+                  queryRefresh({
+                    personal: 'true',
+                    page: '1',
+                    from: from || '',
+                    to: to || '',
+                  })
+                }>
+                マイカレンダー
+              </Button>
+              <Button
+                bg={personal === 'true' ? 'white' : undefined}
+                colorScheme={!personal ? 'blue' : undefined}
+                onClick={() =>
+                  queryRefresh({
+                    personal: '',
+                    page: '1',
+                    from: from || '',
+                    to: to || '',
+                  })
+                }>
+                全体カレンダー
+              </Button>
+            </Box>
             <BigCalendar
               selectable
               resizable

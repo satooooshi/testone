@@ -57,6 +57,30 @@ const headerTab = (headerTabBehavior: HeaderTabBehavior): Tab[] => {
     case 'event':
       return [
         {
+          name: 'カレンダー',
+          onClick: () => {
+            if (queryRefresh)
+              queryRefresh({
+                page: '1',
+                personal,
+                from: from || '',
+                to: to || '',
+              });
+          },
+        },
+        {
+          name: 'リスト',
+          onClick: () => {
+            if (queryRefresh)
+              queryRefresh({
+                page: '1',
+                personal,
+                from: undefined,
+                to: undefined,
+              });
+          },
+        },
+        {
           name: EventTab.ALL,
           onClick: () => {
             if (queryRefresh)
@@ -146,6 +170,11 @@ const headerTab = (headerTabBehavior: HeaderTabBehavior): Tab[] => {
                 to,
               });
           },
+        },
+        {
+          type: 'create',
+          name: '作成',
+          onClick: onCreateClicked,
         },
       ];
     case 'account':

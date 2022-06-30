@@ -20,6 +20,7 @@ import { RiDeleteBin6Line } from 'react-icons/ri';
 import Link from 'next/link';
 import { EventTab, Tab } from 'src/types/header/tab/types';
 import { IoChevronDownCircleOutline } from 'react-icons/io5';
+import EventPageTab from '@/components/tab/EventPageTab';
 
 export type HeaderProps = {
   title: string;
@@ -30,12 +31,13 @@ export type HeaderProps = {
   onClickRightButton?: () => void;
   classNames?: string[];
   isDrawerOpen: boolean;
+  EventPage?: 'カレンダー' | 'リスト';
   setIsDrawerOpen: React.Dispatch<React.SetStateAction<boolean>>;
   setIsTalkRoom?: React.Dispatch<React.SetStateAction<boolean>>;
   setMembersModal?: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-const tabClassNameGetter = (tab: Tab): string => {
+export const tabClassNameGetter = (tab: Tab): string => {
   const name = tab.name;
   switch (name) {
     case EventTab.IMPRESSIVE_UNIVERSITY:
@@ -59,6 +61,7 @@ const HeaderWithTab: React.FC<HeaderProps> = ({
   title,
   activeTabName,
   tabs,
+  EventPage,
   rightButtonName,
   rightMenuName,
   onClickRightButton,
@@ -128,11 +131,17 @@ const HeaderWithTab: React.FC<HeaderProps> = ({
           </div>
         </div> */}
       {/* </div> */}
-      {tabs && tabs.length ? (
+      {EventPage && tabs && (
+        <EventPageTab
+          tabs={tabs}
+          activeTabName={activeTabName}
+          eventPage={EventPage}
+        />
+      )}
+      {tabs && tabs.length && !EventPage ? (
         <Box
           w="100%"
           px="3%"
-          maxWidth="1000px"
           overflowX="auto"
           display="flex"
           flexDir="row"
@@ -171,9 +180,9 @@ const HeaderWithTab: React.FC<HeaderProps> = ({
               <Button
                 onClick={t.onClick}
                 rounded={50}
-                position="absolute"
                 colorScheme="blue"
                 right={0}
+                ml="auto"
                 mr="3%"
                 rightIcon={<AiOutlinePlus />}>
                 {t.name}
@@ -204,7 +213,7 @@ const HeaderWithTab: React.FC<HeaderProps> = ({
                     ? headerStyles.tab__active
                     : headerStyles.tab__disable,
                 )}>
-                <Text color={t.color}>{t.name}</Text>
+                <Text color={t.color}>{t.name} </Text>
               </button>
             ) : null,
           )}
