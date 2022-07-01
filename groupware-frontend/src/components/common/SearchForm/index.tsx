@@ -66,9 +66,9 @@ const useSearchForm = () => useContext(SearchFormContext);
 type SearchFormProps = {
   value: string;
   onChange: ChangeEventHandler<HTMLInputElement>;
-  selectItems: string[];
-  selectingItem: string;
-  onSelect: ChangeEventHandler<HTMLSelectElement>;
+  selectItems?: string[];
+  selectingItem?: string;
+  onSelect?: ChangeEventHandler<HTMLSelectElement>;
   onClickButton: () => void;
   tags?: Tag[];
   selectedTags?: Tag[];
@@ -176,7 +176,7 @@ const SearchInput: React.FC<SearchFormProps> = ({
               </Badge>
             ) : null}
           </Button>
-          {selectItems?.length > 1 && (
+          {selectItems && (
             <Select
               ml="1%"
               name="branch"

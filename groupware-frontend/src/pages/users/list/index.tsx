@@ -62,12 +62,14 @@ const UserList = () => {
   };
 
   const tabs: Tab[] = useHeaderTab({
-    headerTabType: 'event',
+    headerTabType: 'userList',
     queryRefresh,
   });
 
+  console.log('ppp', tags);
+
   const initialHeaderValue = {
-    title: 'Events',
+    title: '社員名鑑',
     activeTabName:
       query === UserRole.ADMIN
         ? '管理者'
@@ -141,28 +143,12 @@ const UserList = () => {
   return (
     <LayoutWithTab
       sidebar={{ activeScreenName: SidebarScreenName.USERS }}
-      header={{
-        title: '社員名鑑',
-      }}>
+      header={initialHeaderValue}>
       <Head>
         <title>ボールド | 社員名鑑</title>
       </Head>
       <TopTabBar topTabBehaviorList={topTabBehaviorList} />
       <SearchForm
-        selectItems={[
-          '指定なし',
-          'イベント参加数順',
-          '質問数順',
-          '回答数順',
-          'ナレッジ投稿数順',
-        ]}
-        selectingItem={getUserSortName(query.sort)}
-        onSelect={(e) => {
-          queryRefresh({
-            sort: getUserSortValue(e.target.value),
-          });
-          return;
-        }}
         onClear={() => setSelectedTags([])}
         value={searchWord || ''}
         onChange={(e) => setSearchWord(e.currentTarget.value)}
@@ -179,9 +165,28 @@ const UserList = () => {
 
       {users && users.users.length ? (
         <>
-          <Box w="24%" ml="auto" mb="30px">
-            <FormControl>
-              <FormLabel>期間</FormLabel>
+          <Box w="100%" my="20px" display="flex" justifyContent="flex-start">
+            <FormControl w="200px">
+              <Select
+                bg="white"
+                defaultValue={query.sort}
+                value={query.sort}
+                onChange={(e) => {
+                  queryRefresh({
+                    sort:
+                      (e.target.value as 'event' | 'question' | 'answer') ||
+                      undefined,
+                  });
+                  return;
+                }}>
+                <option value="">指定なし</option>
+                <option value="event">イベント参加数順</option>
+                <option value="question">質問数順</option>
+                <option value="answer">回答数順</option>
+                <option value="knowledge">ナレッジ投稿数順</option>
+              </Select>
+            </FormControl>
+            <FormControl w="200px" ml="20px">
               <Select
                 bg="white"
                 defaultValue={query.duration}
@@ -192,13 +197,13 @@ const UserList = () => {
                   });
                   return;
                 }}>
-                <option value="">指定なし</option>
+                <option value="">全期間</option>
                 <option value="week">週間</option>
                 <option value="month">月間</option>
               </Select>
             </FormControl>
           </Box>
-          <SimpleGrid minChildWidth="520px" spacing="20px" w="80vw" mx="auto">
+          <SimpleGrid minChildWidth="520px" spacing="20px" w="100%" mx="auto">
             {users.users.map((u) => (
               <div key={u.id}>
                 <UserCard
