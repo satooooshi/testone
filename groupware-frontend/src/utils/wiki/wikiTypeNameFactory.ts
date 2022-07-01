@@ -80,8 +80,6 @@ export const getWikiCategoryList = (wikiType?: WikiType) => {
       ];
     case WikiType.RULES:
       return ['社内規則', 'ABC制度', '会社理念', '福利厚生等', '各種申請書'];
-    default:
-      return [''];
   }
 };
 
