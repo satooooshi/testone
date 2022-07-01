@@ -21,7 +21,13 @@ import {
 import { useHeaderTab } from '@/hooks/headerTab/useHeaderTab';
 import TopTabBar, { TopTabBehavior } from '@/components/layout/TopTabBar';
 import { Box, Radio, RadioGroup, Stack, Text } from '@chakra-ui/react';
-import { wikiTypeNameFactory } from 'src/utils/wiki/wikiTypeNameFactory';
+import {
+  getBoardCategory,
+  getRuleCategory,
+  getWikiCategoryList,
+  wikiNameToCategory,
+  wikiTypeNameFactory,
+} from 'src/utils/wiki/wikiTypeNameFactory';
 import TabList from '@/components/common/TabList';
 
 const QAQuestionList = () => {
@@ -47,247 +53,6 @@ const QAQuestionList = () => {
   const [searchWord, setSearchWord] = useState(word);
   const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
   const { data: tags } = useAPIGetTag();
-
-  const boardTabs: Tab[] = [
-    {
-      name: 'All',
-      onClick: () =>
-        queryRefresh({
-          type: WikiType.BOARD,
-          board_category: undefined,
-          status: undefined,
-        }),
-      isActive: type === WikiType.BOARD && !board_category,
-    },
-    {
-      name: wikiTypeNameFactory(
-        WikiType.BOARD,
-        undefined,
-        true,
-        BoardCategory.KNOWLEDGE,
-      ),
-      onClick: () =>
-        queryRefresh({
-          type: WikiType.BOARD,
-          board_category: BoardCategory.KNOWLEDGE,
-          status: undefined,
-        }),
-      isActive:
-        type === WikiType.BOARD && board_category === BoardCategory.KNOWLEDGE,
-    },
-    {
-      name: wikiTypeNameFactory(
-        WikiType.BOARD,
-        undefined,
-        true,
-        BoardCategory.QA,
-      ),
-      onClick: () =>
-        queryRefresh({
-          type: WikiType.BOARD,
-          board_category: BoardCategory.QA,
-          status: 'new',
-        }),
-      isActive: type === WikiType.BOARD && board_category === BoardCategory.QA,
-    },
-    {
-      name: wikiTypeNameFactory(
-        WikiType.BOARD,
-        undefined,
-        true,
-        BoardCategory.NEWS,
-      ),
-      onClick: () =>
-        queryRefresh({
-          type: WikiType.BOARD,
-          board_category: BoardCategory.NEWS,
-          status: undefined,
-        }),
-      isActive:
-        type === WikiType.BOARD && board_category === BoardCategory.NEWS,
-    },
-    {
-      name: wikiTypeNameFactory(
-        WikiType.BOARD,
-        undefined,
-        true,
-        BoardCategory.IMPRESSIVE_UNIVERSITY,
-      ),
-      onClick: () =>
-        queryRefresh({
-          type: WikiType.BOARD,
-          board_category: BoardCategory.IMPRESSIVE_UNIVERSITY,
-          status: undefined,
-        }),
-      isActive:
-        type === WikiType.BOARD &&
-        board_category === BoardCategory.IMPRESSIVE_UNIVERSITY,
-    },
-    {
-      name: wikiTypeNameFactory(
-        WikiType.BOARD,
-        undefined,
-        true,
-        BoardCategory.CLUB,
-      ),
-      onClick: () =>
-        queryRefresh({
-          type: WikiType.BOARD,
-          board_category: BoardCategory.CLUB,
-          status: undefined,
-        }),
-      isActive:
-        type === WikiType.BOARD && board_category === BoardCategory.CLUB,
-    },
-    {
-      name: wikiTypeNameFactory(
-        WikiType.BOARD,
-        undefined,
-        true,
-        BoardCategory.STUDY_MEETING,
-      ),
-      onClick: () =>
-        queryRefresh({
-          type: WikiType.BOARD,
-          board_category: BoardCategory.STUDY_MEETING,
-          status: undefined,
-        }),
-      isActive:
-        type === WikiType.BOARD &&
-        board_category === BoardCategory.STUDY_MEETING,
-    },
-    {
-      name: wikiTypeNameFactory(
-        WikiType.BOARD,
-        undefined,
-        true,
-        BoardCategory.SELF_IMPROVEMENT,
-      ),
-      onClick: () =>
-        queryRefresh({
-          type: WikiType.BOARD,
-          board_category: BoardCategory.SELF_IMPROVEMENT,
-          status: undefined,
-        }),
-      isActive:
-        type === WikiType.BOARD &&
-        board_category === BoardCategory.SELF_IMPROVEMENT,
-    },
-    {
-      name: wikiTypeNameFactory(
-        WikiType.BOARD,
-        undefined,
-        true,
-        BoardCategory.PERSONAL_ANNOUNCEMENT,
-      ),
-      onClick: () =>
-        queryRefresh({
-          type: WikiType.BOARD,
-          board_category: BoardCategory.PERSONAL_ANNOUNCEMENT,
-          status: undefined,
-        }),
-      isActive:
-        type === WikiType.BOARD &&
-        board_category === BoardCategory.PERSONAL_ANNOUNCEMENT,
-    },
-    {
-      name: wikiTypeNameFactory(
-        WikiType.BOARD,
-        undefined,
-        true,
-        BoardCategory.CELEBRATION,
-      ),
-      onClick: () =>
-        queryRefresh({
-          type: WikiType.BOARD,
-          board_category: BoardCategory.CELEBRATION,
-          status: undefined,
-        }),
-      isActive:
-        type === WikiType.BOARD && board_category === BoardCategory.CELEBRATION,
-    },
-    {
-      name: wikiTypeNameFactory(
-        WikiType.BOARD,
-        undefined,
-        true,
-        BoardCategory.OTHER,
-      ),
-      onClick: () =>
-        queryRefresh({
-          type: WikiType.BOARD,
-          board_category: BoardCategory.OTHER,
-          status: undefined,
-        }),
-      isActive:
-        type === WikiType.BOARD && board_category === BoardCategory.OTHER,
-    },
-  ];
-  // const qaTopTab: TopTabBehavior[] = [
-  //   {
-  //     tabName: '新着',
-  //     onClick: () =>
-  //       queryRefresh({
-  //         type: WikiType.QA,
-  //         status: 'new',
-  //       }),
-  //     isActiveTab: status === 'new',
-  //   },
-  //   {
-  //     tabName: '解決済み',
-  //     onClick: () =>
-  //       queryRefresh({
-  //         type: WikiType.QA,
-  //         status: 'resolved',
-  //       }),
-  //     isActiveTab: status === 'resolved',
-  //   },
-  // ];
-
-  const rulesTab: Tab[] = [
-    {
-      name: '会社理念',
-      onClick: () =>
-        queryRefresh({
-          type: WikiType.RULES,
-          rule_category: RuleCategory.PHILOSOPHY,
-        }),
-      isActive: !rule_category || rule_category === RuleCategory.PHILOSOPHY,
-    },
-    {
-      name: '社内規則',
-      onClick: () =>
-        queryRefresh({
-          type: WikiType.RULES,
-          rule_category: RuleCategory.RULES,
-        }),
-      isActive: rule_category === RuleCategory.RULES,
-    },
-    {
-      name: 'ABC制度',
-      onClick: () =>
-        queryRefresh({ type: WikiType.RULES, rule_category: RuleCategory.ABC }),
-      isActive: rule_category === RuleCategory.ABC,
-    },
-    {
-      name: '福利厚生等',
-      onClick: () =>
-        queryRefresh({
-          type: WikiType.RULES,
-          rule_category: RuleCategory.BENEFITS,
-        }),
-      isActive: rule_category === RuleCategory.BENEFITS,
-    },
-    {
-      name: '各種申請書',
-      onClick: () =>
-        queryRefresh({
-          type: WikiType.RULES,
-          rule_category: RuleCategory.DOCUMENT,
-        }),
-      isActive: rule_category === RuleCategory.DOCUMENT,
-    },
-  ];
 
   const onToggleTag = (t: Tag) => {
     setSelectedTags((s) => toggleTag(s, t));
@@ -345,11 +110,31 @@ const QAQuestionList = () => {
       {/* <Box w="100%" mb="24px">
         <TopTabBar topTabBehaviorList={topTab} />
       </Box> */}
-      {type === WikiType.RULES && <TabList tabs={rulesTab} />}
-      {type === WikiType.BOARD && <TabList tabs={boardTabs} />}
       <div className={qaListStyles.top_contents_wrapper}>
         <div className={qaListStyles.search_form_wrapper}>
           <SearchForm
+            selectItems={getWikiCategoryList(type)}
+            selectingItem={wikiTypeNameFactory(
+              type,
+              rule_category,
+              true,
+              board_category,
+            )}
+            onSelect={(s) =>
+              type === WikiType.RULES
+                ? queryRefresh({
+                    type: type,
+                    rule_category: getRuleCategory(s.target.value),
+                    status: undefined,
+                  })
+                : type === WikiType.BOARD
+                ? queryRefresh({
+                    type: type,
+                    board_category: getBoardCategory(s.target.value),
+                    status: undefined,
+                  })
+                : null
+            }
             onClear={() => setSelectedTags([])}
             value={searchWord}
             onChange={(e) => setSearchWord(e.currentTarget.value)}
