@@ -115,4 +115,28 @@ export const reactionStickers = [
     name: 'scheduleDeterminedSticker',
     src: require('../../../assets/thank_you_sticker.png'),
   },
+  {
+    name: 'callBackSticker',
+    src: require('../../../assets/call_back_sticker.png'),
+  },
+  {
+    name: 'lerningALotSticker',
+    src: require('../../../assets/lerning_a_lot_sticker.png'),
+  },
+  {
+    name: 'lostSoulSticker',
+    src: require('../../../assets/lost_soul_sticker.png'),
+  },
+  {
+    name: 'iSeeSticker',
+    src: require('../../../assets/i_see_sticker.png'),
+  },
+  {
+    name: 'thinkingSticker',
+    src: require('../../../assets/thinking_sticker.png'),
+  },
+  {
+    name: 'doItSticker',
+    src: require('../../../assets/do_it_sticker.png'),
+  },
 ];
