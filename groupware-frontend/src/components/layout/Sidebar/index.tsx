@@ -84,9 +84,9 @@ const Sidebar: React.FC<SidebarProps> = ({ activeScreenName, hideDrawer }) => {
           <div className={sidebarStyles.top_item}>
             <div className={sidebarStyles.bold_logo_and_text}>
               <div className={sidebarStyles.bold_logo}>
-                <Image src={boldLogo} alt="eo logo" />
+                <Image src={boldLogo} alt="bold logo" />
               </div>
-              <p className={sidebarStyles.icon_name__active}>EO</p>
+              <p className={sidebarStyles.logo_text}>Bold</p>
             </div>
             <AiOutlineDoubleLeft
               className={sidebarStyles.outline_double_left}

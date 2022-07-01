@@ -68,6 +68,7 @@ import {
   eventStatusNameToValue,
   eventStatusValueToName,
 } from 'src/utils/event/eventStatusFormatter';
+import { HeaderProps } from '@/components/layout/HeaderWithTab';
 
 const localizer = momentLocalizer(moment);
 //@ts-ignore
@@ -423,14 +424,15 @@ const EventList = () => {
     calendarRef?.current?.scrollIntoView();
   }, []);
 
-  const initialHeaderValue = {
+  const initialHeaderValue: Omit<
+    HeaderProps,
+    'isDrawerOpen' | 'setIsDrawerOpen'
+  > = {
     title: 'Events',
     activeTabName: activeTabName(),
     tabs: tabs,
     EventPage: isCalendar ? 'カレンダー' : 'リスト',
-    rightButtonName: 'イベントを追加',
-    onClickRightButton: () => setModalVisible(true),
-    resetEventForm: () => setNewEvent(initialEventValue),
+    // resetEventForm: () => setNewEvent(initialEventValue),
   };
 
   useEffect(() => {
@@ -441,69 +443,6 @@ const EventList = () => {
       setSelectedTags(searchedTags);
     }
   }, [tag, tags]);
-
-  const topTabBehaviorList: TopTabBehavior[] = [
-    {
-      tabName: 'Myカレンダー',
-      onClick: () => {
-        queryRefresh({
-          page: '1',
-          personal: 'true',
-          from: from || '',
-          to: to || '',
-        });
-      },
-      isActiveTab: !!(isCalendar && personal),
-    },
-    {
-      tabName: '全体カレンダー',
-      onClick: () => {
-        queryRefresh({
-          personal: '',
-          page: '1',
-          from: from || '',
-          to: to || '',
-        });
-      },
-      isActiveTab: !!(isCalendar && !personal),
-    },
-    {
-      tabName: '今後のイベント',
-      onClick: () => {
-        queryRefresh({
-          page: '1',
-          status: 'future',
-          from: undefined,
-          to: undefined,
-        });
-      },
-      isActiveTab: !isCalendar && status === 'future',
-    },
-    {
-      tabName: '過去のイベント',
-      onClick: () => {
-        queryRefresh({
-          page: '1',
-          status: 'past',
-          from: undefined,
-          to: undefined,
-        });
-      },
-      isActiveTab: !isCalendar && status === 'past',
-    },
-    {
-      tabName: '進行中のイベント',
-      onClick: () => {
-        queryRefresh({
-          page: '1',
-          status: 'current',
-          from: undefined,
-          to: undefined,
-        });
-      },
-      isActiveTab: !isCalendar && status === 'current',
-    },
-  ];
 
   return (
     <LayoutWithTab
@@ -532,10 +471,11 @@ const EventList = () => {
         {/* <TabList tabs={tabs} activeTabName={activeTabName()} /> */}
         {isCalendar && (
           <Box
+            w="100%"
             ref={calendarRef}
             justifyContent="center"
             alignItems="center"
-            maxW={isSmallerThan768 ? '99vw' : undefined}
+            // maxW={isSmallerThan768 ? '99vw' : undefined}
             overflowX="auto"
             css={hideScrollbarCss}
             alignSelf="center">

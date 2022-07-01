@@ -67,61 +67,63 @@ const HeaderWithTab: React.FC<HeaderProps> = ({
   setMembersModal,
 }) => {
   return (
-    <>
-      <div className={headerStyles.header}>
-        <div className={headerStyles.header_top_wrapper}>
-          <div className={headerStyles.header_left}>
-            <GiHamburgerMenu
-              onMouseEnter={() => {
-                setIsDrawerOpen(true);
-              }}
-              onClick={() => setIsDrawerOpen(true)}
-              className={headerStyles.ham_icon}
-            />
-          </div>
-          <div className={headerStyles.header_right}>
-            <div className={headerStyles.right_button_wrapper}>
-              {rightMenuName && setMembersModal && setIsTalkRoom ? (
-                <Menu>
-                  {({ isOpen }) => (
-                    <>
-                      <MenuButton
-                        isActive={isOpen}
-                        colorScheme="blue"
-                        as={Button}
-                        rightIcon={<IoChevronDownCircleOutline />}>
-                        {rightMenuName}
-                      </MenuButton>
-                      <MenuList>
-                        <MenuItem
-                          onClick={() => {
-                            setMembersModal(true), setIsTalkRoom(true);
-                          }}>
-                          トーク
-                        </MenuItem>
-                        <MenuItem
-                          onClick={() => {
-                            setMembersModal(true), setIsTalkRoom(false);
-                          }}>
-                          グループ
-                        </MenuItem>
-                      </MenuList>
-                    </>
-                  )}
-                </Menu>
-              ) : null}
-              {rightButtonName && onClickRightButton ? (
-                <Button
-                  size="sm"
-                  colorScheme="blue"
-                  onClick={onClickRightButton}>
-                  {rightButtonName}
-                </Button>
-              ) : null}
-            </div>
+    <Box
+      w="100%"
+      bg="white"
+      display="flex"
+      flexDir="row"
+      alignItems="center"
+      // borderLeftWidth="3px"
+      // borderColor="#f3f6fb"
+    >
+      {/* <div className={headerStyles.header_top_wrapper}>
+        <div className={headerStyles.header_right}>
+          <div className={headerStyles.right_button_wrapper}>
+            {rightMenuName && setMembersModal && setIsTalkRoom ? (
+              <Menu>
+                {({ isOpen }) => (
+                  <>
+                    <MenuButton
+                      isActive={isOpen}
+                      colorScheme="blue"
+                      as={Button}
+                      rightIcon={<IoChevronDownCircleOutline />}>
+                      {rightMenuName}
+                    </MenuButton>
+                    <MenuList>
+                      <MenuItem
+                        onClick={() => {
+                          setMembersModal(true), setIsTalkRoom(true);
+                        }}>
+                        トーク
+                      </MenuItem>
+                      <MenuItem
+                        onClick={() => {
+                          setMembersModal(true), setIsTalkRoom(false);
+                        }}>
+                        グループ
+                      </MenuItem>
+                    </MenuList>
+                  </>
+                )}
+              </Menu>
+            ) : null}
+            {rightButtonName && onClickRightButton ? (
+              <Button size="sm" colorScheme="blue" onClick={onClickRightButton}>
+                {rightButtonName}
+              </Button>
+            ) : null}
           </div>
         </div>
-      </div>
+      </div> */}
+      <GiHamburgerMenu
+        onMouseEnter={() => {
+          setIsDrawerOpen(true);
+        }}
+        onClick={() => setIsDrawerOpen(true)}
+        className={headerStyles.ham_icon}
+      />
+
       {EventPage && tabs && (
         <EventPageTab
           tabs={tabs}
@@ -132,7 +134,9 @@ const HeaderWithTab: React.FC<HeaderProps> = ({
       {tabs && tabs.length && !EventPage ? (
         <Box
           w="100%"
-          px="3%"
+          px="4%"
+          mx="auto"
+          maxW="1700px"
           overflowX="auto"
           display="flex"
           flexDir="row"
@@ -213,24 +217,11 @@ const HeaderWithTab: React.FC<HeaderProps> = ({
                   {t.name}
                 </Text>
               </ChakraLink>
-            ) : // <button
-            //   onClick={t.onClick}
-            //   key={t.name}
-            //   className={clsx(
-            //     headerStyles.tab,
-            //     headerStyles.tab__button,
-            //     tabClassNameGetter(t),
-            //     t.name === activeTabName
-            //       ? headerStyles.tab__active
-            //       : headerStyles.tab__disable,
-            //   )}>
-            //   <Text color={t.color}>{t.name} </Text>
-            // </button>
-            null,
+            ) : null,
           )}
         </Box>
       ) : null}
-    </>
+    </Box>
   );
 };
 

@@ -7,7 +7,7 @@ import clsx from 'clsx';
 import { useMediaQuery } from '@chakra-ui/react';
 
 type LayoutWithTabProps = {
-  sidebar: SidebarProps;
+  sidebar: Omit<SidebarProps, 'hideDrawer'>;
   header: Omit<HeaderProps, 'isDrawerOpen' | 'setIsDrawerOpen'>;
 };
 
