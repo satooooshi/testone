@@ -24,14 +24,21 @@ export const useChatSocket = (
   const {user: myself, setCurrentChatRoomId} = useAuthenticate();
   const {mutate: saveLastReadChatTime} = useAPISaveLastReadChatTime();
   const {data: lastReadChatTime, refetch: refetchLastReadChatTime} =
-    useAPIGetLastReadChatTime(room.id);
+    useAPIGetLastReadChatTime(room.id, {
+      onSuccess: data => console.log('data', data, myself?.lastName),
+    });
 
   let isMounted: boolean | undefined;
 
-  const report = () => {
-    socket.emit('readReport', {
-      room: room.id.toString(),
-      senderId: myself?.id,
+  const saveLastReadTimeAndReport = () => {
+    saveLastReadChatTime(room.id, {
+      onSuccess: () => {
+        socket.emit('readReport', {
+          room: room.id.toString(),
+          senderId: myself?.id,
+        });
+        handleEnterRoom(room.id);
+      },
     });
   };
   const connect = () => {
@@ -68,12 +75,7 @@ export const useChatSocket = (
                 !socketMessage.chatMessage?.isSender &&
                 AppState.currentState === 'active'
               ) {
-                saveLastReadChatTime(room.id, {
-                  onSuccess: () => {
-                    report();
-                    handleEnterRoom(room.id);
-                  },
-                });
+                saveLastReadTimeAndReport();
                 refetchLastReadChatTime();
               }
               socketMessage.chatMessage.createdAt = new Date(
@@ -142,7 +144,7 @@ export const useChatSocket = (
     send: (m: SocketMessage) => {
       socket.emit('message', m);
     },
-    report,
+    saveLastReadTimeAndReport,
     lastReadChatTime,
   };
 };

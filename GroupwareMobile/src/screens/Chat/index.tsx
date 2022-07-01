@@ -149,7 +149,6 @@ const Chat: React.FC = () => {
   >();
   const {handleEnterRoom, refetchRoomCard} = useHandleBadge();
   const [selectedEmoji, setSelectedEmoji] = useState<string>();
-  const {mutate: saveLastReadChatTime} = useAPISaveLastReadChatTime();
   const [selectedMessageForCheckLastRead, setSelectedMessageForCheckLastRead] =
     useState<ChatMessage>();
   const [appState, setAppState] = useState<AppStateStatus>('active');
@@ -290,8 +289,7 @@ const Chat: React.FC = () => {
             `dateRefetchLatestInRoom${room.id}user${myself?.id}`,
             now,
           );
-          saveLastReadChatTime(room.id);
-          console.log('saveLastReadChatTime refetch');
+          socket.saveLastReadTimeAndReport();
 
           setMessages(m => {
             const updatedMessages = refreshMessage([...latestData, ...m]);
@@ -523,13 +521,13 @@ const Chat: React.FC = () => {
     setVideo(data);
   };
 
-  const numbersOfRead = (message: ChatMessage) => {
-    return (
-      socket.lastReadChatTime?.filter(
-        time => time.readTime >= message.createdAt,
-      ).length || 0
-    );
-  };
+  // const numbersOfRead = (message: ChatMessage) => {
+  //   return (
+  //     socket.lastReadChatTime?.filter(
+  //       time => time.readTime >= message.createdAt,
+  //     ).length || 0
+  //   );
+  // };
 
   const onScrollTopOnChat = () => {
     if (messages.length >= 20) {
@@ -851,7 +849,7 @@ const Chat: React.FC = () => {
         scrollToTarget={scrollToTarget}
         isScrollTarget={focusedMessageID === message.id}
         onCheckLastRead={() => setSelectedMessageForCheckLastRead(message)}
-        numbersOfRead={numbersOfRead(message)}
+        // numbersOfRead={numbersOfRead(message)}
         onLongPress={() => setLongPressedMgg(message)}
         onPressImage={() => showImageOnModal(message.content)}
         onPressVideo={() =>
@@ -1084,14 +1082,8 @@ const Chat: React.FC = () => {
 
   useEffect(() => {
     if (appState === 'active' && isFocused) {
-      saveLastReadChatTime(room.id, {
-        onSuccess: () => {
-          socket.report();
-          console.log('saveLastReadChatTime appState');
-
-          handleEnterRoom(room.id);
-        },
-      });
+      socket.saveLastReadTimeAndReport();
+      console.log('saveLastReadChatTime appState');
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [appState, isFocused]);
