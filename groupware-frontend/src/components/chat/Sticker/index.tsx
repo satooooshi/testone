@@ -13,6 +13,7 @@ import {
 } from '@chakra-ui/react';
 import React, { Fragment, memo } from 'react';
 import { BiSmile } from 'react-icons/bi';
+import { hideScrollbarCss } from 'src/utils/chakra/hideScrollBar.css';
 import { darkFontColor } from 'src/utils/colors';
 import { reactionStickers } from 'src/utils/reactionStickers';
 
@@ -41,8 +42,7 @@ const Sticker: React.FC<stickerProps> = memo(({ handleStickerSelected }) => {
               <PopoverHeader border="0">
                 <PopoverCloseButton />
               </PopoverHeader>
-
-              <PopoverBody h="400px" overflow={'scroll'}>
+              <PopoverBody h="400px" overflow={'scroll'} css={hideScrollbarCss}>
                 <SimpleGrid columns={3}>
                   {reactionStickers.map((e) => (
                     <Fragment key={e.name}>

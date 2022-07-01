@@ -24,9 +24,7 @@ export const useChatSocket = (
   const {user: myself, setCurrentChatRoomId} = useAuthenticate();
   const {mutate: saveLastReadChatTime} = useAPISaveLastReadChatTime();
   const {data: lastReadChatTime, refetch: refetchLastReadChatTime} =
-    useAPIGetLastReadChatTime(room.id, {
-      onSuccess: data => console.log('data', data, myself?.lastName),
-    });
+    useAPIGetLastReadChatTime(room.id);
 
   let isMounted: boolean | undefined;
 
@@ -51,6 +49,7 @@ export const useChatSocket = (
   return {
     joinRoom: () => {
       connect();
+
       setCurrentChatRoomId(room.id);
       isMounted = true;
       socket.emit('joinRoom', room.id.toString());

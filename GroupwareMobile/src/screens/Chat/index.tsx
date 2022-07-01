@@ -163,7 +163,6 @@ const Chat: React.FC = () => {
   };
   const socket = useChatSocket(room, refreshMessage, setMessages);
   const messageContentRef = useRef('');
-  console.log('--------');
 
   const {values, handleSubmit, setValues, resetForm} = useFormik<
     Partial<ChatMessage>
@@ -476,7 +475,6 @@ const Chat: React.FC = () => {
       type: [DocumentPicker.types.allFiles],
     });
     const formData = new FormData();
-    console.log('---uri', res.uri, normalizeURL(res.uri));
 
     formData.append('files', {
       name: res.name,
@@ -797,10 +795,6 @@ const Chat: React.FC = () => {
         const messagesInStorage = JSON.parse(jsonMessagesInStorage);
         setMessages(messagesInStorage);
         messagesInStorageLength = messagesInStorage?.length;
-        console.log(
-          'refetch updated messages ========================',
-          dateRefetchLatest,
-        );
         getExpiredUrlMessages();
       }
       const now = dateTimeFormatterFromJSDDate({
@@ -1083,7 +1077,6 @@ const Chat: React.FC = () => {
   useEffect(() => {
     if (appState === 'active' && isFocused) {
       socket.saveLastReadTimeAndReport();
-      console.log('saveLastReadChatTime appState');
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [appState, isFocused]);

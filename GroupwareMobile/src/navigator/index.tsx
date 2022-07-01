@@ -130,7 +130,6 @@ const Navigator = () => {
   const endCall = useCallback(
     async (isCallKeep: boolean = false) => {
       if (isCallKeep && !remoteInvitation.current && !localInvitation) {
-        console.log('end call called by endAllCalls');
         return;
       }
       setIsJoining(false);
@@ -443,48 +442,51 @@ const Navigator = () => {
     getRtmToken();
   }, [AGORA_APP_ID, user?.id]);
 
-  const sendLocalNotification = async (remoteMessage: any) => {
-    if (
-      remoteMessage?.data?.silent ||
-      (remoteMessage?.data?.screen === 'chat' &&
-        remoteMessage.data?.id === `${currentChatRoomId}`)
-    ) {
-      return;
-    }
-    if (!remoteMessage?.data?.calleeId) {
-      const channelId = await notifee.createChannel({
-        id: 'default',
-        name: 'Default Channel',
-      });
+  const sendLocalNotification = useCallback(
+    async (remoteMessage: any) => {
       console.log(
         '============',
         remoteMessage.data?.id,
         `${currentChatRoomId}`,
       );
+      if (
+        remoteMessage?.data?.silent ||
+        (remoteMessage?.data?.screen === 'chat' &&
+          remoteMessage.data?.id === `${currentChatRoomId}`)
+      ) {
+        return;
+      }
+      if (!remoteMessage?.data?.calleeId) {
+        const channelId = await notifee.createChannel({
+          id: 'default',
+          name: 'Default Channel',
+        });
 
-      await notifee.displayNotification({
-        title: remoteMessage.data?.title || '',
-        body: remoteMessage.data?.message || remoteMessage.data?.body || '',
-        android: {
-          channelId: channelId,
-          pressAction: {
-            id: 'action_id',
-            launchActivity: 'default',
+        await notifee.displayNotification({
+          title: remoteMessage.data?.title || '',
+          body: remoteMessage.data?.message || remoteMessage.data?.body || '',
+          android: {
+            channelId: channelId,
+            pressAction: {
+              id: 'action_id',
+              launchActivity: 'default',
+            },
           },
-        },
-        data: {
-          screen: remoteMessage?.data?.screen
-            ? remoteMessage?.data?.screen
-            : '',
-          id: remoteMessage?.data?.id ? remoteMessage?.data?.id : '',
-        },
-        ios: {
-          // iOS resource (.wav, aiff, .caf)
-          sound: 'local.wav',
-        },
-      });
-    }
-  };
+          data: {
+            screen: remoteMessage?.data?.screen
+              ? remoteMessage?.data?.screen
+              : '',
+            id: remoteMessage?.data?.id ? remoteMessage?.data?.id : '',
+          },
+          ios: {
+            // iOS resource (.wav, aiff, .caf)
+            sound: 'local.wav',
+          },
+        });
+      }
+    },
+    [currentChatRoomId],
+  );
 
   const naviateByNotif = (notification: any) => {
     if (
@@ -602,7 +604,7 @@ const Navigator = () => {
       return unsubscribe;
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user?.id]);
+  }, [user?.id, currentChatRoomId]);
 
   useEffect(() => {
     if (isJoining && !isCallScreen) {
