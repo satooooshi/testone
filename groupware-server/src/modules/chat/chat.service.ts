@@ -427,7 +427,6 @@ export class ChatService {
         lastReadTime: query.lastReadTime,
       })
       .getCount();
-
     return unreadCount;
   }
 
@@ -717,7 +716,7 @@ export class ChatService {
     }
 
     const existGroup = await this.chatGroupRepository.findOne(newData.id, {
-      relations: ['members'],
+      relations: ['members', 'lastReadChatTime', 'lastReadChatTime.user'],
     });
     let isMySelf = false;
     const otherExistMembers = existGroup.members.filter((u) => {
@@ -731,14 +730,12 @@ export class ChatService {
     if (!isMySelf) {
       throw new BadRequestException('The user is not a member');
     }
-
-    const newGroup = await this.chatGroupRepository.save(
-      this.chatGroupRepository.create({
-        ...existGroup,
-        ...newData,
-        updatedAt: new Date(),
-      }),
-    );
+    const newGroup = await this.chatGroupRepository.save({
+      ...existGroup,
+      members: newData.members,
+      name: newData.name,
+      updatedAt: new Date(),
+    });
     if (existGroup.name !== newGroup.name) {
       const sysMsgSaidsUpdated = new ChatMessage();
       sysMsgSaidsUpdated.type = ChatMessageType.SYSTEM_TEXT;
@@ -791,7 +788,6 @@ export class ChatService {
       allMemberWithoutMyself.map((u) => u.id),
       silentNotification,
     );
-
     return newGroup;
   }
 
