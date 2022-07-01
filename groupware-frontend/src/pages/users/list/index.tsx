@@ -71,64 +71,19 @@ const UserList = () => {
   const initialHeaderValue = {
     title: '社員名鑑',
     activeTabName:
-      query === UserRole.ADMIN
+      query.role === UserRole.ADMIN
         ? '管理者'
-        : query === UserRole.COMMON
+        : query.role === UserRole.COMMON
         ? '一般社員'
-        : query === UserRole.COACH
+        : query.role === UserRole.COACH
         ? 'コーチ'
-        : query === UserRole.INTERNAL_INSTRUCTOR
+        : query.role === UserRole.INTERNAL_INSTRUCTOR
         ? '講師(社員)'
-        : query === UserRole.EXTERNAL_INSTRUCTOR
+        : query.role === UserRole.EXTERNAL_INSTRUCTOR
         ? '講師(外部)'
         : '全て',
     tabs: tabs,
   };
-
-  const topTabBehaviorList: TopTabBehavior[] = [
-    {
-      tabName: '全て',
-      onClick: () => {
-        queryRefresh({ sort: query.sort, role: undefined, page: '1' });
-      },
-      isActiveTab: !query.role,
-    },
-    {
-      tabName: '管理者',
-      onClick: () => {
-        queryRefresh({ page: '1', role: UserRole.ADMIN });
-      },
-      isActiveTab: query.role === UserRole.ADMIN,
-    },
-    {
-      tabName: '一般社員',
-      onClick: () => {
-        queryRefresh({ page: '1', role: UserRole.COMMON });
-      },
-      isActiveTab: query.role === UserRole.COMMON,
-    },
-    {
-      tabName: 'コーチ',
-      onClick: () => {
-        queryRefresh({ page: '1', role: UserRole.COACH });
-      },
-      isActiveTab: query.role === UserRole.COACH,
-    },
-    {
-      tabName: '講師(社員)',
-      onClick: () => {
-        queryRefresh({ page: '1', role: UserRole.INTERNAL_INSTRUCTOR });
-      },
-      isActiveTab: query.role === UserRole.INTERNAL_INSTRUCTOR,
-    },
-    {
-      tabName: '講師(外部)',
-      onClick: () => {
-        queryRefresh({ page: '1', role: UserRole.EXTERNAL_INSTRUCTOR });
-      },
-      isActiveTab: query.role === UserRole.EXTERNAL_INSTRUCTOR,
-    },
-  ];
 
   useEffect(() => {
     if (tags) {
@@ -147,7 +102,7 @@ const UserList = () => {
       <Head>
         <title>ボールド | 社員名鑑</title>
       </Head>
-      <TopTabBar topTabBehaviorList={topTabBehaviorList} />
+      {/* <TopTabBar topTabBehaviorList={topTabBehaviorList} /> */}
       <SearchForm
         onClear={() => setSelectedTags([])}
         value={searchWord || ''}
