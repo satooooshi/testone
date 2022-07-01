@@ -95,7 +95,6 @@ const EventPageTab: React.FC<EventPageTabProps> = ({
             colorScheme={
               t.name === activeTabName || t.isActive ? 'blue' : undefined
             }
-            bg={t.name !== activeTabName && !t.isActive ? 'white' : undefined}
             onClick={t.onClick}>
             {t.name}
           </Button>
