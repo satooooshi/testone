@@ -11,8 +11,6 @@ import {
   Link as ChakraLink,
   Box,
 } from '@chakra-ui/react';
-import boldLogo from '@/public/bold-logo.png';
-import Image from 'next/image';
 import { GiHamburgerMenu } from 'react-icons/gi';
 import { AiOutlineLeft } from 'react-icons/ai';
 import { FiEdit2 } from 'react-icons/fi';
@@ -56,28 +54,27 @@ const tabClassNameGetter = (tab: Tab): string => {
 };
 
 const HeaderWithTab: React.FC<HeaderProps> = ({
-  title,
   activeTabName,
   tabs,
   rightButtonName,
   rightMenuName,
   onClickRightButton,
-  isDrawerOpen,
   setIsDrawerOpen,
   setIsTalkRoom,
   setMembersModal,
 }) => {
   return (
-    <div className={headerStyles.header_and_tab_wrapper}>
+    <div>
       <div className={headerStyles.header}>
         <div className={headerStyles.header_top_wrapper}>
           <div className={headerStyles.header_left}>
-            <Link href="/">
-              <a className={headerStyles.logo_image}>
-                <Image src={boldLogo} alt="bold logo" />
-              </a>
-            </Link>
-            <h1 className={headerStyles.header_title}>{title}</h1>
+            <GiHamburgerMenu
+              onMouseEnter={() => {
+                setIsDrawerOpen(true);
+              }}
+              onClick={() => setIsDrawerOpen(true)}
+              className={headerStyles.ham_icon}
+            />
           </div>
           <div className={headerStyles.header_right}>
             <div className={headerStyles.right_button_wrapper}>
@@ -119,20 +116,14 @@ const HeaderWithTab: React.FC<HeaderProps> = ({
                 </Button>
               ) : null}
             </div>
-            {!isDrawerOpen && (
-              <GiHamburgerMenu
-                onClick={() => setIsDrawerOpen(true)}
-                className={headerStyles.ham_icon}
-              />
-            )}
           </div>
         </div>
       </div>
+
       {tabs && tabs.length ? (
         <Box
           w="100%"
           px="2%"
-          maxWidth="1000px"
           overflowX="auto"
           display="flex"
           flexDir="row"
