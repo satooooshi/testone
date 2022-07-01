@@ -130,11 +130,7 @@ const SearchInput: React.FC<SearchFormProps> = ({
           onComplete={() => setTagModal(false)}
           isSearch={true}
         />
-        <Box
-          display="flex"
-          flexDir="row"
-          w="100%"
-          justifyContent="space-between">
+        <Box display="flex" flexDir="row" w="100%">
           <InputGroup width="50%">
             <InputLeftElement pointerEvents="none">
               <AiOutlineSearch />
@@ -160,6 +156,7 @@ const SearchInput: React.FC<SearchFormProps> = ({
             </InputRightElement>
           </InputGroup>
           <Button
+            ml="1%"
             bg="white"
             justifyContent="flex-start"
             w="24%"
@@ -179,20 +176,23 @@ const SearchInput: React.FC<SearchFormProps> = ({
               </Badge>
             ) : null}
           </Button>
-          <Select
-            name="branch"
-            value={selectingItem}
-            bg="white"
-            height="10"
-            w="24%"
-            onChange={onSelect}>
-            {selectItems?.length &&
-              selectItems.map((i) => (
-                <option key={i} value={i}>
-                  {i}
-                </option>
-              ))}
-          </Select>
+          {selectItems?.length > 1 && (
+            <Select
+              ml="1%"
+              name="branch"
+              value={selectingItem}
+              bg="white"
+              height="10"
+              w="24%"
+              onChange={onSelect}>
+              {selectItems?.length &&
+                selectItems.map((i) => (
+                  <option key={i} value={i}>
+                    {i}
+                  </option>
+                ))}
+            </Select>
+          )}
         </Box>
       </div>
       <Box display="flex" mt={2} alignItems="center">

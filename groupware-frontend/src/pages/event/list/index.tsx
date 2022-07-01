@@ -598,33 +598,31 @@ const EventList = () => {
 
         {!isCalendar && (
           <>
-            <div className={eventListStyles.search_form_wrapper}>
-              <SearchForm
-                selectingItem={eventStatusValueToName(status)}
-                selectItems={[
-                  '今後のイベント',
-                  '過去のイベント',
-                  '進行中のイベント',
-                ]}
-                onSelect={(i) => {
-                  queryRefresh({
-                    page: '1',
-                    status: eventStatusNameToValue(i.target.value),
-                    from: undefined,
-                    to: undefined,
-                  });
-                }}
-                onClear={() => setSelectedTags([])}
-                value={searchWord || ''}
-                onChange={(e) => setSearchWord(e.currentTarget.value)}
-                onClickButton={() =>
-                  queryRefresh({ page: '1', word: searchWord })
-                }
-                tags={tags || []}
-                selectedTags={selectedTags}
-                toggleTag={onToggleTag}
-              />
-            </div>
+            <SearchForm
+              selectingItem={eventStatusValueToName(status)}
+              selectItems={[
+                '今後のイベント',
+                '過去のイベント',
+                '進行中のイベント',
+              ]}
+              onSelect={(i) => {
+                queryRefresh({
+                  page: '1',
+                  status: eventStatusNameToValue(i.target.value),
+                  from: undefined,
+                  to: undefined,
+                });
+              }}
+              onClear={() => setSelectedTags([])}
+              value={searchWord || ''}
+              onChange={(e) => setSearchWord(e.currentTarget.value)}
+              onClickButton={() =>
+                queryRefresh({ page: '1', word: searchWord })
+              }
+              tags={tags || []}
+              selectedTags={selectedTags}
+              toggleTag={onToggleTag}
+            />
             <Box w="100%">
               {events?.events.length ? (
                 // <div className={eventListStyles.event_card__row}>

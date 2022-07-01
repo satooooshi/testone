@@ -1,6 +1,6 @@
 import { NextRouter } from 'next/router';
 import { useMemo } from 'react';
-import { EventType, RuleCategory, User, WikiType } from 'src/types';
+import { EventType, RuleCategory, User, UserRole, WikiType } from 'src/types';
 import { EventTab, Tab, TabName } from 'src/types/header/tab/types';
 
 type HeaderTab =
@@ -8,6 +8,7 @@ type HeaderTab =
   | 'account'
   | 'home'
   | 'wiki'
+  | 'userList'
   | 'admin'
   | 'mention'
   | 'newUser'
@@ -214,6 +215,48 @@ const headerTab = (headerTabBehavior: HeaderTabBehavior): Tab[] => {
           type: 'link',
           name: '社内Wiki Home',
           href: '/wiki',
+        },
+      ];
+    case 'userList':
+      return [
+        {
+          name: '全て',
+          onClick: () => {
+            if (queryRefresh) queryRefresh({ role: undefined, page: '1' });
+          },
+        },
+        {
+          name: '管理者',
+          onClick: () => {
+            if (queryRefresh) queryRefresh({ role: UserRole.ADMIN, page: '1' });
+          },
+        },
+        {
+          name: '一般社員',
+          onClick: () => {
+            if (queryRefresh)
+              queryRefresh({ role: UserRole.COMMON, page: '1' });
+          },
+        },
+        {
+          name: 'コーチ',
+          onClick: () => {
+            if (queryRefresh) queryRefresh({ role: UserRole.COACH, page: '1' });
+          },
+        },
+        {
+          name: '講師(社員)',
+          onClick: () => {
+            if (queryRefresh)
+              queryRefresh({ role: UserRole.INTERNAL_INSTRUCTOR, page: '1' });
+          },
+        },
+        {
+          name: '講師(外部)',
+          onClick: () => {
+            if (queryRefresh)
+              queryRefresh({ role: UserRole.EXTERNAL_INSTRUCTOR, page: '1' });
+          },
         },
       ];
     case 'admin':
