@@ -319,7 +319,7 @@ const QAQuestionList = () => {
         ? '掲示板'
         : type === WikiType.ALL_POSTAL
         ? 'オール便'
-        : 'All',
+        : '全て',
     tabs,
   };
 

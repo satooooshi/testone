@@ -65,10 +65,11 @@ const EventPageTab: React.FC<EventPageTabProps> = ({
           (t.name === 'カレンダー' || t.name === 'リスト') ? (
           <>
             <Link
+              style={{ textDecoration: 'none' }}
               key={t.name}
               h="100%"
               onClick={t.onClick}
-              px={3}
+              px={4}
               //   mx={3}
               display="flex"
               alignItems="center"

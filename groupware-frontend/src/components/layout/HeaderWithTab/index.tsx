@@ -202,20 +202,40 @@ const HeaderWithTab: React.FC<HeaderProps> = ({
                 {t.name}
               </Button>
             ) : !t.type && t.onClick ? (
-              <button
-                onClick={t.onClick}
+              <ChakraLink
+                style={{ textDecoration: 'none' }}
                 key={t.name}
-                className={clsx(
-                  headerStyles.tab,
-                  headerStyles.tab__button,
-                  tabClassNameGetter(t),
-                  t.name === activeTabName
-                    ? headerStyles.tab__active
-                    : headerStyles.tab__disable,
-                )}>
-                <Text color={t.color}>{t.name} </Text>
-              </button>
-            ) : null,
+                h="100%"
+                onClick={t.onClick}
+                px={3}
+                //   mx={3}
+                display="flex"
+                alignItems="center"
+                whiteSpace="nowrap"
+                borderBottomColor={
+                  t.name === activeTabName ? 'blue.500' : undefined
+                }
+                borderBottomWidth={t.name === activeTabName ? 2 : undefined}>
+                <Text
+                  color={t.name === activeTabName ? 'blue.500' : undefined}
+                  fontWeight="bold">
+                  {t.name}
+                </Text>
+              </ChakraLink>
+            ) : // <button
+            //   onClick={t.onClick}
+            //   key={t.name}
+            //   className={clsx(
+            //     headerStyles.tab,
+            //     headerStyles.tab__button,
+            //     tabClassNameGetter(t),
+            //     t.name === activeTabName
+            //       ? headerStyles.tab__active
+            //       : headerStyles.tab__disable,
+            //   )}>
+            //   <Text color={t.color}>{t.name} </Text>
+            // </button>
+            null,
           )}
         </Box>
       ) : null}
