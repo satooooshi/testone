@@ -937,27 +937,29 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
                 </PopoverHeader>
 
                 <PopoverBody>
-                  <SimpleGrid columns={3}>
-                    {reactionStickers.map((e) => (
-                      <Fragment key={e.name}>
-                        <a
-                          onClick={() => {
-                            handleStickerSelected(e.name);
-                            onClose();
-                          }}>
-                          <Box display="flex" maxW="300px" maxH={'300px'}>
-                            <Image
-                              src={e.src}
-                              w={100}
-                              h={100}
-                              padding={2}
-                              alt="送信された画像"
-                            />
-                          </Box>
-                        </a>
-                      </Fragment>
-                    ))}
-                  </SimpleGrid>
+                  <Box h="400px" overflow={'scroll'}>
+                    <SimpleGrid columns={3}>
+                      {reactionStickers.map((e) => (
+                        <Fragment key={e.name}>
+                          <a
+                            onClick={() => {
+                              handleStickerSelected(e.name);
+                              onClose();
+                            }}>
+                            <Box display="flex" maxW="300px" maxH="300px">
+                              <Image
+                                src={e.src}
+                                w={100}
+                                h={100}
+                                padding={2}
+                                alt="送信された画像"
+                              />
+                            </Box>
+                          </a>
+                        </Fragment>
+                      ))}
+                    </SimpleGrid>
+                  </Box>
                 </PopoverBody>
               </PopoverContent>
             </Portal>
