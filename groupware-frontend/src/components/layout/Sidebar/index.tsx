@@ -10,10 +10,11 @@ import { useAuthenticate } from 'src/contexts/useAuthenticate';
 import { UserRole } from 'src/types';
 import Link from 'next/link';
 import { AiFillTags, AiOutlineGlobal } from 'react-icons/ai';
-import { GiCancel } from 'react-icons/gi';
-import { useMediaQuery } from '@chakra-ui/media-query';
 import { Box, Badge } from '@chakra-ui/react';
 import { useHandleBadge } from 'src/contexts/badge/useHandleBadge';
+import { AiOutlineDoubleLeft } from 'react-icons/ai';
+import Image from 'next/image';
+import boldLogo from '@/public/bold-logo.png';
 
 export enum SidebarScreenName {
   ACCOUNT = 'アカウント',
@@ -30,7 +31,7 @@ export enum SidebarScreenName {
 export type SidebarProps = {
   activeScreenName?: SidebarScreenName;
   isDrawerOpen?: boolean;
-  hideDrawer?: () => void;
+  hideDrawer: () => void;
 };
 
 type LinkWithIconProps = {
@@ -48,7 +49,12 @@ export const LinkWithIcon: React.FC<LinkWithIconProps> = ({
 }) => {
   return (
     <Link href={screenName}>
-      <a className={sidebarStyles.icon_with_name}>
+      <a
+        className={
+          isActive
+            ? sidebarStyles.icon_with_name__active
+            : sidebarStyles.icon_with_name__disable
+        }>
         {icon}
         <p
           className={
@@ -63,41 +69,34 @@ export const LinkWithIcon: React.FC<LinkWithIconProps> = ({
   );
 };
 
-const Sidebar: React.FC<SidebarProps> = ({
-  activeScreenName,
-  isDrawerOpen,
-  hideDrawer,
-}) => {
+const Sidebar: React.FC<SidebarProps> = ({ activeScreenName, hideDrawer }) => {
   const iconClass = (isActive: boolean) =>
     isActive
       ? clsx(sidebarStyles.icon, sidebarStyles.icon__active)
       : clsx(sidebarStyles.icon, sidebarStyles.icon__disable);
   const { user } = useAuthenticate();
-  const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
   const { unreadChatCount } = useHandleBadge();
 
   return (
     <>
-      {isDrawerOpen && (
-        <GiCancel
-          onClick={() => {
-            if (hideDrawer) hideDrawer();
-          }}
-          className={sidebarStyles.cancel_icon}
-        />
-      )}
-      <div
-        className={
-          isSmallerThan768
-            ? clsx(
-                sidebarStyles.sidebar_responsive,
-                !isDrawerOpen && sidebarStyles.sidebar_responsive__disable,
-              )
-            : sidebarStyles.sidebar
-        }>
+      <div className={sidebarStyles.sidebar}>
         <div>
+          <div className={sidebarStyles.top_item}>
+            <div className={sidebarStyles.bold_logo_and_text}>
+              <div className={sidebarStyles.bold_logo}>
+                <Image src={boldLogo} alt="eo logo" />
+              </div>
+              <p className={sidebarStyles.icon_name__active}>EO</p>
+            </div>
+            <AiOutlineDoubleLeft
+              className={sidebarStyles.outline_double_left}
+              onClick={hideDrawer}
+            />
+          </div>
+
           <LinkWithIcon
             screenName="/"
+            isActive={activeScreenName === SidebarScreenName.HOME}
             icon={
               <HiHome
                 className={iconClass(
@@ -109,6 +108,7 @@ const Sidebar: React.FC<SidebarProps> = ({
           />
           <LinkWithIcon
             screenName="/event/list?from=&to="
+            isActive={activeScreenName === SidebarScreenName.EVENT}
             icon={
               <BiCalendarEvent
                 className={iconClass(
@@ -120,6 +120,7 @@ const Sidebar: React.FC<SidebarProps> = ({
           />
           <LinkWithIcon
             screenName="/wiki/list?page=1&tag=&word=&status=undefined&type="
+            isActive={activeScreenName === SidebarScreenName.QA}
             icon={
               <AiOutlineGlobal
                 className={iconClass(activeScreenName === SidebarScreenName.QA)}
@@ -129,6 +130,7 @@ const Sidebar: React.FC<SidebarProps> = ({
           />
           <LinkWithIcon
             screenName="/users/list"
+            isActive={activeScreenName === SidebarScreenName.USERS}
             icon={
               <FaUsers
                 className={iconClass(
@@ -140,6 +142,7 @@ const Sidebar: React.FC<SidebarProps> = ({
           />
           <LinkWithIcon
             screenName="/chat"
+            isActive={activeScreenName === SidebarScreenName.CHAT}
             icon={
               <Box display="flex">
                 <BsChatDotsFill
@@ -167,6 +170,7 @@ const Sidebar: React.FC<SidebarProps> = ({
           />
           <LinkWithIcon
             screenName={`/account/${user?.id}`}
+            isActive={activeScreenName === SidebarScreenName.ACCOUNT}
             icon={
               <RiAccountCircleFill
                 className={iconClass(
