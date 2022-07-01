@@ -42,7 +42,7 @@ const Sticker: React.FC<stickerProps> = memo(({ handleStickerSelected }) => {
                 <PopoverCloseButton />
               </PopoverHeader>
 
-              <PopoverBody>
+              <PopoverBody h="400px" overflow={'scroll'}>
                 <SimpleGrid columns={3}>
                   {reactionStickers.map((e) => (
                     <Fragment key={e.name}>
