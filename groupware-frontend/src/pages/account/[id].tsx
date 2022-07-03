@@ -193,7 +193,7 @@ const MyAccountInfo = () => {
   return (
     <LayoutWithTab
       sidebar={{
-        activeScreenName: SidebarScreenName.ACCOUNT,
+        activeScreenName: SidebarScreenName.USERS,
       }}
       header={{
         title: 'Account',
