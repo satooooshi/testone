@@ -145,7 +145,7 @@ const HeaderWithTab: React.FC<HeaderProps> = ({
             eventPage={EventPage}
           />
         )}
-        {tabs && tabs.length && !EventPage && (
+        {tabs && tabs.length && !EventPage ? (
           <Box
             w="100%"
             overflowX="auto"
@@ -232,7 +232,7 @@ const HeaderWithTab: React.FC<HeaderProps> = ({
               ) : null,
             )}
           </Box>
-        )}
+        ) : null}
       </Box>
     </Box>
   );
