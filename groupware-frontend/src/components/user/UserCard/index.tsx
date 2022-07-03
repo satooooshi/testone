@@ -68,7 +68,6 @@ const UserCard: React.FC<UserCardProps> = ({ user, onClickTag, duration }) => {
               <Link passHref href={onClickTag(t)} key={t.id}>
                 <Badge
                   mr={2}
-                  ml={1}
                   mb={1}
                   p={2}
                   as="sub"
