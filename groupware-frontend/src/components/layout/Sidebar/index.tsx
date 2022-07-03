@@ -1,5 +1,5 @@
 import React, { ReactNode } from 'react';
-import { RiAccountCircleFill } from 'react-icons/ri';
+import { RiAccountCircleFill, RiLogoutBoxRLine } from 'react-icons/ri';
 import { HiHome } from 'react-icons/hi';
 import { BiCalendarEvent } from 'react-icons/bi';
 import { BsChatDotsFill } from 'react-icons/bs';
@@ -9,14 +9,35 @@ import clsx from 'clsx';
 import { useAuthenticate } from 'src/contexts/useAuthenticate';
 import { UserRole } from 'src/types';
 import Link from 'next/link';
-import { AiFillTags, AiOutlineGlobal, AiOutlineRight } from 'react-icons/ai';
-import { Box, Badge, Avatar, Text } from '@chakra-ui/react';
+import {
+  AiFillTags,
+  AiOutlineGlobal,
+  AiOutlineLogout,
+  AiOutlineRight,
+} from 'react-icons/ai';
+import {
+  Box,
+  Badge,
+  Avatar,
+  Text,
+  Menu,
+  MenuButton,
+  MenuList,
+  Button,
+  MenuItem,
+  MenuDivider,
+} from '@chakra-ui/react';
 import { useHandleBadge } from 'src/contexts/badge/useHandleBadge';
 import { AiOutlineDoubleLeft } from 'react-icons/ai';
 import Image from 'next/image';
 import boldLogo from '@/public/bold-logo.png';
 import router from 'next/router';
 import { darkFontColor } from 'src/utils/colors';
+import { useAPILogout } from '@/hooks/api/auth/useAPILogout';
+import { axiosInstance } from 'src/utils/url';
+import { jsonHeader } from 'src/utils/url/header';
+import { GrLogout } from 'react-icons/gr';
+import { IoMdLogOut } from 'react-icons/';
 
 export enum SidebarScreenName {
   ACCOUNT = 'アカウント',
@@ -78,6 +99,17 @@ const Sidebar: React.FC<SidebarProps> = ({ activeScreenName, hideDrawer }) => {
       : clsx(sidebarStyles.icon, sidebarStyles.icon__disable);
   const { user } = useAuthenticate();
   const { unreadChatCount } = useHandleBadge();
+  const { mutate: logout } = useAPILogout({
+    onSuccess: () => {
+      const removeLocalStorage = async () => {
+        await Promise.resolve();
+        localStorage.removeItem('userToken');
+        axiosInstance.defaults.headers = jsonHeader;
+      };
+      removeLocalStorage();
+      router.push('/login');
+    },
+  });
 
   return (
     <>
@@ -183,7 +215,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeScreenName, hideDrawer }) => {
             iconName={SidebarScreenName.ACCOUNT}
           />
         </div>
-        {user?.role === UserRole.ADMIN ? (
+        {/* {user?.role === UserRole.ADMIN ? (
           <LinkWithIcon
             screenName="/admin/users"
             icon={
@@ -207,12 +239,13 @@ const Sidebar: React.FC<SidebarProps> = ({ activeScreenName, hideDrawer }) => {
             }
             iconName={SidebarScreenName.TAGADMIN}
           />
-        )}
+        )} */}
         <div
           className={sidebarStyles.login_user_item}
-          onClick={() => {
-            router.push(`/account/${user?.id}`);
-          }}>
+          // onClick={() => {
+          //   router.push(`/account/${user?.id}`);
+          // }}
+        >
           <div className={sidebarStyles.login_user_name_with_icon}>
             <Avatar
               size="xl"
@@ -225,7 +258,51 @@ const Sidebar: React.FC<SidebarProps> = ({ activeScreenName, hideDrawer }) => {
               {user?.lastName} {user?.firstName}
             </Text>
           </div>
-          <AiOutlineRight size={20} color={darkFontColor} />
+          <Menu>
+            {({ isOpen }) => (
+              <>
+                <MenuButton
+                  w="20px"
+                  // isActive={isOpen}
+                  bg="transparent"
+                  as={Box}
+                  // rightIcon={
+                  //   <AiOutlineRight size={20} color={darkFontColor} />
+                  // }
+                >
+                  <AiOutlineRight size={20} color={darkFontColor} />
+                </MenuButton>
+                <MenuList gutter={100}>
+                  <MenuItem
+                    icon={<RiAccountCircleFill size={20} />}
+                    h={10}
+                    onClick={() => {
+                      router.push(`/account/${user?.id}`);
+                    }}>
+                    プロフィール
+                  </MenuItem>
+                  {user?.role === UserRole.ADMIN && (
+                    <MenuItem
+                      icon={<FaUserCog size={20} />}
+                      h={10}
+                      onClick={() => {
+                        router.push('/admin/users');
+                      }}>
+                      管理者ページ
+                    </MenuItem>
+                  )}
+                  <MenuDivider />
+                  <MenuItem
+                    icon={<RiLogoutBoxRLine size={20} />}
+                    onClick={() => {
+                      logout();
+                    }}>
+                    ログアウト
+                  </MenuItem>
+                </MenuList>
+              </>
+            )}
+          </Menu>
         </div>
       </div>
     </>
