@@ -111,47 +111,45 @@ const QAQuestionList = () => {
         <TopTabBar topTabBehaviorList={topTab} />
       </Box> */}
       <div className={qaListStyles.top_contents_wrapper}>
-        <div className={qaListStyles.search_form_wrapper}>
-          <SearchForm
-            selectItems={getWikiCategoryList(type)}
-            selectingItem={wikiTypeNameFactory(
+        <SearchForm
+          selectItems={getWikiCategoryList(type)}
+          selectingItem={wikiTypeNameFactory(
+            type,
+            rule_category,
+            true,
+            board_category,
+          )}
+          onSelect={(s) =>
+            type === WikiType.RULES
+              ? queryRefresh({
+                  type: type,
+                  rule_category: getRuleCategory(s.target.value),
+                  status: undefined,
+                })
+              : type === WikiType.BOARD
+              ? queryRefresh({
+                  type: type,
+                  board_category: getBoardCategory(s.target.value),
+                  status: undefined,
+                })
+              : null
+          }
+          onClear={() => setSelectedTags([])}
+          value={searchWord}
+          onChange={(e) => setSearchWord(e.currentTarget.value)}
+          onClickButton={() =>
+            queryRefresh({
+              page: '1',
+              tag,
+              status,
+              word: searchWord,
               type,
-              rule_category,
-              true,
-              board_category,
-            )}
-            onSelect={(s) =>
-              type === WikiType.RULES
-                ? queryRefresh({
-                    type: type,
-                    rule_category: getRuleCategory(s.target.value),
-                    status: undefined,
-                  })
-                : type === WikiType.BOARD
-                ? queryRefresh({
-                    type: type,
-                    board_category: getBoardCategory(s.target.value),
-                    status: undefined,
-                  })
-                : null
-            }
-            onClear={() => setSelectedTags([])}
-            value={searchWord}
-            onChange={(e) => setSearchWord(e.currentTarget.value)}
-            onClickButton={() =>
-              queryRefresh({
-                page: '1',
-                tag,
-                status,
-                word: searchWord,
-                type,
-              })
-            }
-            tags={tags || []}
-            selectedTags={selectedTags}
-            toggleTag={onToggleTag}
-          />
-        </div>
+            })
+          }
+          tags={tags || []}
+          selectedTags={selectedTags}
+          toggleTag={onToggleTag}
+        />
         {!isLoading && !questions?.wiki.length && (
           <Text alignItems="center" textAlign="center" mb={4}>
             検索結果が見つかりませんでした

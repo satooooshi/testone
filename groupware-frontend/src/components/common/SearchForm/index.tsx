@@ -104,7 +104,7 @@ const SearchInput: React.FC<SearchFormProps> = ({
       flexDir="column"
       justifyContent="center"
       width={'100%'}
-      mt={5}>
+      my={5}>
       <div
         className={clsx(
           searchFormStyles.search_form_wrapper,

@@ -1,15 +1,28 @@
 import React, { useMemo } from 'react';
 import userCardStyles from '@/styles/components/UserCard.module.scss';
 import { Tag, TagType, User } from 'src/types';
-import { Box, Button, Flex, Text, Image, SimpleGrid } from '@chakra-ui/react';
+import {
+  Box,
+  Button,
+  Flex,
+  Text,
+  Image,
+  SimpleGrid,
+  Badge,
+} from '@chakra-ui/react';
 import Link from 'next/link';
 import UserPointCounter from './UserPointCounter';
 import noImage from '@/public/no-image.jpg';
+import { tagColorFactory } from 'src/utils/factory/tagColorFactory';
 
-type TagLinkProps = {
-  tag: Tag;
-  onClickTag: (t: Tag) => string;
-  tagColor: string;
+type TagCategoryProps = {
+  label: string;
+  type: TagType;
+  color: string;
+};
+
+type TagCardProps = {
+  tagCategory: TagCategoryProps;
 };
 
 type UserCardProps = {
@@ -33,25 +46,51 @@ const groupByTagType = (tags: Tag[]): { [k in TagType]: Tag[] } => {
     },
   );
 };
-
-const TagLink: React.FC<TagLinkProps> = ({ tag, onClickTag, tagColor }) => {
-  return (
-    <Link passHref href={onClickTag(tag)}>
-      <a
-        onClick={() => onClickTag(tag)}
-        className={userCardStyles.tag_item_wrapper}>
-        <Button size="xs" colorScheme={tagColor}>
-          {tag.name}
-        </Button>
-      </a>
-    </Link>
-  );
-};
-
 const UserCard: React.FC<UserCardProps> = ({ user, onClickTag, duration }) => {
   const groupedTags = useMemo(() => {
     return groupByTagType(user.tags || []);
   }, [user.tags]);
+
+  const tagCategories: TagCategoryProps[] = [
+    { label: '技術', type: TagType.TECH, color: 'teal' },
+    { label: '資格', type: TagType.QUALIFICATION, color: 'blue' },
+    { label: '部活動', type: TagType.CLUB, color: 'green' },
+    { label: '趣味', type: TagType.HOBBY, color: 'pink' },
+  ];
+
+  const TagCard: React.FC<TagCardProps> = ({ tagCategory }) => {
+    return (
+      <Flex alignItems="center" mb="4px">
+        <p className={userCardStyles.tags_label}>{tagCategory.label}:</p>
+        <div className={userCardStyles.tags_wrapper}>
+          {groupedTags[tagCategory.type].length ? (
+            groupedTags[tagCategory.type].map((t) => (
+              <Link passHref href={onClickTag(t)} key={t.id}>
+                <Badge
+                  mr={2}
+                  ml={1}
+                  mb={1}
+                  p={2}
+                  as="sub"
+                  fontSize="x-small"
+                  display="flex"
+                  colorScheme={tagCategory.color}
+                  borderRadius={50}
+                  alignItems="center"
+                  variant="outline"
+                  borderWidth={1}>
+                  {t.name}
+                </Badge>
+              </Link>
+            ))
+          ) : (
+            <Text fontSize={13}>未設定</Text>
+          )}
+        </div>
+      </Flex>
+    );
+  };
+
   return (
     <Box bg="white" borderRadius="lg" p="16px">
       <Flex mb="8px">
@@ -120,82 +159,9 @@ const UserCard: React.FC<UserCardProps> = ({ user, onClickTag, duration }) => {
       </Flex>
 
       <Box mb="20px">
-        <Flex alignItems="center" mb="4px">
-          <p className={userCardStyles.tags_label}>技術:</p>
-          <div className={userCardStyles.tags_wrapper}>
-            {groupedTags[TagType.TECH].length ? (
-              groupedTags[TagType.TECH].map((t) => (
-                <TagLink
-                  key={t.id}
-                  tag={t}
-                  onClickTag={onClickTag}
-                  tagColor="teal"
-                />
-              ))
-            ) : (
-              <Button size="xs" height="28px" colorScheme="teal">
-                未設定
-              </Button>
-            )}
-          </div>
-        </Flex>
-        <Flex alignItems="center" mb="4px">
-          <p className={userCardStyles.tags_label}>資格:</p>
-          <div className={userCardStyles.tags_wrapper}>
-            {groupedTags[TagType.QUALIFICATION].length ? (
-              groupedTags[TagType.QUALIFICATION].map((t) => (
-                <TagLink
-                  key={t.id}
-                  tag={t}
-                  onClickTag={onClickTag}
-                  tagColor="blue"
-                />
-              ))
-            ) : (
-              <Button size="xs" height="28px" colorScheme="blue">
-                未設定
-              </Button>
-            )}
-          </div>
-        </Flex>
-        <Flex alignItems="center" mb="4px">
-          <p className={userCardStyles.tags_label}>部活動:</p>
-          <div className={userCardStyles.tags_wrapper}>
-            {groupedTags[TagType.CLUB].length ? (
-              groupedTags[TagType.CLUB].map((t) => (
-                <TagLink
-                  key={t.id}
-                  tag={t}
-                  onClickTag={onClickTag}
-                  tagColor="green"
-                />
-              ))
-            ) : (
-              <Button size="xs" height="28px" colorScheme="green">
-                未設定
-              </Button>
-            )}
-          </div>
-        </Flex>
-        <Flex alignItems="center" mb="4px">
-          <p className={userCardStyles.tags_label}>趣味:</p>
-          <div className={userCardStyles.tags_wrapper}>
-            {groupedTags[TagType.HOBBY].length ? (
-              groupedTags[TagType.HOBBY].map((t) => (
-                <TagLink
-                  key={t.id}
-                  tag={t}
-                  onClickTag={onClickTag}
-                  tagColor="pink"
-                />
-              ))
-            ) : (
-              <Button size="xs" height="28px" colorScheme="pink">
-                未設定
-              </Button>
-            )}
-          </div>
-        </Flex>
+        {tagCategories.map((t) => (
+          <TagCard key={t.label} tagCategory={t} />
+        ))}
       </Box>
       <Button
         as="a"

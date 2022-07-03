@@ -120,7 +120,7 @@ const UserList = () => {
 
       {users && users.users.length ? (
         <>
-          <Box w="100%" my="20px" display="flex" justifyContent="flex-start">
+          <Box w="100%" mb="20px" display="flex" justifyContent="flex-start">
             <FormControl w="200px">
               <Select
                 bg="white"

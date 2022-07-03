@@ -420,9 +420,9 @@ const EventList = () => {
     return new Date();
   }, [from, to]);
 
-  useEffect(() => {
-    calendarRef?.current?.scrollIntoView();
-  }, []);
+  // useEffect(() => {
+  //   calendarRef?.current?.scrollIntoView();
+  // }, []);
 
   const initialHeaderValue: Omit<
     HeaderProps,
@@ -541,8 +541,8 @@ const EventList = () => {
             <SearchForm
               selectingItem={eventStatusValueToName(status)}
               selectItems={[
-                '今後のイベント',
                 '過去のイベント',
+                '今後のイベント',
                 '進行中のイベント',
               ]}
               onSelect={(i) => {
