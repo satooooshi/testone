@@ -37,16 +37,12 @@ const EventPageTab: React.FC<EventPageTabProps> = ({
 }) => {
   return (
     <Flex
-      bg="white"
       w="100%"
-      px="3%"
-      mx="auto"
-      maxW="1700px"
-      overflowX="auto"
       display="flex"
       flexDir="row"
       alignItems="center"
-      css={hideScrollbarCss}
+      //   overflowX="auto"
+      //   css={hideScrollbarCss}
       //   overflow="hidden"
       // px="40px"
       h="60px">
