@@ -166,6 +166,8 @@ const SearchInput: React.FC<SearchFormProps> = ({
                 w="70px"
                 h="80%"
                 size="sm"
+                ml="auto"
+                mr={2}
                 onClick={handleModalSearchButton}>
                 検索
               </Button>
