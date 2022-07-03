@@ -216,7 +216,7 @@ const MyAccountInfo = () => {
             flexDir="column"
             alignSelf="center"
             alignItems="center"
-            w={isSmallerThan768 ? '90vw' : undefined}>
+            w="100%">
             <Box mb="16px">
               {profile.avatarUrl ? (
                 <img
@@ -248,13 +248,13 @@ const MyAccountInfo = () => {
               </Text>
             </Box>
 
-            <Box mb="24px">
+            <Box w="100%" mb="24px">
               <TopTabBar topTabBehaviorList={topTabBehaviorList} />
             </Box>
 
             {activeTab === TabName.DETAIL && (
               <>
-                <Box w="80vw">
+                <Box w="100%">
                   <Box
                     display="flex"
                     mb={5}
