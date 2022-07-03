@@ -144,10 +144,26 @@ const SearchInput: React.FC<SearchFormProps> = ({
               background="white"
               value={value}
               onChange={onChange}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  handleModalSearchButton();
+                }
+              }}
             />
-            <InputRightElement width="70px" mr={0}>
+            <InputRightElement
+              width="85px"
+              mr={0}
+              display="flex"
+              flexDir="row"
+              justifyContent="flex-start">
+              {value.length ? (
+                <Text w="10px" textAlign="center" mr={3} cursor="pointer">
+                  ✖️
+                </Text>
+              ) : null}
               <Button
                 colorScheme="blue"
+                w="70px"
                 h="80%"
                 size="sm"
                 onClick={handleModalSearchButton}>
