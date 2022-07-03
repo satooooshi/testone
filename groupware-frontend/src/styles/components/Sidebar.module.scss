@@ -207,3 +207,32 @@
     display: none;
   }
 }
+
+.login_user_item {
+  display: flex;
+  height: 66px;
+  align-items: center;
+  border-width: 1px;
+  // color: #fff;
+  margin-top: auto;
+  border-radius: 12px;
+  padding-left: 12px;
+  padding-right: 12px;
+  justify-content: space-between;
+  margin-bottom: 100px;
+}
+
+.login_user_icon {
+  width: 40px;
+  height: 40px;
+  margin-right: 12px;
+}
+
+.login_user_name_text {
+  color: #fff;
+}
+
+.login_user_name_with_icon {
+  display: flex;
+  align-items: center;
+}

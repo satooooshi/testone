@@ -9,12 +9,14 @@ import clsx from 'clsx';
 import { useAuthenticate } from 'src/contexts/useAuthenticate';
 import { UserRole } from 'src/types';
 import Link from 'next/link';
-import { AiFillTags, AiOutlineGlobal } from 'react-icons/ai';
-import { Box, Badge } from '@chakra-ui/react';
+import { AiFillTags, AiOutlineGlobal, AiOutlineRight } from 'react-icons/ai';
+import { Box, Badge, Avatar, Text } from '@chakra-ui/react';
 import { useHandleBadge } from 'src/contexts/badge/useHandleBadge';
 import { AiOutlineDoubleLeft } from 'react-icons/ai';
 import Image from 'next/image';
 import boldLogo from '@/public/bold-logo.png';
+import router from 'next/router';
+import { darkFontColor } from 'src/utils/colors';
 
 export enum SidebarScreenName {
   ACCOUNT = 'アカウント',
@@ -206,6 +208,25 @@ const Sidebar: React.FC<SidebarProps> = ({ activeScreenName, hideDrawer }) => {
             iconName={SidebarScreenName.TAGADMIN}
           />
         )}
+        <div
+          className={sidebarStyles.login_user_item}
+          onClick={() => {
+            router.push(`/account/${user?.id}`);
+          }}>
+          <div className={sidebarStyles.login_user_name_with_icon}>
+            <Avatar
+              size="xl"
+              src={user?.avatarUrl}
+              className={sidebarStyles.login_user_icon}
+              width={'40px'}
+              height={'40px'}
+            />
+            <Text color="black" fontWeight="bold">
+              {user?.lastName} {user?.firstName}
+            </Text>
+          </div>
+          <AiOutlineRight size={20} color={darkFontColor} />
+        </div>
       </div>
     </>
   );
