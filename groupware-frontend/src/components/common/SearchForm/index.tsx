@@ -131,7 +131,7 @@ const SearchInput: React.FC<SearchFormProps> = ({
           isSearch={true}
         />
         <Box display="flex" flexDir="row" w="100%">
-          <InputGroup width="50%">
+          <InputGroup width="50%" maxW="700px">
             <InputLeftElement pointerEvents="none">
               <AiOutlineSearch />
             </InputLeftElement>
@@ -160,6 +160,7 @@ const SearchInput: React.FC<SearchFormProps> = ({
             bg="white"
             justifyContent="flex-start"
             w="24%"
+            maxW="200px"
             onClick={() => setTagModal(true)}>
             <Text ml={1}>タグ</Text>
             {selectedTags.length ? (
@@ -184,6 +185,7 @@ const SearchInput: React.FC<SearchFormProps> = ({
               bg="white"
               height="10"
               w="24%"
+              maxW="230px"
               onChange={onSelect}>
               {selectItems?.length &&
                 selectItems.map((i) => (
