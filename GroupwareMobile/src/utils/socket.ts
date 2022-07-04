@@ -1,4 +1,4 @@
-import {AppState, AppStateStatus} from 'react-native';
+import {Alert, AppState, AppStateStatus} from 'react-native';
 import io from 'socket.io-client';
 import {useEffect, useState} from 'react';
 import {baseURL} from './url';
@@ -37,6 +37,9 @@ export const useChatSocket = (
           senderId: myself?.id,
         });
         handleEnterRoom(room.id);
+      },
+      onError: () => {
+        Alert.alert('failed saveLastReadTimeAndReport');
       },
     });
   };
@@ -88,6 +91,10 @@ export const useChatSocket = (
               ) {
                 saveLastReadTimeAndReport();
                 refetchLastReadChatTime();
+              } else if (socketMessage.chatMessage?.sender?.id !== myself?.id) {
+                Alert.alert(
+                  `'saveLastReadTimeAndReport'${appState}${socketMessage.chatMessage.isSender}`,
+                );
               }
               socketMessage.chatMessage.createdAt = new Date(
                 socketMessage.chatMessage.createdAt,
@@ -124,13 +131,7 @@ export const useChatSocket = (
             break;
           }
           case 'edit': {
-            setMessages(msgs => {
-              return msgs.map(m =>
-                m.id === socketMessage.chatMessage.id
-                  ? socketMessage.chatMessage
-                  : m,
-              );
-            });
+            setMessages(msgs => {});
             break;
           }
           case 'delete': {
