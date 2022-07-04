@@ -127,7 +127,10 @@ const SearchInput: React.FC<SearchFormProps> = ({
           onClear={() => {
             onClear();
           }}
-          onComplete={() => setTagModal(false)}
+          onComplete={() => {
+            setTagModal(false);
+            // handleModalSearchButton();
+          }}
           isSearch={true}
         />
         <Box display="flex" flexDir="row" w="100%">
@@ -240,7 +243,9 @@ const SearchInput: React.FC<SearchFormProps> = ({
           </>
         ) : null}
       </Box>
-      {searchedWord ? <p>{`"${searchedWord}"での検索結果`}</p> : null}
+      {searchedWord ? (
+        <Text mt={2}>{`"${searchedWord}"での検索結果`}</Text>
+      ) : null}
     </Box>
   );
 };

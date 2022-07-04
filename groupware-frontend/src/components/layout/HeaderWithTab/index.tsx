@@ -70,7 +70,7 @@ const HeaderWithTab: React.FC<HeaderProps> = ({
   return (
     <Box
       w="100%"
-      bg="white"
+      bg={tabs?.[0]?.type === 'backButton' ? '#f3f6fb' : 'white'}
       display="flex"
       flexDir="row"
       alignItems="center"
@@ -155,7 +155,6 @@ const HeaderWithTab: React.FC<HeaderProps> = ({
             // px="40px"
             h="60px"
             css={hideScrollbarCss}
-            bg={tabs[0].type === 'backButton' ? '#f3f6fb' : 'white'}
             justifyContent={
               tabs[0].type === 'backButton' ? 'flex-end' : 'flex-start'
             }>
