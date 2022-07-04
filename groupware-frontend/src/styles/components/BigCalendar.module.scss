@@ -1,6 +1,9 @@
 .big_calendar {
   height: 90vh;
   width: 100%;
+  background-color: white;
+  padding: 20px;
+  // border-radius: 5%;
   @media (max-width: 768px) {
     height: 75vh;
     width: 750px;
