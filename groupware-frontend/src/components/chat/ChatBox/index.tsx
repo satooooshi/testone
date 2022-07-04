@@ -278,6 +278,11 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
 
   useEffect(() => {
     socket.joinRoom();
+    setNewChatMessage({
+      content: '',
+      type: ChatMessageType.TEXT,
+      chatGroup: room,
+    });
     if (messageWrapperDivRef.current) {
       messageWrapperDivRef.current.scrollTo({ top: 0 });
     }
