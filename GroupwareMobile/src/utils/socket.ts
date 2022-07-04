@@ -25,6 +25,7 @@ export const useChatSocket = (
   const {mutate: saveLastReadChatTime} = useAPISaveLastReadChatTime();
   const {data: lastReadChatTime, refetch: refetchLastReadChatTime} =
     useAPIGetLastReadChatTime(room.id);
+  const [appState, setAppState] = useState<AppStateStatus>('active');
 
   let isMounted: boolean | undefined;
 
@@ -45,6 +46,17 @@ export const useChatSocket = (
       console.log('socket connected.');
     }
   };
+
+  useEffect(() => {
+    const unsubscribeAppState = () => {
+      AppState.addEventListener('change', state => {
+        setAppState(state);
+      });
+    };
+    return () => {
+      unsubscribeAppState();
+    };
+  });
 
   return {
     joinRoom: () => {
@@ -72,7 +84,7 @@ export const useChatSocket = (
             if (socketMessage.chatMessage.content) {
               if (
                 !socketMessage.chatMessage?.isSender &&
-                AppState.currentState === 'active'
+                appState === 'active'
               ) {
                 saveLastReadTimeAndReport();
                 refetchLastReadChatTime();
@@ -83,9 +95,6 @@ export const useChatSocket = (
               socketMessage.chatMessage.updatedAt = new Date(
                 socketMessage.chatMessage.updatedAt,
               );
-              if (socketMessage.chatMessage.sender?.id === myself?.id) {
-                socketMessage.chatMessage.isSender = true;
-              }
               // setImagesForViewing(i => [...i, {uri: socketMessage.chatMessage.content}]);
               if (socketMessage.chatMessage.type === ChatMessageType.VIDEO) {
                 socketMessage.chatMessage.thumbnail = await getThumbnailOfVideo(
