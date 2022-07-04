@@ -85,6 +85,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
   const [newChatMessage, setNewChatMessage] = useState<Partial<ChatMessage>>({
     content: '',
     type: ChatMessageType.TEXT,
+    replyParentMessage: undefined,
     chatGroup: room,
   });
   const socket = useChatSocket(room, setMessages);
@@ -281,6 +282,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
     setNewChatMessage({
       content: '',
       type: ChatMessageType.TEXT,
+      replyParentMessage: undefined,
       chatGroup: room,
     });
     if (messageWrapperDivRef.current) {
