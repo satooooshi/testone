@@ -39,6 +39,7 @@ import { axiosInstance } from 'src/utils/url';
 import { jsonHeader } from 'src/utils/url/header';
 import { GrLogout } from 'react-icons/gr';
 import { IoMdLogOut } from 'react-icons/';
+import { IoSettingsSharp } from 'react-icons/io5';
 
 export enum SidebarScreenName {
   ACCOUNT = 'アカウント',
@@ -278,6 +279,14 @@ const Sidebar: React.FC<SidebarProps> = ({ activeScreenName, hideDrawer }) => {
                       router.push(`/account/${user?.id}`);
                     }}>
                     プロフィール
+                  </MenuItem>
+                  <MenuItem
+                    icon={<IoSettingsSharp size={20} />}
+                    h={10}
+                    onClick={() => {
+                      router.push(`/account/${user?.id}`);
+                    }}>
+                    アカウント設定
                   </MenuItem>
                   {user?.role === UserRole.ADMIN && (
                     <MenuItem
