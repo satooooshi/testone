@@ -907,16 +907,18 @@ const Chat: React.FC = () => {
         <Icon name="close" fontSize={24} />
       </TouchableOpacity>
       <ScrollView horizontal={true}>
-        {reactionStickers.map(e => (
-          <TouchableOpacity
-            key={e.name}
-            onPress={() => handleStickerSelected(e.name)}>
-            <Image
-              source={e.src ? e.src : null}
-              style={{height: 80, width: 80, margin: 10}}
-            />
-          </TouchableOpacity>
-        ))}
+        <View style={tailwind('h-52 flex flex-wrap')}>
+          {reactionStickers.map(e => (
+            <TouchableOpacity
+              key={e.name}
+              onPress={() => handleStickerSelected(e.name)}>
+              <Image
+                source={e.src}
+                style={tailwind('overflow-visible h-20 w-20 m-2.5')}
+              />
+            </TouchableOpacity>
+          ))}
+        </View>
       </ScrollView>
     </Div>
   );
