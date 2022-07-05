@@ -145,7 +145,7 @@ const ChatEditor: React.FC<ChatEditorProps> = memo(
     const onEditorChange = (newState: EditorState) => {
       // editorStateRef.current = newState;
       setEditorState(newState);
-      const content = editorState.getCurrentContent();
+      const content = newState.getCurrentContent();
       const rawObject = convertToRaw(content);
       const markdownString = draftToMarkdown(rawObject);
       setContent(markdownString);
