@@ -82,6 +82,13 @@ function MyApp({ Component, pageProps }: AppProps) {
           },
         },
       },
+      Link: {
+        baseStyle: {
+          _focus: {
+            boxShadow: 'none',
+          },
+        },
+      },
     },
   };
   const customTheme = extendTheme(theme);

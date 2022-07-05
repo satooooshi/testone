@@ -58,9 +58,7 @@ const EventPageTab: React.FC<EventPageTabProps> = ({
             rightIcon={<AiOutlinePlus />}>
             {t.name}
           </Button>
-        ) : t.type === undefined &&
-          t.onClick &&
-          (t.name === 'カレンダー' || t.name === 'リスト') ? (
+        ) : t.name === 'カレンダー' || t.name === 'リスト' ? (
           <>
             <Link
               style={{ textDecoration: 'none' }}
@@ -82,7 +80,7 @@ const EventPageTab: React.FC<EventPageTabProps> = ({
             </Link>
             {t.name === 'リスト' && <Spacer />}
           </>
-        ) : t.type === undefined && t.onClick ? (
+        ) : (
           <Button
             minW={`${t.name.length * 15}px`}
             fontSize={13}
@@ -96,7 +94,7 @@ const EventPageTab: React.FC<EventPageTabProps> = ({
             onClick={t.onClick}>
             {t.name}
           </Button>
-        ) : null,
+        ),
       )}
     </Flex>
   );

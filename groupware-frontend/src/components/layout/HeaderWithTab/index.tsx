@@ -169,20 +169,7 @@ const HeaderWithTab: React.FC<HeaderProps> = ({
                     {t.name}
                   </Button>
                 </ChakraLink>
-              ) : t.type === 'link' ? (
-                <Link key={t.name} href={t.href}>
-                  <a
-                    className={clsx(
-                      headerStyles.tab,
-                      tabClassNameGetter(t),
-                      t.name === activeTabName
-                        ? headerStyles.tab__active
-                        : headerStyles.tab__disable,
-                    )}>
-                    <Text color={t.color}>{t.name}</Text>
-                  </a>
-                </Link>
-              ) : t.type === 'create' && t.onClick ? (
+              ) : t.type === 'create' ? (
                 <Button
                   onClick={t.onClick}
                   rounded={50}
@@ -193,7 +180,7 @@ const HeaderWithTab: React.FC<HeaderProps> = ({
                   rightIcon={<AiOutlinePlus />}>
                   {t.name}
                 </Button>
-              ) : (t.type === 'edit' || t.type === 'delete') && t.onClick ? (
+              ) : t.type === 'edit' || t.type === 'delete' ? (
                 <Button
                   onClick={t.onClick}
                   ml="10px"
@@ -207,14 +194,14 @@ const HeaderWithTab: React.FC<HeaderProps> = ({
                   bg="white">
                   {t.name}
                 </Button>
-              ) : !t.type && t.onClick ? (
+              ) : !t.type ? (
                 <ChakraLink
                   style={{ textDecoration: 'none' }}
                   key={t.name}
                   h="100%"
+                  href={t.href}
                   onClick={t.onClick}
                   px={3}
-                  //   mx={3}
                   display="flex"
                   alignItems="center"
                   whiteSpace="nowrap"

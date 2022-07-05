@@ -8,20 +8,19 @@ export enum EventTab {
   SUBMISSION_ETC = '提出物等',
 }
 
-export type Tab =
-  | {
-      type?: 'create' | 'edit' | 'delete';
-      name: string;
-      onClick?: () => void;
-      color?: string;
-      isActive?: boolean;
-    }
-  | {
-      type: 'link' | 'backButton';
-      name: string;
-      href: string;
-      color?: string;
-    };
+export type Tab = {
+  type?: 'backButton' | 'create' | 'edit' | 'delete';
+  name: string;
+  onClick?: () => void;
+  href?: string;
+  color?: string;
+  isActive?: boolean;
+};
+// | {
+//     type?: ;
+//     name: string;
+//     color?: string;
+//   };
 
 export enum TabName {
   EDIT = 'edit',

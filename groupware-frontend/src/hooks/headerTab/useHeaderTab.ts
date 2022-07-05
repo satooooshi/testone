@@ -181,17 +181,14 @@ const headerTab = (headerTabBehavior: HeaderTabBehavior): Tab[] => {
     case 'account':
       return [
         {
-          type: 'link',
           name: 'アカウント情報',
           href: `/account/${user?.id}`,
         },
         {
-          type: 'link',
           name: 'プロフィール編集',
           href: '/account/profile',
         },
         {
-          type: 'link',
           name: 'パスワード更新',
           href: '/account/update-password',
         },
@@ -199,12 +196,10 @@ const headerTab = (headerTabBehavior: HeaderTabBehavior): Tab[] => {
     case 'home':
       return [
         {
-          type: 'link',
           name: 'ダッシュボード',
           href: '/',
         },
         {
-          type: 'link',
           name: 'メンション一覧',
           href: '/mention',
         },
@@ -212,7 +207,6 @@ const headerTab = (headerTabBehavior: HeaderTabBehavior): Tab[] => {
     case 'wiki':
       return [
         {
-          type: 'link',
           name: '社内Wiki Home',
           href: '/wiki',
         },
@@ -262,32 +256,26 @@ const headerTab = (headerTabBehavior: HeaderTabBehavior): Tab[] => {
     case 'admin':
       return [
         {
-          type: 'link',
           name: 'ユーザー管理',
           href: '/admin/users',
         },
         {
-          type: 'link',
           name: 'ユーザー作成',
           href: '/admin/users/new',
         },
         {
-          type: 'link',
           name: 'タグ管理',
           href: '/admin/tag',
         },
         {
-          type: 'link',
           name: 'タグ管理(ユーザー)',
           href: '/admin/tag/user',
         },
         {
-          type: 'link',
           name: '特集管理',
           href: '/admin/top-news',
         },
         {
-          type: 'link',
           name: 'CSV出力',
           href: '/admin/csv',
         },
@@ -295,12 +283,10 @@ const headerTab = (headerTabBehavior: HeaderTabBehavior): Tab[] => {
     case 'tagEdit':
       return [
         {
-          type: 'link',
           name: 'タグ管理',
           href: '/admin/tag',
         },
         {
-          type: 'link',
           name: 'タグ管理(ユーザー)',
           href: '/admin/tag/user',
         },
@@ -308,12 +294,10 @@ const headerTab = (headerTabBehavior: HeaderTabBehavior): Tab[] => {
     case 'mention':
       return [
         {
-          type: 'link',
           name: 'ダッシュボード',
           href: '/',
         },
         {
-          type: 'link',
           name: 'メンション一覧',
           href: '/mention',
         },
@@ -321,7 +305,6 @@ const headerTab = (headerTabBehavior: HeaderTabBehavior): Tab[] => {
     case 'newUser':
       return [
         {
-          type: 'link',
           name: '管理画面へ',
           href: '/admin/users',
         },
