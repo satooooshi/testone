@@ -9,7 +9,7 @@ import { ChatGroup, ChatMessage, SocketMessage } from 'src/types';
 // import { baseURL } from 'src/utils/url';
 
 // socket
-export const socket = io('https://www.bold-web-socket.com./', {
+export const socket = io('https://www.bbbbbb.ga:443', {
   transports: ['websocket'],
 });
 

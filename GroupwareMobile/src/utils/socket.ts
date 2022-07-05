@@ -9,7 +9,7 @@ import {useAPISaveLastReadChatTime} from '../hooks/api/chat/useAPISaveLastReadCh
 import {useAPIGetLastReadChatTime} from '../hooks/api/chat/useAPIGetLastReadChatTime';
 import {getThumbnailOfVideo} from './getThumbnailOfVideo';
 
-export const socket = io('https://www.bold-web-socket.com./', {
+export const socket = io('https://www.bbbbbb.ga', {
   transports: ['websocket'],
   forceNew: true,
   upgrade: false,
