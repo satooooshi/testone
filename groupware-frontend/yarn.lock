@@ -8070,6 +8070,11 @@ react-typeform-embed@^0.2.1:
   dependencies:
     "@typeform/embed" "^0.10.0"
 
+react-video-thumbnail-image@^0.1.7:
+  version "0.1.7"
+  resolved "https://registry.yarnpkg.com/react-video-thumbnail-image/-/react-video-thumbnail-image-0.1.7.tgz#a87b592c777fdd8a230738a4f32d197eb04618a9"
+  integrity sha512-yWa+4DnTJJNXp+BnXsu6y0U6SWHDHBTaRNr4FZX5Y2EVhCWR5IIx4NIYM3Thl5MUft2APg9q5e9ieVHH+DXMvg==
+
 react-viewer@^3.2.2:
   version "3.2.2"
   resolved "https://registry.yarnpkg.com/react-viewer/-/react-viewer-3.2.2.tgz#38626a7fa862ec84dfa373c2ef5843f4100c465b"
