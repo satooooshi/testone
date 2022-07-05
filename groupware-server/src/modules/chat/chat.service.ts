@@ -380,9 +380,7 @@ export class ChatService {
 
   public async getExpiredUrlMessages(query: number): Promise<ChatMessage[]> {
     const date = new Date();
-    console.log('---', date, query);
     date.setDate(date.getDate() - 5);
-    console.log('---after', date);
     const justBeforeExpiredUrlMessages = await this.chatMessageRepository
       .createQueryBuilder('chat_messages')
       .leftJoinAndSelect('chat_messages.chatGroup', 'chat_group')
@@ -404,10 +402,6 @@ export class ChatService {
     for (const m of justBeforeExpiredUrlMessages) {
       await this.chatMessageRepository.save({ ...m, updatedAt: new Date() });
     }
-    console.log(
-      '---==',
-      justBeforeExpiredUrlMessages.map((m) => m.updatedAt),
-    );
     return justBeforeExpiredUrlMessages;
   }
 

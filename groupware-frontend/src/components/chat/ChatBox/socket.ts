@@ -56,13 +56,13 @@ export const useChatSocket = (
       socket.emit('joinRoom', room.id.toString());
 
       socket.on('readMessageClient', async (senderId: string) => {
-        console.log('socket readMessageClient----', senderId);
+        // console.log('socket readMessageClient----', senderId);
         if (user?.id && senderId && senderId != `${user?.id}`) {
           refetchLastReadChatTime();
         }
       });
       socket.on('msgToClient', async (socketMessage: SocketMessage) => {
-        console.log('msgToClient called', socketMessage);
+        // console.log('msgToClient called', socketMessage);
         if (!socketMessage.chatMessage) {
           return;
         }
@@ -107,7 +107,7 @@ export const useChatSocket = (
             break;
           }
           case 'edit': {
-            console.log('edit called', socketMessage.chatMessage.content);
+            // console.log('edit called', socketMessage.chatMessage.content);
             setMessages((msgs) => {
               return msgs.map((m) =>
                 m.id === socketMessage.chatMessage.id
