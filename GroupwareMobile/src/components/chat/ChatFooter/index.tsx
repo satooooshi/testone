@@ -1,4 +1,4 @@
-import React, {Fragment, useMemo, useRef, useState} from 'react';
+import React, {Fragment, useEffect, useMemo, useRef, useState} from 'react';
 import {
   AppState,
   NativeSyntheticEvent,
@@ -56,8 +56,14 @@ const ChatFooter: React.FC<ChatFooterProps> = ({
   const [selection, setSelection] = useState({start: 0, end: 0});
   const [mentionAdded, setMentionAdded] = useState(false);
   const [visibleMenu, setVisibleMenu] = useState(false);
-  const [isSendable, setIsSendable] = useState(!!value);
+  const [content, setContent] = useState('');
   const inputRef = useRef<TextInput>(null);
+
+  useEffect(() => {
+    if (!value) {
+      setContent(value);
+    }
+  }, [value]);
 
   const renderSuggestions: React.FC<MentionSuggestionsProps> = ({
     keyword,
@@ -93,8 +99,8 @@ const ChatFooter: React.FC<ChatFooterProps> = ({
     },
   ];
   const {plainText, parts} = useMemo(
-    () => parseValue(value, partTypes),
-    [value, partTypes],
+    () => parseValue(content, partTypes),
+    [content, partTypes],
   );
 
   const onChangeInput = (changedText: string) => {
@@ -241,7 +247,7 @@ const ChatFooter: React.FC<ChatFooterProps> = ({
             onSelectionChange={handleSelectionChange}
             multiline
             onChangeText={t => {
-              setIsSendable(!!t);
+              setContent(t);
               onChangeInput(t);
             }}
             autoCapitalize="none"
@@ -279,7 +285,7 @@ const ChatFooter: React.FC<ChatFooterProps> = ({
               name="send"
               fontFamily="Ionicons"
               fontSize={21}
-              color={isSendable ? 'blue600' : 'gray'}
+              color={content ? 'blue600' : 'gray'}
             />
           </TouchableOpacity>
         )}
