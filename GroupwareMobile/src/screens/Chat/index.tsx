@@ -95,6 +95,7 @@ import {useAPIGetExpiredUrlMessages} from '../../hooks/api/chat/useAPIGetExpired
 import {useChatSocket} from '../../utils/socket';
 import {useAPIUpdateChatMessage} from '../../hooks/api/chat/useAPIUpdateChatMessage';
 import {useAPIDeleteChatMessage} from '../../hooks/api/chat/useAPIDeleteChatMessage';
+import uuid from 'react-native-uuid';
 
 const TopTab = createMaterialTopTabNavigator();
 
@@ -429,7 +430,7 @@ const Chat: React.FC = () => {
           for (let i = 0; i < imageURLs.length; i++) {
             sendChatMessage({
               content: imageURLs[i],
-              fileName: fileName?.[i] ? fileName[i] : imageURLs[i] + '.png',
+              fileName: fileName?.[i] ? fileName[i] : uuid.v4() + '.png',
               type: ChatMessageType.IMAGE,
               chatGroup: room,
             });
@@ -451,7 +452,7 @@ const Chat: React.FC = () => {
           for (let i = 0; i < imageURLs.length; i++) {
             sendChatMessage({
               content: imageURLs[i],
-              fileName: fileName?.[i] ? fileName[i] : imageURLs[i] + '.mp4',
+              fileName: fileName?.[i] ? fileName[i] : uuid.v4() + '.mp4',
               type: ChatMessageType.VIDEO,
               chatGroup: room,
             });
