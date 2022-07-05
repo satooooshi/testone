@@ -180,7 +180,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeScreenName, hideDrawer }) => {
             screenName="/chat"
             isActive={activeScreenName === SidebarScreenName.CHAT}
             icon={
-              <Box display="flex">
+              <Box display="flex" alignItems="center">
                 <BsChatDotsFill
                   className={iconClass(
                     activeScreenName === SidebarScreenName.CHAT,
@@ -190,13 +190,14 @@ const Sidebar: React.FC<SidebarProps> = ({ activeScreenName, hideDrawer }) => {
                   <Badge
                     bg="red"
                     color="white"
-                    w="20px"
-                    h="20px"
+                    fontSize={10}
+                    minW="22px"
+                    h="22px"
                     position="fixed"
                     borderRadius="50%"
                     textAlign="center"
-                    lineHeight="20px"
-                    ml="40px">
+                    lineHeight="22px"
+                    ml="170px">
                     {unreadChatCount}
                   </Badge>
                 )}
