@@ -41,7 +41,9 @@ export const uploadImageFromGallery = async (
             }
           : options;
       if (optionsExec.multiple) {
-        photo = await ImagePicker.openPicker(optionsExec && {multiple: true});
+        photo = await ImagePicker.openPicker(
+          optionsExec && {multiple: true, forceJpg: true},
+        );
       } else {
         photo[0] = await ImagePicker.openPicker(optionsExec);
       }
