@@ -303,7 +303,7 @@ const Chat: React.FC = () => {
     useAPISendChatMessage({
       onSuccess: sentMsg => {
         socket.send({chatMessage: sentMsg, type: 'send'});
-        setMessages(refreshMessage([sentMsg, ...messages]));
+        setMessages(msg => refreshMessage([sentMsg, ...msg]));
         if (sentMsg?.chatGroup?.id) {
           refetchRoomCard({id: sentMsg.chatGroup.id, type: ''});
         }
@@ -415,6 +415,7 @@ const Chat: React.FC = () => {
   };
 
   const handleUploadImage = async (useCamera: boolean) => {
+    console.log('call =================================================');
     const {formData, fileName} = await uploadImageFromGallery(
       {
         mediaType: 'photo',
@@ -426,6 +427,7 @@ const Chat: React.FC = () => {
     if (formData) {
       uploadFile(formData, {
         onSuccess: async imageURLs => {
+          console.log('imageURLs =================================', imageURLs);
           for (let i = 0; i < imageURLs.length; i++) {
             sendChatMessage({
               content: imageURLs[i],
