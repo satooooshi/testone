@@ -1,6 +1,13 @@
 import UserAvatar from '@/components/common/UserAvatar';
-import { Box, Text, useMediaQuery } from '@chakra-ui/react';
-import React, { ReactNode } from 'react';
+import {
+  Box,
+  Button,
+  Image,
+  Link,
+  Text,
+  useMediaQuery,
+} from '@chakra-ui/react';
+import React, { ReactNode, useEffect, useRef, useState } from 'react';
 import { ChatMessage, ChatMessageType } from 'src/types';
 import { darkFontColor } from 'src/utils/colors';
 import { userNameFactory } from 'src/utils/factory/userNameFactory';
@@ -20,11 +27,65 @@ const TextMessage: React.FC<TextMessageProps> = ({
   confirmedSearchWord,
   searchedResultIds,
 }) => {
+  const [pressed, setPressed] = useState(false);
+  const [closeButton, setCloseButton] = useState(false);
+  const textRef = useRef<HTMLParagraphElement | null>(null);
+  const NUM_OF_LINES = 3;
+
+  useEffect(() => {
+    if (textRef.current) {
+      const divHeight = textRef.current.offsetHeight;
+      const lineHeight = Number(
+        textRef.current.style.lineHeight.replace('px', ''),
+      );
+      const lines = divHeight / lineHeight;
+      if (lines > 3) {
+        setCloseButton(true);
+      }
+
+      console.log(lines);
+      console.log(divHeight, lineHeight);
+    }
+  }, [pressed]);
+
+  const FoldedTextMessage = (msg: string) => {
+    return (
+      <Box display="flex" flexDir="column">
+        <Link onClick={() => setPressed(true)}>
+          <Text
+            style={{ lineHeight: '20px' }}
+            ref={textRef}
+            noOfLines={pressed ? undefined : NUM_OF_LINES}>
+            {msg}
+          </Text>
+        </Link>
+        {closeButton && (
+          <Button
+            fontSize="13px"
+            minW={0}
+            w="60px"
+            h="25px"
+            borderRadius={20}
+            ml="auto"
+            mr="0px"
+            bg=""
+            onClick={() => {
+              setPressed(false);
+              setCloseButton(false);
+            }}>
+            閉じる
+          </Button>
+        )}
+      </Box>
+    );
+  };
   const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
+
   const replyContent = (parentMsg: ChatMessage) => {
     switch (parentMsg.type) {
       case ChatMessageType.TEXT:
-        return mentionTransform(parentMsg.content);
+        const msg = mentionTransform(parentMsg.content);
+        return FoldedTextMessage(msg);
       case ChatMessageType.IMAGE:
         return '写真';
       case ChatMessageType.VIDEO:
@@ -51,7 +112,7 @@ const TextMessage: React.FC<TextMessageProps> = ({
     }
     return text;
   };
-
+  const reply = message.replyParentMessage;
   return (
     <Box
       maxW={isSmallerThan768 ? '300px' : '40vw'}
@@ -60,7 +121,7 @@ const TextMessage: React.FC<TextMessageProps> = ({
       p="8px"
       rounded="md">
       <Linkify componentDecorator={componentDecorator}>
-        {message.replyParentMessage && (
+        {reply && (
           <Box
             flexDir="row"
             display="flex"
@@ -73,13 +134,27 @@ const TextMessage: React.FC<TextMessageProps> = ({
               w="32px"
               mr="4px"
               cursor="pointer"
-              user={message.replyParentMessage.sender}
+              user={reply.sender}
             />
             <Box width={'90%'}>
-              <Text fontWeight="bold">
-                {userNameFactory(message.replyParentMessage?.sender)}
-              </Text>
-              <Text>{replyContent(message.replyParentMessage)}</Text>
+              <Text fontWeight="bold">{userNameFactory(reply?.sender)}</Text>
+              {replyContent(reply)}
+            </Box>
+            <Box width={'50%'}>
+              {reply.type === ChatMessageType.IMAGE ? (
+                <Image
+                  boxSize={10}
+                  src={
+                    reply.content
+                      ? reply.content
+                      : require('@/public/no-image.jpg')
+                  }
+                />
+              ) : reply.type == ChatMessageType.VIDEO ? (
+                <Image boxSize={10} src={require('@/public/no-image.jpg')} />
+              ) : reply.type == ChatMessageType.STICKER ? (
+                <Image boxSize={10} src={require('@/public/no-image.jpg')} />
+              ) : null}
             </Box>
           </Box>
         )}

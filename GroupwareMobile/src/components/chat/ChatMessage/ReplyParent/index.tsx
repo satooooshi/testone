@@ -1,29 +1,101 @@
-import React from 'react';
-import {Div, Image, Text} from 'react-native-magnus';
+import React, {useCallback, useState} from 'react';
+import {TouchableOpacity} from 'react-native-gesture-handler';
+import {Button, Div, Image, Text} from 'react-native-magnus';
 import {ChatMessage, ChatMessageType} from '../../../../types';
 import {reactionStickers} from '../../../../utils/factory/reactionStickers';
 import {userNameFactory} from '../../../../utils/factory/userNameFactory';
 import {mentionTransform} from '../../../../utils/messageTransform';
 import UserAvatar from '../../../common/UserAvatar';
+import {getThumbnailOfVideo} from '../../../../utils/getThumbnailOfVideo';
 
 type ReplyParentProps = {
   parentMessage: ChatMessage;
 };
 
 const ReplyParent: React.FC<ReplyParentProps> = ({parentMessage}) => {
+  const Limit_LINES = 3;
+  const [pressed, setPressed] = useState(false);
+  const [numberOfLines, setNumberOfLines] = useState(0);
+
+  const onTextLayout = useCallback(e => {
+    setNumberOfLines(e.nativeEvent.lines.length);
+  }, []);
+
+  const FoldedTextMessage = (msg: String) => {
+    return (
+      <>
+        <TouchableOpacity onPress={() => setPressed(true)}>
+          <Text
+            mb={10}
+            numberOfLines={pressed ? undefined : Limit_LINES}
+            onTextLayout={onTextLayout}
+            textAlign="left">
+            {msg}
+          </Text>
+        </TouchableOpacity>
+        {pressed && numberOfLines > 3 ? (
+          <Button
+            mb={5}
+            pt={5}
+            pb={5}
+            color="black"
+            underlayColor="white"
+            rounded={20}
+            fontSize={13}
+            bg="transparent"
+            ml="auto"
+            mr={0}
+            onPress={() => setPressed(false)}>
+            閉じる
+          </Button>
+        ) : null}
+      </>
+    );
+  };
+
   const content = (type: ChatMessageType) => {
     switch (type) {
       case ChatMessageType.TEXT:
-        return mentionTransform(parentMessage.content);
+        return FoldedTextMessage(mentionTransform(parentMessage.content));
+
       case ChatMessageType.IMAGE:
-        return '写真';
+        return (
+          <Text color="black" fontSize={14}>
+            写真
+          </Text>
+        );
       case ChatMessageType.VIDEO:
-        return '動画';
+        return (
+          <Text color="black" fontSize={14}>
+            動画
+          </Text>
+        );
       case ChatMessageType.STICKER:
-        return 'スタンプ';
+        return (
+          <Text color="black" fontSize={14}>
+            スタンプ
+          </Text>
+        );
       case ChatMessageType.OTHER_FILE:
-        return 'ファイル';
+        return (
+          <Text color="black" fontSize={14}>
+            ファイル
+          </Text>
+        );
     }
+  };
+  const getThumbnailImage = (message: ChatMessage) => {
+    const getThumbnail = async () => {
+      message.thumbnail = await getThumbnailOfVideo(
+        message.content,
+        message.fileName,
+      );
+    };
+    if (!message.thumbnail) {
+      getThumbnail();
+      return message.thumbnail;
+    }
+    return message.thumbnail;
   };
 
   return (
@@ -31,8 +103,7 @@ const ReplyParent: React.FC<ReplyParentProps> = ({parentMessage}) => {
       flexDir="row"
       alignItems="center"
       borderBottomWidth={0.5}
-      borderBottomColor="white"
-      pb="sm">
+      borderBottomColor="white">
       <Div mr={'sm'}>
         <UserAvatar
           w={32}
@@ -41,18 +112,17 @@ const ReplyParent: React.FC<ReplyParentProps> = ({parentMessage}) => {
           GoProfile={true}
         />
       </Div>
-      <Div w={'65%'}>
+      <Div w={'65%'} mr={0}>
         <Text color="black" fontWeight="bold" fontSize={14}>
           {userNameFactory(parentMessage.sender)}
         </Text>
-        <Text color="black" fontSize={14}>
-          {content(parentMessage.type)}
-        </Text>
+        {content(parentMessage.type)}
       </Div>
       {parentMessage.type === ChatMessageType.IMAGE ? (
         <Image
           w={40}
           h={40}
+          mb={5}
           source={
             parentMessage.content
               ? {uri: parentMessage.content}
@@ -63,16 +133,18 @@ const ReplyParent: React.FC<ReplyParentProps> = ({parentMessage}) => {
         <Image
           w={40}
           h={40}
+          mb={5}
           source={
             parentMessage.thumbnail
               ? {uri: parentMessage.thumbnail}
-              : require('../../../../../assets/no-image.jpg')
+              : {uri: getThumbnailImage(parentMessage)}
           }
         />
       ) : parentMessage.type === ChatMessageType.STICKER ? (
         <Image
           w={40}
           h={40}
+          mb={5}
           resizeMode="contain"
           source={
             reactionStickers.find(s => s.name === parentMessage.content)?.src
