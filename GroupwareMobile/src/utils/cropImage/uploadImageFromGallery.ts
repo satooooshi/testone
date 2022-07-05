@@ -5,6 +5,7 @@ import ImagePicker, {
   Options,
   PickerErrorCode,
 } from 'react-native-image-crop-picker';
+import ImageResizer from 'react-native-image-resizer';
 
 export const uploadImageFromGallery = async (
   options: Options = {
@@ -49,6 +50,41 @@ export const uploadImageFromGallery = async (
       }
     }
     const fileName = photo.map(f => f.filename);
+
+    if (Platform.OS === 'android') {
+      for (let i = 0; i < photo.length; i++) {
+        // const {path, mime} = photo[i];
+
+        // let compressFormat: 'PNG' | 'JPEG' | 'WEBP' = 'JPEG';
+
+        // if (mime === 'image/jpeg') {
+        //   compressFormat = 'JPEG';
+        // } else if (mime === 'image/png') {
+        //   compressFormat = 'PNG';
+        // }
+        // null means images are stored in cache folder e.g. context.getCacheDir()
+        // probably be a good idea to clean/delete after using the compressed files for upload
+
+        const {path} = await ImageResizer.createResizedImage(
+          photo[i].path,
+          800,
+          800,
+          'JPEG',
+          photo[i].size > 10000000
+            ? 70
+            : photo[i].size > 5000000
+            ? 80
+            : photo[i].size > 2000000
+            ? 90
+            : 100,
+          0,
+          undefined,
+          undefined,
+          {onlyScaleDown: true},
+        );
+        photo[i].path = path;
+      }
+    }
 
     const formData = imagePickerResponseToFormData(photo);
     return {formData, fileName};
