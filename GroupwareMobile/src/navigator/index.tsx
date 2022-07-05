@@ -43,10 +43,10 @@ const Navigator = () => {
   const navigationRef = useNavigationContainerRef<any>();
   const {mutate: registerDevice} = useAPIRegisterDevice({
     onSuccess: updatedInfo => {
-      console.log('RegisterDevice success--------', updatedInfo);
+      // console.log('RegisterDevice success--------', updatedInfo);
     },
     onError: () => {
-      console.log('fail to register device');
+      // console.log('fail to register device');
     },
   });
   const {
@@ -195,26 +195,26 @@ const Navigator = () => {
     await rtcEngine?.adjustRecordingSignalVolume(100);
 
     rtcEngine?.addListener('UserJoined', (uid, elapsed) => {
-      console.log('UserJoined', uid, elapsed);
+      // console.log('UserJoined', uid, elapsed);
     });
     // UserOfflineはチャンネルから人が退出したときのイベント
     // 詳しくはnode_modules/react-native-agora/lib/typescript/src/common/RtcEvents.d.tsに書いてある
     rtcEngine?.addListener('UserOffline', async (uid, reason) => {
-      console.log('UserOffline', uid, reason);
+      // console.log('UserOffline', uid, reason);
       await endCall();
     });
     rtcEngine?.addListener('ConnectionStateChanged', async (state, reason) => {
-      console.log('ConnectionStateChanged ', Platform.OS, state, reason);
+      // console.log('ConnectionStateChanged ', Platform.OS, state, reason);
     });
     rtcEngine?.addListener('LeaveChannel', async ({userCount}) => {
-      console.log('LeaveChannel. user count: ', Platform.OS, userCount);
+      // console.log('LeaveChannel. user count: ', Platform.OS, userCount);
       // await endCall();
     });
     rtcEngine?.addListener('JoinChannelSuccess', (channel, uid, elapsed) => {
-      console.log('JoinChannelSuccess', channel, uid, elapsed);
+      // console.log('JoinChannelSuccess', channel, uid, elapsed);
     });
     rtcEngine?.addListener('Error', errCode => {
-      console.log('errCode', errCode);
+      // console.log('errCode', errCode);
     });
   }, [createRTCInstance, endCall]);
 
@@ -241,7 +241,7 @@ const Navigator = () => {
 
   messaging().setBackgroundMessageHandler(async remoteMessage => {
     // await notifee.incrementBadgeCount();
-    console.log('BackgroundMessage received!!', remoteMessage);
+    // console.log('BackgroundMessage received!!', remoteMessage);
   });
 
   useEffect(
@@ -444,11 +444,11 @@ const Navigator = () => {
 
   const sendLocalNotification = useCallback(
     async (remoteMessage: any) => {
-      console.log(
-        '============',
-        remoteMessage.data?.id,
-        `${currentChatRoomId}`,
-      );
+      // console.log(
+      //   '============',
+      //   remoteMessage.data?.id,
+      //   `${currentChatRoomId}`,
+      // );
       if (
         remoteMessage?.data?.silent ||
         (remoteMessage?.data?.screen === 'chat' &&
@@ -543,9 +543,9 @@ const Navigator = () => {
       notifee.requestPermission();
 
       PushNotification.configure({
-        onRegister: function (token) {
-          console.log('PushNotification TOKEN:', token);
-        },
+        // onRegister: function (token) {
+        //   console.log('PushNotification TOKEN:', token);
+        // },
         onNotification: notification => {
           if (
             (notification?.data?.silent ||
@@ -566,7 +566,6 @@ const Navigator = () => {
               if (storageData) {
                 const messagesInStorage: ChatMessage[] =
                   JSON.parse(storageData);
-                console.log('messagesInStorage', messagesInStorage.length);
 
                 const jsonMessages = JSON.stringify(
                   messagesInStorage.filter(
@@ -580,7 +579,7 @@ const Navigator = () => {
               }
             }
           }
-          console.log('PushNotification onNotification========', notification);
+          // console.log('PushNotification onNotification========', notification);
           if (Platform.OS === 'android') {
             sendLocalNotification(notification);
           } else if (notification.userInteraction) {

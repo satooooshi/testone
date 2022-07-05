@@ -70,12 +70,14 @@ export const useChatSocket = (
       socket.emit('joinRoom', room.id.toString());
 
       socket.on('readMessageClient', async (senderId: string) => {
-        console.log('readMessageClient called', senderId, myself?.id, room.id);
+        // console.log('readMessageClient called', senderId, myself?.id, room.id);
         if (myself?.id && senderId && senderId !== `${myself?.id}`) {
           refetchLastReadChatTime();
         }
       });
       socket.on('msgToClient', async (socketMessage: SocketMessage) => {
+        // console.log('msgToClient called', socketMessage);
+
         if (!socketMessage.chatMessage) {
           return;
         }
@@ -131,7 +133,13 @@ export const useChatSocket = (
             break;
           }
           case 'edit': {
-            setMessages(msgs => {});
+            setMessages(msgs => {
+              return msgs.map(m =>
+                m.id === socketMessage.chatMessage.id
+                  ? socketMessage.chatMessage
+                  : m,
+              );
+            });
             break;
           }
           case 'delete': {

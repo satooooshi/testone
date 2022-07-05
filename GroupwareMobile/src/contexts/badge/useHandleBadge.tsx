@@ -44,8 +44,6 @@ export const BadgeProvider: React.FC = ({children}) => {
     {
       enabled: false,
       onSuccess: data => {
-        console.log('refetchAllRooms called ----', data.rooms.length);
-
         let count = page !== 1 && chatGroups.length ? chatUnreadCount : 0;
         for (const room of data.rooms) {
           count += room.unreadCount ? room.unreadCount : 0;
@@ -94,8 +92,6 @@ export const BadgeProvider: React.FC = ({children}) => {
 
   useEffect(() => {
     if (user?.id && chatGroups.length) {
-      console.log('chatGroups.length', chatGroups.length);
-
       const jsonMessages = JSON.stringify(chatGroups);
       storage.set(`chatRoomList${user?.id}`, jsonMessages);
     }
@@ -116,8 +112,6 @@ export const BadgeProvider: React.FC = ({children}) => {
 
   useEffect(() => {
     if (page > 1) {
-      console.log('-----', page);
-
       refetchAllRooms();
     }
   }, [page, refetchAllRooms]);

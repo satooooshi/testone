@@ -91,7 +91,7 @@ const RoomList: React.FC = () => {
 
   useEffect(() => {
     if (isCompletedRefetchAllRooms) {
-      console.log('isCompletedRefetchAllRooms', chatGroups.length);
+      // console.log('isCompletedRefetchAllRooms', chatGroups.length);
       setChatRooms(chatGroups);
     }
   }, [chatGroups, isCompletedRefetchAllRooms]);

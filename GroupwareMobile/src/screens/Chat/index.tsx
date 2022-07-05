@@ -208,7 +208,7 @@ const Chat: React.FC = () => {
       onSuccess: res => {
         if (res?.length) {
           const refreshedMessage = refreshMessage(res);
-          console.log('refreshMessage =============', refreshedMessage.length);
+          // console.log('refreshMessage =============', refreshedMessage.length);
           setMessages(refreshedMessage);
           if (refetchDoesntExistMessages(res[0].id)) {
             refetchDoesntExistMessages(res[0].id + 20);
@@ -415,7 +415,6 @@ const Chat: React.FC = () => {
   };
 
   const handleUploadImage = async (useCamera: boolean) => {
-    console.log('call =================================================');
     const {formData, fileName} = await uploadImageFromGallery(
       {
         mediaType: 'photo',
@@ -427,7 +426,6 @@ const Chat: React.FC = () => {
     if (formData) {
       uploadFile(formData, {
         onSuccess: async imageURLs => {
-          console.log('imageURLs =================================', imageURLs);
           for (let i = 0; i < imageURLs.length; i++) {
             sendChatMessage({
               content: imageURLs[i],
@@ -736,6 +734,7 @@ const Chat: React.FC = () => {
             setEditMessage(true);
             if (longPressedMsg) {
               setValues(longPressedMsg);
+              messageContentRef.current = longPressedMsg.content;
             }
           }}>
           メッセージを編集
