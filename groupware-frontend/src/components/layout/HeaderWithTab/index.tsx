@@ -10,6 +10,8 @@ import {
   Text,
   Link as ChakraLink,
   Box,
+  Flex,
+  Spacer,
 } from '@chakra-ui/react';
 import { GiHamburgerMenu } from 'react-icons/gi';
 import { AiOutlineLeft, AiOutlinePlus } from 'react-icons/ai';
@@ -20,6 +22,8 @@ import { EventTab, Tab } from 'src/types/header/tab/types';
 import { IoChevronDownCircleOutline } from 'react-icons/io5';
 import EventPageTab from '@/components/tab/EventPageTab';
 import { hideScrollbarCss } from 'src/utils/chakra/hideScrollBar.css';
+import HeaderButton from '@/components/common/Header/HeaderButton';
+import HeaderLink from '@/components/common/Header/HeaderLink';
 
 export type HeaderProps = {
   title: string;
@@ -114,7 +118,6 @@ const HeaderWithTab: React.FC<HeaderProps> = ({
                     rounded={50}
                     // right={0}
                     ml="auto"
-                    mr="3%"
                     rightIcon={<AiOutlinePlus />}>
                     作成
                   </MenuButton>
@@ -137,87 +140,41 @@ const HeaderWithTab: React.FC<HeaderProps> = ({
             </Menu>
           </Box>
         ) : null}
-
-        {EventPage && tabs && (
-          <EventPageTab
-            tabs={tabs}
-            activeTabName={activeTabName}
-            eventPage={EventPage}
-          />
-        )}
-        {tabs && tabs.length && !EventPage ? (
-          <Box
+        {tabs && tabs.length ? (
+          <Flex
             w="100%"
-            overflowX="auto"
             display="flex"
             flexDir="row"
             alignItems="center"
-            // px="40px"
-            h="60px"
-            css={hideScrollbarCss}
-            justifyContent={
-              tabs[0].type === 'backButton' ? 'flex-end' : 'flex-start'
-            }>
-            {tabs.map((t) =>
-              t.type === 'backButton' ? (
-                <ChakraLink
-                  mr="auto"
-                  key={t.name}
-                  href={t.href}
-                  _hover={{ textDecoration: 'none' }}>
-                  <Button leftIcon={<AiOutlineLeft />} bg="white">
-                    {t.name}
-                  </Button>
-                </ChakraLink>
-              ) : t.type === 'create' ? (
-                <Button
-                  onClick={t.onClick}
-                  rounded={50}
-                  colorScheme="blue"
-                  right={0}
-                  ml="auto"
-                  mr="3%"
-                  rightIcon={<AiOutlinePlus />}>
-                  {t.name}
-                </Button>
-              ) : t.type === 'edit' || t.type === 'delete' ? (
-                <Button
-                  onClick={t.onClick}
-                  ml="10px"
-                  leftIcon={
-                    t.type === 'edit' ? (
-                      <FiEdit2 />
-                    ) : (
-                      <RiDeleteBin6Line size="20px" />
-                    )
-                  }
-                  bg="white">
-                  {t.name}
-                </Button>
-              ) : !t.type ? (
-                <ChakraLink
-                  style={{ textDecoration: 'none' }}
-                  key={t.name}
-                  h="100%"
-                  href={t.href}
-                  onClick={t.onClick}
-                  px={3}
-                  display="flex"
-                  alignItems="center"
-                  whiteSpace="nowrap"
-                  borderBottomColor={
-                    t.name === activeTabName ? 'blue.500' : undefined
-                  }
-                  borderBottomWidth={t.name === activeTabName ? 2 : undefined}>
-                  <Text
-                    color={t.name === activeTabName ? 'blue.500' : undefined}
-                    fontWeight="bold">
-                    {t.name}
-                  </Text>
-                </ChakraLink>
-              ) : null,
+            h="60px">
+            {EventPage ? (
+              <EventPageTab
+                tabs={tabs}
+                activeTabName={activeTabName}
+                eventPage={EventPage}
+              />
+            ) : (
+              tabs.map((t) =>
+                t.type === 'backButton' ? (
+                  <>
+                    <ChakraLink
+                      key={t.name}
+                      href={t.href}
+                      _hover={{ textDecoration: 'none' }}>
+                      <Button leftIcon={<AiOutlineLeft />} bg="white">
+                        {t.name}
+                      </Button>
+                    </ChakraLink>
+                    <Spacer />
+                  </>
+                ) : t.type ? (
+                  <HeaderButton t={t} />
+                ) : !t.type ? (
+                  <HeaderLink t={t} activeTabName={activeTabName} />
+                ) : null,
+              )
             )}
-          </Box>
+          </Flex>
         ) : null}
       </Box>
     </Box>
