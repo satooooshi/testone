@@ -87,17 +87,13 @@ export const useChatSocket = (
         switch (socketMessage.type) {
           case 'send': {
             if (socketMessage.chatMessage.content) {
-              if (
-                !socketMessage.chatMessage?.isSender &&
-                appState === 'active'
-              ) {
-                saveLastReadTimeAndReport();
-                refetchLastReadChatTime();
-              } else if (socketMessage.chatMessage?.sender?.id !== myself?.id) {
-                Alert.alert(
-                  `'saveLastReadTimeAndReport'${appState}${socketMessage.chatMessage.isSender}`,
-                );
-              }
+              // if (
+              //   !socketMessage.chatMessage?.isSender &&
+              //   appState === 'active'
+              // ) {
+              //   saveLastReadTimeAndReport();
+              //   refetchLastReadChatTime();
+              // }
               socketMessage.chatMessage.createdAt = new Date(
                 socketMessage.chatMessage.createdAt,
               );

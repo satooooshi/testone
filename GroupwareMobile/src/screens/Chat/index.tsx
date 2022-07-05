@@ -206,6 +206,7 @@ const Chat: React.FC = () => {
     {
       enabled: false,
       onSuccess: res => {
+        console.log('refetchFetchedPastMessages called', res?.length);
         if (res?.length) {
           const refreshedMessage = refreshMessage(res);
           // console.log('refreshMessage =============', refreshedMessage.length);
@@ -289,7 +290,6 @@ const Chat: React.FC = () => {
             now,
           );
           socket.saveLastReadTimeAndReport();
-
           setMessages(m => {
             const updatedMessages = refreshMessage([...latestData, ...m]);
             return updatedMessages;
@@ -1069,6 +1069,9 @@ const Chat: React.FC = () => {
   useEffect(() => {
     const unsubscribeAppState = () => {
       AppState.addEventListener('change', state => {
+        if (appState !== 'active' && state === 'active') {
+          refetchFetchedPastMessages();
+        }
         setAppState(state);
       });
     };
@@ -1078,11 +1081,11 @@ const Chat: React.FC = () => {
   });
 
   useEffect(() => {
-    if (appState === 'active' && isFocused) {
+    if (appState === 'active' && messages.length) {
       socket.saveLastReadTimeAndReport();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [appState, isFocused]);
+  }, [appState, messages]);
 
   const readUserBox = (user: User) => (
     <View style={tailwind('flex-row bg-white items-center px-4 py-2')}>
