@@ -885,6 +885,8 @@ export class ChatService {
     user: User,
     chatGroupId: number,
   ): Promise<LastReadChatTime> {
+    console.log(user.lastName, 'call saveLastReadChatTime');
+
     const chatGroup = await this.chatGroupRepository.findOne(chatGroupId, {
       relations: ['members'],
     });
@@ -899,6 +901,7 @@ export class ChatService {
       .where('g.id = :chatGroupId', { chatGroupId })
       .andWhere('u.id = :userId', { userId: user.id })
       .getOne();
+    console.log(user.lastName, 'end saveLastReadChatTime');
 
     if (existTime) {
       return await this.lastReadChatTimeRepository.save({

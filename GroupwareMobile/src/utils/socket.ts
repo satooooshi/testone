@@ -38,9 +38,6 @@ export const useChatSocket = (
         });
         handleEnterRoom(room.id);
       },
-      onError: () => {
-        Alert.alert('failed saveLastReadTimeAndReport');
-      },
     });
   };
   const connect = () => {

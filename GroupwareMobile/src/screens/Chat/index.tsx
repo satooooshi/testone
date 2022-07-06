@@ -521,14 +521,6 @@ const Chat: React.FC = () => {
     setVideo(data);
   };
 
-  // const numbersOfRead = (message: ChatMessage) => {
-  //   return (
-  //     socket.lastReadChatTime?.filter(
-  //       time => time.readTime >= message.createdAt,
-  //     ).length || 0
-  //   );
-  // };
-
   const onScrollTopOnChat = () => {
     if (messages.length >= 20) {
       setBefore(messages[messages.length - 1].id);
@@ -1091,7 +1083,13 @@ const Chat: React.FC = () => {
   });
 
   useEffect(() => {
-    if (appState === 'active' && messages.length) {
+    if (
+      appState === 'active' &&
+      messages.length &&
+      messages[0]?.sender?.id !== myself?.id
+    ) {
+      console.log('---------0000000000');
+
       socket.saveLastReadTimeAndReport();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
