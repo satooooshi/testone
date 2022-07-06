@@ -113,7 +113,7 @@ const Chat: React.FC = () => {
   const isFocused = useIsFocused();
   const {setIsTabBarVisible} = useIsTabBarVisible();
   const {data: roomDetail, refetch: refetchRoomDetail} = useAPIGetRoomDetail(
-    room.id,
+    Number(room.id),
   );
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [focusedMessageID, setFocusedMessageID] = useState<number>();
@@ -162,7 +162,11 @@ const Chat: React.FC = () => {
       })
       .sort((a, b) => b.id - a.id);
   };
-  const socket = useChatSocket(room, refreshMessage, setMessages);
+  const socket = useChatSocket(
+    roomDetail ? roomDetail : {...room, id: Number(room.id)},
+    refreshMessage,
+    setMessages,
+  );
   const messageContentRef = useRef('');
 
   const {values, handleSubmit, setValues, resetForm} = useFormik<
@@ -172,7 +176,7 @@ const Chat: React.FC = () => {
       content: '',
       type: ChatMessageType.TEXT,
       replyParentMessage: null,
-      chatGroup: room,
+      chatGroup: roomDetail ? roomDetail : {...room, id: Number(room.id)},
     },
     enableReinitialize: true,
     onSubmit: submittedValues => {
@@ -199,7 +203,7 @@ const Chat: React.FC = () => {
     refetch: refetchFetchedPastMessages,
   } = useAPIGetMessages(
     {
-      group: room.id,
+      group: Number(room.id),
       limit: 20,
       after,
       before,
@@ -226,7 +230,7 @@ const Chat: React.FC = () => {
   );
 
   const {refetch: getExpiredUrlMessages} = useAPIGetExpiredUrlMessages(
-    room.id,
+    Number(room.id),
     {
       onSuccess: data => {
         setMessages(mgs => {
@@ -245,16 +249,16 @@ const Chat: React.FC = () => {
 
   const {data: searchedResults, refetch: searchMessages} = useAPISearchMessages(
     {
-      group: room.id,
+      group: Number(room.id),
       word: inputtedSearchWord,
     },
   );
   const suggestions = (): Suggestion[] => {
-    if (!room.members) {
+    if (!roomDetail?.members) {
       return [];
     }
     const users =
-      room?.members
+      roomDetail?.members
         ?.filter(u => u.id !== myself?.id)
         .map(u => ({
           id: `${u.id}`,
@@ -434,7 +438,9 @@ const Chat: React.FC = () => {
               content: imageURLs[i],
               fileName: fileName?.[i] ? fileName[i] : uuid.v4() + '.png',
               type: ChatMessageType.IMAGE,
-              chatGroup: room,
+              chatGroup: roomDetail
+                ? roomDetail
+                : {...room, id: Number(room.id)},
             });
             await new Promise(r => setTimeout(r, 100));
           }
@@ -456,7 +462,9 @@ const Chat: React.FC = () => {
               content: imageURLs[i],
               fileName: fileName?.[i] ? fileName[i] : uuid.v4() + '.mp4',
               type: ChatMessageType.VIDEO,
-              chatGroup: room,
+              chatGroup: roomDetail
+                ? roomDetail
+                : {...room, id: Number(room.id)},
             });
           }
         },
@@ -491,7 +499,7 @@ const Chat: React.FC = () => {
             content: imageURL[0],
             fileName: res.name,
             type: ChatMessageType.OTHER_FILE,
-            chatGroup: room,
+            chatGroup: roomDetail ? roomDetail : {...room, id: Number(room.id)},
           });
         },
         onError: () => {
@@ -507,7 +515,7 @@ const Chat: React.FC = () => {
     sendChatMessage({
       content: sticker,
       type: ChatMessageType.STICKER,
-      chatGroup: room,
+      chatGroup: roomDetail ? roomDetail : {...room, id: Number(room.id)},
     });
     setVisibleStickerSelector(false);
   };
@@ -784,7 +792,7 @@ const Chat: React.FC = () => {
         `dateRefetchLatestInRoom${room.id}user${myself?.id}`,
       );
       refetchUpdatedMessages({
-        group: room.id,
+        group: Number(room.id),
         limit: messagesInStorageLength ? undefined : 20,
         dateRefetchLatest: dateRefetchLatest,
       });
@@ -811,7 +819,7 @@ const Chat: React.FC = () => {
       });
       storage.set(`dateRefetchLatestInRoom${room.id}`, now);
       handleRefetchUpdatedMessages(messagesInStorageLength);
-      handleEnterRoom(room.id);
+      handleEnterRoom(Number(room.id));
       // refetchLatest();
       refetchRoomDetail();
     }
@@ -1301,7 +1309,7 @@ const Chat: React.FC = () => {
             onPress={() =>
               navigation.navigate('ChatStack', {
                 screen: 'ChatMenu',
-                params: {room, removeCache},
+                params: {room: roomDetail ? roomDetail : room, removeCache},
               })
             }>
             <Icon
