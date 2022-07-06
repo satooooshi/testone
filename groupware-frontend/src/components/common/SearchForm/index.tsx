@@ -162,7 +162,12 @@ const SearchInput: React.FC<SearchFormProps> = ({
               flexDir="row"
               justifyContent="flex-start">
               {word.length ? (
-                <Text w="10px" textAlign="center" mr={3} cursor="pointer">
+                <Text
+                  w="10px"
+                  textAlign="center"
+                  mr={3}
+                  cursor="pointer"
+                  onClick={() => setWord('')}>
                   ✖️
                 </Text>
               ) : null}
