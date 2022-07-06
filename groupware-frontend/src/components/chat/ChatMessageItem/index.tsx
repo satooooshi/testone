@@ -234,15 +234,15 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = memo(
       });
     };
 
-    const isBeforeTwelveHours = (createdAt: Date | undefined) => {
-      if (!createdAt) {
-        return false;
-      }
-      const date = new Date();
-      date.setHours(date.getHours() - 12);
+    // const isBeforeTwelveHours = (createdAt: Date | undefined) => {
+    //   if (!createdAt) {
+    //     return false;
+    //   }
+    //   const date = new Date();
+    //   date.setHours(date.getHours() - 12);
 
-      return new Date(createdAt) > date;
-    };
+    //   return new Date(createdAt) > date;
+    // };
 
     const menuOpener = (
       <Popover
@@ -302,7 +302,7 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = memo(
                 onClick={() => reactionOpenerRef.current?.click()}>
                 リアクション
               </MenuItem>
-              {messageState?.sender?.id === user?.id &&
+              {/* {messageState?.sender?.id === user?.id &&
               messageState.type === ChatMessageType.TEXT &&
               isBeforeTwelveHours(messageState.createdAt) ? (
                 <MenuItem value={'edit'} onClick={() => setEditMessage(true)}>
@@ -320,7 +320,7 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = memo(
                   }}>
                   <Text color="red">メッセージを削除</Text>
                 </MenuItem>
-              ) : null}
+              ) : null} */}
             </Menu>
           </>
         )}

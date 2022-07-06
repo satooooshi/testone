@@ -665,15 +665,15 @@ const Chat: React.FC = () => {
     }
   };
 
-  const isBeforeTwelveHours = (createdAt: Date | undefined) => {
-    if (!createdAt) {
-      return false;
-    }
-    const date = new Date();
-    date.setHours(date.getHours() - 12);
+  // const isBeforeTwelveHours = (createdAt: Date | undefined) => {
+  //   if (!createdAt) {
+  //     return false;
+  //   }
+  //   const date = new Date();
+  //   date.setHours(date.getHours() - 12);
 
-    return new Date(createdAt) > date;
-  };
+  //   return new Date(createdAt) > date;
+  // };
 
   const typeDropdown = (
     <Dropdown
@@ -718,7 +718,7 @@ const Chat: React.FC = () => {
       ) : (
         <></>
       )}
-      {longPressedMsg?.sender?.id === myself?.id &&
+      {/* {longPressedMsg?.sender?.id === myself?.id &&
       longPressedMsg?.type === ChatMessageType.TEXT &&
       isBeforeTwelveHours(longPressedMsg.createdAt) ? (
         <Dropdown.Option
@@ -747,7 +747,7 @@ const Chat: React.FC = () => {
         </Dropdown.Option>
       ) : (
         <></>
-      )}
+      )} */}
     </Dropdown>
   );
 
