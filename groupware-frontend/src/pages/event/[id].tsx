@@ -348,12 +348,18 @@ const EventDetail = () => {
                     {eventTypeNameFactory(data.type)}
                   </Badge>
                 </Box>
-                <Box mb="8px" h="160px" mr={4} mt={3}>
+                <Box mb="20px" minH="160px" mr={4} mt={3}>
                   <Heading fontWeight="bold"> {data.title}</Heading>
                   <Box>
-                    <Text mt={3} fontSize={12} noOfLines={5}>
-                      {data.description}
-                    </Text>
+                    <Linkify componentDecorator={componentDecorator}>
+                      <Text
+                        as="span"
+                        mt={3}
+                        fontSize={12}
+                        whiteSpace="pre-line">
+                        {data.description}
+                      </Text>
+                    </Linkify>
                   </Box>
                 </Box>
                 <Box w="100%">
@@ -418,14 +424,6 @@ const EventDetail = () => {
                 `}
                   </Text>
                 </Box>
-                {/* <span className={eventDetailStyles.sub_title}>概要</span>
-                <div className={eventDetailStyles.description_wrapper}>
-                  <Linkify componentDecorator={componentDecorator}>
-                    <span className={eventDetailStyles.description}>
-                      {data.description}
-                    </span>
-                  </Linkify>
-                </div> */}
                 {data.type !== EventType.SUBMISSION_ETC && (
                   <Box mt={3}>
                     <Heading size="xs" mb={2}>
