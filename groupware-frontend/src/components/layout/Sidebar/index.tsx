@@ -287,7 +287,15 @@ const Sidebar: React.FC<SidebarProps> = ({ activeScreenName, hideDrawer }) => {
                     onClick={() => {
                       router.push(`/account/${user?.id}`);
                     }}>
-                    アカウント設定
+                    プロフィール編集
+                  </MenuItem>
+                  <MenuItem
+                    icon={<IoSettingsSharp size={20} />}
+                    h={10}
+                    onClick={() => {
+                      router.push(`/account/${user?.id}`);
+                    }}>
+                    パスワード変更
                   </MenuItem>
                   {user?.role === UserRole.ADMIN && (
                     <MenuItem
