@@ -394,7 +394,7 @@ export class ChatController {
       },
     };
     await sendPushNotifToSpecificUsers(
-      chatGroup?.members.filter((u) => u.id !== id).map((u) => u.id),
+      chatGroup?.members.map((u) => u.id),
       silentNotification,
     );
   }
