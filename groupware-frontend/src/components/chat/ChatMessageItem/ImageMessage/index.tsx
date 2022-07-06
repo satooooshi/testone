@@ -12,6 +12,7 @@ const ImageMessage: React.FC<ImageMessageProps> = ({ message, onClick }) => {
     <a onClick={onClick}>
       <Box display="flex" maxW="300px" maxH={'300px'}>
         <Image
+          // priority={true}
           loading="lazy"
           src={message.content}
           w={300}

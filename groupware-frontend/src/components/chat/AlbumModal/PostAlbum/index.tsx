@@ -135,7 +135,7 @@ const PostAlbum: React.FC<PostAlbumProps> = ({
       onSuccess: (imageURLs) => {
         const images: Partial<ChatAlbumImage>[] = imageURLs.map((image, i) => ({
           imageURL: image,
-          name: fileArr[i].name,
+          fileName: fileArr[i].name,
         }));
         setValues((v) => ({
           ...v,

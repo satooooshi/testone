@@ -307,6 +307,11 @@ export interface ChatMessage {
   replyParentMessage?: ChatMessage | null;
 }
 
+export interface SocketMessage {
+  chatMessage: ChatMessage;
+  type: 'send' | 'edit' | 'delete';
+}
+
 export enum RoomType {
   GROUP = 'group',
   TALK_ROOM = 'talk_room',
@@ -359,8 +364,10 @@ export interface ChatNoteImage {
 }
 
 //this is for react-native-image-viewing
-export type ImageSource = {
+export type FIleSource = {
   uri: string;
+  fileName: string;
+  createdUrl?: string;
 };
 
 export interface ChatAlbum {

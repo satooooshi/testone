@@ -13,7 +13,7 @@ import {
 import { IoMdAddCircle } from 'react-icons/io';
 import { useAPIGetTag } from '@/hooks/api/tag/useAPIGetTag';
 import TagModal from '../../common/TagModal';
-import { DateTimePicker } from 'react-rainbow-components';
+import DateTimePicker from 'node_modules/react-rainbow-components/components/DateTimePicker';
 import { useDropzone } from 'react-dropzone';
 import { useAPIUploadStorage } from '@/hooks/api/storage/useAPIUploadStorage';
 import ReactCrop from 'react-image-crop';

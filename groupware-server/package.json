@@ -31,6 +31,7 @@
     "seed:tags": "ts-node ./node_modules/typeorm-seeding/dist/cli.js seed -s CreateTags",
     "seed:userTags": "ts-node ./node_modules/typeorm-seeding/dist/cli.js seed -s createUserTag",
     "seed:question": "ts-node ./node_modules/typeorm-seeding/dist/cli.js seed -s CreateQAQuestions",
+    "seed:message": "ts-node ./node_modules/typeorm-seeding/dist/cli.js seed -s CreateMessages",
     "migration:generate": "ts-node -r tsconfig-paths/register node_modules/typeorm/cli.js migration:generate -n",
     "migration:run": "ts-node -r tsconfig-paths/register node_modules/typeorm/cli.js migration:run",
     "migration:revert": "ts-node -r tsconfig-paths/register node_modules/typeorm/cli.js migration:revert"
@@ -46,7 +47,7 @@
     "@nestjs/platform-express": "^7.6.15",
     "@nestjs/platform-socket.io": "^8.2.4",
     "@nestjs/schedule": "^1.0.2",
-    "@nestjs/typeorm": "^8.0.1",
+    "@nestjs/typeorm": "8.0.1",
     "@nestjs/websockets": "^8.2.4",
     "@types/cron": "^1.7.3",
     "@types/passport-local": "^1.0.34",

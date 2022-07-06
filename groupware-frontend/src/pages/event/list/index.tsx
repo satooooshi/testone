@@ -554,11 +554,12 @@ const EventList = () => {
                 });
               }}
               onClear={() => setSelectedTags([])}
-              value={searchWord || ''}
-              onChange={(e) => setSearchWord(e.currentTarget.value)}
-              onClickButton={() =>
-                queryRefresh({ page: '1', word: searchWord })
-              }
+              // value={searchWord || ''}
+              // onChange={(e) => setSearchWord(e.currentTarget.value)}
+              // onClickButton={() =>
+              //   queryRefresh({ page: '1', word: searchWord })
+              // }
+              onClickButton={(w) => queryRefresh({ page: '1', word: w })}
               tags={tags || []}
               selectedTags={selectedTags}
               toggleTag={onToggleTag}

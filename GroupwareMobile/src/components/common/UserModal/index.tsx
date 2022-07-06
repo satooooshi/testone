@@ -45,6 +45,7 @@ const UserModal: React.FC<UserModalProps> = props => {
     toggleUser,
     isSelected,
     selectedUsers: selectedUsersInModal,
+    setSelectedUsers,
     clear,
   } = useSelectedUsers(defaultSelectedUsers || []);
   const [searchWords, setSearchWords] = useState<RegExpMatchArray | null>();
@@ -63,9 +64,18 @@ const UserModal: React.FC<UserModalProps> = props => {
     return;
   };
 
+  useEffect(() => {
+    if (defaultSelectedUsers) {
+      setSelectedUsers(defaultSelectedUsers);
+    }
+  }, [defaultSelectedUsers, setSelectedUsers]);
+
   const onCloseUserModal = () => {
     onCloseModal();
     setModalUsers(users);
+    setSearchWords(undefined);
+    selectUserRole('All');
+    clear();
   };
   useEffect(() => {
     if (!searchWords) {
@@ -94,6 +104,7 @@ const UserModal: React.FC<UserModalProps> = props => {
         w={60}
         onPress={() => {
           onCompleteModal(selectedUsersInModal as User[], clear);
+          setSearchWords(undefined);
           onCloseModal();
         }}>
         <Icon color="white" fontSize="6xl" name="check" />

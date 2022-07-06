@@ -11,7 +11,7 @@ export const sendInvitation = async (
   caller: Partial<User>,
   callee: User,
 ): Promise<LocalInvitation> => {
-  await rtmEngine.createInstance(Config.AGORA_APP_ID_TEST);
+  await rtmEngine.createInstance(Config.AGORA_APP_ID);
   const parsedUUid = uuid.v4();
   const localInvitation = await rtmEngine.createLocalInvitation(
     callee.id.toString(),
@@ -28,8 +28,7 @@ export const sendInvitation = async (
 export const cancelCallInvitation = async (
   localInvitation: LocalInvitation,
 ) => {
-  await rtmEngine.createInstance(Config.AGORA_APP_ID_TEST);
-  console.log('cancel', localInvitation);
+  await rtmEngine.createInstance(Config.AGORA_APP_ID);
   try {
     await rtmEngine?.cancelLocalInvitationV2(localInvitation);
   } catch (e) {

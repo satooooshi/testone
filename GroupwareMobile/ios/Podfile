@@ -12,8 +12,6 @@ target 'GroupwareMobile' do
     :hermes_enabled => false
   )
 
-
-
   target 'GroupwareMobileTests' do
     inherit! :complete
     # Pods for testing

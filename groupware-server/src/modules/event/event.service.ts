@@ -221,10 +221,15 @@ export class EventScheduleService {
     const tagIDs = tag.split(' ');
     const [eventsWithRelation, count] = await this.eventRepository
       .createQueryBuilder('events')
-      .select()
       .leftJoinAndSelect('events.userJoiningEvent', 'userJoiningEvent')
-      .leftJoinAndSelect('userJoiningEvent.user', 'user')
-      .leftJoinAndSelect('userJoiningEvent.event', 'event')
+      .leftJoin('userJoiningEvent.user', 'user')
+      .addSelect([
+        'user.id',
+        'user.firstName',
+        'user.lastName',
+        'user.avatarUrl',
+      ])
+      // .leftJoinAndSelect('userJoiningEvent.event', 'event')
       .leftJoinAndSelect('events.tags', 'tag')
       .where(
         word && word.length !== 1
@@ -351,8 +356,14 @@ export class EventScheduleService {
       .createQueryBuilder('events')
       .withDeleted()
       .leftJoinAndSelect('events.userJoiningEvent', 'userJoiningEvent')
-      .leftJoinAndSelect('userJoiningEvent.user', 'user')
-      .leftJoinAndSelect('userJoiningEvent.event', 'event')
+      .leftJoin('userJoiningEvent.user', 'user')
+      .addSelect([
+        'user.id',
+        'user.firstName',
+        'user.lastName',
+        'user.avatarUrl',
+      ])
+      // .leftJoinAndSelect('userJoiningEvent.event', 'event')
       .leftJoinAndSelect('events.tags', 'tags')
       .leftJoinAndSelect('events.files', 'files')
       .leftJoinAndSelect(
@@ -363,9 +374,27 @@ export class EventScheduleService {
       )
       .leftJoinAndSelect('events.videos', 'videos')
       .leftJoinAndSelect('events.author', 'author')
+      .addSelect([
+        'author.id',
+        'author.firstName',
+        'author.lastName',
+        'author.avatarUrl',
+      ])
       .leftJoinAndSelect('events.hostUsers', 'hostUsers')
+      .addSelect([
+        'hostUsers.id',
+        'hostUsers.firstName',
+        'hostUsers.lastName',
+        'hostUsers.avatarUrl',
+      ])
       .leftJoinAndSelect('events.comments', 'comments')
       .leftJoinAndSelect('comments.writer', 'writer')
+      .addSelect([
+        'writer.id',
+        'writer.firstName',
+        'writer.lastName',
+        'writer.avatarUrl',
+      ])
       .where('events.id = :id', { id })
       .getOne();
     existEvent.userJoiningEvent = existEvent.userJoiningEvent.filter(

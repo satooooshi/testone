@@ -63,6 +63,7 @@ import { isEditableEvent } from 'src/utils/factory/isCreatableEvent';
 import { MdCancel } from 'react-icons/md';
 import { useAPIDeleteSubmission } from '@/hooks/api/event/useAPIDeleteSubmission';
 import { hideScrollbarCss } from 'src/utils/chakra/hideScrollBar.css';
+import { componentDecorator } from 'src/utils/componentDecorator';
 
 type FileIconProps = {
   url: string;
@@ -417,6 +418,14 @@ const EventDetail = () => {
                 `}
                   </Text>
                 </Box>
+                {/* <span className={eventDetailStyles.sub_title}>概要</span>
+                <div className={eventDetailStyles.description_wrapper}>
+                  <Linkify componentDecorator={componentDecorator}>
+                    <span className={eventDetailStyles.description}>
+                      {data.description}
+                    </span>
+                  </Linkify>
+                </div> */}
                 {data.type !== EventType.SUBMISSION_ETC && (
                   <Box mt={3}>
                     <Heading size="xs" mb={2}>
