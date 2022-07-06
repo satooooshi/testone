@@ -6,6 +6,7 @@ import { useHandleBadge } from 'src/contexts/badge/useHandleBadge';
 import { useRoomRefetch } from 'src/contexts/chat/useRoomRefetch';
 import { useAuthenticate } from 'src/contexts/useAuthenticate';
 import { ChatGroup, ChatMessage, SocketMessage } from 'src/types';
+import { baseURL } from 'src/utils/url';
 // import { baseURL } from 'src/utils/url';
 
 // socket
@@ -127,7 +128,7 @@ export const useChatSocket = (
       });
     },
     leaveRoom: () => {
-      socket.emit('leaveRoom', room.id);
+      socket.emit('leaveRoom', room.id.toString());
       socket.removeAllListeners();
       setCurrentChatRoomId(undefined);
     },

@@ -1088,8 +1088,6 @@ const Chat: React.FC = () => {
       messages.length &&
       messages[0]?.sender?.id !== myself?.id
     ) {
-      console.log('---------0000000000');
-
       socket.saveLastReadTimeAndReport();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

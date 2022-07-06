@@ -6,6 +6,7 @@ import {ChatGroup} from '../../types';
 import {useAuthenticate} from '../useAuthenticate';
 import NetInfo from '@react-native-community/netinfo';
 import {storage} from '../../utils/url';
+import {socket} from '../../utils/socket';
 
 const BadgeContext = createContext({
   unreadChatCount: 0,
@@ -203,6 +204,7 @@ export const BadgeProvider: React.FC = ({children}) => {
             ),
           );
         } else {
+          socket.emit('leaveRoom', editRoom.id.toString());
           setChatGroups(rooms => rooms.filter(r => r.id !== editRoom.id));
         }
       } else if (editRoom.members?.filter(m => m.id === user?.id).length) {

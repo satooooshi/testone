@@ -66,12 +66,14 @@
 //   public joinRoom(client: Socket, room: string): void {
 //     //@TODO dbにグループがなかったらエラーを吐く
 //     client.join(room);
-//     client.emit('joinedRoom', room);
+//     // client.emit('joinedRoom', room);
 //   }
 
 //   @SubscribeMessage('leaveRoom')
 //   public leaveRoom(client: Socket, room: string): void {
-//     client.leave(room);
-//     client.emit('leftRoom', room);
+//     if (client.rooms.has(room)) {
+//       client.leave(room);
+//     }
+//     // client.emit('leftRoom', room);
 //   }
 // }

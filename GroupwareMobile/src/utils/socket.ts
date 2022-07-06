@@ -146,7 +146,7 @@ export const useChatSocket = (
     },
     leaveRoom: () => {
       setMessages([]);
-      socket.emit('leaveRoom', room.id);
+      socket.emit('leaveRoom', room.id.toString());
       socket.removeAllListeners();
       isMounted = false;
       setCurrentChatRoomId(undefined);

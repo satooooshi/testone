@@ -16,23 +16,31 @@ import ChatLayout from '@/components/chat/Layout';
 import { useAPISaveChatGroup } from '@/hooks/api/chat/useAPISaveChatGroup';
 import { useHandleBadge } from 'src/contexts/badge/useHandleBadge';
 import { useAPIUpdateChatGroup } from '@/hooks/api/chat/useAPIUpdateChatGroup';
+import { useAuthenticate } from 'src/contexts/useAuthenticate';
 
 const ChatDetail = () => {
   const router = useRouter();
   const [modalStates, dispatchModal] = useModalReducer();
   const { id } = router.query as { id: string };
   const [currentRoom, setCurrentRoom] = useState<ChatGroup>();
+  const { user } = useAuthenticate();
   // const socket = io(baseURL, {
   //   transports: ['websocket'],
   // });
-  const { getOneRoom } = useHandleBadge();
+  const { setChatGroupsState, chatGroups } = useHandleBadge();
 
   const { refetch: getRoom } = useAPIGetRoomDetail(Number(id), {
     enabled: false,
     onSuccess: (data) => {
-      if (setCurrentRoom) {
-        setCurrentRoom(data);
+      const isMember = data.members?.filter((m) => m.id === user?.id).length;
+      console.log('-----', isMember);
+
+      if (!isMember) {
+        data.name = 'メンバーがいません';
+        data.members = [];
+        setChatGroupsState(chatGroups.filter((g) => g.id !== data.id));
       }
+      setCurrentRoom(data);
     },
     onError: (err) => {
       if (setCurrentRoom) {
@@ -45,8 +53,9 @@ const ChatDetail = () => {
   });
 
   useEffect(() => {
-    const room = id ? getOneRoom(Number(id)) : undefined;
-    room ? setCurrentRoom(room) : getRoom();
+    // const room = id ? getOneRoom(Number(id)) : undefined;
+    // room ? setCurrentRoom(room) : getRoom();
+    getRoom();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 

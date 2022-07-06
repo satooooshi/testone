@@ -255,7 +255,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
   };
 
   useEffect(() => {
-    if (fetchedPastMessages?.length) {
+    if (fetchedPastMessages?.length && room.members?.length) {
       const refreshedMessage = refreshMessage(fetchedPastMessages);
       setMessages(refreshedMessage);
 
@@ -278,7 +278,9 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
   }, [focusedMessageID]);
 
   useEffect(() => {
-    socket.joinRoom();
+    if (room.members?.length) {
+      socket.joinRoom();
+    }
     setNewChatMessage({
       content: '',
       type: ChatMessageType.TEXT,

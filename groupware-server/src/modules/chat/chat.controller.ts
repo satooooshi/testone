@@ -430,9 +430,9 @@ export class ChatController {
   ): Promise<ChatGroup> {
     const { user } = req;
     const roomDetail = await this.chatService.getRoomDetail(Number(roomId));
-    if (!roomDetail.members.filter((m) => m.id === user.id).length) {
-      throw new BadRequestException('チャットルームを取得する権限がありません');
-    }
+    // if (!roomDetail.members.filter((m) => m.id === user.id).length) {
+    //   throw new BadRequestException('チャットルームを取得する権限がありません');
+    // }
     return roomDetail;
   }
 
