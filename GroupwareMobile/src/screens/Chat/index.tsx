@@ -176,6 +176,7 @@ const Chat: React.FC = () => {
     },
     enableReinitialize: true,
     onSubmit: submittedValues => {
+      setValues(v => ({...v, content: messageContentRef.current}));
       if (messageContentRef.current) {
         if (editMessage) {
           updateChatMessage({
@@ -985,7 +986,7 @@ const Chat: React.FC = () => {
                 onUploadVideo={handleUploadVideo}
                 onUploadImage={handleUploadImage}
                 setVisibleStickerSelector={setVisibleStickerSelector}
-                text={messageContentRef.current}
+                text={values.content}
                 footerHeight={footerHeight}
                 onChangeText={t => (messageContentRef.current = t)}
                 onSend={handleSubmit}
@@ -1061,7 +1062,7 @@ const Chat: React.FC = () => {
                 onUploadVideo={handleUploadVideo}
                 onUploadImage={handleUploadImage}
                 setVisibleStickerSelector={setVisibleStickerSelector}
-                text={messageContentRef.current}
+                text={values.content}
                 footerHeight={footerHeight}
                 onChangeText={t => (messageContentRef.current = t)}
                 onSend={handleSubmit}

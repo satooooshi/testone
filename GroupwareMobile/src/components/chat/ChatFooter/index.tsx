@@ -28,7 +28,7 @@ import {chatStyles} from '../../../styles/screen/chat/chat.style';
 import {Menu} from 'react-native-paper';
 
 type ChatFooterProps = {
-  text: string;
+  text: string | undefined;
   onChangeText: (text: string) => void;
   onUploadFile: () => void;
   onUploadVideo: () => void;
