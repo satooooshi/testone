@@ -61,7 +61,7 @@ const ChatFooter: React.FC<ChatFooterProps> = ({
 
   useEffect(() => {
     if (!value) {
-      setContent(value);
+      setContent('');
     }
   }, [value]);
 
