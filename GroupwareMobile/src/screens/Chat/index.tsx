@@ -513,7 +513,7 @@ const Chat: React.FC = () => {
 
   const playVideoOnModal = async (data: FIleSource) => {
     if (!data.createdUrl) {
-      const url = await getFileUrl(data.fileName, data.uri);
+      const url = await getFileUrl(data.fileName.replace(/\s+/g, ''), data.uri);
       if (url) {
         data.createdUrl = url;
       }
@@ -849,9 +849,10 @@ const Chat: React.FC = () => {
         // numbersOfRead={numbersOfRead(message)}
         onLongPress={() => setLongPressedMgg(message)}
         onPressImage={() => showImageOnModal(message.content)}
-        onPressVideo={() =>
-          playVideoOnModal({uri: message.content, fileName: message.fileName})
-        }
+        onPressVideo={() => {
+          console.log(message.fileName);
+          playVideoOnModal({uri: message.content, fileName: message.fileName});
+        }}
         onPressReaction={r =>
           r.isSender
             ? handleDeleteReaction(r, message)
