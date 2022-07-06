@@ -15,6 +15,8 @@ define(User, (): User => {
   user.email = faker.internet.email();
   user.lastName = faker.name.lastName();
   user.firstName = faker.name.firstName();
+  user.lastNameKana = 'ン';
+  user.firstNameKana = 'ン';
   (user.password = hashSync('password', 10)),
     (user.role =
       userRoleArray[Math.floor(Math.random() * userRoleArray.length)]);

@@ -121,7 +121,7 @@ const EditChatGroupMembersModal: React.FC<EditChatGroupMambersModalProps> = ({
     if (!isOpen) {
       clear();
     }
-  }, [isOpen, clear]);
+  }, [isOpen]);
 
   return (
     <Modal
@@ -145,16 +145,15 @@ const EditChatGroupMembersModal: React.FC<EditChatGroupMambersModalProps> = ({
             <Button
               size="sm"
               flexDir="row"
-              onClick={() => onComplete(selectedUsersInModal as User[])}
+              onClick={() => {
+                onComplete(selectedUsersInModal as User[]);
+                setSearchWords(undefined);
+              }}
               mb="8px"
               colorScheme="green"
               alignItems="center">
               <Text display="inline">
-                {room
-                  ? '更新'
-                  : isTalkRoom && selectedUsersInModal.length === 1
-                  ? '作成'
-                  : '次へ'}
+                {room ? '更新' : isTalkRoom ? '作成' : '次へ'}
               </Text>
             </Button>
           )}

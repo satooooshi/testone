@@ -201,13 +201,13 @@ export class ChatMessage {
           id: this.chatGroup.id.toString(),
         },
       };
-      console.log(
-        '---====',
-        notifiedUsers.map((u) => u.id),
-        this.chatGroup.members.map((u) => u.id),
-        this.sender.id,
-        title,
-      );
+      // console.log(
+      //   '---====',
+      //   notifiedUsers.map((u) => u.id),
+      //   this.chatGroup.members.map((u) => u.id),
+      //   this.sender.id,
+      //   title,
+      // );
 
       await sendPushNotifToSpecificUsers(
         notifiedUsers.map((u) => u.id),

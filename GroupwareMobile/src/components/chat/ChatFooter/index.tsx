@@ -1,4 +1,4 @@
-import React, {Fragment, useMemo, useRef, useState} from 'react';
+import React, {Fragment, useEffect, useMemo, useRef, useState} from 'react';
 import {
   AppState,
   NativeSyntheticEvent,
@@ -28,7 +28,7 @@ import {chatStyles} from '../../../styles/screen/chat/chat.style';
 import {Menu} from 'react-native-paper';
 
 type ChatFooterProps = {
-  text: string;
+  text: string | undefined;
   onChangeText: (text: string) => void;
   onUploadFile: () => void;
   onUploadVideo: () => void;
@@ -56,7 +56,14 @@ const ChatFooter: React.FC<ChatFooterProps> = ({
   const [selection, setSelection] = useState({start: 0, end: 0});
   const [mentionAdded, setMentionAdded] = useState(false);
   const [visibleMenu, setVisibleMenu] = useState(false);
+  const [content, setContent] = useState('');
   const inputRef = useRef<TextInput>(null);
+
+  useEffect(() => {
+    if (!value) {
+      setContent('');
+    }
+  }, [value]);
 
   const renderSuggestions: React.FC<MentionSuggestionsProps> = ({
     keyword,
@@ -92,8 +99,8 @@ const ChatFooter: React.FC<ChatFooterProps> = ({
     },
   ];
   const {plainText, parts} = useMemo(
-    () => parseValue(value, partTypes),
-    [value, partTypes],
+    () => parseValue(content, partTypes),
+    [content, partTypes],
   );
 
   const onChangeInput = (changedText: string) => {
@@ -239,7 +246,10 @@ const ChatFooter: React.FC<ChatFooterProps> = ({
             ref={inputRef}
             onSelectionChange={handleSelectionChange}
             multiline
-            onChangeText={onChangeInput}
+            onChangeText={t => {
+              setContent(t);
+              onChangeInput(t);
+            }}
             autoCapitalize="none"
             placeholderTextColor="#868596"
             style={[
@@ -275,7 +285,7 @@ const ChatFooter: React.FC<ChatFooterProps> = ({
               name="send"
               fontFamily="Ionicons"
               fontSize={21}
-              color={value ? 'blue600' : 'gray'}
+              color={content ? 'blue600' : 'gray'}
             />
           </TouchableOpacity>
         )}

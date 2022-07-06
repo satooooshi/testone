@@ -34,7 +34,6 @@ type ChatMessageItemProps = {
   isScrollTarget: boolean;
   scrollToTarget: (messageIndex: number) => void;
   onCheckLastRead: () => void;
-  numbersOfRead: number;
   onLongPress: () => void;
   onPressImage: () => void;
   onPressVideo: () => void;
@@ -51,7 +50,6 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
   isScrollTarget = false,
   scrollToTarget,
   onCheckLastRead,
-  numbersOfRead,
   onLongPress,
   onPressImage,
   onPressVideo,
@@ -91,7 +89,7 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
             mb="sm"
             mr={message?.isSender ? 'sm' : undefined}
             ml={!message?.isSender ? 'sm' : undefined}>
-            {numbersOfRead ? `既読${numbersOfRead}人` : ''}
+            {`既読${readUsers.length}人`}
           </Text>
         </TouchableOpacity>
       ) : null}

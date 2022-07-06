@@ -32,6 +32,7 @@ const RoomList: React.FC = () => {
     setChatGroupsState,
     editChatGroup,
     isRoomsRefetching,
+    isCompletedRefetchAllRooms,
     refreshRooms,
   } = useHandleBadge();
   const {selectedUserRole, filteredUsers} = useUserRole('All', users);
@@ -89,8 +90,11 @@ const RoomList: React.FC = () => {
   // );
 
   useEffect(() => {
-    setChatRooms(chatGroups);
-  }, [chatGroups]);
+    if (isCompletedRefetchAllRooms) {
+      // console.log('isCompletedRefetchAllRooms', chatGroups.length);
+      setChatRooms(chatGroups);
+    }
+  }, [chatGroups, isCompletedRefetchAllRooms]);
 
   const onPressRightButton = () => {
     // navigation.navigate('ChatStack', {screen: 'NewRoom'});
@@ -207,50 +211,30 @@ const RoomList: React.FC = () => {
             />
           }
         />
-
         {chatRooms.length ? (
           <ScrollDiv
             h={'80%'}
             refreshControl={
               <RefreshControl refreshing={false} onRefresh={refreshRoomList} />
             }>
-            {searchedRooms
-              ? searchedRooms.map(room => {
-                  return (
-                    <Div key={room.id} mb="sm">
-                      <RoomCard
-                        room={room}
-                        onPress={() =>
-                          navigation.navigate('ChatStack', {
-                            screen: 'Chat',
-                            params: {room},
-                          })
-                        }
-                        onPressPinButton={() => {
-                          savePin({...room, isPinned: !room.isPinned});
-                        }}
-                      />
-                    </Div>
-                  );
-                })
-              : chatRooms.map((room, index) => {
-                  return (
-                    <Div key={index} mb="sm">
-                      <RoomCard
-                        room={room}
-                        onPress={() =>
-                          navigation.navigate('ChatStack', {
-                            screen: 'Chat',
-                            params: {room},
-                          })
-                        }
-                        onPressPinButton={() => {
-                          savePin({...room, isPinned: !room.isPinned});
-                        }}
-                      />
-                    </Div>
-                  );
-                })}
+            {(searchedRooms ?? chatRooms).map(room => {
+              return (
+                <Div key={room.id} mb="sm">
+                  <RoomCard
+                    room={room}
+                    onPress={() =>
+                      navigation.navigate('ChatStack', {
+                        screen: 'Chat',
+                        params: {room},
+                      })
+                    }
+                    onPressPinButton={() => {
+                      savePin({...room, isPinned: !room.isPinned});
+                    }}
+                  />
+                </Div>
+              );
+            })}
           </ScrollDiv>
         ) : isRoomsRefetching ? (
           <Div alignItems="center" w={'90%'}>
