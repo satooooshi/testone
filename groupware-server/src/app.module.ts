@@ -13,7 +13,6 @@ import { MailerModule } from '@nestjs-modules/mailer';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 import { TopNewsModule } from './modules/top-news/top-news.module';
 import { ScheduleModule } from '@nestjs/schedule';
-import { ChatGateway } from './gateway/chat.gateway';
 
 @Module({
   imports: [
@@ -75,6 +74,6 @@ import { ChatGateway } from './gateway/chat.gateway';
     TopNewsModule,
   ],
   controllers: [],
-  providers: [ChatGateway],
+  providers: [],
 })
 export class AppModule {}
