@@ -311,8 +311,8 @@ const Chat: React.FC = () => {
         }
         if (sentMsg.type === ChatMessageType.TEXT) {
           messageContentRef.current = '';
+          resetForm();
         }
-        resetForm();
       },
       onError: () => {
         Alert.alert(
