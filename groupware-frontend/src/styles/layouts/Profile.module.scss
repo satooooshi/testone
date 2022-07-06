@@ -1,13 +1,13 @@
 @import '../variables.scss';
 
 .main {
-  display: flex;
-  flex-direction: row;
+  // display: flex;
+  // flex-direction: row;
   justify-content: center;
-  @media (max-width: 576px) {
-    flex-direction: column;
-    justify-content: flex-start;
-  }
+  // @media (max-width: 576px) {
+    // flex-direction: column;
+    // justify-content: flex-start;
+  // }
 }
 
 .update_button {
