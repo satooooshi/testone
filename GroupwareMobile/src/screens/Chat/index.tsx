@@ -784,14 +784,26 @@ const Chat: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [room.id]);
 
+  const handleRefetchUpdatedMessages = useCallback(
+    (messagesInStorageLength?: number) => {
+      const dateRefetchLatest = storage.getString(
+        `dateRefetchLatestInRoom${room.id}user${myself?.id}`,
+      );
+      refetchUpdatedMessages({
+        group: room.id,
+        limit: messagesInStorageLength ? undefined : 20,
+        dateRefetchLatest: dateRefetchLatest,
+      });
+    },
+    [room.id, myself?.id, refetchUpdatedMessages],
+  );
+
   useEffect(() => {
     if (!messages.length) {
       const jsonMessagesInStorage = storage.getString(
         `messagesIntRoom${room.id}user${myself?.id}`,
       );
-      const dateRefetchLatest = storage.getString(
-        `dateRefetchLatestInRoom${room.id}user${myself?.id}`,
-      );
+
       let messagesInStorageLength;
       if (jsonMessagesInStorage) {
         const messagesInStorage = JSON.parse(jsonMessagesInStorage);
@@ -804,11 +816,7 @@ const Chat: React.FC = () => {
         format: 'yyyy-LL-dd HH:mm:ss',
       });
       storage.set(`dateRefetchLatestInRoom${room.id}`, now);
-      refetchUpdatedMessages({
-        group: room.id,
-        limit: messagesInStorageLength ? undefined : 20,
-        dateRefetchLatest: dateRefetchLatest,
-      });
+      handleRefetchUpdatedMessages(messagesInStorageLength);
       handleEnterRoom(room.id);
       // refetchLatest();
       refetchRoomDetail();
@@ -1071,7 +1079,7 @@ const Chat: React.FC = () => {
     const unsubscribeAppState = () => {
       AppState.addEventListener('change', state => {
         if (appState !== 'active' && state === 'active') {
-          refetchFetchedPastMessages();
+          handleRefetchUpdatedMessages();
         }
         setAppState(state);
       });
