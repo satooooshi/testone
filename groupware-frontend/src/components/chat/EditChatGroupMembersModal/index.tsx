@@ -145,7 +145,10 @@ const EditChatGroupMembersModal: React.FC<EditChatGroupMambersModalProps> = ({
             <Button
               size="sm"
               flexDir="row"
-              onClick={() => onComplete(selectedUsersInModal as User[])}
+              onClick={() => {
+                onComplete(selectedUsersInModal as User[]);
+                setSearchWords(undefined);
+              }}
               mb="8px"
               colorScheme="green"
               alignItems="center">
