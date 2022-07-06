@@ -298,50 +298,55 @@ const Profile = () => {
           ) : null}
         </div>
         <div className={profileStyles.form_wrapper}>
-          <FormControl className={profileStyles.input_wrapper}>
-            <FormLabel fontWeight={'bold'}>姓</FormLabel>
-            <Input
-              type="text"
-              name="lastName"
-              placeholder="山田"
-              value={userInfo.lastName}
-              background="white"
-              onChange={handleChange}
-            />
-          </FormControl>
-          <FormControl className={profileStyles.input_wrapper}>
-            <FormLabel fontWeight={'bold'}>名</FormLabel>
-            <Input
-              type="text"
-              name="firstName"
-              placeholder="太郎"
-              value={userInfo.firstName}
-              background="white"
-              onChange={handleChange}
-            />
-          </FormControl>
-          <FormControl className={profileStyles.input_wrapper}>
-            <FormLabel fontWeight={'bold'}>姓(フリガナ)</FormLabel>
-            <Input
-              type="text"
-              name="lastNameKana"
-              placeholder="ヤマダ"
-              value={userInfo.lastNameKana}
-              background="white"
-              onChange={handleChange}
-            />
-          </FormControl>
-          <FormControl className={profileStyles.input_wrapper}>
-            <FormLabel fontWeight={'bold'}>名(フリガナ)</FormLabel>
-            <Input
-              type="text"
-              name="firstNameKana"
-              placeholder="タロウ"
-              value={userInfo.firstNameKana}
-              background="white"
-              onChange={handleChange}
-            />
-          </FormControl>
+          <Stack direction="row">
+            <FormControl className={profileStyles.input_wrapper}>
+              <FormLabel fontWeight={'bold'}>姓</FormLabel>
+              <Input
+                type="text"
+                name="lastName"
+                placeholder="山田"
+                value={userInfo.lastName}
+                background="white"
+                onChange={handleChange}
+              />
+            </FormControl>
+            <FormControl className={profileStyles.input_wrapper}>
+              <FormLabel fontWeight={'bold'}>名</FormLabel>
+              <Input
+                type="text"
+                name="firstName"
+                placeholder="太郎"
+                value={userInfo.firstName}
+                background="white"
+                onChange={handleChange}
+              />
+            </FormControl>
+          </Stack>
+          <Stack direction="row">
+            <FormControl className={profileStyles.input_wrapper}>
+              <FormLabel fontWeight={'bold'}>セイ</FormLabel>
+              <Input
+                type="text"
+                name="lastNameKana"
+                placeholder="ヤマダ"
+                value={userInfo.lastNameKana}
+                background="white"
+                onChange={handleChange}
+              />
+            </FormControl>
+
+            <FormControl className={profileStyles.input_wrapper}>
+              <FormLabel fontWeight={'bold'}>メイ</FormLabel>
+              <Input
+                type="text"
+                name="firstNameKana"
+                placeholder="タロウ"
+                value={userInfo.firstNameKana}
+                background="white"
+                onChange={handleChange}
+              />
+            </FormControl>
+          </Stack>
           <FormControl className={profileStyles.input_wrapper}>
             <FormLabel fontWeight={'bold'}>メールアドレス</FormLabel>
             <Input
