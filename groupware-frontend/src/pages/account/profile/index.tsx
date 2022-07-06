@@ -16,7 +16,6 @@ import {
   Select,
   useToast,
   Text,
-  RadioGroup,
   Radio,
   Stack,
 } from '@chakra-ui/react';
@@ -200,8 +199,6 @@ const Profile = () => {
     },
   });
 
-  const tabs: Tab[] = useHeaderTab({ headerTabType: 'account', user });
-
   const handleUpdateUser = async () => {
     if (!croppedImageURL || !completedCrop || !selectImageName) {
       updateUser(userInfo);
@@ -232,7 +229,6 @@ const Profile = () => {
       header={{
         title: 'Account',
         activeTabName: 'プロフィール編集',
-        tabs,
       }}>
       <Head>
         <title>ボールド | プロフィール編集</title>
