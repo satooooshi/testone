@@ -49,7 +49,6 @@ export interface GetMessagesQuery {
 }
 
 export interface GetChaRoomsByPageQuery {
-  group: number;
   page?: string;
   limit?: string;
   updatedAtLatestRoom?: Date;
@@ -99,7 +98,7 @@ export class ChatController {
     const notificationData: CustomPushNotificationData = {
       title: '',
       body: '',
-      custom: { invitation: invitation, silent: 'silent', type: 'edit' },
+      custom: { invitation: invitation, silent: 'silent', type: 'call' },
     };
     await sendPushNotifToSpecificUsers([callee.id], notificationData);
     return;
@@ -235,6 +234,24 @@ export class ChatController {
     const user = req.user;
     message.sender = user;
     return await this.chatService.sendMessage(message);
+  }
+
+  @Patch('send-message')
+  @UseGuards(JwtAuthenticationGuard)
+  async updateMessage(
+    @Req() req: RequestWithUser,
+    @Body() message: Partial<ChatMessage>,
+  ): Promise<ChatMessage> {
+    const user = req.user;
+    message.sender = user;
+    return await this.chatService.updateMessage(message);
+  }
+
+  @Post('delete-message')
+  @UseGuards(JwtAuthenticationGuard)
+  async deleteMessage(@Body() message: Partial<ChatMessage>) {
+    await this.chatService.deleteMessage(message);
+    return message;
   }
 
   @Post('save-chat-group')
@@ -413,9 +430,9 @@ export class ChatController {
   ): Promise<ChatGroup> {
     const { user } = req;
     const roomDetail = await this.chatService.getRoomDetail(Number(roomId));
-    if (!roomDetail.members.filter((m) => m.id === user.id).length) {
-      throw new BadRequestException('チャットルームを取得する権限がありません');
-    }
+    // if (!roomDetail.members.filter((m) => m.id === user.id).length) {
+    //   throw new BadRequestException('チャットルームを取得する権限がありません');
+    // }
     return roomDetail;
   }
 

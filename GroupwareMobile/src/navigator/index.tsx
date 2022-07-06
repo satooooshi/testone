@@ -29,6 +29,7 @@ import {debounce} from 'lodash';
 import notifee, {EventType} from '@notifee/react-native';
 import PushNotification from 'react-native-push-notification';
 import {useHandleBadge} from '../contexts/badge/useHandleBadge';
+import {ChatMessage} from '../types';
 
 const Stack = createStackNavigator<RootStackParamList>();
 export const rtmEngine = new RtmClient();
@@ -42,10 +43,10 @@ const Navigator = () => {
   const navigationRef = useNavigationContainerRef<any>();
   const {mutate: registerDevice} = useAPIRegisterDevice({
     onSuccess: updatedInfo => {
-      console.log('RegisterDevice success--------', updatedInfo);
+      // console.log('RegisterDevice success--------', updatedInfo);
     },
     onError: () => {
-      console.log('fail to register device');
+      // console.log('fail to register device');
     },
   });
   const {
@@ -129,7 +130,6 @@ const Navigator = () => {
   const endCall = useCallback(
     async (isCallKeep: boolean = false) => {
       if (isCallKeep && !remoteInvitation.current && !localInvitation) {
-        console.log('end call called by endAllCalls');
         return;
       }
       setIsJoining(false);
@@ -195,26 +195,26 @@ const Navigator = () => {
     await rtcEngine?.adjustRecordingSignalVolume(100);
 
     rtcEngine?.addListener('UserJoined', (uid, elapsed) => {
-      console.log('UserJoined', uid, elapsed);
+      // console.log('UserJoined', uid, elapsed);
     });
     // UserOfflineはチャンネルから人が退出したときのイベント
     // 詳しくはnode_modules/react-native-agora/lib/typescript/src/common/RtcEvents.d.tsに書いてある
     rtcEngine?.addListener('UserOffline', async (uid, reason) => {
-      console.log('UserOffline', uid, reason);
+      // console.log('UserOffline', uid, reason);
       await endCall();
     });
     rtcEngine?.addListener('ConnectionStateChanged', async (state, reason) => {
-      console.log('ConnectionStateChanged ', Platform.OS, state, reason);
+      // console.log('ConnectionStateChanged ', Platform.OS, state, reason);
     });
     rtcEngine?.addListener('LeaveChannel', async ({userCount}) => {
-      console.log('LeaveChannel. user count: ', Platform.OS, userCount);
+      // console.log('LeaveChannel. user count: ', Platform.OS, userCount);
       // await endCall();
     });
     rtcEngine?.addListener('JoinChannelSuccess', (channel, uid, elapsed) => {
-      console.log('JoinChannelSuccess', channel, uid, elapsed);
+      // console.log('JoinChannelSuccess', channel, uid, elapsed);
     });
     rtcEngine?.addListener('Error', errCode => {
-      console.log('errCode', errCode);
+      // console.log('errCode', errCode);
     });
   }, [createRTCInstance, endCall]);
 
@@ -241,7 +241,7 @@ const Navigator = () => {
 
   messaging().setBackgroundMessageHandler(async remoteMessage => {
     // await notifee.incrementBadgeCount();
-    console.log('BackgroundMessage received!!', remoteMessage);
+    // console.log('BackgroundMessage received!!', remoteMessage);
   });
 
   useEffect(
@@ -442,137 +442,168 @@ const Navigator = () => {
     getRtmToken();
   }, [AGORA_APP_ID, user?.id]);
 
-  const sendLocalNotification = async (remoteMessage: any) => {
-    if (
-      remoteMessage?.data?.silent ||
-      (remoteMessage?.data?.screen === 'chat' &&
-        remoteMessage.data?.id === `${currentChatRoomId}`)
-    ) {
-      return;
-    }
-    if (!remoteMessage?.data?.calleeId) {
-      const channelId = await notifee.createChannel({
-        id: 'default',
-        name: 'Default Channel',
-      });
+  const sendLocalNotification = useCallback(
+    async (remoteMessage: any) => {
+      // console.log(
+      //   '============',
+      //   remoteMessage.data?.id,
+      //   `${currentChatRoomId}`,
+      // );
+      if (
+        remoteMessage?.data?.silent ||
+        (remoteMessage?.data?.screen === 'chat' &&
+          remoteMessage.data?.id === `${currentChatRoomId}`)
+      ) {
+        return;
+      }
+      if (!remoteMessage?.data?.calleeId) {
+        const channelId = await notifee.createChannel({
+          id: 'default',
+          name: 'Default Channel',
+        });
 
-      await notifee.displayNotification({
-        title: remoteMessage.data?.title || '',
-        body: remoteMessage.data?.message || remoteMessage.data?.body || '',
-        android: {
-          channelId: channelId,
-          pressAction: {
-            id: 'action_id',
-            launchActivity: 'default',
+        await notifee.displayNotification({
+          title: remoteMessage.data?.title || '',
+          body: remoteMessage.data?.message || remoteMessage.data?.body || '',
+          android: {
+            channelId: channelId,
+            pressAction: {
+              id: 'action_id',
+              launchActivity: 'default',
+            },
           },
-        },
-        data: {
-          screen: remoteMessage?.data?.screen
-            ? remoteMessage?.data?.screen
-            : '',
-          id: remoteMessage?.data?.id ? remoteMessage?.data?.id : '',
-        },
-        ios: {
-          // iOS resource (.wav, aiff, .caf)
-          sound: 'local.wav',
-        },
-      });
+          data: {
+            screen: remoteMessage?.data?.screen
+              ? remoteMessage?.data?.screen
+              : '',
+            id: remoteMessage?.data?.id ? remoteMessage?.data?.id : '',
+          },
+          ios: {
+            // iOS resource (.wav, aiff, .caf)
+            sound: 'local.wav',
+          },
+        });
+      }
+    },
+    [currentChatRoomId],
+  );
+
+  const naviateByNotif = (notification: any) => {
+    if (
+      navigationRef.current?.getCurrentRoute()?.name !== 'Login' &&
+      user?.id
+    ) {
+      if (notification.data?.screen === 'event' && notification.data?.id) {
+        navigationRef.current?.navigate('EventStack', {
+          screen: 'EventDetail',
+          params: {id: notification.data?.id},
+          initial: false,
+        });
+      }
+      if (notification.data?.screen === 'wiki' && notification.data?.id) {
+        navigationRef.current?.navigate('WikiStack', {
+          screen: 'WikiDetail',
+          params: {id: notification.data?.id},
+          initial: false,
+        });
+      }
+      if (notification.data?.screen === 'room') {
+        navigationRef.current?.navigate('ChatStack', {
+          screen: 'RoomList',
+        });
+      }
+      if (notification.data?.screen === 'chat' && notification.data?.id) {
+        navigationRef.current?.navigate('ChatStack', {
+          screen: 'Chat',
+          params: {room: {id: notification.data?.id}},
+          initial: false,
+        });
+      }
     }
   };
-
   useEffect(() => {
-    const naviateByNotif = (notification: any) => {
-      if (
-        navigationRef.current?.getCurrentRoute()?.name !== 'Login' &&
-        user?.id
-      ) {
-        if (notification.data?.screen === 'event' && notification.data?.id) {
-          navigationRef.current?.navigate('EventStack', {
-            screen: 'EventDetail',
-            params: {id: notification.data?.id},
-            initial: false,
-          });
+    if (user?.id) {
+      notifee.onForegroundEvent(({type, detail}) => {
+        switch (type) {
+          case EventType.DISMISSED:
+            break;
+          case EventType.PRESS:
+            naviateByNotif(detail.notification);
+            break;
         }
-        if (notification.data?.screen === 'wiki' && notification.data?.id) {
-          navigationRef.current?.navigate('WikiStack', {
-            screen: 'WikiDetail',
-            params: {id: notification.data?.id},
-            initial: false,
-          });
+      });
+      notifee.onBackgroundEvent(async ({type, detail}) => {
+        switch (type) {
+          case EventType.DISMISSED:
+            break;
+          case EventType.PRESS:
+            naviateByNotif(detail.notification);
         }
-        if (notification.data?.screen === 'room') {
-          navigationRef.current?.navigate('ChatStack', {
-            screen: 'RoomList',
-          });
-        }
-        if (notification.data?.screen === 'chat' && notification.data?.id) {
-          navigationRef.current?.navigate('ChatStack', {
-            screen: 'Chat',
-            params: {room: {id: notification.data?.id}},
-            initial: false,
-          });
-        }
-      }
-    };
+      });
+      notifee.requestPermission();
 
-    notifee.onForegroundEvent(({type, detail}) => {
-      switch (type) {
-        case EventType.DISMISSED:
-          break;
-        case EventType.PRESS:
-          naviateByNotif(detail.notification);
-          break;
-      }
-    });
-    notifee.onBackgroundEvent(async ({type, detail}) => {
-      switch (type) {
-        case EventType.DISMISSED:
-          break;
-        case EventType.PRESS:
-          naviateByNotif(detail.notification);
-      }
-    });
-    notifee.requestPermission();
+      PushNotification.configure({
+        // onRegister: function (token) {
+        //   console.log('PushNotification TOKEN:', token);
+        // },
+        onNotification: notification => {
+          if (
+            (notification?.data?.silent ||
+              notification?.data?.type === 'badge') &&
+            notification.data?.id
+          ) {
+            refetchRoomCard({
+              id: notification.data?.id,
+              type: notification.data.type,
+            });
+            if (
+              notification?.data?.type === 'deleteMessage' &&
+              notification.data.messageId
+            ) {
+              const storageData = storage.getString(
+                `messagesIntRoom${notification.data?.id}user${user?.id}`,
+              );
+              if (storageData) {
+                const messagesInStorage: ChatMessage[] =
+                  JSON.parse(storageData);
 
-    PushNotification.configure({
-      onRegister: function (token) {
-        console.log('PushNotification TOKEN:', token);
-      },
-      onNotification: notification => {
-        if (
-          (notification?.data?.silent ||
-            notification?.data?.type === 'badge') &&
-          notification.data?.id
-        ) {
-          refetchRoomCard({
-            id: notification.data?.id,
-            type: notification.data.type,
-          });
+                const jsonMessages = JSON.stringify(
+                  messagesInStorage.filter(
+                    m => m.id !== Number(notification.data.messageId),
+                  ),
+                );
+                storage.set(
+                  `messagesIntRoom${notification.data?.id}user${user?.id}`,
+                  jsonMessages,
+                );
+              }
+            }
+          }
+          // console.log('PushNotification onNotification========', notification);
+          if (Platform.OS === 'android') {
+            sendLocalNotification(notification);
+          } else if (notification.userInteraction) {
+            naviateByNotif(notification);
+          }
+        },
+        permissions: {
+          alert: true,
+          badge: true,
+          sound: true,
+        },
+        requestPermissions: true,
+      });
+
+      const unsubscribe = messaging().onMessage(async remoteMessage => {
+        if (Platform.OS === 'ios') {
+          sendLocalNotification(remoteMessage);
         }
-        console.log('PushNotification onNotification========', notification);
-        if (Platform.OS === 'android') {
-          sendLocalNotification(notification);
-        } else if (notification.userInteraction) {
-          naviateByNotif(notification);
-        }
-      },
-      permissions: {
-        alert: true,
-        badge: true,
-        sound: true,
-      },
-      requestPermissions: true,
-    });
+      });
 
-    const unsubscribe = messaging().onMessage(async remoteMessage => {
-      if (Platform.OS === 'ios') {
-        sendLocalNotification(remoteMessage);
-      }
-    });
-
-    return unsubscribe;
+      return unsubscribe;
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [navigationRef, currentChatRoomId]);
+  }, [user?.id, currentChatRoomId]);
 
   useEffect(() => {
     if (isJoining && !isCallScreen) {

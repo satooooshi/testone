@@ -57,9 +57,9 @@ const SearchProvider: React.FC = ({ children }) => {
 const useSearchForm = () => useContext(SearchFormContext);
 
 type SearchFormProps = {
-  value: string;
-  onChange: ChangeEventHandler<HTMLInputElement>;
-  onClickButton: () => void;
+  // value: string;
+  // onChange: ChangeEventHandler<HTMLInputElement>;
+  onClickButton: (word: string) => void;
   tags?: Tag[];
   selectedTags?: Tag[];
   toggleTag: (t: Tag) => void;
@@ -67,8 +67,8 @@ type SearchFormProps = {
 };
 
 const SearchInput: React.FC<SearchFormProps> = ({
-  value,
-  onChange,
+  // value,
+  // onChange,
   onClickButton,
   tags = [],
   selectedTags = [],
@@ -76,12 +76,13 @@ const SearchInput: React.FC<SearchFormProps> = ({
   onClear,
 }) => {
   const [tagModal, setTagModal] = useState(false);
-  const [searchedWord, setSearchedWord] = useState(value);
+  const [word, setWord] = useState('');
+  const [searchedWord, setSearchedWord] = useState('');
   const { isSmallerThan768, hideSearchModal } = useSearchForm();
 
   const handleModalSearchButton = () => {
-    onClickButton();
-    setSearchedWord(value);
+    onClickButton(word);
+    setSearchedWord(word);
     isSmallerThan768 && hideSearchModal();
   };
 
@@ -108,8 +109,8 @@ const SearchInput: React.FC<SearchFormProps> = ({
           width={isSmallerThan768 ? '100%' : '60%'}
           placeholder="検索ワードを入力"
           background="white"
-          value={value}
-          onChange={onChange}
+          value={word}
+          onChange={(e) => setWord(e.target.value)}
         />
         <Button
           width={isSmallerThan768 ? '100%' : '15vw'}
