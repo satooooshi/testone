@@ -311,6 +311,7 @@ const Chat: React.FC = () => {
         }
         if (sentMsg.type === ChatMessageType.TEXT) {
           messageContentRef.current = '';
+          setValues(v => ({...v, content: ''}));
           resetForm();
         }
       },

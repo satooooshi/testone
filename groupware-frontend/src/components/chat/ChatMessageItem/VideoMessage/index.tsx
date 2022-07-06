@@ -10,7 +10,6 @@ type VideoMessageProps = {
 const VideoMessage: React.FC<VideoMessageProps> = ({ message }) => {
   const userAgent = window.navigator.userAgent;
   const isSafari = userAgent.includes('Safari');
-  console.error(window.navigator.userAgent);
   return (
     <Box display="flex" maxW="300px" maxH={'300px'}>
       {isSafari ? (
