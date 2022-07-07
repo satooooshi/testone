@@ -22,7 +22,7 @@ import {
 import { Response } from 'express';
 import { DateTime } from 'luxon';
 import { ChatAlbum } from 'src/entities/chatAlbum.entity';
-import { ChatGroup } from 'src/entities/chatGroup.entity';
+import { ChatGroup, RoomType } from 'src/entities/chatGroup.entity';
 import { ChatMessage, ChatMessageType } from 'src/entities/chatMessage.entity';
 import { ChatMessageReaction } from 'src/entities/chatMessageReaction.entity';
 import { ChatNote } from 'src/entities/chatNote.entity';
@@ -49,7 +49,6 @@ export interface GetMessagesQuery {
 }
 
 export interface GetChaRoomsByPageQuery {
-  group: number;
   page?: string;
   limit?: string;
   updatedAtLatestRoom?: Date;
@@ -99,7 +98,7 @@ export class ChatController {
     const notificationData: CustomPushNotificationData = {
       title: '',
       body: '',
-      custom: { invitation: invitation, silent: 'silent', type: 'edit' },
+      custom: { invitation: invitation, silent: 'silent', type: 'call' },
     };
     await sendPushNotifToSpecificUsers([callee.id], notificationData);
     return;
@@ -202,6 +201,14 @@ export class ChatController {
     return await this.chatService.getChatMessage(req.user.id, query);
   }
 
+  @Get('expired-url-messages/:id')
+  @UseGuards(JwtAuthenticationGuard)
+  async getExpiredUrlMessages(
+    @Param('id') roomId: number,
+  ): Promise<ChatMessage[]> {
+    return await this.chatService.getExpiredUrlMessages(roomId);
+  }
+
   @Get('search-messages')
   @UseGuards(JwtAuthenticationGuard)
   async searchMessages(
@@ -227,6 +234,24 @@ export class ChatController {
     const user = req.user;
     message.sender = user;
     return await this.chatService.sendMessage(message);
+  }
+
+  @Patch('send-message')
+  @UseGuards(JwtAuthenticationGuard)
+  async updateMessage(
+    @Req() req: RequestWithUser,
+    @Body() message: Partial<ChatMessage>,
+  ): Promise<ChatMessage> {
+    const user = req.user;
+    message.sender = user;
+    return await this.chatService.updateMessage(message);
+  }
+
+  @Post('delete-message')
+  @UseGuards(JwtAuthenticationGuard)
+  async deleteMessage(@Body() message: Partial<ChatMessage>) {
+    await this.chatService.deleteMessage(message);
+    return message;
   }
 
   @Post('save-chat-group')
@@ -264,6 +289,15 @@ export class ChatController {
       chatGroup,
       user,
     );
+    if (
+      savedGroup.roomType === RoomType.PERSONAL &&
+      savedGroup.members.length === 2
+    ) {
+      const chatPartner = savedGroup.members.filter((m) => m.id !== user.id)[0];
+      savedGroup.imageURL = chatPartner.avatarUrl;
+      savedGroup.name = `${chatPartner.lastName} ${chatPartner.firstName}`;
+    }
+
     return savedGroup;
   }
 
@@ -275,6 +309,12 @@ export class ChatController {
   ): Promise<ChatGroup> {
     const user = req.user;
     const otherMembersId = chatGroup.members.map((u) => u.id);
+    if (chatGroup.name) {
+      chatGroup.roomType = RoomType.GROUP;
+    } else {
+      chatGroup.roomType =
+        chatGroup.members.length === 1 ? RoomType.PERSONAL : RoomType.TALK_ROOM;
+    }
     chatGroup.members = [
       ...(chatGroup?.members?.filter((u) => u.id !== user.id) || []),
       user,
@@ -291,6 +331,15 @@ export class ChatController {
       },
     };
     await sendPushNotifToSpecificUsers(otherMembersId, silentNotification);
+
+    if (
+      savedGroup.roomType === RoomType.PERSONAL &&
+      savedGroup.members.length === 2
+    ) {
+      const chatPartner = savedGroup.members.filter((m) => m.id !== user.id)[0];
+      savedGroup.imageURL = chatPartner.avatarUrl;
+      savedGroup.name = `${chatPartner.lastName} ${chatPartner.firstName}`;
+    }
     return savedGroup;
   }
 
@@ -381,9 +430,9 @@ export class ChatController {
   ): Promise<ChatGroup> {
     const { user } = req;
     const roomDetail = await this.chatService.getRoomDetail(Number(roomId));
-    if (!roomDetail.members.filter((m) => m.id === user.id).length) {
-      throw new BadRequestException('チャットルームを取得する権限がありません');
-    }
+    // if (!roomDetail.members.filter((m) => m.id === user.id).length) {
+    //   throw new BadRequestException('チャットルームを取得する権限がありません');
+    // }
     return roomDetail;
   }
 

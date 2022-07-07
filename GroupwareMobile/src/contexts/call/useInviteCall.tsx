@@ -16,6 +16,7 @@ import {baseURL} from '../../utils/url';
 import {ChatGroup} from '../../types';
 import _, {debounce} from 'lodash';
 import {useHandleBadge} from '../badge/useHandleBadge';
+import {socket} from '../../utils/socket';
 
 const InvitationStatusContext = createContext({
   isCallAccepted: false,
@@ -39,9 +40,6 @@ export const InviteCallProvider: React.FC = ({children}) => {
   const {mutate: createGroup} = useAPISaveChatGroup();
   const {editChatGroup, refetchRoomCard} = useHandleBadge();
   const [currentGroupData, setCurrentGroupData] = useState<ChatGroup>();
-  const socket = io(baseURL, {
-    transports: ['websocket'],
-  });
   const {mutate: sendChatMessage} = useAPISendChatMessage({
     onSuccess: sentMsg => {
       socket.emit('message', sentMsg);

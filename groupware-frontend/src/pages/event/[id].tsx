@@ -57,6 +57,7 @@ import { darkFontColor } from 'src/utils/colors';
 import { isEditableEvent } from 'src/utils/factory/isCreatableEvent';
 import { MdCancel } from 'react-icons/md';
 import { useAPIDeleteSubmission } from '@/hooks/api/event/useAPIDeleteSubmission';
+import { componentDecorator } from 'src/utils/componentDecorator';
 
 type FileIconProps = {
   url: string;
@@ -346,7 +347,7 @@ const EventDetail = () => {
                 </div>
                 <span className={eventDetailStyles.sub_title}>概要</span>
                 <div className={eventDetailStyles.description_wrapper}>
-                  <Linkify>
+                  <Linkify componentDecorator={componentDecorator}>
                     <span className={eventDetailStyles.description}>
                       {data.description}
                     </span>

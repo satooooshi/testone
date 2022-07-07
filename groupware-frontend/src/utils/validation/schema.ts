@@ -7,7 +7,7 @@ const blankMixedMessage = '空白文字は使用できません';
 const minEightTextMessage = '8文字以上で入力してください';
 const minDateMessage = '開始日時は終了日時より前に設定してください';
 const minTagsMessage = 'タグは一つ以上設定してください';
-const minUsersMessage = 'チャットメンバーは一人以上設定してください';
+// const minUsersMessage = 'チャットメンバーは一人以上設定してください';
 const unmatchPasswordConfirmation = '再入力と新しいパスワードが一致しません';
 const nWordLimitMessage = (len: number) => `${len}文字以内で入力してください`;
 const afterNowMessage = '現在の日時以降に設定してください';
@@ -164,7 +164,7 @@ export const editEventIntroductionSchema = Yup.object().shape({
 
 export const chatGroupSchema = Yup.object().shape({
   name: Yup.string().max(50, `ルーム名は${nWordLimitMessage(50)}`),
-  members: Yup.array().min(1, minUsersMessage),
+  // members: Yup.array().min(1, minUsersMessage),
 });
 
 export const topNewsSchema = Yup.object().shape({

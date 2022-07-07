@@ -22,7 +22,15 @@ export class NotificationService {
   ) {}
 
   async deleteDevice(token: string) {
-    await this.deviceRepository.delete({ token });
+    const existDevice = await this.deviceRepository.findOne({
+      where: { token: token },
+    });
+    if (existDevice) {
+      console.log('deleteDevice called');
+      const result = await this.deviceRepository.delete(existDevice);
+      console.log('deleteDevice called', result);
+      return result;
+    }
   }
 
   async registerDevice(

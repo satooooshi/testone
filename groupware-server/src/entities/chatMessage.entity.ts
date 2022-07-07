@@ -98,7 +98,6 @@ export class ChatMessage {
   replyParentMessage?: ChatMessage;
 
   @BeforeInsert()
-  @BeforeUpdate()
   async changeToStorageURL?() {
     if (
       this.type === ChatMessageType.IMAGE ||
@@ -109,9 +108,8 @@ export class ChatMessage {
     }
   }
 
-  @AfterInsert()
   @AfterLoad()
-  @AfterUpdate()
+  @AfterInsert()
   async changeToSignedURL?() {
     if (
       this.type === ChatMessageType.IMAGE ||
@@ -120,9 +118,9 @@ export class ChatMessage {
     ) {
       this.content = await genSignedURL(this.content);
     }
-    if (this.type === ChatMessageType.OTHER_FILE) {
-      this.content = mentionTransform(this.content);
-    }
+    // if (this.type === ChatMessageType.OTHER_FILE) {
+    //   this.content = mentionTransform(this.content);
+    // }
   }
 
   @AfterInsert()
@@ -131,11 +129,11 @@ export class ChatMessage {
       if (this.content === '音声通話') return;
       let content = this.content;
       if (this.type === ChatMessageType.IMAGE) {
-        content = '画像';
+        content = '画像を送信しました。';
       } else if (this.type === ChatMessageType.VIDEO) {
-        content = '動画';
+        content = '動画を送信しました。';
       } else if (this.type === ChatMessageType.OTHER_FILE) {
-        content = 'ファイル';
+        content = 'ファイルを送信しました。';
       }
       const mentionRegex = /@\[.*?\]\(([0-9]+)\)/g;
       const mentionedIds: number[] = [];
@@ -203,13 +201,13 @@ export class ChatMessage {
           id: this.chatGroup.id.toString(),
         },
       };
-      console.log(
-        '---====',
-        notifiedUsers.map((u) => u.id),
-        this.chatGroup.members.map((u) => u.id),
-        this.sender.id,
-        title,
-      );
+      // console.log(
+      //   '---====',
+      //   notifiedUsers.map((u) => u.id),
+      //   this.chatGroup.members.map((u) => u.id),
+      //   this.sender.id,
+      //   title,
+      // );
 
       await sendPushNotifToSpecificUsers(
         notifiedUsers.map((u) => u.id),

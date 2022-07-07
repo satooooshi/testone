@@ -6,7 +6,7 @@ import {ChatGroup} from '../../types';
 import {useAuthenticate} from '../useAuthenticate';
 import NetInfo from '@react-native-community/netinfo';
 import {storage} from '../../utils/url';
-import {dateTimeFormatterFromJSDDate} from '../../utils/dateTimeFormatterFromJSDate';
+import {socket} from '../../utils/socket';
 
 const BadgeContext = createContext({
   unreadChatCount: 0,
@@ -15,7 +15,9 @@ const BadgeContext = createContext({
   handleEnterRoom: (() => {}) as (roomId: number) => void,
   refetchRoomCard: (() => {}) as (data: {id: number; type: string}) => void,
   editChatGroup: (() => {}) as (room: ChatGroup) => void,
+  refreshRooms: () => {},
   isRoomsRefetching: false,
+  isCompletedRefetchAllRooms: false,
 });
 
 export const BadgeProvider: React.FC = ({children}) => {
@@ -43,8 +45,6 @@ export const BadgeProvider: React.FC = ({children}) => {
     {
       enabled: false,
       onSuccess: data => {
-        console.log('refetchAllRooms called ----', data.rooms.length);
-
         let count = page !== 1 && chatGroups.length ? chatUnreadCount : 0;
         for (const room of data.rooms) {
           count += room.unreadCount ? room.unreadCount : 0;
@@ -55,12 +55,15 @@ export const BadgeProvider: React.FC = ({children}) => {
         );
         if (data.rooms.length >= 20) {
           setPage(p => p + 1);
-          setIsNeedRefetch(true);
         } else {
-          setIsNeedRefetch(false);
           setPage(1);
           setCompleteRefetch(true);
         }
+      },
+      onError: () => {
+        Alert.alert(
+          'チャットルームの取得に失敗しました。しばらく経ってもルームを取得できない場合は、アプリを再起動してみて下さい。',
+        );
       },
     },
   );
@@ -85,10 +88,6 @@ export const BadgeProvider: React.FC = ({children}) => {
       }
       refetchAllRooms();
     }
-    return () => {
-      const jsonMessages = JSON.stringify(chatGroups);
-      storage.set(`chatRoomList${user?.id}`, jsonMessages);
-    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [networkConnection, user]);
 
@@ -113,11 +112,10 @@ export const BadgeProvider: React.FC = ({children}) => {
   }, [networkConnection]);
 
   useEffect(() => {
-    if (isNeedRefetch) {
-      setIsNeedRefetch(false);
+    if (page > 1) {
       refetchAllRooms();
     }
-  }, [isNeedRefetch, refetchAllRooms]);
+  }, [page, refetchAllRooms]);
 
   const {refetch: refetchRoom} = useAPIGetOneRoom(refetchGroup.id, {
     enabled: false,
@@ -170,13 +168,13 @@ export const BadgeProvider: React.FC = ({children}) => {
   };
 
   const handleEnterRoom = (roomId: number) => {
-    const targetRoom = chatGroups.filter(g => g.id === roomId);
+    const targetRoom = chatGroups.filter(g => g.id === Number(roomId));
     // setCurrentRoom({id: targetRoom[0].id, unreadCount: 0});
     const unreadCount = targetRoom[0]?.unreadCount;
     if (unreadCount) {
       setChatUnreadCount(c => (c - unreadCount >= 0 ? c - unreadCount : 0));
       setChatGroups(group =>
-        group.map(g => (g.id === roomId ? {...g, unreadCount: 0} : g)),
+        group.map(g => (g.id === Number(roomId) ? {...g, unreadCount: 0} : g)),
       );
     }
   };
@@ -185,9 +183,12 @@ export const BadgeProvider: React.FC = ({children}) => {
     setEditRoom(room);
   };
 
+  const refreshRooms = () => {
+    refetchAllRooms();
+  };
+
   useEffect(() => {
     if (editRoom) {
-      console.log('editROom called-----', editRoom.members);
       if (chatGroups.map(g => g.id).includes(editRoom.id)) {
         if (editRoom.members?.filter(m => m.id === user?.id).length) {
           setChatGroups(room =>
@@ -203,6 +204,7 @@ export const BadgeProvider: React.FC = ({children}) => {
             ),
           );
         } else {
+          socket.emit('leaveRoom', editRoom.id.toString());
           setChatGroups(rooms => rooms.filter(r => r.id !== editRoom.id));
         }
       } else if (editRoom.members?.filter(m => m.id === user?.id).length) {
@@ -226,6 +228,8 @@ export const BadgeProvider: React.FC = ({children}) => {
         refetchRoomCard,
         editChatGroup,
         isRoomsRefetching: isLoading,
+        isCompletedRefetchAllRooms: completeRefetch,
+        refreshRooms,
       }}>
       {children}
     </BadgeContext.Provider>

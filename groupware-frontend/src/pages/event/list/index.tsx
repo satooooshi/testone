@@ -534,11 +534,7 @@ const EventList = () => {
             <div className={eventListStyles.search_form_wrapper}>
               <SearchForm
                 onClear={() => setSelectedTags([])}
-                value={searchWord || ''}
-                onChange={(e) => setSearchWord(e.currentTarget.value)}
-                onClickButton={() =>
-                  queryRefresh({ page: '1', word: searchWord })
-                }
+                onClickButton={(w) => queryRefresh({ page: '1', word: w })}
                 tags={tags || []}
                 selectedTags={selectedTags}
                 toggleTag={onToggleTag}
