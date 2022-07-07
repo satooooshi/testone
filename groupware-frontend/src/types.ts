@@ -378,6 +378,10 @@ export interface ChatAlbum {
   isEditor?: boolean;
 }
 
+export interface SaveAlbumResult {
+  album: ChatAlbum;
+  systemMessage: ChatMessage;
+}
 export interface ChatAlbumImage {
   id: number;
   fileName: string;
