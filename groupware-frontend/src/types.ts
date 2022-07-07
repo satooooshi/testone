@@ -330,6 +330,11 @@ export interface ChatGroup {
   updatedAt: Date;
 }
 
+export interface SaveRoomsResult {
+  room: ChatGroup;
+  systemMessage: ChatMessage[];
+}
+
 export interface LastReadChatTime {
   id: number;
   readTime: Date;

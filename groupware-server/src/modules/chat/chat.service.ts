@@ -27,6 +27,7 @@ import {
   GetRoomsResult,
   SearchMessageQuery,
   GetUnreadMessagesQuery,
+  SaveRoomsResult,
 } from './chat.controller';
 
 @Injectable()
@@ -700,7 +701,7 @@ export class ChatService {
   public async v2UpdateChatGroup(
     chatGroup: Partial<ChatGroup>,
     requestUser: User,
-  ): Promise<ChatGroup> {
+  ): Promise<SaveRoomsResult> {
     const newData: Partial<ChatGroup> = {
       ...chatGroup,
       chatMessages: undefined,
@@ -724,6 +725,7 @@ export class ChatService {
     if (!isMySelf) {
       throw new BadRequestException('The user is not a member');
     }
+    const systemMessage: ChatMessage[] = [];
     const newGroup = await this.chatGroupRepository.save({
       ...existGroup,
       members: newData.members,
@@ -737,7 +739,8 @@ export class ChatService {
         requestUser,
       )}さんがルーム名を${existGroup.name}に更新しました`;
       sysMsgSaidsUpdated.chatGroup = newGroup;
-      await this.chatMessageRepository.save(sysMsgSaidsUpdated);
+      const sysMsg = await this.chatMessageRepository.save(sysMsgSaidsUpdated);
+      systemMessage.push(sysMsg);
     }
     const newMembers = newGroup.members.filter(
       (newM) => !existGroup.members.map((m) => m.id).includes(newM.id),
@@ -754,7 +757,8 @@ export class ChatService {
         .map((m) => userNameFactory(m) + 'さん')
         .join(', ')}を追加しました`;
       newMembersSystemMsg.chatGroup = { ...newGroup, members: undefined };
-      await this.chatMessageRepository.save(newMembersSystemMsg);
+      const sysMsg = await this.chatMessageRepository.save(newMembersSystemMsg);
+      systemMessage.push(sysMsg);
     }
     if (removedMembers.length) {
       const removedMembersSystemMsg = new ChatMessage();
@@ -765,7 +769,10 @@ export class ChatService {
         .map((m) => userNameFactory(m) + 'さん')
         .join(', ')}を退出させました`;
       removedMembersSystemMsg.chatGroup = { ...newGroup, members: undefined };
-      await this.chatMessageRepository.save(removedMembersSystemMsg);
+      const sysMsg = await this.chatMessageRepository.save(
+        removedMembersSystemMsg,
+      );
+      systemMessage.push(sysMsg);
     }
     const silentNotification: CustomPushNotificationData = {
       title: '',
@@ -782,7 +789,7 @@ export class ChatService {
       allMemberWithoutMyself.map((u) => u.id),
       silentNotification,
     );
-    return newGroup;
+    return { room: newGroup, systemMessage };
   }
 
   public async v2SaveChatGroup(

@@ -1,12 +1,14 @@
 import { AxiosError } from 'axios';
 import { useMutation, UseMutationOptions } from 'react-query';
-import { ChatGroup } from 'src/types';
+import { ChatGroup, SaveRoomsResult } from 'src/types';
 import { axiosInstance } from 'src/utils/url';
 import { saveChatGroupURL } from 'src/utils/url/chat.url';
 import { jsonHeader } from 'src/utils/url/header';
 
-const updateChatGroup = async (chatGroup: ChatGroup): Promise<ChatGroup> => {
-  const response = await axiosInstance.patch<ChatGroup>(
+const updateChatGroup = async (
+  chatGroup: ChatGroup,
+): Promise<SaveRoomsResult> => {
+  const response = await axiosInstance.patch<SaveRoomsResult>(
     saveChatGroupURL,
     chatGroup,
     {
@@ -18,13 +20,13 @@ const updateChatGroup = async (chatGroup: ChatGroup): Promise<ChatGroup> => {
 
 export const useAPIUpdateChatGroup = (
   mutationOptions?: UseMutationOptions<
-    ChatGroup,
+    SaveRoomsResult,
     AxiosError,
     ChatGroup,
     unknown
   >,
 ) => {
-  return useMutation<ChatGroup, AxiosError, ChatGroup>(
+  return useMutation<SaveRoomsResult, AxiosError, ChatGroup>(
     updateChatGroup,
     mutationOptions,
   );
