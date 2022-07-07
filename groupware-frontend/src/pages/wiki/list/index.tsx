@@ -25,7 +25,6 @@ import {
   getBoardCategory,
   getRuleCategory,
   getWikiCategoryList,
-  wikiNameToCategory,
   wikiTypeNameFactory,
 } from 'src/utils/wiki/wikiTypeNameFactory';
 import TabList from '@/components/common/TabList';
