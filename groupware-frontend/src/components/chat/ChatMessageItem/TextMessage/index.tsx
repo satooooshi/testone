@@ -15,6 +15,7 @@ import { mentionTransform } from 'src/utils/mentionTransform';
 import { replaceFullWidthSpace } from 'src/utils/replaceWidthSpace';
 import Linkify from 'react-linkify';
 import { componentDecorator } from 'src/utils/componentDecorator';
+import VideoImageThumbnail from 'react-video-thumbnail-image';
 
 type TextMessageProps = {
   message: ChatMessage;
@@ -151,7 +152,16 @@ const TextMessage: React.FC<TextMessageProps> = ({
                   }
                 />
               ) : reply.type == ChatMessageType.VIDEO ? (
-                <Image boxSize={10} src={require('@/public/no-image.jpg')} />
+                reply.content ? (
+                  <Box width={50}>
+                    <VideoImageThumbnail
+                      videoUrl={reply.content}
+                      alt="my test video"
+                    />
+                  </Box>
+                ) : (
+                  <Image boxSize={10} src={require('@/public/no-image.jpg')} />
+                )
               ) : reply.type == ChatMessageType.STICKER ? (
                 <Image boxSize={10} src={require('@/public/no-image.jpg')} />
               ) : null}
