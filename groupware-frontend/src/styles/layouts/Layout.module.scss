@@ -59,17 +59,17 @@
 
 .main_padding_with_tab {
   padding-top: 15px;
-  @media (max-width: 768px) {
-    padding-top: 140px;
-    // padding-left: 24px;
-    // padding-right: 24px;
-  }
+  // @media (max-width: 768px) {
+  //   // padding-top: 140px;
+  //   // padding-left: 24px;
+  //   // padding-right: 24px;
+  // }
 }
 .main_padding_no_tab {
   padding-top: 24px;
   @media (max-width: 768px) {
     // padding-left: 24px;
     // padding-right: 24px;
-    padding-top: 8vh;
+    // padding-top: 8vh;
   }
 }

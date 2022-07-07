@@ -110,6 +110,7 @@ const EventCard: React.FC<EventCardProps> = ({
       // mb={3}
       h="250px"
       w="100%"
+      maxW="500px"
       backgroundColor="white"
       borderWidth={1}
       borderColor="gray.200"

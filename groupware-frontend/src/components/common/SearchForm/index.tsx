@@ -213,6 +213,7 @@ const SearchInput: React.FC<SearchFormProps> = ({
               bg="white"
               height="10"
               w="24%"
+              minW="160px"
               maxW="230px"
               onChange={onSelect}>
               {selectItems?.length &&
