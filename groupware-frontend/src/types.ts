@@ -353,6 +353,11 @@ export interface ChatNote {
   isEditor?: boolean;
 }
 
+export interface SaveNoteResult {
+  note: ChatNote;
+  systemMessage: ChatMessage;
+}
+
 export interface ChatNoteImage {
   id: number;
   imageURL: string;
