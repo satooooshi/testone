@@ -55,7 +55,7 @@ index e597912..cd50a22 100644
        onPress={() => {
          (dispatch as DispatchType<'LocalMuteVideo'>)({
 diff --git a/node_modules/agora-rn-uikit/src/Controls/LocalControls.tsx b/node_modules/agora-rn-uikit/src/Controls/LocalControls.tsx
-index eb792e0..8b76ab6 100644
+index eb792e0..39a67e9 100644
 --- a/node_modules/agora-rn-uikit/src/Controls/LocalControls.tsx
 +++ b/node_modules/agora-rn-uikit/src/Controls/LocalControls.tsx
 @@ -23,7 +23,7 @@ function Controls(props: {showButton: Boolean}) {
@@ -67,6 +67,15 @@ index eb792e0..8b76ab6 100644
              <EndCall />
            </>
          )}
+@@ -34,7 +34,7 @@ function Controls(props: {showButton: Boolean}) {
+             <View
+               style={{
+                 ...styles.Controls,
+-                bottom: styles.Controls.bottom + 70,
++                // bottom: styles.Controls.bottom + 70,
+                 ...(maxViewRemoteBtnContainer as object),
+               }}>
+               <RemoteControls user={users[0]} showRemoteSwap={false} />
 diff --git a/node_modules/agora-rn-uikit/src/PropsContext.tsx b/node_modules/agora-rn-uikit/src/PropsContext.tsx
 index dd880c1..f0b017a 100644
 --- a/node_modules/agora-rn-uikit/src/PropsContext.tsx

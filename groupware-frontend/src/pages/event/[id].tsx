@@ -63,6 +63,7 @@ import { isEditableEvent } from 'src/utils/factory/isCreatableEvent';
 import { MdCancel } from 'react-icons/md';
 import { useAPIDeleteSubmission } from '@/hooks/api/event/useAPIDeleteSubmission';
 import { hideScrollbarCss } from 'src/utils/chakra/hideScrollBar.css';
+import { componentDecorator } from 'src/utils/componentDecorator';
 
 type FileIconProps = {
   url: string;
@@ -347,12 +348,18 @@ const EventDetail = () => {
                     {eventTypeNameFactory(data.type)}
                   </Badge>
                 </Box>
-                <Box mb="8px" h="160px" mr={4} mt={3}>
+                <Box mb="20px" minH="160px" mr={4} mt={3}>
                   <Heading fontWeight="bold"> {data.title}</Heading>
                   <Box>
-                    <Text mt={3} fontSize={12} noOfLines={5}>
-                      {data.description}
-                    </Text>
+                    <Linkify componentDecorator={componentDecorator}>
+                      <Text
+                        as="span"
+                        mt={3}
+                        fontSize={12}
+                        whiteSpace="pre-line">
+                        {data.description}
+                      </Text>
+                    </Linkify>
                   </Box>
                 </Box>
                 <Box w="100%">

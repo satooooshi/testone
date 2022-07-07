@@ -134,14 +134,23 @@ const QAQuestionList = () => {
               : null
           }
           onClear={() => setSelectedTags([])}
-          value={searchWord}
-          onChange={(e) => setSearchWord(e.currentTarget.value)}
-          onClickButton={() =>
+          // value={searchWord}
+          // onChange={(e) => setSearchWord(e.currentTarget.value)}
+          // onClickButton={() =>
+          //   queryRefresh({
+          //     page: '1',
+          //     tag,
+          //     status,
+          //     word: searchWord,
+          //     type,
+          //   })
+          // }
+          onClickButton={(w) =>
             queryRefresh({
               page: '1',
               tag,
               status,
-              word: searchWord,
+              word: w,
               type,
             })
           }

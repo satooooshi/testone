@@ -64,12 +64,13 @@ const SearchProvider: React.FC = ({ children }) => {
 const useSearchForm = () => useContext(SearchFormContext);
 
 type SearchFormProps = {
-  value: string;
-  onChange: ChangeEventHandler<HTMLInputElement>;
+  // value: string;
+  // onChange: ChangeEventHandler<HTMLInputElement>;
   selectItems?: string[];
   selectingItem?: string;
   onSelect?: ChangeEventHandler<HTMLSelectElement>;
-  onClickButton: () => void;
+  // onClickButton: () => void;
+  onClickButton: (word: string) => void;
   tags?: Tag[];
   selectedTags?: Tag[];
   toggleTag: (t: Tag) => void;
@@ -77,8 +78,6 @@ type SearchFormProps = {
 };
 
 const SearchInput: React.FC<SearchFormProps> = ({
-  value,
-  onChange,
   selectItems,
   selectingItem,
   onSelect,
@@ -89,12 +88,13 @@ const SearchInput: React.FC<SearchFormProps> = ({
   onClear,
 }) => {
   const [tagModal, setTagModal] = useState(false);
-  const [searchedWord, setSearchedWord] = useState(value);
+  const [word, setWord] = useState('');
+  const [searchedWord, setSearchedWord] = useState('');
   const { isSmallerThan768, hideSearchModal } = useSearchForm();
 
   const handleModalSearchButton = () => {
-    onClickButton();
-    setSearchedWord(value);
+    onClickButton(word);
+    setSearchedWord(word);
     isSmallerThan768 && hideSearchModal();
   };
 
@@ -145,8 +145,10 @@ const SearchInput: React.FC<SearchFormProps> = ({
               name="word"
               placeholder="検索する"
               background="white"
-              value={value}
-              onChange={onChange}
+              value={word}
+              onChange={(e) => setWord(e.target.value)}
+              // value={value}
+              // onChange={onChange}
               onKeyDown={(e) => {
                 if (e.key === 'Enter') {
                   handleModalSearchButton();
@@ -159,8 +161,13 @@ const SearchInput: React.FC<SearchFormProps> = ({
               display="flex"
               flexDir="row"
               justifyContent="flex-start">
-              {value.length ? (
-                <Text w="10px" textAlign="center" mr={3} cursor="pointer">
+              {word.length ? (
+                <Text
+                  w="10px"
+                  textAlign="center"
+                  mr={3}
+                  cursor="pointer"
+                  onClick={() => setWord('')}>
                   ✖️
                 </Text>
               ) : null}
