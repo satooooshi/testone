@@ -242,7 +242,9 @@ const EventCard: React.FC<EventCardProps> = ({
               <AiOutlineArrowRight size={13} />
             </Box>
           </Button> */}
-            <Link href={`/event/${eventSchedule.id}`}>
+            <Link
+              href={`/event/${eventSchedule.id}`}
+              style={{ textDecoration: 'none' }}>
               <Button
                 ml={2}
                 borderRadius={50}

@@ -16,6 +16,8 @@ const HeaderButton: React.FC<HeaderButtonProps> = ({ t }) => {
         <Button
           onClick={t.onClick}
           rounded={50}
+          w="70px"
+          h="35px"
           colorScheme="blue"
           right={0}
           ml="auto"
