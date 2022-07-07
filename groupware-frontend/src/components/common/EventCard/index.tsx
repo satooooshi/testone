@@ -242,23 +242,22 @@ const EventCard: React.FC<EventCardProps> = ({
               <AiOutlineArrowRight size={13} />
             </Box>
           </Button> */}
-            <Button
-              ml={2}
-              borderRadius={50}
-              width="100px"
-              height={7}
-              colorScheme="blue"
-              variant="outline"
-              onClick={() => {
-                router.push(`/event/${eventSchedule.id}`);
-              }}>
-              <Box display="flex">
-                <Text fontSize={10} mr="4px">
-                  詳細を見る
-                </Text>
-                <AiOutlineArrowRight size={13} />
-              </Box>
-            </Button>
+            <Link href={`/event/${eventSchedule.id}`}>
+              <Button
+                ml={2}
+                borderRadius={50}
+                width="100px"
+                height={7}
+                colorScheme="blue"
+                variant="outline">
+                <Box display="flex">
+                  <Text fontSize={10} mr="4px">
+                    詳細を見る
+                  </Text>
+                  <AiOutlineArrowRight size={13} />
+                </Box>
+              </Button>
+            </Link>
           </Box>
         </Box>
       </Box>
