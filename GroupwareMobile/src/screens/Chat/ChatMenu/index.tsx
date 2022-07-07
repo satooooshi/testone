@@ -24,17 +24,17 @@ const ChatMenu: React.FC = () => {
   const [isMute, setIsMute] = useState(false);
   const {editChatGroup} = useHandleBadge();
 
-  const {mutate: updateGroup} = useAPIUpdateChatGroup({
-    onSuccess: updateRoom => {
-      editChatGroup(updateRoom);
-      setIsMute(!isMute);
-    },
-    onError: () => {
-      Alert.alert(
-        'チャットルーム更新中にエラーが発生しました。\n時間をおいて再実行してください。',
-      );
-    },
-  });
+  // const {mutate: updateGroup} = useAPIUpdateChatGroup({
+  //   onSuccess: data => {
+  //     editChatGroup(data.room);
+  //     setIsMute(!isMute);
+  //   },
+  //   onError: () => {
+  //     Alert.alert(
+  //       'チャットルーム更新中にエラーが発生しました。\n時間をおいて再実行してください。',
+  //     );
+  //   },
+  // });
   const {mutate: leaveChatGroup} = useAPILeaveChatRoom({
     onSuccess: () => {
       editChatGroup({
