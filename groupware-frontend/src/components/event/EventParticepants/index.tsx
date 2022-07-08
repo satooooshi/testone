@@ -84,11 +84,17 @@ const EventParticipants: React.FC<EventParticipantsProps> = ({
             </Text>
           </Box>
         )}
-        <SimpleGrid minChildWidth="100px" maxChildWidth="120px" spacing="10px">
+        <SimpleGrid
+          minChildWidth="120px"
+          spacing="10px"
+          display={users.length < 4 ? 'flex' : undefined}
+          // justifyContent="flex-start"
+          flexWrap="wrap">
           {users.map((u, index) =>
             index <= 10 || allVisible ? (
               <Box
-                maxW="120px"
+                maxW="130px"
+                minW="120px"
                 my={1}
                 rounded="md"
                 borderWidth={1}
