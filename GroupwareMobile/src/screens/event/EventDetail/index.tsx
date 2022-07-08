@@ -10,7 +10,15 @@ import {
   Platform,
 } from 'react-native';
 import HeaderWithTextButton from '../../../components/Header';
-import {Div, Text, Button, Overlay, ScrollDiv, Icon} from 'react-native-magnus';
+import {
+  Div,
+  Text,
+  Button,
+  Overlay,
+  ScrollDiv,
+  Icon,
+  Tag,
+} from 'react-native-magnus';
 import FastImage from 'react-native-fast-image';
 import {eventDetailStyles} from '../../../styles/screen/event/eventDetail.style';
 import {useAPIGetEventDetail} from '../../../hooks/api/event/useAPIGetEventDetail';
@@ -113,10 +121,12 @@ const EventDetail: React.FC = () => {
   });
   const {mutate: joinEvent} = useAPIJoinEvent({
     onSuccess: () => refetchEvents(),
-    onError: () => {
-      Alert.alert(
-        'イベント参加中にエラーが発生しました。\n時間をおいて再実行してください。',
-      );
+    onError: err => {
+      // Alert.alert(
+      //   err.response?.data?.message
+      //     ? err.response?.data?.message
+      //     : 'イベント参加中にエラーが発生しました。\n時間をおいて再実行してください。',
+      // );
     },
   });
   const {mutate: cancelEvent} = useAPICancelEvent({
@@ -368,8 +378,18 @@ const EventDetail: React.FC = () => {
       {eventInfo && (
         <>
           <ScrollDiv>
-            <Div flexDir="column">
-              <Div>
+            <Div flexDir="column" px={10}>
+              <Tag
+                mt={10}
+                ml={5}
+                bg={eventTypeColorFactory(eventInfo.type)}
+                color="white">
+                {eventTypeNameFactory(eventInfo.type)}
+              </Tag>
+              <Text fontSize={25} w={windowWidth * 0.65} fontWeight="900">
+                {eventInfo.title}
+              </Text>
+              <Div mt={5}>
                 {eventInfo.type !== EventType.SUBMISSION_ETC ? (
                   <Div w="48%" mr={4}>
                     <FastImage
@@ -399,31 +419,9 @@ const EventDetail: React.FC = () => {
                     />
                   </Div>
                 )}
-                <Button
-                  mb={16}
-                  bg={eventTypeColorFactory(eventInfo.type)}
-                  position="absolute"
-                  bottom={0}
-                  right={10}
-                  color="white">
-                  {eventTypeNameFactory(eventInfo.type)}
-                </Button>
               </Div>
               <Div mx={16}>
-                <Div flexDir="row" justifyContent="space-between" mb={8}>
-                  <Text
-                    fontSize={22}
-                    color={darkFontColor}
-                    w={windowWidth * 0.65}
-                    fontWeight="900">
-                    {eventInfo.title}
-                  </Text>
-                  <ShareButton
-                    text={eventInfo.title}
-                    urlPath={generateClientURL(`/event/${eventInfo.id}`)}
-                  />
-                </Div>
-                <Div alignSelf="flex-end">
+                <Div flexDir="row" alignSelf="flex-end">
                   {eventInfo.type !== 'submission_etc' &&
                   !isFinished &&
                   !eventInfo.isCanceled &&
@@ -463,6 +461,10 @@ const EventDetail: React.FC = () => {
                       締切済み
                     </Text>
                   ) : null}
+                  <ShareButton
+                    text={eventInfo.title}
+                    urlPath={generateClientURL(`/event/${eventInfo.id}`)}
+                  />
                 </Div>
                 <Text
                   mb={8}
