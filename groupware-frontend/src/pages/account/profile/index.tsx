@@ -383,7 +383,7 @@ const Profile = () => {
               onChange={() =>
                 setUserInfo((v) => ({ ...v, isEmailPublic: true }))
               }>
-              公開
+              <Text fontSize="14px">公開</Text>
             </Radio>
             <Radio
               bg="white"
@@ -393,7 +393,7 @@ const Profile = () => {
               onChange={() =>
                 setUserInfo((v) => ({ ...v, isEmailPublic: true }))
               }>
-              非公開
+              <Text fontSize="14px">非公開</Text>
             </Radio>
           </Stack>
         </FormControl>
@@ -418,7 +418,7 @@ const Profile = () => {
               onChange={() =>
                 setUserInfo((v) => ({ ...v, isPhonePublic: true }))
               }>
-              公開
+              <Text fontSize="14px">公開</Text>
             </Radio>
             <Radio
               bg="white"
@@ -428,7 +428,7 @@ const Profile = () => {
               onChange={() =>
                 setUserInfo((v) => ({ ...v, isPhonePublic: false }))
               }>
-              非公開
+              <Text fontSize="14px">非公開</Text>
             </Radio>
           </Stack>
         </FormControl>
