@@ -301,7 +301,7 @@ const Profile = () => {
         ) : null}
       </Box>
       <Box className={profileStyles.form_wrapper}>
-        <Stack direction="row">
+        <Stack direction="row" w="100%">
           <FormControl className={profileStyles.input_wrapper}>
             <FormLabel fontWeight={'bold'} fontSize="14px">
               姓
@@ -331,7 +331,7 @@ const Profile = () => {
             />
           </FormControl>
         </Stack>
-        <Stack direction="row">
+        <Stack direction="row" w="100%">
           <FormControl className={profileStyles.input_wrapper}>
             <FormLabel fontWeight={'bold'} fontSize="14px">
               セイ
