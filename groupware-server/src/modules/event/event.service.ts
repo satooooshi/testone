@@ -370,7 +370,7 @@ export class EventScheduleService {
       .addSelect(selectUserColumns('hostUsers'))
       .leftJoinAndSelect('events.comments', 'comments')
       .leftJoinAndSelect('comments.writer', 'writer')
-      .addSelect(selectUserColumns('hostUsers'))
+      .addSelect(selectUserColumns('writer'))
       .where('events.id = :id', { id })
       .getOne();
     existEvent.userJoiningEvent = existEvent.userJoiningEvent.filter(
