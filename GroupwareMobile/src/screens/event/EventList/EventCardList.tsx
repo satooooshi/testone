@@ -16,6 +16,7 @@ import SearchForm from '../../../components/common/SearchForm';
 import EventFormModal from '../../../components/events/EventFormModal';
 import {useAPICreateEvent} from '../../../hooks/api/event/useAPICreateEvent';
 import {responseErrorMsgFactory} from '../../../utils/factory/responseEroorMsgFactory';
+import {useIsFocused} from '@react-navigation/native';
 
 type EventCardListProps = {
   status: EventStatus;
@@ -51,16 +52,18 @@ const EventCardList: React.FC<EventCardListProps> = ({
     status,
     type,
   });
-  const {isLoading} = useAPIGetEventList(searchQuery, {
+  const isFocused = useIsFocused();
+  const {isLoading, refetch: getEvents} = useAPIGetEventList(searchQuery, {
     onSuccess: data => {
       setEventsForInfiniteScroll(e => {
-        if (e.length) {
+        if (e.length && Number(searchQuery.page) > 1) {
           return [...e, ...data.events];
         }
         return data.events;
       });
     },
   });
+
   const [visibleSearchFormModal, setVisibleSearchFormModal] = useState(false);
   const [eventsForInfinitScroll, setEventsForInfiniteScroll] = useState<
     EventSchedule[]
@@ -72,6 +75,12 @@ const EventCardList: React.FC<EventCardListProps> = ({
       page: q.page ? (Number(q.page) + 1).toString() : '1',
     }));
   };
+
+  useEffect(() => {
+    if (isFocused) {
+      getEvents();
+    }
+  }, [isFocused, getEvents]);
 
   useEffect(() => {
     if (partOfSearchQuery.refetchNeeded) {
@@ -130,7 +139,7 @@ const EventCardList: React.FC<EventCardListProps> = ({
             style={tailwind('h-full pt-4')}
             onEndReached={onEndReached}
             data={eventsForInfinitScroll}
-            keyExtractor={item => item.id.toString()}
+            keyExtractor={item => item.title + item.id.toString()}
             renderItem={({item: eventSchedule}) => (
               <Div mb={16}>
                 <EventCard event={eventSchedule} />
