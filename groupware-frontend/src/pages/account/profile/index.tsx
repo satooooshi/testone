@@ -446,6 +446,7 @@ const Profile = () => {
             name="branch"
             value={userInfo.branch}
             bg="white"
+            border="none"
             height="10"
             onChange={handleChange}>
             <option value={BranchType.NON_SET}>未設定</option>
