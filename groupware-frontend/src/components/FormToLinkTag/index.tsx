@@ -63,11 +63,15 @@ const FormToLinkTag: React.FC<FormToLinkTagProps> = ({
                 isAttached
                 size="xs"
                 colorScheme={tagColorFactory(t.type)}>
-                <Button mr="-px">{t.name}</Button>
+                <Button mr="-px" size="sm" rounded="full">
+                  {t.name}
+                </Button>
                 <IconButton
                   onClick={() => toggleTag(t)}
                   aria-label="削除"
                   icon={<MdCancel size={18} />}
+                  size="sm"
+                  rounded="full"
                 />
               </ButtonGroup>
             </div>
