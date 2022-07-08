@@ -256,32 +256,28 @@ const Profile = () => {
         />
       )}
       <Box className={profileStyles.image_wrapper}>
-        {userInfo.avatarUrl && !selectImageUrl ? (
+        {!selectImageUrl ? (
           <div
             {...getEventImageRootProps({
               className: profileStyles.image_dropzone,
             })}>
             <input {...getEventImageInputProps()} />
-            <img
-              className={profileStyles.avatar}
-              src={croppedImageURL ? croppedImageURL : userInfo.avatarUrl}
-              alt="アバター画像"
-            />
-          </div>
-        ) : null}
-        {!userInfo.avatarUrl && !selectImageUrl ? (
-          <div
-            {...getEventImageRootProps({
-              className: profileStyles.image_dropzone,
-            })}>
-            <input {...getEventImageInputProps()} />
-            <div className={profileStyles.next_image_wrapper}>
-              <Image
+            {userInfo.avatarUrl && (
+              <img
                 className={profileStyles.avatar}
-                src={noImage}
+                src={croppedImageURL ? croppedImageURL : userInfo.avatarUrl}
                 alt="アバター画像"
               />
-            </div>
+            )}
+            {!userInfo.avatarUrl && (
+              <div className={profileStyles.next_image_wrapper}>
+                <Image
+                  className={profileStyles.avatar}
+                  src={noImage}
+                  alt="アバター画像"
+                />
+              </div>
+            )}
           </div>
         ) : null}
         {selectImageUrl ? (
