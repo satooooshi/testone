@@ -4,6 +4,7 @@ import {
   ButtonGroup,
   FormControl,
   IconButton,
+  Text,
 } from '@chakra-ui/react';
 import React from 'react';
 import { MdCancel } from 'react-icons/md';
@@ -11,6 +12,7 @@ import { Tag, TagType } from 'src/types';
 import { tagColorFactory } from 'src/utils/factory/tagColorFactory';
 import { tagTypeNameFactory } from 'src/utils/factory/tagTypeNameFactory';
 import formToLinkTagStyles from '@/styles/components/FormToLinkTag.module.scss';
+import { IoAddOutline } from 'react-icons/io5';
 
 type FormToLinkTagProps = {
   tagType: TagType;
@@ -26,13 +28,20 @@ const FormToLinkTag: React.FC<FormToLinkTagProps> = ({
   tags,
 }) => {
   return (
-    <FormControl
-      w={'100%'}
-      display="flex"
-      flexDir="row"
-      justifyContent="flex-end"
-      alignItems="flex-end"
-      borderBottom="1px solid #b0b0b0">
+    <FormControl w={'100%'} display="flex" flexDir="row">
+      <Button
+        mb={2}
+        px="24px"
+        size="sm"
+        onClick={onEditButtonClick}
+        colorScheme="blue"
+        variant="outline"
+        rounded="full">
+        <Box>
+          <IoAddOutline size="20px" />
+        </Box>
+        <Text fontSize="14px">タグを追加</Text>
+      </Button>
       <Box w={'100%'} display="flex" flexDir="row" flexWrap="wrap">
         {tags
           .filter((t) => t.type === tagType)
@@ -54,13 +63,6 @@ const FormToLinkTag: React.FC<FormToLinkTagProps> = ({
             </div>
           ))}
       </Box>
-      <Button
-        mb={2}
-        size="sm"
-        colorScheme={tagColorFactory(tagType)}
-        onClick={onEditButtonClick}>{`${tagTypeNameFactory(
-        tagType,
-      )}を編集`}</Button>
     </FormControl>
   );
 };
