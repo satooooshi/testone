@@ -28,9 +28,9 @@ const FormToLinkTag: React.FC<FormToLinkTagProps> = ({
   tags,
 }) => {
   return (
-    <FormControl w={'100%'} display="flex" flexDir="row">
+    <FormControl w={'100%'} display="flex" flexDir="row" mb="14px">
       <Button
-        mb={2}
+        mr="20px"
         px="24px"
         size="sm"
         onClick={onEditButtonClick}
@@ -42,7 +42,17 @@ const FormToLinkTag: React.FC<FormToLinkTagProps> = ({
         </Box>
         <Text fontSize="14px">タグを追加</Text>
       </Button>
-      <Box w={'100%'} display="flex" flexDir="row" flexWrap="wrap">
+
+      <Box
+        w="100%"
+        display="flex"
+        flexDir="row"
+        flexWrap="wrap"
+        lineHeight="28px"
+        alignItems="center">
+        <Text fontSize="14px" mr="10px">
+          選択したタグ
+        </Text>
         {tags
           .filter((t) => t.type === tagType)
           .map((t) => (
