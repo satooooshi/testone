@@ -52,7 +52,7 @@ const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
 const WikiStack = () => (
-  <Stack.Navigator initialRouteName="WikiLinks">
+  <Stack.Navigator initialRouteName="WikiList">
     <Stack.Screen
       name="WikiLinks"
       component={WikiLinks}
