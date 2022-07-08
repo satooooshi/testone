@@ -38,7 +38,6 @@ import { useAPILogout } from '@/hooks/api/auth/useAPILogout';
 import { axiosInstance } from 'src/utils/url';
 import { jsonHeader } from 'src/utils/url/header';
 import { GrLogout } from 'react-icons/gr';
-import { IoMdLogOut } from 'react-icons/';
 import { IoSettingsSharp } from 'react-icons/io5';
 
 export enum SidebarScreenName {

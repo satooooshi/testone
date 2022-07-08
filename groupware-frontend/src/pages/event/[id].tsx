@@ -263,7 +263,9 @@ const EventDetail = () => {
 
   const doesntExist = !loadingEventDetail && (!data || !data?.id);
 
+  const previousUrl = document.referrer;
   const tabs: Tab[] = useHeaderTab({
+    previousUrl,
     headerTabType: 'eventDetail',
     onDeleteClicked:
       (user?.role === UserRole.ADMIN || user?.id === data?.author?.id) &&

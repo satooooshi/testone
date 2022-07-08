@@ -141,8 +141,13 @@ const MyAccountInfo = () => {
   });
   const [isSmallerThan1024] = useMediaQuery('(max-width: 1024px)');
   const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
+  const previousUrl = document.referrer;
 
-  const tabs: Tab[] = useHeaderTab({ headerTabType: 'account', user });
+  const tabs: Tab[] = useHeaderTab({
+    headerTabType: 'account',
+    user,
+    previousUrl,
+  });
 
   const topTabBehaviorList: TopTabBehavior[] = [
     {
@@ -199,7 +204,7 @@ const MyAccountInfo = () => {
       header={{
         title: 'Account',
         activeTabName: profile?.id === user?.id ? 'アカウント情報' : '',
-        tabs: profile?.id === user?.id ? tabs : [],
+        tabs: profile?.id !== user?.id ? tabs : [],
         rightButtonName: profile?.id === user?.id ? 'ログアウト' : undefined,
         onClickRightButton:
           profile?.id === user?.id ? () => logout() : undefined,
@@ -426,7 +431,11 @@ const MyAccountInfo = () => {
 
             {activeTab === TabName.EVENT ? (
               events && events.events.length ? (
-                <SimpleGrid columns={{ sm: 1, md: 1, lg: 2 }} spacing="16px">
+                <SimpleGrid
+                  w="100%"
+                  minChildWidth="360px"
+                  maxChildWidth="420px"
+                  spacing="20px">
                   {events.events.map((e) => (
                     <EventCard
                       key={e.id}
@@ -444,7 +453,7 @@ const MyAccountInfo = () => {
 
             {activeTab === TabName.QUESTION ? (
               questionList && questionList.wiki.length ? (
-                <Box>
+                <Box w="100%">
                   {questionList.wiki.map((w) => (
                     <WikiCard wiki={w} key={w.id} />
                   ))}
@@ -456,7 +465,7 @@ const MyAccountInfo = () => {
 
             {activeTab === TabName.KNOWLEDGE ? (
               knowledgeList && knowledgeList.wiki.length ? (
-                <Box>
+                <Box w="100%">
                   {knowledgeList.wiki.map((w) => (
                     <WikiCard wiki={w} key={w.id} />
                   ))}
@@ -470,7 +479,7 @@ const MyAccountInfo = () => {
             {activeTab === TabName.GOOD &&
             profile.userGoodForBoard &&
             profile.userGoodForBoard.length ? (
-              <Box>
+              <Box w="100%">
                 {profile.userGoodForBoard.map((w) => (
                   <WikiCard wiki={w} key={w.id} />
                 ))}

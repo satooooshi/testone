@@ -213,6 +213,7 @@ const SearchInput: React.FC<SearchFormProps> = ({
               bg="white"
               height="10"
               w="24%"
+              minW="160px"
               maxW="230px"
               onChange={onSelect}>
               {selectItems?.length &&
@@ -272,21 +273,21 @@ const SearchModal: React.FC<SearchFormProps> = (props) => {
 const SearchFormResponsively: React.FC<SearchFormProps> = (props) => {
   const { isSmallerThan768, isVisibleSearchModal, showSearchModal } =
     useSearchForm();
-
-  return isSmallerThan768 ? (
-    <>
-      {!isVisibleSearchModal ? (
-        <AiOutlineSearch
-          onClick={() => showSearchModal()}
-          className={searchFormStyles.search_button}
-        />
-      ) : (
-        <SearchModal {...props} />
-      )}
-    </>
-  ) : (
-    <SearchInput {...props} />
-  );
+  return <SearchInput {...props} />;
+  // return isSmallerThan768 ? (
+  //   <>
+  //     {!isVisibleSearchModal ? (
+  //       <AiOutlineSearch
+  //         onClick={() => showSearchModal()}
+  //         className={searchFormStyles.search_button}
+  //       />
+  //     ) : (
+  //       <SearchModal {...props} />
+  //     )}
+  //   </>
+  // ) : (
+  //   <SearchInput {...props} />
+  // );
 };
 
 const SearchForm: React.FC<SearchFormProps> = (props) => {

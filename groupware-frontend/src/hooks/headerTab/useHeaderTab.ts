@@ -34,6 +34,7 @@ type HeaderTabBehavior = {
   onEditClicked?: () => void;
   onCreateClicked?: () => void;
   type?: WikiType;
+  previousUrl?: string;
 };
 
 const headerTab = (headerTabBehavior: HeaderTabBehavior): Tab[] => {
@@ -50,6 +51,7 @@ const headerTab = (headerTabBehavior: HeaderTabBehavior): Tab[] => {
     onDeleteClicked,
     onEditClicked,
     onCreateClicked,
+    previousUrl,
   } = headerTabBehavior;
 
   const headerTabName = '内容を編集';
@@ -181,16 +183,12 @@ const headerTab = (headerTabBehavior: HeaderTabBehavior): Tab[] => {
     case 'account':
       return [
         {
-          name: 'アカウント情報',
-          href: `/account/${user?.id}`,
-        },
-        {
-          name: 'プロフィール編集',
-          href: '/account/profile',
-        },
-        {
-          name: 'パスワード更新',
-          href: '/account/update-password',
+          type: 'backButton',
+          name: '戻る',
+          href:
+            previousUrl?.indexOf('/users/list') !== -1
+              ? previousUrl
+              : '/users/list',
         },
       ];
     case 'home':
@@ -340,7 +338,10 @@ const headerTab = (headerTabBehavior: HeaderTabBehavior): Tab[] => {
         {
           type: 'backButton',
           name: '戻る',
-          href: '/event/list',
+          href:
+            previousUrl?.indexOf('/event/list') !== -1
+              ? previousUrl
+              : '/event/list?page=1&tag=&word=&status=past&from=2022-06-30&to=2022-08-07&personal=',
         },
         {
           type: 'edit',
@@ -373,7 +374,10 @@ const headerTab = (headerTabBehavior: HeaderTabBehavior): Tab[] => {
         {
           type: 'backButton',
           name: '戻る',
-          href: '/wiki/list?page=1&tag=&word=&status=new&type=',
+          href:
+            previousUrl?.indexOf('/wiki/list') !== -1
+              ? previousUrl
+              : '/wiki/list',
         },
         {
           type: 'edit',

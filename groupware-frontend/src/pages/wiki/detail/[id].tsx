@@ -108,10 +108,11 @@ const QuestionDetail = () => {
   const navigateToEditWiki = (id: number) => {
     router.push('/wiki/edit/' + id);
   };
-
+  const previousUrl = document.referrer;
   const tabs: Tab[] = useHeaderTab({
     headerTabType: 'wikiDetail',
     onEditClicked: wiki ? () => navigateToEditWiki(wiki.id) : undefined,
+    previousUrl,
   });
 
   const handleClickStartInputtingReplyButton = (answer: QAAnswer) => {
@@ -264,7 +265,6 @@ const QuestionDetail = () => {
       }
     }, 50);
   }, [wiki?.body]);
-  console.log('---', tabs);
   return (
     <LayoutWithTab
       sidebar={{ activeScreenName: SidebarScreenName.QA }}
