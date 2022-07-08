@@ -13,7 +13,6 @@ import {
 } from '@chakra-ui/react';
 import { useAuthenticate } from 'src/contexts/useAuthenticate';
 import Head from 'next/head';
-import { useHeaderTab } from '@/hooks/headerTab/useHeaderTab';
 import { useFormik } from 'formik';
 import { useAPIUpdatePassword } from '@/hooks/api/user/useAPIUpdatePassword';
 import { updatePasswordSchema } from 'src/utils/validation/schema';
@@ -55,15 +54,12 @@ const UpdatePassword = () => {
       },
     });
 
-  const tabs: Tab[] = useHeaderTab({ headerTabType: 'account', user });
-
   return (
     <LayoutWithTab
       sidebar={{ activeScreenName: SidebarScreenName.ACCOUNT }}
       header={{
         title: 'Account',
         activeTabName: 'パスワード更新',
-        tabs,
       }}>
       <Head>
         <title>ボールド | パスワード更新</title>
