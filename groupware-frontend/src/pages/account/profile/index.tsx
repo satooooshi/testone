@@ -374,7 +374,7 @@ const Profile = () => {
             background="white"
             onChange={handleChange}
           />
-          <Stack spacing={5} direction="row">
+          <Stack spacing={5} direction="row" mt="8px">
             <Radio
               bg="white"
               colorScheme="blue"
@@ -409,7 +409,7 @@ const Profile = () => {
             value={userInfo.phone}
             onChange={handleChange}
           />
-          <Stack spacing={5} direction="row">
+          <Stack spacing={5} direction="row" mt="8px">
             <Radio
               bg="white"
               colorScheme="blue"
