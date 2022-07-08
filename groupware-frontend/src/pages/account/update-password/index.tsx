@@ -83,7 +83,9 @@ const UpdatePassword = () => {
             />
           </FormControl>
           <FormControl className={profileStyles.input_wrapper}>
-            <FormLabel fontWeight={'bold'}>新パスワード</FormLabel>
+            <FormLabel fontWeight={'bold'} fontSize="14px">
+              新パスワード
+            </FormLabel>
             {errors.currentPassword && touched.currentPassword ? (
               <Text fontSize="sm" color="red">
                 {errors.newPassword}
@@ -99,7 +101,9 @@ const UpdatePassword = () => {
             />
           </FormControl>
           <FormControl className={profileStyles.input_wrapper}>
-            <FormLabel fontWeight={'bold'}>新パスワード確認</FormLabel>
+            <FormLabel fontWeight={'bold'} fontSize="14px">
+              新パスワード確認
+            </FormLabel>
             {errors.newPasswordConfirmation &&
             touched.newPasswordConfirmation ? (
               <Text fontSize="sm" color="red">
@@ -122,7 +126,7 @@ const UpdatePassword = () => {
         width="40"
         colorScheme="blue"
         onClick={() => handleSubmit()}>
-        保存
+        <Text fontSize="14px">保存</Text>
       </Button>
     </LayoutWithTab>
   );
