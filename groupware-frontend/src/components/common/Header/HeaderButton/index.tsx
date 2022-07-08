@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button } from '@chakra-ui/react';
+import { Box, Button } from '@chakra-ui/react';
 import { Tab } from 'src/types/header/tab/types';
 import { AiOutlineLeft, AiOutlinePlus } from 'react-icons/ai';
 import { FiEdit2 } from 'react-icons/fi';
@@ -13,17 +13,17 @@ const HeaderButton: React.FC<HeaderButtonProps> = ({ t }) => {
   return (
     <>
       {t.type === 'create' ? (
-        <Button
-          onClick={t.onClick}
-          rounded={50}
-          w="70px"
-          h="35px"
-          colorScheme="blue"
-          right={0}
-          ml="auto"
-          rightIcon={<AiOutlinePlus />}>
-          {t.name}
-        </Button>
+        <Box w="70px" ml="auto" right={0}>
+          <Button
+            onClick={t.onClick}
+            rounded={50}
+            w="70px"
+            h="35px"
+            colorScheme="blue"
+            rightIcon={<AiOutlinePlus />}>
+            {t.name}
+          </Button>
+        </Box>
       ) : t.type === 'edit' || t.type === 'delete' ? (
         <Button
           onClick={t.onClick}

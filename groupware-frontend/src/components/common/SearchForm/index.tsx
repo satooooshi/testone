@@ -110,7 +110,7 @@ const SearchInput: React.FC<SearchFormProps> = ({
           searchFormStyles.search_form_wrapper,
           selectedTags.length && searchFormStyles.selected_tag_top_margin,
         )}>
-        {isSmallerThan680 && (
+        {/* {isSmallerThan680 && (
           <div className={searchFormStyles.close_icon_wrapper}>
             <GiCancel
               onClick={() => hideSearchModal()}
@@ -118,7 +118,7 @@ const SearchInput: React.FC<SearchFormProps> = ({
               className={searchFormStyles.close_icon}
             />
           </div>
-        )}
+        )} */}
         <TagModal
           isOpen={tagModal}
           tags={tags || []}
@@ -189,8 +189,9 @@ const SearchInput: React.FC<SearchFormProps> = ({
           <Box
             ml={isSmallerThan680 ? undefined : 2}
             mt={isSmallerThan680 ? 3 : undefined}
+            w="100%"
             minW="300px"
-            maxW="450px"
+            maxW="500px"
             display="flex"
             flexDir="row">
             <Button
@@ -222,8 +223,9 @@ const SearchInput: React.FC<SearchFormProps> = ({
                 value={selectingItem}
                 bg="white"
                 height="10"
+                w="100%"
                 minW="160px"
-                maxW="230px"
+                maxW="250px"
                 onChange={onSelect}>
                 {selectItems?.length &&
                   selectItems.map((i) => (
