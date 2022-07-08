@@ -464,18 +464,18 @@ const Profile = () => {
             onChange={handleChange}
           />
         </FormControl>
-        <Box mb={2} w={'100%'}>
-          <FormToLinkTag
-            tags={userInfo?.tags || []}
-            tagType={TagType.TECH}
-            toggleTag={toggleSelectedTag}
-            onEditButtonClick={() => dispatchModal({ type: 'openTech' })}
-          />
-        </Box>
         <FormControl mb={6}>
           <FormLabel fontWeight={'bold'} fontSize="14px">
             技術の紹介
           </FormLabel>
+          <Box mb={2} w={'100%'}>
+            <FormToLinkTag
+              tags={userInfo?.tags || []}
+              tagType={TagType.TECH}
+              toggleTag={toggleSelectedTag}
+              onEditButtonClick={() => dispatchModal({ type: 'openTech' })}
+            />
+          </Box>
           <Textarea
             placeholder="技術についての紹介を入力してください"
             type="text"
@@ -487,20 +487,20 @@ const Profile = () => {
             onChange={handleChange}
           />
         </FormControl>
-        <Box mb={2} w={'100%'}>
-          <FormToLinkTag
-            tags={userInfo?.tags || []}
-            tagType={TagType.QUALIFICATION}
-            toggleTag={toggleSelectedTag}
-            onEditButtonClick={() =>
-              dispatchModal({ type: 'openQualification' })
-            }
-          />
-        </Box>
         <FormControl mb={6}>
           <FormLabel fontWeight={'bold'} fontSize="14px">
             資格の紹介
           </FormLabel>
+          <Box mb={2} w={'100%'}>
+            <FormToLinkTag
+              tags={userInfo?.tags || []}
+              tagType={TagType.QUALIFICATION}
+              toggleTag={toggleSelectedTag}
+              onEditButtonClick={() =>
+                dispatchModal({ type: 'openQualification' })
+              }
+            />
+          </Box>
           <Textarea
             placeholder="資格についての紹介を入力してください"
             type="text"
@@ -512,18 +512,19 @@ const Profile = () => {
             onChange={handleChange}
           />
         </FormControl>
-        <Box mb={2} w={'100%'}>
-          <FormToLinkTag
-            tags={userInfo?.tags || []}
-            tagType={TagType.CLUB}
-            toggleTag={toggleSelectedTag}
-            onEditButtonClick={() => dispatchModal({ type: 'openClub' })}
-          />
-        </Box>
+
         <FormControl mb={6}>
           <FormLabel fontWeight={'bold'} fontSize="14px">
             部活動の紹介
           </FormLabel>
+          <Box mb={2} w={'100%'}>
+            <FormToLinkTag
+              tags={userInfo?.tags || []}
+              tagType={TagType.CLUB}
+              toggleTag={toggleSelectedTag}
+              onEditButtonClick={() => dispatchModal({ type: 'openClub' })}
+            />
+          </Box>
           <Textarea
             placeholder="部活動についての紹介を入力してください"
             type="text"
@@ -535,18 +536,18 @@ const Profile = () => {
             onChange={handleChange}
           />
         </FormControl>
-        <Box mb={2} w={'100%'}>
-          <FormToLinkTag
-            tags={userInfo?.tags || []}
-            tagType={TagType.HOBBY}
-            toggleTag={toggleSelectedTag}
-            onEditButtonClick={() => dispatchModal({ type: 'openHobby' })}
-          />
-        </Box>
         <FormControl mb={8}>
           <FormLabel fontWeight={'bold'} fontSize="14px">
             趣味の紹介
           </FormLabel>
+          <Box mb={2} w={'100%'}>
+            <FormToLinkTag
+              tags={userInfo?.tags || []}
+              tagType={TagType.HOBBY}
+              toggleTag={toggleSelectedTag}
+              onEditButtonClick={() => dispatchModal({ type: 'openHobby' })}
+            />
+          </Box>
           <Textarea
             placeholder="趣味についての紹介を入力してください"
             type="text"
