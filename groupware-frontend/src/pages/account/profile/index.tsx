@@ -377,7 +377,7 @@ const Profile = () => {
           <Stack spacing={5} direction="row">
             <Radio
               bg="white"
-              colorScheme="green"
+              colorScheme="blue"
               isChecked={userInfo.isEmailPublic}
               value={'public'}
               onChange={() =>
@@ -387,7 +387,7 @@ const Profile = () => {
             </Radio>
             <Radio
               bg="white"
-              colorScheme="green"
+              colorScheme="blue"
               isChecked={!userInfo.isEmailPublic}
               value={'inPublic'}
               onChange={() =>
@@ -412,7 +412,7 @@ const Profile = () => {
           <Stack spacing={5} direction="row">
             <Radio
               bg="white"
-              colorScheme="green"
+              colorScheme="blue"
               isChecked={userInfo.isPhonePublic}
               value={'public'}
               onChange={() =>
@@ -422,7 +422,7 @@ const Profile = () => {
             </Radio>
             <Radio
               bg="white"
-              colorScheme="green"
+              colorScheme="blue"
               isChecked={!userInfo.isPhonePublic}
               value={'unPublic'}
               onChange={() =>
