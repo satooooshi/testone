@@ -554,7 +554,8 @@ const Profile = () => {
       </Box>
       <Button
         className={profileStyles.update_button_wrapper}
-        width="40"
+        width="25%"
+        rounded="full"
         colorScheme="blue"
         onClick={() => {
           checkErrors();
