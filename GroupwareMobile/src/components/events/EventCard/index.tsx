@@ -101,7 +101,7 @@ const EventCard: React.FC<EventCardProps> = ({event}) => {
         </Div>
         <Div px={8} flexDir="column" w="60%">
           {event.tags?.length ? (
-            <Div my={3}>
+            <Div mt={3}>
               <FlatList
                 horizontal
                 style={eventCardStyles.tagList}
@@ -122,6 +122,7 @@ const EventCard: React.FC<EventCardProps> = ({event}) => {
             </Div>
           ) : null}
           <Text
+            mt={5}
             numberOfLines={2}
             fontWeight="bold"
             fontSize={event.title.length > 12 ? 14 : 16}>
@@ -134,10 +135,12 @@ const EventCard: React.FC<EventCardProps> = ({event}) => {
             <Text
               mt={5}
               numberOfLines={1}
+              fontSize={11}
               color={darkFontColor}
               fontWeight="bold">{`開始: ${startAtText}`}</Text>
             <Text
               numberOfLines={1}
+              fontSize={11}
               color={darkFontColor}
               fontWeight="bold">{`終了: ${endAtText}`}</Text>
           </Div>
