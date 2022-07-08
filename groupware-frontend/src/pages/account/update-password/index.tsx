@@ -1,9 +1,9 @@
 import React from 'react';
 import { SidebarScreenName } from '@/components/layout/Sidebar';
-import { Tab } from 'src/types/header/tab/types';
 import LayoutWithTab from '@/components/layout/LayoutWithTab';
 import profileStyles from '@/styles/layouts/Profile.module.scss';
 import {
+  Box,
   Button,
   FormControl,
   FormLabel,
@@ -17,6 +17,7 @@ import { useFormik } from 'formik';
 import { useAPIUpdatePassword } from '@/hooks/api/user/useAPIUpdatePassword';
 import { updatePasswordSchema } from 'src/utils/validation/schema';
 import router from 'next/router';
+import { AiOutlineArrowLeft } from 'react-icons/ai';
 
 const UpdatePassword = () => {
   const { user } = useAuthenticate();
@@ -64,6 +65,14 @@ const UpdatePassword = () => {
       <Head>
         <title>ボールド | パスワード更新</title>
       </Head>
+      <Box w="100%" mt="20px" mb="40px">
+        <Button bg="white" w="120px" onClick={() => router.back()}>
+          <Box mr="10px">
+            <AiOutlineArrowLeft size="20px" />
+          </Box>
+          <Text fontSize="14px">戻る</Text>
+        </Button>
+      </Box>
       <Box className={profileStyles.form_wrapper} justifyContent="center">
         <FormControl className={profileStyles.input_wrapper}>
           <FormLabel fontWeight={'bold'} fontSize="14px">
