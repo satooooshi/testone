@@ -64,63 +64,65 @@ const UpdatePassword = () => {
       <Head>
         <title>ボールド | パスワード更新</title>
       </Head>
-      <div className={profileStyles.main}>
-        <div className={profileStyles.form_wrapper}>
-          <FormControl className={profileStyles.input_wrapper}>
-            <FormLabel fontWeight={'bold'}>旧パスワード</FormLabel>
-            {errors.currentPassword && touched.currentPassword ? (
-              <Text fontSize="sm" color="red">
-                {errors.currentPassword}
-              </Text>
-            ) : null}
-            <Input
-              type="password"
-              placeholder="現在のパスワードを入力してください"
-              value={values.currentPassword}
-              background="white"
-              name="currentPassword"
-              onChange={handleChange}
-            />
-          </FormControl>
-          <FormControl className={profileStyles.input_wrapper}>
-            <FormLabel fontWeight={'bold'} fontSize="14px">
-              新パスワード
-            </FormLabel>
-            {errors.currentPassword && touched.currentPassword ? (
-              <Text fontSize="sm" color="red">
-                {errors.newPassword}
-              </Text>
-            ) : null}
-            <Input
-              type="password"
-              placeholder="新しいパスワードを入力してください"
-              value={values.newPassword}
-              background="white"
-              name="newPassword"
-              onChange={handleChange}
-            />
-          </FormControl>
-          <FormControl className={profileStyles.input_wrapper}>
-            <FormLabel fontWeight={'bold'} fontSize="14px">
-              新パスワード確認
-            </FormLabel>
-            {errors.newPasswordConfirmation &&
-            touched.newPasswordConfirmation ? (
-              <Text fontSize="sm" color="red">
-                {errors.newPasswordConfirmation}
-              </Text>
-            ) : null}
-            <Input
-              type="password"
-              placeholder="新しいパスワードを入力してください"
-              value={values.newPasswordConfirmation}
-              background="white"
-              name="newPasswordConfirmation"
-              onChange={handleChange}
-            />
-          </FormControl>
-        </div>
-      </div>
+      <Box className={profileStyles.form_wrapper} justifyContent="center">
+        <FormControl className={profileStyles.input_wrapper}>
+          <FormLabel fontWeight={'bold'} fontSize="14px">
+            旧パスワード
+          </FormLabel>
+          {errors.currentPassword && touched.currentPassword ? (
+            <Text fontSize="sm" color="red">
+              {errors.currentPassword}
+            </Text>
+          ) : null}
+          <Input
+            type="password"
+            border="none"
+            placeholder="現在のパスワードを入力してください"
+            value={values.currentPassword}
+            background="white"
+            name="currentPassword"
+            onChange={handleChange}
+          />
+        </FormControl>
+        <FormControl className={profileStyles.input_wrapper}>
+          <FormLabel fontWeight={'bold'} fontSize="14px">
+            新パスワード
+          </FormLabel>
+          {errors.currentPassword && touched.currentPassword ? (
+            <Text fontSize="sm" color="red">
+              {errors.newPassword}
+            </Text>
+          ) : null}
+          <Input
+            type="password"
+            border="none"
+            placeholder="新しいパスワードを入力してください"
+            value={values.newPassword}
+            background="white"
+            name="newPassword"
+            onChange={handleChange}
+          />
+        </FormControl>
+        <FormControl className={profileStyles.input_wrapper}>
+          <FormLabel fontWeight={'bold'} fontSize="14px">
+            新パスワード確認
+          </FormLabel>
+          {errors.newPasswordConfirmation && touched.newPasswordConfirmation ? (
+            <Text fontSize="sm" color="red">
+              {errors.newPasswordConfirmation}
+            </Text>
+          ) : null}
+          <Input
+            type="password"
+            border="none"
+            placeholder="新しいパスワードを入力してください"
+            value={values.newPasswordConfirmation}
+            background="white"
+            name="newPasswordConfirmation"
+            onChange={handleChange}
+          />
+        </FormControl>
+      </Box>
       <Button
         className={profileStyles.update_button_wrapper}
         width="25%"
