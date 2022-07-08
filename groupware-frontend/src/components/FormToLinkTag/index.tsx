@@ -9,10 +9,10 @@ import {
 import React from 'react';
 import { MdCancel } from 'react-icons/md';
 import { Tag, TagType } from 'src/types';
-import { tagColorFactory } from 'src/utils/factory/tagColorFactory';
-import { tagTypeNameFactory } from 'src/utils/factory/tagTypeNameFactory';
 import formToLinkTagStyles from '@/styles/components/FormToLinkTag.module.scss';
 import { IoAddOutline } from 'react-icons/io5';
+import { tagFontColorFactory } from 'src/utils/factory/tagFontColorFactory';
+import { tagBgColorFactory } from 'src/utils/factory/tagBgColorFactory';
 
 type FormToLinkTagProps = {
   tagType: TagType;
@@ -59,14 +59,18 @@ const FormToLinkTag: React.FC<FormToLinkTagProps> = ({
             <div
               className={formToLinkTagStyles.selected_tags_wrapper}
               key={t.id}>
-              <ButtonGroup
-                isAttached
-                size="xs"
-                colorScheme={tagColorFactory(t.type)}>
-                <Button mr="-px" size="sm" rounded="full">
-                  {t.name}
+              <ButtonGroup isAttached size="xs">
+                <Button
+                  color={tagFontColorFactory(t.type)}
+                  backgroundColor={tagBgColorFactory(t.type)}
+                  mr="-10px"
+                  size="sm"
+                  rounded="full">
+                  <Text fontWeight="normal">{t.name}</Text>
                 </Button>
                 <IconButton
+                  color={tagFontColorFactory(t.type)}
+                  backgroundColor={tagBgColorFactory(t.type)}
                   onClick={() => toggleTag(t)}
                   aria-label="削除"
                   icon={<MdCancel size={18} />}
