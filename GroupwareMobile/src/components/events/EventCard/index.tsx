@@ -1,6 +1,6 @@
 import React, {useMemo} from 'react';
 import {EventSchedule, EventType, Tag} from '../../../types';
-import {Div, Text, Tag as TagButton, Icon} from 'react-native-magnus';
+import {Div, Text, Tag as TagButton, Icon, Image} from 'react-native-magnus';
 import FastImage from 'react-native-fast-image';
 import {tagColorFactory} from '../../../utils/factory/tagColorFactory';
 import {FlatList, useWindowDimensions, TouchableHighlight} from 'react-native';
@@ -70,40 +70,69 @@ const EventCard: React.FC<EventCardProps> = ({event}) => {
       }>
       <Div
         w={cardWidth}
-        h={cardWidth * 0.45}
-        bg={grayColor}
+        h={cardWidth * 0.5}
+        minH={cardWidth * 0.5}
+        maxH={cardWidth * 0.6}
+        bg="white"
+        rounded={10}
         shadow="sm"
         borderWidth={1}
         borderColor="gray400"
-        py={4}
-        justifyContent="space-between"
-        flexDir="column">
-        <Div px={8} flexDir="row" h={'75%'}>
+        flexDir="row">
+        <Div
+          borderRightWidth={1}
+          w="40%"
+          justifyContent="center"
+          alignItems="center">
           {event.type !== EventType.SUBMISSION_ETC ? (
-            <Div w="48%" mr={4}>
-              <FastImage
-                style={eventCardStyles.image}
-                resizeMode="contain"
-                source={event.imageURL ? {uri: event.imageURL} : defaultImage()}
+            <Image
+              roundedLeft={10}
+              // style={eventCardStyles.image}
+              // resizeMode="contain"
+              w="100%"
+              h="100%"
+              // minH={cardWidth * 0.5}
+              // maxH={cardWidth * 0.6}
+              source={event.imageURL ? {uri: event.imageURL} : defaultImage()}
+            />
+          ) : (
+            <Icon name="filetext1" fontSize={80} />
+          )}
+        </Div>
+        <Div px={8} flexDir="column" w="60%">
+          {event.tags?.length ? (
+            <Div my={3}>
+              <FlatList
+                horizontal
+                style={eventCardStyles.tagList}
+                data={event.tags || []}
+                renderItem={({item: t}) => (
+                  <TagButton
+                    fontSize={'md'}
+                    h={20}
+                    py={0}
+                    onPress={() => onPressTagButton(t)}
+                    bg={tagColorFactory(t.type)}
+                    color="white"
+                    mr={4}>
+                    {t.name}
+                  </TagButton>
+                )}
               />
             </Div>
-          ) : (
-            <Div w="48%" mr={4} justifyContent="center" alignItems="center">
-              <Icon name="filetext1" fontSize={80} />
-            </Div>
-          )}
-          <Div w="50%">
+          ) : null}
+          <Text
+            numberOfLines={2}
+            fontWeight="bold"
+            fontSize={event.title.length > 12 ? 14 : 16}>
+            {event.title}
+          </Text>
+          <Div minH={50} mt={5}>
+            <Text numberOfLines={3}>{event.description}</Text>
+          </Div>
+          <Div mt="auto" mb={5} borderTopWidth={1} borderColor="gray300">
             <Text
-              numberOfLines={2}
-              fontWeight="bold"
-              fontSize={18}
-              color={darkFontColor}>
-              {event.title}
-            </Text>
-            <Text numberOfLines={1} color={darkFontColor}>
-              {event.description}
-            </Text>
-            <Text
+              mt={5}
               numberOfLines={1}
               color={darkFontColor}
               fontWeight="bold">{`開始: ${startAtText}`}</Text>
@@ -112,25 +141,6 @@ const EventCard: React.FC<EventCardProps> = ({event}) => {
               color={darkFontColor}
               fontWeight="bold">{`終了: ${endAtText}`}</Text>
           </Div>
-        </Div>
-        <Div h={'20%'}>
-          <FlatList
-            horizontal
-            style={eventCardStyles.tagList}
-            data={event.tags || []}
-            renderItem={({item: t}) => (
-              <TagButton
-                fontSize={'lg'}
-                h={28}
-                py={0}
-                onPress={() => onPressTagButton(t)}
-                bg={tagColorFactory(t.type)}
-                color="white"
-                mr={4}>
-                {t.name}
-              </TagButton>
-            )}
-          />
         </Div>
       </Div>
     </TouchableHighlight>
