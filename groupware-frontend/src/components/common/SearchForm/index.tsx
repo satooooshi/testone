@@ -29,7 +29,7 @@ import { tagColorFactory } from 'src/utils/factory/tagColorFactory';
 import { MdCancel } from 'react-icons/md';
 
 const SearchFormContext = createContext({
-  isSmallerThan768: false,
+  isSmallerThan680: false,
   isVisibleSearchModal: false,
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   hideSearchModal: () => {},
@@ -39,7 +39,7 @@ const SearchFormContext = createContext({
 
 const SearchProvider: React.FC = ({ children }) => {
   const [isVisibleSearchModal, setIsVisibleSearchModal] = useState(false);
-  const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
+  const [isSmallerThan680] = useMediaQuery('(max-width: 680px)');
 
   const hideSearchModal = () => {
     setIsVisibleSearchModal(false);
@@ -51,7 +51,7 @@ const SearchProvider: React.FC = ({ children }) => {
   return (
     <SearchFormContext.Provider
       value={{
-        isSmallerThan768,
+        isSmallerThan680,
         isVisibleSearchModal,
         hideSearchModal,
         showSearchModal,
@@ -90,12 +90,12 @@ const SearchInput: React.FC<SearchFormProps> = ({
   const [tagModal, setTagModal] = useState(false);
   const [word, setWord] = useState('');
   const [searchedWord, setSearchedWord] = useState('');
-  const { isSmallerThan768, hideSearchModal } = useSearchForm();
+  const { isSmallerThan680, hideSearchModal } = useSearchForm();
 
   const handleModalSearchButton = () => {
     onClickButton(word);
     setSearchedWord(word);
-    isSmallerThan768 && hideSearchModal();
+    // isSmallerThan680 && hideSearchModal();
   };
 
   return (
@@ -110,7 +110,7 @@ const SearchInput: React.FC<SearchFormProps> = ({
           searchFormStyles.search_form_wrapper,
           selectedTags.length && searchFormStyles.selected_tag_top_margin,
         )}>
-        {isSmallerThan768 && (
+        {isSmallerThan680 && (
           <div className={searchFormStyles.close_icon_wrapper}>
             <GiCancel
               onClick={() => hideSearchModal()}
@@ -133,8 +133,11 @@ const SearchInput: React.FC<SearchFormProps> = ({
           }}
           isSearch={true}
         />
-        <Box display="flex" flexDir="row" w="100%">
-          <InputGroup width="50%" maxW="700px">
+        <Box
+          display="flex"
+          flexDir={isSmallerThan680 ? 'column' : 'row'}
+          w="100%">
+          <InputGroup minW="300px" maxW="700px">
             <InputLeftElement pointerEvents="none">
               <AiOutlineSearch />
             </InputLeftElement>
@@ -183,47 +186,54 @@ const SearchInput: React.FC<SearchFormProps> = ({
               </Button>
             </InputRightElement>
           </InputGroup>
-          <Button
-            ml="1%"
-            bg="white"
-            justifyContent="flex-start"
-            w="24%"
-            maxW="200px"
-            onClick={() => setTagModal(true)}>
-            <Text ml={1}>タグ</Text>
-            {selectedTags.length ? (
-              <Badge
-                ml="auto"
-                bg="blue.400"
-                color="white"
-                w="25px"
-                h="25px"
-                borderRadius="50%"
-                textAlign="center"
-                lineHeight="25px">
-                {selectedTags.length}
-              </Badge>
-            ) : null}
-          </Button>
-          {selectItems && (
-            <Select
-              ml="1%"
-              name="branch"
-              value={selectingItem}
+          <Box
+            ml={isSmallerThan680 ? undefined : 2}
+            mt={isSmallerThan680 ? 3 : undefined}
+            minW="300px"
+            maxW="450px"
+            display="flex"
+            flexDir="row">
+            <Button
               bg="white"
-              height="10"
-              w="24%"
-              minW="160px"
-              maxW="230px"
-              onChange={onSelect}>
-              {selectItems?.length &&
-                selectItems.map((i) => (
-                  <option key={i} value={i}>
-                    {i}
-                  </option>
-                ))}
-            </Select>
-          )}
+              justifyContent="flex-start"
+              w="100%"
+              minW="130px"
+              maxW="200px"
+              onClick={() => setTagModal(true)}>
+              <Text ml={1}>タグ</Text>
+              {selectedTags.length ? (
+                <Badge
+                  ml="auto"
+                  bg="blue.400"
+                  color="white"
+                  w="25px"
+                  h="25px"
+                  borderRadius="50%"
+                  textAlign="center"
+                  lineHeight="25px">
+                  {selectedTags.length}
+                </Badge>
+              ) : null}
+            </Button>
+            {selectItems && (
+              <Select
+                ml={2}
+                name="branch"
+                value={selectingItem}
+                bg="white"
+                height="10"
+                minW="160px"
+                maxW="230px"
+                onChange={onSelect}>
+                {selectItems?.length &&
+                  selectItems.map((i) => (
+                    <option key={i} value={i}>
+                      {i}
+                    </option>
+                  ))}
+              </Select>
+            )}
+          </Box>
         </Box>
       </div>
       <Box display="flex" mt={2} alignItems="center">
@@ -271,10 +281,10 @@ const SearchModal: React.FC<SearchFormProps> = (props) => {
 };
 
 const SearchFormResponsively: React.FC<SearchFormProps> = (props) => {
-  const { isSmallerThan768, isVisibleSearchModal, showSearchModal } =
+  const { isSmallerThan680, isVisibleSearchModal, showSearchModal } =
     useSearchForm();
   return <SearchInput {...props} />;
-  // return isSmallerThan768 ? (
+  // return isSmallerThan680 ? (
   //   <>
   //     {!isVisibleSearchModal ? (
   //       <AiOutlineSearch
