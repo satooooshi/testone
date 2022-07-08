@@ -245,7 +245,8 @@ const Home: React.FC = () => {
               type="wiki"
               onPress={() => {
                 navigation.navigate('WikiStack', {
-                  screen: 'WikiLinks',
+                  screen: 'WikiList',
+                  params: {},
                 });
               }}
             />
