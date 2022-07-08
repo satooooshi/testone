@@ -1,6 +1,5 @@
 import React, { useCallback, useRef, useReducer } from 'react';
 import { SidebarScreenName } from '@/components/layout/Sidebar';
-import { Tab } from 'src/types/header/tab/types';
 import LayoutWithTab from '@/components/layout/LayoutWithTab';
 import profileStyles from '@/styles/layouts/Profile.module.scss';
 import { useAPIUpdateUser } from '@/hooks/api/user/useAPIUpdateUser';
