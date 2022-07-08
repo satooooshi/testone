@@ -87,7 +87,7 @@ const EventParticipants: React.FC<EventParticipantsProps> = ({
         <SimpleGrid
           minChildWidth="120px"
           spacing="10px"
-          display={users.length < 4 ? 'flex' : undefined}
+          display={users.length < 5 ? 'flex' : undefined}
           // justifyContent="flex-start"
           flexWrap="wrap">
           {users.map((u, index) =>
