@@ -45,8 +45,12 @@ import tailwind from 'tailwind-rn';
 import {useAuthenticate} from '../../../contexts/useAuthenticate';
 import GoodSendersModal from '../../../components/chat/GoodSendersModal';
 import {useAPIToggleGoodForBoard} from '../../../hooks/api/wiki/useAPIToggleGoodForBoard';
-import {dateTimeFormatterFromJSDDate} from '../../../utils/dateTimeFormatterFromJSDate';
+import {
+  dateTimeFormatterFromJSDDate,
+  dateTimeFormatterFromJSDDateWithoutTime,
+} from '../../../utils/dateTimeFormatterFromJSDate';
 import {useIsTabBarVisible} from '../../../contexts/bottomTab/useIsTabBarVisible';
+import {wikiCardStyles} from '../../../styles/component/wiki/wikiCard.style';
 
 const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
   const isFocused = useIsFocused();
@@ -188,10 +192,29 @@ const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
         scrollEventThrottle={100}
         contentContainerStyle={{
           ...wikiDetailStyles.wrapper,
-          width: windowWidth * 0.9,
+          width: windowWidth,
         }}>
         {wikiState && wikiState.writer ? (
           <Div flexDir="column" w={'100%'}>
+            {wikiState?.tags ? (
+              <FlatList
+                style={tailwind('my-2')}
+                horizontal
+                data={wikiState?.tags || []}
+                renderItem={({item: t}) => (
+                  <Tag
+                    fontSize={'md'}
+                    h={21}
+                    py={0}
+                    px={8}
+                    bg={tagColorFactory(t.type)}
+                    color="white"
+                    mr={4}>
+                    {t.name}
+                  </Tag>
+                )}
+              />
+            ) : null}
             <Div mb={16} flexDir="row" justifyContent="space-between" mt="sm">
               <Text
                 fontWeight="bold"
@@ -206,23 +229,7 @@ const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
                 text={wikiState.title}
               />
             </Div>
-            <FlatList
-              style={tailwind('mb-4')}
-              horizontal
-              data={wikiState?.tags || []}
-              renderItem={({item: t}) => (
-                <Tag
-                  fontSize={'md'}
-                  h={21}
-                  py={0}
-                  px={8}
-                  bg={tagColorFactory(t.type)}
-                  color="white"
-                  mr={4}>
-                  {t.name}
-                </Tag>
-              )}
-            />
+
             <Div flexDir="column" mb={16}>
               <Div
                 flexDir="row"
@@ -247,14 +254,14 @@ const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
                   {userNameFactory(wikiState.writer)}
                 </Text>
               </Div>
-              <Div flexDir="column" alignItems="flex-end">
+              <Div flexDir="column" alignItems="flex-start" mt={10}>
                 <Text textAlignVertical="bottom" textAlign="center">
-                  {`投稿日: ${dateTimeFormatterFromJSDDate({
+                  {`投稿日: ${dateTimeFormatterFromJSDDateWithoutTime({
                     dateTime: new Date(wikiState.createdAt),
                   })}`}
                 </Text>
                 <Text textAlignVertical="bottom" textAlign="center">
-                  {`最終更新日: ${dateTimeFormatterFromJSDDate({
+                  {`最終更新日: ${dateTimeFormatterFromJSDDateWithoutTime({
                     dateTime: new Date(wikiState.updatedAt),
                   })}`}
                 </Text>
