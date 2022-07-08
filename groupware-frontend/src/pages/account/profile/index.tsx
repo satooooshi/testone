@@ -316,6 +316,7 @@ const Profile = () => {
               placeholder="山田"
               value={userInfo.lastName}
               background="white"
+              border="none"
               onChange={handleChange}
             />
           </FormControl>
@@ -329,6 +330,7 @@ const Profile = () => {
               placeholder="太郎"
               value={userInfo.firstName}
               background="white"
+              border="none"
               onChange={handleChange}
             />
           </FormControl>
@@ -344,6 +346,7 @@ const Profile = () => {
               placeholder="ヤマダ"
               value={userInfo.lastNameKana}
               background="white"
+              border="none"
               onChange={handleChange}
             />
           </FormControl>
@@ -358,6 +361,7 @@ const Profile = () => {
               placeholder="タロウ"
               value={userInfo.firstNameKana}
               background="white"
+              border="none"
               onChange={handleChange}
             />
           </FormControl>
@@ -372,6 +376,7 @@ const Profile = () => {
             placeholder="email@example.com"
             value={userInfo.email}
             background="white"
+            border="none"
             onChange={handleChange}
           />
           <Stack spacing={5} direction="row" mt="8px">
@@ -406,6 +411,7 @@ const Profile = () => {
             name="phone"
             placeholder="000-0000-0000"
             background="white"
+            border="none"
             value={userInfo.phone}
             onChange={handleChange}
           />
@@ -458,6 +464,7 @@ const Profile = () => {
             placeholder="自己紹介を入力してください"
             value={userInfo.introduceOther}
             background="white"
+            border="none"
             onChange={handleChange}
           />
         </FormControl>
@@ -480,6 +487,7 @@ const Profile = () => {
             height="10"
             value={userInfo.introduceTech}
             background="white"
+            border="none"
             onChange={handleChange}
           />
         </FormControl>
@@ -504,6 +512,7 @@ const Profile = () => {
             height="10"
             value={userInfo.introduceQualification}
             background="white"
+            border="none"
             onChange={handleChange}
           />
         </FormControl>
@@ -526,6 +535,7 @@ const Profile = () => {
             height="10"
             value={userInfo.introduceClub}
             background="white"
+            border="none"
             onChange={handleChange}
           />
         </FormControl>
@@ -548,6 +558,7 @@ const Profile = () => {
             height="10"
             value={userInfo.introduceHobby}
             background="white"
+            border="none"
             onChange={handleChange}
           />
         </FormControl>
