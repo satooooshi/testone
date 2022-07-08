@@ -39,6 +39,7 @@ import { formikErrorMsgFactory } from 'src/utils/factory/formikErrorMsgFactory';
 import { useAPIGetUserTag } from '@/hooks/api/tag/useAPIGetUserTag';
 import FormToLinkTag from '@/components/FormToLinkTag';
 import router from 'next/router';
+import { AiOutlineArrowLeft } from 'react-icons/ai';
 
 type ModalState = {
   isOpen: boolean;
@@ -233,6 +234,14 @@ const Profile = () => {
       <Head>
         <title>ボールド | プロフィール編集</title>
       </Head>
+      <Box w="100%" mt="20px" mb="40px">
+        <Button bg="white" w="120px" onClick={() => router.back()}>
+          <Box mr="10px">
+            <AiOutlineArrowLeft size="20px" />
+          </Box>
+          <Text fontSize="14px">戻る</Text>
+        </Button>
+      </Box>
       {tags && (
         <TagModal
           isOpen={isOpen}
