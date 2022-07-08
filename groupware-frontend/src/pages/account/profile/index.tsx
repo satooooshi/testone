@@ -538,7 +538,7 @@ const Profile = () => {
         onClick={() => {
           checkErrors();
         }}>
-        {isLoading ? <Spinner /> : <Text>更新</Text>}
+        {isLoading ? <Spinner /> : <Text>保存</Text>}
       </Button>
     </LayoutWithTab>
   );
