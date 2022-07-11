@@ -3,6 +3,7 @@ import {
   Body,
   Controller,
   Get,
+  Param,
   Patch,
   Post,
   Query,
@@ -19,6 +20,7 @@ import RequestWithUser from '../auth/requestWithUser.interface';
 import { AttendanceService } from './attendance.service';
 
 export interface GetAttendanceQuery {
+  id: number;
   from_date: string;
   to_date: string;
 }
@@ -37,7 +39,7 @@ export class AttendanceController {
 
   @Get('/')
   @UseGuards(JwtAuthenticationGuard)
-  async getAttendanceSpecificUser(
+  async getMyAttendance(
     @Query() query: GetAttendanceQuery,
     @Req() req: RequestWithUser,
   ) {
