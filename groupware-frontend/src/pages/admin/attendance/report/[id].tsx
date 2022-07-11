@@ -29,8 +29,9 @@ import TopTabBar, { TopTabBehavior } from '@/components/layout/TopTabBar';
 import { useAPIUpdateAttendanceReport } from '@/hooks/api/attendance/attendanceReport/useAPIUpdateAttendanceReport';
 import ReportDetailModal from '@/components/attendance/ReportDetailModal';
 import { useAPIDeleteAttendanceReport } from '@/hooks/api/attendance/attendanceReport/useAPIDeleteAttendanceReport';
+import { useRouter } from 'next/router';
 
-const AttendanceReportRow = ({
+export const AttendanceReportRow = ({
   reportData,
   refetchReports,
 }: {
@@ -38,45 +39,14 @@ const AttendanceReportRow = ({
   refetchReports?: () => void;
 }) => {
   const [detailModal, setDetailModal] = useState(false);
-  const [visibleFormModal, setFormModal] = useState(false);
-  const { mutate: saveReport } = useAPIUpdateAttendanceReport({
-    onSuccess: () => {
-      setFormModal(false);
-      alert('勤怠報告を更新しました。');
-      if (refetchReports) {
-        refetchReports();
-      }
-    },
-    onError: (e) => {
-      alert(responseErrorMsgFactory(e));
-    },
-  });
-  const { mutate: deleteReport } = useAPIDeleteAttendanceReport({
-    onSuccess: () => {
-      setFormModal(false);
-      alert('勤怠報告を削除しました。');
-      if (refetchReports) {
-        refetchReports();
-      }
-    },
-    onError: (e) => {
-      alert(responseErrorMsgFactory(e));
-    },
-  });
 
   return (
     <>
-      <ReportFormModal
-        report={reportData}
-        isOpen={visibleFormModal}
-        onCloseModal={() => setFormModal(false)}
-        onSubmit={(report) => saveReport(report)}
-        onDelete={(reportId) => deleteReport({ reportId: reportId })}
-      />
       <ReportDetailModal
         report={reportData}
         isOpen={detailModal}
         onCloseModal={() => setDetailModal(false)}
+        refetchReports={refetchReports}
       />
       <Td>
         <Text>
@@ -91,22 +61,13 @@ const AttendanceReportRow = ({
           'yyyy/LL/dd',
         )}
       </Td>
-      {reportData.verifiedAt ? (
-        <Td>
-          {DateTime.fromJSDate(new Date(reportData.createdAt)).toFormat(
-            'yyyy/LL/dd',
-          )}
-        </Td>
-      ) : (
-        <Td>
-          <Button
-            fontSize={16}
-            colorScheme="blue"
-            onClick={() => setFormModal(true)}>
-            編集
-          </Button>
-        </Td>
-      )}
+      <Td>
+        {reportData.verifiedAt
+          ? DateTime.fromJSDate(new Date(reportData.verifiedAt)).toFormat(
+              'yyyy/LL/dd',
+            )
+          : null}
+      </Td>
       <Td>
         <Button
           fontSize={16}
@@ -120,12 +81,15 @@ const AttendanceReportRow = ({
 };
 
 const AttendanceReport = () => {
+  const router = useRouter();
+  const { id, userName } = router.query as { id: string; userName: string };
+
   const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
   const tabs: Tab[] = [
-    { type: 'link', name: '勤怠打刻', href: '/attendance/view' },
-    { type: 'link', name: '勤怠報告', href: '/attendance/report' },
-    { type: 'link', name: '入社前申請', href: '/attendance/application' },
+    { type: 'link', name: '勤怠打刻', href: `/admin/attendance/view/${id}` },
+    { type: 'link', name: '勤怠報告', href: `/admin/attendance/report/${id}` },
   ];
+
   const [visibleFormModal, setFormModal] = useState(false);
   const [activeTabName, setActiveTabName] = useState('reportAfterAccepted');
   const [unAcceptedReport, setUnAcceptedREport] = useState<
@@ -207,13 +171,11 @@ const AttendanceReport = () => {
 
   return (
     <LayoutWithTab
-      sidebar={{ activeScreenName: SidebarScreenName.ATTENDANCE }}
+      sidebar={{ activeScreenName: SidebarScreenName.ADMIN }}
       header={{
         title: '勤怠報告',
         tabs,
         activeTabName: '勤怠報告',
-        rightButtonName: '新規勤怠報告',
-        onClickRightButton: () => setFormModal(true),
       }}>
       <Head>
         <title>ボールド | 勤怠報告</title>
@@ -271,9 +233,7 @@ const AttendanceReport = () => {
               <Th minW={'100px'}>日付</Th>
               <Th>区分</Th>
               <Th>送信日</Th>
-              <Th>
-                {activeTabName === 'reportAfterAccepted' ? '受理日' : '編集'}
-              </Th>
+              <Th>受理日</Th>
               <Th>詳細</Th>
             </Tr>
           </Thead>

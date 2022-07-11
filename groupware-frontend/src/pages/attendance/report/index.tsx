@@ -30,7 +30,7 @@ import { useAPIUpdateAttendanceReport } from '@/hooks/api/attendance/attendanceR
 import ReportDetailModal from '@/components/attendance/ReportDetailModal';
 import { useAPIDeleteAttendanceReport } from '@/hooks/api/attendance/attendanceReport/useAPIDeleteAttendanceReport';
 
-const AttendanceReportRow = ({
+const AttendanceReportFormRow = ({
   reportData,
   refetchReports,
 }: {
@@ -281,7 +281,7 @@ const AttendanceReport = () => {
             <Tbody position="relative" borderColor="gray.300" borderWidth={1}>
               {acceptedReport.map((d) => (
                 <Tr key={d.id}>
-                  <AttendanceReportRow
+                  <AttendanceReportFormRow
                     reportData={d}
                     refetchReports={refetchReports}
                   />
@@ -294,7 +294,7 @@ const AttendanceReport = () => {
             <Tbody position="relative" borderColor="gray.300" borderWidth={1}>
               {unAcceptedReport.map((d) => (
                 <Tr key={d.id}>
-                  <AttendanceReportRow
+                  <AttendanceReportFormRow
                     reportData={d}
                     refetchReports={refetchReports}
                   />

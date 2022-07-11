@@ -33,47 +33,6 @@ import { useHeaderTab } from '@/hooks/headerTab/useHeaderTab';
 import { useAPIGetAllUnverifiedAttendanceReport } from '@/hooks/api/attendance/attendanceReport/useAPIGetAllUnverifiedAttendanceReport';
 import UnverifiedAttendanceReportRow from '@/components/attendance/UnverifiedAttendanceReportRow';
 
-const AttendanceReportRow = ({
-  reportData,
-  refetchReports,
-}: {
-  reportData: AttendanceRepo;
-  refetchReports?: () => void;
-}) => {
-  const [detailModal, setDetailModal] = useState(false);
-
-  return (
-    <>
-      <ReportDetailModal
-        report={reportData}
-        isOpen={detailModal}
-        onCloseModal={() => setDetailModal(false)}
-      />
-      <Td>
-        <Text>
-          {DateTime.fromJSDate(new Date(reportData.targetDate)).toFormat(
-            'yyyy/LL/dd',
-          )}
-        </Text>
-      </Td>
-      <Td>{attendanceCategoryName(reportData.category)}</Td>
-      <Td>
-        {DateTime.fromJSDate(new Date(reportData.createdAt)).toFormat(
-          'yyyy/LL/dd',
-        )}
-      </Td>
-      <Td>
-        <Button
-          fontSize={16}
-          colorScheme="blue"
-          onClick={() => setDetailModal(true)}>
-          詳細
-        </Button>
-      </Td>
-    </>
-  );
-};
-
 const AttendanceReportAdmin = () => {
   const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
   const tabs: Tab[] = useHeaderTab({ headerTabType: 'admin' });

@@ -23,16 +23,18 @@ type ReportDetailModalProps = {
   report: AttendanceRepo;
   onCloseModal: () => void;
   isOpen: boolean;
+  refetchReports?: () => void;
 };
 
 const ReportDetailModal: React.FC<ReportDetailModalProps> = (props) => {
-  const { onCloseModal, report, isOpen } = props;
+  const { onCloseModal, report, isOpen, refetchReports } = props;
   const { user } = useAuthenticate();
   const isAdmin = user?.role === UserRole.ADMIN;
   const { mutate: verifyReport } = useAPIVerifyAttendanceReport({
     onSuccess: () => {
       alert('承認が完了しました');
       onCloseModal();
+      refetchReports && refetchReports();
     },
     onError: (e) => {
       alert(responseErrorMsgFactory(e));
@@ -99,11 +101,16 @@ const ReportDetailModal: React.FC<ReportDetailModalProps> = (props) => {
                     : '承認されていません。'}
                 </Text>
               </Box>
-              {isAdmin && (
-                <Button mt={5} mb={3} onPress={() => verifyReport(report)}>
+              {isAdmin && !report.verifiedAt ? (
+                <Button
+                  mt={5}
+                  mb={3}
+                  onClick={() => {
+                    verifyReport(report);
+                  }}>
                   承認
                 </Button>
-              )}
+              ) : null}
             </Box>
           </ModalBody>
         </ModalContent>

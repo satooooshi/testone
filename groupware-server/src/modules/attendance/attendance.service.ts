@@ -183,7 +183,9 @@ export class AttendanceService {
   }
 
   public async getAttendanceReports(userId: number, query: GetAttendanceQuery) {
-    const { from_date: fromDate, to_date: toDate } = query;
+    const { from_date: fromDate, to_date: toDate, id } = query;
+    userId - id ? id : userId;
+
     const attendanceReports = await this.attendanceReport
       .createQueryBuilder('attendance_report')
       .leftJoinAndSelect('attendance_report.user', 'user')
