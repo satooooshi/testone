@@ -495,12 +495,25 @@ const Chat: React.FC = () => {
     if (formData) {
       uploadFile(formData, {
         onSuccess: imageURL => {
-          sendChatMessage({
-            content: imageURL[0],
-            fileName: res.name,
-            type: ChatMessageType.OTHER_FILE,
-            chatGroup: roomDetail ? roomDetail : {...room, id: Number(room.id)},
-          });
+          Alert.alert('', `『${res.name}』を送信しますか？`, [
+            {
+              text: 'キャンセル',
+              style: 'cancel',
+            },
+            {
+              text: '送信',
+              onPress: () => {
+                sendChatMessage({
+                  content: imageURL[0],
+                  fileName: res.name,
+                  type: ChatMessageType.OTHER_FILE,
+                  chatGroup: roomDetail
+                    ? roomDetail
+                    : {...room, id: Number(room.id)},
+                });
+              },
+            },
+          ]);
         },
         onError: () => {
           Alert.alert(
