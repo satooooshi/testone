@@ -1,5 +1,7 @@
+import { useAPIVerifyAttendanceReport } from '@/hooks/api/attendance/attendanceReport/useAPIVerifyAttendanceReport';
 import {
   Box,
+  Button,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -11,9 +13,11 @@ import {
 } from '@chakra-ui/react';
 import { DateTime } from 'luxon';
 import React from 'react';
-import { AttendanceRepo } from 'src/types';
+import { useAuthenticate } from 'src/contexts/useAuthenticate';
+import { AttendanceRepo, UserRole } from 'src/types';
 import { attendanceCategoryName } from 'src/utils/factory/attendanceCategoryName';
 import { attendanceReasonName } from 'src/utils/factory/attendanceReasonName';
+import { responseErrorMsgFactory } from 'src/utils/factory/responseErrorMsgFactory';
 
 type ReportDetailModalProps = {
   report: AttendanceRepo;
@@ -23,6 +27,17 @@ type ReportDetailModalProps = {
 
 const ReportDetailModal: React.FC<ReportDetailModalProps> = (props) => {
   const { onCloseModal, report, isOpen } = props;
+  const { user } = useAuthenticate();
+  const isAdmin = user?.role === UserRole.ADMIN;
+  const { mutate: verifyReport } = useAPIVerifyAttendanceReport({
+    onSuccess: () => {
+      alert('承認が完了しました');
+      onCloseModal();
+    },
+    onError: (e) => {
+      alert(responseErrorMsgFactory(e));
+    },
+  });
   return (
     <Modal
       onClose={onCloseModal}
@@ -60,9 +75,9 @@ const ReportDetailModal: React.FC<ReportDetailModalProps> = (props) => {
               </Box>
               <Box display="flex" flexDir="column" mt={5}>
                 <Text fontWeight="bold">詳細:</Text>
-                <Textarea mt={5} isReadOnly={true}>
+                <Text mt={5} whiteSpace="pre-line">
                   {report.detail ? report.detail : '詳細はありません。'}
-                </Textarea>
+                </Text>
               </Box>
               <Box display="flex" flexDir="row" mt={5}>
                 <Text fontWeight="bold">本社報告日:</Text>
@@ -84,11 +99,11 @@ const ReportDetailModal: React.FC<ReportDetailModalProps> = (props) => {
                     : '承認されていません。'}
                 </Text>
               </Box>
-              {/* {isAdmin && (
-                <Button my="lg" onPress={() => verifyReport(report)}>
+              {isAdmin && (
+                <Button mt={5} mb={3} onPress={() => verifyReport(report)}>
                   承認
                 </Button>
-              )} */}
+              )}
             </Box>
           </ModalBody>
         </ModalContent>

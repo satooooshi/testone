@@ -93,6 +93,15 @@ const ApplicationForm = ({
     window.open(url, '_blank');
   };
 
+  // const handleEnter = (event: React.KeyboardEvent<HTMLInputElement>) => {
+  //   if (event.key === 'Enter') {
+  //     const form = event.target.form;
+  //     const index = [...form].indexOf(event.target);
+  //     form.elements[index + 1].focus();
+  //     event.preventDefault();
+  //   }
+  // };
+
   return (
     <Box borderTopWidth={5} borderTopColor={'blue.600'}>
       {errors?.attendanceTime ? (
@@ -106,6 +115,7 @@ const ApplicationForm = ({
         justifyContent="space-between">
         <FormLabel w="40%">日付</FormLabel>
         <Input
+          // onKeyDown={handleEnter}
           type="date"
           value={
             values.attendanceTime
@@ -251,6 +261,7 @@ const ApplicationForm = ({
           bg="white"
           onChange={(e) => {
             if (isNaN(Number(e.target.value))) {
+              alert('小計は半角数字で入力して下さい。');
               return;
             }
             setValues((a) => ({
