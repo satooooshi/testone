@@ -354,7 +354,7 @@ export class EventScheduleService {
       .leftJoinAndSelect('events.userJoiningEvent', 'userJoiningEvent')
       .leftJoin('userJoiningEvent.user', 'user')
       .addSelect(selectUserColumns('user'))
-      // .leftJoinAndSelect('userJoiningEvent.event', 'event')
+      .leftJoinAndSelect('userJoiningEvent.event', 'event')
       .leftJoinAndSelect('events.tags', 'tags')
       .leftJoinAndSelect('events.files', 'files')
       .leftJoinAndSelect(
