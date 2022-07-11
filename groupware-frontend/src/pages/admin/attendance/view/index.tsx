@@ -58,89 +58,15 @@ const AttendanceTableRow = ({
 }) => {
   const [detailModal, setDetailModal] = useState(false);
   const { user } = useAuthenticate();
-  const [hasWorkingTime, setHasWorkingTime] = useState(true);
   // const [WorkingTime, setWorkingTime] = useState<string | undefined>();
   const [selectedDateForApplication, setSelectedDateForApplication] =
     useState<DateTime>();
-  const toast = useToast();
   const targetData = attendanceData?.filter(
     (a) =>
       DateTime.fromJSDate(new Date(a?.targetDate)).toFormat('yyyy-LL-dd') ===
       date.toFormat('yyyy-LL-dd'),
   )?.[0];
-  const initialValues: Partial<Attendance> = {
-    category: AttendanceCategory.COMMON,
-    targetDate: date.toJSDate(),
-    breakMinutes: '00:00',
-    user: user as User,
-    travelCost: [],
-  };
-  const { mutate: createAttendance } = useAPICreateAttendance({
-    onSuccess: (created) => {
-      setValues(created);
-      toast({
-        title: '申請が完了しました',
-        status: 'success',
-      });
-    },
-  });
-  const { mutate: updateAttendance } = useAPIUpdateAttendance({
-    onSuccess: () => {
-      toast({
-        title: '更新が完了しました',
-        status: 'success',
-      });
-    },
-  });
 
-  const validate = () => {
-    const errorMsg = formikErrorMsgFactory(errors);
-    if (errorMsg && hasWorkingTime) {
-      toast({
-        description: errorMsg,
-        status: 'error',
-        isClosable: true,
-      });
-    }
-  };
-  const { values, handleSubmit, setValues, errors } = useFormik({
-    initialValues: targetData || initialValues,
-    enableReinitialize: true,
-    validationSchema: hasWorkingTime ? attendanceSchema : undefined,
-    validateOnChange: true,
-    validateOnMount: true,
-    onSubmit: (submitted) => {
-      if (
-        submitted?.targetDate &&
-        new Date(submitted?.targetDate)?.getMonth() !== new Date().getMonth()
-      ) {
-        toast({
-          title: '今月のデータのみ編集可能です',
-          status: 'error',
-        });
-        return;
-      }
-      submitted.travelCost = submitted?.travelCost?.filter(
-        (t) => !!t.travelCost,
-      );
-      if (submitted?.id) {
-        updateAttendance(submitted as Attendance);
-        return;
-      }
-      createAttendance(submitted);
-    },
-  });
-
-  const dateToTime = (target: Date | string | undefined) => {
-    if (!target) {
-      return undefined;
-    }
-    const dateObj = new Date(target);
-    if (dateObj instanceof Date) {
-      return DateTime.fromJSDate(dateObj).toFormat('HH:mm');
-    }
-    return undefined;
-  };
   const workingTime = useMemo(() => {
     if (targetData) {
       const breakHourAndMinutes = targetData.breakMinutes.split(':');
@@ -164,17 +90,6 @@ const AttendanceTableRow = ({
     }
   }, [targetData]);
 
-  useEffect(() => {
-    if (targetData) {
-      setValues(targetData);
-    }
-  }, [setValues, targetData]);
-
-  useEffect(() => {
-    if (values.category) {
-      setHasWorkingTime(isDisplayableWorkingTime(values.category));
-    }
-  }, [values.category]);
   return (
     <>
       <Modal
@@ -199,8 +114,8 @@ const AttendanceTableRow = ({
       <Td>
         <Text
           color={
-            values.category !== AttendanceCategory.COMMON
-              ? values.verifiedAt
+            targetData?.category !== AttendanceCategory.COMMON
+              ? targetData?.verifiedAt
                 ? 'red'
                 : 'blue'
               : 'black'
