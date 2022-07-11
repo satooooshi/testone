@@ -3,14 +3,14 @@ import React, {useState} from 'react';
 import {useWindowDimensions} from 'react-native';
 import {Div, ScrollDiv, Text} from 'react-native-magnus';
 import MonthPicker from 'react-native-month-year-picker';
-import UnverifiedAttendanceReportRow from '../../../components/attendance/UnverifiedAttendanceReportRow';
-import DropdownOpenerButton from '../../../components/common/DropdownOpenerButton';
-import HeaderWithTextButton from '../../../components/Header';
-import WholeContainer from '../../../components/WholeContainer';
-import {useAdminHeaderTab} from '../../../contexts/admin/useAdminHeaderTab';
-import {useAPIGetAllUnverifiedAttendanceReport} from '../../../hooks/api/attendance/attendanceReport/useAPIGetAllUnverifiedAttendanceReport';
+import UnverifiedAttendanceReportRow from '../../../../components/attendance/UnverifiedAttendanceReportRow';
+import DropdownOpenerButton from '../../../../components/common/DropdownOpenerButton';
+import HeaderWithTextButton from '../../../../components/Header';
+import WholeContainer from '../../../../components/WholeContainer';
+import {useAdminHeaderTab} from '../../../../contexts/admin/useAdminHeaderTab';
+import {useAPIGetAllUnverifiedAttendanceReport} from '../../../../hooks/api/attendance/attendanceReport/useAPIGetAllUnverifiedAttendanceReport';
 
-const AttendanceReportAdmin: React.FC = () => {
+const AttendanceVerifyReport: React.FC = () => {
   const [month, setMonth] = useState(DateTime.now());
   const windowWidth = useWindowDimensions().width;
   const [dateTimeModal, setDateTimeModal] = useState(false);
@@ -89,4 +89,4 @@ const AttendanceReportAdmin: React.FC = () => {
   );
 };
 
-export default AttendanceReportAdmin;
+export default AttendanceVerifyReport;

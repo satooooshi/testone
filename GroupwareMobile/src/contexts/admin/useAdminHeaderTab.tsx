@@ -34,7 +34,9 @@ export const useAdminHeaderTab = (): Tab[] => {
     {
       name: '勤怠報告',
       onPress: () =>
-        navigation.navigate('AdminStack', {screen: 'AttendanceReportAdmin'}),
+        navigation.navigate('AdminStack', {
+          screen: 'AttendanceVerifyReportAdmin',
+        }),
     },
     {
       name: 'タグ管理',

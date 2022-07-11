@@ -51,7 +51,7 @@ import Application from '../../screens/attendance/Application';
 import DefaultAttendanceForm from '../../screens/attendance/DefaultAttendance';
 import AttendanceReport from '../../screens/attendance/AttendanceReport';
 import AttendanceReportDetail from '../../screens/attendance/AttendanceReportDetail';
-import AttendanceReportAdmin from '../../screens/admin/AttendanceReportAdmin';
+import AttendanceVerifyReport from '../../screens/admin/attendance/AttendanceVerifyReport';
 import IconBadge from 'react-native-icon-badge';
 
 const Tab = createBottomTabNavigator();
@@ -203,8 +203,18 @@ const AdminStack = () => {
         options={{headerShown: false}}
       />
       <Stack.Screen
+        name="AttendanceVerifyReportAdmin"
+        component={AttendanceVerifyReport}
+        options={{headerShown: false}}
+      />
+      <Stack.Screen
         name="AttendanceReportAdmin"
-        component={AttendanceReportAdmin}
+        component={AttendanceVerifyReport}
+        options={{headerShown: false}}
+      />
+      <Stack.Screen
+        name="AttendanceViewAdmin"
+        component={AttendanceVerifyReport}
         options={{headerShown: false}}
       />
     </Stack.Navigator>
