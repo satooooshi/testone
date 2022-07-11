@@ -46,7 +46,8 @@ import { formikErrorMsgFactory } from 'src/utils/factory/formikErrorMsgFactory';
 import { useAPIGetDefaultAttendance } from '@/hooks/api/attendance/useAPIGetDefaultAttendance';
 import DefaultModal from 'src/components/attendance/DefaultModal';
 import { isDisplayableWorkingTime } from 'src/utils/factory/isDisplayableWorkingTime';
-import router from 'next/router';
+import { useRouter } from 'next/router';
+import TravelCostDetailModal from '@/components/attendance/TravelCostDetailModal';
 
 const AttendanceTableRow = ({
   date,
@@ -195,15 +196,6 @@ const AttendanceTableRow = ({
           </ModalBody>
         </ModalContent>
       </Modal>
-      <TravelCostFormModal
-        isOpen={!!selectedDateForApplication}
-        onClose={() => setSelectedDateForApplication(undefined)}
-        attendance={values}
-        setAttendance={setValues}
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        //@ts-ignore
-        date={selectedDateForApplication}
-      />
       <Td>
         <Text
           color={
@@ -218,6 +210,14 @@ const AttendanceTableRow = ({
       </Td>
       {targetData ? (
         <>
+          <TravelCostDetailModal
+            isOpen={!!selectedDateForApplication}
+            onClose={() => setSelectedDateForApplication(undefined)}
+            attendance={targetData}
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            //@ts-ignore
+            date={selectedDateForApplication}
+          />
           <Td>
             <Text> {attendanceCategoryName(targetData?.category)}</Text>
           </Td>
@@ -234,16 +234,20 @@ const AttendanceTableRow = ({
           <Td>{targetData.breakMinutes}</Td>
           <Td>{workingTime}</Td>
           <Td>
-            <Button
-              onClick={() => setSelectedDateForApplication(date)}
-              colorScheme="blue">
-              申請
-            </Button>
+            {targetData.travelCost.length ? (
+              <Button
+                onClick={() => setSelectedDateForApplication(date)}
+                colorScheme="blue">
+                確認
+              </Button>
+            ) : null}
           </Td>
           <Td>
-            <Button colorScheme="blue" onClick={() => setDetailModal(true)}>
-              備考
-            </Button>
+            {targetData.detail.length ? (
+              <Button colorScheme="blue" onClick={() => setDetailModal(true)}>
+                確認
+              </Button>
+            ) : null}
           </Td>
         </>
       ) : null}
@@ -252,9 +256,10 @@ const AttendanceTableRow = ({
 };
 
 const AttendanceView = () => {
-  const { id } = router.query as { id: string };
+  const router = useRouter();
+  const { id, userName } = router.query as { id: string; userName: string };
+
   const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
-  const { data: defaultData } = useAPIGetDefaultAttendance();
   const tabs: Tab[] = [
     { type: 'link', name: '勤怠打刻', href: `/admin/attendance/view/${id}` },
     { type: 'link', name: '勤怠報告', href: `/admin/attendance/report/${id}` },
@@ -293,7 +298,14 @@ const AttendanceView = () => {
         onCloseModal={() => setDefaultModal(false)}
         isOpen={visibleDefaultModal}
       />
-
+      <Box display="flex" ml={10} mr="auto" alignItems="center">
+        <Text fontSize={20} mr={2}>
+          氏名:
+        </Text>
+        <Text fontSize={25} fontWeight="bold">
+          {userName}
+        </Text>
+      </Box>
       <Box display="flex" flexDir="row" justifyContent="flex-start" mb="32px">
         <FormControl
           display="flex"

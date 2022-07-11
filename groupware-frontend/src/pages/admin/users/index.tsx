@@ -6,7 +6,14 @@ import userAdminStyles from '@/styles/layouts/UserAdmin.module.scss';
 import { Tag, User, UserRole } from 'src/types';
 import { useAPIUpdateUser } from '@/hooks/api/user/useAPIUpdateUser';
 import { useAPIDeleteUser } from '@/hooks/api/user/useAPIDeleteUser';
-import { Avatar, Button, Progress, Select, Text } from '@chakra-ui/react';
+import {
+  Avatar,
+  Button,
+  Progress,
+  Select,
+  Text,
+  Link as ChakraLink,
+} from '@chakra-ui/react';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
 import { useAuthenticate } from 'src/contexts/useAuthenticate';
@@ -28,6 +35,7 @@ import { blueColor } from 'src/utils/colors';
 import { FaPen } from 'react-icons/fa';
 import { RiDeleteBin6Line } from 'react-icons/ri';
 import { MdWork } from 'react-icons/md';
+import { userNameFactory } from 'src/utils/factory/userNameFactory';
 
 const UserAdmin: React.FC = () => {
   const router = useRouter();
@@ -200,14 +208,23 @@ const UserAdmin: React.FC = () => {
                 </td>
 
                 <td className={userAdminStyles.delete_icon_wrapper}>
-                  <Link href={`/admin/attendance/view/${u.id}`} passHref>
+                  <ChakraLink
+                    onClick={() =>
+                      router.push(
+                        {
+                          pathname: `/admin/attendance/view`,
+                          query: { id: u.id, userName: userNameFactory(u) },
+                        },
+                        `/admin/attendance/view`,
+                      )
+                    }>
                     <a>
                       <MdWork
                         className={userAdminStyles.delete_icon}
                         color={'orange'}
                       />
                     </a>
-                  </Link>
+                  </ChakraLink>
                 </td>
                 <td className={userAdminStyles.delete_icon_wrapper}>
                   <Link href={`/admin/users/editProfile/${u.id}`} passHref>
