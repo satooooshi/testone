@@ -79,10 +79,6 @@ const TravelForm = ({
     window.open(url, '_blank');
   };
 
-  useEffect(() => {
-    handleSubmit();
-  }, [handleSubmit, values]);
-
   return (
     <Box borderTopWidth={5} borderTopColor={'blue.600'}>
       <Text fontSize={22} fontWeight="bold">{`申請#${
@@ -272,17 +268,8 @@ const TravelForm = ({
       (index === undefined ||
         (index !== undefined && !attendance?.travelCost?.[index + 1])) ? (
         <Box mb="8px" flexDir="row" display="flex" justifyContent="flex-end">
-          <Button
-            colorScheme="blue"
-            onClick={() =>
-              setAttendance((a) => ({
-                ...a,
-                travelCost: a?.travelCost?.length
-                  ? [...a.travelCost, initialValues]
-                  : [values, initialValues],
-              }))
-            }>
-            申請を追加
+          <Button colorScheme="blue" onClick={() => handleSubmit()}>
+            {values.createdAt ? '更新する' : '保存する'}
           </Button>
         </Box>
       ) : null}
@@ -311,23 +298,25 @@ const TravelCostFormModal: React.FC<TravelCostFormModalProps> = ({
           </ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            {attendance?.travelCost?.length ? (
-              attendance?.travelCost?.map((t, index) => (
-                <Box mb="32px" key={t.id}>
-                  <TravelForm
-                    index={index}
-                    attendance={attendance}
-                    setAttendance={setAttendance}
-                    travelCost={t}
-                  />
-                </Box>
-              ))
-            ) : (
+            {attendance?.travelCost?.length
+              ? attendance?.travelCost?.map((t, index) => (
+                  <Box mb="32px" key={t.id}>
+                    <TravelForm
+                      index={index}
+                      attendance={attendance}
+                      setAttendance={setAttendance}
+                      travelCost={t}
+                    />
+                  </Box>
+                ))
+              : null}
+            {!attendance?.travelCost?.length ||
+            attendance?.travelCost?.length < 6 ? (
               <TravelForm
                 attendance={attendance}
                 setAttendance={setAttendance}
               />
-            )}
+            ) : null}
           </ModalBody>
         </ModalContent>
       </>
