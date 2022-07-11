@@ -35,7 +35,7 @@ import {
   User,
 } from 'src/types';
 import { useFormik } from 'formik';
-import { useAPIGetAttendace } from '@/hooks/api/attendance/useAPIGetAttendance';
+import { useAPIGetAttendance } from '@/hooks/api/attendance/useAPIGetAttendance';
 import { useAPICreateAttendance } from '@/hooks/api/attendance/useAPICreateAttendance';
 import { useAPIUpdateAttendance } from '@/hooks/api/attendance/useAPIUpdateAttendance';
 import { useAuthenticate } from 'src/contexts/useAuthenticate';
@@ -398,7 +398,7 @@ const AttendanceView = () => {
   ];
   const [visibleDefaultModal, setDefaultModal] = useState(false);
   const [month, setMonth] = useState(DateTime.now());
-  const { data } = useAPIGetAttendace({
+  const { data } = useAPIGetAttendance({
     from_date: month.startOf('month').toFormat('yyyy-LL-dd'),
     to_date: month.endOf('month').endOf('day').toFormat('yyyy-LL-dd'),
   });

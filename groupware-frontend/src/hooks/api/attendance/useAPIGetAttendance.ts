@@ -20,7 +20,7 @@ const getAttendance = async (
   return response.data;
 };
 
-export const useAPIGetAttendace = (
+export const useAPIGetAttendance = (
   query: GetAttendanceQuery,
   options?: UseQueryOptions<Attendance[], AxiosError>,
 ) => {

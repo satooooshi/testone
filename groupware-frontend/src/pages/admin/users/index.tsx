@@ -208,23 +208,19 @@ const UserAdmin: React.FC = () => {
                 </td>
 
                 <td className={userAdminStyles.delete_icon_wrapper}>
-                  <ChakraLink
-                    onClick={() =>
-                      router.push(
-                        {
-                          pathname: `/admin/attendance/view`,
-                          query: { id: u.id, userName: userNameFactory(u) },
-                        },
-                        `/admin/attendance/view`,
-                      )
-                    }>
+                  <Link
+                    href={{
+                      pathname: `/admin/attendance/view/${u.id}`,
+                      query: { id: u.id, userName: userNameFactory(u) },
+                    }}
+                    as={`/admin/attendance/view/${u.id}`}>
                     <a>
                       <MdWork
                         className={userAdminStyles.delete_icon}
                         color={'orange'}
                       />
                     </a>
-                  </ChakraLink>
+                  </Link>
                 </td>
                 <td className={userAdminStyles.delete_icon_wrapper}>
                   <Link href={`/admin/users/editProfile/${u.id}`} passHref>
