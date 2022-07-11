@@ -198,7 +198,7 @@ const headerTab = (headerTabBehavior: HeaderTabBehavior): Tab[] => {
         {
           type: 'link',
           name: '勤怠報告管理',
-          href: '/admin/attendance-report',
+          href: '/admin/attendance/verifyReport',
         },
         {
           type: 'link',

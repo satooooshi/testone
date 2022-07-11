@@ -27,6 +27,7 @@ import { userRoleNameFactory } from 'src/utils/factory/userRoleNameFactory';
 import { blueColor } from 'src/utils/colors';
 import { FaPen } from 'react-icons/fa';
 import { RiDeleteBin6Line } from 'react-icons/ri';
+import { MdWork } from 'react-icons/md';
 
 const UserAdmin: React.FC = () => {
   const router = useRouter();
@@ -136,6 +137,7 @@ const UserAdmin: React.FC = () => {
               <th className={userAdminStyles.table_head}>メールアドレス</th>
               <th className={userAdminStyles.table_head}>社員区分</th>
               <th className={userAdminStyles.table_head}>認証</th>
+              <th className={userAdminStyles.table_head}>勤怠</th>
               <th className={userAdminStyles.table_head}>編集</th>
               <th className={userAdminStyles.table_head} />
             </tr>
@@ -195,6 +197,17 @@ const UserAdmin: React.FC = () => {
                       承認する
                     </Button>
                   )}
+                </td>
+
+                <td className={userAdminStyles.delete_icon_wrapper}>
+                  <Link href={`/admin/users/editProfile/${u.id}`} passHref>
+                    <a>
+                      <MdWork
+                        className={userAdminStyles.delete_icon}
+                        color={'orange'}
+                      />
+                    </a>
+                  </Link>
                 </td>
                 <td className={userAdminStyles.delete_icon_wrapper}>
                   <Link href={`/admin/users/editProfile/${u.id}`} passHref>
