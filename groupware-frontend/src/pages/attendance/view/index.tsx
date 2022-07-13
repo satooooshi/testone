@@ -390,7 +390,8 @@ const AttendanceRow = ({
 
 const AttendanceView = () => {
   const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
-  const { data: defaultData } = useAPIGetDefaultAttendance();
+  const { data: defaultData, refetch: refetchDefaultData } =
+    useAPIGetDefaultAttendance();
   const tabs: Tab[] = [
     { type: 'link', name: '勤怠打刻', href: '/attendance/view' },
     { type: 'link', name: '勤怠報告', href: '/attendance/report' },
@@ -428,6 +429,7 @@ const AttendanceView = () => {
       <DefaultModal
         onCloseModal={() => setDefaultModal(false)}
         isOpen={visibleDefaultModal}
+        refetch={() => refetchDefaultData()}
       />
 
       <Box display="flex" flexDir="row" justifyContent="flex-start" mb="32px">

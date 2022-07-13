@@ -22,6 +22,7 @@ import { DefaultAttendance } from 'src/types';
 type DefaultModalProps = {
   onCloseModal: () => void;
   isOpen: boolean;
+  refetch: () => void;
 };
 const initialValues: Partial<DefaultAttendance> = {
   attendanceTime: '00:00',
@@ -32,6 +33,7 @@ const initialValues: Partial<DefaultAttendance> = {
 const DefaultModal: React.FC<DefaultModalProps> = ({
   onCloseModal,
   isOpen,
+  refetch,
 }) => {
   const { data } = useAPIGetDefaultAttendance();
   const toast = useToast();
@@ -39,6 +41,7 @@ const DefaultModal: React.FC<DefaultModalProps> = ({
     onSuccess: (updated) => {
       onCloseModal();
       setValues(updated);
+      refetch();
       toast({
         title: '更新が完了しました',
         status: 'success',
@@ -49,6 +52,7 @@ const DefaultModal: React.FC<DefaultModalProps> = ({
     onSuccess: (created) => {
       onCloseModal();
       setValues(created);
+      refetch();
       toast({
         title: '登録が完了しました',
         status: 'success',
