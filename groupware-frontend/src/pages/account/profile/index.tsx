@@ -451,7 +451,6 @@ const Profile = () => {
             value={userInfo.branch}
             bg="white"
             border="none"
-            height="10"
             onChange={handleChange}>
             <option value={BranchType.NON_SET}>未設定</option>
             <option value={BranchType.TOKYO}>東京</option>
@@ -465,7 +464,7 @@ const Profile = () => {
           <Textarea
             type="text"
             name="introduceOther"
-            height="10"
+            height="200px"
             placeholder="自己紹介を入力してください"
             value={userInfo.introduceOther}
             background="white"
@@ -489,7 +488,7 @@ const Profile = () => {
             placeholder="技術についての紹介を入力してください"
             type="text"
             name="introduceTech"
-            height="10"
+            height="200px"
             value={userInfo.introduceTech}
             background="white"
             border="none"
@@ -514,7 +513,7 @@ const Profile = () => {
             placeholder="資格についての紹介を入力してください"
             type="text"
             name="introduceQualification"
-            height="10"
+            height="200px"
             value={userInfo.introduceQualification}
             background="white"
             border="none"
@@ -538,7 +537,7 @@ const Profile = () => {
             placeholder="部活動についての紹介を入力してください"
             type="text"
             name="introduceClub"
-            height="10"
+            height="200px"
             value={userInfo.introduceClub}
             background="white"
             border="none"
@@ -561,7 +560,7 @@ const Profile = () => {
             placeholder="趣味についての紹介を入力してください"
             type="text"
             name="introduceHobby"
-            height="10"
+            height="200px"
             value={userInfo.introduceHobby}
             background="white"
             border="none"

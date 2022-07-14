@@ -166,7 +166,7 @@ const WikiCard: React.FC<WikiCardProps> = ({ wiki, type }) => {
           overflow="hidden">
           {wikiState.title}
         </Text>
-        {wikiState.type === WikiType.BOARD && (
+        {wikiState.type === WikiType.BOARD ? (
           <Box flexDir="row" display="flex" mt={3} alignItems="center" w="100%">
             {wikiState.writer ? (
               <Link
@@ -232,7 +232,7 @@ const WikiCard: React.FC<WikiCardProps> = ({ wiki, type }) => {
               </Link>
             </Box>
           </Box>
-        )}
+        ) : null}
 
         <GoodSendersModal
           isOpen={goodSendersModal}

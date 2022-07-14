@@ -10,7 +10,15 @@ import {
   Platform,
 } from 'react-native';
 import HeaderWithTextButton from '../../../components/Header';
-import {Div, Text, Button, Overlay, ScrollDiv, Icon} from 'react-native-magnus';
+import {
+  Div,
+  Text,
+  Button,
+  Overlay,
+  ScrollDiv,
+  Icon,
+  Tag,
+} from 'react-native-magnus';
 import FastImage from 'react-native-fast-image';
 import {eventDetailStyles} from '../../../styles/screen/event/eventDetail.style';
 import {useAPIGetEventDetail} from '../../../hooks/api/event/useAPIGetEventDetail';
@@ -113,7 +121,8 @@ const EventDetail: React.FC = () => {
   });
   const {mutate: joinEvent} = useAPIJoinEvent({
     onSuccess: () => refetchEvents(),
-    onError: () => {
+    onError: err => {
+      console.log('err', err);
       Alert.alert(
         'イベント参加中にエラーが発生しました。\n時間をおいて再実行してください。',
       );
@@ -368,15 +377,34 @@ const EventDetail: React.FC = () => {
       {eventInfo && (
         <>
           <ScrollDiv>
-            <Div flexDir="column">
-              <Div>
+            <Div
+              flexDir="column"
+              // px={10}
+              w={windowWidth - 20}
+              ml="auto"
+              mr="auto">
+              <Tag
+                my={10}
+                ml={5}
+                fontSize="xs"
+                bg={eventTypeColorFactory(eventInfo.type)}
+                color="white">
+                {eventTypeNameFactory(eventInfo.type)}
+              </Tag>
+              <Text
+                fontSize={eventInfo.title.length > 20 ? 20 : 26}
+                w="100%"
+                fontWeight="900">
+                {eventInfo.title}
+              </Text>
+              <Div mt={5}>
                 {eventInfo.type !== EventType.SUBMISSION_ETC ? (
-                  <Div w="48%" mr={4}>
+                  <Div mr={4}>
                     <FastImage
                       style={{
                         ...eventDetailStyles.image,
-                        width: windowWidth,
-                        minHeight: windowWidth * 0.8,
+                        minHeight: windowWidth * 0.7,
+                        maxHeight: windowWidth * 0.8,
                       }}
                       resizeMode="cover"
                       source={
@@ -399,111 +427,67 @@ const EventDetail: React.FC = () => {
                     />
                   </Div>
                 )}
-                <Button
-                  mb={16}
-                  bg={eventTypeColorFactory(eventInfo.type)}
-                  position="absolute"
-                  bottom={0}
-                  right={10}
-                  color="white">
-                  {eventTypeNameFactory(eventInfo.type)}
-                </Button>
               </Div>
               <Div mx={16}>
-                <Div flexDir="row" justifyContent="space-between" mb={8}>
-                  <Text
-                    fontSize={22}
-                    color={darkFontColor}
-                    w={windowWidth * 0.65}
-                    fontWeight="900">
-                    {eventInfo.title}
-                  </Text>
+                <Div flexDir="row" alignSelf="flex-end" mb={16}>
+                  {eventInfo.type !== 'submission_etc' &&
+                  !isFinished &&
+                  !eventInfo.isCanceled ? (
+                    <Button
+                      fontSize={13}
+                      rounded={50}
+                      bg={'blue600'}
+                      color="white"
+                      onPress={() => {
+                        if (eventInfo.isJoining) {
+                          cancelEvent({eventID: Number(id)});
+                        } else {
+                          joinEvent({eventID: Number(id)});
+                        }
+                      }}>
+                      {eventInfo.isJoining
+                        ? 'キャンセルする'
+                        : 'イベントに参加'}
+                    </Button>
+                  ) : eventInfo.type !== 'submission_etc' &&
+                    !isFinished &&
+                    eventInfo.isCanceled &&
+                    eventInfo.isJoining ? (
+                    <Text
+                      px={10}
+                      fontSize={13}
+                      color="tomato"
+                      textAlign="center"
+                      rounded={50}
+                      borderColor="red"
+                      borderWidth={1}>
+                      キャンセル済み
+                    </Text>
+                  ) : isFinished ? (
+                    <Text color="tomato" fontSize={13}>
+                      締切済み
+                    </Text>
+                  ) : null}
                   <ShareButton
                     text={eventInfo.title}
                     urlPath={generateClientURL(`/event/${eventInfo.id}`)}
                   />
                 </Div>
-                <Div alignSelf="flex-end">
-                  {eventInfo.type !== 'submission_etc' &&
-                  !isFinished &&
-                  !eventInfo.isCanceled &&
-                  !eventInfo.isJoining ? (
-                    <Button
-                      mb={16}
-                      bg={'pink600'}
-                      color="white"
-                      onPress={() => joinEvent({eventID: Number(id)})}>
-                      イベントに参加
-                    </Button>
-                  ) : eventInfo.type !== 'submission_etc' &&
-                    !isFinished &&
-                    !eventInfo.isCanceled &&
-                    eventInfo.isJoining ? (
-                    <Div flexDir="row" alignItems="flex-end" mb={16}>
-                      <Text color="tomato" fontSize={16} mr="sm">
-                        参加済み
-                      </Text>
-                      <Button
-                        bg={'pink600'}
-                        color="white"
-                        onPress={() => cancelEvent({eventID: Number(id)})}
-                        alignSelf="flex-end">
-                        キャンセルする
-                      </Button>
-                    </Div>
-                  ) : eventInfo.type !== 'submission_etc' &&
-                    !isFinished &&
-                    eventInfo.isCanceled &&
-                    eventInfo.isJoining ? (
-                    <Text color="tomato" fontSize={16}>
-                      キャンセル済み
-                    </Text>
-                  ) : isFinished ? (
-                    <Text color="tomato" fontSize={16}>
-                      締切済み
-                    </Text>
-                  ) : null}
-                </Div>
-                <Text
-                  mb={8}
-                  fontSize={16}
-                  fontWeight="bold">{`開始: ${startAtText}`}</Text>
-                <Text
-                  mb={16}
-                  fontSize={16}
-                  fontWeight="bold">{`終了: ${endAtText}`}</Text>
+
                 <Div mb={8}>
-                  <Text>概要</Text>
                   <AutoLinkedText
                     text={eventInfo.description}
                     style={{
-                      ...tailwind(
-                        'text-base font-bold text-gray-700 leading-5',
-                      ),
+                      ...tailwind('text-base  text-gray-700 leading-5'),
                     }}
                     linkStyle={tailwind('text-blue-500')}
                   />
                 </Div>
-                <Div mb={8}>
-                  <Text>開催者/講師</Text>
-                  <FlatList
-                    horizontal
-                    data={eventInfo.hostUsers}
-                    renderItem={({item: u}) => (
-                      <Button
-                        fontSize={'xs'}
-                        h={28}
-                        py={0}
-                        bg="purple"
-                        color="white"
-                        mr={4}>
-                        {userNameFactory(u)}
-                      </Button>
-                    )}
-                  />
-                </Div>
-                <Div mb={8}>
-                  <Text>タグ</Text>
+
+                <Div mb={15}>
+                  <Text fontWeight="bold" fontSize={16} mb={5}>
+                    タグ
+                  </Text>
                   <FlatList
                     horizontal
                     data={eventInfo.tags}
@@ -511,12 +495,39 @@ const EventDetail: React.FC = () => {
                     renderItem={({item: t}) => (
                       <Button
                         fontSize={'xs'}
-                        h={28}
+                        h={20}
                         py={0}
                         bg={tagColorFactory(t.type)}
                         color="white"
                         mr={4}>
                         {t.name}
+                      </Button>
+                    )}
+                  />
+                </Div>
+                <Div mb={15}>
+                  <Text fontWeight="bold" fontSize={16} mb={5}>
+                    日時
+                  </Text>
+                  <Text mb={3} fontSize={13}>{`開始: ${startAtText}`}</Text>
+                  <Text fontSize={13}>{`終了: ${endAtText}`}</Text>
+                </Div>
+                <Div mb={8}>
+                  <Text fontWeight="bold" fontSize={16} mb={5}>
+                    開催者/講師
+                  </Text>
+                  <FlatList
+                    horizontal
+                    data={eventInfo.hostUsers}
+                    renderItem={({item: u}) => (
+                      <Button
+                        fontSize={'xs'}
+                        h={20}
+                        py={0}
+                        bg="purple"
+                        color="white"
+                        mr={4}>
+                        {userNameFactory(u)}
                       </Button>
                     )}
                   />
