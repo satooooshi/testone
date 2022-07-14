@@ -25,7 +25,10 @@ import {
   useToast,
   Text,
   Spinner,
+  Stack,
+  Radio,
 } from '@chakra-ui/react';
+import profileStyles from '@/styles/layouts/Profile.module.scss';
 import { imageExtensions } from 'src/utils/imageExtensions';
 import noImage from '@/public/no-image.jpg';
 import { useAPIRegister } from '@/hooks/api/auth/useAPIRegister';
@@ -45,6 +48,8 @@ import FormToLinkTag from '@/components/FormToLinkTag';
 import { useRouter } from 'next/router';
 import { useAuthenticate } from 'src/contexts/useAuthenticate';
 import { formikErrorMsgFactory } from 'src/utils/factory/formikErrorMsgFactory';
+import { FiEdit2 } from 'react-icons/fi';
+import { AiOutlineArrowLeft } from 'react-icons/ai';
 
 type ModalState = {
   isOpen: boolean;
@@ -99,7 +104,7 @@ const CreateNewUser = () => {
     handleChange,
     handleBlur,
     validateForm,
-    setValues: setUserInfo,
+    setValues: setvalues,
     values,
     resetForm,
   } = useFormik({
@@ -169,13 +174,13 @@ const CreateNewUser = () => {
     dispatchCrop,
   ] = useImageCrop();
 
-  // const [userInfo, setUserInfo] = useState<Partial<User>>(initialUserValues);
+  // const [values, setvalues] = useState<Partial<User>>(initialUserValues);
   const { mutate: uploadImage, isLoading: loadingUplaod } = useAPIUploadStorage(
     {
       onSuccess: async (fileURLs) => {
         const updateEventImageOnState = async () => {
           Promise.resolve();
-          setUserInfo((e) => ({ ...e, avatarUrl: fileURLs[0] }));
+          setvalues((e) => ({ ...e, avatarUrl: fileURLs[0] }));
         };
         await updateEventImageOnState();
         registerUser({ ...values, avatarUrl: fileURLs[0] });
@@ -217,16 +222,14 @@ const CreateNewUser = () => {
           isClosable: true,
         });
         resetForm();
-        // setUserInfo(initialUserValues);
+        // setvalues(initialUserValues);
       }
     },
   });
 
-  const tabs: Tab[] = useHeaderTab({ headerTabType: 'admin' });
-
   const toggleSelectedTag = (t: UserTag) => {
     const toggledTag = toggleTag(values.tags, t);
-    setUserInfo((i) => ({
+    setvalues((i) => ({
       ...i,
       tags: toggledTag,
     }));
@@ -253,12 +256,18 @@ const CreateNewUser = () => {
       }}
       header={{
         title: '新規ユーザー作成',
-        tabs: tabs,
-        activeTabName: 'ユーザー作成',
       }}>
       <Head>
         <title>ボールド | ユーザー作成</title>
       </Head>
+      <Box w="100%" mt="20px" mb="40px">
+        <Button bg="white" w="120px" onClick={() => router.back()}>
+          <Box mr="10px">
+            <AiOutlineArrowLeft size="20px" />
+          </Box>
+          <Text fontSize="14px">戻る</Text>
+        </Button>
+      </Box>
       {tags && (
         <TagModal
           isOpen={isOpen}
@@ -273,198 +282,252 @@ const CreateNewUser = () => {
           onComplete={() => dispatchModal({ type: 'close' })}
         />
       )}
-      <div className={createNewUserStyles.main}>
-        <div className={createNewUserStyles.image_wrapper}>
-          {imageURL ? (
-            <ReactCrop
-              keepSelection={true}
-              src={imageURL}
-              crop={crop}
-              onChange={(newCrop) =>
-                dispatchCrop({ type: 'setCrop', value: newCrop })
-              }
-              onComplete={(newCrop) =>
-                dispatchCrop({
-                  type: 'setCompletedCrop',
-                  value: newCrop,
-                  ref: imgRef.current,
-                })
-              }
-              onImageLoaded={onLoad}
-              circularCrop={true}
-            />
-          ) : (
-            <div
-              {...getEventImageRootProps({
-                className: createNewUserStyles.image_dropzone,
-              })}>
+      <Box className={profileStyles.image_wrapper} mb="32px">
+        {!imageURL ? (
+          <div {...getEventImageRootProps()}>
+            <div className={profileStyles.image_dropzone}>
               <input {...getEventImageInputProps()} />
-              <div className={createNewUserStyles.next_image_wrapper}>
-                <Image
-                  className={createNewUserStyles.avatar}
-                  src={noImage}
+              {values.avatarUrl && (
+                <img
+                  className={profileStyles.avatar}
+                  src={croppedImageURL ? croppedImageURL : values.avatarUrl}
                   alt="アバター画像"
                 />
-              </div>
+              )}
+              {!values.avatarUrl && (
+                <div className={profileStyles.next_image_wrapper}>
+                  <Image
+                    className={profileStyles.avatar}
+                    src={noImage}
+                    alt="アバター画像"
+                  />
+                </div>
+              )}
             </div>
-          )}
-        </div>
-        <div className={createNewUserStyles.form_wrapper}>
-          <FormControl className={createNewUserStyles.input_wrapper}>
-            <FormLabel fontWeight={'bold'}>
-              <p>姓</p>
+            <Stack
+              justifyContent="center"
+              direction="row"
+              my="8px"
+              cursor="pointer"
+              color="blue.400">
+              <FiEdit2 />
+              <Text fontSize="14px">写真を編集する</Text>
+            </Stack>
+          </div>
+        ) : null}
+        {imageURL ? (
+          <ReactCrop
+            keepSelection={true}
+            src={imageURL}
+            crop={crop}
+            onChange={(newCrop) => {
+              dispatchCrop({ type: 'setCrop', value: newCrop });
+            }}
+            onComplete={(c) => {
+              dispatchCrop({
+                type: 'setCompletedCrop',
+                value: c,
+                ref: imgRef.current,
+              });
+            }}
+            onImageLoaded={onLoad}
+            circularCrop={true}
+          />
+        ) : null}
+      </Box>
+      <Box className={profileStyles.form_wrapper}>
+        <Stack direction="row" w="100%">
+          <FormControl className={profileStyles.input_wrapper}>
+            <FormLabel fontWeight={'bold'} fontSize="14px">
+              姓
             </FormLabel>
             <Input
               type="text"
+              name="lastName"
               placeholder="山田"
               value={values.lastName}
               background="white"
-              name="lastName"
+              border="none"
               onChange={handleChange}
             />
           </FormControl>
-          <FormControl className={createNewUserStyles.input_wrapper}>
-            <FormLabel fontWeight={'bold'}>
-              <p>名</p>
+          <FormControl className={profileStyles.input_wrapper}>
+            <FormLabel fontWeight={'bold'} fontSize="14px">
+              名
             </FormLabel>
             <Input
               type="text"
+              name="firstName"
               placeholder="太郎"
               value={values.firstName}
               background="white"
-              onChange={(e) =>
-                setUserInfo((i) => ({ ...i, firstName: e.target.value }))
-              }
-              name="firstName"
+              border="none"
+              onChange={handleChange}
             />
           </FormControl>
-          <FormControl className={createNewUserStyles.input_wrapper}>
-            <FormLabel fontWeight={'bold'}>姓(フリガナ)</FormLabel>
+        </Stack>
+        <Stack direction="row" w="100%">
+          <FormControl className={profileStyles.input_wrapper}>
+            <FormLabel fontWeight={'bold'} fontSize="14px">
+              セイ
+            </FormLabel>
             <Input
               type="text"
               name="lastNameKana"
               placeholder="ヤマダ"
               value={values.lastNameKana}
               background="white"
+              border="none"
               onChange={handleChange}
             />
           </FormControl>
-          <FormControl className={createNewUserStyles.input_wrapper}>
-            <FormLabel fontWeight={'bold'}>名(フリガナ)</FormLabel>
+
+          <FormControl className={profileStyles.input_wrapper}>
+            <FormLabel fontWeight={'bold'} fontSize="14px">
+              メイ
+            </FormLabel>
             <Input
               type="text"
               name="firstNameKana"
               placeholder="タロウ"
               value={values.firstNameKana}
               background="white"
+              border="none"
               onChange={handleChange}
             />
           </FormControl>
-          <FormControl className={createNewUserStyles.input_wrapper}>
-            <FormLabel fontWeight={'bold'}>
-              <p>メールアドレス</p>
-            </FormLabel>
-            <Input
-              type="email"
-              placeholder="email@example.com"
-              value={values.email}
-              background="white"
-              onChange={(e) =>
-                setUserInfo((i) => ({ ...i, email: e.target.value }))
-              }
-              name="email"
-            />
-          </FormControl>
-          <FormControl className={createNewUserStyles.input_wrapper}>
-            <FormLabel fontWeight={'bold'}>
-              <p>電話番号</p>
-            </FormLabel>
-            <Input
-              type="phone"
-              placeholder="000-0000-0000"
-              value={values.phone}
-              background="white"
-              onChange={(e) =>
-                setUserInfo((i) => ({ ...i, phone: e.target.value }))
-              }
-              name="phone"
-            />
-          </FormControl>
-          <FormControl className={createNewUserStyles.input_wrapper}>
-            <FormLabel fontWeight={'bold'}>
-              <p>社員区分</p>
-            </FormLabel>
-            <Select
-              name="role"
-              value={values.role}
-              colorScheme="teal"
+        </Stack>
+        <FormControl className={profileStyles.input_wrapper}>
+          <FormLabel fontWeight={'bold'} fontSize="14px">
+            メールアドレス
+          </FormLabel>
+          <Input
+            type="email"
+            name="email"
+            placeholder="email@example.com"
+            value={values.email}
+            background="white"
+            border="none"
+            onChange={handleChange}
+          />
+          <Stack spacing={5} direction="row" mt="8px">
+            <Radio
               bg="white"
-              onChange={handleChange}
-              defaultValue={UserRole.COMMON}>
-              <option value={UserRole.ADMIN}>管理者</option>
-              <option value={UserRole.EXTERNAL_INSTRUCTOR}>
-                {userRoleNameFactory(UserRole.EXTERNAL_INSTRUCTOR)}
-              </option>
-              <option value={UserRole.INTERNAL_INSTRUCTOR}>
-                {userRoleNameFactory(UserRole.INTERNAL_INSTRUCTOR)}
-              </option>
-              <option value={UserRole.COACH}>コーチ</option>
-              <option value={UserRole.COMMON}>一般社員</option>
-            </Select>
-          </FormControl>
-          <FormControl mb={4}>
-            <FormLabel fontWeight={'bold'}>所属支社</FormLabel>
-            <Select
-              name="branch"
-              value={values.branch}
-              defaultValue={BranchType.NON_SET}
+              colorScheme="blue"
+              isChecked={values.isEmailPublic}
+              value={'public'}
+              onChange={() =>
+                setvalues((v) => ({ ...v, isEmailPublic: true }))
+              }>
+              <Text fontSize="14px">公開</Text>
+            </Radio>
+            <Radio
               bg="white"
-              height="10"
-              onChange={handleChange}>
-              <option value={BranchType.NON_SET}>未設定</option>
-              <option value={BranchType.TOKYO}>東京</option>
-              <option value={BranchType.OSAKA}>大阪</option>
-            </Select>
-          </FormControl>
-          <FormControl className={createNewUserStyles.input_wrapper}>
-            <FormLabel fontWeight={'bold'}>
-              <p>社員コード</p>
-            </FormLabel>
-            <Input
-              type="text"
-              placeholder="社員コード"
-              value={values.employeeId || ''}
-              background="white"
-              name="employeeId"
-              onChange={handleChange}
-            />
-          </FormControl>
-          <FormControl mb={4}></FormControl>
-          <FormControl className={createNewUserStyles.input_wrapper}>
-            <FormLabel fontWeight={'bold'}>
-              <p>パスワード</p>
-            </FormLabel>
-            <Input
-              placeholder="password"
-              value={values.password}
-              background="white"
-              name="password"
-              onChange={handleChange}
-            />
-          </FormControl>
-          <FormControl mb={4}>
-            <FormLabel fontWeight={'bold'}>自己紹介</FormLabel>
-            <Textarea
-              placeholder="自己紹介を入力してください"
-              type="text"
-              height="10"
-              value={values.introduceOther}
-              background="white"
-              name="introduceOther"
-              onChange={handleChange}
-            />
-          </FormControl>
-
+              colorScheme="blue"
+              isChecked={!values.isEmailPublic}
+              value={'inPublic'}
+              onChange={() =>
+                setvalues((v) => ({ ...v, isEmailPublic: true }))
+              }>
+              <Text fontSize="14px">非公開</Text>
+            </Radio>
+          </Stack>
+        </FormControl>
+        <FormControl className={profileStyles.input_wrapper}>
+          <FormLabel fontWeight={'bold'} fontSize="14px">
+            電話番号
+          </FormLabel>
+          <Input
+            type="phone"
+            name="phone"
+            placeholder="000-0000-0000"
+            background="white"
+            border="none"
+            value={values.phone}
+            onChange={handleChange}
+          />
+          <Stack spacing={5} direction="row" mt="8px">
+            <Radio
+              bg="white"
+              colorScheme="blue"
+              isChecked={values.isPhonePublic}
+              value={'public'}
+              onChange={() =>
+                setvalues((v) => ({ ...v, isPhonePublic: true }))
+              }>
+              <Text fontSize="14px">公開</Text>
+            </Radio>
+            <Radio
+              bg="white"
+              colorScheme="blue"
+              isChecked={!values.isPhonePublic}
+              value={'unPublic'}
+              onChange={() =>
+                setvalues((v) => ({ ...v, isPhonePublic: false }))
+              }>
+              <Text fontSize="14px">非公開</Text>
+            </Radio>
+          </Stack>
+        </FormControl>
+        <FormControl mb={4}>
+          <FormLabel fontWeight={'bold'} fontSize="14px">
+            所属支社
+          </FormLabel>
+          <Select
+            name="branch"
+            value={values.branch}
+            bg="white"
+            border="none"
+            onChange={handleChange}>
+            <option value={BranchType.NON_SET}>未設定</option>
+            <option value={BranchType.TOKYO}>東京</option>
+            <option value={BranchType.OSAKA}>大阪</option>
+          </Select>
+        </FormControl>
+        <FormControl mb={4}>
+          <FormLabel fontWeight={'bold'} fontSize={14}>
+            <p>社員コード</p>
+          </FormLabel>
+          <Input
+            type="text"
+            placeholder="社員コード"
+            value={values.employeeId || ''}
+            background="white"
+            name="employeeId"
+            onChange={handleChange}
+          />
+        </FormControl>
+        <FormControl mb={4}>
+          <FormLabel fontWeight={'bold'} fontSize={14}>
+            <p>パスワード</p>
+          </FormLabel>
+          <Input
+            placeholder="password"
+            value={values.password}
+            background="white"
+            name="password"
+            onChange={handleChange}
+          />
+        </FormControl>
+        <FormControl mb={4}>
+          <FormLabel fontWeight={'bold'} fontSize="14px">
+            自己紹介
+          </FormLabel>
+          <Textarea
+            type="text"
+            name="introduceOther"
+            height="200px"
+            placeholder="自己紹介を入力してください"
+            value={values.introduceOther}
+            background="white"
+            border="none"
+            onChange={handleChange}
+          />
+        </FormControl>
+        <FormControl mb={6}>
+          <FormLabel fontWeight={'bold'} fontSize="14px">
+            技術の紹介
+          </FormLabel>
           <Box mb={2} w={'100%'}>
             <FormToLinkTag
               tags={values?.tags || []}
@@ -473,18 +536,21 @@ const CreateNewUser = () => {
               onEditButtonClick={() => dispatchModal({ type: 'openTech' })}
             />
           </Box>
-          <FormControl mb={6}>
-            <FormLabel fontWeight={'bold'}>技術の紹介</FormLabel>
-            <Textarea
-              placeholder="技術についての紹介を入力してください"
-              type="text"
-              height="10"
-              background="white"
-              value={values.introduceTech}
-              name="introduceTech"
-              onChange={handleChange}
-            />
-          </FormControl>
+          <Textarea
+            placeholder="技術についての紹介を入力してください"
+            type="text"
+            name="introduceTech"
+            height="200px"
+            value={values.introduceTech}
+            background="white"
+            border="none"
+            onChange={handleChange}
+          />
+        </FormControl>
+        <FormControl mb={6}>
+          <FormLabel fontWeight={'bold'} fontSize="14px">
+            資格の紹介
+          </FormLabel>
           <Box mb={2} w={'100%'}>
             <FormToLinkTag
               tags={values?.tags || []}
@@ -495,18 +561,22 @@ const CreateNewUser = () => {
               }
             />
           </Box>
-          <FormControl mb={6}>
-            <FormLabel fontWeight={'bold'}>資格の紹介</FormLabel>
-            <Textarea
-              type="text"
-              placeholder="資格についての紹介を入力してください"
-              height="10"
-              value={values.introduceQualification}
-              background="white"
-              name="introduceQualification"
-              onChange={handleChange}
-            />
-          </FormControl>
+          <Textarea
+            placeholder="資格についての紹介を入力してください"
+            type="text"
+            name="introduceQualification"
+            height="200px"
+            value={values.introduceQualification}
+            background="white"
+            border="none"
+            onChange={handleChange}
+          />
+        </FormControl>
+
+        <FormControl mb={6}>
+          <FormLabel fontWeight={'bold'} fontSize="14px">
+            部活動の紹介
+          </FormLabel>
           <Box mb={2} w={'100%'}>
             <FormToLinkTag
               tags={values?.tags || []}
@@ -515,18 +585,21 @@ const CreateNewUser = () => {
               onEditButtonClick={() => dispatchModal({ type: 'openClub' })}
             />
           </Box>
-          <FormControl mb={6}>
-            <FormLabel fontWeight={'bold'}>部活動の紹介</FormLabel>
-            <Textarea
-              type="text"
-              placeholder="部活動についての紹介を入力してください"
-              height="10"
-              value={values.introduceClub}
-              background="white"
-              name="introduceClub"
-              onChange={handleChange}
-            />
-          </FormControl>
+          <Textarea
+            placeholder="部活動についての紹介を入力してください"
+            type="text"
+            name="introduceClub"
+            height="200px"
+            value={values.introduceClub}
+            background="white"
+            border="none"
+            onChange={handleChange}
+          />
+        </FormControl>
+        <FormControl mb={8}>
+          <FormLabel fontWeight={'bold'} fontSize="14px">
+            趣味の紹介
+          </FormLabel>
           <Box mb={2} w={'100%'}>
             <FormToLinkTag
               tags={values?.tags || []}
@@ -535,29 +608,27 @@ const CreateNewUser = () => {
               onEditButtonClick={() => dispatchModal({ type: 'openHobby' })}
             />
           </Box>
-          <FormControl mb={8}>
-            <FormLabel fontWeight={'bold'}>趣味の紹介</FormLabel>
-            <Textarea
-              placeholder="趣味についての紹介を入力してください"
-              type="text"
-              height="10"
-              value={values.introduceHobby}
-              background="white"
-              name="introduceHobby"
-              onChange={handleChange}
-            />
-          </FormControl>
-        </div>
-      </div>
-      <div className={createNewUserStyles.finish_button_wrapper}>
+          <Textarea
+            placeholder="趣味についての紹介を入力してください"
+            type="text"
+            name="introduceHobby"
+            height="200px"
+            value={values.introduceHobby}
+            background="white"
+            border="none"
+            onChange={handleChange}
+          />
+        </FormControl>
+      </Box>
+      <Box mb={40}>
         <Button
-          className={createNewUserStyles.update_button_wrapper}
+          className={profileStyles.update_button_wrapper}
           width="40"
           colorScheme="blue"
           onClick={() => checkErrors()}>
           {isLoading ? <Spinner /> : <Text>作成</Text>}
         </Button>
-      </div>
+      </Box>
     </LayoutWithTab>
   );
 };
