@@ -157,7 +157,7 @@ const UserAdmin: React.FC = () => {
       <ChakraLink w="70px" mb={5} mr={3} ml="auto" href="/admin/users/new">
         <Button
           rounded={50}
-          w="70px"
+          w="80px"
           h="35px"
           colorScheme="blue"
           rightIcon={<AiOutlinePlus />}>
