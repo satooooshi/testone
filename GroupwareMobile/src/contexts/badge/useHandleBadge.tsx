@@ -50,9 +50,21 @@ export const BadgeProvider: React.FC = ({children}) => {
           count += room.unreadCount ? room.unreadCount : 0;
         }
         setChatUnreadCount(count);
-        setChatGroups(r =>
-          page !== 1 && r.length ? [...r, ...data.rooms] : [...data.rooms],
-        );
+        setChatGroups(r => {
+          if (page !== 1 && r.length) {
+            const resultPinnedRooms = data.rooms.filter(r => r.isPinned);
+            const resultExceptPinnedRooms = data.rooms.filter(r => !r.isPinned);
+            const existPinnedRooms = r.filter(r => r.isPinned);
+            const existExceptPinnedRooms = r.filter(r => !r.isPinned);
+            return [
+              ...existPinnedRooms,
+              ...resultPinnedRooms,
+              ...existExceptPinnedRooms,
+              ...resultExceptPinnedRooms,
+            ];
+          }
+          return [...data.rooms];
+        });
         if (data.rooms.length >= 20) {
           setPage(p => p + 1);
         } else {
