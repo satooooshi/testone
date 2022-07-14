@@ -258,10 +258,6 @@ const headerTab = (headerTabBehavior: HeaderTabBehavior): Tab[] => {
           href: '/admin/users',
         },
         {
-          name: 'ユーザー作成',
-          href: '/admin/users/new',
-        },
-        {
           name: 'タグ管理',
           href: '/admin/tag',
         },
