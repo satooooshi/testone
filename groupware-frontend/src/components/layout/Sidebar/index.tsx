@@ -10,6 +10,7 @@ import { useAuthenticate } from 'src/contexts/useAuthenticate';
 import { UserRole } from 'src/types';
 import Link from 'next/link';
 import {
+  AiFillEdit,
   AiFillTags,
   AiOutlineGlobal,
   AiOutlineLogout,
@@ -281,7 +282,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeScreenName, hideDrawer }) => {
                     プロフィール
                   </MenuItem>
                   <MenuItem
-                    icon={<IoSettingsSharp size={20} />}
+                    icon={<AiFillEdit size={20} />}
                     h={10}
                     onClick={() => {
                       router.push('/account/profile');
