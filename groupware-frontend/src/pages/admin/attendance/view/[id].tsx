@@ -1,7 +1,7 @@
 import LayoutWithTab from '@/components/layout/LayoutWithTab';
 import { SidebarScreenName } from '@/components/layout/Sidebar';
 import Head from 'next/head';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Tab } from 'src/types/header/tab/types';
 import {
   Box,
@@ -16,38 +16,23 @@ import {
   Tr,
   Text,
   useMediaQuery,
-  Select,
   Button,
-  useToast,
   Modal,
   ModalOverlay,
   ModalBody,
   ModalCloseButton,
   ModalContent,
   ModalHeader,
-  Textarea,
 } from '@chakra-ui/react';
 import { DateTime } from 'luxon';
-import {
-  Attendance,
-  AttendanceCategory,
-  DefaultAttendance,
-  User,
-} from 'src/types';
-import { useFormik } from 'formik';
+import { Attendance, AttendanceCategory } from 'src/types';
 import { useAPIGetAttendance } from '@/hooks/api/attendance/useAPIGetAttendance';
-import { useAPICreateAttendance } from '@/hooks/api/attendance/useAPICreateAttendance';
-import { useAPIUpdateAttendance } from '@/hooks/api/attendance/useAPIUpdateAttendance';
 import { useAuthenticate } from 'src/contexts/useAuthenticate';
 import { attendanceCategoryName } from 'src/utils/factory/attendanceCategoryName';
-import TravelCostFormModal from '@/components/attendance/TravelCostFormModal';
-import { attendanceSchema, emptySchema } from 'src/utils/validation/schema';
-import { formikErrorMsgFactory } from 'src/utils/factory/formikErrorMsgFactory';
-import { useAPIGetDefaultAttendance } from '@/hooks/api/attendance/useAPIGetDefaultAttendance';
-import DefaultModal from 'src/components/attendance/DefaultModal';
-import { isDisplayableWorkingTime } from 'src/utils/factory/isDisplayableWorkingTime';
 import { useRouter } from 'next/router';
 import TravelCostDetailModal from '@/components/attendance/TravelCostDetailModal';
+import { useAPIGetMiniProfileById } from '@/hooks/api/user/useAPIGetMiniProfileById';
+import { userNameFactory } from 'src/utils/factory/userNameFactory';
 
 const AttendanceTableRow = ({
   date,
@@ -57,8 +42,6 @@ const AttendanceTableRow = ({
   attendanceData?: Attendance[];
 }) => {
   const [detailModal, setDetailModal] = useState(false);
-  const { user } = useAuthenticate();
-  // const [WorkingTime, setWorkingTime] = useState<string | undefined>();
   const [selectedDateForApplication, setSelectedDateForApplication] =
     useState<DateTime>();
   const targetData = attendanceData?.filter(
@@ -172,14 +155,15 @@ const AttendanceTableRow = ({
 
 const AttendanceView = () => {
   const router = useRouter();
-  const { id, userName } = router.query as { id: string; userName: string };
+  const { id } = router.query as { id: string };
 
   const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
   const tabs: Tab[] = [
     { type: 'link', name: '勤怠打刻', href: `/admin/attendance/view/${id}` },
     { type: 'link', name: '勤怠報告', href: `/admin/attendance/report/${id}` },
   ];
-  const [visibleDefaultModal, setDefaultModal] = useState(false);
+
+  const { data: userInfo } = useAPIGetMiniProfileById(id);
   const [month, setMonth] = useState(DateTime.now());
   const { data } = useAPIGetAttendance({
     id: Number(router.query.id),
@@ -202,23 +186,19 @@ const AttendanceView = () => {
     <LayoutWithTab
       sidebar={{ activeScreenName: SidebarScreenName.ADMIN }}
       header={{
-        title: '勤怠打刻',
+        title: `${userNameFactory(userInfo)}  勤怠打刻`,
         tabs,
         activeTabName: '勤怠打刻',
       }}>
       <Head>
         <title>ボールド | 勤怠打刻</title>
       </Head>
-      <DefaultModal
-        onCloseModal={() => setDefaultModal(false)}
-        isOpen={visibleDefaultModal}
-      />
       <Box display="flex" ml={10} mr="auto" alignItems="center">
         <Text fontSize={20} mr={2}>
           氏名:
         </Text>
         <Text fontSize={25} fontWeight="bold">
-          {userName}
+          {userNameFactory(userInfo)}
         </Text>
       </Box>
       <Box display="flex" flexDir="row" justifyContent="flex-start" mb="32px">

@@ -208,12 +208,7 @@ const UserAdmin: React.FC = () => {
                 </td>
 
                 <td className={userAdminStyles.delete_icon_wrapper}>
-                  <Link
-                    href={{
-                      pathname: `/admin/attendance/view/${u.id}`,
-                      query: { id: u.id, userName: userNameFactory(u) },
-                    }}
-                    as={`/admin/attendance/view/${u.id}`}>
+                  <Link href={`/admin/attendance/view/${u.id}`} passHref>
                     <a>
                       <MdWork
                         className={userAdminStyles.delete_icon}

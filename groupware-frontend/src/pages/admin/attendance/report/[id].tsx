@@ -30,6 +30,8 @@ import { useAPIUpdateAttendanceReport } from '@/hooks/api/attendance/attendanceR
 import ReportDetailModal from '@/components/attendance/ReportDetailModal';
 import { useAPIDeleteAttendanceReport } from '@/hooks/api/attendance/attendanceReport/useAPIDeleteAttendanceReport';
 import { useRouter } from 'next/router';
+import { useAPIGetMiniProfileById } from '@/hooks/api/user/useAPIGetMiniProfileById';
+import { userNameFactory } from 'src/utils/factory/userNameFactory';
 
 export const AttendanceReportRow = ({
   reportData,
@@ -82,7 +84,8 @@ export const AttendanceReportRow = ({
 
 const AttendanceReport = () => {
   const router = useRouter();
-  const { id, userName } = router.query as { id: string; userName: string };
+  const { id } = router.query as { id: string };
+  const { data: userInfo } = useAPIGetMiniProfileById(id);
 
   const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
   const tabs: Tab[] = [
@@ -182,6 +185,14 @@ const AttendanceReport = () => {
       </Head>
       <Box mb="24px">
         <TopTabBar topTabBehaviorList={topTabBehaviorList} />
+      </Box>
+      <Box display="flex" ml={10} mr="auto" alignItems="center">
+        <Text fontSize={20} mr={2}>
+          氏名:
+        </Text>
+        <Text fontSize={25} fontWeight="bold">
+          {userNameFactory(userInfo)}
+        </Text>
       </Box>
       <ReportFormModal
         isOpen={visibleFormModal}
