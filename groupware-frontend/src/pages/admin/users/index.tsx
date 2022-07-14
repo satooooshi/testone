@@ -27,6 +27,10 @@ import { userRoleNameFactory } from 'src/utils/factory/userRoleNameFactory';
 import { blueColor } from 'src/utils/colors';
 import { FaPen } from 'react-icons/fa';
 import { RiDeleteBin6Line } from 'react-icons/ri';
+import {
+  userRoleNameToValue,
+  userRoleValueToName,
+} from 'src/utils/userRoleFommater';
 
 const UserAdmin: React.FC = () => {
   const router = useRouter();
@@ -119,6 +123,21 @@ const UserAdmin: React.FC = () => {
           tags={tags || []}
           selectedTags={selectedTags}
           toggleTag={onToggleTag}
+          selectItems={[
+            '全て',
+            '管理者',
+            '一般社員',
+            'コーチ',
+            '講師(社員)',
+            '講師(外部)',
+          ]}
+          selectingItem={userRoleValueToName(query.role)}
+          onSelect={(e) =>
+            queryRefresh({
+              page: '1',
+              role: userRoleNameToValue(e.target.value),
+            })
+          }
         />
         {!isLoading && !users?.users.length && (
           <Text alignItems="center" textAlign="center" mb={4}>
