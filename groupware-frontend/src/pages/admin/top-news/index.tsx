@@ -280,6 +280,7 @@ const NewsAdmin: React.VFC = () => {
           <>
             <Box
               w={'100%'}
+              bg="white"
               justifyContent={isSmallerThan768 ? 'flex-start' : 'center'}
               alignItems="center"
               display="flex"
