@@ -284,7 +284,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeScreenName, hideDrawer }) => {
                     icon={<IoSettingsSharp size={20} />}
                     h={10}
                     onClick={() => {
-                      router.push(`/account/${user?.id}`);
+                      router.push('/account/profile');
                     }}>
                     プロフィール編集
                   </MenuItem>
@@ -292,7 +292,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeScreenName, hideDrawer }) => {
                     icon={<IoSettingsSharp size={20} />}
                     h={10}
                     onClick={() => {
-                      router.push(`/account/${user?.id}`);
+                      router.push('/account/update-password');
                     }}>
                     パスワード変更
                   </MenuItem>
