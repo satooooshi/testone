@@ -52,16 +52,10 @@ export const BadgeProvider: React.FC = ({children}) => {
         setChatUnreadCount(count);
         setChatGroups(r => {
           if (page !== 1 && r.length) {
-            const resultPinnedRooms = data.rooms.filter(r => r.isPinned);
-            const resultExceptPinnedRooms = data.rooms.filter(r => !r.isPinned);
-            const existPinnedRooms = r.filter(r => r.isPinned);
-            const existExceptPinnedRooms = r.filter(r => !r.isPinned);
-            return [
-              ...existPinnedRooms,
-              ...resultPinnedRooms,
-              ...existExceptPinnedRooms,
-              ...resultExceptPinnedRooms,
-            ];
+            const mergedRooms = [...r, ...data.rooms];
+            const pinnedRooms = mergedRooms.filter(r => r.isPinned);
+            const exceptPinnedRooms = mergedRooms.filter(r => !r.isPinned);
+            return [...pinnedRooms, ...exceptPinnedRooms];
           }
           return [...data.rooms];
         });
