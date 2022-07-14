@@ -1,4 +1,5 @@
 import {
+  Badge,
   Box,
   Button,
   ButtonGroup,
@@ -56,29 +57,20 @@ const FormToLinkTag: React.FC<FormToLinkTagProps> = ({
         {tags
           .filter((t) => t.type === tagType)
           .map((t) => (
-            <div
-              className={formToLinkTagStyles.selected_tags_wrapper}
-              key={t.id}>
-              <ButtonGroup isAttached size="xs">
-                <Button
-                  color={tagFontColorFactory(t.type)}
-                  backgroundColor={tagBgColorFactory(t.type)}
-                  mr="-10px"
-                  size="sm"
-                  rounded="full">
-                  <Text fontWeight="normal">{t.name}</Text>
-                </Button>
-                <IconButton
-                  color={tagFontColorFactory(t.type)}
-                  backgroundColor={tagBgColorFactory(t.type)}
-                  onClick={() => toggleTag(t)}
-                  aria-label="削除"
-                  icon={<MdCancel size={18} />}
-                  size="sm"
-                  rounded="full"
-                />
-              </ButtonGroup>
-            </div>
+            <Badge
+              ml={2}
+              p={2}
+              key={t.id}
+              display="flex"
+              color={tagFontColorFactory(t.type)}
+              backgroundColor={tagBgColorFactory(t.type)}
+              borderRadius={50}
+              alignItems="center">
+              {t.name}
+              <Box ml={1} cursor="pointer">
+                <MdCancel size={14} onClick={() => toggleTag(t)} />
+              </Box>
+            </Badge>
           ))}
       </Box>
     </FormControl>
