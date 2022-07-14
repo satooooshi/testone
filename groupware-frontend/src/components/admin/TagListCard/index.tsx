@@ -1,10 +1,25 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import tagAdminStyles from '@/styles/layouts/admin/TagAdmin.module.scss';
-import { Button, ButtonGroup, IconButton, Input } from '@chakra-ui/react';
-import { HiPencilAlt } from 'react-icons/hi';
+import {
+  Badge,
+  Box,
+  Button,
+  Input,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
+  Text,
+} from '@chakra-ui/react';
 import { MdCancel } from 'react-icons/md';
 import { Tag, TagType, UserTag } from 'src/types';
-import { tagColorFactory } from 'src/utils/factory/tagColorFactory';
+import { IoAddOutline } from 'react-icons/io5';
+import { FiEdit2 } from 'react-icons/fi';
+import { tagFontColorFactory } from 'src/utils/factory/tagFontColorFactory';
+import { tagBgColorFactory } from 'src/utils/factory/tagBgColorFactory';
 
 type TagListBoxProps = {
   tagType: TagType;
@@ -22,6 +37,7 @@ const TagListBox: React.FC<TagListBoxProps> = ({
   const [newTagName, setNewTagName] = useState('');
   const [tagEditted, setTagEditted] = useState<Tag>();
   const [isVisibleAllTags, setIsVisibleAllTags] = useState(false);
+  const [isOpen, setModal] = useState(false);
 
   const tagLabelName = useMemo(() => {
     switch (tagType) {
@@ -43,13 +59,14 @@ const TagListBox: React.FC<TagListBoxProps> = ({
   }, [tagType, tags]);
 
   const tagsDisplayed = useMemo(() => {
-    return !isVisibleAllTags && filteredTags?.length && filteredTags.length > 4
-      ? filteredTags.slice(0, 4)
+    return !isVisibleAllTags && filteredTags?.length && filteredTags.length > 20
+      ? filteredTags.slice(0, 20)
       : filteredTags;
   }, [filteredTags, isVisibleAllTags]);
 
   useEffect(() => {
     if (tagEditted) {
+      setModal(true);
       setNewTagName(tagEditted.name);
       return;
     }
@@ -57,97 +74,119 @@ const TagListBox: React.FC<TagListBoxProps> = ({
   }, [tagEditted]);
 
   return (
-    <div className={tagAdminStyles.tag_list_area}>
-      <div className={tagAdminStyles.tag_label_wrapper}>
-        <p className={tagAdminStyles.tag_label_text}>{`${tagLabelName}タグ`}</p>
-      </div>
-      <div className={tagAdminStyles.tag_form_wrapper}>
-        {tagEditted && (
-          <div className={tagAdminStyles.selected_tag_wrapper}>
-            <Button colorScheme={tagColorFactory(tagEditted.type)} size="sm">
-              {tagEditted.name}
-            </Button>
-            <p className={tagAdminStyles.right_arrow}>を編集</p>
-          </div>
-        )}
-        <div className={tagAdminStyles.input_and_button_wrapper}>
-          <div className={tagAdminStyles.tag_input_wrapper}>
+    <Box w="100%" mb={5}>
+      <Modal
+        isOpen={isOpen}
+        onClose={() => {
+          setTagEditted(undefined);
+          setNewTagName('');
+          setModal(false);
+        }}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>
+            {tagEditted ? 'タグの編集' : '新規タグの追加'}
+          </ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
             <Input
               name="text"
               value={newTagName}
               onChange={(e) => setNewTagName(e.target.value)}
               placeholder="タグ名を入力"
             />
-          </div>
-          <div className={tagAdminStyles.buttons_wrapper}>
-            <div className={tagAdminStyles.save_button_wrapper}>
-              <Button
-                onClick={() => {
-                  if (tagEditted) {
-                    onClickSaveButton({ ...tagEditted, name: newTagName });
-                    setTagEditted(undefined);
-                    setNewTagName('');
-                    setIsVisibleAllTags(true);
-                    return;
-                  }
-                  onClickSaveButton({ name: newTagName, type: tagType });
+          </ModalBody>
+
+          <ModalFooter>
+            <Button
+              mx="auto"
+              colorScheme="blue"
+              onClick={() => {
+                if (tagEditted) {
+                  onClickSaveButton({ ...tagEditted, name: newTagName });
+                  setTagEditted(undefined);
                   setNewTagName('');
                   setIsVisibleAllTags(true);
-                }}
-                size="sm"
-                colorScheme="green"
-                variant="outline">
-                {!tagEditted ? '新規追加' : '保存'}
-              </Button>
+                  setModal(false);
+                  return;
+                }
+                onClickSaveButton({ name: newTagName, type: tagType });
+                setNewTagName('');
+                setIsVisibleAllTags(true);
+                setModal(false);
+              }}>
+              保存
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+      <Text
+        fontWeight="bold"
+        fontSize={20}
+        mb={3}>{`${tagLabelName}タグ`}</Text>
+      <Box bg="white" w="100%" display="flex" minH={100} p={5} rounded={10}>
+        <Box w={40}>
+          <Button
+            mr="20px"
+            px="24px"
+            size="sm"
+            onClick={() => setModal(true)}
+            colorScheme="blue"
+            variant="outline"
+            rounded="full">
+            <Box>
+              <IoAddOutline size="20px" />
+            </Box>
+            <Text fontSize="14px">タグを追加</Text>
+          </Button>
+        </Box>
+        <div className={tagAdminStyles.tags_wrapper}>
+          {tagsDisplayed?.map((t) => (
+            <div className={tagAdminStyles.tag_item_wrapper} key={t.id}>
+              <Badge
+                ml={2}
+                p={2}
+                key={t.id}
+                display="flex"
+                color={tagFontColorFactory(t.type)}
+                backgroundColor={tagBgColorFactory(t.type)}
+                borderRadius={50}
+                alignItems="center"
+                borderWidth={1}>
+                {t.name}
+                <Box ml={2}>
+                  <FiEdit2
+                    cursor="pointer"
+                    size={14}
+                    onClick={() => setTagEditted(t)}
+                  />
+                </Box>
+                <Box ml={1}>
+                  <MdCancel
+                    cursor="pointer"
+                    size={14}
+                    onClick={() => onClickDeleteButton(t)}
+                  />
+                </Box>
+              </Badge>
             </div>
-            {tagEditted && (
-              <Button
-                onClick={() => {
-                  setTagEditted(undefined);
-                }}
-                size="sm"
-                colorScheme="blue"
-                variant="outline">
-                キャンセル
-              </Button>
-            )}
-          </div>
-        </div>
-      </div>
-      <div className={tagAdminStyles.tags_wrapper}>
-        {tagsDisplayed?.map((t) => (
-          <div className={tagAdminStyles.tag_item_wrapper} key={t.id}>
-            <ButtonGroup
-              isAttached
+          ))}
+          {filteredTags?.length && filteredTags.length > 20 ? (
+            <Button
+              w={20}
+              ml={3}
+              onClick={() => setIsVisibleAllTags(!isVisibleAllTags)}
               size="sm"
-              colorScheme={tagColorFactory(t.type)}>
-              <Button mr="-px">{t.name}</Button>
-              <IconButton
-                aria-label="編集"
-                icon={<HiPencilAlt size={18} />}
-                onClick={() => setTagEditted(t)}
-              />
-              <IconButton
-                onClick={() => onClickDeleteButton(t)}
-                aria-label="削除"
-                icon={<MdCancel size={18} />}
-              />
-            </ButtonGroup>
-          </div>
-        ))}
-      </div>
-      {filteredTags?.length && filteredTags.length > 4 ? (
-        <Button
-          onClick={() => setIsVisibleAllTags(!isVisibleAllTags)}
-          size="md"
-          type="button"
-          _focus={{ boxShadow: 'none' }}
-          isFullWidth={true}
-          colorScheme="blackAlpha">
-          {!isVisibleAllTags ? '全て表示' : '折りたたむ'}
-        </Button>
-      ) : null}
-    </div>
+              type="button"
+              _focus={{ boxShadow: 'none' }}
+              isFullWidth={true}
+              colorScheme="blackAlpha">
+              {!isVisibleAllTags ? '全て表示' : '折りたたむ'}
+            </Button>
+          ) : null}
+        </div>
+      </Box>
+    </Box>
   );
 };
 
