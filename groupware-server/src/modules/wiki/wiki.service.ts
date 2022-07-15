@@ -220,7 +220,7 @@ export class WikiService {
       })
       .skip(offset)
       .take(limit)
-      .orderBy('wiki.createdAt', 'DESC')
+      .orderBy('wiki.id', 'DESC')
       .getManyAndCount();
 
     for (const wiki of wikiWithRelation) {
