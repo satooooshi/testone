@@ -17,12 +17,12 @@ const Chat = () => {
     <ChatLayout modalStates={modalStates} dispatchModal={dispatchModal}>
       {isSmallerThan768 ? (
         <>
-          <Box alignSelf="center">
+          {/* <Box alignSelf="center">
             <Text fontWeight="bold" color={darkFontColor} fontSize="14px">
               ルームを選択
             </Text>
-          </Box>
-          <Box w={'85%'}>
+          </Box> */}
+          <Box w={'100%'}>
             <RoomList
               onClickRoom={(g) => {
                 router.push(`/chat/${g.id.toString()}`, undefined, {
@@ -39,7 +39,7 @@ const Chat = () => {
           flexDir="row"
           h="83vh"
           justifyContent="center">
-          <Box w={isLargerTahn1024 ? '30%' : '40%'}>
+          <Box w="40%">
             <RoomList
               onClickRoom={(g) => {
                 router.push(`/chat/${g.id.toString()}`, undefined, {
@@ -49,7 +49,8 @@ const Chat = () => {
             />
           </Box>
           <Box
-            w="60vw"
+            ml={5}
+            w="60%"
             h="100%"
             display="flex"
             flexDir="row"

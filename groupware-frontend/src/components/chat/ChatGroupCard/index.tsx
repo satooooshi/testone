@@ -45,6 +45,7 @@ const ChatGroupCard: React.FC<ChatGroupCardProps> = ({
 
   return (
     <Box
+      rounded={10}
       display="flex"
       flexDir="row"
       py="16px"
@@ -52,16 +53,40 @@ const ChatGroupCard: React.FC<ChatGroupCardProps> = ({
       alignItems="center"
       boxShadow="md"
       w={'100%'}
-      h="fit-content"
-      bg={
-        isSelected ? 'gray.200' : chatGroup.unreadCount ? 'white' : '#f2f1f2'
-      }>
-      <Avatar src={chatGroup.imageURL} size="md" mr="8px" />
+      h="100px"
+      borderWidth={2}
+      borderColor={isSelected ? 'blue.300' : undefined}
+      bg={isSelected ? 'gray.100' : 'white'}>
+      <Box display="flex" flexDir="column">
+        <Link
+          rounded="full"
+          w="26px"
+          h="26px"
+          // lineHeight="35px"
+          // textAlign="center"
+          bg="white"
+          zIndex={2}
+          mb={-4}
+          ml={-1}
+          borderWidth="2px"
+          borderColor="blue.200"
+          onClick={(e) => {
+            e.stopPropagation();
+            onPressPinButton();
+          }}>
+          {!!chatGroup.isPinned ? (
+            <RiPushpin2Fill size={22} color="blue" />
+          ) : (
+            <RiPushpin2Line size={22} color="blue" />
+          )}
+        </Link>
+        <Avatar src={chatGroup.imageURL} size="md" mr="8px" zIndex={1} />
+      </Box>
       <Box
         display="flex"
         flexDir="column"
         overflow="hidden"
-        w={isSmallerThan768 ? '100%' : '80%'}
+        w="100%"
         h="70px"
         justifyContent="space-around">
         <Box
@@ -69,64 +94,61 @@ const ChatGroupCard: React.FC<ChatGroupCardProps> = ({
           flexDir="row"
           justifyContent="space-between"
           alignItems="center"
-          mb="4px"
+          mb="3px"
           w="100%">
-          <Text fontWeight="bold" color={darkFontColor} noOfLines={1}>
+          <Text fontWeight="bold" noOfLines={1}>
             {chatGroup.name
               ? chatGroup.name
               : nameOfEmptyNameGroup(chatGroup.members)}
           </Text>
-
-          <Box display="flex" flexDir="row">
-            {isSelected == false &&
-            chatGroup?.unreadCount &&
-            chatGroup.unreadCount > 0 ? (
-              <Badge
-                bg="green"
-                color="white"
-                w="30px"
-                h="30px"
-                mr="20px"
-                borderRadius="50%"
-                textAlign="center"
-                lineHeight="30px">
-                {chatGroup.unreadCount}
-              </Badge>
-            ) : null}
-            <Link
-              onClick={(e) => {
-                e.stopPropagation();
-                onPressPinButton();
-              }}>
-              {!!chatGroup.isPinned ? (
-                <RiPushpin2Fill size={24} color="green" />
-              ) : (
-                <RiPushpin2Line size={24} color="green" />
-              )}
-            </Link>
-          </Box>
-        </Box>
-        <Box display="flex" flexDir="row" alignItems="center" mb="4px">
-          <Text fontSize="12px" color={darkFontColor} noOfLines={1}>
-            {chatGroup?.chatMessages?.length
-              ? latestMessage(chatGroup.chatMessages[0])
-              : ' '}
-          </Text>
-        </Box>
-        <Box
-          display="flex"
-          flexDir="row"
-          justifyContent="space-between"
-          alignItems="center">
-          <Text color={darkFontColor} fontSize="14px">
-            {`${chatGroup.members?.length || 0}人のメンバー`}
-          </Text>
-          <Text color={darkFontColor} fontSize="12px">
+          <Text color={darkFontColor} fontSize="12px" whiteSpace="nowrap">
             {dateTimeFormatterFromJSDDate({
               dateTime: new Date(chatGroup.updatedAt),
             })}
           </Text>
         </Box>
+        <Text color={darkFontColor} fontSize="14px">
+          {`${chatGroup.members?.length || 0}人のメンバー`}
+        </Text>
+        <Box
+          display="flex"
+          flexDir="row"
+          alignItems="center"
+          my="4px"
+          justifyContent="space-between">
+          <Text fontSize="15px" noOfLines={1}>
+            {chatGroup?.chatMessages?.length
+              ? latestMessage(chatGroup.chatMessages[0])
+              : ' '}
+          </Text>
+          <Box display="flex" flexDir="row">
+            {isSelected == false &&
+            chatGroup?.unreadCount &&
+            chatGroup.unreadCount > 0 ? (
+              <Badge
+                bg="red"
+                color="white"
+                minW="25px"
+                h="25px"
+                borderRadius="50%"
+                textAlign="center"
+                lineHeight="25px">
+                {chatGroup.unreadCount}
+              </Badge>
+            ) : null}
+          </Box>
+        </Box>
+        {/* <Box
+          display="flex"
+          flexDir="row"
+          justifyContent="space-between"
+          alignItems="center">
+          <Text color={darkFontColor} fontSize="12px">
+            {dateTimeFormatterFromJSDDate({
+              dateTime: new Date(chatGroup.updatedAt),
+            })}
+          </Text>
+        </Box> */}
       </Box>
     </Box>
   );
