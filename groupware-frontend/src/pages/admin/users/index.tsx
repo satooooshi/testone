@@ -190,7 +190,7 @@ const UserAdmin: React.FC = () => {
                 </td>
                 <td className={userAdminStyles.user_info_text}>{u.email}</td>
                 <td className={userAdminStyles.user_info_text}>
-                  <Text>{userRoleValueToName(u.role)}</Text>
+                  {userRoleValueToName(u.role)}
                 </td>
 
                 <td className={userAdminStyles.delete_icon_wrapper}>
