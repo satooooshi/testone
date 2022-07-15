@@ -14,5 +14,7 @@ export const eventTypeColorFactory = (type: EventType): string => {
       return '#f56565';
     case EventType.SUBMISSION_ETC:
       return '#086f83';
+    case EventType.OTHER:
+      return '#A9A9A9';
   }
 };
