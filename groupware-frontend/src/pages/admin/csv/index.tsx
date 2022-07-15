@@ -8,17 +8,23 @@ import {
   QueryToGetUserCsv,
   useAPIDownloadUserCsv,
 } from '@/hooks/api/user/useAPIDownloadUserCsv';
-import { Button, Progress, Spinner, Text } from '@chakra-ui/react';
+import {
+  Box,
+  Button,
+  Heading,
+  Progress,
+  Spinner,
+  Text,
+} from '@chakra-ui/react';
 import Head from 'next/head';
 import React, { useEffect, useState } from 'react';
 import DatePicker from 'node_modules/react-rainbow-components/components/DatePicker';
 import { Tab } from 'src/types/header/tab/types';
-import exportCsvStyles from '@/styles/layouts/admin/ExportCsv.module.scss';
-import clsx from 'clsx';
 import { useHeaderTab } from '@/hooks/headerTab/useHeaderTab';
 import { useRouter } from 'next/router';
 import { useAuthenticate } from 'src/contexts/useAuthenticate';
 import { UserRole } from 'src/types';
+import { darkFontColor } from 'src/utils/colors';
 
 const ExportCsv = () => {
   const router = useRouter();
@@ -57,117 +63,145 @@ const ExportCsv = () => {
       <Head>
         <title>CSV出力</title>
       </Head>
-      <div className={exportCsvStyles.main}>
-        <div
-          className={clsx(
-            exportCsvStyles.form_wrapper,
-            exportCsvStyles.event_export_form,
-          )}>
-          <p className={clsx(exportCsvStyles.mb_8, exportCsvStyles.sub_title)}>
-            社員データの出力
-          </p>
-          <div className={exportCsvStyles.duration_wrapper}>
-            <div
-              className={clsx(
-                exportCsvStyles.mb_8,
-                exportCsvStyles.date_select_wrapper,
-              )}>
-              <DatePicker
-                value={userDuration?.from}
-                onChange={(d) =>
-                  setUserDuration((prev) => ({ ...prev, from: d }))
-                }
-                label="開始日"
-                formatStyle={'medium'}
-              />
-            </div>
-            <div
-              className={clsx(
-                exportCsvStyles.mb_8,
-                exportCsvStyles.date_select_wrapper,
-              )}>
-              <DatePicker
-                value={userDuration?.to}
-                onChange={(d) =>
-                  setUserDuration((prev) => ({ ...prev, to: d }))
-                }
-                label="終了日"
-                formatStyle={'medium'}
-              />
-            </div>
-          </div>
-          <p
-            className={clsx(
-              exportCsvStyles.mb_8,
-              exportCsvStyles.annotation_text,
-            )}>
-            ※イベント参加数などを開始日で選択した日付以降、終了日で指定した日付以前でフィルタリングして出力されます
-          </p>
-          <div className={exportCsvStyles.download_button_wrapper}>
-            <Button
-              onClick={() => downloadUser(userDuration || {})}
-              colorScheme="green">
-              {loadingUserCsv ? <Spinner /> : <Text>ダウンロード</Text>}
-            </Button>
-          </div>
-        </div>
-        <div className={clsx(exportCsvStyles.form_wrapper)}>
-          <p className={clsx(exportCsvStyles.mb_8, exportCsvStyles.sub_title)}>
-            イベントデータの出力
-          </p>
-          <div className={clsx(exportCsvStyles.duration_wrapper)}>
-            <div
-              className={clsx(
-                exportCsvStyles.date_select_wrapper,
-                exportCsvStyles.mb_8,
-              )}>
-              <DatePicker
-                value={eventDuration?.from}
-                onChange={(d) =>
-                  setEventDuration((prev) => ({ ...prev, from: d }))
-                }
-                label="開始日"
-                formatStyle={'medium'}
-              />
-            </div>
-            <div
-              className={clsx(
-                exportCsvStyles.date_select_wrapper,
-                exportCsvStyles.mb_8,
-              )}>
-              <DatePicker
-                value={eventDuration?.to}
-                onChange={(d) =>
-                  setEventDuration((prev) => ({ ...prev, to: d }))
-                }
-                label="終了日"
-                formatStyle={'medium'}
-              />
-            </div>
-          </div>
-          <p
-            className={clsx(
-              exportCsvStyles.mb_8,
-              exportCsvStyles.annotation_text,
-            )}>
-            ※提出物等を除いて出力されます
-          </p>
-          <p
-            className={clsx(
-              exportCsvStyles.mb_8,
-              exportCsvStyles.annotation_text,
-            )}>
-            ※開始日で選択した日付以降、終了日で指定した日付以前に終了したイベントデータが出力されます
-          </p>
-          <div className={exportCsvStyles.download_button_wrapper}>
-            <Button
-              onClick={() => downloadEvent(eventDuration || {})}
-              colorScheme="green">
-              {loadingEventCsv ? <Spinner /> : <Text>ダウンロード</Text>}
-            </Button>
-          </div>
-        </div>
-      </div>
+      <Box display="flex" flexDir="column" w="100%" pt={8}>
+        <Heading size="md">社員データの出力</Heading>
+        <Box w="100%" bg="white" mt={3} py={8} px={5} rounded={10}>
+          <Box
+            display="flex"
+            flexDir="column"
+            w="100%"
+            maxW="800px"
+            mx="auto"
+            justifyContent="center">
+            <Box
+              display="flex"
+              flexDir="row"
+              alignItems="center"
+              justifyContent="center"
+              w="100%">
+              <Heading size="sm" mr={5} whiteSpace="nowrap">
+                開始日
+              </Heading>
+              <Box minW="200px" maxW="500px" w="100%">
+                <DatePicker
+                  value={userDuration?.from}
+                  onChange={(d) =>
+                    setUserDuration((prev) => ({ ...prev, from: d }))
+                  }
+                  placeholder="選択して下さい"
+                  formatStyle="large"
+                />
+              </Box>
+            </Box>
+            <Box
+              display="flex"
+              flexDir="row"
+              alignItems="center"
+              justifyContent="center"
+              w="100%"
+              mt={8}>
+              <Heading size="sm" mr={5} whiteSpace="nowrap">
+                終了日
+              </Heading>
+              <Box minW="200px" maxW="500px" w="100%">
+                <DatePicker
+                  value={userDuration?.to}
+                  onChange={(d) =>
+                    setUserDuration((prev) => ({ ...prev, to: d }))
+                  }
+                  placeholder="選択して下さい"
+                  formatStyle="large"
+                />
+              </Box>
+            </Box>
+
+            <Text color={darkFontColor} mt={5}>
+              ※イベント参加数などを開始日で選択した日付以降、終了日で指定した日付以前でフィルタリングして出力されます
+            </Text>
+            <Box w="100%" mt={5}>
+              <Button
+                w="100%"
+                onClick={() => downloadUser(userDuration || {})}
+                colorScheme="blue"
+                rounded={50}
+                variant="outline">
+                {loadingUserCsv ? <Spinner /> : <Text>CSV出力</Text>}
+              </Button>
+            </Box>
+          </Box>
+        </Box>
+      </Box>
+      <Box display="flex" flexDir="column" w="100%" pt={10}>
+        <Heading size="md">イベントデータの出力</Heading>
+        <Box w="100%" bg="white" mt={3} py={8} px={5} rounded={10}>
+          <Box
+            display="flex"
+            flexDir="column"
+            w="100%"
+            maxW="800px"
+            mx="auto"
+            justifyContent="center">
+            <Box
+              display="flex"
+              flexDir="row"
+              alignItems="center"
+              justifyContent="center"
+              w="100%">
+              <Heading size="sm" mr={5} whiteSpace="nowrap">
+                開始日
+              </Heading>
+              <Box minW="200px" maxW="500px" w="100%">
+                <DatePicker
+                  value={eventDuration?.from}
+                  onChange={(d) =>
+                    setEventDuration((prev) => ({ ...prev, from: d }))
+                  }
+                  placeholder="選択して下さい"
+                  formatStyle="large"
+                />
+              </Box>
+            </Box>
+            <Box
+              display="flex"
+              flexDir="row"
+              alignItems="center"
+              justifyContent="center"
+              w="100%"
+              mt={8}>
+              <Heading size="sm" mr={5} whiteSpace="nowrap">
+                終了日
+              </Heading>
+              <Box minW="200px" maxW="500px" w="100%">
+                <DatePicker
+                  value={eventDuration?.to}
+                  onChange={(d) =>
+                    setEventDuration((prev) => ({ ...prev, to: d }))
+                  }
+                  placeholder="選択して下さい"
+                  formatStyle="large"
+                />
+              </Box>
+            </Box>
+
+            <Text color={darkFontColor} mt={5}>
+              ※提出物等を除いて出力されます
+            </Text>
+            <Text color={darkFontColor} mt={3}>
+              ※開始日で選択した日付以降、終了日で指定した日付以前に終了したイベントデータが出力されます
+            </Text>
+            <Box w="100%" mt={5}>
+              <Button
+                w="100%"
+                onClick={() => downloadEvent(eventDuration || {})}
+                colorScheme="blue"
+                rounded={50}
+                variant="outline">
+                {loadingUserCsv ? <Spinner /> : <Text>CSV出力</Text>}
+              </Button>
+            </Box>
+          </Box>
+        </Box>
+      </Box>
     </LayoutWithTab>
   );
 };

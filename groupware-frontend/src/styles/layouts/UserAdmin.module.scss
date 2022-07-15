@@ -22,6 +22,7 @@
 }
 
 .table {
+  background-color: white;
   align-self: center;
   width: 85vw;
   max-width: 1980px;
@@ -45,7 +46,7 @@
 .table_head {
   text-align: left;
   padding: 10px 0;
-  background: #eff1f5;
+  // background: #eff1f5;
 }
 
 .user_row_wrapper {

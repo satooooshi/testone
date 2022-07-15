@@ -735,7 +735,7 @@ export class ChatService {
       sysMsgSaidsUpdated.type = ChatMessageType.SYSTEM_TEXT;
       sysMsgSaidsUpdated.content = `${userNameFactory(
         requestUser,
-      )}さんがルーム名を${existGroup.name}に更新しました`;
+      )}さんがルーム名を${newGroup.name}に更新しました`;
       sysMsgSaidsUpdated.chatGroup = newGroup;
       await this.chatMessageRepository.save(sysMsgSaidsUpdated);
     }

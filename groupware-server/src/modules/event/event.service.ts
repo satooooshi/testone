@@ -21,6 +21,7 @@ import {
   SearchQueryToGetEvents,
   SearchResultToGetEvents,
 } from './event.controller';
+import { selectUserColumns } from 'src/utils/selectUserColumns';
 
 @Injectable()
 export class EventScheduleService {
@@ -223,12 +224,7 @@ export class EventScheduleService {
       .createQueryBuilder('events')
       .leftJoinAndSelect('events.userJoiningEvent', 'userJoiningEvent')
       .leftJoin('userJoiningEvent.user', 'user')
-      .addSelect([
-        'user.id',
-        'user.firstName',
-        'user.lastName',
-        'user.avatarUrl',
-      ])
+      .addSelect(selectUserColumns('user'))
       // .leftJoinAndSelect('userJoiningEvent.event', 'event')
       .leftJoinAndSelect('events.tags', 'tag')
       .where(
@@ -357,13 +353,8 @@ export class EventScheduleService {
       .withDeleted()
       .leftJoinAndSelect('events.userJoiningEvent', 'userJoiningEvent')
       .leftJoin('userJoiningEvent.user', 'user')
-      .addSelect([
-        'user.id',
-        'user.firstName',
-        'user.lastName',
-        'user.avatarUrl',
-      ])
-      // .leftJoinAndSelect('userJoiningEvent.event', 'event')
+      .addSelect(selectUserColumns('user'))
+      .leftJoinAndSelect('userJoiningEvent.event', 'event')
       .leftJoinAndSelect('events.tags', 'tags')
       .leftJoinAndSelect('events.files', 'files')
       .leftJoinAndSelect(
@@ -374,27 +365,12 @@ export class EventScheduleService {
       )
       .leftJoinAndSelect('events.videos', 'videos')
       .leftJoinAndSelect('events.author', 'author')
-      .addSelect([
-        'author.id',
-        'author.firstName',
-        'author.lastName',
-        'author.avatarUrl',
-      ])
+      .addSelect(selectUserColumns('author'))
       .leftJoinAndSelect('events.hostUsers', 'hostUsers')
-      .addSelect([
-        'hostUsers.id',
-        'hostUsers.firstName',
-        'hostUsers.lastName',
-        'hostUsers.avatarUrl',
-      ])
+      .addSelect(selectUserColumns('hostUsers'))
       .leftJoinAndSelect('events.comments', 'comments')
       .leftJoinAndSelect('comments.writer', 'writer')
-      .addSelect([
-        'writer.id',
-        'writer.firstName',
-        'writer.lastName',
-        'writer.avatarUrl',
-      ])
+      .addSelect(selectUserColumns('writer'))
       .where('events.id = :id', { id })
       .getOne();
     existEvent.userJoiningEvent = existEvent.userJoiningEvent.filter(
