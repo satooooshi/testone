@@ -294,7 +294,7 @@ const NewsAdmin: React.VFC = () => {
                 display="flex"
                 flexDir="row"
                 w="100%"
-                h="40px"
+                h="50px"
                 border="1px"
                 alignItems="center"
                 mb="-1px">
