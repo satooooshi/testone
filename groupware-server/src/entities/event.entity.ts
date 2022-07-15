@@ -37,6 +37,7 @@ export enum EventType {
   COACH = 'coach',
   CLUB = 'club',
   SUBMISSION_ETC = 'submission_etc',
+  OTHER = 'other',
 }
 
 @Entity({ name: 'events' })
