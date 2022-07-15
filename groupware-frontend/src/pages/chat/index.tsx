@@ -49,7 +49,7 @@ const Chat = () => {
             />
           </Box>
           <Box
-            ml={5}
+            ml={3}
             w="60%"
             h="100%"
             display="flex"

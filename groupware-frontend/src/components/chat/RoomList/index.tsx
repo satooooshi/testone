@@ -121,7 +121,7 @@ const RoomList: React.FC<RoomListProps> = ({ currentId, onClickRoom }) => {
       bg="white"
       rounded={10}
       py={3}
-      px={5}
+      px="3%"
       overflowY="auto">
       <InputGroup mb={3}>
         <InputLeftElement pointerEvents="none">

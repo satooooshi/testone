@@ -108,7 +108,7 @@ const ChatDetail = () => {
         justifyContent="center">
         {!isSmallerThan768 ? (
           <>
-            <Box w="40%" mr={5}>
+            <Box w="40%" mr={3}>
               <RoomList
                 currentId={id}
                 onClickRoom={(g) =>
