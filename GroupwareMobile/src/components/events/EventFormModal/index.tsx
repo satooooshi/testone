@@ -575,6 +575,18 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
             ) : (
               <></>
             )}
+            {isCreatableEvent(EventType.OTHER, user?.role) ? (
+              <Dropdown.Option
+                {...magnusDropdownOptions}
+                onPress={() =>
+                  setNewEvent(e => ({...e, type: EventType.OTHER}))
+                }
+                value={EventType.OTHER}>
+                {eventTypeNameFactory(EventType.OTHER)}
+              </Dropdown.Option>
+            ) : (
+              <></>
+            )}
           </Dropdown>
           {newEvent.imageURL ? (
             <>
