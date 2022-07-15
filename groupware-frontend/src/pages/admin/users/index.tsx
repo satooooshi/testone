@@ -14,6 +14,7 @@ import {
   Select,
   Text,
   Link as ChakraLink,
+  useMediaQuery,
 } from '@chakra-ui/react';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
@@ -50,6 +51,7 @@ const UserAdmin: React.FC = () => {
   const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
   const { data: users, refetch, isLoading } = useAPISearchUsers(query);
   const { user } = useAuthenticate();
+  const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
   const { mutate: updateUser } = useAPIUpdateUser({
     onSuccess: () => {
       refetch();
@@ -170,7 +172,10 @@ const UserAdmin: React.FC = () => {
               <th className={userAdminStyles.table_head} />
               <th className={userAdminStyles.table_head}>姓</th>
               <th className={userAdminStyles.table_head}>名</th>
-              <th className={userAdminStyles.table_head}>メールアドレス</th>
+              {!isSmallerThan768 ? (
+                <th className={userAdminStyles.table_head}>メールアドレス</th>
+              ) : null}
+              {/* <th className={userAdminStyles.table_head}>メールアドレス</th> */}
               <th className={userAdminStyles.table_head}>社員区分</th>
               <th className={userAdminStyles.table_head}></th>
               <th className={userAdminStyles.table_head} />
@@ -188,7 +193,10 @@ const UserAdmin: React.FC = () => {
                 <td className={userAdminStyles.user_info_text}>
                   {u.firstName}
                 </td>
-                <td className={userAdminStyles.user_info_text}>{u.email}</td>
+                {!isSmallerThan768 ? (
+                  <td className={userAdminStyles.user_info_text}>{u.email}</td>
+                ) : null}
+                {/* <td className={userAdminStyles.user_info_text}>{u.email}</td> */}
                 <td className={userAdminStyles.user_info_text}>
                   {userRoleValueToName(u.role)}
                 </td>
