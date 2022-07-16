@@ -135,6 +135,6 @@ export class WikiController {
     @Req() req: RequestWithUser,
     @Body() WikiID: { id: number },
   ): Promise<Partial<Wiki>> {
-    return this.qaService.toggleGoodForBoard(req.user.id, WikiID.id);
+    return this.qaService.toggleGoodForBoard(req.user, WikiID.id);
   }
 }

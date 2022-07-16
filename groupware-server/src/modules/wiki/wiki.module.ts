@@ -9,10 +9,17 @@ import { NotificationModule } from '../notification/notification.module';
 import { WikiController } from './wiki.controller';
 import { WikiService } from './wiki.service';
 import { StorageModule } from '../storage/storage.module';
+import { UserGoodForBoard } from 'src/entities/userGoodForBord.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Wiki, QAAnswer, QAAnswerReply, User]),
+    TypeOrmModule.forFeature([
+      Wiki,
+      QAAnswer,
+      QAAnswerReply,
+      User,
+      UserGoodForBoard,
+    ]),
     StorageModule,
     NotificationModule,
     ConfigModule,
