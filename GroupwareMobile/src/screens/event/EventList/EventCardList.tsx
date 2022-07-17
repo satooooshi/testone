@@ -16,6 +16,7 @@ import SearchForm from '../../../components/common/SearchForm';
 import EventFormModal from '../../../components/events/EventFormModal';
 import {useAPICreateEvent} from '../../../hooks/api/event/useAPICreateEvent';
 import {responseErrorMsgFactory} from '../../../utils/factory/responseEroorMsgFactory';
+import {useIsFocused} from '@react-navigation/native';
 
 type EventCardListProps = {
   status: EventStatus;
@@ -51,13 +52,16 @@ const EventCardList: React.FC<EventCardListProps> = ({
     status,
     type,
   });
-  const {isLoading} = useAPIGetEventList(searchQuery, {
+  const isFocused = useIsFocused();
+
+  const {refetch, isLoading} = useAPIGetEventList(searchQuery, {
+    enabled: false,
     onSuccess: data => {
       setEventsForInfiniteScroll(e => {
-        if (e.length) {
-          return [...e, ...data.events];
+        if (searchQuery.page === '1') {
+          return data.events;
         }
-        return data.events;
+        return [...e, ...data.events];
       });
     },
   });
@@ -72,6 +76,12 @@ const EventCardList: React.FC<EventCardListProps> = ({
       page: q.page ? (Number(q.page) + 1).toString() : '1',
     }));
   };
+
+  useEffect(() => {
+    if (isFocused) {
+      refetch();
+    }
+  }, [isFocused, refetch, searchQuery]);
 
   useEffect(() => {
     if (partOfSearchQuery.refetchNeeded) {
@@ -94,7 +104,6 @@ const EventCardList: React.FC<EventCardListProps> = ({
   };
 
   useEffect(() => {
-    setEventsForInfiniteScroll([]);
     setSearchQuery(q => ({...q, ...partOfSearchQuery, page: '1'}));
   }, [partOfSearchQuery]);
 
