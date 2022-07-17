@@ -149,15 +149,17 @@ const RenderWikiCardList: React.FC<RenderWikiCardListProps> = ({
           </Div>
         ) : null}
         {wikiForInfiniteScroll.length ? (
-          <FlatList
-            ref={flatListRef}
-            contentContainerStyle={tailwind('pb-8')}
-            onEndReached={onEndReached}
-            onEndReachedThreshold={0.5}
-            data={wikiForInfiniteScroll || []}
-            keyExtractor={item => item.id.toString()}
-            renderItem={({item}) => <WikiCard wiki={item} />}
-          />
+          <Div h={isQA ? '90%' : '100%'}>
+            <FlatList
+              ref={flatListRef}
+              contentContainerStyle={tailwind('pb-8')}
+              onEndReached={onEndReached}
+              onEndReachedThreshold={0.5}
+              data={wikiForInfiniteScroll || []}
+              keyExtractor={item => item.id.toString()}
+              renderItem={({item}) => <WikiCard wiki={item} />}
+            />
+          </Div>
         ) : !wikiForInfiniteScroll.length ? (
           <Text fontSize={16} textAlign="center">
             検索結果が見つかりませんでした
