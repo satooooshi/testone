@@ -225,29 +225,6 @@ export class WikiService {
       .orderBy('wiki.id', 'DESC')
       .getManyAndCount();
 
-    // const wikisWithRelations: Wiki[] = await Promise.all(
-    //   wikis.map(async (w) => {
-    //     const userGoodForBoard = await this.userGoodForBoardRepository.find({
-    //       where: {
-    //         wiki: w,
-    //       },
-    //       relations: ['user', 'wiki'],
-    //     });
-    //     const goodSenders = userGoodForBoard.map((g) => g.user);
-    //     const isGoodSender = goodSenders.some((u) => u.id === userID);
-
-    //     const answers = await this.qaAnswerRepository.find({
-    //       where: { wiki: w },
-    //       relations: ['writer'],
-    //     });
-    //     return {
-    //       ...w,
-    //       userGoodForBoard: goodSenders,
-    //       answers: answers,
-    //       isGoodSender,
-    //     };
-    //   }),
-    // );
     const endTime = Date.now();
     console.log('get wiki speed check', endTime - startTime);
 
