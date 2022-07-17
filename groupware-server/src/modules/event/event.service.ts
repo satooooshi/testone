@@ -220,6 +220,7 @@ export class EventScheduleService {
       offset = (Number(page) - 1) * limit;
     }
     const tagIDs = tag.split(' ');
+    const startTime = Date.now();
     const [eventsWithRelation, count] = await this.eventRepository
       .createQueryBuilder('events')
       .leftJoinAndSelect('events.userJoiningEvent', 'userJoiningEvent')
@@ -269,8 +270,12 @@ export class EventScheduleService {
       .take(limit)
       .orderBy('events.startAt', status === 'past' ? 'DESC' : 'ASC')
       .getManyAndCount();
+
     const pageCount =
       count % limit === 0 ? count / limit : Math.floor(count / limit) + 1;
+
+    const endTime = Date.now();
+    console.log('get evetns speed check', endTime - startTime);
 
     return { pageCount, events: eventsWithRelation };
   }
@@ -307,14 +312,21 @@ export class EventScheduleService {
   ): Promise<SearchResultToGetEvents> {
     const fromDate = new Date(query.from);
     const toDate = new Date(query.to);
+    const startTime = Date.now();
+
+    console.log(
+      'use partipant_id=============================',
+      query.participant_id,
+    );
+
     const events = await this.eventRepository
       .createQueryBuilder('events')
       .select()
       .leftJoinAndSelect('events.userJoiningEvent', 'userJoiningEvent')
       .leftJoinAndSelect('userJoiningEvent.user', 'user')
-      .leftJoinAndSelect('userJoiningEvent.event', 'event')
-      .leftJoinAndSelect('events.tags', 'tag')
-      .leftJoin('events.hostUsers', 'host_user')
+      // .leftJoinAndSelect('userJoiningEvent.event', 'event')
+      // .leftJoinAndSelect('events.tags', 'tag')
+      // .leftJoin('events.hostUsers', 'host_user')
       .where(
         fromDate.toString() !== 'Invalid Date'
           ? 'events.start_at > :fromDate'
@@ -334,13 +346,16 @@ export class EventScheduleService {
       .andWhere(query.type ? 'events.type = :type' : '1=1', {
         type: query.type,
       })
-      .andWhere(query.participant_id ? 'user = :userID' : '1=1', {
-        userID: query.participant_id,
-      })
-      .andWhere(query.host_user_id ? 'host_user = :hostUserID' : '1=1', {
-        hostUserID: query.host_user_id,
-      })
+      // .andWhere(query.participant_id ? 'user = :userID' : '1=1', {
+      //   userID: query.participant_id,
+      // })
+      // .andWhere(query.host_user_id ? 'host_user = :hostUserID' : '1=1', {
+      //   hostUserID: query.host_user_id,
+      // })
       .getMany();
+
+    const endTime = Date.now();
+    console.log('get specific evetns speed check', endTime - startTime);
     return { pageCount: 0, events };
   }
 
@@ -348,13 +363,14 @@ export class EventScheduleService {
     id: number,
     userID: number,
   ): Promise<EventSchedule> {
+    const startTime = Date.now();
     const existEvent = await this.eventRepository
       .createQueryBuilder('events')
       .withDeleted()
       .leftJoinAndSelect('events.userJoiningEvent', 'userJoiningEvent')
       .leftJoin('userJoiningEvent.user', 'user')
       .addSelect(selectUserColumns('user'))
-      // .leftJoinAndSelect('userJoiningEvent.event', 'event')
+      .leftJoinAndSelect('userJoiningEvent.event', 'event')
       .leftJoinAndSelect('events.tags', 'tags')
       .leftJoinAndSelect('events.files', 'files')
       .leftJoinAndSelect(
@@ -376,6 +392,12 @@ export class EventScheduleService {
     existEvent.userJoiningEvent = existEvent.userJoiningEvent.filter(
       (u) => u?.user.existence,
     );
+    const endTime = Date.now();
+    console.log(
+      'speed check get event detail =====================',
+      endTime - startTime,
+    );
+
     return existEvent;
   }
 
