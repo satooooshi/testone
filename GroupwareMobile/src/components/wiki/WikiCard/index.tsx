@@ -13,6 +13,8 @@ import {useAPIToggleGoodForBoard} from '../../../hooks/api/wiki/useAPIToggleGood
 import {useAuthenticate} from '../../../contexts/useAuthenticate';
 import {darkFontColor} from '../../../utils/colors';
 import GoodSendersModal from '../../chat/GoodSendersModal';
+import {useAPIGetGoodsForBoard} from '../../../hooks/api/wiki/useAPIGetGoodForBoard';
+import {ActivityIndicator} from 'react-native-paper';
 
 type WikiCardProps = {
   wiki: Wiki;
@@ -31,20 +33,25 @@ const WikiCard: React.FC<WikiCardProps> = ({wiki}) => {
   const {user} = useAuthenticate();
   const [wikiState, setWikiState] = useState(wiki);
 
+  const {
+    mutate: getGoodsForBoard,
+    data: goodsForBoard,
+    isLoading,
+  } = useAPIGetGoodsForBoard({
+    onSuccess: res => {
+      const senderIDs = res.map(g => g.user.id);
+      const isGoodSender = senderIDs.some(id => id === user?.id);
+      if (isGoodSender) {
+        setWikiState(w => ({...w, isGoodSender: true}));
+        setIsPressHeart(true);
+      }
+    },
+  });
+
   const {mutate} = useAPIToggleGoodForBoard({
     onSuccess: () => {
+      getGoodsForBoard(wiki.id);
       setIsPressHeart(prevHeartStatus => {
-        setWikiState(w => {
-          if (prevHeartStatus) {
-            w.userGoodForBoard = w.userGoodForBoard?.filter(
-              u => u.id !== user?.id,
-            );
-          } else {
-            w.userGoodForBoard = [user as User, ...(w.userGoodForBoard || [])];
-          }
-          return w;
-        });
-
         return !prevHeartStatus;
       });
     },
@@ -52,7 +59,8 @@ const WikiCard: React.FC<WikiCardProps> = ({wiki}) => {
 
   useEffect(() => {
     setWikiState(wiki);
-  }, [wiki]);
+    getGoodsForBoard(wiki.id);
+  }, [wiki, getGoodsForBoard]);
 
   return (
     <TouchableHighlight
@@ -193,14 +201,17 @@ const WikiCard: React.FC<WikiCardProps> = ({wiki}) => {
                   />
                 )}
               </TouchableHighlight>
-              <Button
-                onPress={() =>
-                  setIsVisible(true)
-                }>{`${wikiState.userGoodForBoard?.length}件のいいね`}</Button>
+              <Button onPress={() => setIsVisible(true)}>
+                {!isLoading && goodsForBoard ? (
+                  `${goodsForBoard?.map(g => g.user).length}件のいいね`
+                ) : (
+                  <ActivityIndicator />
+                )}
+              </Button>
             </Div>
           )}
           <GoodSendersModal
-            goodSenders={wikiState.userGoodForBoard || []}
+            goodSenders={goodsForBoard?.map(g => g.user) || []}
             isVisible={isVisible}
             onClose={() => setIsVisible(false)}
           />

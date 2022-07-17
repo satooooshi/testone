@@ -99,7 +99,11 @@ export enum BoardCategory {
 }
 
 export type TextFormat = 'markdown' | 'html';
-
+export type UserGoodForBoard = {
+  id: number;
+  user: User;
+  wiki: Wiki;
+};
 export interface User {
   id: number;
   email: string;
@@ -137,19 +141,13 @@ export interface User {
   qaAnswerReplies?: QAAnswerReply[];
   //this params is sent when login
   token?: string;
-  userGoodForBoard?: userGoodForBoard[];
+  userGoodForBoard?: UserGoodForBoard[];
   eventCount?: number;
   questionCount?: number;
   answerCount?: number;
   knowledgeCount?: number;
   chatGroups?: ChatGroup[];
 }
-
-export type userGoodForBoard = {
-  id: number;
-  user: User;
-  wiki: Wiki;
-};
 
 export interface Tag {
   id: number;
@@ -190,7 +188,7 @@ export interface Wiki {
   bestAnswer?: QAAnswer;
   createdAt: Date;
   updatedAt: Date;
-  userGoodForBoard?: userGoodForBoard[];
+  userGoodForBoard?: UserGoodForBoard[];
   isGoodSender?: boolean;
 }
 

@@ -33,7 +33,7 @@ import {ScrollerProvider} from '../../../utils/htmlScroll/scroller';
 import {ScrollView, TouchableHighlight} from 'react-native-gesture-handler';
 import WikiBodyRenderer from '../../../components/wiki/WikiBodyRenderer';
 import TOC from '../../../components/wiki/TOC';
-import {FAB} from 'react-native-paper';
+import {ActivityIndicator, FAB} from 'react-native-paper';
 import MarkdownIt from 'markdown-it';
 import {useHTMLScrollFeature} from '../../../hooks/scroll/useHTMLScrollFeature';
 import {useDom} from '../../../hooks/dom/useDom';
@@ -47,6 +47,7 @@ import GoodSendersModal from '../../../components/chat/GoodSendersModal';
 import {useAPIToggleGoodForBoard} from '../../../hooks/api/wiki/useAPIToggleGoodForBoard';
 import {dateTimeFormatterFromJSDDate} from '../../../utils/dateTimeFormatterFromJSDate';
 import {useIsTabBarVisible} from '../../../contexts/bottomTab/useIsTabBarVisible';
+import {useAPIGetGoodsForBoard} from '../../../hooks/api/wiki/useAPIGetGoodForBoard';
 
 const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
   const isFocused = useIsFocused();
@@ -84,6 +85,19 @@ const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
     [scroller],
   );
 
+  const {
+    mutate: getGoodsForBoard,
+    data: goodsForBoard,
+    isLoading,
+  } = useAPIGetGoodsForBoard({
+    onSuccess: res => {
+      const senderIDs = res.map(g => g.user.id);
+      const isGoodSender = senderIDs.some(id => id === user?.id);
+      if (isGoodSender) {
+        setIsPressHeart(true);
+      }
+    },
+  });
   const renderToc = useCallback(
     function renderToc() {
       return (
@@ -111,11 +125,12 @@ const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
   useEffect(() => {
     if (isFocused) {
       refetchWikiInfo();
+      getGoodsForBoard(id);
       setIsTabBarVisible(false);
     } else {
       setIsTabBarVisible(true);
     }
-  }, [isFocused, refetchWikiInfo, setIsTabBarVisible]);
+  }, [isFocused, refetchWikiInfo, setIsTabBarVisible, getGoodsForBoard, id]);
 
   const headerTitle = wikiTypeName + '詳細';
   const headerRightButtonName =
@@ -158,23 +173,8 @@ const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
 
   const {mutate} = useAPIToggleGoodForBoard({
     onSuccess: () => {
+      getGoodsForBoard(id);
       setIsPressHeart(prevHeartStatus => {
-        setWikiState(w => {
-          if (w) {
-            if (prevHeartStatus) {
-              w.userGoodForBoard = w.userGoodForBoard?.filter(
-                u => u.id !== user?.id,
-              );
-            } else {
-              w.userGoodForBoard = [
-                user as User,
-                ...(w.userGoodForBoard || []),
-              ];
-            }
-            return w;
-          }
-        });
-
         return !prevHeartStatus;
       });
     },
@@ -288,14 +288,17 @@ const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
                 />
               )}
             </TouchableHighlight>
-            <Button
-              onPress={() =>
-                setIsVisible(true)
-              }>{`${wikiState.userGoodForBoard?.length}件のいいね`}</Button>
+            <Button onPress={() => setIsVisible(true)}>
+              {!isLoading && goodsForBoard ? (
+                `${goodsForBoard?.map(g => g.user).length}件のいいね`
+              ) : (
+                <ActivityIndicator />
+              )}
+            </Button>
           </Div>
         )}
         <GoodSendersModal
-          goodSenders={wikiState?.userGoodForBoard || []}
+          goodSenders={goodsForBoard?.map(g => g.user) || []}
           isVisible={isVisible}
           onClose={() => setIsVisible(false)}
         />
