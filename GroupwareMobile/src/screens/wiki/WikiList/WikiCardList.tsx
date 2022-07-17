@@ -65,9 +65,18 @@ const RenderWikiCardList: React.FC<RenderWikiCardListProps> = ({
   const {
     data: fetchedWiki,
     isLoading,
-    isFetching,
     refetch,
-  } = useAPIGetWikiList(searchQuery, {enabled: false});
+  } = useAPIGetWikiList(searchQuery, {
+    enabled: false,
+    onSuccess: responseWikis => {
+      setWikiForInfiniteScroll(w => {
+        if (w.length && searchQuery.page !== '1') {
+          return [...w, ...responseWikis.wiki];
+        }
+        return responseWikis.wiki;
+      });
+    },
+  });
   const [wikiForInfiniteScroll, setWikiForInfiniteScroll] = useState(
     fetchedWiki?.wiki || [],
   );
@@ -83,16 +92,17 @@ const RenderWikiCardList: React.FC<RenderWikiCardListProps> = ({
 
   useEffect(() => {
     if (isFocused) {
-      refetch();
-    }
-  }, [searchQuery, refetch, isFocused]);
-
-  useEffect(() => {
-    if (isFocused) {
-      setBoardCategory(boardCategory || BoardCategory.NON_BOARD);
       setRuleCategory(ruleCategory || RuleCategory.NON_RULE);
+      setBoardCategory(boardCategory || BoardCategory.NON_BOARD);
+      setWikiForInfiniteScroll([]);
+      setSearchQuery(q => ({
+        ...q,
+        type,
+        board_category: boardCategory,
+        rule_category: ruleCategory,
+        page: '1',
+      }));
       flatListRef?.current?.scrollToOffset({animated: false, offset: 0});
-      refetch();
     }
   }, [
     isFocused,
@@ -107,20 +117,27 @@ const RenderWikiCardList: React.FC<RenderWikiCardListProps> = ({
   ]);
 
   useEffect(() => {
-    if (!isFetching && fetchedWiki?.wiki && fetchedWiki?.wiki.length) {
-      setWikiForInfiniteScroll(w => {
-        if (
-          w.length &&
-          fetchedWiki.wiki[0].id !== w[0].id &&
-          searchQuery.page !== '1'
-        ) {
-          return [...w, ...fetchedWiki.wiki];
-        }
-        return fetchedWiki.wiki;
-      });
+    if (isFocused) {
+      refetch();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [fetchedWiki?.wiki, isFetching]);
+  }, [searchQuery]);
+
+  // useEffect(() => {
+  //   if (!isFetching && fetchedWiki?.wiki && fetchedWiki?.wiki.length) {
+  //     setWikiForInfiniteScroll(w => {
+  //       if (
+  //         w.length &&
+  //         fetchedWiki.wiki[0].id !== w[0].id &&
+  //         searchQuery.page !== '1'
+  //       ) {
+  //         return [...w, ...fetchedWiki.wiki];
+  //       }
+  //       return fetchedWiki.wiki;
+  //     });
+  //   }
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [fetchedWiki?.wiki]);
 
   const isQA = type === WikiType.BOARD && boardCategory === BoardCategory.QA;
 
