@@ -461,22 +461,10 @@ export class UserService {
     }
     const userGoodForBoards = await this.userGoodForBoardRepository.find({
       where: { user },
-      relations: ['user', 'wiki', 'wiki.tags', 'wiki.writer', 'wiki.answers'],
+      relations: ['wiki', 'wiki.tags', 'wiki.writer', 'wiki.answers'],
     });
 
-    console.log(userGoodForBoards);
-    const wikisSentGood = userGoodForBoards.map((g) => g.wiki);
-
-    for (const wiki of wikisSentGood) {
-      const wikiUserGoodForBoard = await this.userGoodForBoardRepository.find({
-        where: { wiki },
-        relations: ['user'],
-      });
-      wiki.isGoodSender = true;
-      wiki.userGoodForBoard = wikiUserGoodForBoard.map((g) => g.user);
-    }
-
-    return { ...user, userGoodForBoard: wikisSentGood };
+    return { ...user, userGoodForBoard: userGoodForBoards };
   }
 
   async getByEmail(email: string, passwordSelect?: boolean) {

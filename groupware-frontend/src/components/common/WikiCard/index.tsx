@@ -1,7 +1,14 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { dateTimeFormatterFromJSDDate } from 'src/utils/dateTimeFormatter';
 import { BoardCategory, User, Wiki, WikiType } from 'src/types';
-import { Box, Button, Link, Text, useMediaQuery } from '@chakra-ui/react';
+import {
+  Box,
+  Button,
+  Link,
+  Spinner,
+  Text,
+  useMediaQuery,
+} from '@chakra-ui/react';
 import { tagColorFactory } from 'src/utils/factory/tagColorFactory';
 import { wikiTypeNameFactory } from 'src/utils/wiki/wikiTypeNameFactory';
 import UserAvatar from '../UserAvatar';
@@ -11,6 +18,7 @@ import { AiFillHeart, AiOutlineHeart } from 'react-icons/ai';
 import GoodSendersModal from '@/components/wiki/GoodSendersModal';
 import { useAPIToggleGoodForBoard } from '@/hooks/api/wiki/useAPIToggleGoodForBoard';
 import { useAuthenticate } from 'src/contexts/useAuthenticate';
+import { useAPIGetGoodsForBoard } from '@/hooks/api/wiki/useAPIGetGoodsForBoard';
 
 type WikiCardProps = {
   wiki: Wiki;
@@ -26,22 +34,18 @@ const WikiCard: React.FC<WikiCardProps> = ({ wiki }) => {
     wikiState.isGoodSender || false,
   );
 
-  const { mutate } = useAPIToggleGoodForBoard({
-    onSuccess: () => {
-      setIsPressHeart((prevHeartStatus) => {
-        setWikiState((w) => {
-          if (prevHeartStatus) {
-            w.userGoodForBoard = w.userGoodForBoard?.filter(
-              (u) => u.id !== user?.id,
-            );
-          } else {
-            w.userGoodForBoard = [user as User, ...(w.userGoodForBoard || [])];
-          }
-          return w;
-        });
-
-        return !prevHeartStatus;
-      });
+  const {
+    mutate: getGoodForboard,
+    data,
+    isLoading,
+  } = useAPIGetGoodsForBoard({
+    onSuccess: (res) => {
+      const senderIDs = res.map((g) => g.user.id);
+      const isGoodSender = senderIDs.some((id) => id === user?.id);
+      if (isGoodSender) {
+        setWikiState((w) => ({ ...w, isGoodSender: true }));
+        setIsPressHeart(true);
+      }
     },
   });
 
@@ -56,8 +60,18 @@ const WikiCard: React.FC<WikiCardProps> = ({ wiki }) => {
     }
   }, [wiki.type]);
 
+  const { mutate } = useAPIToggleGoodForBoard({
+    onSuccess: () => {
+      getGoodForboard(wiki.id);
+      setIsPressHeart((prevHeartStatus) => {
+        return !prevHeartStatus;
+      });
+    },
+  });
+
   useEffect(() => {
     setWikiState(wiki);
+    getGoodForboard(wiki.id);
   }, [wiki]);
 
   return (
@@ -137,12 +151,13 @@ const WikiCard: React.FC<WikiCardProps> = ({ wiki }) => {
                 onClick={() => {
                   setGoodSendersModal(true);
                 }}>
-                <Button
-                  colorScheme={'blue'}
-                  color="white"
-                  size={
-                    'sm'
-                  }>{`${wikiState.userGoodForBoard?.length}件のいいね`}</Button>
+                <Button colorScheme={'blue'} color="white" size={'sm'}>
+                  {!isLoading && data ? (
+                    `${data?.map((g) => g.user).length}件のいいね`
+                  ) : (
+                    <Spinner />
+                  )}
+                </Button>
               </Link>
             </Box>
           )}
@@ -179,7 +194,7 @@ const WikiCard: React.FC<WikiCardProps> = ({ wiki }) => {
       <GoodSendersModal
         isOpen={goodSendersModal}
         onClose={() => setGoodSendersModal(false)}
-        goodSenders={wiki.userGoodForBoard || []}
+        goodSenders={data?.map((g) => g.user) || []}
       />
       <Box
         display="flex"

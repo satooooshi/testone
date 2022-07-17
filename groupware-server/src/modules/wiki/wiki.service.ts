@@ -123,14 +123,14 @@ export class WikiService {
       .orderBy({ 'answer.created_at': 'ASC', 'reply.created_at': 'ASC' })
       .getOne();
 
-    const userGoodForBoard = await this.userGoodForBoardRepository.find({
-      where: { wiki: existWiki },
-      relations: ['user'],
-    });
-    const goodSenders = userGoodForBoard.map((g) => g.user);
-    const isGoodSender = goodSenders.some((u) => u.id === userID);
+    // const userGoodForBoard = await this.userGoodForBoardRepository.find({
+    //   where: { wiki: existWiki },
+    //   relations: ['user'],
+    // });
+    // const goodSenders = userGoodForBoard.map((g) => g.user);
+    // const isGoodSender = goodSenders.some((u) => u.id === userID);
 
-    return { ...existWiki, userGoodForBoard: goodSenders, isGoodSender };
+    return existWiki;
   }
 
   public async getAnswerDetail(id: number): Promise<QAAnswer> {
@@ -176,6 +176,9 @@ export class WikiService {
       .createQueryBuilder('wiki')
       .select()
       .leftJoinAndSelect('wiki.tags', 'tag')
+      // .leftJoinAndSelect('wiki.userGoodForBoard', 'userGoodForBoard')
+      // .leftJoinAndSelect('wiki.answers', 'answer')
+      // .leftJoinAndSelect('answer.writer', 'answer_writer')
       .leftJoin('wiki.writer', 'writer')
       .addSelect(selectUserColumns('writer'))
       .andWhere(type ? 'wiki.type = :type' : '1=1', { type })
@@ -222,35 +225,46 @@ export class WikiService {
       .orderBy('wiki.id', 'DESC')
       .getManyAndCount();
 
-    const wikisWithRelations: Wiki[] = await Promise.all(
-      wikis.map(async (w) => {
-        const userGoodForBoard = await this.userGoodForBoardRepository.find({
-          where: {
-            wiki: w,
-          },
-          relations: ['user', 'wiki'],
-        });
-        const goodSenders = userGoodForBoard.map((g) => g.user);
-        const isGoodSender = goodSenders.some((u) => u.id === userID);
+    // const wikisWithRelations: Wiki[] = await Promise.all(
+    //   wikis.map(async (w) => {
+    //     const userGoodForBoard = await this.userGoodForBoardRepository.find({
+    //       where: {
+    //         wiki: w,
+    //       },
+    //       relations: ['user', 'wiki'],
+    //     });
+    //     const goodSenders = userGoodForBoard.map((g) => g.user);
+    //     const isGoodSender = goodSenders.some((u) => u.id === userID);
 
-        const answers = await this.qaAnswerRepository.find({
-          where: { wiki: w },
-          relations: ['writer'],
-        });
-        return {
-          ...w,
-          userGoodForBoard: goodSenders,
-          answers: answers,
-          isGoodSender,
-        };
-      }),
-    );
+    //     const answers = await this.qaAnswerRepository.find({
+    //       where: { wiki: w },
+    //       relations: ['writer'],
+    //     });
+    //     return {
+    //       ...w,
+    //       userGoodForBoard: goodSenders,
+    //       answers: answers,
+    //       isGoodSender,
+    //     };
+    //   }),
+    // );
     const endTime = Date.now();
     console.log('get wiki speed check', endTime - startTime);
 
     const pageCount =
       count % limit === 0 ? count / limit : Math.floor(count / limit) + 1;
-    return { pageCount, wiki: wikisWithRelations };
+    return { pageCount, wiki: wikis };
+  }
+
+  public async getHearts(wikiID: number): Promise<UserGoodForBoard[]> {
+    const existWiki = await this.wikiRepository.findOne(wikiID);
+    const existGoodReaction = await this.userGoodForBoardRepository.find({
+      where: {
+        wiki: existWiki,
+      },
+      relations: ['user'],
+    });
+    return existGoodReaction;
   }
 
   public async toggleGoodForBoard(

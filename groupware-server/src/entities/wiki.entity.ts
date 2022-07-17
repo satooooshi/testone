@@ -180,7 +180,7 @@ export class Wiki {
       onDelete: 'CASCADE',
     },
   )
-  userGoodForBoard?: User[];
+  userGoodForBoard?: UserGoodForBoard[];
 
   @BeforeInsert()
   @BeforeUpdate()

@@ -326,7 +326,7 @@ export class User {
       onDelete: 'CASCADE',
     },
   )
-  userGoodForBoard?: Wiki[];
+  userGoodForBoard?: UserGoodForBoard[];
 
   @OneToMany(() => Wiki, (wiki) => wiki.writer)
   wiki?: Wiki[];
