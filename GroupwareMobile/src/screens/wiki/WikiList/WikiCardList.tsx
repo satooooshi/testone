@@ -3,7 +3,6 @@ import React, {
   useEffect,
   Dispatch,
   SetStateAction,
-  useCallback,
   useRef,
 } from 'react';
 import {BoardCategory, RuleCategory, WikiType} from '../../../types';
@@ -15,7 +14,7 @@ import {Div, Radio, Text} from 'react-native-magnus';
 import WikiCard from '../../../components/wiki/WikiCard';
 import {FlatList} from 'react-native';
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
-import {useFocusEffect, useIsFocused, useRoute} from '@react-navigation/native';
+import {useIsFocused, useRoute} from '@react-navigation/native';
 import SearchForm from '../../../components/common/SearchForm';
 import SearchFormOpenerButton from '../../../components/common/SearchForm/SearchFormOpenerButton';
 import {WikiListRouteProps} from '../../../types/navigator/drawerScreenProps';
@@ -40,7 +39,6 @@ type RenderWikiCardListProps = {
   setRuleCategory: Dispatch<SetStateAction<RuleCategory>>;
   setBoardCategory: Dispatch<SetStateAction<BoardCategory>>;
   type?: WikiType;
-  focused: boolean;
 };
 
 const RenderWikiCardList: React.FC<RenderWikiCardListProps> = ({
@@ -51,7 +49,6 @@ const RenderWikiCardList: React.FC<RenderWikiCardListProps> = ({
   boardCategory,
   setBoardCategory,
   type,
-  focused,
 }) => {
   const [searchQuery, setSearchQuery] = useState<SearchQueryToGetWiki>({
     page: '1',
@@ -70,11 +67,12 @@ const RenderWikiCardList: React.FC<RenderWikiCardListProps> = ({
     isLoading,
     isFetching,
     refetch,
-  } = useAPIGetWikiList(searchQuery);
+  } = useAPIGetWikiList(searchQuery, {enabled: false});
   const [wikiForInfiniteScroll, setWikiForInfiniteScroll] = useState(
     fetchedWiki?.wiki || [],
   );
   const flatListRef = useRef<FlatList | null>(null);
+  const isFocused = useIsFocused();
 
   const onEndReached = () => {
     setSearchQuery(q => ({
@@ -83,25 +81,30 @@ const RenderWikiCardList: React.FC<RenderWikiCardListProps> = ({
     }));
   };
 
-  useFocusEffect(
-    useCallback(() => {
-      setRuleCategory(ruleCategory || RuleCategory.NON_RULE);
-    }, [ruleCategory, setRuleCategory]),
-  );
-
-  useFocusEffect(
-    useCallback(() => {
-      setBoardCategory(boardCategory || BoardCategory.NON_BOARD);
-    }, [boardCategory, setBoardCategory]),
-  );
-
   useEffect(() => {
-    if (focused) {
-      flatListRef?.current?.scrollToOffset({animated: false, offset: 0});
-      setSearchQuery(q => ({...q, page: '1', type, word, tag}));
+    if (isFocused) {
       refetch();
     }
-  }, [focused, refetch, tag, type, word, searchQuery.status]);
+  }, [searchQuery, refetch, isFocused]);
+
+  useEffect(() => {
+    if (isFocused) {
+      setBoardCategory(boardCategory || BoardCategory.NON_BOARD);
+      setRuleCategory(ruleCategory || RuleCategory.NON_RULE);
+      flatListRef?.current?.scrollToOffset({animated: false, offset: 0});
+      refetch();
+    }
+  }, [
+    isFocused,
+    refetch,
+    tag,
+    type,
+    word,
+    boardCategory,
+    ruleCategory,
+    setBoardCategory,
+    setRuleCategory,
+  ]);
 
   useEffect(() => {
     if (!isFetching && fetchedWiki?.wiki && fetchedWiki?.wiki.length) {
@@ -176,7 +179,6 @@ const WikiCardList: React.FC<WikiCardListProps> = ({
   const [visibleSearchFormModal, setVisibleSearchFormModal] = useState(false);
   const [word, setWord] = useState('');
   const [tag, setTag] = useState('');
-  const isFocused = useIsFocused();
 
   useEffect(() => {
     if (routeParams?.tag) {
@@ -211,7 +213,6 @@ const WikiCardList: React.FC<WikiCardListProps> = ({
               name={'WikiList-' + RuleCategory.RULES}
               children={() => (
                 <RenderWikiCardList
-                  focused={isFocused}
                   setRuleCategory={setRuleCategory}
                   setBoardCategory={setBoardCategory}
                   ruleCategory={RuleCategory.RULES}
@@ -226,7 +227,6 @@ const WikiCardList: React.FC<WikiCardListProps> = ({
               name={'WikiList-' + RuleCategory.PHILOSOPHY}
               children={() => (
                 <RenderWikiCardList
-                  focused={isFocused}
                   setRuleCategory={setRuleCategory}
                   setBoardCategory={setBoardCategory}
                   ruleCategory={RuleCategory.PHILOSOPHY}
@@ -241,7 +241,6 @@ const WikiCardList: React.FC<WikiCardListProps> = ({
               name={'WikiList-' + RuleCategory.ABC}
               children={() => (
                 <RenderWikiCardList
-                  focused={isFocused}
                   setRuleCategory={setRuleCategory}
                   setBoardCategory={setBoardCategory}
                   ruleCategory={RuleCategory.ABC}
@@ -256,7 +255,6 @@ const WikiCardList: React.FC<WikiCardListProps> = ({
               name={'WikiList-' + RuleCategory.BENEFITS}
               children={() => (
                 <RenderWikiCardList
-                  focused={isFocused}
                   setRuleCategory={setRuleCategory}
                   setBoardCategory={setBoardCategory}
                   ruleCategory={RuleCategory.BENEFITS}
@@ -271,7 +269,6 @@ const WikiCardList: React.FC<WikiCardListProps> = ({
               name={'WikiList-' + RuleCategory.DOCUMENT}
               children={() => (
                 <RenderWikiCardList
-                  focused={isFocused}
                   setRuleCategory={setRuleCategory}
                   setBoardCategory={setBoardCategory}
                   ruleCategory={RuleCategory.DOCUMENT}
@@ -292,7 +289,6 @@ const WikiCardList: React.FC<WikiCardListProps> = ({
               name={'WikiList-board'}
               children={() => (
                 <RenderWikiCardList
-                  focused={isFocused}
                   setRuleCategory={setRuleCategory}
                   setBoardCategory={setBoardCategory}
                   ruleCategory={undefined}
@@ -307,7 +303,6 @@ const WikiCardList: React.FC<WikiCardListProps> = ({
               name={'WikiList-' + BoardCategory.KNOWLEDGE}
               children={() => (
                 <RenderWikiCardList
-                  focused={isFocused}
                   setRuleCategory={setRuleCategory}
                   setBoardCategory={setBoardCategory}
                   ruleCategory={undefined}
@@ -330,7 +325,6 @@ const WikiCardList: React.FC<WikiCardListProps> = ({
               name={'WikiList-' + BoardCategory.QA}
               children={() => (
                 <RenderWikiCardList
-                  focused={isFocused}
                   setRuleCategory={setRuleCategory}
                   setBoardCategory={setBoardCategory}
                   ruleCategory={undefined}
@@ -353,7 +347,6 @@ const WikiCardList: React.FC<WikiCardListProps> = ({
               name={'WikiList-' + BoardCategory.NEWS}
               children={() => (
                 <RenderWikiCardList
-                  focused={isFocused}
                   setRuleCategory={setRuleCategory}
                   setBoardCategory={setBoardCategory}
                   ruleCategory={undefined}
@@ -376,7 +369,6 @@ const WikiCardList: React.FC<WikiCardListProps> = ({
               name={'WikiList-' + BoardCategory.IMPRESSIVE_UNIVERSITY}
               children={() => (
                 <RenderWikiCardList
-                  focused={isFocused}
                   setRuleCategory={setRuleCategory}
                   setBoardCategory={setBoardCategory}
                   ruleCategory={undefined}
@@ -399,7 +391,6 @@ const WikiCardList: React.FC<WikiCardListProps> = ({
               name={'WikiList-' + BoardCategory.CLUB}
               children={() => (
                 <RenderWikiCardList
-                  focused={isFocused}
                   setRuleCategory={setRuleCategory}
                   setBoardCategory={setBoardCategory}
                   ruleCategory={undefined}
@@ -422,7 +413,6 @@ const WikiCardList: React.FC<WikiCardListProps> = ({
               name={'WikiList-' + BoardCategory.STUDY_MEETING}
               children={() => (
                 <RenderWikiCardList
-                  focused={isFocused}
                   setRuleCategory={setRuleCategory}
                   setBoardCategory={setBoardCategory}
                   ruleCategory={undefined}
@@ -445,7 +435,6 @@ const WikiCardList: React.FC<WikiCardListProps> = ({
               name={'WikiList-' + BoardCategory.SELF_IMPROVEMENT}
               children={() => (
                 <RenderWikiCardList
-                  focused={isFocused}
                   setRuleCategory={setRuleCategory}
                   setBoardCategory={setBoardCategory}
                   ruleCategory={undefined}
@@ -468,7 +457,6 @@ const WikiCardList: React.FC<WikiCardListProps> = ({
               name={'WikiList-' + BoardCategory.PERSONAL_ANNOUNCEMENT}
               children={() => (
                 <RenderWikiCardList
-                  focused={isFocused}
                   setRuleCategory={setRuleCategory}
                   setBoardCategory={setBoardCategory}
                   ruleCategory={undefined}
@@ -491,7 +479,6 @@ const WikiCardList: React.FC<WikiCardListProps> = ({
               name={'WikiList-' + BoardCategory.CELEBRATION}
               children={() => (
                 <RenderWikiCardList
-                  focused={isFocused}
                   setRuleCategory={setRuleCategory}
                   setBoardCategory={setBoardCategory}
                   ruleCategory={undefined}
@@ -514,7 +501,6 @@ const WikiCardList: React.FC<WikiCardListProps> = ({
               name={'WikiList-' + BoardCategory.OTHER}
               children={() => (
                 <RenderWikiCardList
-                  focused={isFocused}
                   setRuleCategory={setRuleCategory}
                   setBoardCategory={setBoardCategory}
                   ruleCategory={undefined}
@@ -536,7 +522,6 @@ const WikiCardList: React.FC<WikiCardListProps> = ({
           </TopTab.Navigator>
         ) : (
           <RenderWikiCardList
-            focused={isFocused}
             setRuleCategory={setRuleCategory}
             setBoardCategory={setBoardCategory}
             ruleCategory={undefined}
