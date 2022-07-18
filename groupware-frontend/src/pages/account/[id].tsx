@@ -40,6 +40,7 @@ import { blueColor, darkFontColor } from 'src/utils/colors';
 import { userNameFactory } from 'src/utils/factory/userNameFactory';
 import { useAPISaveChatGroup } from '@/hooks/api/chat/useAPISaveChatGroup';
 import { HiOutlineChat } from 'react-icons/hi';
+import { AiOutlineArrowLeft } from 'react-icons/ai';
 
 type UserTagListProps = {
   tags?: UserTag[];
@@ -214,6 +215,14 @@ const MyAccountInfo = () => {
           ボールド | {profile ? `${profile.lastName} ${profile.firstName}` : ''}
         </title>
       </Head>
+      <Box w="100%" mt="20px" mb="40px">
+        <Button bg="white" w="120px" onClick={() => router.back()}>
+          <Box mr="10px">
+            <AiOutlineArrowLeft size="20px" />
+          </Box>
+          <Text fontSize="14px">戻る</Text>
+        </Button>
+      </Box>
       <div className={accountInfoStyles.main}>
         {profile && (
           <Box
