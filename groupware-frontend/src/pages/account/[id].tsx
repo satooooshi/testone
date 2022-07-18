@@ -232,7 +232,6 @@ const MyAccountInfo = () => {
             alignSelf="center"
             alignItems="center"
             w="100%">
-            {/* プロフィールカード */}
             <Flex direction="row" bg="white" w="100%" p="30px" rounded="5px">
               <Box mx="20px">
                 {profile.avatarUrl ? (
