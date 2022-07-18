@@ -263,7 +263,7 @@ const MyAccountInfo = () => {
               </Box>
             </Flex>
 
-            <Box w="100%" mb="24px">
+            <Box w="100%" my="30px">
               <TopTabBar topTabBehaviorList={topTabBehaviorList} />
             </Box>
 
