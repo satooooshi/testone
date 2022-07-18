@@ -108,6 +108,8 @@ export class ChatService {
     }
     const limitNumber = Number(limit);
 
+    const startTime = Date.now();
+
     const urlUnparsedRooms = await this.chatGroupRepository
       .createQueryBuilder('chat_groups')
       .leftJoin('chat_groups.members', 'member')
@@ -194,6 +196,11 @@ export class ChatService {
       ['desc', 'desc'],
     ]).reverse();
 
+    const endTime = Date.now();
+    console.log(
+      'get rooms by page ========================',
+      endTime - startTime,
+    );
     const pageCount = Number(page);
     return { rooms, pageCount };
   }
