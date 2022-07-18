@@ -175,7 +175,7 @@ const MyAccountInfo = () => {
       header={{
         title: 'Account',
         activeTabName: profile?.id === user?.id ? 'アカウント情報' : '',
-        tabs: profile?.id !== user?.id ? tabs : [],
+        // tabs: profile?.id !== user?.id ? tabs : [],
         rightButtonName: profile?.id === user?.id ? 'ログアウト' : undefined,
         onClickRightButton:
           profile?.id === user?.id ? () => logout() : undefined,

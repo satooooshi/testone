@@ -180,17 +180,17 @@ const headerTab = (headerTabBehavior: HeaderTabBehavior): Tab[] => {
           onClick: onCreateClicked,
         },
       ];
-    // case 'account':
-    //   return [
-    //     {
-    //       type: 'backButton',
-    //       name: '戻る',
-    //       href:
-    //         previousUrl?.indexOf('/users/list') !== -1
-    //           ? previousUrl
-    //           : '/users/list',
-    //     },
-    //   ];
+    case 'account':
+      return [
+        {
+          type: 'backButton',
+          name: '戻る',
+          href:
+            previousUrl?.indexOf('/users/list') !== -1
+              ? previousUrl
+              : '/users/list',
+        },
+      ];
     case 'home':
       return [
         {
