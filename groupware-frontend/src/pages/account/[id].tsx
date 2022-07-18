@@ -268,24 +268,30 @@ const MyAccountInfo = () => {
 
             {activeTab === TabName.DETAIL && (
               <>
+                <Text fontSize="22px" fontWeight="bold" mb="12px" mr="auto">
+                  プロフィール
+                </Text>
+                <SimpleGrid
+                  bg="white"
+                  w="100%"
+                  p="20px"
+                  mb="20px"
+                  rounded="5px"
+                  spacingY="16px">
+                  <Text fontWeight="bold">メールアドレス</Text>
+                  <Text>
+                    {profile.isEmailPublic ? profile.email : '非公開'}
+                  </Text>
+                  <Text fontWeight="bold">携帯電話番号</Text>
+                  <Text>
+                    {profile.isPhonePublic ? profile.phone : '非公開'}
+                  </Text>
+                  <Text fontWeight="bold">所属支社</Text>
+                  <Text>{branchTypeNameFactory(profile.branch)}</Text>
+                  <Text fontWeight="bold">社員コード</Text>
+                  <Text>{profile.employeeId || '未登録'}</Text>
+                </SimpleGrid>
                 <Box w="100%">
-                  <Box
-                    display="flex"
-                    mb={5}
-                    flexDir="row"
-                    alignItems="center"
-                    w="100%">
-                    <Text fontSize={14} w={'10%'}>
-                      社員番号:
-                    </Text>
-                    <Text
-                      fontWeight="bold"
-                      w="85%"
-                      fontSize={18}
-                      color={darkFontColor}>
-                      {profile.employeeId || '未登録'}
-                    </Text>
-                  </Box>
                   <Box
                     display="flex"
                     mb={5}
@@ -301,75 +307,6 @@ const MyAccountInfo = () => {
                       fontSize={18}
                       color={darkFontColor}>
                       {userRoleNameFactory(profile.role)}
-                    </Text>
-                  </Box>
-                  <Box
-                    display="flex"
-                    mb={5}
-                    flexDir="row"
-                    alignItems="center"
-                    w="100%">
-                    <Text fontSize={14} w={'10%'}>
-                      所属支社:
-                    </Text>
-                    <Text
-                      fontWeight="bold"
-                      w="85%"
-                      fontSize={18}
-                      color={darkFontColor}>
-                      {branchTypeNameFactory(profile.branch)}
-                    </Text>
-                  </Box>
-                  <Box
-                    display="flex"
-                    mb={5}
-                    flexDir="row"
-                    alignItems="center"
-                    w="100%">
-                    <Text fontSize={14} w={'10%'}>
-                      {'メール　'}:
-                    </Text>
-                    <Text
-                      fontWeight="bold"
-                      w="85%"
-                      fontSize={18}
-                      color={darkFontColor}>
-                      {profile.isEmailPublic ? profile.email : '非公開'}
-                    </Text>
-                  </Box>
-                  <Box
-                    display="flex"
-                    mb={5}
-                    flexDir="row"
-                    alignItems="center"
-                    w="100%">
-                    <Text fontSize={14} w={'10%'}>
-                      電話番号:
-                    </Text>
-                    <Text
-                      fontWeight="bold"
-                      w="85%"
-                      fontSize={18}
-                      color={darkFontColor}>
-                      {profile.isPhonePublic ? profile.phone : '非公開'}
-                    </Text>
-                  </Box>
-                  <Box
-                    display="flex"
-                    flexDir="row"
-                    alignItems="center"
-                    mb={8}
-                    w="100%">
-                    <Text fontSize={14} w={'10%'}>
-                      自己紹介:
-                    </Text>
-                    <Text
-                      fontWeight="bold"
-                      w="85%"
-                      fontSize={18}
-                      color={darkFontColor}
-                      className={accountInfoStyles.introduce}>
-                      {profile.introduceOther || '未入力'}
                     </Text>
                   </Box>
                   <Box
