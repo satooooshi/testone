@@ -26,6 +26,7 @@ import {
   useMediaQuery,
   SimpleGrid,
   Flex,
+  Wrap,
 } from '@chakra-ui/react';
 import {
   BoardCategory,
@@ -38,78 +39,48 @@ import {
 import { userRoleNameFactory } from 'src/utils/factory/userRoleNameFactory';
 import { branchTypeNameFactory } from 'src/utils/factory/branchTypeNameFactory';
 import { blueColor, darkFontColor } from 'src/utils/colors';
-import { userNameFactory } from 'src/utils/factory/userNameFactory';
 import { useAPISaveChatGroup } from '@/hooks/api/chat/useAPISaveChatGroup';
 import { HiOutlineChat } from 'react-icons/hi';
 import { AiOutlineArrowLeft } from 'react-icons/ai';
+import { tagBgColorFactory } from 'src/utils/factory/tagBgColorFactory';
+import { tagFontColorFactory } from 'src/utils/factory/tagFontColorFactory';
 
 type UserTagListProps = {
   tags?: UserTag[];
   type: TagType;
-  introduce: string;
 };
 
-const UserTagList: React.FC<UserTagListProps> = ({ tags, type, introduce }) => {
-  const color: ThemeTypings['colorSchemes'] = useMemo(() => {
-    switch (type) {
-      case TagType.TECH:
-        return 'teal';
-      case TagType.QUALIFICATION:
-        return 'blue';
-      case TagType.CLUB:
-        return 'green';
-      case TagType.HOBBY:
-        return 'pink';
-      default:
-        return 'teal';
-    }
-  }, [type]);
-
-  const labelName: string = useMemo(() => {
-    switch (type) {
-      case TagType.TECH:
-        return '技術';
-      case TagType.QUALIFICATION:
-        return '資格';
-      case TagType.CLUB:
-        return '部活動';
-      case TagType.HOBBY:
-        return '趣味';
-      default:
-        return '';
-    }
-  }, [type]);
+const UserTagList: React.FC<UserTagListProps> = ({ tags, type }) => {
+  const filteredTags = tags?.filter((t) => t.type === type);
 
   return (
-    <Box bg="white" rounded="md" p={2}>
-      <Text fontWeight="bold" mb={2} fontSize={14}>{`${labelName}タグ`}</Text>
-      <Box display="flex" flexFlow="row" flexWrap="wrap" mb={4}>
-        {tags?.length ? (
-          tags
-            ?.filter((t) => t.type === type)
-            .map((t) => (
-              <div key={t.id} className={accountInfoStyles.tag_button_wrapper}>
-                <Button colorScheme={color} size="xs">
-                  {t.name}
-                </Button>
-              </div>
-            ))
-        ) : (
-          <Button colorScheme={color} size="xs">
+    <Wrap spacing="8px" bg="white" rounded="md">
+      {filteredTags && filteredTags.length ? (
+        filteredTags.map((t) => (
+          <Box key={t.id}>
+            <Button
+              bg={tagBgColorFactory(type)}
+              color={tagFontColorFactory(type)}
+              rounded="3px"
+              size="xs">
+              <Text fontWeight="normal" fontSize="14px">
+                {t.name}
+              </Text>
+            </Button>
+          </Box>
+        ))
+      ) : (
+        <Button
+          bg={tagBgColorFactory(type)}
+          color={tagFontColorFactory(type)}
+          rounded="3px"
+          size="xs">
+          <Text fontWeight="normal" fontSize="14px">
             未設定
-          </Button>
-        )}
-      </Box>
-      <Box>
-        <Text mb={2} fontSize={14}>{`${labelName}の紹介`}</Text>
-        <Text
-          fontSize={16}
-          fontWeight="bold"
-          className={accountInfoStyles.introduce}>
-          {introduce || '未入力'}
-        </Text>
-      </Box>
-    </Box>
+          </Text>
+        </Button>
+      )}
+    </Wrap>
   );
 };
 
@@ -141,8 +112,6 @@ const MyAccountInfo = () => {
       router.push('/login');
     },
   });
-  const [isSmallerThan1024] = useMediaQuery('(max-width: 1024px)');
-  const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
   const previousUrl = document.referrer;
 
   const tabs: Tab[] = useHeaderTab({
@@ -291,6 +260,34 @@ const MyAccountInfo = () => {
                   <Text fontWeight="bold">社員コード</Text>
                   <Text>{profile.employeeId || '未登録'}</Text>
                 </SimpleGrid>
+                <Text fontSize="22px" fontWeight="bold" mb="12px" mr="auto">
+                  タグ
+                </Text>
+                <SimpleGrid
+                  bg="white"
+                  w="100%"
+                  p="20px"
+                  mb="20px"
+                  rounded="5px"
+                  spacingY="16px">
+                  <Text fontWeight="bold">技術タグ</Text>
+                  <UserTagList tags={profile.tags} type={TagType.TECH} />
+                  <Text mb="8px">{profile.introduceTech || '未入力'}</Text>
+                  <Text fontWeight="bold">資格タグ</Text>
+                  <UserTagList
+                    tags={profile.tags}
+                    type={TagType.QUALIFICATION}
+                  />
+                  <Text mb="8px">
+                    {profile.introduceQualification || '未入力'}
+                  </Text>
+                  <Text fontWeight="bold">部活動タグ</Text>
+                  <UserTagList tags={profile.tags} type={TagType.CLUB} />
+                  <Text mb="8px">{profile.introduceClub || '未入力'}</Text>
+                  <Text fontWeight="bold">趣味タグ</Text>
+                  <UserTagList tags={profile.tags} type={TagType.HOBBY} />
+                  <Text mb="8px">{profile.introduceHobby || '未入力'}</Text>
+                </SimpleGrid>
                 <Box w="100%">
                   <Box
                     display="flex"
@@ -308,41 +305,6 @@ const MyAccountInfo = () => {
                       color={darkFontColor}>
                       {userRoleNameFactory(profile.role)}
                     </Text>
-                  </Box>
-                  <Box
-                    w={'100%'}
-                    mb={35}
-                    display="flex"
-                    flexDir="row"
-                    flexWrap="wrap">
-                    <Box mb={8} mr={4} w={isSmallerThan1024 ? '100%' : '49%'}>
-                      <UserTagList
-                        tags={profile.tags}
-                        type={TagType.TECH}
-                        introduce={profile.introduceTech}
-                      />
-                    </Box>
-                    <Box mb={8} w={isSmallerThan1024 ? '100%' : '49%'}>
-                      <UserTagList
-                        tags={profile.tags}
-                        type={TagType.QUALIFICATION}
-                        introduce={profile.introduceQualification}
-                      />
-                    </Box>
-                    <Box mb={8} mr={4} w={isSmallerThan1024 ? '100%' : '49%'}>
-                      <UserTagList
-                        tags={profile.tags}
-                        type={TagType.CLUB}
-                        introduce={profile.introduceClub}
-                      />
-                    </Box>
-                    <Box mb={8} w={isSmallerThan1024 ? '100%' : '49%'}>
-                      <UserTagList
-                        tags={profile.tags}
-                        type={TagType.HOBBY}
-                        introduce={profile.introduceHobby}
-                      />
-                    </Box>
                   </Box>
                   {profile?.id !== user?.id &&
                     profile.role !== UserRole.EXTERNAL_INSTRUCTOR && (
