@@ -94,7 +94,6 @@ const RenderWikiCardList: React.FC<RenderWikiCardListProps> = ({
     if (isFocused) {
       setRuleCategory(ruleCategory || RuleCategory.NON_RULE);
       setBoardCategory(boardCategory || BoardCategory.NON_BOARD);
-      setWikiForInfiniteScroll([]);
       setSearchQuery(q => ({
         ...q,
         type,
