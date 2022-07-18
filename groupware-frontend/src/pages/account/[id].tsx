@@ -212,6 +212,15 @@ const MyAccountInfo = () => {
               <Box>
                 <Text fontSize="20px" fontWeight="bold" mb="5px">
                   {`${profile.lastName} ${profile.firstName}`}
+                  <Button
+                    ml="10px"
+                    size="xs"
+                    bg="green.50"
+                    color="green.600"
+                    fontSize="14px"
+                    fontWeight="none">
+                    {userRoleNameFactory(profile.role)}
+                  </Button>
                 </Text>
                 <Text fontSize="12px" color="gray" mb="12px">
                   {`${profile.lastNameKana} ${profile.firstNameKana}`}
