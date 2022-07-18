@@ -314,11 +314,6 @@ export class EventScheduleService {
     const toDate = new Date(query.to);
     const startTime = Date.now();
 
-    console.log(
-      'use partipant_id=============================',
-      query.participant_id,
-    );
-
     const events = await this.eventRepository
       .createQueryBuilder('events')
       .select()
