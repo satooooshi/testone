@@ -290,23 +290,6 @@ const MyAccountInfo = () => {
                   <Text mb="8px">{profile.introduceHobby || '未入力'}</Text>
                 </SimpleGrid>
                 <Box w="100%">
-                  <Box
-                    display="flex"
-                    mb={5}
-                    flexDir="row"
-                    alignItems="center"
-                    w="100%">
-                    <Text fontSize={14} w={'10%'}>
-                      社員区分:
-                    </Text>
-                    <Text
-                      fontWeight="bold"
-                      w="85%"
-                      fontSize={18}
-                      color={darkFontColor}>
-                      {userRoleNameFactory(profile.role)}
-                    </Text>
-                  </Box>
                   {profile?.id !== user?.id &&
                     profile.role !== UserRole.EXTERNAL_INSTRUCTOR && (
                       <Button
