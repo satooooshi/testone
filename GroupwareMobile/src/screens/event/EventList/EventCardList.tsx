@@ -84,14 +84,21 @@ const EventCardList: React.FC<EventCardListProps> = ({
   }, [isFocused, refetch, searchQuery]);
 
   useEffect(() => {
-    if (partOfSearchQuery.refetchNeeded) {
-      setSearchQuery(q => ({
-        ...q,
-        page: '1',
-      }));
-      setPartOfSearchQuery({refetchNeeded: false});
+    if (!isFocused) {
+      setSearchQuery(q => ({...q, ...partOfSearchQuery, page: '1'}));
     }
-  }, [partOfSearchQuery.refetchNeeded, setPartOfSearchQuery]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isFocused]);
+
+  // useEffect(() => {
+  //   if (partOfSearchQuery.refetchNeeded) {
+  //     setSearchQuery(q => ({
+  //       ...q,
+  //       page: '1',
+  //     }));
+  //     setPartOfSearchQuery({refetchNeeded: false});
+  //   }
+  // }, [partOfSearchQuery.refetchNeeded, setPartOfSearchQuery, status]);
 
   const queryRefresh = (
     query: Partial<SearchQueryToGetEvents>,
