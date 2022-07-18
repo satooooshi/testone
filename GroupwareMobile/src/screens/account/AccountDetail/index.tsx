@@ -495,7 +495,7 @@ const AccountDetail: React.FC = () => {
                       <Div alignItems="center" mt="lg">
                         {profile?.userGoodForBoard?.length ? (
                           profile?.userGoodForBoard?.map(w => (
-                            <WikiCard key={w.id} wiki={w} />
+                            <WikiCard key={w.wiki.id} wiki={w.wiki} />
                           ))
                         ) : (
                           <Text fontSize={16}>

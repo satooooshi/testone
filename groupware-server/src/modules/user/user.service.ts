@@ -18,12 +18,15 @@ import { SearchQueryToGetUsers } from './user.controller';
 import { Tag, TagType } from 'src/entities/tag.entity';
 import { StorageService } from '../storage/storage.service';
 import { DateTime } from 'luxon';
+import { UserGoodForBoard } from 'src/entities/userGoodForBord.entity';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User)
     private userRepository: Repository<User>,
+    @InjectRepository(UserGoodForBoard)
+    private readonly userGoodForBoardRepository: Repository<UserGoodForBoard>,
     private storageService: StorageService,
   ) {}
 
@@ -448,14 +451,7 @@ export class UserService {
   async getAllInfoById(id: number): Promise<User> {
     const user = await this.userRepository.findOne({
       where: { id },
-      relations: [
-        'tags',
-        'userGoodForBoard',
-        'userGoodForBoard.userGoodForBoard',
-        'userGoodForBoard.tags',
-        'userGoodForBoard.writer',
-        'userGoodForBoard.answers',
-      ],
+      relations: ['tags'],
     });
     if (!user) {
       throw new NotFoundException('User with this id does not exist');
@@ -463,11 +459,12 @@ export class UserService {
     if (!user?.verifiedAt) {
       throw new BadRequestException('The user is not verified');
     }
-    for (const wiki of user.userGoodForBoard) {
-      wiki.isGoodSender = true;
-    }
+    const userGoodForBoards = await this.userGoodForBoardRepository.find({
+      where: { user },
+      relations: ['wiki', 'wiki.tags', 'wiki.writer', 'wiki.answers'],
+    });
 
-    return user;
+    return { ...user, userGoodForBoard: userGoodForBoards };
   }
 
   async getByEmail(email: string, passwordSelect?: boolean) {

@@ -6,6 +6,9 @@ import { BoardCategory, Wiki, WikiType } from 'src/entities/wiki.entity';
 import { In, Repository } from 'typeorm';
 import { SearchQueryToGetWiki, SearchResultToGetWiki } from './wiki.controller';
 import { StorageService } from '../storage/storage.service';
+import { selectUserColumns } from 'src/utils/selectUserColumns';
+import { UserGoodForBoard } from 'src/entities/userGoodForBord.entity';
+import { User } from 'src/entities/user.entity';
 
 @Injectable()
 export class WikiService {
@@ -18,6 +21,12 @@ export class WikiService {
 
     @InjectRepository(QAAnswerReply)
     private readonly qaAnswerReplyRepository: Repository<QAAnswerReply>,
+
+    @InjectRepository(UserGoodForBoard)
+    private readonly userGoodForBoardRepository: Repository<UserGoodForBoard>,
+
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
 
     private readonly storageService: StorageService,
   ) {}
@@ -110,20 +119,16 @@ export class WikiService {
       .leftJoinAndSelect('answer.replies', 'reply')
       .leftJoinAndSelect('reply.writer', 'reply_writer')
       .leftJoinAndSelect('wiki.tags', 'tags')
-      .leftJoinAndSelect('wiki.userGoodForBoard', 'userGoodForBoard')
       .where('wiki.id = :id', { id })
       .orderBy({ 'answer.created_at': 'ASC', 'reply.created_at': 'ASC' })
       .getOne();
 
-    if (existWiki.type === WikiType.BOARD) {
-      for (const user of existWiki.userGoodForBoard) {
-        if (user.id === userID) {
-          existWiki.isGoodSender = true;
-          break;
-        }
-        existWiki.isGoodSender = false;
-      }
-    }
+    // const userGoodForBoard = await this.userGoodForBoardRepository.find({
+    //   where: { wiki: existWiki },
+    //   relations: ['user'],
+    // });
+    // const goodSenders = userGoodForBoard.map((g) => g.user);
+    // const isGoodSender = goodSenders.some((u) => u.id === userID);
 
     return existWiki;
   }
@@ -165,14 +170,17 @@ export class WikiService {
       offset = (Number(page) - 1) * limit;
     }
     const tagIDs = tag.split(' ');
-    const [wikiWithRelation, count] = await this.wikiRepository
+    const startTime = Date.now();
+
+    const [wikis, count] = await this.wikiRepository
       .createQueryBuilder('wiki')
       .select()
       .leftJoinAndSelect('wiki.tags', 'tag')
-      .leftJoinAndSelect('wiki.writer', 'writer')
-      .leftJoinAndSelect('wiki.answers', 'answer')
-      .leftJoinAndSelect('answer.writer', 'answer_writer')
-      .leftJoinAndSelect('wiki.userGoodForBoard', 'userGoodForBoard')
+      // .leftJoinAndSelect('wiki.userGoodForBoard', 'userGoodForBoard')
+      // .leftJoinAndSelect('wiki.answers', 'answer')
+      // .leftJoinAndSelect('answer.writer', 'answer_writer')
+      .leftJoin('wiki.writer', 'writer')
+      .addSelect(selectUserColumns('writer'))
       .andWhere(type ? 'wiki.type = :type' : '1=1', { type })
       .andWhere(word ? 'CONCAT(title, wiki.body) LIKE :queryWord' : '1=1', {
         queryWord: `%${word}%`,
@@ -194,12 +202,6 @@ export class WikiService {
         writer: writer,
       })
       .andWhere(
-        query.answer_writer ? 'answer_writer.id = :answerWriter' : '1=1',
-        {
-          answerWriter: query.answer_writer,
-        },
-      )
-      .andWhere(
         rule_category && type === WikiType.RULES
           ? 'wiki.ruleCategory = :ruleCategory'
           : '1=1',
@@ -220,55 +222,44 @@ export class WikiService {
       })
       .skip(offset)
       .take(limit)
-      .orderBy('wiki.createdAt', 'DESC')
+      .orderBy('wiki.id', 'DESC')
       .getManyAndCount();
 
-    for (const wiki of wikiWithRelation) {
-      if (wiki.type === WikiType.BOARD) {
-        for (const userGoodSender of wiki.userGoodForBoard) {
-          if (userGoodSender.id === userID) {
-            wiki.isGoodSender = true;
-            break;
-          }
-          wiki.isGoodSender = false;
-        }
-      }
-    }
+    const endTime = Date.now();
+    console.log('get wiki speed check', endTime - startTime);
 
     const pageCount =
       count % limit === 0 ? count / limit : Math.floor(count / limit) + 1;
-    return { pageCount, wiki: wikiWithRelation };
+    return { pageCount, wiki: wikis };
+  }
+
+  public async getHearts(wikiID: number): Promise<UserGoodForBoard[]> {
+    const existWiki = await this.wikiRepository.findOne(wikiID);
+    const existGoodReaction = await this.userGoodForBoardRepository.find({
+      where: {
+        wiki: existWiki,
+      },
+      relations: ['user'],
+    });
+    return existGoodReaction;
   }
 
   public async toggleGoodForBoard(
-    userID: number,
+    user: User,
     wikiID: number,
   ): Promise<Partial<Wiki>> {
-    const existGoodReaction = await this.wikiRepository
-      .createQueryBuilder('wiki')
-      .leftJoinAndSelect('wiki.userGoodForBoard', 'userGoodForBoard')
-      .where('wiki.id = :id', {
-        id: wikiID,
-      })
-      .andWhere('userGoodForBoard.id = :userID', {
-        userID,
-      })
-      .getOne();
+    const existWiki = await this.wikiRepository.findOne(wikiID);
 
+    const existGoodReaction = await this.userGoodForBoardRepository.findOne({
+      wiki: existWiki,
+      user: user,
+    });
     if (existGoodReaction) {
-      await this.wikiRepository
-        .createQueryBuilder()
-        .relation(Wiki, 'userGoodForBoard')
-        .of({ id: userID })
-        .remove({ id: wikiID });
-      return { isGoodSender: false };
-    } else {
-      await this.wikiRepository
-        .createQueryBuilder()
-        .relation(Wiki, 'userGoodForBoard')
-        .of({ id: userID })
-        .add({ id: wikiID });
-      return { isGoodSender: true };
+      return await this.userGoodForBoardRepository.remove(existGoodReaction);
     }
+    return await this.userGoodForBoardRepository.save({
+      user: user,
+      wiki: existWiki,
+    });
   }
 }
