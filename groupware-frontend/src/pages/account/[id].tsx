@@ -263,12 +263,6 @@ const MyAccountInfo = () => {
               </Box>
             </Flex>
 
-            <Box
-              display="flex"
-              flexDir="row"
-              justifyContent="center"
-              mb="16px"></Box>
-
             <Box w="100%" mb="24px">
               <TopTabBar topTabBehaviorList={topTabBehaviorList} />
             </Box>
