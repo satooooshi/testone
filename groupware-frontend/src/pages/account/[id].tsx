@@ -202,19 +202,11 @@ const MyAccountInfo = () => {
             alignItems="center"
             w="100%">
             <Flex direction="row" bg="white" w="100%" p="30px" rounded="5px">
-              <Box mx="20px">
+              <Box mx="20px" className={accountInfoStyles.avatar}>
                 {profile.avatarUrl ? (
-                  <img
-                    src={profile.avatarUrl}
-                    alt="アバター画像"
-                    className={accountInfoStyles.avatar}
-                  />
+                  <img src={profile.avatarUrl} alt="アバター画像" />
                 ) : (
-                  <Image
-                    src={noImage}
-                    alt="アバター画像"
-                    className={accountInfoStyles.avatar}
-                  />
+                  <Image src={noImage} alt="アバター画像" />
                 )}
               </Box>
               <Box>
