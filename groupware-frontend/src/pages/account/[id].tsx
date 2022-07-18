@@ -25,6 +25,7 @@ import {
   ThemeTypings,
   useMediaQuery,
   SimpleGrid,
+  Flex,
 } from '@chakra-ui/react';
 import {
   BoardCategory,
@@ -231,36 +232,42 @@ const MyAccountInfo = () => {
             alignSelf="center"
             alignItems="center"
             w="100%">
-            <Box mb="16px">
-              {profile.avatarUrl ? (
-                <img
-                  src={profile.avatarUrl}
-                  alt="アバター画像"
-                  className={accountInfoStyles.avatar}
-                />
-              ) : (
-                <Image
-                  src={noImage}
-                  alt="アバター画像"
-                  className={accountInfoStyles.avatar}
-                />
-              )}
-            </Box>
+            {/* プロフィールカード */}
+            <Flex direction="row" bg="white" w="100%" p="30px" rounded="5px">
+              <Box mx="20px">
+                {profile.avatarUrl ? (
+                  <img
+                    src={profile.avatarUrl}
+                    alt="アバター画像"
+                    className={accountInfoStyles.avatar}
+                  />
+                ) : (
+                  <Image
+                    src={noImage}
+                    alt="アバター画像"
+                    className={accountInfoStyles.avatar}
+                  />
+                )}
+              </Box>
+              <Box>
+                <Text fontSize="20px" fontWeight="bold" mb="5px">
+                  {`${profile.lastName} ${profile.firstName}`}
+                </Text>
+                <Text fontSize="12px" color="gray" mb="12px">
+                  {`${profile.lastNameKana} ${profile.firstNameKana}`}
+                </Text>
+                <Text fontWeight="bold" mb="12px">
+                  自己紹介
+                </Text>
+                <Text>{profile.introduceOther || '未入力'}</Text>
+              </Box>
+            </Flex>
 
-            {/* <div className={accountInfoStyles.name_wrapper}> */}
-            {/*   <h1 className={accountInfoStyles.name}> */}
-            {/*     {userNameFactory(user)} */}
-            {/*   </h1> */}
-            {/* </div> */}
-            <Box display="flex" flexDir="row" justifyContent="center" mb="16px">
-              <Text
-                fontSize={20}
-                fontWeight="bold"
-                color={darkFontColor}
-                display="block">
-                {userNameFactory(profile)}
-              </Text>
-            </Box>
+            <Box
+              display="flex"
+              flexDir="row"
+              justifyContent="center"
+              mb="16px"></Box>
 
             <Box w="100%" mb="24px">
               <TopTabBar topTabBehaviorList={topTabBehaviorList} />
