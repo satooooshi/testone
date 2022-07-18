@@ -91,7 +91,7 @@ const WikiCard: React.FC<WikiCardProps> = ({wiki}) => {
         </Div>
         <Div flexDir="column" w="100%">
           <Div flexDir="row" justifyContent="flex-end" mb={4} mr={4}>
-            {isBoard ? (
+            {/* {isBoard ? (
               <Div mr="lg" flexDir="row">
                 <Text textAlignVertical="bottom" mr={2}>
                   {isQA ? '回答' : 'コメント'}
@@ -104,7 +104,7 @@ const WikiCard: React.FC<WikiCardProps> = ({wiki}) => {
                   {wiki.answers?.length.toString() || 0}
                 </Text>
               </Div>
-            ) : null}
+            ) : null} */}
             <Div flexDir="column" alignItems="flex-end">
               <Text textAlignVertical="bottom" textAlign="center">
                 {`投稿日: ${dateTimeFormatterFromJSDDate({

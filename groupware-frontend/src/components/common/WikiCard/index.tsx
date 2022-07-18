@@ -161,7 +161,7 @@ const WikiCard: React.FC<WikiCardProps> = ({ wiki }) => {
               </Link>
             </Box>
           )}
-          {wiki.type === WikiType.BOARD ? (
+          {/* {wiki.type === WikiType.BOARD ? (
             <Box
               mr="16px"
               display="flex"
@@ -175,7 +175,7 @@ const WikiCard: React.FC<WikiCardProps> = ({ wiki }) => {
                 {wikiState.answers?.length.toString()}
               </Text>
             </Box>
-          ) : null}
+          ) : null} */}
           <Box display="flex" flexDir={'column'} alignItems="end">
             <Text fontSize={'16px'} color={darkFontColor} display="flex">
               {`投稿日: ${dateTimeFormatterFromJSDDate({
