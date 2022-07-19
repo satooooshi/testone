@@ -83,8 +83,6 @@ const UserCardList: React.FC<UserCardListProps> = ({userRole, word, tag}) => {
     setSearchQuery(q => ({...q, word, tag}));
   }, [tag, word]);
 
-  useEffect(() => {}, [searchQuery]);
-
   useEffect(() => {
     if (isFocused && searchQuery.page) {
       refetch();
