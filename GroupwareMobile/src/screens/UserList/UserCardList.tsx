@@ -83,20 +83,22 @@ const UserCardList: React.FC<UserCardListProps> = ({userRole, word, tag}) => {
     setSearchQuery(q => ({...q, word, tag}));
   }, [tag, word]);
 
+  useEffect(() => {}, [searchQuery]);
+
+  useEffect(() => {
+    if (isFocused && searchQuery.page) {
+      refetch();
+    }
+  }, [searchQuery.page, refetch, isFocused]);
+
   useEffect(() => {
     setSearchQuery(q => ({...q, page: '1'}));
-  }, [
-    searchQuery.word,
-    searchQuery.tag,
-    searchQuery.sort,
-    searchQuery.duration,
-  ]);
+  }, [searchQuery.word, searchQuery.tag, searchQuery.sort]);
 
   useEffect(() => {
     if (isFocused) {
       flatListRef?.current?.scrollToOffset({animated: false, offset: 0});
       setSearchQuery(q => ({...q, page: '1'}));
-      refetch();
     }
   }, [isFocused, refetch]);
 
