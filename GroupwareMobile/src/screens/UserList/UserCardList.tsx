@@ -60,11 +60,6 @@ const UserCardList: React.FC<UserCardListProps> = ({userRole, word, tag}) => {
 
   const onEndReached = () => {
     if (usersForInfiniteScroll.length >= Number(searchQuery.page) * 20) {
-      console.log(
-        'call onEndReach in if =================================',
-        searchQuery.page,
-        searchQuery.role,
-      );
       setSearchQuery(q => ({...q, page: (Number(q?.page) + 1).toString()}));
     }
   };
