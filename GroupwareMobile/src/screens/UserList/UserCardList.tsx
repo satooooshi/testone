@@ -1,3 +1,4 @@
+import {useIsFocused} from '@react-navigation/native';
 import React, {useEffect, useRef, useState} from 'react';
 import {FlatList} from 'react-native';
 import {Div, Dropdown, Text} from 'react-native-magnus';
@@ -19,15 +20,10 @@ type UserCardListProps = {
   userRole: UserRoleInApp;
   word: string;
   tag: string;
-  focused: boolean;
 };
 
-const UserCardList: React.FC<UserCardListProps> = ({
-  userRole,
-  word,
-  tag,
-  focused,
-}) => {
+const UserCardList: React.FC<UserCardListProps> = ({userRole, word, tag}) => {
+  const isFocused = useIsFocused();
   const [searchQuery, setSearchQuery] = useState<SearchQueryToGetUsers>({
     page: '1',
   });
@@ -94,12 +90,12 @@ const UserCardList: React.FC<UserCardListProps> = ({
   ]);
 
   useEffect(() => {
-    if (focused) {
+    if (isFocused) {
       flatListRef?.current?.scrollToOffset({animated: false, offset: 0});
       setSearchQuery(q => ({...q, page: '1'}));
       refetch();
     }
-  }, [focused, refetch]);
+  }, [isFocused, refetch]);
 
   useEffect(() => {
     if (!isRefetching && users?.users) {

@@ -236,6 +236,7 @@ export class UserService {
       offset = (Number(page) - 1) * limit;
     }
     const tagIDs = tag.split(' ');
+    const startTime = Date.now();
     const [users, count] = await this.userRepository
       .createQueryBuilder('user')
       .leftJoin('user.tags', 'tag')
@@ -258,73 +259,11 @@ export class UserService {
       .andWhere(tag ? 'tag.id IN (:...tagIDs)' : '1=1', {
         tagIDs,
       })
-      .addSelect((subQuery) => {
-        return subQuery
-          .select('COUNT( DISTINCT event.id )', 'eventCount')
-          .from(User, 'u')
-          .leftJoin('u.userJoiningEvent', 'userJoiningEvent')
-          .leftJoin('userJoiningEvent.event', 'event')
-          .where('u.id = user.id')
-          .andWhere('userJoiningEvent.canceledAt IS NULL')
-          .andWhere(
-            fromDate && toDate
-              ? 'event.endAt > :fromDate AND event.endAt < :toDate'
-              : '1=1',
-            { fromDate, toDate },
-          );
-      }, 'eventCount')
-      .addSelect((subQuery) => {
-        return subQuery
-          .select('COUNT( DISTINCT wiki.id )', 'questionCount')
-          .from(User, 'u')
-          .leftJoin('u.wiki', 'wiki')
-          .where(fromDate ? 'wiki.createdAt > :fromDate' : '1=1', {
-            fromDate,
-          })
-          .andWhere('wiki.type = :wikiTypeOfQa', {
-            wikiTypeOfQa: WikiType.BOARD,
-          })
-          .andWhere('wiki.board_category = :boardCategory', {
-            boardCategory: BoardCategory.QA,
-          })
-          .andWhere(fromDate ? 'wiki.createdAt < :toDate' : '1=1', {
-            toDate,
-          })
-          .andWhere('u.id = user.id');
-      }, 'questionCount')
-      .addSelect((subQuery) => {
-        return subQuery
-          .select('COUNT( DISTINCT answer.id )', 'answerCount')
-          .from(User, 'u')
-          .leftJoin('u.qaAnswers', 'answer')
-          .where(fromDate ? 'answer.createdAt > :fromDate' : '1=1', {
-            fromDate,
-          })
-          .andWhere(fromDate ? 'answer.createdAt < :toDate' : '1=1', {
-            toDate,
-          })
-          .andWhere('u.id = user.id');
-      }, 'answerCount')
-      .addSelect((subQuery) => {
-        return subQuery
-          .select('COUNT( DISTINCT wiki.id )', 'answerCount')
-          .from(User, 'u')
-          .leftJoin('u.wiki', 'wiki')
-          .where(fromDate ? 'wiki.createdAt < :fromDate' : '1=1', {
-            fromDate,
-          })
-          .andWhere('wiki.type = :board', {
-            board: WikiType.BOARD,
-          })
-          .andWhere('wiki.board_category = :boarrdCategory', {
-            boarrdCategory: BoardCategory.KNOWLEDGE,
-          })
-          .andWhere('u.id = user.id');
-      }, 'knowledgeCount')
       .skip(offset)
       .take(limit)
       .orderBy(sortKey, sortKey === 'user.lastNameKana' ? 'ASC' : 'DESC')
       .getManyAndCount();
+    const endTime = Date.now();
     const userIDs = users.map((u) => u.id);
     const userArrWithTags = await this.userRepository.findByIds(userIDs, {
       relations: ['tags'],
@@ -389,6 +328,7 @@ export class UserService {
       )
       .where(userIDs.length ? 'user.id IN (:...userIDs)' : '1=1', { userIDs })
       .getMany();
+
     const usersArrWithEachCount = users.map((u) => {
       const tags = userArrWithTags.filter((user) => user.id === u.id)[0]?.tags;
       const eventCount =
@@ -412,6 +352,13 @@ export class UserService {
         answerCount,
       };
     });
+    const endTime2 = Date.now();
+    console.log(
+      'get user list speed check',
+      endTime - startTime,
+      'end ',
+      endTime2 - startTime,
+    );
     const pageCount =
       count % limit === 0 ? count / limit : Math.floor(count / limit) + 1;
     return { users: usersArrWithEachCount, pageCount };
