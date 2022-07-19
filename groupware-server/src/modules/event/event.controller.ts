@@ -75,6 +75,8 @@ const eventTypeName = (eventType: EventType) => {
       return 'コーチ制度';
     case EventType.SUBMISSION_ETC:
       return '提出物等';
+    case EventType.OTHER:
+      return 'その他';
   }
 };
 
