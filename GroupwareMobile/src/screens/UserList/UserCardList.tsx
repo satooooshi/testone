@@ -1,3 +1,4 @@
+import {useIsFocused} from '@react-navigation/native';
 import React, {useEffect, useRef, useState} from 'react';
 import {FlatList} from 'react-native';
 import {Div, Dropdown, Text} from 'react-native-magnus';
@@ -19,15 +20,10 @@ type UserCardListProps = {
   userRole: UserRoleInApp;
   word: string;
   tag: string;
-  focused: boolean;
 };
 
-const UserCardList: React.FC<UserCardListProps> = ({
-  userRole,
-  word,
-  tag,
-  focused,
-}) => {
+const UserCardList: React.FC<UserCardListProps> = ({userRole, word, tag}) => {
+  const isFocused = useIsFocused();
   const [searchQuery, setSearchQuery] = useState<SearchQueryToGetUsers>({
     page: '1',
   });
@@ -36,13 +32,16 @@ const UserCardList: React.FC<UserCardListProps> = ({
     isLoading,
     refetch,
     isRefetching,
-  } = useAPISearchUsers({
-    ...searchQuery,
-    role: userRole !== 'All' ? userRole : undefined,
-    page: searchQuery?.page || '1',
-    word,
-    tag,
-  });
+  } = useAPISearchUsers(
+    {
+      ...searchQuery,
+      role: userRole !== 'All' ? userRole : undefined,
+      page: searchQuery?.page || '1',
+      word,
+      tag,
+    },
+    {enabled: false},
+  );
   const [usersForInfiniteScroll, setUsersForInfiniteScroll] = useState<User[]>(
     [],
   );
@@ -85,21 +84,21 @@ const UserCardList: React.FC<UserCardListProps> = ({
   }, [tag, word]);
 
   useEffect(() => {
-    setSearchQuery(q => ({...q, page: '1'}));
-  }, [
-    searchQuery.word,
-    searchQuery.tag,
-    searchQuery.sort,
-    searchQuery.duration,
-  ]);
-
-  useEffect(() => {
-    if (focused) {
-      flatListRef?.current?.scrollToOffset({animated: false, offset: 0});
-      setSearchQuery(q => ({...q, page: '1'}));
+    if (isFocused && searchQuery.page) {
       refetch();
     }
-  }, [focused, refetch]);
+  }, [searchQuery.page, refetch, isFocused]);
+
+  useEffect(() => {
+    setSearchQuery(q => ({...q, page: '1'}));
+  }, [searchQuery.word, searchQuery.tag, searchQuery.sort]);
+
+  useEffect(() => {
+    if (isFocused) {
+      flatListRef?.current?.scrollToOffset({animated: false, offset: 0});
+      setSearchQuery(q => ({...q, page: '1'}));
+    }
+  }, [isFocused, refetch]);
 
   useEffect(() => {
     if (!isRefetching && users?.users) {
