@@ -33,24 +33,23 @@ const WikiCard: React.FC<WikiCardProps> = ({wiki}) => {
   const {user} = useAuthenticate();
   const [wikiState, setWikiState] = useState(wiki);
 
-  const {
-    mutate: getGoodsForBoard,
-    data: goodsForBoard,
-    isLoading,
-  } = useAPIGetGoodsForBoard({
-    onSuccess: res => {
-      const senderIDs = res.map(g => g.user.id);
-      const isGoodSender = senderIDs.some(id => id === user?.id);
-      if (isGoodSender) {
-        setWikiState(w => ({...w, isGoodSender: true}));
-        setIsPressHeart(true);
-      }
-    },
-  });
+  // const {
+  //   mutate: getGoodsForBoard,
+  //   data: goodsForBoard,
+  //   isLoading,
+  // } = useAPIGetGoodsForBoard({
+  //   onSuccess: res => {
+  //     const senderIDs = res.map(g => g.user.id);
+  //     const isGoodSender = senderIDs.some(id => id === user?.id);
+  //     if (isGoodSender) {
+  //       setWikiState(w => ({...w, isGoodSender: true}));
+  //       setIsPressHeart(true);
+  //     }
+  //   },
+  // });
 
   const {mutate} = useAPIToggleGoodForBoard({
     onSuccess: () => {
-      getGoodsForBoard(wiki.id);
       setIsPressHeart(prevHeartStatus => {
         return !prevHeartStatus;
       });
@@ -59,8 +58,7 @@ const WikiCard: React.FC<WikiCardProps> = ({wiki}) => {
 
   useEffect(() => {
     setWikiState(wiki);
-    getGoodsForBoard(wiki.id);
-  }, [wiki, getGoodsForBoard]);
+  }, [wiki]);
 
   return (
     <TouchableHighlight
@@ -178,7 +176,7 @@ const WikiCard: React.FC<WikiCardProps> = ({wiki}) => {
               </Tag>
             </>
           )}
-          {wiki.type === WikiType.BOARD && (
+          {/* {wiki.type === WikiType.BOARD && (
             <Div flexDir="row" ml="auto" mr={5}>
               <TouchableHighlight
                 underlayColor={'none'}
@@ -209,12 +207,12 @@ const WikiCard: React.FC<WikiCardProps> = ({wiki}) => {
                 )}
               </Button>
             </Div>
-          )}
-          <GoodSendersModal
+          )} */}
+          {/* <GoodSendersModal
             goodSenders={goodsForBoard?.map(g => g.user) || []}
             isVisible={isVisible}
             onClose={() => setIsVisible(false)}
-          />
+          /> */}
         </Div>
       </Div>
     </TouchableHighlight>

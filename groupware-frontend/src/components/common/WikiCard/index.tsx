@@ -62,7 +62,6 @@ const WikiCard: React.FC<WikiCardProps> = ({ wiki }) => {
 
   const { mutate } = useAPIToggleGoodForBoard({
     onSuccess: () => {
-      getGoodForboard(wiki.id);
       setIsPressHeart((prevHeartStatus) => {
         return !prevHeartStatus;
       });
@@ -71,7 +70,6 @@ const WikiCard: React.FC<WikiCardProps> = ({ wiki }) => {
 
   useEffect(() => {
     setWikiState(wiki);
-    getGoodForboard(wiki.id);
   }, [wiki]);
 
   return (
@@ -134,7 +132,7 @@ const WikiCard: React.FC<WikiCardProps> = ({ wiki }) => {
         alignItems="center"
         justifyContent="flex-end">
         <Box display="flex" flexDir="row" height={5} alignItems="center">
-          {wikiState.type === WikiType.BOARD && (
+          {/* {wikiState.type === WikiType.BOARD && (
             <Box display="flex" mr={3}>
               <Link
                 position={'relative'}
@@ -160,7 +158,7 @@ const WikiCard: React.FC<WikiCardProps> = ({ wiki }) => {
                 </Button>
               </Link>
             </Box>
-          )}
+          )} */}
           {/* {wiki.type === WikiType.BOARD ? (
             <Box
               mr="16px"
@@ -191,11 +189,11 @@ const WikiCard: React.FC<WikiCardProps> = ({ wiki }) => {
         </Box>
       </Box>
 
-      <GoodSendersModal
+      {/* <GoodSendersModal
         isOpen={goodSendersModal}
         onClose={() => setGoodSendersModal(false)}
         goodSenders={data?.map((g) => g.user) || []}
-      />
+      /> */}
       <Box
         display="flex"
         flexDir={isSmallerThan768 ? 'column' : 'row'}
