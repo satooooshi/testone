@@ -1,5 +1,5 @@
 import {AxiosError} from 'axios';
-import {useQuery} from 'react-query';
+import {useQuery, UseQueryOptions} from 'react-query';
 import {UserRole, User} from '../../../types';
 import {axiosInstance} from '../../../utils/url';
 import {userAPIQueryRefresh} from '../../../utils/userAPIQueryRefresh';
@@ -28,9 +28,13 @@ const searchUsers = async (
   return res.data;
 };
 
-export const useAPISearchUsers = (query: SearchQueryToGetUsers) => {
+export const useAPISearchUsers = (
+  query: SearchQueryToGetUsers,
+  options?: UseQueryOptions<SearchResultToGetUsers, AxiosError>,
+) => {
   return useQuery<SearchResultToGetUsers, AxiosError>(
     ['searchUsers', query],
     () => searchUsers(query),
+    options,
   );
 };

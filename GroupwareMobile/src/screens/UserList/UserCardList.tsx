@@ -32,13 +32,16 @@ const UserCardList: React.FC<UserCardListProps> = ({userRole, word, tag}) => {
     isLoading,
     refetch,
     isRefetching,
-  } = useAPISearchUsers({
-    ...searchQuery,
-    role: userRole !== 'All' ? userRole : undefined,
-    page: searchQuery?.page || '1',
-    word,
-    tag,
-  });
+  } = useAPISearchUsers(
+    {
+      ...searchQuery,
+      role: userRole !== 'All' ? userRole : undefined,
+      page: searchQuery?.page || '1',
+      word,
+      tag,
+    },
+    {enabled: false},
+  );
   const [usersForInfiniteScroll, setUsersForInfiniteScroll] = useState<User[]>(
     [],
   );
