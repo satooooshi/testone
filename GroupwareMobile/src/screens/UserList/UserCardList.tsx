@@ -31,7 +31,6 @@ const UserCardList: React.FC<UserCardListProps> = ({userRole, word, tag}) => {
     data: users,
     isLoading,
     refetch,
-    isRefetching,
   } = useAPISearchUsers(
     {
       ...searchQuery,
@@ -40,7 +39,17 @@ const UserCardList: React.FC<UserCardListProps> = ({userRole, word, tag}) => {
       word,
       tag,
     },
-    {enabled: false},
+    {
+      enabled: false,
+      onSuccess: fetchedUser => {
+        setUsersForInfiniteScroll(u => {
+          if (u.length && searchQuery?.page !== '1') {
+            return [...u, ...fetchedUser.users];
+          }
+          return fetchedUser.users;
+        });
+      },
+    },
   );
   const [usersForInfiniteScroll, setUsersForInfiniteScroll] = useState<User[]>(
     [],
@@ -50,7 +59,14 @@ const UserCardList: React.FC<UserCardListProps> = ({userRole, word, tag}) => {
   const flatListRef = useRef<FlatList | null>(null);
 
   const onEndReached = () => {
-    setSearchQuery(q => ({...q, page: (Number(q?.page) + 1).toString()}));
+    if (usersForInfiniteScroll.length >= Number(searchQuery.page) * 20) {
+      console.log(
+        'call onEndReach in if =================================',
+        searchQuery.page,
+        searchQuery.role,
+      );
+      setSearchQuery(q => ({...q, page: (Number(q?.page) + 1).toString()}));
+    }
   };
 
   const sortDropdownButtonName = () => {
@@ -96,21 +112,10 @@ const UserCardList: React.FC<UserCardListProps> = ({userRole, word, tag}) => {
   useEffect(() => {
     if (isFocused) {
       flatListRef?.current?.scrollToOffset({animated: false, offset: 0});
+    } else {
       setSearchQuery(q => ({...q, page: '1'}));
     }
-  }, [isFocused, refetch]);
-
-  useEffect(() => {
-    if (!isRefetching && users?.users) {
-      setUsersForInfiniteScroll(u => {
-        if (u.length && searchQuery?.page !== '1') {
-          return [...u, ...users.users];
-        }
-        return users?.users;
-      });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [users?.users, isRefetching]);
+  }, [isFocused]);
 
   return (
     <>
