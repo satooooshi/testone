@@ -405,7 +405,7 @@ export class UserService {
       })
       .andWhere(
         fromDate && toDate
-          ? 'qa.endAt > :fromDate AND qa.endAt < :toDate'
+          ? 'qa.createdAt > :fromDate AND qa.createdAt < :toDate'
           : '1=1',
         { fromDate, toDate },
       )
