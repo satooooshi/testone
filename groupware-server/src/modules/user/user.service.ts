@@ -248,6 +248,69 @@ export class UserService {
     const [users, count] = await this.userRepository
       .createQueryBuilder('user')
       .leftJoin('user.tags', 'tag')
+      .addSelect((subQuery) => {
+        return subQuery
+          .select('COUNT( DISTINCT event.id )', 'eventCount')
+          .from(User, 'u')
+          .leftJoin('u.userJoiningEvent', 'userJoiningEvent')
+          .leftJoin('userJoiningEvent.event', 'event')
+          .where('u.id = user.id')
+          .andWhere('userJoiningEvent.canceledAt IS NULL')
+          .andWhere(
+            fromDate && toDate
+              ? 'event.endAt > :fromDate AND event.endAt < :toDate'
+              : '1=1',
+            { fromDate, toDate },
+          );
+      }, 'eventCount')
+      .addSelect((subQuery) => {
+        return subQuery
+          .select('COUNT( DISTINCT wiki.id )', 'questionCount')
+          .from(User, 'u')
+          .leftJoin('u.wiki', 'wiki')
+          .where(fromDate ? 'wiki.createdAt > :fromDate' : '1=1', {
+            fromDate,
+          })
+          .andWhere('wiki.type = :wikiTypeOfQa', {
+            wikiTypeOfQa: WikiType.BOARD,
+          })
+          .andWhere('wiki.board_category = :boardCategory', {
+            boardCategory: BoardCategory.QA,
+          })
+          .andWhere(fromDate ? 'wiki.createdAt < :toDate' : '1=1', {
+            toDate,
+          })
+          .andWhere('u.id = user.id');
+      }, 'questionCount')
+      .addSelect((subQuery) => {
+        return subQuery
+          .select('COUNT( DISTINCT answer.id )', 'answerCount')
+          .from(User, 'u')
+          .leftJoin('u.qaAnswers', 'answer')
+          .where(fromDate ? 'answer.createdAt > :fromDate' : '1=1', {
+            fromDate,
+          })
+          .andWhere(fromDate ? 'answer.createdAt < :toDate' : '1=1', {
+            toDate,
+          })
+          .andWhere('u.id = user.id');
+      }, 'answerCount')
+      .addSelect((subQuery) => {
+        return subQuery
+          .select('COUNT( DISTINCT wiki.id )', 'answerCount')
+          .from(User, 'u')
+          .leftJoin('u.wiki', 'wiki')
+          .where(fromDate ? 'wiki.createdAt < :fromDate' : '1=1', {
+            fromDate,
+          })
+          .andWhere('wiki.type = :board', {
+            board: WikiType.BOARD,
+          })
+          .andWhere('wiki.board_category = :boarrdCategory', {
+            boarrdCategory: BoardCategory.KNOWLEDGE,
+          })
+          .andWhere('u.id = user.id');
+      }, 'knowledgeCount')
       .where(
         word && word.length > 2
           ? 'MATCH(user.firstName, user.lastName) AGAINST (:word IN NATURAL LANGUAGE MODE)'
