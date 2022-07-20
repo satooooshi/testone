@@ -34,21 +34,6 @@ const WikiCard: React.FC<WikiCardProps> = ({ wiki }) => {
     wikiState.isGoodSender || false,
   );
 
-  const {
-    mutate: getGoodForboard,
-    data,
-    isLoading,
-  } = useAPIGetGoodsForBoard({
-    onSuccess: (res) => {
-      const senderIDs = res.map((g) => g.user.id);
-      const isGoodSender = senderIDs.some((id) => id === user?.id);
-      if (isGoodSender) {
-        setWikiState((w) => ({ ...w, isGoodSender: true }));
-        setIsPressHeart(true);
-      }
-    },
-  });
-
   const tagButtonColor = useMemo(() => {
     switch (wiki.type) {
       case WikiType.BOARD:
@@ -62,8 +47,15 @@ const WikiCard: React.FC<WikiCardProps> = ({ wiki }) => {
 
   const { mutate } = useAPIToggleGoodForBoard({
     onSuccess: () => {
-      getGoodForboard(wiki.id);
       setIsPressHeart((prevHeartStatus) => {
+        setWikiState((w) => {
+          return {
+            ...w,
+            goodsCount: prevHeartStatus
+              ? (w.goodsCount || 0) - 1
+              : (w.goodsCount || 0) + 1,
+          };
+        });
         return !prevHeartStatus;
       });
     },
@@ -71,7 +63,6 @@ const WikiCard: React.FC<WikiCardProps> = ({ wiki }) => {
 
   useEffect(() => {
     setWikiState(wiki);
-    getGoodForboard(wiki.id);
   }, [wiki]);
 
   return (
@@ -152,16 +143,12 @@ const WikiCard: React.FC<WikiCardProps> = ({ wiki }) => {
                   setGoodSendersModal(true);
                 }}>
                 <Button colorScheme={'blue'} color="white" size={'sm'}>
-                  {!isLoading && data ? (
-                    `${data?.map((g) => g.user).length}件のいいね`
-                  ) : (
-                    <Spinner />
-                  )}
+                  {`${wikiState.goodsCount || 0}件のいいね`}
                 </Button>
               </Link>
             </Box>
           )}
-          {/* {wiki.type === WikiType.BOARD ? (
+          {wiki.type === WikiType.BOARD ? (
             <Box
               mr="16px"
               display="flex"
@@ -172,10 +159,10 @@ const WikiCard: React.FC<WikiCardProps> = ({ wiki }) => {
                 {wiki.boardCategory === BoardCategory.QA ? '回答' : 'コメント'}
               </Text>
               <Text color="green.500" fontSize="22px" fontWeight="bold">
-                {wikiState.answers?.length.toString()}
+                {wikiState.answersCount || 0}
               </Text>
             </Box>
-          ) : null} */}
+          ) : null}
           <Box display="flex" flexDir={'column'} alignItems="end">
             <Text fontSize={'16px'} color={darkFontColor} display="flex">
               {`投稿日: ${dateTimeFormatterFromJSDDate({
@@ -194,7 +181,7 @@ const WikiCard: React.FC<WikiCardProps> = ({ wiki }) => {
       <GoodSendersModal
         isOpen={goodSendersModal}
         onClose={() => setGoodSendersModal(false)}
-        goodSenders={data?.map((g) => g.user) || []}
+        wikiID={wikiState.id}
       />
       <Box
         display="flex"

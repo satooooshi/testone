@@ -1,4 +1,5 @@
 import UserAvatar from '@/components/common/UserAvatar';
+import { useAPIGetGoodsForBoard } from '@/hooks/api/wiki/useAPIGetGoodsForBoard';
 import {
   Box,
   Link,
@@ -10,21 +11,25 @@ import {
   ModalOverlay,
   Text,
 } from '@chakra-ui/react';
-import { User } from 'src/types';
+import { useEffect } from 'react';
 import { darkFontColor } from 'src/utils/colors';
 import { userNameFactory } from 'src/utils/factory/userNameFactory';
 
 type GoodSendersModalProps = {
-  goodSenders: User[];
   isOpen: boolean;
   onClose: () => void;
+  wikiID: number;
 };
 
 const GoodSendersModal: React.FC<GoodSendersModalProps> = ({
-  goodSenders,
   isOpen,
   onClose,
+  wikiID,
 }) => {
+  const { mutate: getGoodForBoard, data, isLoading } = useAPIGetGoodsForBoard();
+  useEffect(() => {
+    getGoodForBoard(wikiID);
+  }, [wikiID, getGoodForBoard]);
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
@@ -36,7 +41,7 @@ const GoodSendersModal: React.FC<GoodSendersModalProps> = ({
         </ModalHeader>
         <ModalCloseButton />
         <ModalBody overflow={'scroll'}>
-          {goodSenders?.map((u) => (
+          {data?.map((u) => (
             <Link
               key={u.id}
               display="flex"
@@ -48,8 +53,8 @@ const GoodSendersModal: React.FC<GoodSendersModalProps> = ({
               href={`/account/${u.id}`}
               passHref>
               <Box display="flex" flexDir="row" alignItems="center">
-                <UserAvatar user={u} />
-                <Text fontSize={darkFontColor}>{userNameFactory(u)}</Text>
+                <UserAvatar user={u.user} />
+                <Text fontSize={darkFontColor}>{userNameFactory(u.user)}</Text>
               </Box>
             </Link>
           ))}
