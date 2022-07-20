@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {FlatList, View} from 'react-native';
 import {
   Button,
@@ -8,21 +8,27 @@ import {
   Modal as MagnusModal,
 } from 'react-native-magnus';
 import tailwind from 'tailwind-rn';
+import {useAPIGetGoodsForBoard} from '../../../hooks/api/wiki/useAPIGetGoodForBoard';
 import {User} from '../../../types';
 import {userNameFactory} from '../../../utils/factory/userNameFactory';
 import UserAvatar from '../../common/UserAvatar';
 
 type GoodSendersModalProps = {
-  goodSenders: User[];
   isVisible: boolean;
   onClose: () => void;
+  wikiID: number;
 };
 
 const GoodSendersModal: React.FC<GoodSendersModalProps> = ({
-  goodSenders,
   isVisible,
   onClose,
+  wikiID,
 }) => {
+  const {mutate: getGoodsForBoard, data: goodsForBoard} =
+    useAPIGetGoodsForBoard();
+  useEffect(() => {
+    getGoodsForBoard(wikiID);
+  }, [wikiID, getGoodsForBoard]);
   return (
     <MagnusModal isVisible={isVisible} h={400}>
       <>
@@ -37,20 +43,20 @@ const GoodSendersModal: React.FC<GoodSendersModalProps> = ({
           <Icon color="black" name="close" />
         </Button>
         <FlatList
-          data={goodSenders}
+          data={goodsForBoard}
           renderItem={({item}) => (
             <View style={tailwind('flex-row bg-white items-center px-4 mb-2')}>
               <>
                 <Div mr={'sm'}>
                   <UserAvatar
-                    user={item}
+                    user={item.user}
                     h={64}
                     w={64}
                     onCloseModal={() => onClose()}
                   />
                 </Div>
 
-                <Text fontSize={18}>{userNameFactory(item)}</Text>
+                <Text fontSize={18}>{userNameFactory(item.user)}</Text>
               </>
             </View>
           )}

@@ -13,8 +13,6 @@ import {useAPIToggleGoodForBoard} from '../../../hooks/api/wiki/useAPIToggleGood
 import {useAuthenticate} from '../../../contexts/useAuthenticate';
 import {darkFontColor} from '../../../utils/colors';
 import GoodSendersModal from '../../chat/GoodSendersModal';
-import {useAPIGetGoodsForBoard} from '../../../hooks/api/wiki/useAPIGetGoodForBoard';
-import {ActivityIndicator} from 'react-native-paper';
 
 type WikiCardProps = {
   wiki: Wiki;
@@ -33,25 +31,17 @@ const WikiCard: React.FC<WikiCardProps> = ({wiki}) => {
   const {user} = useAuthenticate();
   const [wikiState, setWikiState] = useState(wiki);
 
-  const {
-    mutate: getGoodsForBoard,
-    data: goodsForBoard,
-    isLoading,
-  } = useAPIGetGoodsForBoard({
-    onSuccess: res => {
-      const senderIDs = res.map(g => g.user.id);
-      const isGoodSender = senderIDs.some(id => id === user?.id);
-      if (isGoodSender) {
-        setWikiState(w => ({...w, isGoodSender: true}));
-        setIsPressHeart(true);
-      }
-    },
-  });
-
   const {mutate} = useAPIToggleGoodForBoard({
     onSuccess: () => {
-      getGoodsForBoard(wiki.id);
       setIsPressHeart(prevHeartStatus => {
+        setWikiState(w => {
+          if (prevHeartStatus) {
+            w.goodsCount = (w.goodsCount || 0) - 1;
+          } else {
+            w.goodsCount = (w.goodsCount || 0) + 1;
+          }
+          return w;
+        });
         return !prevHeartStatus;
       });
     },
@@ -59,8 +49,7 @@ const WikiCard: React.FC<WikiCardProps> = ({wiki}) => {
 
   useEffect(() => {
     setWikiState(wiki);
-    getGoodsForBoard(wiki.id);
-  }, [wiki, getGoodsForBoard]);
+  }, [wiki]);
 
   return (
     <TouchableHighlight
@@ -91,7 +80,7 @@ const WikiCard: React.FC<WikiCardProps> = ({wiki}) => {
         </Div>
         <Div flexDir="column" w="100%">
           <Div flexDir="row" justifyContent="flex-end" mb={4} mr={4}>
-            {/* {isBoard ? (
+            {isBoard ? (
               <Div mr="lg" flexDir="row">
                 <Text textAlignVertical="bottom" mr={2}>
                   {isQA ? '回答' : 'コメント'}
@@ -101,10 +90,10 @@ const WikiCard: React.FC<WikiCardProps> = ({wiki}) => {
                   textAlignVertical="bottom"
                   fontSize={18}
                   mt={-3}>
-                  {wiki.answers?.length.toString() || 0}
+                  {wikiState.answersCount || 0}
                 </Text>
               </Div>
-            ) : null} */}
+            ) : null}
             <Div flexDir="column" alignItems="flex-end">
               <Text textAlignVertical="bottom" textAlign="center">
                 {`投稿日: ${dateTimeFormatterFromJSDDate({
@@ -202,18 +191,14 @@ const WikiCard: React.FC<WikiCardProps> = ({wiki}) => {
                 )}
               </TouchableHighlight>
               <Button onPress={() => setIsVisible(true)}>
-                {!isLoading && goodsForBoard ? (
-                  `${goodsForBoard?.map(g => g.user).length}件のいいね`
-                ) : (
-                  <ActivityIndicator />
-                )}
+                {`${wikiState.goodsCount || 0}件のいいね`}
               </Button>
             </Div>
           )}
           <GoodSendersModal
-            goodSenders={goodsForBoard?.map(g => g.user) || []}
             isVisible={isVisible}
             onClose={() => setIsVisible(false)}
+            wikiID={wikiState.id}
           />
         </Div>
       </Div>
