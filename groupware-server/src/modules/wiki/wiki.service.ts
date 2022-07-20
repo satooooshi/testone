@@ -241,16 +241,25 @@ export class WikiService {
       .groupBy('qa.wiki_id')
       .getRawMany();
 
+    const wikisSentGoodReqUser = await this.userGoodForBoardRepository
+      .createQueryBuilder('userGoodForBoard')
+      .select('userGoodForBoard.wiki_id')
+      .where('user_id = :userID', { userID })
+      .getRawMany();
+
     const wikisAndRelationCount = wikis.map((w) => {
       for (const goodCount of goodsCount) {
         if (goodCount['wiki_id'] === w.id) {
-          w.goodsCount = goodCount['cnt'];
+          w.goodsCount = Number(goodCount['cnt']);
         }
       }
       for (const answerCount of answersCount) {
         if (answerCount['wiki_id'] === w.id) {
-          w.answersCount = answerCount['cnt'];
+          w.answersCount = Number(answerCount['cnt']);
         }
+      }
+      if (wikisSentGoodReqUser.some((g) => g['wiki_id'] === w.id)) {
+        w.isGoodSender = true;
       }
       return w;
     });
