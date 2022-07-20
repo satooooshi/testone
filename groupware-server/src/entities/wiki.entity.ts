@@ -182,6 +182,9 @@ export class Wiki {
   )
   userGoodForBoard?: UserGoodForBoard[];
 
+  goodsCount?: number;
+  answersCount?: number;
+
   @BeforeInsert()
   @BeforeUpdate()
   changeToStorageURL?() {
