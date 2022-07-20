@@ -19,6 +19,7 @@ import { Tag, TagType } from 'src/entities/tag.entity';
 import { StorageService } from '../storage/storage.service';
 import { DateTime } from 'luxon';
 import { UserGoodForBoard } from 'src/entities/userGoodForBord.entity';
+import { QAAnswer } from 'src/entities/qaAnswer.entity';
 
 @Injectable()
 export class UserService {
@@ -27,6 +28,8 @@ export class UserService {
     private userRepository: Repository<User>,
     @InjectRepository(UserGoodForBoard)
     private readonly userGoodForBoardRepository: Repository<UserGoodForBoard>,
+    @InjectRepository(QAAnswer)
+    private readonly qaAnswerRepository: Repository<QAAnswer>,
     private storageService: StorageService,
   ) {}
 
@@ -461,10 +464,54 @@ export class UserService {
     }
     const userGoodForBoards = await this.userGoodForBoardRepository.find({
       where: { user },
-      relations: ['wiki', 'wiki.tags', 'wiki.writer', 'wiki.answers'],
+      relations: ['wiki', 'wiki.tags'],
     });
 
-    return { ...user, userGoodForBoard: userGoodForBoards };
+    if (!userGoodForBoards.length) {
+      return user;
+    }
+
+    const wikisSentGoods = userGoodForBoards.map((u) => u.wiki);
+    const wikiIDs = wikisSentGoods.map((w) => w.id);
+
+    const goodsCount = await this.userGoodForBoardRepository
+      .createQueryBuilder('user_good_for_board')
+      .select(['user_good_for_board.wiki_id', 'COUNT(*) AS cnt'])
+      .where('user_good_for_board.wiki_id IN (:...wikiIDs)', { wikiIDs })
+      .groupBy('user_good_for_board.wiki_id')
+      .getRawMany();
+
+    const answersCount = await this.qaAnswerRepository
+      .createQueryBuilder('qa')
+      .select(['qa.wiki_id', 'COUNT(*) AS cnt'])
+      .where('qa.wiki_id IN (:...wikiIDs)', { wikiIDs })
+      .groupBy('qa.wiki_id')
+      .getRawMany();
+
+    const wikisSentGoodReqUser = await this.userGoodForBoardRepository
+      .createQueryBuilder('user_good_for_board')
+      .select('user_good_for_board.wiki_id')
+      .where('user_id = :userID', { userID: id })
+      .getRawMany();
+
+    const userGoodForBoardsAndRelationCount = userGoodForBoards.map((u) => {
+      for (const goodCount of goodsCount) {
+        if (goodCount['wiki_id'] === u.wiki.id) {
+          u.wiki.goodsCount = Number(goodCount['cnt']);
+        }
+      }
+      for (const answerCount of answersCount) {
+        if (answerCount['wiki_id'] === u.wiki.id) {
+          u.wiki.answersCount = Number(answerCount['cnt']);
+        }
+      }
+      if (wikisSentGoodReqUser.some((g) => g['wiki_id'] === u.wiki.id)) {
+        u.wiki.isGoodSender = true;
+      }
+      return u;
+    });
+
+    return { ...user, userGoodForBoard: userGoodForBoardsAndRelationCount };
   }
 
   async getByEmail(email: string, passwordSelect?: boolean) {

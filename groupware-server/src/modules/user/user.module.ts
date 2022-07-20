@@ -6,12 +6,13 @@ import { ChatModule } from '../chat/chat.module';
 import { StorageModule } from '../storage/storage.module';
 import { UserController } from './user.controller';
 import { UserService } from './user.service';
+import { QAAnswer } from 'src/entities/qaAnswer.entity';
 
 @Module({
   imports: [
     StorageModule,
     ChatModule,
-    TypeOrmModule.forFeature([User, UserGoodForBoard]),
+    TypeOrmModule.forFeature([User, UserGoodForBoard, QAAnswer]),
   ],
   controllers: [UserController],
   providers: [UserService],
