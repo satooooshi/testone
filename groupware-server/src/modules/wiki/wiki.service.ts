@@ -25,9 +25,6 @@ export class WikiService {
     @InjectRepository(UserGoodForBoard)
     private readonly userGoodForBoardRepository: Repository<UserGoodForBoard>,
 
-    @InjectRepository(User)
-    private readonly userRepository: Repository<User>,
-
     private readonly storageService: StorageService,
   ) {}
 
@@ -224,14 +221,18 @@ export class WikiService {
       .take(limit)
       .orderBy('wiki.id', 'DESC')
       .getManyAndCount();
+    const pageCount =
+      count % limit === 0 ? count / limit : Math.floor(count / limit) + 1;
 
+    if (!wikis.length) {
+      return { pageCount, wiki: wikis };
+    }
     const wikiIDs = wikis.map((w) => w.id);
-
     const goodsCount = await this.userGoodForBoardRepository
-      .createQueryBuilder('userGoodForBoard')
-      .select(['userGoodForBoard.wiki_id', 'COUNT(*) AS cnt'])
-      .where('userGoodForBoard.wiki_id IN (:...wikiIDs)', { wikiIDs })
-      .groupBy('userGoodForBoard.wiki_id')
+      .createQueryBuilder('user_good_for_board')
+      .select(['user_good_for_board.wiki_id', 'COUNT(*) AS cnt'])
+      .where('user_good_for_board.wiki_id IN (:...wikiIDs)', { wikiIDs })
+      .groupBy('user_good_for_board.wiki_id')
       .getRawMany();
 
     const answersCount = await this.qaAnswerRepository
@@ -242,8 +243,8 @@ export class WikiService {
       .getRawMany();
 
     const wikisSentGoodReqUser = await this.userGoodForBoardRepository
-      .createQueryBuilder('userGoodForBoard')
-      .select('userGoodForBoard.wiki_id')
+      .createQueryBuilder('user_good_for_board')
+      .select(['user_good_for_board.wiki_id'])
       .where('user_id = :userID', { userID })
       .getRawMany();
 
@@ -265,10 +266,7 @@ export class WikiService {
     });
 
     const endTime = Date.now();
-    console.log('get wiki speed check', endTime - startTime);
-
-    const pageCount =
-      count % limit === 0 ? count / limit : Math.floor(count / limit) + 1;
+    console.log('get wiki speed check2', endTime - startTime);
     return { pageCount, wiki: wikisAndRelationCount };
   }
 
