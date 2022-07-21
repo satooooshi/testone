@@ -10,51 +10,36 @@ import {
   useAPISearchUsers,
 } from '../../hooks/api/user/useAPISearchUsers';
 import {userListStyles} from '../../styles/screen/user/userList.style';
-import {User, UserRoleInApp} from '../../types';
+import {User, UserRole, UserRoleInApp} from '../../types';
 import {
   defaultDropdownProps,
   defaultDropdownOptionProps,
 } from '../../utils/dropdown/helper';
 
 type UserCardListProps = {
-  userRole: UserRoleInApp;
-  word: string;
-  tag: string;
+  userRole: UserRole | undefined;
+  userList: User[];
+  searchQuery: SearchQueryToGetUsers;
+  setSearchQuery: React.Dispatch<React.SetStateAction<SearchQueryToGetUsers>>;
+  isLoading: boolean;
+  // word: string;
+  // tag: string;
 };
 
-const UserCardList: React.FC<UserCardListProps> = ({userRole, word, tag}) => {
+const UserCardList: React.FC<UserCardListProps> = ({
+  userRole,
+  userList,
+  searchQuery,
+  setSearchQuery,
+  isLoading,
+}) => {
   const isFocused = useIsFocused();
-  const [searchQuery, setSearchQuery] = useState<SearchQueryToGetUsers>({});
-  const {isLoading, refetch} = useAPISearchUsers(
-    {
-      ...searchQuery,
-      role: userRole !== 'All' ? userRole : undefined,
-      page: searchQuery?.page || '1',
-      word,
-      tag,
-    },
-    {
-      enabled: false,
-      onSuccess: fetchedUser => {
-        setUsersForInfiniteScroll(u => {
-          if (u.length && searchQuery?.page !== '1') {
-            return [...u, ...fetchedUser.users];
-          }
-          flatListRef?.current?.scrollToOffset({animated: false, offset: 0});
-          return fetchedUser.users;
-        });
-      },
-    },
-  );
-  const [usersForInfiniteScroll, setUsersForInfiniteScroll] = useState<User[]>(
-    [],
-  );
   const sortDropdownRef = useRef<any | null>(null);
   const durationDropdownRef = useRef<any | null>(null);
   const flatListRef = useRef<FlatList | null>(null);
 
   const onEndReached = () => {
-    if (usersForInfiniteScroll.length >= Number(searchQuery.page) * 20) {
+    if (userList.length >= Number(searchQuery.page) * 20) {
       setSearchQuery(q => ({...q, page: (Number(q?.page) + 1).toString()}));
     }
   };
@@ -85,22 +70,16 @@ const UserCardList: React.FC<UserCardListProps> = ({userRole, word, tag}) => {
     }
   };
 
-  useEffect(() => {
-    setSearchQuery(q => ({...q, word, tag, page: '1'}));
-  }, [tag, word]);
+  // useEffect(() => {
+  //   setSearchQuery(q => ({...q, word, tag, page: '1'}));
+  // }, [tag, word]);
 
   useEffect(() => {
-    if (searchQuery.page) {
-      refetch();
+    if (isFocused && searchQuery.role !== userRole) {
+      flatListRef?.current?.scrollToOffset({animated: false, offset: 0});
+      setSearchQuery(q => ({...q, role: userRole, page: '1'}));
     }
-  }, [searchQuery, refetch]);
-
-  useEffect(() => {
-    if (isFocused) {
-      setSearchQuery({page: '1'});
-    } else {
-      setSearchQuery({});
-    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isFocused]);
 
   return (
@@ -187,10 +166,10 @@ const UserCardList: React.FC<UserCardListProps> = ({userRole, word, tag}) => {
           </Dropdown.Option>
         </Dropdown>
       </Div>
-      {usersForInfiniteScroll?.length ? (
+      {userList?.length ? (
         <FlatList
           ref={flatListRef}
-          data={usersForInfiniteScroll}
+          data={userList}
           onEndReached={onEndReached}
           onEndReachedThreshold={0.5}
           contentContainerStyle={userListStyles.flatlist}
