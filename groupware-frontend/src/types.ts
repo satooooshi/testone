@@ -173,6 +173,8 @@ export interface Wiki {
   updatedAt: Date;
   userGoodForBoard?: UserGoodForBoard[];
   isGoodSender?: boolean;
+  goodsCount?: number;
+  answersCount?: number;
 }
 
 export interface QAAnswerReply {

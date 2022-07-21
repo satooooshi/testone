@@ -25,9 +25,6 @@ export class WikiService {
     @InjectRepository(UserGoodForBoard)
     private readonly userGoodForBoardRepository: Repository<UserGoodForBoard>,
 
-    @InjectRepository(User)
-    private readonly userRepository: Repository<User>,
-
     private readonly storageService: StorageService,
   ) {}
 
@@ -123,14 +120,17 @@ export class WikiService {
       .orderBy({ 'answer.created_at': 'ASC', 'reply.created_at': 'ASC' })
       .getOne();
 
-    // const userGoodForBoard = await this.userGoodForBoardRepository.find({
-    //   where: { wiki: existWiki },
-    //   relations: ['user'],
-    // });
-    // const goodSenders = userGoodForBoard.map((g) => g.user);
-    // const isGoodSender = goodSenders.some((u) => u.id === userID);
+    const [userGoodForBoard, goodsCount] =
+      await this.userGoodForBoardRepository.findAndCount({
+        where: { wiki: existWiki },
+        relations: ['user'],
+      });
 
-    return existWiki;
+    const isGoodSender = userGoodForBoard
+      .map((u) => u.user.id)
+      .some((id) => id === userID);
+
+    return { ...existWiki, goodsCount, isGoodSender };
   }
 
   public async getAnswerDetail(id: number): Promise<QAAnswer> {
@@ -217,20 +217,60 @@ export class WikiService {
           boardCategory: board_category,
         },
       )
-      .andWhere(tag ? 'tag.id IN (:...tagIDs)' : '1=1', {
+      .andWhere(tag ? 'tag.id IN wikiIDs  (:...tagIDs)' : '1=1', {
         tagIDs,
       })
       .skip(offset)
       .take(limit)
       .orderBy('wiki.id', 'DESC')
       .getManyAndCount();
-
-    const endTime = Date.now();
-    console.log('get wiki speed check', endTime - startTime);
-
     const pageCount =
       count % limit === 0 ? count / limit : Math.floor(count / limit) + 1;
-    return { pageCount, wiki: wikis };
+
+    if (!wikis.length) {
+      return { pageCount, wiki: wikis };
+    }
+    const wikiIDs = wikis.map((w) => w.id);
+    const goodsCount = await this.userGoodForBoardRepository
+      .createQueryBuilder('user_good_for_board')
+      .select(['user_good_for_board.wiki_id', 'COUNT(*) AS cnt'])
+      .where('user_good_for_board.wiki_id IN (:...wikiIDs)', { wikiIDs })
+      .groupBy('user_good_for_board.wiki_id')
+      .getRawMany();
+
+    const answersCount = await this.qaAnswerRepository
+      .createQueryBuilder('qa')
+      .select(['qa.wiki_id', 'COUNT(*) AS cnt'])
+      .where('qa.wiki_id IN (:...wikiIDs)', { wikiIDs })
+      .groupBy('qa.wiki_id')
+      .getRawMany();
+
+    const wikisSentGoodReqUser = await this.userGoodForBoardRepository
+      .createQueryBuilder('user_good_for_board')
+      .select(['user_good_for_board.wiki_id'])
+      .where('user_id = :userID', { userID })
+      .getRawMany();
+
+    const wikisAndRelationCount = wikis.map((w) => {
+      for (const goodCount of goodsCount) {
+        if (goodCount['wiki_id'] === w.id) {
+          w.goodsCount = Number(goodCount['cnt']);
+        }
+      }
+      for (const answerCount of answersCount) {
+        if (answerCount['wiki_id'] === w.id) {
+          w.answersCount = Number(answerCount['cnt']);
+        }
+      }
+      if (wikisSentGoodReqUser.some((g) => g['wiki_id'] === w.id)) {
+        w.isGoodSender = true;
+      }
+      return w;
+    });
+
+    const endTime = Date.now();
+    console.log('get wiki speed check2', endTime - startTime);
+    return { pageCount, wiki: wikisAndRelationCount };
   }
 
   public async getHearts(wikiID: number): Promise<UserGoodForBoard[]> {
