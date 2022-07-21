@@ -1114,7 +1114,7 @@ const Chat: React.FC = () => {
       socket.saveLastReadTimeAndReport();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [appState, messages]);
+  }, [appState, messages?.[0]]);
 
   const readUserBox = (user: User) => (
     <View style={tailwind('flex-row bg-white items-center px-4 py-2')}>
