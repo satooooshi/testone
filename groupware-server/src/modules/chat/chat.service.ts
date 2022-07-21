@@ -803,21 +803,19 @@ export class ChatService {
       throw new InternalServerErrorException('Something went wrong');
     }
     const userIds = newData.members.map((u) => u.id);
+    newData.name = newData.name ? newData.name : '';
     const maybeExistGroup = await this.chatGroupRepository
       .createQueryBuilder('g')
       .leftJoinAndSelect('g.members', 'u')
-      .where(newData.name ? 'g.name = :name' : 'g.name = ""', {
+      .where('u.id IN (:...userIds)', { userIds })
+      .andWhere('g.name = :name', {
         name: newData.name,
       })
       .getMany();
 
     const existGroup = maybeExistGroup
       .filter((g) => g.members.length === userIds.length)
-      .map((g) => {
-        g.members = g.members.filter((m) => userIds.includes(m.id));
-        return g;
-      })
-      .filter((g) => g.members?.length === userIds.length);
+      .filter((g) => g.members.every((m) => userIds.includes(m.id)));
 
     if (existGroup.length) {
       return existGroup[0];
