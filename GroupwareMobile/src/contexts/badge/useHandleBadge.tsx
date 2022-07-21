@@ -233,7 +233,7 @@ export const BadgeProvider: React.FC = ({children}) => {
         handleEnterRoom,
         refetchRoomCard,
         editChatGroup,
-        isRoomsRefetching: isLoading,
+        isRoomsRefetching: isLoading && page === 1,
         isCompletedRefetchAllRooms: completeRefetch,
         refreshRooms,
       }}>
