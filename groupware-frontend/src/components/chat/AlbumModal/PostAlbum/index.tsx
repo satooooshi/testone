@@ -32,6 +32,7 @@ import dynamic from 'next/dynamic';
 import { ImageDecorator } from 'react-viewer/lib/ViewerProps';
 import { saveAs } from 'file-saver';
 import { fileNameTransformer } from 'src/utils/factory/fileNameTransformer';
+import { socket } from '../../ChatBox/socket';
 const Viewer = dynamic(() => import('react-viewer'), { ssr: false });
 
 type PostAlbumProps = {
@@ -64,7 +65,11 @@ const PostAlbum: React.FC<PostAlbumProps> = ({
       validationSchema: albumSchema,
       onSubmit: (submittedValues, { resetForm }) => {
         createAlbum(submittedValues, {
-          onSuccess: () => {
+          onSuccess: (result) => {
+            socket.emit('message', {
+              type: 'send',
+              chatMessage: result.systemMessage,
+            });
             navigateToList();
             toast({
               description: 'アルバムを作成しました',

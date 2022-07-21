@@ -340,6 +340,11 @@ export interface ChatGroup {
   updatedAt: Date;
 }
 
+export interface SaveRoomsResult {
+  room: ChatGroup;
+  systemMessage: ChatMessage[];
+}
+
 export interface LastReadChatTime {
   id: number;
   readTime: Date;
@@ -356,6 +361,11 @@ export interface ChatNote {
   createdAt: Date;
   updatedAt: Date;
   isEditor?: boolean;
+}
+
+export interface SaveNoteResult {
+  note: ChatNote;
+  systemMessage: ChatMessage;
 }
 
 export interface ChatNoteImage {
@@ -385,6 +395,10 @@ export interface ChatAlbum {
   isEditor?: boolean;
 }
 
+export interface SaveAlbumResult {
+  album: ChatAlbum;
+  systemMessage: ChatMessage;
+}
 export interface ChatAlbumImage {
   id: number;
   fileName: string;
