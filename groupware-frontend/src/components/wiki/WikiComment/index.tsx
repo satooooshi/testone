@@ -85,119 +85,112 @@ const WikiComment: React.FC<WikiCommentProps> = ({
 
   return (
     <>
-      {wikiState && (
-        <>
-          {createdAt && updatedAt && writer && (
-            <div className={qaCommentStyles.question_uploader__info}>
-              <div className={qaCommentStyles.user_info_wrapper}>
-                {writer.existence ? (
-                  <>
-                    <Link href={`/account/${writer?.id}`} passHref>
-                      <a>
-                        <Avatar
-                          className={qaCommentStyles.user_avatar}
-                          src={writer.avatarUrl}
-                        />
-                      </a>
-                    </Link>
-                    <p className={qaCommentStyles.user_name}>
-                      {writer.lastName + ' ' + writer.firstName}
-                    </p>
-                  </>
-                ) : (
-                  <>
+      {createdAt && updatedAt && writer && (
+        <div className={qaCommentStyles.question_uploader__info}>
+          <div className={qaCommentStyles.user_info_wrapper}>
+            {writer.existence ? (
+              <>
+                <Link href={`/account/${writer?.id}`} passHref>
+                  <a>
                     <Avatar
                       className={qaCommentStyles.user_avatar}
-                      src={boldMascot.src}
+                      src={writer.avatarUrl}
                     />
-                    <p className={qaCommentStyles.user_name}>ボールドくん</p>
-                  </>
-                )}
-              </div>
-              <div className={qaCommentStyles.info_left}>
-                <Box display="flex" flexDir={'column'} alignItems="end">
-                  <p className={qaCommentStyles.wrote_date}>
-                    {`投稿日: ${dateTimeFormatterFromJSDDate({
-                      dateTime: new Date(createdAt),
-                    })}`}
-                  </p>
-                  {onClickEditButton && (
-                    <p className={qaCommentStyles.wrote_date}>
-                      {`最終更新日: ${dateTimeFormatterFromJSDDate({
-                        dateTime: new Date(updatedAt),
-                      })}`}
-                    </p>
-                  )}
-                </Box>
-                {isWriter && onClickEditButton ? (
-                  <Button
-                    colorScheme="blue"
-                    width="24"
-                    onClick={onClickEditButton}>
-                    編集
-                  </Button>
-                ) : null}
-                {onClickReplyButton && replyButtonName ? (
-                  <Button
-                    colorScheme="orange"
-                    width="24"
-                    onClick={onClickReplyButton}>
-                    {replyButtonName}
-                  </Button>
-                ) : null}
-              </div>
-            </div>
-          )}
-          <div className={qaCommentStyles.markdown}>
-            <DraftMarkup
-              renderHTML={
-                textFormat && textFormat === 'markdown'
-                  ? mdParser.render(body)
-                  : body
-              }
-            />
-            {bestAnswerButtonName && onClickBestAnswerButton ? (
-              <div className={qaCommentStyles.best_answer_button_wrapper}>
-                <Button
-                  colorScheme={isExistsBestAnswer ? 'whatsapp' : 'pink'}
-                  classnames={[qaCommentStyles.best_answer_button]}
-                  onClick={isWriter ? onClickBestAnswerButton : undefined}>
-                  {bestAnswerButtonName}
-                </Button>
-              </div>
+                  </a>
+                </Link>
+                <p className={qaCommentStyles.user_name}>
+                  {writer.lastName + ' ' + writer.firstName}
+                </p>
+              </>
+            ) : (
+              <>
+                <Avatar
+                  className={qaCommentStyles.user_avatar}
+                  src={boldMascot.src}
+                />
+                <p className={qaCommentStyles.user_name}>ボールドくん</p>
+              </>
+            )}
+          </div>
+          <div className={qaCommentStyles.info_left}>
+            <Box display="flex" flexDir={'column'} alignItems="end">
+              <p className={qaCommentStyles.wrote_date}>
+                {`投稿日: ${dateTimeFormatterFromJSDDate({
+                  dateTime: new Date(createdAt),
+                })}`}
+              </p>
+              {onClickEditButton && (
+                <p className={qaCommentStyles.wrote_date}>
+                  {`最終更新日: ${dateTimeFormatterFromJSDDate({
+                    dateTime: new Date(updatedAt),
+                  })}`}
+                </p>
+              )}
+            </Box>
+            {isWriter && onClickEditButton ? (
+              <Button colorScheme="blue" width="24" onClick={onClickEditButton}>
+                編集
+              </Button>
+            ) : null}
+            {onClickReplyButton && replyButtonName ? (
+              <Button
+                colorScheme="orange"
+                width="24"
+                onClick={onClickReplyButton}>
+                {replyButtonName}
+              </Button>
             ) : null}
           </div>
-          {wikiState?.type === WikiType.BOARD && (
-            <Box display="flex" justifyContent={'flex-end'} mt={5}>
-              <Link
-                onClick={() => {
-                  mutate(wikiState?.id || 0);
-                }}>
-                {isPressHeart ? (
-                  <AiFillHeart size={30} color="red" />
-                ) : (
-                  <AiOutlineHeart size={30} color="black" />
-                )}
-              </Link>
-              <Link
-                onClick={() => {
-                  getGoodsForBoard(wikiState.id);
-                  setGoodSendersModal(true);
-                }}>
-                <Button colorScheme={'blue'} color="white" size={'sm'}>
-                  {`${wikiState.goodsCount}件のいいね`}
-                </Button>
-              </Link>
-            </Box>
-          )}
-          {goodsForBoard && (
-            <GoodSendersModal
-              isOpen={goodSendersModal}
-              onClose={() => setGoodSendersModal(false)}
-              goodsForBoard={goodsForBoard}
-            />
-          )}
-        </>
+        </div>
+      )}
+      <div className={qaCommentStyles.markdown}>
+        <DraftMarkup
+          renderHTML={
+            textFormat && textFormat === 'markdown'
+              ? mdParser.render(body)
+              : body
+          }
+        />
+        {bestAnswerButtonName && onClickBestAnswerButton ? (
+          <div className={qaCommentStyles.best_answer_button_wrapper}>
+            <Button
+              colorScheme={isExistsBestAnswer ? 'whatsapp' : 'pink'}
+              classnames={[qaCommentStyles.best_answer_button]}
+              onClick={isWriter ? onClickBestAnswerButton : undefined}>
+              {bestAnswerButtonName}
+            </Button>
+          </div>
+        ) : null}
+      </div>
+      {wikiState?.type === WikiType.BOARD && (
+        <Box display="flex" justifyContent={'flex-end'} mt={5}>
+          <Link
+            onClick={() => {
+              mutate(wikiState?.id || 0);
+            }}>
+            {isPressHeart ? (
+              <AiFillHeart size={30} color="red" />
+            ) : (
+              <AiOutlineHeart size={30} color="black" />
+            )}
+          </Link>
+          <Link
+            onClick={() => {
+              getGoodsForBoard(wikiState.id);
+              setGoodSendersModal(true);
+            }}>
+            <Button colorScheme={'blue'} color="white" size={'sm'}>
+              {`${wikiState.goodsCount}件のいいね`}
+            </Button>
+          </Link>
+        </Box>
+      )}
+      {goodsForBoard && (
+        <GoodSendersModal
+          isOpen={goodSendersModal}
+          onClose={() => setGoodSendersModal(false)}
+          goodsForBoard={goodsForBoard}
+        />
       )}
     </>
   );
