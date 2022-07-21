@@ -120,14 +120,17 @@ export class WikiService {
       .orderBy({ 'answer.created_at': 'ASC', 'reply.created_at': 'ASC' })
       .getOne();
 
-    // const userGoodForBoard = await this.userGoodForBoardRepository.find({
-    //   where: { wiki: existWiki },
-    //   relations: ['user'],
-    // });
-    // const goodSenders = userGoodForBoard.map((g) => g.user);
-    // const isGoodSender = goodSenders.some((u) => u.id === userID);
+    const [userGoodForBoard, goodsCount] =
+      await this.userGoodForBoardRepository.findAndCount({
+        where: { wiki: existWiki },
+        relations: ['user'],
+      });
 
-    return existWiki;
+    const isGoodSender = userGoodForBoard
+      .map((u) => u.user.id)
+      .some((id) => id === userID);
+
+    return { ...existWiki, goodsCount, isGoodSender };
   }
 
   public async getAnswerDetail(id: number): Promise<QAAnswer> {
