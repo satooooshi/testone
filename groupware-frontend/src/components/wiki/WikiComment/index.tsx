@@ -77,7 +77,6 @@ const WikiComment: React.FC<WikiCommentProps> = ({
 
   useEffect(() => {
     if (wiki) {
-      console.log(wiki.isGoodSender);
       setWikiState(wiki);
     }
   }, [wiki]);

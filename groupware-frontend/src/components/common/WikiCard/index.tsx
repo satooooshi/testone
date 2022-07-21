@@ -46,9 +46,7 @@ const WikiCard: React.FC<WikiCardProps> = ({ wiki }) => {
   }, [wiki.type]);
 
   const { mutate: getGoodsForBoard, data: goodsForBoard } =
-    useAPIGetGoodsForBoard({
-      onSuccess: () => console.log('call ==================='),
-    });
+    useAPIGetGoodsForBoard();
   const { mutate } = useAPIToggleGoodForBoard({
     onSuccess: () => {
       setIsPressHeart((prevHeartStatus) => {
