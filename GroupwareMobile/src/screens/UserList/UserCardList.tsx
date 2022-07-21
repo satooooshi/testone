@@ -24,14 +24,8 @@ type UserCardListProps = {
 
 const UserCardList: React.FC<UserCardListProps> = ({userRole, word, tag}) => {
   const isFocused = useIsFocused();
-  const [searchQuery, setSearchQuery] = useState<SearchQueryToGetUsers>({
-    page: '1',
-  });
-  const {
-    data: users,
-    isLoading,
-    refetch,
-  } = useAPISearchUsers(
+  const [searchQuery, setSearchQuery] = useState<SearchQueryToGetUsers>({});
+  const {isLoading, refetch} = useAPISearchUsers(
     {
       ...searchQuery,
       role: userRole !== 'All' ? userRole : undefined,
@@ -46,6 +40,7 @@ const UserCardList: React.FC<UserCardListProps> = ({userRole, word, tag}) => {
           if (u.length && searchQuery?.page !== '1') {
             return [...u, ...fetchedUser.users];
           }
+          flatListRef?.current?.scrollToOffset({animated: false, offset: 0});
           return fetchedUser.users;
         });
       },
@@ -91,24 +86,20 @@ const UserCardList: React.FC<UserCardListProps> = ({userRole, word, tag}) => {
   };
 
   useEffect(() => {
-    setSearchQuery(q => ({...q, word, tag}));
+    setSearchQuery(q => ({...q, word, tag, page: '1'}));
   }, [tag, word]);
 
   useEffect(() => {
-    if (isFocused && searchQuery.page) {
+    if (searchQuery.page) {
       refetch();
     }
-  }, [searchQuery.page, refetch, isFocused]);
-
-  useEffect(() => {
-    setSearchQuery(q => ({...q, page: '1'}));
-  }, [searchQuery.word, searchQuery.tag, searchQuery.sort]);
+  }, [searchQuery, refetch]);
 
   useEffect(() => {
     if (isFocused) {
-      flatListRef?.current?.scrollToOffset({animated: false, offset: 0});
+      setSearchQuery({page: '1'});
     } else {
-      setSearchQuery(q => ({...q, page: '1'}));
+      setSearchQuery({});
     }
   }, [isFocused]);
 
@@ -131,31 +122,41 @@ const UserCardList: React.FC<UserCardListProps> = ({userRole, word, tag}) => {
           <Dropdown.Option
             {...defaultDropdownOptionProps}
             value={'none'}
-            onPress={() => setSearchQuery(q => ({...q, sort: undefined}))}>
+            onPress={() =>
+              setSearchQuery(q => ({...q, sort: undefined, page: '1'}))
+            }>
             指定なし
           </Dropdown.Option>
           <Dropdown.Option
             {...defaultDropdownOptionProps}
             value={'none'}
-            onPress={() => setSearchQuery(q => ({...q, sort: 'event'}))}>
+            onPress={() =>
+              setSearchQuery(q => ({...q, sort: 'event', page: '1'}))
+            }>
             イベント参加数順
           </Dropdown.Option>
           <Dropdown.Option
             {...defaultDropdownOptionProps}
             value={'none'}
-            onPress={() => setSearchQuery(q => ({...q, sort: 'question'}))}>
+            onPress={() =>
+              setSearchQuery(q => ({...q, sort: 'question', page: '1'}))
+            }>
             質問数順
           </Dropdown.Option>
           <Dropdown.Option
             {...defaultDropdownOptionProps}
             value={'none'}
-            onPress={() => setSearchQuery(q => ({...q, sort: 'answer'}))}>
+            onPress={() =>
+              setSearchQuery(q => ({...q, sort: 'answer', page: '1'}))
+            }>
             回答数順
           </Dropdown.Option>
           <Dropdown.Option
             {...defaultDropdownOptionProps}
             value={'none'}
-            onPress={() => setSearchQuery(q => ({...q, sort: 'knowledge'}))}>
+            onPress={() =>
+              setSearchQuery(q => ({...q, sort: 'knowledge', page: '1'}))
+            }>
             ナレッジ投稿数順
           </Dropdown.Option>
         </Dropdown>
@@ -163,19 +164,25 @@ const UserCardList: React.FC<UserCardListProps> = ({userRole, word, tag}) => {
           <Dropdown.Option
             {...defaultDropdownOptionProps}
             value={'none'}
-            onPress={() => setSearchQuery(q => ({...q, duration: undefined}))}>
+            onPress={() =>
+              setSearchQuery(q => ({...q, duration: undefined, page: '1'}))
+            }>
             指定なし
           </Dropdown.Option>
           <Dropdown.Option
             {...defaultDropdownOptionProps}
             value={'none'}
-            onPress={() => setSearchQuery(q => ({...q, duration: 'week'}))}>
+            onPress={() =>
+              setSearchQuery(q => ({...q, duration: 'week', page: '1'}))
+            }>
             週間
           </Dropdown.Option>
           <Dropdown.Option
             {...defaultDropdownOptionProps}
             value={'none'}
-            onPress={() => setSearchQuery(q => ({...q, duration: 'month'}))}>
+            onPress={() =>
+              setSearchQuery(q => ({...q, duration: 'month', page: '1'}))
+            }>
             月間
           </Dropdown.Option>
         </Dropdown>
