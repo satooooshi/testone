@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import {useWindowDimensions, FlatList, TouchableHighlight} from 'react-native';
-import {BoardCategory, User, Wiki, WikiType} from '../../../types';
+import {BoardCategory, Wiki, WikiType} from '../../../types';
 import {Div, Text, Tag, Icon, Button} from 'react-native-magnus';
 import {tagColorFactory} from '../../../utils/factory/tagColorFactory';
 import {wikiCardStyles} from '../../../styles/component/wiki/wikiCard.style';
