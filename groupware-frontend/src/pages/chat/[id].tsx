@@ -108,14 +108,14 @@ const ChatDetail = () => {
         {!isSmallerThan768 ? (
           <>
             <Box w="30vw">
-              <RoomList
+              {/* <RoomList
                 currentId={id}
                 onClickRoom={(g) =>
                   router.push(`/chat/${g.id.toString()}`, undefined, {
                     shallow: true,
                   })
                 }
-              />
+              /> */}
             </Box>
             {currentRoom ? (
               <ChatBox room={currentRoom} onMenuClicked={handleMenuSelected} />
