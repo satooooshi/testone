@@ -55,6 +55,8 @@ const WikiComment: React.FC<WikiCommentProps> = ({
   const [goodSendersModal, setGoodSendersModal] = useState(false);
   const { user } = useAuthenticate();
 
+  const { mutate: getGoodsForBoard, data: goodsForBoard } =
+    useAPIGetGoodsForBoard();
   const { mutate } = useAPIToggleGoodForBoard({
     onSuccess: () => {
       if (wiki) {
@@ -177,18 +179,24 @@ const WikiComment: React.FC<WikiCommentProps> = ({
                   <AiOutlineHeart size={30} color="black" />
                 )}
               </Link>
-              <Link onClick={() => setGoodSendersModal(true)}>
+              <Link
+                onClick={() => {
+                  getGoodsForBoard(wikiState.id);
+                  setGoodSendersModal(true);
+                }}>
                 <Button colorScheme={'blue'} color="white" size={'sm'}>
                   {`${wikiState.goodsCount}件のいいね`}
                 </Button>
               </Link>
             </Box>
           )}
-          <GoodSendersModal
-            isOpen={goodSendersModal}
-            onClose={() => setGoodSendersModal(false)}
-            wikiID={wikiState.id}
-          />
+          {goodsForBoard && (
+            <GoodSendersModal
+              isOpen={goodSendersModal}
+              onClose={() => setGoodSendersModal(false)}
+              goodsForBoard={goodsForBoard}
+            />
+          )}
         </>
       )}
     </>

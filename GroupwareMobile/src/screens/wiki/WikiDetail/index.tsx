@@ -47,6 +47,7 @@ import GoodSendersModal from '../../../components/chat/GoodSendersModal';
 import {useAPIToggleGoodForBoard} from '../../../hooks/api/wiki/useAPIToggleGoodForBoard';
 import {dateTimeFormatterFromJSDDate} from '../../../utils/dateTimeFormatterFromJSDate';
 import {useIsTabBarVisible} from '../../../contexts/bottomTab/useIsTabBarVisible';
+import {useAPIGetGoodsForBoard} from '../../../hooks/api/wiki/useAPIGetGoodForBoard';
 
 const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
   const isFocused = useIsFocused();
@@ -74,6 +75,8 @@ const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
       : '';
   const {dom, headings} = useDom(wikiBody);
   const {scrollViewRef, scroller} = useHTMLScrollFeature(wikiState?.body);
+  const {mutate: getGoodsForBoard, data: goodsForBoard} =
+    useAPIGetGoodsForBoard();
   const onPressEntry = useCallback(
     (entry: string) => {
       setIsVisibleTOCModal(false);
@@ -282,16 +285,20 @@ const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
                 />
               )}
             </TouchableHighlight>
-            <Button onPress={() => setIsVisible(true)}>
+            <Button
+              onPress={() => {
+                getGoodsForBoard(wikiState.id);
+                setIsVisible(true);
+              }}>
               {`${wikiState.goodsCount}件のいいね`}
             </Button>
           </Div>
         )}
-        {wikiState && (
+        {goodsForBoard && (
           <GoodSendersModal
             isVisible={isVisible}
             onClose={() => setIsVisible(false)}
-            wikiID={wikiState.id}
+            goodsForBoard={goodsForBoard}
           />
         )}
         {wikiState?.type === WikiType.BOARD ? (
