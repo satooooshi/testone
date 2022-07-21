@@ -30,9 +30,7 @@ const WikiCard: React.FC<WikiCardProps> = ({ wiki }) => {
   const { user } = useAuthenticate();
   const [wikiState, setWikiState] = useState(wiki);
 
-  const [isPressHeart, setIsPressHeart] = useState<boolean>(
-    wikiState.isGoodSender || false,
-  );
+  const [isPressHeart, setIsPressHeart] = useState<boolean>(false);
 
   const tagButtonColor = useMemo(() => {
     switch (wiki.type) {
@@ -65,6 +63,7 @@ const WikiCard: React.FC<WikiCardProps> = ({ wiki }) => {
 
   useEffect(() => {
     setWikiState(wiki);
+    setIsPressHeart(wiki.isGoodSender || false);
   }, [wiki]);
 
   return (
