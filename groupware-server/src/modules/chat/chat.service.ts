@@ -806,7 +806,8 @@ export class ChatService {
     newData.name = newData.name ? newData.name : '';
     const maybeExistGroup = await this.chatGroupRepository
       .createQueryBuilder('g')
-      .leftJoinAndSelect('g.members', 'u')
+      .innerJoin('g.members', 'u', 'u.id IN (:...userIds)', { userIds })
+      .leftJoinAndSelect('g.members', 'member')
       .where('u.id IN (:...userIds)', { userIds })
       .andWhere('g.name = :name', {
         name: newData.name,
