@@ -45,6 +45,10 @@ const WikiCard: React.FC<WikiCardProps> = ({ wiki }) => {
     }
   }, [wiki.type]);
 
+  const { mutate: getGoodsForBoard, data: goodsForBoard } =
+    useAPIGetGoodsForBoard({
+      onSuccess: () => console.log('call ==================='),
+    });
   const { mutate } = useAPIToggleGoodForBoard({
     onSuccess: () => {
       setIsPressHeart((prevHeartStatus) => {
@@ -140,6 +144,7 @@ const WikiCard: React.FC<WikiCardProps> = ({ wiki }) => {
               </Link>
               <Link
                 onClick={() => {
+                  getGoodsForBoard(wikiState.id);
                   setGoodSendersModal(true);
                 }}>
                 <Button colorScheme={'blue'} color="white" size={'sm'}>
@@ -181,7 +186,7 @@ const WikiCard: React.FC<WikiCardProps> = ({ wiki }) => {
       <GoodSendersModal
         isOpen={goodSendersModal}
         onClose={() => setGoodSendersModal(false)}
-        wikiID={wikiState.id}
+        goodsForBoard={goodsForBoard || []}
       />
       <Box
         display="flex"

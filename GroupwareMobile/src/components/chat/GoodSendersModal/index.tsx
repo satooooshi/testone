@@ -9,26 +9,21 @@ import {
 } from 'react-native-magnus';
 import tailwind from 'tailwind-rn';
 import {useAPIGetGoodsForBoard} from '../../../hooks/api/wiki/useAPIGetGoodForBoard';
-import {User} from '../../../types';
+import {User, UserGoodForBoard} from '../../../types';
 import {userNameFactory} from '../../../utils/factory/userNameFactory';
 import UserAvatar from '../../common/UserAvatar';
 
 type GoodSendersModalProps = {
   isVisible: boolean;
   onClose: () => void;
-  wikiID: number;
+  goodsForBoard: UserGoodForBoard[];
 };
 
 const GoodSendersModal: React.FC<GoodSendersModalProps> = ({
   isVisible,
   onClose,
-  wikiID,
+  goodsForBoard,
 }) => {
-  const {mutate: getGoodsForBoard, data: goodsForBoard} =
-    useAPIGetGoodsForBoard();
-  useEffect(() => {
-    getGoodsForBoard(wikiID);
-  }, [wikiID, getGoodsForBoard]);
   return (
     <MagnusModal isVisible={isVisible} h={400}>
       <>

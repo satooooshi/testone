@@ -13,6 +13,7 @@ import {useAPIToggleGoodForBoard} from '../../../hooks/api/wiki/useAPIToggleGood
 import {useAuthenticate} from '../../../contexts/useAuthenticate';
 import {darkFontColor} from '../../../utils/colors';
 import GoodSendersModal from '../../chat/GoodSendersModal';
+import {useAPIGetGoodsForBoard} from '../../../hooks/api/wiki/useAPIGetGoodForBoard';
 
 type WikiCardProps = {
   wiki: Wiki;
@@ -30,6 +31,8 @@ const WikiCard: React.FC<WikiCardProps> = ({wiki}) => {
   );
   const {user} = useAuthenticate();
   const [wikiState, setWikiState] = useState(wiki);
+  const {mutate: getGoodsForBoard, data: goodsForBoard} =
+    useAPIGetGoodsForBoard();
 
   const {mutate} = useAPIToggleGoodForBoard({
     onSuccess: () => {
@@ -190,16 +193,22 @@ const WikiCard: React.FC<WikiCardProps> = ({wiki}) => {
                   />
                 )}
               </TouchableHighlight>
-              <Button onPress={() => setIsVisible(true)}>
+              <Button
+                onPress={() => {
+                  getGoodsForBoard(wikiState.id);
+                  setIsVisible(true);
+                }}>
                 {`${wikiState.goodsCount || 0}件のいいね`}
               </Button>
             </Div>
           )}
-          <GoodSendersModal
-            isVisible={isVisible}
-            onClose={() => setIsVisible(false)}
-            wikiID={wikiState.id}
-          />
+          {goodsForBoard && (
+            <GoodSendersModal
+              isVisible={isVisible}
+              onClose={() => setIsVisible(false)}
+              goodsForBoard={goodsForBoard}
+            />
+          )}
         </Div>
       </Div>
     </TouchableHighlight>

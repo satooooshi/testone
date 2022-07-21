@@ -1,5 +1,4 @@
 import UserAvatar from '@/components/common/UserAvatar';
-import { useAPIGetGoodsForBoard } from '@/hooks/api/wiki/useAPIGetGoodsForBoard';
 import {
   Box,
   Link,
@@ -11,25 +10,21 @@ import {
   ModalOverlay,
   Text,
 } from '@chakra-ui/react';
-import { useEffect } from 'react';
+import { UserGoodForBoard } from 'src/types';
 import { darkFontColor } from 'src/utils/colors';
 import { userNameFactory } from 'src/utils/factory/userNameFactory';
 
 type GoodSendersModalProps = {
   isOpen: boolean;
   onClose: () => void;
-  wikiID: number;
+  goodsForBoard: UserGoodForBoard[];
 };
 
 const GoodSendersModal: React.FC<GoodSendersModalProps> = ({
   isOpen,
   onClose,
-  wikiID,
+  goodsForBoard,
 }) => {
-  const { mutate: getGoodForBoard, data, isLoading } = useAPIGetGoodsForBoard();
-  useEffect(() => {
-    getGoodForBoard(wikiID);
-  }, [wikiID, getGoodForBoard]);
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
@@ -41,7 +36,7 @@ const GoodSendersModal: React.FC<GoodSendersModalProps> = ({
         </ModalHeader>
         <ModalCloseButton />
         <ModalBody overflow={'scroll'}>
-          {data?.map((u) => (
+          {goodsForBoard?.map((u) => (
             <Link
               key={u.id}
               display="flex"
