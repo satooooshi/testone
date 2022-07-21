@@ -1,7 +1,14 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { dateTimeFormatterFromJSDDate } from 'src/utils/dateTimeFormatter';
 import { BoardCategory, User, Wiki, WikiType } from 'src/types';
-import { Box, Button, Link, Text, useMediaQuery } from '@chakra-ui/react';
+import {
+  Box,
+  Button,
+  Link,
+  Spinner,
+  Text,
+  useMediaQuery,
+} from '@chakra-ui/react';
 import { tagColorFactory } from 'src/utils/factory/tagColorFactory';
 import { wikiTypeNameFactory } from 'src/utils/wiki/wikiTypeNameFactory';
 import UserAvatar from '../UserAvatar';
@@ -11,6 +18,7 @@ import { AiFillHeart, AiOutlineHeart } from 'react-icons/ai';
 import GoodSendersModal from '@/components/wiki/GoodSendersModal';
 import { useAPIToggleGoodForBoard } from '@/hooks/api/wiki/useAPIToggleGoodForBoard';
 import { useAuthenticate } from 'src/contexts/useAuthenticate';
+import { useAPIGetGoodsForBoard } from '@/hooks/api/wiki/useAPIGetGoodsForBoard';
 
 type WikiCardProps = {
   wiki: Wiki;
@@ -26,22 +34,18 @@ const WikiCard: React.FC<WikiCardProps> = ({ wiki }) => {
     wikiState.isGoodSender || false,
   );
 
-  const { mutate } = useAPIToggleGoodForBoard({
-    onSuccess: () => {
-      setIsPressHeart((prevHeartStatus) => {
-        setWikiState((w) => {
-          if (prevHeartStatus) {
-            w.userGoodForBoard = w.userGoodForBoard?.filter(
-              (u) => u.id !== user?.id,
-            );
-          } else {
-            w.userGoodForBoard = [user as User, ...(w.userGoodForBoard || [])];
-          }
-          return w;
-        });
-
-        return !prevHeartStatus;
-      });
+  const {
+    mutate: getGoodForboard,
+    data,
+    isLoading,
+  } = useAPIGetGoodsForBoard({
+    onSuccess: (res) => {
+      const senderIDs = res.map((g) => g.user.id);
+      const isGoodSender = senderIDs.some((id) => id === user?.id);
+      if (isGoodSender) {
+        setWikiState((w) => ({ ...w, isGoodSender: true }));
+        setIsPressHeart(true);
+      }
     },
   });
 
@@ -55,6 +59,14 @@ const WikiCard: React.FC<WikiCardProps> = ({ wiki }) => {
         return 'green';
     }
   }, [wiki.type]);
+
+  const { mutate } = useAPIToggleGoodForBoard({
+    onSuccess: () => {
+      setIsPressHeart((prevHeartStatus) => {
+        return !prevHeartStatus;
+      });
+    },
+  });
 
   useEffect(() => {
     setWikiState(wiki);
@@ -120,7 +132,7 @@ const WikiCard: React.FC<WikiCardProps> = ({ wiki }) => {
         alignItems="center"
         justifyContent="flex-end">
         <Box display="flex" flexDir="row" height={5} alignItems="center">
-          {wikiState.type === WikiType.BOARD && (
+          {/* {wikiState.type === WikiType.BOARD && (
             <Box display="flex" mr={3}>
               <Link
                 position={'relative'}
@@ -137,16 +149,17 @@ const WikiCard: React.FC<WikiCardProps> = ({ wiki }) => {
                 onClick={() => {
                   setGoodSendersModal(true);
                 }}>
-                <Button
-                  colorScheme={'blue'}
-                  color="white"
-                  size={
-                    'sm'
-                  }>{`${wikiState.userGoodForBoard?.length}件のいいね`}</Button>
+                <Button colorScheme={'blue'} color="white" size={'sm'}>
+                  {!isLoading && data ? (
+                    `${data?.map((g) => g.user).length}件のいいね`
+                  ) : (
+                    <Spinner />
+                  )}
+                </Button>
               </Link>
             </Box>
-          )}
-          {wiki.type === WikiType.BOARD ? (
+          )} */}
+          {/* {wiki.type === WikiType.BOARD ? (
             <Box
               mr="16px"
               display="flex"
@@ -160,7 +173,7 @@ const WikiCard: React.FC<WikiCardProps> = ({ wiki }) => {
                 {wikiState.answers?.length.toString()}
               </Text>
             </Box>
-          ) : null}
+          ) : null} */}
           <Box display="flex" flexDir={'column'} alignItems="end">
             <Text fontSize={'16px'} color={darkFontColor} display="flex">
               {`投稿日: ${dateTimeFormatterFromJSDDate({
@@ -176,11 +189,11 @@ const WikiCard: React.FC<WikiCardProps> = ({ wiki }) => {
         </Box>
       </Box>
 
-      <GoodSendersModal
+      {/* <GoodSendersModal
         isOpen={goodSendersModal}
         onClose={() => setGoodSendersModal(false)}
-        goodSenders={wiki.userGoodForBoard || []}
-      />
+        goodSenders={data?.map((g) => g.user) || []}
+      /> */}
       <Box
         display="flex"
         flexDir={isSmallerThan768 ? 'column' : 'row'}

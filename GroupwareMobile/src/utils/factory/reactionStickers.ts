@@ -49,7 +49,7 @@ export const reactionStickers = [
   },
   {
     name: 'allRightSticker',
-    src: require('../../../assets/completed_sticker.png'),
+    src: require('../../../assets/allright_sticker.png'),
   },
   {
     name: 'attachedSticker',
@@ -109,11 +109,11 @@ export const reactionStickers = [
   },
   {
     name: 'thankYouSticker',
-    src: require('../../../assets/schedule_determined_sticker.png'),
+    src: require('../../../assets/thank_you_sticker.png'),
   },
   {
     name: 'scheduleDeterminedSticker',
-    src: require('../../../assets/thank_you_sticker.png'),
+    src: require('../../../assets/schedule_determined_sticker.png'),
   },
   {
     name: 'callBackSticker',

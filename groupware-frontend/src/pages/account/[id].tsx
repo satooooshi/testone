@@ -472,7 +472,7 @@ const MyAccountInfo = () => {
             profile.userGoodForBoard.length ? (
               <Box>
                 {profile.userGoodForBoard.map((w) => (
-                  <WikiCard wiki={w} key={w.id} />
+                  <WikiCard wiki={w.wiki} key={w.id} />
                 ))}
               </Box>
             ) : null}

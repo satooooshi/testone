@@ -53,13 +53,15 @@ const EventCardList: React.FC<EventCardListProps> = ({
     type,
   });
   const isFocused = useIsFocused();
-  const {isLoading, refetch: getEvents} = useAPIGetEventList(searchQuery, {
+
+  const {refetch, isLoading} = useAPIGetEventList(searchQuery, {
+    enabled: false,
     onSuccess: data => {
       setEventsForInfiniteScroll(e => {
-        if (e.length && Number(searchQuery.page) > 1) {
-          return [...e, ...data.events];
+        if (searchQuery.page === '1') {
+          return data.events;
         }
-        return data.events;
+        return [...e, ...data.events];
       });
     },
   });
@@ -78,19 +80,26 @@ const EventCardList: React.FC<EventCardListProps> = ({
 
   useEffect(() => {
     if (isFocused) {
-      getEvents();
+      refetch();
     }
-  }, [isFocused, getEvents]);
+  }, [isFocused, refetch, searchQuery]);
 
   useEffect(() => {
-    if (partOfSearchQuery.refetchNeeded) {
-      setSearchQuery(q => ({
-        ...q,
-        page: '1',
-      }));
-      setPartOfSearchQuery({refetchNeeded: false});
+    if (!isFocused) {
+      setSearchQuery(q => ({...q, ...partOfSearchQuery, page: '1'}));
     }
-  }, [partOfSearchQuery.refetchNeeded, setPartOfSearchQuery]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isFocused]);
+
+  // useEffect(() => {
+  //   if (partOfSearchQuery.refetchNeeded) {
+  //     setSearchQuery(q => ({
+  //       ...q,
+  //       page: '1',
+  //     }));
+  //     setPartOfSearchQuery({refetchNeeded: false});
+  //   }
+  // }, [partOfSearchQuery.refetchNeeded, setPartOfSearchQuery, status]);
 
   const queryRefresh = (
     query: Partial<SearchQueryToGetEvents>,
@@ -103,7 +112,6 @@ const EventCardList: React.FC<EventCardListProps> = ({
   };
 
   useEffect(() => {
-    setEventsForInfiniteScroll([]);
     setSearchQuery(q => ({...q, ...partOfSearchQuery, page: '1'}));
   }, [partOfSearchQuery]);
 

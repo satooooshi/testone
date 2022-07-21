@@ -1,3 +1,4 @@
+import {useIsFocused} from '@react-navigation/native';
 import React, {useEffect, useRef, useState} from 'react';
 import {FlatList} from 'react-native';
 import {Div, Dropdown, Text} from 'react-native-magnus';
@@ -19,30 +20,32 @@ type UserCardListProps = {
   userRole: UserRoleInApp;
   word: string;
   tag: string;
-  focused: boolean;
 };
 
-const UserCardList: React.FC<UserCardListProps> = ({
-  userRole,
-  word,
-  tag,
-  focused,
-}) => {
-  const [searchQuery, setSearchQuery] = useState<SearchQueryToGetUsers>({
-    page: '1',
-  });
-  const {
-    data: users,
-    isLoading,
-    refetch,
-    isRefetching,
-  } = useAPISearchUsers({
-    ...searchQuery,
-    role: userRole !== 'All' ? userRole : undefined,
-    page: searchQuery?.page || '1',
-    word,
-    tag,
-  });
+const UserCardList: React.FC<UserCardListProps> = ({userRole, word, tag}) => {
+  const isFocused = useIsFocused();
+  const [searchQuery, setSearchQuery] = useState<SearchQueryToGetUsers>({});
+  const {isLoading, refetch} = useAPISearchUsers(
+    {
+      ...searchQuery,
+      role: userRole !== 'All' ? userRole : undefined,
+      page: searchQuery?.page || '1',
+      word,
+      tag,
+    },
+    {
+      enabled: false,
+      onSuccess: fetchedUser => {
+        setUsersForInfiniteScroll(u => {
+          if (u.length && searchQuery?.page !== '1') {
+            return [...u, ...fetchedUser.users];
+          }
+          flatListRef?.current?.scrollToOffset({animated: false, offset: 0});
+          return fetchedUser.users;
+        });
+      },
+    },
+  );
   const [usersForInfiniteScroll, setUsersForInfiniteScroll] = useState<User[]>(
     [],
   );
@@ -51,7 +54,9 @@ const UserCardList: React.FC<UserCardListProps> = ({
   const flatListRef = useRef<FlatList | null>(null);
 
   const onEndReached = () => {
-    setSearchQuery(q => ({...q, page: (Number(q?.page) + 1).toString()}));
+    if (usersForInfiniteScroll.length >= Number(searchQuery.page) * 20) {
+      setSearchQuery(q => ({...q, page: (Number(q?.page) + 1).toString()}));
+    }
   };
 
   const sortDropdownButtonName = () => {
@@ -81,37 +86,22 @@ const UserCardList: React.FC<UserCardListProps> = ({
   };
 
   useEffect(() => {
-    setSearchQuery(q => ({...q, word, tag}));
+    setSearchQuery(q => ({...q, word, tag, page: '1'}));
   }, [tag, word]);
 
   useEffect(() => {
-    setSearchQuery(q => ({...q, page: '1'}));
-  }, [
-    searchQuery.word,
-    searchQuery.tag,
-    searchQuery.sort,
-    searchQuery.duration,
-  ]);
-
-  useEffect(() => {
-    if (focused) {
-      flatListRef?.current?.scrollToOffset({animated: false, offset: 0});
-      setSearchQuery(q => ({...q, page: '1'}));
+    if (searchQuery.page) {
       refetch();
     }
-  }, [focused, refetch]);
+  }, [searchQuery, refetch]);
 
   useEffect(() => {
-    if (!isRefetching && users?.users) {
-      setUsersForInfiniteScroll(u => {
-        if (u.length && searchQuery?.page !== '1') {
-          return [...u, ...users.users];
-        }
-        return users?.users;
-      });
+    if (isFocused) {
+      setSearchQuery({page: '1'});
+    } else {
+      setSearchQuery({});
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [users?.users, isRefetching]);
+  }, [isFocused]);
 
   return (
     <>
@@ -132,31 +122,41 @@ const UserCardList: React.FC<UserCardListProps> = ({
           <Dropdown.Option
             {...defaultDropdownOptionProps}
             value={'none'}
-            onPress={() => setSearchQuery(q => ({...q, sort: undefined}))}>
+            onPress={() =>
+              setSearchQuery(q => ({...q, sort: undefined, page: '1'}))
+            }>
             指定なし
           </Dropdown.Option>
           <Dropdown.Option
             {...defaultDropdownOptionProps}
             value={'none'}
-            onPress={() => setSearchQuery(q => ({...q, sort: 'event'}))}>
+            onPress={() =>
+              setSearchQuery(q => ({...q, sort: 'event', page: '1'}))
+            }>
             イベント参加数順
           </Dropdown.Option>
           <Dropdown.Option
             {...defaultDropdownOptionProps}
             value={'none'}
-            onPress={() => setSearchQuery(q => ({...q, sort: 'question'}))}>
+            onPress={() =>
+              setSearchQuery(q => ({...q, sort: 'question', page: '1'}))
+            }>
             質問数順
           </Dropdown.Option>
           <Dropdown.Option
             {...defaultDropdownOptionProps}
             value={'none'}
-            onPress={() => setSearchQuery(q => ({...q, sort: 'answer'}))}>
+            onPress={() =>
+              setSearchQuery(q => ({...q, sort: 'answer', page: '1'}))
+            }>
             回答数順
           </Dropdown.Option>
           <Dropdown.Option
             {...defaultDropdownOptionProps}
             value={'none'}
-            onPress={() => setSearchQuery(q => ({...q, sort: 'knowledge'}))}>
+            onPress={() =>
+              setSearchQuery(q => ({...q, sort: 'knowledge', page: '1'}))
+            }>
             ナレッジ投稿数順
           </Dropdown.Option>
         </Dropdown>
@@ -164,19 +164,25 @@ const UserCardList: React.FC<UserCardListProps> = ({
           <Dropdown.Option
             {...defaultDropdownOptionProps}
             value={'none'}
-            onPress={() => setSearchQuery(q => ({...q, duration: undefined}))}>
+            onPress={() =>
+              setSearchQuery(q => ({...q, duration: undefined, page: '1'}))
+            }>
             指定なし
           </Dropdown.Option>
           <Dropdown.Option
             {...defaultDropdownOptionProps}
             value={'none'}
-            onPress={() => setSearchQuery(q => ({...q, duration: 'week'}))}>
+            onPress={() =>
+              setSearchQuery(q => ({...q, duration: 'week', page: '1'}))
+            }>
             週間
           </Dropdown.Option>
           <Dropdown.Option
             {...defaultDropdownOptionProps}
             value={'none'}
-            onPress={() => setSearchQuery(q => ({...q, duration: 'month'}))}>
+            onPress={() =>
+              setSearchQuery(q => ({...q, duration: 'month', page: '1'}))
+            }>
             月間
           </Dropdown.Option>
         </Dropdown>

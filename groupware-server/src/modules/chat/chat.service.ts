@@ -109,6 +109,8 @@ export class ChatService {
     }
     const limitNumber = Number(limit);
 
+    const startTime = Date.now();
+
     const urlUnparsedRooms = await this.chatGroupRepository
       .createQueryBuilder('chat_groups')
       .leftJoin('chat_groups.members', 'member')
@@ -195,6 +197,11 @@ export class ChatService {
       ['desc', 'desc'],
     ]).reverse();
 
+    const endTime = Date.now();
+    console.log(
+      'get rooms by page ========================',
+      endTime - startTime,
+    );
     const pageCount = Number(page);
     return { rooms, pageCount };
   }
@@ -737,7 +744,7 @@ export class ChatService {
       sysMsgSaidsUpdated.type = ChatMessageType.SYSTEM_TEXT;
       sysMsgSaidsUpdated.content = `${userNameFactory(
         requestUser,
-      )}さんがルーム名を${existGroup.name}に更新しました`;
+      )}さんがルーム名を${newGroup.name}に更新しました`;
       sysMsgSaidsUpdated.chatGroup = newGroup;
       const sysMsg = await this.chatMessageRepository.save(sysMsgSaidsUpdated);
       systemMessage.push(sysMsg);
@@ -803,21 +810,20 @@ export class ChatService {
       throw new InternalServerErrorException('Something went wrong');
     }
     const userIds = newData.members.map((u) => u.id);
+    newData.name = newData.name ? newData.name : '';
     const maybeExistGroup = await this.chatGroupRepository
       .createQueryBuilder('g')
-      .leftJoinAndSelect('g.members', 'u')
-      .where(newData.name ? 'g.name = :name' : 'g.name = ""', {
+      .innerJoin('g.members', 'u', 'u.id IN (:...userIds)', { userIds })
+      .leftJoinAndSelect('g.members', 'member')
+      .where('u.id IN (:...userIds)', { userIds })
+      .andWhere('g.name = :name', {
         name: newData.name,
       })
       .getMany();
 
     const existGroup = maybeExistGroup
       .filter((g) => g.members.length === userIds.length)
-      .map((g) => {
-        g.members = g.members.filter((m) => userIds.includes(m.id));
-        return g;
-      })
-      .filter((g) => g.members?.length === userIds.length);
+      .filter((g) => g.members.every((m) => userIds.includes(m.id)));
 
     if (existGroup.length) {
       return existGroup[0];
