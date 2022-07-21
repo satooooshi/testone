@@ -149,7 +149,7 @@ const ChatLayout: FC<Props> = ({
                           isClosable: true,
                         });
                         setCurrentRoom({
-                          ...newGroupInfo,
+                          ...newGroupInfo.room,
                           members: selectedUsersInModal,
                         });
                       },
