@@ -10,56 +10,36 @@ import {
   useAPISearchUsers,
 } from '../../hooks/api/user/useAPISearchUsers';
 import {userListStyles} from '../../styles/screen/user/userList.style';
-import {User, UserRoleInApp} from '../../types';
+import {User, UserRole, UserRoleInApp} from '../../types';
 import {
   defaultDropdownProps,
   defaultDropdownOptionProps,
 } from '../../utils/dropdown/helper';
 
 type UserCardListProps = {
-  userRole: UserRoleInApp;
-  word: string;
-  tag: string;
+  userRole: UserRole | undefined;
+  userList: User[];
+  searchQuery: SearchQueryToGetUsers;
+  setSearchQuery: React.Dispatch<React.SetStateAction<SearchQueryToGetUsers>>;
+  isLoading: boolean;
+  // word: string;
+  // tag: string;
 };
 
-const UserCardList: React.FC<UserCardListProps> = ({userRole, word, tag}) => {
+const UserCardList: React.FC<UserCardListProps> = ({
+  userRole,
+  userList,
+  searchQuery,
+  setSearchQuery,
+  isLoading,
+}) => {
   const isFocused = useIsFocused();
-  const [searchQuery, setSearchQuery] = useState<SearchQueryToGetUsers>({
-    page: '1',
-  });
-  const {
-    data: users,
-    isLoading,
-    refetch,
-  } = useAPISearchUsers(
-    {
-      ...searchQuery,
-      role: userRole !== 'All' ? userRole : undefined,
-      page: searchQuery?.page || '1',
-      word,
-      tag,
-    },
-    {
-      enabled: false,
-      onSuccess: fetchedUser => {
-        setUsersForInfiniteScroll(u => {
-          if (u.length && searchQuery?.page !== '1') {
-            return [...u, ...fetchedUser.users];
-          }
-          return fetchedUser.users;
-        });
-      },
-    },
-  );
-  const [usersForInfiniteScroll, setUsersForInfiniteScroll] = useState<User[]>(
-    [],
-  );
   const sortDropdownRef = useRef<any | null>(null);
   const durationDropdownRef = useRef<any | null>(null);
   const flatListRef = useRef<FlatList | null>(null);
 
   const onEndReached = () => {
-    if (usersForInfiniteScroll.length >= Number(searchQuery.page) * 20) {
+    if (userList.length >= Number(searchQuery.page) * 20) {
       setSearchQuery(q => ({...q, page: (Number(q?.page) + 1).toString()}));
     }
   };
@@ -90,26 +70,16 @@ const UserCardList: React.FC<UserCardListProps> = ({userRole, word, tag}) => {
     }
   };
 
-  useEffect(() => {
-    setSearchQuery(q => ({...q, word, tag}));
-  }, [tag, word]);
+  // useEffect(() => {
+  //   setSearchQuery(q => ({...q, word, tag, page: '1'}));
+  // }, [tag, word]);
 
   useEffect(() => {
-    if (isFocused && searchQuery.page) {
-      refetch();
-    }
-  }, [searchQuery.page, refetch, isFocused]);
-
-  useEffect(() => {
-    setSearchQuery(q => ({...q, page: '1'}));
-  }, [searchQuery.word, searchQuery.tag, searchQuery.sort]);
-
-  useEffect(() => {
-    if (isFocused) {
+    if (isFocused && searchQuery.role !== userRole) {
       flatListRef?.current?.scrollToOffset({animated: false, offset: 0});
-    } else {
-      setSearchQuery(q => ({...q, page: '1'}));
+      setSearchQuery(q => ({...q, role: userRole, page: '1'}));
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isFocused]);
 
   return (
@@ -131,31 +101,41 @@ const UserCardList: React.FC<UserCardListProps> = ({userRole, word, tag}) => {
           <Dropdown.Option
             {...defaultDropdownOptionProps}
             value={'none'}
-            onPress={() => setSearchQuery(q => ({...q, sort: undefined}))}>
+            onPress={() =>
+              setSearchQuery(q => ({...q, sort: undefined, page: '1'}))
+            }>
             指定なし
           </Dropdown.Option>
           <Dropdown.Option
             {...defaultDropdownOptionProps}
             value={'none'}
-            onPress={() => setSearchQuery(q => ({...q, sort: 'event'}))}>
+            onPress={() =>
+              setSearchQuery(q => ({...q, sort: 'event', page: '1'}))
+            }>
             イベント参加数順
           </Dropdown.Option>
           <Dropdown.Option
             {...defaultDropdownOptionProps}
             value={'none'}
-            onPress={() => setSearchQuery(q => ({...q, sort: 'question'}))}>
+            onPress={() =>
+              setSearchQuery(q => ({...q, sort: 'question', page: '1'}))
+            }>
             質問数順
           </Dropdown.Option>
           <Dropdown.Option
             {...defaultDropdownOptionProps}
             value={'none'}
-            onPress={() => setSearchQuery(q => ({...q, sort: 'answer'}))}>
+            onPress={() =>
+              setSearchQuery(q => ({...q, sort: 'answer', page: '1'}))
+            }>
             回答数順
           </Dropdown.Option>
           <Dropdown.Option
             {...defaultDropdownOptionProps}
             value={'none'}
-            onPress={() => setSearchQuery(q => ({...q, sort: 'knowledge'}))}>
+            onPress={() =>
+              setSearchQuery(q => ({...q, sort: 'knowledge', page: '1'}))
+            }>
             ナレッジ投稿数順
           </Dropdown.Option>
         </Dropdown>
@@ -163,27 +143,33 @@ const UserCardList: React.FC<UserCardListProps> = ({userRole, word, tag}) => {
           <Dropdown.Option
             {...defaultDropdownOptionProps}
             value={'none'}
-            onPress={() => setSearchQuery(q => ({...q, duration: undefined}))}>
+            onPress={() =>
+              setSearchQuery(q => ({...q, duration: undefined, page: '1'}))
+            }>
             指定なし
           </Dropdown.Option>
           <Dropdown.Option
             {...defaultDropdownOptionProps}
             value={'none'}
-            onPress={() => setSearchQuery(q => ({...q, duration: 'week'}))}>
+            onPress={() =>
+              setSearchQuery(q => ({...q, duration: 'week', page: '1'}))
+            }>
             週間
           </Dropdown.Option>
           <Dropdown.Option
             {...defaultDropdownOptionProps}
             value={'none'}
-            onPress={() => setSearchQuery(q => ({...q, duration: 'month'}))}>
+            onPress={() =>
+              setSearchQuery(q => ({...q, duration: 'month', page: '1'}))
+            }>
             月間
           </Dropdown.Option>
         </Dropdown>
       </Div>
-      {usersForInfiniteScroll?.length ? (
+      {userList?.length ? (
         <FlatList
           ref={flatListRef}
-          data={usersForInfiniteScroll}
+          data={userList}
           onEndReached={onEndReached}
           onEndReachedThreshold={0.5}
           contentContainerStyle={userListStyles.flatlist}

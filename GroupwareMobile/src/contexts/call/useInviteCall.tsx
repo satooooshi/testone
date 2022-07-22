@@ -42,7 +42,7 @@ export const InviteCallProvider: React.FC = ({children}) => {
   const [currentGroupData, setCurrentGroupData] = useState<ChatGroup>();
   const {mutate: sendChatMessage} = useAPISendChatMessage({
     onSuccess: sentMsg => {
-      socket.emit('message', sentMsg);
+      socket.emit('message', {type: 'send', chatMessage: sentMsg});
       if (sentMsg?.chatGroup?.id) {
         refetchRoomCard({id: sentMsg.chatGroup.id, type: ''});
       }
