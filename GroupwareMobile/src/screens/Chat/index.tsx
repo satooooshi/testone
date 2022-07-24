@@ -96,6 +96,7 @@ import {useChatSocket} from '../../utils/socket';
 import {useAPIUpdateChatMessage} from '../../hooks/api/chat/useAPIUpdateChatMessage';
 import {useAPIDeleteChatMessage} from '../../hooks/api/chat/useAPIDeleteChatMessage';
 import uuid from 'react-native-uuid';
+import {useAPIGetReactions} from '../../hooks/api/chat/useAPIGetReactions';
 
 const TopTab = createMaterialTopTabNavigator();
 
@@ -302,6 +303,12 @@ const Chat: React.FC = () => {
           });
         }
       }
+    },
+  });
+
+  const {mutate: getReactions} = useAPIGetReactions({
+    onSuccess: res => {
+      setSelectedReactions(res);
     },
   });
 
@@ -882,7 +889,7 @@ const Chat: React.FC = () => {
         }
         onLongPressReation={() => {
           if (message.reactions?.length && message.isSender) {
-            setSelectedReactions(message.reactions);
+            getReactions(message.id);
           }
         }}
       />

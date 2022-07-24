@@ -47,6 +47,7 @@ import StickerMessage from './StickerMessage';
 import { useAuthenticate } from 'src/contexts/useAuthenticate';
 import { useAPIDeleteChatMessage } from '@/hooks/api/chat/useAPIDeleteChatMessage';
 import { socket } from '../ChatBox/socket';
+import { useAPIGetReactions } from '@/hooks/api/chat/useAPIGetReactions';
 
 type ChatMessageItemProps = {
   message: ChatMessage;
@@ -101,6 +102,12 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = memo(
       return reactionsNoDuplicates;
     };
     const ref = useRef<HTMLDivElement | null>(null);
+
+    const { mutate: getReaction, data: reactions } = useAPIGetReactions({
+      onSuccess: () => {
+        setReactionModal(true);
+      },
+    });
     useEffect(() => {
       if (scrollToTarget && isScrollTarget && ref.current?.offsetTop) {
         scrollToTarget(ref.current?.offsetTop - 80);
@@ -139,7 +146,7 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = memo(
             {message.isSender ? (
               <Button
                 onClick={() => {
-                  setReactionModal(true);
+                  getReaction(messageState.id);
                 }}
                 bg={'blue.200'}
                 flexDir="row"
@@ -344,11 +351,13 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = memo(
           readUsers={readUsers}
         />
 
-        <ReactionListModal
-          isOpen={reactionModal}
-          onClose={() => setReactionModal(false)}
-          reactions={messageState.reactions || []}
-        />
+        {reactions && (
+          <ReactionListModal
+            isOpen={reactionModal}
+            onClose={() => setReactionModal(false)}
+            reactions={reactions || []}
+          />
+        )}
         {messageState.type === ChatMessageType.SYSTEM_TEXT ? (
           <SystemMessage message={messageState} />
         ) : null}

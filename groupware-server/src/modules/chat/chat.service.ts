@@ -323,20 +323,13 @@ export class ChatService {
       .addSelect(['chat_group.id'])
       .leftJoin('chat_messages.sender', 'sender')
       .addSelect(selectUserColumns('sender'))
-      .leftJoin('chat_messages.reactions', 'reactions')
-      .leftJoin('reactions.user', 'user')
-      .addSelect(['reactions.id', 'reactions.emoji'])
-      .addSelect(selectUserColumns('user'))
       .leftJoinAndSelect(
         'chat_messages.replyParentMessage',
         'replyParentMessage',
       )
       .leftJoin('replyParentMessage.sender', 'reply_sender')
       .addSelect(selectUserColumns('reply_sender'))
-      .where('chat_group.id = :chatGroupID', {
-        chatGroupID: query.group,
-      })
-      .andWhere(
+      .where(
         after && include
           ? 'chat_messages.id >= :after'
           : after && !include
@@ -368,13 +361,26 @@ export class ChatService {
       console.log('get messages speed check', endTime - startTime);
     }
 
+    // senderの取得
+    //リアクションの取得
+    const reactions = await this.chatMessageReactionRepository
+      .createQueryBuilder('reactions')
+      .select(['id', 'chat_message_id', 'emoji as emoji', 'user_id'])
+      .where('chat_message_id IN (:...messageIDs)', {
+        messageIDs: existMessages.map((m) => m.id),
+      })
+      .getRawMany();
+    //返信の取得
+
     const messages = existMessages.map((m) => {
-      m.reactions = m.reactions.map((r) => {
-        if (r.user?.id === userID) {
-          return { ...r, isSender: true };
-        }
-        return r;
-      });
+      m.reactions = reactions
+        .filter((r) => r.chat_message_id === m.id)
+        .map((r) => {
+          if (r.user_id === userID) {
+            return { ...r, isSender: true };
+          }
+          return { ...r, isSender: false };
+        });
       if (m.sender && m.sender.id === userID) {
         m.isSender = true;
         return m;
@@ -884,6 +890,15 @@ export class ChatService {
       updatedAt: new Date(),
     });
     return { ...savedReaction, isSender: true };
+  }
+
+  public async getReactions(messageID: number): Promise<ChatMessageReaction[]> {
+    const reactions = await this.chatMessageReactionRepository.find({
+      where: { chatMessage: messageID },
+      relations: ['user'],
+    });
+    console.log(reactions);
+    return reactions;
   }
 
   public async getRoomDetail(roomId: number) {
