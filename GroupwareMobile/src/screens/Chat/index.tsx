@@ -367,7 +367,10 @@ const Chat: React.FC = () => {
     reaction: ChatMessageReaction,
     target: ChatMessage,
   ) => {
-    deleteReaction(reaction, {
+    const reactionSentMyself = target.reactions?.filter(
+      r => r.emoji === reaction.emoji && r.isSender,
+    )[0];
+    deleteReaction(reactionSentMyself || reaction, {
       onSuccess: reactionId => {
         setMessages(m => {
           return refreshMessage(
@@ -882,8 +885,8 @@ const Chat: React.FC = () => {
           console.log(message.fileName);
           playVideoOnModal({uri: message.content, fileName: message.fileName});
         }}
-        onPressReaction={r =>
-          r.isSender
+        onPressReaction={(r, isSender) =>
+          isSender
             ? handleDeleteReaction(r, message)
             : handleSaveReaction(r.emoji, message)
         }

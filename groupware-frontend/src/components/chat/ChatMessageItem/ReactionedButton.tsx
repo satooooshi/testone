@@ -6,10 +6,12 @@ import { numbersOfSameValueInKeyOfObjArr } from 'src/utils/numbersOfSameValueInK
 export const ReactionedButton = ({
   reactions,
   reaction,
+  isSenderInReactions,
   onClickReaction,
 }: {
   reactions: ChatMessageReaction[];
   reaction: ChatMessageReaction;
+  isSenderInReactions: boolean;
   onClickReaction: (reaction: ChatMessageReaction) => void;
 }) => {
   return (
@@ -18,13 +20,13 @@ export const ReactionedButton = ({
         onClick={() => {
           onClickReaction(reaction);
         }}
-        bg={reaction.isSender ? 'blue.600' : undefined}
+        bg={isSenderInReactions ? 'blue.600' : undefined}
         flexDir="row"
         borderColor={'blue.600'}
         borderWidth={1}
         size="xs">
         <Text fontSize={16}>{reaction.emoji}</Text>
-        <Text fontSize={16} color={reaction.isSender ? 'white' : 'blue.600'}>
+        <Text fontSize={16} color={isSenderInReactions ? 'white' : 'blue.600'}>
           {numbersOfSameValueInKeyOfObjArr(
             reactions as ChatMessageReaction[],
             reaction,

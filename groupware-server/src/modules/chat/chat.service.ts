@@ -198,10 +198,12 @@ export class ChatService {
     ]).reverse();
 
     const endTime = Date.now();
-    console.log(
-      'get rooms by page ========================',
-      endTime - startTime,
-    );
+    if (!updatedAtLatestRoom) {
+      console.log(
+        'get rooms by page ========================',
+        endTime - startTime,
+      );
+    }
     const pageCount = Number(page);
     return { rooms, pageCount };
   }
@@ -319,7 +321,12 @@ export class ChatService {
     const startTime = Date.now();
     const existMessages = await this.chatMessageRepository
       .createQueryBuilder('chat_messages')
-      .leftJoin('chat_messages.chatGroup', 'chat_group')
+      .innerJoin(
+        'chat_messages.chatGroup',
+        'chat_group',
+        'chat_group.id = :groupID',
+        { groupID: query.group },
+      )
       .addSelect(['chat_group.id'])
       .leftJoin('chat_messages.sender', 'sender')
       .addSelect(selectUserColumns('sender'))
@@ -373,14 +380,16 @@ export class ChatService {
     //返信の取得
 
     const messages = existMessages.map((m) => {
-      m.reactions = reactions
-        .filter((r) => r.chat_message_id === m.id)
-        .map((r) => {
-          if (r.user_id === userID) {
-            return { ...r, isSender: true };
-          }
-          return { ...r, isSender: false };
-        });
+      if (reactions) {
+        m.reactions = reactions
+          .filter((r) => r.chat_message_id === m.id)
+          .map((r) => {
+            if (r.user_id === userID) {
+              return { ...r, isSender: true };
+            }
+            return { ...r, isSender: false };
+          });
+      }
       if (m.sender && m.sender.id === userID) {
         m.isSender = true;
         return m;
@@ -897,7 +906,6 @@ export class ChatService {
       where: { chatMessage: messageID },
       relations: ['user'],
     });
-    console.log(reactions);
     return reactions;
   }
 
