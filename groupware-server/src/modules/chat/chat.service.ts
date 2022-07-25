@@ -401,7 +401,7 @@ export class ChatService {
       }
       if (m.reply_parent_id) {
         m.replyParentMessage = replyMessages.filter(
-          (replyMsg) => replyMsg.id === m.m.reply_parent_id,
+          (replyMsg) => replyMsg.id === m.reply_parent_id,
         )[0];
       }
       if (m.sender_id && m.sender_id === userID) {
