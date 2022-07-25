@@ -501,11 +501,13 @@ export class ChatController {
   @Get('/v2/room/:roomId/note/:noteId')
   @UseGuards(JwtAuthenticationGuard)
   async getChatNoteDetail(
+    @Param('roomId') roomId: string,
     @Param('noteId') noteId: string,
     @Req() req: RequestWithUser,
   ) {
     const { id: userID } = req.user;
     const notes = await this.chatNoteService.getChatNoteDetail(
+      Number(roomId),
       Number(noteId),
       userID,
     );
@@ -571,10 +573,14 @@ export class ChatController {
   @Get('/v2/room/:roomId/album/:albumId')
   @UseGuards(JwtAuthenticationGuard)
   async getChatAlbumDetail(
+    @Req() req: RequestWithUser,
+    @Param('roomId') roomId: string,
     @Param('albumId') albumId: string,
     // @Query('page') page: string,
   ) {
     const albums = await this.chatAlbumService.getChatAlbumImages(
+      req.user.id,
+      Number(roomId),
       Number(albumId),
     );
     return albums;
