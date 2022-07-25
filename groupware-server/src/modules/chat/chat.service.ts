@@ -316,6 +316,17 @@ export class ChatService {
     } = query;
     const limitNumber = Number(limit);
 
+    const isUserJoining = await this.chatGroupRepository
+      .createQueryBuilder('chat_groups')
+      .innerJoin('chat_groups.members', 'm', 'm.id = :userId', {
+        userId: userID,
+      })
+      .where('chat_groups.id = :chatGroupId', { chatGroupId: query.group })
+      .getOne();
+    if (!isUserJoining) {
+      throw new BadRequestException('The user is not a member');
+    }
+
     const startTime = Date.now();
     const existMessages = await this.chatMessageRepository
       .createQueryBuilder('chat_messages')
