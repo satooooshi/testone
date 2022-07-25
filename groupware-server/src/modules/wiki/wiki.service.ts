@@ -176,9 +176,6 @@ export class WikiService {
       .createQueryBuilder('wiki')
       .select()
       .leftJoinAndSelect('wiki.tags', 'tag')
-      // .leftJoinAndSelect('wiki.userGoodForBoard', 'userGoodForBoard')
-      // .leftJoinAndSelect('wiki.answers', 'answer')
-      // .leftJoinAndSelect('answer.writer', 'answer_writer')
       .leftJoin('wiki.writer', 'writer')
       .addSelect(selectUserColumns('writer'))
       .andWhere(type ? 'wiki.type = :type' : '1=1', { type })
@@ -217,7 +214,7 @@ export class WikiService {
           boardCategory: board_category,
         },
       )
-      .andWhere(tag ? 'tag.id IN wikiIDs  (:...tagIDs)' : '1=1', {
+      .andWhere(tag ? 'tag.id IN (:...tagIDs)' : '1=1', {
         tagIDs,
       })
       .skip(offset)

@@ -815,8 +815,7 @@ export class ChatService {
       .createQueryBuilder('g')
       .innerJoin('g.members', 'u', 'u.id IN (:...userIds)', { userIds })
       .leftJoinAndSelect('g.members', 'member')
-      .where('u.id IN (:...userIds)', { userIds })
-      .andWhere('g.name = :name', {
+      .where('g.name = :name', {
         name: newData.name,
       })
       .getMany();

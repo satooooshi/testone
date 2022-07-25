@@ -26,9 +26,7 @@ const WikiCard: React.FC<WikiCardProps> = ({wiki}) => {
   const [isVisible, setIsVisible] = useState<boolean>(false);
   const isBoard = wiki.type === WikiType.BOARD;
   const isQA = wiki.boardCategory === BoardCategory.QA;
-  const [isPressHeart, setIsPressHeart] = useState<boolean>(
-    wiki.isGoodSender || false,
-  );
+  const [isPressHeart, setIsPressHeart] = useState<boolean>(false);
   const {user} = useAuthenticate();
   const [wikiState, setWikiState] = useState(wiki);
   const {mutate: getGoodsForBoard, data: goodsForBoard} =
@@ -52,6 +50,7 @@ const WikiCard: React.FC<WikiCardProps> = ({wiki}) => {
 
   useEffect(() => {
     setWikiState(wiki);
+    setIsPressHeart(wiki.isGoodSender || false);
   }, [wiki]);
 
   return (
