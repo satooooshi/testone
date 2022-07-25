@@ -43,6 +43,11 @@ const ChatGroupCard: React.FC<ChatGroupCardProps> = ({
     }
   };
 
+  const [avatarImage, setAvatarImage] = useState<string>('');
+  useEffect(() => {
+    setAvatarImage(chatGroup.imageURL);
+  }, [avatarImage]);
+
   return (
     <Box
       display="flex"
@@ -56,7 +61,7 @@ const ChatGroupCard: React.FC<ChatGroupCardProps> = ({
       bg={
         isSelected ? 'gray.200' : chatGroup.unreadCount ? 'white' : '#f2f1f2'
       }>
-      <Avatar src={chatGroup.imageURL} size="md" mr="8px" />
+      <Avatar src={avatarImage} size="md" mr="8px" />
       <Box
         display="flex"
         flexDir="column"
