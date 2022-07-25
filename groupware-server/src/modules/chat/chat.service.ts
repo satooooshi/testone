@@ -321,21 +321,24 @@ export class ChatService {
     const startTime = Date.now();
     const existMessages = await this.chatMessageRepository
       .createQueryBuilder('chat_messages')
+      .select([
+        'chat_messages.id as id',
+        'chat_messages.content as content',
+        'chat_messages.type as type',
+        'chat_messages.call_time as callTime',
+        'chat_messages.file_name as fileName',
+        'chat_messages.created_at as createdAt',
+        'chat_messages.updated_at as updatedAt',
+        'chat_messages.reply_parent_id as reply_parent_id',
+        'chat_messages.sender_id as sender_id',
+        'chat_messages.chat_group_id as chat_group_id',
+      ])
       .innerJoin(
         'chat_messages.chatGroup',
         'chat_group',
         'chat_group.id = :groupID',
         { groupID: query.group },
       )
-      .addSelect(['chat_group.id'])
-      .leftJoin('chat_messages.sender', 'sender')
-      .addSelect(selectUserColumns('sender'))
-      .leftJoinAndSelect(
-        'chat_messages.replyParentMessage',
-        'replyParentMessage',
-      )
-      .leftJoin('replyParentMessage.sender', 'reply_sender')
-      .addSelect(selectUserColumns('reply_sender'))
       .where(
         after && include
           ? 'chat_messages.id >= :after'
@@ -362,13 +365,13 @@ export class ChatService {
       )
       .take(limitNumber >= 0 ? limitNumber : 20)
       .orderBy('chat_messages.createdAt', after ? 'ASC' : 'DESC')
-      .getMany();
+      .getRawMany();
     const endTime = Date.now();
-    if (!dateRefetchLatest) {
-      console.log('get messages speed check', endTime - startTime);
-    }
 
     // senderの取得
+    const senders = await this.userRepository.find({
+      where: { id: In(existMessages.map((m) => m.sender_id)) },
+    });
     //リアクションの取得
     const reactions = await this.chatMessageReactionRepository
       .createQueryBuilder('reactions')
@@ -378,8 +381,14 @@ export class ChatService {
       })
       .getRawMany();
     //返信の取得
+    const replyMessages = await this.chatMessageRepository.find({
+      where: { id: In(existMessages.map((m) => m.reply_parent_id)) },
+      relations: ['sender'],
+    });
 
-    const messages = existMessages.map((m) => {
+    const messages: ChatMessage[] = existMessages.map((m) => {
+      m.chatGroup = { id: m.chat_group_id };
+      m.sender = senders.filter((s) => s.id === m.sender_id)[0];
       if (reactions) {
         m.reactions = reactions
           .filter((r) => r.chat_message_id === m.id)
@@ -390,14 +399,22 @@ export class ChatService {
             return { ...r, isSender: false };
           });
       }
-      if (m.sender && m.sender.id === userID) {
-        m.isSender = true;
-        return m;
+      if (m.reply_parent_id) {
+        m.replyParentMessage = replyMessages.filter(
+          (replyMsg) => replyMsg.id === m.m.reply_parent_id,
+        )[0];
       }
-      m.isSender = false;
+      if (m.sender_id && m.sender_id === userID) {
+        m.isSender = true;
+      } else {
+        m.isSender = false;
+      }
       return m;
     });
 
+    if (!dateRefetchLatest) {
+      console.log('get messages speed check', endTime - startTime);
+    }
     return messages;
   }
 
