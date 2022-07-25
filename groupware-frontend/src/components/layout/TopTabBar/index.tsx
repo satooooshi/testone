@@ -24,8 +24,8 @@ const TopTabBar: React.FC<TopTabBarProps> = ({ topTabBehaviorList }) => {
       w="100%"
       // w={isSmallerThan768 ? '100vw' : '80vw'}
       h="40px"
-      borderBottomWidth={1}
-      borderBottomColor={'gray.200'}
+      // borderBottomWidth={1}
+      // borderBottomColor={'gray.200'}
       overflowX="auto"
       css={hideScrollbarCss}>
       {topTabBehaviorList.map((topTabBehavior) => {
@@ -40,13 +40,14 @@ const TopTabBar: React.FC<TopTabBarProps> = ({ topTabBehaviorList }) => {
             h="100%"
             whiteSpace="nowrap"
             mr={5}
-            color={topTabBehavior.isActiveTab ? 'blue.500' : darkFontColor}
+            color={topTabBehavior.isActiveTab ? 'blue.600' : darkFontColor}
             borderBottomWidth={topTabBehavior.isActiveTab ? 1 : undefined}
             _hover={{ textDecoration: 'none' }}
-            borderBottomColor={
-              topTabBehavior.isActiveTab ? 'blue.500' : 'gray.200'
-            }>
-            <Text pb="8px" fontSize="14px">
+            borderBottomColor="blue.600">
+            <Text
+              pb="8px"
+              fontSize="16px"
+              fontWeight={topTabBehavior.isActiveTab ? 'bold' : ''}>
               {topTabBehavior.tabName}
             </Text>
           </Link>
