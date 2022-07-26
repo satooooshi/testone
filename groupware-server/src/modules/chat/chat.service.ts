@@ -19,7 +19,7 @@ import {
   sendPushNotifToSpecificUsers,
 } from 'src/utils/notification/sendPushNotification';
 import { selectUserColumns } from 'src/utils/selectUserColumns';
-import { In, Repository } from 'typeorm';
+import { In, Repository, getManager } from 'typeorm';
 import { StorageService } from '../storage/storage.service';
 import {
   GetChaRoomsByPageQuery,
@@ -113,30 +113,11 @@ export class ChatService {
 
     const urlUnparsedRooms = await this.chatGroupRepository
       .createQueryBuilder('chat_groups')
-      .leftJoin('chat_groups.members', 'member')
+      .innerJoin('chat_groups.members', 'member', 'member.id = :memberId', {
+        memberId: userID,
+      })
       .leftJoin('chat_groups.members', 'members')
       .addSelect(selectUserColumns('members'))
-      .leftJoin(
-        'chat_groups.muteUsers',
-        'muteUsers',
-        'muteUsers.id = :muteUsersID',
-        { muteUsersID: userID },
-      )
-      .addSelect(['muteUsers.id'])
-      .leftJoin(
-        'chat_groups.pinnedUsers',
-        'pinnedUsers',
-        'pinnedUsers.id = :pinnedUserID',
-        { pinnedUserID: userID },
-      )
-      .addSelect(['pinnedUsers.id'])
-      .leftJoin(
-        'chat_groups.lastReadChatTime',
-        'lastReadChatTime',
-        'lastReadChatTime.user_id = :userID',
-        { userID },
-      )
-      .addSelect(['lastReadChatTime.readTime'])
       .leftJoinAndSelect(
         'chat_groups.chatMessages',
         'm',
@@ -144,7 +125,7 @@ export class ChatService {
       )
       .leftJoin('m.sender', 'sender')
       .addSelect(['sender.id'])
-      .where('member.id = :memberId', { memberId: userID })
+      // .where('member.id = :memberId', { memberId: userID })
       .andWhere(
         !!updatedAtLatestRoom
           ? `chat_groups.updatedAt > :updatedAtLatestRoom`
@@ -158,25 +139,71 @@ export class ChatService {
       .orderBy('chat_groups.updatedAt', 'DESC')
       .getMany();
 
+    if (!urlUnparsedRooms.length) {
+      return { rooms: urlUnparsedRooms, pageCount: 0 };
+    }
+
+    const roomIds = urlUnparsedRooms.map((r) => r.id);
+
+    const manager = getManager();
+    const membersCountList = await manager.query(
+      'select chat_group_id, COUNT(*) as cnt from user_chat_joining where chat_group_id IN (?) group by chat_group_id',
+      [roomIds],
+    );
+
+    const muteUserIds = await manager.query(
+      'select chat_group_id, user_id  from user_chat_mute where chat_group_id IN (?) AND user_id = ?',
+      [roomIds, userID],
+    );
+
+    const pinnedUserIds = await manager.query(
+      'select chat_group_id, user_id  from chat_user_pin where chat_group_id IN (?) AND user_id = ?',
+      [roomIds, userID],
+    );
+
+    const lastReadChatTimeList = await this.lastReadChatTimeRepository
+      .createQueryBuilder('time')
+      .select([
+        'time.id as id',
+        'time.read_time as readTime',
+        'time.chat_group_id as chat_group_id',
+      ])
+      .where('time.chat_group_id IN (:...roomIds)', { roomIds })
+      .andWhere('time.user_id = :userID', { userID })
+      .getRawMany();
+
     let rooms = await Promise.all(
       urlUnparsedRooms.map(async (g, index) => {
+        g.lastReadChatTime = lastReadChatTimeList.filter(
+          (l) => l.chat_group_id === g.id,
+        );
+        const lastReadChatTimeDate = new Date(
+          g?.lastReadChatTime?.[0]?.readTime,
+        );
         let unreadCount = 0;
-        const isPinned = !!g?.pinnedUsers?.length;
+        const isPinned = pinnedUserIds.some((p) => p.chat_group_id === g.id);
+        const memberCount = Number(
+          membersCountList.find((p) => p.chat_group_id === g.id).cnt || 0,
+        );
+        const isMute = muteUserIds.some((p) => p.chat_group_id === g.id);
         const hasBeenRead = g?.lastReadChatTime?.[0]?.readTime
-          ? g?.lastReadChatTime?.[0]?.readTime > g.updatedAt
+          ? lastReadChatTimeDate > g.updatedAt
           : false;
         if (!hasBeenRead) {
           const query = {
             group: g.id,
             lastReadTime:
               g.lastReadChatTime?.[0] && g.lastReadChatTime?.[0].readTime
-                ? g.lastReadChatTime?.[0].readTime
+                ? lastReadChatTimeDate
                 : g.createdAt,
           };
           unreadCount = await this.getUnreadChatMessage(userID, query);
         }
-        if (g.roomType === RoomType.PERSONAL && g.members.length === 2) {
+        if (g.roomType === RoomType.PERSONAL && memberCount === 2) {
           const chatPartner = g.members.filter((m) => m.id !== userID)[0];
+          // const chatPartner = await this.userRepository.findOne(
+          //   g.members.find((m) => m.id !== userID).id,
+          // );
           g.imageURL = chatPartner.avatarUrl;
           g.name = `${chatPartner.lastName} ${chatPartner.firstName}`;
         }
@@ -185,6 +212,8 @@ export class ChatService {
           ...g,
           pinnedUsers: undefined,
           isPinned,
+          isMute,
+          memberCount,
           hasBeenRead,
           unreadCount,
         };

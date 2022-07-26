@@ -137,6 +137,8 @@ export class ChatGroup {
   updatedAt: Date;
 
   isPinned?: boolean;
+  isMute?: boolean;
+  memberCount?: number;
   hasBeenRead?: boolean;
   unreadCount?: number;
 
