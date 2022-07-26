@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useMemo } from 'react';
 import { ChatGroup, ChatMessage, ChatMessageType, User } from 'src/types';
 import { dateTimeFormatterFromJSDDate } from 'src/utils/dateTimeFormatter';
 import {
@@ -43,10 +43,7 @@ const ChatGroupCard: React.FC<ChatGroupCardProps> = ({
     }
   };
 
-  const [avatarImage, setAvatarImage] = useState<string>('');
-  useEffect(() => {
-    setAvatarImage(chatGroup.imageURL);
-  }, [avatarImage]);
+  const avatarImage = useMemo(() => chatGroup.imageURL, [chatGroup.imageURL]);
 
   return (
     <Box
