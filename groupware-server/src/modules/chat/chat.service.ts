@@ -146,10 +146,10 @@ export class ChatService {
     const roomIds = urlUnparsedRooms.map((r) => r.id);
 
     const manager = getManager();
-    const membersCountList = await manager.query(
-      'select chat_group_id, COUNT(*) as cnt from user_chat_joining where chat_group_id IN (?) group by chat_group_id',
-      [roomIds],
-    );
+    // const membersCountList = await manager.query(
+    //   'select chat_group_id, COUNT(user_id) as cnt from user_chat_joining where chat_group_id IN (?) group by chat_group_id',
+    //   [roomIds],
+    // );
 
     const muteUserIds = await manager.query(
       'select chat_group_id, user_id  from user_chat_mute where chat_group_id IN (?) AND user_id = ?',
@@ -182,9 +182,9 @@ export class ChatService {
         );
         let unreadCount = 0;
         const isPinned = pinnedUserIds.some((p) => p.chat_group_id === g.id);
-        const memberCount = Number(
-          membersCountList.find((p) => p.chat_group_id === g.id).cnt || 0,
-        );
+        // const memberCount = Number(
+        //   membersCountList.find((p) => p.chat_group_id === g.id).cnt || 0,
+        // );
         const isMute = muteUserIds.some((p) => p.chat_group_id === g.id);
         const hasBeenRead = g?.lastReadChatTime?.[0]?.readTime
           ? lastReadChatTimeDate > g.updatedAt
@@ -199,11 +199,14 @@ export class ChatService {
           };
           unreadCount = await this.getUnreadChatMessage(userID, query);
         }
-        if (g.roomType === RoomType.PERSONAL && memberCount === 2) {
+
+        if (g.roomType === RoomType.PERSONAL && g.members.length === 2) {
           const chatPartner = g.members.filter((m) => m.id !== userID)[0];
           // const chatPartner = await this.userRepository.findOne(
           //   g.members.find((m) => m.id !== userID).id,
           // );
+          // console.log('----', chatPartner, g.members.length, memberCount);
+
           g.imageURL = chatPartner.avatarUrl;
           g.name = `${chatPartner.lastName} ${chatPartner.firstName}`;
         }
@@ -213,7 +216,7 @@ export class ChatService {
           pinnedUsers: undefined,
           isPinned,
           isMute,
-          memberCount,
+          // memberCount,
           hasBeenRead,
           unreadCount,
         };
