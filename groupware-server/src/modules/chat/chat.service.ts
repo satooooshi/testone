@@ -944,14 +944,15 @@ export class ChatService {
     if (!isMember) {
       throw new NotAcceptableException('Something went wrong');
     }
+
     const existTime = await this.lastReadChatTimeRepository
       .createQueryBuilder('time')
-      .leftJoin('time.chatGroup', 'g')
-      .leftJoin('time.user', 'u')
-      .where('g.id = :chatGroupId', { chatGroupId })
-      .andWhere('u.id = :userId', { userId: user.id })
-      .getOne();
-    console.log(user.lastName, 'end saveLastReadChatTime');
+      .select(['time.id as id', 'time.read_time as readTime'])
+      .where('time.chat_group_id = :chatGroupId', { chatGroupId })
+      .andWhere('time.user_id = :userId', { userId: user.id })
+      .getRawOne();
+
+    console.log('----', existTime);
 
     if (existTime) {
       return await this.lastReadChatTimeRepository.save({
