@@ -487,6 +487,7 @@ export class ChatService {
   ): Promise<LastReadChatTime[]> {
     const chatGroup = await this.chatGroupRepository
       .createQueryBuilder('chat_groups')
+      // .withDeleted()
       .leftJoin('chat_groups.lastReadChatTime', 'lastReadChatTime')
       .addSelect(['lastReadChatTime.readTime'])
       .leftJoin('lastReadChatTime.user', 'user')
@@ -506,7 +507,12 @@ export class ChatService {
     // if (!isMember) {
     //   throw new NotAcceptableException('Something went wrong');
     // }
-    return chatGroup.lastReadChatTime.filter((l) => l.user.id !== user.id);
+
+    // return chatGroup.lastReadChatTime.filter((l) => l.user.id !== user.id);
+
+    return chatGroup.lastReadChatTime.filter(
+      (l) => l.user && l.user.id !== user.id,
+    );
   }
 
   public async sendMessage(

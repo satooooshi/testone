@@ -25,7 +25,8 @@ export const useChatSocket = (
   const {mutate: saveLastReadChatTime} = useAPISaveLastReadChatTime();
   const {data: lastReadChatTime, refetch: refetchLastReadChatTime} =
     useAPIGetLastReadChatTime(room.id);
-  const [appState, setAppState] = useState<AppStateStatus>('active');
+  // const [appState, setAppState] = useState<AppStateStatus>('active');
+  const [willReport, setWillReport] = useState(false);
 
   let isMounted: boolean | undefined;
 
@@ -37,9 +38,18 @@ export const useChatSocket = (
           senderId: myself?.id,
         });
         handleEnterRoom(room.id);
+        setWillReport(false);
       },
     });
   };
+
+  useEffect(() => {
+    if (willReport) {
+      saveLastReadTimeAndReport();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [willReport]);
+
   const connect = () => {
     if (socket.disconnected) {
       socket.connect();
@@ -47,16 +57,16 @@ export const useChatSocket = (
     }
   };
 
-  useEffect(() => {
-    const unsubscribeAppState = () => {
-      AppState.addEventListener('change', state => {
-        setAppState(state);
-      });
-    };
-    return () => {
-      unsubscribeAppState();
-    };
-  });
+  // useEffect(() => {
+  //   const unsubscribeAppState = () => {
+  //     AppState.addEventListener('change', state => {
+  //       setAppState(state);
+  //     });
+  //   };
+  //   return () => {
+  //     unsubscribeAppState();
+  //   };
+  // });
 
   return {
     joinRoom: () => {
@@ -154,7 +164,7 @@ export const useChatSocket = (
     send: (m: SocketMessage) => {
       socket.emit('message', m);
     },
-    saveLastReadTimeAndReport,
+    saveLastReadTimeAndReport: () => setWillReport(true),
     lastReadChatTime,
   };
 };
