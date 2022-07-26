@@ -33,8 +33,6 @@ const ChatDetail = () => {
     enabled: false,
     onSuccess: (data) => {
       const isMember = data.members?.filter((m) => m.id === user?.id).length;
-      console.log('-----', isMember);
-
       if (!isMember) {
         data.name = 'メンバーがいません';
         data.members = [];
