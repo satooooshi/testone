@@ -267,13 +267,6 @@ export class ChatService {
       .createQueryBuilder('chat_groups')
       .innerJoin('chat_groups.members', 'members')
       .addSelect(selectUserColumns('members'))
-      .leftJoinAndSelect(
-        'chat_groups.chatMessages',
-        'm',
-        'm.id = ( SELECT id FROM chat_messages WHERE chat_group_id = chat_groups.id AND type <> "system_text" ORDER BY updated_at DESC LIMIT 1 )',
-      )
-      .leftJoin('m.sender', 'sender')
-      .addSelect(['sender.id'])
       .where('chat_groups.id = :roomId', { roomId: roomId })
       .getOne();
 
@@ -304,9 +297,32 @@ export class ChatService {
       .andWhere('time.user_id = :userID', { userID })
       .getRawMany();
 
+    const latestMessage = await this.chatMessageRepository
+      .createQueryBuilder('messages')
+      .select([
+        'messages.id as id',
+        'messages.content as content',
+        'messages.type as type',
+        'messages.call_time as callTime',
+        'messages.file_name as fileName',
+        'messages.created_at as createdAt',
+        'messages.updated_at as updatedAt',
+        'messages.sender_id as sender_id',
+        'messages.chat_group_id as chat_group_id',
+      ])
+      .where('messages.chat_group_id  = :roomId', { roomId })
+      .andWhere('type <> "system_text"')
+      .orderBy('createdAt', 'DESC')
+      .limit(1)
+      .getRawMany();
+
+    room.chatMessages = latestMessage.map((m) => ({
+      ...m,
+      sender: { id: m.sender_id },
+    }));
     room.lastReadChatTime = lastReadChatTimeList;
-    room.isPinned = !!pinnedUserId;
-    room.isMute = !!muteUserId;
+    room.isPinned = !!pinnedUserId.chat_group_id;
+    room.isMute = !!muteUserId.chat_group_id;
     room.hasBeenRead = room?.lastReadChatTime?.[0]?.readTime
       ? room?.lastReadChatTime?.[0]?.readTime > room.updatedAt
       : false;
