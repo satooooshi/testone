@@ -456,9 +456,13 @@ export class UserService {
   }
 
   async getUsers(): Promise<User[]> {
+    const startTime = Date.now();
     const users = await this.userRepository.find({
+      select: ['id', 'avatarUrl', 'lastName', 'firstName', 'existence', 'role'],
       order: { lastNameKana: 'ASC' },
     });
+    const endTime = Date.now();
+    console.log('spped check get users ==', endTime - startTime);
     return users;
   }
 
