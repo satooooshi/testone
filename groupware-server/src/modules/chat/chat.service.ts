@@ -183,7 +183,7 @@ export class ChatService {
         'messages.created_at as createdAt',
         'messages.updated_at as updatedAt',
         'messages.sender_id as sender_id',
-        'messages.chat_group_id as chat_group_id',
+        'messages.chat_group_id as chatGroupId',
       ])
       .where('messages.chat_group_id IN (:...roomIds)', {
         roomIds,
@@ -196,7 +196,7 @@ export class ChatService {
     let rooms = await Promise.all(
       urlUnparsedRooms.map(async (g, index) => {
         g.chatMessages = latestMessages
-          .filter((m) => m.chat_group_id === g.id)
+          .filter((m) => m.chatGroupId === g.id)
           .map((m) => ({ ...m, sender: { id: m.sender_id } }));
         g.lastReadChatTime = lastReadChatTimeList.filter(
           (l) => l.chat_group_id === g.id,
