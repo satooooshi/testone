@@ -241,29 +241,8 @@ export class ChatService {
   public async getOneRoom(userID: number, roomId: number): Promise<ChatGroup> {
     const room = await this.chatGroupRepository
       .createQueryBuilder('chat_groups')
-      .leftJoin('chat_groups.members', 'members')
+      .innerJoin('chat_groups.members', 'members')
       .addSelect(selectUserColumns('members'))
-      .leftJoin(
-        'chat_groups.muteUsers',
-        'muteUsers',
-        'muteUsers.id = :muteUsersID',
-        { muteUsersID: userID },
-      )
-      .addSelect(['muteUsers.id'])
-      .leftJoin(
-        'chat_groups.pinnedUsers',
-        'pinnedUsers',
-        'pinnedUsers.id = :pinnedUserID',
-        { pinnedUserID: userID },
-      )
-      .addSelect(['pinnedUsers.id'])
-      .leftJoin(
-        'chat_groups.lastReadChatTime',
-        'lastReadChatTime',
-        'lastReadChatTime.user_id = :userID',
-        { userID },
-      )
-      .addSelect(['lastReadChatTime.readTime'])
       .leftJoinAndSelect(
         'chat_groups.chatMessages',
         'm',
@@ -274,7 +253,36 @@ export class ChatService {
       .where('chat_groups.id = :roomId', { roomId: roomId })
       .getOne();
 
-    room.isPinned = !!room.pinnedUsers.length;
+    const manager = getManager();
+    // const membersCountList = await manager.query(
+    //   'select chat_group_id, COUNT(user_id) as cnt from user_chat_joining where chat_group_id IN (?) group by chat_group_id',
+    //   [roomIds],
+    // );
+
+    const muteUserId = await manager.query(
+      'select chat_group_id, user_id  from user_chat_mute where chat_group_id  = ? AND user_id = ?',
+      [roomId, userID],
+    );
+
+    const pinnedUserId = await manager.query(
+      'select chat_group_id, user_id  from chat_user_pin where chat_group_id  = ? AND user_id = ?',
+      [roomId, userID],
+    );
+
+    const lastReadChatTimeList = await this.lastReadChatTimeRepository
+      .createQueryBuilder('time')
+      .select([
+        'time.id as id',
+        'time.read_time as readTime',
+        'time.chat_group_id as chat_group_id',
+      ])
+      .where('time.chat_group_id = :roomId', { roomId })
+      .andWhere('time.user_id = :userID', { userID })
+      .getRawMany();
+
+    room.lastReadChatTime = lastReadChatTimeList;
+    room.isPinned = !!pinnedUserId;
+    room.isMute = !!muteUserId;
     room.hasBeenRead = room?.lastReadChatTime?.[0]?.readTime
       ? room?.lastReadChatTime?.[0]?.readTime > room.updatedAt
       : false;
