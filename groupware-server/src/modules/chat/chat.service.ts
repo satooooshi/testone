@@ -29,6 +29,9 @@ import {
   GetUnreadMessagesQuery,
   SaveRoomsResult,
 } from './chat.controller';
+type UserAndGroupID = User & {
+  chat_group_id: number;
+};
 
 @Injectable()
 export class ChatService {
@@ -116,16 +119,6 @@ export class ChatService {
       .innerJoin('chat_groups.members', 'member', 'member.id = :memberId', {
         memberId: userID,
       })
-      .leftJoin('chat_groups.members', 'members')
-      .addSelect(selectUserColumns('members'))
-      // .leftJoinAndSelect(
-      //   'chat_groups.chatMessages',
-      //   'm',
-      //   'm.id = ( SELECT id FROM chat_messages WHERE chat_group_id = chat_groups.id AND type <> "system_text" ORDER BY updated_at DESC LIMIT 1 )',
-      // )
-      // .leftJoin('m.sender', 'sender')
-      // .addSelect(['sender.id'])
-      // .where('member.id = :memberId', { memberId: userID })
       .andWhere(
         !!updatedAtLatestRoom
           ? `chat_groups.updatedAt > :updatedAtLatestRoom`
@@ -150,6 +143,12 @@ export class ChatService {
     //   'select chat_group_id, COUNT(user_id) as cnt from user_chat_joining where chat_group_id IN (?) group by chat_group_id',
     //   [roomIds],
     // );
+
+    const members: UserAndGroupID[] = await manager.query(
+      'select chat_group_id, users.id as id, users.last_name as lastName, users.first_name as firstName, users.avatar_url as avatarUrl, users.existence as existence from user_chat_joining INNER JOIN users ON users.id = user_id AND chat_group_id IN (?)',
+      [roomIds],
+    );
+    console.log(members);
 
     const muteUserIds = await manager.query(
       'select chat_group_id, user_id  from user_chat_mute where chat_group_id IN (?) AND user_id = ?',
@@ -195,6 +194,7 @@ export class ChatService {
 
     let rooms = await Promise.all(
       urlUnparsedRooms.map(async (g, index) => {
+        g.members = members.filter((m) => m.chat_group_id === g.id);
         g.chatMessages = latestMessages
           .filter((m) => m.chat_group_id === g.id)
           .map((m) => ({ ...m, sender: { id: m.sender_id } }));
@@ -347,7 +347,6 @@ export class ChatService {
 
     return room;
   }
-
   public async getRoomsUnreadChatCount(userID: number): Promise<ChatGroup[]> {
     const [urlUnparsedRooms] = await this.chatGroupRepository
       .createQueryBuilder('chat_groups')
