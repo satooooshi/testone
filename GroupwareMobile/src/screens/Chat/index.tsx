@@ -33,6 +33,7 @@ import {
   ChatMessageReaction,
   ChatMessageType,
   FIleSource,
+  RoomType,
   SocketMessage,
   User,
 } from '../../types';
@@ -1290,7 +1291,9 @@ const Chat: React.FC = () => {
             />
           </TouchableOpacity>
 
-          {roomDetail?.members && roomDetail.members.length < 3 ? (
+          {roomDetail?.members &&
+          roomDetail.members.length === 2 &&
+          roomDetail.roomType === RoomType.PERSONAL ? (
             <Div mt={-4} mr={-4} style={tailwind('flex flex-row ')}>
               <Button
                 bg="transparent"
