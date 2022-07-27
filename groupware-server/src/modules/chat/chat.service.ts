@@ -315,14 +315,15 @@ export class ChatService {
       .orderBy('createdAt', 'DESC')
       .limit(1)
       .getRawMany();
+    console.log('------', pinnedUserId.length, muteUserId, latestMessage);
 
     room.chatMessages = latestMessage.map((m) => ({
       ...m,
       sender: { id: m.sender_id },
     }));
     room.lastReadChatTime = lastReadChatTimeList;
-    room.isPinned = !!pinnedUserId.chat_group_id;
-    room.isMute = !!muteUserId.chat_group_id;
+    room.isPinned = !!pinnedUserId.length;
+    room.isMute = !!muteUserId.length;
     room.hasBeenRead = room?.lastReadChatTime?.[0]?.readTime
       ? room?.lastReadChatTime?.[0]?.readTime > room.updatedAt
       : false;
