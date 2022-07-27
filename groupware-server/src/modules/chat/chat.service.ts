@@ -333,13 +333,8 @@ export class ChatService {
         'chat_messages.sender_id as sender_id',
         'chat_messages.chat_group_id as chat_group_id',
       ])
-      .innerJoin(
-        'chat_messages.chatGroup',
-        'chat_group',
-        'chat_group.id = :groupID',
-        { groupID: query.group },
-      )
-      .where(
+      .where('chat_messages.chat_group_id =:groupID', { groupID: query.group })
+      .andWhere(
         after && include
           ? 'chat_messages.id >= :after'
           : after && !include
