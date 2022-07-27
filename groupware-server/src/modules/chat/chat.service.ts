@@ -118,13 +118,13 @@ export class ChatService {
       })
       .leftJoin('chat_groups.members', 'members')
       .addSelect(selectUserColumns('members'))
-      .leftJoinAndSelect(
-        'chat_groups.chatMessages',
-        'm',
-        'm.id = ( SELECT id FROM chat_messages WHERE chat_group_id = chat_groups.id AND type <> "system_text" ORDER BY updated_at DESC LIMIT 1 )',
-      )
-      .leftJoin('m.sender', 'sender')
-      .addSelect(['sender.id'])
+      // .leftJoinAndSelect(
+      //   'chat_groups.chatMessages',
+      //   'm',
+      //   'm.id = ( SELECT id FROM chat_messages WHERE chat_group_id = chat_groups.id AND type <> "system_text" ORDER BY updated_at DESC LIMIT 1 )',
+      // )
+      // .leftJoin('m.sender', 'sender')
+      // .addSelect(['sender.id'])
       // .where('member.id = :memberId', { memberId: userID })
       .andWhere(
         !!updatedAtLatestRoom
@@ -172,8 +172,32 @@ export class ChatService {
       .andWhere('time.user_id = :userID', { userID })
       .getRawMany();
 
+    const latestMessages = await this.chatMessageRepository
+      .createQueryBuilder('messages')
+      .select([
+        'messages.id as id',
+        'messages.content as content',
+        'messages.type as type',
+        'messages.call_time as callTime',
+        'messages.file_name as fileName',
+        'messages.created_at as createdAt',
+        'messages.updated_at as updatedAt',
+        'messages.sender_id as sender_id',
+        'messages.chat_group_id as chat_group_id',
+      ])
+      .where('messages.chat_group_id IN (:...roomIds)', {
+        roomIds,
+      })
+      .andWhere(
+        'messages.id =  ( SELECT id FROM chat_messages WHERE chat_group_id = messages.chat_group_id AND type <> "system_text" ORDER BY created_at DESC LIMIT 1 )',
+      )
+      .getRawMany();
+
     let rooms = await Promise.all(
       urlUnparsedRooms.map(async (g, index) => {
+        g.chatMessages = latestMessages
+          .filter((m) => m.chat_group_id === g.id)
+          .map((m) => ({ ...m, sender: { id: m.sender_id } }));
         g.lastReadChatTime = lastReadChatTimeList.filter(
           (l) => l.chat_group_id === g.id,
         );
