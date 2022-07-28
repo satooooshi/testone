@@ -41,7 +41,6 @@ export class ChatNoteService {
           chatGroupId: groupID,
         },
       )
-      .where('chat_groups.id = :chatGroupId', { chatGroupId: groupID })
       .getOne();
     return !!isUserBelongToGroup;
   }

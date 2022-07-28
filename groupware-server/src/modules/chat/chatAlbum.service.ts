@@ -48,7 +48,6 @@ export class ChatAlbumService {
           chatGroupId: groupID,
         },
       )
-      .where('chat_groups.id = :chatGroupId', { chatGroupId: groupID })
       .getOne();
     return !!isUserBelongToGroup;
   }
