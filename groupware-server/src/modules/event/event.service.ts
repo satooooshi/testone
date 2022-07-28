@@ -22,7 +22,6 @@ import {
   SearchResultToGetEvents,
 } from './event.controller';
 import { selectUserColumns } from 'src/utils/selectUserColumns';
-import e from 'express';
 
 @Injectable()
 export class EventScheduleService {
