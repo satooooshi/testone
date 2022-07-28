@@ -1293,7 +1293,7 @@ const Chat: React.FC = () => {
 
           {roomDetail?.members &&
           roomDetail.members.length === 2 &&
-          roomDetail.roomType === RoomType.PERSONAL ? (
+          roomDetail.roomType !== RoomType.GROUP ? (
             <Div mt={-4} mr={-4} style={tailwind('flex flex-row ')}>
               <Button
                 bg="transparent"
