@@ -79,7 +79,11 @@ const EditChatGroupMembersModal: React.FC<EditChatGroupMambersModalProps> = ({
   onComplete,
   isTalkRoom = false,
 }) => {
-  const { data: users, refetch: refetchGetUsers } = useAPIGetUsers('ALL', {
+  const {
+    data: users,
+    refetch: refetchGetUsers,
+    isLoading,
+  } = useAPIGetUsers('ALL', {
     enabled: false,
   });
   const { user: myProfile } = useAuthenticate();
