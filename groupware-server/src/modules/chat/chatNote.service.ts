@@ -1,5 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { ChatGroup } from 'src/entities/chatGroup.entity';
 import { ChatNote } from 'src/entities/chatNote.entity';
 import { ChatNoteImage } from 'src/entities/chatNoteImage.entity';
 import { Repository } from 'typeorm';
@@ -21,6 +22,8 @@ export class ChatNoteService {
     private readonly noteRepository: Repository<ChatNote>,
     @InjectRepository(ChatNoteImage)
     private readonly noteImageRepository: Repository<ChatNoteImage>,
+    @InjectRepository(ChatGroup)
+    private readonly chatGroupRepository: Repository<ChatGroup>,
   ) {}
 
   public async saveChatNotes(dto: Partial<ChatNote>): Promise<ChatNote> {
@@ -41,9 +44,21 @@ export class ChatNoteService {
   }
 
   public async getChatNoteDetail(
+    roomID: number,
     noteID: number,
     userID: number,
   ): Promise<ChatNote> {
+    const isUserJoining = await this.chatGroupRepository
+      .createQueryBuilder('chat_groups')
+      .innerJoin('chat_groups.members', 'm', 'm.id = :userId', {
+        userId: userID,
+      })
+      .where('chat_groups.id = :chatGroupId', { chatGroupId: roomID })
+      .getOne();
+    if (!isUserJoining) {
+      throw new BadRequestException('The user is not a member');
+    }
+
     const noteDetail = await this.noteRepository.findOne(noteID, {
       relations: ['chatGroup', 'editors', 'images'],
       withDeleted: true,
@@ -58,6 +73,18 @@ export class ChatNoteService {
     userID: number,
   ): Promise<GetChatNotesResult> {
     const { page, group } = query;
+
+    const isUserJoining = await this.chatGroupRepository
+      .createQueryBuilder('chat_groups')
+      .innerJoin('chat_groups.members', 'm', 'm.id = :userId', {
+        userId: userID,
+      })
+      .where('chat_groups.id = :chatGroupId', { chatGroupId: group })
+      .getOne();
+    if (!isUserJoining) {
+      throw new BadRequestException('The user is not a member');
+    }
+
     const limit = 20;
     const offset = limit * (Number(page) - 1);
     const [existNotes, count] = await this.noteRepository
