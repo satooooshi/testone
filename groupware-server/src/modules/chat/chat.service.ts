@@ -158,7 +158,7 @@ export class ChatService {
       'select chat_group_id, users.id as id, users.last_name as lastName, users.first_name as firstName, users.avatar_url as avatarUrl, users.existence as existence from user_chat_joining INNER JOIN users ON users.id = user_id AND chat_group_id IN (?)',
       [roomIds],
     );
-    console.log(members);
+    // console.log(members);
 
     const muteUserIds = await manager.query(
       'select chat_group_id, user_id  from user_chat_mute where chat_group_id IN (?) AND user_id = ?',
