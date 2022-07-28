@@ -362,28 +362,49 @@ export class ChatService {
       .orderBy('chat_messages.createdAt', after ? 'ASC' : 'DESC')
       .getRawMany();
     const endTime = Date.now();
+    const messageIDs = existMessages.map((m) => m.id);
+    const senderIDs = [
+      ...new Set(existMessages.map((m) => Number(m.sender_id))),
+    ];
+    const replyMessageIDs = existMessages.map((m) => m.reply_parent_id);
 
     // senderの取得
-    const senders = await this.userRepository.find({
-      where: { id: In(existMessages.map((m) => m.sender_id)) },
-    });
+    let senders: User[] = [];
+    if (senderIDs.length) {
+      senders = await this.userRepository
+        .createQueryBuilder('users')
+        .select(selectUserColumns('users'))
+        .where('users.id IN (:...senderIDs)', { senderIDs })
+        .getMany();
+    }
+
     //リアクションの取得
     const reactions = await this.chatMessageReactionRepository
       .createQueryBuilder('reactions')
       .select(['id', 'chat_message_id', 'emoji as emoji', 'user_id'])
-      .where('chat_message_id IN (:...messageIDs)', {
-        messageIDs: existMessages.map((m) => m.id),
+      .where('chat_message_id IN (:messageIDs)', {
+        messageIDs,
       })
       .getRawMany();
     //返信の取得
-    const replyMessages = await this.chatMessageRepository.find({
-      where: { id: In(existMessages.map((m) => m.reply_parent_id)) },
-      relations: ['sender'],
-    });
+
+    let replyMessages: ChatMessage[] = [];
+    if (replyMessageIDs.length) {
+      replyMessages = await this.chatMessageRepository
+        .createQueryBuilder('messages')
+        .leftJoin('messages.sender', 'sender')
+        .addSelect(selectUserColumns('sender'))
+        .where('messages.id IN (:...replyMessageIDs)', {
+          replyMessageIDs,
+        })
+        .getMany();
+    }
 
     const messages: ChatMessage[] = existMessages.map((m) => {
       m.chatGroup = { id: m.chat_group_id };
-      m.sender = senders.filter((s) => s.id === m.sender_id)[0];
+      if (senders.length) {
+        m.sender = senders.filter((s) => s.id === m.sender_id)[0];
+      }
       if (reactions) {
         m.reactions = reactions
           .filter((r) => r.chat_message_id === m.id)
