@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import {useWindowDimensions, FlatList, TouchableHighlight} from 'react-native';
-import {BoardCategory, User, Wiki, WikiType} from '../../../types';
+import {BoardCategory, Wiki, WikiType} from '../../../types';
 import {Div, Text, Tag, Icon, Button} from 'react-native-magnus';
 import {tagColorFactory} from '../../../utils/factory/tagColorFactory';
 import {wikiCardStyles} from '../../../styles/component/wiki/wikiCard.style';
@@ -14,7 +14,6 @@ import {useAuthenticate} from '../../../contexts/useAuthenticate';
 import {darkFontColor} from '../../../utils/colors';
 import GoodSendersModal from '../../chat/GoodSendersModal';
 import {useAPIGetGoodsForBoard} from '../../../hooks/api/wiki/useAPIGetGoodForBoard';
-import {ActivityIndicator} from 'react-native-paper';
 
 type WikiCardProps = {
   wiki: Wiki;
@@ -27,30 +26,23 @@ const WikiCard: React.FC<WikiCardProps> = ({wiki}) => {
   const [isVisible, setIsVisible] = useState<boolean>(false);
   const isBoard = wiki.type === WikiType.BOARD;
   const isQA = wiki.boardCategory === BoardCategory.QA;
-  const [isPressHeart, setIsPressHeart] = useState<boolean>(
-    wiki.isGoodSender || false,
-  );
+  const [isPressHeart, setIsPressHeart] = useState<boolean>(false);
   const {user} = useAuthenticate();
   const [wikiState, setWikiState] = useState(wiki);
-
-  // const {
-  //   mutate: getGoodsForBoard,
-  //   data: goodsForBoard,
-  //   isLoading,
-  // } = useAPIGetGoodsForBoard({
-  //   onSuccess: res => {
-  //     const senderIDs = res.map(g => g.user.id);
-  //     const isGoodSender = senderIDs.some(id => id === user?.id);
-  //     if (isGoodSender) {
-  //       setWikiState(w => ({...w, isGoodSender: true}));
-  //       setIsPressHeart(true);
-  //     }
-  //   },
-  // });
+  const {mutate: getGoodsForBoard, data: goodsForBoard} =
+    useAPIGetGoodsForBoard();
 
   const {mutate} = useAPIToggleGoodForBoard({
     onSuccess: () => {
       setIsPressHeart(prevHeartStatus => {
+        setWikiState(w => {
+          if (prevHeartStatus) {
+            w.goodsCount = (w.goodsCount || 0) - 1;
+          } else {
+            w.goodsCount = (w.goodsCount || 0) + 1;
+          }
+          return w;
+        });
         return !prevHeartStatus;
       });
     },
@@ -58,6 +50,7 @@ const WikiCard: React.FC<WikiCardProps> = ({wiki}) => {
 
   useEffect(() => {
     setWikiState(wiki);
+    setIsPressHeart(wiki.isGoodSender || false);
   }, [wiki]);
 
   return (
@@ -89,7 +82,7 @@ const WikiCard: React.FC<WikiCardProps> = ({wiki}) => {
         </Div>
         <Div flexDir="column" w="100%">
           <Div flexDir="row" justifyContent="flex-end" mb={4} mr={4}>
-            {/* {isBoard ? (
+            {isBoard ? (
               <Div mr="lg" flexDir="row">
                 <Text textAlignVertical="bottom" mr={2}>
                   {isQA ? '回答' : 'コメント'}
@@ -99,10 +92,10 @@ const WikiCard: React.FC<WikiCardProps> = ({wiki}) => {
                   textAlignVertical="bottom"
                   fontSize={18}
                   mt={-3}>
-                  {wiki.answers?.length.toString() || 0}
+                  {wikiState.answersCount || 0}
                 </Text>
               </Div>
-            ) : null} */}
+            ) : null}
             <Div flexDir="column" alignItems="flex-end">
               <Text textAlignVertical="bottom" textAlign="center">
                 {`投稿日: ${dateTimeFormatterFromJSDDate({
@@ -176,7 +169,7 @@ const WikiCard: React.FC<WikiCardProps> = ({wiki}) => {
               </Tag>
             </>
           )}
-          {/* {wiki.type === WikiType.BOARD && (
+          {wiki.type === WikiType.BOARD && (
             <Div flexDir="row" ml="auto" mr={5}>
               <TouchableHighlight
                 underlayColor={'none'}
@@ -199,20 +192,22 @@ const WikiCard: React.FC<WikiCardProps> = ({wiki}) => {
                   />
                 )}
               </TouchableHighlight>
-              <Button onPress={() => setIsVisible(true)}>
-                {!isLoading && goodsForBoard ? (
-                  `${goodsForBoard?.map(g => g.user).length}件のいいね`
-                ) : (
-                  <ActivityIndicator />
-                )}
+              <Button
+                onPress={() => {
+                  getGoodsForBoard(wikiState.id);
+                  setIsVisible(true);
+                }}>
+                {`${wikiState.goodsCount || 0}件のいいね`}
               </Button>
             </Div>
-          )} */}
-          {/* <GoodSendersModal
-            goodSenders={goodsForBoard?.map(g => g.user) || []}
-            isVisible={isVisible}
-            onClose={() => setIsVisible(false)}
-          /> */}
+          )}
+          {goodsForBoard && (
+            <GoodSendersModal
+              isVisible={isVisible}
+              onClose={() => setIsVisible(false)}
+              goodsForBoard={goodsForBoard}
+            />
+          )}
         </Div>
       </Div>
     </TouchableHighlight>

@@ -80,6 +80,7 @@ const AnswerList: React.FC<AnswerListProps> = ({wiki, onPressAvatar}) => {
                 </Div>
                 <Div bg="white" rounded="md" p={8} mb={8}>
                   <RenderHtml
+                    baseStyle={{color: 'black'}}
                     contentWidth={windowWidth * 0.9}
                     source={{
                       html:

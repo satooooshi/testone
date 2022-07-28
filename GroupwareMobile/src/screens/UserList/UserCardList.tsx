@@ -74,9 +74,13 @@ const UserCardList: React.FC<UserCardListProps> = ({
   //   setSearchQuery(q => ({...q, word, tag, page: '1'}));
   // }, [tag, word]);
 
+  const scrollToTop = () => {
+    flatListRef?.current?.scrollToOffset({animated: false, offset: 0});
+  };
+
   useEffect(() => {
     if (isFocused && searchQuery.role !== userRole) {
-      flatListRef?.current?.scrollToOffset({animated: false, offset: 0});
+      scrollToTop();
       setSearchQuery(q => ({...q, role: userRole, page: '1'}));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -101,41 +105,46 @@ const UserCardList: React.FC<UserCardListProps> = ({
           <Dropdown.Option
             {...defaultDropdownOptionProps}
             value={'none'}
-            onPress={() =>
-              setSearchQuery(q => ({...q, sort: undefined, page: '1'}))
-            }>
+            onPress={() => {
+              scrollToTop();
+              setSearchQuery(q => ({...q, sort: undefined, page: '1'}));
+            }}>
             指定なし
           </Dropdown.Option>
           <Dropdown.Option
             {...defaultDropdownOptionProps}
             value={'none'}
-            onPress={() =>
-              setSearchQuery(q => ({...q, sort: 'event', page: '1'}))
-            }>
+            onPress={() => {
+              scrollToTop();
+              setSearchQuery(q => ({...q, sort: 'event', page: '1'}));
+            }}>
             イベント参加数順
           </Dropdown.Option>
           <Dropdown.Option
             {...defaultDropdownOptionProps}
             value={'none'}
-            onPress={() =>
-              setSearchQuery(q => ({...q, sort: 'question', page: '1'}))
-            }>
+            onPress={() => {
+              scrollToTop();
+              setSearchQuery(q => ({...q, sort: 'question', page: '1'}));
+            }}>
             質問数順
           </Dropdown.Option>
           <Dropdown.Option
             {...defaultDropdownOptionProps}
             value={'none'}
-            onPress={() =>
-              setSearchQuery(q => ({...q, sort: 'answer', page: '1'}))
-            }>
+            onPress={() => {
+              scrollToTop();
+              setSearchQuery(q => ({...q, sort: 'answer', page: '1'}));
+            }}>
             回答数順
           </Dropdown.Option>
           <Dropdown.Option
             {...defaultDropdownOptionProps}
             value={'none'}
-            onPress={() =>
-              setSearchQuery(q => ({...q, sort: 'knowledge', page: '1'}))
-            }>
+            onPress={() => {
+              scrollToTop();
+              setSearchQuery(q => ({...q, sort: 'knowledge', page: '1'}));
+            }}>
             ナレッジ投稿数順
           </Dropdown.Option>
         </Dropdown>
@@ -143,25 +152,28 @@ const UserCardList: React.FC<UserCardListProps> = ({
           <Dropdown.Option
             {...defaultDropdownOptionProps}
             value={'none'}
-            onPress={() =>
-              setSearchQuery(q => ({...q, duration: undefined, page: '1'}))
-            }>
+            onPress={() => {
+              scrollToTop();
+              setSearchQuery(q => ({...q, duration: undefined, page: '1'}));
+            }}>
             指定なし
           </Dropdown.Option>
           <Dropdown.Option
             {...defaultDropdownOptionProps}
             value={'none'}
-            onPress={() =>
-              setSearchQuery(q => ({...q, duration: 'week', page: '1'}))
-            }>
+            onPress={() => {
+              scrollToTop();
+              setSearchQuery(q => ({...q, duration: 'week', page: '1'}));
+            }}>
             週間
           </Dropdown.Option>
           <Dropdown.Option
             {...defaultDropdownOptionProps}
             value={'none'}
-            onPress={() =>
-              setSearchQuery(q => ({...q, duration: 'month', page: '1'}))
-            }>
+            onPress={() => {
+              scrollToTop();
+              setSearchQuery(q => ({...q, duration: 'month', page: '1'}));
+            }}>
             月間
           </Dropdown.Option>
         </Dropdown>

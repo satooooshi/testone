@@ -65,6 +65,7 @@ const EventCardList: React.FC<EventCardListProps> = ({
       });
     },
   });
+
   const [visibleSearchFormModal, setVisibleSearchFormModal] = useState(false);
   const [eventsForInfinitScroll, setEventsForInfiniteScroll] = useState<
     EventSchedule[]
@@ -146,7 +147,7 @@ const EventCardList: React.FC<EventCardListProps> = ({
             style={tailwind('h-full pt-4')}
             onEndReached={onEndReached}
             data={eventsForInfinitScroll}
-            keyExtractor={item => item.id.toString()}
+            keyExtractor={item => item.title + item.id.toString()}
             renderItem={({item: eventSchedule}) => (
               <Div mb={16}>
                 <EventCard event={eventSchedule} />

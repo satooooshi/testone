@@ -19,7 +19,7 @@ import {
   sendPushNotifToSpecificUsers,
 } from 'src/utils/notification/sendPushNotification';
 import { selectUserColumns } from 'src/utils/selectUserColumns';
-import { In, Repository } from 'typeorm';
+import { getManager, In, Repository } from 'typeorm';
 import { StorageService } from '../storage/storage.service';
 import {
   GetChaRoomsByPageQuery,
@@ -27,6 +27,7 @@ import {
   GetRoomsResult,
   SearchMessageQuery,
   GetUnreadMessagesQuery,
+  SaveRoomsResult,
 } from './chat.controller';
 
 @Injectable()
@@ -112,39 +113,20 @@ export class ChatService {
 
     const urlUnparsedRooms = await this.chatGroupRepository
       .createQueryBuilder('chat_groups')
-      .leftJoin('chat_groups.members', 'member')
+      .innerJoin('chat_groups.members', 'member', 'member.id = :memberId', {
+        memberId: userID,
+      })
       .leftJoin('chat_groups.members', 'members')
       .addSelect(selectUserColumns('members'))
-      .leftJoin(
-        'chat_groups.muteUsers',
-        'muteUsers',
-        'muteUsers.id = :muteUsersID',
-        { muteUsersID: userID },
-      )
-      .addSelect(['muteUsers.id'])
-      .leftJoin(
-        'chat_groups.pinnedUsers',
-        'pinnedUsers',
-        'pinnedUsers.id = :pinnedUserID',
-        { pinnedUserID: userID },
-      )
-      .addSelect(['pinnedUsers.id'])
-      .leftJoin(
-        'chat_groups.lastReadChatTime',
-        'lastReadChatTime',
-        'lastReadChatTime.user_id = :userID',
-        { userID },
-      )
-      .addSelect(['lastReadChatTime.readTime'])
-      .leftJoinAndSelect(
-        'chat_groups.chatMessages',
-        'm',
-        'm.id = ( SELECT id FROM chat_messages WHERE chat_group_id = chat_groups.id AND type <> "system_text" ORDER BY updated_at DESC LIMIT 1 )',
-      )
-      .leftJoin('m.sender', 'sender')
-      .addSelect(['sender.id'])
-      .where('member.id = :memberId', { memberId: userID })
-      .andWhere(
+      // .leftJoinAndSelect(
+      //   'chat_groups.chatMessages',
+      //   'm',
+      //   'm.id = ( SELECT id FROM chat_messages WHERE chat_group_id = chat_groups.id AND type <> "system_text" ORDER BY created_at DESC LIMIT 1 )',
+      // )
+      // .leftJoin('m.sender', 'sender')
+      // .addSelect(['sender.id'])
+      // .where('member.id = :memberId', { memberId: userID })
+      .where(
         !!updatedAtLatestRoom
           ? `chat_groups.updatedAt > :updatedAtLatestRoom`
           : '1=1',
@@ -157,25 +139,122 @@ export class ChatService {
       .orderBy('chat_groups.updatedAt', 'DESC')
       .getMany();
 
+    if (!urlUnparsedRooms.length) {
+      return { rooms: urlUnparsedRooms, pageCount: 0 };
+    }
+
+    const roomIds = urlUnparsedRooms.map((r) => r.id);
+
+    const manager = getManager();
+    // const membersCountList = await manager.query(
+    //   'select chat_group_id, COUNT(user_id) as cnt from user_chat_joining where chat_group_id IN (?) group by chat_group_id',
+    //   [roomIds],
+    // );
+
+    const muteUserIds = await manager.query(
+      'select chat_group_id, user_id  from user_chat_mute where chat_group_id IN (?) AND user_id = ?',
+      [roomIds, userID],
+    );
+
+    const pinnedUserIds = await manager.query(
+      'select chat_group_id, user_id  from chat_user_pin where chat_group_id IN (?) AND user_id = ?',
+      [roomIds, userID],
+    );
+
+    const lastReadChatTimeList = await this.lastReadChatTimeRepository
+      .createQueryBuilder('time')
+      .select([
+        'time.id as id',
+        'time.read_time as readTime',
+        'time.chat_group_id as chat_group_id',
+      ])
+      .where('time.chat_group_id IN (:...roomIds)', { roomIds })
+      .andWhere('time.user_id = :userID', { userID })
+      .getRawMany();
+
+    // const latestMessages = await this.chatMessageRepository
+    //   .createQueryBuilder('messages')
+    //   .select([
+    //     'messages.id as id',
+    //     'messages.content as content',
+    //     'messages.type as type',
+    //     'messages.call_time as callTime',
+    //     'messages.file_name as fileName',
+    //     'messages.created_at as createdAt',
+    //     'messages.updated_at as updatedAt',
+    //     'messages.sender_id as sender_id',
+    //     'messages.chat_group_id as chatGroupId',
+    //   ])
+    //   .where('messages.chat_group_id IN (:...roomIds)', {
+    //     roomIds,
+    //   })
+    //   .andWhere(
+    //     'messages.id =  ( SELECT id FROM chat_messages WHERE chat_group_id = messages.chat_group_id AND type <> "system_text" ORDER BY created_at DESC LIMIT 1 )',
+    //   )
+    //   .getRawMany();
+
     let rooms = await Promise.all(
       urlUnparsedRooms.map(async (g, index) => {
+        // g.chatMessages = latestMessages
+        //   .filter((m) => m.chatGroupId === g.id)
+        //   .map((m) => ({ ...m, sender: { id: m.sender_id } }));
+
+        const latestMessage = await this.chatMessageRepository
+          .createQueryBuilder('messages')
+          .select([
+            'messages.id as id',
+            'messages.content as content',
+            'messages.type as type',
+            'messages.call_time as callTime',
+            'messages.file_name as fileName',
+            'messages.created_at as createdAt',
+            'messages.updated_at as updatedAt',
+            'messages.sender_id as sender_id',
+            'messages.chat_group_id as chat_group_id',
+          ])
+          .where('messages.chat_group_id  = :roomId', { roomId: g.id })
+          .andWhere('type <> "system_text"')
+          .orderBy('createdAt', 'DESC')
+          .limit(1)
+          .getRawMany();
+        g.chatMessages = latestMessage.map((m) => ({
+          ...m,
+          sender: { id: m.sender_id },
+        }));
+
+        g.lastReadChatTime = lastReadChatTimeList.filter(
+          (l) => l.chat_group_id === g.id,
+        );
+        const lastReadChatTimeDate = new Date(
+          g?.lastReadChatTime?.[0]?.readTime,
+        );
         let unreadCount = 0;
-        const isPinned = !!g?.pinnedUsers?.length;
+        const isPinned = pinnedUserIds.some((p) => p.chat_group_id === g.id);
+        // const memberCount = Number(
+        //   membersCountList.find((p) => p.chat_group_id === g.id).cnt || 0,
+        // );
+        const isMute = muteUserIds.some((p) => p.chat_group_id === g.id);
         const hasBeenRead = g?.lastReadChatTime?.[0]?.readTime
-          ? g?.lastReadChatTime?.[0]?.readTime > g.updatedAt
+          ? lastReadChatTimeDate > g.updatedAt
           : false;
         if (!hasBeenRead) {
           const query = {
             group: g.id,
             lastReadTime:
               g.lastReadChatTime?.[0] && g.lastReadChatTime?.[0].readTime
-                ? g.lastReadChatTime?.[0].readTime
+                ? lastReadChatTimeDate
                 : g.createdAt,
           };
           unreadCount = await this.getUnreadChatMessage(userID, query);
         }
+
         if (g.roomType === RoomType.PERSONAL && g.members.length === 2) {
           const chatPartner = g.members.filter((m) => m.id !== userID)[0];
+          // const chatPartner = await this.userRepository.findOne(
+          //   g.members.find((m) => m.id !== userID).id,
+          // );
+          // console.log('----', chatPartner, g.members.length, memberCount);
+
           g.imageURL = chatPartner.avatarUrl;
           g.name = `${chatPartner.lastName} ${chatPartner.firstName}`;
         }
@@ -184,6 +263,8 @@ export class ChatService {
           ...g,
           pinnedUsers: undefined,
           isPinned,
+          isMute,
+          // memberCount,
           hasBeenRead,
           unreadCount,
         };
@@ -208,40 +289,65 @@ export class ChatService {
   public async getOneRoom(userID: number, roomId: number): Promise<ChatGroup> {
     const room = await this.chatGroupRepository
       .createQueryBuilder('chat_groups')
-      .leftJoin('chat_groups.members', 'members')
+      .innerJoin('chat_groups.members', 'members')
       .addSelect(selectUserColumns('members'))
-      .leftJoin(
-        'chat_groups.muteUsers',
-        'muteUsers',
-        'muteUsers.id = :muteUsersID',
-        { muteUsersID: userID },
-      )
-      .addSelect(['muteUsers.id'])
-      .leftJoin(
-        'chat_groups.pinnedUsers',
-        'pinnedUsers',
-        'pinnedUsers.id = :pinnedUserID',
-        { pinnedUserID: userID },
-      )
-      .addSelect(['pinnedUsers.id'])
-      .leftJoin(
-        'chat_groups.lastReadChatTime',
-        'lastReadChatTime',
-        'lastReadChatTime.user_id = :userID',
-        { userID },
-      )
-      .addSelect(['lastReadChatTime.readTime'])
-      .leftJoinAndSelect(
-        'chat_groups.chatMessages',
-        'm',
-        'm.id = ( SELECT id FROM chat_messages WHERE chat_group_id = chat_groups.id AND type <> "system_text" ORDER BY updated_at DESC LIMIT 1 )',
-      )
-      .leftJoin('m.sender', 'sender')
-      .addSelect(['sender.id'])
       .where('chat_groups.id = :roomId', { roomId: roomId })
       .getOne();
 
-    room.isPinned = !!room.pinnedUsers.length;
+    const manager = getManager();
+    // const membersCountList = await manager.query(
+    //   'select chat_group_id, COUNT(user_id) as cnt from user_chat_joining where chat_group_id IN (?) group by chat_group_id',
+    //   [roomIds],
+    // );
+
+    const muteUserId = await manager.query(
+      'select chat_group_id, user_id  from user_chat_mute where chat_group_id  = ? AND user_id = ?',
+      [roomId, userID],
+    );
+
+    const pinnedUserId = await manager.query(
+      'select chat_group_id, user_id  from chat_user_pin where chat_group_id  = ? AND user_id = ?',
+      [roomId, userID],
+    );
+
+    const lastReadChatTimeList = await this.lastReadChatTimeRepository
+      .createQueryBuilder('time')
+      .select([
+        'time.id as id',
+        'time.read_time as readTime',
+        'time.chat_group_id as chat_group_id',
+      ])
+      .where('time.chat_group_id = :roomId', { roomId })
+      .andWhere('time.user_id = :userID', { userID })
+      .getRawMany();
+
+    const latestMessage = await this.chatMessageRepository
+      .createQueryBuilder('messages')
+      .select([
+        'messages.id as id',
+        'messages.content as content',
+        'messages.type as type',
+        'messages.call_time as callTime',
+        'messages.file_name as fileName',
+        'messages.created_at as createdAt',
+        'messages.updated_at as updatedAt',
+        'messages.sender_id as sender_id',
+        'messages.chat_group_id as chat_group_id',
+      ])
+      .where('messages.chat_group_id  = :roomId', { roomId })
+      .andWhere('type <> "system_text"')
+      .orderBy('createdAt', 'DESC')
+      .limit(1)
+      .getRawMany();
+    console.log('------', pinnedUserId.length, muteUserId, latestMessage);
+
+    room.chatMessages = latestMessage.map((m) => ({
+      ...m,
+      sender: { id: m.sender_id },
+    }));
+    room.lastReadChatTime = lastReadChatTimeList;
+    room.isPinned = !!pinnedUserId.length;
+    room.isMute = !!muteUserId.length;
     room.hasBeenRead = room?.lastReadChatTime?.[0]?.readTime
       ? room?.lastReadChatTime?.[0]?.readTime > room.updatedAt
       : false;
@@ -314,6 +420,17 @@ export class ChatService {
       dateRefetchLatest,
     } = query;
     const limitNumber = Number(limit);
+
+    const isUserJoining = await this.chatGroupRepository
+      .createQueryBuilder('chat_groups')
+      .innerJoin('chat_groups.members', 'm', 'm.id = :userId', {
+        userId: userID,
+      })
+      .where('chat_groups.id = :chatGroupId', { chatGroupId: query.group })
+      .getOne();
+    if (!isUserJoining) {
+      throw new BadRequestException('The user is not a member');
+    }
 
     const startTime = Date.now();
     const existMessages = await this.chatMessageRepository
@@ -486,6 +603,7 @@ export class ChatService {
   ): Promise<LastReadChatTime[]> {
     const chatGroup = await this.chatGroupRepository
       .createQueryBuilder('chat_groups')
+      // .withDeleted()
       .leftJoin('chat_groups.lastReadChatTime', 'lastReadChatTime')
       .addSelect(['lastReadChatTime.readTime'])
       .leftJoin('lastReadChatTime.user', 'user')
@@ -505,7 +623,12 @@ export class ChatService {
     // if (!isMember) {
     //   throw new NotAcceptableException('Something went wrong');
     // }
-    return chatGroup.lastReadChatTime.filter((l) => l.user.id !== user.id);
+
+    // return chatGroup.lastReadChatTime.filter((l) => l.user.id !== user.id);
+
+    return chatGroup.lastReadChatTime.filter(
+      (l) => l.user && l.user.id !== user.id,
+    );
   }
 
   public async sendMessage(
@@ -707,7 +830,7 @@ export class ChatService {
   public async v2UpdateChatGroup(
     chatGroup: Partial<ChatGroup>,
     requestUser: User,
-  ): Promise<ChatGroup> {
+  ): Promise<SaveRoomsResult> {
     const newData: Partial<ChatGroup> = {
       ...chatGroup,
       chatMessages: undefined,
@@ -731,6 +854,7 @@ export class ChatService {
     if (!isMySelf) {
       throw new BadRequestException('The user is not a member');
     }
+    const systemMessage: ChatMessage[] = [];
     const newGroup = await this.chatGroupRepository.save({
       ...existGroup,
       members: newData.members,
@@ -744,7 +868,8 @@ export class ChatService {
         requestUser,
       )}さんがルーム名を${newGroup.name}に更新しました`;
       sysMsgSaidsUpdated.chatGroup = newGroup;
-      await this.chatMessageRepository.save(sysMsgSaidsUpdated);
+      const sysMsg = await this.chatMessageRepository.save(sysMsgSaidsUpdated);
+      systemMessage.push(sysMsg);
     }
     const newMembers = newGroup.members.filter(
       (newM) => !existGroup.members.map((m) => m.id).includes(newM.id),
@@ -761,7 +886,8 @@ export class ChatService {
         .map((m) => userNameFactory(m) + 'さん')
         .join(', ')}を追加しました`;
       newMembersSystemMsg.chatGroup = { ...newGroup, members: undefined };
-      await this.chatMessageRepository.save(newMembersSystemMsg);
+      const sysMsg = await this.chatMessageRepository.save(newMembersSystemMsg);
+      systemMessage.push(sysMsg);
     }
     if (removedMembers.length) {
       const removedMembersSystemMsg = new ChatMessage();
@@ -772,7 +898,10 @@ export class ChatService {
         .map((m) => userNameFactory(m) + 'さん')
         .join(', ')}を退出させました`;
       removedMembersSystemMsg.chatGroup = { ...newGroup, members: undefined };
-      await this.chatMessageRepository.save(removedMembersSystemMsg);
+      const sysMsg = await this.chatMessageRepository.save(
+        removedMembersSystemMsg,
+      );
+      systemMessage.push(sysMsg);
     }
     const silentNotification: CustomPushNotificationData = {
       title: '',
@@ -789,7 +918,7 @@ export class ChatService {
       allMemberWithoutMyself.map((u) => u.id),
       silentNotification,
     );
-    return newGroup;
+    return { room: newGroup, systemMessage };
   }
 
   public async v2SaveChatGroup(
@@ -806,9 +935,9 @@ export class ChatService {
     newData.name = newData.name ? newData.name : '';
     const maybeExistGroup = await this.chatGroupRepository
       .createQueryBuilder('g')
-      .leftJoinAndSelect('g.members', 'u')
-      .where('u.id IN (:...userIds)', { userIds })
-      .andWhere('g.name = :name', {
+      .innerJoin('g.members', 'u', 'u.id IN (:...userIds)', { userIds })
+      .leftJoinAndSelect('g.members', 'member')
+      .where('g.name = :name', {
         name: newData.name,
       })
       .getMany();

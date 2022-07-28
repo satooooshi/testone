@@ -215,7 +215,10 @@ const RoomList: React.FC = () => {
           <ScrollDiv
             h={'80%'}
             refreshControl={
-              <RefreshControl refreshing={false} onRefresh={refreshRoomList} />
+              <RefreshControl
+                refreshing={isRoomsRefetching}
+                onRefresh={refreshRoomList}
+              />
             }>
             {(searchedRooms ?? chatRooms).map(room => {
               return (
@@ -236,10 +239,6 @@ const RoomList: React.FC = () => {
               );
             })}
           </ScrollDiv>
-        ) : isRoomsRefetching ? (
-          <Div alignItems="center" w={'90%'}>
-            <ActivityIndicator />
-          </Div>
         ) : (
           <Text fontSize={16} textAlign="center">
             ルームを作成するか、招待をお待ちください
