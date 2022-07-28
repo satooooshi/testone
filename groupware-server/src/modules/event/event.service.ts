@@ -213,7 +213,14 @@ export class EventScheduleService {
   public async getEvents(
     query: SearchQueryToGetEvents,
   ): Promise<SearchResultToGetEvents> {
-    const { page = 1, word = '', status, tag = '', type } = query;
+    const {
+      page = 1,
+      word = '',
+      status,
+      tag = '',
+      type,
+      participant_id,
+    } = query;
     let offset: number;
     const limit = 20;
     if (page) {
@@ -221,12 +228,25 @@ export class EventScheduleService {
     }
     const tagIDs = tag.split(' ');
     const startTime = Date.now();
+
+    if (participant_id) {
+      const userJoiningEvent = await this.userJoiningEventRepository
+        .createQueryBuilder('userJoiningEvent')
+        .innerJoinAndSelect('userJoiningEvent.event', 'event')
+        .where('userJoiningEvent.user_id = :userID', {
+          userID: participant_id,
+        })
+        .andWhere('userJoiningEvent.canceledAt IS NULL')
+        .take(limit)
+        .orderBy('event.startAt', 'ASC')
+        .getMany();
+      const events = userJoiningEvent.map((u) => u.event);
+      const endTime = Date.now();
+      console.log('get evetns speed check', endTime - startTime);
+      return { pageCount: events.length, events };
+    }
     const [eventsWithRelation, count] = await this.eventRepository
       .createQueryBuilder('events')
-      .leftJoinAndSelect('events.userJoiningEvent', 'userJoiningEvent')
-      .leftJoin('userJoiningEvent.user', 'user')
-      .addSelect(selectUserColumns('user'))
-      // .leftJoinAndSelect('userJoiningEvent.event', 'event')
       .leftJoinAndSelect('events.tags', 'tag')
       .where(
         word && word.length !== 1
@@ -244,9 +264,7 @@ export class EventScheduleService {
         { queryWord: `%${word}%` },
       )
       .andWhere(
-        query.participant_id
-          ? '1=1'
-          : status === 'future'
+        status === 'future'
           ? 'events.start_at > now()'
           : status === 'past'
           ? 'events.start_at < now() AND events.end_at < now()'
@@ -254,15 +272,6 @@ export class EventScheduleService {
           ? 'events.start_at < now() AND events.end_at > now()'
           : '1=1',
       )
-      .andWhere(query.participant_id ? 'user.id = :userID' : '1=1', {
-        userID: query.participant_id,
-      })
-      .andWhere(
-        query.participant_id ? 'userJoiningEvent.canceledAt IS NULL' : '1=1',
-      )
-      .andWhere(query.host_user_id ? 'host_user = :hostUserID' : '1=1', {
-        hostUserID: query.host_user_id,
-      })
       .andWhere(tag ? 'tag.id IN (:...tagIDs)' : '1=1', {
         tagIDs,
       })
