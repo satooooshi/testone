@@ -79,7 +79,9 @@ const EditChatGroupMembersModal: React.FC<EditChatGroupMambersModalProps> = ({
   onComplete,
   isTalkRoom = false,
 }) => {
-  const { data: users, isLoading } = useAPIGetUsers('');
+  const { data: users, refetch: refetchGetUsers } = useAPIGetUsers('ALL', {
+    enabled: false,
+  });
   const { user: myProfile } = useAuthenticate();
   const {
     toggleUser,
@@ -118,7 +120,9 @@ const EditChatGroupMembersModal: React.FC<EditChatGroupMambersModalProps> = ({
   }, [room?.members, setSelectedUsers]);
 
   useEffect(() => {
-    if (!isOpen) {
+    if (isOpen) {
+      refetchGetUsers();
+    } else {
       clear();
     }
   }, [isOpen]);
