@@ -1,4 +1,5 @@
-import { useQuery } from 'react-query';
+import { AxiosError } from 'axios';
+import { useQuery, UseQueryOptions } from 'react-query';
 import { EventSchedule, EventType } from 'src/types';
 import { generateEventSearchQueryString } from 'src/utils/eventQueryRefresh';
 import { axiosInstance } from 'src/utils/url';
@@ -30,8 +31,9 @@ const getEventList = async (
   return response.data;
 };
 
-export const useAPIGetEventList = (query: SearchQueryToGetEvents) => {
-  return useQuery<SearchResultToGetEvents>(['events', query], () =>
-    getEventList(query),
-  );
+export const useAPIGetEventList = (
+  query: SearchQueryToGetEvents,
+  options?: UseQueryOptions<SearchResultToGetEvents, AxiosError>,
+) => {
+  return useQuery(['events', query], () => getEventList(query), options);
 };
