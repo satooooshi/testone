@@ -387,7 +387,6 @@ export class ChatService {
       })
       .getRawMany();
     //返信の取得
-
     let replyMessages: ChatMessage[] = [];
     if (replyMessageIDs.length) {
       replyMessages = await this.chatMessageRepository
@@ -410,10 +409,21 @@ export class ChatService {
           .filter((r) => r.chat_message_id === m.id)
           .map((r) => {
             if (r.user_id === userID) {
-              return { ...r, isSender: true };
+              return {
+                ...r,
+                user: { id: r.user_id },
+                chatMessage: { id: r.chat_message_id },
+                isSender: true,
+              };
             }
-            return { ...r, isSender: false };
+            return {
+              ...r,
+              user: { id: r.user_id },
+              chatMessage: { id: r.chat_message_id },
+              isSender: false,
+            };
           });
+        console.log(m.reactions);
       }
       if (m.reply_parent_id) {
         m.replyParentMessage = replyMessages.filter(

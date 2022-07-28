@@ -197,7 +197,6 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = memo(
         type: 'edit',
         chatMessage: {
           ...message,
-          // reactions: message.reactions?.map((r) => ({ ...r, isSender: undefined })),
           isSender: false,
         },
       });
