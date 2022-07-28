@@ -206,7 +206,7 @@ const EventList = () => {
       ...newQuery,
       tag: selectedTagIDs.join('+'),
     });
-    router.push(`${url}&personal=${newQuery.personal || ''}`, undefined, {
+    router.push(url, undefined, {
       shallow: true,
     });
   };
