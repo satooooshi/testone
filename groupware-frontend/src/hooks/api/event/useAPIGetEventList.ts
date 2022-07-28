@@ -12,6 +12,7 @@ export interface SearchQueryToGetEvents {
   type?: EventType | '';
   from?: string;
   to?: string;
+  personal?: string;
   participant_id?: string;
   host_user_id?: string;
 }

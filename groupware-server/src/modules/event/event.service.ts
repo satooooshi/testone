@@ -309,16 +309,16 @@ export class EventScheduleService {
 
   public async getEventAtSpecificTime(
     query: SearchQueryToGetEvents,
+    userId: number,
   ): Promise<SearchResultToGetEvents> {
     const fromDate = new Date(query.from);
     const toDate = new Date(query.to);
     const startTime = Date.now();
 
-    const events = await this.eventRepository
+    let events = await this.eventRepository
       .createQueryBuilder('events')
-      .select()
-      .leftJoinAndSelect('events.userJoiningEvent', 'userJoiningEvent')
-      .leftJoinAndSelect('userJoiningEvent.user', 'user')
+      // .leftJoinAndSelect('events.userJoiningEvent', 'userJoiningEvent')
+      // .leftJoinAndSelect('userJoiningEvent.user', 'user')
       // .leftJoinAndSelect('userJoiningEvent.event', 'event')
       // .leftJoinAndSelect('events.tags', 'tag')
       // .leftJoin('events.hostUsers', 'host_user')
@@ -349,8 +349,31 @@ export class EventScheduleService {
       // })
       .getMany();
 
+    const eventIds = events.map((e) => e.id);
+    if (query.personal && eventIds.length) {
+      const joiningEventList = await this.userJoiningEventRepository
+        .createQueryBuilder('userJoiningEvent')
+        .select([
+          'userJoiningEvent.event_id as eventId',
+          'userJoiningEvent.user_id as userId',
+        ])
+        .where('userJoiningEvent.user_id  = :userId', { userId })
+        .andWhere('userJoiningEvent.event_id IN (:...eventIds)', { eventIds })
+        .andWhere('userJoiningEvent.canceledAt IS NULL')
+        .getRawMany();
+      console.log('----', userId, joiningEventList);
+
+      const joiningEventId = joiningEventList.map((j) => Number(j.eventId));
+      events = events.filter((e) => joiningEventId.includes(e.id));
+    }
+
     const endTime = Date.now();
-    console.log('get specific evetns speed check', endTime - startTime);
+    console.log(
+      'get specific evetns speed check',
+      endTime - startTime,
+      'event count',
+      events.length,
+    );
     return { pageCount: 0, events };
   }
 

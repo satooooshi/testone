@@ -146,6 +146,7 @@ const EventList = () => {
     type,
     from,
     to,
+    personal,
   });
   const { user } = useAuthenticate();
   const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
@@ -320,15 +321,15 @@ const EventList = () => {
   const memorizedEvent = useMemo<any[] | undefined>(() => {
     const changeToBigCalendarEvent = (ev?: EventSchedule[]) => {
       if (ev) {
-        if (personal === 'true') {
-          ev = ev.filter((e) => {
-            if (
-              e.userJoiningEvent?.filter((u) => u?.user?.id === user?.id).length
-            ) {
-              return true;
-            }
-          });
-        }
+        // if (personal === 'true') {
+        //   ev = ev.filter((e) => {
+        //     if (
+        //       e.userJoiningEvent?.filter((u) => u?.user?.id === user?.id).length
+        //     ) {
+        //       return true;
+        //     }
+        //   });
+        // }
         const events: any[] = ev.map((e) => ({
           ...e,
           start: new Date(e.startAt),
