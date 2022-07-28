@@ -101,7 +101,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
   }, [messages]);
 
   const [selectedImageURL, setSelectedImageURL] = useState<string>();
-  const { data: fetchedPastMessages } = useAPIGetMessages({
+  const { data: fetchedPastMessages, remove } = useAPIGetMessages({
     group: room.id,
     after,
     before,
@@ -256,8 +256,10 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
 
   useEffect(() => {
     if (fetchedPastMessages?.length && room.members?.length) {
-      const refreshedMessage = refreshMessage(fetchedPastMessages);
-      setMessages(refreshedMessage);
+      setMessages((m) => {
+        const refreshedMessage = refreshMessage(fetchedPastMessages, m);
+        return refreshedMessage;
+      });
 
       if (after && refetchDoesntExistMessages(fetchedPastMessages[0].id)) {
         refetchDoesntExistMessages(fetchedPastMessages[0].id + 20);
@@ -291,6 +293,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
       messageWrapperDivRef.current.scrollTo({ top: 0 });
     }
     return () => {
+      remove();
       socket.leaveRoom();
       setMessages([]);
       setBefore(undefined);
@@ -357,19 +360,22 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
     }
   };
 
-  const refreshMessage = (targetMessages: ChatMessage[]): ChatMessage[] => {
-    const arrayIncludesDuplicate = [...messages, ...targetMessages];
+  const refreshMessage = (
+    targetMessages: ChatMessage[],
+    messagesState: ChatMessage[],
+  ): ChatMessage[] => {
+    const filterCurrentGroup = (messages: ChatMessage[]) => {
+      return messages.filter((m) => {
+        return room.id === m.chatGroup?.id;
+      });
+    };
+
+    const arrayIncludesDuplicate = [...messagesState, ...targetMessages];
     return filterCurrentGroup(arrayIncludesDuplicate)
       .filter((value, index, self) => {
         return index === self.findIndex((m) => m.id === value.id);
       })
       .sort((a, b) => b.id - a.id);
-  };
-
-  const filterCurrentGroup = (messages: ChatMessage[]) => {
-    return messages.filter((m) => {
-      return room.id === m.chatGroup?.id;
-    });
   };
 
   const scrollToTarget = useCallback((topOffset: number) => {
