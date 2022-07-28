@@ -223,9 +223,9 @@ export class EventScheduleService {
     const startTime = Date.now();
     const [eventsWithRelation, count] = await this.eventRepository
       .createQueryBuilder('events')
-      // .leftJoinAndSelect('events.userJoiningEvent', 'userJoiningEvent')
-      // .leftJoin('userJoiningEvent.user', 'user')
-      // .addSelect(selectUserColumns('user'))
+      .leftJoinAndSelect('events.userJoiningEvent', 'userJoiningEvent')
+      .leftJoin('userJoiningEvent.user', 'user')
+      .addSelect(selectUserColumns('user'))
       // .leftJoinAndSelect('userJoiningEvent.event', 'event')
       .leftJoinAndSelect('events.tags', 'tag')
       .where(
