@@ -46,6 +46,25 @@ export class ChatService {
     private readonly storageService: StorageService,
   ) {}
 
+  private async checkUserBelongToGroup(
+    userID: number,
+    groupID: number,
+  ): Promise<boolean> {
+    const isUserBelongToGroup = await this.chatGroupRepository
+      .createQueryBuilder('chat_groups')
+      .innerJoin(
+        'chat_groups.members',
+        'm',
+        'm.id = :userId AND chat_groups.id = :chatGroupId',
+        {
+          userId: userID,
+          chatGroupId: groupID,
+        },
+      )
+      .getOne();
+    return !!isUserBelongToGroup;
+  }
+
   public async calleeForPhoneCall(calleeId: string) {
     const user = await this.userRepository.findOne(calleeId);
     return user;
@@ -421,14 +440,11 @@ export class ChatService {
     } = query;
     const limitNumber = Number(limit);
 
-    const isUserJoining = await this.chatGroupRepository
-      .createQueryBuilder('chat_groups')
-      .innerJoin('chat_groups.members', 'm', 'm.id = :userId', {
-        userId: userID,
-      })
-      .where('chat_groups.id = :chatGroupId', { chatGroupId: query.group })
-      .getOne();
-    if (!isUserJoining) {
+    const isUserBelongToGroup = await this.checkUserBelongToGroup(
+      userID,
+      query.group,
+    );
+    if (!isUserBelongToGroup) {
       throw new BadRequestException('The user is not a member');
     }
 

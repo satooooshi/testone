@@ -32,6 +32,26 @@ export class ChatAlbumService {
     @InjectRepository(ChatGroup)
     private readonly chatGroupRepository: Repository<ChatGroup>,
   ) {}
+
+  private async checkUserBelongToGroup(
+    userID: number,
+    groupID: number,
+  ): Promise<boolean> {
+    const isUserBelongToGroup = await this.chatGroupRepository
+      .createQueryBuilder('chat_groups')
+      .innerJoin(
+        'chat_groups.members',
+        'm',
+        'm.id = :userId AND chat_groups.id = :chatGroupId',
+        {
+          userId: userID,
+          chatGroupId: groupID,
+        },
+      )
+      .getOne();
+    return !!isUserBelongToGroup;
+  }
+
   public async saveChatAlbums(dto: Partial<ChatAlbum>): Promise<ChatAlbum> {
     const savedAlbum = await this.albumRepository.save(
       dto.id
@@ -75,14 +95,11 @@ export class ChatAlbumService {
     albumID: number,
     // page: string,
   ): Promise<GetChatAlbumImagesResult> {
-    const isUserJoining = await this.chatGroupRepository
-      .createQueryBuilder('chat_groups')
-      .innerJoin('chat_groups.members', 'm', 'm.id = :userId', {
-        userId: userID,
-      })
-      .where('chat_groups.id = :chatGroupId', { chatGroupId: roomID })
-      .getOne();
-    if (!isUserJoining) {
+    const isUserBelongToGroup = await this.checkUserBelongToGroup(
+      userID,
+      roomID,
+    );
+    if (!isUserBelongToGroup) {
       throw new BadRequestException('The user is not a member');
     }
 
@@ -107,14 +124,11 @@ export class ChatAlbumService {
   ): Promise<GetChatAlbumsResult> {
     const { page, group } = query;
 
-    const isUserJoining = await this.chatGroupRepository
-      .createQueryBuilder('chat_groups')
-      .innerJoin('chat_groups.members', 'm', 'm.id = :userId', {
-        userId: userID,
-      })
-      .where('chat_groups.id = :chatGroupId', { chatGroupId: query.group })
-      .getOne();
-    if (!isUserJoining) {
+    const isUserBelongToGroup = await this.checkUserBelongToGroup(
+      userID,
+      group,
+    );
+    if (!isUserBelongToGroup) {
       throw new BadRequestException('The user is not a member');
     }
 

@@ -26,6 +26,25 @@ export class ChatNoteService {
     private readonly chatGroupRepository: Repository<ChatGroup>,
   ) {}
 
+  private async checkUserBelongToGroup(
+    userID: number,
+    groupID: number,
+  ): Promise<boolean> {
+    const isUserBelongToGroup = await this.chatGroupRepository
+      .createQueryBuilder('chat_groups')
+      .innerJoin(
+        'chat_groups.members',
+        'm',
+        'm.id = :userId AND chat_groups.id = :chatGroupId',
+        {
+          userId: userID,
+          chatGroupId: groupID,
+        },
+      )
+      .getOne();
+    return !!isUserBelongToGroup;
+  }
+
   public async saveChatNotes(dto: Partial<ChatNote>): Promise<ChatNote> {
     const savedNote = await this.noteRepository.save(dto);
     if (dto.images?.length) {
@@ -48,14 +67,11 @@ export class ChatNoteService {
     noteID: number,
     userID: number,
   ): Promise<ChatNote> {
-    const isUserJoining = await this.chatGroupRepository
-      .createQueryBuilder('chat_groups')
-      .innerJoin('chat_groups.members', 'm', 'm.id = :userId', {
-        userId: userID,
-      })
-      .where('chat_groups.id = :chatGroupId', { chatGroupId: roomID })
-      .getOne();
-    if (!isUserJoining) {
+    const isUserBelongToGroup = await this.checkUserBelongToGroup(
+      userID,
+      roomID,
+    );
+    if (!isUserBelongToGroup) {
       throw new BadRequestException('The user is not a member');
     }
 
@@ -74,14 +90,11 @@ export class ChatNoteService {
   ): Promise<GetChatNotesResult> {
     const { page, group } = query;
 
-    const isUserJoining = await this.chatGroupRepository
-      .createQueryBuilder('chat_groups')
-      .innerJoin('chat_groups.members', 'm', 'm.id = :userId', {
-        userId: userID,
-      })
-      .where('chat_groups.id = :chatGroupId', { chatGroupId: group })
-      .getOne();
-    if (!isUserJoining) {
+    const isUserBelongToGroup = await this.checkUserBelongToGroup(
+      userID,
+      group,
+    );
+    if (!isUserBelongToGroup) {
       throw new BadRequestException('The user is not a member');
     }
 
