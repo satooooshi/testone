@@ -20,6 +20,7 @@ import {
 } from 'src/utils/notification/sendPushNotification';
 import { selectUserColumns } from 'src/utils/selectUserColumns';
 import { getManager, In, Repository } from 'typeorm';
+import { genSignedURL } from 'src/utils/storage/genSignedURL';
 import { StorageService } from '../storage/storage.service';
 import {
   GetChaRoomsByPageQuery,
@@ -541,44 +542,52 @@ export class ChatService {
         .getMany();
     }
 
-    const messages: ChatMessage[] = existMessages.map((m) => {
-      m.chatGroup = { id: m.chat_group_id };
-      if (senders.length) {
-        m.sender = senders.filter((s) => s.id === m.sender_id)[0];
-      }
-      if (reactions) {
-        m.reactions = reactions
-          .filter((r) => r.chat_message_id === m.id)
-          .map((r) => {
-            if (r.user_id === userID) {
+    const messages: ChatMessage[] = await Promise.all(
+      existMessages.map(async (m) => {
+        m.chatGroup = { id: m.chat_group_id };
+        if (senders.length) {
+          m.sender = senders.filter((s) => s.id === m.sender_id)[0];
+        }
+        if (reactions) {
+          m.reactions = reactions
+            .filter((r) => r.chat_message_id === m.id)
+            .map((r) => {
+              if (r.user_id === userID) {
+                return {
+                  ...r,
+                  user: { id: r.user_id },
+                  chatMessage: { id: r.chat_message_id },
+                  isSender: true,
+                };
+              }
               return {
                 ...r,
                 user: { id: r.user_id },
                 chatMessage: { id: r.chat_message_id },
-                isSender: true,
+                isSender: false,
               };
-            }
-            return {
-              ...r,
-              user: { id: r.user_id },
-              chatMessage: { id: r.chat_message_id },
-              isSender: false,
-            };
-          });
-        console.log(m.reactions);
-      }
-      if (m.reply_parent_id) {
-        m.replyParentMessage = replyMessages.filter(
-          (replyMsg) => replyMsg.id === m.reply_parent_id,
-        )[0];
-      }
-      if (m.sender_id && m.sender_id === userID) {
-        m.isSender = true;
-      } else {
-        m.isSender = false;
-      }
-      return m;
-    });
+            });
+        }
+        if (m.reply_parent_id) {
+          m.replyParentMessage = replyMessages.filter(
+            (replyMsg) => replyMsg.id === m.reply_parent_id,
+          )[0];
+        }
+        if (m.sender_id && m.sender_id === userID) {
+          m.isSender = true;
+        } else {
+          m.isSender = false;
+        }
+        if (
+          m.type === ChatMessageType.IMAGE ||
+          m.type === ChatMessageType.VIDEO ||
+          m.type === ChatMessageType.OTHER_FILE
+        ) {
+          m.content = await genSignedURL(m.content);
+        }
+        return m;
+      }),
+    );
 
     if (!dateRefetchLatest) {
       console.log('get messages speed check', endTime - startTime);
