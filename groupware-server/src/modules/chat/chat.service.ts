@@ -362,6 +362,9 @@ export class ChatService {
       .take(limitNumber >= 0 ? limitNumber : 20)
       .orderBy('chat_messages.createdAt', after ? 'ASC' : 'DESC')
       .getRawMany();
+    if (!existMessages.length) {
+      return [];
+    }
     const endTime = Date.now();
     const messageIDs = existMessages.map((m) => m.id);
     const senderIDs = [
