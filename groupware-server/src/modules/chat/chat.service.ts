@@ -360,10 +360,12 @@ export class ChatService {
       .getRawMany();
     console.log('------', pinnedUserId.length, muteUserId, latestMessage);
 
-    room.chatMessages = latestMessage.map((m) => ({
-      ...m,
-      sender: { id: m.sender_id },
-    }));
+    room.chatMessages = latestMessage.length
+      ? latestMessage.map((m) => ({
+          ...m,
+          sender: { id: m.sender_id },
+        }))
+      : [];
     room.lastReadChatTime = lastReadChatTimeList;
     room.isPinned = !!pinnedUserId.length;
     room.isMute = !!muteUserId.length;
@@ -384,8 +386,10 @@ export class ChatService {
 
     if (room.roomType === RoomType.PERSONAL && room.members.length === 2) {
       const chatPartner = room.members.filter((m) => m.id !== userID)[0];
-      room.imageURL = chatPartner.avatarUrl;
-      room.name = `${chatPartner.lastName} ${chatPartner.firstName}`;
+      if (chatPartner) {
+        room.imageURL = chatPartner.avatarUrl;
+        room.name = `${chatPartner.lastName} ${chatPartner.firstName}`;
+      }
     }
 
     return room;
@@ -775,12 +779,15 @@ export class ChatService {
     const targetGroup = await this.chatGroupRepository.findOne(chatGroupID);
     const user = await this.userRepository.findOne(userID);
 
-    const isUserJoining = containMembers.members.filter(
-      (m) => m.id === userID,
-    ).length;
-    if (!isUserJoining) {
-      throw new BadRequestException('The user is not participant');
+    if (containMembers?.members.length) {
+      const isUserJoining = containMembers.members.filter(
+        (m) => m.id === userID,
+      ).length;
+      if (!isUserJoining) {
+        throw new BadRequestException('The user is not participant');
+      }
     }
+
     await this.chatGroupRepository
       .createQueryBuilder()
       .relation(ChatGroup, 'members')
