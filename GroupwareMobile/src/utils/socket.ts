@@ -137,11 +137,29 @@ export const useChatSocket = (
           }
           case 'edit': {
             setMessages(msgs => {
-              return msgs.map(m =>
-                m.id === socketMessage.chatMessage.id
-                  ? socketMessage.chatMessage
-                  : m,
-              );
+              return msgs.map(m => {
+                if (m.id === socketMessage.chatMessage.id) {
+                  const message = {
+                    ...socketMessage.chatMessage,
+                    reactions: socketMessage.chatMessage.reactions?.map(r => {
+                      if (r.user?.id === myself?.id) {
+                        return {...r, isSender: true};
+                      }
+                      return {...r, isSender: false};
+                    }),
+                  };
+                  return message;
+                }
+                return {
+                  ...m,
+                  reactions: m.reactions?.map(r => {
+                    if (r.user?.id === myself?.id) {
+                      return {...r, isSender: true};
+                    }
+                    return {...r, isSender: false};
+                  }),
+                };
+              });
             });
             break;
           }

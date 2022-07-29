@@ -308,10 +308,12 @@ export class ChatService {
     ]).reverse();
 
     const endTime = Date.now();
-    console.log(
-      'get rooms by page ========================',
-      endTime - startTime,
-    );
+    if (!updatedAtLatestRoom) {
+      console.log(
+        'get rooms by page ========================',
+        endTime - startTime,
+      );
+    }
     const pageCount = Number(page);
     return { rooms, pageCount };
   }
@@ -461,23 +463,19 @@ export class ChatService {
     const startTime = Date.now();
     const existMessages = await this.chatMessageRepository
       .createQueryBuilder('chat_messages')
-      .leftJoin('chat_messages.chatGroup', 'chat_group')
-      .addSelect(['chat_group.id'])
-      .leftJoin('chat_messages.sender', 'sender')
-      .addSelect(selectUserColumns('sender'))
-      .leftJoin('chat_messages.reactions', 'reactions')
-      .leftJoin('reactions.user', 'user')
-      .addSelect(['reactions.id', 'reactions.emoji'])
-      .addSelect(selectUserColumns('user'))
-      .leftJoinAndSelect(
-        'chat_messages.replyParentMessage',
-        'replyParentMessage',
-      )
-      .leftJoin('replyParentMessage.sender', 'reply_sender')
-      .addSelect(selectUserColumns('reply_sender'))
-      .where('chat_group.id = :chatGroupID', {
-        chatGroupID: query.group,
-      })
+      .select([
+        'chat_messages.id as id',
+        'chat_messages.content as content',
+        'chat_messages.type as type',
+        'chat_messages.call_time as callTime',
+        'chat_messages.file_name as fileName',
+        'chat_messages.created_at as createdAt',
+        'chat_messages.updated_at as updatedAt',
+        'chat_messages.reply_parent_id as reply_parent_id',
+        'chat_messages.sender_id as sender_id',
+        'chat_messages.chat_group_id as chat_group_id',
+      ])
+      .where('chat_messages.chat_group_id =:groupID', { groupID: query.group })
       .andWhere(
         after && include
           ? 'chat_messages.id >= :after'
@@ -504,27 +502,87 @@ export class ChatService {
       )
       .take(limitNumber >= 0 ? limitNumber : 20)
       .orderBy('chat_messages.createdAt', after ? 'ASC' : 'DESC')
-      .getMany();
+      .getRawMany();
     const endTime = Date.now();
-    if (!dateRefetchLatest) {
-      console.log('get messages speed check', endTime - startTime);
+    const messageIDs = existMessages.map((m) => m.id);
+    const senderIDs = [
+      ...new Set(existMessages.map((m) => Number(m.sender_id))),
+    ];
+    const replyMessageIDs = existMessages.map((m) => m.reply_parent_id);
+
+    // senderの取得
+    let senders: User[] = [];
+    if (senderIDs.length) {
+      senders = await this.userRepository
+        .createQueryBuilder('users')
+        .select(selectUserColumns('users'))
+        .where('users.id IN (:...senderIDs)', { senderIDs })
+        .getMany();
     }
 
-    const messages = existMessages.map((m) => {
-      m.reactions = m.reactions.map((r) => {
-        if (r.user?.id === userID) {
-          return { ...r, isSender: true };
-        }
-        return r;
-      });
-      if (m.sender && m.sender.id === userID) {
-        m.isSender = true;
-        return m;
+    //リアクションの取得
+    const reactions = await this.chatMessageReactionRepository
+      .createQueryBuilder('reactions')
+      .select(['id', 'chat_message_id', 'emoji as emoji', 'user_id'])
+      .where('chat_message_id IN (:messageIDs)', {
+        messageIDs,
+      })
+      .getRawMany();
+    //返信の取得
+    let replyMessages: ChatMessage[] = [];
+    if (replyMessageIDs.length) {
+      replyMessages = await this.chatMessageRepository
+        .createQueryBuilder('messages')
+        .leftJoin('messages.sender', 'sender')
+        .addSelect(selectUserColumns('sender'))
+        .where('messages.id IN (:...replyMessageIDs)', {
+          replyMessageIDs,
+        })
+        .getMany();
+    }
+
+    const messages: ChatMessage[] = existMessages.map((m) => {
+      m.chatGroup = { id: m.chat_group_id };
+      if (senders.length) {
+        m.sender = senders.filter((s) => s.id === m.sender_id)[0];
       }
-      m.isSender = false;
+      if (reactions) {
+        m.reactions = reactions
+          .filter((r) => r.chat_message_id === m.id)
+          .map((r) => {
+            if (r.user_id === userID) {
+              return {
+                ...r,
+                user: { id: r.user_id },
+                chatMessage: { id: r.chat_message_id },
+                isSender: true,
+              };
+            }
+            return {
+              ...r,
+              user: { id: r.user_id },
+              chatMessage: { id: r.chat_message_id },
+              isSender: false,
+            };
+          });
+        console.log(m.reactions);
+      }
+      if (m.reply_parent_id) {
+        m.replyParentMessage = replyMessages.filter(
+          (replyMsg) => replyMsg.id === m.reply_parent_id,
+        )[0];
+      }
+      if (m.sender_id && m.sender_id === userID) {
+        m.isSender = true;
+      } else {
+        m.isSender = false;
+      }
       return m;
     });
 
+    if (!dateRefetchLatest) {
+      console.log('get messages speed check', endTime - startTime);
+    }
     return messages;
   }
 
@@ -1032,6 +1090,14 @@ export class ChatService {
       updatedAt: new Date(),
     });
     return { ...savedReaction, isSender: true };
+  }
+
+  public async getReactions(messageID: number): Promise<ChatMessageReaction[]> {
+    const reactions = await this.chatMessageReactionRepository.find({
+      where: { chatMessage: messageID },
+      relations: ['user'],
+    });
+    return reactions;
   }
 
   public async getRoomDetail(roomId: number) {

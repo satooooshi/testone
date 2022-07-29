@@ -97,6 +97,7 @@ import {useChatSocket} from '../../utils/socket';
 import {useAPIUpdateChatMessage} from '../../hooks/api/chat/useAPIUpdateChatMessage';
 import {useAPIDeleteChatMessage} from '../../hooks/api/chat/useAPIDeleteChatMessage';
 import uuid from 'react-native-uuid';
+import {useAPIGetReactions} from '../../hooks/api/chat/useAPIGetReactions';
 
 const TopTab = createMaterialTopTabNavigator();
 
@@ -306,6 +307,12 @@ const Chat: React.FC = () => {
     },
   });
 
+  const {mutate: getReactions} = useAPIGetReactions({
+    onSuccess: res => {
+      setSelectedReactions(res);
+    },
+  });
+
   const {mutate: sendChatMessage, isLoading: loadingSendMessage} =
     useAPISendChatMessage({
       onSuccess: sentMsg => {
@@ -361,7 +368,10 @@ const Chat: React.FC = () => {
     reaction: ChatMessageReaction,
     target: ChatMessage,
   ) => {
-    deleteReaction(reaction, {
+    const reactionSentMyself = target.reactions?.filter(
+      r => r.emoji === reaction.emoji && r.isSender,
+    )[0];
+    deleteReaction(reactionSentMyself || reaction, {
       onSuccess: reactionId => {
         setMessages(m => {
           return refreshMessage(
@@ -876,14 +886,14 @@ const Chat: React.FC = () => {
           console.log(message.fileName);
           playVideoOnModal({uri: message.content, fileName: message.fileName});
         }}
-        onPressReaction={r =>
-          r.isSender
+        onPressReaction={(r, isSender) =>
+          isSender
             ? handleDeleteReaction(r, message)
             : handleSaveReaction(r.emoji, message)
         }
         onLongPressReation={() => {
           if (message.reactions?.length && message.isSender) {
-            setSelectedReactions(message.reactions);
+            getReactions(message.id);
           }
         }}
       />

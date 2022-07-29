@@ -433,6 +433,15 @@ export class ChatController {
     return reaction;
   }
 
+  @Get('get-reactions/:messageID')
+  @UseGuards(JwtAuthenticationGuard)
+  async getReactions(
+    @Param('messageID') messageID: number,
+  ): Promise<ChatMessageReaction[]> {
+    const reactions = await this.chatService.getReactions(messageID);
+    return reactions;
+  }
+
   @Get('/v2/room/:roomId')
   @UseGuards(JwtAuthenticationGuard)
   async getRoomDetail(
