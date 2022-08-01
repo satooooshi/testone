@@ -140,16 +140,6 @@ export class ChatService {
       .innerJoin('chat_groups.members', 'member', 'member.id = :memberId', {
         memberId: userID,
       })
-      // .leftJoin('chat_groups.members', 'members')
-      // .addSelect(selectUserColumns('members'))
-      // .leftJoinAndSelect(
-      //   'chat_groups.chatMessages',
-      //   'm',
-      //   'm.id = ( SELECT id FROM chat_messages WHERE chat_group_id = chat_groups.id AND type <> "system_text" ORDER BY created_at DESC LIMIT 1 )',
-      // )
-      // .leftJoin('m.sender', 'sender')
-      // .addSelect(['sender.id'])
-      // .where('member.id = :memberId', { memberId: userID })
       .where(
         !!updatedAtLatestRoom
           ? `chat_groups.updatedAt > :updatedAtLatestRoom`
@@ -170,10 +160,6 @@ export class ChatService {
     const roomIds = urlUnparsedRooms.map((r) => r.id);
 
     const manager = getManager();
-    // const membersCountList = await manager.query(
-    //   'select chat_group_id, COUNT(user_id) as cnt from user_chat_joining where chat_group_id IN (?) group by chat_group_id',
-    //   [roomIds],
-    // );
 
     const members: UserAndGroupID[] = await manager.query(
       'select chat_group_id, users.id as id, users.last_name as lastName, users.first_name as firstName, users.avatar_url as avatarUrl, users.existence as existence from user_chat_joining INNER JOIN users ON users.id = user_id AND chat_group_id IN (?)',
@@ -245,36 +231,12 @@ export class ChatService {
     let rooms = await Promise.all(
       urlUnparsedRooms.map(async (g, index) => {
         g.members = members.filter((m) => m.chat_group_id === g.id);
-
-        // g.chatMessages = latestMessages
-        //   .filter((m) => m.chatGroupId === g.id)
-        //   .map((m) => ({ ...m, sender: { id: m.sender_id } }));
-
-        // const latestMessage = await this.chatMessageRepository
-        //   .createQueryBuilder('messages')
-        //   .select([
-        //     'messages.id as id',
-        //     'messages.content as content',
-        //     'messages.type as type',
-        //     'messages.call_time as callTime',
-        //     'messages.file_name as fileName',
-        //     'messages.created_at as createdAt',
-        //     'messages.updated_at as updatedAt',
-        //     'messages.sender_id as sender_id',
-        //     'messages.chat_group_id as chat_group_id',
-        //   ])
-        //   .where('messages.chat_group_id  = :roomId', { roomId: g.id })
-        //   .andWhere('type <> "system_text"')
-        //   .orderBy('createdAt', 'DESC')
-        //   .limit(1)
-        //   .getRawMany();
         g.chatMessages = latestMessage
           .filter((m) => m.chat_group_id === g.id)
           .map((m) => ({
             ...m,
             sender: { id: m.sender_id },
           }));
-
         g.lastReadChatTime = lastReadChatTimeList.filter(
           (l) => l.chat_group_id === g.id,
         );
@@ -283,9 +245,6 @@ export class ChatService {
         );
         let unreadCount = 0;
         const isPinned = pinnedUserIds.some((p) => p.chat_group_id === g.id);
-        // const memberCount = Number(
-        //   membersCountList.find((p) => p.chat_group_id === g.id).cnt || 0,
-        // );
         const isMute = muteUserIds.some((p) => p.chat_group_id === g.id);
         const hasBeenRead = g?.lastReadChatTime?.[0]?.readTime
           ? lastReadChatTimeDate > g.updatedAt
@@ -303,21 +262,15 @@ export class ChatService {
 
         if (g.roomType === RoomType.PERSONAL && g.members.length === 2) {
           const chatPartner = g.members.filter((m) => m.id !== userID)[0];
-          // const chatPartner = await this.userRepository.findOne(
-          //   g.members.find((m) => m.id !== userID).id,
-          // );
-          // console.log('----', chatPartner, g.members.length, memberCount);
-
           g.imageURL = chatPartner.avatarUrl;
           g.name = `${chatPartner.lastName} ${chatPartner.firstName}`;
         }
-
+        g.imageURL = await genSignedURL(g.imageURL);
         return {
           ...g,
           pinnedUsers: undefined,
           isPinned,
           isMute,
-          // memberCount,
           hasBeenRead,
           unreadCount,
         };
