@@ -30,6 +30,7 @@ import {
   GetUnreadMessagesQuery,
   SaveRoomsResult,
 } from './chat.controller';
+import { genStorageURL } from 'src/utils/storage/genStorageURL';
 type UserAndGroupID = User & {
   chat_group_id: number;
 };
@@ -953,6 +954,7 @@ export class ChatService {
     const systemMessage: ChatMessage[] = [];
     const newGroup = await this.chatGroupRepository.save({
       ...existGroup,
+      imageURL: genStorageURL(newData.imageURL),
       members: newData.members,
       name: newData.name,
       updatedAt: new Date(),
