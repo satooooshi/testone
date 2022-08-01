@@ -202,26 +202,41 @@ export class ChatService {
       .andWhere('time.user_id = :userID', { userID })
       .getRawMany();
 
-    // const latestMessages = await this.chatMessageRepository
-    //   .createQueryBuilder('messages')
-    //   .select([
-    //     'messages.id as id',
-    //     'messages.content as content',
-    //     'messages.type as type',
-    //     'messages.call_time as callTime',
-    //     'messages.file_name as fileName',
-    //     'messages.created_at as createdAt',
-    //     'messages.updated_at as updatedAt',
-    //     'messages.sender_id as sender_id',
-    //     'messages.chat_group_id as chatGroupId',
-    //   ])
-    //   .where('messages.chat_group_id IN (:...roomIds)', {
-    //     roomIds,
-    //   })
-    //   .andWhere(
-    //     'messages.id =  ( SELECT id FROM chat_messages WHERE chat_group_id = messages.chat_group_id AND type <> "system_text" ORDER BY created_at DESC LIMIT 1 )',
-    //   )
-    //   .getRawMany();
+    const latestMessageIds = await this.chatMessageRepository
+      .createQueryBuilder('messages')
+      .select([
+        'messages.chat_group_id as chatGroupId',
+        'max(messages.id) as id',
+      ])
+      .where('messages.chat_group_id IN (:...roomIds)', {
+        roomIds,
+      })
+      .andWhere('messages.type <> "system_text"')
+      .groupBy('chatGroupId')
+      .getRawMany();
+
+    const latestMessage = await this.chatMessageRepository
+      .createQueryBuilder('messages')
+      .select([
+        'messages.id as id',
+        'messages.content as content',
+        'messages.type as type',
+        'messages.call_time as callTime',
+        'messages.file_name as fileName',
+        'messages.created_at as createdAt',
+        'messages.updated_at as updatedAt',
+        'messages.sender_id as sender_id',
+        'messages.chat_group_id as chat_group_id',
+      ])
+      .where('messages.id IN (:...messageIds)', {
+        messageIds: latestMessageIds.map((t) => t.id),
+      })
+      .getRawMany();
+    console.log(
+      '-----++++',
+      latestMessageIds,
+      latestMessage.map((l) => l.content),
+    );
 
     let rooms = await Promise.all(
       urlUnparsedRooms.map(async (g, index) => {
@@ -231,28 +246,30 @@ export class ChatService {
         //   .filter((m) => m.chatGroupId === g.id)
         //   .map((m) => ({ ...m, sender: { id: m.sender_id } }));
 
-        const latestMessage = await this.chatMessageRepository
-          .createQueryBuilder('messages')
-          .select([
-            'messages.id as id',
-            'messages.content as content',
-            'messages.type as type',
-            'messages.call_time as callTime',
-            'messages.file_name as fileName',
-            'messages.created_at as createdAt',
-            'messages.updated_at as updatedAt',
-            'messages.sender_id as sender_id',
-            'messages.chat_group_id as chat_group_id',
-          ])
-          .where('messages.chat_group_id  = :roomId', { roomId: g.id })
-          .andWhere('type <> "system_text"')
-          .orderBy('createdAt', 'DESC')
-          .limit(1)
-          .getRawMany();
-        g.chatMessages = latestMessage.map((m) => ({
-          ...m,
-          sender: { id: m.sender_id },
-        }));
+        // const latestMessage = await this.chatMessageRepository
+        //   .createQueryBuilder('messages')
+        //   .select([
+        //     'messages.id as id',
+        //     'messages.content as content',
+        //     'messages.type as type',
+        //     'messages.call_time as callTime',
+        //     'messages.file_name as fileName',
+        //     'messages.created_at as createdAt',
+        //     'messages.updated_at as updatedAt',
+        //     'messages.sender_id as sender_id',
+        //     'messages.chat_group_id as chat_group_id',
+        //   ])
+        //   .where('messages.chat_group_id  = :roomId', { roomId: g.id })
+        //   .andWhere('type <> "system_text"')
+        //   .orderBy('createdAt', 'DESC')
+        //   .limit(1)
+        //   .getRawMany();
+        g.chatMessages = latestMessage
+          .filter((m) => m.chat_group_id === g.id)
+          .map((m) => ({
+            ...m,
+            sender: { id: m.sender_id },
+          }));
 
         g.lastReadChatTime = lastReadChatTimeList.filter(
           (l) => l.chat_group_id === g.id,
@@ -1127,10 +1144,18 @@ export class ChatService {
   ): Promise<LastReadChatTime> {
     console.log(user.lastName, 'call saveLastReadChatTime');
 
-    const chatGroup = await this.chatGroupRepository.findOne(chatGroupId, {
-      relations: ['members'],
-    });
-    const isMember = chatGroup.members.filter((m) => m.id === user.id).length;
+    // const chatGroup = await this.chatGroupRepository.findOne(chatGroupId, {
+    //   relations: ['members'],
+    // });
+    // const isMember = chatGroup.members.filter((m) => m.id === user.id).length;
+
+    const manager = getManager();
+    const isMember = await manager.query(
+      'select chat_group_id from user_chat_joining where chat_group_id = ? AND user_id = ?',
+      [chatGroupId, user.id],
+    );
+    console.log('isMember', isMember);
+
     if (!isMember) {
       throw new NotAcceptableException('Something went wrong');
     }
