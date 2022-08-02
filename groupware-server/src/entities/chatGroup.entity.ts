@@ -138,7 +138,6 @@ export class ChatGroup {
 
   isPinned?: boolean;
   isMute?: boolean;
-  memberCount?: number;
   hasBeenRead?: boolean;
   unreadCount?: number;
 
