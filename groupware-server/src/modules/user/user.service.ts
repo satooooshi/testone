@@ -495,7 +495,7 @@ export class UserService {
     }
     const userGoodForBoards = await this.userGoodForBoardRepository.find({
       where: { user },
-      relations: ['wiki', 'wiki.tags'],
+      relations: ['wiki', 'wiki.tags', 'wiki.writer'],
     });
 
     if (!userGoodForBoards.length) {

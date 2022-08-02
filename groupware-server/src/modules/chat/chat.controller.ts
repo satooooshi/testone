@@ -404,10 +404,12 @@ export class ChatController {
         id: chatGroupId.toString(),
       },
     };
-    await sendPushNotifToSpecificUsers(
-      chatGroup?.members.map((u) => u.id),
-      silentNotification,
-    );
+    if (chatGroup?.members.length) {
+      await sendPushNotifToSpecificUsers(
+        chatGroup?.members.map((u) => u.id),
+        silentNotification,
+      );
+    }
   }
 
   @Delete('/v2/reaction/:reactionId')
