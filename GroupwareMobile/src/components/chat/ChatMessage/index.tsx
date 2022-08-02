@@ -24,6 +24,7 @@ import TextMessage from './TextMessage';
 import CallMessage from './CallMessage';
 import VideoMessage from './VideoMessage';
 import StickerMessage from './StickerMessage.tsx';
+import {removeReactionDuplicates} from '../../../utils/removeReactionDuplicate';
 
 type ChatMessageItemProps = {
   message: ChatMessage;
@@ -63,16 +64,6 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
       return false;
     }
     return message?.reactions?.some(r => r.emoji === emoji && r.isSender);
-  };
-  const reactionRemovedDuplicates = (reactions: ChatMessageReaction[]) => {
-    let reactionsNoDuplicates: ChatMessageReaction[] = [];
-    for (const r of reactions) {
-      reactionsNoDuplicates = reactionsNoDuplicates.filter(
-        duplicated => duplicated.emoji !== r.emoji,
-      );
-      reactionsNoDuplicates.push(r);
-    }
-    return reactionsNoDuplicates;
   };
 
   useEffect(() => {
@@ -193,7 +184,7 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
         flexWrap="wrap"
         alignSelf={message?.isSender ? 'flex-end' : 'flex-start'}>
         {message.reactions?.length
-          ? reactionRemovedDuplicates(message.reactions).map(r => (
+          ? removeReactionDuplicates(message.reactions).map(r => (
               <Div mr="xs" mb="xs" key={r.id}>
                 <ReactionToMessage
                   onPress={() => onPressReaction(r, isSender(r.emoji))}

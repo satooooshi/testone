@@ -11,6 +11,7 @@ import tailwind from 'tailwind-rn';
 import {ChatMessageReaction} from '../../../types';
 import {userNameFactory} from '../../../utils/factory/userNameFactory';
 import {numbersOfSameValueInKeyOfObjArr} from '../../../utils/numbersOfSameValueInKeyOfObjArr';
+import {removeReactionDuplicates} from '../../../utils/removeReactionDuplicate';
 import UserAvatar from '../../common/UserAvatar';
 
 type ReactionsModalProps = {
@@ -30,20 +31,6 @@ const ReactionsModal: React.FC<ReactionsModalProps> = ({
   deletedReactionIds = [],
   onPressEmoji,
 }) => {
-  const reactionRemovedDuplicates = (reactions: ChatMessageReaction[]) => {
-    const reactionsNoDuplicates: ChatMessageReaction[] = [];
-    for (const r of reactions) {
-      if (
-        reactionsNoDuplicates.filter(
-          duplicated => duplicated.isSender || duplicated.emoji !== r.emoji,
-        )
-      ) {
-        reactionsNoDuplicates.push(r);
-      }
-    }
-    return reactionsNoDuplicates;
-  };
-
   return (
     <MagnusModal isVisible={isVisible} h={400}>
       <Button
@@ -59,7 +46,7 @@ const ReactionsModal: React.FC<ReactionsModalProps> = ({
       {selectedReactions ? (
         <>
           <ScrollView horizontal style={tailwind('max-h-10 mb-2')}>
-            {reactionRemovedDuplicates(selectedReactions)
+            {removeReactionDuplicates(selectedReactions)
               .filter(r => !deletedReactionIds.includes(r.id))
               .map((r, index) => (
                 <TouchableHighlight
@@ -101,13 +88,13 @@ const ReactionsModal: React.FC<ReactionsModalProps> = ({
             data={
               selectedEmoji
                 ? selectedReactions.filter(r => r.emoji === selectedEmoji)
-                : reactionRemovedDuplicates(selectedReactions).filter(
+                : removeReactionDuplicates(selectedReactions).filter(
                     r => !deletedReactionIds.includes(r.id),
                   ).length
                 ? selectedReactions.filter(
                     r =>
                       r.emoji ===
-                      reactionRemovedDuplicates(selectedReactions).filter(
+                      removeReactionDuplicates(selectedReactions).filter(
                         parsedR => !deletedReactionIds.includes(parsedR.id),
                       )[0].emoji,
                   )
