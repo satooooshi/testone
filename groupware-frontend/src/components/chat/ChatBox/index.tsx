@@ -409,7 +409,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
   return (
     <Box
       {...noClickRootDropzone()}
-      w={isSmallerThan768 ? '100%' : '60vw'}
+      w={isSmallerThan768 ? '100%' : '61%'}
       h="100%"
       bg="white"
       position="relative"
@@ -472,7 +472,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
           </Box>
           <Box display="flex" flexDir="row" overflow="hidden">
             <Text
-              w="80%"
+              w="70%"
               mr={'4px'}
               fontWeight="bold"
               fontSize="18px"
