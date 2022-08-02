@@ -297,19 +297,13 @@ const AccountDetail: React.FC = () => {
     const refetchActiveTabData = (activeTab: string) => {
       switch (activeTab) {
         case eventScreenName:
-          if (!events) {
-            refetchEventList();
-          }
+          refetchEventList();
           return;
         case questionScreenName:
-          if (!questionList) {
-            refetchQuestionList();
-          }
+          refetchQuestionList();
           return;
         case knowledgeScreenName:
-          if (!knowledgeList) {
-            refetchKnowledgeList();
-          }
+          refetchKnowledgeList();
           return;
       }
     };

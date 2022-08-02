@@ -80,6 +80,7 @@ export const InviteCallProvider: React.FC = ({children}) => {
   };
 
   const sendCallInvitation = async (caller: Partial<User>, callee: User) => {
+    setCallTime('');
     const invitation = await setupCallInvitation(caller, callee);
     createGroup(
       {name: '', members: [callee]},

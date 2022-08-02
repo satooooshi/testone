@@ -26,7 +26,9 @@ const RoomList: React.FC = () => {
   const navigation = useNavigation<RoomListNavigationProps>();
   const [roomTypeSelector, setRoomTypeSelector] = useState(false);
   const [userModal, setVisibleUserModal] = useState(false);
-  const {data: users} = useAPIGetUsers('');
+  const {data: users, refetch: refetchGetUsers} = useAPIGetUsers('', {
+    enabled: false,
+  });
   const {
     chatGroups,
     setChatGroupsState,
@@ -95,6 +97,13 @@ const RoomList: React.FC = () => {
       setChatRooms(chatGroups);
     }
   }, [chatGroups, isCompletedRefetchAllRooms]);
+
+  useEffect(() => {
+    if (roomTypeSelector) {
+      refetchGetUsers();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [roomTypeSelector]);
 
   const onPressRightButton = () => {
     // navigation.navigate('ChatStack', {screen: 'NewRoom'});
