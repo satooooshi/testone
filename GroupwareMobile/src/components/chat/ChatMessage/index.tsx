@@ -37,7 +37,7 @@ type ChatMessageItemProps = {
   onLongPress: () => void;
   onPressImage: () => void;
   onPressVideo: () => void;
-  onPressReaction: (reaction: ChatMessageReaction) => void;
+  onPressReaction: (reaction: ChatMessageReaction, isSender: boolean) => void;
   onLongPressReation: (reaction: ChatMessageReaction) => void;
 };
 
@@ -59,8 +59,10 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
   const navigation = useNavigation<any>();
   const windowWidth = useWindowDimensions().width;
   const isSender = (emoji: string) => {
-    return message?.reactions?.filter(r => r.emoji === emoji && r.isSender)
-      .length;
+    if (!message?.reactions) {
+      return false;
+    }
+    return message?.reactions?.some(r => r.emoji === emoji && r.isSender);
   };
   const reactionRemovedDuplicates = (reactions: ChatMessageReaction[]) => {
     let reactionsNoDuplicates: ChatMessageReaction[] = [];
@@ -194,7 +196,7 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
           ? reactionRemovedDuplicates(message.reactions).map(r => (
               <Div mr="xs" mb="xs" key={r.id}>
                 <ReactionToMessage
-                  onPress={() => onPressReaction(r)}
+                  onPress={() => onPressReaction(r, isSender(r.emoji))}
                   onLongPress={() => onLongPressReation(r)}
                   reaction={{...r, isSender: !!isSender(r.emoji)}}
                   numbersOfReaction={numbersOfSameValueInKeyOfObjArr(

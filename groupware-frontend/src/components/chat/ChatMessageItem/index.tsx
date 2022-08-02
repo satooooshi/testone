@@ -47,6 +47,7 @@ import StickerMessage from './StickerMessage';
 import { useAuthenticate } from 'src/contexts/useAuthenticate';
 import { useAPIDeleteChatMessage } from '@/hooks/api/chat/useAPIDeleteChatMessage';
 import { socket } from '../ChatBox/socket';
+import { useAPIGetReactions } from '@/hooks/api/chat/useAPIGetReactions';
 
 type ChatMessageItemProps = {
   message: ChatMessage;
@@ -101,6 +102,12 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = memo(
       return reactionsNoDuplicates;
     };
     const ref = useRef<HTMLDivElement | null>(null);
+
+    const { mutate: getReaction, data: reactions } = useAPIGetReactions({
+      onSuccess: () => {
+        setReactionModal(true);
+      },
+    });
     useEffect(() => {
       if (scrollToTarget && isScrollTarget && ref.current?.offsetTop) {
         scrollToTarget(ref.current?.offsetTop - 80);
@@ -123,23 +130,32 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = memo(
       <Box flexDir="row" flexWrap="wrap" display="flex" maxW={'50vw'}>
         {messageState.reactions?.length ? (
           <>
-            {reactionRemovedDuplicates(messageState.reactions).map((r) => (
-              <Box key={r.id} mb="4px" mr="4px">
-                <ReactionedButton
-                  reaction={r}
-                  reactions={messageState.reactions || []}
-                  onClickReaction={(r) =>
-                    r.isSender
-                      ? handleDeleteReaction(r, messageState)
-                      : handleSaveReaction(r.emoji, messageState)
-                  }
-                />
-              </Box>
-            ))}
+            {reactionRemovedDuplicates(messageState.reactions).map((r) => {
+              const isSenderInReactions = messageState.reactions
+                ? messageState.reactions.some(
+                    (reaction) =>
+                      r.emoji === reaction.emoji && reaction.isSender,
+                  )
+                : false;
+              return (
+                <Box key={r.id} mb="4px" mr="4px">
+                  <ReactionedButton
+                    reaction={r}
+                    reactions={messageState.reactions || []}
+                    isSenderInReactions={isSenderInReactions}
+                    onClickReaction={(r) =>
+                      isSenderInReactions
+                        ? handleDeleteReaction(r, messageState)
+                        : handleSaveReaction(r.emoji, messageState)
+                    }
+                  />
+                </Box>
+              );
+            })}
             {message.isSender ? (
               <Button
                 onClick={() => {
-                  setReactionModal(true);
+                  getReaction(messageState.id);
                 }}
                 bg={'blue.200'}
                 flexDir="row"
@@ -179,7 +195,10 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = memo(
     const emitReaction = (message: ChatMessage) => {
       socket.emit('message', {
         type: 'edit',
-        chatMessage: { ...message, isSender: false },
+        chatMessage: {
+          ...message,
+          isSender: false,
+        },
       });
     };
 
@@ -187,23 +206,29 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = memo(
       reaction: ChatMessageReaction,
       target: ChatMessage,
     ) => {
-      deleteReaction(reaction, {
-        onSuccess: (reactionId) => {
-          setMessageState((m) => {
-            if (m.id === target.id) {
-              const message = {
-                ...m,
-                reactions: m.reactions?.filter((r) => r.id !== reactionId),
-              };
-              emitReaction(message);
-            }
-            return m;
-          });
-        },
-        onError: () => {
-          errorOnUpdatingReaction();
-        },
-      });
+      if (messageState.reactions) {
+        const reactionSentMyself = messageState.reactions?.filter(
+          (r) => r.emoji === reaction.emoji && r.isSender,
+        )[0];
+        deleteReaction(reactionSentMyself || reaction, {
+          onSuccess: (reactionId) => {
+            setMessageState((m) => {
+              if (m.id === target.id) {
+                const message = {
+                  ...m,
+                  reactions: m.reactions?.filter((r) => r.id !== reactionId),
+                };
+                emitReaction(message);
+                return message;
+              }
+              return m;
+            });
+          },
+          onError: () => {
+            errorOnUpdatingReaction();
+          },
+        });
+      }
     };
 
     const handleSaveReaction = async (emoji: string, target?: ChatMessage) => {
@@ -344,11 +369,13 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = memo(
           readUsers={readUsers}
         />
 
-        <ReactionListModal
-          isOpen={reactionModal}
-          onClose={() => setReactionModal(false)}
-          reactions={messageState.reactions || []}
-        />
+        {reactions && (
+          <ReactionListModal
+            isOpen={reactionModal}
+            onClose={() => setReactionModal(false)}
+            reactions={reactions || []}
+          />
+        )}
         {messageState.type === ChatMessageType.SYSTEM_TEXT ? (
           <SystemMessage message={messageState} />
         ) : null}

@@ -56,9 +56,9 @@ const EventCalendar: React.FC<EventCalendarProps> = ({
     mode: 'month',
     targetDate: new Date(),
   });
-  const [searchQuery, setSearchQuery] = useState<SearchQueryToGetEvents>(
-    defaultWeekQuery(),
-  );
+  const [searchQuery, setSearchQuery] = useState<SearchQueryToGetEvents>({
+    personal: personal ? 'true' : '',
+  });
   const {partOfSearchQuery, setPartOfSearchQuery} =
     useEventCardListSearchQuery();
   const isFocused = useIsFocused();
@@ -89,15 +89,15 @@ const EventCalendar: React.FC<EventCalendarProps> = ({
   const memorizedEvent = useMemo<any[]>(() => {
     const changeToBigCalendarEvent = (ev?: EventSchedule[]): any[] => {
       if (ev) {
-        if (personal) {
-          ev = ev.filter(e => {
-            if (
-              e.userJoiningEvent?.filter(u => u?.user?.id === user?.id).length
-            ) {
-              return true;
-            }
-          });
-        }
+        // if (personal) {
+        //   ev = ev.filter(e => {
+        //     if (
+        //       e.userJoiningEvent?.filter(u => u?.user?.id === user?.id).length
+        //     ) {
+        //       return true;
+        //     }
+        //   });
+        // }
         const modifiedEvents: any[] = ev.map(e => ({
           ...e,
           start: new Date(e.startAt),
@@ -114,7 +114,7 @@ const EventCalendar: React.FC<EventCalendarProps> = ({
       return [];
     };
     return changeToBigCalendarEvent(searchResult?.events);
-  }, [personal, searchResult?.events, user?.id]);
+  }, [searchResult?.events]);
 
   const dateRange = React.useMemo(() => {
     if (calendarMode.mode === 'day') {

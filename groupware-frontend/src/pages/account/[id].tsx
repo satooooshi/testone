@@ -206,19 +206,13 @@ const MyAccountInfo = () => {
     const refetchActiveTabData = (activeTab: TabName) => {
       switch (activeTab) {
         case TabName.EVENT:
-          if (!events) {
-            refetchEvent();
-          }
+          refetchEvent();
           return;
         case TabName.QUESTION:
-          if (!questionList) {
-            refetchQuestionList();
-          }
+          refetchQuestionList();
           return;
         case TabName.KNOWLEDGE:
-          if (!knowledgeList) {
-            refetchKnowledgeList();
-          }
+          refetchKnowledgeList();
           return;
       }
     };
