@@ -6,6 +6,7 @@ import {ChatNote, ChatNoteImage} from '../../../../types';
 import {darkFontColor} from '../../../../utils/colors';
 import {dateTimeFormatterFromJSDDate} from '../../../../utils/dateTimeFormatterFromJSDate';
 import {userNameFactory} from '../../../../utils/factory/userNameFactory';
+import AutoLinkedText from '../../../common/AutoLinkedText';
 import UserAvatar from '../../../common/UserAvatar';
 
 type ChatNoteCardProps = {
@@ -96,12 +97,12 @@ const ChatNoteCard: React.FC<ChatNoteCardProps> = ({
             dataDetectorTypes={'link'}
           />
         ) : (
-          <Text
-            selectable
+          <AutoLinkedText
+            selectable={true}
+            text={note.content}
             style={tailwind(' text-black text-base')}
-            linkStyle={tailwind('text-blue-500 text-base text-base')}>
-            {note.content}
-          </Text>
+            linkStyle={tailwind('text-blue-500 text-base text-base')}
+          />
         )}
       </Div>
       <Text fontSize={12} color={darkFontColor}>
