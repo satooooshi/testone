@@ -1,12 +1,11 @@
 import React from 'react';
-import {TouchableHighlight} from 'react-native';
+import {TouchableHighlight, TextInput, Platform} from 'react-native';
 import {Button, Div, Icon, Image, Text} from 'react-native-magnus';
 import tailwind from 'tailwind-rn';
 import {ChatNote, ChatNoteImage} from '../../../../types';
 import {darkFontColor} from '../../../../utils/colors';
 import {dateTimeFormatterFromJSDDate} from '../../../../utils/dateTimeFormatterFromJSDate';
 import {userNameFactory} from '../../../../utils/factory/userNameFactory';
-import AutoLinkedText from '../../../common/AutoLinkedText';
 import UserAvatar from '../../../common/UserAvatar';
 
 type ChatNoteCardProps = {
@@ -87,11 +86,23 @@ const ChatNoteCard: React.FC<ChatNoteCardProps> = ({
         ))}
       </Div>
       <Div mb="lg">
-        <AutoLinkedText
-          text={note.content}
-          style={tailwind(' text-black text-base')}
-          linkStyle={tailwind('text-blue-500 text-base text-base')}
-        />
+        {Platform.OS === 'ios' ? (
+          <TextInput
+            multiline={true}
+            editable={false}
+            scrollEnabled={false}
+            value={note.content}
+            style={tailwind(' text-black text-base')}
+            dataDetectorTypes={'link'}
+          />
+        ) : (
+          <Text
+            selectable
+            style={tailwind(' text-black text-base')}
+            linkStyle={tailwind('text-blue-500 text-base text-base')}>
+            {note.content}
+          </Text>
+        )}
       </Div>
       <Text fontSize={12} color={darkFontColor}>
         {dateTimeFormatterFromJSDDate({
