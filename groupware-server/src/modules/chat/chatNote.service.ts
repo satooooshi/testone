@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { ChatGroup } from 'src/entities/chatGroup.entity';
 import { ChatNote } from 'src/entities/chatNote.entity';
 import { ChatNoteImage } from 'src/entities/chatNoteImage.entity';
+import { genStorageURL } from 'src/utils/storage/genStorageURL';
 import { Repository } from 'typeorm';
 
 export interface GetChatNotesQuery {
@@ -50,6 +51,7 @@ export class ChatNoteService {
     if (dto.images?.length) {
       const sentImages = dto.images.map((i) => ({
         ...i,
+        imageURL: genStorageURL(i.imageURL),
         chatNote: savedNote,
       }));
 
