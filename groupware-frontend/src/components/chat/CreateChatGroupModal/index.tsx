@@ -121,7 +121,12 @@ const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
     enableReinitialize: true,
     validationSchema: chatGroupSchema,
     onSubmit: async () => {
-      if (imgRef.current && completedCrop && imgUploaded === false) {
+      if (
+        imgRef.current &&
+        completedCrop &&
+        imgUploaded === false &&
+        newGroup.name
+      ) {
         const img = getCroppedImageURL(imgRef.current, completedCrop);
         if (!img) {
           return;
