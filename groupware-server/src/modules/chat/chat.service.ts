@@ -262,8 +262,14 @@ export class ChatService {
 
         if (g.roomType === RoomType.PERSONAL && g.members.length === 2) {
           const chatPartner = g.members.filter((m) => m.id !== userID)[0];
-          g.imageURL = chatPartner.avatarUrl;
-          g.name = `${chatPartner.lastName} ${chatPartner.firstName}`;
+          if (chatPartner) {
+            if (chatPartner.existence) {
+              g.imageURL = chatPartner.avatarUrl;
+              g.name = `${chatPartner.lastName} ${chatPartner.firstName}`;
+            } else {
+              g.name = 'メンバーがいません';
+            }
+          }
         }
         g.imageURL = await genSignedURL(g.imageURL);
         return {
