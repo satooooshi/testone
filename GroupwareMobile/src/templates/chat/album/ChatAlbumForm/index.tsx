@@ -1,11 +1,11 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import HeaderWithTextButton from '../../../../components/Header';
 import WholeContainer from '../../../../components/WholeContainer';
 import {
   ChatAlbum,
   ChatAlbumImage,
   ChatGroup,
-  ImageSource,
+  FIleSource,
 } from '../../../../types';
 import ImageView from 'react-native-image-viewing';
 import {UseMutateFunction} from 'react-query';
@@ -28,6 +28,7 @@ import {dateTimeFormatterFromJSDDate} from '../../../../utils/dateTimeFormatterF
 import DownloadIcon from '../../../../components/common/DownLoadIcon';
 import {ActivityIndicator} from 'react-native-paper';
 import {albumSchema} from '../../../../utils/validation/schema';
+import ChatShareIcon from '../../../../components/common/ChatShareIcon';
 
 type ChatAlbumFormProps = {
   album?: ChatAlbum;
@@ -50,6 +51,7 @@ const ChatAlbumForm: React.FC<ChatAlbumFormProps> = ({
   const {width: windowWidth} = useWindowDimensions();
   const [imageModal, setImageModal] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [willSubmit, setWillSubmit] = useState(false);
   const [nowImageIndex, setNowImageIndex] = useState<number>(0);
   const {values, setValues, handleSubmit, errors, touched} = useFormik<
     ChatAlbum | Partial<ChatAlbum>
@@ -58,17 +60,31 @@ const ChatAlbumForm: React.FC<ChatAlbumFormProps> = ({
     validationSchema: albumSchema,
     onSubmit: submittedValues => onSubmit(submittedValues),
   });
-  const images: ImageSource[] =
-    values.images?.map(i => ({uri: i.imageURL || ''})) || [];
+  const images: FIleSource[] =
+    values.images?.map(i => ({
+      uri: i.imageURL || '',
+      fileName: i.fileName || '',
+    })) || [];
 
   const handlePressImage = (url: string) => {
-    const isNowUri = (element: ImageSource) => element.uri === url;
+    const isNowUri = (element: FIleSource) => element.uri === url;
     setNowImageIndex(images.findIndex(isNowUri));
     setImageModal(true);
   };
 
+  useEffect(() => {
+    const safetySubmit = async () => {
+      handleSubmit();
+      await new Promise(r => setTimeout(r, 1000));
+      setWillSubmit(false);
+    };
+    if (willSubmit) {
+      safetySubmit();
+    }
+  }, [willSubmit, handleSubmit]);
+
   const handlePressImageButton = async () => {
-    const {formData} = await uploadImageFromGallery({
+    const {formData, fileName} = await uploadImageFromGallery({
       cropping: true,
       mediaType: 'photo',
       multiple: true,
@@ -81,10 +97,12 @@ const ChatAlbumForm: React.FC<ChatAlbumFormProps> = ({
           setUploading(false);
         },
         onSuccess: imageURLs => {
-          const newImages: Partial<ChatAlbumImage>[] = imageURLs.map(u => ({
-            imageURL: u,
-            name: u + '.png',
-          }));
+          const newImages: Partial<ChatAlbumImage>[] = imageURLs.map(
+            (u, index) => ({
+              imageURL: u,
+              name: fileName?.[index] ? fileName[index] : u + '.png',
+            }),
+          );
           setValues(v => ({
             ...v,
             images: v.images?.length ? [...v.images, ...newImages] : newImages,
@@ -118,7 +136,7 @@ const ChatAlbumForm: React.FC<ChatAlbumFormProps> = ({
         title="アルバム"
         enableBackButton={true}
         rightButtonName={album ? '更新' : '投稿'}
-        onPressRightButton={() => handleSubmit()}
+        onPressRightButton={() => setWillSubmit(true)}
       />
       <ImageView
         animationType="slide"
@@ -131,6 +149,7 @@ const ChatAlbumForm: React.FC<ChatAlbumFormProps> = ({
         FooterComponent={({imageIndex}) => (
           <Div position="absolute" bottom={5} right={5}>
             <DownloadIcon url={images[imageIndex].uri} />
+            <ChatShareIcon image={images[imageIndex]} />
           </Div>
         )}
       />

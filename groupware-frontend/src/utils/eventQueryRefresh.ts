@@ -21,6 +21,7 @@ export const generateEventSearchQueryString = (
     type: newType = query.type || '',
     from: newFrom = query.from,
     to: newTo = query.to,
+    personal,
     participant_id: newParticipantId = query.participant_id,
   } = query;
   const { from: defaultFrom, to: defaultTo } = defaultCalendarEventQuery();
@@ -34,6 +35,9 @@ export const generateEventSearchQueryString = (
   }
   if (newFrom === '' && newTo === '') {
     refreshURL = refreshURL + `&from=${defaultFrom}&to=${defaultTo}`;
+  }
+  if (personal) {
+    refreshURL = refreshURL + '&personal=true';
   }
   if (newParticipantId) {
     refreshURL = refreshURL + `&participant_id=${newParticipantId}`;

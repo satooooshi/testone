@@ -28,6 +28,8 @@ export enum ChatMessageType {
   VIDEO = 'video',
   IMAGE = 'image',
   TEXT = 'text',
+  CALL = 'call',
+  STICKER = 'sticker',
   SYSTEM_TEXT = 'system_text',
   OTHER_FILE = 'other_file',
 }
@@ -97,7 +99,11 @@ export enum BoardCategory {
 }
 
 export type TextFormat = 'markdown' | 'html';
-
+export type UserGoodForBoard = {
+  id: number;
+  user: User;
+  wiki: Wiki;
+};
 export interface User {
   id: number;
   email: string;
@@ -135,11 +141,12 @@ export interface User {
   qaAnswerReplies?: QAAnswerReply[];
   //this params is sent when login
   token?: string;
-  userGoodForBoard?: Wiki[];
+  userGoodForBoard?: UserGoodForBoard[];
   eventCount?: number;
   questionCount?: number;
   answerCount?: number;
   knowledgeCount?: number;
+  chatGroups?: ChatGroup[];
 }
 
 export interface Tag {
@@ -181,8 +188,10 @@ export interface Wiki {
   bestAnswer?: QAAnswer;
   createdAt: Date;
   updatedAt: Date;
-  userGoodForBoard?: User[];
+  userGoodForBoard?: UserGoodForBoard[];
   isGoodSender?: boolean;
+  goodsCount?: number;
+  answersCount?: number;
 }
 
 export interface QAAnswerReply {
@@ -300,7 +309,13 @@ export interface ChatMessage {
   updatedAt: Date;
   isSender?: boolean;
   thumbnail?: string;
+  callTime?: string;
   replyParentMessage?: ChatMessage | null;
+}
+
+export interface SocketMessage {
+  chatMessage: ChatMessage;
+  type: 'send' | 'edit' | 'delete';
 }
 
 export enum RoomType {
@@ -317,12 +332,21 @@ export interface ChatGroup {
   pinnedUsers?: User[];
   isPinned?: boolean;
   chatNotes?: ChatNote[];
+  muteUsers?: User[];
   chatMessages?: ChatMessage[];
+  isMute?: boolean;
+  memberCount?: number;
   members?: User[];
   lastReadChatTime?: LastReadChatTime[];
   hasBeenRead?: boolean;
+  unreadCount?: number;
   createdAt: Date;
   updatedAt: Date;
+}
+
+export interface SaveRoomsResult {
+  room: ChatGroup;
+  systemMessage: ChatMessage[];
 }
 
 export interface LastReadChatTime {
@@ -343,9 +367,14 @@ export interface ChatNote {
   isEditor?: boolean;
 }
 
+export interface SaveNoteResult {
+  note: ChatNote;
+  systemMessage: ChatMessage;
+}
+
 export interface ChatNoteImage {
   id: number;
-  name: string;
+  fileName: string;
   imageURL: string;
   chatNote?: ChatNote;
   createdAt: Date;
@@ -353,8 +382,10 @@ export interface ChatNoteImage {
 }
 
 //this is for react-native-image-viewing
-export type ImageSource = {
+export type FIleSource = {
   uri: string;
+  fileName: string;
+  createdUrl?: string;
 };
 
 export interface ChatAlbum {
@@ -368,9 +399,13 @@ export interface ChatAlbum {
   isEditor?: boolean;
 }
 
+export interface SaveAlbumResult {
+  album: ChatAlbum;
+  systemMessage: ChatMessage;
+}
 export interface ChatAlbumImage {
   id: number;
-  name: string;
+  fileName: string;
   imageURL: string;
   chatAlbum?: ChatAlbum;
   createdAt: Date;

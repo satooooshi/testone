@@ -1,3 +1,4 @@
+import { userNameFactory } from 'src/utils/factory/userNameFactory';
 import { mentionTransform } from 'src/utils/mentionTransform';
 import {
   CustomPushNotificationData,
@@ -29,6 +30,8 @@ export enum ChatMessageType {
   VIDEO = 'video',
   IMAGE = 'image',
   TEXT = 'text',
+  CALL = 'call',
+  STICKER = 'sticker',
   SYSTEM_TEXT = 'system_text',
   OTHER_FILE = 'other_file',
 }
@@ -48,6 +51,8 @@ export class ChatMessage {
   })
   type: ChatMessageType;
 
+  @Column({ type: 'varchar', name: 'call_time', default: '' })
+  callTime?: string;
   @Column({
     name: 'file_name',
     type: 'varchar',
@@ -93,7 +98,6 @@ export class ChatMessage {
   replyParentMessage?: ChatMessage;
 
   @BeforeInsert()
-  @BeforeUpdate()
   async changeToStorageURL?() {
     if (
       this.type === ChatMessageType.IMAGE ||
@@ -104,9 +108,8 @@ export class ChatMessage {
     }
   }
 
-  @AfterInsert()
   @AfterLoad()
-  @AfterUpdate()
+  @AfterInsert()
   async changeToSignedURL?() {
     if (
       this.type === ChatMessageType.IMAGE ||
@@ -115,21 +118,24 @@ export class ChatMessage {
     ) {
       this.content = await genSignedURL(this.content);
     }
-    if (this.type === ChatMessageType.OTHER_FILE) {
-      this.content = mentionTransform(this.content);
-    }
+    // if (this.type === ChatMessageType.OTHER_FILE) {
+    //   this.content = mentionTransform(this.content);
+    // }
   }
 
   @AfterInsert()
   async sendPushNotification() {
     if (this.chatGroup?.id && this.sender?.id) {
+      if (this.content === '音声通話') return;
       let content = this.content;
       if (this.type === ChatMessageType.IMAGE) {
-        content = '画像';
+        content = '画像を送信しました。';
       } else if (this.type === ChatMessageType.VIDEO) {
-        content = '動画';
+        content = '動画を送信しました。';
       } else if (this.type === ChatMessageType.OTHER_FILE) {
-        content = 'ファイル';
+        content = 'ファイルを送信しました。';
+      } else if (this.type === ChatMessageType.STICKER) {
+        content = 'スタンプを送信しました。';
       }
       const mentionRegex = /@\[.*?\]\(([0-9]+)\)/g;
       const mentionedIds: number[] = [];
@@ -140,31 +146,80 @@ export class ChatMessage {
         }
       }
       // console.log(mentionedIds);
-      const allUsersInRoom = await getRepository(User)
-        .createQueryBuilder('user')
-        .select('user.id')
-        .leftJoin('user.chatGroups', 'chatGroups')
-        .where('chatGroups.id = :chatGroupId', {
-          chatGroupId: this.chatGroup.id,
-        })
-        .andWhere('user.id <> :senderId', { senderId: this.sender.id })
-        .andWhere(
-          mentionedIds?.length ? 'user.id NOT IN (:...mentionedIds)' : '1=1',
-          { mentionedIds },
-        )
-        .getMany();
+      // const allUsers = await getRepository(User)
+      //   .createQueryBuilder('user')
+      //   .select('user.id')
+      //   .leftJoin('user.chatGroups', 'chatGroups')
+      //   .leftJoinAndSelect('user.muteChatGroups', 'muteChatGroups')
+      //   .where('chatGroups.id = :chatGroupId', {
+      //     chatGroupId: this.chatGroup.id,
+      //   })
+      //   .andWhere('user.id <> :senderId', { senderId: this.sender.id })
+      //   .getMany();
+      // const notifiedUsers = await getRepository(User)
+      //   .createQueryBuilder('user')
+      //   .select('user.id')
+      //   .leftJoin('user.chatGroups', 'chatGroups')
+      //   .leftJoin('user.muteChatGroups', 'muteChatGroups')
+      //   .where(
+      //     'muteChatGroups.id <> :chatGroupId OR muteChatGroups.id is null',
+      //     {
+      //       chatGroupId: this.chatGroup.id,
+      //     },
+      //   )
+      //   // .orWhere('muteChatGroups.id is null')
+      //   .andWhere('chatGroups.id = :chatGroupId', {
+      //     chatGroupId: this.chatGroup.id,
+      //   })
+      //   .andWhere('user.id <> :senderId', { senderId: this.sender.id })
+      //   .andWhere(
+      //     mentionedIds?.length ? 'user.id NOT IN (:...mentionedIds)' : '1=1',
+      //     { mentionedIds },
+      //   )
+      //   .getMany();
+      const notifiedUsers = this.chatGroup.members.filter(
+        (u) =>
+          u.id !== this.sender.id &&
+          !this.chatGroup.muteUsers.filter((m) => m.id === u.id).length &&
+          !mentionedIds.filter((m) => m === u.id).length,
+      );
+      const groupName = this.chatGroup.name ? `(#${this.chatGroup.name})` : '';
+      const title = `${userNameFactory(this.sender)} ${groupName}`;
       const notificationDataWithNoMention: CustomPushNotificationData = {
-        title: `新着メッセージが届きました`,
+        title: title,
         body: `${mentionTransform(content)}`,
         custom: {
+          type: 'badge',
           screen: 'chat',
           id: this.chatGroup.id.toString(),
         },
       };
+      const silentNotification: CustomPushNotificationData = {
+        title: '',
+        body: '',
+        custom: {
+          type: 'badge',
+          silent: 'silent',
+          id: this.chatGroup.id.toString(),
+        },
+      };
+      // console.log(
+      //   '---====',
+      //   notifiedUsers.map((u) => u.id),
+      //   this.chatGroup.members.map((u) => u.id),
+      //   this.sender.id,
+      //   title,
+      // );
+
       await sendPushNotifToSpecificUsers(
-        allUsersInRoom,
+        notifiedUsers.map((u) => u.id),
         notificationDataWithNoMention,
       );
+      if (this.chatGroup.muteUsers.length)
+        await sendPushNotifToSpecificUsers(
+          this.chatGroup.muteUsers.map((u) => u.id),
+          silentNotification,
+        );
       if (mentionedIds?.length) {
         const mentionedUsers = await getRepository(User)
           .createQueryBuilder('user')
@@ -177,15 +232,18 @@ export class ChatMessage {
           .andWhere('user.id IN (:...mentionedIds)', { mentionedIds })
           .getMany();
         const notificationDataWithMention: CustomPushNotificationData = {
-          title: `あなたをメンションした新着メッセージが届きました`,
+          title: `あなたをメンションした新着メッセージが届きました - ${userNameFactory(
+            this.sender,
+          )} ${groupName}`,
           body: `${mentionTransform(content)}`,
           custom: {
+            type: 'badge',
             screen: 'chat',
             id: this.chatGroup.id.toString(),
           },
         };
         await sendPushNotifToSpecificUsers(
-          mentionedUsers,
+          mentionedUsers.map((u) => u.id),
           notificationDataWithMention,
         );
       }

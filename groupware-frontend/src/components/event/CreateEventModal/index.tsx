@@ -13,7 +13,7 @@ import {
 import { IoMdAddCircle } from 'react-icons/io';
 import { useAPIGetTag } from '@/hooks/api/tag/useAPIGetTag';
 import TagModal from '../../common/TagModal';
-import { DateTimePicker } from 'react-rainbow-components';
+import DateTimePicker from 'node_modules/react-rainbow-components/components/DateTimePicker';
 import { useDropzone } from 'react-dropzone';
 import { useAPIUploadStorage } from '@/hooks/api/storage/useAPIUploadStorage';
 import ReactCrop from 'react-image-crop';
@@ -108,7 +108,9 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
   createEvent,
 }) => {
   const { data: tags } = useAPIGetTag();
-  const { data: users } = useAPIGetUsers('ALL');
+  const { data: users, refetch: refetchGetUsers } = useAPIGetUsers('ALL', {
+    enabled: false,
+  });
   const { user } = useAuthenticate();
   const toast = useToast();
   const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
@@ -118,6 +120,7 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
     handleSubmit: onFinish,
     setValues: setNewEvent,
     validateForm,
+    resetForm,
   } = useFormik<CreateEventRequest | Required<EventSchedule>>({
     initialValues: event ? event : initialEventValue,
     enableReinitialize: true,
@@ -134,6 +137,7 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
       uploadFiles([result], {
         onSuccess: (fileURLs) => {
           createEvent({ ...submittedValues, imageURL: fileURLs[0] });
+          resetForm();
         },
       });
     },
@@ -150,13 +154,28 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
         isClosable: true,
       });
     } else {
-      onFinish();
+      setWillSubmit(true);
     }
   };
 
   const [newYoutube, setNewYoutube] = useState('');
   const [tagModal, setTagModal] = useState(false);
   const [userModal, setUserModal] = useState(false);
+  const [willSubmit, setWillSubmit] = useState(false);
+
+  useEffect(() => {
+    if (enabled) {
+      setWillSubmit(false);
+      refetchGetUsers();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [enabled]);
+
+  useEffect(() => {
+    if (willSubmit) {
+      onFinish();
+    }
+  }, [willSubmit, onFinish]);
 
   const [
     {

@@ -35,7 +35,12 @@ const ChatNoteCard: React.FC<ChatNoteCardProps> = ({
       <Div flexDir="row" justifyContent="space-between" mb="lg">
         <Div flexDir="row" alignItems="center">
           <Div mr="sm">
-            <UserAvatar h={40} w={40} user={note.editors?.[0]} />
+            <UserAvatar
+              h={40}
+              w={40}
+              user={note.editors?.[0]}
+              GoProfile={true}
+            />
           </Div>
           <Text fontWeight="bold" fontSize={16}>
             {note.editors?.length
@@ -84,7 +89,7 @@ const ChatNoteCard: React.FC<ChatNoteCardProps> = ({
       <Div mb="lg">
         <AutoLinkedText
           text={note.content}
-          style={tailwind('text-base')}
+          style={tailwind(' text-black text-base')}
           linkStyle={tailwind('text-blue-500 text-base text-base')}
         />
       </Div>

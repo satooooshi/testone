@@ -10,20 +10,20 @@ import {
   ModalOverlay,
   Text,
 } from '@chakra-ui/react';
-import { User } from 'src/types';
+import { UserGoodForBoard } from 'src/types';
 import { darkFontColor } from 'src/utils/colors';
 import { userNameFactory } from 'src/utils/factory/userNameFactory';
 
 type GoodSendersModalProps = {
-  goodSenders: User[];
   isOpen: boolean;
   onClose: () => void;
+  goodsForBoard: UserGoodForBoard[];
 };
 
 const GoodSendersModal: React.FC<GoodSendersModalProps> = ({
-  goodSenders,
   isOpen,
   onClose,
+  goodsForBoard,
 }) => {
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
@@ -35,8 +35,8 @@ const GoodSendersModal: React.FC<GoodSendersModalProps> = ({
           </Box>
         </ModalHeader>
         <ModalCloseButton />
-        <ModalBody>
-          {goodSenders?.map((u) => (
+        <ModalBody overflow={'scroll'}>
+          {goodsForBoard?.map((u) => (
             <Link
               key={u.id}
               display="flex"
@@ -48,8 +48,8 @@ const GoodSendersModal: React.FC<GoodSendersModalProps> = ({
               href={`/account/${u.id}`}
               passHref>
               <Box display="flex" flexDir="row" alignItems="center">
-                <UserAvatar user={u} />
-                <Text fontSize={darkFontColor}>{userNameFactory(u)}</Text>
+                <UserAvatar user={u.user} />
+                <Text fontSize={darkFontColor}>{userNameFactory(u.user)}</Text>
               </Box>
             </Link>
           ))}

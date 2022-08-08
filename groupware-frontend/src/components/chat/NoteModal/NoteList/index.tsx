@@ -64,7 +64,7 @@ const NoteList: React.FC<NoteListProps> = ({
     page: noteListPage.toString(),
   });
   const handleNoteDelete = (note: ChatNote) => {
-    if (confirm('ノートを削除します。よろしいですa?')) {
+    if (confirm('ノートを削除します。よろしいですか?')) {
       deleteNote(
         { roomId: room.id.toString(), noteId: note.id.toString() },
         {
@@ -132,7 +132,8 @@ const NoteList: React.FC<NoteListProps> = ({
                   className={`react-viewer-icon react-viewer-icon-download`}></i>
               ),
               onClick: ({ src }) => {
-                if (selectedImage?.name) saveAs(src, selectedImage.name);
+                if (selectedImage?.fileName)
+                  saveAs(src, selectedImage.fileName);
               },
             },
           ]);

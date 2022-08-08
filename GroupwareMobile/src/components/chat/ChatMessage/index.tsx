@@ -21,7 +21,10 @@ import FileMessage from './FileMessage';
 import ImageMessage from './ImageMessage';
 import ReactionToMessage from './ReactionToMessage';
 import TextMessage from './TextMessage';
+import CallMessage from './CallMessage';
 import VideoMessage from './VideoMessage';
+import StickerMessage from './StickerMessage.tsx';
+import {removeReactionDuplicates} from '../../../utils/removeReactionDuplicate';
 
 type ChatMessageItemProps = {
   message: ChatMessage;
@@ -32,11 +35,10 @@ type ChatMessageItemProps = {
   isScrollTarget: boolean;
   scrollToTarget: (messageIndex: number) => void;
   onCheckLastRead: () => void;
-  numbersOfRead: number;
   onLongPress: () => void;
   onPressImage: () => void;
   onPressVideo: () => void;
-  onPressReaction: (reaction: ChatMessageReaction) => void;
+  onPressReaction: (reaction: ChatMessageReaction, isSender: boolean) => void;
   onLongPressReation: (reaction: ChatMessageReaction) => void;
 };
 
@@ -49,7 +51,6 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
   isScrollTarget = false,
   scrollToTarget,
   onCheckLastRead,
-  numbersOfRead,
   onLongPress,
   onPressImage,
   onPressVideo,
@@ -59,18 +60,10 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
   const navigation = useNavigation<any>();
   const windowWidth = useWindowDimensions().width;
   const isSender = (emoji: string) => {
-    return message?.reactions?.filter(r => r.emoji === emoji && r.isSender)
-      .length;
-  };
-  const reactionRemovedDuplicates = (reactions: ChatMessageReaction[]) => {
-    let reactionsNoDuplicates: ChatMessageReaction[] = [];
-    for (const r of reactions) {
-      reactionsNoDuplicates = reactionsNoDuplicates.filter(
-        duplicated => duplicated.emoji !== r.emoji,
-      );
-      reactionsNoDuplicates.push(r);
+    if (!message?.reactions) {
+      return false;
     }
-    return reactionsNoDuplicates;
+    return message?.reactions?.some(r => r.emoji === emoji && r.isSender);
   };
 
   useEffect(() => {
@@ -87,7 +80,7 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
             mb="sm"
             mr={message?.isSender ? 'sm' : undefined}
             ml={!message?.isSender ? 'sm' : undefined}>
-            {numbersOfRead ? `既読${numbersOfRead}人` : ''}
+            {`既読${readUsers.length}人`}
           </Text>
         </TouchableOpacity>
       ) : null}
@@ -141,12 +134,16 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
                 searchedResultIds={searchedResultIds}
                 onLongPress={onLongPress}
               />
+            ) : message.type === ChatMessageType.CALL ? (
+              <CallMessage message={message} onLongPress={onLongPress} />
             ) : message.type === ChatMessageType.IMAGE ? (
               <ImageMessage
                 onPress={onPressImage}
                 message={message}
                 onLongPress={onLongPress}
               />
+            ) : message.type === ChatMessageType.STICKER ? (
+              <StickerMessage message={message} onLongPress={onLongPress} />
             ) : message.type === ChatMessageType.VIDEO ? (
               <VideoMessage
                 message={message}
@@ -169,7 +166,12 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
             }
             underlayColor="none">
             <Div mr="xs">
-              <UserAvatar h={40} w={40} user={message?.sender} />
+              <UserAvatar
+                h={40}
+                w={40}
+                user={message?.sender}
+                GoProfile={true}
+              />
             </Div>
           </TouchableHighlight>
         ) : null}
@@ -180,10 +182,10 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
         flexWrap="wrap"
         alignSelf={message?.isSender ? 'flex-end' : 'flex-start'}>
         {message.reactions?.length
-          ? reactionRemovedDuplicates(message.reactions).map(r => (
+          ? removeReactionDuplicates(message.reactions).map(r => (
               <Div mr="xs" mb="xs" key={r.id}>
                 <ReactionToMessage
-                  onPress={() => onPressReaction(r)}
+                  onPress={() => onPressReaction(r, isSender(r.emoji))}
                   onLongPress={() => onLongPressReation(r)}
                   reaction={{...r, isSender: !!isSender(r.emoji)}}
                   numbersOfReaction={numbersOfSameValueInKeyOfObjArr(

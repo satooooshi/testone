@@ -94,6 +94,9 @@ const SelectChatGroupModal: React.FC<SelectChatGroupModal> = ({
               isSelected={selectedChatGroup.id === g.id}
               chatGroup={g}
               key={g.id}
+              onPressPinButton={() => {
+                alert('使っていなかったので対応していません');
+              }}
             />
           </a>
         ))}

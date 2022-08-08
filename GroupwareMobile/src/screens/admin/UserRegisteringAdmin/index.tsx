@@ -382,7 +382,6 @@ const UserRegisteringAdmin: React.FC = () => {
             パスワード
           </Text>
           <Input
-            secureTextEntry={true}
             value={values.password}
             onChangeText={t => setValues({...values, password: t})}
             placeholder="8文字以上で入力してください"

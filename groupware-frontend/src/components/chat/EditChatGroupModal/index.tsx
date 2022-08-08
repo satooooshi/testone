@@ -25,6 +25,8 @@ import { dataURLToFile } from 'src/utils/dataURLToFile';
 import { getCroppedImageURL } from 'src/utils/getCroppedImageURL';
 import { imageExtensions } from 'src/utils/imageExtensions';
 import { useAPIUpdateChatGroup } from '@/hooks/api/chat/useAPIUpdateChatGroup';
+import { useHandleBadge } from 'src/contexts/badge/useHandleBadge';
+import { socket } from '../ChatBox/socket';
 
 type EditChatGroupModalProps = {
   isOpen: boolean;
@@ -40,12 +42,20 @@ const EditChatGroupModal: React.FC<EditChatGroupModalProps> = ({
   onComplete,
 }) => {
   const { mutate: saveGroup } = useAPIUpdateChatGroup({
-    onSuccess: (newInfo) => {
+    onSuccess: (data) => {
       closeModal();
-      onComplete(newInfo);
+      editChatGroup(data.room);
+      onComplete(data.room);
+      for (const msg of data.systemMessage) {
+        socket.emit('message', { type: 'send', chatMessage: msg });
+      }
+    },
+    onError: () => {
+      alert('グループの更新中にエラーが発生しました');
     },
   });
 
+  const { editChatGroup } = useHandleBadge();
   const [selectImageUrl, setSelectImageUrl] = useState<string>('');
   const { mutate: uploadImage, isLoading } = useAPIUploadStorage({
     onSuccess: async (fileURLs) => {

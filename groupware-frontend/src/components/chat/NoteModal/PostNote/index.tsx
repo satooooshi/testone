@@ -29,6 +29,7 @@ const Viewer = dynamic(() => import('react-viewer'), { ssr: false });
 import { saveAs } from 'file-saver';
 import { fileNameTransformer } from 'src/utils/factory/fileNameTransformer';
 import { useAPIUpdateNote } from '@/hooks/api/chat/note/useAPIUpdateChatNote';
+import { socket } from '../../ChatBox/socket';
 
 type EditNoteProps = {
   room: ChatGroup;
@@ -55,7 +56,11 @@ const EditNote: React.FC<EditNoteProps> = ({
     images: [],
   };
   const { mutate: createNote } = useAPICreateChatNote({
-    onSuccess: () => {
+    onSuccess: (result) => {
+      socket.emit('message', {
+        type: 'send',
+        chatMessage: result.systemMessage,
+      });
       toast({
         title: 'ノートを保存しました',
         status: 'success',
@@ -129,6 +134,26 @@ const EditNote: React.FC<EditNoteProps> = ({
     element.src === selectedImage?.imageURL;
   const activeIndex = imagesInSelectedNote.findIndex(isNowUri);
 
+  const [willSubmit, setWillSubmit] = useState(false);
+
+  useEffect(() => {
+    if (isOpen) {
+      setWillSubmit(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen]);
+
+  useEffect(() => {
+    const safetySubmit = async () => {
+      handleSubmit();
+      await new Promise((r) => setTimeout(r, 1000));
+      setWillSubmit(false);
+    };
+    if (willSubmit) {
+      safetySubmit();
+    }
+  }, [willSubmit, handleSubmit]);
+
   useEffect(() => {
     if (!note) {
       resetForm();
@@ -153,7 +178,8 @@ const EditNote: React.FC<EditNoteProps> = ({
                   className={`react-viewer-icon react-viewer-icon-download`}></i>
               ),
               onClick: ({ src }) => {
-                if (selectedImage?.name) saveAs(src, selectedImage.name);
+                if (selectedImage?.fileName)
+                  saveAs(src, selectedImage.fileName);
               },
             },
           ]);
@@ -204,7 +230,7 @@ const EditNote: React.FC<EditNoteProps> = ({
                       <Button
                         size="sm"
                         colorScheme="blue"
-                        onClick={() => handleSubmit()}>
+                        onClick={() => setWillSubmit(true)}>
                         {loadingUploadFile ? (
                           <Spinner />
                         ) : (

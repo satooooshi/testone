@@ -146,6 +146,7 @@ const EventList = () => {
     type,
     from,
     to,
+    personal,
   });
   const { user } = useAuthenticate();
   const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
@@ -206,7 +207,7 @@ const EventList = () => {
       ...newQuery,
       tag: selectedTagIDs.join('+'),
     });
-    router.push(`${url}&personal=${newQuery.personal || ''}`, undefined, {
+    router.push(url, undefined, {
       shallow: true,
     });
   };
@@ -320,15 +321,15 @@ const EventList = () => {
   const memorizedEvent = useMemo<any[] | undefined>(() => {
     const changeToBigCalendarEvent = (ev?: EventSchedule[]) => {
       if (ev) {
-        if (personal === 'true') {
-          ev = ev.filter((e) => {
-            if (
-              e.userJoiningEvent?.filter((u) => u?.user?.id === user?.id).length
-            ) {
-              return true;
-            }
-          });
-        }
+        // if (personal === 'true') {
+        //   ev = ev.filter((e) => {
+        //     if (
+        //       e.userJoiningEvent?.filter((u) => u?.user?.id === user?.id).length
+        //     ) {
+        //       return true;
+        //     }
+        //   });
+        // }
         const events: any[] = ev.map((e) => ({
           ...e,
           start: new Date(e.startAt),
@@ -534,11 +535,7 @@ const EventList = () => {
             <div className={eventListStyles.search_form_wrapper}>
               <SearchForm
                 onClear={() => setSelectedTags([])}
-                value={searchWord || ''}
-                onChange={(e) => setSearchWord(e.currentTarget.value)}
-                onClickButton={() =>
-                  queryRefresh({ page: '1', word: searchWord })
-                }
+                onClickButton={(w) => queryRefresh({ page: '1', word: w })}
                 tags={tags || []}
                 selectedTags={selectedTags}
                 toggleTag={onToggleTag}

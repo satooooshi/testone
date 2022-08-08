@@ -1,10 +1,11 @@
 import React from 'react';
 import {TouchableHighlight, useWindowDimensions} from 'react-native';
-import {Div} from 'react-native-magnus';
+import {Div, Text} from 'react-native-magnus';
 import {ChatMessage} from '../../../../types';
 import ReplyParent from '../ReplyParent';
 import tailwind from 'tailwind-rn';
 import AutoLinkedText from '../../../common/AutoLinkedText';
+import {darkFontColor} from '../../../../utils/colors';
 
 export type TextMessageProps = {
   message: ChatMessage;
@@ -43,6 +44,11 @@ const TextMessage: React.FC<TextMessageProps> = ({
           )}
           style={tailwind('text-white')}
         />
+        {/* {message.updatedAt > message.createdAt ? (
+          <Text fontSize={10} mt={3} color={darkFontColor} textAlign="right">
+            編集済み
+          </Text>
+        ) : null} */}
       </Div>
     </TouchableHighlight>
   );

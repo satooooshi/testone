@@ -7,7 +7,10 @@ import RNBootSplash from 'react-native-bootsplash';
 import PushNotificationIOS from '@react-native-community/push-notification-ios';
 import {Alert, Linking, Platform} from 'react-native';
 import VersionCheck from 'react-native-version-check';
+import {InviteCallProvider} from './contexts/call/useInviteCall';
+import {BadgeProvider} from './contexts/badge/useHandleBadge';
 import {IsTabBarVisibleProvider} from './contexts/bottomTab/useIsTabBarVisible';
+import {Provider} from 'react-native-paper';
 
 const App = () => {
   const queryClient = new QueryClient();
@@ -52,11 +55,17 @@ const App = () => {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthenticateProvider>
-        <IsTabBarVisibleProvider>
-          <Navigator />
-        </IsTabBarVisibleProvider>
-      </AuthenticateProvider>
+      <Provider>
+        <AuthenticateProvider>
+          <IsTabBarVisibleProvider>
+            <BadgeProvider>
+              <InviteCallProvider>
+                <Navigator />
+              </InviteCallProvider>
+            </BadgeProvider>
+          </IsTabBarVisibleProvider>
+        </AuthenticateProvider>
+      </Provider>
     </QueryClientProvider>
   );
 };

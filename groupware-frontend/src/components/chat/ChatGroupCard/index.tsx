@@ -1,55 +1,68 @@
-import React, { useState } from 'react';
+import React, { useMemo } from 'react';
 import { ChatGroup, ChatMessage, ChatMessageType, User } from 'src/types';
 import { dateTimeFormatterFromJSDDate } from 'src/utils/dateTimeFormatter';
-import { Avatar, Box, useMediaQuery, Text, Link } from '@chakra-ui/react';
+import {
+  Avatar,
+  Box,
+  useMediaQuery,
+  Text,
+  Link,
+  Badge,
+} from '@chakra-ui/react';
 import { darkFontColor } from 'src/utils/colors';
 import { RiPushpin2Fill, RiPushpin2Line } from 'react-icons/ri';
-import { useRoomRefetch } from 'src/contexts/chat/useRoomRefetch';
-import { useAPISavePin } from '@/hooks/api/chat/useAPISavePin';
+import { nameOfEmptyNameGroup } from 'src/utils/chat/nameOfEmptyNameGroup';
+import { useAuthenticate } from 'src/contexts/useAuthenticate';
 
 type ChatGroupCardProps = {
   chatGroup: ChatGroup;
   isSelected?: boolean;
+  onPressPinButton: () => void;
 };
 
 const ChatGroupCard: React.FC<ChatGroupCardProps> = ({
   chatGroup,
   isSelected = false,
+  onPressPinButton,
 }) => {
-  const { needRefetch } = useRoomRefetch();
-  const [isPinned, setIsPinned] = useState<boolean>(!!chatGroup.isPinned);
-
-  const { mutate: savePin } = useAPISavePin({
-    onSuccess: () => {
-      setIsPinned(!isPinned);
-      needRefetch();
-    },
-    onError: () => {
-      alert(
-        'ピン留めを更新中にエラーが発生しました。\n時間をおいて再実行してください。',
-      );
-    },
-  });
   const [isSmallerThan768] = useMediaQuery('max-width: 768px');
-  const nameOfEmptyNameGroup = (members?: User[]): string => {
-    if (!members) {
-      return 'メンバーがいません';
+  const { user } = useAuthenticate();
+
+  const latestCall = (message: ChatMessage) => {
+    switch (message.content) {
+      case '音声通話':
+        return `通話時間 ${message.callTime}`;
+      case 'キャンセル':
+        return message.sender?.id === user?.id
+          ? '通話をキャンセルしました'
+          : '不在着信';
+      case '応答なし':
+        return message.sender?.id === user?.id
+          ? '通話に応答がありませんでした'
+          : '不在着信';
+      default:
+        return 'error';
     }
-    const strMembers = members?.map((m) => m.lastName + m.firstName).join();
-    return strMembers;
   };
+
   const latestMessage = (chatMessage: ChatMessage) => {
     switch (chatMessage.type) {
       case ChatMessageType.IMAGE:
         return '画像が送信されました';
       case ChatMessageType.VIDEO:
         return '動画が送信されました';
+      case ChatMessageType.STICKER:
+        return 'スタンプが送信されました';
       case ChatMessageType.OTHER_FILE:
         return 'ファイルが送信されました';
+      case ChatMessageType.CALL:
+        return latestCall(chatMessage);
       default:
         return chatMessage.content;
     }
   };
+
+  const avatarImage = useMemo(() => chatGroup.imageURL, [chatGroup.imageURL]);
 
   return (
     <Box
@@ -62,15 +75,15 @@ const ChatGroupCard: React.FC<ChatGroupCardProps> = ({
       w={'100%'}
       h="fit-content"
       bg={
-        isSelected ? 'gray.200' : chatGroup.hasBeenRead ? '#f2f1f2' : 'white'
+        isSelected ? 'gray.200' : chatGroup.unreadCount ? 'white' : '#f2f1f2'
       }>
-      <Avatar src={chatGroup.imageURL} size="md" mr="8px" />
+      <Avatar src={avatarImage} size="md" mr="8px" />
       <Box
         display="flex"
         flexDir="column"
         overflow="hidden"
         w={isSmallerThan768 ? '100%' : '80%'}
-        h="60px"
+        h="70px"
         justifyContent="space-around">
         <Box
           display="flex"
@@ -84,23 +97,35 @@ const ChatGroupCard: React.FC<ChatGroupCardProps> = ({
               ? chatGroup.name
               : nameOfEmptyNameGroup(chatGroup.members)}
           </Text>
-          {isPinned ? (
+
+          <Box display="flex" flexDir="row">
+            {isSelected == false &&
+            chatGroup?.unreadCount &&
+            chatGroup.unreadCount > 0 ? (
+              <Badge
+                bg="green"
+                color="white"
+                w="30px"
+                h="30px"
+                mr="20px"
+                borderRadius="50%"
+                textAlign="center"
+                lineHeight="30px">
+                {chatGroup.unreadCount}
+              </Badge>
+            ) : null}
             <Link
               onClick={(e) => {
                 e.stopPropagation();
-                savePin({ ...chatGroup, isPinned: !chatGroup.isPinned });
+                onPressPinButton();
               }}>
-              <RiPushpin2Fill size={24} color="green" />
+              {!!chatGroup.isPinned ? (
+                <RiPushpin2Fill size={24} color="green" />
+              ) : (
+                <RiPushpin2Line size={24} color="green" />
+              )}
             </Link>
-          ) : (
-            <Link
-              onClick={(e) => {
-                e.stopPropagation();
-                savePin({ ...chatGroup, isPinned: !chatGroup.isPinned });
-              }}>
-              <RiPushpin2Line size={24} color="green" />
-            </Link>
-          )}
+          </Box>
         </Box>
         <Box display="flex" flexDir="row" alignItems="center" mb="4px">
           <Text fontSize="12px" color={darkFontColor} noOfLines={1}>

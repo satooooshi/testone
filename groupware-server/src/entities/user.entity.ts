@@ -31,6 +31,7 @@ import { ChatMessageReaction } from './chatMessageReaction.entity';
 import { NotificationDevice } from './device.entity';
 import { genSignedURL } from 'src/utils/storage/genSignedURL';
 import { genStorageURL } from 'src/utils/storage/genStorageURL';
+import { UserGoodForBoard } from './userGoodForBord.entity';
 
 export enum UserRole {
   ADMIN = 'admin',
@@ -311,22 +312,21 @@ export class User {
   })
   chatGroups?: ChatGroup[];
 
-  @ManyToMany(() => Wiki, (wiki) => wiki.userGoodForBoard, {
+  @ManyToMany(() => ChatGroup, (chatGroup) => chatGroup.muteUsers, {
     onUpdate: 'CASCADE',
     onDelete: 'CASCADE',
   })
-  @JoinTable({
-    name: 'user_good_for_board',
-    joinColumn: {
-      name: 'user_id',
-      referencedColumnName: 'id',
+  muteChatGroups?: ChatGroup[];
+
+  @OneToMany(
+    () => UserGoodForBoard,
+    (userGoodForBoard) => userGoodForBoard.user,
+    {
+      onUpdate: 'CASCADE',
+      onDelete: 'CASCADE',
     },
-    inverseJoinColumn: {
-      name: 'wiki_id',
-      referencedColumnName: 'id',
-    },
-  })
-  userGoodForBoard?: Wiki[];
+  )
+  userGoodForBoard?: UserGoodForBoard[];
 
   @OneToMany(() => Wiki, (wiki) => wiki.writer)
   wiki?: Wiki[];

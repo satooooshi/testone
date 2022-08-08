@@ -11,6 +11,7 @@ import {
 } from '@nestjs/common';
 import { QAAnswer } from 'src/entities/qaAnswer.entity';
 import { QAAnswerReply } from 'src/entities/qaAnswerReply.entity';
+import { UserGoodForBoard } from 'src/entities/userGoodForBord.entity';
 import {
   BoardCategory,
   RuleCategory,
@@ -130,11 +131,16 @@ export class WikiController {
   }
 
   @UseGuards(JwtAuthenticationGuard)
+  @Get('get-goods-for-board/:id')
+  async getHearts(@Param('id') id: number): Promise<UserGoodForBoard[]> {
+    return this.qaService.getHearts(id);
+  }
+  @UseGuards(JwtAuthenticationGuard)
   @Post('toggle-good-for-board')
   async toggleGoodForBoard(
     @Req() req: RequestWithUser,
     @Body() WikiID: { id: number },
   ): Promise<Partial<Wiki>> {
-    return this.qaService.toggleGoodForBoard(req.user.id, WikiID.id);
+    return this.qaService.toggleGoodForBoard(req.user, WikiID.id);
   }
 }

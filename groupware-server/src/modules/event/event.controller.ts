@@ -45,6 +45,7 @@ export interface SearchQueryToGetEvents {
   type?: EventType;
   from?: string;
   to?: string;
+  personal?: string;
   participant_id?: string;
   host_user_id?: string;
 }
@@ -127,11 +128,12 @@ export class EventScheduleController {
   @Get('list')
   @UseGuards(JwtAuthenticationGuard)
   async getEvents(
+    @Req() req: RequestWithUser,
     @Query() query: SearchQueryToGetEvents,
   ): Promise<SearchResultToGetEvents> {
     const { from, to } = query;
     if (from || to) {
-      return await this.eventService.getEventAtSpecificTime(query);
+      return await this.eventService.getEventAtSpecificTime(query, req.user.id);
     }
     return await this.eventService.getEvents(query);
   }
@@ -294,7 +296,7 @@ export class EventScheduleController {
     return await this.eventService.createComment(comment);
   }
 
-  @Cron(CronExpression.EVERY_MINUTE)
+  @Get('send-notif-events-starts-in-hour')
   async sendNotifEventsStartsInHour() {
     const eventsStartAtAnHourLater =
       await this.eventService.getEventsStartAtAnHourLater();
@@ -309,9 +311,9 @@ export class EventScheduleController {
       };
       await sendPushNotifToSpecificUsers(
         [
-          e.author,
-          ...e.hostUsers.map((u) => u),
-          ...e.userJoiningEvent.map((e) => e.user),
+          e.author.id,
+          ...e.hostUsers.map((u) => u.id),
+          ...e.userJoiningEvent.map((e) => e.user.id),
         ],
         notificationData,
       );
