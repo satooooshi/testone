@@ -196,6 +196,9 @@ const Profile = () => {
         router.back();
       }
     },
+    onError: () => {
+      alert('プロフィールの更新中にエラーが発生しました');
+    },
   });
 
   const tabs: Tab[] = useHeaderTab({ headerTabType: 'admin' });
