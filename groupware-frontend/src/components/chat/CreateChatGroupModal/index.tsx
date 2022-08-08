@@ -67,7 +67,6 @@ const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
   });
   const [completedCrop, setCompletedCrop] = useState<Crop>();
   const imgRef = useRef<HTMLImageElement>();
-  const [imgUploaded, setImgUploaded] = useState(false);
   const onEventImageDrop = useCallback((f: File[]) => {
     setSelectImageUrl(URL.createObjectURL(f[0]));
     setSelectImageName(f[0].name);
@@ -81,13 +80,13 @@ const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
 
   const onLoad = useCallback((img) => {
     imgRef.current = img;
-    setImgUploaded(false);
   }, []);
 
   const { mutate: createGroup, isLoading: loadingCreateGroup } =
     useAPISaveChatGroup({
       onSuccess: (createdData) => {
         onClose();
+        onComplete();
         editChatGroup(createdData);
         router.push(`/chat/${createdData.id.toString()}`, undefined, {
           shallow: true,
@@ -109,6 +108,12 @@ const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [willSubmit]);
 
+  const resetImageUrl = () => {
+    setSelectImageUrl('');
+    imgRef.current = undefined;
+    setCompletedCrop(undefined);
+  };
+
   const {
     values: newGroup,
     setValues: setNewGroup,
@@ -121,12 +126,7 @@ const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
     enableReinitialize: true,
     validationSchema: chatGroupSchema,
     onSubmit: async () => {
-      if (
-        imgRef.current &&
-        completedCrop &&
-        imgUploaded === false &&
-        newGroup.name
-      ) {
+      if (imgRef.current && completedCrop) {
         const img = getCroppedImageURL(imgRef.current, completedCrop);
         if (!img) {
           return;
@@ -134,7 +134,6 @@ const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
         const result = await dataURLToFile(img, selectImageName);
         return uploadImage([result]);
       }
-      onComplete();
       createGroup(newGroup);
     },
   });
@@ -165,6 +164,7 @@ const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
   const onClose = () => {
     resetForm();
     closeModal();
+    resetImageUrl();
   };
 
   const removeFromSelectedMember = (member: User) => {
@@ -172,11 +172,6 @@ const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
       newGroup.members?.filter((m) => m.id !== member.id) || [];
     setNewGroup((g) => ({ ...g, members: newMembers }));
   };
-
-  useEffect(() => {
-    setSelectImageUrl('');
-    setImgUploaded(true);
-  }, [newGroup]);
 
   return (
     <Modal onClose={onClose} scrollBehavior="inside" isOpen={isOpen}>
