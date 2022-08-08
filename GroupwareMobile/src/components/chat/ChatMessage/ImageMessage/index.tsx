@@ -15,12 +15,17 @@ const ImageMessage: React.FC<ImageMessageProps> = ({
   onLongPress,
 }) => {
   const {width: windowWidth} = useWindowDimensions();
+  // console.log('---------ImageMessage', message.id);
 
   return (
     <>
       <TouchableOpacity onPress={onPress} onLongPress={onLongPress}>
         <FastImage
-          source={{uri: message.content, priority: FastImage.priority.low}}
+          source={{
+            uri: message.content,
+            priority: FastImage.priority.low,
+            cache: 'cacheOnly',
+          }}
           style={{height: 144, width: windowWidth * 0.6, borderRadius: 8}}
         />
       </TouchableOpacity>
