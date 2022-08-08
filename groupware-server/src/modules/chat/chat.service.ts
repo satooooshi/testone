@@ -19,7 +19,7 @@ import {
   sendPushNotifToSpecificUsers,
 } from 'src/utils/notification/sendPushNotification';
 import { selectUserColumns } from 'src/utils/selectUserColumns';
-import { getManager, In, Repository } from 'typeorm';
+import { getManager, In, Repository, SimpleConsoleLogger } from 'typeorm';
 import { genSignedURL } from 'src/utils/storage/genSignedURL';
 import { StorageService } from '../storage/storage.service';
 import {
@@ -631,14 +631,16 @@ export class ChatService {
     const sql = this.chatMessageRepository
       .createQueryBuilder('chat_messages')
       .leftJoin('chat_messages.chatGroup', 'g')
-      .where('chat_messages.type <> :type', { type: 'system_text' })
-      .select('chat_messages.id');
+      .where('(chat_messages.type = "text" OR chat_messages.type = "call")')
+      .select(['chat_messages.id', 'chat_messages.type']);
 
     words.map((w, index) => {
       if (index === 0) {
-        sql.andWhere('chat_messages.content LIKE :word0', { word0: `%${w}%` });
+        sql.andWhere('chat_messages.content LIKE BINARY:word0', {
+          word0: `%${w}%`,
+        });
       } else {
-        sql.andWhere(`chat_messages.content LIKE :word${index}`, {
+        sql.andWhere(`chat_messages.content LIKE BINARY:word${index}`, {
           [`word${index}`]: `%${w}%`,
         });
       }
