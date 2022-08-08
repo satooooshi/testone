@@ -1,10 +1,5 @@
 import React, { memo, useEffect, useMemo, useRef, useState } from 'react';
-import {
-  convertToRaw,
-  EditorState,
-  getDefaultKeyBinding,
-  RichUtils,
-} from 'draft-js';
+import { EditorState, getDefaultKeyBinding } from 'draft-js';
 import Editor from '@draft-js-plugins/editor';
 import { draftToMarkdown } from 'markdown-draft-js';
 import createMentionPlugin, { MentionData } from '@draft-js-plugins/mention';
@@ -83,7 +78,9 @@ const ChatEditor: React.FC<ChatEditorProps> = memo(
   ({ room, onSend, isLoading, uploadFiles }) => {
     const { user } = useAuthenticate();
     const [content, setContent] = useState('');
-    const [editorState, setEditorState] = useState(EditorState.createEmpty());
+    const [editorState, setEditorState] = useState<EditorState>(
+      EditorState.createEmpty(),
+    );
     // const editorStateRef = useRef(EditorState.createEmpty());
     const editorRef = useRef<Editor>(null);
     const [mentionedUserData, setMentionedUserData] = useState<MentionData[]>(
@@ -146,16 +143,14 @@ const ChatEditor: React.FC<ChatEditorProps> = memo(
       // editorStateRef.current = newState;
       setEditorState(newState);
       const content = newState.getCurrentContent();
-      const rawObject = convertToRaw(content);
-      const markdownString = draftToMarkdown(rawObject);
-      setContent(markdownString);
+      setContent(content.getPlainText());
     };
 
     const handleOnSend = () => {
       //   const content = editorState.getCurrentContent();
       //   const rawObject = convertToRaw(content);
       //   const markdownString = draftToMarkdown(rawObject);
-      let parsedMessage = content.trimEnd();
+      let parsedMessage = content;
       if (parsedMessage) {
         for (const m of mentionedUserData) {
           const regexp = new RegExp(`\\s${m.name}|^${m.name}`, 'g');
@@ -187,13 +182,6 @@ const ChatEditor: React.FC<ChatEditorProps> = memo(
             keyBindingFn={(e) => {
               if (e.ctrlKey !== e.metaKey && e.key === 'Enter') {
                 handleOnSend();
-                return 'handled';
-              }
-              if (e.keyCode === 13) {
-                setEditorState(RichUtils.insertSoftNewline(editorState));
-                // editorStateRef.current = RichUtils.insertSoftNewline(
-                //   editorStateRef.current,
-                // );
                 return 'handled';
               }
               return getDefaultKeyBinding(e);
@@ -235,7 +223,7 @@ const ChatEditor: React.FC<ChatEditorProps> = memo(
             <IoSend
               size={20}
               onClick={() => handleOnSend()}
-              color={content.trimEnd() ? blueColor : darkFontColor}
+              color={content ? blueColor : darkFontColor}
             />
           )}
         </Link>
