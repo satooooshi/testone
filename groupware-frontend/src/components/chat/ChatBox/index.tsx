@@ -408,7 +408,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
   return (
     <Box
       {...noClickRootDropzone()}
-      w={isSmallerThan768 ? '100%' : '60vw'}
+      w={isSmallerThan768 ? '100%' : '61%'}
       h="100%"
       bg="white"
       position="relative"
@@ -462,26 +462,29 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
         display="flex"
         flexDir="row"
         justifyContent="space-between"
+        alignItems="center"
         py="8px"
         px="16px">
-        <Box display="flex" flexDir="row" alignItems="center">
+        <Box display="flex" flexDir="row" alignItems="center" overflow="hidden">
           <Box mr="8px">
             <Avatar size="sm" src={room.imageURL} />
           </Box>
-          <Box display="flex" flexDir="row">
+          <Box display="flex" flexDir="row" overflow="hidden">
             <Text
+              w="70%"
               mr={'4px'}
               fontWeight="bold"
               fontSize="18px"
               color={darkFontColor}
-              noOfLines={1}>
+              isTruncated>
               {room?.name ? room.name : nameOfEmptyNameGroup(room?.members)}
             </Text>
             <Text
+              w="70px"
               fontWeight="bold"
               fontSize="18px"
               color={darkFontColor}
-              noOfLines={1}>
+              isTruncated>
               {`(${room?.members?.length || 0})`}
             </Text>
           </Box>
