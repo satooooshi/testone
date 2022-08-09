@@ -1,6 +1,7 @@
 import {useNavigation} from '@react-navigation/native';
 import React from 'react';
 import {TouchableHighlight} from 'react-native';
+import FastImage from 'react-native-fast-image';
 import {Image} from 'react-native-magnus';
 import {useAuthenticate} from '../../../contexts/useAuthenticate';
 import {User} from '../../../types';
@@ -58,19 +59,36 @@ const UserAvatar: React.FC<UserAvatarProps> = ({
           }
         }
       }}>
-      <Image
-        {...{h, w}}
-        rounded="circle"
-        source={
-          !user?.existence
-            ? require('../../../../assets/bold-mascot.png')
-            : user?.avatarUrl
-            ? {uri: user.avatarUrl}
-            : require('../../../../assets/no-image-avatar.png')
-        }
-      />
+      {w < 100 ? (
+        <FastImage
+          source={
+            !user?.existence
+              ? require('../../../../assets/bold-mascot.png')
+              : user?.avatarUrl
+              ? {
+                  uri: user.avatarUrl,
+                  priority: FastImage.priority.low,
+                  cache: 'immutable',
+                }
+              : require('../../../../assets/no-image-avatar.png')
+          }
+          style={{height: h, width: w, borderRadius: 100}}
+        />
+      ) : (
+        <Image
+          {...{h, w}}
+          rounded="circle"
+          source={
+            !user?.existence
+              ? require('../../../../assets/bold-mascot.png')
+              : user?.avatarUrl
+              ? {uri: user.avatarUrl}
+              : require('../../../../assets/no-image-avatar.png')
+          }
+        />
+      )}
     </TouchableHighlight>
   );
 };
 
-export default UserAvatar;
+export default React.memo(UserAvatar);
