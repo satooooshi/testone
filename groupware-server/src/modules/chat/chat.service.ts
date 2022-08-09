@@ -713,9 +713,7 @@ export class ChatService {
 
     // return chatGroup.lastReadChatTime.filter((l) => l.user.id !== user.id);
 
-    return chatGroup.lastReadChatTime.filter(
-      (l) => l.user && l.user.id !== user.id,
-    );
+    return chatGroup.lastReadChatTime.filter((l) => l.user);
   }
 
   public async sendMessage(
