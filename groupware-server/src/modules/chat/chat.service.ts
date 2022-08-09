@@ -357,7 +357,6 @@ export class ChatService {
       .orderBy('createdAt', 'DESC')
       .limit(1)
       .getRawMany();
-    console.log('------', pinnedUserId.length, muteUserId, latestMessage);
 
     room.chatMessages = latestMessage.length
       ? latestMessage.map((m) => ({
