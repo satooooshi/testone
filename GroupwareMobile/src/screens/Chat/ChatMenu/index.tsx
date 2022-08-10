@@ -166,36 +166,33 @@ const ChatMenu: React.FC = () => {
           ])
         }
       />
-
-      {!isPersonal && (
-        <ChatMenuRow
-          name="退室"
-          icon={
-            <Icon
-              name="ios-arrow-undo-outline"
-              fontSize={20}
-              fontFamily="Ionicons"
-              mr={'lg'}
-              color="black"
-            />
-          }
-          onPress={() =>
-            Alert.alert('退室してよろしいですか？', undefined, [
-              {
-                text: 'キャンセル',
-                style: 'cancel',
+      <ChatMenuRow
+        name="退室"
+        icon={
+          <Icon
+            name="ios-arrow-undo-outline"
+            fontSize={20}
+            fontFamily="Ionicons"
+            mr={'lg'}
+            color="black"
+          />
+        }
+        onPress={() =>
+          Alert.alert('退室してよろしいですか？', undefined, [
+            {
+              text: 'キャンセル',
+              style: 'cancel',
+            },
+            {
+              text: '退室する',
+              style: 'destructive',
+              onPress: () => {
+                leaveChatGroup(room);
               },
-              {
-                text: '退室する',
-                style: 'destructive',
-                onPress: () => {
-                  leaveChatGroup(room);
-                },
-              },
-            ])
-          }
-        />
-      )}
+            },
+          ])
+        }
+      />
     </WholeContainer>
   );
 };
