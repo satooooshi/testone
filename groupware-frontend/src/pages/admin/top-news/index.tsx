@@ -53,6 +53,8 @@ import type {
   DraggableProvided,
 } from 'react-beautiful-dnd';
 import { AiOutlinePlus } from 'react-icons/ai';
+import { FiEdit2 } from 'react-icons/fi';
+import { RiDeleteBin6Line } from 'react-icons/ri';
 const ReactPaginate = dynamic(() => import('react-paginate'), { ssr: false });
 
 const NewsAdmin: React.VFC = () => {
@@ -286,25 +288,23 @@ const NewsAdmin: React.VFC = () => {
               display="flex"
               flexDir="column"
               overflowX="auto"
-              maxW="1980px"
-              minW="900px"
-              mx="auto"
               alignSelf="center">
               <Box
+                px={5}
                 display="flex"
                 flexDir="row"
                 w="100%"
-                h="40px"
+                h="50px"
                 border="1px"
                 alignItems="center"
                 mb="-1px">
-                <Text w="40%" fontWeight="bold" ml="5px">
+                <Text w="40%" fontWeight="bold" ml="5px" color={darkFontColor}>
                   URL
                 </Text>
-                <Text w="20%" fontWeight="bold">
+                <Text w="20%" fontWeight="bold" color={darkFontColor}>
                   タイトル
                 </Text>
-                <Text w="20%" fontWeight="bold">
+                <Text w="20%" fontWeight="bold" color={darkFontColor}>
                   作成日
                 </Text>
               </Box>
@@ -336,23 +336,38 @@ const NewsAdmin: React.VFC = () => {
                                   w="100%"
                                   border="1px"
                                   h="40px"
+                                  px={5}
                                   alignItems="center"
                                   mb={i + 1 < news.length ? '-1px' : '0px'}>
-                                  <Box w="40%" color="blue" ml="5px">
+                                  <Box
+                                    w="40%"
+                                    color="blue"
+                                    ml="5px"
+
+                                    // whiteSpace="nowrap"
+                                  >
                                     <NextLink href={n.urlPath}>
                                       <a target="_blank">
                                         {location.origin + n.urlPath}
                                       </a>
                                     </NextLink>
                                   </Box>
-                                  <Box w="20%">{n.title}</Box>
-                                  <Box w="20%">
+                                  <Box
+                                    w="20%"
+                                    // whiteSpace="nowrap"
+                                  >
+                                    {n.title}
+                                  </Box>
+                                  <Box
+                                    w="20%"
+                                    // whiteSpace="nowrap"
+                                  >
                                     {dateTimeFormatterFromJSDDate({
                                       dateTime: new Date(n.createdAt),
                                       format: 'yyyy/LL/dd HH:mm',
                                     })}
                                   </Box>
-                                  <Box w="10%">
+                                  <Box display="flex" ml="auto">
                                     <Link
                                       onClick={() => {
                                         setValues({
@@ -361,18 +376,12 @@ const NewsAdmin: React.VFC = () => {
                                         });
                                         setModal(true);
                                       }}>
-                                      <BsPencilSquare
-                                        size={24}
-                                        color={darkFontColor}
-                                      />
+                                      <FiEdit2 size={24} />
                                     </Link>
-                                  </Box>
-                                  <Box w="10%">
-                                    <Link onClick={() => onDeleteNews(n)}>
-                                      <MdDelete
-                                        size={24}
-                                        color={darkFontColor}
-                                      />
+                                    <Link
+                                      ml={3}
+                                      onClick={() => onDeleteNews(n)}>
+                                      <RiDeleteBin6Line size={24} />
                                     </Link>
                                   </Box>
                                 </Box>

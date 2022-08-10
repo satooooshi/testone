@@ -101,6 +101,42 @@ const HeaderWithTab: React.FC<HeaderProps> = ({
         display="flex"
         flexDir="row"
         alignItems="center">
+        {tabs && tabs.length ? (
+          <Flex
+            w="100%"
+            display="flex"
+            flexDir="row"
+            alignItems="center"
+            h="60px">
+            {EventPage ? (
+              <EventPageTab
+                tabs={tabs}
+                activeTabName={activeTabName}
+                eventPage={EventPage}
+              />
+            ) : (
+              tabs.map((t) =>
+                t.type === 'backButton' ? (
+                  <>
+                    <ChakraLink
+                      key={t.name}
+                      href={t.href}
+                      _hover={{ textDecoration: 'none' }}>
+                      <Button leftIcon={<AiOutlineLeft />} bg="white">
+                        {t.name}
+                      </Button>
+                    </ChakraLink>
+                    <Spacer />
+                  </>
+                ) : t.type ? (
+                  <HeaderButton t={t} />
+                ) : !t.type ? (
+                  <HeaderLink t={t} activeTabName={activeTabName} />
+                ) : null,
+              )
+            )}
+          </Flex>
+        ) : null}
         {setMembersModal && setIsTalkRoom ? (
           <Box
             w="100%"
@@ -139,42 +175,6 @@ const HeaderWithTab: React.FC<HeaderProps> = ({
               )}
             </Menu>
           </Box>
-        ) : null}
-        {tabs && tabs.length ? (
-          <Flex
-            w="100%"
-            display="flex"
-            flexDir="row"
-            alignItems="center"
-            h="60px">
-            {EventPage ? (
-              <EventPageTab
-                tabs={tabs}
-                activeTabName={activeTabName}
-                eventPage={EventPage}
-              />
-            ) : (
-              tabs.map((t) =>
-                t.type === 'backButton' ? (
-                  <>
-                    <ChakraLink
-                      key={t.name}
-                      href={t.href}
-                      _hover={{ textDecoration: 'none' }}>
-                      <Button leftIcon={<AiOutlineLeft />} bg="white">
-                        {t.name}
-                      </Button>
-                    </ChakraLink>
-                    <Spacer />
-                  </>
-                ) : t.type ? (
-                  <HeaderButton t={t} />
-                ) : !t.type ? (
-                  <HeaderLink t={t} activeTabName={activeTabName} />
-                ) : null,
-              )
-            )}
-          </Flex>
         ) : null}
       </Box>
     </Box>

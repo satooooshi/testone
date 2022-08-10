@@ -17,15 +17,14 @@
   }
   @media (max-width: 768px) {
     justify-content: flex-start;
-    width: 100vw;
+    width: 100%;
   }
 }
 
 .table {
   background-color: white;
   align-self: center;
-  width: 85vw;
-  max-width: 1980px;
+  width: 100%;
   border-collapse: collapse;
   margin-bottom: 72px;
   overflow: scroll;
@@ -46,7 +45,13 @@
 .table_head {
   text-align: left;
   padding: 10px 0;
+  white-space: 'nowrap';
+  color: $dark_font_color;
   // background: #eff1f5;
+}
+
+.table_head_wrapper {
+  height: 70px;
 }
 
 .user_row_wrapper {
@@ -54,13 +59,10 @@
 }
 
 .user_info_text {
-  color: $dark_font_color;
   font-size: 14px;
   text-align: left;
   vertical-align: middle;
-  @media (max-width: 768px) {
-    min-width: 184px;
-  }
+  min-width: 100px;
 }
 
 .avatar_wrapper {
@@ -103,7 +105,8 @@
   vertical-align: middle;
   padding-top: 5px;
   padding-bottom: 5px;
-  padding-right: 10px;
+  padding-right: 5px;
+  width: 40px;
   @media (max-width: 768px) {
     text-align: center;
   }

@@ -118,8 +118,12 @@ const RoomList: React.FC<RoomListProps> = ({ currentId, onClickRoom }) => {
       flexDir="column"
       alignItems="center"
       h="100%"
+      bg="white"
+      rounded={10}
+      py={3}
+      px="3%"
       overflowY="auto">
-      <InputGroup>
+      <InputGroup mb={3}>
         <InputLeftElement pointerEvents="none">
           <AiOutlineSearch />
         </InputLeftElement>
@@ -143,7 +147,7 @@ const RoomList: React.FC<RoomListProps> = ({ currentId, onClickRoom }) => {
       </InputGroup>
       {chatRooms.length ? (
         (searchedRooms ?? chatRooms).map((g) => (
-          <div
+          <Box
             onClick={() => g.id === Number(currentId) || onClickRoom(g)}
             key={g.id}
             style={{ width: '100%', cursor: 'pointer' }}>
@@ -158,7 +162,7 @@ const RoomList: React.FC<RoomListProps> = ({ currentId, onClickRoom }) => {
                 key={g.id}
               />
             </Box>
-          </div>
+          </Box>
         ))
       ) : (
         <Box wordBreak="break-all">
