@@ -32,7 +32,7 @@ export class AuthController {
     @Req() request: RequestWithUser,
     @Body() registrationData: User,
   ): Promise<User> {
-    if (request.user.role != UserRole.ADMIN) {
+    if (request.user.role !== UserRole.ADMIN) {
       throw new BadRequestException('The user is not admin');
     }
     const registeredUser = await this.authService.register(registrationData);
