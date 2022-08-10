@@ -954,12 +954,9 @@ const Chat: React.FC = () => {
     </Div>
   );
 
-  const renderItem = useCallback(
-    ({item, index}: {item: ChatMessage; index: number}) => {
-      return renderMessage(item, index);
-    },
-    [renderMessage],
-  );
+  const renderItem = ({item, index}: {item: ChatMessage; index: number}) => {
+    return renderMessage(item, index);
+  };
   const keyExtractor = useCallback(item => {
     if (item.id) {
       return item.id.toString();
@@ -982,7 +979,7 @@ const Chat: React.FC = () => {
             onScrollToIndexFailed={info => {
               setRenderMessageIndex(info.index);
             }}
-            windowSize={10}
+            windowSize={20}
             onEndReached={onScrollTopOnChat}
             renderItem={renderItem}
             keyExtractor={keyExtractor}
@@ -1053,7 +1050,7 @@ const Chat: React.FC = () => {
             onScrollToIndexFailed={info => {
               setRenderMessageIndex(info.index);
             }}
-            windowSize={10}
+            windowSize={20}
             onEndReached={onScrollTopOnChat}
             keyExtractor={keyExtractor}
             renderItem={renderItem}

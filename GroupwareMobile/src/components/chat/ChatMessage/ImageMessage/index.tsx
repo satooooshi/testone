@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {memo} from 'react';
 import {TouchableOpacity, useWindowDimensions} from 'react-native';
 import FastImage from 'react-native-fast-image';
 import {ChatMessage} from '../../../../types';
@@ -15,7 +15,6 @@ const ImageMessage: React.FC<ImageMessageProps> = ({
   onLongPress,
 }) => {
   const {width: windowWidth} = useWindowDimensions();
-  // console.log('---------ImageMessage', message.id);
 
   return (
     <>
@@ -24,7 +23,6 @@ const ImageMessage: React.FC<ImageMessageProps> = ({
           source={{
             uri: message.content,
             priority: FastImage.priority.low,
-            cache: 'cacheOnly',
           }}
           style={{height: 144, width: windowWidth * 0.6, borderRadius: 8}}
         />
@@ -33,4 +31,6 @@ const ImageMessage: React.FC<ImageMessageProps> = ({
   );
 };
 
-export default ImageMessage;
+export default memo(ImageMessage, (prev, next) => {
+  return prev.message.id === next.message.id;
+});

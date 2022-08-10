@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {memo} from 'react';
 import {useEffect} from 'react';
 import {useNavigation} from '@react-navigation/native';
 import {
@@ -204,4 +204,4 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
   );
 };
 
-export default ChatMessageItem;
+export default memo(ChatMessageItem);
