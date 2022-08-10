@@ -970,6 +970,15 @@ const Chat: React.FC = () => {
     </Div>
   );
 
+  const renderItem = ({item, index}: {item: ChatMessage; index: number}) => {
+    return renderMessage(item, index);
+  };
+  const keyExtractor = useCallback(item => {
+    if (item.id) {
+      return item.id.toString();
+    }
+  }, []);
+
   const messageListAvoidngKeyboardDisturb = (
     <>
       {Platform.OS === 'ios' ? (
@@ -986,10 +995,10 @@ const Chat: React.FC = () => {
             onScrollToIndexFailed={info => {
               setRenderMessageIndex(info.index);
             }}
-            onEndReached={() => onScrollTopOnChat()}
-            renderItem={({item: message, index}) =>
-              renderMessage(message, index)
-            }
+            windowSize={20}
+            onEndReached={onScrollTopOnChat}
+            renderItem={renderItem}
+            keyExtractor={keyExtractor}
           />
           {reactionTarget ? (
             reactionSelector
@@ -1057,15 +1066,10 @@ const Chat: React.FC = () => {
             onScrollToIndexFailed={info => {
               setRenderMessageIndex(info.index);
             }}
-            onEndReached={() => onScrollTopOnChat()}
-            keyExtractor={item => {
-              if (item.id) {
-                return item.id.toString();
-              }
-            }}
-            renderItem={({item: message, index}) =>
-              renderMessage(message, index)
-            }
+            windowSize={20}
+            onEndReached={onScrollTopOnChat}
+            keyExtractor={keyExtractor}
+            renderItem={renderItem}
           />
           {reactionTarget ? (
             reactionSelector
