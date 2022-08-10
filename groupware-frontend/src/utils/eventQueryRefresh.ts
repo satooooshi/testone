@@ -2,11 +2,23 @@ import { SearchQueryToGetEvents } from '@/hooks/api/event/useAPIGetEventList';
 import { DateTime } from 'luxon';
 
 export const defaultCalendarEventQuery = (): { from: string; to: string } => {
-  const now = new Date();
-  const from = DateTime.fromJSDate(now, { zone: 'Asia/Tokyo' })
-    .minus({ day: 7 })
-    .toFormat('yyyy-LL-dd');
-  const to = DateTime.fromJSDate(now).plus({ day: 31 }).toFormat('yyyy-LL-dd');
+  const calendarFirstDay = () => {
+    const date = new Date();
+    const firstDate = new Date(date.getFullYear(), date.getMonth(), 1);
+    firstDate.setDate(1);
+    const dayOfWeek = firstDate.getDay();
+    if (dayOfWeek === 0) {
+      return firstDate;
+    } else {
+      firstDate.setDate(firstDate.getDate() - dayOfWeek);
+      return firstDate;
+    }
+  };
+  const now = calendarFirstDay();
+  const from = DateTime.fromJSDate(now, { zone: 'Asia/Tokyo' }).toFormat(
+    'yyyy-LL-dd',
+  );
+  const to = DateTime.fromJSDate(now).plus({ day: 34 }).toFormat('yyyy-LL-dd');
   return { from, to };
 };
 
@@ -42,6 +54,6 @@ export const generateEventSearchQueryString = (
   if (newParticipantId) {
     refreshURL = refreshURL + `&participant_id=${newParticipantId}`;
   }
-
+  console.log('refreshURL===', refreshURL);
   return refreshURL;
 };
