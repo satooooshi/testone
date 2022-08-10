@@ -19,7 +19,7 @@ import {
   sendPushNotifToSpecificUsers,
 } from 'src/utils/notification/sendPushNotification';
 import { selectUserColumns } from 'src/utils/selectUserColumns';
-import { getManager, In, Repository } from 'typeorm';
+import { getManager, In, Repository, SimpleConsoleLogger } from 'typeorm';
 import { genSignedURL } from 'src/utils/storage/genSignedURL';
 import { StorageService } from '../storage/storage.service';
 import {
@@ -125,7 +125,7 @@ export class ChatService {
     userID: number,
     query: GetChaRoomsByPageQuery,
   ): Promise<GetRoomsResult> {
-    const { page, limit = '20', updatedAtLatestRoom } = query;
+    const { page, limit = '20' } = query;
 
     let offset = 0;
     if (page) {
@@ -134,6 +134,14 @@ export class ChatService {
     const limitNumber = Number(limit);
 
     const startTime = Date.now();
+    const updatedAtLatestRoom = query.updatedAtLatestRoom
+      ? new Date(query.updatedAtLatestRoom)
+      : undefined;
+    if (updatedAtLatestRoom) {
+      updatedAtLatestRoom.setMilliseconds(
+        updatedAtLatestRoom.getMilliseconds() + 1,
+      );
+    }
 
     const urlUnparsedRooms = await this.chatGroupRepository
       .createQueryBuilder('chat_groups')
@@ -145,7 +153,7 @@ export class ChatService {
           ? `chat_groups.updatedAt > :updatedAtLatestRoom`
           : '1=1',
         {
-          updatedAtLatestRoom: new Date(updatedAtLatestRoom),
+          updatedAtLatestRoom,
         },
       )
       .skip(offset)
@@ -221,11 +229,6 @@ export class ChatService {
           messageIds: latestMessageIds.map((t) => t.id),
         })
         .getRawMany();
-      console.log(
-        '-----++++',
-        latestMessageIds,
-        latestMessage.map((l) => l.content),
-      );
     }
 
     let rooms = await Promise.all(
@@ -262,8 +265,14 @@ export class ChatService {
 
         if (g.roomType === RoomType.PERSONAL && g.members.length === 2) {
           const chatPartner = g.members.filter((m) => m.id !== userID)[0];
-          g.imageURL = chatPartner.avatarUrl;
-          g.name = `${chatPartner.lastName} ${chatPartner.firstName}`;
+          if (chatPartner) {
+            if (chatPartner.existence) {
+              g.imageURL = chatPartner.avatarUrl;
+              g.name = `${chatPartner.lastName} ${chatPartner.firstName}`;
+            } else {
+              g.name = 'メンバーがいません';
+            }
+          }
         }
         g.imageURL = await genSignedURL(g.imageURL);
         return {
@@ -291,6 +300,7 @@ export class ChatService {
       );
     }
     const pageCount = Number(page);
+
     return { rooms, pageCount };
   }
 
@@ -347,7 +357,6 @@ export class ChatService {
       .orderBy('createdAt', 'DESC')
       .limit(1)
       .getRawMany();
-    console.log('------', pinnedUserId.length, muteUserId, latestMessage);
 
     room.chatMessages = latestMessage.length
       ? latestMessage.map((m) => ({
@@ -631,14 +640,16 @@ export class ChatService {
     const sql = this.chatMessageRepository
       .createQueryBuilder('chat_messages')
       .leftJoin('chat_messages.chatGroup', 'g')
-      .where('chat_messages.type <> :type', { type: 'system_text' })
-      .select('chat_messages.id');
+      .where('(chat_messages.type = "text" OR chat_messages.type = "call")')
+      .select(['chat_messages.id', 'chat_messages.type']);
 
     words.map((w, index) => {
       if (index === 0) {
-        sql.andWhere('chat_messages.content LIKE :word0', { word0: `%${w}%` });
+        sql.andWhere('chat_messages.content LIKE BINARY:word0', {
+          word0: `%${w}%`,
+        });
       } else {
-        sql.andWhere(`chat_messages.content LIKE :word${index}`, {
+        sql.andWhere(`chat_messages.content LIKE BINARY:word${index}`, {
           [`word${index}`]: `%${w}%`,
         });
       }
@@ -701,9 +712,7 @@ export class ChatService {
 
     // return chatGroup.lastReadChatTime.filter((l) => l.user.id !== user.id);
 
-    return chatGroup.lastReadChatTime.filter(
-      (l) => l.user && l.user.id !== user.id,
-    );
+    return chatGroup.lastReadChatTime.filter((l) => l.user);
   }
 
   public async sendMessage(

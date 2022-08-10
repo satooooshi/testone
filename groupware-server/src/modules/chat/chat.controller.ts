@@ -404,7 +404,7 @@ export class ChatController {
         id: chatGroupId.toString(),
       },
     };
-    if (chatGroup?.members.length) {
+    if (chatGroup?.members?.length) {
       await sendPushNotifToSpecificUsers(
         chatGroup?.members.map((u) => u.id),
         silentNotification,
