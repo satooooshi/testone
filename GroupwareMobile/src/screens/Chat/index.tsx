@@ -854,11 +854,27 @@ const Chat: React.FC = () => {
     (targetMsg: ChatMessage) => {
       return socket.lastReadChatTime
         ? socket.lastReadChatTime
-            .filter(t => new Date(t.readTime) >= new Date(targetMsg.createdAt))
+            .filter(
+              t =>
+                new Date(t.readTime) >= new Date(targetMsg.createdAt) &&
+                t.user.id !== targetMsg?.sender?.id,
+            )
             .map(t => t.user)
         : [];
     },
     [socket.lastReadChatTime],
+  );
+  const unReadUsers = useCallback(
+    (targetMsg: ChatMessage) => {
+      const unreadUsers = roomDetail?.members?.filter(
+        existMembers =>
+          !readUsers(targetMsg)
+            .map(u => u.id)
+            .includes(existMembers.id),
+      );
+      return unreadUsers?.filter(u => u.id !== targetMsg?.sender?.id);
+    },
+    [readUsers, roomDetail?.members],
   );
 
   const renderMessage = (message: ChatMessage, messageIndex: number) => (
@@ -1246,12 +1262,7 @@ const Chat: React.FC = () => {
             children={() =>
               selectedMessageForCheckLastRead ? (
                 <FlatList
-                  data={roomDetail?.members?.filter(
-                    existMembers =>
-                      !readUsers(selectedMessageForCheckLastRead)
-                        .map(u => u.id)
-                        .includes(existMembers.id),
-                  )}
+                  data={unReadUsers(selectedMessageForCheckLastRead)}
                   keyExtractor={item => item.id.toString()}
                   renderItem={({item}) => readUserBox(item)}
                 />

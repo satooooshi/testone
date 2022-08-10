@@ -125,7 +125,7 @@ export class ChatService {
     userID: number,
     query: GetChaRoomsByPageQuery,
   ): Promise<GetRoomsResult> {
-    const { page, limit = '20', updatedAtLatestRoom } = query;
+    const { page, limit = '20' } = query;
 
     let offset = 0;
     if (page) {
@@ -134,6 +134,14 @@ export class ChatService {
     const limitNumber = Number(limit);
 
     const startTime = Date.now();
+    const updatedAtLatestRoom = query.updatedAtLatestRoom
+      ? new Date(query.updatedAtLatestRoom)
+      : undefined;
+    if (updatedAtLatestRoom) {
+      updatedAtLatestRoom.setMilliseconds(
+        updatedAtLatestRoom.getMilliseconds() + 1,
+      );
+    }
 
     const urlUnparsedRooms = await this.chatGroupRepository
       .createQueryBuilder('chat_groups')
@@ -145,7 +153,7 @@ export class ChatService {
           ? `chat_groups.updatedAt > :updatedAtLatestRoom`
           : '1=1',
         {
-          updatedAtLatestRoom: new Date(updatedAtLatestRoom),
+          updatedAtLatestRoom,
         },
       )
       .skip(offset)
@@ -221,11 +229,6 @@ export class ChatService {
           messageIds: latestMessageIds.map((t) => t.id),
         })
         .getRawMany();
-      console.log(
-        '-----++++',
-        latestMessageIds,
-        latestMessage.map((l) => l.content),
-      );
     }
 
     let rooms = await Promise.all(
@@ -297,6 +300,7 @@ export class ChatService {
       );
     }
     const pageCount = Number(page);
+
     return { rooms, pageCount };
   }
 
@@ -353,7 +357,6 @@ export class ChatService {
       .orderBy('createdAt', 'DESC')
       .limit(1)
       .getRawMany();
-    console.log('------', pinnedUserId.length, muteUserId, latestMessage);
 
     room.chatMessages = latestMessage.length
       ? latestMessage.map((m) => ({
@@ -709,9 +712,7 @@ export class ChatService {
 
     // return chatGroup.lastReadChatTime.filter((l) => l.user.id !== user.id);
 
-    return chatGroup.lastReadChatTime.filter(
-      (l) => l.user && l.user.id !== user.id,
-    );
+    return chatGroup.lastReadChatTime.filter((l) => l.user);
   }
 
   public async sendMessage(

@@ -82,6 +82,7 @@ export class UserController {
   async getAllInfoById(@Param() params: { id: number }): Promise<User> {
     const { id } = params;
     const userProfile = await this.userService.getAllInfoById(id);
+
     return userProfile;
   }
 
@@ -108,9 +109,12 @@ export class UserController {
     @Req() request: RequestWithUser,
     @Body() user: Partial<User>,
   ): Promise<User> {
-    if (!user.id) {
-      return await this.userService.saveUser({ ...request.user, ...user });
+    if (!user?.id) {
+      throw new BadRequestException('The user is not exist');
     }
+    // if (!user.id) {
+    //   return await this.userService.saveUser({ ...request.user, ...user });
+    // }
     return await this.userService.saveUser(user);
   }
 
