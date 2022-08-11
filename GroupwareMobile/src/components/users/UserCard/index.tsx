@@ -8,13 +8,12 @@ import {userCardStyles} from '../../../styles/component/user/userCard.style';
 import {TagType, User, UserTag} from '../../../types';
 import {grayColor, darkFontColor} from '../../../utils/colors';
 import {tagTypeNameFactory} from '../../../utils/factory/tag/tagTypeNameFactory';
-import { tagBgColorFactory } from '../../../utils/factory/tagBgColorFactory';
+import {tagBgColorFactory} from '../../../utils/factory/tagBgColorFactory';
 import {tagColorFactory} from '../../../utils/factory/tagColorFactory';
-import { tagFontColorFactory } from '../../../utils/factory/tagFontColorFactory';
+import {tagFontColorFactory} from '../../../utils/factory/tagFontColorFactory';
 import {userNameFactory} from '../../../utils/factory/userNameFactory';
 import {userNameKanaFactory} from '../../../utils/factory/userNameKanaFactory';
 import UserAvatar from '../../common/UserAvatar';
-
 
 type UserCardProps = {
   user: User;
