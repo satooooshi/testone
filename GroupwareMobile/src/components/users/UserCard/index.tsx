@@ -85,7 +85,7 @@ const UserCard: React.FC<UserCardProps> = ({user, filteredDuration}) => {
             my={12}
             color="gray"
             numberOfLines={3}
-            letterSpacing={1}>
+            letterSpacing={0.5}>
             {user.introduceOther || '未設定'}
           </Text>
           {/* <Div
@@ -131,7 +131,7 @@ const UserCard: React.FC<UserCardProps> = ({user, filteredDuration}) => {
         </Div>
       </Div>
       <Div mb={'xs'} flexDir="row" alignItems="center">
-        <Text w={'13%'} fontSize={14}>{`${tagTypeNameFactory(
+        <Text w={60} fontSize={14} color="gray">{`${tagTypeNameFactory(
           TagType.TECH,
         )}:`}</Text>
         {techTags?.length ? (
@@ -165,7 +165,7 @@ const UserCard: React.FC<UserCardProps> = ({user, filteredDuration}) => {
         )}
       </Div>
       <Div mb={'xs'} flexDir="row" alignItems="center">
-        <Text w={'13%'} fontSize={14}>{`${tagTypeNameFactory(
+        <Text w={60} fontSize={14} color="gray">{`${tagTypeNameFactory(
           TagType.QUALIFICATION,
         )}:`}</Text>
         {qualificationTags?.length ? (
@@ -199,7 +199,7 @@ const UserCard: React.FC<UserCardProps> = ({user, filteredDuration}) => {
         )}
       </Div>
       <Div mb={'xs'} flexDir="row" alignItems="center">
-        <Text w={'13%'} fontSize={14}>{`${tagTypeNameFactory(
+        <Text w={60} fontSize={14} color="gray">{`${tagTypeNameFactory(
           TagType.CLUB,
         )}:`}</Text>
         {clubTags?.length ? (
@@ -233,7 +233,7 @@ const UserCard: React.FC<UserCardProps> = ({user, filteredDuration}) => {
         )}
       </Div>
       <Div mb={'xs'} flexDir="row" alignItems="center">
-        <Text w={'13%'} fontSize={14}>{`${tagTypeNameFactory(
+        <Text w={60} fontSize={14} color="gray">{`${tagTypeNameFactory(
           TagType.HOBBY,
         )}:`}</Text>
         {hobbyTags?.length ? (
