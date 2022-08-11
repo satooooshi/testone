@@ -64,14 +64,7 @@ const UserCard: React.FC<UserCardProps> = ({user, filteredDuration}) => {
 
   return (
     <TouchableHighlight underlayColor="none" onPress={navigateToAccountScreen}>
-      <Div
-        bg={grayColor}
-        w={windowWidth * 0.9}
-        rounded="md"
-        shadow="md"
-        p="xs"
-        borderWidth={1}
-        borderColor={'gray500'}>
+      <Div bg="white" w={windowWidth * 0.9} rounded="xl" p="lg">
         <Div px="xs" justifyContent="space-between" flexDir="row">
           <UserAvatar
             user={user}
