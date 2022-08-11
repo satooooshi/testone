@@ -106,7 +106,7 @@ const RoomCard: React.FC<RoomCardProps> = ({
           alignItems="center"
           rounded="lg"
           flexDir="row">
-          <Div>
+          <Div mr="xs">
             <FastImage
               source={
                 room.imageURL
@@ -161,11 +161,16 @@ const RoomCard: React.FC<RoomCardProps> = ({
               room.members?.length || 0
             }人のメンバー`}</Text>
             <Div
+              mt={4}
               flexDir="row"
               justifyContent="space-between"
               alignItems="center">
               <Div flex={1} pr={1}>
-                <Text fontSize={14} color={darkFontColor} numberOfLines={1}>
+                <Text
+                  fontSize={14}
+                  letterSpacing={0.5}
+                  color="gray500"
+                  numberOfLines={1}>
                   {room.chatMessages?.length
                     ? latestMessage(room.chatMessages[0])
                     : ''}
