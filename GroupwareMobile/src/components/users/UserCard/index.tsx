@@ -1,7 +1,7 @@
 import {useNavigation, useRoute} from '@react-navigation/native';
 import React from 'react';
 import {FlatList, TouchableHighlight, useWindowDimensions} from 'react-native';
-import {Text, Div, Tag} from 'react-native-magnus';
+import {Text, Div, Tag, Button} from 'react-native-magnus';
 import {useAuthenticate} from '../../../contexts/useAuthenticate';
 import {useTagType} from '../../../hooks/tag/useTagType';
 import {userCardStyles} from '../../../styles/component/user/userCard.style';
@@ -63,26 +63,25 @@ const UserCard: React.FC<UserCardProps> = ({user, filteredDuration}) => {
   };
 
   return (
-    <TouchableHighlight underlayColor="none" onPress={navigateToAccountScreen}>
-      <Div bg="white" w={windowWidth * 0.9} rounded="xl" p="lg">
-        <Div px="xs" justifyContent="space-between" flexDir="row">
-          <UserAvatar
-            user={user}
-            w={120}
-            h={120}
-            onPress={navigateToAccountScreen}
-          />
-          <Div w={'60%'}>
-            <Text fontSize={18} fontWeight="bold" color={darkFontColor}>
-              {userNameFactory(user)}
-            </Text>
-            <Text fontSize={14} fontWeight="bold" color={darkFontColor}>
-              {userNameKanaFactory(user)}
-            </Text>
-            <Text fontSize={16} color={darkFontColor} numberOfLines={2}>
-              {user.introduceOther || '未設定'}
-            </Text>
-            <Div
+    <Div bg="white" w={windowWidth * 0.9} rounded="xl" p="lg">
+      <Div px="xs" justifyContent="space-between" flexDir="row">
+        <UserAvatar
+          user={user}
+          w={100}
+          h={100}
+          onPress={navigateToAccountScreen}
+        />
+        <Div w={'60%'}>
+          <Text fontSize={18} fontWeight="bold" color="black">
+            {userNameFactory(user)}
+          </Text>
+          <Text fontSize={12} color="gray">
+            {userNameKanaFactory(user)}
+          </Text>
+          <Text fontSize={14} my={12} color="gray" numberOfLines={3}>
+            {user.introduceOther || '未設定'}
+          </Text>
+          {/* <Div
               flexDir="row"
               w={'80%'}
               justifyContent="space-between"
@@ -121,154 +120,157 @@ const UserCard: React.FC<UserCardProps> = ({user, filteredDuration}) => {
               <Text color="blue700" fontWeight="bold" fontSize={18}>
                 {user.knowledgeCount || 0}
               </Text>
-            </Div>
-          </Div>
-        </Div>
-        <Div pl="xs" mb={'xs'} flexDir="row" alignItems="center">
-          <Text w={'13%'} fontSize={14}>{`${tagTypeNameFactory(
-            TagType.TECH,
-          )}:`}</Text>
-          {techTags?.length ? (
-            <FlatList
-              style={userCardStyles.tagList}
-              horizontal
-              data={techTags}
-              renderItem={({item: t}) => (
-                <Tag
-                  onPress={() => onPressTag(t)}
-                  fontSize={'lg'}
-                  h={28}
-                  py={0}
-                  bg={tagColorFactory(t.type)}
-                  color="white"
-                  mr={4}>
-                  {t.name}
-                </Tag>
-              )}
-            />
-          ) : (
-            <Tag
-              fontSize={'lg'}
-              h={28}
-              py={0}
-              bg={tagColorFactory(TagType.TECH)}
-              color="white"
-              mr={4}>
-              未設定
-            </Tag>
-          )}
-        </Div>
-        <Div pl="xs" mb={'xs'} flexDir="row" alignItems="center">
-          <Text w={'13%'} fontSize={14}>{`${tagTypeNameFactory(
-            TagType.QUALIFICATION,
-          )}:`}</Text>
-          {qualificationTags?.length ? (
-            <FlatList
-              style={userCardStyles.tagList}
-              horizontal
-              data={qualificationTags}
-              renderItem={({item: t}) => (
-                <Tag
-                  onPress={() => onPressTag(t)}
-                  fontSize={'lg'}
-                  h={28}
-                  py={0}
-                  bg={tagColorFactory(t.type)}
-                  color="white"
-                  mr={4}>
-                  {t.name}
-                </Tag>
-              )}
-            />
-          ) : (
-            <Tag
-              fontSize={'lg'}
-              h={28}
-              py={0}
-              bg={tagColorFactory(TagType.QUALIFICATION)}
-              color="white"
-              mr={4}>
-              未設定
-            </Tag>
-          )}
-        </Div>
-        <Div pl="xs" mb={'xs'} flexDir="row" alignItems="center">
-          <Text w={'13%'} fontSize={14}>{`${tagTypeNameFactory(
-            TagType.CLUB,
-          )}:`}</Text>
-          {clubTags?.length ? (
-            <FlatList
-              style={userCardStyles.tagList}
-              horizontal
-              data={clubTags}
-              renderItem={({item: t}) => (
-                <Tag
-                  onPress={() => onPressTag(t)}
-                  fontSize={'lg'}
-                  h={28}
-                  py={0}
-                  bg={tagColorFactory(t.type)}
-                  color="white"
-                  mr={4}>
-                  {t.name}
-                </Tag>
-              )}
-            />
-          ) : (
-            <Tag
-              fontSize={'lg'}
-              h={28}
-              py={0}
-              bg={tagColorFactory(TagType.CLUB)}
-              color="white"
-              mr={4}>
-              未設定
-            </Tag>
-          )}
-        </Div>
-        <Div pl="xs" mb={'xs'} flexDir="row" alignItems="center">
-          <Text w={'13%'} fontSize={14}>{`${tagTypeNameFactory(
-            TagType.HOBBY,
-          )}:`}</Text>
-          {hobbyTags?.length ? (
-            <FlatList
-              style={userCardStyles.tagList}
-              horizontal
-              data={hobbyTags}
-              renderItem={({item: t}) => (
-                <Tag
-                  onPress={() => onPressTag(t)}
-                  fontSize={'lg'}
-                  h={28}
-                  py={0}
-                  bg={tagColorFactory(t.type)}
-                  color="white"
-                  mr={4}>
-                  {t.name}
-                </Tag>
-              )}
-            />
-          ) : (
-            <Tag
-              fontSize={'lg'}
-              h={28}
-              py={0}
-              bg={tagColorFactory(TagType.HOBBY)}
-              color="white"
-              mr={4}>
-              未設定
-            </Tag>
-          )}
-        </Div>
-        <Div mt={20}>
-          <Button bg="indigo100" rounded="circle" alignSelf="center">
-            <Text fontWeight="bold" fontSize={16} color="blue700">
-              プロフィールを見る
-            </Text>
-          </Button>
+            </Div> */}
         </Div>
       </Div>
-    </TouchableHighlight>
+      <Div pl="xs" mb={'xs'} flexDir="row" alignItems="center">
+        <Text w={'13%'} fontSize={14}>{`${tagTypeNameFactory(
+          TagType.TECH,
+        )}:`}</Text>
+        {techTags?.length ? (
+          <FlatList
+            style={userCardStyles.tagList}
+            horizontal
+            data={techTags}
+            renderItem={({item: t}) => (
+              <Tag
+                onPress={() => onPressTag(t)}
+                fontSize={'lg'}
+                h={28}
+                py={0}
+                bg={tagColorFactory(t.type)}
+                color="white"
+                mr={4}>
+                {t.name}
+              </Tag>
+            )}
+          />
+        ) : (
+          <Tag
+            fontSize={'lg'}
+            h={28}
+            py={0}
+            bg={tagColorFactory(TagType.TECH)}
+            color="white"
+            mr={4}>
+            未設定
+          </Tag>
+        )}
+      </Div>
+      <Div pl="xs" mb={'xs'} flexDir="row" alignItems="center">
+        <Text w={'13%'} fontSize={14}>{`${tagTypeNameFactory(
+          TagType.QUALIFICATION,
+        )}:`}</Text>
+        {qualificationTags?.length ? (
+          <FlatList
+            style={userCardStyles.tagList}
+            horizontal
+            data={qualificationTags}
+            renderItem={({item: t}) => (
+              <Tag
+                onPress={() => onPressTag(t)}
+                fontSize={'lg'}
+                h={28}
+                py={0}
+                bg={tagColorFactory(t.type)}
+                color="white"
+                mr={4}>
+                {t.name}
+              </Tag>
+            )}
+          />
+        ) : (
+          <Tag
+            fontSize={'lg'}
+            h={28}
+            py={0}
+            bg={tagColorFactory(TagType.QUALIFICATION)}
+            color="white"
+            mr={4}>
+            未設定
+          </Tag>
+        )}
+      </Div>
+      <Div pl="xs" mb={'xs'} flexDir="row" alignItems="center">
+        <Text w={'13%'} fontSize={14}>{`${tagTypeNameFactory(
+          TagType.CLUB,
+        )}:`}</Text>
+        {clubTags?.length ? (
+          <FlatList
+            style={userCardStyles.tagList}
+            horizontal
+            data={clubTags}
+            renderItem={({item: t}) => (
+              <Tag
+                onPress={() => onPressTag(t)}
+                fontSize={'lg'}
+                h={28}
+                py={0}
+                bg={tagColorFactory(t.type)}
+                color="white"
+                mr={4}>
+                {t.name}
+              </Tag>
+            )}
+          />
+        ) : (
+          <Tag
+            fontSize={'lg'}
+            h={28}
+            py={0}
+            bg={tagColorFactory(TagType.CLUB)}
+            color="white"
+            mr={4}>
+            未設定
+          </Tag>
+        )}
+      </Div>
+      <Div pl="xs" mb={'xs'} flexDir="row" alignItems="center">
+        <Text w={'13%'} fontSize={14}>{`${tagTypeNameFactory(
+          TagType.HOBBY,
+        )}:`}</Text>
+        {hobbyTags?.length ? (
+          <FlatList
+            style={userCardStyles.tagList}
+            horizontal
+            data={hobbyTags}
+            renderItem={({item: t}) => (
+              <Tag
+                onPress={() => onPressTag(t)}
+                fontSize={'lg'}
+                h={28}
+                py={0}
+                bg={tagColorFactory(t.type)}
+                color="white"
+                mr={4}>
+                {t.name}
+              </Tag>
+            )}
+          />
+        ) : (
+          <Tag
+            fontSize={'lg'}
+            h={28}
+            py={0}
+            bg={tagColorFactory(TagType.HOBBY)}
+            color="white"
+            mr={4}>
+            未設定
+          </Tag>
+        )}
+      </Div>
+      <Div mt={20}>
+        <Button
+          bg="indigo100"
+          rounded="circle"
+          alignSelf="center"
+          onPress={navigateToAccountScreen}>
+          <Text fontWeight="bold" fontSize={16} color="blue700">
+            プロフィールを見る
+          </Text>
+        </Button>
+      </Div>
+    </Div>
   );
 };
 
