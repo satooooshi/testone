@@ -260,6 +260,13 @@ const UserCard: React.FC<UserCardProps> = ({user, filteredDuration}) => {
             </Tag>
           )}
         </Div>
+        <Div mt={20}>
+          <Button bg="indigo100" rounded="circle" alignSelf="center">
+            <Text fontWeight="bold" fontSize={16} color="blue700">
+              プロフィールを見る
+            </Text>
+          </Button>
+        </Div>
       </Div>
     </TouchableHighlight>
   );
