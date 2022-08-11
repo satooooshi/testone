@@ -64,21 +64,24 @@ const UserCard: React.FC<UserCardProps> = ({user, filteredDuration}) => {
 
   return (
     <Div bg="white" w={windowWidth * 0.9} rounded="xl" p="lg">
-      <Div px="xs" justifyContent="space-between" flexDir="row">
-        <UserAvatar
-          user={user}
-          w={100}
-          h={100}
-          onPress={navigateToAccountScreen}
-        />
-        <Div w={'60%'}>
+      <Div mb="lg" justifyContent="space-between" flexDir="row">
+        <Div mr={10}>
+          <UserAvatar
+            user={user}
+            w={100}
+            h={100}
+            onPress={navigateToAccountScreen}
+          />
+        </Div>
+        <Div flex={1}>
           <Text fontSize={18} fontWeight="bold" color="black">
             {userNameFactory(user)}
           </Text>
           <Text fontSize={12} color="gray">
             {userNameKanaFactory(user)}
           </Text>
-          <Text fontSize={14} my={12} color="gray" numberOfLines={3}>
+          {/* <Text fontSize={14} my={12} color="gray"> */}
+          <Text fontSize={12} my={12} color="gray" numberOfLines={3}>
             {user.introduceOther || '未設定'}
           </Text>
           {/* <Div
@@ -123,7 +126,7 @@ const UserCard: React.FC<UserCardProps> = ({user, filteredDuration}) => {
             </Div> */}
         </Div>
       </Div>
-      <Div pl="xs" mb={'xs'} flexDir="row" alignItems="center">
+      <Div mb={'xs'} flexDir="row" alignItems="center">
         <Text w={'13%'} fontSize={14}>{`${tagTypeNameFactory(
           TagType.TECH,
         )}:`}</Text>
@@ -157,7 +160,7 @@ const UserCard: React.FC<UserCardProps> = ({user, filteredDuration}) => {
           </Tag>
         )}
       </Div>
-      <Div pl="xs" mb={'xs'} flexDir="row" alignItems="center">
+      <Div mb={'xs'} flexDir="row" alignItems="center">
         <Text w={'13%'} fontSize={14}>{`${tagTypeNameFactory(
           TagType.QUALIFICATION,
         )}:`}</Text>
@@ -191,7 +194,7 @@ const UserCard: React.FC<UserCardProps> = ({user, filteredDuration}) => {
           </Tag>
         )}
       </Div>
-      <Div pl="xs" mb={'xs'} flexDir="row" alignItems="center">
+      <Div mb={'xs'} flexDir="row" alignItems="center">
         <Text w={'13%'} fontSize={14}>{`${tagTypeNameFactory(
           TagType.CLUB,
         )}:`}</Text>
@@ -225,7 +228,7 @@ const UserCard: React.FC<UserCardProps> = ({user, filteredDuration}) => {
           </Tag>
         )}
       </Div>
-      <Div pl="xs" mb={'xs'} flexDir="row" alignItems="center">
+      <Div mb={'xs'} flexDir="row" alignItems="center">
         <Text w={'13%'} fontSize={14}>{`${tagTypeNameFactory(
           TagType.HOBBY,
         )}:`}</Text>
