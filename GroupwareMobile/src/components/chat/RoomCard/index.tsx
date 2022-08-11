@@ -179,18 +179,7 @@ const RoomCard: React.FC<RoomCardProps> = ({
                 ? latestMessage(room.chatMessages[0])
                 : ''}
             </Text>
-            <Div flexDir="row" justifyContent="space-between">
-              <Text>{`${room.members?.length || 0}人のメンバー`}</Text>
-              <Text>
-                {dateTimeFormatterFromJSDDate({
-                  dateTime: new Date(
-                    room?.chatMessages?.[0]?.createdAt
-                      ? room?.chatMessages?.[0]?.createdAt
-                      : room.updatedAt,
-                  ),
-                })}
-              </Text>
-            </Div>
+            <Text>{`${room.members?.length || 0}人のメンバー`}</Text>
           </Div>
         </Div>
       </Swipeable>
