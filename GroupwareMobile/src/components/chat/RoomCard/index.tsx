@@ -99,20 +99,12 @@ const RoomCard: React.FC<RoomCardProps> = ({
         containerStyle={tailwind('rounded-sm')}
         renderRightActions={rightSwipeActions}>
         <Div
-          bg={
-            dangerousBgColor
-              ? dangerousBgColor
-              : room?.unreadCount
-              ? 'white'
-              : 'gray300'
-          }
-          borderColor={'white'}
-          borderWidth={1}
+          bg={dangerousBgColor ? dangerousBgColor : 'white'}
           w={windowWidth * 0.9}
-          shadow="sm"
-          p={4}
-          h={70}
+          p="sm"
+          h={90}
           alignItems="center"
+          rounded="lg"
           flexDir="row">
           <Div>
             <FastImage
@@ -123,37 +115,47 @@ const RoomCard: React.FC<RoomCardProps> = ({
               }
               style={roomCardStyles.image}
             />
-            {room.isPinned && (
-              <Icon
-                name="pin"
-                fontSize={18}
-                color="green500"
-                bg="white"
-                rounded="circle"
-                borderWidth={1}
-                borderColor={'green500'}
-                fontFamily="MaterialCommunityIcons"
-                style={Platform.OS === 'android' && roomCardStyles.pinIcon}
-                position="absolute"
-                bottom={0}
-                right={0}
-              />
-            )}
+            <Icon
+              name={room.isPinned ? 'pin' : 'pin-outline'}
+              fontSize={22}
+              color="blue600"
+              p={2}
+              bg="blue100"
+              rounded="circle"
+              fontFamily="MaterialCommunityIcons"
+              style={Platform.OS === 'android' && roomCardStyles.pinIcon}
+              position="absolute"
+            />
           </Div>
-          <Div w={'75%'} pr={'sm'}>
-            <Div flexDir="row" mb={'xs'} w={'85%'}>
-              <Text numberOfLines={1} fontWeight="bold" fontSize={16}>
-                {nameOfRoom(room, user)}
+          <Div flex={1}>
+            <Div
+              flexDir="row"
+              mb={'xs'}
+              justifyContent="space-between"
+              alignItems="center">
+              <Div flex={1}>
+                <Text numberOfLines={1} fontWeight="bold" fontSize={16}>
+                  {nameOfRoom(room, user)}
+                </Text>
+                {room.muteUsers &&
+                room.muteUsers.filter(u => u.id === user?.id).length ? (
+                  <Icon
+                    ml={3}
+                    name="volume-mute-outline"
+                    fontFamily="Ionicons"
+                    fontSize={16}
+                  />
+                ) : null}
+              </Div>
+              <Text fontSize={11}>
+                {dateTimeFormatterFromJSDDate({
+                  dateTime: new Date(
+                    room?.chatMessages?.[0]?.createdAt
+                      ? room?.chatMessages?.[0]?.createdAt
+                      : room.updatedAt,
+                  ),
+                })}
               </Text>
-              {room.muteUsers &&
-              room.muteUsers.filter(u => u.id === user?.id).length ? (
-                <Icon
-                  ml={3}
-                  name="volume-mute-outline"
-                  fontFamily="Ionicons"
-                  fontSize={16}
-                />
-              ) : null}
             </Div>
             {room?.unreadCount && room?.unreadCount > 0 ? (
               <Badge
