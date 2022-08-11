@@ -170,6 +170,7 @@ const RoomCard: React.FC<RoomCardProps> = ({
                 {`${room?.unreadCount}`}
               </Badge>
             ) : null}
+            <Text>{`${room.members?.length || 0}人のメンバー`}</Text>
             <Text
               mb={'xs'}
               fontSize={14}
@@ -179,7 +180,6 @@ const RoomCard: React.FC<RoomCardProps> = ({
                 ? latestMessage(room.chatMessages[0])
                 : ''}
             </Text>
-            <Text>{`${room.members?.length || 0}人のメンバー`}</Text>
           </Div>
         </Div>
       </Swipeable>
