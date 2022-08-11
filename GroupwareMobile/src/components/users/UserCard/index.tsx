@@ -6,10 +6,8 @@ import {useAuthenticate} from '../../../contexts/useAuthenticate';
 import {useTagType} from '../../../hooks/tag/useTagType';
 import {userCardStyles} from '../../../styles/component/user/userCard.style';
 import {TagType, User, UserTag} from '../../../types';
-import {grayColor, darkFontColor} from '../../../utils/colors';
 import {tagTypeNameFactory} from '../../../utils/factory/tag/tagTypeNameFactory';
 import {tagBgColorFactory} from '../../../utils/factory/tagBgColorFactory';
-import {tagColorFactory} from '../../../utils/factory/tagColorFactory';
 import {tagFontColorFactory} from '../../../utils/factory/tagFontColorFactory';
 import {userNameFactory} from '../../../utils/factory/userNameFactory';
 import {userNameKanaFactory} from '../../../utils/factory/userNameKanaFactory';
@@ -90,46 +88,6 @@ const UserCard: React.FC<UserCardProps> = ({user, filteredDuration}) => {
             letterSpacing={0.5}>
             {user.introduceOther || '未設定'}
           </Text>
-          {/* <Div
-              flexDir="row"
-              w={'80%'}
-              justifyContent="space-between"
-              alignItems="center">
-              <Text fontSize={14}>イベント参加数{durationText()}</Text>
-              <Text color="blue700" fontWeight="bold" fontSize={18}>
-                {user.eventCount || 0}
-              </Text>
-            </Div>
-            <Div
-              flexDir="row"
-              w={'80%'}
-              justifyContent="space-between"
-              alignItems="center">
-              <Text fontSize={14}>質問数{durationText()}</Text>
-              <Text color="blue700" fontWeight="bold" fontSize={18}>
-                {user.questionCount || 0}
-              </Text>
-            </Div>
-            <Div
-              flexDir="row"
-              w={'80%'}
-              justifyContent="space-between"
-              alignItems="center">
-              <Text fontSize={14}>質問回答数{durationText()}</Text>
-              <Text color="blue700" fontWeight="bold" fontSize={18}>
-                {user.answerCount || 0}
-              </Text>
-            </Div>
-            <Div
-              flexDir="row"
-              w={'80%'}
-              justifyContent="space-between"
-              alignItems="center">
-              <Text fontSize={14}>ナレッジ投稿数{durationText()}</Text>
-              <Text color="blue700" fontWeight="bold" fontSize={18}>
-                {user.knowledgeCount || 0}
-              </Text>
-            </Div> */}
         </Div>
       </Div>
       <Div mb={'xs'} flexDir="row" alignItems="center">
@@ -234,7 +192,7 @@ const UserCard: React.FC<UserCardProps> = ({user, filteredDuration}) => {
           </Tag>
         )}
       </Div>
-      <Div mb={'xs'} flexDir="row" alignItems="center">
+      <Div mb={'lg'} flexDir="row" alignItems="center">
         <Text w={50} fontSize={14} color="gray">{`${tagTypeNameFactory(
           TagType.HOBBY,
         )}:`}</Text>
@@ -268,9 +226,43 @@ const UserCard: React.FC<UserCardProps> = ({user, filteredDuration}) => {
           </Tag>
         )}
       </Div>
+      <Div>
+        {durationText() ? (
+          <Text mb="sm" fontSize={10} color="gray">
+            {durationText()}
+          </Text>
+        ) : null}
+      </Div>
+      <Div flexDir="row">
+        <Text color="gray" fontSize={10} mr={5}>
+          イベント参加数
+        </Text>
+        <Text color="gray" fontSize={10} mr={15}>
+          {user.eventCount || 0}
+        </Text>
+        <Text color="gray" fontSize={10} mr={5}>
+          質問数
+        </Text>
+        <Text color="gray" fontSize={10} mr={15}>
+          {user.questionCount || 0}
+        </Text>
+        <Text color="gray" fontSize={10} mr={5}>
+          質問回答数
+        </Text>
+        <Text color="gray" fontSize={10} mr={15}>
+          {user.answerCount || 0}
+        </Text>
+        <Text color="gray" fontSize={10} mr={5}>
+          ナレッジ投稿数
+        </Text>
+        <Text color="gray" fontSize={10} mr={15}>
+          {user.knowledgeCount || 0}
+        </Text>
+      </Div>
       <Div mt={20}>
         <Button
           bg="indigo100"
+          px={15}
           rounded="circle"
           alignSelf="center"
           onPress={navigateToAccountScreen}>
