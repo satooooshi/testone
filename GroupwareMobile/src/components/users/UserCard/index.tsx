@@ -8,10 +8,13 @@ import {userCardStyles} from '../../../styles/component/user/userCard.style';
 import {TagType, User, UserTag} from '../../../types';
 import {grayColor, darkFontColor} from '../../../utils/colors';
 import {tagTypeNameFactory} from '../../../utils/factory/tag/tagTypeNameFactory';
+import { tagBgColorFactory } from '../../../utils/factory/tagBgColorFactory';
 import {tagColorFactory} from '../../../utils/factory/tagColorFactory';
+import { tagFontColorFactory } from '../../../utils/factory/tagFontColorFactory';
 import {userNameFactory} from '../../../utils/factory/userNameFactory';
 import {userNameKanaFactory} from '../../../utils/factory/userNameKanaFactory';
 import UserAvatar from '../../common/UserAvatar';
+
 
 type UserCardProps = {
   user: User;
@@ -131,7 +134,7 @@ const UserCard: React.FC<UserCardProps> = ({user, filteredDuration}) => {
         </Div>
       </Div>
       <Div mb={'xs'} flexDir="row" alignItems="center">
-        <Text w={60} fontSize={14} color="gray">{`${tagTypeNameFactory(
+        <Text w={50} fontSize={14} color="gray">{`${tagTypeNameFactory(
           TagType.TECH,
         )}:`}</Text>
         {techTags?.length ? (
@@ -142,11 +145,11 @@ const UserCard: React.FC<UserCardProps> = ({user, filteredDuration}) => {
             renderItem={({item: t}) => (
               <Tag
                 onPress={() => onPressTag(t)}
-                fontSize={'lg'}
-                h={28}
+                fontSize={'md'}
+                h={24}
                 py={0}
-                bg={tagColorFactory(t.type)}
-                color="white"
+                bg={tagBgColorFactory(t.type)}
+                color={tagFontColorFactory(t.type)}
                 mr={4}>
                 {t.name}
               </Tag>
@@ -154,18 +157,18 @@ const UserCard: React.FC<UserCardProps> = ({user, filteredDuration}) => {
           />
         ) : (
           <Tag
-            fontSize={'lg'}
-            h={28}
+            fontSize={'md'}
+            h={24}
             py={0}
-            bg={tagColorFactory(TagType.TECH)}
-            color="white"
+            bg={tagBgColorFactory(TagType.TECH)}
+            color={tagFontColorFactory(TagType.TECH)}
             mr={4}>
             未設定
           </Tag>
         )}
       </Div>
       <Div mb={'xs'} flexDir="row" alignItems="center">
-        <Text w={60} fontSize={14} color="gray">{`${tagTypeNameFactory(
+        <Text w={50} fontSize={14} color="gray">{`${tagTypeNameFactory(
           TagType.QUALIFICATION,
         )}:`}</Text>
         {qualificationTags?.length ? (
@@ -176,11 +179,11 @@ const UserCard: React.FC<UserCardProps> = ({user, filteredDuration}) => {
             renderItem={({item: t}) => (
               <Tag
                 onPress={() => onPressTag(t)}
-                fontSize={'lg'}
-                h={28}
+                fontSize={'md'}
+                h={24}
                 py={0}
-                bg={tagColorFactory(t.type)}
-                color="white"
+                bg={tagBgColorFactory(t.type)}
+                color={tagFontColorFactory(t.type)}
                 mr={4}>
                 {t.name}
               </Tag>
@@ -188,18 +191,18 @@ const UserCard: React.FC<UserCardProps> = ({user, filteredDuration}) => {
           />
         ) : (
           <Tag
-            fontSize={'lg'}
-            h={28}
+            fontSize={'md'}
+            h={24}
             py={0}
-            bg={tagColorFactory(TagType.QUALIFICATION)}
-            color="white"
+            bg={tagBgColorFactory(TagType.QUALIFICATION)}
+            color={tagFontColorFactory(TagType.QUALIFICATION)}
             mr={4}>
             未設定
           </Tag>
         )}
       </Div>
       <Div mb={'xs'} flexDir="row" alignItems="center">
-        <Text w={60} fontSize={14} color="gray">{`${tagTypeNameFactory(
+        <Text w={50} fontSize={14} color="gray">{`${tagTypeNameFactory(
           TagType.CLUB,
         )}:`}</Text>
         {clubTags?.length ? (
@@ -210,11 +213,11 @@ const UserCard: React.FC<UserCardProps> = ({user, filteredDuration}) => {
             renderItem={({item: t}) => (
               <Tag
                 onPress={() => onPressTag(t)}
-                fontSize={'lg'}
-                h={28}
+                fontSize={'md'}
+                h={24}
                 py={0}
-                bg={tagColorFactory(t.type)}
-                color="white"
+                bg={tagBgColorFactory(t.type)}
+                color={tagFontColorFactory(t.type)}
                 mr={4}>
                 {t.name}
               </Tag>
@@ -222,18 +225,18 @@ const UserCard: React.FC<UserCardProps> = ({user, filteredDuration}) => {
           />
         ) : (
           <Tag
-            fontSize={'lg'}
-            h={28}
+            fontSize={'md'}
+            h={24}
             py={0}
-            bg={tagColorFactory(TagType.CLUB)}
-            color="white"
+            bg={tagBgColorFactory(TagType.CLUB)}
+            color={tagFontColorFactory(TagType.CLUB)}
             mr={4}>
             未設定
           </Tag>
         )}
       </Div>
       <Div mb={'xs'} flexDir="row" alignItems="center">
-        <Text w={60} fontSize={14} color="gray">{`${tagTypeNameFactory(
+        <Text w={50} fontSize={14} color="gray">{`${tagTypeNameFactory(
           TagType.HOBBY,
         )}:`}</Text>
         {hobbyTags?.length ? (
@@ -244,11 +247,11 @@ const UserCard: React.FC<UserCardProps> = ({user, filteredDuration}) => {
             renderItem={({item: t}) => (
               <Tag
                 onPress={() => onPressTag(t)}
-                fontSize={'lg'}
-                h={28}
+                fontSize={'md'}
+                h={24}
                 py={0}
-                bg={tagColorFactory(t.type)}
-                color="white"
+                bg={tagBgColorFactory(t.type)}
+                color={tagFontColorFactory(t.type)}
                 mr={4}>
                 {t.name}
               </Tag>
@@ -256,11 +259,11 @@ const UserCard: React.FC<UserCardProps> = ({user, filteredDuration}) => {
           />
         ) : (
           <Tag
-            fontSize={'lg'}
-            h={28}
+            fontSize={'md'}
+            h={24}
             py={0}
-            bg={tagColorFactory(TagType.HOBBY)}
-            color="white"
+            bg={tagBgColorFactory(TagType.HOBBY)}
+            color={tagFontColorFactory(TagType.HOBBY)}
             mr={4}>
             未設定
           </Tag>
