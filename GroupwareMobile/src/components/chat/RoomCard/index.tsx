@@ -157,6 +157,7 @@ const RoomCard: React.FC<RoomCardProps> = ({
             </Div>
             {room?.unreadCount && room?.unreadCount > 0 ? (
               <Badge
+                // eslint-disable-next-line react-native/no-inline-styles
                 style={{
                   position: 'absolute',
                   left: windowWidth * 0.6,
