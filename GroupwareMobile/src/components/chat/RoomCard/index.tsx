@@ -101,7 +101,7 @@ const RoomCard: React.FC<RoomCardProps> = ({
         <Div
           bg={dangerousBgColor ? dangerousBgColor : 'white'}
           w={windowWidth * 0.9}
-          p="sm"
+          p="md"
           h={90}
           alignItems="center"
           rounded="lg"
@@ -157,18 +157,15 @@ const RoomCard: React.FC<RoomCardProps> = ({
                 })}
               </Text>
             </Div>
-            <Text>{`${room.members?.length || 0}人のメンバー`}</Text>
+            <Text fontSize={11}>{`${
+              room.members?.length || 0
+            }人のメンバー`}</Text>
             <Div
               flexDir="row"
               justifyContent="space-between"
               alignItems="center">
               <Div flex={1} pr={1}>
-                <Text
-                  lineHeight={30}
-                  mb={'xs'}
-                  fontSize={14}
-                  color={darkFontColor}
-                  numberOfLines={1}>
+                <Text fontSize={14} color={darkFontColor} numberOfLines={1}>
                   {room.chatMessages?.length
                     ? latestMessage(room.chatMessages[0])
                     : ''}
