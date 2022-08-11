@@ -80,8 +80,12 @@ const UserCard: React.FC<UserCardProps> = ({user, filteredDuration}) => {
           <Text fontSize={12} color="gray">
             {userNameKanaFactory(user)}
           </Text>
-          {/* <Text fontSize={14} my={12} color="gray"> */}
-          <Text fontSize={12} my={12} color="gray" numberOfLines={3}>
+          <Text
+            fontSize={12}
+            my={12}
+            color="gray"
+            numberOfLines={3}
+            letterSpacing={1}>
             {user.introduceOther || '未設定'}
           </Text>
           {/* <Div
