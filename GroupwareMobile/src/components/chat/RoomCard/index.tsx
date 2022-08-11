@@ -157,29 +157,39 @@ const RoomCard: React.FC<RoomCardProps> = ({
                 })}
               </Text>
             </Div>
-            {room?.unreadCount && room?.unreadCount > 0 ? (
-              <Badge
-                // eslint-disable-next-line react-native/no-inline-styles
-                style={{
-                  position: 'absolute',
-                  left: windowWidth * 0.6,
-                  marginTop: 10,
-                  backgroundColor: 'green',
-                }}
-                size={25}>
-                {`${room?.unreadCount}`}
-              </Badge>
-            ) : null}
             <Text>{`${room.members?.length || 0}人のメンバー`}</Text>
-            <Text
-              mb={'xs'}
-              fontSize={14}
-              color={darkFontColor}
-              numberOfLines={1}>
-              {room.chatMessages?.length
-                ? latestMessage(room.chatMessages[0])
-                : ''}
-            </Text>
+            <Div
+              flexDir="row"
+              justifyContent="space-between"
+              alignItems="center">
+              <Div flex={1} pr={1}>
+                <Text
+                  lineHeight={30}
+                  mb={'xs'}
+                  fontSize={14}
+                  color={darkFontColor}
+                  numberOfLines={1}>
+                  {room.chatMessages?.length
+                    ? latestMessage(room.chatMessages[0])
+                    : ''}
+                </Text>
+              </Div>
+              <Div>
+                {room?.unreadCount && room?.unreadCount > 0 ? (
+                  <Badge
+                    // eslint-disable-next-line react-native/no-inline-styles
+                    style={{
+                      marginLeft: 2,
+                      backgroundColor: 'red',
+                      fontWeight: 'bold',
+                      fontSize: 14,
+                    }}
+                    size={18}>
+                    {`${room?.unreadCount}`}
+                  </Badge>
+                ) : null}
+              </Div>
+            </Div>
           </Div>
         </Div>
       </Swipeable>
