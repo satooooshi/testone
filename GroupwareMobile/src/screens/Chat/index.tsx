@@ -861,11 +861,27 @@ const Chat: React.FC = () => {
     (targetMsg: ChatMessage) => {
       return socket.lastReadChatTime
         ? socket.lastReadChatTime
-            .filter(t => new Date(t.readTime) >= new Date(targetMsg.createdAt))
+            .filter(
+              t =>
+                new Date(t.readTime) >= new Date(targetMsg.createdAt) &&
+                t.user.id !== targetMsg?.sender?.id,
+            )
             .map(t => t.user)
         : [];
     },
     [socket.lastReadChatTime],
+  );
+  const unReadUsers = useCallback(
+    (targetMsg: ChatMessage) => {
+      const unreadUsers = roomDetail?.members?.filter(
+        existMembers =>
+          !readUsers(targetMsg)
+            .map(u => u.id)
+            .includes(existMembers.id),
+      );
+      return unreadUsers?.filter(u => u.id !== targetMsg?.sender?.id);
+    },
+    [readUsers, roomDetail?.members],
   );
 
   const renderMessage = (message: ChatMessage, messageIndex: number) => (
@@ -967,6 +983,15 @@ const Chat: React.FC = () => {
     </Div>
   );
 
+  const renderItem = ({item, index}: {item: ChatMessage; index: number}) => {
+    return renderMessage(item, index);
+  };
+  const keyExtractor = useCallback(item => {
+    if (item.id) {
+      return item.id.toString();
+    }
+  }, []);
+
   const messageListAvoidngKeyboardDisturb = (
     <>
       {Platform.OS === 'ios' ? (
@@ -983,10 +1008,10 @@ const Chat: React.FC = () => {
             onScrollToIndexFailed={info => {
               setRenderMessageIndex(info.index);
             }}
-            onEndReached={() => onScrollTopOnChat()}
-            renderItem={({item: message, index}) =>
-              renderMessage(message, index)
-            }
+            windowSize={20}
+            onEndReached={onScrollTopOnChat}
+            renderItem={renderItem}
+            keyExtractor={keyExtractor}
           />
           {reactionTarget ? (
             reactionSelector
@@ -1054,15 +1079,10 @@ const Chat: React.FC = () => {
             onScrollToIndexFailed={info => {
               setRenderMessageIndex(info.index);
             }}
-            onEndReached={() => onScrollTopOnChat()}
-            keyExtractor={item => {
-              if (item.id) {
-                return item.id.toString();
-              }
-            }}
-            renderItem={({item: message, index}) =>
-              renderMessage(message, index)
-            }
+            windowSize={20}
+            onEndReached={onScrollTopOnChat}
+            keyExtractor={keyExtractor}
+            renderItem={renderItem}
           />
           {reactionTarget ? (
             reactionSelector
@@ -1259,12 +1279,7 @@ const Chat: React.FC = () => {
             children={() =>
               selectedMessageForCheckLastRead ? (
                 <FlatList
-                  data={roomDetail?.members?.filter(
-                    existMembers =>
-                      !readUsers(selectedMessageForCheckLastRead)
-                        .map(u => u.id)
-                        .includes(existMembers.id),
-                  )}
+                  data={unReadUsers(selectedMessageForCheckLastRead)}
                   keyExtractor={item => item.id.toString()}
                   renderItem={({item}) => readUserBox(item)}
                 />

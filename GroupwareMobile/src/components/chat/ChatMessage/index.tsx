@@ -1,4 +1,4 @@
-import React, {ReactNode} from 'react';
+import React, {ReactNode, memo} from 'react';
 import {useEffect} from 'react';
 import {useNavigation} from '@react-navigation/native';
 import {
@@ -75,9 +75,7 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
 
   const timesAndReadCounts = (
     <Div justifyContent="flex-end" alignItems="center">
-      {message.isSender &&
-      readUsers.length &&
-      message.type !== ChatMessageType.SYSTEM_TEXT ? (
+      {readUsers.length && message.type !== ChatMessageType.SYSTEM_TEXT ? (
         <TouchableOpacity onPress={onCheckLastRead}>
           <Text
             mb="sm"
@@ -198,4 +196,4 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
   );
 };
 
-export default ChatMessageItem;
+export default memo(ChatMessageItem);

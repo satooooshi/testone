@@ -121,10 +121,14 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = memo(
     const readUsers = useMemo(() => {
       return lastReadChatTime
         ? lastReadChatTime
-            .filter((t) => new Date(t.readTime) >= new Date(message.createdAt))
+            .filter(
+              (t) =>
+                new Date(t.readTime) >= new Date(message.createdAt) &&
+                t.user.id !== messageState?.sender?.id,
+            )
             .map((t) => t.user)
         : [];
-    }, [lastReadChatTime, message]);
+    }, [lastReadChatTime, message, messageState]);
 
     const reactionList = (
       <Box flexDir="row" flexWrap="wrap" display="flex" maxW={'50vw'}>
@@ -363,6 +367,7 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = memo(
         flexDir="column"
         alignItems={messageState.isSender ? 'flex-end' : 'flex-start'}>
         <ReadUsersListModal
+          sender={messageState.sender}
           usersInRoom={usersInRoom}
           isOpen={visibleReadModal}
           onClose={() => setVisibleLastReadModal(false)}
@@ -462,7 +467,20 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = memo(
               </Box>
               {!messageState.isSender && (
                 <>
-                  {createdAtText}
+                  <Box display="flex" flexDir="column">
+                    {readUsers.length ? (
+                      <Link
+                        onClick={() => setVisibleLastReadModal(true)}
+                        mx="8px"
+                        mb="4px"
+                        color="gray"
+                        fontSize="12px">
+                        既読
+                        {readUsers.length}
+                      </Link>
+                    ) : null}
+                    {createdAtText}
+                  </Box>
                   {menuOpener}
                 </>
               )}
