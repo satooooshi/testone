@@ -240,6 +240,11 @@ const Navigator = () => {
   };
 
   messaging().setBackgroundMessageHandler(async remoteMessage => {
+    console.log('setBackgroundMessageHandler called');
+    if (Platform.OS === 'android') {
+      sendLocalNotification(remoteMessage);
+    }
+
     // await notifee.incrementBadgeCount();
     // console.log('BackgroundMessage received!!', remoteMessage);
   });
@@ -489,6 +494,8 @@ const Navigator = () => {
   );
 
   const naviateByNotif = (notification: any) => {
+    console.log('naviateByNotif called ------');
+
     if (
       navigationRef.current?.getCurrentRoute()?.name !== 'Login' &&
       user?.id
@@ -521,18 +528,24 @@ const Navigator = () => {
       }
     }
   };
+
   useEffect(() => {
     if (user?.id) {
       notifee.onForegroundEvent(({type, detail}) => {
+        console.log('onForegroundEvent call', type);
+
         switch (type) {
           case EventType.DISMISSED:
             break;
           case EventType.PRESS:
+            console.log('onForegroundEvent pressed', type);
             naviateByNotif(detail.notification);
             break;
         }
       });
       notifee.onBackgroundEvent(async ({type, detail}) => {
+        console.log('onBackgroundEvent call');
+
         switch (type) {
           case EventType.DISMISSED:
             break;
@@ -547,6 +560,7 @@ const Navigator = () => {
         //   console.log('PushNotification TOKEN:', token);
         // },
         onNotification: notification => {
+          console.log('onNotification called');
           if (
             (notification?.data?.silent ||
               notification?.data?.type === 'badge') &&
@@ -580,28 +594,28 @@ const Navigator = () => {
             }
           }
           // console.log('PushNotification onNotification========', notification);
-          if (Platform.OS === 'android') {
-            sendLocalNotification(notification);
-          } else if (notification.userInteraction) {
+          if (Platform.OS === 'ios' && notification.userInteraction) {
+            console.log('----naviateByNotif');
             naviateByNotif(notification);
           }
         },
         permissions: {
           alert: true,
           badge: true,
-          sound: true,
         },
         requestPermissions: true,
       });
-
-      const unsubscribe = messaging().onMessage(async remoteMessage => {
-        if (Platform.OS === 'ios') {
-          sendLocalNotification(remoteMessage);
-        }
-      });
-
-      return unsubscribe;
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id]);
+
+  useEffect(() => {
+    const unsubscribe = messaging().onMessage(async remoteMessage => {
+      console.log('---onMessage');
+      sendLocalNotification(remoteMessage);
+    });
+
+    return unsubscribe;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id, currentChatRoomId]);
 
