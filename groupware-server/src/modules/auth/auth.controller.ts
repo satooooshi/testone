@@ -90,6 +90,8 @@ ${registrationData.password}
   async logout(@Res() response: Response) {
     response.setHeader('Set-Cookie', this.authService.getCookieForLogOut());
     response.clearCookie('Authentication');
-    return response.sendStatus(200);
+    response.status(200).json({
+      status: 'OK',
+    });
   }
 }
