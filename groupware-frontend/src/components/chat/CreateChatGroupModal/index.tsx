@@ -149,7 +149,14 @@ const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
   const checkErrors = async () => {
     const errors = await validateForm();
     const messages = formikErrorMsgFactory(errors);
-    if (messages) {
+    if (!newGroup.name) {
+      toast({
+        description: 'ルーム名を入力してください',
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      });
+    } else if (messages) {
       toast({
         description: messages,
         status: 'error',

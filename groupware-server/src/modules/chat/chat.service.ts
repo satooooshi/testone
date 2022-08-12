@@ -262,7 +262,6 @@ export class ChatService {
           };
           unreadCount = await this.getUnreadChatMessage(userID, query);
         }
-
         if (g.roomType === RoomType.PERSONAL && g.members.length === 2) {
           const chatPartner = g.members.filter((m) => m.id !== userID)[0];
           if (chatPartner) {
@@ -270,9 +269,12 @@ export class ChatService {
               g.imageURL = chatPartner.avatarUrl;
               g.name = `${chatPartner.lastName} ${chatPartner.firstName}`;
             } else {
-              g.name = 'メンバーがいません';
+              g.members = g.members.filter((m) => m.existence);
             }
           }
+        }
+        if (g.members.length === 1 && !g.name) {
+          g.name = 'メンバーがいません';
         }
         g.imageURL = await genSignedURL(g.imageURL);
         return {
@@ -1104,10 +1106,28 @@ export class ChatService {
     return reactions;
   }
 
-  public async getRoomDetail(roomId: number) {
+  public async getRoomDetail(roomId: number, userId: number) {
     const existRoom = await this.chatGroupRepository.findOne(roomId, {
       relations: ['members'],
     });
+    if (
+      existRoom &&
+      existRoom.roomType === RoomType.PERSONAL &&
+      existRoom.members.length === 2
+    ) {
+      const chatPartner = existRoom.members.filter((m) => m.id !== userId)[0];
+      if (chatPartner) {
+        if (chatPartner.existence) {
+          existRoom.imageURL = chatPartner.avatarUrl;
+          existRoom.name = `${chatPartner.lastName} ${chatPartner.firstName}`;
+        } else {
+          existRoom.members = existRoom.members.filter((m) => m.existence);
+        }
+      }
+    }
+    if (existRoom.members.length === 1 && !existRoom.name) {
+      existRoom.name = 'メンバーがいません';
+    }
     return existRoom;
   }
 
