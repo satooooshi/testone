@@ -228,8 +228,9 @@ const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
               <ReactCrop
                 keepSelection={true}
                 imageStyle={{
-                  minHeight: '200px',
+                  minHeight: '100px',
                   maxHeight: '300px',
+                  minWidth: '100px',
                 }}
                 src={selectImageUrl}
                 crop={crop}
