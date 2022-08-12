@@ -12,18 +12,3 @@ const logout = async () => {
 export const useAPILogout = (mutationOptions?: UseMutationOptions) => {
   return useMutation(logout, mutationOptions);
 };
-
-export const useLogout = () => {
-  const { mutate: logout } = useAPILogout({
-    onSuccess: () => {
-      const removeLocalStorage = async () => {
-        await Promise.resolve();
-        localStorage.removeItem('userToken');
-        axiosInstance.defaults.headers = jsonHeader;
-      };
-      removeLocalStorage();
-      router.push('/login');
-    },
-  });
-  return { logout };
-};
