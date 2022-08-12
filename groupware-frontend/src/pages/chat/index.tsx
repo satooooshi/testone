@@ -34,7 +34,7 @@ const Chat = () => {
         </>
       ) : (
         <Box
-          w="95%"
+          w="100%"
           display="flex"
           flexDir="row"
           h="83vh"
@@ -49,7 +49,7 @@ const Chat = () => {
             />
           </Box>
           <Box
-            w="70%"
+            w="60vw"
             h="100%"
             display="flex"
             flexDir="row"
