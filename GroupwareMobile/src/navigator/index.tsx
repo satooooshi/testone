@@ -449,11 +449,6 @@ const Navigator = () => {
 
   const sendLocalNotification = useCallback(
     async (remoteMessage: any) => {
-      // console.log(
-      //   '============',
-      //   remoteMessage.data?.id,
-      //   `${currentChatRoomId}`,
-      // );
       if (
         remoteMessage?.data?.silent ||
         (remoteMessage?.data?.screen === 'chat' &&
@@ -461,34 +456,48 @@ const Navigator = () => {
       ) {
         return;
       }
-      if (!remoteMessage?.data?.calleeId) {
-        let channelId = 'default';
-        if (!(await notifee.isChannelCreated(channelId))) {
-          channelId = await notifee.createChannel({
-            id: 'default',
-            name: 'Default Channel',
+      if (Platform.OS === 'android') {
+        if (!remoteMessage?.data?.calleeId) {
+          let channelId = 'default';
+          if (!(await notifee.isChannelCreated(channelId))) {
+            channelId = await notifee.createChannel({
+              id: 'default',
+              name: 'Default Channel',
+            });
+          }
+
+          await notifee.displayNotification({
+            title: remoteMessage.data?.title || '',
+            body: remoteMessage.data?.message || remoteMessage.data?.body || '',
+            android: {
+              channelId: channelId,
+              pressAction: {
+                id: 'action_id',
+                launchActivity: 'default',
+              },
+            },
+            data: {
+              screen: remoteMessage?.data?.screen
+                ? remoteMessage?.data?.screen
+                : '',
+              id: remoteMessage?.data?.id ? remoteMessage?.data?.id : '',
+            },
+            ios: {
+              // iOS resource (.wav, aiff, .caf)
+              sound: 'local.wav',
+            },
           });
         }
-
-        await notifee.displayNotification({
-          title: remoteMessage.data?.title || '',
-          body: remoteMessage.data?.message || remoteMessage.data?.body || '',
-          android: {
-            channelId: channelId,
-            pressAction: {
-              id: 'action_id',
-              launchActivity: 'default',
-            },
-          },
-          data: {
-            screen: remoteMessage?.data?.screen
-              ? remoteMessage?.data?.screen
-              : '',
-            id: remoteMessage?.data?.id ? remoteMessage?.data?.id : '',
-          },
-          ios: {
-            // iOS resource (.wav, aiff, .caf)
-            sound: 'local.wav',
+      } else {
+        PushNotification.localNotification({
+          id: remoteMessage.messageId,
+          vibration: 300,
+          visibility: 'public',
+          message: remoteMessage.notification?.body || '',
+          title: remoteMessage.notification?.title,
+          userInfo: {
+            screen: remoteMessage?.data?.screen,
+            id: remoteMessage?.data?.id,
           },
         });
       }
@@ -614,7 +623,6 @@ const Navigator = () => {
 
   useEffect(() => {
     const unsubscribe = messaging().onMessage(async remoteMessage => {
-      console.log('---onMessage');
       sendLocalNotification(remoteMessage);
     });
 
