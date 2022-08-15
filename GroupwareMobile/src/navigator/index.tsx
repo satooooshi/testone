@@ -462,10 +462,13 @@ const Navigator = () => {
         return;
       }
       if (!remoteMessage?.data?.calleeId) {
-        const channelId = await notifee.createChannel({
-          id: 'default',
-          name: 'Default Channel',
-        });
+        let channelId = 'default';
+        if (!(await notifee.isChannelCreated(channelId))) {
+          channelId = await notifee.createChannel({
+            id: 'default',
+            name: 'Default Channel',
+          });
+        }
 
         await notifee.displayNotification({
           title: remoteMessage.data?.title || '',
