@@ -17,6 +17,7 @@ import { UserService } from './user.service';
 import UpdatePasswordDto from './dto/updatePasswordDto';
 import { Response } from 'express';
 import { ChatService } from '../chat/chat.service';
+import { Roles, RolesGuard } from '../auth/roles.guard';
 
 export interface SearchQueryToGetUsers {
   page?: string;
@@ -128,7 +129,8 @@ export class UserController {
     return await this.userService.updatePassword(request, content);
   }
 
-  @UseGuards(JwtAuthenticationGuard)
+  @UseGuards(JwtAuthenticationGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
   @Post('delete-user')
   async deleteUser(@Body() user: User) {
     const rooms = await this.chatService.getRoomsId(user.id);
