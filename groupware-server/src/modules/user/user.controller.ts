@@ -113,6 +113,9 @@ export class UserController {
     if (!user?.id) {
       throw new BadRequestException('The user is not exist');
     }
+    if (request.user.id !== user.id && request.user.role !== UserRole.ADMIN) {
+      throw new BadRequestException('The action is not allowed');
+    }
     // if (!user.id) {
     //   return await this.userService.saveUser({ ...request.user, ...user });
     // }
