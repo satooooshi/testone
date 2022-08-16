@@ -11,7 +11,7 @@ import { ConfigService } from '@nestjs/config';
 import { Response } from 'express';
 import { User, UserRole } from 'src/entities/user.entity';
 import { NotificationService } from '../notification/notification.service';
-import { RolesGuard } from './roles.guard';
+import { Roles, RolesGuard } from './roles.guard';
 import { AuthService } from './auth.service';
 import { ForgotPasswordDto } from './dto/forgotPassword.dto';
 import JwtAuthenticationGuard from './jwtAuthentication.guard';
@@ -26,7 +26,8 @@ export class AuthController {
     private readonly configService: ConfigService,
   ) {}
 
-  @UseGuards(JwtAuthenticationGuard, new RolesGuard([UserRole.ADMIN]))
+  @UseGuards(JwtAuthenticationGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
   @Post('register')
   async register(@Body() registrationData: User): Promise<User> {
     const registeredUser = await this.authService.register(registrationData);
