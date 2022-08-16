@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   Body,
   Controller,
   Get,
@@ -12,6 +11,7 @@ import { ConfigService } from '@nestjs/config';
 import { Response } from 'express';
 import { User, UserRole } from 'src/entities/user.entity';
 import { NotificationService } from '../notification/notification.service';
+import { RolesGuard } from './roles.guard';
 import { AuthService } from './auth.service';
 import { ForgotPasswordDto } from './dto/forgotPassword.dto';
 import JwtAuthenticationGuard from './jwtAuthentication.guard';
@@ -26,15 +26,9 @@ export class AuthController {
     private readonly configService: ConfigService,
   ) {}
 
-  @UseGuards(JwtAuthenticationGuard)
+  @UseGuards(JwtAuthenticationGuard, new RolesGuard([UserRole.ADMIN]))
   @Post('register')
-  async register(
-    @Req() request: RequestWithUser,
-    @Body() registrationData: User,
-  ): Promise<User> {
-    if (request.user.role !== UserRole.ADMIN) {
-      throw new BadRequestException('The user is not admin');
-    }
+  async register(@Body() registrationData: User): Promise<User> {
     const registeredUser = await this.authService.register(registrationData);
 
     const notifTitle = 'ボールドのポータルに登録されました';
