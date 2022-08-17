@@ -31,7 +31,7 @@ type UserModalProps = ModalContainerProps & {
   users: User[];
   selectedUserRole: UserRoleInApp;
   defaultSelectedUsers?: Partial<User>[];
-  creationType?: RoomType | undefined;
+  creationType?: RoomType;
 };
 
 const UserModal: React.FC<UserModalProps> = props => {
