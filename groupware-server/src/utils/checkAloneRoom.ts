@@ -7,14 +7,10 @@ export const checkAloneRoom = (existRoom: ChatGroup, userId: number) => {
     existRoom.roomType === RoomType.PERSONAL &&
     existRoom.members.length === 2
   ) {
-    const chatPartner = existRoom.members.filter((m) => m.id !== userId)[0];
+    const chatPartner = existRoom.members.find((m) => m.id !== userId);
     if (chatPartner) {
-      if (chatPartner.existence) {
-        existRoom.imageURL = chatPartner.avatarUrl;
-        existRoom.name = `${chatPartner.lastName} ${chatPartner.firstName}`;
-      } else {
-        existRoom.members = existRoom.members.filter((m) => m.existence);
-      }
+      existRoom.imageURL = chatPartner.avatarUrl;
+      existRoom.name = `${chatPartner.lastName} ${chatPartner.firstName}`;
     }
   }
   if (existRoom.members.length === 1 && !existRoom.name) {
