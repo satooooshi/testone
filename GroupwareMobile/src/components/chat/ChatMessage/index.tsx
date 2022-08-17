@@ -1,4 +1,4 @@
-import React, {memo} from 'react';
+import React, {ReactNode, memo} from 'react';
 import {useEffect} from 'react';
 import {useNavigation} from '@react-navigation/native';
 import {
@@ -16,7 +16,6 @@ import {
 import {dateTimeFormatterFromJSDDate} from '../../../utils/dateTimeFormatterFromJSDate';
 import {userNameFactory} from '../../../utils/factory/userNameFactory';
 import {numbersOfSameValueInKeyOfObjArr} from '../../../utils/numbersOfSameValueInKeyOfObjArr';
-import UserAvatar from '../../common/UserAvatar';
 import FileMessage from './FileMessage';
 import ImageMessage from './ImageMessage';
 import ReactionToMessage from './ReactionToMessage';
@@ -33,6 +32,7 @@ type ChatMessageItemProps = {
   searchedResultIds?: (number | undefined)[];
   messageIndex: number;
   isScrollTarget: boolean;
+  senderAvatar: ReactNode;
   scrollToTarget: (messageIndex: number) => void;
   onCheckLastRead: () => void;
   onLongPress: () => void;
@@ -50,6 +50,7 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
   messageIndex,
   isScrollTarget = false,
   scrollToTarget,
+  senderAvatar,
   onCheckLastRead,
   onLongPress,
   onPressImage,
@@ -165,14 +166,7 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
               })
             }
             underlayColor="none">
-            <Div mr="xs">
-              <UserAvatar
-                h={40}
-                w={40}
-                user={message?.sender}
-                GoProfile={true}
-              />
-            </Div>
+            <Div mr="xs">{senderAvatar}</Div>
           </TouchableHighlight>
         ) : null}
       </Div>

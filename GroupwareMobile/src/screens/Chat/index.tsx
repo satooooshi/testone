@@ -708,6 +708,13 @@ const Chat: React.FC = () => {
   //   return new Date(createdAt) > date;
   // };
 
+  const senderAvatars = useMemo(() => {
+    return roomDetail?.members?.map(m => ({
+      id: m.id,
+      avatar: <UserAvatar h={40} w={40} user={m} />,
+    }));
+  }, [roomDetail?.members]);
+
   const typeDropdown = (
     <Dropdown
       {...defaultDropdownProps}
@@ -887,6 +894,9 @@ const Chat: React.FC = () => {
         scrollToRenderedMessage()
       }>
       <ChatMessageItem
+        senderAvatar={
+          senderAvatars?.find(s => s.id === message.sender?.id)?.avatar
+        }
         message={message}
         readUsers={readUsers(message)}
         inputtedSearchWord={inputtedSearchWord}
@@ -900,7 +910,10 @@ const Chat: React.FC = () => {
         onPressImage={() => showImageOnModal(message.content)}
         onPressVideo={() => {
           console.log(message.fileName);
-          playVideoOnModal({uri: message.content, fileName: message.fileName});
+          playVideoOnModal({
+            uri: message.content,
+            fileName: message.fileName,
+          });
         }}
         onPressReaction={(r, isSender) =>
           isSender

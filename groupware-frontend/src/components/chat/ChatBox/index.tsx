@@ -408,7 +408,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
   return (
     <Box
       {...noClickRootDropzone()}
-      w={isSmallerThan768 ? '100%' : '61%'}
+      w={isSmallerThan768 ? '100%' : '60vw'}
       h="100%"
       bg="white"
       position="relative"
@@ -462,29 +462,26 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
         display="flex"
         flexDir="row"
         justifyContent="space-between"
-        alignItems="center"
         py="8px"
         px="16px">
-        <Box display="flex" flexDir="row" alignItems="center" overflow="hidden">
+        <Box display="flex" flexDir="row" alignItems="center">
           <Box mr="8px">
             <Avatar size="sm" src={room.imageURL} />
           </Box>
-          <Box display="flex" flexDir="row" overflow="hidden">
+          <Box display="flex" flexDir="row">
             <Text
-              w="70%"
               mr={'4px'}
               fontWeight="bold"
               fontSize="18px"
               color={darkFontColor}
-              isTruncated>
+              noOfLines={1}>
               {room?.name ? room.name : nameOfEmptyNameGroup(room?.members)}
             </Text>
             <Text
-              w="70px"
               fontWeight="bold"
               fontSize="18px"
               color={darkFontColor}
-              isTruncated>
+              noOfLines={1}>
               {`(${room?.members?.length || 0})`}
             </Text>
           </Box>
@@ -499,21 +496,23 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
           <Link mr="4px" onClick={() => setVisibleAlbumModal(true)}>
             <AiOutlinePicture size={24} />
           </Link>
-          {!isPersonal && (
-            <Menu
-              direction="left"
-              onItemClick={(e) => onMenuClicked(e.value as MenuValue)}
-              menuButton={
-                <MenuButton>
-                  <HiOutlineDotsCircleHorizontal size={24} />
-                </MenuButton>
-              }
-              transition>
-              <MenuItem value={'editGroup'}>ルームの情報を編集</MenuItem>
-              <MenuItem value={'editMembers'}>メンバーを編集</MenuItem>
-              <MenuItem value={'leaveRoom'}>ルームを退室</MenuItem>
-            </Menu>
-          )}
+          <Menu
+            direction="left"
+            onItemClick={(e) => onMenuClicked(e.value as MenuValue)}
+            menuButton={
+              <MenuButton>
+                <HiOutlineDotsCircleHorizontal size={24} />
+              </MenuButton>
+            }
+            transition>
+            {!isPersonal && (
+              <>
+                <MenuItem value={'editGroup'}>ルームの情報を編集</MenuItem>
+                <MenuItem value={'editMembers'}>メンバーを編集</MenuItem>
+              </>
+            )}
+            <MenuItem value={'leaveRoom'}>ルームを退室</MenuItem>
+          </Menu>
         </Box>
       </Box>
       {visibleSearchForm && (

@@ -144,7 +144,8 @@ const ChatEditor: React.FC<ChatEditorProps> = memo(
       const newContent = newState.getCurrentContent().getPlainText();
       const prevContent = editorState.getCurrentContent().getPlainText();
       setContent(newContent);
-      if (prevContent.length === 0) {
+
+      if (prevContent.length === 0 && newContent.length >= 1) {
         setEditorState(EditorState.moveFocusToEnd(newState));
       } else {
         setEditorState(newState);
