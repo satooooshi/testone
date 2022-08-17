@@ -111,7 +111,7 @@ const UserModal: React.FC<UserModalProps> = props => {
           zIndex={20}
           rounded="circle"
           w={60}
-          onPress={() => onSubmitPress()}>
+          onPress={onSubmitPress}>
           <Icon color="white" fontSize="6xl" name="check" />
         </Button>
       ) : (

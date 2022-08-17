@@ -149,7 +149,6 @@ const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
   const checkErrors = async () => {
     const errors = await validateForm();
     const messages = formikErrorMsgFactory(errors);
-    console.log(messages);
     if (messages) {
       toast({
         description: messages,
