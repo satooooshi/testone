@@ -10,7 +10,7 @@ import {
   BadRequestException,
   Res,
 } from '@nestjs/common';
-import { User, UserRole } from 'src/entities/user.entity';
+import { BranchType, User, UserRole } from 'src/entities/user.entity';
 import JwtAuthenticationGuard from '../auth/jwtAuthentication.guard';
 import RequestWithUser from '../auth/requestWithUser.interface';
 import { UserService } from './user.service';
@@ -23,6 +23,7 @@ export interface SearchQueryToGetUsers {
   word?: string;
   tag?: string;
   sort?: 'event' | 'question' | 'answer' | 'knowledge';
+  branch?: BranchType;
   role?: UserRole;
   verified?: boolean;
   duration?: 'month' | 'week';
