@@ -69,6 +69,7 @@ const UserAdmin: React.FC = () => {
       tag: tagQuery,
       word: query.word || '',
       sort: query.sort,
+      branch: query.branch,
       role: query.role,
       duration: query.duration,
     };
