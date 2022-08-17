@@ -1,6 +1,6 @@
 import { AxiosError } from 'axios';
 import { useQuery } from 'react-query';
-import { User, UserRole } from 'src/types';
+import { BranchType, User, UserRole } from 'src/types';
 import { axiosInstance } from 'src/utils/url';
 import { userAPIQueryRefresh } from 'src/utils/userQueryRefresh';
 
@@ -9,6 +9,7 @@ export interface SearchQueryToGetUsers {
   word?: string;
   tag?: string;
   sort?: 'event' | 'question' | 'answer' | 'knowledge';
+  branch?: BranchType;
   role?: UserRole;
   verified?: boolean;
   duration?: 'month' | 'week';
