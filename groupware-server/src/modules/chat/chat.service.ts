@@ -128,10 +128,10 @@ export class ChatService {
     const { page, limit = '20' } = query;
 
     let offset = 0;
+    const limitNumber = Number('100');
     if (page) {
-      offset = (Number(page) - 1) * Number(limit);
+      offset = (Number(page) - 1) * limitNumber;
     }
-    const limitNumber = Number(limit);
 
     const startTime = Date.now();
     const updatedAtLatestRoom = query.updatedAtLatestRoom
