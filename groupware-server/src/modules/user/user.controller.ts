@@ -17,7 +17,7 @@ import { UserService } from './user.service';
 import UpdatePasswordDto from './dto/updatePasswordDto';
 import { Response } from 'express';
 import { ChatService } from '../chat/chat.service';
-import { Roles, RolesGuard } from '../auth/roles.guard';
+import { ReqUserOrRolesGuard, Roles, RolesGuard } from '../auth/roles.guard';
 
 export interface SearchQueryToGetUsers {
   page?: string;
@@ -104,7 +104,8 @@ export class UserController {
     return usersExceptRequestUser;
   }
 
-  @UseGuards(JwtAuthenticationGuard)
+  @UseGuards(JwtAuthenticationGuard, ReqUserOrRolesGuard)
+  @Roles(UserRole.ADMIN)
   @Post('update-user')
   async updateUser(
     @Req() request: RequestWithUser,
@@ -112,9 +113,6 @@ export class UserController {
   ): Promise<User> {
     if (!user?.id) {
       throw new BadRequestException('The user is not exist');
-    }
-    if (request.user.id !== user.id && request.user.role !== UserRole.ADMIN) {
-      throw new BadRequestException('The action is not allowed');
     }
     // if (!user.id) {
     //   return await this.userService.saveUser({ ...request.user, ...user });
