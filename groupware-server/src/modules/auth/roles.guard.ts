@@ -4,6 +4,7 @@ import {
   ExecutionContext,
   Injectable,
   SetMetadata,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { UserRole } from 'src/entities/user.entity';
@@ -17,9 +18,37 @@ export class RolesGuard implements CanActivate {
   canActivate(context: ExecutionContext): boolean {
     const roles = this.reflector.get<UserRole[]>('roles', context.getHandler());
     if (!roles) {
+      return false;
+    }
+
+    const request = context.switchToHttp().getRequest();
+    if (!request.user) {
+      throw new UnauthorizedException();
+    }
+    if (!roles.includes(request.user?.role)) {
+      throw new BadRequestException('The action is not allowed');
+    }
+    return true;
+  }
+}
+
+@Injectable()
+export class ReqUserOrRolesGuard implements CanActivate {
+  constructor(private reflector: Reflector) {}
+
+  canActivate(context: ExecutionContext): boolean {
+    const roles = this.reflector.get<UserRole[]>('roles', context.getHandler());
+    if (!roles) {
+      return false;
+    }
+
+    const request = context.switchToHttp().getRequest();
+    if (!request.user) {
+      throw new UnauthorizedException();
+    }
+    if (request.user.id === request.body?.id) {
       return true;
     }
-    const request = context.switchToHttp().getRequest();
     if (!roles.includes(request.user?.role)) {
       throw new BadRequestException('The action is not allowed');
     }
