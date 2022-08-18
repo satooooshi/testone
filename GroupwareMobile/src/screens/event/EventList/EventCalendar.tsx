@@ -15,9 +15,14 @@ import {
 } from '../../../hooks/api/event/useAPIGetEventList';
 import {useAuthenticate} from '../../../contexts/useAuthenticate';
 import {eventTypeColorFactory} from '../../../utils/factory/eventTypeColorFactory';
-import {Button, Div, Icon, ScrollDiv, Text} from 'react-native-magnus';
+import {Box, Button, Div, Icon, ScrollDiv, Text} from 'react-native-magnus';
 import {darkFontColor} from '../../../utils/colors';
-import {calendarStyles} from '../../../styles/component/event/eventCalendar.style';
+import {
+  monthCalendarStyles,
+  weekCalendarStyles,
+  dayCalendarStyles,
+  calendarStyles,
+} from '../../../styles/component/event/eventCalendar.style';
 import {DateTime} from 'luxon';
 import {
   daysQueryFactoryFromTargetDate,
@@ -33,6 +38,10 @@ import {useAPICreateEvent} from '../../../hooks/api/event/useAPICreateEvent';
 import EventFormModal from '../../../components/events/EventFormModal';
 import {useEventCardListSearchQuery} from '../../../contexts/event/useEventSearchQuery';
 import {responseErrorMsgFactory} from '../../../utils/factory/responseEroorMsgFactory';
+import {SafeAreaView} from 'react-native-safe-area-context';
+import {ScrollView} from 'react-native-gesture-handler';
+import {View} from 'react-native-animatable';
+import {blue100} from 'react-native-paper/lib/typescript/styles/colors';
 
 type EventCalendarProps = {
   personal?: boolean;
@@ -126,10 +135,11 @@ const EventCalendar: React.FC<EventCalendarProps> = ({
     }
     return getDatesInWeek(new Date(), 0, 'ja');
   }, [calendarMode.mode, calendarMode.targetDate]);
-  const calendarHeight = windowHeight - 120;
+  const calendarHeight = windowHeight - 300;
 
   const headerCellHeight = useMemo(() => MIN_HEIGHT / 24 - 20, []);
-
+  console.log('headerCellHeight===', headerCellHeight);
+  console.log('MIN_HEIGHT===', MIN_HEIGHT);
   const allDayEvents = useMemo(() => {
     return memorizedEvent.filter(event =>
       isAllDayEvent(event.startAt, event.endAt),
@@ -170,6 +180,7 @@ const EventCalendar: React.FC<EventCalendarProps> = ({
 
   const onPressModeChangerButton = (modeLiteral: CustomMode) => {
     setCalendarMode(m => ({...m, mode: modeLiteral}));
+    console.log('calendarMode==', calendarMode);
   };
 
   const onPressNextOrPreviousButton = (changeTo: 'previous' | 'next') => {
@@ -366,29 +377,39 @@ const EventCalendar: React.FC<EventCalendarProps> = ({
           </Button>
         </Div>
       </Div>
-      <ScrollDiv>
+      <Div>
         {!isLoading ? (
           <Calendar
+            // calendarContainerStyle={{backgroundColor: 'blue'}}
             bodyContainerStyle={calendarStyles.container}
             headerContainerStyle={{
-              ...calendarStyles.container,
-              ...calendarStyles.header,
+              ...monthCalendarStyles.container,
+              ...monthCalendarStyles.header,
             }}
             onPressDateHeader={onPressDateHeader}
             scrollOffsetMinutes={1200}
             renderHeader={
-              calendarMode.mode === 'day'
+              calendarMode.mode === 'month'
                 ? () => (
                     <CalendarHeader
                       onPressDateHeader={onPressDateHeader}
                       dateRange={dateRange}
                       cellHeight={headerCellHeight}
                       allDayEvents={allDayEvents}
-                      style={calendarStyles.container}
+                      style={monthCalendarStyles.header}
                       activeDate={calendarMode.targetDate}
                     />
                   )
-                : undefined
+                : () => (
+                    <CalendarHeader
+                      onPressDateHeader={onPressDateHeader}
+                      dateRange={dateRange}
+                      cellHeight={headerCellHeight}
+                      allDayEvents={allDayEvents}
+                      style={dayCalendarStyles.header}
+                      activeDate={calendarMode.targetDate}
+                    />
+                  )
             }
             activeDate={calendarMode.targetDate}
             date={calendarMode.targetDate}
@@ -404,6 +425,7 @@ const EventCalendar: React.FC<EventCalendarProps> = ({
               setCalendarMode({mode: 'day', targetDate: date})
             }
             height={calendarHeight}
+            maxVisibleEventCount={2}
             eventCellStyle={
               calendarMode.mode === 'day'
                 ? event => ({
@@ -424,7 +446,7 @@ const EventCalendar: React.FC<EventCalendarProps> = ({
         ) : (
           <ActivityIndicator />
         )}
-      </ScrollDiv>
+      </Div>
     </>
   );
 };
