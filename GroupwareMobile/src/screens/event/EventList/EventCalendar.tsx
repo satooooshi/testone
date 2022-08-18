@@ -372,8 +372,8 @@ const EventCalendar: React.FC<EventCalendarProps> = ({
         <Calendar
           bodyContainerStyle={calendarStyles.container}
           headerContainerStyle={{
-            ...calendarStyles.container,
-            ...calendarStyles.header,
+            ...monthCalendarStyles.container,
+            ...monthCalendarStyles.header,
           }}
           onPressDateHeader={onPressDateHeader}
           scrollOffsetMinutes={1200}
