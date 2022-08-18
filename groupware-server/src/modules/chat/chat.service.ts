@@ -166,13 +166,18 @@ export class ChatService {
     }
 
     const roomIds = urlUnparsedRooms.map((r) => r.id);
+    const personalRoomIds = urlUnparsedRooms.filter(
+      (r) => r.roomType === RoomType.PERSONAL,
+    );
 
     const manager = getManager();
 
-    const members: UserAndGroupID[] = await manager.query(
-      'select chat_group_id, users.id as id, users.last_name as lastName, users.first_name as firstName, users.avatar_url as avatarUrl, users.existence as existence from user_chat_joining INNER JOIN users ON users.id = user_id AND chat_group_id IN (?)',
-      [roomIds],
-    );
+    let members: UserAndGroupID[] = [];
+    if (personalRoomIds.length)
+      members = await manager.query(
+        'select chat_group_id, users.id as id, users.last_name as lastName, users.first_name as firstName, users.avatar_url as avatarUrl, users.existence as existence from user_chat_joining INNER JOIN users ON users.id = user_id AND chat_group_id IN (?)',
+        [personalRoomIds.map((r) => r.id)],
+      );
     // console.log(members);
 
     const muteUserIds = await manager.query(
@@ -233,7 +238,7 @@ export class ChatService {
 
     let rooms = await Promise.all(
       urlUnparsedRooms.map(async (g, index) => {
-        g.members = members.filter((m) => m.chat_group_id === g.id);
+        g.members = members?.filter((m) => m.chat_group_id === g.id);
         g.chatMessages = latestMessage
           .filter((m) => m.chat_group_id === g.id)
           .map((m) => ({
