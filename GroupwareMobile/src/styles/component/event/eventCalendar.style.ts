@@ -10,18 +10,9 @@ export const monthCalendarStyles = StyleSheet.create({
     height: 40,
   },
 });
-export const dayCalendarStyles = StyleSheet.create({
-  container: {
-    backgroundColor: 'white',
-  },
-  header: {
-    backgroundColor: 'white',
-    height: 70,
-  },
-});
 export const calendarStyles = StyleSheet.create({
   container: {
-    backgroundColor: 'orange',
+    backgroundColor: 'white',
   },
   header: {
     backgroundColor: 'white',
