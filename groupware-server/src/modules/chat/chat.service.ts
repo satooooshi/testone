@@ -912,6 +912,7 @@ export class ChatService {
     const userIds = chatGroup.members.map((u) => u.id);
     const users = await this.userRepository.findByIds(userIds);
     chatGroup.members = users;
+    chatGroup.memberCount = users.length;
 
     const newGroup = await this.chatGroupRepository.save(
       this.chatGroupRepository.create(chatGroup),
@@ -951,6 +952,7 @@ export class ChatService {
       ...existGroup,
       imageURL: genStorageURL(newData.imageURL),
       members: newData.members,
+      memberCount: newData.members.length,
       name: newData.name,
       updatedAt: new Date(),
     });
@@ -1044,9 +1046,11 @@ export class ChatService {
     }
 
     const newGroup = await this.chatGroupRepository.save(
-      this.chatGroupRepository.create(newData),
+      this.chatGroupRepository.create({
+        ...newData,
+        memberCount: newData.members.length,
+      }),
     );
-
     return newGroup;
   }
 
