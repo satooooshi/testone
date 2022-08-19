@@ -32,6 +32,7 @@ import ReactCrop from 'react-image-crop';
 import { dataURLToFile } from 'src/utils/dataURLToFile';
 import { useAPIGetProfile } from '@/hooks/api/user/useAPIGetProfile';
 import { useImageCrop } from '@/hooks/crop/useImageCrop';
+import { Crop } from 'react-image-crop';
 import { useHeaderTab } from '@/hooks/headerTab/useHeaderTab';
 import TagModal from '@/components/common/TagModal';
 import { toggleTag } from 'src/utils/toggleTag';
@@ -146,6 +147,16 @@ const Profile = () => {
     [dispatchCrop],
   );
 
+  const onChange = (newCrop: Crop) => {
+    if (
+      newCrop.height !== crop.height ||
+      newCrop.width !== crop.width ||
+      newCrop.y !== crop.y ||
+      newCrop.x !== crop.x
+    )
+      dispatchCrop({ type: 'setCrop', value: newCrop });
+  };
+
   const {
     getRootProps: getEventImageRootProps,
     getInputProps: getEventImageInputProps,
@@ -214,6 +225,19 @@ const Profile = () => {
 
   const onLoad = useCallback((img) => {
     imgRef.current = img;
+    const diameter = img.height < img.width ? img.height : img.width;
+    dispatchCrop({
+      type: 'setCrop',
+      value: {
+        unit: 'px',
+        x: (img.width - diameter) / 2,
+        y: (img.height - diameter) / 2,
+        height: diameter,
+        width: diameter,
+        aspect: 1,
+      },
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const toggleSelectedTag = (t: UserTag) => {
@@ -286,9 +310,7 @@ const Profile = () => {
               keepSelection={true}
               src={selectImageUrl}
               crop={crop}
-              onChange={(newCrop) => {
-                dispatchCrop({ type: 'setCrop', value: newCrop });
-              }}
+              onChange={(newCrop) => onChange(newCrop)}
               onComplete={(c) => {
                 dispatchCrop({
                   type: 'setCompletedCrop',
@@ -298,6 +320,11 @@ const Profile = () => {
               }}
               onImageLoaded={onLoad}
               circularCrop={true}
+              imageStyle={{
+                minHeight: '100px',
+                maxHeight: '1000px',
+                minWidth: '100px',
+              }}
             />
           ) : null}
         </div>

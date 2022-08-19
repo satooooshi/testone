@@ -86,6 +86,15 @@ const EditChatGroupModal: React.FC<EditChatGroupModalProps> = ({
   });
   const onLoad = useCallback((img) => {
     imgRef.current = img;
+    const diameter: number = img.height < img.width ? img.height : img.width;
+    setCrop({
+      unit: 'px',
+      x: (img.width - diameter) / 2,
+      y: (img.height - diameter) / 2,
+      height: diameter,
+      width: diameter,
+      aspect: 1,
+    });
   }, []);
 
   const {
@@ -111,6 +120,20 @@ const EditChatGroupModal: React.FC<EditChatGroupModalProps> = ({
       saveGroup(newGroupInfo as ChatGroup);
     },
   });
+
+  const onChange = (newCrop: Crop) => {
+    if (
+      newCrop.height !== crop.height ||
+      newCrop.width !== crop.width ||
+      newCrop.y !== crop.y ||
+      newCrop.x !== crop.x
+    )
+      setCrop(newCrop);
+  };
+
+  const onClickDeleteImage = () => {
+    console.log('aiueo');
+  };
 
   useEffect(() => {
     setNewGroupInfo(chatGroup);
@@ -141,15 +164,28 @@ const EditChatGroupModal: React.FC<EditChatGroupModalProps> = ({
           <Box>
             <Box>
               {selectImageUrl ? (
-                <ReactCrop
-                  src={selectImageUrl}
-                  crop={crop}
-                  onChange={(newCrop) => setCrop(newCrop)}
-                  onComplete={(c) => setCompletedCrop(c)}
-                  onImageLoaded={onLoad}
-                  circularCrop={true}
-                  keepSelection={true}
-                />
+                <Box textAlign="center">
+                  <ReactCrop
+                    src={selectImageUrl}
+                    crop={crop}
+                    onChange={(newCrop) => onChange(newCrop)}
+                    onComplete={(c) => setCompletedCrop(c)}
+                    onImageLoaded={onLoad}
+                    circularCrop={true}
+                    keepSelection={true}
+                    imageStyle={{
+                      minHeight: '100px',
+                      maxHeight: '300px',
+                      minWidth: '100px',
+                    }}
+                  />
+                  <Button
+                    my="10px"
+                    onClick={() => onClickDeleteImage()}
+                    colorScheme="blue">
+                    既存の画像を削除
+                  </Button>
+                </Box>
               ) : (
                 <Box
                   m="0 auto"
