@@ -820,24 +820,31 @@ export class ChatService {
     // });
   }
 
-  public async joinChatGroup(userID: number, chatGroupID: number) {
-    const containMembers: ChatGroup = await this.chatGroupRepository.findOne({
+  public async joinChatGroup(user: User, chatGroupID: number) {
+    const targetGroup: ChatGroup = await this.chatGroupRepository.findOne({
       where: { id: chatGroupID },
       relations: ['members'],
     });
 
-    const isUserJoining = containMembers.members.filter(
-      (m) => m.id === userID,
+    const isUserJoining = targetGroup.members.filter(
+      (m) => m.id === user.id,
     ).length;
     if (isUserJoining) {
       console.log('The user is already participant');
       return;
     }
-    await this.chatGroupRepository
-      .createQueryBuilder()
-      .relation(ChatGroup, 'members')
-      .of(chatGroupID)
-      .add(userID);
+    targetGroup.members.push(user);
+    targetGroup.memberCount = targetGroup.members.length;
+    const newMembersSystemMsg = new ChatMessage();
+    newMembersSystemMsg.type = ChatMessageType.SYSTEM_TEXT;
+    newMembersSystemMsg.content = `${userNameFactory(
+      user,
+    )}さんがが参加しました`;
+    newMembersSystemMsg.chatGroup = { ...targetGroup, members: undefined };
+    await this.chatMessageRepository.save(newMembersSystemMsg);
+    await this.chatGroupRepository.save(
+      this.chatGroupRepository.create(targetGroup),
+    );
   }
 
   public async leaveChatRoom(userID: number, chatGroupID: number) {
