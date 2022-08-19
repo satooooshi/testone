@@ -99,6 +99,11 @@ export const BadgeProvider: React.FC = ({ children }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
+  // useEffect(() => {
+  //   console.log('-----', chatGroups.length);
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [chatGroups]);
+
   useEffect(() => {
     if (isNeedRefetch) {
       setIsNeedRefetch(false);
