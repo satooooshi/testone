@@ -371,34 +371,32 @@ const EventCalendar: React.FC<EventCalendarProps> = ({
       {!isLoading ? (
         <Calendar
           bodyContainerStyle={calendarStyles.container}
-          headerContainerStyle={{
-            ...monthCalendarStyles.container,
-            ...monthCalendarStyles.header,
-          }}
+          headerContainerStyle={
+            calendarMode.mode === 'month'
+              ? {
+                  ...monthCalendarStyles.container,
+                  ...monthCalendarStyles.header,
+                }
+              : {
+                  ...calendarStyles.container,
+                  ...calendarStyles.header,
+                }
+          }
           onPressDateHeader={onPressDateHeader}
           scrollOffsetMinutes={1200}
           renderHeader={
-            calendarMode.mode === 'month'
+            calendarMode.mode === 'day'
               ? () => (
                   <CalendarHeader
                     onPressDateHeader={onPressDateHeader}
                     dateRange={dateRange}
                     cellHeight={headerCellHeight}
                     allDayEvents={allDayEvents}
-                    style={monthCalendarStyles.header}
+                    style={calendarStyles.container}
                     activeDate={calendarMode.targetDate}
                   />
                 )
-              : () => (
-                  <CalendarHeader
-                    onPressDateHeader={onPressDateHeader}
-                    dateRange={dateRange}
-                    cellHeight={headerCellHeight}
-                    allDayEvents={allDayEvents}
-                    style={calendarStyles.header}
-                    activeDate={calendarMode.targetDate}
-                  />
-                )
+              : undefined
           }
           activeDate={calendarMode.targetDate}
           date={calendarMode.targetDate}
