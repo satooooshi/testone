@@ -55,24 +55,28 @@ const TravelForm = ({
     oneWayOrRound: TravelCostOneWayOrRound.ROUND,
     attendance: attendance as Attendance,
   };
-  const { values, setValues, handleSubmit, errors, touched } = useFormik({
-    initialValues: travelCost || initialValues,
-    validationSchema: travelCostFormModalSchema,
-    onSubmit: (submittedValues) => {
-      setAttendance((a) => {
-        if (a?.travelCost?.length) {
-          const travelCost = a?.travelCost?.map((t, arrIndex) => {
-            if (index === arrIndex) {
-              return submittedValues;
-            }
-            return t;
-          });
-          return { ...a, travelCost };
-        }
-        return { ...a, travelCost: [submittedValues] };
-      });
-    },
-  });
+  const { values, setValues, handleSubmit, errors, touched, resetForm } =
+    useFormik({
+      initialValues: travelCost || initialValues,
+      validationSchema: travelCostFormModalSchema,
+      onSubmit: (submittedValues) => {
+        setAttendance((a) => {
+          if (a?.travelCost?.length) {
+            const travelCost = index
+              ? a?.travelCost?.map((t, arrIndex) => {
+                  if (index === arrIndex) {
+                    return submittedValues;
+                  }
+                  return t;
+                })
+              : { ...a.travelCost, submittedValues };
+            return { ...a, travelCost };
+          }
+          return { ...a, travelCost: [submittedValues] };
+        });
+        resetForm();
+      },
+    });
 
   const checkRoute = () => {
     const url = `https://transit.yahoo.co.jp/search/result?from=${values.departureStation}&via=${values.viaStation}&to=${values.destinationStation}`;
