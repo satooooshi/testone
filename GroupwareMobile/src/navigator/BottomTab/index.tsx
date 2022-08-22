@@ -424,7 +424,7 @@ const BottomTab = () => {
       />
       <Tab.Screen
         name="Menu"
-        component={Home}
+        component={Menu}
         options={{
           tabBarLabel: 'メニュー',
           tabBarIcon: ({color}) => (
