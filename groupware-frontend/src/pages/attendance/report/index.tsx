@@ -239,13 +239,17 @@ const AttendanceReport = () => {
             bg="white"
             value={month.toFormat('yyyy-LL')}
             onChange={(e) => {
-              const yearAndMonth = e.target.value.split('-');
-              setMonth((m) =>
-                m.set({
-                  year: Number(yearAndMonth[0]),
-                  month: Number(yearAndMonth[1]),
-                }),
-              );
+              if (e?.target?.value) {
+                const yearAndMonth = e.target.value.split('-');
+                setMonth((m) =>
+                  m.set({
+                    year: Number(yearAndMonth[0]),
+                    month: Number(yearAndMonth[1]),
+                  }),
+                );
+              } else {
+                setMonth(DateTime.now());
+              }
             }}
           />
         </FormControl>

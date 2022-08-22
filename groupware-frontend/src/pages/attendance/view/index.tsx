@@ -161,6 +161,8 @@ const AttendanceRow = ({
         (minutesNumber < 0 ? 1 : 0);
       const hours = String('00' + hoursNumber).slice(-2);
       setWorkingTime(hours + ':' + minutes);
+    } else {
+      setWorkingTime(undefined);
     }
   }, [values.attendanceTime, values.absenceTime, values.breakMinutes]);
 
@@ -172,8 +174,18 @@ const AttendanceRow = ({
 
   useEffect(() => {
     if (values.category) {
-      setHasWorkingTime(isDisplayableWorkingTime(values.category));
+      const hasWorkingTimeValue = isDisplayableWorkingTime(values.category);
+      setHasWorkingTime(hasWorkingTimeValue);
+      if (!hasWorkingTimeValue) {
+        setValues((v) => ({
+          ...v,
+          attendanceTime: undefined,
+          absenceTime: undefined,
+          breakMinutes: undefined,
+        }));
+      }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [values.category]);
   return (
     <>
@@ -442,13 +454,17 @@ const AttendanceView = () => {
             bg="white"
             value={month.toFormat('yyyy-LL')}
             onChange={(e) => {
-              const yearAndMonth = e.target.value.split('-');
-              setMonth((m) =>
-                m.set({
-                  year: Number(yearAndMonth[0]),
-                  month: Number(yearAndMonth[1]),
-                }),
-              );
+              if (e?.target?.value) {
+                const yearAndMonth = e.target.value.split('-');
+                setMonth((m) =>
+                  m.set({
+                    year: Number(yearAndMonth[0]),
+                    month: Number(yearAndMonth[1]),
+                  }),
+                );
+              } else {
+                setMonth(DateTime.now());
+              }
             }}
           />
         </FormControl>
