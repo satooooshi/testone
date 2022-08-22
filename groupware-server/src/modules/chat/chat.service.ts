@@ -465,6 +465,7 @@ export class ChatService {
         'chat_messages.file_name as fileName',
         'chat_messages.created_at as createdAt',
         'chat_messages.updated_at as updatedAt',
+        'chat_messages.modified_at as modifiedAt',
         'chat_messages.reply_parent_id as reply_parent_id',
         'chat_messages.sender_id as sender_id',
         'chat_messages.chat_group_id as chat_group_id',
