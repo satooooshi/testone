@@ -306,6 +306,7 @@ export interface ChatMessage {
   reactions?: ChatMessageReaction[];
   createdAt: Date;
   updatedAt: Date;
+  modifiedAt: Date;
   isSender?: boolean;
   callTime?: string;
   replyParentMessage?: ChatMessage;
