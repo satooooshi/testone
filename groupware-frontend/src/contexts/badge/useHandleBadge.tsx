@@ -48,9 +48,15 @@ export const BadgeProvider: React.FC = ({ children }) => {
           count += room.unreadCount ? room.unreadCount : 0;
         }
         setChatUnreadCount(count);
-        setChatGroups((r) =>
-          page !== 1 && r.length ? [...r, ...data.rooms] : [...data.rooms],
-        );
+        setChatGroups((r) => {
+          if (page !== 1 && r.length) {
+            const mergedRooms = [...r, ...data.rooms];
+            const pinnedRooms = mergedRooms.filter((r) => r.isPinned);
+            const exceptPinnedRooms = mergedRooms.filter((r) => !r.isPinned);
+            return [...pinnedRooms, ...exceptPinnedRooms];
+          }
+          return [...data.rooms];
+        });
         if (data.rooms.length >= 20) {
           setPage((p) => p + 1);
           setIsNeedRefetch(true);
@@ -93,6 +99,11 @@ export const BadgeProvider: React.FC = ({ children }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
+  // useEffect(() => {
+  //   console.log('-----', chatGroups.length);
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [chatGroups]);
+
   useEffect(() => {
     if (isNeedRefetch) {
       setIsNeedRefetch(false);
@@ -115,26 +126,24 @@ export const BadgeProvider: React.FC = ({ children }) => {
   // }, [user]);
 
   useEffect(() => {
-    if (editRoom) {
+    if (editRoom?.members?.filter((m) => m.id === user?.id).length) {
       if (editRoom.updatedAt > editRoom.createdAt) {
-        if (editRoom.members?.filter((m) => m.id === user?.id).length) {
-          setChatGroups((room) =>
-            room.map((r) =>
-              r.id === editRoom.id
-                ? { ...r, name: editRoom.name, members: editRoom.members }
-                : r,
-            ),
-          );
-        } else {
-          setChatGroups((rooms) => rooms.filter((r) => r.id !== editRoom.id));
-        }
-      } else if (editRoom.members?.filter((m) => m.id === user?.id).length) {
+        setChatGroups((room) =>
+          room.map((r) =>
+            r.id === editRoom.id
+              ? { ...r, name: editRoom.name, members: editRoom.members }
+              : r,
+          ),
+        );
+      } else if (!chatGroups?.filter((g) => g.id === editRoom.id).length) {
         const rooms = chatGroups;
         const pinnedRoomsCount = rooms.filter((r) => r.isPinned).length;
         rooms.splice(pinnedRoomsCount, 0, editRoom);
         setChatGroups(rooms);
         setEditRoom(undefined);
       }
+    } else if (editRoom) {
+      setChatGroups((rooms) => rooms.filter((r) => r.id !== editRoom.id));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editRoom]);

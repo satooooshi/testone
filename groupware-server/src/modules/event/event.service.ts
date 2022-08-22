@@ -21,6 +21,7 @@ import {
   SearchQueryToGetEvents,
   SearchResultToGetEvents,
 } from './event.controller';
+import { selectUserColumns } from 'src/utils/selectUserColumns';
 
 @Injectable()
 export class EventScheduleService {
@@ -212,24 +213,40 @@ export class EventScheduleService {
   public async getEvents(
     query: SearchQueryToGetEvents,
   ): Promise<SearchResultToGetEvents> {
-    const { page = 1, word = '', status, tag = '', type } = query;
+    const {
+      page = 1,
+      word = '',
+      status,
+      tag = '',
+      type,
+      participant_id,
+    } = query;
     let offset: number;
     const limit = 20;
     if (page) {
       offset = (Number(page) - 1) * limit;
     }
     const tagIDs = tag.split(' ');
+    const startTime = Date.now();
+
+    if (participant_id) {
+      const userJoiningEvent = await this.userJoiningEventRepository
+        .createQueryBuilder('userJoiningEvent')
+        .innerJoinAndSelect('userJoiningEvent.event', 'event')
+        .where('userJoiningEvent.user_id = :userID', {
+          userID: participant_id,
+        })
+        .andWhere('userJoiningEvent.canceledAt IS NULL')
+        .take(limit)
+        .orderBy('event.startAt', 'ASC')
+        .getMany();
+      const events = userJoiningEvent.map((u) => u.event);
+      const endTime = Date.now();
+      console.log('get evetns speed check', endTime - startTime);
+      return { pageCount: events.length, events };
+    }
     const [eventsWithRelation, count] = await this.eventRepository
       .createQueryBuilder('events')
-      .leftJoinAndSelect('events.userJoiningEvent', 'userJoiningEvent')
-      .leftJoin('userJoiningEvent.user', 'user')
-      .addSelect([
-        'user.id',
-        'user.firstName',
-        'user.lastName',
-        'user.avatarUrl',
-      ])
-      // .leftJoinAndSelect('userJoiningEvent.event', 'event')
       .leftJoinAndSelect('events.tags', 'tag')
       .where(
         word && word.length !== 1
@@ -247,9 +264,7 @@ export class EventScheduleService {
         { queryWord: `%${word}%` },
       )
       .andWhere(
-        query.participant_id
-          ? '1=1'
-          : status === 'future'
+        status === 'future'
           ? 'events.start_at > now()'
           : status === 'past'
           ? 'events.start_at < now() AND events.end_at < now()'
@@ -257,15 +272,6 @@ export class EventScheduleService {
           ? 'events.start_at < now() AND events.end_at > now()'
           : '1=1',
       )
-      .andWhere(query.participant_id ? 'user.id = :userID' : '1=1', {
-        userID: query.participant_id,
-      })
-      .andWhere(
-        query.participant_id ? 'userJoiningEvent.canceledAt IS NULL' : '1=1',
-      )
-      .andWhere(query.host_user_id ? 'host_user = :hostUserID' : '1=1', {
-        hostUserID: query.host_user_id,
-      })
       .andWhere(tag ? 'tag.id IN (:...tagIDs)' : '1=1', {
         tagIDs,
       })
@@ -273,8 +279,12 @@ export class EventScheduleService {
       .take(limit)
       .orderBy('events.startAt', status === 'past' ? 'DESC' : 'ASC')
       .getManyAndCount();
+
     const pageCount =
       count % limit === 0 ? count / limit : Math.floor(count / limit) + 1;
+
+    const endTime = Date.now();
+    console.log('get evetns speed check', endTime - startTime);
 
     return { pageCount, events: eventsWithRelation };
   }
@@ -308,17 +318,19 @@ export class EventScheduleService {
 
   public async getEventAtSpecificTime(
     query: SearchQueryToGetEvents,
+    userId: number,
   ): Promise<SearchResultToGetEvents> {
     const fromDate = new Date(query.from);
     const toDate = new Date(query.to);
-    const events = await this.eventRepository
+    const startTime = Date.now();
+
+    let events = await this.eventRepository
       .createQueryBuilder('events')
-      .select()
-      .leftJoinAndSelect('events.userJoiningEvent', 'userJoiningEvent')
-      .leftJoinAndSelect('userJoiningEvent.user', 'user')
-      .leftJoinAndSelect('userJoiningEvent.event', 'event')
-      .leftJoinAndSelect('events.tags', 'tag')
-      .leftJoin('events.hostUsers', 'host_user')
+      // .leftJoinAndSelect('events.userJoiningEvent', 'userJoiningEvent')
+      // .leftJoinAndSelect('userJoiningEvent.user', 'user')
+      // .leftJoinAndSelect('userJoiningEvent.event', 'event')
+      // .leftJoinAndSelect('events.tags', 'tag')
+      // .leftJoin('events.hostUsers', 'host_user')
       .where(
         fromDate.toString() !== 'Invalid Date'
           ? 'events.start_at > :fromDate'
@@ -338,13 +350,39 @@ export class EventScheduleService {
       .andWhere(query.type ? 'events.type = :type' : '1=1', {
         type: query.type,
       })
-      .andWhere(query.participant_id ? 'user = :userID' : '1=1', {
-        userID: query.participant_id,
-      })
-      .andWhere(query.host_user_id ? 'host_user = :hostUserID' : '1=1', {
-        hostUserID: query.host_user_id,
-      })
+      // .andWhere(query.participant_id ? 'user = :userID' : '1=1', {
+      //   userID: query.participant_id,
+      // })
+      // .andWhere(query.host_user_id ? 'host_user = :hostUserID' : '1=1', {
+      //   hostUserID: query.host_user_id,
+      // })
       .getMany();
+
+    const eventIds = events.map((e) => e.id);
+    if (query.personal && eventIds.length) {
+      const joiningEventList = await this.userJoiningEventRepository
+        .createQueryBuilder('userJoiningEvent')
+        .select([
+          'userJoiningEvent.event_id as eventId',
+          'userJoiningEvent.user_id as userId',
+        ])
+        .where('userJoiningEvent.user_id  = :userId', { userId })
+        .andWhere('userJoiningEvent.event_id IN (:...eventIds)', { eventIds })
+        .andWhere('userJoiningEvent.canceledAt IS NULL')
+        .getRawMany();
+      console.log('----', userId, joiningEventList);
+
+      const joiningEventId = joiningEventList.map((j) => Number(j.eventId));
+      events = events.filter((e) => joiningEventId.includes(e.id));
+    }
+
+    const endTime = Date.now();
+    console.log(
+      'get specific evetns speed check',
+      endTime - startTime,
+      'event count',
+      events.length,
+    );
     return { pageCount: 0, events };
   }
 
@@ -352,18 +390,14 @@ export class EventScheduleService {
     id: number,
     userID: number,
   ): Promise<EventSchedule> {
+    const startTime = Date.now();
     const existEvent = await this.eventRepository
       .createQueryBuilder('events')
       .withDeleted()
       .leftJoinAndSelect('events.userJoiningEvent', 'userJoiningEvent')
       .leftJoin('userJoiningEvent.user', 'user')
-      .addSelect([
-        'user.id',
-        'user.firstName',
-        'user.lastName',
-        'user.avatarUrl',
-      ])
-      // .leftJoinAndSelect('userJoiningEvent.event', 'event')
+      .addSelect(selectUserColumns('user'))
+      .leftJoinAndSelect('userJoiningEvent.event', 'event')
       .leftJoinAndSelect('events.tags', 'tags')
       .leftJoinAndSelect('events.files', 'files')
       .leftJoinAndSelect(
@@ -374,32 +408,23 @@ export class EventScheduleService {
       )
       .leftJoinAndSelect('events.videos', 'videos')
       .leftJoinAndSelect('events.author', 'author')
-      .addSelect([
-        'author.id',
-        'author.firstName',
-        'author.lastName',
-        'author.avatarUrl',
-      ])
+      .addSelect(selectUserColumns('author'))
       .leftJoinAndSelect('events.hostUsers', 'hostUsers')
-      .addSelect([
-        'hostUsers.id',
-        'hostUsers.firstName',
-        'hostUsers.lastName',
-        'hostUsers.avatarUrl',
-      ])
+      .addSelect(selectUserColumns('hostUsers'))
       .leftJoinAndSelect('events.comments', 'comments')
       .leftJoinAndSelect('comments.writer', 'writer')
-      .addSelect([
-        'writer.id',
-        'writer.firstName',
-        'writer.lastName',
-        'writer.avatarUrl',
-      ])
+      .addSelect(selectUserColumns('writer'))
       .where('events.id = :id', { id })
       .getOne();
     existEvent.userJoiningEvent = existEvent.userJoiningEvent.filter(
       (u) => u?.user.existence,
     );
+    const endTime = Date.now();
+    console.log(
+      'speed check get event detail =====================',
+      endTime - startTime,
+    );
+
     return existEvent;
   }
 

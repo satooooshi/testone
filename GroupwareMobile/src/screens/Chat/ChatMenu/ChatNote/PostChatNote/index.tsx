@@ -9,9 +9,28 @@ import {
   ChatRouteProps,
   PostChatNotesNavigationProps,
 } from '../../../../../types/navigator/drawerScreenProps';
+import {socket} from '../../../../../utils/socket';
 
 const PostChatNote: React.FC = () => {
-  const {mutate: createChatNote} = useAPICreateChatNote();
+  const {mutate: createChatNote} = useAPICreateChatNote({
+    onSuccess: result => {
+      console.log('result--------', result.systemMessage);
+
+      socket.emit('message', {
+        type: 'send',
+        chatMessage: result.systemMessage,
+      });
+      navigation.navigate('ChatStack', {
+        screen: 'ChatNotes',
+        params: {room},
+      });
+    },
+    onError: () => {
+      Alert.alert(
+        'ノート作成中にエラーが発生しました。\n時間をおいて再実行してください。',
+      );
+    },
+  });
   const navigation = useNavigation<PostChatNotesNavigationProps>();
   const {mutate: uploadImage} = useAPIUploadStorage();
   const {room} = useRoute<ChatRouteProps>().params;
@@ -26,19 +45,7 @@ const PostChatNote: React.FC = () => {
       note={initialValues}
       onUploadImage={uploadImage}
       onSubmit={submittedValues => {
-        createChatNote(submittedValues, {
-          onSuccess: () => {
-            navigation.navigate('ChatStack', {
-              screen: 'ChatNotes',
-              params: {room},
-            });
-          },
-          onError: () => {
-            Alert.alert(
-              'ノート作成中にエラーが発生しました。\n時間をおいて再実行してください。',
-            );
-          },
-        });
+        createChatNote(submittedValues);
       }}
     />
   );

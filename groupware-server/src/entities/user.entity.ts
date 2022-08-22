@@ -36,6 +36,7 @@ import { Attendance } from './attendance.entity';
 import { ApplicationBeforeJoining } from './applicationBeforeJoining.entity';
 import { DefaultAttendance } from './defaultAttendance.entity';
 import { AttendanceReport } from './attendanceReport.entity';
+import { UserGoodForBoard } from './userGoodForBord.entity';
 
 export enum UserRole {
   ADMIN = 'admin',
@@ -322,22 +323,15 @@ export class User {
   })
   muteChatGroups?: ChatGroup[];
 
-  @ManyToMany(() => Wiki, (wiki) => wiki.userGoodForBoard, {
-    onUpdate: 'CASCADE',
-    onDelete: 'CASCADE',
-  })
-  @JoinTable({
-    name: 'user_good_for_board',
-    joinColumn: {
-      name: 'user_id',
-      referencedColumnName: 'id',
+  @OneToMany(
+    () => UserGoodForBoard,
+    (userGoodForBoard) => userGoodForBoard.user,
+    {
+      onUpdate: 'CASCADE',
+      onDelete: 'CASCADE',
     },
-    inverseJoinColumn: {
-      name: 'wiki_id',
-      referencedColumnName: 'id',
-    },
-  })
-  userGoodForBoard?: Wiki[];
+  )
+  userGoodForBoard?: UserGoodForBoard[];
 
   @OneToMany(() => Wiki, (wiki) => wiki.writer)
   wiki?: Wiki[];

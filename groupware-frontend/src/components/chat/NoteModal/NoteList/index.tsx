@@ -64,7 +64,7 @@ const NoteList: React.FC<NoteListProps> = ({
     page: noteListPage.toString(),
   });
   const handleNoteDelete = (note: ChatNote) => {
-    if (confirm('ノートを削除します。よろしいですa?')) {
+    if (confirm('ノートを削除します。よろしいですか?')) {
       deleteNote(
         { roomId: room.id.toString(), noteId: note.id.toString() },
         {

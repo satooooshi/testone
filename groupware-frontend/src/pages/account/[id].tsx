@@ -5,7 +5,7 @@ import LayoutWithTab from '@/components/layout/LayoutWithTab';
 import { useAPIGetUserInfoById } from '@/hooks/api/user/useAPIGetUserInfoById';
 import Image from 'next/image';
 import noImage from '@/public/no-image.jpg';
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import EventCard from '@/components/common/EventCard';
 import WikiCard from '@/components/common/WikiCard';
 import { axiosInstance } from 'src/utils/url';
@@ -116,17 +116,28 @@ const MyAccountInfo = () => {
   const router = useRouter();
   const { id } = router.query as { id: string };
   const { data: profile } = useAPIGetUserInfoById(id);
-  const { data: events } = useAPIGetEventList({ participant_id: id });
-  const { data: questionList } = useAPIGetWikiList({
-    writer: id,
-    type: WikiType.BOARD,
-    board_category: BoardCategory.QA,
-  });
-  const { data: knowledgeList } = useAPIGetWikiList({
-    writer: id,
-    type: WikiType.BOARD,
-    board_category: BoardCategory.KNOWLEDGE,
-  });
+  const { data: events, refetch: refetchEvent } = useAPIGetEventList(
+    { participant_id: id },
+    { enabled: false },
+  );
+  const { data: questionList, refetch: refetchQuestionList } =
+    useAPIGetWikiList(
+      {
+        writer: id,
+        type: WikiType.BOARD,
+        board_category: BoardCategory.QA,
+      },
+      { enabled: false },
+    );
+  const { data: knowledgeList, refetch: refetchKnowledgeList } =
+    useAPIGetWikiList(
+      {
+        writer: id,
+        type: WikiType.BOARD,
+        board_category: BoardCategory.KNOWLEDGE,
+      },
+      { enabled: false },
+    );
   const { user } = useAuthenticate();
   const [activeTab, setActiveTab] = useState<TabName>(TabName.DETAIL);
   const { mutate: logout } = useAPILogout({
@@ -190,6 +201,26 @@ const MyAccountInfo = () => {
       });
     },
   });
+
+  useEffect(() => {
+    const refetchActiveTabData = (activeTab: TabName) => {
+      switch (activeTab) {
+        case TabName.EVENT:
+          refetchEvent();
+          return;
+        case TabName.QUESTION:
+          refetchQuestionList();
+          return;
+        case TabName.KNOWLEDGE:
+          refetchKnowledgeList();
+          return;
+      }
+    };
+    if (activeTab) {
+      refetchActiveTabData(activeTab);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeTab]);
 
   return (
     <LayoutWithTab
@@ -472,7 +503,7 @@ const MyAccountInfo = () => {
             profile.userGoodForBoard.length ? (
               <Box>
                 {profile.userGoodForBoard.map((w) => (
-                  <WikiCard wiki={w} key={w.id} />
+                  <WikiCard wiki={w.wiki} key={w.id} />
                 ))}
               </Box>
             ) : null}

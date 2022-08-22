@@ -143,7 +143,8 @@ const ChatFooter: React.FC<ChatFooterProps> = ({
 
       //Mention style doesn't work correctly
       //https://github.com/dabakovich/react-native-controlled-mentions/issues/66
-      onChangeText(newValue + '\n');
+      // onChangeText(newValue + '\n');
+      setContent(newValue + '\n');
       setMentionAdded(true);
 
       /**

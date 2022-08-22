@@ -20,7 +20,10 @@ define(User, (): User => {
   (user.password = hashSync('password', 10)),
     (user.role =
       userRoleArray[Math.floor(Math.random() * userRoleArray.length)]);
-  user.avatarUrl = faker.image.avatar();
+  user.verifiedAt = new Date();
+  user.avatarUrl =
+    'https://storage.googleapis.com/groupware-bucket-development/1659514315874/';
+  user.existence = true;
 
   return user;
 });

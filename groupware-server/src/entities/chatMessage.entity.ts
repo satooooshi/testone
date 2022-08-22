@@ -134,6 +134,8 @@ export class ChatMessage {
         content = '動画を送信しました。';
       } else if (this.type === ChatMessageType.OTHER_FILE) {
         content = 'ファイルを送信しました。';
+      } else if (this.type === ChatMessageType.STICKER) {
+        content = 'スタンプを送信しました。';
       }
       const mentionRegex = /@\[.*?\]\(([0-9]+)\)/g;
       const mentionedIds: number[] = [];

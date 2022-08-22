@@ -29,6 +29,7 @@ const Viewer = dynamic(() => import('react-viewer'), { ssr: false });
 import { saveAs } from 'file-saver';
 import { fileNameTransformer } from 'src/utils/factory/fileNameTransformer';
 import { useAPIUpdateNote } from '@/hooks/api/chat/note/useAPIUpdateChatNote';
+import { socket } from '../../ChatBox/socket';
 
 type EditNoteProps = {
   room: ChatGroup;
@@ -55,7 +56,11 @@ const EditNote: React.FC<EditNoteProps> = ({
     images: [],
   };
   const { mutate: createNote } = useAPICreateChatNote({
-    onSuccess: () => {
+    onSuccess: (result) => {
+      socket.emit('message', {
+        type: 'send',
+        chatMessage: result.systemMessage,
+      });
       toast({
         title: 'ノートを保存しました',
         status: 'success',
