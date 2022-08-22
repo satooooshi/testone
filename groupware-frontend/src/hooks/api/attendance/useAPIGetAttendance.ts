@@ -5,6 +5,7 @@ import { axiosInstance } from 'src/utils/url';
 import { attendanceURL } from 'src/utils/url/attendance.url';
 
 export interface GetAttendanceQuery {
+  id?: number;
   from_date: string;
   to_date: string;
 }
@@ -12,14 +13,14 @@ export interface GetAttendanceQuery {
 const getAttendance = async (
   query: GetAttendanceQuery,
 ): Promise<Attendance[]> => {
-  const { from_date: fromDate, to_date: toDate } = query;
+  const { from_date: fromDate, to_date: toDate, id } = query;
   const response = await axiosInstance.get<Attendance[]>(
-    attendanceURL + `?from_date=${fromDate}&to_date=${toDate}`,
+    attendanceURL + `?id=${id}&from_date=${fromDate}&to_date=${toDate}`,
   );
   return response.data;
 };
 
-export const useAPIGetAttendace = (
+export const useAPIGetAttendance = (
   query: GetAttendanceQuery,
   options?: UseQueryOptions<Attendance[], AxiosError>,
 ) => {

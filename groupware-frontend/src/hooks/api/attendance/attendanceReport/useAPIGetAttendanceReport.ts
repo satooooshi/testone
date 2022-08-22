@@ -5,6 +5,7 @@ import { axiosInstance } from 'src/utils/url';
 import { attendanceReportURL } from 'src/utils/url/attendance.url';
 
 export interface GetAttendanceReportQuery {
+  id?: number;
   from_date: string;
   to_date: string;
 }
@@ -12,9 +13,9 @@ export interface GetAttendanceReportQuery {
 const getAttendanceReport = async (
   query: GetAttendanceReportQuery,
 ): Promise<AttendanceRepo[]> => {
-  const { from_date: fromDate, to_date: toDate } = query;
+  const { from_date: fromDate, to_date: toDate, id } = query;
   const response = await axiosInstance.get<AttendanceRepo[]>(
-    attendanceReportURL + `?from_date=${fromDate}&to_date=${toDate}`,
+    attendanceReportURL + `?id=${id}&from_date=${fromDate}&to_date=${toDate}`,
   );
   return response.data;
 };

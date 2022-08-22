@@ -55,6 +55,7 @@ const UnverifiedAttendanceReportRow: React.FC<UnverifiedAttendanceReportRowProps
                 params: {
                   report: reportData,
                   previousScreenName: routes[routes?.length - 1],
+                  initial: false,
                 },
               });
             }}>

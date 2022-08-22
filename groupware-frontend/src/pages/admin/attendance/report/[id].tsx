@@ -29,8 +29,11 @@ import TopTabBar, { TopTabBehavior } from '@/components/layout/TopTabBar';
 import { useAPIUpdateAttendanceReport } from '@/hooks/api/attendance/attendanceReport/useAPIUpdateAttendanceReport';
 import ReportDetailModal from '@/components/attendance/ReportDetailModal';
 import { useAPIDeleteAttendanceReport } from '@/hooks/api/attendance/attendanceReport/useAPIDeleteAttendanceReport';
+import { useRouter } from 'next/router';
+import { useAPIGetMiniProfileById } from '@/hooks/api/user/useAPIGetMiniProfileById';
+import { userNameFactory } from 'src/utils/factory/userNameFactory';
 
-const AttendanceReportFormRow = ({
+export const AttendanceReportRow = ({
   reportData,
   refetchReports,
 }: {
@@ -38,45 +41,14 @@ const AttendanceReportFormRow = ({
   refetchReports?: () => void;
 }) => {
   const [detailModal, setDetailModal] = useState(false);
-  const [visibleFormModal, setFormModal] = useState(false);
-  const { mutate: saveReport } = useAPIUpdateAttendanceReport({
-    onSuccess: () => {
-      setFormModal(false);
-      alert('勤怠報告を更新しました。');
-      if (refetchReports) {
-        refetchReports();
-      }
-    },
-    onError: (e) => {
-      alert(responseErrorMsgFactory(e));
-    },
-  });
-  const { mutate: deleteReport } = useAPIDeleteAttendanceReport({
-    onSuccess: () => {
-      setFormModal(false);
-      alert('勤怠報告を削除しました。');
-      if (refetchReports) {
-        refetchReports();
-      }
-    },
-    onError: (e) => {
-      alert(responseErrorMsgFactory(e));
-    },
-  });
 
   return (
     <>
-      <ReportFormModal
-        report={reportData}
-        isOpen={visibleFormModal}
-        onCloseModal={() => setFormModal(false)}
-        onSubmit={(report) => saveReport(report)}
-        onDelete={(reportId) => deleteReport({ reportId: reportId })}
-      />
       <ReportDetailModal
         report={reportData}
         isOpen={detailModal}
         onCloseModal={() => setDetailModal(false)}
+        refetchReports={refetchReports}
       />
       <Td>
         <Text>
@@ -91,22 +63,13 @@ const AttendanceReportFormRow = ({
           'yyyy/LL/dd',
         )}
       </Td>
-      {reportData.verifiedAt ? (
-        <Td>
-          {DateTime.fromJSDate(new Date(reportData.createdAt)).toFormat(
-            'yyyy/LL/dd',
-          )}
-        </Td>
-      ) : (
-        <Td>
-          <Button
-            fontSize={16}
-            colorScheme="blue"
-            onClick={() => setFormModal(true)}>
-            編集
-          </Button>
-        </Td>
-      )}
+      <Td>
+        {reportData.verifiedAt
+          ? DateTime.fromJSDate(new Date(reportData.verifiedAt)).toFormat(
+              'yyyy/LL/dd',
+            )
+          : null}
+      </Td>
       <Td>
         <Button
           fontSize={16}
@@ -120,12 +83,16 @@ const AttendanceReportFormRow = ({
 };
 
 const AttendanceReport = () => {
+  const router = useRouter();
+  const { id } = router.query as { id: string };
+  const { data: userInfo } = useAPIGetMiniProfileById(id);
+
   const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
   const tabs: Tab[] = [
-    { type: 'link', name: '勤怠打刻', href: '/attendance/view' },
-    { type: 'link', name: '勤怠報告', href: '/attendance/report' },
-    { type: 'link', name: '入社前申請', href: '/attendance/application' },
+    { type: 'link', name: '勤怠打刻', href: `/admin/attendance/view/${id}` },
+    { type: 'link', name: '勤怠報告', href: `/admin/attendance/report/${id}` },
   ];
+
   const [visibleFormModal, setFormModal] = useState(false);
   const [activeTabName, setActiveTabName] = useState('reportAfterAccepted');
   const [unAcceptedReport, setUnAcceptedREport] = useState<
@@ -207,19 +174,25 @@ const AttendanceReport = () => {
 
   return (
     <LayoutWithTab
-      sidebar={{ activeScreenName: SidebarScreenName.ATTENDANCE }}
+      sidebar={{ activeScreenName: SidebarScreenName.ADMIN }}
       header={{
         title: '勤怠報告',
         tabs,
         activeTabName: '勤怠報告',
-        rightButtonName: '新規勤怠報告',
-        onClickRightButton: () => setFormModal(true),
       }}>
       <Head>
         <title>ボールド | 勤怠報告</title>
       </Head>
       <Box mb="24px">
         <TopTabBar topTabBehaviorList={topTabBehaviorList} />
+      </Box>
+      <Box display="flex" ml={10} mr="auto" alignItems="center">
+        <Text fontSize={20} mr={2}>
+          氏名:
+        </Text>
+        <Text fontSize={25} fontWeight="bold">
+          {userNameFactory(userInfo)}
+        </Text>
       </Box>
       <ReportFormModal
         isOpen={visibleFormModal}
@@ -239,17 +212,13 @@ const AttendanceReport = () => {
             bg="white"
             value={month.toFormat('yyyy-LL')}
             onChange={(e) => {
-              if (e?.target?.value) {
-                const yearAndMonth = e.target.value.split('-');
-                setMonth((m) =>
-                  m.set({
-                    year: Number(yearAndMonth[0]),
-                    month: Number(yearAndMonth[1]),
-                  }),
-                );
-              } else {
-                setMonth(DateTime.now());
-              }
+              const yearAndMonth = e.target.value.split('-');
+              setMonth((m) =>
+                m.set({
+                  year: Number(yearAndMonth[0]),
+                  month: Number(yearAndMonth[1]),
+                }),
+              );
             }}
           />
         </FormControl>
@@ -275,9 +244,7 @@ const AttendanceReport = () => {
               <Th minW={'100px'}>日付</Th>
               <Th>区分</Th>
               <Th>送信日</Th>
-              <Th>
-                {activeTabName === 'reportAfterAccepted' ? '受理日' : '編集'}
-              </Th>
+              <Th>受理日</Th>
               <Th>詳細</Th>
             </Tr>
           </Thead>
@@ -285,7 +252,7 @@ const AttendanceReport = () => {
             <Tbody position="relative" borderColor="gray.300" borderWidth={1}>
               {acceptedReport.map((d) => (
                 <Tr key={d.id}>
-                  <AttendanceReportFormRow
+                  <AttendanceReportRow
                     reportData={d}
                     refetchReports={refetchReports}
                   />
@@ -298,7 +265,7 @@ const AttendanceReport = () => {
             <Tbody position="relative" borderColor="gray.300" borderWidth={1}>
               {unAcceptedReport.map((d) => (
                 <Tr key={d.id}>
-                  <AttendanceReportFormRow
+                  <AttendanceReportRow
                     reportData={d}
                     refetchReports={refetchReports}
                   />

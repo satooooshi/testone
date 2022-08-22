@@ -27,7 +27,9 @@ const AttendanceReportDetail: React.FC<AttendanceReportDetailProps> = ({
   const {mutate: verifyReport} = useAPIVerifyAttendanceReport({
     onSuccess: () => {
       Alert.alert('承認が完了しました');
-      navigation.navigate('AdminStack', {screen: 'AttendanceReportAdmin'});
+      navigation.navigate('AdminStack', {
+        screen: 'AttendanceVerifyReportAdmin',
+      });
     },
     onError: e => {
       Alert.alert(responseErrorMsgFactory(e));

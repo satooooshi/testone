@@ -1,6 +1,6 @@
 import {useNavigation} from '@react-navigation/core';
 import {DateTime} from 'luxon';
-import React, {useMemo, useState} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 import DropdownOpenerButton from '../../../components/common/DropdownOpenerButton';
 import HeaderWithTextButton from '../../../components/Header';
 import {Tab} from '../../../components/Header/HeaderTemplate';
@@ -12,13 +12,16 @@ import {Text, Div, ScrollDiv, Button} from 'react-native-magnus';
 import {useAPIGetDefaultAttendance} from '../../../hooks/api/attendance/useAPIGetDefaultAttendance';
 import {useAPIGetAttendace} from '../../../hooks/api/attendance/useAPIGetAttendance';
 import AttendanceRow from '../../../components/attendance/AttendanceRow';
+import {useIsFocused} from '@react-navigation/native';
 
 const Attendance: React.FC = () => {
   const navigation = useNavigation<AttendanceNavigationProps>();
   const [month, setMonth] = useState(DateTime.now());
   const [dateTimeModal, setDateTimeModal] = useState(false);
   const windowWidth = useWindowDimensions().width;
-  const {data: defaultData} = useAPIGetDefaultAttendance();
+  const isFocused = useIsFocused();
+  const {data: defaultData, refetch: refetchDefault} =
+    useAPIGetDefaultAttendance();
   const {data} = useAPIGetAttendace({
     from_date: month.startOf('month').toFormat('yyyy-LL-dd'),
     to_date: month.endOf('month').endOf('day').toFormat('yyyy-LL-dd'),
@@ -46,6 +49,12 @@ const Attendance: React.FC = () => {
     }
     return arr;
   }, [month]);
+
+  useEffect(() => {
+    if (isFocused) {
+      refetchDefault();
+    }
+  }, [isFocused, refetchDefault]);
 
   return (
     <WholeContainer>

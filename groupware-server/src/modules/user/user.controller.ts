@@ -79,10 +79,20 @@ export class UserController {
 
   @UseGuards(JwtAuthenticationGuard)
   @Get('profile/:id')
-  async getAllInfoById(@Param() params: { id: number }): Promise<User> {
+  async getAllInfoById(
+    @Param() params: { id: number; miniInfo: boolean },
+  ): Promise<User> {
     const { id } = params;
     const userProfile = await this.userService.getAllInfoById(id);
 
+    return userProfile;
+  }
+
+  @UseGuards(JwtAuthenticationGuard)
+  @Get('mini-profile/:id')
+  async getMiniInfoById(@Param() params: { id: number }): Promise<User> {
+    const { id } = params;
+    const userProfile = await this.userService.getMiniInfoById(id);
     return userProfile;
   }
 

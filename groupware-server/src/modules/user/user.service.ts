@@ -545,6 +545,19 @@ export class UserService {
     return { ...user, userGoodForBoard: userGoodForBoardsAndRelationCount };
   }
 
+  async getMiniInfoById(id: number): Promise<User> {
+    const user = await this.userRepository.findOne({
+      where: { id },
+    });
+    if (!user) {
+      throw new NotFoundException('User with this id does not exist');
+    }
+    if (!user?.verifiedAt) {
+      throw new BadRequestException('The user is not verified');
+    }
+    return user;
+  }
+
   async getByEmail(email: string, passwordSelect?: boolean) {
     let user: User;
 

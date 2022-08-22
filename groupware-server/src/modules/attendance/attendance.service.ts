@@ -62,12 +62,12 @@ export class AttendanceService {
     userId: number,
     query: GetAttendanceQuery,
   ) {
-    const { from_date: fromDate, to_date: toDate } = query;
+    const { from_date: fromDate, to_date: toDate, id } = query;
     const attendance = await this.attendanceRepo
       .createQueryBuilder('attendance')
       .leftJoinAndSelect('attendance.travelCost', 'travelCost')
       .leftJoinAndSelect('attendance.user', 'user')
-      .andWhere('user.id = :userId', { userId })
+      .andWhere('user.id = :userId', { userId: id ? id : userId })
       .andWhere('attendance.targetDate between :fromDate and :toDate', {
         fromDate,
         toDate,
@@ -183,7 +183,9 @@ export class AttendanceService {
   }
 
   public async getAttendanceReports(userId: number, query: GetAttendanceQuery) {
-    const { from_date: fromDate, to_date: toDate } = query;
+    const { from_date: fromDate, to_date: toDate, id } = query;
+    userId - id ? id : userId;
+
     const attendanceReports = await this.attendanceReport
       .createQueryBuilder('attendance_report')
       .leftJoinAndSelect('attendance_report.user', 'user')
