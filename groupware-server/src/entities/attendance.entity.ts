@@ -105,7 +105,7 @@ export class Attendance {
   absenceTime: Date;
 
   //備考
-  @Column({ type: 'varchar', name: 'detail', length: 500, default: '' })
+  @Column({ type: 'varchar', name: 'detail', length: 2083, default: '' })
   detail: string;
 
   //休憩時間

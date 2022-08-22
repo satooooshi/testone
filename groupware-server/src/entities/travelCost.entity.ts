@@ -36,11 +36,11 @@ export class TravelCost {
   category: TravelCostCategory;
 
   //行き先
-  @Column({ type: 'varchar', name: 'destination', length: 100, default: '' })
+  @Column({ type: 'varchar', name: 'destination', length: 500, default: '' })
   destination: string;
 
   //目的
-  @Column({ type: 'varchar', name: 'purpose', length: 100, default: '' })
+  @Column({ type: 'varchar', name: 'purpose', length: 500, default: '' })
   purpose: string;
 
   //出発駅
