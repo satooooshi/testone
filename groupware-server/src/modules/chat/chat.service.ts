@@ -307,8 +307,8 @@ export class ChatService {
   public async getOneRoom(userID: number, roomId: number): Promise<ChatGroup> {
     const room = await this.chatGroupRepository
       .createQueryBuilder('chat_groups')
-      .innerJoin('chat_groups.members', 'members')
-      .addSelect(selectUserColumns('members'))
+      // .innerJoin('chat_groups.members', 'members')
+      // .addSelect(selectUserColumns('members'))
       .where('chat_groups.id = :roomId', { roomId: roomId })
       .getOne();
 
@@ -317,6 +317,11 @@ export class ChatService {
     //   'select chat_group_id, COUNT(user_id) as cnt from user_chat_joining where chat_group_id IN (?) group by chat_group_id',
     //   [roomIds],
     // );
+
+    const members: UserAndGroupID[] = await manager.query(
+      'select chat_group_id, users.id as id, users.last_name as lastName, users.first_name as firstName, users.avatar_url as avatarUrl, users.existence as existence from user_chat_joining INNER JOIN users ON users.id = user_id AND chat_group_id = ?',
+      [roomId],
+    );
 
     const muteUserId = await manager.query(
       'select chat_group_id, user_id  from user_chat_mute where chat_group_id  = ? AND user_id = ?',
@@ -357,7 +362,7 @@ export class ChatService {
       .orderBy('createdAt', 'DESC')
       .limit(1)
       .getRawMany();
-
+    room.members = members;
     room.chatMessages = latestMessage.length
       ? latestMessage.map((m) => ({
           ...m,
@@ -1105,9 +1110,22 @@ export class ChatService {
   }
 
   public async getRoomDetail(roomId: number) {
-    const existRoom = await this.chatGroupRepository.findOne(roomId, {
-      relations: ['members'],
-    });
+    const existRoom = await this.chatGroupRepository
+      .createQueryBuilder('chat_groups')
+      .where('chat_groups.id = :roomId', { roomId: roomId })
+      .getOne();
+
+    if (!existRoom) {
+      throw new InternalServerErrorException('the room is not exist');
+    }
+
+    const manager = getManager();
+    const members: UserAndGroupID[] = await manager.query(
+      'select chat_group_id, users.id as id, users.last_name as lastName, users.first_name as firstName, users.avatar_url as avatarUrl, users.existence as existence from user_chat_joining INNER JOIN users ON users.id = user_id AND chat_group_id = ?',
+      [roomId],
+    );
+    existRoom.members = members;
+
     return existRoom;
   }
 
@@ -1115,8 +1133,6 @@ export class ChatService {
     user: User,
     chatGroupId: number,
   ): Promise<LastReadChatTime> {
-    console.log(user.lastName, 'call saveLastReadChatTime');
-
     // const chatGroup = await this.chatGroupRepository.findOne(chatGroupId, {
     //   relations: ['members'],
     // });
@@ -1127,7 +1143,6 @@ export class ChatService {
       'select chat_group_id from user_chat_joining where chat_group_id = ? AND user_id = ?',
       [chatGroupId, user.id],
     );
-    console.log('isMember', isMember);
 
     if (!isMember) {
       throw new NotAcceptableException('Something went wrong');
@@ -1139,8 +1154,6 @@ export class ChatService {
       .where('time.chat_group_id = :chatGroupId', { chatGroupId })
       .andWhere('time.user_id = :userId', { userId: user.id })
       .getRawOne();
-
-    console.log('----', existTime);
 
     if (existTime) {
       return await this.lastReadChatTimeRepository.save({
