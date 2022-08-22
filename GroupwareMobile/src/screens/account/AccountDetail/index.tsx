@@ -329,6 +329,7 @@ const AccountDetail: React.FC = () => {
             {userID === user?.id ? (
               <Button
                 py="md"
+                mb={20}
                 w="100%"
                 rounded="circle"
                 bg="gray300"
@@ -337,16 +338,25 @@ const AccountDetail: React.FC = () => {
               </Button>
             ) : null}
 
+            <Div my={8}>
+              <Text fontSize={14} lineHeight={20} fontWeight="bold">
+                メールアドレス
+              </Text>
+              <Text fontSize={14} lineHeight={20}>
+                {profile.isEmailPublic ? profile.email : '非公開'}
+              </Text>
+            </Div>
+            <Div my={8}>
+              <Text fontSize={14} lineHeight={20} fontWeight="bold">
+                自己紹介
+              </Text>
+              <Text fontSize={14} lineHeight={20}>
+                {profile.introduceOther || '未設定'}
+              </Text>
+            </Div>
+
             <Div alignItems="center">
               <Div flexDir="row" mb="sm">
-                <Text
-                  fontWeight="bold"
-                  mb={'lg'}
-                  color={darkFontColor}
-                  mr="lg"
-                  fontSize={24}>
-                  {userNameFactory(profile)}
-                </Text>
                 {profile.id !== user?.id &&
                 profile.role !== UserRole.EXTERNAL_INSTRUCTOR ? (
                   <Button
