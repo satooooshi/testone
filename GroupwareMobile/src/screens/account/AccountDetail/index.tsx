@@ -313,7 +313,7 @@ const AccountDetail: React.FC = () => {
       <ScrollDiv contentContainerStyle={accountDetailStyles.scrollView}>
         {profile && (
           <Div px={18}>
-            <Div row my={8}>
+            <Div flexDir="row" my={8}>
               <Div mr={12}>
                 <UserAvatar user={profile} h={100} w={100} />
               </Div>
