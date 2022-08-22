@@ -42,6 +42,7 @@ import {userRoleNameFactory} from '../../../utils/factory/userRoleNameFactory';
 import {useInviteCall} from '../../../contexts/call/useInviteCall';
 import {branchTypeNameFactory} from '../../../utils/factory/branchTypeNameFactory';
 import {useHandleBadge} from '../../../contexts/badge/useHandleBadge';
+import {userNameKanaFactory} from '../../../utils/factory/userNameKanaFactory';
 
 const TopTab = createMaterialTopTabNavigator();
 
@@ -311,15 +312,32 @@ const AccountDetail: React.FC = () => {
       {/* <Button onPress={() => SoundPlayer.resume()}>test </Button> */}
       <ScrollDiv contentContainerStyle={accountDetailStyles.scrollView}>
         {profile && (
-          <>
-            <Div alignItems="center">
-              <Div my={'lg'}>
-                <UserAvatar
-                  user={profile}
-                  h={windowWidth * 0.6}
-                  w={windowWidth * 0.6}
-                />
+          <Div px={18}>
+            <Div row my={8}>
+              <Div mr={12}>
+                <UserAvatar user={profile} h={100} w={100} />
               </Div>
+              <Div alignSelf="center">
+                <Text fontSize={16} fontWeight="bold">
+                  {userNameFactory(profile)}
+                </Text>
+                <Text fontSize={12} color="gray500">
+                  {userNameKanaFactory(profile)}
+                </Text>
+              </Div>
+            </Div>
+            {userID === user?.id ? (
+              <Button
+                py="md"
+                w="100%"
+                rounded="circle"
+                bg="gray300"
+                color="black">
+                <Text fontSize={16}>編集</Text>
+              </Button>
+            ) : null}
+
+            <Div alignItems="center">
               <Div flexDir="row" mb="sm">
                 <Text
                   fontWeight="bold"
@@ -520,7 +538,7 @@ const AccountDetail: React.FC = () => {
                 />
               </TopTab.Navigator>
             </Div>
-          </>
+          </Div>
         )}
       </ScrollDiv>
       {profile &&
