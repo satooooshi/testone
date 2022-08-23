@@ -323,7 +323,7 @@ const Chat: React.FC = () => {
         }
         if (sentMsg.type === ChatMessageType.TEXT) {
           messageContentRef.current = '';
-          setValues(v => ({...v, content: ''}));
+          // setValues(v => ({...v, content: ''}));
           resetForm();
         }
       },
@@ -767,6 +767,8 @@ const Chat: React.FC = () => {
           onPress={() => {
             setEditMessage(true);
             if (longPressedMsg) {
+              console.log('edit message', longPressedMsg);
+
               setValues(longPressedMsg);
               messageContentRef.current = longPressedMsg.content;
             }

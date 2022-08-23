@@ -1,6 +1,16 @@
-import React, {Fragment, useEffect, useMemo, useRef, useState} from 'react';
+import React, {
+  createRef,
+  Fragment,
+  memo,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import {
   AppState,
+  Keyboard,
   NativeSyntheticEvent,
   Platform,
   Text,
@@ -14,7 +24,10 @@ import {
   parseValue,
   Suggestion,
 } from 'react-native-controlled-mentions';
-import {MentionPartType} from 'react-native-controlled-mentions/dist/types';
+import {
+  MentionPartType,
+  Part,
+} from 'react-native-controlled-mentions/dist/types';
 import {
   defaultMentionTextStyle,
   generateValueFromPartsAndChangedText,
@@ -56,14 +69,9 @@ const ChatFooter: React.FC<ChatFooterProps> = ({
   const [selection, setSelection] = useState({start: 0, end: 0});
   const [mentionAdded, setMentionAdded] = useState(false);
   const [visibleMenu, setVisibleMenu] = useState(false);
-  const [content, setContent] = useState('');
-  const inputRef = useRef<TextInput>(null);
+  const [keyboardShow, setKeyboardShow] = useState(false);
 
-  useEffect(() => {
-    if (!value) {
-      setContent('');
-    }
-  }, [value]);
+  let inputRef: TextInput | null;
 
   const renderSuggestions: React.FC<MentionSuggestionsProps> = ({
     keyword,
@@ -90,6 +98,27 @@ const ChatFooter: React.FC<ChatFooterProps> = ({
       </ScrollDiv>
     );
   };
+
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener(
+      'keyboardDidShow',
+      () => {
+        setKeyboardShow(true);
+      },
+    );
+    const keyboardDidHideListener = Keyboard.addListener(
+      'keyboardDidHide',
+      () => {
+        setKeyboardShow(false);
+      },
+    );
+
+    return () => {
+      keyboardDidHideListener.remove();
+      keyboardDidShowListener.remove();
+    };
+  }, []);
+
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const partTypes: MentionPartType[] = [
     {
@@ -98,16 +127,37 @@ const ChatFooter: React.FC<ChatFooterProps> = ({
       textStyle: {fontWeight: 'bold', color: 'blue'}, // The mention style in the input
     },
   ];
-  const {plainText, parts} = useMemo(
-    () => parseValue(content, partTypes),
-    [content, partTypes],
-  );
+  const [parseContent, setParseContent] = useState<{
+    plainText: string;
+    parts: Part[];
+  }>(parseValue('', partTypes));
 
-  const onChangeInput = (changedText: string) => {
-    onChangeText(
-      generateValueFromPartsAndChangedText(parts, plainText, changedText),
-    );
-  };
+  useEffect(() => {
+    if (value) {
+      setParseContent(parseValue(value, partTypes));
+    } else {
+      inputRef?.clear();
+      setParseContent(parseValue('', partTypes));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [value]);
+
+  const onChangeInput = useCallback(
+    (changedText: string) => {
+      if (keyboardShow) {
+        setParseContent(parseValue(changedText, partTypes));
+        onChangeText(
+          generateValueFromPartsAndChangedText(
+            parseContent.parts,
+            parseContent.plainText,
+            changedText,
+          ),
+        );
+      }
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [keyboardShow, parseContent],
+  );
 
   const handleSelectionChange = (
     event: NativeSyntheticEvent<TextInputSelectionChangeEventData>,
@@ -120,19 +170,19 @@ const ChatFooter: React.FC<ChatFooterProps> = ({
    */
   const keywordByTrigger = useMemo(() => {
     return getMentionPartSuggestionKeywords(
-      parts,
-      plainText,
+      parseContent.parts,
+      parseContent.plainText,
       selection,
       partTypes,
     );
-  }, [parts, plainText, selection, partTypes]);
+  }, [parseContent.parts, parseContent.plainText, selection, partTypes]);
 
   const onSuggestionPress =
     (mentionType: MentionPartType) => (suggestion: Suggestion) => {
       const newValue = generateValueWithAddedSuggestion(
-        parts,
+        parseContent.parts,
         mentionType,
-        plainText,
+        parseContent.plainText,
         selection,
         suggestion,
       );
@@ -144,7 +194,7 @@ const ChatFooter: React.FC<ChatFooterProps> = ({
       //Mention style doesn't work correctly
       //https://github.com/dabakovich/react-native-controlled-mentions/issues/66
       // onChangeText(newValue + '\n');
-      setContent(newValue + '\n');
+      setParseContent(parseValue(newValue + '\n', partTypes));
       setMentionAdded(true);
 
       /**
@@ -172,16 +222,14 @@ const ChatFooter: React.FC<ChatFooterProps> = ({
 
   return (
     <Div flexDir="column">
-      {inputRef.current?.isFocused()
-        ? (
-            partTypes.filter(
-              one =>
-                isMentionPartType(one) &&
-                one.renderSuggestions != null &&
-                !one.isBottomMentionSuggestionsRender,
-            ) as MentionPartType[]
-          ).map(renderMentionSuggestions)
-        : null}
+      {(
+        partTypes.filter(
+          one =>
+            isMentionPartType(one) &&
+            one.renderSuggestions != null &&
+            !one.isBottomMentionSuggestionsRender,
+        ) as MentionPartType[]
+      ).map(renderMentionSuggestions)}
       <Div
         alignSelf="center"
         flexDir="row"
@@ -244,13 +292,13 @@ const ChatFooter: React.FC<ChatFooterProps> = ({
           rounded="md"
           w="60%">
           <TextInput
-            ref={inputRef}
+            ref={ref => {
+              inputRef = ref;
+            }}
+            value={''}
             onSelectionChange={handleSelectionChange}
             multiline
-            onChangeText={t => {
-              setContent(t);
-              onChangeInput(t);
-            }}
+            onChangeText={t => onChangeInput(t)}
             autoCapitalize="none"
             placeholderTextColor="#868596"
             style={[
@@ -264,7 +312,7 @@ const ChatFooter: React.FC<ChatFooterProps> = ({
               },
             ]}>
             <Text>
-              {parts.map(({text, partType, data}, index) =>
+              {parseContent.parts.map(({text, partType, data}, index) =>
                 partType ? (
                   <Text
                     key={`${index}-${data?.trigger ?? 'pattern'}`}
@@ -286,7 +334,7 @@ const ChatFooter: React.FC<ChatFooterProps> = ({
               name="send"
               fontFamily="Ionicons"
               fontSize={21}
-              color={content ? 'blue600' : 'gray'}
+              color={parseContent.parts?.[0]?.text ? 'blue600' : 'gray'}
             />
           </TouchableOpacity>
         )}
@@ -295,4 +343,4 @@ const ChatFooter: React.FC<ChatFooterProps> = ({
   );
 };
 
-export default ChatFooter;
+export default memo(ChatFooter);
