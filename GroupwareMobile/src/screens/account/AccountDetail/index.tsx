@@ -65,65 +65,41 @@ const DetailScreen: React.FC<DetailScreenProps> = ({profile, isLoading}) => {
   );
 
   return (
-    <Div w={windowWidth * 0.9} alignSelf="center" mt="lg">
+    <Div px={18} mt="lg">
       {!isLoading ? (
         <>
-          <Div mb={'lg'} flexDir="row" alignItems="center">
-            <Text mr="lg" fontSize={16}>
+          <Div mb={'lg'}>
+            <Text fontSize={14} fontWeight="bold">
               社員番号
             </Text>
-            <Text color={darkFontColor} fontWeight="bold" fontSize={20}>
-              {profile.employeeId || '未登録'}
-            </Text>
+            <Text fontSize={14}>{profile.employeeId || '未登録'}</Text>
           </Div>
-          <Div mb={'lg'} flexDir="row" alignItems="center">
-            <Text mr="lg" fontSize={16}>
+          <Div mb={'lg'}>
+            <Text fontSize={14} fontWeight="bold">
               社員区分
             </Text>
-            <Text color={darkFontColor} fontWeight="bold" fontSize={20}>
-              {userRoleNameFactory(profile.role)}
-            </Text>
+            <Text fontSize={14}>{userRoleNameFactory(profile.role)}</Text>
           </Div>
-          <Div mb={'lg'} flexDir="row" alignItems="center">
-            <Text mr="lg" fontSize={16}>
+          <Div mb={'lg'}>
+            <Text fontSize={14} fontWeight="bold">
               所属支社
             </Text>
-            <Text color={darkFontColor} fontWeight="bold" fontSize={20}>
-              {branchTypeNameFactory(profile.branch)}
-            </Text>
+            <Text fontSize={14}>{branchTypeNameFactory(profile.branch)}</Text>
           </Div>
-          <Div mb={'lg'} flexDir="row" alignItems="center">
-            <Text mr="lg" fontSize={16}>
+          <Div mb={'lg'}>
+            <Text fontSize={14} fontWeight="bold">
               メール
             </Text>
-            <Text color={darkFontColor} fontWeight="bold" fontSize={20}>
+            <Text fontSize={14}>
               {profile.isEmailPublic ? profile.email : '非公開'}
             </Text>
           </Div>
-          <Div mb={'lg'} flexDir="row" alignItems="center">
-            <Text mr="lg" fontSize={16}>
+          <Div mb={'lg'}>
+            <Text fontSize={14} fontWeight="bold">
               電話番号
             </Text>
-            <Text color={darkFontColor} fontWeight="bold" fontSize={20}>
+            <Text fontSize={14}>
               {profile.isPhonePublic ? profile.phone : '非公開'}
-            </Text>
-          </Div>
-          <Div
-            w={windowWidth * 0.7}
-            flexDir="row"
-            mb={'lg'}
-            alignItems="center">
-            <Text mr="lg" fontSize={16}>
-              自己紹介
-            </Text>
-          </Div>
-          <Div
-            w={windowWidth * 0.9}
-            flexDir="row"
-            mb={'lg'}
-            alignItems="center">
-            <Text color={darkFontColor} fontWeight="bold" fontSize={15}>
-              {profile.introduceOther || '未設定'}
             </Text>
           </Div>
           <TagListBox
