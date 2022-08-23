@@ -16,12 +16,14 @@ type TagListBoxProps = DivProps & {
 const TagListBox: React.FC<TagListBoxProps> = props => {
   const {tags, tagType, introduce} = props;
   return (
-    <Div {...props} bg="white" p={'lg'} rounded={'md'}>
+    <Div {...props} bg="white" rounded={'md'}>
+      <Text fontSize={16} mb={'sm'}>
+        {`${tagTypeNameFactory(tagType)}タグ`}
+      </Text>
       <Div flexDir="row" flexWrap="wrap" mb={'md'}>
         {tags?.map(t => (
           <TagButton
             key={t.id}
-            mr={4}
             mb={8}
             color="white"
             bg={tagColorFactory(t.type)}>
@@ -29,16 +31,11 @@ const TagListBox: React.FC<TagListBoxProps> = props => {
           </TagButton>
         ))}
       </Div>
-      <Div>
-        <Text fontSize={16} mb={'sm'}>
-          {`${tagTypeNameFactory(tagType)}の紹介`}
-        </Text>
-        <AutoLinkedText
-          text={introduce || '未設定'}
-          style={tailwind('text-base font-bold')}
-          linkStyle={tailwind('text-blue-500 text-base text-base')}
-        />
-      </Div>
+      <AutoLinkedText
+        text={introduce || '未設定'}
+        style={tailwind('text-base font-bold')}
+        linkStyle={tailwind('text-blue-500 text-base text-base')}
+      />
     </Div>
   );
 };
