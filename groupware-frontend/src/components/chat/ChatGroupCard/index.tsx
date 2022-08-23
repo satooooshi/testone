@@ -140,7 +140,7 @@ const ChatGroupCard: React.FC<ChatGroupCardProps> = ({
           justifyContent="space-between"
           alignItems="center">
           <Text color={darkFontColor} fontSize="14px">
-            {`${chatGroup.members?.length || 0}人のメンバー`}
+            {`${chatGroup.memberCount}人のメンバー`}
           </Text>
           <Text color={darkFontColor} fontSize="12px">
             {dateTimeFormatterFromJSDDate({

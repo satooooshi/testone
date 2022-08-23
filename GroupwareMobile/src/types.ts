@@ -336,7 +336,7 @@ export interface ChatGroup {
   muteUsers?: User[];
   chatMessages?: ChatMessage[];
   isMute?: boolean;
-  memberCount?: number;
+  memberCount: number;
   members?: User[];
   lastReadChatTime?: LastReadChatTime[];
   hasBeenRead?: boolean;

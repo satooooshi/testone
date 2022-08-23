@@ -166,13 +166,18 @@ export class ChatService {
     }
 
     const roomIds = urlUnparsedRooms.map((r) => r.id);
+    const personalRoomIds = urlUnparsedRooms.filter(
+      (r) => r.roomType === RoomType.PERSONAL,
+    );
 
     const manager = getManager();
 
-    const members: UserAndGroupID[] = await manager.query(
-      'select chat_group_id, users.id as id, users.last_name as lastName, users.first_name as firstName, users.avatar_url as avatarUrl, users.existence as existence from user_chat_joining INNER JOIN users ON users.id = user_id AND chat_group_id IN (?)',
-      [roomIds],
-    );
+    let members: UserAndGroupID[] = [];
+    if (personalRoomIds.length)
+      members = await manager.query(
+        'select chat_group_id, users.id as id, users.last_name as lastName, users.first_name as firstName, users.avatar_url as avatarUrl, users.existence as existence from user_chat_joining INNER JOIN users ON users.id = user_id AND chat_group_id IN (?)',
+        [personalRoomIds.map((r) => r.id)],
+      );
     // console.log(members);
 
     const muteUserIds = await manager.query(
@@ -233,7 +238,7 @@ export class ChatService {
 
     let rooms = await Promise.all(
       urlUnparsedRooms.map(async (g, index) => {
-        g.members = members.filter((m) => m.chat_group_id === g.id);
+        g.members = members?.filter((m) => m.chat_group_id === g.id);
         g.chatMessages = latestMessage
           .filter((m) => m.chat_group_id === g.id)
           .map((m) => ({
@@ -824,24 +829,31 @@ export class ChatService {
     // });
   }
 
-  public async joinChatGroup(userID: number, chatGroupID: number) {
-    const containMembers: ChatGroup = await this.chatGroupRepository.findOne({
+  public async joinChatGroup(user: User, chatGroupID: number) {
+    const targetGroup: ChatGroup = await this.chatGroupRepository.findOne({
       where: { id: chatGroupID },
       relations: ['members'],
     });
 
-    const isUserJoining = containMembers.members.filter(
-      (m) => m.id === userID,
+    const isUserJoining = targetGroup.members.filter(
+      (m) => m.id === user.id,
     ).length;
     if (isUserJoining) {
       console.log('The user is already participant');
       return;
     }
-    await this.chatGroupRepository
-      .createQueryBuilder()
-      .relation(ChatGroup, 'members')
-      .of(chatGroupID)
-      .add(userID);
+    targetGroup.members.push(user);
+    targetGroup.memberCount = targetGroup.members.length;
+    const newMembersSystemMsg = new ChatMessage();
+    newMembersSystemMsg.type = ChatMessageType.SYSTEM_TEXT;
+    newMembersSystemMsg.content = `${userNameFactory(
+      user,
+    )}さんがが参加しました`;
+    newMembersSystemMsg.chatGroup = { ...targetGroup, members: undefined };
+    await this.chatMessageRepository.save(newMembersSystemMsg);
+    await this.chatGroupRepository.save(
+      this.chatGroupRepository.create(targetGroup),
+    );
   }
 
   public async leaveChatRoom(userID: number, chatGroupID: number) {
@@ -916,6 +928,7 @@ export class ChatService {
     const userIds = chatGroup.members.map((u) => u.id);
     const users = await this.userRepository.findByIds(userIds);
     chatGroup.members = users;
+    chatGroup.memberCount = users.length;
 
     const newGroup = await this.chatGroupRepository.save(
       this.chatGroupRepository.create(chatGroup),
@@ -955,6 +968,7 @@ export class ChatService {
       ...existGroup,
       imageURL: genStorageURL(newData.imageURL),
       members: newData.members,
+      memberCount: newData.members.length,
       name: newData.name,
       updatedAt: new Date(),
     });
@@ -1048,9 +1062,11 @@ export class ChatService {
     }
 
     const newGroup = await this.chatGroupRepository.save(
-      this.chatGroupRepository.create(newData),
+      this.chatGroupRepository.create({
+        ...newData,
+        memberCount: newData.members.length,
+      }),
     );
-
     return newGroup;
   }
 

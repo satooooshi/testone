@@ -61,6 +61,14 @@ export class ChatGroup {
   })
   roomType: RoomType;
 
+  @Column({
+    type: 'int',
+    name: 'member_count',
+    nullable: false,
+    default: 0,
+  })
+  memberCount: number;
+
   @OneToOne(() => EventSchedule, (eventSchedule) => eventSchedule.chatGroup, {
     onUpdate: 'CASCADE',
   })

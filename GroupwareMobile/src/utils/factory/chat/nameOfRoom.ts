@@ -1,21 +1,13 @@
+import RoomForm from '../../../templates/chat/room/RoomForm';
 import {ChatGroup, RoomType, User} from '../../../types';
 
 export const nameOfRoom = (room: ChatGroup, mySelf?: Partial<User>): string => {
-  if (!room?.members?.length) {
-    return 'メンバーがいません';
-  }
   if (room.name) {
     return room.name;
   }
-
-  if (room.roomType === RoomType.PERSONAL) {
-    const chatPartner = room.members.filter(m => m.id !== mySelf?.id);
-    const partnerName = chatPartner
-      .map(p => p.lastName + ' ' + p.firstName)
-      .join();
-
-    return partnerName;
+  if (room.roomType === RoomType.TALK_ROOM) {
+    const strMembers = room?.members?.map(m => m.lastName + m.firstName).join();
+    return strMembers ? strMembers : '名前なしトーク';
   }
-  const strMembers = room?.members?.map(m => m.lastName + m.firstName).join();
-  return strMembers;
+  return '';
 };
