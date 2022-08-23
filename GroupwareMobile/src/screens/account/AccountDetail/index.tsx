@@ -316,7 +316,10 @@ const AccountDetail: React.FC = () => {
                   w="100%"
                   rounded="circle"
                   bg="gray200"
-                  color="black">
+                  color="black"
+                  onPress={() => {
+                    navigation.navigate('AccountStack', {screen: 'Profile'});
+                  }}>
                   <Text fontSize={16}>編集</Text>
                 </Button>
               ) : null}
