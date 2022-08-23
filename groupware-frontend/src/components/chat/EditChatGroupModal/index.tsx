@@ -55,6 +55,7 @@ const EditChatGroupModal: React.FC<EditChatGroupModalProps> = ({
     },
   });
 
+  const [isDeleted, setIsDeleted] = useState<boolean>(false);
   const { editChatGroup } = useHandleBadge();
   const [selectImageUrl, setSelectImageUrl] = useState<string>('');
   const { mutate: uploadImage, isLoading } = useAPIUploadStorage({
@@ -86,6 +87,7 @@ const EditChatGroupModal: React.FC<EditChatGroupModalProps> = ({
   });
   const onLoad = useCallback((img) => {
     imgRef.current = img;
+    setIsDeleted(false);
     const diameter: number = img.height < img.width ? img.height : img.width;
     setCrop({
       unit: 'px',
@@ -116,6 +118,10 @@ const EditChatGroupModal: React.FC<EditChatGroupModalProps> = ({
         const result = await dataURLToFile(img, selectImageName);
         uploadImage([result]);
         return;
+      } else {
+        const newGroupInfoCopy: Partial<ChatGroup> = newGroupInfo;
+        newGroupInfoCopy.imageURL = '';
+        setNewGroupInfo(newGroupInfoCopy);
       }
       saveGroup(newGroupInfo as ChatGroup);
     },
@@ -132,12 +138,21 @@ const EditChatGroupModal: React.FC<EditChatGroupModalProps> = ({
   };
 
   const onClickDeleteImage = () => {
-    console.log('aiueo');
+    setIsDeleted(true);
+    setSelectImageUrl('');
+    imgRef.current = undefined;
+    setCompletedCrop(undefined);
   };
 
   useEffect(() => {
     setNewGroupInfo(chatGroup);
   }, [chatGroup, setNewGroupInfo]);
+
+  const onClickClose = () => {
+    setSelectImageUrl('');
+    setSelectImageName('');
+    setIsDeleted(false);
+  };
 
   return (
     <Modal onClose={closeModal} scrollBehavior="inside" isOpen={isOpen}>
@@ -159,7 +174,7 @@ const EditChatGroupModal: React.FC<EditChatGroupModalProps> = ({
             {isLoading ? <Spinner /> : <Text display="inline">更新</Text>}
           </Button>
         </ModalHeader>
-        <ModalCloseButton />
+        <ModalCloseButton onClick={() => onClickClose()} />
         <ModalBody>
           <Box>
             <Box>
@@ -179,12 +194,6 @@ const EditChatGroupModal: React.FC<EditChatGroupModalProps> = ({
                       minWidth: '100px',
                     }}
                   />
-                  <Button
-                    my="10px"
-                    onClick={() => onClickDeleteImage()}
-                    colorScheme="blue">
-                    既存の画像を削除
-                  </Button>
                 </Box>
               ) : (
                 <Box
@@ -201,7 +210,7 @@ const EditChatGroupModal: React.FC<EditChatGroupModalProps> = ({
                   {...getRootProps()}>
                   <input {...getInputProps()} />
                   <Avatar
-                    src={newGroupInfo.imageURL}
+                    src={isDeleted ? undefined : newGroupInfo.imageURL}
                     h="100%"
                     w="100%"
                     rounded="full"
@@ -209,6 +218,16 @@ const EditChatGroupModal: React.FC<EditChatGroupModalProps> = ({
                   />
                 </Box>
               )}
+              {selectImageUrl || newGroupInfo.imageURL ? (
+                <Box textAlign="center">
+                  <Button
+                    my="10px"
+                    onClick={() => onClickDeleteImage()}
+                    colorScheme="blue">
+                    既存の画像を削除
+                  </Button>
+                </Box>
+              ) : null}
               <FormLabel>
                 <p>ルーム名</p>
                 {errors.name && touched.name ? (
