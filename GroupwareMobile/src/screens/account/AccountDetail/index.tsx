@@ -310,245 +310,255 @@ const AccountDetail: React.FC = () => {
         }
       />
       {/* <Button onPress={() => SoundPlayer.resume()}>test </Button> */}
-      <ScrollDiv contentContainerStyle={accountDetailStyles.scrollView}>
+      <ScrollDiv
+        contentContainerStyle={accountDetailStyles.scrollView}
+        style={{backgroundColor: 'white'}}>
         {profile && (
-          <Div px={18}>
-            <Div flexDir="row" my={8}>
-              <Div mr={12}>
-                <UserAvatar user={profile} h={100} w={100} />
+          <>
+            <Div px={18}>
+              <Div flexDir="row" my={8}>
+                <Div mr={12}>
+                  <UserAvatar user={profile} h={100} w={100} />
+                </Div>
+                <Div alignSelf="center">
+                  <Text fontSize={16} fontWeight="bold">
+                    {userNameFactory(profile)}
+                  </Text>
+                  <Text fontSize={12} color="gray500">
+                    {userNameKanaFactory(profile)}
+                  </Text>
+                </Div>
               </Div>
-              <Div alignSelf="center">
-                <Text fontSize={16} fontWeight="bold">
-                  {userNameFactory(profile)}
-                </Text>
-                <Text fontSize={12} color="gray500">
-                  {userNameKanaFactory(profile)}
-                </Text>
-              </Div>
-            </Div>
-            {userID === user?.id ? (
-              <Button
-                py="md"
-                mb={20}
-                w="100%"
-                rounded="circle"
-                bg="gray300"
-                color="black">
-                <Text fontSize={16}>編集</Text>
-              </Button>
-            ) : null}
+              {userID === user?.id ? (
+                <Button
+                  py="md"
+                  mb={20}
+                  w="100%"
+                  rounded="circle"
+                  bg="gray200"
+                  color="black">
+                  <Text fontSize={16}>編集</Text>
+                </Button>
+              ) : null}
 
-            <Div my={8}>
-              <Text fontSize={14} lineHeight={20} fontWeight="bold">
-                メールアドレス
-              </Text>
-              <Text fontSize={14} lineHeight={20}>
-                {profile.isEmailPublic ? profile.email : '非公開'}
-              </Text>
-            </Div>
-            <Div my={8}>
-              <Text fontSize={14} lineHeight={20} fontWeight="bold">
-                自己紹介
-              </Text>
-              <Text fontSize={14} lineHeight={20}>
-                {profile.introduceOther || '未設定'}
-              </Text>
-            </Div>
+              <Div my={8}>
+                <Text fontSize={14} lineHeight={20} fontWeight="bold">
+                  メールアドレス
+                </Text>
+                <Text fontSize={14} lineHeight={20}>
+                  {profile.isEmailPublic ? profile.email : '非公開'}
+                </Text>
+              </Div>
+              <Div my={8}>
+                <Text fontSize={14} lineHeight={20} fontWeight="bold">
+                  自己紹介
+                </Text>
+                <Text fontSize={14} lineHeight={20}>
+                  {profile.introduceOther || '未設定'}
+                </Text>
+              </Div>
 
-            <Div alignItems="center">
-              <Div flexDir="row" mb="sm">
-                {profile.id !== user?.id &&
-                profile.role !== UserRole.EXTERNAL_INSTRUCTOR ? (
-                  <Button
-                    mr={-50}
-                    mt={-10}
-                    bg="white"
-                    rounded="circle"
-                    onPress={() => {
-                      Alert.alert('通話しますか？', undefined, [
-                        {
-                          text: 'はい',
-                          onPress: () => inviteCall(),
-                        },
-                        {
-                          text: 'いいえ',
-                          onPress: () => {},
-                        },
-                      ]);
-                    }}>
-                    <Icon
-                      name="call"
-                      fontFamily="Ionicons"
-                      fontSize={24}
-                      color="blue700"
-                    />
-                  </Button>
-                ) : null}
+              <Div alignItems="center">
+                <Div flexDir="row" mb="sm">
+                  {profile.id !== user?.id &&
+                  profile.role !== UserRole.EXTERNAL_INSTRUCTOR ? (
+                    <Button
+                      mr={-50}
+                      mt={-10}
+                      bg="white"
+                      rounded="circle"
+                      onPress={() => {
+                        Alert.alert('通話しますか？', undefined, [
+                          {
+                            text: 'はい',
+                            onPress: () => inviteCall(),
+                          },
+                          {
+                            text: 'いいえ',
+                            onPress: () => {},
+                          },
+                        ]);
+                      }}>
+                      <Icon
+                        name="call"
+                        fontFamily="Ionicons"
+                        fontSize={24}
+                        color="blue700"
+                      />
+                    </Button>
+                  ) : null}
+                </Div>
               </Div>
             </Div>
-            <Div h={bottomContentsHeight() ? bottomContentsHeight() : 700}>
-              <TopTab.Navigator
-                initialRouteName={defaultScreenName}
-                screenOptions={{
-                  tabBarScrollEnabled: true,
-                }}>
-                <TopTab.Screen
-                  listeners={{focus: () => setActiveScreen(defaultScreenName)}}
-                  name={defaultScreenName}
-                  children={() => (
-                    <>
-                      <DetailScreen
-                        isLoading={loadingProfile}
-                        profile={profile}
-                      />
-                      <Div
-                        onLayout={({nativeEvent}) => {
-                          setScreenHeight(s => ({
-                            ...s,
-                            [defaultScreenName]: {
-                              ...s?.[defaultScreenName],
-                              height: nativeEvent.layout.y + 130,
-                            },
-                          }));
-                        }}
-                      />
-                    </>
-                  )}
-                  options={{title: 'プロフィール'}}
-                />
-                <TopTab.Screen
-                  listeners={{focus: () => setActiveScreen(eventScreenName)}}
-                  name={eventScreenName}
-                  children={() => (
-                    <>
-                      <Div alignItems="center" mt="lg">
-                        {events?.events?.length ? (
-                          events?.events?.map(e => (
-                            <Div mb={'lg'} key={e.id}>
-                              <EventCard event={e} />
-                            </Div>
-                          ))
-                        ) : (
-                          <Text fontSize={16}>
-                            参加したイベントが見つかりませんでした
-                          </Text>
-                        )}
-                      </Div>
-                      <Div
-                        onLayout={({nativeEvent}) => {
-                          setScreenHeight(s => ({
-                            ...s,
-                            [eventScreenName]: {
-                              ...s?.[eventScreenName],
-                              height: nativeEvent.layout.y + 130,
-                            },
-                          }));
-                        }}
-                      />
-                    </>
-                  )}
-                  options={{title: '参加したイベント'}}
-                />
-                <TopTab.Screen
-                  listeners={{focus: () => setActiveScreen(questionScreenName)}}
-                  name={questionScreenName}
-                  children={() => (
-                    <>
-                      <Div alignItems="center" mt="lg">
-                        {questionList?.wiki?.length ? (
-                          questionList?.wiki?.map(w => (
-                            <WikiCard key={w.id} wiki={w} />
-                          ))
-                        ) : (
-                          <Text fontSize={16}>
-                            投稿した質問が見つかりませんでした
-                          </Text>
-                        )}
-                      </Div>
-                      <Div
-                        onLayout={({nativeEvent}) => {
-                          setScreenHeight(s => ({
-                            ...s,
-                            [questionScreenName]: {
-                              ...s?.[questionScreenName],
-                              height: nativeEvent.layout.y + 130,
-                            },
-                          }));
-                        }}
-                      />
-                    </>
-                  )}
-                  options={{title: '質問'}}
-                />
-                <TopTab.Screen
-                  listeners={{
-                    focus: () => setActiveScreen(knowledgeScreenName),
-                  }}
-                  name={knowledgeScreenName}
-                  children={() => (
-                    <>
-                      <Div alignItems="center" mt="lg">
-                        {knowledgeList?.wiki?.length ? (
-                          knowledgeList?.wiki?.map(w => (
-                            <WikiCard key={w.id} wiki={w} />
-                          ))
-                        ) : (
-                          <Text fontSize={16}>
-                            投稿したナレッジが見つかりませんでした
-                          </Text>
-                        )}
-                      </Div>
-                      <Div
-                        onLayout={({nativeEvent}) => {
-                          setScreenHeight(s => ({
-                            ...s,
-                            [knowledgeScreenName]: {
-                              ...s?.[knowledgeScreenName],
-                              height: nativeEvent.layout.y + 130,
-                            },
-                          }));
-                        }}
-                      />
-                    </>
-                  )}
-                  options={{title: 'ナレッジ'}}
-                />
-                <TopTab.Screen
-                  listeners={{
-                    focus: () => setActiveScreen(goodScreenName),
-                  }}
-                  name={goodScreenName}
-                  children={() => (
-                    <>
-                      <Div alignItems="center" mt="lg">
-                        {profile?.userGoodForBoard?.length ? (
-                          profile?.userGoodForBoard?.map(w => (
-                            <WikiCard key={w.id} wiki={w} />
-                          ))
-                        ) : (
-                          <Text fontSize={16}>
-                            いいねした掲示板が見つかりませんでした
-                          </Text>
-                        )}
-                      </Div>
-                      <Div
-                        onLayout={({nativeEvent}) => {
-                          setScreenHeight(s => ({
-                            ...s,
-                            [goodScreenName]: {
-                              ...s?.[goodScreenName],
-                              height: nativeEvent.layout.y + 130,
-                            },
-                          }));
-                        }}
-                      />
-                    </>
-                  )}
-                  options={{title: 'いいね'}}
-                />
-              </TopTab.Navigator>
+            <Div>
+              <Div h={bottomContentsHeight() ? bottomContentsHeight() : 700}>
+                <TopTab.Navigator
+                  initialRouteName={defaultScreenName}
+                  screenOptions={{
+                    tabBarScrollEnabled: true,
+                  }}>
+                  <TopTab.Screen
+                    listeners={{
+                      focus: () => setActiveScreen(defaultScreenName),
+                    }}
+                    name={defaultScreenName}
+                    children={() => (
+                      <>
+                        <DetailScreen
+                          isLoading={loadingProfile}
+                          profile={profile}
+                        />
+                        <Div
+                          onLayout={({nativeEvent}) => {
+                            setScreenHeight(s => ({
+                              ...s,
+                              [defaultScreenName]: {
+                                ...s?.[defaultScreenName],
+                                height: nativeEvent.layout.y + 130,
+                              },
+                            }));
+                          }}
+                        />
+                      </>
+                    )}
+                    options={{title: 'プロフィール'}}
+                  />
+                  <TopTab.Screen
+                    listeners={{focus: () => setActiveScreen(eventScreenName)}}
+                    name={eventScreenName}
+                    children={() => (
+                      <>
+                        <Div alignItems="center" mt="lg">
+                          {events?.events?.length ? (
+                            events?.events?.map(e => (
+                              <Div mb={'lg'} key={e.id}>
+                                <EventCard event={e} />
+                              </Div>
+                            ))
+                          ) : (
+                            <Text fontSize={16}>
+                              参加したイベントが見つかりませんでした
+                            </Text>
+                          )}
+                        </Div>
+                        <Div
+                          onLayout={({nativeEvent}) => {
+                            setScreenHeight(s => ({
+                              ...s,
+                              [eventScreenName]: {
+                                ...s?.[eventScreenName],
+                                height: nativeEvent.layout.y + 130,
+                              },
+                            }));
+                          }}
+                        />
+                      </>
+                    )}
+                    options={{title: '参加したイベント'}}
+                  />
+                  <TopTab.Screen
+                    listeners={{
+                      focus: () => setActiveScreen(questionScreenName),
+                    }}
+                    name={questionScreenName}
+                    children={() => (
+                      <>
+                        <Div alignItems="center" mt="lg">
+                          {questionList?.wiki?.length ? (
+                            questionList?.wiki?.map(w => (
+                              <WikiCard key={w.id} wiki={w} />
+                            ))
+                          ) : (
+                            <Text fontSize={16}>
+                              投稿した質問が見つかりませんでした
+                            </Text>
+                          )}
+                        </Div>
+                        <Div
+                          onLayout={({nativeEvent}) => {
+                            setScreenHeight(s => ({
+                              ...s,
+                              [questionScreenName]: {
+                                ...s?.[questionScreenName],
+                                height: nativeEvent.layout.y + 130,
+                              },
+                            }));
+                          }}
+                        />
+                      </>
+                    )}
+                    options={{title: '質問'}}
+                  />
+                  <TopTab.Screen
+                    listeners={{
+                      focus: () => setActiveScreen(knowledgeScreenName),
+                    }}
+                    name={knowledgeScreenName}
+                    children={() => (
+                      <>
+                        <Div alignItems="center" mt="lg">
+                          {knowledgeList?.wiki?.length ? (
+                            knowledgeList?.wiki?.map(w => (
+                              <WikiCard key={w.id} wiki={w} />
+                            ))
+                          ) : (
+                            <Text fontSize={16}>
+                              投稿したナレッジが見つかりませんでした
+                            </Text>
+                          )}
+                        </Div>
+                        <Div
+                          onLayout={({nativeEvent}) => {
+                            setScreenHeight(s => ({
+                              ...s,
+                              [knowledgeScreenName]: {
+                                ...s?.[knowledgeScreenName],
+                                height: nativeEvent.layout.y + 130,
+                              },
+                            }));
+                          }}
+                        />
+                      </>
+                    )}
+                    options={{title: 'ナレッジ'}}
+                  />
+                  <TopTab.Screen
+                    listeners={{
+                      focus: () => setActiveScreen(goodScreenName),
+                    }}
+                    name={goodScreenName}
+                    children={() => (
+                      <>
+                        <Div alignItems="center" mt="lg">
+                          {profile?.userGoodForBoard?.length ? (
+                            profile?.userGoodForBoard?.map(w => (
+                              <WikiCard key={w.id} wiki={w} />
+                            ))
+                          ) : (
+                            <Text fontSize={16}>
+                              いいねした掲示板が見つかりませんでした
+                            </Text>
+                          )}
+                        </Div>
+                        <Div
+                          onLayout={({nativeEvent}) => {
+                            setScreenHeight(s => ({
+                              ...s,
+                              [goodScreenName]: {
+                                ...s?.[goodScreenName],
+                                height: nativeEvent.layout.y + 130,
+                              },
+                            }));
+                          }}
+                        />
+                      </>
+                    )}
+                    options={{title: 'いいね'}}
+                  />
+                </TopTab.Navigator>
+              </Div>
             </Div>
-          </Div>
+          </>
         )}
       </ScrollDiv>
       {profile &&
