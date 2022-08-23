@@ -103,6 +103,9 @@ const DetailScreen: React.FC<DetailScreenProps> = ({profile, isLoading}) => {
             </Text>
           </Div>
           <Div my={10} borderColor="gray200" borderBottomWidth={1} />
+          <Text fontSize={20} fontWeight="bold">
+            タグ
+          </Text>
           <TagListBox
             mb={'lg'}
             tags={techTags || []}
