@@ -102,6 +102,7 @@ const DetailScreen: React.FC<DetailScreenProps> = ({profile, isLoading}) => {
               {profile.isPhonePublic ? profile.phone : '非公開'}
             </Text>
           </Div>
+          <Div my={10} borderColor="gray200" borderBottomWidth={1} />
           <TagListBox
             mb={'lg'}
             tags={techTags || []}
