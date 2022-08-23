@@ -93,9 +93,7 @@ const ChatGroupCard: React.FC<ChatGroupCardProps> = ({
           mb="4px"
           w="100%">
           <Text fontWeight="bold" color={darkFontColor} noOfLines={1}>
-            {chatGroup.name
-              ? chatGroup.name
-              : nameOfEmptyNameGroup(chatGroup.members)}
+            {nameOfEmptyNameGroup(chatGroup)}
           </Text>
 
           <Box display="flex" flexDir="row">

@@ -60,6 +60,7 @@ import { useAPISearchMessages } from '@/hooks/api/chat/useAPISearchMessages';
 import { removeHalfWidthSpace } from 'src/utils/replaceWidthSpace';
 import { useChatSocket } from './socket';
 import ChatEditor from '../ChatEditor';
+import { nameOfEmptyNameGroup } from 'src/utils/chat/nameOfEmptyNameGroup';
 
 type ChatBoxProps = {
   room: ChatGroup;
@@ -206,22 +207,6 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
     },
     [sendChatMessage, newChatMessage.chatGroup],
   );
-
-  const nameOfEmptyNameGroup = (members?: User[]): string => {
-    if (!members?.length) {
-      return 'メンバーがいません';
-    }
-
-    if (room.roomType === RoomType.PERSONAL) {
-      const chatPartner = members.filter((m) => m.id !== user?.id);
-      const partnerName = chatPartner
-        .map((p) => p.lastName + ' ' + p.firstName)
-        .join();
-      return partnerName;
-    }
-    const strMembers = members?.map((m) => m.lastName + m.firstName).join();
-    return strMembers.toString();
-  };
 
   // const isRecent = (created: ChatMessage, target: ChatMessage): boolean => {
   //   if (new Date(created.createdAt) > new Date(target.createdAt)) {
@@ -475,7 +460,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
               fontSize="18px"
               color={darkFontColor}
               noOfLines={1}>
-              {room?.name ? room.name : nameOfEmptyNameGroup(room?.members)}
+              {nameOfEmptyNameGroup(room)}
             </Text>
             <Text
               fontWeight="bold"

@@ -7,7 +7,7 @@ export const nameOfRoom = (room: ChatGroup, mySelf?: Partial<User>): string => {
   }
   if (room.roomType === RoomType.TALK_ROOM) {
     const strMembers = room?.members?.map(m => m.lastName + m.firstName).join();
-    return strMembers ? strMembers : '名前なしトーク';
+    return strMembers ? strMembers : 'タイトルなしトーク';
   }
   return '';
 };
