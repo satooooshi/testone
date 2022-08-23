@@ -286,7 +286,7 @@ const AccountDetail: React.FC = () => {
       {/* <Button onPress={() => SoundPlayer.resume()}>test </Button> */}
       <ScrollDiv
         contentContainerStyle={accountDetailStyles.scrollView}
-        style={{backgroundColor: 'white'}}>
+        bg="white">
         {profile && (
           <>
             <Div px={18}>
@@ -528,7 +528,7 @@ const AccountDetail: React.FC = () => {
                     }}
                     name={goodScreenName}
                     children={() => (
-                      <>
+                      <Div bg="white">
                         <Div alignItems="center" mt="lg">
                           {profile?.userGoodForBoard?.length ? (
                             profile?.userGoodForBoard?.map(w => (
@@ -551,7 +551,7 @@ const AccountDetail: React.FC = () => {
                             }));
                           }}
                         />
-                      </>
+                      </Div>
                     )}
                     options={{title: 'いいね'}}
                   />
