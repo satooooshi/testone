@@ -7,7 +7,7 @@ import {
 } from '@react-navigation/native';
 import React, {useEffect, useState} from 'react';
 import {Alert, useWindowDimensions} from 'react-native';
-import {Text, Div, ScrollDiv, Button, Icon} from 'react-native-magnus';
+import {Text, Div, ScrollDiv, Button, Icon, Tag} from 'react-native-magnus';
 import {ActivityIndicator} from 'react-native-paper';
 import TagListBox from '../../../components/account/TagListBox';
 import UserAvatar from '../../../components/common/UserAvatar';
@@ -73,12 +73,6 @@ const DetailScreen: React.FC<DetailScreenProps> = ({profile, isLoading}) => {
               社員番号
             </Text>
             <Text fontSize={14}>{profile.employeeId || '未登録'}</Text>
-          </Div>
-          <Div mb={'lg'}>
-            <Text fontSize={14} fontWeight="bold">
-              社員区分
-            </Text>
-            <Text fontSize={14}>{userRoleNameFactory(profile.role)}</Text>
           </Div>
           <Div mb={'lg'}>
             <Text fontSize={14} fontWeight="bold">
@@ -301,7 +295,10 @@ const AccountDetail: React.FC = () => {
                   <UserAvatar user={profile} h={100} w={100} />
                 </Div>
                 <Div alignSelf="center">
-                  <Text fontSize={16} fontWeight="bold">
+                  <Tag color="green600" bg="green100" fontSize={12} mb={10}>
+                    {userRoleNameFactory(profile.role)}
+                  </Tag>
+                  <Text fontSize={16} fontWeight="bold" mb={6}>
                     {userNameFactory(profile)}
                   </Text>
                   <Text fontSize={12} color="gray500">
