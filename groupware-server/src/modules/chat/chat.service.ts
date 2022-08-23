@@ -1043,15 +1043,38 @@ export class ChatService {
       throw new InternalServerErrorException('Something went wrong');
     }
     const userIds = newData.members.map((u) => u.id);
-    newData.name = newData.name ? newData.name : '';
-    const maybeExistGroup = await this.chatGroupRepository
-      .createQueryBuilder('g')
-      .innerJoin('g.members', 'u', 'u.id IN (:...userIds)', { userIds })
-      .leftJoinAndSelect('g.members', 'member')
-      .where('g.name = :name', {
-        name: newData.name,
-      })
-      .getMany();
+    if (newData.roomType === RoomType.TALK_ROOM) {
+      const name = newData.members?.map((m) => m.lastName + m.firstName).join();
+      newData.name = name.slice(0, 20);
+    }
+    const memberCount = newData.members.length;
+    let maybeExistGroup: ChatGroup[] = [];
+    if (newData.roomType !== RoomType.GROUP) {
+      maybeExistGroup = await this.chatGroupRepository
+        .createQueryBuilder('g')
+        .innerJoin('g.members', 'u', 'u.id = :userId', { userId: userIds[0] })
+        .leftJoin('g.members', 'member')
+        .addSelect(['member.id'])
+        .where('g.room_type <> :type', {
+          type: RoomType.GROUP,
+        })
+        .andWhere('g.member_count = :length', { length: memberCount })
+        .getMany();
+    } else {
+      maybeExistGroup = await this.chatGroupRepository
+        .createQueryBuilder('g')
+        .innerJoin('g.members', 'u', 'u.id = :userId', { userId: userIds[0] })
+        .leftJoin('g.members', 'member')
+        .addSelect(['member.id'])
+        .where('g.name = :name', {
+          name: newData.name,
+        })
+        .where('g.room_type = :type', {
+          type: RoomType.GROUP,
+        })
+        .andWhere('g.member_count = :length', { length: memberCount })
+        .getMany();
+    }
 
     const existGroup = maybeExistGroup
       .filter((g) => g.members.length === userIds.length)
@@ -1064,7 +1087,7 @@ export class ChatService {
     const newGroup = await this.chatGroupRepository.save(
       this.chatGroupRepository.create({
         ...newData,
-        memberCount: newData.members.length,
+        memberCount,
       }),
     );
     return newGroup;
