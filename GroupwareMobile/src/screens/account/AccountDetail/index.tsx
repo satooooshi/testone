@@ -403,7 +403,7 @@ const AccountDetail: React.FC = () => {
                     }}
                     name={defaultScreenName}
                     children={() => (
-                      <>
+                      <Div bg="white">
                         <DetailScreen
                           isLoading={loadingProfile}
                           profile={profile}
@@ -419,7 +419,7 @@ const AccountDetail: React.FC = () => {
                             }));
                           }}
                         />
-                      </>
+                      </Div>
                     )}
                     options={{title: 'プロフィール'}}
                   />
@@ -427,7 +427,7 @@ const AccountDetail: React.FC = () => {
                     listeners={{focus: () => setActiveScreen(eventScreenName)}}
                     name={eventScreenName}
                     children={() => (
-                      <>
+                      <Div bg="white">
                         <Div alignItems="center" mt="lg">
                           {events?.events?.length ? (
                             events?.events?.map(e => (
@@ -452,7 +452,7 @@ const AccountDetail: React.FC = () => {
                             }));
                           }}
                         />
-                      </>
+                      </Div>
                     )}
                     options={{title: '参加したイベント'}}
                   />
@@ -462,7 +462,7 @@ const AccountDetail: React.FC = () => {
                     }}
                     name={questionScreenName}
                     children={() => (
-                      <>
+                      <Div bg="white">
                         <Div alignItems="center" mt="lg">
                           {questionList?.wiki?.length ? (
                             questionList?.wiki?.map(w => (
@@ -485,7 +485,7 @@ const AccountDetail: React.FC = () => {
                             }));
                           }}
                         />
-                      </>
+                      </Div>
                     )}
                     options={{title: '質問'}}
                   />
@@ -495,7 +495,7 @@ const AccountDetail: React.FC = () => {
                     }}
                     name={knowledgeScreenName}
                     children={() => (
-                      <>
+                      <Div bg="white">
                         <Div alignItems="center" mt="lg">
                           {knowledgeList?.wiki?.length ? (
                             knowledgeList?.wiki?.map(w => (
@@ -518,7 +518,7 @@ const AccountDetail: React.FC = () => {
                             }));
                           }}
                         />
-                      </>
+                      </Div>
                     )}
                     options={{title: 'ナレッジ'}}
                   />
