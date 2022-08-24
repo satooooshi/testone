@@ -31,6 +31,7 @@ import {
   SaveRoomsResult,
 } from './chat.controller';
 import { genStorageURL } from 'src/utils/storage/genStorageURL';
+import { checkAloneRoom } from 'src/utils/CheckAloneRoom';
 type UserAndGroupID = User & {
   chat_group_id: number;
 };
@@ -267,18 +268,7 @@ export class ChatService {
           };
           unreadCount = await this.getUnreadChatMessage(userID, query);
         }
-
-        if (g.roomType === RoomType.PERSONAL && g.members.length === 2) {
-          const chatPartner = g.members.filter((m) => m.id !== userID)[0];
-          if (chatPartner) {
-            if (chatPartner.existence) {
-              g.imageURL = chatPartner.avatarUrl;
-              g.name = `${chatPartner.lastName} ${chatPartner.firstName}`;
-            } else {
-              g.name = 'メンバーがいません';
-            }
-          }
-        }
+        checkAloneRoom(g, userID);
         g.imageURL = await genSignedURL(g.imageURL);
         return {
           ...g,
@@ -392,13 +382,7 @@ export class ChatService {
       room.unreadCount = await this.getUnreadChatMessage(userID, query);
     }
 
-    if (room.roomType === RoomType.PERSONAL && room.members.length === 2) {
-      const chatPartner = room.members.filter((m) => m.id !== userID)[0];
-      if (chatPartner) {
-        room.imageURL = chatPartner.avatarUrl;
-        room.name = `${chatPartner.lastName} ${chatPartner.firstName}`;
-      }
-    }
+    checkAloneRoom(room, userID);
 
     return room;
   }
@@ -1152,7 +1136,7 @@ export class ChatService {
     return reactions;
   }
 
-  public async getRoomDetail(roomId: number) {
+  public async getRoomDetail(roomId: number, userId: number) {
     const existRoom = await this.chatGroupRepository
       .createQueryBuilder('chat_groups')
       .where('chat_groups.id = :roomId', { roomId: roomId })
@@ -1168,6 +1152,7 @@ export class ChatService {
       [roomId],
     );
     existRoom.members = members;
+    checkAloneRoom(existRoom, userId);
 
     return existRoom;
   }

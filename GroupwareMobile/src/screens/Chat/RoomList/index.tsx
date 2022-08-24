@@ -193,6 +193,7 @@ const RoomList: React.FC = () => {
               reset();
               setRoomTypeSelector(false);
             }}
+            creationType={creationType}
           />
         </Div>
       ) : null}
