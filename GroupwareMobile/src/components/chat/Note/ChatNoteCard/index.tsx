@@ -1,5 +1,11 @@
 import React from 'react';
-import {TouchableHighlight, TextInput, Platform} from 'react-native';
+import {
+  TouchableHighlight,
+  TextInput,
+  Platform,
+  Linking,
+  Alert,
+} from 'react-native';
 import {Button, Div, Icon, Image, Text} from 'react-native-magnus';
 import tailwind from 'tailwind-rn';
 import {ChatNote, ChatNoteImage} from '../../../../types';
@@ -8,6 +14,8 @@ import {dateTimeFormatterFromJSDDate} from '../../../../utils/dateTimeFormatterF
 import {userNameFactory} from '../../../../utils/factory/userNameFactory';
 import AutoLinkedText from '../../../common/AutoLinkedText';
 import UserAvatar from '../../../common/UserAvatar';
+import Hyperlink from 'react-native-hyperlink';
+import Clipboard from '@react-native-community/clipboard';
 
 type ChatNoteCardProps = {
   note: ChatNote;
@@ -97,12 +105,18 @@ const ChatNoteCard: React.FC<ChatNoteCardProps> = ({
             dataDetectorTypes={'link'}
           />
         ) : (
-          <AutoLinkedText
-            selectable={true}
-            text={note.content}
-            style={tailwind(' text-black text-base')}
+          <Hyperlink
             linkStyle={tailwind('text-blue-500 text-base text-base')}
-          />
+            onPress={t => Linking.openURL(t)}
+            // onLongPress={t => {
+            //   Clipboard.setString(t);
+            //   Alert.alert('クリップボードにコピーしました。');
+            // }}
+          >
+            <Text selectable={true} style={tailwind(' text-black text-base')}>
+              {note.content}
+            </Text>
+          </Hyperlink>
         )}
       </Div>
       <Text fontSize={12} color={darkFontColor}>
