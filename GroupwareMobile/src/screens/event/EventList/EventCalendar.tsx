@@ -384,6 +384,7 @@ const EventCalendar: React.FC<EventCalendarProps> = ({
           }
           onPressDateHeader={onPressDateHeader}
           scrollOffsetMinutes={1200}
+          swipeEnabled={false}
           renderHeader={
             calendarMode.mode === 'day'
               ? () => (
