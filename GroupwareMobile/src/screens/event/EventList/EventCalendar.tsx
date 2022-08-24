@@ -426,6 +426,8 @@ const EventCalendar: React.FC<EventCalendarProps> = ({
                   backgroundColor: eventTypeColorFactory(event.type),
                   borderColor: '#e0e0e0',
                   borderWidth: 1,
+                  padding: 0,
+                  height: 18,
                 })
           }
         />
