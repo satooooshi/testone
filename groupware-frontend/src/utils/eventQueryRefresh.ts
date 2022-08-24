@@ -54,6 +54,5 @@ export const generateEventSearchQueryString = (
   if (newParticipantId) {
     refreshURL = refreshURL + `&participant_id=${newParticipantId}`;
   }
-  console.log('refreshURL===', refreshURL);
   return refreshURL;
 };
