@@ -1,17 +1,22 @@
 import React from 'react';
 import WholeContainer from '../../components/WholeContainer';
-import HeaderWithTextButton from '../../components/Header';
 import PortalLinkBox from '../../components/PortalLinkBox';
-import {Div, ScrollDiv, Text} from 'react-native-magnus';
+import {Div, ScrollDiv, Tag, Text} from 'react-native-magnus';
 import {Alert, Linking} from 'react-native';
 import {useAuthenticate} from '../../contexts/useAuthenticate';
 import {EventType} from '../../types';
 import {useNavigation} from '@react-navigation/native';
 import {HomeNavigationProps} from '../../types/navigator/drawerScreenProps/home';
+import {useAPIGetUserInfoById} from '../../hooks/api/user/useAPIGetUserInfoById';
+import UserAvatar from '../../components/common/UserAvatar';
+import {userRoleNameFactory} from '../../utils/factory/userRoleNameFactory';
+import {userNameFactory} from '../../utils/factory/userNameFactory';
 
 const Home: React.FC = () => {
-  const {setUser, logout} = useAuthenticate();
+  const {user, setUser, logout} = useAuthenticate();
+  const userID = user?.id;
   const navigation = useNavigation<HomeNavigationProps>();
+  const {data: profile} = useAPIGetUserInfoById(userID?.toString() || '0');
 
   const handleLogout = () => {
     logout();
@@ -20,14 +25,23 @@ const Home: React.FC = () => {
 
   return (
     <WholeContainer>
-      <HeaderWithTextButton
-        title="Menu"
-        activeTabName="ダッシュボード"
-        rightButtonName={'ログアウト'}
-        onPressRightButton={handleLogout}
-      />
-      {/* TODO: ログイン名を出す */}
       <ScrollDiv mt="lg" px={16}>
+        {profile ? (
+          <Div flexDir="row" my={20}>
+            <Div mr={12}>
+              <UserAvatar user={profile} h={60} w={60} />
+            </Div>
+            <Div alignSelf="center">
+              <Tag color="green600" bg="green100" fontSize={12} mb={10}>
+                {userRoleNameFactory(profile.role)}
+              </Tag>
+              <Text fontSize={16} fontWeight="bold" mb={6}>
+                {userNameFactory(profile)}
+              </Text>
+            </Div>
+          </Div>
+        ) : null}
+
         <Div flexDir="row" mb={8}>
           <Div flex={1} mr={12}>
             <PortalLinkBox
