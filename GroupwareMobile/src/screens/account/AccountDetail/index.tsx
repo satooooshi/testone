@@ -7,7 +7,7 @@ import {
 } from '@react-navigation/native';
 import React, {useEffect, useState} from 'react';
 import {Alert, useWindowDimensions} from 'react-native';
-import {Text, Div, ScrollDiv, Button, Icon} from 'react-native-magnus';
+import {Text, Div, ScrollDiv, Button, Icon, Tag} from 'react-native-magnus';
 import {ActivityIndicator} from 'react-native-paper';
 import TagListBox from '../../../components/account/TagListBox';
 import UserAvatar from '../../../components/common/UserAvatar';
@@ -76,12 +76,6 @@ const DetailScreen: React.FC<DetailScreenProps> = ({profile, isLoading}) => {
           </Div>
           <Div mb={'lg'}>
             <Text fontSize={14} fontWeight="bold">
-              社員区分
-            </Text>
-            <Text fontSize={14}>{userRoleNameFactory(profile.role)}</Text>
-          </Div>
-          <Div mb={'lg'}>
-            <Text fontSize={14} fontWeight="bold">
               所属支社
             </Text>
             <Text fontSize={14}>{branchTypeNameFactory(profile.branch)}</Text>
@@ -102,8 +96,8 @@ const DetailScreen: React.FC<DetailScreenProps> = ({profile, isLoading}) => {
               {profile.isPhonePublic ? profile.phone : '非公開'}
             </Text>
           </Div>
-          <Div my={10} borderColor="gray200" borderBottomWidth={1} />
-          <Text fontSize={20} fontWeight="bold">
+          <Div mb={'lg'} borderColor="gray200" borderBottomWidth={1} />
+          <Text fontSize={20} fontWeight="bold" mb={'lg'}>
             タグ
           </Text>
           <TagListBox
@@ -292,7 +286,7 @@ const AccountDetail: React.FC = () => {
       {/* <Button onPress={() => SoundPlayer.resume()}>test </Button> */}
       <ScrollDiv
         contentContainerStyle={accountDetailStyles.scrollView}
-        style={{backgroundColor: 'white'}}>
+        bg="white">
         {profile && (
           <>
             <Div px={18}>
@@ -301,7 +295,10 @@ const AccountDetail: React.FC = () => {
                   <UserAvatar user={profile} h={100} w={100} />
                 </Div>
                 <Div alignSelf="center">
-                  <Text fontSize={16} fontWeight="bold">
+                  <Tag color="green600" bg="green100" fontSize={12} mb={10}>
+                    {userRoleNameFactory(profile.role)}
+                  </Tag>
+                  <Text fontSize={16} fontWeight="bold" mb={6}>
                     {userNameFactory(profile)}
                   </Text>
                   <Text fontSize={12} color="gray500">
@@ -309,6 +306,7 @@ const AccountDetail: React.FC = () => {
                   </Text>
                 </Div>
               </Div>
+
               {userID === user?.id ? (
                 <Button
                   py="md"
@@ -316,9 +314,63 @@ const AccountDetail: React.FC = () => {
                   w="100%"
                   rounded="circle"
                   bg="gray200"
-                  color="black">
+                  color="black"
+                  onPress={() => {
+                    navigation.navigate('AccountStack', {screen: 'Profile'});
+                  }}>
                   <Text fontSize={16}>編集</Text>
                 </Button>
+              ) : null}
+
+              {profile &&
+              profile.id !== user?.id &&
+              profile.role !== UserRole.EXTERNAL_INSTRUCTOR ? (
+                <Div flexDir="row" mb={20}>
+                  <Button
+                    rounded="circle"
+                    bg="gray200"
+                    flex={1}
+                    onPress={() => {
+                      Alert.alert('通話しますか？', undefined, [
+                        {
+                          text: 'はい',
+                          onPress: () => inviteCall(),
+                        },
+                        {
+                          text: 'いいえ',
+                          onPress: () => {},
+                        },
+                      ]);
+                    }}>
+                    <Text color="black" fontSize={16}>
+                      通話
+                    </Text>
+                    <Icon
+                      name="call"
+                      ml={10}
+                      color="blue700"
+                      fontFamily="Ionicons"
+                      fontSize={'2xl'}
+                    />
+                  </Button>
+                  <Div w={10} />
+                  <Button
+                    rounded="circle"
+                    bg="gray200"
+                    flex={1}
+                    onPress={() => setCreatGroup(true)}>
+                    <Text color="black" fontSize={16}>
+                      チャット
+                    </Text>
+                    <Icon
+                      fontSize={'2xl'}
+                      ml={10}
+                      color=""
+                      name="chatbubble-ellipses-outline"
+                      fontFamily="Ionicons"
+                    />
+                  </Button>
+                </Div>
               ) : null}
 
               <Div my={8}>
@@ -336,38 +388,6 @@ const AccountDetail: React.FC = () => {
                 <Text fontSize={14} lineHeight={20}>
                   {profile.introduceOther || '未設定'}
                 </Text>
-              </Div>
-
-              <Div alignItems="center">
-                <Div flexDir="row" mb="sm">
-                  {profile.id !== user?.id &&
-                  profile.role !== UserRole.EXTERNAL_INSTRUCTOR ? (
-                    <Button
-                      mr={-50}
-                      mt={-10}
-                      bg="white"
-                      rounded="circle"
-                      onPress={() => {
-                        Alert.alert('通話しますか？', undefined, [
-                          {
-                            text: 'はい',
-                            onPress: () => inviteCall(),
-                          },
-                          {
-                            text: 'いいえ',
-                            onPress: () => {},
-                          },
-                        ]);
-                      }}>
-                      <Icon
-                        name="call"
-                        fontFamily="Ionicons"
-                        fontSize={24}
-                        color="blue700"
-                      />
-                    </Button>
-                  ) : null}
-                </Div>
               </Div>
             </Div>
             <Div>
@@ -508,7 +528,7 @@ const AccountDetail: React.FC = () => {
                     }}
                     name={goodScreenName}
                     children={() => (
-                      <>
+                      <Div bg="white">
                         <Div alignItems="center" mt="lg">
                           {profile?.userGoodForBoard?.length ? (
                             profile?.userGoodForBoard?.map(w => (
@@ -531,7 +551,7 @@ const AccountDetail: React.FC = () => {
                             }));
                           }}
                         />
-                      </>
+                      </Div>
                     )}
                     options={{title: 'いいね'}}
                   />
@@ -541,27 +561,6 @@ const AccountDetail: React.FC = () => {
           </>
         )}
       </ScrollDiv>
-      {profile &&
-        profile.id !== user?.id &&
-        profile.role !== UserRole.EXTERNAL_INSTRUCTOR && (
-          <Button
-            bg="purple600"
-            position="absolute"
-            right={10}
-            bottom={10}
-            h={60}
-            w={60}
-            zIndex={20}
-            rounded="circle"
-            onPress={() => setCreatGroup(true)}>
-            <Icon
-              fontSize={'6xl'}
-              color="white"
-              name="chatbubble-ellipses-outline"
-              fontFamily="Ionicons"
-            />
-          </Button>
-        )}
     </WholeContainer>
   );
 };

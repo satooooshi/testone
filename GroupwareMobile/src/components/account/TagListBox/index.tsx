@@ -4,7 +4,9 @@ import tailwind from 'tailwind-rn';
 import {TagType, UserTag} from '../../../types';
 import {darkFontColor} from '../../../utils/colors';
 import {tagTypeNameFactory} from '../../../utils/factory/tag/tagTypeNameFactory';
+import {tagBgColorFactory} from '../../../utils/factory/tagBgColorFactory';
 import {tagColorFactory} from '../../../utils/factory/tagColorFactory';
+import {tagFontColorFactory} from '../../../utils/factory/tagFontColorFactory';
 import AutoLinkedText from '../../common/AutoLinkedText';
 
 type TagListBoxProps = DivProps & {
@@ -17,25 +19,33 @@ const TagListBox: React.FC<TagListBoxProps> = props => {
   const {tags, tagType, introduce} = props;
   return (
     <Div {...props} bg="white" rounded={'md'}>
-      <Text fontSize={16} mb={'sm'}>
+      <Text fontSize={16} mb={'sm'} fontWeight="bold">
         {`${tagTypeNameFactory(tagType)}タグ`}
       </Text>
-      <Div flexDir="row" flexWrap="wrap" mb={'md'}>
-        {tags?.map(t => (
-          <TagButton
-            key={t.id}
-            mb={8}
-            color="white"
-            bg={tagColorFactory(t.type)}>
-            {t.name}
+      <Div flexDir="row" flexWrap="wrap">
+        {tags?.length ? (
+          tags?.map(t => (
+            <TagButton key={t.id} mb={6} mr={6} bg={tagBgColorFactory(t.type)}>
+              <Text fontSize={12} color={tagFontColorFactory(t.type)}>
+                {t.name}
+              </Text>
+            </TagButton>
+          ))
+        ) : (
+          <TagButton mb={6} mr={6} bg={tagBgColorFactory(tagType)}>
+            <Text fontSize={12} color={tagFontColorFactory(tagType)}>
+              未設定
+            </Text>
           </TagButton>
-        ))}
+        )}
       </Div>
-      <AutoLinkedText
-        text={introduce || '未設定'}
-        style={tailwind('text-base font-bold')}
-        linkStyle={tailwind('text-blue-500 text-base text-base')}
-      />
+      {introduce ? (
+        <AutoLinkedText
+          text={introduce || '未設定'}
+          style={tailwind('text-base')}
+          linkStyle={tailwind('text-blue-500 text-base text-base')}
+        />
+      ) : null}
     </Div>
   );
 };
