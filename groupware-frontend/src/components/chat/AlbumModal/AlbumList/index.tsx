@@ -36,47 +36,51 @@ const AlbumList: React.FC<AlbmListProps> = ({
   const [albumsForScroll, setAlbumsForScroll] = useState<ChatAlbum[]>([]);
   const { mutate: deleteAlbum } = useAPIDeleteChatAlbum();
   const [albumListPage, setAlbumListPage] = useState(1);
-  const {
-    data: albums,
-    isLoading,
-    refetch: refetchAlbums,
-  } = useAPIGetChatAlbums({
-    roomId: room.id.toString(),
-    page: albumListPage.toString(),
-  });
-
-  useEffect(() => {
-    if (albums?.albums?.length) {
-      if (albumListPage === 1) {
-        setAlbumsForScroll(albums.albums);
-      } else {
-        setAlbumsForScroll((a) => {
-          if (
-            a.length &&
-            new Date(a[a.length - 1].createdAt) >
-              new Date(albums.albums[0].createdAt)
-          ) {
-            return [...a, ...albums?.albums];
+  const { isLoading, refetch: refetchAlbums } = useAPIGetChatAlbums(
+    {
+      roomId: room.id.toString(),
+      page: albumListPage.toString(),
+    },
+    {
+      enabled: false,
+      onSuccess: (albums) => {
+        if (albums?.albums?.length) {
+          if (albumListPage === 1) {
+            setAlbumsForScroll(albums.albums);
+          } else {
+            setAlbumsForScroll((a) => {
+              if (
+                a.length &&
+                new Date(a[a.length - 1].createdAt) >
+                  new Date(albums.albums[0].createdAt)
+              ) {
+                return [...a, ...albums?.albums];
+              }
+              return a;
+            });
           }
-          return a;
-        });
-      }
-    }
-  }, [albumListPage, albums?.albums]);
+        }
+      },
+    },
+  );
+
   const onScroll = (e: any) => {
     if (
       e.target.scrollTop > (e.target.scrollHeight * 2) / 3 &&
-      albums?.albums?.length
+      albumsForScroll?.length >= albumListPage * 20
     ) {
       setAlbumListPage((p) => p + 1);
     }
   };
 
   useEffect(() => {
-    setAlbumsForScroll([]);
-    setAlbumListPage(1);
-    refetchAlbums();
-  }, [refetchAlbums, room]);
+    if (isOpen) {
+      refetchAlbums();
+    } else {
+      setAlbumsForScroll([]);
+      setAlbumListPage(1);
+    }
+  }, [refetchAlbums, isOpen, albumListPage]);
 
   return (
     <Modal onClose={onClose} isOpen={isOpen} scrollBehavior="inside">
@@ -118,14 +122,18 @@ const AlbumList: React.FC<AlbmListProps> = ({
                           {
                             onSuccess: () => {
                               setAlbumsForScroll([]);
-                              setAlbumListPage(1);
+                              if (albumListPage === 1) {
+                                setAlbumsForScroll([]);
+                                refetchAlbums();
+                              } else {
+                                setAlbumListPage(1);
+                              }
                               toast({
                                 description: 'アルバムを削除しました。',
                                 status: 'success',
                                 duration: 3000,
                                 isClosable: true,
                               });
-                              refetchAlbums();
                             },
                           },
                         );
