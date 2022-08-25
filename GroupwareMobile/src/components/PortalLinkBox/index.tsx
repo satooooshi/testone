@@ -45,7 +45,8 @@ type PortalType =
   | 'salary'
   | 'users'
   | 'attendance'
-  | 'account';
+  | 'account'
+  | 'logout';
 
 type PortalLinkIconProps = {
   type: PortalType;
@@ -182,6 +183,15 @@ const PortalLinkIcon: React.FC<PortalLinkIconProps> = ({type}) => {
           fontFamily="Feather"
         />
       );
+    case 'logout':
+      return (
+        <Icon
+          name="logout"
+          fontSize={iconSize}
+          color="gray900"
+          fontFamily="MaterialIcons"
+        />
+      );
   }
 };
 
@@ -233,6 +243,8 @@ const PortalLinkBox: React.FC<PortarlLinkBoxProps> = ({type, onPress}) => {
         return '社員名鑑';
       case 'attendance':
         return '勤怠管理';
+      case 'logout':
+        return 'ログアウト';
       default:
         return '';
     }
