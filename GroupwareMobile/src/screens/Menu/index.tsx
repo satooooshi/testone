@@ -95,7 +95,6 @@ const Home: React.FC = () => {
         return data.news;
       });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data?.news, isRefetching]);
 
   return (
@@ -108,6 +107,63 @@ const Home: React.FC = () => {
       />
       {/* TODO: ログイン名を出す */}
       <ScrollDiv mt="lg" px={16}>
+        <Div flexDir="row" mb={8}>
+          <Div flex={1} mr={12}>
+            <PortalLinkBox
+              type="account"
+              onPress={() => {
+                navigation.navigate('AccountStack', {
+                  screen: 'AccountDetail',
+                });
+              }}
+            />
+          </Div>
+          <Div flex={1}>
+            <PortalLinkBox
+              type="my_schedule"
+              onPress={() => {
+                navigation.navigate('EventStack', {
+                  screen: 'EventList',
+                  params: {personal: true},
+                });
+              }}
+            />
+          </Div>
+        </Div>
+
+        <Div flexDir="row" mb={8}>
+          <Div flex={1} mr={12}>
+            <PortalLinkBox
+              type="safety_confirmation"
+              onPress={() => {
+                Alert.alert('近日公開予定です');
+              }}
+            />
+          </Div>
+          <Div flex={1}>
+            <PortalLinkBox
+              type="salary"
+              onPress={() => {
+                Alert.alert('今後実装予定です');
+              }}
+            />
+          </Div>
+        </Div>
+        <Div flexDir="row" mb={8}>
+          <Div flex={1} mr={12}>
+            <PortalLinkBox
+              type="attendance"
+              onPress={() => {
+                Linking.openURL('https://bold-kintai.net/bold/root/attendance');
+              }}
+            />
+          </Div>
+          <Div flex={1} />
+        </Div>
+
+        <Text fontSize={18} fontWeight="bold" my={12}>
+          全体
+        </Text>
         <Div flexDir="row" mb={8}>
           <Div flex={1} mr={12}>
             <PortalLinkBox
@@ -132,6 +188,7 @@ const Home: React.FC = () => {
             />
           </Div>
         </Div>
+
         <Div flexDir="row" mb={8}>
           <Div flex={1} mr={12}>
             <PortalLinkBox
@@ -156,6 +213,7 @@ const Home: React.FC = () => {
             />
           </Div>
         </Div>
+
         <Div flexDir="row" mb={8}>
           <Div flex={1} mr={12}>
             <PortalLinkBox
@@ -180,6 +238,7 @@ const Home: React.FC = () => {
             />
           </Div>
         </Div>
+
         <Div flexDir="row" mb={8}>
           <Div flex={1} mr={12}>
             <PortalLinkBox
@@ -203,29 +262,7 @@ const Home: React.FC = () => {
             />
           </Div>
         </Div>
-        <Div flexDir="row" mb={8}>
-          <Div flex={1} mr={12}>
-            <PortalLinkBox
-              type="account"
-              onPress={() => {
-                navigation.navigate('AccountStack', {
-                  screen: 'AccountDetail',
-                });
-              }}
-            />
-          </Div>
-          <Div flex={1}>
-            <PortalLinkBox
-              type="my_schedule"
-              onPress={() => {
-                navigation.navigate('EventStack', {
-                  screen: 'EventList',
-                  params: {personal: true},
-                });
-              }}
-            />
-          </Div>
-        </Div>
+
         <Div flexDir="row" mb={8}>
           <Div flex={1} mr={12}>
             <PortalLinkBox
@@ -238,37 +275,18 @@ const Home: React.FC = () => {
               }}
             />
           </Div>
-          <Div flex={1}>
-            <PortalLinkBox
-              type="attendance"
-              onPress={() => {
-                Linking.openURL('https://bold-kintai.net/bold/root/attendance');
-              }}
-            />
-          </Div>
+          <Div flex={1} />
         </Div>
+
+        <Text fontSize={18} fontWeight="bold" my={12}>
+          アカウント
+        </Text>
         <Div flexDir="row" mb={8}>
           <Div flex={1} mr={12}>
-            <PortalLinkBox
-              type="safety_confirmation"
-              onPress={() => {
-                Alert.alert('近日公開予定です');
-              }}
-            />
+            <PortalLinkBox type="logout" onPress={handleLogout} />
           </Div>
-          <Div flex={1}>
-            <PortalLinkBox
-              type="salary"
-              onPress={() => {
-                Alert.alert('今後実装予定です');
-              }}
-            />
-          </Div>
+          <Div flex={1} />
         </Div>
-        {/* <Div flexDir="row" mb={8}>
-          <Div flex={1} mr={12}></Div>
-          <Div flex={1}></Div>
-        </Div> */}
       </ScrollDiv>
     </WholeContainer>
   );
