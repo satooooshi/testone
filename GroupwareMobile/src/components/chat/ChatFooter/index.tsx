@@ -1,5 +1,4 @@
 import React, {
-  createRef,
   Fragment,
   memo,
   useCallback,
@@ -9,8 +8,6 @@ import React, {
   useState,
 } from 'react';
 import {
-  AppState,
-  Keyboard,
   NativeSyntheticEvent,
   Platform,
   Text,
@@ -35,10 +32,11 @@ import {
   getMentionPartSuggestionKeywords,
   isMentionPartType,
 } from 'react-native-controlled-mentions/dist/utils';
-import {Div, Icon, ScrollDiv} from 'react-native-magnus';
+import {Button, Div, Icon, ScrollDiv} from 'react-native-magnus';
 import {ActivityIndicator} from 'react-native-paper';
 import {chatStyles} from '../../../styles/screen/chat/chat.style';
 import {Menu} from 'react-native-paper';
+import Input from './Input';
 
 type ChatFooterProps = {
   text: string | undefined;
@@ -69,9 +67,8 @@ const ChatFooter: React.FC<ChatFooterProps> = ({
   const [selection, setSelection] = useState({start: 0, end: 0});
   const [mentionAdded, setMentionAdded] = useState(false);
   const [visibleMenu, setVisibleMenu] = useState(false);
-  const [keyboardShow, setKeyboardShow] = useState(false);
 
-  let inputRef: TextInput | null;
+  const inputRef = useRef<TextInput>(null);
 
   const renderSuggestions: React.FC<MentionSuggestionsProps> = ({
     keyword,
@@ -99,26 +96,6 @@ const ChatFooter: React.FC<ChatFooterProps> = ({
     );
   };
 
-  useEffect(() => {
-    const keyboardDidShowListener = Keyboard.addListener(
-      'keyboardDidShow',
-      () => {
-        setKeyboardShow(true);
-      },
-    );
-    const keyboardDidHideListener = Keyboard.addListener(
-      'keyboardDidHide',
-      () => {
-        setKeyboardShow(false);
-      },
-    );
-
-    return () => {
-      keyboardDidHideListener.remove();
-      keyboardDidShowListener.remove();
-    };
-  }, []);
-
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const partTypes: MentionPartType[] = [
     {
@@ -136,34 +113,35 @@ const ChatFooter: React.FC<ChatFooterProps> = ({
     if (value) {
       setParseContent(parseValue(value, partTypes));
     } else {
-      inputRef?.clear();
       setParseContent(parseValue('', partTypes));
+      // inputRef?.current?.clear();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value]);
 
   const onChangeInput = useCallback(
     (changedText: string) => {
-      if (keyboardShow) {
-        setParseContent(parseValue(changedText, partTypes));
-        onChangeText(
-          generateValueFromPartsAndChangedText(
-            parseContent.parts,
-            parseContent.plainText,
-            changedText,
-          ),
-        );
-      }
+      // if (inputRef?.current?.isFocused()) {
+      setParseContent(parseValue(changedText, partTypes));
+      onChangeText(
+        generateValueFromPartsAndChangedText(
+          parseContent.parts,
+          parseContent.plainText,
+          changedText,
+        ),
+      );
+      // }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [keyboardShow, parseContent],
+    [inputRef, parseContent],
   );
 
-  const handleSelectionChange = (
-    event: NativeSyntheticEvent<TextInputSelectionChangeEventData>,
-  ) => {
-    setSelection(event.nativeEvent.selection);
-  };
+  const handleSelectionChange = useCallback(
+    (event: NativeSyntheticEvent<TextInputSelectionChangeEventData>) => {
+      setSelection(event.nativeEvent.selection);
+    },
+    [],
+  );
 
   /**
    * We memoize the keyword to know should we show mention suggestions or not
@@ -291,40 +269,11 @@ const ChatFooter: React.FC<ChatFooterProps> = ({
           px={8}
           rounded="md"
           w="60%">
-          <TextInput
-            ref={ref => {
-              inputRef = ref;
-            }}
-            value={''}
-            onSelectionChange={handleSelectionChange}
-            multiline
-            onChangeText={t => onChangeInput(t)}
-            autoCapitalize="none"
-            placeholderTextColor="#868596"
-            style={[
-              Platform.OS === 'android'
-                ? chatStyles.inputAndroid
-                : chatStyles.inputIos,
-              {
-                color: 'black',
-                minHeight: windowHeight * 0.03,
-                maxHeight: windowHeight * 0.22,
-              },
-            ]}>
-            <Text>
-              {parseContent.parts.map(({text, partType, data}, index) =>
-                partType ? (
-                  <Text
-                    key={`${index}-${data?.trigger ?? 'pattern'}`}
-                    style={partType.textStyle ?? defaultMentionTextStyle}>
-                    {text}
-                  </Text>
-                ) : (
-                  <Text key={index}>{text}</Text>
-                ),
-              )}
-            </Text>
-          </TextInput>
+          <Input
+            onChangeInput={onChangeInput}
+            handleSelectionChange={handleSelectionChange}
+            parseContent={parseContent}
+          />
         </Div>
         {isLoading ? (
           <ActivityIndicator />

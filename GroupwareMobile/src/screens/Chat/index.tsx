@@ -195,7 +195,7 @@ const Chat: React.FC = () => {
             content: messageContentRef.current,
           });
         }
-        Keyboard.dismiss();
+        // Keyboard.dismiss();
       }
     },
   });
@@ -322,7 +322,6 @@ const Chat: React.FC = () => {
           refetchRoomCard({id: sentMsg.chatGroup.id, type: ''});
         }
         if (sentMsg.type === ChatMessageType.TEXT) {
-          messageContentRef.current = '';
           // setValues(v => ({...v, content: ''}));
           resetForm();
         }
@@ -341,7 +340,6 @@ const Chat: React.FC = () => {
         chatMessage: {...sentMsg, isSender: false},
       });
       resetForm();
-      messageContentRef.current = '';
       setLongPressedMgg(undefined);
       setEditMessage(false);
     },
