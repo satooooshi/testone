@@ -119,7 +119,6 @@ const ChatFooter: React.FC<ChatFooterProps> = ({
 
   const onChangeInput = useCallback(
     (changedText: string) => {
-      // if (inputRef?.current?.isFocused()) {
       setParseContent(parseValue(changedText, partTypes));
       onChangeText(
         generateValueFromPartsAndChangedText(
@@ -128,7 +127,6 @@ const ChatFooter: React.FC<ChatFooterProps> = ({
           changedText,
         ),
       );
-      // }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [inputRef, parseContent],
