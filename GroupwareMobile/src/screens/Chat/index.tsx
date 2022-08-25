@@ -650,7 +650,7 @@ const Chat: React.FC = () => {
 
   useEffect(() => {
     if (messages.length) {
-      saveMessages(messages);
+      saveMessages(messages.slice(0, 20));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [messages]);
