@@ -354,10 +354,10 @@ export class User {
     this.avatarUrl = genStorageURL(this.avatarUrl);
   }
 
-  @AfterInsert()
-  @AfterLoad()
-  @AfterUpdate()
-  async changeToSignedURL?() {
-    this.avatarUrl = await genSignedURL(this.avatarUrl);
-  }
+  // @AfterInsert()
+  // @AfterLoad()
+  // @AfterUpdate()
+  // async changeToSignedURL?() {
+  //   this.avatarUrl = await genSignedURL(this.avatarUrl);
+  // }
 }
