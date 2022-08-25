@@ -20,7 +20,6 @@ import NoteBox from '../NoteBox';
 const Viewer = dynamic(() => import('react-viewer'), { ssr: false });
 import { saveAs } from 'file-saver';
 import { ImageDecorator } from 'react-viewer/lib/ViewerProps';
-import { fileNameTransformer } from 'src/utils/factory/fileNameTransformer';
 
 type NoteListProps = {
   room: ChatGroup;
