@@ -106,71 +106,10 @@ const Home: React.FC = () => {
         rightButtonName={'ログアウト'}
         onPressRightButton={handleLogout}
       />
-      <ScrollDiv mt="lg">
-        <Div
-          bg="white"
-          rounded="md"
-          flexDir="column"
-          alignItems="center"
-          alignSelf="center"
-          mb="lg"
-          py="lg"
-          px="lg"
-          w={windowWidth * 0.9}>
-          <Text mb={'sm'} fontWeight="bold" fontSize={16}>
-            新着の特集記事
-          </Text>
-          {newsForScroll.length ? (
-            newsForScroll.map((news, index) =>
-              index < newsIndex * 5 ? (
-                <TouchableHighlight
-                  key={news.id.toString()}
-                  underlayColor="none"
-                  style={tailwind('w-full')}
-                  onPress={() => onPressNews(news)}>
-                  <Div
-                    mb={8}
-                    pb={8}
-                    borderBottomColor="black"
-                    borderBottomWidth={1}
-                    alignItems="center"
-                    flexDir="row">
-                    <Text fontWeight="bold">・</Text>
-                    <Text color="blue" fontSize={16}>
-                      {news.title}
-                    </Text>
-                  </Div>
-                </TouchableHighlight>
-              ) : (
-                <React.Fragment key={news.id.toString()} />
-              ),
-            )
-          ) : (
-            <></>
-          )}
-          {loadingNews && <ActivityIndicator />}
-          <TouchableHighlight
-            underlayColor="none"
-            style={tailwind('self-end')}
-            onPress={() => {
-              setNewsIndex(i => {
-                if ((i + 1) % 4 === 0) {
-                  setPage(p => p + 1);
-                }
-                return i + 1;
-              });
-            }}>
-            {data?.pageCount && newsIndex !== data.pageCount * 4 ? (
-              <Text color="blue" fontWeight="bold" fontSize={16}>
-                もっと見る
-              </Text>
-            ) : (
-              <></>
-            )}
-          </TouchableHighlight>
-        </Div>
-        <Div flexDir="row" justifyContent="center" alignItems="center">
-          <Div mb={8} mr={4}>
+      {/* TODO: ログイン名を出す */}
+      <ScrollDiv mt="lg" px={16}>
+        <Div flexDir="row" mb={8}>
+          <Div flex={1} mr={12}>
             <PortalLinkBox
               type="impressive_university"
               onPress={() =>
@@ -181,7 +120,7 @@ const Home: React.FC = () => {
               }
             />
           </Div>
-          <Div mb={8} mr={4}>
+          <Div flex={1}>
             <PortalLinkBox
               type="study_meeting"
               onPress={() =>
@@ -192,7 +131,9 @@ const Home: React.FC = () => {
               }
             />
           </Div>
-          <Div mb={8}>
+        </Div>
+        <Div flexDir="row" mb={8}>
+          <Div flex={1} mr={12}>
             <PortalLinkBox
               type="bolday"
               onPress={() =>
@@ -203,9 +144,7 @@ const Home: React.FC = () => {
               }
             />
           </Div>
-        </Div>
-        <Div flexDir="row" justifyContent="center" alignItems="center">
-          <Div mb={8} mr={4}>
+          <Div flex={1}>
             <PortalLinkBox
               type="coach"
               onPress={() =>
@@ -216,7 +155,9 @@ const Home: React.FC = () => {
               }
             />
           </Div>
-          <Div mb={8} mr={4}>
+        </Div>
+        <Div flexDir="row" mb={8}>
+          <Div flex={1} mr={12}>
             <PortalLinkBox
               type="club"
               onPress={() =>
@@ -227,7 +168,7 @@ const Home: React.FC = () => {
               }
             />
           </Div>
-          <Div mb={8}>
+          <Div flex={1}>
             <PortalLinkBox
               type="submission_etc"
               onPress={() =>
@@ -239,8 +180,8 @@ const Home: React.FC = () => {
             />
           </Div>
         </Div>
-        <Div flexDir="row" justifyContent="center" alignItems="center">
-          <Div mb={8} mr={4}>
+        <Div flexDir="row" mb={8}>
+          <Div flex={1} mr={12}>
             <PortalLinkBox
               type="wiki"
               onPress={() => {
@@ -251,7 +192,7 @@ const Home: React.FC = () => {
               }}
             />
           </Div>
-          <Div mb={8} mr={4}>
+          <Div flex={1}>
             <PortalLinkBox
               type="chat"
               onPress={() => {
@@ -261,7 +202,9 @@ const Home: React.FC = () => {
               }}
             />
           </Div>
-          <Div mb={8}>
+        </Div>
+        <Div flexDir="row" mb={8}>
+          <Div flex={1} mr={12}>
             <PortalLinkBox
               type="account"
               onPress={() => {
@@ -271,9 +214,7 @@ const Home: React.FC = () => {
               }}
             />
           </Div>
-        </Div>
-        <Div flexDir="row" justifyContent="center" alignItems="center">
-          <Div mb={8} mr={4}>
+          <Div flex={1}>
             <PortalLinkBox
               type="my_schedule"
               onPress={() => {
@@ -284,7 +225,9 @@ const Home: React.FC = () => {
               }}
             />
           </Div>
-          <Div mb={8} mr={4}>
+        </Div>
+        <Div flexDir="row" mb={8}>
+          <Div flex={1} mr={12}>
             <PortalLinkBox
               type="users"
               onPress={() => {
@@ -295,7 +238,7 @@ const Home: React.FC = () => {
               }}
             />
           </Div>
-          <Div mb={8}>
+          <Div flex={1}>
             <PortalLinkBox
               type="attendance"
               onPress={() => {
@@ -304,8 +247,8 @@ const Home: React.FC = () => {
             />
           </Div>
         </Div>
-        <Div flexDir="row" justifyContent="center" alignItems="center">
-          <Div mb={8} mr={4}>
+        <Div flexDir="row" mb={8}>
+          <Div flex={1} mr={12}>
             <PortalLinkBox
               type="safety_confirmation"
               onPress={() => {
@@ -313,7 +256,7 @@ const Home: React.FC = () => {
               }}
             />
           </Div>
-          <Div mb={8}>
+          <Div flex={1}>
             <PortalLinkBox
               type="salary"
               onPress={() => {
@@ -322,6 +265,10 @@ const Home: React.FC = () => {
             />
           </Div>
         </Div>
+        {/* <Div flexDir="row" mb={8}>
+          <Div flex={1} mr={12}></Div>
+          <Div flex={1}></Div>
+        </Div> */}
       </ScrollDiv>
     </WholeContainer>
   );

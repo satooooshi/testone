@@ -276,8 +276,8 @@ const PortalLinkBox: React.FC<PortarlLinkBoxProps> = ({type, onPress}) => {
     <TouchableHighlight onPress={onPress} style={portalLinkBoxStyles.wrapper}>
       <Div
         bg="white"
-        h={boxWidth}
-        w={boxWidth}
+        h={100}
+        w={'100%'}
         justifyContent="center"
         p={8}
         alignItems="center">
