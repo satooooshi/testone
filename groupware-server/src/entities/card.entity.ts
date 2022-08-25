@@ -7,6 +7,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { Cart } from './cart.entity';
+import { OrderCard } from './orderCards.entity';
 
 export enum CardStatus {
   ON_SALE = 'on_sale',
@@ -77,4 +78,10 @@ export class Card {
     onDelete: 'CASCADE',
   })
   cart: Cart;
+
+  @OneToMany(() => OrderCard, (orderCard) => orderCard.card, {
+    onUpdate: 'CASCADE',
+    onDelete: 'CASCADE',
+  })
+  orderCard: OrderCard;
 }
