@@ -26,15 +26,13 @@ import {
   Part,
 } from 'react-native-controlled-mentions/dist/types';
 import {
-  defaultMentionTextStyle,
   generateValueFromPartsAndChangedText,
   generateValueWithAddedSuggestion,
   getMentionPartSuggestionKeywords,
   isMentionPartType,
 } from 'react-native-controlled-mentions/dist/utils';
-import {Button, Div, Icon, ScrollDiv} from 'react-native-magnus';
+import {Div, Icon, ScrollDiv} from 'react-native-magnus';
 import {ActivityIndicator} from 'react-native-paper';
-import {chatStyles} from '../../../styles/screen/chat/chat.style';
 import {Menu} from 'react-native-paper';
 import Input from './Input';
 
@@ -63,7 +61,7 @@ const ChatFooter: React.FC<ChatFooterProps> = ({
   mentionSuggestions,
   isLoading,
 }) => {
-  const {width: windowWidth, height: windowHeight} = useWindowDimensions();
+  const {width: windowWidth} = useWindowDimensions();
   const [selection, setSelection] = useState({start: 0, end: 0});
   const [mentionAdded, setMentionAdded] = useState(false);
   const [visibleMenu, setVisibleMenu] = useState(false);
