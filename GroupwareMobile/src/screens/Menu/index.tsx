@@ -1,101 +1,22 @@
-import React, {useEffect, useState} from 'react';
+import React from 'react';
 import WholeContainer from '../../components/WholeContainer';
 import HeaderWithTextButton from '../../components/Header';
 import PortalLinkBox from '../../components/PortalLinkBox';
 import {Div, ScrollDiv, Text} from 'react-native-magnus';
-import {
-  Alert,
-  Linking,
-  TouchableHighlight,
-  useWindowDimensions,
-} from 'react-native';
+import {Alert, Linking} from 'react-native';
 import {useAuthenticate} from '../../contexts/useAuthenticate';
-import {useAPIGetTopNews} from '../../hooks/api/topNews/useAPIGetTopNews';
-import {EventType, TopNews} from '../../types';
-import {useIsFocused, useNavigation} from '@react-navigation/native';
+import {EventType} from '../../types';
+import {useNavigation} from '@react-navigation/native';
 import {HomeNavigationProps} from '../../types/navigator/drawerScreenProps/home';
-import tailwind from 'tailwind-rn';
-import {ActivityIndicator} from 'react-native-paper';
 
 const Home: React.FC = () => {
   const {setUser, logout} = useAuthenticate();
   const navigation = useNavigation<HomeNavigationProps>();
-  const {width: windowWidth} = useWindowDimensions();
-  const [page, setPage] = useState(1);
-  const [newsIndex, setNewsIndex] = useState(1);
-  const {
-    data,
-    refetch,
-    isLoading: loadingNews,
-    isRefetching,
-  } = useAPIGetTopNews({
-    page: page.toString(),
-  });
-  const [newsForScroll, setNewsForScroll] = useState<TopNews[]>([]);
-
-  const isFocused = useIsFocused();
 
   const handleLogout = () => {
     logout();
     setUser({});
   };
-
-  const onPressNews = (news: TopNews) => {
-    if (news.urlPath.includes('event')) {
-      const id: string = news.urlPath.replace('/event/', '');
-      if (typeof Number(id) === 'number') {
-        navigation.navigate('EventStack', {
-          screen: 'EventDetail',
-          params: {id: Number(id)},
-          initial: false,
-        });
-      } else {
-        Alert.alert('情報の取得に失敗しました');
-      }
-    } else if (news.urlPath.includes('wiki')) {
-      const id: string = news.urlPath.replace('/wiki/detail/', '');
-      if (typeof Number(id) === 'number') {
-        navigation.navigate('WikiStack', {
-          screen: 'WikiDetail',
-          params: {id: Number(id)},
-          initial: false,
-        });
-      } else {
-        Alert.alert('情報の取得に失敗しました');
-      }
-    } else if (news.urlPath.includes('account')) {
-      const id: string = news.urlPath.replace('/account/', '');
-      if (typeof Number(id) === 'number') {
-        navigation.navigate('UsersStack', {
-          screen: 'AccountDetail',
-          params: {id: Number(id)},
-          initial: false,
-        });
-      } else {
-        Alert.alert('情報の取得に失敗しました');
-      }
-    }
-  };
-
-  useEffect(() => {
-    setNewsIndex(1);
-    setPage(1);
-    setNewsForScroll([]);
-    if (isFocused) {
-      refetch();
-    }
-  }, [refetch, isFocused]);
-
-  useEffect(() => {
-    if (!isRefetching && data?.news) {
-      setNewsForScroll(n => {
-        if (n.length) {
-          return [...n, ...data.news];
-        }
-        return data.news;
-      });
-    }
-  }, [data?.news, isRefetching]);
 
   return (
     <WholeContainer>
