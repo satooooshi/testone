@@ -21,7 +21,7 @@ export class Card {
   @Column({
     type: 'varchar',
     name: 'name',
-    length: '500',
+    length: 500,
     nullable: false,
     default: '',
   })
