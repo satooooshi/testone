@@ -22,7 +22,7 @@ import {
   allPostalColor,
 } from '../../utils/colors';
 import {Text, Div, Icon} from 'react-native-magnus';
-import {TouchableHighlight, useWindowDimensions} from 'react-native';
+import {TouchableHighlight} from 'react-native';
 import {portalLinkBoxStyles} from '../../styles/component/portalLinkBox.style';
 
 type PortalType =
@@ -53,8 +53,7 @@ type PortalLinkIconProps = {
 };
 
 const PortalLinkIcon: React.FC<PortalLinkIconProps> = ({type}) => {
-  const windowWidth = useWindowDimensions().width;
-  const iconSize = windowWidth * 0.1;
+  const iconSize = 30;
   switch (type) {
     case 'impressive_university':
       return (
@@ -258,12 +257,11 @@ const PortalLinkBox: React.FC<PortarlLinkBoxProps> = ({type, onPress}) => {
         w={'100%'}
         rounded="xl"
         justifyContent="center"
-        p={8}
-        alignItems="center">
-        <Div mb={4}>
+        p={24}>
+        <Div mb={12} alignSelf="flex-start">
           <PortalLinkIcon type={type} />
         </Div>
-        <Text fontWeight="bold" fontSize={20}>
+        <Text fontWeight="bold" fontSize={16}>
           {eventTitleText(type)}
         </Text>
         {/* <Text fontSize="lg">{descriptionText(type)}</Text> */}
