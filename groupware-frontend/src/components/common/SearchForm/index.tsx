@@ -111,6 +111,12 @@ const SearchInput: React.FC<SearchFormProps> = ({
           background="white"
           value={word}
           onChange={(e) => setWord(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              e.preventDefault();
+              handleModalSearchButton();
+            }
+          }}
         />
         <Button
           width={isSmallerThan768 ? '100%' : '15vw'}
