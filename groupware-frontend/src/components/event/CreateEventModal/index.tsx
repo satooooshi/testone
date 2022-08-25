@@ -45,6 +45,7 @@ import { imageExtensions } from 'src/utils/imageExtensions';
 import { useFormik } from 'formik';
 import { createEventSchema } from 'src/utils/validation/schema';
 import { useImageCrop } from '@/hooks/crop/useImageCrop';
+import { Crop } from 'react-image-crop';
 import { DateTime } from 'luxon';
 import { tagColorFactory } from 'src/utils/factory/tagColorFactory';
 import { useAuthenticate } from 'src/contexts/useAuthenticate';
@@ -198,7 +199,30 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
 
   const onLoad = useCallback((img) => {
     imgRef.current = img;
+    const diameter = img.height < img.width ? img.height : img.width;
+    dispatchCrop({
+      type: 'setCrop',
+      value: {
+        unit: 'px',
+        x: (img.width - diameter) / 2,
+        y: (img.height - diameter) / 2,
+        width: diameter,
+        height: diameter,
+        aspect: 1,
+      },
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const onChange = (newCrop: Crop) => {
+    if (
+      newCrop.height !== crop.height ||
+      newCrop.width !== crop.width ||
+      newCrop.y !== crop.y ||
+      newCrop.x !== crop.x
+    )
+      dispatchCrop({ type: 'setCrop', value: newCrop });
+  };
 
   const {
     getRootProps: getEventThumbnailRootProps,
@@ -658,9 +682,7 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
               <ReactCrop
                 src={selectThumbnailUrl}
                 crop={crop}
-                onChange={(newCrop) =>
-                  dispatchCrop({ type: 'setCrop', value: newCrop })
-                }
+                onChange={(newCrop) => onChange(newCrop)}
                 keepSelection={true}
                 onComplete={(c) =>
                   dispatchCrop({
@@ -670,6 +692,11 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
                   })
                 }
                 onImageLoaded={onLoad}
+                imageStyle={{
+                  minHeight: '100px',
+                  maxHeight: '300px',
+                  minWidth: '100px',
+                }}
               />
             ) : (
               <Box

@@ -225,20 +225,30 @@ const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
           />
           <Box overflowY="auto" css={hideScrollbarCss}>
             {selectImageUrl ? (
-              <ReactCrop
-                keepSelection={true}
-                imageStyle={{
-                  minHeight: '100px',
-                  maxHeight: '300px',
-                  minWidth: '100px',
-                }}
-                src={selectImageUrl}
-                crop={crop}
-                onChange={(newCrop) => onChange(newCrop)}
-                onComplete={(c) => setCompletedCrop(c)}
-                onImageLoaded={onLoad}
-                circularCrop={true}
-              />
+              <Box display="flex" flexDirection="column">
+                <Box>
+                  <ReactCrop
+                    keepSelection={true}
+                    imageStyle={{
+                      minHeight: '100px',
+                      maxHeight: '300px',
+                      minWidth: '100px',
+                    }}
+                    src={selectImageUrl}
+                    crop={crop}
+                    onChange={(newCrop) => onChange(newCrop)}
+                    onComplete={(c) => setCompletedCrop(c)}
+                    onImageLoaded={onLoad}
+                    circularCrop={true}
+                  />
+                </Box>
+                <Button
+                  my="15px"
+                  onClick={() => resetImageUrl()}
+                  colorScheme="blue">
+                  既存画像を削除
+                </Button>
+              </Box>
             ) : (
               <>
                 <FormLabel>ルーム画像</FormLabel>

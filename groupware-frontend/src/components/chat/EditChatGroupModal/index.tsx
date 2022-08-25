@@ -55,6 +55,7 @@ const EditChatGroupModal: React.FC<EditChatGroupModalProps> = ({
     },
   });
 
+  const [isDeleted, setIsDeleted] = useState<boolean>(false);
   const { editChatGroup } = useHandleBadge();
   const [selectImageUrl, setSelectImageUrl] = useState<string>('');
   const { mutate: uploadImage, isLoading } = useAPIUploadStorage({
@@ -86,6 +87,16 @@ const EditChatGroupModal: React.FC<EditChatGroupModalProps> = ({
   });
   const onLoad = useCallback((img) => {
     imgRef.current = img;
+    setIsDeleted(false);
+    const diameter: number = img.height < img.width ? img.height : img.width;
+    setCrop({
+      unit: 'px',
+      x: (img.width - diameter) / 2,
+      y: (img.height - diameter) / 2,
+      height: diameter,
+      width: diameter,
+      aspect: 1,
+    });
   }, []);
 
   const {
@@ -107,14 +118,41 @@ const EditChatGroupModal: React.FC<EditChatGroupModalProps> = ({
         const result = await dataURLToFile(img, selectImageName);
         uploadImage([result]);
         return;
+      } else {
+        const newGroupInfoCopy: Partial<ChatGroup> = newGroupInfo;
+        newGroupInfoCopy.imageURL = '';
+        setNewGroupInfo(newGroupInfoCopy);
       }
       saveGroup(newGroupInfo as ChatGroup);
     },
   });
 
+  const onChange = (newCrop: Crop) => {
+    if (
+      newCrop.height !== crop.height ||
+      newCrop.width !== crop.width ||
+      newCrop.y !== crop.y ||
+      newCrop.x !== crop.x
+    )
+      setCrop(newCrop);
+  };
+
+  const onClickDeleteImage = () => {
+    setIsDeleted(true);
+    setSelectImageUrl('');
+    imgRef.current = undefined;
+    setCompletedCrop(undefined);
+  };
+
   useEffect(() => {
     setNewGroupInfo(chatGroup);
   }, [chatGroup, setNewGroupInfo]);
+
+  const onClickClose = () => {
+    setSelectImageUrl('');
+    setSelectImageName('');
+    setIsDeleted(false);
+  };
 
   return (
     <Modal onClose={closeModal} scrollBehavior="inside" isOpen={isOpen}>
@@ -136,20 +174,27 @@ const EditChatGroupModal: React.FC<EditChatGroupModalProps> = ({
             {isLoading ? <Spinner /> : <Text display="inline">更新</Text>}
           </Button>
         </ModalHeader>
-        <ModalCloseButton />
+        <ModalCloseButton onClick={() => onClickClose()} />
         <ModalBody>
           <Box>
             <Box>
               {selectImageUrl ? (
-                <ReactCrop
-                  src={selectImageUrl}
-                  crop={crop}
-                  onChange={(newCrop) => setCrop(newCrop)}
-                  onComplete={(c) => setCompletedCrop(c)}
-                  onImageLoaded={onLoad}
-                  circularCrop={true}
-                  keepSelection={true}
-                />
+                <Box textAlign="center">
+                  <ReactCrop
+                    src={selectImageUrl}
+                    crop={crop}
+                    onChange={(newCrop) => onChange(newCrop)}
+                    onComplete={(c) => setCompletedCrop(c)}
+                    onImageLoaded={onLoad}
+                    circularCrop={true}
+                    keepSelection={true}
+                    imageStyle={{
+                      minHeight: '100px',
+                      maxHeight: '300px',
+                      minWidth: '100px',
+                    }}
+                  />
+                </Box>
               ) : (
                 <Box
                   m="0 auto"
@@ -165,7 +210,7 @@ const EditChatGroupModal: React.FC<EditChatGroupModalProps> = ({
                   {...getRootProps()}>
                   <input {...getInputProps()} />
                   <Avatar
-                    src={newGroupInfo.imageURL}
+                    src={isDeleted ? undefined : newGroupInfo.imageURL}
                     h="100%"
                     w="100%"
                     rounded="full"
@@ -173,6 +218,16 @@ const EditChatGroupModal: React.FC<EditChatGroupModalProps> = ({
                   />
                 </Box>
               )}
+              {selectImageUrl || newGroupInfo.imageURL ? (
+                <Box textAlign="center">
+                  <Button
+                    my="10px"
+                    onClick={() => onClickDeleteImage()}
+                    colorScheme="blue">
+                    既存の画像を削除
+                  </Button>
+                </Box>
+              ) : null}
               <FormLabel>
                 <p>ルーム名</p>
                 {errors.name && touched.name ? (

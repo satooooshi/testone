@@ -16,7 +16,6 @@ import {
   Select,
   useToast,
   Text,
-  RadioGroup,
   Radio,
   Stack,
 } from '@chakra-ui/react';
@@ -32,6 +31,7 @@ import ReactCrop from 'react-image-crop';
 import { dataURLToFile } from 'src/utils/dataURLToFile';
 import { useAPIGetProfile } from '@/hooks/api/user/useAPIGetProfile';
 import { useImageCrop } from '@/hooks/crop/useImageCrop';
+import { Crop } from 'react-image-crop';
 import { useHeaderTab } from '@/hooks/headerTab/useHeaderTab';
 import TagModal from '@/components/common/TagModal';
 import { toggleTag } from 'src/utils/toggleTag';
@@ -146,6 +146,16 @@ const Profile = () => {
     [dispatchCrop],
   );
 
+  const onChange = (newCrop: Crop) => {
+    if (
+      newCrop.height !== crop.height ||
+      newCrop.width !== crop.width ||
+      newCrop.y !== crop.y ||
+      newCrop.x !== crop.x
+    )
+      dispatchCrop({ type: 'setCrop', value: newCrop });
+  };
+
   const {
     getRootProps: getEventImageRootProps,
     getInputProps: getEventImageInputProps,
@@ -214,6 +224,19 @@ const Profile = () => {
 
   const onLoad = useCallback((img) => {
     imgRef.current = img;
+    const diameter = img.height < img.width ? img.height : img.width;
+    dispatchCrop({
+      type: 'setCrop',
+      value: {
+        unit: 'px',
+        x: (img.width - diameter) / 2,
+        y: (img.height - diameter) / 2,
+        height: diameter,
+        width: diameter,
+        aspect: 1,
+      },
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const toggleSelectedTag = (t: UserTag) => {
@@ -222,6 +245,14 @@ const Profile = () => {
       ...i,
       tags: toggledTag,
     }));
+  };
+
+  const resetImageUrl = () => {
+    dispatchCrop({
+      type: 'resetImage',
+      value: 'resetImage',
+    });
+    setUserInfo((e) => ({ ...e, avatarUrl: '' }));
   };
 
   const isLoading = loadigUpdateUser || loadingUplaod;
@@ -253,19 +284,6 @@ const Profile = () => {
       )}
       <div className={profileStyles.main}>
         <div className={profileStyles.image_wrapper}>
-          {userInfo.avatarUrl && !selectImageUrl ? (
-            <div
-              {...getEventImageRootProps({
-                className: profileStyles.image_dropzone,
-              })}>
-              <input {...getEventImageInputProps()} />
-              <img
-                className={profileStyles.avatar}
-                src={croppedImageURL ? croppedImageURL : userInfo.avatarUrl}
-                alt="アバター画像"
-              />
-            </div>
-          ) : null}
           {!userInfo.avatarUrl && !selectImageUrl ? (
             <div
               {...getEventImageRootProps({
@@ -280,26 +298,58 @@ const Profile = () => {
                 />
               </div>
             </div>
-          ) : null}
-          {selectImageUrl ? (
-            <ReactCrop
-              keepSelection={true}
-              src={selectImageUrl}
-              crop={crop}
-              onChange={(newCrop) => {
-                dispatchCrop({ type: 'setCrop', value: newCrop });
-              }}
-              onComplete={(c) => {
-                dispatchCrop({
-                  type: 'setCompletedCrop',
-                  value: c,
-                  ref: imgRef.current,
-                });
-              }}
-              onImageLoaded={onLoad}
-              circularCrop={true}
-            />
-          ) : null}
+          ) : selectImageUrl ? (
+            <>
+              <ReactCrop
+                keepSelection={true}
+                src={selectImageUrl}
+                crop={crop}
+                onChange={(newCrop) => {
+                  onChange(newCrop);
+                }}
+                onComplete={(c) => {
+                  dispatchCrop({
+                    type: 'setCompletedCrop',
+                    value: c,
+                    ref: imgRef.current,
+                  });
+                }}
+                onImageLoaded={onLoad}
+                circularCrop={true}
+                imageStyle={{
+                  minHeight: '100px',
+                  maxHeight: '1000px',
+                  minWidth: '300px',
+                }}
+              />
+              <Button
+                mt="15px"
+                colorScheme="blue"
+                onClick={() => resetImageUrl()}>
+                既存画像を削除
+              </Button>
+            </>
+          ) : (
+            <>
+              <div
+                {...getEventImageRootProps({
+                  className: profileStyles.image_dropzone,
+                })}>
+                <input {...getEventImageInputProps()} />
+                <img
+                  className={profileStyles.avatar}
+                  src={croppedImageURL ? croppedImageURL : userInfo.avatarUrl}
+                  alt="アバター画像"
+                />
+              </div>
+              <Button
+                mt="15px"
+                colorScheme="blue"
+                onClick={() => resetImageUrl()}>
+                既存画像を削除
+              </Button>
+            </>
+          )}
         </div>
         <div className={profileStyles.form_wrapper}>
           <FormControl className={profileStyles.input_wrapper}>
