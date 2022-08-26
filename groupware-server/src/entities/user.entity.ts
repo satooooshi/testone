@@ -33,6 +33,7 @@ import { genSignedURL } from 'src/utils/storage/genSignedURL';
 import { genStorageURL } from 'src/utils/storage/genStorageURL';
 import { UserGoodForBoard } from './userGoodForBord.entity';
 import { Cart } from './cart.entity';
+import { ShippingAddress } from './shippingAddress.entity';
 
 export enum UserRole {
   ADMIN = 'admin',
@@ -346,6 +347,9 @@ export class User {
 
   @OneToMany(() => ChatMessageReaction, (reaction) => reaction.user)
   chatMessageReactions?: ChatMessageReaction[];
+
+  @OneToMany(() => ShippingAddress, (shippingAddress) => shippingAddress.user)
+  shippingAddress: ShippingAddress[];
 
   //this is jwt token send when login or authenticate
   token?: string;
