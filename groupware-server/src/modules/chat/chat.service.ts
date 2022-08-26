@@ -134,7 +134,7 @@ export class ChatService {
       offset = (Number(page) - 1) * limitNumber;
     }
 
-    const startTime = Date.now();
+    // const startTime = Date.now();
     const updatedAtLatestRoom = query.updatedAtLatestRoom
       ? new Date(query.updatedAtLatestRoom)
       : undefined;
@@ -179,7 +179,6 @@ export class ChatService {
         'select chat_group_id, users.id as id, users.last_name as lastName, users.first_name as firstName, users.avatar_url as avatarUrl, users.existence as existence from user_chat_joining INNER JOIN users ON users.id = user_id AND chat_group_id IN (?)',
         [personalRoomIds.map((r) => r.id)],
       );
-    // console.log(members);
 
     const muteUserIds = await manager.query(
       'select chat_group_id, user_id  from user_chat_mute where chat_group_id IN (?) AND user_id = ?',
@@ -287,13 +286,13 @@ export class ChatService {
       ['desc', 'desc'],
     ]).reverse();
 
-    const endTime = Date.now();
-    if (!updatedAtLatestRoom) {
-      console.log(
-        'get rooms by page ========================',
-        endTime - startTime,
-      );
-    }
+    // const endTime = Date.now();
+    // if (!updatedAtLatestRoom) {
+    //   console.log(
+    //     'get rooms by page ========================',
+    //     endTime - startTime,
+    //   );
+    // }
     const pageCount = Number(page);
 
     return { rooms, pageCount };
@@ -443,7 +442,7 @@ export class ChatService {
       throw new BadRequestException('The user is not a member');
     }
 
-    const startTime = Date.now();
+    // const startTime = Date.now();
     const existMessages = await this.chatMessageRepository
       .createQueryBuilder('chat_messages')
       .select([
@@ -490,7 +489,7 @@ export class ChatService {
     if (!existMessages.length) {
       return [];
     }
-    const endTime = Date.now();
+    // const endTime = Date.now();
     const messageIDs = existMessages.map((m) => m.id);
     const senderIDs = [
       ...new Set(existMessages.map((m) => Number(m.sender_id))),
@@ -575,9 +574,9 @@ export class ChatService {
       }),
     );
 
-    if (!dateRefetchLatest) {
-      console.log('get messages speed check', endTime - startTime);
-    }
+    // if (!dateRefetchLatest) {
+    //   console.log('get messages speed check', endTime - startTime);
+    // }
     return messages;
   }
 
@@ -717,10 +716,6 @@ export class ChatService {
     if (!message.chatGroup || !message.chatGroup.id) {
       throw new BadRequestException('No group is selected');
     }
-    console.log(
-      'sender avatar url length======',
-      message?.sender?.avatarUrl?.length,
-    );
     const existGroup = await this.chatGroupRepository
       .createQueryBuilder('chat_groups')
       .leftJoin('chat_groups.members', 'members')
@@ -1050,6 +1045,8 @@ export class ChatService {
         .andWhere('g.member_count = :length', { length: memberCount })
         .getMany();
     } else {
+      console.log('call group');
+
       maybeExistGroup = await this.chatGroupRepository
         .createQueryBuilder('g')
         .innerJoin('g.members', 'u', 'u.id = :userId', { userId: userIds[0] })
