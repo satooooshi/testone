@@ -30,7 +30,6 @@ const Input: React.FC<InputProps> = ({
   const {height: windowHeight} = useWindowDimensions();
   return (
     <TextInput
-      value=""
       onSelectionChange={handleSelectionChange}
       multiline
       onChangeText={t => onChangeInput(t)}
