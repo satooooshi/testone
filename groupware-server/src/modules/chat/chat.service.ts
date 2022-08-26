@@ -1045,8 +1045,6 @@ export class ChatService {
         .andWhere('g.member_count = :length', { length: memberCount })
         .getMany();
     } else {
-      console.log('call group');
-
       maybeExistGroup = await this.chatGroupRepository
         .createQueryBuilder('g')
         .innerJoin('g.members', 'u', 'u.id = :userId', { userId: userIds[0] })
@@ -1055,7 +1053,7 @@ export class ChatService {
         .where('g.name = :name', {
           name: newData.name,
         })
-        .where('g.room_type = :type', {
+        .andWhere('g.room_type = :type', {
           type: RoomType.GROUP,
         })
         .andWhere('g.member_count = :length', { length: memberCount })
