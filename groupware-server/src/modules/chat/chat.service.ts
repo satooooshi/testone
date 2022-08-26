@@ -268,7 +268,6 @@ export class ChatService {
           unreadCount = await this.getUnreadChatMessage(userID, query);
         }
         checkAloneRoom(g, userID);
-        g.imageURL = await genSignedURL(g.imageURL);
         return {
           ...g,
           pinnedUsers: undefined,
@@ -739,6 +738,7 @@ export class ChatService {
     const savedMessage = await this.chatMessageRepository.save(
       this.chatMessageRepository.create({ ...message, chatGroup: existGroup }),
     );
+    console.log('0000000', existGroup.imageURL);
 
     existGroup.updatedAt = new Date();
     await this.chatGroupRepository.save({

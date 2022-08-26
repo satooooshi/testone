@@ -244,7 +244,7 @@ export class UserService {
       offset = (Number(page) - 1) * limit;
     }
     const tagIDs = tag.split(' ');
-    const startTime = Date.now();
+    // const startTime = Date.now();
     const [users, count] = await this.userRepository
       .createQueryBuilder('user')
       .leftJoin('user.tags', 'tag')
@@ -334,7 +334,7 @@ export class UserService {
       .take(limit)
       .orderBy(sortKey, sortKey === 'user.lastNameKana' ? 'ASC' : 'DESC')
       .getManyAndCount();
-    const endTime = Date.now();
+    // const endTime = Date.now();
     const userIDs = users.map((u) => u.id);
     const userArrWithTags = await this.userRepository.findByIds(userIDs, {
       relations: ['tags'],
@@ -435,13 +435,14 @@ export class UserService {
         answerCount,
       };
     });
-    const endTime2 = Date.now();
-    console.log(
-      'get user list speed check',
-      endTime - startTime,
-      'end ',
-      endTime2 - startTime,
-    );
+    // const endTime2 = Date.now();
+    // console.log(
+    //   'get user list speed check',
+    //   endTime - startTime,
+    //   'end ',
+    //   endTime2 - startTime,
+    // );
+
     const pageCount =
       count % limit === 0 ? count / limit : Math.floor(count / limit) + 1;
     return { users: usersArrWithEachCount, pageCount };
