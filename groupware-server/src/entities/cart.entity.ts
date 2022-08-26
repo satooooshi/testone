@@ -2,7 +2,7 @@ import { Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Card } from './card.entity';
 import { User } from './user.entity';
 
-@Entity({ name: 'cart' })
+@Entity({ name: 'carts' })
 export class Cart {
   @PrimaryGeneratedColumn()
   id: number;

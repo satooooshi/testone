@@ -14,7 +14,7 @@ export enum CardStatus {
   BEFORE_SALE = 'pre_sales',
   WITHDRAWAL_OF_SALE = 'withdrawal_of_sale',
 }
-@Entity({ name: 'card' })
+@Entity({ name: 'cards' })
 export class Card {
   @PrimaryGeneratedColumn()
   id: number;
@@ -31,8 +31,6 @@ export class Card {
   @Column({
     type: 'longtext',
     name: 'description',
-    nullable: false,
-    default: '',
   })
   description: string;
 

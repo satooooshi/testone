@@ -13,7 +13,7 @@ import { OrderCard } from './orderCards.entity';
 //   BEFORE_SALE = 'pre_sales',
 //   WITHDRAWAL_OF_SALE = 'withdrawal_of_sale',
 // }
-@Entity({ name: 'order' })
+@Entity({ name: 'orders' })
 export class Order {
   @PrimaryGeneratedColumn()
   id: number;
@@ -21,7 +21,7 @@ export class Order {
   @Column({
     type: 'varchar',
     name: 'address',
-    length: '500',
+    length: 500,
     nullable: false,
     default: '',
   })
