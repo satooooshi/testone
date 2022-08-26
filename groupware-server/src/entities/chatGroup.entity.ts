@@ -156,7 +156,7 @@ export class ChatGroup {
         const newMemberMsg = new ChatMessage();
         newMemberMsg.content =
           this.members.map((m) => userNameFactory(m) + 'さん').join(', ') +
-		'が参加しました';
+          'が参加しました';
         newMemberMsg.type = ChatMessageType.SYSTEM_TEXT;
         newMemberMsg.chatGroup = this;
         getRepository(ChatMessage).save(
@@ -172,10 +172,10 @@ export class ChatGroup {
     this.imageURL = genStorageURL(this.imageURL);
   }
 
-  @AfterInsert()
-  @AfterLoad()
-  @AfterUpdate()
-  async changeToSignedURL?() {
-    this.imageURL = await genSignedURL(this.imageURL);
-  }
+  // @AfterInsert()
+  // @AfterLoad()
+  // @AfterUpdate()
+  // async changeToSignedURL?() {
+  //   this.imageURL = await genSignedURL(this.imageURL);
+  // }
 }
