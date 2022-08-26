@@ -717,6 +717,10 @@ export class ChatService {
     if (!message.chatGroup || !message.chatGroup.id) {
       throw new BadRequestException('No group is selected');
     }
+    console.log(
+      'sender avatar url length======',
+      message?.sender?.avatarUrl?.length,
+    );
     const existGroup = await this.chatGroupRepository
       .createQueryBuilder('chat_groups')
       .leftJoin('chat_groups.members', 'members')
