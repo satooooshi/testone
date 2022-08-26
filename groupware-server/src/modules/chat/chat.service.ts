@@ -613,14 +613,15 @@ export class ChatService {
     query: GetUnreadMessagesQuery,
   ): Promise<number> {
     const unreadCount = await this.chatMessageRepository
-      .createQueryBuilder('chat_messages')
-      .where('chat_messages.chatGroup.id = :chatGroupID', {
+      .createQueryBuilder('message')
+      .where('message.chatGroup.id = :chatGroupID AND message.type <> :type', {
         chatGroupID: query.group,
+        type: ChatMessageType.SYSTEM_TEXT,
       })
-      .andWhere('chat_messages.sender.id != :userID', {
+      .andWhere('message.sender_id != :userID', {
         userID,
       })
-      .andWhere('chat_messages.createdAt > :lastReadTime', {
+      .andWhere('message.createdAt > :lastReadTime', {
         lastReadTime: query.lastReadTime,
       })
       .getCount();

@@ -118,6 +118,20 @@ const CreateNewUser = () => {
 
   const onLoad = useCallback((img) => {
     imgRef.current = img;
+    const diameter: number = img.height < img.width ? img.height : img.width;
+    console.log((img.width - diameter) / 2);
+    dispatchCrop({
+      type: 'setCrop',
+      value: {
+        unit: 'px',
+        x: (img.width - diameter) / 2,
+        y: (img.height - diameter) / 2,
+        height: diameter,
+        width: diameter,
+        aspect: 1,
+      },
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const modalReducer = (
@@ -196,6 +210,10 @@ const CreateNewUser = () => {
     },
     [dispatchCrop],
   );
+
+  const onClickDeleteImage = () => {
+    dispatchCrop({ type: 'resetImage', value: 'resetImage' });
+  };
 
   const {
     getRootProps: getEventImageRootProps,
@@ -276,23 +294,43 @@ const CreateNewUser = () => {
       <div className={createNewUserStyles.main}>
         <div className={createNewUserStyles.image_wrapper}>
           {imageURL ? (
-            <ReactCrop
-              keepSelection={true}
-              src={imageURL}
-              crop={crop}
-              onChange={(newCrop) =>
-                dispatchCrop({ type: 'setCrop', value: newCrop })
-              }
-              onComplete={(newCrop) =>
-                dispatchCrop({
-                  type: 'setCompletedCrop',
-                  value: newCrop,
-                  ref: imgRef.current,
-                })
-              }
-              onImageLoaded={onLoad}
-              circularCrop={true}
-            />
+            <>
+              <ReactCrop
+                keepSelection={true}
+                src={imageURL}
+                crop={crop}
+                onChange={(newCrop) => {
+                  if (
+                    newCrop.height !== crop.height ||
+                    newCrop.width !== crop.width ||
+                    newCrop.y !== crop.y ||
+                    newCrop.x !== crop.x
+                  )
+                    dispatchCrop({ type: 'setCrop', value: newCrop });
+                }}
+                onComplete={(newCrop) =>
+                  dispatchCrop({
+                    type: 'setCompletedCrop',
+                    value: newCrop,
+                    ref: imgRef.current,
+                  })
+                }
+                onImageLoaded={onLoad}
+                circularCrop={true}
+                imageStyle={{
+                  minHeight: '100px',
+                  maxHeight: '1000px',
+                  minWidth: '100px',
+                }}
+              />
+              <Button
+                mb="15px"
+                colorScheme="blue"
+                marginTop="30px"
+                onClick={() => onClickDeleteImage()}>
+                既存画像を削除
+              </Button>
+            </>
           ) : (
             <div
               {...getEventImageRootProps({

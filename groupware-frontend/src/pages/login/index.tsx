@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import boldLogo from '@/public/bold-logo.png';
 import loginLayoutStyles from '@/styles/layouts/Login.module.scss';
@@ -22,6 +22,7 @@ import { responseErrorMsgFactory } from 'src/utils/factory/responseErrorMsgFacto
 const Login: React.FC = () => {
   const router = useRouter();
   const { authenticate, setUser } = useAuthenticate();
+  const [isActive, setIsActive] = useState(true);
   const { mutate: mutateLogin } = useAPILogin({
     onSuccess: async (data) => {
       // const setLocalStorage = async () => {
@@ -68,6 +69,7 @@ const Login: React.FC = () => {
     onError: (e) => {
       // FIXME: API側のエラーメッセージを追加する必要があるかもしれません。
       // const messages = responseErrorMsgFactory(e);
+      setIsActive(true);
       const messages = '認証に失敗しました。入力内容をご確認ください';
       toast({
         description: messages,
@@ -84,7 +86,10 @@ const Login: React.FC = () => {
   const { values, handleChange, handleSubmit, validateForm } = useFormik({
     initialValues: { email: '', password: '' },
     validationSchema: loginSchema,
-    onSubmit: (values) => mutateLogin(values),
+    onSubmit: async (values) => {
+      setIsActive(false);
+      mutateLogin(values);
+    },
   });
 
   const checkErrors = async (e: React.FormEvent<Element>) => {
@@ -150,7 +155,7 @@ const Login: React.FC = () => {
           background="white"
           className={clsx(textInputStyles.input, authFormStyles.form_margin)}
         />
-        <AuthButton name="Login" isActive={true} />
+        <AuthButton name="Login" isActive={isActive} />
       </form>
     </div>
   );
