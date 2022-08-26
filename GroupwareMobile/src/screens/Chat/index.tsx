@@ -217,6 +217,7 @@ const Chat: React.FC = () => {
         console.log('refetchFetchedPastMessages called', res?.length);
         if (res?.length) {
           const refreshedMessage = refreshMessage(res);
+          saveMessages(refreshedMessage.slice(0, 20));
           // console.log('refreshMessage =============', refreshedMessage.length);
           setMessages(refreshedMessage);
           if (!messages.filter(m => m.id === res[0].id)?.length) {
@@ -646,12 +647,12 @@ const Chat: React.FC = () => {
     }
   }, [before, after, refetchFetchedPastMessages]);
 
-  useEffect(() => {
-    if (messages.length) {
-      saveMessages(messages.slice(0, 20));
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [messages]);
+  // useEffect(() => {
+  //   if (messages.length) {
+  //     saveMessages(messages.slice(0, 20));
+  //   }
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [messages]);
 
   useEffect(() => {
     // 検索する文字がアルファベットの場合、なぜかuseAPISearchMessagesのonSuccessが動作しない為、こちらで代わりとなる処理を記述しています。
@@ -810,6 +811,7 @@ const Chat: React.FC = () => {
     socket.joinRoom();
     refetchFetchedPastMessages();
     return () => {
+      saveMessages(messages.slice(0, 20));
       socket.leaveRoom();
       setBefore(undefined);
       setAfter(undefined);
