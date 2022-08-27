@@ -36,6 +36,12 @@ type UserAndGroupID = User & {
   chat_group_id: number;
 };
 
+type ChatMessageAndIds = ChatMessage & {
+  chat_group_id: number;
+  sender_id: number;
+  reply_parent_id: number;
+};
+
 @Injectable()
 export class ChatService {
   constructor(
@@ -442,7 +448,7 @@ export class ChatService {
     }
 
     // const startTime = Date.now();
-    const existMessages = await this.chatMessageRepository
+    const existMessages: ChatMessageAndIds[] = await this.chatMessageRepository
       .createQueryBuilder('chat_messages')
       .select([
         'chat_messages.id as id',
@@ -528,7 +534,8 @@ export class ChatService {
 
     const messages: ChatMessage[] = await Promise.all(
       existMessages.map(async (m) => {
-        m.chatGroup = { id: m.chat_group_id };
+        const chatGroup = new ChatGroup();
+        m.chatGroup = { ...chatGroup, id: m.chat_group_id };
         if (senders.length) {
           m.sender = senders.filter((s) => s.id === m.sender_id)[0];
         }
@@ -553,9 +560,9 @@ export class ChatService {
             });
         }
         if (m.reply_parent_id) {
-          m.replyParentMessage = replyMessages.filter(
+          m.replyParentMessage = replyMessages.find(
             (replyMsg) => replyMsg.id === m.reply_parent_id,
-          )[0];
+          );
         }
         if (m.sender_id && m.sender_id === userID) {
           m.isSender = true;
