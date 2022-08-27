@@ -206,6 +206,8 @@ const ChatFooter: React.FC<ChatFooterProps> = ({
       ).map(renderMentionSuggestions)}
       <Div
         alignSelf="center"
+        borderTopWidth={1}
+        borderTopColor="gray300"
         flexDir="row"
         justifyContent="space-evenly"
         bg="white"

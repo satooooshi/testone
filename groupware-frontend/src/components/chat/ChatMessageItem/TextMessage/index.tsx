@@ -126,8 +126,10 @@ const TextMessage: React.FC<TextMessageProps> = ({
               maxW={'40vw'}
               minW={'10vw'}
               wordBreak={'break-word'}
-              color={message.isSender ? 'white' : darkFontColor}
-              bg={message.isSender ? 'blue.500' : '#ececec'}>
+              // color={'white'}
+              color={message.isSender ? 'white' : 'black'}
+              // bg={message.isSender ? 'blue.500' : '#ececec'}
+            >
               {highlightSearchedWord(message)}
             </Text>
             <Text fontSize={3} mt={2} color={darkFontColor} textAlign="right">

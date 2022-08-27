@@ -1208,7 +1208,7 @@ const Chat: React.FC = () => {
   return (
     <WholeContainer>
       {typeDropdown}
-      <Div h="100%">
+      <Div h="100%" bg="blue400">
         <ReactionsModal
           isVisible={!!selectedReactions}
           selectedReactions={selectedReactions}
