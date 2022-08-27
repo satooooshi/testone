@@ -62,7 +62,7 @@ const UserRow: React.FC<UserRowProps> = ({user}) => {
   return (
     <>
       {!deleted && (
-        <>
+        <Div my={2} bg="white">
           <Dropdown {...defaultDropdownProps} ref={dropdownRef}>
             <Dropdown.Option
               {...defaultDropdownOptionProps}
@@ -111,14 +111,7 @@ const UserRow: React.FC<UserRowProps> = ({user}) => {
               {userRoleNameFactory(UserRole.EXTERNAL_INSTRUCTOR)}
             </Dropdown.Option>
           </Dropdown>
-          <Div
-            py="xs"
-            w={'100%'}
-            borderBottomWidth={1}
-            borderBottomColor={'#b0b0b0'}
-            flexDir="row"
-            alignItems="center"
-            minH={40}>
+          <Div py="xs" w={'100%'} flexDir="row" alignItems="center" minH={40}>
             <TouchableOpacity
               style={userAdminStyles.avatar}
               onPress={() =>
@@ -165,7 +158,7 @@ const UserRow: React.FC<UserRowProps> = ({user}) => {
               <ActivityIndicator />
             )}
           </Div>
-        </>
+        </Div>
       )}
     </>
   );
