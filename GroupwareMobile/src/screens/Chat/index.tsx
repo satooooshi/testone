@@ -1002,7 +1002,7 @@ const Chat: React.FC = () => {
     <>
       {Platform.OS === 'ios' ? (
         <KeyboardAvoidingView
-          keyboardVerticalOffset={windowHeight * 0.08}
+          keyboardVerticalOffset={windowHeight * 0.055}
           style={chatStyles.keyboardAvoidingViewIOS}
           behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
           {loadingMessages && fetchingMessages ? <ActivityIndicator /> : null}
