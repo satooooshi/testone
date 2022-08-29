@@ -13,6 +13,9 @@ import { MailerModule } from '@nestjs-modules/mailer';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 import { TopNewsModule } from './modules/top-news/top-news.module';
 import { ScheduleModule } from '@nestjs/schedule';
+import { CardsService } from './modules/cards/cards.service';
+import { CardsController } from './modules/cards/cards.controller';
+import { CardsModule } from './modules/cards/cards.module';
 
 @Module({
   imports: [
@@ -72,8 +75,9 @@ import { ScheduleModule } from '@nestjs/schedule';
     ChatModule,
     NotificationModule,
     TopNewsModule,
+    CardsModule,
   ],
-  controllers: [],
-  providers: [],
+  controllers: [CardsController],
+  providers: [CardsService],
 })
 export class AppModule {}
