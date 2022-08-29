@@ -111,52 +111,54 @@ const UserRow: React.FC<UserRowProps> = ({user}) => {
               {userRoleNameFactory(UserRole.EXTERNAL_INSTRUCTOR)}
             </Dropdown.Option>
           </Dropdown> */}
-          <Div py="xs" w={'100%'} flexDir="row" alignItems="center" minH={40}>
-            <TouchableOpacity
-              style={userAdminStyles.avatar}
-              onPress={() =>
-                navigation.navigate('AccountStack', {
-                  screen: 'AccountDetail',
-                  params: {id: currentUser.id},
-                })
-              }>
-              <UserAvatar w={'100%'} h={'100%'} user={user} />
-            </TouchableOpacity>
-            <Text w={'29%'} mr={'1%'}>{`${userNameFactory(user)}\n${
-              currentUser.email
-            }`}</Text>
-            {/* <Div w={'28%'} mr={'1%'}>
-              <DropdownOpenerButton
-                onPress={() => {
-                  dropdownRef.current?.open();
-                }}
-                name={userRoleNameFactory(currentUser.role)}
-                fontSize={13}
-              />
-            </Div> */}
-            <Div mr={10}>
+          <Div flexDir="row" py="xs" w={'100%'} alignItems="center" minH={40}>
+            <Div flexDir="row" flex={1} alignItems="center">
               <TouchableOpacity
+                style={userAdminStyles.avatar}
                 onPress={() =>
-                  navigation.navigate('AdminStack', {
-                    screen: 'EditedProfile',
+                  navigation.navigate('AccountStack', {
+                    screen: 'AccountDetail',
                     params: {id: currentUser.id},
                   })
                 }>
-                <Icon
-                  name="pen"
-                  fontFamily={'FontAwesome5'}
-                  fontSize={26}
-                  color={blueColor}
-                />
+                <UserAvatar w={'100%'} h={'100%'} user={user} />
               </TouchableOpacity>
+              <Text>{`${userNameFactory(user)}\n${currentUser.email}`}</Text>
+              {/* <Div w={'28%'} mr={'1%'}>
+              <DropdownOpenerButton
+              onPress={() => {
+                dropdownRef.current?.open();
+              }}
+              name={userRoleNameFactory(currentUser.role)}
+              fontSize={13}
+              />
+            </Div> */}
             </Div>
-            {!loadingDelete ? (
-              <TouchableOpacity onPress={() => handleDeleteUser(user)}>
-                <Icon name="delete" fontSize={26} color="tomato" />
-              </TouchableOpacity>
-            ) : (
-              <ActivityIndicator />
-            )}
+            <Div flexDir="row">
+              <Div mr={10}>
+                <TouchableOpacity
+                  onPress={() =>
+                    navigation.navigate('AdminStack', {
+                      screen: 'EditedProfile',
+                      params: {id: currentUser.id},
+                    })
+                  }>
+                  <Icon
+                    name="pen"
+                    fontFamily={'FontAwesome5'}
+                    fontSize={26}
+                    color={blueColor}
+                  />
+                </TouchableOpacity>
+              </Div>
+              {!loadingDelete ? (
+                <TouchableOpacity onPress={() => handleDeleteUser(user)}>
+                  <Icon name="delete" fontSize={26} color="tomato" />
+                </TouchableOpacity>
+              ) : (
+                <ActivityIndicator />
+              )}
+            </Div>
           </Div>
         </Div>
       )}
