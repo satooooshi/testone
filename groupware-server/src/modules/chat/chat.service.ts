@@ -773,11 +773,10 @@ export class ChatService {
       modifiedAt: new Date(),
     });
 
-    existGroup.updatedAt = new Date();
-    await this.chatGroupRepository.save({
-      ...existGroup,
-      updatedAt: new Date(),
-    });
+    // await this.chatGroupRepository.save({
+    //   ...existGroup,
+    //   updatedAt: new Date(),
+    // });
 
     savedMessage.isSender = true;
     return savedMessage;
