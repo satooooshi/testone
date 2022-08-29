@@ -1,4 +1,10 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import createEventModalStyle from '@/styles/components/CreateEventModal.module.scss';
 import Modal from 'react-modal';
 import { MdCancel } from 'react-icons/md';
@@ -81,27 +87,6 @@ type CreateEventModalProps = {
   createEvent: (newEvent: CreateEventRequest) => void;
 };
 
-const setDateTime = (addDays: number, hours: number, minutes: number) => {
-  const today = new Date();
-  today.setDate(today.getDate() + addDays);
-  today.setHours(hours, minutes);
-  return today;
-};
-
-const initialEventValue = {
-  title: '',
-  description: '',
-  startAt: setDateTime(1, 19, 0),
-  endAt: setDateTime(1, 21, 0),
-  type: EventType.CLUB,
-  imageURL: '',
-  chatNeeded: false,
-  hostUsers: [],
-  tags: [],
-  files: [],
-  videos: [],
-};
-
 const CreateEventModal: React.FC<CreateEventModalProps> = ({
   enabled,
   onCancelPressed,
@@ -115,6 +100,27 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
   const { user } = useAuthenticate();
   const toast = useToast();
   const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
+  const setDateTime = (addDays: number, hours: number, minutes: number) => {
+    const today = new Date();
+    today.setDate(today.getDate() + addDays);
+    today.setHours(hours, minutes);
+    return today;
+  };
+  const initialEventValue = useMemo(() => {
+    return {
+      title: '',
+      description: '',
+      startAt: setDateTime(1, 19, 0),
+      endAt: setDateTime(1, 21, 0),
+      type: EventType.CLUB,
+      imageURL: '',
+      chatNeeded: false,
+      hostUsers: [],
+      tags: [],
+      files: [],
+      videos: [],
+    };
+  }, []);
 
   const {
     values: newEvent,
