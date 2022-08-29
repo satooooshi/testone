@@ -63,7 +63,6 @@ const EditChatGroupModal: React.FC<EditChatGroupModalProps> = ({
       saveGroup({ ...newGroupInfo, imageURL: fileURLs[0] } as ChatGroup);
       setSelectImageUrl('');
       setSelectImageName('');
-      setCompletedCrop(undefined);
     },
   });
   const [selectImageName, setSelectImageName] = useState<string>('');
@@ -75,7 +74,6 @@ const EditChatGroupModal: React.FC<EditChatGroupModalProps> = ({
     height: 200,
     aspect: 1,
   });
-  const [completedCrop, setCompletedCrop] = useState<Crop>();
   const imgRef = useRef<HTMLImageElement>();
   const onEventImageDrop = useCallback((f: File[]) => {
     setSelectImageUrl(URL.createObjectURL(f[0]));
@@ -110,8 +108,8 @@ const EditChatGroupModal: React.FC<EditChatGroupModalProps> = ({
     initialValues: { name: chatGroup.name },
     validationSchema: chatGroupSchema,
     onSubmit: async () => {
-      if (imgRef.current && completedCrop) {
-        const img = getCroppedImageURL(imgRef.current, completedCrop);
+      if (imgRef.current) {
+        const img = getCroppedImageURL(imgRef.current, crop);
         if (!img) {
           return;
         }
@@ -141,7 +139,6 @@ const EditChatGroupModal: React.FC<EditChatGroupModalProps> = ({
     setIsDeleted(true);
     setSelectImageUrl('');
     imgRef.current = undefined;
-    setCompletedCrop(undefined);
   };
 
   useEffect(() => {
@@ -184,7 +181,6 @@ const EditChatGroupModal: React.FC<EditChatGroupModalProps> = ({
                     src={selectImageUrl}
                     crop={crop}
                     onChange={(newCrop) => onChange(newCrop)}
-                    onComplete={(c) => setCompletedCrop(c)}
                     onImageLoaded={onLoad}
                     circularCrop={true}
                     keepSelection={true}
