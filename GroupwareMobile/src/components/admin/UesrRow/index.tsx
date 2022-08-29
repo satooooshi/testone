@@ -111,7 +111,7 @@ const UserRow: React.FC<UserRowProps> = ({user}) => {
               {userRoleNameFactory(UserRole.EXTERNAL_INSTRUCTOR)}
             </Dropdown.Option>
           </Dropdown> */}
-          <Div flexDir="row" p="sm" w={'100%'} alignItems="center" minH={40}>
+          <Div flexDir="row" p="md" w={'100%'} alignItems="center" minH={40}>
             <Div flexDir="row" flex={1} alignItems="center">
               <TouchableOpacity
                 style={userAdminStyles.avatar}
@@ -123,9 +123,11 @@ const UserRow: React.FC<UserRowProps> = ({user}) => {
                 }>
                 <UserAvatar w={'100%'} h={'100%'} user={user} />
               </TouchableOpacity>
-              <Div>
-                <Text>{userNameFactory(user)}</Text>
-                <Text>{currentUser.email}</Text>
+              <Div ml={10}>
+                <Text fontSize={16}>{userNameFactory(user)}</Text>
+                <Text fontSize={12} mt={4}>
+                  {currentUser.email}
+                </Text>
               </Div>
               {/* <Div w={'28%'} mr={'1%'}>
               <DropdownOpenerButton
