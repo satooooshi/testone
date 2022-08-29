@@ -33,6 +33,7 @@ import {
   ChatMessageReaction,
   ChatMessageType,
   FIleSource,
+  RoomType,
   SocketMessage,
   User,
 } from '../../types';
@@ -96,6 +97,7 @@ import {useChatSocket} from '../../utils/socket';
 import {useAPIUpdateChatMessage} from '../../hooks/api/chat/useAPIUpdateChatMessage';
 import {useAPIDeleteChatMessage} from '../../hooks/api/chat/useAPIDeleteChatMessage';
 import uuid from 'react-native-uuid';
+import {useAPIGetReactions} from '../../hooks/api/chat/useAPIGetReactions';
 
 const TopTab = createMaterialTopTabNavigator();
 
@@ -217,8 +219,8 @@ const Chat: React.FC = () => {
           const refreshedMessage = refreshMessage(res);
           // console.log('refreshMessage =============', refreshedMessage.length);
           setMessages(refreshedMessage);
-          if (refetchDoesntExistMessages(res[0].id)) {
-            refetchDoesntExistMessages(res[0].id + 20);
+          if (!messages.filter(m => m.id === res[0].id)?.length) {
+            refetchDoesntExistMessages(res[res.length - 1].id);
           } else {
             setAfter(undefined);
             setInclude(false);
@@ -305,6 +307,12 @@ const Chat: React.FC = () => {
     },
   });
 
+  const {mutate: getReactions} = useAPIGetReactions({
+    onSuccess: res => {
+      setSelectedReactions(res);
+    },
+  });
+
   const {mutate: sendChatMessage, isLoading: loadingSendMessage} =
     useAPISendChatMessage({
       onSuccess: sentMsg => {
@@ -360,7 +368,10 @@ const Chat: React.FC = () => {
     reaction: ChatMessageReaction,
     target: ChatMessage,
   ) => {
-    deleteReaction(reaction, {
+    const reactionSentMyself = target.reactions?.filter(
+      r => r.emoji === reaction.emoji && r.isSender,
+    )[0];
+    deleteReaction(reactionSentMyself || reaction, {
       onSuccess: reactionId => {
         setMessages(m => {
           return refreshMessage(
@@ -697,6 +708,13 @@ const Chat: React.FC = () => {
   //   return new Date(createdAt) > date;
   // };
 
+  const senderAvatars = useMemo(() => {
+    return roomDetail?.members?.map(m => ({
+      id: m.id,
+      avatar: <UserAvatar h={40} w={40} user={m} />,
+    }));
+  }, [roomDetail?.members]);
+
   const typeDropdown = (
     <Dropdown
       {...defaultDropdownProps}
@@ -843,11 +861,27 @@ const Chat: React.FC = () => {
     (targetMsg: ChatMessage) => {
       return socket.lastReadChatTime
         ? socket.lastReadChatTime
-            .filter(t => new Date(t.readTime) >= new Date(targetMsg.createdAt))
+            .filter(
+              t =>
+                new Date(t.readTime) >= new Date(targetMsg.createdAt) &&
+                t.user.id !== targetMsg?.sender?.id,
+            )
             .map(t => t.user)
         : [];
     },
     [socket.lastReadChatTime],
+  );
+  const unReadUsers = useCallback(
+    (targetMsg: ChatMessage) => {
+      const unreadUsers = roomDetail?.members?.filter(
+        existMembers =>
+          !readUsers(targetMsg)
+            .map(u => u.id)
+            .includes(existMembers.id),
+      );
+      return unreadUsers?.filter(u => u.id !== targetMsg?.sender?.id);
+    },
+    [readUsers, roomDetail?.members],
   );
 
   const renderMessage = (message: ChatMessage, messageIndex: number) => (
@@ -860,6 +894,9 @@ const Chat: React.FC = () => {
         scrollToRenderedMessage()
       }>
       <ChatMessageItem
+        senderAvatar={
+          senderAvatars?.find(s => s.id === message.sender?.id)?.avatar
+        }
         message={message}
         readUsers={readUsers(message)}
         inputtedSearchWord={inputtedSearchWord}
@@ -873,16 +910,19 @@ const Chat: React.FC = () => {
         onPressImage={() => showImageOnModal(message.content)}
         onPressVideo={() => {
           console.log(message.fileName);
-          playVideoOnModal({uri: message.content, fileName: message.fileName});
+          playVideoOnModal({
+            uri: message.content,
+            fileName: message.fileName,
+          });
         }}
-        onPressReaction={r =>
-          r.isSender
+        onPressReaction={(r, isSender) =>
+          isSender
             ? handleDeleteReaction(r, message)
             : handleSaveReaction(r.emoji, message)
         }
         onLongPressReation={() => {
           if (message.reactions?.length && message.isSender) {
-            setSelectedReactions(message.reactions);
+            getReactions(message.id);
           }
         }}
       />
@@ -943,6 +983,15 @@ const Chat: React.FC = () => {
     </Div>
   );
 
+  const renderItem = ({item, index}: {item: ChatMessage; index: number}) => {
+    return renderMessage(item, index);
+  };
+  const keyExtractor = useCallback(item => {
+    if (item.id) {
+      return item.id.toString();
+    }
+  }, []);
+
   const messageListAvoidngKeyboardDisturb = (
     <>
       {Platform.OS === 'ios' ? (
@@ -959,10 +1008,10 @@ const Chat: React.FC = () => {
             onScrollToIndexFailed={info => {
               setRenderMessageIndex(info.index);
             }}
-            onEndReached={() => onScrollTopOnChat()}
-            renderItem={({item: message, index}) =>
-              renderMessage(message, index)
-            }
+            windowSize={20}
+            onEndReached={onScrollTopOnChat}
+            renderItem={renderItem}
+            keyExtractor={keyExtractor}
           />
           {reactionTarget ? (
             reactionSelector
@@ -1030,15 +1079,10 @@ const Chat: React.FC = () => {
             onScrollToIndexFailed={info => {
               setRenderMessageIndex(info.index);
             }}
-            onEndReached={() => onScrollTopOnChat()}
-            keyExtractor={item => {
-              if (item.id) {
-                return item.id.toString();
-              }
-            }}
-            renderItem={({item: message, index}) =>
-              renderMessage(message, index)
-            }
+            windowSize={20}
+            onEndReached={onScrollTopOnChat}
+            keyExtractor={keyExtractor}
+            renderItem={renderItem}
           />
           {reactionTarget ? (
             reactionSelector
@@ -1114,7 +1158,7 @@ const Chat: React.FC = () => {
       socket.saveLastReadTimeAndReport();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [appState, messages]);
+  }, [appState, messages?.[0]]);
 
   const readUserBox = (user: User) => (
     <View style={tailwind('flex-row bg-white items-center px-4 py-2')}>
@@ -1235,12 +1279,7 @@ const Chat: React.FC = () => {
             children={() =>
               selectedMessageForCheckLastRead ? (
                 <FlatList
-                  data={roomDetail?.members?.filter(
-                    existMembers =>
-                      !readUsers(selectedMessageForCheckLastRead)
-                        .map(u => u.id)
-                        .includes(existMembers.id),
-                  )}
+                  data={unReadUsers(selectedMessageForCheckLastRead)}
                   keyExtractor={item => item.id.toString()}
                   renderItem={({item}) => readUserBox(item)}
                 />
@@ -1290,7 +1329,9 @@ const Chat: React.FC = () => {
             />
           </TouchableOpacity>
 
-          {roomDetail?.members && roomDetail.members.length < 3 ? (
+          {roomDetail?.members &&
+          roomDetail.members.length === 2 &&
+          roomDetail.roomType !== RoomType.GROUP ? (
             <Div mt={-4} mr={-4} style={tailwind('flex flex-row ')}>
               <Button
                 bg="transparent"

@@ -25,7 +25,7 @@ import {
   monthQueryFactoryFromTargetDate,
   weekQueryFactoryFromTargetDate,
 } from '../../../utils/eventQueryRefresh';
-import {useNavigation, useFocusEffect} from '@react-navigation/native';
+import {useNavigation, useIsFocused} from '@react-navigation/native';
 import {EventListNavigationProps} from '../../../types/navigator/drawerScreenProps';
 import {dateTimeFormatterFromJSDDate} from '../../../utils/dateTimeFormatterFromJSDate';
 import {ActivityIndicator} from 'react-native-paper';
@@ -56,11 +56,12 @@ const EventCalendar: React.FC<EventCalendarProps> = ({
     mode: 'month',
     targetDate: new Date(),
   });
-  const [searchQuery, setSearchQuery] = useState<SearchQueryToGetEvents>(
-    defaultWeekQuery(),
-  );
+  const [searchQuery, setSearchQuery] = useState<SearchQueryToGetEvents>({
+    personal: personal ? 'true' : '',
+  });
   const {partOfSearchQuery, setPartOfSearchQuery} =
     useEventCardListSearchQuery();
+  const isFocused = useIsFocused();
   const {mutate: saveEvent, isSuccess} = useAPICreateEvent({
     onSuccess: () => {
       Alert.alert('イベントを作成しました。');
@@ -76,27 +77,27 @@ const EventCalendar: React.FC<EventCalendarProps> = ({
     data: searchResult,
     refetch: refetchEvents,
     isLoading,
-  } = useAPIGetEventList(searchQuery);
+  } = useAPIGetEventList(searchQuery, {enabled: false});
   const {height: windowHeight, width: windowWidth} = useWindowDimensions();
 
-  useFocusEffect(
-    useCallback(() => {
+  useEffect(() => {
+    if (isFocused) {
       refetchEvents();
-    }, [refetchEvents]),
-  );
+    }
+  }, [refetchEvents, isFocused, searchQuery]);
 
   const memorizedEvent = useMemo<any[]>(() => {
     const changeToBigCalendarEvent = (ev?: EventSchedule[]): any[] => {
       if (ev) {
-        if (personal) {
-          ev = ev.filter(e => {
-            if (
-              e.userJoiningEvent?.filter(u => u?.user?.id === user?.id).length
-            ) {
-              return true;
-            }
-          });
-        }
+        // if (personal) {
+        //   ev = ev.filter(e => {
+        //     if (
+        //       e.userJoiningEvent?.filter(u => u?.user?.id === user?.id).length
+        //     ) {
+        //       return true;
+        //     }
+        //   });
+        // }
         const modifiedEvents: any[] = ev.map(e => ({
           ...e,
           start: new Date(e.startAt),
@@ -113,7 +114,7 @@ const EventCalendar: React.FC<EventCalendarProps> = ({
       return [];
     };
     return changeToBigCalendarEvent(searchResult?.events);
-  }, [personal, searchResult?.events, user?.id]);
+  }, [searchResult?.events]);
 
   const dateRange = React.useMemo(() => {
     if (calendarMode.mode === 'day') {

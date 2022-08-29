@@ -108,7 +108,9 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
   createEvent,
 }) => {
   const { data: tags } = useAPIGetTag();
-  const { data: users } = useAPIGetUsers('ALL');
+  const { data: users, refetch: refetchGetUsers } = useAPIGetUsers('ALL', {
+    enabled: false,
+  });
   const { user } = useAuthenticate();
   const toast = useToast();
   const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
@@ -164,6 +166,7 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
   useEffect(() => {
     if (enabled) {
       setWillSubmit(false);
+      refetchGetUsers();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [enabled]);

@@ -26,7 +26,9 @@ const RoomList: React.FC = () => {
   const navigation = useNavigation<RoomListNavigationProps>();
   const [roomTypeSelector, setRoomTypeSelector] = useState(false);
   const [userModal, setVisibleUserModal] = useState(false);
-  const {data: users} = useAPIGetUsers('');
+  const {data: users, refetch: refetchGetUsers} = useAPIGetUsers('', {
+    enabled: false,
+  });
   const {
     chatGroups,
     setChatGroupsState,
@@ -69,10 +71,8 @@ const RoomList: React.FC = () => {
         const pinnedRoomsCount = rooms.filter(
           r => r.isPinned || r.updatedAt > data.updatedAt,
         ).length;
-        if (pinnedRoomsCount) {
-          rooms.splice(pinnedRoomsCount, 0, data);
-          setChatGroupsState(rooms);
-        }
+        rooms.splice(pinnedRoomsCount, 0, data);
+        setChatGroupsState(rooms);
       }
       // refetchAllRooms();
     },
@@ -95,6 +95,13 @@ const RoomList: React.FC = () => {
       setChatRooms(chatGroups);
     }
   }, [chatGroups, isCompletedRefetchAllRooms]);
+
+  useEffect(() => {
+    if (roomTypeSelector) {
+      refetchGetUsers();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [roomTypeSelector]);
 
   const onPressRightButton = () => {
     // navigation.navigate('ChatStack', {screen: 'NewRoom'});
@@ -215,7 +222,10 @@ const RoomList: React.FC = () => {
           <ScrollDiv
             h={'80%'}
             refreshControl={
-              <RefreshControl refreshing={false} onRefresh={refreshRoomList} />
+              <RefreshControl
+                refreshing={isRoomsRefetching}
+                onRefresh={refreshRoomList}
+              />
             }>
             {(searchedRooms ?? chatRooms).map(room => {
               return (
@@ -236,10 +246,6 @@ const RoomList: React.FC = () => {
               );
             })}
           </ScrollDiv>
-        ) : isRoomsRefetching ? (
-          <Div alignItems="center" w={'90%'}>
-            <ActivityIndicator />
-          </Div>
         ) : (
           <Text fontSize={16} textAlign="center">
             ルームを作成するか、招待をお待ちください

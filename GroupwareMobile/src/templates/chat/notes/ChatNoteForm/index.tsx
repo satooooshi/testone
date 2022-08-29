@@ -194,7 +194,7 @@ const ChatNoteForm: React.FC<ChatNoteFormProps> = ({
           value={values.content}
           onChangeText={t => setValues(v => ({...v, content: t}))}
           textAlignVertical="top"
-          style={tailwind(' h-full p-2')}
+          style={tailwind(' text-black h-full p-2 ')}
           autoCapitalize={'none'}
         />
       </KeyboardAwareScrollView>

@@ -9,6 +9,7 @@ import {
   Box,
   Button,
   Link,
+  Spinner,
   Text,
   useMediaQuery,
 } from '@chakra-ui/react';
@@ -23,6 +24,7 @@ import { useAPIToggleGoodForBoard } from '@/hooks/api/wiki/useAPIToggleGoodForBo
 import { useAuthenticate } from 'src/contexts/useAuthenticate';
 import { userNameFactory } from 'src/utils/factory/userNameFactory';
 import { HiOutlineChevronRight } from 'react-icons/hi';
+import { useAPIGetGoodsForBoard } from '@/hooks/api/wiki/useAPIGetGoodsForBoard';
 
 type WikiCardProps = {
   wiki: Wiki;
@@ -35,28 +37,7 @@ const WikiCard: React.FC<WikiCardProps> = ({ wiki, type }) => {
   const { user } = useAuthenticate();
   const [wikiState, setWikiState] = useState(wiki);
 
-  const [isPressHeart, setIsPressHeart] = useState<boolean>(
-    wikiState.isGoodSender || false,
-  );
-
-  const { mutate } = useAPIToggleGoodForBoard({
-    onSuccess: () => {
-      setIsPressHeart((prevHeartStatus) => {
-        setWikiState((w) => {
-          if (prevHeartStatus) {
-            w.userGoodForBoard = w.userGoodForBoard?.filter(
-              (u) => u.id !== user?.id,
-            );
-          } else {
-            w.userGoodForBoard = [user as User, ...(w.userGoodForBoard || [])];
-          }
-          return w;
-        });
-
-        return !prevHeartStatus;
-      });
-    },
-  });
+  const [isPressHeart, setIsPressHeart] = useState<boolean>(false);
 
   const tagButtonColor = useMemo(() => {
     switch (wiki.type) {
@@ -69,8 +50,27 @@ const WikiCard: React.FC<WikiCardProps> = ({ wiki, type }) => {
     }
   }, [wiki.type]);
 
+  const { mutate: getGoodsForBoard, data: goodsForBoard } =
+    useAPIGetGoodsForBoard();
+  const { mutate } = useAPIToggleGoodForBoard({
+    onSuccess: () => {
+      setIsPressHeart((prevHeartStatus) => {
+        setWikiState((w) => {
+          return {
+            ...w,
+            goodsCount: prevHeartStatus
+              ? (w.goodsCount || 0) - 1
+              : (w.goodsCount || 0) + 1,
+          };
+        });
+        return !prevHeartStatus;
+      });
+    },
+  });
+
   useEffect(() => {
     setWikiState(wiki);
+    setIsPressHeart(wiki.isGoodSender || false);
   }, [wiki]);
 
   return (
@@ -202,6 +202,7 @@ const WikiCard: React.FC<WikiCardProps> = ({ wiki, type }) => {
                 justifyContent="center">
                 <Link
                   onClick={() => {
+                    getGoodsForBoard(wikiState.id);
                     setGoodSendersModal(true);
                   }}>
                   <Text>いいね</Text>
@@ -237,7 +238,7 @@ const WikiCard: React.FC<WikiCardProps> = ({ wiki, type }) => {
         <GoodSendersModal
           isOpen={goodSendersModal}
           onClose={() => setGoodSendersModal(false)}
-          goodSenders={wiki.userGoodForBoard || []}
+          goodsForBoard={goodsForBoard || []}
         />
         <Box
           display="flex"

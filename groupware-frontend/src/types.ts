@@ -124,7 +124,7 @@ export interface User {
   qaAnswerReplies?: QAAnswerReply[];
   //this params is sent when login
   token?: string;
-  userGoodForBoard?: Wiki[];
+  userGoodForBoard?: UserGoodForBoard[];
   eventCount?: number;
   questionCount?: number;
   answerCount?: number;
@@ -150,6 +150,12 @@ export interface UserTag {
   users?: User[];
 }
 
+export type UserGoodForBoard = {
+  id: number;
+  user: User;
+  wiki: Wiki;
+};
+
 export interface Wiki {
   id: number;
   title: string;
@@ -165,8 +171,10 @@ export interface Wiki {
   bestAnswer?: QAAnswer;
   createdAt: Date;
   updatedAt: Date;
-  userGoodForBoard?: User[];
+  userGoodForBoard?: UserGoodForBoard[];
   isGoodSender?: boolean;
+  goodsCount?: number;
+  answersCount?: number;
 }
 
 export interface QAAnswerReply {
@@ -330,6 +338,11 @@ export interface ChatGroup {
   updatedAt: Date;
 }
 
+export interface SaveRoomsResult {
+  room: ChatGroup;
+  systemMessage: ChatMessage[];
+}
+
 export interface LastReadChatTime {
   id: number;
   readTime: Date;
@@ -346,6 +359,11 @@ export interface ChatNote {
   createdAt: Date;
   updatedAt: Date;
   isEditor?: boolean;
+}
+
+export interface SaveNoteResult {
+  note: ChatNote;
+  systemMessage: ChatMessage;
 }
 
 export interface ChatNoteImage {
@@ -368,6 +386,10 @@ export interface ChatAlbum {
   isEditor?: boolean;
 }
 
+export interface SaveAlbumResult {
+  album: ChatAlbum;
+  systemMessage: ChatMessage;
+}
 export interface ChatAlbumImage {
   id: number;
   fileName: string;

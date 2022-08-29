@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import {useWindowDimensions, FlatList, TouchableHighlight} from 'react-native';
-import {BoardCategory, User, Wiki, WikiType} from '../../../types';
+import {BoardCategory, Wiki, WikiType} from '../../../types';
 import {Div, Text, Tag, Icon, Button} from 'react-native-magnus';
 import {tagColorFactory} from '../../../utils/factory/tagColorFactory';
 import {wikiCardStyles} from '../../../styles/component/wiki/wikiCard.style';
@@ -16,6 +16,7 @@ import {useAPIToggleGoodForBoard} from '../../../hooks/api/wiki/useAPIToggleGood
 import {useAuthenticate} from '../../../contexts/useAuthenticate';
 import {darkFontColor} from '../../../utils/colors';
 import GoodSendersModal from '../../chat/GoodSendersModal';
+import {useAPIGetGoodsForBoard} from '../../../hooks/api/wiki/useAPIGetGoodForBoard';
 
 type WikiCardProps = {
   wiki: Wiki;
@@ -29,26 +30,23 @@ const WikiCard: React.FC<WikiCardProps> = ({wiki, type}) => {
   const [isVisible, setIsVisible] = useState<boolean>(false);
   const isBoard = wiki.type === WikiType.BOARD;
   const isQA = wiki.boardCategory === BoardCategory.QA;
-  const [isPressHeart, setIsPressHeart] = useState<boolean>(
-    wiki.isGoodSender || false,
-  );
+  const [isPressHeart, setIsPressHeart] = useState<boolean>(false);
   const {user} = useAuthenticate();
   const [wikiState, setWikiState] = useState(wiki);
+  const {mutate: getGoodsForBoard, data: goodsForBoard} =
+    useAPIGetGoodsForBoard();
 
   const {mutate} = useAPIToggleGoodForBoard({
     onSuccess: () => {
       setIsPressHeart(prevHeartStatus => {
         setWikiState(w => {
           if (prevHeartStatus) {
-            w.userGoodForBoard = w.userGoodForBoard?.filter(
-              u => u.id !== user?.id,
-            );
+            w.goodsCount = (w.goodsCount || 0) - 1;
           } else {
-            w.userGoodForBoard = [user as User, ...(w.userGoodForBoard || [])];
+            w.goodsCount = (w.goodsCount || 0) + 1;
           }
           return w;
         });
-
         return !prevHeartStatus;
       });
     },
@@ -56,6 +54,7 @@ const WikiCard: React.FC<WikiCardProps> = ({wiki, type}) => {
 
   useEffect(() => {
     setWikiState(wiki);
+    setIsPressHeart(wiki.isGoodSender || false);
   }, [wiki]);
 
   return (
@@ -168,7 +167,7 @@ const WikiCard: React.FC<WikiCardProps> = ({wiki, type}) => {
                 <Text>いいね</Text>
               </TouchableHighlight>
               <Text mx={1} color="#90CDF4" fontWeight="bold">
-                {wikiState.userGoodForBoard?.length}
+                {wikiState.goodsCount || 0}
               </Text>
               <Div ml={5} mr="lg" flexDir="row">
                 <Text textAlignVertical="bottom" mr={2}>
@@ -204,11 +203,13 @@ const WikiCard: React.FC<WikiCardProps> = ({wiki, type}) => {
         ) : null}
 
         <Div flexDir="row">
-          <GoodSendersModal
-            goodSenders={wikiState.userGoodForBoard || []}
-            isVisible={isVisible}
-            onClose={() => setIsVisible(false)}
-          />
+          {goodsForBoard && (
+            <GoodSendersModal
+              isVisible={isVisible}
+              onClose={() => setIsVisible(false)}
+              goodsForBoard={goodsForBoard}
+            />
+          )}
         </Div>
       </Div>
     </TouchableHighlight>

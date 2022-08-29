@@ -29,10 +29,13 @@ export const sendPushNotifToSpecificUsers = async (
   if (userIds.length) {
     const devices = await deviceRepository
       .createQueryBuilder('devices')
-      .leftJoin('devices.user', 'user')
-      .where('user.id IN (:...userIds)', { userIds })
+      .where('devices.user_id IN (:...userIds)', { userIds })
       .getMany();
-    await sendPushNotifToSpecificDevices(devices, data);
+    // console.log('-----length', devices.length);
+
+    if (devices.length) {
+      await sendPushNotifToSpecificDevices(devices, data);
+    }
   }
 };
 

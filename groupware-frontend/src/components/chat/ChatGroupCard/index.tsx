@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useMemo } from 'react';
 import { ChatGroup, ChatMessage, ChatMessageType, User } from 'src/types';
 import { dateTimeFormatterFromJSDDate } from 'src/utils/dateTimeFormatter';
 import {
@@ -12,6 +12,7 @@ import {
 import { darkFontColor } from 'src/utils/colors';
 import { RiPushpin2Fill, RiPushpin2Line } from 'react-icons/ri';
 import { nameOfEmptyNameGroup } from 'src/utils/chat/nameOfEmptyNameGroup';
+import { useAuthenticate } from 'src/contexts/useAuthenticate';
 
 type ChatGroupCardProps = {
   chatGroup: ChatGroup;
@@ -25,6 +26,24 @@ const ChatGroupCard: React.FC<ChatGroupCardProps> = ({
   onPressPinButton,
 }) => {
   const [isSmallerThan768] = useMediaQuery('max-width: 768px');
+  const { user } = useAuthenticate();
+
+  const latestCall = (message: ChatMessage) => {
+    switch (message.content) {
+      case '音声通話':
+        return `通話時間 ${message.callTime}`;
+      case 'キャンセル':
+        return message.sender?.id === user?.id
+          ? '通話をキャンセルしました'
+          : '不在着信';
+      case '応答なし':
+        return message.sender?.id === user?.id
+          ? '通話に応答がありませんでした'
+          : '不在着信';
+      default:
+        return 'error';
+    }
+  };
 
   const latestMessage = (chatMessage: ChatMessage) => {
     switch (chatMessage.type) {
@@ -37,11 +56,13 @@ const ChatGroupCard: React.FC<ChatGroupCardProps> = ({
       case ChatMessageType.OTHER_FILE:
         return 'ファイルが送信されました';
       case ChatMessageType.CALL:
-        return `通話時間 ${chatMessage.callTime}`;
+        return latestCall(chatMessage);
       default:
         return chatMessage.content;
     }
   };
+
+  const avatarImage = useMemo(() => chatGroup.imageURL, [chatGroup.imageURL]);
 
   return (
     <Box
@@ -80,7 +101,7 @@ const ChatGroupCard: React.FC<ChatGroupCardProps> = ({
             <RiPushpin2Line size={22} color="blue" />
           )}
         </Link>
-        <Avatar src={chatGroup.imageURL} size="md" mr="8px" zIndex={1} />
+        <Avatar src={avatarImage} size="md" mr="8px" />
       </Box>
       <Box
         display="flex"
