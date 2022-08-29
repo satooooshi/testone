@@ -83,7 +83,7 @@ const RoomCard: React.FC<RoomCardProps> = ({
       case ChatMessageType.CALL:
         return latestCall(chatMessage);
       default:
-        return mentionTransform(chatMessage.content);
+        return mentionTransform(chatMessage.content).trim();
     }
   };
 
