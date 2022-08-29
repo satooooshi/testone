@@ -1,7 +1,7 @@
 import {useNavigation} from '@react-navigation/native';
 import React, {useRef, useState} from 'react';
-import {TouchableOpacity, Alert} from 'react-native';
-import {Div, Dropdown, Icon, Text} from 'react-native-magnus';
+import {TouchableOpacity, Alert, FlatList} from 'react-native';
+import {Div, Dropdown, Icon, Tag, Text} from 'react-native-magnus';
 import {ActivityIndicator} from 'react-native-paper';
 import {useAPIDeleteUser} from '../../../hooks/api/user/useAPIDeleteUser';
 import {useAPIUpdateUser} from '../../../hooks/api/user/useAPIUpdateUser';
@@ -12,6 +12,7 @@ import {
   defaultDropdownProps,
   defaultDropdownOptionProps,
 } from '../../../utils/dropdown/helper';
+import {tagColorFactory} from '../../../utils/factory/tagColorFactory';
 import {userNameFactory} from '../../../utils/factory/userNameFactory';
 import {userRoleNameFactory} from '../../../utils/factory/userRoleNameFactory';
 import DropdownOpenerButton from '../../common/DropdownOpenerButton';
@@ -123,8 +124,28 @@ const UserRow: React.FC<UserRowProps> = ({user}) => {
                 }>
                 <UserAvatar w={'100%'} h={'100%'} user={user} />
               </TouchableOpacity>
-              <Div ml={10}>
-                <Text fontSize={16}>{userNameFactory(user)}</Text>
+              <Div ml={10} flex={1}>
+                <Div flexDir="row" alignItems="center">
+                  <Text mr={4} fontSize={16}>
+                    {userNameFactory(user)}
+                  </Text>
+                  {user.tags ? (
+                    <FlatList
+                      horizontal
+                      data={user.tags || []}
+                      renderItem={({item: t}) => (
+                        <Tag
+                          fontSize={'xs'}
+                          ml={4}
+                          bg={tagColorFactory(t.type)}>
+                          <Text fontSize={10} color="white">
+                            {t.name}
+                          </Text>
+                        </Tag>
+                      )}
+                    />
+                  ) : null}
+                </Div>
                 <Text fontSize={12} mt={4}>
                   {currentUser.email}
                 </Text>
@@ -139,8 +160,8 @@ const UserRow: React.FC<UserRowProps> = ({user}) => {
               />
             </Div> */}
             </Div>
-            <Div flexDir="row">
-              <Div mr={10}>
+            <Div flexDir="row" alignItems="center">
+              <Div m={10}>
                 <TouchableOpacity
                   onPress={() =>
                     navigation.navigate('AdminStack', {
@@ -151,14 +172,14 @@ const UserRow: React.FC<UserRowProps> = ({user}) => {
                   <Icon
                     name="pen"
                     fontFamily={'FontAwesome5'}
-                    fontSize={26}
+                    fontSize={22}
                     color={blueColor}
                   />
                 </TouchableOpacity>
               </Div>
               {!loadingDelete ? (
                 <TouchableOpacity onPress={() => handleDeleteUser(user)}>
-                  <Icon name="delete" fontSize={26} color="tomato" />
+                  <Icon name="delete" fontSize={22} color="tomato" />
                 </TouchableOpacity>
               ) : (
                 <ActivityIndicator />
