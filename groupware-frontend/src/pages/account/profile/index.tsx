@@ -130,7 +130,6 @@ const Profile = () => {
   const [
     {
       crop,
-      completedCrop,
       croppedImageURL,
       imageName: selectImageName,
       imageURL: selectImageUrl,
@@ -153,7 +152,11 @@ const Profile = () => {
       newCrop.y !== crop.y ||
       newCrop.x !== crop.x
     )
-      dispatchCrop({ type: 'setCrop', value: newCrop });
+      dispatchCrop({
+        type: 'setCropAndImage',
+        value: newCrop,
+        ref: imgRef.current,
+      });
   };
 
   const {
@@ -204,7 +207,10 @@ const Profile = () => {
           duration: 3000,
           isClosable: true,
         });
-        dispatchCrop({ type: 'setImageFile', value: undefined });
+        dispatchCrop({
+          type: 'resetImage',
+          value: 'resetImage',
+        });
         router.push(`/account/${responseData.id.toString()}`);
       }
     },
@@ -213,7 +219,7 @@ const Profile = () => {
   const tabs: Tab[] = useHeaderTab({ headerTabType: 'account', user });
 
   const handleUpdateUser = async () => {
-    if (!croppedImageURL || !completedCrop || !selectImageName) {
+    if (!croppedImageURL || !selectImageName) {
       updateUser(userInfo);
       return;
     }
@@ -226,7 +232,7 @@ const Profile = () => {
     imgRef.current = img;
     const diameter = img.height < img.width ? img.height : img.width;
     dispatchCrop({
-      type: 'setCrop',
+      type: 'setCropAndImage',
       value: {
         unit: 'px',
         x: (img.width - diameter) / 2,
@@ -235,6 +241,7 @@ const Profile = () => {
         width: diameter,
         aspect: 1,
       },
+      ref: img,
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -306,13 +313,6 @@ const Profile = () => {
                 crop={crop}
                 onChange={(newCrop) => {
                   onChange(newCrop);
-                }}
-                onComplete={(c) => {
-                  dispatchCrop({
-                    type: 'setCompletedCrop',
-                    value: c,
-                    ref: imgRef.current,
-                  });
                 }}
                 onImageLoaded={onLoad}
                 circularCrop={true}

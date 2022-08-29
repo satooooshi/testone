@@ -105,7 +105,7 @@ const CreateNewUser = () => {
   } = useFormik({
     initialValues: initialUserValues,
     onSubmit: async (submitted) => {
-      if (croppedImageURL && imageName && completedCrop) {
+      if (croppedImageURL && imageName) {
         const result = await dataURLToFile(croppedImageURL, imageName);
         uploadImage([result]);
         return;
@@ -119,17 +119,17 @@ const CreateNewUser = () => {
   const onLoad = useCallback((img) => {
     imgRef.current = img;
     const diameter: number = img.height < img.width ? img.height : img.width;
-    console.log((img.width - diameter) / 2);
     dispatchCrop({
-      type: 'setCrop',
+      type: 'setCropAndImage',
       value: {
         unit: 'px',
         x: (img.width - diameter) / 2,
         y: (img.height - diameter) / 2,
-        height: diameter,
         width: diameter,
+        height: diameter,
         aspect: 1,
       },
+      ref: img,
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -178,10 +178,8 @@ const CreateNewUser = () => {
     },
   );
 
-  const [
-    { crop, completedCrop, croppedImageURL, imageName, imageURL },
-    dispatchCrop,
-  ] = useImageCrop();
+  const [{ crop, croppedImageURL, imageName, imageURL }, dispatchCrop] =
+    useImageCrop();
 
   // const [userInfo, setUserInfo] = useState<Partial<User>>(initialUserValues);
   const { mutate: uploadImage, isLoading: loadingUplaod } = useAPIUploadStorage(
@@ -235,6 +233,7 @@ const CreateNewUser = () => {
           isClosable: true,
         });
         resetForm();
+        dispatchCrop({ type: 'resetImage', value: 'resetImage' });
         setUserInfo(initialUserValues);
       }
     },
@@ -306,15 +305,12 @@ const CreateNewUser = () => {
                     newCrop.y !== crop.y ||
                     newCrop.x !== crop.x
                   )
-                    dispatchCrop({ type: 'setCrop', value: newCrop });
+                    dispatchCrop({
+                      type: 'setCropAndImage',
+                      value: newCrop,
+                      ref: imgRef.current,
+                    });
                 }}
-                onComplete={(newCrop) =>
-                  dispatchCrop({
-                    type: 'setCompletedCrop',
-                    value: newCrop,
-                    ref: imgRef.current,
-                  })
-                }
                 onImageLoaded={onLoad}
                 circularCrop={true}
                 imageStyle={{
