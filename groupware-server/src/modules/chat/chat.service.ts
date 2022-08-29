@@ -31,7 +31,7 @@ import {
   SaveRoomsResult,
 } from './chat.controller';
 import { genStorageURL } from 'src/utils/storage/genStorageURL';
-import { checkAloneRoom } from 'src/utils/CheckAloneRoom';
+import { checkAloneRoom } from 'src/utils/checkAloneRoom';
 type UserAndGroupID = User & {
   chat_group_id: number;
 };
