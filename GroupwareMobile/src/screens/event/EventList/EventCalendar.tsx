@@ -427,7 +427,7 @@ const EventCalendar: React.FC<EventCalendarProps> = ({
                   borderColor: '#e0e0e0',
                   borderWidth: 1,
                   padding: 0,
-                  height: 18,
+                  height: calendarMode.mode === 'month' ? 18 : undefined,
                 })
           }
         />
