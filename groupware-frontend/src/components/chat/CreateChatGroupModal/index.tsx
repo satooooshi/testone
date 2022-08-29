@@ -66,7 +66,6 @@ const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
     height: 200,
     aspect: 1,
   });
-  const [completedCrop, setCompletedCrop] = useState<Crop>();
   const imgRef = useRef<HTMLImageElement>();
   const onEventImageDrop = useCallback((f: File[]) => {
     setSelectImageUrl(URL.createObjectURL(f[0]));
@@ -131,7 +130,6 @@ const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
   const resetImageUrl = () => {
     setSelectImageUrl('');
     imgRef.current = undefined;
-    setCompletedCrop(undefined);
   };
 
   const {
@@ -146,8 +144,8 @@ const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
     enableReinitialize: true,
     validationSchema: chatGroupSchema,
     onSubmit: async () => {
-      if (imgRef.current && completedCrop) {
-        const img = getCroppedImageURL(imgRef.current, completedCrop);
+      if (imgRef.current) {
+        const img = getCroppedImageURL(imgRef.current, crop);
         if (!img) {
           return;
         }
@@ -237,7 +235,6 @@ const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
                     src={selectImageUrl}
                     crop={crop}
                     onChange={(newCrop) => onChange(newCrop)}
-                    onComplete={(c) => setCompletedCrop(c)}
                     onImageLoaded={onLoad}
                     circularCrop={true}
                   />
