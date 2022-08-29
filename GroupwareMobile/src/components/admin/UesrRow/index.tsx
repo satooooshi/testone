@@ -63,7 +63,7 @@ const UserRow: React.FC<UserRowProps> = ({user}) => {
     <>
       {!deleted && (
         <Div my={2} bg="white">
-          <Dropdown {...defaultDropdownProps} ref={dropdownRef}>
+          {/* <Dropdown {...defaultDropdownProps} ref={dropdownRef}>
             <Dropdown.Option
               {...defaultDropdownOptionProps}
               value={UserRole.ADMIN}
@@ -110,7 +110,7 @@ const UserRow: React.FC<UserRowProps> = ({user}) => {
               }}>
               {userRoleNameFactory(UserRole.EXTERNAL_INSTRUCTOR)}
             </Dropdown.Option>
-          </Dropdown>
+          </Dropdown> */}
           <Div py="xs" w={'100%'} flexDir="row" alignItems="center" minH={40}>
             <TouchableOpacity
               style={userAdminStyles.avatar}
@@ -125,7 +125,7 @@ const UserRow: React.FC<UserRowProps> = ({user}) => {
             <Text w={'29%'} mr={'1%'}>{`${userNameFactory(user)}\n${
               currentUser.email
             }`}</Text>
-            <Div w={'28%'} mr={'1%'}>
+            {/* <Div w={'28%'} mr={'1%'}>
               <DropdownOpenerButton
                 onPress={() => {
                   dropdownRef.current?.open();
@@ -133,7 +133,7 @@ const UserRow: React.FC<UserRowProps> = ({user}) => {
                 name={userRoleNameFactory(currentUser.role)}
                 fontSize={13}
               />
-            </Div>
+            </Div> */}
             <Div mr={10}>
               <TouchableOpacity
                 onPress={() =>
