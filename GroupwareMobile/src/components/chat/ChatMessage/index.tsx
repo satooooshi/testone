@@ -108,7 +108,7 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
       {message.type === ChatMessageType.SYSTEM_TEXT && (
         <Box
           alignSelf="center"
-          bg="gray300"
+          bg="white"
           w={windowWidth * 0.8}
           rounded={'md'}
           py={4}

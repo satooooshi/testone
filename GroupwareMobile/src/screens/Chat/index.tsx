@@ -195,7 +195,7 @@ const Chat: React.FC = () => {
             content: messageContentRef.current,
           });
         }
-        Keyboard.dismiss();
+        // Keyboard.dismiss();
       }
     },
   });
@@ -217,6 +217,9 @@ const Chat: React.FC = () => {
         console.log('refetchFetchedPastMessages called', res?.length);
         if (res?.length) {
           const refreshedMessage = refreshMessage(res);
+          // if (refreshedMessage.length) {
+          //   saveMessages(refreshedMessage.slice(0, 20));
+          // }
           // console.log('refreshMessage =============', refreshedMessage.length);
           setMessages(refreshedMessage);
           if (!messages.filter(m => m.id === res[0].id)?.length) {
@@ -322,8 +325,7 @@ const Chat: React.FC = () => {
           refetchRoomCard({id: sentMsg.chatGroup.id, type: ''});
         }
         if (sentMsg.type === ChatMessageType.TEXT) {
-          messageContentRef.current = '';
-          setValues(v => ({...v, content: ''}));
+          // setValues(v => ({...v, content: ''}));
           resetForm();
         }
       },
@@ -341,7 +343,6 @@ const Chat: React.FC = () => {
         chatMessage: {...sentMsg, isSender: false},
       });
       resetForm();
-      messageContentRef.current = '';
       setLongPressedMgg(undefined);
       setEditMessage(false);
     },
@@ -698,15 +699,15 @@ const Chat: React.FC = () => {
     }
   };
 
-  // const isBeforeTwelveHours = (createdAt: Date | undefined) => {
-  //   if (!createdAt) {
-  //     return false;
-  //   }
-  //   const date = new Date();
-  //   date.setHours(date.getHours() - 12);
+  const isBeforeTwelveHours = (createdAt: Date | undefined) => {
+    if (!createdAt) {
+      return false;
+    }
+    const date = new Date();
+    date.setHours(date.getHours() - 12);
 
-  //   return new Date(createdAt) > date;
-  // };
+    return new Date(createdAt) > date;
+  };
 
   const senderAvatars = useMemo(() => {
     return roomDetail?.members?.map(m => ({
@@ -758,7 +759,7 @@ const Chat: React.FC = () => {
       ) : (
         <></>
       )}
-      {/* {longPressedMsg?.sender?.id === myself?.id &&
+      {longPressedMsg?.sender?.id === myself?.id &&
       longPressedMsg?.type === ChatMessageType.TEXT &&
       isBeforeTwelveHours(longPressedMsg.createdAt) ? (
         <Dropdown.Option
@@ -767,6 +768,8 @@ const Chat: React.FC = () => {
           onPress={() => {
             setEditMessage(true);
             if (longPressedMsg) {
+              console.log('edit message', longPressedMsg);
+
               setValues(longPressedMsg);
               messageContentRef.current = longPressedMsg.content;
             }
@@ -787,7 +790,7 @@ const Chat: React.FC = () => {
         </Dropdown.Option>
       ) : (
         <></>
-      )} */}
+      )}
     </Dropdown>
   );
 
@@ -810,6 +813,7 @@ const Chat: React.FC = () => {
     socket.joinRoom();
     refetchFetchedPastMessages();
     return () => {
+      // saveMessages();
       socket.leaveRoom();
       setBefore(undefined);
       setAfter(undefined);
@@ -840,7 +844,9 @@ const Chat: React.FC = () => {
       let messagesInStorageLength;
       if (jsonMessagesInStorage) {
         const messagesInStorage = JSON.parse(jsonMessagesInStorage);
-        setMessages(messagesInStorage);
+        if (messagesInStorage?.length) {
+          setMessages(messagesInStorage);
+        }
         messagesInStorageLength = messagesInStorage?.length;
         getExpiredUrlMessages();
       }
@@ -1202,236 +1208,242 @@ const Chat: React.FC = () => {
   return (
     <WholeContainer>
       {typeDropdown}
-      <ReactionsModal
-        isVisible={!!selectedReactions}
-        selectedReactions={selectedReactions}
-        selectedEmoji={selectedEmoji}
-        onPressCloseButton={() => {
-          setSelectedReactions(undefined);
-        }}
-        onPressEmoji={emoji => setSelectedEmoji(emoji)}
-      />
-      {video?.fileName && video.uri ? (
-        <MagnusModal isVisible={!!video} bg="black">
-          <TouchableOpacity
-            style={chatStyles.cancelIcon}
-            onPress={() => {
-              setVideo(undefined);
-            }}>
-            <Icon
-              position="absolute"
-              name={'cancel'}
-              fontFamily="MaterialIcons"
-              fontSize={30}
-              color="#fff"
-            />
-          </TouchableOpacity>
-          <VideoPlayer
-            video={{
-              uri: video?.createdUrl,
-            }}
-            autoplay
-            videoWidth={windowWidth}
-            videoHeight={windowHeight * 0.9}
-          />
-          <TouchableOpacity
-            style={tailwind('absolute bottom-5 right-5')}
-            onPress={async () =>
-              await saveToCameraRoll({url: video.uri, type: 'video'})
-            }>
-            <Icon color="white" name="download" fontSize={24} />
-          </TouchableOpacity>
-          <ChatShareIcon image={video} isVideo />
-        </MagnusModal>
-      ) : null}
-
-      <MagnusModal isVisible={!!selectedMessageForCheckLastRead}>
-        <Button
-          bg="gray400"
-          h={35}
-          w={35}
-          right={15}
-          alignSelf="flex-end"
-          rounded="circle"
-          onPress={() => {
-            setSelectedMessageForCheckLastRead(undefined);
-          }}>
-          <Icon color="black" name="close" />
-        </Button>
-        <TopTab.Navigator initialRouteName={'ReadUsers'}>
-          <TopTab.Screen
-            name="ReadUsers"
-            children={() =>
-              selectedMessageForCheckLastRead ? (
-                <FlatList
-                  data={readUsers(selectedMessageForCheckLastRead)}
-                  keyExtractor={item => item.id.toString()}
-                  renderItem={({item}) => readUserBox(item)}
-                />
-              ) : (
-                <></>
-              )
-            }
-            options={{title: '既読'}}
-          />
-          <TopTab.Screen
-            name="UnReadUsers"
-            children={() =>
-              selectedMessageForCheckLastRead ? (
-                <FlatList
-                  data={unReadUsers(selectedMessageForCheckLastRead)}
-                  keyExtractor={item => item.id.toString()}
-                  renderItem={({item}) => readUserBox(item)}
-                />
-              ) : (
-                <FlatList
-                  data={roomDetail?.members}
-                  keyExtractor={item => item.id.toString()}
-                  renderItem={({item}) => readUserBox(item)}
-                />
-              )
-            }
-            options={{title: '未読'}}
-          />
-        </TopTab.Navigator>
-      </MagnusModal>
-
-      <ImageView
-        animationType="slide"
-        images={imagesForViewing.map(i => {
-          return {uri: i.uri};
-        })}
-        imageIndex={nowImageIndex === -1 ? 0 : nowImageIndex}
-        visible={imageModal}
-        onRequestClose={() => setImageModal(false)}
-        swipeToCloseEnabled={false}
-        doubleTapToZoomEnabled={true}
-        FooterComponent={({imageIndex}) => (
-          <Div>
-            <DownloadIcon url={imagesForViewing[imageIndex].uri} />
-            <ChatShareIcon image={imagesForViewing[imageIndex]} />
-          </Div>
-        )}
-      />
-      <HeaderTemplate
-        title={roomDetail ? nameOfRoom(roomDetail, myself) : nameOfRoom(room)}
-        enableBackButton={true}
-        screenForBack={'RoomList'}>
-        <Div style={tailwind('flex flex-row')}>
-          <TouchableOpacity
-            style={tailwind('flex flex-row mr-1')}
-            onPress={() => setVisibleSearchInput(true)}>
-            <Icon
-              name="search"
-              fontFamily="Feather"
-              fontSize={26}
-              color={darkFontColor}
-            />
-          </TouchableOpacity>
-
-          {roomDetail?.members &&
-          roomDetail.members.length === 2 &&
-          roomDetail.roomType !== RoomType.GROUP ? (
-            <Div mt={-4} mr={-4} style={tailwind('flex flex-row ')}>
-              <Button
-                bg="transparent"
-                pb={-3}
-                onPress={() => {
-                  Alert.alert('通話しますか？', undefined, [
-                    {
-                      text: 'はい',
-                      onPress: () => inviteCall(),
-                    },
-                    {
-                      text: 'いいえ',
-                      onPress: () => {},
-                    },
-                  ]);
-                }}>
-                <Icon
-                  name="call-outline"
-                  fontFamily="Ionicons"
-                  fontSize={25}
-                  color="gray700"
-                />
-              </Button>
-            </Div>
-          ) : null}
-
-          <TouchableOpacity
-            style={tailwind('flex flex-row')}
-            onPress={() =>
-              navigation.navigate('ChatStack', {
-                screen: 'ChatMenu',
-                params: {room: roomDetail ? roomDetail : room, removeCache},
-              })
-            }>
-            <Icon
-              name="dots-horizontal-circle-outline"
-              fontFamily="MaterialCommunityIcons"
-              fontSize={26}
-              color={darkFontColor}
-            />
-          </TouchableOpacity>
-        </Div>
-      </HeaderTemplate>
-
-      {visibleSearchInput && (
-        <Div>
-          <Div style={tailwind('flex flex-row')}>
-            <Input
-              placeholder="メッセージを検索"
-              w={'70%'}
-              value={inputtedSearchWord}
-              onChangeText={text => {
-                setInputtedSearchWord(text);
-                searchMessages();
+      <Div h="100%" bg={Platform.OS === 'ios' ? 'blue300' : 'blue200'}>
+        <ReactionsModal
+          isVisible={!!selectedReactions}
+          selectedReactions={selectedReactions}
+          selectedEmoji={selectedEmoji}
+          onPressCloseButton={() => {
+            setSelectedReactions(undefined);
+          }}
+          onPressEmoji={emoji => setSelectedEmoji(emoji)}
+        />
+        {video?.fileName && video.uri ? (
+          <MagnusModal isVisible={!!video} bg="black">
+            <TouchableOpacity
+              style={chatStyles.cancelIcon}
+              onPress={() => {
+                setVideo(undefined);
+              }}>
+              <Icon
+                position="absolute"
+                name={'cancel'}
+                fontFamily="MaterialIcons"
+                fontSize={30}
+                color="#fff"
+              />
+            </TouchableOpacity>
+            <VideoPlayer
+              video={{
+                uri: video?.createdUrl,
               }}
+              autoplay
+              videoWidth={windowWidth}
+              videoHeight={windowHeight * 0.9}
             />
-            <Div
-              style={tailwind('flex flex-row justify-between m-1')}
-              w={'25%'}>
-              <TouchableOpacity
-                style={tailwind('flex flex-row')}
-                onPress={() => {
-                  !renderMessageIndex &&
-                    setFocusedMessageID(nextFocusIndex('prev'));
-                }}>
-                <Icon name="arrow-up" fontFamily="FontAwesome" fontSize={25} />
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={tailwind('flex flex-row')}
-                onPress={() => {
-                  !renderMessageIndex &&
-                    setFocusedMessageID(nextFocusIndex('next'));
-                }}>
-                <Icon
-                  name="arrow-down"
-                  fontFamily="FontAwesome"
-                  fontSize={25}
-                />
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={tailwind('flex flex-row')}
-                onPress={() => setVisibleSearchInput(false)}>
-                <Icon name="close" fontFamily="FontAwesome" fontSize={25} />
-              </TouchableOpacity>
-            </Div>
-          </Div>
-          {inputtedSearchWord !== '' && (
-            <Div h={40} alignItems={'center'} justifyContent={'center'}>
-              {renderMessageIndex ? (
-                <ActivityIndicator />
-              ) : (
-                <Text color="black">{`${countOfSearchWord} / ${
-                  searchedResults?.length || 0
-                }`}</Text>
-              )}
+            <TouchableOpacity
+              style={tailwind('absolute bottom-5 right-5')}
+              onPress={async () =>
+                await saveToCameraRoll({url: video.uri, type: 'video'})
+              }>
+              <Icon color="white" name="download" fontSize={24} />
+            </TouchableOpacity>
+            <ChatShareIcon image={video} isVideo />
+          </MagnusModal>
+        ) : null}
+
+        <MagnusModal isVisible={!!selectedMessageForCheckLastRead}>
+          <Button
+            bg="gray400"
+            h={35}
+            w={35}
+            right={15}
+            alignSelf="flex-end"
+            rounded="circle"
+            onPress={() => {
+              setSelectedMessageForCheckLastRead(undefined);
+            }}>
+            <Icon color="black" name="close" />
+          </Button>
+          <TopTab.Navigator initialRouteName={'ReadUsers'}>
+            <TopTab.Screen
+              name="ReadUsers"
+              children={() =>
+                selectedMessageForCheckLastRead ? (
+                  <FlatList
+                    data={readUsers(selectedMessageForCheckLastRead)}
+                    keyExtractor={item => item.id.toString()}
+                    renderItem={({item}) => readUserBox(item)}
+                  />
+                ) : (
+                  <></>
+                )
+              }
+              options={{title: '既読'}}
+            />
+            <TopTab.Screen
+              name="UnReadUsers"
+              children={() =>
+                selectedMessageForCheckLastRead ? (
+                  <FlatList
+                    data={unReadUsers(selectedMessageForCheckLastRead)}
+                    keyExtractor={item => item.id.toString()}
+                    renderItem={({item}) => readUserBox(item)}
+                  />
+                ) : (
+                  <FlatList
+                    data={roomDetail?.members}
+                    keyExtractor={item => item.id.toString()}
+                    renderItem={({item}) => readUserBox(item)}
+                  />
+                )
+              }
+              options={{title: '未読'}}
+            />
+          </TopTab.Navigator>
+        </MagnusModal>
+
+        <ImageView
+          animationType="slide"
+          images={imagesForViewing.map(i => {
+            return {uri: i.uri};
+          })}
+          imageIndex={nowImageIndex === -1 ? 0 : nowImageIndex}
+          visible={imageModal}
+          onRequestClose={() => setImageModal(false)}
+          swipeToCloseEnabled={false}
+          doubleTapToZoomEnabled={true}
+          FooterComponent={({imageIndex}) => (
+            <Div>
+              <DownloadIcon url={imagesForViewing[imageIndex].uri} />
+              <ChatShareIcon image={imagesForViewing[imageIndex]} />
             </Div>
           )}
-        </Div>
-      )}
-      {messageListAvoidngKeyboardDisturb}
+        />
+        <HeaderTemplate
+          title={roomDetail ? nameOfRoom(roomDetail, myself) : nameOfRoom(room)}
+          enableBackButton={true}
+          screenForBack={'RoomList'}>
+          <Div style={tailwind('flex flex-row')}>
+            <TouchableOpacity
+              style={tailwind('flex flex-row mr-1')}
+              onPress={() => setVisibleSearchInput(true)}>
+              <Icon
+                name="search"
+                fontFamily="Feather"
+                fontSize={26}
+                color={darkFontColor}
+              />
+            </TouchableOpacity>
+
+            {roomDetail?.members &&
+            roomDetail.members.length === 2 &&
+            roomDetail.roomType !== RoomType.GROUP ? (
+              <Div mt={-4} mr={-4} style={tailwind('flex flex-row ')}>
+                <Button
+                  bg="transparent"
+                  pb={-3}
+                  onPress={() => {
+                    Alert.alert('通話しますか？', undefined, [
+                      {
+                        text: 'はい',
+                        onPress: () => inviteCall(),
+                      },
+                      {
+                        text: 'いいえ',
+                        onPress: () => {},
+                      },
+                    ]);
+                  }}>
+                  <Icon
+                    name="call-outline"
+                    fontFamily="Ionicons"
+                    fontSize={25}
+                    color="gray700"
+                  />
+                </Button>
+              </Div>
+            ) : null}
+
+            <TouchableOpacity
+              style={tailwind('flex flex-row')}
+              onPress={() =>
+                navigation.navigate('ChatStack', {
+                  screen: 'ChatMenu',
+                  params: {room: roomDetail ? roomDetail : room, removeCache},
+                })
+              }>
+              <Icon
+                name="dots-horizontal-circle-outline"
+                fontFamily="MaterialCommunityIcons"
+                fontSize={26}
+                color={darkFontColor}
+              />
+            </TouchableOpacity>
+          </Div>
+        </HeaderTemplate>
+
+        {visibleSearchInput && (
+          <Div>
+            <Div style={tailwind('flex flex-row')}>
+              <Input
+                placeholder="メッセージを検索"
+                w={'70%'}
+                value={inputtedSearchWord}
+                onChangeText={text => {
+                  setInputtedSearchWord(text);
+                  searchMessages();
+                }}
+              />
+              <Div
+                style={tailwind('flex flex-row justify-between m-1')}
+                w={'25%'}>
+                <TouchableOpacity
+                  style={tailwind('flex flex-row')}
+                  onPress={() => {
+                    !renderMessageIndex &&
+                      setFocusedMessageID(nextFocusIndex('prev'));
+                  }}>
+                  <Icon
+                    name="arrow-up"
+                    fontFamily="FontAwesome"
+                    fontSize={25}
+                  />
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={tailwind('flex flex-row')}
+                  onPress={() => {
+                    !renderMessageIndex &&
+                      setFocusedMessageID(nextFocusIndex('next'));
+                  }}>
+                  <Icon
+                    name="arrow-down"
+                    fontFamily="FontAwesome"
+                    fontSize={25}
+                  />
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={tailwind('flex flex-row')}
+                  onPress={() => setVisibleSearchInput(false)}>
+                  <Icon name="close" fontFamily="FontAwesome" fontSize={25} />
+                </TouchableOpacity>
+              </Div>
+            </Div>
+            {inputtedSearchWord !== '' && (
+              <Div h={40} alignItems={'center'} justifyContent={'center'}>
+                {renderMessageIndex ? (
+                  <ActivityIndicator />
+                ) : (
+                  <Text color="black">{`${countOfSearchWord} / ${
+                    searchedResults?.length || 0
+                  }`}</Text>
+                )}
+              </Div>
+            )}
+          </Div>
+        )}
+        {messageListAvoidngKeyboardDisturb}
+      </Div>
     </WholeContainer>
   );
 };

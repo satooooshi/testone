@@ -93,9 +93,7 @@ const ChatGroupCard: React.FC<ChatGroupCardProps> = ({
           mb="4px"
           w="100%">
           <Text fontWeight="bold" color={darkFontColor} noOfLines={1}>
-            {chatGroup.name
-              ? chatGroup.name
-              : nameOfEmptyNameGroup(chatGroup.members)}
+            {nameOfEmptyNameGroup(chatGroup)}
           </Text>
 
           <Box display="flex" flexDir="row">
@@ -140,11 +138,15 @@ const ChatGroupCard: React.FC<ChatGroupCardProps> = ({
           justifyContent="space-between"
           alignItems="center">
           <Text color={darkFontColor} fontSize="14px">
-            {`${chatGroup.members?.length || 0}人のメンバー`}
+            {`${chatGroup.memberCount}人のメンバー`}
           </Text>
           <Text color={darkFontColor} fontSize="12px">
             {dateTimeFormatterFromJSDDate({
-              dateTime: new Date(chatGroup.updatedAt),
+              dateTime: new Date(
+                chatGroup?.chatMessages?.[0]?.createdAt
+                  ? chatGroup?.chatMessages?.[0]?.createdAt
+                  : chatGroup.updatedAt,
+              ),
             })}
           </Text>
         </Box>

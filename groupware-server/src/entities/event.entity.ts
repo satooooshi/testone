@@ -183,6 +183,7 @@ export class EventSchedule {
       } else {
         eventChatRoom.members = [this.author];
       }
+      eventChatRoom.memberCount = eventChatRoom.members.length;
       getRepository(ChatGroup).save(eventChatRoom);
     }
   }

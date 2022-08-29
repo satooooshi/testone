@@ -306,6 +306,7 @@ export interface ChatMessage {
   reactions?: ChatMessageReaction[];
   createdAt: Date;
   updatedAt: Date;
+  modifiedAt: Date;
   isSender?: boolean;
   callTime?: string;
   replyParentMessage?: ChatMessage;
@@ -331,6 +332,7 @@ export interface ChatGroup {
   chatNotes?: ChatNote[];
   chatMessages?: ChatMessage[];
   members?: User[];
+  memberCount: number;
   lastReadChatTime?: LastReadChatTime[];
   hasBeenRead?: boolean;
   unreadCount?: number;

@@ -83,7 +83,7 @@ export const useChatSocket = (
         }
       });
       socket.on('msgToClient', async (socketMessage: SocketMessage) => {
-        console.log('msgToClient called', socketMessage);
+        // console.log('msgToClient called', socketMessage);
 
         if (!socketMessage.chatMessage) {
           return;
