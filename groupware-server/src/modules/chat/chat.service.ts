@@ -745,7 +745,6 @@ export class ChatService {
     const savedMessage = await this.chatMessageRepository.save(
       this.chatMessageRepository.create({ ...message, chatGroup: existGroup }),
     );
-    console.log('0000000', existGroup.imageURL);
 
     existGroup.updatedAt = new Date();
     await this.chatGroupRepository.save({
