@@ -687,32 +687,18 @@ export class ChatService {
     user: User,
     chatGroupId: string,
   ): Promise<LastReadChatTime[]> {
-    const chatGroup = await this.chatGroupRepository
-      .createQueryBuilder('chat_groups')
+    const lastReadChatTimes = await this.lastReadChatTimeRepository
+      .createQueryBuilder('time')
       // .withDeleted()
-      .leftJoin('chat_groups.lastReadChatTime', 'lastReadChatTime')
-      .addSelect(['lastReadChatTime.readTime'])
-      .leftJoin('lastReadChatTime.user', 'user')
+      .leftJoin('time.user', 'user')
       .addSelect(selectUserColumns('user'))
-      .where('chat_groups.id = :roomId', { roomId: chatGroupId })
-      .getOne();
-    // const chatGroup = await this.chatGroupRepository.findOne(chatGroupId, {
-    //   relations: ['lastReadChatTime', 'lastReadChatTime.user'],
-    //   select: ['id', 'lastReadChatTime'],
-    //   withDeleted: true,
-    // });
-    if (!chatGroup) {
+      .where('time.chat_group_id = :roomId', { roomId: chatGroupId })
+      .getMany();
+    if (!lastReadChatTimes.length) {
       return;
     }
 
-    // const isMember = chatGroup.members.filter((m) => m.id === user.id).length;
-    // if (!isMember) {
-    //   throw new NotAcceptableException('Something went wrong');
-    // }
-
-    // return chatGroup.lastReadChatTime.filter((l) => l.user.id !== user.id);
-
-    return chatGroup.lastReadChatTime.filter((l) => l.user);
+    return lastReadChatTimes;
   }
 
   public async sendMessage(

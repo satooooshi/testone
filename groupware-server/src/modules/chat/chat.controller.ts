@@ -172,13 +172,13 @@ export class ChatController {
     return await this.chatService.getChatGroup(req.user.id);
   }
 
-  @Get('group-unread-chat-count')
-  @UseGuards(JwtAuthenticationGuard)
-  async getRoomsUnreadChatCount(
-    @Req() req: RequestWithUser,
-  ): Promise<ChatGroup[]> {
-    return await this.chatService.getRoomsUnreadChatCount(req.user.id);
-  }
+  // @Get('group-unread-chat-count')
+  // @UseGuards(JwtAuthenticationGuard)
+  // async getRoomsUnreadChatCount(
+  //   @Req() req: RequestWithUser,
+  // ): Promise<ChatGroup[]> {
+  //   return await this.chatService.getRoomsUnreadChatCount(req.user.id);
+  // }
 
   @Get('/v2/rooms')
   @UseGuards(JwtAuthenticationGuard)
@@ -213,13 +213,13 @@ export class ChatController {
     return await this.chatService.getChatMessage(req.user.id, query);
   }
 
-  // @Get('expired-url-messages/:id')
-  // @UseGuards(JwtAuthenticationGuard)
-  // async getExpiredUrlMessages(
-  //   @Param('id') roomId: number,
-  // ): Promise<ChatMessage[]> {
-  //   return await this.chatService.getExpiredUrlMessages(roomId);
-  // }
+  @Get('expired-url-messages/:id')
+  @UseGuards(JwtAuthenticationGuard)
+  async getExpiredUrlMessages(
+    @Param('id') roomId: number,
+  ): Promise<ChatMessage[]> {
+    return await this.chatService.getExpiredUrlMessages(roomId);
+  }
 
   @Get('search-messages')
   @UseGuards(JwtAuthenticationGuard)
