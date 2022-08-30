@@ -312,18 +312,14 @@ export class ChatService {
       .getOne();
 
     const manager = getManager();
-    // const membersCountList = await manager.query(
-    //   'select chat_group_id, COUNT(user_id) as cnt from user_chat_joining where chat_group_id IN (?) group by chat_group_id',
-    //   [roomIds],
-    // );
 
-    const members: UserAndGroupID[] = await manager.query(
+    const members: User[] = await manager.query(
       'select chat_group_id, users.id as id, users.last_name as lastName, users.first_name as firstName, users.avatar_url as avatarUrl, users.existence as existence from user_chat_joining INNER JOIN users ON users.id = user_id AND chat_group_id = ?',
       [roomId],
     );
 
     const muteUserId = await manager.query(
-      'select chat_group_id, user_id  from user_chat_mute where chat_group_id  = ? AND user_id = ?',
+      'select user_id from user_chat_mute where chat_group_id  = ? AND user_id = ?',
       [roomId, userID],
     );
 
@@ -709,20 +705,26 @@ export class ChatService {
     }
     const existGroup = await this.chatGroupRepository
       .createQueryBuilder('chat_groups')
-      .leftJoin('chat_groups.members', 'members')
-      .addSelect(['members.id'])
-      .leftJoin('chat_groups.muteUsers', 'muteUsers')
-      .addSelect(['muteUsers.id'])
       .where('chat_groups.id = :roomId', { roomId: message.chatGroup.id })
       .getOne();
 
-    // const existGroup = await this.chatGroupRepository.findOne({
-    //   where: { id: message.chatGroup.id },
-    //   relations: ['members', 'muteUsers'],
-    // });
     if (!existGroup) {
       throw new BadRequestException('That group id is incorrect');
-    } else if (
+    }
+    const manager = getManager();
+
+    const members: User[] = await manager.query(
+      'select user_id as id from user_chat_joining where chat_group_id = ?',
+      [message.chatGroup.id],
+    );
+
+    const muteUsers: User[] = await manager.query(
+      'select user_id as id from user_chat_mute where chat_group_id  = ? ',
+      [message.chatGroup.id],
+    );
+    existGroup.members = members;
+    existGroup.muteUsers = muteUsers;
+    if (
       !existGroup?.members.filter((m) => m?.id === message?.sender?.id).length
     ) {
       throw new BadRequestException('sender is not a member of this group');
