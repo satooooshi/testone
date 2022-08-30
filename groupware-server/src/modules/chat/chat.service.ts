@@ -123,7 +123,7 @@ export class ChatService {
     return await this.chatGroupRepository
       .createQueryBuilder('chat_groups')
       .select(['chat_groups.id'])
-      .leftJoin('chat_groups.members', 'member')
+      .innerJoin('chat_groups.members', 'member')
       .where('member.id = :memberId', { memberId: userID })
       .getMany();
   }
@@ -312,18 +312,14 @@ export class ChatService {
       .getOne();
 
     const manager = getManager();
-    // const membersCountList = await manager.query(
-    //   'select chat_group_id, COUNT(user_id) as cnt from user_chat_joining where chat_group_id IN (?) group by chat_group_id',
-    //   [roomIds],
-    // );
 
-    const members: UserAndGroupID[] = await manager.query(
+    const members: User[] = await manager.query(
       'select chat_group_id, users.id as id, users.last_name as lastName, users.first_name as firstName, users.avatar_url as avatarUrl, users.existence as existence from user_chat_joining INNER JOIN users ON users.id = user_id AND chat_group_id = ?',
       [roomId],
     );
 
     const muteUserId = await manager.query(
-      'select chat_group_id, user_id  from user_chat_mute where chat_group_id  = ? AND user_id = ?',
+      'select user_id from user_chat_mute where chat_group_id  = ? AND user_id = ?',
       [roomId, userID],
     );
 
@@ -390,41 +386,41 @@ export class ChatService {
 
     return room;
   }
-  public async getRoomsUnreadChatCount(userID: number): Promise<ChatGroup[]> {
-    const [urlUnparsedRooms] = await this.chatGroupRepository
-      .createQueryBuilder('chat_groups')
-      .leftJoin('chat_groups.members', 'member')
-      .leftJoinAndSelect(
-        'chat_groups.lastReadChatTime',
-        'lastReadChatTime',
-        'lastReadChatTime.user_id = :userID',
-        { userID },
-      )
-      .where('member.id = :memberId', { memberId: userID })
-      .orderBy('chat_groups.updatedAt', 'DESC')
-      .getManyAndCount();
-    const rooms = await Promise.all(
-      urlUnparsedRooms.map(async (g) => {
-        let unreadCount = 0;
-        const hasBeenRead = g?.lastReadChatTime?.[0]?.readTime
-          ? g?.lastReadChatTime?.[0]?.readTime > g.updatedAt
-          : false;
-        if (!hasBeenRead && g?.lastReadChatTime?.[0]?.readTime) {
-          const query = {
-            group: g.id,
-            lastReadTime: g.lastReadChatTime?.[0].readTime,
-          };
-          unreadCount = await this.getUnreadChatMessage(userID, query);
-        }
+  // public async getRoomsUnreadChatCount(userID: number): Promise<ChatGroup[]> {
+  //   const [urlUnparsedRooms] = await this.chatGroupRepository
+  //     .createQueryBuilder('chat_groups')
+  //     .leftJoin('chat_groups.members', 'member')
+  //     .leftJoinAndSelect(
+  //       'chat_groups.lastReadChatTime',
+  //       'lastReadChatTime',
+  //       'lastReadChatTime.user_id = :userID',
+  //       { userID },
+  //     )
+  //     .where('member.id = :memberId', { memberId: userID })
+  //     .orderBy('chat_groups.updatedAt', 'DESC')
+  //     .getManyAndCount();
+  //   const rooms = await Promise.all(
+  //     urlUnparsedRooms.map(async (g) => {
+  //       let unreadCount = 0;
+  //       const hasBeenRead = g?.lastReadChatTime?.[0]?.readTime
+  //         ? g?.lastReadChatTime?.[0]?.readTime > g.updatedAt
+  //         : false;
+  //       if (!hasBeenRead && g?.lastReadChatTime?.[0]?.readTime) {
+  //         const query = {
+  //           group: g.id,
+  //           lastReadTime: g.lastReadChatTime?.[0].readTime,
+  //         };
+  //         unreadCount = await this.getUnreadChatMessage(userID, query);
+  //       }
 
-        return {
-          ...g,
-          unreadCount,
-        };
-      }),
-    );
-    return rooms;
-  }
+  //       return {
+  //         ...g,
+  //         unreadCount,
+  //       };
+  //     }),
+  //   );
+  //   return rooms;
+  // }
 
   public async getChatMessage(
     userID: number,
@@ -640,7 +636,6 @@ export class ChatService {
     const words = replaceFullWidthSpace.split(' ');
     const sql = this.chatMessageRepository
       .createQueryBuilder('chat_messages')
-      .leftJoin('chat_messages.chatGroup', 'g')
       .where('(chat_messages.type = "text" OR chat_messages.type = "call")')
       .select(['chat_messages.id', 'chat_messages.type']);
 
@@ -656,7 +651,7 @@ export class ChatService {
       }
     });
     const message = await sql
-      .andWhere('g.id = :group', { group: query.group })
+      .andWhere('chat_messages.chat_group_id = :group', { group: query.group })
       .orderBy('chat_messages.createdAt', 'DESC')
       .getMany();
     return message;
@@ -688,32 +683,18 @@ export class ChatService {
     user: User,
     chatGroupId: string,
   ): Promise<LastReadChatTime[]> {
-    const chatGroup = await this.chatGroupRepository
-      .createQueryBuilder('chat_groups')
+    const lastReadChatTimes = await this.lastReadChatTimeRepository
+      .createQueryBuilder('time')
       // .withDeleted()
-      .leftJoin('chat_groups.lastReadChatTime', 'lastReadChatTime')
-      .addSelect(['lastReadChatTime.readTime'])
-      .leftJoin('lastReadChatTime.user', 'user')
+      .innerJoin('time.user', 'user')
       .addSelect(selectUserColumns('user'))
-      .where('chat_groups.id = :roomId', { roomId: chatGroupId })
-      .getOne();
-    // const chatGroup = await this.chatGroupRepository.findOne(chatGroupId, {
-    //   relations: ['lastReadChatTime', 'lastReadChatTime.user'],
-    //   select: ['id', 'lastReadChatTime'],
-    //   withDeleted: true,
-    // });
-    if (!chatGroup) {
+      .where('time.chat_group_id = :roomId', { roomId: chatGroupId })
+      .getMany();
+    if (!lastReadChatTimes.length) {
       return;
     }
 
-    // const isMember = chatGroup.members.filter((m) => m.id === user.id).length;
-    // if (!isMember) {
-    //   throw new NotAcceptableException('Something went wrong');
-    // }
-
-    // return chatGroup.lastReadChatTime.filter((l) => l.user.id !== user.id);
-
-    return chatGroup.lastReadChatTime.filter((l) => l.user);
+    return lastReadChatTimes;
   }
 
   public async sendMessage(
@@ -724,20 +705,26 @@ export class ChatService {
     }
     const existGroup = await this.chatGroupRepository
       .createQueryBuilder('chat_groups')
-      .leftJoin('chat_groups.members', 'members')
-      .addSelect(['members.id'])
-      .leftJoin('chat_groups.muteUsers', 'muteUsers')
-      .addSelect(['muteUsers.id'])
       .where('chat_groups.id = :roomId', { roomId: message.chatGroup.id })
       .getOne();
 
-    // const existGroup = await this.chatGroupRepository.findOne({
-    //   where: { id: message.chatGroup.id },
-    //   relations: ['members', 'muteUsers'],
-    // });
     if (!existGroup) {
       throw new BadRequestException('That group id is incorrect');
-    } else if (
+    }
+    const manager = getManager();
+
+    const members: User[] = await manager.query(
+      'select user_id as id from user_chat_joining where chat_group_id = ?',
+      [message.chatGroup.id],
+    );
+
+    const muteUsers: User[] = await manager.query(
+      'select user_id as id from user_chat_mute where chat_group_id  = ? ',
+      [message.chatGroup.id],
+    );
+    existGroup.members = members;
+    existGroup.muteUsers = muteUsers;
+    if (
       !existGroup?.members.filter((m) => m?.id === message?.sender?.id).length
     ) {
       throw new BadRequestException('sender is not a member of this group');
