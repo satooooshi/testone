@@ -123,7 +123,7 @@ export class ChatService {
     return await this.chatGroupRepository
       .createQueryBuilder('chat_groups')
       .select(['chat_groups.id'])
-      .leftJoin('chat_groups.members', 'member')
+      .innerJoin('chat_groups.members', 'member')
       .where('member.id = :memberId', { memberId: userID })
       .getMany();
   }
@@ -686,7 +686,7 @@ export class ChatService {
     const lastReadChatTimes = await this.lastReadChatTimeRepository
       .createQueryBuilder('time')
       // .withDeleted()
-      .leftJoin('time.user', 'user')
+      .innerJoin('time.user', 'user')
       .addSelect(selectUserColumns('user'))
       .where('time.chat_group_id = :roomId', { roomId: chatGroupId })
       .getMany();
