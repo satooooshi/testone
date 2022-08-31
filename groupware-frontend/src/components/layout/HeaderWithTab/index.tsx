@@ -33,12 +33,8 @@ export type HeaderProps = {
 const tabClassNameGetter = (tab: Tab): string => {
   const name = tab.name;
   switch (name) {
-    case EventTab.IMPRESSIVE_UNIVERSITY:
-      return headerStyles.impressive_university_tab;
     case EventTab.STUDY_MEETING:
       return headerStyles.study_meeting_tab;
-    case EventTab.BOLDAY:
-      return headerStyles.bolday_tab;
     case EventTab.COACH:
       return headerStyles.coach_tab;
     case EventTab.CLUB:

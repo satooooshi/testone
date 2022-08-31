@@ -2,6 +2,10 @@ import { EventType } from 'src/types';
 
 export const eventTypeColorFactory = (type: EventType): string => {
   switch (type) {
+    case EventType.IMPRESSIVE_UNIVERSITY:
+      return '#3182ce';
+    case EventType.BOLDAY:
+      return '#f6ad55';
     case EventType.STUDY_MEETING:
       return '#38a169';
     case EventType.COACH:
