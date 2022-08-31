@@ -38,15 +38,15 @@ export default function Home() {
         <title>sample | Home</title>
       </Head>
       <div className={homeStyles.box_row_wrapper}>
-        <div className={homeStyles.box_wrapper}>
+        {/* <div className={homeStyles.box_wrapper}>
           <PortalLinkBox href={PortalLinkType.IMPRESSIVE_UNIVERSITY} />
-        </div>
+        </div> */}
         <div className={homeStyles.box_wrapper}>
           <PortalLinkBox href={PortalLinkType.STUDY_MEETING} />
         </div>
-        <div className={homeStyles.box_wrapper}>
+        {/* <div className={homeStyles.box_wrapper}>
           <PortalLinkBox href={PortalLinkType.BOLDAY} />
-        </div>
+        </div> */}
         <div className={homeStyles.box_wrapper}>
           <PortalLinkBox href={PortalLinkType.COACH} />
         </div>
