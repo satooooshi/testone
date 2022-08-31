@@ -385,9 +385,9 @@ export class ChatController {
     return await this.chatService.saveLastReadChatTime(req.user, chatGroupId);
   }
 
-  @Post('send-notifi-for-reftch-room:id')
+  @Post('send-notifi-for-refetch-room/:id')
   @UseGuards(JwtAuthenticationGuard)
-  async sendNotifiFofRefetchRoom(
+  async sendNotifiForRefetchRoom(
     @Req() req: RequestWithUser,
     @Param('id') chatGroupId: number,
   ) {
@@ -397,7 +397,7 @@ export class ChatController {
       body: '',
       custom: {
         silent: 'silent',
-        type: 'create',
+        type: 'badge',
         screen: '',
         id: chatGroupId.toString(),
       },

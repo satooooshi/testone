@@ -13,6 +13,7 @@ import { RoomRefetchProvider } from 'src/contexts/chat/useRoomRefetch';
 import { useAPIGetRoomsByPage } from '@/hooks/api/chat/useAPIGetRoomsByPage';
 import { useAPIGetOneRoom } from '@/hooks/api/chat/useAPIGetOneRoom';
 import router from 'next/router';
+import { useAPISendNotifiForRefetchRoom } from '@/hooks/api/chat/useAPISendNotifiForRefetchRoom';
 
 const BadgeContext = createContext({
   unreadChatCount: 0,
@@ -92,6 +93,8 @@ export const BadgeProvider: React.FC = ({ children }) => {
     },
   });
 
+  const { mutate: sendNotifiForRefetch } = useAPISendNotifiForRefetchRoom();
+
   useEffect(() => {
     if (user?.id) {
       refetchAllRooms();
@@ -164,6 +167,7 @@ export const BadgeProvider: React.FC = ({ children }) => {
     const targetRoom = chatGroups.filter((g) => g.id === roomId);
     const unreadCount = targetRoom[0]?.unreadCount;
     if (unreadCount) {
+      sendNotifiForRefetch(roomId);
       setChatUnreadCount((c) => (c - unreadCount >= 0 ? c - unreadCount : 0));
       setChatGroups((group) =>
         group.map((g) => (g.id === roomId ? { ...g, unreadCount: 0 } : g)),
