@@ -75,6 +75,7 @@ const AttendanceRow = ({
     user: user as User,
     travelCost: [],
   };
+
   const { mutate: createAttendance } = useAPICreateAttendance({
     onSuccess: (created) => {
       setValues(created);
