@@ -106,23 +106,23 @@ const QAQuestionList = () => {
       isActiveTab:
         type === WikiType.BOARD && board_category === BoardCategory.NEWS,
     },
-    {
-      tabName: wikiTypeNameFactory(
-        WikiType.BOARD,
-        undefined,
-        true,
-        BoardCategory.IMPRESSIVE_UNIVERSITY,
-      ),
-      onClick: () =>
-        queryRefresh({
-          type: WikiType.BOARD,
-          board_category: BoardCategory.IMPRESSIVE_UNIVERSITY,
-          status: undefined,
-        }),
-      isActiveTab:
-        type === WikiType.BOARD &&
-        board_category === BoardCategory.IMPRESSIVE_UNIVERSITY,
-    },
+    // {
+    //   tabName: wikiTypeNameFactory(
+    //     WikiType.BOARD,
+    //     undefined,
+    //     true,
+    //     BoardCategory.IMPRESSIVE_UNIVERSITY,
+    //   ),
+    //   onClick: () =>
+    //     queryRefresh({
+    //       type: WikiType.BOARD,
+    //       board_category: BoardCategory.IMPRESSIVE_UNIVERSITY,
+    //       status: undefined,
+    //     }),
+    //   isActiveTab:
+    //     type === WikiType.BOARD &&
+    //     board_category === BoardCategory.IMPRESSIVE_UNIVERSITY,
+    // },
     {
       tabName: wikiTypeNameFactory(
         WikiType.BOARD,
