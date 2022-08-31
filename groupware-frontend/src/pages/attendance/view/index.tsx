@@ -144,10 +144,20 @@ const AttendanceRow = ({
   useEffect(() => {
     if (values.attendanceTime && values.absenceTime && values.breakMinutes) {
       const breakHourAndMinutes = values.breakMinutes.split(':');
-      const diff =
+      let diff =
         (new Date(values.absenceTime).getTime() -
           new Date(values.attendanceTime).getTime()) /
         3600000;
+
+      if (diff < 0) {
+        const absenceTime = new Date(values.absenceTime);
+        absenceTime.setDate(values.absenceTime.getDate() + 1);
+        diff =
+          (new Date(absenceTime).getTime() -
+            new Date(values.attendanceTime).getTime()) /
+          3600000;
+      }
+
       const minutesNumber =
         Math.round((diff - Math.floor(diff)) * 60) -
         Number(breakHourAndMinutes[1]);
@@ -399,7 +409,6 @@ const AttendanceRow = ({
     </>
   );
 };
-
 const AttendanceView = () => {
   const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
   const { data: defaultData, refetch: refetchDefaultData } =
