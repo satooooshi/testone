@@ -694,7 +694,7 @@ export class ChatService {
       return;
     }
 
-    return lastReadChatTimes;
+    return lastReadChatTimes.filter((t) => t?.user && t.user?.existence);
   }
 
   public async sendMessage(
