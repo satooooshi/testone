@@ -229,12 +229,6 @@ const EventList = () => {
   };
 
   const activeTabName = () => {
-    if (type === EventType.IMPRESSIVE_UNIVERSITY) {
-      return EventTab.IMPRESSIVE_UNIVERSITY;
-    }
-    if (type === EventType.BOLDAY) {
-      return EventTab.BOLDAY;
-    }
     if (type === EventType.STUDY_MEETING) {
       return EventTab.STUDY_MEETING;
     }
