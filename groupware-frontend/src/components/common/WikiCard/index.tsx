@@ -1,7 +1,14 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { dateTimeFormatterFromJSDDate } from 'src/utils/dateTimeFormatter';
 import { BoardCategory, User, Wiki, WikiType } from 'src/types';
-import { Box, Button, Link, Text, useMediaQuery } from '@chakra-ui/react';
+import {
+  Box,
+  Button,
+  Link,
+  Spinner,
+  Text,
+  useMediaQuery,
+} from '@chakra-ui/react';
 import { tagColorFactory } from 'src/utils/factory/tagColorFactory';
 import { wikiTypeNameFactory } from 'src/utils/wiki/wikiTypeNameFactory';
 import UserAvatar from '../UserAvatar';
@@ -11,6 +18,7 @@ import { AiFillHeart, AiOutlineHeart } from 'react-icons/ai';
 import GoodSendersModal from '@/components/wiki/GoodSendersModal';
 import { useAPIToggleGoodForBoard } from '@/hooks/api/wiki/useAPIToggleGoodForBoard';
 import { useAuthenticate } from 'src/contexts/useAuthenticate';
+import { useAPIGetGoodsForBoard } from '@/hooks/api/wiki/useAPIGetGoodsForBoard';
 
 type WikiCardProps = {
   wiki: Wiki;
@@ -22,28 +30,7 @@ const WikiCard: React.FC<WikiCardProps> = ({ wiki }) => {
   const { user } = useAuthenticate();
   const [wikiState, setWikiState] = useState(wiki);
 
-  const [isPressHeart, setIsPressHeart] = useState<boolean>(
-    wikiState.isGoodSender || false,
-  );
-
-  const { mutate } = useAPIToggleGoodForBoard({
-    onSuccess: () => {
-      setIsPressHeart((prevHeartStatus) => {
-        setWikiState((w) => {
-          if (prevHeartStatus) {
-            w.userGoodForBoard = w.userGoodForBoard?.filter(
-              (u) => u.id !== user?.id,
-            );
-          } else {
-            w.userGoodForBoard = [user as User, ...(w.userGoodForBoard || [])];
-          }
-          return w;
-        });
-
-        return !prevHeartStatus;
-      });
-    },
-  });
+  const [isPressHeart, setIsPressHeart] = useState<boolean>(false);
 
   const tagButtonColor = useMemo(() => {
     switch (wiki.type) {
@@ -56,8 +43,27 @@ const WikiCard: React.FC<WikiCardProps> = ({ wiki }) => {
     }
   }, [wiki.type]);
 
+  const { mutate: getGoodsForBoard, data: goodsForBoard } =
+    useAPIGetGoodsForBoard();
+  const { mutate } = useAPIToggleGoodForBoard({
+    onSuccess: () => {
+      setIsPressHeart((prevHeartStatus) => {
+        setWikiState((w) => {
+          return {
+            ...w,
+            goodsCount: prevHeartStatus
+              ? (w.goodsCount || 0) - 1
+              : (w.goodsCount || 0) + 1,
+          };
+        });
+        return !prevHeartStatus;
+      });
+    },
+  });
+
   useEffect(() => {
     setWikiState(wiki);
+    setIsPressHeart(wiki.isGoodSender || false);
   }, [wiki]);
 
   return (
@@ -135,14 +141,12 @@ const WikiCard: React.FC<WikiCardProps> = ({ wiki }) => {
               </Link>
               <Link
                 onClick={() => {
+                  getGoodsForBoard(wikiState.id);
                   setGoodSendersModal(true);
                 }}>
-                <Button
-                  colorScheme={'blue'}
-                  color="white"
-                  size={
-                    'sm'
-                  }>{`${wikiState.userGoodForBoard?.length}件のいいね`}</Button>
+                <Button colorScheme={'blue'} color="white" size={'sm'}>
+                  {`${wikiState.goodsCount || 0}件のいいね`}
+                </Button>
               </Link>
             </Box>
           )}
@@ -157,7 +161,7 @@ const WikiCard: React.FC<WikiCardProps> = ({ wiki }) => {
                 {wiki.boardCategory === BoardCategory.QA ? '回答' : 'コメント'}
               </Text>
               <Text color="green.500" fontSize="22px" fontWeight="bold">
-                {wikiState.answers?.length.toString()}
+                {wikiState.answersCount || 0}
               </Text>
             </Box>
           ) : null}
@@ -179,7 +183,7 @@ const WikiCard: React.FC<WikiCardProps> = ({ wiki }) => {
       <GoodSendersModal
         isOpen={goodSendersModal}
         onClose={() => setGoodSendersModal(false)}
-        goodSenders={wiki.userGoodForBoard || []}
+        goodsForBoard={goodsForBoard || []}
       />
       <Box
         display="flex"

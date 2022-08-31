@@ -353,14 +353,12 @@ const QAQuestionList = () => {
         <div className={qaListStyles.search_form_wrapper}>
           <SearchForm
             onClear={() => setSelectedTags([])}
-            value={searchWord}
-            onChange={(e) => setSearchWord(e.currentTarget.value)}
-            onClickButton={() =>
+            onClickButton={(w) =>
               queryRefresh({
                 page: '1',
                 tag,
                 status,
-                word: searchWord,
+                word: w,
                 type,
               })
             }

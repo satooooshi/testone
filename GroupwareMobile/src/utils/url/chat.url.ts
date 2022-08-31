@@ -14,12 +14,14 @@ export const getLatestMentionedMessageURL = `/${chatURL}/latest-mentioned`;
 export const getLastReadChatTimeURL = `/${chatURL}/get-last-read-chat-time`;
 export const sendChantMessageURL = `/${chatURL}/send-message`;
 export const getRoomURL = `/${chatURL}/get-room`;
+export const deleteChantMessageURL = `/${chatURL}/delete-message`;
 export const saveChatGroupURL = `/${chatURL}/v2/room`;
 export const savePinURL = `${saveChatGroupURL}/pin`;
 export const saveLastReadChatTimeURL = `/${chatURL}/save-last-read-chat-time`;
 export const saveReactionURL = `/${chatURL}/v2/reaction`;
 export const deleteReactionURL = (reactionId: string) =>
   `/${chatURL}/v2/reaction/${reactionId}`;
+export const getReactionsURL = `${chatURL}/get-reactions`;
 export const leaveChatRoomURL = `/${chatURL}/leave-room`;
 export const noteURL = (roomId: string) => `${chatURL}/v2/room/${roomId}/note`;
 export const albumURL = (roomId: string) =>

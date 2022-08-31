@@ -9,12 +9,12 @@ type StickerMessageProps = {
 
 const StickerMessage: React.FC<StickerMessageProps> = ({ message }) => {
   return (
-    <Box display="flex" maxW="300px" maxH={'300px'}>
+    <Box display="flex" maxW="150px" maxH={'150px'}>
       <Image
         loading="lazy"
         src={reactionStickers.find((s) => s.name === message.content)?.src}
-        w={300}
-        h={300}
+        w={150}
+        h={150}
         alt="送信された画像"
       />
     </Box>

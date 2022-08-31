@@ -49,7 +49,6 @@ export interface GetMessagesQuery {
 }
 
 export interface GetChaRoomsByPageQuery {
-  group: number;
   page?: string;
   limit?: string;
   updatedAtLatestRoom?: Date;
@@ -79,6 +78,18 @@ export interface GetRoomsResult {
   rooms: ChatGroup[];
   pageCount: number;
 }
+export interface SaveRoomsResult {
+  room: ChatGroup;
+  systemMessage: ChatMessage[];
+}
+export interface SaveAlbumResult {
+  album: ChatAlbum;
+  systemMessage: ChatMessage;
+}
+export interface SaveNoteResult {
+  note: ChatNote;
+  systemMessage: ChatMessage;
+}
 
 @Controller('chat')
 export class ChatController {
@@ -99,7 +110,7 @@ export class ChatController {
     const notificationData: CustomPushNotificationData = {
       title: '',
       body: '',
-      custom: { invitation: invitation, silent: 'silent', type: 'edit' },
+      custom: { invitation: invitation, silent: 'silent', type: 'call' },
     };
     await sendPushNotifToSpecificUsers([callee.id], notificationData);
     return;
@@ -161,13 +172,13 @@ export class ChatController {
     return await this.chatService.getChatGroup(req.user.id);
   }
 
-  @Get('group-unread-chat-count')
-  @UseGuards(JwtAuthenticationGuard)
-  async getRoomsUnreadChatCount(
-    @Req() req: RequestWithUser,
-  ): Promise<ChatGroup[]> {
-    return await this.chatService.getRoomsUnreadChatCount(req.user.id);
-  }
+  // @Get('group-unread-chat-count')
+  // @UseGuards(JwtAuthenticationGuard)
+  // async getRoomsUnreadChatCount(
+  //   @Req() req: RequestWithUser,
+  // ): Promise<ChatGroup[]> {
+  //   return await this.chatService.getRoomsUnreadChatCount(req.user.id);
+  // }
 
   @Get('/v2/rooms')
   @UseGuards(JwtAuthenticationGuard)
@@ -237,6 +248,24 @@ export class ChatController {
     return await this.chatService.sendMessage(message);
   }
 
+  @Patch('send-message')
+  @UseGuards(JwtAuthenticationGuard)
+  async updateMessage(
+    @Req() req: RequestWithUser,
+    @Body() message: Partial<ChatMessage>,
+  ): Promise<ChatMessage> {
+    const user = req.user;
+    message.sender = user;
+    return await this.chatService.updateMessage(message);
+  }
+
+  @Post('delete-message')
+  @UseGuards(JwtAuthenticationGuard)
+  async deleteMessage(@Body() message: Partial<ChatMessage>) {
+    await this.chatService.deleteMessage(message);
+    return message;
+  }
+
   @Post('save-chat-group')
   @UseGuards(JwtAuthenticationGuard)
   async createChatGroup(
@@ -266,22 +295,21 @@ export class ChatController {
   async v2UpdateChatGroup(
     @Req() req: RequestWithUser,
     @Body() chatGroup: Partial<ChatGroup>,
-  ): Promise<ChatGroup> {
+  ): Promise<SaveRoomsResult> {
     const user = req.user;
-    const savedGroup = await this.chatService.v2UpdateChatGroup(
-      chatGroup,
-      user,
-    );
+    const result = await this.chatService.v2UpdateChatGroup(chatGroup, user);
     if (
-      savedGroup.roomType === RoomType.PERSONAL &&
-      savedGroup.members.length === 2
+      result.room.roomType === RoomType.PERSONAL &&
+      result.room.members.length === 2
     ) {
-      const chatPartner = savedGroup.members.filter((m) => m.id !== user.id)[0];
-      savedGroup.imageURL = chatPartner.avatarUrl;
-      savedGroup.name = `${chatPartner.lastName} ${chatPartner.firstName}`;
+      const chatPartner = result.room.members.filter(
+        (m) => m.id !== user.id,
+      )[0];
+      result.room.imageURL = chatPartner.avatarUrl;
+      result.room.name = `${chatPartner.lastName} ${chatPartner.firstName}`;
     }
 
-    return savedGroup;
+    return result;
   }
 
   @Post('/v2/room')
@@ -376,10 +404,12 @@ export class ChatController {
         id: chatGroupId.toString(),
       },
     };
-    await sendPushNotifToSpecificUsers(
-      chatGroup?.members.filter((u) => u.id !== id).map((u) => u.id),
-      silentNotification,
-    );
+    if (chatGroup?.members?.length) {
+      await sendPushNotifToSpecificUsers(
+        chatGroup?.members.map((u) => u.id),
+        silentNotification,
+      );
+    }
   }
 
   @Delete('/v2/reaction/:reactionId')
@@ -405,6 +435,15 @@ export class ChatController {
     return reaction;
   }
 
+  @Get('get-reactions/:messageID')
+  @UseGuards(JwtAuthenticationGuard)
+  async getReactions(
+    @Param('messageID') messageID: number,
+  ): Promise<ChatMessageReaction[]> {
+    const reactions = await this.chatService.getReactions(messageID);
+    return reactions;
+  }
+
   @Get('/v2/room/:roomId')
   @UseGuards(JwtAuthenticationGuard)
   async getRoomDetail(
@@ -412,10 +451,13 @@ export class ChatController {
     @Req() req: RequestWithUser,
   ): Promise<ChatGroup> {
     const { user } = req;
-    const roomDetail = await this.chatService.getRoomDetail(Number(roomId));
-    if (!roomDetail.members.filter((m) => m.id === user.id).length) {
-      throw new BadRequestException('チャットルームを取得する権限がありません');
-    }
+    const roomDetail = await this.chatService.getRoomDetail(
+      Number(roomId),
+      user.id,
+    );
+    // if (!roomDetail.members.filter((m) => m.id === user.id).length) {
+    //   throw new BadRequestException('チャットルームを取得する権限がありません');
+    // }
     return roomDetail;
   }
 
@@ -439,17 +481,17 @@ export class ChatController {
   async createChatNotes(
     @Body() body: Partial<ChatNote>,
     @Req() req: RequestWithUser,
-  ) {
+  ): Promise<SaveNoteResult> {
     const { user } = req;
     body.editors = [user];
-    const notes = await this.chatNoteService.saveChatNotes(body);
-    await this.chatService.sendMessage({
+    const note = await this.chatNoteService.saveChatNotes(body);
+    const systemMessage = await this.chatService.sendMessage({
       content: `${userNameFactory(user)}さんが新しいノートを作成しました`,
       type: ChatMessageType.SYSTEM_TEXT,
       chatGroup: body.chatGroup,
       sender: user,
     });
-    return notes;
+    return { note, systemMessage };
   }
 
   @Patch('/v2/room/:roomId/note/:noteId')
@@ -473,11 +515,13 @@ export class ChatController {
   @Get('/v2/room/:roomId/note/:noteId')
   @UseGuards(JwtAuthenticationGuard)
   async getChatNoteDetail(
+    @Param('roomId') roomId: string,
     @Param('noteId') noteId: string,
     @Req() req: RequestWithUser,
   ) {
     const { id: userID } = req.user;
     const notes = await this.chatNoteService.getChatNoteDetail(
+      Number(roomId),
       Number(noteId),
       userID,
     );
@@ -504,19 +548,19 @@ export class ChatController {
   async createChatAlbums(
     @Body() body: Partial<ChatAlbum>,
     @Req() req: RequestWithUser,
-  ) {
+  ): Promise<SaveAlbumResult> {
     const { user } = req;
     body.editors = [user];
-    const albums = await this.chatAlbumService.saveChatAlbums(body);
-    await this.chatService.sendMessage({
+    const album = await this.chatAlbumService.saveChatAlbums(body);
+    const systemMessage = await this.chatService.sendMessage({
       content: `${userNameFactory(user)}さんが新しいアルバム: ${
-        albums.title
+        album.title
       }を作成しました`,
       type: ChatMessageType.SYSTEM_TEXT,
       chatGroup: body.chatGroup,
       sender: user,
     });
-    return albums;
+    return { album, systemMessage };
   }
 
   @Patch('/v2/room/:roomId/album/:albumId')
@@ -543,10 +587,14 @@ export class ChatController {
   @Get('/v2/room/:roomId/album/:albumId')
   @UseGuards(JwtAuthenticationGuard)
   async getChatAlbumDetail(
+    @Req() req: RequestWithUser,
+    @Param('roomId') roomId: string,
     @Param('albumId') albumId: string,
     // @Query('page') page: string,
   ) {
     const albums = await this.chatAlbumService.getChatAlbumImages(
+      req.user.id,
+      Number(roomId),
       Number(albumId),
     );
     return albums;

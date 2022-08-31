@@ -25,7 +25,6 @@ const UserList = () => {
   const router = useRouter();
   const query = router.query as SearchQueryToGetUsers;
   const { data: tags } = useAPIGetUserTag();
-  const [searchWord, setSearchWord] = useState(query.word);
   const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
   const { data: users, isLoading } = useAPISearchUsers(query);
 
@@ -119,9 +118,7 @@ const UserList = () => {
         <div className={userListStyles.search_form_wrapper}>
           <SearchForm
             onClear={() => setSelectedTags([])}
-            value={searchWord || ''}
-            onChange={(e) => setSearchWord(e.currentTarget.value)}
-            onClickButton={() => queryRefresh({ page: '1', word: searchWord })}
+            onClickButton={(w) => queryRefresh({ page: '1', word: w })}
             tags={tags || []}
             selectedTags={selectedTags}
             toggleTag={onToggleTag}
@@ -148,6 +145,7 @@ const UserList = () => {
                         sort:
                           (e.target.value as 'event' | 'question' | 'answer') ||
                           undefined,
+                        page: '1',
                       });
                       return;
                     }}>
@@ -170,6 +168,7 @@ const UserList = () => {
                       queryRefresh({
                         duration:
                           (e.target.value as 'week' | 'month') || undefined,
+                        page: '1',
                       });
                       return;
                     }}>

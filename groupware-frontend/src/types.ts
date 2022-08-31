@@ -124,7 +124,7 @@ export interface User {
   qaAnswerReplies?: QAAnswerReply[];
   //this params is sent when login
   token?: string;
-  userGoodForBoard?: Wiki[];
+  userGoodForBoard?: UserGoodForBoard[];
   eventCount?: number;
   questionCount?: number;
   answerCount?: number;
@@ -150,6 +150,12 @@ export interface UserTag {
   users?: User[];
 }
 
+export type UserGoodForBoard = {
+  id: number;
+  user: User;
+  wiki: Wiki;
+};
+
 export interface Wiki {
   id: number;
   title: string;
@@ -165,8 +171,10 @@ export interface Wiki {
   bestAnswer?: QAAnswer;
   createdAt: Date;
   updatedAt: Date;
-  userGoodForBoard?: User[];
+  userGoodForBoard?: UserGoodForBoard[];
   isGoodSender?: boolean;
+  goodsCount?: number;
+  answersCount?: number;
 }
 
 export interface QAAnswerReply {
@@ -298,9 +306,15 @@ export interface ChatMessage {
   reactions?: ChatMessageReaction[];
   createdAt: Date;
   updatedAt: Date;
+  modifiedAt: Date;
   isSender?: boolean;
   callTime?: string;
   replyParentMessage?: ChatMessage;
+}
+
+export interface SocketMessage {
+  chatMessage: ChatMessage;
+  type: 'send' | 'edit' | 'delete';
 }
 
 export enum RoomType {
@@ -318,11 +332,17 @@ export interface ChatGroup {
   chatNotes?: ChatNote[];
   chatMessages?: ChatMessage[];
   members?: User[];
+  memberCount: number;
   lastReadChatTime?: LastReadChatTime[];
   hasBeenRead?: boolean;
   unreadCount?: number;
   createdAt: Date;
   updatedAt: Date;
+}
+
+export interface SaveRoomsResult {
+  room: ChatGroup;
+  systemMessage: ChatMessage[];
 }
 
 export interface LastReadChatTime {
@@ -341,6 +361,11 @@ export interface ChatNote {
   createdAt: Date;
   updatedAt: Date;
   isEditor?: boolean;
+}
+
+export interface SaveNoteResult {
+  note: ChatNote;
+  systemMessage: ChatMessage;
 }
 
 export interface ChatNoteImage {
@@ -363,6 +388,10 @@ export interface ChatAlbum {
   isEditor?: boolean;
 }
 
+export interface SaveAlbumResult {
+  album: ChatAlbum;
+  systemMessage: ChatMessage;
+}
 export interface ChatAlbumImage {
   id: number;
   fileName: string;

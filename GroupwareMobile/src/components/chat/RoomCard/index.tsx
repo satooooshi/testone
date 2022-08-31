@@ -83,7 +83,7 @@ const RoomCard: React.FC<RoomCardProps> = ({
       case ChatMessageType.CALL:
         return latestCall(chatMessage);
       default:
-        return mentionTransform(chatMessage.content);
+        return mentionTransform(chatMessage.content).trim();
     }
   };
 
@@ -126,7 +126,7 @@ const RoomCard: React.FC<RoomCardProps> = ({
             {room.isPinned && (
               <Icon
                 name="pin"
-                fontSize={26}
+                fontSize={18}
                 color="green500"
                 bg="white"
                 rounded="circle"
@@ -136,7 +136,7 @@ const RoomCard: React.FC<RoomCardProps> = ({
                 style={Platform.OS === 'android' && roomCardStyles.pinIcon}
                 position="absolute"
                 bottom={0}
-                right={10}
+                right={0}
               />
             )}
           </Div>
@@ -177,7 +177,7 @@ const RoomCard: React.FC<RoomCardProps> = ({
                 : ''}
             </Text>
             <Div flexDir="row" justifyContent="space-between">
-              <Text>{`${room.members?.length || 0}人のメンバー`}</Text>
+              <Text>{`${room.memberCount}人のメンバー`}</Text>
               <Text>
                 {dateTimeFormatterFromJSDDate({
                   dateTime: new Date(

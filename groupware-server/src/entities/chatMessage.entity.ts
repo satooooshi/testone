@@ -91,6 +91,9 @@ export class ChatMessage {
   })
   updatedAt: Date;
 
+  @Column({ type: 'datetime', name: 'modified_at', nullable: true })
+  modifiedAt: Date | null;
+
   isSender?: boolean;
 
   @ManyToOne(() => ChatMessage, (chatMessage) => chatMessage.id)
@@ -134,6 +137,8 @@ export class ChatMessage {
         content = '動画を送信しました。';
       } else if (this.type === ChatMessageType.OTHER_FILE) {
         content = 'ファイルを送信しました。';
+      } else if (this.type === ChatMessageType.STICKER) {
+        content = 'スタンプを送信しました。';
       }
       const mentionRegex = /@\[.*?\]\(([0-9]+)\)/g;
       const mentionedIds: number[] = [];
@@ -201,13 +206,13 @@ export class ChatMessage {
           id: this.chatGroup.id.toString(),
         },
       };
-      console.log(
-        '---====',
-        notifiedUsers.map((u) => u.id),
-        this.chatGroup.members.map((u) => u.id),
-        this.sender.id,
-        title,
-      );
+      // console.log(
+      //   '---====',
+      //   notifiedUsers.map((u) => u.id),
+      //   this.chatGroup.members.map((u) => u.id),
+      //   this.sender.id,
+      //   title,
+      // );
 
       await sendPushNotifToSpecificUsers(
         notifiedUsers.map((u) => u.id),

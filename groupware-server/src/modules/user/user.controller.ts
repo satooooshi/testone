@@ -16,6 +16,8 @@ import RequestWithUser from '../auth/requestWithUser.interface';
 import { UserService } from './user.service';
 import UpdatePasswordDto from './dto/updatePasswordDto';
 import { Response } from 'express';
+import { ChatService } from '../chat/chat.service';
+import { ReqUserOrRolesGuard, Roles, RolesGuard } from '../auth/roles.guard';
 
 export interface SearchQueryToGetUsers {
   page?: string;
@@ -34,7 +36,10 @@ export interface QueryToGetUserCsv {
 
 @Controller('user')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly userService: UserService,
+    private readonly chatService: ChatService,
+  ) {}
 
   //@TODO this endpoint is for inputting data
   // @Post('register-users')
@@ -78,6 +83,7 @@ export class UserController {
   async getAllInfoById(@Param() params: { id: number }): Promise<User> {
     const { id } = params;
     const userProfile = await this.userService.getAllInfoById(id);
+
     return userProfile;
   }
 
@@ -98,15 +104,19 @@ export class UserController {
     return usersExceptRequestUser;
   }
 
-  @UseGuards(JwtAuthenticationGuard)
+  @UseGuards(JwtAuthenticationGuard, ReqUserOrRolesGuard)
+  @Roles(UserRole.ADMIN)
   @Post('update-user')
   async updateUser(
     @Req() request: RequestWithUser,
     @Body() user: Partial<User>,
   ): Promise<User> {
-    if (!user.id) {
-      return await this.userService.saveUser({ ...request.user, ...user });
+    if (!user?.id) {
+      throw new BadRequestException('The user is not exist');
     }
+    // if (!user.id) {
+    //   return await this.userService.saveUser({ ...request.user, ...user });
+    // }
     return await this.userService.saveUser(user);
   }
 
@@ -120,9 +130,16 @@ export class UserController {
     return await this.userService.updatePassword(request, content);
   }
 
-  @UseGuards(JwtAuthenticationGuard)
+  @UseGuards(JwtAuthenticationGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
   @Post('delete-user')
   async deleteUser(@Body() user: User) {
-    return await this.userService.deleteUser(user);
+    const rooms = await this.chatService.getRoomsId(user.id);
+    for (const r of rooms) {
+      if (r.id) {
+        await this.chatService.leaveChatRoom(user.id, r.id);
+      }
+    }
+    await this.userService.deleteUser(user);
   }
 }

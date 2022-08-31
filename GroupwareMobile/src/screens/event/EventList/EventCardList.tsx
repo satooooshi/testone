@@ -16,6 +16,7 @@ import SearchForm from '../../../components/common/SearchForm';
 import EventFormModal from '../../../components/events/EventFormModal';
 import {useAPICreateEvent} from '../../../hooks/api/event/useAPICreateEvent';
 import {responseErrorMsgFactory} from '../../../utils/factory/responseEroorMsgFactory';
+import {useIsFocused} from '@react-navigation/native';
 
 type EventCardListProps = {
   status: EventStatus;
@@ -51,16 +52,20 @@ const EventCardList: React.FC<EventCardListProps> = ({
     status,
     type,
   });
-  const {isLoading} = useAPIGetEventList(searchQuery, {
+  const isFocused = useIsFocused();
+
+  const {refetch, isLoading} = useAPIGetEventList(searchQuery, {
+    enabled: false,
     onSuccess: data => {
       setEventsForInfiniteScroll(e => {
-        if (e.length) {
-          return [...e, ...data.events];
+        if (searchQuery.page === '1') {
+          return data.events;
         }
-        return data.events;
+        return [...e, ...data.events];
       });
     },
   });
+
   const [visibleSearchFormModal, setVisibleSearchFormModal] = useState(false);
   const [eventsForInfinitScroll, setEventsForInfiniteScroll] = useState<
     EventSchedule[]
@@ -74,14 +79,27 @@ const EventCardList: React.FC<EventCardListProps> = ({
   };
 
   useEffect(() => {
-    if (partOfSearchQuery.refetchNeeded) {
-      setSearchQuery(q => ({
-        ...q,
-        page: '1',
-      }));
-      setPartOfSearchQuery({refetchNeeded: false});
+    if (isFocused) {
+      refetch();
     }
-  }, [partOfSearchQuery.refetchNeeded, setPartOfSearchQuery]);
+  }, [isFocused, refetch, searchQuery]);
+
+  useEffect(() => {
+    if (!isFocused) {
+      setSearchQuery(q => ({...q, ...partOfSearchQuery, page: '1'}));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isFocused]);
+
+  // useEffect(() => {
+  //   if (partOfSearchQuery.refetchNeeded) {
+  //     setSearchQuery(q => ({
+  //       ...q,
+  //       page: '1',
+  //     }));
+  //     setPartOfSearchQuery({refetchNeeded: false});
+  //   }
+  // }, [partOfSearchQuery.refetchNeeded, setPartOfSearchQuery, status]);
 
   const queryRefresh = (
     query: Partial<SearchQueryToGetEvents>,
@@ -94,7 +112,6 @@ const EventCardList: React.FC<EventCardListProps> = ({
   };
 
   useEffect(() => {
-    setEventsForInfiniteScroll([]);
     setSearchQuery(q => ({...q, ...partOfSearchQuery, page: '1'}));
   }, [partOfSearchQuery]);
 
@@ -130,7 +147,7 @@ const EventCardList: React.FC<EventCardListProps> = ({
             style={tailwind('h-full pt-4')}
             onEndReached={onEndReached}
             data={eventsForInfinitScroll}
-            keyExtractor={item => item.id.toString()}
+            keyExtractor={item => item.title + item.id.toString()}
             renderItem={({item: eventSchedule}) => (
               <Div mb={16}>
                 <EventCard event={eventSchedule} />

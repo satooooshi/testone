@@ -20,6 +20,7 @@ import {
   Dropdown,
   Input,
   Image,
+  Box,
 } from 'react-native-magnus';
 import WholeContainer from '../../components/WholeContainer';
 import {useAPIGetMessages} from '../../hooks/api/chat/useAPIGetMessages';
@@ -32,6 +33,8 @@ import {
   ChatMessageReaction,
   ChatMessageType,
   FIleSource,
+  RoomType,
+  SocketMessage,
   User,
 } from '../../types';
 import {uploadImageFromGallery} from '../../utils/cropImage/uploadImageFromGallery';
@@ -76,9 +79,7 @@ import {useAPIGetRoomDetail} from '../../hooks/api/chat/useAPIGetRoomDetail';
 import {chatMessageSchema} from '../../utils/validation/schema';
 import {reactionEmojis} from '../../utils/factory/reactionEmojis';
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
-import io from 'socket.io-client';
 import {baseURL, storage} from '../../utils/url';
-import {getThumbnailOfVideo} from '../../utils/getThumbnailOfVideo';
 import {useAuthenticate} from '../../contexts/useAuthenticate';
 import {useInviteCall} from '../../contexts/call/useInviteCall';
 import {reactionStickers} from '../../utils/factory/reactionStickers';
@@ -88,20 +89,20 @@ import ChatShareIcon from '../../components/common/ChatShareIcon';
 import {getFileUrl} from '../../utils/storage/getFileUrl';
 import {useHandleBadge} from '../../contexts/badge/useHandleBadge';
 import {useIsTabBarVisible} from '../../contexts/bottomTab/useIsTabBarVisible';
-import {debounce} from 'lodash';
 import Clipboard from '@react-native-community/clipboard';
 import {dateTimeFormatterFromJSDDate} from '../../utils/dateTimeFormatterFromJSDate';
 import {useAPIGetUpdatedMessages} from '../../hooks/api/chat/useAPIGetUpdatedMessages';
 import {useAPIGetExpiredUrlMessages} from '../../hooks/api/chat/useAPIGetExpiredUrlMessages';
-
-// const socket = io('http://34.84.206.131:3001/', {
-//   transports: ['websocket'],
-// });
+import {useChatSocket} from '../../utils/socket';
+import {useAPIUpdateChatMessage} from '../../hooks/api/chat/useAPIUpdateChatMessage';
+import {useAPIDeleteChatMessage} from '../../hooks/api/chat/useAPIDeleteChatMessage';
+import uuid from 'react-native-uuid';
+import {useAPIGetReactions} from '../../hooks/api/chat/useAPIGetReactions';
 
 const TopTab = createMaterialTopTabNavigator();
 
 const Chat: React.FC = () => {
-  const {user: myself, setCurrentChatRoomId} = useAuthenticate();
+  const {user: myself} = useAuthenticate();
   const typeDropdownRef = useRef<any | null>(null);
   const messageIosRef = useRef<FlatList | null>(null);
   const messageAndroidRef = useRef<{flatListRef: Element | null}>({
@@ -114,7 +115,7 @@ const Chat: React.FC = () => {
   const isFocused = useIsFocused();
   const {setIsTabBarVisible} = useIsTabBarVisible();
   const {data: roomDetail, refetch: refetchRoomDetail} = useAPIGetRoomDetail(
-    room.id,
+    Number(room.id),
   );
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [focusedMessageID, setFocusedMessageID] = useState<number>();
@@ -138,11 +139,10 @@ const Chat: React.FC = () => {
   }, [messages]);
   const [nowImageIndex, setNowImageIndex] = useState<number>(0);
   const [video, setVideo] = useState<FIleSource>();
-  const {data: lastReadChatTime, refetch: refetchLastReadChatTime} =
-    useAPIGetLastReadChatTime(room.id);
   const [longPressedMsg, setLongPressedMgg] = useState<ChatMessage>();
   const [reactionTarget, setReactionTarget] = useState<ChatMessage>();
   const [visibleStickerSelctor, setVisibleStickerSelector] = useState(false);
+  const [editMessage, setEditMessage] = useState(false);
   const {mutate: saveReaction} = useAPISaveReaction();
   const {width: windowWidth, height: windowHeight} = useWindowDimensions();
   const [footerHeight, setFooterHeight] = useState(0);
@@ -152,24 +152,50 @@ const Chat: React.FC = () => {
   >();
   const {handleEnterRoom, refetchRoomCard} = useHandleBadge();
   const [selectedEmoji, setSelectedEmoji] = useState<string>();
-  const {mutate: saveLastReadChatTime} = useAPISaveLastReadChatTime();
   const [selectedMessageForCheckLastRead, setSelectedMessageForCheckLastRead] =
     useState<ChatMessage>();
   const [appState, setAppState] = useState<AppStateStatus>('active');
 
-  const {values, handleSubmit, setValues} = useFormik<Partial<ChatMessage>>({
+  const refreshMessage = (targetMessages: ChatMessage[]): ChatMessage[] => {
+    const arrayIncludesDuplicate = [...messages, ...targetMessages];
+    return arrayIncludesDuplicate
+      .filter((value, index, self) => {
+        return index === self.findIndex(m => m.id === value.id);
+      })
+      .sort((a, b) => b.id - a.id);
+  };
+  const socket = useChatSocket(
+    roomDetail ? roomDetail : {...room, id: Number(room.id)},
+    refreshMessage,
+    setMessages,
+  );
+  const messageContentRef = useRef('');
+
+  const {values, handleSubmit, setValues, resetForm} = useFormik<
+    Partial<ChatMessage>
+  >({
     initialValues: {
       content: '',
       type: ChatMessageType.TEXT,
       replyParentMessage: null,
-      chatGroup: room,
+      chatGroup: roomDetail ? roomDetail : {...room, id: Number(room.id)},
     },
-    validationSchema: chatMessageSchema,
     enableReinitialize: true,
     onSubmit: submittedValues => {
-      Keyboard.dismiss();
-      if (submittedValues.content) {
-        sendChatMessage(submittedValues);
+      setValues(v => ({...v, content: messageContentRef.current}));
+      if (messageContentRef.current) {
+        if (editMessage) {
+          updateChatMessage({
+            ...submittedValues,
+            content: messageContentRef.current,
+          });
+        } else {
+          sendChatMessage({
+            ...submittedValues,
+            content: messageContentRef.current,
+          });
+        }
+        // Keyboard.dismiss();
       }
     },
   });
@@ -179,7 +205,7 @@ const Chat: React.FC = () => {
     refetch: refetchFetchedPastMessages,
   } = useAPIGetMessages(
     {
-      group: room.id,
+      group: Number(room.id),
       limit: 20,
       after,
       before,
@@ -188,12 +214,16 @@ const Chat: React.FC = () => {
     {
       enabled: false,
       onSuccess: res => {
+        console.log('refetchFetchedPastMessages called', res?.length);
         if (res?.length) {
           const refreshedMessage = refreshMessage(res);
-          console.log('refreshMessage =============', refreshedMessage.length);
+          // if (refreshedMessage.length) {
+          //   saveMessages(refreshedMessage.slice(0, 20));
+          // }
+          // console.log('refreshMessage =============', refreshedMessage.length);
           setMessages(refreshedMessage);
-          if (refetchDoesntExistMessages(res[0].id)) {
-            refetchDoesntExistMessages(res[0].id + 20);
+          if (!messages.filter(m => m.id === res[0].id)?.length) {
+            refetchDoesntExistMessages(res[res.length - 1].id);
           } else {
             setAfter(undefined);
             setInclude(false);
@@ -205,7 +235,7 @@ const Chat: React.FC = () => {
   );
 
   const {refetch: getExpiredUrlMessages} = useAPIGetExpiredUrlMessages(
-    room.id,
+    Number(room.id),
     {
       onSuccess: data => {
         setMessages(mgs => {
@@ -224,16 +254,16 @@ const Chat: React.FC = () => {
 
   const {data: searchedResults, refetch: searchMessages} = useAPISearchMessages(
     {
-      group: room.id,
+      group: Number(room.id),
       word: inputtedSearchWord,
     },
   );
   const suggestions = (): Suggestion[] => {
-    if (!room.members) {
+    if (!roomDetail?.members) {
       return [];
     }
     const users =
-      room?.members
+      roomDetail?.members
         ?.filter(u => u.id !== myself?.id)
         .map(u => ({
           id: `${u.id}`,
@@ -244,42 +274,8 @@ const Chat: React.FC = () => {
     return users;
   };
 
-  // const {refetch: refetchLatest} = useAPIGetMessages(
-  //   {
-  //     group: room.id,
-  //     limit: room.unreadCount || 0,
-  //   },
-  //   {
-  //     enabled: false,
-  //     onSuccess: latestData => {
-  //       if (latestData?.length) {
-  //         const msgToAppend: ChatMessage[] = [];
-  //         const imagesToApped: ImageSource[] = [];
-  //         for (const latest of latestData) {
-  //           if (!messages?.length || isRecent(latest, messages?.[0])) {
-  //             msgToAppend.push(latest);
-  //             if (latest.type === ChatMessageType.IMAGE) {
-  //               imagesToApped.unshift({uri: latest.content});
-  //             }
-  //           }
-  //         }
-  //         setMessages(m => refreshMessage([...msgToAppend, ...m]));
-  //         // setImagesForViewing(i => [...i, ...imagesToApped]);
-  //       }
-  //       console.log('latest success ====================', latestData.length);
-  //       const now = dateTimeFormatterFromJSDDate({
-  //         dateTime: new Date(),
-  //         format: 'yyyy-LL-dd HH:mm:ss',
-  //       });
-
-  //       storage.set(`dateRefetchLatestInRoom${room.id}user${myself?.id}`, now);
-  //     },
-  //   },
-  // );
-
   const {mutate: refetchUpdatedMessages} = useAPIGetUpdatedMessages({
     onSuccess: latestData => {
-      refetchLastReadChatTime();
       if (appState === 'active') {
         if (latestData?.length) {
           // const msgToAppend: ChatMessage[] = [];
@@ -304,36 +300,34 @@ const Chat: React.FC = () => {
             `dateRefetchLatestInRoom${room.id}user${myself?.id}`,
             now,
           );
-          saveLastReadChatTime(room.id);
-          storage.set(`dateRefetchLatestInRoom${room.id}`, now);
+          socket.saveLastReadTimeAndReport();
           setMessages(m => {
             const updatedMessages = refreshMessage([...latestData, ...m]);
-            // if (updatedMessages[0].id !== m[0].id) {
-            //   refetchLastReadChatTime();
-            // }
             return updatedMessages;
           });
-          // setImagesForViewing(i => [...i, ...imagesToApped]);
         }
-        setRefetchTimes(t => t + 1);
       }
+    },
+  });
+
+  const {mutate: getReactions} = useAPIGetReactions({
+    onSuccess: res => {
+      setSelectedReactions(res);
     },
   });
 
   const {mutate: sendChatMessage, isLoading: loadingSendMessage} =
     useAPISendChatMessage({
       onSuccess: sentMsg => {
-        // socket.emit('message', {...sentMsg, isSender: false});
-        setMessages(refreshMessage([sentMsg, ...messages]));
+        socket.send({chatMessage: sentMsg, type: 'send'});
+        setMessages(msg => refreshMessage([sentMsg, ...msg]));
         if (sentMsg?.chatGroup?.id) {
           refetchRoomCard({id: sentMsg.chatGroup.id, type: ''});
         }
-        setValues(v => ({
-          ...v,
-          content: '',
-          type: ChatMessageType.TEXT,
-          replyParentMessage: undefined,
-        }));
+        if (sentMsg.type === ChatMessageType.TEXT) {
+          // setValues(v => ({...v, content: ''}));
+          resetForm();
+        }
       },
       onError: () => {
         Alert.alert(
@@ -341,6 +335,25 @@ const Chat: React.FC = () => {
         );
       },
     });
+
+  const {mutate: updateChatMessage} = useAPIUpdateChatMessage({
+    onSuccess: sentMsg => {
+      socket.send({
+        type: 'edit',
+        chatMessage: {...sentMsg, isSender: false},
+      });
+      resetForm();
+      setLongPressedMgg(undefined);
+      setEditMessage(false);
+    },
+    onError: () => {
+      Alert.alert(
+        'チャットの更新中にエラーが発生しました。\n時間をおいて再度実行してください。',
+      );
+    },
+  });
+
+  const {mutate: deleteMessage} = useAPIDeleteChatMessage();
 
   const {mutate: uploadFile, isLoading: loadingUploadFile} =
     useAPIUploadStorage();
@@ -356,18 +369,23 @@ const Chat: React.FC = () => {
     reaction: ChatMessageReaction,
     target: ChatMessage,
   ) => {
-    deleteReaction(reaction, {
+    const reactionSentMyself = target.reactions?.filter(
+      r => r.emoji === reaction.emoji && r.isSender,
+    )[0];
+    deleteReaction(reactionSentMyself || reaction, {
       onSuccess: reactionId => {
         setMessages(m => {
           return refreshMessage(
             m.map(eachMessage => {
               if (eachMessage.id === target.id) {
-                return {
+                const message = {
                   ...eachMessage,
                   reactions: eachMessage.reactions?.filter(
                     r => r.id !== reactionId,
                   ),
                 };
+                socket.send({type: 'edit', chatMessage: message});
+                return message;
               }
               return eachMessage;
             }),
@@ -394,12 +412,14 @@ const Chat: React.FC = () => {
         setMessages(m =>
           m.map(eachMessage => {
             if (eachMessage.id === savedReaction.chatMessage?.id) {
-              return {
+              const message = {
                 ...eachMessage,
                 reactions: eachMessage.reactions?.length
                   ? [...eachMessage.reactions, reactionAdded]
                   : [reactionAdded],
               };
+              socket.send({type: 'edit', chatMessage: message});
+              return message;
             }
             return eachMessage;
           }),
@@ -418,18 +438,24 @@ const Chat: React.FC = () => {
       {
         mediaType: 'photo',
         cropping: false,
+        multiple: true,
       },
       useCamera,
     );
     if (formData) {
       uploadFile(formData, {
-        onSuccess: imageURL => {
-          sendChatMessage({
-            content: imageURL[0],
-            fileName: fileName ? fileName : imageURL[0] + '.png',
-            type: ChatMessageType.IMAGE,
-            chatGroup: room,
-          });
+        onSuccess: async imageURLs => {
+          for (let i = 0; i < imageURLs.length; i++) {
+            sendChatMessage({
+              content: imageURLs[i],
+              fileName: fileName?.[i] ? fileName[i] : uuid.v4() + '.png',
+              type: ChatMessageType.IMAGE,
+              chatGroup: roomDetail
+                ? roomDetail
+                : {...room, id: Number(room.id)},
+            });
+            await new Promise(r => setTimeout(r, 100));
+          }
         },
       });
     }
@@ -438,17 +464,21 @@ const Chat: React.FC = () => {
   const handleUploadVideo = async () => {
     const {formData, fileName} = await uploadImageFromGallery({
       mediaType: 'video',
-      multiple: false,
+      multiple: true,
     });
     if (formData) {
       uploadFile(formData, {
-        onSuccess: imageURL => {
-          sendChatMessage({
-            content: imageURL[0],
-            fileName: fileName ? fileName : imageURL[0] + '.mp4',
-            type: ChatMessageType.VIDEO,
-            chatGroup: room,
-          });
+        onSuccess: imageURLs => {
+          for (let i = 0; i < imageURLs.length; i++) {
+            sendChatMessage({
+              content: imageURLs[i],
+              fileName: fileName?.[i] ? fileName[i] : uuid.v4() + '.mp4',
+              type: ChatMessageType.VIDEO,
+              chatGroup: roomDetail
+                ? roomDetail
+                : {...room, id: Number(room.id)},
+            });
+          }
         },
       });
     }
@@ -463,25 +493,39 @@ const Chat: React.FC = () => {
         return url;
       }
     };
+    ('content://com.android.providers.media.documents/document/image%3A77');
     const res = await DocumentPicker.pickSingle({
       type: [DocumentPicker.types.allFiles],
     });
     const formData = new FormData();
+
     formData.append('files', {
       name: res.name,
-      uri: normalizeURL(res.uri),
+      uri: Platform.OS === 'ios' ? normalizeURL(res.uri) : res.uri,
       type: res.type,
     });
-    uploadFile(formData);
     if (formData) {
       uploadFile(formData, {
         onSuccess: imageURL => {
-          sendChatMessage({
-            content: imageURL[0],
-            fileName: res.name,
-            type: ChatMessageType.OTHER_FILE,
-            chatGroup: room,
-          });
+          Alert.alert('', `『${res.name}』を送信しますか？`, [
+            {
+              text: 'キャンセル',
+              style: 'cancel',
+            },
+            {
+              text: '送信',
+              onPress: () => {
+                sendChatMessage({
+                  content: imageURL[0],
+                  fileName: res.name,
+                  type: ChatMessageType.OTHER_FILE,
+                  chatGroup: roomDetail
+                    ? roomDetail
+                    : {...room, id: Number(room.id)},
+                });
+              },
+            },
+          ]);
         },
         onError: () => {
           Alert.alert(
@@ -496,14 +540,14 @@ const Chat: React.FC = () => {
     sendChatMessage({
       content: sticker,
       type: ChatMessageType.STICKER,
-      chatGroup: room,
+      chatGroup: roomDetail ? roomDetail : {...room, id: Number(room.id)},
     });
     setVisibleStickerSelector(false);
   };
 
   const playVideoOnModal = async (data: FIleSource) => {
     if (!data.createdUrl) {
-      const url = await getFileUrl(data.fileName, data.uri);
+      const url = await getFileUrl(data.fileName.replace(/\s+/g, ''), data.uri);
       if (url) {
         data.createdUrl = url;
       }
@@ -511,22 +555,10 @@ const Chat: React.FC = () => {
     setVideo(data);
   };
 
-  const isRecent = (created: ChatMessage, target: ChatMessage): boolean => {
-    if (new Date(created.createdAt) > new Date(target.createdAt)) {
-      return true;
-    }
-    return false;
-  };
-
-  const numbersOfRead = (message: ChatMessage) => {
-    return (
-      lastReadChatTime?.filter(time => time.readTime >= message.createdAt)
-        .length || 0
-    );
-  };
-
   const onScrollTopOnChat = () => {
-    setBefore(messages[messages.length - 1].id);
+    if (messages.length >= 20) {
+      setBefore(messages[messages.length - 1].id);
+    }
   };
 
   const scrollToRenderedMessage = () => {
@@ -586,13 +618,13 @@ const Chat: React.FC = () => {
   };
 
   const refetchDoesntExistMessages = (focused?: number) => {
-    if (!messages.length) {
-      return false;
+    if (!messages?.length) {
+      return;
     }
     const isExist = messages.filter(m => m.id === focused)?.length;
 
     if (!isExist) {
-      setAfter(focused);
+      setAfter(focused ? focused : 0);
       setInclude(true);
       return true;
     } else {
@@ -601,32 +633,25 @@ const Chat: React.FC = () => {
     }
   };
 
-  const refreshMessage = (targetMessages: ChatMessage[]): ChatMessage[] => {
-    const arrayIncludesDuplicate = [...messages, ...targetMessages];
-    return arrayIncludesDuplicate
-      .filter((value, index, self) => {
-        return index === self.findIndex(m => m.id === value.id);
-      })
-      .sort((a, b) => b.id - a.id);
-  };
-
   const saveMessages = (msg: ChatMessage[]) => {
     const jsonMessages = JSON.stringify(msg);
     storage.set(`messagesIntRoom${room.id}user${myself?.id}`, jsonMessages);
   };
 
-  useEffect(() => {
-    setBefore(undefined);
-    setAfter(undefined);
-  }, [room]);
+  // useEffect(() => {
+  //   setBefore(undefined);
+  //   setAfter(undefined);
+  // }, [room]);
 
   useEffect(() => {
-    refetchFetchedPastMessages();
-  }, [before, after, include, refetchFetchedPastMessages]);
+    if (before || after) {
+      refetchFetchedPastMessages();
+    }
+  }, [before, after, refetchFetchedPastMessages]);
 
   useEffect(() => {
     if (messages.length) {
-      saveMessages(messages);
+      saveMessages(messages.slice(0, 20));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [messages]);
@@ -647,11 +672,58 @@ const Chat: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [focusedMessageID]);
 
+  const handleDeleteMessage = () => {
+    if (longPressedMsg) {
+      Alert.alert(
+        'メッセージを削除してよろしいですか？',
+        '',
+        [
+          {text: 'キャンセル', style: 'cancel'},
+          {
+            text: '削除する',
+            style: 'destructive',
+            onPress: () =>
+              deleteMessage(longPressedMsg, {
+                onSuccess: () => {
+                  socket.send({
+                    type: 'delete',
+                    chatMessage: longPressedMsg,
+                  });
+                  setLongPressedMgg(undefined);
+                },
+              }),
+          },
+        ],
+        {cancelable: false},
+      );
+    }
+  };
+
+  const isBeforeTwelveHours = (createdAt: Date | undefined) => {
+    if (!createdAt) {
+      return false;
+    }
+    const date = new Date();
+    date.setHours(date.getHours() - 12);
+
+    return new Date(createdAt) > date;
+  };
+
+  const senderAvatars = useMemo(() => {
+    return roomDetail?.members?.map(m => ({
+      id: m.id,
+      avatar: <UserAvatar h={40} w={40} user={m} />,
+    }));
+  }, [roomDetail?.members]);
+
   const typeDropdown = (
     <Dropdown
       {...defaultDropdownProps}
       title="アクションを選択"
-      onBackdropPress={() => typeDropdownRef.current?.close()}
+      onBackdropPress={() => {
+        typeDropdownRef.current?.close();
+        setLongPressedMgg(undefined);
+      }}
       ref={typeDropdownRef}>
       <Dropdown.Option
         {...defaultDropdownOptionProps}
@@ -687,6 +759,38 @@ const Chat: React.FC = () => {
       ) : (
         <></>
       )}
+      {longPressedMsg?.sender?.id === myself?.id &&
+      longPressedMsg?.type === ChatMessageType.TEXT &&
+      isBeforeTwelveHours(longPressedMsg.createdAt) ? (
+        <Dropdown.Option
+          {...defaultDropdownOptionProps}
+          value="edit"
+          onPress={() => {
+            setEditMessage(true);
+            if (longPressedMsg) {
+              console.log('edit message', longPressedMsg);
+
+              setValues(longPressedMsg);
+              messageContentRef.current = longPressedMsg.content;
+            }
+          }}>
+          メッセージを編集
+        </Dropdown.Option>
+      ) : (
+        <></>
+      )}
+      {longPressedMsg?.sender?.id === myself?.id &&
+      isBeforeTwelveHours(longPressedMsg?.createdAt) ? (
+        <Dropdown.Option
+          {...defaultDropdownOptionProps}
+          value="edit"
+          color="red"
+          onPress={() => handleDeleteMessage()}>
+          メッセージを削除
+        </Dropdown.Option>
+      ) : (
+        <></>
+      )}
     </Dropdown>
   );
 
@@ -706,96 +810,44 @@ const Chat: React.FC = () => {
   }, [isFocused, setIsTabBarVisible]);
 
   useEffect(() => {
-    setCurrentChatRoomId(room.id);
-    // let isMounted = true;
-    // socket.connect();
-    // socket.emit('joinRoom', room.id.toString());
-    // socket.on('readMessageClient', async (senderId: string) => {
-    //   if (myself?.id && senderId && senderId !== `${myself?.id}`) {
-    //     console.log('readMessageClient called', senderId, myself.id, room.id);
-    //     refetchLastReadChatTime();
-    //   }
-    // });
-    // socket.on('msgToClient', async (sentMsgByOtherUsers: ChatMessage) => {
-    //   if (sentMsgByOtherUsers.content) {
-    //     if (
-    //       sentMsgByOtherUsers?.sender?.id !== myself?.id &&
-    //       AppState.currentState === 'active'
-    //     ) {
-    //       saveLastReadChatTime(room.id, {
-    //         onSuccess: () => {
-    //           socket.emit('readReport', {
-    //             room: room.id.toString(),
-    //             senderId: myself?.id,
-    //           });
-    //           handleEnterRoom(room.id);
-    //         },
-    //       });
-    //       refetchLastReadChatTime();
-    //     }
-    //     sentMsgByOtherUsers.createdAt = new Date(sentMsgByOtherUsers.createdAt);
-    //     sentMsgByOtherUsers.updatedAt = new Date(sentMsgByOtherUsers.updatedAt);
-    //     if (sentMsgByOtherUsers.sender?.id === myself?.id) {
-    //       sentMsgByOtherUsers.isSender = true;
-    //     }
-    //     // setImagesForViewing(i => [...i, {uri: sentMsgByOtherUsers.content}]);
-    //     if (isMounted) {
-    //       setMessages(msgs => {
-    //         if (
-    //           msgs.length &&
-    //           msgs[0].id !== sentMsgByOtherUsers.id &&
-    //           sentMsgByOtherUsers.chatGroup?.id === room.id
-    //         ) {
-    //           return refreshMessage([sentMsgByOtherUsers, ...msgs]);
-    //         } else if (sentMsgByOtherUsers.chatGroup?.id !== room.id) {
-    //           return refreshMessage(
-    //             msgs.filter(m => m.id !== sentMsgByOtherUsers.id),
-    //           );
-    //         }
-    //         return refreshMessage(msgs);
-    //       });
-    //     }
-    //   }
-    // });
-    // setCurrentChatRoomId(room.id);
-
-    // socket.on('joinedRoom', (r: any) => {
-    //   console.log('joinedRoom', r);
-    // });
-
-    // socket.on('leftRoom', (r: any) => {
-    //   console.log('leftRoom', r);
-    // });
-
+    socket.joinRoom();
+    refetchFetchedPastMessages();
     return () => {
-      setMessages([]);
-      handleEnterRoom(room.id);
-      // socket.emit('leaveRoom', room.id);
-      // isMounted = false;
-      // socket.disconnect();
-      setCurrentChatRoomId(undefined);
+      // saveMessages();
+      socket.leaveRoom();
+      setBefore(undefined);
+      setAfter(undefined);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [room.id]);
 
+  const handleRefetchUpdatedMessages = useCallback(
+    (messagesInStorageLength?: number) => {
+      const dateRefetchLatest = storage.getString(
+        `dateRefetchLatestInRoom${room.id}user${myself?.id}`,
+      );
+      refetchUpdatedMessages({
+        group: Number(room.id),
+        limit: messagesInStorageLength ? undefined : 20,
+        dateRefetchLatest: dateRefetchLatest,
+      });
+    },
+    [room.id, myself?.id, refetchUpdatedMessages],
+  );
+
   useEffect(() => {
-    saveLastReadChatTime(room.id);
     if (!messages.length) {
       const jsonMessagesInStorage = storage.getString(
         `messagesIntRoom${room.id}user${myself?.id}`,
       );
-      const dateRefetchLatest = storage.getString(
-        `dateRefetchLatestInRoom${room.id}user${myself?.id}`,
-      );
+
       let messagesInStorageLength;
       if (jsonMessagesInStorage) {
         const messagesInStorage = JSON.parse(jsonMessagesInStorage);
-        setMessages(messagesInStorage);
+        if (messagesInStorage?.length) {
+          setMessages(messagesInStorage);
+        }
         messagesInStorageLength = messagesInStorage?.length;
-        console.log(
-          'refetch updated messages ========================',
-          dateRefetchLatest,
-        );
         getExpiredUrlMessages();
       }
       const now = dateTimeFormatterFromJSDDate({
@@ -803,12 +855,8 @@ const Chat: React.FC = () => {
         format: 'yyyy-LL-dd HH:mm:ss',
       });
       storage.set(`dateRefetchLatestInRoom${room.id}`, now);
-      refetchUpdatedMessages({
-        group: room.id,
-        limit: messagesInStorageLength ? undefined : 20,
-        dateRefetchLatest: dateRefetchLatest,
-      });
-      handleEnterRoom(room.id);
+      handleRefetchUpdatedMessages(messagesInStorageLength);
+      handleEnterRoom(Number(room.id));
       // refetchLatest();
       refetchRoomDetail();
     }
@@ -817,13 +865,29 @@ const Chat: React.FC = () => {
 
   const readUsers = useCallback(
     (targetMsg: ChatMessage) => {
-      return lastReadChatTime
-        ? lastReadChatTime
-            .filter(t => new Date(t.readTime) >= new Date(targetMsg.createdAt))
+      return socket.lastReadChatTime
+        ? socket.lastReadChatTime
+            .filter(
+              t =>
+                new Date(t.readTime) >= new Date(targetMsg.createdAt) &&
+                t.user.id !== targetMsg?.sender?.id,
+            )
             .map(t => t.user)
         : [];
     },
-    [lastReadChatTime],
+    [socket.lastReadChatTime],
+  );
+  const unReadUsers = useCallback(
+    (targetMsg: ChatMessage) => {
+      const unreadUsers = roomDetail?.members?.filter(
+        existMembers =>
+          !readUsers(targetMsg)
+            .map(u => u.id)
+            .includes(existMembers.id),
+      );
+      return unreadUsers?.filter(u => u.id !== targetMsg?.sender?.id);
+    },
+    [readUsers, roomDetail?.members],
   );
 
   const renderMessage = (message: ChatMessage, messageIndex: number) => (
@@ -836,6 +900,9 @@ const Chat: React.FC = () => {
         scrollToRenderedMessage()
       }>
       <ChatMessageItem
+        senderAvatar={
+          senderAvatars?.find(s => s.id === message.sender?.id)?.avatar
+        }
         message={message}
         readUsers={readUsers(message)}
         inputtedSearchWord={inputtedSearchWord}
@@ -844,20 +911,24 @@ const Chat: React.FC = () => {
         scrollToTarget={scrollToTarget}
         isScrollTarget={focusedMessageID === message.id}
         onCheckLastRead={() => setSelectedMessageForCheckLastRead(message)}
-        numbersOfRead={numbersOfRead(message)}
+        // numbersOfRead={numbersOfRead(message)}
         onLongPress={() => setLongPressedMgg(message)}
         onPressImage={() => showImageOnModal(message.content)}
-        onPressVideo={() =>
-          playVideoOnModal({uri: message.content, fileName: message.fileName})
-        }
-        onPressReaction={r =>
-          r.isSender
+        onPressVideo={() => {
+          console.log(message.fileName);
+          playVideoOnModal({
+            uri: message.content,
+            fileName: message.fileName,
+          });
+        }}
+        onPressReaction={(r, isSender) =>
+          isSender
             ? handleDeleteReaction(r, message)
             : handleSaveReaction(r.emoji, message)
         }
         onLongPressReation={() => {
           if (message.reactions?.length && message.isSender) {
-            setSelectedReactions(message.reactions);
+            getReactions(message.id);
           }
         }}
       />
@@ -902,19 +973,30 @@ const Chat: React.FC = () => {
         <Icon name="close" fontSize={24} />
       </TouchableOpacity>
       <ScrollView horizontal={true}>
-        {reactionStickers.map(e => (
-          <TouchableOpacity
-            key={e.name}
-            onPress={() => handleStickerSelected(e.name)}>
-            <Image
-              source={e.src ? e.src : null}
-              style={{height: 80, width: 80, margin: 10}}
-            />
-          </TouchableOpacity>
-        ))}
+        <View style={tailwind('h-52 flex flex-wrap')}>
+          {reactionStickers.map(e => (
+            <TouchableOpacity
+              key={e.name}
+              onPress={() => handleStickerSelected(e.name)}>
+              <Image
+                source={e.src}
+                style={tailwind('overflow-visible h-20 w-20 m-2.5')}
+              />
+            </TouchableOpacity>
+          ))}
+        </View>
       </ScrollView>
     </Div>
   );
+
+  const renderItem = ({item, index}: {item: ChatMessage; index: number}) => {
+    return renderMessage(item, index);
+  };
+  const keyExtractor = useCallback(item => {
+    if (item.id) {
+      return item.id.toString();
+    }
+  }, []);
 
   const messageListAvoidngKeyboardDisturb = (
     <>
@@ -932,10 +1014,10 @@ const Chat: React.FC = () => {
             onScrollToIndexFailed={info => {
               setRenderMessageIndex(info.index);
             }}
-            onEndReached={() => onScrollTopOnChat()}
-            renderItem={({item: message, index}) =>
-              renderMessage(message, index)
-            }
+            windowSize={20}
+            onEndReached={onScrollTopOnChat}
+            renderItem={renderItem}
+            keyExtractor={keyExtractor}
           />
           {reactionTarget ? (
             reactionSelector
@@ -956,20 +1038,27 @@ const Chat: React.FC = () => {
                   setFooterHeight(nativeEvent.layout.y);
                 }}
               />
+              {editMessage ? (
+                <Box flexDir="row" alignItems="center" bg="gray">
+                  <Button
+                    bg="transparent"
+                    onPress={() => {
+                      setEditMessage(false);
+                      resetForm();
+                    }}>
+                    <Icon color="black" name="close" />
+                  </Button>
+                  <Text>メッセージ編集中</Text>
+                </Box>
+              ) : null}
               <ChatFooter
                 onUploadFile={handleUploadFile}
                 onUploadVideo={handleUploadVideo}
                 onUploadImage={handleUploadImage}
                 setVisibleStickerSelector={setVisibleStickerSelector}
-                text={values.content || ''}
+                text={values.content}
                 footerHeight={footerHeight}
-                onChangeText={t =>
-                  setValues(v => ({
-                    ...v,
-                    type: ChatMessageType.TEXT,
-                    content: t,
-                  }))
-                }
+                onChangeText={t => (messageContentRef.current = t)}
                 onSend={handleSubmit}
                 mentionSuggestions={suggestions()}
                 isLoading={isLoadingSending}
@@ -996,11 +1085,10 @@ const Chat: React.FC = () => {
             onScrollToIndexFailed={info => {
               setRenderMessageIndex(info.index);
             }}
-            onEndReached={() => onScrollTopOnChat()}
-            keyExtractor={item => item.id.toString()}
-            renderItem={({item: message, index}) =>
-              renderMessage(message, index)
-            }
+            windowSize={20}
+            onEndReached={onScrollTopOnChat}
+            keyExtractor={keyExtractor}
+            renderItem={renderItem}
           />
           {reactionTarget ? (
             reactionSelector
@@ -1021,20 +1109,27 @@ const Chat: React.FC = () => {
                   setFooterHeight(nativeEvent.layout.y);
                 }}
               />
+              {editMessage ? (
+                <Box flexDir="row" alignItems="center" bg="gray">
+                  <Button
+                    bg="transparent"
+                    onPress={() => {
+                      setEditMessage(false);
+                      resetForm();
+                    }}>
+                    <Icon color="black" name="close" />
+                  </Button>
+                  <Text>メッセージ編集中</Text>
+                </Box>
+              ) : null}
               <ChatFooter
                 onUploadFile={handleUploadFile}
                 onUploadVideo={handleUploadVideo}
                 onUploadImage={handleUploadImage}
                 setVisibleStickerSelector={setVisibleStickerSelector}
-                text={values.content || ''}
+                text={values.content}
                 footerHeight={footerHeight}
-                onChangeText={t =>
-                  setValues(v => ({
-                    ...v,
-                    type: ChatMessageType.TEXT,
-                    content: t,
-                  }))
-                }
+                onChangeText={t => (messageContentRef.current = t)}
                 onSend={handleSubmit}
                 mentionSuggestions={suggestions()}
                 isLoading={isLoadingSending}
@@ -1049,6 +1144,9 @@ const Chat: React.FC = () => {
   useEffect(() => {
     const unsubscribeAppState = () => {
       AppState.addEventListener('change', state => {
+        if (appState !== 'active' && state === 'active') {
+          handleRefetchUpdatedMessages();
+        }
         setAppState(state);
       });
     };
@@ -1057,56 +1155,16 @@ const Chat: React.FC = () => {
     };
   });
 
-  const [refetchTimes, setRefetchTimes] = useState(0);
   useEffect(() => {
-    const messageRefetchInterval = async () => {
-      await new Promise(r => setTimeout(r, 5000));
-      if (appState === 'active' && isFocused) {
-        console.log('messageRefetchInterval---', myself?.lastName);
-        const dateRefetchLatest = storage.getString(
-          `dateRefetchLatestInRoom${room.id}`,
-        );
-        refetchUpdatedMessages({
-          group: room.id,
-          limit: undefined,
-          dateRefetchLatest: dateRefetchLatest,
-        });
-      }
-    };
-    if (appState === 'active' && refetchTimes > 0) {
-      messageRefetchInterval();
+    if (
+      appState === 'active' &&
+      messages.length &&
+      messages[0]?.sender?.id !== myself?.id
+    ) {
+      socket.saveLastReadTimeAndReport();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [refetchTimes, appState]);
-
-  // useEffect(() => {
-  //   if (appState === 'active' && isFocused) {
-  //     saveLastReadChatTime(room.id, {
-  //       onSuccess: () => {
-  //         socket.emit('readReport', {
-  //           room: room.id.toString(),
-  //           senderId: myself?.id,
-  //         });
-  //         handleEnterRoom(room.id);
-  //       },
-  //     });
-  //   }
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [appState, isFocused]);
-
-  // useEffect(() => {
-  //   saveLastReadChatTime(room.id, {
-  //     onSuccess: () => {
-  //       socket.emit('readReport', {
-  //         room: room.id.toString(),
-  //         senderId: myself?.id,
-  //       });
-  //       handleEnterRoom(room.id);
-  //     },
-  //   });
-  //   return () => saveLastReadChatTime(room.id);
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [room.id, saveLastReadChatTime]);
+  }, [appState, messages?.[0]]);
 
   const readUserBox = (user: User) => (
     <View style={tailwind('flex-row bg-white items-center px-4 py-2')}>
@@ -1150,239 +1208,242 @@ const Chat: React.FC = () => {
   return (
     <WholeContainer>
       {typeDropdown}
-      <ReactionsModal
-        isVisible={!!selectedReactions}
-        selectedReactions={selectedReactions}
-        selectedEmoji={selectedEmoji}
-        onPressCloseButton={() => {
-          setSelectedReactions(undefined);
-        }}
-        onPressEmoji={emoji => setSelectedEmoji(emoji)}
-      />
-      {video?.fileName && video.uri ? (
-        <MagnusModal isVisible={!!video} bg="black">
-          <TouchableOpacity
-            style={chatStyles.cancelIcon}
-            onPress={() => {
-              setVideo(undefined);
-            }}>
-            <Icon
-              position="absolute"
-              name={'cancel'}
-              fontFamily="MaterialIcons"
-              fontSize={30}
-              color="#fff"
-            />
-          </TouchableOpacity>
-          <VideoPlayer
-            video={{
-              uri: video?.createdUrl,
-            }}
-            autoplay
-            videoWidth={windowWidth}
-            videoHeight={windowHeight * 0.9}
-          />
-          <TouchableOpacity
-            style={tailwind('absolute bottom-5 right-5')}
-            onPress={async () =>
-              await saveToCameraRoll({url: video.uri, type: 'video'})
-            }>
-            <Icon color="white" name="download" fontSize={24} />
-          </TouchableOpacity>
-          <ChatShareIcon image={video} isVideo />
-        </MagnusModal>
-      ) : null}
-
-      <MagnusModal isVisible={!!selectedMessageForCheckLastRead}>
-        <Button
-          bg="gray400"
-          h={35}
-          w={35}
-          right={15}
-          alignSelf="flex-end"
-          rounded="circle"
-          onPress={() => {
-            setSelectedMessageForCheckLastRead(undefined);
-          }}>
-          <Icon color="black" name="close" />
-        </Button>
-        <TopTab.Navigator initialRouteName={'ReadUsers'}>
-          <TopTab.Screen
-            name="ReadUsers"
-            children={() =>
-              selectedMessageForCheckLastRead ? (
-                <FlatList
-                  data={readUsers(selectedMessageForCheckLastRead)}
-                  keyExtractor={item => item.id.toString()}
-                  renderItem={({item}) => readUserBox(item)}
-                />
-              ) : (
-                <></>
-              )
-            }
-            options={{title: '既読'}}
-          />
-          <TopTab.Screen
-            name="UnReadUsers"
-            children={() =>
-              selectedMessageForCheckLastRead ? (
-                <FlatList
-                  data={roomDetail?.members?.filter(
-                    existMembers =>
-                      !readUsers(selectedMessageForCheckLastRead)
-                        .map(u => u.id)
-                        .includes(existMembers.id),
-                  )}
-                  keyExtractor={item => item.id.toString()}
-                  renderItem={({item}) => readUserBox(item)}
-                />
-              ) : (
-                <FlatList
-                  data={roomDetail?.members}
-                  keyExtractor={item => item.id.toString()}
-                  renderItem={({item}) => readUserBox(item)}
-                />
-              )
-            }
-            options={{title: '未読'}}
-          />
-        </TopTab.Navigator>
-      </MagnusModal>
-
-      <ImageView
-        animationType="slide"
-        images={imagesForViewing.map(i => {
-          return {uri: i.uri};
-        })}
-        imageIndex={nowImageIndex === -1 ? 0 : nowImageIndex}
-        visible={imageModal}
-        onRequestClose={() => setImageModal(false)}
-        swipeToCloseEnabled={false}
-        doubleTapToZoomEnabled={true}
-        FooterComponent={({imageIndex}) => (
-          <Div>
-            <DownloadIcon url={imagesForViewing[imageIndex].uri} />
-            <ChatShareIcon image={imagesForViewing[imageIndex]} />
-          </Div>
-        )}
-      />
-      <HeaderTemplate
-        title={roomDetail ? nameOfRoom(roomDetail, myself) : nameOfRoom(room)}
-        enableBackButton={true}
-        screenForBack={'RoomList'}>
-        <Div style={tailwind('flex flex-row')}>
-          <TouchableOpacity
-            style={tailwind('flex flex-row mr-1')}
-            onPress={() => setVisibleSearchInput(true)}>
-            <Icon
-              name="search"
-              fontFamily="Feather"
-              fontSize={26}
-              color={darkFontColor}
-            />
-          </TouchableOpacity>
-
-          {roomDetail?.members && roomDetail.members.length < 3 ? (
-            <Div mt={-4} mr={-4} style={tailwind('flex flex-row ')}>
-              <Button
-                bg="transparent"
-                pb={-3}
-                onPress={() => {
-                  Alert.alert('通話しますか？', undefined, [
-                    {
-                      text: 'はい',
-                      onPress: () => inviteCall(),
-                    },
-                    {
-                      text: 'いいえ',
-                      onPress: () => {},
-                    },
-                  ]);
-                }}>
-                <Icon
-                  name="call-outline"
-                  fontFamily="Ionicons"
-                  fontSize={25}
-                  color="gray700"
-                />
-              </Button>
-            </Div>
-          ) : null}
-
-          <TouchableOpacity
-            style={tailwind('flex flex-row')}
-            onPress={() =>
-              navigation.navigate('ChatStack', {
-                screen: 'ChatMenu',
-                params: {room, removeCache},
-              })
-            }>
-            <Icon
-              name="dots-horizontal-circle-outline"
-              fontFamily="MaterialCommunityIcons"
-              fontSize={26}
-              color={darkFontColor}
-            />
-          </TouchableOpacity>
-        </Div>
-      </HeaderTemplate>
-
-      {visibleSearchInput && (
-        <Div>
-          <Div style={tailwind('flex flex-row')}>
-            <Input
-              placeholder="メッセージを検索"
-              w={'70%'}
-              value={inputtedSearchWord}
-              onChangeText={text => {
-                setInputtedSearchWord(text);
-                searchMessages();
+      <Div h="100%" bg={Platform.OS === 'ios' ? 'blue300' : 'blue200'}>
+        <ReactionsModal
+          isVisible={!!selectedReactions}
+          selectedReactions={selectedReactions}
+          selectedEmoji={selectedEmoji}
+          onPressCloseButton={() => {
+            setSelectedReactions(undefined);
+          }}
+          onPressEmoji={emoji => setSelectedEmoji(emoji)}
+        />
+        {video?.fileName && video.uri ? (
+          <MagnusModal isVisible={!!video} bg="black">
+            <TouchableOpacity
+              style={chatStyles.cancelIcon}
+              onPress={() => {
+                setVideo(undefined);
+              }}>
+              <Icon
+                position="absolute"
+                name={'cancel'}
+                fontFamily="MaterialIcons"
+                fontSize={30}
+                color="#fff"
+              />
+            </TouchableOpacity>
+            <VideoPlayer
+              video={{
+                uri: video?.createdUrl,
               }}
+              autoplay
+              videoWidth={windowWidth}
+              videoHeight={windowHeight * 0.9}
             />
-            <Div
-              style={tailwind('flex flex-row justify-between m-1')}
-              w={'25%'}>
-              <TouchableOpacity
-                style={tailwind('flex flex-row')}
-                onPress={() => {
-                  !renderMessageIndex &&
-                    setFocusedMessageID(nextFocusIndex('prev'));
-                }}>
-                <Icon name="arrow-up" fontFamily="FontAwesome" fontSize={25} />
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={tailwind('flex flex-row')}
-                onPress={() => {
-                  !renderMessageIndex &&
-                    setFocusedMessageID(nextFocusIndex('next'));
-                }}>
-                <Icon
-                  name="arrow-down"
-                  fontFamily="FontAwesome"
-                  fontSize={25}
-                />
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={tailwind('flex flex-row')}
-                onPress={() => setVisibleSearchInput(false)}>
-                <Icon name="close" fontFamily="FontAwesome" fontSize={25} />
-              </TouchableOpacity>
-            </Div>
-          </Div>
-          {inputtedSearchWord !== '' && (
-            <Div h={40} alignItems={'center'} justifyContent={'center'}>
-              {renderMessageIndex ? (
-                <ActivityIndicator />
-              ) : (
-                <Text color="black">{`${countOfSearchWord} / ${
-                  searchedResults?.length || 0
-                }`}</Text>
-              )}
+            <TouchableOpacity
+              style={tailwind('absolute bottom-5 right-5')}
+              onPress={async () =>
+                await saveToCameraRoll({url: video.uri, type: 'video'})
+              }>
+              <Icon color="white" name="download" fontSize={24} />
+            </TouchableOpacity>
+            <ChatShareIcon image={video} isVideo />
+          </MagnusModal>
+        ) : null}
+
+        <MagnusModal isVisible={!!selectedMessageForCheckLastRead}>
+          <Button
+            bg="gray400"
+            h={35}
+            w={35}
+            right={15}
+            alignSelf="flex-end"
+            rounded="circle"
+            onPress={() => {
+              setSelectedMessageForCheckLastRead(undefined);
+            }}>
+            <Icon color="black" name="close" />
+          </Button>
+          <TopTab.Navigator initialRouteName={'ReadUsers'}>
+            <TopTab.Screen
+              name="ReadUsers"
+              children={() =>
+                selectedMessageForCheckLastRead ? (
+                  <FlatList
+                    data={readUsers(selectedMessageForCheckLastRead)}
+                    keyExtractor={item => item.id.toString()}
+                    renderItem={({item}) => readUserBox(item)}
+                  />
+                ) : (
+                  <></>
+                )
+              }
+              options={{title: '既読'}}
+            />
+            <TopTab.Screen
+              name="UnReadUsers"
+              children={() =>
+                selectedMessageForCheckLastRead ? (
+                  <FlatList
+                    data={unReadUsers(selectedMessageForCheckLastRead)}
+                    keyExtractor={item => item.id.toString()}
+                    renderItem={({item}) => readUserBox(item)}
+                  />
+                ) : (
+                  <FlatList
+                    data={roomDetail?.members}
+                    keyExtractor={item => item.id.toString()}
+                    renderItem={({item}) => readUserBox(item)}
+                  />
+                )
+              }
+              options={{title: '未読'}}
+            />
+          </TopTab.Navigator>
+        </MagnusModal>
+
+        <ImageView
+          animationType="slide"
+          images={imagesForViewing.map(i => {
+            return {uri: i.uri};
+          })}
+          imageIndex={nowImageIndex === -1 ? 0 : nowImageIndex}
+          visible={imageModal}
+          onRequestClose={() => setImageModal(false)}
+          swipeToCloseEnabled={false}
+          doubleTapToZoomEnabled={true}
+          FooterComponent={({imageIndex}) => (
+            <Div>
+              <DownloadIcon url={imagesForViewing[imageIndex].uri} />
+              <ChatShareIcon image={imagesForViewing[imageIndex]} />
             </Div>
           )}
-        </Div>
-      )}
-      {messageListAvoidngKeyboardDisturb}
+        />
+        <HeaderTemplate
+          title={roomDetail ? nameOfRoom(roomDetail, myself) : nameOfRoom(room)}
+          enableBackButton={true}
+          screenForBack={'RoomList'}>
+          <Div style={tailwind('flex flex-row')}>
+            <TouchableOpacity
+              style={tailwind('flex flex-row mr-1')}
+              onPress={() => setVisibleSearchInput(true)}>
+              <Icon
+                name="search"
+                fontFamily="Feather"
+                fontSize={26}
+                color={darkFontColor}
+              />
+            </TouchableOpacity>
+
+            {roomDetail?.members &&
+            roomDetail.members.length === 2 &&
+            roomDetail.roomType !== RoomType.GROUP ? (
+              <Div mt={-4} mr={-4} style={tailwind('flex flex-row ')}>
+                <Button
+                  bg="transparent"
+                  pb={-3}
+                  onPress={() => {
+                    Alert.alert('通話しますか？', undefined, [
+                      {
+                        text: 'はい',
+                        onPress: () => inviteCall(),
+                      },
+                      {
+                        text: 'いいえ',
+                        onPress: () => {},
+                      },
+                    ]);
+                  }}>
+                  <Icon
+                    name="call-outline"
+                    fontFamily="Ionicons"
+                    fontSize={25}
+                    color="gray700"
+                  />
+                </Button>
+              </Div>
+            ) : null}
+
+            <TouchableOpacity
+              style={tailwind('flex flex-row')}
+              onPress={() =>
+                navigation.navigate('ChatStack', {
+                  screen: 'ChatMenu',
+                  params: {room: roomDetail ? roomDetail : room, removeCache},
+                })
+              }>
+              <Icon
+                name="dots-horizontal-circle-outline"
+                fontFamily="MaterialCommunityIcons"
+                fontSize={26}
+                color={darkFontColor}
+              />
+            </TouchableOpacity>
+          </Div>
+        </HeaderTemplate>
+
+        {visibleSearchInput && (
+          <Div>
+            <Div style={tailwind('flex flex-row')}>
+              <Input
+                placeholder="メッセージを検索"
+                w={'70%'}
+                value={inputtedSearchWord}
+                onChangeText={text => {
+                  setInputtedSearchWord(text);
+                  searchMessages();
+                }}
+              />
+              <Div
+                style={tailwind('flex flex-row justify-between m-1')}
+                w={'25%'}>
+                <TouchableOpacity
+                  style={tailwind('flex flex-row')}
+                  onPress={() => {
+                    !renderMessageIndex &&
+                      setFocusedMessageID(nextFocusIndex('prev'));
+                  }}>
+                  <Icon
+                    name="arrow-up"
+                    fontFamily="FontAwesome"
+                    fontSize={25}
+                  />
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={tailwind('flex flex-row')}
+                  onPress={() => {
+                    !renderMessageIndex &&
+                      setFocusedMessageID(nextFocusIndex('next'));
+                  }}>
+                  <Icon
+                    name="arrow-down"
+                    fontFamily="FontAwesome"
+                    fontSize={25}
+                  />
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={tailwind('flex flex-row')}
+                  onPress={() => setVisibleSearchInput(false)}>
+                  <Icon name="close" fontFamily="FontAwesome" fontSize={25} />
+                </TouchableOpacity>
+              </Div>
+            </Div>
+            {inputtedSearchWord !== '' && (
+              <Div h={40} alignItems={'center'} justifyContent={'center'}>
+                {renderMessageIndex ? (
+                  <ActivityIndicator />
+                ) : (
+                  <Text color="black">{`${countOfSearchWord} / ${
+                    searchedResults?.length || 0
+                  }`}</Text>
+                )}
+              </Div>
+            )}
+          </Div>
+        )}
+        {messageListAvoidngKeyboardDisturb}
+      </Div>
     </WholeContainer>
   );
 };
