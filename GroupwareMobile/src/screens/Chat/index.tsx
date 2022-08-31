@@ -318,9 +318,9 @@ const Chat: React.FC = () => {
 
   const {mutate: sendChatMessage, isLoading: loadingSendMessage} =
     useAPISendChatMessage({
-      onSuccess: sentMsg => {
+      onSuccess: async sentMsg => {
+        setMessages(msg => [sentMsg, ...msg]);
         socket.send({chatMessage: sentMsg, type: 'send'});
-        setMessages(msg => refreshMessage([sentMsg, ...msg]));
         if (sentMsg?.chatGroup?.id) {
           refetchRoomCard({id: sentMsg.chatGroup.id, type: ''});
         }
