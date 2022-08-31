@@ -11,7 +11,6 @@ import {InviteCallProvider} from './contexts/call/useInviteCall';
 import {BadgeProvider} from './contexts/badge/useHandleBadge';
 import {IsTabBarVisibleProvider} from './contexts/bottomTab/useIsTabBarVisible';
 import {Provider} from 'react-native-paper';
-import {HeightContextProvider} from './contexts/HeightContext';
 
 const App = () => {
   const queryClient = new QueryClient();
@@ -61,9 +60,7 @@ const App = () => {
           <IsTabBarVisibleProvider>
             <BadgeProvider>
               <InviteCallProvider>
-                <HeightContextProvider>
-                  <Navigator />
-                </HeightContextProvider>
+                <Navigator />
               </InviteCallProvider>
             </BadgeProvider>
           </IsTabBarVisibleProvider>

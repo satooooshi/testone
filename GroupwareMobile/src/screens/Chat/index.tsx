@@ -1007,13 +1007,13 @@ const Chat: React.FC = () => {
     }
   }, []);
 
-  const heightContext = useContext(HeightContext);
+  const {safeAreaViewHeight} = useIsTabBarVisible();
 
   const messageListAvoidngKeyboardDisturb = (
     <>
       {Platform.OS === 'ios' ? (
         <KeyboardAvoidingView
-          keyboardVerticalOffset={heightContext.height}
+          keyboardVerticalOffset={safeAreaViewHeight}
           style={chatStyles.keyboardAvoidingViewIOS}
           behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
           {loadingMessages && fetchingMessages ? <ActivityIndicator /> : null}

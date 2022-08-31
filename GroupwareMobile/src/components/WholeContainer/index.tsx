@@ -8,7 +8,7 @@ import {
 } from 'react-native';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import tailwind from 'tailwind-rn';
-import {HeightContext} from '../../contexts/HeightContext';
+import {useIsTabBarVisible} from '../../contexts/bottomTab/useIsTabBarVisible';
 
 type WholeContainerProps = {
   color?: 'auth' | 'white' | 'gray';
@@ -16,14 +16,14 @@ type WholeContainerProps = {
 
 const WholeContainer: React.FC<WholeContainerProps> = props => {
   const {children} = props;
-  const heightContext = useContext(HeightContext);
+  const {updateSafeAreaViewHeight} = useIsTabBarVisible();
   return (
     <>
       <SafeAreaView
         style={WholeContainerStyle.statusBar}
         onLayout={(e): void => {
           if (e.nativeEvent.layout.height > 0) {
-            heightContext.updateHeight(e.nativeEvent.layout.height);
+            updateSafeAreaViewHeight(e.nativeEvent.layout.height);
           }
         }}
       />
