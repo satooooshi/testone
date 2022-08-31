@@ -66,6 +66,7 @@ export default function Home() {
           <PortalLinkBox href={PortalLinkType.ACCOUNT} />
         </div>
         <div className={homeStyles.box_wrapper}>
+          <PortalLinkBox href={PortalLinkType.ATTENDANCE} />
           <PortalLinkBox href={PortalLinkType.MYSCHEDULE} />
         </div>
       </div>

@@ -132,16 +132,32 @@ const UserRow: React.FC<UserRowProps> = ({user}) => {
             <Text w={'29%'} mr={'1%'}>{`${userNameFactory(user)}\n${
               currentUser.email
             }`}</Text>
-            <Div w={'28%'} mr={'1%'}>
+            <Div w={'24%'} mr={'1%'}>
               <DropdownOpenerButton
                 onPress={() => {
                   dropdownRef.current?.open();
                 }}
                 name={userRoleNameFactory(currentUser.role)}
-                fontSize={13}
+                fontSize={11}
               />
             </Div>
-            <Div mr={10}>
+            <Div mr={8}>
+              <TouchableOpacity
+                onPress={() =>
+                  navigation.navigate('AdminStack', {
+                    screen: 'attendance',
+                    params: {id: currentUser.id},
+                  })
+                }>
+                <Icon
+                  name="time-outline"
+                  fontSize={23}
+                  color="red900"
+                  fontFamily="Ionicons"
+                />
+              </TouchableOpacity>
+            </Div>
+            <Div mr={8}>
               <TouchableOpacity
                 onPress={() =>
                   navigation.navigate('AdminStack', {
@@ -152,14 +168,14 @@ const UserRow: React.FC<UserRowProps> = ({user}) => {
                 <Icon
                   name="pen"
                   fontFamily={'FontAwesome5'}
-                  fontSize={26}
+                  fontSize={23}
                   color={blueColor}
                 />
               </TouchableOpacity>
             </Div>
             {!loadingDelete ? (
               <TouchableOpacity onPress={() => handleDeleteUser(user)}>
-                <Icon name="delete" fontSize={26} color="tomato" />
+                <Icon name="delete" fontSize={23} color="tomato" />
               </TouchableOpacity>
             ) : (
               <ActivityIndicator />
