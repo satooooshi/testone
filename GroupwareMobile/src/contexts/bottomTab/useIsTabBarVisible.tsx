@@ -2,14 +2,14 @@ import React, {createContext, useContext, useEffect, useState} from 'react';
 
 const IsTabBarVisibleContext = createContext({
   isTabBarVisible: true,
-  safeAreaViewHeight: 20,
+  safeAreaViewHeight: 47,
   setIsTabBarVisible: (() => {}) as (isTabBarVisible: boolean) => void,
   updateSafeAreaViewHeight: (() => {}) as (h: number) => void,
 });
 
 export const IsTabBarVisibleProvider: React.FC = ({children}) => {
   const [isVisible, setIsVIsible] = useState(true);
-  const [safeAreaViewHeight, setHeight] = useState(0);
+  const [safeAreaViewHeight, setHeight] = useState(47);
 
   const setIsTabBarVisible = (isTabBarVisible: boolean) => {
     setIsVIsible(isTabBarVisible);
