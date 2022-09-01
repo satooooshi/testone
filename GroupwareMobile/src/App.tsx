@@ -62,9 +62,7 @@ const App = () => {
             {
               text: 'ストアを開く',
               onPress: () => {
-                Linking.openURL(
-                  'itms-beta://testflight.apple.com/join/g07rZKIj',
-                );
+                Linking.openURL('itms-beta://testflight.apple.com');
               },
             },
           ]);
