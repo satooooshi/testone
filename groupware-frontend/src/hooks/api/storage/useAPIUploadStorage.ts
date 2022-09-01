@@ -31,7 +31,7 @@ export const uploadStorage = async (files: File[]): Promise<string[]> => {
           quality: 1, // the quality of the image, max is 1,
           maxWidth: 800, // the max width of the output image, defaults to 1920px
           maxHeight: 800, // the max height of the output image, defaults to 1920px
-          resize: false, // defaults to true, set false if you do not want to resize the image width and height
+          resize: true, // defaults to true, set false if you do not want to resize the image width and height
         },
       );
       const img = resizedImage[0];
@@ -61,7 +61,6 @@ export const uploadStorage = async (files: File[]): Promise<string[]> => {
       readStorageURL,
       fileURLs,
     );
-
     return urlResponse.data;
   } catch (err) {
     if (err instanceof Error) {
