@@ -272,8 +272,8 @@ const UserRegisteringAdmin: React.FC = () => {
             <Image
               alignSelf="center"
               my={'lg'}
-              h={windowWidth * 0.6}
-              w={windowWidth * 0.6}
+              h={windowWidth * 0.4}
+              w={windowWidth * 0.4}
               source={
                 values.avatarUrl
                   ? {uri: values.avatarUrl}
