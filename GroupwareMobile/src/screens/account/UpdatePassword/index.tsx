@@ -88,7 +88,7 @@ const UpdatePassword: React.FC = () => {
       </Button>
 
       <Div w="100%" h="100%" px="5%" bg="white" alignSelf="center" pt={'lg'}>
-        <Div mb={'lg'}>
+        <Div mb={'xl'}>
           <Text fontSize={16} fontWeight="bold">
             現在のパスワード
           </Text>
@@ -105,7 +105,7 @@ const UpdatePassword: React.FC = () => {
             placeholder="現在のパスワードを入力してください"
           />
         </Div>
-        <Div mb={'lg'}>
+        <Div mb={'xl'}>
           <Text fontSize={16} fontWeight="bold">
             新しいパスワード
           </Text>
@@ -122,7 +122,7 @@ const UpdatePassword: React.FC = () => {
             placeholder="新しいパスワードを入力してください"
           />
         </Div>
-        <Div mb={'lg'}>
+        <Div mb={'xl'}>
           <Text fontSize={16} fontWeight="bold">
             新しいパスワード(再入力)
           </Text>
