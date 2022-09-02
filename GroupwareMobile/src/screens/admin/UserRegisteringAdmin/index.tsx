@@ -262,221 +262,248 @@ const UserRegisteringAdmin: React.FC = () => {
           {branchTypeNameFactory(BranchType.OSAKA)}
         </Dropdown.Option>
       </Dropdown>
-      <KeyboardAwareScrollView
-        contentContainerStyle={{
-          ...userRegisteringAdminStyles.scrollView,
-          width: windowWidth * 0.9,
-        }}>
-        <TouchableOpacity onPress={handleUploadImage}>
-          <Image
-            alignSelf="center"
-            my={'lg'}
-            h={windowWidth * 0.6}
-            w={windowWidth * 0.6}
-            source={
-              values.avatarUrl
-                ? {uri: values.avatarUrl}
-                : require('../../../../assets/no-image-avatar.png')
-            }
-            rounded="circle"
-          />
-        </TouchableOpacity>
-        <Div mb="lg">
-          <Text fontSize={16} fontWeight="bold">
-            姓
-          </Text>
-          <Input
-            value={values.lastName}
-            onChangeText={t => setValues({...values, lastName: t})}
-            placeholder="山田"
-            autoCapitalize="none"
-          />
-        </Div>
-        <Div mb="lg">
-          <Text fontSize={16} fontWeight="bold">
-            名
-          </Text>
-          <Input
-            value={values.firstName}
-            onChangeText={t => setValues({...values, firstName: t})}
-            placeholder="太郎"
-            autoCapitalize="none"
-          />
-        </Div>
-        <Div mb="lg">
-          <Text fontSize={16} fontWeight="bold">
-            姓(フリガナ)
-          </Text>
-          <Input
-            value={values.lastNameKana}
-            onChangeText={handleChange('lastNameKana')}
-            placeholder="ヤマダ"
-            autoCapitalize="none"
-          />
-        </Div>
-        <Div mb="lg">
-          <Text fontSize={16} fontWeight="bold">
-            名(フリガナ)
-          </Text>
-          <Input
-            value={values.firstNameKana}
-            onChangeText={handleChange('firstNameKana')}
-            placeholder="タロウ"
-            autoCapitalize="none"
-          />
-        </Div>
-        <Div mb="lg">
-          <Text fontSize={16} fontWeight="bold">
-            メールアドレス
-          </Text>
-          <Input
-            value={values.email}
-            onChangeText={t => setValues({...values, email: t})}
-            placeholder="bold@example.com"
-            autoCapitalize="none"
-          />
-        </Div>
-        <Div mb="lg">
-          <Text fontSize={16} fontWeight="bold">
-            電話番号
-          </Text>
-          <Input
-            value={values.phone}
-            onChangeText={t => setValues({...values, phone: t})}
-            placeholder="000-0000-0000"
-            autoCapitalize="none"
-          />
-        </Div>
-        <Div mb="lg">
-          <Text fontSize={16} fontWeight="bold">
-            社員区分
-          </Text>
-          <DropdownOpenerButton
-            onPress={() => {
-              userRoleDropdownRef.current?.open();
-            }}
-            name={values.role ? userRoleNameFactory(values.role) : '未選択'}
-          />
-        </Div>
-        <Div mb="lg">
-          <Text fontSize={16} fontWeight="bold">
-            所属支社
-          </Text>
-          <DropdownOpenerButton
-            name={branchTypeNameFactory(values.branch || BranchType.NON_SET)}
-            onPress={() => branchTypeDropdownRef.current?.open()}
-          />
-        </Div>
-        <Div mb="lg">
-          <Text fontSize={16} fontWeight="bold">
-            社員コード
-          </Text>
-          <Input
-            value={values.employeeId || ''}
-            onChangeText={t => setValues({...values, employeeId: t})}
-            autoCapitalize="none"
-          />
-        </Div>
-        <Div mb="lg">
-          <Text fontSize={16} fontWeight="bold">
-            パスワード
-          </Text>
-          <Input
-            value={values.password}
-            onChangeText={t => setValues({...values, password: t})}
-            placeholder="8文字以上で入力してください"
-            autoCapitalize="none"
-          />
-        </Div>
-        <Div mb="lg">
-          <Text fontSize={16} fontWeight="bold">
-            自己紹介
-          </Text>
-          <TextInput
-            value={values.introduceOther}
-            onChangeText={t => setValues({...values, introduceOther: t})}
-            multiline={true}
-            placeholder="新しく入社した山田太郎です。よろしくお願いします！"
-            autoCapitalize="none"
-            style={userRegisteringAdminStyles.textArea}
-          />
-        </Div>
-        <Div mb="lg">
-          <TagEditLine
-            onPressRightButton={() => handleOpenTagModal(TagType.TECH)}
-            tags={techTags || []}
-            tagType={TagType.TECH}
-          />
+      <Div bg="white">
+        <KeyboardAwareScrollView
+          contentContainerStyle={{
+            ...userRegisteringAdminStyles.scrollView,
+            width: windowWidth * 0.9,
+          }}>
+          <Div my="md">
+            <Image
+              alignSelf="center"
+              h={windowWidth * 0.4}
+              w={windowWidth * 0.4}
+              source={
+                values.avatarUrl
+                  ? {uri: values.avatarUrl}
+                  : require('../../../../assets/no-image-avatar.png')
+              }
+              rounded="circle"
+            />
+            <Button
+              borderless
+              bg="white"
+              p={'sm'}
+              alignSelf="center"
+              onPress={handleUploadImage}>
+              <Icon
+                name="edit-2"
+                fontFamily={'Feather'}
+                fontSize={22}
+                color="blue600"
+              />
+              <Text fontSize={16} p={'md'} color="blue600">
+                写真を編集する
+              </Text>
+            </Button>
+          </Div>
+          <Div mb="xl">
+            <Text ml={'lg'} mb={'sm'} fontSize={16}>
+              姓
+            </Text>
+            <Input
+              fontSize={16}
+              value={values.lastName}
+              onChangeText={t => setValues({...values, lastName: t})}
+              placeholder="山田"
+              autoCapitalize="none"
+            />
+          </Div>
+          <Div mb="xl">
+            <Text ml={'lg'} mb={'sm'} fontSize={16}>
+              名
+            </Text>
+            <Input
+              fontSize={16}
+              value={values.firstName}
+              onChangeText={t => setValues({...values, firstName: t})}
+              placeholder="太郎"
+              autoCapitalize="none"
+            />
+          </Div>
+          <Div mb="xl">
+            <Text ml={'lg'} mb={'sm'} fontSize={16}>
+              セイ
+            </Text>
+            <Input
+              fontSize={16}
+              value={values.lastNameKana}
+              onChangeText={handleChange('lastNameKana')}
+              placeholder="ヤマダ"
+              autoCapitalize="none"
+            />
+          </Div>
+          <Div mb="xl">
+            <Text ml={'lg'} mb={'sm'} fontSize={16}>
+              メイ
+            </Text>
+            <Input
+              fontSize={16}
+              value={values.firstNameKana}
+              onChangeText={handleChange('firstNameKana')}
+              placeholder="タロウ"
+              autoCapitalize="none"
+            />
+          </Div>
+          <Div mb="xl">
+            <Text ml={'lg'} mb={'sm'} fontSize={16}>
+              メールアドレス
+            </Text>
+            <Input
+              fontSize={16}
+              value={values.email}
+              onChangeText={t => setValues({...values, email: t})}
+              placeholder="bold@example.com"
+              autoCapitalize="none"
+            />
+          </Div>
+          <Div mb="xl">
+            <Text ml={'lg'} mb={'sm'} fontSize={16}>
+              電話番号
+            </Text>
+            <Input
+              fontSize={16}
+              value={values.phone}
+              onChangeText={t => setValues({...values, phone: t})}
+              placeholder="000-0000-0000"
+              autoCapitalize="none"
+            />
+          </Div>
+          <Div mb="xl">
+            <Text ml={'lg'} mb={'sm'} fontSize={16}>
+              社員区分
+            </Text>
+            <DropdownOpenerButton
+              onPress={() => {
+                userRoleDropdownRef.current?.open();
+              }}
+              name={values.role ? userRoleNameFactory(values.role) : '未選択'}
+            />
+          </Div>
+          <Div mb="xl">
+            <Text ml={'lg'} mb={'sm'} fontSize={16}>
+              所属支社
+            </Text>
+            <DropdownOpenerButton
+              name={branchTypeNameFactory(values.branch || BranchType.NON_SET)}
+              onPress={() => branchTypeDropdownRef.current?.open()}
+            />
+          </Div>
+          <Div mb="xl">
+            <Text ml={'lg'} mb={'sm'} fontSize={16}>
+              社員コード
+            </Text>
+            <Input
+              fontSize={16}
+              value={values.employeeId || ''}
+              onChangeText={t => setValues({...values, employeeId: t})}
+              autoCapitalize="none"
+            />
+          </Div>
+          <Div mb="xl">
+            <Text ml={'lg'} mb={'sm'} fontSize={16}>
+              パスワード
+            </Text>
+            <Input
+              fontSize={16}
+              value={values.password}
+              onChangeText={t => setValues({...values, password: t})}
+              placeholder="8文字以上で入力してください"
+              autoCapitalize="none"
+            />
+          </Div>
+          <Div mb="xl">
+            <Text ml={'lg'} mb={'sm'} fontSize={16}>
+              自己紹介
+            </Text>
+            <TextInput
+              value={values.introduceOther}
+              onChangeText={t => setValues({...values, introduceOther: t})}
+              multiline={true}
+              placeholder="新しく入社した山田太郎です。よろしくお願いします！"
+              autoCapitalize="none"
+              style={userRegisteringAdminStyles.textArea}
+            />
+          </Div>
+          <Div mb="xl">
+            <TagEditLine
+              onPressRightButton={() => handleOpenTagModal(TagType.TECH)}
+              tags={techTags || []}
+              tagType={TagType.TECH}
+            />
 
-          <Text fontSize={16} fontWeight="bold">
-            技術の紹介
-          </Text>
-          <TextInput
-            value={values.introduceTech}
-            onChangeText={t => setValues({...values, introduceTech: t})}
-            multiline={true}
-            placeholder="自分の技術についての紹介を入力してください"
-            autoCapitalize="none"
-            style={userRegisteringAdminStyles.textArea}
-          />
-        </Div>
-        <Div mb="lg">
-          <TagEditLine
-            onPressRightButton={() => handleOpenTagModal(TagType.QUALIFICATION)}
-            tags={qualificationTags || []}
-            tagType={TagType.QUALIFICATION}
-          />
-          <Text fontSize={16} fontWeight="bold">
-            資格の紹介
-          </Text>
-          <TextInput
-            value={values.introduceQualification}
-            onChangeText={t =>
-              setValues({...values, introduceQualification: t})
-            }
-            multiline={true}
-            placeholder="自分の資格についての紹介を入力してください"
-            autoCapitalize="none"
-            style={userRegisteringAdminStyles.textArea}
-          />
-        </Div>
-        <Div mb="lg">
-          <TagEditLine
-            onPressRightButton={() => handleOpenTagModal(TagType.CLUB)}
-            tags={clubTags || []}
-            tagType={TagType.CLUB}
-          />
-          <Text fontSize={16} fontWeight="bold">
-            部活動の紹介
-          </Text>
-          <TextInput
-            value={values.introduceClub}
-            onChangeText={t => setValues({...values, introduceClub: t})}
-            multiline={true}
-            placeholder="自分の部活動についての紹介を入力してください"
-            autoCapitalize="none"
-            style={userRegisteringAdminStyles.textArea}
-          />
-        </Div>
-        <Div mb="lg">
-          <TagEditLine
-            onPressRightButton={() => handleOpenTagModal(TagType.HOBBY)}
-            tags={hobbyTags || []}
-            tagType={TagType.HOBBY}
-          />
-          <Text fontSize={16} fontWeight="bold">
-            趣味の紹介
-          </Text>
-          <TextInput
-            value={values.introduceHobby}
-            onChangeText={t => setValues({...values, introduceHobby: t})}
-            multiline={true}
-            placeholder="自分の趣味についての紹介を入力してください"
-            autoCapitalize="none"
-            style={userRegisteringAdminStyles.textArea}
-          />
-        </Div>
-      </KeyboardAwareScrollView>
+            <Text ml={'lg'} mb={'sm'} fontSize={16}>
+              技術の紹介
+            </Text>
+            <TextInput
+              value={values.introduceTech}
+              onChangeText={t => setValues({...values, introduceTech: t})}
+              multiline={true}
+              placeholder="自分の技術についての紹介を入力してください"
+              autoCapitalize="none"
+              style={userRegisteringAdminStyles.textArea}
+            />
+          </Div>
+          <Div mb="xl">
+            <TagEditLine
+              onPressRightButton={() =>
+                handleOpenTagModal(TagType.QUALIFICATION)
+              }
+              tags={qualificationTags || []}
+              tagType={TagType.QUALIFICATION}
+            />
+            <Text ml={'lg'} mb={'sm'} fontSize={16}>
+              資格の紹介
+            </Text>
+            <TextInput
+              value={values.introduceQualification}
+              onChangeText={t =>
+                setValues({...values, introduceQualification: t})
+              }
+              multiline={true}
+              placeholder="自分の資格についての紹介を入力してください"
+              autoCapitalize="none"
+              style={userRegisteringAdminStyles.textArea}
+            />
+          </Div>
+          <Div mb="xl">
+            <TagEditLine
+              onPressRightButton={() => handleOpenTagModal(TagType.CLUB)}
+              tags={clubTags || []}
+              tagType={TagType.CLUB}
+            />
+            <Text ml={'lg'} mb={'sm'} fontSize={16}>
+              部活動の紹介
+            </Text>
+            <TextInput
+              value={values.introduceClub}
+              onChangeText={t => setValues({...values, introduceClub: t})}
+              multiline={true}
+              placeholder="自分の部活動についての紹介を入力してください"
+              autoCapitalize="none"
+              style={userRegisteringAdminStyles.textArea}
+            />
+          </Div>
+          <Div mb="xl">
+            <TagEditLine
+              onPressRightButton={() => handleOpenTagModal(TagType.HOBBY)}
+              tags={hobbyTags || []}
+              tagType={TagType.HOBBY}
+            />
+            <Text ml={'lg'} mb={'sm'} fontSize={16}>
+              趣味の紹介
+            </Text>
+            <TextInput
+              value={values.introduceHobby}
+              onChangeText={t => setValues({...values, introduceHobby: t})}
+              multiline={true}
+              placeholder="自分の趣味についての紹介を入力してください"
+              autoCapitalize="none"
+              style={userRegisteringAdminStyles.textArea}
+            />
+          </Div>
+        </KeyboardAwareScrollView>
+      </Div>
     </WholeContainer>
   );
 };
