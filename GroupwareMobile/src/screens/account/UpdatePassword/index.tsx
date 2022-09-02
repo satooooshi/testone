@@ -87,7 +87,7 @@ const UpdatePassword: React.FC = () => {
         <Icon color="white" name="check" fontSize={32} />
       </Button>
 
-      <Div w={windowWidth * 0.9} alignSelf="center" mt={'lg'}>
+      <Div w="100%" h="100%" px="5%" bg="white" alignSelf="center" pt={'lg'}>
         <Div mb={'lg'}>
           <Text fontSize={16} fontWeight="bold">
             現在のパスワード
