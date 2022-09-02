@@ -300,7 +300,7 @@ const UserRegisteringAdmin: React.FC = () => {
           />
         </Div>
         <Div mb="lg">
-          <Text fontSize={16}>姓(フリガナ)</Text>
+          <Text fontSize={16}>セイ</Text>
           <Input
             value={values.lastNameKana}
             onChangeText={handleChange('lastNameKana')}
@@ -309,7 +309,7 @@ const UserRegisteringAdmin: React.FC = () => {
           />
         </Div>
         <Div mb="lg">
-          <Text fontSize={16}>名(フリガナ)</Text>
+          <Text fontSize={16}>メイ</Text>
           <Input
             value={values.firstNameKana}
             onChangeText={handleChange('firstNameKana')}
