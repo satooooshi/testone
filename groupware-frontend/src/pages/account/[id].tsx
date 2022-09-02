@@ -140,13 +140,8 @@ const MyAccountInfo = () => {
       },
       { enabled: false },
     );
-  const { data: goodList, refetch: refetchGoodList } = useAPIGetUserGoodList(
-    {
-      type: WikiType.BOARD,
-      board_category: BoardCategory.GOOD,
-    },
-    { enabled: false },
-  );
+  const { data: goodList, refetch: refetchGoodList } =
+    useAPIGetUserGoodList(id);
 
   const { user } = useAuthenticate();
   const [activeTab, setActiveTab] = useState<TabName>(TabName.DETAIL);
@@ -511,10 +506,12 @@ const MyAccountInfo = () => {
                 </Text>
               )
             ) : null}
-            {activeTab === TabName.GOOD && goodList && goodList.wiki.length ? (
+            {activeTab === TabName.GOOD &&
+            goodList &&
+            goodList.userGoodForBoard.length ? (
               <Box>
-                {goodList.wiki.map((w) => (
-                  <WikiCard wiki={w} key={w.id} />
+                {goodList.userGoodForBoard.map((board) => (
+                  <WikiCard wiki={board.wiki} key={board.id} />
                 ))}
               </Box>
             ) : null}
