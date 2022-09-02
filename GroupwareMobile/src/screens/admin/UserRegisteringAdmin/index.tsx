@@ -268,10 +268,9 @@ const UserRegisteringAdmin: React.FC = () => {
             ...userRegisteringAdminStyles.scrollView,
             width: windowWidth * 0.9,
           }}>
-          <TouchableOpacity onPress={handleUploadImage}>
+          <Div my="md">
             <Image
               alignSelf="center"
-              my={'lg'}
               h={windowWidth * 0.4}
               w={windowWidth * 0.4}
               source={
@@ -281,7 +280,23 @@ const UserRegisteringAdmin: React.FC = () => {
               }
               rounded="circle"
             />
-          </TouchableOpacity>
+            <Button
+              borderless
+              bg="white"
+              p={'sm'}
+              alignSelf="center"
+              onPress={handleUploadImage}>
+              <Icon
+                name="edit-2"
+                fontFamily={'Feather'}
+                fontSize={22}
+                color="blue600"
+              />
+              <Text fontSize={16} p={'md'} color="blue600">
+                写真を編集する
+              </Text>
+            </Button>
+          </Div>
           <Div mb="xl">
             <Text ml={'lg'} mb={'sm'} fontSize={16}>
               姓
