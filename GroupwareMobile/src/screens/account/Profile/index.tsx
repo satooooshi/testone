@@ -216,7 +216,7 @@ const Profile: React.FC = () => {
               onPress={handleUploadImage}
             />
           </Div>
-          <Div mb="lg">
+          <Div mb="xl">
             <Text ml={'lg'} mb={'sm'} fontSize={16}>
               メールアドレス
             </Text>
@@ -251,7 +251,7 @@ const Profile: React.FC = () => {
               </Div>
             </Div>
           </Div>
-          <Div mb="lg">
+          <Div mb="xl">
             <Text ml={'lg'} mb={'sm'} fontSize={16}>
               電話番号
             </Text>
@@ -286,7 +286,7 @@ const Profile: React.FC = () => {
               </Div>
             </Div>
           </Div>
-          <Div mb="lg">
+          <Div mb="xl">
             <Text ml={'lg'} mb={'sm'} fontSize={16}>
               姓
             </Text>
@@ -297,7 +297,7 @@ const Profile: React.FC = () => {
               autoCapitalize="none"
             />
           </Div>
-          <Div mb="lg">
+          <Div mb="xl">
             <Text ml={'lg'} mb={'sm'} fontSize={16}>
               名
             </Text>
@@ -308,7 +308,7 @@ const Profile: React.FC = () => {
               autoCapitalize="none"
             />
           </Div>
-          <Div mb="lg">
+          <Div mb="xl">
             <Text ml={'lg'} mb={'sm'} fontSize={16}>
               姓(フリガナ)
             </Text>
@@ -319,7 +319,7 @@ const Profile: React.FC = () => {
               autoCapitalize="none"
             />
           </Div>
-          <Div mb="lg">
+          <Div mb="xl">
             <Text ml={'lg'} mb={'sm'} fontSize={16}>
               名(フリガナ)
             </Text>
@@ -330,7 +330,7 @@ const Profile: React.FC = () => {
               autoCapitalize="none"
             />
           </Div>
-          <Div mb="lg">
+          <Div mb="xl">
             <Text ml={'lg'} mb={'sm'} fontSize={16}>
               所属支社
             </Text>
@@ -365,7 +365,7 @@ const Profile: React.FC = () => {
               {branchTypeNameFactory(BranchType.OSAKA)}
             </Dropdown.Option>
           </Dropdown>
-          <Div mb="lg">
+          <Div mb="xl">
             <Text ml={'lg'} mb={'sm'} fontSize={16}>
               自己紹介
             </Text>
@@ -379,7 +379,7 @@ const Profile: React.FC = () => {
               style={profileStyles.textArea}
             />
           </Div>
-          <Div mb="lg">
+          <Div mb="xl">
             <TagEditLine
               onPressRightButton={() => handleOpenTagModal(TagType.TECH)}
               tags={techTags || []}
@@ -399,7 +399,7 @@ const Profile: React.FC = () => {
               style={profileStyles.textArea}
             />
           </Div>
-          <Div mb="lg">
+          <Div mb="xl">
             <TagEditLine
               onPressRightButton={() =>
                 handleOpenTagModal(TagType.QUALIFICATION)
@@ -420,7 +420,7 @@ const Profile: React.FC = () => {
               style={profileStyles.textArea}
             />
           </Div>
-          <Div mb="lg">
+          <Div mb="xl">
             <TagEditLine
               onPressRightButton={() => handleOpenTagModal(TagType.CLUB)}
               tags={clubTags || []}
@@ -439,7 +439,7 @@ const Profile: React.FC = () => {
               style={profileStyles.textArea}
             />
           </Div>
-          <Div mb="lg">
+          <Div mb="xl">
             <TagEditLine
               onPressRightButton={() => handleOpenTagModal(TagType.HOBBY)}
               tags={hobbyTags || []}
