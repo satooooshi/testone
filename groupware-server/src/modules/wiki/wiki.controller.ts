@@ -22,8 +22,6 @@ import JwtAuthenticationGuard from '../auth/jwtAuthentication.guard';
 import RequestWithUser from '../auth/requestWithUser.interface';
 import SaveWikiDto from './dto/saveWikiDto';
 import { WikiService } from './wiki.service';
-import { User, UserRole } from 'src/entities/user.entity';
-import { UserService } from '../user/user.service';
 export interface SearchQueryToGetWiki {
   page?: string;
   word?: string;
@@ -40,6 +38,12 @@ export interface SearchResultToGetWiki {
   // this key is the total page count
   pageCount: number;
   wiki: Wiki[];
+}
+
+export interface SearchResultToGetWikiGoodList {
+  // this key is the total page count
+  pageCount: number;
+  userGoodForBoard: UserGoodForBoard[];
 }
 
 @Controller('wiki')
@@ -61,7 +65,7 @@ export class WikiController {
   async getWikiUserGoodList(
     @Req() req: RequestWithUser,
     @Query() query: SearchQueryToGetWiki,
-  ): Promise<SearchResultToGetWiki> {
+  ): Promise<SearchResultToGetWikiGoodList> {
     const userID = req.user.id;
     return await this.qaService.getWikiGoodList(userID, query);
   }

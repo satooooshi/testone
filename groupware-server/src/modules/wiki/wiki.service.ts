@@ -4,12 +4,15 @@ import { QAAnswer } from 'src/entities/qaAnswer.entity';
 import { QAAnswerReply } from 'src/entities/qaAnswerReply.entity';
 import { BoardCategory, Wiki, WikiType } from 'src/entities/wiki.entity';
 import { In, Repository } from 'typeorm';
-import { SearchQueryToGetWiki, SearchResultToGetWiki } from './wiki.controller';
+import {
+  SearchQueryToGetWiki,
+  SearchResultToGetWiki,
+  SearchResultToGetWikiGoodList,
+} from './wiki.controller';
 import { StorageService } from '../storage/storage.service';
 import { selectUserColumns } from 'src/utils/selectUserColumns';
 import { UserGoodForBoard } from 'src/entities/userGoodForBord.entity';
 import { User } from 'src/entities/user.entity';
-import { UserService } from '../user/user.service';
 
 @Injectable()
 export class WikiService {
@@ -27,8 +30,6 @@ export class WikiService {
     private readonly userGoodForBoardRepository: Repository<UserGoodForBoard>,
 
     private readonly storageService: StorageService,
-
-    private readonly userService: UserService,
   ) {}
 
   public async saveWiki(wiki: Partial<Wiki>): Promise<Wiki> {
@@ -174,7 +175,6 @@ export class WikiService {
     }
     const tagIDs = tag.split(' ');
     const startTime = Date.now();
-
     const [wikis, count] = await this.wikiRepository
       .createQueryBuilder('wiki')
       .select()
@@ -276,39 +276,44 @@ export class WikiService {
   public async getWikiGoodList(
     userID: number,
     query: SearchQueryToGetWiki,
-  ): Promise<SearchResultToGetWiki> {
-    const {
-      page = 1,
-      word = '',
-      status = 'new',
-      tag = '',
-      type,
-      rule_category,
-      board_category,
-      writer,
-    } = query;
-
-    let offset: number;
-    const limit = 20;
-    if (page) {
-      offset = (Number(page) - 1) * limit;
-    }
-
-    const tagIDs = tag.split(' ');
+  ): Promise<SearchResultToGetWikiGoodList> {
     const startTime = Date.now();
 
-    const { userGoodForBoard } = await this.userService.getAllInfoById(userID);
-    const wikis = userGoodForBoard
-      .map((w) => w.wiki)
-      .sort((a: Wiki, b: Wiki) => {
-        return b.updatedAt.getTime() - a.updatedAt.getTime();
-      });
-    const count = wikis.length;
+    const [userGoodForBoard, count] = await this.userGoodForBoardRepository
+      .createQueryBuilder('user_good_for_board')
+      .innerJoinAndSelect('user_good_for_board.wiki', 'wiki')
+      .where('user_good_for_board.user_id = :userID', { userID: userID })
+      .orderBy({ 'wiki.updatedAt': 'DESC' })
+      .getManyAndCount();
+
+    const wikiIDs = userGoodForBoard.map((board) => board.wiki.id);
+    const goodsCount = await this.userGoodForBoardRepository
+      .createQueryBuilder('user_good_for_board')
+      .select(['user_good_for_board.wiki_id', 'COUNT(*) AS cnt'])
+      .where('user_good_for_board.wiki_id IN (:...wikiIDs)', { wikiIDs })
+      .groupBy('user_good_for_board.wiki_id')
+      .getRawMany();
+
+    const boardAndRelationCount = userGoodForBoard.map((b) => {
+      b.wiki.isGoodSender = true;
+      for (const goodCount of goodsCount) {
+        if (goodCount['wiki_id'] === b.wiki.id) {
+          b.wiki.goodsCount = Number(goodCount['cnt']);
+        }
+      }
+      return b;
+    });
+
+    const limit = 20;
     const pageCount =
       count % limit === 0 ? count / limit : Math.floor(count / limit) + 1;
 
+    const endTime = Date.now();
+    console.log('get wiki good list speed check2', endTime - startTime);
     if (count) {
-      return { pageCount, wiki: wikis };
+      return { pageCount, userGoodForBoard: boardAndRelationCount };
+    } else {
+      return { pageCount: 0, userGoodForBoard: [] };
     }
   }
 
