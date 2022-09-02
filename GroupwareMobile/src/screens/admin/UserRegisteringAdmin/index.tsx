@@ -282,9 +282,7 @@ const UserRegisteringAdmin: React.FC = () => {
           />
         </TouchableOpacity>
         <Div mb="lg">
-          <Text fontSize={16} fontWeight="bold">
-            姓
-          </Text>
+          <Text fontSize={16}>姓</Text>
           <Input
             value={values.lastName}
             onChangeText={t => setValues({...values, lastName: t})}
@@ -293,9 +291,7 @@ const UserRegisteringAdmin: React.FC = () => {
           />
         </Div>
         <Div mb="lg">
-          <Text fontSize={16} fontWeight="bold">
-            名
-          </Text>
+          <Text fontSize={16}>名</Text>
           <Input
             value={values.firstName}
             onChangeText={t => setValues({...values, firstName: t})}
@@ -304,9 +300,7 @@ const UserRegisteringAdmin: React.FC = () => {
           />
         </Div>
         <Div mb="lg">
-          <Text fontSize={16} fontWeight="bold">
-            姓(フリガナ)
-          </Text>
+          <Text fontSize={16}>姓(フリガナ)</Text>
           <Input
             value={values.lastNameKana}
             onChangeText={handleChange('lastNameKana')}
@@ -315,9 +309,7 @@ const UserRegisteringAdmin: React.FC = () => {
           />
         </Div>
         <Div mb="lg">
-          <Text fontSize={16} fontWeight="bold">
-            名(フリガナ)
-          </Text>
+          <Text fontSize={16}>名(フリガナ)</Text>
           <Input
             value={values.firstNameKana}
             onChangeText={handleChange('firstNameKana')}
@@ -326,9 +318,7 @@ const UserRegisteringAdmin: React.FC = () => {
           />
         </Div>
         <Div mb="lg">
-          <Text fontSize={16} fontWeight="bold">
-            メールアドレス
-          </Text>
+          <Text fontSize={16}>メールアドレス</Text>
           <Input
             value={values.email}
             onChangeText={t => setValues({...values, email: t})}
@@ -337,9 +327,7 @@ const UserRegisteringAdmin: React.FC = () => {
           />
         </Div>
         <Div mb="lg">
-          <Text fontSize={16} fontWeight="bold">
-            電話番号
-          </Text>
+          <Text fontSize={16}>電話番号</Text>
           <Input
             value={values.phone}
             onChangeText={t => setValues({...values, phone: t})}
@@ -348,9 +336,7 @@ const UserRegisteringAdmin: React.FC = () => {
           />
         </Div>
         <Div mb="lg">
-          <Text fontSize={16} fontWeight="bold">
-            社員区分
-          </Text>
+          <Text fontSize={16}>社員区分</Text>
           <DropdownOpenerButton
             onPress={() => {
               userRoleDropdownRef.current?.open();
@@ -359,18 +345,14 @@ const UserRegisteringAdmin: React.FC = () => {
           />
         </Div>
         <Div mb="lg">
-          <Text fontSize={16} fontWeight="bold">
-            所属支社
-          </Text>
+          <Text fontSize={16}>所属支社</Text>
           <DropdownOpenerButton
             name={branchTypeNameFactory(values.branch || BranchType.NON_SET)}
             onPress={() => branchTypeDropdownRef.current?.open()}
           />
         </Div>
         <Div mb="lg">
-          <Text fontSize={16} fontWeight="bold">
-            社員コード
-          </Text>
+          <Text fontSize={16}>社員コード</Text>
           <Input
             value={values.employeeId || ''}
             onChangeText={t => setValues({...values, employeeId: t})}
@@ -378,9 +360,7 @@ const UserRegisteringAdmin: React.FC = () => {
           />
         </Div>
         <Div mb="lg">
-          <Text fontSize={16} fontWeight="bold">
-            パスワード
-          </Text>
+          <Text fontSize={16}>パスワード</Text>
           <Input
             value={values.password}
             onChangeText={t => setValues({...values, password: t})}
@@ -389,9 +369,7 @@ const UserRegisteringAdmin: React.FC = () => {
           />
         </Div>
         <Div mb="lg">
-          <Text fontSize={16} fontWeight="bold">
-            自己紹介
-          </Text>
+          <Text fontSize={16}>自己紹介</Text>
           <TextInput
             value={values.introduceOther}
             onChangeText={t => setValues({...values, introduceOther: t})}
@@ -408,9 +386,7 @@ const UserRegisteringAdmin: React.FC = () => {
             tagType={TagType.TECH}
           />
 
-          <Text fontSize={16} fontWeight="bold">
-            技術の紹介
-          </Text>
+          <Text fontSize={16}>技術の紹介</Text>
           <TextInput
             value={values.introduceTech}
             onChangeText={t => setValues({...values, introduceTech: t})}
@@ -426,9 +402,7 @@ const UserRegisteringAdmin: React.FC = () => {
             tags={qualificationTags || []}
             tagType={TagType.QUALIFICATION}
           />
-          <Text fontSize={16} fontWeight="bold">
-            資格の紹介
-          </Text>
+          <Text fontSize={16}>資格の紹介</Text>
           <TextInput
             value={values.introduceQualification}
             onChangeText={t =>
@@ -446,9 +420,7 @@ const UserRegisteringAdmin: React.FC = () => {
             tags={clubTags || []}
             tagType={TagType.CLUB}
           />
-          <Text fontSize={16} fontWeight="bold">
-            部活動の紹介
-          </Text>
+          <Text fontSize={16}>部活動の紹介</Text>
           <TextInput
             value={values.introduceClub}
             onChangeText={t => setValues({...values, introduceClub: t})}
@@ -464,9 +436,7 @@ const UserRegisteringAdmin: React.FC = () => {
             tags={hobbyTags || []}
             tagType={TagType.HOBBY}
           />
-          <Text fontSize={16} fontWeight="bold">
-            趣味の紹介
-          </Text>
+          <Text fontSize={16}>趣味の紹介</Text>
           <TextInput
             value={values.introduceHobby}
             onChangeText={t => setValues({...values, introduceHobby: t})}
