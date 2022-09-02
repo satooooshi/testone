@@ -327,16 +327,19 @@ const Chat: React.FC = () => {
 
   const {mutate: sendChatMessage, isLoading: loadingSendMessage} =
     useAPISendChatMessage({
-      onSuccess: sentMsg => {
-        socket.send({chatMessage: sentMsg, type: 'send'});
-        setMessages(msg => refreshMessage([sentMsg, ...msg]));
-        if (sentMsg?.chatGroup?.id) {
-          refetchRoomCard({id: sentMsg.chatGroup.id, type: ''});
-        }
+      onSuccess: async sentMsg => {
+        setMessages(msg => [sentMsg, ...msg]);
         if (sentMsg.type === ChatMessageType.TEXT) {
-          // setValues(v => ({...v, content: ''}));
           resetForm();
         }
+        //非同期でやるとこでisLoadingの待ち時間を減らす。
+        const asyncFunc = async (): Promise<void> => {
+          socket.send({chatMessage: sentMsg, type: 'send'});
+          if (sentMsg?.chatGroup?.id) {
+            refetchRoomCard({id: sentMsg.chatGroup.id, type: ''});
+          }
+        };
+        setTimeout(asyncFunc, 0);
       },
       onError: () => {
         Alert.alert(
