@@ -282,8 +282,10 @@ const UserRegisteringAdmin: React.FC = () => {
               rounded="circle"
             />
           </TouchableOpacity>
-          <Div mb="lg">
-            <Text fontSize={16}>姓</Text>
+          <Div mb="xl">
+            <Text ml={'lg'} mb={'sm'} fontSize={16}>
+              姓
+            </Text>
             <Input
               value={values.lastName}
               onChangeText={t => setValues({...values, lastName: t})}
@@ -291,8 +293,10 @@ const UserRegisteringAdmin: React.FC = () => {
               autoCapitalize="none"
             />
           </Div>
-          <Div mb="lg">
-            <Text fontSize={16}>名</Text>
+          <Div mb="xl">
+            <Text ml={'lg'} mb={'sm'} fontSize={16}>
+              名
+            </Text>
             <Input
               value={values.firstName}
               onChangeText={t => setValues({...values, firstName: t})}
@@ -300,8 +304,10 @@ const UserRegisteringAdmin: React.FC = () => {
               autoCapitalize="none"
             />
           </Div>
-          <Div mb="lg">
-            <Text fontSize={16}>セイ</Text>
+          <Div mb="xl">
+            <Text ml={'lg'} mb={'sm'} fontSize={16}>
+              セイ
+            </Text>
             <Input
               value={values.lastNameKana}
               onChangeText={handleChange('lastNameKana')}
@@ -309,8 +315,10 @@ const UserRegisteringAdmin: React.FC = () => {
               autoCapitalize="none"
             />
           </Div>
-          <Div mb="lg">
-            <Text fontSize={16}>メイ</Text>
+          <Div mb="xl">
+            <Text ml={'lg'} mb={'sm'} fontSize={16}>
+              メイ
+            </Text>
             <Input
               value={values.firstNameKana}
               onChangeText={handleChange('firstNameKana')}
@@ -318,8 +326,10 @@ const UserRegisteringAdmin: React.FC = () => {
               autoCapitalize="none"
             />
           </Div>
-          <Div mb="lg">
-            <Text fontSize={16}>メールアドレス</Text>
+          <Div mb="xl">
+            <Text ml={'lg'} mb={'sm'} fontSize={16}>
+              メールアドレス
+            </Text>
             <Input
               value={values.email}
               onChangeText={t => setValues({...values, email: t})}
@@ -327,8 +337,10 @@ const UserRegisteringAdmin: React.FC = () => {
               autoCapitalize="none"
             />
           </Div>
-          <Div mb="lg">
-            <Text fontSize={16}>電話番号</Text>
+          <Div mb="xl">
+            <Text ml={'lg'} mb={'sm'} fontSize={16}>
+              電話番号
+            </Text>
             <Input
               value={values.phone}
               onChangeText={t => setValues({...values, phone: t})}
@@ -336,8 +348,10 @@ const UserRegisteringAdmin: React.FC = () => {
               autoCapitalize="none"
             />
           </Div>
-          <Div mb="lg">
-            <Text fontSize={16}>社員区分</Text>
+          <Div mb="xl">
+            <Text ml={'lg'} mb={'sm'} fontSize={16}>
+              社員区分
+            </Text>
             <DropdownOpenerButton
               onPress={() => {
                 userRoleDropdownRef.current?.open();
@@ -345,23 +359,29 @@ const UserRegisteringAdmin: React.FC = () => {
               name={values.role ? userRoleNameFactory(values.role) : '未選択'}
             />
           </Div>
-          <Div mb="lg">
-            <Text fontSize={16}>所属支社</Text>
+          <Div mb="xl">
+            <Text ml={'lg'} mb={'sm'} fontSize={16}>
+              所属支社
+            </Text>
             <DropdownOpenerButton
               name={branchTypeNameFactory(values.branch || BranchType.NON_SET)}
               onPress={() => branchTypeDropdownRef.current?.open()}
             />
           </Div>
-          <Div mb="lg">
-            <Text fontSize={16}>社員コード</Text>
+          <Div mb="xl">
+            <Text ml={'lg'} mb={'sm'} fontSize={16}>
+              社員コード
+            </Text>
             <Input
               value={values.employeeId || ''}
               onChangeText={t => setValues({...values, employeeId: t})}
               autoCapitalize="none"
             />
           </Div>
-          <Div mb="lg">
-            <Text fontSize={16}>パスワード</Text>
+          <Div mb="xl">
+            <Text ml={'lg'} mb={'sm'} fontSize={16}>
+              パスワード
+            </Text>
             <Input
               value={values.password}
               onChangeText={t => setValues({...values, password: t})}
@@ -369,8 +389,10 @@ const UserRegisteringAdmin: React.FC = () => {
               autoCapitalize="none"
             />
           </Div>
-          <Div mb="lg">
-            <Text fontSize={16}>自己紹介</Text>
+          <Div mb="xl">
+            <Text ml={'lg'} mb={'sm'} fontSize={16}>
+              自己紹介
+            </Text>
             <TextInput
               value={values.introduceOther}
               onChangeText={t => setValues({...values, introduceOther: t})}
@@ -380,14 +402,16 @@ const UserRegisteringAdmin: React.FC = () => {
               style={userRegisteringAdminStyles.textArea}
             />
           </Div>
-          <Div mb="lg">
+          <Div mb="xl">
             <TagEditLine
               onPressRightButton={() => handleOpenTagModal(TagType.TECH)}
               tags={techTags || []}
               tagType={TagType.TECH}
             />
 
-            <Text fontSize={16}>技術の紹介</Text>
+            <Text ml={'lg'} mb={'sm'} fontSize={16}>
+              技術の紹介
+            </Text>
             <TextInput
               value={values.introduceTech}
               onChangeText={t => setValues({...values, introduceTech: t})}
@@ -397,7 +421,7 @@ const UserRegisteringAdmin: React.FC = () => {
               style={userRegisteringAdminStyles.textArea}
             />
           </Div>
-          <Div mb="lg">
+          <Div mb="xl">
             <TagEditLine
               onPressRightButton={() =>
                 handleOpenTagModal(TagType.QUALIFICATION)
@@ -405,7 +429,9 @@ const UserRegisteringAdmin: React.FC = () => {
               tags={qualificationTags || []}
               tagType={TagType.QUALIFICATION}
             />
-            <Text fontSize={16}>資格の紹介</Text>
+            <Text ml={'lg'} mb={'sm'} fontSize={16}>
+              資格の紹介
+            </Text>
             <TextInput
               value={values.introduceQualification}
               onChangeText={t =>
@@ -417,13 +443,15 @@ const UserRegisteringAdmin: React.FC = () => {
               style={userRegisteringAdminStyles.textArea}
             />
           </Div>
-          <Div mb="lg">
+          <Div mb="xl">
             <TagEditLine
               onPressRightButton={() => handleOpenTagModal(TagType.CLUB)}
               tags={clubTags || []}
               tagType={TagType.CLUB}
             />
-            <Text fontSize={16}>部活動の紹介</Text>
+            <Text ml={'lg'} mb={'sm'} fontSize={16}>
+              部活動の紹介
+            </Text>
             <TextInput
               value={values.introduceClub}
               onChangeText={t => setValues({...values, introduceClub: t})}
@@ -433,13 +461,15 @@ const UserRegisteringAdmin: React.FC = () => {
               style={userRegisteringAdminStyles.textArea}
             />
           </Div>
-          <Div mb="lg">
+          <Div mb="xl">
             <TagEditLine
               onPressRightButton={() => handleOpenTagModal(TagType.HOBBY)}
               tags={hobbyTags || []}
               tagType={TagType.HOBBY}
             />
-            <Text fontSize={16}>趣味の紹介</Text>
+            <Text ml={'lg'} mb={'sm'} fontSize={16}>
+              趣味の紹介
+            </Text>
             <TextInput
               value={values.introduceHobby}
               onChangeText={t => setValues({...values, introduceHobby: t})}
