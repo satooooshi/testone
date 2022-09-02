@@ -124,7 +124,7 @@ const UpdatePassword: React.FC = () => {
         </Div>
         <Div mb={'xl'}>
           <Text ml="lg" mb="sm" fontSize={16}>
-            新しいパスワード(再入力)
+            新しいパスワード確認
           </Text>
           {errors.newPasswordConfirmation && touched.newPasswordConfirmation ? (
             <Text fontSize={16} fontWeight="bold" color="tomato">
