@@ -16,6 +16,7 @@ import {
   Overlay,
   Radio,
   Dropdown,
+  Image,
 } from 'react-native-magnus';
 import DropdownOpenerButton from '../../../components/common/DropdownOpenerButton';
 import TagModal from '../../../components/common/TagModal';
@@ -208,13 +209,29 @@ const Profile: React.FC = () => {
             ...profileStyles.scrollView,
           }}>
           <Div px={'5%'} bg="white">
-            <Div my={'lg'} justifyContent="center" alignItems="center">
+            <Div my="lg" alignSelf="center">
               <UserAvatar
-                h={windowWidth * 0.6}
-                w={windowWidth * 0.6}
+                h={windowWidth * 0.4}
+                w={windowWidth * 0.4}
                 user={values}
-                onPress={handleUploadImage}
+                onPress={() => {}}
               />
+              <Button
+                borderless
+                bg="white"
+                p={'sm'}
+                alignSelf="center"
+                onPress={handleUploadImage}>
+                <Icon
+                  name="edit-2"
+                  fontFamily={'Feather'}
+                  fontSize={22}
+                  color="blue600"
+                />
+                <Text fontSize={16} p={'md'} color="blue600">
+                  写真を編集する
+                </Text>
+              </Button>
             </Div>
             <Div mb="xl">
               <Text ml={'lg'} mb={'sm'} fontSize={16}>
