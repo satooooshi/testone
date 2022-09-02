@@ -60,7 +60,7 @@ const App = () => {
         if (isUpdateNeeded) {
           Alert.alert('アプリを更新してください', '', [
             {
-              text: 'ストアを開く',
+              text: 'TestFlightを開く',
               onPress: () => {
                 Linking.openURL('itms-beta://testflight.apple.com');
               },
