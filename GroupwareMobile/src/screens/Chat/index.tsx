@@ -1,4 +1,11 @@
-import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useContext,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import {
   Alert,
   AppState,
@@ -98,6 +105,8 @@ import {useAPIUpdateChatMessage} from '../../hooks/api/chat/useAPIUpdateChatMess
 import {useAPIDeleteChatMessage} from '../../hooks/api/chat/useAPIDeleteChatMessage';
 import uuid from 'react-native-uuid';
 import {useAPIGetReactions} from '../../hooks/api/chat/useAPIGetReactions';
+
+import {HeightContext} from '../../contexts/HeightContext';
 
 const TopTab = createMaterialTopTabNavigator();
 
@@ -998,11 +1007,13 @@ const Chat: React.FC = () => {
     }
   }, []);
 
+  const {safeAreaViewHeight} = useIsTabBarVisible();
+
   const messageListAvoidngKeyboardDisturb = (
     <>
       {Platform.OS === 'ios' ? (
         <KeyboardAvoidingView
-          keyboardVerticalOffset={windowHeight * 0.08}
+          keyboardVerticalOffset={safeAreaViewHeight}
           style={chatStyles.keyboardAvoidingViewIOS}
           behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
           {loadingMessages && fetchingMessages ? <ActivityIndicator /> : null}
