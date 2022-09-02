@@ -217,7 +217,7 @@ const Profile: React.FC = () => {
             />
           </Div>
           <Div mb="lg">
-            <Text fontSize={16} fontWeight="bold">
+            <Text ml={'lg'} mb={'sm'} fontSize={16}>
               メールアドレス
             </Text>
             <Input
@@ -252,7 +252,7 @@ const Profile: React.FC = () => {
             </Div>
           </Div>
           <Div mb="lg">
-            <Text fontSize={16} fontWeight="bold">
+            <Text ml={'lg'} mb={'sm'} fontSize={16}>
               電話番号
             </Text>
             <Input
@@ -287,7 +287,7 @@ const Profile: React.FC = () => {
             </Div>
           </Div>
           <Div mb="lg">
-            <Text fontSize={16} fontWeight="bold">
+            <Text ml={'lg'} mb={'sm'} fontSize={16}>
               姓
             </Text>
             <Input
@@ -298,7 +298,7 @@ const Profile: React.FC = () => {
             />
           </Div>
           <Div mb="lg">
-            <Text fontSize={16} fontWeight="bold">
+            <Text ml={'lg'} mb={'sm'} fontSize={16}>
               名
             </Text>
             <Input
@@ -309,7 +309,7 @@ const Profile: React.FC = () => {
             />
           </Div>
           <Div mb="lg">
-            <Text fontSize={16} fontWeight="bold">
+            <Text ml={'lg'} mb={'sm'} fontSize={16}>
               姓(フリガナ)
             </Text>
             <Input
@@ -320,7 +320,7 @@ const Profile: React.FC = () => {
             />
           </Div>
           <Div mb="lg">
-            <Text fontSize={16} fontWeight="bold">
+            <Text ml={'lg'} mb={'sm'} fontSize={16}>
               名(フリガナ)
             </Text>
             <Input
@@ -331,7 +331,7 @@ const Profile: React.FC = () => {
             />
           </Div>
           <Div mb="lg">
-            <Text fontSize={16} fontWeight="bold">
+            <Text ml={'lg'} mb={'sm'} fontSize={16}>
               所属支社
             </Text>
             <DropdownOpenerButton
@@ -366,7 +366,7 @@ const Profile: React.FC = () => {
             </Dropdown.Option>
           </Dropdown>
           <Div mb="lg">
-            <Text fontSize={16} fontWeight="bold">
+            <Text ml={'lg'} mb={'sm'} fontSize={16}>
               自己紹介
             </Text>
             <TextInput
@@ -386,7 +386,7 @@ const Profile: React.FC = () => {
               tagType={TagType.TECH}
             />
 
-            <Text fontSize={16} fontWeight="bold">
+            <Text ml={'lg'} mb={'sm'} fontSize={16}>
               技術の紹介
             </Text>
             <TextInput
@@ -407,7 +407,7 @@ const Profile: React.FC = () => {
               tags={qualificationTags || []}
               tagType={TagType.QUALIFICATION}
             />
-            <Text fontSize={16} fontWeight="bold">
+            <Text ml={'lg'} mb={'sm'} fontSize={16}>
               資格の紹介
             </Text>
             <TextInput
@@ -426,7 +426,7 @@ const Profile: React.FC = () => {
               tags={clubTags || []}
               tagType={TagType.CLUB}
             />
-            <Text fontSize={16} fontWeight="bold">
+            <Text ml={'lg'} mb={'sm'} fontSize={16}>
               部活動の紹介
             </Text>
             <TextInput
@@ -445,7 +445,7 @@ const Profile: React.FC = () => {
               tags={hobbyTags || []}
               tagType={TagType.HOBBY}
             />
-            <Text fontSize={16} fontWeight="bold">
+            <Text ml={'lg'} mb={'sm'} fontSize={16}>
               趣味の紹介
             </Text>
             <TextInput
