@@ -98,6 +98,7 @@ const UpdatePassword: React.FC = () => {
             </Text>
           ) : null}
           <Input
+            fontSize={16}
             secureTextEntry={true}
             value={values.currentPassword}
             onChangeText={t => setValues(v => ({...v, currentPassword: t}))}
@@ -115,6 +116,7 @@ const UpdatePassword: React.FC = () => {
             </Text>
           ) : null}
           <Input
+            fontSize={16}
             secureTextEntry={true}
             value={values.newPassword}
             onChangeText={t => setValues(v => ({...v, newPassword: t}))}
@@ -132,6 +134,7 @@ const UpdatePassword: React.FC = () => {
             </Text>
           ) : null}
           <Input
+            fontSize={16}
             secureTextEntry={true}
             value={values.newPasswordConfirmation}
             onChangeText={t =>
