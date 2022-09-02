@@ -287,6 +287,7 @@ const UserRegisteringAdmin: React.FC = () => {
               姓
             </Text>
             <Input
+              fontSize={16}
               value={values.lastName}
               onChangeText={t => setValues({...values, lastName: t})}
               placeholder="山田"
@@ -298,6 +299,7 @@ const UserRegisteringAdmin: React.FC = () => {
               名
             </Text>
             <Input
+              fontSize={16}
               value={values.firstName}
               onChangeText={t => setValues({...values, firstName: t})}
               placeholder="太郎"
@@ -309,6 +311,7 @@ const UserRegisteringAdmin: React.FC = () => {
               セイ
             </Text>
             <Input
+              fontSize={16}
               value={values.lastNameKana}
               onChangeText={handleChange('lastNameKana')}
               placeholder="ヤマダ"
@@ -320,6 +323,7 @@ const UserRegisteringAdmin: React.FC = () => {
               メイ
             </Text>
             <Input
+              fontSize={16}
               value={values.firstNameKana}
               onChangeText={handleChange('firstNameKana')}
               placeholder="タロウ"
@@ -331,6 +335,7 @@ const UserRegisteringAdmin: React.FC = () => {
               メールアドレス
             </Text>
             <Input
+              fontSize={16}
               value={values.email}
               onChangeText={t => setValues({...values, email: t})}
               placeholder="bold@example.com"
@@ -342,6 +347,7 @@ const UserRegisteringAdmin: React.FC = () => {
               電話番号
             </Text>
             <Input
+              fontSize={16}
               value={values.phone}
               onChangeText={t => setValues({...values, phone: t})}
               placeholder="000-0000-0000"
@@ -373,6 +379,7 @@ const UserRegisteringAdmin: React.FC = () => {
               社員コード
             </Text>
             <Input
+              fontSize={16}
               value={values.employeeId || ''}
               onChangeText={t => setValues({...values, employeeId: t})}
               autoCapitalize="none"
@@ -383,6 +390,7 @@ const UserRegisteringAdmin: React.FC = () => {
               パスワード
             </Text>
             <Input
+              fontSize={16}
               value={values.password}
               onChangeText={t => setValues({...values, password: t})}
               placeholder="8文字以上で入力してください"
