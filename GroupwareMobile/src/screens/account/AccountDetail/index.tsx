@@ -403,7 +403,7 @@ const AccountDetail: React.FC = () => {
                     }}
                     name={defaultScreenName}
                     children={() => (
-                      <Div bg="white">
+                      <Div bg="white" h="100%">
                         <DetailScreen
                           isLoading={loadingProfile}
                           profile={profile}
@@ -427,7 +427,7 @@ const AccountDetail: React.FC = () => {
                     listeners={{focus: () => setActiveScreen(eventScreenName)}}
                     name={eventScreenName}
                     children={() => (
-                      <Div bg="white">
+                      <Div bg="white" h="100%">
                         <Div alignItems="center" mt="lg">
                           {events?.events?.length ? (
                             events?.events?.map(e => (
@@ -462,7 +462,7 @@ const AccountDetail: React.FC = () => {
                     }}
                     name={questionScreenName}
                     children={() => (
-                      <Div bg="white">
+                      <Div bg="white" h="100%">
                         <Div alignItems="center" mt="lg">
                           {questionList?.wiki?.length ? (
                             questionList?.wiki?.map(w => (
@@ -495,7 +495,7 @@ const AccountDetail: React.FC = () => {
                     }}
                     name={knowledgeScreenName}
                     children={() => (
-                      <Div bg="white">
+                      <Div bg="white" h="100%">
                         <Div alignItems="center" mt="lg">
                           {knowledgeList?.wiki?.length ? (
                             knowledgeList?.wiki?.map(w => (
@@ -528,7 +528,7 @@ const AccountDetail: React.FC = () => {
                     }}
                     name={goodScreenName}
                     children={() => (
-                      <Div bg="white">
+                      <Div bg="white" h="100%">
                         <Div alignItems="center" mt="lg">
                           {profile?.userGoodForBoard?.length ? (
                             profile?.userGoodForBoard?.map(w => (
