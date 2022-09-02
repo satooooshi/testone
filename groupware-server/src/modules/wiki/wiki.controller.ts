@@ -22,7 +22,8 @@ import JwtAuthenticationGuard from '../auth/jwtAuthentication.guard';
 import RequestWithUser from '../auth/requestWithUser.interface';
 import SaveWikiDto from './dto/saveWikiDto';
 import { WikiService } from './wiki.service';
-
+import { User, UserRole } from 'src/entities/user.entity';
+import { UserService } from '../user/user.service';
 export interface SearchQueryToGetWiki {
   page?: string;
   word?: string;
@@ -53,6 +54,16 @@ export class WikiController {
   ): Promise<SearchResultToGetWiki> {
     const userID = req.user.id;
     return await this.qaService.getWikiList(userID, query);
+  }
+
+  @Get('/good/list')
+  @UseGuards(JwtAuthenticationGuard)
+  async getWikiUserGoodList(
+    @Req() req: RequestWithUser,
+    @Query() query: SearchQueryToGetWiki,
+  ): Promise<SearchResultToGetWiki> {
+    const userID = req.user.id;
+    return await this.qaService.getWikiGoodList(userID, query);
   }
 
   @Get('detail/:id')
@@ -135,6 +146,7 @@ export class WikiController {
   async getHearts(@Param('id') id: number): Promise<UserGoodForBoard[]> {
     return this.qaService.getHearts(id);
   }
+
   @UseGuards(JwtAuthenticationGuard)
   @Post('toggle-good-for-board')
   async toggleGoodForBoard(

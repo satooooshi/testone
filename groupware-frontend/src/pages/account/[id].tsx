@@ -17,6 +17,7 @@ import Head from 'next/head';
 import TopTabBar, { TopTabBehavior } from '@/components/layout/TopTabBar';
 import { useAPIGetEventList } from '@/hooks/api/event/useAPIGetEventList';
 import { useAPIGetWikiList } from '@/hooks/api/wiki/useAPIGetWikiList';
+import { useAPIGetUserGoodList } from '@/hooks/api/wiki/useAPIGetWikiGoodList';
 import { useHeaderTab } from '@/hooks/headerTab/useHeaderTab';
 import {
   Text,
@@ -129,6 +130,7 @@ const MyAccountInfo = () => {
       },
       { enabled: false },
     );
+
   const { data: knowledgeList, refetch: refetchKnowledgeList } =
     useAPIGetWikiList(
       {
@@ -138,6 +140,14 @@ const MyAccountInfo = () => {
       },
       { enabled: false },
     );
+  const { data: goodList, refetch: refetchGoodList } = useAPIGetUserGoodList(
+    {
+      type: WikiType.BOARD,
+      board_category: BoardCategory.GOOD,
+    },
+    { enabled: false },
+  );
+
   const { user } = useAuthenticate();
   const [activeTab, setActiveTab] = useState<TabName>(TabName.DETAIL);
   const { mutate: logout } = useAPILogout({
@@ -213,6 +223,9 @@ const MyAccountInfo = () => {
           return;
         case TabName.KNOWLEDGE:
           refetchKnowledgeList();
+          return;
+        case TabName.GOOD:
+          refetchGoodList();
           return;
       }
     };
@@ -498,12 +511,10 @@ const MyAccountInfo = () => {
                 </Text>
               )
             ) : null}
-            {activeTab === TabName.GOOD &&
-            profile.userGoodForBoard &&
-            profile.userGoodForBoard.length ? (
+            {activeTab === TabName.GOOD && goodList && goodList.wiki.length ? (
               <Box>
-                {profile.userGoodForBoard.map((w) => (
-                  <WikiCard wiki={w.wiki} key={w.id} />
+                {goodList.wiki.map((w) => (
+                  <WikiCard wiki={w} key={w.id} />
                 ))}
               </Box>
             ) : null}

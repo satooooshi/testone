@@ -9,6 +9,7 @@ import { StorageService } from '../storage/storage.service';
 import { selectUserColumns } from 'src/utils/selectUserColumns';
 import { UserGoodForBoard } from 'src/entities/userGoodForBord.entity';
 import { User } from 'src/entities/user.entity';
+import { UserService } from '../user/user.service';
 
 @Injectable()
 export class WikiService {
@@ -26,6 +27,8 @@ export class WikiService {
     private readonly userGoodForBoardRepository: Repository<UserGoodForBoard>,
 
     private readonly storageService: StorageService,
+
+    private readonly userService: UserService,
   ) {}
 
   public async saveWiki(wiki: Partial<Wiki>): Promise<Wiki> {
@@ -268,6 +271,45 @@ export class WikiService {
     const endTime = Date.now();
     console.log('get wiki speed check2', endTime - startTime);
     return { pageCount, wiki: wikisAndRelationCount };
+  }
+
+  public async getWikiGoodList(
+    userID: number,
+    query: SearchQueryToGetWiki,
+  ): Promise<SearchResultToGetWiki> {
+    const {
+      page = 1,
+      word = '',
+      status = 'new',
+      tag = '',
+      type,
+      rule_category,
+      board_category,
+      writer,
+    } = query;
+
+    let offset: number;
+    const limit = 20;
+    if (page) {
+      offset = (Number(page) - 1) * limit;
+    }
+
+    const tagIDs = tag.split(' ');
+    const startTime = Date.now();
+
+    const { userGoodForBoard } = await this.userService.getAllInfoById(userID);
+    const wikis = userGoodForBoard
+      .map((w) => w.wiki)
+      .sort((a: Wiki, b: Wiki) => {
+        return b.updatedAt.getTime() - a.updatedAt.getTime();
+      });
+    const count = wikis.length;
+    const pageCount =
+      count % limit === 0 ? count / limit : Math.floor(count / limit) + 1;
+
+    if (count) {
+      return { pageCount, wiki: wikis };
+    }
   }
 
   public async getHearts(wikiID: number): Promise<UserGoodForBoard[]> {
