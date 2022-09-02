@@ -87,9 +87,9 @@ const UpdatePassword: React.FC = () => {
         <Icon color="white" name="check" fontSize={32} />
       </Button>
 
-      <Div w={windowWidth * 0.9} alignSelf="center" mt={'lg'}>
-        <Div mb={'lg'}>
-          <Text fontSize={16} fontWeight="bold">
+      <Div w="100%" h="100%" px="5%" bg="white" alignSelf="center" pt={'lg'}>
+        <Div mb={'xl'}>
+          <Text ml="lg" mb="sm" fontSize={16}>
             現在のパスワード
           </Text>
           {errors.currentPassword && touched.currentPassword ? (
@@ -98,6 +98,7 @@ const UpdatePassword: React.FC = () => {
             </Text>
           ) : null}
           <Input
+            fontSize={16}
             secureTextEntry={true}
             value={values.currentPassword}
             onChangeText={t => setValues(v => ({...v, currentPassword: t}))}
@@ -105,8 +106,8 @@ const UpdatePassword: React.FC = () => {
             placeholder="現在のパスワードを入力してください"
           />
         </Div>
-        <Div mb={'lg'}>
-          <Text fontSize={16} fontWeight="bold">
+        <Div mb={'xl'}>
+          <Text ml="lg" mb="sm" fontSize={16}>
             新しいパスワード
           </Text>
           {errors.newPassword && touched.newPassword ? (
@@ -115,6 +116,7 @@ const UpdatePassword: React.FC = () => {
             </Text>
           ) : null}
           <Input
+            fontSize={16}
             secureTextEntry={true}
             value={values.newPassword}
             onChangeText={t => setValues(v => ({...v, newPassword: t}))}
@@ -122,9 +124,9 @@ const UpdatePassword: React.FC = () => {
             placeholder="新しいパスワードを入力してください"
           />
         </Div>
-        <Div mb={'lg'}>
-          <Text fontSize={16} fontWeight="bold">
-            新しいパスワード(再入力)
+        <Div mb={'xl'}>
+          <Text ml="lg" mb="sm" fontSize={16}>
+            新しいパスワード確認
           </Text>
           {errors.newPasswordConfirmation && touched.newPasswordConfirmation ? (
             <Text fontSize={16} fontWeight="bold" color="tomato">
@@ -132,6 +134,7 @@ const UpdatePassword: React.FC = () => {
             </Text>
           ) : null}
           <Input
+            fontSize={16}
             secureTextEntry={true}
             value={values.newPasswordConfirmation}
             onChangeText={t =>
