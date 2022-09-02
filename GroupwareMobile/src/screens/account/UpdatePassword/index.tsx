@@ -89,7 +89,7 @@ const UpdatePassword: React.FC = () => {
 
       <Div w="100%" h="100%" px="5%" bg="white" alignSelf="center" pt={'lg'}>
         <Div mb={'xl'}>
-          <Text fontSize={16} fontWeight="bold">
+          <Text ml="lg" mb="sm" fontSize={16}>
             現在のパスワード
           </Text>
           {errors.currentPassword && touched.currentPassword ? (
@@ -106,7 +106,7 @@ const UpdatePassword: React.FC = () => {
           />
         </Div>
         <Div mb={'xl'}>
-          <Text fontSize={16} fontWeight="bold">
+          <Text ml="lg" mb="sm" fontSize={16}>
             新しいパスワード
           </Text>
           {errors.newPassword && touched.newPassword ? (
@@ -123,7 +123,7 @@ const UpdatePassword: React.FC = () => {
           />
         </Div>
         <Div mb={'xl'}>
-          <Text fontSize={16} fontWeight="bold">
+          <Text ml="lg" mb="sm" fontSize={16}>
             新しいパスワード(再入力)
           </Text>
           {errors.newPasswordConfirmation && touched.newPasswordConfirmation ? (
