@@ -221,6 +221,7 @@ const Profile: React.FC = () => {
                 メールアドレス
               </Text>
               <Input
+                fontSize={16}
                 value={values.email}
                 onChangeText={handleChange('email')}
                 placeholder="bold@example.com"
@@ -258,6 +259,7 @@ const Profile: React.FC = () => {
                 電話番号
               </Text>
               <Input
+                fontSize={16}
                 value={values.phone}
                 onChangeText={handleChange('phone')}
                 placeholder="000-0000-0000"
@@ -295,6 +297,7 @@ const Profile: React.FC = () => {
                 姓
               </Text>
               <Input
+                fontSize={16}
                 value={values.lastName}
                 onChangeText={handleChange('lastName')}
                 placeholder="山田"
@@ -306,6 +309,7 @@ const Profile: React.FC = () => {
                 名
               </Text>
               <Input
+                fontSize={16}
                 value={values.firstName}
                 onChangeText={handleChange('firstName')}
                 placeholder="太郎"
@@ -317,6 +321,7 @@ const Profile: React.FC = () => {
                 姓(フリガナ)
               </Text>
               <Input
+                fontSize={16}
                 value={values.lastNameKana}
                 onChangeText={handleChange('lastNameKana')}
                 placeholder="ヤマダ"
@@ -328,6 +333,7 @@ const Profile: React.FC = () => {
                 名(フリガナ)
               </Text>
               <Input
+                fontSize={16}
                 value={values.firstNameKana}
                 onChangeText={handleChange('firstNameKana')}
                 placeholder="タロウ"
