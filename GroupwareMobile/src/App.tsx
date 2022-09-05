@@ -57,16 +57,16 @@ const App = () => {
         const latestVersion = Number(await res.json());
         const currentVersion = Number(VersionCheck.getCurrentVersion());
         const isUpdateNeeded = currentVersion < latestVersion;
-        if (isUpdateNeeded) {
-          Alert.alert('アプリを更新してください', '', [
-            {
-              text: 'TestFlightを開く',
-              onPress: () => {
-                Linking.openURL('itms-beta://testflight.apple.com');
-              },
-            },
-          ]);
-        }
+        // if (isUpdateNeeded) {
+        //   Alert.alert('アプリを更新してください', '', [
+        //     {
+        //       text: 'TestFlightを開く',
+        //       onPress: () => {
+        //         Linking.openURL('itms-beta://testflight.apple.com');
+        //       },
+        //     },
+        //   ]);
+        // }
       }
     };
 
