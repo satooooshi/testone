@@ -13,6 +13,7 @@ import { MailerModule } from '@nestjs-modules/mailer';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 import { TopNewsModule } from './modules/top-news/top-news.module';
 import { ScheduleModule } from '@nestjs/schedule';
+import { APP_DIRNAME } from './var';
 
 @Module({
   imports: [
@@ -32,7 +33,7 @@ import { ScheduleModule } from '@nestjs/schedule';
           from: configService.get('EMAIL_FROM'),
         },
         template: {
-          dir: __dirname + '/templates/',
+          dir: APP_DIRNAME + '/templates/',
           adapter: new HandlebarsAdapter(), // or new PugAdapter()
           options: {
             strict: true,
@@ -51,11 +52,11 @@ import { ScheduleModule } from '@nestjs/schedule';
         port: configService.get('DB_PORT'),
         entities: [__dirname + '/entities/*.entity{.ts,.js}'],
         synchronize: false,
-        migrations:
-          process.env.NODE_ENV !== 'production'
-            ? [__dirname + '/migrations/*{.js}']
-            : [__dirname + '/migrations/*{.ts,.js}'],
-        migrationsRun: true,
+        // migrations:
+        //   process.env.NODE_ENV !== 'production'
+        //     ? [__dirname + '/migrations/*{.js}']
+        //     : [__dirname + '/migrations/*{.ts,.js}'],
+        // migrationsRun: true,
         extra: {
           charset: 'utf8mb4_bin',
         },
