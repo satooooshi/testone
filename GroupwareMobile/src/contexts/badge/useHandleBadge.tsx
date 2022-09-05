@@ -190,6 +190,7 @@ export const BadgeProvider: React.FC = ({children}) => {
   };
 
   const refreshRooms = () => {
+    setCompleteRefetch(false);
     refetchAllRooms();
   };
 

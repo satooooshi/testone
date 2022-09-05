@@ -83,18 +83,17 @@ const RoomList: React.FC = () => {
     },
   });
 
-  // useFocusEffect(
-  //   useCallback(() => {
-  //     setChatRooms(chatGroups);
-  //   }, [chatGroups]),
-  // );
-
   useEffect(() => {
-    if (isCompletedRefetchAllRooms) {
-      // console.log('isCompletedRefetchAllRooms', chatGroups.length);
-      setChatRooms(chatGroups);
-    }
-  }, [chatGroups, isCompletedRefetchAllRooms]);
+    setChatRooms(chatGroups);
+    console.log('change chatRoom', chatGroups.length);
+  }, [chatGroups]);
+
+  // useEffect(() => {
+  //   if (isCompletedRefetchAllRooms) {
+  //     console.log('isCompletedRefetchAllRooms', chatGroups.length);
+  //     setChatRooms(chatGroups);
+  //   }
+  // }, [chatGroups, isCompletedRefetchAllRooms]);
 
   useEffect(() => {
     if (roomTypeSelector) {
@@ -220,12 +219,13 @@ const RoomList: React.FC = () => {
           }
           clearButtonMode="while-editing"
         />
+        <Text>ルーム数{chatRooms.length}</Text>
         {chatRooms.length ? (
           <ScrollDiv
             h={'80%'}
             refreshControl={
               <RefreshControl
-                refreshing={isRoomsRefetching}
+                refreshing={!isCompletedRefetchAllRooms}
                 onRefresh={refreshRoomList}
               />
             }>
