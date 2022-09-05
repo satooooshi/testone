@@ -14,6 +14,32 @@ import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handleba
 import { TopNewsModule } from './modules/top-news/top-news.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { APP_DIRNAME } from './var';
+import { ChatAlbum } from './entities/chatAlbum.entity';
+import { ChatAlbumImage } from './entities/chatAlbumImage.entity';
+import { ChatGroup } from './entities/chatGroup.entity';
+import { ChatMessage } from './entities/chatMessage.entity';
+import { ChatMessageReaction } from './entities/chatMessageReaction.entity';
+import { ChatNote } from './entities/chatNote.entity';
+import { ChatNoteImage } from './entities/chatNoteImage.entity';
+import { Department } from './entities/department.entity';
+import { NotificationDevice } from './entities/device.entity';
+import { EventSchedule } from './entities/event.entity';
+import { EventComment } from './entities/eventComment.entity';
+import { EventFile } from './entities/eventFile.entity';
+import { EventIntroduction } from './entities/eventIntroduction.entity';
+import { EventIntroductionSubImage } from './entities/eventIntroductionSubImage.entity';
+import { EventVideo } from './entities/eventVideo.entity';
+import { LastReadChatTime } from './entities/lastReadChatTime.entity';
+import { QAAnswer } from './entities/qaAnswer.entity';
+import { QAAnswerReply } from './entities/qaAnswerReply.entity';
+import { SubmissionFile } from './entities/submissionFiles.entity';
+import { Tag } from './entities/tag.entity';
+import { TopNews } from './entities/topNews.entity';
+import { User } from './entities/user.entity';
+import { UserGoodForBoard } from './entities/userGoodForBord.entity';
+import { UserJoiningEvent } from './entities/userJoiningEvent.entity';
+import { UserTag } from './entities/userTag.entity';
+import { Wiki } from './entities/wiki.entity';
 
 @Module({
   imports: [
@@ -50,7 +76,35 @@ import { APP_DIRNAME } from './var';
         password: configService.get('DB_PASSWORD'),
         database: configService.get('DB_DATABASE'),
         port: configService.get('DB_PORT'),
-        entities: [__dirname + '/entities/*.entity{.ts,.js}'],
+        // entities: [__dirname + '/entities/*.entity{.ts,.js}'],
+        entities: [
+          ChatAlbum,
+          ChatAlbumImage,
+          ChatGroup,
+          ChatMessage,
+          ChatMessageReaction,
+          ChatNote,
+          ChatNoteImage,
+          Department,
+          NotificationDevice,
+          EventSchedule,
+          EventComment,
+          EventFile,
+          EventIntroduction,
+          EventIntroductionSubImage,
+          EventVideo,
+          LastReadChatTime,
+          QAAnswer,
+          QAAnswerReply,
+          SubmissionFile,
+          Tag,
+          TopNews,
+          User,
+          UserGoodForBoard,
+          UserJoiningEvent,
+          UserTag,
+          Wiki,
+        ],
         synchronize: false,
         // migrations:
         //   process.env.NODE_ENV !== 'production'
