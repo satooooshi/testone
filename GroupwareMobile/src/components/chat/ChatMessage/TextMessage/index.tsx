@@ -31,7 +31,10 @@ const TextMessage: React.FC<TextMessageProps> = ({
         p={8}
         justifyContent="center">
         {message.replyParentMessage && (
-          <ReplyParent parentMessage={message.replyParentMessage} />
+          <ReplyParent
+            parentMessage={message.replyParentMessage}
+            isSender={message.isSender}
+          />
         )}
         <AutoLinkedText
           message={message}
@@ -46,11 +49,11 @@ const TextMessage: React.FC<TextMessageProps> = ({
             message.isSender ? tailwind('text-white') : tailwind('text-black')
           }
         />
-        {/* {message.updatedAt > message.createdAt ? (
+        {message.modifiedAt ? (
           <Text fontSize={10} mt={3} color={darkFontColor} textAlign="right">
             編集済み
           </Text>
-        ) : null} */}
+        ) : null}
       </Div>
     </TouchableHighlight>
   );

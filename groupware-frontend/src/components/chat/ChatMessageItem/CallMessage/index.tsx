@@ -36,15 +36,12 @@ const CallMessage: React.FC<CallMessageProps> = ({ message }) => {
       <Box ml={2} flexDir="column" display="flex" alignItems="center">
         <Text
           fontSize={15}
-          color={message.isSender ? 'white' : darkFontColor}
+          color={message.isSender ? 'white' : 'black'}
           bg={message.isSender ? 'blue.500' : '#ececec'}>
           {mentionTransform(message.content)}
         </Text>
 
-        <Text
-          mt={1}
-          fontSize={11}
-          color={message.isSender ? 'white' : darkFontColor}>
+        <Text mt={1} fontSize={11} color={message.isSender ? 'white' : 'black'}>
           {message.callTime}
         </Text>
       </Box>

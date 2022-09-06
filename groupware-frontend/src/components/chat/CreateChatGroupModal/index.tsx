@@ -57,6 +57,7 @@ const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
   const [membersModal, setMembersModal] = useState(false);
   const [selectImageUrl, setSelectImageUrl] = useState<string>('');
   const [selectImageName, setSelectImageName] = useState<string>('');
+
   const [crop, setCrop] = useState<Crop>({
     unit: 'px',
     x: 130,
@@ -65,7 +66,6 @@ const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
     height: 200,
     aspect: 1,
   });
-  const [completedCrop, setCompletedCrop] = useState<Crop>();
   const imgRef = useRef<HTMLImageElement>();
   const onEventImageDrop = useCallback((f: File[]) => {
     setSelectImageUrl(URL.createObjectURL(f[0]));
@@ -78,9 +78,28 @@ const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
   const [willSubmit, setWillSubmit] = useState(false);
   const router = useRouter();
 
-  const onLoad = useCallback((img) => {
+  const onLoad = useCallback((img: HTMLImageElement) => {
     imgRef.current = img;
+    const radius = img.height < img.width ? img.height : img.width;
+    setCrop({
+      unit: 'px',
+      x: (img.width - radius) / 2,
+      y: (img.height - radius) / 2,
+      width: radius,
+      height: radius,
+      aspect: 1,
+    });
   }, []);
+
+  const onChange = (newCrop: Crop) => {
+    if (
+      newCrop.height !== crop.height ||
+      newCrop.width !== crop.width ||
+      newCrop.y !== crop.y ||
+      newCrop.x !== crop.x
+    )
+      setCrop(newCrop);
+  };
 
   const { mutate: createGroup, isLoading: loadingCreateGroup } =
     useAPISaveChatGroup({
@@ -111,7 +130,6 @@ const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
   const resetImageUrl = () => {
     setSelectImageUrl('');
     imgRef.current = undefined;
-    setCompletedCrop(undefined);
   };
 
   const {
@@ -126,8 +144,8 @@ const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
     enableReinitialize: true,
     validationSchema: chatGroupSchema,
     onSubmit: async () => {
-      if (imgRef.current && completedCrop) {
-        const img = getCroppedImageURL(imgRef.current, completedCrop);
+      if (imgRef.current) {
+        const img = getCroppedImageURL(imgRef.current, crop);
         if (!img) {
           return;
         }
@@ -176,7 +194,7 @@ const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
   return (
     <Modal onClose={onClose} scrollBehavior="inside" isOpen={isOpen}>
       <ModalOverlay />
-      <ModalContent h="90vh" bg={'#f9fafb'}>
+      <ModalContent h="90vh" bg={'#f9fafb'} textAlign="center">
         <ModalHeader
           flexDir="row"
           justifyContent="space-between"
@@ -205,16 +223,29 @@ const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
           />
           <Box overflowY="auto" css={hideScrollbarCss}>
             {selectImageUrl ? (
-              <ReactCrop
-                keepSelection={true}
-                imageStyle={{ maxHeight: '80%' }}
-                src={selectImageUrl}
-                crop={crop}
-                onChange={(newCrop) => setCrop(newCrop)}
-                onComplete={(c) => setCompletedCrop(c)}
-                onImageLoaded={onLoad}
-                circularCrop={true}
-              />
+              <Box display="flex" flexDirection="column">
+                <Box>
+                  <ReactCrop
+                    keepSelection={true}
+                    imageStyle={{
+                      minHeight: '100px',
+                      maxHeight: '300px',
+                      minWidth: '100px',
+                    }}
+                    src={selectImageUrl}
+                    crop={crop}
+                    onChange={(newCrop) => onChange(newCrop)}
+                    onImageLoaded={onLoad}
+                    circularCrop={true}
+                  />
+                </Box>
+                <Button
+                  my="15px"
+                  onClick={() => resetImageUrl()}
+                  colorScheme="blue">
+                  既存画像を削除
+                </Button>
+              </Box>
             ) : (
               <>
                 <FormLabel>ルーム画像</FormLabel>

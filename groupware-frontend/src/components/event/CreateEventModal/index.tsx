@@ -1,4 +1,10 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import createEventModalStyle from '@/styles/components/CreateEventModal.module.scss';
 import Modal from 'react-modal';
 import { MdCancel } from 'react-icons/md';
@@ -45,6 +51,7 @@ import { imageExtensions } from 'src/utils/imageExtensions';
 import { useFormik } from 'formik';
 import { createEventSchema } from 'src/utils/validation/schema';
 import { useImageCrop } from '@/hooks/crop/useImageCrop';
+import { Crop } from 'react-image-crop';
 import { DateTime } from 'luxon';
 import { tagColorFactory } from 'src/utils/factory/tagColorFactory';
 import { useAuthenticate } from 'src/contexts/useAuthenticate';
@@ -80,27 +87,6 @@ type CreateEventModalProps = {
   createEvent: (newEvent: CreateEventRequest) => void;
 };
 
-const setDateTime = (addDays: number, hours: number, minutes: number) => {
-  const today = new Date();
-  today.setDate(today.getDate() + addDays);
-  today.setHours(hours, minutes);
-  return today;
-};
-
-const initialEventValue = {
-  title: '',
-  description: '',
-  startAt: setDateTime(1, 19, 0),
-  endAt: setDateTime(1, 21, 0),
-  type: EventType.CLUB,
-  imageURL: '',
-  chatNeeded: false,
-  hostUsers: [],
-  tags: [],
-  files: [],
-  videos: [],
-};
-
 const CreateEventModal: React.FC<CreateEventModalProps> = ({
   enabled,
   onCancelPressed,
@@ -114,6 +100,27 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
   const { user } = useAuthenticate();
   const toast = useToast();
   const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
+  const setDateTime = (addDays: number, hours: number, minutes: number) => {
+    const today = new Date();
+    today.setDate(today.getDate() + addDays);
+    today.setHours(hours, minutes);
+    return today;
+  };
+  const initialEventValue = useMemo(() => {
+    return {
+      title: '',
+      description: '',
+      startAt: setDateTime(1, 19, 0),
+      endAt: setDateTime(1, 21, 0),
+      type: EventType.CLUB,
+      imageURL: '',
+      chatNeeded: false,
+      hostUsers: [],
+      tags: [],
+      files: [],
+      videos: [],
+    };
+  }, []);
 
   const {
     values: newEvent,
@@ -128,7 +135,7 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
     validateOnBlur: false,
     validationSchema: createEventSchema,
     onSubmit: async (submittedValues) => {
-      if (!croppedImageURL || !selectThumbnailName || !completedCrop) {
+      if (!croppedImageURL || !selectThumbnailName) {
         createEvent(submittedValues);
         return;
       }
@@ -138,6 +145,7 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
         onSuccess: (fileURLs) => {
           createEvent({ ...submittedValues, imageURL: fileURLs[0] });
           resetForm();
+          dispatchCrop({ type: 'resetImage', value: 'resetImage' });
         },
       });
     },
@@ -180,7 +188,6 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
   const [
     {
       crop,
-      completedCrop,
       croppedImageURL,
       imageName: selectThumbnailName,
       imageURL: selectThumbnailUrl,
@@ -188,7 +195,6 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
     dispatchCrop,
   ] = useImageCrop();
   const imgRef = useRef<HTMLImageElement | null>(null);
-
   const onEventThumbnailDrop = useCallback(
     (f: File[]) => {
       dispatchCrop({ type: 'setImageFile', value: f[0] });
@@ -198,7 +204,35 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
 
   const onLoad = useCallback((img) => {
     imgRef.current = img;
+    const diameter = img.height < img.width ? img.height : img.width;
+    dispatchCrop({
+      type: 'setCropAndImage',
+      value: {
+        unit: 'px',
+        x: (img.width - diameter) / 2,
+        y: (img.height - diameter) / 2,
+        width: diameter,
+        height: diameter,
+        aspect: 1,
+      },
+      ref: img,
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const onChange = (newCrop: Crop) => {
+    if (
+      newCrop.height !== crop.height ||
+      newCrop.width !== crop.width ||
+      newCrop.y !== crop.y ||
+      newCrop.x !== crop.x
+    )
+      dispatchCrop({
+        type: 'setCropAndImage',
+        value: newCrop,
+        ref: imgRef.current,
+      });
+  };
 
   const {
     getRootProps: getEventThumbnailRootProps,
@@ -635,7 +669,7 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
             </FormControl>
           </Box>
           <Text mb="15px">サムネイル</Text>
-          {((newEvent.imageURL && !selectThumbnailUrl) || completedCrop) && (
+          {((newEvent.imageURL && !selectThumbnailUrl) || croppedImageURL) && (
             <Button
               mb="15px"
               onClick={() => {
@@ -658,18 +692,14 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
               <ReactCrop
                 src={selectThumbnailUrl}
                 crop={crop}
-                onChange={(newCrop) =>
-                  dispatchCrop({ type: 'setCrop', value: newCrop })
-                }
+                onChange={(newCrop) => onChange(newCrop)}
                 keepSelection={true}
-                onComplete={(c) =>
-                  dispatchCrop({
-                    type: 'setCompletedCrop',
-                    value: c,
-                    ref: imgRef.current,
-                  })
-                }
                 onImageLoaded={onLoad}
+                imageStyle={{
+                  minHeight: '100px',
+                  maxHeight: '300px',
+                  minWidth: '100px',
+                }}
               />
             ) : (
               <Box

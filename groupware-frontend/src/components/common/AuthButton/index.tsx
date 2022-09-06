@@ -12,6 +12,7 @@ const AuthButton: React.FC<AuthButtonProps> = ({ name, isActive, onClick }) => {
     <button
       type="submit"
       onClick={onClick}
+      disabled={!isActive}
       className={clsx(
         styles.button_oblong,
         isActive

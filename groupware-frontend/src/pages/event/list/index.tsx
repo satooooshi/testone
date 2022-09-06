@@ -414,12 +414,12 @@ const EventList = () => {
     }
   };
 
-  const initialCalendarDate: Date = useMemo(() => {
-    if (from && to) {
-      return DateTime.fromFormat(from, 'yyyy-LL-dd').toJSDate();
-    }
-    return new Date();
-  }, [from, to]);
+  // const initialCalendarDate: Date = useMemo(() => {
+  //   if (from && to) {
+  //     return DateTime.fromFormat(from, 'yyyy-LL-dd').toJSDate();
+  //   }
+  //   return new Date();
+  // }, [from, to]);
 
   // useEffect(() => {
   //   calendarRef?.current?.scrollIntoView();
@@ -526,7 +526,7 @@ const EventList = () => {
                 handleCalendarRangeChange(range);
               }}
               popup={true}
-              defaultDate={initialCalendarDate}
+              // defaultDate={initialCalendarDate}
               onSelectSlot={handleNewEventFromCalendar}
               onSelectEvent={(e) => {
                 const eventSchedule = e as EventSchedule;
