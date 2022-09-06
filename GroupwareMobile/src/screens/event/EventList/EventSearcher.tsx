@@ -27,22 +27,22 @@ const EventSearcher: React.FC = () => {
       name: 'All',
       onPress: () => setPartOfSearchQuery({type: undefined}),
     },
-    {
-      name: eventTypeNameFactory(EventType.IMPRESSIVE_UNIVERSITY),
-      onPress: () =>
-        setPartOfSearchQuery({type: EventType.IMPRESSIVE_UNIVERSITY}),
-      borderBottomColor: eventTypeColorFactory(EventType.IMPRESSIVE_UNIVERSITY),
-    },
+    // {
+    //   name: eventTypeNameFactory(EventType.IMPRESSIVE_UNIVERSITY),
+    //   onPress: () =>
+    //     setPartOfSearchQuery({type: EventType.IMPRESSIVE_UNIVERSITY}),
+    //   borderBottomColor: eventTypeColorFactory(EventType.IMPRESSIVE_UNIVERSITY),
+    // },
     {
       name: eventTypeNameFactory(EventType.STUDY_MEETING),
       onPress: () => setPartOfSearchQuery({type: EventType.STUDY_MEETING}),
       borderBottomColor: eventTypeColorFactory(EventType.STUDY_MEETING),
     },
-    {
-      name: eventTypeNameFactory(EventType.BOLDAY),
-      onPress: () => setPartOfSearchQuery({type: EventType.BOLDAY}),
-      borderBottomColor: eventTypeColorFactory(EventType.BOLDAY),
-    },
+    // {
+    //   name: eventTypeNameFactory(EventType.BOLDAY),
+    //   onPress: () => setPartOfSearchQuery({type: EventType.BOLDAY}),
+    //   borderBottomColor: eventTypeColorFactory(EventType.BOLDAY),
+    // },
     {
       name: eventTypeNameFactory(EventType.COACH),
       onPress: () => setPartOfSearchQuery({type: EventType.COACH}),

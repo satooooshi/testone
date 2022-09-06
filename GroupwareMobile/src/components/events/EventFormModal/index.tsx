@@ -505,7 +505,7 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
             />
           </Div>
           <Dropdown ref={dropdownRef} title="タイプの選択">
-            {isCreatableEvent(EventType.IMPRESSIVE_UNIVERSITY, user?.role) ? (
+            {/* {isCreatableEvent(EventType.IMPRESSIVE_UNIVERSITY, user?.role) ? (
               <Dropdown.Option
                 {...magnusDropdownOptions}
                 onPress={() =>
@@ -519,7 +519,7 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
               </Dropdown.Option>
             ) : (
               <></>
-            )}
+            )} */}
             {isCreatableEvent(EventType.STUDY_MEETING, user?.role) ? (
               <Dropdown.Option
                 {...magnusDropdownOptions}
@@ -532,7 +532,7 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
             ) : (
               <></>
             )}
-            {isCreatableEvent(EventType.BOLDAY, user?.role) ? (
+            {/* {isCreatableEvent(EventType.BOLDAY, user?.role) ? (
               <Dropdown.Option
                 {...magnusDropdownOptions}
                 onPress={() =>
@@ -543,7 +543,7 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
               </Dropdown.Option>
             ) : (
               <></>
-            )}
+            )} */}
             {isCreatableEvent(EventType.COACH, user?.role) ? (
               <Dropdown.Option
                 {...magnusDropdownOptions}

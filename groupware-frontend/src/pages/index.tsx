@@ -38,6 +38,24 @@ export default function Home() {
         <title>sample | Home</title>
       </Head>
       <div className={homeStyles.box_row_wrapper}>
+        <div className={homeStyles.box_wrapper}>
+          <PortalLinkBox href={PortalLinkType.CHAT} />
+        </div>
+        <div className={homeStyles.box_wrapper}>
+          <PortalLinkBox href={PortalLinkType.ATTENDANCE} />
+        </div>
+        <div className={homeStyles.box_wrapper}>
+          <PortalLinkBox href={PortalLinkType.WIKI} />
+        </div>
+        <div className={homeStyles.box_wrapper}>
+          <PortalLinkBox href={PortalLinkType.ACCOUNT} />
+        </div>
+        <div className={homeStyles.box_wrapper}>
+          <PortalLinkBox href={PortalLinkType.MYSCHEDULE} />
+        </div>
+        <div className={homeStyles.box_wrapper}>
+          <PortalLinkBox href={PortalLinkType.SUBMISSION_ETC} />
+        </div>
         {/* <div className={homeStyles.box_wrapper}>
           <PortalLinkBox href={PortalLinkType.IMPRESSIVE_UNIVERSITY} />
         </div> */}
@@ -48,26 +66,10 @@ export default function Home() {
           <PortalLinkBox href={PortalLinkType.BOLDAY} />
         </div> */}
         <div className={homeStyles.box_wrapper}>
-          <PortalLinkBox href={PortalLinkType.COACH} />
-        </div>
-        <div className={homeStyles.box_wrapper}>
           <PortalLinkBox href={PortalLinkType.CLUB} />
         </div>
         <div className={homeStyles.box_wrapper}>
-          <PortalLinkBox href={PortalLinkType.SUBMISSION_ETC} />
-        </div>
-        <div className={homeStyles.box_wrapper}>
-          <PortalLinkBox href={PortalLinkType.WIKI} />
-        </div>
-        <div className={homeStyles.box_wrapper}>
-          <PortalLinkBox href={PortalLinkType.CHAT} />
-        </div>
-        <div className={homeStyles.box_wrapper}>
-          <PortalLinkBox href={PortalLinkType.ACCOUNT} />
-        </div>
-        <div className={homeStyles.box_wrapper}>
-          <PortalLinkBox href={PortalLinkType.ATTENDANCE} />
-          <PortalLinkBox href={PortalLinkType.MYSCHEDULE} />
+          <PortalLinkBox href={PortalLinkType.COACH} />
         </div>
       </div>
     </LayoutWithTab>

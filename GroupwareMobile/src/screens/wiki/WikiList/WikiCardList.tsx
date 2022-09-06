@@ -389,7 +389,7 @@ const WikiCardList: React.FC<WikiCardListProps> = ({
                 ),
               }}
             />
-            <TopTab.Screen
+            {/* <TopTab.Screen
               name={'WikiList-' + BoardCategory.IMPRESSIVE_UNIVERSITY}
               children={() => (
                 <RenderWikiCardList
@@ -410,7 +410,7 @@ const WikiCardList: React.FC<WikiCardListProps> = ({
                   BoardCategory.IMPRESSIVE_UNIVERSITY,
                 ),
               }}
-            />
+            /> */}
             <TopTab.Screen
               name={'WikiList-' + BoardCategory.CLUB}
               children={() => (

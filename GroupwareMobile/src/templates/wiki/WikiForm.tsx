@@ -334,7 +334,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
       ) : (
         <></>
       )}
-      {isCreatableWiki({
+      {/* {isCreatableWiki({
         type: WikiType.BOARD,
         boardCategory: BoardCategory.IMPRESSIVE_UNIVERSITY,
         userRole: user?.role,
@@ -359,7 +359,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
         </Dropdown.Option>
       ) : (
         <></>
-      )}
+      )} */}
       {isCreatableWiki({
         type: WikiType.BOARD,
         boardCategory: BoardCategory.CLUB,

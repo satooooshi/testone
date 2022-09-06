@@ -172,6 +172,38 @@ const Home: React.FC = () => {
         <Div flexDir="row" justifyContent="center" alignItems="center">
           <Div mb={8} mr={4}>
             <PortalLinkBox
+              type="chat"
+              onPress={() => {
+                navigation.navigate('ChatStack', {
+                  screen: 'RoomList',
+                });
+              }}
+            />
+          </Div>
+          <Div mb={8} mr={4}>
+            <PortalLinkBox
+              type="wiki"
+              onPress={() => {
+                navigation.navigate('WikiStack', {
+                  screen: 'WikiLinks',
+                });
+              }}
+            />
+          </Div>
+          <Div mb={8}>
+            <PortalLinkBox
+              type="account"
+              onPress={() => {
+                navigation.navigate('AccountStack', {
+                  screen: 'AccountDetail',
+                });
+              }}
+            />
+          </Div>
+        </Div>
+        {/* <Div flexDir="row" justifyContent="center" alignItems="center">
+          <Div mb={8} mr={4}>
+            <PortalLinkBox
               type="impressive_university"
               onPress={() =>
                 navigation.navigate('EventStack', {
@@ -201,6 +233,40 @@ const Home: React.FC = () => {
                   params: {type: EventType.BOLDAY},
                 })
               }
+            />
+          </Div>
+        </Div> */}
+        <Div flexDir="row" justifyContent="center" alignItems="center">
+          <Div mb={8} mr={4}>
+            <PortalLinkBox
+              type="attendance"
+              onPress={() => {
+                navigation.navigate('AttendanceStack', {
+                  screen: 'AttendanceHome',
+                });
+              }}
+            />
+          </Div>
+          <Div mb={8} mr={4}>
+            <PortalLinkBox
+              type="my_schedule"
+              onPress={() => {
+                navigation.navigate('EventStack', {
+                  screen: 'EventList',
+                  params: {personal: true},
+                });
+              }}
+            />
+          </Div>
+          <Div mb={8}>
+            <PortalLinkBox
+              type="users"
+              onPress={() => {
+                navigation.navigate('UsersStack', {
+                  screen: 'UserList',
+                  params: {},
+                });
+              }}
             />
           </Div>
         </Div>
@@ -239,71 +305,19 @@ const Home: React.FC = () => {
             />
           </Div>
         </Div>
-        <Div flexDir="row" justifyContent="center" alignItems="center">
+
+        {/* <Div flexDir="row" justifyContent="center" alignItems="center">
           <Div mb={8} mr={4}>
             <PortalLinkBox
-              type="wiki"
-              onPress={() => {
-                navigation.navigate('WikiStack', {
-                  screen: 'WikiLinks',
-                });
-              }}
-            />
-          </Div>
-          <Div mb={8} mr={4}>
-            <PortalLinkBox
-              type="chat"
-              onPress={() => {
-                navigation.navigate('ChatStack', {
-                  screen: 'RoomList',
-                });
-              }}
-            />
-          </Div>
-          <Div mb={8}>
-            <PortalLinkBox
-              type="account"
-              onPress={() => {
-                navigation.navigate('AccountStack', {
-                  screen: 'AccountDetail',
-                });
-              }}
-            />
-          </Div>
-        </Div>
-        <Div flexDir="row" justifyContent="center" alignItems="center">
-          <Div mb={8} mr={4}>
-            <PortalLinkBox
-              type="my_schedule"
-              onPress={() => {
+              type="study_meeting"
+              onPress={() =>
                 navigation.navigate('EventStack', {
-                  screen: 'EventList',
-                  params: {personal: true},
-                });
-              }}
+                  screen: 'EventIntroduction',
+                  params: {type: EventType.STUDY_MEETING},
+                })
+              }
             />
           </Div>
-          <Div mb={8} mr={4}>
-            <PortalLinkBox
-              type="users"
-              onPress={() => {
-                navigation.navigate('UsersStack', {
-                  screen: 'UserList',
-                  params: {},
-                });
-              }}
-            />
-          </Div>
-          <Div mb={8}>
-            <PortalLinkBox
-              type="attendance"
-              onPress={() => {
-                Linking.openURL('https://bold-kintai.net/bold/root/attendance');
-              }}
-            />
-          </Div>
-        </Div>
-        <Div flexDir="row" justifyContent="center" alignItems="center">
           <Div mb={8} mr={4}>
             <PortalLinkBox
               type="safety_confirmation"
@@ -320,7 +334,7 @@ const Home: React.FC = () => {
               }}
             />
           </Div>
-        </Div>
+        </Div> */}
       </ScrollDiv>
     </WholeContainer>
   );
