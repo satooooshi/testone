@@ -40,12 +40,6 @@ export interface SearchResultToGetWiki {
   wiki: Wiki[];
 }
 
-export interface SearchResultToGetWikiGoodList {
-  // this key is the total page count
-  pageCount: number;
-  userGoodForBoard: UserGoodForBoard[];
-}
-
 @Controller('wiki')
 export class WikiController {
   constructor(private readonly qaService: WikiService) {}
@@ -65,7 +59,7 @@ export class WikiController {
   async getWikiUserGoodList(
     @Req() req: RequestWithUser,
     @Param('id') userID: string,
-  ): Promise<SearchResultToGetWikiGoodList> {
+  ): Promise<UserGoodForBoard[]> {
     return await this.qaService.getWikiGoodList(userID);
   }
 

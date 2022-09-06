@@ -4,11 +4,7 @@ import { QAAnswer } from 'src/entities/qaAnswer.entity';
 import { QAAnswerReply } from 'src/entities/qaAnswerReply.entity';
 import { BoardCategory, Wiki, WikiType } from 'src/entities/wiki.entity';
 import { In, Repository } from 'typeorm';
-import {
-  SearchQueryToGetWiki,
-  SearchResultToGetWiki,
-  SearchResultToGetWikiGoodList,
-} from './wiki.controller';
+import { SearchQueryToGetWiki, SearchResultToGetWiki } from './wiki.controller';
 import { StorageService } from '../storage/storage.service';
 import { selectUserColumns } from 'src/utils/selectUserColumns';
 import { UserGoodForBoard } from 'src/entities/userGoodForBord.entity';
@@ -273,9 +269,7 @@ export class WikiService {
     return { pageCount, wiki: wikisAndRelationCount };
   }
 
-  public async getWikiGoodList(
-    userID: string,
-  ): Promise<SearchResultToGetWikiGoodList> {
+  public async getWikiGoodList(userID: string): Promise<UserGoodForBoard[]> {
     const startTime = Date.now();
 
     const [userGoodForBoard, count] = await this.userGoodForBoardRepository
@@ -285,54 +279,21 @@ export class WikiService {
       .orderBy({ 'wiki.updatedAt': 'DESC' })
       .getManyAndCount();
 
+    if (count === 0) {
+      return [] as UserGoodForBoard[];
+    }
+
     const wikiIDs = userGoodForBoard.map((board) => board.wiki.id);
+    if (wikiIDs.length === 0) {
+      return [] as UserGoodForBoard[];
+    }
+
     const goodsCount = await this.userGoodForBoardRepository
       .createQueryBuilder('user_good_for_board')
       .select(['user_good_for_board.wiki_id', 'COUNT(*) AS cnt'])
       .where('user_good_for_board.wiki_id IN (:...wikiIDs)', { wikiIDs })
       .groupBy('user_good_for_board.wiki_id')
       .getRawMany();
-
-    console.log(
-      await this.userGoodForBoardRepository
-        .createQueryBuilder('user_good_for_board')
-        .select(['user_good_for_board.wiki_id', 'COUNT(*) AS cnt'])
-        .where('user_good_for_board.wiki_id IN (:...wikiIDs)', { wikiIDs })
-        .groupBy('user_good_for_board.wiki_id')
-        .getRawMany(),
-    );
-
-    const posts = await this.userGoodForBoardRepository
-      .createQueryBuilder('user_good_for_board')
-      //.select(['user_good_for_board.wiki_id'])
-      .select([
-        'user_good_for_board.wiki_id as board_id',
-        'user_good_for_board.user_id as user_id',
-      ])
-      .innerJoinAndSelect('user_good_for_board.wiki', 'wiki') // AndSelect appends wiki object columns in output
-      .innerJoin('user_good_for_board.user', 'user')
-      .where((qb) => {
-        const subQuery = qb
-          .subQuery()
-          .select('wiki.id')
-          .from(Wiki, 'wiki')
-          //.where("user_good_for_board.wiki_id = wiki.id")
-          .getQuery();
-        return 'user_good_for_board.wiki_id IN ' + subQuery;
-      })
-      //.setParameter("registered", true)
-      .getRawMany();
-    //.getMany();
-    console.log('test subquery\n', posts);
-
-    const sql = await this.userGoodForBoardRepository
-      .createQueryBuilder('user_good_for_board')
-      .innerJoinAndSelect('user_good_for_board.wiki', 'wiki')
-      .where('user_good_for_board.user_id = :userID', { userID: userID })
-      .orderBy({ 'wiki.updatedAt': 'DESC' })
-      .getQuery();
-    //.getSql();
-    console.log(sql);
 
     const boardAndRelationCount = userGoodForBoard.map((b) => {
       b.wiki.isGoodSender = true;
@@ -344,17 +305,10 @@ export class WikiService {
       return b;
     });
 
-    const limit = 20;
-    const pageCount =
-      count % limit === 0 ? count / limit : Math.floor(count / limit) + 1;
-
     const endTime = Date.now();
     console.log('get wiki good list speed check2', endTime - startTime);
-    if (count) {
-      return { pageCount, userGoodForBoard: boardAndRelationCount };
-    } else {
-      return { pageCount: 0, userGoodForBoard: [] };
-    }
+
+    return boardAndRelationCount;
   }
 
   public async getHearts(wikiID: number): Promise<UserGoodForBoard[]> {
