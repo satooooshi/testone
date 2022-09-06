@@ -506,12 +506,10 @@ const MyAccountInfo = () => {
                 </Text>
               )
             ) : null}
-            {activeTab === TabName.GOOD &&
-            goodList &&
-            goodList.userGoodForBoard.length ? (
+            {activeTab === TabName.GOOD && goodList && goodList.length ? (
               <Box>
-                {goodList.userGoodForBoard.map((board) => (
-                  <WikiCard wiki={board.wiki} key={board.id} />
+                {goodList.map((b) => (
+                  <WikiCard wiki={b.wiki} key={b.id} />
                 ))}
               </Box>
             ) : null}
