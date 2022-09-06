@@ -905,10 +905,10 @@ export class ChatService {
     const users = await this.userRepository.findByIds(userIds);
     chatGroup.members = users;
     chatGroup.memberCount = users.length;
-
     const newGroup = await this.chatGroupRepository.save(
       this.chatGroupRepository.create(chatGroup),
     );
+
     return newGroup;
   }
 
@@ -1010,6 +1010,7 @@ export class ChatService {
 
   public async v2SaveChatGroup(
     chatGroup: Partial<ChatGroup>,
+    userID: number,
   ): Promise<ChatGroup> {
     const newData: Partial<ChatGroup> = {
       ...chatGroup,
@@ -1030,7 +1031,12 @@ export class ChatService {
         .createQueryBuilder('g')
         .innerJoin('g.members', 'u', 'u.id = :userId', { userId: userIds[0] })
         .leftJoin('g.members', 'member')
-        .addSelect(['member.id'])
+        .addSelect([
+          'member.id',
+          'member.lastName',
+          'member.firstName',
+          'member.avatarUrl',
+        ])
         .where('g.room_type <> :type', {
           type: RoomType.GROUP,
         })
@@ -1057,6 +1063,7 @@ export class ChatService {
       .filter((g) => g.members.every((m) => userIds.includes(m.id)));
 
     if (existGroup.length) {
+      checkAloneRoom(existGroup[0], userID);
       return existGroup[0];
     }
 
