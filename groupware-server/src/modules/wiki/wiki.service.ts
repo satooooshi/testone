@@ -293,6 +293,47 @@ export class WikiService {
       .groupBy('user_good_for_board.wiki_id')
       .getRawMany();
 
+    console.log(
+      await this.userGoodForBoardRepository
+        .createQueryBuilder('user_good_for_board')
+        .select(['user_good_for_board.wiki_id', 'COUNT(*) AS cnt'])
+        .where('user_good_for_board.wiki_id IN (:...wikiIDs)', { wikiIDs })
+        .groupBy('user_good_for_board.wiki_id')
+        .getRawMany(),
+    );
+
+    const posts = await this.userGoodForBoardRepository
+      .createQueryBuilder('user_good_for_board')
+      //.select(['user_good_for_board.wiki_id'])
+      .select([
+        'user_good_for_board.wiki_id as board_id',
+        'user_good_for_board.user_id as user_id',
+      ])
+      .innerJoinAndSelect('user_good_for_board.wiki', 'wiki') // AndSelect appends wiki object columns in output
+      .innerJoin('user_good_for_board.user', 'user')
+      .where((qb) => {
+        const subQuery = qb
+          .subQuery()
+          .select('wiki.id')
+          .from(Wiki, 'wiki')
+          //.where("user_good_for_board.wiki_id = wiki.id")
+          .getQuery();
+        return 'user_good_for_board.wiki_id IN ' + subQuery;
+      })
+      //.setParameter("registered", true)
+      .getRawMany();
+    //.getMany();
+    console.log('test subquery\n', posts);
+
+    const sql = await this.userGoodForBoardRepository
+      .createQueryBuilder('user_good_for_board')
+      .innerJoinAndSelect('user_good_for_board.wiki', 'wiki')
+      .where('user_good_for_board.user_id = :userID', { userID: userID })
+      .orderBy({ 'wiki.updatedAt': 'DESC' })
+      .getQuery();
+    //.getSql();
+    console.log(sql);
+
     const boardAndRelationCount = userGoodForBoard.map((b) => {
       b.wiki.isGoodSender = true;
       for (const goodCount of goodsCount) {

@@ -18,7 +18,7 @@ const getUserGoodList = async (
 };
 
 export const useAPIGetUserGoodList = (userID: string) => {
-  return useQuery(['QAs', userID], () => {
+  return useQuery(['userGoodList', userID], () => {
     return getUserGoodList(userID);
   });
 };
