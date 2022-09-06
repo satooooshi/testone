@@ -119,31 +119,6 @@ const SearchInput: React.FC<SearchFormProps> = ({
             />
           </div>
         )} */}
-        <Input
-          className={searchFormStyles.input}
-          type="search"
-          name="word"
-          width={isSmallerThan680 ? '100%' : '60%'}
-          placeholder="検索ワードを入力"
-          background="white"
-          value={word}
-          onChange={(e) => setWord(e.target.value)}
-          onKeyPress={(e) => {
-            if (e.key === 'Enter') {
-              e.preventDefault();
-              handleModalSearchButton();
-            }
-          }}
-        />
-        <Button
-          width={isSmallerThan680 ? '100%' : '15vw'}
-          className={searchFormStyles.add_tag_button}
-          colorScheme="green"
-          onClick={() => setTagModal(true)}>
-          {selectedTags.length
-            ? `${selectedTags.length}個のタグ`
-            : 'タグを選択'}
-        </Button>
         <TagModal
           isOpen={tagModal}
           tags={tags || []}
@@ -177,7 +152,7 @@ const SearchInput: React.FC<SearchFormProps> = ({
               onChange={(e) => setWord(e.target.value)}
               // value={value}
               // onChange={onChange}
-              onKeyDown={(e) => {
+              onKeyPress={(e) => {
                 if (e.key === 'Enter') {
                   handleModalSearchButton();
                 }
