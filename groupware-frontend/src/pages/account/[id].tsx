@@ -506,12 +506,18 @@ const MyAccountInfo = () => {
                 </Text>
               )
             ) : null}
-            {activeTab === TabName.GOOD && goodList && goodList.length ? (
-              <Box>
-                {goodList.map((b) => (
-                  <WikiCard wiki={b.wiki} key={b.id} />
-                ))}
-              </Box>
+            {activeTab === TabName.GOOD ? (
+              goodList && goodList.length ? (
+                <Box>
+                  {goodList.map((b) => (
+                    <WikiCard wiki={b.wiki} key={b.id} />
+                  ))}
+                </Box>
+              ) : (
+                <Text fontSize={16}>
+                  いいねした掲示板が見つかりませんでした
+                </Text>
+              )
             ) : null}
           </Box>
         )}

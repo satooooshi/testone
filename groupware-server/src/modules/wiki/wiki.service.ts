@@ -270,28 +270,22 @@ export class WikiService {
   }
 
   public async getWikiGoodList(userID: string): Promise<UserGoodForBoard[]> {
-    const startTime = Date.now();
-
-    const [userGoodForBoard, count] = await this.userGoodForBoardRepository
+    const userGoodForBoard = await this.userGoodForBoardRepository
       .createQueryBuilder('user_good_for_board')
       .innerJoinAndSelect('user_good_for_board.wiki', 'wiki')
       .where('user_good_for_board.user_id = :userID', { userID: userID })
       .orderBy({ 'wiki.updatedAt': 'DESC' })
-      .getManyAndCount();
+      .getMany();
 
-    if (count === 0) {
-      return [] as UserGoodForBoard[];
-    }
-
-    const wikiIDs = userGoodForBoard.map((board) => board.wiki.id);
-    if (wikiIDs.length === 0) {
+    const wikiIds = userGoodForBoard.map((board) => board.wiki.id);
+    if (wikiIds.length === 0) {
       return [] as UserGoodForBoard[];
     }
 
     const goodsCount = await this.userGoodForBoardRepository
       .createQueryBuilder('user_good_for_board')
       .select(['user_good_for_board.wiki_id', 'COUNT(*) AS cnt'])
-      .where('user_good_for_board.wiki_id IN (:...wikiIDs)', { wikiIDs })
+      .where('user_good_for_board.wiki_id IN (:...wikiIds)', { wikiIds })
       .groupBy('user_good_for_board.wiki_id')
       .getRawMany();
 
@@ -304,10 +298,6 @@ export class WikiService {
       }
       return b;
     });
-
-    const endTime = Date.now();
-    console.log('get wiki good list speed check2', endTime - startTime);
-
     return boardAndRelationCount;
   }
 

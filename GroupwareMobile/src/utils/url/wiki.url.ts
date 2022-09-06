@@ -1,7 +1,7 @@
 const wikiURL = 'wiki';
 
 export const getWikiListURL = `/${wikiURL}/list`;
-export const getWikiGoodListURL = `/${wikiURL}/good/list`;
+export const getWikiGoodListURL = `/${wikiURL}/user-good-list`;
 export const getWikiDetailURL = `/${wikiURL}/detail`;
 export const getLatestWikiURL = `/${wikiURL}/latest`;
 export const getBestAnswerURL = `/${wikiURL}/get-best-answer`;
