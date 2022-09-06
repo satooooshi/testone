@@ -67,7 +67,7 @@ export class AttendanceService {
       .createQueryBuilder('attendance')
       .leftJoinAndSelect('attendance.travelCost', 'travelCost')
       .leftJoinAndSelect('attendance.user', 'user')
-      .andWhere('user.id = :userId', { userId: id ? id : userId })
+      .andWhere('user.id = :userId', { userId: id > 0 ? id : userId })
       .andWhere('attendance.targetDate between :fromDate and :toDate', {
         fromDate,
         toDate,
