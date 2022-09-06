@@ -28,7 +28,8 @@ const TextMessage: React.FC<TextMessageProps> = ({
         maxW={windowWidth * 0.6}
         minW={windowWidth * 0.06}
         bg={message.isSender ? 'blue900' : 'white'}
-        p={10}
+        py={8}
+        px={15}
         justifyContent="center">
         {message.replyParentMessage && (
           <ReplyParent
