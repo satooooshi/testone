@@ -57,9 +57,10 @@ export class WikiController {
   @Get('/user-good-list/:id')
   @UseGuards(JwtAuthenticationGuard)
   async getWikiUserGoodList(
+    @Req() request: RequestWithUser,
     @Param('id') userID: string,
   ): Promise<UserGoodForBoard[]> {
-    return await this.qaService.getWikiGoodList(userID);
+    return await this.qaService.getWikiGoodList(userID, request.user.id);
   }
 
   @Get('detail/:id')
