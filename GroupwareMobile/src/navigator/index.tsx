@@ -533,7 +533,7 @@ const Navigator = () => {
   messaging().setBackgroundMessageHandler(async remoteMessage => {
     console.log('setBackgroundMessageHandler called');
     if (Platform.OS === 'android') {
-      setTimeout(() => asyncHandleNotifi(remoteMessage), 0);
+      setTimeout(() => asyncHandleNotifi(remoteMessage), 10);
     }
     // if (Platform.OS === 'android') {
     //   sendLocalNotification(remoteMessage);
