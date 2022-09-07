@@ -412,14 +412,15 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
             style={eventFormModalStyles.descriptionInput}
           />
           <Div mb="lg" />
-          <Button
-            mb="lg"
-            onPress={() => setVisibleUserModal(true)}
-            bg="pink600"
-            alignSelf="flex-end"
-            fontWeight="bold">
-            開催者/講師を編集
-          </Button>
+          <Div row justifyContent="space-between" alignItems="center">
+            <Text fontSize={16}>開催者/講師</Text>
+            <Button
+              onPress={() => setVisibleUserModal(true)}
+              bg="pink600"
+              fontWeight="bold">
+              編集
+            </Button>
+          </Div>
           <Div flexDir="row" flexWrap="wrap" mb={8}>
             {newEvent.hostUsers?.map(u => (
               <TagButton
@@ -432,14 +433,15 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
               </TagButton>
             ))}
           </Div>
-          <Button
-            mb="lg"
-            onPress={() => setVisibleTagModal(true)}
-            bg="green600"
-            alignSelf="flex-end"
-            fontWeight="bold">
-            タグを編集
-          </Button>
+          <Div row justifyContent="space-between" alignItems="center">
+            <Text fontSize={16}>タグ</Text>
+            <Button
+              onPress={() => setVisibleTagModal(true)}
+              bg="green600"
+              fontWeight="bold">
+              編集
+            </Button>
+          </Div>
           <Div flexDir="row" flexWrap="wrap" mb={8}>
             {newEvent.tags?.map(t => (
               <TagButton
