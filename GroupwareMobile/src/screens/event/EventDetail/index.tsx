@@ -376,13 +376,8 @@ const EventDetail: React.FC = () => {
 
       {eventInfo && (
         <>
-          <ScrollDiv>
-            <Div
-              flexDir="column"
-              // px={10}
-              w={windowWidth - 20}
-              ml="auto"
-              mr="auto">
+          <ScrollDiv bg="white">
+            <Div flexDir="column" px="lg" w="100%" ml="auto" mr="auto">
               <Tag
                 my={10}
                 ml={5}
