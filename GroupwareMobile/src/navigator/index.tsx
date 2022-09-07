@@ -239,15 +239,14 @@ const Navigator = () => {
     },
   };
 
-  // messaging().setBackgroundMessageHandler(async remoteMessage => {
-  //   console.log('setBackgroundMessageHandler called');
-  //   if (Platform.OS === 'android') {
-  //     sendLocalNotification(remoteMessage);
-  //   }
-
-  //   // await notifee.incrementBadgeCount();
-  //   // console.log('BackgroundMessage received!!', remoteMessage);
-  // });
+  messaging().setBackgroundMessageHandler(async remoteMessage => {
+    // console.log('setBackgroundMessageHandler called');
+    // if (Platform.OS === 'android') {
+    //   sendLocalNotification(remoteMessage);
+    // }
+    // await notifee.incrementBadgeCount();
+    // console.log('BackgroundMessage received!!', remoteMessage);
+  });
 
   useEffect(
     () => {
@@ -532,6 +531,7 @@ const Navigator = () => {
         });
       }
       if (notification.data?.screen === 'chat' && notification.data?.id) {
+        console.log('----go to chat room');
         navigationRef.current?.navigate('ChatStack', {
           screen: 'Chat',
           params: {room: {id: notification.data?.id}},
@@ -572,7 +572,9 @@ const Navigator = () => {
         //   console.log('PushNotification TOKEN:', token);
         // },
         onNotification: notification => {
-          console.log('onNotification called');
+          if (notification.userInteraction) {
+            naviateByNotif(notification);
+          }
           if (
             (notification?.data?.silent ||
               notification?.data?.type === 'badge') &&
@@ -604,11 +606,6 @@ const Navigator = () => {
                 );
               }
             }
-          }
-          // console.log('PushNotification onNotification========', notification);
-          if (notification.userInteraction) {
-            console.log('----naviateByNotif');
-            naviateByNotif(notification);
           }
         },
         permissions: {
