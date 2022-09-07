@@ -533,7 +533,7 @@ const Navigator = () => {
   messaging().setBackgroundMessageHandler(async remoteMessage => {
     console.log('setBackgroundMessageHandler called');
     if (Platform.OS === 'android') {
-      setTimeout(() => asyncHandleNotifi(remoteMessage), 0);
+      asyncHandleNotifi(remoteMessage);
     }
     // if (Platform.OS === 'android') {
     //   sendLocalNotification(remoteMessage);
@@ -613,7 +613,7 @@ const Navigator = () => {
             naviateByNotif(notification);
           }
           if (Platform.OS === 'ios') {
-            setTimeout(() => asyncHandleNotifi(notification), 0);
+            asyncHandleNotifi(notification);
           }
         },
         permissions: {
@@ -629,7 +629,7 @@ const Navigator = () => {
   useEffect(() => {
     const unsubscribe = messaging().onMessage(async remoteMessage => {
       if (Platform.OS === 'android') {
-        setTimeout(() => asyncHandleNotifi(remoteMessage), 0);
+        asyncHandleNotifi(remoteMessage);
       }
       sendLocalNotification(remoteMessage);
     });
