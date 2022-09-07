@@ -613,7 +613,7 @@ const Navigator = () => {
             naviateByNotif(notification);
           }
           if (Platform.OS === 'ios') {
-            setTimeout(() => asyncHandleNotifi(notification), 0);
+            asyncHandleNotifi(notification);
           }
         },
         permissions: {
@@ -629,7 +629,7 @@ const Navigator = () => {
   useEffect(() => {
     const unsubscribe = messaging().onMessage(async remoteMessage => {
       if (Platform.OS === 'android') {
-        setTimeout(() => asyncHandleNotifi(remoteMessage), 0);
+        asyncHandleNotifi(remoteMessage);
       }
       sendLocalNotification(remoteMessage);
     });
