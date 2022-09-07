@@ -531,7 +531,6 @@ const Navigator = () => {
         });
       }
       if (notification.data?.screen === 'chat' && notification.data?.id) {
-        console.log('----go to chat room');
         navigationRef.current?.navigate('ChatStack', {
           screen: 'Chat',
           params: {room: {id: notification.data?.id}},
