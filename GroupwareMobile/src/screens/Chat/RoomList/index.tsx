@@ -2,6 +2,7 @@ import {useNavigation} from '@react-navigation/native';
 import React, {useEffect, useState} from 'react';
 import {
   Alert,
+  FlatList,
   RefreshControl,
   TouchableHighlight,
   TouchableOpacity,
@@ -221,34 +222,43 @@ const RoomList: React.FC = () => {
           clearButtonMode="while-editing"
         />
         {chatRooms.length ? (
-          <ScrollDiv
-            h={'80%'}
+          // <ScrollDiv
+          //   h={'80%'}
+          //   refreshControl={
+          //     <RefreshControl
+          //       refreshing={isRoomsRefetching}
+          //       onRefresh={refreshRoomList}
+          //     />
+          //   }>
+          <FlatList
+            style={{height: '80%'}}
             refreshControl={
               <RefreshControl
                 refreshing={isRoomsRefetching}
                 onRefresh={refreshRoomList}
               />
-            }>
-            {(searchedRooms ?? chatRooms).map(room => {
-              return (
-                <Div key={room.id} mb="sm">
-                  <RoomCard
-                    room={room}
-                    onPress={() =>
-                      navigation.navigate('ChatStack', {
-                        screen: 'Chat',
-                        params: {room},
-                      })
-                    }
-                    onPressPinButton={() => {
-                      savePin({...room, isPinned: !room.isPinned});
-                    }}
-                  />
-                </Div>
-              );
-            })}
-          </ScrollDiv>
+            }
+            data={searchedRooms ?? chatRooms}
+            windowSize={30}
+            renderItem={({item: room}) => (
+              <Div key={room.id} mb="sm">
+                <RoomCard
+                  room={room}
+                  onPress={() =>
+                    navigation.navigate('ChatStack', {
+                      screen: 'Chat',
+                      params: {room},
+                    })
+                  }
+                  onPressPinButton={() => {
+                    savePin({...room, isPinned: !room.isPinned});
+                  }}
+                />
+              </Div>
+            )}
+          />
         ) : (
+          // </ScrollDiv>
           <Text fontSize={16} textAlign="center">
             ルームを作成するか、招待をお待ちください
           </Text>
