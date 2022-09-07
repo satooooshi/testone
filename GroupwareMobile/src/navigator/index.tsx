@@ -239,15 +239,15 @@ const Navigator = () => {
     },
   };
 
-  messaging().setBackgroundMessageHandler(async remoteMessage => {
-    console.log('setBackgroundMessageHandler called');
-    if (Platform.OS === 'android') {
-      sendLocalNotification(remoteMessage);
-    }
+  // messaging().setBackgroundMessageHandler(async remoteMessage => {
+  //   console.log('setBackgroundMessageHandler called');
+  //   if (Platform.OS === 'android') {
+  //     sendLocalNotification(remoteMessage);
+  //   }
 
-    // await notifee.incrementBadgeCount();
-    // console.log('BackgroundMessage received!!', remoteMessage);
-  });
+  //   // await notifee.incrementBadgeCount();
+  //   // console.log('BackgroundMessage received!!', remoteMessage);
+  // });
 
   useEffect(
     () => {
@@ -606,7 +606,7 @@ const Navigator = () => {
             }
           }
           // console.log('PushNotification onNotification========', notification);
-          if (Platform.OS === 'ios' && notification.userInteraction) {
+          if (notification.userInteraction) {
             console.log('----naviateByNotif');
             naviateByNotif(notification);
           }
