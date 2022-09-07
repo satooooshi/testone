@@ -397,6 +397,7 @@ const EventDetail: React.FC = () => {
                 fontWeight="900">
                 {eventInfo.title}
               </Text>
+              <Div my="sm" borderWidth={1} borderColor="gray300" />
               <Div mt={5}>
                 {eventInfo.type !== EventType.SUBMISSION_ETC ? (
                   <Div mr={4}>
