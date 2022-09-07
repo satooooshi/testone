@@ -240,11 +240,10 @@ const Navigator = () => {
   };
 
   messaging().setBackgroundMessageHandler(async remoteMessage => {
-    console.log('setBackgroundMessageHandler called');
-    if (Platform.OS === 'android') {
-      sendLocalNotification(remoteMessage);
-    }
-
+    // console.log('setBackgroundMessageHandler called');
+    // if (Platform.OS === 'android') {
+    //   sendLocalNotification(remoteMessage);
+    // }
     // await notifee.incrementBadgeCount();
     // console.log('BackgroundMessage received!!', remoteMessage);
   });
@@ -512,6 +511,13 @@ const Navigator = () => {
       navigationRef.current?.getCurrentRoute()?.name !== 'Login' &&
       user?.id
     ) {
+      if (notification.data?.screen === 'chat' && notification.data?.id) {
+        navigationRef.current?.navigate('ChatStack', {
+          screen: 'Chat',
+          params: {room: {id: notification.data?.id}},
+          initial: false,
+        });
+      }
       if (notification.data?.screen === 'event' && notification.data?.id) {
         navigationRef.current?.navigate('EventStack', {
           screen: 'EventDetail',
@@ -529,13 +535,6 @@ const Navigator = () => {
       if (notification.data?.screen === 'room') {
         navigationRef.current?.navigate('ChatStack', {
           screen: 'RoomList',
-        });
-      }
-      if (notification.data?.screen === 'chat' && notification.data?.id) {
-        navigationRef.current?.navigate('ChatStack', {
-          screen: 'Chat',
-          params: {room: {id: notification.data?.id}},
-          initial: false,
         });
       }
     }
@@ -572,12 +571,10 @@ const Navigator = () => {
         //   console.log('PushNotification TOKEN:', token);
         // },
         onNotification: notification => {
-          console.log('onNotification called');
-          if (
-            (notification?.data?.silent ||
-              notification?.data?.type === 'badge') &&
-            notification.data?.id
-          ) {
+          if (notification.userInteraction) {
+            naviateByNotif(notification);
+          }
+          const asyncFunc = async (): Promise<void> => {
             refetchRoomCard({
               id: notification.data?.id,
               type: notification.data.type,
@@ -604,11 +601,13 @@ const Navigator = () => {
                 );
               }
             }
-          }
-          // console.log('PushNotification onNotification========', notification);
-          if (Platform.OS === 'ios' && notification.userInteraction) {
-            console.log('----naviateByNotif');
-            naviateByNotif(notification);
+          };
+          if (
+            (notification?.data?.silent ||
+              notification?.data?.type === 'badge') &&
+            notification.data?.id
+          ) {
+            setTimeout(asyncFunc, 0);
           }
         },
         permissions: {
