@@ -362,6 +362,7 @@ const Profile: React.FC = () => {
                 所属支社
               </Text>
               <DropdownOpenerButton
+                fontSize={16}
                 name={branchTypeNameFactory(
                   values.branch || BranchType.NON_SET,
                 )}

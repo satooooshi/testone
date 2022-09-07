@@ -373,6 +373,7 @@ const UserRegisteringAdmin: React.FC = () => {
               社員区分
             </Text>
             <DropdownOpenerButton
+              fontSize={16}
               onPress={() => {
                 userRoleDropdownRef.current?.open();
               }}
@@ -384,6 +385,7 @@ const UserRegisteringAdmin: React.FC = () => {
               所属支社
             </Text>
             <DropdownOpenerButton
+              fontSize={16}
               name={branchTypeNameFactory(values.branch || BranchType.NON_SET)}
               onPress={() => branchTypeDropdownRef.current?.open()}
             />
