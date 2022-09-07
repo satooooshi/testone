@@ -399,6 +399,7 @@ const EditedProfile: React.FC = () => {
                   userRoleDropdownRef.current?.open();
                 }}
                 name={values.role ? userRoleNameFactory(values.role) : '未選択'}
+                fontSize={16}
               />
             </Div>
             <Div mb="xl">
@@ -406,6 +407,7 @@ const EditedProfile: React.FC = () => {
                 所属支社
               </Text>
               <DropdownOpenerButton
+                fontSize={16}
                 name={branchTypeNameFactory(
                   values.branch || BranchType.NON_SET,
                 )}
