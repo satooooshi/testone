@@ -27,7 +27,7 @@ import {useAPIGetUserTag} from '../../../hooks/api/tag/useAPIGetUserTag';
 import {useAPIUpdateUser} from '../../../hooks/api/user/useAPIUpdateUser';
 import {useTagType} from '../../../hooks/tag/useTagType';
 import {profileStyles} from '../../../styles/screen/account/profile.style';
-import {TagType, User, BranchType} from '../../../types';
+import {TagType, User, BranchType, UserRole} from '../../../types';
 import {uploadImageFromGallery} from '../../../utils/cropImage/uploadImageFromGallery';
 import {formikErrorMsgFactory} from '../../../utils/factory/formikEroorMsgFactory';
 import {branchTypeNameFactory} from '../../../utils/factory/branchTypeNameFactory';
@@ -46,6 +46,7 @@ import {
 import {useAdminHeaderTab} from '../../../contexts/admin/useAdminHeaderTab';
 import {useAPIGetUserInfoById} from '../../../hooks/api/user/useAPIGetUserInfoById';
 import {useIsTabBarVisible} from '../../../contexts/bottomTab/useIsTabBarVisible';
+import {userRoleNameFactory} from '../../../utils/factory/userRoleNameFactory';
 
 const initialValues: Partial<User> = {
   email: '',
@@ -65,6 +66,7 @@ const EditedProfile: React.FC = () => {
   const navigation = useNavigation<EditedProfileAdminNavigationProps>();
   const route = useRoute<EditedProfileRouteProps>();
   const userID = route.params?.id || 0;
+  const userRoleDropdownRef = useRef<any | null>(null);
   const {
     data: profile,
     refetch,
@@ -191,6 +193,48 @@ const EditedProfile: React.FC = () => {
         onPress={() => checkValidateErrors()}>
         <Icon color="white" name="check" fontSize={32} />
       </Button>
+      <Dropdown {...defaultDropdownProps} ref={userRoleDropdownRef}>
+        <Dropdown.Option
+          {...defaultDropdownOptionProps}
+          value={UserRole.ADMIN}
+          onPress={() => {
+            setValues(v => ({...v, role: UserRole.ADMIN}));
+          }}>
+          {userRoleNameFactory(UserRole.ADMIN)}
+        </Dropdown.Option>
+        <Dropdown.Option
+          {...defaultDropdownOptionProps}
+          value={UserRole.COMMON}
+          onPress={() => {
+            setValues(v => ({...v, role: UserRole.COMMON}));
+          }}>
+          {userRoleNameFactory(UserRole.COMMON)}
+        </Dropdown.Option>
+        <Dropdown.Option
+          {...defaultDropdownOptionProps}
+          value={UserRole.COACH}
+          onPress={() => {
+            setValues(v => ({...v, role: UserRole.COACH}));
+          }}>
+          {userRoleNameFactory(UserRole.COACH)}
+        </Dropdown.Option>
+        <Dropdown.Option
+          {...defaultDropdownOptionProps}
+          value={UserRole.INTERNAL_INSTRUCTOR}
+          onPress={() => {
+            setValues(v => ({...v, role: UserRole.INTERNAL_INSTRUCTOR}));
+          }}>
+          {userRoleNameFactory(UserRole.INTERNAL_INSTRUCTOR)}
+        </Dropdown.Option>
+        <Dropdown.Option
+          {...defaultDropdownOptionProps}
+          value={UserRole.EXTERNAL_INSTRUCTOR}
+          onPress={() => {
+            setValues(v => ({...v, role: UserRole.EXTERNAL_INSTRUCTOR}));
+          }}>
+          {userRoleNameFactory(UserRole.EXTERNAL_INSTRUCTOR)}
+        </Dropdown.Option>
+      </Dropdown>
       {values && (
         <KeyboardAwareScrollView
           extraScrollHeight={50}
@@ -344,6 +388,17 @@ const EditedProfile: React.FC = () => {
                 onChangeText={handleChange('firstNameKana')}
                 placeholder="タロウ"
                 autoCapitalize="none"
+              />
+            </Div>
+            <Div mb="xl">
+              <Text ml={'lg'} mb={'sm'} fontSize={16}>
+                社員区分
+              </Text>
+              <DropdownOpenerButton
+                onPress={() => {
+                  userRoleDropdownRef.current?.open();
+                }}
+                name={values.role ? userRoleNameFactory(values.role) : '未選択'}
               />
             </Div>
             <Div mb="xl">
