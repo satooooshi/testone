@@ -198,19 +198,36 @@ const EditedProfile: React.FC = () => {
             ...profileStyles.scrollView,
           }}>
           <Div px="5%" bg="white">
-            <Div my={'lg'} justifyContent="center" alignItems="center">
+            <Div my={'lg'} alignSelf="center">
               <UserAvatar
-                h={windowWidth * 0.6}
-                w={windowWidth * 0.6}
+                h={windowWidth * 0.4}
+                w={windowWidth * 0.4}
                 user={values}
-                onPress={handleUploadImage}
+                onPress={() => {}}
               />
+              <Button
+                borderless
+                bg="white"
+                p={'sm'}
+                alignSelf="center"
+                onPress={handleUploadImage}>
+                <Icon
+                  name="edit-2"
+                  fontFamily={'Feather'}
+                  fontSize={22}
+                  color="blue600"
+                />
+                <Text fontSize={16} p={'md'} color="blue600">
+                  写真を編集する
+                </Text>
+              </Button>
             </Div>
-            <Div mb="lg">
-              <Text fontSize={16} fontWeight="bold">
+            <Div mb="xl">
+              <Text ml={'lg'} mb={'sm'} fontSize={16}>
                 メールアドレス
               </Text>
               <Input
+                fontSize={16}
                 value={values.email}
                 onChangeText={handleChange('email')}
                 placeholder="bold@example.com"
@@ -243,11 +260,12 @@ const EditedProfile: React.FC = () => {
                 </Div>
               </Div>
             </Div>
-            <Div mb="lg">
-              <Text fontSize={16} fontWeight="bold">
+            <Div mb="xl">
+              <Text ml={'lg'} mb={'sm'} fontSize={16}>
                 電話番号
               </Text>
               <Input
+                fontSize={16}
                 value={values.phone}
                 onChangeText={handleChange('phone')}
                 placeholder="000-0000-0000"
@@ -280,52 +298,56 @@ const EditedProfile: React.FC = () => {
                 </Div>
               </Div>
             </Div>
-            <Div mb="lg">
-              <Text fontSize={16} fontWeight="bold">
+            <Div mb="xl">
+              <Text ml={'lg'} mb={'sm'} fontSize={16}>
                 姓
               </Text>
               <Input
+                fontSize={16}
                 value={values.lastName}
                 onChangeText={handleChange('lastName')}
                 placeholder="山田"
                 autoCapitalize="none"
               />
             </Div>
-            <Div mb="lg">
-              <Text fontSize={16} fontWeight="bold">
+            <Div mb="xl">
+              <Text ml={'lg'} mb={'sm'} fontSize={16}>
                 名
               </Text>
               <Input
+                fontSize={16}
                 value={values.firstName}
                 onChangeText={handleChange('firstName')}
                 placeholder="太郎"
                 autoCapitalize="none"
               />
             </Div>
-            <Div mb="lg">
-              <Text fontSize={16} fontWeight="bold">
+            <Div mb="xl">
+              <Text ml={'lg'} mb={'sm'} fontSize={16}>
                 姓(フリガナ)
               </Text>
               <Input
+                fontSize={16}
                 value={values.lastNameKana}
                 onChangeText={handleChange('lastNameKana')}
                 placeholder="ヤマダ"
                 autoCapitalize="none"
               />
             </Div>
-            <Div mb="lg">
-              <Text fontSize={16} fontWeight="bold">
+            <Div mb="xl">
+              <Text ml={'lg'} mb={'sm'} fontSize={16}>
                 名(フリガナ)
               </Text>
               <Input
+                fontSize={16}
                 value={values.firstNameKana}
                 onChangeText={handleChange('firstNameKana')}
                 placeholder="タロウ"
                 autoCapitalize="none"
               />
             </Div>
-            <Div mb="lg">
-              <Text fontSize={16} fontWeight="bold">
+            <Div mb="xl">
+              <Text ml={'lg'} mb={'sm'} fontSize={16}>
                 所属支社
               </Text>
               <DropdownOpenerButton
@@ -361,8 +383,8 @@ const EditedProfile: React.FC = () => {
                 {branchTypeNameFactory(BranchType.OSAKA)}
               </Dropdown.Option>
             </Dropdown>
-            <Div mb="lg">
-              <Text fontSize={16} fontWeight="bold">
+            <Div mb="xl">
+              <Text ml={'lg'} mb={'sm'} fontSize={16}>
                 自己紹介
               </Text>
               <TextInput
@@ -375,14 +397,14 @@ const EditedProfile: React.FC = () => {
                 style={profileStyles.textArea}
               />
             </Div>
-            <Div mb="lg">
+            <Div mb="xl">
               <TagEditLine
                 onPressRightButton={() => handleOpenTagModal(TagType.TECH)}
                 tags={techTags || []}
                 tagType={TagType.TECH}
               />
 
-              <Text fontSize={16} fontWeight="bold">
+              <Text ml={'lg'} mb={'sm'} fontSize={16}>
                 技術の紹介
               </Text>
               <TextInput
@@ -395,7 +417,7 @@ const EditedProfile: React.FC = () => {
                 style={profileStyles.textArea}
               />
             </Div>
-            <Div mb="lg">
+            <Div mb="xl">
               <TagEditLine
                 onPressRightButton={() =>
                   handleOpenTagModal(TagType.QUALIFICATION)
@@ -403,7 +425,7 @@ const EditedProfile: React.FC = () => {
                 tags={qualificationTags || []}
                 tagType={TagType.QUALIFICATION}
               />
-              <Text fontSize={16} fontWeight="bold">
+              <Text ml={'lg'} mb={'sm'} fontSize={16}>
                 資格の紹介
               </Text>
               <TextInput
@@ -416,13 +438,13 @@ const EditedProfile: React.FC = () => {
                 style={profileStyles.textArea}
               />
             </Div>
-            <Div mb="lg">
+            <Div mb="xl">
               <TagEditLine
                 onPressRightButton={() => handleOpenTagModal(TagType.CLUB)}
                 tags={clubTags || []}
                 tagType={TagType.CLUB}
               />
-              <Text fontSize={16} fontWeight="bold">
+              <Text ml={'lg'} mb={'sm'} fontSize={16}>
                 部活動の紹介
               </Text>
               <TextInput
@@ -435,13 +457,13 @@ const EditedProfile: React.FC = () => {
                 style={profileStyles.textArea}
               />
             </Div>
-            <Div mb="lg">
+            <Div mb="xl">
               <TagEditLine
                 onPressRightButton={() => handleOpenTagModal(TagType.HOBBY)}
                 tags={hobbyTags || []}
                 tagType={TagType.HOBBY}
               />
-              <Text fontSize={16} fontWeight="bold">
+              <Text ml={'lg'} mb={'sm'} fontSize={16}>
                 趣味の紹介
               </Text>
               <TextInput
