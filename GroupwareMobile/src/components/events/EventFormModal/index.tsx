@@ -416,7 +416,13 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
             <Text fontSize={16}>開催者/講師</Text>
             <Button
               onPress={() => setVisibleUserModal(true)}
-              bg="pink600"
+              py="sm"
+              px="xl"
+              bg="white"
+              color="blue700"
+              borderWidth={1}
+              borderColor="blue700"
+              rounded="circle"
               fontWeight="bold">
               編集
             </Button>
@@ -437,7 +443,13 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
             <Text fontSize={16}>タグ</Text>
             <Button
               onPress={() => setVisibleTagModal(true)}
-              bg="green600"
+              py="sm"
+              px="xl"
+              bg="white"
+              color="blue700"
+              borderWidth={1}
+              borderColor="blue700"
+              rounded="circle"
               fontWeight="bold">
               編集
             </Button>
