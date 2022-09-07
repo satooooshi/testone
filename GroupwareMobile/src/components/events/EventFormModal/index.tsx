@@ -324,6 +324,7 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
         </Button>
         <KeyboardAwareScrollView
           contentContainerStyle={{
+            width: windowWidth,
             ...tailwind('self-center'),
           }}>
           <Div bg="white" p="5%">
