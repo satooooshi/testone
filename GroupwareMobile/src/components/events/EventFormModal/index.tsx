@@ -400,6 +400,7 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
               }
             />
           </Div>
+          <Text fontSize={16}>概要</Text>
           <TextInput
             value={newEvent.description}
             onChangeText={t => setNewEvent(e => ({...e, description: t}))}
