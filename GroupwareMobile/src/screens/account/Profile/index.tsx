@@ -209,7 +209,7 @@ const Profile: React.FC = () => {
             ...profileStyles.scrollView,
           }}>
           <Div px={'5%'} bg="white">
-            <Div my="lg" alignSelf="center">
+            <Div my="2xl" alignSelf="center">
               <UserAvatar
                 h={windowWidth * 0.4}
                 w={windowWidth * 0.4}
