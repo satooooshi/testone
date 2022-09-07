@@ -99,13 +99,14 @@ const UserAdmin: React.FC = () => {
         right={10}
         onPress={() => setVisibleSearchFormModal(true)}
       />
-      <Div p={16}>
+      <Div px={16}>
         {usersForInfiniteScroll.length ? (
           <FlatList
             data={usersForInfiniteScroll}
             {...{onEndReached}}
             onEndReachedThreshold={0.5}
             keyExtractor={item => item.id.toString()}
+            ListHeaderComponent={<Div h={10} />}
             renderItem={({item}) => <UserRow user={item} />}
           />
         ) : (
