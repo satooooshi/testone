@@ -574,11 +574,7 @@ const Navigator = () => {
           if (notification.userInteraction) {
             naviateByNotif(notification);
           }
-          if (
-            (notification?.data?.silent ||
-              notification?.data?.type === 'badge') &&
-            notification.data?.id
-          ) {
+          const asyncFunc = async (): Promise<void> => {
             refetchRoomCard({
               id: notification.data?.id,
               type: notification.data.type,
@@ -605,6 +601,13 @@ const Navigator = () => {
                 );
               }
             }
+          };
+          if (
+            (notification?.data?.silent ||
+              notification?.data?.type === 'badge') &&
+            notification.data?.id
+          ) {
+            setTimeout(asyncFunc, 0);
           }
         },
         permissions: {
