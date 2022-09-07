@@ -169,7 +169,7 @@ const EditedProfile: React.FC = () => {
       <Overlay visible={loadingProfile || loadingUpdate} p="xl">
         <ActivityIndicator />
       </Overlay>
-      <HeaderWithTextButton title={'Admin'} tabs={tabs} />
+      <HeaderWithTextButton title={'編集'} enableBackButton={true} />
       <TagModal
         onCompleteModal={selectedTagsInModal =>
           setValues(v => ({...v, tags: selectedTagsInModal}))
