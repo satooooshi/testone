@@ -511,6 +511,13 @@ const Navigator = () => {
       navigationRef.current?.getCurrentRoute()?.name !== 'Login' &&
       user?.id
     ) {
+      if (notification.data?.screen === 'chat' && notification.data?.id) {
+        navigationRef.current?.navigate('ChatStack', {
+          screen: 'Chat',
+          params: {room: {id: notification.data?.id}},
+          initial: false,
+        });
+      }
       if (notification.data?.screen === 'event' && notification.data?.id) {
         navigationRef.current?.navigate('EventStack', {
           screen: 'EventDetail',
@@ -528,13 +535,6 @@ const Navigator = () => {
       if (notification.data?.screen === 'room') {
         navigationRef.current?.navigate('ChatStack', {
           screen: 'RoomList',
-        });
-      }
-      if (notification.data?.screen === 'chat' && notification.data?.id) {
-        navigationRef.current?.navigate('ChatStack', {
-          screen: 'Chat',
-          params: {room: {id: notification.data?.id}},
-          initial: false,
         });
       }
     }
