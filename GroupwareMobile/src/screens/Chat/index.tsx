@@ -106,8 +106,6 @@ import {useAPIDeleteChatMessage} from '../../hooks/api/chat/useAPIDeleteChatMess
 import uuid from 'react-native-uuid';
 import {useAPIGetReactions} from '../../hooks/api/chat/useAPIGetReactions';
 
-import {HeightContext} from '../../contexts/HeightContext';
-
 const TopTab = createMaterialTopTabNavigator();
 
 const Chat: React.FC = () => {
