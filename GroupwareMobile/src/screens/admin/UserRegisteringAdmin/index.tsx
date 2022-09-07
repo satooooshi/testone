@@ -262,13 +262,12 @@ const UserRegisteringAdmin: React.FC = () => {
           {branchTypeNameFactory(BranchType.OSAKA)}
         </Dropdown.Option>
       </Dropdown>
-      <Div bg="white">
-        <KeyboardAwareScrollView
-          contentContainerStyle={{
-            ...userRegisteringAdminStyles.scrollView,
-            width: windowWidth * 0.9,
-          }}>
-          <Div my="md">
+      <KeyboardAwareScrollView
+        contentContainerStyle={{
+          ...userRegisteringAdminStyles.scrollView,
+        }}>
+        <Div px="5%" bg="white">
+          <Div my="2xl">
             <Image
               alignSelf="center"
               h={windowWidth * 0.4}
@@ -502,8 +501,8 @@ const UserRegisteringAdmin: React.FC = () => {
               style={userRegisteringAdminStyles.textArea}
             />
           </Div>
-        </KeyboardAwareScrollView>
-      </Div>
+        </Div>
+      </KeyboardAwareScrollView>
     </WholeContainer>
   );
 };
