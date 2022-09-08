@@ -81,7 +81,7 @@ const ChatFooter: React.FC<ChatFooterProps> = ({
     );
 
     return (
-      <Div>
+      <>
         {candidateMembers.length ? (
           <ScrollDiv
             h={140}
@@ -98,7 +98,7 @@ const ChatFooter: React.FC<ChatFooterProps> = ({
             ))}
           </ScrollDiv>
         ) : null}
-      </Div>
+      </>
     );
   };
 
