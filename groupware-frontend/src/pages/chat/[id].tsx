@@ -82,8 +82,12 @@ const ChatDetail = () => {
           leaveChatGroup(
             { id: Number(id) },
             {
-              onSuccess: () =>
+              onSuccess: () => {
                 router.push('/chat', undefined, { shallow: true }),
+                  setChatGroupsState(
+                    chatGroups.filter((g) => g.id != Number(id)),
+                  );
+              },
             },
           );
         }
