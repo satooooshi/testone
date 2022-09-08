@@ -76,21 +76,25 @@ const ChatFooter: React.FC<ChatFooterProps> = ({
       return null;
     }
 
+    const candidateMembers = mentionSuggestions.filter(one =>
+      one.name.toLocaleLowerCase().includes(keyword.toLocaleLowerCase()),
+    );
+
     return (
-      <ScrollDiv h={140} borderTopColor="blue200" borderTopWidth={1}>
-        {mentionSuggestions
-          .filter(one =>
-            one.name.toLocaleLowerCase().includes(keyword.toLocaleLowerCase()),
-          )
-          .map(one => (
-            <TouchableOpacity
-              key={one.id}
-              onPress={() => onSuggestionPress(one)}
-              style={{padding: 12, width: '100%'}}>
-              <Text>{one.name}</Text>
-            </TouchableOpacity>
-          ))}
-      </ScrollDiv>
+      <Div>
+        {candidateMembers.length ? (
+          <ScrollDiv h={140} borderTopColor="blue200" borderTopWidth={1}>
+            {candidateMembers.map(one => (
+              <TouchableOpacity
+                key={one.id}
+                onPress={() => onSuggestionPress(one)}
+                style={{padding: 12, width: '100%'}}>
+                <Text>{one.name}</Text>
+              </TouchableOpacity>
+            ))}
+          </ScrollDiv>
+        ) : null}
+      </Div>
     );
   };
 
