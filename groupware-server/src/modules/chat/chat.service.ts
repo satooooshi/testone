@@ -814,7 +814,6 @@ export class ChatService {
       (m) => m.id === user.id,
     ).length;
     if (isUserJoining) {
-      console.log('The user is already participant');
       return;
     }
     targetGroup.members.push(user);
@@ -831,21 +830,15 @@ export class ChatService {
     );
   }
 
-  public async leaveChatRoom(userID: number, chatGroupID: number) {
-    const containMembers: ChatGroup = await this.chatGroupRepository.findOne({
-      where: { id: chatGroupID },
-      relations: ['members'],
-    });
-    const targetGroup = await this.chatGroupRepository.findOne(chatGroupID);
-    const user = await this.userRepository.findOne(userID);
+  public async leaveChatRoom(user: User, chatGroupID: number) {
+    const manager = getManager();
+    const members: User[] = await manager.query(
+      'select  users.id as id, users.last_name as lastName, users.first_name as firstName from user_chat_joining INNER JOIN users ON users.existence is not null AND user_id = ? AND chat_group_id = ?',
+      [user.id, chatGroupID],
+    );
 
-    if (containMembers?.members.length) {
-      const isUserJoining = containMembers.members.filter(
-        (m) => m.id === userID,
-      ).length;
-      if (!isUserJoining) {
-        throw new BadRequestException('The user is not participant');
-      }
+    if (!members.length) {
+      throw new BadRequestException('The user is not participant');
     }
 
     await this.chatGroupRepository
@@ -858,19 +851,20 @@ export class ChatService {
       .createQueryBuilder()
       .relation(ChatGroup, 'members')
       .of(chatGroupID)
-      .remove(userID);
+      .remove(user.id);
     await this.chatGroupRepository
       .createQueryBuilder()
       .relation(ChatGroup, 'previousMembers')
       .of(chatGroupID)
-      .add(userID);
+      .add(user.id);
     const systemMessage = new ChatMessage();
     const userName = userNameFactory(user);
     systemMessage.content = `${userName}さんが退出しました`;
     systemMessage.type = ChatMessageType.SYSTEM_TEXT;
-    systemMessage.createdAt = new Date();
-    systemMessage.chatGroup = targetGroup;
-    await this.chatMessageRepository.save(systemMessage);
+    await this.chatMessageRepository.save({
+      ...systemMessage,
+      chatGroup: { id: chatGroupID },
+    });
   }
 
   public async editChatMembers(roomId: number, members: User[]) {
@@ -962,7 +956,6 @@ export class ChatService {
         'select users.id as id, users.last_name as lastName, users.existence as existence from user_chat_leaving INNER JOIN users ON users.existence is not null AND users.id = user_id AND chat_group_id = ?',
         [existGroup.id],
       );
-      console.log('previousMembers----', previousMembers);
 
       existGroup.previousMembers = previousMembers.filter(
         (newM) => !newMembers.map((m) => m.id).includes(newM.id),
@@ -1182,7 +1175,6 @@ export class ChatService {
       'select users.id as id, users.last_name as lastName, users.first_name as firstName, users.avatar_url as avatarUrl, users.existence as existence from user_chat_leaving INNER JOIN users ON users.existence is not null AND users.id = user_id AND chat_group_id = ?',
       [roomId],
     );
-    console.log('======left member', members);
 
     existRoom.members = members;
     existRoom.previousMembers = previousMembers;
