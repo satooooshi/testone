@@ -963,7 +963,10 @@ export class ChatService {
         (newM) => !newMembers.map((m) => m.id).includes(newM.id),
       );
       if (removedMembers.length) {
-        existGroup.previousMembers = [...previousMembers, ...removedMembers];
+        existGroup.previousMembers = [
+          ...existGroup.previousMembers,
+          ...removedMembers,
+        ];
       }
     }
     const newGroup = await this.chatGroupRepository.save({
