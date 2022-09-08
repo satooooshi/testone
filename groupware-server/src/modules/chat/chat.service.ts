@@ -182,7 +182,7 @@ export class ChatService {
     let members: UserAndGroupID[] = [];
     if (personalRoomIds.length)
       members = await manager.query(
-        'select chat_group_id, users.id as id, users.last_name as lastName, users.first_name as firstName, users.avatar_url as avatarUrl, users.existence as existence from user_chat_joining INNER JOIN users ON users.id = user_id AND chat_group_id IN (?)',
+        'select chat_group_id, users.id as id, users.last_name as lastName, users.first_name as firstName, users.avatar_url as avatarUrl, users.existence as existence from user_chat_joining INNER JOIN users ON users.existence is not null AND users.id = user_id AND chat_group_id IN (?)',
         [personalRoomIds.map((r) => r.id)],
       );
 
@@ -314,7 +314,7 @@ export class ChatService {
     const manager = getManager();
 
     const members: User[] = await manager.query(
-      'select chat_group_id, users.id as id, users.last_name as lastName, users.first_name as firstName, users.avatar_url as avatarUrl, users.existence as existence from user_chat_joining INNER JOIN users ON users.id = user_id AND chat_group_id = ?',
+      'select chat_group_id, users.id as id, users.last_name as lastName, users.first_name as firstName, users.avatar_url as avatarUrl, users.existence as existence from user_chat_joining INNER JOIN users ON users.existence is not null AND users.id = user_id AND chat_group_id = ?',
       [roomId],
     );
 
@@ -722,15 +722,14 @@ export class ChatService {
       'select user_id as id from user_chat_mute where chat_group_id  = ? ',
       [message.chatGroup.id],
     );
-    existGroup.members = members;
-    existGroup.muteUsers = muteUsers;
-    if (
-      !existGroup?.members.filter((m) => m?.id === message?.sender?.id).length
-    ) {
+    if (!members.filter((m) => m?.id === message?.sender?.id).length) {
       throw new BadRequestException('sender is not a member of this group');
     }
     const savedMessage = await this.chatMessageRepository.save(
-      this.chatMessageRepository.create({ ...message, chatGroup: existGroup }),
+      this.chatMessageRepository.create({
+        ...message,
+        chatGroup: { ...existGroup, members: members, muteUsers: muteUsers },
+      }),
     );
 
     existGroup.updatedAt = new Date();
@@ -860,7 +859,11 @@ export class ChatService {
       .relation(ChatGroup, 'members')
       .of(chatGroupID)
       .remove(userID);
-
+    await this.chatGroupRepository
+      .createQueryBuilder()
+      .relation(ChatGroup, 'previousMembers')
+      .of(chatGroupID)
+      .add(userID);
     const systemMessage = new ChatMessage();
     const userName = userNameFactory(user);
     systemMessage.content = `${userName}さんが退出しました`;
@@ -947,6 +950,30 @@ export class ChatService {
       throw new BadRequestException('The user is not a member');
     }
     const systemMessage: ChatMessage[] = [];
+    const removedMembers = existGroup.members.filter(
+      (existM) => !newData.members.map((m) => m.id).includes(existM.id),
+    );
+    const newMembers = newData.members.filter(
+      (newM) => !existGroup.members.map((m) => m.id).includes(newM.id),
+    );
+    if (removedMembers.length || newMembers.length) {
+      const manager = getManager();
+      const previousMembers: User[] = await manager.query(
+        'select users.id as id, users.last_name as lastName, users.existence as existence from user_chat_leaving INNER JOIN users ON users.existence is not null AND users.id = user_id AND chat_group_id = ?',
+        [existGroup.id],
+      );
+      console.log('previousMembers----', previousMembers);
+
+      existGroup.previousMembers = previousMembers.filter(
+        (newM) => !newMembers.map((m) => m.id).includes(newM.id),
+      );
+      if (removedMembers.length) {
+        existGroup.previousMembers = [
+          ...existGroup.previousMembers,
+          ...removedMembers,
+        ];
+      }
+    }
     const newGroup = await this.chatGroupRepository.save({
       ...existGroup,
       imageURL: genStorageURL(newData.imageURL),
@@ -965,12 +992,6 @@ export class ChatService {
       const sysMsg = await this.chatMessageRepository.save(sysMsgSaidsUpdated);
       systemMessage.push(sysMsg);
     }
-    const newMembers = newGroup.members.filter(
-      (newM) => !existGroup.members.map((m) => m.id).includes(newM.id),
-    );
-    const removedMembers = existGroup.members.filter(
-      (existM) => !newGroup.members.map((m) => m.id).includes(existM.id),
-    );
     if (newMembers.length) {
       const newMembersSystemMsg = new ChatMessage();
       newMembersSystemMsg.type = ChatMessageType.SYSTEM_TEXT;
@@ -1153,11 +1174,18 @@ export class ChatService {
     }
 
     const manager = getManager();
-    const members: UserAndGroupID[] = await manager.query(
-      'select chat_group_id, users.id as id, users.last_name as lastName, users.first_name as firstName, users.avatar_url as avatarUrl, users.existence as existence from user_chat_joining INNER JOIN users ON users.id = user_id AND chat_group_id = ?',
+    const members: User[] = await manager.query(
+      'select  users.id as id, users.last_name as lastName, users.first_name as firstName, users.avatar_url as avatarUrl, users.existence as existence from user_chat_joining INNER JOIN users ON users.existence is not null AND users.id = user_id AND chat_group_id = ?',
       [roomId],
     );
+    const previousMembers: User[] = await manager.query(
+      'select users.id as id, users.last_name as lastName, users.first_name as firstName, users.avatar_url as avatarUrl, users.existence as existence from user_chat_leaving INNER JOIN users ON users.existence is not null AND users.id = user_id AND chat_group_id = ?',
+      [roomId],
+    );
+    console.log('======left member', members);
+
     existRoom.members = members;
+    existRoom.previousMembers = previousMembers;
     checkAloneRoom(existRoom, userId);
 
     return existRoom;

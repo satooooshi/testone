@@ -41,9 +41,7 @@ const ChatDetail = () => {
       setCurrentRoom(data);
     },
     onError: (err) => {
-      if (setCurrentRoom) {
-        setCurrentRoom(undefined);
-      }
+      setCurrentRoom(undefined);
       if (err?.response?.data?.message) {
         alert(err?.response?.data?.message);
       }
