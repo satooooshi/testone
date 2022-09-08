@@ -117,7 +117,7 @@ export class ChatGroup {
   })
   members?: User[];
 
-  @ManyToMany(() => User, (user) => user.chatGroups, {
+  @ManyToMany(() => User, (user) => user.leftChatGroups, {
     onUpdate: 'CASCADE',
     onDelete: 'CASCADE',
   })
