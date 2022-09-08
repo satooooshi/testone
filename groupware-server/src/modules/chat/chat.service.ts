@@ -851,6 +851,12 @@ export class ChatService {
 
     await this.chatGroupRepository
       .createQueryBuilder()
+      .update(ChatGroup)
+      .set({ memberCount: () => 'member_count - 1' })
+      .where('id = :id', { id: chatGroupID })
+      .execute();
+    await this.chatGroupRepository
+      .createQueryBuilder()
       .relation(ChatGroup, 'members')
       .of(chatGroupID)
       .remove(userID);
