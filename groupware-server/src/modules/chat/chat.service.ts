@@ -1185,8 +1185,8 @@ export class ChatService {
     );
     console.log('======left member', previousMembers);
 
-    existRoom.members = members;
-    existRoom.previousMembers = previousMembers;
+    existRoom.members = members.filter((m) => m.existence);
+    existRoom.previousMembers = previousMembers.filter((m) => m.existence);
     checkAloneRoom(existRoom, userId);
 
     return existRoom;
