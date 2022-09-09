@@ -48,7 +48,7 @@ const Home: React.FC = () => {
               type="account"
               onPress={() => {
                 navigation.navigate('AccountStack', {
-                  screen: 'AccountDetail',
+                  screen: 'MyProfile',
                 });
               }}
             />
