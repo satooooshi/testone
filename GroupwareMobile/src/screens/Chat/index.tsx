@@ -719,11 +719,15 @@ const Chat: React.FC = () => {
   };
 
   const senderAvatars = useMemo(() => {
-    return roomDetail?.members?.map(m => ({
+    const allMembers = [
+      ...(roomDetail?.members || []),
+      ...(roomDetail?.previousMembers || []),
+    ];
+    return allMembers.map(m => ({
       member: m,
       avatar: <UserAvatar h={40} w={40} user={m} />,
     }));
-  }, [roomDetail?.members]);
+  }, [roomDetail?.members, roomDetail?.previousMembers]);
 
   const typeDropdown = (
     <Dropdown

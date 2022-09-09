@@ -392,7 +392,11 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
   const isPersonal = room.roomType === RoomType.PERSONAL;
 
   const senderAvatars = useMemo(() => {
-    return room?.members?.map((m) => ({
+    const allMembers = [
+      ...(room?.members || []),
+      ...(room?.previousMembers || []),
+    ];
+    return allMembers.map((m) => ({
       member: m,
       avatar: (
         <Avatar
@@ -403,7 +407,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
         />
       ),
     }));
-  }, [room?.members]);
+  }, [room?.members, room.previousMembers]);
 
   return (
     <Box
