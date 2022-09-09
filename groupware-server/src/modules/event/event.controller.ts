@@ -45,6 +45,7 @@ export interface SearchQueryToGetEvents {
   type?: EventType;
   from?: string;
   to?: string;
+  personal?: string;
   participant_id?: string;
   host_user_id?: string;
 }
@@ -127,11 +128,12 @@ export class EventScheduleController {
   @Get('list')
   @UseGuards(JwtAuthenticationGuard)
   async getEvents(
+    @Req() req: RequestWithUser,
     @Query() query: SearchQueryToGetEvents,
   ): Promise<SearchResultToGetEvents> {
     const { from, to } = query;
     if (from || to) {
-      return await this.eventService.getEventAtSpecificTime(query);
+      return await this.eventService.getEventAtSpecificTime(query, req.user.id);
     }
     return await this.eventService.getEvents(query);
   }
@@ -254,10 +256,7 @@ export class EventScheduleController {
       req.user,
     );
     if (joinedEvent.chatNeeded && joinedEvent.chatGroup) {
-      await this.chatService.joinChatGroup(
-        req.user.id,
-        joinedEvent.chatGroup.id,
-      );
+      await this.chatService.joinChatGroup(req.user, joinedEvent.chatGroup.id);
     }
     return joinedEvent;
   }

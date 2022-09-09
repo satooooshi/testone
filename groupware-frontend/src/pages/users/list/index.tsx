@@ -131,6 +131,7 @@ const UserList = () => {
                     sort:
                       (e.target.value as 'event' | 'question' | 'answer') ||
                       undefined,
+                    page: '1',
                   });
                   return;
                 }}>
@@ -149,6 +150,7 @@ const UserList = () => {
                 onChange={(e) => {
                   queryRefresh({
                     duration: (e.target.value as 'week' | 'month') || undefined,
+                    page: '1',
                   });
                   return;
                 }}>

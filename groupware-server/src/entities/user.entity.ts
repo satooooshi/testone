@@ -31,6 +31,7 @@ import { ChatMessageReaction } from './chatMessageReaction.entity';
 import { NotificationDevice } from './device.entity';
 import { genSignedURL } from 'src/utils/storage/genSignedURL';
 import { genStorageURL } from 'src/utils/storage/genStorageURL';
+import { UserGoodForBoard } from './userGoodForBord.entity';
 
 export enum UserRole {
   ADMIN = 'admin',
@@ -317,22 +318,15 @@ export class User {
   })
   muteChatGroups?: ChatGroup[];
 
-  @ManyToMany(() => Wiki, (wiki) => wiki.userGoodForBoard, {
-    onUpdate: 'CASCADE',
-    onDelete: 'CASCADE',
-  })
-  @JoinTable({
-    name: 'user_good_for_board',
-    joinColumn: {
-      name: 'user_id',
-      referencedColumnName: 'id',
+  @OneToMany(
+    () => UserGoodForBoard,
+    (userGoodForBoard) => userGoodForBoard.user,
+    {
+      onUpdate: 'CASCADE',
+      onDelete: 'CASCADE',
     },
-    inverseJoinColumn: {
-      name: 'wiki_id',
-      referencedColumnName: 'id',
-    },
-  })
-  userGoodForBoard?: Wiki[];
+  )
+  userGoodForBoard?: UserGoodForBoard[];
 
   @OneToMany(() => Wiki, (wiki) => wiki.writer)
   wiki?: Wiki[];
@@ -360,10 +354,10 @@ export class User {
     this.avatarUrl = genStorageURL(this.avatarUrl);
   }
 
-  @AfterInsert()
-  @AfterLoad()
-  @AfterUpdate()
-  async changeToSignedURL?() {
-    this.avatarUrl = await genSignedURL(this.avatarUrl);
-  }
+  // @AfterInsert()
+  // @AfterLoad()
+  // @AfterUpdate()
+  // async changeToSignedURL?() {
+  //   this.avatarUrl = await genSignedURL(this.avatarUrl);
+  // }
 }

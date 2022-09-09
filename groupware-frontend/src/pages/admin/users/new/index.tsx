@@ -104,13 +104,13 @@ const CreateNewUser = () => {
     handleChange,
     handleBlur,
     validateForm,
-    setValues: setvalues,
+    setValues: setUserInfo,
     values,
     resetForm,
   } = useFormik({
     initialValues: initialUserValues,
     onSubmit: async (submitted) => {
-      if (croppedImageURL && imageName && completedCrop) {
+      if (croppedImageURL && imageName) {
         const result = await dataURLToFile(croppedImageURL, imageName);
         uploadImage([result]);
         return;
@@ -123,6 +123,20 @@ const CreateNewUser = () => {
 
   const onLoad = useCallback((img) => {
     imgRef.current = img;
+    const diameter: number = img.height < img.width ? img.height : img.width;
+    dispatchCrop({
+      type: 'setCropAndImage',
+      value: {
+        unit: 'px',
+        x: (img.width - diameter) / 2,
+        y: (img.height - diameter) / 2,
+        width: diameter,
+        height: diameter,
+        aspect: 1,
+      },
+      ref: img,
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const modalReducer = (
@@ -169,18 +183,16 @@ const CreateNewUser = () => {
     },
   );
 
-  const [
-    { crop, completedCrop, croppedImageURL, imageName, imageURL },
-    dispatchCrop,
-  ] = useImageCrop();
+  const [{ crop, croppedImageURL, imageName, imageURL }, dispatchCrop] =
+    useImageCrop();
 
-  // const [values, setvalues] = useState<Partial<User>>(initialUserValues);
+  // const [values, setUserInfo] = useState<Partial<User>>(initialUserValues);
   const { mutate: uploadImage, isLoading: loadingUplaod } = useAPIUploadStorage(
     {
       onSuccess: async (fileURLs) => {
         const updateEventImageOnState = async () => {
           Promise.resolve();
-          setvalues((e) => ({ ...e, avatarUrl: fileURLs[0] }));
+          setUserInfo((e) => ({ ...e, avatarUrl: fileURLs[0] }));
         };
         await updateEventImageOnState();
         registerUser({ ...values, avatarUrl: fileURLs[0] });
@@ -202,6 +214,10 @@ const CreateNewUser = () => {
     [dispatchCrop],
   );
 
+  const onClickDeleteImage = () => {
+    dispatchCrop({ type: 'resetImage', value: 'resetImage' });
+  };
+
   const {
     getRootProps: getEventImageRootProps,
     getInputProps: getEventImageInputProps,
@@ -222,14 +238,15 @@ const CreateNewUser = () => {
           isClosable: true,
         });
         resetForm();
-        // setvalues(initialUserValues);
+        dispatchCrop({ type: 'resetImage', value: 'resetImage' });
+        setUserInfo(initialUserValues);
       }
     },
   });
 
   const toggleSelectedTag = (t: UserTag) => {
     const toggledTag = toggleTag(values.tags, t);
-    setvalues((i) => ({
+    setUserInfo((i) => ({
       ...i,
       tags: toggledTag,
     }));
@@ -316,23 +333,40 @@ const CreateNewUser = () => {
           </div>
         ) : null}
         {imageURL ? (
-          <ReactCrop
-            keepSelection={true}
-            src={imageURL}
-            crop={crop}
-            onChange={(newCrop) => {
-              dispatchCrop({ type: 'setCrop', value: newCrop });
-            }}
-            onComplete={(c) => {
-              dispatchCrop({
-                type: 'setCompletedCrop',
-                value: c,
-                ref: imgRef.current,
-              });
-            }}
-            onImageLoaded={onLoad}
-            circularCrop={true}
-          />
+          <>
+            <ReactCrop
+              keepSelection={true}
+              src={imageURL}
+              crop={crop}
+              onChange={(newCrop) => {
+                if (
+                  newCrop.height !== crop.height ||
+                  newCrop.width !== crop.width ||
+                  newCrop.y !== crop.y ||
+                  newCrop.x !== crop.x
+                )
+                  dispatchCrop({
+                    type: 'setCropAndImage',
+                    value: newCrop,
+                    ref: imgRef.current,
+                  });
+              }}
+              onImageLoaded={onLoad}
+              circularCrop={true}
+              imageStyle={{
+                minHeight: '100px',
+                maxHeight: '1000px',
+                minWidth: '100px',
+              }}
+            />
+            <Button
+              mb="15px"
+              colorScheme="blue"
+              marginTop="30px"
+              onClick={() => onClickDeleteImage()}>
+              既存画像を削除
+            </Button>
+          </>
         ) : null}
       </Box>
       <Box className={profileStyles.form_wrapper}>
@@ -417,7 +451,7 @@ const CreateNewUser = () => {
               isChecked={values.isEmailPublic}
               value={'public'}
               onChange={() =>
-                setvalues((v) => ({ ...v, isEmailPublic: true }))
+                setUserInfo((v) => ({ ...v, isEmailPublic: true }))
               }>
               <Text fontSize="14px">公開</Text>
             </Radio>
@@ -427,7 +461,7 @@ const CreateNewUser = () => {
               isChecked={!values.isEmailPublic}
               value={'inPublic'}
               onChange={() =>
-                setvalues((v) => ({ ...v, isEmailPublic: true }))
+                setUserInfo((v) => ({ ...v, isEmailPublic: true }))
               }>
               <Text fontSize="14px">非公開</Text>
             </Radio>
@@ -453,7 +487,7 @@ const CreateNewUser = () => {
               isChecked={values.isPhonePublic}
               value={'public'}
               onChange={() =>
-                setvalues((v) => ({ ...v, isPhonePublic: true }))
+                setUserInfo((v) => ({ ...v, isPhonePublic: true }))
               }>
               <Text fontSize="14px">公開</Text>
             </Radio>
@@ -463,7 +497,7 @@ const CreateNewUser = () => {
               isChecked={!values.isPhonePublic}
               value={'unPublic'}
               onChange={() =>
-                setvalues((v) => ({ ...v, isPhonePublic: false }))
+                setUserInfo((v) => ({ ...v, isPhonePublic: false }))
               }>
               <Text fontSize="14px">非公開</Text>
             </Radio>

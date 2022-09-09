@@ -29,10 +29,13 @@ export const sendPushNotifToSpecificUsers = async (
   if (userIds.length) {
     const devices = await deviceRepository
       .createQueryBuilder('devices')
-      .leftJoin('devices.user', 'user')
-      .where('user.id IN (:...userIds)', { userIds })
+      .where('devices.user_id IN (:...userIds)', { userIds })
       .getMany();
-    await sendPushNotifToSpecificDevices(devices, data);
+    // console.log('-----length', devices.length);
+
+    if (devices.length) {
+      await sendPushNotifToSpecificDevices(devices, data);
+    }
   }
 };
 
@@ -59,6 +62,7 @@ const sendPushNotifToSpecificDevices = async (
     silent: data?.custom?.silent === 'silent' ? true : false,
     // badge: data.custom.type === 'badge' ? 1 : 0,
     sound: data.title ? 'local.wav' : undefined,
+    // android_channel_id: 'default-channel-id',
     /* The topic of the notification. When using token-based authentication, specify the bundle ID of the app.
      * When using certificate-based authentication, the topic is usually your app's bundle ID.
      * More details can be found under https://developer.apple.com/documentation/usernotifications/setting_up_a_remote_notification_server/sending_notification_requests_to_apns

@@ -112,7 +112,7 @@ const TextMessage: React.FC<TextMessageProps> = ({
               user={message.replyParentMessage.sender}
             />
             <Box width={'90%'}>
-              <Text fontWeight="bold">
+              <Text fontWeight="bold" color={'black'}>
                 {userNameFactory(message.replyParentMessage?.sender)}
               </Text>
               <Text>{replyContent(message.replyParentMessage)}</Text>
@@ -126,12 +126,11 @@ const TextMessage: React.FC<TextMessageProps> = ({
               maxW={'40vw'}
               minW={'10vw'}
               wordBreak={'break-word'}
-              color={message.isSender ? 'white' : darkFontColor}
-              bg={message.isSender ? 'blue.500' : '#ececec'}>
+              color={message.isSender ? 'white' : 'black'}>
               {highlightSearchedWord(message)}
             </Text>
             <Text fontSize={3} mt={2} color={darkFontColor} textAlign="right">
-              {isEdited ? ' 編集済み' : null}
+              {message.modifiedAt ? ' 編集済み' : null}
             </Text>
           </>
         ) : (

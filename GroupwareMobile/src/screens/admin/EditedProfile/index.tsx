@@ -27,7 +27,7 @@ import {useAPIGetUserTag} from '../../../hooks/api/tag/useAPIGetUserTag';
 import {useAPIUpdateUser} from '../../../hooks/api/user/useAPIUpdateUser';
 import {useTagType} from '../../../hooks/tag/useTagType';
 import {profileStyles} from '../../../styles/screen/account/profile.style';
-import {TagType, User, BranchType} from '../../../types';
+import {TagType, User, BranchType, UserRole} from '../../../types';
 import {uploadImageFromGallery} from '../../../utils/cropImage/uploadImageFromGallery';
 import {formikErrorMsgFactory} from '../../../utils/factory/formikEroorMsgFactory';
 import {branchTypeNameFactory} from '../../../utils/factory/branchTypeNameFactory';
@@ -46,6 +46,7 @@ import {
 import {useAdminHeaderTab} from '../../../contexts/admin/useAdminHeaderTab';
 import {useAPIGetUserInfoById} from '../../../hooks/api/user/useAPIGetUserInfoById';
 import {useIsTabBarVisible} from '../../../contexts/bottomTab/useIsTabBarVisible';
+import {userRoleNameFactory} from '../../../utils/factory/userRoleNameFactory';
 
 const initialValues: Partial<User> = {
   email: '',
@@ -65,6 +66,7 @@ const EditedProfile: React.FC = () => {
   const navigation = useNavigation<EditedProfileAdminNavigationProps>();
   const route = useRoute<EditedProfileRouteProps>();
   const userID = route.params?.id || 0;
+  const userRoleDropdownRef = useRef<any | null>(null);
   const {
     data: profile,
     refetch,
@@ -167,7 +169,7 @@ const EditedProfile: React.FC = () => {
       <Overlay visible={loadingProfile || loadingUpdate} p="xl">
         <ActivityIndicator />
       </Overlay>
-      <HeaderWithTextButton title={'Admin'} tabs={tabs} />
+      <HeaderWithTextButton title={'編集'} enableBackButton={true} />
       <TagModal
         onCompleteModal={selectedTagsInModal =>
           setValues(v => ({...v, tags: selectedTagsInModal}))
@@ -191,262 +193,346 @@ const EditedProfile: React.FC = () => {
         onPress={() => checkValidateErrors()}>
         <Icon color="white" name="check" fontSize={32} />
       </Button>
+      <Dropdown {...defaultDropdownProps} ref={userRoleDropdownRef}>
+        <Dropdown.Option
+          {...defaultDropdownOptionProps}
+          value={UserRole.ADMIN}
+          onPress={() => {
+            setValues(v => ({...v, role: UserRole.ADMIN}));
+          }}>
+          {userRoleNameFactory(UserRole.ADMIN)}
+        </Dropdown.Option>
+        <Dropdown.Option
+          {...defaultDropdownOptionProps}
+          value={UserRole.COMMON}
+          onPress={() => {
+            setValues(v => ({...v, role: UserRole.COMMON}));
+          }}>
+          {userRoleNameFactory(UserRole.COMMON)}
+        </Dropdown.Option>
+        <Dropdown.Option
+          {...defaultDropdownOptionProps}
+          value={UserRole.COACH}
+          onPress={() => {
+            setValues(v => ({...v, role: UserRole.COACH}));
+          }}>
+          {userRoleNameFactory(UserRole.COACH)}
+        </Dropdown.Option>
+        <Dropdown.Option
+          {...defaultDropdownOptionProps}
+          value={UserRole.INTERNAL_INSTRUCTOR}
+          onPress={() => {
+            setValues(v => ({...v, role: UserRole.INTERNAL_INSTRUCTOR}));
+          }}>
+          {userRoleNameFactory(UserRole.INTERNAL_INSTRUCTOR)}
+        </Dropdown.Option>
+        <Dropdown.Option
+          {...defaultDropdownOptionProps}
+          value={UserRole.EXTERNAL_INSTRUCTOR}
+          onPress={() => {
+            setValues(v => ({...v, role: UserRole.EXTERNAL_INSTRUCTOR}));
+          }}>
+          {userRoleNameFactory(UserRole.EXTERNAL_INSTRUCTOR)}
+        </Dropdown.Option>
+      </Dropdown>
       {values && (
         <KeyboardAwareScrollView
           extraScrollHeight={50}
           contentContainerStyle={{
             ...profileStyles.scrollView,
-            width: windowWidth * 0.9,
           }}>
-          <Div my={'lg'} justifyContent="center" alignItems="center">
-            <UserAvatar
-              h={windowWidth * 0.6}
-              w={windowWidth * 0.6}
-              user={values}
-              onPress={handleUploadImage}
-            />
-          </Div>
-          <Div mb="lg">
-            <Text fontSize={16} fontWeight="bold">
-              メールアドレス
-            </Text>
-            <Input
-              value={values.email}
-              onChangeText={handleChange('email')}
-              placeholder="bold@example.com"
-              autoCapitalize="none"
-            />
-            <Div row>
-              <Div row alignItems="center" mr="sm">
-                <Text>公開</Text>
-                {/* @ts-ignore */}
-                <Radio
-                  value={1}
-                  activeColor="green500"
-                  onChange={() => setValues(e => ({...e, isEmailPublic: true}))}
-                  checked={values.isEmailPublic}
+          <Div px="5%" bg="white">
+            <Div my={'2xl'} alignSelf="center">
+              <UserAvatar
+                h={windowWidth * 0.4}
+                w={windowWidth * 0.4}
+                user={values}
+                onPress={() => {}}
+              />
+              <Button
+                borderless
+                bg="white"
+                p={'sm'}
+                alignSelf="center"
+                onPress={handleUploadImage}>
+                <Icon
+                  name="edit-2"
+                  fontFamily={'Feather'}
+                  fontSize={22}
+                  color="blue600"
                 />
-              </Div>
-              <Div row alignItems="center">
-                <Text>非公開</Text>
-                {/* @ts-ignore */}
-                <Radio
-                  value={2}
-                  activeColor="green500"
-                  onChange={() =>
-                    setValues(e => ({...e, isEmailPublic: false}))
-                  }
-                  checked={!values.isEmailPublic}
-                />
+                <Text fontSize={16} p={'md'} color="blue600">
+                  写真を編集する
+                </Text>
+              </Button>
+            </Div>
+            <Div mb="xl">
+              <Text ml={'lg'} mb={'sm'} fontSize={16}>
+                メールアドレス
+              </Text>
+              <Input
+                fontSize={16}
+                value={values.email}
+                onChangeText={handleChange('email')}
+                placeholder="bold@example.com"
+                autoCapitalize="none"
+              />
+              <Div row>
+                <Div row alignItems="center" mr="sm">
+                  <Text>公開</Text>
+                  {/* @ts-ignore */}
+                  <Radio
+                    value={1}
+                    activeColor="green500"
+                    onChange={() =>
+                      setValues(e => ({...e, isEmailPublic: true}))
+                    }
+                    checked={values.isEmailPublic}
+                  />
+                </Div>
+                <Div row alignItems="center">
+                  <Text>非公開</Text>
+                  {/* @ts-ignore */}
+                  <Radio
+                    value={2}
+                    activeColor="green500"
+                    onChange={() =>
+                      setValues(e => ({...e, isEmailPublic: false}))
+                    }
+                    checked={!values.isEmailPublic}
+                  />
+                </Div>
               </Div>
             </Div>
-          </Div>
-          <Div mb="lg">
-            <Text fontSize={16} fontWeight="bold">
-              電話番号
-            </Text>
-            <Input
-              value={values.phone}
-              onChangeText={handleChange('phone')}
-              placeholder="000-0000-0000"
-              autoCapitalize="none"
-            />
-            <Div row>
-              <Div row alignItems="center" mr="sm">
-                <Text>公開</Text>
-                {/* @ts-ignore */}
-                <Radio
-                  value={1}
-                  activeColor="green500"
-                  onChange={() => setValues(e => ({...e, isPhonePublic: true}))}
-                  checked={values.isPhonePublic}
-                />
-              </Div>
-              <Div row alignItems="center">
-                <Text>非公開</Text>
-                {/* @ts-ignore */}
-                <Radio
-                  value={2}
-                  activeColor="green500"
-                  onChange={() =>
-                    setValues(e => ({...e, isPhonePublic: false}))
-                  }
-                  checked={!values.isPhonePublic}
-                />
+            <Div mb="xl">
+              <Text ml={'lg'} mb={'sm'} fontSize={16}>
+                電話番号
+              </Text>
+              <Input
+                fontSize={16}
+                value={values.phone}
+                onChangeText={handleChange('phone')}
+                placeholder="000-0000-0000"
+                autoCapitalize="none"
+              />
+              <Div row>
+                <Div row alignItems="center" mr="sm">
+                  <Text>公開</Text>
+                  {/* @ts-ignore */}
+                  <Radio
+                    value={1}
+                    activeColor="green500"
+                    onChange={() =>
+                      setValues(e => ({...e, isPhonePublic: true}))
+                    }
+                    checked={values.isPhonePublic}
+                  />
+                </Div>
+                <Div row alignItems="center">
+                  <Text>非公開</Text>
+                  {/* @ts-ignore */}
+                  <Radio
+                    value={2}
+                    activeColor="green500"
+                    onChange={() =>
+                      setValues(e => ({...e, isPhonePublic: false}))
+                    }
+                    checked={!values.isPhonePublic}
+                  />
+                </Div>
               </Div>
             </Div>
-          </Div>
-          <Div mb="lg">
-            <Text fontSize={16} fontWeight="bold">
-              姓
-            </Text>
-            <Input
-              value={values.lastName}
-              onChangeText={handleChange('lastName')}
-              placeholder="山田"
-              autoCapitalize="none"
-            />
-          </Div>
-          <Div mb="lg">
-            <Text fontSize={16} fontWeight="bold">
-              名
-            </Text>
-            <Input
-              value={values.firstName}
-              onChangeText={handleChange('firstName')}
-              placeholder="太郎"
-              autoCapitalize="none"
-            />
-          </Div>
-          <Div mb="lg">
-            <Text fontSize={16} fontWeight="bold">
-              姓(フリガナ)
-            </Text>
-            <Input
-              value={values.lastNameKana}
-              onChangeText={handleChange('lastNameKana')}
-              placeholder="ヤマダ"
-              autoCapitalize="none"
-            />
-          </Div>
-          <Div mb="lg">
-            <Text fontSize={16} fontWeight="bold">
-              名(フリガナ)
-            </Text>
-            <Input
-              value={values.firstNameKana}
-              onChangeText={handleChange('firstNameKana')}
-              placeholder="タロウ"
-              autoCapitalize="none"
-            />
-          </Div>
-          <Div mb="lg">
-            <Text fontSize={16} fontWeight="bold">
-              所属支社
-            </Text>
-            <DropdownOpenerButton
-              name={branchTypeNameFactory(values.branch || BranchType.NON_SET)}
-              onPress={() => dropdownRef.current?.open()}
-            />
-          </Div>
-          <Dropdown ref={dropdownRef} {...defaultDropdownProps}>
-            <Dropdown.Option
-              {...defaultDropdownOptionProps}
-              value={BranchType.NON_SET}
-              onPress={() =>
-                setValues(v => ({...v, branch: BranchType.NON_SET}))
-              }>
-              {branchTypeNameFactory(BranchType.NON_SET)}
-            </Dropdown.Option>
-            <Dropdown.Option
-              {...defaultDropdownOptionProps}
-              value={BranchType.TOKYO}
-              onPress={() =>
-                setValues(v => ({...v, branch: BranchType.TOKYO}))
-              }>
-              {branchTypeNameFactory(BranchType.TOKYO)}
-            </Dropdown.Option>
-            <Dropdown.Option
-              {...defaultDropdownOptionProps}
-              value={BranchType.OSAKA}
-              onPress={() =>
-                setValues(v => ({...v, branch: BranchType.OSAKA}))
-              }>
-              {branchTypeNameFactory(BranchType.OSAKA)}
-            </Dropdown.Option>
-          </Dropdown>
-          <Div mb="lg">
-            <Text fontSize={16} fontWeight="bold">
-              自己紹介
-            </Text>
-            <TextInput
-              textAlignVertical="top"
-              value={values.introduceOther}
-              onChangeText={handleChange('introduceOther')}
-              multiline={true}
-              placeholder="新しく入社した山田太郎です。よろしくお願いします！"
-              autoCapitalize="none"
-              style={profileStyles.textArea}
-            />
-          </Div>
-          <Div mb="lg">
-            <TagEditLine
-              onPressRightButton={() => handleOpenTagModal(TagType.TECH)}
-              tags={techTags || []}
-              tagType={TagType.TECH}
-            />
+            <Div mb="xl">
+              <Text ml={'lg'} mb={'sm'} fontSize={16}>
+                姓
+              </Text>
+              <Input
+                fontSize={16}
+                value={values.lastName}
+                onChangeText={handleChange('lastName')}
+                placeholder="山田"
+                autoCapitalize="none"
+              />
+            </Div>
+            <Div mb="xl">
+              <Text ml={'lg'} mb={'sm'} fontSize={16}>
+                名
+              </Text>
+              <Input
+                fontSize={16}
+                value={values.firstName}
+                onChangeText={handleChange('firstName')}
+                placeholder="太郎"
+                autoCapitalize="none"
+              />
+            </Div>
+            <Div mb="xl">
+              <Text ml={'lg'} mb={'sm'} fontSize={16}>
+                姓(フリガナ)
+              </Text>
+              <Input
+                fontSize={16}
+                value={values.lastNameKana}
+                onChangeText={handleChange('lastNameKana')}
+                placeholder="ヤマダ"
+                autoCapitalize="none"
+              />
+            </Div>
+            <Div mb="xl">
+              <Text ml={'lg'} mb={'sm'} fontSize={16}>
+                名(フリガナ)
+              </Text>
+              <Input
+                fontSize={16}
+                value={values.firstNameKana}
+                onChangeText={handleChange('firstNameKana')}
+                placeholder="タロウ"
+                autoCapitalize="none"
+              />
+            </Div>
+            <Div mb="xl">
+              <Text ml={'lg'} mb={'sm'} fontSize={16}>
+                社員区分
+              </Text>
+              <DropdownOpenerButton
+                onPress={() => {
+                  userRoleDropdownRef.current?.open();
+                }}
+                name={values.role ? userRoleNameFactory(values.role) : '未選択'}
+                fontSize={16}
+              />
+            </Div>
+            <Div mb="xl">
+              <Text ml={'lg'} mb={'sm'} fontSize={16}>
+                所属支社
+              </Text>
+              <DropdownOpenerButton
+                fontSize={16}
+                name={branchTypeNameFactory(
+                  values.branch || BranchType.NON_SET,
+                )}
+                onPress={() => dropdownRef.current?.open()}
+              />
+            </Div>
+            <Dropdown ref={dropdownRef} {...defaultDropdownProps}>
+              <Dropdown.Option
+                {...defaultDropdownOptionProps}
+                value={BranchType.NON_SET}
+                onPress={() =>
+                  setValues(v => ({...v, branch: BranchType.NON_SET}))
+                }>
+                {branchTypeNameFactory(BranchType.NON_SET)}
+              </Dropdown.Option>
+              <Dropdown.Option
+                {...defaultDropdownOptionProps}
+                value={BranchType.TOKYO}
+                onPress={() =>
+                  setValues(v => ({...v, branch: BranchType.TOKYO}))
+                }>
+                {branchTypeNameFactory(BranchType.TOKYO)}
+              </Dropdown.Option>
+              <Dropdown.Option
+                {...defaultDropdownOptionProps}
+                value={BranchType.OSAKA}
+                onPress={() =>
+                  setValues(v => ({...v, branch: BranchType.OSAKA}))
+                }>
+                {branchTypeNameFactory(BranchType.OSAKA)}
+              </Dropdown.Option>
+            </Dropdown>
+            <Div mb="xl">
+              <Text ml={'lg'} mb={'sm'} fontSize={16}>
+                自己紹介
+              </Text>
+              <TextInput
+                textAlignVertical="top"
+                value={values.introduceOther}
+                onChangeText={handleChange('introduceOther')}
+                multiline={true}
+                placeholder="新しく入社した山田太郎です。よろしくお願いします！"
+                autoCapitalize="none"
+                style={profileStyles.textArea}
+              />
+            </Div>
+            <Div mb="xl">
+              <TagEditLine
+                onPressRightButton={() => handleOpenTagModal(TagType.TECH)}
+                tags={techTags || []}
+                tagType={TagType.TECH}
+              />
 
-            <Text fontSize={16} fontWeight="bold">
-              技術の紹介
-            </Text>
-            <TextInput
-              textAlignVertical="top"
-              value={values.introduceTech}
-              onChangeText={handleChange('introduceTech')}
-              multiline={true}
-              placeholder="自分の技術についての紹介を入力してください"
-              autoCapitalize="none"
-              style={profileStyles.textArea}
-            />
-          </Div>
-          <Div mb="lg">
-            <TagEditLine
-              onPressRightButton={() =>
-                handleOpenTagModal(TagType.QUALIFICATION)
-              }
-              tags={qualificationTags || []}
-              tagType={TagType.QUALIFICATION}
-            />
-            <Text fontSize={16} fontWeight="bold">
-              資格の紹介
-            </Text>
-            <TextInput
-              value={values.introduceQualification}
-              onChangeText={handleChange('introduceQualification')}
-              multiline={true}
-              textAlignVertical="top"
-              placeholder="自分の資格についての紹介を入力してください"
-              autoCapitalize="none"
-              style={profileStyles.textArea}
-            />
-          </Div>
-          <Div mb="lg">
-            <TagEditLine
-              onPressRightButton={() => handleOpenTagModal(TagType.CLUB)}
-              tags={clubTags || []}
-              tagType={TagType.CLUB}
-            />
-            <Text fontSize={16} fontWeight="bold">
-              部活動の紹介
-            </Text>
-            <TextInput
-              value={values.introduceClub}
-              onChangeText={handleChange('introduceClub')}
-              multiline={true}
-              textAlignVertical="top"
-              placeholder="自分の部活動についての紹介を入力してください"
-              autoCapitalize="none"
-              style={profileStyles.textArea}
-            />
-          </Div>
-          <Div mb="lg">
-            <TagEditLine
-              onPressRightButton={() => handleOpenTagModal(TagType.HOBBY)}
-              tags={hobbyTags || []}
-              tagType={TagType.HOBBY}
-            />
-            <Text fontSize={16} fontWeight="bold">
-              趣味の紹介
-            </Text>
-            <TextInput
-              value={values.introduceHobby}
-              onChangeText={handleChange('introduceHobby')}
-              multiline={true}
-              textAlignVertical="top"
-              placeholder="自分の趣味についての紹介を入力してください"
-              autoCapitalize="none"
-              style={profileStyles.textArea}
-            />
+              <Text ml={'lg'} mb={'sm'} fontSize={16}>
+                技術の紹介
+              </Text>
+              <TextInput
+                textAlignVertical="top"
+                value={values.introduceTech}
+                onChangeText={handleChange('introduceTech')}
+                multiline={true}
+                placeholder="自分の技術についての紹介を入力してください"
+                autoCapitalize="none"
+                style={profileStyles.textArea}
+              />
+            </Div>
+            <Div mb="xl">
+              <TagEditLine
+                onPressRightButton={() =>
+                  handleOpenTagModal(TagType.QUALIFICATION)
+                }
+                tags={qualificationTags || []}
+                tagType={TagType.QUALIFICATION}
+              />
+              <Text ml={'lg'} mb={'sm'} fontSize={16}>
+                資格の紹介
+              </Text>
+              <TextInput
+                value={values.introduceQualification}
+                onChangeText={handleChange('introduceQualification')}
+                multiline={true}
+                textAlignVertical="top"
+                placeholder="自分の資格についての紹介を入力してください"
+                autoCapitalize="none"
+                style={profileStyles.textArea}
+              />
+            </Div>
+            <Div mb="xl">
+              <TagEditLine
+                onPressRightButton={() => handleOpenTagModal(TagType.CLUB)}
+                tags={clubTags || []}
+                tagType={TagType.CLUB}
+              />
+              <Text ml={'lg'} mb={'sm'} fontSize={16}>
+                部活動の紹介
+              </Text>
+              <TextInput
+                value={values.introduceClub}
+                onChangeText={handleChange('introduceClub')}
+                multiline={true}
+                textAlignVertical="top"
+                placeholder="自分の部活動についての紹介を入力してください"
+                autoCapitalize="none"
+                style={profileStyles.textArea}
+              />
+            </Div>
+            <Div mb="xl">
+              <TagEditLine
+                onPressRightButton={() => handleOpenTagModal(TagType.HOBBY)}
+                tags={hobbyTags || []}
+                tagType={TagType.HOBBY}
+              />
+              <Text ml={'lg'} mb={'sm'} fontSize={16}>
+                趣味の紹介
+              </Text>
+              <TextInput
+                value={values.introduceHobby}
+                onChangeText={handleChange('introduceHobby')}
+                multiline={true}
+                textAlignVertical="top"
+                placeholder="自分の趣味についての紹介を入力してください"
+                autoCapitalize="none"
+                style={profileStyles.textArea}
+              />
+            </Div>
           </Div>
         </KeyboardAwareScrollView>
       )}

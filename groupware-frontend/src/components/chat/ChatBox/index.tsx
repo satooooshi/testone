@@ -61,6 +61,7 @@ import { removeHalfWidthSpace } from 'src/utils/replaceWidthSpace';
 import { useChatSocket } from './socket';
 import ChatEditor from '../ChatEditor';
 import { RiMore2Fill } from 'react-icons/ri';
+import { nameOfEmptyNameGroup } from 'src/utils/chat/nameOfEmptyNameGroup';
 
 type ChatBoxProps = {
   room: ChatGroup;
@@ -102,7 +103,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
   }, [messages]);
 
   const [selectedImageURL, setSelectedImageURL] = useState<string>();
-  const { data: fetchedPastMessages } = useAPIGetMessages({
+  const { data: fetchedPastMessages, remove } = useAPIGetMessages({
     group: room.id,
     after,
     before,
@@ -208,22 +209,6 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
     [sendChatMessage, newChatMessage.chatGroup],
   );
 
-  const nameOfEmptyNameGroup = (members?: User[]): string => {
-    if (!members?.length) {
-      return 'メンバーがいません';
-    }
-
-    if (room.roomType === RoomType.PERSONAL) {
-      const chatPartner = members.filter((m) => m.id !== user?.id);
-      const partnerName = chatPartner
-        .map((p) => p.lastName + ' ' + p.firstName)
-        .join();
-      return partnerName;
-    }
-    const strMembers = members?.map((m) => m.lastName + m.firstName).join();
-    return strMembers.toString();
-  };
-
   // const isRecent = (created: ChatMessage, target: ChatMessage): boolean => {
   //   if (new Date(created.createdAt) > new Date(target.createdAt)) {
   //     return true;
@@ -257,8 +242,10 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
 
   useEffect(() => {
     if (fetchedPastMessages?.length && room.members?.length) {
-      const refreshedMessage = refreshMessage(fetchedPastMessages);
-      setMessages(refreshedMessage);
+      setMessages((m) => {
+        const refreshedMessage = refreshMessage(fetchedPastMessages, m);
+        return refreshedMessage;
+      });
 
       if (after && refetchDoesntExistMessages(fetchedPastMessages[0].id)) {
         refetchDoesntExistMessages(fetchedPastMessages[0].id + 20);
@@ -292,6 +279,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
       messageWrapperDivRef.current.scrollTo({ top: 0 });
     }
     return () => {
+      remove();
       socket.leaveRoom();
       setMessages([]);
       setBefore(undefined);
@@ -358,19 +346,22 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
     }
   };
 
-  const refreshMessage = (targetMessages: ChatMessage[]): ChatMessage[] => {
-    const arrayIncludesDuplicate = [...messages, ...targetMessages];
+  const refreshMessage = (
+    targetMessages: ChatMessage[],
+    messagesState: ChatMessage[],
+  ): ChatMessage[] => {
+    const filterCurrentGroup = (messages: ChatMessage[]) => {
+      return messages.filter((m) => {
+        return room.id === m.chatGroup?.id;
+      });
+    };
+
+    const arrayIncludesDuplicate = [...messagesState, ...targetMessages];
     return filterCurrentGroup(arrayIncludesDuplicate)
       .filter((value, index, self) => {
         return index === self.findIndex((m) => m.id === value.id);
       })
       .sort((a, b) => b.id - a.id);
-  };
-
-  const filterCurrentGroup = (messages: ChatMessage[]) => {
-    return messages.filter((m) => {
-      return room.id === m.chatGroup?.id;
-    });
   };
 
   const scrollToTarget = useCallback((topOffset: number) => {
@@ -472,7 +463,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
               fontSize="18px"
               color={darkFontColor}
               noOfLines={1}>
-              {room?.name ? room.name : nameOfEmptyNameGroup(room?.members)}
+              {nameOfEmptyNameGroup(room)}
             </Text>
             <Text
               fontWeight="bold"
@@ -493,21 +484,23 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
           <Link mr="4px" onClick={() => setVisibleAlbumModal(true)}>
             <AiOutlinePicture size={24} />
           </Link>
-          {!isPersonal && (
-            <Menu
-              direction="left"
-              onItemClick={(e) => onMenuClicked(e.value as MenuValue)}
-              menuButton={
-                <MenuButton>
-                  <RiMore2Fill size={24} />
-                </MenuButton>
-              }
-              transition>
-              <MenuItem value={'editGroup'}>ルームの情報を編集</MenuItem>
-              <MenuItem value={'editMembers'}>メンバーを編集</MenuItem>
-              <MenuItem value={'leaveRoom'}>ルームを退室</MenuItem>
-            </Menu>
-          )}
+          <Menu
+            direction="left"
+            onItemClick={(e) => onMenuClicked(e.value as MenuValue)}
+            menuButton={
+              <MenuButton>
+                <RiMore2Fill size={24} />
+              </MenuButton>
+            }
+            transition>
+            {!isPersonal && (
+              <>
+                <MenuItem value={'editGroup'}>ルームの情報を編集</MenuItem>
+                <MenuItem value={'editMembers'}>メンバーを編集</MenuItem>
+              </>
+            )}
+            <MenuItem value={'leaveRoom'}>ルームを退室</MenuItem>
+          </Menu>
         </Box>
       </Box>
       {visibleSearchForm && (

@@ -133,9 +133,7 @@ const RoomList: React.FC<RoomListProps> = ({ currentId, onClickRoom }) => {
             }
             const filteredRooms = chatRooms.filter((r) => {
               const regex = new RegExp(e.target.value);
-              return r.name
-                ? regex.test(r.name)
-                : regex.test(nameOfEmptyNameGroup(r.members));
+              return regex.test(nameOfEmptyNameGroup(r));
             });
             setSearchedRooms(filteredRooms);
           }}

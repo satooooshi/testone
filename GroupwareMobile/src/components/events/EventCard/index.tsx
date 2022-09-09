@@ -75,9 +75,6 @@ const EventCard: React.FC<EventCardProps> = ({event}) => {
         maxH={cardWidth * 0.6}
         bg="white"
         rounded={10}
-        shadow="sm"
-        borderWidth={1}
-        borderColor="gray400"
         flexDir="row">
         <Div
           borderRightWidth={1}
@@ -99,7 +96,7 @@ const EventCard: React.FC<EventCardProps> = ({event}) => {
             <Icon name="filetext1" fontSize={80} />
           )}
         </Div>
-        <Div px={8} flexDir="column" w="60%">
+        <Div px={8} flexDir="column" w="60%" py="md">
           {event.tags?.length ? (
             <Div mt={3}>
               <FlatList

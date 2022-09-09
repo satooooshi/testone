@@ -1,14 +1,14 @@
 import {useNavigation, useRoute} from '@react-navigation/native';
 import React from 'react';
 import {FlatList, TouchableHighlight, useWindowDimensions} from 'react-native';
-import {Text, Div, Tag} from 'react-native-magnus';
+import {Text, Div, Tag, Button} from 'react-native-magnus';
 import {useAuthenticate} from '../../../contexts/useAuthenticate';
 import {useTagType} from '../../../hooks/tag/useTagType';
 import {userCardStyles} from '../../../styles/component/user/userCard.style';
 import {TagType, User, UserTag} from '../../../types';
-import {grayColor, darkFontColor} from '../../../utils/colors';
 import {tagTypeNameFactory} from '../../../utils/factory/tag/tagTypeNameFactory';
-import {tagColorFactory} from '../../../utils/factory/tagColorFactory';
+import {tagBgColorFactory} from '../../../utils/factory/tagBgColorFactory';
+import {tagFontColorFactory} from '../../../utils/factory/tagFontColorFactory';
 import {userNameFactory} from '../../../utils/factory/userNameFactory';
 import {userNameKanaFactory} from '../../../utils/factory/userNameKanaFactory';
 import UserAvatar from '../../common/UserAvatar';
@@ -63,212 +63,215 @@ const UserCard: React.FC<UserCardProps> = ({user, filteredDuration}) => {
   };
 
   return (
-    <TouchableHighlight underlayColor="none" onPress={navigateToAccountScreen}>
-      <Div
-        bg={grayColor}
-        w={windowWidth * 0.9}
-        rounded="md"
-        shadow="md"
-        p="xs"
-        borderWidth={1}
-        borderColor={'gray500'}>
-        <Div px="xs" justifyContent="space-between" flexDir="row">
+    <Div bg="white" w={windowWidth * 0.9} rounded="xl" p="lg">
+      <Div mb="lg" justifyContent="space-between" flexDir="row">
+        <Div mr={10}>
           <UserAvatar
             user={user}
-            w={120}
-            h={120}
+            w={100}
+            h={100}
             onPress={navigateToAccountScreen}
           />
-          <Div w={'60%'}>
-            <Text fontSize={18} fontWeight="bold" color={darkFontColor}>
-              {userNameFactory(user)}
-            </Text>
-            <Text fontSize={14} fontWeight="bold" color={darkFontColor}>
-              {userNameKanaFactory(user)}
-            </Text>
-            <Text fontSize={16} color={darkFontColor} numberOfLines={2}>
-              {user.introduceOther || '未設定'}
-            </Text>
-            <Div
-              flexDir="row"
-              w={'80%'}
-              justifyContent="space-between"
-              alignItems="center">
-              <Text fontSize={14}>イベント参加数{durationText()}</Text>
-              <Text color="blue700" fontWeight="bold" fontSize={18}>
-                {user.eventCount || 0}
-              </Text>
-            </Div>
-            <Div
-              flexDir="row"
-              w={'80%'}
-              justifyContent="space-between"
-              alignItems="center">
-              <Text fontSize={14}>質問数{durationText()}</Text>
-              <Text color="blue700" fontWeight="bold" fontSize={18}>
-                {user.questionCount || 0}
-              </Text>
-            </Div>
-            <Div
-              flexDir="row"
-              w={'80%'}
-              justifyContent="space-between"
-              alignItems="center">
-              <Text fontSize={14}>質問回答数{durationText()}</Text>
-              <Text color="blue700" fontWeight="bold" fontSize={18}>
-                {user.answerCount || 0}
-              </Text>
-            </Div>
-            <Div
-              flexDir="row"
-              w={'80%'}
-              justifyContent="space-between"
-              alignItems="center">
-              <Text fontSize={14}>ナレッジ投稿数{durationText()}</Text>
-              <Text color="blue700" fontWeight="bold" fontSize={18}>
-                {user.knowledgeCount || 0}
-              </Text>
-            </Div>
-          </Div>
         </Div>
-        <Div pl="xs" mb={'xs'} flexDir="row" alignItems="center">
-          <Text w={'13%'} fontSize={14}>{`${tagTypeNameFactory(
-            TagType.TECH,
-          )}:`}</Text>
-          {techTags?.length ? (
-            <FlatList
-              style={userCardStyles.tagList}
-              horizontal
-              data={techTags}
-              renderItem={({item: t}) => (
-                <Tag
-                  onPress={() => onPressTag(t)}
-                  fontSize={'lg'}
-                  h={28}
-                  py={0}
-                  bg={tagColorFactory(t.type)}
-                  color="white"
-                  mr={4}>
-                  {t.name}
-                </Tag>
-              )}
-            />
-          ) : (
-            <Tag
-              fontSize={'lg'}
-              h={28}
-              py={0}
-              bg={tagColorFactory(TagType.TECH)}
-              color="white"
-              mr={4}>
-              未設定
-            </Tag>
-          )}
-        </Div>
-        <Div pl="xs" mb={'xs'} flexDir="row" alignItems="center">
-          <Text w={'13%'} fontSize={14}>{`${tagTypeNameFactory(
-            TagType.QUALIFICATION,
-          )}:`}</Text>
-          {qualificationTags?.length ? (
-            <FlatList
-              style={userCardStyles.tagList}
-              horizontal
-              data={qualificationTags}
-              renderItem={({item: t}) => (
-                <Tag
-                  onPress={() => onPressTag(t)}
-                  fontSize={'lg'}
-                  h={28}
-                  py={0}
-                  bg={tagColorFactory(t.type)}
-                  color="white"
-                  mr={4}>
-                  {t.name}
-                </Tag>
-              )}
-            />
-          ) : (
-            <Tag
-              fontSize={'lg'}
-              h={28}
-              py={0}
-              bg={tagColorFactory(TagType.QUALIFICATION)}
-              color="white"
-              mr={4}>
-              未設定
-            </Tag>
-          )}
-        </Div>
-        <Div pl="xs" mb={'xs'} flexDir="row" alignItems="center">
-          <Text w={'13%'} fontSize={14}>{`${tagTypeNameFactory(
-            TagType.CLUB,
-          )}:`}</Text>
-          {clubTags?.length ? (
-            <FlatList
-              style={userCardStyles.tagList}
-              horizontal
-              data={clubTags}
-              renderItem={({item: t}) => (
-                <Tag
-                  onPress={() => onPressTag(t)}
-                  fontSize={'lg'}
-                  h={28}
-                  py={0}
-                  bg={tagColorFactory(t.type)}
-                  color="white"
-                  mr={4}>
-                  {t.name}
-                </Tag>
-              )}
-            />
-          ) : (
-            <Tag
-              fontSize={'lg'}
-              h={28}
-              py={0}
-              bg={tagColorFactory(TagType.CLUB)}
-              color="white"
-              mr={4}>
-              未設定
-            </Tag>
-          )}
-        </Div>
-        <Div pl="xs" mb={'xs'} flexDir="row" alignItems="center">
-          <Text w={'13%'} fontSize={14}>{`${tagTypeNameFactory(
-            TagType.HOBBY,
-          )}:`}</Text>
-          {hobbyTags?.length ? (
-            <FlatList
-              style={userCardStyles.tagList}
-              horizontal
-              data={hobbyTags}
-              renderItem={({item: t}) => (
-                <Tag
-                  onPress={() => onPressTag(t)}
-                  fontSize={'lg'}
-                  h={28}
-                  py={0}
-                  bg={tagColorFactory(t.type)}
-                  color="white"
-                  mr={4}>
-                  {t.name}
-                </Tag>
-              )}
-            />
-          ) : (
-            <Tag
-              fontSize={'lg'}
-              h={28}
-              py={0}
-              bg={tagColorFactory(TagType.HOBBY)}
-              color="white"
-              mr={4}>
-              未設定
-            </Tag>
-          )}
+        <Div flex={1}>
+          <Text fontSize={18} fontWeight="bold" color="black">
+            {userNameFactory(user)}
+          </Text>
+          <Text fontSize={12} color="gray">
+            {userNameKanaFactory(user)}
+          </Text>
+          <Text
+            fontSize={12}
+            my={12}
+            color="gray"
+            numberOfLines={3}
+            letterSpacing={0.5}>
+            {user.introduceOther || '未設定'}
+          </Text>
         </Div>
       </Div>
-    </TouchableHighlight>
+      <Div mb={'xs'} flexDir="row" alignItems="center">
+        <Text w={50} fontSize={14} color="gray">{`${tagTypeNameFactory(
+          TagType.TECH,
+        )}:`}</Text>
+        {techTags?.length ? (
+          <FlatList
+            style={userCardStyles.tagList}
+            horizontal
+            data={techTags}
+            renderItem={({item: t}) => (
+              <Tag
+                onPress={() => onPressTag(t)}
+                fontSize={'md'}
+                h={24}
+                py={0}
+                bg={tagBgColorFactory(t.type)}
+                color={tagFontColorFactory(t.type)}
+                mr={4}>
+                {t.name}
+              </Tag>
+            )}
+          />
+        ) : (
+          <Tag
+            fontSize={'md'}
+            h={24}
+            py={0}
+            bg={tagBgColorFactory(TagType.TECH)}
+            color={tagFontColorFactory(TagType.TECH)}
+            mr={4}>
+            未設定
+          </Tag>
+        )}
+      </Div>
+      <Div mb={'xs'} flexDir="row" alignItems="center">
+        <Text w={50} fontSize={14} color="gray">{`${tagTypeNameFactory(
+          TagType.QUALIFICATION,
+        )}:`}</Text>
+        {qualificationTags?.length ? (
+          <FlatList
+            style={userCardStyles.tagList}
+            horizontal
+            data={qualificationTags}
+            renderItem={({item: t}) => (
+              <Tag
+                onPress={() => onPressTag(t)}
+                fontSize={'md'}
+                h={24}
+                py={0}
+                bg={tagBgColorFactory(t.type)}
+                color={tagFontColorFactory(t.type)}
+                mr={4}>
+                {t.name}
+              </Tag>
+            )}
+          />
+        ) : (
+          <Tag
+            fontSize={'md'}
+            h={24}
+            py={0}
+            bg={tagBgColorFactory(TagType.QUALIFICATION)}
+            color={tagFontColorFactory(TagType.QUALIFICATION)}
+            mr={4}>
+            未設定
+          </Tag>
+        )}
+      </Div>
+      <Div mb={'xs'} flexDir="row" alignItems="center">
+        <Text w={50} fontSize={14} color="gray">{`${tagTypeNameFactory(
+          TagType.CLUB,
+        )}:`}</Text>
+        {clubTags?.length ? (
+          <FlatList
+            style={userCardStyles.tagList}
+            horizontal
+            data={clubTags}
+            renderItem={({item: t}) => (
+              <Tag
+                onPress={() => onPressTag(t)}
+                fontSize={'md'}
+                h={24}
+                py={0}
+                bg={tagBgColorFactory(t.type)}
+                color={tagFontColorFactory(t.type)}
+                mr={4}>
+                {t.name}
+              </Tag>
+            )}
+          />
+        ) : (
+          <Tag
+            fontSize={'md'}
+            h={24}
+            py={0}
+            bg={tagBgColorFactory(TagType.CLUB)}
+            color={tagFontColorFactory(TagType.CLUB)}
+            mr={4}>
+            未設定
+          </Tag>
+        )}
+      </Div>
+      <Div mb={'lg'} flexDir="row" alignItems="center">
+        <Text w={50} fontSize={14} color="gray">{`${tagTypeNameFactory(
+          TagType.HOBBY,
+        )}:`}</Text>
+        {hobbyTags?.length ? (
+          <FlatList
+            style={userCardStyles.tagList}
+            horizontal
+            data={hobbyTags}
+            renderItem={({item: t}) => (
+              <Tag
+                onPress={() => onPressTag(t)}
+                fontSize={'md'}
+                h={24}
+                py={0}
+                bg={tagBgColorFactory(t.type)}
+                color={tagFontColorFactory(t.type)}
+                mr={4}>
+                {t.name}
+              </Tag>
+            )}
+          />
+        ) : (
+          <Tag
+            fontSize={'md'}
+            h={24}
+            py={0}
+            bg={tagBgColorFactory(TagType.HOBBY)}
+            color={tagFontColorFactory(TagType.HOBBY)}
+            mr={4}>
+            未設定
+          </Tag>
+        )}
+      </Div>
+      <Div>
+        {durationText() ? (
+          <Text mb="sm" fontSize={10} color="gray">
+            {durationText()}
+          </Text>
+        ) : null}
+      </Div>
+      <Div flexDir="row">
+        <Text color="gray" fontSize={10} mr={5}>
+          イベント参加数
+        </Text>
+        <Text color="gray" fontSize={10} mr={15}>
+          {user.eventCount || 0}
+        </Text>
+        <Text color="gray" fontSize={10} mr={5}>
+          質問数
+        </Text>
+        <Text color="gray" fontSize={10} mr={15}>
+          {user.questionCount || 0}
+        </Text>
+        <Text color="gray" fontSize={10} mr={5}>
+          質問回答数
+        </Text>
+        <Text color="gray" fontSize={10} mr={15}>
+          {user.answerCount || 0}
+        </Text>
+        <Text color="gray" fontSize={10} mr={5}>
+          ナレッジ投稿数
+        </Text>
+        <Text color="gray" fontSize={10} mr={15}>
+          {user.knowledgeCount || 0}
+        </Text>
+      </Div>
+      <Div mt={20}>
+        <Button
+          bg="indigo100"
+          px={15}
+          rounded="circle"
+          alignSelf="center"
+          onPress={navigateToAccountScreen}>
+          <Text fontWeight="bold" fontSize={16} color="blue700">
+            プロフィールを見る
+          </Text>
+        </Button>
+      </Div>
+    </Div>
   );
 };
 
