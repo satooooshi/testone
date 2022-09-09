@@ -27,8 +27,8 @@ import { noteSchema } from 'src/utils/validation/schema';
 import dynamic from 'next/dynamic';
 const Viewer = dynamic(() => import('react-viewer'), { ssr: false });
 import { saveAs } from 'file-saver';
-import { fileNameTransformer } from 'src/utils/factory/fileNameTransformer';
 import { useAPIUpdateNote } from '@/hooks/api/chat/note/useAPIUpdateChatNote';
+import { socket } from '../../ChatBox/socket';
 
 type EditNoteProps = {
   room: ChatGroup;
@@ -48,6 +48,7 @@ const EditNote: React.FC<EditNoteProps> = ({
 }) => {
   const toast = useToast();
   const imageUploaderRef = useRef<HTMLInputElement | null>(null);
+  const focusTextareaRef = useRef<HTMLTextAreaElement>(null);
   const initialValues: Partial<ChatNote> = {
     content: '',
     chatGroup: room,
@@ -55,7 +56,11 @@ const EditNote: React.FC<EditNoteProps> = ({
     images: [],
   };
   const { mutate: createNote } = useAPICreateChatNote({
-    onSuccess: () => {
+    onSuccess: (result) => {
+      socket.emit('message', {
+        type: 'send',
+        chatMessage: result.systemMessage,
+      });
       toast({
         title: 'ノートを保存しました',
         status: 'success',
@@ -134,8 +139,12 @@ const EditNote: React.FC<EditNoteProps> = ({
   useEffect(() => {
     if (isOpen) {
       setWillSubmit(false);
+      const focusOn = async () => {
+        await new Promise((r) => setTimeout(r, 50));
+        focusTextareaRef?.current?.focus();
+      };
+      focusOn();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen]);
 
   useEffect(() => {
@@ -306,6 +315,7 @@ const EditNote: React.FC<EditNoteProps> = ({
                     onChange={handleChange}
                     placeholder="今なにしてる？"
                     bg="white"
+                    ref={focusTextareaRef}
                     minH={'300px'}
                   />
                 </Box>

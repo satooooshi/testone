@@ -22,6 +22,7 @@ import {
 import { QAAnswer } from './qaAnswer.entity';
 import { Tag } from './tag.entity';
 import { User } from './user.entity';
+import { UserGoodForBoard } from './userGoodForBord.entity';
 
 export enum WikiType {
   RULES = 'rule',
@@ -171,22 +172,18 @@ export class Wiki {
   })
   tags?: Tag[];
 
-  @ManyToMany(() => User, (user) => user.userGoodForBoard, {
-    onUpdate: 'CASCADE',
-    onDelete: 'CASCADE',
-  })
-  @JoinTable({
-    name: 'user_good_for_board',
-    joinColumn: {
-      name: 'wiki_id',
-      referencedColumnName: 'id',
+  @ManyToMany(
+    () => UserGoodForBoard,
+    (userGoodForBoard) => userGoodForBoard.wiki,
+    {
+      onUpdate: 'CASCADE',
+      onDelete: 'CASCADE',
     },
-    inverseJoinColumn: {
-      name: 'user_id',
-      referencedColumnName: 'id',
-    },
-  })
-  userGoodForBoard?: User[];
+  )
+  userGoodForBoard?: UserGoodForBoard[];
+
+  goodsCount?: number;
+  answersCount?: number;
 
   @BeforeInsert()
   @BeforeUpdate()

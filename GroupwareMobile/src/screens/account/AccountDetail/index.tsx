@@ -155,20 +155,29 @@ const AccountDetail: React.FC = () => {
     refetch,
     isLoading: loadingProfile,
   } = useAPIGetUserInfoById(userID?.toString() || '0');
-  const {data: events, refetch: refetchEventList} = useAPIGetEventList({
-    participant_id: userID?.toString(),
-  });
-  const {data: questionList, refetch: refetchQuestionList} = useAPIGetWikiList({
-    writer: userID?.toString() || '0',
-    type: WikiType.BOARD,
-    board_category: BoardCategory.QA,
-  });
-  const {data: knowledgeList, refetch: refetchKnowledgeList} =
-    useAPIGetWikiList({
+  const {data: events, refetch: refetchEventList} = useAPIGetEventList(
+    {
+      participant_id: userID?.toString(),
+    },
+    {enabled: false},
+  );
+  const {data: questionList, refetch: refetchQuestionList} = useAPIGetWikiList(
+    {
       writer: userID?.toString() || '0',
       type: WikiType.BOARD,
-      board_category: BoardCategory.KNOWLEDGE,
-    });
+      board_category: BoardCategory.QA,
+    },
+    {enabled: false},
+  );
+  const {data: knowledgeList, refetch: refetchKnowledgeList} =
+    useAPIGetWikiList(
+      {
+        writer: userID?.toString() || '0',
+        type: WikiType.BOARD,
+        board_category: BoardCategory.KNOWLEDGE,
+      },
+      {enabled: false},
+    );
   const [safetyCreateGroup, setCreatGroup] = useState(false);
   const {mutate: createGroup} = useAPISaveChatGroup({
     onSuccess: createdData => {
@@ -254,19 +263,30 @@ const AccountDetail: React.FC = () => {
   useEffect(() => {
     if (isFocused) {
       refetch();
-      refetchEventList();
-      refetchQuestionList();
-      refetchKnowledgeList();
+
       setIsTabBarVisible(true);
     }
-  }, [
-    isFocused,
-    refetch,
-    refetchEventList,
-    refetchQuestionList,
-    refetchKnowledgeList,
-    setIsTabBarVisible,
-  ]);
+  }, [isFocused, refetch, setIsTabBarVisible]);
+
+  useEffect(() => {
+    const refetchActiveTabData = (activeTab: string) => {
+      switch (activeTab) {
+        case eventScreenName:
+          refetchEventList();
+          return;
+        case questionScreenName:
+          refetchQuestionList();
+          return;
+        case knowledgeScreenName:
+          refetchKnowledgeList();
+          return;
+      }
+    };
+    if (activeScreen) {
+      refetchActiveTabData(activeScreen);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeScreen]);
 
   return (
     <WholeContainer>
@@ -530,15 +550,18 @@ const AccountDetail: React.FC = () => {
                     children={() => (
                       <Div bg="white" h="100%">
                         <Div alignItems="center" mt="lg">
-                          {profile?.userGoodForBoard?.length ? (
-                            profile?.userGoodForBoard?.map(w => (
-                              <WikiCard key={w.id} wiki={w} />
-                            ))
-                          ) : (
-                            <Text fontSize={16}>
-                              いいねした掲示板が見つかりませんでした
-                            </Text>
-                          )}
+                        {profile?.userGoodForBoard?.length ? (
+                          profile?.userGoodForBoard?.map(
+                            w =>
+                              w.wiki && (
+                                <WikiCard key={w.wiki.id} wiki={w.wiki} />
+                              ),
+                          )
+                        ) : (
+                          <Text fontSize={16}>
+                            いいねした掲示板が見つかりませんでした
+                          </Text>
+                        )}
                         </Div>
                         <Div
                           onLayout={({nativeEvent}) => {

@@ -16,6 +16,7 @@ import {
   EditRoomNavigationProps,
   EditRoomRouteProps,
 } from '../../../types/navigator/drawerScreenProps';
+import {socket} from '../../../utils/socket';
 
 const EditRoom: React.FC = () => {
   const navigation = useNavigation<EditRoomNavigationProps>();
@@ -30,16 +31,20 @@ const EditRoom: React.FC = () => {
   const {mutate: uploadImage} = useAPIUploadStorage();
   const {data: users} = useAPIGetUsers('');
   const headerTitle = 'ルーム編集';
+
   const {mutate: updateGroup} = useAPIUpdateChatGroup({
-    onSuccess: updatedGroup => {
-      editChatGroup(updatedGroup);
+    onSuccess: data => {
+      editChatGroup(data.room);
+      for (const msg of data.systemMessage) {
+        socket.emit('message', {type: 'send', chatMessage: msg});
+      }
       Alert.alert('ルームの更新が完了しました。', undefined, [
         {
           text: 'OK',
           onPress: () => {
             navigation.navigate('ChatStack', {
               screen: 'ChatMenu',
-              params: {room: updatedGroup},
+              params: {room: data.room},
             });
           },
         },

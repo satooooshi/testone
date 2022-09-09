@@ -10,3 +10,4 @@ export const createAnswerReplyURL = `/${wikiURL}/create-answer-reply`;
 export const createBestAnswerURL = `/${wikiURL}/create-best-answer`;
 export const updateWikiURL = `/${wikiURL}/update-wiki`;
 export const toggleGoodForBoardURL = `/${wikiURL}/toggle-good-for-board`;
+export const getGoodsForBoardURL = `/${wikiURL}/get-goods-for-board`;

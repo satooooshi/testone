@@ -18,7 +18,7 @@ import {
 import tailwind from 'tailwind-rn';
 import {useSelectedUsers} from '../../../hooks/user/useSelectedUsers';
 import {useUserRole} from '../../../hooks/user/useUserRole';
-import {User, UserRole, UserRoleInApp} from '../../../types';
+import {RoomType, User, UserRole, UserRoleInApp} from '../../../types';
 import {userNameFactory} from '../../../utils/factory/userNameFactory';
 import {userRoleNameFactory} from '../../../utils/factory/userRoleNameFactory';
 import UserAvatar from '../UserAvatar';
@@ -31,6 +31,7 @@ type UserModalProps = ModalContainerProps & {
   users: User[];
   selectedUserRole: UserRoleInApp;
   defaultSelectedUsers?: Partial<User>[];
+  creationType?: RoomType;
 };
 
 const UserModal: React.FC<UserModalProps> = props => {
@@ -40,6 +41,7 @@ const UserModal: React.FC<UserModalProps> = props => {
     onCompleteModal,
     selectedUserRole: alreadySelectedUserRole,
     defaultSelectedUsers,
+    creationType,
   } = props;
   const {
     toggleUser,
@@ -89,26 +91,32 @@ const UserModal: React.FC<UserModalProps> = props => {
     setModalUsers(searchedTags);
   }, [searchWords, users]);
 
+  const onSubmitPress = () => {
+    onCompleteModal(selectedUsersInModal as User[], clear);
+    setSearchWords(undefined);
+    onCloseModal();
+  };
+
   const dropdownRef = useRef<any | null>(null);
   const {width: windowWidth} = useWindowDimensions();
   return (
     <Modal {...props}>
-      <Button
-        bg="purple600"
-        position="absolute"
-        right={10}
-        bottom={10}
-        h={60}
-        zIndex={20}
-        rounded="circle"
-        w={60}
-        onPress={() => {
-          onCompleteModal(selectedUsersInModal as User[], clear);
-          setSearchWords(undefined);
-          onCloseModal();
-        }}>
-        <Icon color="white" fontSize="6xl" name="check" />
-      </Button>
+      {selectedUsersInModal?.length || creationType !== RoomType.TALK_ROOM ? (
+        <Button
+          bg="purple600"
+          position="absolute"
+          right={10}
+          bottom={10}
+          h={60}
+          zIndex={20}
+          rounded="circle"
+          w={60}
+          onPress={onSubmitPress}>
+          <Icon color="white" fontSize="6xl" name="check" />
+        </Button>
+      ) : (
+        <></>
+      )}
       <Button
         bg="gray400"
         h={35}

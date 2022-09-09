@@ -240,6 +240,11 @@ const Navigator = () => {
   };
 
   messaging().setBackgroundMessageHandler(async remoteMessage => {
+    console.log('setBackgroundMessageHandler called');
+    if (Platform.OS === 'android') {
+      sendLocalNotification(remoteMessage);
+    }
+
     // await notifee.incrementBadgeCount();
     // console.log('BackgroundMessage received!!', remoteMessage);
   });
@@ -444,11 +449,6 @@ const Navigator = () => {
 
   const sendLocalNotification = useCallback(
     async (remoteMessage: any) => {
-      // console.log(
-      //   '============',
-      //   remoteMessage.data?.id,
-      //   `${currentChatRoomId}`,
-      // );
       if (
         remoteMessage?.data?.silent ||
         (remoteMessage?.data?.screen === 'chat' &&
@@ -456,31 +456,48 @@ const Navigator = () => {
       ) {
         return;
       }
-      if (!remoteMessage?.data?.calleeId) {
-        const channelId = await notifee.createChannel({
-          id: 'default',
-          name: 'Default Channel',
-        });
+      if (Platform.OS === 'android') {
+        if (!remoteMessage?.data?.calleeId) {
+          let channelId = 'default';
+          if (!(await notifee.isChannelCreated(channelId))) {
+            channelId = await notifee.createChannel({
+              id: 'default',
+              name: 'Default Channel',
+            });
+          }
 
-        await notifee.displayNotification({
-          title: remoteMessage.data?.title || '',
-          body: remoteMessage.data?.message || remoteMessage.data?.body || '',
-          android: {
-            channelId: channelId,
-            pressAction: {
-              id: 'action_id',
-              launchActivity: 'default',
+          await notifee.displayNotification({
+            title: remoteMessage.data?.title || '',
+            body: remoteMessage.data?.message || remoteMessage.data?.body || '',
+            android: {
+              channelId: channelId,
+              pressAction: {
+                id: 'action_id',
+                launchActivity: 'default',
+              },
             },
-          },
-          data: {
-            screen: remoteMessage?.data?.screen
-              ? remoteMessage?.data?.screen
-              : '',
-            id: remoteMessage?.data?.id ? remoteMessage?.data?.id : '',
-          },
-          ios: {
-            // iOS resource (.wav, aiff, .caf)
-            sound: 'local.wav',
+            data: {
+              screen: remoteMessage?.data?.screen
+                ? remoteMessage?.data?.screen
+                : '',
+              id: remoteMessage?.data?.id ? remoteMessage?.data?.id : '',
+            },
+            ios: {
+              // iOS resource (.wav, aiff, .caf)
+              sound: 'local.wav',
+            },
+          });
+        }
+      } else {
+        PushNotification.localNotification({
+          id: remoteMessage.messageId,
+          vibration: 300,
+          visibility: 'public',
+          message: remoteMessage.notification?.body || '',
+          title: remoteMessage.notification?.title,
+          userInfo: {
+            screen: remoteMessage?.data?.screen,
+            id: remoteMessage?.data?.id,
           },
         });
       }
@@ -489,6 +506,8 @@ const Navigator = () => {
   );
 
   const naviateByNotif = (notification: any) => {
+    console.log('naviateByNotif called ------');
+
     if (
       navigationRef.current?.getCurrentRoute()?.name !== 'Login' &&
       user?.id
@@ -521,18 +540,24 @@ const Navigator = () => {
       }
     }
   };
+
   useEffect(() => {
     if (user?.id) {
       notifee.onForegroundEvent(({type, detail}) => {
+        console.log('onForegroundEvent call', type);
+
         switch (type) {
           case EventType.DISMISSED:
             break;
           case EventType.PRESS:
+            console.log('onForegroundEvent pressed', type);
             naviateByNotif(detail.notification);
             break;
         }
       });
       notifee.onBackgroundEvent(async ({type, detail}) => {
+        console.log('onBackgroundEvent call');
+
         switch (type) {
           case EventType.DISMISSED:
             break;
@@ -547,6 +572,7 @@ const Navigator = () => {
         //   console.log('PushNotification TOKEN:', token);
         // },
         onNotification: notification => {
+          console.log('onNotification called');
           if (
             (notification?.data?.silent ||
               notification?.data?.type === 'badge') &&
@@ -580,28 +606,27 @@ const Navigator = () => {
             }
           }
           // console.log('PushNotification onNotification========', notification);
-          if (Platform.OS === 'android') {
-            sendLocalNotification(notification);
-          } else if (notification.userInteraction) {
+          if (Platform.OS === 'ios' && notification.userInteraction) {
+            console.log('----naviateByNotif');
             naviateByNotif(notification);
           }
         },
         permissions: {
           alert: true,
           badge: true,
-          sound: true,
         },
         requestPermissions: true,
       });
-
-      const unsubscribe = messaging().onMessage(async remoteMessage => {
-        if (Platform.OS === 'ios') {
-          sendLocalNotification(remoteMessage);
-        }
-      });
-
-      return unsubscribe;
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id]);
+
+  useEffect(() => {
+    const unsubscribe = messaging().onMessage(async remoteMessage => {
+      sendLocalNotification(remoteMessage);
+    });
+
+    return unsubscribe;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id, currentChatRoomId]);
 

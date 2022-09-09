@@ -18,6 +18,7 @@ import {
 } from '@/hooks/chat/useModalReducer';
 import EditChatGroupModal from '@/components/chat/EditChatGroupModal';
 import { useAPIUpdateChatGroup } from '@/hooks/api/chat/useAPIUpdateChatGroup';
+import { socket } from '../ChatBox/socket';
 
 type Props = {
   currentRoom?: ChatGroup;
@@ -53,7 +54,10 @@ const ChatLayout: FC<Props> = ({
 
   const { mutate: updateGroup } = useAPIUpdateChatGroup({
     onSuccess: (data) => {
-      editChatGroup(data);
+      editChatGroup(data.room);
+      for (const msg of data.systemMessage) {
+        socket.emit('message', { type: 'send', chatMessage: msg });
+      }
     },
     onError: () => {
       alert('グループの更新中にエラーが発生しました');
@@ -145,7 +149,7 @@ const ChatLayout: FC<Props> = ({
                           isClosable: true,
                         });
                         setCurrentRoom({
-                          ...newGroupInfo,
+                          ...newGroupInfo.room,
                           members: selectedUsersInModal,
                         });
                       },

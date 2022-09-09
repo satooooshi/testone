@@ -91,6 +91,9 @@ export class ChatMessage {
   })
   updatedAt: Date;
 
+  @Column({ type: 'datetime', name: 'modified_at', nullable: true })
+  modifiedAt: Date | null;
+
   isSender?: boolean;
 
   @ManyToOne(() => ChatMessage, (chatMessage) => chatMessage.id)

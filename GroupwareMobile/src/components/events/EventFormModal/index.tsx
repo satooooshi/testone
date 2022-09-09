@@ -76,7 +76,9 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
   const {user} = useAuthenticate();
   const dropdownRef = useRef<any | null>(null);
   const {data: tags} = useAPIGetTag();
-  const {data: users} = useAPIGetUsers('ALL');
+  const {data: users, refetch: refetchGetUsers} = useAPIGetUsers('ALL', {
+    enabled: false,
+  });
   const [visibleTagModal, setVisibleTagModal] = useState(false);
   const [visibleUserModal, setVisibleUserModal] = useState(false);
   const [willSubmit, setWillSubmit] = useState(false);
@@ -120,6 +122,7 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
   useEffect(() => {
     if (isVisible) {
       setWillSubmit(false);
+      refetchGetUsers();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isVisible]);

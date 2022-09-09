@@ -4,7 +4,6 @@ import { getCroppedImageURL } from 'src/utils/getCroppedImageURL';
 
 type UseImageCropState = {
   crop: Crop;
-  completedCrop?: Crop;
   imageName?: string;
   imageURL?: string;
   croppedImageURL?: string;
@@ -16,7 +15,7 @@ type UseImageCropAction =
       value: Crop;
     }
   | {
-      type: 'setCompletedCrop';
+      type: 'setCropAndImage';
       value: Crop;
       ref: HTMLImageElement | null;
     }
@@ -37,14 +36,14 @@ const cropReducer = (
     case 'setCrop': {
       return { ...state, crop: action.value };
     }
-    case 'setCompletedCrop': {
+    case 'setCropAndImage': {
       if (!action.ref) {
         return state;
       }
       const croppedImageURL = getCroppedImageURL(action.ref, action.value);
       return {
         ...state,
-        completedCrop: action.value,
+        crop: action.value,
         croppedImageURL: croppedImageURL,
       };
     }
@@ -54,7 +53,6 @@ const cropReducer = (
           ...state,
           imageURL: undefined,
           imageName: undefined,
-          completedCrop: undefined,
           croppedImageURL: undefined,
         };
       }
@@ -67,7 +65,6 @@ const cropReducer = (
         ...state,
         imageURL: undefined,
         imageName: undefined,
-        completedCrop: undefined,
         croppedImageURL: undefined,
       };
     }

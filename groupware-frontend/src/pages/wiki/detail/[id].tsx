@@ -448,17 +448,13 @@ const QuestionDetail = () => {
                           createdAt={answer.createdAt}
                           writer={answer.writer}
                           isWriter={myself?.id === wiki.writer?.id}
-                          replyButtonName={
-                            answerReply.answer?.id === answer.id ||
-                            !enableReplyToAnswer(answer)
-                              ? undefined
-                              : '返信/追記'
-                          }
+                          replyButtonName={'返信/追記'}
                           onClickReplyButton={() =>
                             handleClickStartInputtingReplyButton(answer)
                           }
                         />
                       </Box>
+
                       {answerReply.answer &&
                       answerReply.answer.id === answer.id ? (
                         <WrappedDraftEditor

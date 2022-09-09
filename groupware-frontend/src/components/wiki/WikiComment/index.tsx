@@ -5,7 +5,8 @@ import {
   dateTimeFormatterFromJSDDate,
   dateTimeFormatterFromJSDDateWithoutTime,
 } from 'src/utils/dateTimeFormatter';
-import { Avatar, Box, Button, Text } from '@chakra-ui/react';
+import { Avatar, Box, Button, Text, Spinner } from '@chakra-ui/react';
+
 import MarkdownIt from 'markdown-it';
 import Editor from 'react-markdown-editor-lite';
 import 'react-markdown-editor-lite/lib/index.css';
@@ -17,6 +18,7 @@ import { useAuthenticate } from 'src/contexts/useAuthenticate';
 import { AiFillHeart, AiOutlineHeart } from 'react-icons/ai';
 import GoodSendersModal from '../GoodSendersModal';
 import { Link } from '@chakra-ui/react';
+import { useAPIGetGoodsForBoard } from '@/hooks/api/wiki/useAPIGetGoodsForBoard';
 
 type WikiCommentProps = {
   textFormat?: TextFormat;
@@ -55,32 +57,32 @@ const WikiComment: React.FC<WikiCommentProps> = ({
   const [goodSendersModal, setGoodSendersModal] = useState(false);
   const { user } = useAuthenticate();
 
+  const { mutate: getGoodsForBoard, data: goodsForBoard } =
+    useAPIGetGoodsForBoard();
   const { mutate } = useAPIToggleGoodForBoard({
     onSuccess: () => {
-      setIsPressHeart((prevHeartStatus) => {
-        setWikiState((w) => {
-          if (w) {
-            if (prevHeartStatus) {
-              w.userGoodForBoard = w.userGoodForBoard?.filter(
-                (u) => u.id !== user?.id,
-              );
-            } else {
-              w.userGoodForBoard = [
-                user as User,
-                ...(w.userGoodForBoard || []),
-              ];
+      if (wiki) {
+        setIsPressHeart((prevHeartStatus) => {
+          setWikiState((w) => {
+            if (w) {
+              return {
+                ...w,
+                goodsCount: prevHeartStatus
+                  ? (w.goodsCount || 0) - 1
+                  : (w.goodsCount || 0) + 1,
+              };
             }
-            return w;
-          }
+          });
+          return !prevHeartStatus;
         });
-
-        return !prevHeartStatus;
-      });
+      }
     },
   });
 
   useEffect(() => {
-    setWikiState(wiki);
+    if (wiki) {
+      setWikiState(wiki);
+    }
   }, [wiki]);
 
   return (
@@ -200,13 +202,24 @@ const WikiComment: React.FC<WikiCommentProps> = ({
               <AiOutlineHeart size={30} color="black" />
             )}
           </Link>
+          <Link
+            onClick={() => {
+              getGoodsForBoard(wikiState.id);
+              setGoodSendersModal(true);
+            }}>
+            <Button colorScheme={'blue'} color="white" size={'sm'}>
+              {`${wikiState.goodsCount}件のいいね`}
+            </Button>
+          </Link>
         </Box>
       )}
-      <GoodSendersModal
-        isOpen={goodSendersModal}
-        onClose={() => setGoodSendersModal(false)}
-        goodSenders={wikiState?.userGoodForBoard || []}
-      />
+      {goodsForBoard && (
+        <GoodSendersModal
+          isOpen={goodSendersModal}
+          onClose={() => setGoodSendersModal(false)}
+          goodsForBoard={goodsForBoard}
+        />
+      )}
     </>
   );
 };
