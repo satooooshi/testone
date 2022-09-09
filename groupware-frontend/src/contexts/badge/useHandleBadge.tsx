@@ -49,13 +49,49 @@ export const BadgeProvider: React.FC = ({ children }) => {
         }
         setChatUnreadCount(count);
         setChatGroups((r) => {
+          const sortRooms = (room: ChatGroup[]) => {
+            if (!room.length) {
+              return [];
+            }
+            const pinnedRooms = room
+              .filter((r) => r.isPinned)
+              .sort((a, b) => {
+                if (
+                  (b?.chatMessages?.[0]?.createdAt
+                    ? b?.chatMessages?.[0]?.createdAt
+                    : b.createdAt) >
+                  (a?.chatMessages?.[0]?.createdAt
+                    ? a?.chatMessages?.[0]?.createdAt
+                    : a.createdAt)
+                ) {
+                  return 1;
+                } else {
+                  return -1;
+                }
+              });
+            const exceptPinnedRooms = room
+              .filter((r) => !r.isPinned)
+              .sort((a, b) => {
+                if (
+                  (b?.chatMessages?.[0]?.createdAt
+                    ? b?.chatMessages?.[0]?.createdAt
+                    : b.createdAt) >
+                  (a?.chatMessages?.[0]?.createdAt
+                    ? a?.chatMessages?.[0]?.createdAt
+                    : a.createdAt)
+                ) {
+                  return 1;
+                } else {
+                  return -1;
+                }
+              });
+            return [...pinnedRooms, ...exceptPinnedRooms];
+          };
           if (page !== 1 && r.length) {
             const mergedRooms = [...r, ...data.rooms];
-            const pinnedRooms = mergedRooms.filter((r) => r.isPinned);
-            const exceptPinnedRooms = mergedRooms.filter((r) => !r.isPinned);
-            return [...pinnedRooms, ...exceptPinnedRooms];
+            return sortRooms(mergedRooms);
           }
-          return [...data.rooms];
+          return sortRooms(data.rooms);
         });
         if (data.rooms.length >= 20) {
           setPage((p) => p + 1);
