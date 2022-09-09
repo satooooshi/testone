@@ -99,41 +99,20 @@ const UserAdmin: React.FC = () => {
         right={10}
         onPress={() => setVisibleSearchFormModal(true)}
       />
-      <Div
-        borderBottomWidth={1}
-        borderBottomColor={'#b0b0b0'}
-        flexDir="row"
-        h={60}>
-        <Div minW={'20%'} />
-        <Div minW={'30%'} justifyContent="center">
-          <Text fontWeight="bold" fontSize={16}>
-            {'名前\nメールアドレス'}
-          </Text>
-        </Div>
-        <Div minW={'30%'} justifyContent="center">
-          <Text fontWeight="bold" fontSize={16}>
-            社員区分
-          </Text>
-        </Div>
-        <Div minW={'20%'} justifyContent="center">
-          <Text fontWeight="bold" fontSize={16}>
-            編集
-          </Text>
-        </Div>
-        <Div minW={'10%'} />
+      <Div px={16}>
+        {usersForInfiniteScroll.length ? (
+          <FlatList
+            data={usersForInfiniteScroll}
+            {...{onEndReached}}
+            onEndReachedThreshold={0.5}
+            keyExtractor={item => item.id.toString()}
+            ListHeaderComponent={<Div h={10} />}
+            renderItem={({item}) => <UserRow user={item} />}
+          />
+        ) : (
+          <Text fontSize={16}>検索結果が見つかりませんでした</Text>
+        )}
       </Div>
-
-      {usersForInfiniteScroll.length ? (
-        <FlatList
-          data={usersForInfiniteScroll}
-          {...{onEndReached}}
-          onEndReachedThreshold={0.5}
-          keyExtractor={item => item.id.toString()}
-          renderItem={({item}) => <UserRow user={item} />}
-        />
-      ) : (
-        <Text fontSize={16}>検索結果が見つかりませんでした</Text>
-      )}
       {isLoading && <ActivityIndicator />}
     </WholeContainer>
   );

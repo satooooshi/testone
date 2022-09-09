@@ -129,12 +129,12 @@ const WikiCard: React.FC<WikiCardProps> = ({wiki, type}) => {
           ) : null}
         </Div>
         <Div flexDir={'row'} w="100%" alignItems="center" mb={10}>
-          <Text fontSize={16} color={darkFontColor}>
+          <Text fontSize={14} color={darkFontColor}>
             {`投稿: ${dateTimeFormatterFromJSDDateWithoutTime({
               dateTime: new Date(wiki.createdAt),
             })}`}
           </Text>
-          <Text ml={10} fontSize={16} color={darkFontColor}>
+          <Text ml={10} fontSize={14} color={darkFontColor}>
             {`最終更新: ${dateTimeFormatterFromJSDDateWithoutTime({
               dateTime: new Date(wiki.updatedAt),
             })}`}
@@ -174,7 +174,7 @@ const WikiCard: React.FC<WikiCardProps> = ({wiki, type}) => {
                   {isQA ? '回答' : 'コメント'}
                 </Text>
                 <Text color="#90CDF4" fontWeight="bold">
-                  {wiki.answers?.length}
+                  {wikiState.answersCount || 0}
                 </Text>
               </Div>
             </Div>

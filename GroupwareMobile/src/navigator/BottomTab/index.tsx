@@ -3,6 +3,7 @@ import React, {useEffect, useState} from 'react';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 
 import Home from '../../screens/Home';
+import Menu from '../../screens/Menu';
 import EventList from '../../screens/event/EventList';
 // import Wiki from '../../screens/wiki';
 import {RootStackParamList} from '../../types/navigator/RootStackParamList';
@@ -419,6 +420,23 @@ const BottomTab = () => {
             ) : (
               <Icon name="tags" color={color} fontSize={26} />
             ),
+        }}
+      />
+      <Tab.Screen
+        name="Menu"
+        component={Menu}
+        options={{
+          tabBarLabel: 'メニュー',
+          tabBarIcon: ({color}) => (
+            <>
+              <Icon
+                name="menu"
+                fontFamily="Feather"
+                color={color}
+                fontSize={23}
+              />
+            </>
+          ),
         }}
       />
     </Tab.Navigator>
