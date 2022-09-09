@@ -393,7 +393,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
 
   const senderAvatars = useMemo(() => {
     return room?.members?.map((m) => ({
-      id: m.id,
+      member: m,
       avatar: (
         <Avatar
           h="40px"
@@ -576,9 +576,9 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
           <>
             {messages.map((m) => (
               <ChatMessageItem
-                senderAvatar={
-                  senderAvatars?.find((s) => s.id === m.sender?.id)?.avatar
-                }
+                senderAvatar={senderAvatars?.find(
+                  (s) => s.member.id === m.sender?.id,
+                )}
                 isScrollTarget={focusedMessageID === m.id}
                 scrollToTarget={scrollToTarget}
                 usersInRoom={room.members || []}

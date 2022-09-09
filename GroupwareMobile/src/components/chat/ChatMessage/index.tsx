@@ -32,7 +32,10 @@ type ChatMessageItemProps = {
   searchedResultIds?: (number | undefined)[];
   messageIndex: number;
   isScrollTarget: boolean;
-  senderAvatar: ReactNode;
+  senderAvatar?: {
+    member: User;
+    avatar: JSX.Element;
+  };
   scrollToTarget: (messageIndex: number) => void;
   onCheckLastRead: () => void;
   onLongPress: () => void;
@@ -124,7 +127,9 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
         alignItems="flex-start">
         <Div>
           {!message.isSender && message.type !== ChatMessageType.SYSTEM_TEXT ? (
-            <Text>{userNameFactory(message.sender)}</Text>
+            <Text>
+              {userNameFactory(senderAvatar?.member || message.sender)}
+            </Text>
           ) : null}
           <Div flexDir="row" alignItems="flex-end">
             {message.isSender && timesAndReadCounts}
@@ -166,7 +171,7 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
               })
             }
             underlayColor="none">
-            <Div mr="xs">{senderAvatar}</Div>
+            <Div mr="xs">{senderAvatar?.avatar}</Div>
           </TouchableHighlight>
         ) : null}
       </Div>

@@ -59,7 +59,10 @@ type ChatMessageItemProps = {
   confirmedSearchWord: string;
   searchedResultIds?: (number | undefined)[];
   lastReadChatTime: LastReadChatTime[] | undefined;
-  senderAvatar: ReactNode;
+  senderAvatar?: {
+    member: User;
+    avatar: JSX.Element;
+  };
 };
 
 const ChatMessageItem: React.FC<ChatMessageItemProps> = memo(
@@ -369,7 +372,7 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = memo(
         flexDir="column"
         alignItems={messageState.isSender ? 'flex-end' : 'flex-start'}>
         <ReadUsersListModal
-          sender={messageState.sender}
+          sender={senderAvatar?.member}
           usersInRoom={usersInRoom}
           isOpen={visibleReadModal}
           onClose={() => setVisibleLastReadModal(false)}
@@ -396,7 +399,7 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = memo(
             flexDir={messageState.isSender ? 'row-reverse' : undefined}>
             {!messageState.isSender ? (
               <Link href={`/account/${messageState.sender?.id}`} passHref>
-                {senderAvatar}
+                {senderAvatar?.avatar}
               </Link>
             ) : null}
             <Box display="flex" alignItems="flex-end">
@@ -421,8 +424,8 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = memo(
               <Box display="flex" flexDir="column" alignItems="flex-start">
                 {!messageState.isSender && (
                   <Text>
-                    {messageState.sender && messageState.sender?.existence
-                      ? userNameFactory(messageState.sender)
+                    {senderAvatar?.member && senderAvatar.member?.existence
+                      ? userNameFactory(senderAvatar.member)
                       : 'ボールドくん'}
                   </Text>
                 )}

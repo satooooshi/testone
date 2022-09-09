@@ -720,7 +720,7 @@ const Chat: React.FC = () => {
 
   const senderAvatars = useMemo(() => {
     return roomDetail?.members?.map(m => ({
-      id: m.id,
+      member: m,
       avatar: <UserAvatar h={40} w={40} user={m} />,
     }));
   }, [roomDetail?.members]);
@@ -909,9 +909,9 @@ const Chat: React.FC = () => {
         scrollToRenderedMessage()
       }>
       <ChatMessageItem
-        senderAvatar={
-          senderAvatars?.find(s => s.id === message.sender?.id)?.avatar
-        }
+        senderAvatar={senderAvatars?.find(
+          s => s.member.id === message.sender?.id,
+        )}
         message={message}
         readUsers={readUsers(message)}
         inputtedSearchWord={inputtedSearchWord}

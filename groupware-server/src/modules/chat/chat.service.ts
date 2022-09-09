@@ -492,20 +492,7 @@ export class ChatService {
     }
     // const endTime = Date.now();
     const messageIDs = existMessages.map((m) => m.id);
-    const senderIDs = [
-      ...new Set(existMessages.map((m) => Number(m.sender_id))),
-    ];
     const replyMessageIDs = existMessages.map((m) => m.reply_parent_id);
-
-    // senderの取得
-    let senders: User[] = [];
-    if (senderIDs.length) {
-      senders = await this.userRepository
-        .createQueryBuilder('users')
-        .select(selectUserColumns('users'))
-        .where('users.id IN (:...senderIDs)', { senderIDs })
-        .getMany();
-    }
 
     //リアクションの取得
     const reactions = await this.chatMessageReactionRepository
@@ -532,9 +519,7 @@ export class ChatService {
       existMessages.map(async (m) => {
         const chatGroup = new ChatGroup();
         m.chatGroup = { ...chatGroup, id: m.chat_group_id };
-        if (senders.length) {
-          m.sender = senders.filter((s) => s.id === m.sender_id)[0];
-        }
+        m.sender = { id: m.sender_id } as User;
         if (reactions) {
           m.reactions = reactions
             .filter((r) => r.chat_message_id === m.id)
