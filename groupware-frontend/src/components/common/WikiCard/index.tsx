@@ -208,7 +208,7 @@ const WikiCard: React.FC<WikiCardProps> = ({ wiki, type }) => {
                   <Text>いいね</Text>
                 </Link>
                 <Text mx={1} color="#90CDF4" fontWeight="bold">
-                  {wikiState.userGoodForBoard?.length}
+                  {wikiState.goodsCount || 0}
                 </Text>
                 <Text mx={1}>
                   {wiki.boardCategory === BoardCategory.QA
@@ -216,7 +216,7 @@ const WikiCard: React.FC<WikiCardProps> = ({ wiki, type }) => {
                     : 'コメント'}
                 </Text>
                 <Text color="#90CDF4" fontWeight="bold">
-                  {wikiState.answers?.length}
+                  {wikiState.answersCount || 0}
                 </Text>
               </Box>
               <Link
