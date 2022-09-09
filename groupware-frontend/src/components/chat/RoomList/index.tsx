@@ -69,10 +69,6 @@ const RoomList: React.FC<RoomListProps> = ({ currentId, onClickRoom }) => {
       refetchInterval: 1000,
       onSuccess: (data) => {
         const latestRooms = data.rooms;
-        // console.log(
-        //   'success latest rooms refech ================================',
-        //   latestRooms.length,
-        // );
         if (latestRooms.length) {
           const latestPinnedRooms: ChatGroup[] = [];
           for (const latestRoom of latestRooms) {
