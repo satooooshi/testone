@@ -104,11 +104,11 @@ export class StorageService {
       if (file.name === storageObjName) console.log(file.name);
     });
 
-    const deleteFile = async () => {
+    const deleteFileFromGCS = async () => {
       await this.storage.bucket(bucketName).file(storageObjName).delete({});
       console.log(`gs://${bucketName}/${storageObjName} deleted`);
     };
-    deleteFile().catch(console.error);
+    deleteFileFromGCS().catch(console.error);
     [files] = await this.storage.bucket(bucketName).getFiles();
 
     console.log('--- after deletions ---');

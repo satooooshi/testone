@@ -937,6 +937,11 @@ export class ChatService {
     const existGroup = await this.chatGroupRepository.findOne(newData.id, {
       relations: ['members', 'lastReadChatTime', 'lastReadChatTime.user'],
     });
+
+    if (existGroup.imageURL && existGroup.imageURL !== chatGroup.imageURL) {
+      this.storageService.deleteFile(existGroup.imageURL);
+    }
+
     let isMySelf = false;
     const otherExistMembers = existGroup.members.filter((u) => {
       if (u.id === requestUser.id) {

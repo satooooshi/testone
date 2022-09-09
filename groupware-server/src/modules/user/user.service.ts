@@ -629,6 +629,13 @@ export class UserService {
     if (!existUser) {
       throw new InternalServerErrorException('Something went wrong');
     }
+
+    if (
+      existUser.avatarUrl &&
+      existUser.avatarUrl !== newUserProfile.avatarUrl
+    ) {
+      this.storageService.deleteFile(existUser.avatarUrl);
+    }
     const newUserObj = await this.userRepository.save(
       this.userRepository.create({
         ...existUser,
