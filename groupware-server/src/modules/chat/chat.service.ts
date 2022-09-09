@@ -77,6 +77,12 @@ export class ChatService {
     return !!isUserBelongToGroup;
   }
 
+  private throwExceptionWhenUserNotExist(user: User) {
+    if (!user.existence) {
+      throw new BadRequestException('The user does not exist');
+    }
+  }
+
   public async calleeForPhoneCall(calleeId: string) {
     const user = await this.userRepository.findOne(calleeId);
     return user;
@@ -831,9 +837,11 @@ export class ChatService {
   }
 
   public async leaveChatRoom(user: User, chatGroupID: number) {
+    this.throwExceptionWhenUserNotExist(user);
+
     const manager = getManager();
     const isUserJoining = !!(await manager.query(
-      'select  users.id as id, users.last_name as lastName, users.first_name as firstName from user_chat_joining INNER JOIN users ON users.existence is not null AND user_id = ? AND chat_group_id = ?',
+      'select user_id from user_chat_joining where user_id = ? AND chat_group_id = ?',
       [user.id, chatGroupID],
     ));
 
@@ -867,15 +875,9 @@ export class ChatService {
     });
   }
 
-  public async editChatMembers(roomId: number, members: User[]) {
-    const targetRoom = await this.chatGroupRepository.findOne(roomId, {
-      relations: ['members'],
-    });
-    await this.chatGroupRepository.save({ ...targetRoom, members });
-    return targetRoom;
-  }
-
   public async leaveAllRooms(user: User) {
+    this.throwExceptionWhenUserNotExist(user);
+
     const manager = getManager();
     const joinedAllRooms = await manager.query(
       'select chat_group_id from user_chat_joining where user_id = ?',
@@ -904,6 +906,14 @@ export class ChatService {
         chatGroup: { id: chatGroupID },
       });
     }
+  }
+
+  public async editChatMembers(roomId: number, members: User[]) {
+    const targetRoom = await this.chatGroupRepository.findOne(roomId, {
+      relations: ['members'],
+    });
+    await this.chatGroupRepository.save({ ...targetRoom, members });
+    return targetRoom;
   }
 
   public async savePin(chatGroup: Partial<ChatGroup>, userID: number) {
