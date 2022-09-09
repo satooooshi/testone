@@ -152,14 +152,14 @@ export class ChatService {
 
     const urlUnparsedRooms = await this.chatGroupRepository
       .createQueryBuilder('chat_groups')
-      .innerJoin('chat_groups.members', 'member', 'member.id = :memberId', {
-        memberId: userID,
-      })
-      .where(
+      .innerJoin(
+        'chat_groups.members',
+        'member',
         !!updatedAtLatestRoom
-          ? `chat_groups.updatedAt > :updatedAtLatestRoom`
-          : '1=1',
+          ? `member.id = :memberId AND chat_groups.updatedAt > :updatedAtLatestRoom`
+          : 'member.id = :memberId',
         {
+          memberId: userID,
           updatedAtLatestRoom,
         },
       )
