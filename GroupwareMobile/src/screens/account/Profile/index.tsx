@@ -177,6 +177,7 @@ const Profile: React.FC = () => {
       <HeaderWithTextButton
         title={'Account'}
         tabs={tabs}
+        enableBackButton={true}
         activeTabName={'プロフィール編集'}
       />
       <TagModal

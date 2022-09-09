@@ -71,6 +71,7 @@ const UpdatePassword: React.FC = () => {
       <HeaderWithTextButton
         title={'Account'}
         tabs={tabs}
+        enableBackButton={true}
         activeTabName={'パスワード更新'}
       />
       <Button
