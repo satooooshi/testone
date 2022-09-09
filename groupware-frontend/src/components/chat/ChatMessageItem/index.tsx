@@ -14,7 +14,7 @@ import {
   useMediaQuery,
   useToast,
 } from '@chakra-ui/react';
-import React, { Fragment, useMemo, useRef, memo } from 'react';
+import React, { Fragment, useMemo, useRef, memo, ReactNode } from 'react';
 import { Avatar } from '@chakra-ui/react';
 import {
   ChatMessage,
@@ -59,6 +59,7 @@ type ChatMessageItemProps = {
   confirmedSearchWord: string;
   searchedResultIds?: (number | undefined)[];
   lastReadChatTime: LastReadChatTime[] | undefined;
+  senderAvatar: ReactNode;
 };
 
 const ChatMessageItem: React.FC<ChatMessageItemProps> = memo(
@@ -72,6 +73,7 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = memo(
     confirmedSearchWord,
     searchedResultIds,
     lastReadChatTime,
+    senderAvatar,
   }) => {
     const { mutate: deleteMessage } = useAPIDeleteChatMessage({
       onSuccess: (data) => {
@@ -394,16 +396,7 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = memo(
             flexDir={messageState.isSender ? 'row-reverse' : undefined}>
             {!messageState.isSender ? (
               <Link href={`/account/${messageState.sender?.id}`} passHref>
-                <Avatar
-                  h="40px"
-                  w="40px"
-                  cursor="pointer"
-                  src={
-                    !messageState.sender?.existence
-                      ? boldMascot.src
-                      : messageState.sender?.avatarUrl
-                  }
-                />
+                {senderAvatar}
               </Link>
             ) : null}
             <Box display="flex" alignItems="flex-end">

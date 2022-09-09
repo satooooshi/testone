@@ -61,6 +61,7 @@ import { removeHalfWidthSpace } from 'src/utils/replaceWidthSpace';
 import { useChatSocket } from './socket';
 import ChatEditor from '../ChatEditor';
 import { nameOfEmptyNameGroup } from 'src/utils/chat/nameOfEmptyNameGroup';
+import boldMascot from '@/public/bold-mascot.png';
 
 type ChatBoxProps = {
   room: ChatGroup;
@@ -390,6 +391,20 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
 
   const isPersonal = room.roomType === RoomType.PERSONAL;
 
+  const senderAvatars = useMemo(() => {
+    return room?.members?.map((m) => ({
+      id: m.id,
+      avatar: (
+        <Avatar
+          h="40px"
+          w="40px"
+          cursor="pointer"
+          src={!m?.existence ? boldMascot.src : m.avatarUrl}
+        />
+      ),
+    }));
+  }, [room?.members]);
+
   return (
     <Box
       {...noClickRootDropzone()}
@@ -561,6 +576,9 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
           <>
             {messages.map((m) => (
               <ChatMessageItem
+                senderAvatar={
+                  senderAvatars?.find((s) => s.id === m.sender?.id)?.avatar
+                }
                 isScrollTarget={focusedMessageID === m.id}
                 scrollToTarget={scrollToTarget}
                 usersInRoom={room.members || []}
