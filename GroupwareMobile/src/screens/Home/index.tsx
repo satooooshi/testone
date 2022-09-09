@@ -107,7 +107,7 @@ const Home: React.FC = () => {
         onPressRightButton={handleLogout}
       />
 
-      <ScrollDiv mt="lg" px="5%">
+      <ScrollDiv pt="lg" px="5%">
         <Text mb={'sm'} fontWeight="bold" fontSize={18}>
           新着の特集記事
         </Text>
