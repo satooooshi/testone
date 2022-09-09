@@ -87,11 +87,12 @@ export const BadgeProvider: React.FC = ({ children }) => {
               });
             return [...pinnedRooms, ...exceptPinnedRooms];
           };
-          if (page !== 1 && r.length) {
-            const mergedRooms = [...r, ...data.rooms];
-            return sortRooms(mergedRooms);
+          const rooms =
+            page !== 1 && r.length ? [...r, ...data.rooms] : data.rooms;
+          if (data.rooms.length >= 20) {
+            return rooms;
           }
-          return sortRooms(data.rooms);
+          return sortRooms(rooms);
         });
         if (data.rooms.length >= 20) {
           setPage((p) => p + 1);
