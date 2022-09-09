@@ -832,12 +832,12 @@ export class ChatService {
 
   public async leaveChatRoom(user: User, chatGroupID: number) {
     const manager = getManager();
-    const members: User[] = await manager.query(
+    const isUserJoining = !!(await manager.query(
       'select  users.id as id, users.last_name as lastName, users.first_name as firstName from user_chat_joining INNER JOIN users ON users.existence is not null AND user_id = ? AND chat_group_id = ?',
       [user.id, chatGroupID],
-    );
+    ));
 
-    if (!members.length) {
+    if (!isUserJoining) {
       throw new BadRequestException('The user is not participant');
     }
 
@@ -873,6 +873,37 @@ export class ChatService {
     });
     await this.chatGroupRepository.save({ ...targetRoom, members });
     return targetRoom;
+  }
+
+  public async leaveAllRooms(user: User) {
+    const manager = getManager();
+    const joinedAllRooms = await manager.query(
+      'select chat_group_id from user_chat_joining where user_id = ?',
+      [user.id],
+    );
+
+    const roomsIds: number[] = joinedAllRooms.map((r) =>
+      Number(r.chat_group_id),
+    );
+    await this.chatGroupRepository
+      .createQueryBuilder()
+      .update(ChatGroup)
+      .set({ memberCount: () => 'member_count - 1' })
+      .where('id IN (:...ids)', { ids: roomsIds })
+      .execute();
+    await manager.query('DELETE from user_chat_joining where user_id = ?', [
+      user.id,
+    ]);
+    for (const chatGroupID of roomsIds) {
+      const systemMessage = new ChatMessage();
+      const userName = userNameFactory(user);
+      systemMessage.content = `${userName}さんが退出しました`;
+      systemMessage.type = ChatMessageType.SYSTEM_TEXT;
+      await this.chatMessageRepository.save({
+        ...systemMessage,
+        chatGroup: { id: chatGroupID },
+      });
+    }
   }
 
   public async savePin(chatGroup: Partial<ChatGroup>, userID: number) {
