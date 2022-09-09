@@ -106,7 +106,11 @@ const Home: React.FC = () => {
         rightButtonName={'ログアウト'}
         onPressRightButton={handleLogout}
       />
-      <ScrollDiv mt="lg">
+
+      <ScrollDiv mt="lg" px="5%">
+        <Text mb={'sm'} fontWeight="bold" fontSize={18}>
+          新着の特集記事
+        </Text>
         <Div
           bg="white"
           rounded="md"
@@ -116,10 +120,7 @@ const Home: React.FC = () => {
           mb="lg"
           py="lg"
           px="lg"
-          w={windowWidth * 0.9}>
-          <Text mb={'sm'} fontWeight="bold" fontSize={16}>
-            新着の特集記事
-          </Text>
+          w="100%">
           {newsForScroll.length ? (
             newsForScroll.map((news, index) =>
               index < newsIndex * 5 ? (
