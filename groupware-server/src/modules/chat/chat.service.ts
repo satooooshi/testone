@@ -962,7 +962,6 @@ export class ChatService {
         'select users.id as id, users.last_name as lastName, users.existence as existence from user_chat_leaving INNER JOIN users ON users.existence is not null AND users.id = user_id AND chat_group_id = ?',
         [existGroup.id],
       );
-      console.log('previousMembers----', previousMembers);
 
       existGroup.previousMembers = previousMembers.filter(
         (newM) => !newMembers.map((m) => m.id).includes(newM.id),
@@ -974,6 +973,11 @@ export class ChatService {
         ];
       }
     }
+
+    if (existGroup.name !== newData.name) {
+      existGroup.roomType = RoomType.GROUP;
+    }
+
     const newGroup = await this.chatGroupRepository.save({
       ...existGroup,
       imageURL: genStorageURL(newData.imageURL),
