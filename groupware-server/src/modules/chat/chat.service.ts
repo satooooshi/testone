@@ -132,7 +132,7 @@ export class ChatService {
     userID: number,
     query: GetChaRoomsByPageQuery,
   ): Promise<GetRoomsResult> {
-    const { page, limit = '20' } = query;
+    const { page, limit = '100' } = query;
 
     let offset = 0;
     const limitNumber = Number(limit);
@@ -169,7 +169,7 @@ export class ChatService {
       .getMany();
 
     if (!urlUnparsedRooms.length) {
-      return { rooms: urlUnparsedRooms, pageCount: 0 };
+      return { rooms: urlUnparsedRooms, gotAllRooms: true };
     }
 
     const roomIds = urlUnparsedRooms.map((r) => r.id);
@@ -298,9 +298,8 @@ export class ChatService {
     //     endTime - startTime,
     //   );
     // }
-    const pageCount = Number(page);
 
-    return { rooms, pageCount };
+    return { rooms, gotAllRooms: rooms.length < limitNumber };
   }
 
   public async getOneRoom(userID: number, roomId: number): Promise<ChatGroup> {

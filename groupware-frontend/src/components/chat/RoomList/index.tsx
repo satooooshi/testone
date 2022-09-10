@@ -63,7 +63,7 @@ const RoomList: React.FC<RoomListProps> = ({ currentId, onClickRoom }) => {
 
   const { refetch: refetchLatestRooms } = useAPIGetRoomsByPage(
     {
-      limit: '20',
+      limit: '100',
       updatedAtLatestRoom: returnUpdatedAtLatest(),
     },
     {

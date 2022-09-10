@@ -1,4 +1,4 @@
-import {useNavigation} from '@react-navigation/native';
+import {useIsFocused, useNavigation} from '@react-navigation/native';
 import React, {useEffect, useState} from 'react';
 import {
   Alert,
@@ -42,6 +42,7 @@ const RoomList: React.FC = () => {
   const [creationType, setCreationType] = useState<RoomType>();
   const [searchedRooms, setSearchedRooms] = useState<ChatGroup[]>();
   const [chatRooms, setChatRooms] = useState<ChatGroup[]>(chatGroups);
+  const isFocused = useIsFocused();
 
   const {mutate: createGroup} = useAPISaveChatGroup({
     onSuccess: createdData => {
@@ -85,9 +86,10 @@ const RoomList: React.FC = () => {
   });
 
   useEffect(() => {
-    setChatRooms(chatGroups);
-    console.log('change chatRoom', chatGroups.length);
-  }, [chatGroups]);
+    if (isFocused) {
+      setChatRooms(chatGroups);
+    }
+  }, [chatGroups, isFocused]);
 
   // useEffect(() => {
   //   if (isCompletedRefetchAllRooms) {
@@ -222,14 +224,6 @@ const RoomList: React.FC = () => {
         />
         <Text>ルーム数{chatRooms.length}</Text>
         {chatRooms.length ? (
-          // <ScrollDiv
-          //   h={'80%'}
-          //   refreshControl={
-          //     <RefreshControl
-          //       refreshing={isRoomsRefetching}
-          //       onRefresh={refreshRoomList}
-          //     />
-          //   }>
           <FlatList
             style={{height: '80%'}}
             refreshControl={
@@ -258,7 +252,6 @@ const RoomList: React.FC = () => {
             )}
           />
         ) : (
-          // </ScrollDiv>
           <Text fontSize={16} textAlign="center">
             ルームを作成するか、招待をお待ちください
           </Text>
