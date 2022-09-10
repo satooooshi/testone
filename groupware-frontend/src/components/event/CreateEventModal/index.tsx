@@ -170,6 +170,8 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
   const [tagModal, setTagModal] = useState(false);
   const [userModal, setUserModal] = useState(false);
   const [willSubmit, setWillSubmit] = useState(false);
+  const [isLoadingTN, setIsloadingTN] = useState(false);
+  const [isLoadingRF, setIsloadingRF] = useState(false);
 
   useEffect(() => {
     if (enabled) {
@@ -197,7 +199,9 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
   const imgRef = useRef<HTMLImageElement | null>(null);
   const onEventThumbnailDrop = useCallback(
     (f: File[]) => {
+      setIsloadingTN(true);
       dispatchCrop({ type: 'setImageFile', value: f[0] });
+      setIsloadingTN(false);
     },
     [dispatchCrop],
   );
@@ -247,6 +251,7 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
     getInputProps: getRelatedFileInputProps,
   } = useDropzone({
     onDrop: (files: File[]) => {
+      setIsloadingRF(true);
       uploadFiles(files, {
         onSuccess: (urls: string[]) => {
           const newFiles: Partial<EventFile>[] = urls.map((u, i) => ({
@@ -257,6 +262,9 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
             ...e,
             files: [...(e.files || []), ...newFiles],
           }));
+        },
+        onSettled: () => {
+          setIsloadingRF(false);
         },
       });
     },
@@ -420,6 +428,7 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
           justifyContent={isSmallerThan768 ? 'space-between' : 'flex-end'}
           w="100%">
           <Button
+            disabled={isLoadingTN || isLoadingRF}
             mr="40px"
             onClick={() => {
               checkErrors();
@@ -669,6 +678,7 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
             </FormControl>
           </Box>
           <Text mb="15px">サムネイル</Text>
+
           {((newEvent.imageURL && !selectThumbnailUrl) || croppedImageURL) && (
             <Button
               mb="15px"
@@ -706,11 +716,17 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
                 {...getEventThumbnailRootProps({
                   className: createEventModalStyle.image_dropzone,
                 })}>
-                <input {...getEventThumbnailInputProps()} />
-                <Text>
-                  クリックかドラッグアンドドロップで
-                  {newEvent.imageURL ? '別のサムネイルに更新' : '投稿'}
-                </Text>
+                {isLoadingTN ? (
+                  <Spinner />
+                ) : (
+                  <>
+                    <input {...getEventThumbnailInputProps()} />
+                    <Text>
+                      クリックかドラッグアンドドロップで
+                      {newEvent.imageURL ? '別のサムネイルに更新' : '投稿'}
+                    </Text>
+                  </>
+                )}
               </Box>
             )}
           </Box>
@@ -720,8 +736,14 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
               {...getRelatedFileRootProps({
                 className: createEventModalStyle.image_dropzone,
               })}>
-              <input {...getRelatedFileInputProps()} />
-              <Text>クリックかドラッグアンドドロップで投稿</Text>
+              {isLoadingRF ? (
+                <Spinner />
+              ) : (
+                <>
+                  <input {...getRelatedFileInputProps()} />
+                  <Text>クリックかドラッグアンドドロップで投稿</Text>
+                </>
+              )}
             </div>
           </Box>
           {newEvent.files?.length ? (
