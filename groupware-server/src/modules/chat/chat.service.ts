@@ -1178,15 +1178,20 @@ export class ChatService {
       'select  users.id as id, users.last_name as lastName, users.first_name as firstName, users.avatar_url as avatarUrl, users.existence as existence from user_chat_joining INNER JOIN users ON users.existence is not null AND users.id = user_id AND chat_group_id = ?',
       [roomId],
     );
-    const previousMembers: User[] = await manager.query(
-      'select users.id as id, users.last_name as lastName, users.first_name as firstName, users.avatar_url as avatarUrl, users.existence as existence from user_chat_leaving INNER JOIN users ON users.existence is not null AND users.id = user_id AND chat_group_id = ?',
-      [roomId],
-    );
-    console.log('======left member', members);
+    // const previousMembers: User[] = await manager.query(
+    //   'select users.id as id, users.last_name as lastName, users.first_name as firstName, users.avatar_url as avatarUrl, users.existence as existence from user_chat_leaving INNER JOIN users ON users.existence is not null AND users.id = user_id AND chat_group_id = ?',
+    //   [roomId],
+    // );
 
-    existRoom.members = members;
-    existRoom.previousMembers = previousMembers;
+    // existRoom.previousMembers = previousMembers;
     checkAloneRoom(existRoom, userId);
+    existRoom.imageURL = await genSignedURL(existRoom.imageURL);
+    existRoom.members = await Promise.all(
+      members.map(async (m) => ({
+        ...m,
+        avatarUrl: await genSignedURL(m.avatarUrl),
+      })),
+    );
 
     return existRoom;
   }
