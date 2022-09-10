@@ -135,7 +135,7 @@ export class ChatService {
     const { page, limit = '20' } = query;
 
     let offset = 0;
-    const limitNumber = Number(limit);
+    const limitNumber = Number('100');
     if (page) {
       offset = (Number(page) - 1) * limitNumber;
     }
