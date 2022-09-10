@@ -222,7 +222,7 @@ const RoomList: React.FC = () => {
           }
           clearButtonMode="while-editing"
         />
-        <Text>ルーム数{chatRooms.length}</Text>
+        {/* <Text>ルーム数{chatRooms.length}</Text> */}
         {chatRooms.length ? (
           <FlatList
             style={{height: '80%'}}
