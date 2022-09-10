@@ -96,26 +96,11 @@ export class StorageService {
     let decodedURL = decodeURI(url);
     decodedURL = decodedURL.split('?')[0];
     const storageObjName = decodedURL.replace(bucketURL, '');
-    console.log('--- storageObjName ---', storageObjName);
-
-    console.log('--- before deletions ---');
-    let [files] = await this.storage.bucket(bucketName).getFiles();
-    files.forEach((file) => {
-      if (file.name === storageObjName) console.log(file.name);
-    });
 
     const deleteFileFromGCS = async () => {
       await this.storage.bucket(bucketName).file(storageObjName).delete({});
-      console.log(`gs://${bucketName}/${storageObjName} deleted`);
     };
     deleteFileFromGCS().catch(console.error);
-    [files] = await this.storage.bucket(bucketName).getFiles();
-
-    console.log('--- after deletions ---');
-    [files] = await this.storage.bucket(bucketName).getFiles();
-    files.forEach((file) => {
-      if (file.name === storageObjName) console.log(file.name);
-    });
   }
 
   public async parseStorageURLToSignedURL(text: string): Promise<string> {
