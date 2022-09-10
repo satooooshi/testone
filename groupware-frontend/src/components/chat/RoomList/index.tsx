@@ -15,6 +15,7 @@ import { useHandleBadge } from 'src/contexts/badge/useHandleBadge';
 import router from 'next/router';
 import { useAuthenticate } from 'src/contexts/useAuthenticate';
 import { useAPIGetRoomsByPage } from '@/hooks/api/chat/useAPIGetRoomsByPage';
+import { sortRooms } from 'src/utils/chat/sortRooms';
 
 type RoomListProps = {
   currentId?: string;
@@ -84,44 +85,6 @@ const RoomList: React.FC<RoomListProps> = ({ currentId, onClickRoom }) => {
               updateUnreadCount(incrementCount);
             }
           }
-          const sortRooms = (room: ChatGroup[]) => {
-            if (!room.length) {
-              return [];
-            }
-            const pinnedRooms = room
-              .filter((r) => r.isPinned)
-              .sort((a, b) => {
-                if (
-                  (b?.chatMessages?.[0]?.createdAt
-                    ? b?.chatMessages?.[0]?.createdAt
-                    : b.createdAt) >
-                  (a?.chatMessages?.[0]?.createdAt
-                    ? a?.chatMessages?.[0]?.createdAt
-                    : a.createdAt)
-                ) {
-                  return 1;
-                } else {
-                  return -1;
-                }
-              });
-            const exceptPinnedRooms = room
-              .filter((r) => !r.isPinned)
-              .sort((a, b) => {
-                if (
-                  (b?.chatMessages?.[0]?.createdAt
-                    ? b?.chatMessages?.[0]?.createdAt
-                    : b.createdAt) >
-                  (a?.chatMessages?.[0]?.createdAt
-                    ? a?.chatMessages?.[0]?.createdAt
-                    : a.createdAt)
-                ) {
-                  return 1;
-                } else {
-                  return -1;
-                }
-              });
-            return [...pinnedRooms, ...exceptPinnedRooms];
-          };
           const ids = latestRooms.map((r) => r.id);
           const existRooms = chatGroups.filter((r) => !ids.includes(r.id));
 
