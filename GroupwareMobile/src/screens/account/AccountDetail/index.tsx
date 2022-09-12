@@ -295,8 +295,8 @@ const AccountDetail: React.FC = () => {
         tabs={tabs}
         activeTabName={'アカウント情報'}
         enableBackButton={userID !== user?.id}
-        rightButtonName={mySelfOfNot ? 'ログアウト' : undefined}
-        onPressRightButton={mySelfOfNot ? handleLogout : undefined}
+        // rightButtonName={mySelfOfNot ? 'ログアウト' : undefined}
+        // onPressRightButton={mySelfOfNot ? handleLogout : undefined}
         screenForBack={
           route.params?.previousScreenName
             ? route.params.previousScreenName
