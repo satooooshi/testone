@@ -101,7 +101,7 @@ const Home: React.FC = () => {
         <Text fontSize={18} fontWeight="bold" my={12}>
           全体
         </Text>
-        <Div flexDir="row" mb={8}>
+        {/* <Div flexDir="row" mb={8}>
           <Div flex={1} mr={12}>
             <PortalLinkBox
               type="impressive_university"
@@ -113,27 +113,27 @@ const Home: React.FC = () => {
               }
             />
           </Div>
-          <Div flex={1}>
-            <PortalLinkBox
-              type="study_meeting"
-              onPress={() =>
-                navigation.navigate('EventStack', {
-                  screen: 'EventIntroduction',
-                  params: {type: EventType.STUDY_MEETING},
-                })
-              }
-            />
-          </Div>
-        </Div>
-
-        <Div flexDir="row" mb={8}>
-          <Div flex={1} mr={12}>
+          <Div flex={1} mb={8}>
             <PortalLinkBox
               type="bolday"
               onPress={() =>
                 navigation.navigate('EventStack', {
                   screen: 'EventIntroduction',
                   params: {type: EventType.BOLDAY},
+                })
+              }
+            />
+          </Div>
+        </Div> */}
+
+        <Div flexDir="row" mb={8}>
+          <Div flex={1} mr={12}>
+            <PortalLinkBox
+              type="study_meeting"
+              onPress={() =>
+                navigation.navigate('EventStack', {
+                  screen: 'EventIntroduction',
+                  params: {type: EventType.STUDY_MEETING},
                 })
               }
             />
