@@ -115,17 +115,19 @@ const RoomCard: React.FC<RoomCardProps> = ({
               }
               style={roomCardStyles.image}
             />
-            <Icon
-              name={room.isPinned ? 'pin' : 'pin-outline'}
-              fontSize={22}
-              color="blue600"
-              p={2}
-              bg="blue100"
-              rounded="circle"
-              fontFamily="MaterialCommunityIcons"
-              style={Platform.OS === 'android' && roomCardStyles.pinIcon}
-              position="absolute"
-            />
+            {room.isPinned ? (
+              <Icon
+                name={room.isPinned ? 'pin' : 'pin-outline'}
+                fontSize={20}
+                color="blue600"
+                p={2}
+                bg="blue100"
+                rounded="circle"
+                fontFamily="MaterialCommunityIcons"
+                style={Platform.OS === 'android' && roomCardStyles.pinIcon}
+                position="absolute"
+              />
+            ) : null}
           </Div>
           <Div flex={1}>
             <Div
