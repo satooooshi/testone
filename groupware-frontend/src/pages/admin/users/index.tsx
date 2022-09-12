@@ -35,6 +35,7 @@ import { userRoleNameFactory } from 'src/utils/factory/userRoleNameFactory';
 import { blueColor } from 'src/utils/colors';
 import { FaPen } from 'react-icons/fa';
 import { RiDeleteBin6Line } from 'react-icons/ri';
+import { userNameFactory } from 'src/utils/factory/userNameFactory';
 
 const UserAdmin: React.FC = () => {
   const router = useRouter();
@@ -58,11 +59,11 @@ const UserAdmin: React.FC = () => {
   };
   const toast = useToast();
   const { mutate: deleteUser } = useAPIDeleteUser({
-    onSuccess: (_, variables) => {
+    onSuccess: (_, user) => {
       setIsDeletingUser(-1);
       refetch();
       toast({
-        description: `${variables.lastName} ${variables.lastName}さんを削除しました。`,
+        description: `${userNameFactory(user)} さんを削除しました。`,
         status: 'success',
         duration: 3000,
         isClosable: true,
@@ -72,9 +73,7 @@ const UserAdmin: React.FC = () => {
   const tabs: Tab[] = useHeaderTab({ headerTabType: 'admin' });
 
   const onDeleteClicked = (user: User) => {
-    if (
-      confirm(`${user.lastName} ${user.firstName}さんを削除して宜しいですか？`)
-    ) {
+    if (confirm(`${userNameFactory(user)} さんを削除して宜しいですか？`)) {
       setIsDeletingUser(user.id);
       deleteUser(user);
     }
