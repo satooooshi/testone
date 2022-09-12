@@ -1,5 +1,5 @@
 import React, {useMemo} from 'react';
-import {Button} from 'react-native-magnus';
+import {Button, Div} from 'react-native-magnus';
 import {blueColor} from '../../utils/colors';
 import HeaderTemplate, {HeaderTemplateProps} from './HeaderTemplate';
 
@@ -17,6 +17,8 @@ const HeaderWithTextButton: React.FC<HeaderWithTextButtonProps> = props => {
     <HeaderTemplate {...props}>
       {boolToDisplayRightButton && (
         <Button
+          position="absolute"
+          right={5}
           alignSelf="center"
           h={32}
           fontSize={16}

@@ -1,8 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { TextFormat, User, Wiki, WikiType } from 'src/types';
 import qaCommentStyles from '@/styles/components/QAComment.module.scss';
-import { dateTimeFormatterFromJSDDate } from 'src/utils/dateTimeFormatter';
-import { Avatar, Box, Button, Spinner } from '@chakra-ui/react';
+import {
+  dateTimeFormatterFromJSDDate,
+  dateTimeFormatterFromJSDDateWithoutTime,
+} from 'src/utils/dateTimeFormatter';
+import { Avatar, Box, Button, Text, Spinner } from '@chakra-ui/react';
+
 import MarkdownIt from 'markdown-it';
 import Editor from 'react-markdown-editor-lite';
 import 'react-markdown-editor-lite/lib/index.css';
@@ -24,7 +28,6 @@ type WikiCommentProps = {
   writer?: User;
   isWriter?: boolean;
   isExistsBestAnswer?: boolean;
-  onClickEditButton?: () => void;
   replyButtonName?: string;
   onClickReplyButton?: () => void;
   bestAnswerButtonName?: string;
@@ -40,7 +43,6 @@ const WikiComment: React.FC<WikiCommentProps> = ({
   writer,
   isWriter,
   isExistsBestAnswer,
-  onClickEditButton,
   replyButtonName,
   onClickReplyButton,
   bestAnswerButtonName,
@@ -85,7 +87,7 @@ const WikiComment: React.FC<WikiCommentProps> = ({
 
   return (
     <>
-      {createdAt && updatedAt && writer && (
+      {createdAt && writer && (
         <div className={qaCommentStyles.question_uploader__info}>
           <div className={qaCommentStyles.user_info_wrapper}>
             {writer.existence ? (
@@ -112,28 +114,30 @@ const WikiComment: React.FC<WikiCommentProps> = ({
               </>
             )}
           </div>
+
           <div className={qaCommentStyles.info_left}>
-            <Box display="flex" flexDir={'column'} alignItems="end">
-              <p className={qaCommentStyles.wrote_date}>
-                {`投稿日: ${dateTimeFormatterFromJSDDate({
+            <Box display="flex" flexDir="column" alignItems="end">
+              <Text fontSize={'15px'} display="flex" whiteSpace="nowrap">
+                {`投稿: ${dateTimeFormatterFromJSDDateWithoutTime({
                   dateTime: new Date(createdAt),
                 })}`}
-              </p>
-              {onClickEditButton && (
-                <p className={qaCommentStyles.wrote_date}>
-                  {`最終更新日: ${dateTimeFormatterFromJSDDate({
+              </Text>
+              {updatedAt && (
+                <Text
+                  ml={2}
+                  fontSize={'15px'}
+                  display="flex"
+                  whiteSpace="nowrap">
+                  {`最終更新: ${dateTimeFormatterFromJSDDateWithoutTime({
                     dateTime: new Date(updatedAt),
                   })}`}
-                </p>
+                </Text>
               )}
             </Box>
-            {isWriter && onClickEditButton ? (
-              <Button colorScheme="blue" width="24" onClick={onClickEditButton}>
-                編集
-              </Button>
-            ) : null}
             {onClickReplyButton && replyButtonName ? (
               <Button
+                ml={3}
+                // borderRadius={50}
                 colorScheme="orange"
                 width="24"
                 onClick={onClickReplyButton}>
@@ -163,10 +167,34 @@ const WikiComment: React.FC<WikiCommentProps> = ({
         ) : null}
       </div>
       {wikiState?.type === WikiType.BOARD && (
-        <Box display="flex" justifyContent={'flex-end'} mt={5}>
+        <Box
+          ml="auto"
+          mr={5}
+          mt={3}
+          display="flex"
+          flexDir="row"
+          alignItems="center"
+          justifyContent="flex-end">
+          <Box
+            display="flex"
+            flexDir="row"
+            alignItems="center"
+            justifyContent="center">
+            <Link
+              onClick={() => {
+                setGoodSendersModal(true);
+              }}>
+              <Text fontSize="20px">いいね</Text>
+            </Link>
+            <Text mx={2} color="#90CDF4" fontWeight="bold" fontSize="20px">
+              {wikiState.userGoodForBoard?.length}
+            </Text>
+          </Box>
           <Link
+            ml={3}
+            position={'relative'}
             onClick={() => {
-              mutate(wikiState?.id || 0);
+              mutate(wikiState.id || 0);
             }}>
             {isPressHeart ? (
               <AiFillHeart size={30} color="red" />

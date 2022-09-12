@@ -8,21 +8,28 @@ import searchFormStyles from '@/styles/components/SearchForm.module.scss';
 import TagModal from '../TagModal';
 import { Tag } from 'src/types';
 import {
+  Badge,
+  Box,
   Button,
   ButtonGroup,
   IconButton,
+  Select,
   Input,
+  InputGroup,
+  InputLeftElement,
+  InputRightElement,
+  Text,
   useMediaQuery,
 } from '@chakra-ui/react';
 import { GiCancel } from 'react-icons/gi';
 import ReactModal from 'react-modal';
-import { AiOutlineSearch } from 'react-icons/ai';
+import { AiOutlinePlus, AiOutlineSearch } from 'react-icons/ai';
 import clsx from 'clsx';
 import { tagColorFactory } from 'src/utils/factory/tagColorFactory';
 import { MdCancel } from 'react-icons/md';
 
 const SearchFormContext = createContext({
-  isSmallerThan768: false,
+  isSmallerThan680: false,
   isVisibleSearchModal: false,
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   hideSearchModal: () => {},
@@ -32,7 +39,7 @@ const SearchFormContext = createContext({
 
 const SearchProvider: React.FC = ({ children }) => {
   const [isVisibleSearchModal, setIsVisibleSearchModal] = useState(false);
-  const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
+  const [isSmallerThan680] = useMediaQuery('(max-width: 680px)');
 
   const hideSearchModal = () => {
     setIsVisibleSearchModal(false);
@@ -44,7 +51,7 @@ const SearchProvider: React.FC = ({ children }) => {
   return (
     <SearchFormContext.Provider
       value={{
-        isSmallerThan768,
+        isSmallerThan680,
         isVisibleSearchModal,
         hideSearchModal,
         showSearchModal,
@@ -59,6 +66,10 @@ const useSearchForm = () => useContext(SearchFormContext);
 type SearchFormProps = {
   // value: string;
   // onChange: ChangeEventHandler<HTMLInputElement>;
+  selectItems?: string[];
+  selectingItem?: string;
+  onSelect?: ChangeEventHandler<HTMLSelectElement>;
+  // onClickButton: () => void;
   onClickButton: (word: string) => void;
   tags?: Tag[];
   selectedTags?: Tag[];
@@ -67,8 +78,9 @@ type SearchFormProps = {
 };
 
 const SearchInput: React.FC<SearchFormProps> = ({
-  // value,
-  // onChange,
+  selectItems,
+  selectingItem,
+  onSelect,
   onClickButton,
   tags = [],
   selectedTags = [],
@@ -78,22 +90,27 @@ const SearchInput: React.FC<SearchFormProps> = ({
   const [tagModal, setTagModal] = useState(false);
   const [word, setWord] = useState('');
   const [searchedWord, setSearchedWord] = useState('');
-  const { isSmallerThan768, hideSearchModal } = useSearchForm();
+  const { isSmallerThan680, hideSearchModal } = useSearchForm();
 
   const handleModalSearchButton = () => {
     onClickButton(word);
     setSearchedWord(word);
-    isSmallerThan768 && hideSearchModal();
+    // isSmallerThan680 && hideSearchModal();
   };
 
   return (
-    <div className={searchFormStyles.main_wrapper}>
+    <Box
+      display="flex"
+      flexDir="column"
+      justifyContent="center"
+      width={'100%'}
+      my={5}>
       <div
         className={clsx(
           searchFormStyles.search_form_wrapper,
           selectedTags.length && searchFormStyles.selected_tag_top_margin,
         )}>
-        {isSmallerThan768 && (
+        {/* {isSmallerThan680 && (
           <div className={searchFormStyles.close_icon_wrapper}>
             <GiCancel
               onClick={() => hideSearchModal()}
@@ -101,32 +118,7 @@ const SearchInput: React.FC<SearchFormProps> = ({
               className={searchFormStyles.close_icon}
             />
           </div>
-        )}
-        <Input
-          className={searchFormStyles.input}
-          type="search"
-          name="word"
-          width={isSmallerThan768 ? '100%' : '60%'}
-          placeholder="検索ワードを入力"
-          background="white"
-          value={word}
-          onChange={(e) => setWord(e.target.value)}
-          onKeyPress={(e) => {
-            if (e.key === 'Enter') {
-              e.preventDefault();
-              handleModalSearchButton();
-            }
-          }}
-        />
-        <Button
-          width={isSmallerThan768 ? '100%' : '15vw'}
-          className={searchFormStyles.add_tag_button}
-          colorScheme="green"
-          onClick={() => setTagModal(true)}>
-          {selectedTags.length
-            ? `${selectedTags.length}個のタグ`
-            : 'タグを選択'}
-        </Button>
+        )} */}
         <TagModal
           isOpen={tagModal}
           tags={tags || []}
@@ -135,59 +127,146 @@ const SearchInput: React.FC<SearchFormProps> = ({
           onClear={() => {
             onClear();
           }}
-          onComplete={() => setTagModal(false)}
+          onComplete={() => {
+            setTagModal(false);
+            // handleModalSearchButton();
+          }}
           isSearch={true}
         />
-        <div className={clsx(searchFormStyles.search_and_close_button_wrapper)}>
-          <Button
-            width={isSmallerThan768 ? '100%' : '15vw'}
-            colorScheme="pink"
-            onClick={handleModalSearchButton}>
-            検索
-          </Button>
-          <TagModal
-            isOpen={tagModal}
-            tags={tags || []}
-            selectedTags={selectedTags}
-            toggleTag={toggleTag}
-            onClear={() => {
-              onClear();
-            }}
-            onComplete={() => setTagModal(false)}
-            isSearch={true}
-          />
-        </div>
+        <Box
+          display="flex"
+          flexDir={isSmallerThan680 ? 'column' : 'row'}
+          w="100%">
+          <InputGroup minW="300px" maxW="700px">
+            <InputLeftElement pointerEvents="none">
+              <AiOutlineSearch />
+            </InputLeftElement>
+            <Input
+              w="100%"
+              // className={searchFormStyles.input}
+              type="search"
+              name="word"
+              placeholder="検索する"
+              background="white"
+              value={word}
+              onChange={(e) => setWord(e.target.value)}
+              // value={value}
+              // onChange={onChange}
+              onKeyPress={(e) => {
+                if (e.key === 'Enter') {
+                  handleModalSearchButton();
+                }
+              }}
+            />
+            <InputRightElement
+              width="85px"
+              mr={0}
+              display="flex"
+              flexDir="row"
+              justifyContent="flex-start">
+              {word.length ? (
+                <Text
+                  w="10px"
+                  textAlign="center"
+                  mr={3}
+                  cursor="pointer"
+                  onClick={() => setWord('')}>
+                  ✖️
+                </Text>
+              ) : null}
+              <Button
+                colorScheme="blue"
+                w="70px"
+                h="80%"
+                size="sm"
+                ml="auto"
+                mr={2}
+                onClick={handleModalSearchButton}>
+                検索
+              </Button>
+            </InputRightElement>
+          </InputGroup>
+          <Box
+            ml={isSmallerThan680 ? undefined : 2}
+            mt={isSmallerThan680 ? 3 : undefined}
+            w="100%"
+            minW="300px"
+            maxW="500px"
+            display="flex"
+            flexDir="row">
+            <Button
+              bg="white"
+              justifyContent="flex-start"
+              w="100%"
+              minW="130px"
+              maxW="200px"
+              onClick={() => setTagModal(true)}>
+              <Text ml={1}>タグ</Text>
+              {selectedTags.length ? (
+                <Badge
+                  ml="auto"
+                  bg="blue.400"
+                  color="white"
+                  w="25px"
+                  h="25px"
+                  borderRadius="50%"
+                  textAlign="center"
+                  lineHeight="25px">
+                  {selectedTags.length}
+                </Badge>
+              ) : null}
+            </Button>
+            {selectItems && (
+              <Select
+                ml={2}
+                name="branch"
+                value={selectingItem}
+                bg="white"
+                height="10"
+                w="100%"
+                minW="160px"
+                maxW="250px"
+                onChange={onSelect}>
+                {selectItems?.length &&
+                  selectItems.map((i) => (
+                    <option key={i} value={i}>
+                      {i}
+                    </option>
+                  ))}
+              </Select>
+            )}
+          </Box>
+        </Box>
       </div>
-      {selectedTags.length ? (
-        <div className={searchFormStyles.search_items_wrapper}>
-          <div className={searchFormStyles.searched_items_title_wrapper}>
-            <p className={searchFormStyles.searched_items_title}>
-              選択したタグ
-            </p>
-          </div>
-          <div className={searchFormStyles.selected_tags_wrapper}>
-            {selectedTags.map((tag) => (
-              <div
-                className={searchFormStyles.selected_tag_item_wrapper}
-                key={tag.id}>
-                <ButtonGroup
-                  isAttached
-                  size="sm"
-                  colorScheme={tagColorFactory(tag.type)}>
-                  <Button mr="-px">{tag.name}</Button>
-                  <IconButton
-                    onClick={() => toggleTag(tag)}
-                    aria-label="削除"
-                    icon={<MdCancel size={18} />}
-                  />
-                </ButtonGroup>
-              </div>
-            ))}
-          </div>
-        </div>
+      <Box display="flex" mt={2} alignItems="center">
+        {selectedTags?.length ? (
+          <>
+            <Box ml={1} display="flex">
+              {selectedTags.map((tag) => (
+                <Badge
+                  ml={2}
+                  p={2}
+                  key={tag.id}
+                  display="flex"
+                  colorScheme={tagColorFactory(tag.type)}
+                  borderRadius={50}
+                  alignItems="center"
+                  variant="outline"
+                  borderWidth={1}>
+                  {tag.name}
+                  <Box ml={1}>
+                    <MdCancel size={14} onClick={() => toggleTag(tag)} />
+                  </Box>
+                </Badge>
+              ))}
+            </Box>
+          </>
+        ) : null}
+      </Box>
+      {searchedWord ? (
+        <Text mt={2}>{`"${searchedWord}"での検索結果`}</Text>
       ) : null}
-      {searchedWord ? <p>{`"${searchedWord}"での検索結果`}</p> : null}
-    </div>
+    </Box>
   );
 };
 
@@ -204,23 +283,23 @@ const SearchModal: React.FC<SearchFormProps> = (props) => {
 };
 
 const SearchFormResponsively: React.FC<SearchFormProps> = (props) => {
-  const { isSmallerThan768, isVisibleSearchModal, showSearchModal } =
+  const { isSmallerThan680, isVisibleSearchModal, showSearchModal } =
     useSearchForm();
-
-  return isSmallerThan768 ? (
-    <>
-      {!isVisibleSearchModal ? (
-        <AiOutlineSearch
-          onClick={() => showSearchModal()}
-          className={searchFormStyles.search_button}
-        />
-      ) : (
-        <SearchModal {...props} />
-      )}
-    </>
-  ) : (
-    <SearchInput {...props} />
-  );
+  return <SearchInput {...props} />;
+  // return isSmallerThan680 ? (
+  //   <>
+  //     {!isVisibleSearchModal ? (
+  //       <AiOutlineSearch
+  //         onClick={() => showSearchModal()}
+  //         className={searchFormStyles.search_button}
+  //       />
+  //     ) : (
+  //       <SearchModal {...props} />
+  //     )}
+  //   </>
+  // ) : (
+  //   <SearchInput {...props} />
+  // );
 };
 
 const SearchForm: React.FC<SearchFormProps> = (props) => {

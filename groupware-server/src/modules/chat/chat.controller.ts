@@ -330,7 +330,10 @@ export class ChatController {
       ...(chatGroup?.members?.filter((u) => u.id !== user.id) || []),
       user,
     ];
-    const savedGroup = await this.chatService.v2SaveChatGroup(chatGroup);
+    const savedGroup = await this.chatService.v2SaveChatGroup(
+      chatGroup,
+      req.user.id,
+    );
     const silentNotification: CustomPushNotificationData = {
       title: '',
       body: '',

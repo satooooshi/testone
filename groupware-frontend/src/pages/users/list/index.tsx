@@ -12,7 +12,14 @@ import { toggleTag } from 'src/utils/toggleTag';
 import paginationStyles from '@/styles/components/Pagination.module.scss';
 import { userQueryRefresh } from 'src/utils/userQueryRefresh';
 import { SidebarScreenName } from '@/components/layout/Sidebar';
-import { Box, FormControl, FormLabel, Select, Text } from '@chakra-ui/react';
+import {
+  Box,
+  FormControl,
+  FormLabel,
+  Select,
+  SimpleGrid,
+  Text,
+} from '@chakra-ui/react';
 import TopTabBar, { TopTabBehavior } from '@/components/layout/TopTabBar';
 import { useAPIGetUserTag } from '@/hooks/api/tag/useAPIGetUserTag';
 import {
@@ -20,6 +27,12 @@ import {
   useAPISearchUsers,
 } from '@/hooks/api/user/useAPISearchUsers';
 import topTabBarStyles from '@/styles/components/TopTabBar.module.scss';
+import {
+  getUserSortName,
+  getUserSortValue,
+} from 'src/utils/userList/sortNameFormatter';
+import { useHeaderTab } from '@/hooks/headerTab/useHeaderTab';
+import { Tab } from 'src/types/header/tab/types';
 
 const UserList = () => {
   const router = useRouter();
@@ -47,50 +60,29 @@ const UserList = () => {
     router.push(url, undefined, { shallow: true });
   };
 
-  const topTabBehaviorList: TopTabBehavior[] = [
-    {
-      tabName: '全て',
-      onClick: () => {
-        queryRefresh({ sort: query.sort, role: undefined, page: '1' });
-      },
-      isActiveTab: !query.role,
-    },
-    {
-      tabName: '管理者',
-      onClick: () => {
-        queryRefresh({ page: '1', role: UserRole.ADMIN });
-      },
-      isActiveTab: query.role === UserRole.ADMIN,
-    },
-    {
-      tabName: '一般社員',
-      onClick: () => {
-        queryRefresh({ page: '1', role: UserRole.COMMON });
-      },
-      isActiveTab: query.role === UserRole.COMMON,
-    },
-    {
-      tabName: 'コーチ',
-      onClick: () => {
-        queryRefresh({ page: '1', role: UserRole.COACH });
-      },
-      isActiveTab: query.role === UserRole.COACH,
-    },
-    {
-      tabName: '講師(社員)',
-      onClick: () => {
-        queryRefresh({ page: '1', role: UserRole.INTERNAL_INSTRUCTOR });
-      },
-      isActiveTab: query.role === UserRole.INTERNAL_INSTRUCTOR,
-    },
-    {
-      tabName: '講師(外部)',
-      onClick: () => {
-        queryRefresh({ page: '1', role: UserRole.EXTERNAL_INSTRUCTOR });
-      },
-      isActiveTab: query.role === UserRole.EXTERNAL_INSTRUCTOR,
-    },
-  ];
+  const tabs: Tab[] = useHeaderTab({
+    headerTabType: 'userList',
+    queryRefresh,
+  });
+
+  console.log('ppp', tags);
+
+  const initialHeaderValue = {
+    title: '社員名鑑',
+    activeTabName:
+      query.role === UserRole.ADMIN
+        ? '管理者'
+        : query.role === UserRole.COMMON
+        ? '一般社員'
+        : query.role === UserRole.COACH
+        ? 'コーチ'
+        : query.role === UserRole.INTERNAL_INSTRUCTOR
+        ? '講師(社員)'
+        : query.role === UserRole.EXTERNAL_INSTRUCTOR
+        ? '講師(外部)'
+        : '全て',
+    tabs: tabs,
+  };
 
   useEffect(() => {
     if (tags) {
@@ -105,101 +97,88 @@ const UserList = () => {
   return (
     <LayoutWithTab
       sidebar={{ activeScreenName: SidebarScreenName.USERS }}
-      header={{
-        title: '社員名鑑',
-      }}>
+      header={initialHeaderValue}>
       <Head>
         <title>sample | 社員名鑑</title>
       </Head>
-      <div className={userListStyles.above_pagination}>
-        <Box mb="24px">
-          <TopTabBar topTabBehaviorList={topTabBehaviorList} />
-        </Box>
-        <div className={userListStyles.search_form_wrapper}>
-          <SearchForm
-            onClear={() => setSelectedTags([])}
-            onClickButton={(w) => queryRefresh({ page: '1', word: w })}
-            tags={tags || []}
-            selectedTags={selectedTags}
-            toggleTag={onToggleTag}
-          />
-        </div>
-        {!isLoading && !users?.users.length && (
-          <Text alignItems="center" textAlign="center" mb={4}>
-            検索結果が見つかりませんでした
-          </Text>
-        )}
+      {/* <TopTabBar topTabBehaviorList={topTabBehaviorList} /> */}
+      <SearchForm
+        onClear={() => setSelectedTags([])}
+        // value={searchWord || ''}
+        // onChange={(e) => setSearchWord(e.currentTarget.value)}
+        // onClickButton={() => queryRefresh({ page: '1', word: searchWord })}
+        onClickButton={(w) => queryRefresh({ page: '1', word: w })}
+        tags={tags || []}
+        selectedTags={selectedTags}
+        toggleTag={onToggleTag}
+      />
+      {!isLoading && !users?.users.length && (
+        <Text alignItems="center" textAlign="center" mb={4}>
+          検索結果が見つかりませんでした
+        </Text>
+      )}
 
-        {users && users.users.length ? (
-          <>
-            <div className={userListStyles.sort_select_row}>
-              <div className={userListStyles.sort_select_wrapper}>
-                <FormControl>
-                  <FormLabel>ソート</FormLabel>
-                  <Select
-                    bg="white"
-                    defaultValue={query.sort}
-                    value={query.sort}
-                    onChange={(e) => {
-                      queryRefresh({
-                        sort:
-                          (e.target.value as 'event' | 'question' | 'answer') ||
-                          undefined,
-                        page: '1',
-                      });
-                      return;
-                    }}>
-                    <option value="">指定なし</option>
-                    <option value="event">イベント参加数順</option>
-                    <option value="question">質問数順</option>
-                    <option value="answer">回答数順</option>
-                    <option value="knowledge">ナレッジ投稿数順</option>
-                  </Select>
-                </FormControl>
+      {users && users.users.length ? (
+        <>
+          <Box w="100%" mb="20px" display="flex" justifyContent="flex-start">
+            <FormControl w="200px">
+              <Select
+                bg="white"
+                defaultValue={query.sort}
+                value={query.sort}
+                onChange={(e) => {
+                  queryRefresh({
+                    sort:
+                      (e.target.value as 'event' | 'question' | 'answer') ||
+                      undefined,
+                    page: '1',
+                  });
+                  return;
+                }}>
+                <option value="">指定なし</option>
+                <option value="event">イベント参加数順</option>
+                <option value="question">質問数順</option>
+                <option value="answer">回答数順</option>
+                <option value="knowledge">ナレッジ投稿数順</option>
+              </Select>
+            </FormControl>
+            <FormControl w="200px" ml="20px">
+              <Select
+                bg="white"
+                defaultValue={query.duration}
+                value={query.duration}
+                onChange={(e) => {
+                  queryRefresh({
+                    duration: (e.target.value as 'week' | 'month') || undefined,
+                    page: '1',
+                  });
+                  return;
+                }}>
+                <option value="">全期間</option>
+                <option value="week">週間</option>
+                <option value="month">月間</option>
+              </Select>
+            </FormControl>
+          </Box>
+          <SimpleGrid minChildWidth="520px" spacing="20px" w="100%" mx="auto">
+            {users.users.map((u) => (
+              <div key={u.id}>
+                <UserCard
+                  user={u}
+                  onClickTag={(tag) => {
+                    const defaultQuery = userQueryRefresh({
+                      ...query,
+                      tag: tag.id.toString(),
+                    });
+                    return defaultQuery;
+                  }}
+                  duration={query.duration}
+                />
               </div>
-              <div className={userListStyles.sort_select_wrapper}>
-                <FormControl>
-                  <FormLabel>期間</FormLabel>
-                  <Select
-                    bg="white"
-                    defaultValue={query.duration}
-                    value={query.duration}
-                    onChange={(e) => {
-                      queryRefresh({
-                        duration:
-                          (e.target.value as 'week' | 'month') || undefined,
-                        page: '1',
-                      });
-                      return;
-                    }}>
-                    <option value="">指定なし</option>
-                    <option value="week">週間</option>
-                    <option value="month">月間</option>
-                  </Select>
-                </FormControl>
-              </div>
-            </div>
-
-            <div className={userListStyles.user_card_row}>
-              {users.users.map((u) => (
-                <div key={u.id} className={userListStyles.user_card_wrapper}>
-                  <UserCard
-                    user={u}
-                    onClickTag={(tag) => {
-                      const defaultQuery = userQueryRefresh({
-                        ...query,
-                        tag: tag.id.toString(),
-                      });
-                      return defaultQuery;
-                    }}
-                    duration={query.duration}
-                  />
-                </div>
-              ))}
-            </div>
-          </>
-        ) : null}
-      </div>
+            ))}
+          </SimpleGrid>
+        </>
+      ) : null}
       {users?.pageCount ? (
         <div className={paginationStyles.pagination_wrap_layout}>
           <ReactPaginate

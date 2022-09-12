@@ -43,10 +43,32 @@ import {
 import { useAPIGetTag } from '@/hooks/api/tag/useAPIGetTag';
 import { useHeaderTab } from '@/hooks/headerTab/useHeaderTab';
 import { useAPIUpdateEvent } from '@/hooks/api/event/useAPIUpdateEvent';
-import { Box, useMediaQuery, useToast } from '@chakra-ui/react';
+import {
+  Box,
+  Modal,
+  ModalOverlay,
+  SimpleGrid,
+  useMediaQuery,
+  useToast,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalHeader,
+  Text,
+  Select,
+  Button,
+  Link,
+} from '@chakra-ui/react';
 import { responseErrorMsgFactory } from 'src/utils/factory/responseErrorMsgFactory';
 import { hideScrollbarCss } from 'src/utils/chakra/hideScrollBar.css';
 import { isEditableEvent } from 'src/utils/factory/isCreatableEvent';
+import { useAPIJoinEvent } from '@/hooks/api/event/useAPIJoinEvent';
+import TabList from '@/components/common/TabList';
+import {
+  eventStatusNameToValue,
+  eventStatusValueToName,
+} from 'src/utils/event/eventStatusFormatter';
+import { HeaderProps } from '@/components/layout/HeaderWithTab';
 
 const localizer = momentLocalizer(moment);
 //@ts-ignore
@@ -122,6 +144,7 @@ const EventList = () => {
   const router = useRouter();
   const toast = useToast();
   const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
+  const [isSmallerThan1024] = useMediaQuery('(max-width: 1024px)');
 
   const {
     page = '1',
@@ -188,6 +211,20 @@ const EventList = () => {
     },
   });
   const [newEvent, setNewEvent] = useState<CreateEventRequest>();
+  const [openAnswerModal, setOpenAnswerModal] = useState(0);
+
+  const { mutate: joinEvent } = useAPIJoinEvent({
+    onError: (err) => {
+      if (err.response?.data?.message) {
+        toast({
+          description: err.response?.data?.message,
+          status: 'error',
+          duration: 3000,
+          isClosable: true,
+        });
+      }
+    },
+  });
 
   const onToggleTag = (t: Tag) => {
     setSelectedTags((s) => toggleTag(s, t));
@@ -214,6 +251,7 @@ const EventList = () => {
 
   const tabs: Tab[] = useHeaderTab({
     headerTabType: 'event',
+    onCreateClicked: () => setModalVisible(true),
     queryRefresh,
     personal,
     from,
@@ -377,17 +415,19 @@ const EventList = () => {
   //   return new Date();
   // }, [from, to]);
 
-  useEffect(() => {
-    calendarRef?.current?.scrollIntoView();
-  }, []);
+  // useEffect(() => {
+  //   calendarRef?.current?.scrollIntoView();
+  // }, []);
 
-  const initialHeaderValue = {
+  const initialHeaderValue: Omit<
+    HeaderProps,
+    'isDrawerOpen' | 'setIsDrawerOpen'
+  > = {
     title: 'Events',
     activeTabName: activeTabName(),
     tabs: tabs,
-    rightButtonName: 'イベントを追加',
-    onClickRightButton: () => setModalVisible(true),
-    resetEventForm: () => setNewEvent(initialEventValue),
+    EventPage: isCalendar ? 'カレンダー' : 'リスト',
+    // resetEventForm: () => setNewEvent(initialEventValue),
   };
 
   useEffect(() => {
@@ -398,69 +438,6 @@ const EventList = () => {
       setSelectedTags(searchedTags);
     }
   }, [tag, tags]);
-
-  const topTabBehaviorList: TopTabBehavior[] = [
-    {
-      tabName: 'Myカレンダー',
-      onClick: () => {
-        queryRefresh({
-          page: '1',
-          personal: 'true',
-          from: from || '',
-          to: to || '',
-        });
-      },
-      isActiveTab: !!(isCalendar && personal),
-    },
-    {
-      tabName: '全体カレンダー',
-      onClick: () => {
-        queryRefresh({
-          personal: '',
-          page: '1',
-          from: from || '',
-          to: to || '',
-        });
-      },
-      isActiveTab: !!(isCalendar && !personal),
-    },
-    {
-      tabName: '今後のイベント',
-      onClick: () => {
-        queryRefresh({
-          page: '1',
-          status: 'future',
-          from: undefined,
-          to: undefined,
-        });
-      },
-      isActiveTab: !isCalendar && status === 'future',
-    },
-    {
-      tabName: '過去のイベント',
-      onClick: () => {
-        queryRefresh({
-          page: '1',
-          status: 'past',
-          from: undefined,
-          to: undefined,
-        });
-      },
-      isActiveTab: !isCalendar && status === 'past',
-    },
-    {
-      tabName: '進行中のイベント',
-      onClick: () => {
-        queryRefresh({
-          page: '1',
-          status: 'current',
-          from: undefined,
-          to: undefined,
-        });
-      },
-      isActiveTab: !isCalendar && status === 'current',
-    },
-  ];
 
   return (
     <LayoutWithTab
@@ -479,20 +456,50 @@ const EventList = () => {
         display="flex"
         flexDir="column"
         justifyContent="flex-start"
+        w="100%"
         mb="72px">
-        <Box mb="24px">
+        {/* <Box mb="24px">
           <TopTabBar topTabBehaviorList={topTabBehaviorList} />
-        </Box>
-
+        </Box> */}
+        {/* <TabList tabs={tabs} activeTabName={activeTabName()} /> */}
         {isCalendar && (
           <Box
+            w="100%"
             ref={calendarRef}
             justifyContent="center"
             alignItems="center"
-            maxW={isSmallerThan768 ? '99vw' : undefined}
+            // maxW={isSmallerThan768 ? '99vw' : undefined}
             overflowX="auto"
             css={hideScrollbarCss}
             alignSelf="center">
+            <Box display="flex" flexDir="row" alignItems="center" mt={5} mb={8}>
+              <Button
+                bg={!personal ? 'white' : undefined}
+                colorScheme={personal === 'true' ? 'blue' : undefined}
+                onClick={() =>
+                  queryRefresh({
+                    personal: 'true',
+                    page: '1',
+                    from: from || '',
+                    to: to || '',
+                  })
+                }>
+                マイカレンダー
+              </Button>
+              <Button
+                bg={personal === 'true' ? 'white' : undefined}
+                colorScheme={!personal ? 'blue' : undefined}
+                onClick={() =>
+                  queryRefresh({
+                    personal: '',
+                    page: '1',
+                    from: from || '',
+                    to: to || '',
+                  })
+                }>
+                全体カレンダー
+              </Button>
+            </Box>
             <BigCalendar
               selectable
               resizable
@@ -524,35 +531,57 @@ const EventList = () => {
 
         {!isCalendar && (
           <>
-            <div className={eventListStyles.search_form_wrapper}>
-              <SearchForm
-                onClear={() => setSelectedTags([])}
-                onClickButton={(w) => queryRefresh({ page: '1', word: w })}
-                tags={tags || []}
-                selectedTags={selectedTags}
-                toggleTag={onToggleTag}
-              />
-            </div>
-            <div className={eventListStyles.event_list_wrapper}>
+            <SearchForm
+              selectingItem={eventStatusValueToName(status)}
+              selectItems={[
+                '過去のイベント',
+                '今後のイベント',
+                '進行中のイベント',
+              ]}
+              onSelect={(i) => {
+                queryRefresh({
+                  page: '1',
+                  status: eventStatusNameToValue(i.target.value),
+                  from: undefined,
+                  to: undefined,
+                });
+              }}
+              onClear={() => setSelectedTags([])}
+              // value={searchWord || ''}
+              // onChange={(e) => setSearchWord(e.currentTarget.value)}
+              // onClickButton={() =>
+              //   queryRefresh({ page: '1', word: searchWord })
+              // }
+              onClickButton={(w) => queryRefresh({ page: '1', word: w })}
+              tags={tags || []}
+              selectedTags={selectedTags}
+              toggleTag={onToggleTag}
+            />
+            <Box w="100%">
               {events?.events.length ? (
-                <div className={eventListStyles.event_card__row}>
+                // <div className={eventListStyles.event_card__row}>
+                <SimpleGrid
+                  w="100%"
+                  minChildWidth="360px"
+                  maxChildWidth="420px"
+                  spacing="20px">
                   {events.events.map((e) => (
-                    <div
-                      key={e.id}
-                      className={eventListStyles.event_card_margin}>
+                    <Box key={e.id}>
                       <EventCard
+                        onClickAnswer={(id) => setOpenAnswerModal(id)}
                         hrefTagClick={hrefTagClick}
                         eventSchedule={e}
                       />
-                    </div>
+                    </Box>
                   ))}
-                </div>
+                  {/* </div> */}
+                </SimpleGrid>
               ) : !isLoadingEvents ? (
                 <p className={eventListStyles.no_result_text}>
                   検索結果が見つかりませんでした
                 </p>
               ) : null}
-            </div>
+            </Box>
           </>
         )}
       </Box>
@@ -569,8 +598,8 @@ const EventList = () => {
             initialPage={page ? Number(page) - 1 : 1}
             forcePage={page ? Number(page) - 1 : 1}
             disableInitialCallback={true}
-            previousLabel={'前へ'}
-            nextLabel={'次へ'}
+            previousLabel={'<'}
+            nextLabel={'>'}
             marginPagesDisplayed={2}
             pageRangeDisplayed={5}
             containerClassName={paginationStyles.pagination}

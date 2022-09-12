@@ -15,6 +15,7 @@ import {
   ModalContent,
   ModalHeader,
   ModalOverlay,
+  SimpleGrid,
   Text,
 } from '@chakra-ui/react';
 import { useAuthenticate } from 'src/contexts/useAuthenticate';
@@ -55,23 +56,17 @@ const EventParticipants: React.FC<EventParticipantsProps> = ({
 
   const userList = (users: UserJoiningEvent[], isModal?: boolean) => {
     return (
-      <Box shadow="md" rounded="md" borderWidth={1} borderColor={'gray.200'}>
+      <Box rounded="md" bg="white" w="100%" p={5} mt={3}>
         {!isModal ? (
           <Box
+            w="100%"
             display="flex"
             flexDir="row"
             alignItems="center"
-            mx="16px"
-            minH="50px"
-            justifyContent="space-between"
-            borderBottomColor="gray.200"
-            borderBottomWidth={1}>
-            <Text color="green.600" fontWeight="bold" fontSize="20px">
-              参加者一覧
-            </Text>
+            justifyContent="space-between">
             {users?.length >= 10 ? (
               <Link onClick={() => setAllVisible((v) => !v)}>
-                <Text fontWeight="bold" fontSize="20px" color="blue.600">
+                <Text fontWeight="bold" fontSize="20px" color="blue.600" mb={2}>
                   {'全て見る'}
                 </Text>
               </Link>
@@ -79,71 +74,82 @@ const EventParticipants: React.FC<EventParticipantsProps> = ({
           </Box>
         ) : null}
         {!participantsExceptCanceled?.length && (
-          <Box
-            borderWidth={1}
-            borderColor={'gray.200'}
-            py="8px"
-            px="16px"
-            display="flex"
-            flexDir="row"
-            alignItems="center"
-            justifyContent="space-between">
-            <Text color={darkFontColor} fontWeight="bold" fontSize="18px">
+          <Box>
+            <Text
+              color={darkFontColor}
+              fontWeight="bold"
+              fontSize="18px"
+              textAlign="center">
               まだ参加申し込みされていません
             </Text>
           </Box>
         )}
-        {users.map((u, index) =>
-          index <= 10 || allVisible ? (
-            <Box
-              borderWidth={1}
-              borderColor={'gray.200'}
-              py="8px"
-              px="16px"
-              display="flex"
-              flexDir="row"
-              alignItems="center"
-              key={u.user.id}
-              justifyContent="space-between">
-              <Link href={`/account/${u.user.id}`}>
-                <Box display="flex" flexDir="row" alignItems="center">
-                  <UserAvatar user={u.user} h="40px" w="40px" mr="8px" />
-                  <Text color={darkFontColor} fontWeight="bold" fontSize="18px">
-                    {userNameFactory(u.user)}
-                  </Text>
-                </Box>
-              </Link>
-              {user?.role === UserRole.ADMIN && (
-                <Menu>
-                  <MenuButton as={Button} colorScheme="red" size="sm">
-                    {u.lateMinutes
-                      ? lateMinutesText(Number(u.lateMinutes))
-                      : '遅刻を記録'}
-                  </MenuButton>
-                  <MenuList>
-                    <MenuOptionGroup
-                      onChange={(v) =>
-                        onChangeJoiningData({ ...u, lateMinutes: Number(v) })
-                      }
-                      defaultValue={''}
-                      value={u.lateMinutes.toString()}
-                      type="radio">
-                      <MenuItemOption value="">記録しない</MenuItemOption>
-                      <MenuItemOption value="15">15分遅刻</MenuItemOption>
-                      <MenuItemOption value="30">30分遅刻</MenuItemOption>
-                      <MenuItemOption value="45">45分遅刻</MenuItemOption>
-                      <MenuItemOption value="60">1時間遅刻</MenuItemOption>
-                      <MenuItemOption value="90">1時間半遅刻</MenuItemOption>
-                      <MenuItemOption value="120">2時間遅刻</MenuItemOption>
-                    </MenuOptionGroup>
-                  </MenuList>
-                </Menu>
-              )}
-            </Box>
-          ) : (
-            <></>
-          ),
-        )}
+        <SimpleGrid
+          minChildWidth="120px"
+          spacing="10px"
+          display={users.length < 5 ? 'flex' : undefined}
+          // justifyContent="flex-start"
+          flexWrap="wrap">
+          {users.map((u, index) =>
+            index <= 10 || allVisible ? (
+              <Box
+                maxW="130px"
+                minW="120px"
+                my={1}
+                rounded="md"
+                borderWidth={1}
+                borderColor={'gray.200'}
+                py="8px"
+                display="flex"
+                flexDir="column"
+                alignItems="center"
+                key={u.user.id}>
+                <Link href={`/account/${u.user.id}`} mb={2}>
+                  <Box display="flex" flexDir="column" alignItems="center">
+                    <UserAvatar user={u.user} h="80px" w="80px" mb="8px" />
+                    <Text fontWeight="bold" fontSize="14px" textAlign="center">
+                      {userNameFactory(u.user)}
+                    </Text>
+                  </Box>
+                </Link>
+                {user?.role === UserRole.ADMIN && (
+                  <Menu>
+                    <MenuButton
+                      as={Button}
+                      mt="auto"
+                      size="xs"
+                      borderRadius={50}
+                      colorScheme="blue"
+                      variant="outline">
+                      {u.lateMinutes
+                        ? lateMinutesText(Number(u.lateMinutes))
+                        : '遅刻を記録'}
+                    </MenuButton>
+                    <MenuList>
+                      <MenuOptionGroup
+                        onChange={(v) =>
+                          onChangeJoiningData({ ...u, lateMinutes: Number(v) })
+                        }
+                        defaultValue={''}
+                        value={u.lateMinutes.toString()}
+                        type="radio">
+                        <MenuItemOption value="">記録しない</MenuItemOption>
+                        <MenuItemOption value="15">15分遅刻</MenuItemOption>
+                        <MenuItemOption value="30">30分遅刻</MenuItemOption>
+                        <MenuItemOption value="45">45分遅刻</MenuItemOption>
+                        <MenuItemOption value="60">1時間遅刻</MenuItemOption>
+                        <MenuItemOption value="90">1時間半遅刻</MenuItemOption>
+                        <MenuItemOption value="120">2時間遅刻</MenuItemOption>
+                      </MenuOptionGroup>
+                    </MenuList>
+                  </Menu>
+                )}
+              </Box>
+            ) : (
+              <></>
+            ),
+          )}
+        </SimpleGrid>
       </Box>
     );
   };
@@ -153,11 +159,12 @@ const EventParticipants: React.FC<EventParticipantsProps> = ({
       <Modal
         onClose={() => setAllVisible(false)}
         isOpen={allVisible}
-        scrollBehavior="inside">
+        scrollBehavior="inside"
+        size="xl">
         <ModalOverlay />
         <ModalContent h="90vh" bg={'#f9fafb'}>
           <ModalCloseButton />
-          <ModalHeader color="green.600">参加者一覧</ModalHeader>
+          <ModalHeader fontSize="16px">参加者一覧</ModalHeader>
           <ModalBody>
             {userList(
               participantsExceptCanceled?.filter((u) => u.user.existence),

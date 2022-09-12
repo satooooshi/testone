@@ -107,7 +107,7 @@ const ChatDetail = () => {
         justifyContent="center">
         {!isSmallerThan768 ? (
           <>
-            <Box w="30vw">
+            <Box w="40%" mr={3}>
               <RoomList
                 currentId={id}
                 onClickRoom={(g) =>
@@ -117,24 +117,29 @@ const ChatDetail = () => {
                 }
               />
             </Box>
-            {currentRoom ? (
-              <ChatBox room={currentRoom} onMenuClicked={handleMenuSelected} />
-            ) : (
-              <Box
-                w="60vw"
-                h="100%"
-                display="flex"
-                flexDir="row"
-                justifyContent="center"
-                alignItems="center"
-                boxShadow="md"
-                bg="white"
-                borderRadius="md">
-                <Text position="absolute" top="auto" bottom="auto">
-                  ルームを選択してください
-                </Text>
-              </Box>
-            )}
+            <Box w="60%">
+              {currentRoom ? (
+                <ChatBox
+                  room={currentRoom}
+                  onMenuClicked={handleMenuSelected}
+                />
+              ) : (
+                <Box
+                  w="100%"
+                  h="100%"
+                  display="flex"
+                  flexDir="row"
+                  justifyContent="center"
+                  alignItems="center"
+                  boxShadow="md"
+                  bg="white"
+                  borderRadius="md">
+                  <Text position="absolute" top="auto" bottom="auto">
+                    ルームを選択してください
+                  </Text>
+                </Box>
+              )}
+            </Box>
           </>
         ) : currentRoom ? (
           <ChatBox room={currentRoom} onMenuClicked={handleMenuSelected} />

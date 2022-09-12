@@ -174,12 +174,12 @@ const RenderWikiCardList: React.FC<RenderWikiCardListProps> = ({
           <Div h={isQA ? '90%' : '100%'}>
             <FlatList
               ref={flatListRef}
-              contentContainerStyle={tailwind('pb-8')}
+              contentContainerStyle={tailwind('py-8')}
               onEndReached={onEndReached}
               onEndReachedThreshold={0.5}
               data={wikiForInfiniteScroll || []}
               keyExtractor={item => item.id.toString()}
-              renderItem={({item}) => <WikiCard wiki={item} />}
+              renderItem={({item}) => <WikiCard wiki={item} type={type} />}
             />
           </Div>
         ) : !wikiForInfiniteScroll.length ? (

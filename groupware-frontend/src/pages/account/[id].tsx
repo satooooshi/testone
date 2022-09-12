@@ -25,6 +25,8 @@ import {
   ThemeTypings,
   useMediaQuery,
   SimpleGrid,
+  Flex,
+  Wrap,
 } from '@chakra-ui/react';
 import {
   BoardCategory,
@@ -37,78 +39,48 @@ import {
 import { userRoleNameFactory } from 'src/utils/factory/userRoleNameFactory';
 import { branchTypeNameFactory } from 'src/utils/factory/branchTypeNameFactory';
 import { blueColor, darkFontColor } from 'src/utils/colors';
-import { userNameFactory } from 'src/utils/factory/userNameFactory';
 import { useAPISaveChatGroup } from '@/hooks/api/chat/useAPISaveChatGroup';
 import { HiOutlineChat } from 'react-icons/hi';
+import { AiOutlineArrowLeft } from 'react-icons/ai';
+import { tagBgColorFactory } from 'src/utils/factory/tagBgColorFactory';
+import { tagFontColorFactory } from 'src/utils/factory/tagFontColorFactory';
 
 type UserTagListProps = {
   tags?: UserTag[];
   type: TagType;
-  introduce: string;
 };
 
-const UserTagList: React.FC<UserTagListProps> = ({ tags, type, introduce }) => {
-  const color: ThemeTypings['colorSchemes'] = useMemo(() => {
-    switch (type) {
-      case TagType.TECH:
-        return 'teal';
-      case TagType.QUALIFICATION:
-        return 'blue';
-      case TagType.CLUB:
-        return 'green';
-      case TagType.HOBBY:
-        return 'pink';
-      default:
-        return 'teal';
-    }
-  }, [type]);
-
-  const labelName: string = useMemo(() => {
-    switch (type) {
-      case TagType.TECH:
-        return '技術';
-      case TagType.QUALIFICATION:
-        return '資格';
-      case TagType.CLUB:
-        return '部活動';
-      case TagType.HOBBY:
-        return '趣味';
-      default:
-        return '';
-    }
-  }, [type]);
+const UserTagList: React.FC<UserTagListProps> = ({ tags, type }) => {
+  const filteredTags = tags?.filter((t) => t.type === type);
 
   return (
-    <Box bg="white" rounded="md" p={2}>
-      <Text fontWeight="bold" mb={2} fontSize={14}>{`${labelName}タグ`}</Text>
-      <Box display="flex" flexFlow="row" flexWrap="wrap" mb={4}>
-        {tags?.length ? (
-          tags
-            ?.filter((t) => t.type === type)
-            .map((t) => (
-              <div key={t.id} className={accountInfoStyles.tag_button_wrapper}>
-                <Button colorScheme={color} size="xs">
-                  {t.name}
-                </Button>
-              </div>
-            ))
-        ) : (
-          <Button colorScheme={color} size="xs">
+    <Wrap spacing="8px" bg="white" rounded="md">
+      {filteredTags && filteredTags.length ? (
+        filteredTags.map((t) => (
+          <Box key={t.id}>
+            <Button
+              bg={tagBgColorFactory(type)}
+              color={tagFontColorFactory(type)}
+              rounded="3px"
+              size="xs">
+              <Text fontWeight="normal" fontSize="14px">
+                {t.name}
+              </Text>
+            </Button>
+          </Box>
+        ))
+      ) : (
+        <Button
+          bg={tagBgColorFactory(type)}
+          color={tagFontColorFactory(type)}
+          rounded="3px"
+          size="xs">
+          <Text fontWeight="normal" fontSize="14px">
             未設定
-          </Button>
-        )}
-      </Box>
-      <Box>
-        <Text mb={2} fontSize={14}>{`${labelName}の紹介`}</Text>
-        <Text
-          fontSize={16}
-          color={darkFontColor}
-          fontWeight="bold"
-          className={accountInfoStyles.introduce}>
-          {introduce || '未入力'}
-        </Text>
-      </Box>
-    </Box>
+          </Text>
+        </Button>
+      )}
+    </Wrap>
   );
 };
 
@@ -151,10 +123,13 @@ const MyAccountInfo = () => {
       router.push('/login');
     },
   });
-  const [isSmallerThan1024] = useMediaQuery('(max-width: 1024px)');
-  const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
+  const previousUrl = document.referrer;
 
-  const tabs: Tab[] = useHeaderTab({ headerTabType: 'account', user });
+  const tabs: Tab[] = useHeaderTab({
+    headerTabType: 'account',
+    user,
+    previousUrl,
+  });
 
   const topTabBehaviorList: TopTabBehavior[] = [
     {
@@ -225,12 +200,13 @@ const MyAccountInfo = () => {
   return (
     <LayoutWithTab
       sidebar={{
-        activeScreenName: SidebarScreenName.ACCOUNT,
+        activeScreenName:
+          profile?.id !== user?.id ? SidebarScreenName.USERS : undefined,
       }}
       header={{
         title: 'Account',
         activeTabName: profile?.id === user?.id ? 'アカウント情報' : '',
-        tabs: profile?.id === user?.id ? tabs : [],
+        // tabs: profile?.id !== user?.id ? tabs : [],
         rightButtonName: profile?.id === user?.id ? 'ログアウト' : undefined,
         onClickRightButton:
           profile?.id === user?.id ? () => logout() : undefined,
@@ -240,6 +216,14 @@ const MyAccountInfo = () => {
           sample | {profile ? `${profile.lastName} ${profile.firstName}` : ''}
         </title>
       </Head>
+      <Box w="100%" mt="20px" mb="40px">
+        <Button bg="white" w="120px" onClick={() => router.back()}>
+          <Box mr="10px">
+            <AiOutlineArrowLeft size="20px" />
+          </Box>
+          <Text fontSize="14px">戻る</Text>
+        </Button>
+      </Box>
       <div className={accountInfoStyles.main}>
         {profile && (
           <Box
@@ -247,183 +231,96 @@ const MyAccountInfo = () => {
             flexDir="column"
             alignSelf="center"
             alignItems="center"
-            w={isSmallerThan768 ? '90vw' : undefined}>
-            <Box mb="16px">
-              {profile.avatarUrl ? (
-                <img
-                  src={profile.avatarUrl}
-                  alt="アバター画像"
-                  className={accountInfoStyles.avatar}
-                />
-              ) : (
-                <Image
-                  src={noImage}
-                  alt="アバター画像"
-                  className={accountInfoStyles.avatar}
-                />
-              )}
-            </Box>
+            w="100%">
+            <Flex direction="row" bg="white" w="100%" p="30px" rounded="5px">
+              <Box mx="20px" className={accountInfoStyles.avatar}>
+                {profile.avatarUrl ? (
+                  <img src={profile.avatarUrl} alt="アバター画像" />
+                ) : (
+                  <Image src={noImage} alt="アバター画像" />
+                )}
+              </Box>
+              <Box>
+                <Text fontSize="20px" fontWeight="bold" mb="5px">
+                  {`${profile.lastName} ${profile.firstName}`}
+                  <Button
+                    ml="10px"
+                    size="xs"
+                    bg="green.50"
+                    color="green.600"
+                    fontSize="14px"
+                    fontWeight="none">
+                    {userRoleNameFactory(profile.role)}
+                  </Button>
+                </Text>
+                <Text fontSize="12px" color="gray" mb="12px">
+                  {`${profile.lastNameKana} ${profile.firstNameKana}`}
+                </Text>
+                <Text fontWeight="bold" mb="12px">
+                  自己紹介
+                </Text>
+                <Text>{profile.introduceOther || '未入力'}</Text>
+              </Box>
+            </Flex>
 
-            {/* <div className={accountInfoStyles.name_wrapper}> */}
-            {/*   <h1 className={accountInfoStyles.name}> */}
-            {/*     {userNameFactory(user)} */}
-            {/*   </h1> */}
-            {/* </div> */}
-            <Box display="flex" flexDir="row" justifyContent="center" mb="16px">
-              <Text
-                fontSize={20}
-                fontWeight="bold"
-                color={darkFontColor}
-                display="block">
-                {userNameFactory(profile)}
-              </Text>
-            </Box>
-
-            <Box mb="24px">
+            <Box w="100%" my="30px">
               <TopTabBar topTabBehaviorList={topTabBehaviorList} />
             </Box>
 
             {activeTab === TabName.DETAIL && (
               <>
-                <Box w="80vw">
-                  <Box
-                    display="flex"
-                    mb={5}
-                    flexDir="row"
-                    alignItems="center"
-                    w="100%">
-                    <Text fontSize={14} w={'10%'}>
-                      社員番号:
-                    </Text>
-                    <Text
-                      fontWeight="bold"
-                      w="85%"
-                      fontSize={18}
-                      color={darkFontColor}>
-                      {profile.employeeId || '未登録'}
-                    </Text>
-                  </Box>
-                  <Box
-                    display="flex"
-                    mb={5}
-                    flexDir="row"
-                    alignItems="center"
-                    w="100%">
-                    <Text fontSize={14} w={'10%'}>
-                      社員区分:
-                    </Text>
-                    <Text
-                      fontWeight="bold"
-                      w="85%"
-                      fontSize={18}
-                      color={darkFontColor}>
-                      {userRoleNameFactory(profile.role)}
-                    </Text>
-                  </Box>
-                  <Box
-                    display="flex"
-                    mb={5}
-                    flexDir="row"
-                    alignItems="center"
-                    w="100%">
-                    <Text fontSize={14} w={'10%'}>
-                      所属支社:
-                    </Text>
-                    <Text
-                      fontWeight="bold"
-                      w="85%"
-                      fontSize={18}
-                      color={darkFontColor}>
-                      {branchTypeNameFactory(profile.branch)}
-                    </Text>
-                  </Box>
-                  <Box
-                    display="flex"
-                    mb={5}
-                    flexDir="row"
-                    alignItems="center"
-                    w="100%">
-                    <Text fontSize={14} w={'10%'}>
-                      {'メール　'}:
-                    </Text>
-                    <Text
-                      fontWeight="bold"
-                      w="85%"
-                      fontSize={18}
-                      color={darkFontColor}>
-                      {profile.isEmailPublic ? profile.email : '非公開'}
-                    </Text>
-                  </Box>
-                  <Box
-                    display="flex"
-                    mb={5}
-                    flexDir="row"
-                    alignItems="center"
-                    w="100%">
-                    <Text fontSize={14} w={'10%'}>
-                      電話番号:
-                    </Text>
-                    <Text
-                      fontWeight="bold"
-                      w="85%"
-                      fontSize={18}
-                      color={darkFontColor}>
-                      {profile.isPhonePublic ? profile.phone : '非公開'}
-                    </Text>
-                  </Box>
-                  <Box
-                    display="flex"
-                    flexDir="row"
-                    alignItems="center"
-                    mb={8}
-                    w="100%">
-                    <Text fontSize={14} w={'10%'}>
-                      自己紹介:
-                    </Text>
-                    <Text
-                      fontWeight="bold"
-                      w="85%"
-                      fontSize={18}
-                      color={darkFontColor}
-                      className={accountInfoStyles.introduce}>
-                      {profile.introduceOther || '未入力'}
-                    </Text>
-                  </Box>
-                  <Box
-                    w={'100%'}
-                    mb={35}
-                    display="flex"
-                    flexDir="row"
-                    flexWrap="wrap">
-                    <Box mb={8} mr={4} w={isSmallerThan1024 ? '100%' : '49%'}>
-                      <UserTagList
-                        tags={profile.tags}
-                        type={TagType.TECH}
-                        introduce={profile.introduceTech}
-                      />
-                    </Box>
-                    <Box mb={8} w={isSmallerThan1024 ? '100%' : '49%'}>
-                      <UserTagList
-                        tags={profile.tags}
-                        type={TagType.QUALIFICATION}
-                        introduce={profile.introduceQualification}
-                      />
-                    </Box>
-                    <Box mb={8} mr={4} w={isSmallerThan1024 ? '100%' : '49%'}>
-                      <UserTagList
-                        tags={profile.tags}
-                        type={TagType.CLUB}
-                        introduce={profile.introduceClub}
-                      />
-                    </Box>
-                    <Box mb={8} w={isSmallerThan1024 ? '100%' : '49%'}>
-                      <UserTagList
-                        tags={profile.tags}
-                        type={TagType.HOBBY}
-                        introduce={profile.introduceHobby}
-                      />
-                    </Box>
-                  </Box>
+                <Text fontSize="22px" fontWeight="bold" mb="12px" mr="auto">
+                  プロフィール
+                </Text>
+                <SimpleGrid
+                  bg="white"
+                  w="100%"
+                  p="20px"
+                  mb="20px"
+                  rounded="5px"
+                  spacingY="16px">
+                  <Text fontWeight="bold">メールアドレス</Text>
+                  <Text>
+                    {profile.isEmailPublic ? profile.email : '非公開'}
+                  </Text>
+                  <Text fontWeight="bold">携帯電話番号</Text>
+                  <Text>
+                    {profile.isPhonePublic ? profile.phone : '非公開'}
+                  </Text>
+                  <Text fontWeight="bold">所属支社</Text>
+                  <Text>{branchTypeNameFactory(profile.branch)}</Text>
+                  <Text fontWeight="bold">社員コード</Text>
+                  <Text>{profile.employeeId || '未登録'}</Text>
+                </SimpleGrid>
+                <Text fontSize="22px" fontWeight="bold" mb="12px" mr="auto">
+                  タグ
+                </Text>
+                <SimpleGrid
+                  bg="white"
+                  w="100%"
+                  p="20px"
+                  mb="20px"
+                  rounded="5px"
+                  spacingY="16px">
+                  <Text fontWeight="bold">技術タグ</Text>
+                  <UserTagList tags={profile.tags} type={TagType.TECH} />
+                  <Text mb="8px">{profile.introduceTech || '未入力'}</Text>
+                  <Text fontWeight="bold">資格タグ</Text>
+                  <UserTagList
+                    tags={profile.tags}
+                    type={TagType.QUALIFICATION}
+                  />
+                  <Text mb="8px">
+                    {profile.introduceQualification || '未入力'}
+                  </Text>
+                  <Text fontWeight="bold">部活動タグ</Text>
+                  <UserTagList tags={profile.tags} type={TagType.CLUB} />
+                  <Text mb="8px">{profile.introduceClub || '未入力'}</Text>
+                  <Text fontWeight="bold">趣味タグ</Text>
+                  <UserTagList tags={profile.tags} type={TagType.HOBBY} />
+                  <Text mb="8px">{profile.introduceHobby || '未入力'}</Text>
+                </SimpleGrid>
+                <Box w="100%">
                   {profile?.id !== user?.id &&
                     profile.role !== UserRole.EXTERNAL_INSTRUCTOR && (
                       <Button
@@ -457,7 +354,11 @@ const MyAccountInfo = () => {
 
             {activeTab === TabName.EVENT ? (
               events && events.events.length ? (
-                <SimpleGrid columns={{ sm: 1, md: 1, lg: 2 }} spacing="16px">
+                <SimpleGrid
+                  w="100%"
+                  minChildWidth="360px"
+                  maxChildWidth="420px"
+                  spacing="20px">
                   {events.events.map((e) => (
                     <EventCard
                       key={e.id}
@@ -475,7 +376,7 @@ const MyAccountInfo = () => {
 
             {activeTab === TabName.QUESTION ? (
               questionList && questionList.wiki.length ? (
-                <Box>
+                <Box w="100%">
                   {questionList.wiki.map((w) => (
                     <WikiCard wiki={w} key={w.id} />
                   ))}
@@ -487,7 +388,7 @@ const MyAccountInfo = () => {
 
             {activeTab === TabName.KNOWLEDGE ? (
               knowledgeList && knowledgeList.wiki.length ? (
-                <Box>
+                <Box w="100%">
                   {knowledgeList.wiki.map((w) => (
                     <WikiCard wiki={w} key={w.id} />
                   ))}
@@ -501,7 +402,7 @@ const MyAccountInfo = () => {
             {activeTab === TabName.GOOD &&
             profile.userGoodForBoard &&
             profile.userGoodForBoard.length ? (
-              <Box>
+              <Box w="100%">
                 {profile.userGoodForBoard.map((w) => (
                   <WikiCard wiki={w.wiki} key={w.id} />
                 ))}

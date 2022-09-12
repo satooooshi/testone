@@ -1,13 +1,13 @@
 @import '../variables.scss';
 
 .main {
-  display: flex;
-  flex-direction: row;
+  // display: flex;
+  // flex-direction: row;
   justify-content: center;
-  @media (max-width: 576px) {
-    flex-direction: column;
-    justify-content: flex-start;
-  }
+  // @media (max-width: 576px) {
+    // flex-direction: column;
+    // justify-content: flex-start;
+  // }
 }
 
 .update_button {
@@ -25,12 +25,9 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-right: 40px;
-  margin-top: 80px;
   width: 30vw;
   // height: 31vw;
   @media (max-width: 576px) {
-    margin: 0 auto 20px auto;
     width: 70vw;
     // height: 51vw;
   }
@@ -44,7 +41,6 @@
   border: 3px dashed #eeeeee;
   background-color: #fafafa;
   color: #bdbdbd;
-  margin-bottom: 16px;
   width: 20vw;
   height: 21vw;
   border-radius: 100%;

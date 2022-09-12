@@ -26,6 +26,13 @@ import {
   Button,
   Link,
   useToast,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
 } from '@chakra-ui/react';
 import { FormikErrors, useFormik } from 'formik';
 import Head from 'next/head';
@@ -45,6 +52,9 @@ import type {
   DroppableProvided,
   DraggableProvided,
 } from 'react-beautiful-dnd';
+import { AiOutlinePlus } from 'react-icons/ai';
+import { FiEdit2 } from 'react-icons/fi';
+import { RiDeleteBin6Line } from 'react-icons/ri';
 const ReactPaginate = dynamic(() => import('react-paginate'), { ssr: false });
 
 const NewsAdmin: React.VFC = () => {
@@ -61,6 +71,7 @@ const NewsAdmin: React.VFC = () => {
   const { mutate: updateNews, isLoading: updateLoading } = useAPIUpdateNews();
   const { mutate: deleteNews } = useAPIDeleteNews();
   const [news, setNews] = useState(data?.news);
+  const [isOpen, setModal] = useState(false);
 
   const initialValues: Partial<TopNews> = {
     title: '',
@@ -123,65 +134,11 @@ const NewsAdmin: React.VFC = () => {
           },
         });
       }
+      setModal(false);
     },
   });
 
   const newsExistence = !(page === '1' && !data?.news?.length && !isLoading);
-
-  const form = (
-    <Box
-      ref={formRef}
-      mb="16px"
-      w="85vw"
-      maxW="800px"
-      flexDir={'column'}
-      display="flex"
-      alignItems={'flex-end'}>
-      <FormControl mb="8px">
-        <FormLabel>URL</FormLabel>
-        {errors.urlPath && touched.urlPath ? (
-          <FormLabel color="tomato">{errors.urlPath}</FormLabel>
-        ) : null}
-        <Input
-          bg="white"
-          value={values.urlPath}
-          onChange={handleChange}
-          name="urlPath"
-          placeholder="イベント詳細/Wiki詳細/アカウント詳細のいずれかのURLを入力してください"
-        />
-      </FormControl>
-      <FormControl mb="8px">
-        <FormLabel>タイトル(100文字以内)</FormLabel>
-        {errors.title && touched.title ? (
-          <FormLabel color="tomato">{errors.title}</FormLabel>
-        ) : null}
-        <Input
-          bg="white"
-          value={values.title}
-          onChange={handleChange}
-          name="title"
-          placeholder="タイトルを入力してください"
-        />
-      </FormControl>
-      <Box flexDir="row">
-        {newsExistence && (
-          <Button
-            onClick={() => {
-              setFormOpened(false);
-              reset();
-            }}
-            colorScheme="green"
-            size="md"
-            mr="8px">
-            閉じる
-          </Button>
-        )}
-        <Button onClick={() => handleSubmit()} colorScheme="pink" size="md">
-          作成
-        </Button>
-      </Box>
-    </Box>
-  );
 
   const onDeleteNews = (news: TopNews) => {
     if (confirm(`「${news.title}」を削除してよろしいですか？`)) {
@@ -247,6 +204,64 @@ const NewsAdmin: React.VFC = () => {
       <Head>
         <title>特集管理</title>
       </Head>
+      <Modal
+        size="5xl"
+        isOpen={isOpen}
+        onClose={() => {
+          setModal(false);
+          reset();
+        }}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>{isOpen ? '特集の編集' : '新規特集の作成'}</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <FormControl mb="20px">
+              <FormLabel fontWeight="bold">URL</FormLabel>
+              {errors.urlPath && touched.urlPath ? (
+                <FormLabel color="tomato">{errors.urlPath}</FormLabel>
+              ) : null}
+              <Input
+                bg="white"
+                value={values.urlPath}
+                onChange={handleChange}
+                name="urlPath"
+                placeholder="イベント詳細/Wiki詳細/アカウント詳細のいずれかのURLを入力してください"
+              />
+            </FormControl>
+            <FormControl mb="20px">
+              <FormLabel fontWeight="bold">タイトル(100文字以内)</FormLabel>
+              {errors.title && touched.title ? (
+                <FormLabel color="tomato">{errors.title}</FormLabel>
+              ) : null}
+              <Input
+                bg="white"
+                value={values.title}
+                onChange={handleChange}
+                name="title"
+                placeholder="タイトルを入力してください"
+              />
+            </FormControl>
+          </ModalBody>
+
+          <ModalFooter>
+            <Button onClick={() => handleSubmit()} mx="auto" colorScheme="blue">
+              作成
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+      <Box w="70px" mb={5} mr={3} ml="auto">
+        <Button
+          onClick={() => setModal(true)}
+          rounded={50}
+          w="80px"
+          h="35px"
+          colorScheme="blue"
+          rightIcon={<AiOutlinePlus />}>
+          作成
+        </Button>
+      </Box>
       <Box
         display="flex"
         flexDir="column"
@@ -254,62 +269,42 @@ const NewsAdmin: React.VFC = () => {
         alignItems="center"
         w={!isSmallerThan768 ? '100%' : '99vw'}
         mb="72px">
-        <Text color="blue.500" fontSize="16px" mb="8px">
+        {/* <Text color="blue.500" fontSize="16px" mb="8px">
           特集管理ではアプリのTOP画面に表示されるリンクの管理ができます
-        </Text>
+        </Text> */}
         {!newsExistence ? (
           <>
-            <Text mb="16px">
-              まだ特集が作成されていません。下のフォームから特集を作成してください。
+            <Text my="16px" fontSize={20}>
+              まだ特集が作成されていません。
             </Text>
-            {form}
           </>
         ) : (
           <>
-            {formOpened ? (
-              form
-            ) : (
-              <Box
-                display="flex"
-                justifyContent="flex-end"
-                w="85vw"
-                mb="16px"
-                maxW="1980px">
-                <Button
-                  colorScheme="pink"
-                  size="md"
-                  alignSelf="flex-end"
-                  onClick={() => setFormOpened(true)}>
-                  新規特集の作成
-                </Button>
-              </Box>
-            )}
             <Box
               w={'100%'}
+              bg="white"
               justifyContent={isSmallerThan768 ? 'flex-start' : 'center'}
               alignItems="center"
               display="flex"
               flexDir="column"
               overflowX="auto"
-              maxW="1980px"
-              minW="900px"
-              mx="auto"
               alignSelf="center">
               <Box
+                px={5}
                 display="flex"
                 flexDir="row"
                 w="100%"
-                h="40px"
+                h="50px"
                 border="1px"
                 alignItems="center"
                 mb="-1px">
-                <Text w="40%" fontWeight="bold" ml="5px">
+                <Text w="40%" fontWeight="bold" ml="5px" color={darkFontColor}>
                   URL
                 </Text>
-                <Text w="20%" fontWeight="bold">
+                <Text w="20%" fontWeight="bold" color={darkFontColor}>
                   タイトル
                 </Text>
-                <Text w="20%" fontWeight="bold">
+                <Text w="20%" fontWeight="bold" color={darkFontColor}>
                   作成日
                 </Text>
               </Box>
@@ -341,43 +336,52 @@ const NewsAdmin: React.VFC = () => {
                                   w="100%"
                                   border="1px"
                                   h="40px"
+                                  px={5}
                                   alignItems="center"
                                   mb={i + 1 < news.length ? '-1px' : '0px'}>
-                                  <Box w="40%" color="blue" ml="5px">
+                                  <Box
+                                    w="40%"
+                                    color="blue"
+                                    ml="5px"
+
+                                    // whiteSpace="nowrap"
+                                  >
                                     <NextLink href={n.urlPath}>
                                       <a target="_blank">
                                         {location.origin + n.urlPath}
                                       </a>
                                     </NextLink>
                                   </Box>
-                                  <Box w="20%">{n.title}</Box>
-                                  <Box w="20%">
+                                  <Box
+                                    w="20%"
+                                    // whiteSpace="nowrap"
+                                  >
+                                    {n.title}
+                                  </Box>
+                                  <Box
+                                    w="20%"
+                                    // whiteSpace="nowrap"
+                                  >
                                     {dateTimeFormatterFromJSDDate({
                                       dateTime: new Date(n.createdAt),
                                       format: 'yyyy/LL/dd HH:mm',
                                     })}
                                   </Box>
-                                  <Box w="10%">
+                                  <Box display="flex" ml="auto">
                                     <Link
                                       onClick={() => {
                                         setValues({
                                           ...n,
                                           urlPath: location.origin + n.urlPath,
                                         });
-                                        setFormOpened(true);
+                                        setModal(true);
                                       }}>
-                                      <BsPencilSquare
-                                        size={24}
-                                        color={darkFontColor}
-                                      />
+                                      <FiEdit2 size={24} />
                                     </Link>
-                                  </Box>
-                                  <Box w="10%">
-                                    <Link onClick={() => onDeleteNews(n)}>
-                                      <MdDelete
-                                        size={24}
-                                        color={darkFontColor}
-                                      />
+                                    <Link
+                                      ml={3}
+                                      onClick={() => onDeleteNews(n)}>
+                                      <RiDeleteBin6Line size={24} />
                                     </Link>
                                   </Box>
                                 </Box>

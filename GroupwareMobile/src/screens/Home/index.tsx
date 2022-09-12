@@ -106,7 +106,11 @@ const Home: React.FC = () => {
         rightButtonName={'ログアウト'}
         onPressRightButton={handleLogout}
       />
-      <ScrollDiv mt="lg">
+
+      <ScrollDiv pt="lg" px="5%">
+        <Text mb={'sm'} fontWeight="bold" fontSize={18}>
+          新着の特集記事
+        </Text>
         <Div
           bg="white"
           rounded="md"
@@ -116,10 +120,7 @@ const Home: React.FC = () => {
           mb="lg"
           py="lg"
           px="lg"
-          w={windowWidth * 0.9}>
-          <Text mb={'sm'} fontWeight="bold" fontSize={16}>
-            新着の特集記事
-          </Text>
+          w="100%">
           {newsForScroll.length ? (
             newsForScroll.map((news, index) =>
               index < newsIndex * 5 ? (
@@ -169,172 +170,6 @@ const Home: React.FC = () => {
             )}
           </TouchableHighlight>
         </Div>
-        <Div flexDir="row" justifyContent="center" alignItems="center">
-          <Div mb={8} mr={4}>
-            <PortalLinkBox
-              type="chat"
-              onPress={() => {
-                navigation.navigate('ChatStack', {
-                  screen: 'RoomList',
-                });
-              }}
-            />
-          </Div>
-          <Div mb={8} mr={4}>
-            <PortalLinkBox
-              type="wiki"
-              onPress={() => {
-                navigation.navigate('WikiStack', {
-                  screen: 'WikiLinks',
-                });
-              }}
-            />
-          </Div>
-          <Div mb={8}>
-            <PortalLinkBox
-              type="account"
-              onPress={() => {
-                navigation.navigate('AccountStack', {
-                  screen: 'AccountDetail',
-                });
-              }}
-            />
-          </Div>
-        </Div>
-        {/* <Div flexDir="row" justifyContent="center" alignItems="center">
-          <Div mb={8} mr={4}>
-            <PortalLinkBox
-              type="impressive_university"
-              onPress={() =>
-                navigation.navigate('EventStack', {
-                  screen: 'EventIntroduction',
-                  params: {type: EventType.IMPRESSIVE_UNIVERSITY},
-                })
-              }
-            />
-          </Div>
-          <Div mb={8} mr={4}>
-            <PortalLinkBox
-              type="study_meeting"
-              onPress={() =>
-                navigation.navigate('EventStack', {
-                  screen: 'EventIntroduction',
-                  params: {type: EventType.STUDY_MEETING},
-                })
-              }
-            />
-          </Div>
-          <Div mb={8}>
-            <PortalLinkBox
-              type="bolday"
-              onPress={() =>
-                navigation.navigate('EventStack', {
-                  screen: 'EventIntroduction',
-                  params: {type: EventType.BOLDAY},
-                })
-              }
-            />
-          </Div>
-        </Div> */}
-        <Div flexDir="row" justifyContent="center" alignItems="center">
-          <Div mb={8} mr={4}>
-            <PortalLinkBox
-              type="attendance"
-              onPress={() => {
-                navigation.navigate('AttendanceStack', {
-                  screen: 'AttendanceHome',
-                });
-              }}
-            />
-          </Div>
-          <Div mb={8} mr={4}>
-            <PortalLinkBox
-              type="my_schedule"
-              onPress={() => {
-                navigation.navigate('EventStack', {
-                  screen: 'EventList',
-                  params: {personal: true},
-                });
-              }}
-            />
-          </Div>
-          <Div mb={8}>
-            <PortalLinkBox
-              type="users"
-              onPress={() => {
-                navigation.navigate('UsersStack', {
-                  screen: 'UserList',
-                  params: {},
-                });
-              }}
-            />
-          </Div>
-        </Div>
-        <Div flexDir="row" justifyContent="center" alignItems="center">
-          <Div mb={8} mr={4}>
-            <PortalLinkBox
-              type="coach"
-              onPress={() =>
-                navigation.navigate('EventStack', {
-                  screen: 'EventIntroduction',
-                  params: {type: EventType.COACH},
-                })
-              }
-            />
-          </Div>
-          <Div mb={8} mr={4}>
-            <PortalLinkBox
-              type="club"
-              onPress={() =>
-                navigation.navigate('EventStack', {
-                  screen: 'EventIntroduction',
-                  params: {type: EventType.CLUB},
-                })
-              }
-            />
-          </Div>
-          <Div mb={8}>
-            <PortalLinkBox
-              type="submission_etc"
-              onPress={() =>
-                navigation.navigate('EventStack', {
-                  screen: 'EventList',
-                  params: {type: EventType.SUBMISSION_ETC},
-                })
-              }
-            />
-          </Div>
-        </Div>
-
-        {/* <Div flexDir="row" justifyContent="center" alignItems="center">
-          <Div mb={8} mr={4}>
-            <PortalLinkBox
-              type="study_meeting"
-              onPress={() =>
-                navigation.navigate('EventStack', {
-                  screen: 'EventIntroduction',
-                  params: {type: EventType.STUDY_MEETING},
-                })
-              }
-            />
-          </Div>
-          <Div mb={8} mr={4}>
-            <PortalLinkBox
-              type="safety_confirmation"
-              onPress={() => {
-                Alert.alert('近日公開予定です');
-              }}
-            />
-          </Div>
-          <Div mb={8}>
-            <PortalLinkBox
-              type="salary"
-              onPress={() => {
-                Alert.alert('今後実装予定です');
-              }}
-            />
-          </Div>
-        </Div> */}
       </ScrollDiv>
     </WholeContainer>
   );

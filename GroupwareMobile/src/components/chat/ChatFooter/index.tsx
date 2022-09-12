@@ -194,6 +194,11 @@ const ChatFooter: React.FC<ChatFooterProps> = ({
     </Fragment>
   );
 
+  const sendable = useMemo(() => {
+    return !!parseContent.parts?.[0]?.text;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [parseContent.parts?.[0]?.text]);
+
   return (
     <Div flexDir="column">
       {(
@@ -276,12 +281,15 @@ const ChatFooter: React.FC<ChatFooterProps> = ({
         {isLoading ? (
           <ActivityIndicator />
         ) : (
-          <TouchableOpacity onPress={onSend}>
+          <TouchableOpacity
+            onPress={() => {
+              sendable && onSend();
+            }}>
             <Icon
               name="send"
               fontFamily="Ionicons"
               fontSize={21}
-              color={parseContent.parts?.[0]?.text ? 'blue600' : 'gray'}
+              color={sendable ? 'blue600' : 'gray'}
             />
           </TouchableOpacity>
         )}

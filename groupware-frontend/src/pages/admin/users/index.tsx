@@ -8,11 +8,13 @@ import { useAPIUpdateUser } from '@/hooks/api/user/useAPIUpdateUser';
 import { useAPIDeleteUser } from '@/hooks/api/user/useAPIDeleteUser';
 import {
   Avatar,
+  Box,
   Button,
   Progress,
   Select,
   Text,
   Link as ChakraLink,
+  useMediaQuery,
 } from '@chakra-ui/react';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
@@ -34,6 +36,12 @@ import { userRoleNameFactory } from 'src/utils/factory/userRoleNameFactory';
 import { blueColor } from 'src/utils/colors';
 import { FaPen } from 'react-icons/fa';
 import { RiDeleteBin6Line } from 'react-icons/ri';
+import {
+  userRoleNameToValue,
+  userRoleValueToName,
+} from 'src/utils/userRoleFommater';
+import { AiOutlinePlus } from 'react-icons/ai';
+import { FiEdit2 } from 'react-icons/fi';
 import { MdWork } from 'react-icons/md';
 import { userNameFactory } from 'src/utils/factory/userNameFactory';
 
@@ -45,6 +53,7 @@ const UserAdmin: React.FC = () => {
   const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
   const { data: users, refetch, isLoading } = useAPISearchUsers(query);
   const { user } = useAuthenticate();
+  const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
   const { mutate: updateUser } = useAPIUpdateUser({
     onSuccess: () => {
       refetch();
@@ -121,20 +130,43 @@ const UserAdmin: React.FC = () => {
       <Head>
         <title>sample | ユーザー管理</title>
       </Head>
-      <div className={userAdminStyles.search_form_wrapper}>
-        <SearchForm
-          onClear={() => setSelectedTags([])}
-          onClickButton={(w) => queryRefresh({ page: '1', word: w })}
-          tags={tags || []}
-          selectedTags={selectedTags}
-          toggleTag={onToggleTag}
-        />
-        {!isLoading && !users?.users.length && (
-          <Text alignItems="center" textAlign="center" mb={4}>
-            検索結果が見つかりませんでした
-          </Text>
-        )}
-      </div>
+      <SearchForm
+        onClear={() => setSelectedTags([])}
+        onClickButton={(w) => queryRefresh({ page: '1', word: w })}
+        tags={tags || []}
+        selectedTags={selectedTags}
+        toggleTag={onToggleTag}
+        selectItems={[
+          '全て',
+          '管理者',
+          '一般社員',
+          'コーチ',
+          '講師(社員)',
+          '講師(外部)',
+        ]}
+        selectingItem={userRoleValueToName(query.role)}
+        onSelect={(e) =>
+          queryRefresh({
+            page: '1',
+            role: userRoleNameToValue(e.target.value),
+          })
+        }
+      />
+      {!isLoading && !users?.users.length && (
+        <Text alignItems="center" textAlign="center" mb={4}>
+          検索結果が見つかりませんでした
+        </Text>
+      )}
+      <ChakraLink w="70px" mb={5} mr={3} ml="auto" href="/admin/users/new">
+        <Button
+          rounded={50}
+          w="80px"
+          h="35px"
+          colorScheme="blue"
+          rightIcon={<AiOutlinePlus />}>
+          作成
+        </Button>
+      </ChakraLink>
       <div className={userAdminStyles.table_wrapper}>
         <table className={userAdminStyles.table}>
           <tbody>
@@ -142,11 +174,14 @@ const UserAdmin: React.FC = () => {
               <th className={userAdminStyles.table_head} />
               <th className={userAdminStyles.table_head}>姓</th>
               <th className={userAdminStyles.table_head}>名</th>
-              <th className={userAdminStyles.table_head}>メールアドレス</th>
+              {!isSmallerThan768 ? (
+                <th className={userAdminStyles.table_head}>メールアドレス</th>
+              ) : null}
+              {/* <th className={userAdminStyles.table_head}>メールアドレス</th> */}
               <th className={userAdminStyles.table_head}>社員区分</th>
-              <th className={userAdminStyles.table_head}>認証</th>
               <th className={userAdminStyles.table_head}>勤怠</th>
               <th className={userAdminStyles.table_head}>編集</th>
+              <th className={userAdminStyles.table_head}>削除</th>
               <th className={userAdminStyles.table_head} />
             </tr>
             {users?.users?.map((u) => (
@@ -162,49 +197,12 @@ const UserAdmin: React.FC = () => {
                 <td className={userAdminStyles.user_info_text}>
                   {u.firstName}
                 </td>
-                <td className={userAdminStyles.user_info_text}>{u.email}</td>
+                {!isSmallerThan768 ? (
+                  <td className={userAdminStyles.user_info_text}>{u.email}</td>
+                ) : null}
+                {/* <td className={userAdminStyles.user_info_text}>{u.email}</td> */}
                 <td className={userAdminStyles.user_info_text}>
-                  <Select
-                    name="roles"
-                    colorScheme="teal"
-                    bg="white"
-                    width="80%"
-                    className={userAdminStyles.roles}
-                    onChange={(e) =>
-                      updateUser({ ...u, role: e.target.value as UserRole })
-                    }
-                    defaultValue={u.role}>
-                    <option value={UserRole.ADMIN}>管理者</option>
-                    <option value={UserRole.EXTERNAL_INSTRUCTOR}>
-                      {userRoleNameFactory(UserRole.EXTERNAL_INSTRUCTOR)}
-                    </option>
-                    <option value={UserRole.INTERNAL_INSTRUCTOR}>
-                      {userRoleNameFactory(UserRole.INTERNAL_INSTRUCTOR)}
-                    </option>
-                    <option value={UserRole.COACH}>コーチ</option>
-                    <option value={UserRole.COMMON}>一般社員</option>
-                  </Select>
-                </td>
-                <td className={userAdminStyles.verified_button_wrapper}>
-                  {u.verifiedAt ? (
-                    <Button
-                      colorScheme="green"
-                      height="32px"
-                      onClick={() =>
-                        updateUser({ ...u, verifiedAt: new Date() })
-                      }>
-                      認証済み
-                    </Button>
-                  ) : (
-                    <Button
-                      colorScheme="green"
-                      height="32px"
-                      onClick={() =>
-                        updateUser({ ...u, verifiedAt: new Date() })
-                      }>
-                      承認する
-                    </Button>
-                  )}
+                  {userRoleValueToName(u.role)}
                 </td>
 
                 <td className={userAdminStyles.delete_icon_wrapper}>
@@ -220,9 +218,9 @@ const UserAdmin: React.FC = () => {
                 <td className={userAdminStyles.delete_icon_wrapper}>
                   <Link href={`/admin/users/editProfile/${u.id}`} passHref>
                     <a>
-                      <FaPen
+                      <FiEdit2
                         className={userAdminStyles.delete_icon}
-                        color={blueColor}
+                        // color={blueColor}
                       />
                     </a>
                   </Link>
@@ -232,7 +230,7 @@ const UserAdmin: React.FC = () => {
                   <RiDeleteBin6Line
                     onClick={() => onDeleteClicked(u)}
                     className={userAdminStyles.delete_icon}
-                    color="tomato"
+                    // color="tomato"
                   />
                 </td>
               </tr>

@@ -1,5 +1,5 @@
 import React, { ReactNode } from 'react';
-import { RiAccountCircleFill } from 'react-icons/ri';
+import { RiAccountCircleFill, RiLogoutBoxRLine } from 'react-icons/ri';
 import { HiHome } from 'react-icons/hi';
 import { BiCalendarEvent } from 'react-icons/bi';
 import { BsChatDotsFill } from 'react-icons/bs';
@@ -9,12 +9,40 @@ import clsx from 'clsx';
 import { useAuthenticate } from 'src/contexts/useAuthenticate';
 import { UserRole } from 'src/types';
 import Link from 'next/link';
-import { AiFillTags, AiOutlineGlobal } from 'react-icons/ai';
+import {
+  AiFillEdit,
+  AiFillTags,
+  AiOutlineGlobal,
+  AiOutlineLogout,
+  AiOutlineRight,
+} from 'react-icons/ai';
+import {
+  Box,
+  Badge,
+  Avatar,
+  Text,
+  Menu,
+  MenuButton,
+  MenuList,
+  Button,
+  MenuItem,
+  MenuDivider,
+} from '@chakra-ui/react';
+// import { Menu, MenuItem, MenuButton, MenuDivider,  MenuList, } from '@szhsin/react-menu';
 import { GiCancel } from 'react-icons/gi';
 import { useMediaQuery } from '@chakra-ui/media-query';
 import { MdWork } from 'react-icons/md';
-import { Box, Badge } from '@chakra-ui/react';
 import { useHandleBadge } from 'src/contexts/badge/useHandleBadge';
+import { AiOutlineDoubleLeft } from 'react-icons/ai';
+import Image from 'next/image';
+import valleyinLogo from '@/public/valleyin-logo.png';
+import router from 'next/router';
+import { darkFontColor } from 'src/utils/colors';
+import { useAPILogout } from '@/hooks/api/auth/useAPILogout';
+import { axiosInstance } from 'src/utils/url';
+import { jsonHeader } from 'src/utils/url/header';
+import { GrLogout } from 'react-icons/gr';
+import { IoSettingsSharp } from 'react-icons/io5';
 
 export enum SidebarScreenName {
   ACCOUNT = 'アカウント',
@@ -32,7 +60,7 @@ export enum SidebarScreenName {
 export type SidebarProps = {
   activeScreenName?: SidebarScreenName;
   isDrawerOpen?: boolean;
-  hideDrawer?: () => void;
+  hideDrawer: () => void;
 };
 
 type LinkWithIconProps = {
@@ -50,7 +78,12 @@ export const LinkWithIcon: React.FC<LinkWithIconProps> = ({
 }) => {
   return (
     <Link href={screenName}>
-      <a className={sidebarStyles.icon_with_name}>
+      <a
+        className={
+          isActive
+            ? sidebarStyles.icon_with_name__active
+            : sidebarStyles.icon_with_name__disable
+        }>
         {icon}
         <p
           className={
@@ -65,41 +98,45 @@ export const LinkWithIcon: React.FC<LinkWithIconProps> = ({
   );
 };
 
-const Sidebar: React.FC<SidebarProps> = ({
-  activeScreenName,
-  isDrawerOpen,
-  hideDrawer,
-}) => {
+const Sidebar: React.FC<SidebarProps> = ({ activeScreenName, hideDrawer }) => {
   const iconClass = (isActive: boolean) =>
     isActive
       ? clsx(sidebarStyles.icon, sidebarStyles.icon__active)
       : clsx(sidebarStyles.icon, sidebarStyles.icon__disable);
   const { user } = useAuthenticate();
-  const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
   const { unreadChatCount } = useHandleBadge();
+  const { mutate: logout } = useAPILogout({
+    onSuccess: () => {
+      const removeLocalStorage = async () => {
+        await Promise.resolve();
+        localStorage.removeItem('userToken');
+        axiosInstance.defaults.headers = jsonHeader;
+      };
+      removeLocalStorage();
+      router.push('/login');
+    },
+  });
 
   return (
     <>
-      {isDrawerOpen && (
-        <GiCancel
-          onClick={() => {
-            if (hideDrawer) hideDrawer();
-          }}
-          className={sidebarStyles.cancel_icon}
-        />
-      )}
-      <div
-        className={
-          isSmallerThan768
-            ? clsx(
-                sidebarStyles.sidebar_responsive,
-                !isDrawerOpen && sidebarStyles.sidebar_responsive__disable,
-              )
-            : sidebarStyles.sidebar
-        }>
+      <div className={sidebarStyles.sidebar}>
         <div>
+          <div className={sidebarStyles.top_item}>
+            <div className={sidebarStyles.bold_logo_and_text}>
+              <div className={sidebarStyles.bold_logo}>
+                <Image src={valleyinLogo} alt="bold logo" />
+              </div>
+              <p className={sidebarStyles.logo_text}>Valleyin</p>
+            </div>
+            <AiOutlineDoubleLeft
+              className={sidebarStyles.outline_double_left}
+              onClick={hideDrawer}
+            />
+          </div>
+
           <LinkWithIcon
             screenName="/"
+            isActive={activeScreenName === SidebarScreenName.HOME}
             icon={
               <HiHome
                 className={iconClass(
@@ -111,6 +148,7 @@ const Sidebar: React.FC<SidebarProps> = ({
           />
           <LinkWithIcon
             screenName="/event/list?from=&to="
+            isActive={activeScreenName === SidebarScreenName.EVENT}
             icon={
               <BiCalendarEvent
                 className={iconClass(
@@ -121,7 +159,8 @@ const Sidebar: React.FC<SidebarProps> = ({
             iconName={SidebarScreenName.EVENT}
           />
           <LinkWithIcon
-            screenName="/wiki"
+            screenName="/wiki/list?page=1&tag=&word=&status=undefined&type="
+            isActive={activeScreenName === SidebarScreenName.QA}
             icon={
               <AiOutlineGlobal
                 className={iconClass(activeScreenName === SidebarScreenName.QA)}
@@ -131,6 +170,7 @@ const Sidebar: React.FC<SidebarProps> = ({
           />
           <LinkWithIcon
             screenName="/users/list"
+            isActive={activeScreenName === SidebarScreenName.USERS}
             icon={
               <FaUsers
                 className={iconClass(
@@ -142,8 +182,9 @@ const Sidebar: React.FC<SidebarProps> = ({
           />
           <LinkWithIcon
             screenName="/chat"
+            isActive={activeScreenName === SidebarScreenName.CHAT}
             icon={
-              <Box display="flex">
+              <Box display="flex" alignItems="center">
                 <BsChatDotsFill
                   className={iconClass(
                     activeScreenName === SidebarScreenName.CHAT,
@@ -153,30 +194,20 @@ const Sidebar: React.FC<SidebarProps> = ({
                   <Badge
                     bg="red"
                     color="white"
-                    w="20px"
-                    h="20px"
+                    fontSize={10}
+                    minW="22px"
+                    h="22px"
                     position="fixed"
                     borderRadius="50%"
                     textAlign="center"
-                    lineHeight="20px"
-                    ml="40px">
+                    lineHeight="22px"
+                    ml="170px">
                     {unreadChatCount}
                   </Badge>
                 )}
               </Box>
             }
             iconName={SidebarScreenName.CHAT}
-          />
-          <LinkWithIcon
-            screenName={`/account/${user?.id}`}
-            icon={
-              <RiAccountCircleFill
-                className={iconClass(
-                  activeScreenName === SidebarScreenName.ACCOUNT,
-                )}
-              />
-            }
-            iconName={SidebarScreenName.ACCOUNT}
           />
           <LinkWithIcon
             screenName={`/attendance`}
@@ -189,8 +220,20 @@ const Sidebar: React.FC<SidebarProps> = ({
             }
             iconName={SidebarScreenName.ATTENDANCE}
           />
+          {/* <LinkWithIcon
+            screenName={`/account/${user?.id}`}
+            isActive={activeScreenName === SidebarScreenName.ACCOUNT}
+            icon={
+              <RiAccountCircleFill
+                className={iconClass(
+                  activeScreenName === SidebarScreenName.ACCOUNT,
+                )}
+              />
+            }
+            iconName={SidebarScreenName.ACCOUNT}
+          />
         </div>
-        {user?.role === UserRole.ADMIN ? (
+        {/* {user?.role === UserRole.ADMIN ? (
           <LinkWithIcon
             screenName="/admin/users"
             icon={
@@ -214,7 +257,85 @@ const Sidebar: React.FC<SidebarProps> = ({
             }
             iconName={SidebarScreenName.TAGADMIN}
           />
-        )}
+        )} */}
+          <Box>
+            <Menu>
+              {({ isOpen }) => (
+                <>
+                  <MenuButton
+                    // w="20px"
+                    // isActive={isOpen}
+                    bg="transparent"
+                    as={Box}
+                    // rightIcon={
+                    //   <AiOutlineRight size={20} color={darkFontColor} />
+                    // }
+                    className={sidebarStyles.login_user_item}>
+                    <div className={sidebarStyles.login_user_name_with_icon}>
+                      <Avatar
+                        size="xl"
+                        src={user?.avatarUrl}
+                        className={sidebarStyles.login_user_icon}
+                        width={'40px'}
+                        height={'40px'}
+                      />
+                      <Text color="black" fontWeight="bold">
+                        {user?.lastName} {user?.firstName}
+                      </Text>
+                      <Box ml="auto">
+                        <AiOutlineRight size={20} color={darkFontColor} />
+                      </Box>
+                    </div>
+                  </MenuButton>
+                  <MenuList borderWidth="2px">
+                    <MenuItem
+                      icon={<RiAccountCircleFill size={20} />}
+                      h={10}
+                      onClick={() => {
+                        router.push(`/account/${user?.id}`);
+                      }}>
+                      プロフィール
+                    </MenuItem>
+                    <MenuItem
+                      icon={<AiFillEdit size={20} />}
+                      h={10}
+                      onClick={() => {
+                        router.push('/account/profile');
+                      }}>
+                      プロフィール編集
+                    </MenuItem>
+                    <MenuItem
+                      icon={<IoSettingsSharp size={20} />}
+                      h={10}
+                      onClick={() => {
+                        router.push('/account/update-password');
+                      }}>
+                      パスワード変更
+                    </MenuItem>
+                    {user?.role === UserRole.ADMIN && (
+                      <MenuItem
+                        icon={<FaUserCog size={20} />}
+                        h={10}
+                        onClick={() => {
+                          router.push('/admin/users');
+                        }}>
+                        管理者ページ
+                      </MenuItem>
+                    )}
+                    <MenuDivider />
+                    <MenuItem
+                      icon={<RiLogoutBoxRLine size={20} />}
+                      onClick={() => {
+                        logout();
+                      }}>
+                      ログアウト
+                    </MenuItem>
+                  </MenuList>
+                </>
+              )}
+            </Menu>
+          </Box>
+        </div>
       </div>
     </>
   );

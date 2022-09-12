@@ -42,16 +42,16 @@ export default function Home() {
           <PortalLinkBox href={PortalLinkType.CHAT} />
         </div>
         <div className={homeStyles.box_wrapper}>
-          <PortalLinkBox href={PortalLinkType.ATTENDANCE} />
-        </div>
-        <div className={homeStyles.box_wrapper}>
-          <PortalLinkBox href={PortalLinkType.WIKI} />
-        </div>
-        <div className={homeStyles.box_wrapper}>
           <PortalLinkBox href={PortalLinkType.ACCOUNT} />
         </div>
         <div className={homeStyles.box_wrapper}>
           <PortalLinkBox href={PortalLinkType.MYSCHEDULE} />
+        </div>
+        <div className={homeStyles.box_wrapper}>
+          <PortalLinkBox href={PortalLinkType.ATTENDANCE} />
+        </div>
+        <div className={homeStyles.box_wrapper}>
+          <PortalLinkBox href={PortalLinkType.WIKI} />
         </div>
         <div className={homeStyles.box_wrapper}>
           <PortalLinkBox href={PortalLinkType.SUBMISSION_ETC} />

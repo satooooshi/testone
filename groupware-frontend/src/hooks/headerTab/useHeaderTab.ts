@@ -1,6 +1,6 @@
 import { NextRouter } from 'next/router';
 import { useMemo } from 'react';
-import { EventType, RuleCategory, User, WikiType } from 'src/types';
+import { EventType, RuleCategory, User, UserRole, WikiType } from 'src/types';
 import { EventTab, Tab, TabName } from 'src/types/header/tab/types';
 
 type HeaderTab =
@@ -8,13 +8,14 @@ type HeaderTab =
   | 'account'
   | 'home'
   | 'wiki'
+  | 'userList'
   | 'admin'
   | 'mention'
   | 'newUser'
   | 'chatDetail'
   | 'qaForm'
   | 'eventDetail'
-  | 'adminEventDetail'
+  // | 'adminEventDetail'
   | 'wikiDetail'
   | 'tagEdit'
   | 'wikiList';
@@ -30,7 +31,10 @@ type HeaderTabBehavior = {
   isSmallerThan768?: boolean;
   setActiveTab?: (value: React.SetStateAction<TabName>) => void;
   onDeleteClicked?: () => void;
+  onEditClicked?: () => void;
+  onCreateClicked?: () => void;
   type?: WikiType;
+  previousUrl?: string;
 };
 
 const headerTab = (headerTabBehavior: HeaderTabBehavior): Tab[] => {
@@ -45,6 +49,9 @@ const headerTab = (headerTabBehavior: HeaderTabBehavior): Tab[] => {
     isSmallerThan768,
     setActiveTab,
     onDeleteClicked,
+    onEditClicked,
+    onCreateClicked,
+    previousUrl,
   } = headerTabBehavior;
 
   const headerTabName = '内容を編集';
@@ -52,6 +59,30 @@ const headerTab = (headerTabBehavior: HeaderTabBehavior): Tab[] => {
   switch (headerTabType) {
     case 'event':
       return [
+        {
+          name: 'カレンダー',
+          onClick: () => {
+            if (queryRefresh)
+              queryRefresh({
+                page: '1',
+                personal,
+                from: from || '',
+                to: to || '',
+              });
+          },
+        },
+        {
+          name: 'リスト',
+          onClick: () => {
+            if (queryRefresh)
+              queryRefresh({
+                page: '1',
+                personal,
+                from: undefined,
+                to: undefined,
+              });
+          },
+        },
         {
           name: EventTab.ALL,
           onClick: () => {
@@ -117,34 +148,30 @@ const headerTab = (headerTabBehavior: HeaderTabBehavior): Tab[] => {
               });
           },
         },
+        {
+          type: 'create',
+          name: '作成',
+          onClick: onCreateClicked,
+        },
       ];
     case 'account':
       return [
         {
-          type: 'link',
-          name: 'アカウント情報',
-          href: `/account/${user?.id}`,
-        },
-        {
-          type: 'link',
-          name: 'プロフィール編集',
-          href: '/account/profile',
-        },
-        {
-          type: 'link',
-          name: 'パスワード更新',
-          href: '/account/update-password',
+          type: 'backButton',
+          name: '戻る',
+          href:
+            previousUrl?.indexOf('/users/list') !== -1
+              ? previousUrl
+              : '/users/list',
         },
       ];
     case 'home':
       return [
         {
-          type: 'link',
           name: 'ダッシュボード',
           href: '/',
         },
         {
-          type: 'link',
           name: 'メンション一覧',
           href: '/mention',
         },
@@ -152,45 +179,75 @@ const headerTab = (headerTabBehavior: HeaderTabBehavior): Tab[] => {
     case 'wiki':
       return [
         {
-          type: 'link',
           name: '社内Wiki Home',
           href: '/wiki',
+        },
+      ];
+    case 'userList':
+      return [
+        {
+          name: '全て',
+          onClick: () => {
+            if (queryRefresh) queryRefresh({ role: undefined, page: '1' });
+          },
+        },
+        {
+          name: '管理者',
+          onClick: () => {
+            if (queryRefresh) queryRefresh({ role: UserRole.ADMIN, page: '1' });
+          },
+        },
+        {
+          name: '一般社員',
+          onClick: () => {
+            if (queryRefresh)
+              queryRefresh({ role: UserRole.COMMON, page: '1' });
+          },
+        },
+        {
+          name: 'コーチ',
+          onClick: () => {
+            if (queryRefresh) queryRefresh({ role: UserRole.COACH, page: '1' });
+          },
+        },
+        {
+          name: '講師(社員)',
+          onClick: () => {
+            if (queryRefresh)
+              queryRefresh({ role: UserRole.INTERNAL_INSTRUCTOR, page: '1' });
+          },
+        },
+        {
+          name: '講師(外部)',
+          onClick: () => {
+            if (queryRefresh)
+              queryRefresh({ role: UserRole.EXTERNAL_INSTRUCTOR, page: '1' });
+          },
         },
       ];
     case 'admin':
       return [
         {
-          type: 'link',
           name: 'ユーザー管理',
           href: '/admin/users',
         },
         {
-          type: 'link',
-          name: 'ユーザー作成',
-          href: '/admin/users/new',
-        },
-        {
-          type: 'link',
           name: '勤怠報告管理',
           href: '/admin/attendance/verifyReport',
         },
         {
-          type: 'link',
           name: 'タグ管理',
           href: '/admin/tag',
         },
         {
-          type: 'link',
           name: 'タグ管理(ユーザー)',
           href: '/admin/tag/user',
         },
         {
-          type: 'link',
           name: '特集管理',
           href: '/admin/top-news',
         },
         {
-          type: 'link',
           name: 'CSV出力',
           href: '/admin/csv',
         },
@@ -198,12 +255,10 @@ const headerTab = (headerTabBehavior: HeaderTabBehavior): Tab[] => {
     case 'tagEdit':
       return [
         {
-          type: 'link',
           name: 'タグ管理',
           href: '/admin/tag',
         },
         {
-          type: 'link',
           name: 'タグ管理(ユーザー)',
           href: '/admin/tag/user',
         },
@@ -211,12 +266,10 @@ const headerTab = (headerTabBehavior: HeaderTabBehavior): Tab[] => {
     case 'mention':
       return [
         {
-          type: 'link',
           name: 'ダッシュボード',
           href: '/',
         },
         {
-          type: 'link',
           name: 'メンション一覧',
           href: '/mention',
         },
@@ -224,7 +277,6 @@ const headerTab = (headerTabBehavior: HeaderTabBehavior): Tab[] => {
     case 'newUser':
       return [
         {
-          type: 'link',
           name: '管理画面へ',
           href: '/admin/users',
         },
@@ -258,38 +310,59 @@ const headerTab = (headerTabBehavior: HeaderTabBehavior): Tab[] => {
     case 'eventDetail':
       return [
         {
-          type: 'link',
-          name: '一覧に戻る',
-          href: '/event/list',
-        },
-      ];
-    case 'adminEventDetail':
-      return [
-        {
-          type: 'link',
-          name: '一覧に戻る',
-          href: '/event/list',
+          type: 'backButton',
+          name: '戻る',
+          href:
+            previousUrl?.indexOf('/event/list') !== -1
+              ? previousUrl
+              : '/event/list?page=1&tag=&word=&status=past&from=2022-06-30&to=2022-08-07&personal=',
         },
         {
-          name: 'イベントを削除',
-          onClick: () => {
-            if (onDeleteClicked) onDeleteClicked();
-          },
-          color: 'red',
+          type: 'edit',
+          name: '編集する',
+          onClick: onEditClicked,
+        },
+        {
+          type: 'delete',
+          name: '削除する',
+          onClick: onDeleteClicked,
         },
       ];
+    // case 'adminEventDetail':
+    //   return [
+    //     {
+    //       type: 'backButton',
+    //       name: '戻る',
+    //       href: '/event/list',
+    //     },
+    //     {
+    //       type: 'delete',
+    //       name: '削除する',
+    //       onClick: () => {
+    //         if (onDeleteClicked) onDeleteClicked();
+    //       },
+    //     },
+    //   ];
     case 'wikiDetail':
       return [
         {
-          type: 'link',
-          name: 'Wiki一覧画面へ',
-          href: '/wiki/list?page=1&tag=&word=&status=new&type=',
+          type: 'backButton',
+          name: '戻る',
+          href:
+            previousUrl?.indexOf('/wiki/list') !== -1
+              ? previousUrl
+              : '/wiki/list',
+        },
+        {
+          type: 'edit',
+          name: '編集する',
+          onClick: onEditClicked,
         },
       ];
     case 'wikiList':
       return [
         {
-          name: 'All',
+          name: '全て',
           onClick: () => {
             {
               if (queryRefresh)
@@ -340,6 +413,11 @@ const headerTab = (headerTabBehavior: HeaderTabBehavior): Tab[] => {
                 });
             }
           },
+        },
+        {
+          type: 'create',
+          name: '作成',
+          onClick: onCreateClicked,
         },
       ];
   }

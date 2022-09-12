@@ -62,6 +62,7 @@ function MyApp({ Component, pageProps }: AppProps) {
       },
     },
   });
+
   const theme = {
     styles: {
       global: {
@@ -70,6 +71,22 @@ function MyApp({ Component, pageProps }: AppProps) {
           lineHeight: '100%',
           fontFamily:
             "'游ゴシック体', YuGothic, '游ゴシック', 'Yu Gothic', sans-serif",
+        },
+      },
+    },
+    components: {
+      Button: {
+        baseStyle: {
+          _focus: {
+            boxShadow: 'none',
+          },
+        },
+      },
+      Link: {
+        baseStyle: {
+          _focus: {
+            boxShadow: 'none',
+          },
         },
       },
     },

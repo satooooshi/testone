@@ -27,7 +27,7 @@ const TextMessage: React.FC<TextMessageProps> = ({
         rounded="xl"
         maxW={windowWidth * 0.6}
         minW={windowWidth * 0.4}
-        bg={message.isSender ? 'blue900' : 'white'}
+        bg={message.isSender ? 'blue600' : 'gray300'}
         p={8}
         justifyContent="center">
         {message.replyParentMessage && (

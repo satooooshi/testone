@@ -13,20 +13,19 @@ type TopTabBarProps = {
   topTabBehaviorList: TopTabBehavior[];
 };
 const TopTabBar: React.FC<TopTabBarProps> = ({ topTabBehaviorList }) => {
-  const tabCount = topTabBehaviorList.length;
-  const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
+  // const tabCount = topTabBehaviorList.length;
+  // const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
   return (
     <Box
-      mx="auto"
       alignSelf="center"
       display="flex"
       flexDir="row"
       alignItems="center"
-      w={isSmallerThan768 ? '100vw' : '80vw'}
-      px={isSmallerThan768 ? '5%' : undefined}
+      w="100%"
+      // w={isSmallerThan768 ? '100vw' : '80vw'}
       h="40px"
-      borderBottomWidth={1}
-      borderBottomColor={'gray.200'}
+      // borderBottomWidth={1}
+      // borderBottomColor={'gray.200'}
       overflowX="auto"
       css={hideScrollbarCss}>
       {topTabBehaviorList.map((topTabBehavior) => {
@@ -39,17 +38,16 @@ const TopTabBar: React.FC<TopTabBarProps> = ({ topTabBehaviorList }) => {
             justifyContent="center"
             alignItems="center"
             h="100%"
-            minW="160px"
-            mx="16px"
-            w={`${Math.floor(100 / tabCount)}%`}
             whiteSpace="nowrap"
-            color={topTabBehavior.isActiveTab ? 'blue.500' : darkFontColor}
+            mr={5}
+            color={topTabBehavior.isActiveTab ? 'blue.600' : darkFontColor}
             borderBottomWidth={topTabBehavior.isActiveTab ? 1 : undefined}
             _hover={{ textDecoration: 'none' }}
-            borderBottomColor={
-              topTabBehavior.isActiveTab ? 'blue.500' : 'gray.200'
-            }>
-            <Text pb="8px" fontSize={isSmallerThan768 ? '14px' : '16px'}>
+            borderBottomColor="blue.600">
+            <Text
+              pb="8px"
+              fontSize="16px"
+              fontWeight={topTabBehavior.isActiveTab ? 'bold' : ''}>
               {topTabBehavior.tabName}
             </Text>
           </Link>

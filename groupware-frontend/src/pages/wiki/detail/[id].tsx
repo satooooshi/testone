@@ -22,6 +22,9 @@ import {
   Link as ChakraLink,
   Flex,
   useToast,
+  Box,
+  Badge,
+  Heading,
 } from '@chakra-ui/react';
 import WrappedDraftEditor from '@/components/wiki/WrappedDraftEditor';
 import { ContentState, Editor, EditorState } from 'draft-js';
@@ -48,6 +51,7 @@ const QuestionDetail = () => {
   const { data: wiki, refetch } = useAPIGetWikiDetail(
     typeof id === 'string' ? id : '0',
   );
+  const [showingCommentCount, setShowingCommentCount] = useState(3);
   const [answerVisible, setAnswerVisible] = useState(false);
   const [answerReply, setAnswerReply] = useState<Partial<QAAnswerReply>>({});
   const draftEditor = useRef<Editor>(null);
@@ -104,8 +108,12 @@ const QuestionDetail = () => {
   const navigateToEditWiki = (id: number) => {
     router.push('/wiki/edit/' + id);
   };
-
-  const tabs: Tab[] = useHeaderTab({ headerTabType: 'wikiDetail' });
+  const previousUrl = document.referrer;
+  const tabs: Tab[] = useHeaderTab({
+    headerTabType: 'wikiDetail',
+    onEditClicked: wiki ? () => navigateToEditWiki(wiki.id) : undefined,
+    previousUrl,
+  });
 
   const handleClickStartInputtingReplyButton = (answer: QAAnswer) => {
     if (answerReply.answer?.id !== answer.id) {
@@ -178,6 +186,16 @@ const QuestionDetail = () => {
 
   const headerTitle = 'Wiki詳細';
 
+  const initialHeaderValue = {
+    title: 'Wiki詳細',
+    // rightButtonName:
+    //   myself?.id === wiki?.writer?.id || myself?.role === UserRole.ADMIN
+    //     ? 'Wikiを編集'
+    //     : undefined,
+    // onClickRightButton: wiki ? () => navigateToEditWiki(wiki.id) : undefined,
+    tabs: tabs,
+  };
+
   const isH2Str = (id: string) => {
     const target = document.getElementById(id);
     if (
@@ -247,58 +265,75 @@ const QuestionDetail = () => {
       }
     }, 50);
   }, [wiki?.body]);
-
   return (
     <LayoutWithTab
       sidebar={{ activeScreenName: SidebarScreenName.QA }}
-      header={{ title: headerTitle, tabs: tabs }}>
+      header={initialHeaderValue}>
       {wiki && wiki.writer ? (
-        <div className={qaDetailStyles.main}>
-          <Head>
-            <title>sample | {wiki ? wiki.title : headerTitle}</title>
-          </Head>
-          <div className={qaDetailStyles.title_wrapper}>
-            <p className={qaDetailStyles.title_text}>{wiki.title}</p>
-          </div>
-          {wiki && wiki.tags && wiki.tags.length ? (
-            <div className={qaDetailStyles.tags_wrapper}>
-              {wiki.tags.map((tag) => (
-                <Link href={`/wiki/list?tag=${tag.id}`} key={tag.id}>
-                  <a className={qaDetailStyles.tag}>
-                    <Button colorScheme={tagColorFactory(tag.type)} size="xs">
+        <Box mb={10} w="100%">
+          <Box bg="white" borderRadius={10} p={5} w="100%">
+            <Head>
+              <title>valleyin | {wiki ? wiki.title : headerTitle}</title>
+            </Head>
+            {wiki && wiki.tags && wiki.tags.length ? (
+              <div className={qaDetailStyles.tags_wrapper}>
+                {wiki.tags.map((tag) => (
+                  <Link href={`/wiki/list?tag=${tag.id}`} key={tag.id}>
+                    <Badge
+                      ml={1}
+                      p={2}
+                      as="sub"
+                      fontSize="x-small"
+                      display="flex"
+                      colorScheme={tagColorFactory(tag.type)}
+                      borderRadius={50}
+                      alignItems="center"
+                      variant="outline"
+                      borderWidth={1}>
                       {tag.name}
-                    </Button>
-                  </a>
-                </Link>
-              ))}
-            </div>
-          ) : null}
-          {headLinkContents &&
-          headLinkContents.length &&
-          !(
-            wiki.type === WikiType.BOARD &&
-            wiki.boardCategory === BoardCategory.QA
-          ) ? (
-            <Flex mb={'8px'} rounded="md" bg="white" flexDir="column" p="40px">
-              <Text fontWeight="bold" mb="16px" alignSelf="center">
-                目次
-              </Text>
-              {headLinkContents.map((content, index) => (
-                <ChakraLink
-                  mb={'8px'}
-                  pb={'2px'}
-                  pl={isH2Str((index + 1).toString()) ? '24px' : 0}
-                  _hover={{ borderBottom: '1px solid #b0b0b0' }}
-                  key={content}
-                  href={`#${index + 1}`}>
-                  {content}
-                </ChakraLink>
-              ))}
-            </Flex>
-          ) : null}
+                    </Badge>
+                  </Link>
+                ))}
+              </div>
+            ) : null}
+            <Heading my={3} size="lg">
+              {wiki.title}
+            </Heading>
+            {headLinkContents &&
+            headLinkContents.length &&
+            !(
+              wiki.type === WikiType.BOARD &&
+              wiki.boardCategory === BoardCategory.QA
+            ) ? (
+              <Flex
+                mb={'8px'}
+                rounded="md"
+                bg="white"
+                flexDir="column"
+                p="40px">
+                <Text fontWeight="bold" mb="16px" alignSelf="center">
+                  目次
+                </Text>
+                {headLinkContents.map((content, index) => (
+                  <ChakraLink
+                    mb={'8px'}
+                    pb={'2px'}
+                    pl={isH2Str((index + 1).toString()) ? '24px' : 0}
+                    _hover={{ borderBottom: '1px solid #b0b0b0' }}
+                    key={content}
+                    href={`#${index + 1}`}>
+                    {content}
+                  </ChakraLink>
+                ))}
+              </Flex>
+            ) : null}
 
-          <div className={qaDetailStyles.question_wrapper}>
-            <div id="wiki-body" className={qaDetailStyles.qa_wrapper}>
+            <Box
+              display="flex"
+              flexDir="column"
+              // alignItems="flex-end"
+              my={3}
+              w="100%">
               <WikiComment
                 textFormat={wiki.textFormat}
                 body={wiki.body}
@@ -306,36 +341,59 @@ const QuestionDetail = () => {
                 updatedAt={wiki.updatedAt}
                 writer={wiki.writer}
                 isWriter={isEditableWiki(wiki, user)}
-                onClickEditButton={() =>
-                  (myself?.id === wiki.writer?.id ||
-                    myself?.role === UserRole.ADMIN) &&
-                  navigateToEditWiki(wiki.id)
-                }
                 wiki={wiki}
               />
-            </div>
-          </div>
+            </Box>
+          </Box>
           {wiki.type === WikiType.BOARD ? (
-            <div className={qaDetailStyles.answer_count__wrapper}>
-              <p className={qaDetailStyles.answer_count}>
-                {wiki.boardCategory === BoardCategory.QA ? '回答' : 'コメント'}
-                {wiki.answers?.length ? wiki.answers.length : 0}件
-              </p>
-              <Button
-                size="sm"
-                colorScheme="teal"
-                onClick={() => {
-                  checkErrors('answer');
-                }}>
-                {wiki.boardCategory === BoardCategory.QA
-                  ? answerVisible
-                    ? '回答を投稿する'
-                    : '回答を追加'
-                  : answerVisible
-                  ? 'コメントを投稿する'
-                  : 'コメントを追加'}
-              </Button>
-            </div>
+            <Box
+              display="flex"
+              flexDir="row"
+              w="100%"
+              px={1}
+              alignItems="center"
+              justifyContent="space-between"
+              my={8}>
+              <Box alignSelf="center" display="flex" flexDir="row">
+                <Heading fontSize="20px">
+                  {wiki.boardCategory === BoardCategory.QA
+                    ? '回答'
+                    : 'コメント'}
+                </Heading>
+                {wiki.answers?.length ? (
+                  <Text fontSize="13px" ml={2} alignSelf="center">
+                    {wiki.answers.length}件
+                  </Text>
+                ) : null}
+              </Box>
+              <Box display="flex" flexDir="row">
+                <Button
+                  borderRadius={50}
+                  colorScheme="blue"
+                  size="sm"
+                  onClick={() => {
+                    checkErrors('answer');
+                  }}>
+                  {wiki.boardCategory === BoardCategory.QA
+                    ? answerVisible
+                      ? '回答を投稿する'
+                      : '回答を追加'
+                    : answerVisible
+                    ? 'コメントを投稿する'
+                    : 'コメントを追加'}
+                </Button>
+                {wiki.answers && showingCommentCount < wiki.answers.length && (
+                  <Heading
+                    onClick={() => setShowingCommentCount((c) => c + 2)}
+                    fontSize="16px"
+                    cursor="pointer"
+                    alignSelf="center"
+                    ml={4}>
+                    もっと見る
+                  </Heading>
+                )}
+              </Box>
+            </Box>
           ) : null}
           {answerVisible && (
             <WrappedDraftEditor
@@ -355,41 +413,48 @@ const QuestionDetail = () => {
           )}
           {wiki.answers && wiki.answers.length
             ? wiki.answers.map(
-                (answer) =>
+                (answer, index) =>
+                  index < showingCommentCount &&
                   answer.writer && (
                     <div
                       key={answer.id}
                       className={qaDetailStyles.answers_wrapper}>
-                      <div className={qaDetailStyles.qa_comment_wrapper}>
-                        <div className={qaDetailStyles.qa_wrapper}>
-                          <WikiComment
-                            bestAnswerButtonName={
-                              wiki.boardCategory === BoardCategory.QA
-                                ? wiki.bestAnswer?.id === answer.id
-                                  ? 'ベストアンサーに選ばれた回答'
-                                  : !wiki.resolvedAt &&
-                                    myself?.id === wiki.writer?.id
-                                  ? 'ベストアンサーに選ぶ'
-                                  : undefined
+                      <Box
+                        bg="white"
+                        p="10px"
+                        borderRadius={10}
+                        w="100%"
+                        mb={3}>
+                        <WikiComment
+                          bestAnswerButtonName={
+                            wiki.boardCategory === BoardCategory.QA
+                              ? wiki.bestAnswer?.id === answer.id
+                                ? 'ベストアンサーに選ばれた回答'
+                                : !wiki.resolvedAt &&
+                                  myself?.id === wiki.writer?.id
+                                ? 'ベストアンサーに選ぶ'
                                 : undefined
-                            }
-                            isExistsBestAnswer={wiki.bestAnswer ? true : false}
-                            onClickBestAnswerButton={() =>
-                              !wiki.bestAnswer &&
-                              createBestAnswer({ ...wiki, bestAnswer: answer })
-                            }
-                            body={answer.body}
-                            createdAt={answer.createdAt}
-                            updatedAt={answer.updatedAt}
-                            writer={answer.writer}
-                            isWriter={myself?.id === wiki.writer?.id}
-                            replyButtonName={'返信/追記'}
-                            onClickReplyButton={() =>
-                              handleClickStartInputtingReplyButton(answer)
-                            }
-                          />
-                        </div>
-                      </div>
+                              : undefined
+                          }
+                          isExistsBestAnswer={wiki.bestAnswer ? true : false}
+                          onClickBestAnswerButton={() =>
+                            !wiki.bestAnswer &&
+                            createBestAnswer({
+                              ...wiki,
+                              bestAnswer: answer,
+                            })
+                          }
+                          body={answer.body}
+                          createdAt={answer.createdAt}
+                          writer={answer.writer}
+                          isWriter={myself?.id === wiki.writer?.id}
+                          replyButtonName={'返信/追記'}
+                          onClickReplyButton={() =>
+                            handleClickStartInputtingReplyButton(answer)
+                          }
+                        />
+                      </Box>
+
                       {answerReply.answer &&
                       answerReply.answer.id === answer.id ? (
                         <WrappedDraftEditor
@@ -418,15 +483,22 @@ const QuestionDetail = () => {
                         </Button>
                       ) : null}
                       {answer.replies?.map((r) => (
-                        <div key={r.id} className={qaDetailStyles.reply}>
+                        <Box
+                          bg="white"
+                          key={r.id}
+                          p="10px"
+                          borderRadius={10}
+                          mb={5}>
+                          {/* <div key={r.id} className={qaDetailStyles.reply}> */}
                           <AnswerReply reply={r} />
-                        </div>
+                          {/* </div> */}
+                        </Box>
                       ))}
                     </div>
                   ),
               )
             : null}
-        </div>
+        </Box>
       ) : null}
     </LayoutWithTab>
   );

@@ -22,7 +22,7 @@ import {
   allPostalColor,
 } from '../../utils/colors';
 import {Text, Div, Icon} from 'react-native-magnus';
-import {TouchableHighlight, useWindowDimensions} from 'react-native';
+import {TouchableHighlight} from 'react-native';
 import {portalLinkBoxStyles} from '../../styles/component/portalLinkBox.style';
 
 type PortalType =
@@ -45,6 +45,8 @@ type PortalType =
   | 'salary'
   | 'users'
   | 'attendance'
+  | 'account'
+  | 'logout'
   | 'attendance_report'
   | 'application'
   | 'work'
@@ -55,8 +57,7 @@ type PortalLinkIconProps = {
 };
 
 const PortalLinkIcon: React.FC<PortalLinkIconProps> = ({type}) => {
-  const windowWidth = useWindowDimensions().width;
-  const iconSize = windowWidth * 0.1;
+  const iconSize = 30;
   switch (type) {
     case 'impressive_university':
       return (
@@ -204,6 +205,8 @@ const PortalLinkIcon: React.FC<PortalLinkIconProps> = ({type}) => {
           fontFamily="Feather"
         />
       );
+    case 'logout':
+      return <Icon name="logout" fontSize={iconSize} color="gray900" />;
     case 'application':
       return (
         <Icon
@@ -222,8 +225,6 @@ type PortarlLinkBoxProps = {
 };
 
 const PortalLinkBox: React.FC<PortarlLinkBoxProps> = ({type, onPress}) => {
-  const windowWidth = useWindowDimensions().width;
-  const boxWidth = windowWidth * 0.3;
   const eventTitleText = (href: PortalType): string => {
     switch (href) {
       case 'impressive_university':
@@ -266,6 +267,8 @@ const PortalLinkBox: React.FC<PortarlLinkBoxProps> = ({type, onPress}) => {
         return '社員名鑑';
       case 'attendance':
         return '勤怠打刻';
+      case 'logout':
+        return 'ログアウト';
       case 'application':
         return '入社前申請';
       case 'attendance_report':
@@ -274,52 +277,20 @@ const PortalLinkBox: React.FC<PortarlLinkBoxProps> = ({type, onPress}) => {
         return '';
     }
   };
-  // const descriptionText = (href: PortalType): string => {
-  //   switch (href) {
-  //     case 'impressive_university':
-  //       return '技術力と人間力を 毎日プロから学ぶことが出来る研修制度です。';
-  //     case 'study_meeting':
-  //       return '社員同士が教え合いながら、知識を深めていく勉強会です。';
-  //     case 'bolday':
-  //       return '社員同士が高めあう風土が生まれる帰社日';
-  //     case 'coach':
-  //       return '現場経験の豊富なエキスパート陣が、様々な視点から社員へアドバイスや指導を行います。';
-  //     case 'club':
-  //       return '12部活、11サークルが活動中。部活として認定された活動には部費を支給しています。フットサルやマラソン等のスポーツ系から、写真や料理等の文化系の部活まで様々な部活動があります。';
-  //     case 'submission_etc':
-  //       return '社内での提出物の日程を確認します';
-  //     case 'wiki':
-  //       return '社内規則/ナレッジ/Q&Aを共有する総合的な情報共有スペースです';
-  //     case 'rules':
-  //       return '社内規則を共有し、社員の業務を促進します';
-  //     case 'knowledge':
-  //       return '社員がお互いに効率的な業務を促進し知識共有スペースです。業務での不明点解決に役立ちます';
-  //     case 'qa':
-  //       return '社員同士が質問、回答しあい、他社員の質問や回答を通して自身の知見を更に深める事が出来ます。';
-  //     case 'chat':
-  //       return '気軽にチャット、連携しあい、業務の効率を高めます。';
-  //     case 'admin':
-  //       return '各ユーザーの管理を管理者権限で行ないます。';
-  //     case 'account':
-  //       return '自分のアカウント情報を編集します。';
-  //     default:
-  //       return '';
-  //   }
-  // };
 
   return (
     <TouchableHighlight onPress={onPress} style={portalLinkBoxStyles.wrapper}>
       <Div
         bg="white"
-        h={boxWidth}
-        w={boxWidth}
+        h={100}
+        w={'100%'}
+        rounded="xl"
         justifyContent="center"
-        p={8}
-        alignItems="center">
-        <Div mb={4}>
+        p={24}>
+        <Div mb={12} alignSelf="flex-start">
           <PortalLinkIcon type={type} />
         </Div>
-        <Text fontWeight="bold" fontSize={20}>
+        <Text fontWeight="bold" fontSize={16}>
           {eventTitleText(type)}
         </Text>
         {/* <Text fontSize="lg">{descriptionText(type)}</Text> */}

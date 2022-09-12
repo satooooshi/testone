@@ -17,20 +17,25 @@ import {
   Spinner,
   Text,
   Textarea,
+  Badge,
   useToast,
+  Heading,
+  useMediaQuery,
+  Image,
+  SimpleGrid,
+  Divider,
 } from '@chakra-ui/react';
 import Head from 'next/head';
 import { useAuthenticate } from 'src/contexts/useAuthenticate';
 import React from 'react';
 import { useAPICreateComment } from '@/hooks/api/event/useAPICreateComment';
-import EventCommentCard from '@/components/event/EventComment';
+import CommentCard from '@/components/common/Comment';
 import { Tab } from 'src/types/header/tab/types';
 import { dateTimeFormatterFromJSDDate } from 'src/utils/dateTimeFormatter';
 import generateYoutubeId from 'src/utils/generateYoutubeId';
 import { useMemo } from 'react';
 import { useAPIDeleteEvent } from '@/hooks/api/event/useAPIDeleteEvent';
 import { useAPIUpdateEvent } from '@/hooks/api/event/useAPIUpdateEvent';
-import Image from 'next/image';
 import noImage from '@/public/no-image.jpg';
 import { useHeaderTab } from '@/hooks/headerTab/useHeaderTab';
 import { EventFile, EventType, SubmissionFile, UserRole } from 'src/types';
@@ -57,6 +62,7 @@ import { darkFontColor } from 'src/utils/colors';
 import { isEditableEvent } from 'src/utils/factory/isCreatableEvent';
 import { MdCancel } from 'react-icons/md';
 import { useAPIDeleteSubmission } from '@/hooks/api/event/useAPIDeleteSubmission';
+import { hideScrollbarCss } from 'src/utils/chakra/hideScrollBar.css';
 import { componentDecorator } from 'src/utils/componentDecorator';
 
 type FileIconProps = {
@@ -88,6 +94,8 @@ const FileIcon: React.FC<FileIconProps> = ({ url, name, submitted }) => {
 };
 
 const EventDetail = () => {
+  const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
+  const [isSmallerThan1024] = useMediaQuery('(max-width: 1024px)');
   const router = useRouter();
   const { id } = router.query as { id: string };
   const { mutate: downloadEvent, isLoading: loadingEventCsv } =
@@ -96,6 +104,7 @@ const EventDetail = () => {
     useAPIDonwloadSubmissionZip();
   const [editModal, setEditModal] = useState(false);
   const [commentVisible, setCommentVisible] = useState(false);
+  const [showingCommentCount, setShowingCommentCount] = useState(3);
   const [newComment, setNewComment] = useState<string>('');
   const { user } = useAuthenticate();
   const {
@@ -111,9 +120,9 @@ const EventDetail = () => {
   const imageSource = useMemo(() => {
     switch (data?.type) {
       case EventType.STUDY_MEETING:
-        return <Image src={studyMeeting1Image} alt="イベント画像" />;
+        return <Image src={studyMeeting1Image.src} alt="イベント画像" />;
       case EventType.BOLDAY:
-        return <Image src={boldayImage1} alt="イベント画像" />;
+        return <Image src={boldayImage1.src} alt="イベント画像" />;
       case EventType.CLUB:
         return (
           <FcSportsMode
@@ -122,9 +131,9 @@ const EventDetail = () => {
           />
         );
       case EventType.IMPRESSIVE_UNIVERSITY:
-        return <Image src={impressiveUnivertyImage} alt="イベント画像" />;
+        return <Image src={impressiveUnivertyImage.src} alt="イベント画像" />;
       case EventType.COACH:
-        return <Image src={coachImage} alt="イベント画像" />;
+        return <Image src={coachImage.src} alt="イベント画像" />;
       case EventType.SUBMISSION_ETC:
         return (
           <MdAssignment
@@ -134,7 +143,7 @@ const EventDetail = () => {
         );
 
       default:
-        return <Image src={noImage} alt="イベント画像" />;
+        return <Image src={noImage.src} alt="イベント画像" />;
     }
   }, [data?.type]);
 
@@ -254,21 +263,22 @@ const EventDetail = () => {
 
   const doesntExist = !loadingEventDetail && (!data || !data?.id);
 
-  const tabs: Tab[] = useHeaderTab(
-    user?.role === UserRole.ADMIN && !doesntExist
-      ? {
-          headerTabType: 'adminEventDetail',
-          onDeleteClicked,
-        }
-      : {
-          headerTabType: 'eventDetail',
-        },
-  );
+  const previousUrl = document.referrer;
+  const tabs: Tab[] = useHeaderTab({
+    previousUrl,
+    headerTabType: 'eventDetail',
+    onDeleteClicked:
+      (user?.role === UserRole.ADMIN || user?.id === data?.author?.id) &&
+      !doesntExist
+        ? onDeleteClicked
+        : undefined,
+    onEditClicked: isEditable ? () => setEditModal(true) : undefined,
+  });
 
   const initialHeaderValue = {
     title: 'イベント詳細',
-    rightButtonName: isEditable ? 'イベントを編集' : undefined,
-    onClickRightButton: isEditable ? () => setEditModal(true) : undefined,
+    // rightButtonName: isEditable ? 'イベントを編集' : undefined,
+    // onClickRightButton: isEditable ? () => setEditModal(true) : undefined,
     tabs: tabs,
   };
 
@@ -299,42 +309,113 @@ const EventDetail = () => {
         createEvent={(newEvent) => saveEvent(newEvent)}
       />
       {data && data.id ? (
-        <div className={eventDetailStyles.main}>
-          <Head>
-            <title>sample | {data.title}</title>
-          </Head>
-          <div className={eventDetailStyles.all_wrapper}>
-            <div className={eventDetailStyles.event_info_wrapper}>
-              <div className={eventDetailStyles.event_info_left}>
+        <Box
+          w="100%"
+          pb="20px"
+          display="flex"
+          flexDir="column"
+          justifyContent="space-between">
+          <Box
+            w="100%"
+            display="flex"
+            flexDir="column"
+            justifyContent="space-between"
+            p={5}
+            borderRadius={5}
+            bg="white">
+            <Box
+              display="flex"
+              flexDir={isSmallerThan768 ? 'column' : 'row'}
+              alignItems={isSmallerThan768 ? 'center' : ''}>
+              <Box w={isSmallerThan768 ? '60%' : '40%'} mb={5}>
                 {data.imageURL ? (
-                  <img src={data.imageURL} alt="イベント画像" />
+                  <Image src={data.imageURL} alt="イベント画像" />
                 ) : (
                   imageSource
                 )}
-              </div>
-              <div className={eventDetailStyles.event_info_right}>
-                <span className={eventDetailStyles.event_title}>
-                  {data.title}
-                </span>
-                <div className={eventDetailStyles.type_wrapper}>
-                  <Button
+              </Box>
+
+              <Box
+                w={isSmallerThan768 ? '90%' : '60%'}
+                pl={isSmallerThan768 ? 0 : 4}>
+                <Box mb="8px">
+                  <Badge
+                    py="4px"
+                    px="8px"
+                    color="white"
+                    fontSize="smaller"
                     background={eventTypeColorFactory(data.type)}
-                    _hover={{}}
-                    size="sm"
-                    color="white">
+                    borderRadius={50}
+                    alignItems="center">
                     {eventTypeNameFactory(data.type)}
-                  </Button>
-                </div>
-                <div className={eventDetailStyles.event_dates_wrapper}>
+                  </Badge>
+                </Box>
+                <Box mb="20px" minH="160px" mr={4} mt={3}>
+                  <Heading fontWeight="bold"> {data.title}</Heading>
+                  <Box>
+                    <Linkify componentDecorator={componentDecorator}>
+                      <Text
+                        as="span"
+                        mt={3}
+                        fontSize={12}
+                        whiteSpace="pre-line">
+                        {data.description}
+                      </Text>
+                    </Linkify>
+                  </Box>
+                </Box>
+                <Box w="100%">
+                  <Heading size="xs" mb={1}>
+                    タグ
+                  </Heading>
+                  <Box
+                    display="flex"
+                    flexDir="row"
+                    flexWrap="wrap"
+                    ml={-1}
+                    mb={1}>
+                    {data.tags && data.tags.length
+                      ? data.tags.map((t) => (
+                          <Link
+                            _hover={{ textDecoration: 'none' }}
+                            href={`/event/list?tag=${t.id}`}
+                            key={t.id}>
+                            <Badge
+                              ml={1}
+                              mb={1}
+                              p={2}
+                              as="sub"
+                              fontSize="x-small"
+                              display="flex"
+                              colorScheme={tagColorFactory(t.type)}
+                              borderRadius={50}
+                              alignItems="center"
+                              variant="outline"
+                              borderWidth={1}>
+                              {t.name}
+                            </Badge>
+                          </Link>
+                        ))
+                      : null}
+                  </Box>
+                </Box>
+                <Box
+                  mt={2}
+                  display="flex"
+                  flexDir="column"
+                  justifyContent="space-between">
+                  <Heading mb={2} size="xs">
+                    日時
+                  </Heading>
                   {data.type !== EventType.SUBMISSION_ETC && (
-                    <span className={eventDetailStyles.start_date}>
-                      {`開始: ${dateTimeFormatterFromJSDDate({
+                    <Text fontSize={14}>
+                      {dateTimeFormatterFromJSDDate({
                         dateTime: new Date(data.startAt),
-                        format: 'yyyy/LL/dd HH:mm',
-                      })} ~ `}
-                    </span>
+                        format: '開始: yyyy/LL/dd HH:mm ',
+                      })}
+                    </Text>
                   )}
-                  <span className={eventDetailStyles.end_date}>
+                  <Text fontSize={14} mt="5px">
                     {`
                   ${
                     data.type !== EventType.SUBMISSION_ETC ? '終了' : '締切'
@@ -343,21 +424,13 @@ const EventDetail = () => {
                       format: 'yyyy/LL/dd HH:mm',
                     })}
                 `}
-                  </span>
-                </div>
-                <span className={eventDetailStyles.sub_title}>概要</span>
-                <div className={eventDetailStyles.description_wrapper}>
-                  <Linkify componentDecorator={componentDecorator}>
-                    <span className={eventDetailStyles.description}>
-                      {data.description}
-                    </span>
-                  </Linkify>
-                </div>
+                  </Text>
+                </Box>
                 {data.type !== EventType.SUBMISSION_ETC && (
-                  <>
-                    <span className={eventDetailStyles.sub_title}>
+                  <Box mt={3}>
+                    <Heading size="xs" mb={2}>
                       開催者/講師
-                    </span>
+                    </Heading>
                     {data && data.hostUsers && data.hostUsers.length ? (
                       <div className={eventDetailStyles.tags_wrapper}>
                         {data.hostUsers.map((hostUser) => (
@@ -373,307 +446,340 @@ const EventDetail = () => {
                         ))}
                       </div>
                     ) : null}
-                  </>
-                )}
-                <span className={eventDetailStyles.sub_title}>タグ</span>
-                {data && data.tags && data.tags.length ? (
-                  <div className={eventDetailStyles.tags_wrapper}>
-                    {data.tags.map((tag) => (
-                      <Link href={`/event/list?tag=${tag.id}`} key={tag.id}>
-                        <a className={eventDetailStyles.tag}>
-                          <Button
-                            colorScheme={tagColorFactory(tag.type)}
-                            size="xs">
-                            {tag.name}
-                          </Button>
-                        </a>
-                      </Link>
-                    ))}
-                  </div>
-                ) : null}
-                <div className={eventDetailStyles.join_event_wrapper}>
-                  {data.type !== 'submission_etc' && !isFinished ? (
-                    <>
-                      {!data.isCanceled && (
-                        <Button
-                          className={eventDetailStyles.join_event_button}
-                          colorScheme={data.isJoining ? 'teal' : 'pink'}
-                          onClick={() =>
-                            !data.isJoining &&
-                            joinEvent({ eventID: Number(id) })
-                          }>
-                          {data.isJoining ? '参加済' : 'イベントに参加'}
-                        </Button>
-                      )}
-                      {data.isJoining && !data.isCanceled ? (
-                        <Button
-                          colorScheme={'red'}
-                          onClick={() => cancelEvent({ eventID: Number(id) })}>
-                          キャンセルする
-                        </Button>
-                      ) : data.isJoining && data.isCanceled ? (
-                        <Text color="tomato">キャンセル済み</Text>
-                      ) : null}
-                    </>
-                  ) : isFinished ? (
-                    <Text color="tomato">締切済み</Text>
-                  ) : null}
-                </div>
-                {isAdminUser && data.type === EventType.SUBMISSION_ETC ? (
-                  <div className={eventDetailStyles.admin_buttons_wrapper}>
-                    <Button
-                      colorScheme={'green'}
-                      onClick={() =>
-                        downloadZip({
-                          id: data.id.toString(),
-                          name: data.title,
-                        })
-                      }>
-                      {loadingSubmissionZip ? (
-                        <Text>
-                          一括ダウンロードには時間がかかります
-                          <Spinner />
-                        </Text>
-                      ) : (
-                        <Text>提出物を一括ダウンロード</Text>
-                      )}
-                    </Button>
-                  </div>
-                ) : null}
-                {!isCommonUser && data.type !== EventType.SUBMISSION_ETC ? (
-                  <div className={eventDetailStyles.admin_buttons_wrapper}>
-                    <Button
-                      colorScheme={'green'}
-                      onClick={() => downloadEvent({ id, name: data.title })}>
-                      {loadingEventCsv ? (
-                        <Spinner />
-                      ) : (
-                        <Text>イベントデータをCSV出力</Text>
-                      )}
-                    </Button>
-                  </div>
-                ) : null}
-              </div>
-            </div>
-            <Text
-              fontSize="16px"
-              mb="8px"
-              display="block"
-              alignSelf="flex-start">
-              参考資料
-            </Text>
-            {data.files && data.files.length ? (
-              <Box display="flex" flexDir="row" flexWrap="wrap" mb="16px">
-                {data.files.map((f) => (
-                  <Box mr="4px" mb="4px" key={f.id}>
-                    <FileIcon url={f.url} name={f.name} />
                   </Box>
-                ))}
+                )}
               </Box>
-            ) : (
-              <Text mb="16px" display="block" alignSelf="flex-start">
-                参考資料はありません
-              </Text>
-            )}
-            <Text
-              fontSize="16px"
-              mb="8px"
-              display="block"
-              alignSelf="flex-start">
-              関連動画
-            </Text>
-            {data.videos && data.videos.length ? (
-              <div className={eventDetailStyles.videos}>
-                {data.videos.map((v) => (
-                  <Youtube
-                    key={v.id}
-                    className={eventDetailStyles.video}
-                    videoId={generateYoutubeId(v.url)}
-                  />
-                ))}
-              </div>
-            ) : (
-              <Text mb="16px" display="block" alignSelf="flex-start">
-                関連動画はありません
-              </Text>
-            )}
-            {data.type !== EventType.SUBMISSION_ETC && (
-              <div className={eventDetailStyles.comment_participants_wrapper}>
-                <div className={eventDetailStyles.event_participants_wrapper}>
-                  <EventParticipants
-                    onChangeJoiningData={(uje) => handleChangeJoiningData(uje)}
-                    userJoiningEvent={data.userJoiningEvent}
-                  />
-                </div>
-                <div className={eventDetailStyles.width}>
-                  <div className={eventDetailStyles.count_and_button_wrapper}>
-                    <p className={eventDetailStyles.comment_count}>
-                      コメント{data.comments?.length ? data.comments.length : 0}
-                      件
-                    </p>
+            </Box>
+            <Box
+              mt={3}
+              display="flex"
+              flexDir="column"
+              alignItems="center"
+              w="100%">
+              {!isCommonUser && data.type !== EventType.SUBMISSION_ETC ? (
+                <Button
+                  mb={3}
+                  borderRadius={50}
+                  colorScheme="blue"
+                  variant="outline"
+                  w="50%"
+                  onClick={() => downloadEvent({ id, name: data.title })}>
+                  {loadingEventCsv ? (
+                    <Spinner />
+                  ) : (
+                    <Text>イベントデータをCSV出力</Text>
+                  )}
+                </Button>
+              ) : null}
+              {data.type !== 'submission_etc' && !isFinished ? (
+                <>
+                  {!data.isCanceled && (
                     <Button
+                      w="50%"
+                      borderRadius={50}
+                      colorScheme="blue"
+                      onClick={() => {
+                        if (!data.isJoining) {
+                          if (confirm(`イベントに参加しますか？`)) {
+                            joinEvent({ eventID: Number(id) });
+                          }
+                        } else {
+                          if (
+                            confirm(`イベントへの参加をキャンセルしますか？`)
+                          ) {
+                            cancelEvent({ eventID: Number(id) });
+                          }
+                        }
+                      }}>
+                      {data.isJoining ? 'キャンセルする' : 'イベントに参加'}
+                    </Button>
+                  )}
+                  {data.isJoining && data.isCanceled ? (
+                    <Text
+                      p={2}
+                      color="tomato"
+                      w="50%"
+                      textAlign="center"
+                      borderRadius={50}
+                      borderColor="red"
+                      borderWidth="1px">
+                      キャンセル済み
+                    </Text>
+                  ) : null}
+                </>
+              ) : isFinished ? (
+                <Text
+                  p={2}
+                  color="tomato"
+                  w="50%"
+                  textAlign="center"
+                  borderRadius={50}
+                  borderColor="red"
+                  borderWidth="1px">
+                  締切済み
+                </Text>
+              ) : null}
+
+              {isAdminUser && data.type === EventType.SUBMISSION_ETC ? (
+                <Button
+                  w="50%"
+                  borderRadius={50}
+                  variant="outline"
+                  colorScheme={'green'}
+                  onClick={() =>
+                    downloadZip({
+                      id: data.id.toString(),
+                      name: data.title,
+                    })
+                  }>
+                  {loadingSubmissionZip ? (
+                    <Text>
+                      一括ダウンロードには時間がかかります
+                      <Spinner />
+                    </Text>
+                  ) : (
+                    <Text>提出物を一括ダウンロード</Text>
+                  )}
+                </Button>
+              ) : null}
+            </Box>
+          </Box>
+
+          <Heading
+            fontSize="16px"
+            my="8px"
+            display="block"
+            alignSelf="flex-start">
+            参考資料
+          </Heading>
+          {data.files && data.files.length ? (
+            <Box
+              bg="white"
+              display="flex"
+              flexDir="row"
+              flexWrap="wrap"
+              mb="16px"
+              w="100%">
+              {data.files.map((f) => (
+                <FileIcon url={f.url} name={f.name} key={f.id} />
+              ))}
+            </Box>
+          ) : (
+            <Text mb="16px" mx="auto">
+              参考資料はありません
+            </Text>
+          )}
+          <Heading
+            fontSize="16px"
+            mb="8px"
+            display="block"
+            alignSelf="flex-start">
+            関連動画
+          </Heading>
+          {data.videos && data.videos.length ? (
+            <SimpleGrid
+              minChildWidth="250px"
+              maxChildWidth="400px"
+              spacing="10px">
+              {data.videos.map((v) => (
+                <Youtube
+                  key={v.id}
+                  className={eventDetailStyles.video}
+                  videoId={generateYoutubeId(v.url)}
+                />
+              ))}
+            </SimpleGrid>
+          ) : (
+            <Text mb="16px" mx="auto">
+              関連動画はありません
+            </Text>
+          )}
+          {data.type !== EventType.SUBMISSION_ETC && (
+            <>
+              <Box w="100%" mt={2}>
+                <Heading fontSize="16px">参加者一覧</Heading>
+                <EventParticipants
+                  onChangeJoiningData={(uje) => handleChangeJoiningData(uje)}
+                  userJoiningEvent={data.userJoiningEvent}
+                />
+              </Box>
+              <Box w="100%" mt={5}>
+                <div className={eventDetailStyles.count_and_button_wrapper}>
+                  <Box alignSelf="center" display="flex" flexDir="row">
+                    <Heading fontSize="16px">イベントの感想</Heading>
+                    {data.comments?.length ? (
+                      <Text fontSize="11px" ml={2} alignSelf="center">
+                        {data.comments.length}件
+                      </Text>
+                    ) : null}
+                  </Box>
+                  <Box display="flex" flexDir="row">
+                    <Button
+                      borderRadius={50}
+                      colorScheme="blue"
                       size="sm"
-                      colorScheme="teal"
                       onClick={() => {
                         commentVisible && newComment
                           ? handleCreateComment()
                           : setCommentVisible(true);
                       }}>
-                      {commentVisible ? 'コメントを投稿する' : 'コメントを追加'}
+                      感想を投稿
                     </Button>
-                  </div>
-                  {commentVisible && (
-                    <Textarea
-                      height="56"
-                      background="white"
-                      placeholder="コメントを記入してください。"
-                      value={newComment}
-                      onChange={(e) => setNewComment(e.target.value)}
-                      className={eventDetailStyles.comment_input}
-                      autoFocus
-                    />
-                  )}
-                  {data.comments && data.comments.length
-                    ? data.comments.map(
-                        (comment) =>
-                          comment.writer && (
-                            <>
-                              <EventCommentCard
-                                key={comment.id}
-                                body={comment.body}
-                                date={comment.createdAt}
-                                writer={comment.writer}
-                              />
-                            </>
-                          ),
-                      )
-                    : null}
-                </div>
-              </div>
-            )}
-            {data.type === EventType.SUBMISSION_ETC && !isFinished ? (
-              <>
-                <Box
-                  borderBottomColor="green.500"
-                  borderBottomWidth={1}
-                  pb="10px"
-                  mb="16px">
-                  <Box
-                    display="flex"
-                    flexFlow="row"
-                    justifyContent="space-between">
-                    <Button
-                      size="sm"
-                      colorScheme="blue"
-                      marginRight="16px"
-                      onClick={() => {
-                        submissionRef.current?.click();
-                      }}>
-                      {loadingUplaod ? <Spinner /> : <Text>提出物を追加</Text>}
-                    </Button>
-                    <Button
-                      size="sm"
-                      colorScheme={'pink'}
-                      onClick={() => {
-                        saveSubmission(submitFiles);
-                      }}>
-                      提出状況を保存
-                    </Button>
-                  </Box>
-                  <Text
-                    color={darkFontColor}
-                    fontSize={'16px'}
-                    fontWeight="bold">
-                    {data.submissionFiles.length + '件のファイルを提出済み'}
-                  </Text>
-                  <Text color="tomato">
-                    ※水色のアイコンのファイルはまだ提出状況が保存されていません
-                  </Text>
-                  <input
-                    type="file"
-                    hidden
-                    ref={submissionRef}
-                    multiple
-                    onChange={() => {
-                      const files = submissionRef.current?.files;
-                      const fileArr: File[] = [];
-                      if (!files) {
-                        return;
-                      }
-                      for (let i = 0; i < files.length; i++) {
-                        const renamedFile = new File(
-                          [files[i]],
-                          files[i].name,
-                          {
-                            type: files[i].type,
-                            lastModified: files[i].lastModified,
-                          },
-                        );
-                        fileArr.push(renamedFile);
-                      }
-                      uploadStorage(fileArr, {
-                        onSuccess: (urls) => {
-                          const filesNotSubmitted: Partial<SubmissionFile>[] =
-                            urls.map((u, i) => ({
-                              url: u,
-                              name: fileArr[i].name,
-                              eventSchedule: data,
-                              userSubmitted: user,
-                              submitUnFinished: true,
-                            }));
-                          setSubmitFiles((files) => [
-                            ...files,
-                            ...filesNotSubmitted,
-                          ]);
-                        },
-                      });
-                    }}
-                  />
-                </Box>
-                {submitFiles && submitFiles.length ? (
-                  <Box display="flex" flexDir="row" flexWrap="wrap" mb="16px">
-                    {submitFiles.map((f) =>
-                      f.url && f.name ? (
-                        <>
-                          <Box key={f.url} mb="4px" mr="10px" display="flex">
-                            <FileIcon
-                              url={f.url}
-                              name={f.name}
-                              submitted={f.submitUnFinished}
-                            />
-                            <Box ml="-13px" mt="-2">
-                              <MdCancel
-                                size="25px"
-                                onClick={() => {
-                                  if (f.id) {
-                                    if (
-                                      confirm(
-                                        'ファイルを削除してよろしいですか？',
-                                      )
-                                    ) {
-                                      deleteSubmission({ submissionId: f.id });
-                                    }
-                                  } else {
-                                    const files = submitFiles.filter(
-                                      (file) => file.url !== f.url,
-                                    );
-                                    setSubmitFiles(files);
-                                  }
-                                }}
-                              />
-                            </Box>
-                          </Box>
-                        </>
-                      ) : null,
+                    {showingCommentCount < data.comments.length && (
+                      <Heading
+                        onClick={() => setShowingCommentCount((c) => c + 3)}
+                        fontSize="16px"
+                        cursor="pointer"
+                        alignSelf="center"
+                        ml={4}>
+                        もっと見る
+                      </Heading>
                     )}
                   </Box>
-                ) : (
-                  <></>
+                </div>
+                {commentVisible && (
+                  <Textarea
+                    height="56"
+                    background="white"
+                    placeholder="コメントを記入してください。"
+                    value={newComment}
+                    onChange={(e) => setNewComment(e.target.value)}
+                    className={eventDetailStyles.comment_input}
+                    autoFocus
+                  />
                 )}
-              </>
-            ) : null}
-          </div>
-        </div>
+                <Box rounded="md" display="flex" flexDir="column" bg="white">
+                  {data.comments && data.comments.length
+                    ? data.comments.map((comment, index) =>
+                        index < showingCommentCount && comment.writer ? (
+                          <CommentCard
+                            key={comment.id}
+                            body={comment.body}
+                            date={comment.createdAt}
+                            writer={comment.writer}
+                          />
+                        ) : null,
+                      )
+                    : null}
+                </Box>
+              </Box>
+            </>
+          )}
+          {data.type === EventType.SUBMISSION_ETC && !isFinished ? (
+            <>
+              <Box
+                borderBottomColor="green.500"
+                borderBottomWidth={1}
+                pb="10px"
+                mb="16px">
+                <Box
+                  display="flex"
+                  flexFlow="row"
+                  justifyContent="space-between">
+                  <Button
+                    size="sm"
+                    colorScheme="blue"
+                    marginRight="16px"
+                    onClick={() => {
+                      submissionRef.current?.click();
+                    }}>
+                    {loadingUplaod ? <Spinner /> : <Text>提出物を追加</Text>}
+                  </Button>
+                  <Button
+                    size="sm"
+                    colorScheme={'pink'}
+                    onClick={() => {
+                      saveSubmission(submitFiles);
+                    }}>
+                    提出状況を保存
+                  </Button>
+                </Box>
+                <Text color={darkFontColor} fontSize={'16px'} fontWeight="bold">
+                  {data.submissionFiles.length + '件のファイルを提出済み'}
+                </Text>
+                <Text color="tomato">
+                  ※水色のアイコンのファイルはまだ提出状況が保存されていません
+                </Text>
+                <input
+                  type="file"
+                  hidden
+                  ref={submissionRef}
+                  multiple
+                  onChange={() => {
+                    const files = submissionRef.current?.files;
+                    const fileArr: File[] = [];
+                    if (!files) {
+                      return;
+                    }
+                    for (let i = 0; i < files.length; i++) {
+                      const renamedFile = new File([files[i]], files[i].name, {
+                        type: files[i].type,
+                        lastModified: files[i].lastModified,
+                      });
+                      fileArr.push(renamedFile);
+                    }
+                    uploadStorage(fileArr, {
+                      onSuccess: (urls) => {
+                        const filesNotSubmitted: Partial<SubmissionFile>[] =
+                          urls.map((u, i) => ({
+                            url: u,
+                            name: fileArr[i].name,
+                            eventSchedule: data,
+                            userSubmitted: user,
+                            submitUnFinished: true,
+                          }));
+                        setSubmitFiles((files) => [
+                          ...files,
+                          ...filesNotSubmitted,
+                        ]);
+                      },
+                    });
+                  }}
+                />
+              </Box>
+              {submitFiles && submitFiles.length ? (
+                <Box display="flex" flexDir="row" flexWrap="wrap" mb="16px">
+                  {submitFiles.map((f) =>
+                    f.url && f.name ? (
+                      <>
+                        <Box key={f.url} mb="4px" mr="10px" display="flex">
+                          <FileIcon
+                            url={f.url}
+                            name={f.name}
+                            submitted={f.submitUnFinished}
+                          />
+                          <Box ml="-13px" mt="-2">
+                            <MdCancel
+                              size="25px"
+                              onClick={() => {
+                                if (f.id) {
+                                  if (
+                                    confirm(
+                                      'ファイルを削除してよろしいですか？',
+                                    )
+                                  ) {
+                                    deleteSubmission({ submissionId: f.id });
+                                  }
+                                } else {
+                                  const files = submitFiles.filter(
+                                    (file) => file.url !== f.url,
+                                  );
+                                  setSubmitFiles(files);
+                                }
+                              }}
+                            />
+                          </Box>
+                        </Box>
+                      </>
+                    ) : null,
+                  )}
+                </Box>
+              ) : (
+                <></>
+              )}
+            </>
+          ) : null}
+        </Box>
       ) : null}
     </LayoutWithTab>
   );

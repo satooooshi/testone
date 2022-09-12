@@ -60,6 +60,7 @@ import { useAPISearchMessages } from '@/hooks/api/chat/useAPISearchMessages';
 import { removeHalfWidthSpace } from 'src/utils/replaceWidthSpace';
 import { useChatSocket } from './socket';
 import ChatEditor from '../ChatEditor';
+import { RiMore2Fill } from 'react-icons/ri';
 import { nameOfEmptyNameGroup } from 'src/utils/chat/nameOfEmptyNameGroup';
 
 type ChatBoxProps = {
@@ -393,9 +394,11 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
   return (
     <Box
       {...noClickRootDropzone()}
-      w={isSmallerThan768 ? '100%' : '60vw'}
+      w="100%"
       h="100%"
       bg="white"
+      py={2}
+      rounded={10}
       position="relative"
       borderRadius="md"
       boxShadow="md">
@@ -441,18 +444,18 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
        */}
       <Box
         h="40px"
+        pb={2}
         bg="white"
         borderBottomColor="#b0b0b0"
-        borderWidth={'0.5px'}
+        borderBottomWidth={'0.5px'}
         display="flex"
         flexDir="row"
         justifyContent="space-between"
-        py="8px"
         px="16px">
         <Box display="flex" flexDir="row" alignItems="center">
-          <Box mr="8px">
+          {/* <Box mr="8px">
             <Avatar size="sm" src={room.imageURL} />
-          </Box>
+          </Box> */}
           <Box display="flex" flexDir="row">
             <Text
               mr={'4px'}
@@ -486,7 +489,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
             onItemClick={(e) => onMenuClicked(e.value as MenuValue)}
             menuButton={
               <MenuButton>
-                <HiOutlineDotsCircleHorizontal size={24} />
+                <RiMore2Fill size={24} />
               </MenuButton>
             }
             transition>

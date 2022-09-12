@@ -1,14 +1,28 @@
 import React, { useMemo } from 'react';
 import userCardStyles from '@/styles/components/UserCard.module.scss';
 import { Tag, TagType, User } from 'src/types';
-import { Avatar, Button } from '@chakra-ui/react';
+import {
+  Box,
+  Button,
+  Flex,
+  Text,
+  Image,
+  SimpleGrid,
+  Badge,
+} from '@chakra-ui/react';
 import Link from 'next/link';
 import UserPointCounter from './UserPointCounter';
+import noImage from '@/public/no-image.jpg';
+import { tagColorFactory } from 'src/utils/factory/tagColorFactory';
 
-type TagLinkProps = {
-  tag: Tag;
-  onClickTag: (t: Tag) => string;
-  tagColor: string;
+type TagCategoryProps = {
+  label: string;
+  type: TagType;
+  color: string;
+};
+
+type TagCardProps = {
+  tagCategory: TagCategoryProps;
 };
 
 type UserCardProps = {
@@ -32,173 +46,133 @@ const groupByTagType = (tags: Tag[]): { [k in TagType]: Tag[] } => {
     },
   );
 };
-
-const TagLink: React.FC<TagLinkProps> = ({ tag, onClickTag, tagColor }) => {
-  return (
-    <Link passHref href={onClickTag(tag)}>
-      <a
-        onClick={() => onClickTag(tag)}
-        className={userCardStyles.tag_item_wrapper}>
-        <Button size="xs" colorScheme={tagColor}>
-          {tag.name}
-        </Button>
-      </a>
-    </Link>
-  );
-};
-
 const UserCard: React.FC<UserCardProps> = ({ user, onClickTag, duration }) => {
   const groupedTags = useMemo(() => {
     return groupByTagType(user.tags || []);
   }, [user.tags]);
+
+  const tagCategories: TagCategoryProps[] = [
+    { label: '技術', type: TagType.TECH, color: 'teal' },
+    { label: '資格', type: TagType.QUALIFICATION, color: 'blue' },
+    { label: '部活動', type: TagType.CLUB, color: 'green' },
+    { label: '趣味', type: TagType.HOBBY, color: 'pink' },
+  ];
+
+  const TagCard: React.FC<TagCardProps> = ({ tagCategory }) => {
+    return (
+      <Flex alignItems="center" mb="4px">
+        <p className={userCardStyles.tags_label}>{tagCategory.label}:</p>
+        <div className={userCardStyles.tags_wrapper}>
+          {groupedTags[tagCategory.type].length ? (
+            groupedTags[tagCategory.type].map((t) => (
+              <Link passHref href={onClickTag(t)} key={t.id}>
+                <Badge
+                  mr={2}
+                  mb={1}
+                  p={2}
+                  as="sub"
+                  fontSize="x-small"
+                  display="flex"
+                  colorScheme={tagCategory.color}
+                  borderRadius={50}
+                  alignItems="center"
+                  variant="outline"
+                  borderWidth={1}>
+                  {t.name}
+                </Badge>
+              </Link>
+            ))
+          ) : (
+            <Text fontSize={13}>未設定</Text>
+          )}
+        </div>
+      </Flex>
+    );
+  };
+
   return (
-    <Link href={`/account/${user.id}`} passHref>
-      <a className={userCardStyles.wrapper}>
-        <div className={userCardStyles.top}>
-          <Avatar
-            priority={true}
-            size="xl"
-            src={user.avatarUrl}
-            className={userCardStyles.avatar}
-          />
-          <div className={userCardStyles.user_info_text}>
-            <p
-              className={
-                userCardStyles.name
-              }>{`${user.lastName} ${user.firstName}`}</p>
-            <p
-              className={
-                userCardStyles.name_kana
-              }>{`${user.lastNameKana} ${user.firstNameKana}`}</p>
-            <div className={userCardStyles.introduce_text_wrapper}>
-              <p className={userCardStyles.introduce_text}>{`${
-                user.introduceOther || '自己紹介未入力'
-              }`}</p>
-            </div>
-            <UserPointCounter
-              label="event"
-              count={user.eventCount || 0}
-              duration={duration}
-            />
-            <UserPointCounter
-              label="question"
-              count={user.questionCount || 0}
-              duration={duration}
-            />
-            <UserPointCounter
-              label="answer"
-              count={user.answerCount || 0}
-              duration={duration}
-            />
-            <UserPointCounter
-              label="knowledge"
-              count={user.knowledgeCount || 0}
-              duration={duration}
-            />
-          </div>
-        </div>
+    <Box bg="white" borderRadius="lg" p="16px">
+      <Flex mb="8px">
+        <Image
+          src={user.avatarUrl}
+          fallbackSrc={noImage.src}
+          objectFit="cover"
+          mr="16px"
+          boxSize="160px"
+          borderRadius="full"
+          alt="アバター画像"
+        />
+        <Box w="100%" overflow="hidden" textOverflow="ellipsis">
+          <Text
+            fontWeight="bold"
+            fontSize="18px"
+            mb="4px"
+            noOfLines={1}>{`${user.lastName} ${user.firstName}`}</Text>
+          <Text
+            fontSize="12px"
+            color="gray"
+            mb="12px"
+            noOfLines={1}>{`${user.lastNameKana} ${user.firstNameKana}`}</Text>
+          <Box h="40px">
+            <Text color="gray" fontSize="14px" noOfLines={2}>{`${
+              user.introduceOther || '自己紹介未入力'
+            }`}</Text>
+          </Box>
+          <SimpleGrid
+            columns={2}
+            bg="gray.100"
+            maxWidth="320px"
+            spacingX="36px"
+            spacingY="12px"
+            w="100%"
+            borderRadius="lg"
+            justifyContent="space-between"
+            alignItems="start"
+            p="4">
+            <SimpleGrid spacingY="12px">
+              <UserPointCounter
+                label="event"
+                count={user.eventCount || 0}
+                duration={duration}
+              />
+              <UserPointCounter
+                label="question"
+                count={user.questionCount || 0}
+                duration={duration}
+              />
+            </SimpleGrid>
+            <SimpleGrid spacingY="12px">
+              <UserPointCounter
+                label="answer"
+                count={user.answerCount || 0}
+                duration={duration}
+              />
+              <UserPointCounter
+                label="knowledge"
+                count={user.knowledgeCount || 0}
+                duration={duration}
+              />
+            </SimpleGrid>
+          </SimpleGrid>
+        </Box>
+      </Flex>
 
-        <div className={userCardStyles.bottom}>
-          <div className={userCardStyles.tags_with_label_wrapper}>
-            <p className={userCardStyles.tags_label}>技術:</p>
-            <div className={userCardStyles.tags_wrapper}>
-              {groupedTags[TagType.TECH].length ? (
-                groupedTags[TagType.TECH].map((t) => (
-                  <TagLink
-                    key={t.id}
-                    tag={t}
-                    onClickTag={onClickTag}
-                    tagColor="teal"
-                  />
-                ))
-              ) : (
-                <Button size="xs" colorScheme="teal">
-                  未設定
-                </Button>
-              )}
-            </div>
-          </div>
-          <div className={userCardStyles.tags_with_label_wrapper}>
-            <p className={userCardStyles.tags_label}>資格:</p>
-            <div className={userCardStyles.tags_wrapper}>
-              {groupedTags[TagType.QUALIFICATION].length ? (
-                groupedTags[TagType.QUALIFICATION].map((t) => (
-                  <TagLink
-                    key={t.id}
-                    tag={t}
-                    onClickTag={onClickTag}
-                    tagColor="blue"
-                  />
-                ))
-              ) : (
-                <Button size="xs" height="28px" colorScheme="blue">
-                  未設定
-                </Button>
-              )}
-            </div>
-          </div>
-          <div className={userCardStyles.tags_with_label_wrapper}>
-            <p className={userCardStyles.tags_label}>部活動:</p>
-            <div className={userCardStyles.tags_wrapper}>
-              {groupedTags[TagType.CLUB].length ? (
-                groupedTags[TagType.CLUB].map((t) => (
-                  <TagLink
-                    key={t.id}
-                    tag={t}
-                    onClickTag={onClickTag}
-                    tagColor="green"
-                  />
-                ))
-              ) : (
-                <Button size="xs" height="28px" colorScheme="green">
-                  未設定
-                </Button>
-              )}
-            </div>
-          </div>
-          <div className={userCardStyles.tags_with_label_wrapper}>
-            <p className={userCardStyles.tags_label}>趣味:</p>
-            <div className={userCardStyles.tags_wrapper}>
-              {groupedTags[TagType.HOBBY].length ? (
-                groupedTags[TagType.HOBBY].map((t) => (
-                  <TagLink
-                    key={t.id}
-                    tag={t}
-                    onClickTag={onClickTag}
-                    tagColor="pink"
-                  />
-                ))
-              ) : (
-                <Button size="xs" height="28px" colorScheme="pink">
-                  未設定
-                </Button>
-              )}
-            </div>
-          </div>
-
-          {/* <div className={userCardStyles.counts_wrapper}> */}
-          {/*   <div className={userCardStyles.count_item_wrapper}> */}
-          {/*     <p className={userCardStyles.count}>{user.eventCount}</p> */}
-          {/*     <p className={userCardStyles.count_label}> */}
-          {/*       イベント参加数{durationText()} */}
-          {/*     </p> */}
-          {/*   </div> */}
-          {/*   <div className={userCardStyles.count_item_wrapper}> */}
-          {/*     <p className={userCardStyles.count}>{user.questionCount}</p> */}
-          {/*     <p className={userCardStyles.count_label}> */}
-          {/*       質問数{durationText()} */}
-          {/*     </p> */}
-          {/*   </div> */}
-          {/*   <div className={userCardStyles.count_item_wrapper}> */}
-          {/*     <p className={userCardStyles.count}>{user.answerCount}</p> */}
-          {/*     <p className={userCardStyles.count_label}> */}
-          {/*       回答数{durationText()} */}
-          {/*     </p> */}
-          {/*   </div> */}
-          {/* </div> */}
-        </div>
-      </a>
-    </Link>
+      <Box mb="20px">
+        {tagCategories.map((t) => (
+          <TagCard key={t.label} tagCategory={t} />
+        ))}
+      </Box>
+      <Button
+        as="a"
+        href={`/account/${user.id}`}
+        size="lg"
+        rounded="full"
+        w="50%"
+        fontSize="14px"
+        color="blue.600">
+        プロフィールを見る
+      </Button>
+    </Box>
   );
 };
 
