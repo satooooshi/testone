@@ -7,9 +7,7 @@ import { Tab } from 'src/types/header/tab/types';
 import { SimpleGrid } from '@chakra-ui/react';
 
 const Attendance = () => {
-  const tabs: Tab[] = [
-    { type: 'link', name: '勤怠管理 Home', href: '/attendance' },
-  ];
+  const tabs: Tab[] = [{ name: '勤怠管理 Home', href: '/attendance' }];
 
   return (
     <LayoutWithTab

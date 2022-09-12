@@ -415,9 +415,9 @@ const AttendanceView = () => {
   const { data: defaultData, refetch: refetchDefaultData } =
     useAPIGetDefaultAttendance();
   const tabs: Tab[] = [
-    { type: 'link', name: '勤怠打刻', href: '/attendance/view' },
-    { type: 'link', name: '勤怠報告', href: '/attendance/report' },
-    { type: 'link', name: '入社前申請', href: '/attendance/application' },
+    { name: '勤怠打刻', href: '/attendance/view' },
+    { name: '勤怠報告', href: '/attendance/report' },
+    { name: '入社前申請', href: '/attendance/application' },
   ];
   const [visibleDefaultModal, setDefaultModal] = useState(false);
   const [month, setMonth] = useState(DateTime.now());
