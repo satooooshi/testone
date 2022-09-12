@@ -20,7 +20,7 @@ const Attendance = () => {
         activeTabName: '勤怠管理 Home',
       }}>
       <Head>
-        <title>ボールド | 社内Wiki</title>
+        <title>Valleyin | 社内Wiki</title>
       </Head>
 
       <SimpleGrid columns={{ sm: 1, md: 2, lg: 3 }} spacing={'16px'}>

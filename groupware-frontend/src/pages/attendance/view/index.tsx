@@ -446,7 +446,7 @@ const AttendanceView = () => {
         activeTabName: '勤怠打刻',
       }}>
       <Head>
-        <title>ボールド | 勤怠打刻</title>
+        <title>Valleyin | 勤怠打刻</title>
       </Head>
       <DefaultModal
         onCloseModal={() => setDefaultModal(false)}
