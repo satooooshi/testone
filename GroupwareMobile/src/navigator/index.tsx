@@ -243,16 +243,6 @@ const Navigator = () => {
     },
   };
 
-  messaging().setBackgroundMessageHandler(async remoteMessage => {
-    console.log('setBackgroundMessageHandler called');
-    if (Platform.OS === 'android') {
-      sendLocalNotification(remoteMessage);
-    }
-
-    // await notifee.incrementBadgeCount();
-    // console.log('BackgroundMessage received!!', remoteMessage);
-  });
-
   useEffect(
     () => {
       if (refusedInvitation) {
@@ -451,6 +441,39 @@ const Navigator = () => {
     getRtmToken();
   }, [AGORA_APP_ID, user?.id]);
 
+  const asyncHandleNotifi = async (notification: any): Promise<void> => {
+    if (
+      (notification?.data?.silent || notification?.data?.type === 'badge') &&
+      notification.data?.id
+    ) {
+      refetchRoomCard({
+        id: notification.data?.id,
+        type: notification.data.type,
+      });
+      if (
+        notification?.data?.type === 'deleteMessage' &&
+        notification.data.messageId
+      ) {
+        const storageData = storage.getString(
+          `messagesIntRoom${notification.data?.id}user${user?.id}`,
+        );
+        if (storageData) {
+          const messagesInStorage: ChatMessage[] = JSON.parse(storageData);
+
+          const jsonMessages = JSON.stringify(
+            messagesInStorage.filter(
+              m => m.id !== Number(notification.data.messageId),
+            ),
+          );
+          storage.set(
+            `messagesIntRoom${notification.data?.id}user${user?.id}`,
+            jsonMessages,
+          );
+        }
+      }
+    }
+  };
+
   const sendLocalNotification = useCallback(
     async (remoteMessage: any) => {
       if (
@@ -509,6 +532,18 @@ const Navigator = () => {
     [currentChatRoomId],
   );
 
+  messaging().setBackgroundMessageHandler(async remoteMessage => {
+    console.log('setBackgroundMessageHandler called');
+    if (Platform.OS === 'android') {
+      setTimeout(() => asyncHandleNotifi(remoteMessage), 10);
+    }
+    // if (Platform.OS === 'android') {
+    //   sendLocalNotification(remoteMessage);
+    // }
+    // await notifee.incrementBadgeCount();
+    // console.log('BackgroundMessage received!!', remoteMessage);
+  });
+
   const naviateByNotif = (notification: any) => {
     console.log('naviateByNotif called ------');
 
@@ -516,6 +551,13 @@ const Navigator = () => {
       navigationRef.current?.getCurrentRoute()?.name !== 'Login' &&
       user?.id
     ) {
+      if (notification.data?.screen === 'chat' && notification.data?.id) {
+        navigationRef.current?.navigate('ChatStack', {
+          screen: 'Chat',
+          params: {room: {id: notification.data?.id}},
+          initial: false,
+        });
+      }
       if (notification.data?.screen === 'event' && notification.data?.id) {
         navigationRef.current?.navigate('EventStack', {
           screen: 'EventDetail',
@@ -533,13 +575,6 @@ const Navigator = () => {
       if (notification.data?.screen === 'room') {
         navigationRef.current?.navigate('ChatStack', {
           screen: 'RoomList',
-        });
-      }
-      if (notification.data?.screen === 'chat' && notification.data?.id) {
-        navigationRef.current?.navigate('ChatStack', {
-          screen: 'Chat',
-          params: {room: {id: notification.data?.id}},
-          initial: false,
         });
       }
     }
@@ -576,43 +611,11 @@ const Navigator = () => {
         //   console.log('PushNotification TOKEN:', token);
         // },
         onNotification: notification => {
-          console.log('onNotification called');
-          if (
-            (notification?.data?.silent ||
-              notification?.data?.type === 'badge') &&
-            notification.data?.id
-          ) {
-            refetchRoomCard({
-              id: notification.data?.id,
-              type: notification.data.type,
-            });
-            if (
-              notification?.data?.type === 'deleteMessage' &&
-              notification.data.messageId
-            ) {
-              const storageData = storage.getString(
-                `messagesIntRoom${notification.data?.id}user${user?.id}`,
-              );
-              if (storageData) {
-                const messagesInStorage: ChatMessage[] =
-                  JSON.parse(storageData);
-
-                const jsonMessages = JSON.stringify(
-                  messagesInStorage.filter(
-                    m => m.id !== Number(notification.data.messageId),
-                  ),
-                );
-                storage.set(
-                  `messagesIntRoom${notification.data?.id}user${user?.id}`,
-                  jsonMessages,
-                );
-              }
-            }
-          }
-          // console.log('PushNotification onNotification========', notification);
-          if (Platform.OS === 'ios' && notification.userInteraction) {
-            console.log('----naviateByNotif');
+          if (notification.userInteraction) {
             naviateByNotif(notification);
+          }
+          if (Platform.OS === 'ios') {
+            asyncHandleNotifi(notification);
           }
         },
         permissions: {
@@ -627,6 +630,9 @@ const Navigator = () => {
 
   useEffect(() => {
     const unsubscribe = messaging().onMessage(async remoteMessage => {
+      if (Platform.OS === 'android') {
+        asyncHandleNotifi(remoteMessage);
+      }
       sendLocalNotification(remoteMessage);
     });
 

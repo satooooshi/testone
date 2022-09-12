@@ -341,7 +341,7 @@ const BottomTab = () => {
           backgroundColor: darkFontColor,
         },
       }}>
-      <Tab.Screen
+      {/* <Tab.Screen
         name="Home"
         component={Home}
         options={{
@@ -352,6 +352,21 @@ const BottomTab = () => {
               fontFamily="MaterialCommunityIcons"
               color={color}
               fontSize={26}
+            />
+          ),
+        }}
+      /> */}
+      <Tab.Screen
+        name="AttendanceStack"
+        component={AttendanceStack}
+        options={{
+          tabBarLabel: '勤怠管理',
+          tabBarIcon: ({color}) => (
+            <Icon
+              name="work"
+              fontFamily="MaterialIcons"
+              color={color}
+              fontSize={23}
             />
           ),
         }}
@@ -390,6 +405,7 @@ const BottomTab = () => {
         name="UsersStack"
         component={UserListStack}
         options={{
+          tabBarItemStyle: {display: 'none'},
           tabBarLabel: '社員名鑑',
           tabBarIcon: ({color}) => (
             <Icon
@@ -448,6 +464,7 @@ const BottomTab = () => {
         name="AccountStack"
         component={AccountStack}
         options={{
+          tabBarItemStyle: {display: 'none'},
           tabBarLabel: 'アカウント',
           tabBarIcon: ({color}) => (
             <>
@@ -461,25 +478,12 @@ const BottomTab = () => {
           ),
         }}
       />
-      <Tab.Screen
-        name="AttendanceStack"
-        component={AttendanceStack}
-        options={{
-          tabBarLabel: '勤怠管理',
-          tabBarIcon: ({color}) => (
-            <Icon
-              name="work"
-              fontFamily="MaterialIcons"
-              color={color}
-              fontSize={23}
-            />
-          ),
-        }}
-      />
+
       <Tab.Screen
         name="AdminStack"
         component={AdminStack}
         options={{
+          tabBarItemStyle: {display: 'none'},
           tabBarLabel: '管理',
           tabBarIcon: ({color}) =>
             isAdmin ? (

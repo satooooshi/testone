@@ -296,7 +296,7 @@ const Profile = () => {
         />
       )}
       <Box className={profileStyles.image_wrapper} mb="32px">
-        {!userInfo.avatarUrl && !selectImageUrl ? (
+        {/* {!userInfo.avatarUrl && !selectImageUrl ? (
           <div {...getEventImageRootProps()}>
             <div className={profileStyles.image_dropzone}>
               <input {...getEventImageInputProps()} />
@@ -327,8 +327,22 @@ const Profile = () => {
               <Text fontSize="14px">写真を編集する</Text>
             </Stack>
           </div>
-        ) : null}
-        {selectImageUrl ? (
+        ) : null} */}
+        {!userInfo.avatarUrl && !selectImageUrl ? (
+          <div
+            {...getEventImageRootProps({
+              className: profileStyles.image_dropzone,
+            })}>
+            <input {...getEventImageInputProps()} />
+            <div className={profileStyles.next_image_wrapper}>
+              <Image
+                className={profileStyles.avatar}
+                src={noImage}
+                alt="アバター画像"
+              />
+            </div>
+          </div>
+        ) : selectImageUrl ? (
           <>
             <ReactCrop
               keepSelection={true}
