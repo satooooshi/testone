@@ -190,13 +190,8 @@ export const BadgeProvider: React.FC = ({children}) => {
       if (rooms.length === chatGroups.length && refetchGroup.type === 'badge') {
         setChatUnreadCount(count => count + 1);
       }
-      if (data.isPinned) {
-        setChatGroups([...[data], ...rooms]);
-      } else {
-        const pinnedRoomsCount = rooms.filter(r => r.isPinned).length;
-        rooms.splice(pinnedRoomsCount, 0, data);
-        setChatGroups(rooms);
-      }
+      setChatGroups(sortRooms([data, ...rooms]));
+
       setRefetchGroup({id: 0, type: ''});
     },
   });
