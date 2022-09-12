@@ -10,7 +10,6 @@ import React, {
 import {
   NativeSyntheticEvent,
   Platform,
-  Text,
   TextInput,
   TextInputSelectionChangeEventData,
   TouchableOpacity,
@@ -31,7 +30,8 @@ import {
   getMentionPartSuggestionKeywords,
   isMentionPartType,
 } from 'react-native-controlled-mentions/dist/utils';
-import {Div, Icon, ScrollDiv} from 'react-native-magnus';
+
+import {Div, Icon, ScrollDiv, Text} from 'react-native-magnus';
 import {ActivityIndicator} from 'react-native-paper';
 import {Menu} from 'react-native-paper';
 import Input from './Input';
@@ -76,21 +76,29 @@ const ChatFooter: React.FC<ChatFooterProps> = ({
       return null;
     }
 
+    const candidateMembers = mentionSuggestions.filter(one =>
+      one.name.toLocaleLowerCase().includes(keyword.toLocaleLowerCase()),
+    );
+
     return (
-      <ScrollDiv h={140} borderTopColor="blue200" borderTopWidth={1}>
-        {mentionSuggestions
-          .filter(one =>
-            one.name.toLocaleLowerCase().includes(keyword.toLocaleLowerCase()),
-          )
-          .map(one => (
-            <TouchableOpacity
-              key={one.id}
-              onPress={() => onSuggestionPress(one)}
-              style={{padding: 12, width: '100%'}}>
-              <Text>{one.name}</Text>
-            </TouchableOpacity>
-          ))}
-      </ScrollDiv>
+      <>
+        {candidateMembers.length ? (
+          <ScrollDiv
+            h={140}
+            bg="white"
+            borderTopColor="gray200"
+            borderTopWidth={1}>
+            {candidateMembers.map(one => (
+              <TouchableOpacity
+                key={one.id}
+                onPress={() => onSuggestionPress(one)}
+                style={{padding: 12, width: '100%'}}>
+                <Text color="black">{one.name}</Text>
+              </TouchableOpacity>
+            ))}
+          </ScrollDiv>
+        ) : null}
+      </>
     );
   };
 
