@@ -17,6 +17,7 @@ import {
   TouchableOpacity,
   useWindowDimensions,
   View,
+  TextInput,
 } from 'react-native';
 import {
   Div,
@@ -108,6 +109,7 @@ import {useAPIGetReactions} from '../../hooks/api/chat/useAPIGetReactions';
 const TopTab = createMaterialTopTabNavigator();
 
 const Chat: React.FC = () => {
+  const inputRef = useRef<TextInput>(null);
   const {user: myself} = useAuthenticate();
   const typeDropdownRef = useRef<any | null>(null);
   const messageIosRef = useRef<FlatList | null>(null);
@@ -806,6 +808,7 @@ const Chat: React.FC = () => {
   useEffect(() => {
     if (longPressedMsg) {
       typeDropdownRef.current?.open();
+      inputRef?.current?.focus();
     }
   }, [longPressedMsg]);
 
@@ -1063,6 +1066,7 @@ const Chat: React.FC = () => {
                 </Box>
               ) : null}
               <ChatFooter
+                inputRef={inputRef}
                 onUploadFile={handleUploadFile}
                 onUploadVideo={handleUploadVideo}
                 onUploadImage={handleUploadImage}
@@ -1134,6 +1138,7 @@ const Chat: React.FC = () => {
                 </Box>
               ) : null}
               <ChatFooter
+                inputRef={inputRef}
                 onUploadFile={handleUploadFile}
                 onUploadVideo={handleUploadVideo}
                 onUploadImage={handleUploadImage}

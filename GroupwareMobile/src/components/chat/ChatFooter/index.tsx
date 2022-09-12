@@ -37,6 +37,7 @@ import {Menu} from 'react-native-paper';
 import Input from './Input';
 
 type ChatFooterProps = {
+  inputRef?: any;
   text: string | undefined;
   onChangeText: (text: string) => void;
   onUploadFile: () => void;
@@ -50,6 +51,7 @@ type ChatFooterProps = {
 };
 
 const ChatFooter: React.FC<ChatFooterProps> = ({
+  inputRef,
   text: value,
   onChangeText,
   onUploadFile,
@@ -65,8 +67,6 @@ const ChatFooter: React.FC<ChatFooterProps> = ({
   const [selection, setSelection] = useState({start: 0, end: 0});
   const [mentionAdded, setMentionAdded] = useState(false);
   const [visibleMenu, setVisibleMenu] = useState(false);
-
-  const inputRef = useRef<TextInput>(null);
 
   const renderSuggestions: React.FC<MentionSuggestionsProps> = ({
     keyword,
@@ -284,6 +284,7 @@ const ChatFooter: React.FC<ChatFooterProps> = ({
             onChangeInput={onChangeInput}
             handleSelectionChange={handleSelectionChange}
             parseContent={parseContent}
+            inputRef={inputRef}
           />
         </Div>
         {isLoading ? (

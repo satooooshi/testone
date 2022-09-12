@@ -73,6 +73,7 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = memo(
     searchedResultIds,
     lastReadChatTime,
   }) => {
+    const editorRef = useRef(null);
     const { mutate: deleteMessage } = useAPIDeleteChatMessage({
       onSuccess: (data) => {
         socket.emit('message', {
@@ -113,6 +114,14 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = memo(
         scrollToTarget(ref.current?.offsetTop - 80);
       }
     }, [isScrollTarget, scrollToTarget]);
+
+    useEffect(() => {
+      editorRef?.current?.focus();
+      editorRef?.current?.setSelectionRange(
+        editorRef?.current?.value.length,
+        editorRef?.current?.value.length,
+      );
+    }, [editMessage]);
 
     useEffect(() => {
       setMessageState(message);
@@ -334,7 +343,11 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = memo(
               {messageState?.sender?.id === user?.id &&
               messageState.type === ChatMessageType.TEXT &&
               isBeforeTwelveHours(messageState.createdAt) ? (
-                <MenuItem value={'edit'} onClick={() => setEditMessage(true)}>
+                <MenuItem
+                  value={'edit'}
+                  onClick={() => {
+                    setEditMessage(true);
+                  }}>
                   メッセージを編集
                 </MenuItem>
               ) : null}
@@ -435,6 +448,7 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = memo(
                 )}
                 {messageState.type === ChatMessageType.TEXT ? (
                   <TextMessage
+                    editorRef={editorRef}
                     message={messageState}
                     confirmedSearchWord={confirmedSearchWord}
                     searchedResultIds={searchedResultIds}

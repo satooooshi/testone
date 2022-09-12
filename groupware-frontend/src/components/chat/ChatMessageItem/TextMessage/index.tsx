@@ -12,6 +12,7 @@ import { useAPIUpdateChatMessage } from '@/hooks/api/chat/useAPIUpdateChatMessag
 import { socket } from '../../ChatBox/socket';
 
 type TextMessageProps = {
+  editorRef?: any;
   message: ChatMessage;
   confirmedSearchWord: string;
   searchedResultIds?: (number | undefined)[];
@@ -20,6 +21,7 @@ type TextMessageProps = {
 };
 
 const TextMessage: React.FC<TextMessageProps> = ({
+  editorRef,
   message,
   confirmedSearchWord,
   searchedResultIds,
@@ -136,6 +138,7 @@ const TextMessage: React.FC<TextMessageProps> = ({
         ) : (
           <>
             <Textarea
+              ref={editorRef}
               borderRadius="8px"
               maxW={'40vw'}
               minW={'10vw'}
