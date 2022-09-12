@@ -273,7 +273,7 @@ const Profile = () => {
         title: 'Admin',
       }}>
       <Head>
-        <title>sample | プロフィール編集</title>
+        <title>vallyein | プロフィール編集</title>
       </Head>
       <Box w="100%" mt="20px" mb="40px">
         <Button bg="white" w="120px" onClick={() => router.back()}>

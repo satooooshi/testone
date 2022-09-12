@@ -39,7 +39,7 @@ const AnswerReply: React.FC<AnswerReplyProps> = ({ reply }) => {
                 className={answerReplyStyles.user_avatar}
                 src={boldMascot.src}
               />
-              <p className={answerReplyStyles.user_name}>sampleくん</p>
+              <p className={answerReplyStyles.user_name}>vallyeinくん</p>
             </>
           )}
         </div>

@@ -1095,8 +1095,8 @@ index 0000000..bd74fdc
 +int string catalyst_reload_button 0x0
 +int string catalyst_reload_error 0x0
 +int string catalyst_report_button 0x0
-+int string catalyst_sample_profiler_disable 0x0
-+int string catalyst_sample_profiler_enable 0x0
++int string catalyst_vallyein_profiler_disable 0x0
++int string catalyst_vallyein_profiler_enable 0x0
 +int string catalyst_settings 0x0
 +int string catalyst_settings_title 0x0
 +int string combobox_description 0x0
@@ -3109,8 +3109,8 @@ index 0000000..f41dcf3
 +string catalyst_reload_button
 +string catalyst_reload_error
 +string catalyst_report_button
-+string catalyst_sample_profiler_disable
-+string catalyst_sample_profiler_enable
++string catalyst_vallyein_profiler_disable
++string catalyst_vallyein_profiler_enable
 +string catalyst_settings
 +string catalyst_settings_title
 +string combobox_description

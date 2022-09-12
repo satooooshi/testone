@@ -128,7 +128,7 @@ const UserAdmin: React.FC = () => {
         tabs,
       }}>
       <Head>
-        <title>sample | ユーザー管理</title>
+        <title>vallyein | ユーザー管理</title>
       </Head>
       <SearchForm
         onClear={() => setSelectedTags([])}

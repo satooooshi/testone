@@ -35,7 +35,7 @@ export default function Home() {
         onClickRightButton: () => logout(),
       }}>
       <Head>
-        <title>sample | Home</title>
+        <title>vallyein | Home</title>
       </Head>
       <div className={homeStyles.box_row_wrapper}>
         <div className={homeStyles.box_wrapper}>

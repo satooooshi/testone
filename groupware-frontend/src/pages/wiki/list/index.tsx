@@ -104,7 +104,7 @@ const QAQuestionList = () => {
       sidebar={{ activeScreenName: SidebarScreenName.QA }}
       header={initialHeaderValue}>
       <Head>
-        <title>sample | Wiki</title>
+        <title>vallyein | Wiki</title>
       </Head>
       {/* <Box w="100%" mb="24px">
         <TopTabBar topTabBehaviorList={topTab} />
