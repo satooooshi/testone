@@ -383,11 +383,6 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
     [setNewChatMessage],
   );
 
-  const onClickEdit = useCallback(() => {
-    console.log(editorRef?.current);
-    editorRef.current?.focus();
-  }, []);
-
   const onClickImage = useCallback((m: ChatMessage) => {
     if (m.type === ChatMessageType.IMAGE) {
       setSelectedImageURL(m.content);

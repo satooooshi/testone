@@ -343,11 +343,7 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = memo(
               {messageState?.sender?.id === user?.id &&
               messageState.type === ChatMessageType.TEXT &&
               isBeforeTwelveHours(messageState.createdAt) ? (
-                <MenuItem
-                  value={'edit'}
-                  onClick={() => {
-                    setEditMessage(true);
-                  }}>
+                <MenuItem value={'edit'} onClick={() => setEditMessage(true)}>
                   メッセージを編集
                 </MenuItem>
               ) : null}

@@ -5,7 +5,6 @@ import {
   TextInput,
   TextInputSelectionChangeEventData,
   useWindowDimensions,
-  Button,
 } from 'react-native';
 import {Part} from 'react-native-controlled-mentions';
 import {defaultMentionTextStyle} from 'react-native-controlled-mentions/dist/utils';
@@ -32,39 +31,37 @@ const Input: React.FC<InputProps> = ({
 }) => {
   const {height: windowHeight} = useWindowDimensions();
   return (
-    <>
-      <TextInput
-        ref={inputRef}
-        onSelectionChange={handleSelectionChange}
-        multiline
-        onChangeText={t => onChangeInput(t)}
-        autoCapitalize="none"
-        placeholderTextColor="#868596"
-        style={[
-          Platform.OS === 'android'
-            ? chatStyles.inputAndroid
-            : chatStyles.inputIos,
-          {
-            color: 'black',
-            minHeight: windowHeight * 0.03,
-            maxHeight: windowHeight * 0.22,
-          },
-        ]}>
-        <Text>
-          {parseContent.parts.map(({text, partType, data}, index) =>
-            partType ? (
-              <Text
-                key={`${index}-${data?.trigger ?? 'pattern'}`}
-                style={partType.textStyle ?? defaultMentionTextStyle}>
-                {text}
-              </Text>
-            ) : (
-              <Text key={index}>{text}</Text>
-            ),
-          )}
-        </Text>
-      </TextInput>
-    </>
+    <TextInput
+      ref={inputRef}
+      onSelectionChange={handleSelectionChange}
+      multiline
+      onChangeText={t => onChangeInput(t)}
+      autoCapitalize="none"
+      placeholderTextColor="#868596"
+      style={[
+        Platform.OS === 'android'
+          ? chatStyles.inputAndroid
+          : chatStyles.inputIos,
+        {
+          color: 'black',
+          minHeight: windowHeight * 0.03,
+          maxHeight: windowHeight * 0.22,
+        },
+      ]}>
+      <Text>
+        {parseContent.parts.map(({text, partType, data}, index) =>
+          partType ? (
+            <Text
+              key={`${index}-${data?.trigger ?? 'pattern'}`}
+              style={partType.textStyle ?? defaultMentionTextStyle}>
+              {text}
+            </Text>
+          ) : (
+            <Text key={index}>{text}</Text>
+          ),
+        )}
+      </Text>
+    </TextInput>
   );
 };
 
