@@ -201,7 +201,6 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
     (f: File[]) => {
       setIsloadingTN(true);
       dispatchCrop({ type: 'setImageFile', value: f[0] });
-      setIsloadingTN(false);
     },
     [dispatchCrop],
   );
@@ -221,6 +220,7 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
       },
       ref: img,
     });
+    setIsloadingTN(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -679,7 +679,8 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
           </Box>
           <Text mb="15px">サムネイル</Text>
 
-          {((newEvent.imageURL && !selectThumbnailUrl) || croppedImageURL) && (
+          {((newEvent.imageURL && !selectThumbnailUrl) ||
+            selectThumbnailUrl) && (
             <Button
               mb="15px"
               onClick={() => {
@@ -705,6 +706,7 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
                 onChange={(newCrop) => onChange(newCrop)}
                 keepSelection={true}
                 onImageLoaded={onLoad}
+                onImageError={() => setIsloadingTN(false)}
                 imageStyle={{
                   minHeight: '100px',
                   maxHeight: '300px',
