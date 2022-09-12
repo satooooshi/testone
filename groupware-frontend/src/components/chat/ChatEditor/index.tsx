@@ -63,7 +63,7 @@ export const Entry: React.FC<EntryComponentProps> = ({
 };
 
 type ChatEditorProps = {
-  editorRef?: Editor;
+  editorRef?: any;
   room: ChatGroup;
   onSend: (content: string) => void;
   isLoading: boolean;
@@ -176,7 +176,7 @@ const ChatEditor: React.FC<ChatEditorProps> = memo(
           bg="#fefefe"
           h="20%"
           onClick={() => {
-            editorRef.current?.focus();
+            editorRef?.current?.focus();
           }}>
           <Editor
             editorKey={'editor'}
