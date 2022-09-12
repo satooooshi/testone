@@ -1,7 +1,7 @@
 import UserAvatar from '@/components/common/UserAvatar';
 import { Box, Text, Textarea, useMediaQuery } from '@chakra-ui/react';
 import React, { ReactNode, useEffect, useState } from 'react';
-import { ChatMessage, ChatMessageType } from 'src/types';
+import { ChatMessage, ChatMessageType, User } from 'src/types';
 import { darkFontColor } from 'src/utils/colors';
 import { userNameFactory } from 'src/utils/factory/userNameFactory';
 import { mentionTransform } from 'src/utils/mentionTransform';
@@ -17,6 +17,10 @@ type TextMessageProps = {
   searchedResultIds?: (number | undefined)[];
   editMessage: boolean;
   finishEdit: () => void;
+  senderAvatars?: {
+    member: User;
+    avatar: JSX.Element;
+  }[];
 };
 
 const TextMessage: React.FC<TextMessageProps> = ({
@@ -25,6 +29,7 @@ const TextMessage: React.FC<TextMessageProps> = ({
   searchedResultIds,
   editMessage,
   finishEdit,
+  senderAvatars,
 }) => {
   const [isEdited, setIsEdited] = useState(false);
   const { mutate: updateMessage } = useAPIUpdateChatMessage({
@@ -109,11 +114,20 @@ const TextMessage: React.FC<TextMessageProps> = ({
               w="32px"
               mr="4px"
               cursor="pointer"
-              user={message.replyParentMessage.sender}
+              user={
+                senderAvatars?.find(
+                  (s) => s.member.id === message.replyParentMessage?.sender?.id,
+                )?.member
+              }
             />
             <Box width={'90%'}>
               <Text fontWeight="bold">
-                {userNameFactory(message.replyParentMessage?.sender)}
+                {userNameFactory(
+                  senderAvatars?.find(
+                    (s) =>
+                      s.member.id === message.replyParentMessage?.sender?.id,
+                  )?.member,
+                )}
               </Text>
               <Text>{replyContent(message.replyParentMessage)}</Text>
             </Box>

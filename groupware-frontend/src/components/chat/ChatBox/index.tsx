@@ -391,11 +391,12 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
 
   const isPersonal = room.roomType === RoomType.PERSONAL;
 
+  const allMembers = useMemo(
+    () => [...(room?.members || []), ...(room?.previousMembers || [])],
+    [room.members, room.previousMembers],
+  );
+
   const senderAvatars = useMemo(() => {
-    const allMembers = [
-      ...(room?.members || []),
-      ...(room?.previousMembers || []),
-    ];
     return allMembers.map((m) => ({
       member: m,
       avatar: (
@@ -407,7 +408,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
         />
       ),
     }));
-  }, [room?.members, room.previousMembers]);
+  }, [allMembers]);
 
   return (
     <Box
@@ -580,9 +581,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
           <>
             {messages.map((m) => (
               <ChatMessageItem
-                senderAvatar={senderAvatars?.find(
-                  (s) => s.member.id === m.sender?.id,
-                )}
+                senderAvatars={senderAvatars}
                 isScrollTarget={focusedMessageID === m.id}
                 scrollToTarget={scrollToTarget}
                 usersInRoom={room.members || []}
@@ -640,13 +639,23 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
           </Link>
           <UserAvatar
             mr="8px"
-            src={newChatMessage.replyParentMessage.sender?.avatarUrl}
+            src={
+              allMembers?.find(
+                (m) => m.id === newChatMessage.replyParentMessage?.sender?.id,
+              )?.avatarUrl
+            }
             size="md"
-            user={newChatMessage.replyParentMessage.sender}
+            user={allMembers?.find(
+              (m) => m.id === newChatMessage.replyParentMessage?.sender?.id,
+            )}
           />
           <Box display="flex" justifyContent="center" flexDir="column" w="100%">
             <Text fontWeight="bold">
-              {userNameFactory(newChatMessage.replyParentMessage.sender)}
+              {userNameFactory(
+                allMembers?.find(
+                  (m) => m.id === newChatMessage.replyParentMessage?.sender?.id,
+                ),
+              )}
             </Text>
             <Text isTruncated w="90%" noOfLines={1}>
               {replyTargetContent(newChatMessage.replyParentMessage)}

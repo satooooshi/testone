@@ -59,10 +59,10 @@ type ChatMessageItemProps = {
   confirmedSearchWord: string;
   searchedResultIds?: (number | undefined)[];
   lastReadChatTime: LastReadChatTime[] | undefined;
-  senderAvatar?: {
+  senderAvatars?: {
     member: User;
     avatar: JSX.Element;
-  };
+  }[];
 };
 
 const ChatMessageItem: React.FC<ChatMessageItemProps> = memo(
@@ -76,7 +76,7 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = memo(
     confirmedSearchWord,
     searchedResultIds,
     lastReadChatTime,
-    senderAvatar,
+    senderAvatars,
   }) => {
     const { mutate: deleteMessage } = useAPIDeleteChatMessage({
       onSuccess: (data) => {
@@ -365,6 +365,10 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = memo(
       return <></>;
     }
 
+    const senderAvatar = senderAvatars?.find(
+      (s) => s.member.id === message.sender?.id,
+    );
+
     return (
       <Box
         ref={ref}
@@ -431,6 +435,7 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = memo(
                 )}
                 {messageState.type === ChatMessageType.TEXT ? (
                   <TextMessage
+                    senderAvatars={senderAvatars}
                     message={messageState}
                     confirmedSearchWord={confirmedSearchWord}
                     searchedResultIds={searchedResultIds}

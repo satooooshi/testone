@@ -503,16 +503,23 @@ export class ChatService {
       })
       .getRawMany();
     //返信の取得
-    let replyMessages: ChatMessage[] = [];
+    let replyMessages = [];
     if (replyMessageIDs.length) {
       replyMessages = await this.chatMessageRepository
         .createQueryBuilder('messages')
-        .leftJoin('messages.sender', 'sender')
-        .addSelect(selectUserColumns('sender'))
+        .select([
+          'messages.id as id',
+          'messages.content as content',
+          'messages.type as type',
+          'messages.call_time as callTime',
+          'messages.file_name as fileName',
+          'messages.sender_id as sender_id',
+          'messages.chat_group_id as chat_group_id',
+        ])
         .where('messages.id IN (:...replyMessageIDs)', {
           replyMessageIDs,
         })
-        .getMany();
+        .getRawMany();
     }
 
     const messages: ChatMessage[] = await Promise.all(
@@ -541,9 +548,11 @@ export class ChatService {
             });
         }
         if (m.reply_parent_id) {
-          m.replyParentMessage = replyMessages.find(
+          const replyMessage = replyMessages.find(
             (replyMsg) => replyMsg.id === m.reply_parent_id,
           );
+          replyMessage.sender = { id: replyMessage.sender_id } as User;
+          m.replyParentMessage = replyMessage;
         }
         if (m.sender_id && m.sender_id === userID) {
           m.isSender = true;

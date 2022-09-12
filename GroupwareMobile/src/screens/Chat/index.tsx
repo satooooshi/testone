@@ -913,9 +913,7 @@ const Chat: React.FC = () => {
         scrollToRenderedMessage()
       }>
       <ChatMessageItem
-        senderAvatar={senderAvatars?.find(
-          s => s.member.id === message.sender?.id,
-        )}
+        senderAvatars={senderAvatars}
         message={message}
         readUsers={readUsers(message)}
         inputtedSearchWord={inputtedSearchWord}
@@ -1046,6 +1044,9 @@ const Chat: React.FC = () => {
                     setValues(v => ({...v, replyParentMessage: undefined}))
                   }
                   replyParentMessage={values.replyParentMessage}
+                  senderAvatar={senderAvatars.find(
+                    s => s.member.id === values.replyParentMessage?.sender?.id,
+                  )}
                 />
               )}
               <Div
