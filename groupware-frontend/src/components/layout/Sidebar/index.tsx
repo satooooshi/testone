@@ -29,6 +29,9 @@ import {
   MenuDivider,
 } from '@chakra-ui/react';
 // import { Menu, MenuItem, MenuButton, MenuDivider,  MenuList, } from '@szhsin/react-menu';
+import { GiCancel } from 'react-icons/gi';
+import { useMediaQuery } from '@chakra-ui/media-query';
+import { MdWork } from 'react-icons/md';
 import { useHandleBadge } from 'src/contexts/badge/useHandleBadge';
 import { AiOutlineDoubleLeft } from 'react-icons/ai';
 import Image from 'next/image';
@@ -51,6 +54,7 @@ export enum SidebarScreenName {
   CHAT = 'チャット',
   ADMIN = '管理',
   TAGADMIN = 'タグ編集',
+  ATTENDANCE = '勤怠管理',
 }
 
 export type SidebarProps = {
@@ -205,6 +209,17 @@ const Sidebar: React.FC<SidebarProps> = ({ activeScreenName, hideDrawer }) => {
             }
             iconName={SidebarScreenName.CHAT}
           />
+          <LinkWithIcon
+            screenName={`/attendance`}
+            icon={
+              <MdWork
+                className={iconClass(
+                  activeScreenName === SidebarScreenName.ATTENDANCE,
+                )}
+              />
+            }
+            iconName={SidebarScreenName.ATTENDANCE}
+          />
           {/* <LinkWithIcon
             screenName={`/account/${user?.id}`}
             isActive={activeScreenName === SidebarScreenName.ACCOUNT}
@@ -216,7 +231,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeScreenName, hideDrawer }) => {
               />
             }
             iconName={SidebarScreenName.ACCOUNT}
-          /> */}
+          />
         </div>
         {/* {user?.role === UserRole.ADMIN ? (
           <LinkWithIcon
@@ -243,85 +258,85 @@ const Sidebar: React.FC<SidebarProps> = ({ activeScreenName, hideDrawer }) => {
             iconName={SidebarScreenName.TAGADMIN}
           />
         )} */}
-        <Box>
-          <Menu>
-            {({ isOpen }) => (
-              <>
-                <MenuButton
-                  // w="20px"
-                  // isActive={isOpen}
-                  bg="transparent"
-                  as={Box}
-                  // rightIcon={
-                  //   <AiOutlineRight size={20} color={darkFontColor} />
-                  // }
-                  className={sidebarStyles.login_user_item}>
-                  <div className={sidebarStyles.login_user_name_with_icon}>
-                    <Avatar
-                      size="xl"
-                      src={user?.avatarUrl}
-                      className={sidebarStyles.login_user_icon}
-                      width={'40px'}
-                      height={'40px'}
-                    />
-                    <Text color="black" fontWeight="bold">
-                      {user?.lastName} {user?.firstName}
-                    </Text>
-                    <Box ml="auto">
-                      <AiOutlineRight size={20} color={darkFontColor} />
-                    </Box>
-                  </div>
-                </MenuButton>
-                <MenuList borderWidth="2px">
-                  <MenuItem
-                    icon={<RiAccountCircleFill size={20} />}
-                    h={10}
-                    onClick={() => {
-                      router.push(`/account/${user?.id}`);
-                    }}>
-                    プロフィール
-                  </MenuItem>
-                  <MenuItem
-                    icon={<AiFillEdit size={20} />}
-                    h={10}
-                    onClick={() => {
-                      router.push('/account/profile');
-                    }}>
-                    プロフィール編集
-                  </MenuItem>
-                  <MenuItem
-                    icon={<IoSettingsSharp size={20} />}
-                    h={10}
-                    onClick={() => {
-                      router.push('/account/update-password');
-                    }}>
-                    パスワード変更
-                  </MenuItem>
-                  {user?.role === UserRole.ADMIN && (
+          <Box>
+            <Menu>
+              {({ isOpen }) => (
+                <>
+                  <MenuButton
+                    // w="20px"
+                    // isActive={isOpen}
+                    bg="transparent"
+                    as={Box}
+                    // rightIcon={
+                    //   <AiOutlineRight size={20} color={darkFontColor} />
+                    // }
+                    className={sidebarStyles.login_user_item}>
+                    <div className={sidebarStyles.login_user_name_with_icon}>
+                      <Avatar
+                        size="xl"
+                        src={user?.avatarUrl}
+                        className={sidebarStyles.login_user_icon}
+                        width={'40px'}
+                        height={'40px'}
+                      />
+                      <Text color="black" fontWeight="bold">
+                        {user?.lastName} {user?.firstName}
+                      </Text>
+                      <Box ml="auto">
+                        <AiOutlineRight size={20} color={darkFontColor} />
+                      </Box>
+                    </div>
+                  </MenuButton>
+                  <MenuList borderWidth="2px">
                     <MenuItem
-                      icon={<FaUserCog size={20} />}
+                      icon={<RiAccountCircleFill size={20} />}
                       h={10}
                       onClick={() => {
-                        router.push('/admin/users');
+                        router.push(`/account/${user?.id}`);
                       }}>
-                      管理者ページ
+                      プロフィール
                     </MenuItem>
-                  )}
-                  <MenuDivider />
-                  <MenuItem
-                    icon={<RiLogoutBoxRLine size={20} />}
-                    onClick={() => {
-                      logout();
-                    }}>
-                    ログアウト
-                  </MenuItem>
-                </MenuList>
-              </>
-            )}
-          </Menu>
-        </Box>
+                    <MenuItem
+                      icon={<AiFillEdit size={20} />}
+                      h={10}
+                      onClick={() => {
+                        router.push('/account/profile');
+                      }}>
+                      プロフィール編集
+                    </MenuItem>
+                    <MenuItem
+                      icon={<IoSettingsSharp size={20} />}
+                      h={10}
+                      onClick={() => {
+                        router.push('/account/update-password');
+                      }}>
+                      パスワード変更
+                    </MenuItem>
+                    {user?.role === UserRole.ADMIN && (
+                      <MenuItem
+                        icon={<FaUserCog size={20} />}
+                        h={10}
+                        onClick={() => {
+                          router.push('/admin/users');
+                        }}>
+                        管理者ページ
+                      </MenuItem>
+                    )}
+                    <MenuDivider />
+                    <MenuItem
+                      icon={<RiLogoutBoxRLine size={20} />}
+                      onClick={() => {
+                        logout();
+                      }}>
+                      ログアウト
+                    </MenuItem>
+                  </MenuList>
+                </>
+              )}
+            </Menu>
+          </Box>
+        </div>
       </div>
-      {/* </div> */}
     </>
   );
 };

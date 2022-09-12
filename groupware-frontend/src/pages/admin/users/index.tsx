@@ -42,6 +42,8 @@ import {
 } from 'src/utils/userRoleFommater';
 import { AiOutlinePlus } from 'react-icons/ai';
 import { FiEdit2 } from 'react-icons/fi';
+import { MdWork } from 'react-icons/md';
+import { userNameFactory } from 'src/utils/factory/userNameFactory';
 
 const UserAdmin: React.FC = () => {
   const router = useRouter();
@@ -177,7 +179,9 @@ const UserAdmin: React.FC = () => {
               ) : null}
               {/* <th className={userAdminStyles.table_head}>メールアドレス</th> */}
               <th className={userAdminStyles.table_head}>社員区分</th>
-              <th className={userAdminStyles.table_head}></th>
+              <th className={userAdminStyles.table_head}>勤怠</th>
+              <th className={userAdminStyles.table_head}>編集</th>
+              <th className={userAdminStyles.table_head}>削除</th>
               <th className={userAdminStyles.table_head} />
             </tr>
             {users?.users?.map((u) => (
@@ -201,6 +205,16 @@ const UserAdmin: React.FC = () => {
                   {userRoleValueToName(u.role)}
                 </td>
 
+                <td className={userAdminStyles.delete_icon_wrapper}>
+                  <Link href={`/admin/attendance/view/${u.id}`} passHref>
+                    <a>
+                      <MdWork
+                        className={userAdminStyles.delete_icon}
+                        color={'orange'}
+                      />
+                    </a>
+                  </Link>
+                </td>
                 <td className={userAdminStyles.delete_icon_wrapper}>
                   <Link href={`/admin/users/editProfile/${u.id}`} passHref>
                     <a>

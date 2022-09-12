@@ -37,6 +37,10 @@ import EventIntroduction from '../../screens/event/EventIntroduction';
 import {useAuthenticate} from '../../contexts/useAuthenticate';
 import {UserRole} from '../../types';
 import WikiLinks from '../../screens/wiki/WikiLinks';
+import AttendanceHome from '../../screens/attendance/AttendanceHome';
+import Attendance from '../../screens/attendance/Attendance';
+import Application from '../../screens/attendance/Application';
+import DefaultAttendance from '../../screens/attendance/DefaultAttendance';
 import EditedProfile from '../../screens/admin/EditedProfile';
 
 const Drawer = createDrawerNavigator();
@@ -256,6 +260,33 @@ const ChatStack = () => (
   </Stack.Navigator>
 );
 
+const AttendanceStack = () => {
+  return (
+    <Stack.Navigator initialRouteName={'AttendanceHome'}>
+      <Stack.Screen
+        name="AttendanceHome"
+        component={AttendanceHome}
+        options={{headerShown: false}}
+      />
+      <Stack.Screen
+        name="Attendance"
+        component={Attendance}
+        options={{headerShown: false}}
+      />
+      <Stack.Screen
+        name="ApplicationBeforeJoining"
+        component={Application}
+        options={{headerShown: false}}
+      />
+      <Stack.Screen
+        name="DefaultAttendance"
+        component={DefaultAttendance}
+        options={{headerShown: false}}
+      />
+    </Stack.Navigator>
+  );
+};
+
 const DrawerTab = () => {
   const {user} = useAuthenticate();
   const isAdmin = user?.role === UserRole.ADMIN;
@@ -355,6 +386,21 @@ const DrawerTab = () => {
             <Icon
               name="user-alt"
               fontFamily="FontAwesome5"
+              color={color}
+              fontSize={26}
+            />
+          ),
+        }}
+      />
+      <Drawer.Screen
+        name="AttendanceStack"
+        component={AttendanceStack}
+        options={{
+          drawerLabel: '勤怠管理',
+          drawerIcon: ({color}) => (
+            <Icon
+              name="work"
+              fontFamily="MaterialIcons"
               color={color}
               fontSize={26}
             />
