@@ -63,6 +63,7 @@ export const Entry: React.FC<EntryComponentProps> = ({
 };
 
 type ChatEditorProps = {
+  editorRef?: Editor;
   room: ChatGroup;
   onSend: (content: string) => void;
   isLoading: boolean;
@@ -75,14 +76,14 @@ type ChatEditorProps = {
 };
 
 const ChatEditor: React.FC<ChatEditorProps> = memo(
-  ({ room, onSend, isLoading, uploadFiles }) => {
+  ({ room, onSend, isLoading, uploadFiles, editorRef }) => {
     const { user } = useAuthenticate();
     const [content, setContent] = useState('');
     const [editorState, setEditorState] = useState<EditorState>(
       EditorState.createEmpty(),
     );
     // const editorStateRef = useRef(EditorState.createEmpty());
-    const editorRef = useRef<Editor>(null);
+    // const editorRef = useRef<Editor>(null);
     const [mentionedUserData, setMentionedUserData] = useState<MentionData[]>(
       [],
     );
