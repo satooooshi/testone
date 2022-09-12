@@ -132,10 +132,10 @@ export class ChatService {
     userID: number,
     query: GetChaRoomsByPageQuery,
   ): Promise<GetRoomsResult> {
-    const { page, limit = '20' } = query;
+    const { page, limit = '100' } = query;
 
     let offset = 0;
-    const limitNumber = Number(limit);
+    const limitNumber = Number('100');
     if (page) {
       offset = (Number(page) - 1) * limitNumber;
     }
@@ -169,7 +169,7 @@ export class ChatService {
       .getMany();
 
     if (!urlUnparsedRooms.length) {
-      return { rooms: urlUnparsedRooms, pageCount: 0 };
+      return { rooms: urlUnparsedRooms, gotAllRooms: true };
     }
 
     const roomIds = urlUnparsedRooms.map((r) => r.id);
@@ -182,7 +182,7 @@ export class ChatService {
     let members: UserAndGroupID[] = [];
     if (personalRoomIds.length)
       members = await manager.query(
-        'select chat_group_id, users.id as id, users.last_name as lastName, users.first_name as firstName, users.avatar_url as avatarUrl, users.existence as existence from user_chat_joining INNER JOIN users ON users.id = user_id AND chat_group_id IN (?)',
+        'select chat_group_id, users.id as id, users.last_name as lastName, users.first_name as firstName, users.avatar_url as avatarUrl, users.existence as existence from user_chat_joining INNER JOIN users ON users.existence is not null AND users.id = user_id AND chat_group_id IN (?)',
         [personalRoomIds.map((r) => r.id)],
       );
 
@@ -298,9 +298,8 @@ export class ChatService {
     //     endTime - startTime,
     //   );
     // }
-    const pageCount = Number(page);
 
-    return { rooms, pageCount };
+    return { rooms, gotAllRooms: rooms.length < limitNumber };
   }
 
   public async getOneRoom(userID: number, roomId: number): Promise<ChatGroup> {
@@ -314,7 +313,7 @@ export class ChatService {
     const manager = getManager();
 
     const members: User[] = await manager.query(
-      'select chat_group_id, users.id as id, users.last_name as lastName, users.first_name as firstName, users.avatar_url as avatarUrl, users.existence as existence from user_chat_joining INNER JOIN users ON users.id = user_id AND chat_group_id = ?',
+      'select chat_group_id, users.id as id, users.last_name as lastName, users.first_name as firstName, users.avatar_url as avatarUrl, users.existence as existence from user_chat_joining INNER JOIN users ON users.existence is not null AND users.id = user_id AND chat_group_id = ?',
       [roomId],
     );
 
@@ -722,15 +721,14 @@ export class ChatService {
       'select user_id as id from user_chat_mute where chat_group_id  = ? ',
       [message.chatGroup.id],
     );
-    existGroup.members = members;
-    existGroup.muteUsers = muteUsers;
-    if (
-      !existGroup?.members.filter((m) => m?.id === message?.sender?.id).length
-    ) {
+    if (!members.filter((m) => m?.id === message?.sender?.id).length) {
       throw new BadRequestException('sender is not a member of this group');
     }
     const savedMessage = await this.chatMessageRepository.save(
-      this.chatMessageRepository.create({ ...message, chatGroup: existGroup }),
+      this.chatMessageRepository.create({
+        ...message,
+        chatGroup: { ...existGroup, members: members, muteUsers: muteUsers },
+      }),
     );
 
     existGroup.updatedAt = new Date();
@@ -851,9 +849,20 @@ export class ChatService {
 
     await this.chatGroupRepository
       .createQueryBuilder()
+      .update(ChatGroup)
+      .set({ memberCount: () => 'member_count - 1' })
+      .where('id = :id', { id: chatGroupID })
+      .execute();
+    await this.chatGroupRepository
+      .createQueryBuilder()
       .relation(ChatGroup, 'members')
       .of(chatGroupID)
       .remove(userID);
+    await this.chatGroupRepository
+      .createQueryBuilder()
+      .relation(ChatGroup, 'previousMembers')
+      .of(chatGroupID)
+      .add(userID);
     const systemMessage = new ChatMessage();
     const userName = userNameFactory(user);
     systemMessage.content = `${userName}さんが退出しました`;
@@ -940,6 +949,34 @@ export class ChatService {
       throw new BadRequestException('The user is not a member');
     }
     const systemMessage: ChatMessage[] = [];
+    const removedMembers = existGroup.members.filter(
+      (existM) => !newData.members.map((m) => m.id).includes(existM.id),
+    );
+    const newMembers = newData.members.filter(
+      (newM) => !existGroup.members.map((m) => m.id).includes(newM.id),
+    );
+    if (removedMembers.length || newMembers.length) {
+      const manager = getManager();
+      const previousMembers: User[] = await manager.query(
+        'select users.id as id, users.last_name as lastName, users.existence as existence from user_chat_leaving INNER JOIN users ON users.existence is not null AND users.id = user_id AND chat_group_id = ?',
+        [existGroup.id],
+      );
+
+      existGroup.previousMembers = previousMembers.filter(
+        (newM) => !newMembers.map((m) => m.id).includes(newM.id),
+      );
+      if (removedMembers.length) {
+        existGroup.previousMembers = [
+          ...existGroup.previousMembers,
+          ...removedMembers,
+        ];
+      }
+    }
+
+    if (existGroup.name !== newData.name) {
+      existGroup.roomType = RoomType.GROUP;
+    }
+
     const newGroup = await this.chatGroupRepository.save({
       ...existGroup,
       imageURL: genStorageURL(newData.imageURL),
@@ -958,12 +995,6 @@ export class ChatService {
       const sysMsg = await this.chatMessageRepository.save(sysMsgSaidsUpdated);
       systemMessage.push(sysMsg);
     }
-    const newMembers = newGroup.members.filter(
-      (newM) => !existGroup.members.map((m) => m.id).includes(newM.id),
-    );
-    const removedMembers = existGroup.members.filter(
-      (existM) => !newGroup.members.map((m) => m.id).includes(existM.id),
-    );
     if (newMembers.length) {
       const newMembersSystemMsg = new ChatMessage();
       newMembersSystemMsg.type = ChatMessageType.SYSTEM_TEXT;
@@ -1146,12 +1177,24 @@ export class ChatService {
     }
 
     const manager = getManager();
-    const members: UserAndGroupID[] = await manager.query(
-      'select chat_group_id, users.id as id, users.last_name as lastName, users.first_name as firstName, users.avatar_url as avatarUrl, users.existence as existence from user_chat_joining INNER JOIN users ON users.id = user_id AND chat_group_id = ?',
+    const members: User[] = await manager.query(
+      'select  users.id as id, users.last_name as lastName, users.first_name as firstName, users.avatar_url as avatarUrl, users.existence as existence from user_chat_joining INNER JOIN users ON users.existence is not null AND users.id = user_id AND chat_group_id = ?',
       [roomId],
     );
-    existRoom.members = members;
+    // const previousMembers: User[] = await manager.query(
+    //   'select users.id as id, users.last_name as lastName, users.first_name as firstName, users.avatar_url as avatarUrl, users.existence as existence from user_chat_leaving INNER JOIN users ON users.existence is not null AND users.id = user_id AND chat_group_id = ?',
+    //   [roomId],
+    // );
+
+    // existRoom.previousMembers = previousMembers;
     checkAloneRoom(existRoom, userId);
+    existRoom.imageURL = await genSignedURL(existRoom.imageURL);
+    existRoom.members = await Promise.all(
+      members.map(async (m) => ({
+        ...m,
+        avatarUrl: await genSignedURL(m.avatarUrl),
+      })),
+    );
 
     return existRoom;
   }

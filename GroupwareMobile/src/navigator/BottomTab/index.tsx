@@ -332,6 +332,7 @@ const BottomTab = () => {
         name="UsersStack"
         component={UserListStack}
         options={{
+          tabBarItemStyle: {display: 'none'},
           tabBarLabel: '社員名鑑',
           tabBarIcon: ({color}) => (
             <Icon
@@ -390,6 +391,7 @@ const BottomTab = () => {
         name="AccountStack"
         component={AccountStack}
         options={{
+          tabBarItemStyle: {display: 'none'},
           tabBarLabel: 'アカウント',
           tabBarIcon: ({color}) => (
             <>
@@ -407,6 +409,7 @@ const BottomTab = () => {
         name="AdminStack"
         component={AdminStack}
         options={{
+          tabBarItemStyle: {display: 'none'},
           tabBarLabel: '管理',
           tabBarIcon: ({color}) =>
             isAdmin ? (
