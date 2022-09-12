@@ -43,8 +43,8 @@ export const wikiTypeNameFactory = (
         switch (ruleCategory) {
           case RuleCategory.RULES:
             return '社内規則';
-          case RuleCategory.ABC:
-            return 'ABC制度';
+          // case RuleCategory.ABC:
+          //   return 'ABC制度';
           case RuleCategory.PHILOSOPHY:
             return '会社理念';
           case RuleCategory.BENEFITS:
@@ -79,7 +79,7 @@ export const getWikiCategoryList = (wikiType?: WikiType) => {
         'その他',
       ];
     case WikiType.RULES:
-      return ['社内規則', 'ABC制度', '会社理念', '福利厚生等', '各種申請書'];
+      return ['社内規則', '会社理念', '福利厚生等', '各種申請書'];
   }
 };
 
@@ -112,13 +112,15 @@ export const getRuleCategory = (name: string) => {
   switch (name) {
     case '社内規則':
       return RuleCategory.RULES;
-    case 'ABC制度':
-      return RuleCategory.ABC;
+    // case 'ABC制度':
+    //   return RuleCategory.ABC;
     case '会社理念':
       return RuleCategory.PHILOSOPHY;
     case '福利厚生等':
       return RuleCategory.BENEFITS;
     case '各種申請書':
       return RuleCategory.DOCUMENT;
+    default:
+      return '';
   }
 };

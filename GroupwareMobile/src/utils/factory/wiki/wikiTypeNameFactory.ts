@@ -43,8 +43,8 @@ export const wikiTypeNameFactory = (
         switch (ruleCategory) {
           case RuleCategory.RULES:
             return '社内規則';
-          case RuleCategory.ABC:
-            return 'ABC制度';
+          // case RuleCategory.ABC:
+          //   return 'ABC制度';
           case RuleCategory.PHILOSOPHY:
             return '会社理念';
           case RuleCategory.BENEFITS:

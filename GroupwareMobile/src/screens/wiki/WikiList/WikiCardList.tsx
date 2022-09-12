@@ -261,7 +261,7 @@ const WikiCardList: React.FC<WikiCardListProps> = ({
               )}
               options={{title: '会社理念'}}
             />
-            <TopTab.Screen
+            {/* <TopTab.Screen
               name={'WikiList-' + RuleCategory.ABC}
               children={() => (
                 <RenderWikiCardList
@@ -274,7 +274,7 @@ const WikiCardList: React.FC<WikiCardListProps> = ({
                 />
               )}
               options={{title: 'ABC制度'}}
-            />
+            /> */}
             <TopTab.Screen
               name={'WikiList-' + RuleCategory.BENEFITS}
               children={() => (
