@@ -37,10 +37,49 @@ export const BadgeProvider: React.FC = ({children}) => {
   //   string | undefined
   // >('');
 
+  const sortRooms = (room: ChatGroup[]) => {
+    if (!room.length) {
+      return [];
+    }
+    const pinnedRooms = room
+      .filter(r => r.isPinned)
+      .sort((a, b) => {
+        if (
+          (b?.chatMessages?.[0]?.createdAt
+            ? b?.chatMessages?.[0]?.createdAt
+            : b.createdAt) >
+          (a?.chatMessages?.[0]?.createdAt
+            ? a?.chatMessages?.[0]?.createdAt
+            : a.createdAt)
+        ) {
+          return 1;
+        } else {
+          return -1;
+        }
+      });
+    const exceptPinnedRooms = room
+      .filter(r => !r.isPinned)
+      .sort((a, b) => {
+        if (
+          (b?.chatMessages?.[0]?.createdAt
+            ? b?.chatMessages?.[0]?.createdAt
+            : b.createdAt) >
+          (a?.chatMessages?.[0]?.createdAt
+            ? a?.chatMessages?.[0]?.createdAt
+            : a.createdAt)
+        ) {
+          return 1;
+        } else {
+          return -1;
+        }
+      });
+    return [...pinnedRooms, ...exceptPinnedRooms];
+  };
+
   const {refetch: refetchAllRooms, isLoading} = useAPIGetRooms(
     {
       page: page.toString(),
-      limit: '20',
+      limit: '100',
     },
     {
       enabled: false,
@@ -51,15 +90,14 @@ export const BadgeProvider: React.FC = ({children}) => {
         }
         setChatUnreadCount(count);
         setChatGroups(r => {
-          if (page !== 1 && r.length) {
-            const mergedRooms = [...r, ...data.rooms];
-            const pinnedRooms = mergedRooms.filter(r => r.isPinned);
-            const exceptPinnedRooms = mergedRooms.filter(r => !r.isPinned);
-            return [...pinnedRooms, ...exceptPinnedRooms];
+          const rooms =
+            page !== 1 && r.length ? [...r, ...data.rooms] : data.rooms;
+          if (!data.gotAllRooms) {
+            return rooms;
           }
-          return [...data.rooms];
+          return sortRooms(rooms);
         });
-        if (data.rooms.length >= 20) {
+        if (!data.gotAllRooms) {
           setPage(p => p + 1);
         } else {
           setPage(1);
@@ -190,6 +228,7 @@ export const BadgeProvider: React.FC = ({children}) => {
   };
 
   const refreshRooms = () => {
+    setCompleteRefetch(false);
     refetchAllRooms();
   };
 

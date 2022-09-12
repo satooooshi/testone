@@ -76,7 +76,7 @@ export interface GetRoomsQuery {
 
 export interface GetRoomsResult {
   rooms: ChatGroup[];
-  pageCount: number;
+  gotAllRooms: boolean;
 }
 export interface SaveRoomsResult {
   room: ChatGroup;
