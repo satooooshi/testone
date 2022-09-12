@@ -73,7 +73,7 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = memo(
     searchedResultIds,
     lastReadChatTime,
   }) => {
-    const editorRef = useRef(null);
+    const focusTextareaRef = useRef<HTMLTextAreaElement>(null);
     const { mutate: deleteMessage } = useAPIDeleteChatMessage({
       onSuccess: (data) => {
         socket.emit('message', {
@@ -116,10 +116,10 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = memo(
     }, [isScrollTarget, scrollToTarget]);
 
     useEffect(() => {
-      editorRef?.current?.focus();
-      editorRef?.current?.setSelectionRange(
-        editorRef?.current?.value.length,
-        editorRef?.current?.value.length,
+      focusTextareaRef?.current?.focus();
+      focusTextareaRef?.current?.setSelectionRange(
+        focusTextareaRef?.current?.value.length,
+        focusTextareaRef?.current?.value.length,
       );
     }, [editMessage]);
 
@@ -444,7 +444,7 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = memo(
                 )}
                 {messageState.type === ChatMessageType.TEXT ? (
                   <TextMessage
-                    editorRef={editorRef}
+                    focusTextareaRef={focusTextareaRef}
                     message={messageState}
                     confirmedSearchWord={confirmedSearchWord}
                     searchedResultIds={searchedResultIds}
