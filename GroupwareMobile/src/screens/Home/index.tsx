@@ -103,8 +103,8 @@ const Home: React.FC = () => {
       <HeaderWithTextButton
         title="Home"
         activeTabName="ダッシュボード"
-        rightButtonName={'ログアウト'}
-        onPressRightButton={handleLogout}
+        // rightButtonName={'ログアウト'}
+        // onPressRightButton={handleLogout}
       />
 
       <ScrollDiv pt="lg" px="5%">
