@@ -152,7 +152,7 @@ const AttendanceRow = ({
 
       if (diff < 0) {
         const absenceTime = new Date(values.absenceTime);
-        absenceTime.setDate(values.absenceTime.getDate() + 1);
+        absenceTime.setDate(absenceTime.getDate() + 1);
         diff =
           (new Date(absenceTime).getTime() -
             new Date(values.attendanceTime).getTime()) /
