@@ -72,6 +72,7 @@ const TextMessage: React.FC<TextMessageProps> = ({
   useEffect(() => {
     const escFunction = (e: any) => {
       if (e.key == 'Escape') {
+        setMessageValue(message.content);
         finishEdit();
       }
     };
@@ -140,7 +141,7 @@ const TextMessage: React.FC<TextMessageProps> = ({
               maxW={'40vw'}
               minW={'10vw'}
               value={messageValue}
-              onKeyPress={(e: React.KeyboardEvent) => {
+              onKeyDown={(e: React.KeyboardEvent) => {
                 if (e.ctrlKey !== e.metaKey && e.key === 'Enter') {
                   updateMessage({ ...message, content: messageValue });
                 }
