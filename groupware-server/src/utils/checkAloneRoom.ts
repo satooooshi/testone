@@ -7,7 +7,7 @@ export const checkAloneRoom = (existRoom: ChatGroup, userId: number) => {
     existRoom.roomType === RoomType.PERSONAL &&
     existRoom.memberCount === 2
   ) {
-    const chatPartner = existRoom.members.find((m) => m.id !== userId);
+    const chatPartner = existRoom?.members?.find((m) => m.id !== userId);
     if (chatPartner) {
       existRoom.imageURL = chatPartner.avatarUrl;
       existRoom.name = `${chatPartner.lastName} ${chatPartner.firstName}`;

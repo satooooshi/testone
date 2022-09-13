@@ -782,6 +782,7 @@ const Chat: React.FC = () => {
               setValues(longPressedMsg);
               messageContentRef.current = longPressedMsg.content;
             }
+            setLongPressedMgg(undefined);
           }}>
           メッセージを編集
         </Dropdown.Option>
@@ -1219,7 +1220,7 @@ const Chat: React.FC = () => {
   return (
     <WholeContainer>
       {typeDropdown}
-      <Div h="100%" bg={Platform.OS === 'ios' ? 'blue300' : 'blue200'}>
+      <Div h="100%" bg={Platform.OS === 'ios' ? 'blue300' : 'blue400'}>
         <ReactionsModal
           isVisible={!!selectedReactions}
           selectedReactions={selectedReactions}
