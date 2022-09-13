@@ -782,6 +782,7 @@ const Chat: React.FC = () => {
               setValues(longPressedMsg);
               messageContentRef.current = longPressedMsg.content;
             }
+            setLongPressedMgg(undefined);
           }}>
           メッセージを編集
         </Dropdown.Option>
