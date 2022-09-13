@@ -933,9 +933,19 @@ export class ChatService {
       throw new InternalServerErrorException('Something went wrong');
     }
 
-    const existGroup = await this.chatGroupRepository.findOne(newData.id, {
-      relations: ['members', 'lastReadChatTime', 'lastReadChatTime.user'],
-    });
+    const existGroup = await this.chatGroupRepository
+      .createQueryBuilder('group')
+      .where('group.id = :id', { id: chatGroup.id })
+      .getOne();
+    if (!existGroup) {
+      throw new BadRequestException('The group does not exist');
+    }
+    const manager = getManager();
+    existGroup.members = await manager.query(
+      'select users.id as id ,users.last_name as lastName, users.first_name as firstName from user_chat_joining INNER JOIN users ON users.existence is not null AND users.id = user_id AND chat_group_id = ?',
+      [existGroup.id],
+    );
+
     let isMySelf = false;
     const otherExistMembers = existGroup.members.filter((u) => {
       if (u.id === requestUser.id) {
@@ -956,9 +966,8 @@ export class ChatService {
       (newM) => !existGroup.members.map((m) => m.id).includes(newM.id),
     );
     if (removedMembers.length || newMembers.length) {
-      const manager = getManager();
       const previousMembers: User[] = await manager.query(
-        'select users.id as id, users.last_name as lastName, users.existence as existence from user_chat_leaving INNER JOIN users ON users.existence is not null AND users.id = user_id AND chat_group_id = ?',
+        'select users.id as id, users.last_name as lastName, users.first_name as firstName, users.existence as existence from user_chat_leaving INNER JOIN users ON users.existence is not null AND users.id = user_id AND chat_group_id = ?',
         [existGroup.id],
       );
 
