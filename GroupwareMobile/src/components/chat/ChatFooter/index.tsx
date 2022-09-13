@@ -37,7 +37,7 @@ import {Menu} from 'react-native-paper';
 import Input from './Input';
 
 type ChatFooterProps = {
-  inputRef?: any;
+  inputRef?: React.RefObject<TextInput>;
   text: string | undefined;
   onChangeText: (text: string) => void;
   onUploadFile: () => void;

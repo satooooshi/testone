@@ -12,7 +12,7 @@ import { useAPIUpdateChatMessage } from '@/hooks/api/chat/useAPIUpdateChatMessag
 import { socket } from '../../ChatBox/socket';
 
 type TextMessageProps = {
-  focusTextareaRef?: any;
+  focusTextareaRef?: React.RefObject<HTMLTextAreaElement>;
   message: ChatMessage;
   confirmedSearchWord: string;
   searchedResultIds?: (number | undefined)[];

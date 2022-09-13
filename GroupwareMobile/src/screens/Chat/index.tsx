@@ -738,9 +738,11 @@ const Chat: React.FC = () => {
       ref={typeDropdownRef}>
       <Dropdown.Option
         {...defaultDropdownOptionProps}
-        onPress={() => {
+        onPress={async () => {
           setValues(v => ({...v, replyParentMessage: longPressedMsg}));
           setLongPressedMgg(undefined);
+          await new Promise(r => setTimeout(r, 500));
+          inputRef?.current?.focus();
         }}
         value={'reply'}>
         返信する
@@ -776,13 +778,13 @@ const Chat: React.FC = () => {
         <Dropdown.Option
           {...defaultDropdownOptionProps}
           value="edit"
-          onPress={() => {
+          onPress={async () => {
             setEditMessage(true);
             if (longPressedMsg) {
-              console.log('edit message', longPressedMsg);
-
               setValues(longPressedMsg);
               messageContentRef.current = longPressedMsg.content;
+              await new Promise(r => setTimeout(r, 500));
+              inputRef?.current?.focus();
             }
           }}>
           メッセージを編集
@@ -808,7 +810,7 @@ const Chat: React.FC = () => {
   useEffect(() => {
     if (longPressedMsg) {
       typeDropdownRef.current?.open();
-      inputRef?.current?.focus();
+      // inputRef?.current?.focus();
     }
   }, [longPressedMsg]);
 

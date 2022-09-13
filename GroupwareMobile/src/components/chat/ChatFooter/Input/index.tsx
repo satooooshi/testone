@@ -12,7 +12,7 @@ import {Text} from 'react-native-magnus';
 import {chatStyles} from '../../../../styles/screen/chat/chat.style';
 
 type InputProps = {
-  inputRef?: any;
+  inputRef?: React.RefObject<TextInput>;
   onChangeInput: (changedText: string) => void;
   handleSelectionChange: (
     event: NativeSyntheticEvent<TextInputSelectionChangeEventData>,

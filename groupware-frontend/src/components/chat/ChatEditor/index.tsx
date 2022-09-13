@@ -63,7 +63,7 @@ export const Entry: React.FC<EntryComponentProps> = ({
 };
 
 type ChatEditorProps = {
-  editorRef?: any;
+  editorRef?: HTMLDivElement | null;
   room: ChatGroup;
   onSend: (content: string) => void;
   isLoading: boolean;
