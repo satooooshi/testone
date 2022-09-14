@@ -159,8 +159,8 @@ const AttendanceView = () => {
 
   const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
   const tabs: Tab[] = [
-    { type: 'link', name: '勤怠打刻', href: `/admin/attendance/view/${id}` },
-    { type: 'link', name: '勤怠報告', href: `/admin/attendance/report/${id}` },
+    { name: '勤怠打刻', href: `/admin/attendance/view/${id}` },
+    { name: '勤怠報告', href: `/admin/attendance/report/${id}` },
   ];
 
   const { data: userInfo } = useAPIGetMiniProfileById(id);

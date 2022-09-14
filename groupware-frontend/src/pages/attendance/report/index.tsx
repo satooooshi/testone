@@ -122,9 +122,9 @@ const AttendanceReportFormRow = ({
 const AttendanceReport = () => {
   const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
   const tabs: Tab[] = [
-    { type: 'link', name: '勤怠打刻', href: '/attendance/view' },
-    { type: 'link', name: '勤怠報告', href: '/attendance/report' },
-    { type: 'link', name: '入社前申請', href: '/attendance/application' },
+    { name: '勤怠打刻', href: '/attendance/view' },
+    { name: '勤怠報告', href: '/attendance/report' },
+    { name: '入社前申請', href: '/attendance/application' },
   ];
   const [visibleFormModal, setFormModal] = useState(false);
   const [activeTabName, setActiveTabName] = useState('reportAfterAccepted');
