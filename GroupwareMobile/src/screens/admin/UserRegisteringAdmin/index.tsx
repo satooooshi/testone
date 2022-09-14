@@ -42,6 +42,7 @@ import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import {useAdminHeaderTab} from '../../../contexts/admin/useAdminHeaderTab';
 import {useIsFocused} from '@react-navigation/native';
 import {useIsTabBarVisible} from '../../../contexts/bottomTab/useIsTabBarVisible';
+import HeaderWithPortalLinkBox from '../../../components/HeaderWithPortalLinkBox';
 
 const initialValues: Partial<User> = {
   email: '',
@@ -171,11 +172,7 @@ const UserRegisteringAdmin: React.FC = () => {
       <Overlay visible={isLoading} p="xl">
         <ActivityIndicator />
       </Overlay>
-      <HeaderWithTextButton
-        title="ユーザー作成"
-        tabs={tabs}
-        activeTabName={'ユーザー作成'}
-      />
+      <HeaderWithPortalLinkBox />
       <TagModal
         onCompleteModal={selectedTagsInModal =>
           setValues(v => ({...v, tags: selectedTagsInModal}))

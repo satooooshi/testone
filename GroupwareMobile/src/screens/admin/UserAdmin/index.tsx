@@ -2,6 +2,7 @@ import {useFocusEffect} from '@react-navigation/native';
 import React, {useCallback, useEffect, useState} from 'react';
 import {FlatList} from 'react-native';
 import {Text, Div} from 'react-native-magnus';
+import {useNavigation} from '@react-navigation/native';
 import {ActivityIndicator} from 'react-native-paper';
 import UserRow from '../../../components/admin/UesrRow';
 import SearchForm from '../../../components/common/SearchForm';
@@ -15,8 +16,11 @@ import {
   useAPISearchUsers,
 } from '../../../hooks/api/user/useAPISearchUsers';
 import {User, UserTag} from '../../../types';
+import PortalLinkBox from '../../../components/PortalLinkBox';
+import HeaderWithPortalLinkBox from '../../../components/HeaderWithPortalLinkBox';
 
 const UserAdmin: React.FC = () => {
+  const navigation = useNavigation<HomeNavigationProps>();
   const [searchQuery, setSearchQuery] = useState<SearchQueryToGetUsers>({
     page: '1',
   });
@@ -79,11 +83,7 @@ const UserAdmin: React.FC = () => {
 
   return (
     <WholeContainer>
-      <HeaderWithTextButton
-        title="Admin"
-        tabs={tabs}
-        activeTabName={'ユーザー管理'}
-      />
+      <HeaderWithPortalLinkBox />
       <SearchForm
         searchTarget="user"
         defaultValue={{word: '', selectedTags}}

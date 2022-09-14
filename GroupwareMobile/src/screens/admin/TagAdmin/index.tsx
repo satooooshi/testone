@@ -13,6 +13,7 @@ import {useAPIGetTag} from '../../../hooks/api/tag/useAPIGetTag';
 import {useTagType} from '../../../hooks/tag/useTagType';
 import {tagAdminStyles} from '../../../styles/screen/admin/tagAdmin.style';
 import {Tag, TagType, UserRole} from '../../../types';
+import HeaderWithPortalLinkBox from '../../../components/HeaderWithPortalLinkBox';
 
 const TagAdmin: React.FC = () => {
   const {data: tags, refetch, isLoading: loadingTags} = useAPIGetTag();
@@ -105,11 +106,7 @@ const TagAdmin: React.FC = () => {
       <Overlay visible={isLoading} p="xl">
         <ActivityIndicator />
       </Overlay>
-      <HeaderWithTextButton
-        title={'タグ管理'}
-        tabs={tabs}
-        activeTabName={'タグ管理'}
-      />
+      <HeaderWithPortalLinkBox />
       <ScrollDiv
         contentContainerStyle={{
           ...tagAdminStyles.scrollView,

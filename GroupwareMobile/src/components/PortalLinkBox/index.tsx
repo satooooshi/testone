@@ -5,6 +5,7 @@ import Foundation from 'react-native-vector-icons/Foundation';
 import Entypo from 'react-native-vector-icons/Entypo';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
+import Feather from 'react-native-vector-icons/Feather';
 import {
   impressiveUniversityColor,
   studyMeetingColor,
@@ -46,7 +47,11 @@ type PortalType =
   | 'users'
   | 'attendance'
   | 'account'
-  | 'logout';
+  | 'logout'
+  | 'user_admin'
+  | 'user_registering_admin'
+  | 'tag_admin'
+  | 'user_tag_admin';
 
 type PortalLinkIconProps = {
   type: PortalType;
@@ -191,6 +196,14 @@ const PortalLinkIcon: React.FC<PortalLinkIconProps> = ({type}) => {
           fontFamily="MaterialIcons"
         />
       );
+    case 'user_admin':
+      return <Feather name="users" size={iconSize} color="red900" />;
+    case 'user_registering_admin':
+      return <AntDesign name="adduser" size={iconSize} color="red900" />;
+    case 'tag_admin':
+      return <AntDesign name="tago" size={iconSize} color="black" />;
+    case 'user_tag_admin':
+      return <FontAwesome5 name="user-tag" size={iconSize} color="red900" />;
   }
 };
 
@@ -244,6 +257,14 @@ const PortalLinkBox: React.FC<PortarlLinkBoxProps> = ({type, onPress}) => {
         return '勤怠管理';
       case 'logout':
         return 'ログアウト';
+      case 'user_admin':
+        return 'ユーザー管理';
+      case 'user_registering_admin':
+        return 'ユーザー作成';
+      case 'tag_admin':
+        return 'タグ管理';
+      case 'user_tag_admin':
+        return 'タグ管理(ユーザー)';
       default:
         return '';
     }
