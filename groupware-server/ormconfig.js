@@ -14,15 +14,16 @@ module.exports = {
       : process.env.DB_DATABASE,
   port: process.env.NODE_ENV !== 'production' ? 3306 : process.env.DB_PORT,
   entities: [
-    process.env.NODE_ENV !== 'production'
-      ? 'dist/entities/*.entity.js'
-      : 'entities/*.entity.js',
+    'dist/entities/*.entity.js',
+    // process.env.NODE_ENV !== 'production'
+    //   ? 'dist/entities/*.entity.js'
+    //   : 'entities/*.entity.js',
   ],
   synchronize: false,
   migrations: [
     process.env.NODE_ENV !== 'production'
       ? 'src/migrations/*.ts'
-      : 'migrations/*.js',
+      : 'dist/migrations/*.js',
   ],
   seeds: ['dist/seeds/*.js'],
   factories: ['dist/factories/*.js'],

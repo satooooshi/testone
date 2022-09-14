@@ -4,6 +4,7 @@ import * as cookieParser from 'cookie-parser';
 import * as fs from 'fs';
 import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common';
 import { json, urlencoded } from 'express';
+import { APP_DIRNAME } from './var';
 
 const cloud_storage_settings = {
   type: process.env.CLOUD_STORAGE_TYPE,
@@ -43,7 +44,7 @@ async function bootstrap() {
     ],
   });
   const jsonEncoded = JSON.stringify(cloud_storage_settings);
-  fs.writeFile(__dirname + '/cloud_storage.json', jsonEncoded, (err) => {
+  fs.writeFile(APP_DIRNAME + '/cloud_storage.json', jsonEncoded, (err) => {
     if (err) {
       console.log(err);
     }
