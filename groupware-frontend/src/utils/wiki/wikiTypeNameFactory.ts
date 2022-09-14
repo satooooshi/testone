@@ -121,6 +121,6 @@ export const getRuleCategory = (name: string) => {
     case '各種申請書':
       return RuleCategory.DOCUMENT;
     default:
-      return '';
+      return undefined;
   }
 };
