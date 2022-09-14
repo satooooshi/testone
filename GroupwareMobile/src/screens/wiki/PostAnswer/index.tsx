@@ -46,7 +46,7 @@ const PostAnswer: React.FC = () => {
   const isLoading = loadingSaveAnswer || loadingUploadImage;
   const initialValues: Partial<QAAnswer> = {
     body: '',
-    textFormat: wikiInfo?.textFormat,
+    textFormat: 'html',
     wiki: wikiInfo,
   };
   const {

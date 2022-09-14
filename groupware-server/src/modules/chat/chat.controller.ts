@@ -76,7 +76,7 @@ export interface GetRoomsQuery {
 
 export interface GetRoomsResult {
   rooms: ChatGroup[];
-  pageCount: number;
+  gotAllRooms: boolean;
 }
 export interface SaveRoomsResult {
   room: ChatGroup;
@@ -164,12 +164,6 @@ export class ChatController {
       privilegeExpiredTs,
     );
     return token;
-  }
-
-  @Get('group-list')
-  @UseGuards(JwtAuthenticationGuard)
-  async getChatGroup(@Req() req: RequestWithUser): Promise<ChatGroup[]> {
-    return await this.chatService.getChatGroup(req.user.id);
   }
 
   // @Get('group-unread-chat-count')
@@ -330,7 +324,10 @@ export class ChatController {
       ...(chatGroup?.members?.filter((u) => u.id !== user.id) || []),
       user,
     ];
-    const savedGroup = await this.chatService.v2SaveChatGroup(chatGroup);
+    const savedGroup = await this.chatService.v2SaveChatGroup(
+      chatGroup,
+      req.user.id,
+    );
     const silentNotification: CustomPushNotificationData = {
       title: '',
       body: '',

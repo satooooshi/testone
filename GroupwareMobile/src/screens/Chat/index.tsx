@@ -1,4 +1,11 @@
-import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useContext,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import {
   Alert,
   AppState,
@@ -98,7 +105,6 @@ import {useAPIUpdateChatMessage} from '../../hooks/api/chat/useAPIUpdateChatMess
 import {useAPIDeleteChatMessage} from '../../hooks/api/chat/useAPIDeleteChatMessage';
 import uuid from 'react-native-uuid';
 import {useAPIGetReactions} from '../../hooks/api/chat/useAPIGetReactions';
-
 const TopTab = createMaterialTopTabNavigator();
 
 const Chat: React.FC = () => {
@@ -318,16 +324,19 @@ const Chat: React.FC = () => {
 
   const {mutate: sendChatMessage, isLoading: loadingSendMessage} =
     useAPISendChatMessage({
-      onSuccess: sentMsg => {
-        socket.send({chatMessage: sentMsg, type: 'send'});
-        setMessages(msg => refreshMessage([sentMsg, ...msg]));
-        if (sentMsg?.chatGroup?.id) {
-          refetchRoomCard({id: sentMsg.chatGroup.id, type: ''});
-        }
+      onSuccess: async sentMsg => {
+        setMessages(msg => [sentMsg, ...msg]);
         if (sentMsg.type === ChatMessageType.TEXT) {
-          // setValues(v => ({...v, content: ''}));
           resetForm();
         }
+        //非同期でやるとこでisLoadingの待ち時間を減らす。
+        const asyncFunc = async (): Promise<void> => {
+          socket.send({chatMessage: sentMsg, type: 'send'});
+          if (sentMsg?.chatGroup?.id) {
+            refetchRoomCard({id: sentMsg.chatGroup.id, type: ''});
+          }
+        };
+        setTimeout(asyncFunc, 0);
       },
       onError: () => {
         Alert.alert(
@@ -773,6 +782,7 @@ const Chat: React.FC = () => {
               setValues(longPressedMsg);
               messageContentRef.current = longPressedMsg.content;
             }
+            setLongPressedMgg(undefined);
           }}>
           メッセージを編集
         </Dropdown.Option>
@@ -998,11 +1008,13 @@ const Chat: React.FC = () => {
     }
   }, []);
 
+  const {safeAreaViewHeight} = useIsTabBarVisible();
+
   const messageListAvoidngKeyboardDisturb = (
     <>
       {Platform.OS === 'ios' ? (
         <KeyboardAvoidingView
-          keyboardVerticalOffset={windowHeight * 0.08}
+          keyboardVerticalOffset={safeAreaViewHeight}
           style={chatStyles.keyboardAvoidingViewIOS}
           behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
           {loadingMessages && fetchingMessages ? <ActivityIndicator /> : null}
@@ -1208,7 +1220,7 @@ const Chat: React.FC = () => {
   return (
     <WholeContainer>
       {typeDropdown}
-      <Div h="100%" bg={Platform.OS === 'ios' ? 'blue300' : 'blue200'}>
+      <Div h="100%" bg={Platform.OS === 'ios' ? 'blue300' : 'blue400'}>
         <ReactionsModal
           isVisible={!!selectedReactions}
           selectedReactions={selectedReactions}
