@@ -48,7 +48,7 @@ const WikiList: React.FC<WikiListProps> = ({navigation}) => {
   return (
     <WholeContainer>
       <HeaderWithTextButton
-        enableBackButton={true}
+        enableBackButton={false}
         tabs={tabs}
         title="社内Wiki"
         activeTabName={
