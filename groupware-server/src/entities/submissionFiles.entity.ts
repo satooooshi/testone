@@ -78,10 +78,10 @@ export class SubmissionFile {
     this.url = genStorageURL(this.url);
   }
 
-  @AfterInsert()
-  @AfterLoad()
-  @AfterUpdate()
-  async changeToSignedURL?() {
-    this.url = await genSignedURL(this.url);
-  }
+  // @AfterInsert()
+  // @AfterLoad()
+  // @AfterUpdate()
+  // async changeToSignedURL?() {
+  //   this.url = await genSignedURL(this.url);
+  // }
 }

@@ -77,10 +77,10 @@ export class EventIntroduction {
     this.imageUrl = genStorageURL(this.imageUrl);
   }
 
-  @AfterInsert()
-  @AfterLoad()
-  @AfterUpdate()
-  async changeToSignedURL?() {
-    this.imageUrl = await genSignedURL(this.imageUrl);
-  }
+  // @AfterInsert()
+  // @AfterLoad()
+  // @AfterUpdate()
+  // async changeToSignedURL?() {
+  //   this.imageUrl = await genSignedURL(this.imageUrl);
+  // }
 }

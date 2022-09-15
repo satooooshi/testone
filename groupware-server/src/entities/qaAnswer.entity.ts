@@ -95,10 +95,10 @@ export class QAAnswer {
     this.body = genStorageURL(this.body);
   }
 
-  @AfterInsert()
-  @AfterLoad()
-  @AfterUpdate()
-  async changeToSignedURL?() {
-    this.body = await genSignedURL(this.body);
-  }
+  // @AfterInsert()
+  // @AfterLoad()
+  // @AfterUpdate()
+  // async changeToSignedURL?() {
+  //   this.body = await genSignedURL(this.body);
+  // }
 }

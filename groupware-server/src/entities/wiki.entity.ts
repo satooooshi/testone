@@ -191,12 +191,12 @@ export class Wiki {
     this.body = genStorageURL(this.body);
   }
 
-  @AfterInsert()
-  @AfterLoad()
-  @AfterUpdate()
-  async changeToSignedURL?() {
-    this.body = await genSignedURL(this.body);
-  }
+  // @AfterInsert()
+  // @AfterLoad()
+  // @AfterUpdate()
+  // async changeToSignedURL?() {
+  //   this.body = await genSignedURL(this.body);
+  // }
 
   isGoodSender?: boolean;
 }

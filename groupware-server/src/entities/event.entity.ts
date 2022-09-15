@@ -194,10 +194,10 @@ export class EventSchedule {
     this.imageURL = genStorageURL(this.imageURL);
   }
 
-  @AfterInsert()
-  @AfterLoad()
-  @AfterUpdate()
-  async changeToSignedURL?() {
-    this.imageURL = await genSignedURL(this.imageURL);
-  }
+  // @AfterInsert()
+  // @AfterLoad()
+  // @AfterUpdate()
+  // async changeToSignedURL?() {
+  //   this.imageURL = await genSignedURL(this.imageURL);
+  // }
 }
