@@ -1,5 +1,5 @@
-import React, {memo} from 'react';
-import {TouchableOpacity, useWindowDimensions} from 'react-native';
+import React, {memo, useEffect, useState} from 'react';
+import {TouchableOpacity, useWindowDimensions, Image} from 'react-native';
 import FastImage from 'react-native-fast-image';
 import {ChatMessage} from '../../../../types';
 
@@ -15,6 +15,15 @@ const ImageMessage: React.FC<ImageMessageProps> = ({
   onLongPress,
 }) => {
   const {width: windowWidth} = useWindowDimensions();
+  const [he, setHe] = useState<number>(0);
+  const [wi, setWi] = useState<number>(0);
+
+  useEffect(() => {
+    Image.getSize(message.content, (width, height) => {
+      setHe(height);
+      setWi(width);
+    });
+  }, [message]);
 
   return (
     <>
@@ -25,12 +34,11 @@ const ImageMessage: React.FC<ImageMessageProps> = ({
             priority: FastImage.priority.low,
           }}
           style={{
-            height: 144,
-            width: windowWidth * 0.6,
+            height: !(wi > he) ? windowWidth * 0.6 : 144,
+            width: wi > he ? windowWidth * 0.6 : 144,
             borderRadius: 8,
-            //backgroundColor: '#2a4365',
           }}
-          resizeMode={FastImage.resizeMode.contain}
+          resizeMode={FastImage.resizeMode.cover}
         />
       </TouchableOpacity>
     </>
