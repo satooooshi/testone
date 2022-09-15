@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {ReactNode, memo} from 'react';
 import {useEffect} from 'react';
 import {useNavigation} from '@react-navigation/native';
 import {
@@ -16,7 +16,6 @@ import {
 import {dateTimeFormatterFromJSDDate} from '../../../utils/dateTimeFormatterFromJSDate';
 import {userNameFactory} from '../../../utils/factory/userNameFactory';
 import {numbersOfSameValueInKeyOfObjArr} from '../../../utils/numbersOfSameValueInKeyOfObjArr';
-import UserAvatar from '../../common/UserAvatar';
 import FileMessage from './FileMessage';
 import ImageMessage from './ImageMessage';
 import ReactionToMessage from './ReactionToMessage';
@@ -33,6 +32,7 @@ type ChatMessageItemProps = {
   searchedResultIds?: (number | undefined)[];
   messageIndex: number;
   isScrollTarget: boolean;
+  senderAvatar: ReactNode;
   scrollToTarget: (messageIndex: number) => void;
   onCheckLastRead: () => void;
   onLongPress: () => void;
@@ -50,6 +50,7 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
   messageIndex,
   isScrollTarget = false,
   scrollToTarget,
+  senderAvatar,
   onCheckLastRead,
   onLongPress,
   onPressImage,
@@ -74,9 +75,7 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
 
   const timesAndReadCounts = (
     <Div justifyContent="flex-end" alignItems="center">
-      {message.isSender &&
-      readUsers.length &&
-      message.type !== ChatMessageType.SYSTEM_TEXT ? (
+      {readUsers.length && message.type !== ChatMessageType.SYSTEM_TEXT ? (
         <TouchableOpacity onPress={onCheckLastRead}>
           <Text
             mb="sm"
@@ -109,7 +108,7 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
       {message.type === ChatMessageType.SYSTEM_TEXT && (
         <Box
           alignSelf="center"
-          bg="gray300"
+          bg="white"
           w={windowWidth * 0.8}
           rounded={'md'}
           py={4}
@@ -122,7 +121,7 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
         flexDir={message.isSender ? 'row' : 'row-reverse'}
         mb={'xs'}
         alignSelf={message?.isSender ? 'flex-end' : 'flex-start'}
-        alignItems="flex-end">
+        alignItems="flex-start">
         <Div>
           {!message.isSender && message.type !== ChatMessageType.SYSTEM_TEXT ? (
             <Text>{userNameFactory(message.sender)}</Text>
@@ -167,14 +166,7 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
               })
             }
             underlayColor="none">
-            <Div mr="xs">
-              <UserAvatar
-                h={40}
-                w={40}
-                user={message?.sender}
-                GoProfile={true}
-              />
-            </Div>
+            <Div mr="xs">{senderAvatar}</Div>
           </TouchableHighlight>
         ) : null}
       </Div>
@@ -204,4 +196,4 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
   );
 };
 
-export default ChatMessageItem;
+export default memo(ChatMessageItem);

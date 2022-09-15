@@ -1,7 +1,8 @@
-import {useNavigation} from '@react-navigation/native';
+import {useIsFocused, useNavigation} from '@react-navigation/native';
 import React, {useEffect, useState} from 'react';
 import {
   Alert,
+  FlatList,
   RefreshControl,
   TouchableHighlight,
   TouchableOpacity,
@@ -41,6 +42,7 @@ const RoomList: React.FC = () => {
   const [creationType, setCreationType] = useState<RoomType>();
   const [searchedRooms, setSearchedRooms] = useState<ChatGroup[]>();
   const [chatRooms, setChatRooms] = useState<ChatGroup[]>(chatGroups);
+  const isFocused = useIsFocused();
 
   const {mutate: createGroup} = useAPISaveChatGroup({
     onSuccess: createdData => {
@@ -71,10 +73,8 @@ const RoomList: React.FC = () => {
         const pinnedRoomsCount = rooms.filter(
           r => r.isPinned || r.updatedAt > data.updatedAt,
         ).length;
-        if (pinnedRoomsCount) {
-          rooms.splice(pinnedRoomsCount, 0, data);
-          setChatGroupsState(rooms);
-        }
+        rooms.splice(pinnedRoomsCount, 0, data);
+        setChatGroupsState(rooms);
       }
       // refetchAllRooms();
     },
@@ -85,18 +85,18 @@ const RoomList: React.FC = () => {
     },
   });
 
-  // useFocusEffect(
-  //   useCallback(() => {
-  //     setChatRooms(chatGroups);
-  //   }, [chatGroups]),
-  // );
-
   useEffect(() => {
-    if (isCompletedRefetchAllRooms) {
-      // console.log('isCompletedRefetchAllRooms', chatGroups.length);
+    if (isFocused) {
       setChatRooms(chatGroups);
     }
-  }, [chatGroups, isCompletedRefetchAllRooms]);
+  }, [chatGroups, isFocused]);
+
+  // useEffect(() => {
+  //   if (isCompletedRefetchAllRooms) {
+  //     console.log('isCompletedRefetchAllRooms', chatGroups.length);
+  //     setChatRooms(chatGroups);
+  //   }
+  // }, [chatGroups, isCompletedRefetchAllRooms]);
 
   useEffect(() => {
     if (roomTypeSelector) {
@@ -195,6 +195,7 @@ const RoomList: React.FC = () => {
               reset();
               setRoomTypeSelector(false);
             }}
+            creationType={creationType}
           />
         </Div>
       ) : null}
@@ -219,35 +220,37 @@ const RoomList: React.FC = () => {
               fontSize={12}
             />
           }
+          clearButtonMode="while-editing"
         />
+        {/* <Text>ルーム数{chatRooms.length}</Text> */}
         {chatRooms.length ? (
-          <ScrollDiv
-            h={'80%'}
+          <FlatList
+            style={{height: '80%'}}
             refreshControl={
               <RefreshControl
-                refreshing={isRoomsRefetching}
+                refreshing={!isCompletedRefetchAllRooms}
                 onRefresh={refreshRoomList}
               />
-            }>
-            {(searchedRooms ?? chatRooms).map(room => {
-              return (
-                <Div key={room.id} mb="sm">
-                  <RoomCard
-                    room={room}
-                    onPress={() =>
-                      navigation.navigate('ChatStack', {
-                        screen: 'Chat',
-                        params: {room},
-                      })
-                    }
-                    onPressPinButton={() => {
-                      savePin({...room, isPinned: !room.isPinned});
-                    }}
-                  />
-                </Div>
-              );
-            })}
-          </ScrollDiv>
+            }
+            data={searchedRooms ?? chatRooms}
+            windowSize={30}
+            renderItem={({item: room}) => (
+              <Div key={room.id} mb="sm">
+                <RoomCard
+                  room={room}
+                  onPress={() =>
+                    navigation.navigate('ChatStack', {
+                      screen: 'Chat',
+                      params: {room},
+                    })
+                  }
+                  onPressPinButton={() => {
+                    savePin({...room, isPinned: !room.isPinned});
+                  }}
+                />
+              </Div>
+            )}
+          />
         ) : (
           <Text fontSize={16} textAlign="center">
             ルームを作成するか、招待をお待ちください

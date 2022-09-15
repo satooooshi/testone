@@ -307,6 +307,7 @@ export interface ChatMessage {
   reactions?: ChatMessageReaction[];
   createdAt: Date;
   updatedAt: Date;
+  modifiedAt: Date;
   isSender?: boolean;
   thumbnail?: string;
   callTime?: string;
@@ -335,7 +336,7 @@ export interface ChatGroup {
   muteUsers?: User[];
   chatMessages?: ChatMessage[];
   isMute?: boolean;
-  memberCount?: number;
+  memberCount: number;
   members?: User[];
   lastReadChatTime?: LastReadChatTime[];
   hasBeenRead?: boolean;

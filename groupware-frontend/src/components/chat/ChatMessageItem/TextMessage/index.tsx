@@ -72,6 +72,7 @@ const TextMessage: React.FC<TextMessageProps> = ({
   useEffect(() => {
     const escFunction = (e: any) => {
       if (e.key == 'Escape') {
+        setMessageValue(message.content);
         finishEdit();
       }
     };
@@ -126,13 +127,12 @@ const TextMessage: React.FC<TextMessageProps> = ({
               maxW={'40vw'}
               minW={'10vw'}
               wordBreak={'break-word'}
-              color={message.isSender ? 'white' : darkFontColor}
-              bg={message.isSender ? 'blue.500' : '#ececec'}>
+              color={message.isSender ? 'white' : 'black'}>
               {highlightSearchedWord(message)}
             </Text>
-            {/* <Text fontSize={3} mt={2} color={darkFontColor} textAlign="right">
-              {isEdited ? ' 編集済み' : null}
-            </Text> */}
+            <Text fontSize={3} mt={2} color={darkFontColor} textAlign="right">
+              {message.modifiedAt ? ' 編集済み' : null}
+            </Text>
           </>
         ) : (
           <>
@@ -141,7 +141,7 @@ const TextMessage: React.FC<TextMessageProps> = ({
               maxW={'40vw'}
               minW={'10vw'}
               value={messageValue}
-              onKeyPress={(e: React.KeyboardEvent) => {
+              onKeyDown={(e: React.KeyboardEvent) => {
                 if (e.ctrlKey !== e.metaKey && e.key === 'Enter') {
                   updateMessage({ ...message, content: messageValue });
                 }

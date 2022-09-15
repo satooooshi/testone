@@ -83,7 +83,7 @@ const RoomCard: React.FC<RoomCardProps> = ({
       case ChatMessageType.CALL:
         return latestCall(chatMessage);
       default:
-        return mentionTransform(chatMessage.content);
+        return mentionTransform(chatMessage.content).trim();
     }
   };
 
@@ -177,7 +177,7 @@ const RoomCard: React.FC<RoomCardProps> = ({
                 : ''}
             </Text>
             <Div flexDir="row" justifyContent="space-between">
-              <Text>{`${room.members?.length || 0}人のメンバー`}</Text>
+              <Text>{`${room.memberCount}人のメンバー`}</Text>
               <Text>
                 {dateTimeFormatterFromJSDDate({
                   dateTime: new Date(

@@ -76,7 +76,7 @@ export interface GetRoomsQuery {
 
 export interface GetRoomsResult {
   rooms: ChatGroup[];
-  pageCount: number;
+  gotAllRooms: boolean;
 }
 export interface SaveRoomsResult {
   room: ChatGroup;
@@ -172,13 +172,13 @@ export class ChatController {
     return await this.chatService.getChatGroup(req.user.id);
   }
 
-  @Get('group-unread-chat-count')
-  @UseGuards(JwtAuthenticationGuard)
-  async getRoomsUnreadChatCount(
-    @Req() req: RequestWithUser,
-  ): Promise<ChatGroup[]> {
-    return await this.chatService.getRoomsUnreadChatCount(req.user.id);
-  }
+  // @Get('group-unread-chat-count')
+  // @UseGuards(JwtAuthenticationGuard)
+  // async getRoomsUnreadChatCount(
+  //   @Req() req: RequestWithUser,
+  // ): Promise<ChatGroup[]> {
+  //   return await this.chatService.getRoomsUnreadChatCount(req.user.id);
+  // }
 
   @Get('/v2/rooms')
   @UseGuards(JwtAuthenticationGuard)
@@ -330,7 +330,10 @@ export class ChatController {
       ...(chatGroup?.members?.filter((u) => u.id !== user.id) || []),
       user,
     ];
-    const savedGroup = await this.chatService.v2SaveChatGroup(chatGroup);
+    const savedGroup = await this.chatService.v2SaveChatGroup(
+      chatGroup,
+      req.user.id,
+    );
     const silentNotification: CustomPushNotificationData = {
       title: '',
       body: '',
@@ -404,7 +407,7 @@ export class ChatController {
         id: chatGroupId.toString(),
       },
     };
-    if (chatGroup?.members.length) {
+    if (chatGroup?.members?.length) {
       await sendPushNotifToSpecificUsers(
         chatGroup?.members.map((u) => u.id),
         silentNotification,
@@ -451,7 +454,10 @@ export class ChatController {
     @Req() req: RequestWithUser,
   ): Promise<ChatGroup> {
     const { user } = req;
-    const roomDetail = await this.chatService.getRoomDetail(Number(roomId));
+    const roomDetail = await this.chatService.getRoomDetail(
+      Number(roomId),
+      user.id,
+    );
     // if (!roomDetail.members.filter((m) => m.id === user.id).length) {
     //   throw new BadRequestException('チャットルームを取得する権限がありません');
     // }

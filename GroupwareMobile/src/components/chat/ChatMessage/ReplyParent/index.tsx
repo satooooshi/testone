@@ -8,9 +8,10 @@ import UserAvatar from '../../../common/UserAvatar';
 
 type ReplyParentProps = {
   parentMessage: ChatMessage;
+  isSender?: boolean;
 };
 
-const ReplyParent: React.FC<ReplyParentProps> = ({parentMessage}) => {
+const ReplyParent: React.FC<ReplyParentProps> = ({parentMessage, isSender}) => {
   const content = (type: ChatMessageType) => {
     switch (type) {
       case ChatMessageType.TEXT:
@@ -31,7 +32,7 @@ const ReplyParent: React.FC<ReplyParentProps> = ({parentMessage}) => {
       flexDir="row"
       alignItems="center"
       borderBottomWidth={0.5}
-      borderBottomColor="white"
+      borderBottomColor="black"
       pb="sm">
       <Div mr={'sm'}>
         <UserAvatar
@@ -42,10 +43,10 @@ const ReplyParent: React.FC<ReplyParentProps> = ({parentMessage}) => {
         />
       </Div>
       <Div w={'65%'}>
-        <Text color="black" fontWeight="bold" fontSize={14}>
+        <Text color={isSender ? 'white' : 'black'} fontSize={14}>
           {userNameFactory(parentMessage.sender)}
         </Text>
-        <Text color="black" fontSize={14}>
+        <Text color={isSender ? 'white' : 'black'} fontSize={14}>
           {content(parentMessage.type)}
         </Text>
       </Div>

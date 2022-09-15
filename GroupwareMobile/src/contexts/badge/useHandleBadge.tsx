@@ -37,10 +37,49 @@ export const BadgeProvider: React.FC = ({children}) => {
   //   string | undefined
   // >('');
 
+  const sortRooms = (room: ChatGroup[]) => {
+    if (!room.length) {
+      return [];
+    }
+    const pinnedRooms = room
+      .filter(r => r.isPinned)
+      .sort((a, b) => {
+        if (
+          (b?.chatMessages?.[0]?.createdAt
+            ? b?.chatMessages?.[0]?.createdAt
+            : b.createdAt) >
+          (a?.chatMessages?.[0]?.createdAt
+            ? a?.chatMessages?.[0]?.createdAt
+            : a.createdAt)
+        ) {
+          return 1;
+        } else {
+          return -1;
+        }
+      });
+    const exceptPinnedRooms = room
+      .filter(r => !r.isPinned)
+      .sort((a, b) => {
+        if (
+          (b?.chatMessages?.[0]?.createdAt
+            ? b?.chatMessages?.[0]?.createdAt
+            : b.createdAt) >
+          (a?.chatMessages?.[0]?.createdAt
+            ? a?.chatMessages?.[0]?.createdAt
+            : a.createdAt)
+        ) {
+          return 1;
+        } else {
+          return -1;
+        }
+      });
+    return [...pinnedRooms, ...exceptPinnedRooms];
+  };
+
   const {refetch: refetchAllRooms, isLoading} = useAPIGetRooms(
     {
       page: page.toString(),
-      limit: '20',
+      limit: '100',
     },
     {
       enabled: false,
@@ -51,15 +90,14 @@ export const BadgeProvider: React.FC = ({children}) => {
         }
         setChatUnreadCount(count);
         setChatGroups(r => {
-          if (page !== 1 && r.length) {
-            const mergedRooms = [...r, ...data.rooms];
-            const pinnedRooms = mergedRooms.filter(r => r.isPinned);
-            const exceptPinnedRooms = mergedRooms.filter(r => !r.isPinned);
-            return [...pinnedRooms, ...exceptPinnedRooms];
+          const rooms =
+            page !== 1 && r.length ? [...r, ...data.rooms] : data.rooms;
+          if (!data.gotAllRooms) {
+            return rooms;
           }
-          return [...data.rooms];
+          return sortRooms(rooms);
         });
-        if (data.rooms.length >= 20) {
+        if (!data.gotAllRooms) {
           setPage(p => p + 1);
         } else {
           setPage(1);
@@ -80,30 +118,30 @@ export const BadgeProvider: React.FC = ({children}) => {
 
   useEffect(() => {
     if (networkConnection && user?.id) {
-      const jsonRoomListInStorage = storage.getString(
-        `chatRoomList${user?.id}`,
-      );
-      if (jsonRoomListInStorage) {
-        const messagesInStorage = JSON.parse(jsonRoomListInStorage);
-        setChatGroups(messagesInStorage);
-        let count = 0;
-        for (const room of messagesInStorage) {
-          count += room.unreadCount ? room.unreadCount : 0;
-        }
-        setChatUnreadCount(count);
-      }
+      // const jsonRoomListInStorage = storage.getString(
+      //   `chatRoomList${user?.id}`,
+      // );
+      // if (jsonRoomListInStorage) {
+      //   const messagesInStorage = JSON.parse(jsonRoomListInStorage);
+      //   setChatGroups(messagesInStorage);
+      //   let count = 0;
+      //   for (const room of messagesInStorage) {
+      //     count += room.unreadCount ? room.unreadCount : 0;
+      //   }
+      //   setChatUnreadCount(count);
+      // }
       refetchAllRooms();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [networkConnection, user]);
 
-  useEffect(() => {
-    if (user?.id && chatGroups.length) {
-      const jsonMessages = JSON.stringify(chatGroups);
-      storage.set(`chatRoomList${user?.id}`, jsonMessages);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user?.id, chatGroups]);
+  // useEffect(() => {
+  //   if (user?.id && chatGroups.length) {
+  //     const jsonMessages = JSON.stringify(chatGroups);
+  //     storage.set(`chatRoomList${user?.id}`, jsonMessages);
+  //   }
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [user?.id, chatGroups]);
 
   useEffect(() => {
     const unsubscribe = NetInfo.addEventListener(state => {
@@ -152,13 +190,8 @@ export const BadgeProvider: React.FC = ({children}) => {
       if (rooms.length === chatGroups.length && refetchGroup.type === 'badge') {
         setChatUnreadCount(count => count + 1);
       }
-      if (data.isPinned) {
-        setChatGroups([...[data], ...rooms]);
-      } else {
-        const pinnedRoomsCount = rooms.filter(r => r.isPinned).length;
-        rooms.splice(pinnedRoomsCount, 0, data);
-        setChatGroups(rooms);
-      }
+      setChatGroups(sortRooms([data, ...rooms]));
+
       setRefetchGroup({id: 0, type: ''});
     },
   });
@@ -190,6 +223,7 @@ export const BadgeProvider: React.FC = ({children}) => {
   };
 
   const refreshRooms = () => {
+    setCompleteRefetch(false);
     refetchAllRooms();
   };
 

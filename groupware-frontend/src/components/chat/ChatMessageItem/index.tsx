@@ -121,10 +121,14 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = memo(
     const readUsers = useMemo(() => {
       return lastReadChatTime
         ? lastReadChatTime
-            .filter((t) => new Date(t.readTime) >= new Date(message.createdAt))
+            .filter(
+              (t) =>
+                new Date(t.readTime) >= new Date(message.createdAt) &&
+                t.user.id !== messageState?.sender?.id,
+            )
             .map((t) => t.user)
         : [];
-    }, [lastReadChatTime, message]);
+    }, [lastReadChatTime, message, messageState]);
 
     const reactionList = (
       <Box flexDir="row" flexWrap="wrap" display="flex" maxW={'50vw'}>
@@ -259,15 +263,15 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = memo(
       });
     };
 
-    // const isBeforeTwelveHours = (createdAt: Date | undefined) => {
-    //   if (!createdAt) {
-    //     return false;
-    //   }
-    //   const date = new Date();
-    //   date.setHours(date.getHours() - 12);
+    const isBeforeTwelveHours = (createdAt: Date | undefined) => {
+      if (!createdAt) {
+        return false;
+      }
+      const date = new Date();
+      date.setHours(date.getHours() - 12);
 
-    //   return new Date(createdAt) > date;
-    // };
+      return new Date(createdAt) > date;
+    };
 
     const menuOpener = (
       <Popover
@@ -327,7 +331,7 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = memo(
                 onClick={() => reactionOpenerRef.current?.click()}>
                 リアクション
               </MenuItem>
-              {/* {messageState?.sender?.id === user?.id &&
+              {messageState?.sender?.id === user?.id &&
               messageState.type === ChatMessageType.TEXT &&
               isBeforeTwelveHours(messageState.createdAt) ? (
                 <MenuItem value={'edit'} onClick={() => setEditMessage(true)}>
@@ -345,7 +349,7 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = memo(
                   }}>
                   <Text color="red">メッセージを削除</Text>
                 </MenuItem>
-              ) : null} */}
+              ) : null}
             </Menu>
           </>
         )}
@@ -363,6 +367,7 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = memo(
         flexDir="column"
         alignItems={messageState.isSender ? 'flex-end' : 'flex-start'}>
         <ReadUsersListModal
+          sender={messageState.sender}
           usersInRoom={usersInRoom}
           isOpen={visibleReadModal}
           onClose={() => setVisibleLastReadModal(false)}
@@ -462,7 +467,20 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = memo(
               </Box>
               {!messageState.isSender && (
                 <>
-                  {createdAtText}
+                  <Box display="flex" flexDir="column">
+                    {readUsers.length ? (
+                      <Link
+                        onClick={() => setVisibleLastReadModal(true)}
+                        mx="8px"
+                        mb="4px"
+                        color="gray"
+                        fontSize="12px">
+                        既読
+                        {readUsers.length}
+                      </Link>
+                    ) : null}
+                    {createdAtText}
+                  </Box>
                   {menuOpener}
                 </>
               )}

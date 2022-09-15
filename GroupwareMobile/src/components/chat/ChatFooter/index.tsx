@@ -1,9 +1,15 @@
-import React, {Fragment, useEffect, useMemo, useRef, useState} from 'react';
+import React, {
+  Fragment,
+  memo,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import {
-  AppState,
   NativeSyntheticEvent,
   Platform,
-  Text,
   TextInput,
   TextInputSelectionChangeEventData,
   TouchableOpacity,
@@ -14,18 +20,21 @@ import {
   parseValue,
   Suggestion,
 } from 'react-native-controlled-mentions';
-import {MentionPartType} from 'react-native-controlled-mentions/dist/types';
 import {
-  defaultMentionTextStyle,
+  MentionPartType,
+  Part,
+} from 'react-native-controlled-mentions/dist/types';
+import {
   generateValueFromPartsAndChangedText,
   generateValueWithAddedSuggestion,
   getMentionPartSuggestionKeywords,
   isMentionPartType,
 } from 'react-native-controlled-mentions/dist/utils';
-import {Div, Icon, ScrollDiv} from 'react-native-magnus';
+
+import {Div, Icon, ScrollDiv, Text} from 'react-native-magnus';
 import {ActivityIndicator} from 'react-native-paper';
-import {chatStyles} from '../../../styles/screen/chat/chat.style';
 import {Menu} from 'react-native-paper';
+import Input from './Input';
 
 type ChatFooterProps = {
   text: string | undefined;
@@ -52,18 +61,12 @@ const ChatFooter: React.FC<ChatFooterProps> = ({
   mentionSuggestions,
   isLoading,
 }) => {
-  const {width: windowWidth, height: windowHeight} = useWindowDimensions();
+  const {width: windowWidth} = useWindowDimensions();
   const [selection, setSelection] = useState({start: 0, end: 0});
   const [mentionAdded, setMentionAdded] = useState(false);
   const [visibleMenu, setVisibleMenu] = useState(false);
-  const [content, setContent] = useState('');
-  const inputRef = useRef<TextInput>(null);
 
-  useEffect(() => {
-    if (!value) {
-      setContent('');
-    }
-  }, [value]);
+  const inputRef = useRef<TextInput>(null);
 
   const renderSuggestions: React.FC<MentionSuggestionsProps> = ({
     keyword,
@@ -73,23 +76,32 @@ const ChatFooter: React.FC<ChatFooterProps> = ({
       return null;
     }
 
+    const candidateMembers = mentionSuggestions.filter(one =>
+      one.name.toLocaleLowerCase().includes(keyword.toLocaleLowerCase()),
+    );
+
     return (
-      <ScrollDiv h={140} borderTopColor="blue200" borderTopWidth={1}>
-        {mentionSuggestions
-          .filter(one =>
-            one.name.toLocaleLowerCase().includes(keyword.toLocaleLowerCase()),
-          )
-          .map(one => (
-            <TouchableOpacity
-              key={one.id}
-              onPress={() => onSuggestionPress(one)}
-              style={{padding: 12, width: '100%'}}>
-              <Text>{one.name}</Text>
-            </TouchableOpacity>
-          ))}
-      </ScrollDiv>
+      <>
+        {candidateMembers.length ? (
+          <ScrollDiv
+            h={140}
+            bg="white"
+            borderTopColor="gray200"
+            borderTopWidth={1}>
+            {candidateMembers.map(one => (
+              <TouchableOpacity
+                key={one.id}
+                onPress={() => onSuggestionPress(one)}
+                style={{padding: 12, width: '100%'}}>
+                <Text color="black">{one.name}</Text>
+              </TouchableOpacity>
+            ))}
+          </ScrollDiv>
+        ) : null}
+      </>
     );
   };
+
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const partTypes: MentionPartType[] = [
     {
@@ -98,41 +110,61 @@ const ChatFooter: React.FC<ChatFooterProps> = ({
       textStyle: {fontWeight: 'bold', color: 'blue'}, // The mention style in the input
     },
   ];
-  const {plainText, parts} = useMemo(
-    () => parseValue(content, partTypes),
-    [content, partTypes],
+  const [parseContent, setParseContent] = useState<{
+    plainText: string;
+    parts: Part[];
+  }>(parseValue('', partTypes));
+
+  useEffect(() => {
+    if (value) {
+      setParseContent(parseValue(value, partTypes));
+    } else {
+      setParseContent(parseValue('', partTypes));
+      // inputRef?.current?.clear();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [value]);
+
+  const onChangeInput = useCallback(
+    (changedText: string) => {
+      setParseContent(parseValue(changedText, partTypes));
+      onChangeText(
+        generateValueFromPartsAndChangedText(
+          parseContent.parts,
+          parseContent.plainText,
+          changedText,
+        ),
+      );
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [inputRef, parseContent],
   );
 
-  const onChangeInput = (changedText: string) => {
-    onChangeText(
-      generateValueFromPartsAndChangedText(parts, plainText, changedText),
-    );
-  };
-
-  const handleSelectionChange = (
-    event: NativeSyntheticEvent<TextInputSelectionChangeEventData>,
-  ) => {
-    setSelection(event.nativeEvent.selection);
-  };
+  const handleSelectionChange = useCallback(
+    (event: NativeSyntheticEvent<TextInputSelectionChangeEventData>) => {
+      setSelection(event.nativeEvent.selection);
+    },
+    [],
+  );
 
   /**
    * We memoize the keyword to know should we show mention suggestions or not
    */
   const keywordByTrigger = useMemo(() => {
     return getMentionPartSuggestionKeywords(
-      parts,
-      plainText,
+      parseContent.parts,
+      parseContent.plainText,
       selection,
       partTypes,
     );
-  }, [parts, plainText, selection, partTypes]);
+  }, [parseContent.parts, parseContent.plainText, selection, partTypes]);
 
   const onSuggestionPress =
     (mentionType: MentionPartType) => (suggestion: Suggestion) => {
       const newValue = generateValueWithAddedSuggestion(
-        parts,
+        parseContent.parts,
         mentionType,
-        plainText,
+        parseContent.plainText,
         selection,
         suggestion,
       );
@@ -144,7 +176,7 @@ const ChatFooter: React.FC<ChatFooterProps> = ({
       //Mention style doesn't work correctly
       //https://github.com/dabakovich/react-native-controlled-mentions/issues/66
       // onChangeText(newValue + '\n');
-      setContent(newValue + '\n');
+      setParseContent(parseValue(newValue + '\n', partTypes));
       setMentionAdded(true);
 
       /**
@@ -170,20 +202,25 @@ const ChatFooter: React.FC<ChatFooterProps> = ({
     </Fragment>
   );
 
+  const sendable = useMemo(() => {
+    return !!parseContent.parts?.[0]?.text;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [parseContent.parts?.[0]?.text]);
+
   return (
     <Div flexDir="column">
-      {inputRef.current?.isFocused()
-        ? (
-            partTypes.filter(
-              one =>
-                isMentionPartType(one) &&
-                one.renderSuggestions != null &&
-                !one.isBottomMentionSuggestionsRender,
-            ) as MentionPartType[]
-          ).map(renderMentionSuggestions)
-        : null}
+      {(
+        partTypes.filter(
+          one =>
+            isMentionPartType(one) &&
+            one.renderSuggestions != null &&
+            !one.isBottomMentionSuggestionsRender,
+        ) as MentionPartType[]
+      ).map(renderMentionSuggestions)}
       <Div
         alignSelf="center"
+        borderTopWidth={1}
+        borderTopColor="gray300"
         flexDir="row"
         justifyContent="space-evenly"
         bg="white"
@@ -243,50 +280,24 @@ const ChatFooter: React.FC<ChatFooterProps> = ({
           px={8}
           rounded="md"
           w="60%">
-          <TextInput
-            ref={inputRef}
-            onSelectionChange={handleSelectionChange}
-            multiline
-            onChangeText={t => {
-              setContent(t);
-              onChangeInput(t);
-            }}
-            autoCapitalize="none"
-            placeholderTextColor="#868596"
-            style={[
-              Platform.OS === 'android'
-                ? chatStyles.inputAndroid
-                : chatStyles.inputIos,
-              {
-                color: 'black',
-                minHeight: windowHeight * 0.03,
-                maxHeight: windowHeight * 0.22,
-              },
-            ]}>
-            <Text>
-              {parts.map(({text, partType, data}, index) =>
-                partType ? (
-                  <Text
-                    key={`${index}-${data?.trigger ?? 'pattern'}`}
-                    style={partType.textStyle ?? defaultMentionTextStyle}>
-                    {text}
-                  </Text>
-                ) : (
-                  <Text key={index}>{text}</Text>
-                ),
-              )}
-            </Text>
-          </TextInput>
+          <Input
+            onChangeInput={onChangeInput}
+            handleSelectionChange={handleSelectionChange}
+            parseContent={parseContent}
+          />
         </Div>
         {isLoading ? (
           <ActivityIndicator />
         ) : (
-          <TouchableOpacity onPress={onSend}>
+          <TouchableOpacity
+            onPress={() => {
+              sendable && onSend();
+            }}>
             <Icon
               name="send"
               fontFamily="Ionicons"
               fontSize={21}
-              color={content ? 'blue600' : 'gray'}
+              color={sendable ? 'blue600' : 'gray'}
             />
           </TouchableOpacity>
         )}
@@ -295,4 +306,4 @@ const ChatFooter: React.FC<ChatFooterProps> = ({
   );
 };
 
-export default ChatFooter;
+export default memo(ChatFooter);

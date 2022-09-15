@@ -27,7 +27,9 @@ import {useInviteCall} from '../contexts/call/useInviteCall';
 import SoundPlayer from 'react-native-sound-player';
 import {debounce} from 'lodash';
 import notifee, {EventType} from '@notifee/react-native';
-import PushNotification from 'react-native-push-notification';
+import PushNotification, {
+  ReceivedNotification,
+} from 'react-native-push-notification';
 import {useHandleBadge} from '../contexts/badge/useHandleBadge';
 import {ChatMessage} from '../types';
 
@@ -239,11 +241,6 @@ const Navigator = () => {
     },
   };
 
-  messaging().setBackgroundMessageHandler(async remoteMessage => {
-    // await notifee.incrementBadgeCount();
-    // console.log('BackgroundMessage received!!', remoteMessage);
-  });
-
   useEffect(
     () => {
       if (refusedInvitation) {
@@ -442,13 +439,41 @@ const Navigator = () => {
     getRtmToken();
   }, [AGORA_APP_ID, user?.id]);
 
+  const asyncHandleNotifi = async (notification: any): Promise<void> => {
+    if (
+      (notification?.data?.silent || notification?.data?.type === 'badge') &&
+      notification.data?.id
+    ) {
+      refetchRoomCard({
+        id: notification.data?.id,
+        type: notification.data.type,
+      });
+      if (
+        notification?.data?.type === 'deleteMessage' &&
+        notification.data.messageId
+      ) {
+        const storageData = storage.getString(
+          `messagesIntRoom${notification.data?.id}user${user?.id}`,
+        );
+        if (storageData) {
+          const messagesInStorage: ChatMessage[] = JSON.parse(storageData);
+
+          const jsonMessages = JSON.stringify(
+            messagesInStorage.filter(
+              m => m.id !== Number(notification.data.messageId),
+            ),
+          );
+          storage.set(
+            `messagesIntRoom${notification.data?.id}user${user?.id}`,
+            jsonMessages,
+          );
+        }
+      }
+    }
+  };
+
   const sendLocalNotification = useCallback(
     async (remoteMessage: any) => {
-      // console.log(
-      //   '============',
-      //   remoteMessage.data?.id,
-      //   `${currentChatRoomId}`,
-      // );
       if (
         remoteMessage?.data?.silent ||
         (remoteMessage?.data?.screen === 'chat' &&
@@ -456,31 +481,48 @@ const Navigator = () => {
       ) {
         return;
       }
-      if (!remoteMessage?.data?.calleeId) {
-        const channelId = await notifee.createChannel({
-          id: 'default',
-          name: 'Default Channel',
-        });
+      if (Platform.OS === 'android') {
+        if (!remoteMessage?.data?.calleeId) {
+          let channelId = 'default';
+          if (!(await notifee.isChannelCreated(channelId))) {
+            channelId = await notifee.createChannel({
+              id: 'default',
+              name: 'Default Channel',
+            });
+          }
 
-        await notifee.displayNotification({
-          title: remoteMessage.data?.title || '',
-          body: remoteMessage.data?.message || remoteMessage.data?.body || '',
-          android: {
-            channelId: channelId,
-            pressAction: {
-              id: 'action_id',
-              launchActivity: 'default',
+          await notifee.displayNotification({
+            title: remoteMessage.data?.title || '',
+            body: remoteMessage.data?.message || remoteMessage.data?.body || '',
+            android: {
+              channelId: channelId,
+              pressAction: {
+                id: 'action_id',
+                launchActivity: 'default',
+              },
             },
-          },
-          data: {
-            screen: remoteMessage?.data?.screen
-              ? remoteMessage?.data?.screen
-              : '',
-            id: remoteMessage?.data?.id ? remoteMessage?.data?.id : '',
-          },
-          ios: {
-            // iOS resource (.wav, aiff, .caf)
-            sound: 'local.wav',
+            data: {
+              screen: remoteMessage?.data?.screen
+                ? remoteMessage?.data?.screen
+                : '',
+              id: remoteMessage?.data?.id ? remoteMessage?.data?.id : '',
+            },
+            ios: {
+              // iOS resource (.wav, aiff, .caf)
+              sound: 'local.wav',
+            },
+          });
+        }
+      } else {
+        PushNotification.localNotification({
+          id: remoteMessage.messageId,
+          vibration: 300,
+          visibility: 'public',
+          message: remoteMessage.notification?.body || '',
+          title: remoteMessage.notification?.title,
+          userInfo: {
+            screen: remoteMessage?.data?.screen,
+            id: remoteMessage?.data?.id,
           },
         });
       }
@@ -488,11 +530,32 @@ const Navigator = () => {
     [currentChatRoomId],
   );
 
+  messaging().setBackgroundMessageHandler(async remoteMessage => {
+    console.log('setBackgroundMessageHandler called');
+    if (Platform.OS === 'android') {
+      setTimeout(() => asyncHandleNotifi(remoteMessage), 10);
+    }
+    // if (Platform.OS === 'android') {
+    //   sendLocalNotification(remoteMessage);
+    // }
+    // await notifee.incrementBadgeCount();
+    // console.log('BackgroundMessage received!!', remoteMessage);
+  });
+
   const naviateByNotif = (notification: any) => {
+    console.log('naviateByNotif called ------');
+
     if (
       navigationRef.current?.getCurrentRoute()?.name !== 'Login' &&
       user?.id
     ) {
+      if (notification.data?.screen === 'chat' && notification.data?.id) {
+        navigationRef.current?.navigate('ChatStack', {
+          screen: 'Chat',
+          params: {room: {id: notification.data?.id}},
+          initial: false,
+        });
+      }
       if (notification.data?.screen === 'event' && notification.data?.id) {
         navigationRef.current?.navigate('EventStack', {
           screen: 'EventDetail',
@@ -512,27 +575,26 @@ const Navigator = () => {
           screen: 'RoomList',
         });
       }
-      if (notification.data?.screen === 'chat' && notification.data?.id) {
-        navigationRef.current?.navigate('ChatStack', {
-          screen: 'Chat',
-          params: {room: {id: notification.data?.id}},
-          initial: false,
-        });
-      }
     }
   };
+
   useEffect(() => {
     if (user?.id) {
       notifee.onForegroundEvent(({type, detail}) => {
+        console.log('onForegroundEvent call', type);
+
         switch (type) {
           case EventType.DISMISSED:
             break;
           case EventType.PRESS:
+            console.log('onForegroundEvent pressed', type);
             naviateByNotif(detail.notification);
             break;
         }
       });
       notifee.onBackgroundEvent(async ({type, detail}) => {
+        console.log('onBackgroundEvent call');
+
         switch (type) {
           case EventType.DISMISSED:
             break;
@@ -547,61 +609,32 @@ const Navigator = () => {
         //   console.log('PushNotification TOKEN:', token);
         // },
         onNotification: notification => {
-          if (
-            (notification?.data?.silent ||
-              notification?.data?.type === 'badge') &&
-            notification.data?.id
-          ) {
-            refetchRoomCard({
-              id: notification.data?.id,
-              type: notification.data.type,
-            });
-            if (
-              notification?.data?.type === 'deleteMessage' &&
-              notification.data.messageId
-            ) {
-              const storageData = storage.getString(
-                `messagesIntRoom${notification.data?.id}user${user?.id}`,
-              );
-              if (storageData) {
-                const messagesInStorage: ChatMessage[] =
-                  JSON.parse(storageData);
-
-                const jsonMessages = JSON.stringify(
-                  messagesInStorage.filter(
-                    m => m.id !== Number(notification.data.messageId),
-                  ),
-                );
-                storage.set(
-                  `messagesIntRoom${notification.data?.id}user${user?.id}`,
-                  jsonMessages,
-                );
-              }
-            }
-          }
-          // console.log('PushNotification onNotification========', notification);
-          if (Platform.OS === 'android') {
-            sendLocalNotification(notification);
-          } else if (notification.userInteraction) {
+          if (notification.userInteraction) {
             naviateByNotif(notification);
+          }
+          if (Platform.OS === 'ios') {
+            asyncHandleNotifi(notification);
           }
         },
         permissions: {
           alert: true,
           badge: true,
-          sound: true,
         },
         requestPermissions: true,
       });
-
-      const unsubscribe = messaging().onMessage(async remoteMessage => {
-        if (Platform.OS === 'ios') {
-          sendLocalNotification(remoteMessage);
-        }
-      });
-
-      return unsubscribe;
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id]);
+
+  useEffect(() => {
+    const unsubscribe = messaging().onMessage(async remoteMessage => {
+      if (Platform.OS === 'android') {
+        asyncHandleNotifi(remoteMessage);
+      }
+      sendLocalNotification(remoteMessage);
+    });
+
+    return unsubscribe;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id, currentChatRoomId]);
 

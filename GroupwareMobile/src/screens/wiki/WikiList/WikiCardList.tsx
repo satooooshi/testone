@@ -84,10 +84,12 @@ const RenderWikiCardList: React.FC<RenderWikiCardListProps> = ({
   const isFocused = useIsFocused();
 
   const onEndReached = () => {
-    setSearchQuery(q => ({
-      ...q,
-      page: q.page ? (Number(q.page) + 1).toString() : '1',
-    }));
+    if (wikiForInfiniteScroll.length >= 20 * Number(searchQuery.page)) {
+      setSearchQuery(q => ({
+        ...q,
+        page: q.page ? (Number(q.page) + 1).toString() : '1',
+      }));
+    }
   };
 
   useEffect(() => {
@@ -152,7 +154,9 @@ const RenderWikiCardList: React.FC<RenderWikiCardListProps> = ({
               checked={searchQuery.status === 'new'}
               value="new"
               suffix={<Text>新着</Text>}
-              onChange={() => setSearchQuery(q => ({...q, status: 'new'}))}
+              onChange={() =>
+                setSearchQuery(q => ({...q, status: 'new', page: '1'}))
+              }
             />
             {/* @ts-ignore */}
             <Radio
@@ -160,7 +164,9 @@ const RenderWikiCardList: React.FC<RenderWikiCardListProps> = ({
               checked={searchQuery.status === 'resolved'}
               value="resolved"
               suffix={<Text>解決済み</Text>}
-              onChange={() => setSearchQuery(q => ({...q, status: 'resolved'}))}
+              onChange={() =>
+                setSearchQuery(q => ({...q, status: 'resolved', page: '1'}))
+              }
             />
           </Div>
         ) : null}
