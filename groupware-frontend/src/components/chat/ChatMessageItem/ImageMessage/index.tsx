@@ -17,6 +17,7 @@ const ImageMessage: React.FC<ImageMessageProps> = ({ message, onClick }) => {
           src={message.content}
           w={300}
           h={300}
+          style={{ objectFit: 'contain' }}
           alt="送信された画像"
         />
       </Box>
