@@ -564,13 +564,13 @@ export class ChatService {
         } else {
           m.isSender = false;
         }
-        if (
-          m.type === ChatMessageType.IMAGE ||
-          m.type === ChatMessageType.VIDEO ||
-          m.type === ChatMessageType.OTHER_FILE
-        ) {
-          m.content = await genSignedURL(m.content);
-        }
+        // if (
+        //   m.type === ChatMessageType.IMAGE ||
+        //   m.type === ChatMessageType.VIDEO ||
+        //   m.type === ChatMessageType.OTHER_FILE
+        // ) {
+        //   m.content = await genSignedURL(m.content);
+        // }
         return m;
       }),
     );
