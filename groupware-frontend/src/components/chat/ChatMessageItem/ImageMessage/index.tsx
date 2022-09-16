@@ -15,9 +15,9 @@ const ImageMessage: React.FC<ImageMessageProps> = ({ message, onClick }) => {
           // priority={true}
           loading="lazy"
           src={message.content}
-          w={300}
-          h={300}
-          objectFit={'scale-down'}
+          maxW={300}
+          maxH={300}
+          objectFit={'contain'}
           objectPosition={message.isSender ? 'right center' : 'left center'}
           alt="送信された画像"
         />

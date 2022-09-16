@@ -11,6 +11,8 @@ import { componentDecorator } from 'src/utils/componentDecorator';
 import { useAPIUpdateChatMessage } from '@/hooks/api/chat/useAPIUpdateChatMessage';
 import { socket } from '../../ChatBox/socket';
 import { reactionStickers } from '../../../../utils/reactionStickers';
+import NextImage from 'next/image';
+import noImage from '@/public/no-image.jpg';
 
 type TextMessageProps = {
   message: ChatMessage;
@@ -121,37 +123,62 @@ const TextMessage: React.FC<TextMessageProps> = ({
             </Box>
             <Box>
               {message.replyParentMessage.type === ChatMessageType.IMAGE ? (
-                <Image
-                  // priority={true}
-                  loading="lazy"
-                  src={message.replyParentMessage.content}
-                  w={'100'}
-                  h={'100'}
-                  objectFit={'contain'}
-                  alt="送信された画像"
-                />
-              ) : message.replyParentMessage.type === ChatMessageType.VIDEO ? (
-                <video width="100" height="100" controls={false} muted>
-                  <source
+                message?.replyParentMessage?.content ? (
+                  <Image
+                    loading="lazy"
                     src={message.replyParentMessage.content}
-                    type="video/mp4"
+                    w={'100'}
+                    h={'100'}
+                    objectFit={'contain'}
+                    alt="表示できない画像"
                   />
-                </video>
+                ) : (
+                  <NextImage
+                    width="70"
+                    height="70"
+                    src={noImage}
+                    alt="表示できない画像"
+                  />
+                )
+              ) : message.replyParentMessage.type === ChatMessageType.VIDEO ? (
+                message?.replyParentMessage?.content ? (
+                  <video width="100" height="100" controls={false} muted>
+                    <source
+                      src={message.replyParentMessage.content}
+                      type="video/mp4"
+                    />
+                  </video>
+                ) : (
+                  <NextImage
+                    width="70"
+                    height="70"
+                    src={noImage}
+                    alt="表示できない動画"
+                  />
+                )
               ) : message.replyParentMessage.type ===
                 ChatMessageType.STICKER ? (
-                <Image
-                  // priority={true}
-                  loading="lazy"
-                  src={
-                    reactionStickers.find(
-                      (s) => s.name === message?.replyParentMessage?.content,
-                    )?.src
-                  }
-                  w={'100%'}
-                  h={'100'}
-                  objectFit={'contain'}
-                  alt="送信された画像"
-                />
+                message?.replyParentMessage?.content ? (
+                  <Image
+                    loading="lazy"
+                    src={
+                      reactionStickers.find(
+                        (s) => s.name === message?.replyParentMessage?.content,
+                      )?.src
+                    }
+                    w={'100%'}
+                    h={'100'}
+                    objectFit={'contain'}
+                    alt="表示できない画像"
+                  />
+                ) : (
+                  <NextImage
+                    width="70"
+                    height="70"
+                    src={noImage}
+                    alt="表示できない画像"
+                  />
+                )
               ) : null}
             </Box>
           </Box>
