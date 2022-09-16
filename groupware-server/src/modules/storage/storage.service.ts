@@ -15,8 +15,8 @@ export class StorageService {
     const signedURLs: string[] = [];
     for await (const u of urls) {
       const normalURL = genStorageURL(u);
-      const signedURL = await genSignedURL(normalURL);
-      signedURLs.push(signedURL);
+      // const signedURL = await genSignedURL(normalURL);
+      signedURLs.push(normalURL);
     }
     return signedURLs;
   }
