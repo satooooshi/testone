@@ -17,8 +17,8 @@ const ImageMessage: React.FC<ImageMessageProps> = ({ message, onClick }) => {
           src={message.content}
           w={300}
           h={300}
-          objectFit={'contain'}
-          objectPosition={'right center'}
+          objectFit={'scale-down'}
+          objectPosition={message.isSender ? 'right center' : 'left center'}
           alt="送信された画像"
         />
       </Box>
