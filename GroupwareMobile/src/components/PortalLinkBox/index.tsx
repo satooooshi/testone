@@ -227,7 +227,7 @@ const PortalLinkBox: React.FC<PortarlLinkBoxProps> = ({type, onPress}) => {
       case 'chat':
         return 'チャット';
       case 'admin':
-        return '管理者ページ';
+        return '管理ページ';
       case 'account':
         return 'アカウント';
       case 'my_schedule':

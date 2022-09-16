@@ -121,7 +121,7 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
         flexDir={message.isSender ? 'row' : 'row-reverse'}
         mb={'xs'}
         alignSelf={message?.isSender ? 'flex-end' : 'flex-start'}
-        alignItems="flex-end">
+        alignItems="flex-start">
         <Div>
           {!message.isSender && message.type !== ChatMessageType.SYSTEM_TEXT ? (
             <Text>{userNameFactory(message.sender)}</Text>

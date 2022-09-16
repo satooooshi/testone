@@ -4,7 +4,7 @@ import PortalLinkBox from '../../components/PortalLinkBox';
 import {Div, ScrollDiv, Tag, Text} from 'react-native-magnus';
 import {Alert, Linking} from 'react-native';
 import {useAuthenticate} from '../../contexts/useAuthenticate';
-import {EventType} from '../../types';
+import {EventType, UserRole} from '../../types';
 import {useNavigation} from '@react-navigation/native';
 import {HomeNavigationProps} from '../../types/navigator/drawerScreenProps/home';
 import {useAPIGetUserInfoById} from '../../hooks/api/user/useAPIGetUserInfoById';
@@ -207,6 +207,29 @@ const Home: React.FC = () => {
                   screen: 'UserList',
                   params: {},
                 });
+              }}
+            />
+          </Div>
+          <Div flex={1} />
+        </Div>
+
+        <Text fontSize={18} fontWeight="bold" my={12}>
+          管理
+        </Text>
+        <Div flexDir="row" mb={8}>
+          <Div flex={1} mr={12}>
+            <PortalLinkBox
+              type="admin"
+              onPress={() => {
+                if (user?.role === UserRole.ADMIN) {
+                  navigation.navigate('AdminStack', {
+                    screen: 'UserAdmin',
+                  });
+                } else {
+                  navigation.navigate('AdminStack', {
+                    screen: 'TagAdmin',
+                  });
+                }
               }}
             />
           </Div>
