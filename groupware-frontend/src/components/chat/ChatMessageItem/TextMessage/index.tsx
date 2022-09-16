@@ -1,5 +1,5 @@
 import UserAvatar from '@/components/common/UserAvatar';
-import { Box, Text, Textarea, useMediaQuery } from '@chakra-ui/react';
+import { Box, Text, Textarea, useMediaQuery, Image } from '@chakra-ui/react';
 import React, { ReactNode, useEffect, useState } from 'react';
 import { ChatMessage, ChatMessageType } from 'src/types';
 import { darkFontColor } from 'src/utils/colors';
@@ -10,6 +10,7 @@ import Linkify from 'react-linkify';
 import { componentDecorator } from 'src/utils/componentDecorator';
 import { useAPIUpdateChatMessage } from '@/hooks/api/chat/useAPIUpdateChatMessage';
 import { socket } from '../../ChatBox/socket';
+import { reactionStickers } from '../../../../utils/reactionStickers';
 
 type TextMessageProps = {
   message: ChatMessage;
@@ -112,11 +113,46 @@ const TextMessage: React.FC<TextMessageProps> = ({
               cursor="pointer"
               user={message.replyParentMessage.sender}
             />
-            <Box width={'90%'}>
+            <Box width={'50%'}>
               <Text fontWeight="bold">
                 {userNameFactory(message.replyParentMessage?.sender)}
               </Text>
               <Text>{replyContent(message.replyParentMessage)}</Text>
+            </Box>
+            <Box>
+              {message.replyParentMessage.type === ChatMessageType.IMAGE ? (
+                <Image
+                  // priority={true}
+                  loading="lazy"
+                  src={message.replyParentMessage.content}
+                  w={'100'}
+                  h={'100'}
+                  objectFit={'contain'}
+                  alt="送信された画像"
+                />
+              ) : message.replyParentMessage.type === ChatMessageType.VIDEO ? (
+                <video width="100" height="100" controls={false} muted>
+                  <source
+                    src={message.replyParentMessage.content}
+                    type="video/mp4"
+                  />
+                </video>
+              ) : message.replyParentMessage.type ===
+                ChatMessageType.STICKER ? (
+                <Image
+                  // priority={true}
+                  loading="lazy"
+                  src={
+                    reactionStickers.find(
+                      (s) => s.name === message?.replyParentMessage?.content,
+                    )?.src
+                  }
+                  w={'100%'}
+                  h={'100'}
+                  objectFit={'contain'}
+                  alt="送信された画像"
+                />
+              ) : null}
             </Box>
           </Box>
         )}

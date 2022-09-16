@@ -639,8 +639,8 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
                 // priority={true}
                 loading="lazy"
                 src={newChatMessage.replyParentMessage.content}
-                w={'100%'}
-                h={'100px'}
+                w={'100'}
+                h={'100'}
                 objectFit={'contain'}
                 alt="送信された画像"
               />
@@ -664,7 +664,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
                   )?.src
                 }
                 w={'100%'}
-                h={'100px'}
+                h={'100'}
                 objectFit={'contain'}
                 alt="送信された画像"
               />
