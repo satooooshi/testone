@@ -370,7 +370,6 @@ export class EventScheduleService {
         .andWhere('userJoiningEvent.event_id IN (:...eventIds)', { eventIds })
         .andWhere('userJoiningEvent.canceledAt IS NULL')
         .getRawMany();
-      console.log('----', userId, joiningEventList);
 
       const joiningEventId = joiningEventList.map((j) => Number(j.eventId));
       events = events.filter((e) => joiningEventId.includes(e.id));
