@@ -498,6 +498,9 @@ export class UserService {
       where: { user },
       relations: ['wiki', 'wiki.tags', 'wiki.writer'],
       take: 20,
+      order: {
+        id: 'DESC',
+      },
     });
 
     if (!userGoodForBoards.length) {
