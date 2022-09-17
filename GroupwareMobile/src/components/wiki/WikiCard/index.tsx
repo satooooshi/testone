@@ -17,10 +17,9 @@ import {useAPIGetGoodsForBoard} from '../../../hooks/api/wiki/useAPIGetGoodForBo
 
 type WikiCardProps = {
   wiki: Wiki;
-  backFromDetail?: () => void; // ONLY passed from WikiCardList Component
 };
 
-const WikiCard: React.FC<WikiCardProps> = ({wiki, backFromDetail}) => {
+const WikiCard: React.FC<WikiCardProps> = ({wiki}) => {
   const windowWidth = useWindowDimensions().width;
   const navigation = useNavigation<any>();
   const routes = navigation.getState()?.routes;
@@ -57,16 +56,13 @@ const WikiCard: React.FC<WikiCardProps> = ({wiki, backFromDetail}) => {
   return (
     <TouchableHighlight
       underlayColor="none"
-      onPress={() => {
-        if (backFromDetail !== undefined) {
-          backFromDetail();
-        }
+      onPress={() =>
         navigation.navigate('WikiStack', {
           screen: 'WikiDetail',
           params: {id: wiki.id, previousScreenName: routes[routes?.length - 1]},
           initial: false,
-        });
-      }}>
+        })
+      }>
       <Div
         flexDir="column"
         w={windowWidth}

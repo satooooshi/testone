@@ -82,15 +82,6 @@ const RenderWikiCardList: React.FC<RenderWikiCardListProps> = ({
   );
   const flatListRef = useRef<FlatList | null>(null);
   const isFocused = useIsFocused();
-  const [currentPos, setCurrentPos] = useState(0);
-  const [noRefetch, setNoRefetch] = useState(false);
-  const onViewableItemsChanged = useRef(({viewableItems}) => {
-    const index = viewableItems[0]?.index;
-    if (currentPos !== index) {
-      setCurrentPos(index);
-    }
-  });
-  const viewConfigRef = useRef({viewAreaCoveragePercentThreshold: 50});
 
   const onEndReached = () => {
     if (wikiForInfiniteScroll.length >= 20 * Number(searchQuery.page)) {
@@ -112,7 +103,7 @@ const RenderWikiCardList: React.FC<RenderWikiCardListProps> = ({
         rule_category: ruleCategory,
         page: '1',
       }));
-      //flatListRef?.current?.scrollToOffset({animated: false, offset: 0});
+      flatListRef?.current?.scrollToOffset({animated: false, offset: 0});
     }
   }, [
     isFocused,
@@ -127,15 +118,11 @@ const RenderWikiCardList: React.FC<RenderWikiCardListProps> = ({
   ]);
 
   useEffect(() => {
-    if (isFocused && !noRefetch) {
+    if (isFocused) {
       refetch();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchQuery]);
-
-  useEffect(() => {
-    setNoRefetch(false);
-  }, [currentPos, tag, type, word]);
 
   // useEffect(() => {
   //   if (!isFetching && fetchedWiki?.wiki && fetchedWiki?.wiki.length) {
@@ -191,15 +178,8 @@ const RenderWikiCardList: React.FC<RenderWikiCardListProps> = ({
               onEndReached={onEndReached}
               onEndReachedThreshold={0.5}
               data={wikiForInfiniteScroll || []}
-              keyExtractor={(item, index) => String(index)} //{item => item.id.toString()}
-              onViewableItemsChanged={onViewableItemsChanged.current}
-              viewabilityConfig={viewConfigRef.current}
-              renderItem={({item}) => (
-                <WikiCard
-                  backFromDetail={() => setNoRefetch(true)}
-                  wiki={item}
-                />
-              )}
+              keyExtractor={item => item.id.toString()}
+              renderItem={({item}) => <WikiCard wiki={item} />}
             />
           </Div>
         ) : !wikiForInfiniteScroll.length ? (
