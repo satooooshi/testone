@@ -41,9 +41,7 @@ const ChatDetail = () => {
       setCurrentRoom(data);
     },
     onError: (err) => {
-      if (setCurrentRoom) {
-        setCurrentRoom(undefined);
-      }
+      setCurrentRoom(undefined);
       if (err?.response?.data?.message) {
         alert(err?.response?.data?.message);
       }
@@ -84,8 +82,12 @@ const ChatDetail = () => {
           leaveChatGroup(
             { id: Number(id) },
             {
-              onSuccess: () =>
+              onSuccess: () => {
                 router.push('/chat', undefined, { shallow: true }),
+                  setChatGroupsState(
+                    chatGroups.filter((g) => g.id != Number(id)),
+                  );
+              },
             },
           );
         }

@@ -4,7 +4,7 @@ import PortalLinkBox from '../../components/PortalLinkBox';
 import {Div, ScrollDiv, Tag, Text} from 'react-native-magnus';
 import {Alert, Linking} from 'react-native';
 import {useAuthenticate} from '../../contexts/useAuthenticate';
-import {EventType, UserRole} from '../../types';
+import {EventType, UserRole, UserRole} from '../../types';
 import {useNavigation} from '@react-navigation/native';
 import {HomeNavigationProps} from '../../types/navigator/drawerScreenProps/home';
 import {useAPIGetUserInfoById} from '../../hooks/api/user/useAPIGetUserInfoById';
