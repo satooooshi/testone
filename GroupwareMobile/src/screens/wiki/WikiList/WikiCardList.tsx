@@ -101,9 +101,9 @@ const RenderWikiCardList: React.FC<RenderWikiCardListProps> = ({
         type,
         board_category: boardCategory,
         rule_category: ruleCategory,
-        page: '1',
+        page: searchQuery.page, //'1',
       }));
-      flatListRef?.current?.scrollToOffset({animated: false, offset: 0});
+      //flatListRef?.current?.scrollToOffset({animated: false, offset: 0});
     }
   }, [
     isFocused,
