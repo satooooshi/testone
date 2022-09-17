@@ -5,7 +5,6 @@ import Foundation from 'react-native-vector-icons/Foundation';
 import Entypo from 'react-native-vector-icons/Entypo';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
-import Feather from 'react-native-vector-icons/Feather';
 import {
   impressiveUniversityColor,
   studyMeetingColor,
@@ -197,7 +196,9 @@ const PortalLinkIcon: React.FC<PortalLinkIconProps> = ({type}) => {
         />
       );
     case 'user_admin':
-      return <Feather name="users" size={iconSize} color="red900" />;
+      return (
+        <FontAwesome5 name="user-cog" color={adminColor} size={iconSize} />
+      );
     case 'user_registering_admin':
       return <AntDesign name="adduser" size={iconSize} color="red900" />;
     case 'tag_admin':
