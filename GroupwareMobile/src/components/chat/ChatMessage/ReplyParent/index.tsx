@@ -103,6 +103,7 @@ const ReplyParent: React.FC<ReplyParentProps> = ({parentMessage}) => {
     <Div
       flexDir="row"
       alignItems="center"
+      justifyContent="space-between"
       borderBottomWidth={0.5}
       borderBottomColor="white">
       <Div mr={'sm'}>
@@ -113,7 +114,7 @@ const ReplyParent: React.FC<ReplyParentProps> = ({parentMessage}) => {
           GoProfile={true}
         />
       </Div>
-      <Div w={'65%'} mr={0}>
+      <Div w={'30%'} maxW={'65%'} mr={0}>
         <Text color="black" fontWeight="bold" fontSize={14}>
           {userNameFactory(parentMessage.sender)}
         </Text>
