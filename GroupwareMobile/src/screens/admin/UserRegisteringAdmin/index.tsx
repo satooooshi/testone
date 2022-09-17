@@ -39,7 +39,6 @@ import {formikErrorMsgFactory} from '../../../utils/factory/formikEroorMsgFactor
 import {branchTypeNameFactory} from '../../../utils/factory/branchTypeNameFactory';
 import {createUserSchema} from '../../../utils/validation/schema';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
-import {useAdminHeaderTab} from '../../../contexts/admin/useAdminHeaderTab';
 import {useIsFocused} from '@react-navigation/native';
 import {useIsTabBarVisible} from '../../../contexts/bottomTab/useIsTabBarVisible';
 
@@ -138,7 +137,6 @@ const UserRegisteringAdmin: React.FC = () => {
       );
     },
   });
-  const tabs = useAdminHeaderTab();
 
   useEffect(() => {
     if (isFocused) {
@@ -171,11 +169,7 @@ const UserRegisteringAdmin: React.FC = () => {
       <Overlay visible={isLoading} p="xl">
         <ActivityIndicator />
       </Overlay>
-      <HeaderWithTextButton
-        title="ユーザー作成"
-        tabs={tabs}
-        activeTabName={'ユーザー作成'}
-      />
+      <HeaderWithTextButton title="ユーザー作成" />
       <TagModal
         onCompleteModal={selectedTagsInModal =>
           setValues(v => ({...v, tags: selectedTagsInModal}))

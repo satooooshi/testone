@@ -9,7 +9,6 @@ import SearchForm from '../../../components/common/SearchForm';
 import SearchFormOpenerButton from '../../../components/common/SearchForm/SearchFormOpenerButton';
 import HeaderWithTextButton from '../../../components/Header';
 import WholeContainer from '../../../components/WholeContainer';
-import {useAdminHeaderTab} from '../../../contexts/admin/useAdminHeaderTab';
 import {useAPIGetUserTag} from '../../../hooks/api/tag/useAPIGetUserTag';
 import {User, UserRole, UserTag} from '../../../types';
 import {userRoleNameFactory} from '../../../utils/factory/userRoleNameFactory';
@@ -49,8 +48,6 @@ const UserAdmin: React.FC = () => {
   const [usersForInfiniteScroll, setUsersForInfiniteScroll] = useState<User[]>(
     [],
   );
-
-  const tabs = useAdminHeaderTab();
 
   const onEndReached = () => {
     setSearchQuery(q => ({...q, page: (Number(q.page) + 1).toString()}));
@@ -93,11 +90,7 @@ const UserAdmin: React.FC = () => {
   ];
   return (
     <WholeContainer>
-      <HeaderWithTextButton
-        title="Admin"
-        tabs={tabs}
-        activeTabName={'ユーザー管理'}
-      />
+      <HeaderWithTextButton title="Admin" />
       <SearchForm
         searchTarget="user"
         defaultValue={{word: '', selectedTags}}
