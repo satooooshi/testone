@@ -14,11 +14,16 @@ import {
   TextInputSelectionChangeEventData,
   TouchableOpacity,
   useWindowDimensions,
+  ScrollView,
 } from 'react-native';
 import {
   MentionSuggestionsProps,
   parseValue,
   Suggestion,
+  MentionInput,
+  Triggers,
+  useMentions,
+  replaceTriggerValues,
 } from 'react-native-controlled-mentions';
 import {
   MentionPartType,
@@ -31,10 +36,57 @@ import {
   isMentionPartType,
 } from 'react-native-controlled-mentions/dist/utils';
 
+import {Pressable, SafeAreaView, View} from 'react-native';
+
 import {Div, Icon, ScrollDiv, Text} from 'react-native-magnus';
 import {ActivityIndicator} from 'react-native-paper';
 import {Menu} from 'react-native-paper';
 import Input from './Input';
+
+import {chatStyles} from '../../../styles/screen/chat/chat.style';
+
+// Custom component for rendering suggestions
+const Suggestions: FC<SuggestionsProvidedProps & {suggestions: Suggestion[]}> =
+  ({keyword, onSelect, suggestions}) => {
+    if (keyword == null) {
+      return null;
+    }
+
+    return (
+      <View>
+        {suggestions
+          .filter(one =>
+            one.name.toLocaleLowerCase().includes(keyword.toLocaleLowerCase()),
+          )
+          .map(one => (
+            <Pressable
+              key={one.id}
+              onPress={() => onSelect(one)}
+              style={{padding: 12}}>
+              <Text>{one.name}</Text>
+            </Pressable>
+          ))}
+      </View>
+    );
+  };
+
+// Config of suggestible triggers
+const triggersConfig = {
+  mention: {
+    trigger: '@',
+    allowedSpacesCount: 3,
+    isInsertSpaceAfterMention: true,
+    textStyle: {fontWeight: 'bold', color: 'blue'},
+  },
+};
+
+type DefaultTriggerConfig = {
+  trigger: string;
+  allowedSpacesCount?: number | undefined;
+  isInsertSpaceAfterMention?: boolean | undefined;
+  textStyle?: StyleProp<TextStyle>;
+  getPlainString?: ((mention: TriggerData) => string) | undefined;
+};
 
 type ChatFooterProps = {
   text: string | undefined;
@@ -50,7 +102,7 @@ type ChatFooterProps = {
 };
 
 const ChatFooter: React.FC<ChatFooterProps> = ({
-  text: value,
+  text: text,
   onChangeText,
   onUploadFile,
   onUploadVideo,
@@ -61,162 +113,47 @@ const ChatFooter: React.FC<ChatFooterProps> = ({
   mentionSuggestions,
   isLoading,
 }) => {
+  const textInputRef = useRef<TextInput>(null);
   const {width: windowWidth} = useWindowDimensions();
-  const [selection, setSelection] = useState({start: 0, end: 0});
-  const [mentionAdded, setMentionAdded] = useState(false);
   const [visibleMenu, setVisibleMenu] = useState(false);
-
-  const inputRef = useRef<TextInput>(null);
-
-  const renderSuggestions: React.FC<MentionSuggestionsProps> = ({
-    keyword,
-    onSuggestionPress,
-  }) => {
-    if (keyword == null) {
-      return null;
-    }
-
-    const candidateMembers = mentionSuggestions.filter(one =>
-      one.name.toLocaleLowerCase().includes(keyword.toLocaleLowerCase()),
+  const [textValue, setTextValue] = useState(
+    text, //replaceTriggerValues(text || '', ({name}) => `@${name}`),
+  ); //
+  //const [visibleText, setVisibleText] = useState(text || '');
+  //const [parseContent, setParseContent] = useState<string>(
+  //  replaceTriggerValues(textValue, ({name}) => `@${name}`),
+  //);
+  const onChangeInput = (t: string) => {
+    console.log(
+      replaceTriggerValues(
+        'A a a a a. Hello world {@}[b bさん](211) how are you ??',
+        ({name}) => `@${name}`,
+      ),
     );
-
-    return (
-      <>
-        {candidateMembers.length ? (
-          <ScrollDiv
-            h={140}
-            bg="white"
-            borderTopColor="gray200"
-            borderTopWidth={1}>
-            {candidateMembers.map(one => (
-              <TouchableOpacity
-                key={one.id}
-                onPress={() => onSuggestionPress(one)}
-                style={{padding: 12, width: '100%'}}>
-                <Text color="black">{one.name}</Text>
-              </TouchableOpacity>
-            ))}
-          </ScrollDiv>
-        ) : null}
-      </>
-    );
+    console.log(t);
+    setTextValue(t);
+    onChangeText(t);
   };
-
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const partTypes: MentionPartType[] = [
-    {
-      trigger: '@', // Should be a single character like '@' or '#'
-      renderSuggestions,
-      textStyle: {fontWeight: 'bold', color: 'blue'}, // The mention style in the input
-    },
-  ];
-  const [parseContent, setParseContent] = useState<{
-    plainText: string;
-    parts: Part[];
-  }>(parseValue('', partTypes));
+  const {textInputProps, triggers} = useMentions({
+    value: textValue || '',
+    onChange: onChangeInput, //setTextValue,
+    triggersConfig,
+  });
 
   useEffect(() => {
-    if (value) {
-      setParseContent(parseValue(value, partTypes));
-    } else {
-      setParseContent(parseValue('', partTypes));
-      // inputRef?.current?.clear();
-    }
+    console.log('mentionSuggestions', mentionSuggestions);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [value]);
-
-  const onChangeInput = useCallback(
-    (changedText: string) => {
-      setParseContent(parseValue(changedText, partTypes));
-      onChangeText(
-        generateValueFromPartsAndChangedText(
-          parseContent.parts,
-          parseContent.plainText,
-          changedText,
-        ),
-      );
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [inputRef, parseContent],
-  );
-
-  const handleSelectionChange = useCallback(
-    (event: NativeSyntheticEvent<TextInputSelectionChangeEventData>) => {
-      setSelection(event.nativeEvent.selection);
-    },
-    [],
-  );
-
-  /**
-   * We memoize the keyword to know should we show mention suggestions or not
-   */
-  const keywordByTrigger = useMemo(() => {
-    return getMentionPartSuggestionKeywords(
-      parseContent.parts,
-      parseContent.plainText,
-      selection,
-      partTypes,
-    );
-  }, [parseContent.parts, parseContent.plainText, selection, partTypes]);
-
-  const onSuggestionPress =
-    (mentionType: MentionPartType) => (suggestion: Suggestion) => {
-      const newValue = generateValueWithAddedSuggestion(
-        parseContent.parts,
-        mentionType,
-        parseContent.plainText,
-        selection,
-        suggestion,
-      );
-
-      if (!newValue) {
-        return;
-      }
-
-      //Mention style doesn't work correctly
-      //https://github.com/dabakovich/react-native-controlled-mentions/issues/66
-      // onChangeText(newValue + '\n');
-      setParseContent(parseValue(newValue + '\n', partTypes));
-      setMentionAdded(true);
-
-      /**
-       * Move cursor to the end of just added mention starting from trigger string and including:
-       * - Length of trigger string
-       * - Length of mention name
-       * - Length of space after mention (1)
-       *
-       * Not working now due to the RN bug
-       */
-      // const newCursorPosition = currentPart.position.start + triggerPartIndex + trigger.length +
-      // suggestion.name.length + 1;
-
-      // textInput.current?.setNativeProps({selection: {start: newCursorPosition, end: newCursorPosition}});
-    };
-
-  const renderMentionSuggestions = (mentionType: MentionPartType) => (
-    <Fragment key={mentionType.trigger}>
-      {renderSuggestions({
-        keyword: keywordByTrigger[mentionType.trigger],
-        onSuggestionPress: onSuggestionPress(mentionType),
-      })}
-    </Fragment>
-  );
+    //console.log(textInputRef?.current);
+  }, []);
 
   const sendable = useMemo(() => {
-    return !!parseContent.parts?.[0]?.text;
+    return !!textValue?.trim(); //!!parseContent.parts?.[0]?.text;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [parseContent.parts?.[0]?.text]);
+  }, [textValue]); //;[parseContent.parts?.[0]?.text]);
 
   return (
     <Div flexDir="column">
-      {(
-        partTypes.filter(
-          one =>
-            isMentionPartType(one) &&
-            one.renderSuggestions != null &&
-            !one.isBottomMentionSuggestionsRender,
-        ) as MentionPartType[]
-      ).map(renderMentionSuggestions)}
+      <Suggestions suggestions={mentionSuggestions} {...triggers.mention} />
       <Div
         alignSelf="center"
         borderTopWidth={1}
@@ -280,10 +217,13 @@ const ChatFooter: React.FC<ChatFooterProps> = ({
           px={8}
           rounded="md"
           w="60%">
-          <Input
-            onChangeInput={onChangeInput}
-            handleSelectionChange={handleSelectionChange}
-            parseContent={parseContent}
+          <TextInput
+            placeholder="メッセージを入力"
+            placeholderTextColor="#868596"
+            style={{padding: 12}}
+            multiline
+            ref={textInputRef}
+            {...textInputProps}
           />
         </Div>
         {isLoading ? (
@@ -292,6 +232,8 @@ const ChatFooter: React.FC<ChatFooterProps> = ({
           <TouchableOpacity
             onPress={() => {
               sendable && onSend();
+              setTextValue('');
+              //textInputRef?.current?.clear();// it clears the field but the field is soonly overwritten by textValue state
             }}>
             <Icon
               name="send"

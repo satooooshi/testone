@@ -140,7 +140,7 @@ export class ChatMessage {
       } else if (this.type === ChatMessageType.STICKER) {
         content = 'スタンプを送信しました。';
       }
-      const mentionRegex = /@\[.*?\]\(([0-9]+)\)/g;
+      const mentionRegex = /{@}\[.*?\]\(([0-9]+)\)/g;
       const mentionedIds: number[] = [];
       let mentionArr = [];
       while ((mentionArr = mentionRegex.exec(content)) !== null) {
