@@ -237,6 +237,8 @@ const EditedProfile: React.FC = () => {
       </Dropdown>
       {values && (
         <KeyboardAwareScrollView
+          // eslint-disable-next-line react-native/no-inline-styles
+          style={{backgroundColor: 'white'}}
           extraScrollHeight={50}
           contentContainerStyle={{
             ...profileStyles.scrollView,

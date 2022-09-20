@@ -245,6 +245,8 @@ const UserRegisteringAdmin: React.FC = () => {
         </Dropdown.Option>
       </Dropdown>
       <KeyboardAwareScrollView
+        // eslint-disable-next-line react-native/no-inline-styles
+        style={{backgroundColor: 'white'}}
         contentContainerStyle={{
           ...userRegisteringAdminStyles.scrollView,
         }}>
