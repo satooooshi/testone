@@ -46,6 +46,33 @@ import Input from './Input';
 import {chatStyles} from '../../../styles/screen/chat/chat.style';
 
 // Custom component for rendering suggestions
+const Suggestions_: FC<SuggestionsProvidedProps & {suggestions: Suggestion[]}> =
+  ({keyword, onSelect, suggestions}) => {
+    if (keyword == null) {
+      return null;
+    }
+
+    return (
+      <View>
+        <ScrollDiv bg="white">
+          {suggestions
+            .filter(one =>
+              one.name
+                .toLocaleLowerCase()
+                .includes(keyword.toLocaleLowerCase()),
+            )
+            .map(one => (
+              <Pressable
+                key={one.id}
+                onPress={() => onSelect(one)}
+                style={{padding: 12}}>
+                <Text>{one.name}</Text>
+              </Pressable>
+            ))}
+        </ScrollDiv>
+      </View>
+    );
+  };
 const Suggestions: FC<SuggestionsProvidedProps & {suggestions: Suggestion[]}> =
   ({keyword, onSelect, suggestions}) => {
     if (keyword == null) {
@@ -54,18 +81,24 @@ const Suggestions: FC<SuggestionsProvidedProps & {suggestions: Suggestion[]}> =
 
     return (
       <View>
-        {suggestions
-          .filter(one =>
-            one.name.toLocaleLowerCase().includes(keyword.toLocaleLowerCase()),
-          )
-          .map(one => (
-            <Pressable
-              key={one.id}
-              onPress={() => onSelect(one)}
-              style={{padding: 12}}>
-              <Text>{one.name}</Text>
-            </Pressable>
-          ))}
+        {suggestions.length ? (
+          <ScrollDiv bg="white" borderTopColor="gray200" borderTopWidth={1}>
+            {suggestions
+              .filter(one =>
+                one.name
+                  .toLocaleLowerCase()
+                  .includes(keyword.toLocaleLowerCase()),
+              )
+              .map(one => (
+                <TouchableOpacity
+                  key={one.id}
+                  onPress={() => onSelect(one)}
+                  style={{padding: 12, width: '100%'}}>
+                  <Text color="black">{one.name}</Text>
+                </TouchableOpacity>
+              ))}
+          </ScrollDiv>
+        ) : null}
       </View>
     );
   };
@@ -114,7 +147,7 @@ const ChatFooter: React.FC<ChatFooterProps> = ({
   isLoading,
 }) => {
   const textInputRef = useRef<TextInput>(null);
-  const {width: windowWidth} = useWindowDimensions();
+  const {width: windowWidth, height: windowHeight} = useWindowDimensions();
   const [visibleMenu, setVisibleMenu] = useState(false);
   const [textValue, setTextValue] = useState(
     text, //replaceTriggerValues(text || '', ({name}) => `@${name}`),
@@ -153,7 +186,8 @@ const ChatFooter: React.FC<ChatFooterProps> = ({
 
   return (
     <Div flexDir="column">
-      <Suggestions suggestions={mentionSuggestions} {...triggers.mention} />
+      <Suggestions_ suggestions={mentionSuggestions} {...triggers.mention} />
+
       <Div
         alignSelf="center"
         borderTopWidth={1}
@@ -224,6 +258,16 @@ const ChatFooter: React.FC<ChatFooterProps> = ({
             multiline
             ref={textInputRef}
             {...textInputProps}
+            style={[
+              Platform.OS === 'android'
+                ? chatStyles.inputAndroid
+                : chatStyles.inputIos,
+              {
+                color: 'black',
+                minHeight: windowHeight * 0.03,
+                maxHeight: windowHeight * 0.22,
+              },
+            ]}
           />
         </Div>
         {isLoading ? (
@@ -249,3 +293,46 @@ const ChatFooter: React.FC<ChatFooterProps> = ({
 };
 
 export default memo(ChatFooter);
+
+const renderMentionSuggestions = (mentionType: MentionPartType) => (
+  <Fragment key={mentionType.trigger}>
+    {renderSuggestions({
+      keyword: keywordByTrigger[mentionType.trigger],
+      onSuggestionPress: onSuggestionPress(mentionType),
+    })}
+  </Fragment>
+);
+
+const renderSuggestions: React.FC<MentionSuggestionsProps> = ({
+  keyword,
+  onSuggestionPress,
+}) => {
+  if (keyword == null) {
+    return null;
+  }
+
+  const candidateMembers = mentionSuggestions.filter(one =>
+    one.name.toLocaleLowerCase().includes(keyword.toLocaleLowerCase()),
+  );
+
+  return (
+    <>
+      {candidateMembers.length ? (
+        <ScrollDiv
+          h={140}
+          bg="white"
+          borderTopColor="gray200"
+          borderTopWidth={1}>
+          {candidateMembers.map(one => (
+            <TouchableOpacity
+              key={one.id}
+              onPress={() => onSuggestionPress(one)}
+              style={{padding: 12, width: '100%'}}>
+              <Text color="black">{one.name}</Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollDiv>
+      ) : null}
+    </>
+  );
+};
