@@ -229,7 +229,7 @@ const Home: React.FC = () => {
                 }}
               />
             </Div>
-            <Div flex={1} mr={12}>
+            <Div flex={1}>
               <PortalLinkBox
                 type="user_registering_admin"
                 onPress={() => {
@@ -255,7 +255,7 @@ const Home: React.FC = () => {
               }}
             />
           </Div>
-          <Div flex={1} mr={12}>
+          <Div flex={1}>
             <PortalLinkBox
               type="user_tag_admin"
               onPress={() => {
