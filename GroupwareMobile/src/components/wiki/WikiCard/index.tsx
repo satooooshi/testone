@@ -59,7 +59,7 @@ const WikiCard: React.FC<WikiCardProps> = ({wiki}) => {
       onPress={() =>
         navigation.navigate('WikiStack', {
           screen: 'WikiDetail',
-          params: {id: wiki.id, previousScreenName: routes[routes?.length - 1]},
+          params: {id: wiki.id},
           initial: false,
         })
       }>
