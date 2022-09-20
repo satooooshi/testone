@@ -89,8 +89,8 @@ const WikiCard: React.FC<WikiCardProps> = ({wiki, type}) => {
           }>
           {!type || type === WikiType.BOARD ? (
             <Tag
-              fontSize={'lg'}
-              h={28}
+              fontSize={'md'}
+              h={24}
               py={0}
               bg={wikiTypeColorFactory(wiki.type, wiki.ruleCategory)}
               color="white"
@@ -116,8 +116,8 @@ const WikiCard: React.FC<WikiCardProps> = ({wiki, type}) => {
                       params: {tag: t.id.toString()},
                     })
                   }
-                  fontSize={'lg'}
-                  h={28}
+                  fontSize={'md'}
+                  h={24}
                   py={0}
                   bg={tagColorFactory(t.type)}
                   color="white"
@@ -129,12 +129,12 @@ const WikiCard: React.FC<WikiCardProps> = ({wiki, type}) => {
           ) : null}
         </Div>
         <Div flexDir={'row'} w="100%" alignItems="center" mb={10}>
-          <Text fontSize={14} color={darkFontColor}>
+          <Text fontSize={12} color={darkFontColor}>
             {`投稿: ${dateTimeFormatterFromJSDDateWithoutTime({
               dateTime: new Date(wiki.createdAt),
             })}`}
           </Text>
-          <Text ml={10} fontSize={14} color={darkFontColor}>
+          <Text ml={10} fontSize={12} color={darkFontColor}>
             {`最終更新: ${dateTimeFormatterFromJSDDateWithoutTime({
               dateTime: new Date(wiki.updatedAt),
             })}`}
@@ -146,7 +146,7 @@ const WikiCard: React.FC<WikiCardProps> = ({wiki, type}) => {
               <UserAvatar user={wiki.writer} h={48} w={48} GoProfile={true} />
             </Div>
           )}
-          <Text w={'80%'} numberOfLines={2} fontWeight="bold" fontSize={22}>
+          <Text w={'80%'} numberOfLines={2} fontWeight="bold" fontSize={18}>
             {wiki.title}
           </Text>
         </Div>
