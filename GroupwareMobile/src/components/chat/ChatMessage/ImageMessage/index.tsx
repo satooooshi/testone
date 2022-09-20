@@ -16,34 +16,34 @@ const ImageMessage: React.FC<ImageMessageProps> = ({
   onLongPress,
 }) => {
   const {width: windowWidth} = useWindowDimensions();
-  const [he, setHe] = useState<number>(0);
-  const [wi, setWi] = useState<number>(0);
+  const [h, setH] = useState<number>(0);
+  const [w, setW] = useState<number>(0);
 
   useEffect(() => {
-    Image.getSize(message.content, (width, height) => {
-      setHe(height);
-      setWi(width);
+    Image.getSize(message.content, (wi, he) => {
+      let height = 0,
+        width = 0;
+      if (wi < he && 3 * wi < he) {
+        height = windowWidth * 0.6;
+        width = 72;
+      } else if (wi < he) {
+        height = windowWidth * 0.6;
+        width = 144;
+      } else if (he < wi && 3 * he < wi) {
+        height = 72;
+        width = windowWidth * 0.6;
+      } else if (he < wi) {
+        height = 144;
+        width = windowWidth * 0.6;
+      }
+      setH(height);
+      setW(width);
     });
-  }, [message]);
+  }, [message.content, windowWidth]);
 
-  if (he === 0 && wi === 0) {
+  if (h === 0 && w === 0) {
     return <ActivityIndicator />;
   } else {
-    console.log(he, wi);
-    let height, width;
-    if (wi < he && 3 * wi < he) {
-      height = windowWidth * 0.6;
-      width = 72;
-    } else if (wi < he) {
-      height = windowWidth * 0.6;
-      width = 144;
-    } else if (he < wi && 3 * he < wi) {
-      height = 72;
-      width = windowWidth * 0.6;
-    } else if (he < wi) {
-      height = 144;
-      width = windowWidth * 0.6;
-    }
     return (
       <>
         <TouchableOpacity onPress={onPress} onLongPress={onLongPress}>
@@ -53,8 +53,8 @@ const ImageMessage: React.FC<ImageMessageProps> = ({
               priority: FastImage.priority.low,
             }}
             style={{
-              height: height,
-              width: width,
+              height: h,
+              width: w,
               borderRadius: 8,
             }}
             resizeMode={FastImage.resizeMode.cover}

@@ -598,7 +598,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
           display="flex"
           flexDir="row"
           alignItems="center"
-          h="13%"
+          h="110"
           borderBottomWidth={1}
           px="8px"
           position="relative"
@@ -663,7 +663,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
                       s.name === newChatMessage?.replyParentMessage?.content,
                   )?.src
                 }
-                w={'100%'}
+                w={'100'}
                 h={'100'}
                 objectFit={'contain'}
                 alt="送信された画像"
