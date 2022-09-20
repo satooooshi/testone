@@ -157,7 +157,7 @@ const UserRegisteringAdmin: React.FC = () => {
       <Overlay visible={isLoading} p="xl">
         <ActivityIndicator />
       </Overlay>
-      <HeaderWithTextButton enableBackButton={true} title="ユーザー作成" />
+      <HeaderWithTextButton title="ユーザー作成" />
       <TagModal
         onCompleteModal={selectedTagsInModal =>
           setValues(v => ({...v, tags: selectedTagsInModal}))
