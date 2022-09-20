@@ -5,7 +5,6 @@ import {ActivityIndicator} from 'react-native-paper';
 import TagCollapse from '../../../components/admin/TagCollapse';
 import HeaderWithTextButton from '../../../components/Header';
 import WholeContainer from '../../../components/WholeContainer';
-import {useAdminHeaderTab} from '../../../contexts/admin/useAdminHeaderTab';
 import {useAuthenticate} from '../../../contexts/useAuthenticate';
 import {useAPICreateTag} from '../../../hooks/api/tag/useAPICreateTag';
 import {useAPIDeleteTag} from '../../../hooks/api/tag/useAPIDeleteTag';
@@ -63,7 +62,6 @@ const TagAdmin: React.FC = () => {
   const modifiedTags: Tag[] =
     tags?.map(t => ({...t, name: modifyStrToFlat(t.name)})) || [];
 
-  const tabs = useAdminHeaderTab();
   const {user} = useAuthenticate();
   const isAdmin = user?.role === UserRole.ADMIN;
 
@@ -105,11 +103,7 @@ const TagAdmin: React.FC = () => {
       <Overlay visible={isLoading} p="xl">
         <ActivityIndicator />
       </Overlay>
-      <HeaderWithTextButton
-        title={'タグ管理'}
-        tabs={tabs}
-        activeTabName={'タグ管理'}
-      />
+      <HeaderWithTextButton title={'タグ管理'} />
       <ScrollDiv
         contentContainerStyle={{
           ...tagAdminStyles.scrollView,

@@ -14,6 +14,7 @@ import {userNameFactory} from '../../utils/factory/userNameFactory';
 
 const Home: React.FC = () => {
   const {user, setUser, logout} = useAuthenticate();
+  const isAdmin = user?.role === UserRole.ADMIN;
   const userID = user?.id;
   const navigation = useNavigation<HomeNavigationProps>();
   const {data: profile} = useAPIGetUserInfoById(userID?.toString() || '0');
@@ -216,24 +217,54 @@ const Home: React.FC = () => {
         <Text fontSize={18} fontWeight="bold" my={12}>
           管理
         </Text>
-        <Div flexDir="row" mb={8}>
-          <Div flex={1} mr={12}>
-            <PortalLinkBox
-              type="admin"
-              onPress={() => {
-                if (user?.role === UserRole.ADMIN) {
+        {isAdmin ? (
+          <Div flexDir="row" mb={8}>
+            <Div flex={1} mr={12}>
+              <PortalLinkBox
+                type="user_admin"
+                onPress={() => {
                   navigation.navigate('AdminStack', {
                     screen: 'UserAdmin',
                   });
-                } else {
+                }}
+              />
+            </Div>
+            <Div flex={1}>
+              <PortalLinkBox
+                type="user_registering_admin"
+                onPress={() => {
                   navigation.navigate('AdminStack', {
-                    screen: 'TagAdmin',
+                    screen: 'UserRegisteringAdmin',
                   });
-                }
+                }}
+              />
+            </Div>
+          </Div>
+        ) : (
+          <></>
+        )}
+
+        <Div flexDir="row" mb={8}>
+          <Div flex={1} mr={12}>
+            <PortalLinkBox
+              type="tag_admin"
+              onPress={() => {
+                navigation.navigate('AdminStack', {
+                  screen: 'TagAdmin',
+                });
               }}
             />
           </Div>
-          <Div flex={1} />
+          <Div flex={1}>
+            <PortalLinkBox
+              type="user_tag_admin"
+              onPress={() => {
+                navigation.navigate('AdminStack', {
+                  screen: 'UserTagAdmin',
+                });
+              }}
+            />
+          </Div>
         </Div>
 
         <Text fontSize={18} fontWeight="bold" my={12}>
