@@ -34,10 +34,10 @@ const ChatNoteCard: React.FC<ChatNoteCardProps> = ({
   onPressDeleteButton,
   onPressImage,
 }) => {
-  const [s, setS] = useState(false);
+  const [selectable, setSelectable] = useState(false);
   useEffect(() => {
     let timeoutId = setTimeout(() => {
-      setS(true);
+      setSelectable(true);
     }, 50);
     return () => {
       clearTimeout(timeoutId);
@@ -123,7 +123,9 @@ const ChatNoteCard: React.FC<ChatNoteCardProps> = ({
             //  Alert.alert('クリップボードにコピーしました。');
             //}}
           >
-            <Text selectable={s} style={tailwind(' text-black text-base')}>
+            <Text
+              selectable={selectable}
+              style={tailwind(' text-black text-base')}>
               {note.content}
             </Text>
           </Hyperlink>
