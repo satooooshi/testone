@@ -61,25 +61,25 @@ const ReplyParent: React.FC<ReplyParentProps> = ({parentMessage}) => {
 
       case ChatMessageType.IMAGE:
         return (
-          <Text color="black" fontSize={14}>
+          <Text color={parentMessage.sender ? 'white' : 'black'} fontSize={14}>
             写真
           </Text>
         );
       case ChatMessageType.VIDEO:
         return (
-          <Text color="black" fontSize={14}>
+          <Text color={parentMessage.sender ? 'white' : 'black'} fontSize={14}>
             動画
           </Text>
         );
       case ChatMessageType.STICKER:
         return (
-          <Text color="black" fontSize={14}>
+          <Text color={parentMessage.sender ? 'white' : 'black'} fontSize={14}>
             スタンプ
           </Text>
         );
       case ChatMessageType.OTHER_FILE:
         return (
-          <Text color="black" fontSize={14}>
+          <Text color={parentMessage.sender ? 'white' : 'black'} fontSize={14}>
             ファイル
           </Text>
         );
