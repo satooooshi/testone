@@ -1,10 +1,11 @@
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   TouchableHighlight,
   TextInput,
   Platform,
   Linking,
   Alert,
+  Text as RNTEXT,
 } from 'react-native';
 import {Button, Div, Icon, Image, Text} from 'react-native-magnus';
 import tailwind from 'tailwind-rn';
@@ -33,6 +34,15 @@ const ChatNoteCard: React.FC<ChatNoteCardProps> = ({
   onPressDeleteButton,
   onPressImage,
 }) => {
+  const [s, setS] = useState(false);
+  useEffect(() => {
+    let timeoutId = setTimeout(() => {
+      setS(true);
+    }, 50);
+    return () => {
+      clearTimeout(timeoutId);
+    };
+  }, [note]);
   return (
     <Div
       bg="white"
@@ -108,12 +118,12 @@ const ChatNoteCard: React.FC<ChatNoteCardProps> = ({
           <Hyperlink
             linkStyle={tailwind('text-blue-500 text-base text-base')}
             onPress={t => Linking.openURL(t)}
-            // onLongPress={t => {
-            //   Clipboard.setString(t);
-            //   Alert.alert('クリップボードにコピーしました。');
-            // }}
+            //onLongPress={t => {
+            //  Clipboard.setString(t);
+            //  Alert.alert('クリップボードにコピーしました。');
+            //}}
           >
-            <Text selectable={true} style={tailwind(' text-black text-base')}>
+            <Text selectable={s} style={tailwind(' text-black text-base')}>
               {note.content}
             </Text>
           </Hyperlink>
