@@ -95,19 +95,22 @@ const RenderWikiCardList: React.FC<RenderWikiCardListProps> = ({
 
   useEffect(() => {
     if (isFocused) {
-      setRuleCategory(ruleCategory || RuleCategory.NON_RULE);
-      setBoardCategory(boardCategory || BoardCategory.NON_BOARD);
-      setSearchQuery(q => ({
-        ...q,
-        type,
-        board_category: boardCategory,
-        rule_category: ruleCategory,
-        page: '1', //seachQuery.page,
-      }));
       if (!noRefetch) {
+        setRuleCategory(ruleCategory || RuleCategory.NON_RULE);
+        setBoardCategory(boardCategory || BoardCategory.NON_BOARD);
+        setSearchQuery(q => ({
+          ...q,
+          type,
+          board_category: boardCategory,
+          rule_category: ruleCategory,
+          page: '1', //seachQuery.page,
+        }));
         flatListRef?.current?.scrollToOffset({animated: false, offset: 0});
+      } else {
+        setNoRefetch(false);
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     isFocused,
     refetch,
@@ -122,10 +125,6 @@ const RenderWikiCardList: React.FC<RenderWikiCardListProps> = ({
 
   useEffect(() => {
     // Do not refetch when go back from wiki detail screen
-    if (noRefetch) {
-      setNoRefetch(false);
-      return;
-    }
     if (isFocused) {
       refetch();
     }
