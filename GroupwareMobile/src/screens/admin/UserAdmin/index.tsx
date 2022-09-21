@@ -1,5 +1,5 @@
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
-import {useFocusEffect} from '@react-navigation/native';
+import {useFocusEffect, useIsFocused} from '@react-navigation/native';
 import React, {useCallback, useEffect, useState} from 'react';
 import {FlatList} from 'react-native';
 import {Text, Div} from 'react-native-magnus';
@@ -17,10 +17,13 @@ import {
   SearchQueryToGetUsers,
   useAPISearchUsers,
 } from '../../../hooks/api/user/useAPISearchUsers';
+import {useIsTabBarVisible} from '../../../contexts/bottomTab/useIsTabBarVisible';
 
 const TopTab = createMaterialTopTabNavigator();
 
 const UserAdmin: React.FC = () => {
+  const isFocused = useIsFocused();
+  const {setIsTabBarVisible} = useIsTabBarVisible();
   const [searchQuery, setSearchQuery] = useState<SearchQueryToGetUsers>({
     page: '1',
     //role: UserRole.COACH,
@@ -72,6 +75,12 @@ const UserAdmin: React.FC = () => {
       });
     }
   }, [users?.users, isRefetching]);
+
+  useEffect(() => {
+    if (isFocused) {
+      setIsTabBarVisible(true);
+    }
+  }, [isFocused, setIsTabBarVisible]);
 
   useEffect(() => {
     const tagIDs = searchQuery.tag?.split('+') || [];
