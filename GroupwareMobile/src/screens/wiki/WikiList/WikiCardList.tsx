@@ -82,6 +82,7 @@ const RenderWikiCardList: React.FC<RenderWikiCardListProps> = ({
   );
   const flatListRef = useRef<FlatList | null>(null);
   const isFocused = useIsFocused();
+  const [noRefetch, setNoRefetch] = useState(false);
 
   const onEndReached = () => {
     if (wikiForInfiniteScroll.length >= 20 * Number(searchQuery.page)) {
@@ -103,7 +104,9 @@ const RenderWikiCardList: React.FC<RenderWikiCardListProps> = ({
         rule_category: ruleCategory,
         page: searchQuery.page, //'1',
       }));
-      //flatListRef?.current?.scrollToOffset({animated: false, offset: 0});
+      if (!noRefetch) {
+        flatListRef?.current?.scrollToOffset({animated: false, offset: 0});
+      }
     }
   }, [
     isFocused,
@@ -118,6 +121,11 @@ const RenderWikiCardList: React.FC<RenderWikiCardListProps> = ({
   ]);
 
   useEffect(() => {
+    // Do not refetch when go back from wiki detail screen
+    if (noRefetch) {
+      setNoRefetch(false);
+      return;
+    }
     if (isFocused) {
       refetch();
     }
@@ -179,7 +187,9 @@ const RenderWikiCardList: React.FC<RenderWikiCardListProps> = ({
               onEndReachedThreshold={0.5}
               data={wikiForInfiniteScroll || []}
               keyExtractor={item => item.id.toString()}
-              renderItem={({item}) => <WikiCard wiki={item} />}
+              renderItem={({item}) => (
+                <WikiCard goBackFromDetail={setNoRefetch} wiki={item} />
+              )}
             />
           </Div>
         ) : !wikiForInfiniteScroll.length ? (
