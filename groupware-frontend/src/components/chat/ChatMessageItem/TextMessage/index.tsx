@@ -142,7 +142,14 @@ const TextMessage: React.FC<TextMessageProps> = ({
                 )
               ) : message.replyParentMessage.type === ChatMessageType.VIDEO ? (
                 message?.replyParentMessage?.content ? (
-                  <video width="100" height="100" controls={false} muted>
+                  <video
+                    style={{
+                      maxHeight: '100px',
+                      width: '100px',
+                      objectFit: 'contain',
+                    }}
+                    controls={false}
+                    muted>
                     <source
                       src={message.replyParentMessage.content}
                       type="video/mp4"

@@ -624,7 +624,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
             size="md"
             user={newChatMessage.replyParentMessage.sender}
           />
-          <Box display="flex" justifyContent="center" flexDir="column" w="50%">
+          <Box display="flex" justifyContent="center" flexDir="column" w="80%">
             <Text fontWeight="bold">
               {userNameFactory(newChatMessage.replyParentMessage.sender)}
             </Text>
@@ -632,11 +632,10 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
               {replyTargetContent(newChatMessage.replyParentMessage)}
             </Text>
           </Box>
-          <Box>
+          <Box w="20%">
             {newChatMessage.replyParentMessage.type ===
             ChatMessageType.IMAGE ? (
               <Image
-                // priority={true}
                 loading="lazy"
                 src={newChatMessage.replyParentMessage.content}
                 w={'100'}
@@ -646,7 +645,14 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
               />
             ) : newChatMessage.replyParentMessage.type ===
               ChatMessageType.VIDEO ? (
-              <video width="100" height="100" controls={false} muted>
+              <video
+                style={{
+                  maxHeight: '100px',
+                  maxWidth: '100px',
+                  objectFit: 'contain',
+                }}
+                controls={false}
+                muted>
                 <source
                   src={newChatMessage.replyParentMessage.content}
                   type="video/mp4"
@@ -655,7 +661,6 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
             ) : newChatMessage.replyParentMessage.type ===
               ChatMessageType.STICKER ? (
               <Image
-                // priority={true}
                 loading="lazy"
                 src={
                   reactionStickers.find(
