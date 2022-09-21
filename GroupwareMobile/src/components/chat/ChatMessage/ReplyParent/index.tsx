@@ -13,76 +13,60 @@ type ReplyParentProps = {
   isSender?: boolean;
 };
 
-const ReplyParent: React.FC<ReplyParentProps> = ({parentMessage}) => {
-  const Limit_LINES = 3;
-  const [pressed, setPressed] = useState(false);
-  const [numberOfLines, setNumberOfLines] = useState(0);
+const ReplyParent: React.FC<ReplyParentProps> = ({parentMessage, isSender}) => {
+  // const Limit_LINES = 3;
+  // const [pressed, setPressed] = useState(false);
+  // const [numberOfLines, setNumberOfLines] = useState(0);
 
-  const onTextLayout = useCallback(e => {
-    setNumberOfLines(e.nativeEvent.lines.length);
-  }, []);
+  // const onTextLayout = useCallback(e => {
+  //   setNumberOfLines(e.nativeEvent.lines.length);
+  // }, []);
 
-  const FoldedTextMessage = (msg: String) => {
-    return (
-      <>
-        <TouchableOpacity onPress={() => setPressed(true)}>
-          <Text
-            mb={10}
-            numberOfLines={pressed ? undefined : Limit_LINES}
-            onTextLayout={onTextLayout}
-            textAlign="left">
-            {msg}
-          </Text>
-        </TouchableOpacity>
-        {pressed && numberOfLines > 3 ? (
-          <Button
-            mb={5}
-            pt={5}
-            pb={5}
-            color="black"
-            underlayColor="white"
-            rounded={20}
-            fontSize={13}
-            bg="transparent"
-            ml="auto"
-            mr={0}
-            onPress={() => setPressed(false)}>
-            閉じる
-          </Button>
-        ) : null}
-      </>
-    );
-  };
+  // const FoldedTextMessage = (msg: String) => {
+  //   return (
+  //     <>
+  //       <TouchableOpacity onPress={() => setPressed(true)}>
+  //         <Text
+  //           mb={10}
+  //           numberOfLines={pressed ? undefined : Limit_LINES}
+  //           onTextLayout={onTextLayout}
+  //           color={isSender ? 'white' : 'black'}
+  //           textAlign="left">
+  //           {msg}
+  //         </Text>
+  //       </TouchableOpacity>
+  //       {pressed && numberOfLines > 3 ? (
+  //         <Button
+  //           mb={5}
+  //           pt={5}
+  //           pb={5}
+  //           color="black"
+  //           underlayColor="white"
+  //           rounded={20}
+  //           fontSize={13}
+  //           bg="transparent"
+  //           ml="auto"
+  //           mr={0}
+  //           onPress={() => setPressed(false)}>
+  //           閉じる
+  //         </Button>
+  //       ) : null}
+  //     </>
+  //   );
+  // };
 
   const content = (type: ChatMessageType) => {
     switch (type) {
       case ChatMessageType.TEXT:
-        return FoldedTextMessage(mentionTransform(parentMessage.content));
-
+        return mentionTransform(parentMessage.content);
       case ChatMessageType.IMAGE:
-        return (
-          <Text color={parentMessage.sender ? 'white' : 'black'} fontSize={14}>
-            写真
-          </Text>
-        );
+        return '写真';
       case ChatMessageType.VIDEO:
-        return (
-          <Text color={parentMessage.sender ? 'white' : 'black'} fontSize={14}>
-            動画
-          </Text>
-        );
+        return '動画';
       case ChatMessageType.STICKER:
-        return (
-          <Text color={parentMessage.sender ? 'white' : 'black'} fontSize={14}>
-            スタンプ
-          </Text>
-        );
+        return 'スタンプ';
       case ChatMessageType.OTHER_FILE:
-        return (
-          <Text color={parentMessage.sender ? 'white' : 'black'} fontSize={14}>
-            ファイル
-          </Text>
-        );
+        return 'ファイル';
     }
   };
   const getThumbnailImage = (message: ChatMessage) => {
@@ -115,10 +99,10 @@ const ReplyParent: React.FC<ReplyParentProps> = ({parentMessage}) => {
         />
       </Div>
       <Div w={'65%'}>
-        <Text color={parentMessage.sender ? 'white' : 'black'} fontSize={14}>
+        <Text color={isSender ? 'white' : 'black'} fontSize={14}>
           {userNameFactory(parentMessage.sender)}
         </Text>
-        <Text color={parentMessage.sender ? 'white' : 'black'} fontSize={14}>
+        <Text color={isSender ? 'white' : 'black'} fontSize={14}>
           {content(parentMessage.type)}
         </Text>
       </Div>
