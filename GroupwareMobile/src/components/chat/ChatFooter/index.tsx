@@ -73,35 +73,6 @@ const Suggestions_: FC<SuggestionsProvidedProps & {suggestions: Suggestion[]}> =
       </View>
     );
   };
-const Suggestions: FC<SuggestionsProvidedProps & {suggestions: Suggestion[]}> =
-  ({keyword, onSelect, suggestions}) => {
-    if (keyword == null) {
-      return null;
-    }
-
-    return (
-      <View>
-        {suggestions.length ? (
-          <ScrollDiv bg="white" borderTopColor="gray200" borderTopWidth={1}>
-            {suggestions
-              .filter(one =>
-                one.name
-                  .toLocaleLowerCase()
-                  .includes(keyword.toLocaleLowerCase()),
-              )
-              .map(one => (
-                <TouchableOpacity
-                  key={one.id}
-                  onPress={() => onSelect(one)}
-                  style={{padding: 12, width: '100%'}}>
-                  <Text color="black">{one.name}</Text>
-                </TouchableOpacity>
-              ))}
-          </ScrollDiv>
-        ) : null}
-      </View>
-    );
-  };
 
 // Config of suggestible triggers
 const triggersConfig = {
@@ -151,7 +122,7 @@ const ChatFooter: React.FC<ChatFooterProps> = ({
   const [visibleMenu, setVisibleMenu] = useState(false);
   const [textValue, setTextValue] = useState(
     text, //replaceTriggerValues(text || '', ({name}) => `@${name}`),
-  ); //
+  );
   //const [visibleText, setVisibleText] = useState(text || '');
   //const [parseContent, setParseContent] = useState<string>(
   //  replaceTriggerValues(textValue, ({name}) => `@${name}`),
@@ -163,8 +134,13 @@ const ChatFooter: React.FC<ChatFooterProps> = ({
         ({name}) => `@${name}`,
       ),
     );
-    console.log(t);
-    setTextValue(t);
+    console.log('t', t);
+    const mentionRegex = /([\S]+)@$/g;
+    const spacedT = t.replace(mentionRegex, '$1 @');
+    console.log('spacedT', spacedT);
+    const trimedT = spacedT.replace(/(\s)@([\S]+)/g, '@$2');
+    console.log('trimedT', trimedT);
+    setTextValue(trimedT);
     onChangeText(t);
   };
   const {textInputProps, triggers} = useMentions({
