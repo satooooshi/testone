@@ -1,30 +1,18 @@
-import React, {
-  Fragment,
-  memo,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import React, {memo, useMemo, useRef, useState} from 'react';
 import {
   Platform,
   TextInput,
   TouchableOpacity,
   useWindowDimensions,
 } from 'react-native';
-import {
-  MentionSuggestionsProps,
-  Suggestion,
-  useMentions,
-} from 'react-native-controlled-mentions';
-import {MentionPartType} from 'react-native-controlled-mentions/dist/types';
+import {Suggestion, useMentions} from 'react-native-controlled-mentions';
 
-import {Pressable, SafeAreaView, View} from 'react-native';
+import {Pressable, View} from 'react-native';
 
 import {Div, Icon, ScrollDiv, Text} from 'react-native-magnus';
 import {ActivityIndicator} from 'react-native-paper';
 import {Menu} from 'react-native-paper';
-import Input from './Input';
+//import Input from './Input';
 
 import {chatStyles} from '../../../styles/screen/chat/chat.style';
 
