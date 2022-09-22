@@ -94,7 +94,7 @@ const ChatEditor: React.FC<ChatEditorProps> = memo(
           ?.filter((u) => u.id !== user?.id)
           .map((u) => ({
             id: u.id,
-            name: userNameFactory(u) + 'さん',
+            name: `@${userNameFactory(u)}さん`,
             avatar: u.avatarUrl,
           })) || [];
       const allTag = { id: 0, name: 'all', avatar: '' };
@@ -160,7 +160,10 @@ const ChatEditor: React.FC<ChatEditorProps> = memo(
       if (parsedMessage) {
         for (const m of mentionedUserData) {
           const regexp = new RegExp(`\\s${m.name}|^${m.name}`, 'g');
-          parsedMessage = parsedMessage.replace(regexp, `@${m.name}`);
+          parsedMessage = parsedMessage.replace(
+            regexp,
+            `{@}[${m.name.slice(1)}](${m.id})`,
+          );
         }
         onSend(parsedMessage);
         setEditorState(EditorState.createEmpty());
@@ -238,5 +241,4 @@ const ChatEditor: React.FC<ChatEditorProps> = memo(
   },
 );
 
-ChatEditor.displayName = 'ChatEditor';
 export default ChatEditor;
