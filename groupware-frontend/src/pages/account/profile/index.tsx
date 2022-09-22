@@ -41,6 +41,7 @@ import FormToLinkTag from '@/components/FormToLinkTag';
 import router from 'next/router';
 import { AiOutlineArrowLeft } from 'react-icons/ai';
 import { FiEdit2 } from 'react-icons/fi';
+import { AiOutlineDelete } from 'react-icons/ai';
 
 type ModalState = {
   isOpen: boolean;
@@ -296,18 +297,11 @@ const Profile = () => {
         />
       )}
       <Box className={profileStyles.image_wrapper} mb="32px">
-        {/* {!userInfo.avatarUrl && !selectImageUrl ? (
-          <div {...getEventImageRootProps()}>
-            <div className={profileStyles.image_dropzone}>
-              <input {...getEventImageInputProps()} />
-              {userInfo.avatarUrl && (
-                <img
-                  className={profileStyles.avatar}
-                  src={croppedImageURL ? croppedImageURL : userInfo.avatarUrl}
-                  alt="アバター画像"
-                />
-              )}
-              {!userInfo.avatarUrl && (
+        {!userInfo.avatarUrl && !selectImageUrl ? (
+          <>
+            <div {...getEventImageRootProps()}>
+              <div className={profileStyles.image_dropzone}>
+                <input {...getEventImageInputProps()} />
                 <div className={profileStyles.next_image_wrapper}>
                   <Image
                     className={profileStyles.avatar}
@@ -315,33 +309,19 @@ const Profile = () => {
                     alt="アバター画像"
                   />
                 </div>
-              )}
+              </div>
+              <Box h="8px" />
+              <Stack
+                justifyContent="center"
+                direction="row"
+                my="8px"
+                cursor="pointer"
+                color="blue.400">
+                <FiEdit2 />
+                <Text fontSize="14px">写真を編集する</Text>
+              </Stack>
             </div>
-            <Stack
-              justifyContent="center"
-              direction="row"
-              my="8px"
-              cursor="pointer"
-              color="blue.400">
-              <FiEdit2 />
-              <Text fontSize="14px">写真を編集する</Text>
-            </Stack>
-          </div>
-        ) : null} */}
-        {!userInfo.avatarUrl && !selectImageUrl ? (
-          <div
-            {...getEventImageRootProps({
-              className: profileStyles.image_dropzone,
-            })}>
-            <input {...getEventImageInputProps()} />
-            <div className={profileStyles.next_image_wrapper}>
-              <Image
-                className={profileStyles.avatar}
-                src={noImage}
-                alt="アバター画像"
-              />
-            </div>
-          </div>
+          </>
         ) : selectImageUrl ? (
           <>
             <ReactCrop
@@ -359,12 +339,29 @@ const Profile = () => {
                 minWidth: '300px',
               }}
             />
-            <Button
-              mt="15px"
-              colorScheme="blue"
+            <Box h="8px" />
+            <div {...getEventImageRootProps()}>
+              <input {...getEventImageInputProps()} />
+              <Stack
+                justifyContent="center"
+                direction="row"
+                my="8px"
+                cursor="pointer"
+                color="blue.400">
+                <FiEdit2 />
+                <Text fontSize="14px">写真を編集する</Text>
+              </Stack>
+            </div>
+            <Stack
+              justifyContent="center"
+              direction="row"
+              my="8px"
+              cursor="pointer"
+              color="red"
               onClick={() => resetImageUrl()}>
-              既存画像を削除
-            </Button>
+              <AiOutlineDelete />
+              <Text fontSize="14px">写真を削除する</Text>
+            </Stack>
           </>
         ) : (
           <>
@@ -379,15 +376,21 @@ const Profile = () => {
                 alt="アバター画像"
               />
             </div>
-            <Button
-              mt="15px"
-              colorScheme="blue"
+            <Box h="8px" />
+            <Stack
+              justifyContent="center"
+              direction="row"
+              my="8px"
+              cursor="pointer"
+              color="red"
               onClick={() => resetImageUrl()}>
-              既存画像を削除
-            </Button>
+              <AiOutlineDelete />
+              <Text fontSize="14px">写真を削除する</Text>
+            </Stack>
           </>
         )}
       </Box>
+
       <Box className={profileStyles.form_wrapper}>
         <Stack direction="row" w="100%">
           <FormControl className={profileStyles.input_wrapper}>

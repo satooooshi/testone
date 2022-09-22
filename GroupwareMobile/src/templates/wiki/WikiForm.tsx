@@ -1,5 +1,6 @@
 import {useFormik} from 'formik';
 import React, {useEffect, useRef, useState} from 'react';
+import {useNavigation} from '@react-navigation/native';
 import {useWindowDimensions} from 'react-native';
 import {
   Button,
@@ -46,6 +47,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
   saveWiki,
   onUploadImage,
 }) => {
+  //const navigation = useNavigation<PostWikiRouteProps>();
   const scrollRef = useRef<KeyboardAwareScrollView | null>(null);
   const [willSubmit, setWillSubmit] = useState(false);
   const initialValues: Partial<Wiki> = {
@@ -524,6 +526,8 @@ const WikiForm: React.FC<WikiFormProps> = ({
       <HeaderWithTextButton
         title={wiki?.id ? 'Wiki編集' : 'Wiki作成'}
         enableBackButton={true}
+        rightButtonName={'投稿'}
+        onPressRightButton={() => setWillSubmit(true)}
       />
       <TagModal
         onCompleteModal={selectedTagsInModal =>
@@ -624,13 +628,6 @@ const WikiForm: React.FC<WikiFormProps> = ({
               </TagButton>
             ))}
           </Div>
-          <Button
-            mb={16}
-            bg="pink600"
-            w={'100%'}
-            onPress={() => setWillSubmit(true)}>
-            投稿
-          </Button>
         </Div>
         {errors.body && touched.body ? (
           <Text fontSize={16} color="tomato">

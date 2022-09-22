@@ -169,7 +169,7 @@ const EditedProfile: React.FC = () => {
       <Overlay visible={loadingProfile || loadingUpdate} p="xl">
         <ActivityIndicator />
       </Overlay>
-      <HeaderWithTextButton title={'編集'} enableBackButton={true} />
+      <HeaderWithTextButton title={'ユーザー編集'} enableBackButton={true} />
       <TagModal
         onCompleteModal={selectedTagsInModal =>
           setValues(v => ({...v, tags: selectedTagsInModal}))
@@ -237,6 +237,8 @@ const EditedProfile: React.FC = () => {
       </Dropdown>
       {values && (
         <KeyboardAwareScrollView
+          // eslint-disable-next-line react-native/no-inline-styles
+          style={{backgroundColor: 'white'}}
           extraScrollHeight={50}
           contentContainerStyle={{
             ...profileStyles.scrollView,
