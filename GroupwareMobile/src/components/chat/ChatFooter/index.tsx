@@ -45,14 +45,14 @@ const Suggestions: React.FC<
   );
 };
 
-// Config of suggestible triggers
+const mentionPartType: TriggerPartType = {
+  trigger: '@',
+  allowedSpacesCount: 3,
+  isInsertSpaceAfterMention: true,
+  textStyle: {fontWeight: 'bold', color: 'blue'},
+};
 const triggersConfig: TriggersConfig<'mention'> = {
-  mention: {
-    trigger: '@',
-    allowedSpacesCount: 3,
-    isInsertSpaceAfterMention: true,
-    textStyle: {fontWeight: 'bold', color: 'blue'},
-  },
+  mention: mentionPartType,
 };
 
 type ChatFooterProps = {
@@ -83,19 +83,31 @@ const ChatFooter: React.FC<ChatFooterProps> = ({
   const {width: windowWidth, height: windowHeight} = useWindowDimensions();
   const [visibleMenu, setVisibleMenu] = useState(false);
   const [textValue, setTextValue] = useState(text);
+  const [mentioned, setMentioned] = useState([] as string[]);
+
   const onChangeInput = (t: string) => {
+    mentioned.forEach(name => {
+      t = t.replace('@' + name.substring(0, name.length - 1), '');
+    });
     setTextValue(t);
+    const re = /{@}\[(.*?)\]\([0-9]+\)/g;
+    let matches;
+    let names: string[] = [];
+    while ((matches = re.exec(t)) != null) {
+      names = [...names, matches[1]];
+    }
+    setMentioned(names);
     onChangeText(t);
   };
+  const sendable = useMemo(() => {
+    return !!textValue?.trim();
+  }, [textValue]);
+
   const {textInputProps, triggers} = useMentions({
     value: textValue || '',
     onChange: onChangeInput,
     triggersConfig,
   });
-
-  const sendable = useMemo(() => {
-    return !!textValue?.trim();
-  }, [textValue]);
 
   useEffect(() => {
     if (text) {
