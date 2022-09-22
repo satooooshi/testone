@@ -49,7 +49,7 @@ import { useRouter } from 'next/router';
 import { useAuthenticate } from 'src/contexts/useAuthenticate';
 import { formikErrorMsgFactory } from 'src/utils/factory/formikErrorMsgFactory';
 import { FiEdit2 } from 'react-icons/fi';
-import { AiOutlineArrowLeft } from 'react-icons/ai';
+import { AiOutlineArrowLeft, AiOutlineDelete } from 'react-icons/ai';
 
 type ModalState = {
   isOpen: boolean;
@@ -300,38 +300,6 @@ const CreateNewUser = () => {
         />
       )}
       <Box className={profileStyles.image_wrapper} mb="32px">
-        {/* {!imageURL ? (
-          <div {...getEventImageRootProps()}>
-            <div className={profileStyles.image_dropzone}>
-              <input {...getEventImageInputProps()} />
-              {values.avatarUrl && (
-                <img
-                  className={profileStyles.avatar}
-                  src={croppedImageURL ? croppedImageURL : values.avatarUrl}
-                  alt="アバター画像"
-                />
-              )}
-              {!values.avatarUrl && (
-                <div className={profileStyles.next_image_wrapper}>
-                  <Image
-                    className={profileStyles.avatar}
-                    src={noImage}
-                    alt="アバター画像"
-                  />
-                </div>
-              )}
-            </div>
-            <Stack
-              justifyContent="center"
-              direction="row"
-              my="8px"
-              cursor="pointer"
-              color="blue.400">
-              <FiEdit2 />
-              <Text fontSize="14px">写真を編集する</Text>
-            </Stack>
-          </div>
-        ) : null} */}
         {imageURL ? (
           <>
             <ReactCrop
@@ -359,27 +327,52 @@ const CreateNewUser = () => {
                 minWidth: '100px',
               }}
             />
-            <Button
-              mb="15px"
-              colorScheme="blue"
-              marginTop="30px"
+            <Box h="8px" />
+            <div {...getEventImageRootProps()}>
+              <input {...getEventImageInputProps()} />
+              <Stack
+                justifyContent="center"
+                direction="row"
+                my="8px"
+                cursor="pointer"
+                color="blue.400">
+                <FiEdit2 />
+                <Text fontSize="14px">写真を編集する</Text>
+              </Stack>
+            </div>
+            <Stack
+              justifyContent="center"
+              direction="row"
+              my="8px"
+              cursor="pointer"
+              color="red"
               onClick={() => onClickDeleteImage()}>
-              既存画像を削除
-            </Button>
+              <AiOutlineDelete />
+              <Text fontSize="14px">写真を削除する</Text>
+            </Stack>
           </>
         ) : (
-          <div
-            {...getEventImageRootProps({
-              className: profileStyles.image_dropzone,
-            })}>
-            <input {...getEventImageInputProps()} />
-            <div className={profileStyles.next_image_wrapper}>
-              <Image
-                className={profileStyles.avatar}
-                src={noImage}
-                alt="アバター画像"
-              />
+          <div {...getEventImageRootProps()}>
+            <div className={profileStyles.image_dropzone}>
+              <input {...getEventImageInputProps()} />
+              <div className={profileStyles.next_image_wrapper}>
+                <Image
+                  className={profileStyles.avatar}
+                  src={noImage}
+                  alt="アバター画像"
+                />
+              </div>
             </div>
+            <Box h="8px" />
+            <Stack
+              justifyContent="center"
+              direction="row"
+              my="8px"
+              cursor="pointer"
+              color="blue.400">
+              <FiEdit2 />
+              <Text fontSize="14px">写真を編集する</Text>
+            </Stack>
           </div>
         )}
       </Box>

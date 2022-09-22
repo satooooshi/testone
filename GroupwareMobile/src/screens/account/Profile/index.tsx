@@ -205,6 +205,8 @@ const Profile: React.FC = () => {
       </Button>
       {values && (
         <KeyboardAwareScrollView
+          // eslint-disable-next-line react-native/no-inline-styles
+          style={{backgroundColor: 'white'}}
           extraScrollHeight={50}
           contentContainerStyle={{
             ...profileStyles.scrollView,

@@ -39,9 +39,6 @@ import {formikErrorMsgFactory} from '../../../utils/factory/formikEroorMsgFactor
 import {branchTypeNameFactory} from '../../../utils/factory/branchTypeNameFactory';
 import {createUserSchema} from '../../../utils/validation/schema';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
-import {useAdminHeaderTab} from '../../../contexts/admin/useAdminHeaderTab';
-import {useIsFocused} from '@react-navigation/native';
-import {useIsTabBarVisible} from '../../../contexts/bottomTab/useIsTabBarVisible';
 
 const initialValues: Partial<User> = {
   email: '',
@@ -64,8 +61,6 @@ const initialValues: Partial<User> = {
 const UserRegisteringAdmin: React.FC = () => {
   const userRoleDropdownRef = useRef<any | null>(null);
   const branchTypeDropdownRef = useRef<any | null>(null);
-  const isFocused = useIsFocused();
-  const {setIsTabBarVisible} = useIsTabBarVisible();
   const {mutate: register, isLoading} = useAPIRegister({
     onSuccess: responseData => {
       if (responseData) {
@@ -138,15 +133,6 @@ const UserRegisteringAdmin: React.FC = () => {
       );
     },
   });
-  const tabs = useAdminHeaderTab();
-
-  useEffect(() => {
-    if (isFocused) {
-      setIsTabBarVisible(false);
-    } else {
-      setIsTabBarVisible(true);
-    }
-  }, [isFocused, setIsTabBarVisible]);
 
   const handleUploadImage = async () => {
     const {formData} = await uploadImageFromGallery({
@@ -171,11 +157,7 @@ const UserRegisteringAdmin: React.FC = () => {
       <Overlay visible={isLoading} p="xl">
         <ActivityIndicator />
       </Overlay>
-      <HeaderWithTextButton
-        title="ユーザー作成"
-        tabs={tabs}
-        activeTabName={'ユーザー作成'}
-      />
+      <HeaderWithTextButton title="ユーザー作成" />
       <TagModal
         onCompleteModal={selectedTagsInModal =>
           setValues(v => ({...v, tags: selectedTagsInModal}))
@@ -263,6 +245,8 @@ const UserRegisteringAdmin: React.FC = () => {
         </Dropdown.Option>
       </Dropdown>
       <KeyboardAwareScrollView
+        // eslint-disable-next-line react-native/no-inline-styles
+        style={{backgroundColor: 'white'}}
         contentContainerStyle={{
           ...userRegisteringAdminStyles.scrollView,
         }}>

@@ -187,6 +187,8 @@ const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
         {...scroller.handlers}
         ref={scrollViewRef}
         scrollEventThrottle={100}
+        // eslint-disable-next-line react-native/no-inline-styles
+        style={{backgroundColor: 'white'}}
         contentContainerStyle={{
           ...wikiDetailStyles.wrapper,
           width: windowWidth,
