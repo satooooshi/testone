@@ -1188,13 +1188,14 @@ export class ChatService {
 
     // existRoom.previousMembers = previousMembers;
     checkAloneRoom(existRoom, userId);
-    existRoom.imageURL = await genSignedURL(existRoom.imageURL);
-    existRoom.members = await Promise.all(
-      members.map(async (m) => ({
-        ...m,
-        avatarUrl: await genSignedURL(m.avatarUrl),
-      })),
-    );
+    existRoom.members = members;
+    // existRoom.imageURL = await genSignedURL(existRoom.imageURL);
+    // existRoom.members = await Promise.all(
+    //   members.map(async (m) => ({
+    //     ...m,
+    //     avatarUrl: await genSignedURL(m.avatarUrl),
+    //   })),
+    // );
 
     return existRoom;
   }
