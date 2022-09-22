@@ -249,7 +249,7 @@ export class EventScheduleService {
       .createQueryBuilder('events')
       .leftJoinAndSelect('events.tags', 'tag')
       .where(
-        word && word.length !== 1
+        !!word && !!word.match(/[\s]/g)?.length
           ? 'MATCH(events.title, events.description) AGAINST (:word IN NATURAL LANGUAGE MODE)'
           : '1=1',
         { word },
@@ -258,7 +258,7 @@ export class EventScheduleService {
         type,
       })
       .andWhere(
-        word.length === 1
+        !word.match(/[\s]/g)?.length
           ? 'CONCAT(events.title, events.description) LIKE :queryWord'
           : '1=1',
         { queryWord: `%${word}%` },
