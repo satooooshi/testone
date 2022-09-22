@@ -24,7 +24,7 @@ const ReactionToMessage: React.FC<ReactionToMessageProps> = ({
       <Div
         bg={reaction.isSender ? 'blue600' : undefined}
         flexDir="row"
-        borderColor={'blue600'}
+        borderColor={'#FFFFFF'}
         borderWidth={1}
         p="xs"
         rounded="md">
