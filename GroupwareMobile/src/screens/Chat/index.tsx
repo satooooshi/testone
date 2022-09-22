@@ -240,23 +240,23 @@ const Chat: React.FC = () => {
     },
   );
 
-  const {refetch: getExpiredUrlMessages} = useAPIGetExpiredUrlMessages(
-    Number(room.id),
-    {
-      onSuccess: data => {
-        setMessages(mgs => {
-          return mgs.map(m => {
-            for (const d of data) {
-              if (d.id === m.id) {
-                m.content = d.content;
-              }
-            }
-            return m;
-          });
-        });
-      },
-    },
-  );
+  // const {refetch: getExpiredUrlMessages} = useAPIGetExpiredUrlMessages(
+  //   Number(room.id),
+  //   {
+  //     onSuccess: data => {
+  //       setMessages(mgs => {
+  //         return mgs.map(m => {
+  //           for (const d of data) {
+  //             if (d.id === m.id) {
+  //               m.content = d.content;
+  //             }
+  //           }
+  //           return m;
+  //         });
+  //       });
+  //     },
+  //   },
+  // );
 
   const {data: searchedResults, refetch: searchMessages} = useAPISearchMessages(
     {
