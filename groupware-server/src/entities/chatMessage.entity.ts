@@ -148,7 +148,6 @@ export class ChatMessage {
           mentionedIds.push(Number(mentionArr[1]));
         }
       }
-      console.log('------', mentionedIds, content);
 
       // console.log(mentionedIds);
       // const allUsers = await getRepository(User)
