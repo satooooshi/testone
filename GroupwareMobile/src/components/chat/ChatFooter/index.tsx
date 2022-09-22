@@ -1,4 +1,4 @@
-import React, {memo, useMemo, useRef, useState} from 'react';
+import React, {memo, useEffect, useMemo, useRef, useState} from 'react';
 import {
   Platform,
   TextInput,
@@ -82,7 +82,6 @@ const ChatFooter: React.FC<ChatFooterProps> = ({
   mentionSuggestions,
   isLoading,
 }) => {
-  const textInputRef = useRef<TextInput>(null);
   const {width: windowWidth, height: windowHeight} = useWindowDimensions();
   const [visibleMenu, setVisibleMenu] = useState(false);
   const [textValue, setTextValue] = useState(text);
@@ -99,6 +98,14 @@ const ChatFooter: React.FC<ChatFooterProps> = ({
   const sendable = useMemo(() => {
     return !!textValue?.trim();
   }, [textValue]);
+
+  useEffect(() => {
+    if (text) {
+      setTextValue(text);
+    } else {
+      setTextValue('');
+    }
+  }, [text]);
 
   return (
     <Div flexDir="column">
@@ -171,15 +178,12 @@ const ChatFooter: React.FC<ChatFooterProps> = ({
             placeholder="メッセージを入力"
             placeholderTextColor="#868596"
             multiline
-            ref={textInputRef}
             {...textInputProps}
             style={[
               Platform.OS === 'android'
                 ? chatStyles.inputAndroid
                 : chatStyles.inputIos,
               {
-                color: 'black',
-                padding: 12,
                 minHeight: windowHeight * 0.03,
                 maxHeight: windowHeight * 0.22,
               },
@@ -192,8 +196,6 @@ const ChatFooter: React.FC<ChatFooterProps> = ({
           <TouchableOpacity
             onPress={() => {
               sendable && onSend();
-              setTextValue('');
-              //textInputRef?.current?.clear();// it clears the field but the field is soonly overwritten by textValue state
             }}>
             <Icon
               name="send"
