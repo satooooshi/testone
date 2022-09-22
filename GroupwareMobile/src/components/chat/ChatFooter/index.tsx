@@ -27,7 +27,7 @@ const Suggestions: React.FC<
 
   return (
     <View>
-      <ScrollDiv bg="white">
+      <ScrollDiv bg="white" keyboardShouldPersistTaps="always">
         {suggestions
           .filter(one =>
             one.name.toLocaleLowerCase().includes(keyword.toLocaleLowerCase()),
