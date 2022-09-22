@@ -1219,7 +1219,7 @@ const Chat: React.FC = () => {
   return (
     <WholeContainer>
       {typeDropdown}
-      <Div h="100%" bg={Platform.OS === 'ios' ? '#FFFFFF' : '#FFFFFF'}>
+      <Div h="100%" bg="white">
         <ReactionsModal
           isVisible={!!selectedReactions}
           selectedReactions={selectedReactions}
