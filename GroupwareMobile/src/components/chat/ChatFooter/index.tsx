@@ -5,10 +5,13 @@ import {
   TouchableOpacity,
   useWindowDimensions,
 } from 'react-native';
-import {Suggestion, useMentions} from 'react-native-controlled-mentions';
-
+import {
+  Suggestion,
+  SuggestionsProvidedProps,
+  TriggersConfig,
+  useMentions,
+} from 'react-native-controlled-mentions';
 import {Pressable, View} from 'react-native';
-
 import {Div, Icon, ScrollDiv, Text} from 'react-native-magnus';
 import {ActivityIndicator} from 'react-native-paper';
 import {Menu} from 'react-native-paper';
@@ -17,36 +20,35 @@ import {Menu} from 'react-native-paper';
 import {chatStyles} from '../../../styles/screen/chat/chat.style';
 
 // Custom component for rendering suggestions
-const Suggestions: FC<SuggestionsProvidedProps & {suggestions: Suggestion[]}> =
-  ({keyword, onSelect, suggestions}) => {
-    if (keyword == null) {
-      return null;
-    }
+const Suggestions: React.FC<
+  SuggestionsProvidedProps & {suggestions: Suggestion[]}
+> = ({keyword, onSelect, suggestions}) => {
+  if (keyword == null) {
+    return null;
+  }
 
-    return (
-      <View>
-        <ScrollDiv bg="white">
-          {suggestions
-            .filter(one =>
-              one.name
-                .toLocaleLowerCase()
-                .includes(keyword.toLocaleLowerCase()),
-            )
-            .map(one => (
-              <Pressable
-                key={one.id}
-                onPress={() => onSelect(one)}
-                style={{padding: 12}}>
-                <Text>{one.name}</Text>
-              </Pressable>
-            ))}
-        </ScrollDiv>
-      </View>
-    );
-  };
+  return (
+    <View>
+      <ScrollDiv bg="white">
+        {suggestions
+          .filter(one =>
+            one.name.toLocaleLowerCase().includes(keyword.toLocaleLowerCase()),
+          )
+          .map(one => (
+            <Pressable
+              key={one.id}
+              onPress={() => onSelect(one)}
+              style={{padding: 12}}>
+              <Text>{one.name}</Text>
+            </Pressable>
+          ))}
+      </ScrollDiv>
+    </View>
+  );
+};
 
 // Config of suggestible triggers
-const triggersConfig = {
+const triggersConfig: TriggersConfig<'mention'> = {
   mention: {
     trigger: '@',
     allowedSpacesCount: 3,
@@ -168,7 +170,6 @@ const ChatFooter: React.FC<ChatFooterProps> = ({
           <TextInput
             placeholder="メッセージを入力"
             placeholderTextColor="#868596"
-            style={{padding: 12}}
             multiline
             ref={textInputRef}
             {...textInputProps}
@@ -178,6 +179,7 @@ const ChatFooter: React.FC<ChatFooterProps> = ({
                 : chatStyles.inputIos,
               {
                 color: 'black',
+                padding: 12,
                 minHeight: windowHeight * 0.03,
                 maxHeight: windowHeight * 0.22,
               },
