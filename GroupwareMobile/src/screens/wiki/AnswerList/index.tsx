@@ -48,7 +48,7 @@ const AnswerList: React.FC<AnswerListProps> = ({wiki, onPressAvatar}) => {
           answer =>
             answer.writer && (
               <Div mb={26}>
-                <Div flexDir="column" mb={8}>
+                <Div flexDir="column">
                   <Div
                     flexDir="row"
                     justifyContent="flex-start"
@@ -62,23 +62,24 @@ const AnswerList: React.FC<AnswerListProps> = ({wiki, onPressAvatar}) => {
                       <Div mr={8}>
                         <UserAvatar
                           user={answer.writer}
-                          h={64}
-                          w={64}
+                          h={32}
+                          w={32}
                           GoProfile={true}
                         />
                       </Div>
                     </TouchableOpacity>
-                    <Text fontSize={18} color={darkFontColor}>
+                    <Text fontSize={14} color={darkFontColor}>
                       {userNameFactory(answer.writer)}
                     </Text>
+                    <Div flex={1} />
+                    <Text fontSize={14} color={darkFontColor}>
+                      {dateTimeFormatterFromJSDDate({
+                        dateTime: new Date(answer.createdAt),
+                      })}
+                    </Text>
                   </Div>
-                  <Text textAlignVertical="bottom" textAlign="right">
-                    {`投稿日: ${dateTimeFormatterFromJSDDate({
-                      dateTime: new Date(answer.createdAt),
-                    })}`}
-                  </Text>
                 </Div>
-                <Div bg="white" rounded="md" p={8} mb={8}>
+                <Div mb={8} ml={40}>
                   <RenderHtml
                     baseStyle={{color: 'black'}}
                     contentWidth={windowWidth * 0.9}
