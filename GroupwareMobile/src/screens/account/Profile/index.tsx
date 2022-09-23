@@ -413,15 +413,14 @@ const Profile: React.FC = () => {
               />
             </Div>
             <Div mb="xl">
+              <Text ml={'lg'} mb={'sm'} fontSize={16}>
+                技術の紹介
+              </Text>
               <TagEditLine
                 onPressRightButton={() => handleOpenTagModal(TagType.TECH)}
                 tags={techTags || []}
                 tagType={TagType.TECH}
               />
-
-              <Text ml={'lg'} mb={'sm'} fontSize={16}>
-                技術の紹介
-              </Text>
               <TextInput
                 textAlignVertical="top"
                 value={values.introduceTech}
@@ -433,6 +432,9 @@ const Profile: React.FC = () => {
               />
             </Div>
             <Div mb="xl">
+              <Text ml={'lg'} mb={'sm'} fontSize={16}>
+                資格の紹介
+              </Text>
               <TagEditLine
                 onPressRightButton={() =>
                   handleOpenTagModal(TagType.QUALIFICATION)
@@ -440,9 +442,6 @@ const Profile: React.FC = () => {
                 tags={qualificationTags || []}
                 tagType={TagType.QUALIFICATION}
               />
-              <Text ml={'lg'} mb={'sm'} fontSize={16}>
-                資格の紹介
-              </Text>
               <TextInput
                 value={values.introduceQualification}
                 onChangeText={handleChange('introduceQualification')}
@@ -454,14 +453,14 @@ const Profile: React.FC = () => {
               />
             </Div>
             <Div mb="xl">
+              <Text ml={'lg'} mb={'sm'} fontSize={16}>
+                部活動の紹介
+              </Text>
               <TagEditLine
                 onPressRightButton={() => handleOpenTagModal(TagType.CLUB)}
                 tags={clubTags || []}
                 tagType={TagType.CLUB}
               />
-              <Text ml={'lg'} mb={'sm'} fontSize={16}>
-                部活動の紹介
-              </Text>
               <TextInput
                 value={values.introduceClub}
                 onChangeText={handleChange('introduceClub')}
@@ -473,14 +472,14 @@ const Profile: React.FC = () => {
               />
             </Div>
             <Div mb="xl">
+              <Text ml={'lg'} mb={'sm'} fontSize={16}>
+                趣味の紹介
+              </Text>
               <TagEditLine
                 onPressRightButton={() => handleOpenTagModal(TagType.HOBBY)}
                 tags={hobbyTags || []}
                 tagType={TagType.HOBBY}
               />
-              <Text ml={'lg'} mb={'sm'} fontSize={16}>
-                趣味の紹介
-              </Text>
               <TextInput
                 value={values.introduceHobby}
                 onChangeText={handleChange('introduceHobby')}
