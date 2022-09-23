@@ -224,10 +224,10 @@ const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
                 w={'70%'}>
                 {wikiState.title}
               </Text>
-              <ShareButton
+              {/* <ShareButton
                 urlPath={generateClientURL(`/wiki/detail/${wikiState.id}`)}
                 text={wikiState.title}
-              />
+              /> */}
             </Div>
 
             <Div flexDir="column" mb={16}>
@@ -283,13 +283,19 @@ const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
                     color="black"
                     fontFamily="FontAwesome"
                   />
-                }>
+                }
+                onPress={() => {
+                  navigation.navigate('Share', {
+                    urlPath: generateClientURL(`/wiki/detail/${wikiState.id}`),
+                    text: wikiState.title,
+                  });
+                }}>
                 チャットで共有
               </Button>
               {wikiState?.type === WikiType.BOARD && (
                 <>
                   <Button
-                    mx="sm"
+                    mx="md"
                     rounded="circle"
                     bg="white"
                     borderWidth={1}
