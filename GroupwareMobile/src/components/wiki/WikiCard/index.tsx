@@ -2,7 +2,6 @@ import React, {useState, useEffect} from 'react';
 import {useWindowDimensions, FlatList, TouchableHighlight} from 'react-native';
 import {BoardCategory, Wiki, WikiType} from '../../../types';
 import {Div, Text, Tag, Icon, Button} from 'react-native-magnus';
-import {tagColorFactory} from '../../../utils/factory/tagColorFactory';
 import {wikiCardStyles} from '../../../styles/component/wiki/wikiCard.style';
 import {wikiTypeColorFactory} from '../../../utils/factory/wiki/wikiTypeColorFactory';
 import {wikiTypeNameFactory} from '../../../utils/factory/wiki/wikiTypeNameFactory';
@@ -17,6 +16,8 @@ import {useAuthenticate} from '../../../contexts/useAuthenticate';
 import {darkFontColor} from '../../../utils/colors';
 import GoodSendersModal from '../../chat/GoodSendersModal';
 import {useAPIGetGoodsForBoard} from '../../../hooks/api/wiki/useAPIGetGoodForBoard';
+import {tagBgColorFactory} from '../../../utils/factory/tagBgColorFactory';
+import {tagFontColorFactory} from '../../../utils/factory/tagFontColorFactory';
 
 type WikiCardProps = {
   wiki: Wiki;
@@ -119,8 +120,8 @@ const WikiCard: React.FC<WikiCardProps> = ({wiki, type}) => {
                   fontSize={'md'}
                   h={24}
                   py={0}
-                  bg={tagColorFactory(t.type)}
-                  color="white"
+                  bg={tagBgColorFactory(t.type)}
+                  color={tagFontColorFactory(t.type)}
                   ml={4}>
                   {t.name}
                 </Tag>
