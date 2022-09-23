@@ -25,7 +25,7 @@ const ShareTextButton: React.FC<ShareButtonProps> = ({urlPath, text}) => {
         bg="white"
         color="black"
         borderWidth={1}
-        borderColor="gray300"
+        borderColor="gray400"
         rounded={'xl'}
         suffix={
           <Icon

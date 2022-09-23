@@ -279,7 +279,7 @@ const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
                     rounded="circle"
                     bg="white"
                     borderWidth={1}
-                    borderColor="gray300"
+                    borderColor="gray400"
                     onPress={() => {
                       mutate(wikiState.id);
                     }}>
