@@ -407,12 +407,7 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = memo(
                   {senderAvatar?.avatar}
                 </Link>
               ) : (
-                <Avatar
-                  h="40px"
-                  w="40px"
-                  cursor="pointer"
-                  src={boldMascot.src}
-                />
+                <Avatar h="40px" w="40px" src={boldMascot.src} />
               )
             ) : null}
             <Box display="flex" alignItems="flex-end">
