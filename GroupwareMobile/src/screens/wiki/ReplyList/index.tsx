@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import {TouchableOpacity, useWindowDimensions} from 'react-native';
-import {Div, Text, Collapse, Button} from 'react-native-magnus';
+import {Div, Text, Collapse, Button, Icon} from 'react-native-magnus';
 import {QAAnswer, User} from '../../../types';
 import MarkdownIt from 'markdown-it';
 import RenderHtml from 'react-native-render-html';
@@ -39,15 +39,27 @@ const ReplyList: React.FC<ReplyListProps> = ({answer, onPressAvatar}) => {
       {answer.replies?.length ? (
         <Collapse mb={8}>
           <Collapse.Header
-            pt={12}
-            pb={12}
-            bg={darkFontColor}
-            w={'100%'}
-            rounded="none"
-            justifyContent="center">
-            <Text fontSize={14} color="white">
-              回答への返信{answer.replies.length}件
-            </Text>
+            bg="white"
+            color="gray"
+            pl={32}
+            py="lg"
+            prefix={
+              <Icon
+                name="triangle-down"
+                mr="lg"
+                color="gray"
+                fontFamily="Octicons"
+              />
+            }
+            activePrefix={
+              <Icon
+                name="triangle-up"
+                mr="lg"
+                color="gray"
+                fontFamily="Octicons"
+              />
+            }>
+            {`${answer.replies.length}件の返信`}
           </Collapse.Header>
           <Collapse.Body mb={8} h={repliesHeight}>
             <Div onLayout={e => setRepliesHeight(e.nativeEvent.layout.height)}>
@@ -87,7 +99,7 @@ const ReplyList: React.FC<ReplyListProps> = ({answer, onPressAvatar}) => {
                             </Text>
                           </Div>
                         </Div>
-                        <Div bg="white" rounded="md" ml={40} mb={16}>
+                        <Div bg="white" rounded="md" pb={8} ml={40} mb={16}>
                           <RenderHtml
                             contentWidth={windowWidth * 0.9}
                             source={{
