@@ -144,7 +144,7 @@ const RenderWikiCardList: React.FC<RenderWikiCardListProps> = ({
 
   return (
     <>
-      <Div>
+      <Div bg="gray200">
         {isQA ? (
           <Div flexDir="row" justifyContent="flex-end" my="sm" mr="sm">
             {/* @ts-ignore */}

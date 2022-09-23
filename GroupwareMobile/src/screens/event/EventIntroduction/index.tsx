@@ -35,9 +35,7 @@ const EventIntroduction: React.FC = () => {
           uri: 'https://www.bold.ne.jp/assets/assets_recruit/images/enviroment/img_balday_main.png',
         };
       case EventType.STUDY_MEETING:
-        return {
-          uri: 'https://www.bold.ne.jp/assets/assets_recruit/images/enviroment/img_studygroup_main.png',
-        };
+        return require('../../../../assets/study_meeting.jpg');
       case EventType.COACH:
         return require('../../../../assets/coach_1.jpeg');
       case EventType.CLUB:
