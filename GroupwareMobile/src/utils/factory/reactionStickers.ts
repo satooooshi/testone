@@ -15,14 +15,16 @@ export const reactionStickers = [
     name: 'funnySticker',
     src: require('../../../assets/funny_sticker.png'),
   },
+  /*
   {
     name: 'callSticker',
     src: require('../../../assets/call_sticker.png'),
-  },
+  },*/
   {
     name: 'lookSticker',
     src: require('../../../assets/look_sticker.png'),
   },
+  /*
   {
     name: 'helpSticker',
     src: require('../../../assets/help_sticker.png'),
@@ -30,7 +32,7 @@ export const reactionStickers = [
   {
     name: 'questionSticker',
     src: require('../../../assets/question_sticker.png'),
-  },
+  },*/
   {
     name: 'goodJobSticker',
     src: require('../../../assets/goodjob_sticker.png'),
@@ -51,26 +53,29 @@ export const reactionStickers = [
     name: 'allRightSticker',
     src: require('../../../assets/allright_sticker.png'),
   },
+  /*
   {
     name: 'attachedSticker',
     src: require('../../../assets/attached_sticker.png'),
-  },
+  },*/
   {
     name: 'checkItSticker',
     src: require('../../../assets/check_it_sticker.png'),
   },
+  /*
   {
     name: 'closeDeadlineSticker',
     src: require('../../../assets/close_deadline_sticker.png'),
-  },
+  },*/
   {
     name: 'completedSticker',
     src: require('../../../assets/completed_sticker.png'),
   },
+  /*
   {
     name: 'confirmationSticker',
     src: require('../../../assets/confirmation_sticker.png'),
-  },
+  },*/
   {
     name: 'congratulationsSticker',
     src: require('../../../assets/congratulations_sticker.png'),
@@ -79,10 +84,11 @@ export const reactionStickers = [
     name: 'deadlineDaySticker',
     src: require('../../../assets/deadline_day_sticker.png'),
   },
+  /*
   {
     name: 'exclamationSticker',
     src: require('../../../assets/exclamation_sticker.png'),
-  },
+  },*/
   {
     name: 'ngSticker',
     src: require('../../../assets/ng_sticker.png'),
@@ -95,6 +101,7 @@ export const reactionStickers = [
     name: 'okSticker',
     src: require('../../../assets/ok_sticker.png'),
   },
+  /*
   {
     name: 'okayNowSticker',
     src: require('../../../assets/okay_now_sticker.png'),
@@ -102,7 +109,7 @@ export const reactionStickers = [
   {
     name: 'osewaninaruSticker',
     src: require('../../../assets/osewaninaru_sticker.png'),
-  },
+  },*/
   {
     name: 'pleaseTakeCareSticker',
     src: require('../../../assets/please_take_care_sticker.png'),
@@ -111,6 +118,7 @@ export const reactionStickers = [
     name: 'thankYouSticker',
     src: require('../../../assets/thank_you_sticker.png'),
   },
+  /*
   {
     name: 'scheduleDeterminedSticker',
     src: require('../../../assets/schedule_determined_sticker.png'),
@@ -122,7 +130,7 @@ export const reactionStickers = [
   {
     name: 'lerningALotSticker',
     src: require('../../../assets/lerning_a_lot_sticker.png'),
-  },
+  },*/
   {
     name: 'lostSoulSticker',
     src: require('../../../assets/lost_soul_sticker.png'),
@@ -135,8 +143,9 @@ export const reactionStickers = [
     name: 'thinkingSticker',
     src: require('../../../assets/thinking_sticker.png'),
   },
+  /*
   {
     name: 'doItSticker',
     src: require('../../../assets/do_it_sticker.png'),
-  },
+  },*/
 ];
