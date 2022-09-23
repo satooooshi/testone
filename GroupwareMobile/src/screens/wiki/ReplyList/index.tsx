@@ -56,7 +56,7 @@ const ReplyList: React.FC<ReplyListProps> = ({answer, onPressAvatar}) => {
                   reply =>
                     reply.writer && (
                       <>
-                        <Div flexDir="column" mb={16}>
+                        <Div flexDir="column">
                           <Div
                             flexDir="row"
                             justifyContent="flex-start"
@@ -67,26 +67,27 @@ const ReplyList: React.FC<ReplyListProps> = ({answer, onPressAvatar}) => {
                                   onPressAvatar(reply.writer);
                                 }
                               }}>
-                              <Div>
+                              <Div mr={8}>
                                 <UserAvatar
-                                  w={64}
-                                  h={64}
+                                  w={32}
+                                  h={32}
                                   user={reply.writer}
                                   GoProfile={true}
                                 />
                               </Div>
                             </TouchableOpacity>
-                            <Text fontSize={18} color={darkFontColor}>
+                            <Text fontSize={14} color={darkFontColor}>
                               {userNameFactory(reply.writer)}
                             </Text>
+                            <Div flex={1} />
+                            <Text fontSize={14} color={darkFontColor}>
+                              {dateTimeFormatterFromJSDDate({
+                                dateTime: new Date(reply.createdAt),
+                              })}
+                            </Text>
                           </Div>
-                          <Text textAlignVertical="bottom" textAlign="right">
-                            {`投稿日: ${dateTimeFormatterFromJSDDate({
-                              dateTime: new Date(reply.createdAt),
-                            })}`}
-                          </Text>
                         </Div>
-                        <Div bg="white" rounded="md" p={8} mb={16}>
+                        <Div bg="white" rounded="md" ml={40} mb={16}>
                           <RenderHtml
                             contentWidth={windowWidth * 0.9}
                             source={{
