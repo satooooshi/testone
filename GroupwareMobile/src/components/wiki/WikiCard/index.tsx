@@ -2,7 +2,6 @@ import React, {useState, useEffect} from 'react';
 import {useWindowDimensions, FlatList, TouchableHighlight} from 'react-native';
 import {BoardCategory, Wiki, WikiType} from '../../../types';
 import {Div, Text, Tag, Icon, Button} from 'react-native-magnus';
-import {tagColorFactory} from '../../../utils/factory/tagColorFactory';
 import {wikiCardStyles} from '../../../styles/component/wiki/wikiCard.style';
 import {wikiTypeColorFactory} from '../../../utils/factory/wiki/wikiTypeColorFactory';
 import {wikiTypeNameFactory} from '../../../utils/factory/wiki/wikiTypeNameFactory';
@@ -17,6 +16,8 @@ import {useAuthenticate} from '../../../contexts/useAuthenticate';
 import {darkFontColor} from '../../../utils/colors';
 import GoodSendersModal from '../../chat/GoodSendersModal';
 import {useAPIGetGoodsForBoard} from '../../../hooks/api/wiki/useAPIGetGoodForBoard';
+import {tagBgColorFactory} from '../../../utils/factory/tagBgColorFactory';
+import {tagFontColorFactory} from '../../../utils/factory/tagFontColorFactory';
 
 type WikiCardProps = {
   wiki: Wiki;
@@ -119,8 +120,8 @@ const WikiCard: React.FC<WikiCardProps> = ({wiki, type}) => {
                   fontSize={'md'}
                   h={24}
                   py={0}
-                  bg={tagColorFactory(t.type)}
-                  color="white"
+                  bg={tagBgColorFactory(t.type)}
+                  color={tagFontColorFactory(t.type)}
                   ml={4}>
                   {t.name}
                 </Tag>
@@ -143,7 +144,7 @@ const WikiCard: React.FC<WikiCardProps> = ({wiki, type}) => {
         <Div w={'100%'} px={8} flexDir="row" alignItems="center">
           {wiki.type !== WikiType.RULES && (
             <Div mr={8}>
-              <UserAvatar user={wiki.writer} h={48} w={48} GoProfile={true} />
+              <UserAvatar user={wiki.writer} h={32} w={32} GoProfile={true} />
             </Div>
           )}
           <Text w={'80%'} numberOfLines={2} fontWeight="bold" fontSize={18}>
@@ -151,12 +152,7 @@ const WikiCard: React.FC<WikiCardProps> = ({wiki, type}) => {
           </Text>
         </Div>
         {isBoard ? (
-          <Div
-            ml="auto"
-            mr={10}
-            flexDir="row"
-            alignItems="center"
-            justifyContent="flex-end">
+          <Div mt="sm" mr={10} flexDir="row" alignItems="center">
             <Div
               flexDir="row"
               alignItems="center"
@@ -166,18 +162,19 @@ const WikiCard: React.FC<WikiCardProps> = ({wiki, type}) => {
               <TouchableHighlight onPress={() => setIsVisible(true)}>
                 <Text>いいね</Text>
               </TouchableHighlight>
-              <Text mx={1} color="#90CDF4" fontWeight="bold">
+              <Text mx="sm" color="blue700" fontSize={14} fontWeight="bold">
                 {wikiState.goodsCount || 0}
               </Text>
-              <Div ml={5} mr="lg" flexDir="row">
-                <Text textAlignVertical="bottom" mr={2}>
+              <Div ml="lg" mr="lg" flexDir="row">
+                <Text textAlignVertical="bottom" mr="sm">
                   {isQA ? '回答' : 'コメント'}
                 </Text>
-                <Text color="#90CDF4" fontWeight="bold">
+                <Text color="blue700" fontSize={14} fontWeight="bold">
                   {wikiState.answersCount || 0}
                 </Text>
               </Div>
             </Div>
+            <Div flex={1} />
             <TouchableHighlight
               underlayColor={'none'}
               onPress={() => mutate(wiki.id)}>
