@@ -37,10 +37,8 @@ import {FAB} from 'react-native-paper';
 import MarkdownIt from 'markdown-it';
 import {useHTMLScrollFeature} from '../../../hooks/scroll/useHTMLScrollFeature';
 import {useDom} from '../../../hooks/dom/useDom';
-import ShareButton from '../../../components/common/ShareButton';
 import {generateClientURL} from '../../../utils/url';
 import UserAvatar from '../../../components/common/UserAvatar';
-import {tagColorFactory} from '../../../utils/factory/tagColorFactory';
 import tailwind from 'tailwind-rn';
 import {useAuthenticate} from '../../../contexts/useAuthenticate';
 import GoodSendersModal from '../../../components/chat/GoodSendersModal';
@@ -54,6 +52,7 @@ import {wikiCardStyles} from '../../../styles/component/wiki/wikiCard.style';
 import {useAPIGetGoodsForBoard} from '../../../hooks/api/wiki/useAPIGetGoodForBoard';
 import {tagBgColorFactory} from '../../../utils/factory/tagBgColorFactory';
 import {tagFontColorFactory} from '../../../utils/factory/tagFontColorFactory';
+import ShareTextButton from '../../../components/common/ShareTextButton';
 
 const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
   const isFocused = useIsFocused();
@@ -269,29 +268,10 @@ const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
             </Div>
 
             <Div flexDir="row" alignItems="center">
-              <Button
-                bg="white"
-                color="black"
-                borderWidth={1}
-                borderColor="gray300"
-                rounded={'xl'}
-                suffix={
-                  <Icon
-                    ml="sm"
-                    name="share"
-                    fontSize={'lg'}
-                    color="black"
-                    fontFamily="FontAwesome"
-                  />
-                }
-                onPress={() => {
-                  navigation.navigate('Share', {
-                    urlPath: generateClientURL(`/wiki/detail/${wikiState.id}`),
-                    text: wikiState.title,
-                  });
-                }}>
-                チャットで共有
-              </Button>
+              <ShareTextButton
+                urlPath={generateClientURL(`/wiki/detail/${wikiState.id}`)}
+                text={wikiState.title}
+              />
               {wikiState?.type === WikiType.BOARD && (
                 <>
                   <Button
