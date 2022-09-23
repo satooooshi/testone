@@ -26,17 +26,13 @@ const TagListBox: React.FC<TagListBoxProps> = props => {
         {tags?.length ? (
           tags?.map(t => (
             <TagButton key={t.id} mb={6} mr={6} bg={tagBgColorFactory(t.type)}>
-              <Text fontSize={12} color={tagFontColorFactory(t.type)}>
+              <Text fontSize={14} color={tagFontColorFactory(t.type)}>
                 {t.name}
               </Text>
             </TagButton>
           ))
         ) : (
-          <TagButton mb={6} mr={6} bg={tagBgColorFactory(tagType)}>
-            <Text fontSize={12} color={tagFontColorFactory(tagType)}>
-              未設定
-            </Text>
-          </TagButton>
+          <Text fontSize={14}>未設定</Text>
         )}
       </Div>
       {introduce ? (

@@ -37,10 +37,8 @@ import {FAB} from 'react-native-paper';
 import MarkdownIt from 'markdown-it';
 import {useHTMLScrollFeature} from '../../../hooks/scroll/useHTMLScrollFeature';
 import {useDom} from '../../../hooks/dom/useDom';
-import ShareButton from '../../../components/common/ShareButton';
 import {generateClientURL} from '../../../utils/url';
 import UserAvatar from '../../../components/common/UserAvatar';
-import {tagColorFactory} from '../../../utils/factory/tagColorFactory';
 import tailwind from 'tailwind-rn';
 import {useAuthenticate} from '../../../contexts/useAuthenticate';
 import GoodSendersModal from '../../../components/chat/GoodSendersModal';
@@ -52,6 +50,9 @@ import {
 import {useIsTabBarVisible} from '../../../contexts/bottomTab/useIsTabBarVisible';
 import {wikiCardStyles} from '../../../styles/component/wiki/wikiCard.style';
 import {useAPIGetGoodsForBoard} from '../../../hooks/api/wiki/useAPIGetGoodForBoard';
+import {tagBgColorFactory} from '../../../utils/factory/tagBgColorFactory';
+import {tagFontColorFactory} from '../../../utils/factory/tagFontColorFactory';
+import ShareTextButton from '../../../components/common/ShareTextButton';
 
 const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
   const isFocused = useIsFocused();
@@ -203,11 +204,10 @@ const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
                 renderItem={({item: t}) => (
                   <Tag
                     fontSize={'md'}
-                    h={21}
-                    py={0}
-                    px={8}
-                    bg={tagColorFactory(t.type)}
-                    color="white"
+                    py="sm"
+                    px="md"
+                    bg={tagBgColorFactory(t.type)}
+                    color={tagFontColorFactory(t.type)}
                     mr={4}>
                     {t.name}
                   </Tag>
@@ -223,10 +223,10 @@ const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
                 w={'70%'}>
                 {wikiState.title}
               </Text>
-              <ShareButton
+              {/* <ShareButton
                 urlPath={generateClientURL(`/wiki/detail/${wikiState.id}`)}
                 text={wikiState.title}
-              />
+              /> */}
             </Div>
 
             <Div flexDir="column" mb={16}>
@@ -266,43 +266,61 @@ const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
                 </Text>
               </Div>
             </Div>
+
+            <Div flexDir="row" alignItems="center">
+              <ShareTextButton
+                urlPath={generateClientURL(`/wiki/detail/${wikiState.id}`)}
+                text={wikiState.title}
+              />
+              {wikiState?.type === WikiType.BOARD && (
+                <>
+                  <Button
+                    mx="md"
+                    rounded="circle"
+                    bg="white"
+                    borderWidth={1}
+                    borderColor="gray400"
+                    onPress={() => {
+                      mutate(wikiState.id);
+                    }}>
+                    {isPressHeart ? (
+                      <Icon
+                        name="heart"
+                        fontFamily="AntDesign"
+                        fontSize={'xl'}
+                        color={'red'}
+                      />
+                    ) : (
+                      <Icon
+                        name="hearto"
+                        fontFamily="AntDesign"
+                        fontSize={'xl'}
+                        color={darkFontColor}
+                      />
+                    )}
+                  </Button>
+                  <TouchableOpacity
+                    onPress={() => {
+                      getGoodsForBoard(wikiState.id);
+                      setIsVisible(true);
+                    }}>
+                    <Div row alignItems="center">
+                      <Text fontSize="lg" fontWeight="bold">
+                        {wikiState.goodsCount}件
+                      </Text>
+                      <Text> のいいね</Text>
+                    </Div>
+                  </TouchableOpacity>
+                </>
+              )}
+            </Div>
+
             <Div bg="white" rounded="md" p={8} mb={16}>
               {dom && <WikiBodyRenderer dom={dom} />}
             </Div>
           </Div>
         ) : null}
-        {wikiState?.type === WikiType.BOARD && (
-          <Div flexDir="row" ml="auto" mb={10}>
-            <TouchableHighlight
-              underlayColor={'none'}
-              onPress={() => mutate(wikiState.id)}>
-              {isPressHeart ? (
-                <Icon
-                  name="heart"
-                  fontFamily="AntDesign"
-                  fontSize={37}
-                  color={'red'}
-                  mr={3}
-                />
-              ) : (
-                <Icon
-                  name="hearto"
-                  fontFamily="AntDesign"
-                  fontSize={35}
-                  color={darkFontColor}
-                  mr={3}
-                />
-              )}
-            </TouchableHighlight>
-            <Button
-              onPress={() => {
-                getGoodsForBoard(wikiState.id);
-                setIsVisible(true);
-              }}>
-              {`${wikiState.goodsCount}件のいいね`}
-            </Button>
-          </Div>
-        )}
+
         {goodsForBoard && (
           <GoodSendersModal
             isVisible={isVisible}
@@ -312,6 +330,20 @@ const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
         )}
         {wikiState?.type === WikiType.BOARD ? (
           <Div w={windowWidth * 0.9} alignSelf="center">
+            <Button
+              alignSelf="center"
+              rounded="xl"
+              w={windowWidth * 0.8}
+              mb="xl"
+              bg="blue700"
+              fontWeight="bold"
+              color="white"
+              onPress={onPressPostAnswerButton}>
+              {wikiState.boardCategory === BoardCategory.QA
+                ? '回答する'
+                : 'コメントを投稿する'}
+            </Button>
+
             <Div
               justifyContent="space-between"
               alignItems="center"
@@ -319,31 +351,20 @@ const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
               mb={10}
               pb={10}
               borderBottomWidth={1}
-              borderBottomColor={wikiBorderColor}>
-              <Text fontWeight="bold" fontSize={24} color={darkFontColor}>
+              borderBottomColor="gray400">
+              <Text fontWeight="bold" fontSize={20} color={darkFontColor}>
                 {wikiState.boardCategory === BoardCategory.QA
                   ? '回答'
                   : 'コメント'}
-                {wikiState?.answers?.length ? wikiState.answers.length : 0}件
               </Text>
-              <Button
-                alignSelf="center"
-                h={32}
-                fontSize={16}
-                py={0}
-                px={10}
-                onPress={onPressPostAnswerButton}
-                bg={wikiAnswerButtonColor}
-                color="white">
-                {wikiState.boardCategory === BoardCategory.QA
-                  ? wikiState?.answers?.length
-                    ? '回答を追加する'
-                    : '回答を投稿する'
-                  : wikiState?.answers?.length
-                  ? 'コメントを追加する'
-                  : 'コメントを投稿する'}
-              </Button>
             </Div>
+
+            <Text fontSize={14} mb="lg">
+              {wikiState?.answers?.length ? wikiState.answers.length : 0}件の
+              {wikiState.boardCategory === BoardCategory.QA
+                ? '回答'
+                : 'コメント'}
+            </Text>
 
             <AnswerList wiki={wikiState} onPressAvatar={onPressAvatar} />
           </Div>
