@@ -152,12 +152,7 @@ const WikiCard: React.FC<WikiCardProps> = ({wiki, type}) => {
           </Text>
         </Div>
         {isBoard ? (
-          <Div
-            ml="auto"
-            mr={10}
-            flexDir="row"
-            alignItems="center"
-            justifyContent="flex-end">
+          <Div mt="sm" mr={10} flexDir="row" alignItems="center">
             <Div
               flexDir="row"
               alignItems="center"
@@ -167,18 +162,19 @@ const WikiCard: React.FC<WikiCardProps> = ({wiki, type}) => {
               <TouchableHighlight onPress={() => setIsVisible(true)}>
                 <Text>いいね</Text>
               </TouchableHighlight>
-              <Text mx={1} color="#90CDF4" fontWeight="bold">
+              <Text mx="sm" color="blue700" fontSize={14} fontWeight="bold">
                 {wikiState.goodsCount || 0}
               </Text>
-              <Div ml={5} mr="lg" flexDir="row">
-                <Text textAlignVertical="bottom" mr={2}>
+              <Div ml="lg" mr="lg" flexDir="row">
+                <Text textAlignVertical="bottom" mr="sm">
                   {isQA ? '回答' : 'コメント'}
                 </Text>
-                <Text color="#90CDF4" fontWeight="bold">
+                <Text color="blue700" fontSize={14} fontWeight="bold">
                   {wikiState.answersCount || 0}
                 </Text>
               </Div>
             </Div>
+            <Div flex={1} />
             <TouchableHighlight
               underlayColor={'none'}
               onPress={() => mutate(wiki.id)}>
