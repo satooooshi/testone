@@ -550,18 +550,18 @@ const AccountDetail: React.FC = () => {
                     children={() => (
                       <Div bg="white" h="100%">
                         <Div alignItems="center" mt="lg">
-                        {profile?.userGoodForBoard?.length ? (
-                          profile?.userGoodForBoard?.map(
-                            w =>
-                              w.wiki && (
-                                <WikiCard key={w.wiki.id} wiki={w.wiki} />
-                              ),
-                          )
-                        ) : (
-                          <Text fontSize={16}>
-                            いいねした掲示板が見つかりませんでした
-                          </Text>
-                        )}
+                          {profile?.userGoodForBoard?.length ? (
+                            profile?.userGoodForBoard?.map(
+                              w =>
+                                w.wiki && (
+                                  <WikiCard key={w.wiki.id} wiki={w.wiki} />
+                                ),
+                            )
+                          ) : (
+                            <Text fontSize={16}>
+                              いいねした掲示板が見つかりませんでした
+                            </Text>
+                          )}
                         </Div>
                         <Div
                           onLayout={({nativeEvent}) => {
