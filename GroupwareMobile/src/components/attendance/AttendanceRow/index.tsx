@@ -123,10 +123,20 @@ const AttendanceRow = ({
   useEffect(() => {
     if (values.attendanceTime && values.absenceTime && values.breakMinutes) {
       const breakHourAndMinutes = values.breakMinutes.split(':');
-      const diff =
+      let diff =
         (new Date(values.absenceTime).getTime() -
           new Date(values.attendanceTime).getTime()) /
         3600000;
+
+      if (diff < 0) {
+        const absenceTime = new Date(values.absenceTime);
+        absenceTime.setDate(absenceTime.getDate() + 1);
+        diff =
+          (new Date(absenceTime).getTime() -
+            new Date(values.attendanceTime).getTime()) /
+          3600000;
+      }
+
       const minutesNumber =
         Math.round((diff - Math.floor(diff)) * 60) -
         Number(breakHourAndMinutes[1]);
@@ -140,6 +150,8 @@ const AttendanceRow = ({
         (minutesNumber < 0 ? 1 : 0);
       const hours = String('00' + hoursNumber).slice(-2);
       setWorkingTime(hours + ':' + minutes);
+    } else {
+      setWorkingTime(undefined);
     }
   }, [values.attendanceTime, values.absenceTime, values.breakMinutes]);
 
