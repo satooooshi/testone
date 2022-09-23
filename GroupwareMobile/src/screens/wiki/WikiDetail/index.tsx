@@ -267,43 +267,74 @@ const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
                 </Text>
               </Div>
             </Div>
+
+            <Div flexDir="row" alignItems="center">
+              <Button
+                bg="white"
+                color="black"
+                borderWidth={1}
+                borderColor="gray300"
+                rounded={'xl'}
+                suffix={
+                  <Icon
+                    ml="sm"
+                    name="share"
+                    fontSize={'lg'}
+                    color="black"
+                    fontFamily="FontAwesome"
+                  />
+                }>
+                チャットで共有
+              </Button>
+              {wikiState?.type === WikiType.BOARD && (
+                <>
+                  <Button
+                    mx="sm"
+                    rounded="circle"
+                    bg="white"
+                    borderWidth={1}
+                    borderColor="gray300"
+                    onPress={() => {
+                      mutate(wikiState.id);
+                    }}>
+                    {isPressHeart ? (
+                      <Icon
+                        name="heart"
+                        fontFamily="AntDesign"
+                        fontSize={'xl'}
+                        color={'red'}
+                      />
+                    ) : (
+                      <Icon
+                        name="hearto"
+                        fontFamily="AntDesign"
+                        fontSize={'xl'}
+                        color={darkFontColor}
+                      />
+                    )}
+                  </Button>
+                  <TouchableOpacity
+                    onPress={() => {
+                      getGoodsForBoard(wikiState.id);
+                      setIsVisible(true);
+                    }}>
+                    <Div row alignItems="center">
+                      <Text fontSize="lg" fontWeight="bold">
+                        {wikiState.goodsCount}件
+                      </Text>
+                      <Text> のいいね</Text>
+                    </Div>
+                  </TouchableOpacity>
+                </>
+              )}
+            </Div>
+
             <Div bg="white" rounded="md" p={8} mb={16}>
               {dom && <WikiBodyRenderer dom={dom} />}
             </Div>
           </Div>
         ) : null}
-        {wikiState?.type === WikiType.BOARD && (
-          <Div flexDir="row" ml="auto" mb={10}>
-            <TouchableHighlight
-              underlayColor={'none'}
-              onPress={() => mutate(wikiState.id)}>
-              {isPressHeart ? (
-                <Icon
-                  name="heart"
-                  fontFamily="AntDesign"
-                  fontSize={37}
-                  color={'red'}
-                  mr={3}
-                />
-              ) : (
-                <Icon
-                  name="hearto"
-                  fontFamily="AntDesign"
-                  fontSize={35}
-                  color={darkFontColor}
-                  mr={3}
-                />
-              )}
-            </TouchableHighlight>
-            <Button
-              onPress={() => {
-                getGoodsForBoard(wikiState.id);
-                setIsVisible(true);
-              }}>
-              {`${wikiState.goodsCount}件のいいね`}
-            </Button>
-          </Div>
-        )}
+
         {goodsForBoard && (
           <GoodSendersModal
             isVisible={isVisible}
