@@ -54,7 +54,7 @@ export const reactionStickers = [
   },
   {
     name: 'rogerSticker',
-    src: rogerSticker.src
+    src: rogerSticker.src,
   },
   {
     name: 'sorrySticker',
