@@ -52,6 +52,8 @@ import {
 import {useIsTabBarVisible} from '../../../contexts/bottomTab/useIsTabBarVisible';
 import {wikiCardStyles} from '../../../styles/component/wiki/wikiCard.style';
 import {useAPIGetGoodsForBoard} from '../../../hooks/api/wiki/useAPIGetGoodForBoard';
+import {tagBgColorFactory} from '../../../utils/factory/tagBgColorFactory';
+import {tagFontColorFactory} from '../../../utils/factory/tagFontColorFactory';
 
 const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
   const isFocused = useIsFocused();
@@ -203,11 +205,10 @@ const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
                 renderItem={({item: t}) => (
                   <Tag
                     fontSize={'md'}
-                    h={21}
-                    py={0}
-                    px={8}
-                    bg={tagColorFactory(t.type)}
-                    color="white"
+                    py="sm"
+                    px="md"
+                    bg={tagBgColorFactory(t.type)}
+                    color={tagFontColorFactory(t.type)}
                     mr={4}>
                     {t.name}
                   </Tag>
