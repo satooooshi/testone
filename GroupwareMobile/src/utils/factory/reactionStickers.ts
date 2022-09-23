@@ -66,11 +66,11 @@ export const reactionStickers = [
   {
     name: 'closeDeadlineSticker',
     src: require('../../../assets/close_deadline_sticker.png'),
-  },*/
+  },
   {
     name: 'completedSticker',
     src: require('../../../assets/completed_sticker.png'),
-  },
+  },*/
   /*
   {
     name: 'confirmationSticker',
@@ -80,11 +80,12 @@ export const reactionStickers = [
     name: 'congratulationsSticker',
     src: require('../../../assets/congratulations_sticker.png'),
   },
+  /*
   {
     name: 'deadlineDaySticker',
     src: require('../../../assets/deadline_day_sticker.png'),
   },
-  /*
+  
   {
     name: 'exclamationSticker',
     src: require('../../../assets/exclamation_sticker.png'),
