@@ -330,6 +330,20 @@ const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
         )}
         {wikiState?.type === WikiType.BOARD ? (
           <Div w={windowWidth * 0.9} alignSelf="center">
+            <Button
+              alignSelf="center"
+              rounded="xl"
+              w={windowWidth * 0.8}
+              mb="xl"
+              bg="blue700"
+              fontWeight="bold"
+              color="white"
+              onPress={onPressPostAnswerButton}>
+              {wikiState.boardCategory === BoardCategory.QA
+                ? '回答する'
+                : 'コメントを投稿する'}
+            </Button>
+
             <Div
               justifyContent="space-between"
               alignItems="center"
@@ -337,31 +351,20 @@ const WikiDetail: React.FC<WikiDetailProps> = ({navigation, route}) => {
               mb={10}
               pb={10}
               borderBottomWidth={1}
-              borderBottomColor={wikiBorderColor}>
-              <Text fontWeight="bold" fontSize={24} color={darkFontColor}>
+              borderBottomColor="gray400">
+              <Text fontWeight="bold" fontSize={20} color={darkFontColor}>
                 {wikiState.boardCategory === BoardCategory.QA
                   ? '回答'
                   : 'コメント'}
-                {wikiState?.answers?.length ? wikiState.answers.length : 0}件
               </Text>
-              <Button
-                alignSelf="center"
-                h={32}
-                fontSize={16}
-                py={0}
-                px={10}
-                onPress={onPressPostAnswerButton}
-                bg={wikiAnswerButtonColor}
-                color="white">
-                {wikiState.boardCategory === BoardCategory.QA
-                  ? wikiState?.answers?.length
-                    ? '回答を追加する'
-                    : '回答を投稿する'
-                  : wikiState?.answers?.length
-                  ? 'コメントを追加する'
-                  : 'コメントを投稿する'}
-              </Button>
             </Div>
+
+            <Text fontSize={14} mb="lg">
+              {wikiState?.answers?.length ? wikiState.answers.length : 0}件の
+              {wikiState.boardCategory === BoardCategory.QA
+                ? '回答'
+                : 'コメント'}
+            </Text>
 
             <AnswerList wiki={wikiState} onPressAvatar={onPressAvatar} />
           </Div>
