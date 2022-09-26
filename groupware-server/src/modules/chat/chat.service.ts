@@ -887,6 +887,9 @@ export class ChatService {
     const roomsIds: number[] = joinedAllRooms.map((r) =>
       Number(r.chat_group_id),
     );
+    if (!roomsIds.length) {
+      return;
+    }
     await this.chatGroupRepository
       .createQueryBuilder()
       .update(ChatGroup)
