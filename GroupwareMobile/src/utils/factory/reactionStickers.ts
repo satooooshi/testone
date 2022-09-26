@@ -3,15 +3,6 @@ export const reactionStickers = [
     name: 'goodSticker',
     src: require('../../../assets/stickers/good_sticker.png'),
   },
-  /*
-  {
-    name: 'helpSticker',
-    src: require('../../../assets/stickers/help_sticker.png'),
-  },
-  {
-    name: 'questionSticker',
-    src: require('../../../assets/stickers/question_sticker.png'),
-  },*/
   {
     name: 'goodJobSticker',
     src: require('../../../assets/stickers/goodjob_sticker.png'),
@@ -32,43 +23,14 @@ export const reactionStickers = [
     name: 'allRightSticker',
     src: require('../../../assets/stickers/allright_sticker.png'),
   },
-  /*
-  {
-    name: 'attachedSticker',
-    src: require('../../../assets/stickers/attached_sticker.png'),
-  },*/
   {
     name: 'checkItSticker',
     src: require('../../../assets/stickers/check_it_sticker.png'),
   },
-  /*
-  {
-    name: 'closeDeadlineSticker',
-    src: require('../../../assets/stickers/close_deadline_sticker.png'),
-  },
-  {
-    name: 'completedSticker',
-    src: require('../../../assets/stickers/completed_sticker.png'),
-  },*/
-  /*
-  {
-    name: 'confirmationSticker',
-    src: require('../../../assets/stickers/confirmation_sticker.png'),
-  },*/
   {
     name: 'congratulationsSticker',
     src: require('../../../assets/stickers/congratulations_sticker.png'),
   },
-  /*
-  {
-    name: 'deadlineDaySticker',
-    src: require('../../../assets/stickers/deadline_day_sticker.png'),
-  },
-  
-  {
-    name: 'exclamationSticker',
-    src: require('../../../assets/stickers/exclamation_sticker.png'),
-  },*/
   {
     name: 'ngSticker',
     src: require('../../../assets/stickers/ng_sticker.png'),
@@ -89,28 +51,6 @@ export const reactionStickers = [
     name: 'notDoneSticker',
     src: require('../../../assets/stickers/not_done_sticker.png'),
   },
-  /*
-  {
-    name: 'okayNowSticker',
-    src: require('../../../assets/stickers/okay_now_sticker.png'),
-  },
-  {
-    name: 'osewaninaruSticker',
-    src: require('../../../assets/stickers/osewaninaru_sticker.png'),
-  },*/
-  /*
-  {
-    name: 'scheduleDeterminedSticker',
-    src: require('../../../assets/stickers/schedule_determined_sticker.png'),
-  },
-  {
-    name: 'callBackSticker',
-    src: require('../../../assets/stickers/call_back_sticker.png'),
-  },
-  {
-    name: 'lerningALotSticker',
-    src: require('../../../assets/stickers/lerning_a_lot_sticker.png'),
-  },*/
   {
     name: 'lostSoulSticker',
     src: require('../../../assets/stickers/lost_soul_sticker.png'),
@@ -123,11 +63,6 @@ export const reactionStickers = [
     name: 'thinkingSticker',
     src: require('../../../assets/stickers/thinking_sticker.png'),
   },
-  /*
-  {
-    name: 'doItSticker',
-    src: require('../../../assets/stickers/do_it_sticker.png'),
-  },*/
   {
     name: 'shockSticker',
     src: require('../../../assets/stickers/shock_sticker.png'),
@@ -140,11 +75,6 @@ export const reactionStickers = [
     name: 'funnySticker',
     src: require('../../../assets/stickers/funny_sticker.png'),
   },
-  /*
-  {
-    name: 'callSticker',
-    src: require('../../../assets/stickers/call_sticker.png'),
-  },*/
   {
     name: 'lookSticker',
     src: require('../../../assets/stickers/look_sticker.png'),
