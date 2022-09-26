@@ -119,7 +119,6 @@ export class WikiService {
       .where('wiki.id = :id', { id })
       .orderBy({ 'answer.created_at': 'ASC', 'reply.created_at': 'ASC' })
       .getOne();
-
     const [userGoodForBoard, goodsCount] =
       await this.userGoodForBoardRepository.findAndCount({
         where: { wiki: existWiki },
@@ -127,7 +126,7 @@ export class WikiService {
       });
 
     const isGoodSender = userGoodForBoard
-      .map((u) => u.user.id)
+      .map((u) => u.user && u.user.id)
       .some((id) => id === userID);
 
     return { ...existWiki, goodsCount, isGoodSender };
