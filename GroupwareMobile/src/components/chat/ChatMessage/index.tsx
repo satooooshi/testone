@@ -24,6 +24,7 @@ import CallMessage from './CallMessage';
 import VideoMessage from './VideoMessage';
 import StickerMessage from './StickerMessage.tsx';
 import {removeReactionDuplicates} from '../../../utils/removeReactionDuplicate';
+import UserAvatar from '../../../components/common/UserAvatar';
 
 type ChatMessageItemProps = {
   message: ChatMessage;
@@ -176,10 +177,9 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
             }
             underlayColor="none">
             <Div mr="xs">
-              {
+              {<UserAvatar h={40} w={40} user={undefined} /> ??
                 senderAvatars?.find(s => s.member.id === message.sender?.id)
-                  ?.avatar
-              }
+                  ?.avatar}
             </Div>
           </TouchableHighlight>
         ) : null}
