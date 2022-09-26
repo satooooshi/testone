@@ -30,6 +30,14 @@ import lostSoulSticker from '@/public/stickers/lost_soul_sticker.png';
 
 export const reactionStickers = [
   {
+    name: 'okSticker',
+    src: okSticker.src,
+  },
+  {
+    name: 'thankYouSticker',
+    src: thankYouSticker.src,
+  },
+  {
     name: 'goodSticker',
     src: goodSticker.src,
   },
@@ -69,18 +77,12 @@ export const reactionStickers = [
     name: 'ngSticker',
     src: ngSticker.src,
   },
-  {
-    name: 'okSticker',
-    src: okSticker.src,
-  },
+  
   {
     name: 'pleaseTakeCareSticker',
     src: pleaseTakeCareSticker.src,
   },
-  {
-    name: 'thankYouSticker',
-    src: thankYouSticker.src,
-  },
+  
   {
     name: 'notDoneSticker',
     src: notDoneSticker.src,

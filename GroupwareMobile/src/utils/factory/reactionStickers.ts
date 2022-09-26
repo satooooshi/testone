@@ -1,5 +1,13 @@
 export const reactionStickers = [
   {
+    name: 'okSticker',
+    src: require('../../../assets/stickers/ok_sticker.png'),
+  },
+  {
+    name: 'thankYouSticker',
+    src: require('../../../assets/stickers/thank_you_sticker.png'),
+  },
+  {
     name: 'goodSticker',
     src: require('../../../assets/stickers/good_sticker.png'),
   },
@@ -36,16 +44,8 @@ export const reactionStickers = [
     src: require('../../../assets/stickers/ng_sticker.png'),
   },
   {
-    name: 'okSticker',
-    src: require('../../../assets/stickers/ok_sticker.png'),
-  },
-  {
     name: 'pleaseTakeCareSticker',
     src: require('../../../assets/stickers/please_take_care_sticker.png'),
-  },
-  {
-    name: 'thankYouSticker',
-    src: require('../../../assets/stickers/thank_you_sticker.png'),
   },
   {
     name: 'notDoneSticker',
