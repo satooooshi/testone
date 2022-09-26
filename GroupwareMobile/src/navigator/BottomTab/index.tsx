@@ -97,6 +97,13 @@ const WikiStack = () => (
   </Stack.Navigator>
 );
 
+/*
+    <Stack.Screen
+      name="EventIntroduction"
+      component={EventIntroduction}
+      options={{headerShown: false}}
+    />
+*/
 const EventStack = () => (
   <Stack.Navigator initialRouteName="EventList">
     <Stack.Screen
@@ -104,11 +111,7 @@ const EventStack = () => (
       component={EventList}
       options={{headerShown: false}}
     />
-    <Stack.Screen
-      name="EventIntroduction"
-      component={EventIntroduction}
-      options={{headerShown: false}}
-    />
+
     <Stack.Screen
       name="EventDetail"
       component={EventDetail}
@@ -117,6 +120,27 @@ const EventStack = () => (
     <Stack.Screen
       name="Share"
       component={Share}
+      options={{headerShown: false}}
+    />
+  </Stack.Navigator>
+);
+
+const IntroStack = () => (
+  <Stack.Navigator initialRouteName="EventIntroduction">
+    <Stack.Screen
+      name="EventIntroduction"
+      component={EventIntroduction}
+      options={{headerShown: false}}
+    />
+  </Stack.Navigator>
+);
+
+const MenuStack = () => (
+  <Stack.Navigator initialRouteName="Menu">
+    <Stack.Screen name="Menu" component={Menu} options={{headerShown: false}} />
+    <Stack.Screen
+      name="EventIntroduction"
+      component={EventIntroduction}
       options={{headerShown: false}}
     />
   </Stack.Navigator>
@@ -428,8 +452,8 @@ const BottomTab = () => {
         }}
       />
       <Tab.Screen
-        name="Menu"
-        component={Menu}
+        name="MenuStack"
+        component={MenuStack}
         options={{
           tabBarLabel: 'メニュー',
           tabBarIcon: ({color}) => (
@@ -449,3 +473,21 @@ const BottomTab = () => {
 };
 
 export default BottomTab;
+
+/**
+ *       <Tab.Screen
+        name="MenuStack"
+        component={MenuStack}
+        options={{
+          tabBarItemStyle: {display: 'none'},
+        }}
+      />
+
+       <Tab.Screen
+        name="IntroStack"
+        component={IntroStack}
+        options={{
+          tabBarItemStyle: {display: 'none'},
+        }}
+      />
+ */

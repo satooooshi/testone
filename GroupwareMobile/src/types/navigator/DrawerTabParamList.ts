@@ -4,6 +4,8 @@ import {RootStackParamList} from './RootStackParamList';
 export type DrawerTabParamList = {
   Home: NavigatorScreenParams<RootStackParamList>;
   EventStack: NavigatorScreenParams<RootStackParamList>;
+  IntroStack: NavigatorScreenParams<RootStackParamList>;
+  MenuStack: NavigatorScreenParams<RootStackParamList>;
   WikiStack: NavigatorScreenParams<RootStackParamList>;
   Users: NavigatorScreenParams<RootStackParamList>;
   ChatStack: NavigatorScreenParams<RootStackParamList>;

@@ -105,7 +105,7 @@ const Home: React.FC = () => {
             <PortalLinkBox
               type="impressive_university"
               onPress={() =>
-                navigation.navigate('EventStack', {
+                navigation.navigate('MenuStack', {
                   screen: 'EventIntroduction',
                   params: {type: EventType.IMPRESSIVE_UNIVERSITY},
                 })
@@ -116,7 +116,7 @@ const Home: React.FC = () => {
             <PortalLinkBox
               type="study_meeting"
               onPress={() =>
-                navigation.navigate('EventStack', {
+                navigation.navigate('MenuStack', {
                   screen: 'EventIntroduction',
                   params: {type: EventType.STUDY_MEETING},
                 })
@@ -130,7 +130,7 @@ const Home: React.FC = () => {
             <PortalLinkBox
               type="bolday"
               onPress={() =>
-                navigation.navigate('EventStack', {
+                navigation.navigate('MenuStack', {
                   screen: 'EventIntroduction',
                   params: {type: EventType.BOLDAY},
                 })
@@ -141,7 +141,7 @@ const Home: React.FC = () => {
             <PortalLinkBox
               type="coach"
               onPress={() =>
-                navigation.navigate('EventStack', {
+                navigation.navigate('MenuStack', {
                   screen: 'EventIntroduction',
                   params: {type: EventType.COACH},
                 })
@@ -155,7 +155,7 @@ const Home: React.FC = () => {
             <PortalLinkBox
               type="club"
               onPress={() =>
-                navigation.navigate('EventStack', {
+                navigation.navigate('MenuStack', {
                   screen: 'EventIntroduction',
                   params: {type: EventType.CLUB},
                 })
@@ -166,7 +166,7 @@ const Home: React.FC = () => {
             <PortalLinkBox
               type="submission_etc"
               onPress={() =>
-                navigation.navigate('EventStack', {
+                navigation.navigate('MenuStack', {
                   screen: 'EventList',
                   params: {type: EventType.SUBMISSION_ETC},
                 })
