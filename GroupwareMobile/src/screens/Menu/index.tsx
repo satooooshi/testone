@@ -17,6 +17,7 @@ const Home: React.FC = () => {
   const isAdmin = user?.role === UserRole.ADMIN;
   const userID = user?.id;
   const navigation = useNavigation<HomeNavigationProps>();
+  const routes = navigation.getState()?.routes;
   const {data: profile} = useAPIGetUserInfoById(userID?.toString() || '0');
 
   const handleLogout = () => {
@@ -105,9 +106,12 @@ const Home: React.FC = () => {
             <PortalLinkBox
               type="impressive_university"
               onPress={() =>
-                navigation.navigate('MenuStack', {
+                navigation.navigate('IntroStack', {
                   screen: 'EventIntroduction',
-                  params: {type: EventType.IMPRESSIVE_UNIVERSITY},
+                  params: {
+                    type: EventType.IMPRESSIVE_UNIVERSITY,
+                    previousScreenName: routes[routes?.length - 2],
+                  },
                 })
               }
             />
@@ -115,12 +119,15 @@ const Home: React.FC = () => {
           <Div flex={1}>
             <PortalLinkBox
               type="study_meeting"
-              onPress={() =>
-                navigation.navigate('MenuStack', {
+              onPress={() => {
+                return navigation.navigate('IntroStack', {
                   screen: 'EventIntroduction',
-                  params: {type: EventType.STUDY_MEETING},
-                })
-              }
+                  params: {
+                    type: EventType.STUDY_MEETING,
+                    previousScreenName: routes[routes?.length - 2],
+                  },
+                });
+              }}
             />
           </Div>
         </Div>
@@ -130,9 +137,12 @@ const Home: React.FC = () => {
             <PortalLinkBox
               type="bolday"
               onPress={() =>
-                navigation.navigate('MenuStack', {
+                navigation.navigate('IntroStack', {
                   screen: 'EventIntroduction',
-                  params: {type: EventType.BOLDAY},
+                  params: {
+                    type: EventType.BOLDAY,
+                    previousScreenName: routes[routes?.length - 2],
+                  },
                 })
               }
             />
@@ -141,9 +151,12 @@ const Home: React.FC = () => {
             <PortalLinkBox
               type="coach"
               onPress={() =>
-                navigation.navigate('MenuStack', {
+                navigation.navigate('IntroStack', {
                   screen: 'EventIntroduction',
-                  params: {type: EventType.COACH},
+                  params: {
+                    type: EventType.COACH,
+                    previousScreenName: routes[routes?.length - 2],
+                  },
                 })
               }
             />
@@ -155,9 +168,12 @@ const Home: React.FC = () => {
             <PortalLinkBox
               type="club"
               onPress={() =>
-                navigation.navigate('MenuStack', {
+                navigation.navigate('IntroStack', {
                   screen: 'EventIntroduction',
-                  params: {type: EventType.CLUB},
+                  params: {
+                    type: EventType.CLUB,
+                    previousScreenName: routes[routes?.length - 2],
+                  },
                 })
               }
             />
@@ -166,9 +182,12 @@ const Home: React.FC = () => {
             <PortalLinkBox
               type="submission_etc"
               onPress={() =>
-                navigation.navigate('MenuStack', {
+                navigation.navigate('IntroStack', {
                   screen: 'EventList',
-                  params: {type: EventType.SUBMISSION_ETC},
+                  params: {
+                    type: EventType.SUBMISSION_ETC,
+                    previousScreenName: routes[routes?.length - 2],
+                  },
                 })
               }
             />

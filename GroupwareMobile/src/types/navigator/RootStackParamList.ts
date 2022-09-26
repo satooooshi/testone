@@ -108,4 +108,5 @@ export type RootStackParamList = {
   };
   WikiLinks: undefined;
   MyProfile: undefined;
+  Menu: undefined;
 };
