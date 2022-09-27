@@ -96,11 +96,7 @@ const EventIntroduction: React.FC = () => {
         title={eventTypeNameFactory(type)}
         enableBackButton={true}
         rightButtonName="予定を見る"
-        screenForBack={
-          route.params?.previousScreenName.name === 'Menu'
-            ? route.params.previousScreenName.name
-            : undefined
-        }
+        screenForBack={'Menu'}
         onPressRightButton={() =>
           navigation.navigate('EventStack', {
             screen: 'EventList',

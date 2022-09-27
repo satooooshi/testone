@@ -110,7 +110,6 @@ const Home: React.FC = () => {
                   screen: 'EventIntroduction',
                   params: {
                     type: EventType.IMPRESSIVE_UNIVERSITY,
-                    previousScreenName: routes[routes?.length - 2],
                   },
                 })
               }
@@ -124,7 +123,6 @@ const Home: React.FC = () => {
                   screen: 'EventIntroduction',
                   params: {
                     type: EventType.STUDY_MEETING,
-                    previousScreenName: routes[routes?.length - 2],
                   },
                 });
               }}
@@ -141,7 +139,6 @@ const Home: React.FC = () => {
                   screen: 'EventIntroduction',
                   params: {
                     type: EventType.BOLDAY,
-                    previousScreenName: routes[routes?.length - 2],
                   },
                 })
               }
@@ -155,7 +152,6 @@ const Home: React.FC = () => {
                   screen: 'EventIntroduction',
                   params: {
                     type: EventType.COACH,
-                    previousScreenName: routes[routes?.length - 2],
                   },
                 })
               }
@@ -172,7 +168,6 @@ const Home: React.FC = () => {
                   screen: 'EventIntroduction',
                   params: {
                     type: EventType.CLUB,
-                    previousScreenName: routes[routes?.length - 2],
                   },
                 })
               }
@@ -186,7 +181,6 @@ const Home: React.FC = () => {
                   screen: 'EventList',
                   params: {
                     type: EventType.SUBMISSION_ETC,
-                    previousScreenName: routes[routes?.length - 2],
                   },
                 })
               }
