@@ -65,7 +65,6 @@ import { nameOfEmptyNameGroup } from 'src/utils/chat/nameOfEmptyNameGroup';
 import Editor from '@draft-js-plugins/editor';
 import { reactionStickers } from '../../../utils/reactionStickers';
 
-
 type ChatBoxProps = {
   room: ChatGroup;
   onMenuClicked: (menuValue: MenuValue) => void;
