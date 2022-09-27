@@ -721,11 +721,15 @@ const Chat: React.FC = () => {
   };
 
   const senderAvatars = useMemo(() => {
-    return roomDetail?.members?.map(m => ({
-      id: m.id,
+    const allMembers = [
+      ...(roomDetail?.members || []),
+      ...(roomDetail?.previousMembers || []),
+    ];
+    return allMembers.map(m => ({
+      member: m,
       avatar: <UserAvatar h={40} w={40} user={m} />,
     }));
-  }, [roomDetail?.members]);
+  }, [roomDetail?.members, roomDetail?.previousMembers]);
 
   const typeDropdown = (
     <Dropdown
@@ -915,9 +919,7 @@ const Chat: React.FC = () => {
         scrollToRenderedMessage()
       }>
       <ChatMessageItem
-        senderAvatar={
-          senderAvatars?.find(s => s.id === message.sender?.id)?.avatar
-        }
+        senderAvatars={senderAvatars}
         message={message}
         readUsers={readUsers(message)}
         inputtedSearchWord={inputtedSearchWord}
@@ -1048,6 +1050,9 @@ const Chat: React.FC = () => {
                     setValues(v => ({...v, replyParentMessage: undefined}))
                   }
                   replyParentMessage={values.replyParentMessage}
+                  senderAvatar={senderAvatars.find(
+                    s => s.member.id === values.replyParentMessage?.sender?.id,
+                  )}
                 />
               )}
               <Div

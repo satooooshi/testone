@@ -438,11 +438,15 @@ export class ChatService {
     if (senderIDs.length) {
       senders = await this.userRepository
         .createQueryBuilder('users')
-        .select(selectUserColumns('users'))
+        .select([
+          'users.id',
+          'users.lastName',
+          'users.firstName',
+          'users.existence',
+        ])
         .where('users.id IN (:...senderIDs)', { senderIDs })
         .getMany();
     }
-
     //リアクションの取得
     const reactions = await this.chatMessageReactionRepository
       .createQueryBuilder('reactions')

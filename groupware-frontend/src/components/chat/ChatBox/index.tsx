@@ -62,6 +62,7 @@ import { removeHalfWidthSpace } from 'src/utils/replaceWidthSpace';
 import { useChatSocket } from './socket';
 import ChatEditor from '../ChatEditor';
 import { nameOfEmptyNameGroup } from 'src/utils/chat/nameOfEmptyNameGroup';
+import boldMascot from '@/public/bold-mascot.png';
 import Editor from '@draft-js-plugins/editor';
 import { reactionStickers } from '../../../utils/reactionStickers';
 
@@ -397,6 +398,25 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
 
   const isPersonal = room.roomType === RoomType.PERSONAL;
 
+  const allMembers = useMemo(
+    () => [...(room?.members || []), ...(room?.previousMembers || [])],
+    [room.members, room.previousMembers],
+  );
+
+  const senderAvatars = useMemo(() => {
+    return allMembers.map((m) => ({
+      member: m,
+      avatar: (
+        <Avatar
+          h="40px"
+          w="40px"
+          cursor="pointer"
+          src={!m?.existence ? boldMascot.src : m.avatarUrl}
+        />
+      ),
+    }));
+  }, [allMembers]);
+
   return (
     <Box
       {...noClickRootDropzone()}
@@ -568,6 +588,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
           <>
             {messages.map((m) => (
               <ChatMessageItem
+                senderAvatars={senderAvatars}
                 isScrollTarget={focusedMessageID === m.id}
                 scrollToTarget={scrollToTarget}
                 usersInRoom={room.members || []}
@@ -625,13 +646,23 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
           </Link>
           <UserAvatar
             mr="8px"
-            src={newChatMessage.replyParentMessage.sender?.avatarUrl}
+            src={
+              allMembers?.find(
+                (m) => m.id === newChatMessage.replyParentMessage?.sender?.id,
+              )?.avatarUrl
+            }
             size="md"
-            user={newChatMessage.replyParentMessage.sender}
+            user={allMembers?.find(
+              (m) => m.id === newChatMessage.replyParentMessage?.sender?.id,
+            )}
           />
           <Box display="flex" justifyContent="center" flexDir="column" w="80%">
             <Text fontWeight="bold">
-              {userNameFactory(newChatMessage.replyParentMessage.sender)}
+              {userNameFactory(
+                allMembers?.find(
+                  (m) => m.id === newChatMessage.replyParentMessage?.sender?.id,
+                ),
+              )}
             </Text>
             <Text isTruncated w="90%" noOfLines={1}>
               {replyTargetContent(newChatMessage.replyParentMessage)}
