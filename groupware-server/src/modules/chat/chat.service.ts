@@ -429,7 +429,9 @@ export class ChatService {
     const senderIDs = [
       ...new Set(existMessages.map((m) => Number(m.sender_id))),
     ];
-    const replyMessageIDs = existMessages.map((m) => m.reply_parent_id);
+    const replyMessageIDs = existMessages
+      .filter((m) => m.reply_parent_id)
+      .map((m) => m.reply_parent_id);
 
     // senderの取得
     let senders: User[] = [];
@@ -450,11 +452,12 @@ export class ChatService {
       })
       .getRawMany();
     //返信の取得
+
     let replyMessages: ChatMessage[] = [];
     if (replyMessageIDs.length) {
       replyMessages = await this.chatMessageRepository
         .createQueryBuilder('messages')
-        .leftJoin(
+        .innerJoin(
           'messages.sender',
           'sender',
           'messages.id IN (:...replyMessageIDs)',
