@@ -10,7 +10,6 @@ import React, {
 import {
   NativeSyntheticEvent,
   Platform,
-  Text,
   TextInput,
   TextInputSelectionChangeEventData,
   TouchableOpacity,
@@ -31,12 +30,14 @@ import {
   getMentionPartSuggestionKeywords,
   isMentionPartType,
 } from 'react-native-controlled-mentions/dist/utils';
-import {Div, Icon, ScrollDiv} from 'react-native-magnus';
+
+import {Div, Icon, ScrollDiv, Text} from 'react-native-magnus';
 import {ActivityIndicator} from 'react-native-paper';
 import {Menu} from 'react-native-paper';
 import Input from './Input';
 
 type ChatFooterProps = {
+  inputRef?: React.RefObject<TextInput>;
   text: string | undefined;
   onChangeText: (text: string) => void;
   onUploadFile: () => void;
@@ -50,6 +51,7 @@ type ChatFooterProps = {
 };
 
 const ChatFooter: React.FC<ChatFooterProps> = ({
+  inputRef,
   text: value,
   onChangeText,
   onUploadFile,
@@ -66,8 +68,6 @@ const ChatFooter: React.FC<ChatFooterProps> = ({
   const [mentionAdded, setMentionAdded] = useState(false);
   const [visibleMenu, setVisibleMenu] = useState(false);
 
-  const inputRef = useRef<TextInput>(null);
-
   const renderSuggestions: React.FC<MentionSuggestionsProps> = ({
     keyword,
     onSuggestionPress,
@@ -76,21 +76,29 @@ const ChatFooter: React.FC<ChatFooterProps> = ({
       return null;
     }
 
+    const candidateMembers = mentionSuggestions.filter(one =>
+      one.name.toLocaleLowerCase().includes(keyword.toLocaleLowerCase()),
+    );
+
     return (
-      <ScrollDiv h={140} borderTopColor="blue200" borderTopWidth={1}>
-        {mentionSuggestions
-          .filter(one =>
-            one.name.toLocaleLowerCase().includes(keyword.toLocaleLowerCase()),
-          )
-          .map(one => (
-            <TouchableOpacity
-              key={one.id}
-              onPress={() => onSuggestionPress(one)}
-              style={{padding: 12, width: '100%'}}>
-              <Text>{one.name}</Text>
-            </TouchableOpacity>
-          ))}
-      </ScrollDiv>
+      <>
+        {candidateMembers.length ? (
+          <ScrollDiv
+            h={140}
+            bg="white"
+            borderTopColor="gray200"
+            borderTopWidth={1}>
+            {candidateMembers.map(one => (
+              <TouchableOpacity
+                key={one.id}
+                onPress={() => onSuggestionPress(one)}
+                style={{padding: 12, width: '100%'}}>
+                <Text color="black">{one.name}</Text>
+              </TouchableOpacity>
+            ))}
+          </ScrollDiv>
+        ) : null}
+      </>
     );
   };
 
@@ -194,6 +202,11 @@ const ChatFooter: React.FC<ChatFooterProps> = ({
     </Fragment>
   );
 
+  const sendable = useMemo(() => {
+    return !!parseContent.parts?.[0]?.text;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [parseContent.parts?.[0]?.text]);
+
   return (
     <Div flexDir="column">
       {(
@@ -271,17 +284,21 @@ const ChatFooter: React.FC<ChatFooterProps> = ({
             onChangeInput={onChangeInput}
             handleSelectionChange={handleSelectionChange}
             parseContent={parseContent}
+            inputRef={inputRef}
           />
         </Div>
         {isLoading ? (
           <ActivityIndicator />
         ) : (
-          <TouchableOpacity onPress={onSend}>
+          <TouchableOpacity
+            onPress={() => {
+              sendable && onSend();
+            }}>
             <Icon
               name="send"
               fontFamily="Ionicons"
               fontSize={21}
-              color={parseContent.parts?.[0]?.text ? 'blue600' : 'gray'}
+              color={sendable ? 'blue600' : 'gray'}
             />
           </TouchableOpacity>
         )}

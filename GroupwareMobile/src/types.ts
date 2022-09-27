@@ -41,6 +41,7 @@ export enum EventType {
   COACH = 'coach',
   CLUB = 'club',
   SUBMISSION_ETC = 'submission_etc',
+  OTHER = 'other',
 }
 
 export enum TagType {
@@ -338,6 +339,7 @@ export interface ChatGroup {
   isMute?: boolean;
   memberCount: number;
   members?: User[];
+  previousMembers?: User[];
   lastReadChatTime?: LastReadChatTime[];
   hasBeenRead?: boolean;
   unreadCount?: number;

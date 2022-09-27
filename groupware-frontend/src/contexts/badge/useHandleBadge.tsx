@@ -14,6 +14,7 @@ import { useAPIGetRoomsByPage } from '@/hooks/api/chat/useAPIGetRoomsByPage';
 import { useAPIGetOneRoom } from '@/hooks/api/chat/useAPIGetOneRoom';
 import router from 'next/router';
 import { useAPISendNotifiForRefetchRoom } from '@/hooks/api/chat/useAPISendNotifiForRefetchRoom';
+import { sortRooms } from 'src/utils/chat/sortRooms';
 
 const BadgeContext = createContext({
   unreadChatCount: 0,
@@ -39,7 +40,7 @@ export const BadgeProvider: React.FC = ({ children }) => {
   const { refetch: refetchAllRooms, isLoading } = useAPIGetRoomsByPage(
     {
       page: page.toString(),
-      limit: '20',
+      limit: '100',
     },
     {
       enabled: false,
@@ -50,15 +51,14 @@ export const BadgeProvider: React.FC = ({ children }) => {
         }
         setChatUnreadCount(count);
         setChatGroups((r) => {
-          if (page !== 1 && r.length) {
-            const mergedRooms = [...r, ...data.rooms];
-            const pinnedRooms = mergedRooms.filter((r) => r.isPinned);
-            const exceptPinnedRooms = mergedRooms.filter((r) => !r.isPinned);
-            return [...pinnedRooms, ...exceptPinnedRooms];
+          const rooms =
+            page !== 1 && r.length ? [...r, ...data.rooms] : data.rooms;
+          if (!data.gotAllRooms) {
+            return rooms;
           }
-          return [...data.rooms];
+          return sortRooms(rooms);
         });
-        if (data.rooms.length >= 20) {
+        if (!data.gotAllRooms) {
           setPage((p) => p + 1);
           setIsNeedRefetch(true);
         } else {

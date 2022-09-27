@@ -14,7 +14,7 @@ import {
   useMediaQuery,
   useToast,
 } from '@chakra-ui/react';
-import React, { Fragment, useMemo, useRef, memo } from 'react';
+import React, { Fragment, useMemo, useRef, memo, ReactNode } from 'react';
 import { Avatar } from '@chakra-ui/react';
 import {
   ChatMessage,
@@ -59,6 +59,10 @@ type ChatMessageItemProps = {
   confirmedSearchWord: string;
   searchedResultIds?: (number | undefined)[];
   lastReadChatTime: LastReadChatTime[] | undefined;
+  senderAvatars?: {
+    member: User;
+    avatar: JSX.Element;
+  }[];
 };
 
 const ChatMessageItem: React.FC<ChatMessageItemProps> = memo(
@@ -72,7 +76,9 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = memo(
     confirmedSearchWord,
     searchedResultIds,
     lastReadChatTime,
+    senderAvatars,
   }) => {
+    const focusTextareaRef = useRef<HTMLTextAreaElement>(null);
     const { mutate: deleteMessage } = useAPIDeleteChatMessage({
       onSuccess: (data) => {
         socket.emit('message', {
@@ -113,6 +119,14 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = memo(
         scrollToTarget(ref.current?.offsetTop - 80);
       }
     }, [isScrollTarget, scrollToTarget]);
+
+    useEffect(() => {
+      focusTextareaRef?.current?.focus();
+      focusTextareaRef?.current?.setSelectionRange(
+        focusTextareaRef?.current?.value.length,
+        focusTextareaRef?.current?.value.length,
+      );
+    }, [editMessage]);
 
     useEffect(() => {
       setMessageState(message);
@@ -360,6 +374,10 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = memo(
       return <></>;
     }
 
+    const senderAvatar = senderAvatars?.find(
+      (s) => s.member.id === message.sender?.id,
+    );
+
     return (
       <Box
         ref={ref}
@@ -367,7 +385,7 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = memo(
         flexDir="column"
         alignItems={messageState.isSender ? 'flex-end' : 'flex-start'}>
         <ReadUsersListModal
-          sender={messageState.sender}
+          sender={senderAvatar?.member}
           usersInRoom={usersInRoom}
           isOpen={visibleReadModal}
           onClose={() => setVisibleLastReadModal(false)}
@@ -394,16 +412,7 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = memo(
             flexDir={messageState.isSender ? 'row-reverse' : undefined}>
             {!messageState.isSender ? (
               <Link href={`/account/${messageState.sender?.id}`} passHref>
-                <Avatar
-                  h="40px"
-                  w="40px"
-                  cursor="pointer"
-                  src={
-                    !messageState.sender?.existence
-                      ? boldMascot.src
-                      : messageState.sender?.avatarUrl
-                  }
-                />
+                {senderAvatar?.avatar}
               </Link>
             ) : null}
             <Box display="flex" alignItems="flex-end">
@@ -428,13 +437,15 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = memo(
               <Box display="flex" flexDir="column" alignItems="flex-start">
                 {!messageState.isSender && (
                   <Text>
-                    {messageState.sender && messageState.sender?.existence
-                      ? userNameFactory(messageState.sender)
+                    {senderAvatar?.member && senderAvatar.member?.existence
+                      ? userNameFactory(senderAvatar.member)
                       : 'ボールドくん'}
                   </Text>
                 )}
                 {messageState.type === ChatMessageType.TEXT ? (
                   <TextMessage
+                    senderAvatars={senderAvatars}
+                    focusTextareaRef={focusTextareaRef}
                     message={messageState}
                     confirmedSearchWord={confirmedSearchWord}
                     searchedResultIds={searchedResultIds}
@@ -448,7 +459,7 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = memo(
                     borderRadius="8px"
                     p="8px"
                     maxW={isSmallerThan768 ? undefined : '40vw'}
-                    minW={'150px'}
+                    //minW={'150px'}
                     wordBreak="break-word">
                     {messageState.type === ChatMessageType.IMAGE ? (
                       <ImageMessage

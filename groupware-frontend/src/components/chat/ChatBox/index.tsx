@@ -7,6 +7,7 @@ import {
   Input,
   InputGroup,
   InputRightElement,
+  Image,
 } from '@chakra-ui/react';
 import { darkFontColor } from 'src/utils/colors';
 import { Menu, MenuItem, MenuButton } from '@szhsin/react-menu';
@@ -61,6 +62,9 @@ import { removeHalfWidthSpace } from 'src/utils/replaceWidthSpace';
 import { useChatSocket } from './socket';
 import ChatEditor from '../ChatEditor';
 import { nameOfEmptyNameGroup } from 'src/utils/chat/nameOfEmptyNameGroup';
+import boldMascot from '@/public/bold-mascot.png';
+import Editor from '@draft-js-plugins/editor';
+import { reactionStickers } from '../../../utils/reactionStickers';
 
 type ChatBoxProps = {
   room: ChatGroup;
@@ -109,6 +113,8 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
     include,
     limit: '20',
   });
+
+  const editorRef = useRef<Editor>(null);
 
   const { refetch: searchMessages } = useAPISearchMessages(
     {
@@ -371,6 +377,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
 
   const onClickReply = useCallback(
     (m: ChatMessage) => {
+      editorRef.current?.focus();
       setNewChatMessage((pre) => ({
         ...pre,
         replyParentMessage: m,
@@ -378,6 +385,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
     },
     [setNewChatMessage],
   );
+
   const onClickImage = useCallback((m: ChatMessage) => {
     if (m.type === ChatMessageType.IMAGE) {
       setSelectedImageURL(m.content);
@@ -389,6 +397,25 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
   }, [searchedResults]);
 
   const isPersonal = room.roomType === RoomType.PERSONAL;
+
+  const allMembers = useMemo(
+    () => [...(room?.members || []), ...(room?.previousMembers || [])],
+    [room.members, room.previousMembers],
+  );
+
+  const senderAvatars = useMemo(() => {
+    return allMembers.map((m) => ({
+      member: m,
+      avatar: (
+        <Avatar
+          h="40px"
+          w="40px"
+          cursor="pointer"
+          src={!m?.existence ? boldMascot.src : m.avatarUrl}
+        />
+      ),
+    }));
+  }, [allMembers]);
 
   return (
     <Box
@@ -561,6 +588,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
           <>
             {messages.map((m) => (
               <ChatMessageItem
+                senderAvatars={senderAvatars}
                 isScrollTarget={focusedMessageID === m.id}
                 scrollToTarget={scrollToTarget}
                 usersInRoom={room.members || []}
@@ -596,7 +624,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
           display="flex"
           flexDir="row"
           alignItems="center"
-          h="13%"
+          h="110"
           borderBottomWidth={1}
           px="8px"
           position="relative"
@@ -618,17 +646,70 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
           </Link>
           <UserAvatar
             mr="8px"
-            src={newChatMessage.replyParentMessage.sender?.avatarUrl}
+            src={
+              allMembers?.find(
+                (m) => m.id === newChatMessage.replyParentMessage?.sender?.id,
+              )?.avatarUrl
+            }
             size="md"
-            user={newChatMessage.replyParentMessage.sender}
+            user={allMembers?.find(
+              (m) => m.id === newChatMessage.replyParentMessage?.sender?.id,
+            )}
           />
-          <Box display="flex" justifyContent="center" flexDir="column" w="100%">
+          <Box display="flex" justifyContent="center" flexDir="column" w="80%">
             <Text fontWeight="bold">
-              {userNameFactory(newChatMessage.replyParentMessage.sender)}
+              {userNameFactory(
+                allMembers?.find(
+                  (m) => m.id === newChatMessage.replyParentMessage?.sender?.id,
+                ),
+              )}
             </Text>
             <Text isTruncated w="90%" noOfLines={1}>
               {replyTargetContent(newChatMessage.replyParentMessage)}
             </Text>
+          </Box>
+          <Box w="20%">
+            {newChatMessage.replyParentMessage.type ===
+            ChatMessageType.IMAGE ? (
+              <Image
+                loading="lazy"
+                src={newChatMessage.replyParentMessage.content}
+                w={'100'}
+                h={'100'}
+                objectFit={'contain'}
+                alt="送信された画像"
+              />
+            ) : newChatMessage.replyParentMessage.type ===
+              ChatMessageType.VIDEO ? (
+              <video
+                style={{
+                  maxHeight: '100px',
+                  maxWidth: '100px',
+                  objectFit: 'contain',
+                }}
+                controls={false}
+                muted>
+                <source
+                  src={newChatMessage.replyParentMessage.content}
+                  type="video/mp4"
+                />
+              </video>
+            ) : newChatMessage.replyParentMessage.type ===
+              ChatMessageType.STICKER ? (
+              <Image
+                loading="lazy"
+                src={
+                  reactionStickers.find(
+                    (s) =>
+                      s.name === newChatMessage?.replyParentMessage?.content,
+                  )?.src
+                }
+                w={'100'}
+                h={'100'}
+                objectFit={'contain'}
+                alt="送信された画像"
+              />
+            ) : null}
           </Box>
         </Box>
       )}
@@ -637,6 +718,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
         onSend={onSend}
         isLoading={isLoading}
         uploadFiles={uploadFiles}
+        editorRef={editorRef}
       />
       <Sticker handleStickerSelected={handleStickerSelected} />
     </Box>

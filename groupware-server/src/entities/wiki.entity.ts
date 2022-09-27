@@ -195,7 +195,8 @@ export class Wiki {
   @AfterLoad()
   @AfterUpdate()
   async changeToSignedURL?() {
-    this.body = await genSignedURL(this.body);
+    // this.body = await genSignedURL(this.body);
+    this.body = genStorageURL(this.body);
   }
 
   isGoodSender?: boolean;
