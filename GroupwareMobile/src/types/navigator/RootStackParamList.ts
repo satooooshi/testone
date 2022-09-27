@@ -1,4 +1,5 @@
 import {
+  AttendanceRepo,
   BoardCategory,
   ChatAlbum,
   ChatGroup,
@@ -109,4 +110,13 @@ export type RootStackParamList = {
   WikiLinks: undefined;
   MyProfile: undefined;
   Menu: undefined;
+  AttendanceHome: undefined;
+  Attendance: undefined;
+  AttendanceReport: undefined;
+  AttendanceReportDetail: {
+    report: AttendanceRepo;
+    previousScreenName?: keyof RootStackParamList;
+  };
+  DefaultAttendance: undefined;
+  ApplicationBeforeJoining: undefined;
 };

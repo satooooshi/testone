@@ -32,6 +32,13 @@ export const useAdminHeaderTab = (): Tab[] => {
         navigation.navigate('AdminStack', {screen: 'UserRegisteringAdmin'}),
     },
     {
+      name: '勤怠報告',
+      onPress: () =>
+        navigation.navigate('AdminStack', {
+          screen: 'AttendanceVerifyReportAdmin',
+        }),
+    },
+    {
       name: 'タグ管理',
       onPress: () => navigation.navigate('AdminStack', {screen: 'TagAdmin'}),
     },

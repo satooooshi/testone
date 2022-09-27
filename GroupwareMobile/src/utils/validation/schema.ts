@@ -154,3 +154,29 @@ export const createUserSchema = Yup.object().shape({
     .min(8, 'パスワードは' + minEightTextMessage)
     .required('パスワードは' + requireMessage),
 });
+
+export const travelCostFormModalSchema = Yup.object().shape({
+  destination: Yup.string().required(requireMessage),
+  purpose: Yup.string().required(requireMessage),
+  departureStation: Yup.string().required(requireMessage),
+  destinationStation: Yup.string().required(requireMessage),
+  travelCost: Yup.number().required(requireMessage),
+});
+
+export const applicationFormModalSchema = Yup.object().shape({
+  attendanceTime: Yup.date().required('日付は' + requireMessage),
+  destination: Yup.string().required(requireMessage),
+  purpose: Yup.string().required(requireMessage),
+  departureStation: Yup.string().required(requireMessage),
+  destinationStation: Yup.string().required(requireMessage),
+  travelCost: Yup.number().required(requireMessage),
+});
+
+export const attendanceSchema = Yup.object().shape({
+  attendanceTime: Yup.date().required('出勤時間は' + requireMessage),
+  absenceTime: Yup.date().required('退勤時間は' + requireMessage),
+});
+
+export const attendanceReportSchema = Yup.object().shape({
+  targetDate: Yup.date().required('日付は' + requireMessage),
+});
