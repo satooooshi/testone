@@ -217,32 +217,6 @@ const AccountDetail: React.FC = () => {
 
   const mySelfOfNot = id === user?.id || !id;
 
-  const tabs: Tab[] =
-    userID !== user?.id
-      ? [
-          {
-            name: 'アカウント情報',
-            onPress: () =>
-              navigation.navigate('AccountStack', {screen: 'MyProfile'}),
-          },
-        ]
-      : [
-          {
-            name: 'アカウント情報',
-            onPress: () => {},
-          },
-          {
-            name: 'プロフィール編集',
-            onPress: () =>
-              navigation.navigate('AccountStack', {screen: 'Profile'}),
-          },
-          {
-            name: 'パスワード更新',
-            onPress: () =>
-              navigation.navigate('AccountStack', {screen: 'UpdatePassword'}),
-          },
-        ];
-
   const handleLogout = () => {
     logout();
     setUser({});
@@ -292,7 +266,6 @@ const AccountDetail: React.FC = () => {
     <WholeContainer>
       <HeaderWithTextButton
         title={'Account'}
-        tabs={tabs}
         activeTabName={'アカウント情報'}
         enableBackButton={userID !== user?.id}
         // rightButtonName={mySelfOfNot ? 'ログアウト' : undefined}

@@ -28,20 +28,7 @@ const UpdatePassword: React.FC = () => {
         );
       },
     });
-  const tabs: Tab[] = [
-    {
-      name: 'アカウント情報',
-      onPress: () => navigation.navigate('AccountStack', {screen: 'MyProfile'}),
-    },
-    {
-      name: 'プロフィール編集',
-      onPress: () => navigation.navigate('AccountStack', {screen: 'Profile'}),
-    },
-    {
-      name: 'パスワード更新',
-      onPress: () => {},
-    },
-  ];
+
   const {handleSubmit, values, resetForm, setValues, errors, touched} =
     useFormik({
       initialValues: {
@@ -70,7 +57,6 @@ const UpdatePassword: React.FC = () => {
       </Overlay>
       <HeaderWithTextButton
         title={'Account'}
-        tabs={tabs}
         enableBackButton={true}
         screenForBack={'Menu'}
         activeTabName={'パスワード更新'}

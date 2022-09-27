@@ -126,21 +126,6 @@ const Profile: React.FC = () => {
       );
     },
   });
-  const tabs: Tab[] = [
-    {
-      name: 'アカウント情報',
-      onPress: () => navigation.navigate('AccountStack', {screen: 'MyProfile'}),
-    },
-    {
-      name: 'プロフィール編集',
-      onPress: () => {},
-    },
-    {
-      name: 'パスワード更新',
-      onPress: () =>
-        navigation.navigate('AccountStack', {screen: 'UpdatePassword'}),
-    },
-  ];
 
   const handleUploadImage = async () => {
     const {formData} = await uploadImageFromGallery({
@@ -176,7 +161,6 @@ const Profile: React.FC = () => {
       </Overlay>
       <HeaderWithTextButton
         title={'Account'}
-        tabs={tabs}
         enableBackButton={true}
         activeTabName={'プロフィール編集'}
       />
