@@ -3,12 +3,13 @@ import { GetSignedUrlConfig, Storage } from '@google-cloud/storage';
 import { ConfigService } from '@nestjs/config';
 import { genStorageURL } from 'src/utils/storage/genStorageURL';
 import { genSignedURL } from 'src/utils/storage/genSignedURL';
+import { APP_DIRNAME } from 'src/var';
 
 @Injectable()
 export class StorageService {
   constructor(private readonly configService: ConfigService) {}
   private readonly storage = new Storage({
-    keyFilename: __dirname + '../../../cloud_storage.json',
+    keyFilename: APP_DIRNAME + '/cloud_storage.json',
   });
 
   public async genSignedURLForRead(urls: string[]) {
@@ -42,7 +43,7 @@ export class StorageService {
 
   public async upload(files: Express.Multer.File[]) {
     const storage = new Storage({
-      keyFilename: __dirname + '../../../cloud_storage.json',
+      keyFilename: APP_DIRNAME + '/cloud_storage.json',
     });
     const bucket = storage.bucket(
       this.configService.get('CLOUD_STORAGE_BUCKET'),

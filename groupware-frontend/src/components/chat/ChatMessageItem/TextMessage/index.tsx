@@ -1,5 +1,5 @@
 import UserAvatar from '@/components/common/UserAvatar';
-import { Box, Text, Textarea, useMediaQuery } from '@chakra-ui/react';
+import { Box, Text, Textarea, useMediaQuery, Image } from '@chakra-ui/react';
 import React, { ReactNode, useEffect, useState } from 'react';
 import { ChatMessage, ChatMessageType } from 'src/types';
 import { darkFontColor } from 'src/utils/colors';
@@ -10,8 +10,12 @@ import Linkify from 'react-linkify';
 import { componentDecorator } from 'src/utils/componentDecorator';
 import { useAPIUpdateChatMessage } from '@/hooks/api/chat/useAPIUpdateChatMessage';
 import { socket } from '../../ChatBox/socket';
+import { reactionStickers } from '../../../../utils/reactionStickers';
+import NextImage from 'next/image';
+import noImage from '@/public/no-image.jpg';
 
 type TextMessageProps = {
+  focusTextareaRef?: React.RefObject<HTMLTextAreaElement>;
   message: ChatMessage;
   confirmedSearchWord: string;
   searchedResultIds?: (number | undefined)[];
@@ -20,6 +24,7 @@ type TextMessageProps = {
 };
 
 const TextMessage: React.FC<TextMessageProps> = ({
+  focusTextareaRef,
   message,
   confirmedSearchWord,
   searchedResultIds,
@@ -112,11 +117,78 @@ const TextMessage: React.FC<TextMessageProps> = ({
               cursor="pointer"
               user={message.replyParentMessage.sender}
             />
-            <Box width={'90%'}>
+            <Box width={'50%'}>
               <Text fontWeight="bold">
                 {userNameFactory(message.replyParentMessage?.sender)}
               </Text>
               <Text>{replyContent(message.replyParentMessage)}</Text>
+            </Box>
+            <Box>
+              {message.replyParentMessage.type === ChatMessageType.IMAGE ? (
+                message?.replyParentMessage?.content ? (
+                  <Image
+                    loading="lazy"
+                    src={message.replyParentMessage.content}
+                    w={'100'}
+                    h={'100'}
+                    objectFit={'contain'}
+                    alt="表示できない画像"
+                  />
+                ) : (
+                  <NextImage
+                    width="70"
+                    height="70"
+                    src={noImage}
+                    alt="表示できない画像"
+                  />
+                )
+              ) : message.replyParentMessage.type === ChatMessageType.VIDEO ? (
+                message?.replyParentMessage?.content ? (
+                  <video
+                    style={{
+                      maxHeight: '100px',
+                      width: '100px',
+                      objectFit: 'contain',
+                    }}
+                    controls={false}
+                    muted>
+                    <source
+                      src={message.replyParentMessage.content}
+                      type="video/mp4"
+                    />
+                  </video>
+                ) : (
+                  <NextImage
+                    width="70"
+                    height="70"
+                    src={noImage}
+                    alt="表示できない動画"
+                  />
+                )
+              ) : message.replyParentMessage.type ===
+                ChatMessageType.STICKER ? (
+                message?.replyParentMessage?.content ? (
+                  <Image
+                    loading="lazy"
+                    src={
+                      reactionStickers.find(
+                        (s) => s.name === message?.replyParentMessage?.content,
+                      )?.src
+                    }
+                    w={'100%'}
+                    h={'100'}
+                    objectFit={'contain'}
+                    alt="表示できない画像"
+                  />
+                ) : (
+                  <NextImage
+                    width="70"
+                    height="70"
+                    src={noImage}
+                    alt="表示できない画像"
+                  />
+                )
+              ) : null}
             </Box>
           </Box>
         )}
@@ -137,6 +209,7 @@ const TextMessage: React.FC<TextMessageProps> = ({
         ) : (
           <>
             <Textarea
+              ref={focusTextareaRef}
               borderRadius="8px"
               maxW={'40vw'}
               minW={'10vw'}

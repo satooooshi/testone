@@ -77,54 +77,24 @@ export class ChatService {
     return !!isUserBelongToGroup;
   }
 
+  private throwExceptionWhenUserNotExist(user: User) {
+    if (!user.existence) {
+      throw new BadRequestException('The user does not exist');
+    }
+  }
+
   public async calleeForPhoneCall(calleeId: string) {
     const user = await this.userRepository.findOne(calleeId);
     return user;
-  }
-
-  public async getChatGroup(userID: number): Promise<ChatGroup[]> {
-    const groups = await this.chatGroupRepository
-      .createQueryBuilder('chat_groups')
-      .innerJoinAndSelect('chat_groups.members', 'member')
-      .where('member.id = :memberId', { memberId: userID })
-      .getMany();
-    const groupIDs = groups.map((g) => g.id);
-    let groupsAndUsers = await this.chatGroupRepository.find({
-      where: { id: In(groupIDs) },
-      relations: [
-        'members',
-        'lastReadChatTime',
-        'lastReadChatTime.user',
-        'pinnedUsers',
-      ],
-      order: { updatedAt: 'DESC' },
-    });
-    groupsAndUsers = groupsAndUsers.map((g) => {
-      const isPinned = !!g.pinnedUsers.filter((u) => u.id === userID).length;
-      const hasBeenRead = g?.lastReadChatTime?.[0]?.readTime
-        ? g?.lastReadChatTime?.[0]?.readTime > g.updatedAt
-        : false;
-      return {
-        ...g,
-        pinnedUsers: undefined,
-        isPinned,
-        hasBeenRead,
-      };
-    });
-    groupsAndUsers = orderBy(groupsAndUsers, [
-      'isPinned',
-      'updatedAt',
-      ['desc', 'desc'],
-    ]).reverse();
-    return groupsAndUsers;
   }
 
   public async getRoomsId(userID: number): Promise<ChatGroup[]> {
     return await this.chatGroupRepository
       .createQueryBuilder('chat_groups')
       .select(['chat_groups.id'])
-      .innerJoin('chat_groups.members', 'member')
-      .where('member.id = :memberId', { memberId: userID })
+      .innerJoin('chat_groups.members', 'member', 'member.id = :memberId', {
+        memberId: userID,
+      })
       .getMany();
   }
 
@@ -152,14 +122,14 @@ export class ChatService {
 
     const urlUnparsedRooms = await this.chatGroupRepository
       .createQueryBuilder('chat_groups')
-      .innerJoin('chat_groups.members', 'member', 'member.id = :memberId', {
-        memberId: userID,
-      })
-      .where(
+      .innerJoin(
+        'chat_groups.members',
+        'member',
         !!updatedAtLatestRoom
-          ? `chat_groups.updatedAt > :updatedAtLatestRoom`
-          : '1=1',
+          ? `member.id = :memberId AND chat_groups.updatedAt > :updatedAtLatestRoom`
+          : 'member.id = :memberId',
         {
+          memberId: userID,
           updatedAtLatestRoom,
         },
       )
@@ -385,41 +355,6 @@ export class ChatService {
 
     return room;
   }
-  // public async getRoomsUnreadChatCount(userID: number): Promise<ChatGroup[]> {
-  //   const [urlUnparsedRooms] = await this.chatGroupRepository
-  //     .createQueryBuilder('chat_groups')
-  //     .leftJoin('chat_groups.members', 'member')
-  //     .leftJoinAndSelect(
-  //       'chat_groups.lastReadChatTime',
-  //       'lastReadChatTime',
-  //       'lastReadChatTime.user_id = :userID',
-  //       { userID },
-  //     )
-  //     .where('member.id = :memberId', { memberId: userID })
-  //     .orderBy('chat_groups.updatedAt', 'DESC')
-  //     .getManyAndCount();
-  //   const rooms = await Promise.all(
-  //     urlUnparsedRooms.map(async (g) => {
-  //       let unreadCount = 0;
-  //       const hasBeenRead = g?.lastReadChatTime?.[0]?.readTime
-  //         ? g?.lastReadChatTime?.[0]?.readTime > g.updatedAt
-  //         : false;
-  //       if (!hasBeenRead && g?.lastReadChatTime?.[0]?.readTime) {
-  //         const query = {
-  //           group: g.id,
-  //           lastReadTime: g.lastReadChatTime?.[0].readTime,
-  //         };
-  //         unreadCount = await this.getUnreadChatMessage(userID, query);
-  //       }
-
-  //       return {
-  //         ...g,
-  //         unreadCount,
-  //       };
-  //     }),
-  //   );
-  //   return rooms;
-  // }
 
   public async getChatMessage(
     userID: number,
@@ -519,11 +454,15 @@ export class ChatService {
     if (replyMessageIDs.length) {
       replyMessages = await this.chatMessageRepository
         .createQueryBuilder('messages')
-        .leftJoin('messages.sender', 'sender')
+        .leftJoin(
+          'messages.sender',
+          'sender',
+          'messages.id IN (:...replyMessageIDs)',
+          {
+            replyMessageIDs,
+          },
+        )
         .addSelect(selectUserColumns('sender'))
-        .where('messages.id IN (:...replyMessageIDs)', {
-          replyMessageIDs,
-        })
         .getMany();
     }
 
@@ -581,32 +520,32 @@ export class ChatService {
     return messages;
   }
 
-  public async getExpiredUrlMessages(query: number): Promise<ChatMessage[]> {
-    const date = new Date();
-    date.setDate(date.getDate() - 5);
-    const justBeforeExpiredUrlMessages = await this.chatMessageRepository
-      .createQueryBuilder('chat_messages')
-      .leftJoinAndSelect('chat_messages.chatGroup', 'chat_group')
-      .where('chat_group.id = :chatGroupID', { chatGroupID: query })
-      .andWhere(
-        'chat_messages.type <> :text AND chat_messages.type <> :system AND chat_messages.type <> :sticker AND chat_messages.type <> :call',
-        {
-          text: ChatMessageType.TEXT,
-          system: ChatMessageType.SYSTEM_TEXT,
-          sticker: ChatMessageType.STICKER,
-          call: ChatMessageType.CALL,
-        },
-      )
-      .andWhere('chat_messages.updatedAt < :fiveDaysAgo', {
-        fiveDaysAgo: date,
-      })
-      .orderBy('chat_messages.createdAt', 'DESC')
-      .getMany();
-    for (const m of justBeforeExpiredUrlMessages) {
-      await this.chatMessageRepository.save({ ...m, updatedAt: new Date() });
-    }
-    return justBeforeExpiredUrlMessages;
-  }
+  // public async getExpiredUrlMessages(query: number): Promise<ChatMessage[]> {
+  //   const date = new Date();
+  //   date.setDate(date.getDate() - 5);
+  //   const justBeforeExpiredUrlMessages = await this.chatMessageRepository
+  //     .createQueryBuilder('chat_messages')
+  //     .leftJoinAndSelect('chat_messages.chatGroup', 'chat_group')
+  //     .where('chat_group.id = :chatGroupID', { chatGroupID: query })
+  //     .andWhere(
+  //       'chat_messages.type <> :text AND chat_messages.type <> :system AND chat_messages.type <> :sticker AND chat_messages.type <> :call',
+  //       {
+  //         text: ChatMessageType.TEXT,
+  //         system: ChatMessageType.SYSTEM_TEXT,
+  //         sticker: ChatMessageType.STICKER,
+  //         call: ChatMessageType.CALL,
+  //       },
+  //     )
+  //     .andWhere('chat_messages.updatedAt < :fiveDaysAgo', {
+  //       fiveDaysAgo: date,
+  //     })
+  //     .orderBy('chat_messages.createdAt', 'DESC')
+  //     .getMany();
+  //   for (const m of justBeforeExpiredUrlMessages) {
+  //     await this.chatMessageRepository.save({ ...m, updatedAt: new Date() });
+  //   }
+  //   return justBeforeExpiredUrlMessages;
+  // }
 
   public async getUnreadChatMessage(
     userID: number,
@@ -685,9 +624,10 @@ export class ChatService {
     const lastReadChatTimes = await this.lastReadChatTimeRepository
       .createQueryBuilder('time')
       // .withDeleted()
-      .innerJoin('time.user', 'user')
+      .innerJoin('time.user', 'user', 'time.chat_group_id = :roomId', {
+        roomId: chatGroupId,
+      })
       .addSelect(selectUserColumns('user'))
-      .where('time.chat_group_id = :roomId', { roomId: chatGroupId })
       .getMany();
     if (!lastReadChatTimes.length) {
       return;
@@ -813,7 +753,6 @@ export class ChatService {
       (m) => m.id === user.id,
     ).length;
     if (isUserJoining) {
-      console.log('The user is already participant');
       return;
     }
     targetGroup.members.push(user);
@@ -830,21 +769,17 @@ export class ChatService {
     );
   }
 
-  public async leaveChatRoom(userID: number, chatGroupID: number) {
-    const containMembers: ChatGroup = await this.chatGroupRepository.findOne({
-      where: { id: chatGroupID },
-      relations: ['members'],
-    });
-    const targetGroup = await this.chatGroupRepository.findOne(chatGroupID);
-    const user = await this.userRepository.findOne(userID);
+  public async leaveChatRoom(user: User, chatGroupID: number) {
+    this.throwExceptionWhenUserNotExist(user);
 
-    if (containMembers?.members.length) {
-      const isUserJoining = containMembers.members.filter(
-        (m) => m.id === userID,
-      ).length;
-      if (!isUserJoining) {
-        throw new BadRequestException('The user is not participant');
-      }
+    const manager = getManager();
+    const isUserJoining = !!(await manager.query(
+      'select user_id from user_chat_joining where user_id = ? AND chat_group_id = ?',
+      [user.id, chatGroupID],
+    ));
+
+    if (!isUserJoining) {
+      throw new BadRequestException('The user is not participant');
     }
 
     await this.chatGroupRepository
@@ -857,19 +792,56 @@ export class ChatService {
       .createQueryBuilder()
       .relation(ChatGroup, 'members')
       .of(chatGroupID)
-      .remove(userID);
+      .remove(user.id);
     await this.chatGroupRepository
       .createQueryBuilder()
       .relation(ChatGroup, 'previousMembers')
       .of(chatGroupID)
-      .add(userID);
+      .add(user.id);
     const systemMessage = new ChatMessage();
     const userName = userNameFactory(user);
     systemMessage.content = `${userName}さんが退出しました`;
     systemMessage.type = ChatMessageType.SYSTEM_TEXT;
-    systemMessage.createdAt = new Date();
-    systemMessage.chatGroup = targetGroup;
-    await this.chatMessageRepository.save(systemMessage);
+    await this.chatMessageRepository.save({
+      ...systemMessage,
+      chatGroup: { id: chatGroupID },
+    });
+  }
+
+  public async leaveAllRooms(user: User) {
+    this.throwExceptionWhenUserNotExist(user);
+
+    const manager = getManager();
+    const joinedAllRooms = await manager.query(
+      'select chat_group_id from user_chat_joining where user_id = ?',
+      [user.id],
+    );
+
+    const roomsIds: number[] = joinedAllRooms.map((r) =>
+      Number(r.chat_group_id),
+    );
+    if (!roomsIds.length) {
+      return;
+    }
+    await this.chatGroupRepository
+      .createQueryBuilder()
+      .update(ChatGroup)
+      .set({ memberCount: () => 'member_count - 1' })
+      .where('id IN (:...ids)', { ids: roomsIds })
+      .execute();
+    await manager.query('DELETE from user_chat_joining where user_id = ?', [
+      user.id,
+    ]);
+    for (const chatGroupID of roomsIds) {
+      const systemMessage = new ChatMessage();
+      const userName = userNameFactory(user);
+      systemMessage.content = `${userName}さんが退出しました`;
+      systemMessage.type = ChatMessageType.SYSTEM_TEXT;
+      await this.chatMessageRepository.save({
+        ...systemMessage,
+        chatGroup: { id: chatGroupID },
+      });
+    }
   }
 
   public async editChatMembers(roomId: number, members: User[]) {
@@ -933,9 +905,19 @@ export class ChatService {
       throw new InternalServerErrorException('Something went wrong');
     }
 
-    const existGroup = await this.chatGroupRepository.findOne(newData.id, {
-      relations: ['members', 'lastReadChatTime', 'lastReadChatTime.user'],
-    });
+    const existGroup = await this.chatGroupRepository
+      .createQueryBuilder('group')
+      .where('group.id = :id', { id: chatGroup.id })
+      .getOne();
+    if (!existGroup) {
+      throw new BadRequestException('The group does not exist');
+    }
+    const manager = getManager();
+    existGroup.members = await manager.query(
+      'select users.id as id ,users.last_name as lastName, users.first_name as firstName from user_chat_joining INNER JOIN users ON users.existence is not null AND users.id = user_id AND chat_group_id = ?',
+      [existGroup.id],
+    );
+
     let isMySelf = false;
     const otherExistMembers = existGroup.members.filter((u) => {
       if (u.id === requestUser.id) {
@@ -956,9 +938,8 @@ export class ChatService {
       (newM) => !existGroup.members.map((m) => m.id).includes(newM.id),
     );
     if (removedMembers.length || newMembers.length) {
-      const manager = getManager();
       const previousMembers: User[] = await manager.query(
-        'select users.id as id, users.last_name as lastName, users.existence as existence from user_chat_leaving INNER JOIN users ON users.existence is not null AND users.id = user_id AND chat_group_id = ?',
+        'select users.id as id, users.last_name as lastName, users.first_name as firstName, users.existence as existence from user_chat_leaving INNER JOIN users ON users.existence is not null AND users.id = user_id AND chat_group_id = ?',
         [existGroup.id],
       );
 
@@ -1060,7 +1041,12 @@ export class ChatService {
     if (newData.roomType !== RoomType.GROUP) {
       maybeExistGroup = await this.chatGroupRepository
         .createQueryBuilder('g')
-        .innerJoin('g.members', 'u', 'u.id = :userId', { userId: userIds[0] })
+        .innerJoin(
+          'g.members',
+          'u',
+          'u.id = :userId AND g.room_type <> :type AND g.member_count = :length',
+          { userId: userIds[0], type: RoomType.GROUP, length: memberCount },
+        )
         .leftJoin('g.members', 'member')
         .addSelect([
           'member.id',
@@ -1068,24 +1054,22 @@ export class ChatService {
           'member.firstName',
           'member.avatarUrl',
         ])
-        .where('g.room_type <> :type', {
-          type: RoomType.GROUP,
-        })
-        .andWhere('g.member_count = :length', { length: memberCount })
         .getMany();
     } else {
       maybeExistGroup = await this.chatGroupRepository
         .createQueryBuilder('g')
+        .innerJoin(
+          'g.members',
+          'u',
+          'u.id = :userId AND g.room_type = :type AND g.member_count = :length',
+          { userId: userIds[0], type: RoomType.GROUP, length: memberCount },
+        )
         .innerJoin('g.members', 'u', 'u.id = :userId', { userId: userIds[0] })
         .leftJoin('g.members', 'member')
         .addSelect(['member.id'])
         .where('g.name = :name', {
           name: newData.name,
         })
-        .andWhere('g.room_type = :type', {
-          type: RoomType.GROUP,
-        })
-        .andWhere('g.member_count = :length', { length: memberCount })
         .getMany();
     }
 
@@ -1181,20 +1165,21 @@ export class ChatService {
       'select  users.id as id, users.last_name as lastName, users.first_name as firstName, users.avatar_url as avatarUrl, users.existence as existence from user_chat_joining INNER JOIN users ON users.existence is not null AND users.id = user_id AND chat_group_id = ?',
       [roomId],
     );
-    // const previousMembers: User[] = await manager.query(
-    //   'select users.id as id, users.last_name as lastName, users.first_name as firstName, users.avatar_url as avatarUrl, users.existence as existence from user_chat_leaving INNER JOIN users ON users.existence is not null AND users.id = user_id AND chat_group_id = ?',
-    //   [roomId],
-    // );
+    const previousMembers: User[] = await manager.query(
+      'select users.id as id, users.last_name as lastName, users.first_name as firstName, users.avatar_url as avatarUrl, users.existence as existence from user_chat_leaving INNER JOIN users ON users.existence is not null AND users.id = user_id AND chat_group_id = ?',
+      [roomId],
+    );
 
     // existRoom.previousMembers = previousMembers;
     checkAloneRoom(existRoom, userId);
-    existRoom.imageURL = await genSignedURL(existRoom.imageURL);
-    existRoom.members = await Promise.all(
-      members.map(async (m) => ({
-        ...m,
-        avatarUrl: await genSignedURL(m.avatarUrl),
-      })),
-    );
+    existRoom.members = members;
+    // existRoom.imageURL = await genSignedURL(existRoom.imageURL);
+    // existRoom.members = await Promise.all(
+    //   members.map(async (m) => ({
+    //     ...m,
+    //     avatarUrl: await genSignedURL(m.avatarUrl),
+    //   })),
+    // );
 
     return existRoom;
   }

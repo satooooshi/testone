@@ -56,6 +56,7 @@ const triggersConfig: TriggersConfig<'mention'> = {
 };
 
 type ChatFooterProps = {
+  inputRef?: React.RefObject<TextInput>;
   text: string | undefined;
   onChangeText: (text: string) => void;
   onUploadFile: () => void;
@@ -69,7 +70,8 @@ type ChatFooterProps = {
 };
 
 const ChatFooter: React.FC<ChatFooterProps> = ({
-  text: text,
+  text,
+  inputRef,
   onChangeText,
   onUploadFile,
   onUploadVideo,
@@ -173,6 +175,7 @@ const ChatFooter: React.FC<ChatFooterProps> = ({
           rounded="md"
           w="60%">
           <TextInput
+            ref={inputRef}
             placeholder="メッセージを入力"
             placeholderTextColor="#868596"
             multiline
