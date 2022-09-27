@@ -112,6 +112,7 @@ const eventTitleText = {
   [EventType.COACH]: 'コーチ制度',
   [EventType.CLUB]: '部活動',
   [EventType.SUBMISSION_ETC]: '提出物等',
+  [EventType.OTHER]: 'その他',
 };
 
 type EventListGetParams = SearchQueryToGetEvents & {
@@ -247,6 +248,9 @@ const EventList = () => {
     if (type === EventType.SUBMISSION_ETC) {
       return EventTab.SUBMISSION_ETC;
     }
+    if (type === EventType.OTHER) {
+      return EventTab.OTHER;
+    }
     return EventTab.ALL;
   };
 
@@ -315,6 +319,8 @@ const EventList = () => {
         return { style: { backgroundColor: '#f56565' } };
       case EventType.SUBMISSION_ETC:
         return { style: { backgroundColor: '#086f83' } };
+      case EventType.OTHER:
+        return { style: { backgroundColor: '#a9a9a9' } };
     }
   };
 

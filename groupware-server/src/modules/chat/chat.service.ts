@@ -77,6 +77,12 @@ export class ChatService {
     return !!isUserBelongToGroup;
   }
 
+  private throwExceptionWhenUserNotExist(user: User) {
+    if (!user.existence) {
+      throw new BadRequestException('The user does not exist');
+    }
+  }
+
   public async calleeForPhoneCall(calleeId: string) {
     const user = await this.userRepository.findOne(calleeId);
     return user;
@@ -132,10 +138,10 @@ export class ChatService {
     userID: number,
     query: GetChaRoomsByPageQuery,
   ): Promise<GetRoomsResult> {
-    const { page, limit = '20' } = query;
+    const { page, limit = '100' } = query;
 
     let offset = 0;
-    const limitNumber = Number(limit);
+    const limitNumber = Number('100');
     if (page) {
       offset = (Number(page) - 1) * limitNumber;
     }
@@ -169,7 +175,7 @@ export class ChatService {
       .getMany();
 
     if (!urlUnparsedRooms.length) {
-      return { rooms: urlUnparsedRooms, pageCount: 0 };
+      return { rooms: urlUnparsedRooms, gotAllRooms: true };
     }
 
     const roomIds = urlUnparsedRooms.map((r) => r.id);
@@ -298,9 +304,8 @@ export class ChatService {
     //     endTime - startTime,
     //   );
     // }
-    const pageCount = Number(page);
 
-    return { rooms, pageCount };
+    return { rooms, gotAllRooms: rooms.length < limitNumber };
   }
 
   public async getOneRoom(userID: number, roomId: number): Promise<ChatGroup> {
@@ -564,7 +569,7 @@ export class ChatService {
           m.type === ChatMessageType.VIDEO ||
           m.type === ChatMessageType.OTHER_FILE
         ) {
-          m.content = await genSignedURL(m.content);
+          m.content = await genStorageURL(m.content);
         }
         return m;
       }),
@@ -808,7 +813,6 @@ export class ChatService {
       (m) => m.id === user.id,
     ).length;
     if (isUserJoining) {
-      console.log('The user is already participant');
       return;
     }
     targetGroup.members.push(user);
@@ -825,21 +829,17 @@ export class ChatService {
     );
   }
 
-  public async leaveChatRoom(userID: number, chatGroupID: number) {
-    const containMembers: ChatGroup = await this.chatGroupRepository.findOne({
-      where: { id: chatGroupID },
-      relations: ['members'],
-    });
-    const targetGroup = await this.chatGroupRepository.findOne(chatGroupID);
-    const user = await this.userRepository.findOne(userID);
+  public async leaveChatRoom(user: User, chatGroupID: number) {
+    this.throwExceptionWhenUserNotExist(user);
 
-    if (containMembers?.members.length) {
-      const isUserJoining = containMembers.members.filter(
-        (m) => m.id === userID,
-      ).length;
-      if (!isUserJoining) {
-        throw new BadRequestException('The user is not participant');
-      }
+    const manager = getManager();
+    const isUserJoining = !!(await manager.query(
+      'select user_id from user_chat_joining where user_id = ? AND chat_group_id = ?',
+      [user.id, chatGroupID],
+    ));
+
+    if (!isUserJoining) {
+      throw new BadRequestException('The user is not participant');
     }
 
     await this.chatGroupRepository
@@ -852,19 +852,56 @@ export class ChatService {
       .createQueryBuilder()
       .relation(ChatGroup, 'members')
       .of(chatGroupID)
-      .remove(userID);
+      .remove(user.id);
     await this.chatGroupRepository
       .createQueryBuilder()
       .relation(ChatGroup, 'previousMembers')
       .of(chatGroupID)
-      .add(userID);
+      .add(user.id);
     const systemMessage = new ChatMessage();
     const userName = userNameFactory(user);
     systemMessage.content = `${userName}さんが退出しました`;
     systemMessage.type = ChatMessageType.SYSTEM_TEXT;
-    systemMessage.createdAt = new Date();
-    systemMessage.chatGroup = targetGroup;
-    await this.chatMessageRepository.save(systemMessage);
+    await this.chatMessageRepository.save({
+      ...systemMessage,
+      chatGroup: { id: chatGroupID },
+    });
+  }
+
+  public async leaveAllRooms(user: User) {
+    this.throwExceptionWhenUserNotExist(user);
+
+    const manager = getManager();
+    const joinedAllRooms = await manager.query(
+      'select chat_group_id from user_chat_joining where user_id = ?',
+      [user.id],
+    );
+
+    const roomsIds: number[] = joinedAllRooms.map((r) =>
+      Number(r.chat_group_id),
+    );
+    if (!roomsIds.length) {
+      return;
+    }
+    await this.chatGroupRepository
+      .createQueryBuilder()
+      .update(ChatGroup)
+      .set({ memberCount: () => 'member_count - 1' })
+      .where('id IN (:...ids)', { ids: roomsIds })
+      .execute();
+    await manager.query('DELETE from user_chat_joining where user_id = ?', [
+      user.id,
+    ]);
+    for (const chatGroupID of roomsIds) {
+      const systemMessage = new ChatMessage();
+      const userName = userNameFactory(user);
+      systemMessage.content = `${userName}さんが退出しました`;
+      systemMessage.type = ChatMessageType.SYSTEM_TEXT;
+      await this.chatMessageRepository.save({
+        ...systemMessage,
+        chatGroup: { id: chatGroupID },
+      });
+    }
   }
 
   public async editChatMembers(roomId: number, members: User[]) {
@@ -928,9 +965,19 @@ export class ChatService {
       throw new InternalServerErrorException('Something went wrong');
     }
 
-    const existGroup = await this.chatGroupRepository.findOne(newData.id, {
-      relations: ['members', 'lastReadChatTime', 'lastReadChatTime.user'],
-    });
+    const existGroup = await this.chatGroupRepository
+      .createQueryBuilder('group')
+      .where('group.id = :id', { id: chatGroup.id })
+      .getOne();
+    if (!existGroup) {
+      throw new BadRequestException('The group does not exist');
+    }
+    const manager = getManager();
+    existGroup.members = await manager.query(
+      'select users.id as id ,users.last_name as lastName, users.first_name as firstName from user_chat_joining INNER JOIN users ON users.existence is not null AND users.id = user_id AND chat_group_id = ?',
+      [existGroup.id],
+    );
+
     let isMySelf = false;
     const otherExistMembers = existGroup.members.filter((u) => {
       if (u.id === requestUser.id) {
@@ -951,12 +998,10 @@ export class ChatService {
       (newM) => !existGroup.members.map((m) => m.id).includes(newM.id),
     );
     if (removedMembers.length || newMembers.length) {
-      const manager = getManager();
       const previousMembers: User[] = await manager.query(
-        'select users.id as id, users.last_name as lastName, users.existence as existence from user_chat_leaving INNER JOIN users ON users.existence is not null AND users.id = user_id AND chat_group_id = ?',
+        'select users.id as id, users.last_name as lastName, users.first_name as firstName, users.existence as existence from user_chat_leaving INNER JOIN users ON users.existence is not null AND users.id = user_id AND chat_group_id = ?',
         [existGroup.id],
       );
-      console.log('previousMembers----', previousMembers);
 
       existGroup.previousMembers = previousMembers.filter(
         (newM) => !newMembers.map((m) => m.id).includes(newM.id),
@@ -968,6 +1013,11 @@ export class ChatService {
         ];
       }
     }
+
+    if (existGroup.name !== newData.name) {
+      existGroup.roomType = RoomType.GROUP;
+    }
+
     const newGroup = await this.chatGroupRepository.save({
       ...existGroup,
       imageURL: genStorageURL(newData.imageURL),
@@ -1176,11 +1226,17 @@ export class ChatService {
       'select users.id as id, users.last_name as lastName, users.first_name as firstName, users.avatar_url as avatarUrl, users.existence as existence from user_chat_leaving INNER JOIN users ON users.existence is not null AND users.id = user_id AND chat_group_id = ?',
       [roomId],
     );
-    console.log('======left member', members);
 
-    existRoom.members = members;
-    existRoom.previousMembers = previousMembers;
+    // existRoom.previousMembers = previousMembers;
     checkAloneRoom(existRoom, userId);
+    existRoom.members = members;
+    // existRoom.imageURL = await genSignedURL(existRoom.imageURL);
+    // existRoom.members = await Promise.all(
+    //   members.map(async (m) => ({
+    //     ...m,
+    //     avatarUrl: await genSignedURL(m.avatarUrl),
+    //   })),
+    // );
 
     return existRoom;
   }

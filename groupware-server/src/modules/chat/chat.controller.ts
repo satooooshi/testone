@@ -76,7 +76,7 @@ export interface GetRoomsQuery {
 
 export interface GetRoomsResult {
   rooms: ChatGroup[];
-  pageCount: number;
+  gotAllRooms: boolean;
 }
 export interface SaveRoomsResult {
   room: ChatGroup;
@@ -394,9 +394,8 @@ export class ChatController {
     @Req() req: RequestWithUser,
     @Body() chatGroup: Partial<ChatGroup>,
   ) {
-    const { id } = req.user;
     const { id: chatGroupId } = chatGroup;
-    await this.chatService.leaveChatRoom(id, chatGroupId);
+    await this.chatService.leaveChatRoom(req.user, chatGroupId);
     const silentNotification: CustomPushNotificationData = {
       title: '',
       body: '',
