@@ -333,6 +333,7 @@ export class UserService {
       .skip(offset)
       .take(limit)
       .orderBy(sortKey, sortKey === 'user.lastNameKana' ? 'ASC' : 'DESC')
+      .addOrderBy('user.lastNameKana', 'ASC')
       .getManyAndCount();
     // const endTime = Date.now();
     const userIDs = users.map((u) => u.id);
