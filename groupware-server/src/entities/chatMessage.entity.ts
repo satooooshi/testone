@@ -140,24 +140,14 @@ export class ChatMessage {
       } else if (this.type === ChatMessageType.STICKER) {
         content = 'スタンプを送信しました。';
       }
-
-      const atAllMentionRegex = /{@}\[all\]\(0\)/g;
-      let mentionedIds: number[] = [];
-      const isAtAllMention = atAllMentionRegex.test(content);
-      if (isAtAllMention) {
-        mentionedIds = this.chatGroup.members
-          .filter((u) => u.id !== this.sender.id)
-          .map((u) => u.id);
-      } else {
-        const mentionRegex = /{@}\[.*?\]\(([0-9]+)\)/g;
-        let mentionArr = [];
-        while ((mentionArr = mentionRegex.exec(content)) !== null) {
-          if (mentionArr[1] && typeof Number(mentionArr[1]) === 'number') {
-            mentionedIds.push(Number(mentionArr[1]));
-          }
+      const mentionRegex = /@\[.*?\]\(([0-9]+)\)/g;
+      const mentionedIds: number[] = [];
+      let mentionArr = [];
+      while ((mentionArr = mentionRegex.exec(content)) !== null) {
+        if (mentionArr[1] && typeof Number(mentionArr[1]) === 'number') {
+          mentionedIds.push(Number(mentionArr[1]));
         }
       }
-
       // console.log(mentionedIds);
       // const allUsers = await getRepository(User)
       //   .createQueryBuilder('user')
