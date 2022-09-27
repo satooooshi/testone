@@ -72,6 +72,7 @@ const UpdatePassword: React.FC = () => {
         title={'Account'}
         tabs={tabs}
         enableBackButton={true}
+        screenForBack={'Menu'}
         activeTabName={'パスワード更新'}
       />
       <Button
