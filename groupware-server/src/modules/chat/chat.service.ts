@@ -529,18 +529,14 @@ export class ChatService {
     if (replyMessageIDs.length) {
       replyMessages = await this.chatMessageRepository
         .createQueryBuilder('messages')
-        .leftJoin(
-          'messages.sender',
-          'sender',
-          'messages.id IN (:...replyMessageIDs',
-          { replyMessageIDs },
-        )
+        .leftJoin('messages.sender', 'sender')
         .addSelect([
           'sender.id',
           'sender.lastName',
           'sender.firstName',
           'sender.existence',
         ])
+        .where('messages.id IN (:...replyMessageIDs)', { replyMessageIDs })
         .getMany();
     }
 
