@@ -62,56 +62,8 @@ const UserRow: React.FC<UserRowProps> = ({user}) => {
   };
   return (
     <>
-      {!deleted ? (
+      {!deleted && (
         <Div my={2} bg="white">
-          {/* <Dropdown {...defaultDropdownProps} ref={dropdownRef}>
-            <Dropdown.Option
-              {...defaultDropdownOptionProps}
-              value={UserRole.ADMIN}
-              onPress={() => {
-                updateUser({...currentUser, role: UserRole.ADMIN});
-              }}>
-              {userRoleNameFactory(UserRole.ADMIN)}
-            </Dropdown.Option>
-            <Dropdown.Option
-              {...defaultDropdownOptionProps}
-              value={UserRole.COMMON}
-              onPress={() => {
-                updateUser({...currentUser, role: UserRole.COMMON});
-              }}>
-              {userRoleNameFactory(UserRole.COMMON)}
-            </Dropdown.Option>
-            <Dropdown.Option
-              {...defaultDropdownOptionProps}
-              value={UserRole.COACH}
-              onPress={() => {
-                updateUser({...currentUser, role: UserRole.COACH});
-              }}>
-              {userRoleNameFactory(UserRole.COACH)}
-            </Dropdown.Option>
-            <Dropdown.Option
-              {...defaultDropdownOptionProps}
-              value={UserRole.INTERNAL_INSTRUCTOR}
-              onPress={() => {
-                updateUser({
-                  ...currentUser,
-                  role: UserRole.INTERNAL_INSTRUCTOR,
-                });
-              }}>
-              {userRoleNameFactory(UserRole.INTERNAL_INSTRUCTOR)}
-            </Dropdown.Option>
-            <Dropdown.Option
-              {...defaultDropdownOptionProps}
-              value={UserRole.EXTERNAL_INSTRUCTOR}
-              onPress={() => {
-                updateUser({
-                  ...currentUser,
-                  role: UserRole.EXTERNAL_INSTRUCTOR,
-                });
-              }}>
-              {userRoleNameFactory(UserRole.EXTERNAL_INSTRUCTOR)}
-            </Dropdown.Option>
-          </Dropdown> */}
           <Div flexDir="row" p="md" w={'100%'} alignItems="center" minH={40}>
             <Div flexDir="row" flex={1} alignItems="center">
               <TouchableOpacity
@@ -124,78 +76,33 @@ const UserRow: React.FC<UserRowProps> = ({user}) => {
                 }>
                 <UserAvatar w={'100%'} h={'100%'} user={user} />
               </TouchableOpacity>
-              <Text w={'29%'} mr={'1%'}>{`${userNameFactory(user)}\n${
-                currentUser.email
-              }`}</Text>
-              <Div w={'24%'} mr={'1%'}>
-                <DropdownOpenerButton
-                  onPress={() => {
-                    dropdownRef.current?.open();
-                  }}
-                  name={userRoleNameFactory(currentUser.role)}
-                  fontSize={11}
-                />
-              </Div>
-              <Div mr={8}>
-                <TouchableOpacity
-                  onPress={() =>
-                    navigation.navigate('AdminStack', {
-                      screen: 'attendance',
-                      params: {id: currentUser.id},
-                    })
-                  }>
-                  <Icon
-                    name="time-outline"
-                    fontSize={23}
-                    color="red900"
-                    fontFamily="Ionicons"
-                  />
-                </TouchableOpacity>
-              </Div>
-              <Div mr={8}>
-                <TouchableOpacity
-                  style={userAdminStyles.avatar}
-                  onPress={() =>
-                    navigation.navigate('AccountStack', {
-                      screen: 'AccountDetail',
-                      params: {id: currentUser.id},
-                    })
-                  }>
-                  <UserAvatar w={'100%'} h={'100%'} user={user} />
-                  <Icon
-                    name="pen"
-                    fontFamily={'FontAwesome5'}
-                    fontSize={23}
-                    color={blueColor}
-                  />
-                </TouchableOpacity>
-                <Div ml={10} flex={1}>
-                  <Div flexDir="row" alignItems="center">
-                    <Text mr={4} fontSize={16}>
-                      {userNameFactory(user)}
-                    </Text>
-                    {user.tags ? (
-                      <FlatList
-                        horizontal
-                        data={user.tags || []}
-                        renderItem={({item: t}) => (
-                          <Tag
-                            fontSize={'xs'}
-                            ml={4}
-                            bg={tagColorFactory(t.type)}>
-                            <Text fontSize={10} color="white">
-                              {t.name}
-                            </Text>
-                          </Tag>
-                        )}
-                      />
-                    ) : null}
-                  </Div>
-                  <Text fontSize={12} mt={4}>
-                    {currentUser.email}
+              <Div ml={10} flex={1}>
+                <Div flexDir="row" alignItems="center">
+                  <Text mr={4} fontSize={16}>
+                    {userNameFactory(user)}
                   </Text>
+                  {user.tags ? (
+                    <FlatList
+                      horizontal
+                      data={user.tags || []}
+                      renderItem={({item: t}) => (
+                        <Tag
+                          fontSize={'xs'}
+                          ml={4}
+                          bg={tagColorFactory(t.type)}>
+                          <Text fontSize={10} color="white">
+                            {t.name}
+                          </Text>
+                        </Tag>
+                      )}
+                    />
+                  ) : null}
                 </Div>
-                {/* <Div w={'28%'} mr={'1%'}>
+                <Text fontSize={12} mt={4}>
+                  {currentUser.email}
+                </Text>
+              </Div>
+              {/* <Div w={'28%'} mr={'1%'}>
               <DropdownOpenerButton
               onPress={() => {
                 dropdownRef.current?.open();
@@ -204,31 +111,23 @@ const UserRow: React.FC<UserRowProps> = ({user}) => {
               fontSize={13}
               />
             </Div> */}
-              </Div>
-              <Div flexDir="row" alignItems="center">
-                <Div m={10}>
-                  <TouchableOpacity
-                    onPress={() =>
-                      navigation.navigate('AdminStack', {
-                        screen: 'EditedProfile',
-                        params: {id: currentUser.id},
-                      })
-                    }>
-                    <Icon
-                      name="pen"
-                      fontFamily={'FontAwesome5'}
-                      fontSize={22}
-                      color={blueColor}
-                    />
-                  </TouchableOpacity>
-                </Div>
-                {!loadingDelete ? (
-                  <TouchableOpacity onPress={() => handleDeleteUser(user)}>
-                    <Icon name="delete" fontSize={22} color="tomato" />
-                  </TouchableOpacity>
-                ) : (
-                  <ActivityIndicator />
-                )}
+            </Div>
+            <Div flexDir="row" alignItems="center">
+              <Div m={10}>
+                <TouchableOpacity
+                  onPress={() =>
+                    navigation.navigate('AdminStack', {
+                      screen: 'EditedProfile',
+                      params: {id: currentUser.id},
+                    })
+                  }>
+                  <Icon
+                    name="pen"
+                    fontFamily={'FontAwesome5'}
+                    fontSize={22}
+                    color={blueColor}
+                  />
+                </TouchableOpacity>
               </Div>
               {!loadingDelete ? (
                 <TouchableOpacity onPress={() => handleDeleteUser(user)}>
@@ -240,7 +139,7 @@ const UserRow: React.FC<UserRowProps> = ({user}) => {
             </Div>
           </Div>
         </Div>
-      ) : null}
+      )}
     </>
   );
 };
