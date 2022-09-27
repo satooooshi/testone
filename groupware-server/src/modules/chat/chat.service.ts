@@ -497,8 +497,25 @@ export class ChatService {
     }
     // const endTime = Date.now();
     const messageIDs = existMessages.map((m) => m.id);
+    const senderIDs = [
+      ...new Set(existMessages.map((m) => Number(m.sender_id))),
+    ];
     const replyMessageIDs = existMessages.map((m) => m.reply_parent_id);
 
+    // senderの取得
+    let senders: User[] = [];
+    if (senderIDs.length) {
+      senders = await this.userRepository
+        .createQueryBuilder('users')
+        .select([
+          'users.id',
+          'users.lastName',
+          'users.firstName',
+          'users.existence',
+        ])
+        .where('users.id IN (:...senderIDs)', { senderIDs })
+        .getMany();
+    }
     //リアクションの取得
     const reactions = await this.chatMessageReactionRepository
       .createQueryBuilder('reactions')
@@ -512,26 +529,28 @@ export class ChatService {
     if (replyMessageIDs.length) {
       replyMessages = await this.chatMessageRepository
         .createQueryBuilder('messages')
-        .select([
-          'messages.id as id',
-          'messages.content as content',
-          'messages.type as type',
-          'messages.call_time as callTime',
-          'messages.file_name as fileName',
-          'messages.sender_id as sender_id',
-          'messages.chat_group_id as chat_group_id',
+        .leftJoin(
+          'messages.sender',
+          'sender',
+          'messages.id IN (:...replyMessageIDs',
+          { replyMessageIDs },
+        )
+        .addSelect([
+          'sender.id',
+          'sender.lastName',
+          'sender.firstName',
+          'sender.existence',
         ])
-        .where('messages.id IN (:...replyMessageIDs)', {
-          replyMessageIDs,
-        })
-        .getRawMany();
+        .getMany();
     }
 
     const messages: ChatMessage[] = await Promise.all(
       existMessages.map(async (m) => {
         const chatGroup = new ChatGroup();
         m.chatGroup = { ...chatGroup, id: m.chat_group_id };
-        m.sender = { id: m.sender_id } as User;
+        if (senders.length) {
+          m.sender = senders.filter((s) => s.id === m.sender_id)[0];
+        }
         if (reactions) {
           m.reactions = reactions
             .filter((r) => r.chat_message_id === m.id)
@@ -553,11 +572,9 @@ export class ChatService {
             });
         }
         if (m.reply_parent_id) {
-          const replyMessage = replyMessages.find(
+          m.replyParentMessage = replyMessages.find(
             (replyMsg) => replyMsg.id === m.reply_parent_id,
           );
-          replyMessage.sender = { id: replyMessage.sender_id } as User;
-          m.replyParentMessage = replyMessage;
         }
         if (m.sender_id && m.sender_id === userID) {
           m.isSender = true;
