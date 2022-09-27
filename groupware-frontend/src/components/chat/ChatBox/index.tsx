@@ -62,6 +62,7 @@ import { removeHalfWidthSpace } from 'src/utils/replaceWidthSpace';
 import { useChatSocket } from './socket';
 import ChatEditor from '../ChatEditor';
 import { nameOfEmptyNameGroup } from 'src/utils/chat/nameOfEmptyNameGroup';
+import Editor from '@draft-js-plugins/editor';
 import { reactionStickers } from '../../../utils/reactionStickers';
 
 type ChatBoxProps = {
@@ -111,6 +112,8 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
     include,
     limit: '20',
   });
+
+  const editorRef = useRef<Editor>(null);
 
   const { refetch: searchMessages } = useAPISearchMessages(
     {
@@ -373,6 +376,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
 
   const onClickReply = useCallback(
     (m: ChatMessage) => {
+      editorRef.current?.focus();
       setNewChatMessage((pre) => ({
         ...pre,
         replyParentMessage: m,
@@ -380,6 +384,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
     },
     [setNewChatMessage],
   );
+
   const onClickImage = useCallback((m: ChatMessage) => {
     if (m.type === ChatMessageType.IMAGE) {
       setSelectedImageURL(m.content);
@@ -682,6 +687,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
         onSend={onSend}
         isLoading={isLoading}
         uploadFiles={uploadFiles}
+        editorRef={editorRef}
       />
       <Sticker handleStickerSelected={handleStickerSelected} />
     </Box>

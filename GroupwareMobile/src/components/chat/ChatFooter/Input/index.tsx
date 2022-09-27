@@ -12,6 +12,7 @@ import {Text} from 'react-native-magnus';
 import {chatStyles} from '../../../../styles/screen/chat/chat.style';
 
 type InputProps = {
+  inputRef?: React.RefObject<TextInput>;
   onChangeInput: (changedText: string) => void;
   handleSelectionChange: (
     event: NativeSyntheticEvent<TextInputSelectionChangeEventData>,
@@ -23,6 +24,7 @@ type InputProps = {
 };
 
 const Input: React.FC<InputProps> = ({
+  inputRef,
   onChangeInput,
   handleSelectionChange,
   parseContent,
@@ -30,6 +32,7 @@ const Input: React.FC<InputProps> = ({
   const {height: windowHeight} = useWindowDimensions();
   return (
     <TextInput
+      ref={inputRef}
       onSelectionChange={handleSelectionChange}
       multiline
       onChangeText={t => onChangeInput(t)}

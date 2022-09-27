@@ -15,6 +15,7 @@ import NextImage from 'next/image';
 import noImage from '@/public/no-image.jpg';
 
 type TextMessageProps = {
+  focusTextareaRef?: React.RefObject<HTMLTextAreaElement>;
   message: ChatMessage;
   confirmedSearchWord: string;
   searchedResultIds?: (number | undefined)[];
@@ -23,6 +24,7 @@ type TextMessageProps = {
 };
 
 const TextMessage: React.FC<TextMessageProps> = ({
+  focusTextareaRef,
   message,
   confirmedSearchWord,
   searchedResultIds,
@@ -207,6 +209,7 @@ const TextMessage: React.FC<TextMessageProps> = ({
         ) : (
           <>
             <Textarea
+              ref={focusTextareaRef}
               borderRadius="8px"
               maxW={'40vw'}
               minW={'10vw'}
