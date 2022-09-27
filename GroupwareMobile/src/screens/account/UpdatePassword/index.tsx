@@ -1,18 +1,15 @@
-import {useIsFocused, useNavigation} from '@react-navigation/native';
+import {useIsFocused} from '@react-navigation/native';
 import {useFormik} from 'formik';
 import React, {useEffect} from 'react';
 import {ActivityIndicator, Alert, useWindowDimensions} from 'react-native';
 import {Button, Div, Icon, Input, Overlay, Text} from 'react-native-magnus';
 import HeaderWithTextButton from '../../../components/Header';
-import {Tab} from '../../../components/Header/HeaderTemplate';
 import WholeContainer from '../../../components/WholeContainer';
 import {useIsTabBarVisible} from '../../../contexts/bottomTab/useIsTabBarVisible';
 import {useAPIUpdatePassword} from '../../../hooks/api/user/useAPIUpdatePassword';
-import {UpdatePasswordNavigationProps} from '../../../types/navigator/drawerScreenProps';
 import {updatePasswordSchema} from '../../../utils/validation/schema';
 
 const UpdatePassword: React.FC = () => {
-  const navigation = useNavigation<UpdatePasswordNavigationProps>();
   const isFocused = useIsFocused();
   const {setIsTabBarVisible} = useIsTabBarVisible();
   const {width: windowWidth} = useWindowDimensions();

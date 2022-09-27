@@ -13,7 +13,6 @@ import TagListBox from '../../../components/account/TagListBox';
 import UserAvatar from '../../../components/common/UserAvatar';
 import EventCard from '../../../components/events/EventCard';
 import HeaderWithTextButton from '../../../components/Header';
-import {Tab} from '../../../components/Header/HeaderTemplate';
 import WholeContainer from '../../../components/WholeContainer';
 import WikiCard from '../../../components/wiki/WikiCard';
 import {useIsTabBarVisible} from '../../../contexts/bottomTab/useIsTabBarVisible';
@@ -36,7 +35,6 @@ import {
   AccountDetailNavigationProps,
   AccountDetailRouteProps,
 } from '../../../types/navigator/drawerScreenProps';
-import {darkFontColor} from '../../../utils/colors';
 import {userNameFactory} from '../../../utils/factory/userNameFactory';
 import {userRoleNameFactory} from '../../../utils/factory/userRoleNameFactory';
 import {useInviteCall} from '../../../contexts/call/useInviteCall';
