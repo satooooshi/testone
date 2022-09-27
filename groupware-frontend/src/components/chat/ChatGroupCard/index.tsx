@@ -145,7 +145,7 @@ const ChatGroupCard: React.FC<ChatGroupCardProps> = ({
               dateTime: new Date(
                 chatGroup?.chatMessages?.[0]?.createdAt
                   ? chatGroup?.chatMessages?.[0]?.createdAt
-                  : chatGroup.updatedAt,
+                  : chatGroup.createdAt,
               ),
             })}
           </Text>
