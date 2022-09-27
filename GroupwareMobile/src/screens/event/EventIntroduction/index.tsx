@@ -15,6 +15,7 @@ import {
   EventIntroductionRouteProps,
 } from '../../../types/navigator/drawerScreenProps';
 import eventTypeNameFactory from '../../../utils/factory/eventTypeNameFactory';
+import {RootStackParamList} from '../../../types/navigator/RootStackParamList';
 
 const EventIntroduction: React.FC = () => {
   const {type} = useRoute<EventIntroductionRouteProps>().params;
@@ -27,6 +28,7 @@ const EventIntroduction: React.FC = () => {
     type,
   });
   const {data: eventIntroduction, refetch} = useAPIGetEventIntroduction(type);
+  const route = useRoute();
   const navigation = useNavigation<EventIntroductionNavigationProps>();
   const headlineImage: Source = useMemo(() => {
     switch (type) {
@@ -94,6 +96,7 @@ const EventIntroduction: React.FC = () => {
         title={eventTypeNameFactory(type)}
         enableBackButton={true}
         rightButtonName="予定を見る"
+        screenForBack={'Menu'}
         onPressRightButton={() =>
           navigation.navigate('EventStack', {
             screen: 'EventList',
