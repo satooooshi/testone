@@ -786,6 +786,7 @@ const Chat: React.FC = () => {
               await new Promise(r => setTimeout(r, 500));
               inputRef?.current?.focus();
             }
+            setLongPressedMgg(undefined);
           }}>
           メッセージを編集
         </Dropdown.Option>

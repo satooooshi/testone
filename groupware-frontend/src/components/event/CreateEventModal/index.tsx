@@ -327,6 +327,8 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
     user?.role,
   );
 
+  const isCreatableOther = isCreatableEvent(EventType.OTHER, user?.role);
+
   useEffect(() => {
     const getInitialEventType = () => {
       if (isCreatableImpressiveUniversity) {
@@ -347,6 +349,9 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
       if (isCreatableSubmissionEtc) {
         return EventType.SUBMISSION_ETC;
       }
+      if (isCreatableOther) {
+        return EventType.OTHER;
+      }
       return undefined;
     };
     const initialEventType = getInitialEventType();
@@ -364,6 +369,7 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
     isCreatableImpressiveUniversity,
     isCreatableStudyMeeting,
     isCreatableSubmissionEtc,
+    isCreatableOther,
     setNewEvent,
   ]);
 
@@ -664,6 +670,9 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
                 )}
                 {isCreatableSubmissionEtc && (
                   <option value={EventType.SUBMISSION_ETC}>提出物等</option>
+                )}
+                {isCreatableOther && (
+                  <option value={EventType.OTHER}>その他</option>
                 )}
               </Select>
             </FormControl>
