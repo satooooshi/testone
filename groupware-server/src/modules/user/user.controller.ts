@@ -10,7 +10,7 @@ import {
   BadRequestException,
   Res,
 } from '@nestjs/common';
-import { User, UserRole } from 'src/entities/user.entity';
+import { BranchType, User, UserRole } from 'src/entities/user.entity';
 import JwtAuthenticationGuard from '../auth/jwtAuthentication.guard';
 import RequestWithUser from '../auth/requestWithUser.interface';
 import { UserService } from './user.service';
@@ -24,6 +24,7 @@ export interface SearchQueryToGetUsers {
   word?: string;
   tag?: string;
   sort?: 'event' | 'question' | 'answer' | 'knowledge';
+  branch?: BranchType;
   role?: UserRole;
   verified?: boolean;
   duration?: 'month' | 'week';
@@ -134,12 +135,7 @@ export class UserController {
   @Roles(UserRole.ADMIN)
   @Post('delete-user')
   async deleteUser(@Body() user: User) {
-    const rooms = await this.chatService.getRoomsId(user.id);
-    for (const r of rooms) {
-      if (r.id) {
-        await this.chatService.leaveChatRoom(user.id, r.id);
-      }
-    }
+    await this.chatService.leaveAllRooms(user);
     await this.userService.deleteUser(user);
   }
 }

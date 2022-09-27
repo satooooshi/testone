@@ -17,6 +17,7 @@ import {
   TouchableOpacity,
   useWindowDimensions,
   View,
+  TextInput,
 } from 'react-native';
 import {
   Div,
@@ -108,6 +109,7 @@ import {useAPIGetReactions} from '../../hooks/api/chat/useAPIGetReactions';
 const TopTab = createMaterialTopTabNavigator();
 
 const Chat: React.FC = () => {
+  const inputRef = useRef<TextInput>(null);
   const {user: myself} = useAuthenticate();
   const typeDropdownRef = useRef<any | null>(null);
   const messageIosRef = useRef<FlatList | null>(null);
@@ -240,23 +242,23 @@ const Chat: React.FC = () => {
     },
   );
 
-  const {refetch: getExpiredUrlMessages} = useAPIGetExpiredUrlMessages(
-    Number(room.id),
-    {
-      onSuccess: data => {
-        setMessages(mgs => {
-          return mgs.map(m => {
-            for (const d of data) {
-              if (d.id === m.id) {
-                m.content = d.content;
-              }
-            }
-            return m;
-          });
-        });
-      },
-    },
-  );
+  // const {refetch: getExpiredUrlMessages} = useAPIGetExpiredUrlMessages(
+  //   Number(room.id),
+  //   {
+  //     onSuccess: data => {
+  //       setMessages(mgs => {
+  //         return mgs.map(m => {
+  //           for (const d of data) {
+  //             if (d.id === m.id) {
+  //               m.content = d.content;
+  //             }
+  //           }
+  //           return m;
+  //         });
+  //       });
+  //     },
+  //   },
+  // );
 
   const {data: searchedResults, refetch: searchMessages} = useAPISearchMessages(
     {
@@ -736,9 +738,11 @@ const Chat: React.FC = () => {
       ref={typeDropdownRef}>
       <Dropdown.Option
         {...defaultDropdownOptionProps}
-        onPress={() => {
+        onPress={async () => {
           setValues(v => ({...v, replyParentMessage: longPressedMsg}));
           setLongPressedMgg(undefined);
+          await new Promise(r => setTimeout(r, 500));
+          inputRef?.current?.focus();
         }}
         value={'reply'}>
         返信する
@@ -774,14 +778,15 @@ const Chat: React.FC = () => {
         <Dropdown.Option
           {...defaultDropdownOptionProps}
           value="edit"
-          onPress={() => {
+          onPress={async () => {
             setEditMessage(true);
             if (longPressedMsg) {
-              console.log('edit message', longPressedMsg);
-
               setValues(longPressedMsg);
               messageContentRef.current = longPressedMsg.content;
+              await new Promise(r => setTimeout(r, 500));
+              inputRef?.current?.focus();
             }
+            setLongPressedMgg(undefined);
           }}>
           メッセージを編集
         </Dropdown.Option>
@@ -806,6 +811,7 @@ const Chat: React.FC = () => {
   useEffect(() => {
     if (longPressedMsg) {
       typeDropdownRef.current?.open();
+      // inputRef?.current?.focus();
     }
   }, [longPressedMsg]);
 
@@ -1063,6 +1069,7 @@ const Chat: React.FC = () => {
                 </Box>
               ) : null}
               <ChatFooter
+                inputRef={inputRef}
                 onUploadFile={handleUploadFile}
                 onUploadVideo={handleUploadVideo}
                 onUploadImage={handleUploadImage}
@@ -1134,6 +1141,7 @@ const Chat: React.FC = () => {
                 </Box>
               ) : null}
               <ChatFooter
+                inputRef={inputRef}
                 onUploadFile={handleUploadFile}
                 onUploadVideo={handleUploadVideo}
                 onUploadImage={handleUploadImage}
@@ -1219,7 +1227,7 @@ const Chat: React.FC = () => {
   return (
     <WholeContainer>
       {typeDropdown}
-      <Div h="100%" bg={Platform.OS === 'ios' ? 'blue300' : 'blue200'}>
+      <Div h="100%" bg={Platform.OS === 'ios' ? 'blue300' : 'blue400'}>
         <ReactionsModal
           isVisible={!!selectedReactions}
           selectedReactions={selectedReactions}

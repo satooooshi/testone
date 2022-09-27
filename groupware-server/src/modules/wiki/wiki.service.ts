@@ -119,10 +119,10 @@ export class WikiService {
       .where('wiki.id = :id', { id })
       .orderBy({ 'answer.created_at': 'ASC', 'reply.created_at': 'ASC' })
       .getOne();
-
     const [userGoodForBoard, goodsCount] =
       await this.userGoodForBoardRepository.findAndCount({
         where: { wiki: existWiki },
+        withDeleted: true,
         relations: ['user'],
       });
 
@@ -171,7 +171,6 @@ export class WikiService {
     }
     const tagIDs = tag.split(' ');
     const startTime = Date.now();
-
     const [wikis, count] = await this.wikiRepository
       .createQueryBuilder('wiki')
       .select()
@@ -270,12 +269,84 @@ export class WikiService {
     return { pageCount, wiki: wikisAndRelationCount };
   }
 
+  public async getWikiGoodList(
+    userID: string,
+    myId: number,
+  ): Promise<UserGoodForBoard[]> {
+    const isMySelf = Number(userID) === myId;
+    const userGoodForBoards = await this.userGoodForBoardRepository
+      .createQueryBuilder('user_good_for_board')
+      .innerJoinAndSelect(
+        'user_good_for_board.wiki',
+        'wiki',
+        'user_good_for_board.user_id = :userID',
+        { userID },
+      )
+      .innerJoin('wiki.writer', 'writer')
+      .addSelect(selectUserColumns('writer'))
+      .leftJoinAndSelect('wiki.tags', 'tags')
+      .take(20)
+      .orderBy({ 'wiki.updatedAt': 'DESC' })
+      .getMany();
+
+    const wikiIds = userGoodForBoards.map((board) => board.wiki.id);
+    if (wikiIds.length === 0) {
+      return [] as UserGoodForBoard[];
+    }
+
+    const goodsCount = await this.userGoodForBoardRepository
+      .createQueryBuilder('user_good_for_board')
+      .select(['user_good_for_board.wiki_id', 'COUNT(*) AS cnt'])
+      .where('user_good_for_board.wiki_id IN (:...wikiIds)', { wikiIds })
+      .groupBy('user_good_for_board.wiki_id')
+      .getRawMany();
+
+    const answersCount = await this.qaAnswerRepository
+      .createQueryBuilder('qa')
+      .select(['qa.wiki_id', 'COUNT(*) AS cnt'])
+      .where('qa.wiki_id IN (:...wikiIds)', { wikiIds })
+      .groupBy('qa.wiki_id')
+      .getRawMany();
+
+    let wikisSentGoodReqUser = [];
+    if (!isMySelf) {
+      wikisSentGoodReqUser = await this.userGoodForBoardRepository
+        .createQueryBuilder('user_good_for_board')
+        .select('user_good_for_board.wiki_id')
+        .where('user_id = :myId', { myId })
+        .getRawMany();
+    }
+
+    const boardAndRelationCount = userGoodForBoards.map((u) => {
+      for (const goodCount of goodsCount) {
+        if (goodCount['wiki_id'] === u.wiki.id) {
+          u.wiki.goodsCount = Number(goodCount['cnt']);
+        }
+      }
+      for (const answerCount of answersCount) {
+        if (answerCount['wiki_id'] === u.wiki.id) {
+          u.wiki.answersCount = Number(answerCount['cnt']);
+        }
+      }
+      if (
+        isMySelf ||
+        wikisSentGoodReqUser.some((g) => g['wiki_id'] === u.wiki.id)
+      ) {
+        u.wiki.isGoodSender = true;
+      }
+      return u;
+    });
+
+    return boardAndRelationCount;
+  }
+
   public async getHearts(wikiID: number): Promise<UserGoodForBoard[]> {
     const existWiki = await this.wikiRepository.findOne(wikiID);
     const existGoodReaction = await this.userGoodForBoardRepository.find({
       where: {
         wiki: existWiki,
       },
+      withDeleted: true,
       relations: ['user'],
     });
     return existGoodReaction;

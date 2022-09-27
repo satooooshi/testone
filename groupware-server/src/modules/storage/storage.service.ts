@@ -4,20 +4,21 @@ import { ConfigService } from '@nestjs/config';
 import { genStorageURL } from 'src/utils/storage/genStorageURL';
 import { genSignedURL } from 'src/utils/storage/genSignedURL';
 import { file } from 'jszip';
+import { APP_DIRNAME } from 'src/var';
 
 @Injectable()
 export class StorageService {
   constructor(private readonly configService: ConfigService) {}
   private readonly storage = new Storage({
-    keyFilename: __dirname + '../../../cloud_storage.json',
+    keyFilename: APP_DIRNAME + '/cloud_storage.json',
   });
 
   public async genSignedURLForRead(urls: string[]) {
     const signedURLs: string[] = [];
     for await (const u of urls) {
       const normalURL = genStorageURL(u);
-      const signedURL = await genSignedURL(normalURL);
-      signedURLs.push(signedURL);
+      // const signedURL = await genSignedURL(normalURL);
+      signedURLs.push(normalURL);
     }
     return signedURLs;
   }
@@ -43,7 +44,7 @@ export class StorageService {
 
   public async upload(files: Express.Multer.File[]) {
     const storage = new Storage({
-      keyFilename: __dirname + '../../../cloud_storage.json',
+      keyFilename: APP_DIRNAME + '/cloud_storage.json',
     });
     const bucket = storage.bucket(
       this.configService.get('CLOUD_STORAGE_BUCKET'),

@@ -52,8 +52,6 @@ const sendPushNotifToSpecificDevices = async (
   const pushNotifService = new PushNotifications(pushNotifSettings);
   const tokens = devices.map((d) => d.token);
 
-  console.log('notification data', data.title, data.body);
-
   const dataToSend = {
     title: data.title ? data.title : '', // REQUIRED for Android
     topic: process.env.IOS_BUNDLE_ID ? '' : '', // REQUIRED for iOS (apn and gcm)
