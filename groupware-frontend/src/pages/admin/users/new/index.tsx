@@ -521,15 +521,21 @@ const CreateNewUser = () => {
             bg="white"
             onChange={handleChange}
             defaultValue={UserRole.COMMON}>
-            <option value={UserRole.ADMIN}>管理者</option>
+            <option value={UserRole.ADMIN}>
+              {userRoleNameFactory(UserRole.ADMIN)}
+            </option>
             <option value={UserRole.EXTERNAL_INSTRUCTOR}>
               {userRoleNameFactory(UserRole.EXTERNAL_INSTRUCTOR)}
             </option>
             <option value={UserRole.INTERNAL_INSTRUCTOR}>
               {userRoleNameFactory(UserRole.INTERNAL_INSTRUCTOR)}
             </option>
-            <option value={UserRole.COACH}>コーチ</option>
-            <option value={UserRole.COMMON}>一般社員</option>
+            <option value={UserRole.COACH}>
+              {userRoleNameFactory(UserRole.COACH)}
+            </option>
+            <option value={UserRole.COMMON}>
+              {userRoleNameFactory(UserRole.COMMON)}
+            </option>
           </Select>
         </FormControl>
         <FormControl mb={4}>
