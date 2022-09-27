@@ -109,6 +109,7 @@ export type RootStackParamList = {
   };
   WikiLinks: undefined;
   MyProfile: undefined;
+  Menu: undefined;
   AttendanceHome: undefined;
   Attendance: undefined;
   AttendanceReport: undefined;

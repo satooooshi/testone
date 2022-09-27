@@ -510,6 +510,34 @@ const CreateNewUser = () => {
             </Radio>
           </Stack>
         </FormControl>
+        <FormControl className={createNewUserStyles.input_wrapper}>
+          <FormLabel fontWeight={'bold'}>
+            <p>社員区分</p>
+          </FormLabel>
+          <Select
+            name="role"
+            value={values.role}
+            colorScheme="teal"
+            bg="white"
+            onChange={handleChange}
+            defaultValue={UserRole.COMMON}>
+            <option value={UserRole.ADMIN}>
+              {userRoleNameFactory(UserRole.ADMIN)}
+            </option>
+            <option value={UserRole.EXTERNAL_INSTRUCTOR}>
+              {userRoleNameFactory(UserRole.EXTERNAL_INSTRUCTOR)}
+            </option>
+            <option value={UserRole.INTERNAL_INSTRUCTOR}>
+              {userRoleNameFactory(UserRole.INTERNAL_INSTRUCTOR)}
+            </option>
+            <option value={UserRole.COACH}>
+              {userRoleNameFactory(UserRole.COACH)}
+            </option>
+            <option value={UserRole.COMMON}>
+              {userRoleNameFactory(UserRole.COMMON)}
+            </option>
+          </Select>
+        </FormControl>
         <FormControl mb={4}>
           <FormLabel fontWeight={'bold'} fontSize="14px">
             所属支社
