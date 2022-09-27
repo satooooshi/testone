@@ -13,7 +13,6 @@ import TagListBox from '../../../components/account/TagListBox';
 import UserAvatar from '../../../components/common/UserAvatar';
 import EventCard from '../../../components/events/EventCard';
 import HeaderWithTextButton from '../../../components/Header';
-import {Tab} from '../../../components/Header/HeaderTemplate';
 import WholeContainer from '../../../components/WholeContainer';
 import WikiCard from '../../../components/wiki/WikiCard';
 import {useIsTabBarVisible} from '../../../contexts/bottomTab/useIsTabBarVisible';
@@ -36,7 +35,6 @@ import {
   AccountDetailNavigationProps,
   AccountDetailRouteProps,
 } from '../../../types/navigator/drawerScreenProps';
-import {darkFontColor} from '../../../utils/colors';
 import {userNameFactory} from '../../../utils/factory/userNameFactory';
 import {userRoleNameFactory} from '../../../utils/factory/userRoleNameFactory';
 import {useInviteCall} from '../../../contexts/call/useInviteCall';
@@ -217,32 +215,6 @@ const AccountDetail: React.FC = () => {
 
   const mySelfOfNot = id === user?.id || !id;
 
-  const tabs: Tab[] =
-    userID !== user?.id
-      ? [
-          {
-            name: 'アカウント情報',
-            onPress: () =>
-              navigation.navigate('AccountStack', {screen: 'MyProfile'}),
-          },
-        ]
-      : [
-          {
-            name: 'アカウント情報',
-            onPress: () => {},
-          },
-          {
-            name: 'プロフィール編集',
-            onPress: () =>
-              navigation.navigate('AccountStack', {screen: 'Profile'}),
-          },
-          {
-            name: 'パスワード更新',
-            onPress: () =>
-              navigation.navigate('AccountStack', {screen: 'UpdatePassword'}),
-          },
-        ];
-
   const handleLogout = () => {
     logout();
     setUser({});
@@ -291,8 +263,7 @@ const AccountDetail: React.FC = () => {
   return (
     <WholeContainer>
       <HeaderWithTextButton
-        title={'Account'}
-        tabs={tabs}
+        title={'アカウント情報'}
         activeTabName={'アカウント情報'}
         enableBackButton={userID !== user?.id}
         // rightButtonName={mySelfOfNot ? 'ログアウト' : undefined}

@@ -284,9 +284,18 @@ const Home: React.FC = () => {
         </Text>
         <Div flexDir="row" mb={8}>
           <Div flex={1} mr={12}>
+            <PortalLinkBox
+              type="update_password"
+              onPress={() => {
+                navigation.navigate('AccountStack', {
+                  screen: 'UpdatePassword',
+                });
+              }}
+            />
+          </Div>
+          <Div flex={1}>
             <PortalLinkBox type="logout" onPress={handleLogout} />
           </Div>
-          <Div flex={1} />
         </Div>
       </ScrollDiv>
     </WholeContainer>
