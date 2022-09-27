@@ -13,7 +13,10 @@
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
     "start:prod": "typeorm migration:run && node main",
+    "start:prod-new": "node dist/main",
     "start:local": "dist/node main",
+    "pack:ncc": "ncc build dist/main.js -m -o build",
+    "start:ncc": "node build/index",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "test": "jest",
     "test:watch": "jest --watch",
@@ -34,7 +37,8 @@
     "seed:message": "ts-node ./node_modules/typeorm-seeding/dist/cli.js seed -s CreateMessages",
     "migration:generate": "ts-node -r tsconfig-paths/register node_modules/typeorm/cli.js migration:generate -n",
     "migration:run": "ts-node -r tsconfig-paths/register node_modules/typeorm/cli.js migration:run",
-    "migration:revert": "ts-node -r tsconfig-paths/register node_modules/typeorm/cli.js migration:revert"
+    "migration:revert": "ts-node -r tsconfig-paths/register node_modules/typeorm/cli.js migration:revert",
+    "migration:prod": "typeorm migration:run"
   },
   "dependencies": {
     "@google-cloud/storage": "^5.14.0",
@@ -51,6 +55,7 @@
     "@nestjs/websockets": "^8.2.4",
     "@types/cron": "^1.7.3",
     "@types/passport-local": "^1.0.34",
+    "@vercel/ncc": "^0.34.0",
     "agora-access-token": "^2.0.4",
     "bcrypt": "^5.0.1",
     "class-transformer": "<=0.4.0",
