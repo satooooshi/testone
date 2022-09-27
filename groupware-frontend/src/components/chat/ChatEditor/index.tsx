@@ -160,17 +160,10 @@ const ChatEditor: React.FC<ChatEditorProps> = memo(
       if (parsedMessage) {
         for (const m of mentionedUserData) {
           const regexp = new RegExp(`\\s${m.name}|^${m.name}`, 'g');
-          if (m.name === 'all') {
-            parsedMessage = parsedMessage.replace(
-              regexp,
-              `{@}[${m.name}](${m.id})`,
-            );
-          } else {
-            parsedMessage = parsedMessage.replace(
-              regexp,
-              `{@}[${m.name.slice(1)}](${m.id})`,
-            );
-          }
+          parsedMessage = parsedMessage.replace(
+            regexp,
+            `{@}[${m.name.slice(1)}](${m.id})`,
+          );
         }
         onSend(parsedMessage);
         setEditorState(EditorState.createEmpty());
