@@ -209,6 +209,7 @@ export class UserService {
       word = '',
       tag = '',
       sort,
+      branch,
       role,
       verified,
       duration,
@@ -331,6 +332,7 @@ export class UserService {
       .andWhere(tag ? 'tag.id IN (:...tagIDs)' : '1=1', {
         tagIDs,
       })
+      .andWhere(branch ? 'user.branch = :branch' : '1=1', { branch })
       .skip(offset)
       .take(limit)
       .orderBy(sortKey, sortKey === 'user.lastNameKana' ? 'ASC' : 'DESC')
