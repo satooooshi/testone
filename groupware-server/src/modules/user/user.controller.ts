@@ -135,12 +135,7 @@ export class UserController {
   @Roles(UserRole.ADMIN)
   @Post('delete-user')
   async deleteUser(@Body() user: User) {
-    const rooms = await this.chatService.getRoomsId(user.id);
-    for (const r of rooms) {
-      if (r.id) {
-        await this.chatService.leaveChatRoom(user.id, r.id);
-      }
-    }
+    await this.chatService.leaveAllRooms(user);
     await this.userService.deleteUser(user);
   }
 }

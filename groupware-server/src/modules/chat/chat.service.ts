@@ -77,6 +77,12 @@ export class ChatService {
     return !!isUserBelongToGroup;
   }
 
+  private throwExceptionWhenUserNotExist(user: User) {
+    if (!user.existence) {
+      throw new BadRequestException('The user does not exist');
+    }
+  }
+
   public async calleeForPhoneCall(calleeId: string) {
     const user = await this.userRepository.findOne(calleeId);
     return user;
@@ -813,7 +819,6 @@ export class ChatService {
       (m) => m.id === user.id,
     ).length;
     if (isUserJoining) {
-      console.log('The user is already participant');
       return;
     }
     targetGroup.members.push(user);
@@ -830,21 +835,17 @@ export class ChatService {
     );
   }
 
-  public async leaveChatRoom(userID: number, chatGroupID: number) {
-    const containMembers: ChatGroup = await this.chatGroupRepository.findOne({
-      where: { id: chatGroupID },
-      relations: ['members'],
-    });
-    const targetGroup = await this.chatGroupRepository.findOne(chatGroupID);
-    const user = await this.userRepository.findOne(userID);
+  public async leaveChatRoom(user: User, chatGroupID: number) {
+    this.throwExceptionWhenUserNotExist(user);
 
-    if (containMembers?.members.length) {
-      const isUserJoining = containMembers.members.filter(
-        (m) => m.id === userID,
-      ).length;
-      if (!isUserJoining) {
-        throw new BadRequestException('The user is not participant');
-      }
+    const manager = getManager();
+    const isUserJoining = !!(await manager.query(
+      'select user_id from user_chat_joining where user_id = ? AND chat_group_id = ?',
+      [user.id, chatGroupID],
+    ));
+
+    if (!isUserJoining) {
+      throw new BadRequestException('The user is not participant');
     }
 
     await this.chatGroupRepository
@@ -857,19 +858,56 @@ export class ChatService {
       .createQueryBuilder()
       .relation(ChatGroup, 'members')
       .of(chatGroupID)
-      .remove(userID);
+      .remove(user.id);
     await this.chatGroupRepository
       .createQueryBuilder()
       .relation(ChatGroup, 'previousMembers')
       .of(chatGroupID)
-      .add(userID);
+      .add(user.id);
     const systemMessage = new ChatMessage();
     const userName = userNameFactory(user);
     systemMessage.content = `${userName}さんが退出しました`;
     systemMessage.type = ChatMessageType.SYSTEM_TEXT;
-    systemMessage.createdAt = new Date();
-    systemMessage.chatGroup = targetGroup;
-    await this.chatMessageRepository.save(systemMessage);
+    await this.chatMessageRepository.save({
+      ...systemMessage,
+      chatGroup: { id: chatGroupID },
+    });
+  }
+
+  public async leaveAllRooms(user: User) {
+    this.throwExceptionWhenUserNotExist(user);
+
+    const manager = getManager();
+    const joinedAllRooms = await manager.query(
+      'select chat_group_id from user_chat_joining where user_id = ?',
+      [user.id],
+    );
+
+    const roomsIds: number[] = joinedAllRooms.map((r) =>
+      Number(r.chat_group_id),
+    );
+    if (!roomsIds.length) {
+      return;
+    }
+    await this.chatGroupRepository
+      .createQueryBuilder()
+      .update(ChatGroup)
+      .set({ memberCount: () => 'member_count - 1' })
+      .where('id IN (:...ids)', { ids: roomsIds })
+      .execute();
+    await manager.query('DELETE from user_chat_joining where user_id = ?', [
+      user.id,
+    ]);
+    for (const chatGroupID of roomsIds) {
+      const systemMessage = new ChatMessage();
+      const userName = userNameFactory(user);
+      systemMessage.content = `${userName}さんが退出しました`;
+      systemMessage.type = ChatMessageType.SYSTEM_TEXT;
+      await this.chatMessageRepository.save({
+        ...systemMessage,
+        chatGroup: { id: chatGroupID },
+      });
+    }
   }
 
   public async editChatMembers(roomId: number, members: User[]) {
@@ -1190,10 +1228,10 @@ export class ChatService {
       'select  users.id as id, users.last_name as lastName, users.first_name as firstName, users.avatar_url as avatarUrl, users.existence as existence from user_chat_joining INNER JOIN users ON users.existence is not null AND users.id = user_id AND chat_group_id = ?',
       [roomId],
     );
-    // const previousMembers: User[] = await manager.query(
-    //   'select users.id as id, users.last_name as lastName, users.first_name as firstName, users.avatar_url as avatarUrl, users.existence as existence from user_chat_leaving INNER JOIN users ON users.existence is not null AND users.id = user_id AND chat_group_id = ?',
-    //   [roomId],
-    // );
+    const previousMembers: User[] = await manager.query(
+      'select users.id as id, users.last_name as lastName, users.first_name as firstName, users.avatar_url as avatarUrl, users.existence as existence from user_chat_leaving INNER JOIN users ON users.existence is not null AND users.id = user_id AND chat_group_id = ?',
+      [roomId],
+    );
 
     // existRoom.previousMembers = previousMembers;
     checkAloneRoom(existRoom, userId);
