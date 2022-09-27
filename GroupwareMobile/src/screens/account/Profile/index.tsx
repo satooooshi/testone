@@ -1,4 +1,4 @@
-import {useIsFocused, useNavigation} from '@react-navigation/native';
+import {useIsFocused} from '@react-navigation/native';
 import {useFormik} from 'formik';
 import React, {useEffect, useState, useRef} from 'react';
 import {
@@ -16,7 +16,6 @@ import {
   Overlay,
   Radio,
   Dropdown,
-  Image,
 } from 'react-native-magnus';
 import DropdownOpenerButton from '../../../components/common/DropdownOpenerButton';
 import TagModal from '../../../components/common/TagModal';
@@ -30,12 +29,10 @@ import {useAPIUpdateUser} from '../../../hooks/api/user/useAPIUpdateUser';
 import {useTagType} from '../../../hooks/tag/useTagType';
 import {profileStyles} from '../../../styles/screen/account/profile.style';
 import {TagType, User, BranchType} from '../../../types';
-import {ProfileNavigationProps} from '../../../types/navigator/drawerScreenProps/account';
 import {uploadImageFromGallery} from '../../../utils/cropImage/uploadImageFromGallery';
 import {formikErrorMsgFactory} from '../../../utils/factory/formikEroorMsgFactory';
 import {branchTypeNameFactory} from '../../../utils/factory/branchTypeNameFactory';
 import {profileSchema} from '../../../utils/validation/schema';
-import {Tab} from '../../../components/Header/HeaderTemplate';
 import UserAvatar from '../../../components/common/UserAvatar';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import {
@@ -62,7 +59,6 @@ const initialValues: Partial<User> = {
 };
 
 const Profile: React.FC = () => {
-  const navigation = useNavigation<ProfileNavigationProps>();
   const {
     data: profile,
     refetch,
@@ -126,21 +122,6 @@ const Profile: React.FC = () => {
       );
     },
   });
-  const tabs: Tab[] = [
-    {
-      name: 'アカウント情報',
-      onPress: () => navigation.navigate('AccountStack', {screen: 'MyProfile'}),
-    },
-    {
-      name: 'プロフィール編集',
-      onPress: () => {},
-    },
-    {
-      name: 'パスワード更新',
-      onPress: () =>
-        navigation.navigate('AccountStack', {screen: 'UpdatePassword'}),
-    },
-  ];
 
   const handleUploadImage = async () => {
     const {formData} = await uploadImageFromGallery({
@@ -175,8 +156,7 @@ const Profile: React.FC = () => {
         <ActivityIndicator />
       </Overlay>
       <HeaderWithTextButton
-        title={'Account'}
-        tabs={tabs}
+        title={'プロフィール編集'}
         enableBackButton={true}
         activeTabName={'プロフィール編集'}
       />

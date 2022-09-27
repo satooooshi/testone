@@ -54,7 +54,8 @@ type PortalType =
   | 'user_admin'
   | 'user_registering_admin'
   | 'tag_admin'
-  | 'user_tag_admin';
+  | 'user_tag_admin'
+  | 'update_password';
 
 type PortalLinkIconProps = {
   type: PortalType;
@@ -230,6 +231,15 @@ const PortalLinkIcon: React.FC<PortalLinkIconProps> = ({type}) => {
       return <AntDesign name="tago" size={iconSize} color="black" />;
     case 'user_tag_admin':
       return <FontAwesome5 name="user-tag" size={iconSize} color="red900" />;
+    case 'update_password':
+      return (
+        <Icon
+          name="setting"
+          fontFamily="AntDesign"
+          fontSize={iconSize}
+          color="black"
+        />
+      );
   }
 };
 
@@ -295,6 +305,8 @@ const PortalLinkBox: React.FC<PortarlLinkBoxProps> = ({type, onPress}) => {
         return 'タグ管理';
       case 'user_tag_admin':
         return 'タグ管理(ユーザー)';
+      case 'update_password':
+        return 'パスワード更新';
       default:
         return '';
     }

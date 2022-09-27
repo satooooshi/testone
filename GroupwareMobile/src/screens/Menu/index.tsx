@@ -107,9 +107,11 @@ const Home: React.FC = () => {
             <PortalLinkBox
               type="impressive_university"
               onPress={() =>
-                navigation.navigate('EventStack', {
+                navigation.navigate('IntroStack', {
                   screen: 'EventIntroduction',
-                  params: {type: EventType.IMPRESSIVE_UNIVERSITY},
+                  params: {
+                    type: EventType.IMPRESSIVE_UNIVERSITY,
+                  },
                 })
               }
             />
@@ -117,12 +119,14 @@ const Home: React.FC = () => {
           <Div flex={1}>
             <PortalLinkBox
               type="study_meeting"
-              onPress={() =>
-                navigation.navigate('EventStack', {
+              onPress={() => {
+                return navigation.navigate('IntroStack', {
                   screen: 'EventIntroduction',
-                  params: {type: EventType.STUDY_MEETING},
-                })
-              }
+                  params: {
+                    type: EventType.STUDY_MEETING,
+                  },
+                });
+              }}
             />
           </Div>
         </Div>
@@ -132,9 +136,11 @@ const Home: React.FC = () => {
             <PortalLinkBox
               type="bolday"
               onPress={() =>
-                navigation.navigate('EventStack', {
+                navigation.navigate('IntroStack', {
                   screen: 'EventIntroduction',
-                  params: {type: EventType.BOLDAY},
+                  params: {
+                    type: EventType.BOLDAY,
+                  },
                 })
               }
             />
@@ -143,9 +149,11 @@ const Home: React.FC = () => {
             <PortalLinkBox
               type="coach"
               onPress={() =>
-                navigation.navigate('EventStack', {
+                navigation.navigate('IntroStack', {
                   screen: 'EventIntroduction',
-                  params: {type: EventType.COACH},
+                  params: {
+                    type: EventType.COACH,
+                  },
                 })
               }
             />
@@ -157,9 +165,11 @@ const Home: React.FC = () => {
             <PortalLinkBox
               type="club"
               onPress={() =>
-                navigation.navigate('EventStack', {
+                navigation.navigate('IntroStack', {
                   screen: 'EventIntroduction',
-                  params: {type: EventType.CLUB},
+                  params: {
+                    type: EventType.CLUB,
+                  },
                 })
               }
             />
@@ -168,9 +178,11 @@ const Home: React.FC = () => {
             <PortalLinkBox
               type="submission_etc"
               onPress={() =>
-                navigation.navigate('EventStack', {
+                navigation.navigate('IntroStack', {
                   screen: 'EventList',
-                  params: {type: EventType.SUBMISSION_ETC},
+                  params: {
+                    type: EventType.SUBMISSION_ETC,
+                  },
                 })
               }
             />
@@ -274,9 +286,18 @@ const Home: React.FC = () => {
         </Text>
         <Div flexDir="row" mb={8}>
           <Div flex={1} mr={12}>
+            <PortalLinkBox
+              type="update_password"
+              onPress={() => {
+                navigation.navigate('AccountStack', {
+                  screen: 'UpdatePassword',
+                });
+              }}
+            />
+          </Div>
+          <Div flex={1}>
             <PortalLinkBox type="logout" onPress={handleLogout} />
           </Div>
-          <Div flex={1} />
         </Div>
       </ScrollDiv>
     </WholeContainer>
