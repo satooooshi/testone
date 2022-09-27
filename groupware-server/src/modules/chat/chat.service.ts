@@ -912,6 +912,9 @@ export class ChatService {
     if (!existGroup) {
       throw new BadRequestException('The group does not exist');
     }
+    if (existGroup.imageURL && existGroup.imageURL !== chatGroup.imageURL) {
+      this.storageService.deleteFile(existGroup.imageURL);
+    }
     const manager = getManager();
     existGroup.members = await manager.query(
       'select users.id as id ,users.last_name as lastName, users.first_name as firstName from user_chat_joining INNER JOIN users ON users.existence is not null AND users.id = user_id AND chat_group_id = ?',
