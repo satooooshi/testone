@@ -1233,7 +1233,6 @@ export class ChatService {
       [roomId],
     );
 
-
     // existRoom.previousMembers = previousMembers;
     checkAloneRoom(existRoom, userId);
     existRoom.members = members;
