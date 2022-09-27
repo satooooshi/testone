@@ -17,7 +17,6 @@ const Home: React.FC = () => {
   const isAdmin = user?.role === UserRole.ADMIN;
   const userID = user?.id;
   const navigation = useNavigation<HomeNavigationProps>();
-  const routes = navigation.getState()?.routes;
   const {data: profile} = useAPIGetUserInfoById(userID?.toString() || '0');
 
   const handleLogout = () => {
