@@ -160,7 +160,7 @@ const Profile: React.FC = () => {
         <ActivityIndicator />
       </Overlay>
       <HeaderWithTextButton
-        title={'Account'}
+        title={'プロフィール編集'}
         enableBackButton={true}
         activeTabName={'プロフィール編集'}
       />

@@ -277,7 +277,7 @@ const PortalLinkBox: React.FC<PortarlLinkBoxProps> = ({type, onPress}) => {
       case 'user_tag_admin':
         return 'タグ管理(ユーザー)';
       case 'update_password':
-        return 'パスワード変更';
+        return 'パスワード更新';
       default:
         return '';
     }

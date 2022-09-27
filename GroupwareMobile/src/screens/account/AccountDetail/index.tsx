@@ -265,7 +265,7 @@ const AccountDetail: React.FC = () => {
   return (
     <WholeContainer>
       <HeaderWithTextButton
-        title={'Account'}
+        title={'アカウント情報'}
         activeTabName={'アカウント情報'}
         enableBackButton={userID !== user?.id}
         // rightButtonName={mySelfOfNot ? 'ログアウト' : undefined}

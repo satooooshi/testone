@@ -56,7 +56,7 @@ const UpdatePassword: React.FC = () => {
         <ActivityIndicator />
       </Overlay>
       <HeaderWithTextButton
-        title={'Account'}
+        title={'パスワード更新'}
         enableBackButton={true}
         screenForBack={'Menu'}
         activeTabName={'パスワード更新'}
