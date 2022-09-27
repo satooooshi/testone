@@ -111,20 +111,20 @@ export class ChatMessage {
     }
   }
 
-  @AfterLoad()
-  @AfterInsert()
-  async changeToSignedURL?() {
-    if (
-      this.type === ChatMessageType.IMAGE ||
-      this.type === ChatMessageType.VIDEO ||
-      this.type === ChatMessageType.OTHER_FILE
-    ) {
-      this.content = await genSignedURL(this.content);
-    }
-    // if (this.type === ChatMessageType.OTHER_FILE) {
-    //   this.content = mentionTransform(this.content);
-    // }
-  }
+  // @AfterLoad()
+  // @AfterInsert()
+  // async changeToSignedURL?() {
+  //   if (
+  //     this.type === ChatMessageType.IMAGE ||
+  //     this.type === ChatMessageType.VIDEO ||
+  //     this.type === ChatMessageType.OTHER_FILE
+  //   ) {
+  //     this.content = await genSignedURL(this.content);
+  //   }
+  //   // if (this.type === ChatMessageType.OTHER_FILE) {
+  //   //   this.content = mentionTransform(this.content);
+  //   // }
+  // }
 
   @AfterInsert()
   async sendPushNotification() {

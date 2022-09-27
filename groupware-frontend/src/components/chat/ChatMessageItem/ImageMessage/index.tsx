@@ -10,13 +10,15 @@ type ImageMessageProps = {
 const ImageMessage: React.FC<ImageMessageProps> = ({ message, onClick }) => {
   return (
     <a onClick={onClick}>
-      <Box display="flex" maxW="300px" maxH={'300px'}>
+      <Box display="flex" maxW="300px" maxH="300px">
         <Image
           // priority={true}
           loading="lazy"
           src={message.content}
-          w={300}
-          h={300}
+          maxW={300}
+          maxH={300}
+          objectFit={'scale-down'}
+          objectPosition={message.isSender ? 'right center' : 'left center'}
           alt="送信された画像"
         />
       </Box>

@@ -15,6 +15,7 @@ import { useHandleBadge } from 'src/contexts/badge/useHandleBadge';
 import router from 'next/router';
 import { useAuthenticate } from 'src/contexts/useAuthenticate';
 import { useAPIGetRoomsByPage } from '@/hooks/api/chat/useAPIGetRoomsByPage';
+import { sortRooms } from 'src/utils/chat/sortRooms';
 
 type RoomListProps = {
   currentId?: string;
@@ -62,7 +63,7 @@ const RoomList: React.FC<RoomListProps> = ({ currentId, onClickRoom }) => {
 
   const { refetch: refetchLatestRooms } = useAPIGetRoomsByPage(
     {
-      limit: '20',
+      limit: '100',
       updatedAtLatestRoom: returnUpdatedAtLatest(),
     },
     {
@@ -74,7 +75,6 @@ const RoomList: React.FC<RoomListProps> = ({ currentId, onClickRoom }) => {
         //   latestRooms.length,
         // );
         if (latestRooms.length) {
-          const latestPinnedRooms: ChatGroup[] = [];
           for (const latestRoom of latestRooms) {
             if (currentChatRoomId !== latestRoom.id) {
               const olderRoom = chatGroups.filter(
@@ -84,25 +84,11 @@ const RoomList: React.FC<RoomListProps> = ({ currentId, onClickRoom }) => {
                 (latestRoom?.unreadCount || 0) - (olderRoom?.unreadCount || 0);
               updateUnreadCount(incrementCount);
             }
-            if (latestRoom.isPinned) {
-              latestPinnedRooms.unshift(latestRoom);
-            }
           }
           const ids = latestRooms.map((r) => r.id);
           const existRooms = chatGroups.filter((r) => !ids.includes(r.id));
-          const existPinnedRooms = existRooms.filter((r) => r.isPinned);
-          const existExceptPinnedRooms = existRooms.filter((r) => !r.isPinned);
 
-          const latestRoomsExceptPinnedRooms = latestRooms.filter(
-            (r) => !r.isPinned,
-          );
-
-          setChatGroupsState([
-            ...latestPinnedRooms,
-            ...existPinnedRooms,
-            ...latestRoomsExceptPinnedRooms,
-            ...existExceptPinnedRooms,
-          ]);
+          setChatGroupsState(sortRooms([...latestRooms, ...existRooms]));
         }
       },
     },

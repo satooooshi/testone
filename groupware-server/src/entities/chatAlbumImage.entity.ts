@@ -62,6 +62,7 @@ export class ChatAlbumImage {
   @AfterLoad()
   @AfterUpdate()
   async changeToSignedURL?() {
-    this.imageURL = await genSignedURL(this.imageURL);
+    this.imageURL = genStorageURL(this.imageURL);
+    // this.imageURL = await genSignedURL(this.imageURL);
   }
 }
