@@ -411,9 +411,13 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = memo(
             alignSelf={messageState.isSender ? 'flex-end' : 'flex-start'}
             flexDir={messageState.isSender ? 'row-reverse' : undefined}>
             {!messageState.isSender ? (
-              <Link href={`/account/${messageState.sender?.id}`} passHref>
-                {senderAvatar?.avatar}
-              </Link>
+              senderAvatar?.member && senderAvatar.member?.existence ? (
+                <Link href={`/account/${messageState.sender?.id}`} passHref>
+                  {senderAvatar?.avatar}
+                </Link>
+              ) : (
+                <Avatar h="40px" w="40px" src={boldMascot.src} />
+              )
             ) : null}
             <Box display="flex" alignItems="flex-end">
               {messageState.isSender && (
