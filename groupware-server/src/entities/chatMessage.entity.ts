@@ -140,7 +140,7 @@ export class ChatMessage {
       } else if (this.type === ChatMessageType.STICKER) {
         content = 'スタンプを送信しました。';
       }
-      const mentionRegex = /@\[.*?\]\(([0-9]+)\)/g;
+      const mentionRegex = /{@}\[.*?\]\(([0-9]+)\)/g;
       const mentionedIds: number[] = [];
       let mentionArr = [];
       while ((mentionArr = mentionRegex.exec(content)) !== null) {
@@ -148,6 +148,7 @@ export class ChatMessage {
           mentionedIds.push(Number(mentionArr[1]));
         }
       }
+
       // console.log(mentionedIds);
       // const allUsers = await getRepository(User)
       //   .createQueryBuilder('user')

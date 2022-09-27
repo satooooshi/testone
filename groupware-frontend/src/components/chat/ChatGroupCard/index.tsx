@@ -13,6 +13,7 @@ import { darkFontColor } from 'src/utils/colors';
 import { RiPushpin2Fill, RiPushpin2Line } from 'react-icons/ri';
 import { nameOfEmptyNameGroup } from 'src/utils/chat/nameOfEmptyNameGroup';
 import { useAuthenticate } from 'src/contexts/useAuthenticate';
+import { mentionTransform } from 'src/utils/mentionTransform';
 
 type ChatGroupCardProps = {
   chatGroup: ChatGroup;
@@ -58,7 +59,7 @@ const ChatGroupCard: React.FC<ChatGroupCardProps> = ({
       case ChatMessageType.CALL:
         return latestCall(chatMessage);
       default:
-        return chatMessage.content;
+        return mentionTransform(chatMessage.content);
     }
   };
 
