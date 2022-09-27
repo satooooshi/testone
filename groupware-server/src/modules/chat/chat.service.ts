@@ -88,49 +88,13 @@ export class ChatService {
     return user;
   }
 
-  public async getChatGroup(userID: number): Promise<ChatGroup[]> {
-    const groups = await this.chatGroupRepository
-      .createQueryBuilder('chat_groups')
-      .innerJoinAndSelect('chat_groups.members', 'member')
-      .where('member.id = :memberId', { memberId: userID })
-      .getMany();
-    const groupIDs = groups.map((g) => g.id);
-    let groupsAndUsers = await this.chatGroupRepository.find({
-      where: { id: In(groupIDs) },
-      relations: [
-        'members',
-        'lastReadChatTime',
-        'lastReadChatTime.user',
-        'pinnedUsers',
-      ],
-      order: { updatedAt: 'DESC' },
-    });
-    groupsAndUsers = groupsAndUsers.map((g) => {
-      const isPinned = !!g.pinnedUsers.filter((u) => u.id === userID).length;
-      const hasBeenRead = g?.lastReadChatTime?.[0]?.readTime
-        ? g?.lastReadChatTime?.[0]?.readTime > g.updatedAt
-        : false;
-      return {
-        ...g,
-        pinnedUsers: undefined,
-        isPinned,
-        hasBeenRead,
-      };
-    });
-    groupsAndUsers = orderBy(groupsAndUsers, [
-      'isPinned',
-      'updatedAt',
-      ['desc', 'desc'],
-    ]).reverse();
-    return groupsAndUsers;
-  }
-
   public async getRoomsId(userID: number): Promise<ChatGroup[]> {
     return await this.chatGroupRepository
       .createQueryBuilder('chat_groups')
       .select(['chat_groups.id'])
-      .innerJoin('chat_groups.members', 'member')
-      .where('member.id = :memberId', { memberId: userID })
+      .innerJoin('chat_groups.members', 'member', 'member.id = :memberId', {
+        memberId: userID,
+      })
       .getMany();
   }
 
@@ -158,14 +122,14 @@ export class ChatService {
 
     const urlUnparsedRooms = await this.chatGroupRepository
       .createQueryBuilder('chat_groups')
-      .innerJoin('chat_groups.members', 'member', 'member.id = :memberId', {
-        memberId: userID,
-      })
-      .where(
+      .innerJoin(
+        'chat_groups.members',
+        'member',
         !!updatedAtLatestRoom
-          ? `chat_groups.updatedAt > :updatedAtLatestRoom`
-          : '1=1',
+          ? `member.id = :memberId AND chat_groups.updatedAt > :updatedAtLatestRoom`
+          : 'member.id = :memberId',
         {
+          memberId: userID,
           updatedAtLatestRoom,
         },
       )
@@ -391,41 +355,6 @@ export class ChatService {
 
     return room;
   }
-  // public async getRoomsUnreadChatCount(userID: number): Promise<ChatGroup[]> {
-  //   const [urlUnparsedRooms] = await this.chatGroupRepository
-  //     .createQueryBuilder('chat_groups')
-  //     .leftJoin('chat_groups.members', 'member')
-  //     .leftJoinAndSelect(
-  //       'chat_groups.lastReadChatTime',
-  //       'lastReadChatTime',
-  //       'lastReadChatTime.user_id = :userID',
-  //       { userID },
-  //     )
-  //     .where('member.id = :memberId', { memberId: userID })
-  //     .orderBy('chat_groups.updatedAt', 'DESC')
-  //     .getManyAndCount();
-  //   const rooms = await Promise.all(
-  //     urlUnparsedRooms.map(async (g) => {
-  //       let unreadCount = 0;
-  //       const hasBeenRead = g?.lastReadChatTime?.[0]?.readTime
-  //         ? g?.lastReadChatTime?.[0]?.readTime > g.updatedAt
-  //         : false;
-  //       if (!hasBeenRead && g?.lastReadChatTime?.[0]?.readTime) {
-  //         const query = {
-  //           group: g.id,
-  //           lastReadTime: g.lastReadChatTime?.[0].readTime,
-  //         };
-  //         unreadCount = await this.getUnreadChatMessage(userID, query);
-  //       }
-
-  //       return {
-  //         ...g,
-  //         unreadCount,
-  //       };
-  //     }),
-  //   );
-  //   return rooms;
-  // }
 
   public async getChatMessage(
     userID: number,
@@ -500,7 +429,9 @@ export class ChatService {
     const senderIDs = [
       ...new Set(existMessages.map((m) => Number(m.sender_id))),
     ];
-    const replyMessageIDs = existMessages.map((m) => m.reply_parent_id);
+    const replyMessageIDs = existMessages
+      .filter((m) => m.reply_parent_id)
+      .map((m) => m.reply_parent_id);
 
     // senderの取得
     let senders: User[] = [];
@@ -525,18 +456,20 @@ export class ChatService {
       })
       .getRawMany();
     //返信の取得
-    let replyMessages = [];
+
+    let replyMessages: ChatMessage[] = [];
     if (replyMessageIDs.length) {
       replyMessages = await this.chatMessageRepository
         .createQueryBuilder('messages')
-        .leftJoin('messages.sender', 'sender')
-        .addSelect([
-          'sender.id',
-          'sender.lastName',
-          'sender.firstName',
-          'sender.existence',
-        ])
-        .where('messages.id IN (:...replyMessageIDs)', { replyMessageIDs })
+        .innerJoin(
+          'messages.sender',
+          'sender',
+          'messages.id IN (:...replyMessageIDs)',
+          {
+            replyMessageIDs,
+          },
+        )
+        .addSelect(selectUserColumns('sender'))
         .getMany();
     }
 
@@ -594,32 +527,32 @@ export class ChatService {
     return messages;
   }
 
-  public async getExpiredUrlMessages(query: number): Promise<ChatMessage[]> {
-    const date = new Date();
-    date.setDate(date.getDate() - 5);
-    const justBeforeExpiredUrlMessages = await this.chatMessageRepository
-      .createQueryBuilder('chat_messages')
-      .leftJoinAndSelect('chat_messages.chatGroup', 'chat_group')
-      .where('chat_group.id = :chatGroupID', { chatGroupID: query })
-      .andWhere(
-        'chat_messages.type <> :text AND chat_messages.type <> :system AND chat_messages.type <> :sticker AND chat_messages.type <> :call',
-        {
-          text: ChatMessageType.TEXT,
-          system: ChatMessageType.SYSTEM_TEXT,
-          sticker: ChatMessageType.STICKER,
-          call: ChatMessageType.CALL,
-        },
-      )
-      .andWhere('chat_messages.updatedAt < :fiveDaysAgo', {
-        fiveDaysAgo: date,
-      })
-      .orderBy('chat_messages.createdAt', 'DESC')
-      .getMany();
-    for (const m of justBeforeExpiredUrlMessages) {
-      await this.chatMessageRepository.save({ ...m, updatedAt: new Date() });
-    }
-    return justBeforeExpiredUrlMessages;
-  }
+  // public async getExpiredUrlMessages(query: number): Promise<ChatMessage[]> {
+  //   const date = new Date();
+  //   date.setDate(date.getDate() - 5);
+  //   const justBeforeExpiredUrlMessages = await this.chatMessageRepository
+  //     .createQueryBuilder('chat_messages')
+  //     .leftJoinAndSelect('chat_messages.chatGroup', 'chat_group')
+  //     .where('chat_group.id = :chatGroupID', { chatGroupID: query })
+  //     .andWhere(
+  //       'chat_messages.type <> :text AND chat_messages.type <> :system AND chat_messages.type <> :sticker AND chat_messages.type <> :call',
+  //       {
+  //         text: ChatMessageType.TEXT,
+  //         system: ChatMessageType.SYSTEM_TEXT,
+  //         sticker: ChatMessageType.STICKER,
+  //         call: ChatMessageType.CALL,
+  //       },
+  //     )
+  //     .andWhere('chat_messages.updatedAt < :fiveDaysAgo', {
+  //       fiveDaysAgo: date,
+  //     })
+  //     .orderBy('chat_messages.createdAt', 'DESC')
+  //     .getMany();
+  //   for (const m of justBeforeExpiredUrlMessages) {
+  //     await this.chatMessageRepository.save({ ...m, updatedAt: new Date() });
+  //   }
+  //   return justBeforeExpiredUrlMessages;
+  // }
 
   public async getUnreadChatMessage(
     userID: number,
@@ -698,9 +631,10 @@ export class ChatService {
     const lastReadChatTimes = await this.lastReadChatTimeRepository
       .createQueryBuilder('time')
       // .withDeleted()
-      .innerJoin('time.user', 'user')
+      .innerJoin('time.user', 'user', 'time.chat_group_id = :roomId', {
+        roomId: chatGroupId,
+      })
       .addSelect(selectUserColumns('user'))
-      .where('time.chat_group_id = :roomId', { roomId: chatGroupId })
       .getMany();
     if (!lastReadChatTimes.length) {
       return;
@@ -985,6 +919,9 @@ export class ChatService {
     if (!existGroup) {
       throw new BadRequestException('The group does not exist');
     }
+    if (existGroup.imageURL && existGroup.imageURL !== chatGroup.imageURL) {
+      this.storageService.deleteFile(existGroup.imageURL);
+    }
     const manager = getManager();
     existGroup.members = await manager.query(
       'select users.id as id ,users.last_name as lastName, users.first_name as firstName from user_chat_joining INNER JOIN users ON users.existence is not null AND users.id = user_id AND chat_group_id = ?',
@@ -1114,7 +1051,12 @@ export class ChatService {
     if (newData.roomType !== RoomType.GROUP) {
       maybeExistGroup = await this.chatGroupRepository
         .createQueryBuilder('g')
-        .innerJoin('g.members', 'u', 'u.id = :userId', { userId: userIds[0] })
+        .innerJoin(
+          'g.members',
+          'u',
+          'u.id = :userId AND g.room_type <> :type AND g.member_count = :length',
+          { userId: userIds[0], type: RoomType.GROUP, length: memberCount },
+        )
         .leftJoin('g.members', 'member')
         .addSelect([
           'member.id',
@@ -1122,24 +1064,22 @@ export class ChatService {
           'member.firstName',
           'member.avatarUrl',
         ])
-        .where('g.room_type <> :type', {
-          type: RoomType.GROUP,
-        })
-        .andWhere('g.member_count = :length', { length: memberCount })
         .getMany();
     } else {
       maybeExistGroup = await this.chatGroupRepository
         .createQueryBuilder('g')
+        .innerJoin(
+          'g.members',
+          'u',
+          'u.id = :userId AND g.room_type = :type AND g.member_count = :length',
+          { userId: userIds[0], type: RoomType.GROUP, length: memberCount },
+        )
         .innerJoin('g.members', 'u', 'u.id = :userId', { userId: userIds[0] })
         .leftJoin('g.members', 'member')
         .addSelect(['member.id'])
         .where('g.name = :name', {
           name: newData.name,
         })
-        .andWhere('g.room_type = :type', {
-          type: RoomType.GROUP,
-        })
-        .andWhere('g.member_count = :length', { length: memberCount })
         .getMany();
     }
 
