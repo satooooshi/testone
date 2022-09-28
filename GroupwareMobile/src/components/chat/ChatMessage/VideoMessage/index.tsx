@@ -26,43 +26,40 @@ const VideoMessage: React.FC<VideMessageProps> = ({
   const [w, setW] = useState<number>(0);
 
   useEffect(() => {
-    const getThumbnail = async () => {
-      message.thumbnail = await getThumbnailOfVideo(
-        message.content,
-        message.fileName,
-      );
-      const loadImageDimension = async () => {
-        await RNImage.getSize(message.thumbnail || '', (wi, he) => {
-          let height = 0,
-            width = 0;
-          if (wi < he && 3 * wi < he) {
-            height = windowWidth * 0.6;
-            width = 72;
-          } else if (wi < he) {
-            height = windowWidth * 0.6;
-            width = 144;
-          } else if (he < wi && 3 * he < wi) {
-            height = 72;
-            width = windowWidth * 0.6;
-          } else if (he < wi) {
-            height = 144;
-            width = windowWidth * 0.6;
-          } else if (wi - he > -10 || wi - he < 10) {
-            height = 144;
-            width = 144;
-          } else {
-            height = 144;
-            width = windowWidth * 0.6;
-          }
-          setH(height);
-          setW(width);
-        });
-      };
-      loadImageDimension();
+    const subscribe = async () => {
+      if (!message.thumbnail) {
+        message.thumbnail = await getThumbnailOfVideo(
+          message.content,
+          message.fileName,
+        );
+      }
+      await RNImage.getSize(message.thumbnail || '', (wi, he) => {
+        let height = 0,
+          width = 0;
+        if (wi < he && 3 * wi < he) {
+          height = windowWidth * 0.6;
+          width = 72;
+        } else if (wi < he) {
+          height = windowWidth * 0.6;
+          width = 144;
+        } else if (he < wi && 3 * he < wi) {
+          height = 72;
+          width = windowWidth * 0.6;
+        } else if (he < wi) {
+          height = 144;
+          width = windowWidth * 0.6;
+        } else if (wi - he > -10 || wi - he < 10) {
+          height = 144;
+          width = 144;
+        } else {
+          height = 144;
+          width = windowWidth * 0.6;
+        }
+        setH(height);
+        setW(width);
+      });
     };
-    if (!message.thumbnail) {
-      getThumbnail();
-    }
+    subscribe();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [message.thumbnail]);
 
