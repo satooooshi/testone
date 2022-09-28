@@ -20,25 +20,34 @@ const ImageMessage: React.FC<ImageMessageProps> = ({
   const [w, setW] = useState<number>(0);
 
   useEffect(() => {
-    Image.getSize(message.content, (wi, he) => {
-      let height = 0,
-        width = 0;
-      if (wi < he && 3 * wi < he) {
-        height = windowWidth * 0.6;
-        width = 72;
-      } else if (wi < he) {
-        height = windowWidth * 0.6;
-        width = 144;
-      } else if (he < wi && 3 * he < wi) {
-        height = 72;
-        width = windowWidth * 0.6;
-      } else if (he < wi) {
-        height = 144;
-        width = windowWidth * 0.6;
-      }
-      setH(height);
-      setW(width);
-    });
+    const loadImageDimension = async () => {
+      await Image.getSize(message.content, (wi, he) => {
+        let height = 0,
+          width = 0;
+        if (wi < he && 3 * wi < he) {
+          height = windowWidth * 0.6;
+          width = 72;
+        } else if (wi < he) {
+          height = windowWidth * 0.6;
+          width = 144;
+        } else if (he < wi && 3 * he < wi) {
+          height = 72;
+          width = windowWidth * 0.6;
+        } else if (he < wi) {
+          height = 144;
+          width = windowWidth * 0.6;
+        } else if (wi - he > -10 || wi - he < 10) {
+          height = 144;
+          width = 144;
+        } else {
+          height = 144;
+          width = windowWidth * 0.6;
+        }
+        setH(height);
+        setW(width);
+      });
+    };
+    loadImageDimension();
   }, [message.content, windowWidth]);
 
   if (h === 0 && w === 0) {
