@@ -204,6 +204,7 @@ const Chat: React.FC = () => {
           });
         }
         // Keyboard.dismiss();
+        messageIosRef?.current?.scrollToIndex({index: 0});
       }
     },
   });
