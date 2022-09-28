@@ -867,7 +867,6 @@ const Chat: React.FC = () => {
           setMessages(messagesInStorage);
         }
         messagesInStorageLength = messagesInStorage?.length;
-        getExpiredUrlMessages();
       }
       const now = dateTimeFormatterFromJSDDate({
         dateTime: new Date(),

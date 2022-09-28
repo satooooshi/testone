@@ -444,6 +444,7 @@ export class ChatService {
           'users.firstName',
           'users.existence',
         ])
+        .withDeleted()
         .where('users.id IN (:...senderIDs)', { senderIDs })
         .getMany();
     }
@@ -461,6 +462,7 @@ export class ChatService {
     if (replyMessageIDs.length) {
       replyMessages = await this.chatMessageRepository
         .createQueryBuilder('messages')
+        .withDeleted()
         .innerJoin(
           'messages.sender',
           'sender',

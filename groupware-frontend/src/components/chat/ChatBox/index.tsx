@@ -403,6 +403,12 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
     [room.members, room.previousMembers],
   );
 
+  const replyParentMessageSender = useMemo(() => {
+    return allMembers?.find(
+      (m) => m.id === newChatMessage.replyParentMessage?.sender?.id,
+    );
+  }, [newChatMessage, allMembers]);
+
   const senderAvatars = useMemo(() => {
     return allMembers.map((m) => ({
       member: m,
@@ -647,21 +653,21 @@ const ChatBox: React.FC<ChatBoxProps> = ({ room, onMenuClicked }) => {
           <UserAvatar
             mr="8px"
             src={
-              allMembers?.find(
-                (m) => m.id === newChatMessage.replyParentMessage?.sender?.id,
-              )?.avatarUrl
+              replyParentMessageSender
+                ? replyParentMessageSender.avatarUrl
+                : newChatMessage.replyParentMessage.sender?.avatarUrl
             }
             size="md"
-            user={allMembers?.find(
-              (m) => m.id === newChatMessage.replyParentMessage?.sender?.id,
-            )}
+            user={
+              replyParentMessageSender ||
+              newChatMessage.replyParentMessage.sender
+            }
           />
           <Box display="flex" justifyContent="center" flexDir="column" w="80%">
             <Text fontWeight="bold">
               {userNameFactory(
-                allMembers?.find(
-                  (m) => m.id === newChatMessage.replyParentMessage?.sender?.id,
-                ),
+                replyParentMessageSender ||
+                  newChatMessage.replyParentMessage.sender,
               )}
             </Text>
             <Text isTruncated w="90%" noOfLines={1}>
