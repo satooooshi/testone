@@ -31,27 +31,34 @@ const VideoMessage: React.FC<VideMessageProps> = ({
         message.content,
         message.fileName,
       );
-      console.log('image sizes,', message.thumbnail);
-      RNImage.getSize(message.thumbnail, (wi, he) => {
-        let height = 0,
-          width = 0;
-        if (wi < he && 3 * wi < he) {
-          height = windowWidth * 0.6;
-          width = 72;
-        } else if (wi < he) {
-          height = windowWidth * 0.6;
-          width = 144;
-        } else if (he < wi && 3 * he < wi) {
-          height = 72;
-          width = windowWidth * 0.6;
-        } else if (he < wi) {
-          height = 144;
-          width = windowWidth * 0.6;
-        }
-        console.log('image sizes,', height, width);
-        setH(height);
-        setW(width);
-      });
+      const loadImageDimension = async () => {
+        await RNImage.getSize(message.thumbnail || '', (wi, he) => {
+          let height = 0,
+            width = 0;
+          if (wi < he && 3 * wi < he) {
+            height = windowWidth * 0.6;
+            width = 72;
+          } else if (wi < he) {
+            height = windowWidth * 0.6;
+            width = 144;
+          } else if (he < wi && 3 * he < wi) {
+            height = 72;
+            width = windowWidth * 0.6;
+          } else if (he < wi) {
+            height = 144;
+            width = windowWidth * 0.6;
+          } else if (wi - he > -10 || wi - he < 10) {
+            height = 144;
+            width = 144;
+          } else {
+            height = 144;
+            width = windowWidth * 0.6;
+          }
+          setH(height);
+          setW(width);
+        });
+      };
+      loadImageDimension();
     };
     if (!message.thumbnail) {
       getThumbnail();
