@@ -382,6 +382,26 @@ export class ChatController {
     return await this.chatService.saveLastReadChatTime(req.user, chatGroupId);
   }
 
+  @Post('send-notifi-for-refetch-room/:id')
+  @UseGuards(JwtAuthenticationGuard)
+  async sendNotifiForRefetchRoom(
+    @Req() req: RequestWithUser,
+    @Param('id') chatGroupId: number,
+  ) {
+    const { user } = req;
+    const silentNotification: CustomPushNotificationData = {
+      title: '',
+      body: '',
+      custom: {
+        silent: 'silent',
+        type: 'badge',
+        screen: '',
+        id: chatGroupId.toString(),
+      },
+    };
+    await sendPushNotifToSpecificUsers([user.id], silentNotification);
+  }
+
   @Post('leave-room')
   @UseGuards(JwtAuthenticationGuard)
   async leaveGroup(

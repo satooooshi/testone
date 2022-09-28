@@ -57,7 +57,7 @@ const sendPushNotifToSpecificDevices = async (
     topic: process.env.IOS_BUNDLE_ID ? '' : '', // REQUIRED for iOS (apn and gcm)
     contentAvailable: true,
     priority: 'high',
-    silent: data?.custom?.silent === 'silent' ? true : false,
+    silent: data?.custom?.silent === 'silent',
     // badge: data.custom.type === 'badge' ? 1 : 0,
     sound: data.title ? 'local.wav' : undefined,
     // android_channel_id: 'default-channel-id',
