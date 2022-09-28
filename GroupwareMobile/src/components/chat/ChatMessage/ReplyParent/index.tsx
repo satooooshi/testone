@@ -101,13 +101,13 @@ const ReplyParent: React.FC<ReplyParentProps> = ({
         <UserAvatar
           w={32}
           h={32}
-          user={senderAvatar?.member}
+          user={senderAvatar?.member || parentMessage.sender}
           GoProfile={true}
         />
       </Div>
       <Div w={'65%'}>
         <Text color={isSender ? 'white' : 'black'} fontSize={14}>
-          {userNameFactory(senderAvatar?.member)}
+          {userNameFactory(senderAvatar?.member || parentMessage.sender)}
         </Text>
         <Text color={isSender ? 'white' : 'black'} fontSize={14}>
           {content(parentMessage.type)}

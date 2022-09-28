@@ -178,7 +178,7 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
             underlayColor="none">
             <Div mr="xs">
               {senderAvatars?.find(s => s.member.id === message.sender?.id)
-                ?.avatar ?? <UserAvatar h={40} w={40} user={undefined} />}
+                ?.avatar ?? <UserAvatar h={40} w={40} user={message.sender} />}
             </Div>
           </TouchableHighlight>
         ) : null}

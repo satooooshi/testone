@@ -51,11 +51,15 @@ const ReplyTarget: React.FC<ReplyTargetProps> = ({
         <Icon name="close" fontSize={24} />
       </TouchableOpacity>
       <Div mr="lg">
-        <UserAvatar w={40} h={40} user={senderAvatar?.member} />
+        <UserAvatar
+          w={40}
+          h={40}
+          user={senderAvatar?.member || replyParentMessage.sender}
+        />
       </Div>
       <Div alignSelf="center" w={'70%'}>
         <Text fontSize={12} fontWeight={'bold'} numberOfLines={1}>
-          {userNameFactory(senderAvatar?.member)}
+          {userNameFactory(senderAvatar?.member || replyParentMessage.sender)}
         </Text>
         <Text numberOfLines={1} color={darkFontColor} fontSize={12}>
           {content(replyParentMessage.type)}
