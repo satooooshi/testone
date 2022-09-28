@@ -267,8 +267,7 @@ const NewsAdmin: React.VFC = () => {
         flexDir="column"
         justifyContent={!isSmallerThan768 ? 'center' : 'flex-start'}
         alignItems="center"
-        w={!isSmallerThan768 ? '100%' : '99vw'}
-        mb="72px">
+        w={!isSmallerThan768 ? '100%' : '99vw'}>
         {/* <Text color="blue.500" fontSize="16px" mb="8px">
           特集管理ではアプリのTOP画面に表示されるリンクの管理ができます
         </Text> */}

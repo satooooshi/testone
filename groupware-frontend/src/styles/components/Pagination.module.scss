@@ -1,6 +1,7 @@
 @import '../variables.scss';
 
 .pagination {
+  top: 20px;
   margin: 15px auto;
   display: flex;
   list-style: none;
@@ -28,8 +29,10 @@
 .pagination_wrap_layout {
   display: flex;
   justify-content: center;
-  position: absolute;
+  //position: absolute;
+  scroll-padding-top: 100px;
   bottom: 16px;
   right: auto;
   left: auto;
+  margin-top: 30px;
 }
