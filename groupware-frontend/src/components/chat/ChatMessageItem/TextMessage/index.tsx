@@ -99,6 +99,10 @@ const TextMessage: React.FC<TextMessageProps> = ({
     }
   }, [message.createdAt, message.updatedAt]);
 
+  const senderAvatar = senderAvatars?.find(
+    (s) => s.member.id === message.replyParentMessage?.sender?.id,
+  );
+
   return (
     <Box
       maxW={isSmallerThan768 ? '300px' : '40vw'}
@@ -121,18 +125,17 @@ const TextMessage: React.FC<TextMessageProps> = ({
               mr="4px"
               cursor="pointer"
               user={
-                senderAvatars?.find(
-                  (s) => s.member.id === message.replyParentMessage?.sender?.id,
-                )?.member
+                senderAvatar
+                  ? senderAvatar.member
+                  : message.replyParentMessage.sender
               }
             />
             <Box width={'50%'}>
               <Text fontWeight="bold">
                 {userNameFactory(
-                  senderAvatars?.find(
-                    (s) =>
-                      s.member.id === message.replyParentMessage?.sender?.id,
-                  )?.member,
+                  senderAvatar
+                    ? senderAvatar.member
+                    : message.replyParentMessage.sender,
                 )}
               </Text>
               <Text>{replyContent(message.replyParentMessage)}</Text>

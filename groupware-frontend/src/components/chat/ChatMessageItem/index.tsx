@@ -385,7 +385,7 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = memo(
         flexDir="column"
         alignItems={messageState.isSender ? 'flex-end' : 'flex-start'}>
         <ReadUsersListModal
-          sender={senderAvatar?.member}
+          sender={senderAvatar ? senderAvatar.member : messageState.sender}
           usersInRoom={usersInRoom}
           isOpen={visibleReadModal}
           onClose={() => setVisibleLastReadModal(false)}
@@ -411,13 +411,27 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = memo(
             alignSelf={messageState.isSender ? 'flex-end' : 'flex-start'}
             flexDir={messageState.isSender ? 'row-reverse' : undefined}>
             {!messageState.isSender ? (
-              senderAvatar?.member && senderAvatar.member?.existence ? (
-                <Link href={`/account/${messageState.sender?.id}`} passHref>
-                  {senderAvatar?.avatar}
-                </Link>
-              ) : (
-                <Avatar h="40px" w="40px" src={boldMascot.src} />
-              )
+              <Link
+                href={
+                  messageState.sender?.existence
+                    ? `/account/${messageState.sender?.id}`
+                    : undefined
+                }
+                passHref>
+                {senderAvatar ? (
+                  senderAvatar?.avatar
+                ) : (
+                  <Avatar
+                    h="40px"
+                    w="40px"
+                    src={
+                      messageState.sender?.existence
+                        ? messageState.sender?.avatarUrl
+                        : boldMascot.src
+                    }
+                  />
+                )}
+              </Link>
             ) : null}
             <Box display="flex" alignItems="flex-end">
               {messageState.isSender && (
@@ -441,9 +455,11 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = memo(
               <Box display="flex" flexDir="column" alignItems="flex-start">
                 {!messageState.isSender && (
                   <Text>
-                    {senderAvatar?.member && senderAvatar.member?.existence
-                      ? userNameFactory(senderAvatar.member)
-                      : 'ボールドくん'}
+                    {userNameFactory(
+                      senderAvatar?.member
+                        ? senderAvatar.member
+                        : messageState.sender,
+                    )}
                   </Text>
                 )}
                 {messageState.type === ChatMessageType.TEXT ? (
