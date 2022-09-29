@@ -43,7 +43,7 @@ export const uploadStorage = async (files: File[]): Promise<string[]> => {
     return file;
   };
 
-  const fileNames = files.map((f) => f.name);
+  const fileNames = files.map((f) => f.name.normalize('NFC'));
   try {
     const res = await axiosInstance.post(uploadStorageURL, fileNames);
     const signedURLMapping: { [fileName: string]: string } = res.data;
