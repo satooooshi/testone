@@ -55,6 +55,9 @@ const sendPushNotifToSpecificDevices = async (
   const dataToSend = {
     title: data.title ? data.title : '', // REQUIRED for Android
     topic: process.env.IOS_BUNDLE_ID ? '' : '', // REQUIRED for iOS (apn and gcm)
+    icon: 'ic_stat_format_shapes', // in each nofiti message with  black color background , overwriten with default_notification_icon with black color background if not provided. ic_stat_bold',
+    image:
+      'https://images.unsplash.com/photo-1542553458-79a13aebfda6?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxleHBsb3JlLWZlZWR8Mnx8fGVufDB8fHx8&auto=format&fit=crop&w=700&q=60',
     contentAvailable: true,
     priority: 'high',
     silent: data?.custom?.silent === 'silent',
