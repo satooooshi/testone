@@ -45,14 +45,13 @@ const Suggestions: React.FC<
   );
 };
 
-const mentionPartType: TriggerPartType = {
-  trigger: '@',
-  allowedSpacesCount: 3,
-  isInsertSpaceAfterMention: true,
-  textStyle: {fontWeight: 'bold', color: 'blue'},
-};
 const triggersConfig: TriggersConfig<'mention'> = {
-  mention: mentionPartType,
+  mention: {
+    trigger: '@',
+    allowedSpacesCount: 3,
+    isInsertSpaceAfterMention: true,
+    textStyle: {fontWeight: 'bold', color: 'blue'},
+  },
 };
 
 type ChatFooterProps = {
