@@ -61,10 +61,11 @@
 .pagination_wrapper {
   display: flex;
   justify-content: center;
-  position: absolute;
+  //position: absolute;
   bottom: 24px;
   right: auto;
   left: auto;
+  margin-top: -40px;
 }
 
 .search_form_wrapper {
