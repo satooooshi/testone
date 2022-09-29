@@ -10,7 +10,7 @@ import { baseURL } from 'src/utils/url';
 // import { baseURL } from 'src/utils/url';
 
 // socket
-export const socket = io('https://www.bbbbbb.ga:443', {
+export const socket = io('https://www.groupware-develop.tk', {
   transports: ['websocket'],
 });
 
@@ -54,7 +54,7 @@ export const useChatSocket = (
   return {
     joinRoom: () => {
       setCurrentChatRoomId(room.id);
-      socket.emit('joinRoom', room.id.toString());
+      socket.emit('joinRoom', 'valleyin-app' + room.id.toString());
 
       socket.on('readMessageClient', async (senderId: string) => {
         // console.log('socket readMessageClient----', senderId);
@@ -146,7 +146,7 @@ export const useChatSocket = (
       });
     },
     leaveRoom: () => {
-      socket.emit('leaveRoom', room.id.toString());
+      socket.emit('leaveRoom', 'valleyin-app' + room.id.toString());
       socket.removeAllListeners();
       setCurrentChatRoomId(undefined);
     },
