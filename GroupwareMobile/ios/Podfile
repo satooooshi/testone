@@ -26,6 +26,7 @@ target 'GroupwareMobile' do
     installer.pods_project.build_configurations.each do |config|
       config.build_settings["EXCLUDED_ARCHS[sdk=iphonesimulator*]"] = "arm64"
       config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '12.1'
+      config.build_settings['CODE_SIGN_IDENTITY'] = ''
     end
     react_native_post_install(installer)
   end
