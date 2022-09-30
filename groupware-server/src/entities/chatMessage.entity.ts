@@ -96,7 +96,9 @@ export class ChatMessage {
 
   isSender?: boolean;
 
-  @ManyToOne(() => ChatMessage, (chatMessage) => chatMessage.id)
+  @ManyToOne(() => ChatMessage, (chatMessage) => chatMessage.id, {
+    onDelete: 'SET NULL',
+  })
   @JoinColumn({ name: 'reply_parent_id' })
   replyParentMessage?: ChatMessage;
 
