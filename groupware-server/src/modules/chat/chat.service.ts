@@ -1076,7 +1076,6 @@ export class ChatService {
           'u.id = :userId AND g.room_type = :type AND g.member_count = :length',
           { userId: userIds[0], type: RoomType.GROUP, length: memberCount },
         )
-        .innerJoin('g.members', 'u', 'u.id = :userId', { userId: userIds[0] })
         .leftJoin('g.members', 'member')
         .addSelect(['member.id'])
         .where('g.name = :name', {
