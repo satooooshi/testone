@@ -34,9 +34,8 @@
           android:value="true"/>
         <!-- Change the resource name to your App's accent color - or any other color you want -->
         <!-- or @android:color/{name} to use a standard color -->
-        <meta-data android:name="com.google.firebase.messaging.default_notification_icon" android:resource="@mipmap/ic_stat_react_js_icon" tools:replace="android:resource"/>
-        <meta-data android:name="com.google.firebase.messaging.default_notification_color" android:resource="@color/colorAccent" tools:replace="android:resource"/>
-       <!-- <meta-data android:name="com.google.firebase.messaging.default_notification_color" android:resource="@android:color/white" tools:replace="android:resource"/> -->
+        <meta-data android:name="com.google.firebase.messaging.default_notification_icon" android:resource="@mipmap/ic_push_notification" tools:replace="android:resource"/>
+        <meta-data android:name="com.google.firebase.messaging.default_notification_color" android:resource="@color/notificationColorAccent" tools:replace="android:resource"/>
         <meta-data  android:name="com.dieam.reactnativepushnotification.notification_color"
           android:resource="@color/white"/>
         <receiver android:name="com.dieam.reactnativepushnotification.modules.RNPushNotificationActions"	android:exported="true" />
