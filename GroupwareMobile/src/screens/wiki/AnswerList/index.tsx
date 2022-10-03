@@ -6,7 +6,7 @@ import {
   useWindowDimensions,
 } from 'react-native';
 import RenderHtml from 'react-native-render-html';
-import {Div, Text, Button, Overlay} from 'react-native-magnus';
+import {Div, Text, Button, Overlay, Icon} from 'react-native-magnus';
 import {BoardCategory, User, Wiki} from '../../../types';
 import {darkFontColor} from '../../../utils/colors';
 import {userNameFactory} from '../../../utils/factory/userNameFactory';
@@ -17,6 +17,8 @@ import {useAuthenticate} from '../../../contexts/useAuthenticate';
 import {useAPIGetWikiDetail} from '../../../hooks/api/wiki/useAPIGetWikiDetail';
 import UserAvatar from '../../../components/common/UserAvatar';
 import {dateTimeFormatterFromJSDDate} from '../../../utils/dateTimeFormatterFromJSDate';
+import {PostReplyNavigationProps} from '../../../types/navigator/drawerScreenProps';
+import {useNavigation} from '@react-navigation/native';
 
 type AnswerListProps = {
   wiki: Wiki;
@@ -37,6 +39,8 @@ const AnswerList: React.FC<AnswerListProps> = ({wiki, onPressAvatar}) => {
       },
     });
   const {refetch: refetchWikiInfo} = useAPIGetWikiDetail(wiki.id);
+  const navigation: PostReplyNavigationProps =
+    useNavigation<PostReplyNavigationProps>();
 
   return (
     <>
@@ -79,35 +83,87 @@ const AnswerList: React.FC<AnswerListProps> = ({wiki, onPressAvatar}) => {
                     </Text>
                   </Div>
                 </Div>
-                <Div mb={8} ml={40}>
-                  <RenderHtml
-                    baseStyle={{color: 'black'}}
-                    contentWidth={windowWidth * 0.9}
-                    source={{
-                      html:
-                        answer.textFormat === 'html'
-                          ? answer.body
-                          : mdParser.render(answer.body),
-                    }}
-                  />
-                </Div>
-                {wiki.boardCategory === BoardCategory.QA &&
-                  (wiki.bestAnswer?.id === answer.id ? (
-                    <Button mb={8} bg="green600" w={'100%'}>
-                      ベストアンサー
-                    </Button>
-                  ) : !wiki.resolvedAt && wiki.writer?.id === user?.id ? (
+                <Div ml={40}>
+                  <Div mb={'sm'}>
+                    <RenderHtml
+                      baseStyle={{color: 'black'}}
+                      contentWidth={windowWidth * 0.9}
+                      source={{
+                        html:
+                          answer.textFormat === 'html'
+                            ? answer.body
+                            : mdParser.render(answer.body),
+                      }}
+                    />
+                  </Div>
+
+                  <ReplyList answer={answer} onPressAvatar={onPressAvatar} />
+
+                  <Div flexDir="row" alignItems="center">
                     <Button
-                      mb={8}
-                      bg="orange600"
-                      w={'100%'}
-                      onPress={() =>
-                        saveBestAnswer({...wiki, bestAnswer: answer})
-                      }>
-                      ベストアンサーに選ぶ
+                      rounded="circle"
+                      borderWidth={1}
+                      borderColor="gray400"
+                      bg="white"
+                      p="lg"
+                      onPress={() => {
+                        navigation.navigate('WikiStack', {
+                          screen: 'PostReply',
+                          params: {id: answer.id},
+                          initial: false,
+                        });
+                      }}>
+                      <Icon
+                        name="reply"
+                        fontFamily="MaterialIcons"
+                        fontSize={'2xl'}
+                        color={'gray'}
+                      />
                     </Button>
-                  ) : null)}
-                <ReplyList answer={answer} onPressAvatar={onPressAvatar} />
+                    <Div flex={1} />
+                    {wiki.boardCategory === BoardCategory.QA &&
+                      (wiki.bestAnswer?.id === answer.id ? (
+                        <Button
+                          bg="white"
+                          color="green500"
+                          borderWidth={1}
+                          borderColor="green500"
+                          rounded={'xl'}
+                          prefix={
+                            <Icon
+                              name="award"
+                              fontFamily="Feather"
+                              fontSize={'2xl'}
+                              color={'green500'}
+                              mr={'sm'}
+                            />
+                          }>
+                          ベストアンサー
+                        </Button>
+                      ) : !wiki.resolvedAt && wiki.writer?.id === user?.id ? (
+                        <Button
+                          bg="white"
+                          borderWidth={1}
+                          borderColor="gray400"
+                          color="gray"
+                          rounded="xl"
+                          prefix={
+                            <Icon
+                              name="award"
+                              fontFamily="Feather"
+                              fontSize={'2xl'}
+                              color={'gray'}
+                              mr={'sm'}
+                            />
+                          }
+                          onPress={() =>
+                            saveBestAnswer({...wiki, bestAnswer: answer})
+                          }>
+                          ベストアンサーに選ぶ
+                        </Button>
+                      ) : null)}
+                  </Div>
+                </Div>
               </Div>
             ),
         )
