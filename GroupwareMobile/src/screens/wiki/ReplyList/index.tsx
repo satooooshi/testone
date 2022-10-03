@@ -25,7 +25,6 @@ const ReplyList: React.FC<ReplyListProps> = ({answer, onPressAvatar}) => {
           <Collapse.Header
             bg="white"
             color="gray"
-            pl={32}
             py="lg"
             prefix={
               <Icon
