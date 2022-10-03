@@ -17,6 +17,8 @@ import {useAuthenticate} from '../../../contexts/useAuthenticate';
 import {useAPIGetWikiDetail} from '../../../hooks/api/wiki/useAPIGetWikiDetail';
 import UserAvatar from '../../../components/common/UserAvatar';
 import {dateTimeFormatterFromJSDDate} from '../../../utils/dateTimeFormatterFromJSDate';
+import {PostReplyNavigationProps} from '../../../types/navigator/drawerScreenProps';
+import {useNavigation} from '@react-navigation/native';
 
 type AnswerListProps = {
   wiki: Wiki;
@@ -37,6 +39,8 @@ const AnswerList: React.FC<AnswerListProps> = ({wiki, onPressAvatar}) => {
       },
     });
   const {refetch: refetchWikiInfo} = useAPIGetWikiDetail(wiki.id);
+  const navigation: PostReplyNavigationProps =
+    useNavigation<PostReplyNavigationProps>();
 
   return (
     <>
@@ -107,6 +111,18 @@ const AnswerList: React.FC<AnswerListProps> = ({wiki, onPressAvatar}) => {
                       ベストアンサーに選ぶ
                     </Button>
                   ) : null)}
+                <Button
+                  bg="pink600"
+                  w={'100%'}
+                  onPress={() => {
+                    navigation.navigate('WikiStack', {
+                      screen: 'PostReply',
+                      params: {id: answer.id},
+                      initial: false,
+                    });
+                  }}>
+                  返信する
+                </Button>
                 <ReplyList answer={answer} onPressAvatar={onPressAvatar} />
               </Div>
             ),

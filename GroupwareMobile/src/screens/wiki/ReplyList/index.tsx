@@ -1,12 +1,10 @@
 import React, {useState} from 'react';
 import {TouchableOpacity, useWindowDimensions} from 'react-native';
-import {Div, Text, Collapse, Button, Icon} from 'react-native-magnus';
+import {Div, Text, Collapse, Icon} from 'react-native-magnus';
 import {QAAnswer, User} from '../../../types';
 import MarkdownIt from 'markdown-it';
 import RenderHtml from 'react-native-render-html';
 import {userNameFactory} from '../../../utils/factory/userNameFactory';
-import {PostReplyNavigationProps} from '../../../types/navigator/drawerScreenProps';
-import {useNavigation} from '@react-navigation/native';
 import {darkFontColor} from '../../../utils/colors';
 import UserAvatar from '../../../components/common/UserAvatar';
 import {dateTimeFormatterFromJSDDate} from '../../../utils/dateTimeFormatterFromJSDate';
@@ -17,25 +15,11 @@ type ReplyListProps = {
 };
 
 const ReplyList: React.FC<ReplyListProps> = ({answer, onPressAvatar}) => {
-  const navigation: PostReplyNavigationProps =
-    useNavigation<PostReplyNavigationProps>();
   const mdParser = new MarkdownIt({breaks: true});
   const {width: windowWidth} = useWindowDimensions();
   const [repliesHeight, setRepliesHeight] = useState<number>(100);
   return (
     <>
-      <Button
-        bg="pink600"
-        w={'100%'}
-        onPress={() => {
-          navigation.navigate('WikiStack', {
-            screen: 'PostReply',
-            params: {id: answer.id},
-            initial: false,
-          });
-        }}>
-        返信する
-      </Button>
       {answer.replies?.length ? (
         <Collapse mb={8}>
           <Collapse.Header
