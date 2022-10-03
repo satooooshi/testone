@@ -58,9 +58,18 @@ const ReplyList: React.FC<ReplyListProps> = ({answer, onPressAvatar}) => {
                 color="gray"
                 fontFamily="Octicons"
               />
-            }>
-            {`${answer.replies.length}件の返信`}
-          </Collapse.Header>
+            }
+            suffix={
+              <Text color="gray" fontSize={14}>
+                {`${answer.replies.length}件の返信`}を見る
+              </Text>
+            }
+            activeSuffix={
+              <Text color="gray" fontSize={14}>
+                {`${answer.replies.length}件の返信`}を閉じる
+              </Text>
+            }
+          />
           <Collapse.Body mb={8} h={repliesHeight}>
             <Div onLayout={e => setRepliesHeight(e.nativeEvent.layout.height)}>
               {answer.replies.length ? (
