@@ -156,9 +156,10 @@ export class EventScheduleService {
       { label: 'タグ', value: 'tag' },
       { label: 'タイプ', value: 'type' },
       { label: '開催者', value: 'hostUsers' },
-      { label: '参加者', value: 'users' },
-      { label: '参加者の社員コード', value: 'employeeId' },
-      { label: '参加人数', value: 'participantsCount' },
+      { label: '応募者', value: 'users' },
+      { label: '出席状況', value: 'status' },
+      { label: '応募者の社員コード', value: 'employeeId' },
+      { label: '応募人数', value: 'participantsCount' },
     ];
     const csvEvents: any[] = [];
     const events = await this.eventRepository.find({
@@ -181,6 +182,7 @@ export class EventScheduleService {
             userJoiningEvent.user.lastName +
             ' ' +
             userJoiningEvent.user.firstName;
+          const isCancel = !!userJoiningEvent.canceledAt;
           csvEvents.push({
             ...e,
             startAt: dateTimeFormatterFromJSDDate({ dateTime: e.startAt }),
@@ -189,6 +191,7 @@ export class EventScheduleService {
             type: this.eventTypeNameFactory(e.type),
             hostUsers: host,
             users: participantName,
+            status: isCancel ? '欠席' : '出席',
             employeeId: userJoiningEvent.user.employeeId,
             participantsCount: e.userJoiningEvent.length,
           });
@@ -203,6 +206,7 @@ export class EventScheduleService {
         type: this.eventTypeNameFactory(e.type),
         hostUsers: host,
         users: '',
+        status: '',
         employeeId: '',
         participantsCount: e.userJoiningEvent.length,
       });
