@@ -355,6 +355,9 @@ const Profile = () => {
           <FormControl className={profileStyles.input_wrapper}>
             <FormLabel fontWeight={'bold'}>メールアドレス</FormLabel>
             <Input
+              readOnly
+              color="gray"
+              fontWeight="bold"
               type="email"
               name="email"
               placeholder="email@example.com"
@@ -421,6 +424,9 @@ const Profile = () => {
           <FormControl className={profileStyles.input_wrapper}>
             <FormLabel fontWeight={'bold'}>姓</FormLabel>
             <Input
+              readOnly
+              color="gray"
+              fontWeight="bold"
               type="text"
               name="lastName"
               placeholder="山田"
@@ -432,6 +438,9 @@ const Profile = () => {
           <FormControl className={profileStyles.input_wrapper}>
             <FormLabel fontWeight={'bold'}>名</FormLabel>
             <Input
+              readOnly
+              color="gray"
+              fontWeight="bold"
               type="text"
               name="firstName"
               placeholder="太郎"
@@ -443,6 +452,9 @@ const Profile = () => {
           <FormControl className={profileStyles.input_wrapper}>
             <FormLabel fontWeight={'bold'}>姓(フリガナ)</FormLabel>
             <Input
+              readOnly
+              color="gray"
+              fontWeight="bold"
               type="text"
               name="lastNameKana"
               placeholder="ヤマダ"
@@ -454,6 +466,9 @@ const Profile = () => {
           <FormControl className={profileStyles.input_wrapper}>
             <FormLabel fontWeight={'bold'}>名(フリガナ)</FormLabel>
             <Input
+              readOnly
+              color="gray"
+              fontWeight="bold"
               type="text"
               name="firstNameKana"
               placeholder="タロウ"
