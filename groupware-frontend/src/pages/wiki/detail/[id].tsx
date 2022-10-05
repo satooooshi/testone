@@ -460,7 +460,7 @@ const QuestionDetail = () => {
                         <WrappedDraftEditor
                           style={{
                             marginBottom: 10,
-                            width: isSmallerThan768 ? '100vw' : '70vw',
+                            width: '100%',
                           }}
                           editorRef={draftEditor}
                           placeholder={
