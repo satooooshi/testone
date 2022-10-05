@@ -76,7 +76,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
     title: '',
     body: '',
     tags: [],
-    type: type || WikiType.BOARD,
+    type: type || undefined,
     ruleCategory: type === WikiType.RULES ? RuleCategory.RULES : undefined,
     boardCategory:
       type === WikiType.BOARD || !type
@@ -145,6 +145,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
   const headerTabName = '内容を編集';
 
   const saveButtonName = useMemo(() => {
+    console.log(newQuestion.type);
     return newQuestion.type
       ? wikiTypeNameFactory(
           newQuestion.type,
@@ -189,6 +190,9 @@ const WikiForm: React.FC<WikiFormProps> = ({
   };
 
   const onTypeSelectionChange = (e: ChangeEvent<HTMLSelectElement>) => {
+    if (!e.target.value) {
+      return setNewQuestion((e) => ({ ...e, type: undefined }));
+    }
     if (
       e.target.value === RuleCategory.RULES ||
       e.target.value === RuleCategory.ABC ||
@@ -311,22 +315,20 @@ const WikiForm: React.FC<WikiFormProps> = ({
               flexDir={isSmallerThan768 ? 'column' : undefined}
               mb={isSmallerThan768 ? '16px' : undefined}>
               <FormLabel fontWeight="bold">タイプを選択してください</FormLabel>
+              {errors.type && touched.type ? (
+                <Text color="tomato">{errors.type}</Text>
+              ) : null}
               <Select
                 colorScheme="teal"
                 bg="white"
                 onChange={onTypeSelectionChange}
-                defaultValue={
-                  type === WikiType.RULES
-                    ? RuleCategory.RULES
-                    : type === WikiType.ALL_POSTAL
-                    ? type
-                    : BoardCategory.QA
-                }>
+                defaultValue={newQuestion.type}>
                 {isCreatableWiki({
                   type: WikiType.RULES,
                   userRole: user?.role,
                 }) ? (
                   <>
+                    <option value={undefined} label={'指定なし'}></option>
                     <option value={RuleCategory.PHILOSOPHY}>
                       {wikiTypeNameFactory(
                         WikiType.RULES,
