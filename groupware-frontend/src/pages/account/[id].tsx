@@ -28,7 +28,6 @@ import {
   SimpleGrid,
   Flex,
   Wrap,
-  AvatarBadge,
 } from '@chakra-ui/react';
 import {
   BoardCategory,
