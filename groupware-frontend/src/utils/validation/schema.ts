@@ -64,6 +64,7 @@ export const registerSchema = Yup.object().shape({
     .matches(/^([^ ]*)$/, blankMixedMessage)
     .min(8, minEightTextMessage)
     .required(`パスワードは${minEightTextMessage}`),
+  employeeId: Yup.string().required('社員コードは' + requireMessage),
   introduceOther: Yup.string().max(
     1000,
     `自己紹介は${nWordLimitMessage(1000)}`,
@@ -146,6 +147,54 @@ export const profileSchema = Yup.object().shape({
   ),
 });
 
+export const adminEditUserProfileSchema = Yup.object().shape({
+  email: Yup.string()
+    .matches(
+      /^([\w!#$%&'*+\-\/=?^`{|}~]+(\.[\w!#$%&'*+\-\/=?^`{|}~]+)*|"([\w!#$%&'*+\-\/=?^`{|}~. ()<>\[\]:;@,]|\\[\\"])+")@(([a-zA-Z\d\-]+\.)+[a-zA-Z]+|\[(\d{1,3}(\.\d{1,3}){3}|IPv6:[\da-fA-F]{0,4}(:[\da-fA-F]{0,4}){1,5}(:\d{1,3}(\.\d{1,3}){3}|(:[\da-fA-F]{0,4}){0,2}))\])$/,
+      emailFormatMessage,
+    )
+    .required(requireMessage),
+  phone: Yup.string().matches(
+    /^0\d{2,3}-\d{1,4}-\d{1,4}$/,
+    `電話番号は${phoneFormatMessage}`,
+  ),
+  lastName: Yup.string()
+    .required(`姓は${requireMessage}`)
+    .max(50, `姓は${nWordLimitMessage(50)}`),
+  firstName: Yup.string()
+    .required(`名は${requireMessage}`)
+    .max(50, `名は${nWordLimitMessage(50)}`),
+  lastNameKana: Yup.string()
+    .required(`姓(フリガナ)は${requireMessage}`)
+    .matches(/^[ァ-ヶー]+$/, `姓(フリガナ)は${kanaFormatMessage}`)
+    .max(50, `姓(フリガナ)は${nWordLimitMessage(50)}`),
+  firstNameKana: Yup.string()
+    .required(`名(フリガナ)は${requireMessage}`)
+    .matches(/^[ァ-ヶー]+$/, `名(フリガナ)は${kanaFormatMessage}`)
+    .max(50, `名(フリガナ)は${nWordLimitMessage(50)}`),
+  employeeId: Yup.string().required('社員コードは' + requireMessage),
+  introduceOther: Yup.string().max(
+    1000,
+    `自己紹介は${nWordLimitMessage(1000)}`,
+  ),
+  introduceTech: Yup.string().max(
+    1000,
+    `技術の紹介は${nWordLimitMessage(1000)}`,
+  ),
+  introduceQualification: Yup.string().max(
+    1000,
+    `資格の紹介は${nWordLimitMessage(1000)}`,
+  ),
+  introduceClub: Yup.string().max(
+    1000,
+    `部活動の紹介は${nWordLimitMessage(1000)}`,
+  ),
+  introduceHobby: Yup.string().max(
+    1000,
+    `趣味の紹介は${nWordLimitMessage(1000)}`,
+  ),
+});
+
 export const albumSchema = Yup.object().shape({
   title: Yup.string().required('タイトルを設定してください'),
   images: Yup.array().min(1, '画像を一つ以上選択してください'),
@@ -163,7 +212,9 @@ export const editEventIntroductionSchema = Yup.object().shape({
 });
 
 export const chatGroupSchema = Yup.object().shape({
-  name: Yup.string().required(`タイトルは${requireMessage}`).max(50, `ルーム名は${nWordLimitMessage(50)}`),
+  name: Yup.string()
+    .required(`タイトルは${requireMessage}`)
+    .max(50, `ルーム名は${nWordLimitMessage(50)}`),
   // members: Yup.array().min(1, minUsersMessage),
 });
 

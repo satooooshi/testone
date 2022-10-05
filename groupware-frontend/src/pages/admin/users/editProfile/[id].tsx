@@ -33,7 +33,7 @@ import { useImageCrop } from '@/hooks/crop/useImageCrop';
 import { useHeaderTab } from '@/hooks/headerTab/useHeaderTab';
 import TagModal from '@/components/common/TagModal';
 import { toggleTag } from 'src/utils/toggleTag';
-import { profileSchema } from 'src/utils/validation/schema';
+import { adminEditUserProfileSchema } from 'src/utils/validation/schema';
 import { formikErrorMsgFactory } from 'src/utils/factory/formikErrorMsgFactory';
 import { useAPIGetUserTag } from '@/hooks/api/tag/useAPIGetUserTag';
 import FormToLinkTag from '@/components/FormToLinkTag';
@@ -177,7 +177,7 @@ const Profile = () => {
   } = useFormik<Partial<User>>({
     initialValues: profile ? profile : initialUserValues,
     enableReinitialize: true,
-    validationSchema: profileSchema,
+    validationSchema: adminEditUserProfileSchema,
     onSubmit: () => {
       handleUpdateUser();
     },
