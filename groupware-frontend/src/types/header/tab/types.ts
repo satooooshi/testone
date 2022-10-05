@@ -6,6 +6,7 @@ export enum EventTab {
   COACH = 'コーチ制度',
   CLUB = '部活動',
   SUBMISSION_ETC = '提出物等',
+  OTHER = 'その他',
 }
 
 export type Tab = {

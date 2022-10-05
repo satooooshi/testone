@@ -7,7 +7,7 @@ import userListStyles from '@/styles/layouts/UserList.module.scss';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
-import { Tag, UserRole } from 'src/types';
+import { BranchType, Tag, UserRole } from 'src/types';
 import { toggleTag } from 'src/utils/toggleTag';
 import paginationStyles from '@/styles/components/Pagination.module.scss';
 import { userQueryRefresh } from 'src/utils/userQueryRefresh';
@@ -53,6 +53,7 @@ const UserList = () => {
       tag: tagQuery,
       word: query.word || '',
       sort: query.sort,
+      branch: query.branch,
       role: query.role,
       duration: query.duration,
     };
@@ -140,6 +141,23 @@ const UserList = () => {
                 <option value="question">質問数順</option>
                 <option value="answer">回答数順</option>
                 <option value="knowledge">ナレッジ投稿数順</option>
+              </Select>
+            </FormControl>
+            <FormControl w="200px" ml="20px">
+              <Select
+                bg="white"
+                defaultValue={query.branch}
+                value={query.branch}
+                onChange={(e) => {
+                  queryRefresh({
+                    branch: (e.target.value as BranchType) || undefined,
+                    page: '1',
+                  });
+                  return;
+                }}>
+                <option value="">指定なし</option>
+                <option value="tokyo">東京支社</option>
+                <option value="osaka">大阪支社</option>
               </Select>
             </FormControl>
             <FormControl w="200px" ml="20px">

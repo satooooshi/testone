@@ -5,10 +5,7 @@ import {Div, Dropdown, Text} from 'react-native-magnus';
 import {ActivityIndicator} from 'react-native-paper';
 import DropdownOpenerButton from '../../components/common/DropdownOpenerButton';
 import UserCard from '../../components/users/UserCard';
-import {
-  SearchQueryToGetUsers,
-  useAPISearchUsers,
-} from '../../hooks/api/user/useAPISearchUsers';
+import {SearchQueryToGetUsers} from '../../hooks/api/user/useAPISearchUsers';
 import {userListStyles} from '../../styles/screen/user/userList.style';
 import {User, UserRole, UserRoleInApp} from '../../types';
 import {
@@ -35,6 +32,7 @@ const UserCardList: React.FC<UserCardListProps> = ({
 }) => {
   const isFocused = useIsFocused();
   const sortDropdownRef = useRef<any | null>(null);
+  const branchDropdownRef = useRef<any | null>(null);
   const durationDropdownRef = useRef<any | null>(null);
   const flatListRef = useRef<FlatList | null>(null);
 
@@ -54,6 +52,17 @@ const UserCardList: React.FC<UserCardListProps> = ({
         return '回答数順';
       case 'knowledge':
         return 'ナレッジ投稿数順';
+      default:
+        return '指定なし';
+    }
+  };
+
+  const branchDropdownButtonName = () => {
+    switch (searchQuery.branch) {
+      case 'tokyo':
+        return '東京支社';
+      case 'osaka':
+        return '大阪支社';
       default:
         return '指定なし';
     }
@@ -89,13 +98,19 @@ const UserCardList: React.FC<UserCardListProps> = ({
   return (
     <>
       <Div flexDir="row" my="lg" justifyContent="space-evenly">
-        <Div w="45%">
+        <Div w="32%">
           <DropdownOpenerButton
             name={sortDropdownButtonName()}
             onPress={() => sortDropdownRef.current?.open()}
           />
         </Div>
-        <Div w="45%">
+        <Div w="32%">
+          <DropdownOpenerButton
+            name={branchDropdownButtonName()}
+            onPress={() => branchDropdownRef.current?.open()}
+          />
+        </Div>
+        <Div w="32%">
           <DropdownOpenerButton
             name={durationDropdownButtonName()}
             onPress={() => durationDropdownRef.current?.open()}
@@ -146,6 +161,35 @@ const UserCardList: React.FC<UserCardListProps> = ({
               setSearchQuery(q => ({...q, sort: 'knowledge', page: '1'}));
             }}>
             ナレッジ投稿数順
+          </Dropdown.Option>
+        </Dropdown>
+        <Dropdown ref={branchDropdownRef} {...defaultDropdownProps}>
+          <Dropdown.Option
+            {...defaultDropdownOptionProps}
+            value={'none'}
+            onPress={() => {
+              scrollToTop();
+              setSearchQuery(q => ({...q, branch: undefined, page: '1'}));
+            }}>
+            指定なし
+          </Dropdown.Option>
+          <Dropdown.Option
+            {...defaultDropdownOptionProps}
+            value={'none'}
+            onPress={() => {
+              scrollToTop();
+              setSearchQuery(q => ({...q, branch: 'tokyo', page: '1'}));
+            }}>
+            東京支社
+          </Dropdown.Option>
+          <Dropdown.Option
+            {...defaultDropdownOptionProps}
+            value={'none'}
+            onPress={() => {
+              scrollToTop();
+              setSearchQuery(q => ({...q, branch: 'osaka', page: '1'}));
+            }}>
+            大阪支社
           </Dropdown.Option>
         </Dropdown>
         <Dropdown ref={durationDropdownRef} {...defaultDropdownProps}>

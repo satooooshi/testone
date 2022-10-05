@@ -175,6 +175,19 @@ const headerTab = (headerTabBehavior: HeaderTabBehavior): Tab[] => {
           },
         },
         {
+          name: EventTab.OTHER,
+          onClick: () => {
+            if (queryRefresh)
+              queryRefresh({
+                page: '1',
+                type: EventType.OTHER,
+                personal,
+                from,
+                to,
+              });
+          },
+        },
+        {
           type: 'create',
           name: '作成',
           onClick: onCreateClicked,

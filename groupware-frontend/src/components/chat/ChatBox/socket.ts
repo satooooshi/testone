@@ -10,7 +10,7 @@ import { baseURL } from 'src/utils/url';
 // import { baseURL } from 'src/utils/url';
 
 // socket
-export const socket = io('https://www.bbbbbb.ga:443', {
+export const socket = io('https://www.groupware-develop.tk/', {
   transports: ['websocket'],
 });
 

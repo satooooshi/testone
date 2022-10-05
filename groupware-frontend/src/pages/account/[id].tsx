@@ -17,6 +17,7 @@ import Head from 'next/head';
 import TopTabBar, { TopTabBehavior } from '@/components/layout/TopTabBar';
 import { useAPIGetEventList } from '@/hooks/api/event/useAPIGetEventList';
 import { useAPIGetWikiList } from '@/hooks/api/wiki/useAPIGetWikiList';
+import { useAPIGetUserGoodList } from '@/hooks/api/wiki/useAPIGetWikiGoodList';
 import { useHeaderTab } from '@/hooks/headerTab/useHeaderTab';
 import {
   Text,
@@ -101,6 +102,7 @@ const MyAccountInfo = () => {
       },
       { enabled: false },
     );
+
   const { data: knowledgeList, refetch: refetchKnowledgeList } =
     useAPIGetWikiList(
       {
@@ -110,6 +112,9 @@ const MyAccountInfo = () => {
       },
       { enabled: false },
     );
+  const { data: goodList, refetch: refetchGoodList } =
+    useAPIGetUserGoodList(id);
+
   const { user } = useAuthenticate();
   const [activeTab, setActiveTab] = useState<TabName>(TabName.DETAIL);
   const { mutate: logout } = useAPILogout({
@@ -188,6 +193,9 @@ const MyAccountInfo = () => {
           return;
         case TabName.KNOWLEDGE:
           refetchKnowledgeList();
+          return;
+        case TabName.GOOD:
+          refetchGoodList();
           return;
       }
     };
@@ -399,14 +407,18 @@ const MyAccountInfo = () => {
                 </Text>
               )
             ) : null}
-            {activeTab === TabName.GOOD &&
-            profile.userGoodForBoard &&
-            profile.userGoodForBoard.length ? (
-              <Box w="100%">
-                {profile.userGoodForBoard.map((w) => (
-                  <WikiCard wiki={w.wiki} key={w.id} />
-                ))}
-              </Box>
+            {activeTab === TabName.GOOD ? (
+              goodList && goodList.length ? (
+                <Box>
+                  {goodList.map((b) => (
+                    <WikiCard wiki={b.wiki} key={b.id} />
+                  ))}
+                </Box>
+              ) : (
+                <Text fontSize={16}>
+                  いいねした掲示板が見つかりませんでした
+                </Text>
+              )
             ) : null}
           </Box>
         )}

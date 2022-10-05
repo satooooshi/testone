@@ -195,7 +195,10 @@ const Profile = () => {
           duration: 3000,
           isClosable: true,
         });
-        dispatchCrop({ type: 'setImageFile', value: undefined });
+        dispatchCrop({
+          type: 'resetImage',
+          value: 'resetImage',
+        });
         router.back();
       }
     },
