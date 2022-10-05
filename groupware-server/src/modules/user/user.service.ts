@@ -245,8 +245,9 @@ export class UserService {
     }
     const tagIDs = tag.split(' ');
     // const startTime = Date.now();
-    let users, count;
-    const q = await this.userRepository
+    //let users, count;
+    //const q = await this.userRepository
+    const [users, count] = await this.userRepository
       .createQueryBuilder('user')
       .leftJoin('user.tags', 'tag')
       .addSelect((subQuery) => {
@@ -332,7 +333,15 @@ export class UserService {
         tagIDs,
       })
       .skip(offset)
-      .take(limit);
+      .take(limit)
+      .orderBy(sortKey, sortKey === 'user.lastNameKana' ? 'ASC' : 'DESC')
+      .addOrderBy(
+        'user.lastNameKana',
+        sortKey === 'user.lastNameKana' ? undefined : 'ASC',
+      )
+      .getManyAndCount();
+
+    /*
     if (sortKey === 'user.lastNameKana') {
       [users, count] = await q.orderBy(sortKey, 'ASC').getManyAndCount();
     } else {
@@ -341,6 +350,7 @@ export class UserService {
         .addOrderBy('user.lastNameKana', 'ASC')
         .getManyAndCount();
     }
+    */
     //.orderBy(sortKey, sortKey === 'user.lastNameKana' ? 'ASC' : 'DESC')
 
     // const endTime = Date.now();
