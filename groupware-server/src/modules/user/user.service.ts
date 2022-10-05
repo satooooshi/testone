@@ -341,18 +341,6 @@ export class UserService {
       )
       .getManyAndCount();
 
-    /*
-    if (sortKey === 'user.lastNameKana') {
-      [users, count] = await q.orderBy(sortKey, 'ASC').getManyAndCount();
-    } else {
-      [users, count] = await q
-        .orderBy(sortKey, 'DESC')
-        .addOrderBy('user.lastNameKana', 'ASC')
-        .getManyAndCount();
-    }
-    */
-    //.orderBy(sortKey, sortKey === 'user.lastNameKana' ? 'ASC' : 'DESC')
-
     // const endTime = Date.now();
     const userIDs = users.map((u) => u.id);
     const userArrWithTags = await this.userRepository.findByIds(userIDs, {
