@@ -1,6 +1,5 @@
 import React from 'react';
 import { QAAnswerReply } from 'src/types';
-import answerReplyStyles from '@/styles/components/AnswerReply.module.scss';
 import { dateTimeFormatterFromJSDDate } from 'src/utils/dateTimeFormatter';
 import { Avatar, Box, Flex, Text } from '@chakra-ui/react';
 import WikiComment from '../WikiComment';
