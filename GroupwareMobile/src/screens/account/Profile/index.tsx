@@ -289,14 +289,12 @@ const Profile: React.FC = () => {
               </Div>
             </Div>
           </Div>
+          {/*
           <Div mb="lg">
             <Text fontSize={16} fontWeight="bold">
               姓
             </Text>
             <Input
-              editable={false}
-              color="gray"
-              fontWeight="bold"
               value={values.lastName}
               onChangeText={handleChange('lastName')}
               placeholder="山田"
@@ -308,9 +306,6 @@ const Profile: React.FC = () => {
               名
             </Text>
             <Input
-              editable={false}
-              color="gray"
-              fontWeight="bold"
               value={values.firstName}
               onChangeText={handleChange('firstName')}
               placeholder="太郎"
@@ -322,9 +317,6 @@ const Profile: React.FC = () => {
               姓(フリガナ)
             </Text>
             <Input
-              editable={false}
-              color="gray"
-              fontWeight="bold"
               value={values.lastNameKana}
               onChangeText={handleChange('lastNameKana')}
               placeholder="ヤマダ"
@@ -336,9 +328,6 @@ const Profile: React.FC = () => {
               名(フリガナ)
             </Text>
             <Input
-              editable={false}
-              color="gray"
-              fontWeight="bold"
               value={values.firstNameKana}
               onChangeText={handleChange('firstNameKana')}
               placeholder="タロウ"
@@ -380,6 +369,7 @@ const Profile: React.FC = () => {
               {branchTypeNameFactory(BranchType.OSAKA)}
             </Dropdown.Option>
           </Dropdown>
+          */}
           <Div mb="lg">
             <Text fontSize={16} fontWeight="bold">
               自己紹介
