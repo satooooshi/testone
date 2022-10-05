@@ -204,6 +204,11 @@ const Chat: React.FC = () => {
           });
         }
         // Keyboard.dismiss();
+        Platform.OS === 'ios'
+          ? messageIosRef?.current?.scrollToIndex({index: 0})
+          : (messageAndroidRef.current?.flatListRef as any)?.scrollToIndex({
+              index: 0,
+            });
       }
     },
   });
