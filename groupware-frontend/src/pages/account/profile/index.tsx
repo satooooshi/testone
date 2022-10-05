@@ -379,7 +379,7 @@ const Profile = () => {
                 isChecked={!userInfo.isEmailPublic}
                 value={'inPublic'}
                 onChange={() =>
-                  setUserInfo((v) => ({ ...v, isEmailPublic: true }))
+                  setUserInfo((v) => ({ ...v, isEmailPublic: false }))
                 }>
                 非公開
               </Radio>
