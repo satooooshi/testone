@@ -13,7 +13,7 @@ type AnswerReplyProps = {
 
 const AnswerReply: React.FC<AnswerReplyProps> = ({ reply }) => {
   return (
-    <Box w="70vw">
+    <Box bg="white" p="10px" borderRadius={10}>
       <Flex justifyContent="space-between" alignItems="center">
         <Flex mr="5%" alignItems="center">
           {reply.writer?.existence ? (

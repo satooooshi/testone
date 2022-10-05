@@ -482,18 +482,13 @@ const QuestionDetail = () => {
                           返信を送信
                         </Button>
                       ) : null}
-                      {answer.replies?.map((r) => (
-                        <Box
-                          bg="white"
-                          key={r.id}
-                          p="10px"
-                          borderRadius={10}
-                          mb={5}>
-                          {/* <div key={r.id} className={qaDetailStyles.reply}> */}
-                          <AnswerReply reply={r} />
-                          {/* </div> */}
-                        </Box>
-                      ))}
+                      <Box alignSelf="end" w="90%">
+                        {answer.replies?.map((r) => (
+                          <Box key={r.id} mb={5}>
+                            <AnswerReply reply={r} />
+                          </Box>
+                        ))}
+                      </Box>
                     </div>
                   ),
               )
