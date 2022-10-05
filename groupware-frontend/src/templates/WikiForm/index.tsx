@@ -145,7 +145,6 @@ const WikiForm: React.FC<WikiFormProps> = ({
   const headerTabName = '内容を編集';
 
   const saveButtonName = useMemo(() => {
-    console.log(newQuestion.type);
     return newQuestion.type
       ? wikiTypeNameFactory(
           newQuestion.type,

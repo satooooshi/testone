@@ -605,6 +605,10 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
                 colorScheme="teal"
                 bg="white"
                 onChange={(e) => {
+                  if (!e.target.value) {
+                    setNewEvent((e) => ({ ...e, type: undefined }));
+                    return;
+                  }
                   const type = e.target.value as EventType;
                   setNewEvent((prev) => ({
                     ...prev,
@@ -616,7 +620,7 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
                   }));
                 }}
                 defaultValue={newEvent.type}>
-                <option value={undefined}>指定なし</option>
+                <option value={undefined} label={'指定なし'}></option>
                 {isCreatableImpressiveUniversity && (
                   <option value={EventType.IMPRESSIVE_UNIVERSITY}>
                     感動大学
