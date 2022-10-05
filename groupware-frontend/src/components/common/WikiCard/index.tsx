@@ -19,6 +19,7 @@ import GoodSendersModal from '@/components/wiki/GoodSendersModal';
 import { useAPIToggleGoodForBoard } from '@/hooks/api/wiki/useAPIToggleGoodForBoard';
 import { useAuthenticate } from 'src/contexts/useAuthenticate';
 import { useAPIGetGoodsForBoard } from '@/hooks/api/wiki/useAPIGetGoodsForBoard';
+import { userNameFactory } from 'src/utils/factory/userNameFactory';
 
 type WikiCardProps = {
   wiki: Wiki;
@@ -106,6 +107,7 @@ const WikiCard: React.FC<WikiCardProps> = ({ wiki }) => {
               />
             </Link>
           ) : null}
+          <Text w={'30%'}>{userNameFactory(wikiState.writer)}</Text>
           <Text
             color={darkFontColor}
             fontSize={isSmallerThan768 ? '16px' : '20px'}
