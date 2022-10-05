@@ -28,6 +28,7 @@ import {
   SimpleGrid,
   Flex,
   Wrap,
+  AvatarBadge,
 } from '@chakra-ui/react';
 import {
   BoardCategory,
@@ -45,6 +46,9 @@ import { HiOutlineChat } from 'react-icons/hi';
 import { AiOutlineArrowLeft } from 'react-icons/ai';
 import { tagBgColorFactory } from 'src/utils/factory/tagBgColorFactory';
 import { tagFontColorFactory } from 'src/utils/factory/tagFontColorFactory';
+import { Avatar } from '@chakra-ui/react';
+import { userNameKanaFactory } from 'src/utils/factory/userNameKanaFactory';
+import { userNameFactory } from 'src/utils/factory/userNameFactory';
 
 type UserTagListProps = {
   tags?: UserTag[];
@@ -232,7 +236,7 @@ const MyAccountInfo = () => {
           <Text fontSize="14px">戻る</Text>
         </Button>
       </Box>
-      <div className={accountInfoStyles.main}>
+      <Box pb="24px" w="100%">
         {profile && (
           <Box
             display="flex"
@@ -243,14 +247,18 @@ const MyAccountInfo = () => {
             <Flex direction="row" bg="white" w="100%" p="30px" rounded="5px">
               <Box mx="20px" className={accountInfoStyles.avatar}>
                 {profile.avatarUrl ? (
-                  <img src={profile.avatarUrl} alt="アバター画像" />
+                  <img
+                    src={profile.avatarUrl}
+                    className={accountInfoStyles.avatar}
+                    alt="アバター画像"
+                  />
                 ) : (
                   <Image src={noImage} alt="アバター画像" />
                 )}
               </Box>
               <Box>
                 <Text fontSize="20px" fontWeight="bold" mb="5px">
-                  {`${profile.lastName} ${profile.firstName}`}
+                  {userNameFactory(profile)}
                   <Button
                     ml="10px"
                     size="xs"
@@ -262,7 +270,7 @@ const MyAccountInfo = () => {
                   </Button>
                 </Text>
                 <Text fontSize="12px" color="gray" mb="12px">
-                  {`${profile.lastNameKana} ${profile.firstNameKana}`}
+                  {userNameKanaFactory(profile)}
                 </Text>
                 <Text fontWeight="bold" mb="12px">
                   自己紹介
@@ -422,7 +430,7 @@ const MyAccountInfo = () => {
             ) : null}
           </Box>
         )}
-      </div>
+      </Box>
     </LayoutWithTab>
   );
 };
