@@ -221,6 +221,9 @@ const Profile: React.FC = () => {
               メールアドレス
             </Text>
             <Input
+              editable={false}
+              color="gray"
+              fontWeight="bold"
               value={values.email}
               onChangeText={handleChange('email')}
               placeholder="bold@example.com"
@@ -291,6 +294,9 @@ const Profile: React.FC = () => {
               姓
             </Text>
             <Input
+              editable={false}
+              color="gray"
+              fontWeight="bold"
               value={values.lastName}
               onChangeText={handleChange('lastName')}
               placeholder="山田"
@@ -302,6 +308,9 @@ const Profile: React.FC = () => {
               名
             </Text>
             <Input
+              editable={false}
+              color="gray"
+              fontWeight="bold"
               value={values.firstName}
               onChangeText={handleChange('firstName')}
               placeholder="太郎"
@@ -313,6 +322,9 @@ const Profile: React.FC = () => {
               姓(フリガナ)
             </Text>
             <Input
+              editable={false}
+              color="gray"
+              fontWeight="bold"
               value={values.lastNameKana}
               onChangeText={handleChange('lastNameKana')}
               placeholder="ヤマダ"
@@ -324,6 +336,9 @@ const Profile: React.FC = () => {
               名(フリガナ)
             </Text>
             <Input
+              editable={false}
+              color="gray"
+              fontWeight="bold"
               value={values.firstNameKana}
               onChangeText={handleChange('firstNameKana')}
               placeholder="タロウ"
