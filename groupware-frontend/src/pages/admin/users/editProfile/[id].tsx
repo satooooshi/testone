@@ -478,6 +478,17 @@ const Profile = () => {
               <option value={BranchType.OSAKA}>大阪</option>
             </Select>
           </FormControl>
+          <FormControl className={profileStyles.input_wrapper}>
+            <FormLabel fontWeight={'bold'}>社員コード</FormLabel>
+            <Input
+              type="text"
+              name="employeeId"
+              placeholder="社員コード"
+              value={userInfo.employeeId || ''}
+              background="white"
+              onChange={handleChange}
+            />
+          </FormControl>
           <FormControl mb={4}>
             <FormLabel fontWeight={'bold'}>自己紹介</FormLabel>
             <Textarea
