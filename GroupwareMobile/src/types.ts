@@ -57,6 +57,7 @@ export enum WikiType {
   ALL_POSTAL = 'all-postal',
   //掲示板
   BOARD = 'board',
+  MAIL_MAGAZINE = 'mail_magazine',
 }
 
 export enum RuleCategory {
