@@ -40,6 +40,8 @@ const WikiCard: React.FC<WikiCardProps> = ({ wiki }) => {
         return 'orange';
       case WikiType.RULES:
         return 'green';
+      case WikiType.MAIL_MAGAZINE:
+        return 'blue';
     }
   }, [wiki.type]);
 

@@ -372,6 +372,14 @@ const WikiForm: React.FC<WikiFormProps> = ({
                     {wikiTypeNameFactory(WikiType.ALL_POSTAL)}
                   </option>
                 ) : null}
+                {isCreatableWiki({
+                  type: WikiType.MAIL_MAGAZINE,
+                  userRole: user?.role,
+                }) ? (
+                  <option value={WikiType.MAIL_MAGAZINE}>
+                    {wikiTypeNameFactory(WikiType.MAIL_MAGAZINE)}
+                  </option>
+                ) : null}
 
                 <option value={BoardCategory.KNOWLEDGE}>
                   {wikiTypeNameFactory(
