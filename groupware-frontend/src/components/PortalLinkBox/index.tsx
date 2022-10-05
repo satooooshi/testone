@@ -268,7 +268,7 @@ const descriptionText = (href: PortalLinkType): string => {
       return `会社から全社員に向けての重要連絡事項です。今後の提出期限や重要なお知らせを記載しています。
 毎週金曜日に更新しますので必ず確認してください。`;
     case PortalLinkType.MAIL_MAGAZINE:
-      return `メルマガの文章`;
+      return `会社から全社員に向けて、イベントのお知らせ事項のほか、部活動の告知、本社メンバーから伝えたいことなどラフなコンテンツをお届けしています。毎週水曜日に更新しますので、必ず確認してください！！`;
     case PortalLinkType.KNOWLEDGE:
       return '社員がお互いに効率的な業務を促進し知識共有スペースです。業務での不明点解決に役立ちます';
     case PortalLinkType.QA:
