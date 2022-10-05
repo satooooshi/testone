@@ -91,7 +91,7 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
       .set({hour: 19, minute: 0})
       .toJSDate(),
     endAt: DateTime.now().plus({days: 1}).set({hour: 21, minute: 0}).toJSDate(),
-    type: type || EventType.CLUB,
+    type: type || undefined,
     imageURL: '',
     chatNeeded: false,
     hostUsers: [],
@@ -278,12 +278,6 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
       setNewEvent(event);
     }
   }, [event, setNewEvent]);
-
-  useEffect(() => {
-    if (type && isCreatableEvent(type, user?.role)) {
-      setNewEvent(e => ({...e, type}));
-    }
-  }, [setNewEvent, type, user?.role]);
 
   useEffect(() => {
     event?.tags && setSelectedTags(event.tags);

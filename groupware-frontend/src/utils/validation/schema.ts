@@ -97,6 +97,7 @@ export const createEventSchema = Yup.object().shape({
     .min(Yup.ref('startAt'), minDateMessage)
     .required(`終了日時は${requireMessage}`),
   tags: Yup.array().min(1, minTagsMessage),
+  type: Yup.string().required(`タイプを選択してください`),
 });
 
 export const profileSchema = Yup.object().shape({
@@ -163,7 +164,9 @@ export const editEventIntroductionSchema = Yup.object().shape({
 });
 
 export const chatGroupSchema = Yup.object().shape({
-  name: Yup.string().required(`タイトルは${requireMessage}`).max(50, `ルーム名は${nWordLimitMessage(50)}`),
+  name: Yup.string()
+    .required(`タイトルは${requireMessage}`)
+    .max(50, `ルーム名は${nWordLimitMessage(50)}`),
   // members: Yup.array().min(1, minUsersMessage),
 });
 

@@ -73,6 +73,7 @@ export const savingEventSchema = Yup.object().shape({
     .min(Yup.ref('startAt'), minDateMessage)
     .required(`終了日時は${requireMessage}`),
   tags: Yup.array().min(1, minTagsMessage),
+  type: Yup.string().required('タイプを選択してください'),
 });
 
 export const noteSchema = Yup.object().shape({
