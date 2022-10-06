@@ -256,6 +256,22 @@ const WikiForm: React.FC<WikiFormProps> = ({
       ) : (
         <></>
       )}
+      {isCreatableWiki({type: WikiType.MAIL_MAGAZINE, userRole: user?.role}) ? (
+        <Dropdown.Option
+          {...defaultDropdownOptionProps}
+          onPress={() =>
+            setNewWiki(w => ({
+              ...w,
+              type: WikiType.MAIL_MAGAZINE,
+              ruleCategory: RuleCategory.NON_RULE,
+            }))
+          }
+          value={WikiType.MAIL_MAGAZINE}>
+          {wikiTypeNameFactory(WikiType.MAIL_MAGAZINE)}
+        </Dropdown.Option>
+      ) : (
+        <></>
+      )}
       {isCreatableWiki({
         type: WikiType.BOARD,
         boardCategory: BoardCategory.KNOWLEDGE,
