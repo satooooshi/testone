@@ -336,7 +336,12 @@ export class UserService {
       .skip(offset)
       .take(limit)
       .orderBy(sortKey, sortKey === 'user.lastNameKana' ? 'ASC' : 'DESC')
+      .addOrderBy(
+        'user.lastNameKana',
+        sortKey === 'user.lastNameKana' ? undefined : 'ASC',
+      )
       .getManyAndCount();
+
     // const endTime = Date.now();
     const userIDs = users.map((u) => u.id);
     const userArrWithTags = await this.userRepository.findByIds(userIDs, {
