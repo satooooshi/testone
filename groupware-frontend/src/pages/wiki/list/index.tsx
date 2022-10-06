@@ -314,6 +314,8 @@ const QAQuestionList = () => {
         ? '掲示板'
         : type === WikiType.ALL_POSTAL
         ? 'オール便'
+        : type === WikiType.MAIL_MAGAZINE
+        ? 'メルマガ'
         : 'All',
     tabs,
     rightButtonName: 'Wikiを作成',

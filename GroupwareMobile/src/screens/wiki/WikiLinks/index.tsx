@@ -13,8 +13,12 @@ const WikiLinks: React.FC = () => {
   return (
     <WholeContainer>
       <HeaderWithTextButton title="社内Wiki Home" />
-      <Div alignItems="center" mt="lg">
-        <Div flexDir="row" alignItems="center" justifyContent="center" mb="lg">
+      <Div ml={7} mt="lg">
+        <Div
+          flexDir="row"
+          alignItems="center"
+          justifyContent="flex-start"
+          mb="lg">
           <Div mr="lg">
             <PortalLinkBox
               type="rules"
@@ -43,6 +47,21 @@ const WikiLinks: React.FC = () => {
               navigation.navigate('WikiStack', {
                 screen: 'WikiList',
                 params: {type: WikiType.BOARD},
+              })
+            }
+          />
+        </Div>
+        <Div
+          flexDir="row"
+          alignItems="center"
+          justifyContent="flex-start"
+          mb="lg">
+          <PortalLinkBox
+            type="mail_magazine"
+            onPress={() =>
+              navigation.navigate('WikiStack', {
+                screen: 'WikiList',
+                params: {type: WikiType.MAIL_MAGAZINE},
               })
             }
           />
