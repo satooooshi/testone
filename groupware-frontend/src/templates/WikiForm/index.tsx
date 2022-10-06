@@ -327,7 +327,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
                   userRole: user?.role,
                 }) ? (
                   <>
-                    <option value={undefined} label={'指定なし'}></option>
+                    <option label={'指定なし'}></option>
                     <option value={RuleCategory.PHILOSOPHY}>
                       {wikiTypeNameFactory(
                         WikiType.RULES,

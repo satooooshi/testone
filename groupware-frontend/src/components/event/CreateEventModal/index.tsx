@@ -620,7 +620,7 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
                   }));
                 }}
                 defaultValue={newEvent.type}>
-                <option value={undefined} label={'指定なし'}></option>
+                <option label={'指定なし'}></option>
                 {isCreatableImpressiveUniversity && (
                   <option value={EventType.IMPRESSIVE_UNIVERSITY}>
                     感動大学
