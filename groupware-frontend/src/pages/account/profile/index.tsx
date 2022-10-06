@@ -355,6 +355,9 @@ const Profile = () => {
           <FormControl className={profileStyles.input_wrapper}>
             <FormLabel fontWeight={'bold'}>メールアドレス</FormLabel>
             <Input
+              readOnly
+              color="gray"
+              fontWeight="bold"
               type="email"
               name="email"
               placeholder="email@example.com"
@@ -418,6 +421,7 @@ const Profile = () => {
               </Radio>
             </Stack>
           </FormControl>
+          {/*
           <FormControl className={profileStyles.input_wrapper}>
             <FormLabel fontWeight={'bold'}>姓</FormLabel>
             <Input
@@ -475,6 +479,7 @@ const Profile = () => {
               <option value={BranchType.OSAKA}>大阪</option>
             </Select>
           </FormControl>
+          */}
           <FormControl mb={4}>
             <FormLabel fontWeight={'bold'}>自己紹介</FormLabel>
             <Textarea
