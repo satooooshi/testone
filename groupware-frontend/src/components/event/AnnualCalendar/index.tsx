@@ -55,10 +55,6 @@ export interface DatetimeSettings {
   minutes: number;
 }
 
-type EventListGetParams = SearchQueryToGetEvents & {
-  personal?: string;
-};
-
 const AnnualCalendar = () => {
   const router = useRouter();
   const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
