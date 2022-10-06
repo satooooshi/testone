@@ -121,14 +121,6 @@ const AnnualCalendar: React.FC<any> = () => {
     console.log('refetch called.');
   }, []);
 
-  const customToolbar = () => (
-    <Text fontWeight="bold" fontSize={20} mb={8} textAlign="center">
-      {DateTime.fromJSDate(new Date())
-        .plus({ months: i })
-        .toFormat('yyyy年M月')}
-    </Text>
-  );
-
   return (
     <>
       <Text fontWeight="bold" fontSize={20} textAlign="center">
@@ -185,7 +177,18 @@ const AnnualCalendar: React.FC<any> = () => {
                   }}
                   eventPropGetter={eventPropGetter}
                   components={{
-                    toolbar: customToolbar,
+                    // eslint-disable-next-line react/display-name
+                    toolbar: () => (
+                      <Text
+                        fontWeight="bold"
+                        fontSize={20}
+                        mb={8}
+                        textAlign="center">
+                        {DateTime.fromJSDate(new Date())
+                          .plus({ months: i })
+                          .toFormat('yyyy年M月')}
+                      </Text>
+                    ),
                   }}
                 />
               </Box>
