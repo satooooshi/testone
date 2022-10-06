@@ -52,7 +52,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
     title: '',
     body: '',
     tags: [],
-    type: type || WikiType.BOARD,
+    type: type || undefined,
     ruleCategory: ruleCategory || RuleCategory.NON_RULE,
     boardCategory: boardCategory
       ? boardCategory
@@ -560,6 +560,11 @@ const WikiForm: React.FC<WikiFormProps> = ({
               <Text fontSize={16} mb={4}>
                 タイプを選択
               </Text>
+              {errors.type && touched.type ? (
+                <Text fontSize={16} color="tomato">
+                  {errors.type}
+                </Text>
+              ) : null}
               <Button
                 bg="white"
                 borderWidth={1}

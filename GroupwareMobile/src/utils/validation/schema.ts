@@ -22,6 +22,7 @@ export const loginSchema = Yup.object().shape({
 export const wikiSchema = Yup.object().shape({
   title: Yup.string().required(requireMessage).max(100, nWordLimitMessage(100)),
   body: Yup.string().required(requireMessage),
+  type: Yup.string().required('タイプを選択してください'),
 });
 export const createCommentSchema = Yup.object().shape({
   body: Yup.string().required('コメントは' + requireMessage),
@@ -73,6 +74,7 @@ export const savingEventSchema = Yup.object().shape({
     .min(Yup.ref('startAt'), minDateMessage)
     .required(`終了日時は${requireMessage}`),
   tags: Yup.array().min(1, minTagsMessage),
+  type: Yup.string().required('タイプを選択してください'),
 });
 
 export const noteSchema = Yup.object().shape({
