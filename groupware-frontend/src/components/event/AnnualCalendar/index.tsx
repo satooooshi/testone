@@ -52,7 +52,7 @@ export interface DatetimeSettings {
   minutes: number;
 }
 
-const AnnualCalendar = () => {
+const AnnualCalendar: React.FC<any> = () => {
   const router = useRouter();
   const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
 
@@ -121,6 +121,14 @@ const AnnualCalendar = () => {
     console.log('refetch called.');
   }, []);
 
+  const customToolbar = () => (
+    <Text fontWeight="bold" fontSize={20} mb={8} textAlign="center">
+      {DateTime.fromJSDate(new Date())
+        .plus({ months: i })
+        .toFormat('yyyy年M月')}
+    </Text>
+  );
+
   return (
     <>
       <Text fontWeight="bold" fontSize={20} textAlign="center">
@@ -145,6 +153,7 @@ const AnnualCalendar = () => {
         <>
           {_.range(-1, 13).map((i) => (
             <Box
+              key={i}
               display="flex"
               flexDir="column"
               justifyContent="flex-start"
@@ -176,17 +185,7 @@ const AnnualCalendar = () => {
                   }}
                   eventPropGetter={eventPropGetter}
                   components={{
-                    toolbar: () => (
-                      <Text
-                        fontWeight="bold"
-                        fontSize={20}
-                        mb={8}
-                        textAlign="center">
-                        {DateTime.fromJSDate(new Date())
-                          .plus({ months: i })
-                          .toFormat('yyyy年M月')}
-                      </Text>
-                    ),
+                    toolbar: customToolbar,
                   }}
                 />
               </Box>
