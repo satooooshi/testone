@@ -1,10 +1,7 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
+import React, { useEffect, useMemo, useRef } from 'react';
 import { useRouter } from 'next/router';
-import dynamic from 'next/dynamic';
-const ReactPaginate = dynamic(() => import('react-paginate'), { ssr: false });
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { EventSchedule, EventType, Tag } from 'src/types';
-
+import { EventSchedule, EventType } from 'src/types';
 import {
   Calendar,
   DateRange,
@@ -60,7 +57,7 @@ const AnnualCalendar = () => {
   const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
 
   const searchQuery: SearchQueryToGetEvents = {
-    page: '1',
+    page: '',
     word: '',
     tag: '',
     status: undefined,
