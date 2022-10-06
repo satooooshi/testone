@@ -245,8 +245,6 @@ export class UserService {
     }
     const tagIDs = tag.split(' ');
     // const startTime = Date.now();
-    //let users, count;
-    //const q = await this.userRepository
     const [users, count] = await this.userRepository
       .createQueryBuilder('user')
       .leftJoin('user.tags', 'tag')
