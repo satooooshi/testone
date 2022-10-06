@@ -36,57 +36,6 @@ export const updatePasswordSchema = Yup.object().shape({
     .oneOf([Yup.ref('newPassword'), null], unmatchPasswordConfirmation),
 });
 
-export const registerSchema = Yup.object().shape({
-  lastName: Yup.string()
-    .required(`姓は${requireMessage}`)
-    .max(50, `姓は${nWordLimitMessage(50)}`),
-  firstName: Yup.string()
-    .required(`名は${requireMessage}`)
-    .max(50, `名は${nWordLimitMessage(50)}`),
-  lastNameKana: Yup.string()
-    .required(`姓(フリガナ)は${requireMessage}`)
-    .matches(/^[ァ-ヶー]+$/, `姓(フリガナ)は${kanaFormatMessage}`)
-    .max(50, `姓(フリガナ)は${nWordLimitMessage(50)}`),
-  firstNameKana: Yup.string()
-    .required(`名(フリガナ)は${requireMessage}`)
-    .matches(/^[ァ-ヶー]+$/, `名(フリガナ)は${kanaFormatMessage}`)
-    .max(50, `名(フリガナ)は${nWordLimitMessage(50)}`),
-  email: Yup.string()
-    .matches(
-      /^([\w!#$%&'*+\-\/=?^`{|}~]+(\.[\w!#$%&'*+\-\/=?^`{|}~]+)*|"([\w!#$%&'*+\-\/=?^`{|}~. ()<>\[\]:;@,]|\\[\\"])+")@(([a-zA-Z\d\-]+\.)+[a-zA-Z]+|\[(\d{1,3}(\.\d{1,3}){3}|IPv6:[\da-fA-F]{0,4}(:[\da-fA-F]{0,4}){1,5}(:\d{1,3}(\.\d{1,3}){3}|(:[\da-fA-F]{0,4}){0,2}))\])$/,
-      emailFormatMessage,
-    )
-    .required(`メールアドレス${requireMessage}`),
-  phone: Yup.string().matches(
-    /^0\d{2,3}-\d{1,4}-\d{1,4}$/,
-    `電話番号は${phoneFormatMessage}`,
-  ),
-  password: Yup.string()
-    .matches(/^([^ ]*)$/, blankMixedMessage)
-    .min(8, minEightTextMessage)
-    .required(`パスワードは${minEightTextMessage}`),
-  introduceOther: Yup.string().max(
-    1000,
-    `自己紹介は${nWordLimitMessage(1000)}`,
-  ),
-  introduceTech: Yup.string().max(
-    1000,
-    `技術の紹介は${nWordLimitMessage(1000)}`,
-  ),
-  introduceQualification: Yup.string().max(
-    1000,
-    `資格の紹介は${nWordLimitMessage(1000)}`,
-  ),
-  introduceClub: Yup.string().max(
-    1000,
-    `部活動の紹介は${nWordLimitMessage(1000)}`,
-  ),
-  introduceHobby: Yup.string().max(
-    1000,
-    `趣味の紹介は${nWordLimitMessage(1000)}`,
-  ),
-});
-
 export const createEventSchema = Yup.object().shape({
   title: Yup.string()
     .required(`タイトルは${requireMessage}`)
@@ -101,7 +50,7 @@ export const createEventSchema = Yup.object().shape({
   type: Yup.string().required(`タイプを選択してください`),
 });
 
-export const profileSchema = Yup.object().shape({
+const profileValidation = {
   email: Yup.string()
     .matches(
       /^([\w!#$%&'*+\-\/=?^`{|}~]+(\.[\w!#$%&'*+\-\/=?^`{|}~]+)*|"([\w!#$%&'*+\-\/=?^`{|}~. ()<>\[\]:;@,]|\\[\\"])+")@(([a-zA-Z\d\-]+\.)+[a-zA-Z]+|\[(\d{1,3}(\.\d{1,3}){3}|IPv6:[\da-fA-F]{0,4}(:[\da-fA-F]{0,4}){1,5}(:\d{1,3}(\.\d{1,3}){3}|(:[\da-fA-F]{0,4}){0,2}))\])$/,
@@ -146,6 +95,24 @@ export const profileSchema = Yup.object().shape({
     1000,
     `趣味の紹介は${nWordLimitMessage(1000)}`,
   ),
+};
+
+export const profileSchema = Yup.object().shape({
+  ...profileValidation,
+});
+
+export const adminEditUserProfileSchema = Yup.object().shape({
+  ...profileValidation,
+  employeeId: Yup.string().required('社員コードは' + requireMessage),
+});
+
+export const registerSchema = Yup.object().shape({
+  ...profileValidation,
+  password: Yup.string()
+    .matches(/^([^ ]*)$/, blankMixedMessage)
+    .min(8, minEightTextMessage)
+    .required(`パスワードは${minEightTextMessage}`),
+  employeeId: Yup.string().required('社員コードは' + requireMessage),
 });
 
 export const albumSchema = Yup.object().shape({

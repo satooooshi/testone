@@ -148,6 +148,11 @@ export const profileSchema = Yup.object().shape({
   ...profileValidation,
 });
 
+export const adminEditUserProfileSchema = Yup.object().shape({
+  ...profileValidation,
+  employeeId: Yup.string().required('社員コードは' + requireMessage),
+});
+
 export const createUserSchema = Yup.object().shape({
   ...profileValidation,
   employeeId: Yup.string().required('社員コードは' + requireMessage),
