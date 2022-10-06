@@ -26,7 +26,7 @@ export const getFileUrl = async (name: string, url: string) => {
     const {path} = await config(options).fetch('GET', url);
     return path();
   } catch {
-    Alert.alert('ファイル情報取得時にエラーが発生しました');
+    console.log('ファイル情報取得時にエラーが発生しました');
     return undefined;
   }
 };
