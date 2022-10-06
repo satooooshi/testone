@@ -128,7 +128,7 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
     setValues: setNewEvent,
     validateForm,
     resetForm,
-  } = useFormik<CreateEventRequest>({
+  } = useFormik<CreateEventRequest | Required<EventSchedule>>({
     initialValues: event ? event : initialEventValue,
     enableReinitialize: true,
     validateOnChange: false,
