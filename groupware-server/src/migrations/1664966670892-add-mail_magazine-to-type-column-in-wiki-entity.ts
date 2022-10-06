@@ -1,9 +1,9 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class addMailMagazineToTypeColumnInEventEntity1664966670892
+export class addMailMagazineToTypeColumnInWikiEntity1664966670892
   implements MigrationInterface
 {
-  name = 'addMailMagazineToTypeColumnInEventEntity1664966670892';
+  name = 'addMailMagazineToTypeColumnInWikiEntity1664966670892';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(
