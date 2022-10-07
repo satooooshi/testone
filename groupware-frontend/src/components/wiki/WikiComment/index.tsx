@@ -184,7 +184,7 @@ const WikiComment: React.FC<WikiCommentProps> = ({
               onClick={() => {
                 setGoodSendersModal(true);
               }}>
-              <Text fontSize="20px">いいね</Text>
+              <Text fontSize="20px">{`${wikiState.goodsCount}件のいいね`}</Text>
             </Link>
             <Text mx={2} color="#90CDF4" fontWeight="bold" fontSize="20px">
               {wikiState.userGoodForBoard?.length}
@@ -201,15 +201,6 @@ const WikiComment: React.FC<WikiCommentProps> = ({
             ) : (
               <AiOutlineHeart size={30} color="black" />
             )}
-          </Link>
-          <Link
-            onClick={() => {
-              getGoodsForBoard(wikiState.id);
-              setGoodSendersModal(true);
-            }}>
-            <Button colorScheme={'blue'} color="white" size={'sm'}>
-              {`${wikiState.goodsCount}件のいいね`}
-            </Button>
           </Link>
         </Box>
       )}
