@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import React, { useEffect, useMemo, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useRouter } from 'next/router';
 import { EventSchedule, EventType } from 'src/types';
+import { eventPropGetter } from 'src/utils/eventPropGetter';
 import {
   Calendar,
   DateRange,
@@ -61,7 +62,7 @@ const AnnualCalendar: React.FC<any> = () => {
     word: '',
     tag: '',
     status: undefined,
-    type: '',
+    type: EventType.IMPRESSIVE_UNIVERSITY,
     from: DateTime.fromJSDate(new Date())
       .minus({ months: 2 })
       .toJSDate()
@@ -80,27 +81,7 @@ const AnnualCalendar: React.FC<any> = () => {
   } = useAPIGetEventList(searchQuery);
   const calendarRef = useRef<HTMLDivElement | null>(null);
 
-  const eventPropGetter = (event: any): any => {
-    const type = event.type;
-    switch (type) {
-      case EventType.IMPRESSIVE_UNIVERSITY:
-        return { style: { backgroundColor: '#3182ce' } };
-      case EventType.STUDY_MEETING:
-        return { style: { backgroundColor: '#38a169' } };
-      case EventType.BOLDAY:
-        return { style: { backgroundColor: '#f6ad55' } };
-      case EventType.COACH:
-        return { style: { backgroundColor: '#90cdf4', color: '#65657d' } };
-      case EventType.CLUB:
-        return { style: { backgroundColor: '#f56565' } };
-      case EventType.SUBMISSION_ETC:
-        return { style: { backgroundColor: '#086f83' } };
-      case EventType.OTHER:
-        return { style: { backgroundColor: '#a9a9a9' } };
-    }
-  };
-
-  const memorizedEvent = useMemo<any[] | undefined>(() => {
+  const bigCalendarEvent = () => {
     const changeToBigCalendarEvent = (ev?: EventSchedule[]) => {
       if (ev) {
         const events: any[] = ev.map((e) => ({
@@ -113,7 +94,7 @@ const AnnualCalendar: React.FC<any> = () => {
       return [];
     };
     return changeToBigCalendarEvent(events?.events);
-  }, [events]);
+  };
 
   useEffect(() => {
     calendarRef?.current?.scrollIntoView();
@@ -167,7 +148,7 @@ const AnnualCalendar: React.FC<any> = () => {
                   views={[Views.MONTH]}
                   className={bigCalendarStyles.big_calendar}
                   localizer={localizer}
-                  events={memorizedEvent}
+                  events={bigCalendarEvent()}
                   formats={formats}
                   defaultView={Views.MONTH}
                   popup={true}
