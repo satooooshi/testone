@@ -94,20 +94,22 @@ const WikiCard: React.FC<WikiCardProps> = ({ wiki }) => {
         justifyContent="space-bewtween">
         <Box w="90%" display="flex" alignItems="center">
           {wiki.type !== WikiType.RULES && wikiState.writer ? (
-            <Link
-              href={`/account/${wikiState.writer.id}`}
-              passHref
-              _hover={{ textDecoration: 'none' }}>
-              <UserAvatar
-                user={wikiState.writer}
-                w="40px"
-                h="40px"
-                rounded="full"
-                mr="8px"
-              />
-            </Link>
+            <>
+              <Link
+                href={`/account/${wikiState.writer.id}`}
+                passHref
+                _hover={{ textDecoration: 'none' }}>
+                <UserAvatar
+                  user={wikiState.writer}
+                  w="40px"
+                  h="40px"
+                  rounded="full"
+                  mr="8px"
+                />
+              </Link>
+              <Text w={'30%'}>{userNameFactory(wikiState.writer)}</Text>
+            </>
           ) : null}
-          <Text w={'30%'}>{userNameFactory(wikiState.writer)}</Text>
           <Text
             color={darkFontColor}
             fontSize={isSmallerThan768 ? '16px' : '20px'}
