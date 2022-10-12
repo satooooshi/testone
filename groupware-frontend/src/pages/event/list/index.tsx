@@ -345,18 +345,20 @@ const EventList = () => {
   const eventPropGetter = (event: any): any => {
     const type = event.type;
     switch (type) {
-      case EventType.IMPRESSIVE_UNIVERSITY:
+      case EventType.ARTIST:
         return { style: { backgroundColor: '#3182ce' } };
-      case EventType.STUDY_MEETING:
+      case EventType.IDOL:
         return { style: { backgroundColor: '#38a169' } };
-      case EventType.BOLDAY:
+      case EventType.YOUTUBER:
         return { style: { backgroundColor: '#f6ad55' } };
-      case EventType.COACH:
+      case EventType.TIKTOKER:
         return { style: { backgroundColor: '#90cdf4', color: '#65657d' } };
-      case EventType.CLUB:
+      case EventType.INSTAGRAMER:
         return { style: { backgroundColor: '#f56565' } };
-      case EventType.SUBMISSION_ETC:
+      case EventType.TALENT:
         return { style: { backgroundColor: '#086f83' } };
+      case EventType.OTHER:
+        return { style: { backgroundColor: 'gray' } };
     }
   };
 

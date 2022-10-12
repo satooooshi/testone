@@ -2,17 +2,19 @@ import { EventType } from 'src/types';
 
 export const eventTypeColorFactory = (type: EventType): string => {
   switch (type) {
-    case EventType.IMPRESSIVE_UNIVERSITY:
+    case EventType.ARTIST:
       return '#3182ce';
-    case EventType.BOLDAY:
+    case EventType.IDOL:
       return '#f6ad55';
-    case EventType.STUDY_MEETING:
+    case EventType.YOUTUBER:
       return '#38a169';
-    case EventType.COACH:
+    case EventType.TIKTOKER:
       return '#90cdf4';
-    case EventType.CLUB:
+    case EventType.INSTAGRAMER:
       return '#f56565';
-    case EventType.SUBMISSION_ETC:
+    case EventType.TALENT:
       return '#086f83';
+    case EventType.OTHER:
+      return 'gray';
   }
 };
