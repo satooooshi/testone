@@ -75,7 +75,7 @@ const QAQuestionList = () => {
   });
 
   const initialHeaderValue = {
-    title: '社内Wiki',
+    title: 'News',
     activeTabName:
       type === WikiType.RULES
         ? '社内規則'

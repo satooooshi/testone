@@ -398,7 +398,7 @@ const BottomTab = () => {
         name="WikiStack"
         component={WikiStack}
         options={{
-          tabBarLabel: '社内Wiki',
+          tabBarLabel: 'News',
           tabBarIcon: ({color}) => (
             <Icon
               name="globe-outline"
@@ -414,7 +414,7 @@ const BottomTab = () => {
         component={UserListStack}
         options={{
           tabBarItemStyle: {display: 'none'},
-          tabBarLabel: '社員名鑑',
+          tabBarLabel: 'メンバー',
           tabBarIcon: ({color}) => (
             <Icon
               name="users"

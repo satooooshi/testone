@@ -336,7 +336,7 @@ const DrawerTab = () => {
         name="WikiStack"
         component={WikiStack}
         options={{
-          drawerLabel: '社内Wiki',
+          drawerLabel: 'News',
           drawerIcon: ({color}) => (
             <Icon
               name="globe-outline"
@@ -351,7 +351,7 @@ const DrawerTab = () => {
         name="UsersStack"
         component={UserListStack}
         options={{
-          drawerLabel: '社員名鑑',
+          drawerLabel: 'メンバー',
           drawerIcon: ({color}) => (
             <Icon
               name="users"

@@ -235,7 +235,7 @@ export const eventTitleText = (href: PortalLinkType): string => {
     case PortalLinkType.SUBMISSION_ETC:
       return '〆切一覧';
     case PortalLinkType.WIKI:
-      return '社内Wiki';
+      return 'News';
     case PortalLinkType.RULES:
       return '社内規則';
     case PortalLinkType.ALL_POSTAL:

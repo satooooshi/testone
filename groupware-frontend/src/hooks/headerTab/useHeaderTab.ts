@@ -179,7 +179,7 @@ const headerTab = (headerTabBehavior: HeaderTabBehavior): Tab[] => {
     case 'wiki':
       return [
         {
-          name: '社内Wiki Home',
+          name: 'News Home',
           href: '/wiki',
         },
       ];

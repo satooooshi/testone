@@ -50,7 +50,7 @@ const WikiList: React.FC<WikiListProps> = ({navigation}) => {
       <HeaderWithTextButton
         enableBackButton={false}
         tabs={tabs}
-        title="社内Wiki"
+        title="News"
         activeTabName={
           type ? wikiTypeNameFactory(type, ruleCategory, false) : 'All'
         }

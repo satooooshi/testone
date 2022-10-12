@@ -68,7 +68,7 @@ const UserList = () => {
   console.log('ppp', tags);
 
   const initialHeaderValue = {
-    title: '社員名鑑',
+    title: 'メンバー',
     activeTabName:
       query.role === UserRole.ADMIN
         ? '管理者'
@@ -99,7 +99,7 @@ const UserList = () => {
       sidebar={{ activeScreenName: SidebarScreenName.USERS }}
       header={initialHeaderValue}>
       <Head>
-        <title>vallyein | 社員名鑑</title>
+        <title>vallyein | メンバー</title>
       </Head>
       {/* <TopTabBar topTabBehaviorList={topTabBehaviorList} /> */}
       <SearchForm

@@ -14,12 +14,12 @@ const Wiki = () => {
     <LayoutWithTab
       sidebar={{ activeScreenName: SidebarScreenName.QA }}
       header={{
-        title: '社内Wiki',
+        title: 'News',
         tabs,
-        activeTabName: '社内Wiki Home',
+        activeTabName: 'News Home',
       }}>
       <Head>
-        <title>vallyein | 社内Wiki</title>
+        <title>vallyein | News</title>
       </Head>
 
       <SimpleGrid columns={{ sm: 1, md: 2, lg: 3 }} spacing={'16px'}>
