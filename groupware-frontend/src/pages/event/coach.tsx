@@ -9,17 +9,18 @@ import { useAPISaveEventIntroduction } from '@/hooks/api/event/useAPISaveEventIn
 
 const Coach: React.FC = () => {
   const router = useRouter();
-  const type = EventType.COACH;
+  const type = EventType.YOUTUBER;
   const initialHeaderValue = {
     title: 'コーチ制度',
     rightButtonName: '予定を見る',
-    onClickRightButton: () => router.push('/event/list?type=coach&from=&to='),
+    onClickRightButton: () =>
+      router.push('/event/list?type=youtuber&from=&to='),
   };
   const { data: recommendedEvents } = useAPIGetLatestEvent({
     type,
   });
   const { data: eventIntroduction, refetch } = useAPIGetEventIntroduction(
-    EventType.COACH,
+    EventType.YOUTUBER,
   );
   const { mutate: saveEventIntroduction } = useAPISaveEventIntroduction();
 

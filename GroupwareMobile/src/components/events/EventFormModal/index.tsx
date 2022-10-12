@@ -279,7 +279,7 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
   }, [event, setNewEvent]);
 
   useEffect(() => {
-    if (type && isCreatableEvent(type, user?.role)) {
+    if (type) {
       setNewEvent(e => ({...e, type}));
     }
   }, [setNewEvent, type, user?.role]);

@@ -13,12 +13,12 @@ import EventIntroductionTemplate from 'src/templates/event/EventIntroduction';
 const Bolday: React.FC = () => {
   const router = useRouter();
   const { data: recommendedEvents } = useAPIGetLatestEvent({
-    type: EventType.BOLDAY,
+    type: EventType.ARTIST,
   });
   const { data: eventIntroduction, refetch } = useAPIGetEventIntroduction(
-    EventType.BOLDAY,
+    EventType.ARTIST,
   );
-  const type = EventType.BOLDAY;
+  const type = EventType.ARTIST;
   const { mutate: saveEventIntroduction } = useAPISaveEventIntroduction();
 
   const initialHeaderValue = {

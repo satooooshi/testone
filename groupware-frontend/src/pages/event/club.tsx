@@ -18,12 +18,12 @@ const Club: React.FC = () => {
     rightButtonName: '予定を見る',
     onClickRightButton: () => router.push('/event/list?type=club&from=&to='),
   };
-  const type = EventType.CLUB;
+  const type = EventType.IDOL;
   const { data: recommendedEvents } = useAPIGetLatestEvent({
     type,
   });
   const { data: eventIntroduction, refetch } = useAPIGetEventIntroduction(
-    EventType.CLUB,
+    EventType.IDOL,
   );
   const headlineImgSource = clubImage5;
   const bottomImgSources = [clubImage3, clubImage4, clubImage6, clubImage2];
