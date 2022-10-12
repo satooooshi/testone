@@ -339,7 +339,7 @@ const BottomTab = () => {
 
   return (
     <Tab.Navigator
-      initialRouteName="Home"
+      initialRouteName="Menu"
       screenOptions={{
         headerShown: false,
         tabBarLabelStyle: {color: 'white'},
