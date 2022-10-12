@@ -31,12 +31,13 @@ import { User } from './user.entity';
 import { UserJoiningEvent } from './userJoiningEvent.entity';
 
 export enum EventType {
-  IMPRESSIVE_UNIVERSITY = 'impressive_university',
-  STUDY_MEETING = 'study_meeting',
-  BOLDAY = 'bolday',
-  COACH = 'coach',
-  CLUB = 'club',
-  SUBMISSION_ETC = 'submission_etc',
+  ARTIST = 'artist',
+  IDOL = 'idol',
+  YOUTUBER = 'youtuber',
+  TIKTOKER = 'tiktoker',
+  INSTAGRAMER = 'instagramer',
+  TALENT = 'talent',
+  OTHER = 'other',
 }
 
 @Entity({ name: 'events' })
@@ -77,7 +78,7 @@ export class EventSchedule {
     name: 'type',
     type: 'enum',
     enum: EventType,
-    default: EventType.STUDY_MEETING,
+    default: EventType.ARTIST,
   })
   type: EventType;
 
