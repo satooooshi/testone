@@ -40,22 +40,6 @@ export type HeaderProps = {
   setMembersModal?: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-export const tabClassNameGetter = (tab: Tab): string => {
-  const name = tab.name;
-  switch (name) {
-    case EventTab.STUDY_MEETING:
-      return headerStyles.study_meeting_tab;
-    case EventTab.COACH:
-      return headerStyles.coach_tab;
-    case EventTab.CLUB:
-      return headerStyles.club_tab;
-    case EventTab.SUBMISSION_ETC:
-      return headerStyles.submission_etc_tab;
-    default:
-      return '';
-  }
-};
-
 const HeaderWithTab: React.FC<HeaderProps> = ({
   activeTabName,
   tabs,
