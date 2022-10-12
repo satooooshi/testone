@@ -27,36 +27,40 @@ const EventSearcher: React.FC = () => {
       name: 'All',
       onPress: () => setPartOfSearchQuery({type: undefined}),
     },
-    // {
-    //   name: eventTypeNameFactory(EventType.IMPRESSIVE_UNIVERSITY),
-    //   onPress: () =>
-    //     setPartOfSearchQuery({type: EventType.IMPRESSIVE_UNIVERSITY}),
-    //   borderBottomColor: eventTypeColorFactory(EventType.IMPRESSIVE_UNIVERSITY),
-    // },
     {
-      name: eventTypeNameFactory(EventType.STUDY_MEETING),
-      onPress: () => setPartOfSearchQuery({type: EventType.STUDY_MEETING}),
-      borderBottomColor: eventTypeColorFactory(EventType.STUDY_MEETING),
-    },
-    // {
-    //   name: eventTypeNameFactory(EventType.BOLDAY),
-    //   onPress: () => setPartOfSearchQuery({type: EventType.BOLDAY}),
-    //   borderBottomColor: eventTypeColorFactory(EventType.BOLDAY),
-    // },
-    {
-      name: eventTypeNameFactory(EventType.COACH),
-      onPress: () => setPartOfSearchQuery({type: EventType.COACH}),
-      borderBottomColor: eventTypeColorFactory(EventType.COACH),
+      name: eventTypeNameFactory(EventType.ARTIST),
+      onPress: () => setPartOfSearchQuery({type: EventType.ARTIST}),
+      borderBottomColor: eventTypeColorFactory(EventType.ARTIST),
     },
     {
-      name: eventTypeNameFactory(EventType.CLUB),
-      onPress: () => setPartOfSearchQuery({type: EventType.CLUB}),
-      borderBottomColor: eventTypeColorFactory(EventType.CLUB),
+      name: eventTypeNameFactory(EventType.IDOL),
+      onPress: () => setPartOfSearchQuery({type: EventType.IDOL}),
+      borderBottomColor: eventTypeColorFactory(EventType.IDOL),
     },
     {
-      name: eventTypeNameFactory(EventType.SUBMISSION_ETC),
-      onPress: () => setPartOfSearchQuery({type: EventType.SUBMISSION_ETC}),
-      borderBottomColor: eventTypeColorFactory(EventType.SUBMISSION_ETC),
+      name: eventTypeNameFactory(EventType.YOUTUBER),
+      onPress: () => setPartOfSearchQuery({type: EventType.YOUTUBER}),
+      borderBottomColor: eventTypeColorFactory(EventType.YOUTUBER),
+    },
+    {
+      name: eventTypeNameFactory(EventType.TIKTOKER),
+      onPress: () => setPartOfSearchQuery({type: EventType.TIKTOKER}),
+      borderBottomColor: eventTypeColorFactory(EventType.TIKTOKER),
+    },
+    {
+      name: eventTypeNameFactory(EventType.INSTAGRAMER),
+      onPress: () => setPartOfSearchQuery({type: EventType.INSTAGRAMER}),
+      borderBottomColor: eventTypeColorFactory(EventType.INSTAGRAMER),
+    },
+    {
+      name: eventTypeNameFactory(EventType.TALENT),
+      onPress: () => setPartOfSearchQuery({type: EventType.TALENT}),
+      borderBottomColor: eventTypeColorFactory(EventType.TALENT),
+    },
+    {
+      name: eventTypeNameFactory(EventType.OTHER),
+      onPress: () => setPartOfSearchQuery({type: EventType.OTHER}),
+      borderBottomColor: eventTypeColorFactory(EventType.OTHER),
     },
   ];
 

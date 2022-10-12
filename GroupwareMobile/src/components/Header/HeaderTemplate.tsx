@@ -90,6 +90,7 @@ const HeaderTemplate: React.FC<HeaderTemplateProps> = ({
         <Div h={48} bg="white" py="xs" px="xs" row alignItems="center">
           <FlatList
             style={headerStyles.tabList}
+            showsHorizontalScrollIndicator={false}
             data={tabs}
             horizontal
             renderItem={({item: t}) => (

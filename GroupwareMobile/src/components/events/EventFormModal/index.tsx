@@ -90,7 +90,7 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
       .set({hour: 19, minute: 0})
       .toJSDate(),
     endAt: DateTime.now().plus({days: 1}).set({hour: 21, minute: 0}).toJSDate(),
-    type: type || EventType.CLUB,
+    type: type || EventType.ARTIST,
     imageURL: '',
     chatNeeded: false,
     hostUsers: [],
@@ -358,37 +358,27 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
               alignSelf="center"
               mb={'lg'}>
               <Text fontSize={16}>開始日時</Text>
-              {newEvent.type !== EventType.SUBMISSION_ETC ? (
-                <DropdownOpenerButton
-                  name={dateTimeFormatterFromJSDDate({
-                    dateTime: newEvent.startAt
-                      ? new Date(newEvent.startAt)
-                      : new Date(),
-                    format: 'yyyy/LL/dd HH:mm',
-                  })}
-                  onPress={() =>
-                    setDateTimeModal({
-                      visible: 'startAt',
-                      date: newEvent.startAt || new Date(),
-                    })
-                  }
-                />
-              ) : (
-                <Text color="blue" fontSize={16}>
-                  提出物イベントは終了日時の2時間前の日時に開始としてカレンダーに表示されます
-                </Text>
-              )}
+              <DropdownOpenerButton
+                name={dateTimeFormatterFromJSDDate({
+                  dateTime: newEvent.startAt
+                    ? new Date(newEvent.startAt)
+                    : new Date(),
+                  format: 'yyyy/LL/dd HH:mm',
+                })}
+                onPress={() =>
+                  setDateTimeModal({
+                    visible: 'startAt',
+                    date: newEvent.startAt || new Date(),
+                  })
+                }
+              />
             </Div>
             <Div
               flexDir="column"
               alignItems="flex-start"
               alignSelf="center"
               mb={'lg'}>
-              <Text fontSize={16}>
-                {newEvent.type !== EventType.SUBMISSION_ETC
-                  ? '終了日時'
-                  : '締切日時'}
-              </Text>
+              <Text fontSize={16}>終了日時</Text>
               <DropdownOpenerButton
                 name={dateTimeFormatterFromJSDDate({
                   dateTime: newEvent.endAt
@@ -521,81 +511,83 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
               />
             </Div>
             <Dropdown ref={dropdownRef} title="タイプの選択">
-              {isCreatableEvent(EventType.IMPRESSIVE_UNIVERSITY, user?.role) ? (
-                <Dropdown.Option
-                  {...magnusDropdownOptions}
-                  onPress={() =>
-                    setNewEvent(e => ({
-                      ...e,
-                      type: EventType.IMPRESSIVE_UNIVERSITY,
-                    }))
-                  }
-                  value={EventType.IMPRESSIVE_UNIVERSITY}>
-                  {eventTypeNameFactory(EventType.IMPRESSIVE_UNIVERSITY)}
-                </Dropdown.Option>
-              ) : (
-                <></>
-              )}
-              {isCreatableEvent(EventType.STUDY_MEETING, user?.role) ? (
-                <Dropdown.Option
-                  {...magnusDropdownOptions}
-                  onPress={() =>
-                    setNewEvent(e => ({...e, type: EventType.STUDY_MEETING}))
-                  }
-                  value={EventType.STUDY_MEETING}>
-                  {eventTypeNameFactory(EventType.STUDY_MEETING)}
-                </Dropdown.Option>
-              ) : (
-                <></>
-              )}
-              {isCreatableEvent(EventType.BOLDAY, user?.role) ? (
-                <Dropdown.Option
-                  {...magnusDropdownOptions}
-                  onPress={() =>
-                    setNewEvent(e => ({...e, type: EventType.BOLDAY}))
-                  }
-                  value={EventType.BOLDAY}>
-                  {eventTypeNameFactory(EventType.BOLDAY)}
-                </Dropdown.Option>
-              ) : (
-                <></>
-              )}
-              {isCreatableEvent(EventType.COACH, user?.role) ? (
-                <Dropdown.Option
-                  {...magnusDropdownOptions}
-                  onPress={() =>
-                    setNewEvent(e => ({...e, type: EventType.COACH}))
-                  }
-                  value={EventType.COACH}>
-                  {eventTypeNameFactory(EventType.COACH)}
-                </Dropdown.Option>
-              ) : (
-                <></>
-              )}
-              {isCreatableEvent(EventType.CLUB, user?.role) ? (
-                <Dropdown.Option
-                  {...magnusDropdownOptions}
-                  onPress={() =>
-                    setNewEvent(e => ({...e, type: EventType.CLUB}))
-                  }
-                  value={EventType.CLUB}>
-                  {eventTypeNameFactory(EventType.CLUB)}
-                </Dropdown.Option>
-              ) : (
-                <></>
-              )}
-              {isCreatableEvent(EventType.SUBMISSION_ETC, user?.role) ? (
-                <Dropdown.Option
-                  {...magnusDropdownOptions}
-                  onPress={() =>
-                    setNewEvent(e => ({...e, type: EventType.SUBMISSION_ETC}))
-                  }
-                  value={EventType.SUBMISSION_ETC}>
-                  {eventTypeNameFactory(EventType.SUBMISSION_ETC)}
-                </Dropdown.Option>
-              ) : (
-                <></>
-              )}
+              <Dropdown.Option
+                {...magnusDropdownOptions}
+                onPress={() =>
+                  setNewEvent(e => ({
+                    ...e,
+                    type: EventType.ARTIST,
+                  }))
+                }
+                value={EventType.ARTIST}>
+                {eventTypeNameFactory(EventType.ARTIST)}
+              </Dropdown.Option>
+              <Dropdown.Option
+                {...magnusDropdownOptions}
+                onPress={() =>
+                  setNewEvent(e => ({
+                    ...e,
+                    type: EventType.IDOL,
+                  }))
+                }
+                value={EventType.IDOL}>
+                {eventTypeNameFactory(EventType.IDOL)}
+              </Dropdown.Option>
+              <Dropdown.Option
+                {...magnusDropdownOptions}
+                onPress={() =>
+                  setNewEvent(e => ({
+                    ...e,
+                    type: EventType.YOUTUBER,
+                  }))
+                }
+                value={EventType.YOUTUBER}>
+                {eventTypeNameFactory(EventType.YOUTUBER)}
+              </Dropdown.Option>
+              <Dropdown.Option
+                {...magnusDropdownOptions}
+                onPress={() =>
+                  setNewEvent(e => ({
+                    ...e,
+                    type: EventType.TIKTOKER,
+                  }))
+                }
+                value={EventType.TIKTOKER}>
+                {eventTypeNameFactory(EventType.TIKTOKER)}
+              </Dropdown.Option>
+              <Dropdown.Option
+                {...magnusDropdownOptions}
+                onPress={() =>
+                  setNewEvent(e => ({
+                    ...e,
+                    type: EventType.INSTAGRAMER,
+                  }))
+                }
+                value={EventType.INSTAGRAMER}>
+                {eventTypeNameFactory(EventType.INSTAGRAMER)}
+              </Dropdown.Option>
+              <Dropdown.Option
+                {...magnusDropdownOptions}
+                onPress={() =>
+                  setNewEvent(e => ({
+                    ...e,
+                    type: EventType.TALENT,
+                  }))
+                }
+                value={EventType.TALENT}>
+                {eventTypeNameFactory(EventType.TALENT)}
+              </Dropdown.Option>
+              <Dropdown.Option
+                {...magnusDropdownOptions}
+                onPress={() =>
+                  setNewEvent(e => ({
+                    ...e,
+                    type: EventType.OTHER,
+                  }))
+                }
+                value={EventType.OTHER}>
+                {eventTypeNameFactory(EventType.OTHER)}
+              </Dropdown.Option>
             </Dropdown>
             {newEvent.imageURL ? (
               <>
@@ -730,12 +722,7 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
                     setNewEvent(e => ({
                       ...e,
                       endAt: date,
-                      startAt:
-                        newEvent.type === EventType.SUBMISSION_ETC
-                          ? DateTime.fromJSDate(date)
-                              .minus({hours: 2})
-                              .toJSDate()
-                          : e.startAt,
+                      startAt: e.startAt,
                     }));
                   }
                   return {

@@ -45,18 +45,20 @@ export class EventScheduleService {
 
   public eventTypeNameFactory(eventType: EventType): string {
     switch (eventType) {
-      case EventType.IMPRESSIVE_UNIVERSITY:
-        return '感動大学';
-      case EventType.STUDY_MEETING:
-        return '勉強会';
-      case EventType.COACH:
-        return 'コーチ制度';
-      case EventType.BOLDAY:
-        return 'BOLDay';
-      case EventType.CLUB:
-        return '部活動';
-      case EventType.SUBMISSION_ETC:
-        return '提出物等';
+      case EventType.ARTIST:
+        return 'アーティスト';
+      case EventType.IDOL:
+        return 'アイドル';
+      case EventType.YOUTUBER:
+        return 'YouTuber';
+      case EventType.TIKTOKER:
+        return 'TikToker';
+      case EventType.INSTAGRAMER:
+        return 'インスタグラマー';
+      case EventType.TALENT:
+        return 'タレント';
+      case EventType.OTHER:
+        return 'その他';
     }
   }
 
@@ -99,9 +101,6 @@ export class EventScheduleService {
       .leftJoinAndSelect('events.tags', 'tags')
       .where('events.startAt > :fromDate', { fromDate })
       .andWhere('events.startAt < :toDate', { toDate })
-      .andWhere('events.type <> :eventType', {
-        eventType: EventType.SUBMISSION_ETC,
-      })
       .getMany();
 
     for (const e of events) {
@@ -166,7 +165,7 @@ export class EventScheduleService {
         'hostUsers',
         'tags',
       ],
-      where: { type: Not(EventType.SUBMISSION_ETC), id },
+      where: { id },
       withDeleted: true,
     });
 
