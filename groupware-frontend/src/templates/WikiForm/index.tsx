@@ -265,7 +265,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
           tabs,
         }}>
         <Head>
-          <title>vallyein | {wiki ? 'Wiki編集' : 'Wiki作成'}</title>
+          <title>FanReturn | {wiki ? 'Wiki編集' : 'Wiki作成'}</title>
         </Head>
         <TagModal
           isOpen={tagModal}

@@ -275,7 +275,7 @@ const CreateNewUser = () => {
         title: '新規ユーザー作成',
       }}>
       <Head>
-        <title>vallyein | ユーザー作成</title>
+        <title>FanReturn | ユーザー作成</title>
       </Head>
       <Box w="100%" mt="20px" mb="40px">
         <Button bg="white" w="120px" onClick={() => router.back()}>

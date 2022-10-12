@@ -99,7 +99,7 @@ const UserList = () => {
       sidebar={{ activeScreenName: SidebarScreenName.USERS }}
       header={initialHeaderValue}>
       <Head>
-        <title>vallyein | メンバー</title>
+        <title>FanReturn | メンバー</title>
       </Head>
       {/* <TopTabBar topTabBehaviorList={topTabBehaviorList} /> */}
       <SearchForm

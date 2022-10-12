@@ -445,7 +445,7 @@ const EventList = () => {
       sidebar={{ activeScreenName: SidebarScreenName.EVENT }}>
       <Head>
         <title>
-          vallyein | {type ? eventTitleText[type] : '全てのイベント'}
+          FanReturn | {type ? eventTitleText[type] : '全てのイベント'}
         </title>
       </Head>
       <CreateEventModal

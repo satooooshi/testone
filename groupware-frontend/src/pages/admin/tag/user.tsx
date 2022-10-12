@@ -84,7 +84,7 @@ const UserTagAdmin: React.FC = () => {
         tabs,
       }}>
       <Head>
-        <title>vallyein | タグ管理</title>
+        <title>FanReturn | タグ管理</title>
       </Head>
       <div className={tagAdminStyles.main}>
         <TagListBox

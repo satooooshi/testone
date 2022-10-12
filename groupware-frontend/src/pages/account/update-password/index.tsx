@@ -63,7 +63,7 @@ const UpdatePassword = () => {
         activeTabName: 'パスワード更新',
       }}>
       <Head>
-        <title>vallyein | パスワード更新</title>
+        <title>FanReturn | パスワード更新</title>
       </Head>
       <Box w="100%" mt="20px" mb="40px">
         <Button bg="white" w="120px" onClick={() => router.back()}>

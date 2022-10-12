@@ -10,7 +10,7 @@ module.exports = {
       : process.env.DB_PASSWORD,
   database:
     process.env.NODE_ENV !== 'production'
-      ? 'valleyin-app-mysql8'
+      ? 'fanreturn-mysql8'
       : process.env.DB_DATABASE,
   port: process.env.NODE_ENV !== 'production' ? 3306 : process.env.DB_PORT,
   entities: [

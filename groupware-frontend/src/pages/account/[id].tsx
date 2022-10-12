@@ -213,7 +213,8 @@ const MyAccountInfo = () => {
       }}>
       <Head>
         <title>
-          vallyein | {profile ? `${profile.lastName} ${profile.firstName}` : ''}
+          FanReturn |{' '}
+          {profile ? `${profile.lastName} ${profile.firstName}` : ''}
         </title>
       </Head>
       <Box w="100%" mt="20px" mb="40px">
