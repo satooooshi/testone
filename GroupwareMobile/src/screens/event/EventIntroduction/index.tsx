@@ -190,6 +190,7 @@ const AnnualCalendar = () => {
   const calendarHeight = windowHeight - 300;
 
   const [searchQuery] = useState<SearchQueryToGetEvents>({
+    type: EventType.IMPRESSIVE_UNIVERSITY,
     from: DateTime.fromJSDate(new Date())
       .minus({months: 1})
       .toJSDate()
@@ -283,8 +284,9 @@ const AnnualCalendar = () => {
                 onPressEvent={event => {
                   navigation.navigate('EventStack', {
                     screen: 'EventDetail',
-                    params: {id: event.id},
-                    //previousScreenName: 'EventIntroduction',
+                    params: {
+                      id: event.id,
+                    },
                   });
                 }}
                 eventCellStyle={event => ({

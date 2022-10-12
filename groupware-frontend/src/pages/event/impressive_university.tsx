@@ -36,19 +36,17 @@ const ImpressionUniversity: React.FC = () => {
   };
 
   return (
-    <>
-      <EventIntroductionTemplate
-        recommendedEvents={recommendedEvents}
-        type={type}
-        eventIntroduction={eventIntroduction}
-        headlineImgSource={headlineImgSource}
-        bottomImgSources={bottomImgSources}
-        onSaveIntroduction={saveEventIntroduction}
-        onSuccessToSaveIntroduction={() => refetch()}
-        headerProps={initialHeaderValue}
-      />
+    <EventIntroductionTemplate
+      recommendedEvents={recommendedEvents}
+      type={type}
+      eventIntroduction={eventIntroduction}
+      headlineImgSource={headlineImgSource}
+      bottomImgSources={bottomImgSources}
+      onSaveIntroduction={saveEventIntroduction}
+      onSuccessToSaveIntroduction={() => refetch()}
+      headerProps={initialHeaderValue}>
       <AnnualCalendar />
-    </>
+    </EventIntroductionTemplate>
   );
 };
 

@@ -47,13 +47,7 @@ const formats: Formats = {
   dayHeaderFormat: 'M月D日(ddd)',
 };
 
-export interface DatetimeSettings {
-  addDays: number;
-  hours: number;
-  minutes: number;
-}
-
-const AnnualCalendar: React.FC<any> = () => {
+const AnnualCalendar: React.FC = () => {
   const router = useRouter();
   const [isSmallerThan768] = useMediaQuery('(max-width: 768px)');
 
@@ -79,27 +73,22 @@ const AnnualCalendar: React.FC<any> = () => {
     refetch,
     isLoading: isLoadingEvents,
   } = useAPIGetEventList(searchQuery);
-  const calendarRef = useRef<HTMLDivElement | null>(null);
 
-  const bigCalendarEvent = () => {
-    const changeToBigCalendarEvent = (ev?: EventSchedule[]) => {
-      if (ev) {
-        const events: any[] = ev.map((e) => ({
-          ...e,
-          start: new Date(e.startAt),
-          end: new Date(e.endAt),
-        }));
-        return events;
-      }
-      return [];
-    };
-    return changeToBigCalendarEvent(events?.events);
+  const changeToBigCalendarEvent = (ev?: EventSchedule[]) => {
+    if (ev) {
+      const events: any[] = ev.map((e) => ({
+        ...e,
+        start: new Date(e.startAt),
+        end: new Date(e.endAt),
+      }));
+      return events;
+    }
+    return [];
   };
 
   useEffect(() => {
-    calendarRef?.current?.scrollIntoView();
+    console.log('mounted, refetch called');
     refetch();
-    console.log('refetch called.');
   }, []);
 
   return (
@@ -132,7 +121,6 @@ const AnnualCalendar: React.FC<any> = () => {
               justifyContent="flex-start"
               mb="72px">
               <Box
-                ref={calendarRef}
                 justifyContent="center"
                 alignItems="center"
                 maxW={isSmallerThan768 ? '99vw' : undefined}
@@ -148,7 +136,7 @@ const AnnualCalendar: React.FC<any> = () => {
                   views={[Views.MONTH]}
                   className={bigCalendarStyles.big_calendar}
                   localizer={localizer}
-                  events={bigCalendarEvent()}
+                  events={changeToBigCalendarEvent(events?.events)}
                   formats={formats}
                   defaultView={Views.MONTH}
                   popup={true}

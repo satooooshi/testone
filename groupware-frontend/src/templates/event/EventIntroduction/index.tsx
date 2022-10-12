@@ -22,6 +22,7 @@ import { Tab } from 'src/types/header/tab/types';
 import { blueColor } from 'src/utils/colors';
 
 export interface EventIntroductionProps {
+  children?: any;
   recommendedEvents?: EventSchedule[];
   type: EventType;
   eventIntroduction?: EventIntroduction;
@@ -39,6 +40,7 @@ export interface EventIntroductionProps {
 }
 
 const EventIntroductionTemplate: React.FC<EventIntroductionProps> = ({
+  children,
   recommendedEvents,
   type,
   eventIntroduction,
@@ -129,6 +131,7 @@ const EventIntroductionTemplate: React.FC<EventIntroductionProps> = ({
             eventIntroduction={eventIntroduction}
           />
         ) : null}
+        {children}
       </div>
     </LayoutWithTab>
   );
