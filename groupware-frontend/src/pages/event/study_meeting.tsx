@@ -11,7 +11,7 @@ import { useAPISaveEventIntroduction } from '@/hooks/api/event/useAPISaveEventIn
 
 const StudyMeeting: React.FC = () => {
   const router = useRouter();
-  const type = EventType.STUDY_MEETING;
+  const type = EventType.ARTIST;
   const initialHeaderValue = {
     title: '技術勉強会',
     rightButtonName: '予定を見る',
@@ -22,7 +22,7 @@ const StudyMeeting: React.FC = () => {
     type,
   });
   const { data: eventIntroduction, refetch } = useAPIGetEventIntroduction(
-    EventType.STUDY_MEETING,
+    EventType.ARTIST,
   );
   const { mutate: saveEventIntroduction } = useAPISaveEventIntroduction();
   // const headlineImgSource =

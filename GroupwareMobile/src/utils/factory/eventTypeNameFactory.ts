@@ -2,14 +2,20 @@ import {EventType} from '../../types';
 
 const eventTypeNameFactory = (type: EventType): any => {
   switch (type) {
-    case EventType.STUDY_MEETING:
-      return '技術勉強会';
-    case EventType.COACH:
-      return 'コーチ制度';
-    case EventType.CLUB:
-      return '部活動';
-    case EventType.SUBMISSION_ETC:
-      return '提出物等';
+    case EventType.ARTIST:
+      return 'アーティスト';
+    case EventType.IDOL:
+      return 'アイドル';
+    case EventType.YOUTUBER:
+      return 'YouTuber';
+    case EventType.TIKTOKER:
+      return 'TikToker';
+    case EventType.INSTAGRAMER:
+      return 'インスタグラマー';
+    case EventType.TALENT:
+      return 'タレント';
+    case EventType.OTHER:
+      return 'その他';
   }
 };
 

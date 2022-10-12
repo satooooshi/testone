@@ -35,12 +35,13 @@ export enum ChatMessageType {
 }
 
 export enum EventType {
-  IMPRESSIVE_UNIVERSITY = 'impressive_university',
-  STUDY_MEETING = 'study_meeting',
-  BOLDAY = 'bolday',
-  COACH = 'coach',
-  CLUB = 'club',
-  SUBMISSION_ETC = 'submission_etc',
+  ARTIST = 'artist',
+  IDOL = 'idol',
+  YOUTUBER = 'youtuber',
+  TIKTOKER = 'tiktoker',
+  INSTAGRAMER = 'instagramer',
+  TALENT = 'talent',
+  OTHER = 'other',
 }
 
 export enum TagType {

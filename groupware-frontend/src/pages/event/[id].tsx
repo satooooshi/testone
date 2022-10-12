@@ -117,35 +117,35 @@ const EventDetail = () => {
   const [submitFiles, setSubmitFiles] = useState<
     Partial<SubmissionFile & { submitUnFinished: boolean }>[]
   >([]);
-  const imageSource = useMemo(() => {
-    switch (data?.type) {
-      case EventType.STUDY_MEETING:
-        return <Image src={studyMeeting1Image.src} alt="イベント画像" />;
-      case EventType.BOLDAY:
-        return <Image src={boldayImage1.src} alt="イベント画像" />;
-      case EventType.CLUB:
-        return (
-          <FcSportsMode
-            style={{ height: '100%', width: '100%' }}
-            className={clsx(portalLinkBoxStyles.club_icon)}
-          />
-        );
-      case EventType.IMPRESSIVE_UNIVERSITY:
-        return <Image src={impressiveUnivertyImage.src} alt="イベント画像" />;
-      case EventType.COACH:
-        return <Image src={coachImage.src} alt="イベント画像" />;
-      case EventType.SUBMISSION_ETC:
-        return (
-          <MdAssignment
-            style={{ height: '100%', width: '100%' }}
-            className={clsx(portalLinkBoxStyles.submission_etc_icon)}
-          />
-        );
+  // const imageSource = useMemo(() => {
+  //   switch (data?.type) {
+  //     case EventType.STUDY_MEETING:
+  //       return <Image src={studyMeeting1Image.src} alt="イベント画像" />;
+  //     case EventType.BOLDAY:
+  //       return <Image src={boldayImage1.src} alt="イベント画像" />;
+  //     case EventType.CLUB:
+  //       return (
+  //         <FcSportsMode
+  //           style={{ height: '100%', width: '100%' }}
+  //           className={clsx(portalLinkBoxStyles.club_icon)}
+  //         />
+  //       );
+  //     case EventType.IMPRESSIVE_UNIVERSITY:
+  //       return <Image src={impressiveUnivertyImage.src} alt="イベント画像" />;
+  //     case EventType.COACH:
+  //       return <Image src={coachImage.src} alt="イベント画像" />;
+  //     case EventType.SUBMISSION_ETC:
+  //       return (
+  //         <MdAssignment
+  //           style={{ height: '100%', width: '100%' }}
+  //           className={clsx(portalLinkBoxStyles.submission_etc_icon)}
+  //         />
+  //       );
 
-      default:
-        return <Image src={noImage.src} alt="イベント画像" />;
-    }
-  }, [data?.type]);
+  //     default:
+  //       return <Image src={noImage.src} alt="イベント画像" />;
+  //   }
+  // }, [data?.type]);
 
   const { mutate: saveSubmission } = useAPISaveSubmission({
     onSuccess: () => {
@@ -331,7 +331,7 @@ const EventDetail = () => {
                 {data.imageURL ? (
                   <Image src={data.imageURL} alt="イベント画像" />
                 ) : (
-                  imageSource
+                  <Image src={noImage.src} alt="イベント画像" />
                 )}
               </Box>
 
@@ -407,47 +407,39 @@ const EventDetail = () => {
                   <Heading mb={2} size="xs">
                     日時
                   </Heading>
-                  {data.type !== EventType.SUBMISSION_ETC && (
-                    <Text fontSize={14}>
-                      {dateTimeFormatterFromJSDDate({
-                        dateTime: new Date(data.startAt),
-                        format: '開始: yyyy/LL/dd HH:mm ',
-                      })}
-                    </Text>
-                  )}
-                  <Text fontSize={14} mt="5px">
-                    {`
-                  ${
-                    data.type !== EventType.SUBMISSION_ETC ? '終了' : '締切'
-                  }: ${dateTimeFormatterFromJSDDate({
-                      dateTime: new Date(data.endAt),
-                      format: 'yyyy/LL/dd HH:mm',
+                  <Text fontSize={14}>
+                    {dateTimeFormatterFromJSDDate({
+                      dateTime: new Date(data.startAt),
+                      format: '開始: yyyy/LL/dd HH:mm ',
                     })}
-                `}
+                  </Text>
+                  <Text fontSize={14} mt="5px">
+                    {dateTimeFormatterFromJSDDate({
+                      dateTime: new Date(data.endAt),
+                      format: '終了: yyyy/LL/dd HH:mm',
+                    })}
                   </Text>
                 </Box>
-                {data.type !== EventType.SUBMISSION_ETC && (
-                  <Box mt={3}>
-                    <Heading size="xs" mb={2}>
-                      開催者/講師
-                    </Heading>
-                    {data && data.hostUsers && data.hostUsers.length ? (
-                      <div className={eventDetailStyles.tags_wrapper}>
-                        {data.hostUsers.map((hostUser) => (
-                          <Link
-                            href={`/account/${hostUser.id}`}
-                            key={hostUser.id}>
-                            <a className={eventDetailStyles.tag}>
-                              <Button colorScheme="purple" size="xs">
-                                {userNameFactory(hostUser)}
-                              </Button>
-                            </a>
-                          </Link>
-                        ))}
-                      </div>
-                    ) : null}
-                  </Box>
-                )}
+                <Box mt={3}>
+                  <Heading size="xs" mb={2}>
+                    開催者
+                  </Heading>
+                  {data && data.hostUsers && data.hostUsers.length ? (
+                    <div className={eventDetailStyles.tags_wrapper}>
+                      {data.hostUsers.map((hostUser) => (
+                        <Link
+                          href={`/account/${hostUser.id}`}
+                          key={hostUser.id}>
+                          <a className={eventDetailStyles.tag}>
+                            <Button colorScheme="purple" size="xs">
+                              {userNameFactory(hostUser)}
+                            </Button>
+                          </a>
+                        </Link>
+                      ))}
+                    </div>
+                  ) : null}
+                </Box>
               </Box>
             </Box>
             <Box
@@ -456,7 +448,7 @@ const EventDetail = () => {
               flexDir="column"
               alignItems="center"
               w="100%">
-              {!isCommonUser && data.type !== EventType.SUBMISSION_ETC ? (
+              {!isCommonUser ? (
                 <Button
                   mb={3}
                   borderRadius={50}
@@ -471,7 +463,7 @@ const EventDetail = () => {
                   )}
                 </Button>
               ) : null}
-              {data.type !== 'submission_etc' && !isFinished ? (
+              {!isFinished ? (
                 <>
                   {!data.isCanceled && (
                     <Button
@@ -518,29 +510,6 @@ const EventDetail = () => {
                   borderWidth="1px">
                   締切済み
                 </Text>
-              ) : null}
-
-              {isAdminUser && data.type === EventType.SUBMISSION_ETC ? (
-                <Button
-                  w="50%"
-                  borderRadius={50}
-                  variant="outline"
-                  colorScheme={'green'}
-                  onClick={() =>
-                    downloadZip({
-                      id: data.id.toString(),
-                      name: data.title,
-                    })
-                  }>
-                  {loadingSubmissionZip ? (
-                    <Text>
-                      一括ダウンロードには時間がかかります
-                      <Spinner />
-                    </Text>
-                  ) : (
-                    <Text>提出物を一括ダウンロード</Text>
-                  )}
-                </Button>
               ) : null}
             </Box>
           </Box>
@@ -594,78 +563,76 @@ const EventDetail = () => {
               関連動画はありません
             </Text>
           )}
-          {data.type !== EventType.SUBMISSION_ETC && (
-            <>
-              <Box w="100%" mt={2}>
-                <Heading fontSize="16px">参加者一覧</Heading>
-                <EventParticipants
-                  onChangeJoiningData={(uje) => handleChangeJoiningData(uje)}
-                  userJoiningEvent={data.userJoiningEvent}
-                />
-              </Box>
-              <Box w="100%" mt={5}>
-                <div className={eventDetailStyles.count_and_button_wrapper}>
-                  <Box alignSelf="center" display="flex" flexDir="row">
-                    <Heading fontSize="16px">イベントの感想</Heading>
-                    {data.comments?.length ? (
-                      <Text fontSize="11px" ml={2} alignSelf="center">
-                        {data.comments.length}件
-                      </Text>
-                    ) : null}
-                  </Box>
-                  <Box display="flex" flexDir="row">
-                    <Button
-                      borderRadius={50}
-                      colorScheme="blue"
-                      size="sm"
-                      onClick={() => {
-                        commentVisible && newComment
-                          ? handleCreateComment()
-                          : setCommentVisible(true);
-                      }}>
-                      感想を投稿
-                    </Button>
-                    {showingCommentCount < data.comments.length && (
-                      <Heading
-                        onClick={() => setShowingCommentCount((c) => c + 3)}
-                        fontSize="16px"
-                        cursor="pointer"
-                        alignSelf="center"
-                        ml={4}>
-                        もっと見る
-                      </Heading>
-                    )}
-                  </Box>
-                </div>
-                {commentVisible && (
-                  <Textarea
-                    height="56"
-                    background="white"
-                    placeholder="コメントを記入してください。"
-                    value={newComment}
-                    onChange={(e) => setNewComment(e.target.value)}
-                    className={eventDetailStyles.comment_input}
-                    autoFocus
-                  />
-                )}
-                <Box rounded="md" display="flex" flexDir="column" bg="white">
-                  {data.comments && data.comments.length
-                    ? data.comments.map((comment, index) =>
-                        index < showingCommentCount && comment.writer ? (
-                          <CommentCard
-                            key={comment.id}
-                            body={comment.body}
-                            date={comment.createdAt}
-                            writer={comment.writer}
-                          />
-                        ) : null,
-                      )
-                    : null}
+          <>
+            <Box w="100%" mt={2}>
+              <Heading fontSize="16px">参加者一覧</Heading>
+              <EventParticipants
+                onChangeJoiningData={(uje) => handleChangeJoiningData(uje)}
+                userJoiningEvent={data.userJoiningEvent}
+              />
+            </Box>
+            <Box w="100%" mt={5}>
+              <div className={eventDetailStyles.count_and_button_wrapper}>
+                <Box alignSelf="center" display="flex" flexDir="row">
+                  <Heading fontSize="16px">イベントの感想</Heading>
+                  {data.comments?.length ? (
+                    <Text fontSize="11px" ml={2} alignSelf="center">
+                      {data.comments.length}件
+                    </Text>
+                  ) : null}
                 </Box>
+                <Box display="flex" flexDir="row">
+                  <Button
+                    borderRadius={50}
+                    colorScheme="blue"
+                    size="sm"
+                    onClick={() => {
+                      commentVisible && newComment
+                        ? handleCreateComment()
+                        : setCommentVisible(true);
+                    }}>
+                    感想を投稿
+                  </Button>
+                  {showingCommentCount < data.comments.length && (
+                    <Heading
+                      onClick={() => setShowingCommentCount((c) => c + 3)}
+                      fontSize="16px"
+                      cursor="pointer"
+                      alignSelf="center"
+                      ml={4}>
+                      もっと見る
+                    </Heading>
+                  )}
+                </Box>
+              </div>
+              {commentVisible && (
+                <Textarea
+                  height="56"
+                  background="white"
+                  placeholder="コメントを記入してください。"
+                  value={newComment}
+                  onChange={(e) => setNewComment(e.target.value)}
+                  className={eventDetailStyles.comment_input}
+                  autoFocus
+                />
+              )}
+              <Box rounded="md" display="flex" flexDir="column" bg="white">
+                {data.comments && data.comments.length
+                  ? data.comments.map((comment, index) =>
+                      index < showingCommentCount && comment.writer ? (
+                        <CommentCard
+                          key={comment.id}
+                          body={comment.body}
+                          date={comment.createdAt}
+                          writer={comment.writer}
+                        />
+                      ) : null,
+                    )
+                  : null}
               </Box>
-            </>
-          )}
-          {data.type === EventType.SUBMISSION_ETC && !isFinished ? (
+            </Box>
+          </>
+          {!isFinished ? (
             <>
               <Box
                 borderBottomColor="green.500"

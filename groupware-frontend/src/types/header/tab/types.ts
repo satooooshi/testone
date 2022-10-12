@@ -1,9 +1,12 @@
 export enum EventTab {
   ALL = 'All',
-  STUDY_MEETING = '技術勉強会',
-  COACH = 'コーチ制度',
-  CLUB = '部活動',
-  SUBMISSION_ETC = '提出物等',
+  ARTIST = 'アーティスト',
+  IDOL = 'アイドル',
+  YOUTUBER = 'YouTuber',
+  TIKTOKER = 'TikToker',
+  INSTAGRAMER = 'インスタグラマー',
+  TALENT = 'タレント',
+  OTHER = 'その他',
 }
 
 export type Tab = {

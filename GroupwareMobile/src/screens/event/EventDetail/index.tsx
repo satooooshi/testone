@@ -507,7 +507,7 @@ const EventDetail: React.FC = () => {
               </Div>
               <Div mb={8}>
                 <Text fontWeight="bold" fontSize={16} mb={5}>
-                  開催者/講師
+                  開催者
                 </Text>
                 <FlatList
                   horizontal

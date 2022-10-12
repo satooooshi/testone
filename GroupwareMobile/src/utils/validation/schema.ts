@@ -11,7 +11,7 @@ const minTagsMessage = 'タグは一つ以上設定してください';
 const unmatchPasswordConfirmation = '再入力と新しいパスワードが一致しません';
 const nWordLimitMessage = (len: number) => `${len}文字以内で入力してください`;
 const afterNowMessage = '現在の日時以降に設定してください';
-// const minHostUsersMessage = '開催者/講師は一人以上設定してください';
+// const minHostUsersMessage = '開催者は一人以上設定してください';
 // const minRoomUserMessage = 'トークルームには一人以上の社員を招待してください';
 
 export const loginSchema = Yup.object().shape({

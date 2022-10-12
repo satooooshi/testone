@@ -417,7 +417,7 @@ const EventFormModal: React.FC<EventFormModalProps> = props => {
             />
             <Div mb="lg" />
             <Div row justifyContent="space-between" alignItems="center">
-              <Text fontSize={16}>開催者/講師</Text>
+              <Text fontSize={16}>開催者</Text>
               <Button
                 onPress={() => setVisibleUserModal(true)}
                 py="sm"

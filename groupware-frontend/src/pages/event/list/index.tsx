@@ -118,7 +118,7 @@ const initialEventValue = {
     hours: 21,
     minutes: 0,
   }),
-  type: EventType.STUDY_MEETING,
+  type: EventType.ARTIST,
   imageURL: '',
   chatNeeded: false,
   hostUsers: [],
@@ -128,12 +128,13 @@ const initialEventValue = {
 };
 
 const eventTitleText = {
-  [EventType.IMPRESSIVE_UNIVERSITY]: '感動大学',
-  [EventType.STUDY_MEETING]: '勉強会',
-  [EventType.BOLDAY]: 'BOLDay',
-  [EventType.COACH]: 'コーチ制度',
-  [EventType.CLUB]: '部活動',
-  [EventType.SUBMISSION_ETC]: '提出物等',
+  [EventType.ARTIST]: 'アーティスト',
+  [EventType.IDOL]: 'アイドル',
+  [EventType.YOUTUBER]: 'YouTuber',
+  [EventType.TIKTOKER]: 'TikToker',
+  [EventType.INSTAGRAMER]: 'インスタグラマー',
+  [EventType.TALENT]: 'タレント',
+  [EventType.OTHER]: 'other',
 };
 
 type EventListGetParams = SearchQueryToGetEvents & {
@@ -267,17 +268,26 @@ const EventList = () => {
   };
 
   const activeTabName = () => {
-    if (type === EventType.STUDY_MEETING) {
-      return EventTab.STUDY_MEETING;
+    if (type === EventType.ARTIST) {
+      return EventTab.ARTIST;
     }
-    if (type === EventType.COACH) {
-      return EventTab.COACH;
+    if (type === EventType.IDOL) {
+      return EventTab.IDOL;
     }
-    if (type === EventType.CLUB) {
-      return EventTab.CLUB;
+    if (type === EventType.YOUTUBER) {
+      return EventTab.YOUTUBER;
     }
-    if (type === EventType.SUBMISSION_ETC) {
-      return EventTab.SUBMISSION_ETC;
+    if (type === EventType.TIKTOKER) {
+      return EventTab.TIKTOKER;
+    }
+    if (type === EventType.INSTAGRAMER) {
+      return EventTab.INSTAGRAMER;
+    }
+    if (type === EventType.TALENT) {
+      return EventTab.TALENT;
+    }
+    if (type === EventType.OTHER) {
+      return EventTab.OTHER;
     }
     return EventTab.ALL;
   };

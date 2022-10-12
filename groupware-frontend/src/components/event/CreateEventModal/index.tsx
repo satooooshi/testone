@@ -112,7 +112,7 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
       description: '',
       startAt: setDateTime(1, 19, 0),
       endAt: setDateTime(1, 21, 0),
-      type: EventType.CLUB,
+      type: EventType.ARTIST,
       imageURL: '',
       chatNeeded: false,
       hostUsers: [],
@@ -306,66 +306,67 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
     }));
   };
 
-  const isCreatableImpressiveUniversity = isCreatableEvent(
-    EventType.IMPRESSIVE_UNIVERSITY,
-    user?.role,
-  );
+  // const isCreatableImpressiveUniversity = isCreatableEvent(
+  //   EventType.IMPRESSIVE_UNIVERSITY,
+  //   user?.role,
+  // );
 
-  const isCreatableStudyMeeting = isCreatableEvent(
-    EventType.STUDY_MEETING,
-    user?.role,
-  );
+  // const isCreatableStudyMeeting = isCreatableEvent(
+  //   EventType.STUDY_MEETING,
+  //   user?.role,
+  // );
 
-  const isCreatableBolday = isCreatableEvent(EventType.BOLDAY, user?.role);
+  // const isCreatableBolday = isCreatableEvent(EventType.BOLDAY, user?.role);
 
-  const isCreatableCoach = isCreatableEvent(EventType.COACH, user?.role);
+  // const isCreatableCoach = isCreatableEvent(EventType.COACH, user?.role);
 
-  const isCreatableClub = isCreatableEvent(EventType.CLUB, user?.role);
+  // const isCreatableClub = isCreatableEvent(EventType.CLUB, user?.role);
 
-  const isCreatableSubmissionEtc = isCreatableEvent(
-    EventType.SUBMISSION_ETC,
-    user?.role,
-  );
+  // const isCreatableSubmissionEtc = isCreatableEvent(
+  //   EventType.SUBMISSION_ETC,
+  //   user?.role,
+  // );
 
-  useEffect(() => {
-    const getInitialEventType = () => {
-      if (isCreatableImpressiveUniversity) {
-        return EventType.IMPRESSIVE_UNIVERSITY;
-      }
-      if (isCreatableBolday) {
-        return EventType.BOLDAY;
-      }
-      if (isCreatableStudyMeeting) {
-        return EventType.STUDY_MEETING;
-      }
-      if (isCreatableCoach) {
-        return EventType.COACH;
-      }
-      if (isCreatableClub) {
-        return EventType.CLUB;
-      }
-      if (isCreatableSubmissionEtc) {
-        return EventType.SUBMISSION_ETC;
-      }
-      return undefined;
-    };
-    const initialEventType = getInitialEventType();
-    if (!event && initialEventType) {
-      setNewEvent((e) => ({
-        ...e,
-        type: initialEventType,
-      }));
-    }
-  }, [
-    event,
-    isCreatableBolday,
-    isCreatableClub,
-    isCreatableCoach,
-    isCreatableImpressiveUniversity,
-    isCreatableStudyMeeting,
-    isCreatableSubmissionEtc,
-    setNewEvent,
-  ]);
+  // useEffect(() => {
+  //   // const getInitialEventType = () => {
+  //   //   if (isCreatableImpressiveUniversity) {
+  //   //     return EventType.IMPRESSIVE_UNIVERSITY;
+  //   //   }
+  //   //   if (isCreatableBolday) {
+  //   //     return EventType.BOLDAY;
+  //   //   }
+  //   //   if (isCreatableStudyMeeting) {
+  //   //     return EventType.STUDY_MEETING;
+  //   //   }
+  //   //   if (isCreatableCoach) {
+  //   //     return EventType.COACH;
+  //   //   }
+  //   //   if (isCreatableClub) {
+  //   //     return EventType.CLUB;
+  //   //   }
+  //   //   if (isCreatableSubmissionEtc) {
+  //   //     return EventType.SUBMISSION_ETC;
+  //   //   }
+  //   //   return undefined;
+  //   // };
+  //   // const initialEventType = getInitialEventType();
+  //   const initialEventType = getInitialEventType();
+  //   if (!event && initialEventType) {
+  //     setNewEvent((e) => ({
+  //       ...e,
+  //       type: initialEventType,
+  //     }));
+  //   }
+  // }, [
+  //   event,
+  //   // isCreatableBolday,
+  //   // isCreatableClub,
+  //   // isCreatableCoach,
+  //   // isCreatableImpressiveUniversity,
+  //   // isCreatableStudyMeeting,
+  //   // isCreatableSubmissionEtc,
+  //   setNewEvent,
+  // ]);
 
   const pushYoutube = () => {
     const youtubeRegex =
@@ -467,19 +468,13 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
               <Box
                 w={isSmallerThan768 ? '100%' : '40%'}
                 mb={isSmallerThan768 ? '16px' : 0}>
-                {newEvent.type !== EventType.SUBMISSION_ETC ? (
-                  <DateTimePicker
-                    value={newEvent.startAt}
-                    onChange={(d) => setNewEvent((e) => ({ ...e, startAt: d }))}
-                    label="開始日時"
-                    hour24
-                    formatStyle={'medium'}
-                  />
-                ) : (
-                  <Text color={'blue.600'}>
-                    提出物イベントは終了日時の2時間前の日時に開始としてカレンダーに表示されます
-                  </Text>
-                )}
+                <DateTimePicker
+                  value={newEvent.startAt}
+                  onChange={(d) => setNewEvent((e) => ({ ...e, startAt: d }))}
+                  label="開始日時"
+                  hour24
+                  formatStyle={'medium'}
+                />
               </Box>
               <Box
                 w={isSmallerThan768 ? '100%' : '40%'}
@@ -489,18 +484,11 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
                   onChange={(d) =>
                     setNewEvent((e) => ({
                       ...e,
-                      startAt:
-                        newEvent.type === EventType.SUBMISSION_ETC
-                          ? DateTime.fromJSDate(d).minus({ hour: 2 }).toJSDate()
-                          : e.startAt,
+                      startAt: e.startAt,
                       endAt: d,
                     }))
                   }
-                  label={
-                    newEvent.type !== EventType.SUBMISSION_ETC
-                      ? '終了日時'
-                      : '締切日時'
-                  }
+                  label={'終了日時'}
                   hour24
                   formatStyle={'medium'}
                 />
@@ -530,7 +518,7 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
             onClick={() => setUserModal(true)}
             size="sm"
             colorScheme="pink">
-            開催者/講師を編集
+            開催者を編集
           </Button>
           <SelectUserModal
             isOpen={userModal}
@@ -596,37 +584,35 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
           overflowY="auto"
           css={hideScrollbarCss}>
           {/* chat group is able to be created only on creation */}
-          {!newEvent.id && newEvent.type !== EventType.SUBMISSION_ETC ? (
-            <Box mb="16px">
-              <FormControl>
-                <FormLabel>
-                  チャットルームの作成(作成後に変更することはできません)
-                </FormLabel>
-                <RadioGroup ml={1} defaultValue={'unneeded'}>
-                  <Stack spacing={5} direction="row">
-                    <Radio
-                      bg="white"
-                      colorScheme="green"
-                      value="needed"
-                      onChange={() =>
-                        setNewEvent((v) => ({ ...v, chatNeeded: true }))
-                      }>
-                      On
-                    </Radio>
-                    <Radio
-                      bg="white"
-                      colorScheme="green"
-                      value="unneeded"
-                      onChange={() =>
-                        setNewEvent((v) => ({ ...v, chatNeeded: false }))
-                      }>
-                      Off
-                    </Radio>
-                  </Stack>
-                </RadioGroup>
-              </FormControl>
-            </Box>
-          ) : null}
+          <Box mb="16px">
+            <FormControl>
+              <FormLabel>
+                チャットルームの作成(作成後に変更することはできません)
+              </FormLabel>
+              <RadioGroup ml={1} defaultValue={'unneeded'}>
+                <Stack spacing={5} direction="row">
+                  <Radio
+                    bg="white"
+                    colorScheme="green"
+                    value="needed"
+                    onChange={() =>
+                      setNewEvent((v) => ({ ...v, chatNeeded: true }))
+                    }>
+                    On
+                  </Radio>
+                  <Radio
+                    bg="white"
+                    colorScheme="green"
+                    value="unneeded"
+                    onChange={() =>
+                      setNewEvent((v) => ({ ...v, chatNeeded: false }))
+                    }>
+                    Off
+                  </Radio>
+                </Stack>
+              </RadioGroup>
+            </FormControl>
+          </Box>
           <Box mb="16px">
             <FormControl>
               <FormLabel>タイプ</FormLabel>
@@ -638,33 +624,17 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
                   setNewEvent((prev) => ({
                     ...prev,
                     type,
-                    chatNeeded:
-                      type === EventType.SUBMISSION_ETC
-                        ? false
-                        : prev.chatNeeded,
+                    chatNeeded: prev.chatNeeded,
                   }));
                 }}
                 defaultValue={newEvent.type}>
-                {isCreatableImpressiveUniversity && (
-                  <option value={EventType.IMPRESSIVE_UNIVERSITY}>
-                    感動大学
-                  </option>
-                )}
-                {isCreatableStudyMeeting && (
-                  <option value={EventType.STUDY_MEETING}>勉強会</option>
-                )}
-                {isCreatableBolday && (
-                  <option value={EventType.BOLDAY}>BOLDay</option>
-                )}
-                {isCreatableCoach && (
-                  <option value={EventType.COACH}>コーチ制度</option>
-                )}
-                {isCreatableClub && (
-                  <option value={EventType.CLUB}>部活動</option>
-                )}
-                {isCreatableSubmissionEtc && (
-                  <option value={EventType.SUBMISSION_ETC}>提出物等</option>
-                )}
+                <option value={EventType.ARTIST}>アーティスト</option>
+                <option value={EventType.IDOL}>アイドル</option>
+                <option value={EventType.YOUTUBER}>YouTuber</option>
+                <option value={EventType.TIKTOKER}>TikToker</option>
+                <option value={EventType.INSTAGRAMER}>インスタグラマー</option>
+                <option value={EventType.TALENT}>タレント</option>
+                <option value={EventType.OTHER}>その他</option>
               </Select>
             </FormControl>
           </Box>

@@ -97,12 +97,12 @@ const headerTab = (headerTabBehavior: HeaderTabBehavior): Tab[] => {
           },
         },
         {
-          name: EventTab.STUDY_MEETING,
+          name: EventTab.ARTIST,
           onClick: () => {
             if (queryRefresh)
               queryRefresh({
                 page: '1',
-                type: EventType.STUDY_MEETING,
+                type: EventType.ARTIST,
                 personal,
                 from,
                 to,
@@ -110,12 +110,12 @@ const headerTab = (headerTabBehavior: HeaderTabBehavior): Tab[] => {
           },
         },
         {
-          name: EventTab.COACH,
+          name: EventTab.IDOL,
           onClick: () => {
             if (queryRefresh)
               queryRefresh({
                 page: '1',
-                type: EventType.COACH,
+                type: EventType.IDOL,
                 personal,
                 from,
                 to,
@@ -123,12 +123,12 @@ const headerTab = (headerTabBehavior: HeaderTabBehavior): Tab[] => {
           },
         },
         {
-          name: EventTab.CLUB,
+          name: EventTab.YOUTUBER,
           onClick: () => {
             if (queryRefresh)
               queryRefresh({
                 page: '1',
-                type: EventType.CLUB,
+                type: EventType.YOUTUBER,
                 personal,
                 from,
                 to,
@@ -136,12 +136,51 @@ const headerTab = (headerTabBehavior: HeaderTabBehavior): Tab[] => {
           },
         },
         {
-          name: EventTab.SUBMISSION_ETC,
+          name: EventTab.TIKTOKER,
           onClick: () => {
             if (queryRefresh)
               queryRefresh({
                 page: '1',
-                type: EventType.SUBMISSION_ETC,
+                type: EventType.TIKTOKER,
+                personal,
+                from,
+                to,
+              });
+          },
+        },
+        {
+          name: EventTab.INSTAGRAMER,
+          onClick: () => {
+            if (queryRefresh)
+              queryRefresh({
+                page: '1',
+                type: EventType.INSTAGRAMER,
+                personal,
+                from,
+                to,
+              });
+          },
+        },
+        {
+          name: EventTab.TALENT,
+          onClick: () => {
+            if (queryRefresh)
+              queryRefresh({
+                page: '1',
+                type: EventType.TALENT,
+                personal,
+                from,
+                to,
+              });
+          },
+        },
+        {
+          name: EventTab.OTHER,
+          onClick: () => {
+            if (queryRefresh)
+              queryRefresh({
+                page: '1',
+                type: EventType.OTHER,
                 personal,
                 from,
                 to,
