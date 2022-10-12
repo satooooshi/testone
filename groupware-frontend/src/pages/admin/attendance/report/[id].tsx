@@ -181,7 +181,7 @@ const AttendanceReport = () => {
         activeTabName: '勤怠報告',
       }}>
       <Head>
-        <title>Valleyin | 勤怠報告</title>
+        <title>FanReturn | 勤怠報告</title>
       </Head>
       <Box mb="24px">
         <TopTabBar topTabBehaviorList={topTabBehaviorList} />

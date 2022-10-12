@@ -179,7 +179,7 @@ const UserAdmin: React.FC = () => {
               ) : null}
               {/* <th className={userAdminStyles.table_head}>メールアドレス</th> */}
               <th className={userAdminStyles.table_head}>社員区分</th>
-              <th className={userAdminStyles.table_head}>勤怠</th>
+              {/* <th className={userAdminStyles.table_head}>勤怠</th> */}
               <th className={userAdminStyles.table_head}>編集</th>
               <th className={userAdminStyles.table_head}>削除</th>
               <th className={userAdminStyles.table_head} />
@@ -205,7 +205,7 @@ const UserAdmin: React.FC = () => {
                   {userRoleValueToName(u.role)}
                 </td>
 
-                <td className={userAdminStyles.delete_icon_wrapper}>
+                {/* <td className={userAdminStyles.delete_icon_wrapper}>
                   <Link href={`/admin/attendance/view/${u.id}`} passHref>
                     <a>
                       <MdWork
@@ -214,7 +214,7 @@ const UserAdmin: React.FC = () => {
                       />
                     </a>
                   </Link>
-                </td>
+                </td> */}
                 <td className={userAdminStyles.delete_icon_wrapper}>
                   <Link href={`/admin/users/editProfile/${u.id}`} passHref>
                     <a>

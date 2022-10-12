@@ -39,7 +39,7 @@ const Application: React.FC = () => {
         activeTabName: '入社前申請',
       }}>
       <Head>
-        <title>Valleyin | 入社前申請</title>
+        <title>FanReturn | 入社前申請</title>
       </Head>
       <ApplicationFormModal
         application={selectedApplication}

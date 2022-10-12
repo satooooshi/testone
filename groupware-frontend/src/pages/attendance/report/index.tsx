@@ -216,7 +216,7 @@ const AttendanceReport = () => {
         onClickRightButton: () => setFormModal(true),
       }}>
       <Head>
-        <title>Valleyin | 勤怠報告</title>
+        <title>FanReturn | 勤怠報告</title>
       </Head>
       <Box mb="24px">
         <TopTabBar topTabBehaviorList={topTabBehaviorList} />

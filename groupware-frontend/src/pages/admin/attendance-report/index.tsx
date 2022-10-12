@@ -97,7 +97,7 @@ const AttendanceVerifyReportAdmin = () => {
         tabs,
       }}>
       <Head>
-        <title>Valleyin | 勤怠報告</title>
+        <title>FanReturn | 勤怠報告</title>
       </Head>
 
       <Box display="flex" flexDir="row" justifyContent="flex-start" mb="32px">

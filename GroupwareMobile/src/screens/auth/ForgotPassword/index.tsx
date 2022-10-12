@@ -37,7 +37,7 @@ const ForgotPassword: React.FC<LoginProps> = ({navigation}) => {
               minHeight: windowWidth * 0.6,
             }}
             resizeMode="contain"
-            source={require('../../../../assets/valleyin-logo.png')}
+            source={require('../../../../assets/fanreturn_logo.png')}
           />
           <Formik
             initialValues={{email: ''}}

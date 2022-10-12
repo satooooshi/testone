@@ -231,10 +231,10 @@ const headerTab = (headerTabBehavior: HeaderTabBehavior): Tab[] => {
           name: 'ユーザー管理',
           href: '/admin/users',
         },
-        {
-          name: '勤怠報告管理',
-          href: '/admin/attendance/verifyReport',
-        },
+        // {
+        //   name: '勤怠報告管理',
+        //   href: '/admin/attendance/verifyReport',
+        // },
         {
           name: 'タグ管理',
           href: '/admin/tag',

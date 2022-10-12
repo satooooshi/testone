@@ -364,7 +364,7 @@ const BottomTab = () => {
           ),
         }}
       /> */}
-      <Tab.Screen
+      {/* <Tab.Screen
         name="AttendanceStack"
         component={AttendanceStack}
         options={{
@@ -378,7 +378,7 @@ const BottomTab = () => {
             />
           ),
         }}
-      />
+      /> */}
       <Tab.Screen
         name="EventStack"
         component={EventStack}

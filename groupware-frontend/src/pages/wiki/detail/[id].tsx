@@ -273,7 +273,7 @@ const QuestionDetail = () => {
         <Box mb={10} w="100%">
           <Box bg="white" borderRadius={10} p={5} w="100%">
             <Head>
-              <title>valleyin | {wiki ? wiki.title : headerTitle}</title>
+              <title>FanReturn | {wiki ? wiki.title : headerTitle}</title>
             </Head>
             {wiki && wiki.tags && wiki.tags.length ? (
               <div className={qaDetailStyles.tags_wrapper}>

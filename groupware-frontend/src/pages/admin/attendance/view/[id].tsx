@@ -191,7 +191,7 @@ const AttendanceView = () => {
         activeTabName: '勤怠打刻',
       }}>
       <Head>
-        <title>Valleyin | 勤怠打刻</title>
+        <title>FanReturn | 勤怠打刻</title>
       </Head>
       <Box display="flex" ml={10} mr="auto" alignItems="center">
         <Text fontSize={20} mr={2}>

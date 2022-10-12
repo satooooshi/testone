@@ -73,7 +73,7 @@ const HeaderTemplate: React.FC<HeaderTemplateProps> = ({
             <FastImage
               style={headerStyles.logoImage}
               resizeMode="contain"
-              source={require('../../../assets/valleyin-logo.png')}
+              source={require('../../../assets/fanreturn_logo.png')}
             />
           </TouchableHighlight> */}
         <Text

@@ -25,7 +25,7 @@ import { FcSportsMode } from 'react-icons/fc';
 import { tagColorFactory } from 'src/utils/factory/tagColorFactory';
 import { darkFontColor } from 'src/utils/colors';
 import { hideScrollbarCss } from 'src/utils/chakra/hideScrollBar.css';
-import valleyinLogo from '@/public/valleyin-logo.png';
+import valleyinLogo from '@/public/fanreturn_logo.png';
 import { AiOutlineArrowRight } from 'react-icons/ai';
 import { useRouter } from 'next/router';
 

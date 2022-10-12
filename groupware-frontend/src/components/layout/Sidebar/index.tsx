@@ -35,7 +35,9 @@ import { MdWork } from 'react-icons/md';
 import { useHandleBadge } from 'src/contexts/badge/useHandleBadge';
 import { AiOutlineDoubleLeft } from 'react-icons/ai';
 import Image from 'next/image';
-import valleyinLogo from '@/public/valleyin-logo.png';
+import valleyinLogo from '@/public/fanreturn_logo.png';
+import titleImage from '@/public/fanreturn_title.png';
+import logText from '@/public/fanreturn-logo-text.png';
 import router from 'next/router';
 import { darkFontColor } from 'src/utils/colors';
 import { useAPILogout } from '@/hooks/api/auth/useAPILogout';
@@ -122,12 +124,9 @@ const Sidebar: React.FC<SidebarProps> = ({ activeScreenName, hideDrawer }) => {
       <div className={sidebarStyles.sidebar}>
         <div>
           <div className={sidebarStyles.top_item}>
-            <div className={sidebarStyles.bold_logo_and_text}>
-              <div className={sidebarStyles.bold_logo}>
-                <Image src={valleyinLogo} alt="bold logo" />
-              </div>
-              <p className={sidebarStyles.logo_text}>Valleyin</p>
-            </div>
+            <Box w="90%" mx="auto">
+              <Image src={logText} alt="bold logo" />
+            </Box>
             <AiOutlineDoubleLeft
               className={sidebarStyles.outline_double_left}
               onClick={hideDrawer}
@@ -209,7 +208,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeScreenName, hideDrawer }) => {
             }
             iconName={SidebarScreenName.CHAT}
           />
-          <LinkWithIcon
+          {/* <LinkWithIcon
             screenName={`/attendance`}
             icon={
               <MdWork
@@ -219,7 +218,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeScreenName, hideDrawer }) => {
               />
             }
             iconName={SidebarScreenName.ATTENDANCE}
-          />
+          /> */}
           {/* <LinkWithIcon
             screenName={`/account/${user?.id}`}
             isActive={activeScreenName === SidebarScreenName.ACCOUNT}
