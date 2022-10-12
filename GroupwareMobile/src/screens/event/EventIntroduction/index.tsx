@@ -286,6 +286,7 @@ const AnnualCalendar = () => {
                     screen: 'EventDetail',
                     params: {
                       id: event.id,
+                      previousScreenName: 'EventIntroduction',
                     },
                   });
                 }}

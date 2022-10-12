@@ -7,6 +7,7 @@ import {headerStyles} from '../../styles/component/header.style';
 import {DrawerActions, useNavigation} from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {RootStackParamList} from '../../types/navigator/RootStackParamList';
+import {EventType} from '../../types';
 
 export type Tab = {
   name: string;
@@ -36,7 +37,7 @@ const HeaderTemplate: React.FC<HeaderTemplateProps> = ({
   screenForBack,
   children,
 }) => {
-  const navigation = useNavigation();
+  const navigation = useNavigation<any>();
   return (
     <>
       <Div
@@ -50,6 +51,13 @@ const HeaderTemplate: React.FC<HeaderTemplateProps> = ({
           {enableBackButton && (
             <TouchableOpacity
               onPress={() => {
+                if (screenForBack === 'EventIntroduction') {
+                  navigation.navigate('EventStack', {
+                    screen: 'EventIntroduction',
+                    params: {type: EventType.IMPRESSIVE_UNIVERSITY},
+                  });
+                  return;
+                }
                 if (screenForBack) {
                   navigation.goBack();
                   navigation.navigate(screenForBack as any);
