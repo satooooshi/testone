@@ -39,7 +39,7 @@ async function bootstrap() {
       'https://groupware-frontend-theta.vercel.app',
       'https://groupware-seven.vercel.app',
       'https://valleyin-vallyein-app-groupware-frontend-sgzkfl3uyq-an.a.run.app',
-      'https://frontend-for-client-sgzkfl3uyq-an.a.run.app',
+      'https://frontend-for-client2-sgzkfl3uyq-an.a.run.app',
       '*',
       process.env.CLIENT_DOMAIN,
     ],
