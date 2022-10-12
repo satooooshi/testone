@@ -83,7 +83,7 @@ export default class CreateEventIntroduction implements Seeder {
       //       imageUrl:
       //         'https://storage.googleapis.com/groupware-bucket-development/1637377016631/club_5.jpg',
       //       // imageUrlSub1:
-      //       //   'https://storage.googleapis.com/groupware-bucket-development/1637377008205/club_3.png',
+      //       //   'https://storage.googleapis.com/groupware-bucket-development/1637377008205/club_3.jpg',
       //       // imageUrlSub2:
       //       //   'https://storage.googleapis.com/groupware-bucket-development/1637377012334/club_4.jpg',
       //       // imageUrlSub3:
