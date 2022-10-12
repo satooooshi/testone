@@ -639,7 +639,7 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.valleyinApp;
+				PRODUCT_BUNDLE_IDENTIFIER = com.fanreturn;
 				PRODUCT_NAME = GroupwareMobile;
 				SWIFT_OBJC_BRIDGING_HEADER = "GroupwareMobile-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -760,7 +760,7 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.valleyinApp;
+				PRODUCT_BUNDLE_IDENTIFIER = com.fanreturn;
 				PRODUCT_NAME = GroupwareMobile;
 				SWIFT_OBJC_BRIDGING_HEADER = "GroupwareMobile-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
