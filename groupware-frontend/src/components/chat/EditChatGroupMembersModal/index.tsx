@@ -81,7 +81,13 @@ const EditChatGroupMembersModal: React.FC<EditChatGroupMambersModalProps> = ({
   isTalkRoom = false,
   category,
 }) => {
-  const { data: users, isLoading } = useAPIGetUsers('ALL');
+  const {
+    data: users,
+    refetch: refetchGetUsers,
+    isLoading,
+  } = useAPIGetUsers('ALL', {
+    enabled: false,
+  });
   const { user: myProfile } = useAuthenticate();
   const {
     toggleUser,
@@ -142,10 +148,12 @@ const EditChatGroupMembersModal: React.FC<EditChatGroupMambersModalProps> = ({
   }, [room?.members, room?.owner, setSelectedUsers, category]);
 
   useEffect(() => {
-    if (!isOpen) {
+    if (isOpen) {
+      refetchGetUsers();
+    } else {
       clear();
     }
-  }, [isOpen, clear]);
+  }, [isOpen]);
 
   return (
     <Modal
@@ -170,20 +178,19 @@ const EditChatGroupMembersModal: React.FC<EditChatGroupMambersModalProps> = ({
                 ? 'を編集'
                 : 'を追加')}
           </Text>
-          {selectedUsersInModal.length !== 0 && (
+          {(selectedUsersInModal.length !== 0 || !isTalkRoom) && (
             <Button
               size="sm"
               flexDir="row"
-              onClick={() => onComplete(selectedUsersInModal as User[])}
+              onClick={() => {
+                onComplete(selectedUsersInModal as User[]);
+                setSearchWords(undefined);
+              }}
               mb="8px"
               colorScheme="green"
               alignItems="center">
               <Text display="inline">
-                {room
-                  ? '更新'
-                  : isTalkRoom && selectedUsersInModal.length === 1
-                  ? '作成'
-                  : '次へ'}
+                {room ? '更新' : isTalkRoom ? '作成' : '次へ'}
               </Text>
             </Button>
           )}

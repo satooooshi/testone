@@ -9,9 +9,7 @@ import {useAuthenticate} from '../contexts/useAuthenticate';
 import {RootStackParamList} from '../types/navigator/RootStackParamList';
 import {axiosInstance, storage, tokenString} from '../utils/url';
 import BottomTab from './BottomTab';
-import messaging, {
-  FirebaseMessagingTypes,
-} from '@react-native-firebase/messaging';
+import messaging from '@react-native-firebase/messaging';
 import {requestIOSMsgPermission} from '../utils/permission/requestIOSMsgPermisson';
 import {useAPIRegisterDevice} from '../hooks/api/notification/useAPIRegisterDevice';
 import ForgotPassword from '../screens/auth/ForgotPassword';
@@ -29,22 +27,28 @@ import {useInviteCall} from '../contexts/call/useInviteCall';
 import SoundPlayer from 'react-native-sound-player';
 import {debounce} from 'lodash';
 import notifee, {EventType} from '@notifee/react-native';
+import PushNotification, {
+  ReceivedNotification,
+} from 'react-native-push-notification';
+import {useHandleBadge} from '../contexts/badge/useHandleBadge';
+import {ChatMessage} from '../types';
 
 const Stack = createStackNavigator<RootStackParamList>();
 export const rtmEngine = new RtmClient();
 //rtcはメソッド使用直前にcreateInstanceしないとエラーがでることがある
 let rtcEngine: RtcEngine;
 let callKeepUUID = '';
+let isCallScreen = false;
 
 const Navigator = () => {
   const {user, currentChatRoomId} = useAuthenticate();
   const navigationRef = useNavigationContainerRef<any>();
   const {mutate: registerDevice} = useAPIRegisterDevice({
     onSuccess: updatedInfo => {
-      console.log('RegisterDevice success--------', updatedInfo);
+      // console.log('RegisterDevice success--------', updatedInfo);
     },
     onError: () => {
-      Alert.alert('fail to register device');
+      // console.log('fail to register device');
     },
   });
   const {
@@ -56,6 +60,7 @@ const Navigator = () => {
     stopRing,
     sendCallHistory,
   } = useInviteCall();
+  const {unreadChatCount, refetchRoomCard} = useHandleBadge();
   const [isJoining, setIsJoining] = useState(false);
   const [isCalling, setIsCalling] = useState(false);
   const [callTimeout, setCallTimeout] = useState(false);
@@ -77,6 +82,7 @@ const Navigator = () => {
 
   const soundOnEnd = async () => {
     try {
+      SoundPlayer.setSpeaker(false);
       SoundPlayer.playSoundFile('end_call', 'mp3');
     } catch (e) {
       console.log('sound on end call failed:', e);
@@ -88,6 +94,13 @@ const Navigator = () => {
       callKeepUUID = '';
     }
   };
+
+  useEffect(() => {
+    const setBadgeIcon = async () => {
+      await notifee.setBadgeCount(unreadChatCount);
+    };
+    setBadgeIcon();
+  }, [unreadChatCount]);
 
   useEffect(() => {
     const handleMessaging = async () => {
@@ -117,40 +130,42 @@ const Navigator = () => {
   }, [registerDevice, user]);
 
   const endCall = useCallback(
-    async (alertNeeded: boolean = true) => {
-      if (alertNeeded) {
-        // callkeepをプログラム側でendした場合とユーザーが通話拒否ボタンを押したときとで切りわける
-        // ユーザーが通話拒否ボタンを押したときはアラート等を出さないようにする
-        // setOnCallUid('');
-        setAlertCountOnEndCall(c => c + 1);
+    async (isCallKeep: boolean = false) => {
+      if (isCallKeep && !remoteInvitation.current && !localInvitation) {
+        return;
       }
+      setIsJoining(false);
       if (!isCallAccepted && localInvitation) {
         // local invitation(送信した通話招待)があればcancelする
-        if (alertNeeded) {
-          await rtmEngine?.cancelLocalInvitationV2(localInvitation);
-          if (callTimeout) {
-            sendCallHistory('応答なし');
-          } else {
-            sendCallHistory('キャンセル');
-          }
+        stopRing();
+        await rtmEngine?.cancelLocalInvitationV2(localInvitation);
+        if (callTimeout) {
+          sendCallHistory('応答なし');
+        } else {
+          sendCallHistory('キャンセル');
         }
+      } else if (!callKeepUUID && !isCallKeep) {
+        if (AppState.currentState === 'active') {
+          setAlertCountOnEndCall(c => c + 1);
+        }
+        await soundOnEnd();
       }
-
-      await soundOnEnd();
       setChannelName('');
-      setIsJoining(false);
       setIsCalling(false);
       setCallTimeout(false);
       disableCallAcceptedFlag();
       setLocalInvitationState(undefined);
-      // reject();
-      if (remoteInvitation.current) {
+      if (remoteInvitation.current && callKeepUUID) {
+        reject();
         // remote invitation(送られてきた通話招待)があればrefuseする
         await rtmEngine?.refuseRemoteInvitationV2({
           ...remoteInvitation.current,
           hash: 0,
         });
-        remoteInvitation.current = undefined;
+      }
+      remoteInvitation.current = undefined;
+      if (Platform.OS === 'ios') {
+        RNCallKeep.endAllCalls();
       }
       // initしないとエラーがでることがある
       await rtcInit();
@@ -163,6 +178,8 @@ const Navigator = () => {
       localInvitation,
       setLocalInvitationState,
       callTimeout,
+      remoteInvitation.current,
+      AppState.currentState,
     ],
   );
 
@@ -176,28 +193,30 @@ const Navigator = () => {
     await createRTCInstance();
     await rtcEngine?.disableVideo();
     rtcEngine?.removeAllListeners();
+    await rtcEngine?.adjustPlaybackSignalVolume(100);
+    await rtcEngine?.adjustRecordingSignalVolume(100);
 
     rtcEngine?.addListener('UserJoined', (uid, elapsed) => {
-      console.log('UserJoined', uid, elapsed);
+      // console.log('UserJoined', uid, elapsed);
     });
     // UserOfflineはチャンネルから人が退出したときのイベント
     // 詳しくはnode_modules/react-native-agora/lib/typescript/src/common/RtcEvents.d.tsに書いてある
     rtcEngine?.addListener('UserOffline', async (uid, reason) => {
-      console.log('UserOffline', uid, reason);
+      // console.log('UserOffline', uid, reason);
       await endCall();
     });
     rtcEngine?.addListener('ConnectionStateChanged', async (state, reason) => {
-      console.log('ConnectionStateChanged ', Platform.OS, state, reason);
+      // console.log('ConnectionStateChanged ', Platform.OS, state, reason);
     });
     rtcEngine?.addListener('LeaveChannel', async ({userCount}) => {
-      console.log('LeaveChannel. user count: ', Platform.OS, userCount);
+      // console.log('LeaveChannel. user count: ', Platform.OS, userCount);
       // await endCall();
     });
     rtcEngine?.addListener('JoinChannelSuccess', (channel, uid, elapsed) => {
-      console.log('JoinChannelSuccess', channel, uid, elapsed);
+      // console.log('JoinChannelSuccess', channel, uid, elapsed);
     });
     rtcEngine?.addListener('Error', errCode => {
-      console.log('errCode', errCode);
+      // console.log('errCode', errCode);
     });
   }, [createRTCInstance, endCall]);
 
@@ -222,11 +241,6 @@ const Navigator = () => {
     },
   };
 
-  messaging().setBackgroundMessageHandler(async remoteMessage => {
-    console.log('BackgroundMessage received!!', remoteMessage);
-    sendLocalNotification(remoteMessage);
-  });
-
   useEffect(
     () => {
       if (refusedInvitation) {
@@ -246,7 +260,7 @@ const Navigator = () => {
     // listenerを複数登録しないようにする
     rtmEngine.removeAllListeners();
     rtmEngine.addListener('RemoteInvitationCanceled', async () => {
-      await endCall(false);
+      await endCall(true);
     });
     rtmEngine.addListener('LocalInvitationRefused', async () => {
       setRefusedInvitation(true);
@@ -274,7 +288,10 @@ const Navigator = () => {
     const options: IOptions = {
       ios: {
         appName: 'Eface',
-        supportsVideo: true,
+        supportsVideo: false,
+        imageName: 'bold-logo.png',
+        maximumCallGroups: '1',
+        maximumCallsPerCallGroup: '2',
       },
       android: {
         alertTitle: '通話機能を利用するためには許可が必要です',
@@ -295,12 +312,9 @@ const Navigator = () => {
     try {
       await RNCallKeep.setup(options);
       RNCallKeep.setAvailable(true);
-      RNCallKeep.addEventListener('didLoadWithEvents', events => {
-        console.log(events);
-      });
       RNCallKeep.addEventListener('answerCall', answerCall);
       // ユーザーが通話拒否ボタンを押したときはアラート等を出さないようにする
-      RNCallKeep.addEventListener('endCall', () => endCall(false));
+      RNCallKeep.addEventListener('endCall', () => endCall(true));
     } catch (err) {
       //@ts-ignore
       console.error('Initialize CallKeep Error:', err?.message);
@@ -320,7 +334,6 @@ const Navigator = () => {
     }
     const callerId = callingData.callerId;
     setOnCallUid(callerId);
-    // RNCallKeep.backToForeground();
     RNCallKeep.displayIncomingCall(
       callingData?.channelId as string,
       userNameFactory(user),
@@ -329,9 +342,6 @@ const Navigator = () => {
       false,
     );
   };
-  // const navigateToCallWindow = useCallback(() => {
-  //   navigationRef.current?.navigate('Call');
-  // }, [navigationRef]);
 
   const joinChannel = useCallback(
     async (realChannelName: string) => {
@@ -352,52 +362,28 @@ const Navigator = () => {
         );
         await rtcEngine?.disableVideo();
         setChannelName(realChannelName);
-        // navigateToCallWindow();
-        remoteInvitation.current = undefined;
         setIsJoining(true);
       }
     },
     [rtcInit],
   );
-  // console.log(Platform.OS, 'callerId', onCallUid);
-  const [startCall, setStartCall] = useState(false);
 
   const answerCall = async () => {
-    // アプリをバックグラウンドからフォアグラウンドに
-    // if (Platform.OS === 'ios' && AppState.currentState === 'background') {
-    //   await new Promise(r => setTimeout(r, 1000));
-    // }
+    const invitation = remoteInvitation.current;
+    const realChannelName = remoteInvitation.current?.channelId as string;
     RNCallKeep.backToForeground();
-    RNCallKeep.endAllCalls();
-    if (Platform.OS === 'android') {
-      if (remoteInvitation.current?.channelId) {
-        const realChannelName = remoteInvitation.current?.channelId as string;
-        // 招待を承認
-        await rtmEngine.acceptRemoteInvitationV2(remoteInvitation.current);
-        await joinChannel(realChannelName);
-        setIsCalling(true);
+
+    if (invitation && realChannelName) {
+      // 招待を承認
+      await rtmEngine.acceptRemoteInvitationV2(invitation);
+      await joinChannel(realChannelName);
+      setIsCalling(true);
+      if (Platform.OS === 'android') {
+        remoteInvitation.current = undefined;
+        RNCallKeep.endAllCalls();
       }
-    } else {
-      setStartCall(true);
     }
   };
-
-  useEffect(() => {
-    const execAnswerCall = async () => {
-      if (remoteInvitation.current?.channelId) {
-        const realChannelName = remoteInvitation.current?.channelId as string;
-        // 招待を承認
-        await rtmEngine.acceptRemoteInvitationV2(remoteInvitation.current);
-        await joinChannel(realChannelName);
-        setIsCalling(true);
-        setStartCall(false);
-      }
-    };
-    if (AppState.currentState !== 'active' && startCall) {
-      execAnswerCall();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [AppState.currentState, startCall]);
 
   useEffect(() => {
     if (localInvitation?.calleeId) {
@@ -421,12 +407,12 @@ const Navigator = () => {
 
   useEffect(() => {
     rtcInit();
-    // callKeepInit();
+    callKeepInit();
     rtmInit();
     return () => {
       // アンマウント時に全てのリスナーを消す
-      // RNCallKeep.removeEventListener('answerCall');
-      // RNCallKeep.removeEventListener('endCall');
+      RNCallKeep.removeEventListener('answerCall');
+      RNCallKeep.removeEventListener('endCall');
       rtcEngine.removeAllListeners();
       rtmEngine.removeAllListeners();
     };
@@ -453,113 +439,214 @@ const Navigator = () => {
     getRtmToken();
   }, [AGORA_APP_ID, user?.id]);
 
-  const sendLocalNotification = async (
-    remoteMessage: FirebaseMessagingTypes.RemoteMessage,
-  ) => {
-    if (!remoteMessage?.data?.calleeId) {
-      const channelId = await notifee.createChannel({
-        id: 'default',
-        name: 'Default Channel',
+  const asyncHandleNotifi = async (notification: any): Promise<void> => {
+    if (
+      (notification?.data?.silent || notification?.data?.type === 'badge') &&
+      notification.data?.id
+    ) {
+      refetchRoomCard({
+        id: notification.data?.id,
+        type: notification.data.type,
       });
+      if (
+        notification?.data?.type === 'deleteMessage' &&
+        notification.data.messageId
+      ) {
+        const storageData = storage.getString(
+          `messagesIntRoom${notification.data?.id}user${user?.id}`,
+        );
+        if (storageData) {
+          const messagesInStorage: ChatMessage[] = JSON.parse(storageData);
 
-      await notifee.displayNotification({
-        title: remoteMessage.data?.title || '',
-        body: remoteMessage.data?.body || '',
-        android: {
-          channelId: channelId,
-          pressAction: {
-            id: 'action_id',
-            launchActivity: 'default',
+          const jsonMessages = JSON.stringify(
+            messagesInStorage.filter(
+              m => m.id !== Number(notification.data.messageId),
+            ),
+          );
+          storage.set(
+            `messagesIntRoom${notification.data?.id}user${user?.id}`,
+            jsonMessages,
+          );
+        }
+      }
+    }
+  };
+
+  const sendLocalNotification = useCallback(
+    async (remoteMessage: any) => {
+      if (
+        remoteMessage?.data?.silent ||
+        (remoteMessage?.data?.screen === 'chat' &&
+          remoteMessage.data?.id === `${currentChatRoomId}`)
+      ) {
+        return;
+      }
+      if (Platform.OS === 'android') {
+        if (!remoteMessage?.data?.calleeId) {
+          let channelId = 'default';
+          if (!(await notifee.isChannelCreated(channelId))) {
+            channelId = await notifee.createChannel({
+              id: 'default',
+              name: 'Default Channel',
+            });
+          }
+
+          await notifee.displayNotification({
+            title: remoteMessage.data?.title || '',
+            body: remoteMessage.data?.message || remoteMessage.data?.body || '',
+            android: {
+              channelId: channelId,
+              pressAction: {
+                id: 'action_id',
+                launchActivity: 'default',
+              },
+            },
+            data: {
+              screen: remoteMessage?.data?.screen
+                ? remoteMessage?.data?.screen
+                : '',
+              id: remoteMessage?.data?.id ? remoteMessage?.data?.id : '',
+            },
+            ios: {
+              // iOS resource (.wav, aiff, .caf)
+              sound: 'local.wav',
+            },
+          });
+        }
+      } else {
+        PushNotification.localNotification({
+          id: remoteMessage.messageId,
+          vibration: 300,
+          visibility: 'public',
+          message: remoteMessage.notification?.body || '',
+          title: remoteMessage.notification?.title,
+          userInfo: {
+            screen: remoteMessage?.data?.screen,
+            id: remoteMessage?.data?.id,
           },
-        },
-        data: {
-          screen: remoteMessage?.data?.screen
-            ? remoteMessage?.data?.screen
-            : '',
-          id: remoteMessage?.data?.id ? remoteMessage?.data?.id : '',
-        },
-        ios: {
-          // iOS resource (.wav, aiff, .caf)
-          sound: 'local.wav',
-        },
-      });
+        });
+      }
+    },
+    [currentChatRoomId],
+  );
+
+  messaging().setBackgroundMessageHandler(async remoteMessage => {
+    console.log('setBackgroundMessageHandler called');
+    if (Platform.OS === 'android') {
+      setTimeout(() => asyncHandleNotifi(remoteMessage), 10);
+    }
+    // if (Platform.OS === 'android') {
+    //   sendLocalNotification(remoteMessage);
+    // }
+    // await notifee.incrementBadgeCount();
+    // console.log('BackgroundMessage received!!', remoteMessage);
+  });
+
+  const naviateByNotif = (notification: any) => {
+    console.log('naviateByNotif called ------');
+
+    if (
+      navigationRef.current?.getCurrentRoute()?.name !== 'Login' &&
+      user?.id
+    ) {
+      if (notification.data?.screen === 'chat' && notification.data?.id) {
+        navigationRef.current?.navigate('ChatStack', {
+          screen: 'Chat',
+          params: {room: {id: notification.data?.id}},
+          initial: false,
+        });
+      }
+      if (notification.data?.screen === 'event' && notification.data?.id) {
+        navigationRef.current?.navigate('EventStack', {
+          screen: 'EventDetail',
+          params: {id: notification.data?.id},
+          initial: false,
+        });
+      }
+      if (notification.data?.screen === 'wiki' && notification.data?.id) {
+        navigationRef.current?.navigate('WikiStack', {
+          screen: 'WikiDetail',
+          params: {id: notification.data?.id},
+          initial: false,
+        });
+      }
+      if (notification.data?.screen === 'room') {
+        navigationRef.current?.navigate('ChatStack', {
+          screen: 'RoomList',
+        });
+      }
     }
   };
 
   useEffect(() => {
-    const naviateByNotif = (notification: any) => {
-      if (navigationRef.current?.getCurrentRoute?.name !== 'Login') {
-        if (notification.data?.screen === 'event' && notification.data?.id) {
-          navigationRef.current?.navigate('EventStack', {
-            screen: 'EventDetail',
-            params: {id: notification.data?.id},
-            initial: false,
-          });
-        }
-        if (notification.data?.screen === 'wiki' && notification.data?.id) {
-          navigationRef.current?.navigate('WikiStack', {
-            screen: 'WikiDetail',
-            params: {id: notification.data?.id},
-            initial: false,
-          });
-        }
-        if (notification.data?.screen === 'room') {
-          navigationRef.current?.navigate('ChatStack', {
-            screen: 'RoomList',
-          });
-        }
-        if (notification.data?.screen === 'chat' && notification.data?.id) {
-          navigationRef.current?.navigate('ChatStack', {
-            screen: 'Chat',
-            params: {room: {id: notification.data?.id}},
-            initial: false,
-          });
-        }
-      }
-    };
+    if (user?.id) {
+      notifee.onForegroundEvent(({type, detail}) => {
+        console.log('onForegroundEvent call', type);
 
-    notifee.onForegroundEvent(({type, detail}) => {
-      switch (type) {
-        case EventType.DISMISSED:
-          break;
-        case EventType.PRESS:
-          naviateByNotif(detail.notification);
-          break;
-      }
-    });
-    notifee.onBackgroundEvent(async ({type, detail}) => {
-      console.log('navigator ================');
-      switch (type) {
-        case EventType.DISMISSED:
-          break;
-        case EventType.PRESS:
-          naviateByNotif(detail.notification);
-      }
-    });
-    notifee.requestPermission();
+        switch (type) {
+          case EventType.DISMISSED:
+            break;
+          case EventType.PRESS:
+            console.log('onForegroundEvent pressed', type);
+            naviateByNotif(detail.notification);
+            break;
+        }
+      });
+      notifee.onBackgroundEvent(async ({type, detail}) => {
+        console.log('onBackgroundEvent call');
 
+        switch (type) {
+          case EventType.DISMISSED:
+            break;
+          case EventType.PRESS:
+            naviateByNotif(detail.notification);
+        }
+      });
+      notifee.requestPermission();
+
+      PushNotification.configure({
+        // onRegister: function (token) {
+        //   console.log('PushNotification TOKEN:', token);
+        // },
+        onNotification: notification => {
+          if (notification.userInteraction) {
+            naviateByNotif(notification);
+          }
+          if (Platform.OS === 'ios') {
+            asyncHandleNotifi(notification);
+          }
+        },
+        permissions: {
+          alert: true,
+          badge: true,
+        },
+        requestPermissions: true,
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id]);
+
+  useEffect(() => {
     const unsubscribe = messaging().onMessage(async remoteMessage => {
-      console.log('onMessage  --------', remoteMessage);
-      if (
-        remoteMessage?.data?.screen &&
-        remoteMessage.data?.id === `${currentChatRoomId}`
-      ) {
-        console.log('They are in the same chat room!!');
-        return;
+      if (Platform.OS === 'android') {
+        asyncHandleNotifi(remoteMessage);
       }
       sendLocalNotification(remoteMessage);
     });
 
     return unsubscribe;
-  }, [navigationRef, currentChatRoomId]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id, currentChatRoomId]);
 
   useEffect(() => {
-    if (isJoining) {
+    if (isJoining && !isCallScreen) {
       navigationRef.current?.navigate('Call');
-    } else if (user?.id) {
+      isCallScreen = true;
+    } else if (user?.id && isCallScreen && !isJoining) {
       navigationRef.current?.navigate('Main');
+      isCallScreen = false;
     }
-  }, [isJoining, navigationRef, user?.id]);
+  }, [isJoining, navigationRef, user?.id, channelName, isCalling]);
 
   useEffect(
     () => {
@@ -567,9 +654,6 @@ const Navigator = () => {
         const joining = async () => {
           const realChannelName = localInvitation?.channelId as string;
           await joinChannel(realChannelName);
-          // 応答なしだと自動で終了する(テスト)
-          // await new Promise(r => setTimeout(r, 20000));
-          // setCallTimeout(true);
         };
         joining();
       }
@@ -581,8 +665,6 @@ const Navigator = () => {
     () => {
       const cancelCallByTimeout = async () => {
         if (localInvitation && !isCallAccepted) {
-          console.log('cancel call by time out ===================');
-          // await rtmEngine?.cancelLocalInvitationV2(localInvitation);
           await endCall(true);
         }
       };

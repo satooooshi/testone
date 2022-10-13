@@ -22,6 +22,7 @@ import {useAPISaveChatGroup} from '../../../hooks/api/chat/useAPISaveChatGroup';
 import {useAPIGetEventList} from '../../../hooks/api/event/useAPIGetEventList';
 import {useAPIGetUserInfoById} from '../../../hooks/api/user/useAPIGetUserInfoById';
 import {useAPIGetWikiList} from '../../../hooks/api/wiki/useAPIGetWikiList';
+import {useAPIGetUserGoodList} from '../../../hooks/api/wiki/useAPIGetUserGoodList';
 import {useTagType} from '../../../hooks/tag/useTagType';
 import {accountDetailStyles} from '../../../styles/screen/account/accountDetail.style';
 import {
@@ -41,6 +42,7 @@ import {userNameFactory} from '../../../utils/factory/userNameFactory';
 import {userRoleNameFactory} from '../../../utils/factory/userRoleNameFactory';
 import {useInviteCall} from '../../../contexts/call/useInviteCall';
 import {branchTypeNameFactory} from '../../../utils/factory/branchTypeNameFactory';
+import {useHandleBadge} from '../../../contexts/badge/useHandleBadge';
 
 const TopTab = createMaterialTopTabNavigator();
 
@@ -159,8 +161,9 @@ const AccountDetail: React.FC = () => {
   const navigation = useNavigation<AccountDetailNavigationProps>();
   const route = useRoute<AccountDetailRouteProps>();
   const {user, setUser, logout} = useAuthenticate();
-  // const {sendCallInvitation} = useInviteCall();
+  const {sendCallInvitation} = useInviteCall();
   const {setIsTabBarVisible} = useIsTabBarVisible();
+  const {editChatGroup} = useHandleBadge();
   const id = route.params?.id;
   const userID = id || user?.id;
   const screenName = 'AccountDetail';
@@ -178,22 +181,41 @@ const AccountDetail: React.FC = () => {
     refetch,
     isLoading: loadingProfile,
   } = useAPIGetUserInfoById(userID?.toString() || '0');
-  const {data: events, refetch: refetchEventList} = useAPIGetEventList({
-    participant_id: userID?.toString(),
-  });
-  const {data: questionList, refetch: refetchQuestionList} = useAPIGetWikiList({
-    writer: userID?.toString() || '0',
-    type: WikiType.BOARD,
-    board_category: BoardCategory.QA,
-  });
-  const {data: knowledgeList, refetch: refetchKnowledgeList} =
-    useAPIGetWikiList({
+  const {data: events, refetch: refetchEventList} = useAPIGetEventList(
+    {
+      participant_id: userID?.toString(),
+    },
+    {enabled: false},
+  );
+  const {data: questionList, refetch: refetchQuestionList} = useAPIGetWikiList(
+    {
       writer: userID?.toString() || '0',
       type: WikiType.BOARD,
-      board_category: BoardCategory.KNOWLEDGE,
-    });
+      board_category: BoardCategory.QA,
+    },
+    {enabled: false},
+  );
+  const {data: knowledgeList, refetch: refetchKnowledgeList} =
+    useAPIGetWikiList(
+      {
+        writer: userID?.toString() || '0',
+        type: WikiType.BOARD,
+        board_category: BoardCategory.KNOWLEDGE,
+      },
+      {enabled: false},
+    );
+  const {data: goodList, refetch: refetchGoodList} = useAPIGetUserGoodList(
+    userID?.toString() || '0',
+    {
+      enabled: false,
+    },
+  );
+  const [safetyCreateGroup, setCreatGroup] = useState(false);
   const {mutate: createGroup} = useAPISaveChatGroup({
     onSuccess: createdData => {
+      if (createdData.updatedAt === createdData.createdAt) {
+        editChatGroup(createdData);
+      }
       const resetAction = StackActions.popToTop();
       navigation.dispatch(resetAction);
 
@@ -207,6 +229,17 @@ const AccountDetail: React.FC = () => {
       Alert.alert('チャットルームの作成に失敗しました');
     },
   });
+
+  useEffect(() => {
+    if (safetyCreateGroup && profile) {
+      createGroup({
+        name: '',
+        members: [profile],
+        roomType: RoomType.PERSONAL,
+      });
+    }
+  }, [safetyCreateGroup, profile, createGroup]);
+
   const isFocused = useIsFocused();
   const [activeScreen, setActiveScreen] = useState(defaultScreenName);
 
@@ -247,11 +280,11 @@ const AccountDetail: React.FC = () => {
     setUser({});
   };
 
-  // const inviteCall = async () => {
-  //   if (user && profile) {
-  //     await sendCallInvitation(user, profile);
-  //   }
-  // };
+  const inviteCall = async () => {
+    if (user && profile) {
+      await sendCallInvitation(user, profile);
+    }
+  };
   // const inviteCall = async () => {
   //   if (user && profile) {
   //     const localInvitation = await setupCallInvitation(user, profile);
@@ -262,19 +295,33 @@ const AccountDetail: React.FC = () => {
   useEffect(() => {
     if (isFocused) {
       refetch();
-      refetchEventList();
-      refetchQuestionList();
-      refetchKnowledgeList();
+
       setIsTabBarVisible(true);
     }
-  }, [
-    isFocused,
-    refetch,
-    refetchEventList,
-    refetchQuestionList,
-    refetchKnowledgeList,
-    setIsTabBarVisible,
-  ]);
+  }, [isFocused, refetch, setIsTabBarVisible]);
+
+  useEffect(() => {
+    const refetchActiveTabData = (activeTab: string) => {
+      switch (activeTab) {
+        case eventScreenName:
+          refetchEventList();
+          return;
+        case questionScreenName:
+          refetchQuestionList();
+          return;
+        case knowledgeScreenName:
+          refetchKnowledgeList();
+          return;
+        case goodScreenName:
+          refetchGoodList();
+          return;
+      }
+    };
+    if (activeScreen) {
+      refetchActiveTabData(activeScreen);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeScreen]);
 
   return (
     <WholeContainer>
@@ -303,11 +350,17 @@ const AccountDetail: React.FC = () => {
                   w={windowWidth * 0.6}
                 />
               </Div>
-              {/* <Div flexDir="row" mb="sm"> */}
-              <Text fontWeight="bold" color={darkFontColor} fontSize={24}>
-                {userNameFactory(profile)}
-              </Text>
-              {/* {profile.id !== user?.id ? (
+              <Div flexDir="row" mb="sm">
+                <Text
+                  fontWeight="bold"
+                  mb={'lg'}
+                  color={darkFontColor}
+                  mr="lg"
+                  fontSize={24}>
+                  {userNameFactory(profile)}
+                </Text>
+                {profile.id !== user?.id &&
+                profile.role !== UserRole.EXTERNAL_INSTRUCTOR ? (
                   <Button
                     mr={-50}
                     mt={-10}
@@ -326,14 +379,14 @@ const AccountDetail: React.FC = () => {
                       ]);
                     }}>
                     <Icon
-                      name="phone"
-                      fontFamily="Entypo"
+                      name="call"
+                      fontFamily="Ionicons"
                       fontSize={24}
                       color="blue700"
                     />
                   </Button>
-                ) : null} */}
-              {/* </Div> */}
+                ) : null}
+              </Div>
             </Div>
             <Div h={bottomContentsHeight() ? bottomContentsHeight() : 700}>
               <TopTab.Navigator
@@ -470,10 +523,11 @@ const AccountDetail: React.FC = () => {
                   children={() => (
                     <>
                       <Div alignItems="center" mt="lg">
-                        {profile?.userGoodForBoard?.length ? (
-                          profile?.userGoodForBoard?.map(w => (
-                            <WikiCard key={w.id} wiki={w} />
-                          ))
+                        {goodList?.length ? (
+                          goodList?.map(
+                            b =>
+                              b.wiki && <WikiCard key={b.id} wiki={b.wiki} />,
+                          )
                         ) : (
                           <Text fontSize={16}>
                             いいねした掲示板が見つかりませんでした
@@ -512,13 +566,7 @@ const AccountDetail: React.FC = () => {
             w={60}
             zIndex={20}
             rounded="circle"
-            onPress={() =>
-              createGroup({
-                name: '',
-                members: [profile],
-                roomType: RoomType.PERSONAL,
-              })
-            }>
+            onPress={() => setCreatGroup(true)}>
             <Icon
               fontSize={'6xl'}
               color="white"

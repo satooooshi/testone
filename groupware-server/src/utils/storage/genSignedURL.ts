@@ -1,4 +1,5 @@
 import { Storage } from '@google-cloud/storage';
+import { APP_DIRNAME } from 'src/var';
 import { genStorageURL } from './genStorageURL';
 
 export const genSignedURL = async (text: string): Promise<string> => {
@@ -7,7 +8,7 @@ export const genSignedURL = async (text: string): Promise<string> => {
   }
   text = genStorageURL(text);
   const storage = new Storage({
-    keyFilename: __dirname + '../../../cloud_storage.json',
+    keyFilename: APP_DIRNAME + '/cloud_storage.json',
   });
   let parseText = text;
   const bucketName = process.env.CLOUD_STORAGE_BUCKET;
@@ -18,11 +19,13 @@ export const genSignedURL = async (text: string): Promise<string> => {
   if (!storageURLs || !storageURLs.length) {
     return text;
   }
+  const date = Date.now() + 60000 * 60 * 24 * 6;
+
   const options: any = {
     version: 'v4',
     action: 'read',
-    //1 hour
-    expires: Date.now() + 30 * 60 * 1000,
+    //6 days
+    expires: date,
   };
 
   for await (const unsignedURL of storageURLs) {

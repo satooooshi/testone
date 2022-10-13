@@ -12,8 +12,34 @@ import { NotificationModule } from './modules/notification/notification.module';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 import { TopNewsModule } from './modules/top-news/top-news.module';
-import { ChatGateway } from './gateway/chat.gateway';
 import { ScheduleModule } from '@nestjs/schedule';
+import { APP_DIRNAME } from './var';
+import { ChatAlbum } from './entities/chatAlbum.entity';
+import { ChatAlbumImage } from './entities/chatAlbumImage.entity';
+import { ChatGroup } from './entities/chatGroup.entity';
+import { ChatMessage } from './entities/chatMessage.entity';
+import { ChatMessageReaction } from './entities/chatMessageReaction.entity';
+import { ChatNote } from './entities/chatNote.entity';
+import { ChatNoteImage } from './entities/chatNoteImage.entity';
+import { Department } from './entities/department.entity';
+import { NotificationDevice } from './entities/device.entity';
+import { EventSchedule } from './entities/event.entity';
+import { EventComment } from './entities/eventComment.entity';
+import { EventFile } from './entities/eventFile.entity';
+import { EventIntroduction } from './entities/eventIntroduction.entity';
+import { EventIntroductionSubImage } from './entities/eventIntroductionSubImage.entity';
+import { EventVideo } from './entities/eventVideo.entity';
+import { LastReadChatTime } from './entities/lastReadChatTime.entity';
+import { QAAnswer } from './entities/qaAnswer.entity';
+import { QAAnswerReply } from './entities/qaAnswerReply.entity';
+import { SubmissionFile } from './entities/submissionFiles.entity';
+import { Tag } from './entities/tag.entity';
+import { TopNews } from './entities/topNews.entity';
+import { User } from './entities/user.entity';
+import { UserGoodForBoard } from './entities/userGoodForBord.entity';
+import { UserJoiningEvent } from './entities/userJoiningEvent.entity';
+import { UserTag } from './entities/userTag.entity';
+import { Wiki } from './entities/wiki.entity';
 
 @Module({
   imports: [
@@ -33,7 +59,7 @@ import { ScheduleModule } from '@nestjs/schedule';
           from: configService.get('EMAIL_FROM'),
         },
         template: {
-          dir: __dirname + '/templates/',
+          dir: APP_DIRNAME + '/templates/',
           adapter: new HandlebarsAdapter(), // or new PugAdapter()
           options: {
             strict: true,
@@ -50,13 +76,41 @@ import { ScheduleModule } from '@nestjs/schedule';
         password: configService.get('DB_PASSWORD'),
         database: configService.get('DB_DATABASE'),
         port: configService.get('DB_PORT'),
-        entities: [__dirname + '/entities/*.entity{.ts,.js}'],
+        // entities: [__dirname + '/entities/*.entity{.ts,.js}'],
+        entities: [
+          ChatAlbum,
+          ChatAlbumImage,
+          ChatGroup,
+          ChatMessage,
+          ChatMessageReaction,
+          ChatNote,
+          ChatNoteImage,
+          Department,
+          NotificationDevice,
+          EventSchedule,
+          EventComment,
+          EventFile,
+          EventIntroduction,
+          EventIntroductionSubImage,
+          EventVideo,
+          LastReadChatTime,
+          QAAnswer,
+          QAAnswerReply,
+          SubmissionFile,
+          Tag,
+          TopNews,
+          User,
+          UserGoodForBoard,
+          UserJoiningEvent,
+          UserTag,
+          Wiki,
+        ],
         synchronize: false,
-        migrations:
-          process.env.NODE_ENV !== 'production'
-            ? [__dirname + '/migrations/*{.js}']
-            : [__dirname + '/migrations/*{.ts,.js}'],
-        migrationsRun: true,
+        // migrations:
+        //   process.env.NODE_ENV !== 'production'
+        //     ? [__dirname + '/migrations/*{.js}']
+        //     : [__dirname + '/migrations/*{.ts,.js}'],
+        // migrationsRun: true,
         extra: {
           charset: 'utf8mb4_bin',
         },
@@ -75,6 +129,6 @@ import { ScheduleModule } from '@nestjs/schedule';
     TopNewsModule,
   ],
   controllers: [],
-  providers: [ChatGateway],
+  providers: [],
 })
 export class AppModule {}

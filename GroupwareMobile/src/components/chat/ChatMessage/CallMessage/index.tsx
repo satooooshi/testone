@@ -22,7 +22,8 @@ const CallMessage: React.FC<CallMessageProps> = ({message, onLongPress}) => {
         rounded="xl"
         h={60}
         w={150}
-        bg={message.isSender ? 'blue600' : 'gray500'}
+        bg={message.isSender ? 'blue900' : 'white'}
+        // bg={message.isSender ? 'blue600' : 'gray500'}
         p={8}
         flexDir="row"
         alignItems="center">
@@ -30,18 +31,26 @@ const CallMessage: React.FC<CallMessageProps> = ({message, onLongPress}) => {
           w={40}
           h={40}
           rounded="circle"
-          bg={message.isSender ? 'blue500' : 'gray400'}
+          bg={message.isSender ? 'blue800' : 'gray200'}
           alignItems="center"
           justifyContent="center"
           ml={3}>
-          <Icon name="phone" fontFamily="Entypo" fontSize={25} color="white" />
+          <Icon
+            name="call"
+            fontFamily="Ionicons"
+            fontSize={25}
+            color={message.isSender ? 'white' : 'gray900'}
+          />
         </Div>
         <Div ml={10} flexDir="column" alignItems="center">
-          <Text fontSize={15} color="white">
+          <Text fontSize={15} color={message.isSender ? 'white' : 'black'}>
             {messageContent}
           </Text>
           {message.callTime ? (
-            <Text mt={2} fontSize={12} color="white">
+            <Text
+              mt={2}
+              fontSize={12}
+              color={message.isSender ? 'white' : 'black'}>
               {message.callTime}
             </Text>
           ) : null}

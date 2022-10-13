@@ -1,8 +1,11 @@
 import { useReducer } from 'react';
+export type MenuValue =
+  | 'editGroup'
+  | 'editMembers'
+  | 'leaveRoom'
+  | 'editOwners';
 
-export type MenuValue = 'editGroup' | 'editMembers' | 'editOwners';
-
-type ModalState = {
+export type ModalState = {
   editChatGroupModalVisible: boolean;
   createGroupWindow: boolean;
   selectChatGroupWindow: boolean;
@@ -11,7 +14,7 @@ type ModalState = {
   modalSelectRoomTypeVisible: boolean;
 };
 
-type ModalAction =
+export type ModalAction =
   | {
       type: 'editChatGroupModalVisible';
       value: boolean;

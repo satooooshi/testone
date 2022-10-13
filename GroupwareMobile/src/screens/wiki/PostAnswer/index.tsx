@@ -6,7 +6,7 @@ import {answerSchema} from '../../../utils/validation/schema';
 import {useAPIUploadStorage} from '../../../hooks/api/storage/useAPIUploadStorage';
 import {uploadImageFromGallery} from '../../../utils/cropImage/uploadImageFromGallery';
 import {ActivityIndicator, Alert, useWindowDimensions} from 'react-native';
-import {Button, Div, Overlay, Text} from 'react-native-magnus';
+import {Button, Div, Overlay, ScrollDiv, Text} from 'react-native-magnus';
 import {
   PostWikiNavigationProps,
   PostAnswerRouteProps,
@@ -46,7 +46,7 @@ const PostAnswer: React.FC = () => {
   const isLoading = loadingSaveAnswer || loadingUploadImage;
   const initialValues: Partial<QAAnswer> = {
     body: '',
-    textFormat: wikiInfo?.textFormat,
+    textFormat: 'html',
     wiki: wikiInfo,
   };
   const {
@@ -95,7 +95,7 @@ const PostAnswer: React.FC = () => {
             nestedScrollEnabled={true}
             scrollEventThrottle={20}
             keyboardDismissMode={'none'}>
-            <Div
+            <ScrollDiv
               w={windowWidth * 0.9}
               h={windowHeight * 0.3}
               alignSelf="center"
@@ -111,7 +111,7 @@ const PostAnswer: React.FC = () => {
                       : mdParser.render(wikiInfo.body),
                 }}
               />
-            </Div>
+            </ScrollDiv>
             <Div w={windowWidth * 0.9} alignSelf="center" pt={10}>
               <Button
                 mb={16}

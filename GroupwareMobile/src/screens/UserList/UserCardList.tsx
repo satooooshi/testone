@@ -1,56 +1,45 @@
+import {useIsFocused} from '@react-navigation/native';
 import React, {useEffect, useRef, useState} from 'react';
 import {FlatList} from 'react-native';
 import {Div, Dropdown, Text} from 'react-native-magnus';
 import {ActivityIndicator} from 'react-native-paper';
 import DropdownOpenerButton from '../../components/common/DropdownOpenerButton';
 import UserCard from '../../components/users/UserCard';
-import {
-  SearchQueryToGetUsers,
-  useAPISearchUsers,
-} from '../../hooks/api/user/useAPISearchUsers';
+import {SearchQueryToGetUsers} from '../../hooks/api/user/useAPISearchUsers';
 import {userListStyles} from '../../styles/screen/user/userList.style';
-import {User, UserRoleInApp} from '../../types';
+import {User, UserRole, UserRoleInApp} from '../../types';
 import {
   defaultDropdownProps,
   defaultDropdownOptionProps,
 } from '../../utils/dropdown/helper';
 
 type UserCardListProps = {
-  userRole: UserRoleInApp;
-  word: string;
-  tag: string;
-  focused: boolean;
+  userRole: UserRole | undefined;
+  userList: User[];
+  searchQuery: SearchQueryToGetUsers;
+  setSearchQuery: React.Dispatch<React.SetStateAction<SearchQueryToGetUsers>>;
+  isLoading: boolean;
+  // word: string;
+  // tag: string;
 };
 
 const UserCardList: React.FC<UserCardListProps> = ({
   userRole,
-  word,
-  tag,
-  focused,
+  userList,
+  searchQuery,
+  setSearchQuery,
+  isLoading,
 }) => {
-  const [searchQuery, setSearchQuery] = useState<SearchQueryToGetUsers>({
-    page: '1',
-  });
-  const {
-    data: users,
-    isLoading,
-    refetch,
-    isRefetching,
-  } = useAPISearchUsers({
-    ...searchQuery,
-    role: userRole !== 'All' ? userRole : undefined,
-    page: searchQuery?.page || '1',
-    word,
-    tag,
-  });
-  const [usersForInfiniteScroll, setUsersForInfiniteScroll] = useState<User[]>(
-    [],
-  );
+  const isFocused = useIsFocused();
   const sortDropdownRef = useRef<any | null>(null);
+  const branchDropdownRef = useRef<any | null>(null);
   const durationDropdownRef = useRef<any | null>(null);
+  const flatListRef = useRef<FlatList | null>(null);
 
   const onEndReached = () => {
-    setSearchQuery(q => ({...q, page: (Number(q?.page) + 1).toString()}));
+    if (userList.length >= Number(searchQuery.page) * 20) {
+      setSearchQuery(q => ({...q, page: (Number(q?.page) + 1).toString()}));
+    }
   };
 
   const sortDropdownButtonName = () => {
@@ -68,6 +57,17 @@ const UserCardList: React.FC<UserCardListProps> = ({
     }
   };
 
+  const branchDropdownButtonName = () => {
+    switch (searchQuery.branch) {
+      case 'tokyo':
+        return '東京支社';
+      case 'osaka':
+        return '大阪支社';
+      default:
+        return '指定なし';
+    }
+  };
+
   const durationDropdownButtonName = () => {
     switch (searchQuery.duration) {
       case 'week':
@@ -79,49 +79,38 @@ const UserCardList: React.FC<UserCardListProps> = ({
     }
   };
 
-  useEffect(() => {
-    setSearchQuery(q => ({...q, word, tag}));
-  }, [tag, word]);
+  // useEffect(() => {
+  //   setSearchQuery(q => ({...q, word, tag, page: '1'}));
+  // }, [tag, word]);
+
+  const scrollToTop = () => {
+    flatListRef?.current?.scrollToOffset({animated: false, offset: 0});
+  };
 
   useEffect(() => {
-    setUsersForInfiniteScroll([]);
-    setSearchQuery(q => ({...q, page: '1'}));
-  }, [
-    searchQuery.word,
-    searchQuery.tag,
-    searchQuery.sort,
-    searchQuery.duration,
-  ]);
-
-  useEffect(() => {
-    if (focused) {
-      setUsersForInfiniteScroll([]);
-      setSearchQuery(q => ({...q, page: '1'}));
-      refetch();
+    if (isFocused && searchQuery.role !== userRole) {
+      scrollToTop();
+      setSearchQuery(q => ({...q, role: userRole, page: '1'}));
     }
-  }, [focused, refetch]);
-
-  useEffect(() => {
-    if (!isRefetching && users?.users) {
-      setUsersForInfiniteScroll(u => {
-        if (u.length) {
-          return [...u, ...users.users];
-        }
-        return users?.users;
-      });
-    }
-  }, [users?.users, isRefetching]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isFocused]);
 
   return (
     <>
       <Div flexDir="row" my="lg" justifyContent="space-evenly">
-        <Div w="45%">
+        <Div w="32%">
           <DropdownOpenerButton
             name={sortDropdownButtonName()}
             onPress={() => sortDropdownRef.current?.open()}
           />
         </Div>
-        <Div w="45%">
+        <Div w="32%">
+          <DropdownOpenerButton
+            name={branchDropdownButtonName()}
+            onPress={() => branchDropdownRef.current?.open()}
+          />
+        </Div>
+        <Div w="32%">
           <DropdownOpenerButton
             name={durationDropdownButtonName()}
             onPress={() => durationDropdownRef.current?.open()}
@@ -131,58 +120,112 @@ const UserCardList: React.FC<UserCardListProps> = ({
           <Dropdown.Option
             {...defaultDropdownOptionProps}
             value={'none'}
-            onPress={() => setSearchQuery(q => ({...q, sort: undefined}))}>
+            onPress={() => {
+              scrollToTop();
+              setSearchQuery(q => ({...q, sort: undefined, page: '1'}));
+            }}>
             指定なし
           </Dropdown.Option>
           <Dropdown.Option
             {...defaultDropdownOptionProps}
             value={'none'}
-            onPress={() => setSearchQuery(q => ({...q, sort: 'event'}))}>
+            onPress={() => {
+              scrollToTop();
+              setSearchQuery(q => ({...q, sort: 'event', page: '1'}));
+            }}>
             イベント参加数順
           </Dropdown.Option>
           <Dropdown.Option
             {...defaultDropdownOptionProps}
             value={'none'}
-            onPress={() => setSearchQuery(q => ({...q, sort: 'question'}))}>
+            onPress={() => {
+              scrollToTop();
+              setSearchQuery(q => ({...q, sort: 'question', page: '1'}));
+            }}>
             質問数順
           </Dropdown.Option>
           <Dropdown.Option
             {...defaultDropdownOptionProps}
             value={'none'}
-            onPress={() => setSearchQuery(q => ({...q, sort: 'answer'}))}>
+            onPress={() => {
+              scrollToTop();
+              setSearchQuery(q => ({...q, sort: 'answer', page: '1'}));
+            }}>
             回答数順
           </Dropdown.Option>
           <Dropdown.Option
             {...defaultDropdownOptionProps}
             value={'none'}
-            onPress={() => setSearchQuery(q => ({...q, sort: 'knowledge'}))}>
+            onPress={() => {
+              scrollToTop();
+              setSearchQuery(q => ({...q, sort: 'knowledge', page: '1'}));
+            }}>
             ナレッジ投稿数順
+          </Dropdown.Option>
+        </Dropdown>
+        <Dropdown ref={branchDropdownRef} {...defaultDropdownProps}>
+          <Dropdown.Option
+            {...defaultDropdownOptionProps}
+            value={'none'}
+            onPress={() => {
+              scrollToTop();
+              setSearchQuery(q => ({...q, branch: undefined, page: '1'}));
+            }}>
+            指定なし
+          </Dropdown.Option>
+          <Dropdown.Option
+            {...defaultDropdownOptionProps}
+            value={'none'}
+            onPress={() => {
+              scrollToTop();
+              setSearchQuery(q => ({...q, branch: 'tokyo', page: '1'}));
+            }}>
+            東京支社
+          </Dropdown.Option>
+          <Dropdown.Option
+            {...defaultDropdownOptionProps}
+            value={'none'}
+            onPress={() => {
+              scrollToTop();
+              setSearchQuery(q => ({...q, branch: 'osaka', page: '1'}));
+            }}>
+            大阪支社
           </Dropdown.Option>
         </Dropdown>
         <Dropdown ref={durationDropdownRef} {...defaultDropdownProps}>
           <Dropdown.Option
             {...defaultDropdownOptionProps}
             value={'none'}
-            onPress={() => setSearchQuery(q => ({...q, duration: undefined}))}>
+            onPress={() => {
+              scrollToTop();
+              setSearchQuery(q => ({...q, duration: undefined, page: '1'}));
+            }}>
             指定なし
           </Dropdown.Option>
           <Dropdown.Option
             {...defaultDropdownOptionProps}
             value={'none'}
-            onPress={() => setSearchQuery(q => ({...q, duration: 'week'}))}>
+            onPress={() => {
+              scrollToTop();
+              setSearchQuery(q => ({...q, duration: 'week', page: '1'}));
+            }}>
             週間
           </Dropdown.Option>
           <Dropdown.Option
             {...defaultDropdownOptionProps}
             value={'none'}
-            onPress={() => setSearchQuery(q => ({...q, duration: 'month'}))}>
+            onPress={() => {
+              scrollToTop();
+              setSearchQuery(q => ({...q, duration: 'month', page: '1'}));
+            }}>
             月間
           </Dropdown.Option>
         </Dropdown>
       </Div>
-      {usersForInfiniteScroll?.length ? (
+      {userList?.length ? (
         <FlatList
-          data={usersForInfiniteScroll}
+          ref={flatListRef}
+          data={userList}
           onEndReached={onEndReached}
           onEndReachedThreshold={0.5}
           contentContainerStyle={userListStyles.flatlist}

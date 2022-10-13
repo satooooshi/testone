@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {ReactNode, memo} from 'react';
 import {useEffect} from 'react';
 import {useNavigation} from '@react-navigation/native';
 import {
@@ -16,7 +16,6 @@ import {
 import {dateTimeFormatterFromJSDDate} from '../../../utils/dateTimeFormatterFromJSDate';
 import {userNameFactory} from '../../../utils/factory/userNameFactory';
 import {numbersOfSameValueInKeyOfObjArr} from '../../../utils/numbersOfSameValueInKeyOfObjArr';
-import UserAvatar from '../../common/UserAvatar';
 import FileMessage from './FileMessage';
 import ImageMessage from './ImageMessage';
 import ReactionToMessage from './ReactionToMessage';
@@ -24,6 +23,8 @@ import TextMessage from './TextMessage';
 import CallMessage from './CallMessage';
 import VideoMessage from './VideoMessage';
 import StickerMessage from './StickerMessage.tsx';
+import {removeReactionDuplicates} from '../../../utils/removeReactionDuplicate';
+import UserAvatar from '../../../components/common/UserAvatar';
 
 type ChatMessageItemProps = {
   message: ChatMessage;
@@ -32,13 +33,16 @@ type ChatMessageItemProps = {
   searchedResultIds?: (number | undefined)[];
   messageIndex: number;
   isScrollTarget: boolean;
+  senderAvatars?: {
+    member: User;
+    avatar: JSX.Element;
+  }[];
   scrollToTarget: (messageIndex: number) => void;
   onCheckLastRead: () => void;
-  numbersOfRead: number;
   onLongPress: () => void;
   onPressImage: () => void;
   onPressVideo: () => void;
-  onPressReaction: (reaction: ChatMessageReaction) => void;
+  onPressReaction: (reaction: ChatMessageReaction, isSender: boolean) => void;
   onLongPressReation: (reaction: ChatMessageReaction) => void;
 };
 
@@ -50,8 +54,8 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
   messageIndex,
   isScrollTarget = false,
   scrollToTarget,
+  senderAvatars,
   onCheckLastRead,
-  numbersOfRead,
   onLongPress,
   onPressImage,
   onPressVideo,
@@ -61,18 +65,10 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
   const navigation = useNavigation<any>();
   const windowWidth = useWindowDimensions().width;
   const isSender = (emoji: string) => {
-    return message?.reactions?.filter(r => r.emoji === emoji && r.isSender)
-      .length;
-  };
-  const reactionRemovedDuplicates = (reactions: ChatMessageReaction[]) => {
-    let reactionsNoDuplicates: ChatMessageReaction[] = [];
-    for (const r of reactions) {
-      reactionsNoDuplicates = reactionsNoDuplicates.filter(
-        duplicated => duplicated.emoji !== r.emoji,
-      );
-      reactionsNoDuplicates.push(r);
+    if (!message?.reactions) {
+      return false;
     }
-    return reactionsNoDuplicates;
+    return message?.reactions?.some(r => r.emoji === emoji && r.isSender);
   };
 
   useEffect(() => {
@@ -83,15 +79,13 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
 
   const timesAndReadCounts = (
     <Div justifyContent="flex-end" alignItems="center">
-      {message.isSender &&
-      readUsers.length &&
-      message.type !== ChatMessageType.SYSTEM_TEXT ? (
+      {readUsers.length && message.type !== ChatMessageType.SYSTEM_TEXT ? (
         <TouchableOpacity onPress={onCheckLastRead}>
           <Text
             mb="sm"
             mr={message?.isSender ? 'sm' : undefined}
             ml={!message?.isSender ? 'sm' : undefined}>
-            {numbersOfRead ? `既読${numbersOfRead}人` : ''}
+            {`既読${readUsers.length}人`}
           </Text>
         </TouchableOpacity>
       ) : null}
@@ -118,7 +112,7 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
       {message.type === ChatMessageType.SYSTEM_TEXT && (
         <Box
           alignSelf="center"
-          bg="gray300"
+          bg="white"
           w={windowWidth * 0.8}
           rounded={'md'}
           py={4}
@@ -131,15 +125,21 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
         flexDir={message.isSender ? 'row' : 'row-reverse'}
         mb={'xs'}
         alignSelf={message?.isSender ? 'flex-end' : 'flex-start'}
-        alignItems="flex-end">
+        alignItems="flex-start">
         <Div>
           {!message.isSender && message.type !== ChatMessageType.SYSTEM_TEXT ? (
-            <Text>{userNameFactory(message.sender)}</Text>
+            <Text>
+              {userNameFactory(
+                senderAvatars?.find(s => s.member.id === message.sender?.id)
+                  ?.member || message.sender,
+              )}
+            </Text>
           ) : null}
           <Div flexDir="row" alignItems="flex-end">
             {message.isSender && timesAndReadCounts}
             {message.type === ChatMessageType.TEXT ? (
               <TextMessage
+                senderAvatars={senderAvatars}
                 message={message}
                 inputtedSearchWord={inputtedSearchWord}
                 searchedResultIds={searchedResultIds}
@@ -177,7 +177,8 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
             }
             underlayColor="none">
             <Div mr="xs">
-              <UserAvatar h={40} w={40} user={message?.sender} />
+              {senderAvatars?.find(s => s.member.id === message.sender?.id)
+                ?.avatar ?? <UserAvatar h={40} w={40} user={message.sender} />}
             </Div>
           </TouchableHighlight>
         ) : null}
@@ -188,10 +189,10 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
         flexWrap="wrap"
         alignSelf={message?.isSender ? 'flex-end' : 'flex-start'}>
         {message.reactions?.length
-          ? reactionRemovedDuplicates(message.reactions).map(r => (
+          ? removeReactionDuplicates(message.reactions).map(r => (
               <Div mr="xs" mb="xs" key={r.id}>
                 <ReactionToMessage
-                  onPress={() => onPressReaction(r)}
+                  onPress={() => onPressReaction(r, isSender(r.emoji))}
                   onLongPress={() => onLongPressReation(r)}
                   reaction={{...r, isSender: !!isSender(r.emoji)}}
                   numbersOfReaction={numbersOfSameValueInKeyOfObjArr(
@@ -208,4 +209,4 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
   );
 };
 
-export default ChatMessageItem;
+export default memo(ChatMessageItem);

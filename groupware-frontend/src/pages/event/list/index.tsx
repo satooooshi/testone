@@ -112,6 +112,7 @@ const eventTitleText = {
   [EventType.COACH]: 'コーチ制度',
   [EventType.CLUB]: '部活動',
   [EventType.SUBMISSION_ETC]: '提出物等',
+  [EventType.OTHER]: 'その他',
 };
 
 type EventListGetParams = SearchQueryToGetEvents & {
@@ -146,6 +147,7 @@ const EventList = () => {
     type,
     from,
     to,
+    personal,
   });
   const { user } = useAuthenticate();
   const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
@@ -206,7 +208,7 @@ const EventList = () => {
       ...newQuery,
       tag: selectedTagIDs.join('+'),
     });
-    router.push(`${url}&personal=${newQuery.personal || ''}`, undefined, {
+    router.push(url, undefined, {
       shallow: true,
     });
   };
@@ -245,6 +247,9 @@ const EventList = () => {
     }
     if (type === EventType.SUBMISSION_ETC) {
       return EventTab.SUBMISSION_ETC;
+    }
+    if (type === EventType.OTHER) {
+      return EventTab.OTHER;
     }
     return EventTab.ALL;
   };
@@ -314,21 +319,23 @@ const EventList = () => {
         return { style: { backgroundColor: '#f56565' } };
       case EventType.SUBMISSION_ETC:
         return { style: { backgroundColor: '#086f83' } };
+      case EventType.OTHER:
+        return { style: { backgroundColor: '#a9a9a9' } };
     }
   };
 
   const memorizedEvent = useMemo<any[] | undefined>(() => {
     const changeToBigCalendarEvent = (ev?: EventSchedule[]) => {
       if (ev) {
-        if (personal === 'true') {
-          ev = ev.filter((e) => {
-            if (
-              e.userJoiningEvent?.filter((u) => u?.user?.id === user?.id).length
-            ) {
-              return true;
-            }
-          });
-        }
+        // if (personal === 'true') {
+        //   ev = ev.filter((e) => {
+        //     if (
+        //       e.userJoiningEvent?.filter((u) => u?.user?.id === user?.id).length
+        //     ) {
+        //       return true;
+        //     }
+        //   });
+        // }
         const events: any[] = ev.map((e) => ({
           ...e,
           start: new Date(e.startAt),
@@ -375,12 +382,12 @@ const EventList = () => {
     }
   };
 
-  const initialCalendarDate: Date = useMemo(() => {
-    if (from && to) {
-      return DateTime.fromFormat(from, 'yyyy-LL-dd').toJSDate();
-    }
-    return new Date();
-  }, [from, to]);
+  // const initialCalendarDate: Date = useMemo(() => {
+  //   if (from && to) {
+  //     return DateTime.fromFormat(from, 'yyyy-LL-dd').toJSDate();
+  //   }
+  //   return new Date();
+  // }, [from, to]);
 
   useEffect(() => {
     calendarRef?.current?.scrollIntoView();
@@ -518,7 +525,7 @@ const EventList = () => {
                 handleCalendarRangeChange(range);
               }}
               popup={true}
-              defaultDate={initialCalendarDate}
+              // defaultDate={initialCalendarDate}
               onSelectSlot={handleNewEventFromCalendar}
               onSelectEvent={(e) => {
                 const eventSchedule = e as EventSchedule;
@@ -534,11 +541,7 @@ const EventList = () => {
             <div className={eventListStyles.search_form_wrapper}>
               <SearchForm
                 onClear={() => setSelectedTags([])}
-                value={searchWord || ''}
-                onChange={(e) => setSearchWord(e.currentTarget.value)}
-                onClickButton={() =>
-                  queryRefresh({ page: '1', word: searchWord })
-                }
+                onClickButton={(w) => queryRefresh({ page: '1', word: w })}
                 tags={tags || []}
                 selectedTags={selectedTags}
                 toggleTag={onToggleTag}

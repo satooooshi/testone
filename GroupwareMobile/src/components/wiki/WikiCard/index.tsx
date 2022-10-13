@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import {useWindowDimensions, FlatList, TouchableHighlight} from 'react-native';
-import {BoardCategory, User, Wiki, WikiType} from '../../../types';
+import {BoardCategory, Wiki, WikiType} from '../../../types';
 import {Div, Text, Tag, Icon, Button} from 'react-native-magnus';
 import {tagColorFactory} from '../../../utils/factory/tagColorFactory';
 import {wikiCardStyles} from '../../../styles/component/wiki/wikiCard.style';
@@ -13,6 +13,7 @@ import {useAPIToggleGoodForBoard} from '../../../hooks/api/wiki/useAPIToggleGood
 import {useAuthenticate} from '../../../contexts/useAuthenticate';
 import {darkFontColor} from '../../../utils/colors';
 import GoodSendersModal from '../../chat/GoodSendersModal';
+import {useAPIGetGoodsForBoard} from '../../../hooks/api/wiki/useAPIGetGoodForBoard';
 
 type WikiCardProps = {
   wiki: Wiki;
@@ -25,26 +26,23 @@ const WikiCard: React.FC<WikiCardProps> = ({wiki}) => {
   const [isVisible, setIsVisible] = useState<boolean>(false);
   const isBoard = wiki.type === WikiType.BOARD;
   const isQA = wiki.boardCategory === BoardCategory.QA;
-  const [isPressHeart, setIsPressHeart] = useState<boolean>(
-    wiki.isGoodSender || false,
-  );
+  const [isPressHeart, setIsPressHeart] = useState<boolean>(false);
   const {user} = useAuthenticate();
   const [wikiState, setWikiState] = useState(wiki);
+  const {mutate: getGoodsForBoard, data: goodsForBoard} =
+    useAPIGetGoodsForBoard();
 
   const {mutate} = useAPIToggleGoodForBoard({
     onSuccess: () => {
       setIsPressHeart(prevHeartStatus => {
         setWikiState(w => {
           if (prevHeartStatus) {
-            w.userGoodForBoard = w.userGoodForBoard?.filter(
-              u => u.id !== user?.id,
-            );
+            w.goodsCount = (w.goodsCount || 0) - 1;
           } else {
-            w.userGoodForBoard = [user as User, ...(w.userGoodForBoard || [])];
+            w.goodsCount = (w.goodsCount || 0) + 1;
           }
           return w;
         });
-
         return !prevHeartStatus;
       });
     },
@@ -52,6 +50,7 @@ const WikiCard: React.FC<WikiCardProps> = ({wiki}) => {
 
   useEffect(() => {
     setWikiState(wiki);
+    setIsPressHeart(wiki.isGoodSender || false);
   }, [wiki]);
 
   return (
@@ -74,7 +73,7 @@ const WikiCard: React.FC<WikiCardProps> = ({wiki}) => {
         <Div w={'100%'} px={8} flexDir="row" alignItems="center">
           {wiki.type !== WikiType.RULES && (
             <Div mr={8}>
-              <UserAvatar user={wiki.writer} h={48} w={48} />
+              <UserAvatar user={wiki.writer} h={48} w={48} GoProfile={true} />
             </Div>
           )}
           <Text w={'80%'} numberOfLines={2} fontWeight="bold" fontSize={22}>
@@ -93,7 +92,7 @@ const WikiCard: React.FC<WikiCardProps> = ({wiki}) => {
                   textAlignVertical="bottom"
                   fontSize={18}
                   mt={-3}>
-                  {wiki.answers?.length.toString() || 0}
+                  {wikiState.answersCount || 0}
                 </Text>
               </Div>
             ) : null}
@@ -194,16 +193,21 @@ const WikiCard: React.FC<WikiCardProps> = ({wiki}) => {
                 )}
               </TouchableHighlight>
               <Button
-                onPress={() =>
-                  setIsVisible(true)
-                }>{`${wikiState.userGoodForBoard?.length}件のいいね`}</Button>
+                onPress={() => {
+                  getGoodsForBoard(wikiState.id);
+                  setIsVisible(true);
+                }}>
+                {`${wikiState.goodsCount || 0}件のいいね`}
+              </Button>
             </Div>
           )}
-          <GoodSendersModal
-            goodSenders={wikiState.userGoodForBoard || []}
-            isVisible={isVisible}
-            onClose={() => setIsVisible(false)}
-          />
+          {goodsForBoard && (
+            <GoodSendersModal
+              isVisible={isVisible}
+              onClose={() => setIsVisible(false)}
+              goodsForBoard={goodsForBoard}
+            />
+          )}
         </Div>
       </Div>
     </TouchableHighlight>

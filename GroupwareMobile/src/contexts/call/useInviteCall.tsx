@@ -15,6 +15,8 @@ import io from 'socket.io-client';
 import {baseURL} from '../../utils/url';
 import {ChatGroup} from '../../types';
 import _, {debounce} from 'lodash';
+import {useHandleBadge} from '../badge/useHandleBadge';
+import {socket} from '../../utils/socket';
 
 const InvitationStatusContext = createContext({
   isCallAccepted: false,
@@ -36,13 +38,14 @@ const InvitationStatusContext = createContext({
 
 export const InviteCallProvider: React.FC = ({children}) => {
   const {mutate: createGroup} = useAPISaveChatGroup();
+  const {editChatGroup, refetchRoomCard} = useHandleBadge();
   const [currentGroupData, setCurrentGroupData] = useState<ChatGroup>();
-  const socket = io(baseURL, {
-    transports: ['websocket'],
-  });
   const {mutate: sendChatMessage} = useAPISendChatMessage({
     onSuccess: sentMsg => {
-      socket.emit('message', sentMsg);
+      socket.emit('message', {type: 'send', chatMessage: sentMsg});
+      if (sentMsg?.chatGroup?.id) {
+        refetchRoomCard({id: sentMsg.chatGroup.id, type: ''});
+      }
     },
   });
   const [isCallAccepted, setIsCallAccepted] = useState(false);
@@ -56,13 +59,16 @@ export const InviteCallProvider: React.FC = ({children}) => {
   const disableCallAcceptedFlag = () => {
     setIsCallAccepted(false);
   };
-  const ringCall = () => {
-    SoundPlayer.playSoundFile('ring_sound', 'mp3');
-    console.log('ring sound ringing!');
+
+  const ringCall = async () => {
+    SoundPlayer.loadSoundFile('ring_sound', 'mp3');
+    SoundPlayer.setSpeaker(false);
+    SoundPlayer.setVolume(0.1);
+    SoundPlayer.play();
+    // SoundPlayer.playSoundFile('ring_sound', 'mp3');
   };
   const stopRing = useCallback(() => {
     SoundPlayer.stop();
-    console.log('ring sound stoped!!');
   }, []);
 
   const setLocalInvitationState = (invitation: LocalInvitation | undefined) => {
@@ -74,15 +80,16 @@ export const InviteCallProvider: React.FC = ({children}) => {
   };
 
   const sendCallInvitation = async (caller: Partial<User>, callee: User) => {
-    console.log('will send call invitation', callee);
+    setCallTime('');
     const invitation = await setupCallInvitation(caller, callee);
-    console.log('send call invitation');
     createGroup(
       {name: '', members: [callee]},
       {
         onSuccess: createdGroup => {
+          if (createdGroup.updatedAt === createdGroup.createdAt) {
+            editChatGroup(createdGroup);
+          }
           setCurrentGroupData(createdGroup);
-          console.log('success set chatGroup!!');
         },
       },
     );
@@ -91,11 +98,6 @@ export const InviteCallProvider: React.FC = ({children}) => {
 
   const sendCallHistory = useCallback(
     (message: string) => {
-      console.log(
-        'currentGroupData====================',
-        message,
-        currentGroupData,
-      );
       if (currentGroupData) {
         sendChatMessage({
           content: message,

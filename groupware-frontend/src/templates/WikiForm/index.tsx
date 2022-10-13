@@ -76,7 +76,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
     title: '',
     body: '',
     tags: [],
-    type: type || WikiType.BOARD,
+    type: type || undefined,
     ruleCategory: type === WikiType.RULES ? RuleCategory.RULES : undefined,
     boardCategory:
       type === WikiType.BOARD || !type
@@ -129,6 +129,19 @@ const WikiForm: React.FC<WikiFormProps> = ({
     },
   ];
 
+  const [willSubmit, setWillSubmit] = useState(false);
+
+  useEffect(() => {
+    const safetySubmit = async () => {
+      handleSubmit();
+      await new Promise((r) => setTimeout(r, 1000));
+      setWillSubmit(false);
+    };
+    if (willSubmit) {
+      safetySubmit();
+    }
+  }, [willSubmit, handleSubmit]);
+
   const headerTabName = '内容を編集';
 
   const saveButtonName = useMemo(() => {
@@ -176,6 +189,9 @@ const WikiForm: React.FC<WikiFormProps> = ({
   };
 
   const onTypeSelectionChange = (e: ChangeEvent<HTMLSelectElement>) => {
+    if (!e.target.value) {
+      return setNewQuestion((e) => ({ ...e, type: undefined }));
+    }
     if (
       e.target.value === RuleCategory.RULES ||
       e.target.value === RuleCategory.ABC ||
@@ -298,22 +314,20 @@ const WikiForm: React.FC<WikiFormProps> = ({
               flexDir={isSmallerThan768 ? 'column' : undefined}
               mb={isSmallerThan768 ? '16px' : undefined}>
               <FormLabel fontWeight="bold">タイプを選択してください</FormLabel>
+              {errors.type && touched.type ? (
+                <Text color="tomato">{errors.type}</Text>
+              ) : null}
               <Select
                 colorScheme="teal"
                 bg="white"
                 onChange={onTypeSelectionChange}
-                defaultValue={
-                  type === WikiType.RULES
-                    ? RuleCategory.RULES
-                    : type === WikiType.ALL_POSTAL
-                    ? type
-                    : BoardCategory.QA
-                }>
+                defaultValue={newQuestion.type}>
                 {isCreatableWiki({
                   type: WikiType.RULES,
                   userRole: user?.role,
                 }) ? (
                   <>
+                    <option label={'指定なし'}></option>
                     <option value={RuleCategory.PHILOSOPHY}>
                       {wikiTypeNameFactory(
                         WikiType.RULES,
@@ -357,6 +371,14 @@ const WikiForm: React.FC<WikiFormProps> = ({
                 }) ? (
                   <option value={WikiType.ALL_POSTAL}>
                     {wikiTypeNameFactory(WikiType.ALL_POSTAL)}
+                  </option>
+                ) : null}
+                {isCreatableWiki({
+                  type: WikiType.MAIL_MAGAZINE,
+                  userRole: user?.role,
+                }) ? (
+                  <option value={WikiType.MAIL_MAGAZINE}>
+                    {wikiTypeNameFactory(WikiType.MAIL_MAGAZINE)}
                   </option>
                 ) : null}
 
@@ -547,7 +569,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
                 marginRight="16px">
                 タグを編集
               </Button>
-              <Button colorScheme="pink" onClick={() => handleSubmit()}>
+              <Button colorScheme="pink" onClick={() => setWillSubmit(true)}>
                 {wiki ? `${saveButtonName}を更新` : `${saveButtonName}を投稿`}
               </Button>
             </Box>

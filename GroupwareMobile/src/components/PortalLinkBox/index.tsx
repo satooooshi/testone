@@ -20,6 +20,7 @@ import {
   ruleColor,
   qaColor,
   allPostalColor,
+  mailMagazineColor,
 } from '../../utils/colors';
 import {Text, Div, Icon} from 'react-native-magnus';
 import {TouchableHighlight, useWindowDimensions} from 'react-native';
@@ -38,6 +39,7 @@ type PortalType =
   | 'knowledge'
   | 'qa'
   | 'all-postal'
+  | 'mail_magazine'
   | 'chat'
   | 'admin'
   | 'my_schedule'
@@ -103,6 +105,15 @@ const PortalLinkIcon: React.FC<PortalLinkIconProps> = ({type}) => {
           name="mail"
           fontFamily="Entypo"
           color={allPostalColor}
+          fontSize={iconSize}
+        />
+      );
+    case 'mail_magazine':
+      return (
+        <Icon
+          name="paper-plane"
+          fontFamily="Entypo"
+          color={mailMagazineColor}
           fontSize={iconSize}
         />
       );
@@ -213,6 +224,8 @@ const PortalLinkBox: React.FC<PortarlLinkBoxProps> = ({type, onPress}) => {
         return '社内規則';
       case 'all-postal':
         return 'オール便';
+      case 'mail_magazine':
+        return 'メルマガ';
       case 'knowledge':
         return 'ナレッジ';
       case 'qa':

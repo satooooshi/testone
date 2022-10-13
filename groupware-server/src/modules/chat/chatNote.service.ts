@@ -1,7 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { ChatGroup } from 'src/entities/chatGroup.entity';
 import { ChatNote } from 'src/entities/chatNote.entity';
 import { ChatNoteImage } from 'src/entities/chatNoteImage.entity';
+import { genStorageURL } from 'src/utils/storage/genStorageURL';
 import { Repository } from 'typeorm';
 
 export interface GetChatNotesQuery {
@@ -21,13 +23,35 @@ export class ChatNoteService {
     private readonly noteRepository: Repository<ChatNote>,
     @InjectRepository(ChatNoteImage)
     private readonly noteImageRepository: Repository<ChatNoteImage>,
+    @InjectRepository(ChatGroup)
+    private readonly chatGroupRepository: Repository<ChatGroup>,
   ) {}
+
+  private async checkUserBelongToGroup(
+    userID: number,
+    groupID: number,
+  ): Promise<boolean> {
+    const isUserBelongToGroup = await this.chatGroupRepository
+      .createQueryBuilder('chat_groups')
+      .innerJoin(
+        'chat_groups.members',
+        'm',
+        'm.id = :userId AND chat_groups.id = :chatGroupId',
+        {
+          userId: userID,
+          chatGroupId: groupID,
+        },
+      )
+      .getOne();
+    return !!isUserBelongToGroup;
+  }
 
   public async saveChatNotes(dto: Partial<ChatNote>): Promise<ChatNote> {
     const savedNote = await this.noteRepository.save(dto);
     if (dto.images?.length) {
       const sentImages = dto.images.map((i) => ({
         ...i,
+        imageURL: genStorageURL(i.imageURL),
         chatNote: savedNote,
       }));
 
@@ -41,9 +65,18 @@ export class ChatNoteService {
   }
 
   public async getChatNoteDetail(
+    roomID: number,
     noteID: number,
     userID: number,
   ): Promise<ChatNote> {
+    const isUserBelongToGroup = await this.checkUserBelongToGroup(
+      userID,
+      roomID,
+    );
+    if (!isUserBelongToGroup) {
+      throw new BadRequestException('The user is not a member');
+    }
+
     const noteDetail = await this.noteRepository.findOne(noteID, {
       relations: ['chatGroup', 'editors', 'images'],
       withDeleted: true,
@@ -58,6 +91,15 @@ export class ChatNoteService {
     userID: number,
   ): Promise<GetChatNotesResult> {
     const { page, group } = query;
+
+    const isUserBelongToGroup = await this.checkUserBelongToGroup(
+      userID,
+      group,
+    );
+    if (!isUserBelongToGroup) {
+      throw new BadRequestException('The user is not a member');
+    }
+
     const limit = 20;
     const offset = limit * (Number(page) - 1);
     const [existNotes, count] = await this.noteRepository

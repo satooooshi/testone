@@ -7,7 +7,7 @@ import userListStyles from '@/styles/layouts/UserList.module.scss';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
-import { Tag, UserRole } from 'src/types';
+import { BranchType, Tag, UserRole } from 'src/types';
 import { toggleTag } from 'src/utils/toggleTag';
 import paginationStyles from '@/styles/components/Pagination.module.scss';
 import { userQueryRefresh } from 'src/utils/userQueryRefresh';
@@ -25,7 +25,6 @@ const UserList = () => {
   const router = useRouter();
   const query = router.query as SearchQueryToGetUsers;
   const { data: tags } = useAPIGetUserTag();
-  const [searchWord, setSearchWord] = useState(query.word);
   const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
   const { data: users, isLoading } = useAPISearchUsers(query);
 
@@ -41,6 +40,7 @@ const UserList = () => {
       tag: tagQuery,
       word: query.word || '',
       sort: query.sort,
+      branch: query.branch,
       role: query.role,
       duration: query.duration,
     };
@@ -119,9 +119,7 @@ const UserList = () => {
         <div className={userListStyles.search_form_wrapper}>
           <SearchForm
             onClear={() => setSelectedTags([])}
-            value={searchWord || ''}
-            onChange={(e) => setSearchWord(e.currentTarget.value)}
-            onClickButton={() => queryRefresh({ page: '1', word: searchWord })}
+            onClickButton={(w) => queryRefresh({ page: '1', word: w })}
             tags={tags || []}
             selectedTags={selectedTags}
             toggleTag={onToggleTag}
@@ -138,8 +136,9 @@ const UserList = () => {
             <div className={userListStyles.sort_select_row}>
               <div className={userListStyles.sort_select_wrapper}>
                 <FormControl>
-                  <FormLabel>ソート</FormLabel>
+                  <FormLabel pr={'2'}>ソート</FormLabel>
                   <Select
+                    pr={'2'}
                     bg="white"
                     defaultValue={query.sort}
                     value={query.sort}
@@ -148,6 +147,7 @@ const UserList = () => {
                         sort:
                           (e.target.value as 'event' | 'question' | 'answer') ||
                           undefined,
+                        page: '1',
                       });
                       return;
                     }}>
@@ -161,8 +161,30 @@ const UserList = () => {
               </div>
               <div className={userListStyles.sort_select_wrapper}>
                 <FormControl>
-                  <FormLabel>期間</FormLabel>
+                  <FormLabel px={'2'}>所属支社</FormLabel>
                   <Select
+                    px={'2'}
+                    bg="white"
+                    defaultValue={query.branch}
+                    value={query.branch}
+                    onChange={(e) => {
+                      queryRefresh({
+                        branch: (e.target.value as BranchType) || undefined,
+                        page: '1',
+                      });
+                      return;
+                    }}>
+                    <option value="">指定なし</option>
+                    <option value="tokyo">東京支社</option>
+                    <option value="osaka">大阪支社</option>
+                  </Select>
+                </FormControl>
+              </div>
+              <div className={userListStyles.sort_select_wrapper}>
+                <FormControl>
+                  <FormLabel pl={'2'}>期間</FormLabel>
+                  <Select
+                    pl={'2'}
                     bg="white"
                     defaultValue={query.duration}
                     value={query.duration}
@@ -170,6 +192,7 @@ const UserList = () => {
                       queryRefresh({
                         duration:
                           (e.target.value as 'week' | 'month') || undefined,
+                        page: '1',
                       });
                       return;
                     }}>

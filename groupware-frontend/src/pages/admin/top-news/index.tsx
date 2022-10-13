@@ -360,7 +360,10 @@ const NewsAdmin: React.VFC = () => {
                                   <Box w="10%">
                                     <Link
                                       onClick={() => {
-                                        setValues(n);
+                                        setValues({
+                                          ...n,
+                                          urlPath: location.origin + n.urlPath,
+                                        });
                                         setFormOpened(true);
                                       }}>
                                       <BsPencilSquare

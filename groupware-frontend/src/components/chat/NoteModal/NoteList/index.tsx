@@ -20,7 +20,6 @@ import NoteBox from '../NoteBox';
 const Viewer = dynamic(() => import('react-viewer'), { ssr: false });
 import { saveAs } from 'file-saver';
 import { ImageDecorator } from 'react-viewer/lib/ViewerProps';
-import { fileNameTransformer } from 'src/utils/factory/fileNameTransformer';
 
 type NoteListProps = {
   room: ChatGroup;
@@ -55,16 +54,35 @@ const NoteList: React.FC<NoteListProps> = ({
   const [notesForInfiniteScroll, setNotesForInfiniteScroll] = useState<
     ChatNote[]
   >([]);
-  const {
-    data: notes,
-    refetch: refetchNotes,
-    isLoading,
-  } = useAPIGetChatNotes({
-    roomId: room.id.toString(),
-    page: noteListPage.toString(),
-  });
+  const { refetch: refetchNotes, isLoading } = useAPIGetChatNotes(
+    {
+      roomId: room.id.toString(),
+      page: noteListPage.toString(),
+    },
+    {
+      enabled: false,
+      onSuccess: (notes) => {
+        if (notes?.notes?.length) {
+          if (noteListPage === 1) {
+            setNotesForInfiniteScroll(notes.notes);
+          } else {
+            setNotesForInfiniteScroll((n) => {
+              if (
+                n.length &&
+                new Date(n[n.length - 1].createdAt) >
+                  new Date(notes.notes[0].createdAt)
+              ) {
+                return [...n, ...notes?.notes];
+              }
+              return n;
+            });
+          }
+        }
+      },
+    },
+  );
   const handleNoteDelete = (note: ChatNote) => {
-    if (confirm('ノートを削除します。よろしいですa?')) {
+    if (confirm('ノートを削除します。よろしいですか?')) {
       deleteNote(
         { roomId: room.id.toString(), noteId: note.id.toString() },
         {
@@ -75,8 +93,12 @@ const NoteList: React.FC<NoteListProps> = ({
               duration: 3000,
               isClosable: true,
             });
-            setNoteListPage(1);
-            refetchNotes();
+            if (noteListPage === 1) {
+              setNotesForInfiniteScroll([]);
+              refetchNotes();
+            } else {
+              setNoteListPage(1);
+            }
           },
         },
       );
@@ -84,35 +106,19 @@ const NoteList: React.FC<NoteListProps> = ({
   };
 
   useEffect(() => {
-    const refreshNotes = () => {
+    if (isOpen) {
+      refetchNotes();
+    } else {
       setNotesForInfiniteScroll([]);
       setNoteListPage(1);
-      refetchNotes();
-    };
-    refreshNotes();
-  }, [refetchNotes, room]);
-
-  useEffect(() => {
-    if (notes?.notes?.length) {
-      if (noteListPage === 1) {
-        setNotesForInfiniteScroll(notes.notes);
-      } else {
-        setNotesForInfiniteScroll((n) => {
-          if (
-            n.length &&
-            new Date(n[n.length - 1].createdAt) >
-              new Date(notes.notes[0].createdAt)
-          ) {
-            return [...n, ...notes?.notes];
-          }
-          return n;
-        });
-      }
     }
-  }, [notes?.notes, noteListPage]);
+  }, [refetchNotes, isOpen, noteListPage]);
 
   const onScroll = (e: any) => {
-    if (e.target.scrollHeight - e.target.scrollTop === e.target.clientHeight) {
+    if (
+      e.target.scrollHeight - e.target.scrollTop === e.target.clientHeight &&
+      notesForInfiniteScroll?.length >= noteListPage * 20
+    ) {
       setNoteListPage((p) => p + 1);
     }
   };
@@ -132,7 +138,8 @@ const NoteList: React.FC<NoteListProps> = ({
                   className={`react-viewer-icon react-viewer-icon-download`}></i>
               ),
               onClick: ({ src }) => {
-                if (selectedImage?.name) saveAs(src, selectedImage.name);
+                if (selectedImage?.fileName)
+                  saveAs(src, selectedImage.fileName);
               },
             },
           ]);
