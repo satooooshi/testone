@@ -48,25 +48,19 @@ export default function Home() {
           <PortalLinkBox href={PortalLinkType.MYSCHEDULE} />
         </div>
         <div className={homeStyles.box_wrapper}>
-          <PortalLinkBox href={PortalLinkType.ATTENDANCE} />
-        </div>
-        <div className={homeStyles.box_wrapper}>
           <PortalLinkBox href={PortalLinkType.WIKI} />
-        </div>
-        <div className={homeStyles.box_wrapper}>
-          <PortalLinkBox href={PortalLinkType.SUBMISSION_ETC} />
         </div>
         {/* <div className={homeStyles.box_wrapper}>
           <PortalLinkBox href={PortalLinkType.IMPRESSIVE_UNIVERSITY} />
         </div> */}
         <div className={homeStyles.box_wrapper}>
-          <PortalLinkBox href={PortalLinkType.STUDY_MEETING} />
+          <PortalLinkBox href={PortalLinkType.FANRETURN} />
         </div>
         {/* <div className={homeStyles.box_wrapper}>
           <PortalLinkBox href={PortalLinkType.BOLDAY} />
         </div> */}
         <div className={homeStyles.box_wrapper}>
-          <PortalLinkBox href={PortalLinkType.CLUB} />
+          <PortalLinkBox href={PortalLinkType.FAN_EVENT} />
         </div>
         <div className={homeStyles.box_wrapper}>
           <PortalLinkBox href={PortalLinkType.COACH} />
