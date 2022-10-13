@@ -80,7 +80,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
     ruleCategory: type === WikiType.RULES ? RuleCategory.RULES : undefined,
     boardCategory:
       type === WikiType.BOARD || !type
-        ? BoardCategory.QA
+        ? BoardCategory.OTHER
         : BoardCategory.NON_BOARD,
     textFormat: 'html',
   };
