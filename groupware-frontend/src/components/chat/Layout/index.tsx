@@ -70,6 +70,8 @@ const ChatLayout: FC<Props> = ({
     isSmallerThan768,
   });
 
+  const isOwner = modalStates?.editOwnersModalVisible;
+
   return (
     <LayoutWithTab
       sidebar={{ activeScreenName: SidebarScreenName.CHAT }}
@@ -99,6 +101,7 @@ const ChatLayout: FC<Props> = ({
               }
             }}
             isTalkRoom={isTalkRoom}
+            category={'メンバー'}
           />
 
           <CreateChatGroupModal
@@ -128,14 +131,16 @@ const ChatLayout: FC<Props> = ({
                 }
               />
               <EditChatGroupMembersModal
-                isOpen={modalStates.editMembersModalVisible}
+                isOpen={isOwner || modalStates.editMembersModalVisible}
                 room={currentRoom}
                 onComplete={(selectedUsersInModal) => {
                   updateGroup(
-                    {
-                      ...currentRoom,
-                      members: selectedUsersInModal,
-                    },
+                    !isOwner
+                      ? {
+                          ...currentRoom,
+                          members: selectedUsersInModal,
+                        }
+                      : { ...currentRoom, owner: selectedUsersInModal },
                     {
                       onSuccess: (newGroupInfo) => {
                         dispatchModal({
@@ -143,15 +148,24 @@ const ChatLayout: FC<Props> = ({
                           value: false,
                         });
                         toast({
-                          title: `メンバーを更新しました`,
+                          title: `${
+                            isOwner ? 'オーナー' : 'メンバー'
+                          }を更新しました`,
                           status: 'success',
                           duration: 3000,
                           isClosable: true,
                         });
-                        setCurrentRoom({
-                          ...newGroupInfo.room,
-                          members: selectedUsersInModal,
-                        });
+                        setCurrentRoom(
+                          !isOwner
+                            ? {
+                                ...newGroupInfo.room,
+                                members: selectedUsersInModal,
+                              }
+                            : {
+                                ...newGroupInfo.room,
+                                owner: selectedUsersInModal,
+                              },
+                        );
                       },
                       onError: () => {
                         toast({
@@ -170,6 +184,7 @@ const ChatLayout: FC<Props> = ({
                     value: false,
                   })
                 }
+                category={isOwner ? 'オーナー' : 'メンバー'}
               />
             </>
           )}

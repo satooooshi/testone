@@ -3,7 +3,8 @@ export type MenuValue =
   | 'editGroup'
   | 'editMembers'
   | 'leaveRoom'
-  | 'editOwners';
+  | 'editOwners'
+  | 'deleteRoom';
 
 export type ModalState = {
   editChatGroupModalVisible: boolean;
