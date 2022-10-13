@@ -342,7 +342,7 @@ const Profile: React.FC = () => {
             </Div>
             <Div mb="xl">
               <Text ml={'lg'} mb={'sm'} fontSize={16}>
-                所属支社
+                ジャンル
               </Text>
               <DropdownOpenerButton
                 fontSize={16}

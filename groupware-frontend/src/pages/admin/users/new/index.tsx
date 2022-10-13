@@ -512,7 +512,7 @@ const CreateNewUser = () => {
         </FormControl>
         <FormControl className={createNewUserStyles.input_wrapper}>
           <FormLabel fontWeight={'bold'}>
-            <p>社員区分</p>
+            <Text fontSize="14px">メンバー区分</Text>
           </FormLabel>
           <Select
             name="role"
@@ -540,7 +540,7 @@ const CreateNewUser = () => {
         </FormControl>
         <FormControl mb={4}>
           <FormLabel fontWeight={'bold'} fontSize="14px">
-            所属支社
+            ジャンル
           </FormLabel>
           <Select
             name="branch"
@@ -553,7 +553,7 @@ const CreateNewUser = () => {
             <option value={BranchType.OSAKA}>大阪</option>
           </Select>
         </FormControl>
-        <FormControl mb={4}>
+        {/* <FormControl mb={4}>
           <FormLabel fontWeight={'bold'} fontSize={14}>
             <p>社員コード</p>
           </FormLabel>
@@ -565,7 +565,7 @@ const CreateNewUser = () => {
             name="employeeId"
             onChange={handleChange}
           />
-        </FormControl>
+        </FormControl> */}
         <FormControl mb={4}>
           <FormLabel fontWeight={'bold'} fontSize={14}>
             <p>パスワード</p>

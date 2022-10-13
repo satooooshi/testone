@@ -88,7 +88,7 @@ export class EventScheduleService {
       { label: 'タイプ', value: 'type' },
       { label: '開催者', value: 'hostUsers' },
       { label: '参加者', value: 'users' },
-      { label: '参加者の社員コード', value: 'employeeId' },
+      // { label: '参加者の社員コード', value: 'employeeId' },
       { label: '参加人数', value: 'participantsCount' },
     ];
     const csvEvents: any[] = [];

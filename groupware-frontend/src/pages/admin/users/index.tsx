@@ -178,7 +178,7 @@ const UserAdmin: React.FC = () => {
                 <th className={userAdminStyles.table_head}>メールアドレス</th>
               ) : null}
               {/* <th className={userAdminStyles.table_head}>メールアドレス</th> */}
-              <th className={userAdminStyles.table_head}>社員区分</th>
+              <th className={userAdminStyles.table_head}>メンバー区分</th>
               {/* <th className={userAdminStyles.table_head}>勤怠</th> */}
               <th className={userAdminStyles.table_head}>編集</th>
               <th className={userAdminStyles.table_head}>削除</th>

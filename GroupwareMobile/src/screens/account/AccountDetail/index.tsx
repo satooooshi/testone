@@ -66,15 +66,15 @@ const DetailScreen: React.FC<DetailScreenProps> = ({profile, isLoading}) => {
     <Div px={18} mt="lg">
       {!isLoading ? (
         <>
-          <Div mb={'lg'}>
+          {/* <Div mb={'lg'}>
             <Text fontSize={14} fontWeight="bold">
               社員番号
             </Text>
             <Text fontSize={14}>{profile.employeeId || '未登録'}</Text>
-          </Div>
+          </Div> */}
           <Div mb={'lg'}>
             <Text fontSize={14} fontWeight="bold">
-              所属支社
+              ジャンル
             </Text>
             <Text fontSize={14}>{branchTypeNameFactory(profile.branch)}</Text>
           </Div>

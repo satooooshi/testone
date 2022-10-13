@@ -354,7 +354,7 @@ const UserRegisteringAdmin: React.FC = () => {
           </Div>
           <Div mb="xl">
             <Text ml={'lg'} mb={'sm'} fontSize={16}>
-              社員区分
+              メンバー区分
             </Text>
             <DropdownOpenerButton
               fontSize={16}
@@ -366,7 +366,7 @@ const UserRegisteringAdmin: React.FC = () => {
           </Div>
           <Div mb="xl">
             <Text ml={'lg'} mb={'sm'} fontSize={16}>
-              所属支社
+              ジャンル
             </Text>
             <DropdownOpenerButton
               fontSize={16}
@@ -374,7 +374,7 @@ const UserRegisteringAdmin: React.FC = () => {
               onPress={() => branchTypeDropdownRef.current?.open()}
             />
           </Div>
-          <Div mb="xl">
+          {/* <Div mb="xl">
             <Text ml={'lg'} mb={'sm'} fontSize={16}>
               社員コード
             </Text>
@@ -384,7 +384,7 @@ const UserRegisteringAdmin: React.FC = () => {
               onChangeText={t => setValues({...values, employeeId: t})}
               autoCapitalize="none"
             />
-          </Div>
+          </Div> */}
           <Div mb="xl">
             <Text ml={'lg'} mb={'sm'} fontSize={16}>
               パスワード

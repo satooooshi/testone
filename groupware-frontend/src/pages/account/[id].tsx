@@ -288,10 +288,10 @@ const MyAccountInfo = () => {
                   <Text>
                     {profile.isPhonePublic ? profile.phone : '非公開'}
                   </Text>
-                  <Text fontWeight="bold">所属支社</Text>
+                  <Text fontWeight="bold">ジャンル</Text>
                   <Text>{branchTypeNameFactory(profile.branch)}</Text>
-                  <Text fontWeight="bold">社員コード</Text>
-                  <Text>{profile.employeeId || '未登録'}</Text>
+                  {/* <Text fontWeight="bold">社員コード</Text>
+                  <Text>{profile.employeeId || '未登録'}</Text> */}
                 </SimpleGrid>
                 <Text fontSize="22px" fontWeight="bold" mb="12px" mr="auto">
                   タグ

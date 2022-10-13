@@ -49,11 +49,11 @@ const UserCardList: React.FC<UserCardListProps> = ({
       case 'event':
         return 'イベント参加数順';
       case 'question':
-        return '質問数順';
+        return 'メッセージ数順';
       case 'answer':
         return '回答数順';
       case 'knowledge':
-        return 'ナレッジ投稿数順';
+        return 'コメント数順';
       default:
         return '指定なし';
     }
@@ -127,7 +127,7 @@ const UserCardList: React.FC<UserCardListProps> = ({
               scrollToTop();
               setSearchQuery(q => ({...q, sort: 'question', page: '1'}));
             }}>
-            質問数順
+            メッセージ数順
           </Dropdown.Option>
           <Dropdown.Option
             {...defaultDropdownOptionProps}
@@ -145,7 +145,7 @@ const UserCardList: React.FC<UserCardListProps> = ({
               scrollToTop();
               setSearchQuery(q => ({...q, sort: 'knowledge', page: '1'}));
             }}>
-            ナレッジ投稿数順
+            コメント数順
           </Dropdown.Option>
         </Dropdown>
         <Dropdown ref={durationDropdownRef} {...defaultDropdownProps}>

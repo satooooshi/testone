@@ -137,9 +137,9 @@ const UserList = () => {
                 }}>
                 <option value="">指定なし</option>
                 <option value="event">イベント参加数順</option>
-                <option value="question">質問数順</option>
+                <option value="question">メッセージ数順</option>
                 <option value="answer">回答数順</option>
-                <option value="knowledge">ナレッジ投稿数順</option>
+                <option value="knowledge">コメント数順</option>
               </Select>
             </FormControl>
             <FormControl w="200px" ml="20px">

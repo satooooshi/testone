@@ -527,7 +527,7 @@ const Profile = () => {
         </FormControl>
         <FormControl mb={4}>
           <FormLabel fontWeight={'bold'} fontSize="14px">
-            <p>社員区分</p>
+            <p>メンバー区分</p>
           </FormLabel>
           <Select
             name="role"
@@ -555,7 +555,7 @@ const Profile = () => {
         </FormControl>
         <FormControl mb={4}>
           <FormLabel fontWeight={'bold'} fontSize="14px">
-            所属支社
+            ジャンル
           </FormLabel>
           <Select
             name="branch"

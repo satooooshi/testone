@@ -148,7 +148,7 @@ export const profileSchema = Yup.object().shape({
 
 export const createUserSchema = Yup.object().shape({
   ...profileValidation,
-  employeeId: Yup.string().required('社員コードは' + requireMessage),
+  // employeeId: Yup.string().required('社員コードは' + requireMessage),
   password: Yup.string()
     .matches(/^([^ ]*)$/, 'パスワードは' + blankMixedMessage)
     .min(8, 'パスワードは' + minEightTextMessage)
