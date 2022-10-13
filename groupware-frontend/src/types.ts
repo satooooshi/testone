@@ -8,8 +8,13 @@ export enum UserRole {
 }
 
 export enum BranchType {
-  TOKYO = 'tokyo',
-  OSAKA = 'osaka',
+  ARTIST = 'artist',
+  IDOL = 'idol',
+  YOUTUBER = 'youtuber',
+  TIKTOKER = 'tiktoker',
+  INSTAGRAMER = 'instagramer',
+  TALENT = 'talent',
+  OTHER = 'other',
   NON_SET = 'non_set',
 }
 

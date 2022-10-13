@@ -549,8 +549,13 @@ const CreateNewUser = () => {
             border="none"
             onChange={handleChange}>
             <option value={BranchType.NON_SET}>未設定</option>
-            <option value={BranchType.TOKYO}>東京</option>
-            <option value={BranchType.OSAKA}>大阪</option>
+            <option value={BranchType.ARTIST}>アーティスト</option>
+            <option value={BranchType.IDOL}>アイドル</option>
+            <option value={BranchType.YOUTUBER}>YouTuber</option>
+            <option value={BranchType.TIKTOKER}>TikToker</option>
+            <option value={BranchType.INSTAGRAMER}>インスタグラマー</option>
+            <option value={BranchType.TALENT}>タレント</option>
+            <option value={BranchType.OTHER}>その他</option>
           </Select>
         </FormControl>
         {/* <FormControl mb={4}>
