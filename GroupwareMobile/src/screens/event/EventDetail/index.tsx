@@ -266,16 +266,16 @@ const EventDetail: React.FC = () => {
   };
   const defaultImage = () => {
     switch (eventInfo?.type) {
-      case EventType.STUDY_MEETING:
-        return require('../../../../assets/study_meeting_1.jpg');
-      case EventType.IMPRESSIVE_UNIVERSITY:
-        return require('../../../../assets/impressive_university_1.png');
-      case EventType.BOLDAY:
-        return require('../../../../assets/bolday_1.jpg');
-      case EventType.COACH:
-        return require('../../../../assets/coach_1.jpeg');
-      case EventType.CLUB:
-        return require('../../../../assets/club_3.jpg');
+      // case EventType.STUDY_MEETING:
+      //   return require('../../../../assets/study_meeting_1.jpg');
+      // case EventType.IMPRESSIVE_UNIVERSITY:
+      //   return require('../../../../assets/impressive_university_1.png');
+      // case EventType.BOLDAY:
+      //   return require('../../../../assets/bolday_1.jpg');
+      // case EventType.COACH:
+      //   return require('../../../../assets/coach_1.jpeg');
+      // case EventType.CLUB:
+      //   return require('../../../../assets/club_3.jpg');
       default:
         return undefined;
     }
@@ -394,40 +394,24 @@ const EventDetail: React.FC = () => {
               </Text>
               <Div my="sm" borderWidth={1} borderColor="gray300" />
               <Div mt={5}>
-                {eventInfo.type !== EventType.SUBMISSION_ETC ? (
-                  <Div mr={4}>
-                    <FastImage
-                      style={{
-                        ...eventDetailStyles.image,
-                        minHeight: windowWidth * 0.7,
-                        maxHeight: windowWidth * 0.8,
-                      }}
-                      resizeMode="cover"
-                      source={
-                        eventInfo.imageURL
-                          ? {uri: eventInfo.imageURL}
-                          : defaultImage()
-                      }
-                    />
-                  </Div>
-                ) : (
-                  <Div justifyContent="center" alignItems="center">
-                    <Icon
-                      name="filetext1"
-                      fontSize={80}
-                      style={{
-                        ...eventDetailStyles.image,
-                        width: windowWidth,
-                        minHeight: windowWidth * 0.8,
-                      }}
-                    />
-                  </Div>
-                )}
+                <Div mr={4}>
+                  <FastImage
+                    style={{
+                      ...eventDetailStyles.image,
+                      minHeight: windowWidth * 0.7,
+                      maxHeight: windowWidth * 0.8,
+                    }}
+                    resizeMode="cover"
+                    source={
+                      eventInfo.imageURL
+                        ? {uri: eventInfo.imageURL}
+                        : defaultImage()
+                    }
+                  />
+                </Div>
               </Div>
               <Div flexDir="row" alignSelf="flex-end" mb={16}>
-                {eventInfo.type !== 'submission_etc' &&
-                !isFinished &&
-                !eventInfo.isCanceled ? (
+                {!isFinished && !eventInfo.isCanceled ? (
                   <Button
                     fontSize={13}
                     rounded={50}
@@ -442,8 +426,7 @@ const EventDetail: React.FC = () => {
                     }}>
                     {eventInfo.isJoining ? 'キャンセルする' : 'イベントに参加'}
                   </Button>
-                ) : eventInfo.type !== 'submission_etc' &&
-                  !isFinished &&
+                ) : !isFinished &&
                   eventInfo.isCanceled &&
                   eventInfo.isJoining ? (
                   <Text
@@ -554,164 +537,66 @@ const EventDetail: React.FC = () => {
                     />
                   ))
                 : null}
-              {eventInfo.type !== EventType.SUBMISSION_ETC ? (
-                <Div>
-                  {userJoiningEvents && (
-                    <EventParticipants
-                      userJoiningEvents={eventInfo.userJoiningEvent}
-                      isEditable={isEditableEvent(eventInfo, user)}
-                      onSuccessSaveUserJoiningEvent={() => refetchEvents()}
-                    />
-                  )}
+              <Div>
+                {userJoiningEvents && (
+                  <EventParticipants
+                    userJoiningEvents={eventInfo.userJoiningEvent}
+                    isEditable={isEditableEvent(eventInfo, user)}
+                    onSuccessSaveUserJoiningEvent={() => refetchEvents()}
+                  />
+                )}
 
-                  <Div
-                    borderBottomWidth={1}
-                    borderColor="green400"
-                    flexDir="row"
-                    justifyContent="space-between"
-                    alignItems="flex-end"
-                    mb="lg"
-                    pb="md"
-                    mt={16}>
-                    <Text>
-                      コメント:
-                      {eventInfo?.comments.length || 0}件
-                    </Text>
-                    <Button
-                      py={4}
-                      color="white"
-                      onPress={() => {
-                        commentVisible
-                          ? checkValidateErrors()
-                          : setCommentVisible(true);
-                      }}>
-                      {commentVisible ? 'コメントを投稿する' : 'コメントを追加'}
-                    </Button>
-                  </Div>
-                  {commentVisible && (
-                    <TextInput
-                      value={values.body}
-                      onChangeText={t => setValues({...values, body: t})}
-                      placeholder="コメントを記入してください。"
-                      textAlignVertical={'top'}
-                      multiline={true}
-                      autoCapitalize="none"
-                      style={tailwind(
-                        'border border-green-400 mb-4 bg-white rounded border-blue-500 p-2 h-24',
-                      )}
-                    />
-                  )}
-                  {eventInfo?.comments && eventInfo?.comments.length
-                    ? eventInfo?.comments.map(
-                        comment =>
-                          comment.writer && (
-                            <EventCommentCard
-                              key={comment.id}
-                              body={comment.body}
-                              date={comment.createdAt}
-                              writer={comment.writer}
-                            />
-                          ),
-                      )
-                    : null}
+                <Div
+                  borderBottomWidth={1}
+                  borderColor="green400"
+                  flexDir="row"
+                  justifyContent="space-between"
+                  alignItems="flex-end"
+                  mb="lg"
+                  pb="md"
+                  mt={16}>
+                  <Text>
+                    コメント:
+                    {eventInfo?.comments.length || 0}件
+                  </Text>
+                  <Button
+                    py={4}
+                    color="white"
+                    onPress={() => {
+                      commentVisible
+                        ? checkValidateErrors()
+                        : setCommentVisible(true);
+                    }}>
+                    {commentVisible ? 'コメントを投稿する' : 'コメントを追加'}
+                  </Button>
                 </Div>
-              ) : eventInfo.type === EventType.SUBMISSION_ETC ? (
-                <>
-                  <Div
-                    m={16}
-                    borderBottomWidth={1}
-                    borderColor="green400"
-                    mb="lg"
-                    pb="md">
-                    {!isFinishedEvent(eventInfo) && (
-                      <Div
-                        flexDir="row"
-                        justifyContent="space-between"
-                        alignItems="flex-end">
-                        <Div>
-                          <Button
-                            py={0}
-                            bg="blue600"
-                            color="white"
-                            h={40}
-                            rounded="lg"
-                            onPress={() => handleUploadSubmission()}>
-                            提出物を追加
-                          </Button>
-                        </Div>
-                        <Button
-                          py={0}
-                          bg="pink600"
-                          color="white"
-                          h={40}
-                          rounded="lg"
-                          onPress={() => {
-                            saveSubmission(unsavedSubmissions);
-                          }}>
-                          提出状況を保存
-                        </Button>
-                      </Div>
+                {commentVisible && (
+                  <TextInput
+                    value={values.body}
+                    onChangeText={t => setValues({...values, body: t})}
+                    placeholder="コメントを記入してください。"
+                    textAlignVertical={'top'}
+                    multiline={true}
+                    autoCapitalize="none"
+                    style={tailwind(
+                      'border border-green-400 mb-4 bg-white rounded border-blue-500 p-2 h-24',
                     )}
-                    <Text fontWeight="bold">{`${eventInfo?.submissionFiles?.length}件のファイルを提出済み`}</Text>
-                    <Text color="tomato" fontSize={12}>
-                      {
-                        '※水色のアイコンのファイルはまだ提出状況が保存されていません'
-                      }
-                    </Text>
-                  </Div>
-                  <Div flexDir="row" flexWrap="wrap" mx={16}>
-                    {eventInfo?.submissionFiles?.map(f =>
-                      f.url && f.name ? (
-                        <Div flexDir="row" mr={4}>
-                          <Div mb={4}>
-                            <FileIcon name={f.name} url={f.url} />
-                          </Div>
-                          <Div ml={-12} mt={-5}>
-                            <TouchableOpacity onPress={() => handleDelete(f)}>
-                              <Icon
-                                name="closecircle"
-                                color="gray900"
-                                fontSize={24}
-                              />
-                            </TouchableOpacity>
-                          </Div>
-                        </Div>
-                      ) : null,
-                    )}
-                    {unsavedSubmissions?.map(f =>
-                      f.url && f.name ? (
-                        <Div flexDir="row" mr={4}>
-                          <Div mb={4}>
-                            <Div mr={4} mb={4}>
-                              <FileIcon
-                                name={f.name}
-                                url={f.url}
-                                color="blue"
-                              />
-                            </Div>
-                          </Div>
-                          <Div ml={-12} mt={-5}>
-                            <TouchableOpacity
-                              onPress={() =>
-                                setUnsavedSubmissions(
-                                  unsavedSubmissions.filter(
-                                    file => file.url !== f.url,
-                                  ),
-                                )
-                              }>
-                              <Icon
-                                name="closecircle"
-                                color="gray900"
-                                fontSize={24}
-                              />
-                            </TouchableOpacity>
-                          </Div>
-                        </Div>
-                      ) : null,
-                    )}
-                  </Div>
-                </>
-              ) : null}
+                  />
+                )}
+                {eventInfo?.comments && eventInfo?.comments.length
+                  ? eventInfo?.comments.map(
+                      comment =>
+                        comment.writer && (
+                          <EventCommentCard
+                            key={comment.id}
+                            body={comment.body}
+                            date={comment.createdAt}
+                            writer={comment.writer}
+                          />
+                        ),
+                    )
+                  : null}
+              </Div>
             </Div>
           </ScrollDiv>
         </>

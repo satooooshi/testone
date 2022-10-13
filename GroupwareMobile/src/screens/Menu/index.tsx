@@ -155,7 +155,7 @@ const Home: React.FC = () => {
           </Div>
         </Div> */}
 
-        <Div flexDir="row" mb={8}>
+        {/* <Div flexDir="row" mb={8}>
           <Div flex={1} mr={12}>
             <PortalLinkBox
               type="study_meeting"
@@ -180,9 +180,9 @@ const Home: React.FC = () => {
               }
             />
           </Div>
-        </Div>
+        </Div> */}
 
-        <Div flexDir="row" mb={8}>
+        {/* <Div flexDir="row" mb={8}>
           <Div flex={1} mr={12}>
             <PortalLinkBox
               type="club"
@@ -209,7 +209,7 @@ const Home: React.FC = () => {
               }
             />
           </Div>
-        </Div>
+        </Div> */}
 
         <Div flexDir="row" mb={8}>
           <Div flex={1} mr={12}>
