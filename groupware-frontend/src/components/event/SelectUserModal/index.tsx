@@ -65,7 +65,7 @@ const SelectUserModal: React.FC<SelectUserModalProps> = ({
   onComplete,
 }) => {
   const [selectedRole, setSelectedRole] = useState<UserRole | 'all'>(
-    UserRole.INTERNAL_INSTRUCTOR,
+    UserRole.INFLUENCER,
   );
   const [modalUsers, setModalUsers] = useState(users);
   const [searchWords, setSearchWords] = useState<RegExpMatchArray | null>();
