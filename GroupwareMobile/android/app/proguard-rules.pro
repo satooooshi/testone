@@ -9,5 +9,5 @@
 
 # Add any project specific keep options here:
 
--keep class com.valleyinapp.BuildConfig { *; }
+-keep class com.fanreturn.android.BuildConfig { *; }
 

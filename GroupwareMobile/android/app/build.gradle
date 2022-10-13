@@ -145,8 +145,8 @@ android {
     }
 
     defaultConfig {
-        resValue "string", "build_config_package", "com.valleyinapp"
-        applicationId "com.valleyinapp"
+        resValue "string", "build_config_package", "com.fanreturn.android"
+        applicationId "com.fanreturn.android"
         minSdkVersion 26
         targetSdkVersion 31
         versionCode 19

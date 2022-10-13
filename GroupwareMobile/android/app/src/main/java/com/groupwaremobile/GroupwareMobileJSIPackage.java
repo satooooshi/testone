@@ -1,4 +1,4 @@
-package com.valleyinapp;
+package com.fanreturn.android;
 
 import com.facebook.react.bridge.JSIModuleSpec;
 import com.facebook.react.bridge.JavaScriptContextHolder;
