@@ -40,16 +40,18 @@ import { UserGoodForBoard } from './userGoodForBord.entity';
 
 export enum UserRole {
   ADMIN = 'admin',
-  EXTERNAL_INSTRUCTOR = 'external_instructor',
-  INTERNAL_INSTRUCTOR = 'internal_instructor',
-  COACH = 'coach',
+  INFLUENCER = 'influencer',
   COMMON = 'common',
 }
 
 export enum BranchType {
-  TOKYO = 'tokyo',
-  OSAKA = 'osaka',
-  NON_SET = 'non_set',
+  ARTIST = 'artist',
+  IDOL = 'idol',
+  YOUTUBER = 'youtuber',
+  TIKTOKER = 'tiktoker',
+  INSTAGRAMER = 'instagramer',
+  TALENT = 'talent',
+  OTHER = 'other',
 }
 
 @Entity({ name: 'users' })
@@ -132,7 +134,7 @@ export class User {
   @Column({
     type: 'enum',
     enum: BranchType,
-    default: BranchType.NON_SET,
+    default: BranchType.OTHER,
   })
   branch: BranchType;
 
