@@ -5,7 +5,7 @@ export class modifyUserTable1665642815550 implements MigrationInterface {
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(
-      `ALTER TABLE users CHANGE branch branch enum ('artist', 'idol', 'youtuber', 'tiktoker', 'instagramer', 'talent', 'other') NOT NULL DEFAULT 'other'`,
+      `ALTER TABLE users CHANGE branch branch enum ('non_set', 'artist', 'idol', 'youtuber', 'tiktoker', 'instagramer', 'talent', 'other') NOT NULL DEFAULT 'other'`,
     );
     await queryRunner.query(
       `ALTER TABLE users CHANGE role role enum ('admin', 'influencer', 'common') NOT NULL DEFAULT 'common'`,

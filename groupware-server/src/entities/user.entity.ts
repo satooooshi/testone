@@ -52,6 +52,7 @@ export enum BranchType {
   INSTAGRAMER = 'instagramer',
   TALENT = 'talent',
   OTHER = 'other',
+  NON_SET = 'non_set',
 }
 
 @Entity({ name: 'users' })
