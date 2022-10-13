@@ -52,9 +52,9 @@ const UserCard: React.FC<UserCardProps> = ({ user, onClickTag, duration }) => {
   }, [user.tags]);
 
   const tagCategories: TagCategoryProps[] = [
-    { label: '技術', type: TagType.TECH, color: 'teal' },
-    { label: '資格', type: TagType.QUALIFICATION, color: 'blue' },
-    { label: '部活動', type: TagType.CLUB, color: 'green' },
+    { label: '才能・スキル', type: TagType.TECH, color: 'teal' },
+    { label: 'ジャンル', type: TagType.QUALIFICATION, color: 'blue' },
+    { label: '活動地域', type: TagType.CLUB, color: 'green' },
     { label: '趣味', type: TagType.HOBBY, color: 'pink' },
   ];
 

@@ -303,10 +303,10 @@ const MyAccountInfo = () => {
                   mb="20px"
                   rounded="5px"
                   spacingY="16px">
-                  <Text fontWeight="bold">技術タグ</Text>
+                  <Text fontWeight="bold">才能・スキルタグ</Text>
                   <UserTagList tags={profile.tags} type={TagType.TECH} />
                   <Text mb="8px">{profile.introduceTech || '未入力'}</Text>
-                  <Text fontWeight="bold">資格タグ</Text>
+                  <Text fontWeight="bold">ジャンルタグ</Text>
                   <UserTagList
                     tags={profile.tags}
                     type={TagType.QUALIFICATION}
@@ -314,7 +314,7 @@ const MyAccountInfo = () => {
                   <Text mb="8px">
                     {profile.introduceQualification || '未入力'}
                   </Text>
-                  <Text fontWeight="bold">部活動タグ</Text>
+                  <Text fontWeight="bold">活動地域タグ</Text>
                   <UserTagList tags={profile.tags} type={TagType.CLUB} />
                   <Text mb="8px">{profile.introduceClub || '未入力'}</Text>
                   <Text fontWeight="bold">趣味タグ</Text>

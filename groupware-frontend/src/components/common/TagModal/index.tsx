@@ -112,9 +112,9 @@ const TagModal: React.FC<TagModalProps> = ({
             }
             defaultValue={selectedTagType}>
             <option value={'all'}>全て</option>
-            <option value={TagType.TECH}>技術</option>
-            <option value={TagType.CLUB}>部活動</option>
-            <option value={TagType.QUALIFICATION}>資格</option>
+            <option value={TagType.TECH}>才能・スキル</option>
+            <option value={TagType.CLUB}>ジャンル</option>
+            <option value={TagType.QUALIFICATION}>活動地域</option>
             <option value={TagType.HOBBY}>趣味</option>
             <option value={TagType.OTHER}>その他</option>
           </Select>

@@ -3,11 +3,11 @@ import { TagType } from 'src/types';
 export const tagTypeNameFactory = (tagType: TagType): string => {
   switch (tagType) {
     case TagType.TECH:
-      return '技術';
+      return '才能・スキル';
     case TagType.QUALIFICATION:
-      return '資格';
+      return 'ジャンル';
     case TagType.CLUB:
-      return '部活動';
+      return '活動地域';
     case TagType.HOBBY:
       return '趣味';
     default:
