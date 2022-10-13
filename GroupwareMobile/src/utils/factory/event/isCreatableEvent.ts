@@ -14,7 +14,7 @@ export const isCreatableEvent = (
     case EventType.BOLDAY:
       return userRole === UserRole.ADMIN;
     case EventType.COACH:
-      return userRole === UserRole.ADMIN || userRole === UserRole.COACH;
+      return userRole === UserRole.ADMIN || userRole === UserRole.INFLUENCER;
     case EventType.CLUB:
       return (
         userRole === UserRole.ADMIN ||

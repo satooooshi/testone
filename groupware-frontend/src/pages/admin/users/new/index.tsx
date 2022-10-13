@@ -524,14 +524,8 @@ const CreateNewUser = () => {
             <option value={UserRole.ADMIN}>
               {userRoleNameFactory(UserRole.ADMIN)}
             </option>
-            <option value={UserRole.EXTERNAL_INSTRUCTOR}>
-              {userRoleNameFactory(UserRole.EXTERNAL_INSTRUCTOR)}
-            </option>
-            <option value={UserRole.INTERNAL_INSTRUCTOR}>
-              {userRoleNameFactory(UserRole.INTERNAL_INSTRUCTOR)}
-            </option>
-            <option value={UserRole.COACH}>
-              {userRoleNameFactory(UserRole.COACH)}
+            <option value={UserRole.INFLUENCER}>
+              {userRoleNameFactory(UserRole.INFLUENCER)}
             </option>
             <option value={UserRole.COMMON}>
               {userRoleNameFactory(UserRole.COMMON)}

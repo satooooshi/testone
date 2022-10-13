@@ -73,13 +73,9 @@ const UserList = () => {
       query.role === UserRole.ADMIN
         ? '管理者'
         : query.role === UserRole.COMMON
-        ? '一般社員'
-        : query.role === UserRole.COACH
-        ? 'コーチ'
-        : query.role === UserRole.INTERNAL_INSTRUCTOR
-        ? '講師(社員)'
-        : query.role === UserRole.EXTERNAL_INSTRUCTOR
-        ? '講師(外部)'
+        ? 'ファン'
+        : query.role === UserRole.INFLUENCER
+        ? 'インフルエンサー'
         : '全て',
     tabs: tabs,
   };

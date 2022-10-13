@@ -13,7 +13,7 @@ export const useUserRole = (
   const filteredUsers =
     selectedUserRole !== 'All'
       ? users?.filter((u) => u.role === selectedUserRole)
-      : users?.filter((u) => u.role !== UserRole.EXTERNAL_INSTRUCTOR);
+      : users;
 
   const selectUserRole = (userRole: UserRoleInApp) => {
     setSelectedUserRole(userRole);

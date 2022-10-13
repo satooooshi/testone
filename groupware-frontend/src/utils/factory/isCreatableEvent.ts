@@ -14,7 +14,7 @@ export const isCreatableEvent = (
     //     userRole === UserRole.ADMIN || userRole === UserRole.INTERNAL_INSTRUCTOR
     //   );
     // case EventType.COACH:
-    //   return userRole === UserRole.ADMIN || userRole === UserRole.COACH;
+    //   return userRole === UserRole.ADMIN || userRole === UserRole.INFLUENCER;
     // case EventType.CLUB:
     //   return (
     //     userRole === UserRole.ADMIN ||

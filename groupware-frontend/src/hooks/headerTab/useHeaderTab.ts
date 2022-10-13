@@ -237,30 +237,17 @@ const headerTab = (headerTabBehavior: HeaderTabBehavior): Tab[] => {
           },
         },
         {
-          name: '一般社員',
+          name: 'ファン',
           onClick: () => {
             if (queryRefresh)
               queryRefresh({ role: UserRole.COMMON, page: '1' });
           },
         },
         {
-          name: 'コーチ',
-          onClick: () => {
-            if (queryRefresh) queryRefresh({ role: UserRole.COACH, page: '1' });
-          },
-        },
-        {
-          name: '講師(社員)',
+          name: 'インフルエンサー',
           onClick: () => {
             if (queryRefresh)
-              queryRefresh({ role: UserRole.INTERNAL_INSTRUCTOR, page: '1' });
-          },
-        },
-        {
-          name: '講師(外部)',
-          onClick: () => {
-            if (queryRefresh)
-              queryRefresh({ role: UserRole.EXTERNAL_INSTRUCTOR, page: '1' });
+              queryRefresh({ role: UserRole.INFLUENCER, page: '1' });
           },
         },
       ];

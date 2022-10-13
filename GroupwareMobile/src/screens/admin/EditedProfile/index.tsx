@@ -212,27 +212,11 @@ const EditedProfile: React.FC = () => {
         </Dropdown.Option>
         <Dropdown.Option
           {...defaultDropdownOptionProps}
-          value={UserRole.COACH}
+          value={UserRole.INFLUENCER}
           onPress={() => {
-            setValues(v => ({...v, role: UserRole.COACH}));
+            setValues(v => ({...v, role: UserRole.INFLUENCER}));
           }}>
-          {userRoleNameFactory(UserRole.COACH)}
-        </Dropdown.Option>
-        <Dropdown.Option
-          {...defaultDropdownOptionProps}
-          value={UserRole.INTERNAL_INSTRUCTOR}
-          onPress={() => {
-            setValues(v => ({...v, role: UserRole.INTERNAL_INSTRUCTOR}));
-          }}>
-          {userRoleNameFactory(UserRole.INTERNAL_INSTRUCTOR)}
-        </Dropdown.Option>
-        <Dropdown.Option
-          {...defaultDropdownOptionProps}
-          value={UserRole.EXTERNAL_INSTRUCTOR}
-          onPress={() => {
-            setValues(v => ({...v, role: UserRole.EXTERNAL_INSTRUCTOR}));
-          }}>
-          {userRoleNameFactory(UserRole.EXTERNAL_INSTRUCTOR)}
+          {userRoleNameFactory(UserRole.INFLUENCER)}
         </Dropdown.Option>
       </Dropdown>
       {values && (
@@ -427,19 +411,80 @@ const EditedProfile: React.FC = () => {
               </Dropdown.Option>
               <Dropdown.Option
                 {...defaultDropdownOptionProps}
-                value={BranchType.TOKYO}
                 onPress={() =>
-                  setValues(v => ({...v, branch: BranchType.TOKYO}))
-                }>
-                {branchTypeNameFactory(BranchType.TOKYO)}
+                  setValues(e => ({
+                    ...e,
+                    type: BranchType.ARTIST,
+                  }))
+                }
+                value={BranchType.ARTIST}>
+                {branchTypeNameFactory(BranchType.ARTIST)}
               </Dropdown.Option>
               <Dropdown.Option
                 {...defaultDropdownOptionProps}
-                value={BranchType.OSAKA}
                 onPress={() =>
-                  setValues(v => ({...v, branch: BranchType.OSAKA}))
-                }>
-                {branchTypeNameFactory(BranchType.OSAKA)}
+                  setValues(e => ({
+                    ...e,
+                    type: BranchType.IDOL,
+                  }))
+                }
+                value={BranchType.IDOL}>
+                {branchTypeNameFactory(BranchType.IDOL)}
+              </Dropdown.Option>
+              <Dropdown.Option
+                {...defaultDropdownOptionProps}
+                onPress={() =>
+                  setValues(e => ({
+                    ...e,
+                    type: BranchType.YOUTUBER,
+                  }))
+                }
+                value={BranchType.YOUTUBER}>
+                {branchTypeNameFactory(BranchType.YOUTUBER)}
+              </Dropdown.Option>
+              <Dropdown.Option
+                {...defaultDropdownOptionProps}
+                onPress={() =>
+                  setValues(e => ({
+                    ...e,
+                    type: BranchType.TIKTOKER,
+                  }))
+                }
+                value={BranchType.TIKTOKER}>
+                {branchTypeNameFactory(BranchType.TIKTOKER)}
+              </Dropdown.Option>
+              <Dropdown.Option
+                {...defaultDropdownOptionProps}
+                onPress={() =>
+                  setValues(e => ({
+                    ...e,
+                    type: BranchType.INSTAGRAMER,
+                  }))
+                }
+                value={BranchType.INSTAGRAMER}>
+                {branchTypeNameFactory(BranchType.INSTAGRAMER)}
+              </Dropdown.Option>
+              <Dropdown.Option
+                {...defaultDropdownOptionProps}
+                onPress={() =>
+                  setValues(e => ({
+                    ...e,
+                    type: BranchType.TALENT,
+                  }))
+                }
+                value={BranchType.TALENT}>
+                {branchTypeNameFactory(BranchType.TALENT)}
+              </Dropdown.Option>
+              <Dropdown.Option
+                {...defaultDropdownOptionProps}
+                onPress={() =>
+                  setValues(e => ({
+                    ...e,
+                    type: BranchType.OTHER,
+                  }))
+                }
+                value={BranchType.OTHER}>
+                {branchTypeNameFactory(BranchType.OTHER)}
               </Dropdown.Option>
             </Dropdown>
             <Div mb="xl">

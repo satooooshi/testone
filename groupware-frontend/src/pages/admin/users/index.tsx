@@ -136,14 +136,7 @@ const UserAdmin: React.FC = () => {
         tags={tags || []}
         selectedTags={selectedTags}
         toggleTag={onToggleTag}
-        selectItems={[
-          '全て',
-          '管理者',
-          '一般社員',
-          'コーチ',
-          '講師(社員)',
-          '講師(外部)',
-        ]}
+        selectItems={['全て', '管理者', 'ファン', 'インフルエンサー']}
         selectingItem={userRoleValueToName(query.role)}
         onSelect={(e) =>
           queryRefresh({

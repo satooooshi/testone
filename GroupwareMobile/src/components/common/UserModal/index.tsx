@@ -218,9 +218,9 @@ const UserModal: React.FC<UserModalProps> = props => {
         </Dropdown.Option>
         <Dropdown.Option
           {...defaultDropdownOptionProps}
-          onPress={() => selectUserRole(UserRole.COACH)}
-          value={UserRole.COACH}>
-          {userRoleNameFactory(UserRole.COACH)}
+          onPress={() => selectUserRole(UserRole.INFLUENCER)}
+          value={UserRole.INFLUENCER}>
+          {userRoleNameFactory(UserRole.INFLUENCER)}
         </Dropdown.Option>
         <Dropdown.Option
           {...defaultDropdownOptionProps}

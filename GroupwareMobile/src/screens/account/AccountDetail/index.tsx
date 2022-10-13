@@ -313,9 +313,7 @@ const AccountDetail: React.FC = () => {
                 </Button>
               ) : null}
 
-              {profile &&
-              profile.id !== user?.id &&
-              profile.role !== UserRole.EXTERNAL_INSTRUCTOR ? (
+              {profile && profile.id !== user?.id ? (
                 <Div flexDir="row" mb={20}>
                   <Button
                     rounded="circle"

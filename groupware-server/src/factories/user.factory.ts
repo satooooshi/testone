@@ -5,13 +5,7 @@ import { hashSync } from 'bcrypt';
 
 define(User, (): User => {
   const user = new User();
-  const userRoleArray = [
-    UserRole.COMMON,
-    UserRole.ADMIN,
-    UserRole.EXTERNAL_INSTRUCTOR,
-    UserRole.INTERNAL_INSTRUCTOR,
-    UserRole.COACH,
-  ];
+  const userRoleArray = [UserRole.COMMON, UserRole.ADMIN, UserRole.INFLUENCER];
   user.email = faker.internet.email();
   user.lastName = faker.name.lastName();
   user.firstName = faker.name.firstName();

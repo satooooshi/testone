@@ -322,33 +322,32 @@ const MyAccountInfo = () => {
                   <Text mb="8px">{profile.introduceHobby || '未入力'}</Text>
                 </SimpleGrid>
                 <Box w="100%">
-                  {profile?.id !== user?.id &&
-                    profile.role !== UserRole.EXTERNAL_INSTRUCTOR && (
-                      <Button
-                        h={'64px'}
-                        w={'64px'}
-                        bg={blueColor}
-                        position={'fixed'}
-                        top={'auto'}
-                        bottom={'24px'}
-                        right={'24px'}
-                        rounded={'full'}
-                        zIndex={1}
-                        px={0}
-                        _hover={{ textDecoration: 'none' }}>
-                        <HiOutlineChat
-                          style={{ width: 40, height: 40 }}
-                          onClick={() =>
-                            createGroup({
-                              name: '',
-                              members: [profile],
-                              roomType: RoomType.PERSONAL,
-                            })
-                          }
-                          color="white"
-                        />
-                      </Button>
-                    )}
+                  {profile?.id !== user?.id && (
+                    <Button
+                      h={'64px'}
+                      w={'64px'}
+                      bg={blueColor}
+                      position={'fixed'}
+                      top={'auto'}
+                      bottom={'24px'}
+                      right={'24px'}
+                      rounded={'full'}
+                      zIndex={1}
+                      px={0}
+                      _hover={{ textDecoration: 'none' }}>
+                      <HiOutlineChat
+                        style={{ width: 40, height: 40 }}
+                        onClick={() =>
+                          createGroup({
+                            name: '',
+                            members: [profile],
+                            roomType: RoomType.PERSONAL,
+                          })
+                        }
+                        color="white"
+                      />
+                    </Button>
+                  )}
                 </Box>
               </>
             )}

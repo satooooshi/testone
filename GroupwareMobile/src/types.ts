@@ -12,9 +12,7 @@ export type DeepPartial<T> = T extends Function
 
 export enum UserRole {
   ADMIN = 'admin',
-  EXTERNAL_INSTRUCTOR = 'external_instructor',
-  INTERNAL_INSTRUCTOR = 'internal_instructor',
-  COACH = 'coach',
+  INFLUENCER = 'influencer',
   COMMON = 'common',
 }
 
