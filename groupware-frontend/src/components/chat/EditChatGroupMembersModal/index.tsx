@@ -250,7 +250,7 @@ const EditChatGroupMembersModal: React.FC<EditChatGroupMambersModalProps> = ({
                 <Box mr={'4px'} mb={'4px'} key={u.id}>
                   <ButtonGroup isAttached size="xs" colorScheme="purple">
                     <Button mr="-px">{userNameFactory(u)}</Button>
-                    {(room?.owner[0]?.id === myProfile?.id ||
+                    {((room?.owner && room?.owner[0]?.id === myProfile?.id) ||
                       room?.members?.filter((m) => m.id === u.id).length ===
                         0) && (
                       <IconButton
