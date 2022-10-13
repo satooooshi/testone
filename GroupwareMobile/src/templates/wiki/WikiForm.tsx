@@ -59,7 +59,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
     boardCategory: boardCategory
       ? boardCategory
       : !type || type === WikiType.BOARD
-      ? BoardCategory.QA
+      ? BoardCategory.OTHER
       : BoardCategory.NON_BOARD,
     textFormat: 'html',
   };
@@ -162,7 +162,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
       {...defaultDropdownProps}
       title="タイプを選択"
       ref={typeDropdownRef}>
-      {isCreatableWiki({type: WikiType.RULES, userRole: user?.role}) ? (
+      {/* {isCreatableWiki({type: WikiType.RULES, userRole: user?.role}) ? (
         <Dropdown.Option
           {...defaultDropdownOptionProps}
           onPress={() =>
@@ -241,7 +241,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
         </Dropdown.Option>
       ) : (
         <></>
-      )}
+      )} */}
       {isCreatableWiki({type: WikiType.ALL_POSTAL, userRole: user?.role}) ? (
         <Dropdown.Option
           {...defaultDropdownOptionProps}
@@ -284,7 +284,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
       ) : (
         <></>
       )}
-      {isCreatableWiki({
+      {/* {isCreatableWiki({
         type: WikiType.BOARD,
         boardCategory: BoardCategory.QA,
         userRole: user?.role,
@@ -309,7 +309,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
         </Dropdown.Option>
       ) : (
         <></>
-      )}
+      )} */}
       {isCreatableWiki({
         type: WikiType.BOARD,
         boardCategory: BoardCategory.NEWS,
@@ -388,7 +388,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
       ) : (
         <></>
       )}
-      {isCreatableWiki({
+      {/* {isCreatableWiki({
         type: WikiType.BOARD,
         boardCategory: BoardCategory.STUDY_MEETING,
         userRole: user?.role,
@@ -413,7 +413,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
         </Dropdown.Option>
       ) : (
         <></>
-      )}
+      )} */}
       {isCreatableWiki({
         type: WikiType.BOARD,
         boardCategory: BoardCategory.SELF_IMPROVEMENT,
@@ -440,7 +440,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
       ) : (
         <></>
       )}
-      {isCreatableWiki({
+      {/* {isCreatableWiki({
         type: WikiType.BOARD,
         boardCategory: BoardCategory.PERSONAL_ANNOUNCEMENT,
         userRole: user?.role,
@@ -491,7 +491,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
         </Dropdown.Option>
       ) : (
         <></>
-      )}
+      )} */}
       {isCreatableWiki({
         type: WikiType.BOARD,
         boardCategory: BoardCategory.OTHER,

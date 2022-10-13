@@ -400,21 +400,21 @@ const headerTab = (headerTabBehavior: HeaderTabBehavior): Tab[] => {
             }
           },
         },
+        // {
+        //   name: '社内規則',
+        //   onClick: () => {
+        //     {
+        //       if (queryRefresh)
+        //         queryRefresh({
+        //           type: WikiType.RULES,
+        //           rule_category: RuleCategory.PHILOSOPHY,
+        //           board_category: undefined,
+        //         });
+        //     }
+        //   },
+        // },
         {
-          name: '社内規則',
-          onClick: () => {
-            {
-              if (queryRefresh)
-                queryRefresh({
-                  type: WikiType.RULES,
-                  rule_category: RuleCategory.PHILOSOPHY,
-                  board_category: undefined,
-                });
-            }
-          },
-        },
-        {
-          name: 'オール便',
+          name: '運営からのお知らせ',
           onClick: () => {
             {
               if (queryRefresh)

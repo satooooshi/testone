@@ -215,7 +215,7 @@ export const eventTitleText = (href: PortalLinkType): string => {
     case PortalLinkType.RULES:
       return '社内規則';
     case PortalLinkType.ALL_POSTAL:
-      return 'オール便';
+      return '運営からのお知らせ';
     case PortalLinkType.KNOWLEDGE:
       return 'ナレッジ';
     case PortalLinkType.QA:

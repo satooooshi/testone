@@ -77,12 +77,10 @@ const QAQuestionList = () => {
   const initialHeaderValue = {
     title: 'News',
     activeTabName:
-      type === WikiType.RULES
-        ? '社内規則'
-        : type === WikiType.BOARD
+      type === WikiType.BOARD
         ? '掲示板'
         : type === WikiType.ALL_POSTAL
-        ? 'オール便'
+        ? '運営からのお知らせ'
         : '全て',
     tabs,
   };

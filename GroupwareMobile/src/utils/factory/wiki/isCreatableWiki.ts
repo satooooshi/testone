@@ -21,23 +21,27 @@ export const isCreatableWiki = (context: Context): boolean => {
       if (context?.boardCategory) {
         switch (context?.boardCategory) {
           case BoardCategory.KNOWLEDGE:
-            return true;
+            return (
+              userRole === UserRole.ADMIN || userRole === UserRole.INFLUENCER
+            );
           case BoardCategory.QA:
             return true;
           case BoardCategory.NEWS:
             return userRole === UserRole.ADMIN;
-          case BoardCategory.IMPRESSIVE_UNIVERSITY:
-            return userRole === UserRole.ADMIN;
           case BoardCategory.CLUB:
-            return true;
-          case BoardCategory.STUDY_MEETING:
-            return userRole === UserRole.ADMIN;
+            return (
+              userRole === UserRole.ADMIN || userRole === UserRole.INFLUENCER
+            );
+          // case BoardCategory.STUDY_MEETING:
+          //   return userRole === UserRole.ADMIN;
           case BoardCategory.SELF_IMPROVEMENT:
-            return true;
-          case BoardCategory.PERSONAL_ANNOUNCEMENT:
-            return true;
-          case BoardCategory.CELEBRATION:
-            return userRole === UserRole.ADMIN;
+            return (
+              userRole === UserRole.ADMIN || userRole === UserRole.INFLUENCER
+            );
+          // case BoardCategory.PERSONAL_ANNOUNCEMENT:
+          //   return true;
+          // case BoardCategory.CELEBRATION:
+          //   return userRole === UserRole.ADMIN;
           case BoardCategory.OTHER:
             return true;
         }

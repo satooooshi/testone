@@ -25,12 +25,12 @@ const WikiList: React.FC<WikiListProps> = ({navigation}) => {
       name: 'All',
       onPress: () => setType(undefined),
     },
+    // {
+    //   name: '社内規則',
+    //   onPress: () => setType(WikiType.RULES),
+    // },
     {
-      name: '社内規則',
-      onPress: () => setType(WikiType.RULES),
-    },
-    {
-      name: 'オール便',
+      name: '運営からのお知らせ',
       onPress: () => setType(WikiType.ALL_POSTAL),
     },
     {
@@ -54,7 +54,7 @@ const WikiList: React.FC<WikiListProps> = ({navigation}) => {
         activeTabName={
           type ? wikiTypeNameFactory(type, ruleCategory, false) : 'All'
         }
-        rightButtonName={'Wiki新規作成'}
+        rightButtonName={'新規作成'}
         onPressRightButton={() =>
           navigation.navigate('WikiStack', {
             screen: 'PostWiki',

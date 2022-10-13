@@ -322,7 +322,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
                     ? type
                     : BoardCategory.QA
                 }>
-                {isCreatableWiki({
+                {/* {isCreatableWiki({
                   type: WikiType.RULES,
                   userRole: user?.role,
                 }) ? (
@@ -363,7 +363,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
                       )}
                     </option>
                   </>
-                ) : null}
+                ) : null} */}
                 {isCreatableWiki({
                   type: WikiType.ALL_POSTAL,
                   userRole: user?.role,
@@ -372,23 +372,29 @@ const WikiForm: React.FC<WikiFormProps> = ({
                     {wikiTypeNameFactory(WikiType.ALL_POSTAL)}
                   </option>
                 ) : null}
+                {isCreatableWiki({
+                  type: WikiType.BOARD,
+                  boardCategory: BoardCategory.KNOWLEDGE,
+                  userRole: user?.role,
+                }) ? (
+                  <option value={BoardCategory.KNOWLEDGE}>
+                    {wikiTypeNameFactory(
+                      WikiType.BOARD,
+                      undefined,
+                      true,
+                      BoardCategory.KNOWLEDGE,
+                    )}
+                  </option>
+                ) : null}
 
-                <option value={BoardCategory.KNOWLEDGE}>
-                  {wikiTypeNameFactory(
-                    WikiType.BOARD,
-                    undefined,
-                    true,
-                    BoardCategory.KNOWLEDGE,
-                  )}
-                </option>
-                <option value={BoardCategory.QA}>
+                {/* <option value={BoardCategory.QA}>
                   {wikiTypeNameFactory(
                     WikiType.BOARD,
                     undefined,
                     true,
                     BoardCategory.QA,
                   )}
-                </option>
+                </option> */}
                 {isCreatableWiki({
                   type: WikiType.BOARD,
                   boardCategory: BoardCategory.NEWS,
@@ -400,20 +406,6 @@ const WikiForm: React.FC<WikiFormProps> = ({
                       undefined,
                       true,
                       BoardCategory.NEWS,
-                    )}
-                  </option>
-                ) : null}
-                {isCreatableWiki({
-                  type: WikiType.BOARD,
-                  boardCategory: BoardCategory.IMPRESSIVE_UNIVERSITY,
-                  userRole: user?.role,
-                }) ? (
-                  <option value={BoardCategory.IMPRESSIVE_UNIVERSITY}>
-                    {wikiTypeNameFactory(
-                      WikiType.BOARD,
-                      undefined,
-                      true,
-                      BoardCategory.IMPRESSIVE_UNIVERSITY,
                     )}
                   </option>
                 ) : null}
@@ -433,20 +425,6 @@ const WikiForm: React.FC<WikiFormProps> = ({
                 ) : null}
                 {isCreatableWiki({
                   type: WikiType.BOARD,
-                  boardCategory: BoardCategory.STUDY_MEETING,
-                  userRole: user?.role,
-                }) ? (
-                  <option value={BoardCategory.STUDY_MEETING}>
-                    {wikiTypeNameFactory(
-                      WikiType.BOARD,
-                      undefined,
-                      true,
-                      BoardCategory.STUDY_MEETING,
-                    )}
-                  </option>
-                ) : null}
-                {isCreatableWiki({
-                  type: WikiType.BOARD,
                   boardCategory: BoardCategory.SELF_IMPROVEMENT,
                   userRole: user?.role,
                 }) ? (
@@ -459,7 +437,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
                     )}
                   </option>
                 ) : null}
-                {isCreatableWiki({
+                {/* {isCreatableWiki({
                   type: WikiType.BOARD,
                   boardCategory: BoardCategory.PERSONAL_ANNOUNCEMENT,
                   userRole: user?.role,
@@ -486,7 +464,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
                       BoardCategory.CELEBRATION,
                     )}
                   </option>
-                ) : null}
+                ) : null} */}
                 {isCreatableWiki({
                   type: WikiType.BOARD,
                   boardCategory: BoardCategory.OTHER,
