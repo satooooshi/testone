@@ -14,10 +14,7 @@ const Chat = () => {
   const [modalStates, dispatchModal] = useModalReducer();
 
   return (
-    <ChatLayout
-      modalStates={modalStates}
-      dispatchModal={dispatchModal}
-      category={'メンバー'}>
+    <ChatLayout modalStates={modalStates} dispatchModal={dispatchModal}>
       {isSmallerThan768 ? (
         <>
           <Box alignSelf="center">
