@@ -821,16 +821,18 @@ export class ChatService {
         .of(chatGroupID)
         .remove(user.id);
 
-      // const otherMembers = containMembers.members.filter(
-      //   (m) => m.id !== user.id,
-      // );
-      // if (otherMembers.length) {
-      //   await this.chatGroupRepository
-      //     .createQueryBuilder()
-      //     .relation(ChatGroup, 'owner')
-      //     .of(chatGroupID)
-      //     .add(otherMembers[0].id);
-      // }
+      const otherMemberIds = await manager.query(
+        'select user_id from user_chat_joining where user_id <> ? AND chat_group_id = ?',
+        [user.id, chatGroupID],
+      );
+
+      if (otherMemberIds.length) {
+        await this.chatGroupRepository
+          .createQueryBuilder()
+          .relation(ChatGroup, 'owner')
+          .of(chatGroupID)
+          .add(otherMemberIds[0].id);
+      }
     }
     await this.chatGroupRepository
       .createQueryBuilder()
