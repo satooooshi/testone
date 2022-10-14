@@ -25,7 +25,7 @@ import UserAvatar from '../../common/UserAvatar';
 
 type ModalContainerProps = Omit<ModalProps, 'children'>;
 
-type UserModalProps = ModalContainerProps & {
+type RoomMemberModalProps = ModalContainerProps & {
   isChatGroupOwner: boolean;
   isOwnerEdit?: boolean;
   onCloseModal: () => void;
@@ -35,7 +35,7 @@ type UserModalProps = ModalContainerProps & {
   defaultSelectedUsers?: Partial<User>[];
 };
 
-const RoomMemberModal: React.FC<UserModalProps> = props => {
+const RoomMemberModal: React.FC<RoomMemberModalProps> = props => {
   const {
     isChatGroupOwner,
     onCloseModal,
