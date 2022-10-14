@@ -124,6 +124,17 @@ const Chat: React.FC = () => {
   const {setIsTabBarVisible} = useIsTabBarVisible();
   const {data: roomDetail, refetch: refetchRoomDetail} = useAPIGetRoomDetail(
     Number(room.id),
+    {
+      onError: () => {
+        navigation.navigate('ChatStack', {
+          screen: 'RoomList',
+        });
+        editChatGroup({
+          ...room,
+          members: room.members?.filter(u => u.id !== myself?.id),
+        });
+      },
+    },
   );
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [focusedMessageID, setFocusedMessageID] = useState<number>();
@@ -158,7 +169,7 @@ const Chat: React.FC = () => {
   const [selectedReactions, setSelectedReactions] = useState<
     ChatMessageReaction[] | undefined
   >();
-  const {handleEnterRoom, refetchRoomCard} = useHandleBadge();
+  const {handleEnterRoom, refetchRoomCard, editChatGroup} = useHandleBadge();
   const [selectedEmoji, setSelectedEmoji] = useState<string>();
   const [selectedMessageForCheckLastRead, setSelectedMessageForCheckLastRead] =
     useState<ChatMessage>();
