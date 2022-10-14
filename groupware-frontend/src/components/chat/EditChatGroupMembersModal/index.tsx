@@ -58,7 +58,7 @@ const UserRenderer = ({
         borderBottom="1px #ececec solid"
         py="8px"
         alignItems="center"
-        bg={isSelected ? 'brand.100' : undefined}>
+        bg={isSelected ? 'gray.100' : undefined}>
         <Avatar
           src={user.avatarUrl}
           w="40px"
