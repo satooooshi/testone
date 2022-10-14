@@ -83,7 +83,7 @@
   position: fixed;
   top: 10px;
   left: 10px;
-  color: $blue_color;
+  color: $brand_color;
   z-index: 99;
   @media (min-width: 576px) {
     width: 45px;
@@ -100,7 +100,7 @@
   position: fixed;
   top: 10px;
   right: 10px;
-  color: $blue_color;
+  color: $brand_color;
   z-index: 99;
   @media (min-width: 768px) {
     display: none;
@@ -108,7 +108,7 @@
 }
 
 .icon__active {
-  color: #0b3cae;
+  color: $brand_color;
 }
 
 .icon__disable {
@@ -183,14 +183,14 @@
 .logo_text {
   font-size: 20px;
   font-weight: 700;
-  color: $blue_color;
+  color: $brand_color;
   margin-left: 15px;
 }
 
 .icon_name__active {
   font-size: 16px;
   font-weight: 700;
-  color: $blue_color;
+  color: $brand_color;
   margin-left: 15px;
 }
 
