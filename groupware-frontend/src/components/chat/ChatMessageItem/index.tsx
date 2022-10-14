@@ -175,9 +175,9 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = memo(
                 onClick={() => {
                   getReaction(messageState.id);
                 }}
-                bg={'brand.200'}
+                bg={'gray.200'}
                 flexDir="row"
-                borderColor={'brand.600'}
+                borderColor={'gray.600'}
                 borderWidth={1}
                 size="xs">
                 <AiOutlineUnorderedList size={24} />
