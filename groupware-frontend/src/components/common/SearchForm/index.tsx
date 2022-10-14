@@ -205,7 +205,7 @@ const SearchInput: React.FC<SearchFormProps> = ({
               {selectedTags.length ? (
                 <Badge
                   ml="auto"
-                  bg="blue.400"
+                  bg="brand.400"
                   color="white"
                   w="25px"
                   h="25px"

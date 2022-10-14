@@ -84,7 +84,7 @@ const TravelForm = ({
   };
 
   return (
-    <Box borderTopWidth={5} borderTopColor={'blue.600'}>
+    <Box borderTopWidth={5} borderTopColor={'brand.600'}>
       <Text fontSize={22} fontWeight="bold">{`申請#${
         index ? index + 1 : 1
       }`}</Text>

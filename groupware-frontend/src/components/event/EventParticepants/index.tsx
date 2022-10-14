@@ -66,7 +66,11 @@ const EventParticipants: React.FC<EventParticipantsProps> = ({
             justifyContent="space-between">
             {users?.length >= 10 ? (
               <Link onClick={() => setAllVisible((v) => !v)}>
-                <Text fontWeight="bold" fontSize="20px" color="blue.600" mb={2}>
+                <Text
+                  fontWeight="bold"
+                  fontSize="20px"
+                  color="brand.600"
+                  mb={2}>
                   {'全て見る'}
                 </Text>
               </Link>

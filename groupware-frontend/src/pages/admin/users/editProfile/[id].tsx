@@ -320,7 +320,7 @@ const Profile = () => {
                 direction="row"
                 my="8px"
                 cursor="pointer"
-                color="blue.400">
+                color="brand.400">
                 <FiEdit2 />
                 <Text fontSize="14px">写真を編集する</Text>
               </Stack>
@@ -351,7 +351,7 @@ const Profile = () => {
                 direction="row"
                 my="8px"
                 cursor="pointer"
-                color="blue.400">
+                color="brand.400">
                 <FiEdit2 />
                 <Text fontSize="14px">写真を編集する</Text>
               </Stack>

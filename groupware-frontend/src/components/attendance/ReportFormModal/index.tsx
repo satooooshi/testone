@@ -70,7 +70,7 @@ const ReportForm: React.FC<ReportFormModalProps> = (props) => {
     }
   };
   return (
-    <Box borderTopWidth={5} borderTopColor={'blue.600'}>
+    <Box borderTopWidth={5} borderTopColor={'brand.600'}>
       <FormControl
         mt={5}
         display="flex"

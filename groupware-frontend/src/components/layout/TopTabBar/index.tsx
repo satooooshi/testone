@@ -40,10 +40,10 @@ const TopTabBar: React.FC<TopTabBarProps> = ({ topTabBehaviorList }) => {
             h="100%"
             whiteSpace="nowrap"
             mr={5}
-            color={topTabBehavior.isActiveTab ? 'blue.600' : darkFontColor}
+            color={topTabBehavior.isActiveTab ? 'brand.600' : darkFontColor}
             borderBottomWidth={topTabBehavior.isActiveTab ? 1 : undefined}
             _hover={{ textDecoration: 'none' }}
-            borderBottomColor="blue.600">
+            borderBottomColor="brand.600">
             <Text
               pb="8px"
               fontSize="16px"

@@ -20,10 +20,10 @@ const HeaderLink: React.FC<HeaderLinkProps> = ({ t, activeTabName }) => {
         display="flex"
         alignItems="center"
         whiteSpace="nowrap"
-        borderBottomColor={t.name === activeTabName ? 'blue.500' : undefined}
+        borderBottomColor={t.name === activeTabName ? 'brand.500' : undefined}
         borderBottomWidth={t.name === activeTabName ? 2 : undefined}>
         <Text
-          color={t.name === activeTabName ? 'blue.500' : undefined}
+          color={t.name === activeTabName ? 'brand.500' : undefined}
           fontWeight="bold">
           {t.name}
         </Text>

@@ -52,13 +52,15 @@ const ReactionListModal: React.FC<ReactionListModalProps> = ({
                 key={e}
                 cursor="pointer"
                 px={2}
-                borderBottomColor={selectedEmoji === e ? 'blue.500' : undefined}
+                borderBottomColor={
+                  selectedEmoji === e ? 'brand.500' : undefined
+                }
                 borderBottomWidth={selectedEmoji === e ? 3 : undefined}>
                 <Text fontSize={32} mr="2px">
                   {e}
                 </Text>
                 {reactions.filter((r) => r.emoji === e).length ? (
-                  <Text fontSize={18} color="blue.600">
+                  <Text fontSize={18} color="brand.600">
                     {reactions.filter((r) => r.emoji === e).length}
                   </Text>
                 ) : null}

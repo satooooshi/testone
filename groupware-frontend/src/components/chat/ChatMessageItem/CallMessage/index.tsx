@@ -12,7 +12,7 @@ const CallMessage: React.FC<CallMessageProps> = ({ message }) => {
     <Box
       w={150}
       h={50}
-      bg={message.isSender ? 'blue.500' : '#ececec'}
+      bg={message.isSender ? 'brand.500' : '#ececec'}
       p="8px"
       rounded="md"
       display="flex"
@@ -23,7 +23,7 @@ const CallMessage: React.FC<CallMessageProps> = ({ message }) => {
         h={8}
         rounded="full"
         display="flex"
-        bg={message.isSender ? 'blue.400' : 'gray.300'}
+        bg={message.isSender ? 'brand.400' : 'gray.300'}
         alignItems="center"
         justifyContent="center">
         <IoCall color="white" />
@@ -32,7 +32,7 @@ const CallMessage: React.FC<CallMessageProps> = ({ message }) => {
         <Text
           fontSize={15}
           color={message.isSender ? 'white' : 'black'}
-          bg={message.isSender ? 'blue.500' : '#ececec'}>
+          bg={message.isSender ? 'brand.500' : '#ececec'}>
           message.content
         </Text>
 

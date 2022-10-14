@@ -103,7 +103,7 @@ const ApplicationForm = ({
   // };
 
   return (
-    <Box borderTopWidth={5} borderTopColor={'blue.600'}>
+    <Box borderTopWidth={5} borderTopColor={'brand.600'}>
       {errors?.attendanceTime ? (
         <FormLabel color="tomato">{errors?.attendanceTime}</FormLabel>
       ) : null}

@@ -77,7 +77,7 @@ const ChatGroupCard: React.FC<ChatGroupCardProps> = ({
       w={'100%'}
       h="100px"
       borderWidth={2}
-      borderColor={isSelected ? 'blue.300' : undefined}
+      borderColor={isSelected ? 'brand.300' : undefined}
       bg={isSelected ? 'gray.100' : 'white'}>
       <Box display="flex" flexDir="column">
         <Link
@@ -91,7 +91,7 @@ const ChatGroupCard: React.FC<ChatGroupCardProps> = ({
           mb={-4}
           ml={-1}
           borderWidth="2px"
-          borderColor="blue.200"
+          borderColor="brand.200"
           onClick={(e) => {
             e.stopPropagation();
             onPressPinButton();

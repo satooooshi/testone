@@ -20,13 +20,13 @@ export const ReactionedButton = ({
         onClick={() => {
           onClickReaction(reaction);
         }}
-        bg={isSenderInReactions ? 'blue.600' : undefined}
+        bg={isSenderInReactions ? 'brand.600' : undefined}
         flexDir="row"
-        borderColor={'blue.600'}
+        borderColor={'brand.600'}
         borderWidth={1}
         size="xs">
         <Text fontSize={16}>{reaction.emoji}</Text>
-        <Text fontSize={16} color={isSenderInReactions ? 'white' : 'blue.600'}>
+        <Text fontSize={16} color={isSenderInReactions ? 'white' : 'brand.600'}>
           {numbersOfSameValueInKeyOfObjArr(
             reactions as ChatMessageReaction[],
             reaction,
