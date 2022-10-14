@@ -17,6 +17,7 @@ import {useAuthenticate} from '../../contexts/useAuthenticate';
 import ModalSelectingWikiType, {
   SelectWikiArg,
 } from '../../components/wiki/ModalSelectWikiType';
+import QuillEditor from 'react-native-cn-quill';
 
 type WikiFormProps = {
   wiki?: Wiki;
@@ -38,6 +39,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
   onUploadImage,
 }) => {
   const scrollRef = useRef<KeyboardAwareScrollView | null>(null);
+  const quillRef = useRef<QuillEditor | null>(null);
   const [willSubmit, setWillSubmit] = useState(false);
   const initialValues: Partial<Wiki> = {
     title: '',
@@ -68,6 +70,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
         return;
       }
       saveWiki(w);
+      quillRef.current?.blur();
     },
   });
   const {width: windowWidth} = useWindowDimensions();
@@ -289,6 +292,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
             onUploadImage={onUploadImage}
             initialBody={newWiki.body}
             onChange={text => setNewWiki(w => ({...w, body: text}))}
+            quillRef={quillRef}
           />
         </Div>
       </KeyboardAwareScrollView>
