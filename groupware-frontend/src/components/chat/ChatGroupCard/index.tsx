@@ -9,7 +9,7 @@ import {
   Link,
   Badge,
 } from '@chakra-ui/react';
-import { darkFontColor } from 'src/utils/colors';
+import { brandColor, darkFontColor } from 'src/utils/colors';
 import { RiPushpin2Fill, RiPushpin2Line } from 'react-icons/ri';
 import { nameOfEmptyNameGroup } from 'src/utils/chat/nameOfEmptyNameGroup';
 import { useAuthenticate } from 'src/contexts/useAuthenticate';
@@ -97,9 +97,9 @@ const ChatGroupCard: React.FC<ChatGroupCardProps> = ({
             onPressPinButton();
           }}>
           {!!chatGroup.isPinned ? (
-            <RiPushpin2Fill size={22} color="blue" />
+            <RiPushpin2Fill size={22} color={brandColor} />
           ) : (
-            <RiPushpin2Line size={22} color="blue" />
+            <RiPushpin2Line size={22} color={brandColor} />
           )}
         </Link>
         <Avatar src={avatarImage} size="md" mr="8px" />
