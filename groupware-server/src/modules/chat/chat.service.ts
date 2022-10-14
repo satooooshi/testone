@@ -1128,6 +1128,7 @@ export class ChatService {
       checkAloneRoom(existGroup[0], userID);
       return existGroup[0];
     }
+
     newData.members = users;
     newData.owner = owners;
 
@@ -1137,6 +1138,13 @@ export class ChatService {
         memberCount,
       }),
     );
+    const initLastReadTime = newGroup.members.map((u) => ({
+      user: u,
+      chatGroup: newGroup,
+      readTime: new Date(),
+    }));
+    await this.lastReadChatTimeRepository.save(initLastReadTime);
+
     return newGroup;
   }
 
@@ -1248,12 +1256,12 @@ export class ChatService {
     // const isMember = chatGroup.members.filter((m) => m.id === user.id).length;
 
     const manager = getManager();
-    const isMember = await manager.query(
+    const isMember: User[] = await manager.query(
       'select chat_group_id from user_chat_joining where chat_group_id = ? AND user_id = ?',
       [chatGroupId, user.id],
     );
 
-    if (!isMember) {
+    if (!isMember.length) {
       throw new NotAcceptableException('Something went wrong');
     }
 
