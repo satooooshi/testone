@@ -195,16 +195,19 @@ const RoomForm: React.FC<RoomFormProps> = ({
             </TagButton>
           ))}
         </Div>
-        <Div mb="lg">
-          <Button
-            w={'100%'}
-            mb="lg"
-            onPress={() => setVisibleOwnerModal(true)}
-            bg="pink600"
-            fontWeight="bold">
-            オーナーを編集
-          </Button>
-        </Div>
+        {initialRoom?.owner ? (
+          <Div mb="lg">
+            <Button
+              w={'100%'}
+              mb="lg"
+              onPress={() => setVisibleOwnerModal(true)}
+              bg="pink600"
+              fontWeight="bold">
+              オーナーを編集
+            </Button>
+          </Div>
+        ) : null}
+
         <Div flexDir="row" flexWrap="wrap" mb={'lg'}>
           {values.owner?.map(u => (
             <TagButton key={u.id} mr={4} mb={8} color="white" bg={'purple800'}>
