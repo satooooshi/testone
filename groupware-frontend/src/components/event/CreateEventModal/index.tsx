@@ -417,7 +417,7 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
         display="flex"
         flexDirection={isSmallerThan768 ? 'row' : 'column'}
         justifyContent="space-between"
-        borderBottomColor="blue.500"
+        borderBottomColor="brand.500"
         borderBottomWidth={1}
         pb="8px"
         alignItems="center"
@@ -439,7 +439,7 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
             onClick={() => {
               checkErrors();
             }}
-            colorScheme="blue">
+            colorScheme="brand">
             {isLoading ? <Spinner /> : <Text>イベントを保存</Text>}
           </Button>
           <MdCancel
@@ -491,7 +491,7 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
                     formatStyle={'medium'}
                   />
                 ) : (
-                  <Text color={'blue.600'}>
+                  <Text color={'brand.600'}>
                     提出物イベントは終了日時の2時間前の日時に開始としてカレンダーに表示されます
                   </Text>
                 )}
@@ -695,7 +695,7 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
               onClick={() => {
                 onClickDeleteImage();
               }}
-              colorScheme="blue">
+              colorScheme="brand">
               既存画像を削除
             </Button>
           )}
@@ -762,7 +762,7 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
               {newEvent.files.map((f) => (
                 <Box
                   key={f.url}
-                  borderColor={'blue.500'}
+                  borderColor={'brand.500'}
                   rounded="md"
                   borderWidth={1}
                   display="flex"
@@ -773,7 +773,7 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
                   mb="8px"
                   px="8px">
                   <Text
-                    color="blue.600"
+                    color="brand.600"
                     alignSelf="center"
                     h="40px"
                     verticalAlign="middle"
@@ -831,7 +831,7 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
             {newEvent?.videos?.map((y) => (
               <Box
                 key={y.url}
-                borderColor={'blue.500'}
+                borderColor={'brand.500'}
                 borderWidth={1}
                 rounded="md"
                 display="flex"
@@ -842,7 +842,7 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
                 mb="8px"
                 px="8px">
                 <Text
-                  color="blue.600"
+                  color="brand.600"
                   alignSelf="center"
                   h="40px"
                   verticalAlign="middle"

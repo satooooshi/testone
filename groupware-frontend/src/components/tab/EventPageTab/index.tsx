@@ -35,7 +35,7 @@ const EventPageTab: React.FC<EventPageTabProps> = ({
             h={8}
             mr={2}
             colorScheme={
-              t.name === activeTabName || t.isActive ? 'blue' : undefined
+              t.name === activeTabName || t.isActive ? 'brand' : undefined
             }
             onClick={t.onClick}>
             {t.name}

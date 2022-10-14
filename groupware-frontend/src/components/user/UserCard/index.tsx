@@ -169,7 +169,7 @@ const UserCard: React.FC<UserCardProps> = ({ user, onClickTag, duration }) => {
         rounded="full"
         w="50%"
         fontSize="14px"
-        color="blue.600">
+        color="brand.600">
         プロフィールを見る
       </Button>
     </Box>

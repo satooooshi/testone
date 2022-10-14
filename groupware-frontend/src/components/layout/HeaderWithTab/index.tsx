@@ -151,7 +151,7 @@ const HeaderWithTab: React.FC<HeaderProps> = ({
                 <>
                   <MenuButton
                     isActive={isOpen}
-                    colorScheme="blue"
+                    colorScheme="brand"
                     as={Button}
                     rounded={50}
                     // right={0}

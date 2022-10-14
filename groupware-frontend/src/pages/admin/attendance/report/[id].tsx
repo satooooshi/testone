@@ -73,7 +73,7 @@ export const AttendanceReportRow = ({
       <Td>
         <Button
           fontSize={16}
-          colorScheme="blue"
+          colorScheme="brand"
           onClick={() => setDetailModal(true)}>
           詳細
         </Button>

@@ -460,7 +460,7 @@ const EventDetail = () => {
                 <Button
                   mb={3}
                   borderRadius={50}
-                  colorScheme="blue"
+                  colorScheme="brand"
                   variant="outline"
                   w="50%"
                   onClick={() => downloadEvent({ id, name: data.title })}>
@@ -477,7 +477,7 @@ const EventDetail = () => {
                     <Button
                       w="50%"
                       borderRadius={50}
-                      colorScheme="blue"
+                      colorScheme="brand"
                       onClick={() => {
                         if (!data.isJoining) {
                           if (confirm(`イベントに参加しますか？`)) {
@@ -616,7 +616,7 @@ const EventDetail = () => {
                   <Box display="flex" flexDir="row">
                     <Button
                       borderRadius={50}
-                      colorScheme="blue"
+                      colorScheme="brand"
                       size="sm"
                       onClick={() => {
                         commentVisible && newComment
@@ -678,7 +678,7 @@ const EventDetail = () => {
                   justifyContent="space-between">
                   <Button
                     size="sm"
-                    colorScheme="blue"
+                    colorScheme="brand"
                     marginRight="16px"
                     onClick={() => {
                       submissionRef.current?.click();

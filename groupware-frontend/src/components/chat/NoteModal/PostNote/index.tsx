@@ -233,7 +233,7 @@ const EditNote: React.FC<EditNoteProps> = ({
                       </Button>
                       <Button
                         size="sm"
-                        colorScheme="blue"
+                        colorScheme="brand"
                         onClick={() => setWillSubmit(true)}>
                         {loadingUploadFile ? (
                           <Spinner />

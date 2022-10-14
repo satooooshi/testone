@@ -320,7 +320,7 @@ const Profile = () => {
                 direction="row"
                 my="8px"
                 cursor="pointer"
-                color="blue.400">
+                color="brand.400">
                 <FiEdit2 />
                 <Text fontSize="14px">写真を編集する</Text>
               </Stack>
@@ -351,7 +351,7 @@ const Profile = () => {
                 direction="row"
                 my="8px"
                 cursor="pointer"
-                color="blue.400">
+                color="brand.400">
                 <FiEdit2 />
                 <Text fontSize="14px">写真を編集する</Text>
               </Stack>
@@ -472,7 +472,7 @@ const Profile = () => {
           <Stack spacing={5} direction="row" mt="8px">
             <Radio
               bg="white"
-              colorScheme="blue"
+              colorScheme="brand"
               isChecked={userInfo.isEmailPublic}
               value={'public'}
               onChange={() =>
@@ -482,7 +482,7 @@ const Profile = () => {
             </Radio>
             <Radio
               bg="white"
-              colorScheme="blue"
+              colorScheme="brand"
               isChecked={!userInfo.isEmailPublic}
               value={'inPublic'}
               onChange={() =>
@@ -508,7 +508,7 @@ const Profile = () => {
           <Stack spacing={5} direction="row" mt="8px">
             <Radio
               bg="white"
-              colorScheme="blue"
+              colorScheme="brand"
               isChecked={userInfo.isPhonePublic}
               value={'public'}
               onChange={() =>
@@ -518,7 +518,7 @@ const Profile = () => {
             </Radio>
             <Radio
               bg="white"
-              colorScheme="blue"
+              colorScheme="brand"
               isChecked={!userInfo.isPhonePublic}
               value={'unPublic'}
               onChange={() =>
@@ -669,7 +669,7 @@ const Profile = () => {
       <Button
         className={profileStyles.update_button_wrapper}
         width="40"
-        colorScheme="blue"
+        colorScheme="brand"
         onClick={() => {
           checkErrors();
         }}>

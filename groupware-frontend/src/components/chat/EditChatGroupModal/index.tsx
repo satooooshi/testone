@@ -219,7 +219,7 @@ const EditChatGroupModal: React.FC<EditChatGroupModalProps> = ({
                   <Button
                     my="10px"
                     onClick={() => onClickDeleteImage()}
-                    colorScheme="blue">
+                    colorScheme="brand">
                     既存の画像を削除
                   </Button>
                 </Box>

@@ -242,7 +242,7 @@ const CreateChatGroupModal: React.FC<CreateChatGroupModalProps> = ({
                 <Button
                   my="15px"
                   onClick={() => resetImageUrl()}
-                  colorScheme="blue">
+                  colorScheme="brand">
                   既存画像を削除
                 </Button>
               </Box>

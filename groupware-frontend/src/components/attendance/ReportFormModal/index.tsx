@@ -70,7 +70,7 @@ const ReportForm: React.FC<ReportFormModalProps> = (props) => {
     }
   };
   return (
-    <Box borderTopWidth={5} borderTopColor={'blue.600'}>
+    <Box borderTopWidth={5} borderTopColor={'brand.600'}>
       <FormControl
         mt={5}
         display="flex"
@@ -231,7 +231,7 @@ const ReportForm: React.FC<ReportFormModalProps> = (props) => {
         />
       </FormControl>
       <Box mt={5} flexDir="row" display="flex" justifyContent="flex-end">
-        <Button colorScheme={'blue'} onClick={() => checkValidateErrors()}>
+        <Button colorScheme={'brand'} onClick={() => checkValidateErrors()}>
           {values.id ? '更新' : '送信'}
         </Button>
         {values.id && onDelete && (

@@ -233,7 +233,7 @@ const EventCard: React.FC<EventCardProps> = ({
             borderRadius={50}
             width="100px"
             height={7}
-            colorScheme="blue"
+            colorScheme="brand"
             onClick={() => onClickAnswer(eventSchedule.id)}>
             <Box display="flex">
               <Text fontSize={10} mr="6px">
@@ -250,7 +250,7 @@ const EventCard: React.FC<EventCardProps> = ({
                 borderRadius={50}
                 width="100px"
                 height={7}
-                colorScheme="blue"
+                colorScheme="brand"
                 variant="outline">
                 <Box display="flex">
                   <Text fontSize={10} mr="4px">

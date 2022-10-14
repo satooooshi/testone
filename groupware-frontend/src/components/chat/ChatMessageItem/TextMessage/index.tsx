@@ -107,7 +107,7 @@ const TextMessage: React.FC<TextMessageProps> = ({
     <Box
       maxW={isSmallerThan768 ? '300px' : '40vw'}
       minW={isSmallerThan768 ? '140px' : '10vw'}
-      bg={message.isSender ? 'blue.500' : '#ececec'}
+      bg={message.isSender ? 'brand.500' : '#ececec'}
       p="8px"
       rounded="md">
       <Linkify componentDecorator={componentDecorator}>
@@ -240,7 +240,7 @@ const TextMessage: React.FC<TextMessageProps> = ({
               onChange={(e) => setMessageValue(e.target.value)}
               wordBreak={'break-word'}
               color="white"
-              bg="blue.500"
+              bg="brand.500"
             />
             <Text fontSize={12} mt={3}>
               Escキーでキャンセル • Ctr + Enterキーで 保存

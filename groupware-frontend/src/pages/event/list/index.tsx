@@ -489,7 +489,7 @@ const EventList = () => {
             <Box display="flex" flexDir="row" alignItems="center" mt={5} mb={8}>
               <Button
                 bg={!personal ? 'white' : undefined}
-                colorScheme={personal === 'true' ? 'blue' : undefined}
+                colorScheme={personal === 'true' ? 'brand' : undefined}
                 onClick={() =>
                   queryRefresh({
                     personal: 'true',
@@ -502,7 +502,7 @@ const EventList = () => {
               </Button>
               <Button
                 bg={personal === 'true' ? 'white' : undefined}
-                colorScheme={!personal ? 'blue' : undefined}
+                colorScheme={!personal ? 'brand' : undefined}
                 onClick={() =>
                   queryRefresh({
                     personal: '',

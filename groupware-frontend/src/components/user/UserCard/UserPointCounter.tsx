@@ -40,8 +40,8 @@ const UserPointCounter: React.FC<UserPointCounterType> = ({
         {labelText}
         {/* {durationText()} */}
       </Text>
-      <Text fontSize="12px" fontWeight="bold" color="green.300">
-        {count.toString()}
+      <Text fontSize="12px" fontWeight="bold" color="brand.600">
+        {count}
       </Text>
     </Flex>
   );

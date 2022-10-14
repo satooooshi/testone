@@ -335,7 +335,7 @@ const CreateNewUser = () => {
                 direction="row"
                 my="8px"
                 cursor="pointer"
-                color="blue.400">
+                color="brand.400">
                 <FiEdit2 />
                 <Text fontSize="14px">写真を編集する</Text>
               </Stack>
@@ -369,7 +369,7 @@ const CreateNewUser = () => {
               direction="row"
               my="8px"
               cursor="pointer"
-              color="blue.400">
+              color="brand.400">
               <FiEdit2 />
               <Text fontSize="14px">写真を編集する</Text>
             </Stack>
@@ -454,7 +454,7 @@ const CreateNewUser = () => {
           <Stack spacing={5} direction="row" mt="8px">
             <Radio
               bg="white"
-              colorScheme="blue"
+              colorScheme="brand"
               isChecked={values.isEmailPublic}
               value={'public'}
               onChange={() =>
@@ -464,7 +464,7 @@ const CreateNewUser = () => {
             </Radio>
             <Radio
               bg="white"
-              colorScheme="blue"
+              colorScheme="brand"
               isChecked={!values.isEmailPublic}
               value={'inPublic'}
               onChange={() =>
@@ -490,7 +490,7 @@ const CreateNewUser = () => {
           <Stack spacing={5} direction="row" mt="8px">
             <Radio
               bg="white"
-              colorScheme="blue"
+              colorScheme="brand"
               isChecked={values.isPhonePublic}
               value={'public'}
               onChange={() =>
@@ -500,7 +500,7 @@ const CreateNewUser = () => {
             </Radio>
             <Radio
               bg="white"
-              colorScheme="blue"
+              colorScheme="brand"
               isChecked={!values.isPhonePublic}
               value={'unPublic'}
               onChange={() =>
@@ -693,7 +693,7 @@ const CreateNewUser = () => {
         <Button
           className={profileStyles.update_button_wrapper}
           width="40"
-          colorScheme="blue"
+          colorScheme="brand"
           onClick={() => checkErrors()}>
           {isLoading ? <Spinner /> : <Text>作成</Text>}
         </Button>
