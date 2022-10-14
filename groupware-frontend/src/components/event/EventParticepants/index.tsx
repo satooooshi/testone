@@ -123,7 +123,7 @@ const EventParticipants: React.FC<EventParticipantsProps> = ({
                       mt="auto"
                       size="xs"
                       borderRadius={50}
-                      colorScheme="blue"
+                      colorScheme="brand"
                       variant="outline">
                       {u.lateMinutes
                         ? lateMinutesText(Number(u.lateMinutes))

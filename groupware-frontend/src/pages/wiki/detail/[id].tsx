@@ -369,7 +369,7 @@ const QuestionDetail = () => {
               <Box display="flex" flexDir="row">
                 <Button
                   borderRadius={50}
-                  colorScheme="blue"
+                  colorScheme="brand"
                   size="sm"
                   onClick={() => {
                     checkErrors('answer');

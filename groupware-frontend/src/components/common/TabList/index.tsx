@@ -26,7 +26,7 @@ const TabList: React.FC<TabListProps> = ({ activeTabName, tabs }) => {
             key={t.name}
             mr={2}
             colorScheme={
-              t.name === activeTabName || t.isActive ? 'blue' : undefined
+              t.name === activeTabName || t.isActive ? 'brand' : undefined
             }
             bg={t.name !== activeTabName && !t.isActive ? 'white' : undefined}
             onClick={t.onClick}>

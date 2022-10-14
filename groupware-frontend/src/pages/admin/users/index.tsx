@@ -173,7 +173,7 @@ const UserAdmin: React.FC = () => {
           rounded={50}
           w="80px"
           h="35px"
-          colorScheme="blue"
+          colorScheme="brand"
           rightIcon={<AiOutlinePlus />}>
           作成
         </Button>

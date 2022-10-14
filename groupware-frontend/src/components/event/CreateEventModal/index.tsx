@@ -439,7 +439,7 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
             onClick={() => {
               checkErrors();
             }}
-            colorScheme="blue">
+            colorScheme="brand">
             {isLoading ? <Spinner /> : <Text>イベントを保存</Text>}
           </Button>
           <MdCancel
@@ -695,7 +695,7 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
               onClick={() => {
                 onClickDeleteImage();
               }}
-              colorScheme="blue">
+              colorScheme="brand">
               既存画像を削除
             </Button>
           )}

@@ -291,7 +291,7 @@ const ApplicationForm = ({
         </Select>
       </FormControl>
       <Box mb="8px" flexDir="row" display="flex" justifyContent="flex-end">
-        <Button colorScheme={'blue'} onClick={() => handleSubmit()}>
+        <Button colorScheme={'brand'} onClick={() => handleSubmit()}>
           {values.id ? '更新' : '申請'}
         </Button>
         {application?.id && (

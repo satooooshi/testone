@@ -231,7 +231,7 @@ const ReportForm: React.FC<ReportFormModalProps> = (props) => {
         />
       </FormControl>
       <Box mt={5} flexDir="row" display="flex" justifyContent="flex-end">
-        <Button colorScheme={'blue'} onClick={() => checkValidateErrors()}>
+        <Button colorScheme={'brand'} onClick={() => checkValidateErrors()}>
           {values.id ? '更新' : '送信'}
         </Button>
         {values.id && onDelete && (

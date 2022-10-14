@@ -19,7 +19,7 @@ const HeaderButton: React.FC<HeaderButtonProps> = ({ t }) => {
             rounded={50}
             w="70px"
             h="35px"
-            colorScheme="blue"
+            colorScheme="brand"
             rightIcon={<AiOutlinePlus />}>
             {t.name}
           </Button>

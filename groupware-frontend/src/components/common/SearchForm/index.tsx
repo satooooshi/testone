@@ -175,7 +175,7 @@ const SearchInput: React.FC<SearchFormProps> = ({
                 </Text>
               ) : null}
               <Button
-                colorScheme="blue"
+                colorScheme="brand"
                 w="70px"
                 h="80%"
                 size="sm"

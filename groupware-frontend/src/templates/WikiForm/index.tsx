@@ -555,7 +555,7 @@ const WikiForm: React.FC<WikiFormProps> = ({
               flexDir="row"
               justifyContent={isSmallerThan768 ? 'center' : 'flex-end'}>
               <Button
-                colorScheme="blue"
+                colorScheme="brand"
                 onClick={() => setTagModal(true)}
                 marginRight="16px">
                 タグを編集

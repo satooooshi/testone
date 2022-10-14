@@ -245,7 +245,10 @@ const NewsAdmin: React.VFC = () => {
           </ModalBody>
 
           <ModalFooter>
-            <Button onClick={() => handleSubmit()} mx="auto" colorScheme="blue">
+            <Button
+              onClick={() => handleSubmit()}
+              mx="auto"
+              colorScheme="brand">
               作成
             </Button>
           </ModalFooter>
@@ -257,7 +260,7 @@ const NewsAdmin: React.VFC = () => {
           rounded={50}
           w="80px"
           h="35px"
-          colorScheme="blue"
+          colorScheme="brand"
           rightIcon={<AiOutlinePlus />}>
           作成
         </Button>
@@ -340,7 +343,7 @@ const NewsAdmin: React.VFC = () => {
                                   mb={i + 1 < news.length ? '-1px' : '0px'}>
                                   <Box
                                     w="40%"
-                                    color="blue"
+                                    color="brand"
                                     ml="5px"
 
                                     // whiteSpace="nowrap"

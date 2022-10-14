@@ -272,7 +272,7 @@ const TravelForm = ({
       (index === undefined ||
         (index !== undefined && !attendance?.travelCost?.[index + 1])) ? (
         <Box mb="8px" flexDir="row" display="flex" justifyContent="flex-end">
-          <Button colorScheme="blue" onClick={() => handleSubmit()}>
+          <Button colorScheme="brand" onClick={() => handleSubmit()}>
             {values.createdAt ? '更新する' : '保存する'}
           </Button>
         </Box>

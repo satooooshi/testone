@@ -146,7 +146,7 @@ const TagModal: React.FC<TagModalProps> = ({
         <Button
           size="md"
           width="140px"
-          colorScheme="blue"
+          colorScheme="brand"
           borderRadius={5}
           className={tagModalStyles.modal_cancel_button}
           onClick={closeTagModal}>
