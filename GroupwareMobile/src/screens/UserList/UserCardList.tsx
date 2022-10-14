@@ -95,7 +95,7 @@ const UserCardList: React.FC<UserCardListProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isFocused]);
 
-  return (
+  return isFocused ? (
     <>
       <Div flexDir="row" my="lg" justifyContent="space-evenly">
         <Div w="32%">
@@ -243,6 +243,8 @@ const UserCardList: React.FC<UserCardListProps> = ({
       )}
       {isLoading && <ActivityIndicator />}
     </>
+  ) : (
+    <></>
   );
 };
 
