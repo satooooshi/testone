@@ -58,11 +58,11 @@ const AnnualCalendar: React.FC = () => {
     status: undefined,
     type: EventType.IMPRESSIVE_UNIVERSITY,
     from: DateTime.fromJSDate(new Date())
-      .minus({ months: 2 })
+      .minus({ months: 1 })
       .toJSDate()
       .toDateString(),
     to: DateTime.fromJSDate(new Date())
-      .plus({ months: 13 })
+      .plus({ months: 7 })
       .toJSDate()
       .toDateString(),
     personal: '',
@@ -101,10 +101,10 @@ const AnnualCalendar: React.FC = () => {
       </Text>
       <Text fontWeight="bold" fontSize={20} textAlign="center" mb={10}>
         {DateTime.fromJSDate(new Date())
-          .minus({ months: 1 })
+          .minus({ months: 0 })
           .toFormat('yyyy年 M月 ~ ')}
         {DateTime.fromJSDate(new Date())
-          .plus({ months: 12 })
+          .plus({ months: 5 })
           .toFormat('yyyy年 M月')}
       </Text>
       {isLoadingEvents ? (
@@ -113,7 +113,7 @@ const AnnualCalendar: React.FC = () => {
         </Box>
       ) : (
         <>
-          {_.range(-1, 13).map((i) => (
+          {_.range(0, 6).map((i) => (
             <Box
               key={i}
               display="flex"

@@ -176,7 +176,7 @@ const EventIntroduction: React.FC = () => {
             borderBottomWidth: 1,
           }}
         />
-        <AnnualCalendar />
+        {type === EventType.IMPRESSIVE_UNIVERSITY ? <AnnualCalendar /> : <></>}
       </KeyboardAwareScrollView>
     </WholeContainer>
   );
@@ -196,7 +196,7 @@ const AnnualCalendar = () => {
       .toJSDate()
       .toDateString(),
     to: DateTime.fromJSDate(new Date())
-      .plus({months: 12})
+      .plus({months: 7})
       .toJSDate()
       .toDateString(),
     personal: '',
@@ -245,16 +245,16 @@ const AnnualCalendar = () => {
         </Text>
         <Text fontWeight="bold" fontSize={16} mb={8} textAlign="center">
           {DateTime.fromJSDate(new Date())
-            .minus({months: 1})
+            .minus({months: 0})
             .toFormat('yyyy年 M月 ~ ')}
           {DateTime.fromJSDate(new Date())
-            .plus({months: 12})
+            .plus({months: 5})
             .toFormat('yyyy年 M月')}
         </Text>
       </Div>
       {!isLoadingCalender ? (
         <>
-          {_.range(-1, 13).map(i => (
+          {_.range(0, 6).map(i => (
             <>
               <Div
                 style={{
