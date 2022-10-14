@@ -99,7 +99,10 @@ const ChatDetail = () => {
         deleteChatGroup(
           { id: Number(id) },
           {
-            onSuccess: () => router.push('/chat', undefined, { shallow: true }),
+            onSuccess: () => {
+              router.push('/chat', undefined, { shallow: true });
+              setChatGroupsState(chatGroups.filter((g) => g.id != Number(id)));
+            },
           },
         );
       }
