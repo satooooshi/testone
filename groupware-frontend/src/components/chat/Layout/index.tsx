@@ -179,10 +179,17 @@ const ChatLayout: FC<Props> = ({
                   );
                 }}
                 onClose={() =>
-                  dispatchModal({
-                    type: 'editMembersModalVisible',
-                    value: false,
-                  })
+                  dispatchModal(
+                    isOwner
+                      ? {
+                          type: 'editOwnersModalVisible',
+                          value: false,
+                        }
+                      : {
+                          type: 'editMembersModalVisible',
+                          value: false,
+                        },
+                  )
                 }
                 category={isOwner ? 'オーナー' : 'メンバー'}
               />

@@ -1009,6 +1009,7 @@ export class ChatService {
       members: newData.members,
       memberCount: newData.members.length,
       name: newData.name,
+      owner: newData.owner,
       updatedAt: new Date(),
     });
     if (existGroup.name !== newGroup.name) {
