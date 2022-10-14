@@ -91,7 +91,7 @@ const ChatGroupCard: React.FC<ChatGroupCardProps> = ({
           mb={-4}
           ml={-1}
           borderWidth="2px"
-          borderColor="brand.200"
+          borderColor="gray.200"
           onClick={(e) => {
             e.stopPropagation();
             onPressPinButton();
