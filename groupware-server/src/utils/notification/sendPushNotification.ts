@@ -55,6 +55,7 @@ const sendPushNotifToSpecificDevices = async (
   const dataToSend = {
     title: data.title ? data.title : '', // REQUIRED for Android
     topic: process.env.IOS_BUNDLE_ID ? '' : '', // REQUIRED for iOS (apn and gcm)
+    icon: 'ic_push_notification', // optional, defaults to 'ic_launcher'.
     contentAvailable: true,
     priority: 'high',
     silent: data?.custom?.silent === 'silent',
