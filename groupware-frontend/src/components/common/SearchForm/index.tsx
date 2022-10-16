@@ -175,7 +175,7 @@ const SearchInput: React.FC<SearchFormProps> = ({
                 </Text>
               ) : null}
               <Button
-                colorScheme="blue"
+                colorScheme="brand"
                 w="70px"
                 h="80%"
                 size="sm"
@@ -205,7 +205,7 @@ const SearchInput: React.FC<SearchFormProps> = ({
               {selectedTags.length ? (
                 <Badge
                   ml="auto"
-                  bg="blue.400"
+                  bg="brand.400"
                   color="white"
                   w="25px"
                   h="25px"

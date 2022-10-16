@@ -17,6 +17,7 @@ import Head from 'next/head';
 import TopTabBar, { TopTabBehavior } from '@/components/layout/TopTabBar';
 import { useAPIGetEventList } from '@/hooks/api/event/useAPIGetEventList';
 import { useAPIGetWikiList } from '@/hooks/api/wiki/useAPIGetWikiList';
+import { useAPIGetUserGoodList } from '@/hooks/api/wiki/useAPIGetWikiGoodList';
 import { useHeaderTab } from '@/hooks/headerTab/useHeaderTab';
 import {
   Text,
@@ -44,6 +45,9 @@ import { HiOutlineChat } from 'react-icons/hi';
 import { AiOutlineArrowLeft } from 'react-icons/ai';
 import { tagBgColorFactory } from 'src/utils/factory/tagBgColorFactory';
 import { tagFontColorFactory } from 'src/utils/factory/tagFontColorFactory';
+import { Avatar } from '@chakra-ui/react';
+import { userNameKanaFactory } from 'src/utils/factory/userNameKanaFactory';
+import { userNameFactory } from 'src/utils/factory/userNameFactory';
 
 type UserTagListProps = {
   tags?: UserTag[];
@@ -101,6 +105,7 @@ const MyAccountInfo = () => {
       },
       { enabled: false },
     );
+
   const { data: knowledgeList, refetch: refetchKnowledgeList } =
     useAPIGetWikiList(
       {
@@ -110,6 +115,9 @@ const MyAccountInfo = () => {
       },
       { enabled: false },
     );
+  const { data: goodList, refetch: refetchGoodList } =
+    useAPIGetUserGoodList(id);
+
   const { user } = useAuthenticate();
   const [activeTab, setActiveTab] = useState<TabName>(TabName.DETAIL);
   const { mutate: logout } = useAPILogout({
@@ -189,6 +197,9 @@ const MyAccountInfo = () => {
         case TabName.KNOWLEDGE:
           refetchKnowledgeList();
           return;
+        case TabName.GOOD:
+          refetchGoodList();
+          return;
       }
     };
     if (activeTab) {
@@ -224,7 +235,7 @@ const MyAccountInfo = () => {
           <Text fontSize="14px">戻る</Text>
         </Button>
       </Box>
-      <div className={accountInfoStyles.main}>
+      <Box pb="24px" w="100%">
         {profile && (
           <Box
             display="flex"
@@ -235,14 +246,18 @@ const MyAccountInfo = () => {
             <Flex direction="row" bg="white" w="100%" p="30px" rounded="5px">
               <Box mx="20px" className={accountInfoStyles.avatar}>
                 {profile.avatarUrl ? (
-                  <img src={profile.avatarUrl} alt="アバター画像" />
+                  <img
+                    src={profile.avatarUrl}
+                    className={accountInfoStyles.avatar}
+                    alt="アバター画像"
+                  />
                 ) : (
                   <Image src={noImage} alt="アバター画像" />
                 )}
               </Box>
               <Box>
                 <Text fontSize="20px" fontWeight="bold" mb="5px">
-                  {`${profile.lastName} ${profile.firstName}`}
+                  {userNameFactory(profile)}
                   <Button
                     ml="10px"
                     size="xs"
@@ -254,7 +269,7 @@ const MyAccountInfo = () => {
                   </Button>
                 </Text>
                 <Text fontSize="12px" color="gray" mb="12px">
-                  {`${profile.lastNameKana} ${profile.firstNameKana}`}
+                  {userNameKanaFactory(profile)}
                 </Text>
                 <Text fontWeight="bold" mb="12px">
                   自己紹介
@@ -399,18 +414,22 @@ const MyAccountInfo = () => {
                 </Text>
               )
             ) : null}
-            {activeTab === TabName.GOOD &&
-            profile.userGoodForBoard &&
-            profile.userGoodForBoard.length ? (
-              <Box w="100%">
-                {profile.userGoodForBoard.map((w) => (
-                  <WikiCard wiki={w.wiki} key={w.id} />
-                ))}
-              </Box>
+            {activeTab === TabName.GOOD ? (
+              goodList && goodList.length ? (
+                <Box>
+                  {goodList.map((b) => (
+                    <WikiCard wiki={b.wiki} key={b.id} />
+                  ))}
+                </Box>
+              ) : (
+                <Text fontSize={16}>
+                  いいねした掲示板が見つかりませんでした
+                </Text>
+              )
             ) : null}
           </Box>
         )}
-      </div>
+      </Box>
     </LayoutWithTab>
   );
 };

@@ -35,7 +35,7 @@ const FormToLinkTag: React.FC<FormToLinkTagProps> = ({
         px="24px"
         size="sm"
         onClick={onEditButtonClick}
-        colorScheme="blue"
+        colorScheme="brand"
         variant="outline"
         rounded="full">
         <Box>

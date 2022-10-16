@@ -24,6 +24,7 @@ import CallMessage from './CallMessage';
 import VideoMessage from './VideoMessage';
 import StickerMessage from './StickerMessage.tsx';
 import {removeReactionDuplicates} from '../../../utils/removeReactionDuplicate';
+import UserAvatar from '../../../components/common/UserAvatar';
 
 type ChatMessageItemProps = {
   message: ChatMessage;
@@ -32,7 +33,10 @@ type ChatMessageItemProps = {
   searchedResultIds?: (number | undefined)[];
   messageIndex: number;
   isScrollTarget: boolean;
-  senderAvatar: ReactNode;
+  senderAvatars?: {
+    member: User;
+    avatar: JSX.Element;
+  }[];
   scrollToTarget: (messageIndex: number) => void;
   onCheckLastRead: () => void;
   onLongPress: () => void;
@@ -50,7 +54,7 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
   messageIndex,
   isScrollTarget = false,
   scrollToTarget,
-  senderAvatar,
+  senderAvatars,
   onCheckLastRead,
   onLongPress,
   onPressImage,
@@ -124,12 +128,18 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
         alignItems="flex-start">
         <Div>
           {!message.isSender && message.type !== ChatMessageType.SYSTEM_TEXT ? (
-            <Text>{userNameFactory(message.sender)}</Text>
+            <Text>
+              {userNameFactory(
+                senderAvatars?.find(s => s.member.id === message.sender?.id)
+                  ?.member || message.sender,
+              )}
+            </Text>
           ) : null}
           <Div flexDir="row" alignItems="flex-end">
             {message.isSender && timesAndReadCounts}
             {message.type === ChatMessageType.TEXT ? (
               <TextMessage
+                senderAvatars={senderAvatars}
                 message={message}
                 inputtedSearchWord={inputtedSearchWord}
                 searchedResultIds={searchedResultIds}
@@ -166,7 +176,10 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
               })
             }
             underlayColor="none">
-            <Div mr="xs">{senderAvatar}</Div>
+            <Div mr="xs">
+              {senderAvatars?.find(s => s.member.id === message.sender?.id)
+                ?.avatar ?? <UserAvatar h={40} w={40} user={message.sender} />}
+            </Div>
           </TouchableHighlight>
         ) : null}
       </Div>

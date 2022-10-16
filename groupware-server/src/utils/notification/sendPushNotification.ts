@@ -52,14 +52,13 @@ const sendPushNotifToSpecificDevices = async (
   const pushNotifService = new PushNotifications(pushNotifSettings);
   const tokens = devices.map((d) => d.token);
 
-  console.log('notification data', data.title, data.body);
-
   const dataToSend = {
     title: data.title ? data.title : '', // REQUIRED for Android
     topic: process.env.IOS_BUNDLE_ID ? '' : '', // REQUIRED for iOS (apn and gcm)
+    icon: 'ic_push_notification', // optional, defaults to 'ic_launcher'.
     contentAvailable: true,
     priority: 'high',
-    silent: data?.custom?.silent === 'silent' ? true : false,
+    silent: data?.custom?.silent === 'silent',
     // badge: data.custom.type === 'badge' ? 1 : 0,
     sound: data.title ? 'local.wav' : undefined,
     // android_channel_id: 'default-channel-id',

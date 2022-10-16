@@ -96,7 +96,9 @@ export class ChatMessage {
 
   isSender?: boolean;
 
-  @ManyToOne(() => ChatMessage, (chatMessage) => chatMessage.id)
+  @ManyToOne(() => ChatMessage, (chatMessage) => chatMessage.id, {
+    onDelete: 'SET NULL',
+  })
   @JoinColumn({ name: 'reply_parent_id' })
   replyParentMessage?: ChatMessage;
 
@@ -111,20 +113,20 @@ export class ChatMessage {
     }
   }
 
-  @AfterLoad()
-  @AfterInsert()
-  async changeToSignedURL?() {
-    if (
-      this.type === ChatMessageType.IMAGE ||
-      this.type === ChatMessageType.VIDEO ||
-      this.type === ChatMessageType.OTHER_FILE
-    ) {
-      this.content = await genSignedURL(this.content);
-    }
-    // if (this.type === ChatMessageType.OTHER_FILE) {
-    //   this.content = mentionTransform(this.content);
-    // }
-  }
+  // @AfterLoad()
+  // @AfterInsert()
+  // async changeToSignedURL?() {
+  //   if (
+  //     this.type === ChatMessageType.IMAGE ||
+  //     this.type === ChatMessageType.VIDEO ||
+  //     this.type === ChatMessageType.OTHER_FILE
+  //   ) {
+  //     this.content = await genSignedURL(this.content);
+  //   }
+  //   // if (this.type === ChatMessageType.OTHER_FILE) {
+  //   //   this.content = mentionTransform(this.content);
+  //   // }
+  // }
 
   @AfterInsert()
   async sendPushNotification() {
@@ -140,7 +142,7 @@ export class ChatMessage {
       } else if (this.type === ChatMessageType.STICKER) {
         content = 'スタンプを送信しました。';
       }
-      const mentionRegex = /@\[.*?\]\(([0-9]+)\)/g;
+      const mentionRegex = /{@}\[.*?\]\(([0-9]+)\)/g;
       const mentionedIds: number[] = [];
       let mentionArr = [];
       while ((mentionArr = mentionRegex.exec(content)) !== null) {
@@ -148,6 +150,7 @@ export class ChatMessage {
           mentionedIds.push(Number(mentionArr[1]));
         }
       }
+
       // console.log(mentionedIds);
       // const allUsers = await getRepository(User)
       //   .createQueryBuilder('user')

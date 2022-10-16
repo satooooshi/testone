@@ -122,7 +122,7 @@ const ExportCsv = () => {
               <Button
                 w="100%"
                 onClick={() => downloadUser(userDuration || {})}
-                colorScheme="blue"
+                colorScheme="brand"
                 rounded={50}
                 variant="outline">
                 {loadingUserCsv ? <Spinner /> : <Text>CSV出力</Text>}
@@ -193,7 +193,7 @@ const ExportCsv = () => {
               <Button
                 w="100%"
                 onClick={() => downloadEvent(eventDuration || {})}
-                colorScheme="blue"
+                colorScheme="brand"
                 rounded={50}
                 variant="outline">
                 {loadingUserCsv ? <Spinner /> : <Text>CSV出力</Text>}

@@ -135,7 +135,7 @@ const UpdatePassword = () => {
       <Button
         className={profileStyles.update_button_wrapper}
         width="25%"
-        colorScheme="blue"
+        colorScheme="brand"
         rounded="full"
         onClick={() => handleSubmit()}>
         <Text fontSize="14px">保存</Text>

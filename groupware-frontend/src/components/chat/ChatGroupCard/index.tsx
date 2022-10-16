@@ -9,10 +9,11 @@ import {
   Link,
   Badge,
 } from '@chakra-ui/react';
-import { darkFontColor } from 'src/utils/colors';
+import { brandColor, darkFontColor } from 'src/utils/colors';
 import { RiPushpin2Fill, RiPushpin2Line } from 'react-icons/ri';
 import { nameOfEmptyNameGroup } from 'src/utils/chat/nameOfEmptyNameGroup';
 import { useAuthenticate } from 'src/contexts/useAuthenticate';
+import { mentionTransform } from 'src/utils/mentionTransform';
 
 type ChatGroupCardProps = {
   chatGroup: ChatGroup;
@@ -58,7 +59,7 @@ const ChatGroupCard: React.FC<ChatGroupCardProps> = ({
       case ChatMessageType.CALL:
         return latestCall(chatMessage);
       default:
-        return chatMessage.content;
+        return mentionTransform(chatMessage.content);
     }
   };
 
@@ -76,7 +77,7 @@ const ChatGroupCard: React.FC<ChatGroupCardProps> = ({
       w={'100%'}
       h="100px"
       borderWidth={2}
-      borderColor={isSelected ? 'blue.300' : undefined}
+      borderColor={isSelected ? 'brand.300' : undefined}
       bg={isSelected ? 'gray.100' : 'white'}>
       <Box display="flex" flexDir="column">
         <Link
@@ -90,15 +91,15 @@ const ChatGroupCard: React.FC<ChatGroupCardProps> = ({
           mb={-4}
           ml={-1}
           borderWidth="2px"
-          borderColor="blue.200"
+          borderColor="gray.200"
           onClick={(e) => {
             e.stopPropagation();
             onPressPinButton();
           }}>
           {!!chatGroup.isPinned ? (
-            <RiPushpin2Fill size={22} color="blue" />
+            <RiPushpin2Fill size={22} color={brandColor} />
           ) : (
-            <RiPushpin2Line size={22} color="blue" />
+            <RiPushpin2Line size={22} color={brandColor} />
           )}
         </Link>
         <Avatar src={avatarImage} size="md" mr="8px" />
@@ -167,7 +168,7 @@ const ChatGroupCard: React.FC<ChatGroupCardProps> = ({
               dateTime: new Date(
                 chatGroup?.chatMessages?.[0]?.createdAt
                   ? chatGroup?.chatMessages?.[0]?.createdAt
-                  : chatGroup.updatedAt,
+                  : chatGroup.createdAt,
               ),
             })}
           </Text>

@@ -154,7 +154,7 @@ const RoomCard: React.FC<RoomCardProps> = ({
                   dateTime: new Date(
                     room?.chatMessages?.[0]?.createdAt
                       ? room?.chatMessages?.[0]?.createdAt
-                      : room.updatedAt,
+                      : room.createdAt,
                   ),
                 })}
               </Text>

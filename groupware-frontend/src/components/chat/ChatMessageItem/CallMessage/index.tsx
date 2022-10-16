@@ -1,11 +1,6 @@
-import UserAvatar from '@/components/common/UserAvatar';
-import { Box, Text, useMediaQuery } from '@chakra-ui/react';
+import { Box, Text } from '@chakra-ui/react';
 import React from 'react';
-import { ChatMessage, ChatMessageType } from 'src/types';
-import { darkFontColor } from 'src/utils/colors';
-import { userNameFactory } from 'src/utils/factory/userNameFactory';
-import { mentionTransform } from 'src/utils/mentionTransform';
-import Linkify from 'react-linkify';
+import { ChatMessage } from 'src/types';
 import { IoCall } from 'react-icons/io5';
 
 type CallMessageProps = {
@@ -17,7 +12,7 @@ const CallMessage: React.FC<CallMessageProps> = ({ message }) => {
     <Box
       w={150}
       h={50}
-      bg={message.isSender ? 'blue.500' : '#ececec'}
+      bg={message.isSender ? 'brand.500' : '#ececec'}
       p="8px"
       rounded="md"
       display="flex"
@@ -28,7 +23,7 @@ const CallMessage: React.FC<CallMessageProps> = ({ message }) => {
         h={8}
         rounded="full"
         display="flex"
-        bg={message.isSender ? 'blue.400' : 'gray.300'}
+        bg={message.isSender ? 'brand.400' : 'gray.300'}
         alignItems="center"
         justifyContent="center">
         <IoCall color="white" />
@@ -37,8 +32,8 @@ const CallMessage: React.FC<CallMessageProps> = ({ message }) => {
         <Text
           fontSize={15}
           color={message.isSender ? 'white' : 'black'}
-          bg={message.isSender ? 'blue.500' : '#ececec'}>
-          {mentionTransform(message.content)}
+          bg={message.isSender ? 'brand.500' : '#ececec'}>
+          message.content
         </Text>
 
         <Text mt={1} fontSize={11} color={message.isSender ? 'white' : 'black'}>

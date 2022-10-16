@@ -369,7 +369,7 @@ const QuestionDetail = () => {
               <Box display="flex" flexDir="row">
                 <Button
                   borderRadius={50}
-                  colorScheme="blue"
+                  colorScheme="brand"
                   size="sm"
                   onClick={() => {
                     checkErrors('answer');
@@ -460,7 +460,7 @@ const QuestionDetail = () => {
                         <WrappedDraftEditor
                           style={{
                             marginBottom: 10,
-                            width: isSmallerThan768 ? '100vw' : '70vw',
+                            width: '100%',
                           }}
                           editorRef={draftEditor}
                           placeholder={
@@ -482,18 +482,13 @@ const QuestionDetail = () => {
                           返信を送信
                         </Button>
                       ) : null}
-                      {answer.replies?.map((r) => (
-                        <Box
-                          bg="white"
-                          key={r.id}
-                          p="10px"
-                          borderRadius={10}
-                          mb={5}>
-                          {/* <div key={r.id} className={qaDetailStyles.reply}> */}
-                          <AnswerReply reply={r} />
-                          {/* </div> */}
-                        </Box>
-                      ))}
+                      <Box alignSelf="end" w="90%">
+                        {answer.replies?.map((r) => (
+                          <Box key={r.id} mb={5}>
+                            <AnswerReply reply={r} />
+                          </Box>
+                        ))}
+                      </Box>
                     </div>
                   ),
               )

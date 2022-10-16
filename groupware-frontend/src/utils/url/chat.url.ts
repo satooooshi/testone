@@ -16,6 +16,7 @@ export const saveChatGroupURL = `/${chatURL}/v2/room`;
 export const getRoomURL = `/${chatURL}/get-room`;
 export const savePinURL = `${saveChatGroupURL}/pin`;
 export const saveLastReadChatTimeURL = `/${chatURL}/save-last-read-chat-time`;
+export const sendNotifiForRefetchRoomURL = `/${chatURL}/send-notifi-for-refetch-room`;
 export const saveReactionURL = `/${chatURL}/v2/reaction`;
 export const deleteReactionURL = (reactionId: string) =>
   `/${chatURL}/v2/reaction/${reactionId}`;

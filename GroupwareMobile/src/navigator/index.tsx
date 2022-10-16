@@ -496,6 +496,8 @@ const Navigator = () => {
             body: remoteMessage.data?.message || remoteMessage.data?.body || '',
             android: {
               channelId: channelId,
+              smallIcon: 'ic_push_notification', // optional, defaults to 'ic_launcher'.
+              //color: '#6B7EFF',  if set, the logo will not be visible. if not set, the icon background will be app manifest's toned-down default_notification_color
               pressAction: {
                 id: 'action_id',
                 launchActivity: 'default',

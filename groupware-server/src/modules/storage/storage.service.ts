@@ -3,6 +3,7 @@ import { GetSignedUrlConfig, Storage } from '@google-cloud/storage';
 import { ConfigService } from '@nestjs/config';
 import { genStorageURL } from 'src/utils/storage/genStorageURL';
 import { genSignedURL } from 'src/utils/storage/genSignedURL';
+import { file } from 'jszip';
 import { APP_DIRNAME } from 'src/var';
 
 @Injectable()
@@ -16,8 +17,8 @@ export class StorageService {
     const signedURLs: string[] = [];
     for await (const u of urls) {
       const normalURL = genStorageURL(u);
-      const signedURL = await genSignedURL(normalURL);
-      signedURLs.push(signedURL);
+      // const signedURL = await genSignedURL(normalURL);
+      signedURLs.push(normalURL);
     }
     return signedURLs;
   }
@@ -87,6 +88,20 @@ export class StorageService {
       arr.push(downloadedFile[0]);
     }
     return arr;
+  }
+
+  public async deleteFile(url: string): Promise<void> {
+    const bucketName = this.configService.get('CLOUD_STORAGE_BUCKET');
+    const bucketURL = 'https://storage.googleapis.com/' + bucketName + '/';
+
+    let decodedURL = decodeURI(url);
+    decodedURL = decodedURL.split('?')[0];
+    const storageObjName = decodedURL.replace(bucketURL, '');
+
+    const deleteFileFromGCS = async () => {
+      await this.storage.bucket(bucketName).file(storageObjName).delete({});
+    };
+    deleteFileFromGCS().catch(console.error);
   }
 
   public async parseStorageURLToSignedURL(text: string): Promise<string> {

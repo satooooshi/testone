@@ -170,6 +170,8 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
   const [tagModal, setTagModal] = useState(false);
   const [userModal, setUserModal] = useState(false);
   const [willSubmit, setWillSubmit] = useState(false);
+  const [isLoadingTN, setIsloadingTN] = useState(false);
+  const [isLoadingRF, setIsloadingRF] = useState(false);
 
   useEffect(() => {
     if (enabled) {
@@ -197,6 +199,7 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
   const imgRef = useRef<HTMLImageElement | null>(null);
   const onEventThumbnailDrop = useCallback(
     (f: File[]) => {
+      setIsloadingTN(true);
       dispatchCrop({ type: 'setImageFile', value: f[0] });
     },
     [dispatchCrop],
@@ -217,6 +220,7 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
       },
       ref: img,
     });
+    setIsloadingTN(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -247,6 +251,7 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
     getInputProps: getRelatedFileInputProps,
   } = useDropzone({
     onDrop: (files: File[]) => {
+      setIsloadingRF(true);
       uploadFiles(files, {
         onSuccess: (urls: string[]) => {
           const newFiles: Partial<EventFile>[] = urls.map((u, i) => ({
@@ -257,6 +262,9 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
             ...e,
             files: [...(e.files || []), ...newFiles],
           }));
+        },
+        onSettled: () => {
+          setIsloadingRF(false);
         },
       });
     },
@@ -327,6 +335,8 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
     user?.role,
   );
 
+  const isCreatableOther = isCreatableEvent(EventType.OTHER, user?.role);
+
   useEffect(() => {
     const getInitialEventType = () => {
       if (isCreatableImpressiveUniversity) {
@@ -347,6 +357,9 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
       if (isCreatableSubmissionEtc) {
         return EventType.SUBMISSION_ETC;
       }
+      if (isCreatableOther) {
+        return EventType.OTHER;
+      }
       return undefined;
     };
     const initialEventType = getInitialEventType();
@@ -364,6 +377,7 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
     isCreatableImpressiveUniversity,
     isCreatableStudyMeeting,
     isCreatableSubmissionEtc,
+    isCreatableOther,
     setNewEvent,
   ]);
 
@@ -403,7 +417,7 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
         display="flex"
         flexDirection={isSmallerThan768 ? 'row' : 'column'}
         justifyContent="space-between"
-        borderBottomColor="blue.500"
+        borderBottomColor="brand.500"
         borderBottomWidth={1}
         pb="8px"
         alignItems="center"
@@ -420,11 +434,12 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
           justifyContent={isSmallerThan768 ? 'space-between' : 'flex-end'}
           w="100%">
           <Button
+            disabled={isLoadingTN || isLoadingRF}
             mr="40px"
             onClick={() => {
               checkErrors();
             }}
-            colorScheme="blue">
+            colorScheme="brand">
             {isLoading ? <Spinner /> : <Text>イベントを保存</Text>}
           </Button>
           <MdCancel
@@ -476,7 +491,7 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
                     formatStyle={'medium'}
                   />
                 ) : (
-                  <Text color={'blue.600'}>
+                  <Text color={'brand.600'}>
                     提出物イベントは終了日時の2時間前の日時に開始としてカレンダーに表示されます
                   </Text>
                 )}
@@ -665,17 +680,22 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
                 {isCreatableSubmissionEtc && (
                   <option value={EventType.SUBMISSION_ETC}>提出物等</option>
                 )}
+                {isCreatableOther && (
+                  <option value={EventType.OTHER}>その他</option>
+                )}
               </Select>
             </FormControl>
           </Box>
           <Text mb="15px">サムネイル</Text>
-          {((newEvent.imageURL && !selectThumbnailUrl) || croppedImageURL) && (
+
+          {((newEvent.imageURL && !selectThumbnailUrl) ||
+            selectThumbnailUrl) && (
             <Button
               mb="15px"
               onClick={() => {
                 onClickDeleteImage();
               }}
-              colorScheme="blue">
+              colorScheme="brand">
               既存画像を削除
             </Button>
           )}
@@ -695,6 +715,7 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
                 onChange={(newCrop) => onChange(newCrop)}
                 keepSelection={true}
                 onImageLoaded={onLoad}
+                onImageError={() => setIsloadingTN(false)}
                 imageStyle={{
                   minHeight: '100px',
                   maxHeight: '300px',
@@ -706,11 +727,17 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
                 {...getEventThumbnailRootProps({
                   className: createEventModalStyle.image_dropzone,
                 })}>
-                <input {...getEventThumbnailInputProps()} />
-                <Text>
-                  クリックかドラッグアンドドロップで
-                  {newEvent.imageURL ? '別のサムネイルに更新' : '投稿'}
-                </Text>
+                {isLoadingTN ? (
+                  <Spinner />
+                ) : (
+                  <>
+                    <input {...getEventThumbnailInputProps()} />
+                    <Text>
+                      クリックかドラッグアンドドロップで
+                      {newEvent.imageURL ? '別のサムネイルに更新' : '投稿'}
+                    </Text>
+                  </>
+                )}
               </Box>
             )}
           </Box>
@@ -720,8 +747,14 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
               {...getRelatedFileRootProps({
                 className: createEventModalStyle.image_dropzone,
               })}>
-              <input {...getRelatedFileInputProps()} />
-              <Text>クリックかドラッグアンドドロップで投稿</Text>
+              {isLoadingRF ? (
+                <Spinner />
+              ) : (
+                <>
+                  <input {...getRelatedFileInputProps()} />
+                  <Text>クリックかドラッグアンドドロップで投稿</Text>
+                </>
+              )}
             </div>
           </Box>
           {newEvent.files?.length ? (
@@ -729,7 +762,7 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
               {newEvent.files.map((f) => (
                 <Box
                   key={f.url}
-                  borderColor={'blue.500'}
+                  borderColor={'brand.500'}
                   rounded="md"
                   borderWidth={1}
                   display="flex"
@@ -740,7 +773,7 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
                   mb="8px"
                   px="8px">
                   <Text
-                    color="blue.600"
+                    color="brand.600"
                     alignSelf="center"
                     h="40px"
                     verticalAlign="middle"
@@ -798,7 +831,7 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
             {newEvent?.videos?.map((y) => (
               <Box
                 key={y.url}
-                borderColor={'blue.500'}
+                borderColor={'brand.500'}
                 borderWidth={1}
                 rounded="md"
                 display="flex"
@@ -809,7 +842,7 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
                 mb="8px"
                 px="8px">
                 <Text
-                  color="blue.600"
+                  color="brand.600"
                   alignSelf="center"
                   h="40px"
                   verticalAlign="middle"

@@ -100,7 +100,7 @@ const TagListBox: React.FC<TagListBoxProps> = ({
           <ModalFooter>
             <Button
               mx="auto"
-              colorScheme="blue"
+              colorScheme="brand"
               onClick={() => {
                 if (tagEditted) {
                   onClickSaveButton({ ...tagEditted, name: newTagName });
@@ -131,7 +131,7 @@ const TagListBox: React.FC<TagListBoxProps> = ({
             px="24px"
             size="sm"
             onClick={() => setModal(true)}
-            colorScheme="blue"
+            colorScheme="brand"
             variant="outline"
             rounded="full">
             <Box>

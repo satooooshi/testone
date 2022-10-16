@@ -166,12 +166,6 @@ export class ChatController {
     return token;
   }
 
-  @Get('group-list')
-  @UseGuards(JwtAuthenticationGuard)
-  async getChatGroup(@Req() req: RequestWithUser): Promise<ChatGroup[]> {
-    return await this.chatService.getChatGroup(req.user.id);
-  }
-
   // @Get('group-unread-chat-count')
   // @UseGuards(JwtAuthenticationGuard)
   // async getRoomsUnreadChatCount(
@@ -213,13 +207,13 @@ export class ChatController {
     return await this.chatService.getChatMessage(req.user.id, query);
   }
 
-  @Get('expired-url-messages/:id')
-  @UseGuards(JwtAuthenticationGuard)
-  async getExpiredUrlMessages(
-    @Param('id') roomId: number,
-  ): Promise<ChatMessage[]> {
-    return await this.chatService.getExpiredUrlMessages(roomId);
-  }
+  // @Get('expired-url-messages/:id')
+  // @UseGuards(JwtAuthenticationGuard)
+  // async getExpiredUrlMessages(
+  //   @Param('id') roomId: number,
+  // ): Promise<ChatMessage[]> {
+  //   return await this.chatService.getExpiredUrlMessages(roomId);
+  // }
 
   @Get('search-messages')
   @UseGuards(JwtAuthenticationGuard)
@@ -388,15 +382,34 @@ export class ChatController {
     return await this.chatService.saveLastReadChatTime(req.user, chatGroupId);
   }
 
+  @Post('send-notifi-for-refetch-room/:id')
+  @UseGuards(JwtAuthenticationGuard)
+  async sendNotifiForRefetchRoom(
+    @Req() req: RequestWithUser,
+    @Param('id') chatGroupId: number,
+  ) {
+    const { user } = req;
+    const silentNotification: CustomPushNotificationData = {
+      title: '',
+      body: '',
+      custom: {
+        silent: 'silent',
+        type: 'badge',
+        screen: '',
+        id: chatGroupId.toString(),
+      },
+    };
+    await sendPushNotifToSpecificUsers([user.id], silentNotification);
+  }
+
   @Post('leave-room')
   @UseGuards(JwtAuthenticationGuard)
   async leaveGroup(
     @Req() req: RequestWithUser,
     @Body() chatGroup: Partial<ChatGroup>,
   ) {
-    const { id } = req.user;
     const { id: chatGroupId } = chatGroup;
-    await this.chatService.leaveChatRoom(id, chatGroupId);
+    await this.chatService.leaveChatRoom(req.user, chatGroupId);
     const silentNotification: CustomPushNotificationData = {
       title: '',
       body: '',
