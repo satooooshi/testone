@@ -46,6 +46,7 @@ export enum WikiType {
   ALL_POSTAL = 'all-postal',
   BOARD = 'board',
   MAIL_MAGAZINE = 'mail_magazine',
+  INTERVIEW = 'interview',
 }
 
 export enum RuleCategory {

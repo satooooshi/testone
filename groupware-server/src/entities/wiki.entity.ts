@@ -30,6 +30,7 @@ export enum WikiType {
   //掲示板
   BOARD = 'board',
   MAIL_MAGAZINE = 'mail_magazine',
+  INTERVIEW = 'interview',
 }
 
 export enum RuleCategory {
