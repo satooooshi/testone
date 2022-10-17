@@ -94,6 +94,7 @@ const RenderWikiCardList: React.FC<RenderWikiCardListProps> = ({
 
   useEffect(() => {
     if (isFocused) {
+      console.log(boardCategory, ruleCategory);
       setRuleCategory(ruleCategory || RuleCategory.NON_RULE);
       setBoardCategory(boardCategory || BoardCategory.NON_BOARD);
       setSearchQuery(q => ({
@@ -206,9 +207,6 @@ const WikiCardList: React.FC<WikiCardListProps> = ({
   const [tag, setTag] = useState('');
 
   useEffect(() => {
-    console.log('change word ======================', word);
-  }, [word]);
-  useEffect(() => {
     if (routeParams?.tag) {
       setTag(routeParams?.tag);
     }
@@ -222,7 +220,7 @@ const WikiCardList: React.FC<WikiCardListProps> = ({
         onCloseModal={() => setVisibleSearchFormModal(false)}
         onSubmit={values => {
           setVisibleSearchFormModal(false);
-          setType(undefined);
+          // setType(undefined);
           setWord(values.word);
           const selectedTagIDs = values.selectedTags.map(t => t.id.toString());
           const tagQuery = selectedTagIDs.join('+');
@@ -230,7 +228,7 @@ const WikiCardList: React.FC<WikiCardListProps> = ({
         }}
         onClear={() => {
           setVisibleSearchFormModal(false);
-          setType(undefined);
+          // setType(undefined);
           setWord('');
           setTag('');
         }}
