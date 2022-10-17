@@ -1,5 +1,4 @@
 import React, { useMemo } from 'react';
-import userCardStyles from '@/styles/components/UserCard.module.scss';
 import { Tag, TagType, User } from 'src/types';
 import {
   Box,
@@ -13,7 +12,6 @@ import {
 import Link from 'next/link';
 import UserPointCounter from './UserPointCounter';
 import noImage from '@/public/no-image.jpg';
-import { tagColorFactory } from 'src/utils/factory/tagColorFactory';
 
 type TagCategoryProps = {
   label: string;
@@ -61,8 +59,19 @@ const UserCard: React.FC<UserCardProps> = ({ user, onClickTag, duration }) => {
   const TagCard: React.FC<TagCardProps> = ({ tagCategory }) => {
     return (
       <Flex alignItems="center" mb="4px">
-        <p className={userCardStyles.tags_label}>{tagCategory.label}:</p>
-        <div className={userCardStyles.tags_wrapper}>
+        <Text w="64px" fontSize="14px">
+          {tagCategory.label}:
+        </Text>
+        <Flex
+          alignItems="center"
+          w="100%"
+          overflow="scroll"
+          sx={{
+            '&::-webkit-scrollbar': {
+              display: 'none',
+            },
+            '-ms-overflow-style': 'none',
+          }}>
           {groupedTags[tagCategory.type].length ? (
             groupedTags[tagCategory.type].map((t) => (
               <Link passHref href={onClickTag(t)} key={t.id}>
@@ -85,7 +94,7 @@ const UserCard: React.FC<UserCardProps> = ({ user, onClickTag, duration }) => {
           ) : (
             <Text fontSize={13}>未設定</Text>
           )}
-        </div>
+        </Flex>
       </Flex>
     );
   };
