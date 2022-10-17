@@ -124,7 +124,6 @@ const UserList = () => {
         <div className={userListStyles.search_form_wrapper}>
           <SearchForm
             onClearTag={() => setSelectedTags([])}
-            onClear={() => setSelectedTags([])}
             onClickButton={(w) => queryRefresh({ page: '1', word: w })}
             tags={tags || []}
             selectedTags={selectedTags}

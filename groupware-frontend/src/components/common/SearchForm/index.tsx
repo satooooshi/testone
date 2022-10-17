@@ -96,7 +96,7 @@ const SearchInput: React.FC<SearchFormProps> = ({
 
   const handleOnComplete = () => {
     setTagModal(false);
-    onClickButton();
+    onClickButton(word);
   };
 
   return (

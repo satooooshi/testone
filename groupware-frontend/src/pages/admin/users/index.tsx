@@ -139,10 +139,7 @@ const UserAdmin: React.FC = () => {
       </Head>
       <div className={userAdminStyles.search_form_wrapper}>
         <SearchForm
-          value={searchWord || ''}
-          onChange={(e) => setSearchWord(e.currentTarget.value)}
           onClearTag={() => setSelectedTags([])}
-          onClear={() => setSelectedTags([])}
           onClickButton={(w) => queryRefresh({ page: '1', word: w })}
           tags={tags || []}
           selectedTags={selectedTags}
