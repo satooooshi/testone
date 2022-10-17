@@ -100,7 +100,7 @@ const UserCard: React.FC<UserCardProps> = ({ user, onClickTag, duration }) => {
   };
 
   return (
-    <Box bg="white" borderRadius="lg" p="16px">
+    <Box bg="white" borderRadius="lg" p="16px" maxW="720px">
       <Flex mb="8px">
         <Image
           src={user.avatarUrl}
