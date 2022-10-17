@@ -49,7 +49,6 @@ const WikiList: React.FC<WikiListProps> = ({navigation}) => {
 
   useEffect(() => {
     if (typePassedByRoute) {
-      console.log(typePassedByRoute);
       setType(typePassedByRoute);
     }
   }, [typePassedByRoute]);
