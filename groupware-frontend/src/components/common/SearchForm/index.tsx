@@ -91,6 +91,7 @@ const SearchInput: React.FC<SearchFormProps> = ({
   const handleModalResetButton = () => {
     onClear();
     setSearchedWord('');
+    setWord('');
     isSmallerThan768 && hideSearchModal();
   };
 
