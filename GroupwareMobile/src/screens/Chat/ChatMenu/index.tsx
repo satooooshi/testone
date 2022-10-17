@@ -127,7 +127,8 @@ const ChatMenu: React.FC = () => {
         }}
       /> */}
       {!isPersonal &&
-        (myProfile?.id && room?.owner[0]?.id === myProfile?.id ? (
+        ((myProfile?.id && room?.owner[0]?.id === myProfile?.id) ||
+        !room?.owner?.length ? (
           <ChatMenuRow
             name="ルームを編集"
             icon={<Icon name="setting" fontSize={20} mr={'lg'} color="black" />}
