@@ -17,7 +17,7 @@ import {useAPIGetGoodsForBoard} from '../../../hooks/api/wiki/useAPIGetGoodForBo
 
 type WikiCardProps = {
   wiki: Wiki;
-  goBackFromDetail: (yes: boolean) => void;
+  goBackFromDetail?: (yes: boolean) => void;
 };
 
 const WikiCard: React.FC<WikiCardProps> = ({wiki, goBackFromDetail}) => {
@@ -63,7 +63,7 @@ const WikiCard: React.FC<WikiCardProps> = ({wiki, goBackFromDetail}) => {
           params: {id: wiki.id},
           initial: false,
         });
-        goBackFromDetail(true);
+        goBackFromDetail && goBackFromDetail(true);
       }}>
       <Div
         flexDir="column"
